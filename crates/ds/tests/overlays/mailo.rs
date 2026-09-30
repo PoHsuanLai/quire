@@ -6,15 +6,12 @@
 use crate::cases::Case;
 use dioxus::prelude::*;
 use ds::{
-    Anchor, CommandPalette, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, Icon, Menu,
-    MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Point, Px, RowAction, RunTone,
-    TargetElement, TextLine, TextRun, use_hover_hub,
+    Anchor, CommandPalette, HoverKey, HoverKind, HoverTarget, Icon, Menu, MenuCursor, MenuEntry,
+    MenuKind, MenuRow, MenuTile, Point, Px, RowAction, RunTone, TargetElement, TextLine, TextRun,
 };
 use std::time::Duration;
 
 const NOW: Duration = Duration::ZERO;
-/// Past the 450 ms hover intent.
-const INTENT: Duration = Duration::from_millis(520);
 
 /// A remove button that does nothing.
 pub fn remove() -> RowAction {
@@ -94,12 +91,6 @@ pub const MAILO_CASES: &[Case] = &[
         make: || rsx! { HoverTarget { hover_key: HoverKey("thread:88".to_string()), kind: HoverKind::Thread, as_: TargetElement::Div, "Re: UIDL stability" } },
         wait: NOW,
     },
-    Case {
-        component: "hover_card",
-        state: "tip-open",
-        make: || rsx! { TimeTip {} },
-        wait: INTENT,
-    },
 ];
 
 /// Where the menus open.
@@ -108,27 +99,4 @@ fn at() -> Anchor {
         x: Px(20.0),
         y: Px(20.0),
     })
-}
-
-/// A row's time with its tip, open once the hub says so.
-#[component]
-fn TimeTip() -> Element {
-    let hub = use_hover_hub();
-    let key = HoverKey("time:88".to_string());
-    use_hook({
-        let key = key.clone();
-        move || {
-            hub.feed(HoverEvent::Over(
-                (key, HoverKind::Tip),
-                HoverKind::Tip.profile(),
-            ))
-        }
-    });
-    let open = hub.open().or(hub.leaving());
-    rsx! {
-        HoverTarget { hover_key: key, kind: HoverKind::Tip, "09:41" }
-        if let Some((open, _)) = open {
-            HoverCard { key: "{open.0}", kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }
-        }
-    }
 }

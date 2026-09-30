@@ -1,6 +1,7 @@
 //! The alert as markup: every state matches its golden under
 //! `tests/snapshots/alert/`, lints clean and uses only `ds-` classes the stylesheet styles; the
-//! markup says which button is the default (Primary) and how a destructive action reads.
+//! markup says which button is the default (Primary), how a destructive action reads and how the
+//! footer lies for one, two and three buttons.
 //!
 //! `DS_BLESS=1 cargo test -p ds --features lint --test alert_ssr` rewrites the goldens.
 
@@ -10,8 +11,8 @@ mod golden;
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertEmphasis, Appearance, Ds, Flow, Icon, IconSource, Inject, Material, RootExtent,
-    Shown, TextLine, Theme,
+    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Check, Ds, Flow, Icon, IconSource,
+    Inject, Material, RootExtent, Shown, Suppression, TextLine, Theme,
 };
 use ds_lint::{LintConfig, markup};
 
@@ -27,10 +28,17 @@ fn root(theme: Theme, body: Element) -> Element {
     }
 }
 
-fn bluetooth(emphasis: AlertEmphasis, flow: Flow, theme: Theme) -> Element {
+fn button(label: &str, role: AlertRole) -> AlertButton {
+    AlertButton::new(label, role, EventHandler::new(|()| {}))
+}
+
+fn bluetooth(action: AlertRole, flow: Flow, theme: Theme) -> Element {
+    let buttons = vec![
+        button("Turn Off", action),
+        button("Cancel", AlertRole::Cancel),
+    ];
     let alert = rsx! {
-        Alert { title: TITLE, message: Some(TextLine::from(MESSAGE)), action: "Turn Off", emphasis, flow,
-            onaction: |_| {}, oncancel: |_| {} }
+        Alert { title: TITLE, message: Some(TextLine::from(MESSAGE)), buttons, flow }
     };
     match flow {
         Flow::Floating => root(theme, alert),
@@ -49,8 +57,42 @@ fn erase() -> Element {
         Theme::Light,
         rsx! {
             Alert { title: "Erase this disk?", message: Some(TextLine::from("Everything on it will be lost.")),
-                action: "Erase", emphasis: AlertEmphasis::Destructive, icon: Some(IconSource::Glyph(Icon::Trash)),
-                onaction: |_| {}, oncancel: |_| {} }
+                buttons: vec![button("Erase", AlertRole::Destructive), button("Cancel", AlertRole::Cancel)],
+                style: AlertStyle::Critical, icon: Some(IconSource::Glyph(Icon::Trash)) }
+        },
+    )
+}
+
+fn notice() -> Element {
+    root(
+        Theme::Light,
+        rsx! {
+            Alert { title: "Bluetooth is off", buttons: vec![button("OK", AlertRole::Normal)] }
+        },
+    )
+}
+
+fn extras() -> Element {
+    root(
+        Theme::Light,
+        rsx! {
+            Alert { title: "Delete the message?", buttons: vec![button("Delete", AlertRole::Destructive), button("Cancel", AlertRole::Cancel)],
+                suppression: Some(Suppression { label: "Do not ask again".to_owned(), value: Check::Off, onchange: EventHandler::new(|_| {}) }),
+                help: Some(EventHandler::new(|()| {})) }
+        },
+    )
+}
+
+fn save() -> Element {
+    root(
+        Theme::Light,
+        rsx! {
+            Alert { title: "Save the changes?", style: AlertStyle::Warning,
+                buttons: vec![
+                    button("Save", AlertRole::Normal),
+                    button("Don’t Save", AlertRole::Destructive),
+                    button("Cancel", AlertRole::Cancel),
+                ] }
         },
     )
 }
@@ -59,8 +101,7 @@ fn hidden(flow: Flow) -> Element {
     root(
         Theme::Light,
         rsx! {
-            Alert { title: TITLE, action: "Turn Off", flow, shown: Some(Shown::Hidden),
-                onaction: |_| {}, oncancel: |_| {} }
+            Alert { title: TITLE, buttons: vec![button("Turn Off", AlertRole::Normal)], flow, shown: Some(Shown::Hidden) }
         },
     )
 }
@@ -69,18 +110,21 @@ type Specimen = (&'static str, fn() -> Element);
 
 const SPECIMENS: &[Specimen] = &[
     ("floating-light", || {
-        bluetooth(AlertEmphasis::Default, Flow::Floating, Theme::Light)
+        bluetooth(AlertRole::Normal, Flow::Floating, Theme::Light)
     }),
     ("floating-dark", || {
-        bluetooth(AlertEmphasis::Default, Flow::Floating, Theme::Dark)
+        bluetooth(AlertRole::Normal, Flow::Floating, Theme::Dark)
     }),
     ("inline-popover", || {
-        bluetooth(AlertEmphasis::Default, Flow::Inline, Theme::Light)
+        bluetooth(AlertRole::Normal, Flow::Inline, Theme::Light)
     }),
     ("destructive", || {
-        bluetooth(AlertEmphasis::Destructive, Flow::Floating, Theme::Light)
+        bluetooth(AlertRole::Destructive, Flow::Floating, Theme::Light)
     }),
     ("destructive-icon", erase),
+    ("one-button", notice),
+    ("three-buttons", save),
+    ("suppression-help", extras),
     ("hidden-floating", || hidden(Flow::Floating)),
     ("hidden-inline", || hidden(Flow::Inline)),
 ];
@@ -170,60 +214,89 @@ fn buttons(html: &str) -> Vec<(String, String, String)> {
         .collect()
 }
 
+/// `(label, answers, role)` as `buttons` reads them.
+fn b(label: &str, answers: &str, role: &str) -> (String, String, String) {
+    (label.to_owned(), answers.to_owned(), role.to_owned())
+}
+
 #[test]
-fn the_default_is_the_filled_button_on_the_right_unless_the_action_destroys() {
+fn the_default_is_the_filled_first_button_unless_it_destroys() {
     let plain = by_name("floating-light");
     assert!(plain.contains(TITLE) && plain.contains(MESSAGE), "{plain}");
     assert_eq!(
         buttons(&plain),
         [
-            (
-                "Cancel".to_owned(),
-                "escape".to_owned(),
-                "normal".to_owned()
-            ),
-            (
-                "Turn Off".to_owned(),
-                "return".to_owned(),
-                "normal".to_owned()
-            )
+            b("Turn Off", "return", "normal"),
+            b("Cancel", "escape", "normal")
         ]
     );
     for want in [
-        "data-placement=\"centre\"",
+        "data-attach=\"centre\"",
         "data-width=\"narrow\"",
-        "data-strength=\"modal\"",
+        "data-style=\"informational\"",
+        "data-layout=\"row\"",
     ] {
         assert!(plain.contains(want), "{want} in {plain}");
     }
+    assert!(
+        !plain.contains("ds-scrim"),
+        "an alert dims nothing: {plain}"
+    );
     let destructive = by_name("destructive");
     assert_eq!(
         buttons(&destructive),
         [
-            (
-                "Cancel".to_owned(),
-                "return".to_owned(),
-                "normal".to_owned()
-            ),
-            (
-                "Turn Off".to_owned(),
-                String::new(),
-                "destructive".to_owned()
-            )
+            b("Turn Off", "", "destructive"),
+            b("Cancel", "return", "normal")
         ]
     );
-    assert!(destructive.contains("data-emphasis=\"destructive\""));
-    assert!(destructive.contains("data-size=\"regular\""));
     let icon = by_name("destructive-icon");
     assert!(icon.contains("class=\"ds-alert-icon\""), "{icon}");
+    assert!(icon.contains("data-style=\"critical\""), "{icon}");
 }
 
 #[test]
-fn inline_it_stands_in_its_container_with_its_own_scrim() {
+fn the_footer_lies_by_the_number_of_buttons() {
+    let cases = [
+        ("one-button", "row", vec![b("OK", "return", "normal")]),
+        (
+            "three-buttons",
+            "stack",
+            vec![
+                b("Save", "return", "normal"),
+                b("Don’t Save", "", "destructive"),
+                b("Cancel", "escape", "normal"),
+            ],
+        ),
+    ];
+    for (name, layout, want) in cases {
+        let html = by_name(name);
+        assert!(
+            html.contains(&format!("data-layout=\"{layout}\"")),
+            "{name}: {html}"
+        );
+        assert_eq!(buttons(&html), want, "{name}");
+    }
+}
+
+#[test]
+fn a_suppression_checkbox_and_a_help_button_come_with_the_alert() {
+    let html = by_name("suppression-help");
+    for want in [
+        "class=\"ds-alert-suppression\"",
+        "class=\"ds-checkbox\"",
+        "class=\"ds-alert-help\"",
+        "data-variant=\"help\"",
+    ] {
+        assert!(html.contains(want), "{want} in {html}");
+    }
+}
+
+#[test]
+fn inline_it_stands_in_its_container_and_catches_the_pointer() {
     let inline = by_name("inline-popover");
     for want in [
         "class=\"ds-alert-stage\" data-flow=\"inline\"",
-        "class=\"ds-scrim\"",
         "role=\"alertdialog\"",
         "aria-label=\"Turn Bluetooth off?\"",
     ] {

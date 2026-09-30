@@ -59,14 +59,11 @@ pub enum Anim {
     PeekFullIn,
     /// `fade`: the scrim.
     Fade,
-    /// `fade` at `--t-quick`: the command palette's backdrop (section 5 row 7).
+    /// `fade` at `--t-quick`: the command palette's backdrop, and the fade in of a popover, a
+    /// tooltip and a hover card (design/30 section 1.3).
     PaletteFade,
-    /// `hc-in`: hover card, tooltip.
-    HcIn,
     /// `hc-in` at `--t-quick --e-out`: the link pill (section 5 row 26).
     LinkPillIn,
-    /// `hc-out`: hover card leaving.
-    HcOut,
     /// `page-in`: composer page, inline reply.
     PageIn,
     /// `shake-x`: the To row with no recipient.
@@ -98,9 +95,11 @@ pub enum Anim {
     /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
     /// design/05 section 10 gives shell chrome, once its hold ends.
     OsdOut,
-    /// `sheet-out`: a sheet leaving fades and settles 8 px back down, from a .98 scale's worth
-    /// of shrink, over `--t-move --e-exit` (design/05 section 10: exits accelerate), the way it
-    /// came in by `peek-in` reversed and quieter.
+    /// `sheet-in` at `--t-big --e-out`: a sheet slides down from the top edge (design/30
+    /// section 1.3: Slide(Top), the tween a sheet plays when it is not spring-driven).
+    SheetIn,
+    /// `sheet-out`: a sheet slides back up past the top edge over `--t-move --e-exit` (design/30
+    /// section 1.3: exits accelerate).
     SheetOut,
     /// `banner-out`: a notification banner slides out by its stack's entry edge (to the right
     /// by default, `--banner-dx`/`--banner-dy`) from wherever a swipe left it (`--swipe-dx`)
@@ -116,8 +115,9 @@ pub enum Anim {
     /// over `--t-move --e-out`: a large surface decelerates in, since a spring's overshoot would
     /// pull it off the edge it is anchored to.
     PanelIn,
-    /// `panel-out`: the edge panel slides back out past the edge over `--t-move --e-exit`,
-    /// holding its last frame until the host unmaps it at `settle(PanelOut)`.
+    /// `panel-out`: the edge panel, or a toast, slides back out past the edge over
+    /// `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
+    /// unmaps it at `settle(PanelOut)`.
     PanelOut,
     /// `rise` at `--t-big --e-spring`: the screenshot thumbnail arrives as a surface, at the
     /// toast's spring rather than a row's `--t-move --e-out` (design/20 section 1.13).
@@ -159,7 +159,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 45] = [
+    pub const ALL: [Anim; 44] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -173,9 +173,7 @@ impl Anim {
         Anim::PeekFullIn,
         Anim::Fade,
         Anim::PaletteFade,
-        Anim::HcIn,
         Anim::LinkPillIn,
-        Anim::HcOut,
         Anim::PageIn,
         Anim::ShakeX,
         Anim::Shake,
@@ -188,6 +186,7 @@ impl Anim {
         Anim::PaneOutR,
         Anim::OsdIn,
         Anim::OsdOut,
+        Anim::SheetIn,
         Anim::SheetOut,
         Anim::BannerOut,
         Anim::BannerIn,
@@ -223,9 +222,7 @@ impl Anim {
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",
             Anim::PaletteFade => "a-palette-fade",
-            Anim::HcIn => "a-hc-in",
             Anim::LinkPillIn => "a-link-pill-in",
-            Anim::HcOut => "a-hc-out",
             Anim::PageIn => "a-page-in",
             Anim::ShakeX => "a-shake-x",
             Anim::Shake => "a-shake",
@@ -238,6 +235,7 @@ impl Anim {
             Anim::PaneOutR => "a-pane-out-r",
             Anim::OsdIn => "a-osd-in",
             Anim::OsdOut => "a-osd-out",
+            Anim::SheetIn => "a-sheet-in",
             Anim::SheetOut => "a-sheet-out",
             Anim::BannerOut => "a-banner-out",
             Anim::BannerIn => "a-banner-in",

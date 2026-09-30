@@ -2,13 +2,13 @@
 //! element whose `animation-name` goes away before the animation ends, in paint and in the hit
 //! test, while `Harness::rect` (layout, no transform) reads the resting box. The raw case is
 //! sill's repro, ported; it passes only with Blitz patched to restyle such an element. The
-//! quire cases are the defence that holds on the unpatched pin: a `Panel` whose entrance timer
+//! quire cases are the defence that holds on the unpatched pin: a `SidePanel` whose entrance timer
 //! (wall clock) settles while the frame clock has barely started the slide, and a hide taken back
 //! halfway through `panel-out`; neither may leave the panel off its resting box.
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Material, MotionLevel, Panel, Point, Px, RootExtent, Shown, settle,
+    Anim, Appearance, Ds, Material, MotionLevel, Point, Px, RootExtent, Shown, SidePanel, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
@@ -76,7 +76,7 @@ static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
 fn Center() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover, extent: RootExtent::Viewport,
-            Panel { label: "Notification Center", shown: SHOWN(), width: Px(384.0),
+            SidePanel { label: "Notification Center", shown: SHOWN(), width: Px(384.0),
                 p { "Nothing new." }
             }
         }
@@ -90,12 +90,12 @@ const PANEL_VIEW: Viewport = Viewport {
 };
 
 fn presence(h: &Harness) -> Option<String> {
-    h.attr(".ds-panel", "data-presence")
+    h.attr(".ds-side-panel", "data-presence")
 }
 
 /// A point 20 px inside the panel's resting box (layout ignores transforms), at mid-height.
 fn inside_resting_panel(h: &Harness) -> Point {
-    let rest = h.rect(".ds-panel").expect("the panel is laid out");
+    let rest = h.rect(".ds-side-panel").expect("the panel is laid out");
     at(
         rest.origin.x.0 + 20.0,
         rest.origin.y.0 + rest.size.height.0 / 2.0,
@@ -128,14 +128,14 @@ fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
     assert!(!h.is_animating());
     let point = inside_resting_panel(&h);
     assert!(
-        h.hits(point, ".ds-panel"),
+        h.hits(point, ".ds-side-panel"),
         "the panel takes a press where it rests"
     );
 }
 
-/// Shown again halfway through its slide out: since H1 (design/05 section 14) the slide out is
-/// a spring, so the panel turns back from where it is (entering), comes to rest in place, and
-/// nothing is left of the exit.
+/// Shown again halfway through its slide out: the hide is taken back at once (the panel is
+/// present, playing `hold`, which moves nothing), comes to rest in place, and nothing is left of
+/// the exit.
 #[test]
 fn a_hide_taken_back_midway_leaves_the_panel_at_rest() {
     let mut h = Harness::new(Center, PANEL_VIEW);
@@ -147,15 +147,14 @@ fn a_hide_taken_back_midway_leaves_the_panel_at_rest() {
     h.advance(ms(1));
     assert_eq!(
         presence(&h).as_deref(),
-        Some("entering"),
-        "taken back at once: it turns round from where it is"
+        Some("present"),
+        "taken back at once: it never left"
     );
-    assert_eq!(h.attr(".ds-panel", "data-drive").as_deref(), Some("spring"));
-    settle_until(&mut h, |h| presence(h).as_deref() == Some("present"));
+    h.advance(ms(600));
     assert!(!h.is_animating());
     let point = inside_resting_panel(&h);
     assert!(
-        h.hits(point, ".ds-panel"),
+        h.hits(point, ".ds-side-panel"),
         "the panel takes a press where it rests"
     );
 }

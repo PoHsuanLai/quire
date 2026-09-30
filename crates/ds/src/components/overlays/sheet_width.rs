@@ -10,6 +10,8 @@ pub enum SheetWidth {
     /// `min(340px, 88%)`: an alert or a password prompt (`PolkitPrompt`). Written
     /// `data-width="narrow"`.
     Narrow,
+    /// `min(1040px, 92%)`: a gallery of cards (Edit Widgets). Written `data-width="wide"`.
+    Wide,
 }
 
 impl SheetWidth {
@@ -19,6 +21,7 @@ impl SheetWidth {
         match self {
             SheetWidth::Regular => None,
             SheetWidth::Narrow => Some("narrow"),
+            SheetWidth::Wide => Some("wide"),
         }
     }
 }

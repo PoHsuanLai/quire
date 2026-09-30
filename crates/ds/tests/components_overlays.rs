@@ -18,8 +18,6 @@ mod mailo;
 mod mailo4;
 #[path = "overlays/mailo5.rs"]
 mod mailo5;
-#[path = "overlays/mailo6.rs"]
-mod mailo6;
 
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
@@ -129,7 +127,6 @@ fn every_overlay_matches_its_golden() {
         .chain(mailo::MAILO_CASES)
         .chain(mailo4::MAILO4_CASES)
         .chain(mailo5::MAILO5_CASES)
-        .chain(mailo6::MAILO6_CASES)
         .filter_map(|case| {
             let dom = built(case.make, None, case.wait);
             golden::check(&golden_name(case), &inside_root(&dom)).err()
@@ -251,11 +248,11 @@ fn the_root_renders_the_toast_host_after_the_overlay_host() {
     let child = html.find("<p>inside</p>").expect("the children");
     let toast = html.find("class=\"ds-toast\"").expect("the toast host");
     assert!(child < toast, "{html}");
-    assert!(html.contains("data-shown=\"shown\""), "{html}");
+    assert!(html.contains("data-presence=\"entering\""), "{html}");
 }
 
 #[test]
-fn a_toast_mounts_below_the_edge_and_is_dropped_after_it_sinks() {
+fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     #[component]
     fn Pushed() -> Element {
         let toasts = ds::use_toasts();
@@ -265,22 +262,24 @@ fn a_toast_mounts_below_the_edge_and_is_dropped_after_it_sinks() {
     fn pushed() -> Element {
         rsx! { Pushed {} }
     }
-    // Its first frame is below the edge, so the spring rises from there.
+    // It arrives sliding in from the right (`panel-in`, --t-move), and is present once that has
+    // settled.
     let mut dom = built(pushed, None, Duration::ZERO);
     run_for(&mut dom, Duration::from_millis(5));
     dom.render_immediate(&mut NoOpMutations);
     let first = inside_root(&dom);
-    assert!(first.contains("data-shown=\"hidden\""), "{first}");
-    run_for(&mut dom, Duration::from_millis(80));
+    assert!(first.contains("data-presence=\"entering\""), "{first}");
+    run_for(&mut dom, Duration::from_millis(400));
     let up = inside_root(&dom);
-    assert!(up.contains("data-shown=\"shown\""), "{up}");
-    // The hub hides it after its 5000 ms hold (ToastHold): it sinks, still drawn below the
-    // edge, then is gone once `--t-big` and a frame have passed (420 + 34 ms at Standard).
+    assert!(up.contains("data-presence=\"present\""), "{up}");
+    // The hub hides it after its 5000 ms hold (ToastHold): it slides out, still drawn, then is
+    // gone once `--t-quick` and a frame have passed (150 + 34 ms at Standard).
     // (The hold, not `hide()`: `ToastHub::stop_hold` writes the hold signal while its own
     // `if let` still borrows it, which panics.)
-    run_for(&mut dom, Duration::from_millis(5000));
+    // The hold runs from the push: 5000 ms in, it has been leaving for a moment only.
+    run_for(&mut dom, Duration::from_millis(4650));
     let sinking = inside_root(&dom);
-    assert!(sinking.contains("data-shown=\"hidden\""), "{sinking}");
+    assert!(sinking.contains("data-presence=\"leaving\""), "{sinking}");
     run_for(&mut dom, Duration::from_millis(520));
     let gone = inside_root(&dom);
     assert!(!gone.contains("ds-toast"), "{gone}");

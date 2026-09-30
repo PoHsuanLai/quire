@@ -9,13 +9,13 @@ use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, Check,
     Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, LinkPill,
     LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut, ShortcutKey,
-    TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub, use_toast_hub,
+    TargetElement, Tooltip, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
 use ds::{KeyEquivalent, KeyStyle};
 
 /// The hover targets, one per card kind.
-const TARGETS: [(HoverKind, &str, &str); 5] = [
+const TARGETS: [(HoverKind, &str, &str); 4] = [
     (
         HoverKind::Thread,
         "thread:88",
@@ -28,13 +28,28 @@ const TARGETS: [(HoverKind, &str, &str); 5] = [
         "Work account (account card)",
     ),
     (HoverKind::Side, "side:2", "Pinned: Mei Chen (side card)"),
-    (HoverKind::Tip, "time:88", "09:41 (time tip)"),
 ];
+
+/// The kind of card `key`'s target opens: the target table's, or a pinned person's side card.
+/// A tooltip's key is not in either, and draws its own surface.
+fn card_kind(key: &HoverKey) -> Option<HoverKind> {
+    let id = key.0.as_str();
+    TARGETS
+        .iter()
+        .find(|(_, target, _)| *target == id)
+        .map(|(kind, _, _)| *kind)
+        .or_else(|| {
+            PINNED
+                .iter()
+                .any(|(pinned, _)| *pinned == id)
+                .then_some(HoverKind::Side)
+        })
+}
 
 /// Pinned people drawn as list items that are hover targets themselves.
 const PINNED: [(&str, &str); 2] = [("side:4", "Sam Lindqvist"), ("side:5", "Priya Raman")];
 
-/// Hover targets for every card kind, and both tooltip kinds.
+/// Hover targets for every card kind, and the tooltip.
 #[component]
 pub fn Cards() -> Element {
     let hub = use_hover_hub();
@@ -46,7 +61,7 @@ pub fn Cards() -> Element {
     rsx! {
         Section {
             title: "Hover cards and tooltips",
-            note: "Rest the pointer on a target: 450 ms to open, 150 ms to close, then warm for 400 ms so the next opens at once. The time tip is HoverKind::Tip; the pinned people below are li targets (TargetElement::Li).",
+            note: "Rest the pointer on a target: 500 ms to open a card, 150 ms to close, then warm for 400 ms so the next opens at once; a tooltip waits 1 s cold. The pinned people below are li targets (TargetElement::Li).",
             div { class: "g-row",
                 for (kind , key , text) in TARGETS {
                     HoverTarget { hover_key: HoverKey(key.to_string()), kind,
@@ -62,16 +77,14 @@ pub fn Cards() -> Element {
                 }
             }
             div { class: "g-row",
-                Tooltip { kind: TooltipKind::Fly, text: "Archive → out of Inbox",
-                    Button { size: ControlSize::Mini, label: "Fly tooltip", onclick: |_| {} }
+                Tooltip { text: "Archive → out of Inbox",
+                    Button { size: ControlSize::Mini, label: "Tooltip", onclick: |_| {} }
                 }
-                Tooltip { kind: TooltipKind::Card, text: "Snooze", sub: Some("Until tomorrow 08:00".to_string()),
-                    Button { size: ControlSize::Mini, label: "Card tooltip", onclick: |_| {} }
+                Tooltip { text: "Until tomorrow 08:00",
+                    Button { size: ControlSize::Mini, label: "Another tooltip", onclick: |_| {} }
                 }
             }
-            if let Some((key, HoverKind::Tip)) = open.clone() {
-                HoverCard { key: "{key.0}", kind: HoverKind::Tip, "Wed 23 Sep 2026, 09:41" }
-            } else if let Some((key, kind)) = open {
+            if let Some((key, kind)) = open.and_then(|(key, _)| card_kind(&key).map(|kind| (key, kind))) {
                 HoverCard { key: "{key.0}", kind,
                     div { class: "ds-hovercard-person",
                         Avatar { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Ink }
@@ -174,7 +187,7 @@ pub fn Pills(showcase: Showcase) -> Element {
     let toasts = use_toast_hub();
     let mut next = use_signal(|| 10u64);
     rsx! {
-        Section { title: "Toast", note: "The undo toast springs up from the card's bottom edge; drag its tab right past 46 px, or tap it, to undo.",
+        Section { title: "Toast", note: "The toast slides in from the right edge, holds for 5 s (the pointer over it pauses the hold) and slides out; swipe it to the right to dismiss it, or press Undo.",
             div { class: "g-row",
                 Button {
                     label: "Push a toast with undo",

@@ -4,11 +4,10 @@
 //! anchor, and joins the layer stack where it takes Escape. Some callers want the same rows or
 //! the same card inside a container of their own: mailo's sender card lists its actions as a
 //! menu inside the card, and a test with no layout asserts a card's content where it put it.
-//! One type serves both components, since the choice is the same fact about either. The scrim
-//! took it too: a reader peeked inside a pane dims the pane beneath it with an
-//! inline scrim, which the overlay's scrim layer would have drawn above the reader.
+//! One type serves every component that has the choice, since it is the same fact about each: a
+//! menu, a hover card, an alert.
 
-/// Where a menu, a hover card or a scrim is drawn.
+/// Where a menu, a hover card or an alert is drawn.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum Flow {
     /// In the overlay host, placed against its anchor (the default).

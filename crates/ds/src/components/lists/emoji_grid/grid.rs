@@ -7,7 +7,7 @@
 //! is its accessible label and its Fly tooltip, never a caption under the cell.
 
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
-use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
+use crate::components::overlays::tooltip::Tooltip;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
@@ -81,7 +81,7 @@ pub(crate) fn draw_cells<T>(
                         mounted.call((index, event));
                     }
                 },
-                Tooltip { kind: TooltipKind::Fly, text: cell.name.clone(),
+                Tooltip { text: cell.name.clone(),
                     span { class: "ds-emoji-glyph", "aria-hidden": "true", "{cell.glyph}" }
                 }
             }

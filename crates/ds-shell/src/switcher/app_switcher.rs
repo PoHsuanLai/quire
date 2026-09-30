@@ -8,12 +8,13 @@ use crate::switcher::switcher_fit::{SwitcherMetrics, fit};
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
-use ds::components::overlays::tooltip::{Tooltip, TooltipKind};
+use ds::components::overlays::tooltip::{Hint, HintSide};
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
 use ds_core::vocab::Shown;
 use ds_motion::anim::Anim;
 use ds_motion::detail::touch::Touch;
+use ds_motion::hover_intent::HoverProfile;
 use ds_motion::pulse_key::PulseKey;
 use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
@@ -121,7 +122,7 @@ pub fn AppSwitcher(
     }
 }
 
-/// One tile: its icon, and its name as a Fly under it, up while it is selected.
+/// One tile: its icon, and its name as a label above it, up while it is selected.
 fn tile(
     app: SwitcherApp,
     selection: Selection,
@@ -159,7 +160,7 @@ fn tile(
             },
             onpointerenter: move |_| onhover.call(hovered.clone()),
             onclick: move |_| onactivate.call(activated.clone()),
-            Tooltip { kind: TooltipKind::Fly, text: app.name, shown,
+            Hint { text: app.name, shown, profile: HoverProfile::Label, side: HintSide::Above, root: "ds-tooltip",
                 span { class: "ds-switcher-icon",
                     IconView { source: app.icon, size, plate: app.plate }
                 }

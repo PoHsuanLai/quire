@@ -25,29 +25,25 @@ html,body{margin:0;padding:0;background:transparent}
 /* Highlight is the element's own fill (menu rows), never a ring. */
 .ds[*|data-modality=keyboard] [*|data-focus=highlight]:focus{outline:none}
 /* == tokens == */
-.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#007aff;--accent-ink:#ffffff;--accent-soft:rgba(0,122,255,.18);--accent-text:#0058bd;--accent-text-material:#004394;--seal:#007aff;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(0,88,189,.7);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
-.ds[*|data-theme=dark]{--paper:#1e1e1e;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--ink:#e8e8e8;--ink-soft:#a3a3a3;--line:#444444;--line-soft:#383838;--accent:#0a84ff;--accent-soft:rgba(10,132,255,.2);--accent-text:#7bb4fe;--accent-text-material:#cae0fe;--seal:#0a84ff;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#3f3930;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(123,180,254,.6);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--orb-bg:#1b1f29;--orb-c1:#df6aa6;--orb-c2:#04bbc3;--orb-c3:#8d92f9;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
+.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
+.ds[*|data-theme=dark]{--paper:#1e1e1e;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--ink:#e8e8e8;--ink-soft:#a3a3a3;--line:#444444;--line-soft:#383838;--accent:#8ebaf7;--accent-soft:rgba(142,186,247,.2);--accent-text:#94c0fe;--accent-text-material:#d5e6fe;--seal:#8ebaf7;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#3f3930;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(148,192,254,.55);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--orb-bg:#1b1f29;--orb-c1:#df6aa6;--orb-c2:#04bbc3;--orb-c3:#8d92f9;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-typeface=editorial]{--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.015em;--tracking-lock-clock:-.035em;--tracking-lock-date:.01em;--tracking-caps:.14em;--tracking-caps-narrow:.12em;--fw-caps:400;--fs-caps:var(--fs-eyebrow);--tracking-mono:-.02em;--fs-mono:.78em;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-widget-hero:47px;--fs-lock-clock:140px;}
 .ds[*|data-motion=reduced]{--t-move:150ms;--t-big:150ms;--t-shake:150ms;--t-awake:150ms;--t-idle-dim:150ms;}
 /* == accents == */
-.ds{--swatch-blue:#007aff;--swatch-purple:#af52de;--swatch-pink:#ff2d55;--swatch-red:#ff3b30;--swatch-orange:#ff9500;--swatch-yellow:#ffcc00;--swatch-green:#34c759;--swatch-graphite:#8e8e93;}
-.ds[*|data-theme=dark]{--swatch-blue:#0a84ff;--swatch-purple:#bf5af2;--swatch-pink:#ff375f;--swatch-red:#ff453a;--swatch-orange:#ff9f0a;--swatch-yellow:#ffd60a;--swatch-green:#30d158;--swatch-graphite:#98989d;}
-.ds[*|data-accent=blue]{--accent:#007aff;--accent-ink:#ffffff;--accent-soft:rgba(0,122,255,.18);--accent-text:#0058bd;--accent-text-material:#004394;--accent-ring:rgba(0,88,189,.7);--seal:#007aff;}
-.ds[*|data-accent=purple]{--accent:#af52de;--accent-ink:#ffffff;--accent-soft:rgba(175,82,222,.18);--accent-text:#8b29b7;--accent-text-material:#7603a0;--accent-ring:rgba(139,41,183,.65);--seal:#af52de;}
-.ds[*|data-accent=pink]{--accent:#ff2d55;--accent-ink:#ffffff;--accent-soft:rgba(255,45,85,.18);--accent-text:#b50033;--accent-text-material:#8e0026;--accent-ring:rgba(181,0,51,.6);--seal:#ff2d55;}
-.ds[*|data-accent=red]{--accent:#ff3b30;--accent-ink:#ffffff;--accent-soft:rgba(255,59,48,.18);--accent-text:#b70106;--accent-text-material:#950003;--accent-ring:rgba(183,1,6,.6);--seal:#ff3b30;}
-.ds[*|data-accent=orange]{--accent:#ff9500;--accent-ink:#25170b;--accent-soft:rgba(255,149,0,.21);--accent-text:#905203;--accent-text-material:#754100;--accent-ring:rgba(144,82,3,.75);--seal:#ff9500;}
-.ds[*|data-accent=yellow]{--accent:#ffcc00;--accent-ink:#201a09;--accent-soft:rgba(255,204,0,.49);--accent-text:#765d04;--accent-text-material:#655002;--accent-ring:rgba(118,93,4,.75);--seal:#ffcc00;}
-.ds[*|data-accent=green]{--accent:#34c759;--accent-ink:#111e12;--accent-soft:rgba(52,199,89,.21);--accent-text:#006e27;--accent-text-material:#005b1f;--accent-ring:rgba(0,110,39,.7);--seal:#34c759;}
-.ds[*|data-accent=graphite]{--accent:#8e8e93;--accent-ink:#ffffff;--accent-soft:rgba(142,142,147,.18);--accent-text:#606064;--accent-text-material:#4a4a4e;--accent-ring:rgba(96,96,100,.75);--seal:#8e8e93;}
-.ds[*|data-theme=dark][*|data-accent=blue]{--accent:#0a84ff;--accent-ink:#ffffff;--accent-soft:rgba(10,132,255,.2);--accent-text:#7bb4fe;--accent-text-material:#cae0fe;--accent-ring:rgba(123,180,254,.6);--seal:#0a84ff;}
-.ds[*|data-theme=dark][*|data-accent=purple]{--accent:#bf5af2;--accent-ink:#ffffff;--accent-soft:rgba(191,90,242,.2);--accent-text:#d793fe;--accent-text-material:#efd7fe;--accent-ring:rgba(215,147,254,.6);--seal:#bf5af2;}
-.ds[*|data-theme=dark][*|data-accent=pink]{--accent:#ff375f;--accent-ink:#ffffff;--accent-soft:rgba(255,55,95,.2);--accent-text:#ff8892;--accent-text-material:#ffd1d2;--accent-ring:rgba(255,136,146,.65);--seal:#ff375f;}
-.ds[*|data-theme=dark][*|data-accent=red]{--accent:#ff453a;--accent-ink:#ffffff;--accent-soft:rgba(255,69,58,.2);--accent-text:#fe8b7d;--accent-text-material:#ffd2cb;--accent-ring:rgba(254,139,125,.65);--seal:#ff453a;}
-.ds[*|data-theme=dark][*|data-accent=orange]{--accent:#ff9f0a;--accent-ink:#24180b;--accent-soft:rgba(255,159,10,.2);--accent-text:#ffa83c;--accent-text-material:#fedebe;--accent-ring:rgba(255,168,60,.55);--seal:#ff9f0a;}
-.ds[*|data-theme=dark][*|data-accent=yellow]{--accent:#ffd60a;--accent-ink:#1f1a09;--accent-soft:rgba(255,214,10,.2);--accent-text:#ebc400;--accent-text-material:#ffe47f;--accent-ring:rgba(235,196,0,.5);--seal:#ffd60a;}
-.ds[*|data-theme=dark][*|data-accent=green]{--accent:#30d158;--accent-ink:#111e12;--accent-soft:rgba(48,209,88,.2);--accent-text:#37d65d;--accent-text-material:#7dff91;--accent-ring:rgba(55,214,93,.55);--seal:#30d158;}
-.ds[*|data-theme=dark][*|data-accent=graphite]{--accent:#98989d;--accent-ink:#191828;--accent-soft:rgba(152,152,157,.2);--accent-text:#b4b4b9;--accent-text-material:#eaeaf0;--accent-ring:rgba(180,180,185,.6);--seal:#98989d;}
+.ds{--swatch-postmark:#94c0fe;--swatch-red:#f8a59a;--swatch-amber:#e3b572;--swatch-green:#92d098;--swatch-blue:#69cee6;--swatch-violet:#c1b1f8;}
+.ds[*|data-theme=dark]{--swatch-postmark:#8ebaf7;--swatch-red:#f19f94;--swatch-amber:#dcaf6c;--swatch-green:#8cc992;--swatch-blue:#62c8df;--swatch-violet:#bbabf2;}
+.ds[*|data-accent=postmark]{--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--accent-ring:rgba(57,97,152,.75);--seal:#94c0fe;}
+.ds[*|data-accent=red]{--accent:#f8a59a;--accent-ink:#271513;--accent-soft:rgba(248,165,154,.28);--accent-text:#944b42;--accent-text-material:#813a32;--accent-ring:rgba(148,75,66,.7);--seal:#f8a59a;}
+.ds[*|data-accent=amber]{--accent:#e3b572;--accent-ink:#23190a;--accent-soft:rgba(227,181,114,.31);--accent-text:#805708;--accent-text-material:#6c4801;--accent-ring:rgba(128,87,8,.7);--seal:#e3b572;}
+.ds[*|data-accent=green]{--accent:#92d098;--accent-ink:#111e12;--accent-soft:rgba(146,208,152,.34);--accent-text:#326c3b;--accent-text-material:#1f5b2a;--accent-ring:rgba(50,108,59,.75);--seal:#92d098;}
+.ds[*|data-accent=blue]{--accent:#69cee6;--accent-ink:#071e23;--accent-soft:rgba(105,206,230,.32);--accent-text:#03697b;--accent-text-material:#015766;--accent-ring:rgba(3,105,123,.7);--seal:#69cee6;}
+.ds[*|data-accent=violet]{--accent:#c1b1f8;--accent-ink:#1b1827;--accent-soft:rgba(193,177,248,.3);--accent-text:#675796;--accent-text-material:#564684;--accent-ring:rgba(103,87,150,.75);--seal:#c1b1f8;}
+.ds[*|data-theme=dark][*|data-accent=postmark]{--accent:#8ebaf7;--accent-ink:#111b28;--accent-soft:rgba(142,186,247,.2);--accent-text:#94c0fe;--accent-text-material:#d5e6fe;--accent-ring:rgba(148,192,254,.55);--seal:#8ebaf7;}
+.ds[*|data-theme=dark][*|data-accent=red]{--accent:#f19f94;--accent-ink:#271513;--accent-soft:rgba(241,159,148,.2);--accent-text:#fba89d;--accent-text-material:#fee0db;--accent-ring:rgba(251,168,157,.55);--seal:#f19f94;}
+.ds[*|data-theme=dark][*|data-accent=amber]{--accent:#dcaf6c;--accent-ink:#23190a;--accent-soft:rgba(220,175,108,.2);--accent-text:#e3b572;--accent-text-material:#ffe3bd;--accent-ring:rgba(227,181,114,.55);--seal:#dcaf6c;}
+.ds[*|data-theme=dark][*|data-accent=green]{--accent:#8cc992;--accent-ink:#111e12;--accent-soft:rgba(140,201,146,.2);--accent-text:#8fcc95;--accent-text-material:#b8f7be;--accent-ring:rgba(143,204,149,.55);--seal:#8cc992;}
+.ds[*|data-theme=dark][*|data-accent=blue]{--accent:#62c8df;--accent-ink:#071e23;--accent-soft:rgba(98,200,223,.2);--accent-text:#65cbe3;--accent-text-material:#b6f0ff;--accent-ring:rgba(101,203,227,.55);--seal:#62c8df;}
+.ds[*|data-theme=dark][*|data-accent=violet]{--accent:#bbabf2;--accent-ink:#1b1827;--accent-soft:rgba(187,171,242,.2);--accent-text:#c4b5fc;--accent-text-material:#e9e4fe;--accent-ring:rgba(196,181,252,.55);--seal:#bbabf2;}
 /* == materials == */
 .ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;--m-highlight:none;--m-hairline:none;--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:none;border-radius:var(--m-radius);box-shadow:var(--m-box);}
 .ds[*|data-material=bar]{--m-tint:color-mix(in srgb,rgba(252,253,249,calc(.7*var(--m-tint-alpha,.8)/.8)) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8)));--m-tint-solid:color-mix(in srgb,rgba(252,253,249,.94) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,.94));--m-edge:inset 0 calc(-1 * var(--hairline)) 0 rgba(0,0,0,.08);--m-shadow:none;--m-radius:0;--m-box:var(--m-hairline),var(--m-edge);--m-frame-alpha:calc(.7*var(--m-tint-alpha,.8)/.8);--m-highlight:none;--m-hairline:0 var(--hairline) 0 rgba(0,0,0,var(--m-hairline-light,.14));--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:var(--m-edge);border-radius:var(--m-radius);box-shadow:var(--m-box);}
@@ -73,8 +69,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-material][*|data-frame=tinted] > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}
 .ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}
-.ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}
-.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-panel,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-shot-plate{background:var(--m-tint);}
+.ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-side-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}
+.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-popover,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-side-panel,.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent][*|data-blur=on] .ds-shot-plate{background:var(--m-tint);}
 .ds-osd > .ds-frame::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:var(--m-inner);}
 .ds[*|data-blur=off] .ds-osd > .ds-frame{opacity:.94;}
 .ds{--m-level-fill:rgba(253,253,251,.97);--m-level-well:rgba(0,0,0,.18);--m-level-shade:inset 0 1px 2px rgba(0,0,0,.14);--m-level-glyph:rgba(0,0,0,.62);--m-level-glyph-fill:rgba(0,0,0,.72);--m-level-knob:0 0 0 var(--hairline) rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.22);}
@@ -128,11 +124,9 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.3.3 fade */
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
-/* 4.3.8 hc-in */
+/* 4.3.8 hc-in: the link pill's entrance (a popover, tooltip and hover card fade instead) */
 @keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 
-/* 4.3.9 hc-out */
-@keyframes hc-out{ to{ opacity:0; transform:translateY(2px); } }
 
 /* 4.3.11 page-in */
 @keyframes page-in{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
@@ -189,10 +183,12 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
-/* sheet-out (quire's): a sheet's exit, `peek-in` reversed and quieter: it fades and
-   settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
-   accelerate), holding its transparent last frame until the host unmaps the surface. */
-@keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+/* sheet-in and sheet-out (quire's, design/30 section 1.3): a sheet slides down from past the top
+   edge at `--t-big --e-out` and back up at `--t-move --e-exit` (exits accelerate; a bottom sheet
+   rises from below instead: `--sheet-dy`), holding its
+   last frame until the host unmaps the surface. */
+@keyframes sheet-in{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
+@keyframes sheet-out{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
 
 /* widget-out (quire's): a widget's card leaving as the person removes it: it shrinks
    to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
@@ -214,9 +210,10 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
-   back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
+   back out at `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
+   unmaps it. A toast slides the same way. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
-@keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes panel-out{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
 /* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
    width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
@@ -256,7 +253,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
 @keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
-@keyframes hc-out--b{ to{ opacity:0; transform:translateY(2px); } }
 @keyframes page-in--b{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
 @keyframes shake-x--b{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
 @keyframes menu-pop--b{ from{ opacity:0; transform:translateY(-4px) scale(.97); } to{ opacity:1; transform:none; } }
@@ -271,12 +267,13 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 @keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
 @keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
-@keyframes sheet-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+@keyframes sheet-in--b{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
+@keyframes sheet-out--b{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
 @keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 @keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
 @keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
-@keyframes panel-out--b{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes panel-out--b{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes morph-in--b{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
 @keyframes morph-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
@@ -313,12 +310,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade[*|data-pulse=b]{animation:fade--b var(--t-move) var(--e-out);}
 .a-palette-fade[*|data-pulse=a]{animation:fade var(--t-quick) var(--e-out);}
 .a-palette-fade[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out);}
-.a-hc-in[*|data-pulse=a]{animation:hc-in var(--t-move) var(--e-out);}
-.a-hc-in[*|data-pulse=b]{animation:hc-in--b var(--t-move) var(--e-out);}
 .a-link-pill-in[*|data-pulse=a]{animation:hc-in var(--t-quick) var(--e-out);}
 .a-link-pill-in[*|data-pulse=b]{animation:hc-in--b var(--t-quick) var(--e-out);}
-.a-hc-out[*|data-pulse=a]{animation:hc-out var(--t-quick) var(--e-out) forwards;}
-.a-hc-out[*|data-pulse=b]{animation:hc-out--b var(--t-quick) var(--e-out) forwards;}
 .a-page-in[*|data-pulse=a]{animation:page-in var(--t-big) var(--e-out);}
 .a-page-in[*|data-pulse=b]{animation:page-in--b var(--t-big) var(--e-out);}
 .a-shake-x[*|data-pulse=a]{animation:shake-x var(--t-shake) var(--e-shake);}
@@ -343,6 +336,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-osd-in[*|data-pulse=b]{animation:osd-in--b var(--t-quick) var(--e-out);}
 .a-osd-out[*|data-pulse=a]{animation:osd-out var(--t-move) var(--e-exit) forwards;}
 .a-osd-out[*|data-pulse=b]{animation:osd-out--b var(--t-move) var(--e-exit) forwards;}
+.a-sheet-in[*|data-pulse=a]{animation:sheet-in var(--t-big) var(--e-out);}
+.a-sheet-in[*|data-pulse=b]{animation:sheet-in--b var(--t-big) var(--e-out);}
 .a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
 .a-banner-out[*|data-pulse=a]{animation:banner-out var(--t-move) var(--e-exit) forwards;}
@@ -351,8 +346,8 @@ html,body{margin:0;padding:0;background:transparent}
 .a-banner-in[*|data-pulse=b]{animation:banner-in--b var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=a]{animation:panel-in var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=b]{animation:panel-in--b var(--t-move) var(--e-out);}
-.a-panel-out[*|data-pulse=a]{animation:panel-out var(--t-move) var(--e-exit) forwards;}
-.a-panel-out[*|data-pulse=b]{animation:panel-out--b var(--t-move) var(--e-exit) forwards;}
+.a-panel-out[*|data-pulse=a]{animation:panel-out var(--t-quick) var(--e-exit) forwards;}
+.a-panel-out[*|data-pulse=b]{animation:panel-out--b var(--t-quick) var(--e-exit) forwards;}
 .a-shot-in[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
 .a-shot-in[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
 .a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
@@ -398,12 +393,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-hc-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-hc-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-hc-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-hc-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=a]{animation-name:hold;}
@@ -424,6 +415,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-osd-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=b]{animation-name:menu-out--b;}
+.ds[*|data-motion=reduced] .a-sheet-in[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-sheet-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-banner-out[*|data-pulse=a]{animation-name:menu-out;}
@@ -491,19 +484,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* == components == */
 /* -- account_tile -- */
 /* AccountTile (design/04-COMPONENTS.md section 27): `S:107-118`, `S:356-357`, `S:548-551`. The
-   tile is a toolbar Button drawn as a square plate on the frame (`S:108-114`, `S:118`; the
-   current-item shadow is `--shadow-current`); this file draws the plate, sizes its avatar and
-   draws the All tile. `.ds-account-tiles` is the four-column group a
+   tile is IconButton's Pin variant (box, hover, press and pressed are icon_button.css); this
+   file sizes its avatar and draws the All tile. `.ds-account-tiles` is the four-column group a
    consumer wraps the tiles in (`S:107`).
    O-26: an unpressed tile's avatar colour arrives already desaturated from Rust (chroma x .55,
    no `filter`); opacity .85 stays here. The avatar's hover turn is `--t-quick --e-spring`.
    TODO(O-3): `rotate(-6deg) scale(1.08)` have no tokens. */
 
-.ds-button.ds-account-tile{
-  position:relative; width:auto; height:auto; aspect-ratio:1; padding:0; border-radius:var(--r-tile); background:var(--f-pill-hover); color:var(--f-ink);
-}
-.ds-button.ds-account-tile:hover{ background:var(--f-pill); color:var(--f-ink); }
-.ds-button.ds-account-tile[*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 .ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
 .ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-out); }
@@ -515,37 +502,38 @@ html,body{margin:0;padding:0;background:transparent}
    the Pin as well, to outrank its ground, which comes later in the cascade), the Pin's pill
    on hover; where an avatar would be, a dashed ring in `--f-ink-faint` around a plus, both
    going to `--f-ink` under the pointer. */
-.ds-button.ds-account-tile[*|data-face=add]{ background:transparent; }
-.ds-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
+.ds-icon-button.ds-account-tile[*|data-face=add]{ background:transparent; }
+.ds-icon-button.ds-account-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
 .ds-account-tile .ds-avatar[*|data-tone=add]{
   box-sizing:border-box; background:transparent; color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
   transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }
-
-/* The unread count: a badge in the tile's corner, over the avatar (`S:356-357`). */
-.ds-account-tile .ds-badge{ position:absolute; top:var(--s-2); right:var(--s-2); }
 /* -- alert -- */
-/* Alert (design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
-   narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred over a modal
-   scrim: one centred column as the polkit prompt's, the optional icon at 48, the title in the
-   display face 16/700, the message in `--fs-control` in the soft ink, then Cancel and the action
-   in two equal columns 8 apart, 18 below, the action on the right. The default button is
-   Primary (accent-filled); the other is Secondary, or, for a destructive action, a Danger at the
-   Regular size whose label is red at rest as well as on hover. The panel's entrance and exit
-   are the sheet's (`peek-in`, then the driven spring).
+/* Alert (design/30 section 2.5, design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass
+   alert in the narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred: one
+   centred column as the polkit prompt's, the optional icon at 48, the title in the display face
+   16/700, the body in `--fs-control` in the soft ink, then the footer: one or two buttons side
+   by side at equal width 8 apart, 18 below, the default on the right (the first button is last
+   on screen), or three or more stacked, the default on top. The default button is Primary
+   (accent-filled); another is Secondary, or, for a destructive action, a Danger at the Regular
+   size whose label is red at rest as well as on hover. The panel's entrance and exit are the
+   sheet's. Nothing behind it is dimmed.
    Inline (`data-flow=inline`): a stage over the nearest positioned ancestor, on the peek layer,
-   holding the modal scrim and the sheet's centring stage, so it fits a control-center popover. */
+   holding the sheet's centring stage, so it fits a control-center popover; it catches the pointer
+   for what it covers. */
 
 .ds-alert{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
 .ds-alert-icon{ display:flex; margin-bottom:var(--s-12); }
 .ds-alert-title{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
-.ds-alert-message{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
-.ds-alert-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
-.ds-alert-slot{ display:flex; min-width:0; }
+.ds-alert-body{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
+.ds-alert-footer{ display:flex; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
+.ds-alert-footer[*|data-layout=row]{ flex-direction:row-reverse; }
+.ds-alert-footer[*|data-layout=stack]{ flex-direction:column; }
+.ds-alert-slot{ display:flex; flex:1; min-width:0; }
 .ds-alert-slot .ds-button{ width:100%; justify-content:center; }
-.ds-alert[*|data-emphasis=destructive] .ds-button[*|data-variant=danger]{ color:var(--danger); }
-.ds-alert-stage{ position:absolute; inset:0; z-index:var(--z-peek); }
+.ds-alert .ds-button[*|data-variant=danger]{ color:var(--danger); }
+.ds-alert-stage{ position:absolute; inset:0; z-index:var(--z-peek); pointer-events:auto; }
 /* -- animated_list -- */
 /* AnimatedList (design/04-COMPONENTS.md section 16 markup): the `ul` the rows live in. Its
    `data-presence` only selects which entrance an entering row plays (list_row.css); the list
@@ -691,158 +679,114 @@ html,body{margin:0;padding:0;background:transparent}
    control center's Battery module's one device. */
 .ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
 .ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
-/* -- badge -- */
-/* Badge (design/30 section 2.9): a capsule with a count, or a dot. Attribute selectors carry
-   `*|` (spike S2). The count is in the data face, tabular. Alert is `--danger` with its ink
-   (`--danger-ink`); Quiet is a neutral capsule (`--surface-2`, a hairline, `--ink-soft`). No bump:
-   a count changes as any text does. Placement is the parent's (`margin-left:auto` in a row, a
-   corner of a tile). */
-
-.ds-badge{
-  --bd-h:var(--s-16); --bd-fs:var(--fs-note);
-  display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; min-width:var(--bd-h); height:var(--bd-h); padding:0 var(--s-4);
-  border-radius:var(--r-pill); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--bd-fs); font-weight:600; line-height:1;
-}
-.ds-badge[*|data-size=mini]{ --bd-h:var(--s-12); --bd-fs:var(--fs-nano); padding:0 var(--s-3); }
-.ds-badge[*|data-size=small]{ --bd-h:var(--s-14); --bd-fs:var(--fs-caption); }
-.ds-badge[*|data-tone=alert]{ background:var(--danger); color:var(--danger-ink); }
-.ds-badge[*|data-tone=quiet]{ background:var(--surface-2); color:var(--ink-soft); box-shadow:inset 0 0 0 var(--hair) var(--line); }
-/* The dot has no number: a circle of the badge's height, less the label's inset. */
-.ds-badge[*|data-content=dot]{ min-width:0; width:calc(var(--bd-h) / 2); height:calc(var(--bd-h) / 2); padding:0; }
-.ds-badge-label{ line-height:1; white-space:nowrap; }
 /* -- button -- */
-/* Button (design/30 section 2.1, `NSButton`). Attribute selectors carry `*|` (spike S2). The
-   focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
+/* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
+   The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
+   Disabled takes design/13 section 13.3.3's settled disabled item, .35, rather than
+   O-1's unsigned .45 candidate: below. */
 
-   Sized by the ladder (design/29-SIZING.md): the rung sets `--btn-*` once, every bezel reads
-   them, so a size is written in one place and every bezel follows it. Pressed (design/30
-   section 1.4) is a darker fill, never a scale: `data-pressed` is written for a pointer or a
-   key held down. Disabled and busy take no pointer and draw at the disabled .35 (design/13
-   section 13.3.3; busy keeps its spinner at full strength). */
+.ds-button{ font:inherit; }
 
-.ds-button{
-  --btn-h:var(--ctl-h-m); --btn-r:var(--ctl-r-m); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
-  display:inline-flex; align-items:center; justify-content:center; gap:var(--s-6); box-sizing:border-box; flex:none;
-  height:var(--btn-h); padding:0 var(--btn-pad); border:var(--hair) solid transparent; border-radius:var(--btn-r);
-  font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
-  background:transparent; color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out);
+/* Heights come from the size ladder (design/29-SIZING.md R1): a Regular button is 22 tall with
+   the reference push button's radius 5 (`--ctl-r-m`) and its label centred on `line-height:1`;
+   padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
+
+   Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
+   `--hair` border: Primary's is transparent, so it draws exactly as it did with
+   `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
+   the box model gains the same border width Secondary and Danger already have, so all three
+   stand the same height at a given size instead of Primary sitting one `--hair` short top and
+   bottom. */
+.ds-button[*|data-variant=primary],
+.ds-button[*|data-variant=secondary]{
+  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
+  height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
+  font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
+  transition:box-shadow var(--t-quick) var(--e-out);
 }
-.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-r:var(--ctl-r-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
-.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-r:var(--ctl-r-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
-.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-r:var(--ctl-r-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
+.ds-button[*|data-variant=primary]:hover,
+.ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
+.ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
+/* Pressed (design/30 section 1.4): a darker fill, no scale. */
+.ds-button[*|data-variant=primary][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=secondary][*|data-pressed]{ background:var(--surface); box-shadow:var(--shadow-1); }
 
-/* Push: a raised rounded rectangle with a line; a toggle button that is on is the pressed grey. */
-.ds-button[*|data-variant=push]{ background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=push]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--surface); box-shadow:none; }
-.ds-button[*|data-variant=push][*|data-state=on]{ color:var(--ink); background:var(--surface); box-shadow:none; }
-/* The default button answers Return and takes the accent; a pressed one darkens. */
-.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
-.ds-button[*|data-variant=push][*|data-answers=return]:hover{ background:var(--accent); color:var(--accent-ink); }
-.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
-/* Destructive: red under the pointer; a destructive default button is red at rest. */
-.ds-button[*|data-variant=push][*|data-role=destructive]:hover{ background:var(--danger-wash); color:var(--danger); }
-.ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]{ background:var(--danger); color:var(--danger-ink); }
-.ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]:hover{ background:var(--danger); color:var(--danger-ink); }
+/* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
+.ds-button[*|data-variant=mini],
+.ds-button[*|data-variant=danger]{
+  display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
+  border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
+  border-radius:var(--ctl-r-xs); height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
+}
+.ds-button[*|data-variant=mini]:hover,
+.ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=mini][*|data-pressed],
+.ds-button[*|data-variant=danger][*|data-pressed]{ background:var(--surface); box-shadow:none; }
 
-/* Toolbar: no bezel at rest, a fill under the pointer and while pressed or open. */
-.ds-button[*|data-variant=toolbar]{ color:var(--ink-faint); }
-.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=toolbar][*|data-pressed],
-.ds-button[*|data-variant=toolbar][*|data-state=on],
-.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
-.ds-button[*|data-variant=toolbar][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
-/* An image-only button is a square of the rung's height. */
-.ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; }
+/* Mini pressed: `S:523`, the RSVP row. */
+/* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
+   state also draws its edge in the text accent (3:1 or better on every ground). */
+.ds-button[*|data-variant=mini][*|aria-pressed=true]{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent-text); }
 
-/* Inline: words with no bezel; the quiet link-button. */
-.ds-button[*|data-variant=inline]{ color:var(--ink-faint); padding:0 var(--s-4); font-weight:var(--ctl-fw-m); }
-.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--surface-2); }
-.ds-button[*|data-variant=inline][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
+/* Danger (derived from `C:958-963`): red only on hover. */
+.ds-button[*|data-variant=danger]:hover{ background:var(--danger-wash); color:var(--danger); }
 
-/* Help: a round bezel, the question mark drawn from the label's first letter. */
-.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=help]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--surface); box-shadow:none; }
+/* Quiet: `S:601-602`. S's link-button has no icon, so no gap; with one it takes the gap every
+   other variant has (6), laid out as they are (polish pass: the glyph touched the label).
+   TODO(O-3): its icon size and active state are not specified. */
+.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
+.ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
 
-/* The frame draws a toolbar or inline button in its own inks (`data-ground=frame` remaps them). */
+/* Frame: words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
+   the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
+   `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
+   current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
+   edge, as an item does: Blitz's user-agent `button{justify-content:center}` would centre a
+   frame word stretched across the sidebar. */
+.ds-button[*|data-variant=frame]{
+  display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:default;
+  padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+.ds-button[*|data-variant=frame][*|data-pressed]{ background:var(--f-pill); color:var(--f-ink); }
+.ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
-/* Parts: the icon and the label sit on the line; a mark face and a leading mark as before. */
-.ds-button-icon{ display:inline-flex; align-items:center; line-height:0; flex:none; }
-.ds-button-label{ min-width:0; }
-.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
+/* Size, after the variants so it wins at equal weight: `data-size` is written only
+   when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
+   Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
+   a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
+.ds-button[*|data-size=regular]{ height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border-radius:var(--ctl-r-m); font-size:var(--fs-control); font-weight:700; line-height:1; }
+.ds-button[*|data-size=mini]{ height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); border-radius:var(--ctl-r-xs); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
+/* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
+.ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
+
+/* Disabled (design/13 section 13.3.3's disabled item): .35, the default cursor, and no
+   pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
+   dropped handlers keep a press from firing. */
+.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
+/* A disabled default button stays the default: the Mac keeps its shape and edge at
+   the reduced opacity. Band B's pastel fill at .35 is barely apart from a disabled Secondary
+   beside it (design/03-COLOR.md section 20.4: no state on the fill's colour alone), so it keeps
+   an `--accent-text` edge, the pressed Mini's and the armed toast tab's. */
+.ds-button[*|data-variant=primary][*|aria-disabled=true]{ border-color:var(--accent-text); }
+
+/* A trailing mark: a dropdown's caret after its value, in the label's colour a
+   step quieter; `line-height:0` so the glyph does not stretch the line. */
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
+
+/* A mark face: the bubble's B, i, U and S (design/04 section 30), each in its own
+   style. S's italic is Georgia; the serif here is `--font-serif` (design/02). */
 .ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
 .ds-button-face[*|data-face=bold]{ font-weight:700; }
 .ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
-/* Disabled: .35, no pointer at all, so no hover or press matches. Busy: no input, the
-   label dims, the spinner in the leading slot stays clear. */
-.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
-.ds-button[*|aria-busy=true]{ cursor:default; pointer-events:none; }
-.ds-button[*|aria-busy=true] > .ds-button-icon,
-.ds-button[*|aria-busy=true] > .ds-button-label,
-.ds-button[*|aria-busy=true] > .ds-button-trail{ opacity:.35; }
-/* The busy spinner of a default button reads on the accent fill: its spokes take the ink. */
-.ds-button[*|data-variant=push][*|data-answers=return][*|aria-busy=true] .ds-progress-indicator{ background:var(--accent-ink); }
-/* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
-   disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
-.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
-
-/* StatusItem: the bar's status item. The slot is the bar's 30 wide (`--bar-status-w`,
-   design/29-SIZING.md section 5.1: the glyph 7 in from each side) by the box's height; the box and
-   the glyph come from the consumer's settings through `--bar-status-box` and `--bar-status-glyph`
-   (`ds::StatusMetrics`), the fallbacks being the keys' defaults, 22 and 16. The glyph is sized
-   here because the size is a setting. Inks on the frame as a toolbar button's; pressed and open
-   on the pressed fill. The pill's radius is the shell scale's bar-item radius. */
-.ds-button[*|data-variant=status-item]{
-  width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); padding:0; border-radius:var(--r-shell-bar-item);
-  color:var(--ink-soft);
-}
-.ds-button[*|data-variant=status-item]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=status-item][*|data-pressed],
-.ds-button[*|data-variant=status-item][*|aria-pressed=true],
-.ds-button[*|data-variant=status-item][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
-/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level
-   parts) fill that square, so the glyph follows the setting as a single icon does. */
-.ds-button[*|data-variant=status-item] .ds-ic,
-.ds-button[*|data-variant=status-item] .ds-ext-icon,
-.ds-button[*|data-variant=status-item] .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
-.ds-button[*|data-variant=status-item] .ds-status-glyph > .ds-status-part,
-.ds-button[*|data-variant=status-item] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
-/* -- checkbox -- */
-/* Checkbox (design/30 section 2.3, `NSButton` checkbox). Attribute selectors carry `*|` (spike
-   S2); the focus ring is the global one, on the button (spike S12). The box is the ladder's
-   checkbox (10, 12, 14, 14: `--check-*`) at a 4 px radius, its hairline an inset shadow; on and
-   mixed fill it with the accent, the check mark and the dash in the accent's ink. Pressed darkens
-   the box; the label takes the rung's type. */
-
-.ds-checkbox{ --cb:var(--check-m); --cb-fs:var(--ctl-fs-m);
-  display:inline-flex; align-items:center; gap:var(--s-6); box-sizing:border-box; flex:none; padding:0; border:0; background:transparent;
-  font:inherit; font-size:var(--cb-fs); color:var(--ink); line-height:1; cursor:default; text-align:left;
-}
-.ds-checkbox[*|data-size=mini]{ --cb:var(--check-xs); --cb-fs:var(--ctl-fs-xs); }
-.ds-checkbox[*|data-size=small]{ --cb:var(--check-s); --cb-fs:var(--ctl-fs-s); }
-.ds-checkbox[*|data-size=large]{ --cb:var(--check-l); --cb-fs:var(--ctl-fs-l); }
-
-.ds-checkbox-indicator{
-  position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--cb); height:var(--cb);
-  border-radius:var(--r-micro); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1); color:var(--accent-ink);
-  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
-}
-.ds-checkbox[*|data-state=on] .ds-checkbox-indicator,
-.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
-.ds-checkbox[*|data-pressed] .ds-checkbox-indicator{ background:var(--surface); }
-.ds-checkbox[*|data-pressed][*|data-state=on] .ds-checkbox-indicator,
-.ds-checkbox[*|data-pressed][*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent-text); }
-.ds-checkbox-dash{ display:block; width:60%; height:var(--s-2); border-radius:var(--r-pill); background:var(--accent-ink); }
-.ds-checkbox-label{ min-width:0; }
-.ds-checkbox[*|aria-disabled=true],
-.ds-checkbox[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+/* A leading mark: a glyph or a caller's mark (a provider's inline chip) before the
+   label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
+.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 /* -- chip -- */
 /* Chip (design/04-COMPONENTS.md section 10). Attribute selectors carry `*|` (spike S2); the
    washes replace `color-mix` (`--ok-wash`, `--danger-wash`). Chips never truncate. */
@@ -935,7 +879,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
-   `peek-in`, a search `TextField` over an embedded Rich menu (menu.css).
+   `peek-in`, a SearchField over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its
@@ -958,10 +902,10 @@ html,body{margin:0;padding:0;background:transparent}
    query at 22/500 (`--fs-shell-field`) beside a 20 px search glyph (`--shell-field-glyph`);
    row titles 14 and details 12 (`--fs-shell-row`, `--fs-shell-detail`). Its shadow is the
    material stack's contact and ambient pair (`--m-box`). */
-.ds-palette[*|data-host=surface] .ds-text-field-frame{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
-.ds-palette[*|data-host=surface] .ds-text-field-icon .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
-.ds-palette[*|data-host=surface] .ds-text-field .ds-input[*|data-variant=plain],
-.ds-palette[*|data-host=surface] .ds-text-field .ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
+.ds-palette[*|data-host=surface] .ds-search{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
+.ds-palette[*|data-host=surface] .ds-search > .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
+.ds-palette[*|data-host=surface] .ds-search .ds-input[*|data-variant=inline],
+.ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
 /* Kept mounted while hidden: nothing is laid out, and each showing replays
@@ -974,11 +918,12 @@ html,body{margin:0;padding:0;background:transparent}
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
    pane; in a surface it still fills its container, which the host widens. */
 .ds-palette{ --aside:0px; }
-.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto minmax(0, 1fr); }
+.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto auto minmax(0, 1fr); }
 .ds-palette[*|data-host=overlay][*|data-aside=shown]{ width:min(calc(540px + var(--aside)), 96%); }
-.ds-palette[*|data-aside=shown] > .ds-text-field{ grid-row:1; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:2; grid-column:1; min-width:0; }
-.ds-palette-aside{ grid-row:2; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
+.ds-palette[*|data-aside=shown] > .ds-search{ grid-row:1; grid-column:1 / -1; }
+.ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
+.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
+.ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
    it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
    row kept up from `--dy`, the height the removed rows took, set on the list while it plays. At
@@ -1005,6 +950,32 @@ html,body{margin:0;padding:0;background:transparent}
   margin-left:auto; white-space:nowrap; flex:none;
   font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--f-ink-faint);
 }
+/* -- count -- */
+/* Count (design/04-COMPONENTS.md section 14): `S:136`, `S:117`, `S:341-342`, tabular from C
+   (`C:308-311`). Empty at zero. Attribute selectors carry `*|` (spike S2). */
+
+.ds-count{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
+.ds-count[*|data-place=item]{ margin-left:auto; font-size:var(--fs-note); color:var(--f-ink-faint); }
+.ds-count[*|data-place=tile]{ position:absolute; top:4px; right:5px; font-size:var(--fs-nano); color:var(--f-ink-soft); }
+/* -- device_glyph -- */
+/* DeviceGlyph (design/23-WIDGETS.md section 4.4): a filled device solid in `currentColor`, the
+   same `svg.ds-ic` box as every glyph (its size from its attributes), so a battery ring's
+   `.ds-battery-device .ds-ic` rule sizes it at .47 of the ring. It never shrinks in a row. */
+
+.ds-device-glyph{ display:block; flex:none; }
+/* -- dock_parts -- */
+/* The dock's running dot, label and floor (the macOS polish pass; design/10-BEHAVIOUR-dock.md section
+   10.3.2). The floor's paint and mask are generated with the shapes (`css/shape_css.rs`). */
+
+.ds-running-dot{ position:absolute; left:50%; top:calc(100% + var(--dock-dot-gap) - var(--dock-dot) * .5); width:var(--dock-dot); height:var(--dock-dot);
+  margin-left:calc(var(--dock-dot) * -.5); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
+  animation:fade var(--t-quick) var(--e-out); }
+
+/* The dock label (design/30 section 2.10): the tile's name in a small dark pill above it, on the
+   popover's surface without its line, fading in and out over `--t-quick`. */
+.ds-popover.ds-dock-label{ width:auto; max-width:260px; padding:var(--s-3) var(--s-8); background:var(--ink); color:var(--paper); border:0; border-radius:var(--r-small);
+  font-size:var(--fs-shell-tip); white-space:nowrap; animation:fade var(--t-quick) var(--e-out); }
+.ds-popover.ds-dock-label[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
 /* -- drag_ghost -- */
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
@@ -1111,28 +1082,43 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-group-header-count{ font-variant-numeric:tabular-nums; }
 .ds-group-header-actions{ display:flex; align-items:center; gap:var(--s-2); margin-left:auto; flex:none;
   font-family:var(--font-ui); letter-spacing:0; text-transform:none; }
+/* -- empty_state -- */
+/* EmptyState (design/30 section 2.9, `ContentUnavailableView`): a centred column filling its
+   container: the glyph at 48 in the faint ink, the title in the display face 16/700, the
+   description in `--fs-control` in the soft ink, the action 14 below. A failure keeps the same
+   layout (the form is `data-form`, for the user's own styles). Static: nothing moves. */
+
+.ds-empty-state{ display:flex; flex-direction:column; align-items:center; justify-content:center; box-sizing:border-box; width:100%; min-height:100%; padding:var(--s-22); gap:var(--s-6); text-align:center; color:var(--ink); }
+.ds-empty-state-icon{ display:flex; margin-bottom:var(--s-6); color:var(--ink-faint); }
+.ds-empty-state-title{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
+.ds-empty-state-body{ max-width:32em; font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
+.ds-empty-state-action{ display:flex; gap:var(--s-8); align-items:center; justify-content:center; margin-top:var(--s-8); }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
-   the side card `S:428`, the live dot `S:561`. Enters with `hc-in`; while the hub reports it
-   leaving it plays `hc-out` and is unmounted at `settle(HcOut)`. The flag's colour-mix is the
+   the side card `S:428`, the live dot `S:561`. It fades in over `--t-quick` (design/30 section
+   1.3: no spring); while the hub reports it leaving it fades out and is unmounted once that
+   settles. The flag's colour-mix is the
    precomputed `--danger-wash`; the message's two-line clamp is `text::clip_chars` in the
    consumer, with a two-line height as the guard. A thread target is a block (a row), any other
    an inline span. */
 
 .ds-hover-target{ display:inline; }
 .ds-hover-target[*|data-kind=thread]{ display:block; }
+/* A tooltip's or a label's target wraps a control: as big as it. */
+.ds-hover-target[*|data-hint]{ display:inline-flex; }
 /* A target drawn as a `div` or as the list's own `li` (`data-as`) is a block. */
 .ds-hover-target[*|data-as=div], .ds-hover-target[*|data-as=li]{ display:block; }
 
 .ds-popover.ds-hovercard{ width:300px; border-radius:var(--r-panel); padding:var(--s-12) var(--s-13); font-size:var(--fs-control);
-  animation:hc-in var(--t-move) var(--e-out); }
-.ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
+  animation:fade var(--t-quick) var(--e-out); }
+.ds-popover.ds-hovercard[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
 .ds-popover.ds-hovercard[*|data-kind=account],
 .ds-popover.ds-hovercard[*|data-kind=side]{ width:260px; }
 /* Drawn in place (`flow: Flow::Inline`): static in the caller's container, the
    same card otherwise; the caller's box decides where it stands. */
 .ds-popover.ds-hovercard[*|data-flow=inline]{ position:static; }
 
+.ds-hovercard-body{ display:block; }
 .ds-hovercard-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-reading); line-height:1.2; }
 .ds-hovercard-sub{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-note); color:var(--ink-faint); margin-top:var(--s-2); }
 .ds-hovercard-msgs{ margin-top:var(--s-9); display:grid; gap:var(--s-7); }
@@ -1152,15 +1138,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hovercard-flag[*|data-tone=info] .ds-ic{ color:var(--accent-text); }
 .ds-hovercard-actions{ margin-top:var(--s-10); display:flex; gap:var(--s-6); flex-wrap:wrap; }
 .ds-hovercard-live{ display:inline-block; width:6px; height:6px; border-radius:var(--r-pill); background:var(--ok); }
-
-/* A tip (design/06 section 3 `time`): the Card tooltip's size (tooltip.css
-   `.ds-tip`) on the hover card's surface, one line, placed below its target like a sender card
-   and opened on the same hub timing. */
-.ds-popover.ds-hovercard[*|data-kind=tip]{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip);
-  border-radius:var(--r-item); white-space:nowrap; }
 /* -- hover_strip -- */
 /* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
-   toolbar Buttons on the strip's own round box (`.ds-strip-action`); this file reveals the
+   IconButton's Strip variant (their box and hover are icon_button.css); this file reveals the
    strip on row hover, fading the buttons in, and places each button's Fly label (section 18's
    Fly, scoped to the strip as S scopes it). The Fly fades in over `--t-quick` as the pointer
    rests on its button.
@@ -1178,11 +1158,8 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
 
-.ds-button.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
-.ds-button.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
-.ds-button.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
-.ds-strip .ds-strip-action{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
-.ds-row:hover .ds-strip .ds-strip-action{ opacity:1; }
+.ds-strip .ds-icon-button{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-row:hover .ds-strip .ds-icon-button{ opacity:1; }
 
 .ds-strip .ds-fly{
   position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
@@ -1190,16 +1167,93 @@ html,body{margin:0;padding:0;background:transparent}
   padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0; pointer-events:none;
   transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
-.ds-strip .ds-strip-action:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); }
+.ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* Caller-driven: `data-shown=visible` shows the strip with no pointer on its row
    (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
    S12, so the caller says so), the buttons fading in as on hover; `data-shown=hidden` keeps it
    down under the pointer. */
 .ds-strip[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
-.ds-strip[*|data-shown=visible] .ds-strip-action{ opacity:1; }
+.ds-strip[*|data-shown=visible] .ds-icon-button{ opacity:1; }
 .ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
-.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-strip-action{ opacity:0; }
+.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ opacity:0; }
+/* -- icon_button -- */
+/* IconButton (design/04-COMPONENTS.md section 2). Attribute selectors carry `*|` (spike S2).
+   The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
+   The glyph is sized by `Glyph` itself; no rule here sizes or strokes an icon (spike S6).
+   Disabled: .35, as a disabled menu item (design/13 section 13.3.3), at the end. */
+
+.ds-icon-button{ font:inherit; }
+
+/* Every box is square on the size ladder (design/29-SIZING.md): Tool is Large (28), Foot is
+   Regular (22); Status is the bar's 30 x 22 slot. Strip keeps mailo's 26 round box (its rows are
+   the app side, one density step larger until audited, design/29 section 13 decision 9).
+
+   Tool: `S:204-206`, with C's active and expanded rules and transform transition (`C:993-1002`). */
+.ds-icon-button[*|data-variant=tool]{
+  display:inline-grid; place-items:center; width:var(--ctl-h-l); height:var(--ctl-h-l); border:var(--hair) solid transparent; border-radius:var(--ctl-r-l);
+  background:transparent; color:var(--ink-faint); cursor:default;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-icon-button[*|data-variant=tool]:hover{ color:var(--ink); background:var(--surface); }
+.ds-icon-button[*|data-variant=tool][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); border-color:var(--line); }
+
+/* Foot: `S:151-153`. Active: not specified. */
+.ds-icon-button[*|data-variant=foot]{
+  width:var(--ctl-h-m); height:var(--ctl-h-m); border-radius:var(--ctl-r-m); border:0; background:transparent; cursor:default;
+  display:grid; place-items:center; color:var(--f-ink-soft);
+}
+.ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
+
+/* Strip: the button half of `S:312-323`; the reveal and `pop-in` belong to HoverStrip (section 17).
+   TODO(O-3, O-10): `!important` is dropped (HoverStrip settles pop-in). */
+.ds-icon-button[*|data-variant=strip]{
+  position:relative; width:26px; height:26px; border:0; border-radius:var(--r-pill); background:transparent; cursor:default;
+  display:grid; place-items:center; color:var(--ink-soft);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-icon-button[*|data-variant=strip]:hover{ background:var(--accent-soft); color:var(--ink); }
+.ds-icon-button[*|data-variant=tool][*|data-pressed],
+.ds-icon-button[*|data-variant=pin][*|data-pressed]{ background:var(--surface-2); color:var(--ink); }
+.ds-icon-button[*|data-variant=strip][*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
+
+/* Pin: `S:108-114`, `S:118`; the current-item shadow is `--shadow-current` (O-3). */
+.ds-icon-button[*|data-variant=pin]{
+  aspect-ratio:1; border:0; border-radius:var(--r-tile); cursor:default; background:var(--f-pill-hover);
+  display:grid; place-items:center; position:relative; color:var(--f-ink);
+  transition:background-color var(--t-quick) var(--e-out);
+}
+.ds-icon-button[*|data-variant=pin]:hover{ background:var(--f-pill); }
+.ds-icon-button[*|data-variant=pin][*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
+
+/* Status (bar gaps; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar status item on
+   the frame. The slot is the bar's 30 wide (`--bar-status-w`, design/29-SIZING.md section 5.1:
+   the glyph 7 in from each side) by the box's height; the box and the glyph come from the
+   consumer's settings through `--bar-status-box` and `--bar-status-glyph` (`ds::StatusMetrics`);
+   the fallbacks are the keys' defaults, 22 and 16. The glyph is sized here, not by its attributes, because the size is a setting: Blitz and
+   browsers let a CSS width override an `svg`'s presentation width. Inks on the frame as the Foot
+   button's; pressed and open on `--f-pill`, the open title's pill. The pill's radius is the
+   shell scale's bar-item radius (`--r-shell-bar-item`, 5, a Regular control's). */
+.ds-icon-button[*|data-variant=status]{
+  display:inline-grid; place-items:center; width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); border:0; border-radius:var(--r-shell-bar-item);
+  background:transparent; color:var(--f-ink-soft); cursor:default;
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level parts) fill that square, so the glyph follows the
+   setting as a single icon does. */
+.ds-icon-button[*|data-variant=status] > .ds-ic,
+.ds-icon-button[*|data-variant=status] > .ds-ext-icon,
+.ds-icon-button[*|data-variant=status] > .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
+.ds-icon-button[*|data-variant=status] .ds-status-glyph > .ds-status-part,
+.ds-icon-button[*|data-variant=status] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
+.ds-icon-button[*|data-variant=status]:hover{ color:var(--f-ink); background:var(--f-pill-hover); }
+.ds-icon-button[*|data-variant=status][*|data-pressed],
+.ds-icon-button[*|data-variant=status][*|aria-pressed=true],
+.ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
+
+/* Disabled: .35, the default cursor, and no pointer, so no hover or press matches;
+   `disabled` and the dropped handlers keep a press from firing. */
+.ds-icon-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
 /* -- icon_view -- */
 /* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
    URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
@@ -1219,52 +1273,62 @@ html,body{margin:0;padding:0;background:transparent}
    through: sill's idle service, not this overlay, owns waking the display. */
 
 .ds-idle-dim{ position:absolute; inset:0; pointer-events:none; background:var(--scrim-idle); }
-/* -- key_equivalent -- */
-/* KeyEquivalent (design/30 section 2.1). Attribute selectors carry `*|` (spike S2).
-   Text: the glyphs as plain text beside the words they belong to, the secondary ink, the face
-   and size of the surroundings (no code face, no cap) so a modifier glyph draws as large as a
-   letter; a block of its own so a gap before it holds in Blitz.
-   Cap: each key a cap in the code face (`--font-code`: a key cap is fixed pitch), with a rim and a
-   heavier foot. `inline-block` on the cap: Blitz lays out an inline box's text but not its padding or
-   border, so an inline cap was its glyph on a patch of `--surface-2`, caps run together; a
-   block-level box keeps the rim and the sides. Static: no hover, active, focus or motion. */
+/* -- kbd -- */
+/* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
+   In the code face (`--font-code`, Space Mono in either typeface): a key cap is fixed pitch.
+   Static: no hover, active, focus or motion. Attribute selectors carry `*|` (spike S2).
+   `inline-block` (sheet and modal parts): Blitz lays out an inline box's text but not
+   its padding or border, so an inline cap was its glyph on a patch of `--surface-2`, caps run
+   together; a block-level box keeps the rim and the 5 px sides the browser gave S's `kbd`. */
 
-.ds-key-equivalent[*|data-style=text]{ display:inline-block; color:var(--ink-soft); white-space:nowrap; }
-.ds-key-equivalent[*|data-style=cap]{ --kc-fs:var(--fs-note); display:inline-flex; align-items:center; }
-.ds-key-equivalent[*|data-style=cap][*|data-size=mini]{ --kc-fs:var(--fs-micro); }
-.ds-key-equivalent[*|data-style=cap][*|data-size=small]{ --kc-fs:var(--fs-caption); }
-.ds-key-equivalent-key{
-  display:inline-block; font-family:var(--font-code); font-size:var(--kc-fs); border:var(--hair) solid var(--line); border-bottom-width:2px;
+.ds-kbd{ display:inline-block;
+  font-family:var(--font-code); font-size:var(--fs-note); border:var(--hair) solid var(--line); border-bottom-width:2px;
   border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
 }
-/* A mini cap's arrow glyphs: at that size an arrow's stroke reads as a dash. Drawn at `--fs-control`
-   (13) with a tighter line-height so the extra line-box the bigger face would ask for is absorbed
-   instead of growing the cap: the cap's height comes from its padding and border, not the glyph,
-   as long as the line box the glyph sits in is no taller than the one the rest of the face draws. */
-.ds-key-equivalent[*|data-style=cap][*|data-size=mini] .ds-key-equivalent-key[*|data-glyph=arrow]{ font-size:var(--fs-control); line-height:1.13; }
-/* -- label -- */
-/* Label (design/30 section 2.8, `NSTextField` label). Attribute selectors carry `*|` (spike S2).
-   The role picks the ink (full, then three steps quieter), the style a step of the type scale;
-   nothing else: a label has no box of its own. */
+.ds-kbd[*|data-size=small]{ font-size:var(--fs-micro); }
 
-.ds-label{ color:var(--ink); font-size:var(--fs-control); }
-.ds-label[*|data-role=secondary]{ color:var(--ink-soft); }
-.ds-label[*|data-role=tertiary]{ color:var(--ink-faint); }
-.ds-label[*|data-role=quaternary]{ color:var(--ink-faint); opacity:.7; }
+/* Small's arrow glyphs: at 9.5 px an arrow's stroke reads as a dash. Drawn at
+   `--fs-control` (13) with a tighter line-height so the extra line-box the bigger face would
+   ask for is absorbed instead of growing the cap: the cap's height comes from its padding and
+   border, not the glyph, as long as the line box the glyph sits in is no taller than the one
+   the rest of the Small face already draws. */
+.ds-kbd[*|data-size=small][*|data-glyph=arrow]{ font-size:var(--fs-control); line-height:1.13; }
+/* -- chord -- */
+/* Chord (launcher chords): a shortcut as plain text beside the words it belongs to, Spotlight's
+   hint. The secondary ink, the face and size of its surroundings (no code face, no cap), so ⌘ ⇧
+   ⌥ ⌃ draw at a letter's size. A block of its own so a gap before it holds in Blitz. */
+.ds-chord{ display:inline-block; color:var(--ink-soft); white-space:nowrap; }
+/* -- level -- */
+/* LevelControl (the user's brief of 2026-09-25): a level with a glyph that
+   follows it, in three looks. The inks are the material's level inks (`--m-level-*`, per scheme,
+   `material/level.rs`); the capsule is a Regular control, 22 (`--ctl-h-m`, design/29-SIZING.md);
+   `--f` is the level, written inline by the component. Attribute selectors carry `*|`
+   (spike S2).
 
-.ds-label[*|data-style=caption]{ font-size:var(--fs-caption); }
-.ds-label[*|data-style=footnote]{ font-size:var(--fs-help); }
-.ds-label[*|data-style=headline]{ font-weight:700; }
-.ds-label[*|data-style=title]{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; }
-.ds-label[*|data-style=display]{ font-family:var(--font-display); font-size:var(--fs-display); font-weight:700; }
+   Motion. A level set from outside slides over `--t-quick --e-out`; under the pointer
+   (`data-drag=live`) the fill follows it with no transition. Glyph parts cross-fade over
+   `--t-quick`; the sun's rays scale with `--f`. */
 
-.ds-label[*|aria-disabled=true]{ opacity:.35; }
-/* -- level_glyph -- */
-/* LevelGlyph (design/26-DETAILS.md 5.2.7): the speaker, the sun and the keyboard light that follow
-   a level, drawn as stacked parts. `--f` is the level the enclosing control writes; a part shows
-   or not as the level says, and its change cross-fades over `--t-quick` (the sun's rays scale with
-   `--f`). Attribute selectors carry `*|` (spike S2). */
+.ds-level{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; cursor:default; }
+.ds-level-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
+/* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
+   still reaches the control. Last in the rail, so it is over everything drawn there. */
+.ds-level-hit{ position:absolute; top:calc(var(--s-6) * -1); bottom:calc(var(--s-6) * -1); left:calc(var(--s-16) * -1); right:calc(var(--s-16) * -1); }
+.ds-level-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
 
+/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
+.ds-level-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-well); box-shadow:var(--m-level-shade);
+}
+.ds-level-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out); }
+.ds-level[*|data-drag=live] .ds-level-fill{ transition:none; }
+
+/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
+   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
+.ds-level-in{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
+.ds-level-track > .ds-level-in{ color:var(--m-level-glyph); }
+.ds-level-fill > .ds-level-in{ color:var(--m-level-glyph-fill); }
 .ds-level-glyph{ position:relative; display:block; flex:none; }
 .ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
 .ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
@@ -1273,47 +1337,31 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
 /* The keyboard light's rays grow from the rising sun's centre, (12, 9) on the 24 grid. */
 .ds-level-part[*|data-part=key-rays]{ transform-origin:50% 37.5%; transform:scale(calc(.6 + .4 * var(--f))); }
-/* -- level_indicator -- */
-/* LevelIndicator (design/30 section 2.9, `NSLevelIndicator`): a read-only level, drawn as the
-   capsule slider is, without a knob or a hit area. The inks are the material's level inks
-   (`--m-level-*`, per scheme, `material/level.rs`); the capsule is a control of the rung's height
-   (`--ctl-h-*`); `--f` is the level, written inline by the component. Attribute selectors carry
-   `*|` (spike S2). A level set from outside slides over `--t-move --e-linear`: a value a person
-   reads as it moves. The bands colour the fill: warning and critical draw in their own inks. */
 
-.ds-level-indicator{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; }
-.ds-level-indicator[*|data-size=mini]{ --level-h:var(--ctl-h-xs); }
-.ds-level-indicator[*|data-size=small]{ --level-h:var(--ctl-h-s); }
-.ds-level-indicator[*|data-size=large]{ --level-h:var(--ctl-h-l); }
-.ds-level-indicator-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
-.ds-level-indicator-icon-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
-
-/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
-.ds-level-indicator-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
-  background:var(--m-level-well); box-shadow:var(--m-level-shade);
-}
-.ds-level-indicator-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
-  background:var(--m-level-fill); transition:width var(--t-move) var(--e-linear); }
-
-/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
-   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
-.ds-level-indicator-track > .ds-level-indicator-icon,
-.ds-level-indicator-fill > .ds-level-indicator-icon{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
-.ds-level-indicator-track > .ds-level-indicator-icon{ color:var(--m-level-glyph); }
-.ds-level-indicator-fill > .ds-level-indicator-icon{ color:var(--m-level-glyph-fill); }
+/* The knob: a round disc of the fill's ink riding the fill's end, the capsule less the 1 px knob
+   inset (design/29-SIZING.md R3: 20 in the Regular 22); the fill ends at its centre. */
+.ds-level[*|data-look=capsule-knob] .ds-level-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
+.ds-level-knob{ position:absolute; top:var(--knob-inset); left:calc(var(--knob-inset) + var(--f) * (100% - var(--level-h))); width:calc(var(--level-h) - 2 * var(--knob-inset)); height:calc(var(--level-h) - 2 * var(--knob-inset));
+  border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
+  transition:left var(--t-quick) var(--e-out); }
+.ds-level[*|data-drag=live] .ds-level-knob{ transition:none; }
 
 /* Sixteen squares. */
-.ds-level-indicator[*|data-style=discrete] .ds-level-indicator-rail{ height:auto; }
-.ds-level-indicator-segments{ display:flex; gap:var(--s-2); }
-.ds-level-indicator-segment{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
-  transition:background-color var(--t-quick) var(--e-in-out); }
-.ds-level-indicator-segment[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
+.ds-level[*|data-look=segments] .ds-level-rail{ height:auto; }
+.ds-level-segments{ display:flex; gap:var(--s-2); }
+.ds-level-seg{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:background-color var(--t-quick) var(--e-out); }
+.ds-level-seg[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
+.ds-level[*|data-drag=live] .ds-level-seg{ transition:none; }
 
-/* Bands: the fill (and each lit square) takes the band's ink. */
-.ds-level-indicator[*|data-band=warning] .ds-level-indicator-fill,
-.ds-level-indicator[*|data-band=warning] .ds-level-indicator-segment[*|data-on=on]{ background:var(--warn); }
-.ds-level-indicator[*|data-band=critical] .ds-level-indicator-fill,
-.ds-level-indicator[*|data-band=critical] .ds-level-indicator-segment[*|data-on=on]{ background:var(--danger); }
+/* Disabled: a level that cannot be moved says so. The rail and the lead glyph drop to the
+   disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
+   grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
+   input). */
+.ds-level[*|aria-disabled=true]{ cursor:not-allowed; }
+.ds-level[*|aria-disabled=true] .ds-level-rail,
+.ds-level[*|aria-disabled=true] .ds-level-lead{ opacity:.35; }
+.ds-level[*|aria-disabled=true] .ds-level-knob{ display:none; }
 /* -- link_pill -- */
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
@@ -1478,7 +1526,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-field .ds-input,
 .ds-lock-field .ds-input-mask,
 .ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
-.ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--lock-ink); }
+.ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
 /* The field draws its caret among the dots in their ink; the input's own stays hidden. */
 .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
 /* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
@@ -1494,20 +1542,20 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
 .ds-lock-go[*|aria-busy=true]{ opacity:1; }
 .ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
-.ds-lock-busy .ds-progress-indicator{ background:var(--lock-ink); }
+.ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
 
 .ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
 
 /* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
 .ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-caret::before{ background:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
 .ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-progress-indicator{ background:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-spinner{ border-color:var(--f-ink); }
 /* -- menu -- */
 /* Menu (design/04-COMPONENTS.md section 20): Rich and Slim `S:665-680`, `S:787-791`; Dropdown
    `C:1003-1023`; Context is Slim at the pointer. The surface is `.ds-popover`'s. The menu holds
@@ -1550,7 +1598,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 /* The query line of `filter: Filter::Field`: the typed text in a row at the top of
-   the menu, drawn as a plain TextField is (`.ds-input[data-variant=plain]`: body size, 1.55
+   the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
    line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
    the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
@@ -1669,9 +1717,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=action],
 .ds-menu[*|data-kind=context] .ds-menu-item[*|data-trailing=action]{ grid-template-columns:22px 1fr auto auto; }
 .ds-menu-action{ display:inline-flex; align-items:center; }
-.ds-menu[*|data-kind=slim] .ds-menu-action .ds-button,
-.ds-menu[*|data-kind=context] .ds-menu-action .ds-button,
-.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-button{ width:22px; height:22px; }
+.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
+.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
 
 /* Shaped rows (`RowShape`): a file's thumbnail fills its tile with no plate; a
    clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has
@@ -1804,7 +1852,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-tile[*|aria-disabled=true]:hover{ background:var(--surface-2); box-shadow:none; transform:none; }
 
-.ds-module-disc > .ds-progress{ position:absolute; top:-4px; right:-4px; bottom:-4px; left:-4px; width:auto; height:auto; }
 .ds-module-disc{
   position:relative; display:grid; place-items:center; flex:none; width:var(--ctl-h-l); height:var(--ctl-h-l); border-radius:var(--r-pill);
   background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
@@ -1989,79 +2036,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pane[*|data-pane=root][*|data-presence=entering],.ds-pane[*|data-pane=root][*|data-presence=leaving]{
   transform:translateX(calc(var(--pane-p) * -1 * var(--s-26))); opacity:calc(1 - var(--pane-p)); }
 .ds[*|data-motion=reduced] .ds-pane{ transform:none; }
-/* -- panel -- */
-/* Panel (design/20 section 1.6): the notification center's edge panel, and Edit
-   Widgets' bottom sheet (below). A stage fills
-   the root and takes no pointer; the panel stands at the right edge, `--s-8` in from the top, the
-   bottom and the edge, as tall as the root allows, in its material (the transparent-scope card
-   rule paints it) at the material's radius, and scrolls its own content. Mounted shown it slides
-   in with `panel-in` (`--t-move --e-out`); present keeps the entrance declared, so the settle
-   timer never cancels a slide the frame clock is still playing. Hidden, nothing is laid out. An optional scrim covers
-   the stage behind it. The panel's material scope fills the root too: Blitz places an absolutely
-   positioned box against its parent, so a scope of no height would give the panel none.
-   Attribute selectors carry `*|` (spike S2). */
-
-.ds-panel-scope{ position:absolute; inset:0; pointer-events:none; }
-.ds-panel-stage{ position:absolute; inset:0; pointer-events:none; }
-.ds-panel-stage[*|data-shown=hidden]{ display:none; }
-.ds-panel{ position:absolute; top:var(--s-8); bottom:var(--s-8); box-sizing:border-box; max-width:calc(100% - var(--s-16));
-  display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
-.ds-panel-stage[*|data-edge=right] > .ds-panel{ right:var(--s-8); }
-.ds-panel[*|data-presence=entering],.ds-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
-/* Driven (design/05 section 14, H1): after its first entrance the panel is drawn from a spring in
-   Rust, `--present-p` (0 past the edge, 1 in place), playing `hold` so the entrance it drops
-   leaves no value behind; a show while it leaves turns it back from where it is.
-   Under Reduced it fades in place instead. */
-.ds-panel[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear);
-  transform:translateX(calc((1 - var(--present-p)) * (100% + var(--s-16)))); }
-.ds[*|data-motion=reduced] .ds-panel[*|data-drive=spring]{ transform:none; opacity:var(--present-p); }
-.ds-panel[*|data-presence=leaving]{ pointer-events:none; }
-
-/* At the bottom (the reference's Edit Widgets sheet): centred `--s-8` above the root's
-   bottom, as wide as the host asks less `--s-8` at each side, as tall as it asks but never more
-   than half the root, so the top of the desktop, where widgets land, stays in view. It arrives as
-   a sheet does, `peek-in` at `--t-move --e-out` (no spring: opening is not contact), and after
-   that follows the sheet's spring: it fades and settles 12 px down at 95 % as it goes, and comes
-   back the same way. Under Reduced it only fades. */
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel{ top:auto; left:0; right:0; margin:0 auto; max-height:calc(50% - var(--s-8)); }
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=entering],
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }
-.ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
-  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
-.ds[*|data-motion=reduced] .ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-drive=spring]{ transform:none; }
-/* -- radio_group -- */
-/* RadioGroup (design/30 section 2.3, `NSButton` radio buttons). Attribute selectors carry `*|`
-   (spike S2); the focus ring is the global one, on the focused item (spike S12). The indicator is
-   the ladder's checkbox size (`--check-*`) as a circle, its hairline an inset shadow; the checked
-   one fills with the accent and a dot in the accent's ink. The Row arrangement stands each item's
-   image over its label, side by side. */
-
-.ds-radio-group{ --rg:var(--check-m); --rg-fs:var(--ctl-fs-m); display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-6); }
-.ds-radio-group[*|data-size=mini]{ --rg:var(--check-xs); --rg-fs:var(--ctl-fs-xs); }
-.ds-radio-group[*|data-size=small]{ --rg:var(--check-s); --rg-fs:var(--ctl-fs-s); }
-.ds-radio-group[*|data-size=large]{ --rg:var(--check-l); --rg-fs:var(--ctl-fs-l); }
-.ds-radio-group[*|data-arrangement=row]{ flex-direction:row; align-items:flex-start; gap:var(--s-16); }
-
-.ds-radio-group-item{
-  display:inline-flex; align-items:center; gap:var(--s-6); box-sizing:border-box; padding:0; border:0; background:transparent;
-  font:inherit; font-size:var(--rg-fs); color:var(--ink); line-height:1; cursor:default; text-align:left;
-}
-.ds-radio-group[*|data-arrangement=row] .ds-radio-group-item{ flex-direction:column; gap:var(--s-6); }
-.ds-radio-group-indicator{
-  display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--rg); height:var(--rg);
-  border-radius:var(--r-pill); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1);
-  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
-}
-.ds-radio-group-dot{ display:none; width:40%; height:40%; border-radius:var(--r-pill); background:var(--accent-ink); }
-.ds-radio-group-item[*|data-state=on] .ds-radio-group-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
-.ds-radio-group-item[*|data-state=on] .ds-radio-group-dot{ display:block; }
-.ds-radio-group-item[*|data-pressed] .ds-radio-group-indicator{ background:var(--surface); }
-.ds-radio-group-item[*|data-pressed][*|data-state=on] .ds-radio-group-indicator{ background:var(--accent-text); }
-.ds-radio-group-image{ display:inline-flex; line-height:0; color:var(--ink-soft); }
-.ds-radio-group-label{ min-width:0; }
-.ds-radio-group-item[*|aria-disabled=true],
-.ds-radio-group[*|aria-disabled=true],
-.ds-radio-group[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.
@@ -2126,8 +2100,9 @@ html,body{margin:0;padding:0;background:transparent}
    of `.ds` (design/05-MOTION.md section 9 rule 10). The wrapper covers the root, lets the
    pointer through, carries the layer's `--z-*`, and is what placement measures as its bounds.
    A layer closed by an outside click lays a catcher under its surface. Radii and shadows per
-   elevation: Pop 12 with `--shadow-pop` (`S:666`), Bubble 10 with `--shadow-bubble` (`S:684`),
-   Sheet 14 with `--shadow-sheet` (`S:233`); every surface is `--raise` with a 1px `--line`. */
+   elevation: a popover is `--r-panel` with `--shadow-pop`; the menu, the hover card and the tip
+   card use the same surface (the menu's `data-elevation` and the selection bubble's are kept
+   for them); every surface is `--raise` with a 1px `--line`. */
 
 .ds-overlay{ position:absolute; inset:0; pointer-events:none; }
 .ds-overlay[*|data-layer=toast]{ z-index:var(--z-toast); }
@@ -2150,11 +2125,28 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }
 .ds-popover[*|data-elevation=bubble]{ border-radius:var(--r-field); box-shadow:var(--shadow-bubble); }
-.ds-popover[*|data-elevation=sheet]{ border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); }
 
-/* Closed by Escape or an outside click, a popover fades out before it goes, as a menu does
-   (`menu-out`, `--t-quick --e-exit`; the macOS polish pass), taking no pointer while it does. */
+/* A popover (`data-dismiss` says what closes it): `--r-panel`, fading in over `--t-quick` and,
+   closed by Escape or an outside click, out over `--t-quick --e-exit` before it goes, taking no
+   pointer while it does (design/30 section 1.3). */
+.ds-popover[*|data-dismiss]{ border-radius:var(--r-panel); }
+.ds-popover[*|data-dismiss][*|data-presence=entering],.ds-popover[*|data-dismiss][*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-popover[*|data-dismiss][*|data-presence=entering][*|data-pulse=b],.ds-popover[*|data-dismiss][*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
 .ds-popover[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-popover-body{ position:relative; border-radius:inherit; }
+
+/* The arrow (`Arrow::Arrow`): a 34 x 8 point on the side facing the anchor. A 12 px square turned
+   45 degrees and stretched 2 to 1 is 34 wide with its outer half, 8 tall, standing out as the
+   point; only its two outer edges carry the line, so none shows across the body, and the body
+   (positioned, drawn after it) keeps the arrow's inner half under its content. `data-side` names
+   the popover's edge it stands on, and `left`/`top` (inline) its place along that edge. A popup
+   root has none (its card is fitted to the surface, and an outside press is the compositor's). */
+.ds-popover-arrow{ position:absolute; width:var(--s-12); height:var(--s-12); background:var(--raise); pointer-events:none; }
+.ds-popover-arrow[*|data-side=top]{ top:calc(var(--s-6) * -1); margin-left:calc(var(--s-6) * -1); border-top:var(--hair) solid var(--line); border-left:var(--hair) solid var(--line); transform:scale(2,1) rotate(45deg); }
+.ds-popover-arrow[*|data-side=bottom]{ bottom:calc(var(--s-6) * -1); margin-left:calc(var(--s-6) * -1); border-bottom:var(--hair) solid var(--line); border-right:var(--hair) solid var(--line); transform:scale(2,1) rotate(45deg); }
+.ds-popover-arrow[*|data-side=left]{ left:calc(var(--s-6) * -1); margin-top:calc(var(--s-6) * -1); border-bottom:var(--hair) solid var(--line); border-left:var(--hair) solid var(--line); transform:scale(1,2) rotate(45deg); }
+.ds-popover-arrow[*|data-side=right]{ right:calc(var(--s-6) * -1); margin-top:calc(var(--s-6) * -1); border-top:var(--hair) solid var(--line); border-right:var(--hair) solid var(--line); transform:scale(1,2) rotate(45deg); }
+.ds[*|data-extent=popup] .ds-popover-arrow{ display:none; }
 /* -- polkit_prompt -- */
 /* PolkitPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.10): a narrow centred
    sheet (`SheetWidth::Narrow`, 340) as the reference desktop's password alert: everything
@@ -2250,29 +2242,24 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }
 /* -- scrim -- */
-/* Scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the overlay, dims
-   with `--scrim` and fades in; a click closes. Hover is not specified; the focus ring is the
-   global one (it is a button). */
+/* The peek's scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the
+   overlay, dims with `--scrim` and fades in; a click closes. Hover is not specified; the focus
+   ring is the global one (it is a button). */
 
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
+/* -- search_field -- */
+/* SearchField (design/04-COMPONENTS.md section 7): `.cmdk-in` and `.cmdk .tokens`
+   (`S:235-236`, `S:794-798`). The field inside is an Inline TextInput; focus is the caret only.
+   Its rules name the variant so they outrank TextInput's own. The field
+   stays one line: TextInput's `em` height follows the 16 px here. Hover and disabled are not
+   specified. */
 
-/* Inline (`flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
-   caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
-   ancestor. It sets no z-index: content the caller renders after it in that container paints
-   over it, and every overlay layer stays above it. */
-/* An inline scrim's own layer (`layer: Some(ZLayer)`) is written on the element as
-   `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
-   below its floating surfaces. With none it stays at z-index auto, as above. */
-
-/* Modal (sheet and modal parts): `--scrim-modal`, .40 light and .55 dark, behind a dialog that
-   asks for a decision; design/03 section 17. */
-.ds-scrim[*|data-strength=modal]{ background:var(--scrim-modal); }
-
-/* Leaving with its sheet: `menu-out`, the fade a closing menu plays, at `--t-quick
-   --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
-   pointer while it goes. */
-.ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-search{ display:flex; align-items:center; gap:var(--s-9); padding:var(--s-12) var(--s-14); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
+.ds-search .ds-input-wrap{ flex:1; }
+.ds-search .ds-input[*|data-variant=inline]{ font-size:var(--fs-title); border:0; outline:none; background:transparent; color:var(--ink); width:100%; padding:0; height:1.55em; }
+.ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-title); padding:0; }
+.ds-search-tokens{ display:flex; gap:var(--s-5); flex-wrap:wrap; padding:0 var(--s-14) var(--s-8); }
 /* -- section_header -- */
 /* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
    Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
@@ -2307,62 +2294,47 @@ html,body{margin:0;padding:0;background:transparent}
    `--accent-soft` behind the words, which take the ink. */
 .ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }
 /* -- segmented -- */
-/* SegmentedControl (design/30 section 2.3, `NSSegmentedControl`). Attribute selectors carry `*|`
-   (spike S2). The focus ring is the global one (spike S12).
+/* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
+   Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
+   Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
    Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
-   the Mac's are, and the selection of a SelectOne control is one thumb behind them (the control's
-   last child, so every other child is a segment; the segments stack above it by `--z-raise`). The
-   thumb is placed in the selected segment's own grid cell (`--seg-col`), so at rest it covers
-   exactly the box the layout gave that segment at any scale, and a spring in Rust shifts it from
-   there by `--seg-dx` segments while it moves; nothing here transitions it. A label's ink follows
-   the thumb, not a transition: `data-thumb=under` while the thumb covers most of it (a colour
-   transition ran on its own clock, so a label went to the thumb's light ink on the light track
-   before the thumb arrived).
+   the Mac's are, and the pressed fill is one thumb behind them (the control's `::before`, so every
+   child is still a segment; the segments stack above it by `--z-raise`). The thumb is placed in
+   the selected segment's own grid cell (`--seg-col`), so at rest it covers exactly the box the
+   layout gave that segment at any scale, and a spring in Rust shifts it from there by `--seg-dx`
+   segments while it moves; nothing here transitions it. A label's ink follows the thumb, not a
+   transition: `data-thumb=under` while the thumb covers most of it (a colour transition ran on
+   its own clock, so a label went to the thumb's light ink on the light track before the thumb
+   arrived, and after a theme change every label faded from the old scheme's ink).
    Size (design/29-SIZING.md, decision 5): a rounded rectangle on the ladder, not a capsule. The
-   well is a control's height (16, 19, 22, 28) at the well radius; the thumb and each segment fill
-   it less the 1 px knob inset at the concentric radius. The well's hairline is an inset shadow,
-   so it takes nothing from the inset. Disabled segments draw at .35. */
+   well is a control's height (Regular 22, Small 16) at the well radius (6, 4); the thumb and
+   each segment fill it less the 1 px knob inset (20, 14) at the concentric radius (5, 3). The
+   well's hairline is an inset shadow, so it takes nothing from the inset.
+   TODO(O-1): disabled is not specified. */
 
-.ds-segmented{ --seg-n:1; --seg-col:1; --seg-dx:0;
-  --sg-h:var(--ctl-h-m); --sg-well-r:var(--seg-well-r-m); --sg-r:var(--seg-r-m); --sg-pad:var(--ctl-pad-m); --sg-fs:var(--ctl-fs-m);
-  position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
-  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset); background:var(--line-soft);
-  height:var(--sg-h); border-radius:var(--sg-well-r);
-}
-.ds-segmented[*|data-size=mini]{ --sg-h:var(--ctl-h-xs); --sg-well-r:var(--seg-well-r-xs); --sg-r:var(--seg-r-xs); --sg-pad:var(--ctl-pad-xs); --sg-fs:var(--ctl-fs-xs); }
-.ds-segmented[*|data-size=small]{ --sg-h:var(--ctl-h-s); --sg-well-r:var(--seg-well-r-s); --sg-r:var(--seg-r-s); --sg-pad:var(--ctl-pad-s); --sg-fs:var(--ctl-fs-s); }
-.ds-segmented[*|data-size=large]{ --sg-h:var(--ctl-h-l); --sg-well-r:var(--seg-well-r-l); --sg-r:var(--seg-r-l); --sg-pad:var(--ctl-pad-l); --sg-fs:var(--ctl-fs-l); }
+.ds-segmented{ --seg-n:1; --seg-col:1; --seg-dx:0; position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
+  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset);
+  height:var(--ctl-h-m); border-radius:var(--seg-well-r-m); --seg-r:var(--seg-r-m); }
+.ds-segmented[*|data-size=regular]{ background:var(--surface-2); }
+.ds-segmented[*|data-size=small]{ height:var(--ctl-h-xs); border-radius:var(--seg-well-r-xs); --seg-r:var(--seg-r-xs); background:var(--surface); }
 
 /* The thumb: out of flow in the selected segment's cell, which is its containing block (both
    ends named: an abspos item's `auto` end line is the padding edge, not span 1), and one
    segment plus a gap per unit of `--seg-dx` (its own width is a segment's). */
-.ds-segmented-indicator{
-  position:absolute; grid-row:1 / span 1; grid-column:var(--seg-col) / span 1; top:0; right:0; bottom:0; left:0;
-  border-radius:var(--sg-r); background:var(--raise); box-shadow:var(--shadow-1); pointer-events:none;
+.ds-segmented::before{
+  content:""; position:absolute; grid-row:1 / span 1; grid-column:var(--seg-col) / span 1; top:0; right:0; bottom:0; left:0;
+  border-radius:var(--seg-r); background:var(--ink); pointer-events:none;
   transform:translateX(calc(var(--seg-dx) * (100% + var(--s-2))));
 }
 
-.ds-segmented-segment{
-  position:relative; z-index:var(--z-raise); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4);
-  font:inherit; font-size:var(--sg-fs); font-weight:var(--ctl-fw-m); line-height:1; white-space:nowrap; color:var(--ink-soft);
-  height:100%; padding:0 var(--sg-pad); border:0; border-radius:var(--sg-r); background:transparent; cursor:default;
+.ds-segment{
+  position:relative; z-index:var(--z-raise); font:inherit; border:0; background:transparent; border-radius:var(--seg-r); font-weight:600; cursor:default; color:var(--ink-soft);
+  height:100%; line-height:1; white-space:nowrap;
 }
-.ds-segmented-segment:hover{ color:var(--ink); }
-.ds-segmented-segment[*|data-thumb=under]{ color:var(--ink); }
-.ds-segmented-icon{ display:inline-flex; line-height:0; }
-/* Without a thumb the selected segment carries its own raised face, as the thumb is (SelectAny
-   keeps it); Momentary shows a grey pressed fill while the segment is down. */
-.ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected]{ background:var(--raise); color:var(--ink); box-shadow:var(--shadow-1); }
-.ds-segmented[*|data-tracking=momentary] .ds-segmented-segment[*|data-pressed]{ background:var(--line); color:var(--ink); }
-/* Dark: a darker well and a lighter grey face than the card's raise. */
-.ds[*|data-theme=dark] .ds-segmented{ background:var(--surface-2); }
-.ds[*|data-theme=dark] .ds-segmented-indicator,
-.ds[*|data-theme=dark] .ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected]{ background:var(--line); }
-.ds-segmented[*|data-tracking=select-one] .ds-segmented-segment[*|data-pressed]{ opacity:.85; }
-.ds-segmented-segment[*|aria-disabled=true],
-.ds-segmented[*|aria-disabled=true],
-.ds-segmented[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
-.ds-segmented-label{ min-width:0; }
+.ds-segmented[*|data-size=regular] .ds-segment{ padding:0 var(--ctl-pad-m); font-size:var(--fs-small); }
+.ds-segmented[*|data-size=small] .ds-segment{ padding:0 var(--ctl-pad-xs); font-size:var(--fs-help); }
+.ds-segment:hover{ color:var(--ink); }
+.ds-segment[*|data-thumb=under]{ color:var(--paper); }
 /* -- selection_bubble -- */
 /* SelectionBubble (design/04-COMPONENTS.md section 30), verbatim `S:683-691`, over the
    `.ds-popover` Bubble surface: formatting buttons, or the link field. Italic's Georgia face is
@@ -2463,33 +2435,40 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-track-time{ white-space:nowrap; }
 .ds-track-times{ display:flex; justify-content:space-between; font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- sheet -- */
-/* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
-   centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
+/* Sheet (design/30 section 2.5, `NSWindow` sheet): `min(560px, 88%)` wide, hanging from the top
+   edge of its root (`data-attach=window`) or centred (`data-attach=centre`), as tall as its
+   content up to the root less the 36px inset. It dims nothing: macOS draws no scrim, and the
+   host catches the click outside if it wants it. It slides down from past the top edge over
+   `--t-big --e-out` and back up over `--t-move --e-exit` (design/30 section 1.3), holding its
+   last frame until the host unmaps it; a hide taken back plays `hold`, which moves nothing.
    TODO(O-14): the size is the candidate, not signed off. TODO(O-15): focus is not moved. */
 
-.ds-sheet{ position:absolute; top:36px; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - 72px); overflow-y:auto; scrollbar-width:none;
-  background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto;
-  animation:peek-in var(--t-big) var(--e-out); }
+.ds-sheet{ position:absolute; top:0; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - var(--s-36)); overflow-y:auto; scrollbar-width:none;
+  background:var(--surface-2); border-radius:0 0 var(--r-panel) var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto; }
+.ds-sheet[*|data-presence=entering],.ds-sheet[*|data-presence=present]{ animation:sheet-in var(--t-big) var(--e-out); }
+.ds-sheet[*|data-presence=entering][*|data-pulse=b],.ds-sheet[*|data-presence=present][*|data-pulse=b]{ animation-name:sheet-in--b; }
+.ds-sheet[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
 
-/* Driven (design/05 section 14, H1): after its first entrance the sheet is drawn from
-   a spring in Rust, `--present-p` (0 gone, 1 shown): it fades and settles 12 px down at 95 % as
-   it goes, and comes back the same way from wherever it is. It plays `hold`, which moves
-   nothing, so the entrance it drops leaves no value behind. Leaving, it is no longer
-   a target for the pointer. Under Reduced it only fades. */
-.ds-sheet[*|data-drive=spring]{ --present-p:1; animation:hold var(--t-quick) var(--e-linear); opacity:var(--present-p);
-  transform:translateY(calc((1 - var(--present-p)) * var(--s-12))) scale(calc(.95 + .05 * var(--present-p))); }
-.ds[*|data-motion=reduced] .ds-sheet[*|data-drive=spring]{ transform:none; }
-.ds-sheet[*|data-presence=leaving]{ pointer-events:none; }
+/* The body: the caller's content, filling the sheet. */
+.ds-sheet-body{ display:flex; flex-direction:column; flex:1; min-height:0; }
 
 /* Centred: a stage filling the overlay centres the sheet by flex, inside the same
    36px inset top and bottom, so no transform is needed (the keyframes own it, and Blitz's layout
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
-.ds-sheet[*|data-placement=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; }
+.ds-sheet[*|data-attach=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; border-radius:var(--r-panel); }
 
-/* Narrow (`SheetWidth::Narrow`, M11): an alert's column, as the reference desktop's password
+/* Narrow (`SheetWidth::Narrow`): an alert's column, as the reference desktop's password
    prompt; the rest of the sheet is as above. */
 .ds-sheet[*|data-width=narrow]{ width:min(340px, 88%); }
+
+/* Wide (`SheetWidth::Wide`): a gallery of cards, as Edit Widgets'. */
+.ds-sheet[*|data-width=wide]{ width:min(1040px, 92%); }
+
+/* Bottom (`Attach::Bottom`): `--s-8` above the root's bottom edge, never taller than half of it,
+   rising from below (`--sheet-dy`, the keyframes' offset). */
+.ds-sheet[*|data-attach=bottom]{ --sheet-dy:calc(100% + var(--s-36)); top:auto; bottom:var(--s-8); max-height:calc(50% - var(--s-8)); border-radius:var(--r-panel); }
 /* -- shot_thumbnail -- */
 /* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13).
    The card is a plate in the Toast material inside a transparent Toast scope (the
@@ -2543,6 +2522,28 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation-name:hold; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=leaving]{ animation-name:menu-out; }
+/* -- side_panel -- */
+/* SidePanel (design/30 section 2.5, design/20 section 1.6): the notification center's edge panel.
+   A stage fills the root and takes no pointer; the panel stands at the right edge, `--s-8` in
+   from the top, the bottom and the edge, as tall as the root allows, in its material (the
+   transparent-scope card rule paints it) at the material's radius, and scrolls its own content.
+   It slides in from past the right edge with `panel-in` (`--t-move --e-out`) and back out with
+   `panel-out` (`--t-quick --e-exit`), holding its last frame until the host unmaps it; a hide
+   taken back plays `hold`, which moves nothing. Hidden, nothing is laid out. The panel's material
+   scope fills the root too: Blitz places an absolutely positioned box against its parent, so a
+   scope of no height would give the panel none. Attribute selectors carry `*|` (spike S2). */
+
+.ds-side-panel-scope{ position:absolute; inset:0; pointer-events:none; }
+.ds-side-panel-stage{ position:absolute; inset:0; pointer-events:none; }
+.ds-side-panel-stage[*|data-shown=hidden]{ display:none; }
+.ds-side-panel{ position:absolute; top:var(--s-8); bottom:var(--s-8); right:var(--s-8); box-sizing:border-box; max-width:calc(100% - var(--s-16));
+  display:flex; flex-direction:column; gap:var(--s-8); padding:var(--s-12); overflow-y:auto; scrollbar-width:none; border-radius:var(--m-radius); color:var(--ink); pointer-events:auto; }
+.ds-side-panel[*|data-presence=entering],.ds-side-panel[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-side-panel[*|data-presence=entering][*|data-pulse=b],.ds-side-panel[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-side-panel[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-side-panel[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-side-panel-header{ display:flex; align-items:center; flex:none; }
+.ds-side-panel-body{ display:flex; flex-direction:column; gap:var(--s-8); flex:1; min-height:0; }
 /* -- sidebar_item -- */
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
    drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span
@@ -2607,92 +2608,40 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+/* -- skeleton -- */
+/* Skeleton (design/30 section 2.9): a placeholder in the quiet fill, static (no shimmer), that
+   fades in and out over `--t-quick` (the content cross-fades against it). A line is one line
+   tall and as wide as it is put; a block takes the card radius; a circle is round. */
 
-/* The unread count: a quiet badge at the end of the row. */
-.ds-sidebar-item .ds-badge{ margin-left:auto; }
+.ds-skeleton{ display:block; background:var(--line); }
+.ds-skeleton[*|data-shape=line]{ height:1em; border-radius:var(--r-item); }
+.ds-skeleton[*|data-shape=block]{ min-height:var(--s-36); border-radius:var(--r-card); }
+.ds-skeleton[*|data-shape=circle]{ border-radius:var(--r-pill); }
+.ds-skeleton[*|data-presence=entering],.ds-skeleton[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-skeleton[*|data-presence=entering][*|data-pulse=b],.ds-skeleton[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds-skeleton[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-skeleton[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
 /* -- slider -- */
-/* Slider (design/30 section 2.1, `NSSlider`; sized by design/29-SIZING.md). Attribute selectors
-   carry `*|` (spike S2); the focus ring is the global one, on `.ds-slider` (spike S12). The level
-   is `--f`, written inline by the component.
+/* Slider (design/04-COMPONENTS.md section 5, derived; sized by design/29-SIZING.md): the
+   reference's regular slider, a 4 px capsule track under a plain white round knob of 20 (the
+   Regular knob, `--slider-knob-m`) with the handle's shadow and no ring. A DragTracker in Rust
+   writes `--f`. Attribute selectors carry `*|` (spike S2); the focus ring is the global one, on
+   `.ds-slider` (spike S12). The thumb follows the pointer 1:1: nothing here transitions `left`.
+   TODO(O-5): the track's `--line` unfilled colour is the doc's candidate.
+   TODO(O-3): the live scale 1.15 (`S:257`) has no scalar token.
+   The hover state and disabled (O-1) are not specified. */
 
-   Linear: a capsule track under a plain round knob (`--slider-knob-*`, the handle's shadow, no
-   ring); a DragTracker in Rust writes `--f`, the knob follows the pointer 1:1 and springs to a
-   tick or where a throw lands, so nothing here transitions `left`. Pressed changes nothing on
-   the knob: macOS has no swell. Ticks are marks on the track at their own `--f`.
-
-   Capsule and CapsuleKnob (the user's brief of 2026-09-25): a level with a glyph that follows
-   it. The inks are the material's level inks (`--m-level-*`, per scheme, `material/level.rs`);
-   the capsule is a control of the rung's height (`--ctl-h-*`). A level set from outside slides
-   over `--t-quick --e-out`; under the pointer (`data-pressed`) the fill follows it with no
-   transition. Glyph parts cross-fade over `--t-quick`; the sun's rays scale with `--f`. */
-
-.ds-slider{ --sl-knob:var(--slider-knob-m); --sl-track:var(--slider-track-m); --sl-h:var(--ctl-h-m); position:relative; display:block; cursor:default; }
-.ds-slider[*|data-size=mini]{ --sl-knob:var(--slider-knob-xs); --sl-track:var(--slider-track-xs); --sl-h:var(--ctl-h-xs); }
-.ds-slider[*|data-size=small]{ --sl-knob:var(--slider-knob-s); --sl-track:var(--slider-track-s); --sl-h:var(--ctl-h-s); }
-.ds-slider[*|data-size=large]{ --sl-knob:var(--slider-knob-l); --sl-track:var(--slider-track-l); --sl-h:var(--ctl-h-l); }
-
-.ds-slider[*|data-look=linear]{ width:100%; height:var(--sl-knob); }
-.ds-slider[*|data-look=linear] .ds-slider-track{
-  position:absolute; left:0; right:0; top:calc((var(--sl-knob) - var(--sl-track)) / 2); height:var(--sl-track); overflow:hidden;
+.ds-slider{ position:relative; display:block; width:100%; height:var(--slider-knob-m); cursor:default; }
+.ds-slider-track{
+  position:absolute; left:0; right:0; top:calc((var(--slider-knob-m) - var(--slider-track-m)) / 2); height:var(--slider-track-m); overflow:hidden;
   border-radius:var(--r-pill); background:var(--line);
 }
-.ds-slider[*|data-look=linear] .ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
-.ds-slider-tick{ position:absolute; top:0; bottom:0; left:calc(var(--f) * 100%); width:var(--hair); background:var(--ink-faint); }
-.ds-slider[*|data-look=linear] .ds-slider-thumb{
-  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:var(--sl-knob); height:var(--sl-knob); margin-left:calc(var(--sl-knob) / -2);
-  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); cursor:default;
+.ds-slider-fill{ height:100%; width:calc(var(--f) * 100%); background:var(--accent); }
+.ds-slider-thumb{
+  position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:var(--slider-knob-m); height:var(--slider-knob-m); margin-left:calc(var(--slider-knob-m) / -2);
+  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); cursor:grab;
 }
-
-/* The capsule looks. The rail is the control's height; a lead glyph stands before it. */
-.ds-slider[*|data-look=capsule],
-.ds-slider[*|data-look=capsule-knob]{ --level-h:var(--sl-h); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; }
-.ds-slider-rail{ position:relative; flex:1; min-width:0; height:var(--level-h, var(--sl-h)); }
-/* Where a press and a drag land: the rail and a margin round it, so a drag a little past an end
-   still reaches the control. Last in the rail, so it is over everything drawn there. */
-.ds-slider-hit{ position:absolute; top:calc(var(--s-6) * -1); bottom:calc(var(--s-6) * -1); left:calc(var(--s-16) * -1); right:calc(var(--s-16) * -1); }
-.ds-slider-icon-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
-
-/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
-.ds-slider[*|data-look=capsule] .ds-slider-track,
-.ds-slider[*|data-look=capsule-knob] .ds-slider-track{
-  position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
-  background:var(--m-level-well); box-shadow:var(--m-level-shade);
-}
-.ds-slider[*|data-look=capsule] .ds-slider-fill,
-.ds-slider[*|data-look=capsule-knob] .ds-slider-fill{
-  position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
-  background:var(--m-level-fill); transition:width var(--t-quick) var(--e-out);
-}
-.ds-slider[*|data-pressed] .ds-slider-fill{ transition:none; }
-
-/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
-   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
-.ds-slider-track > .ds-slider-icon,
-.ds-slider-fill > .ds-slider-icon{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
-.ds-slider-track > .ds-slider-icon{ color:var(--m-level-glyph); }
-.ds-slider-fill > .ds-slider-icon{ color:var(--m-level-glyph-fill); }
-
-/* The knob: a round disc of the fill's ink riding the fill's end, the capsule less the 1 px knob
-   inset (design/29-SIZING.md R3); the fill ends at its centre. */
-.ds-slider[*|data-look=capsule-knob] .ds-slider-fill{ width:calc(var(--level-h) / 2 + var(--f) * (100% - var(--level-h))); }
-.ds-slider[*|data-look=capsule-knob] .ds-slider-thumb{
-  position:absolute; top:var(--knob-inset); left:calc(var(--knob-inset) + var(--f) * (100% - var(--level-h))); width:calc(var(--level-h) - 2 * var(--knob-inset)); height:calc(var(--level-h) - 2 * var(--knob-inset));
-  border-radius:var(--r-pill); background:var(--m-level-fill); box-shadow:var(--m-level-knob);
-  transition:left var(--t-quick) var(--e-out);
-}
-.ds-slider[*|data-pressed] .ds-slider-thumb{ transition:none; }
-
-/* Disabled: a level that cannot be moved says so. The rail and the lead glyph drop to the
-   disabled .35 (design/13 section 13.3.3's disabled item), the knob is not drawn (nothing to
-   grab), and the pointer is the not-allowed cursor; no press registers (the component takes no
-   input). Busy takes no input either, and keeps the default cursor. */
-.ds-slider[*|aria-disabled=true]{ cursor:not-allowed; }
-.ds-slider[*|aria-disabled=true] .ds-slider-rail,
-.ds-slider[*|aria-disabled=true] .ds-slider-icon-lead{ opacity:.35; }
-.ds-slider[*|data-look=linear][*|aria-disabled=true]{ opacity:.35; }
-.ds-slider[*|aria-disabled=true] .ds-slider-thumb{ display:none; }
-.ds-slider[*|data-look=linear][*|aria-disabled=true] .ds-slider-thumb{ display:block; }
-.ds-slider[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+.ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
 /* -- space_editor -- */
 /* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
    Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from
@@ -2704,7 +2653,7 @@ html,body{margin:0;padding:0;background:transparent}
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
    The Space dot is also the AppearancePicker's accent swatch (section 26).
-   `.ds-field` is this editor's colour field only (a text field's wrapper is `.ds-input-wrap`, not `.ds-field`, and
+   `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
    its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
    22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
    in a wide panel drew 140 px discs. The stop's remove button names the stop, as
@@ -2760,7 +2709,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
 
-/* The title as a name field (`on_rename`): the plain TextField takes the title's
+/* The title as a name field (`on_rename`): the inline TextInput takes the title's
    display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
    scheme's rows under a heading in the data face, upper case, as the field headers are. */
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
@@ -2778,71 +2727,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
 .ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
-/* -- progress -- */
-/* ProgressIndicator (design/30 section 2.9). Attribute selectors carry `*|` (spike S2). Sized
-   by the ladder: the bar's thickness is `--progress-*`, the spinner's and the ring's box
-   `--spinner-*`. A determinate value is `--f`, written from Rust (a tween, so it retargets from
-   where it stands); a running operation is `--step` (`data-pending=step`), a turn one twelfth a
-   step, so nothing here loops. */
-
-.ds-progress{ --pg-h:var(--progress-m); --pg-box:var(--spinner-m); position:relative; box-sizing:border-box; flex:none; }
-.ds-progress[*|data-size=mini]{ --pg-h:var(--progress-xs); --pg-box:var(--spinner-xs); }
-.ds-progress[*|data-size=small]{ --pg-h:var(--progress-s); --pg-box:var(--spinner-s); }
-.ds-progress[*|data-size=large]{ --pg-h:var(--progress-l); --pg-box:var(--spinner-l); }
-.ds-progress[*|data-pending=idle]{ visibility:hidden; }
-
-/* Bar: a capsule track, the fill in the accent. */
-.ds-progress[*|data-style=bar]{ width:100%; height:var(--pg-h); }
-.ds-progress[*|data-style=bar] .ds-progress-track{ height:100%; overflow:hidden; border-radius:var(--r-pill); background:var(--line); }
-.ds-progress[*|data-style=bar] .ds-progress-fill{ height:100%; width:calc(var(--f, 1) * 100%); border-radius:var(--r-pill); background:var(--accent); }
-/* The barber pole: diagonal stripes on a fill twice the track wide, slid a twelfth of their
-   horizontal period (24 px) a step. */
-.ds-progress[*|data-style=bar][*|data-pending=step] .ds-progress-fill{
-  width:200%; border-radius:0;
-  background-image:repeating-linear-gradient(135deg, var(--accent) 0, var(--accent) 8.5px, var(--accent-soft) 8.5px, var(--accent-soft) 17px);
-  transform:translateX(calc(var(--step) * -2px));
-}
-
-/* Spinner: twelve spokes round the centre, the lit one at age 0. */
-.ds-progress[*|data-style=spinner]{ width:var(--pg-box); height:var(--pg-box); }
-.ds-progress-indicator{
-  position:absolute; top:0; left:calc(50% - var(--pg-box) * .05); width:calc(var(--pg-box) * .1); height:calc(var(--pg-box) * .28);
-  border-radius:var(--r-pill); background:var(--ink-soft); transform-origin:50% calc(var(--pg-box) / 2);
-}
-.ds-progress-indicator[*|data-spoke="0"]{ transform:rotate(0deg); }
-.ds-progress-indicator[*|data-spoke="1"]{ transform:rotate(30deg); }
-.ds-progress-indicator[*|data-spoke="2"]{ transform:rotate(60deg); }
-.ds-progress-indicator[*|data-spoke="3"]{ transform:rotate(90deg); }
-.ds-progress-indicator[*|data-spoke="4"]{ transform:rotate(120deg); }
-.ds-progress-indicator[*|data-spoke="5"]{ transform:rotate(150deg); }
-.ds-progress-indicator[*|data-spoke="6"]{ transform:rotate(180deg); }
-.ds-progress-indicator[*|data-spoke="7"]{ transform:rotate(210deg); }
-.ds-progress-indicator[*|data-spoke="8"]{ transform:rotate(240deg); }
-.ds-progress-indicator[*|data-spoke="9"]{ transform:rotate(270deg); }
-.ds-progress-indicator[*|data-spoke="10"]{ transform:rotate(300deg); }
-.ds-progress-indicator[*|data-spoke="11"]{ transform:rotate(330deg); }
-.ds-progress-indicator[*|data-age="0"]{ opacity:1; }
-.ds-progress-indicator[*|data-age="1"]{ opacity:.85; }
-.ds-progress-indicator[*|data-age="2"]{ opacity:.72; }
-.ds-progress-indicator[*|data-age="3"]{ opacity:.6; }
-.ds-progress-indicator[*|data-age="4"]{ opacity:.5; }
-.ds-progress-indicator[*|data-age="5"]{ opacity:.42; }
-.ds-progress-indicator[*|data-age="6"]{ opacity:.35; }
-.ds-progress-indicator[*|data-age="7"]{ opacity:.29; }
-.ds-progress-indicator[*|data-age="8"]{ opacity:.24; }
-.ds-progress-indicator[*|data-age="9"]{ opacity:.2; }
-.ds-progress-indicator[*|data-age="10"]{ opacity:.16; }
-.ds-progress-indicator[*|data-age="11"]{ opacity:.13; }
-
-/* Ring: the track and the arc share one box; the arc's colour is the accent, the track's the
-   line. Unknown, the arc is turned by the loop's step. */
-.ds-progress[*|data-style=ring]{ width:var(--pg-box); height:var(--pg-box); }
-.ds-progress[*|data-style=ring] .ds-progress-track,
-.ds-progress[*|data-style=ring] .ds-progress-fill{ position:absolute; top:0; left:0; width:100%; height:100%; }
-.ds-progress[*|data-style=ring] .ds-progress-track{ color:var(--line); }
-.ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--accent); }
-.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(calc(var(--step) * 30deg)); }
-.ds-progress-glyph{ position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
    (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a pending loop.
@@ -2879,68 +2763,74 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-status-glyph[*|data-pending=low]{ opacity:.45; }
 .ds-status-glyph[*|data-kind=volume]{ width:var(--ic-size); height:var(--ic-size); }
 .ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }
-/* -- text_field -- */
-/* TextField (design/30 section 2.2, `NSTextField`, `NSSecureTextField`, `NSSearchField`).
-   Attribute selectors carry `*|` (spike S2). The root holds the field and the notes under it; the
-   frame is the bezel: the hairline, the ground and the accent ring, so a prefix, a search glyph,
-   a clear button or a spinner sit inside it. Blitz's `:focus-within` is always false, so the
-   component writes `data-focus=ring` on the root while its input has the caret and the ring is
-   drawn from that. Sized by the ladder: `--tf-*` are set once per rung and every part reads them.
-   `.ds-input-wrap` wraps the input so the placeholder can be a span over it: Blitz draws no
-   `placeholder` and has no `::placeholder` (O-23's fallback).
-   One line: Blitz gives an `input` no intrinsic size, so it took the replaced-element default of
-   300 x 150. A Bezeled field is a control of the rung's height whose line fills the frame inside
-   its hairlines; the width fills the root, whose width is the consumer's.
-   Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
-   (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this. */
+/* -- tabs -- */
+/* Tabs (design/04-COMPONENTS.md section 12): C's `.tabs` (`C:243-257`); the bar's margins are
+   page layout. The underline is a real span (O-22's fallback for `::after`) that grows in
+   place; there is no sliding underline. Attribute selectors carry `*|` (spike S2).
+   Active and disabled (O-1) are not specified. */
 
-.ds-text-field{
-  --tf-h:var(--ctl-h-m); --tf-r:var(--ctl-r-m); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
-  display:flex; flex-direction:column; gap:var(--s-2); min-width:0; text-align:start;
+.ds-tabs{ display:flex; gap:var(--s-6); border-bottom:var(--hair) solid var(--line); }
+.ds-tab{
+  position:relative; border:0; background:transparent; cursor:default;
+  padding:var(--s-10) var(--s-14) var(--s-12); font-family:var(--font-display); font-weight:700; font-size:var(--fs-title);
+  color:var(--ink-faint); transition:color var(--t-quick) var(--e-out);
 }
-.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-r:var(--ctl-r-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-r:var(--ctl-r-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-r:var(--ctl-r-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
+.ds-tab:hover{ color:var(--ink-soft); }
+.ds-tab[*|aria-selected=true]{ color:var(--ink); }
+.ds-tab-underline{
+  position:absolute; left:10px; right:10px; bottom:-1px; height:3px;
+  border-radius:var(--r-pill) var(--r-pill) 0 0; background:var(--accent-text);
+  transform:scaleX(0); transform-origin:50% 100%;
+  transition:transform var(--t-move) var(--e-out);
+}
+.ds-tab[*|aria-selected=true] .ds-tab-underline{ transform:scaleX(1); }
+/* -- text_input -- */
+/* TextInput (design/04-COMPONENTS.md section 6): Boxed is `.inp`, Inline is `.inp.inline` with
+   `.pinput` folded in (`S:599-600`, `S:781-786`). Attribute selectors carry `*|` (spike S2).
+   `.ds-input-wrap` wraps the input so the placeholder can be a span over it: Blitz draws no
+   `placeholder` and has no `::placeholder` (O-23's fallback). (It was `.ds-field`, which is the
+   Space editor's colour field: the two sheets styled each other's element, gallery fix A.)
+   One line: Blitz gives an `input` no intrinsic size, so it took the replaced-element default of
+   300 x 150. Boxed is a Regular control (22, design/29-SIZING.md R1) whose line fills the box
+   inside its hairlines; Inline's height is its line (`1.55em`) plus the padding and the border,
+   in `em` so a consumer's font size (the search row's 16, the bubble's 12.5) keeps it one line;
+   the width fills the wrapper, whose width is the consumer's.
+   Font and colour are on `.ds-input` itself: the reset's element rules are `:where(.ds) input`,
+   (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this.
+   TODO(O-1): disabled is not specified; hover is not specified. */
 
-/* The frame: the bezel. A field reads from its leading edge wherever it sits: a centred container
-   (the polkit card's `text-align:center`) would centre the mask and the placeholder, which span
-   the field, while Blitz lays the input's own text and caret out from the start whatever
-   `text-align` says, so the dots drew mid-field with the caret before them. */
-.ds-text-field-frame{ display:flex; align-items:center; gap:var(--s-4); min-width:0; text-align:start; }
-.ds-text-field[*|data-variant=bezeled] .ds-text-field-frame{
-  box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--tf-r);
-  transition:border-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+/* A field reads from its leading edge wherever it sits: a centred container (the polkit
+   card's `text-align:center`) would centre the mask and the placeholder, which span the field,
+   while Blitz lays the input's own text and caret out from the start whatever `text-align` says,
+   so the dots drew mid-field with the caret before them. */
+.ds-input-wrap{ position:relative; display:flex; min-width:0; text-align:start; }
+.ds-input-wrap[*|data-variant=inline]{ flex:1; min-width:120px; }
+
+.ds-input{ width:100%; min-width:0; outline:none; font-size:var(--fs-body); line-height:1.55; color:var(--ink); }
+.ds-input[*|data-variant=boxed]{
+  height:var(--ctl-h-m); line-height:calc(var(--ctl-h-m) - 2 * var(--hair));
+  background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--ctl-r-m); padding:0 var(--s-8);
+  transition:border-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
-.ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ border-color:var(--accent-text); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
-.ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ border-color:var(--danger); }
-.ds-text-field-icon,
-.ds-text-field-suffix{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); line-height:0; }
-.ds-text-field-help{ font-size:var(--fs-help); color:var(--ink-faint); }
-.ds-text-field[*|data-validity=invalid] .ds-text-field-help .ds-label{ color:var(--danger); }
-.ds-text-field-tokens{ display:flex; flex-wrap:wrap; gap:var(--s-6); padding:var(--s-4) var(--s-8) var(--s-8); }
-.ds-text-field[*|aria-disabled=true] .ds-text-field-frame{ opacity:.35; }
-.ds-text-field[*|aria-busy=true] .ds-text-field-frame{ cursor:default; }
-
-.ds-input-wrap{ position:relative; display:flex; flex:1; min-width:0; text-align:start; }
-.ds-input-wrap[*|data-variant=plain]{ min-width:120px; }
-
-.ds-input{ width:100%; min-width:0; outline:none; font-size:var(--tf-fs); line-height:1.55; color:var(--ink); }
-.ds-input[*|data-variant=bezeled]{
-  height:calc(var(--tf-h) - 2 * var(--hair)); line-height:calc(var(--tf-h) - 2 * var(--hair));
-  background:transparent; border:0; padding:0;
+.ds-input[*|data-variant=boxed]:focus{ border-color:var(--accent-text); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
+.ds-input[*|data-variant=inline]{
+  height:calc(1.55em + 8px);
+  border:var(--hair) solid transparent; background:transparent; padding:var(--s-3) var(--s-2); box-shadow:none;
 }
-/* The global keyboard ring must not double the field's own focus. */
+.ds-input[*|data-variant=inline]:focus{ border-color:transparent; box-shadow:none; }
+/* The global keyboard ring must not double the field's own focus (or the Inline container's). */
 .ds[*|data-modality=keyboard] .ds-input:focus{ outline:none; }
 
-/* The placeholder sits where the input's text starts. */
+/* The placeholder sits where the input's text starts: its border plus its padding. */
 .ds-input-placeholder{
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
-  font:inherit; font-size:var(--tf-fs); line-height:1.55; color:var(--ink-faint);
+  font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-placeholder{ line-height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-placeholder{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ padding:var(--s-4) var(--s-3); }
 
-/* A secure field (`data-kind=secure`): Blitz draws a password field's characters as typed, so the
+/* A password (`data-kind=password`): Blitz draws a password field's characters as typed, so the
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
    per character over it, where the placeholder would sit; the secret itself never paints.
    Blitz measures the hidden text in its editor's own face, untracked, so its caret drifts off
@@ -2950,7 +2840,8 @@ html,body{margin:0;padding:0;background:transparent}
    the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
    field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
    the plan's `--accent-soft` behind its dots. */
-.ds-input[*|data-kind=secure]{ color:transparent; caret-color:var(--ink); }
+.ds-input[*|data-kind=password],
+.ds-input[*|data-kind=secret]{ color:transparent; caret-color:var(--ink); }
 .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
 /* The caret takes no room in the line: a point on the baseline, its bar hung from the line's top
    (Inter's ascent .969em plus the half-leading of a 1.55 line, (1.55 - 1.21) / 2 = .17em). */
@@ -2963,43 +2854,59 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-input-mask-selected{ background:var(--accent-soft); }
 .ds-input-mask{
   position:absolute; left:0; top:0; right:0; pointer-events:none; white-space:nowrap; overflow:hidden;
-  font:inherit; font-size:var(--tf-fs); line-height:1.55; color:var(--ink); letter-spacing:.1em;
+  font:inherit; font-size:var(--fs-body); line-height:1.55; color:var(--ink); letter-spacing:.1em;
 }
-/* Bezeled, the mask's line is the field's ground (its content box is the input's, to the pixel),
+/* Boxed, the mask's line is the field's ground (its content box is the input's, to the pixel),
    so Blitz's own selection, which it paints over the hidden text in a fixed colour no style
-   reaches, stays under it and only the dots' highlight shows. A Plain field's ground is its
-   container's, which the mask cannot repeat: there Blitz's highlight shows beside the dots' when
-   a range is selected. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:calc(var(--tf-h) - 2 * var(--hair)); background:var(--surface); }
-/* Bezeled, the caret spans the field's line, hung from its top: the ascent plus the line's
+   reaches, stays under it and only the dots' highlight shows. An Inline field's ground is its
+   container's (the lock pill's glass), which the mask cannot repeat: there Blitz's highlight
+   shows beside the dots' when a range is selected. */
+.ds-input-wrap[*|data-variant=boxed] .ds-input-mask{ padding:var(--hair) calc(var(--s-8) + var(--hair)); line-height:calc(var(--ctl-h-m) - 2 * var(--hair)); background:var(--surface); background-clip:content-box; }
+/* Boxed, the caret spans the field's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=boxed] .ds-input-caret::before{ top:calc(-.969em - (var(--ctl-h-m) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--ctl-h-m) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=inline] .ds-input-mask{ padding:var(--s-4) var(--s-3); }
 
-/* Plain: the field takes the face of the text it edits. No box, border, padding or ground; font,
-   size, weight, tracking, line height and colour are inherited, so a title or a property row's
-   value is edited in place. Only the caret and the selection are the field's. Blitz sizes a
-   one-line input by its line height, so the height is left to it. */
-.ds-text-field[*|data-variant=plain]{ flex:1 1 auto; min-width:0; }
-.ds-input[*|data-variant=plain]{
+/* A secret (`data-kind=secret`) is drawn as a password is; it differs only in its
+   markup, which never carries a `value`. */
+
+/* Bare: the field takes the face of the text it edits. No box, border, padding or
+   ground; font, size, weight, tracking, line height and colour are inherited, so a title or a
+   property row's value is edited in place. Only the caret and the selection are the field's.
+   Blitz sizes a one-line input by its line height, so the height is left to it. */
+.ds-input-wrap[*|data-variant=bare]{ flex:1 1 auto; min-width:0; }
+.ds-input[*|data-variant=bare]{
   height:auto; border:0; padding:0; margin:0; background:transparent; box-shadow:none; border-radius:0;
   font:inherit; font-size:inherit; line-height:inherit; letter-spacing:inherit; color:inherit; caret-color:var(--accent-text);
 }
-.ds-input[*|data-variant=plain]::selection{ background:var(--accent-soft); }
-.ds-input-wrap[*|data-variant=plain] .ds-input-placeholder,
-.ds-input-wrap[*|data-variant=plain] .ds-input-mask{ padding:0; font-size:inherit; line-height:inherit; letter-spacing:inherit; }
-.ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ color:inherit; opacity:.45; }
-.ds-input[*|data-variant=plain][*|data-kind=secure]{ color:transparent; }
-.ds-input-wrap[*|data-variant=plain] .ds-input-mask{ color:inherit; }
-/* A plain field's line height is its parent's, so its caret spans the text's ascent and descent;
-   its tracking is its parent's, usually none: the bar is centred on the point. */
-.ds-input-wrap[*|data-variant=plain] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
+.ds-input[*|data-variant=bare]::selection{ background:var(--accent-soft); }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder,
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ padding:0; font-size:inherit; line-height:inherit; letter-spacing:inherit; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-placeholder{ color:inherit; opacity:.45; }
+.ds-input[*|data-variant=bare][*|data-kind=password],
+.ds-input[*|data-variant=bare][*|data-kind=secret]{ color:transparent; }
+.ds-input-wrap[*|data-variant=bare] .ds-input-mask{ color:inherit; }
+/* A bare field's line height is its parent's, so its caret spans the text's ascent and descent. */
+/* A bare field's tracking is its parent's, usually none: the bar is centred on the point. */
+.ds-input-wrap[*|data-variant=bare] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
 
-/* A plain search field is the query row of a palette or a launcher (`S:235-236`): a row of its
-   own with a hairline under it, the glyph in the faint ink, the query at the title size and one
-   line tall. */
-.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-text-field-frame{ padding:var(--s-12) var(--s-14); gap:var(--s-9); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
-.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input{ font-size:var(--fs-title); color:var(--ink); }
-.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-title); }
+/* Multiline: a `textarea`. Blitz gives it `rows` line heights of content (two when
+   `rows` is absent) plus its padding, so the one-line height above is undone and the field's
+   `rows` sets it; a growing field raises `rows` itself. No resize handle: its height is the
+   component's. */
+.ds-input[*|data-kind=multiline]{ height:auto; resize:none; white-space:pre-wrap; overflow:auto; scrollbar-width:none; display:block; }
+/* A boxed multiline field reads at the reading line, with the Regular field's inset above and
+   below its lines. */
+.ds-input[*|data-variant=boxed][*|data-kind=multiline]{ line-height:1.55; padding:var(--s-4) var(--s-8); }
+.ds-input-wrap[*|data-kind=multiline]{ align-items:flex-start; }
+
+/* File: the chosen name, read-only, and the Tool "Choose…" button after it. The
+   name is a span drawn as the field (no input: nothing is typed here), cut at its end. The wrap
+   takes its container's width: a span has no 300 px intrinsic width as an input has, so without
+   it the name collapsed to its padding on Blitz. */
+.ds-input-wrap[*|data-kind=file]{ align-items:center; gap:var(--s-6); width:100%; }
+.ds-input[*|data-kind=file]{ display:block; white-space:nowrap; overflow:hidden; cursor:default; flex:1 1 0; width:auto; }
+.ds-input-wrap[*|data-kind=file] .ds-input-placeholder{ right:auto; }
 /* -- text_runs -- */
 /* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
@@ -3020,86 +2927,63 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
 .ds-run-link:hover{ color:var(--accent-text); }
 /* -- toast -- */
-/* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
-   (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
-   the tab follows the pointer with its transition off while `data-drag=live`, and fills with
-   the accent while `data-armed=armed`. Tab hover is not specified.
-   Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
-   toast mounts hidden, so its first frame is below the edge and the spring runs from there
-   (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
-   toast, as S's `.toast .tab` does. */
+/* Toast (design/30 section 2.9, design/04-COMPONENTS.md section 23): one dark pill at the
+   bottom right that moves like a notification banner: it slides in from past the right edge with
+   `panel-in` (`--t-move --e-out`) and out with `panel-out` (`--t-quick --e-exit`), holding its
+   last frame until the host drops it; a swipe to the right carries it along (`--swipe-dx`, its
+   exit starts there). Nothing is laid out while the hub is empty. The action is a quiet button
+   inside the pill, in the accent's ink on the pill. A hide taken back plays `hold`. */
 
-.ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
-  display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
-  padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
-  transition:transform var(--t-big) var(--e-out); }
-.ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
-.ds-toast-text{ min-width:0; overflow:hidden; }
-.ds-toast-hint{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
-.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
-  border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
-  transition:transform var(--t-move) var(--e-out), background-color var(--t-quick) var(--e-out); }
-.ds-toast-tab:active{ cursor:grabbing; }
-.ds-toast-tab[*|data-drag=live]{ transition:none; }
-.ds-toast-tab[*|data-armed=armed]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
+.ds-toast{ position:absolute; right:var(--s-14); bottom:var(--s-14); transform:translateX(var(--swipe-dx,0px));
+  display:flex; align-items:center; gap:var(--s-8); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
+  padding:var(--s-6) var(--s-6) var(--s-6) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto; touch-action:none; }
+.ds-toast[*|data-presence=entering],.ds-toast[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-toast[*|data-presence=entering][*|data-pulse=b],.ds-toast[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-toast[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-toast[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-toast-body{ min-width:0; overflow:hidden; }
+.ds-toast .ds-toast-action{ display:flex; align-items:center; gap:var(--s-6); background:var(--paper); color:var(--ink); border:0; border-radius:var(--r-pill);
+  padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; cursor:default;
+  transition:background-color var(--t-quick) var(--e-in-out); }
 /* -- toggle -- */
-/* Toggle (design/30 section 2.3, `NSSwitch`; sized by design/29-SIZING.md): the switch on the
-   size ladder. The button is the focus and press target; the track is `round_even(1.73 h)` wide
-   and a capsule (R2, R4), the indicator fills it less the 1 px knob inset (R3): Regular and Large
-   38 x 22 with a 20 knob, Small 32 x 18 with a 16 knob, Mini 26 x 15 with a 13 knob (the reference's
-   mini switch, in settings rows). The off track's hairline is an inset shadow, so it takes no room
-   from the inset. Attribute selectors carry `*|` (spike S2); the focus ring is the global one, on
-   the button (spike S12).
-   Driven motion (design/05 section 14, H1): the indicator's offset is `--knob-x`, written in pixels
-   by a spring in Rust on the button (its travel is `SizeScale::switch_travel`), so nothing here
-   transitions the indicator's transform; the track's tint fades over `--t-quick`. Pressed darkens
-   the track, disabled and busy draw it at .35 and take no pointer. */
+/* Toggle (design/04-COMPONENTS.md section 4; sized by design/29-SIZING.md): the switch on the
+   size ladder. The track is `round_even(1.73 h)` wide and a capsule (R2, R4); the knob fills it
+   less the 1 px knob inset (R3): Regular and Large 38 x 22 with a 20 knob, Small 32 x 18 with a
+   16 knob, Mini 26 x 15 with a 13 knob (the reference's mini switch, in settings rows). The off track's
+   hairline is an inset shadow, so it takes no room from the inset. Attribute selectors carry `*|`
+   (spike S2); the focus ring is the global one, on the track (spike S12).
+   Driven motion (design/05 section 14, H1): the knob's offset is `--knob-x`, written in pixels by a
+   spring in Rust on the button (its travel is `SizeScale::switch_travel`), so nothing here
+   transitions the knob's transform.
+   TODO(O-1): disabled is not specified; hover is not specified. */
 
-.ds-toggle{ --knob-x:0; --sw-w:var(--switch-w-m); --sw-h:var(--switch-h-m); --sw-r:var(--switch-r-m); --sw-knob:var(--switch-knob-m);
-  display:inline-flex; flex:none; box-sizing:border-box; width:var(--sw-w); height:var(--sw-h); padding:0; border:0; border-radius:var(--sw-r);
-  background:transparent; cursor:default;
+.ds-toggle{ --knob-x:0;
+  display:inline-flex; align-items:center; flex:none; box-sizing:border-box; width:var(--switch-w-m); height:var(--switch-h-m); padding:0 var(--knob-inset);
+  border:0; border-radius:var(--switch-r-m); background:var(--surface-2); box-shadow:inset 0 0 0 var(--hair) var(--line); cursor:default;
+  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
-.ds-toggle[*|data-size=mini]{ --sw-w:var(--switch-w-xs); --sw-h:var(--switch-h-xs); --sw-r:var(--switch-r-xs); --sw-knob:var(--switch-knob-xs); }
-.ds-toggle[*|data-size=small]{ --sw-w:var(--switch-w-s); --sw-h:var(--switch-h-s); --sw-r:var(--switch-r-s); --sw-knob:var(--switch-knob-s); }
-.ds-toggle[*|data-size=large]{ --sw-w:var(--switch-w-l); --sw-h:var(--switch-h-l); --sw-r:var(--switch-r-l); --sw-knob:var(--switch-knob-l); }
-
-.ds-toggle-track{
-  display:flex; align-items:center; box-sizing:border-box; width:100%; height:100%; padding:0 var(--knob-inset);
-  border-radius:var(--sw-r); background:var(--surface-2); box-shadow:inset 0 0 0 var(--hair) var(--line);
-  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
-}
-.ds-toggle-indicator{
-  display:block; flex:none; width:var(--sw-knob); height:var(--sw-knob);
+.ds-toggle-knob{
+  display:block; flex:none; width:var(--switch-knob-m); height:var(--switch-knob-m);
   border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-1);
   transform:translateX(calc(var(--knob-x) * 1px));
 }
-.ds-toggle[*|aria-checked=true] .ds-toggle-track{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
-.ds-toggle[*|data-pressed] .ds-toggle-track{ background:var(--surface); }
-.ds-toggle[*|data-pressed][*|aria-checked=true] .ds-toggle-track{ background:var(--accent-text); }
-.ds-toggle[*|aria-disabled=true],
-.ds-toggle[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+.ds-toggle[*|data-size=mini]{ width:var(--switch-w-xs); height:var(--switch-h-xs); border-radius:var(--switch-r-xs); }
+.ds-toggle[*|data-size=mini] .ds-toggle-knob{ width:var(--switch-knob-xs); height:var(--switch-knob-xs); }
+.ds-toggle[*|data-size=small]{ width:var(--switch-w-s); height:var(--switch-h-s); border-radius:var(--switch-r-s); }
+.ds-toggle[*|data-size=small] .ds-toggle-knob{ width:var(--switch-knob-s); height:var(--switch-knob-s); }
+.ds-toggle[*|data-size=large]{ width:var(--switch-w-l); height:var(--switch-h-l); border-radius:var(--switch-r-l); }
+.ds-toggle[*|data-size=large] .ds-toggle-knob{ width:var(--switch-knob-l); height:var(--switch-knob-l); }
+.ds-toggle[*|aria-checked=true]{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
 /* -- tooltip -- */
-/* Tooltip (design/04-COMPONENTS.md section 18). Fly `S:442-446`: a dark label above its
-   target, shown on hover after the Tip profile's open delay (1 s: 2.5 x `--t-big`, until the Fly is driven by the Tip profile), at once while the hover hub is warm (O-11: `HoverHub`
-   stamps `data-hover` on `.ds`); it leaves at once. Both labels are 12 px, the shell scale's
-   `--fs-shell-tip` (the macOS polish pass; the Fly was 10). Card `S:426-427`: the small hover card for
-   a value, over the hover card's surface, entering with `hc-in` and leaving with `hc-out`. */
+/* Tooltip (design/30 section 2.5, `NSToolTip`): one line on the popover's surface, below its
+   target, opened by the Tip profile through the hover hub (1 s cold, at once while the hub is
+   warm) and gone the moment the pointer leaves. It fades in and out over `--t-quick`, no
+   spring (design/30 section 1.3). The text follows the shell scale's tip size. A dock label
+   (`ds-dock-label`, the shell's sheet) is the same hint above its target. */
 
-.ds-fly-target{ position:relative; display:inline-flex; }
-.ds-fly{ position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
-  background:var(--ink); color:var(--paper); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-shell-tip); padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0;
-  pointer-events:none; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
-.ds-fly-target:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:calc(var(--t-big) * 2.5); }
-.ds[*|data-hover=warm] .ds-fly-target:hover .ds-fly{ transition-delay:initial; }
-/* Caller-driven: up or down on the caller's say, whatever the pointer does,
-   at once (the caller's machine has already waited). */
-.ds-fly-target[*|data-shown=visible] .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); transition-delay:initial; }
-.ds-fly-target[*|data-shown=hidden]:hover .ds-fly{ opacity:0; transform:translateX(-50%) translateY(3px); transition-delay:initial; }
-
-.ds-popover.ds-tip{ width:auto; max-width:260px; padding:var(--s-6) var(--s-10); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
-  animation:hc-in var(--t-move) var(--e-out); }
-.ds-popover.ds-tip[*|data-presence=leaving]{ animation:hc-out var(--t-quick) var(--e-out) forwards; }
-.ds-tip-sub{ margin-top:var(--s-1); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-note); color:var(--ink-faint); }
+.ds-popover.ds-tooltip{ width:auto; max-width:260px; padding:var(--s-3) var(--s-8); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
+  animation:fade var(--t-quick) var(--e-out); }
+.ds-popover.ds-tooltip[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
 /* -- tree_item -- */
 /* TreeItem: a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
    (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
@@ -3153,9 +3037,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The children, one indent step in, the same rhythm as the sidebar's items. */
 .ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
-
-/* The unread count: a quiet badge at the end of the row. */
-.ds-tree-item .ds-badge{ margin-left:auto; }
 /* -- voice_orb -- */
 /* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
    speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`
@@ -3433,16 +3314,3 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
-/* -- device_glyph -- */
-/* DeviceGlyph (design/23-WIDGETS.md section 4.4): a filled device solid in `currentColor`, the
-   same `svg.ds-ic` box as every glyph (its size from its attributes), so a battery ring's
-   `.ds-battery-device .ds-ic` rule sizes it at .47 of the ring. It never shrinks in a row. */
-
-.ds-device-glyph{ display:block; flex:none; }
-/* -- dock_parts -- */
-/* The dock's running dot and floor (the macOS polish pass; design/10-BEHAVIOUR-dock.md section
-   10.3.2). The floor's paint and mask are generated with the shapes (`css/shape_css.rs`). */
-
-.ds-running-dot{ position:absolute; left:50%; top:calc(100% + var(--dock-dot-gap) - var(--dock-dot) * .5); width:var(--dock-dot); height:var(--dock-dot);
-  margin-left:calc(var(--dock-dot) * -.5); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
-  animation:fade var(--t-quick) var(--e-out); }

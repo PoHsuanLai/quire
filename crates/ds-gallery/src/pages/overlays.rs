@@ -1,4 +1,4 @@
-//! Overlays: every menu kind, the palette, popovers at each elevation, peek, sheet and scrim.
+//! Overlays: every menu kind, the palette, popovers under each dismiss policy, peek and sheet.
 //! The pills, the toast and the hover cards are in `pills.rs`.
 
 use super::pills::{Bubble, Cards, Pills};
@@ -6,9 +6,9 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Check,
-    CommandPalette, Elevation, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile,
-    MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet,
+    Anchor, Arrow, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Check,
+    CommandPalette, Dismiss, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile,
+    MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Sheet,
     Shortcut, ShortcutKey, Side, use_toast_hub,
 };
 use ds::{Answers, ControlSize};
@@ -20,10 +20,9 @@ enum Opened {
     Nested,
     Status,
     Palette,
-    Popover(Elevation),
+    Popover(Dismiss, Arrow),
     Peek(PeekMode),
     Sheet,
-    Scrim,
 }
 
 const MENUS: [(MenuKind, &str); 4] = [
@@ -33,10 +32,18 @@ const MENUS: [(MenuKind, &str); 4] = [
     (MenuKind::Context, "Context menu"),
 ];
 
-const POPOVERS: [(Elevation, &str); 3] = [
-    (Elevation::Pop, "Popover: pop"),
-    (Elevation::Bubble, "Popover: bubble"),
-    (Elevation::Sheet, "Popover: sheet"),
+const POPOVERS: [(Dismiss, Arrow, &str); 3] = [
+    (
+        Dismiss::Transient,
+        Arrow::Arrow,
+        "Popover: transient, arrow",
+    ),
+    (
+        Dismiss::Semitransient,
+        Arrow::None,
+        "Popover: semitransient",
+    ),
+    (Dismiss::Manual, Arrow::None, "Popover: manual"),
 ];
 
 /// Where a posed snapshot opens its menu: over the page, clear of the toolbar.
@@ -106,16 +113,15 @@ pub fn OverlaysPage() -> Element {
                 {button(Opened::Status, "Bar status menu (status lines, no entrance)")}
             }
         }
-        Section { title: "Palette, popovers, peek, sheet, scrim",
+        Section { title: "Palette, popovers, peek, sheet",
             div { class: "g-row",
                 {button(Opened::Palette, "Command palette")}
-                for (elevation , label) in POPOVERS {
-                    {button(Opened::Popover(elevation), label)}
+                for (dismiss , arrow , label) in POPOVERS {
+                    {button(Opened::Popover(dismiss, arrow), label)}
                 }
                 {button(Opened::Peek(PeekMode::Center), "Peek: center")}
                 {button(Opened::Peek(PeekMode::Full), "Peek: full")}
                 {button(Opened::Sheet, "Sheet")}
-                {button(Opened::Scrim, "Scrim alone")}
             }
         }
         Cards {}
@@ -128,7 +134,6 @@ pub fn OverlaysPage() -> Element {
         super::overlays_mailo4::HookKeyedCards {}
         super::overlays_mailo4::LabelChecklist {}
         super::overlays_mailo4::InlineActions {}
-        super::overlays_mailo5::InlineScrim {}
         super::overlays_mailo5::FieldFilterMenu {}
         super::control_center::ControlCenter {}
         super::overlays_sheet::PowerMenu {}
@@ -187,16 +192,17 @@ pub fn OverlaysPage() -> Element {
                 }
             },
             Some(Opened::Palette) => rsx! { Palette { onclose: close } },
-            Some(Opened::Popover(elevation)) => rsx! {
+            Some(Opened::Popover(dismiss, arrow)) => rsx! {
                 Popover {
-                    key: "{elevation:?}",
+                    key: "{dismiss:?}",
                     anchor: at.clone(),
                     placement: Placement::new(Side::Bottom, ds::Align::Start),
                     gap: Px(8.0),
-                    elevation,
+                    arrow,
+                    dismiss,
                     onclose: close,
                     div { class: "g-panel",
-                        Specimen { name: format!("{elevation:?} elevation"), code: "Escape or an outside click closes".to_string(),
+                        Specimen { name: format!("{dismiss:?} dismiss"), code: "Transient: Escape or an outside click closes; Semitransient: Escape only; Manual: its owner".to_string(),
                             Button { size: ControlSize::Mini, label: "Close", onclick: move |_| opened.set(None) }
                         }
                     }
@@ -214,12 +220,11 @@ pub fn OverlaysPage() -> Element {
                 Sheet { label: "Settings", onclose: close,
                     div { class: "g-panel",
                         h2 { "A sheet" }
-                        p { class: "g-note", "The general modal panel: Peek Center's surface, sized by its content." }
+                        p { class: "g-note", "Hangs from the top edge and dims nothing; Escape closes it." }
                         Button { answers: Answers::Return, label: "Done", onclick: move |_| opened.set(None) }
                     }
                 }
             },
-            Some(Opened::Scrim) => rsx! { Scrim { label: "Close the scrim", onclose: close } },
             None => rsx! {},
         }
     }

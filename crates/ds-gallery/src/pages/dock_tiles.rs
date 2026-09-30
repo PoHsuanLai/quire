@@ -1,14 +1,12 @@
 //! The Controls page's dock tiles: app icons at the dock's own sizes, a pill
 //! whose corner is a setting (`Surface { radius }`), and a label the dock's machine shows
-//! and hides (`Tooltip { shown }`).
+//! and hides (`DockLabel { shown }`).
 
 use super::app_icons::{APPS, app_icon};
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Corner, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Shown, Surface, Tooltip,
-    TooltipKind,
-};
+use ds::{Corner, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Shown, Surface};
+use ds_shell::DockLabel;
 
 /// An app's icon at `size`, or the window glyph when it cannot be drawn.
 fn icon(hue: [u8; 3], size: IconSize) -> IconSource {
@@ -39,8 +37,7 @@ pub fn DockTiles() -> Element {
                         Surface { material: Material::Dock, radius: Some(Corner::Px(Px(12.0))),
                             div { class: "g-dock-tiles",
                                 for (index , (name , hue)) in APPS.iter().enumerate() {
-                                    Tooltip {
-                                        kind: TooltipKind::Fly,
+                                    DockLabel {
                                         text: *name,
                                         shown: Some(if index == 1 { Shown::Visible } else { Shown::Hidden }),
                                         IconView { source: icon(*hue, IconSize::Tile48) }

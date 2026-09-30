@@ -1,7 +1,7 @@
 //! PolkitPrompt: a program asks for the person's password (design/20-SURFACES.md section 1.10;
-//! design/04-COMPONENTS.md section 42). A narrow centred `Sheet` over a modal scrim, entering
-//! with `peek-in`: the person's picture, a bold title, the program's message, "Details" as a hover
-//! card, the password in a boxed `Secret` field that shakes once when it was wrong, then Cancel
+//! design/04-COMPONENTS.md section 42). A narrow centred `Sheet` (it dims nothing), sliding in
+//! from the top: the person's picture, a bold title, the program's message, "Details" as a
+//! tooltip, the password in a boxed `Secret` field that shakes once when it was wrong, then Cancel
 //! and Authenticate.
 
 use crate::lock::picture::{AT_POLKIT, prompt_picture};
@@ -10,16 +10,14 @@ use crate::lock::vocab::{CapsLock, LockUser, PromptState};
 use crate::user_picture::{mood::Mood, portrait::Liveliness};
 use dioxus::prelude::*;
 use ds::Answers;
+use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
 use ds::components::fields::text_field::TextField;
 use ds::components::fields::text_field_focus::FieldFocus;
 use ds::components::fields::text_field_model::FieldKind;
-use ds::components::overlays::scrim_strength::ScrimStrength;
-use ds::components::overlays::tooltip::{Tooltip, TooltipKind};
-use ds::components::overlays::{
-    sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
-};
+use ds::components::overlays::tooltip::Tooltip;
+use ds::components::overlays::{sheet::Sheet, sheet_attach::Attach, sheet_width::SheetWidth};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
 use ds_style::icon::Icon;
@@ -69,17 +67,16 @@ pub fn PolkitPrompt(
             onclose: move |()| oncancel.call(()),
             shown,
             on_hidden,
-            placement: SheetPlacement::Centre,
-            scrim: ScrimStrength::Modal,
+            attach: Attach::Centre,
             width: SheetWidth::Narrow,
-            id: panel_id,
+            common: Common { id: panel_id, ..Common::default() },
             div { class: "ds-polkit", "data-state": state.slug(),
                 {prompt_picture(user.picture, AT_POLKIT, polkit_life(&state))}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }
                 div { class: "ds-polkit-action", {text(&action)} }
                 if let Some(detail) = detail {
                     div { class: "ds-polkit-details",
-                        Tooltip { kind: TooltipKind::Card, text: detail.plain_text(),
+                        Tooltip { text: detail.plain_text(),
                             span { class: "ds-polkit-details-word", "Details" }
                         }
                     }

@@ -1,6 +1,6 @@
 //! Edit Widgets as the person meets it: a desktop over the calm
 //! wallpaper with the widgets placed on it, each at its grid cell from the right, and quire's
-//! `Panel` at the bottom edge holding `WidgetGallery`, no taller than half the desktop, so the
+//! `Sheet` (`Attach::Bottom`) holding `WidgetGallery`, no taller than half the desktop, so the
 //! top rows where a new widget lands stay in view. Live: Add places the widget on the desktop
 //! above the sheet at the size it takes there, and the gallery's own list shows it; Remove takes
 //! it away, the card on the desktop shrinking and fading out (`CardPresence::Leaving`)
@@ -9,9 +9,8 @@
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Inject, Material, Panel, PanelEdge, Px, RootChrome, Shown, SpaceLook, use_scope,
-};
+use ds::components::overlays::sheet_width::SheetWidth;
+use ds::{Appearance, Attach, Ds, Inject, Material, RootChrome, Sheet, SpaceLook, use_scope};
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds_shell::{
     BatteryWidget, CardPresence, MonthWidget, Timeline, Widget, WidgetCard, WidgetGallery,
@@ -93,8 +92,8 @@ pub(super) fn EditWidgetsStage() -> Element {
                             on_gone: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
                     }
                 }
-                Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(330.0), material: Material::Sheet,
-                    div { class: "g-we-sheet", style: "{metrics}",
+                Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide,
+                    div { class: "g-we-sheet", style: "{metrics};height:330px",
                         WidgetGallery { layout: layout(), onedit }
                     }
                 }

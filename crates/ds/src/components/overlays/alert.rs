@@ -1,41 +1,52 @@
-//! Alert: a short question with Cancel and one action, as the Mac draws an `NSAlert` before
-//! Liquid Glass (design/04-COMPONENTS.md section 55): a narrow panel over a modal
-//! scrim, everything centred in one column (an optional icon at 48, a bold title, the message
-//! in the soft ink), then Cancel and the action side by side at equal width, the action on the
-//! right. It enters with the sheet's `peek-in` and, hidden by its host, springs out as a sheet
-//! does.
+//! Alert: a short question or notice with one to three or more buttons, as the Mac draws an
+//! `NSAlert` before Liquid Glass (design/30 section 2.5, design/04-COMPONENTS.md section 55): a
+//! narrow panel, everything centred in one column (an optional icon at 48, a bold title, the
+//! message in the soft ink), then the buttons. It stands in a [`Sheet`] and dims nothing.
 //!
-//! Keys (design/06-INTERACTIONS.md sections 17 and 18): Escape, or a press on the scrim, is
-//! Cancel; Return presses the default button, whichever button has the keyboard; Space presses
-//! the button that has it; Tab moves between the two. The default button is the action, unless
-//! the action is destructive, when it is Cancel (`AlertEmphasis::default_button`), and the
+//! Buttons (`AlertButton`): the first is the default unless it is destructive, when the first
+//! that is not is (`default_button`); one that cancels answers Escape. One or two lie side by side
+//! at equal width with the default on the right, three or more stack with the default on top
+//! (`FooterLayout`).
+//!
+//! Keys (design/06-INTERACTIONS.md sections 17 and 18): Escape presses the Cancel button; Return
+//! presses the default button, whichever button has the keyboard; Space presses the button that
+//! has it; Tab and Shift+Tab move between the buttons, wrapping, since the alert is modal. The
 //! keyboard starts on the default button. Blitz synthesises no click from a key, and each key
 //! taken here is prevented, so a browser's synthesised click cannot press a button twice.
 //!
 //! Where it stands: `Flow::Floating` (the default) is a `Sheet` in the overlay, centred in the
-//! whole root (a full window); `Flow::Inline` draws the same panel and scrim where the caller
-//! renders it, covering the nearest positioned ancestor (a control-center popover), with no
-//! layer of its own on the stack.
+//! whole root (a full window); `Flow::Inline` draws the same panel where the caller renders it,
+//! covering the nearest positioned ancestor (a control-center popover) and catching the pointer
+//! for the popover under it, with no layer of its own on the stack.
+//!
+//! An alert may carry a suppression `Checkbox` under its message ("Do not show this again") and a
+//! help button (the `Help` bezel) at the foot's leading corner.
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
-use crate::components::controls::button_model::{Answers, ButtonRole};
-use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
-use crate::components::overlays::flow::Flow;
-use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
-use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::components::overlays::{
-    sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
+use crate::components::controls::button_model::{Answers, Bezel, ButtonRole};
+use crate::components::controls::checkbox::Checkbox;
+use crate::components::overlays::alert_model::{
+    AlertButton, AlertRole, AlertStyle, FooterLayout, Suppression, default_button, escape_button,
+    tab_target,
 };
+use crate::components::overlays::flow::Flow;
+use crate::components::overlays::{sheet::Sheet, sheet_attach::Attach, sheet_width::SheetWidth};
 use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
+use ds_core::word::Word;
 use ds_motion::anim::Anim;
-use ds_motion::presence::spring::use_spring_presence;
+use ds_motion::presence::{
+    Exit,
+    spec::PresenceSpec,
+    use_presence::{Presented, use_presence},
+};
 use ds_style::icon::render::IconSize;
+use ds_style::tokens::control_size::ControlSize;
 use std::rc::Rc;
 
 /// What an alert says and what its buttons do.
@@ -43,106 +54,120 @@ use std::rc::Rc;
 struct Words {
     title: String,
     message: Option<TextLine>,
-    action: String,
-    cancel: String,
-    emphasis: AlertEmphasis,
+    style: AlertStyle,
+    buttons: Vec<AlertButton>,
     icon: Option<IconSource>,
-    onaction: EventHandler<()>,
-    oncancel: EventHandler<()>,
+    suppression: Option<Suppression>,
+    help: Option<EventHandler<()>>,
 }
 
-/// A question with Cancel and one action.
+impl Words {
+    fn roles(&self) -> Vec<AlertRole> {
+        self.buttons.iter().map(|button| button.role).collect()
+    }
+
+    /// Press button `index`, if there is one.
+    fn press(&self, index: Option<usize>) {
+        if let Some(button) = index.and_then(|index| self.buttons.get(index)) {
+            button.onpress.call(());
+        }
+    }
+}
+
+/// A question or notice with buttons.
 ///
-/// `title` is the question ("Turn Bluetooth off?"), `message` what follows from it; `action`
-/// labels the action button ("Turn Off") and `cancel` the other ("Cancel"). `emphasis:
-/// AlertEmphasis::Destructive` draws the action's label red and makes Cancel the default (see
-/// [`AlertEmphasis`]). `onaction` hears the action; `oncancel` hears Cancel, Escape and a press
-/// on the scrim. `icon` is drawn at 48 above the title (an app's icon; none by default).
+/// `title` is the question ("Turn Bluetooth off?"), `message` what follows from it; `buttons` are
+/// its answers (see the module doc for their order and roles); `style` is `data-style`; `icon` is
+/// drawn at 48 above the title (an app's icon; none by default).
 ///
 /// `flow: Flow::Inline` draws it where the caller renders it, over the nearest positioned
 /// ancestor, for a surface too small for a sheet's root (a 320 px control-center popover);
 /// render it last in that container. `Flow::Floating` (the default) centres it in the root's
 /// overlay, which needs a root with a height (`RootExtent::Viewport`). `shown` and `on_hidden`
 /// are the sheet's, for a host that hides it with its exit rather than unmounting it.
-/// `panel_id` names the panel, for a host whose blur region resolves an id.
+///
+/// `common` goes on the panel (the sheet), so a host whose blur region resolves an id finds it.
 #[component]
 pub fn Alert(
     #[props(into)] title: String,
     #[props(default)] message: Option<TextLine>,
-    #[props(into)] action: String,
-    #[props(default = "Cancel".to_owned(), into)] cancel: String,
-    #[props(default)] emphasis: AlertEmphasis,
-    onaction: EventHandler<()>,
-    oncancel: EventHandler<()>,
+    buttons: Vec<AlertButton>,
+    #[props(default)] style: AlertStyle,
     #[props(default)] icon: Option<IconSource>,
+    #[props(default)] suppression: Option<Suppression>,
+    #[props(default)] help: Option<EventHandler<()>>,
     #[props(default)] flow: Flow,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
-    #[props(default)] panel_id: Option<String>,
+    #[props(default)] common: Common,
 ) -> Element {
     let words = Words {
         title: title.clone(),
         message,
-        action,
-        cancel,
-        emphasis,
+        style,
+        buttons,
         icon,
-        onaction,
-        oncancel,
+        suppression,
+        help,
     };
     match flow {
-        Flow::Floating => rsx! {
-            Sheet {
-                label: title,
-                onclose: move |()| oncancel.call(()),
-                shown,
-                on_hidden,
-                placement: SheetPlacement::Centre,
-                scrim: ScrimStrength::Modal,
-                width: SheetWidth::Narrow,
-                id: panel_id,
-                AlertBody { words }
+        Flow::Floating => {
+            let escape = words.clone();
+            rsx! {
+                Sheet {
+                    label: title,
+                    onclose: move |()| escape.press(escape_button(&escape.roles())),
+                    shown,
+                    on_hidden,
+                    attach: Attach::Centre,
+                    width: SheetWidth::Narrow,
+                    common,
+                    AlertBody { words }
+                }
             }
-        },
+        }
         Flow::Inline => rsx! {
-            InlineAlert { words, shown, on_hidden, panel_id }
+            InlineAlert { words, shown, on_hidden, common }
         },
     }
 }
 
-/// The alert drawn in place: a stage over the nearest positioned ancestor holding a modal scrim
-/// and the sheet's panel, centred, with the sheet's entrance and exit.
+/// The alert drawn in place: a stage over the nearest positioned ancestor holding the sheet's
+/// panel, centred, with the sheet's entrance and exit.
 #[component]
 fn InlineAlert(
     words: Words,
     shown: Option<Shown>,
     on_hidden: Option<EventHandler<()>>,
-    panel_id: Option<String>,
+    common: Common,
 ) -> Element {
-    let showing = use_spring_presence(shown, on_hidden, Anim::PeekIn);
-    if !showing.drawn() {
+    let Presented { presence, alias } = use_presence(
+        shown.unwrap_or(Shown::Visible),
+        PresenceSpec {
+            enter: Anim::SheetIn,
+            exit: Exit::SheetOut,
+        },
+        on_hidden,
+    );
+    let Some(drawn) = presence.drawn_slug() else {
         return rsx! {};
-    }
-    let oncancel = words.oncancel;
-    let look = ScrimLook {
-        presence: showing.leaving().then_some("leaving"),
-        strength: ScrimStrength::Modal,
     };
-    let close = format!("Close {}", words.title);
+    let class = common.class("ds-sheet");
+    let data = common.data_attributes();
     rsx! {
         div { class: "ds-alert-stage", "data-flow": Flow::Inline.attr(),
-            {scrim_button_as(&close, look, || true, oncancel)}
             div { class: "ds-sheet-stage",
                 div {
-                    class: "ds-sheet",
-                    id: panel_id,
-                    "data-presence": showing.slug(),
-                    "data-drive": showing.drive(),
-                    style: showing.style(),
-                    "data-placement": SheetPlacement::Centre.attribute(),
+                    id: common.id.clone(),
+                    class,
+                    "data-presence": drawn,
+                    "data-pulse": alias.slug(),
+                    "data-attach": Attach::Centre.slug(),
                     "data-width": SheetWidth::Narrow.attribute(),
                     role: "alertdialog",
                     "aria-label": "{words.title}",
+                    onmounted: move |event| common.mounted(event),
+                    ..data,
                     AlertBody { words: words.clone() }
                 }
             }
@@ -150,26 +175,34 @@ fn InlineAlert(
     }
 }
 
-/// The column: icon, title, message, and the two buttons, with the keys.
+/// The column: icon, title, message, and the buttons, with the keys.
 #[component]
 fn AlertBody(words: Words) -> Element {
-    let default = words.emphasis.default_button();
-    let buttons = use_hook(|| CopyValue::new(Buttons::default()));
-    let press = move |button: AlertButton| match button {
-        AlertButton::Cancel => words.oncancel.call(()),
-        AlertButton::Action => words.onaction.call(()),
+    let roles = words.roles();
+    let default = default_button(&roles);
+    let escape = escape_button(&roles);
+    let count = words.buttons.len();
+    let elements = use_hook(|| CopyValue::new(Vec::<Option<Rc<MountedData>>>::new()));
+    let press = {
+        let words = words.clone();
+        EventHandler::new(move |index: Option<usize>| words.press(index))
     };
-    let press = EventHandler::new(press);
     rsx! {
         div {
             class: "ds-alert",
-            "data-emphasis": words.emphasis.attribute(),
-            onkeydown: move |event| {
-                if let Some(button) = alert_key(&event.key(), default) {
+            "data-style": words.style.slug(),
+            onkeydown: move |event| match event.key() {
+                Key::Escape => {
                     event.stop_propagation();
                     event.prevent_default();
-                    press.call(button);
+                    press.call(escape);
                 }
+                Key::Enter => {
+                    event.stop_propagation();
+                    event.prevent_default();
+                    press.call(default);
+                }
+                _ => {}
             },
             if let Some(icon) = words.icon {
                 div { class: "ds-alert-icon",
@@ -178,90 +211,89 @@ fn AlertBody(words: Words) -> Element {
             }
             div { class: "ds-alert-title", "{words.title}" }
             if let Some(message) = &words.message {
-                div { class: "ds-alert-message", {text(message)} }
+                div { class: "ds-alert-body", {text(message)} }
             }
-            div { class: "ds-alert-actions",
-                {slot(Slot { button: AlertButton::Cancel, label: &words.cancel, emphasis: words.emphasis, press, buttons })}
-                {slot(Slot { button: AlertButton::Action, label: &words.action, emphasis: words.emphasis, press, buttons })}
+            if let Some(suppression) = words.suppression.clone() {
+                div { class: "ds-alert-suppression",
+                    Checkbox {
+                        label: suppression.label,
+                        value: suppression.value,
+                        size: ControlSize::Small,
+                        onchange: suppression.onchange,
+                    }
+                }
             }
-        }
-    }
-}
-
-/// The two buttons' elements, so Tab can keep the keyboard inside the alert (it is modal).
-#[derive(Default)]
-struct Buttons {
-    cancel: Option<Rc<MountedData>>,
-    action: Option<Rc<MountedData>>,
-}
-
-impl Buttons {
-    fn keep(&mut self, button: AlertButton, element: Rc<MountedData>) {
-        match button {
-            AlertButton::Cancel => self.cancel = Some(element),
-            AlertButton::Action => self.action = Some(element),
-        }
-    }
-
-    /// The element of the button that is not `button`: with two, Tab and Shift+Tab both go
-    /// there.
-    fn other(&self, button: AlertButton) -> Option<Rc<MountedData>> {
-        match button {
-            AlertButton::Cancel => self.action.clone(),
-            AlertButton::Action => self.cancel.clone(),
+            if let Some(help) = words.help {
+                div { class: "ds-alert-help",
+                    Button { bezel: Bezel::Help, label: "Help", onclick: move |_| help.call(()) }
+                }
+            }
+            div { class: "ds-alert-footer", "data-layout": FooterLayout::of(count).slug(),
+                for (index , button) in words.buttons.iter().enumerate() {
+                    {slot(Slot { index, count, button, default, press, elements })}
+                }
+            }
         }
     }
 }
 
 /// What one slot draws.
 struct Slot<'a> {
-    button: AlertButton,
-    label: &'a str,
-    emphasis: AlertEmphasis,
-    press: EventHandler<AlertButton>,
-    buttons: CopyValue<Buttons>,
+    index: usize,
+    count: usize,
+    button: &'a AlertButton,
+    default: Option<usize>,
+    press: EventHandler<Option<usize>>,
+    elements: CopyValue<Vec<Option<Rc<MountedData>>>>,
 }
 
-/// One button in its slot: the slot takes Space for the button inside it and Tab to the other
+/// One button in its slot: the slot takes Space for the button inside it and Tab to the next
 /// button, and the default button takes the keyboard as it mounts.
 fn slot(slot: Slot<'_>) -> Element {
     let Slot {
+        index,
+        count,
         button,
-        label,
-        emphasis,
+        default,
         press,
-        mut buttons,
+        mut elements,
     } = slot;
-    let (answers, role) = face(button, emphasis);
-    let starts = emphasis.default_button() == button;
+    let is_default = default == Some(index);
+    let (answers, role) = face(button.role, is_default);
     rsx! {
         span {
+            key: "{index}",
             class: "ds-alert-slot",
             onkeydown: move |event| {
                 let key = event.key();
                 if is_space(&key) {
                     event.stop_propagation();
                     event.prevent_default();
-                    press.call(button);
+                    press.call(Some(index));
                 } else if key == Key::Tab {
                     event.stop_propagation();
                     event.prevent_default();
-                    if let Some(other) = buttons.peek().other(button) {
-                        focus_soon(other);
+                    let target = tab_target(count, index, event.modifiers().shift());
+                    if let Some(Some(next)) = elements.peek().get(target).cloned() {
+                        focus_soon(next);
                     }
                 }
             },
             Button {
                 common: Common { mounted: Some(EventHandler::new(move |event: MountedEvent| {
-                    buttons.write().keep(button, event.data());
-                    if starts {
+                    let mut kept = elements.write();
+                    if kept.len() <= index {
+                        kept.resize(index + 1, None);
+                    }
+                    kept[index] = Some(event.data());
+                    if is_default {
                         focus_soon(event.data());
                     }
                 })), ..Common::default() },
                 answers,
                 role,
-                label: label.to_owned(),
-                onclick: move |_| press.call(button),
+                label: button.label.clone(),
+                onclick: move |_| press.call(Some(index)),
             }
         }
     }
@@ -270,25 +302,12 @@ fn slot(slot: Slot<'_>) -> Element {
 /// How a button is drawn: the default answers Return and takes the accent, a Cancel that is not
 /// the default answers Escape, a destructive action that is not the default is a destructive
 /// button (its red label is the alert's rule).
-fn face(button: AlertButton, emphasis: AlertEmphasis) -> (Answers, ButtonRole) {
-    match (button, emphasis.default_button() == button, emphasis) {
-        (_, true, _) => (Answers::Return, ButtonRole::Normal),
-        (AlertButton::Action, false, AlertEmphasis::Destructive) => {
-            (Answers::Nothing, ButtonRole::Destructive)
-        }
-        (AlertButton::Cancel, false, _) => (Answers::Escape, ButtonRole::Normal),
-        (AlertButton::Action, false, AlertEmphasis::Default) => {
-            (Answers::Nothing, ButtonRole::Normal)
-        }
-    }
-}
-
-/// The button a key presses anywhere in the alert: Escape is Cancel, Return the default.
-fn alert_key(key: &Key, default: AlertButton) -> Option<AlertButton> {
-    match key {
-        Key::Escape => Some(AlertButton::Cancel),
-        Key::Enter => Some(default),
-        _ => None,
+fn face(role: AlertRole, is_default: bool) -> (Answers, ButtonRole) {
+    match (role, is_default) {
+        (_, true) => (Answers::Return, ButtonRole::Normal),
+        (AlertRole::Destructive, false) => (Answers::Nothing, ButtonRole::Destructive),
+        (AlertRole::Cancel, false) => (Answers::Escape, ButtonRole::Normal),
+        (AlertRole::Normal, false) => (Answers::Nothing, ButtonRole::Normal),
     }
 }
 
@@ -299,48 +318,32 @@ fn is_space(key: &Key) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{alert_key, face, is_space};
+    use super::{face, is_space};
     use crate::components::controls::button_model::{Answers, ButtonRole};
-    use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
+    use crate::components::overlays::alert_model::AlertRole::{Cancel, Destructive, Normal};
     use dioxus::prelude::Key;
 
     #[test]
-    fn escape_cancels_and_return_presses_the_default() {
-        let cases = [
-            (Key::Escape, AlertButton::Action, Some(AlertButton::Cancel)),
-            (Key::Escape, AlertButton::Cancel, Some(AlertButton::Cancel)),
-            (Key::Enter, AlertButton::Action, Some(AlertButton::Action)),
-            (Key::Enter, AlertButton::Cancel, Some(AlertButton::Cancel)),
-            (Key::Tab, AlertButton::Action, None),
-        ];
-        for (key, default, want) in cases {
-            assert_eq!(alert_key(&key, default), want, "{key:?} {default:?}");
-        }
+    fn space_is_the_space_character() {
         assert!(is_space(&Key::Character(" ".into())));
         assert!(!is_space(&Key::Character("a".into())));
     }
 
     #[test]
     fn the_default_answers_return_and_a_destructive_action_is_red() {
-        use AlertButton::{Action, Cancel};
-        use AlertEmphasis::{Default, Destructive};
         let cases = [
-            (Cancel, Default, Answers::Escape, ButtonRole::Normal),
-            (Action, Default, Answers::Return, ButtonRole::Normal),
-            (Cancel, Destructive, Answers::Return, ButtonRole::Normal),
+            (Cancel, false, (Answers::Escape, ButtonRole::Normal)),
+            (Normal, true, (Answers::Return, ButtonRole::Normal)),
+            (Normal, false, (Answers::Nothing, ButtonRole::Normal)),
+            (Cancel, true, (Answers::Return, ButtonRole::Normal)),
             (
-                Action,
                 Destructive,
-                Answers::Nothing,
-                ButtonRole::Destructive,
+                false,
+                (Answers::Nothing, ButtonRole::Destructive),
             ),
         ];
-        for (button, emphasis, answers, role) in cases {
-            assert_eq!(
-                face(button, emphasis),
-                (answers, role),
-                "{button:?} {emphasis:?}"
-            );
+        for (role, is_default, want) in cases {
+            assert_eq!(face(role, is_default), want, "{role:?} {is_default}");
         }
     }
 }

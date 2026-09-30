@@ -149,28 +149,12 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `S:401`.
-            Anim::HcIn => recipe(
-                "hc-in",
-                DurationToken::Move,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
             // `S:433`.
             Anim::LinkPillIn => recipe(
                 "hc-in",
                 DurationToken::Quick,
                 EasingToken::Out,
                 Fill::None,
-                Iteration::Once,
-            ),
-            // `S:402`.
-            Anim::HcOut => recipe(
-                "hc-out",
-                DurationToken::Quick,
-                EasingToken::Out,
-                Fill::Forwards,
                 Iteration::Once,
             ),
             // `S:568`.
@@ -206,6 +190,7 @@ impl Anim {
             Anim::PaneOutR => own::PANE_OUT_R,
             Anim::OsdIn => own::OSD_IN,
             Anim::OsdOut => own::OSD_OUT,
+            Anim::SheetIn => own::SHEET_IN,
             Anim::SheetOut => own::SHEET_OUT,
             Anim::BannerOut => own::BANNER_OUT,
             Anim::BannerIn => own::BANNER_IN,

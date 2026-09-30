@@ -37,6 +37,7 @@ pub mod motion_lab;
 pub mod outbox;
 pub mod overlays;
 pub mod overlays_alert;
+pub mod overlays_catalogue;
 pub mod overlays_mailo;
 pub mod overlays_mailo4;
 pub mod overlays_mailo5;

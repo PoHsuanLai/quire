@@ -739,7 +739,7 @@ path each, until step 12 replaces them with the prelude.
        `LevelIndicator`, `Badge`, `KeyEquivalent`;
     5. menus and lists: `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,
        `SectionHeader`;
-    6. overlays and feedback: `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
+    6. overlays and feedback: (done) `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
     7. shell-only pieces and app features (30 sections 2.10 and 2.11), then the P2 components;
     8. sill's switch-over (the local pieces L1-L16 of the component inventory) and the Arc Look;

@@ -206,7 +206,7 @@ fn the_settle_table() {
     #[rustfmt::skip]
     const CASES: &[(Anim, MotionLevel, u64)] = &[
         (Anim::Heal, MotionLevel::Standard, 284),
-        (Anim::HcOut, MotionLevel::Standard, 184),
+        (Anim::MenuOut, MotionLevel::Standard, 184),
         (Anim::RowIn, MotionLevel::Standard, 284),
         (Anim::Shake, MotionLevel::Standard, 454),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
@@ -233,9 +233,11 @@ fn the_settle_table() {
         // The banner's exit at --t-move, which only Reduced shortens.
         (Anim::BannerOut, MotionLevel::Standard, 284),
         (Anim::BannerIn, MotionLevel::Standard, 284),
-        // The center's edge panel, in and out at --t-move.
+        // The edge panel and the toast: in at --t-move, out at --t-quick; a sheet: in at
+        // --t-big, out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
-        (Anim::PanelOut, MotionLevel::Standard, 284),
+        (Anim::PanelOut, MotionLevel::Standard, 184),
+        (Anim::SheetIn, MotionLevel::Standard, 434),
         // The screenshot thumbnail slides in and out at --t-move.
         (Anim::ShotIn, MotionLevel::Standard, 284),
         (Anim::ShotOut, MotionLevel::Standard, 284),

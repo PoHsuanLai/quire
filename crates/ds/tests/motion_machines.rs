@@ -6,7 +6,6 @@ use ds::{
     DRAG_THRESHOLD, Drag, DragPhase, Fraction, HoverEvent, HoverIntent, HoverProfile, HoverWarmth,
     IntentEffect, IntentPhase, Point, Px, Rect, Size, WINDOW_DRAG_THRESHOLD,
 };
-use ds::{Pull, PullTab, TabArm};
 use std::time::{Duration, Instant};
 
 fn ms(n: u64) -> Duration {
@@ -440,93 +439,6 @@ fn drag_hits_targets_and_drops() {
         },
         "new targets are hit-tested at once"
     );
-}
-
-#[test]
-fn pull_tab_clamps_arms_and_undoes() {
-    struct Case {
-        name: &'static str,
-        moves: &'static [f32],
-        dx: f32,
-        arm: TabArm,
-        release: Pull,
-        then_click: Pull,
-    }
-    let cases = [
-        Case {
-            name: "pulled past 46 arms, and the release undoes",
-            moves: &[20.0, 50.0],
-            dx: 50.0,
-            arm: TabArm::Armed,
-            release: Pull::Undo,
-            then_click: Pull::Hold,
-        },
-        Case {
-            name: "exactly 46 is not armed",
-            moves: &[46.0],
-            dx: 46.0,
-            arm: TabArm::Disarmed,
-            release: Pull::Hold,
-            then_click: Pull::Hold,
-        },
-        Case {
-            name: "pulled far right clamps to 78",
-            moves: &[200.0],
-            dx: 78.0,
-            arm: TabArm::Armed,
-            release: Pull::Undo,
-            then_click: Pull::Hold,
-        },
-        Case {
-            name: "pulled left clamps to -6",
-            moves: &[-50.0],
-            dx: -6.0,
-            arm: TabArm::Disarmed,
-            release: Pull::Hold,
-            then_click: Pull::Hold,
-        },
-        Case {
-            name: "pulled out and back: released disarmed, and the click is not a tap",
-            moves: &[60.0, 10.0],
-            dx: 10.0,
-            arm: TabArm::Disarmed,
-            release: Pull::Hold,
-            then_click: Pull::Hold,
-        },
-        Case {
-            name: "a press that barely moved: the click is a tap and undoes",
-            moves: &[2.0],
-            dx: 2.0,
-            arm: TabArm::Disarmed,
-            release: Pull::Hold,
-            then_click: Pull::Undo,
-        },
-        Case {
-            name: "a plain click",
-            moves: &[],
-            dx: 0.0,
-            arm: TabArm::Disarmed,
-            release: Pull::Hold,
-            then_click: Pull::Undo,
-        },
-    ];
-    for case in cases {
-        let x0 = 300.0;
-        let tab = case
-            .moves
-            .iter()
-            .fold(PullTab::default().down(Px(x0)), |tab, dx| {
-                tab.moved(Px(x0 + dx))
-            });
-        assert_eq!(tab.dx(), Px(case.dx), "{}: dx", case.name);
-        assert_eq!(tab.arm(), case.arm, "{}: arm", case.name);
-        let (released, pull) = tab.up();
-        assert_eq!(pull, case.release, "{}: release", case.name);
-        assert_eq!(released.dx(), Px(0.0), "{}: springs back", case.name);
-        assert_eq!(released.arm(), TabArm::Disarmed, "{}: un-armed", case.name);
-        let (_, click) = released.click();
-        assert_eq!(click, case.then_click, "{}: click", case.name);
-    }
 }
 
 #[test]

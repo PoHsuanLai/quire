@@ -52,7 +52,7 @@ impl Anim {
             | Anim::BubblePop
             | Anim::PeekIn
             | Anim::PeekFullIn
-            | Anim::HcIn
+            | Anim::SheetIn
             | Anim::LinkPillIn
             | Anim::PageIn
             | Anim::PillUp
@@ -66,8 +66,7 @@ impl Anim {
             | Anim::MorphIn
             | Anim::MorphInSpring
             | Anim::RollIn => CrossFade(In),
-            Anim::HcOut
-            | Anim::PaneOutL
+            Anim::PaneOutL
             | Anim::PaneOutR
             | Anim::OsdOut
             | Anim::SheetOut

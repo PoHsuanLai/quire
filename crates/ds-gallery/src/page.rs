@@ -19,6 +19,9 @@ pub enum Page {
     Lists,
     /// Menus, popovers, hover cards, tooltips, toast, scrim, sheet, peek, palette.
     Overlays,
+    /// Popover, sheet, alert, side panel, tooltip, dock label, hover card, toast, empty state and
+    /// skeleton, in every state (design/30 sections 2.5 and 2.9).
+    Feedback,
     /// The eight materials over black, white and a wallpaper.
     Materials,
     /// Every animation at every level.

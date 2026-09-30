@@ -16,28 +16,25 @@ re-theme every surface consistently, and every token variable
 
 | Component | Root | Parts |
 | --- | --- | --- |
-| Alert | `.ds-alert` | `.ds-alert-icon`, `.ds-alert-title` |
+| Alert | `.ds-alert` | `.ds-alert-icon`, `.ds-alert-title`, `.ds-alert-body`, `.ds-alert-footer` |
 | Avatar | `.ds-avatar` | none yet |
-| Badge | `.ds-badge` | `.ds-badge-label` |
-| Button | `.ds-button` | `.ds-button-icon`, `.ds-button-label` |
-| Checkbox | `.ds-checkbox` | `.ds-checkbox-indicator`, `.ds-checkbox-label` |
+| Button | `.ds-button` | none yet |
 | Chip | `.ds-chip` | `.ds-chip-remove` |
-| KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
-| Label | `.ds-label` | none yet |
-| LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |
+| EmptyState | `.ds-empty-state` | `.ds-empty-state-icon`, `.ds-empty-state-title`, `.ds-empty-state-body`, `.ds-empty-state-action` |
+| HoverCard | `.ds-hovercard` | `.ds-hovercard-body` |
 | List | `.ds-list` | none yet |
 | Menu | `.ds-menu` | `.ds-menu-item`, `.ds-menu-separator` |
-| Popover | `.ds-popover` | none yet |
-| ProgressIndicator | `.ds-progress` | `.ds-progress-track`, `.ds-progress-fill`, `.ds-progress-indicator`, `.ds-progress-glyph` |
-| RadioGroup | `.ds-radio-group` | `.ds-radio-group-item`, `.ds-radio-group-indicator`, `.ds-radio-group-label`, `.ds-radio-group-image` |
+| Popover | `.ds-popover` | `.ds-popover-body`, `.ds-popover-arrow` |
 | Row | `.ds-row` | none yet |
 | SectionHeader | `.ds-section-header` | none yet |
-| SegmentedControl | `.ds-segmented` | `.ds-segmented-segment`, `.ds-segmented-indicator`, `.ds-segmented-label`, `.ds-segmented-icon` |
-| Sheet | `.ds-sheet` | none yet |
-| Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb`, `.ds-slider-icon`, `.ds-slider-tick` |
-| TextField | `.ds-text-field` | `.ds-text-field-frame`, `.ds-text-field-icon`, `.ds-text-field-suffix`, `.ds-text-field-help`, `.ds-text-field-tokens` |
-| Toast | `.ds-toast` | none yet |
-| Toggle | `.ds-toggle` | `.ds-toggle-track`, `.ds-toggle-indicator` |
+| SegmentedControl | `.ds-segmented` | none yet |
+| Sheet | `.ds-sheet` | `.ds-sheet-body` |
+| SidePanel | `.ds-side-panel` | `.ds-side-panel-header`, `.ds-side-panel-body` |
+| Skeleton | `.ds-skeleton` | none yet |
+| Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb` |
+| Toast | `.ds-toast` | `.ds-toast-body`, `.ds-toast-action` |
+| Toggle | `.ds-toggle` | none yet |
+| Tooltip | `.ds-tooltip` | none yet |
 
 ## Attributes
 
@@ -49,8 +46,6 @@ re-theme every surface consistently, and every token variable
 | `data-selected` | `Selection` |
 | `data-busy` | `Availability::Busy` |
 | `data-availability` | `Availability`: enabled, disabled, busy |
-| `data-pressed` | `PressPhase`: present while a pointer or a key holds the control down |
-| `data-role` | a button's role: normal or destructive |
 | `data-focus` | `FocusStyle`: ring, highlight |
 | `data-activity` | `Activity`, on `.ds`: written as `inactive` while the window is not the one focused, absent while it is |
 | `aria-*` | the state an element exposes to assistive technology |

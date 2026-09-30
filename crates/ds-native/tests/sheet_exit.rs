@@ -1,13 +1,10 @@
-//! On a real Blitz document: a sheet its host hides springs
-//! out (H1, design/05 section 14) and reports `on_hidden` once the spring rests, never before
-//! `settle(SheetOut)`; shown again while
-//! leaving, it enters again and never reports; and a centred sheet in a viewport root stands in
-//! the middle of it.
+//! On a real Blitz document: a sheet its host hides slides back up (`sheet-out`, --t-move) and
+//! reports `on_hidden` once the exit has settled, never before `settle(SheetOut)`; shown again
+//! while leaving, it is present at once and never reports; and a centred sheet in a viewport root
+//! stands in the middle of it.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Ds, Material, MotionLevel, RootExtent, Sheet, SheetPlacement, Shown, settle,
-};
+use ds::{Anim, Appearance, Attach, Ds, Material, MotionLevel, RootExtent, Sheet, Shown, settle};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -30,7 +27,7 @@ fn Page() -> Element {
                 onclose: move |_| {},
                 shown: shown(),
                 on_hidden: move |_| log.with_mut(|log| log.push("hidden")),
-                placement: SheetPlacement::Centre,
+                attach: Attach::Centre,
                 p { "Shut down?" }
             }
             p { class: "log", {log().join(",")} }
@@ -68,10 +65,6 @@ fn a_hidden_sheet_leaves_then_reports_at_its_settle() {
         harness.attr(".ds-sheet", "data-presence").as_deref(),
         Some("leaving")
     );
-    assert_eq!(
-        harness.attr(".ds-scrim", "data-presence").as_deref(),
-        Some("leaving")
-    );
     harness.advance(exit() - Duration::from_millis(60));
     assert_eq!(
         harness.text_of(".log").as_deref(),
@@ -79,8 +72,6 @@ fn a_hidden_sheet_leaves_then_reports_at_its_settle() {
         "not before the settle"
     );
     assert_eq!(harness.count(".ds-sheet"), 1, "still drawn while it leaves");
-    // Driven motion (design/05 section 14): it reports when its spring rests, not at a fixed
-    // settle.
     settle_until(&mut harness, |h| {
         h.text_of(".log").as_deref() == Some("hidden")
     });
@@ -88,7 +79,7 @@ fn a_hidden_sheet_leaves_then_reports_at_its_settle() {
 }
 
 #[test]
-fn shown_again_while_leaving_it_enters_and_never_reports() {
+fn shown_again_while_leaving_it_is_present_and_never_reports() {
     let mut harness = page();
     set(&mut harness, Shown::Hidden);
     harness.advance(Duration::from_millis(100));
@@ -96,11 +87,10 @@ fn shown_again_while_leaving_it_enters_and_never_reports() {
     harness.advance(Duration::from_millis(20));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),
-        Some("entering")
+        Some("present"),
+        "the hide was taken back: it never left"
     );
-    settle_until(&mut harness, |h| {
-        h.attr(".ds-sheet", "data-presence").as_deref() == Some("present")
-    });
+    harness.advance(exit() + Duration::from_millis(60));
     assert_eq!(harness.text_of(".log").as_deref(), Some(""));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),

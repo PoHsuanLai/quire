@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Button, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material,
-    MotionLevel, Panel, Point, Px, Rect, RootExtent, Shown, settle, use_hover_hub, use_toasts,
+    MotionLevel, Point, Px, Rect, RootExtent, Shown, SidePanel, settle, use_hover_hub, use_toasts,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -59,10 +59,10 @@ fn SceneContent() -> Element {
                 onclick: move |_| toasts.push("Archived".into(), None),
             }
         }
-        if let Some((_, kind)) = hub.open() {
-            HoverCard { kind, p { "dana@example.com" } }
+        if hub.open().is_some() {
+            HoverCard { kind: HoverKind::Sender, p { "dana@example.com" } }
         }
-        Panel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0),
+        SidePanel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0),
             p { "Nothing new." }
         }
     }
@@ -100,10 +100,10 @@ fn sample(harness: &mut Harness, at: Duration, paint: Paint) -> Sample {
     };
     Sample {
         at,
-        panel: harness.attr(".ds-panel", "data-presence"),
-        panel_rect: harness.rect(".ds-panel"),
+        panel: harness.attr(".ds-side-panel", "data-presence"),
+        panel_rect: harness.rect(".ds-side-panel"),
         hover_cards: harness.count(".ds-hovercard"),
-        toast: harness.attr(".ds-toast", "data-shown"),
+        toast: harness.attr(".ds-toast", "data-presence"),
         toast_rect: harness.rect(".ds-toast"),
         animating: if harness.is_animating() {
             Animating::Yes
@@ -218,8 +218,7 @@ fn the_same_scenario_gives_the_same_frames_idle_or_under_load() {
     );
     let opened = first(&|s| s.hover_cards == 1);
     assert!(opened >= ms(700) && opened < ms(720), "{opened:?}");
-    // (It mounts hidden for a frame so its spring rises from below the edge.)
-    let hidden = first(&|s| s.at > ms(1000) && s.toast.as_deref() == Some("hidden"));
+    let hidden = first(&|s| s.at > ms(1000) && s.toast.as_deref() == Some("leaving"));
     assert!(hidden >= ms(5800) && hidden < ms(5820), "{hidden:?}");
 }
 
@@ -229,7 +228,7 @@ fn the_same_scenario_gives_the_same_frames_idle_or_under_load() {
 fn Center() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover, extent: RootExtent::Viewport,
-            Panel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0),
+            SidePanel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0),
                 p { "Nothing new." }
             }
         }
@@ -254,35 +253,35 @@ fn a_stalled_first_frame_cannot_end_the_entrance_early() {
         .map(|_| {
             let mut h = virtual_harness(Center);
             assert_eq!(
-                h.attr(".ds-panel", "data-presence").as_deref(),
+                h.attr(".ds-side-panel", "data-presence").as_deref(),
                 Some("entering")
             );
             std::thread::sleep(entrance + ms(50));
             h.advance(ms(1));
             assert_eq!(
-                h.attr(".ds-panel", "data-presence").as_deref(),
+                h.attr(".ds-side-panel", "data-presence").as_deref(),
                 Some("entering"),
                 "the wall-clock stall did not move the timer"
             );
             let mut trace = vec![sample(&mut h, ms(1), Paint::Frame)];
             h.advance(entrance - ms(2));
             assert_eq!(
-                h.attr(".ds-panel", "data-presence").as_deref(),
+                h.attr(".ds-side-panel", "data-presence").as_deref(),
                 Some("entering"),
                 "not a millisecond before settle(PanelIn)"
             );
             trace.push(sample(&mut h, entrance - ms(1), Paint::Frame));
             h.advance(ms(1));
             assert_eq!(
-                h.attr(".ds-panel", "data-presence").as_deref(),
+                h.attr(".ds-side-panel", "data-presence").as_deref(),
                 Some("present"),
                 "present exactly at settle(PanelIn) = {entrance:?}"
             );
             trace.push(sample(&mut h, entrance, Paint::Frame));
             let rested = settle_until(&mut h, |h| !h.is_animating());
             assert!(rested >= h.now() - ms(1));
-            let rest = h.rect(".ds-panel").expect("the panel");
-            assert!(h.hits(inside(rest), ".ds-panel"), "hit where it rests");
+            let rest = h.rect(".ds-side-panel").expect("the panel");
+            assert!(h.hits(inside(rest), ".ds-side-panel"), "hit where it rests");
             trace.push(sample(&mut h, entrance, Paint::Frame));
             trace
         })

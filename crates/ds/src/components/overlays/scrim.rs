@@ -1,37 +1,14 @@
-//! Scrim: dims the card and catches the click that closes (design/04-COMPONENTS.md
-//! section 24).
+//! The scrim button a peek draws under its card (design/04-COMPONENTS.md section 24): it dims
+//! the card behind and closes on a click. Crate-private: a sheet dims nothing on macOS, so the
+//! public `Scrim` component and its strengths are gone (design/30 Part 4); the peek is the one
+//! modal that still dims.
 
-use crate::components::overlays::flow::Flow;
-use crate::components::overlays::popover::{Stacking, use_float};
-use crate::components::overlays::scrim_strength::ScrimStrength;
 use dioxus::prelude::*;
-use ds_core::vocab::Dismiss;
-use ds_style::tokens::layer::ZLayer;
 
-/// The scrim button itself, for a modal that draws its own (`Peek`, `Sheet`): a click closes
-/// when `closes()` says the modal is the topmost layer.
+/// The scrim button itself, for a modal that draws its own (`Peek`): a click closes when
+/// `closes()` says the modal is the topmost layer.
 pub(crate) fn scrim_button(
     label: &str,
-    closes: impl Fn() -> bool + 'static,
-    onclose: EventHandler<()>,
-) -> Element {
-    scrim_button_as(label, ScrimLook::default(), closes, onclose)
-}
-
-/// How a modal's own scrim is drawn beyond its label (sheet and modal parts).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub(crate) struct ScrimLook {
-    /// `data-presence="leaving"` while its modal plays its exit, so the scrim fades out with it
-    /// and stops catching the pointer; `None` otherwise.
-    pub(crate) presence: Option<&'static str>,
-    /// How hard it dims.
-    pub(crate) strength: ScrimStrength,
-}
-
-/// [`scrim_button`] drawn as `look` says.
-pub(crate) fn scrim_button_as(
-    label: &str,
-    look: ScrimLook,
     closes: impl Fn() -> bool + 'static,
     onclose: EventHandler<()>,
 ) -> Element {
@@ -40,94 +17,11 @@ pub(crate) fn scrim_button_as(
             r#type: "button",
             class: "ds-scrim",
             "aria-label": "{label}",
-            "data-presence": look.presence,
-            "data-strength": look.strength.attribute(),
             onclick: move |_| {
                 if closes() {
                     onclose.call(());
                 }
             },
         }
-    }
-}
-
-/// A dimming layer that closes on click.
-///
-/// `flow` says which layer it dims. [`Flow::Floating`] (the default) is the overlay's scrim:
-/// drawn at the end of `.ds` on the scrim layer (`--z-scrim`), above everything the page draws,
-/// a layer on the stack that Escape closes. [`Flow::Inline`] is drawn where the
-/// caller renders it, at the caller's stacking level: `position:absolute; inset:0` inside the
-/// nearest positioned ancestor, with no overlay, no layer and no Escape of its own, so whatever
-/// the caller draws after it in the same container (a peeked reader) sits above it. The
-/// layering rule: an inline scrim dims its container's earlier content and lies under its later
-/// content and under every floating surface; to put something above it, render it after the
-/// scrim in the same positioned container. A press closes it either way (`onclose`), an inline
-/// one at once since no other layer can be above it in the overlay's sense.
-///
-/// `layer` gives an inline scrim a stacking layer of its own, written as
-/// `z-index: var(--z-…)` on it. Without one it sets no z-index, so a positioned row the caller
-/// draws after it in the same container (a list row that is `position:relative` for its hover
-/// strip) paints over it. The caller picks the layer: above its own rows (`ZLayer::Raise` over
-/// rows that set none) and below its floating surfaces (the reader it peeks, a menu), which
-/// then need a layer above the one chosen. A floating scrim is always on `--z-scrim` and ignores
-/// it.
-///
-/// The flow is fixed for the scrim's life: key it by the flow to switch.
-///
-/// `strength: ScrimStrength::Modal` dims with `--scrim-modal` (.40 light, .55 dark) instead of
-/// `--scrim` (.22), behind a dialog that asks for a decision (sheet and modal parts).
-#[component]
-pub fn Scrim(
-    label: String,
-    onclose: EventHandler<()>,
-    #[props(default)] flow: Flow,
-    #[props(default)] layer: Option<ZLayer>,
-    #[props(default)] strength: ScrimStrength,
-) -> Element {
-    let look = ScrimLook {
-        strength,
-        ..ScrimLook::default()
-    };
-    let stacking = match flow {
-        Flow::Floating => Stacking::Layer(Dismiss::Semitransient),
-        Flow::Inline => Stacking::Passive,
-    };
-    let float = use_float(ZLayer::Scrim, stacking);
-    match flow {
-        Flow::Floating => {
-            float.show(
-                scrim_button_as(&label, look, move || float.is_top(), onclose),
-                onclose,
-            );
-            rsx! {}
-        }
-        Flow::Inline => rsx! {
-            button {
-                r#type: "button",
-                class: "ds-scrim",
-                "data-flow": flow.attr(),
-                style: layer.map(layer_style),
-                "data-strength": strength.attribute(),
-                "aria-label": "{label}",
-                onclick: move |_| onclose.call(()),
-            }
-        },
-    }
-}
-
-/// An inline scrim's own layer, as its `style`: `z-index:var(--z-raise)`.
-fn layer_style(layer: ZLayer) -> String {
-    format!("z-index:var({})", layer.var().as_str())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::layer_style;
-    use ds_style::tokens::layer::ZLayer;
-
-    #[test]
-    fn a_layer_is_written_as_its_token() {
-        assert_eq!(layer_style(ZLayer::Raise), "z-index:var(--z-raise)");
-        assert_eq!(layer_style(ZLayer::LinkPill), "z-index:var(--z-link-pill)");
     }
 }

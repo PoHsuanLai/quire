@@ -30,9 +30,8 @@ that rev.
   primitives have no caller in quire yet: `use_collapse` waits for the `Disclosure` of step 4a.5
   (`TreeItem` is a native `details`), and `LongPress` waits for the dock and titlebar menus in
   sill. `rubber::resist` is read by the host's scroll; `Swipe` keeps its own `swipe_damping`
-  setting (a quarter, not `.55`) until design/22 decides the key. The tooltip's Fly label is
-  CSS, so its delay is 2.5 x `--t-big` (1 s, the Tip profile's) until the Fly is driven by
-  `HoverProfile::Tip`. `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
+  setting (a quarter, not `.55`) until design/22 decides the key. The tooltip is driven by
+  `HoverProfile::Tip` since step 4a.6 (the CSS Fly and its `2.5 x --t-big` delay are gone). `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
   (`MenuTiming` carries its own). The pressed appearance (`data-pressed`) is written by `Button`,
   `Toggle`, `Checkbox`, `RadioGroup`, `SegmentedControl` and `Slider`; rows, tiles and menu items
   write it when steps 4a.5 and 4a.7 rebuild them, and no control writes `PressPhase::Held` until a
@@ -1185,7 +1184,7 @@ What Blitz at the pinned rev paints (48 px, headless):
 - **The OSD's motion** reads a signed `--osd-dy` per position (-8 px top right, 8 px bottom
   centre), so one keyframe pair serves both.
 - **Hover intent timing**: 450 ms open, 0 warm, 150 ms close, 400 ms warm window
-  (`DelayToken`s), shared by every card, the Card tooltip and `HoverKind::Tip`.
+  (`DelayToken`s), shared by every card; a tooltip waits by the Tip profile (1 s) and a dock label by the Label profile (100 ms) through the same hub (step 4a.6).
 - **Notification swipe** (`motion::swipe`): 1:1 right, a quarter left, springs back under 80 px
   and 600 px/s, flies out past either, release speed from the last two moves within 100 ms,
   mostly-vertical movement ignored, a drag swallows its click.
@@ -1194,3 +1193,21 @@ What Blitz at the pinned rev paints (48 px, headless):
 - **The dock pill never decides an app icon's colourway**: every plate hue is 3.0-4.1:1 against
   the pill on the Work and Home frames in both schemes, because the plate's L 0.62 sits between
   the light and the dark frame.
+
+- **Step 4a.6 (overlays and feedback) decisions.** (1) `Attach::Bottom` and `SheetWidth::Wide` are
+  added to design/30's `Attach {Window, Centre}` and `SheetWidth {Regular, Narrow}`: the bottom
+  `Panel` edge was dropped (Part 4), but Edit Widgets stands at the bottom so the desktop's top
+  rows, where a new widget lands, stay in view; the user should settle whether it keeps that
+  (remove both to make it a centred sheet). (2) `Alert` lacks the suppression `Checkbox` and the
+  help button until `Checkbox` and the Help bezel land (step 4a.4); buttons are `Vec<AlertButton>`
+  (first is the default unless destructive; one that cancels answers Escape). (3) `Popover`'s
+  arrow is `Arrow::None` by default (a shell popover hangs from its anchor, no arrow, design/27
+  5.6); "one at a time" is the layer stack's, not a rule of its own. (4) `HoverKind` is now only a
+  card's content kind (`Thread`, `Sender`, `Account`, `Side`); the hub's card key is
+  `(HoverKey, HoverProfile)`. (5) `EmptyState`'s Retry and `Alert`'s buttons use the current
+  `Button`/`ButtonVariant`; they follow the rebuilt `Button` in step 4a.4. (6) `Toast` places
+  bottom right (it slides in from the right); its swipe glue (`toast_swipe`) copies the
+  notification card's (`ds-shell::notifications::swipe`) and should share one home when step 4a.7
+  rebuilds the card. (7) Skeleton has no `-shape` part: the root is the shape (`data-shape`).
+  (8) Public parts are in `ds::selectors`; the gallery example that restyles each and the
+  `lint::user_stylesheet` cases wait for step 16.

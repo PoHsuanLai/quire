@@ -19,14 +19,15 @@ use ds_style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use ds_style::tokens::delay::DelayToken;
 use std::time::Duration;
 
-/// A card the hub is tracking: the consumer's key and the kind of card.
-type Card = (HoverKey, HoverKind);
+/// A card the hub is tracking: the consumer's key and the profile it waits by.
+type Card = (HoverKey, HoverProfile);
 
 /// What a hover target is, by the consumer's own key: `sender:3`, `thread:88`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct HoverKey(pub String);
 
-/// Which card a target opens (design/04-COMPONENTS.md section 22).
+/// Which hover card a target opens (design/30 section 2.5: kinds are content). It says where the
+/// card stands against its target and how wide it is; every kind waits by [`HoverProfile::Card`].
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum HoverKind {
     /// A list row: the thread card, placed right of the list column.
@@ -37,27 +38,12 @@ pub enum HoverKind {
     Account,
     /// A sidebar entry (pin, Today): the narrow side card, placed right of the target.
     Side,
-    /// A value's small tip (a row's time, design/06-INTERACTIONS.md section 3 `time`): one line,
-    /// tooltip-sized, placed below like a sender card, on the same intent timing as every card.
-    Tip,
-}
-
-impl HoverKind {
-    /// The profile this kind waits by: a tip is a tooltip, every other kind a card.
-    pub fn profile(self) -> HoverProfile {
-        match self {
-            HoverKind::Tip => HoverProfile::Tip,
-            HoverKind::Thread | HoverKind::Sender | HoverKind::Account | HoverKind::Side => {
-                HoverProfile::Card
-            }
-        }
-    }
 }
 
 /// The hover manager, provided as context by `Ds`.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct HoverHub {
-    intent: Signal<HoverIntent<(HoverKey, HoverKind)>>,
+    intent: Signal<HoverIntent<Card>>,
     leaving: Signal<Option<Card>>,
     peeked: Signal<Option<Card>>,
     open_timer: Signal<Option<Task>>,
@@ -69,7 +55,7 @@ pub struct HoverHub {
 
 impl HoverHub {
     /// Feed an event; the hub starts and cancels its own timers.
-    pub fn feed(&self, event: HoverEvent<(HoverKey, HoverKind)>) {
+    pub fn feed(&self, event: HoverEvent<Card>) {
         let _ = self.try_feed(event);
     }
 
@@ -80,22 +66,22 @@ impl HoverHub {
     }
 
     /// The card that is open (or closing), for the consumer to render.
-    pub fn open(&self) -> Option<(HoverKey, HoverKind)> {
+    pub fn open(&self) -> Option<(HoverKey, HoverProfile)> {
         match self.intent.read().phase() {
             IntentPhase::Open { key } | IntentPhase::Closing { key, .. } => Some(key.clone()),
             IntentPhase::Idle | IntentPhase::Pending { .. } => None,
         }
     }
 
-    /// The card playing `hc-out`, until `settle(HcOut)` unmounts it; render it with
+    /// The card fading out, until its exit settles and unmounts it; render it with
     /// `data-presence="leaving"`.
-    pub fn leaving(&self) -> Option<(HoverKey, HoverKind)> {
+    pub fn leaving(&self) -> Option<(HoverKey, HoverProfile)> {
         self.leaving.read().clone()
     }
 
     /// The card Space last turned into a peek (design/06-INTERACTIONS.md section 3); the
     /// consumer opens its peek when this changes.
-    pub fn peeked(&self) -> Option<(HoverKey, HoverKind)> {
+    pub fn peeked(&self) -> Option<(HoverKey, HoverProfile)> {
         self.peeked.read().clone()
     }
 
@@ -132,12 +118,12 @@ impl HoverHub {
         }
     }
 
-    /// Play `hc-out` on `card`, unmount it once that settles, and end the warm window.
+    /// Fade `card` out, unmount it once that settles, and end the warm window.
     fn close(&self, card: Card) -> Result<(), Gone> {
         stop(self.close_timer)?;
         try_set_if_changed(self.leaving, Some(card.clone()))?;
         let level = try_get(self.env)?.resolved.motion;
-        let out = settle(Anim::HcOut, level);
+        let out = settle(Anim::MenuOut, level);
         let leaving = self.leaving;
         spawn_in(self.scope, async move {
             sleep(out).await;
@@ -184,7 +170,7 @@ fn stop(timer: Signal<Option<Task>>) -> Result<(), Gone> {
     Ok(())
 }
 
-/// A new hub for `Ds` to provide, timing `hc-out` at the root's motion level.
+/// A new hub for `Ds` to provide, timing the fade out at the root's motion level.
 pub fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| HoverHub {

@@ -7,7 +7,8 @@
 //! `QUIRE_GALLERY_SHOTS` names a directory, as `edit-widgets-<pose>.png`.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Fraction, Material, Panel, PanelEdge, Px, RootChrome, Shown};
+use ds::components::overlays::sheet_width::SheetWidth;
+use ds::{Appearance, Attach, Ds, Fraction, Material, RootChrome, Sheet};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds_shell::{
@@ -90,8 +91,8 @@ fn Stage() -> Element {
                         on_gone: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
                 }
             }
-            Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(380.0), material: Material::Sheet,
-                div { style: "display:flex;flex-direction:column;flex:1;min-height:0;{metrics}",
+            Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide,
+                div { style: "display:flex;flex-direction:column;height:380px;min-height:0;{metrics}",
                     WidgetGallery { layout: layout(), onedit }
                 }
             }

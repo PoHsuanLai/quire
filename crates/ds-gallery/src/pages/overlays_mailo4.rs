@@ -7,8 +7,9 @@ use dioxus::prelude::*;
 use ds::Bezel;
 use ds::Check;
 use ds::{
-    Button, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
-    MenuEntry, MenuKind, MenuRow, MenuTile, MountedRef, PickDismiss, use_hover_intent, use_rect,
+    Button, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, HoverProfile, Icon,
+    Menu, MenuEntry, MenuKind, MenuRow, MenuTile, MountedRef, PickDismiss, use_hover_intent,
+    use_rect,
 };
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
@@ -37,7 +38,7 @@ fn Keyed(name: &'static str, placing: Placing) -> Element {
                     (Placing::Element, Some(mounted)) => HoverAnchor::Element(mounted),
                     (Placing::Element, None) | (Placing::Unplaced, _) => HoverAnchor::Unplaced,
                 };
-                driver.over(key.clone(), HoverKind::Sender, anchor);
+                driver.over(key.clone(), HoverProfile::Card, anchor);
             },
             onpointerleave: move |_| driver.out(),
             Button { bezel: Bezel::Inline, label: name, onclick: |_| {} }

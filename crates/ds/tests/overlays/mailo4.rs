@@ -5,11 +5,11 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::Check;
 use ds::{
     Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
     MenuEntry, MenuKind, MenuRow, MenuTile, PickDismiss, Point, Px, Rect, Size, use_hover_intent,
 };
+use ds::{Check, HoverProfile};
 use std::time::Duration;
 
 /// Past the 500 ms hover intent.
@@ -115,15 +115,15 @@ fn name_rect() -> Rect {
 #[component]
 fn HookKeyed(anchor: HoverAnchor, flow: Flow) -> Element {
     let driver = use_hover_intent();
-    use_hook(move || driver.over(HoverKey("sender:3".to_string()), HoverKind::Sender, anchor));
+    use_hook(move || driver.over(HoverKey("sender:3".to_string()), HoverProfile::Card, anchor));
     let hub = driver.hub();
     let open = hub.open().or(hub.leaving());
     rsx! {
         div {
-            if let Some((key, kind)) = open {
+            if let Some((key, _)) = open {
                 HoverCard {
                     key: "{key.0}",
-                    kind,
+                    kind: HoverKind::Sender,
                     flow,
                     parts: vec![
                         HoverCardPart::Title("Dana Okafor".to_string()),

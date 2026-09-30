@@ -14,11 +14,9 @@
 /* 4.3.3 fade */
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
-/* 4.3.8 hc-in */
+/* 4.3.8 hc-in: the link pill's entrance (a popover, tooltip and hover card fade instead) */
 @keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 
-/* 4.3.9 hc-out */
-@keyframes hc-out{ to{ opacity:0; transform:translateY(2px); } }
 
 /* 4.3.11 page-in */
 @keyframes page-in{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
@@ -75,10 +73,12 @@
 
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
-/* sheet-out (quire's): a sheet's exit, `peek-in` reversed and quieter: it fades and
-   settles 8px back down from a .98 scale at `--t-move --e-exit` (design/05 section 10: exits
-   accelerate), holding its transparent last frame until the host unmaps the surface. */
-@keyframes sheet-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.98) translateY(8px); } }
+/* sheet-in and sheet-out (quire's, design/30 section 1.3): a sheet slides down from past the top
+   edge at `--t-big --e-out` and back up at `--t-move --e-exit` (exits accelerate; a bottom sheet
+   rises from below instead: `--sheet-dy`), holding its
+   last frame until the host unmaps the surface. */
+@keyframes sheet-in{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
+@keyframes sheet-out{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
 
 /* widget-out (quire's): a widget's card leaving as the person removes it: it shrinks
    to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
@@ -100,9 +100,10 @@
 
 /* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
-   back out at `--t-move --e-exit`, holding its last frame until the host unmaps it. */
+   back out at `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
+   unmaps it. A toast slides the same way. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
-@keyframes panel-out{ from{ transform:none; } to{ transform:translateX(calc(100% + var(--s-16))); } }
+@keyframes panel-out{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
 /* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
    width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r

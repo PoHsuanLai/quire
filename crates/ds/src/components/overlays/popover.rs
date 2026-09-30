@@ -10,44 +10,25 @@
 
 use crate::host::measure::client_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
+use crate::root::common::Common;
 use crate::stack::host::{OverlayId, Overlays, use_overlays};
 use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::{
-    placement::{Placement, place},
+    placement::{Placed, Placement, Side, place},
     units::{Point, Px, Rect, Size},
 };
 use ds_core::time::{FRAME_SLACK, clock::sleep};
-use ds_core::vocab::Dismiss;
+use ds_core::vocab::{Dismiss, Shown};
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
-use ds_motion::timer::use_motion_timer;
+use ds_motion::presence::{
+    Exit,
+    spec::PresenceSpec,
+    use_presence::{Presented, use_presence},
+};
 use ds_style::tokens::layer::ZLayer;
-
-/// Which surface a popover draws.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum Elevation {
-    /// Menus, hover cards: `--shadow-pop`.
-    #[default]
-    Pop,
-    /// The selection bubble.
-    Bubble,
-    /// The palette, peek: `--shadow-sheet`.
-    Sheet,
-}
-
-impl Elevation {
-    /// The layer a bare popover of this elevation floats on: menus pop, the bubble is the
-    /// bubble, a sheet-elevated surface is the palette's.
-    fn layer(self) -> ZLayer {
-        match self {
-            Elevation::Pop => ZLayer::Menu,
-            Elevation::Bubble => ZLayer::Bubble,
-            Elevation::Sheet => ZLayer::Palette,
-        }
-    }
-}
 
 /// Whether a floating surface joins the layer stack: hover cards and tooltips never take
 /// Escape or a click, so they stay off it.
@@ -180,10 +161,14 @@ impl Float {
         }
         asked.set(Some(element.clone()));
         spawn(async move {
-            sleep(FRAME_SLACK).await;
-            if let Some(rect) = client_rect(&element.0).await {
-                let mut slot = slot;
-                slot.set(Some(rect));
+            // Layout may not have reached the element yet: ask again a few frames running.
+            for _ in 0..60 {
+                sleep(FRAME_SLACK).await;
+                if let Some(rect) = client_rect(&element.0).await {
+                    let mut slot = slot;
+                    slot.set(Some(rect));
+                    return;
+                }
             }
         });
     }
@@ -191,16 +176,21 @@ impl Float {
     /// Where the surface goes, relative to the overlay bounds: `place()` against the measured
     /// bounds and the surface's own size, or against the anchor alone before either is known.
     pub(crate) fn origin(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Point {
-        let Some(anchor) = anchor else {
-            return Point::default();
-        };
+        self.placing(anchor, want, gap)
+            .map_or(Point::default(), |placed| placed.origin)
+    }
+
+    /// [`Float::origin`] with the side the surface landed on, for a surface that draws an arrow
+    /// toward its anchor. `None` before the anchor is known.
+    pub(crate) fn placing(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Option<Placed> {
+        let anchor = anchor?;
         let bounds = self.bounds.rect().unwrap_or(UNMEASURED);
         let content = self
             .surface
             .rect()
             .map(|rect| rect.size)
             .unwrap_or_default();
-        place(anchor, content, bounds, want, gap).origin
+        Some(place(anchor, content, bounds, want, gap))
     }
 
     /// Where the surface sits in client coordinates, once the bounds and its own size are
@@ -310,54 +300,130 @@ pub(crate) fn escape_closes(float: Float, event: &KeyboardEvent, onclose: EventH
     }
 }
 
-/// Whether a popover is on its way out.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Leaving {
-    Staying,
-    Fading,
+/// Whether a popover points at its anchor (`NSPopover`'s arrow, design/30 section 2.5): an app
+/// popover anchored to a control does; a shell popover hung from the bar or Control Center does
+/// not (design/27 5.6).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Arrow {
+    /// The 34 x 8 arrow on the side facing the anchor.
+    Arrow,
+    /// No arrow: the popover hangs from its anchor.
+    #[default]
+    None,
 }
 
-/// A floating surface. Escape or a click outside fades it out over `--t-quick` before
-/// `onclose` runs.
+/// How far the arrow stands out of the popover, and so how much further from its anchor the
+/// popover sits.
+const ARROW_HEIGHT: Px = Px(8.0);
+
+/// How far the arrow's centre stays from a corner of the popover.
+const ARROW_INSET: Px = Px(24.0);
+
+/// The arrow's `data-side` and `left`/`top`: on the side of the popover that faces the anchor,
+/// centred on the anchor's middle, kept `ARROW_INSET` from the corners.
+fn arrow_at(side: Side, anchor: Rect, at: Point, size: Size) -> (&'static str, String) {
+    let clamp = |along: f32, extent: f32| {
+        along.clamp(ARROW_INSET.0, (extent - ARROW_INSET.0).max(ARROW_INSET.0))
+    };
+    match side {
+        Side::Bottom | Side::Top => {
+            let x = anchor.origin.x.0 + anchor.size.width.0 / 2.0 - at.x.0;
+            let word = if side == Side::Bottom {
+                "top"
+            } else {
+                "bottom"
+            };
+            (word, format!("left:{}px", clamp(x, size.width.0)))
+        }
+        Side::Left | Side::Right => {
+            let y = anchor.origin.y.0 + anchor.size.height.0 / 2.0 - at.y.0;
+            let word = if side == Side::Right { "left" } else { "right" };
+            (word, format!("top:{}px", clamp(y, size.height.0)))
+        }
+    }
+}
+
+/// A floating surface anchored to an element, a rect or a point (`NSPopover`).
+///
+/// `dismiss` says what closes it: [`Dismiss::Transient`] (the default) Escape and a click
+/// outside, [`Dismiss::Semitransient`] Escape only, [`Dismiss::Manual`] neither. It fades in over
+/// `--t-quick` and, closed by either, fades out before `onclose` runs. `arrow` draws the 34 x 8
+/// arrow toward the anchor. `common` puts the consumer's `id`, `data-*` and classes on the
+/// surface, and its `aria_label` names it.
 #[component]
 pub fn Popover(
     anchor: Anchor,
     placement: Placement,
     gap: Px,
-    #[props(default)] elevation: Elevation,
+    #[props(default)] arrow: Arrow,
     #[props(default)] dismiss: Dismiss,
     onclose: EventHandler<()>,
+    #[props(default)] common: Common,
     children: Element,
 ) -> Element {
-    let layer = elevation.layer();
+    let layer = ZLayer::Menu;
     let float = use_float(layer, Stacking::Layer(dismiss));
-    let at = float.origin(float.anchor_rect(&anchor), placement, gap);
+    let gap = match arrow {
+        Arrow::Arrow => gap + ARROW_HEIGHT,
+        Arrow::None => gap,
+    };
+    let anchor_rect = float.anchor_rect(&anchor);
+    let placed = float.placing(anchor_rect, placement, gap);
+    let at = placed.map_or(Point::default(), |placed| placed.origin);
     let probe = float.surface();
-    // Escape and an outside click fade the popover out, then close it, as a menu does (the
-    // macOS polish pass; `Anim::MenuOut`, `--t-quick`).
-    let fade = use_motion_timer(Anim::MenuOut);
-    let mut leaving = use_signal(|| Leaving::Staying);
+    // Escape and an outside click fade the popover out, then close it (`Exit::Fade`,
+    // `--t-quick`).
+    let mut shown = use_signal(|| Shown::Visible);
+    let Presented { presence, alias } = use_presence(
+        shown(),
+        PresenceSpec {
+            enter: Anim::PaletteFade,
+            exit: Exit::Fade,
+        },
+        Some(onclose),
+    );
     let close = EventHandler::new(move |()| {
-        if *leaving.peek() == Leaving::Staying {
-            leaving.set(Leaving::Fading);
-            fade.start(onclose);
+        if *shown.peek() == Shown::Visible {
+            shown.set(Shown::Hidden);
         }
     });
-    let presence = match leaving() {
-        Leaving::Fading => Some("leaving"),
-        Leaving::Staying => None,
+    let pointer = match (arrow, placed, anchor_rect, probe.rect()) {
+        (Arrow::Arrow, Some(placed), Some(anchor), Some(size)) => {
+            Some(arrow_at(placed.side, anchor, placed.origin, size.size))
+        }
+        _ => None,
     };
+    let class = common.class("ds-popover");
+    let data = common.data_attributes();
+    if presence.drawn_slug().is_none() {
+        float.show(rsx! {}, close);
+        return rsx! {};
+    }
     float.show(
         rsx! {
             div {
-                class: "ds-popover",
-                "data-elevation": elevation.slug(),
+                id: common.id.clone(),
+                class,
+                "aria-label": common.aria_label.clone(),
+                "data-dismiss": dismiss.slug(),
                 "data-layer": layer_slug(layer),
-                "data-presence": presence,
-                style: position_style(at),
-                onmounted: move |event| probe.on_mounted(event),
+                "data-presence": presence.drawn_slug(),
+                "data-pulse": alias.slug(),
+                style: if placed.is_some() && probe.rect().is_some() {
+                    position_style(at)
+                } else {
+                    format!("{};visibility:hidden", position_style(at))
+                },
+                onmounted: move |event| {
+                    common.mounted(event.clone());
+                    probe.on_mounted(event);
+                },
                 onkeydown: move |event| escape_closes(float, &event, close),
-                {children}
+                ..data,
+                if let Some((side, along)) = pointer {
+                    span { class: "ds-popover-arrow", "data-side": side, style: along }
+                }
+                div { class: "ds-popover-body", {children} }
             }
         },
         close,
