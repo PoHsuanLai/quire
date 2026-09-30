@@ -1,11 +1,12 @@
 //! What a test reads off an element's computed style: its text colour and its fill, as
 //! `getComputedStyle` would give them (animated values included, at the harness's animation
 //! time), the laid-out box of its `::before` (a thumb drawn as a pseudo-element has no
-//! selector of its own), and where that box is painted once its own translation is applied.
+//! selector of its own), and where that box is painted through its transforms.
 
 use crate::harness::{Harness, first};
 use blitz_dom::util::ToColorColor;
-use blitz_dom::{BaseDocument, NodeId, parse_transform_matrix};
+use blitz_dom::{BaseDocument, NodeId};
+use blitz_kit::paint_rect::painted_rect as painted_bounds_of;
 use ds::{Point, Px, Rect, Size};
 
 /// A computed colour in sRGB, each channel and alpha in 0..=1.
@@ -88,23 +89,23 @@ impl Harness {
 }
 
 impl Harness {
-    /// [`Harness::part_rect`] moved by the translation of the part's own `transform` (the
-    /// matrix's `e` and `f`, as `getComputedStyle` resolves it against the laid-out box):
-    /// where a box that slides by `translateX` is painted. Scales and rotations, and ancestors'
-    /// transforms, are left out.
+    /// Where the part is painted: [`Harness::part_rect`] carried through the part's own
+    /// `transform` and every transformed ancestor's (`blitz_kit::paint_rect`): a box that slides
+    /// by `translateX` is read where it appears.
     pub fn painted_rect(&self, selector: &str, part: Part) -> Option<Rect> {
-        let laid = self.part_rect(selector, part)?;
-        let (dx, dy) = self.with_doc(|doc| {
+        self.with_doc(|doc| {
             let node = part.node(doc, first(doc, selector)?)?;
-            let (matrix, _) = parse_transform_matrix(&doc.resolved_style_value(node, "transform"))?;
-            Some((matrix[12] as f32, matrix[13] as f32))
-        })?;
-        Some(Rect {
-            origin: Point {
-                x: Px(laid.origin.x.0 + dx),
-                y: Px(laid.origin.y.0 + dy),
-            },
-            size: laid.size,
+            let painted = painted_bounds_of(doc, node)?;
+            Some(Rect {
+                origin: Point {
+                    x: Px(painted.x as f32),
+                    y: Px(painted.y as f32),
+                },
+                size: Size {
+                    width: Px(painted.width as f32),
+                    height: Px(painted.height as f32),
+                },
+            })
         })
     }
 }
