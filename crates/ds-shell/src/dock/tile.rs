@@ -9,8 +9,9 @@
 //! (design/08 section 2.2); the badge hangs off its top right corner and the bar sits inside its
 //! foot, both on the plate so they scale with it. The running dot sits in the tile's own box, so
 //! it stays on the baseline while the plate bounces. `label` names the tile for assistive
-//! technology and draws over it as a `DockLabel` while `label_shown` says so (`None` follows the
-//! pointer).
+//! technology and draws over the plate as a `DockLabel` while `label_shown` says so (`None`
+//! follows the pointer). `lift` raises the plate (and its badge, bar and label) by a bounce,
+//! whole in layout so the label follows; the dot stays where it is.
 
 use crate::dock::parts::{DockLabel, RunningDot};
 use dioxus::prelude::*;
@@ -43,7 +44,8 @@ pub(crate) fn plate_side(side: Px) -> IconPx {
 /// A dock tile. `icon` is drawn on `plate` (`None` for an app whose own picture is its plate),
 /// re-coloured by `plate_tint` under a Muted or Monochrome dock. `badge` is the app's count or
 /// dot; `progress` its work under way, as a share; `running` is `Active` while the app has a
-/// window, which draws the dot. `side` is the tile's current side.
+/// window, which draws the dot. `side` is the tile's current side, `lift` how far a bounce has
+/// raised the plate.
 #[component]
 pub fn DockTile(
     icon: IconSource,
@@ -53,6 +55,7 @@ pub fn DockTile(
     #[props(default)] progress: Option<Fraction>,
     #[props(default)] running: Activity,
     #[props(default = REST_SIDE)] side: Px,
+    #[props(default)] lift: Px,
     #[props(into)] label: String,
     #[props(default)] label_shown: Option<Shown>,
     onclick: EventHandler<Press>,
@@ -62,6 +65,7 @@ pub fn DockTile(
     let data = common.data_attributes();
     let listen = PressListeners::new(onclick);
     let plate_px = plate_side(side);
+    let inset = (side.0 - f32::from(plate_px.0)) / 2.0;
     let name = common.aria_label.clone().unwrap_or_else(|| label.clone());
     rsx! {
         button {
@@ -76,26 +80,28 @@ pub fn DockTile(
             onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
             onmounted: move |event| common.mounted(event),
             ..data,
-            DockLabel { text: label, shown: label_shown,
-                span { class: "ds-dock-plate", style: "width:{plate_px.0}px;height:{plate_px.0}px",
+            span {
+                class: "ds-dock-plate",
+                style: "left:{inset}px;top:{inset - lift.0}px;width:{plate_px.0}px;height:{plate_px.0}px",
+                DockLabel { text: label, shown: label_shown,
                     IconView {
                         source: icon,
                         size: IconSize::Px(plate_px),
                         plate,
                         plate_tint,
                     }
-                    if let Some(content) = badge {
-                        span { class: "ds-dock-badge",
-                            Badge { content, tone: BadgeTone::Alert, size: ControlSize::Small }
-                        }
+                }
+                if let Some(content) = badge {
+                    span { class: "ds-dock-badge",
+                        Badge { content, tone: BadgeTone::Alert, size: ControlSize::Small }
                     }
-                    if let Some(share) = progress {
-                        span { class: "ds-dock-progress",
-                            ProgressIndicator {
-                                style: ProgressStyle::Bar,
-                                progress: Progress::Known(share),
-                                size: ControlSize::Mini,
-                            }
+                }
+                if let Some(share) = progress {
+                    span { class: "ds-dock-progress",
+                        ProgressIndicator {
+                            style: ProgressStyle::Bar,
+                            progress: Progress::Known(share),
+                            size: ControlSize::Mini,
                         }
                     }
                 }
