@@ -3,7 +3,8 @@
 
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
-use crate::components::fields::text_field_model::{FieldBezel, FieldKind};
+use crate::components::fields::text_field_area::area;
+use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::focus::targets::Told;
 use dioxus::prelude::*;
 use ds_core::vocab::Availability;
@@ -23,6 +24,8 @@ pub(crate) struct Handlers {
 /// Everything the line needs besides its value.
 pub(crate) struct Field {
     pub bezel: FieldBezel,
+    /// How tall a multi-line field is; a line ignores it.
+    pub rows: FieldRows,
     pub size: ControlSize,
     pub label: String,
     /// The input's own `id`, from the caller's `Common`.
@@ -43,19 +46,24 @@ pub(crate) struct Field {
 /// The placeholder as a span over the field, shown while the value is empty: Blitz draws no
 /// `placeholder` attribute and has no `::placeholder` (O-23's fallback). The input carries the
 /// text as `aria-placeholder` instead, so a browser does not draw it twice.
-fn placeholder_shown(value: &str, placeholder: &str) -> Option<String> {
+pub(crate) fn placeholder_shown(value: &str, placeholder: &str) -> Option<String> {
     (value.is_empty() && !placeholder.is_empty()).then(|| placeholder.to_string())
 }
 
 /// `aria-placeholder`, when there is a placeholder at all.
-fn aria_placeholder(placeholder: &str) -> Option<String> {
+pub(crate) fn aria_placeholder(placeholder: &str) -> Option<String> {
     (!placeholder.is_empty()).then(|| placeholder.to_string())
 }
 
-/// A single line: text, a search or a secret. A secure field writes no `value`.
+/// The field's text as it draws: a line (text, a search or a secret; a secure field writes no
+/// `value`) or, for a multi-line field, a `textarea`.
 pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
+    if kind == FieldKind::Multiline {
+        return area(field, value);
+    }
     let Field {
         bezel,
+        rows: _,
         size,
         label,
         id,

@@ -7,6 +7,7 @@
 //! text: nothing moves, and a failed secure entry's shake is the entry's, not this component's.
 
 use crate::components::content::icon_view::IconView;
+use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -36,7 +37,7 @@ fn glyph_of(form: EmptyForm) -> Icon {
 }
 
 /// A placeholder for nothing to show. `icon` overrides the form's glyph; `description` is the
-/// line under the title; `action` is an element of the caller's (a button that adds the first
+/// line under the title, whole or as runs (a `RunTone::Code` run is a command to copy); `action` is an element of the caller's (a button that adds the first
 /// item); a `Failure` with `onretry` draws a Retry button, after the action. `common` puts the
 /// consumer's `id`, `data-*` and classes on the root, and `aria_label` names it in place of its
 /// title.
@@ -44,7 +45,7 @@ fn glyph_of(form: EmptyForm) -> Icon {
 pub fn EmptyState(
     #[props(default)] form: EmptyForm,
     #[props(into)] title: String,
-    #[props(default)] description: Option<String>,
+    #[props(default)] description: Option<TextLine>,
     #[props(default)] icon: Option<Icon>,
     #[props(default)] action: Option<Element>,
     #[props(default)] onretry: Option<EventHandler<()>>,
@@ -68,7 +69,7 @@ pub fn EmptyState(
             }
             div { class: "ds-empty-state-title", "{title}" }
             if let Some(description) = description {
-                div { class: "ds-empty-state-body", "{description}" }
+                div { class: "ds-empty-state-body", {text(&description)} }
             }
             if action.is_some() || retry.is_some() {
                 div { class: "ds-empty-state-action",

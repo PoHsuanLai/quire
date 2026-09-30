@@ -18,7 +18,7 @@ use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::MaskCaret;
-use crate::components::fields::text_field_model::{FieldBezel, FieldKind, Validity};
+use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows, Validity};
 use crate::components::fields::text_field_parts::{Field, Handlers, line};
 use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
@@ -53,7 +53,7 @@ impl Holds {
 fn held(kind: FieldKind, value: String, typed: Signal<String>) -> String {
     match kind {
         FieldKind::Secure => typed(),
-        FieldKind::Plain | FieldKind::Search => value,
+        FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => value,
     }
 }
 
@@ -82,7 +82,8 @@ fn clear_size(size: ControlSize) -> ControlSize {
 /// on Blitz too.
 ///
 /// `kind` picks what it holds ([`FieldKind`]): `Secure` keeps its text out of the markup, `Search`
-/// draws a magnifier, a clear button and `tokens` under it. `bezel` is its edge ([`FieldBezel`]).
+/// draws a magnifier, a clear button and `tokens` under it, and `Multiline` is a `textarea`
+/// `rows` tall (Enter adds a line; the caret leaving commits). `bezel` is its edge ([`FieldBezel`]).
 /// `onchange` hears the value committed: Enter, or the caret leaving (Blitz sends no `change`
 /// event, so the field makes its own, the same on both renderers). `prefix` and `suffix` are
 /// marks inside the frame before and after the text; `help` is a note under it, and `validity`
@@ -96,6 +97,7 @@ pub fn TextField(
     #[props(default)] placeholder: String,
     #[props(default)] kind: FieldKind,
     #[props(default)] bezel: FieldBezel,
+    #[props(default)] rows: FieldRows,
     #[props(default)] size: ControlSize,
     #[props(default)] availability: Availability,
     #[props(default)] validity: Validity,
@@ -149,6 +151,7 @@ pub fn TextField(
     let note = validity.message().cloned().or(help);
     let field = Field {
         bezel,
+        rows,
         size,
         label,
         id: common.id.clone(),
@@ -175,7 +178,7 @@ pub fn TextField(
         (None, FieldKind::Search) => Some(rsx! {
             IconView { source: Icon::Search.into(), size: glyph_size(size) }
         }),
-        (None, FieldKind::Plain | FieldKind::Secure) => None,
+        (None, FieldKind::Plain | FieldKind::Secure | FieldKind::Multiline) => None,
     };
     let class = match (&shake, kind) {
         (Some((anim, _)), FieldKind::Secure) => common.class(&format!("ds-text-field {anim}")),
@@ -183,7 +186,7 @@ pub fn TextField(
     };
     let alias = match kind {
         FieldKind::Secure => shake.map(|(_, alias)| alias),
-        FieldKind::Plain | FieldKind::Search => None,
+        FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => None,
     };
     let data = common.data_attributes();
     rsx! {

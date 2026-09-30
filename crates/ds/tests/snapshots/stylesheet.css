@@ -2073,6 +2073,19 @@ html,body{margin:0;padding:0;background:transparent}
    its tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=plain] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
 
+/* Multiline (`data-kind=multiline`): a `textarea` as tall as its `data-rows`, lines of the field's
+   own 1.55 leading. The frame grows to hold it (no rung height) with a vertical pad, the caret
+   and the placeholder start at the top, and the text scrolls inside the textarea past its rows. */
+.ds-text-field[*|data-kind=multiline][*|data-variant=bezeled] .ds-text-field-frame{ height:auto; align-items:flex-start; padding-top:var(--s-6); padding-bottom:var(--s-6); }
+.ds-input-wrap[*|data-kind=multiline]{ --tf-rows:3; }
+.ds-input-wrap[*|data-rows=two]{ --tf-rows:2; }
+.ds-input-wrap[*|data-rows=four]{ --tf-rows:4; }
+.ds-input-wrap[*|data-rows=six]{ --tf-rows:6; }
+.ds-input-wrap[*|data-rows=ten]{ --tf-rows:10; }
+.ds-input[*|data-kind=multiline]{ display:block; box-sizing:border-box; height:calc(var(--tf-fs) * 1.55 * var(--tf-rows)); resize:none; overflow:auto; line-height:1.55; }
+.ds-input[*|data-kind=multiline][*|data-variant=bezeled]{ height:calc(var(--tf-fs) * 1.55 * var(--tf-rows)); line-height:1.55; }
+.ds-input-wrap[*|data-kind=multiline][*|data-variant=bezeled] .ds-input-placeholder{ line-height:1.55; white-space:pre-wrap; }
+
 /* A plain search field is the query row of a palette or a launcher (`S:235-236`): a row of its
    own with a hairline under it, the glyph in the faint ink, the query at the title size and one
    line tall. */
@@ -2098,6 +2111,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run[*|data-tone=underline]{ text-decoration:underline; }
 .ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
 .ds-run-link:hover{ color:var(--accent-text); }
+/* A code run: the fixed-pitch face (`--font-code`) a step under the line's size on a quiet ground, so
+   a command or an address reads as something to copy. */
+.ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:.92em; background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
 /* -- thread_row -- */
 /* ThreadRow (design/30 section 2.11): a mail row's content inside a `Row` of the Card density,
    `S:175-199`, `S:293-307`. The row is a card with the dot, the words and the tail in a grid. The

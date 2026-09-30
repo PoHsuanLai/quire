@@ -17,7 +17,7 @@ use ds::components::controls::progress::view::ProgressIndicator;
 use ds::components::controls::radio_group::Arrangement;
 use ds::components::controls::segmented::Tracking;
 use ds::components::controls::slider_model::{SliderLook, Ticks};
-use ds::components::fields::text_field_model::Invalid;
+use ds::components::fields::text_field_model::{FieldRows, Invalid};
 use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::motion::detail::stamp::EventStamp;
@@ -432,6 +432,16 @@ pub const CASES: &[Case] = &[
                 }
             }
         },
+    },
+    Case {
+        component: "text_field",
+        state: "multiline-three",
+        make: || rsx! { TextField { label: "Note", value: "First line\nSecond line", kind: FieldKind::Multiline, oninput: |_| {} } },
+    },
+    Case {
+        component: "text_field",
+        state: "multiline-six-empty-rejected",
+        make: || rsx! { TextField { label: "Note", value: "", kind: FieldKind::Multiline, rows: FieldRows::Six, placeholder: "Add a note", validity: rejected(), oninput: |_| {} } },
     },
     Case {
         component: "text_field",
