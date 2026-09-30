@@ -14,6 +14,6 @@ pub mod sheet_attach;
 pub mod sheet_width;
 pub(crate) mod side_panel;
 pub(crate) mod skeleton;
+pub mod swipe_glue;
 pub mod toast;
-mod toast_swipe;
 pub mod tooltip;

@@ -8,7 +8,7 @@
 //! `ToastHold` (5 s), and the pointer over the toast pauses it. A toast pushed with an undo has
 //! an action button (`Undo`); a swipe to the right dismisses it, from where the hand let go.
 
-use crate::components::overlays::toast_swipe::use_toast_swipe;
+use crate::components::overlays::swipe_glue::{SwipeOn, use_swipe_glue};
 use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
@@ -19,6 +19,7 @@ use ds_motion::presence::{
     spec::PresenceSpec,
     use_presence::{Presented, use_presence},
 };
+use ds_motion::swipe::SwipeMetrics;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
@@ -61,7 +62,11 @@ pub fn ToastHost() -> Element {
         },
         None,
     );
-    let swipe = use_toast_swipe(EventHandler::new(move |()| hub.hide()));
+    let swipe = use_swipe_glue(
+        SwipeOn::Yes,
+        SwipeMetrics::default(),
+        EventHandler::new(move |()| hub.hide()),
+    );
     let Some(drawn) = presence.drawn_slug() else {
         return rsx! {};
     };
