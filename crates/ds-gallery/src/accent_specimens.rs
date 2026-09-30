@@ -1,7 +1,7 @@
 //! What the accent sheet draws (`accent_sheet.rs`): the paint the settled band lends, and the
 //! surfaces.
 
-use crate::pages::calendar::month_sample::{AUGUST, First, month as lay_out};
+use crate::pages::shell::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Answers;

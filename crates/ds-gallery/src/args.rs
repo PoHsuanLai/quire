@@ -243,7 +243,7 @@ mod tests {
             (&["--snapshot"], Err("--snapshot needs a directory")),
             (&["--snapshot="], Err("--snapshot needs a directory")),
             (
-                &["--page", "type", "--page", "gaps"],
+                &["--page", "type", "--page", "blitz-limits"],
                 Err("--page given twice"),
             ),
             (

@@ -194,9 +194,9 @@ mod tests {
     fn a_root_starts_where_it_was_asked_to() {
         assert_eq!(starting().page, Axes::default().page);
         start_with(Axes {
-            page: Page::Gaps,
+            page: Page::BlitzLimits,
             ..Axes::default()
         });
-        assert_eq!(starting().page, Page::Gaps);
+        assert_eq!(starting().page, Page::BlitzLimits);
     }
 }
