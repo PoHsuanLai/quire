@@ -6,8 +6,11 @@
 //! build for a platform that has none, simply answers [`ds::SystemPrefs::default`].
 
 use crate::latest::{self, Receiver};
-use ds::{Contrast, ReducedMotion, Scheme, SystemPrefs};
 use ds_core::spawner::Spawner;
+use ds_style::appearance::system::Contrast;
+use ds_style::appearance::system::ReducedMotion;
+use ds_style::appearance::system::SystemPrefs;
+use ds_style::appearance::theme::Scheme;
 use std::collections::HashMap;
 use zbus::zvariant::OwnedValue;
 
@@ -247,7 +250,10 @@ mod tests {
     };
 
     use super::SystemPrefsSource;
-    use ds::{Contrast, ReducedMotion, Scheme, SystemPrefs};
+    use ds_style::appearance::system::Contrast;
+    use ds_style::appearance::system::ReducedMotion;
+    use ds_style::appearance::system::SystemPrefs;
+    use ds_style::appearance::theme::Scheme;
     use std::collections::HashMap;
     use zbus::zvariant::OwnedValue;
 

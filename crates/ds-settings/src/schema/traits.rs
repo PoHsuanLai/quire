@@ -62,33 +62,41 @@ mod tests {
         let cases: &[(&str, Vec<String>, &[&str])] = &[
             (
                 "theme",
-                stored_words::<ds::Theme>(),
+                stored_words::<ds_style::appearance::theme::Theme>(),
                 &["system", "light", "dark"],
             ),
             (
                 "motion",
-                stored_words::<ds::Motion>(),
+                stored_words::<ds_style::appearance::motion::Motion>(),
                 &["standard", "reduced"],
             ),
             (
                 "typeface",
-                stored_words::<ds::Typeface>(),
+                stored_words::<ds_style::appearance::typeface::Typeface>(),
                 &["system", "editorial"],
             ),
-            ("look", stored_words::<ds::Look>(), &["mac"]),
+            ("look", stored_words::<ds_style::look::Look>(), &["mac"]),
         ];
         for (name, got, want) in cases {
             assert_eq!(got, want, "{name}");
         }
         assert_eq!(
-            stored_words::<ds::Accent>().first().map(String::as_str),
+            stored_words::<ds_style::appearance::accent::Accent>()
+                .first()
+                .map(String::as_str),
             Some("postmark")
         );
-        assert_eq!(stored_words::<ds::Accent>().len(), 6);
+        assert_eq!(
+            stored_words::<ds_style::appearance::accent::Accent>().len(),
+            6
+        );
     }
 
     #[test]
     fn a_two_word_enum_is_a_toggle() {
-        assert!(matches!(kind_of::<ds::Motion>(), KeyKind::Toggle { .. }));
+        assert!(matches!(
+            kind_of::<ds_style::appearance::motion::Motion>(),
+            KeyKind::Toggle { .. }
+        ));
     }
 }

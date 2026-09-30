@@ -120,7 +120,7 @@ fn begin<D: SettingsDoc + Send>(
 
 /// Re-read `path` after every settled burst of events and publish it, until the watcher or the
 /// receiver is dropped. `good` is the last value that read cleanly.
-// The debounce is a wall-clock wait on the spawner's own thread: `ds::sleep` follows the clock
+// The debounce is a wall-clock wait on the spawner's own thread: `ds_core::time::clock::sleep` follows the clock
 // installed on its caller's thread and is not `Send`, and a task on a runtime has neither.
 async fn settle<D: SettingsDoc + Send>(
     path: PathBuf,

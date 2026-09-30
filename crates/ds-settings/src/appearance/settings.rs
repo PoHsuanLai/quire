@@ -5,8 +5,13 @@
 
 use crate::schema::Page;
 use crate::units::{Fraction, Percent};
-use ds::{Accent, Appearance, Look, Motion, Theme, Typeface};
 use ds_core::word::Word;
+use ds_style::appearance::accent::Accent;
+use ds_style::appearance::appearance::Appearance;
+use ds_style::appearance::motion::Motion;
+use ds_style::appearance::theme::Theme;
+use ds_style::appearance::typeface::Typeface;
+use ds_style::look::Look;
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.

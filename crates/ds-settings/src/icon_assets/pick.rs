@@ -2,7 +2,7 @@
 
 use super::lookup::{Presence, a_file, apps_dir};
 use crate::units::Px;
-use ds::icon::IconStyle;
+use ds_style::icon::retint::IconStyle;
 use std::path::{Path, PathBuf};
 
 /// The sizes every app ships in every style, each drawn directly (design/08 2.11): the
@@ -79,7 +79,7 @@ mod tests {
     use super::{APP_ICON_PX, AppIconName, find_app_icon, sizes_to_try};
     use crate::icon_assets::lookup::{Presence, a_file};
     use crate::units::Px;
-    use ds::icon::IconStyle;
+    use ds_style::icon::retint::IconStyle;
     use std::path::{Path, PathBuf};
 
     #[test]

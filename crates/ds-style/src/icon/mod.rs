@@ -32,7 +32,7 @@ pub mod retint;
 pub(crate) mod sets;
 pub mod shape;
 pub mod stroke;
-#[cfg(test)]
+#[cfg(all(test, feature = "dioxus"))]
 mod tests;
 pub(crate) mod tone_band;
 #[cfg(test)]
