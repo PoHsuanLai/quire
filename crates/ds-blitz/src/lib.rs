@@ -78,7 +78,7 @@ pub use blitz_host::provide_host;
 pub use click_focus::FocusFallback;
 pub use contexts::RootContexts;
 pub use error::{NativeError, OpenWindowError};
-pub use fonts::{font_context, register_fonts};
+pub use fonts::font_context;
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_tag::FrameTag;
