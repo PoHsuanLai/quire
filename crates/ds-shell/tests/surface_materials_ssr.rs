@@ -16,7 +16,10 @@ use ds::{
     Fraction, Icon, IconSize, IconSource, IconView, Inject, Material, PRESETS, PlateFamily,
     PlateTint, Px, Selection, Shown, Surface, Theme,
 };
-use ds_shell::{DockFloor, DockTile, MenuBarItem, RunningDot, WorkspacePill, WorkspacePills};
+use ds_shell::{
+    DockFloor, DockTile, MenuBarItem, PaneFooter, PaneHeader, RunningDot, WorkspacePill,
+    WorkspacePills,
+};
 
 /// The Work Space's Monochrome plate tint.
 fn work() -> Option<PlateTint> {
@@ -140,6 +143,39 @@ const CASES: &[Case] = &[
                 badge: Some(BadgeContent::Dot),
                 label: "Files",
                 onclick: |_| {},
+            }
+        }
+    }),
+    ("dock-tile-bounce", || {
+        rsx! {
+            DockTile {
+                icon: IconSource::Glyph(Icon::Mail),
+                plate: Some(PlateFamily::Blue),
+                running: Activity::Active,
+                lift: Px(12.0),
+                label: "Mail",
+                onclick: |_| {},
+            }
+        }
+    }),
+    ("pane-header-back-and-switch", || {
+        rsx! {
+            PaneHeader {
+                title: "Wi-Fi",
+                back: Some(EventHandler::new(|_: ds::Press| {})),
+                trailing: rsx! { span { "switch" } },
+            }
+        }
+    }),
+    ("pane-header-plain", || {
+        rsx! {
+            PaneHeader { title: "Bluetooth" }
+        }
+    }),
+    ("pane-footer", || {
+        rsx! {
+            PaneFooter {
+                ds::Button { bezel: ds::Bezel::Inline, label: "Wi-Fi Settings…", onclick: |_| {} }
             }
         }
     }),
