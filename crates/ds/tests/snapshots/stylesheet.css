@@ -2203,6 +2203,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-preview-text[*|data-face=mono]{ font-family:var(--font-code); font-size:var(--fs-help); }
 .ds-preview-pending{ display:flex; flex-direction:column; align-items:center; gap:var(--s-12); color:var(--ink-faint); font-size:var(--fs-small); }
 .ds-preview-pending-mark{ position:relative; display:block; width:20px; height:20px; }
+.ds-preview-pending-words{ display:block; }
 .ds-preview-emoji{ font-size:var(--fs-emoji-preview); line-height:1; }
 
 .ds-preview-caption{ display:flex; flex-direction:column; align-items:center; gap:var(--s-2); text-align:center; min-width:0; }
