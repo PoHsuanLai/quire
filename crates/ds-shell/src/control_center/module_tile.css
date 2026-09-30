@@ -1,8 +1,8 @@
 /* ModuleTile (design/20 section 1.5, design/13 section 13.3.7): a module on
    the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
-   hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
-   with `--accent-ink`. Busy: the Off disc with the progress ring around it. The tile does not
+   hairline) with a paper disc in ink. On: the same plate (the tile does not tint, as macOS's
+   does not), the disc in `--accent` with `--accent-ink`. Busy: the Off disc with the progress ring around it. The tile does not
    lift under the pointer (design/30 Part 4).
    A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
@@ -14,7 +14,6 @@
   transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
 .ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-tile[*|aria-busy=true]{ cursor:default; }
 
