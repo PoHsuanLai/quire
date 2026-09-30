@@ -9,7 +9,7 @@ use ds::{
     Appearance, Corner, Ds, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Scheme,
     Shown, Surface,
 };
-use ds_native::{Harness, Viewport};
+use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::DockLabel;
 use image::{Rgba, RgbaImage};
 use probe::rect;
@@ -140,8 +140,9 @@ fn Labels() -> Element {
 /// the pointer, where an uncontrolled label shows after the Label profile's 100 ms.
 #[test]
 fn a_caller_shows_and_hides_a_dock_label() {
-    let mut harness = Harness::new(Labels, VIEW);
-    harness.advance(ms(40));
+    let mut harness =
+        Harness::with_config(Labels, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(400));
     assert_eq!(
         harness.count(".ds-dock-label"),
         1,

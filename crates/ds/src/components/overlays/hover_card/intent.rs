@@ -76,6 +76,11 @@ impl HoverDriver {
         self.anchors.file(key, anchor);
     }
 
+    /// Where `key`'s target was last measured, if it has been.
+    pub(crate) fn anchor_of(&self, key: &HoverKey) -> Option<Rect> {
+        self.anchors.of(key)
+    }
+
     /// The pointer left the target: the card closes after 150 ms unless it comes back or
     /// enters the card.
     pub fn out(&self) {

@@ -15,11 +15,12 @@ use crate::components::overlays::hover_card::{
     target::HoverTarget,
     use_card,
 };
-use crate::host::measure::MountedRef;
+use crate::host::measure::{MountedRef, client_rect};
 use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, use_hover_hub};
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
 use ds_motion::hover_intent::HoverProfile;
@@ -87,6 +88,7 @@ pub fn Hint(
 ) -> Element {
     let key = use_hook(own_key);
     let hub = use_hover_hub();
+    let element = use_signal(|| None::<MountedRef>);
     let mine = match shown {
         Some(Shown::Visible) => true,
         Some(Shown::Hidden) => false,
@@ -102,12 +104,12 @@ pub fn Hint(
                     HoverTarget { hover_key: key.clone(), profile, {children} }
                 },
                 Some(_) => rsx! {
-                    Anchored { hover_key: key.clone(), {children} }
+                    Anchored { hover_key: key.clone(), element, {children} }
                 },
             }
         }
         if mine {
-            HintSurface { hover_key: key, text, root, side, own: shown.is_some(), common }
+            HintSurface { hover_key: key, text, root, side, own: shown.is_some(), element, common }
         }
     }
 }
@@ -115,7 +117,11 @@ pub fn Hint(
 /// The wrapper of a caller-driven hint: it files its own rect as the anchor once mounted, since
 /// no pointer will come over it to do that.
 #[component]
-fn Anchored(hover_key: HoverKey, children: Element) -> Element {
+fn Anchored(
+    hover_key: HoverKey,
+    element: Signal<Option<MountedRef>>,
+    children: Element,
+) -> Element {
     let driver = use_hover_intent();
     rsx! {
         span {
@@ -123,6 +129,8 @@ fn Anchored(hover_key: HoverKey, children: Element) -> Element {
             "data-hover-key": "{hover_key.0}",
             "data-hint": "true",
             onmounted: move |event| {
+                let mut element = element;
+                element.set(Some(MountedRef(event.data())));
                 driver.anchor(hover_key.clone(), HoverAnchor::Element(MountedRef(event.data())));
             },
             {children}
@@ -138,8 +146,33 @@ fn HintSurface(
     root: &'static str,
     side: HintSide,
     own: bool,
+    element: Signal<Option<MountedRef>>,
     common: Common,
 ) -> Element {
+    // A caller-driven hint follows its target for as long as it is up: layout can move the target
+    // after the hint was placed, and the hint is placed again against the latest rect. The loop
+    // belongs to this surface and ends with it.
+    let driver = use_hover_intent();
+    let followed = hover_key.clone();
+    use_future(move || {
+        let followed = followed.clone();
+        async move {
+            if !own {
+                return;
+            }
+            loop {
+                sleep(FRAME_SLACK).await;
+                let Some(target) = element.peek().clone() else {
+                    continue;
+                };
+                if let Some(rect) = client_rect(&target.0).await
+                    && driver.anchor_of(&followed) != Some(rect)
+                {
+                    driver.anchor(followed.clone(), HoverAnchor::Rect(rect));
+                }
+            }
+        }
+    });
     let (float, style, presence) = use_card(side.standing(), own.then_some(&hover_key));
     let probe = float.surface();
     let class = common.class(&format!("ds-popover {root}"));
