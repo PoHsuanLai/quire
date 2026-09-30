@@ -4,8 +4,8 @@
 //! given, before any children.
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
-use crate::components::content::text_runs::{TextLine, text as runs};
 use crate::components::content::label::{Label, LabelRole, LabelStyle};
+use crate::components::content::text_runs::{TextLine, text as runs};
 use crate::components::controls::key_equivalent::KeyEquivalent;
 use crate::components::controls::key_equivalent::KeyStyle;
 use dioxus::prelude::*;

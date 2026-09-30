@@ -5,10 +5,11 @@ use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{Accent, Appearance, AppearancePicker, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use ds::{
-    AccountFace, AccountTile, Colour, CommandPill, DragGhost, DropLine, EdgeStrip, Grip, Hex,
-    HoverStrip, ImageSource, MarkProvider, MarkSize, MarkStyle, Point, ProviderMark, Px,
+    Colour, CommandPill, DragGhost, DropLine, DropState, EdgeStrip, Grip, Hex, HoverStrip,
+    ImageSource, MarkProvider, MarkSize, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px,
+    Selection,
 };
-use ds::{Check, Shortcut, ShortcutKey};
+use ds::{Shortcut, ShortcutKey};
 
 /// One component in one state.
 pub struct Case {
@@ -66,26 +67,36 @@ pub const CASES: &[Case] = &[
         state: "image",
         make: || rsx! { ProviderMark { provider: MarkProvider::Google, size: MarkSize::Tile, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
-    // AccountTile: All, one pressed, one unpressed (desaturated), nothing unread.
+    // PinTile: All, one selected, one not (its colour muted), nothing unread, the Add tile, a drop line.
     Case {
-        component: "account_tile",
+        component: "pin_tile",
         state: "all-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Check::On, unread: 4, onclick: |_| {} } },
+        make: || rsx! { PinTile { face: PinFace::All, selection: Selection::Selected, unread: 4, onclick: |_| {} } },
     },
     Case {
-        component: "account_tile",
+        component: "pin_tile",
         state: "one-pressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Google, address: Some("poh@acme.example".to_string()) }, pressed: Check::On, unread: 2, onclick: |_| {} } },
+        make: || rsx! { PinTile { face: PinFace::Account { initial: 'P', colour: VIOLET, provider: MarkProvider::Google, address: Some("poh@acme.example".to_string()) }, selection: Selection::Selected, unread: 2, onclick: |_| {} } },
     },
     Case {
-        component: "account_tile",
+        component: "pin_tile",
         state: "one-unpressed",
-        make: || rsx! { AccountTile { account: AccountFace::One { initial: 'P', colour: VIOLET, provider: MarkProvider::Fastmail, address: None }, pressed: Check::Off, unread: 2, onclick: |_| {} } },
+        make: || rsx! { PinTile { face: PinFace::Account { initial: 'P', colour: VIOLET, provider: MarkProvider::Fastmail, address: None }, selection: Selection::Unselected, unread: 2, onclick: |_| {} } },
     },
     Case {
-        component: "account_tile",
+        component: "pin_tile",
         state: "none-unread",
-        make: || rsx! { AccountTile { account: AccountFace::All, pressed: Check::Off, unread: 0, onclick: |_| {} } },
+        make: || rsx! { PinTile { face: PinFace::All, unread: 0, onclick: |_| {} } },
+    },
+    Case {
+        component: "pin_tile",
+        state: "drop-target",
+        make: || rsx! { PinTile { face: PinFace::All, drop: DropState::Target, onclick: |_| {} } },
+    },
+    Case {
+        component: "pin_tile",
+        state: "drag-source",
+        make: || rsx! { PinTile { face: PinFace::All, drop: DropState::Source, onclick: |_| {} } },
     },
     // EdgeStrip.
     Case {

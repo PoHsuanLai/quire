@@ -1,11 +1,10 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::Check;
 use ds::{
-    Accessory, AccountFace, AccountTile, AddAccountTile, Button, Colour, Common, Fraction, Hex,
-    Icon, ImageSource, MarkProvider, MarkStyle, PillAction, Propagation, Row, RowLeading, SendMood,
-    SendPhase, SendPill, Shown,
+    Accessory, Button, Colour, Common, Fraction, Hex, Icon, ImageSource, MarkProvider, MarkStyle,
+    PillAction, PinFace, PinTile, Propagation, Row, RowLeading, Selection, SendMood, SendPhase,
+    SendPill, Shown,
 };
 use ds::{Avatar, Muting};
 use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
@@ -37,8 +36,8 @@ fn scheduled() -> Element {
 const VIOLET: Colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
 
 /// Poh's account on Google.
-fn poh() -> AccountFace {
-    AccountFace::One {
+fn poh() -> PinFace {
+    PinFace::Account {
         initial: 'P',
         colour: VIOLET,
         provider: MarkProvider::Google,
@@ -71,18 +70,18 @@ pub const CASES: &[Case] = &[
         golden: "controls/text_field/password-filled.html",
         make: || rsx! { TextField { kind: FieldKind::Secure, label: "Password", value: "hunter2", oninput: |_| {} } },
     },
-    // AccountTile: the favicon mark, and the Add account tile, with and without a hint.
+    // PinTile: the favicon mark, and the Add account tile, with and without a hint.
     Case {
-        golden: "lists/account_tile/one-image-mark.html",
-        make: || rsx! { AccountTile { account: poh(), pressed: Check::On, unread: 2, mark: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())), onclick: |_| {} } },
+        golden: "lists/pin_tile/one-image-mark.html",
+        make: || rsx! { PinTile { face: poh(), selection: Selection::Selected, unread: 2, mark: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())), onclick: |_| {} } },
     },
     Case {
-        golden: "lists/account_tile/add.html",
-        make: || rsx! { AddAccountTile { title: "Add account…", onclick: |_| {} } },
+        golden: "lists/pin_tile/add.html",
+        make: || rsx! { PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} } },
     },
     Case {
-        golden: "lists/account_tile/add-named.html",
-        make: || rsx! { AddAccountTile { label: "Add an account to Work", onclick: |_| {} } },
+        golden: "lists/pin_tile/add-named.html",
+        make: || rsx! { PinTile { face: PinFace::Add { label: "Add an account to Work".to_string(), hint: None }, onclick: |_| {} } },
     },
     // SendPill: Cancel for a held send, and a fatal refusal on two lines.
     Case {

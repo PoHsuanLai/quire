@@ -7,12 +7,12 @@ use ds::ControlSize;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{Accessory, Align, Availability, Button, RowLeading};
 use ds::{
-    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
-    HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
-    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, LinkPill, LinkTarget,
-    Menu, MenuImage, MenuItem, MenuPlacement, PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue,
-    Placement, Point, Popover, Px, Rect, SendPhase, SendPill, Sheet, Shown, Side,
-    Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
+    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette,
+    CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph, HoverCard, HoverCardPart,
+    HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile, HoverStat, HoverTarget, Icon,
+    IconSize, IconSource, IconUrl, LinkPill, LinkTarget, Menu, MenuImage, MenuItem, MenuPlacement,
+    PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Rect,
+    SendPhase, SendPill, Sheet, Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
 };
 
 use ds::{
@@ -213,7 +213,7 @@ fn SenderCard(kind: HoverKind) -> Element {
                 }
                 div { class: "ds-hovercard-foot",
                     "stays unread while you look"
-                    span { class: "ds-hovercard-keys", ds::KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]), style: ds::KeyStyle::Cap } " peek" }
+                    span { class: "ds-hovercard-keys", ds::KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]), style: ds::KeyStyle::Cap, size: ds::ControlSize::Mini } ds::Label { text: "peek", role: ds::LabelRole::Tertiary, style: ds::LabelStyle::Caption } }
                 }
                 div { class: "ds-hovercard-actions",
                     Button { size: ControlSize::Mini, label: "Reply", onclick: |_| {} }

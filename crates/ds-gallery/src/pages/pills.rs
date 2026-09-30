@@ -6,9 +6,8 @@ use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
-    Avatar, AvatarSize, AvatarTone, Button,
-    Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, LinkPill,
-    LinkTarget, SendPhase, SendPill, Shortcut, ShortcutKey,
+    Avatar, AvatarSize, AvatarTone, Button, Fraction, Glyph, HoverCard, HoverKey, HoverKind,
+    HoverTarget, Icon, IconSize, LinkPill, LinkTarget, SendPhase, SendPill, Shortcut, ShortcutKey,
     TargetElement, Tooltip, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};

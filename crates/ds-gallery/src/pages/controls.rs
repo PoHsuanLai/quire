@@ -11,11 +11,10 @@ use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::Word;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Availability, Avatar, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Fraction, Hex,
-    ImageSource, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, Progress,
-    ProgressIndicator, ProgressStyle, ProviderMark, SegmentedControl, Shortcut, ShortcutKey,
-    Slider, Toggle, Verdict,
+    Availability, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Check, Chip,
+    ChipVariant, Colour, CommandPill, Fraction, Hex, ImageSource, LabelHue, MarkProvider, MarkSize,
+    MarkStyle, PersonHue, PinFace, PinTile, Progress, ProgressIndicator, ProgressStyle,
+    ProviderMark, SegmentedControl, Selection, Shortcut, ShortcutKey, Slider, Toggle, Verdict,
 };
 use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
@@ -215,15 +214,15 @@ fn Faces() -> Element {
 
 #[component]
 fn Marks() -> Element {
-    let mut pressed = use_signal(|| Check::On);
-    let one = |initial, provider| AccountFace::One {
+    let mut selected = use_signal(|| Selection::Selected);
+    let one = |initial, provider| PinFace::Account {
         initial,
         colour: Colour::Solid(Hex([0x1a, 0x73, 0xe8])),
         provider,
         address: Some(format!("{initial}@example.org").to_lowercase()),
     };
     rsx! {
-        Section { title: "ProviderMark and AccountTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
+        Section { title: "ProviderMark and PinTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
             for size in [MarkSize::Tile, MarkSize::Row, MarkSize::Inline] {
                 div { class: "g-row",
                     for provider in PROVIDERS {
@@ -232,12 +231,12 @@ fn Marks() -> Element {
                 }
             }
             div { class: "g-row",
-                AccountTile { account: AccountFace::All, pressed: Check::On, unread: 12, onclick: |_| {} }
-                AccountTile { account: one('P', MarkProvider::Google), pressed: pressed(), unread: 3, onclick: move |_| pressed.set(pressed().flipped()) }
-                AccountTile { account: one('W', MarkProvider::Microsoft), pressed: Check::Off, unread: 0, onclick: |_| {} }
-                AccountTile { account: one('G', MarkProvider::Google), pressed: Check::On, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
-                AccountTile { account: one('L', MarkProvider::Local), pressed: Check::On, unread: 1, onclick: |_| {} }
-                AddAccountTile { title: "Add account…", onclick: |_| {} }
+                PinTile { face: PinFace::All, selection: Selection::Selected, unread: 12, onclick: |_| {} }
+                PinTile { face: one('P', MarkProvider::Google), selection: selected(), unread: 3, onclick: move |_| selected.set(if selected() == Selection::Selected { Selection::Unselected } else { Selection::Selected }) }
+                PinTile { face: one('W', MarkProvider::Microsoft), unread: 0, onclick: |_| {} }
+                PinTile { face: one('G', MarkProvider::Google), selection: Selection::Selected, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
+                PinTile { face: one('L', MarkProvider::Local), selection: Selection::Selected, unread: 1, onclick: |_| {} }
+                PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} }
             }
         }
     }

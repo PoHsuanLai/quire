@@ -1,0 +1,41 @@
+/* PinTile (design/30 section 2.11): a square tile on the frame, `S:107-118`, `S:356-357`. The
+   plate is the frame's own pill (`--f-pill-hover` at rest, `--f-pill` under the pointer and while
+   it is the filter, with the current-item shadow); pressed is the darker fill, never a scale, and
+   nothing turns or lifts under the pointer (design/30 R2). An account's colour arrives already
+   muted from Rust (`Avatar { muting }`). The unread `Badge` sits in the corner, over the avatar.
+   `data-drop=target` draws the list's drop line at the tile's leading edge, in the gap between
+   tiles; `data-drag=source` dims the tile being dragged. Attribute selectors carry `*|` (spike S2). */
+
+.ds-pin-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); }
+
+.ds-pin-tile{
+  position:relative; display:grid; place-items:center; box-sizing:border-box; aspect-ratio:1; padding:0; border:0; border-radius:var(--r-tile);
+  background:var(--f-pill-hover); color:var(--f-ink); font:inherit; cursor:default;
+  transition:background-color var(--t-quick) var(--e-in-out);
+}
+.ds-pin-tile:hover{ background:var(--f-pill); }
+.ds-pin-tile[*|data-selected=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
+.ds-pin-tile[*|data-pressed]{ background:var(--f-pill); box-shadow:none; }
+.ds-pin-tile[*|data-drag=source]{ opacity:.35; }
+
+.ds-pin-tile .ds-avatar{ font-size:var(--fs-meta); }
+.ds-pin-tile-face{ display:grid; place-items:center; width:28px; height:28px; color:var(--f-ink); }
+
+/* The Add tile: no plate at rest, the pill under the pointer; where an avatar would be, a dashed
+   ring in `--f-ink-faint` around a plus, both going to `--f-ink` under the pointer. */
+.ds-pin-tile[*|data-face=add]{ background:transparent; }
+.ds-pin-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
+.ds-pin-tile[*|data-face=add] .ds-pin-tile-face{
+  box-sizing:border-box; border-radius:var(--r-pill); color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
+  transition:color var(--t-quick) var(--e-in-out), border-color var(--t-quick) var(--e-in-out);
+}
+.ds-pin-tile[*|data-face=add]:hover .ds-pin-tile-face{ color:var(--f-ink); border-color:var(--f-ink); }
+
+/* The unread count, in the corner. */
+.ds-pin-tile .ds-badge{ position:absolute; top:var(--s-2); right:var(--s-2); }
+
+/* The provider's mark, bottom right (a `ProviderMark` on the tile's rung). */
+.ds-pin-tile .ds-provider{ position:absolute; right:var(--s-7); bottom:var(--s-7); box-shadow:var(--shadow-mark-tile); }
+
+/* The drop line: the accent, in the gap before the tile a drag would take the place of. */
+.ds-pin-tile-drop{ position:absolute; top:var(--s-2); bottom:var(--s-2); left:calc(var(--s-4) * -1); width:var(--s-2); border-radius:var(--r-pill); background:var(--accent); pointer-events:none; }
