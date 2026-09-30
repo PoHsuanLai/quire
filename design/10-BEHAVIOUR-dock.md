@@ -230,7 +230,7 @@ API as used by cosmic-applets app-list).
 
 ## 10.4 State machine
 
-Pure, in `sill-surfaces/src/surfaces/dock/machine.rs`; the component feeds events and applies
+Pure, in sill's `sill-dock/src/dock/machine/mod.rs`; the component feeds events and applies
 effects. `now` is always an argument; no clocks inside.
 
 ```rust

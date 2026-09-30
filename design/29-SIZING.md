@@ -31,7 +31,7 @@ This document:
 The audit's working files (a CSS parse of every literal `px` in quire's component sheets,
 specimen sheets, gallery crops, sill captures and HTML mockups of the options) were removed once
 the decisions settled; the numbers below are what they measured. The measured boxes come from
-`cargo run --release -p ds-native --example sizing_audit -- DIR`: the laid-out rect of each part
+`cargo run --release -p ds-blitz --example sizing_audit -- DIR`: the laid-out rect of each part
 (`Harness::rect`) at 1x.
 
 ## 3. Inventory
@@ -43,7 +43,7 @@ the decisions settled; the numbers below are what they measured. The measured bo
 | Spacing `--s-*` | 1, 1.5, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 18, 22, 26, 36 | `tokens/spacing.rs` | Named by value, taken from the web prototype ("dense and not a geometric ramp", `01-LAYOUT.md#2-units-and-the-spacing-scale`). Uses across the sheets: s-6 63, s-8 56, s-2 31, s-4 29, s-10 27, s-12 27, s-3 26, s-5 25, s-16 24, s-7 15, s-14 14, s-9 11, s-11 10, s-1 9, s-22 4, s-18 3, s-26 3, s-1-5 2, s-13 2, s-36 2, s-15 1 |
 | Radius `--r-*` | panel 14, card 12/12/12/4, btn 9, chip 6/6/6/2, pill 999, field 10, menu 12, item 9, tile 12, window 18, menu-item 8, bubble-button 7, small 6, kbd 5, tiny 4, micro 3, media 10/10/10/3 | `tokens/shape.rs` | 17 names, 11 distinct numbers. No rule ties a radius to a height. Uses: pill 56, tile 9, panel 9, menu-item 7 |
 | Material radius `--m-radius` | window/bar 0, dock 22, popover 14, sheet and OSD 18, toast 16, widget 20 | `material/recipe.rs:274` | The control center is a Sheet (18) |
-| Shell scale | bar font 13/500, bar item 24, bar pad 10, bar item radius 4, menu font 13, menu row 22, separator margin 5, highlight radius 6, launcher field 22/500, field glyph 20, row 14/12, tip 12 | `shell/tokens/shell_type.rs` | Written by sill from its settings (`shell_style.rs`) |
+| Shell scale | bar font 13/500, bar item 24, bar pad 10, bar item radius 4, menu font 13, menu row 22, separator margin 5, highlight radius 6, launcher field 22/500, field glyph 20, row 14/12, tip 12 | `ds-style/tokens/shell_type.rs` | Written by sill from its settings (`shell_style.rs`) |
 | Status metrics | box 22, glyph 16 | `IconButton { Status }` fallbacks | From `bar.status_icon_box_px`, `bar.status_glyph_px` |
 | Type | control 13, small 12, help 11.5, body 13.5, base 15; inherited `line-height:1.55` | `tokens/type_scale.rs`, `css/reset.css:10` | The 1.55 line is the reading line; controls inherit it |
 
@@ -58,13 +58,13 @@ the decisions settled; the numbers below are what they measured. The measured bo
 | Segmented, Regular | 210 x **36.6** | 12 x 1.55 line + 5+5 padding + 3+3 inset + hairlines |
 | Button, Mini | 47 x 24 | 12 x 1 line + 5+5 padding + hairlines |
 | Button, Primary/Regular | 79 x **38.2** | 13 x 1.55 line + 8+8 padding + hairlines |
-| Level capsule (control center) | 270 x 26 | `--level-h:26px`, `level.css` |
+| Level capsule (control center) | 270 x 26 | `--level-h:26px`, the level sheet |
 | Module tile | 144 x 52 | `min-height:52px`; padding 8 4 8 10 |
 | Module disc | 28 x 28 | literal |
 | Module panel with a level | 296 x **73.8** | padding 10/12 + 16.25 head + 8 gap + 26 + hairlines |
 | Bar item (title) | 49 x 24 | `--shell-bar-item` |
 | Status item | 22 x 22 | `--bar-status-box` |
-| Icon buttons | tool 28 x 26, foot 24, strip 26, status 22 | literals in `icon_button.css` |
+| Icon buttons | tool 28 x 26, foot 24, strip 26, status 22 | literals in `button.css` |
 | Text input, boxed | about 37 | `calc(1.55em + 16px)` at 13.5 |
 | Settings row | min 44 | literal |
 | Menu row, slim/dropdown | 22 | `--shell-menu-row` |
@@ -87,10 +87,10 @@ others are its own constants, so there are two copies of several sizes.
 | `bar.status_icon_box_px` / `status_glyph_px` | 22 / 16 | same | `--bar-status-box` / `--bar-status-glyph` |
 | `bar.status_gap_px` | 4 | same | the right group's gap |
 | `bar.item_radius_px` | 4 | same | `--r-shell-bar-item` (title pill, status pill, workspace pills) |
-| bar padding | `var(--s-8)` | `style/bar.css` | |
+| bar padding | `var(--s-8)` | sill's `sill-bar/src/bar/style.css` | |
 | `control_center.width_px` / `grid_gap_px` / `grid_padding_px` | 320 / 8 / 12 | `sill-settings/src/control_center.rs:198` | `ModuleGrid` |
 | module heights for the popup size | tile 56, level 76, now playing 112, appearance 226, battery 204, detail head 48, list row 34, detail foot 82 | `control_center/geometry.rs` | the popup's size estimate before layout |
-| popup chrome | margin 8, side 28, top 8, bottom 40; menu item 30, header 28, separator 9, chrome 12 | `bar/geometry.rs` | the popup's size and anchor |
+| popup chrome | margin 8, side 28, top 8, bottom 40; menu item 30, header 28, separator 9, chrome 12 | sill's `sill-bar/src/bar/` geometry | the popup's size and anchor |
 | the level look | `LevelLook::Capsule` (no knob) | `control_center/level.rs:9` | Display, Keyboard, Sound |
 
 ## 4. Inconsistencies, ranked
@@ -103,15 +103,15 @@ Ranked by how much of the "disproportional" look each explains.
 | 2 | **Everything is about 1.2-1.7x the reference.** Regular button 38 against 22; segmented 30-37 against 22; toggle 26 tall against 22; bar 32 against 24 | 3.2, 5.3 | The web prototype's density (15 px body; `27-HIG-PARITY.md` row 8) was carried into the shell |
 | 3 | **Fractional heights** 29.8, 36.6, 38.2, 73.8 | measured | Breaks the pixel-snapping rule (`01-LAYOUT.md#21-pixel-snapping-settled-2026-09-25`): edges land between device pixels at 1.25-1.75 |
 | 4 | **Toggle proportions.** 38 x 26 track, 18 knob: the knob is .69 of the height and sits 4 px in (3 padding + 1 border); the width is 1.46x the height | `toggle.css`; specimens | The reference's switch knob is the height less 2 (1 px inset) and the track about 1.73x as wide as it is tall (26 x 15, knob 13). Ours reads as a thick frame round a small ball, which is what "the toggle needs care" points at |
-| 5 | **The inner radius is larger than the outer one.** The level capsule (radius 13) sits 10-12 px inside a module panel of radius 12; tiles (radius 12) sit 12 px inside the 18 px Sheet; workspace pills (radius 4) sit 2 px inside a radius 4 container | `level.css`, `module_panel.css`, `recipe.rs`, `workspace_pills.css` | Concentric corners need inner = outer - inset. Here the inner corner is rounder than the frame round it, so the gap between the curves is uneven and the corners bulge |
-| 6 | **Two kinds of capsule, two sizes.** The Slider is a 4 px track under a 22 thumb; the LevelControl is a 26 px filled capsule with no knob. The control center uses the second at 26, next to 28 discs | `slider.css`, `level.css`, `control_center/level.rs` | The reference's control center slider is about 22 tall with a round knob filling it (M). Our capsule is taller than every other control in its row, the "very disproportional capsule" |
-| 7 | **Radii are not tied to height.** `--r-btn` 9 is used on a 38 button (.24 h) and on a 24 Mini (.38 h); the title pill and the status pill are radius 4 on 24 and 22 | `button.css`, `shell.rs` | The reference is 5 on 22 (.23 h) for rounded rectangles and h/2 for capsules |
+| 5 | **The inner radius is larger than the outer one.** The level capsule (radius 13) sits 10-12 px inside a module panel of radius 12; tiles (radius 12) sit 12 px inside the 18 px Sheet; workspace pills (radius 4) sit 2 px inside a radius 4 container | the level sheet, `module_panel.css`, `recipe.rs`, `workspace_pills.css` | Concentric corners need inner = outer - inset. Here the inner corner is rounder than the frame round it, so the gap between the curves is uneven and the corners bulge |
+| 6 | **Two kinds of capsule, two sizes.** The Slider is a 4 px track under a 22 thumb; the LevelControl is a 26 px filled capsule with no knob. The control center uses the second at 26, next to 28 discs | `slider.css`, the level sheet, `control_center/level.rs` | The reference's control center slider is about 22 tall with a round knob filling it (M). Our capsule is taller than every other control in its row, the "very disproportional capsule" |
+| 7 | **Radii are not tied to height.** `--r-btn` 9 is used on a 38 button (.24 h) and on a 24 Mini (.38 h); the title pill and the status pill are radius 4 on 24 and 22 | `button.css`, the shell sheet | The reference is 5 on 22 (.23 h) for rounded rectangles and h/2 for capsules |
 | 8 | **The bar mixes three item heights**: the title pill 24, the status box 22, the workspace box 24 with 20 pills, all in a 32 bar | sill settings, `workspace_pills.css` | Pills of different heights in one row read as unequal capsules; 4-5 px above and below each |
-| 9 | **The status item is a square.** 22 x 22 with a 16 glyph leaves 3 px either side | `icon_button.css` | The reference's status slot is about 30-32 wide by 24 tall with the glyph 7 in from each side (H); a square box makes the pressed pill look pinched |
+| 9 | **The status item is a square.** 22 x 22 with a 16 glyph leaves 3 px either side | `button.css` | The reference's status slot is about 30-32 wide by 24 tall with the glyph 7 in from each side (H); a square box makes the pressed pill look pinched |
 | 10 | **The spacing scale has 21 steps and 13 of them are off a 4 px grid** (1, 1.5, 3, 5, 7, 9, 11, 13, 14, 15, 18, 22, 26) | 3.1 | Off-grid steps (s-3, s-5, s-7, s-9, s-11) are used about 90 times. Asymmetric paddings follow (tile 8 4 8 10; panel 10/12; button 8/14; Mini 5/10) |
-| 11 | **sill keeps a second copy of the sizes.** TILE_PX 56 against the tile's 52; LEVEL_PX 76 against 73.8; LIST_ROW_PX 34 against the settings row's 44; menu ITEM_PX 30 against the 22 row | `control_center/geometry.rs`, `bar/geometry.rs` | Any sizing change must be made twice or the popup's first size is wrong |
+| 11 | **sill keeps a second copy of the sizes.** TILE_PX 56 against the tile's 52; LEVEL_PX 76 against 73.8; LIST_ROW_PX 34 against the settings row's 44; menu ITEM_PX 30 against the 22 row | `control_center/geometry.rs`, sill's `sill-bar/src/bar/` geometry | Any sizing change must be made twice or the popup's first size is wrong |
 | 12 | **The segmented control is a capsule** (radius 999 in and out), where the reference's is a rounded rectangle (well radius 6, segment 5, 1 px inset, H) | `segmented.css` | Capsule segments next to rounded-rectangle buttons: two shape languages in one panel |
-| 13 | **Icon-button sizes** 28 x 26 (not square), 24, 26, 22; glyph boxes 11, 13, 14, 16, 17, 18, 20, 22 | `icon_button.css`, `01-LAYOUT.md#11-fixed-sizes` | No glyph size is tied to a control size |
+| 13 | **Icon-button sizes** 28 x 26 (not square), 24, 26, 22; glyph boxes 11, 13, 14, 16, 17, 18, 20, 22 | `button.css`, `01-LAYOUT.md#11-fixed-sizes` | No glyph size is tied to a control size |
 | 14 | **Container radii are unrelated to their padding.** Popover 14, Sheet 18, Toast 16, Widget 20, Dock 22, Menu 12 | `recipe.rs`, `shape.rs` | Reference: window, popover and sheet 10, menu 8 (inset 5), dock 16, notification 16 (H). The rule in 6 derives them |
 | 15 | **Slider thumb has a 3 px ring and a tint**; the reference's is a plain white disc of 20 with a shadow on a 4 px track (H) | `slider.css` | Reads heavier than the track it rides |
 | 16 | **Disabled and hover are unspecified** for toggle, slider and segmented (O-1) | component headers | Not a size issue, noted because the toggle pass will touch it |
@@ -208,7 +208,7 @@ These are the principles; the options differ only in the numbers fed to them.
   kept for offsets only (the hairline is its own token).
 - **R8. Glyph size follows control size** (a table per option), so a glyph never sets a box.
 - **R9. One source of truth.** sill's size estimates (`control_center/geometry.rs`,
-  `bar/geometry.rs`) read quire's size tokens (a `ds::ControlSize` / module-height API) instead
+  sill's `sill-bar/src/bar/` geometry) read quire's size tokens (a `ds::style::tokens::control_size::ControlSize` / module-height API) instead
   of their own constants.
 
 R1-R6 are checkable: a unit test over the token tables (every capsule radius is h/2, every knob
@@ -310,7 +310,7 @@ survives; the spacing scale stays a 21-step list.
 **A's numbers, built with B's mechanism.** Take the reference ladder (S 16 / M 22 / L 28, 1 px
 knob inset, concentric containers, 4 px grid) as the shell's scale, because the whole programme
 aims at parity with the pre-Liquid-Glass Mac (27) and A is the only option whose every number is
-cited. Build it the way B proposes: a `ds::ControlSize { Small, Regular, Large }` whose sizes are
+cited. Build it the way B proposes: a `ds::style::tokens::control_size::ControlSize { Small, Regular, Large }` whose sizes are
 computed from a height and the section 6 rules in Rust (one `SizeScale` struct, one test that
 sweeps R1-R6), written as tokens (`--ctl-h-*`, `--ctl-r-*`, `--knob-*`, `--seg-*`), so a
 density can be added later without a second system. The shell ships Compact (A's numbers); the
@@ -357,7 +357,7 @@ progress page beside Colour.
 
 1. C's two cheap fixes: sill's size constants read quire (R9); the gallery's snapshot stops
    overwriting `tools/progress/shots/gallery/` unless asked.
-2. `ds::SizeScale` and `ControlSize` with R1-R6 as a unit test; tokens emitted; no component
+2. `ds::style::tokens::size_scale::SizeScale` and `ControlSize` with R1-R6 as a unit test; tokens emitted; no component
    moved yet.
 3. Toggle, Slider, SegmentedControl, LevelControl (add the knob look to the control center),
    Button sizes, IconButton Status onto the scale; specimens re-rendered at 1x, 1.5x and 2x.
@@ -395,14 +395,14 @@ lint (`Rule::RawControlHeight`).
 - bjango, "Designing menu bar extras": `https://bjango.com/articles/designingmenubarextras/`.
 - WWDC25 (Liquid Glass) for concentricity as a named rule; not in the target period.
 - This repo: `crates/ds/src/tokens/{spacing,shape,shell,type_scale}.rs`,
-  `crates/ds/src/components/*.css`, `crates/ds/src/material/recipe.rs`,
+  `crates/ds/src/components/*.css`, `crates/ds-style/src/material/recipe.rs`,
   `crates/ds/src/icon/{family,plate_tint,retint}.rs`; sill (read only):
   `crates/sill-settings/src/{bar,control_center}.rs`,
-  `crates/sill-surfaces/src/surfaces/{bar,control_center}/`, `crates/sill-surfaces/src/style/`.
+  `crates/sill-surfaces/src/surfaces/{bar,control_center}/`, sill's `crates/sill-bar/src/bar/style.css`.
 
 ## 15. Built (branch `sizing-audit`, 2026-09-28)
 
-- `ds::SizeScale` and `ds::ControlSize {Small, Regular, Large}` (`tokens/{size_scale,
+- `ds::style::tokens::size_scale::SizeScale` and `ds::style::tokens::control_size::ControlSize {Small, Regular, Large}` (`tokens/{size_scale,
   control_size,size_vars}.rs`), one table test over R1-R8 (`tokens/size_rules_tests.rs`); the
   stylesheet emits `--ctl-{h,r,cap-r,glyph,pad,fs,fw}-{s,m,l}`, `--knob-*`, `--switch-{w,h,r,knob}-*`,
   `--slider-{track,knob}-*`, `--seg-{well-r,h,r}-*`, `--knob-inset`; `ShellScale` (`--shell-bar-h`

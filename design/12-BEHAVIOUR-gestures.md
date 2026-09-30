@@ -156,7 +156,7 @@ Blocked (two fingers locked X) emits no scroll phases; G5 owns those contacts.
 
 When a host claims the pointer (12.3.10), a G1 stroke locked on X is a **page swipe** instead
 of a scroll iff, at Began, the latched target (11 §11.3.3) cannot move in the stroke's
-direction and the surface registered a navigation handler (`ds_native::use_navigation`). Then
+direction and the surface registered a navigation handler (`ds_blitz::use_navigation`). Then
 the host runs the live model 12.3.7 with `D = 1000` raw x units per page (~38 mm) and
 `Back/Forward` on commit. Otherwise it scrolls. WebKit's 15 px start distance is subsumed by
 the 40-unit lock. Status: proposed (R5 H, R8 H).

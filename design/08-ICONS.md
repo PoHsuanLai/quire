@@ -129,7 +129,7 @@ rim and highlight are `--hair`.
   3. `NeedsAttention` status uses `--warn` for the recoloured mask (proposed).
 - Blitz: the recoloured tray icon is a `mask-image` data URI with `background:
   currentColor`, the same path as the S6 fallback.
-- Settled mechanics (tray gaps, quire Q6): `ds::IconSource::{Glyph(Icon), Symbolic(ExternalIcon),
+- Settled mechanics (tray gaps, quire Q6): `ds::prelude::IconSource::{Glyph(Icon), Symbolic(ExternalIcon),
   Image(ExternalIcon)}`, `ExternalIcon { url: IconUrl, size: IconSize }`. `IconUrl` is a `data:`
   or `file:` URL only (`png`, `svg`, `file`, `parse` constructors). `Symbolic` renders
   `span.ds-ext-icon[data-kind=symbolic]` with an inline `mask-image:url(...)` over
@@ -693,7 +693,7 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 | Item | Licence | What to record |
 | --- | --- | --- |
 | Lucide | ISC | notice file `crates/ds-style/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
-| Tabler Icons | MIT | notice file `crates/ds-style/assets/icons/LICENSE-tabler.txt` (open: not added yet, though `Icon::Brightness` is Tabler's `brightness-half`), list of imported glyph names, version |
+| Tabler Icons | MIT | notice file the Tabler notice file under `crates/ds-style/assets/icons/` (open: not added yet, though `Icon::Brightness` is Tabler's `brightness-half`), list of imported glyph names, version |
 | Our glyphs | our licence | author, date |
 | Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |
 | FLUX.2 Klein 4B weights | FLUX.2 Klein licence | exact licence text and whether outputs may be used commercially; verify before shipping |

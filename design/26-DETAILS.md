@@ -119,7 +119,7 @@ follows the level"), and a CSS transition on `stroke-dashoffset` does not run
 (design/05 §9 rule 8). So a part *inside* a glyph either is its own stacked `svg` whose HTML
 wrapper CSS can move (layers: Pending, glyph Morph, Shake), or is recomputed per frame in Rust
 (shapes: Sweep, Check). The tween reads the easing tokens through `CubicBezier::at`
-(`motion/curve.rs`), so CSS-played and Rust-played motion share one curve table.
+(`ds-style/tokens/curve.rs`), so CSS-played and Rust-played motion share one curve table.
 
 ### 3.3 Rules
 
@@ -206,7 +206,7 @@ operation timeouts are the services' (sill), not motion tokens.
 
 Typed, no `bool` (CONVENTIONS §4), small structs, every effect started from a handler or an
 effect hook, never from render (design/05 §7.1). Each primitive is a hook returning what the
-component renders, plus, where it helps, a thin component. Names avoid the existing `ds::Count`
+component renders, plus, where it helps, a thin component. Names avoid the existing `ds_settings::Count`
 (the count badge): the counting primitive is `CountUp`.
 
 ```rust
@@ -494,7 +494,7 @@ and every component with a `Detailed` state ships one harness test per moment th
 
 How to read an entry: **States** are the element's own enum. The table gives, per moment, **our
 detail** (primitive and tokens), **the reference** (with confidence and source key), **today**
-(quire `crates/ds`, sill `crates/sill-surfaces` at `ee9dd76`), and the **gap** (numbered `G#`,
+(quire `crates/ds`, sill sill's `crates/sill-bar`, `crates/sill-dock` and `crates/sill-overlays` at `ee9dd76`), and the **gap** (numbered `G#`,
 section 6 counts them). A moment the element does not have is omitted. "none" under Today means
 the state is shown with no motion (a snap).
 
@@ -507,7 +507,7 @@ which moves onto them in D1's sill lane (CONSUMING.md "Status glyphs" lists what
 #### 5.1.1 Wi-Fi item
 States: Off, Joining, Connected {bars 1-3, secured}, NoInternet, Failed. Today the sill glyph is a
 bucket of `WifiLow`/`Wifi`/`WifiHigh`/`WifiOff`, and `Link::Connecting` shows `WifiOff`
-(`bar/status.rs`): the bar reads "Wi-Fi off" while it is connecting, a bug (G1's sill side:
+(sill's `sill-bar/src/bar/status_item.rs`): the bar reads "Wi-Fi off" while it is connecting, a bug (G1's sill side:
 `Link::Connecting` must be `WifiState::Joining`). Built as `WifiState::{Off, Idle, Joining,
 Joined { bars, reach }, Failed}`: Idle (on, joined to nothing) is the faint fan, distinct from
 Off's slash; no internet is `Joined { reach: NoInternet }`; the lock is the menu's, not the
@@ -544,7 +544,7 @@ Critical (≤ 10 %), Absent.
 
 #### 5.1.4 Volume item
 States: Muted, Level(0-3 waves), NoDevice. `LevelGlyph::Volume(Muting)` already cross-fades its
-waves by thirds and draws a slash (quire `level/glyph.rs`); the bar uses static `Volume*` icons.
+waves by thirds and draws a slash (quire `ds/components/content/level_glyph/glyph.rs`); the bar uses static `Volume*` icons.
 
 | Moment | Our detail | Reference | Today | Gap |
 | --- | --- | --- | --- | --- |
@@ -647,7 +647,7 @@ States: NotPlaying, Playing(track, position), Paused, Buffering, trackchange.
 | Pending (buffering) | `Pending{Breathe}` on the art | UNKNOWN | none | part of **G29** |
 
 #### 5.2.11 Power profile (segmented) and Appearance picker
-See 5.10.2 (Segmented) and `AppearancePicker` (built; selection ring is its own).
+See 5.10.2 (Segmented) and the appearance picker (built; selection ring is its own).
 
 ### 5.3 OSD
 
@@ -731,7 +731,7 @@ States: Hidden, Shown(level, glyph), Muted.
 | Battery ring (Appear) | `Sweep` from zero over `--t-sweep`, percentage `CountUp::InStep` (the user's ask), on the widget's first map in a session and when the widget is added | widgets animate between entries (M, [NUM]) | `BatteryLevel` bump on change only | **G27** |
 | Battery ring (Change) | `Sweep` `--t-quick` + count in step; one-point steps: no count, the text changes (R12) | digits roll (M) | `bump` | part of G27; section 8 item 3 (bump vs roll) |
 | Battery (charging) | the bolt layer draws on in the ring's gap, the gap opens by `Sweep` | a bolt in a gap at twelve (M, design/23 M11) | drawn still | **G48** |
-| Clock second hand | **tick**: one frame a second, no tween; only when seconds are shown | the second hand sweeps smoothly (L, [CLOCK]) | ticks (a `Seconds::Shown(u8)` per render) | section 8 item 2 (sweep costs 60 frames a second forever: refused by R3 unless the user overrides) |
+| Clock second hand | **tick**: one frame a second, no tween; only when seconds are shown | the second hand sweeps smoothly (L, [CLOCK]) | ticks (a `Seconds::prelude::Shown(u8)` per render) | section 8 item 2 (sweep costs 60 frames a second forever: refused by R3 unless the user overrides) |
 | Clock minute | none (R12) | none (L) | none | none |
 | Calendar today (day rollover) | the accent disc cross-fades from yesterday to today `--t-quick` at midnight | the date changes (L) | snaps | **G49** (small) |
 | World clock day/night | the face cross-fades white ↔ dark `--t-big` at the zone's sunrise and sunset | faces by day and night (M, design/23 M22) | snaps | **G50** (small) |
@@ -816,7 +816,7 @@ session ends: the button's label is replaced by `Pending{Spin}` after `PendingGr
   unbuilt modules G22).
 - Infinite loops the grammar removes: 2 (`Spinner{Breathe}` behind `ModuleState::Busy`, G15;
   `Spinner{Spin}` behind `PromptState::Checking`, G45). Both keep Blitz from ever idling while
-  shown today (`spinner.css` TODO O-9).
+  shown today (the progress indicator's sheet TODO O-9).
 - Moment rows already right today: **34** (Gap "none"); the other 75 rows carry the 56 gaps.
 
 ## 7. Waves
@@ -830,7 +830,7 @@ land on the primitives rather than beside them: battery-fill is the first consum
 | Wave | Lane | Scope | Where | Closes |
 | --- | --- | --- | --- | --- |
 | D0 | D0a primitives: time | `Moment`, `Touch`, `FirstShow`, `EventStamp`, `Operation`, `Detailed`, `use_detail`, `moment_table`; `Tween` on `CubicBezier::at` and a frame clock that stops at rest; `Sweep`, `CountUp`, `Reveal`; tokens `--t-sweep`, `--t-count-step`, `SettleHold` into design/05 and the token table; gallery page "Details" with a replay button per primitive; harness tests (idle after settle, Reduced jumps, retarget mid-flight) | Q | foundation. **Built 2026-09-27** (`details-d0b`) |
-| D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side). **Built 2026-09-27** (`details-d0b`), with one change: `SyncHalo` keeps its loops (it is mail's; mailo decides, design/05 §12 item 4), listed in `ds/tests/details_lint.rs` with the three other mail loops |
+| D0 | D0b primitives: state | `Pending` (+ `--t-pending-step`, `PendingGrace`, `PendingCap`), `Settle`, `Shake`, `MorphGlyph`, `RollDigits`, `Nudge`; `Spinner` rebuilt on `Pending` (its two infinite loops gone; `ModuleState::Busy` and `PromptState::Checking` inherit the bound; `SyncHalo`'s idle breathe, mailo's, goes as design/05 §12 item 4 proposes, so tell the mailo session before it lands) | Q | G15, G45 (quire side). **Built 2026-09-27** (`details-d0b`), with one change: `SyncHalo` keeps its loops (it is mail's; mailo decides, design/05 §12 item 4), listed in `ds-shell/tests/details_lint.rs` with the three other mail loops |
 | D1 | status glyphs | a layered `StatusGlyph` family: Wi-Fi (dot + 3 arcs, the "!" badge), battery (outline, fill layer, bolt, plug), Bluetooth (base, slash, connected dots), volume (on `LevelGlyph`), each with its `Detailed` state and moment table | Q | G1-G4, G8-G10, G12 (quire side), and the glyph side of G5-G7 (the failed-join shake, the Bluetooth glyph and its bounded breath). **Built 2026-09-27** (`details-d1`) |
 | D1 | bar wiring | sill's bar items on `StatusGlyph`: `Link::Connecting` → Joining with an op stamp from the network service, no-internet from connectivity, battery thresholds (`bar.battery_low_percent`), the Bluetooth bar item | S | G1-G12 |
 | D2 | control center modules | `ModuleTile` disc glyph on `MorphGlyph`/`Settle`; `SettingsRow` trailing `Pending`/`Settle{Check}`/`Shake`; Now Playing play/pause `MorphGlyph{OffUp}`, position bar, track cross-fade; Battery module rings on `Sweep`/`CountUp`; a keyboard-brightness module on `LevelControl` | Q+S | G14, G16-G18, G20, G21, G23, G25-G30. **Quire lane built 2026-09-27** (`details-d2`): `ModuleTile { disc: DiscMotion }`, `SettingsRow { phase: RowPhase, work: RowWork, disc: RowDisc }` and `RowTrailing::Battery`, `PlayPauseButton`, `NowPlayingTrack`, `TrackPosition`, `DeviceBattery`, `LevelGlyph::KeyboardBrightness`, `Icon::MoonFilled`, `Anim::MorphInSpring`; the sill lane is CONSUMING.md "Control center details" |

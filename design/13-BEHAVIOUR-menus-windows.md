@@ -46,7 +46,7 @@ behaviour and numbers.
 | Open-title highlight | pill 24 high (`--shell-bar-item`), radius 4 (`--r-shell-bar-item`), `--f-pill` while its menu is open and `--f-pill-hover` under the pointer; no transition; ds `MenuBarItem` draws the same pill for text and glyph items | settled 2026-09-24 (the macOS polish pass) |
 | Title text | 13 px (`--fs-shell-bar`) at 500 (`--fw-shell-bar`), the app name 700 | settled 2026-09-24 (R5 13 pt) |
 | Workspace indicator | one segmented group on the frame (ds `WorkspacePills`): a `--f-pill-hover` track 24 high, radius 4, the current workspace on `--f-pill` with `--shadow-current` | settled 2026-09-24 |
-| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `MenuBarItem` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::StatusMetrics` from the three settings keys |
+| Status item | max 22 px glyph box, Lucide glyph 16 px (`one weight, one colour`), gap 4 | proposed values (R2 H); `20-SURFACES.md` §1.1 proposes `IconSize::Bar` 22, see open decision 8. Mechanism settled (bar gaps): ds `MenuBarItem` reads `--bar-status-box`/`--bar-status-glyph`, written by `ds::style::tokens::status::StatusMetrics` from the three settings keys |
 | Disabled | opacity .35 | R2 (H) |
 | Material / tint | `Material::Bar` over compositor blur; the workspace SpaceLook's colour goes where the Look puts it (Mac: the backdrop layer behind the material; Arc: `--f-*` frame tokens; design/30 §3.3), cross-fade `--t-big` | settled (plan Spaces); drawn by `Ds` (bar gaps: `data-frame="tinted"`, the gradient at the bar's tint alpha, `data-ground="frame"`) |
 
@@ -171,7 +171,7 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 
 | Rule | Specification | Status |
 | --- | --- | --- |
-| First click (our apps) | a pointer press that activates an inactive ds-native toplevel is consumed (not delivered to Blitz) unless the element under it or an ancestor carries `data-first-mouse` (ds opts in: window drag areas, scrollbar thumbs, the traffic-light buttons). "Activating" = the surface's `xdg_toplevel` `activated` state or `wl_keyboard.enter` arrived within 100 ms before the press | R10 (H), detection proposed |
+| First click (our apps) | a pointer press that activates an inactive ds-blitz toplevel is consumed (not delivered to Blitz) unless the element under it or an ancestor carries `data-first-mouse` (ds opts in: window drag areas, scrollbar thumbs, the traffic-light buttons). "Activating" = the surface's `xdg_toplevel` `activated` state or `wl_keyboard.enter` arrived within 100 ms before the press | R10 (H), detection proposed |
 | Hover and scroll | work in inactive windows without activating them (Wayland default); our scroll engine latches normally | proposed |
 | Foreign apps | toolkit and compositor behaviour; not controlled | limit |
 | Cmd-drag a background window | compositor feature; cosmic-comp moves windows with Super+drag (activation behaviour is cosmic-comp's) | R11 (M); limit |
@@ -196,7 +196,7 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 | Visible rows | `floor((460 - 56 - 10) / 44)` = 8 | derived |
 | Open | `peek-in --t-big --e-spring` (s .95, y 12 -> 1, A5) | see 13.9 item 9 |
 | Close | `fade --t-quick --e-exit`; the catcher is never animated or dimmed (plan) | settled catcher, fade proposed |
-| Open latency | p95 < 100 ms over 20 toggles (`accept-launcher.sh`) | settled (plan) |
+| Open latency | p95 < 100 ms over 20 toggles (sill's `dev/accept/launcher.sh`) | settled (plan) |
 | Sections | provider groups with a `SectionHeader`; a group longer than its share shows "Show More" as the header's trailing action, reachable by keyboard | proposed (sill M9, Q302) |
 | Preview pane | a Quick-Look-style pane beside the list; the card widens by the pane | proposed (Q302) |
 | Preview keys | Space toggles the pane only while browsing (not while typing); Cmd+Y always toggles it; Right at the end of the text shows it, a second Right or Cmd+Right focuses it; Tab walks the pane's controls when it has focus, in the results Tab stays the provider filter; Esc closes one level at a time (pane focus, pane, query, launcher) | proposed (Q302) |
@@ -224,7 +224,7 @@ Played from the freedesktop sound theme (`sound.theme`, default `freedesktop`) b
 
 The frame quire draws for a window that asks for no server decorations
 (`Ds { window: WindowFrame::Titlebar }`, design/04 "Window frame"). It acts through the host seam
-`ds::HostWindow`: ds-native over winit, sill over shell-host's `SurfaceHandle`.
+`ds::prelude::HostWindow`: ds-blitz over winit, sill over shell-host's `SurfaceHandle`.
 
 | Behaviour | Specification | Status |
 | --- | --- | --- |
@@ -269,7 +269,7 @@ leaves → `Idle`; `since + dwell_ms` elapses → act → `Disarmed { left: None
 `Disarmed { left: Some(t) }` → `t + rearm_ms` elapses → `Idle`. A pointer that enters while
 `Disarmed` does nothing. Hover intent (design/06) is not used: the dwell is its own timer.
 
-Acceptance (sill `dev/accept-hot-corners.sh`, nested compositor, debug-inject or fake input):
+Acceptance (sill `dev/accept/hot-corners.sh`, nested compositor, debug-inject or fake input):
 (1) enter and rest 150 ms → the action fires once; (2) enter and leave at 100 ms → nothing;
 (3) rest 2 s → exactly once; (4) leave and return within 500 ms → nothing, after 500 ms → again;
 (5) with `size_px` 2, a pointer at (1, 1) of the corner is inside and (2, 2) is outside;
@@ -282,7 +282,7 @@ cosmic-gaps list (send modifier state to the surface under the pointer).
 
 Pure; `now` is an argument; effects are returned.
 
-Menu tracking: **settled** (implemented in quire `crates/ds/src/overlay/menu_track.rs`,
+Menu tracking: **settled** (implemented in quire `crates/ds/src/stack/menu_track/machine.rs`,
 2026-09-24, sill gap Q1; the table below is its test list). The shipped shape differs from the
 first sketch in names only: generic over the caller's menu key, timings carried in the machine.
 
@@ -384,14 +384,14 @@ Banner duration is not a setting (R8: not user-changeable since Big Sur).
 
 | Concern | Owner |
 | --- | --- |
-| Menu tracking machine, safe triangle, `Menu` component | quire `overlay/menu_track.rs` (settled, shipped), `components/menu.rs` |
+| Menu tracking machine, safe triangle, `Menu` component | quire `ds/stack/menu_track/machine.rs` (settled, shipped), `ds/components/menus/menu/menu.rs` |
 | Popup surfaces, reposition, grabs | shell-host `popup` (`PopupConfig`, `xdg_positioner`, `xdg_popup.reposition`) |
 | Bar, switcher, notifications, control center, launcher surfaces | sill `surfaces/{bar,switcher,notifications,control_center,launcher}` |
-| Notification server | sill-services (pattern: cosmic-notifications `subscriptions/notifications.rs`) |
+| Notification server | sill-services (pattern: cosmic-notifications subscriptions/notifications.rs) |
 | Toplevel activation / close / minimize | sill-services `cosmic_wl` (cctk) |
 | Shortcuts | `dist/cosmic/.../system_actions` (Launcher, WindowSwitcher) |
 | Sounds | sill-services `sound` (libpulse-binding) |
-| First-mouse filter | shell-host `input/pointer.rs` (activation-time tracking) + ds `data-first-mouse` |
+| First-mouse filter | shell-host shell-host's input/pointer.rs (activation-time tracking) + ds `data-first-mouse` |
 
 Platform limits:
 
@@ -413,7 +413,7 @@ Platform limits:
 
 ## 13.8 Acceptance tests
 
-Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-comp.
+Driven by `ds_harness::Harness` (pure menus) and `sill debug` in nested cosmic-comp.
 
 1. **Open on press**: a press on a bar title shows its menu on the next frame; release on the
    title leaves it open; a second press on the title closes it.
@@ -442,7 +442,7 @@ Driven by `ds-native::Harness` (pure menus) and `sill debug` in nested cosmic-co
     slowly: springs back; horizontal scroll of 100 px on the banner: dismissed.
 11. **Grouping**: 3 notifications from one app within 2 s: one banner card with count 3; 5 from
     5 apps: 3 visible cards, newest on top.
-12. **First mouse**: clicking a button in an inactive ds-native window activates the window and
+12. **First mouse**: clicking a button in an inactive ds-blitz window activates the window and
     the button's handler does not run; a second click runs it; a `data-first-mouse` element
     runs on the first click.
 13. **Launcher**: rows 44 px, 8

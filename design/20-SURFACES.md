@@ -1,7 +1,7 @@
 # 20 Surfaces
 
 One section per shell surface and per app: what it is built from. Every row names a
-Material (`ds::Material`), components (04-COMPONENTS), motion (05-MOTION token and keyframe
+Material (`ds::prelude::Material`), components (04-COMPONENTS), motion (05-MOTION token and keyframe
 names), behaviours (06, 10-13), keyboard, blur and input regions, and the milestone.
 
 Status: **S** = settled (PLAN, SPEC or prototypes), **P** = proposed.
@@ -97,13 +97,13 @@ The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*`
 | Blur / input | per toast `Element("toast-<id>")`; input same | P |
 | Milestone | M6 | S |
 
-Components (CONSUMING.md "Notification parts"): the banner is `ds::NotificationCard` (app icon at
+Components (CONSUMING.md "Notification parts"): the banner is `ds_shell::prelude::NotificationCard` (app icon at
 32, summary 13/700, age in the data face, a `Rich` body clamped two lines to six on hover,
 `CardAction` Mini buttons, the 18 px close button at the top left, a `GroupCount` chip with up to
 three offset layers, dismissed by `use_swipe`), in the Toast material by default from inside its own
-transparent scope; the stack is `ds::BannerStack` (`BannerPosition::{TopRight, BottomRight}`,
+transparent scope; the stack is `ds_shell::prelude::BannerStack` (`BannerPosition::{TopRight, BottomRight}`,
 `on_hidden` per key once the exit ends); the center is a `SidePanel` (right edge,
-`notifications.center_width_px`, Popover material, `shown` and `on_hidden`) of `ds::GroupHeader`s
+`notifications.center_width_px`, Popover material, `shown` and `on_hidden`) of `ds_shell::prelude::GroupHeader`s
 over cards. The center's material is Popover. `NotificationMetrics` writes the geometry keys.
 
 ### 1.7 OSD (SPEC Tier 1)
@@ -118,9 +118,9 @@ over cards. The center's material is Popover. `NotificationMetrics` writes the g
 | Keyboard / blur / input | `None`; blur `Element("osd")`; input `Empty` | P |
 | Milestone | M6 | S |
 
-Components: `ds::Osd` (the card and its presence, `on_hidden` once the exit ends, inside one
-transparent Osd root), `ds::LevelIndicator` (the level with its glyph inside), `ds::OsdPosition`
-and `ds::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSUMING.md "OSD parts".
+Components: `ds_shell::prelude::Osd` (the card and its presence, `on_hidden` once the exit ends, inside one
+transparent Osd root), `ds::components::controls::level_indicator::LevelIndicator` (the level with its glyph inside), `ds_shell::osd::OsdPosition`
+and `ds_shell::tokens::osd::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSUMING.md "OSD parts".
 
 ### 1.8 Power menu (SPEC Tier 1)
 
@@ -279,7 +279,7 @@ paper (`--paper`). Only mail's frame shows the Space colour (21-SPACES §9).
 | Field | Value | St |
 | --- | --- | --- |
 | Role | toplevel; migrates webview → Blitz (Phase A path dep, Phase B Blitz) | S |
-| Material | `Window` with Space frame (`.ds-layer` A/B cross-fade + `.ds-grain`) around the card | S |
+| Material | `Window` with Space frame (`.ds-layer` A/B cross-fade) around the card | S |
 | Layout | S `.win` grid 232 px + card, card inset 8 (01-LAYOUT) | S |
 | Components | `CommandPill`, `Row` (`List{SourceList}` for the sidebar), `SectionHeader`, `HoverCard`, `Tooltip`, `Menu`, `CommandPalette`, `ToastHost`, `EdgePeek`, `SegmentedControl`, `Chip`, `Avatar`, `Badge`, `Button`, `TextField`, `RadioGroup`, Space editor pieces | S |
 | Motion | design/30 §1.3 only; the A5 keyframe set is retired (design/30 Part 4); the Space layer cross-fades `--t-big` | S |
@@ -313,7 +313,7 @@ paper (`--paper`). Only mail's frame shows the Space colour (21-SPACES §9).
 | Material | `Window` | P |
 | Components | toolbar `Button{Toolbar}`, pdfrum page widget (`blitz_dom::Widget`) | S |
 | Motion | `peek-in` in, `fade` out | P |
-| Thumbnails | a PDF's first page (and the page strip's pages) reuse the launcher preview's part, `ds_native::PdfFileThumb` over `ds::PdfThumb` (design/04 section 45): same raster, same cache | S |
+| Thumbnails | a PDF's first page (and the page strip's pages) reuse the launcher preview's part, `ds_blitz::PdfFileThumb` over `ds::prelude::PdfThumb` (design/04 section 45): same raster, same cache | S |
 | Keyboard | Space and Esc close | P |
 | Milestone | M12 | S |
 

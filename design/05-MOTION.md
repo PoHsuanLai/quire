@@ -33,7 +33,7 @@ Quoted from the prototypes. Each one is a rule the port is reviewed against.
    differently for a reason you can't see (C:1377-1388, "Why the randomness went").
 2. **Springs only on contact.** "Nothing loops and nothing bounces on its own. The only overshoot
    in the app is in the 200ms after you touched something" (C:1123-1124). mailo's
-   `tokens.css` restates it: "`--e-spring` overshoots and is spent only on contact".
+   mailo's tokens.css restates it: "`--e-spring` overshoots and is spent only on contact".
 3. **Exits accelerate; entrances decelerate or spring.** Every exit uses the exit curve
    `cubic-bezier(.55,0,.75,.2)` (`--e-exit`, C:40; S inlines it at S:327, S:328, S:351, S:376,
    S:570, S:572). Every entrance uses `--e-out` or `--e-spring`.
@@ -97,7 +97,7 @@ Where the scalars are read: `--overshoot` inside `pop-in`, `row-in`, `compose-ri
 ### 3.2 Motion levels (C:172-176)
 
 Levels are one attribute that rescales the whole system: "The setting rescales the one system
-rather than switching animations off one by one" (mailo `tokens.css`, same values as C). Only
+rather than switching animations off one by one" (mailo mailo's tokens.css, same values as C). Only
 six tokens change; every other token keeps the look's value.
 
 | Token | Calm | Standard | Extra | Reduced (new, plan) |
@@ -207,7 +207,7 @@ The prototypes write these as literal milliseconds, so they do not change with l
 
 ### 4.1 How to read this catalogue
 
-This is the canonical set `css/motion.css` is generated from (plan: "motion.css = canonical
+This is the canonical set `ds-motion/motion.css` is generated from (plan: "motion.css = canonical
 mockup keyframes; spaces.html wins on name clashes; mascot/look-scoped keyframes out"). Every
 `@keyframes` in S and C is here, quoted verbatim from its source line. When both files define a
 name, S's text is quoted and C's difference is noted. Each entry names its `Anim` variant from
@@ -605,7 +605,7 @@ Settled for the port; the catalogue above is unchanged except where named.
 - `osd-out`: `from{ opacity:1; transform:none } to{ opacity:0;
   transform:translateY(calc(var(--osd-dy) * .5)) }` at `--t-move --e-exit`, forwards (§10's exit
   rule), `Anim::OsdOut`.
-- `--osd-dy` is the card's signed offset for its anchor, declared by `ds::Osd` per position:
+- `--osd-dy` is the card's signed offset for its anchor, declared by `ds_shell::prelude::Osd` per position:
   `-8px` at the top right (drops in from above, lifts back out), `8px` at the bottom centre
   (rises in, drops away). Played outside the card, the fallback is the top right's.
 
@@ -670,7 +670,7 @@ The persona's five keyframes (`persona-blink`, `-breathe`, `-wince`, `-hop`, `-d
 change asking for it. Allowed because it is bounded: whole loops only, only for 20 s after a wake
 (mount, a new `WakeStamp`, a mood change), driven by a Rust task that then ends, never a CSS
 `infinite`; then the picture rests on frame 0 and paints 0 frames (the idle-frame rule wins;
-tested in `ds-native/tests/emoji_life.rs` with `Harness::is_animating`). Under Reduced only still
+tested in `ds-conformance/tests/emoji_animation.rs` with `Harness::is_animating`). Under Reduced only still
 frames are shown.
 
 ### 4.12 Added by quire (battery fill, 2026-09-26)
@@ -879,7 +879,7 @@ Blitz dispatches no `animationend` or `transitionend` (plan, "Findings: Blitz", 
 state that the prototypes advanced on `animationend` or a `setTimeout` is advanced by a Rust
 timer whose length comes from the same token table the stylesheet is generated from, so CSS and
 Rust cannot drift (plan: "`onanimationend`-driven state … Rust timers from a Rust timing table;
-generate `tokens.css` from that table").
+generate mailo's tokens.css from that table").
 
 ```
 settle(anim, level, index) = duration(anim, level) + index * stagger(level) + FRAME_SLACK
@@ -1033,7 +1033,7 @@ Behaviour (what triggers what) is in `06-INTERACTIONS.md#20-desktop-interactions
 | Dock bounce amplitude | about one icon height | | proposed | Appendix C-A (L) |
 | Dock auto-hide (off by default) | 0.2 s delay after the pointer rests at the edge, ~0.5 s slide | not specified | settled (user) | plan; Appendix C-A (M) |
 | Launcher panel open | `peek-in`, `--t-big`, `--e-spring` (S's command menu); backdrop none (the catcher surface is never animated) | `--e-spring` | proposed for the keyframe; settled (plan) for "catcher never animated" | S:234; plan sill "Launcher v1" |
-| Launcher open latency budget | p95 < 100 ms from `launcher toggle` to first frame, over 20 toggles | n/a (a latency, not a duration) | settled (plan) | plan sill; `dev/accept-launcher.sh` |
+| Launcher open latency budget | p95 < 100 ms from `launcher toggle` to first frame, over 20 toggles | n/a (a latency, not a duration) | settled (plan) | plan sill; sill's `dev/accept/launcher.sh` |
 | Undo toast (in apps) | spring in from `translateX(-50%) translateY(160%)` over `--t-big`; hold ToastHold 5200 ms | `--e-spring` | settled (prototype) | S:360-364, S:1552 |
 | Notification banner | spring in (as the toast); hold ~5 s; top-right; swipe right dismisses | `--e-spring` | proposed; entry direction decided: from the right, `notifications.banner_entry_direction` selects from below (section 12 item 7) | Appendix C-D (M) |
 | Workspace switch: frame tint cross-fade | 380 ms (`--t-scene`) opacity cross-fade of two layers | `--e-out` | settled (user) | plan; S:86, S:1178-1186 |

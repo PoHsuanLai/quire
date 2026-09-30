@@ -424,7 +424,7 @@ pink removed and the randomness removed:
 | The desktop ships **Post as S defines it** (blue Postmark, S's tokens and component values from section 9) for every app and every surface's content | settled (plan: "spaces.html wins"; design seed "mailo's 'Spaces' language … paper-and-ink palette") | plan "Context", "Design: `<ds>`" |
 | Shell chrome (bar, dock, launcher) is drawn on the current workspace's Space frame: its `--f-*` tokens over compositor blur; apps stay on paper; a workspace switch cross-fades the tint over 380 ms | settled (user) | plan "UX decisions settled"; `21-SPACES.md` |
 | The Candy shelf (5 hues x base/deep/soft, light and dark, 6.2) is the palette for **app icons** (the plate's gradient families) and for **label colours** (`--c-{red,amber,green,blue,violet}{,-deep,-soft}` in the token model) | settled for icons (user, "Icons"); proposed for labels, which reverses S's "all chips accent-soft" and restores "Colour is a claim" | plan "Icons", "Token model" |
-| Riso, Tide, Candy (with warmth) are kept in the token table as optional themes, reachable from the AppearancePicker, not the default | proposed | this document |
+| Riso, Tide, Candy (with warmth) are kept in the token table as optional themes, reachable from the appearance picker, not the default | proposed | this document |
 | Tide as an optional theme needs a filter-free exit (`dissolve` blurs) | proposed | `05-MOTION.md#12-open-decisions` |
 | Motion levels Calm / Standard / Extra / Reduced apply on top of whichever look is active | proposed (see section 8.1) | plan "Token model" |
 

@@ -140,7 +140,7 @@ Desktop, In Stage Manager), Widget style (Automatic, Monochrome, Full-color), Us
 **Today (sill master 0096872, "Widget drag", F880-F892).**
 - Kinds: `WidgetKind` closed enum in `sill-settings` (Calendar, UpNext, Battery, NowPlaying,
   WorldClock). Membership and order: the keys `widgets.center` and `widgets.desktop_widgets`
-  (22 §3.20). The size is not chosen: `sill-surfaces/src/widgets/mod.rs` `size_of(kind, host)`
+  (22 §3.20). The size is not chosen: sill's widget size table `size_of(kind, host)`
   fixes one size per kind and host (every notification center tile Medium, the month Large there;
   on the desktop Calendar and Battery Small, Up Next, Now Playing and World Clock Medium).
 - Positions: **state**, `$XDG_STATE_HOME/sill/desktop-widgets.json`, no settings key (F881, and
@@ -152,13 +152,13 @@ Desktop, In Stage Manager), Widget style (Automatic, Monochrome, Full-color), Us
   and a clamped place is **never written back** (`view::recorded`): only a widget seen for the
   first time is recorded, and a drop records the arrangement dropped, so the place comes back
   with the output (F882).
-- Drag, always on: `desktop_widgets/drag.rs` `Hold::{Idle, Pressed, Live}`; only Manhattan travel
+- Drag, always on: sill's `sill-widgets-ui/src/desktop/drag.rs` `Hold::{Idle, Pressed, Live}`; only Manhattan travel
   past `window.move_threshold_px` (4) makes a press `Live`, so a click still reaches a widget's
   control (F883, F887); `arrange.rs` `snap` and `make_room` push covered widgets to their nearest
   free spot and back (F884); the motion is quire's `use_tween` in `placed.rs` (F885).
 - Scalars: `widgets.desktop` (the layer on or off), `widgets.desktop_cell_px`,
   `widgets.desktop_gap_px`, `widgets.world_clocks` (the zones, `;`-separated, read by
-  `widgets/world_clock.rs`).
+  sill's `sill-ui-kit/src/widgets/world_clock`).
 
 quire (`widget-interface`, in progress): `ds::widget::Widget` trait (`Entry`, `Intent`, `kind`,
 `name`, `sizes`, `placeholder`, `view`, `title`), `WidgetKind` as a reverse-DNS string,
@@ -342,7 +342,7 @@ Clock is essential and fixed. Third party: yes, any app's status item.
 
 **Today (sill master 0096872).** Tray items (StatusNotifierItem) in arrival order, each keyed by
 `TrayItemId`, which is the item's **bus address** (`<unique name><object path>`,
-`sill-services/src/tray/model.rs`): it changes every time the app restarts. sill does not read
+`sill-model/src/tray/model.rs`): it changes every time the app restarts. sill does not read
 the SNI `Id` property today. Control center module items follow `MENU_BAR_ORDER`; the control
 center item and the clock sit at the right end.
 
@@ -501,7 +501,7 @@ Quick Note, Start Screen Saver, Disable Screen Saver, Put Display to Sleep, Lock
 (22 §3.23); design/13 §13.3.12. The modifier key was retired on 2026-09-26 (sill FINDINGS
 "hot_corners.modifier retired"): a keyboard-less layer surface is never sent
 `wl_keyboard.modifiers`, so a corner cannot know what is held (shell-host F61, sill G121); the
-wish is a fork item in `sill/docs/cosmic-gaps.md`.
+wish is a fork item in `docs/cosmic-gaps.md` in sill.
 
 **Mapping.** Owner: sill (actions are shell actions). It is the pattern with one slot per corner
 and a registry of **actions**; the action registry is shared with 4.10 and 4.11 (one
@@ -905,14 +905,14 @@ running it (the widget gallery shows apps that are closed), and a **live interfa
 | `ds::components::widget_kind::WidgetSize`; sill `widgets::size_of(kind, host)` | `Shape`; `KindInfo::size_in(host)` | `ds-settings`; `ds::place` |
 | sill `desktop_widgets::saved::{SavedEntry, OutputKey}` | `Cell { instance, output: Option<OutputName>, column, row }` (`OutputKey::Any` is `None`) | `ds-settings`; sill keeps the file and `with_output` |
 | sill `desktop_widgets::placement::{GridSlot, clamp, nearest_free}` | stay sill's (the desktop grid is sill's); `clamp` keeps rule 5.2.6 | sill |
-| sill `desktop_widgets/drag.rs` (`Hold::{Idle,Pressed,Live}`, threshold, grab offset) with `arrange.rs` (`snap`, `make_room`), and sill `dock/machine/press.rs` (press, threshold, drag reorder, drag-out) | `ds::motion::reorder`: one press-travel-lift-drop machine and the make-room rule for a grid and for a row, used by the desktop, the dock, the bar's Command-drag, toolbars and checklists | quire |
+| sill sill's `sill-widgets-ui/src/desktop/drag.rs` (`Hold::{Idle,Pressed,Live}`, threshold, grab offset) with `arrange.rs` (`snap`, `make_room`), and sill `dock/machine/press.rs` (press, threshold, drag reorder, drag-out) | `ds::motion::reorder`: one press-travel-lift-drop machine and the make-room rule for a grid and for a row, used by the desktop, the dock, the bar's Command-drag, toolbars and checklists | quire |
 | sill `pins::model::{DockPins, PinEvent, PinAt}` and `pins::run` | `Layout` plus the dock's own events; `pins::run` is the model for rule 5.2.4's writer task | sill, over the shared data |
 | sill `ControlCenterModule`, `MENU_BAR_ORDER`, `in_menu_bar` | `ModuleInfo` in a registry; presence from the `menu_bar_*` keys, bar order from `layout.bar_items` | sill, contract in quire |
 | sill `ProviderKind` closed enum and its `ALL` order | built-in `KindId`s; order from `layout.launcher_categories` (Web pinned last) | sill-launcher |
 | sill `CornerAction` closed enum; palmrest `Action` | `ShellAction` ids in one action registry | sill (palmrest reads ids) |
 | `ds-settings` `KeyKind::List` ("a rows editor") | its widget is `OrderedChecklist`; `KeyKind::Record` (P5) makes `List(Record)` a table editor | ds-settings + Settings app |
 | `SettingsRow`, `ds::motion::roster`, `DragGhost`, `DropPlace`, `ds::detail::use_tween` | reused unchanged by the pickers and the reorder machine | quire |
-| `AppearancePicker`, `UserPicture` picker | stay single-value pickers (one choice, no placement) | unchanged |
+| the appearance picker, `UserPicture` picker | stay single-value pickers (one choice, no placement) | unchanged |
 
 ## 6. Order of work
 
@@ -939,7 +939,7 @@ Shell; each a quire lane plus a sill lane where named.
 2. **P1 Extract the pattern** (quire): `KindId`, `InstanceId`, `Shape`, `Shown`, `Placement`,
    `Layout`, `Cell` and `AppId` in `ds-settings` with the lenient loader and the atomic writer;
    `Registry<I>`/`KindInfo` (with `size_in`) in `ds::place`; `WidgetRegistry` becomes
-   `Registry<WidgetInfo>`; `ds::motion::reorder` from sill's `desktop_widgets/drag.rs`,
+   `Registry<WidgetInfo>`; `ds::motion::reorder` from sill's sill's `sill-widgets-ui/src/desktop/drag.rs`,
    `arrange.rs` and `dock/machine/press.rs`; `OrderedChecklist`; `KindGallery` from the widget
    gallery; design/22 `## 10. Layouts`. Warn sill before any rename lands (sill reads quire by
    path).
@@ -1058,5 +1058,5 @@ config. Positions and cells stay state (`$XDG_STATE_HOME/sill/desktop-widgets.js
   (2, 3.4-3.6, 3.12-3.13, 3.19-3.23, 5, 9), 23 (4.3, 6; section 9 on `widget-interface`), 27
   (0.2, 4.16, 5.2, 5.11, 5.12, 6.2).
 - Code (read-only): sill at `45f9af0`, re-read at master `0096872` for this revision (widget drag
-  F880-F892, `saved.rs`, `size_of`, the tray model, `rank/sections.rs`, the keys test); quire `master` at `a2cbcb7a` and the `widget-interface`
-  worktree's uncommitted `crates/ds/src/widget/`.
+  F880-F892, sill's saved-layout file, `size_of`, the tray model, `rank/sections.rs`, the keys test); quire `master` at `a2cbcb7a` and the `widget-interface`
+  worktree's uncommitted `crates/ds-shell/src/widget/`.
