@@ -1,5 +1,6 @@
-//! The shell's kit: its metric tokens and paints. Its sheets ride in the components section.
+//! The shell's kit: its metric tokens and paints. Its component sheets are placed in the components section, each after the sheet it follows.
 
+use crate::shell::sheets::SHEETS;
 use crate::shell::tokens::{
     control_center::ControlCenterSize, dock::DockToken, notifications::NotificationToken,
     osd::OsdToken, shell_scale::ShellSize, shell_type::ShellType, widget_paint::WidgetPaint,
@@ -22,5 +23,6 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<WidgetGrid>().at(Place::Metrics),
     ],
     sections: &[],
+    sheets: &SHEETS,
     vocabulary: Vocabulary::NONE,
 };

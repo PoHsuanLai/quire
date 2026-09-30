@@ -94,6 +94,7 @@ pub static KIT: Kit = Kit {
             css: ground,
         },
     ],
+    sheets: &[],
     vocabulary: Vocabulary {
         inline_vars,
         ..Vocabulary::NONE

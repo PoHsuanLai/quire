@@ -4,6 +4,7 @@
 //! component sheet in its fixed order (`assembly::sheets`).
 
 use crate::assembly::{kit::kits, sheets::SHEETS};
+use ds_style::css::document::placed;
 use std::sync::LazyLock;
 
 /// Every rule the design system draws with, in cascade order. Built once, on first use.
@@ -13,6 +14,6 @@ pub fn stylesheet() -> &'static str {
 }
 
 /// Every component sheet, `(name, css)`, in the order the stylesheet appends them.
-pub fn component_sheets() -> &'static [(&'static str, &'static str)] {
-    &SHEETS
+pub fn component_sheets() -> Vec<(&'static str, &'static str)> {
+    placed(&SHEETS, &kits().sheets())
 }

@@ -31,6 +31,20 @@ pub struct Section {
     pub css: fn(&Kits) -> Cow<'static, str>,
 }
 
+/// One component's stylesheet, contributed by a crate that owns components the `components`
+/// section does not list, and placed in it right after the sheet called `after` (or after another
+/// contributed sheet of that name). The place is the cascade order the sheet had when it was one of
+/// the components' own, so a crate above `ds` adds sheets without changing what wins.
+#[derive(Debug, Clone, Copy)]
+pub struct Sheet {
+    /// The name written in the marker `/* -- name -- */`.
+    pub name: &'static str,
+    /// The sheet's CSS.
+    pub css: &'static str,
+    /// The name of the sheet it follows.
+    pub after: &'static str,
+}
+
 /// What a kit tells the linter beyond its tokens.
 #[derive(Debug, Clone, Copy)]
 pub struct Vocabulary {
@@ -64,6 +78,8 @@ pub struct Kit {
     pub tokens: &'static [TokenSet],
     /// The stylesheet sections it adds, in order.
     pub sections: &'static [Section],
+    /// The component sheets it adds to the `components` section, each after a sheet it names.
+    pub sheets: &'static [Sheet],
     /// What the linter may accept because of it.
     pub vocabulary: Vocabulary,
 }

@@ -216,8 +216,9 @@ const OWN: &[&str] = &[
 #[test]
 fn list_stylesheets_use_tokens_only() {
     let mut failures = Vec::new();
+    let all = ds::component_sheets();
     for name in OWN {
-        let Some((_, css)) = ds::component_sheets().iter().find(|(n, _)| n == name) else {
+        let Some((_, css)) = all.iter().find(|(n, _)| n == name) else {
             failures.push(format!("{name}: not in the component list"));
             continue;
         };

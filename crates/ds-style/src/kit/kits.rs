@@ -1,7 +1,7 @@
 //! `Kits`: the kits a surface is drawn with, in cascade order.
 
 use super::blocks::token_blocks;
-use super::model::Kit;
+use super::model::{Kit, Sheet};
 use crate::css::document::document;
 use crate::tokens::{easing::EasingToken, set::TokenSet, timing::DurationToken};
 use std::collections::HashSet;
@@ -42,6 +42,14 @@ impl Kits {
             .map(|section| (section.name, (section.css)(self).into_owned()))
             .collect();
         document(&sections)
+    }
+
+    /// The component sheets the kits add to the `components` section, in kit order.
+    pub fn sheets(&self) -> Vec<Sheet> {
+        self.kits
+            .iter()
+            .flat_map(|kit| kit.sheets.iter().copied())
+            .collect()
     }
 
     /// The `.ds` token blocks of every kit's families: the base declarations, then what the dark
