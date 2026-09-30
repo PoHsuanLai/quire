@@ -28,6 +28,9 @@ pub enum Arrangement {
     Column,
     /// Side by side, each item's image over its label: the Appearance choice.
     Row,
+    /// Colour circles side by side, the checked one ringed (the accent choice): each choice's
+    /// `swatch` is the circle and its label only names the button.
+    Swatches,
 }
 
 /// The item after `key` moved from `at`: the enabled neighbour the arrows and Home and End name.
@@ -171,15 +174,24 @@ fn RadioItem<T: Clone + PartialEq + 'static>(
                     onpick.call(());
                 }
             },
-            span { class: "ds-radio-group-indicator", "aria-hidden": "true",
-                span { class: "ds-radio-group-dot" }
-            }
-            if let Some(source) = choice.icon {
-                span { class: "ds-radio-group-image",
-                    IconView { source, size: glyph_size(size) }
+            if let Some(var) = choice.swatch {
+                span {
+                    class: "ds-radio-group-swatch",
+                    "aria-hidden": "true",
+                    style: "background:var({var})",
                 }
+                span { class: "ds-radio-group-name", {text(&choice.label)} }
+            } else {
+                span { class: "ds-radio-group-indicator", "aria-hidden": "true",
+                    span { class: "ds-radio-group-dot" }
+                }
+                if let Some(source) = choice.icon {
+                    span { class: "ds-radio-group-image",
+                        IconView { source, size: glyph_size(size) }
+                    }
+                }
+                span { class: "ds-radio-group-label", {text(&choice.label)} }
             }
-            span { class: "ds-radio-group-label", {text(&choice.label)} }
         }
     }
 }

@@ -1,15 +1,13 @@
 //! Lists: a live `List` of mail rows whose rows leave by the roster, heal and come back on undo;
 //! the mail rows a search draws; `Row` in every state; a source list; the notification column;
-//! pinned tiles; the hover strip; the appearance picker.
+//! pinned tiles; the hover strip.
 
-use crate::axes::Axes;
 use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, AppearancePicker, Button, Check, Chip, ChipVariant, Colour, DragGhost, Emphasis, Hex,
-    HoverStrip, Icon, List, ListItem, MarkProvider, MarkStyle, PinFace, PinTile, Point,
-    ProviderMark, Px, RowState, Selection, StripAction, SystemPrefs, ThreadRow, UndoToken,
-    use_toast_hub,
+    ActionId, Button, Check, Chip, ChipVariant, Colour, DragGhost, Emphasis, Hex, HoverStrip, Icon,
+    List, ListItem, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, RowState,
+    Selection, StripAction, ThreadRow, UndoToken, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
 
@@ -98,7 +96,6 @@ pub fn ListsPage() -> Element {
         crate::pages::lists::sidebar::Sidebar {}
         crate::pages::lists::leaving::LeavingColumn {}
         Tiles {}
-        Picker {}
     }
 }
 
@@ -276,29 +273,6 @@ fn Tiles() -> Element {
             }
             if ghost() == Check::On {
                 DragGhost { title: "Re: UIDL stability across servers", sub: "Dana Okafor · 09:41", at: Point { x: Px(760.0), y: Px(140.0) } }
-            }
-        }
-    }
-}
-
-#[component]
-fn Picker() -> Element {
-    let mut axes = use_context::<Signal<Axes>>();
-    let value = axes().appearance();
-    rsx! {
-        Section { title: "AppearancePicker", note: "Bound to the gallery's own theme, accent and motion: it drives the toolbar.",
-            div { class: "g-list g-stage-pad",
-                AppearancePicker {
-                    value,
-                    system: SystemPrefs::default(),
-                    onchange: move |next: ds::Appearance| {
-                        axes.with_mut(|axes| {
-                            axes.theme = next.theme;
-                            axes.accent = next.accent;
-                            axes.motion = next.motion;
-                        });
-                    },
-                }
             }
         }
     }

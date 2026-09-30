@@ -16,13 +16,7 @@ that rev.
 
 ## Open items
 
-- **Part 4 names still alive after step 4a.8.** `AppearancePicker` and `PickerLayout` stay: sill's
-  Appearance module and the gallery still draw the theme and accent choice with them, and their
-  replacement does not exist yet. `RadioGroup` takes an `IconSource` as a choice's image, which
-  cannot be a colour disc, so an accent swatch has no form in it; the Theme half is a
-  `SegmentedControl` already. It needs one decision: an `IconSource` variant (or a `Choice` image)
-  that paints an accent, or a settled Appearance pane in the macOS style (light, dark, auto
-  thumbnails) that drops the swatch row. `use_pulse`, `PulseKey` and `Pulse` stay in `ds-motion` as
+- **Part 4 names still alive after step 4a.8.** `use_pulse`, `PulseKey` and `Pulse` stay in `ds-motion` as
   the alias machinery of the one shake (`use_shake`); they are no longer a way to flourish, and
   `use_once` is private. `PaneSlide` stays because `PaneSwitcher` draws from it.
 - **Lower crates' CSS names variables the shell declares.** `ds-motion`'s keyframes read
@@ -31,10 +25,6 @@ that rev.
   `UndeclaredVar` and only `ds_shell::stylesheet()` lints clean (`ds-shell/tests/self_lint.rs`).
   Nothing under `ds` alone draws the OSD, the banners or the dock floor, so the reads are inert
   there. Ends when the keyframes and the floor shape move to `ds-shell`'s own sheets.
-- **The picker's Space dot is styled above `ds`.** `ds::AppearancePicker` draws `.ds-space-dot`,
-  whose rules are in `ds-shell`'s `space_editor` sheet, so under `ds::stylesheet()` alone the
-  dot is unstyled (`STYLED_ABOVE` in `ds/tests/components_lists.rs`). Ends when those rules move
-  to a sheet `ds` owns, which reorders the stylesheet golden.
 - **Motion and interaction primitives of step 4a.3 have consumers still to move.** One
   primitive has no caller in quire yet: `LongPress` waits for the dock and titlebar menus in
   sill. `rubber::resist` is read by the host's scroll; `Swipe` keeps its own `swipe_damping`
@@ -63,8 +53,7 @@ that rev.
   (step 4a.6), and its search kind has neither the cancel button of a window's toolbar nor a suggestions
   list; the file and multiline kinds and `Password` are gone (a mail signature editor is a `TextView`).
   `Label` is built and the plain spans, `StatusLine`s and header fields are not yet moved onto it (each
-  moves with its component). `RadioGroup` can draw the Appearance choice, but `AppearancePicker` stays
-  (see "Part 4 names still alive"). The battery rings of `ds-shell` draw their own
+  moves with its component). `RadioGroup` draws the accent choice as colour circles (`Arrangement::Swatches`). The battery rings of `ds-shell` draw their own
   SVG on the arc geometry `ProgressIndicator` now owns; step 4a.7 recomposes them from it. The hover card's
   `KeyHint` still draws its own key cap; step 4a.6 uses `KeyEquivalent`. A `Badge` at zero draws nothing,
   so a row that reserved its width for the count no longer does.

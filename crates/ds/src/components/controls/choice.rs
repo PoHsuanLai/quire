@@ -4,6 +4,9 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::TextLine;
 use ds_core::vocab::Availability;
+use ds_core::word::Word;
+use ds_style::appearance::accent::Accent;
+use ds_style::css::accents_css::swatch_var;
 
 /// One option: the value it stands for, its label, an optional image and whether it can be
 /// picked.
@@ -15,6 +18,10 @@ pub struct Choice<T> {
     pub label: TextLine,
     /// An image beside or above the label (a segment or a radio button with a picture).
     pub icon: Option<IconSource>,
+    /// A colour circle standing for the option, as the name of a custom property
+    /// (`--swatch-blue`): a `RadioGroup` with `Arrangement::Swatches` draws it in place of the
+    /// indicator and the words, which then only name the button.
+    pub swatch: Option<String>,
     /// Whether it can be picked; a disabled one is shown and passed over by the arrows.
     pub availability: Availability,
 }
@@ -26,6 +33,7 @@ impl<T> Choice<T> {
             value,
             label: label.into(),
             icon: None,
+            swatch: None,
             availability: Availability::Enabled,
         }
     }
@@ -34,6 +42,14 @@ impl<T> Choice<T> {
     pub fn with_icon(self, icon: impl Into<IconSource>) -> Self {
         Choice {
             icon: Some(icon.into()),
+            ..self
+        }
+    }
+
+    /// The same choice drawn as a colour circle painted with the custom property `var`.
+    pub fn with_swatch(self, var: impl Into<String>) -> Self {
+        Choice {
+            swatch: Some(var.into()),
             ..self
         }
     }
@@ -52,6 +68,13 @@ impl<T> Choice<T> {
             .into_iter()
             .map(|(value, label)| Choice::new(value, label))
             .collect()
+    }
+}
+
+impl Choice<Accent> {
+    /// `accent`, named by its label and drawn as its own colour circle.
+    pub fn accent(accent: Accent) -> Self {
+        Choice::new(accent, accent.label()).with_swatch(swatch_var(accent))
     }
 }
 

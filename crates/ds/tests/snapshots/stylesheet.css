@@ -400,23 +400,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-alert-stage{ position:absolute; inset:0; z-index:var(--z-peek); pointer-events:auto; }
 .ds-alert-suppression{ margin-top:var(--s-12); }
 .ds-alert-help{ position:absolute; left:var(--s-22); bottom:var(--s-18); }
-/* -- appearance_picker -- */
-/* AppearancePicker (design/04-COMPONENTS.md section 26, derived): rows stacked 14 apart (the
-   Space editor's stack gap, `S:247`), each a Field SectionHeader over its control. The swatches
-   are Space dots (space_editor.css) five apart, as in the sidebar foot (`S:845`), painted with
-   `--swatch-*`. No states of its own. TODO(O-16): the overall width is the host surface's. */
-
-.ds-appearance{ display:grid; gap:var(--s-14); }
-.ds-appearance-row{ min-width:0; }
-.ds-appearance-swatches{ display:flex; flex-wrap:wrap; gap:var(--s-5); }
-
-/* Compact: for a narrow host, such as the control center's 300 px module.
-   The segmented row fills the row and never passes it: Regular (22) segments with 4 px sides, still
-   equal columns sharing the width (a grid, as every segmented control is: a flex row here once
-   grew each segment from its own words, so the segments were unequal and the thumb, a
-   segment's width, missed the selected one). */
-.ds-appearance[*|data-layout=compact] .ds-segmented{ display:grid; }
-.ds-appearance[*|data-layout=compact] .ds-segmented .ds-segment{ padding-left:var(--s-4); padding-right:var(--s-4); }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a
@@ -449,8 +432,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:calc(var(--s-6) * -1); }
 /* -- badge -- */
 /* Badge (design/30 section 2.9): a capsule with a count, or a dot. Attribute selectors carry
-   `*|` (spike S2). The count is in the data face, tabular. Alert is `--danger` with its ink
-   (`--danger-ink`); Quiet is a neutral capsule (`--surface-2`, a hairline, `--ink-soft`). No bump:
+   `*|` (spike S2). The count is in the data face, tabular. Alert is systemRed (the red accent's own
+   `--swatch-red`, #FF3B30 light and #FF453A dark, not the muted `--danger` that reads as text) with white ink (`--on-hue`); Quiet is a neutral capsule (`--surface-2`, a hairline, `--ink-soft`). No bump:
    a count changes as any text does. Placement is the parent's (`margin-left:auto` in a row, a
    corner of a tile). */
 
@@ -461,7 +444,7 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-badge[*|data-size=mini]{ --bd-h:var(--s-12); --bd-fs:var(--fs-nano); padding:0 var(--s-3); }
 .ds-badge[*|data-size=small]{ --bd-h:var(--s-14); --bd-fs:var(--fs-caption); }
-.ds-badge[*|data-tone=alert]{ background:var(--danger); color:var(--danger-ink); }
+.ds-badge[*|data-tone=alert]{ background:var(--swatch-red); color:var(--on-hue); }
 .ds-badge[*|data-tone=quiet]{ background:var(--surface-2); color:var(--ink-soft); box-shadow:inset 0 0 0 var(--hair) var(--line); }
 /* The dot has no number: a circle of the badge's height, less the label's inset. */
 .ds-badge[*|data-content=dot]{ min-width:0; width:calc(var(--bd-h) / 2); height:calc(var(--bd-h) / 2); padding:0; }
@@ -1172,6 +1155,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-radio-group-item[*|aria-disabled=true],
 .ds-radio-group[*|aria-disabled=true],
 .ds-radio-group[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+
+/* Swatches: colour circles five apart, each 22 with a 2 ring that is transparent until checked, then the
+   ink. The words only name the button (`.ds-radio-group-name`, visually hidden). */
+.ds-radio-group[*|data-arrangement=swatches]{ flex-direction:row; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
+.ds-radio-group-swatch{ display:block; flex:none; box-sizing:border-box; width:22px; height:22px; border-radius:var(--r-pill); border:2px solid transparent;
+  transition:border-color var(--t-quick) var(--e-in-out); }
+.ds-radio-group-item[*|data-state=on] .ds-radio-group-swatch{ border-color:var(--ink); }
+.ds-radio-group-item[*|data-pressed] .ds-radio-group-swatch{ opacity:.8; }
+.ds-radio-group-name{ position:absolute; width:var(--hair); height:var(--hair); overflow:hidden; }
 /* -- peek -- */
 /* Peek (design/04-COMPONENTS.md section 24), `S:223-225`; Full from `C:1049-1050`. It sits over
    its scrim, inset `36px 12%`, `--surface-2`, the Sheet shadow, and springs in with `peek-in`.

@@ -4,8 +4,8 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    Appearance, AppearancePicker, Ds, Fraction, Icon, Inject, LevelGlyph, Material, Muting,
-    PickerLayout, Px, SystemPrefs, Theme,
+    Accent, Appearance, Arrangement, Choice, Ds, Fraction, Icon, Inject, LevelGlyph, Material,
+    Muting, Px, RadioGroup, SectionHeader, SegmentedControl, Theme, Tracking, Word,
 };
 use ds::{Slider, SliderLook};
 use ds_shell::{GridColumns, ModuleGrid, ModulePanel, ModuleTile, PanelPlate, TileSpan};
@@ -67,12 +67,28 @@ pub fn part(props: PartProps) -> Element {
             }
         },
         PartCase::Picker => rsx! {
-            ModuleGrid {
-                ModulePanel {
-                    AppearancePicker { value: Appearance::default(), system: SystemPrefs::default(), onchange: |_| {}, layout: PickerLayout::Compact }
-                }
-            }
-        },
+                    ModuleGrid {
+                        ModulePanel {
+        div { style: "display:grid;gap:14px",
+                            SectionHeader { title: "Theme" }
+                            SegmentedControl::<Theme> {
+                                label: "Theme",
+                                choices: Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label()))),
+                                tracking: Tracking::SelectOne(Appearance::default().theme),
+                                onchange: |_| {},
+                            }
+                            SectionHeader { title: "Accent" }
+                            RadioGroup::<Accent> {
+                                label: "Accent",
+                                arrangement: Arrangement::Swatches,
+                                choices: Accent::ALL.iter().map(|accent| Choice::accent(*accent)).collect(),
+                                value: Appearance::default().accent,
+                                onchange: |_| {},
+                            }
+                        }
+                        }
+                    }
+                },
     };
     rsx! {
         Ds {
