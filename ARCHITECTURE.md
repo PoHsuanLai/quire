@@ -769,7 +769,7 @@ path each, until step 12 replaces them with the prelude.
 14. **`anyrender_pdfrum`** moves to the pdfrum repo as `pdfrum-anyrender`; `ds-blitz`'s `pdf`
     feature depends on it there.
 15. **Docs**: `CONSUMING.md` for the new crate names, `DESIGN.md` paths, delete this section.
-16. **User styles** (section 11): `KitRank::User`, `UserStyle` + its watch in `ds-settings`, the
+16. **User styles** (done) (section 11): `KitRank::User`, `UserStyle` + its watch in `ds-settings`, the
     `user_style` prop on `Ds`, `ds::selectors`, `lint::user_stylesheet`.
 
 ## 11. User styles
@@ -779,10 +779,10 @@ every consumer (sill, mailo, any app on quire) gets it the same way.
 
 | Piece | Home | What it is |
 |---|---|---|
-| The file | `ds-settings::user_style` | `UserStyle(String)`, a `SettingsDoc` with `FILE = "style.css"` under the app's config dir (`~/.config/<app>/style.css`), `Format::Css` (raw text, never parsed at load). A missing file is an empty style. |
+| The file | `ds-style::kit::UserStyle`, `ds-settings::user_style` | `UserStyle(String)` (a value in `ds-style`, so `ds` can take it as a prop; re-exported by `ds-settings`), a `SettingsDoc` with `FILE = "style.css"` under the app's config dir (`~/.config/<app>/style.css`), `Format::Css` (raw text, never parsed at load). A missing file is an empty style. |
 | Live reload | `ds-settings::Store::watch::<UserStyle>()` | the same watch every settings file uses (rename-safe, debounced); each change publishes the whole text |
 | Cascade slot | `ds-style::kit::KitRank::User` | always after every kit, so a user rule wins over the design system by order, never by `!important` |
-| Rendering | `ds::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet; every surface root re-renders when it changes |
+| Rendering | `ds::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet (no element while the style is blank); every surface root re-renders when it changes |
 | Public selector surface | `ds::selectors` (a table, and its doc page) | what a user stylesheet may rely on: `[data-surface=<name>]` on every surface root; `.ds-<component>` on every component root; the parts each component lists as public (`.ds-<component>-<part>`); `data-variant`, `data-size`, `data-state`, `aria-*`; every token variable (`--<prefix><slug>`). Anything else is internal and may change without notice. |
 | Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers |
 
