@@ -1,11 +1,10 @@
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
-   card and the bubble, and the overlay wrapper every floating component renders into at the end
+   card, and the overlay wrapper every floating component renders into at the end
    of `.ds` (design/05-MOTION.md section 9 rule 10). The wrapper covers the root, lets the
    pointer through, carries the layer's `--z-*`, and is what placement measures as its bounds.
    A layer closed by an outside click lays a catcher under its surface. Radii and shadows per
    elevation: a popover is `--r-panel` with `--shadow-pop`; the menu, the hover card and the tip
-   card use the same surface (the menu's `data-elevation` and the selection bubble's are kept
-   for them); every surface is `--raise` with a 1px `--line`. */
+   card use the same surface (the menu's `data-elevation` is kept for it); every surface is `--raise` with a 1px `--line`. */
 
 .ds-overlay{ position:absolute; inset:0; pointer-events:none; }
 .ds-overlay[*|data-layer=toast]{ z-index:var(--z-toast); }
@@ -14,7 +13,6 @@
 .ds-overlay[*|data-layer=palette]{ z-index:var(--z-palette); }
 .ds-overlay[*|data-layer=card]{ z-index:var(--z-card); }
 .ds-overlay[*|data-layer=menu]{ z-index:var(--z-menu); }
-.ds-overlay[*|data-layer=bubble]{ z-index:var(--z-bubble); }
 .ds-overlay-catch{ position:absolute; inset:0; pointer-events:auto; }
 
 /* A popup root (`RootExtent::Popup`, `root/extent.rs`): the host fits the surface to the root, so
@@ -27,7 +25,6 @@
 
 .ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }
-.ds-popover[*|data-elevation=bubble]{ border-radius:var(--r-field); box-shadow:var(--shadow-bubble); }
 
 /* A popover (`data-dismiss` says what closes it): `--r-panel`, fading in over `--t-quick` and,
    closed by Escape or an outside click, out over `--t-quick --e-exit` before it goes, taking no

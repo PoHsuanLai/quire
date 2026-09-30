@@ -7,7 +7,7 @@ use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
 /// How a button's label is drawn. Every face but `Label` draws a one-letter mark in the style
-/// it names (the selection bubble's B, I, U and S, design/04 section 30) and names the button
+/// it names (the composer's B, I, U and S marks) and names the button
 /// to assistive technology by its `label` ("Bold") instead.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum ButtonFace {
@@ -101,7 +101,7 @@ pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
 
 /// The label drawn in `face`: a span of words (runs in their tones), or the
 /// face's letter in its style. The mark is `aria-hidden`, since the button is named by its
-/// label. Usable on its own as a `BubbleButton`'s `label`, so the bubble's marks need no raw
+/// label. Usable on its own as a toolbar button's label, so the marks need no raw
 /// `b`, `i`, `u` or `s`.
 #[component]
 pub fn FaceMark(face: ButtonFace, #[props(into)] label: TextLine) -> Element {

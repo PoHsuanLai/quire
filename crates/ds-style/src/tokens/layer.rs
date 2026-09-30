@@ -50,9 +50,6 @@ pub enum ZLayer {
     /// `--z-menu` 40: floating menus and the zZ floater.
     #[token(value = "40")]
     Menu,
-    /// `--z-bubble` 41: the selection bubble.
-    #[token(value = "41")]
-    Bubble,
     /// `--z-drag` 50: the drag ghost.
     #[token(value = "50")]
     Drag,

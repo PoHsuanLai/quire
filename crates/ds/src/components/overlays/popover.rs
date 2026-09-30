@@ -1,4 +1,4 @@
-//! Popover: the shared floating surface under menus, hover cards, tooltips, the bubble and the
+//! Popover: the shared floating surface under menus, hover cards, tooltips and the
 //! palette. Placement in Rust; Esc and outside click through the layer stack
 //! (design/04-COMPONENTS.md section 21).
 //!
@@ -56,7 +56,6 @@ pub(crate) fn layer_slug(layer: ZLayer) -> &'static str {
         ZLayer::Palette => "palette",
         ZLayer::Card => "card",
         ZLayer::Menu => "menu",
-        ZLayer::Bubble => "bubble",
         ZLayer::Drag => "drag",
     }
 }

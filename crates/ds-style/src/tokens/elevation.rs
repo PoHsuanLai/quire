@@ -42,9 +42,6 @@ pub enum Shadow {
         dark = "0 22px 34px -14px rgba(0,0,0,.8)"
     )]
     Drag,
-    /// `--shadow-bubble`: the selection bubble.
-    #[token(value = "0 12px 28px -12px rgba(0,0,0,.45)")]
-    Bubble,
     /// `--shadow-current`: the current sidebar item and the pressed tile.
     #[token(value = "0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25)")]
     Current,

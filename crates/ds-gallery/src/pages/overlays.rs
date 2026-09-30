@@ -1,7 +1,7 @@
 //! Overlays: the palette, popovers under each dismiss policy, peek and sheet.
 //! The pills, the toast and the hover cards are in `pills.rs`.
 
-use super::pills::{Bubble, Cards, Pills};
+use super::pills::{Cards, Pills};
 use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
@@ -88,7 +88,6 @@ pub fn OverlaysPage() -> Element {
             }
         }
         Cards {}
-        Bubble {}
         Pills { showcase }
         super::launcher::EmbeddedPalette {}
         super::launcher_hints::SpotlightHints {}

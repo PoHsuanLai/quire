@@ -128,10 +128,6 @@ pub(crate) const SHEETS: [(&str, &str); 63] = [
         "segmented",
         include_str!("../components/controls/segmented.css"),
     ),
-    (
-        "selection_bubble",
-        include_str!("../components/fields/selection_bubble.css"),
-    ),
     ("send_pill", include_str!("../components/app/send_pill.css")),
     ("sheet", include_str!("../components/overlays/sheet.css")),
     (

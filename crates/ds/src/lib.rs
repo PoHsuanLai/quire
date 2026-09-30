@@ -113,7 +113,6 @@ pub use crate::components::{
     editor::{spell_menu::SpellMarks, surface::EditSurface},
     fields::{
         field_row::{FieldGroup, FieldRow, RowLayout},
-        selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
         stepper::{
             model::{Readout, StepDirection, StepRange},
             view::Stepper,

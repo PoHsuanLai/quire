@@ -1,4 +1,4 @@
-//! The overlays page's second half: hover cards and tooltips, the selection bubble, the toast,
+//! The overlays page's second half: hover cards and tooltips, the toast,
 //! the link pill and the send pill.
 
 use super::outbox::Outbox;
@@ -6,9 +6,9 @@ use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
-    Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, Check,
+    Avatar, AvatarSize, AvatarTone, Button,
     Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, LinkPill,
-    LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut, ShortcutKey,
+    LinkTarget, SendPhase, SendPill, Shortcut, ShortcutKey,
     TargetElement, Tooltip, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
@@ -111,73 +111,6 @@ pub fn Cards() -> Element {
                 }
             }
         }
-    }
-}
-
-/// A sentence to select, and the bubble over it in either mode.
-#[component]
-pub fn Bubble() -> Element {
-    let mut text = use_signal(|| None::<MountedRef>);
-    let mut shown = use_signal(|| None::<(Rect, Check)>);
-    let mut bold = use_signal(|| Check::Off);
-    let open = move |link: Check| {
-        if let Some(MountedRef(element)) = text() {
-            spawn(async move {
-                if let Ok(rect) = element.get_client_rect().await {
-                    shown.set(Some((to_rect(rect), link)));
-                }
-            });
-        }
-    };
-    let actions = vec![
-        BubbleAction::Button(BubbleButton {
-            label: rsx! { b { "B" } },
-            title: "Bold".to_string(),
-            pressed: Some(bold()),
-            onclick: EventHandler::new(move |()| bold.set(bold().flipped())),
-        }),
-        BubbleAction::Separator,
-        BubbleAction::Button(BubbleButton {
-            label: rsx! { Glyph { icon: Icon::Link, size: IconSize::Compact } },
-            title: "Link".to_string(),
-            pressed: None,
-            onclick: EventHandler::new(move |()| open(Check::On)),
-        }),
-    ];
-    rsx! {
-        Section { title: "SelectionBubble", note: "The composer supplies the selection's rect; the bubble sits 8 px above it and never flips.",
-            div { class: "g-row",
-                span {
-                    class: "g-name",
-                    onmounted: move |event| text.set(Some(MountedRef(event.data()))),
-                    "Pretend this sentence is selected."
-                }
-                Button { size: ControlSize::Mini, label: "Actions", onclick: move |_| open(Check::Off) }
-                Button { size: ControlSize::Mini, label: "Link field", onclick: move |_| open(Check::On) }
-            }
-            if let Some((anchor, link)) = shown() {
-                SelectionBubble {
-                    key: "{link:?}",
-                    anchor,
-                    mode: match link { Check::On => BubbleMode::Link, Check::Off | Check::Mixed => BubbleMode::Actions(actions) },
-                    onlink: |_| {},
-                    onclose: move |_| shown.set(None),
-                }
-            }
-        }
-    }
-}
-
-fn to_rect(rect: dioxus::html::geometry::PixelsRect) -> Rect {
-    Rect {
-        origin: ds::Point {
-            x: ds::Px(rect.origin.x as f32),
-            y: ds::Px(rect.origin.y as f32),
-        },
-        size: ds::Size {
-            width: ds::Px(rect.size.width as f32),
-            height: ds::Px(rect.size.height as f32),
-        },
     }
 }
 

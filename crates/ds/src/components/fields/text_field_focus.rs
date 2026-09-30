@@ -11,7 +11,7 @@ use std::rc::Rc;
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum FieldFocus {
-    /// As soon as it is mounted: the palette's input, the bubble's link field.
+    /// As soon as it is mounted: the palette's input.
     OnMount,
     /// Only when the user or the consumer puts it there.
     #[default]

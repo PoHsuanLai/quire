@@ -337,10 +337,6 @@ fn overlay_stylesheets_use_tokens_only() {
             include_str!("../src/components/overlays/scrim.css"),
         ),
         (
-            "selection_bubble",
-            include_str!("../src/components/fields/selection_bubble.css"),
-        ),
-        (
             "send_pill",
             include_str!("../src/components/app/send_pill.css"),
         ),

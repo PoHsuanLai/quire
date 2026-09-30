@@ -32,8 +32,6 @@ pub enum Radius {
     Window,
     /// `--r-menu-item` 8: menu item, prop row, foot button.
     MenuItem,
-    /// `--r-bubble-button` 7.
-    BubbleButton,
     /// `--r-small` 6: fly, gutter, quiet button.
     Small,
     /// `--r-kbd` 5: key cap, favicon.
@@ -59,7 +57,6 @@ impl Radius {
                 Radius::Chip | Radius::Item | Radius::Small => "6px",
                 Radius::Pill => "999px",
                 Radius::Menu | Radius::MenuItem => "8px",
-                Radius::BubbleButton => "7px",
                 Radius::Tiny => "4px",
                 Radius::Micro => "3px",
             },

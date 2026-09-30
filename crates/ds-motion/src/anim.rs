@@ -6,7 +6,7 @@
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring, plus four
 //! assignment rows that play a catalogue keyframe at another
 //! recipe (section 5 rows 7, 26, 37 and 64): `PaletteFade`,
-//! `LinkPillIn`, `BubblePop` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
+//! `LinkPillIn` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
 //! closed by Escape or an outside click (bar gaps), plus `CmdkRise`, `cmdk-in` without its fade,
 //! for a command panel that must be opaque on its first frame, plus four for
 //! states the catalogue has no motion for: `PillUp` (a centred pill's entrance),
@@ -44,13 +44,9 @@ pub enum Anim {
     SlideL,
     /// `menu-in`: C's trigger-anchored menus.
     MenuIn,
-    /// `menu-pop`: every floating menu.
-    MenuPop,
     /// `menu-out`: a menu closed by Escape or an outside click fades before it goes
     /// (design/13-BEHAVIOUR-menus-windows.md section 13.3.2, "fade on close"; bar gaps).
     MenuOut,
-    /// `menu-pop` at `--t-quick`: the selection bubble (section 5 row 37).
-    BubblePop,
     /// `peek-in`: peek and the command menu.
     PeekIn,
     /// `peek-in` at `--t-move --e-out`: the reader entering Full peek (section 5 row 64, C).
@@ -126,16 +122,14 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 36] = [
+    pub const ALL: [Anim; 34] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
         Anim::SlideR,
         Anim::SlideL,
         Anim::MenuIn,
-        Anim::MenuPop,
         Anim::MenuOut,
-        Anim::BubblePop,
         Anim::PeekIn,
         Anim::PeekFullIn,
         Anim::Fade,
@@ -174,9 +168,7 @@ impl Anim {
             Anim::SlideR => "a-slide-r",
             Anim::SlideL => "a-slide-l",
             Anim::MenuIn => "a-menu-in",
-            Anim::MenuPop => "a-menu-pop",
             Anim::MenuOut => "a-menu-out",
-            Anim::BubblePop => "a-bubble-pop",
             Anim::PeekIn => "a-peek-in",
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",

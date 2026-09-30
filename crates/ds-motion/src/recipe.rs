@@ -100,23 +100,7 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `S:666`.
-            Anim::MenuPop => recipe(
-                "menu-pop",
-                DurationToken::Move,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
             Anim::MenuOut => own::MENU_OUT,
-            // `S:684`.
-            Anim::BubblePop => recipe(
-                "menu-pop",
-                DurationToken::Quick,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
             // `S:225`.
             Anim::PeekIn => recipe(
                 "peek-in",

@@ -7,12 +7,11 @@ use ds::ControlSize;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{Accessory, Align, Availability, Button, RowLeading};
 use ds::{
-    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
-    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
+    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
     HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
     HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
     Menu, MenuImage, MenuItem, MenuPlacement, PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue,
-    Placement, Point, Popover, Px, Rect, SelectionBubble, SendPhase, SendPill, Sheet, Shown, Side,
+    Placement, Point, Popover, Px, Rect, SendPhase, SendPill, Sheet, Shown, Side,
     Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
 };
 
@@ -318,52 +317,6 @@ fn Pushed(undo: Option<UndoToken>) -> Element {
     rsx! {}
 }
 
-fn bubble_actions() -> Vec<BubbleAction> {
-    vec![
-        BubbleAction::Button(BubbleButton {
-            label: rsx! { b { "B" } },
-            title: "Bold (Ctrl B)".to_string(),
-            pressed: Some(Check::On),
-            onclick: EventHandler::new(|()| {}),
-        }),
-        BubbleAction::Button(BubbleButton {
-            label: rsx! { i { "i" } },
-            title: "Italic (Ctrl I)".to_string(),
-            pressed: Some(Check::Off),
-            onclick: EventHandler::new(|()| {}),
-        }),
-        BubbleAction::Button(BubbleButton {
-            label: rsx! { "</>" },
-            title: "Inline code (Ctrl E)".to_string(),
-            pressed: None,
-            onclick: EventHandler::new(|()| {}),
-        }),
-        BubbleAction::Separator,
-        BubbleAction::Button(BubbleButton {
-            label: rsx! {
-                Glyph { icon: Icon::Link, size: ds::IconSize::Small }
-                "Link"
-            },
-            title: "Link (Ctrl K)".to_string(),
-            pressed: None,
-            onclick: EventHandler::new(|()| {}),
-        }),
-    ]
-}
-
-fn selection() -> Rect {
-    Rect {
-        origin: Point {
-            x: Px(300.0),
-            y: Px(200.0),
-        },
-        size: Size {
-            width: Px(120.0),
-            height: Px(18.0),
-        },
-    }
-}
-
 pub const CASES: &[Case] = &[
     // Menu: each placement, an empty list, disabled items and submenus, status lines.
     Case {
@@ -653,19 +606,6 @@ pub const CASES: &[Case] = &[
         component: "link_pill",
         state: "lying",
         make: || rsx! { LinkPill { target: LinkTarget::Lying { registered: "g00gle-security.xyz".to_string(), shown: "google.com".to_string() } } },
-        wait: NOW,
-    },
-    // SelectionBubble: formatting actions, and the link field.
-    Case {
-        component: "selection_bubble",
-        state: "actions",
-        make: || rsx! { SelectionBubble { anchor: selection(), mode: BubbleMode::Actions(bubble_actions()), onlink: |_| {}, onclose: |_| {} } },
-        wait: NOW,
-    },
-    Case {
-        component: "selection_bubble",
-        state: "link",
-        make: || rsx! { SelectionBubble { anchor: selection(), mode: BubbleMode::Link, onlink: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // SendPill: mounted below the edge, up a frame later, done.
