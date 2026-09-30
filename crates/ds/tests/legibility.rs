@@ -4,7 +4,6 @@
 
 use ds::Alpha;
 use ds::Hex;
-use ds::Look;
 use ds::Word;
 use ds::{
     Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
@@ -19,7 +18,7 @@ fn measured(fore: &str, back: &str) -> f64 {
 }
 
 fn colour(token: ColourToken, scheme: Scheme) -> String {
-    token.value(Look::Mac, scheme).css()
+    token.value(scheme).css()
 }
 
 #[test]
@@ -32,17 +31,32 @@ fn every_accent_is_legible_in_both_schemes() {
             let roles = accent_of(accent, scheme);
             let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
             let wash = roles.fill.over(roles.wash, ground).css();
-            let pairs = [
+            // The accent text on every ground the card draws on, not the card alone.
+            let mut pairs = [
+                ColourToken::Paper,
+                ColourToken::Surface,
+                ColourToken::Surface2,
+                ColourToken::Raise,
+            ]
+            .map(|on| {
                 (
-                    "accent text on the card",
+                    format!("accent text on {on:?}"),
                     roles.text.css(),
-                    surface.clone(),
+                    colour(on, scheme),
                     4.5,
-                ),
-                ("ink on the accent wash", ink.clone(), wash, 4.5),
+                )
+            })
+            .to_vec();
+            pairs.extend([
+                ("ink on the accent wash".to_owned(), ink.clone(), wash, 4.5),
                 // The Mac system fills carry white at 3:1 (Apple's blue button is 4.0), dark ink otherwise.
-                ("text on the accent", roles.ink.css(), roles.fill.css(), 3.0),
-            ];
+                (
+                    "text on the accent".to_owned(),
+                    roles.ink.css(),
+                    roles.fill.css(),
+                    3.0,
+                ),
+            ]);
             for (label, fore, back, floor) in pairs {
                 let got = measured(&fore, &back);
                 if got < floor {
@@ -609,4 +623,98 @@ fn the_busy_dots_keep_the_accent_on_the_card() {
         "{} failures: {failures:#?}",
         failures.len()
     );
+}
+
+// ---- Text on every ground, and the selected row ----------------------------------------------
+
+/// Every text ink holds its floor on every ground the card draws on: `--ink` and `--ink-soft` at
+/// 4.5:1, the faint metadata at 3:1 (design/03-COLOR.md section 6).
+#[test]
+fn every_text_ink_holds_its_floor_on_every_ground() {
+    const GROUNDS: [ColourToken; 4] = [
+        ColourToken::Paper,
+        ColourToken::Surface,
+        ColourToken::Surface2,
+        ColourToken::Raise,
+    ];
+    const INKS: [(ColourToken, f64); 3] = [
+        (ColourToken::Ink, 4.5),
+        (ColourToken::InkSoft, 4.5),
+        (ColourToken::InkFaint, 3.0),
+    ];
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL.iter().copied() {
+        for ground in GROUNDS {
+            for (ink, floor) in INKS {
+                let (fore, back) = (colour(ink, scheme), colour(ground, scheme));
+                let got = measured(&fore, &back);
+                if got < floor {
+                    failures.push(format!(
+                        "{scheme:?}: {ink:?} {fore} on {ground:?} {back} is {got:.2}, needs {floor}"
+                    ));
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}
+
+/// A selection paint as a screen shows it over `ground`: the value the token names, its
+/// `var(--accent…)` answered with the accent's own roles.
+fn selection_paint(
+    value: &str,
+    scheme: Scheme,
+    (fill, ink, wash): (String, String, String),
+    ground: &str,
+) -> String {
+    let under = rgb(ground);
+    match value {
+        "var(--accent)" => fill,
+        "var(--accent-ink)" => ink,
+        "var(--accent-soft)" => over(&wash, under),
+        "var(--ink)" => colour(ColourToken::Ink, scheme),
+        rgba if rgba.starts_with("rgba(") => over(rgba, under),
+        other => panic!("{other} is not a selection paint this test knows"),
+    }
+}
+
+/// A selected row's text reads on its fill: in an active window `--sel-ink` on `--sel-bg` (3:1
+/// over the accent, Apple's own blue button being 4.0); in an inactive one `--ink` on
+/// `--sel-bg-quiet` at 4.5:1. Every accent, both schemes, on each ground a list sits on.
+#[test]
+fn a_selected_row_keeps_its_ink() {
+    use ds::SelectionToken;
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL.iter().copied() {
+        let scope = ds::TokenScope::BASE.in_scheme(scheme);
+        let css = |token: SelectionToken| ds::Token::css_value(token, scope).to_string();
+        for accent in Accent::ALL.iter().copied() {
+            let roles = accent_of(accent, scheme);
+            for ground in [ColourToken::Paper, ColourToken::Surface, ColourToken::Raise] {
+                let under = colour(ground, scheme);
+                let paint = |token| {
+                    let accent = (roles.fill.css(), roles.ink.css(), roles.wash_colour().css());
+                    selection_paint(&css(token), scheme, accent, &under)
+                };
+                let (bg, quiet, ink) = (
+                    paint(SelectionToken::Bg),
+                    paint(SelectionToken::BgQuiet),
+                    paint(SelectionToken::Ink),
+                );
+                let plain_ink = colour(ColourToken::Ink, scheme);
+                for (name, fore, back, needs) in [
+                    ("--sel-ink on --sel-bg", &ink, &bg, 3.0),
+                    ("--ink on --sel-bg-quiet", &plain_ink, &quiet, 4.5),
+                ] {
+                    let got = measured(fore, back);
+                    if got < needs {
+                        failures.push(format!(
+                            "{scheme:?} {accent:?} on {ground:?}: {name}, {fore} on {back} is {got:.2}, needs {needs}"
+                        ));
+                    }
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
 }

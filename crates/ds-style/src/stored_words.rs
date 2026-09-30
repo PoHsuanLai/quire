@@ -9,7 +9,6 @@ use crate::appearance::{
     theme::{Scheme, Theme},
     typeface::Typeface,
 };
-use crate::look::Look;
 use crate::tokens::label_hue::LabelHue;
 use ds_core::testing::word_matches_serde;
 
@@ -17,7 +16,6 @@ use ds_core::testing::word_matches_serde;
 fn stored_vocabularies_serialise_as_their_slugs() {
     word_matches_serde::<Accent>();
     word_matches_serde::<LabelHue>();
-    word_matches_serde::<Look>();
     word_matches_serde::<Material>();
     word_matches_serde::<Motion>();
     word_matches_serde::<MotionLevel>();

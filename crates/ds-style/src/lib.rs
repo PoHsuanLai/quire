@@ -16,7 +16,6 @@ pub mod emit;
 pub mod fonts;
 pub mod icon;
 pub mod kit;
-pub mod look;
 pub mod material;
 #[cfg(feature = "dioxus")]
 pub mod scale;

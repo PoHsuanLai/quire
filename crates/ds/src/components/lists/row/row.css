@@ -15,20 +15,30 @@
 
 /* The selection: the accent under its ink; a quiet grey when the window is inactive or the row's
    list is not the one holding the keyboard. */
-.ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg); color:var(--sel-ink); }
 .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
 .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
-.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--accent-ink); }
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--sel-ink); }
 .ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true],
-.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg-quiet); color:var(--ink); }
 .ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
+/* A source list is a sidebar: its selection stays the accent while the window is active, whether
+   or not the list holds the keyboard, and goes grey only with the window (macOS). */
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg); color:var(--sel-ink); }
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--sel-ink); }
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg-quiet); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
 
 /* The words: the title over its detail. Emphasis Strong is an unread row. */
 .ds-row-words{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }

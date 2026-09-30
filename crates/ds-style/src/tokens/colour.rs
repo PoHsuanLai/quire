@@ -15,7 +15,6 @@
 use super::accent_table::accent_of;
 use super::hex::{Alpha, Colour, Hex};
 use crate::appearance::{accent::Accent, theme::Scheme};
-use crate::look::Look;
 use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
 
@@ -144,21 +143,21 @@ pub enum ColourToken {
     #[token(name = "knob-fill")]
     Knob,
     /// `--orb-bg`: the voice orb's ground, the ring it fades to at its rim and the dots over
-    /// it (design/30 section 2.9). Values per Look: Mac is the reference's oklch(95% .02 264.695)
+    /// it (design/30 section 2.9). Values: the reference's oklch(95% .02 264.695)
     /// light, darkened to oklch(24% .02 264.695) in dark.
     OrbBg,
-    /// `--orb-c1`: the orb's first glow, oklch(75% .15 350) in the Mac Look (dark: 68%).
+    /// `--orb-c1`: the orb's first glow, oklch(75% .15 350) (dark: 68%).
     OrbC1,
-    /// `--orb-c2`: the orb's second glow, oklch(80% .12 200) in the Mac Look (dark: 72%).
+    /// `--orb-c2`: the orb's second glow, oklch(80% .12 200) (dark: 72%).
     OrbC2,
-    /// `--orb-c3`: the orb's third glow, oklch(78% .14 280) in the Mac Look (dark: 70%).
+    /// `--orb-c3`: the orb's third glow, oklch(78% .14 280) (dark: 70%).
     OrbC3,
 }
 
 impl ColourToken {
-    /// The value in `look` and `scheme`, with Blue as the accent (the band's roles,
+    /// The value in `scheme`, with Blue as the accent (the band's roles,
     /// section 20).
-    pub fn value(self, look: Look, scheme: Scheme) -> Colour {
+    pub fn value(self, scheme: Scheme) -> Colour {
         // Only the accent family asks the band: the band measures against the card's grounds,
         // which are this table's too.
         let blue = || accent_of(Accent::Blue, scheme);
@@ -169,7 +168,7 @@ impl ColourToken {
             ColourToken::AccentText => return Colour::Solid(blue().text),
             ColourToken::AccentTextMaterial => return Colour::Solid(blue().text_material),
             ColourToken::AccentRing => return blue().ring_colour(),
-            other => other.palette(look),
+            other => other.mac(),
         };
         match scheme {
             Scheme::Light => light,
@@ -177,16 +176,7 @@ impl ColourToken {
         }
     }
 
-    /// `look`'s palette, light and dark, with the washes and literals of design/03-COLOR.md
-    /// sections 11-12. The accent family is the accent table's and is answered by
-    /// [`Self::value`] before this is asked.
-    fn palette(self, look: Look) -> (Colour, Colour) {
-        match look {
-            Look::Mac => self.mac(),
-        }
-    }
-
-    /// The Mac Look (design/30-CATALOGUE.md section 3.2): the system window paper, white
+    /// The Look (design/30-CATALOGUE.md section 3.2): the system window paper, white
     /// controls and content, and the label colours as solid greys. The label, secondary and
     /// tertiary levels sit at about 87, 64 and 48 % (dark: 91, 64 and 52 %), a little firmer than
     /// macOS's 85, 55 and 25 %, because the legibility gates (design/03-COLOR.md section 6)
@@ -269,16 +259,15 @@ impl ColourToken {
     }
 }
 
-/// A colour token as the stylesheet writes it: the table's value in the scope's Look and scheme.
+/// A colour token as the stylesheet writes it: the table's value in the scope's scheme.
 fn colour_css(token: ColourToken, scope: TokenScope) -> CssValue {
-    CssValue::computed(token.value(scope.look, scope.scheme).css())
+    CssValue::computed(token.value(scope.scheme).css())
 }
 
 #[cfg(test)]
 mod tests {
     use super::{Colour, ColourToken, Hex};
     use crate::appearance::theme::Scheme;
-    use crate::look::Look;
     use ds_core::colour::fit::oklch_bytes;
 
     /// `(token, scheme, oklch lightness, chroma, hue)`: what each orb colour names.
@@ -297,11 +286,7 @@ mod tests {
     fn orb_colours_are_the_oklch_values_they_name() {
         for (token, scheme, l, c, h) in ORB {
             let want = Colour::Solid(Hex(oklch_bytes(*l, *c, *h)));
-            assert_eq!(
-                token.value(Look::Mac, *scheme),
-                want,
-                "{token:?} {scheme:?}"
-            );
+            assert_eq!(token.value(*scheme), want, "{token:?} {scheme:?}");
         }
     }
 }

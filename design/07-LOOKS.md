@@ -1,6 +1,6 @@
 # 07 Looks
 
-> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3 replaces sections 2 to 7 (the look model, Post, Riso, Tide, Candy, warmth), section 10 (Mochi) and section 11 (desktop default): the Looks are Mac (default) and Arc, and a Look is values only. Post's and S's values here are the source of the Arc Look's values. Where this file and 30 disagree, 30 wins.
+> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3 replaces sections 2 to 7 (the look model, Post, Riso, Tide, Candy, warmth), section 10 (Mochi) and section 11 (desktop default): there is one Look, the Mac values, and what the design takes from Arc are features (Space colour on the chrome, the command pill, pinned tiles, Today tabs, edge peek, link pill, sidebar on colour), not a second value set. Post's and S's values here are history and the source of those features. Where this file and 30 disagree, 30 wins.
 
 
 Status: draft for review, 2026-09-23. `S` = `~/mailo-design/mailo-spaces.html` (newest; wins

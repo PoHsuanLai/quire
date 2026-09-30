@@ -11,8 +11,8 @@ use dioxus::prelude::*;
 use ds::ImagePosition;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
-    FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement,
-    Point, Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
+    FrameVars, Grain, Hex, Icon, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement, Point,
+    Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
 use ds_harness::{Backdrop, Driver, Harness, Input, Viewport};
 use ds_shell::MenuBarItem;
@@ -296,7 +296,7 @@ fn the_frame_ground_draws_frame_inks_and_its_overlays_paper() {
     let frame = harness.render().expect("renders");
     keep(&frame, "frame-ground");
     let frame_ink = Hex::parse(&FrameVars::of(&look(0), Scheme::Light).ink).expect("hex");
-    let paper_ink = ColourToken::Ink.value(Look::Mac, Scheme::Light);
+    let paper_ink = ColourToken::Ink.value(Scheme::Light);
     let on_frame = modal(&pixels(&frame, rect(&harness, ".on-frame"), 2.0));
     let on_paper = modal(&pixels(&frame, rect(&harness, ".on-paper"), 2.0));
     let [r, g, b] = frame_ink.0;

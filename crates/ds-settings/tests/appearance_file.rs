@@ -130,9 +130,9 @@ fn a_bad_value_costs_only_its_own_field() {
         },
         Case {
             name: "a number where a word belongs keeps the accent",
-            text: "[appearance]\nlook = 7\naccent = \"green\"\n",
+            text: "[appearance]\ntheme = 7\naccent = \"green\"\n",
             want: with(|f| f.appearance.accent = Accent::Green),
-            invalid: &["appearance.look"],
+            invalid: &["appearance.theme"],
         },
         Case {
             name: "the retired postmark accent falls back to blue and is reported",
@@ -198,21 +198,27 @@ fn a_key_nobody_reads_is_reported_and_gone_after_the_next_save() {
     let store = scratch.store();
     write(
         &scratch,
-        b"version = 1\nfuture = \"dropped\"\n[appearance]\ntheme = \"dark\"\npuppy = true\n\
+        b"version = 1\nfuture = \"dropped\"\n[appearance]\ntheme = \"dark\"\npuppy = true\nlook = \"arc\"\n\
           [icons]\nsparkle = 3\n[later]\nanswer = 42\n",
     );
     let read = store.load::<AppearanceFile>();
     assert_eq!(read.value.appearance.theme, Theme::Dark);
     assert_eq!(
         unknown(&read),
-        ["appearance.puppy", "future", "icons.sparkle", "later"]
+        [
+            "appearance.look",
+            "appearance.puppy",
+            "future",
+            "icons.sparkle",
+            "later"
+        ]
     );
     assert!(read.invalid.is_empty(), "{:?}", read.invalid);
 
     store.save(&read.value).unwrap_or_else(|e| panic!("{e}"));
     let written =
         std::fs::read_to_string(scratch.app_dir().join(FILE)).unwrap_or_else(|e| panic!("{e}"));
-    for gone in ["puppy", "future", "sparkle", "later", "answer"] {
+    for gone in ["puppy", "look", "future", "sparkle", "later", "answer"] {
         assert!(
             !written.contains(gone),
             "{gone} survived the save:\n{written}"

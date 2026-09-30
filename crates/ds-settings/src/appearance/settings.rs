@@ -11,7 +11,6 @@ use ds_style::appearance::appearance::Appearance;
 use ds_style::appearance::motion::Motion;
 use ds_style::appearance::theme::Theme;
 use ds_style::appearance::typeface::Typeface;
-use ds_style::look::Look;
 use serde::{Deserialize, Serialize};
 
 /// `appearance.*`: what every surface resolves its look from.
@@ -26,13 +25,6 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub theme: Theme,
-    /// `appearance.look`: the value set the tokens are written in.
-    #[settings(
-        label = "Look",
-        help = "The visual language: the values colours, radii and shadows take.",
-        section = "Appearance"
-    )]
-    pub look: Look,
     /// `appearance.accent`: one of six.
     #[settings(
         label = "Accent",
@@ -132,7 +124,6 @@ impl Default for AppearanceSettings {
     fn default() -> Self {
         AppearanceSettings {
             theme: Theme::System,
-            look: Look::Mac,
             accent: Accent::Blue,
             motion_level: Motion::Standard,
             typeface: Typeface::System,

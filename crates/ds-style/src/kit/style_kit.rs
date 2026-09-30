@@ -29,6 +29,7 @@ use crate::tokens::{
     orb::ORB_VARS,
     person::PersonSwatch,
     pixel::PixelToken,
+    selection::SelectionToken,
     set::{Only, Place, TokenSet},
     shape::Radius,
     shell_scale::ShellSize,
@@ -50,6 +51,7 @@ pub static KIT: Kit = Kit {
     tokens: &[
         TokenSet::of::<ColourToken>().at(Place::Scheme),
         TokenSet::of::<HueColour>().at(Place::Scheme),
+        TokenSet::of::<SelectionToken>().at(Place::Scheme),
         TokenSet::of::<Shadow>().at(Place::Scheme),
         TokenSet::of::<WidgetPaint>().at(Place::Scheme),
         TokenSet::of::<Radius>().at(Place::Shape),
