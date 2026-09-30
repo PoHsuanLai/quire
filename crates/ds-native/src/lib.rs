@@ -123,7 +123,7 @@ pub use pdf_thumb::{
 pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use runtime::TokioSpawner;
 pub use snap::snap_to_device;
-pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_with};
+pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};
 pub use window::{Decorations, WinitWindow};
 pub use window_requests::WindowLife;
 

@@ -11,7 +11,7 @@ use crate::registry;
 use crate::sheet;
 use ds::Word;
 use ds::{Accent, Motion, Scheme, Theme, Typeface};
-use ds_native::{Viewport, snapshot_at};
+use ds_native::{Viewport, snapshot_placed};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
@@ -115,7 +115,7 @@ pub fn shots_of(pages: &[Page]) -> Vec<Shot> {
 pub fn render(shot: &Shot) -> Result<image::RgbaImage, GalleryError> {
     start_with(shot.axes());
     let mut frames =
-        snapshot_at(App, shot.viewport(), &[AT]).map_err(|source| GalleryError::Render {
+        snapshot_placed(App, shot.viewport(), &[AT]).map_err(|source| GalleryError::Render {
             name: shot.file(),
             source,
         })?;
