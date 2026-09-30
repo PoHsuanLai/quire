@@ -17,6 +17,7 @@ pub static KIT: Kit = Kit {
         name: "motion",
         css: keyframes,
     }],
+    sheets: &[],
     vocabulary: Vocabulary {
         keyframes: keyframe_names,
         grammar_durations: &GRAMMAR_DURATIONS,

@@ -2,7 +2,7 @@
 //! and the kits a surface is drawn with.
 
 use crate::assembly::sheets::SHEETS;
-use ds_style::css::document::{sheets, utilities_css};
+use ds_style::css::document::{placed, sheets, utilities_css};
 use ds_style::kit::{Kit, KitRank, Kits, STYLE_KIT, Section, Vocabulary};
 use std::borrow::Cow;
 
@@ -20,6 +20,7 @@ pub(crate) static KIT: Kit = Kit {
             css: components,
         },
     ],
+    sheets: &[],
     vocabulary: Vocabulary::NONE,
 };
 
@@ -37,6 +38,6 @@ fn utilities(_: &Kits) -> Cow<'static, str> {
     Cow::Owned(utilities_css())
 }
 
-fn components(_: &Kits) -> Cow<'static, str> {
-    Cow::Owned(sheets(&SHEETS))
+fn components(kits: &Kits) -> Cow<'static, str> {
+    Cow::Owned(sheets(&placed(&SHEETS, &kits.sheets())))
 }

@@ -17,6 +17,7 @@ pub(crate) mod month_grid;
 pub(crate) mod notifications;
 pub(crate) mod now_playing;
 pub(crate) mod osd;
+pub(crate) mod sheets;
 pub(crate) mod space_editor;
 pub(crate) mod switcher;
 pub(crate) mod thumbs;

@@ -34,6 +34,7 @@ static EARLY: Kit = Kit {
             css: tokens,
         },
     ],
+    sheets: &[],
     vocabulary: Vocabulary::NONE,
 };
 
@@ -44,6 +45,7 @@ static LATE: Kit = Kit {
         name: "two",
         css: second,
     }],
+    sheets: &[],
     vocabulary: Vocabulary::NONE,
 };
 
