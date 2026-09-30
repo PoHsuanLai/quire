@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Anchor, Appearance, Ds, Material, Menu, MenuItem, Point, Px, RootExtent, ShortcutKey};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -99,13 +99,17 @@ fn a_press_on_a_row_reaches_it_and_escape_closes() {
     let second = harness
         .centre(".ds-menu-item:nth-child(2) .ds-menu-label")
         .expect("the second row");
-    harness.pointer_move(second);
-    harness.click(second);
+    harness.send(Input::pointer_move(second));
+    harness.send(Input::click(second));
     harness.advance(ms(300));
     assert_eq!(harness.text_of(".log").as_deref(), Some("pick:1"));
     let mut harness = laid_out(Fitted);
-    assert!(harness.is_focused(".ds-menu"), "the menu has the keyboard");
-    harness.key(ShortcutKey::Escape);
+    assert_eq!(
+        harness.focus_of(".ds-menu"),
+        FocusState::Focused,
+        "the menu has the keyboard"
+    );
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-menu"), 0);
 }

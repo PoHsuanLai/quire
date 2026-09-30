@@ -7,7 +7,7 @@ use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Material, PaletteGroup,
     PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord, RowShape, Shortcut, ShortcutKey,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -101,7 +101,7 @@ fn moving_the_selection_moves_the_chord() {
         3,
         "every row keeps its time"
     );
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(100));
     assert_eq!(
         harness.count("#card .ds-key-equivalent"),
@@ -112,7 +112,7 @@ fn moving_the_selection_moves_the_chord() {
         where_the_chord_is(&harness),
         (Some("Two.pdf".into()), Some("Two.pdf".into()))
     );
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(100));
     assert_eq!(
         where_the_chord_is(&harness),

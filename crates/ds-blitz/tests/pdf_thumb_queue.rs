@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Px, Size};
 use ds_blitz::{PdfFileThumb, pdf_thumb_rasters};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, SaveOptions, blank_document, save};
 use peniko::Color;

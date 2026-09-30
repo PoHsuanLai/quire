@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Motion, RootChrome};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::widget::REFRESH_FLOOR;
 use ds_shell::{
     ClockCity, ClockEntry, ClockTime, Dated, DayPhase, EntryDate, Refresh, RefreshAsk, Seconds,
@@ -108,7 +108,7 @@ fn Overdue() -> Element {
 
 fn harness(app: fn() -> Element) -> Harness {
     ASKS.with(|asks| asks.borrow_mut().clear());
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 fn shown(harness: &Harness) -> String {

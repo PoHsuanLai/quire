@@ -4,13 +4,13 @@
 //! images live across frames, as in a window. Every frame is submitted and waited for, so a
 //! frame's time includes the GPU finishing it.
 
+use crate::error::HarnessError;
 use crate::gpu_device::open_device;
 use crate::painter::{Canvas, PaintTime, draw};
 use anyrender::ResourceId;
 use anyrender_vello_hybrid::{ImageManager, VelloHybridScenePainter};
 use blitz_dom::BaseDocument;
 use blitz_kit::adapter::AdapterPref;
-use ds_blitz::NativeError;
 use rustc_hash::FxHashMap;
 use std::time::{Duration, Instant};
 use vello_common::paint::ImageId;
@@ -91,7 +91,7 @@ impl Target {
 
 impl GpuPainter {
     /// A device on the preferred adapter and a renderer for `width` x `height` device pixels.
-    pub(crate) fn open(pref: &AdapterPref, width: u32, height: u32) -> Result<Self, NativeError> {
+    pub(crate) fn open(pref: &AdapterPref, width: u32, height: u32) -> Result<Self, HarnessError> {
         let (handle, adapter) = open_device(pref)?;
         let renderer = Renderer::new(
             &handle.device,
@@ -124,7 +124,7 @@ impl GpuPainter {
         &mut self,
         doc: &mut BaseDocument,
         canvas: Canvas,
-    ) -> Result<PaintTime, NativeError> {
+    ) -> Result<PaintTime, HarnessError> {
         let started = Instant::now();
         let (encoder, encode) = self.encode(doc, canvas)?;
         self.finish(encoder)?;
@@ -136,7 +136,7 @@ impl GpuPainter {
         &mut self,
         doc: &mut BaseDocument,
         canvas: Canvas,
-    ) -> Result<Vec<u8>, NativeError> {
+    ) -> Result<Vec<u8>, HarnessError> {
         let (mut encoder, _) = self.encode(doc, canvas)?;
         let target = &self.target;
         encoder.copy_texture_to_buffer(
@@ -179,7 +179,7 @@ impl GpuPainter {
         &mut self,
         doc: &mut BaseDocument,
         canvas: Canvas,
-    ) -> Result<(wgpu::CommandEncoder, Duration), NativeError> {
+    ) -> Result<(wgpu::CommandEncoder, Duration), HarnessError> {
         let started = Instant::now();
         let device = &self.handle.device;
         if (self.target.width, self.target.height) != (canvas.width, canvas.height) {
@@ -226,21 +226,21 @@ impl GpuPainter {
                 &self.target.view,
                 &textures,
             )
-            .map_err(|error| NativeError::Renderer(format!("vello_hybrid: {error:?}")))?;
+            .map_err(|error| HarnessError::Renderer(format!("vello_hybrid: {error:?}")))?;
         Ok((encoder, encoded))
     }
 
     /// Submit `encoder` and wait until the GPU has run it.
-    fn finish(&mut self, encoder: wgpu::CommandEncoder) -> Result<(), NativeError> {
+    fn finish(&mut self, encoder: wgpu::CommandEncoder) -> Result<(), HarnessError> {
         self.handle.queue.submit([encoder.finish()]);
         self.wait()
     }
 
-    fn wait(&self) -> Result<(), NativeError> {
+    fn wait(&self) -> Result<(), HarnessError> {
         self.handle
             .device
             .poll(wgpu::PollType::wait_indefinitely())
             .map(|_| ())
-            .map_err(|error| NativeError::Renderer(format!("wgpu poll: {error}")))
+            .map_err(|error| HarnessError::Renderer(format!("wgpu poll: {error}")))
     }
 }

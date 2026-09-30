@@ -11,7 +11,7 @@ use ds::{
     MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::MenuBarItem;
 use std::time::Duration;
 
@@ -120,10 +120,10 @@ fn settle_in(harness: &mut Harness) {
 fn the_menu_reports_the_choice_under_the_pointer() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
-    harness.pointer_move(row(&harness, "Open"));
-    harness.pointer_move(row(&harness, "Quit"));
+    harness.send(Input::pointer_move(row(&harness, "Open")));
+    harness.send(Input::pointer_move(row(&harness, "Quit")));
     let info = harness.centre(".ds-menu-info").expect("the status line");
-    harness.pointer_move(info);
+    harness.send(Input::pointer_move(info));
     assert_eq!(log(&harness), "hover:0,hover:2,hover:none");
 }
 
@@ -145,14 +145,14 @@ fn a_status_line_is_drawn_and_never_selected() {
         "a status line is no item"
     );
     // Up from the first choice wraps to the last, past the status line.
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::key(ShortcutKey::Up));
     assert_eq!(
         harness
             .text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
             .as_deref(),
         Some("Quit")
     );
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(
         harness
             .text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
@@ -166,13 +166,13 @@ fn a_status_line_is_drawn_and_never_selected() {
 fn a_press_dragged_onto_an_item_and_released_picks_it() {
     let mut harness = Harness::new(ClosedMenu, VIEW);
     let opener = harness.centre(".opener").expect("the opener");
-    harness.pointer_move(opener);
-    harness.pointer_down(opener);
+    harness.send(Input::pointer_move(opener));
+    harness.send(Input::pointer_down(opener));
     settle_in(&mut harness);
     assert_eq!(harness.count(".ds-menu"), 1, "the press opened the menu");
     let quit = row(&harness, "Quit");
-    harness.pointer_move(quit);
-    harness.pointer_up(quit);
+    harness.send(Input::pointer_move(quit));
+    harness.send(Input::pointer_up(quit));
     settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "hover:2,release:Primary,pick:3,close");
     assert_eq!(harness.count(".ds-menu"), 0, "the pick closed it");
@@ -183,12 +183,12 @@ fn a_press_dragged_onto_an_item_and_released_picks_it() {
 fn a_drag_released_on_a_disabled_item_closes_picking_nothing() {
     let mut harness = Harness::new(ClosedMenu, VIEW);
     let opener = harness.centre(".opener").expect("the opener");
-    harness.pointer_move(opener);
-    harness.pointer_down(opener);
+    harness.send(Input::pointer_move(opener));
+    harness.send(Input::pointer_down(opener));
     settle_in(&mut harness);
     let pause = row(&harness, "Pause");
-    harness.pointer_move(pause);
-    harness.pointer_up(pause);
+    harness.send(Input::pointer_move(pause));
+    harness.send(Input::pointer_up(pause));
     harness.advance(fade() + ms(40));
     assert_eq!(log(&harness), "hover:1,release:Primary,close");
 }
@@ -199,7 +199,7 @@ fn a_drag_released_on_a_disabled_item_closes_picking_nothing() {
 fn a_click_picks_before_it_closes() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
-    harness.click(row(&harness, "Open"));
+    harness.send(Input::click(row(&harness, "Open")));
     settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "hover:0,release:Primary,pick:1,close");
 }
@@ -213,13 +213,13 @@ fn fade() -> Duration {
 /// settled, not before.
 #[test]
 fn escape_fades_the_menu_out_before_it_closes() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         OpenMenu,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     settle_in(&mut harness);
     let escaped = harness.now();
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),
         Some("leaving")
@@ -245,10 +245,10 @@ fn escape_fades_the_menu_out_before_it_closes() {
 fn an_outside_click_fades_the_menu_out_before_it_closes() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: Px(440.0),
         y: Px(320.0),
-    });
+    }));
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),
         Some("leaving")
@@ -300,7 +300,7 @@ fn a_press_reports_where_it_happened() {
         (115.0, 35.0, PointerButton::Secondary),
     ];
     for &(x, y, button) in CASES {
-        harness.press(Point { x: Px(x), y: Px(y) }, button);
+        harness.send(Input::press(Point { x: Px(x), y: Px(y) }, button));
         assert_eq!(
             harness.text_of(".seen").as_deref(),
             Some(format!("{button:?} {x} {y}").as_str())
@@ -343,9 +343,9 @@ fn selected(harness: &Harness) -> Option<String> {
 fn home_and_end_go_to_the_first_and_last_enabled_choice() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
-    harness.key(ShortcutKey::End);
+    harness.send(Input::key(ShortcutKey::End));
     assert_eq!(selected(&harness).as_deref(), Some("Quit"));
-    harness.key(ShortcutKey::Home);
+    harness.send(Input::key(ShortcutKey::Home));
     assert_eq!(selected(&harness).as_deref(), Some("Open"));
 }
 
@@ -353,17 +353,17 @@ fn home_and_end_go_to_the_first_and_last_enabled_choice() {
 fn typing_a_letter_selects_the_choice_that_starts_with_it() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
-    harness.key(ShortcutKey::Char('q'));
+    harness.send(Input::key(ShortcutKey::Char('q')));
     assert_eq!(selected(&harness).as_deref(), Some("Quit"));
     harness.advance(ms(1200));
-    harness.key(ShortcutKey::Char('o'));
+    harness.send(Input::key(ShortcutKey::Char('o')));
     assert_eq!(
         selected(&harness).as_deref(),
         Some("Open"),
         "the buffer was forgotten"
     );
     harness.advance(ms(1200));
-    harness.key(ShortcutKey::Char('p'));
+    harness.send(Input::key(ShortcutKey::Char('p')));
     assert_eq!(
         selected(&harness).as_deref(),
         Some("Open"),

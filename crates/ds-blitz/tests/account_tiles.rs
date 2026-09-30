@@ -10,7 +10,7 @@ use ds::{
     Appearance, Colour, Ds, Grain, Hex, MarkProvider, Material, PinAdd, PinFace, PinItem, PinTiles,
     SpaceLook,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -85,7 +85,7 @@ fn the_add_tile_presses_and_is_never_pressed() {
         Some("Add account")
     );
     let before = harness.text_of(".log").unwrap_or_default();
-    harness.click(harness.centre(add).expect("the add tile"));
+    harness.send(Input::click(harness.centre(add).expect("the add tile")));
     harness.advance(ms(50));
     assert_eq!(before, "");
     assert_eq!(harness.text_of(".log").as_deref(), Some("add"));
@@ -99,7 +99,7 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
     harness.advance(ms(50));
     let tiles = ".ds-pin-tile[*|data-face=account]";
     let first = harness.centre(tiles).expect("the first tile");
-    harness.click(first);
+    harness.send(Input::click(first));
     harness.advance(ms(50));
     assert_eq!(harness.text_of(".log").as_deref(), Some("pick:P"));
     let third = {
@@ -112,14 +112,14 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
             y: first.y,
         }
     };
-    harness.pointer_move(first);
-    harness.pointer_down(first);
+    harness.send(Input::pointer_move(first));
+    harness.send(Input::pointer_down(first));
     harness.advance(ms(50));
     for part in [0.25f32, 0.5, 0.75, 1.0] {
-        harness.pointer_move(ds::Point {
+        harness.send(Input::pointer_move(ds::Point {
             x: ds::Px(first.x.0 + (third.x.0 - first.x.0) * part),
             y: first.y,
-        });
+        }));
         harness.advance(ms(20));
     }
     assert_eq!(
@@ -128,7 +128,7 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
         "the drop line shows where it would land"
     );
     assert_eq!(harness.count(".ds-pin-tile[*|data-drag=source]"), 1);
-    harness.pointer_up(third);
+    harness.send(Input::pointer_up(third));
     harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".log").as_deref(),

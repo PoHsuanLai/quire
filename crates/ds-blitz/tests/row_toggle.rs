@@ -7,7 +7,7 @@ use ds::{
     Accessory, Appearance, Availability, Check, Ds, Icon, Material, Point, Row, RowLeading,
     RowSize, RowState, TextLine,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -74,7 +74,10 @@ const SECOND: &str = ".list > .ds-row:last-child";
 fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
     let mut harness = Harness::new(RowsApp, VIEW);
     harness.advance(TICK);
-    harness.click(centre(&harness, &format!("{FIRST} .ds-toggle")));
+    harness.send(Input::click(centre(
+        &harness,
+        &format!("{FIRST} .ds-toggle"),
+    )));
     harness.advance(TICK);
     assert_eq!(
         log(&harness),
@@ -88,7 +91,10 @@ fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
         Some("true")
     );
 
-    harness.click(centre(&harness, &format!("{FIRST} .ds-row-title")));
+    harness.send(Input::click(centre(
+        &harness,
+        &format!("{FIRST} .ds-row-title"),
+    )));
     harness.advance(TICK);
     assert_eq!(
         log(&harness),
@@ -96,8 +102,14 @@ fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
         "the words run the row only"
     );
 
-    harness.click(centre(&harness, &format!("{SECOND} .ds-toggle")));
-    harness.click(centre(&harness, &format!("{SECOND} .ds-row-title")));
+    harness.send(Input::click(centre(
+        &harness,
+        &format!("{SECOND} .ds-toggle"),
+    )));
+    harness.send(Input::click(centre(
+        &harness,
+        &format!("{SECOND} .ds-row-title"),
+    )));
     harness.advance(TICK);
     assert_eq!(
         log(&harness),

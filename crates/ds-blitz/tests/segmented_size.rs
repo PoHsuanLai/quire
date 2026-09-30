@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, SegmentedControl};
 use ds::{Choice, ControlSize, Tracking};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 #[allow(non_snake_case)]

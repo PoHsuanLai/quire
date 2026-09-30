@@ -15,7 +15,7 @@ use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Material, Rect, ShortcutKey,
     person_hue,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use ds_shell::{LockUser, PolkitPrompt};
 use image::RgbaImage;
 use std::time::Duration;
@@ -191,11 +191,11 @@ fn typed_into(typed: &str, after: &[ShortcutKey]) -> Harness {
     let mut harness = Harness::new(Polkit, VIEW);
     harness.advance(Duration::from_millis(600));
     for c in typed.chars() {
-        harness.key(ShortcutKey::Char(c));
+        harness.send(Input::key(ShortcutKey::Char(c)));
         harness.advance(Duration::from_millis(20));
     }
     for &key in after {
-        harness.key(key);
+        harness.send(Input::key(key));
         harness.advance(Duration::from_millis(20));
     }
     harness.advance(Duration::from_millis(300));
@@ -205,10 +205,11 @@ fn typed_into(typed: &str, after: &[ShortcutKey]) -> Harness {
 /// Where the field's dots are once it has lost the keyboard (and whether a caret still paints):
 /// the dots unfocused are where they were, with no caret among them.
 fn blurred_dots(harness: &mut Harness, field: Rect) -> (Vec<Dot>, Option<f32>) {
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(Duration::from_millis(300));
-    assert!(
-        !harness.is_focused(".ds-polkit input"),
+    assert_eq!(
+        harness.focus_of(".ds-polkit input"),
+        FocusState::Unfocused,
         "Tab took the keyboard from the field"
     );
     let shot = harness.render().expect("a frame");
@@ -306,7 +307,7 @@ fn a_typed_secret_draws_its_dots_from_the_leading_edge_in_a_centred_card() {
     let mut harness = Harness::new(Polkit, VIEW);
     harness.advance(Duration::from_millis(600));
     for c in TYPED.chars() {
-        harness.key(ShortcutKey::Char(c));
+        harness.send(Input::key(ShortcutKey::Char(c)));
         harness.advance(Duration::from_millis(20));
     }
     assert_eq!(

@@ -9,7 +9,7 @@ use ds::{
     Appearance, Availability, Button, ControlSize, Ds, Fraction, Material, Progress,
     ProgressIndicator, ProgressStyle,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -47,8 +47,7 @@ fn Page() -> Element {
 }
 
 fn harness() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness
 }
@@ -124,8 +123,8 @@ fn a_busy_button_shows_a_spinner_and_takes_no_press() {
         Some("true")
     );
     let at = harness.centre("#button .ds-button").expect("the button");
-    harness.click(at);
-    harness.key(ds::ShortcutKey::Enter);
+    harness.send(Input::click(at));
+    harness.send(Input::key(ds::ShortcutKey::Enter));
     assert_eq!(PRESSES.get(), 0, "no press while busy");
     harness.within(|| *AVAILABILITY.write() = Availability::Enabled);
     harness.advance(ms(0));

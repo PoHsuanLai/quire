@@ -9,7 +9,7 @@ use ds::{
     Appearance, Ds, EdgePeek, LinkPill, LinkTarget, Material, Point, Px, RowLeading, Shown,
     TodayTab, TodayTabs,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -47,7 +47,7 @@ fn the_edge_peeks_the_sidebar_after_a_rest_and_hides_it_on_leaving() {
         x: Px(4.0),
         y: Px(150.0),
     };
-    harness.pointer_move(edge);
+    harness.send(Input::pointer_move(edge));
     harness.advance(ms(30));
     assert_eq!(
         side(&harness).as_deref(),
@@ -59,10 +59,10 @@ fn the_edge_peeks_the_sidebar_after_a_rest_and_hides_it_on_leaving() {
     harness.advance(ms(700));
     let style = harness.attr("nav.ds-side", "style").unwrap_or_default();
     assert!(style.contains("--present-p:1"), "in place: {style}");
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(350.0),
         y: Px(150.0),
-    });
+    }));
     harness.advance(ms(1000));
     assert_eq!(
         side(&harness).as_deref(),
@@ -75,10 +75,10 @@ fn the_edge_peeks_the_sidebar_after_a_rest_and_hides_it_on_leaving() {
 fn a_click_on_the_strip_pins_the_sidebar() {
     let mut harness = Harness::new(Edge, VIEW);
     harness.advance(ms(50));
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: Px(4.0),
         y: Px(150.0),
-    });
+    }));
     harness.advance(ms(100));
     assert_eq!(side(&harness).as_deref(), Some("shown"));
     assert_eq!(harness.count(".ds-edge"), 0, "no strip while pinned");
@@ -155,7 +155,7 @@ fn the_link_pill_expands_under_the_pointer_and_copies_on_a_click() {
         "collapsed: the domain only"
     );
     let pill = harness.centre(".ds-link-pill").expect("the pill");
-    harness.pointer_move(pill);
+    harness.send(Input::pointer_move(pill));
     harness.advance(ms(400));
     assert_eq!(
         harness.attr(".ds-link-pill", "data-expanded").as_deref(),
@@ -163,7 +163,7 @@ fn the_link_pill_expands_under_the_pointer_and_copies_on_a_click() {
     );
     assert!(harness.count(".ds-link-pill-dim") >= 1, "the whole address");
     let pill = harness.centre(".ds-link-pill").expect("the pill");
-    harness.click(pill);
+    harness.send(Input::click(pill));
     harness.advance(ms(100));
     assert_eq!(
         harness.text_of(".copied").as_deref(),

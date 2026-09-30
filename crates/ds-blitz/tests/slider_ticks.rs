@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Fraction, Material, Point, Px, ShortcutKey, Slider, Ticks};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(0));
@@ -41,8 +41,7 @@ fn level(harness: &mut Harness) -> u16 {
 
 #[test]
 fn a_press_and_the_arrows_stop_on_the_marks() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(
         harness.count(".ds-slider-tick"),
@@ -54,21 +53,21 @@ fn a_press_and_the_arrows_stop_on_the_marks() {
         x: Px(track.origin.x.0 + track.size.width.0 * share),
         y: Px(track.origin.y.0 + track.size.height.0 / 2.0),
     };
-    harness.pointer_move(at(0.62));
-    harness.pointer_down(at(0.62));
+    harness.send(Input::pointer_move(at(0.62)));
+    harness.send(Input::pointer_down(at(0.62)));
     harness.advance(ms(80));
-    harness.pointer_up(at(0.62));
+    harness.send(Input::pointer_up(at(0.62)));
     harness.advance(ms(80));
     assert_eq!(
         level(&mut harness),
         500,
         "62 % of the track is the middle mark"
     );
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(level(&mut harness), 750, "an arrow is one mark");
-    harness.key(ShortcutKey::Right);
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(level(&mut harness), 1000, "and stops at the end");
-    harness.key(ShortcutKey::Left);
+    harness.send(Input::key(ShortcutKey::Left));
     assert_eq!(level(&mut harness), 750);
 }

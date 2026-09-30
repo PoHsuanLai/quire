@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Ds, Material, Motion, MotionLevel, RootChrome, Shown, settle};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{BatteryWidget, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize};
 use std::time::Duration;
 
@@ -53,8 +53,7 @@ fn Reduced() -> Element {
 }
 
 fn harness(app: fn() -> Element) -> Harness {
-    let mut harness =
-        Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(1200));
     harness
 }

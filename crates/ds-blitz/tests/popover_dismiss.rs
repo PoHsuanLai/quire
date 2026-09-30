@@ -9,7 +9,7 @@ use ds::{
     Align, Anchor, Appearance, Arrow, Dismiss, Ds, Flip, Material, Placement, Point, Popover, Px,
     RootExtent, ShortcutKey, Side,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -52,8 +52,7 @@ fn Page() -> Element {
 fn start(dismiss: Dismiss, arrow: Arrow) -> Harness {
     DISMISS.with(|cell| cell.set(dismiss));
     ARROW.with(|cell| cell.set(arrow));
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(400));
     assert_eq!(
         harness.attr(".ds-popover", "data-presence").as_deref(),
@@ -65,10 +64,11 @@ fn start(dismiss: Dismiss, arrow: Arrow) -> Harness {
 /// The keyboard in the popover, where Escape is heard (a popover holds the keyboard as its
 /// content takes it).
 fn take_keyboard(harness: &mut Harness) {
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(ms(16));
-    assert!(
-        harness.is_focused("#inside"),
+    assert_eq!(
+        harness.focus_of("#inside"),
+        FocusState::Focused,
         "the button took the keyboard"
     );
 }
@@ -78,8 +78,8 @@ fn click_outside(harness: &mut Harness) {
         x: Px(600.0),
         y: Px(360.0),
     };
-    harness.pointer_down(at);
-    harness.pointer_up(at);
+    harness.send(Input::pointer_down(at));
+    harness.send(Input::pointer_up(at));
     harness.advance(ms(16));
 }
 
@@ -91,7 +91,7 @@ fn state(harness: &Harness) -> Option<String> {
 fn transient_closes_on_escape_and_on_an_outside_click_after_its_fade() {
     let mut harness = start(Dismiss::Transient, Arrow::None);
     take_keyboard(&mut harness);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(16));
     assert_eq!(
         harness.attr(".ds-popover", "data-presence").as_deref(),
@@ -126,7 +126,7 @@ fn semitransient_closes_on_escape_only() {
         "an outside click leaves it"
     );
     take_keyboard(&mut harness);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(400));
     assert_eq!(state(&harness).as_deref(), Some("closed"));
 }
@@ -136,7 +136,7 @@ fn manual_closes_on_neither() {
     let mut harness = start(Dismiss::Manual, Arrow::None);
     click_outside(&mut harness);
     take_keyboard(&mut harness);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(600));
     assert_eq!(
         state(&harness).as_deref(),

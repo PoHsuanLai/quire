@@ -12,7 +12,7 @@ use ds::{
 };
 use ds::{Bezel, ImagePosition};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -91,8 +91,7 @@ fn Page() -> Element {
 }
 
 fn settled() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness
 }
@@ -104,7 +103,7 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 }
 
 fn press(harness: &mut Harness, at: Point) {
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(400));
 }
 
@@ -169,7 +168,7 @@ fn a_branch_opens_over_the_move_duration_from_its_measured_height() {
     let mut harness = settled();
     let open = body(&harness, PROJECTS);
     let triangle = centre(&harness, &format!("{PROJECTS} .ds-row-disclosure"));
-    harness.click(triangle);
+    harness.send(Input::click(triangle));
     harness.advance(ds::settle(ds::Anim::Heal, ds::MotionLevel::Standard) / 3);
     let mid = body(&harness, PROJECTS);
     assert!(
@@ -345,7 +344,9 @@ fn the_field_takes_the_titles_place_and_moves_nothing() {
 #[test]
 fn the_field_has_the_keyboard_with_its_text_selected() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| harness.is_focused(FIELD));
+    settle_until(&mut edit, |harness| {
+        harness.focus_of(FIELD) == FocusState::Focused
+    });
     settle_until(&mut edit, |harness| {
         harness.selected_text(FIELD).as_deref() == Some("Projects")
     });
@@ -354,15 +355,21 @@ fn the_field_has_the_keyboard_with_its_text_selected() {
 #[test]
 fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| harness.is_focused(FIELD));
+    settle_until(&mut edit, |harness| {
+        harness.focus_of(FIELD) == FocusState::Focused
+    });
     let at = edit.centre(FIELD).expect("the field is laid out");
-    edit.click(at);
+    edit.send(Input::click(at));
     edit.advance(ms(50));
     for c in "Work".chars() {
-        edit.key(ShortcutKey::Char(c));
+        edit.send(Input::key(ShortcutKey::Char(c)));
         edit.advance(ms(20));
     }
-    assert!(edit.is_focused(FIELD), "the field kept the keyboard");
+    assert_eq!(
+        edit.focus_of(FIELD),
+        FocusState::Focused,
+        "the field kept the keyboard"
+    );
     assert_eq!(log(&edit), "", "no toggle, no select");
     assert_eq!(
         edit.attr(PROJECTS, "aria-expanded").as_deref(),
@@ -373,12 +380,14 @@ fn a_press_and_typing_in_the_field_neither_toggle_nor_select_the_row() {
 #[test]
 fn enter_and_escape_reach_the_fields_handler_and_end_the_rename() {
     let mut edit = started(renaming);
-    settle_until(&mut edit, |harness| harness.is_focused(FIELD));
+    settle_until(&mut edit, |harness| {
+        harness.focus_of(FIELD) == FocusState::Focused
+    });
     for c in "Work".chars() {
-        edit.key(ShortcutKey::Char(c));
+        edit.send(Input::key(ShortcutKey::Char(c)));
         edit.advance(ms(20));
     }
-    edit.key(ShortcutKey::Enter);
+    edit.send(Input::key(ShortcutKey::Enter));
     settle_until(&mut edit, |harness| harness.count(FIELD) == 0);
     assert_eq!(log(&edit), "enter:Work");
     assert_eq!(
@@ -387,8 +396,10 @@ fn enter_and_escape_reach_the_fields_handler_and_end_the_rename() {
         Some("Work")
     );
     let mut again = started(renaming);
-    settle_until(&mut again, |harness| harness.is_focused(FIELD));
-    again.key(ShortcutKey::Escape);
+    settle_until(&mut again, |harness| {
+        harness.focus_of(FIELD) == FocusState::Focused
+    });
+    again.send(Input::key(ShortcutKey::Escape));
     settle_until(&mut again, |harness| harness.count(FIELD) == 0);
     assert_eq!(log(&again), "escape");
 }
@@ -399,7 +410,7 @@ fn a_press_on_the_row_selects_once_the_rename_is_over() {
     let at = read
         .centre(&format!("{PROJECTS} .ds-row-title"))
         .expect("the title");
-    read.click(at);
+    read.send(Input::click(at));
     read.advance(ms(50));
     assert_eq!(log(&read), "select");
 }

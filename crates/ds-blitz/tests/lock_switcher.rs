@@ -11,7 +11,9 @@ use ds::{
     Material, MotionLevel, PlateFamily, Px, RootChrome, ShortcutKey, person_hue, settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{
+    ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport,
+};
 use ds_shell::{
     AppKey, AppSwitcher, EmojiId, LockPrompt, LockUser, PolkitPrompt, PromptState, SwitcherApp,
 };
@@ -96,7 +98,7 @@ fn Polkit() -> Element {
 /// Type `text` into the focused field, one key at a time, letting each render land.
 fn type_text(harness: &mut Harness, text: &str) {
     for c in text.chars() {
-        harness.key(ShortcutKey::Char(c));
+        harness.send(Input::key(ShortcutKey::Char(c)));
         harness.advance(ms(20));
     }
 }
@@ -106,8 +108,7 @@ fn type_text(harness: &mut Harness, text: &str) {
 // mood or shake timer settle inside a step meant to hold it (the emoji glances test
 // flaked this way).
 fn mounted(app: fn() -> Element) -> Harness {
-    let mut harness =
-        Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| {
         *STATE.write() = PromptState::Idle;
         HEARD.write().clear();
@@ -124,7 +125,7 @@ fn set_state(harness: &mut Harness, state: PromptState) {
 }
 
 fn shaking(harness: &Harness) -> bool {
-    harness.has_class(".ds-lock-prompt .ds-password-field", "a-shake-x")
+    harness.has_class(".ds-lock-prompt .ds-password-field", "a-shake-x") == ClassPresence::Present
 }
 
 fn dots(harness: &Harness, field: &str) -> Option<String> {
@@ -136,8 +137,9 @@ const LOCK_INPUT: &str = ".ds-lock-prompt .ds-password-field input";
 #[test]
 fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     let mut harness = mounted(Lock);
-    assert!(
-        harness.is_focused(LOCK_INPUT),
+    assert_eq!(
+        harness.focus_of(LOCK_INPUT),
+        FocusState::Focused,
         "the field takes the keyboard"
     );
     type_text(&mut harness, "abc");
@@ -183,8 +185,9 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
         Some(String::new()),
         "the caller heard the field empty"
     );
-    assert!(
-        harness.is_focused(LOCK_INPUT),
+    assert_eq!(
+        harness.focus_of(LOCK_INPUT),
+        FocusState::Focused,
         "the caret is back in the field"
     );
 
@@ -245,7 +248,7 @@ fn enter_hands_the_secret_to_onsubmit_and_never_writes_it() {
         "the secret is not in the markup"
     );
     let before = harness.within(|| SUBMITTED.peek().len());
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| SUBMITTED.peek().clone()),
@@ -266,7 +269,9 @@ fn the_arrow_submits_and_shows_only_once_something_is_typed() {
         harness.attr(".ds-lock-go", "data-filled").as_deref(),
         Some("typed")
     );
-    harness.click(harness.centre(".ds-lock-go").expect("the arrow"));
+    harness.send(Input::click(
+        harness.centre(".ds-lock-go").expect("the arrow"),
+    ));
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| SUBMITTED.peek().clone()),
@@ -282,14 +287,14 @@ fn escape_empties_the_field() {
         dots(&harness, ".ds-lock-prompt .ds-password-field").as_deref(),
         Some("•••")
     );
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(40));
     assert_eq!(dots(&harness, ".ds-lock-prompt .ds-password-field"), None);
     assert_eq!(
         harness.within(|| HEARD.peek().last().cloned()),
         Some(String::new())
     );
-    assert!(harness.is_focused(LOCK_INPUT));
+    assert_eq!(harness.focus_of(LOCK_INPUT), FocusState::Focused);
     // And it takes typing again from nothing.
     type_text(&mut harness, "z");
     assert_eq!(
@@ -315,7 +320,7 @@ fn checking_closes_the_field() {
         heard,
         "no input while checking"
     );
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(20));
     assert!(
         harness.within(|| SUBMITTED.peek().is_empty()),
@@ -331,21 +336,24 @@ fn checking_closes_the_field() {
 fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
     let mut harness = mounted(Polkit);
     let input = ".ds-polkit .ds-password-field input";
-    if !harness.is_focused(input) {
-        harness.click(harness.centre(input).expect("the field"));
+    if harness.focus_of(input) == FocusState::Unfocused {
+        harness.send(Input::click(harness.centre(input).expect("the field")));
         harness.advance(ms(30));
     }
     type_text(&mut harness, "pw");
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| SUBMITTED.peek().clone()),
         vec!["pw".to_owned()]
     );
     set_state(&mut harness, PromptState::Wrong);
-    assert!(harness.has_class(".ds-polkit .ds-password-field", "a-shake-x"));
+    assert_eq!(
+        harness.has_class(".ds-polkit .ds-password-field", "a-shake-x"),
+        ClassPresence::Present
+    );
     settle_until(&mut harness, |h| {
-        !h.has_class(".ds-polkit .ds-password-field", "a-shake-x")
+        h.has_class(".ds-polkit .ds-password-field", "a-shake-x") == ClassPresence::Absent
     });
     assert_eq!(
         dots(&harness, ".ds-polkit .ds-password-field"),
@@ -356,7 +364,7 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
     let cancel = harness
         .centre(".ds-polkit-actions .ds-button[*|data-answers=escape]")
         .expect("Cancel");
-    harness.click(cancel);
+    harness.send(Input::click(cancel));
     harness.advance(ms(30));
     assert_eq!(harness.within(|| *CANCELLED.peek()), 1);
 }
@@ -365,13 +373,13 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
 fn escape_in_the_polkit_field_cancels() {
     let mut harness = mounted(Polkit);
     let input = ".ds-polkit .ds-password-field input";
-    if !harness.is_focused(input) {
-        harness.click(harness.centre(input).expect("the field"));
+    if harness.focus_of(input) == FocusState::Unfocused {
+        harness.send(Input::click(harness.centre(input).expect("the field")));
         harness.advance(ms(30));
     }
     type_text(&mut harness, "pw");
     let before = harness.within(|| *CANCELLED.peek());
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(30));
     assert_eq!(harness.within(|| *CANCELLED.peek()), before + 1);
     assert!(harness.within(|| SUBMITTED.peek().is_empty()));
@@ -446,7 +454,7 @@ fn cell(key: &str) -> String {
 fn the_switcher_reports_the_tile_hovered_and_the_tile_clicked() {
     let mut harness = switcher(5, 1440.0, "files");
     let notes = harness.centre(&cell("notes")).expect("the notes tile");
-    harness.pointer_move(notes);
+    harness.send(Input::pointer_move(notes));
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| HOVERED.peek().last().cloned()),
@@ -455,7 +463,7 @@ fn the_switcher_reports_the_tile_hovered_and_the_tile_clicked() {
     let terminal = harness
         .centre(&cell("terminal"))
         .expect("the terminal tile");
-    harness.click(terminal);
+    harness.send(Input::click(terminal));
     harness.advance(ms(30));
     assert_eq!(
         harness.within(|| ACTIVATED.peek().clone()),

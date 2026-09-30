@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SystemPrefs};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel};
 use std::cell::Cell;
 use std::time::Duration;

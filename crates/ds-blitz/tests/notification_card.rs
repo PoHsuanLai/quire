@@ -8,7 +8,7 @@ use ds::{
     Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, ShortcutKey, TextRun,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
 
 const VIEW: Viewport = Viewport {
@@ -79,7 +79,7 @@ fn the_close_button_an_action_and_a_link_keep_their_press() {
     let mut harness = Harness::new(Card, VIEW);
     harness.within(|| LOG.write().clear());
     let over = centre(&harness, ".ds-notification-plate");
-    harness.pointer_move(over);
+    harness.send(Input::pointer_move(over));
     settle_until(&mut harness, |h| {
         h.attr(".ds-notification", "data-hover").as_deref() == Some("on")
     });
@@ -92,11 +92,11 @@ fn the_close_button_an_action_and_a_link_keep_their_press() {
     });
 
     let close = centre(&harness, ".ds-notification-close");
-    harness.click(close);
+    harness.send(Input::click(close));
     let action = centre(&harness, ".ds-notification-actions .ds-button");
-    harness.click(action);
+    harness.send(Input::click(action));
     let link = centre(&harness, ".ds-run-link");
-    harness.click(link);
+    harness.send(Input::click(link));
     let entries = log(&mut harness);
     assert!(
         entries.contains(&"close".to_owned()),
@@ -114,13 +114,13 @@ fn the_close_button_an_action_and_a_link_keep_their_press() {
 
     // A press on the card itself opens it, on its words as on its body's text.
     let head = centre(&harness, ".ds-notification-summary");
-    harness.click(head);
+    harness.send(Input::click(head));
     assert_eq!(log(&mut harness).iter().filter(|e| *e == "open").count(), 1);
     let text = harness.rect(".ds-notification-body").expect("a body");
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: ds::Px(text.origin.x.0 + text.size.width.0 - 20.0),
         y: ds::Px(text.origin.y.0 + 8.0),
-    });
+    }));
     assert_eq!(log(&mut harness).iter().filter(|e| *e == "open").count(), 2);
 }
 
@@ -138,7 +138,7 @@ fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves(
     );
 
     let over = centre(&harness, ".ds-notification-plate");
-    harness.pointer_move(over);
+    harness.send(Input::pointer_move(over));
     settle_until(&mut harness, |h| body_height(h) >= rest * 2.95);
     let open = body_height(&harness);
     assert!(
@@ -149,10 +149,10 @@ fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves(
         assert!(LOG.peek().contains(&"hover Over".to_owned()));
     });
 
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: ds::Px(470.0),
         y: ds::Px(350.0),
-    });
+    }));
     settle_until(&mut harness, |h| (body_height(h) - rest).abs() < 0.5);
     assert_eq!(
         harness.attr(".ds-notification", "data-hover").as_deref(),
@@ -166,8 +166,8 @@ fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves(
 /// Tab until `selector` has the keyboard, at most `limit` presses.
 fn tab_to(harness: &mut Harness, selector: &str, limit: usize) -> bool {
     (0..limit).any(|_| {
-        harness.key(ShortcutKey::Tab);
-        harness.is_focused(selector)
+        harness.send(Input::key(ShortcutKey::Tab));
+        harness.focus_of(selector) == FocusState::Focused
     })
 }
 
@@ -186,10 +186,10 @@ fn the_close_button_takes_the_keyboard_and_closes_on_enter_and_space() {
             .count()
     };
     let before = closes(&mut harness);
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(std::time::Duration::from_millis(50));
     assert_eq!(closes(&mut harness), before + 1, "Enter closes");
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Space));
     harness.advance(std::time::Duration::from_millis(50));
     assert_eq!(closes(&mut harness), before + 2, "Space closes");
     assert!(

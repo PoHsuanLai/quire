@@ -10,7 +10,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px, Rect};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
 use std::cell::Cell;
 use std::time::Duration;
@@ -115,18 +115,18 @@ fn a_banner_starts_past_its_right_edge_and_rests_on_its_place() {
 fn a_card_swiped_away_leaves_along_the_swipe_and_its_row_goes() {
     let (mut harness, probes, _) = enter();
     let at = probes.rest;
-    harness.pointer_down(at);
+    harness.send(Input::pointer_down(at));
     for step in 1..=4u8 {
         harness.advance(Duration::from_millis(100));
-        harness.pointer_move(Point {
+        harness.send(Input::pointer_move(Point {
             x: Px(at.x.0 + 25.0 * f32::from(step)),
             y: at.y,
-        });
+        }));
     }
-    harness.pointer_up(Point {
+    harness.send(Input::pointer_up(Point {
         x: Px(at.x.0 + 100.0),
         y: at.y,
-    });
+    }));
     assert_eq!(
         harness.attr(".ds-banner", "data-presence").as_deref(),
         Some("leaving")

@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{Margins, PageSize, PageSpec, Pt};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Viewport};
 use pdfrum::{Document, RenderOptions, VelloCpuBackend};
 
 /// The content box: 480 x 360 CSS px, 64 px (48 pt) of margin all round.

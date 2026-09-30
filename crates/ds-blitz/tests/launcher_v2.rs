@@ -9,7 +9,9 @@ use ds::{
     EmojiCells, FieldKey, Material, PaletteGroup, PaletteGroups, PaneContent, PreviewPane,
     ShortcutKey,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{
+    ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -91,8 +93,9 @@ fn selected(harness: &Harness) -> String {
 fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
     let mut harness = Harness::new(GridPalette, VIEW);
     harness.advance(ms(200));
-    assert!(
-        harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Focused,
         "the field has the keyboard"
     );
     assert_eq!(selected(&harness), "One");
@@ -115,16 +118,17 @@ fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
         (ShortcutKey::Down, "cell 0"),
     ];
     for (step, (key, want)) in walk.iter().enumerate() {
-        harness.key(*key);
+        harness.send(Input::key(*key));
         harness.advance(ms(20));
         assert_eq!(selected(&harness), *want, "step {step}: {key:?}");
     }
     assert_eq!(harness.count(".ds-emoji-cell[*|aria-selected=true]"), 1);
-    assert!(
+    assert_eq!(
         harness.has_class("#card .ds-emoji-grid", "ds-emoji-text"),
+        ClassPresence::Present,
         "the grid paints in the colour face"
     );
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(20));
     assert_eq!(log(&harness), "close,pick:20");
 }
@@ -181,8 +185,8 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
         harness.count(".ds-section-header-action[*|data-selected=true]"),
         0
     );
-    harness.key(ShortcutKey::Down);
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(20));
     assert_eq!(harness.count(".ds-row[*|aria-selected=true]"), 0);
     assert_eq!(
@@ -193,7 +197,7 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
         "the cursor rests on the header's action"
     );
     let rows_before = harness.count("#card .ds-row");
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(20));
     assert_eq!(log(&harness), "more", "the action ran and nothing closed");
     assert_eq!(harness.count("#card .ds-row"), rows_before + 1);
@@ -208,8 +212,8 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
             .as_deref(),
         Some("Terminal")
     );
-    harness.key(ShortcutKey::Down);
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(20));
     assert_eq!(
         harness
@@ -301,26 +305,26 @@ fn a_claim_takes_space_only_while_browsing_and_right_only_at_the_end() {
         ShortcutKey::Char('b'),
         ShortcutKey::Space,
     ] {
-        harness.key(key);
+        harness.send(Input::key(key));
         harness.advance(ms(20));
     }
     assert_eq!(query(&harness), "[ab ]", "typing, Space is typed");
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(20));
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Space));
     harness.advance(ms(20));
     assert_eq!(query(&harness), "[ab ]", "browsing, Space is the caller's");
     assert!(log(&harness).ends_with(" @end,pane"), "{}", log(&harness));
-    harness.key(ShortcutKey::Left);
+    harness.send(Input::key(ShortcutKey::Left));
     harness.advance(ms(20));
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     harness.advance(ms(20));
     assert!(
         log(&harness).ends_with("ArrowLeft@end,ArrowRight@inside"),
         "Right inside the text is the field's: {}",
         log(&harness)
     );
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     harness.advance(ms(20));
     assert!(
         log(&harness).ends_with("ArrowRight@end,show"),
@@ -393,7 +397,7 @@ fn width(harness: &Harness, selector: &str) -> f32 {
 }
 
 fn toggle(harness: &mut Harness) {
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(ms(60));
 }
 
@@ -475,10 +479,13 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
     let mut harness = Harness::new(LoneGrid, VIEW);
     harness.advance(ms(100));
     let first = harness.centre(".ds-emoji-cell").expect("a cell");
-    harness.click(first);
-    ds_harness::harness::settle_until(&mut harness, |harness| harness.is_focused(".ds-emoji-grid"));
-    assert!(
-        harness.is_focused(".ds-emoji-grid"),
+    harness.send(Input::click(first));
+    ds_harness::harness::settle_until(&mut harness, |harness| {
+        harness.focus_of(".ds-emoji-grid") == FocusState::Focused
+    });
+    assert_eq!(
+        harness.focus_of(".ds-emoji-grid"),
+        FocusState::Focused,
         "the grid has the keyboard"
     );
     let at = |harness: &Harness| {
@@ -495,11 +502,11 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
         (ShortcutKey::Left, "cell 8"),
     ];
     for (step, (key, want)) in walk.iter().enumerate() {
-        harness.key(*key);
+        harness.send(Input::key(*key));
         harness.advance(ms(20));
         assert_eq!(at(&harness), *want, "step {step}: {key:?}");
     }
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(20));
     assert_eq!(harness.text_of(".picked").as_deref(), Some("Some(28)"));
 }
@@ -526,7 +533,7 @@ fn LeavingPane() -> Element {
 /// that has settled (`settle(PaneOutR)`, 284 ms at Standard), so the caller drops it then.
 #[test]
 fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         LeavingPane,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
@@ -536,7 +543,7 @@ fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
         Some("present")
     );
     let at = harness.centre(".hide").expect("the button");
-    harness.click(at);
+    harness.send(Input::click(at));
     let asked = harness.now();
     harness.advance(ms(20));
     assert_eq!(

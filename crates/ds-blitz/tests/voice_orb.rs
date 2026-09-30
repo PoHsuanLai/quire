@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Activity, Appearance, Ds, Material, Motion, Px, VoiceOrb};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Backdrop, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Backdrop, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -31,7 +31,7 @@ fn Stage() -> Element {
 
 /// The orb at rest on the virtual clock: inactive, standard motion.
 fn virtual_harness() -> Harness {
-    Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 /// Set the orb's activity from outside, as its owner would.

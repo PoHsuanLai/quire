@@ -11,7 +11,7 @@ use ds::{
     PaletteGroups, ShortcutKey,
 };
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -132,10 +132,10 @@ fn run_action(harness: &mut Harness) {
         if harness.count(".ds-section-header-action[*|data-selected=true]") == 1 {
             break;
         }
-        harness.key(ShortcutKey::Down);
+        harness.send(Input::key(ShortcutKey::Down));
         harness.advance(ms(10));
     }
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(20));
 }
 
@@ -205,7 +205,7 @@ fn a_click_on_show_more_plays_the_same_expand() {
     let at = harness
         .centre(".ds-section-header-action")
         .expect("the action");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(20));
     assert_eq!(harness.count("[*|data-row-motion=in]"), 4);
     assert_settles_to_zero_frames(&mut harness);

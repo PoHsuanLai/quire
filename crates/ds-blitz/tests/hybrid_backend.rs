@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Point, Px};
 use ds_blitz::AdapterPref;
-use ds_harness::{Backend, Harness, HarnessConfig, Viewport};
+use ds_harness::{Backend, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::time::{Duration, Instant};
 
 const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
@@ -34,7 +34,7 @@ fn hybrid(app: fn() -> Element, viewport: Viewport, pref: AdapterPref) -> Option
     let config = HarnessConfig::new(viewport)
         .with_backend(Backend::Hybrid)
         .with_adapter(pref);
-    match Harness::try_with_config(app, config) {
+    match Harness::try_new(app, config) {
         Ok(harness) => Some(harness),
         Err(error) => {
             eprintln!("skipped: no GPU ({error})");
@@ -156,7 +156,7 @@ fn scroll(label: &str, mut harness: Harness) {
         // Kept on Wall: a real wall-clock timing, this is the benchmark's own measurement of
         // how long the wheel event's style/layout actually took, not a correctness bound.
         let started = Instant::now();
-        harness.wheel(at, Px(0.0), Px(-STEP));
+        harness.send(Input::wheel(at, Px(0.0), Px(-STEP)));
         layouts.push(started.elapsed());
         let time = harness.paint_timed().expect("paints");
         frames.push(time.total);

@@ -13,7 +13,7 @@ use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{Appearance, Ds, LevelStyle, Material, Scheme, Theme};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use image::{Rgba, RgbaImage, imageops};
 use std::cell::Cell;
 use std::path::Path;

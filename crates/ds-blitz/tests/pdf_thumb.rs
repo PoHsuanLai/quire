@@ -11,7 +11,7 @@ use ds::{Appearance, Ds, Material, PdfPage, PdfTrouble, Px, Scale, Size};
 use ds_blitz::{DeviceBox, PdfFileThumb, ThumbRequest};
 use ds_blitz::{pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, Encryption, SaveOptions, blank_document, save};
 use peniko::Color;
@@ -371,7 +371,7 @@ fn the_pane_draws_a_pdf_from_its_path_through_use_pdf_page() {
         Some("web")
     );
     let at = harness.centre(".to-pdf").expect("the button");
-    harness.click(at);
+    harness.send(Input::click(at));
     settle_until(&mut harness, |h| {
         h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("ready")
     });

@@ -11,7 +11,7 @@ use ds::{
     Anim, Appearance, Ds, Material, MotionLevel, Point, Px, RootExtent, Shown, SidePanel, settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const CSS: &str = "@keyframes slide{ from{ transform:translateX(400px); } to{ transform:none; } }
@@ -47,7 +47,7 @@ fn ms(n: u64) -> Duration {
 fn cancelled(after: u64) -> Harness {
     let mut h = Harness::new(sliding_box, BOX_VIEW);
     h.advance(ms(after));
-    h.click(at(620.0, 20.0));
+    h.send(Input::click(at(620.0, 20.0)));
     h.advance(ms(2000));
     assert_eq!(h.attr(".box", "class").as_deref(), Some("box"));
     assert!(!h.is_animating());

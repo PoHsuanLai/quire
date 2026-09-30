@@ -8,7 +8,7 @@ use ds::detail::Touch;
 use ds::motion::{PxPerUnit, SpringPhase, SpringResponse, SpringSpec, Throw, Velocity, use_spring};
 use ds::{Appearance, Check, Ds, Fraction, Material, Point, Px, RootExtent, Slider, Toggle};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -21,7 +21,7 @@ const VIEW: Viewport = Viewport {
 const FRAME: Duration = ds::FRAME_TICK;
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 // ---- A bare spring: interruption continuity ---------------------------------------------
@@ -125,20 +125,20 @@ fn a_slider_thrown_from_thirty_percent_lands_where_the_throw_projects() {
         y: Px(track.origin.y.0 + 11.0),
     };
     // Down at 20 %, then two quick moves to 30 % in 16 ms steps: 24 px per frame, 1500 px/s.
-    harness.pointer_down(at(0.18));
+    harness.send(Input::pointer_down(at(0.18)));
     harness.advance(FRAME);
-    harness.pointer_move(at(0.18));
+    harness.send(Input::pointer_move(at(0.18)));
     harness.advance(FRAME);
     let step = 1500.0 * FRAME.as_secs_f32();
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(x0 + width * 0.30 - step),
         y: at(0.3).y,
-    });
+    }));
     harness.advance(FRAME);
-    harness.pointer_move(at(0.30));
+    harness.send(Input::pointer_move(at(0.30)));
     let released = harness.text_of(".level").unwrap_or_default();
     assert_eq!(released, "300", "the drag held it at 30 %");
-    harness.pointer_up(at(0.30));
+    harness.send(Input::pointer_up(at(0.30)));
     harness.advance(Duration::ZERO);
 
     let projected = Throw {
@@ -175,9 +175,9 @@ fn a_slider_let_go_while_still_keeps_its_value() {
         x: Px(track.origin.x.0 + track.size.width.0 * 0.5),
         y: Px(track.origin.y.0 + 11.0),
     };
-    harness.pointer_down(at);
+    harness.send(Input::pointer_down(at));
     harness.advance(Duration::from_millis(200));
-    harness.pointer_up(at);
+    harness.send(Input::pointer_up(at));
     harness.advance(Duration::ZERO);
     assert_eq!(harness.text_of(".level").as_deref(), Some("500"));
     assert_settles_to_zero_frames(&mut harness);
@@ -210,11 +210,11 @@ fn a_toggle_clicked_again_mid_slide_turns_back_from_where_it_is() {
     let mut harness = virtual_harness(Wifi);
     harness.advance(Duration::ZERO);
     let centre = harness.centre(".ds-toggle").expect("the toggle");
-    harness.click(centre);
+    harness.send(Input::click(centre));
     harness.advance(FRAME * 4);
     let mid = knob(&harness);
     assert!((1.0..11.0).contains(&mid), "mid-slide: {mid}");
-    harness.click(centre);
+    harness.send(Input::click(centre));
     harness.advance(Duration::ZERO);
     let turned = knob(&harness);
     assert!(

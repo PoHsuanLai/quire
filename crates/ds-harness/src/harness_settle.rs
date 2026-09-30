@@ -1,10 +1,11 @@
-//! `Harness::advance` lets real wall-clock time pass (`harness` module doc): a test that asks
+//! `Driver::advance` lets real wall-clock time pass (`harness` module doc): a test that asks
 //! for exactly the time a settle takes can see it land early or late on a loaded machine. A test
 //! that instead polls for the state it wants, up to a generous bound, and checks *when* that
 //! landed relative to other events, survives load. [`settle_until`] is that poll, shared so every
 //! test times a settle the same way instead of growing its own copy (as `cc_pane_switcher.rs` and
 //! `coherence.rs` each once did).
 
+use crate::driver::Driver;
 use crate::harness::Harness;
 use ds::VirtualClock;
 use std::time::{Duration, Instant};

@@ -13,7 +13,7 @@ use ds::{
 };
 use ds::{MotionLevel, settle};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 // `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are
@@ -68,7 +68,7 @@ fn ask(harness: &mut Harness, id: &str) {
     let at = harness
         .centre(&format!("#{id}"))
         .unwrap_or_else(|| panic!("#{id} is missing:\n{}", harness.html()));
-    harness.click(at);
+    harness.send(Input::click(at));
 }
 
 /// How long a pane switch takes to settle at the Standard level (both panes play `--t-move`).
@@ -135,7 +135,7 @@ fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
 
 #[test]
 fn a_switch_during_a_slide_reverses_cleanly() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         PanesApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );

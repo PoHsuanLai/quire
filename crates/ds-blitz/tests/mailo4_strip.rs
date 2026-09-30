@@ -8,7 +8,7 @@ use ds::{
     StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -89,7 +89,7 @@ fn press(app: fn() -> Element) -> String {
     let at = harness
         .centre(".ds-strip .ds-button")
         .unwrap_or_else(|| panic!("no strip button:\n{}", harness.html()));
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(Duration::from_millis(200));
     harness.text_of(".log").unwrap_or_default()
 }

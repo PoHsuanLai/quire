@@ -9,7 +9,7 @@ use ds::{
     ProgressStyle, PulseKey,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport, snapshot, snapshot_at};
+use ds_harness::{Driver, Harness, Query, Viewport, snapshot, snapshot_at};
 use image::RgbaImage;
 use std::time::Duration;
 

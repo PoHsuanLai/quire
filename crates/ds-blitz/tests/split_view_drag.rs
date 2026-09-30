@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, PaneSpec, Point, Px, Shown, SplitPane, SplitView};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -38,8 +38,7 @@ fn width(harness: &Harness) -> f32 {
 }
 
 fn harness() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     harness
 }
@@ -53,25 +52,25 @@ fn dragging_the_divider_sizes_the_pane_within_its_widths() {
     let mut harness = harness();
     assert_eq!(width(&harness), 240.0);
     let from = divider(&harness);
-    harness.drag(
+    harness.send(Input::drag(
         from,
         Point {
             x: Px(from.x.0 + 40.0),
             y: from.y,
         },
         8,
-    );
+    ));
     harness.advance(Duration::from_millis(600));
     assert_eq!(width(&harness), 280.0);
     let from = divider(&harness);
-    harness.drag(
+    harness.send(Input::drag(
         from,
         Point {
             x: Px(from.x.0 + 200.0),
             y: from.y,
         },
         8,
-    );
+    ));
     harness.advance(Duration::from_millis(600));
     assert_eq!(width(&harness), 320.0, "held to the most");
 }
@@ -80,20 +79,20 @@ fn dragging_the_divider_sizes_the_pane_within_its_widths() {
 fn a_drag_past_half_the_least_folds_the_pane_and_a_double_click_reopens_it() {
     let mut harness = harness();
     let from = divider(&harness);
-    harness.drag(
+    harness.send(Input::drag(
         from,
         Point {
             x: Px(from.x.0 - 200.0),
             y: from.y,
         },
         10,
-    );
+    ));
     harness.advance(Duration::from_millis(1500));
     assert_eq!(harness.text_of(".shown").as_deref(), Some("hidden"));
     assert!(width(&harness) < 1.0, "folded: {}", width(&harness));
     let at = divider(&harness);
-    harness.click(at);
-    harness.click(at);
+    harness.send(Input::click(at));
+    harness.send(Input::click(at));
     harness.advance(Duration::from_millis(1500));
     assert_eq!(harness.text_of(".shown").as_deref(), Some("visible"));
     assert_eq!(width(&harness), 240.0);

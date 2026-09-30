@@ -9,7 +9,7 @@ use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey,
     use_focus_request,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;
@@ -25,7 +25,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 // ---- a feed's wake runs at the instant of the ask --------------------------------------
@@ -138,7 +138,7 @@ fn Shown() -> Element {
 /// time (`None` if it never did within 100 ms).
 fn focus_landed(harness: &mut Harness, start: Instant) -> Option<Duration> {
     for _ in 0..=100 {
-        if harness.is_focused("#target") {
+        if harness.focus_of("#target") == FocusState::Focused {
             return Some(harness.now() - start);
         }
         harness.advance(ms(1));
@@ -169,7 +169,7 @@ fn a_focus_asked_from_a_press_lands_in_the_same_frame_every_run() {
             harness.advance(ms(50));
             let open = harness.centre("#open").expect("the button is laid out");
             let start = harness.now();
-            harness.click(open);
+            harness.send(Input::click(open));
             assert_eq!(harness.attr("#presses", "data-n").as_deref(), Some("1"));
             focus_landed(&mut harness, start)
         })
@@ -228,7 +228,7 @@ fn the_palette_reports_the_newly_selected_row_in_the_frame_it_was_selected() {
     harness.advance(ms(300));
     let first = harness.rect(&nth_row(1)).expect("the first row");
     assert_eq!(reported(&mut harness), Some(first));
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     let second = harness.rect(&nth_row(2)).expect("the second row");
     assert!(second.origin.y.0 > first.origin.y.0);
     assert_eq!(

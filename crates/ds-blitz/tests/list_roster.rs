@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Ds, List, ListItem, Material, Motion, MotionLevel, settle};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
 
@@ -102,7 +102,7 @@ fn start(keys: &[u32], motion: Motion) -> Harness {
     MOTION.with(|cell| cell.set(motion));
     FIRST.with(|first| first.replace(keys.to_vec()));
     let config = HarnessConfig::new(VIEW).with_clock(Clock::Virtual);
-    let mut harness = Harness::with_config(Column, config);
+    let mut harness = Harness::new(Column, config);
     // Rows listed on the first render are simply there; their heights are measured.
     harness.advance(Duration::from_millis(50));
     harness

@@ -16,7 +16,7 @@ use ds::{
 use ds::{FieldFocus, Grain, PRESETS, Scheme, SpaceLook, Theme};
 use ds_blitz::TokioSpawner;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds_shell::{DotIndex, SpaceEditor};
 use std::sync::Arc;
@@ -73,9 +73,9 @@ fn a_button_click_flips_aria_pressed() {
     let button = centre(&harness, ".ds-button");
     let pressed = |harness: &Harness| harness.attr(".ds-button", "aria-pressed");
     assert_eq!(pressed(&harness).as_deref(), Some("false"));
-    harness.click(button);
+    harness.send(Input::click(button));
     assert_eq!(pressed(&harness).as_deref(), Some("true"));
-    harness.click(button);
+    harness.send(Input::click(button));
     assert_eq!(pressed(&harness).as_deref(), Some("false"));
 }
 
@@ -84,9 +84,9 @@ fn the_root_stamps_the_last_input_modality() {
     let mut harness = Harness::new(PressApp, VIEW);
     let modality = |harness: &Harness| harness.attr(".ds", "data-modality");
     assert_eq!(modality(&harness).as_deref(), Some("pointer"));
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     assert_eq!(modality(&harness).as_deref(), Some("keyboard"));
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(modality(&harness).as_deref(), Some("pointer"));
 }
 
@@ -105,9 +105,9 @@ fn a_toggle_switches() {
     let mut harness = Harness::new(ToggleApp, VIEW);
     let checked = |harness: &Harness| harness.attr(".ds-toggle", "aria-checked");
     assert_eq!(checked(&harness).as_deref(), Some("false"));
-    harness.click(centre(&harness, ".ds-toggle"));
+    harness.send(Input::click(centre(&harness, ".ds-toggle")));
     assert_eq!(checked(&harness).as_deref(), Some("true"));
-    harness.click(centre(&harness, ".ds-toggle"));
+    harness.send(Input::click(centre(&harness, ".ds-toggle")));
     assert_eq!(checked(&harness).as_deref(), Some("false"));
 }
 
@@ -138,14 +138,14 @@ fn ToastHubProbe() -> Element {
 
 #[test]
 fn the_toast_hub_hides_after_its_hold_and_not_before() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         ToastHubApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     let state = |harness: &Harness| harness.text_of(".probe-toast");
     assert_eq!(state(&harness).as_deref(), Some("hidden"));
     let pushed = harness.now();
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(state(&harness).as_deref(), Some("shown"));
     // Half the 5000 ms hold, not all of it (FINDINGS "Timing tests"): a check at the deadline
     // leaves no margin against a loaded machine's overshoot on `advance`.
@@ -192,13 +192,13 @@ fn HoverHubProbe() -> Element {
 
 #[test]
 fn the_hover_hub_opens_after_500_ms_and_not_before() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         HoverHubApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     let state = |harness: &Harness| harness.text_of(".probe-hover");
     let rested = harness.now();
-    harness.pointer_move(centre(&harness, ".probe-target"));
+    harness.send(Input::pointer_move(centre(&harness, ".probe-target")));
     assert_eq!(state(&harness).as_deref(), Some("closed"));
     // Under half the 500 ms open delay, not near it (fixed 2026-09-25, FINDINGS "Timing tests"):
     // the old check left only 50 ms of margin (11 % of the window).
@@ -261,10 +261,10 @@ fn MenuDemo() -> Element {
 fn a_menu_opens_on_click_and_closes_on_escape() {
     let mut harness = Harness::new(MenuApp, VIEW);
     assert_eq!(harness.count(".ds-menu"), 0);
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(harness.count(".ds-menu"), 1, "{}", harness.html());
     assert_eq!(harness.count(".ds-menu-item"), 3);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     // Long enough for any exit the menu plays.
     harness.advance(ms(600));
     assert_eq!(harness.count(".ds-menu"), 0, "{}", harness.html());
@@ -292,12 +292,12 @@ fn HoverCardDemo() -> Element {
 
 #[test]
 fn a_hover_card_appears_after_500_ms_and_not_before() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         HoverCardApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     let rested = harness.now();
-    harness.pointer_move(centre(&harness, ".ds-hover-target"));
+    harness.send(Input::pointer_move(centre(&harness, ".ds-hover-target")));
     // Under half the 500 ms open delay, not near it (fixed 2026-09-25, FINDINGS "Timing tests"):
     // the old check left only 50 ms of margin (11 % of the window).
     harness.advance(ms(200));
@@ -330,13 +330,13 @@ fn ToastDemo() -> Element {
 
 #[test]
 fn a_toast_hides_after_its_hold() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         ToastApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     let shown = |harness: &Harness| harness.attr(".ds-toast", "data-presence");
     let pushed = harness.now();
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     // It arrives sliding in from the right, and is present once that has settled.
     assert_eq!(shown(&harness).as_deref(), Some("entering"));
     harness.advance(ms(400));
@@ -415,7 +415,7 @@ fn a_row_leaves_and_the_rows_below_heal() {
         harness.attr(&format!(".ds-list-item:nth-child({n})"), "data-presence")
     };
 
-    harness.click(centre(&harness, ".ds-list-item:nth-child(1)"));
+    harness.send(Input::click(centre(&harness, ".ds-list-item:nth-child(1)")));
     assert_eq!(presence(&harness, 1).as_deref(), Some("leaving"));
     assert_eq!(
         harness.count(".ds-list-item"),
@@ -485,7 +485,7 @@ fn a_field_focused_on_mount_takes_typing_without_a_click() {
         let mut harness = Harness::new(app, VIEW);
         harness.advance(ms(100));
         assert_eq!(harness.text_of(".probe-text").as_deref(), Some("[]"));
-        harness.key(ShortcutKey::Char('a'));
+        harness.send(Input::key(ShortcutKey::Char('a')));
         assert_eq!(
             harness.text_of(".probe-text").as_deref(),
             Some(want),
@@ -530,7 +530,7 @@ fn the_space_editor_reports_the_dot_picked_inside_it() {
     );
     assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
     assert!(harness.count(".ds-stop") > 1, "{}", harness.html());
-    harness.click(centre(&harness, ".ds-stop:nth-child(2)"));
+    harness.send(Input::click(centre(&harness, ".ds-stop:nth-child(2)")));
     assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("1"));
     assert_eq!(
         harness

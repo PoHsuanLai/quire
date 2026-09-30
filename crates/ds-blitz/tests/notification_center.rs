@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Ds, Material, MotionLevel, Px, RootExtent, Shown, SidePanel, settle};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
@@ -63,8 +63,7 @@ fn shown_it_comes_to_rest_at_the_right_edge() {
 
 #[test]
 fn hidden_it_slides_out_and_on_hidden_runs_at_settle_and_not_before() {
-    let mut harness =
-        Harness::with_config(Center, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Center, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let out = settle(Anim::PanelOut, MotionLevel::Standard);
     let hiding = harness.now();

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Check, Ds, Icon, Material, Point, ShortcutKey};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use ds_shell::{ModuleTile, TileSpan};
 use std::time::Duration;
 
@@ -62,12 +62,12 @@ const TICK: Duration = Duration::from_millis(50);
 fn the_chevron_opens_the_detail_and_does_not_toggle() {
     let mut harness = Harness::new(TileApp, VIEW);
     harness.advance(TICK);
-    harness.click(centre(&harness, ".ds-module-chevron"));
+    harness.send(Input::click(centre(&harness, ".ds-module-chevron")));
     harness.advance(TICK);
     assert_eq!(log(&harness), "detail");
     assert_eq!(state(&harness), "off", "the chevron did not toggle");
 
-    harness.click(centre(&harness, ".ds-module-title"));
+    harness.send(Input::click(centre(&harness, ".ds-module-title")));
     harness.advance(TICK);
     assert_eq!(log(&harness), "detail,toggle");
     assert_eq!(state(&harness), "on", "the tile itself toggles");
@@ -81,26 +81,28 @@ fn the_chevron_opens_the_detail_and_does_not_toggle() {
 fn the_keys_toggle_on_the_tile_and_open_on_the_chevron() {
     let mut harness = Harness::new(TileApp, VIEW);
     harness.advance(TICK);
-    harness.key(ShortcutKey::Tab);
-    assert!(
-        harness.is_focused(".ds-module-tile"),
+    harness.send(Input::key(ShortcutKey::Tab));
+    assert_eq!(
+        harness.focus_of(".ds-module-tile"),
+        FocusState::Focused,
         "Tab reaches the tile"
     );
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle");
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Space));
     harness.advance(TICK);
     assert_eq!(log(&harness), "toggle,toggle");
     assert_eq!(state(&harness), "off");
 
-    harness.key(ShortcutKey::Tab);
-    assert!(
-        harness.is_focused(".ds-module-chevron"),
+    harness.send(Input::key(ShortcutKey::Tab));
+    assert_eq!(
+        harness.focus_of(".ds-module-chevron"),
+        FocusState::Focused,
         "Tab reaches the chevron"
     );
-    harness.key(ShortcutKey::Enter);
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Enter));
+    harness.send(Input::key(ShortcutKey::Right));
     harness.advance(TICK);
     assert_eq!(
         log(&harness),

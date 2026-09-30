@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::Point;
-use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -60,12 +60,12 @@ const TOGGLES: [&str; 4] = [
 ];
 
 fn harness() -> Harness {
-    Harness::with_config(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 fn next(harness: &mut Harness) {
     let at = harness.centre(".next").expect("the button is on screen");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(Duration::from_millis(50));
 }
 
@@ -115,8 +115,7 @@ fn removing_every_rule_returns_to_the_default() {
 
 #[test]
 fn removing_the_style_element_returns_to_the_default_and_adding_one_restyles() {
-    let mut harness =
-        Harness::with_config(Toggled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Toggled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(
         fill(&harness),
         [255, 0, 0, 255],

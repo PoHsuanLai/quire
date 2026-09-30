@@ -764,7 +764,7 @@ path each, until step 12 replaces them with the prelude.
    the allowed-edges table in `check-boundary.sh` and `DESIGN.md`.
 9. **`ds-native` -> `ds-blitz` + `ds-harness`** (done): rename, then move the harness; `pdf`, `print`,
    `spell` become features; `tokio` is named only in `launch`.
-10. **`Driver`/`DocQuery`**: replace the five constructors and `_with` pairs with `Input`;
+10. **`Driver`/`DocQuery`** (done): replace the five constructors and `_with` pairs with `Input`;
     `Query` extension trait.
 11. **`ds-conformance`**: move `ds-native/tests` by the section 3 rules, renaming work-named
     files; move SSR tests beside their crates; `ds-gallery` pages regrouped.

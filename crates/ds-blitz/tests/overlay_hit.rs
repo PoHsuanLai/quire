@@ -12,7 +12,7 @@ use ds::{
     use_hover_intent, use_overlays,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -153,10 +153,10 @@ fn point_and_click(app: fn() -> Element) -> (Harness, Point) {
         x: Px(200.0),
         y: Px(150.0),
     };
-    harness.pointer_move(over_row);
+    harness.send(Input::pointer_move(over_row));
     harness.advance(ms(30));
     let pin = centre(&harness, ".pin");
-    harness.click(pin);
+    harness.send(Input::click(pin));
     harness.advance(ms(30));
     (harness, over_row)
 }
@@ -301,7 +301,7 @@ fn sender_card_open() -> (Harness, Point) {
     let mut harness = Harness::new(MailApp, VIEW);
     harness.advance(ms(50));
     let name = centre(&harness, ".m1 .ds-thread-name");
-    harness.pointer_move(name);
+    harness.send(Input::pointer_move(name));
     settle_until(&mut harness, |h| {
         h.text_of(".card-of").as_deref() == Some("sender:1")
     });
@@ -326,7 +326,7 @@ fn cross_to_the_button(steps: u16) {
             x: Px(name.x.0 + (pin.x.0 - name.x.0) * t),
             y: Px(name.y.0 + (pin.y.0 - name.y.0) * t),
         };
-        harness.pointer_move(at);
+        harness.send(Input::pointer_move(at));
         harness.advance(ms(20));
         assert_eq!(
             harness.text_of(".card-of").as_deref(),
@@ -337,7 +337,7 @@ fn cross_to_the_button(steps: u16) {
     }
     harness.advance(ms(600));
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("sender:1"));
-    harness.click(centre(&harness, ".pin"));
+    harness.send(Input::click(centre(&harness, ".pin")));
     harness.advance(ms(30));
     let log = log(&harness);
     assert!(log.ends_with("click pin"), "{log}");
@@ -375,7 +375,7 @@ fn leaving_the_name_for_its_row_reopens_the_thread_card() {
         on_row.x.0 < row.origin.x.0 + row.size.width.0 - 60.0,
         "{on_row:?} in {row:?}"
     );
-    harness.pointer_move(on_row);
+    harness.send(Input::pointer_move(on_row));
     // Not at once: the pointer may be crossing the row to the card (the close grace, 150 ms).
     harness.advance(ms(60));
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("sender:1"));

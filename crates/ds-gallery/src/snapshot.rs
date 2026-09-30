@@ -121,7 +121,7 @@ pub fn render(shot: &Shot) -> Result<image::RgbaImage, GalleryError> {
         })?;
     frames.pop().ok_or_else(|| GalleryError::Render {
         name: shot.file(),
-        source: ds_blitz::NativeError::Renderer("no frame".into()),
+        source: ds_harness::HarnessError::Renderer("no frame".into()),
     })
 }
 

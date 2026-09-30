@@ -12,7 +12,9 @@ use ds::{
     Appearance, Ds, HostWindow, Material, Maximized, Point, Px, ResizeEdge, ShortcutKey, Support,
     TileError, TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{
+    Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
+};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -128,12 +130,12 @@ const BAR: Point = Point {
 
 /// Press at `from`, move through `path`, release at the last point.
 fn drag(harness: &mut Harness, from: Point, path: &[Point]) {
-    harness.pointer_move(from);
-    harness.pointer_down(from);
+    harness.send(Input::pointer_move(from));
+    harness.send(Input::pointer_down(from));
     for &point in path {
-        harness.pointer_move(point);
+        harness.send(Input::pointer_move(point));
     }
-    harness.pointer_up(path.last().copied().unwrap_or(from));
+    harness.send(Input::pointer_up(path.last().copied().unwrap_or(from)));
     harness.advance(ms(30));
 }
 
@@ -153,7 +155,7 @@ fn a_titlebar_drag_moves_once_past_the_threshold() {
 #[test]
 fn a_plain_click_on_the_titlebar_does_not_move() {
     let mut harness = start(Normal);
-    harness.click(BAR);
+    harness.send(Input::click(BAR));
     harness.advance(ms(600));
     drag(&mut harness, BAR, &[at(403.0, 17.0), at(404.0, 13.0)]);
     assert_eq!(
@@ -166,9 +168,9 @@ fn a_plain_click_on_the_titlebar_does_not_move() {
 #[test]
 fn a_double_click_on_the_titlebar_zooms() {
     let mut harness = start(Normal);
-    harness.click(BAR);
+    harness.send(Input::click(BAR));
     harness.advance(ms(60));
-    harness.click(BAR);
+    harness.send(Input::click(BAR));
     harness.advance(ms(60));
     assert_eq!(log(&harness), "zoom:Toggle");
 }
@@ -178,7 +180,7 @@ fn the_green_light_zooms_and_the_others_close_and_minimize() {
     let mut harness = start(Normal);
     for light in ["zoom", "minimize", "close"] {
         let point = centre(&harness, &format!(".ds-light[*|data-light={light}]"));
-        harness.click(point);
+        harness.send(Input::click(point));
         harness.advance(ms(60));
     }
     assert_eq!(log(&harness), "zoom:Toggle,minimize,close");
@@ -202,9 +204,9 @@ fn a_press_on_a_light_does_not_begin_a_move() {
 fn a_double_click_on_a_light_does_not_zoom_the_titlebar_way() {
     let mut harness = start(Normal);
     let close = centre(&harness, ".ds-light[*|data-light=close]");
-    harness.click(close);
+    harness.send(Input::click(close));
     harness.advance(ms(60));
-    harness.click(close);
+    harness.send(Input::click(close));
     harness.advance(ms(60));
     assert_eq!(log(&harness), "close,close");
 }
@@ -213,8 +215,8 @@ fn a_double_click_on_a_light_does_not_zoom_the_titlebar_way() {
 fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.pointer_move(green);
-    harness.pointer_down(green);
+    harness.send(Input::pointer_move(green));
+    harness.send(Input::pointer_down(green));
     harness.advance(ms(600));
     assert_eq!(harness.count(".ds-menu"), 1, "{}", harness.html());
     assert_eq!(
@@ -223,7 +225,7 @@ fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
             .as_deref(),
         Some("true")
     );
-    harness.pointer_up(green);
+    harness.send(Input::pointer_up(green));
     harness.advance(ms(60));
     assert_eq!(
         log(&harness),
@@ -231,7 +233,7 @@ fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
         "the release that ends the hold does not zoom"
     );
     let fill = centre(&harness, ".ds-menu .ds-menu-item");
-    harness.click(fill);
+    harness.send(Input::click(fill));
     harness.advance(ms(700));
     assert_eq!(log(&harness), "zoom:Maximize");
     assert_eq!(harness.count(".ds-menu"), 0);
@@ -241,7 +243,7 @@ fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
 fn a_placement_the_host_cannot_make_is_unavailable() {
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.press(green, ds::PointerButton::Secondary);
+    harness.send(Input::press(green, ds::PointerButton::Secondary));
     harness.advance(ms(60));
     // The header is the menu's first child; the rows follow it.
     let rows: Vec<(String, Option<String>)> = (2..=5)
@@ -265,7 +267,7 @@ fn a_placement_the_host_cannot_make_is_unavailable() {
         harness.html()
     );
     let left = centre(&harness, ".ds-menu > :nth-child(3)");
-    harness.click(left);
+    harness.send(Input::click(left));
     harness.advance(ms(300));
     assert_eq!(log(&harness), "", "an unavailable row places nothing");
 }
@@ -274,12 +276,12 @@ fn a_placement_the_host_cannot_make_is_unavailable() {
 fn resting_on_the_green_light_opens_the_menu_and_passing_over_it_does_not() {
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.pointer_move(green);
+    harness.send(Input::pointer_move(green));
     harness.advance(ms(300));
-    harness.pointer_move(BAR);
+    harness.send(Input::pointer_move(BAR));
     harness.advance(ms(700));
     assert_eq!(harness.count(".ds-menu"), 0, "passed over");
-    harness.pointer_move(green);
+    harness.send(Input::pointer_move(green));
     harness.advance(ms(900));
     assert_eq!(harness.count(".ds-menu"), 1, "rested on");
 }
@@ -288,9 +290,9 @@ fn resting_on_the_green_light_opens_the_menu_and_passing_over_it_does_not() {
 fn an_edge_resizes_from_that_edge() {
     let mut harness = start(Normal);
     for (point, _) in [(at(478.0, 120.0), "right"), (at(2.0, 238.0), "bottom-left")] {
-        harness.pointer_move(point);
-        harness.pointer_down(point);
-        harness.pointer_up(point);
+        harness.send(Input::pointer_move(point));
+        harness.send(Input::pointer_down(point));
+        harness.send(Input::pointer_up(point));
         harness.advance(ms(30));
     }
     assert_eq!(log(&harness), "resize:right,resize:bottom-left");
@@ -312,7 +314,7 @@ fn a_maximized_window_neither_moves_nor_resizes_and_its_green_light_restores() {
         Some("maximized")
     );
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.click(green);
+    harness.send(Input::click(green));
     harness.advance(ms(60));
     assert_eq!(log(&harness), "zoom:Toggle");
 }
@@ -320,19 +322,23 @@ fn a_maximized_window_neither_moves_nor_resizes_and_its_green_light_restores() {
 #[test]
 fn the_lights_take_tab_arrow_down_opens_the_menu_and_escape_closes_it() {
     let mut harness = start(Normal);
-    harness.key(ShortcutKey::Tab);
-    assert!(
-        harness.is_focused(".ds-light[*|data-light=close]"),
+    harness.send(Input::key(ShortcutKey::Tab));
+    assert_eq!(
+        harness.focus_of(".ds-light[*|data-light=close]"),
+        FocusState::Focused,
         "{}",
         harness.html()
     );
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Tab);
-    assert!(harness.is_focused(".ds-light[*|data-light=zoom]"));
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Tab));
+    assert_eq!(
+        harness.focus_of(".ds-light[*|data-light=zoom]"),
+        FocusState::Focused
+    );
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(60));
     assert_eq!(harness.count(".ds-menu"), 1);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-menu"), 0);
     assert_eq!(log(&harness), "");
@@ -341,17 +347,18 @@ fn the_lights_take_tab_arrow_down_opens_the_menu_and_escape_closes_it() {
 #[test]
 fn with_option_held_the_green_light_only_zooms() {
     use dioxus::html::Modifiers;
+    let alt = |at, action| Input::Pointer(PointerInput::new(at, action).with_mods(Modifiers::ALT));
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.pointer_move_with(green, Modifiers::ALT);
-    harness.button_down_with(green, ds::PointerButton::Primary, Modifiers::ALT);
+    harness.send(alt(green, PointerAction::Move));
+    harness.send(alt(green, PointerAction::Down(ds::PointerButton::Primary)));
     harness.advance(ms(600));
     assert_eq!(
         harness.count(".ds-menu"),
         0,
         "a hold with Option opens no menu"
     );
-    harness.button_up_with(green, ds::PointerButton::Primary, Modifiers::ALT);
+    harness.send(alt(green, PointerAction::Up(ds::PointerButton::Primary)));
     harness.advance(ms(60));
     assert_eq!(log(&harness), "zoom:Toggle");
 }

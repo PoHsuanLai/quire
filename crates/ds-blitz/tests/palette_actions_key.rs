@@ -8,7 +8,7 @@ use ds::{
     Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Menu, Rect, ShortcutKey,
     use_focus_request,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -92,27 +92,29 @@ fn Launcher() -> Element {
 fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() {
     let mut harness = Harness::new(Launcher, VIEW);
     harness.advance(ms(300));
-    assert!(harness.is_focused("#card .ds-input"));
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'));
+    assert_eq!(harness.focus_of("#card .ds-input"), FocusState::Focused);
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k')));
     harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-popover.ds-menu"),
         1,
         "the first Ctrl+K opens it"
     );
-    assert!(
-        harness.is_focused(".ds-popover.ds-menu"),
+    assert_eq!(
+        harness.focus_of(".ds-popover.ds-menu"),
+        FocusState::Focused,
         "the menu has the keyboard"
     );
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k')));
     harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-popover.ds-menu"),
         0,
         "the second Ctrl+K closes it"
     );
-    assert!(
-        harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Focused,
         "the field has the keyboard back"
     );
 }

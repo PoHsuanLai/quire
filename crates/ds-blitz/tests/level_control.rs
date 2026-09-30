@@ -12,7 +12,7 @@ use ds::{
     MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;
@@ -141,11 +141,11 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
         x: Px(rail.origin.x.0 + rail.size.width.0 * share),
         y: Px(rail.origin.y.0 + 11.0),
     };
-    harness.pointer_down(at(0.3));
+    harness.send(Input::pointer_down(at(0.3)));
     // The track is measured once per press, after layout; then the fill is the pointer's.
     harness.advance(ms(80));
     let pressed = width(&harness, ".ds-slider-fill");
-    harness.pointer_move(at(0.7));
+    harness.send(Input::pointer_move(at(0.7)));
     harness.advance(ms(16));
     let moved = width(&harness, ".ds-slider-fill");
     let followed = painted(&mut harness, "level-drag");
@@ -171,15 +171,15 @@ fn a_drag_past_the_end_never_stretches_the_track() {
     let mut harness = start(500, Motion::Standard);
     let rail = rect(&harness, ".ds-slider-rail");
     let y = Px(rail.origin.y.0 + 13.0);
-    harness.pointer_down(Point {
+    harness.send(Input::pointer_down(Point {
         x: Px(rail.origin.x.0 + 100.0),
         y,
-    });
+    }));
     harness.advance(ms(16));
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(rail.origin.x.0 + rail.size.width.0 + 12.0),
         y,
-    });
+    }));
     harness.advance(ms(16));
     assert_eq!(width(&harness, ".ds-slider-track"), rail.size.width.0);
     assert_eq!(harness.attr(".ds-slider", "data-over"), None);
@@ -193,18 +193,19 @@ fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
         x: Px(rail.origin.x.0 + 100.0),
         y: Px(rail.origin.y.0 + 11.0),
     };
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(120));
     assert_eq!(level(&mut harness), 500, "a click at the middle keeps 50 %");
-    assert!(
-        harness.is_focused(".ds-slider"),
+    assert_eq!(
+        harness.focus_of(".ds-slider"),
+        FocusState::Focused,
         "the press focuses the control"
     );
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(level(&mut harness), 563);
-    harness.key(ShortcutKey::Left);
-    harness.key(ShortcutKey::Left);
+    harness.send(Input::key(ShortcutKey::Left));
+    harness.send(Input::key(ShortcutKey::Left));
     assert_eq!(level(&mut harness), 438);
-    harness.chord(&[ShortcutKey::Shift], ShortcutKey::Up);
+    harness.send(Input::chord(&[ShortcutKey::Shift], ShortcutKey::Up));
     assert_eq!(level(&mut harness), 453);
 }

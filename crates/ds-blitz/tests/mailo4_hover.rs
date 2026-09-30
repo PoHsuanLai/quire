@@ -13,7 +13,7 @@ use ds::{
     Material, MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;
 use std::rc::Rc;
 use std::time::Duration;
@@ -158,13 +158,13 @@ fn pin(n: usize) -> String {
 
 #[test]
 fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         ByElement,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(50));
     let entered = harness.now();
-    harness.pointer_move(centre(&harness, &pin(2)));
+    harness.send(Input::pointer_move(centre(&harness, &pin(2))));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
     // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
@@ -191,7 +191,7 @@ fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
         "{card:?} beside {item:?}"
     );
     // Warm: the next pin's card replaces it at once.
-    harness.pointer_move(centre(&harness, &pin(3)));
+    harness.send(Input::pointer_move(centre(&harness, &pin(3))));
     harness.advance(ms(60));
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:2"));
 }
@@ -201,7 +201,7 @@ fn a_card_keyed_on_a_rect_the_caller_has_opens_below_it() {
     let mut harness = Harness::new(ByPoint, VIEW);
     harness.advance(ms(50));
     let at = centre(&harness, &pin(1));
-    harness.pointer_move(at);
+    harness.send(Input::pointer_move(at));
     harness.advance(ms(600));
     let card = rect(&harness, ".ds-hovercard");
     // A sender card: at the anchor's left, 6 below it; the anchor is the entry point.
@@ -213,13 +213,13 @@ fn a_card_keyed_on_a_rect_the_caller_has_opens_below_it() {
 
 #[test]
 fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Unplaced,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(50));
     let entered = harness.now();
-    harness.pointer_move(centre(&harness, &pin(1)));
+    harness.send(Input::pointer_move(centre(&harness, &pin(1))));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
     // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
@@ -249,7 +249,7 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     assert_eq!(harness.attr(".ds-hovercard", "style"), None);
     // Out: 150 ms to close, then `hc-out` plays before the card goes.
     let left = harness.now();
-    harness.pointer_move(AWAY);
+    harness.send(Input::pointer_move(AWAY));
     // Well under half the 150 ms close delay, same reasoning as the open check above.
     harness.advance(ms(60));
     assert_ne!(
@@ -268,11 +268,11 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     harness.advance(ms(250));
     assert_eq!(harness.count(".ds-hovercard"), 0, "{}", harness.html());
     // Still inside the 400 ms warm window: the next pin opens at once.
-    harness.pointer_move(centre(&harness, &pin(2)));
+    harness.send(Input::pointer_move(centre(&harness, &pin(2))));
     harness.advance(ms(60));
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:1"));
     // A press takes it away at once, not warm.
-    harness.pointer_down(centre(&harness, &pin(2)));
+    harness.send(Input::pointer_down(centre(&harness, &pin(2))));
     harness.advance(ms(30));
     assert_eq!(harness.count(".ds-hovercard"), 0, "{}", harness.html());
 }

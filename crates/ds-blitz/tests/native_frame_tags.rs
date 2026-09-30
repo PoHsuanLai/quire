@@ -9,7 +9,7 @@ use ds_blitz::{
     AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
     RequestOrigin,
 };
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
@@ -79,7 +79,7 @@ fn reader(requests: Arc<Recorder>) -> (Harness, Arc<Mutex<Vec<FrameLink>>>) {
     let config = HarnessConfig::new(VIEW)
         .with_net(NetPolicy::Custom(requests))
         .with_frame_links(links);
-    (Harness::with_config(Reader, config), heard)
+    (Harness::new(Reader, config), heard)
 }
 
 fn tag(text: &str) -> Option<FrameTag> {
@@ -126,7 +126,7 @@ fn a_link_click_carries_its_frames_tag() {
             .frame(selector)
             .and_then(|frame| frame.centre("a.link"))
             .expect("the frame's link");
-        harness.click(at);
+        harness.send(Input::click(at));
     }
     harness.advance(Duration::from_millis(50));
     let heard = heard.lock().unwrap_or_else(PoisonError::into_inner).clone();

@@ -13,7 +13,7 @@ use ds::{
     RootChrome, Shown, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::{Osd, OsdPosition};
 use image::{RgbaImage, imageops};
 use std::time::Duration;
@@ -88,7 +88,7 @@ fn frames(harness: &mut Harness) -> Vec<RgbaImage> {
     ] {
         shoot(harness, label.into(), wait);
     }
-    harness.pointer_down(at(0.5));
+    harness.send(Input::pointer_down(at(0.5)));
     for (label, wait) in [
         ("press at 50 %: 16 ms", 16),
         ("40 ms", 24),
@@ -97,17 +97,17 @@ fn frames(harness: &mut Harness) -> Vec<RgbaImage> {
     ] {
         shoot(harness, label.into(), wait);
     }
-    harness.pointer_move(at(1.0));
+    harness.send(Input::pointer_move(at(1.0)));
     shoot(harness, "drag to the end".into(), 30);
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(left + width + 14.0),
         y: Px(middle),
-    });
+    }));
     shoot(harness, "14 px past: stretched".into(), 30);
-    harness.pointer_up(Point {
+    harness.send(Input::pointer_up(Point {
         x: Px(left + width + 14.0),
         y: Px(middle),
-    });
+    }));
     for (label, wait) in [
         ("released: 30 ms", 30),
         ("80 ms", 50),
@@ -149,7 +149,7 @@ pub fn strip() -> Result<RgbaImage, GalleryError> {
     if rows.is_empty() {
         return Err(GalleryError::Render {
             name: "level-motion".into(),
-            source: ds_blitz::NativeError::Renderer("no frame".into()),
+            source: ds_harness::HarnessError::Renderer("no frame".into()),
         });
     }
     Ok(stacked(&rows, 12))

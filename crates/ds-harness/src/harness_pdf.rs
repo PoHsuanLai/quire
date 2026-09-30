@@ -1,6 +1,7 @@
 //! Printing a harness's document as it is now, for [`pdf_app`] and for tests that assert on a
 //! printout's text rather than its pixels.
 
+use crate::driver::Driver;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use crate::snapshot::{MOUNT_SETTLE, Viewport};
@@ -22,7 +23,7 @@ pub fn pdf_app(
         height: content.height,
         scale_percent: 100,
     };
-    let mut harness = Harness::with_config(app, config.with_viewport(viewport));
+    let mut harness = Harness::new(app, config.with_viewport(viewport));
     harness.advance(MOUNT_SETTLE);
     harness.pdf(spec)
 }

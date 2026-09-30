@@ -14,7 +14,7 @@ use ds::{
 };
 use ds::{Slider, SliderLook};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::MenuBarItem;
 use ds_shell::{ModulePanel, ModuleTile};
 use std::time::Duration;
@@ -30,7 +30,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 fn battery(level: u16, power: BatteryPower) -> BatteryState {

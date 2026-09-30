@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::TextField;
 use ds::{Appearance, Common, Ds, EditSurface, Material, ShortcutKey};
 use ds_blitz::FocusFallback;
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -53,7 +53,7 @@ fn Shell() -> Element {
 }
 
 fn harness(fallback: FocusFallback) -> Harness {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Shell,
         HarnessConfig::new(VIEW).with_focus_fallback(fallback),
     );
@@ -69,7 +69,7 @@ fn click(harness: &mut Harness, selector: &str) {
     let at = harness
         .centre(selector)
         .unwrap_or_else(|| panic!("{selector} is not in the document:\n{}", harness.html()));
-    harness.click(at);
+    harness.send(Input::click(at));
     // A frame: the fallback waits out a document busy with the click's own re-render.
     harness.advance(ms(60));
 }
@@ -78,8 +78,8 @@ fn click(harness: &mut Harness, selector: &str) {
 fn a_click_on_plain_text_leaves_the_shell_focused_and_it_hears_the_next_key() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
-    assert!(harness.is_focused(".app"));
-    harness.key(ShortcutKey::Char('j'));
+    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
+    harness.send(Input::key(ShortcutKey::Char('j')));
     assert_eq!(log(&harness), "key:j");
 }
 
@@ -87,8 +87,8 @@ fn a_click_on_plain_text_leaves_the_shell_focused_and_it_hears_the_next_key() {
 fn with_blitz_default_the_click_clears_the_focus() {
     let mut harness = harness(FocusFallback::BlitzDefault);
     click(&mut harness, ".plain");
-    assert!(!harness.is_focused(".app"));
-    harness.key(ShortcutKey::Char('j'));
+    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
+    harness.send(Input::key(ShortcutKey::Char('j')));
     assert_eq!(log(&harness), "");
 }
 
@@ -98,7 +98,7 @@ fn a_second_click_keeps_the_shell_focused_without_a_blur() {
     click(&mut harness, ".plain");
     harness.advance(ms(600));
     click(&mut harness, ".plain");
-    assert!(harness.is_focused(".app"));
+    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
     assert_eq!(log(&harness), "", "the shell heard no blur");
 }
 
@@ -107,7 +107,7 @@ fn a_double_click_still_arrives() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
     click(&mut harness, ".plain");
-    assert!(harness.is_focused(".app"));
+    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
     assert_eq!(log(&harness), "dblclick");
 }
 
@@ -115,9 +115,9 @@ fn a_double_click_still_arrives() {
 fn a_field_the_click_leaves_hears_its_blur_and_the_shell_takes_the_keyboard() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".field input");
-    assert!(harness.is_focused(".field input"));
+    assert_eq!(harness.focus_of(".field input"), FocusState::Focused);
     click(&mut harness, ".plain");
-    assert!(harness.is_focused(".app"));
+    assert_eq!(harness.focus_of(".app"), FocusState::Focused);
     assert_eq!(log(&harness), "field-blur");
 }
 
@@ -126,6 +126,6 @@ fn inside_an_edit_surface_its_own_focus_wins() {
     let mut harness = harness(FocusFallback::Ancestor);
     click(&mut harness, ".plain");
     click(&mut harness, ".inside");
-    assert!(harness.is_focused("#editor"));
-    assert!(!harness.is_focused(".app"));
+    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
+    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
 }

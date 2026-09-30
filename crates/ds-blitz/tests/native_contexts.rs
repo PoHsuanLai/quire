@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::RootContexts;
-use ds_harness::{Harness, HarnessConfig, Viewport, snapshot_with};
+use ds_harness::{Harness, HarnessConfig, Query, Viewport, snapshot_with};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -40,7 +40,7 @@ fn a_root_reads_contexts_the_harness_was_given() {
             name: "inbox.sqlite".to_owned(),
         }))
         .with(Start(42));
-    let harness = Harness::with_contexts(Reader, VIEW, contexts);
+    let harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_contexts(contexts));
     assert_eq!(harness.text_of(".store").as_deref(), Some("inbox.sqlite"));
     assert_eq!(harness.text_of(".start").as_deref(), Some("42"));
 }
@@ -53,7 +53,7 @@ fn a_later_context_of_the_same_type_shadows_an_earlier_one() {
         }))
         .with_context(Start(1))
         .with_context(Start(2));
-    let harness = Harness::with_config(Reader, config);
+    let harness = Harness::new(Reader, config);
     assert_eq!(harness.text_of(".start").as_deref(), Some("2"));
 }
 

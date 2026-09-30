@@ -2,47 +2,45 @@
 //! host's hit test and IME requests read back. The IME events go through the same routing the
 //! window uses (`crate::edit_ime`): to the surface that has the keyboard.
 
-use crate::harness::{Harness, first};
+use crate::driver::{DocQuery, first};
+use crate::harness::Harness;
+use crate::input::{ImeInput, KeyInput};
 use blitz_traits::events::{MouseEventButton, UiEvent};
 use ds::{
     CapturedPointer, ImeEvent, ImeSwitch, Point, PointerPhase, Px, Rect, ShortcutKey, TextPosition,
 };
 use ds_blitz::seam::edit_hit as hit;
+use keyboard_types::Modifiers;
 
 impl Harness {
-    /// The IME attaches to the focused surface (winit's `Ime::Enabled`); a composition starts
-    /// with the first [`Harness::ime_update`].
-    pub fn ime_start(&mut self) {
-        self.ime(ImeEvent::Enabled);
-    }
-
-    /// The IME shows `text` as its preedit, with its cursor at bytes `cursor` of it.
-    pub fn ime_update(&mut self, text: &str, cursor: usize) {
-        self.ime(ImeEvent::Preedit {
-            text: text.to_owned(),
-            cursor: Some((cursor, cursor)),
-        });
-    }
-
-    /// The IME commits `text`, clearing its preedit first as winit does.
-    pub fn ime_commit(&mut self, text: &str) {
-        self.ime(ImeEvent::Preedit {
-            text: String::new(),
-            cursor: None,
-        });
-        self.ime(ImeEvent::Commit(text.to_owned()));
-    }
-
-    /// The IME detaches (winit's `Ime::Disabled`).
-    pub fn ime_end(&mut self) {
-        self.ime(ImeEvent::Disabled);
+    /// Deliver one input-method step, through the routing the window uses: to the surface that
+    /// has the keyboard.
+    pub(crate) fn ime(&mut self, input: ImeInput) {
+        match input {
+            ImeInput::Start => self.ime_event(ImeEvent::Enabled),
+            ImeInput::Update { text, cursor } => self.ime_event(ImeEvent::Preedit {
+                text,
+                cursor: Some((cursor, cursor)),
+            }),
+            ImeInput::Commit(text) => {
+                self.ime_event(ImeEvent::Preedit {
+                    text: String::new(),
+                    cursor: None,
+                });
+                self.ime_event(ImeEvent::Commit(text));
+            }
+            ImeInput::End => self.ime_event(ImeEvent::Disabled),
+        }
     }
 
     /// Put `html` and its plain `text` on the clipboard, as a browser's copy would, and press
     /// Ctrl+V where the focus is.
-    pub fn paste_html(&mut self, html: &str, text: &str) {
+    pub(crate) fn paste(&mut self, html: &str, text: &str) {
         self.doc.shell.put_html(html.to_owned(), text.to_owned());
-        self.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
+        self.key(KeyInput {
+            key: ShortcutKey::Char('v'),
+            mods: Modifiers::CONTROL,
+        });
     }
 
     /// The text position the host resolves at `at` inside the first edit surface matching
@@ -86,7 +84,7 @@ impl Harness {
     }
 
     /// Hand `event` to the surface that has the keyboard, and bring the document up to date.
-    fn ime(&mut self, event: ImeEvent) {
+    fn ime_event(&mut self, event: ImeEvent) {
         let sink = self.with_doc(|doc| self.doc.listeners.target(doc));
         if let Some(sink) = sink {
             self.doc.doc.vdom.in_runtime(|| sink.call(event));

@@ -9,7 +9,7 @@ use ds::{
     Answers, Appearance, Bezel, Button, Check, Checkbox, Choice, ControlSize, Ds, Icon,
     ImagePosition, Material, RadioGroup, SegmentedControl, ShortcutKey, Toggle, Tracking,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -40,8 +40,7 @@ fn Buttons() -> Element {
 }
 
 fn harness(app: fn() -> Element) -> Harness {
-    let mut harness =
-        Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness
 }
@@ -50,10 +49,10 @@ fn harness(app: fn() -> Element) -> Harness {
 fn return_and_space_press_an_image_only_button_once_each() {
     PRESSES.set(0);
     let mut harness = harness(Buttons);
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Enter));
     assert_eq!(PRESSES.get(), 1, "Return presses it once");
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(PRESSES.get(), 2, "Space presses it once");
 }
 
@@ -61,11 +60,11 @@ fn return_and_space_press_an_image_only_button_once_each() {
 fn a_button_that_answers_escape_takes_space_and_leaves_return_to_the_dialog() {
     PRESSES.set(0);
     let mut harness = harness(Buttons);
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Enter));
     assert_eq!(PRESSES.get(), 0, "Return is the default button's");
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(PRESSES.get(), 100, "Space presses it");
 }
 
@@ -119,20 +118,20 @@ fn state(harness: &Harness) -> String {
 fn space_flips_a_switch_and_a_checkbox_and_picks_a_segment() {
     let mut harness = harness(Choices);
     assert_eq!(state(&harness), "off off 0 0");
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(state(&harness), "on off 0 0", "the switch");
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     assert_eq!(
         state(&harness),
         "on off 0 0",
         "Return is not a switch's key"
     );
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(state(&harness), "on on 0 0", "the checkbox");
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(
         state(&harness),
         "on on 1 0",
@@ -144,7 +143,7 @@ fn space_flips_a_switch_and_a_checkbox_and_picks_a_segment() {
 fn the_arrows_check_the_next_radio_button_and_the_group_has_one_tab_stop() {
     let mut harness = harness(Choices);
     for _ in 0..4 {
-        harness.key(ShortcutKey::Tab);
+        harness.send(Input::key(ShortcutKey::Tab));
     }
     assert_eq!(
         harness
@@ -152,14 +151,14 @@ fn the_arrows_check_the_next_radio_button_and_the_group_has_one_tab_stop() {
             .as_deref(),
         Some("0")
     );
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(state(&harness), "off off 0 1");
     harness.advance(Duration::from_millis(50));
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(state(&harness), "off off 0 2");
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(state(&harness), "off off 0 2", "the end stops");
-    harness.key(ShortcutKey::Home);
+    harness.send(Input::key(ShortcutKey::Home));
     assert_eq!(state(&harness), "off off 0 0");
 }
 
@@ -178,8 +177,8 @@ fn Pills() -> Element {
 fn a_workspace_pill_takes_return_and_space_too() {
     PRESSES.set(0);
     let mut harness = harness(Pills);
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Enter);
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Enter));
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(PRESSES.get(), 2, "one press for each key");
 }

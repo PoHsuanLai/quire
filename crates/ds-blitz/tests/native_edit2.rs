@@ -9,7 +9,9 @@ use ds::{
     EditPointer, EditSurface, Extend, ExtraClass, ImeSwitch, KeyInput, Material, Point,
     PointerPhase, Probe, Px, ShortcutKey, TextPosition, use_edit_handle,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{
+    ClassPresence, Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
+};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -87,8 +89,14 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 #[test]
 fn the_surface_carries_the_apps_class_and_data() {
     let harness = fresh();
-    assert!(harness.has_class("#editor", "ds-edit"));
-    assert!(harness.has_class("#editor", "c-body"));
+    assert_eq!(
+        harness.has_class("#editor", "ds-edit"),
+        ClassPresence::Present
+    );
+    assert_eq!(
+        harness.has_class("#editor", "c-body"),
+        ClassPresence::Present
+    );
     assert_eq!(harness.attr("#editor", "data-draft").as_deref(), Some("42"));
 }
 
@@ -98,11 +106,11 @@ fn a_programmatic_focus_does_what_a_press_does() {
     assert_eq!(harness.ime_switch(), ImeSwitch::Off);
     harness.within(|| handle().focus());
     harness.advance(ms(50));
-    assert!(harness.is_focused("#editor"));
+    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
     assert_eq!(drain(&FOCUS), vec![EditFocus::In]);
     assert_eq!(harness.ime_switch(), ImeSwitch::On);
-    harness.ime_update("か", 3);
-    harness.ime_commit("火");
+    harness.send(Input::ime_update("か", 3));
+    harness.send(Input::ime_commit("火"));
     let heard = drain(&INPUT);
     assert_eq!(
         heard.first(),
@@ -117,22 +125,25 @@ fn a_programmatic_focus_does_what_a_press_does() {
     );
     harness.within(|| handle().blur());
     harness.advance(ms(50));
-    assert!(!harness.is_focused("#editor"));
+    assert_eq!(harness.focus_of("#editor"), FocusState::Unfocused);
     assert_eq!(drain(&FOCUS), vec![EditFocus::Out]);
     assert_eq!(harness.ime_switch(), ImeSwitch::Off);
-    harness.ime_commit("x");
+    harness.send(Input::ime_commit("x"));
     assert_eq!(drain(&INPUT), Vec::new(), "no longer the IME's target");
 }
 
 #[test]
 fn shift_click_extends_from_the_anchor() {
     let mut harness = fresh();
-    harness.click(centre(&harness, "#one"));
+    harness.send(Input::click(centre(&harness, "#one")));
     harness.advance(ms(600));
     drain(&POINTER);
     let two = harness.rect("#two").expect("the second paragraph");
     let point = at(two.origin.x.0 + 1.0, two.origin.y.0 + 10.0);
-    harness.click_with(point, Modifiers::SHIFT);
+    harness.send(Input::Pointer(
+        PointerInput::new(point, PointerAction::Click(ds::PointerButton::Primary))
+            .with_mods(Modifiers::SHIFT),
+    ));
     let log = drain(&POINTER);
     assert_eq!(log[0].phase, PointerPhase::Press);
     assert_eq!(log[0].extend, Extend::FromAnchor);
@@ -146,11 +157,11 @@ fn a_drag_across_two_nodes_reports_each_with_the_button_held() {
     let two = harness.rect("#two").expect("the second paragraph");
     let from = at(one.origin.x.0 + 1.0, one.origin.y.0 + 10.0);
     let to = at(two.origin.x.0 + 400.0 - 150.0, two.origin.y.0 + 10.0);
-    harness.pointer_move(from);
-    harness.pointer_down(from);
+    harness.send(Input::pointer_move(from));
+    harness.send(Input::pointer_down(from));
     assert!(harness.held_buttons().contains(ds::PointerButton::Primary));
-    harness.pointer_move(to);
-    harness.pointer_up(to);
+    harness.send(Input::pointer_move(to));
+    harness.send(Input::pointer_up(to));
     assert!(harness.held_buttons().is_empty());
     let log = drain(&POINTER);
     let phases: Vec<PointerPhase> = log.iter().map(|pointer| pointer.phase).collect();
@@ -179,7 +190,7 @@ fn a_drag_keeps_reporting_outside_the_surface_until_the_release() {
     // Below the surface, over the button: not the surface's box at all.
     let outside = centre(&harness, "#away");
     assert!(outside.y.0 > surface.origin.y.0 + surface.size.height.0);
-    harness.drag(from, outside, 3);
+    harness.send(Input::drag(from, outside, 3));
     let log = drain(&POINTER);
     let phases: Vec<PointerPhase> = log.iter().map(|pointer| pointer.phase).collect();
     assert_eq!(phases.first(), Some(&PointerPhase::Press));
@@ -199,7 +210,7 @@ fn a_drag_keeps_reporting_outside_the_surface_until_the_release() {
             >= 2,
         "{phases:?}"
     );
-    harness.pointer_move(centre(&harness, "#one"));
+    harness.send(Input::pointer_move(centre(&harness, "#one")));
     assert_eq!(
         drain(&POINTER),
         Vec::new(),
@@ -210,7 +221,7 @@ fn a_drag_keeps_reporting_outside_the_surface_until_the_release() {
 #[test]
 fn home_end_and_delete_reach_the_app() {
     let mut harness = fresh();
-    harness.click(centre(&harness, "#one"));
+    harness.send(Input::click(centre(&harness, "#one")));
     drain(&INPUT);
     for key in [
         ShortcutKey::Home,
@@ -218,7 +229,7 @@ fn home_end_and_delete_reach_the_app() {
         ShortcutKey::Delete,
         ShortcutKey::PageDown,
     ] {
-        harness.key(key);
+        harness.send(Input::key(key));
     }
     let keys: Vec<dioxus::prelude::Key> = drain(&INPUT)
         .into_iter()
@@ -229,7 +240,7 @@ fn home_end_and_delete_reach_the_app() {
         .collect();
     use dioxus::prelude::Key as K;
     assert_eq!(keys, vec![K::Home, K::End, K::Delete, K::PageDown]);
-    harness.chord(&[ShortcutKey::Shift], ShortcutKey::Insert);
+    harness.send(Input::chord(&[ShortcutKey::Shift], ShortcutKey::Insert));
     assert!(matches!(
         drain(&INPUT).as_slice(),
         [] | [EditInput::Paste(_)]

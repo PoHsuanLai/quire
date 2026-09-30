@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Readout, ShortcutKey, StepRange, Stepper};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -32,8 +32,7 @@ fn value(harness: &Harness) -> i32 {
 }
 
 fn harness() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness
 }
@@ -42,11 +41,11 @@ fn harness() -> Harness {
 fn a_press_steps_once_and_the_lower_half_steps_down() {
     let mut harness = harness();
     let up = harness.centre(".ds-stepper-up").expect("up half");
-    harness.click(up);
+    harness.send(Input::click(up));
     assert_eq!(value(&harness), 6);
     let down = harness.centre(".ds-stepper-down").expect("down half");
-    harness.click(down);
-    harness.click(down);
+    harness.send(Input::click(down));
+    harness.send(Input::click(down));
     assert_eq!(value(&harness), 4);
 }
 
@@ -54,7 +53,7 @@ fn a_press_steps_once_and_the_lower_half_steps_down() {
 fn a_held_press_repeats_after_the_delay_and_stops_when_let_go() {
     let mut harness = harness();
     let up = harness.centre(".ds-stepper-up").expect("up half");
-    harness.pointer_down(up);
+    harness.send(Input::pointer_down(up));
     assert_eq!(value(&harness), 6, "the press itself steps once");
     harness.advance(Duration::from_millis(400));
     assert_eq!(value(&harness), 6, "nothing repeats before the delay");
@@ -67,7 +66,7 @@ fn a_held_press_repeats_after_the_delay_and_stops_when_let_go() {
         later >= after_delay + 8,
         "about ten more steps in 700 ms: {after_delay} then {later}"
     );
-    harness.pointer_up(up);
+    harness.send(Input::pointer_up(up));
     harness.advance(Duration::from_millis(500));
     assert_eq!(value(&harness), later, "released: it stops");
 }
@@ -75,14 +74,14 @@ fn a_held_press_repeats_after_the_delay_and_stops_when_let_go() {
 #[test]
 fn the_arrow_keys_step_the_focused_pair() {
     let mut harness = harness();
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Up));
     assert_eq!(value(&harness), 6);
-    harness.key(ShortcutKey::Down);
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(value(&harness), 4);
-    harness.key(ShortcutKey::End);
+    harness.send(Input::key(ShortcutKey::End));
     assert_eq!(value(&harness), 100);
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::key(ShortcutKey::Up));
     assert_eq!(value(&harness), 100, "the top holds");
 }

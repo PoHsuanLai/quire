@@ -6,6 +6,8 @@
 //! the code production runs. Its clock is [`Clock::Wall`] or [`Clock::Virtual`]
 //! ([`HarnessConfig::with_clock`]). Feature `pdf` adds [`pdf_app`] and [`Harness::pdf`].
 
+mod driver;
+mod error;
 mod frame_view;
 mod gpu_device;
 mod gpu_paint;
@@ -19,15 +21,19 @@ mod harness_hit;
 mod harness_input;
 #[cfg(feature = "pdf")]
 mod harness_pdf;
+mod harness_pointer;
 mod harness_settle;
 mod harness_style;
 mod harness_wheel;
 mod headless;
+mod input;
 mod painter;
 #[cfg(test)]
 mod snap_tests;
 pub mod snapshot;
 
+pub use driver::{ClassPresence, DocQuery, Driver, FocusState, Query};
+pub use error::HarnessError;
 pub use frame_view::FrameView;
 pub use harness::Harness;
 pub use harness_backend::Backend;
@@ -37,6 +43,7 @@ pub use harness_input::HeldButtons;
 #[cfg(feature = "pdf")]
 pub use harness_pdf::pdf_app;
 pub use harness_style::{Part, Srgba};
-pub use headless::Backdrop;
+pub use headless::{Backdrop, Layout};
+pub use input::{ImeInput, Input, KeyInput, PointerAction, PointerInput};
 pub use painter::PaintTime;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};

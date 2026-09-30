@@ -8,7 +8,7 @@ use ds::{
     EditSurface, ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect,
     ShortcutKey, Size, TextPosition, TextRange, use_edit_handle,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -95,7 +95,7 @@ fn focused_at(view: Viewport) -> Harness {
     let mut harness = Harness::new(Editor, view);
     harness.advance(ms(50));
     let into = harness.centre("#one").expect("the first paragraph");
-    harness.click(into);
+    harness.send(Input::click(into));
     harness.advance(ms(50));
     pointed();
     harness
@@ -120,7 +120,7 @@ fn near(a: f32, b: f32) -> bool {
 #[test]
 fn a_click_focuses_the_surface_and_switches_the_ime_on() {
     let harness = focused();
-    assert!(harness.is_focused("#editor"));
+    assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
     assert_eq!(harness.ime_switch(), ImeSwitch::On);
     assert_eq!(FOCUS.with(|log| log.borrow().clone()), vec![EditFocus::In]);
 }
@@ -128,10 +128,10 @@ fn a_click_focuses_the_surface_and_switches_the_ime_on() {
 #[test]
 fn typed_keys_arrive_as_text_and_keys_in_order() {
     let mut harness = focused();
-    harness.key(ShortcutKey::Char('h'));
-    harness.key(ShortcutKey::Char('i'));
-    harness.key(ShortcutKey::Enter);
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('b'));
+    harness.send(Input::key(ShortcutKey::Char('h')));
+    harness.send(Input::key(ShortcutKey::Char('i')));
+    harness.send(Input::key(ShortcutKey::Enter));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('b')));
     assert_eq!(
         heard(),
         vec![
@@ -152,10 +152,10 @@ fn typed_keys_arrive_as_text_and_keys_in_order() {
 #[test]
 fn a_composition_arrives_as_start_updates_and_end_in_order() {
     let mut harness = focused();
-    harness.ime_start();
-    harness.ime_update("ㄓ", 3);
-    harness.ime_update("ㄓㄨ", 6);
-    harness.ime_commit("注");
+    harness.send(Input::ime_start());
+    harness.send(Input::ime_update("ㄓ", 3));
+    harness.send(Input::ime_update("ㄓㄨ", 6));
+    harness.send(Input::ime_commit("注"));
     let update = |text: &str, cursor: Option<usize>| {
         EditInput::Composition(Composition::Update {
             text: text.to_owned(),
@@ -174,7 +174,7 @@ fn a_composition_arrives_as_start_updates_and_end_in_order() {
             }),
         ]
     );
-    harness.key(ShortcutKey::Char('x'));
+    harness.send(Input::key(ShortcutKey::Char('x')));
     assert_eq!(
         heard(),
         vec![EditInput::Text("x".to_owned())],
@@ -185,16 +185,16 @@ fn a_composition_arrives_as_start_updates_and_end_in_order() {
 #[test]
 fn keys_while_composing_belong_to_the_ime() {
     let mut harness = focused();
-    harness.ime_update("ka", 2);
+    harness.send(Input::ime_update("ka", 2));
     heard();
-    harness.key(ShortcutKey::Char('n'));
+    harness.send(Input::key(ShortcutKey::Char('n')));
     assert_eq!(heard(), Vec::new());
 }
 
 #[test]
 fn a_paste_carries_the_clipboards_html_and_its_text() {
     let mut harness = focused();
-    harness.paste_html("<b>bold</b> move", "bold move");
+    harness.send(Input::paste("<b>bold</b> move", "bold move"));
     assert_eq!(
         heard(),
         vec![EditInput::Paste(Pasted::Html {
@@ -203,13 +203,13 @@ fn a_paste_carries_the_clipboards_html_and_its_text() {
         })]
     );
     harness.set_clipboard_text("plain");
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v')));
     assert_eq!(
         heard(),
         vec![EditInput::Paste(Pasted::Text("plain".to_owned()))]
     );
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c'));
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('x'));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c')));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('x')));
     assert_eq!(heard(), vec![EditInput::Copy, EditInput::Cut]);
 }
 
@@ -342,7 +342,7 @@ fn a_press_reports_the_position_under_it() {
         x: Px(LEFT + 0.5),
         y: Px(top + LINE * 1.5),
     };
-    harness.click(point);
+    harness.send(Input::click(point));
     let log = pointed();
     let phases: Vec<PointerPhase> = log.iter().map(|pointer| pointer.phase).collect();
     assert_eq!(phases, vec![PointerPhase::Press, PointerPhase::Release]);
@@ -432,10 +432,10 @@ fn the_ime_cursor_area_follows_what_the_app_sets() {
         "not before the surface has the keyboard"
     );
     let into = harness.centre("#editor").expect("the surface");
-    harness.click(into);
+    harness.send(Input::click(into));
     harness.advance(ms(50));
     assert_eq!(harness.ime_cursor_area(), Some(rect(10.0, 12.0)));
-    harness.key(ShortcutKey::Char('a'));
+    harness.send(Input::key(ShortcutKey::Char('a')));
     harness.advance(ms(50));
     assert_eq!(harness.ime_cursor_area(), Some(rect(40.0, 32.0)));
 }

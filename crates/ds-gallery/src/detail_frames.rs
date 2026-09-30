@@ -11,7 +11,7 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::detail::{EventStamp, Slashed};
 use ds::{Appearance, Ds, Inject, Material, Theme};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use image::{RgbaImage, imageops};
 use std::path::Path;
 use std::time::Duration;

@@ -8,7 +8,7 @@ use ds::{
     Appearance, DropAcceptance, Ds, FileDrag, FileDragInput, FileDrop, Material, Offer, Point,
     use_file_drop,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::path::PathBuf;
 
 const VIEW: Viewport = Viewport {
@@ -125,9 +125,10 @@ fn files_over_a_target_light_it_and_moving_off_dims_it() {
     let composer = composer_only(&harness);
     assert_eq!(lights(&harness), (None, None), "nothing lit before a drag");
 
-    let entered = harness.file_drag(FileDragInput::Entered {
+    harness.send(Input::FileDrag(FileDragInput::Entered {
         point: Some(composer),
-    });
+    }));
+    let entered = harness.drop_answer();
     assert_eq!(entered, DropAcceptance::Copy, "paths not known yet: taken");
     assert_eq!(
         lights(&harness),
@@ -135,7 +136,10 @@ fn files_over_a_target_light_it_and_moving_off_dims_it() {
         "nothing lit until files are known"
     );
 
-    let offered = harness.file_drag(FileDragInput::Offered(Offer::Files(files())));
+    harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Files(
+        files(),
+    ))));
+    let offered = harness.drop_answer();
     assert_eq!(offered, DropAcceptance::Copy);
     assert_eq!(lights(&harness), (some("target"), some("accepts")));
     assert_eq!(
@@ -143,14 +147,16 @@ fn files_over_a_target_light_it_and_moving_off_dims_it() {
         Some("over:report.pdf,photo.jpg")
     );
 
-    let off = harness.file_drag(FileDragInput::Moved {
+    harness.send(Input::FileDrag(FileDragInput::Moved {
         point: at(&harness, ".outside"),
-    });
+    }));
+    let off = harness.drop_answer();
     assert_eq!(off, DropAcceptance::Refuse, "nothing to drop on: refused");
     assert_eq!(lights(&harness), (some("accepts"), some("accepts")));
     assert_eq!(harness.text_of(".composer-drag").as_deref(), Some("idle"));
 
-    let left = harness.file_drag(FileDragInput::Left);
+    harness.send(Input::FileDrag(FileDragInput::Left));
+    let left = harness.drop_answer();
     assert_eq!(left, DropAcceptance::Refuse);
     assert_eq!(
         lights(&harness),
@@ -164,14 +170,16 @@ fn files_over_a_target_light_it_and_moving_off_dims_it() {
 fn a_release_on_a_target_hands_it_the_paths() {
     let mut harness = harness();
     let composer = composer_only(&harness);
-    harness.file_drag(FileDragInput::Entered {
+    harness.send(Input::FileDrag(FileDragInput::Entered {
         point: Some(at(&harness, ".outside")),
-    });
-    harness.file_drag(FileDragInput::Offered(Offer::Files(files())));
-    harness.file_drag(FileDragInput::Moved { point: composer });
+    }));
+    harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Files(
+        files(),
+    ))));
+    harness.send(Input::FileDrag(FileDragInput::Moved { point: composer }));
     let before = log(&harness);
 
-    harness.file_drag(FileDragInput::Dropped);
+    harness.send(Input::FileDrag(FileDragInput::Dropped));
 
     assert_eq!(before, "", "nothing dropped before the release");
     assert_eq!(log(&harness), "composer:report.pdf,photo.jpg");
@@ -182,7 +190,7 @@ fn a_release_on_a_target_hands_it_the_paths() {
         "the target shows what it took until the next drag"
     );
 
-    harness.file_drag(FileDragInput::Entered { point: None });
+    harness.send(Input::FileDrag(FileDragInput::Entered { point: None }));
     assert_eq!(harness.text_of(".composer-drag").as_deref(), Some("idle"));
 }
 
@@ -190,11 +198,15 @@ fn a_release_on_a_target_hands_it_the_paths() {
 fn the_innermost_target_takes_the_drop() {
     let mut harness = harness();
     let chip = at(&harness, ".chip");
-    harness.file_drag(FileDragInput::Entered { point: Some(chip) });
-    harness.file_drag(FileDragInput::Offered(Offer::Files(files())));
+    harness.send(Input::FileDrag(FileDragInput::Entered {
+        point: Some(chip),
+    }));
+    harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Files(
+        files(),
+    ))));
     assert_eq!(lights(&harness), (some("accepts"), some("target")));
 
-    harness.file_drag(FileDragInput::Dropped);
+    harness.send(Input::FileDrag(FileDragInput::Dropped));
 
     assert_eq!(
         log(&harness),
@@ -207,13 +219,15 @@ fn the_innermost_target_takes_the_drop() {
 fn a_release_before_the_paths_arrive_lands_when_they_do() {
     let mut harness = harness();
     let composer = composer_only(&harness);
-    harness.file_drag(FileDragInput::Entered {
+    harness.send(Input::FileDrag(FileDragInput::Entered {
         point: Some(composer),
-    });
-    harness.file_drag(FileDragInput::Dropped);
+    }));
+    harness.send(Input::FileDrag(FileDragInput::Dropped));
     let before = log(&harness);
 
-    harness.file_drag(FileDragInput::Offered(Offer::Files(files())));
+    harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Files(
+        files(),
+    ))));
 
     assert_eq!(before, "");
     assert_eq!(log(&harness), "composer:report.pdf,photo.jpg");
@@ -223,14 +237,15 @@ fn a_release_before_the_paths_arrive_lands_when_they_do() {
 fn a_dragged_url_lights_nothing_and_drops_nothing() {
     let mut harness = harness();
     let composer = composer_only(&harness);
-    harness.file_drag(FileDragInput::Entered {
+    harness.send(Input::FileDrag(FileDragInput::Entered {
         point: Some(composer),
-    });
-    let offered = harness.file_drag(FileDragInput::Offered(Offer::Other));
+    }));
+    harness.send(Input::FileDrag(FileDragInput::Offered(Offer::Other)));
+    let offered = harness.drop_answer();
     assert_eq!(offered, DropAcceptance::Refuse);
     assert_eq!(lights(&harness), (None, None));
 
-    harness.file_drag(FileDragInput::Dropped);
+    harness.send(Input::FileDrag(FileDragInput::Dropped));
 
     assert_eq!(log(&harness), "");
 }

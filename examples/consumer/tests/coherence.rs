@@ -12,7 +12,7 @@
 
 use consumer::{App, STYLE};
 use ds::{Anim, Appearance, SpaceLook, SystemPrefs, resolve, settle};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_lint::{LintConfig, Profile, Rule, assert_clean, markup};
 
 const VIEW: Viewport = Viewport {
@@ -35,7 +35,7 @@ fn consumer_css() -> String {
 
 /// A harness on the virtual clock, so a timed assertion holds exactly under any load.
 fn harness() -> Harness {
-    Harness::with_config(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 /// Rule 1: `STYLE` under the strictest profile, the call `CONSUMING.md` section 5 shows.
@@ -85,7 +85,7 @@ fn the_sent_badge_times_out_on_ds_motions_own_clock() {
     let send = harness
         .centre(".ds-button")
         .unwrap_or_else(|| panic!("Send is not on screen:\n{}", harness.html()));
-    harness.click(send);
+    harness.send(Input::click(send));
     assert_eq!(
         shown(&harness).as_deref(),
         Some("shown"),
@@ -120,7 +120,7 @@ fn the_menu_opens_and_closes_under_harness() {
     let more = harness
         .centre(".ds-button:not([*|data-answers])")
         .unwrap_or_else(|| panic!("More is not on screen:\n{}", harness.html()));
-    harness.click(more);
+    harness.send(Input::click(more));
     assert!(
         harness.count(".ds-menu-item") > 0,
         "the menu did not open:\n{}",
@@ -130,7 +130,7 @@ fn the_menu_opens_and_closes_under_harness() {
     let item = harness
         .centre(".ds-menu-item")
         .unwrap_or_else(|| panic!("no menu item on screen:\n{}", harness.html()));
-    harness.click(item);
+    harness.send(Input::click(item));
     harness.advance(
         settle(
             Anim::MenuOut,

@@ -8,7 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey, Shown};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Layout, Query, Viewport};
 use image::RgbaImage;
 use probe::rect;
 use std::time::Duration;
@@ -94,7 +94,7 @@ fn Rows() -> Element {
 /// follows the selection, and follows the row when the results above it move it.
 #[test]
 fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
-    let mut harness = Harness::unmapped(Rows, VIEW);
+    let mut harness = Harness::new(Rows, HarnessConfig::new(VIEW).with_layout(Layout::Held));
     harness.advance(ms(150));
     assert_eq!(
         log(&harness),
@@ -106,7 +106,7 @@ fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
     let first = rect(&harness, &nth_row(1));
     assert!(first.size.width.0 > 0.0 && first.size.height.0 > 0.0);
     assert_eq!(log(&harness), format!("select:0,rect:{}", show(first)));
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     harness.advance(ms(100));
     let second = rect(&harness, &nth_row(2));
     assert!(
@@ -118,9 +118,9 @@ fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
         "{}",
         log(&harness)
     );
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::key(ShortcutKey::Up));
     harness.advance(ms(100));
-    harness.key(ShortcutKey::Char('f'));
+    harness.send(Input::key(ShortcutKey::Char('f')));
     harness.advance(ms(100));
     let moved = rect(&harness, &nth_row(1));
     assert!(
@@ -191,18 +191,19 @@ fn TabPassed() -> Element {
 fn tab_keeps_the_field(page: fn() -> Element) -> bool {
     let mut harness = Harness::new(page, VIEW);
     harness.advance(ms(200));
-    assert!(
-        harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Focused,
         "the field starts focused"
     );
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     harness.advance(ms(50));
     assert_eq!(
         harness.text_of(".tabs").as_deref(),
         Some("1"),
         "the caller heard Tab"
     );
-    harness.is_focused("#card .ds-input")
+    harness.focus_of("#card .ds-input") == FocusState::Focused
 }
 
 /// A Tab the caller takes (`prevent_default` on the event `onkey` hands it) leaves the
@@ -267,7 +268,7 @@ fn KeptFresh() -> Element {
 
 fn toggle(harness: &mut Harness) {
     let at = harness.centre(".toggle").expect("the toggle");
-    harness.click(at);
+    harness.send(Input::click(at));
 }
 
 /// How many pixels inside `area` differ between two frames.
@@ -307,19 +308,21 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         "hidden lays out nothing: {laid:?}"
     );
     let hidden = harness.render().expect("a frame");
-    assert!(
-        !harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Unfocused,
         "hidden takes no keyboard"
     );
 
     toggle(&mut harness);
     harness.advance(ms(40));
     let first_mid = harness.render().expect("a frame");
-    assert!(
-        harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Focused,
         "shown, it takes the keyboard"
     );
-    harness.key(ShortcutKey::Char('f'));
+    harness.send(Input::key(ShortcutKey::Char('f')));
     harness.advance(ms(110));
     assert_eq!(harness.text_of(".query").as_deref(), Some("[f]"));
     toggle(&mut harness);
@@ -327,8 +330,9 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
     toggle(&mut harness);
     harness.advance(ms(40));
     let second_mid = harness.render().expect("a frame");
-    assert!(
-        harness.is_focused("#card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#card .ds-input"),
+        FocusState::Focused,
         "shown again, it has the keyboard"
     );
     assert_eq!(

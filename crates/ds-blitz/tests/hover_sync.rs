@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard};
 use std::cell::RefCell;
 use std::time::Duration;
@@ -91,13 +91,13 @@ const REST: Point = Point {
 #[test]
 fn a_block_sliding_under_a_resting_pointer_is_entered_and_the_field_left() {
     let mut harness = Harness::new(Slider, VIEW);
-    harness.pointer_move(REST);
+    harness.send(Input::pointer_move(REST));
     assert_eq!(count("enter field"), 1);
     slide(&mut harness, Slide::Under);
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(REST.x.0 + 1.0),
         y: REST.y,
-    });
+    }));
     settle_until(&mut harness, |_| {
         count("enter block") == 1 && count("leave field") == 1
     });
@@ -113,7 +113,7 @@ fn a_block_sliding_under_a_resting_pointer_is_entered_and_the_field_left() {
 #[test]
 fn it_is_entered_even_before_the_pointer_moves_again() {
     let mut harness = Harness::new(Slider, VIEW);
-    harness.pointer_move(REST);
+    harness.send(Input::pointer_move(REST));
     slide(&mut harness, Slide::Under);
     settle_until(&mut harness, |_| count("enter block") == 1);
     slide(&mut harness, Slide::Away);
@@ -138,7 +138,7 @@ fn a_block_sliding_in_before_any_pointer_hears_nothing() {
 #[test]
 fn a_block_covering_the_whole_field_is_still_entered() {
     let mut harness = Harness::new(Slider, VIEW);
-    harness.pointer_move(REST);
+    harness.send(Input::pointer_move(REST));
     slide(&mut harness, Slide::Cover);
     settle_until(&mut harness, |_| count("enter block") == 1);
     // The limitation, pinned so that lifting it shows up here.
@@ -199,13 +199,13 @@ fn a_banner_arriving_under_a_resting_pointer_is_hovered() {
     show(&mut harness, &[]);
     settle_until(&mut harness, |h| h.count(".ds-banner") == 0);
 
-    harness.pointer_move(there);
+    harness.send(Input::pointer_move(there));
     show(&mut harness, &[2]);
     settle_until(&mut harness, at_rest);
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(there.x.0 + 1.0),
         y: there.y,
-    });
+    }));
     settle_until(&mut harness, |h| {
         h.attr(CARD, "data-hover").as_deref() == Some("on")
     });

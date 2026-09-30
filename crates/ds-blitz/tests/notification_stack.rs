@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Ds, Icon, IconSource, Material, MotionLevel, Point, Px, settle};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
 use std::time::Duration;
 
@@ -75,7 +75,7 @@ fn start(keys: &[u32]) -> Harness {
 
 /// `start`, on `clock`.
 fn start_on(keys: &[u32], clock: Clock) -> Harness {
-    let mut harness = Harness::with_config(Stack, HarnessConfig::new(VIEW).with_clock(clock));
+    let mut harness = Harness::new(Stack, HarnessConfig::new(VIEW).with_clock(clock));
     show(&mut harness, keys);
     for &n in keys {
         settle_until(&mut harness, |h| {
@@ -170,18 +170,18 @@ fn a_card_swiped_away_in_the_stack_is_carried_out_by_its_row() {
     let at = harness
         .centre(&format!("{} .ds-notification-plate", row(2)))
         .expect("banner 2");
-    harness.pointer_down(at);
+    harness.send(Input::pointer_down(at));
     for step in 1..=4u8 {
         harness.advance(Duration::from_millis(100));
-        harness.pointer_move(Point {
+        harness.send(Input::pointer_move(Point {
             x: Px(at.x.0 + 25.0 * f32::from(step)),
             y: at.y,
-        });
+        }));
     }
-    harness.pointer_up(Point {
+    harness.send(Input::pointer_up(Point {
         x: Px(at.x.0 + 100.0),
         y: at.y,
-    });
+    }));
     // Reported at the release, not after a flight of its own: the caller dropped it at once, so
     // its row is already leaving, while the card holds where the finger left it.
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));

@@ -10,7 +10,7 @@ use ds::{
     MotionLevel, Point, Px, Rect, RootExtent, Shown, SidePanel, settle, use_hover_hub, use_toasts,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::mpsc::{self, TryRecvError};
 use std::thread::JoinHandle;
@@ -31,7 +31,7 @@ fn standard(anim: Anim) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 // ---- The scenario: a panel entering, a hover card, a toast ------------------------------
@@ -139,11 +139,11 @@ fn run_scenario() -> Vec<Sample> {
     while at < ms(6600) {
         if at == ms(200) {
             let target = harness.centre(".ds-hover-target").expect("hover target");
-            harness.pointer_move(target);
+            harness.send(Input::pointer_move(target));
         }
         if at == ms(800) {
             let button = harness.centre(".ds-button").expect("button");
-            harness.click(button);
+            harness.send(Input::click(button));
         }
         harness.advance(step);
         at += step;
@@ -296,7 +296,7 @@ fn settle_until_reports_virtual_instants() {
     let mut h = virtual_harness(Scene);
     let rested = h.now();
     let target = h.centre(".ds-hover-target").expect("hover target");
-    h.pointer_move(target);
+    h.send(Input::pointer_move(target));
     let opened = settle_until(&mut h, |h| h.count(".ds-hovercard") == 1);
     assert_eq!(opened.duration_since(rested), ms(500));
 }

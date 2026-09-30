@@ -2,13 +2,13 @@
 //! surfaces use, so a test can see and time what a surface would paint. Pixel assertions and
 //! PNG captures read the same premultiplied RGBA from either.
 
+use crate::error::HarnessError;
 use crate::gpu_paint::GpuPainter;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use crate::headless::{Backdrop, physical};
 use crate::painter::{PaintTime, Painter};
 use dioxus::prelude::Element;
-use ds_blitz::NativeError;
 
 /// Which renderer a [`Harness`] paints with ([`HarnessConfig::with_backend`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -18,9 +18,8 @@ pub enum Backend {
     Cpu,
     /// anyrender_vello_hybrid on an offscreen wgpu device, opened once when the harness is
     /// built, on the adapter [`HarnessConfig::with_adapter`] and `WGPU_ADAPTER_NAME` pick.
-    /// Where no device opens (CI), [`Harness::try_with_config`] returns the error and a harness
-    /// built with [`Harness::with_config`] returns it from every picture instead: never a
-    /// panic.
+    /// Where no device opens (CI), [`Harness::try_new`] returns the error and a harness built
+    /// with [`Harness::new`] returns it from every picture instead: never a panic.
     Hybrid,
 }
 
@@ -42,13 +41,10 @@ impl Harness {
     /// Build `app` as `config` says and render its first frame, or the error that stops its
     /// renderer: a [`Backend::Hybrid`] harness with no GPU device to open, which a test skips
     /// on.
-    pub fn try_with_config(
-        app: fn() -> Element,
-        config: HarnessConfig,
-    ) -> Result<Self, NativeError> {
-        let harness = Harness::with_config(app, config);
+    pub fn try_new(app: fn() -> Element, config: HarnessConfig) -> Result<Self, HarnessError> {
+        let harness = Harness::new(app, config);
         match &harness.doc.painter {
-            Painter::Unavailable(why) => Err(NativeError::Renderer(why.clone())),
+            Painter::Unavailable(why) => Err(HarnessError::Renderer(why.clone())),
             Painter::Cpu | Painter::Gpu(_) => Ok(harness),
         }
     }
@@ -59,7 +55,7 @@ impl Harness {
     /// it, so the time is the whole frame's, GPU included, never just the recording. The
     /// document is not resolved here: style and layout (a scroll, a click) happen in the input
     /// call before, so time that separately.
-    pub fn paint_timed(&mut self) -> Result<PaintTime, NativeError> {
+    pub fn paint_timed(&mut self) -> Result<PaintTime, HarnessError> {
         self.doc.paint_timed(Backdrop::Scheme)
     }
 

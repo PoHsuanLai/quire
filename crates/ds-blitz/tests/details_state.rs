@@ -10,7 +10,7 @@ use ds::detail::{
 };
 use ds::{Appearance, Ds, Material, Motion};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -84,8 +84,7 @@ fn start(harness: &mut Harness) {
 
 #[test]
 fn a_pending_loop_spins_at_once_steps_until_it_ends_and_goes_quiet() {
-    let mut harness =
-        Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     start(&mut harness);
     harness.advance(Duration::from_millis(0));
     assert_eq!(frame(&harness), "Step(0)", "no grace: it shows at once");
@@ -102,8 +101,7 @@ fn a_pending_loop_spins_at_once_steps_until_it_ends_and_goes_quiet() {
 
 #[test]
 fn reduced_keeps_the_loop_turning() {
-    let mut harness =
-        Harness::with_config(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     start(&mut harness);
     harness.advance(Duration::from_millis(0));
@@ -113,7 +111,7 @@ fn reduced_keeps_the_loop_turning() {
 }
 
 fn shaking(harness: &Harness) -> bool {
-    harness.has_class("#shake", "a-shake-x")
+    harness.has_class("#shake", "a-shake-x") == ClassPresence::Present
 }
 
 #[test]

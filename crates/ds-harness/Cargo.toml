@@ -32,6 +32,7 @@ rustc-hash = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
+thiserror = { workspace = true }
 
 [features]
 # `pdf_app` and `Harness::pdf`: a harness's document printed as it is now.

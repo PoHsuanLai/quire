@@ -10,7 +10,7 @@ use ds::{
     StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -127,7 +127,7 @@ fn settled(app: fn() -> Element) -> Harness {
 fn click_centre(app: fn() -> Element) -> String {
     let mut harness = settled(app);
     let centre = harness.centre(".ds-row").expect("the row");
-    harness.click(centre);
+    harness.send(Input::click(centre));
     harness.advance(Duration::from_millis(100));
     harness.text_of(".log").unwrap_or_default()
 }
@@ -158,7 +158,9 @@ fn the_strip_is_the_designs_box_in_a_74px_row() {
 #[test]
 fn the_strip_takes_the_pointer_where_its_rect_says() {
     let mut harness = settled(Visible);
-    harness.pointer_move(harness.centre(".ds-row").expect("the row"));
+    harness.send(Input::pointer_move(
+        harness.centre(".ds-row").expect("the row"),
+    ));
     let strip = rect(&harness, ".ds-strip");
     let button = rect(&harness, ".ds-strip .ds-button");
     let inside = |x: f32, y: f32| Point { x: Px(x), y: Px(y) };
@@ -192,7 +194,7 @@ fn the_strip_takes_the_pointer_where_its_rect_says() {
 fn a_hidden_strip_takes_no_hits_even_under_the_pointer() {
     let mut harness = settled(Hidden);
     let button = harness.centre(".ds-strip .ds-button").expect("a button");
-    harness.pointer_move(button);
+    harness.send(Input::pointer_move(button));
     harness.advance(Duration::from_millis(400));
     assert!(!harness.hits(button, ".ds-strip"));
     assert!(harness.hits(button, ".ds-row"));

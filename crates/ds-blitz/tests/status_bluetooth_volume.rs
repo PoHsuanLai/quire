@@ -8,7 +8,7 @@ use ds::{
     VolumeWaves,
 };
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{ClassPresence, Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -70,7 +70,10 @@ fn bluetooth_off_draws_the_slash_and_a_failure_shakes_nothing() {
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, BluetoothState::Failed(EventStamp(1)));
     settle_until(&mut harness, |h| h.count("#bt [*|data-part=slash]") == 0);
-    assert!(!harness.has_class("#bt .ds-status-glyph", "a-shake-x"));
+    assert_eq!(
+        harness.has_class("#bt .ds-status-glyph", "a-shake-x"),
+        ClassPresence::Absent
+    );
     assert_settles_to_zero_frames(&mut harness);
 }
 
