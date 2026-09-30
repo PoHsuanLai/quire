@@ -18,6 +18,9 @@
 //! panel), where it draws no scrim and its card fills its container. A
 //! caller may keep it mounted and say whether it is `shown` (`palette_shown`).
 
+use crate::components::fields::text_field::TextField;
+use crate::components::fields::text_field_model::FieldBezel;
+use crate::components::fields::text_field_model::FieldKind;
 use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
 use crate::components::menus::palette::palette_claim::{Claim, FieldKey};
 use crate::components::menus::palette::palette_group::PaletteGroups;
@@ -36,8 +39,7 @@ use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
 
-use crate::components::fields::search_field::SearchField;
-use crate::components::fields::text_input_focus::FieldFocus;
+use crate::components::fields::text_field_focus::FieldFocus;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
 use crate::components::menus::palette::{
     palette_host::CommandPaletteHost, palette_motion::PaletteHandle,
@@ -299,7 +301,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             "data-aside": widened,
             style: card_style,
             onpointerdown: move |event| event.stop_propagation(),
-            SearchField {
+            TextField {
                 label: label.clone(),
                 value: query.clone(),
                 placeholder,
@@ -307,8 +309,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 oninput,
                 onkey: field_key,
                 focus: field,
-                handle: Some(handle),
-            }
+                handle: Some(handle), kind: FieldKind::Search, bezel: FieldBezel::Plain }
             div {
                 class: "ds-menu",
                 "data-kind": "rich",

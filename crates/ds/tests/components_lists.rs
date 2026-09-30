@@ -91,7 +91,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
         ],
         "account_tile" => &["account_tile", "button", "avatar", "provider_mark", "badge"],
         "sidebar_item" => &["sidebar_item", "drop_place", "avatar", "badge"],
-        "tree_item" => &["tree_item", "drop_place", "badge", "button", "text_input"],
+        "tree_item" => &["tree_item", "drop_place", "badge", "button", "text_field"],
         "hover_strip" => &["hover_strip", "button"],
         "appearance_picker" => &["appearance_picker", "section_header", "segmented"],
         "drag" => &["drag_ghost"],

@@ -488,8 +488,8 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Vocabulary | `Word`, `Availability`, `Selection`, `Emphasis`, `Switch`, `Expanded`, `Check`, `Shown`, `Fraction`, `Percent`, `ShortcutKey`, `Shortcut`, `Here`, `DropState` |
 | Geometry | `Px`, `Point`, `Size`, `Rect`, `Scale`, `Placement`, `Alpha` |
 | Icons | `Icon`, `IconSource`, `IconView`, `IconSize`, `ExternalIcon`, `StatusState`, `BatteryGlyph`, `WifiGlyph`, `VolumeGlyph`, `BluetoothGlyph` |
-| Controls | `Button`, `ButtonVariant`, `ButtonSize`, `IconButton`, `IconButtonVariant`, `Chip`, `ChipVariant`, `Toggle`, `Slider`, `SegmentedControl`, `Tabs`, `Spinner`, `Kbd`, `Count`, `LevelControl`, `Bumped` |
-| Fields | `TextInput`, `InputVariant`, `TextInputKind`, `SearchField`, `FieldFocus`, `SelectionBubble`, `EditSurface`, `SpellMarks` |
+| Controls | `Label`, `Button`, `Bezel`, `ButtonRole`, `Answers`, `ImagePosition`, `IconSwap`, `Chip`, `ChipVariant`, `Toggle`, `Checkbox`, `RadioGroup`, `Choice`, `SegmentedControl`, `Tracking`, `Slider`, `SliderLook`, `Ticks`, `ProgressIndicator`, `ProgressStyle`, `Progress`, `LevelIndicator`, `LevelStyle`, `Bands`, `Badge`, `BadgeContent`, `BadgeTone`, `KeyEquivalent`, `KeyStyle`, `ControlSize` |
+| Fields | `TextField`, `FieldKind`, `FieldBezel`, `Validity`, `FieldFocus`, `SelectionBubble`, `EditSurface`, `SpellMarks` |
 | Menus | `Menu`, `MenuKind`, `MenuEntry`, `MenuRow`, `MenuTile`, `MenuTrail`, `MenuFilter`, `MenuCursor`, `CommandPalette`, `PaletteGroup`, `RowAction`, `RowChord` |
 | Overlays | `Alert`, `Popover`, `Sheet`, `Tooltip`, `TooltipKind`, `HoverCard`, `Toast`, `ToastHost`, `Scrim`, `Panel`, `DragGhost`, `use_overlays`, `use_toasts` |
 | Lists and content | `AnimatedList`, `LeavingList`, `ListRow`, `SettingsRow`, `SectionHeader`, `Avatar`, `ImageSource`, `RichText`, `TextLine`, `TextRun`, `ProviderMark`, `PreviewPane`, `EmojiGrid`, `PdfThumb` |
@@ -513,7 +513,7 @@ are reached as `ds::app::X`, not through the prelude.
 | `Span` (`shell/battery/ring`) / (`spell/words`) | `RingSpan` / `WordSpan` |
 | `Level` (`shell/osd`), `Swipe` (`shell/notifications`) | `OsdLevel`, `NotificationSwipe` |
 | `Filter`, `Cursor`, `Tile`, `Trail` (menus) | `MenuFilter`, `MenuCursor`, `MenuTile`, `MenuTrail` |
-| `Focus` (text input), `Key` (shortcut), `Env` | `FieldFocus`, `ShortcutKey`, `Scope` |
+| `Focus` (text field), `Key` (shortcut), `Env` | `FieldFocus`, `ShortcutKey`, `Scope` |
 | `Text`, `Run` (text runs) | `TextLine`, `TextRun` |
 | `Step` (month grid), `Provider` (provider mark), `Mono` (preview) | `MonthStep`, `MarkProvider`, `PaneMono` |
 | `OsdPhase`, `Alias` (`shown_phase`), `ListPresence`, `Healing` | deleted / `Presence` / `roster::Heal` |

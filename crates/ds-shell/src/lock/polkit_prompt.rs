@@ -12,11 +12,9 @@ use dioxus::prelude::*;
 use ds::Answers;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
-use ds::components::fields::{
-    text_input::{InputVariant, TextInput},
-    text_input_focus::FieldFocus,
-    text_input_kind::TextInputKind,
-};
+use ds::components::fields::text_field::TextField;
+use ds::components::fields::text_field_focus::FieldFocus;
+use ds::components::fields::text_field_model::FieldKind;
 use ds::components::overlays::scrim_strength::ScrimStrength;
 use ds::components::overlays::tooltip::{Tooltip, TooltipKind};
 use ds::components::overlays::{
@@ -131,10 +129,9 @@ fn field(
     rsx! {
         div { class, "data-pulse": alias,
             for round in [entry.key()] {
-                TextInput {
+                TextField {
                     key: "{round}",
-                    variant: InputVariant::Boxed,
-                    kind: TextInputKind::Secret,
+                    kind: FieldKind::Secure,
                     label: "Password",
                     value: "",
                     placeholder: "Password",

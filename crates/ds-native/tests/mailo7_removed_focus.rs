@@ -7,9 +7,10 @@
 //! to a mounted element gives the keyboard back to that element itself.
 
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
-    Anchor, Appearance, Button, Common, Ds, InputVariant, Material, Menu, MenuEntry, MenuKind,
-    MenuRow, MountedRef, Point, Press, Px, ShortcutKey, TextInput,
+    Anchor, Appearance, Button, Common, Ds, Material, Menu, MenuEntry, MenuKind, MenuRow,
+    MountedRef, Point, Press, Px, ShortcutKey,
 };
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
@@ -105,7 +106,7 @@ fn FieldPage() -> Element {
                 div { class: "pane", tabindex: "0", style: "padding:8px",
                     div { class: "wrap", style: "display:flex; height:32px",
                         if editing() {
-                            TextInput { variant: InputVariant::Boxed, label: "Name", value: "Inbox",
+                            TextField { label: "Name", value: "Inbox",
                                 oninput: |_| {},
                                 onkey: move |event: KeyboardEvent| {
                                     if event.key() == dioxus::prelude::Key::Enter {

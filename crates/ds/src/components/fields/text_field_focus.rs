@@ -1,4 +1,4 @@
-//! When a `TextInput` takes the caret, and the bookkeeping that serves a focus request once.
+//! When a `TextField` takes the caret, and the bookkeeping that serves a focus request once.
 
 use crate::focus::field::FieldHandle;
 use crate::focus::request::{FocusRequest, FocusTicket};
@@ -85,6 +85,13 @@ impl FieldFocuser {
         }
         if focus.on_mount() {
             focus_soon_told(event.data(), focus.landing(), told.focus);
+        }
+    }
+
+    /// Put the caret back in the field, as a press on a control inside its frame took it.
+    pub(crate) fn refocus(&self) {
+        if let Some(element) = self.element.peek().clone() {
+            crate::focus::soon::focus_soon(element);
         }
     }
 

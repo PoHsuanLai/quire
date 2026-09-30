@@ -11,11 +11,9 @@ use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
-use ds::components::fields::{
-    text_input::{InputVariant, TextInput},
-    text_input_focus::FieldFocus,
-    text_input_kind::TextInputKind,
-};
+use ds::components::fields::text_field::TextField;
+use ds::components::fields::text_field_focus::FieldFocus;
+use ds::components::fields::text_field_model::{FieldBezel, FieldKind};
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_motion::detail::{
@@ -167,10 +165,10 @@ fn lock_field(field: Field, state: &PromptState) -> Element {
             "data-filled": entry.filled().slug(),
             "aria-disabled": availability.aria_disabled(),
             for round in [entry.key()] {
-                TextInput {
+                TextField {
                     key: "{round}",
-                    variant: InputVariant::Inline,
-                    kind: TextInputKind::Secret,
+                    bezel: FieldBezel::Plain,
+                    kind: FieldKind::Secure,
                     label: "Password",
                     value: "",
                     placeholder: placeholder.clone(),

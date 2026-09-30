@@ -2,9 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{Bezel, Button, ImagePosition};
-use ds::{
-    FieldFocus, Icon, InputVariant, PlaceId, Propagation, Shown, TextInput, TreeItem, TreeShape,
-};
+use ds::{FieldBezel, TextField};
+use ds::{FieldFocus, Icon, PlaceId, Propagation, Shown, TreeItem, TreeShape};
 
 /// One state and its golden.
 pub struct Case {
@@ -15,7 +14,7 @@ pub struct Case {
 /// The rename field mailo draws in a row's label place.
 fn rename(value: &str) -> Element {
     rsx! {
-        TextInput { variant: InputVariant::Bare, label: "Rename folder", value: value.to_string(), oninput: |_| {}, focus: FieldFocus::OnMount }
+        TextField { bezel: FieldBezel::Plain, label: "Rename folder", value: value.to_string(), oninput: |_| {}, focus: FieldFocus::OnMount }
     }
 }
 

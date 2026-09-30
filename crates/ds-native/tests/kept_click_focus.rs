@@ -9,10 +9,11 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Ds, FieldFocus, HoverStrip, Icon, InputVariant, Material, Press,
-    ShortcutKey, Shown, StripAction, TextInput, TreeItem, TreeShape, use_focus_request,
+    ActionId, Appearance, Ds, FieldFocus, HoverStrip, Icon, Material, Press, ShortcutKey, Shown,
+    StripAction, TreeItem, TreeShape, use_focus_request,
 };
 use ds::{Bezel, Button, ImagePosition};
+use ds::{FieldBezel, TextField};
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -180,7 +181,7 @@ fn Renaming() -> Element {
                         open: Shown::Hidden,
                         on_toggle: move |_| note("toggle:projects"),
                         editing: rsx! {
-                            TextInput { variant: InputVariant::Bare, label: "Rename folder", value: "Projects",
+                            TextField { bezel: FieldBezel::Plain, label: "Rename folder", value: "Projects",
                                 focus: FieldFocus::Controlled(request),
                                 oninput: |_: String| {},
                             }

@@ -4,11 +4,12 @@
 use super::{Scope, Section};
 use crate::axes::Axes;
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::Word;
 use ds::{
     Accent, AnimatedList, Availability, Button, Check, Chip, ChipVariant, Emphasis, Fraction, Icon,
-    InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, RowState, Scheme,
-    SegmentedControl, Selection, SidebarItem, Slider, Surface, TextInput, Toggle, Verdict,
+    ItemKind, LabelHue, ListRow, Material, Presence, RowState, Scheme, SegmentedControl, Selection,
+    SidebarItem, Slider, Surface, Toggle, Verdict,
 };
 use ds::{Answers, Bezel, ButtonRole, ControlSize};
 use ds::{Choice, Tracking};
@@ -133,8 +134,8 @@ fn Cell(subject: Subject) -> Element {
             SegmentedControl::<u8> { label: "Tabs", choices: Choice::pairs(vec![(0, "Inbox".to_string()), (1, "Sent".to_string())]), tracking: Tracking::SelectOne(0), onchange: |_| {} }
         },
         Subject::Field => rsx! {
-            TextInput { variant: InputVariant::Boxed, label: "Name", value: "", placeholder: "Your name", oninput: |_| {} }
-            TextInput { variant: InputVariant::Boxed, label: "Mail", value: "dana@example.org", oninput: |_| {} }
+            TextField { label: "Name", value: "", placeholder: "Your name", oninput: |_| {} }
+            TextField { label: "Mail", value: "dana@example.org", oninput: |_| {} }
         },
     }
 }

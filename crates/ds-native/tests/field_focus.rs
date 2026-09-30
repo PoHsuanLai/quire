@@ -3,10 +3,8 @@
 //! (`Focus::Controlled`) moves it with no event, and the field reports it itself.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, Ds, FieldFocus, InputVariant, Material, TextInput, TextInputKind,
-    use_focus_request,
-};
+use ds::{Appearance, Button, Ds, FieldFocus, Material, use_focus_request};
+use ds::{FieldKind, TextField};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -35,15 +33,15 @@ fn Fields() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
                 div { id: "a", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "A", value: "", oninput: |_| {},
+                    TextField { label: "A", value: "", oninput: |_| {},
                         onfocus: move |()| note("focus:a"), onblur: move |()| note("blur:a") }
                 }
                 div { id: "b", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "B", value: "", oninput: |_| {},
+                    TextField { label: "B", value: "", oninput: |_| {},
                         onfocus: move |()| note("focus:b"), onblur: move |()| note("blur:b") }
                 }
                 div { id: "c", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Password, label: "C", value: "secret",
+                    TextField { kind: FieldKind::Secure, label: "C", value: "secret",
                         focus: FieldFocus::Controlled(request), oninput: |_| {},
                         onfocus: move |()| note("focus:c"), onblur: move |()| note("blur:c") }
                 }

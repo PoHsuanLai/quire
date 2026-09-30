@@ -5,7 +5,8 @@
 //! surface's own focus wins inside it.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Common, Ds, EditSurface, InputVariant, Material, ShortcutKey, TextInput};
+use ds::TextField;
+use ds::{Appearance, Common, Ds, EditSurface, Material, ShortcutKey};
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -34,7 +35,7 @@ fn Shell() -> Element {
                     "Plain text, nothing focusable"
                 }
                 div { class: "field", style: "display:flex; margin-top:12px",
-                    TextInput { variant: InputVariant::Boxed, label: "Find", value: "",
+                    TextField { label: "Find", value: "",
                         oninput: |_| {},
                         onblur: move |()| note("field-blur".to_owned()),
                     }

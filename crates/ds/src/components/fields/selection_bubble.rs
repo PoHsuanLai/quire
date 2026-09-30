@@ -4,10 +4,9 @@
 //! selection (clamped 8 px inside the window, never flipped below), and runs the link field:
 //! Enter applies the link, Escape hides the bubble.
 
-use crate::components::fields::{
-    text_input::{InputVariant, TextInput},
-    text_input_focus::FieldFocus,
-};
+use crate::components::fields::text_field::TextField;
+use crate::components::fields::text_field_focus::FieldFocus;
+use crate::components::fields::text_field_model::FieldBezel;
 use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
 use dioxus::prelude::*;
 use ds_core::geometry::{
@@ -93,8 +92,8 @@ pub fn SelectionBubble(
             }
         },
         BubbleMode::Link => rsx! {
-            TextInput {
-                variant: InputVariant::Inline,
+            TextField {
+                bezel: FieldBezel::Plain,
                 label: "Link",
                 value: link(),
                 placeholder: "Paste a link, then Enter",

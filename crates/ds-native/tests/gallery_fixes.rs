@@ -4,10 +4,11 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Fraction, Grain, HeaderKind, Icon, InputVariant, ItemKind, Material, PRESETS,
-    Presence, Rect, RowState, Scheme, SearchField, SectionHeader, Selection, SendPhase, SendPill,
-    SidebarItem, SpaceLook, TextInput, Theme, use_toasts,
+    Appearance, Ds, Fraction, Grain, HeaderKind, Icon, ItemKind, Material, PRESETS, Presence, Rect,
+    RowState, Scheme, SectionHeader, Selection, SendPhase, SendPill, SidebarItem, SpaceLook, Theme,
+    use_toasts,
 };
+use ds::{FieldBezel, FieldKind, TextField};
 use ds_native::{Harness, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use std::time::Duration;
@@ -39,13 +40,13 @@ fn FieldsApp() -> Element {
         Root {
             div { style: "width:240px",
                 div { class: "probe-boxed",
-                    TextInput { variant: InputVariant::Boxed, label: "To", value: "", placeholder: "Add a person", oninput: |_| {} }
+                    TextField { label: "To", value: "", placeholder: "Add a person", oninput: |_| {} }
                 }
                 div { class: "probe-inline",
-                    TextInput { variant: InputVariant::Inline, label: "To", value: "dana@example.org", oninput: |_| {} }
+                    TextField { bezel: FieldBezel::Plain, label: "To", value: "dana@example.org", oninput: |_| {} }
                 }
                 div { class: "probe-search",
-                    SearchField { label: "Search", value: "", placeholder: "Search mail", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} }
+                    TextField { label: "Search", value: "", placeholder: "Search mail", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} , kind: FieldKind::Search, bezel: FieldBezel::Plain}
                 }
             }
         }

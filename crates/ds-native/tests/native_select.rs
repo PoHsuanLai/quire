@@ -3,9 +3,9 @@
 //! its own element.
 
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
-    Appearance, Button, Ds, FieldFocus, InputVariant, Material, ShortcutKey, TextInput, focus_soon,
-    use_focus_request,
+    Appearance, Button, Ds, FieldFocus, Material, ShortcutKey, focus_soon, use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::rc::Rc;
@@ -31,11 +31,11 @@ fn Rename() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
                 div { id: "name", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "Name", value: name(),
+                    TextField { label: "Name", value: name(),
                         focus: FieldFocus::Controlled(request), oninput: move |value| name.set(value) }
                 }
                 div { id: "other", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "Other", value: "", oninput: |_| {} }
+                    TextField { label: "Other", value: "", oninput: |_| {} }
                 }
                 div { id: "again", style: "display:flex",
                     Button { label: "Rename",
@@ -54,7 +54,7 @@ fn Plain() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { id: "name", style: "display:flex; width:300px; padding:12px",
-                TextInput { variant: InputVariant::Boxed, label: "Name", value: "Archive",
+                TextField { label: "Name", value: "Archive",
                     focus: FieldFocus::Controlled(request), oninput: |_| {} }
             }
         }

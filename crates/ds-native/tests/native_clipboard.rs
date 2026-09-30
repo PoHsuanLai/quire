@@ -3,7 +3,8 @@
 //! `ds_native::clipboard::{write_text, read_text}` reach the same clipboard.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, InputVariant, Material, Point, ShortcutKey, TextInput};
+use ds::TextField;
+use ds::{Appearance, Button, Ds, Material, Point, ShortcutKey};
 use ds_native::clipboard::{ClipboardError, read_text, write_text};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -35,11 +36,11 @@ fn Fields() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
                 div { id: "from", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "From", value: from(),
+                    TextField { label: "From", value: from(),
                         oninput: move |value| from.set(value) }
                 }
                 div { id: "to", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "To", value: to(),
+                    TextField { label: "To", value: to(),
                         oninput: move |value| to.set(value) }
                 }
                 div { id: "copy", style: "display:flex",

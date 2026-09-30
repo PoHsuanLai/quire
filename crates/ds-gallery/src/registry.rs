@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 20] = [
+pub const REGISTRY: [Entry; 21] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -42,6 +42,13 @@ pub const REGISTRY: [Entry; 20] = [
         lede: "Every control in every state it can express: variants, pressed, expanded, disabled, empty and filled. Press Tab to see the keyboard focus ring.",
         height: 3450,
         body: pages::controls::ControlsPage,
+    },
+    Entry {
+        page: Page::Catalogue,
+        title: "Catalogue",
+        lede: "Every control and field of the catalogue in every state it can express, at each size: label, button, toggle, checkbox, radio group, segmented control, slider, text field, progress and level indicators, badge, key equivalent. Press Tab to see the focus ring, Return or Space to press.",
+        height: 9000,
+        body: pages::catalogue::CataloguePage,
     },
     Entry {
         page: Page::Lists,

@@ -3,9 +3,10 @@
 //! a handle's blur is heard once too; an unknown or unreadable selector is a typed error.
 
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
-    Appearance, Button, Ds, FieldHandle, FocusError, InputVariant, Material, Select, TextInput,
-    focus_by_selector, use_field_handle,
+    Appearance, Button, Ds, FieldHandle, FocusError, Material, Select, focus_by_selector,
+    use_field_handle,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -57,7 +58,7 @@ fn Page(reach: Reach) -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
                 div { class: "rename", style: "display:flex",
-                    TextInput { variant: InputVariant::Boxed, label: "Name", value: "Inbox",
+                    TextField { label: "Name", value: "Inbox",
                         handle: Some(handle),
                         oninput: |_| {},
                         onfocus: move |()| log.with_mut(|log| log.push("focus".to_owned())),

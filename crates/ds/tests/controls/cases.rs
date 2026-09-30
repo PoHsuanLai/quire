@@ -9,11 +9,11 @@ use ds::{
 use ds::{
     Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Chip, ChipVariant, Colour,
     Common, ExternalIcon, FieldFocus, HeaderKind, Hex, Icon, IconPx, IconSize, IconSource, IconUrl,
-    IconView, InputVariant, LabelHue, PersonHue, SearchField, SectionHeader, SegmentedControl,
-    Slider, TextInput, Toggle, Verdict,
+    IconView, LabelHue, PersonHue, SectionHeader, SegmentedControl, Slider, Toggle, Verdict,
 };
 use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
+use ds::{FieldBezel, FieldKind, TextField};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -257,47 +257,47 @@ pub const CASES: &[Case] = &[
         state: "disabled",
         make: || rsx! { Toggle { label: "Bluetooth", value: Check::Off, availability: Availability::Disabled, onchange: |_| {} } },
     },
-    // TextInput: both variants, placeholder shown and hidden, disabled.
+    // TextField: both bezels, placeholder shown and hidden, disabled.
     Case {
-        component: "text_input",
-        state: "boxed-empty",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, label: "To", value: "", placeholder: "Add a person", oninput: |_| {} } },
+        component: "text_field",
+        state: "bezeled-empty",
+        make: || rsx! { TextField { label: "To", value: "", placeholder: "Add a person", oninput: |_| {} } },
     },
     Case {
-        component: "text_input",
-        state: "boxed-filled",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, label: "To", value: "dana@", placeholder: "Add a person", oninput: |_| {} } },
+        component: "text_field",
+        state: "bezeled-filled",
+        make: || rsx! { TextField { label: "To", value: "dana@", placeholder: "Add a person", oninput: |_| {} } },
     },
     Case {
-        component: "text_input",
-        state: "inline-empty",
-        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Link", value: "", placeholder: "Paste a link", oninput: |_| {} } },
+        component: "text_field",
+        state: "plain-empty",
+        make: || rsx! { TextField { bezel: FieldBezel::Plain, label: "Link", value: "", placeholder: "Paste a link", oninput: |_| {} } },
     },
     Case {
-        component: "text_input",
+        component: "text_field",
         state: "no-placeholder",
-        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Name", value: "", oninput: |_| {} } },
+        make: || rsx! { TextField { bezel: FieldBezel::Plain, label: "Name", value: "", oninput: |_| {} } },
     },
     Case {
-        component: "text_input",
+        component: "text_field",
         state: "disabled",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, label: "Name", value: "Dana", availability: Availability::Disabled, oninput: |_| {} } },
+        make: || rsx! { TextField { label: "Name", value: "Dana", availability: Availability::Disabled, oninput: |_| {} } },
     },
     Case {
-        component: "text_input",
+        component: "text_field",
         state: "focus-on-mount",
-        make: || rsx! { TextInput { variant: InputVariant::Inline, label: "Link", value: "", placeholder: "Paste a link", focus: FieldFocus::OnMount, oninput: |_| {} } },
+        make: || rsx! { TextField { bezel: FieldBezel::Plain, label: "Link", value: "", placeholder: "Paste a link", focus: FieldFocus::OnMount, oninput: |_| {} } },
     },
     // SearchField: empty, and typed with tokens.
     Case {
-        component: "search_field",
-        state: "empty",
-        make: || rsx! { SearchField { label: "Search", value: "", placeholder: "Search mail, people, actions", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} } },
+        component: "text_field",
+        state: "search-empty",
+        make: || rsx! { TextField { label: "Search", value: "", placeholder: "Search mail, people, actions", tokens: Vec::new(), oninput: |_| {}, onkey: |_| {} , kind: FieldKind::Search, bezel: FieldBezel::Plain} },
     },
     Case {
-        component: "search_field",
-        state: "tokens",
-        make: || rsx! { SearchField { label: "Search", value: "uidl", placeholder: "Search mail, people, actions", tokens: vec!["from dana".to_string(), "has:attachment".to_string()], oninput: |_| {}, onkey: |_| {} } },
+        component: "text_field",
+        state: "search-tokens",
+        make: || rsx! { TextField { label: "Search", value: "uidl", placeholder: "Search mail, people, actions", tokens: vec!["from dana".to_string(), "has:attachment".to_string()], oninput: |_| {}, onkey: |_| {} , kind: FieldKind::Search, bezel: FieldBezel::Plain} },
     },
     // Kbd: both sizes, every modifier.
     Case {

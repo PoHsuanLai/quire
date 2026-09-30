@@ -3,9 +3,10 @@
 //! trailing action fires without picking it or closing the menu.
 
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
-    Anchor, Appearance, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuCursor, MenuEntry,
-    MenuFilter, MenuKind, MenuRow, Point, Px, RowAction, ShortcutKey, TextInput,
+    Anchor, Appearance, Ds, FieldFocus, Icon, Material, Menu, MenuCursor, MenuEntry, MenuFilter,
+    MenuKind, MenuRow, Point, Px, RowAction, ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -67,8 +68,7 @@ fn Page(drive: Drive) -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "height:460px; padding:20px",
                 div { class: "field",
-                    TextInput {
-                        variant: InputVariant::Boxed,
+                    TextField {
                         label: "To",
                         value: String::new(),
                         oninput: move |_| {},

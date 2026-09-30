@@ -4,9 +4,9 @@
 use super::parts::CheckRows;
 use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
-use ds::components::fields::text_input::{InputVariant, TextInput};
 use ds::components::lists::section_header::{HeaderKind, SectionHeader};
 use ds::{Choice, Tracking};
+use ds::{FieldBezel, TextField};
 use ds_core::word::Word;
 use ds_style::appearance::{
     motion::Motion,
@@ -60,8 +60,8 @@ pub(super) fn Title(
     let swatch = DotPaint::gradient(&derive(&dots, scheme).stops);
     let heading = match (&name, on_rename) {
         (_, Some(rename)) => rsx! {
-            TextInput {
-                variant: InputVariant::Inline,
+            TextField {
+                bezel: FieldBezel::Plain,
                 label: "Space name",
                 value: name.clone().unwrap_or_default(),
                 placeholder: "Name this Space",
