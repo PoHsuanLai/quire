@@ -2,9 +2,9 @@
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
-//! `try_set`, so a hold that finds the hub gone stops (`crate::core::task`).
+//! `try_set`, so a hold that finds the hub gone stops (`crate::style::task`).
 
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::style::scope::Scope;
 use crate::style::tokens::delay::DelayToken;
@@ -120,7 +120,7 @@ impl ToastHub {
     /// Hide at once.
     pub fn hide(&self) {
         if self.stop_hold().is_ok() {
-            let _ = crate::core::task::try_set_if_changed(self.state, ToastState::Hidden);
+            let _ = crate::style::task::try_set_if_changed(self.state, ToastState::Hidden);
         }
     }
 

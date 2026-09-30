@@ -10,7 +10,7 @@
 //! caret stays.
 
 use crate::components::fields::text_input_kind::MASK_DOT;
-use crate::core::task::{spawn_in, try_set_if_changed};
+use crate::style::task::{spawn_in, try_set_if_changed};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::caret::FieldSelection;
 use crate::host::document::DocumentHost;

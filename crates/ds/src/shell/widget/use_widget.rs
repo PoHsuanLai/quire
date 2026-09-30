@@ -4,7 +4,7 @@
 //! timeline holds (the next entry's date, the refresh) and sleeps on nothing else: a widget whose
 //! provider pushes one entry at a time costs no frame between pushes (the idle-frame rule).
 
-use crate::core::task::{spawn_in, try_get, try_set};
+use crate::style::task::{spawn_in, try_get, try_set};
 use crate::shell::widget::contract::{Widget, fit};
 use crate::shell::widget::kind::WidgetSize;
 use crate::shell::widget::timeline::{RefreshAsk, Timeline, Wake};

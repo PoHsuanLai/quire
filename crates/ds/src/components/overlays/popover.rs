@@ -261,7 +261,7 @@ impl Float {
         if let Some(stack) = self.stack {
             let next = stack.peek().clone().remove(self.layer_id);
             if *stack.peek() != next {
-                let _ = crate::core::task::try_set(stack, next);
+                let _ = crate::style::task::try_set(stack, next);
             }
         }
     }
@@ -271,7 +271,7 @@ impl Float {
     pub(crate) fn rejoin(&self) {
         if let (Stacking::Layer(dismiss), Some(stack)) = (self.stacking, self.stack) {
             let next = stack.peek().clone().push(self.layer_id, dismiss);
-            let _ = crate::core::task::try_set(stack, next);
+            let _ = crate::style::task::try_set(stack, next);
         }
     }
 

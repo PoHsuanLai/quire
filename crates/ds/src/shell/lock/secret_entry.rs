@@ -106,9 +106,9 @@ fn clear(
 ) {
     let mut typed = typed;
     typed.set(String::new());
-    let _ = crate::core::task::try_set(filled, Filled::Empty);
-    if let Ok(round) = crate::core::task::try_get(generation) {
-        let _ = crate::core::task::try_set(generation, round.wrapping_add(1));
+    let _ = crate::style::task::try_set(filled, Filled::Empty);
+    if let Ok(round) = crate::style::task::try_get(generation) {
+        let _ = crate::style::task::try_set(generation, round.wrapping_add(1));
     }
     oninput.call(String::new());
 }
@@ -179,8 +179,8 @@ fn settle_later(
         sleep(settle(Anim::ShakeX, level)).await;
         // Only forward: an older firing's timer must not cut a newer shake short. A prompt that
         // unmounted meanwhile has nothing left to empty.
-        if crate::core::task::try_get(settled).is_ok_and(|done| done < round) {
-            let _ = crate::core::task::try_set(settled, round);
+        if crate::style::task::try_get(settled).is_ok_and(|done| done < round) {
+            let _ = crate::style::task::try_set(settled, round);
             empty();
         }
     });

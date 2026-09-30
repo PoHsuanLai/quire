@@ -3,7 +3,7 @@
 
 use super::model::Turn;
 use super::step::turn_after;
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::FRAME_TICK;
 use crate::core::time::clock::{now, since, sleep};
 use crate::core::vocab::Activity;

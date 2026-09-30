@@ -4,7 +4,7 @@
 
 use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
 use crate::core::geometry::units::Px;
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::core::vocab::PressPhase;
 use crate::style::scope::{Scope, use_scope_signal};
