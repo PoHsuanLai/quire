@@ -932,6 +932,7 @@ pub struct KeySpec {
     pub label: Label, pub help: Help,
     pub page: Page, pub section: Section,
     pub exposure: Exposure,       // Basic | Advanced (file-only)
+    pub labels: WordLabels,       // optional: a human label per enum word, by stored word
 }
 pub struct Schema { pub app: AppId, pub file: FilePath, pub keys: Vec<KeySpec> }
 ```
@@ -950,6 +951,9 @@ Widget by kind, fixed:
 | `Colour` | the appearance picker's swatch row |
 | `Shortcut` | key-capture field |
 | `List` | rows editor |
+
+`labels` (`[key.labels]`, word = "Label") is optional and absent from older schemas; a word
+without a label is shown as its own words (`workspace_prev` as "Workspace prev").
 
 The schema's `kind` for a two-variant enum stays `toggle`; the Settings app decides between
 switch and segments from the words, so a program writes nothing extra. Two words are an on/off

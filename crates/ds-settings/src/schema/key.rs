@@ -19,6 +19,24 @@ pub struct Label(pub String);
 #[serde(transparent)]
 pub struct Help(pub String);
 
+/// What a picker calls each word of an enum key, by the stored word: `workspace_prev` is
+/// "Previous workspace". Optional: a word without an entry is shown as its own words.
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct WordLabels(pub std::collections::BTreeMap<String, String>);
+
+impl WordLabels {
+    /// Whether no word has a label.
+    pub fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+
+    /// The label of `word`, if the schema gave one.
+    pub fn of(&self, word: &str) -> Option<&str> {
+        self.0.get(word).map(String::as_str)
+    }
+}
+
 /// A key's group within its page, e.g. dock's "Magnification" section.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
@@ -157,6 +175,10 @@ pub struct KeySpec {
     pub page: Page,
     pub section: Section,
     pub exposure: Exposure,
+    /// Human labels for an enum key's words; empty for every other key and for a schema written
+    /// before they existed (the field is absent then).
+    #[serde(default, skip_serializing_if = "WordLabels::is_empty")]
+    pub labels: WordLabels,
 }
 
 /// Every variant count from 1 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-
@@ -298,5 +320,29 @@ mod tests {
             Page::App("com.example.App".to_owned()).label(),
             "com.example.App"
         );
+    }
+}
+
+#[cfg(test)]
+mod label_tests {
+    use super::{KeySpec, WordLabels};
+
+    const OLD: &str = "path = \"a.b\"\ndefault = \"x\"\nlabel = \"B\"\nhelp = \"\"\nsection = \"\"\nexposure = \"basic\"\n[kind]\nkind = \"text\"\n[page]\nkind = \"appearance\"\n";
+
+    #[test]
+    fn a_key_written_before_labels_existed_still_reads_and_writes_without_them() {
+        let spec: KeySpec = toml::from_str(OLD).expect("old schema text parses");
+        assert!(spec.labels.is_empty());
+        assert!(!toml::to_string(&spec).unwrap().contains("labels"));
+    }
+
+    #[test]
+    fn labels_round_trip_by_word() {
+        let text = format!("{OLD}[labels]\nback = \"Back\"\n");
+        let spec: KeySpec = toml::from_str(&text).expect("parses");
+        assert_eq!(spec.labels.of("back"), Some("Back"));
+        assert_eq!(spec.labels.of("other"), None);
+        let again: KeySpec = toml::from_str(&toml::to_string(&spec).unwrap()).unwrap();
+        assert_eq!(again.labels, WordLabels(spec.labels.0.clone()));
     }
 }
