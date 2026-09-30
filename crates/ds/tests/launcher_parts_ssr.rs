@@ -520,7 +520,7 @@ fn a_rows_chord_follows_the_selection() {
         assert_eq!(rows.len(), 3, "{name}: {html}");
         for (at, (row, chord)) in rows.iter().zip(chords).enumerate() {
             let drawn = row
-                .split("class=\"ds-chord\">")
+                .split("data-style=\"text\" data-size=\"regular\">")
                 .nth(1)
                 .and_then(|rest| rest.split('<').next())
                 .unwrap_or("");
@@ -530,14 +530,19 @@ fn a_rows_chord_follows_the_selection() {
     }
 }
 
-/// A pane action is its label then its keys as one plain chord: no key caps.
+/// A pane action is its label then its keys as one plain key equivalent: no key caps.
 #[test]
-fn a_pane_action_ends_in_a_plain_chord() {
+fn a_pane_action_ends_in_a_plain_key_equivalent() {
     let html = render(pane_pdf);
-    assert!(!html.contains("ds-kbd"), "{html}");
+    assert!(!html.contains("ds-key-equivalent-key"), "{html}");
     assert!(
-        html.contains("Reveal in Files</span><span class=\"ds-chord\">⌘R</span>"),
+        html.contains("Reveal in Files</span><span class=\"ds-key-equivalent\" data-style=\"text\" data-size=\"regular\">⌘R</span>"),
         "{html}"
     );
-    assert!(html.contains("<span class=\"ds-chord\">↵</span>"), "{html}");
+    assert!(
+        html.contains(
+            "<span class=\"ds-key-equivalent\" data-style=\"text\" data-size=\"regular\">↵</span>"
+        ),
+        "{html}"
+    );
 }
