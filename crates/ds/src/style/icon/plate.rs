@@ -9,9 +9,9 @@
 //! (`mask-composite: add`), so a squircle is drawn as a mask: four quadrant images at the
 //! corners and two rectangles for the cross between them. The shapes are sampled here, as data.
 
-use crate::core::word::Word;
 use crate::style::icon::url::IconUrl;
 use crate::style::tokens::plate::EXPONENT;
+use ds_core::word::Word;
 use std::f64::consts::FRAC_PI_2;
 
 /// Samples per quadrant for a corner mask, and for each quadrant of the plate.
@@ -120,8 +120,8 @@ pub fn plate_mask() -> IconUrl {
 #[cfg(test)]
 mod tests {
     use super::{Quadrant, fill_mask, plate_mask, point, quadrant_mask};
-    use crate::core::word::Word;
     use crate::style::tokens::plate::{EXPONENT, shadow_radius_share};
+    use ds_core::word::Word;
 
     /// Whether `(x, y)`, measured from a corner of a squircle corner of extent `k`, lies inside the
     /// shape: the analytic test the pixel proofs compare against.

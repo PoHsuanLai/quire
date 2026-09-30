@@ -12,9 +12,9 @@
 use super::family::{NEUTRAL_DARK, PlateFamily};
 use super::retint::{IconStyle, Tint, recolour};
 use super::tone_band::Tone;
-use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::{hex::Hex, name::VarName};
+use ds_core::word::Word;
 
 /// How a plate is re-coloured: `icons.style` when it is not Colour.
 #[derive(Debug, Clone, Copy, PartialEq)]

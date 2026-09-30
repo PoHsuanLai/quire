@@ -4,7 +4,7 @@
 //! only on the highlighted row, so the list reads as its data (a file's time) and the hint
 //! follows the selection; `Always` keeps it on every row, as a menu's shortcuts are.
 
-use crate::core::vocab::{Selection, Shortcut};
+use ds_core::vocab::{Selection, Shortcut};
 
 /// When a row's chord shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -61,7 +61,7 @@ pub(crate) fn shown_chord(chord: &RowChord, selection: Selection) -> Option<&Sho
 #[cfg(test)]
 mod tests {
     use super::{RowChord, shown_chord};
-    use crate::core::vocab::{Selection, Shortcut, ShortcutKey};
+    use ds_core::vocab::{Selection, Shortcut, ShortcutKey};
 
     #[test]
     fn a_chord_shows_by_its_rule() {

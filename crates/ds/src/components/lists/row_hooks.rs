@@ -3,9 +3,9 @@
 //! targets inside a `thread` row), and the row itself starts a drag on a press and opens the
 //! thread card on entry. quire draws the parts, so it attaches the caller's handlers to them.
 
-use crate::core::time::clock::sleep;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 
 /// A part's pointer entering and leaving, as the events themselves (a caller reads the point to
 /// place its card, or the element to anchor it).

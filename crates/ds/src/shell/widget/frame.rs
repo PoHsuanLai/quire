@@ -10,7 +10,6 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::components::content::text_runs::text;
-use crate::core::word::Word;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::widget::contract::WidgetKind;
@@ -20,6 +19,7 @@ use crate::shell::widget::scope::use_frame_provider;
 use crate::style::appearance::material::Material;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint` (the
 /// Space's by default; a tile never lays a second gradient, `CardTint::on`). `kind` writes

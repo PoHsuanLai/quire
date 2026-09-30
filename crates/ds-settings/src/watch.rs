@@ -7,7 +7,7 @@ use crate::error::SettingsError;
 use crate::latest::{self, Receiver, Sender};
 use crate::lenient::{Loaded, Read, read};
 use crate::store::Store;
-use ds::Spawner;
+use ds_core::spawner::Spawner;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
 use std::ffi::OsStr;
 use std::path::PathBuf;

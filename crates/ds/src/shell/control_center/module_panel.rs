@@ -9,11 +9,11 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use crate::shell::control_center::module_tile_kind::TileSpan;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// Whether the panel paints the tile's plate.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

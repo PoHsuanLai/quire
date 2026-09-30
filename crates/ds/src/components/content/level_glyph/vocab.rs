@@ -2,8 +2,8 @@
 //! carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
 
 use crate::components::content::status::volume::VolumeState;
-use crate::core::vocab::{Fraction, Muting};
-use crate::core::word::Word;
+use ds_core::vocab::{Fraction, Muting};
+use ds_core::word::Word;
 
 /// Whether the control takes input.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

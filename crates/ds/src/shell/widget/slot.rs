@@ -4,10 +4,10 @@
 //! as the drag reaches the cell. The host places it; quire draws it, so a shell draws nothing of
 //! its own for the guide.
 
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// `div.ds-widget-slot[data-size][data-host]`: the footprint of a `size` widget in `host`.
 /// Decorative (`aria-hidden`): the drag's own announcement says where it goes.

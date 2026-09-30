@@ -10,11 +10,11 @@
 //! ground with a round hole at its centre, tiled, so every dot stays round at any width and
 //! shows the colour of its own place on the field.
 
-use crate::core::base64;
-use crate::core::png::{self, Channels, Deflate, Raster};
 use crate::style::appearance::theme::Scheme;
 use crate::style::space::palette::{Dot, swatch};
 use crate::style::tokens::hex::Hex;
+use ds_core::base64;
+use ds_core::png::{self, Channels, Deflate, Raster};
 use std::sync::LazyLock;
 
 /// The colour plane's size: one sample per grid cell of S's 540 x 352 drawing, stretched to the

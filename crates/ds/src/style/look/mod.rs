@@ -8,7 +8,7 @@
 //!
 //! [`TokenScope`]: crate::style::tokens::token::TokenScope
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// A whole visual language, as `appearance.look` names it.

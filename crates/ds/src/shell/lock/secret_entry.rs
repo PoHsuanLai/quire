@@ -4,14 +4,14 @@
 //! empties it, and a `Wrong` arrival plays `shake-x` once and empties it when the shake settles
 //! ("Errors shake once and hold still", design/05 principle 7).
 
-use crate::core::time::clock::sleep;
-use crate::core::word::Word;
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::shell::lock::vocab::PromptState;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::scope::Scope;
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
+use ds_core::word::Word;
 
 /// Whether the field holds anything: the enter button shows only once it does.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -189,7 +189,7 @@ fn settle_later(
 #[cfg(test)]
 mod tests {
     use super::Filled;
-    use crate::core::word::Word;
+    use ds_core::word::Word;
 
     #[test]
     fn filled_follows_emptiness_only() {

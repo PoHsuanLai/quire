@@ -26,9 +26,6 @@ use crate::components::menus::{
 };
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
-use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
@@ -37,6 +34,9 @@ use crate::motion::timer::use_motion_timer;
 use crate::stack::menu_track::types::MenuTiming;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
+use ds_core::press::{PointerButton, Press};
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// A floating list of choices. `timing` is the submenu delay and safe-triangle timeout, read
 /// by the caller from `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms`

@@ -4,13 +4,13 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
-use crate::core::vocab::{RowState, Selection};
-use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::vocab::{RowState, Selection};
+use ds_core::word::Word;
 
 /// What kind of place.
 #[derive(Debug, Clone, PartialEq)]

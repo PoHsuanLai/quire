@@ -23,9 +23,6 @@ use crate::components::content::picture_fit::picture_style;
 use crate::components::content::text_runs::TextLine;
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::components::controls::press::Propagation;
-use crate::core::geometry::units::{Point, Px};
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spec::PresenceSpec;
 use crate::motion::presence::use_presence::{EntranceAlias, Presented, use_presence};
@@ -40,6 +37,9 @@ use crate::shell::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPres
 use crate::style::appearance::material::Material;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 
 /// One action the thumbnail offers on hover: Delete now; Mark Up and Copy Text once the shell
 /// has them. Its press stays at its button: it never also opens the picture.

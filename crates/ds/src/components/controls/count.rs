@@ -1,7 +1,7 @@
 //! Count: an unread or item count, empty at zero (design/04-COMPONENTS.md section 14).
 
-use crate::core::word::Word;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// Where a count sits.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

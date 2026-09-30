@@ -16,7 +16,6 @@ use crate::components::editor::spell_menu::{
     Asked, Opened, SpellLayer, SpellLink, at_caret, at_pointer,
 };
 use crate::components::editor::state::{SurfaceState, write_soon};
-use crate::core::geometry::units::Rect;
 use crate::edit::composition::on_ime;
 use crate::edit::handle::{EditHandle, SurfaceHooks};
 use crate::edit::input::EditInput;
@@ -29,6 +28,7 @@ use crate::root::common::Common;
 use crate::spell::lang::Spell;
 use crate::spell::marks::SpellReplace;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
 use std::rc::Rc;
 
 /// An editing surface over the app's own content.

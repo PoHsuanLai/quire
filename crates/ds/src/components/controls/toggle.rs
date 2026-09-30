@@ -6,8 +6,6 @@
 //! the speed it has, instead of restarting a transition. A click is a contact with no velocity:
 //! critically damped, no bounce.
 
-use crate::core::vocab::{Availability, Check};
-use crate::core::word::Word;
 use crate::motion::detail::touch::Touch;
 use crate::motion::{
     spring_spec::{SpringResponse, SpringSpec},
@@ -16,6 +14,8 @@ use crate::motion::{
 };
 use crate::style::tokens::control_size::ControlSize;
 use dioxus::prelude::*;
+use ds_core::vocab::{Availability, Check};
+use ds_core::word::Word;
 
 /// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of
 /// its travel (the track less its two knob insets and the knob, design/29-SIZING.md R3).
@@ -80,8 +80,8 @@ pub fn Toggle(
 #[cfg(test)]
 mod tests {
     use super::{knob_at, refuse_mixed};
-    use crate::core::vocab::Check;
     use crate::style::tokens::control_size::ControlSize;
+    use ds_core::vocab::Check;
 
     #[test]
     fn the_knob_travels_the_track_less_the_knob_and_its_insets() {

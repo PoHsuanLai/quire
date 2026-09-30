@@ -3,8 +3,8 @@
 
 use super::Timeline;
 use super::ease::Ease;
-use crate::core::vocab::Fraction;
 use crate::style::tokens::easing::Easing;
+use ds_core::vocab::Fraction;
 use std::time::Duration;
 
 /// A value gliding from `from` to `to` along `ease`. Values are in whatever unit the caller

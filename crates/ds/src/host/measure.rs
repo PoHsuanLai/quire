@@ -10,11 +10,11 @@
 //! ("RefCell already borrowed"). The host's [`GeometryHost::measure`](crate::GeometryHost::measure)
 //! answers [`Measured::Busy`] instead, and the read waits a frame.
 
-use crate::style::busy::{after_render, wait_out_busy};
-use crate::core::geometry::units::{Point, Rect};
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::document::use_document_host;
+use crate::style::busy::{after_render, wait_out_busy};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Rect};
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::rc::Rc;
 
 /// One attempt at reading an element's rect through the host.
@@ -181,8 +181,8 @@ pub(crate) async fn laid_out_now(element: &MountedData) -> Option<Rect> {
 #[cfg(test)]
 mod tests {
     use super::{SLOW_RETRY, laid_out, layout_retry};
-    use crate::core::geometry::units::{Point, Px, Rect, Size};
-    use crate::core::time::FRAME_SLACK;
+    use ds_core::geometry::units::{Point, Px, Rect, Size};
+    use ds_core::time::FRAME_SLACK;
 
     #[test]
     fn a_read_before_layout_is_tried_again_frame_paced_then_slower_then_not() {

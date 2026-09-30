@@ -7,13 +7,13 @@
 use crate::components::editor::spell::{SpellCtx, draw, touch};
 use crate::components::menus::menu_entry::{MenuEntry, MenuRow};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
-use crate::core::geometry::units::{Point, Rect};
-use crate::style::task::{spawn_in, try_set};
 use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
 use crate::spell::marks::{Misspelt, SpellReplace};
 use crate::spell::service::Learned;
+use crate::style::task::{spawn_in, try_set};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Rect};
 use std::rc::Rc;
 
 /// How many suggestions the menu lists, at most (the reference's count).
@@ -308,10 +308,10 @@ impl PartialEq for SpellLink {
 mod tests {
     use super::{Opened, Replaces, SpellPick, entries};
     use crate::components::menus::menu_entry::MenuEntry;
-    use crate::core::geometry::units::{Point, Px};
     use crate::host::position::EditNode;
     use crate::spell::marks::Misspelt;
     use crate::spell::words::WordSpan;
+    use ds_core::geometry::units::{Point, Px};
 
     fn opened(suggestions: &[&str]) -> Opened {
         Opened {

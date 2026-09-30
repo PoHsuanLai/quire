@@ -2,8 +2,8 @@
 //! its footprint on the grid, where it is drawn, and its title row.
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::word::Word;
 use crate::style::icon::Icon;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// A widget's footprint on the grid unit (`widgets.desktop_cell_px`, `desktop_gap_px`).

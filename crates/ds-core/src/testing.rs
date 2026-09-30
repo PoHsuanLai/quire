@@ -1,6 +1,6 @@
 //! The check a stored `Word` enum runs against its serde form.
 
-use super::Word;
+use crate::word::Word;
 use serde::Serialize;
 
 /// Asserts that every variant of `T` serialises as its own slug, so a stored enum's settings

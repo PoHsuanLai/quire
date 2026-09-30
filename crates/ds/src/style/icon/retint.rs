@@ -20,10 +20,10 @@
 //! icon is re-coloured the same way, so a Monochrome dock is one hue.
 
 use super::tone_band::Tone;
-use crate::core::colour::oklab::{Oklab, Oklch};
-use crate::core::colour::srgb::{LinearRgb, Srgb};
 use crate::style::appearance::theme::Scheme;
 use crate::style::space::palette::{Dot, derive};
+use ds_core::colour::oklab::{Oklab, Oklch};
+use ds_core::colour::srgb::{LinearRgb, Srgb};
 
 /// The style an app icon is drawn in: `icons.style`, which `sill` maps onto this.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

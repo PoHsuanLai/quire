@@ -5,8 +5,8 @@
 
 use crate::components::controls::chord::Chord;
 use crate::components::menus::row_shape::{ClipBody, RowShape, clip_box, clip_lines};
-use crate::core::vocab::Shortcut;
 use dioxus::prelude::*;
+use ds_core::vocab::Shortcut;
 
 /// A plain row's shape, for the entries that carry none.
 pub(crate) const PLAIN: &RowShape = &RowShape::Plain;

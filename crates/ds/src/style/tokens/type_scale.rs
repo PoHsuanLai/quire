@@ -3,9 +3,9 @@
 //! The plan names the ends, `--fs-micro` 9.5 and `--fs-display` 26; the steps between are named
 //! here by role (design/02-TYPE.md open decision 3), one per distinct size in the ramp.
 
-use crate::core::word::Word;
 use crate::style::appearance::typeface::Typeface;
 use crate::style::tokens::token::{Token, TokenScope};
+use ds_core::word::Word;
 
 /// A type family, by job. Which face does each job depends on the root's [`Typeface`]
 /// (design/02-TYPE.md section 2): the `.ds` block names the System faces and the

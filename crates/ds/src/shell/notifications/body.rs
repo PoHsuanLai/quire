@@ -7,9 +7,9 @@
 //! fades; one of four fades at rest and not on hover; one of nine fades on both.
 
 use crate::components::content::rich_text::{Rich, rich};
-use crate::core::word::Word;
 use crate::host::measure::use_rect;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The lines a body is clamped to at rest.
 const REST_LINES: u8 = 2;

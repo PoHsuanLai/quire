@@ -6,8 +6,6 @@
 //! ([`crate::DeviceGlyph`]).
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::shell::battery::device_glyph::{Device, DeviceGlyph};
 use crate::shell::battery::figure::BatteryFigure;
 use crate::shell::battery::level::{BatteryLevel, RingMark};
@@ -15,6 +13,8 @@ use crate::shell::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// The Batteries widget.

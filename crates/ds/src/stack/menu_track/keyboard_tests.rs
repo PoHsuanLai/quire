@@ -1,10 +1,10 @@
 //! The two keyboard events a ds `Menu` feeds (`Select`, `Expand`) and the tracker that starts
 //! open (`MenuTrack::open`), where the Menu's submenus are driven by this machine.
 
-use crate::core::vocab::PressPhase;
 use crate::stack::menu_track::types::{
     ItemPath, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Submenu,
 };
+use ds_core::vocab::PressPhase;
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
 

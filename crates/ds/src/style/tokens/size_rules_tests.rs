@@ -4,7 +4,7 @@
 use super::control_size::ControlSize;
 use super::size_scale::{HalfPx, KNOB_INSET, SizeScale, WholePx};
 use super::size_vars::{SizeToken, SizeVar};
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// The spacing steps new sizes are drawn from (R7): a 4 px grid with a 2 px half step.
 pub(crate) const SPACING_GRID: [u16; 10] = [2, 4, 6, 8, 10, 12, 16, 20, 24, 32];

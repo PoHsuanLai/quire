@@ -105,7 +105,7 @@ impl From<Oklch> for Oklab {
 #[cfg(test)]
 mod tests {
     use super::{Oklab, Oklch};
-    use crate::core::colour::srgb::Srgb;
+    use crate::colour::srgb::Srgb;
 
     #[test]
     fn every_grey_has_no_chroma_and_primaries_their_own() {

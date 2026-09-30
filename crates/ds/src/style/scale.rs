@@ -5,8 +5,8 @@
 //! host that is not `ds-native` (shell-host) passes `scale` to `Ds` itself. The root resolves
 //! it once and provides it to its subtree, so a `Glyph` can snap its stroke.
 
-use crate::core::geometry::scale::Scale;
 use dioxus::prelude::*;
+use ds_core::geometry::scale::Scale;
 
 /// The scale the enclosing root resolved, as its subtree reads it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

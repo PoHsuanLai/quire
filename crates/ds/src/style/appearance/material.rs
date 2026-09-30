@@ -1,7 +1,7 @@
 //! The eight materials (design/03-COLOR.md sections 17.1 and 17.3).
 
 use super::blur::Blur;
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// What a surface is drawn in.

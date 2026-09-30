@@ -3,11 +3,11 @@
 //! inside an SVG, spike S6), and the Rust-driven parts (a slash drawn on, a battery's fill) are
 //! recomputed per frame only while they move (design/26-DETAILS.md section 3.2).
 
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::motion::detail::pending::Lit;
 use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 
 /// How much of a part shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

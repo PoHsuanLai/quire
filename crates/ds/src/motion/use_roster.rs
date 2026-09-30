@@ -10,11 +10,11 @@ use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use super::roster_rest::{RestQueue, RestTimer};
 use super::settle::settle;
-use crate::style::task::{Gone, spawn_in, try_get};
-use crate::core::time::clock::sleep;
 use crate::style::scope::{Scope, use_scope_signal};
+use crate::style::task::{Gone, spawn_in, try_get};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 
 /// How a row leaves the roster.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

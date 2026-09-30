@@ -7,8 +7,8 @@
 //! inside it gives up its own look and takes the item's; an `IconButton { Status }` draws the
 //! same pill itself and needs no wrapper.
 
-use crate::core::vocab::{Emphasis, Shown};
 use dioxus::prelude::*;
+use ds_core::vocab::{Emphasis, Shown};
 
 /// One bar item: `children` is the control (a `Button { Quiet }`, a clock, the app name); `open`
 /// is whether its menu is showing.

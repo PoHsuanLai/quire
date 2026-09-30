@@ -5,11 +5,11 @@
 
 use crate::components::content::icon_source::{ExternalIcon, IconSource};
 use crate::components::content::status::family::StatusGlyph;
-use crate::core::word::Word;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::plate_tint::{PlateTint, tint_style};
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// Which way an external icon is painted: the `data-kind` word and the property its URL is
 /// written into.

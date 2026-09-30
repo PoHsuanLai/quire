@@ -1,7 +1,7 @@
 //! The battery item's state and what each change of it means (design/26-DETAILS.md 5.1.3).
 
-use crate::core::vocab::Fraction;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
+use ds_core::vocab::Fraction;
 
 /// Where the power comes from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -118,7 +118,7 @@ impl Detailed for BatteryState {
 #[cfg(test)]
 mod tests {
     use super::{BatteryPower, BatteryState, LowAt, STEPS, Tone};
-    use crate::core::vocab::Fraction;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn the_fill_is_drawn_in_steps_and_any_charge_shows() {

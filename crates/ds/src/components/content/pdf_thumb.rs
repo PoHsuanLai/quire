@@ -14,12 +14,12 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::picture_fit::picture_style;
-use crate::core::geometry::units::{Point, Px, Rect, Size};
-use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect, Size};
+use ds_core::word::Word;
 
 /// A sheet whose page is not known yet (loading, or no pages): A4 portrait, in points.
 pub const PDF_DEFAULT_SHEET: ImageSize = ImageSize {
@@ -175,7 +175,7 @@ pub fn sheet_rect(room: Size, shape: ImageSize) -> Rect {
 mod tests {
     use super::{PDF_DEFAULT_SHEET, sheet_rect};
     use crate::components::content::image_source::ImageSize;
-    use crate::core::geometry::units::{Px, Size};
+    use ds_core::geometry::units::{Px, Size};
 
     #[test]
     fn the_sheet_keeps_the_page_aspect_centred_in_the_room() {

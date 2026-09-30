@@ -1,9 +1,9 @@
 //! Dragging without HTML5 drag events: a Rust tracker owns the pointer, the Euclidean drag
 //! threshold and the drop-target hit test (design/06-INTERACTIONS.md section 6).
 
-use crate::core::geometry::units::{Point, Px, Rect};
-use crate::core::vocab::Fraction;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect};
+use ds_core::vocab::Fraction;
 
 /// How far a press travels, straight-line, before content becomes a drag rather than a click:
 /// 3 px (design/30-CATALOGUE.md section 1.4). Named so a component that hands its drag to the

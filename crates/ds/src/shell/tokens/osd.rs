@@ -3,10 +3,10 @@
 //! dock's at the bottom centre. A tuned token so the setting reaches the card through one
 //! inline write ([`OsdMetrics::style_attr`]) on any element around it, as the dock's geometry.
 
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
 use crate::style::tokens::tuned::px;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// The OSD card's tuned token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -43,9 +43,9 @@ impl OsdMetrics {
 #[cfg(test)]
 mod tests {
     use super::{OsdMetrics, OsdToken};
-    use crate::core::geometry::units::Px;
-    use crate::core::word::Word;
     use crate::style::tokens::token::TokenScope;
+    use ds_core::geometry::units::Px;
+    use ds_core::word::Word;
 
     #[test]
     fn the_default_writes_what_the_stylesheet_falls_back_to() {

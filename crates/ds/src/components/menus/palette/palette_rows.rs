@@ -8,12 +8,12 @@
 //! The row is measured again whenever the selection, the element under it, or the results
 //! change; a read still waiting for layout is dropped when a newer one starts.
 
-use crate::core::geometry::units::Rect;
-use crate::style::task::spawn_in;
 use crate::host::measure::MountedRef;
 use crate::host::measure::{laid_out_now, laid_out_rect};
+use crate::style::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
 
 /// The selection as a choice number and the line that choice is drawn on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

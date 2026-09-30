@@ -11,7 +11,6 @@
 
 use crate::components::chrome::resize_edges::ResizeEdges;
 use crate::components::chrome::traffic_lights::{TilePose, TrafficLightGroup};
-use crate::core::geometry::units::{Point, Px};
 use crate::window::grab::{Grab, GrabEffect};
 use crate::window::{
     host::{WindowHost, use_window_host, use_window_state},
@@ -20,6 +19,7 @@ use crate::window::{
 };
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
 
 /// Whether the window shows its traffic lights.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

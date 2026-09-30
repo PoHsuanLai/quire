@@ -6,8 +6,6 @@ use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::chip::{Chip, ChipVariant};
 use crate::components::controls::slider::Slider;
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::core::colour::contrast::Verdict;
-use crate::core::vocab::Fraction;
 use crate::focus::click::kept_click;
 use crate::style::appearance::theme::Scheme;
 use crate::style::icon::Icon;
@@ -19,6 +17,8 @@ use crate::style::space::{
     presets::PRESETS,
 };
 use dioxus::prelude::*;
+use ds_core::colour::contrast::Verdict;
+use ds_core::vocab::Fraction;
 
 /// The stop chips under the field and the "+ Colour" button.
 #[component]

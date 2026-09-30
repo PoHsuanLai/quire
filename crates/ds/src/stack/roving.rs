@@ -3,8 +3,8 @@
 //! menu wraps. Pure: the menu, the command palette and a list step through it, and
 //! [`Roving`] holds the same rules over keyed items.
 
-use crate::core::vocab::Availability;
 use dioxus::prelude::Key;
+use ds_core::vocab::Availability;
 
 /// How a step moves past the ends: a floating menu wraps, everything else stops
 /// (design/30-CATALOGUE.md section 1.4, Roving focus).
@@ -197,7 +197,7 @@ impl<K: Clone + PartialEq> Roving<K> {
 #[cfg(test)]
 mod tests {
     use super::{Edge, Roving, Step, Wrap, edge_live, moved, moved_live, settled};
-    use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
+    use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
 
     #[test]
     fn a_menu_wraps_and_the_palette_stops() {

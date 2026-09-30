@@ -1,11 +1,11 @@
 //! A drop target in the app: an element that takes files dragged in from outside the window.
 
-use crate::core::vocab::DropState;
 use crate::file_drop::board::{DropTarget, FileDropBoard};
 use crate::file_drop::drag::{FileDrag, FileDrop};
 use crate::file_drop::track::TargetView;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
+use ds_core::vocab::DropState;
 
 /// A drop target's handle: bind its element with [`FileDropHandle::mounted`], read what the drag
 /// looks like from it with [`FileDropHandle::drag`], and write [`FileDropHandle::drop_attr`] as

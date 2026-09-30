@@ -15,11 +15,11 @@ use crate::components::app::tree_item_parts::{
 use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
-use crate::core::press::Press;
-use crate::core::vocab::{RowState, Shown};
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::{RowState, Shown};
 
 /// Whether an item can hold others. A leaf has no `details` to open: it is drawn as a plain
 /// row with the chevron's space kept, so its label lines up with its siblings'.

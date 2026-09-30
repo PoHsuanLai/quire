@@ -3,11 +3,11 @@
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::press::{PressListeners, Propagation};
-use crate::core::press::Press;
-use crate::core::vocab::Shown;
 use crate::focus::click::kept_click;
 use dioxus::core::{Attribute, AttributeValue};
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::Shown;
 
 /// The row's attributes, the same on a branch's `summary` and a leaf's `div`.
 #[derive(Debug, Clone, PartialEq)]

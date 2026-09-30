@@ -1,5 +1,5 @@
 use super::Word;
-use super::testing::word_matches_serde;
+use crate::testing::word_matches_serde;
 use serde::Serialize;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Word)]

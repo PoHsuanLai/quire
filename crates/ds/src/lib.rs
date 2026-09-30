@@ -14,7 +14,6 @@ extern crate self as ds;
 mod assembly;
 pub mod catalog;
 mod components;
-mod core;
 pub mod detail;
 mod edit;
 mod file_drop;
@@ -163,28 +162,6 @@ pub use crate::components::{
         sheet_placement::SheetPlacement,
         toast::use_toasts,
         tooltip::{Tooltip, TooltipKind},
-    },
-};
-pub use crate::core::word::Word;
-pub use crate::core::{
-    colour::contrast::{Verdict, ratio},
-    geometry::{
-        placement::{Align, Flip, Placed, Placement, Side, place},
-        scale::Scale,
-        units::{Point, Px, Rect, Size},
-    },
-    press::{PointerButton, Press},
-    spawner::Spawner,
-    standard_action::{Reserved, SpaceNumber, StandardAction},
-    text::clip::clip_chars,
-    time::{
-        FRAME_SLACK, FRAME_TICK,
-        clock::{ClockGuard, VirtualClock, sleep},
-    },
-    vocab::{
-        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
-        InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
-        Shown,
     },
 };
 pub use crate::edit::{
@@ -432,6 +409,28 @@ pub use crate::window::{
     vocab::{
         Activation, Fullscreen, Maximized, ResizeEdge, Support, TileError, WindowState, WindowTile,
         Zoom,
+    },
+};
+pub use ds_core::word::Word;
+pub use ds_core::{
+    colour::contrast::{Verdict, ratio},
+    geometry::{
+        placement::{Align, Flip, Placed, Placement, Side, place},
+        scale::Scale,
+        units::{Point, Px, Rect, Size},
+    },
+    press::{PointerButton, Press},
+    spawner::Spawner,
+    standard_action::{Reserved, SpaceNumber, StandardAction},
+    text::clip::clip_chars,
+    time::{
+        FRAME_SLACK, FRAME_TICK,
+        clock::{ClockGuard, VirtualClock, sleep},
+    },
+    vocab::{
+        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
+        InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
+        Shown,
     },
 };
 

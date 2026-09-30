@@ -1,8 +1,8 @@
 //! SectionHeader: a small-caps label that names a group (design/04-COMPONENTS.md section 13).
 
-use crate::core::vocab::Selection;
-use crate::core::word::Word;
 use dioxus::prelude::*;
+use ds_core::vocab::Selection;
+use ds_core::word::Word;
 
 /// Where the header sits.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

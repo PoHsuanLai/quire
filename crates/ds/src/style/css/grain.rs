@@ -9,8 +9,8 @@
 //! grey wherever the frame is darker than the middle in the black half, and wherever it is
 //! lighter in the white half; the element's opacity (`--f-grain`) then sets the strength.
 
-use crate::core::base64;
-use crate::core::png::{self, Channels, Deflate, Raster};
+use ds_core::base64;
+use ds_core::png::{self, Channels, Deflate, Raster};
 use std::sync::LazyLock;
 
 const SIZE: usize = 128;

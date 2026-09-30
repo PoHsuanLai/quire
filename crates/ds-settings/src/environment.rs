@@ -9,7 +9,8 @@ use crate::store::Store;
 use crate::units::Percent;
 use crate::watch::Watch;
 use dioxus::prelude::*;
-use ds::{Spawner, SystemPrefs};
+use ds::SystemPrefs;
+use ds_core::spawner::Spawner;
 use std::sync::Arc;
 
 /// The inputs to [`ds::resolve`], as they are now.

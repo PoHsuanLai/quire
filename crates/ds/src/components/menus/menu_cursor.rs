@@ -4,8 +4,8 @@
 //! reports what the keys and the pointer asked for. Pure, beside `menu` and `menu_panel`.
 
 use crate::components::menus::menu_lines::KeyAct;
-use crate::core::vocab::Availability;
 use crate::stack::roving::{Step, settled};
+use ds_core::vocab::Availability;
 
 /// Whose highlight a menu shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -62,8 +62,8 @@ impl MenuCursor {
 mod tests {
     use super::{MenuCursor, highlighted, seed};
     use crate::components::menus::menu_lines::KeyAct;
-    use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
     use crate::stack::roving::Step;
+    use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
 
     #[test]
     fn the_highlight_is_the_menus_own_or_the_callers() {

@@ -7,14 +7,14 @@
 use crate::components::editor::ctx::SurfaceCtx;
 use crate::components::editor::focus::focus_surface;
 use crate::components::editor::state::Capture;
-use crate::core::geometry::units::{Point, Px};
-use crate::core::vocab::PressPhase;
 use crate::edit::clicks::Clicks;
 use crate::edit::pointer::{EditPointer, Extend};
 use crate::host::captured::{CapturedPointer, PointerPhase};
 use crate::host::probe::Probe;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
+use ds_core::vocab::PressPhase;
 
 /// The primary button went down on the surface: tell the app, capture the pointer, take the
 /// keyboard.

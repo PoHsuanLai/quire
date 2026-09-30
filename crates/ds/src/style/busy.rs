@@ -11,8 +11,8 @@
 //! retries wait for [`after_render`], an effect that wakes the task, and land in the same frame
 //! at the same instant, every run; only a document still busy after those waits a frame.
 
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use dioxus::core::queue_effect;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::future::Future;
 use std::pin::Pin;
 use std::task::{Context, Poll};

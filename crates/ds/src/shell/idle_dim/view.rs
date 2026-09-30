@@ -11,10 +11,10 @@
 //! root's only child (CONSUMING.md "A document's frame must have a height": `Viewport` is what
 //! gives an all-positioned root one).
 
-use crate::core::vocab::Percent;
 use crate::shell::idle_dim::drive::use_idle_dim;
 use crate::shell::idle_dim::model::IdleDimPhase;
 use dioxus::prelude::*;
+use ds_core::vocab::Percent;
 
 /// The idle dim overlay. `level` is `idle.dim_level_pct` (10..90); `phase` is the caller's own
 /// request, driven by sill's idle service.

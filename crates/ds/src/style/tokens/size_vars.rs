@@ -7,7 +7,7 @@
 use super::control_size::ControlSize;
 use super::size_scale::{KNOB_INSET, SizeScale};
 use super::token::{CssValue, Token, TokenScope};
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// One quantity every size has.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

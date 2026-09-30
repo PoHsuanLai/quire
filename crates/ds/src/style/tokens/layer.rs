@@ -1,8 +1,8 @@
 //! Z-order inside a window (design/01-LAYOUT.md section 12). The plan names the ends,
 //! `--z-raise` 1 and `--z-drag` 50; the layers between are named after what sits on them.
 
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
+use ds_core::word::Word;
 
 /// One stacking layer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

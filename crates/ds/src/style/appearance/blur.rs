@@ -1,6 +1,6 @@
 //! Blur intent and blur availability (design/03-COLOR.md section 17.1).
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Whether a material asks the compositor to blur what is behind it.

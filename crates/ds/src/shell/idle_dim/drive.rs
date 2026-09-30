@@ -10,7 +10,6 @@
 //! another. [`plan`] plays the same role `crate::motion::detail::sweep::plan` does for a sweep.
 
 use super::model::IdleDimPhase;
-use crate::core::vocab::{Fraction, Percent};
 use crate::motion::detail::level::use_level;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::playback::use_playback;
@@ -18,6 +17,7 @@ use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::vocab::{Fraction, Percent};
 
 /// What changed since the last render: a request the caller made, or a settings edit that moved
 /// `level` while the phase stayed the same.
@@ -96,8 +96,8 @@ pub(crate) fn use_idle_dim(level: Percent, phase: IdleDimPhase) -> Fraction {
 #[cfg(test)]
 mod tests {
     use super::{IdleDimChange, IdleDimPhase, IdleDimPlan, plan, target};
-    use crate::core::vocab::Percent;
     use crate::style::appearance::motion::MotionLevel;
+    use ds_core::vocab::Percent;
 
     #[test]
     fn waking_always_snaps() {

@@ -6,8 +6,8 @@
 //! claim); taking chroma away says it is not the one in view. A grey would drop the first fact,
 //! and every muted account would look alike.
 
-use crate::core::colour::{oklab::Oklab, srgb::Srgb};
 use crate::style::tokens::hex::{Colour, Hex};
+use ds_core::colour::{oklab::Oklab, srgb::Srgb};
 
 /// How much of its chroma a muted colour keeps: S's `saturate(.55)`.
 pub(crate) const MUTED_CHROMA: f64 = 0.55;
@@ -34,8 +34,8 @@ pub(crate) fn desaturated(hex: Hex) -> Hex {
 #[cfg(test)]
 mod tests {
     use super::{desaturated, muted};
-    use crate::core::colour::{oklab::Oklab, srgb::Srgb};
     use crate::style::tokens::hex::{Alpha, Colour, Hex};
+    use ds_core::colour::{oklab::Oklab, srgb::Srgb};
 
     fn oklab(hex: Hex) -> [f64; 3] {
         let Oklab { l, a, b } = Oklab::from(Srgb::from(hex));

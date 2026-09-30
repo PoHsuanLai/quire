@@ -10,12 +10,12 @@
 //! `flow: Flow::Inline`.
 
 use super::{Anchors, use_anchors};
-use crate::core::geometry::units::Rect;
 use crate::host::measure::MountedRef;
 use crate::motion::hover_intent::HoverEvent;
 use crate::stack::hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub};
 use crate::stack::layer_stack::LayerStack;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
 
 /// What a hook-keyed card is placed against.
 #[derive(Debug, Clone, PartialEq)]

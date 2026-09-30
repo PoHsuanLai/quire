@@ -10,12 +10,12 @@ use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::components::overlays::{sheet_placement::SheetPlacement, sheet_width::SheetWidth};
-use crate::core::vocab::Dismiss;
-use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::{SpringPresence, Step, use_spring_presence};
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
+use ds_core::vocab::Dismiss;
+use ds_core::vocab::Shown;
 
 /// A modal panel.
 ///

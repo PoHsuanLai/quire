@@ -7,12 +7,12 @@
 //! the settle timer, starts over from an empty query and the first choice unless [`Retain`]
 //! says otherwise, and takes the keyboard.
 
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::presence::Presence;
 use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 
 /// What a palette shown again keeps from its last showing.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -144,7 +144,7 @@ impl Showing {
 #[cfg(test)]
 mod tests {
     use super::{Change, change};
-    use crate::core::vocab::Shown;
+    use ds_core::vocab::Shown;
 
     #[test]
     fn only_a_hidden_palette_shown_again_replays() {

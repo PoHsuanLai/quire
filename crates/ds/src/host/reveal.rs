@@ -6,9 +6,9 @@
 //! host does it: [`GeometryHost::reveal`](crate::GeometryHost::reveal) reads the item's place in
 //! the list's layout and sets the list's scroll offset.
 
-use crate::style::busy::wait_out_busy;
 use crate::host::document::use_document_host;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
+use crate::style::busy::wait_out_busy;
 use dioxus::prelude::*;
 
 /// One attempt at scrolling a scroller.

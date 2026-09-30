@@ -2,8 +2,8 @@
 //! a switch plays, which one is arriving. The component feeds it the pane its caller asks for
 //! and the settle of each round; every decision about what is drawn and what plays is here.
 
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
+use ds_core::word::Word;
 
 /// One of a switcher's two panes: the root (a control center's grid) or its detail (a module's
 /// list).

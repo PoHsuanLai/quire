@@ -1,12 +1,12 @@
 //! A status glyph's slash, drawn on and off over `--t-quick --e-out` (design/26 5.1: Unavailable
 //! is `MorphGlyph{Slash}`), standing still on the first frame and jumping under Reduced (R7).
 
-use crate::core::vocab::Fraction;
 use crate::motion::detail::{
     morph::Slashed,
     tween::{TweenSpec, use_tween},
 };
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
+use ds_core::vocab::Fraction;
 
 /// How the slash moves.
 const DRAW: TweenSpec = TweenSpec {

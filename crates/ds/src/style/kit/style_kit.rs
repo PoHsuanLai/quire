@@ -2,7 +2,6 @@
 //! sections, and the custom properties those sections declare for themselves.
 
 use super::model::{Kit, KitRank, Section, Vocabulary};
-use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::css::{
     RESET,
@@ -39,6 +38,7 @@ use crate::style::tokens::{
     type_scale::{Family, FontSize},
     type_voice::VoiceToken,
 };
+use ds_core::word::Word;
 use std::borrow::Cow;
 
 /// The style layer's contribution to the stylesheet and the linter.

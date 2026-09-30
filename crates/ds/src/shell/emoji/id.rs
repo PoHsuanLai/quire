@@ -1,7 +1,7 @@
 //! [`EmojiId`]: which emoji a user picked for their picture (user data), one of the shipped set
 //! (design/25-EMOJI.md section 3). The slugs are the sheet files' stems and the serde names.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 macro_rules! emoji_set {

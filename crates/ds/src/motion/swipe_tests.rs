@@ -2,7 +2,7 @@ use super::{
     Click, Sample, Speed, Stamp, SwipeEffect, SwipeInput as I, SwipeLook, SwipeMetrics, SwipeState,
     release_speed, shaped,
 };
-use crate::core::geometry::units::Px;
+use ds_core::geometry::units::Px;
 use std::time::Duration;
 
 fn at(ms: u64) -> Stamp {

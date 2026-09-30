@@ -4,10 +4,10 @@
 //! ([`WidgetMetrics::style_attr`]) on any element around the widgets. A `WidgetFrame` sizes
 //! itself from both, so the setting reaches the card and not only sill's layout.
 
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
 use crate::style::tokens::tuned::px;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// One widget grid token, each a tuned token its `widgets.*` key moves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -58,9 +58,9 @@ impl WidgetMetrics {
 #[cfg(test)]
 mod tests {
     use super::{WidgetGrid, WidgetMetrics};
-    use crate::core::geometry::units::Px;
-    use crate::core::word::Word;
     use crate::style::tokens::token::TokenScope;
+    use ds_core::geometry::units::Px;
+    use ds_core::word::Word;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

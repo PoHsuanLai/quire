@@ -1,7 +1,6 @@
 //! The app's handle on its surface: the geometry reads it needs to draw its own caret and
 //! selection, and to place its `/` and `@` menus at the caret.
 
-use crate::core::geometry::units::{Point, Rect};
 use crate::focus::soon::focus_soon;
 use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::measure::Measured;
@@ -9,6 +8,7 @@ use crate::host::parts::EditHost;
 use crate::host::position::{TextPosition, TextRange};
 use crate::host::probe::Probe;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Rect};
 use std::rc::Rc;
 
 /// A handle on one [`EditSurface`](crate::EditSurface): pass it as the surface's `handle`, then

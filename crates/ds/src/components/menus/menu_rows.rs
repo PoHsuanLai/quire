@@ -9,10 +9,10 @@ use crate::components::menus::menu_item::{
 use crate::components::menus::menu_lines::Line;
 use crate::components::menus::menu_shape::PLAIN;
 use crate::components::menus::row_chord::NO_CHORD;
-use crate::core::geometry::units::Point;
-use crate::core::press::Press;
-use crate::core::vocab::{Selection, Shown};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Point;
+use ds_core::press::Press;
+use ds_core::vocab::{Selection, Shown};
 
 /// What a panel draws around its choices: the selection, the choice whose submenu is open,
 /// and what a click, a pointer move and a mount on choice `i` report.

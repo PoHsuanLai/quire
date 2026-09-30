@@ -11,9 +11,9 @@
 //! the shell's tuned tokens are written this way). At scale 1, and when no scale is given, every
 //! token is its design value verbatim: the stylesheet and every picture at 1x are unchanged.
 
-use crate::core::geometry::{scale::Scale, units::Px};
-use crate::core::word::Word;
 use crate::style::tokens::token::{Token, TokenScope};
+use ds_core::geometry::{scale::Scale, units::Px};
+use ds_core::word::Word;
 
 /// One pixel token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -158,8 +158,8 @@ fn decimal(numerator: u64, denominator: u64) -> String {
 #[cfg(test)]
 mod tests {
     use super::PixelToken;
-    use crate::core::geometry::{scale::Scale, units::Px};
-    use crate::core::word::Word;
+    use ds_core::geometry::{scale::Scale, units::Px};
+    use ds_core::word::Word;
 
     /// Each token's CSS at 1.25, 1.5, 1.75 and 2.
     const TABLE: &[(PixelToken, [&str; 4])] = &[

@@ -7,10 +7,10 @@ use super::legibility::legibility;
 use super::picked::{BAND, hue_of};
 use super::roles::AccentRoles;
 use super::text_grounds::{BACKDROPS, TEXT_MATERIALS, TextOn, text_grounds, text_on};
-use crate::core::colour::{oklab::Oklab, srgb::Srgb};
-use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::tokens::hex::{Alpha, Hex};
+use ds_core::colour::{oklab::Oklab, srgb::Srgb};
+use ds_core::word::Word;
 
 fn roles(hue: u16, weight: BandWeight, scheme: Scheme) -> AccentRoles {
     accent_roles(

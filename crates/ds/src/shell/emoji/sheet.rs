@@ -6,9 +6,9 @@
 //! document fetches nothing.
 
 use super::id::EmojiId;
-use crate::core::word::Word;
 use crate::shell::user_picture::mood::PictureSize;
 use crate::style::icon::url::IconUrl;
+use ds_core::word::Word;
 use serde::Deserialize;
 use std::sync::{LazyLock, OnceLock};
 use std::time::Duration;

@@ -6,10 +6,10 @@ use super::mood::{Mood, PictureSize};
 use super::picture::UserPicture;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::content::image_source::ImageSource;
-use crate::core::word::Word;
 use crate::motion::wake::WakeStamp;
 use crate::shell::emoji::AnimatedEmoji;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The size a letter disc is drawn at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

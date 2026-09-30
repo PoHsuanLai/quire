@@ -1,8 +1,8 @@
 //! Resting opacities a keyframe ends on, named so a keyframe and the element that rests there
 //! agree.
 
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
+use ds_core::word::Word;
 
 /// One resting opacity.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

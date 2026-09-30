@@ -16,7 +16,6 @@
 //! transparent root (`data-chrome=transparent`) paints nothing, and its `.ds-popover` and
 //! `.ds-sheet` cards paint the material's tint, edge and drop instead.
 
-use crate::core::word::Word;
 use crate::style::appearance::material::Material;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, presence_selector, property, rule};
@@ -27,6 +26,7 @@ use crate::style::material::recipe::{DEFAULT_TINT_ALPHA, SOLID_ALPHA, layers};
 use crate::style::material::stack::VIBRANCY;
 use crate::style::tokens::tint::{flat_tint, tint};
 use crate::style::tokens::{hex::Hex, layer::ZLayer, name::VarName};
+use ds_core::word::Word;
 
 /// The variable a root writes inline with `appearance.material_tint_alpha` as a fraction
 /// (`.8` at the default). Absent, every tint is section 17.2's own.

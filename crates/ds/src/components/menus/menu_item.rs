@@ -13,13 +13,13 @@ use crate::components::menus::menu_shape;
 use crate::components::menus::row_action::{RowAction, trailing};
 use crate::components::menus::row_chord::{RowChord, shown_chord};
 use crate::components::menus::row_shape::RowShape;
-use crate::core::geometry::units::{Point, Px};
-use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::{Availability, Check, FocusStyle, Selection, Shortcut, Shown};
-use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
+use ds_core::press::{PointerButton, Press};
+use ds_core::vocab::{Availability, Check, FocusStyle, Selection, Shortcut, Shown};
+use ds_core::word::Word;
 
 /// An item's words as the entry holds them: an `Item`'s string or a `Row`'s runs.
 #[derive(Debug, Clone, Copy)]

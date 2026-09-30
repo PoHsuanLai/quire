@@ -3,13 +3,13 @@
 //! (design/04-COMPONENTS.md section 39; design/05-MOTION.md section 7, timers instead of
 //! `animationend`). A render that keeps the month keeps the body, and plays nothing.
 
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::timer::{TimerPhase, use_motion_timer};
 use crate::shell::month_grid::data::{
     DayKey, Eventful, MonthDay, MonthKey, MonthWeek, WeekNumbers,
 };
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use std::cmp::Ordering;
 
 /// How a month's weeks arrive.

@@ -2,8 +2,8 @@
 //! by a share of the overshoot, and springs back on release. Swipe resistance and the host's
 //! scroll physics read it; a slider does not stretch.
 
-use crate::core::geometry::units::Px;
 use crate::style::appearance::motion::MotionLevel;
+use ds_core::geometry::units::Px;
 
 /// The share of the overshoot the content follows (macOS's scroll rubber band, conf M).
 pub const RUBBER_SHARE: f32 = 0.55;
@@ -21,8 +21,8 @@ pub fn resist(past: Px, level: MotionLevel) -> Px {
 #[cfg(test)]
 mod tests {
     use super::resist;
-    use crate::core::geometry::units::Px;
     use crate::style::appearance::motion::MotionLevel::{Reduced, Standard};
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn the_band_follows_a_share_of_the_overshoot() {

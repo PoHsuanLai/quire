@@ -10,10 +10,10 @@
 //! its say alone, at once, with no hover and no delay of its own.
 
 use crate::components::overlays::hover_card::{target::HoverTarget, use_card};
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 
 /// Which tooltip.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -13,7 +13,7 @@
 
 use super::name::VarName;
 use super::token::Token;
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// The emoji face's custom property: the one member of its family.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

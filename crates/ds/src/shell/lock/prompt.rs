@@ -9,8 +9,6 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
     text_input_kind::TextInputKind,
 };
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use crate::motion::detail::{
     operation::Operation, touch::Touch, use_detail::use_detail, use_operation::use_operation,
 };
@@ -23,6 +21,8 @@ use crate::shell::user_picture::{picture::UserPicture, portrait::Liveliness};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// The placeholder when the caller gives none.
 const ENTER_PASSWORD: &str = "Enter Password";

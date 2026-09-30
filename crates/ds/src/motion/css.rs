@@ -7,13 +7,13 @@
 //! it over (spike S5). Each class's declaration is the [`Anim`]'s recipe, written from the same
 //! table [`crate::settle`] times.
 
-use crate::core::word::Word;
 use crate::motion::{
     anim::Anim,
     recipe::{Fill, Iteration, Recipe},
 };
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::emit::{attr_selector, property, rule};
+use ds_core::word::Word;
 
 /// The canonical keyframes, verbatim from design/05-MOTION.md section 4 (without `filter`).
 pub const MOTION: &str = include_str!("motion.css");

@@ -6,12 +6,12 @@
 
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::picture_fit::picture_style;
-use crate::core::geometry::units::Px;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::thumbs::shot_frame::shot_frame;
 use crate::style::appearance::material::Material;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
 
 /// The ghost's width: half the default card's.
 const GHOST_WIDTH: Px = Px(120.0);

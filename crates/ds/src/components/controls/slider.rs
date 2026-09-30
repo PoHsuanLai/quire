@@ -7,8 +7,6 @@
 //! value from elsewhere springs it critically from where it is.
 
 use crate::components::controls::track::fraction_at;
-use crate::core::geometry::units::{Point, Px, Rect};
-use crate::core::vocab::{Availability, Fraction};
 use crate::host::measure::client_rect;
 use crate::motion::detail::touch::{Contact, Touch};
 use crate::motion::drag::{DragPhase, use_drag};
@@ -22,6 +20,8 @@ use crate::motion::{
 use dioxus::core::queue_effect;
 use dioxus::html::geometry::ClientPoint;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect};
+use ds_core::vocab::{Availability, Fraction};
 use std::rc::Rc;
 
 /// A release slower than this, in pixels per second, sets the value where the thumb was let go;
@@ -173,7 +173,7 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.down((), at);
-                meter.set(VelocityMeter::default().moved(at.x, crate::core::time::clock::now()));
+                meter.set(VelocityMeter::default().moved(at.x, ds_core::time::clock::now()));
                 if let Some(mounted) = element() {
                     spawn(async move {
                         // Focus is best-effort: a renderer without it still slides.
@@ -191,7 +191,7 @@ pub fn Slider(
                 }
                 let at = point(event.client_coordinates());
                 drag.moved(at);
-                let measured_now = meter.peek().moved(at.x, crate::core::time::clock::now());
+                let measured_now = meter.peek().moved(at.x, ds_core::time::clock::now());
                 meter.set(measured_now);
                 if let Some(measured) = track() {
                     onchange.call(fraction_at(measured, at.x));
@@ -199,7 +199,7 @@ pub fn Slider(
             },
             onpointerup: move |event| {
                 drag.up();
-                let velocity = meter.peek().released(crate::core::time::clock::now());
+                let velocity = meter.peek().released(ds_core::time::clock::now());
                 meter.set(VelocityMeter::default());
                 let width = track.peek().map_or(0.0, |rect| rect.size.width.0);
                 if let (true, Some(to)) = (enabled, thrown_to(value, velocity, width)) {
@@ -227,7 +227,7 @@ pub fn Slider(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::core::geometry::units::Size;
+    use ds_core::geometry::units::Size;
 
     fn track(left: f32, width: f32) -> Rect {
         Rect {

@@ -2,10 +2,10 @@
 //! (design/20-SURFACES.md sections 1.9 and 1.10; design/04-COMPONENTS.md section 42): whose it
 //! is, how the asking is going, whether caps lock is on, and where the Space's colour reaches.
 
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use crate::motion::detail::{detailed::Detailed, moment::Moment};
 use crate::shell::user_picture::picture::UserPicture;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// Where the current Space's colour reaches on the lock screen. The reference lock screen is
 /// white type and a white glass field over the wallpaper; Arc's colour may take the field.
@@ -146,7 +146,7 @@ impl LockUser {
 #[cfg(test)]
 mod tests {
     use super::PromptState;
-    use crate::core::vocab::Availability;
+    use ds_core::vocab::Availability;
 
     #[test]
     fn only_idle_and_wrong_take_typing() {

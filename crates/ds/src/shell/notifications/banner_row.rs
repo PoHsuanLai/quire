@@ -12,17 +12,17 @@
 //! The row hands its card a `Carried` holding its `Flight`: a card swiped away marks it, and the
 //! row writes `data-flight=swipe`, which points its exit right whatever the stack's entry edge.
 
-use crate::core::geometry::units::Px;
-use crate::style::task::spawn_in;
-use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, RowPitch, presence_slug};
 use crate::motion::use_roster::Pitches;
 use crate::shell::notifications::banner_stack::{BannerKey, BannerPosition};
 use crate::shell::notifications::swipe::{Carried, Flight};
+use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 use std::rc::Rc;
 
 /// One banner in the stack.
@@ -95,9 +95,9 @@ fn heal_style(heal: Option<Heal>, position: BannerPosition) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::heal_style;
-    use crate::core::geometry::units::Px;
     use crate::motion::roster::Heal;
     use crate::shell::notifications::banner_stack::BannerPosition;
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn a_healing_row_moves_towards_the_gap() {

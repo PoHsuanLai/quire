@@ -2,8 +2,8 @@
 //! Shut Down (Primary) and Restart (Danger) side by side, and Danger's own size is the Mini's, a
 //! row action's, which sat a size smaller than its neighbours.
 
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// How big a button is drawn. A button given no size keeps its variant's own: Regular for
 /// Primary, Secondary, Quiet and Frame, Mini for Mini and Danger (design/04-COMPONENTS.md
@@ -36,8 +36,8 @@ pub fn disabled(availability: Availability) -> Option<&'static str> {
 #[cfg(test)]
 mod tests {
     use super::{ButtonSize, disabled};
-    use crate::core::vocab::Availability;
-    use crate::core::word::Word;
+    use ds_core::vocab::Availability;
+    use ds_core::word::Word;
 
     #[test]
     fn each_size_has_its_word() {

@@ -1,0 +1,28 @@
+[package]
+name = "ds-core"
+description = "The design system's pure base: vocabulary, geometry units, colour, time, the Spawner trait, errors, text clip and image encodings."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds-core-derive = { workspace = true }
+serde = { workspace = true }
+thiserror = { workspace = true }
+futures-timer = { workspace = true }
+keyboard-types = { workspace = true }
+# `testing::word_matches_serde`, for the tests of crates that store a `Word`.
+serde_json = { workspace = true, optional = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+serde_json = { workspace = true }
+
+[features]
+# `ds_core::testing`: checks a stored `Word` against its serde form.
+testing = ["dep:serde_json"]

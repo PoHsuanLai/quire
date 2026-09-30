@@ -2,7 +2,7 @@
 //!
 //! A peek is Center or Full; a place in an app's own grid is not an overlay and stays the app's.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Where an open peek sits.

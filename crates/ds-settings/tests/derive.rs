@@ -6,7 +6,7 @@
 use std::borrow::Cow;
 use std::path::PathBuf;
 
-use ds::Word;
+use ds_core::word::Word;
 use ds_settings::schema::{KeyKind, Page, SettingsSchema, Widget};
 use ds_settings::{Ms, SettingsSchema};
 use serde::{Deserialize, Serialize};

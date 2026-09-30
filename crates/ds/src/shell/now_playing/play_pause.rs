@@ -4,12 +4,12 @@
 
 use crate::components::controls::button_size::disabled;
 use crate::components::controls::press::PressListeners;
-use crate::core::press::Press;
-use crate::core::vocab::Availability;
 use crate::motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use crate::shell::now_playing::kind::Playback;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::Availability;
 
 /// Play or pause as `playback` offers next, named for that action ("Play", "Pause").
 /// `Disabled` when the player cannot do it.

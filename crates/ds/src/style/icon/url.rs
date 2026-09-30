@@ -1,8 +1,8 @@
 //! Where an external icon's pixels come from: a `data:` or `file:` URL the document loads,
 //! written so it can always sit inside a quoted CSS `url("…")`.
 
-use crate::core::base64;
-use crate::core::error::DsError;
+use ds_core::base64;
+use ds_core::error::DsError;
 use std::path::Path;
 
 /// Where an external icon's pixels come from: a `data:` or `file:` URL, the two schemes a
@@ -99,7 +99,7 @@ fn escape_for_css(url: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::IconUrl;
-    use crate::core::error::DsError;
+    use ds_core::error::DsError;
     use std::path::Path;
 
     #[test]

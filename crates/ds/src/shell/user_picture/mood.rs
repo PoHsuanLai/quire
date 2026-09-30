@@ -1,7 +1,7 @@
 //! What the caller tells a moving picture (design/25-EMOJI.md section 5): its size, its mood,
 //! and when to wake. The picture plays the moods; it never chooses one.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// How large a picture is drawn (`data-size`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

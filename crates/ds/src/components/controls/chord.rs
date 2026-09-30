@@ -2,8 +2,8 @@
 //! Files ⌘R"): the glyphs in a row, no key caps, no border, in the secondary ink at the size of
 //! the words beside it. [`Kbd`](crate::Kbd) stays the boxed key caps for a keyboard legend.
 
-use crate::core::vocab::Shortcut;
 use dioxus::prelude::*;
+use ds_core::vocab::Shortcut;
 
 /// `shortcut` as one run of glyphs (`⌘⇧R`, modifiers in the Mac's order, O-2), in `--ink-soft`
 /// and the surrounding face and size so a modifier glyph draws as large as a letter. An empty

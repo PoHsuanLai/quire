@@ -5,11 +5,11 @@
 use super::family::PlateFamily;
 use super::plate_tint::{PlateStops, PlateTint};
 use super::retint::{IconStyle, Tint, retint_in};
-use crate::core::colour::contrast::ratio;
-use crate::core::colour::{oklab::Oklab, srgb::Srgb};
 use crate::style::appearance::theme::Scheme;
 use crate::style::space::presets::PRESETS;
 use crate::style::tokens::hex::Hex;
+use ds_core::colour::contrast::ratio;
+use ds_core::colour::{oklab::Oklab, srgb::Srgb};
 
 /// The dark dock the sizing mockups measured against (design/29-SIZING.md section 11).
 const DOCK_DARK: &str = "#2A2C30";

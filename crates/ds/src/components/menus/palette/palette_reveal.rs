@@ -6,9 +6,9 @@
 //! pointer and select that one in turn.
 
 use crate::components::menus::palette::palette_rows::Revision;
-use crate::style::task::spawn_in;
 use crate::host::measure::MountedRef;
 use crate::host::reveal::reveal;
+use crate::style::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 

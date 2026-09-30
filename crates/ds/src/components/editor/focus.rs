@@ -5,8 +5,6 @@
 
 use crate::components::editor::ctx::SurfaceCtx;
 use crate::components::editor::state::write_soon;
-use crate::core::geometry::units::Rect;
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::edit::composition::settle;
 use crate::edit::pointer::EditFocus;
 use crate::focus::select::Select;
@@ -16,6 +14,8 @@ use crate::host::ime::{ImeEvent, ImeSwitch};
 use crate::host::measure::BUSY_ATTEMPTS;
 use crate::host::probe::Probe;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::rc::Rc;
 
 /// The surface has the keyboard: the IME on and pointed at the app's area, the app told once.

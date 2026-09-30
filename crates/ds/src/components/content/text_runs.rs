@@ -9,9 +9,9 @@
 //! `TextLine` (`Some(string)` must be written `Some(string.into())`: `None` could not be inferred if
 //! both `Option<String>` and `Option<TextLine>` were accepted).
 
-use crate::core::word::Word;
 use dioxus::core::SuperFrom;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// How one run is set.

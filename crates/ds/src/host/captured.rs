@@ -1,7 +1,7 @@
 //! A pointer press the host followed past the surface's own box.
 
-use crate::core::geometry::units::Point;
 use dioxus::prelude::Modifiers;
+use ds_core::geometry::units::Point;
 
 /// The part of a press-drag-release gesture.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

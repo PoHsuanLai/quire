@@ -11,10 +11,10 @@ pub(crate) mod rows;
 
 use crate::components::controls::segmented::SegmentedControl;
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::core::word::Word;
 use crate::style::appearance::theme::{Scheme, Theme};
 use crate::style::space::look::{CardAccent, SpaceLook};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};

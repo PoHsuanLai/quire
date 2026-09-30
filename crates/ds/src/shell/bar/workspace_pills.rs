@@ -6,9 +6,9 @@
 //! reorder them wraps each `WorkspacePill` in its own element and listens there.
 
 use crate::components::controls::press::PressListeners;
-use crate::core::press::Press;
-use crate::core::vocab::Selection;
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::Selection;
 
 /// The group: `children` are its `WorkspacePill`s (or the caller's wrappers around them).
 #[component]

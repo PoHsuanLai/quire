@@ -3,13 +3,13 @@
 //! `--t-move`) and the number changes instantly (design/30 section 1.3).
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::shell::battery::level::{
     BOLT, RingLayer, RingMark, RingTone, given, ring, use_ring_share,
 };
 use crate::shell::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 
 /// The ring at `level` (permille), charging or not, named `label`, with the percentage under it;
 /// `children` (the device's glyph, optional) sit in the ring's middle.

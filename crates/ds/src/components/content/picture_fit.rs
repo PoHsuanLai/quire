@@ -2,7 +2,7 @@
 //! card, a PDF page, a preview pane's media), written to whole hundredths of a pixel so the box a
 //! host sizes for and the box the document lays out are the same number.
 
-use crate::core::geometry::units::{Px, Rect};
+use ds_core::geometry::units::{Px, Rect};
 
 /// The picture's inline placement, in whole hundredths of a pixel.
 pub fn picture_style(picture: Rect) -> String {
@@ -22,7 +22,7 @@ fn round(px: Px) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::picture_style;
-    use crate::core::geometry::units::{Point, Px, Rect, Size};
+    use ds_core::geometry::units::{Point, Px, Rect, Size};
 
     #[test]
     fn a_rect_is_written_to_hundredths_of_a_pixel() {

@@ -3,7 +3,7 @@
 //! No `bool` props: every two-state prop is one of these enums, so a call site reads
 //! `Availability::Disabled`, never `true`.
 
-use crate::core::word::Word;
+use crate::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Whether a control takes input (design/30 section 1.5). `Disabled` adds `aria-disabled="true"`
@@ -300,7 +300,7 @@ impl Shortcut {
     /// The keys in the order they are drawn: modifiers first in the Mac's order (⌃⌥⇧⌘),
     /// deduplicated, then the rest as given.
     pub fn keys(&self) -> Vec<ShortcutKey> {
-        crate::core::standard_action::normalized(self.0.iter().copied())
+        crate::standard_action::normalized(self.0.iter().copied())
     }
 }
 
@@ -369,7 +369,7 @@ impl Availability {
     }
 
     /// `aria-busy`: present only while busy.
-    pub(crate) fn aria_busy(self) -> Option<&'static str> {
+    pub fn aria_busy(self) -> Option<&'static str> {
         match self {
             Availability::Enabled | Availability::Disabled => None,
             Availability::Busy => Some("true"),
@@ -521,7 +521,7 @@ mod word_tests {
         Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, InputModality,
         Muting, PressPhase, Selection, Shown,
     };
-    use crate::core::word::Word;
+    use crate::word::Word;
 
     /// Every member of `T` parses back from its own slug, and no two share one.
     fn round_trips<T: Word + std::fmt::Debug>() {

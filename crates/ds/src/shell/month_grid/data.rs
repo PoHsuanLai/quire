@@ -4,7 +4,7 @@
 //! `From` and quire needs no calendar of its own.
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// A calendar month: which month a grid shows. Ordered, so a change of month knows its way.

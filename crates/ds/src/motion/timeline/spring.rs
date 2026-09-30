@@ -3,8 +3,8 @@
 //! it: a position, a velocity, and whether it is still moving.
 
 use super::Timeline;
-use crate::core::time::FRAME_TICK;
 use crate::motion::spring::{Leg, SpringPhase, SpringTuning, State};
+use ds_core::time::FRAME_TICK;
 use std::time::Duration;
 
 /// The longest a spring is looked at for its rest: past it, a spring counts as resting (the

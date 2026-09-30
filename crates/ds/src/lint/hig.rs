@@ -9,9 +9,9 @@ use super::kind;
 use super::rule::{Offence, Rule};
 use super::tokenize::Located;
 use super::walk::{CollectedRule, Decl};
-use crate::core::word::Word;
 use crate::style::appearance::typeface::Typeface;
 use crate::style::tokens::type_scale::FontSize;
+use ds_core::word::Word;
 
 /// The pseudo-classes that mark a focus rule (`:focus-visible` and `:focus-within` are
 /// `FocusPseudoClass`'s to reject, but a ring written under them is still a ring).

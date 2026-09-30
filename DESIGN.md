@@ -2,11 +2,13 @@
 
 Which design doc section each module implements. The docs in `design/` are canonical; this file
 only says where in the code a section lives, so a reviewer can go from a paragraph to a file and
-back. Paths are under `crates/ds/src/` unless another crate is named.
+back. Paths are under `crates/ds/src/` unless another crate is named first (`ds-core/colour/srgb.rs`
+is `crates/ds-core/src/colour/srgb.rs`).
 
-`ds` is laid out in the layers it will split into, each naming only the ones below it
-(`scripts/check-boundary.sh`): `core/` (vocabulary, geometry units, time, tasks, errors, text,
-colour, PNG and base64), `style/` (appearance, tokens, materials, Space palettes, fonts, icons,
+`ds-core` is a crate of its own (vocabulary, geometry units, time, errors, text, colour, PNG and
+base64, the `Spawner` trait): plain data and maths with no Dioxus, under everything else. `ds` is
+laid out in the layers it will split into, each naming only the ones below it
+(`scripts/check-boundary.sh`): `style/` (appearance, tokens, materials, Space palettes, fonts, icons,
 the stylesheet's sections, the scope a component draws in), `motion/` (animation data, timers,
 machines, the keyframes, and `motion/detail/`), `lint/`, then the host seams (`host/`, `focus/`,
 `edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then
@@ -27,8 +29,8 @@ public surface, one path per item.
 | `style/appearance/system.rs` | plan "ds-settings" portal mapping | `SystemPrefs{scheme, motion, contrast}` |
 | `style/appearance/resolve.rs` | 05-MOTION §9 rule 11 (explicit `data-motion`); 03-COLOR open decision 13 | `resolve()`, `Resolved::attrs()` |
 | `style/appearance/peek.rs` | 04-COMPONENTS §24 `PeekMode` | Center or Full |
-| `core/colour/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | `Verdict` |
-| `core/colour/{srgb,oklab,fit}.rs` | 03-COLOR §4.2, §17.4, §20; 08-ICONS §1.5, §2.10 | `Srgb`, `LinearRgb`, `Oklab`, `Oklch` and their conversions, the one copy every colour computation uses; the prototype's gamut fit (`oklch_bytes`, `oklch_hex`) |
+| `ds-core/colour/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | `Verdict` |
+| `ds-core/colour/{srgb,oklab,fit}.rs` | 03-COLOR §4.2, §17.4, §20; 08-ICONS §1.5, §2.10 | `Srgb`, `LinearRgb`, `Oklab`, `Oklch` and their conversions, the one copy every colour computation uses; the prototype's gamut fit (`oklch_bytes`, `oklch_hex`) |
 | `style/space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4.2-4.4, §5, §6, §9; 21-SPACES §2 | `Scheme`/`Capping` |
 | `style/space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` |
 | `style/space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | the frame's custom properties and grain opacity |
@@ -50,7 +52,7 @@ public surface, one path per item.
 | `style/tokens/easing.rs`, `style/tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `style/tokens/shape.rs` | 01-LAYOUT §10 |
 | `style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
-| `style/tokens/pixel.rs`, `core/geometry/scale.rs`, `style/scale.rs`, `style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_native::snap` |
+| `style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `style/scale.rs`, `style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_native::snap` |
 | `style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `style/tokens/layer.rs` | 01-LAYOUT §12 |
@@ -69,9 +71,9 @@ public surface, one path per item.
 | Module | Implements |
 | --- | --- |
 | `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 47 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10) and `MenuOut` (13 §13.3.2's close fade), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
-| `motion/settle.rs`, `core/time/mod.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
+| `motion/settle.rs`, `ds-core/time/mod.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
 | `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
-| `core/task.rs` | every task quire spawns belongs to its owner's scope and drops with it (`spawn_in` registers it through the scope's own `spawn`); its writes are `try_set`, so a timer that finds its owner gone stops (FINDINGS "Launcher gaps") |
+| `style/task.rs` | every task quire spawns belongs to its owner's scope and drops with it (`spawn_in` registers it through the scope's own `spawn`); its writes are `try_set`, so a timer that finds its owner gone stops (FINDINGS "Launcher gaps") |
 | `host/{document,no_host,parts,signals}.rs`, `host/{focused,caret,fallback,found,hand_back,ime,pasted,position,probe,captured,drop_hit}.rs` | the document seam: `DocumentHost` and its parts (`FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`), `NoHost`, `HostSignals`, and the vocabulary they speak |
 | `focus/{soon,request}.rs` | 06-INTERACTIONS §17: `focus_soon` (every focus change goes through the host and waits out a busy document) and `FocusRequest`/`use_focus_request` (`Focus::Controlled`, giving a field the keyboard back) |
 | `motion/{pulse,pulse_key}.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
@@ -81,7 +83,7 @@ public surface, one path per item.
 | `motion/{long_press,rubber,use_collapse}.rs` | 30 §1.3-1.4: the long-press machine over `PressPhase`, `rubber::resist`, `use_collapse` |
 | `stack/{roving,typeahead}.rs` | 30 §1.4: `Roving`, `Rove`, `Wrap`, `Typeahead` |
 | `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
-| `core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
+| `ds-core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
 | `host/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `GeometryHost::measure` (ds-native's waits out a document the renderer holds; `NoHost` answers `Unknown`) (FINDINGS "Bar gaps") |
 | `stack/{host,layer_stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `stack/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
@@ -90,19 +92,19 @@ public surface, one path per item.
 | `root/common.rs`, `root/pass_through.rs` | 30-CATALOGUE R8: the `Common` props (`id`, `data`, `extra_class`, `aria_label`, `mounted`) and the checked `data-*` names and classes a consumer may add |
 | `assembly/selectors.rs`, `docs/selectors.md` | 30-CATALOGUE 1.7; ARCHITECTURE section 11: the public selector table a user stylesheet may rely on, and its doc page (a test keeps them equal) |
 | `root/chrome.rs` | 21-SPACES §3, §5; 03-COLOR §17.1: `RootChrome::{Painted, Transparent}` (a Popover, Sheet or Toast root hosts cards and paints nothing), `FrameTint::{Opaque, Tinted, None}` (the window's loose layers; the bar, dock, popover panel, OSD and widget's `.ds-frame` group at the tint alpha), `Ground::{Paper, Frame}` (the bar and dock draw on the frame); each derived from the material with an override prop (FINDINGS "Bar gaps") |
-| `core/text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
+| `ds-core/text/clip.rs` | 04-COMPONENTS "Truncation"; 02-TYPE §10 |
 | `style/icon/{mod,shape,geometry,render}.rs` | 08-ICONS §1.3-1.5 (stroke as attributes) |
 | `style/icon/geometry_shell.rs` | 08-ICONS §1.6 |
 | `components/content/voice_orb/`, `style/tokens/orb.rs`, `--orb-*` in `style/tokens/colour.rs` | 30-CATALOGUE §2.9 (`VoiceOrb`, ADD), §3.2 (orb colours per Look): `OrbMetrics::of` (size-derived look), `Turn` and its frame timer (only while `Activity::Active`), `OrbColours` |
 | `components/content/icon_source.rs`, `style/icon/url.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`; `IconUrl` (`data:`/`file:` only) |
 | `style/icon/classify.rs` | 08-ICONS §1.5 step 2: `classify_with(png, limit) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
-| `core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
+| `ds-core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
 | `lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the vocabulary (variables, keyframes, grammar timing) is `Kits::vocabulary()`, read into `LintConfig::new(&kits)`, and `lint` names no motion module |
 
 ## `ds`: components
 
-`core/vocab.rs` is 30-CATALOGUE 1.5, the shared state vocabulary (`Check`, `Shown`, `Availability`, `Selection`, `Emphasis`, `Muting`, `PressPhase`, `Dismiss`, `Activity`, `FocusStyle`, `InputModality`, `RowState`; with `core/press.rs` and
-`core/standard_action.rs`). Components sit in directories by concept: `components/{controls,
+`ds-core/vocab.rs` is 30-CATALOGUE 1.5, the shared state vocabulary (`Check`, `Shown`, `Availability`, `Selection`, `Emphasis`, `Muting`, `PressPhase`, `Dismiss`, `Activity`, `FocusStyle`, `InputModality`, `RowState`; with `ds-core/press.rs` and
+`ds-core/standard_action.rs`). Components sit in directories by concept: `components/{controls,
 fields,menus,menus/palette,overlays,lists,content,chrome}` hold the general ones, `components/app`
 mail's own, and `shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
 `notifications`, `thumbs`, `now_playing`, `month_grid`, `clock`, `battery`, `emoji`,
@@ -131,11 +133,11 @@ manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that play
 `space_editor/field.rs` (the hue x chroma colour plane and the tiled round-dot cell over it,
 built once per scheme, and the mapping between a dot and its place on it, O-19),
 `space_editor/parts.rs` (stops, grain, presets, contrast checks); the field's PNGs are
-`core/png.rs`'s, as is the grain tile (`style/css/grain.rs`).
+`ds-core/png.rs`'s, as is the grain tile (`style/css/grain.rs`).
 
 Props worth knowing: `TextInput` and
 `SearchField` `focus: Focus{OnMount, Manual}`; `ListRow` and `SidebarItem` `drop:
-DropState{Idle, Target, Source}` (`core/vocab.rs`, §34); `BubbleAction::{Button(BubbleButton),
+DropState{Idle, Target, Source}` (`ds-core/vocab.rs`, §34); `BubbleAction::{Button(BubbleButton),
 Separator}`; `AccountFace::One{address}`; `SpaceEditor` `name` and `on_active_dot:
 EventHandler<ActiveDot>`; `Ds` `tint_alpha: Option<Alpha>`, fed by
 `ds_settings::Environment::tint_alpha`.

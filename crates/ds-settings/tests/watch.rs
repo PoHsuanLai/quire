@@ -3,7 +3,8 @@
 
 mod support;
 
-use ds::{Spawner, Theme};
+use ds::Theme;
+use ds_core::spawner::Spawner;
 use ds_settings::{AppearanceFile, DEBOUNCE, WatchState};
 use std::future::Future;
 use std::pin::Pin;

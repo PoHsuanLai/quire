@@ -8,10 +8,10 @@
 //!
 //! The machine decides; `use_swipe` owns the clock and the timers and draws the offset.
 
-use crate::core::geometry::units::Px;
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::style::tokens::delay::DelayToken;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 use std::time::Duration;
 
 /// A speed in logical pixels per second.

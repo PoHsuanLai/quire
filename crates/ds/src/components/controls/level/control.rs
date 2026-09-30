@@ -10,12 +10,12 @@ use super::look::{Drawn, body};
 use super::machine::{Hold, KeyStep, LevelInput, Nudge, step};
 use crate::components::content::level_glyph::glyph::LevelGlyphView;
 use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource};
-use crate::core::geometry::units::{Px, Rect, Size};
-use crate::core::vocab::{Availability, Fraction, PressPhase};
-use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Px, Rect, Size};
+use ds_core::vocab::{Availability, Fraction, PressPhase};
+use ds_core::word::Word;
 use std::rc::Rc;
 
 /// A level: the glyph that follows it and the capsule, knob or segments that show it.
@@ -147,7 +147,7 @@ fn travel(rail: Rect, look: LevelLook) -> Rect {
         LevelLook::CapsuleKnob => {
             let inset = rail.size.height.0 / 2.0;
             Rect {
-                origin: crate::core::geometry::units::Point {
+                origin: ds_core::geometry::units::Point {
                     x: Px(rail.origin.x.0 + inset),
                     y: rail.origin.y,
                 },

@@ -2,14 +2,14 @@
 //! that plays the row's entrance, exit and heal, and measures its height, which is how far the
 //! rows below it heal when it leaves.
 
-use crate::style::task::spawn_in;
-use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
 use crate::motion::use_roster::Pitches;
+use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use std::rc::Rc;
 
 /// One row in the list.
@@ -86,9 +86,9 @@ fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::motion_style;
-    use crate::core::geometry::units::Px;
     use crate::motion::presence::{Exit, Presence};
     use crate::motion::roster::{Heal, RosterEntry};
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn only_a_healing_row_writes_its_distance() {

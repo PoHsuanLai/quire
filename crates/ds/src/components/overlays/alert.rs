@@ -29,13 +29,13 @@ use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::components::overlays::{
     sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
 };
-use crate::core::vocab::Shown;
 use crate::focus::soon::focus_soon;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::use_spring_presence;
 use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
 use std::rc::Rc;
 
 /// What an alert says and what its buttons do.

@@ -14,10 +14,10 @@
 
 use super::accent_table::accent_of;
 use super::hex::{Alpha, Colour, Hex};
-use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::look::Look;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
+use ds_core::word::Word;
 
 const fn solid(rgb: u32) -> Colour {
     Colour::Solid(rgb_hex(rgb))
@@ -277,9 +277,9 @@ fn colour_css(token: ColourToken, scope: TokenScope) -> CssValue {
 #[cfg(test)]
 mod tests {
     use super::{Colour, ColourToken, Hex};
-    use crate::core::colour::fit::oklch_bytes;
     use crate::style::appearance::theme::Scheme;
     use crate::style::look::Look;
+    use ds_core::colour::fit::oklch_bytes;
 
     /// `(token, scheme, oklch lightness, chroma, hue)`: what each orb colour names.
     const ORB: &[(ColourToken, Scheme, f64, f64, f64)] = &[

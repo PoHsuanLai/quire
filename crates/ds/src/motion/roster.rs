@@ -5,7 +5,7 @@
 
 use super::anim::Anim;
 use super::presence::{Exit, Presence};
-use crate::core::geometry::units::Px;
+use ds_core::geometry::units::Px;
 
 /// A row's height plus the gap below it: how far the rows below move when it goes.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]

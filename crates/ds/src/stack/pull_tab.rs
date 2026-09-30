@@ -2,8 +2,8 @@
 //! without moving, to undo (design/06-INTERACTIONS.md section 9.2, design/04-COMPONENTS.md
 //! section 23).
 
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// How far left the tab may be pulled.
 const PULL_MIN: Px = Px(-6.0);

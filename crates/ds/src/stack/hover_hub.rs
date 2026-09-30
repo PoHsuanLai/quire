@@ -6,17 +6,17 @@
 //! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
 //! (`crate::style::task`).
 
-use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::core::time::clock::sleep;
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{
     HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
 use crate::motion::settle::settle;
 use crate::style::scope::Scope;
+use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use std::time::Duration;
 
 /// A card the hub is tracking: the consumer's key and the kind of card.
@@ -74,7 +74,7 @@ impl HoverHub {
     }
 
     fn try_feed(&self, event: HoverEvent<Card>) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.intent)?.step(event, crate::core::time::clock::now());
+        let (next, effect) = try_get(self.intent)?.step(event, ds_core::time::clock::now());
         try_set_if_changed(self.intent, next)?;
         self.apply(effect)
     }
@@ -102,7 +102,7 @@ impl HoverHub {
     /// Whether cards open at once right now.
     pub fn warmth(&self) -> HoverWarmth {
         let _expiry = self.warm_tick.read();
-        self.intent.read().warmth(crate::core::time::clock::now())
+        self.intent.read().warmth(ds_core::time::clock::now())
     }
 
     fn apply(&self, effect: IntentEffect<Card>) -> Result<(), Gone> {
