@@ -787,7 +787,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
-   `peek-in`, a SearchField over an embedded Rich menu (menu.css).
+   `peek-in`, a search `TextField` over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its
@@ -982,7 +982,7 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-item); white-space:nowrap; }
 /* -- hover_strip -- */
 /* HoverStrip (design/04-COMPONENTS.md section 17): `S:312-323`, `S:441-446`. The buttons are
-   IconButton's Strip variant (their box and hover are icon_button.css); this file reveals the
+   toolbar Buttons on the strip's own round box (`.ds-strip-action`); this file reveals the
    strip on row hover, fading the buttons in, and places each button's Fly label (section 18's
    Fly, scoped to the strip as S scopes it). The Fly fades in over `--t-quick` as the pointer
    rests on its button.
