@@ -851,7 +851,6 @@ dependencies = [
  "dioxus-ssr",
  "ds",
  "ds-blitz",
- "ds-core",
  "ds-harness",
  "ds-lint",
  "ds-settings",
@@ -1496,6 +1495,7 @@ dependencies = [
 name = "ds-core-derive"
 version = "0.1.0"
 dependencies = [
+ "proc-macro-crate",
  "proc-macro2",
  "quote",
  "syn 2.0.119",
