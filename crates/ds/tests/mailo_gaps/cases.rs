@@ -3,16 +3,13 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Button, Colour, Common, Fraction, Hex, ImageSource,
-    MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase, SendPill, Shown,
+    Accessory, AccountFace, AccountTile, AddAccountTile, Button, Colour, Common, Fraction, Hex,
+    Icon, ImageSource, MarkProvider, MarkStyle, PillAction, Propagation, Row, RowLeading, SendMood,
+    SendPhase, SendPill, Shown,
 };
 use ds::{Avatar, Muting};
-use ds::{
-    AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, Selection,
-    SidebarItem, TodayTrailing,
-};
-use ds::{Bezel, ControlSize};
-use ds::{FieldKind, TextField};
+use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::{Bezel, ControlSize, FieldKind, ImagePosition, TextField};
 
 /// A scheduled draft's favicon.
 const CLOCKED: AvatarFace = AvatarFace {
@@ -25,16 +22,13 @@ const CLOCKED: AvatarFace = AvatarFace {
 /// A scheduled Today row: its time and cancel, and no close.
 fn scheduled() -> Element {
     rsx! {
-        SidebarItem {
-            state: RowState { selection: Selection::Unselected, ..RowState::default() },
-            kind: ItemKind::Today { avatar: CLOCKED },
-            label: "Q3 notes",
-            count: None,
-            presence: Presence::Present,
-            preview: None,
-            onclick: |_| {},
-            onclose: None,
-            trailing: TodayTrailing { time: "Mon 9:00".to_string(), cancel: "Cancel sending Q3 notes".to_string(), on_cancel: EventHandler::new(|()| {}) },
+        Row {
+            title: "Q3 notes",
+            leading: RowLeading::Avatar(CLOCKED),
+            accessory: Accessory::Slot(rsx! {
+                span { "Mon 9:00" }
+                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::X, label: "Cancel sending Q3 notes", propagation: Propagation::Stop, onclick: |_| {} }
+            }),
         }
     }
 }
@@ -99,9 +93,9 @@ pub const CASES: &[Case] = &[
         golden: "overlays/send_pill/fatal-refused.html",
         make: || rsx! { SendPill { text: "Not sent", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} } },
     },
-    // SidebarItem: a scheduled Today row with its time and cancel.
+    // Row: a scheduled Today row with its time and cancel.
     Case {
-        golden: "lists/sidebar_item/today-scheduled.html",
+        golden: "lists/row/today-scheduled.html",
         make: scheduled,
     },
     // Avatar: an account's colour muted (chroma .55, hue and lightness kept),

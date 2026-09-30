@@ -4,9 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Material, MenuEntry, MenuRow,
-    MenuTile, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord,
-    RowShape, Shortcut, ShortcutKey,
+    Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Material, PaletteGroup,
+    PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord, RowShape, Shortcut, ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -25,17 +24,17 @@ fn reveal() -> Shortcut {
     Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
 }
 
-fn file(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::File)),
+fn file(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow {
+        leading: ds::RowLeading::Icon(Icon::File),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_string(),
             modified: "13:00".to_string(),
         },
         chord: RowChord::on_selected(reveal()),
-        ..MenuRow::new(value, title)
-    })
+        ..ds::PaletteRow::new(value, title)
+    }
 }
 
 #[allow(non_snake_case)]
@@ -62,16 +61,16 @@ fn Files() -> Element {
     }
 }
 
-const SELECTED: &str = "#card .ds-menu-item[*|aria-selected=true]";
+const SELECTED: &str = "#card .ds-row[*|aria-selected=true]";
 
 /// The selected row's title, and the title of the one row that draws a chord.
 fn where_the_chord_is(harness: &Harness) -> (Option<String>, Option<String>) {
-    let selected = harness.text_of(&format!("{SELECTED} .ds-menu-title"));
+    let selected = harness.text_of(&format!("{SELECTED} .ds-row-title"));
     let chorded = ["One.pdf", "Two.pdf", "Three.pdf"]
         .into_iter()
         .enumerate()
         .find(|(at, _)| {
-            let row = format!("#card .ds-menu-item:nth-of-type({})", at + 2);
+            let row = format!("#card .ds-row:nth-of-type({})", at + 2);
             harness.count(&format!("{row} .ds-key-equivalent")) == 1
         })
         .map(|(_, title)| title.to_string());
@@ -98,7 +97,7 @@ fn moving_the_selection_moves_the_chord() {
         Some("⌘R")
     );
     assert_eq!(
-        harness.count("#card .ds-menu-when"),
+        harness.count("#card .ds-row-when"),
         3,
         "every row keeps its time"
     );
@@ -120,7 +119,7 @@ fn moving_the_selection_moves_the_chord() {
         (Some("Three.pdf".into()), Some("Three.pdf".into()))
     );
     let when = harness
-        .rect(&format!("{SELECTED} .ds-menu-when"))
+        .rect(&format!("{SELECTED} .ds-row-when"))
         .expect("the time is drawn");
     let chord = harness
         .rect(&format!("{SELECTED} .ds-key-equivalent"))

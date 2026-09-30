@@ -1,11 +1,11 @@
-//! An exit taken back: a row whose fold is playing is restored in place
-//! by `Roster::stay` before the fold settles. The row is present again with no exit, and the
-//! rows below never heal, even after the fold's settle time has long passed.
+//! An exit taken back: a row whose fold is playing is restored in place when its key is listed
+//! again before the fold settles. The row is present again with no exit, and the rows below never
+//! heal, even after the fold's settle time has long passed.
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AnimatedList, Appearance, Button, Ds, Emphasis, Exit, LeaveBy, ListRow, Material, Point,
-    Px, RosterSpec, RowPitch, RowState, Selection, Stayed, settle, use_roster,
+    Anim, Appearance, Button, Ds, Emphasis, List, ListItem, Material, Point, RowState, Selection,
+    ThreadRow, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -28,55 +28,48 @@ fn StayApp() -> Element {
     }
 }
 
-/// Three rows; clicking one folds it away, Undo takes the last fold back.
+/// Three rows; clicking one folds it away, Undo lists its key again.
 #[allow(non_snake_case)]
 fn StayList() -> Element {
     let mut keys = use_signal(|| vec![1u32, 2, 3]);
     let mut last = use_signal(|| None::<u32>);
-    let roster = use_roster(
-        keys(),
-        RosterSpec {
-            leave: LeaveBy::Action,
-            exit: Exit::Row,
-            pitch: RowPitch(Px(79.0)),
-            on_settled: None,
-        },
-    );
+    let items: Vec<ListItem<u32>> = keys()
+        .into_iter()
+        .map(|key| {
+            ListItem::row(
+                key,
+                format!("Subject {key}"),
+                rsx! {
+                    ThreadRow {
+                        state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
+                        name: format!("Sender {key}"),
+                        via: None,
+                        subject: format!("Subject {key}"),
+                        snippet: None,
+                        time: "09:41",
+                        tags: rsx! {},
+                        star: None,
+                        strip: None,
+                        onclick: move |_| {
+                            keys.retain(|shown| *shown != key);
+                            last.set(Some(key));
+                        },
+                    }
+                },
+            )
+        })
+        .collect();
     rsx! {
         Button {
             label: "Undo",
             onclick: move |_| {
-                if let Some(key) = last() {
-                    assert_eq!(roster.stay(key), Ok(Stayed::Restored));
+                if last().is_some() {
                     keys.set(vec![1, 2, 3]);
                     last.set(None);
                 }
             },
         }
-        AnimatedList { label: "Threads",
-            for entry in roster.entries() {
-                ListRow {
-                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    key: "{entry.key}",
-                    presence: entry.presence,
-                    heal: entry.heal,
-                    name: format!("Sender {}", entry.key),
-                    via: None,
-                    subject: format!("Subject {}", entry.key),
-                    snippet: None,
-                    time: "09:41",
-                    tags: rsx! {},
-                    star: None,
-
-                    strip: None,
-                    onclick: move |_| {
-                        roster.leave(entry.key);
-                        keys.retain(|key| *key != entry.key);
-                        last.set(Some(entry.key));
-                    },
-                }
-            }
-        }
+        List::<u32> { label: "Threads", items }
     }
 }
 
@@ -87,14 +80,14 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 }
 
 fn row(n: usize) -> String {
-    format!(".ds-row:nth-child({n})")
+    format!(".ds-list-item:nth-child({n})")
 }
 
 #[test]
 fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
     let mut harness = Harness::new(StayApp, VIEW);
     harness.advance(ms(1500));
-    assert_eq!(harness.count(".ds-row"), 3);
+    assert_eq!(harness.count(".ds-list-item"), 3);
     let tops: Vec<_> = (1..=3)
         .map(|n| harness.rect(&row(n)).map(|rect| rect.origin.y))
         .collect();
@@ -118,7 +111,7 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
 
     // Past where the fold would have settled, and past any heal it would have started.
     harness.advance(fold + ms(600));
-    assert_eq!(harness.count(".ds-row"), 3, "{}", harness.html());
+    assert_eq!(harness.count(".ds-list-item"), 3, "{}", harness.html());
     for n in 1..=3 {
         assert_eq!(
             harness.attr(&row(n), "data-presence").as_deref(),
@@ -153,7 +146,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
     // the window, over the margin a loaded machine's overshoot on `advance` can eat into.
     harness.advance(ms(100));
     assert_eq!(
-        harness.count(".ds-row"),
+        harness.count(".ds-list-item"),
         3,
         "the second fold is still playing, and the stale first-fold timer never fired"
     );
@@ -162,7 +155,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
         Some("leaving")
     );
     let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
-    let dropped = settle_until(&mut harness, |h| h.count(".ds-row") == 2);
+    let dropped = settle_until(&mut harness, |h| h.count(".ds-list-item") == 2);
     assert!(
         dropped.duration_since(refolded) >= fold,
         "the second fold dropped the row only once its own full settle had run: {:?}",

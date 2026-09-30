@@ -23,8 +23,8 @@ use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::{
-    Alpha, Anchor, Appearance, Availability, Ds, Inject, LayerStack, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Peek, PeekMode, Point, Px,
+    Alpha, Anchor, Appearance, Ds, Inject, LayerStack, Material, Menu, MenuItem, MenuPlacement,
+    Peek, PeekMode, Point, Px,
 };
 use std::cell::Cell;
 use std::future::Future;
@@ -142,9 +142,9 @@ fn floating_surfaces_render_through_the_overlay_host() {
         rsx! {
             p { class: "here",
                 Menu {
-                    kind: MenuKind::Slim,
+                    placement: MenuPlacement::Popup,
                     anchor: Anchor::Point(Point { x: Px(10.0), y: Px(10.0) }),
-                    entries: vec![MenuEntry::Item { availability: Availability::Enabled, value: 1u8, title: "One".to_string(), detail: None, tile: None, trail: MenuTrail::None, check: None }],
+                    items: vec![MenuItem::new(1u8, "One")],
                     onpick: |_| {},
                     onclose: |_| {},
                 }
@@ -178,9 +178,9 @@ fn the_newest_layer_takes_the_escape() {
                 p { "reader" }
             }
             Menu {
-                kind: MenuKind::Slim,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Point(Point::default()),
-                entries: Vec::<MenuEntry<u8>>::new(),
+                items: Vec::<MenuItem<u8>>::new(),
                 onpick: |_| {},
                 onclose: |_| {},
             }
@@ -319,10 +319,13 @@ fn overlay_stylesheets_use_tokens_only() {
             "link_pill",
             include_str!("../src/components/app/link_pill.css"),
         ),
-        ("menu", include_str!("../src/components/menus/menu.css")),
         (
-            "menu_entry",
-            include_str!("../src/components/menus/menu_entry.css"),
+            "menu",
+            include_str!("../src/components/menus/menu/menu.css"),
+        ),
+        (
+            "menu_item",
+            include_str!("../src/components/menus/item/item.css"),
         ),
         ("peek", include_str!("../src/components/app/peek.css")),
         (

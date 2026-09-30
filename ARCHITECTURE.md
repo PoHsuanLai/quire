@@ -230,7 +230,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Spellcheck | `ds::spell::SpellService`; implementation `ds-blitz::spell` |
 | Window frame, traffic lights, window host | `ds::chrome`; `ds::window::HostWindow`; implementation `ds-blitz::window` |
 | Overlay stack, hover hub, toast hub | `ds::stack` |
-| Menu data | `ds::menus::{MenuEntry, MenuKind, MenuRow}` |
+| Menu data | `ds::menus::{MenuItem, MenuPlacement, MenuImage}` |
 | Menu pointer tracking | `ds::stack::menu_track` |
 | Popup menu view | `ds::menus::Menu` |
 | Toasts | `ds::overlays::toast` + `ds::stack::toast_hub` |
@@ -467,8 +467,8 @@ pub enum Input {
 
 ### Closed enums (never traits)
 
-Tokens' values and the `Rule`/`Severity`/`Profile` of the linter; `MenuEntry`, `MenuKind`,
-`MenuRow`; `Icon`, `IconSource`; `Anim`, `Exit`, `Moment`; `Presence`; `Painter`, `Backend`,
+Tokens' values and the `Rule`/`Severity`/`Profile` of the linter; `MenuItem`, `MenuPlacement`,
+`Accessory`, `RowLeading`; `Icon`, `IconSource`; `Anim`, `Exit`, `Moment`; `Presence`; `Painter`, `Backend`,
 `Clock`, `NetPolicy`, the print route; `ConfigRoot::{Xdg, Scratch}`, `SystemPrefsSource::{Portal,
 Fixed}`; `Input`; `KitRank`. A new variant is a compile error at every `match`, which is the
 point.
@@ -488,11 +488,10 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Vocabulary | `Word`, `Availability`, `Selection`, `Emphasis`, `Switch`, `Expanded`, `Check`, `Shown`, `Fraction`, `Percent`, `ShortcutKey`, `Shortcut`, `Here`, `DropState` |
 | Geometry | `Px`, `Point`, `Size`, `Rect`, `Scale`, `Placement`, `Alpha` |
 | Icons | `Icon`, `IconSource`, `IconView`, `IconSize`, `ExternalIcon`, `StatusState`, `BatteryGlyph`, `WifiGlyph`, `VolumeGlyph`, `BluetoothGlyph` |
-| Controls | `Label`, `Button`, `Bezel`, `ButtonRole`, `Answers`, `ImagePosition`, `IconSwap`, `Chip`, `ChipVariant`, `Toggle`, `Checkbox`, `RadioGroup`, `Choice`, `SegmentedControl`, `Tracking`, `Slider`, `SliderLook`, `Ticks`, `ProgressIndicator`, `ProgressStyle`, `Progress`, `LevelIndicator`, `LevelStyle`, `Bands`, `Badge`, `BadgeContent`, `BadgeTone`, `KeyEquivalent`, `KeyStyle`, `ControlSize` |
+| `Cursor` (menus) | `MenuCursor` |
 | Fields | `TextField`, `FieldKind`, `FieldBezel`, `Validity`, `FieldFocus`, `SelectionBubble`, `EditSurface`, `SpellMarks` |
-| Menus | `Menu`, `MenuKind`, `MenuEntry`, `MenuRow`, `MenuTile`, `MenuTrail`, `MenuFilter`, `MenuCursor`, `CommandPalette`, `PaletteGroup`, `RowAction`, `RowChord` |
 | Overlays | `Alert`, `Popover`, `Sheet`, `Tooltip`, `TooltipKind`, `HoverCard`, `Toast`, `ToastHost`, `Scrim`, `Panel`, `DragGhost`, `use_overlays`, `use_toasts` |
-| Lists and content | `AnimatedList`, `LeavingList`, `ListRow`, `SettingsRow`, `SectionHeader`, `Avatar`, `ImageSource`, `RichText`, `TextLine`, `TextRun`, `ProviderMark`, `PreviewPane`, `EmojiGrid`, `PdfThumb` |
+| Lists and content | `List`, `ListItem`, `Row`, `RowLeading`, `Accessory`, `RowAction`, `RowChord`, `SectionHeader`, `Avatar`, `ImageSource`, `RichText`, `TextLine`, `TextRun`, `ProviderMark`, `PreviewPane`, `EmojiGrid`, `PdfThumb` |
 | Chrome | `WindowFrame`, `TrafficLights`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Presence`, `PresenceSpec`, `use_presence`, `Timeline`, `use_timeline`, `Exit`, `use_roster`, `use_pulse`, `use_swipe`, `use_drag`, `Detailed`, `Moment`, `use_detail`, `Cue` |
 | Host | `DocumentHost`, `use_document_host`, `SpellService`, `HostWindow`, `HostSignals`, `Focused`, `Measured` |
@@ -512,7 +511,7 @@ are reached as `ds::app::X`, not through the prelude.
 | `Held` (`overlay/menu_track`) / (`motion/use_swipe`) | `MenuHold` / `SwipeHold` |
 | `Span` (`shell/battery/ring`) / (`spell/words`) | `RingSpan` / `WordSpan` |
 | `Level` (`shell/osd`), `Swipe` (`shell/notifications`) | `OsdLevel`, `NotificationSwipe` |
-| `Filter`, `Cursor`, `Tile`, `Trail` (menus) | `MenuFilter`, `MenuCursor`, `MenuTile`, `MenuTrail` |
+| `Cursor` (menus) | `MenuCursor` |
 | `Focus` (text field), `Key` (shortcut), `Env` | `FieldFocus`, `ShortcutKey`, `Scope` |
 | `Text`, `Run` (text runs) | `TextLine`, `TextRun` |
 | `Step` (month grid), `Provider` (provider mark), `Mono` (preview) | `MonthStep`, `MarkProvider`, `PaneMono` |
@@ -737,8 +736,9 @@ path each, until step 12 replaces them with the prelude.
     4. P1 controls and fields: (done) `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,
        `RadioGroup`, `SegmentedControl`, `Slider`, `TextField`, `ProgressIndicator`,
        `LevelIndicator`, `Badge`, `KeyEquivalent`;
-    5. menus and lists: `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,
-       `SectionHeader`;
+    5. menus and lists: (done) `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,
+       `SectionHeader`; `RowBattery` became `Accessory::Battery`, composing `BatteryGlyph` (the device models stay in
+       `ds-shell::battery`);
     6. overlays and feedback: (done) `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
     7. shell-only pieces and app features (30 sections 2.10 and 2.11), then the P2 components;

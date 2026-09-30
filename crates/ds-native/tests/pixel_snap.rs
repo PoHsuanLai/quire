@@ -13,7 +13,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::icon::stroke_device_pixels;
-use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuEntry, MenuTrail, Point, Px, Scale};
+use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuItem, Point, Px, Scale};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{keep, rect};
@@ -33,20 +33,19 @@ const FIXTURE_CSS: &str = ".ds.ds{--line-soft:#000000}\
 
 #[allow(non_snake_case)]
 fn Fixture() -> Element {
-    let item = |value: i32, title: &str| MenuEntry::Item {
+    let item = |value: i32, title: &str| MenuItem::Item {
         value,
         title: title.to_owned(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
+        image: None,
+        key: None,
         check: None,
         availability: ds::Availability::Enabled,
     };
     let entries = vec![
         item(1, "New Window"),
-        MenuEntry::Separator,
+        MenuItem::Separator,
         item(2, "Settings"),
-        MenuEntry::Separator,
+        MenuItem::Separator,
         item(3, "Quit"),
     ];
     rsx! {
@@ -59,9 +58,9 @@ fn Fixture() -> Element {
                 span { class: "icon", Glyph { icon: Icon::Plus, size: IconSize::Base } }
             }
             ds::Menu::<i32> {
-                kind: ds::MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: ds::Anchor::Point(Point { x: Px(191.0), y: Px(81.0) }),
-                entries,
+                items: entries,
                 onpick: move |_| {},
                 onclose: move |_| {},
             }

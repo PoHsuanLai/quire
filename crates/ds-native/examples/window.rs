@@ -9,8 +9,8 @@ use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
 use ds::Answers;
 use ds::{
-    Anchor, Appearance, Availability, Button, Check, Ds, Material, Menu, MenuEntry, MenuKind,
-    MenuTrail, Point, Px, use_toast_hub,
+    Anchor, Appearance, Availability, Button, Check, Ds, Material, Menu, MenuItem, Point, Px,
+    use_toast_hub,
 };
 use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
@@ -64,9 +64,9 @@ fn Demo() -> Element {
         }
         if open() == Check::On {
             Menu {
-                kind: MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(72.0) }),
-                entries: entries(),
+                items: entries(),
                 onpick: move |_: u8| open.set(Check::Off),
                 onclose: move |_| open.set(Check::Off),
             }
@@ -74,18 +74,17 @@ fn Demo() -> Element {
     }
 }
 
-fn entries() -> Vec<MenuEntry<u8>> {
+fn entries() -> Vec<MenuItem<u8>> {
     ["Later today", "Tomorrow", "Next week"]
         .into_iter()
         .zip(0..)
-        .map(|(title, value)| MenuEntry::Item {
-            availability: Availability::Enabled,
+        .map(|(title, value)| MenuItem::Item {
             value,
             title: title.into(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
+            image: None,
+            key: None,
             check: None,
+            availability: Availability::Enabled,
         })
         .collect()
 }

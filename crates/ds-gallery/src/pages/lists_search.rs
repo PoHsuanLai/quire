@@ -6,8 +6,8 @@ use super::Section;
 use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::{
-    ActionId, Button, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState, RunTone, Selection,
-    Shown, StripAction, TextLine, TextRun, Titles,
+    ActionId, Button, Emphasis, HoverStrip, Icon, List, ListItem, RowState, RunTone, Selection,
+    Shown, StripAction, TextLine, TextRun, ThreadRow, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
@@ -73,30 +73,43 @@ pub fn SearchRows() -> Element {
                 Button { size: ControlSize::Mini, label: "Up", onclick: move |_| at.set(0) }
                 Button { size: ControlSize::Mini, label: "Down", onclick: move |_| at.set(1) }
             }
-            ul { class: "g-list g-stage-pad",
-                for (index , (name , subject , snippet , time)) in hits().into_iter().enumerate() {
-                    ListRow {
-                        state: RowState { selection: if at() == index { Selection::Selected } else { Selection::Unselected }, emphasis: Emphasis::Plain, ..RowState::default() },
-                        key: "{name}",
-                        presence: Presence::Present,
-                        name,
-                        via: None,
-                        aria_label: format!("Open {}", subject.plain_text()),
-                        subject,
-                        snippet,
-                        time,
-                        tags: rsx! {},
-                        star: None,
-                        strip: rsx! {
-                            HoverStrip {
-                                actions: actions(),
-                                shown: if at() == index { Shown::Visible } else { Shown::Hidden },
-                                titles: Titles::FromLabel,
-                                expanded: vec![(ActionId("label".to_string()), if at() == index { Shown::Visible } else { Shown::Hidden })],
-                            }
-                        },
-                        onclick: move |_| at.set(index),
-                    }
+            div { class: "g-list g-stage-pad",
+                List::<usize> {
+                    label: "Search results",
+                    cursor: Some(at()),
+                    items: hits()
+                        .into_iter()
+                        .enumerate()
+                        .map(|(index, (name, subject, snippet, time))| {
+                            ListItem::row(
+                                index,
+                                name,
+                                rsx! {
+                                    ThreadRow {
+                                        state: RowState { selection: if at() == index { Selection::Selected } else { Selection::Unselected }, emphasis: Emphasis::Plain, ..RowState::default() },
+                                        name,
+                                        via: None,
+                                        subject: subject.clone(),
+                                        snippet,
+                                        time,
+                                        tags: rsx! {},
+                                        star: None,
+                                        strip: rsx! {
+                                            HoverStrip {
+                                                actions: actions(),
+                                                shown: if at() == index { Shown::Visible } else { Shown::Hidden },
+                                                titles: Titles::FromLabel,
+                                                expanded: vec![(ActionId("label".to_string()), if at() == index { Shown::Visible } else { Shown::Hidden })],
+                                            }
+                                        },
+                                        common: ds::Common { aria_label: Some(format!("Open {}", subject.plain_text())), ..ds::Common::default() },
+                                        onclick: move |_| at.set(index),
+                                    }
+                                },
+                            )
+                        })
+                        .collect::<Vec<_>>(),
+                    onselect: move |index: usize| at.set(index),
                 }
             }
         }

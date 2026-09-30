@@ -12,10 +12,10 @@ use ds::ControlSize;
 use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Availability, Avatar, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Fraction,
-    HeaderKind, Hex, ImageSource, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, Progress,
-    ProgressIndicator, ProgressStyle, ProviderMark, SectionHeader, SegmentedControl, Shortcut,
-    ShortcutKey, Slider, Toggle, Verdict,
+    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Fraction, Hex,
+    ImageSource, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, Progress,
+    ProgressIndicator, ProgressStyle, ProviderMark, SegmentedControl, Shortcut, ShortcutKey,
+    Slider, Toggle, Verdict,
 };
 use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
@@ -151,12 +151,6 @@ fn Choosers() -> Element {
                     Badge { content: BadgeContent::Number(count()) , tone: BadgeTone::Quiet, size: ControlSize::Mini}
                 }
                 Specimen { name: "spin", ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(busy), size: ControlSize::Small } }
-            }
-            div { class: "g-grid4",
-                SectionHeader { kind: HeaderKind::Frame, text: "Frame" }
-                SectionHeader { kind: HeaderKind::Group, text: "Group", value: Some("12".to_string()) }
-                SectionHeader { kind: HeaderKind::Field, text: "Field", value: Some("Light".to_string()) }
-                SectionHeader { kind: HeaderKind::Menu, text: "Menu", action: Some(("Clear".to_string(), EventHandler::new(|()| {}))) }
             }
         }
     }

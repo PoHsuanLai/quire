@@ -91,9 +91,10 @@ pub const STYLES: &[(&str, &[&str])] = &[
     ),
     (
         "section_header",
-        &[include_str!(
-            "../../src/components/lists/section_header.css"
-        )],
+        &[
+            include_str!("../../src/components/lists/section_header.css"),
+            include_str!("../../src/components/controls/disclosure.css"),
+        ],
     ),
     (
         "badge",

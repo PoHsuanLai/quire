@@ -8,8 +8,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Appearance, Availability, CommandPalette, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Motion, MotionLevel, Point, Px, settle, sleep,
+    Anchor, Anim, Appearance, CommandPalette, Ds, Material, Menu, MenuItem, MenuPlacement, Motion,
+    MotionLevel, PaletteGroup, PaletteRow, Point, Px, settle, sleep,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -24,21 +24,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
-}
-
-fn entries() -> Vec<MenuEntry<u8>> {
-    vec![item(1, "Open"), item(2, "Pause"), item(3, "Quit")]
-}
+/// The titles both subjects list.
+const TITLES: [&str; 3] = ["Open", "Pause", "Quit"];
 
 /// What the script mounts.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,7 +77,14 @@ fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
         });
     });
     let count = tick() % 3 + 1;
-    let rows: Vec<MenuEntry<u8>> = entries().into_iter().take(count as usize).collect();
+    let taken = TITLES.iter().zip(1u8..).take(count as usize);
+    let rows: Vec<MenuItem<u8>> = taken
+        .clone()
+        .map(|(title, value)| MenuItem::new(value, *title))
+        .collect();
+    let palette_rows: Vec<PaletteRow<u8>> = taken
+        .map(|(title, value)| PaletteRow::new(value, *title))
+        .collect();
     rsx! {
         Ds { appearance: Appearance { motion, ..Appearance::default() }, material: Material::Window,
             p { class: "mounts", "{mounts}" }
@@ -105,7 +99,7 @@ fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
                             placeholder: "Search".to_string(),
                             query: String::new(),
                             tokens: Vec::new(),
-                            groups: vec![("Results".to_string(), rows)],
+                            groups: vec![PaletteGroup::list("Results", palette_rows)],
                             empty: "Nothing".to_string(),
                             oninput: move |_| {},
                             onpick: move |_| {},
@@ -114,9 +108,9 @@ fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
                     },
                     Subject::Menu => rsx! {
                         Menu::<u8> {
-                            kind: MenuKind::Slim,
+                            placement: MenuPlacement::Popup,
                             anchor: Anchor::Point(Point { x: Px(40.0), y: Px(60.0) }),
-                            entries: rows,
+                            items: rows,
                             onpick: move |_| {},
                             onclose: move |()| shown.set(Shown::No),
                         }
@@ -127,7 +121,7 @@ fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
     }
 }
 
-/// Mount at 10 ms, unmount 100 ms later: before any entrance (`peek-in`, `menu-pop`) settles.
+/// Mount at 10 ms, unmount 100 ms later: before the palette's entrance (`peek-in`) settles.
 fn early_unmount() -> Vec<Step> {
     vec![(10, Shown::Yes), (100, Shown::No)]
 }
@@ -209,12 +203,11 @@ fn a_palette_unmounted_before_its_entrance_settles_does_not_panic() {
 }
 
 #[test]
-fn a_menu_unmounted_before_its_entrance_settles_does_not_panic() {
-    assert!(entrance(Anim::MenuPop) > ms(110), "the unmount is early");
+fn a_menu_unmounted_before_its_fade_settles_does_not_panic() {
     let mut harness = Harness::new(MenuGoneEarly, VIEW);
     run_script(
         &mut harness,
-        entrance(Anim::MenuPop) + ms(400),
+        settle(Anim::MenuOut, MotionLevel::Standard) + ms(400),
         "1",
         ".ds-menu",
     );

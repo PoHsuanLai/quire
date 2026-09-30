@@ -7,7 +7,7 @@ use ds::ControlSize;
 use ds::components::controls::button::Button;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::controls::slider::Slider;
-use ds::components::lists::section_header::{HeaderKind, SectionHeader};
+use ds::components::lists::section_header::SectionHeader;
 use ds::focus::click::kept_click;
 use ds_core::colour::contrast::Verdict;
 use ds_core::vocab::Fraction;
@@ -88,7 +88,7 @@ pub(super) fn GrainRow(look: SpaceLook, onchange: EventHandler<SpaceLook>) -> El
     let grain = look.grain.0.min(100);
     rsx! {
         div {
-            SectionHeader { kind: HeaderKind::Field, text: "Grain", value: grain.to_string() }
+            SectionHeader { title: "Grain", value: grain.to_string() }
             Slider {
                 label: "Grain",
                 value: Fraction(u16::from(grain) * 10),
@@ -112,7 +112,7 @@ pub(super) fn Presets(
 ) -> Element {
     rsx! {
         div {
-            SectionHeader { kind: HeaderKind::Field, text: "Presets" }
+            SectionHeader { title: "Presets" }
             div { class: "ds-presets",
                 for (index, paint) in PRESETS.iter().map(|preset| DotPaint::gradient(&derive(preset.dots, scheme).stops)).enumerate() {
                     button {
@@ -143,7 +143,7 @@ pub(super) fn Presets(
 pub(super) fn Checks(look: SpaceLook, scheme: Scheme) -> Element {
     rsx! {
         div {
-            SectionHeader { kind: HeaderKind::Field, text: "Measured, this Space, this theme" }
+            SectionHeader { title: "Measured, this Space, this theme" }
             CheckRows { look, scheme }
         }
     }

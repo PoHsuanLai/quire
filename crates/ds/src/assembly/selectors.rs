@@ -111,14 +111,19 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["track", "fill", "icon"],
     },
     ComponentSelectors {
+        component: "Disclosure",
+        root: "ds-disclosure",
+        parts: &["indicator", "body"],
+    },
+    ComponentSelectors {
         component: "List",
         root: "ds-list",
-        parts: &[],
+        parts: &["item"],
     },
     ComponentSelectors {
         component: "Menu",
         root: "ds-menu",
-        parts: &["item", "separator"],
+        parts: &["item", "separator", "header"],
     },
     ComponentSelectors {
         component: "Popover",
@@ -136,14 +141,19 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["item", "indicator", "label", "image"],
     },
     ComponentSelectors {
+        component: "PopUpButton",
+        root: "ds-popup",
+        parts: &["sizer"],
+    },
+    ComponentSelectors {
         component: "Row",
         root: "ds-row",
-        parts: &[],
+        parts: &["leading", "title", "detail", "trailing"],
     },
     ComponentSelectors {
         component: "SectionHeader",
         root: "ds-section-header",
-        parts: &[],
+        parts: &["title", "value", "action"],
     },
     ComponentSelectors {
         component: "SegmentedControl",

@@ -15,9 +15,11 @@ pub enum Page {
     /// radio group, segmented control, slider, text field, progress and level indicators, badge,
     /// key equivalent.
     Catalogue,
-    /// Rows, strips, sidebar items, the roster.
+    /// Rows, lists, section headers, disclosures, the roster.
     Lists,
-    /// Menus, popovers, hover cards, tooltips, toast, scrim, sheet, peek, palette.
+    /// Menus, menu items and pop-up buttons.
+    Menus,
+    /// Popovers, hover cards, tooltips, toast, scrim, sheet, peek, palette.
     Overlays,
     /// Popover, sheet, alert, side panel, tooltip, dock label, hover card, toast, empty state and
     /// skeleton, in every state (design/30 sections 2.5 and 2.9).

@@ -1,7 +1,8 @@
 //! What the command palette lists and how its keys read: pure, beside `command_palette`.
 
-use crate::components::menus::menu_lines::Line;
-use crate::components::menus::{menu_entry::MenuEntry, menu_match::fuzzy};
+use crate::components::content::text_runs::TextLine;
+use crate::components::menus::menu_match::fuzzy;
+use crate::components::menus::palette::palette_group::PaletteRow;
 use crate::stack::roving::Step;
 use dioxus::prelude::Key;
 
@@ -31,17 +32,24 @@ pub(crate) fn palette_key(key: &Key) -> Option<PaletteKey> {
     }
 }
 
-/// `entries` as menu lines, each item's title marked where `query` matches it.
-pub(crate) fn marked<'a, T>(entries: &'a [MenuEntry<T>], query: &str) -> Vec<Line<'a, T>> {
-    entries
-        .iter()
-        .map(|entry| Line {
-            entry,
-            marks: match (entry.takes_marks(), entry.match_title()) {
-                (true, Some(title)) => fuzzy(query, &title)
-                    .map(|hit| hit.marks)
-                    .unwrap_or_default(),
-                (_, _) => Vec::new(),
+/// A row and the title characters the query matched.
+pub(crate) struct MarkedRow<'a, T> {
+    /// The row as given.
+    pub row: &'a PaletteRow<T>,
+    /// The matched title characters, by index; none for a title the caller marked itself.
+    pub marks: Vec<usize>,
+}
+
+/// `rows`, each plain title marked where `query` matches it.
+pub(crate) fn marked<'a, T>(rows: &'a [PaletteRow<T>], query: &str) -> Vec<MarkedRow<'a, T>> {
+    rows.iter()
+        .map(|row| MarkedRow {
+            row,
+            marks: match &row.title {
+                TextLine::Plain(title) => {
+                    fuzzy(query, title).map(|hit| hit.marks).unwrap_or_default()
+                }
+                TextLine::Runs(_) => Vec::new(),
             },
         })
         .collect()

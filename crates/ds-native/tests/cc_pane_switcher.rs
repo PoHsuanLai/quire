@@ -8,8 +8,8 @@ use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::Word;
 use ds::{
-    Anim, Appearance, Button, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
-    SettingsRow,
+    Accessory, Anim, Appearance, Button, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher,
+    Row, RowLeading, RowSize,
 };
 use ds::{MotionLevel, settle};
 use ds_native::harness::settle_until;
@@ -47,11 +47,11 @@ fn PanesApp() -> Element {
                     on_settled: move |pane: Pane| log.with_mut(|log| log.push(pane.slug())),
                     root: rsx! {
                         for name in ["Wi-Fi", "Bluetooth", "Focus"] {
-                            SettingsRow { key: "{name}", glyph: Icon::Wifi, title: name, onclick: |_| {} }
+                            Row { key: "{name}", leading: RowLeading::Icon(Icon::Wifi), title: name, size: RowSize::Settings, onclick: |_| {} }
                         }
                     },
                     detail: rsx! {
-                        SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
+                        Row { leading: RowLeading::Icon(Icon::Wifi), title: "Home", accessory: Accessory::Check(Check::On), size: RowSize::Settings, onclick: |_| {} }
                     },
                 }
             }

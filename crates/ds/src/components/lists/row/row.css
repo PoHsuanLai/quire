@@ -1,0 +1,90 @@
+/* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
+   are 24 tall (Compact) or 44 (Settings); a row under a highlight fills with the accent and takes
+   the accent's ink (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
+   list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-row{
+  position:relative; display:flex; align-items:center; gap:var(--s-8); box-sizing:border-box; min-height:24px; padding:0 var(--s-8);
+  border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none; list-style:none;
+  font-size:var(--fs-shell-menu);
+}
+.ds-row[*|data-density=settings]{ min-height:44px; }
+.ds-row[*|aria-disabled=true]{ opacity:.35; }
+.ds-row[*|aria-busy=true]{ cursor:default; }
+
+/* The selection: the accent under its ink; a quiet grey when the window is inactive or the row's
+   list is not the one holding the keyboard. */
+.ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
+
+/* The words: the title over its detail. Emphasis Strong is an unread row. */
+.ds-row-words{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
+.ds-row-title{ display:block; font-weight:400; line-height:1.3; }
+.ds-row[*|data-emphasis=strong] .ds-row-title{ font-weight:600; }
+.ds-row-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+.ds-row mark{ background:transparent; color:var(--accent-text); font-weight:800; }
+.ds-row[*|aria-selected=true] mark{ color:inherit; }
+
+/* The leading element. */
+.ds-row-leading{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-row-leading[*|data-leading=disc]{ width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
+  transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out); }
+.ds-row-leading[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=source],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=text],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:34px; height:34px; }
+.ds-row-leading[*|data-leading=text]{ border:var(--hair) solid var(--line); border-radius:var(--r-shell-highlight); background:var(--surface);
+  font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
+.ds-row-leading[*|data-leading=avatar],
+.ds-row-leading[*|data-leading=image]{ background:transparent; }
+.ds-row-leading[*|data-leading=image] > .ds-ext-icon{ width:100%; height:100%; }
+.ds-row-leading[*|data-leading=thumb]{ overflow:hidden; }
+.ds-row-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-shell-highlight); }
+
+/* The accessory. */
+.ds-row-trailing{ display:inline-flex; align-items:center; flex:none; gap:var(--s-4); margin-left:auto; color:var(--ink-faint); font-size:var(--fs-help); }
+.ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
+.ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }
+.ds-row-spin{ display:flex; align-items:center; justify-content:center; }
+.ds-row-trailing[*|data-mark=text]{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
+.ds-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
+.ds-row-when{ display:inline-block; flex:none; margin-left:auto; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-row-when + .ds-row-trailing, .ds-row-when + .ds-key-equivalent{ margin-left:calc(var(--s-6) - var(--s-8)); }
+.ds-row .ds-key-equivalent{ flex:none; }
+.ds-row-action{ display:inline-flex; align-items:center; flex:none; }
+.ds-row-action .ds-button{ width:22px; height:22px; }
+
+/* An outline: the triangle's box, kept by a leaf, and the children one step in. */
+.ds-row-disclosure{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:var(--s-12); color:var(--ink-faint); }
+.ds-row-branch{ display:flex; flex-direction:column; min-width:0; }
+.ds-row-branch > .ds-disclosure-body{ padding-left:var(--s-12); }
+
+/* Shaped rows: a clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4)
+   since Blitz has no line clamp; a clipboard picture sits under its title at its own aspect. */
+.ds-row-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
+  max-height:calc(var(--lines) * 1.35em); }
+.ds-row-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
+
+/* Drag (design/04-COMPONENTS.md section 34): the dragged row is dimmed, the row under the pointer
+   that would take the drop is lit and grown, and every row that could take it is outlined. */
+.ds-row[*|data-drag=source]{ opacity:.35; }
+.ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+.ds-row[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
+
+/* A palette group's Show More brings the rows it added in as inserted rows come. */
+.ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }

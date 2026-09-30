@@ -46,6 +46,7 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::ChevronLeft => CHEVRON_LEFT,
         Icon::ChevronRight => CHEVRON_RIGHT,
         Icon::ChevronUp => CHEVRON_UP,
+        Icon::ChevronsUpDown => CHEVRONS_UP_DOWN,
         Icon::ChevronDown => CHEVRON_DOWN,
         Icon::Folder => FOLDER,
         Icon::File => FILE,
@@ -401,6 +402,7 @@ const CHEVRON_RIGHT: &[Shape] = &[Shape::Path("m9 18 6-6-6-6")];
 
 /// Lucide `chevron-up`.
 const CHEVRON_UP: &[Shape] = &[Shape::Path("m18 15-6-6-6 6")];
+const CHEVRONS_UP_DOWN: &[Shape] = &[Shape::Path("m7 15 5 5 5-5"), Shape::Path("m7 9 5-5 5 5")];
 
 /// Lucide `chevron-down`.
 const CHEVRON_DOWN: &[Shape] = &[Shape::Path("m6 9 6 6 6-6")];

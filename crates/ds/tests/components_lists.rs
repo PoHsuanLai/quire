@@ -24,18 +24,16 @@ mod mailo4;
 mod motion;
 #[path = "lists/rows.rs"]
 mod rows;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::{CASES, Case};
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
-use ds::Emphasis;
-use ds::{
-    Anim, AnimatedList, DragGhost, DragPhase, DragTracker, Exit, Point, Px, Rect, RosterState,
-    RowPitch, Size, use_drag,
-};
+use ds::{Anim, DragGhost, DragPhase, DragTracker, Exit, Point, Px, Rect, Size, use_drag};
 use mailo::MAILO_CASES;
 use mailo4::MAILO4_CASES;
-use rows::{ROW_CASES, Row};
+use rows::ROW_CASES;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -80,19 +78,44 @@ fn every_list_component_matches_its_golden() {
 /// renders.
 fn sheets(component: &str) -> Vec<&'static str> {
     let own: &[&str] = match component {
-        "list_row" | "animated_list" | "roster" => &[
-            "list_row",
-            "animated_list",
+        "thread_row" | "roster" => &[
+            "thread_row",
+            "row",
+            "list",
             "hover_strip",
             "button",
             "provider_mark",
             "chip",
             "text_runs",
         ],
+        "row" => &[
+            "row",
+            "disclosure",
+            "badge",
+            "avatar",
+            "button",
+            "icon_view",
+            "toggle",
+            "progress",
+            "key_equivalent",
+            "status_glyph",
+            "text_field",
+            "text_runs",
+        ],
+        "list" => &[
+            "list",
+            "row",
+            "thread_row",
+            "hover_strip",
+            "button",
+            "provider_mark",
+            "chip",
+            "section_header",
+            "disclosure",
+            "text_runs",
+        ],
         "account_tile" => &["account_tile", "button", "avatar", "provider_mark", "badge"],
-        "sidebar_item" => &["sidebar_item", "drop_place", "avatar", "badge"],
-        "tree_item" => &["tree_item", "drop_place", "badge", "button", "text_field"],
-        "hover_strip" => &["hover_strip", "button"],
+        "hover_strip" => &["hover_strip", "icon_button"],
         "appearance_picker" => &["appearance_picker", "section_header", "segmented"],
         "drag" => &["drag_ghost"],
         other => return sheet(other).into_iter().collect(),
@@ -149,10 +172,11 @@ fn every_class_in_a_golden_is_styled_by_its_component() {
 
 /// The stylesheets of the components listed here.
 const OWN: &[&str] = &[
-    "list_row",
+    "thread_row",
+    "row",
+    "list",
+    "disclosure",
     "hover_strip",
-    "sidebar_item",
-    "animated_list",
     "appearance_picker",
     "command_pill",
     "account_tile",

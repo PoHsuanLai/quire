@@ -1,0 +1,47 @@
+/* MenuItem (design/30 section 2.4, `NSMenuItem`): a row of 22 (`--shell-menu-row`) in the text
+   menu's type (`--fs-shell-menu` at 400), with the state column (a check, a dash for mixed), the
+   image column, the title and, at the end, the key equivalent or a submenu's chevron. The
+   highlight is a `FocusStyle::Highlight` fill that snaps, with no fade: the accent under its ink
+   while the menu's window is active, the grey wash otherwise. A menu tracks the pointer, so
+   there is no hover rule. Attribute selectors carry `*|` (spike S2). */
+
+.ds-menu-item{
+  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
+  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
+}
+.ds-menu-state{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink); }
+.ds-menu-image{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-menu-image[*|data-image=none]{ visibility:hidden; }
+.ds-menu-image[*|data-image=image] > .ds-ext-icon{ width:100%; height:100%; }
+.ds-menu-label{ flex:1 1 auto; min-width:0; }
+.ds-menu-trailing{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-help); color:var(--ink-faint); }
+.ds-menu-trailing[*|data-mark=chevron]{ padding-left:var(--s-4); }
+
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true],
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true],
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }
+
+/* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
+.ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
+
+/* A group title: the data face in capitals over the rows it heads. */
+.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); white-space:nowrap; }
+
+/* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no selection
+   and the arrow keys pass it. */
+.ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
+.ds-menu-info-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); }
+.ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }

@@ -1,0 +1,25 @@
+/* Disclosure (design/30 section 2.1, `NSButton` disclosure triangle): a 12 px triangle that turns
+   a quarter over `--t-quick` as its body opens, and a body whose height and opacity `use_collapse`
+   writes inline. Under Reduced the triangle changes at once. A closed body takes no pointer and
+   is not painted. Attribute selectors carry `*|` (spike S2). */
+
+.ds-disclosure{ display:flex; flex-direction:column; min-width:0; }
+.ds-disclosure-trigger{
+  display:flex; align-items:center; gap:var(--s-4); align-self:flex-start; border:0; background:transparent; padding:0 var(--s-2);
+  font:inherit; font-size:var(--fs-control); color:var(--ink); cursor:default; text-align:left;
+}
+.ds-disclosure-trigger[*|aria-disabled=true]{ opacity:.35; }
+.ds-disclosure-indicator{
+  flex:none; display:inline-flex; align-items:center; justify-content:center; width:var(--s-12); height:var(--s-12); line-height:0;
+  color:var(--ink-faint); transition:transform var(--t-quick) var(--e-in-out);
+}
+.ds-disclosure-indicator[*|data-shown=visible]{ transform:rotate(90deg); }
+.ds[*|data-motion=reduced] .ds-disclosure-indicator{ transition:none; }
+.ds-disclosure[*|data-size=mini] .ds-disclosure-trigger{ font-size:var(--fs-micro); }
+.ds-disclosure[*|data-size=small] .ds-disclosure-trigger{ font-size:var(--fs-help); }
+.ds-disclosure[*|data-size=large] .ds-disclosure-trigger{ font-size:var(--fs-body); }
+
+.ds-disclosure-label{ min-width:0; }
+.ds-disclosure-body{ min-width:0; }
+.ds-disclosure-body[*|data-closed=true]{ visibility:hidden; pointer-events:none; }
+.ds-disclosure-content{ display:flow-root; }

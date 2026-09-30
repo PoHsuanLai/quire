@@ -4,9 +4,8 @@
 use super::parts::CheckRows;
 use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
-use ds::components::lists::section_header::{HeaderKind, SectionHeader};
-use ds::{Choice, Tracking};
-use ds::{FieldBezel, TextField};
+use ds::components::lists::section_header::SectionHeader;
+use ds::{Choice, FieldBezel, TextField, Tracking};
 use ds_core::word::Word;
 use ds_style::appearance::{
     motion::Motion,
@@ -84,7 +83,7 @@ pub(super) fn Title(
 pub(super) fn MotionRow(choice: MotionChoice) -> Element {
     rsx! {
         div {
-            SectionHeader { kind: HeaderKind::Field, text: "Motion" }
+            SectionHeader { title: "Motion" }
             SegmentedControl::<Motion> {
                 label: "Motion",
                 choices: Choice::pairs(Motion::ALL.iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>()),
@@ -100,7 +99,7 @@ pub(super) fn MotionRow(choice: MotionChoice) -> Element {
 pub(super) fn EachScheme(look: SpaceLook) -> Element {
     rsx! {
         div {
-            SectionHeader { kind: HeaderKind::Field, text: "Measured, this Space" }
+            SectionHeader { title: "Measured, this Space" }
             for &(scheme , heading) in schemes_of(look.theme) {
                 div { key: "{heading}", class: "ds-checks-scheme",
                     div { class: "ds-checks-heading", "{heading}" }

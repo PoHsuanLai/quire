@@ -1,13 +1,13 @@
 //! The bar gaps' menu controls on a real Blitz document (FINDINGS "Bar gaps"): the
 //! menu reports the choice under the pointer and every release over it; a press that began
 //! outside and is released on an item picks it; a pick calls `onpick` before `onclose`; Escape
-//! and an outside click fade the menu out before `onclose`; a bar menu opens with no entrance;
+//! and an outside click fade the menu out before `onclose`; every menu opens with no entrance;
 //! a status line is drawn and never selected; a press reports where it happened.
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Appearance, Availability, Ds, Icon, Material, Menu, MenuEntrance, MenuEntry,
-    MenuKind, MenuTrail, MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
+    Anchor, Anim, Appearance, Availability, Ds, Icon, Material, Menu, MenuItem, MenuPlacement,
+    MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_native::harness::settle_until;
@@ -20,29 +20,18 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-/// A document under test.
-type App = fn() -> Element;
-
 fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str, availability: Availability) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability,
-    }
+fn item(value: u8, title: &str, availability: Availability) -> MenuItem<u8> {
+    MenuItem::new(value, title).with_availability(availability)
 }
 
 /// A status line, then three choices: Open (0), Pause (1, disabled), Quit (2).
-fn entries() -> Vec<MenuEntry<u8>> {
+fn entries() -> Vec<MenuItem<u8>> {
     vec![
-        MenuEntry::Info {
+        MenuItem::Info {
             title: "Wired".to_string(),
             detail: Some("192.168.1.4".to_string()),
         },
@@ -52,11 +41,10 @@ fn entries() -> Vec<MenuEntry<u8>> {
     ]
 }
 
-/// Which way the menu under test starts and appears.
+/// Whether the menu under test starts open.
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Setup {
     open: bool,
-    entrance: MenuEntrance,
 }
 
 /// A page with an opener that opens the menu on the press (as a bar title does), the menu, and
@@ -78,10 +66,9 @@ fn MenuPage(setup: Setup) -> Element {
             }
             if open() {
                 Menu::<u8> {
-                    kind: MenuKind::Slim,
+                    placement: MenuPlacement::Bar,
                     anchor: Anchor::Point(Point { x: Px(40.0), y: Px(60.0) }),
-                    entries: entries(),
-                    entrance: setup.entrance,
+                    items: entries(),
                     on_hover: move |index: Option<usize>| {
                         note(format!("hover:{}", index.map_or("none".to_string(), |i| i.to_string())));
                     },
@@ -99,17 +86,12 @@ fn MenuPage(setup: Setup) -> Element {
 
 #[allow(non_snake_case)]
 fn OpenMenu() -> Element {
-    rsx! { MenuPage { setup: Setup { open: true, entrance: MenuEntrance::Animated } } }
+    rsx! { MenuPage { setup: Setup { open: true } } }
 }
 
 #[allow(non_snake_case)]
 fn ClosedMenu() -> Element {
-    rsx! { MenuPage { setup: Setup { open: false, entrance: MenuEntrance::Animated } } }
-}
-
-#[allow(non_snake_case)]
-fn InstantMenu() -> Element {
-    rsx! { MenuPage { setup: Setup { open: true, entrance: MenuEntrance::Instant } } }
+    rsx! { MenuPage { setup: Setup { open: false } } }
 }
 
 fn log(harness: &Harness) -> String {
@@ -165,14 +147,14 @@ fn a_status_line_is_drawn_and_never_selected() {
     harness.key(ShortcutKey::Up);
     assert_eq!(
         harness
-            .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
             .as_deref(),
         Some("Quit")
     );
     harness.key(ShortcutKey::Down);
     assert_eq!(
         harness
-            .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
             .as_deref(),
         Some("Open")
     );
@@ -190,7 +172,7 @@ fn a_press_dragged_onto_an_item_and_released_picks_it() {
     let quit = row(&harness, "Quit");
     harness.pointer_move(quit);
     harness.pointer_up(quit);
-    harness.advance(ms(20));
+    settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "hover:2,release:Primary,pick:3,close");
     assert_eq!(harness.count(".ds-menu"), 0, "the pick closed it");
 }
@@ -217,7 +199,7 @@ fn a_click_picks_before_it_closes() {
     let mut harness = Harness::new(OpenMenu, VIEW);
     settle_in(&mut harness);
     harness.click(row(&harness, "Open"));
-    harness.advance(ms(20));
+    settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "hover:0,release:Primary,pick:1,close");
 }
 
@@ -275,27 +257,14 @@ fn an_outside_click_fades_the_menu_out_before_it_closes() {
     assert_eq!(log(&harness), "close");
 }
 
-/// A bar menu opens at rest, with no entrance; the default plays one.
+/// Every menu opens at rest, with no entrance.
 #[test]
-fn a_bar_menu_opens_with_no_entrance() {
-    // (app, name, presence on the first frame, data-entrance)
-    let cases: [(App, &str, &str, Option<&str>); 2] = [
-        (InstantMenu, "instant", "present", Some("instant")),
-        (OpenMenu, "animated", "entering", None),
-    ];
-    for (app, name, presence, entrance) in cases {
-        let harness = Harness::new(app, VIEW);
-        assert_eq!(
-            harness.attr(".ds-menu", "data-presence").as_deref(),
-            Some(presence),
-            "{name}"
-        );
-        assert_eq!(
-            harness.attr(".ds-menu", "data-entrance").as_deref(),
-            entrance,
-            "{name}"
-        );
-    }
+fn a_menu_opens_with_no_entrance() {
+    let harness = Harness::new(OpenMenu, VIEW);
+    assert_eq!(
+        harness.attr(".ds-menu", "data-presence").as_deref(),
+        Some("present")
+    );
 }
 
 // ---- Where a press happened ---------------------------------------------------------------
@@ -366,7 +335,7 @@ fn the_exported_measurer_reads_a_rect() {
 
 /// The title of the selected choice.
 fn selected(harness: &Harness) -> Option<String> {
-    harness.text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+    harness.text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
 }
 
 #[test]

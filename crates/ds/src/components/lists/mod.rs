@@ -1,18 +1,9 @@
-//! Lists: rows and what rows share (clicks, hooks, stars), the animated and leaving lists, section
-//! headers and settings rows.
+//! Lists: rows and the list they live in, section headers, the emoji grid, the preview pane and
+//! the appearance picker.
 
-pub(crate) mod animated_list;
 pub(crate) mod appearance_picker;
 pub mod emoji_grid;
-pub(crate) mod leaving_list;
-pub(crate) mod leaving_row;
-pub(crate) mod list_row;
+pub(crate) mod list;
 pub(crate) mod preview;
-pub(crate) mod row_battery;
-pub(crate) mod row_click;
-pub(crate) mod row_hooks;
-pub(crate) mod row_star;
+pub(crate) mod row;
 pub mod section_header;
-pub(crate) mod settings_row;
-pub(crate) mod settings_row_phase;
-pub(crate) mod settings_row_trailing;

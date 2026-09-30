@@ -2,7 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Check, Ds, Icon, Inject, Material, Pane, PaneSwitcher, RowTrailing, SettingsRow,
+    Accessory, Appearance, Check, Ds, Icon, Inject, List, ListItem, Material, Pane, PaneSwitcher,
+    Row, RowLeading, RowSize,
 };
 use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 
@@ -27,7 +28,10 @@ pub fn panes(props: PaneProps) -> Element {
                     }
                 },
                 detail: rsx! {
-                    SettingsRow { glyph: Icon::Wifi, title: "Home", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
+                    List::<&'static str> {
+                        label: "Networks",
+                        items: vec![ListItem::row("Home", "Home", rsx! { Row { leading: RowLeading::Icon(Icon::Wifi), title: "Home", accessory: Accessory::Check(Check::On), size: RowSize::Settings, onclick: |_| {} } })],
+                    }
                 },
             }
         }

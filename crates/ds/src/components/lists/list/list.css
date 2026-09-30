@@ -1,0 +1,37 @@
+/* List (design/30 section 2.6): the rows' container. Each item sits in a `div.ds-list-item` that
+   carries the roster's motion state (`data-presence=entering|present|leaving|healing`,
+   `data-exit`); the item is a flow root, so its content's margins stay inside it and its measured
+   height is the whole distance the rows below heal. An arriving item plays `row-in` (fades and
+   slides down over `--t-move`); a leaving one plays its exit forwards and takes no pointer
+   (`row-out`, fades and slides up over `--t-quick`; a notification banner's `banner-out`); the
+   rows below a settled batch heal from `--dy` over `--t-move`. At rest an item plays `hold`, which
+   moves nothing. Under Reduced motion an entrance is `fade`, an exit `menu-out`, and a heal
+   `hold`. The list takes the keyboard itself, so it draws no ring. Attribute selectors carry
+   `*|` (spike S2). */
+
+.ds-list{ display:flex; flex-direction:column; outline:none; }
+.ds[*|data-modality=keyboard] .ds-list:focus{ outline:none; }
+.ds-list-item{ display:flow-root; animation:none; }
+
+.ds-list-item[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-list-item[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
+
+.ds-list-item[*|data-presence=leaving]{ pointer-events:none; }
+.ds-list-item[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
+.ds-list-item[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
+
+.ds-list-item[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
+
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=entering]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=leaving]{ animation-name:menu-out; }
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=healing]{ animation-name:hold; }
+
+/* Inset: the rows in a card, a hairline above every row after the first. */
+.ds-list[*|data-style=inset]{ padding:var(--s-4); border-radius:var(--r-card); background:var(--surface); }
+.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row{ border-top:var(--hair) solid var(--line); border-top-left-radius:0; border-top-right-radius:0; }
+.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]{ border-top-color:transparent; }
+
+/* SourceList: a sidebar's rows at the sidebar's size (Small 24, Medium 28, Large 32). */
+.ds-list[*|data-style=source-list] .ds-row{ min-height:28px; }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row{ min-height:24px; }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row{ min-height:32px; }

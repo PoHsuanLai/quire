@@ -6,8 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Ds, HoverStrip, Icon, ListRow, Material, Point, Presence, Px, Rect,
-    RowState, Shown, StripAction,
+    ActionId, Appearance, Ds, HoverStrip, Icon, Material, Point, Px, Rect, RowState, Shown,
+    StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
 use ds_native::{Harness, Viewport};
@@ -62,9 +62,8 @@ fn Page(shown: Option<Shown>, width: Width) -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             style { {ROW} }
             ul { class: "list", style: list,
-                ListRow {
+                ThreadRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    presence: Presence::Present,
                     name: "Dana Okafor",
                     via: None,
                     subject: "Re: UIDL stability",

@@ -9,8 +9,8 @@
 use dioxus::prelude::*;
 use ds::TextField;
 use ds::{
-    Anchor, Appearance, Button, Common, Ds, Material, Menu, MenuEntry, MenuKind, MenuRow,
-    MountedRef, Point, Press, Px, ShortcutKey,
+    Anchor, Appearance, Button, Common, Ds, Material, Menu, MenuItem, MountedRef, Point, Press, Px,
+    ShortcutKey,
 };
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
@@ -26,11 +26,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn entries() -> Vec<MenuEntry<u8>> {
-    vec![
-        MenuEntry::Row(MenuRow::new(0, "Rename")),
-        MenuEntry::Row(MenuRow::new(1, "Delete")),
-    ]
+fn entries() -> Vec<MenuItem<u8>> {
+    vec![MenuItem::new(0, "Rename"), MenuItem::new(1, "Delete")]
 }
 
 /// A shell whose keys open a menu ("m") and are logged; its "More" button opens the same menu.
@@ -65,9 +62,9 @@ fn MenuPage(anchored: Anchored) -> Element {
             }
             if open() {
                 Menu::<u8> {
-                    kind: MenuKind::Dropdown,
+                    placement: ds::MenuPlacement::Bar,
                     anchor,
-                    entries: entries(),
+                    items: entries(),
                     onpick: |_| {},
                     onclose: move |()| open.set(false),
                 }

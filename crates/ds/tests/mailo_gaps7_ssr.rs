@@ -9,6 +9,8 @@
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;

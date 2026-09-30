@@ -8,8 +8,8 @@ use crate::registry;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Anchor, Availability, BlurState, Button, Check, Icon, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, MotionLevel, MountedRef, SegmentedControl, Theme, Toggle, Typeface,
+    Accent, BlurState, Check, Material, MenuItem, MotionLevel, PopUpButton, PopUpKind,
+    SegmentedControl, Theme, Toggle, Typeface,
 };
 use ds::{Choice, ControlSize, Tracking};
 
@@ -122,7 +122,7 @@ fn Tool(name: String, children: Element) -> Element {
     }
 }
 
-/// A button showing the current choice, opening a dropdown menu of every choice.
+/// A pop-up button showing the current choice, opening a menu of every choice.
 #[component]
 fn ChoiceMenu<T: Clone + PartialEq + 'static>(
     label: String,
@@ -130,48 +130,20 @@ fn ChoiceMenu<T: Clone + PartialEq + 'static>(
     value: T,
     onpick: EventHandler<T>,
 ) -> Element {
-    let mut open = use_signal(|| Check::Off);
-    let mut anchor = use_signal(|| None::<MountedRef>);
-    let current = options
-        .iter()
-        .find(|(option, _)| *option == value)
-        .map_or(String::new(), |(_, name)| name.clone());
-    let items = options
-        .iter()
-        .map(|(option, name)| MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: option.clone(),
-            title: name.clone(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
-            check: Some(if *option == value {
-                Check::On
-            } else {
-                Check::Off
-            }),
-        })
-        .collect::<Vec<_>>();
-    let entries = std::iter::once(MenuEntry::Header(label))
-        .chain(items)
+    let items = std::iter::once(MenuItem::Header(label.clone()))
+        .chain(
+            options
+                .iter()
+                .map(|(option, name)| MenuItem::new(option.clone(), name.clone())),
+        )
         .collect::<Vec<_>>();
     rsx! {
-        span { class: "g-anchor", onmounted: move |event| anchor.set(Some(MountedRef(event.data()))),
-            Button {
-                label: current,
-                icon: Some(Icon::ChevronDown),
-                value: Some(open()),
-                onclick: move |_| open.set(Check::On),
-            }
-        }
-        if let (Check::On, Some(mounted)) = (open(), anchor()) {
-            Menu::<T> {
-                kind: MenuKind::Dropdown,
-                anchor: Anchor::Mounted(mounted),
-                entries,
-                onpick: move |choice| onpick.call(choice),
-                onclose: move |_| open.set(Check::Off),
-            }
+        PopUpButton::<T> {
+            kind: PopUpKind::PopUp,
+            items,
+            value: Some(value),
+            title: Some(label),
+            onpick: move |choice| onpick.call(choice),
         }
     }
 }

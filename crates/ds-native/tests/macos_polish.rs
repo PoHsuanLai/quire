@@ -10,7 +10,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
-    MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Shown, Surface,
+    MenuItem, PlateFamily, Px, Scheme, Shown, Surface,
 };
 use ds_native::{Harness, Viewport};
 use ds_shell::MenuBarItem;
@@ -225,22 +225,20 @@ fn an_open_bar_item_draws_its_pill() {
 #[allow(non_snake_case)]
 fn SlimMenu() -> Element {
     let entries = vec![
-        MenuEntry::Item {
+        MenuItem::Item {
             value: 1,
             title: "New Window".to_owned(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
+            image: None,
+            key: None,
             check: None,
             availability: ds::Availability::Enabled,
         },
-        MenuEntry::Separator,
-        MenuEntry::Item {
+        MenuItem::Separator,
+        MenuItem::Item {
             value: 2,
             title: "Quit".to_owned(),
-            detail: None,
-            tile: Some(MenuTile::Icon(Icon::Power)),
-            trail: MenuTrail::None,
+            image: Some(ds::MenuImage::Icon(Icon::Power)),
+            key: None,
             check: None,
             availability: ds::Availability::Enabled,
         },
@@ -249,9 +247,9 @@ fn SlimMenu() -> Element {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "anchor", style: "width:20px; height:20px; margin:20px" }
             ds::Menu::<i32> {
-                kind: ds::MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: ds::Anchor::Point(ds::Point { x: Px(40.0), y: Px(40.0) }),
-                entries,
+                items: entries,
                 onpick: move |_| {},
                 onclose: move |_| {},
             }
@@ -329,16 +327,11 @@ fn a_squircle_dock_root_masks_its_frame_and_keeps_its_shadow() {
 
 #[allow(non_snake_case)]
 fn Launcher() -> Element {
-    let groups = vec![(
-        "Applications".to_owned(),
-        vec![MenuEntry::Item {
-            value: 1_u8,
-            title: "Files".to_owned(),
-            detail: Some("File manager".to_owned()),
-            tile: None,
-            trail: MenuTrail::None,
-            check: None,
-            availability: ds::Availability::Enabled,
+    let groups = vec![ds::PaletteGroup::list(
+        "Applications",
+        vec![ds::PaletteRow {
+            detail: Some("File manager".into()),
+            ..ds::PaletteRow::new(1_u8, "Files")
         }],
     )];
     rsx! {

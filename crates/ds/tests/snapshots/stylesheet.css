@@ -549,12 +549,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-alert-stage{ position:absolute; inset:0; z-index:var(--z-peek); pointer-events:auto; }
 .ds-alert-suppression{ margin-top:var(--s-12); }
 .ds-alert-help{ position:absolute; left:var(--s-22); bottom:var(--s-18); }
-/* -- animated_list -- */
-/* AnimatedList (design/04-COMPONENTS.md section 16 markup): the `ul` the rows live in. Its
-   `data-presence` only selects which entrance an entering row plays (list_row.css); the list
-   itself does not move. */
-
-.ds-list{ list-style:none; margin:0; padding:0; }
 /* -- appearance_picker -- */
 /* AppearancePicker (design/04-COMPONENTS.md section 26, derived): rows stacked 14 apart (the
    Space editor's stack gap, `S:247`), each a Field SectionHeader over its control. The swatches
@@ -796,7 +790,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
-   `peek-in`, a search `TextField` over an embedded Rich menu (menu.css).
+   `peek-in`, a SearchField over the results list under it.
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its
@@ -812,7 +806,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
-.ds-palette[*|data-host=surface] > .ds-menu[*|data-embed=palette]{ flex:0 1 auto; min-height:0; max-height:none; }
+.ds-palette-list{ padding:var(--shell-menu-inset); overflow-y:auto; scrollbar-width:none; max-height:360px; outline:none; }
+.ds-palette-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
+.ds-palette[*|data-host=surface] > .ds-palette-list{ flex:0 1 auto; min-height:0; max-height:none; }
 
 /* The launcher's scale (the macOS polish pass, design/13 section 13.3.9, settled 2026-09-24):
    the card is as tall as its content up to its container (no empty box under the last row); the
@@ -823,8 +819,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-host=surface] .ds-text-field-icon .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
 .ds-palette[*|data-host=surface] .ds-text-field .ds-input[*|data-variant=plain],
 .ds-palette[*|data-host=surface] .ds-text-field .ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
-.ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
-.ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
+.ds-palette[*|data-host=surface] .ds-row-title{ font-size:var(--fs-shell-row); }
+.ds-palette[*|data-host=surface] .ds-row-detail{ font-size:var(--fs-shell-detail); }
 /* Kept mounted while hidden: nothing is laid out, and each showing replays
    the entrance under the keyframe's other name (`data-pulse`, design/05-MOTION.md section 9
    rule 2), so the animation starts over even where the engine kept the element's styles. */
@@ -838,7 +834,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto minmax(0, 1fr); }
 .ds-palette[*|data-host=overlay][*|data-aside=shown]{ width:min(calc(540px + var(--aside)), 96%); }
 .ds-palette[*|data-aside=shown] > .ds-text-field{ grid-row:1; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:2; grid-column:1; min-width:0; }
+.ds-palette[*|data-aside=shown] > .ds-palette-list{ grid-row:2; grid-column:1; min-width:0; }
 .ds-palette-aside{ grid-row:2; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
    it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
@@ -846,9 +842,9 @@ html,body{margin:0;padding:0;background:transparent}
    rest the list's children play `hold` (moves nothing), below every motion here (which come
    later in the cascade): an entrance or heal whose settle timer (wall clock) ends it before the
    frame clock does is replaced by another animation, never dropped midway. */
-.ds-menu[*|data-embed=palette] > *{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-menu-item[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
-.ds-menu[*|data-embed=palette] > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
+.ds-palette-list > *{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-palette-list > [*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-palette-list > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 /* -- command_pill -- */
 /* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
    `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).
@@ -866,6 +862,32 @@ html,body{margin:0;padding:0;background:transparent}
   margin-left:auto; white-space:nowrap; flex:none;
   font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--f-ink-faint);
 }
+/* -- disclosure -- */
+/* Disclosure (design/30 section 2.1, `NSButton` disclosure triangle): a 12 px triangle that turns
+   a quarter over `--t-quick` as its body opens, and a body whose height and opacity `use_collapse`
+   writes inline. Under Reduced the triangle changes at once. A closed body takes no pointer and
+   is not painted. Attribute selectors carry `*|` (spike S2). */
+
+.ds-disclosure{ display:flex; flex-direction:column; min-width:0; }
+.ds-disclosure-trigger{
+  display:flex; align-items:center; gap:var(--s-4); align-self:flex-start; border:0; background:transparent; padding:0 var(--s-2);
+  font:inherit; font-size:var(--fs-control); color:var(--ink); cursor:default; text-align:left;
+}
+.ds-disclosure-trigger[*|aria-disabled=true]{ opacity:.35; }
+.ds-disclosure-indicator{
+  flex:none; display:inline-flex; align-items:center; justify-content:center; width:var(--s-12); height:var(--s-12); line-height:0;
+  color:var(--ink-faint); transition:transform var(--t-quick) var(--e-in-out);
+}
+.ds-disclosure-indicator[*|data-shown=visible]{ transform:rotate(90deg); }
+.ds[*|data-motion=reduced] .ds-disclosure-indicator{ transition:none; }
+.ds-disclosure[*|data-size=mini] .ds-disclosure-trigger{ font-size:var(--fs-micro); }
+.ds-disclosure[*|data-size=small] .ds-disclosure-trigger{ font-size:var(--fs-help); }
+.ds-disclosure[*|data-size=large] .ds-disclosure-trigger{ font-size:var(--fs-body); }
+
+.ds-disclosure-label{ min-width:0; }
+.ds-disclosure-body{ min-width:0; }
+.ds-disclosure-body[*|data-closed=true]{ visibility:hidden; pointer-events:none; }
+.ds-disclosure-content{ display:flow-root; }
 /* -- drag_ghost -- */
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
@@ -1160,276 +1182,114 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-link-pill-dim[*|data-part=path]{ flex:0 1 auto; min-width:0; overflow:hidden; }
 .ds-link-pill[*|data-truth=lying]{ background:var(--danger); color:var(--danger-ink); }
 .ds-link-pill[*|data-truth=lying] b{ color:var(--danger-ink); }
-/* -- leaving_list -- */
-/* LeavingList (design/04-COMPONENTS.md section 54): the consumer's rows in a column,
-   each in a `div.ds-leaving-row` that carries the roster's motion state, as ListRow does
-   (`data-presence=entering|present|leaving|healing`, `data-exit`). The row is a flow root, so
-   its content's margins stay inside it and its measured height is the whole distance the rows
-   below heal. An arriving row plays `row-in` (fades and slides down over `--t-move`); a leaving
-   row plays its exit forwards and takes no pointer (`row-out`, fades and slides up over
-   `--t-quick`; a notification banner's `banner-out`). The rows below a settled batch heal from
-   `--dy` (the dropped rows' summed height) over `--t-move`. At rest a row plays `hold`, which
-   moves nothing. Under Reduced motion (design/05 section 14.4) an entrance is `fade`, an exit
-   `menu-out`, and a heal `hold`: the rows below take their places without sliding. Attribute
-   selectors carry `*|` (spike S2). */
+/* -- list -- */
+/* List (design/30 section 2.6): the rows' container. Each item sits in a `div.ds-list-item` that
+   carries the roster's motion state (`data-presence=entering|present|leaving|healing`,
+   `data-exit`); the item is a flow root, so its content's margins stay inside it and its measured
+   height is the whole distance the rows below heal. An arriving item plays `row-in` (fades and
+   slides down over `--t-move`); a leaving one plays its exit forwards and takes no pointer
+   (`row-out`, fades and slides up over `--t-quick`; a notification banner's `banner-out`); the
+   rows below a settled batch heal from `--dy` over `--t-move`. At rest an item plays `hold`, which
+   moves nothing. Under Reduced motion an entrance is `fade`, an exit `menu-out`, and a heal
+   `hold`. The list takes the keyboard itself, so it draws no ring. Attribute selectors carry
+   `*|` (spike S2). */
 
-.ds-leaving-list{ display:flex; flex-direction:column; }
-.ds-leaving-row{ display:flow-root; animation:none; }
+.ds-list{ display:flex; flex-direction:column; outline:none; }
+.ds[*|data-modality=keyboard] .ds-list:focus{ outline:none; }
+.ds-list-item{ display:flow-root; animation:none; }
 
-.ds-leaving-row[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
-.ds-leaving-row[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-list-item[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+.ds-list-item[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 
-.ds-leaving-row[*|data-presence=leaving]{ pointer-events:none; }
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
-.ds-leaving-row[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
+.ds-list-item[*|data-presence=leaving]{ pointer-events:none; }
+.ds-list-item[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
+.ds-list-item[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
 
-.ds-leaving-row[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
+.ds-list-item[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 
-.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=entering]{ animation-name:fade; }
-.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=leaving]{ animation-name:menu-out; }
-.ds[*|data-motion=reduced] .ds-leaving-row[*|data-presence=healing]{ animation-name:hold; }
-/* -- list_row -- */
-/* ListRow (design/04-COMPONENTS.md section 16): `S:175-199`, `S:293-307`. Attribute selectors
-   carry `*|` (spike S2). Motion state is the roster's: `data-presence=entering|present|leaving|
-   healing` with `data-exit=row`. An entering row plays `row-in` (fades and slides down over
-   `--t-move`), a leaving row `row-out` (fades and slides up over `--t-quick`), and a healing row
-   slides from `--dy` over `--t-move`. Subject and snippet truncate with `.ds-truncate`; the name
-   only when `ListRow` finds it longer than its column's character budget (`NameFit`), since a
-   fade on a name that fits eats its last letters and Blitz cannot tell CSS it overflows. The
-   star's fill is an SVG attribute (spike S6), so this file colours it with `color`.
-   Not specified: the row's active state, disabled. `drop: DropState` writes the dragged source
-   `[data-drag=source]` (.35, `C:374`) and a drop target `[data-drop=target]` (section 34's
-   drop-target look, `C:320-323`). */
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=entering]{ animation-name:fade; }
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=leaving]{ animation-name:menu-out; }
+.ds[*|data-motion=reduced] .ds-list-item[*|data-presence=healing]{ animation-name:hold; }
 
-.ds-row{
-  position:relative; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start;
-  padding:var(--s-10) var(--s-11); margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface);
-  border:var(--hair) solid transparent; cursor:default; user-select:none; list-style:none;
-  transition:transform var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out),
-             background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
-  animation:none;
-}
-.ds-row:hover{ box-shadow:var(--shadow-2); border-color:var(--line); }
-.ds-row[*|aria-selected=true]{ background:var(--raise); border-color:var(--accent-text); box-shadow:var(--shadow-1); }
+/* Inset: the rows in a card, a hairline above every row after the first. */
+.ds-list[*|data-style=inset]{ padding:var(--s-4); border-radius:var(--r-card); background:var(--surface); }
+.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row{ border-top:var(--hair) solid var(--line); border-top-left-radius:0; border-top-right-radius:0; }
+.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]{ border-top-color:transparent; }
 
-/* Entering: an arrival. */
-.ds-row[*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out) backwards; }
-
-/* At rest after an entrance, a heal or an exit taken back: `hold`, which moves nothing, so the
-   rest timer (wall clock) that turns a row present never drops a running animation without
-   starting another; Blitz at the pinned rev keeps a dropped animation's last value. */
-.ds-row[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
-
-/* Leaving. */
-.ds-row[*|data-presence=leaving]{ pointer-events:none; }
-.ds-row[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
-
-/* Drag (section 34). */
-.ds-row[*|data-drag=source]{ opacity:.35; }
-.ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
-
-/* Healing (`S:330`). */
-.ds-row[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
-
-/* Dot (`S:185-187`, `S:295-296`). */
-.ds-row-dot{ padding-top:var(--s-6); }
-.ds-dot{
-  display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
-  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
-}
-.ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
-
-/* Text (`S:189-197`). */
-.ds-row-main{ min-width:0; }
-.ds-row-from{ display:flex; align-items:baseline; gap:var(--s-7); min-width:0; }
-.ds-row-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
-.ds-row[*|data-emphasis=plain] .ds-row-name{ font-weight:500; color:var(--ink-soft); }
-.ds-row-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); color:var(--ink-faint); }
-.ds-row-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
-.ds-row[*|data-emphasis=strong] .ds-row-sub{ font-weight:600; }
-.ds-row-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
-.ds-row-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--s-5); }
-.ds-row-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
-.ds-row-tags{ display:flex; gap:var(--s-4); align-items:center; }
-
-/* Star (`S:299-307`). */
-.ds-star{
-  position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
-  cursor:default; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
-  transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }
-.ds-star[*|aria-pressed=true]{ color:var(--warn); }
-.ds-star-glyph{ display:grid; place-items:center; }
+/* SourceList: a sidebar's rows at the sidebar's size (Small 24, Medium 28, Large 32). */
+.ds-list[*|data-style=source-list] .ds-row{ min-height:28px; }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row{ min-height:24px; }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row{ min-height:32px; }
 /* -- menu -- */
-/* Menu (design/04-COMPONENTS.md section 20): Rich and Slim `S:665-680`, `S:787-791`; Dropdown
-   `C:1003-1023`; Context is Slim at the pointer. The surface is `.ds-popover`'s. The menu holds
-   focus while open (its keys are its own), so it draws no ring of its own. Leaving is removal
-   at once (`S:2052`, `C:1744`).
-   TODO: the Dropdown's max height is not specified in design/04-COMPONENTS.md; it keeps 320. */
+/* Menu (design/30 section 2.4, `NSMenu`): one density for every placement (rows 22, separators 9,
+   inset 5, radius 8: design/29-SIZING.md section 5.4). The surface is `.ds-popover`'s. The menu
+   holds focus while open (its keys are its own), so it draws no ring of its own. A menu opens at
+   once; one closed by Escape, an outside click or a pick fades out before it goes (`menu-out`,
+   `--t-quick --e-exit`), taking no pointer while it does. */
 
-.ds-menu{ width:280px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; animation:menu-pop var(--t-move) var(--e-out); }
+.ds-menu{ width:auto; min-width:186px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
-.ds-menu[*|data-kind=slim],
-.ds-menu[*|data-kind=context]{ width:220px; }
-.ds-popover.ds-menu[*|data-kind=dropdown]{ width:auto; min-width:186px; box-shadow:var(--shadow-2);
-  transform-origin:88% 0; animation:menu-in var(--t-move) var(--e-out); }
+.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); box-shadow:var(--shadow-2); }
+.ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
-/* A menu's surface is the reference's menu (design/29-SIZING.md section 5.4): radius 8 with its
-   rows inset 5 (`--r-shell-menu`, `--shell-menu-inset`); the rows' highlight is 5, not concentric,
-   as the reference draws it. */
-.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); }
+/* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no surface (no
+   `.ds-popover`) and no padding of its own; the card's box sizes it. */
+.ds-menu[*|data-flow=inline]{ width:auto; min-width:0; max-height:none; overflow:visible; padding:0; }
 
-/* Embedded in the command palette: static, no surface, no entrance (`S:796`). */
-.ds-menu[*|data-embed=palette]{ width:auto; max-height:360px; animation:none; }
-/* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no
-   surface (no `.ds-popover`), no entrance and no padding of its own; the card's box sizes it. */
-.ds-menu[*|data-flow=inline]{ width:auto; max-height:none; overflow:visible; padding:0; animation:none; }
+/* A submenu (design/13 section 13.3.4) is a menu beside its parent row. */
 
-.ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* A separator is a hairline with the shell scale's margin above and below (5, design/13
    section 13.3.3, settled 2026-09-24), inset to the rows' text. */
 .ds-menu-separator{ height:var(--hair); margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
-.ds-menu mark{ background:transparent; color:var(--accent-text); font-weight:800; }
+.ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
+/* -- menu_item -- */
+/* MenuItem (design/30 section 2.4, `NSMenuItem`): a row of 22 (`--shell-menu-row`) in the text
+   menu's type (`--fs-shell-menu` at 400), with the state column (a check, a dash for mixed), the
+   image column, the title and, at the end, the key equivalent or a submenu's chevron. The
+   highlight is a `FocusStyle::Highlight` fill that snaps, with no fade: the accent under its ink
+   while the menu's window is active, the grey wash otherwise. A menu tracks the pointer, so
+   there is no hover rule. Attribute selectors carry `*|` (spike S2). */
 
-/* A submenu (design/13 section 13.3.4): beside its parent row, opened with no animation (only
-   the first menu of a session pops). */
-.ds-popover.ds-menu[*|data-depth]{ animation:none; }
+.ds-menu-item{
+  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
+  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
+}
+.ds-menu-state{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink); }
+.ds-menu-image{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-menu-image[*|data-image=none]{ visibility:hidden; }
+.ds-menu-image[*|data-image=image] > .ds-ext-icon{ width:100%; height:100%; }
+.ds-menu-label{ flex:1 1 auto; min-width:0; }
+.ds-menu-trailing{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-help); color:var(--ink-faint); }
+.ds-menu-trailing[*|data-mark=chevron]{ padding-left:var(--s-4); }
 
-/* A bar menu opens at once (design/13 section 13.3.2), and a menu closed by Escape or an outside
-   click fades out before it goes (`menu-out`, `--t-quick --e-exit`), taking no pointer while it
-   does. */
-.ds-popover.ds-menu[*|data-entrance=instant]{ animation:none; }
-.ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
-
-/* The query line of `filter: Filter::Field`: the typed text in a row at the top of
-   the menu, drawn as a plain TextField is (`.ds-input[data-variant=plain]`: body size, 1.55
-   line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
-   menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
-   the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
-.ds-menu-filter{ display:flex; align-items:center; min-height:var(--ctl-h-l); padding:var(--s-3) var(--s-8); margin-bottom:var(--s-3);
-  border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
-.ds-menu-filter-placeholder{ color:var(--ink-faint); }
-.ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent-text); flex:none; }
-/* -- menu_entry -- */
-/* Menu items (design/04-COMPONENTS.md section 20): the Rich grid `S:667-673`, Slim `S:678-680`,
-   checked `S:787-788`, Dropdown `C:1011-1023`. A pointer over a Rich, Slim or Context item
-   moves the selection (O-13), so hover and keyboard look alike there; the Dropdown keeps C's
-   hover. Disabled items and submenu parents: design/13-BEHAVIOUR-menus-windows.md 13.3.3-13.3.4. */
-
-.ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:default; }
-.ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
-/* Highlight (design/30 section 1.4, `FocusStyle::Highlight`): the selected row is filled with the
-   accent and drawn in the accent's ink while its window is the active one; in an inactive window
-   it is the grey wash. */
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true],
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
-.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
-.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
-.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--accent-ink); }
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true],
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
-.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--ink); }
-.ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:var(--hair) solid var(--line); background:var(--surface); display:grid; place-items:center;
-  font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
-.ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
-.ds-menu-tile[*|data-tile=none]{ border:0; background:transparent; }
-/* An app's icon is its own plate: no border or ground under it, and it fills
-   the tile whatever size its caller resolved it at. */
-.ds-menu-tile[*|data-tile=image]{ border:0; background:transparent; }
-.ds-menu-tile[*|data-tile=image] > .ds-ext-icon{ width:100%; height:100%; }
-.ds-menu-title{ display:block; font-size:var(--fs-control); font-weight:600; }
-.ds-menu-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-.ds-menu-trail{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); }
-.ds-menu-trail .ds-ic{ color:var(--accent-text); }
-.ds-menu-item[*|aria-checked=true] .ds-menu-title{ color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }
 
-/* Slim, and Context which is Slim: a text menu at the shell scale (the macOS polish pass,
-   design/13 section 13.3.3, settled 2026-09-24): 22 px rows (`--shell-menu-row`), 13 px text
-   at 400, the 22 px check column, and the selection an inset highlight at 6 px
-   (`--r-shell-highlight`). A row with a detail line grows past the minimum. */
-.ds-menu[*|data-kind=slim] .ds-menu-item,
-.ds-menu[*|data-kind=context] .ds-menu-item{ grid-template-columns:22px 1fr auto; gap:var(--s-4); padding:0 var(--s-8) 0 var(--s-2); min-height:var(--shell-menu-row);
-  border-radius:var(--r-shell-highlight); font-size:var(--fs-shell-menu); }
-.ds-menu[*|data-kind=slim] .ds-menu-title,
-.ds-menu[*|data-kind=context] .ds-menu-title{ font-size:var(--fs-shell-menu); font-weight:400; }
-.ds-menu[*|data-kind=slim] .ds-menu-tile,
-.ds-menu[*|data-kind=context] .ds-menu-tile{ width:22px; height:22px; border:0; background:transparent; }
+/* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
+.ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
 
-/* The palette's snippet: one line, faded, at most 380 wide (`S:799`). */
-.ds-menu[*|data-embed=palette] .ds-menu-detail{ max-width:380px; }
+/* A group title: the data face in capitals over the rows it heads. */
+.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); white-space:nowrap; }
 
-/* Dropdown: a check column, C's hover. Its keyboard selection is not specified; it looks like
-   hover. Rows, text and highlight at the shell scale, as Slim's. */
-.ds-menu[*|data-kind=dropdown] .ds-menu-item{ display:flex; align-items:center; gap:var(--s-8); padding:0 var(--s-9); min-height:var(--shell-menu-row); border-radius:var(--r-shell-highlight); font-size:var(--fs-shell-menu); color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item:hover,
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item > .ds-ic{ opacity:0; }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true]{ color:var(--ink); font-weight:600; }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-checked=true] > .ds-ic{ opacity:1; color:var(--accent-text); }
-.ds-menu[*|data-kind=dropdown] .ds-menu-title{ font-size:inherit; font-weight:inherit; }
-.ds-menu[*|data-kind=dropdown] .ds-menu-trail{ margin-left:auto; }
-
-/* Disabled (design/13 section 13.3.3): opacity .35, not selectable, no hover. */
-.ds-menu-item[*|aria-disabled=true]{ opacity:.35; cursor:default; }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-soft); }
-
-/* A submenu parent: the 12 px chevron ends the row in the trail's place (design/13 section
-   13.3.3); while its submenu is open it keeps the selected look. */
-.ds-menu-chevron{ display:inline-flex; align-items:center; margin-left:auto; }
-.ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
-.ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
-/* A dropdown keeps its grey hover look: the highlight's inks do not apply in it. */
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-title,
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-detail,
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-trail,
-.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-chevron .ds-ic{ color:inherit; }
-
-/* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no hover,
-   no selection and the arrow keys pass it. */
+/* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no selection
+   and the arrow keys pass it. */
 .ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
-.ds-menu-info-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-menu-info-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-
-/* A row's trailing action: a fourth column holding a Strip icon button (26 round,
-   `--ink-soft`, the accent-soft hover), at 22 in the shell's text menus so the row keeps its
-   height. The button hears its own click; the row neither picks nor takes the selection. */
-.ds-menu-item[*|data-trailing=action]{ grid-template-columns:34px 1fr auto auto; }
-.ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=action],
-.ds-menu[*|data-kind=context] .ds-menu-item[*|data-trailing=action]{ grid-template-columns:22px 1fr auto auto; }
-.ds-menu-action{ display:inline-flex; align-items:center; }
-.ds-menu[*|data-kind=slim] .ds-menu-action .ds-button,
-.ds-menu[*|data-kind=context] .ds-menu-action .ds-button,
-.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-button{ width:22px; height:22px; }
-
-/* Shaped rows (`RowShape`): a file's thumbnail fills its tile with no plate; a
-   clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has
-   no line clamp; a clipboard picture sits under its title at its own aspect; the time leads the
-   trail. */
-.ds-menu-tile[*|data-tile=thumb]{ border:0; background:transparent; overflow:hidden; }
-.ds-menu-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-menu-item); }
-.ds-menu-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
-  max-height:calc(var(--lines) * 1.35em); }
-.ds-menu-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
-/* Each part of a shaped trail is its own box, the time's gap before the shortcut included:
-   Blitz lays a plain inline span's horizontal margin out as nothing. */
-.ds-menu-when, .ds-menu-keys{ display:inline-block; }
-.ds-menu-when{ margin-right:var(--s-6); }
-/* A row's chord (launcher chords, `RowChord`): after the trail's data in the secondary ink, at
-   the trail's size; shown on the selected row only unless the row asks for every row. */
-.ds-menu-keys + .ds-chord{ margin-left:var(--s-6); }
 /* -- pane_switcher -- */
 /* PaneSwitcher (design/13 section 13.3.7): the arriving pane slides in (the
    detail from the right, the root from the left) and the outgoing one leaves the other way,
@@ -1566,6 +1426,22 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover-arrow[*|data-side=left]{ left:calc(var(--s-6) * -1); margin-top:calc(var(--s-6) * -1); border-bottom:var(--hair) solid var(--line); border-left:var(--hair) solid var(--line); transform:scale(1,2) rotate(45deg); }
 .ds-popover-arrow[*|data-side=right]{ right:calc(var(--s-6) * -1); margin-top:calc(var(--s-6) * -1); border-top:var(--hair) solid var(--line); border-right:var(--hair) solid var(--line); transform:scale(1,2) rotate(45deg); }
 .ds[*|data-extent=popup] .ds-popover-arrow{ display:none; }
+/* -- pop_up_button -- */
+/* PopUpButton (design/30 section 2.1, `NSPopUpButton`): a push `Button` with a chevron well at its
+   end, as wide as its widest item so choosing never resizes it. The wrapper is a one-cell grid:
+   the button fills the cell and each hidden sizer (an item's title in the button's type and
+   padding, plus the well) stretches it. The pop-up's chevrons stand one over the other; a
+   pull-down's is one, down. Attribute selectors carry `*|` (spike S2). */
+
+.ds-popup{ display:inline-grid; vertical-align:middle; }
+.ds-popup > .ds-button{ grid-area:1 / 1; width:100%; justify-content:space-between; }
+.ds-popup-sizer{
+  grid-area:1 / 1; height:0; overflow:hidden; visibility:hidden; white-space:nowrap; box-sizing:border-box;
+  padding:0 calc(var(--ctl-pad-m) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-m); font-size:var(--ctl-fs-m); font-weight:var(--ctl-fw-m);
+}
+.ds-popup[*|data-size=mini] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-xs) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-xs); font-size:var(--ctl-fs-xs); font-weight:var(--ctl-fw-xs); }
+.ds-popup[*|data-size=small] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-s) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-s); font-size:var(--ctl-fs-s); font-weight:var(--ctl-fw-s); }
+.ds-popup[*|data-size=large] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-l) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-l); font-size:var(--ctl-fs-l); font-weight:var(--ctl-fw-l); }
 /* -- preview_pane -- */
 /* PreviewPane (design/04-COMPONENTS.md section 47): a column filling the palette's
    aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
@@ -1638,6 +1514,97 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-provider[*|data-kind=local] .ds-ic{ display:block; }
 .ds-provider[*|data-kind=image]{ padding:var(--s-1-5); }
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }
+/* -- row -- */
+/* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
+   are 24 tall (Compact) or 44 (Settings); a row under a highlight fills with the accent and takes
+   the accent's ink (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
+   list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
+   Attribute selectors carry `*|` (spike S2). */
+
+.ds-row{
+  position:relative; display:flex; align-items:center; gap:var(--s-8); box-sizing:border-box; min-height:24px; padding:0 var(--s-8);
+  border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none; list-style:none;
+  font-size:var(--fs-shell-menu);
+}
+.ds-row[*|data-density=settings]{ min-height:44px; }
+.ds-row[*|aria-disabled=true]{ opacity:.35; }
+.ds-row[*|aria-busy=true]{ cursor:default; }
+
+/* The selection: the accent under its ink; a quiet grey when the window is inactive or the row's
+   list is not the one holding the keyboard. */
+.ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
+.ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--surface-2); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds[*|data-activity=inactive] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
+
+/* The words: the title over its detail. Emphasis Strong is an unread row. */
+.ds-row-words{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
+.ds-row-title{ display:block; font-weight:400; line-height:1.3; }
+.ds-row[*|data-emphasis=strong] .ds-row-title{ font-weight:600; }
+.ds-row-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+.ds-row mark{ background:transparent; color:var(--accent-text); font-weight:800; }
+.ds-row[*|aria-selected=true] mark{ color:inherit; }
+
+/* The leading element. */
+.ds-row-leading{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-row-leading[*|data-leading=disc]{ width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
+  transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out); }
+.ds-row-leading[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=source],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=text],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:34px; height:34px; }
+.ds-row-leading[*|data-leading=text]{ border:var(--hair) solid var(--line); border-radius:var(--r-shell-highlight); background:var(--surface);
+  font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
+.ds-row-leading[*|data-leading=avatar],
+.ds-row-leading[*|data-leading=image]{ background:transparent; }
+.ds-row-leading[*|data-leading=image] > .ds-ext-icon{ width:100%; height:100%; }
+.ds-row-leading[*|data-leading=thumb]{ overflow:hidden; }
+.ds-row-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-shell-highlight); }
+
+/* The accessory. */
+.ds-row-trailing{ display:inline-flex; align-items:center; flex:none; gap:var(--s-4); margin-left:auto; color:var(--ink-faint); font-size:var(--fs-help); }
+.ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
+.ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }
+.ds-row-spin{ display:flex; align-items:center; justify-content:center; }
+.ds-row-trailing[*|data-mark=text]{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
+.ds-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
+.ds-row-when{ display:inline-block; flex:none; margin-left:auto; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-row-when + .ds-row-trailing, .ds-row-when + .ds-key-equivalent{ margin-left:calc(var(--s-6) - var(--s-8)); }
+.ds-row .ds-key-equivalent{ flex:none; }
+.ds-row-action{ display:inline-flex; align-items:center; flex:none; }
+.ds-row-action .ds-button{ width:22px; height:22px; }
+
+/* An outline: the triangle's box, kept by a leaf, and the children one step in. */
+.ds-row-disclosure{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:var(--s-12); color:var(--ink-faint); }
+.ds-row-branch{ display:flex; flex-direction:column; min-width:0; }
+.ds-row-branch > .ds-disclosure-body{ padding-left:var(--s-12); }
+
+/* Shaped rows: a clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4)
+   since Blitz has no line clamp; a clipboard picture sits under its title at its own aspect. */
+.ds-row-clip{ --lines:2; display:block; font-family:var(--font-code); font-size:var(--fs-help); line-height:1.35; color:var(--ink); white-space:pre-wrap; overflow:hidden;
+  max-height:calc(var(--lines) * 1.35em); }
+.ds-row-clip-image{ display:block; margin-top:var(--s-3); object-fit:cover; border:var(--hair) solid var(--line); border-radius:var(--r-tiny); }
+
+/* Drag (design/04-COMPONENTS.md section 34): the dragged row is dimmed, the row under the pointer
+   that would take the drop is lit and grown, and every row that could take it is outlined. */
+.ds-row[*|data-drag=source]{ opacity:.35; }
+.ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
+.ds-row[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
+
+/* A palette group's Show More brings the rows it added in as inserted rows come. */
+.ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 /* -- scrim -- */
 /* The peek's scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the
    overlay, dims with `--scrim` and fades in; a click closes. Hover is not specified; the focus
@@ -1646,37 +1613,29 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
 /* -- section_header -- */
-/* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
-   Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
-   Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state.
-   A header heads its group: it is a full-width row of its own, spanning every column when its
-   container is a grid (gallery fix A: four headers in a grid read as one run-on row). The
-   eyebrow never wraps; the rule takes the free space. The action's rule names the header, as
-   S's `.s-h button` does. The action always ends the row: after the rule it has no free space
-   to take, and in a header without a rule (Field, Menu) its `margin-left:auto` does what the
-   rule would (polish pass: a Menu header's action sat against its eyebrow). */
+/* SectionHeader (design/30 section 2.6): one look, the data face in capitals over the list's
+   ink. A header heads its group: a full-width row of its own, spanning every column when its
+   container is a grid. The title never wraps; the action always ends the row through its
+   `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
+   Attribute selectors carry `*|` (spike S2). */
 
-.ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); font-weight:var(--fw-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
-.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); color:var(--f-ink-faint); }
-.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps-narrow); }
-.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); }
-.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); }
-
-.ds-section-header-text{ white-space:nowrap; }
-.ds-section-header-rule{ flex:1; min-width:0; height:var(--hair); }
-.ds-section-header[*|data-kind=frame] .ds-section-header-rule{ background:var(--f-line); }
-.ds-section-header[*|data-kind=group] .ds-section-header-rule{ background:var(--line-soft); }
-
-.ds-section-header-value{ font-variant-numeric:tabular-nums; }
-.ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
-
+.ds-section-header{
+  display:flex; align-items:center; gap:var(--s-6); width:100%; grid-column:1 / -1; box-sizing:border-box; padding:var(--s-7) var(--s-8) var(--s-3);
+  font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps);
+  text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint);
+}
+.ds-section-header-title{ white-space:nowrap; }
+.ds-section-header-toggle{
+  display:flex; align-items:center; gap:var(--s-4); border:0; background:none; padding:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:default;
+}
+.ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
 .ds-section-header .ds-section-header-action{
   margin-left:auto; border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
-  color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
+  color:var(--ink-faint); padding:0 var(--s-2); text-transform:none;
 }
-.ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
-/* A palette's cursor on a group's action ("Show More"): the rows' selection look,
-   `--accent-soft` behind the words, which take the ink. */
+.ds-section-header .ds-section-header-action:hover{ color:var(--ink); }
+.ds-section-header-value + .ds-section-header-action{ margin-left:0; }
+/* A palette's cursor on a group's action ("Show More"): the rows' selection look. */
 .ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }
 /* -- segmented -- */
 /* SegmentedControl (design/30 section 2.3, `NSSegmentedControl`). Attribute selectors carry `*|`
@@ -1768,46 +1727,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill-text{ display:flex; flex-direction:column; gap:var(--s-2); }
 .ds-send-pill-why{ font-weight:500; opacity:.8; white-space:normal; max-width:280px; }
 .ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
-/* -- settings_row -- */
-/* SettingsRow: a 44 px row with a hairline (`--hair`, `--line`) above every
-   row after the first, the words in the shell text menu's type (title `--fs-shell-menu` at 400,
-   detail `--fs-help` in `--ink-faint`, as `MenuEntry::Row` in a Slim menu, design/13 section
-   13.3.3), a 16 px glyph in a 22 px column, and the trailing mark at the end. Under the pointer
-   the row takes the Dropdown's `--surface-2` at the shell highlight's radius. A check is
-   `--accent`; a chevron, a value and a glyph are `--ink-faint`. */
-
-.ds-settings-row{
-  display:flex; align-items:center; gap:var(--s-8); min-height:44px; box-sizing:border-box; padding:0 var(--s-8);
-  border-top:var(--hair) solid transparent; border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none;
-  transition:background-color var(--t-quick) var(--e-out);
-}
-.ds-settings-row + .ds-settings-row{ border-top-color:var(--line); }
-.ds-settings-row:hover{ background:var(--surface-2); }
-.ds-settings-row[*|aria-disabled=true]{ opacity:.35; cursor:default; }
-.ds-settings-row[*|aria-disabled=true]:hover{ background:transparent; }
-
-.ds-settings-row-glyph{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
-.ds-settings-row-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
-.ds-settings-row-title{ font-size:var(--fs-shell-menu); font-weight:400; line-height:1.3; }
-.ds-settings-row-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-
-.ds-settings-row-trail{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); }
-.ds-settings-row-trail[*|data-mark=check]{ width:14px; color:var(--accent-text); }
-.ds-settings-row-value{ font-size:var(--fs-help); }
-
-/* An operation on the row (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8). The glyph may sit
-   on a 26 px disc: paper with ink for an item not in use, `--accent` with `--accent-ink` and an
-   inset `--accent-text` hairline for the item in use (the tile disc's look), the colour
-   cross-fading over `--t-quick`. A spinner in the trailing slot turns in a 14 px well. */
-.ds-settings-row-glyph[*|data-disc]{
-  width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-settings-row-glyph[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
-.ds-settings-row-trail[*|data-mark=pending]{ width:14px; height:14px; justify-content:center; }
-.ds-settings-row-spin{ position:relative; display:block; width:6px; height:6px; }
-.ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
-.ds-settings-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
 /* -- sheet -- */
 /* Sheet (design/30 section 2.5, `NSWindow` sheet): `min(560px, 88%)` wide, hanging from the top
    edge of its root (`data-attach=window`) or centred (`data-attach=centre`), as tall as its
@@ -1865,73 +1784,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-side-panel[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-side-panel-header{ display:flex; align-items:center; flex:none; }
 .ds-side-panel-body{ display:flex; flex-direction:column; gap:var(--s-8); flex:1; min-height:0; }
-/* -- sidebar_item -- */
-/* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
-   drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span
-   (O-22's fallback for `::before`). The current-item shadow is `--shadow-current` (O-3); `dest`
-   is a static ring. `--f-hover` in S is a bug (A8 #1): the destination ground is
-   `--f-pill-hover`. A Today entry is a roster row: it enters with `row-in` and leaves with
-   `row-out`.
-   `drop: DropState` writes the drop target `[data-drop=target]` and the dragged source
-   `[data-drag=source]` (.35, section 34), drawn by `.ds-drop-place`. The Candy label hue on the icon and seal (`C:950-951`) is a Look,
-   not specified here. Disabled: not specified (O-1).
-   The label is the flexible part: it starts at the left and takes the free space, so the count
-   and the close button sit at the end and an item without them does not centre (gallery fix A:
-   Blitz's user-agent `button{justify-content:center}` centred an item with no count). The fade
-   of a truncating label then falls on its empty end unless the text really reaches it. The
-   close rule names the item, as S's `.item .x` does. */
-
-.ds-sidebar-item{
-  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-9); width:100%; box-sizing:border-box; text-align:left; cursor:default; border:0;
-  background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font:inherit; font-size:var(--fs-body); font-weight:600;
-  color:var(--f-ink-soft); position:relative;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-sidebar-item:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-sidebar-item[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
-.ds-sidebar-item-text{ flex:1 1 0; min-width:0; }
-.ds-sidebar-item-text[*|data-emphasis=plain]{ font-weight:500; }
-
-/* The seal (`S:345-346`): Place items only. */
-.ds-sidebar-item-seal{
-  position:absolute; left:-7px; top:50%; width:5px; height:5px; border-radius:var(--r-pill); background:var(--f-ink);
-  transform:translateY(-50%);
-}
-
-/* Today's close button (`S:140-143`). */
-.ds-sidebar-item .ds-sidebar-item-close{
-  margin-left:auto; opacity:0; border:0; background:none; cursor:default; padding:0; color:var(--f-ink-faint); line-height:0;
-  transition:opacity var(--t-quick) var(--e-out);
-}
-.ds-sidebar-item:hover .ds-sidebar-item-close{ opacity:1; }
-
-/* A scheduled Today row's trailing time and cancel (mailo's `.today-item.later .when`, its `.x`):
-   the time in data type at `--f-ink-faint`, never wrapping; the cancel is drawn as the close
-   is, but always shown, since cancelling is the row's one action. */
-.ds-sidebar-item-time{ flex:none; font-family:var(--font-data); font-size:var(--fs-note); color:var(--f-ink-faint); white-space:nowrap; font-variant-numeric:tabular-nums; }
-.ds-sidebar-item .ds-sidebar-item-cancel{
-  flex:none; border:0; background:none; cursor:default; padding:0; color:var(--f-ink-faint); line-height:0;
-  transition:color var(--t-quick) var(--e-out);
-}
-.ds-sidebar-item .ds-sidebar-item-cancel:hover{ color:var(--f-ink); }
-
-/* Destination preview (`S:447-448`). */
-.ds-sidebar-item[*|data-preview=destination]{
-  background:var(--f-pill-hover); color:var(--f-ink); box-shadow:0 0 0 1.5px var(--accent-text) inset;
-}
-
-/* The drop states (target, source, accepts) are `.ds-drop-place`'s, shared with TreeItem
-   (drop_place.css). */
-
-/* Today presence (`S:350-351`): a roster row. It enters with `row-in` and leaves with `row-out`;
-   at rest, `hold` (moves nothing), so turning present never drops `row-in` without starting
-   another animation. */
-.ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
-.ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
-
-/* The unread count: a quiet badge at the end of the row. */
-.ds-sidebar-item .ds-badge{ margin-left:auto; }
 /* -- skeleton -- */
 /* Skeleton (design/30 section 2.9): a placeholder in the quiet fill, static (no shimmer), that
    fades in and out over `--t-quick` (the content cross-fades against it). A line is one line
@@ -2269,6 +2121,56 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run[*|data-tone=underline]{ text-decoration:underline; }
 .ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
 .ds-run-link:hover{ color:var(--accent-text); }
+/* -- thread_row -- */
+/* ThreadRow (design/30 section 2.11): a mail row's content inside a `Row` of the Card density,
+   `S:175-199`, `S:293-307`. The row is a card with the dot, the words and the tail in a grid. The
+   `Row`'s own state draws the selection (a raised card with an accent hairline), the dragged source
+   (.35) and the drop target. Subject and snippet truncate with `.ds-truncate`; the name only when
+   `ThreadRow` finds it longer than its column's character budget (`NameFit`), since a fade on a name
+   that fits eats its last letters and Blitz cannot tell CSS it overflows. The star's fill is an SVG
+   attribute (spike S6), so this file colours it with `color`. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-row[*|data-density=card]{
+  display:block; padding:0; margin-bottom:var(--s-5); border-radius:var(--r-card); background:var(--surface); color:var(--ink);
+  border:var(--hair) solid transparent; min-height:0;
+}
+.ds-row[*|data-density=card] > .ds-row-words{ display:block; height:100%; }
+.ds-row[*|data-density=card][*|aria-selected=true]{ background:var(--raise); border-color:var(--accent-text); box-shadow:var(--shadow-1); color:var(--ink); }
+.ds-row[*|data-density=card][*|data-drop=target]{ background:var(--accent-soft); }
+
+.ds-thread{ position:relative; box-sizing:border-box; height:100%; display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:var(--s-10); align-items:start; padding:var(--s-10) var(--s-11); }
+
+/* Dot (`S:185-187`, `S:295-296`). */
+.ds-thread-dot{ padding-top:var(--s-6); }
+.ds-dot{
+  display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
+  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
+}
+.ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
+
+/* Text (`S:189-197`). */
+.ds-thread-main{ min-width:0; }
+.ds-thread-from{ display:flex; align-items:baseline; gap:var(--s-7); min-width:0; }
+.ds-thread-name{ white-space:nowrap; overflow:hidden; font-size:var(--fs-body); font-weight:700; color:var(--ink); min-width:0; }
+.ds-row[*|data-emphasis=plain] .ds-thread-name{ font-weight:500; color:var(--ink-soft); }
+.ds-thread-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); color:var(--ink-faint); }
+.ds-thread-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
+.ds-row[*|data-emphasis=strong] .ds-thread-sub{ font-weight:600; }
+.ds-thread-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
+.ds-thread-tail{ display:flex; flex-direction:column; align-items:flex-end; gap:var(--s-5); }
+.ds-thread-time{ font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-thread-tags{ display:flex; gap:var(--s-4); align-items:center; }
+
+/* Star (`S:299-307`). */
+.ds-star{
+  position:absolute; left:6px; bottom:7px; width:22px; height:22px; border:0; padding:0; background:transparent;
+  cursor:default; display:grid; place-items:center; opacity:0; color:var(--ink-faint);
+  transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }
+.ds-star[*|aria-pressed=true]{ color:var(--warn); }
+.ds-star-glyph{ display:grid; place-items:center; }
 /* -- toast -- */
 /* Toast (design/30 section 2.9, design/04-COMPONENTS.md section 23): one dark pill at the
    bottom right that moves like a notification banner: it slides in from past the right edge with
@@ -2334,62 +2236,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-tooltip{ width:auto; max-width:260px; padding:var(--s-3) var(--s-8); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
   animation:fade var(--t-quick) var(--e-out); }
 .ds-popover.ds-tooltip[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
-/* -- tree_item -- */
-/* TreeItem: a sidebar tree's row as a `details`/`summary`, in SidebarItem's chrome
-   (design/04-COMPONENTS.md section 19: padding --s-6 --s-8, --r-item, ui 13.5/600 --f-ink-soft,
-   --f-pill-hover under the pointer, --f-pill and the current shadow when current). The drop
-   states are `.ds-drop-place`'s (drop_place.css), shared with SidebarItem. Attribute selectors
-   carry `*|` (spike S2). The summary's own marker is removed (`list-style:none`: Blitz draws a
-   `disclosure-closed` list marker from its user-agent sheet); the chevron is a Glyph that
-   turns a quarter over --t-quick as the item opens. `:focus-within` is false on Blitz (spike
-   S12), so the trailing ⋯ shows on the row's hover, while its menu is open (`aria-expanded`),
-   and under keyboard focus. */
-
-.ds-tree-item{ display:flex; flex-direction:column; min-width:0; }
-.ds-tree-item-row{
-  display:flex; align-items:center; justify-content:flex-start; gap:var(--s-6); width:100%; box-sizing:border-box; min-width:0;
-  list-style:none; cursor:default; border:0; background:transparent; padding:var(--s-6) var(--s-8); border-radius:var(--r-item);
-  font:inherit; font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft); position:relative;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-tree-item[*|data-shape=leaf] > .ds-tree-item-row{ cursor:default; }
-.ds-tree-item-row:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-tree-item-row[*|aria-current=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
-
-/* The chevron: 12 px, --f-ink-faint, right at rest and down when open. A leaf keeps the box. */
-.ds-tree-item-chevron{
-  flex:none; display:flex; align-items:center; justify-content:center; width:var(--s-12); height:var(--s-12); line-height:0;
-  color:var(--f-ink-faint); transition:transform var(--t-quick) var(--e-out);
-}
-.ds-tree-item-row[*|aria-expanded=true] .ds-tree-item-chevron{ transform:rotate(90deg); }
-
-/* The label takes the free space, so the count and the ⋯ sit at the end. As a button (a place
-   that selects) it is words on the row, nothing of a button's own: `display:block` because
-   Blitz's user-agent `button` centres its content (the sidebar item's gallery fix A). */
-.ds-tree-item-label{
-  display:block; flex:1 1 0; min-width:0; overflow:hidden; white-space:nowrap; text-align:left;
-  border:0; background:none; padding:0; margin:0; font:inherit; color:inherit; cursor:default;
-}
-
-/* The editing slot: the caller's field in the label's place and box, so a rename
-   moves nothing on the row; a Bare field inherits the row's face. */
-.ds-tree-item-edit{ display:flex; align-items:center; cursor:text; }
-.ds-tree-item-edit > *{ flex:1 1 0; min-width:0; }
-
-/* The trailing slot: hidden until the row is hovered, its menu is open or it has the keyboard.
-   It lends its height into the row's padding, so a row with a 26 px Strip button is as tall as
-   one without. */
-.ds-tree-item-trail{ flex:none; display:flex; align-items:center; line-height:0; margin:calc(-1 * var(--s-6)) 0; }
-.ds-tree-item-trail > *{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
-.ds-tree-item-row:hover .ds-tree-item-trail > *,
-.ds-tree-item-trail > [*|aria-expanded=true],
-.ds[*|data-modality=keyboard] .ds-tree-item-trail > :focus{ opacity:1; }
-
-/* The children, one indent step in, the same rhythm as the sidebar's items. */
-.ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
-
-/* The unread count: a quiet badge at the end of the row. */
-.ds-tree-item .ds-badge{ margin-left:auto; }
 /* -- voice_orb -- */
 /* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
    speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`
@@ -2479,22 +2325,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-resize-edge[*|data-edge=top-right]{ top:0; right:0; width:12px; height:12px; cursor:nesw-resize; }
 .ds-resize-edge[*|data-edge=bottom-left]{ bottom:0; left:0; width:12px; height:12px; cursor:nesw-resize; }
 .ds-resize-edge[*|data-edge=bottom-right]{ bottom:0; right:0; width:12px; height:12px; cursor:nwse-resize; }
-/* -- drop_place -- */
-/* A drop place: the drop states SidebarItem and TreeItem share, one rule set for
-   both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
-   order so each state wins over either item's hover and current rules, which have the same
-   specificity. Both items have the sidebar item's padding (--s-6 --s-8), which the Accepts
-   border takes its width out of. */
-
-/* Target: under a dragged thread and accepting it. */
-.ds-drop-place[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
-/* Source: the item itself is being dragged (.35, section 34). */
-.ds-drop-place[*|data-drag=source]{ opacity:.35; }
-/* Accepts: a place that can take the drag while the pointer is elsewhere: a dashed
-   `--accent` hairline, quieter than the target's fill, scale and shadow. The border takes its
-   width out of the padding, so the label does not move as the drag starts. Blitz paints a dashed
-   border (not a dashed outline, which it draws solid). */
-.ds-drop-place[*|data-drop=accepts]{ border:var(--hair) dashed var(--accent-text); padding:calc(var(--s-6) - var(--hair)) calc(var(--s-8) - var(--hair)); }
 /* -- detail_morph -- */
 /* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
    wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming

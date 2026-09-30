@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, Menu,
-    MenuEntry, MenuKind, MenuTrail, Rect, ShortcutKey, use_focus_request,
+    Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Menu, Rect, ShortcutKey,
+    use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -21,16 +21,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title.to_string())
 }
 
 /// Whether `event` is the actions key, Ctrl+K.
@@ -59,7 +51,7 @@ fn Launcher() -> Element {
                         placeholder: "Search".to_string(),
                         query: String::new(),
                         tokens: Vec::new(),
-                        groups: vec![("Applications".to_string(), vec![item(1, "Files"), item(2, "Firefox")])],
+                        groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
                         empty: "Nothing".to_string(),
                         oninput: move |_| {},
                         onpick: move |_| {},
@@ -81,9 +73,9 @@ fn Launcher() -> Element {
                 }
                 if let (true, Some(rect)) = (actions(), row()) {
                     Menu::<u8> {
-                        kind: MenuKind::Rich,
+                        placement: ds::MenuPlacement::Popup,
                         anchor: Anchor::Rect(rect),
-                        entries: vec![item(9, "Open"), item(10, "Quit")],
+                        items: vec![ds::MenuItem::new(9, "Open"), ds::MenuItem::new(10, "Quit")],
                         onpick: move |_| {},
                         onclose: move |()| {
                             actions.set(false);

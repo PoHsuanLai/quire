@@ -11,10 +11,10 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EMOJI_COLUMNS,
-    EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Material,
-    MenuEntry, MenuRow, MenuTile, MenuTrail, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
-    PaneMono, PdfPage, PreviewPane, Px, RowChord, RowShape, Shortcut, ShortcutKey,
+    Accessory, Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL,
+    EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource,
+    Inject, Material, PaletteGroup, PaletteGroups, PaletteRow, PaneAction, PaneContent, PaneMono,
+    PdfPage, PreviewPane, Px, RowChord, RowLeading, RowShape, Shortcut, ShortcutKey,
 };
 use ds_lint::{LintConfig, markup};
 
@@ -49,12 +49,12 @@ fn palette_with(groups: Vec<PaletteGroup<u8>>, selected: usize, aside: Option<El
     })
 }
 
-fn row(value: u8, title: &str, shape: RowShape) -> MenuEntry<u8> {
-    MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::File)),
+fn row(value: u8, title: &str, shape: RowShape) -> PaletteRow<u8> {
+    PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
         shape,
-        ..MenuRow::new(value, title)
-    })
+        ..PaletteRow::new(value, title)
+    }
 }
 
 fn file(thumb: Option<ImageSource>) -> RowShape {
@@ -84,12 +84,12 @@ fn files() -> Element {
 
 /// A file row with a shortcut after its time: the two in boxes of their own.
 fn file_with_keys() -> Element {
-    let row = MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::File)),
+    let row = PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
         shape: file(None),
-        trail: MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Enter])),
-        ..MenuRow::new(1, "Invoice.pdf")
-    });
+        accessory: Accessory::Text(Shortcut(vec![ShortcutKey::Enter]).glyphs()),
+        ..PaletteRow::new(1, "Invoice.pdf")
+    };
     palette(vec![PaletteGroup::list("Documents", vec![row])], 0)
 }
 
@@ -97,28 +97,26 @@ fn file_with_keys() -> Element {
 /// whose chord shows always: on `selected`, only that file row ends in `⌘R`.
 fn chord_rows(selected: usize) -> Element {
     let reveal = Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')]);
-    let chorded = |value: u8, title: &str| {
-        MenuEntry::Row(MenuRow {
-            tile: Some(MenuTile::Icon(Icon::File)),
-            shape: RowShape::File {
-                thumb: None,
-                location: "~/Documents".to_owned(),
-                modified: "13:00".to_owned(),
-            },
-            chord: RowChord::on_selected(reveal.clone()),
-            ..MenuRow::new(value, title)
-        })
+    let chorded = |value: u8, title: &str| PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
+        shape: RowShape::File {
+            thumb: None,
+            location: "~/Documents".to_owned(),
+            modified: "13:00".to_owned(),
+        },
+        chord: RowChord::on_selected(reveal.clone()),
+        ..PaletteRow::new(value, title)
     };
-    let always = MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::Settings)),
-        trail: MenuTrail::Note("Setting".to_owned()),
+    let always = PaletteRow {
+        leading: RowLeading::Icon(Icon::Settings),
+        accessory: Accessory::Text("Setting".to_owned()),
         chord: RowChord::always(Shortcut(vec![
             ShortcutKey::Super,
             ShortcutKey::Shift,
             ShortcutKey::Char('d'),
         ])),
-        ..MenuRow::new(3, "Displays")
-    });
+        ..PaletteRow::new(3, "Displays")
+    };
     palette(
         vec![PaletteGroup::list(
             "Documents",
@@ -442,16 +440,16 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 fn the_markup_carries_the_states() {
     let files = render(files);
     assert!(files.contains("data-shape=\"file\""), "{files}");
-    assert!(files.contains("data-tile=\"thumb\""), "{files}");
+    assert!(files.contains("data-leading=\"thumb\""), "{files}");
     assert!(
-        files.contains("~/Documents") && files.contains("ds-menu-when"),
+        files.contains("~/Documents") && files.contains("ds-row-when"),
         "{files}"
     );
     let keyed = render(file_with_keys);
     assert!(
         keyed.contains(
-            "<span class=\"ds-menu-trail\"><span class=\"ds-menu-when\">Yesterday</span>\
-             <span class=\"ds-menu-keys\">↵</span></span>"
+            "<span class=\"ds-row-when\">Yesterday</span>\
+             <span class=\"ds-row-trailing\" data-mark=\"text\">↵</span>"
         ),
         "the time and the shortcut are separate boxes (Q343): {keyed}"
     );
@@ -498,9 +496,9 @@ fn the_markup_carries_the_states() {
     );
 }
 
-/// Each row's markup, in order: the text from one `ds-menu-item` to the next.
+/// Each row's markup, in order: the text from one `ds-row` to the next.
 fn rows_of(html: &str) -> Vec<&str> {
-    html.split("class=\"ds-menu-item\"").skip(1).collect()
+    html.split("class=\"ds-row\"").skip(1).collect()
 }
 
 /// A chord case: its name, the palette, and the chord each of the three rows draws.
@@ -526,7 +524,7 @@ fn a_rows_chord_follows_the_selection() {
                 .unwrap_or("");
             assert_eq!(drawn, *chord, "{name}: row {at}: {row}");
         }
-        assert_eq!(html.matches("ds-menu-when\">13:00").count(), 2, "{name}");
+        assert_eq!(html.matches("ds-row-when\">13:00").count(), 2, "{name}");
     }
 }
 

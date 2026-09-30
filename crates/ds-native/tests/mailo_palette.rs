@@ -5,9 +5,7 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CommandPalette, Ds, Grain, Icon, Material, MenuEntry, MenuRow, RowAction, SpaceLook,
-};
+use ds::{Appearance, CommandPalette, Ds, Grain, Icon, Material, RowAction, SpaceLook};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -30,22 +28,20 @@ fn flat() -> SpaceLook {
 }
 
 /// Three recent searches, each with a remove that logs its row.
-fn rows(mut log: Signal<Vec<String>>) -> Vec<(String, Vec<MenuEntry<u8>>)> {
+fn rows(mut log: Signal<Vec<String>>) -> Vec<ds::PaletteGroup<u8>> {
     let entries = (1..=3u8)
-        .map(|value| {
-            MenuEntry::Row(MenuRow {
-                trailing: Some(RowAction {
-                    icon: Icon::X,
-                    label: "Remove from recent".to_string(),
-                    on_press: EventHandler::new(move |_| {
-                        log.with_mut(|log| log.push(format!("remove:{value}")))
-                    }),
+        .map(|value| ds::PaletteRow {
+            action: Some(RowAction {
+                icon: Icon::X,
+                label: "Remove from recent".to_string(),
+                on_press: EventHandler::new(move |_| {
+                    log.with_mut(|log| log.push(format!("remove:{value}")))
                 }),
-                ..MenuRow::new(value, format!("recent search {value}"))
-            })
+            }),
+            ..ds::PaletteRow::new(value, format!("recent search {value}"))
         })
         .collect();
-    vec![("Recent".to_string(), entries)]
+    vec![ds::PaletteGroup::list("Recent", entries)]
 }
 
 #[component]
@@ -82,7 +78,7 @@ fn a_trailing_action_fires_without_picking_or_selecting_its_row() {
     harness.advance(ms(600));
     assert_eq!(harness.text_of(".log").as_deref(), Some("select:0"));
     // The second row's remove: the pointer crosses the row to reach it.
-    let remove = ".ds-menu-item:nth-child(3) .ds-menu-action .ds-button";
+    let remove = ".ds-row:nth-child(3) .ds-row-action .ds-button";
     let at = harness.centre(remove).expect("the second row's remove");
     harness.click(at);
     harness.advance(ms(100));

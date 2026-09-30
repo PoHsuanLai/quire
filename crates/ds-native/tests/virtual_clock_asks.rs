@@ -6,8 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    MenuTrail, Rect, ShortcutKey, use_focus_request,
+    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey,
+    use_focus_request,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
@@ -182,16 +182,8 @@ fn a_focus_asked_from_a_press_lands_in_the_same_frame_every_run() {
 
 // ---- the palette's selected row, reported in the frame of the selection ---------------
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title.to_string())
 }
 
 static ROW: GlobalSignal<Option<Rect>> = Signal::global(|| None);
@@ -207,7 +199,7 @@ fn Palette() -> Element {
                     placeholder: "Search".to_string(),
                     query: String::new(),
                     tokens: Vec::new(),
-                    groups: vec![("Applications".to_string(), vec![item(1, "Files"), item(2, "Firefox"), item(3, "Fonts")])],
+                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox"), item(3, "Fonts")])],
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
                     onpick: move |_| {},
@@ -223,7 +215,7 @@ fn Palette() -> Element {
 }
 
 fn nth_row(n: usize) -> String {
-    format!("#card .ds-menu-item:nth-child({})", n + 1)
+    format!("#card .ds-row:nth-child({})", n + 1)
 }
 
 fn reported(harness: &mut Harness) -> Option<Rect> {

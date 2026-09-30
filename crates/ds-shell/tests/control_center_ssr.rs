@@ -175,12 +175,12 @@ fn a_row_writes_its_trailing_mark() {
         (
             rows::RowCase::CheckOn,
             "data-trailing=\"check\"",
-            Some("aria-pressed=\"true\""),
+            Some("aria-checked=\"true\""),
         ),
         (
             rows::RowCase::CheckOff,
             "data-trailing=\"check\"",
-            Some("aria-pressed=\"false\""),
+            Some("aria-checked=\"false\""),
         ),
         (
             rows::RowCase::Toggle,
@@ -188,7 +188,7 @@ fn a_row_writes_its_trailing_mark() {
             Some("aria-label=\"Headphones\""),
         ),
         (rows::RowCase::Chevron, "data-trailing=\"chevron\"", None),
-        (rows::RowCase::Value, "84%</span>", None),
+        (rows::RowCase::Value, ">84%</span>", None),
         (rows::RowCase::Disabled, "aria-disabled=\"true\"", None),
     ];
     for (case, want, also) in cases {

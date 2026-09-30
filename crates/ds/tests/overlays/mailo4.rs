@@ -1,15 +1,14 @@
 //! The mail-app overlay cases: hover cards keyed on the caller's own hooks through
 //! `use_hover_intent`, drawn in place with no anchor or floating against a rect the caller
-//! already had; a label checklist whose picks keep it open, and a menu's rows drawn inline in
-//! a sender card.
+//! already had, and a menu's items drawn inline in a sender card.
 
 use crate::cases::Case;
 use dioxus::prelude::*;
+use ds::HoverProfile;
 use ds::{
     Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
-    MenuEntry, MenuKind, MenuRow, MenuTile, PickDismiss, Point, Px, Rect, Size, use_hover_intent,
+    MenuImage, MenuItem, MenuPlacement, Point, Px, Rect, Size, use_hover_intent,
 };
-use ds::{Check, HoverProfile};
 use std::time::Duration;
 
 /// Past the 500 ms hover intent.
@@ -20,20 +19,8 @@ const NOW: Duration = Duration::ZERO;
 pub const MAILO4_CASES: &[Case] = &[
     Case {
         component: "menu",
-        state: "stay-checklist",
-        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: at(), entries: labels(), onpick: |_: u8| {}, onclose: |_| {}, dismiss: PickDismiss::Stay } },
-        wait: NOW,
-    },
-    Case {
-        component: "menu",
-        state: "inline-rich",
-        make: || rsx! { div { Menu { kind: MenuKind::Rich, anchor: at(), entries: sender_actions(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline } } },
-        wait: NOW,
-    },
-    Case {
-        component: "menu",
-        state: "inline-checklist",
-        make: || rsx! { div { Menu { kind: MenuKind::Dropdown, anchor: at(), entries: labels(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline, dismiss: PickDismiss::Stay } } },
+        state: "inline",
+        make: || rsx! { div { Menu { placement: MenuPlacement::Popup, anchor: at(), items: sender_actions(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline } } },
         wait: NOW,
     },
     Case {
@@ -64,35 +51,11 @@ fn at() -> Anchor {
     })
 }
 
-/// A label checklist: two labels on, one off.
-fn labels() -> Vec<MenuEntry<u8>> {
-    [
-        ("Invoices", Check::On),
-        ("Travel", Check::Off),
-        ("Family", Check::On),
-    ]
-    .into_iter()
-    .zip(0u8..)
-    .map(|((name, check), value)| {
-        MenuEntry::Row(MenuRow {
-            check: Some(check),
-            ..MenuRow::new(value, name)
-        })
-    })
-    .collect()
-}
-
 /// A sender card's actions.
-fn sender_actions() -> Vec<MenuEntry<u8>> {
+fn sender_actions() -> Vec<MenuItem<u8>> {
     vec![
-        MenuEntry::Row(MenuRow {
-            tile: Some(MenuTile::Icon(Icon::Pin)),
-            ..MenuRow::new(0, "Pin Dana")
-        }),
-        MenuEntry::Row(MenuRow {
-            tile: Some(MenuTile::Icon(Icon::Search)),
-            ..MenuRow::new(1, "Every thread from Dana")
-        }),
+        MenuItem::new(0, "Pin Dana").with_image(MenuImage::Icon(Icon::Pin)),
+        MenuItem::new(1, "Every thread from Dana").with_image(MenuImage::Icon(Icon::Search)),
     ]
 }
 

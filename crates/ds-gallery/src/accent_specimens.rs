@@ -7,9 +7,9 @@ use dioxus::prelude::*;
 use ds::Answers;
 use ds::Word;
 use ds::{
-    Accent, Appearance, Availability, Button, Check, Chip, ChipVariant, CommandPalette,
-    CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile, MenuTrail, Radius,
-    RootChrome, Scheme, SegmentedControl, Surface, Theme, Toggle, accent_of,
+    Accent, Appearance, Button, Check, Chip, ChipVariant, CommandPalette, CommandPaletteHost,
+    Corner, Ds, Icon, Inject, Material, PaletteRow, Radius, RootChrome, RowLeading, Scheme,
+    SegmentedControl, Surface, Theme, Toggle, accent_of,
 };
 use ds::{Choice, Tracking};
 use ds_shell::{
@@ -210,15 +210,10 @@ fn Controls() -> Element {
     }
 }
 
-fn entry(value: u8, title: &str, icon: Icon) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: Some(MenuTile::Icon(icon)),
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
+fn entry(value: u8, title: &str, icon: Icon) -> PaletteRow<u8> {
+    PaletteRow {
+        leading: RowLeading::Icon(icon),
+        ..PaletteRow::new(value, title)
     }
 }
 
@@ -238,7 +233,7 @@ fn Launcher(vars: String) -> Element {
                 placeholder: "Search apps",
                 query: "",
                 tokens: Vec::new(),
-                groups: vec![("Applications".to_string(), rows)],
+                groups: vec![ds::PaletteGroup::list("Applications", rows)],
                 empty: "Nothing matches.",
                 oninput: |_| {},
                 onpick: |_| {},

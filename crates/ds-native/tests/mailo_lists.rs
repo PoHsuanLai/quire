@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Ds, HoverStrip, Icon, ListRow, Material, PartHooks, Point, Presence, Px,
-    RowState, Shown, StripAction,
+    ActionId, Appearance, Ds, HoverStrip, Icon, Material, PartHooks, Point, Px, RowState, Shown,
+    StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
 use ds_native::{Harness, Viewport};
@@ -57,9 +57,8 @@ fn Page(strip: Strip) -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             ul { class: "list", style: "width:600px; padding:20px; margin:0",
-                ListRow {
+                ThreadRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    presence: Presence::Present,
                     name: "Dana Okafor",
                     via: None,
                     subject: "Re: UIDL stability",
@@ -125,7 +124,7 @@ fn a_strip_click_does_not_open_the_row() {
     let mut harness = Harness::new(Hovered, VIEW);
     harness.advance(Duration::from_millis(50));
     // Over the row first, so the strip is revealed by hover and takes the pointer.
-    harness.pointer_move(centre(&harness, ".ds-row-sub"));
+    harness.pointer_move(centre(&harness, ".ds-thread-sub"));
     harness.advance(Duration::from_millis(400));
     harness.click(strip_button(&harness));
     harness.advance(Duration::from_millis(100));
@@ -133,7 +132,7 @@ fn a_strip_click_does_not_open_the_row() {
     assert!(seen.contains("archive"), "the strip button acted: {seen}");
     assert!(!seen.contains("open"), "and the row did not open: {seen}");
     // The row itself still opens.
-    harness.click(centre(&harness, ".ds-row-sub"));
+    harness.click(centre(&harness, ".ds-thread-sub"));
     harness.advance(Duration::from_millis(50));
     assert!(log(&harness).ends_with("open"), "{}", log(&harness));
 }
@@ -142,16 +141,16 @@ fn a_strip_click_does_not_open_the_row() {
 fn the_name_the_time_and_the_row_hand_the_pointer_to_the_caller() {
     let mut harness = Harness::new(Bare, VIEW);
     harness.advance(Duration::from_millis(50));
-    harness.pointer_move(centre(&harness, ".ds-row-name"));
-    harness.pointer_move(centre(&harness, ".ds-row-sub"));
-    harness.pointer_move(centre(&harness, ".ds-row-time"));
+    harness.pointer_move(centre(&harness, ".ds-thread-name"));
+    harness.pointer_move(centre(&harness, ".ds-thread-sub"));
+    harness.pointer_move(centre(&harness, ".ds-thread-time"));
     harness.pointer_move(AWAY);
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         log(&harness),
         "row-enter,sender-enter,sender-leave,time-enter,time-leave"
     );
-    harness.pointer_down(centre(&harness, ".ds-row-sub"));
+    harness.pointer_down(centre(&harness, ".ds-thread-sub"));
     harness.advance(Duration::from_millis(50));
     assert!(log(&harness).ends_with("row-down"), "{}", log(&harness));
 }

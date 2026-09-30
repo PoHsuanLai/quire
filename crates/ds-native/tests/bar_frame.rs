@@ -10,9 +10,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
-    FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuEntrance, MenuEntry, MenuKind, MenuTile,
-    MenuTrail, MotionLevel, PRESETS, Placement, Point, Popover, Px, RootChrome, Scheme, Side,
-    SpaceLook, StatusMetrics, Theme, derive,
+    FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement,
+    Point, Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_native::{Backdrop, Harness, Viewport};
@@ -200,16 +199,15 @@ fn a_look_change_cross_fades_the_tint() {
 
 // ---- A popup root ---------------------------------------------------------------------------
 
-fn entries() -> Vec<MenuEntry<u8>> {
+fn entries() -> Vec<MenuItem<u8>> {
     ["Wi-Fi settings", "Turn Wi-Fi off"]
         .into_iter()
         .enumerate()
-        .map(|(value, title)| MenuEntry::Item {
+        .map(|(value, title)| MenuItem::Item {
             value: value as u8,
             title: title.to_owned(),
-            detail: None,
-            tile: None::<MenuTile>,
-            trail: MenuTrail::None,
+            image: None,
+            key: None,
             check: None,
             availability: ds::Availability::Enabled,
         })
@@ -222,12 +220,11 @@ fn popup(chrome: Option<RootChrome>) -> Element {
             style { {PROBE_CSS} }
             div { class: "room" }
             Menu::<u8> {
-                kind: MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(80.0), y: Px(60.0) }),
-                entries: entries(),
+                items: entries(),
                 onpick: |_| {},
                 onclose: |_| {},
-                entrance: MenuEntrance::Instant,
             }
         }
     }

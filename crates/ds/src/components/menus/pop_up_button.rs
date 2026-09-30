@@ -1,0 +1,236 @@
+//! PopUpButton: a button that opens a menu of choices (`NSPopUpButton`, design/30 section 2.1).
+//! A pop-up shows the chosen item and marks it in its menu; a pull-down keeps a fixed title and
+//! marks nothing. It owns its chevrons, opens a `Menu`, and selects by typing while it holds the
+//! keyboard.
+
+use crate::components::controls::button::Button;
+use crate::components::controls::button_face::Trailing;
+use crate::components::controls::button_model::Bezel;
+use crate::components::menus::item::item::MenuItem;
+use crate::components::menus::menu::menu::Menu;
+use crate::components::menus::menu::placement::MenuPlacement;
+use crate::host::measure::{Anchor, MountedRef};
+use crate::root::common::Common;
+use crate::stack::typeahead::Typeahead;
+use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::time::clock::now;
+use ds_core::vocab::{Availability, Check, Shown};
+use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::tokens::control_size::ControlSize;
+
+/// Which pop-up button.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum PopUpKind {
+    /// It shows the chosen item; its menu marks it.
+    #[default]
+    PopUp,
+    /// It shows a fixed title; its menu marks nothing.
+    PullDown,
+}
+
+/// The title of the item `value` names, if any.
+fn chosen_title<T: PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Option<String> {
+    let value = value?;
+    items.iter().find_map(|item| match item {
+        MenuItem::Item {
+            value: own, title, ..
+        } if own == value => Some(title.clone()),
+        MenuItem::Item { .. }
+        | MenuItem::Submenu { .. }
+        | MenuItem::Header(_)
+        | MenuItem::Info { .. }
+        | MenuItem::Separator => None,
+    })
+}
+
+/// `items` with the chosen one marked `On` and the others `Off`: a pop-up's menu.
+fn marked<T: Clone + PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Vec<MenuItem<T>> {
+    items
+        .iter()
+        .map(|item| match item {
+            MenuItem::Item {
+                value: own,
+                title,
+                image,
+                key,
+                availability,
+                ..
+            } => MenuItem::Item {
+                value: own.clone(),
+                title: title.clone(),
+                image: image.clone(),
+                key: key.clone(),
+                check: Some(if Some(own) == value {
+                    Check::On
+                } else {
+                    Check::Off
+                }),
+                availability: *availability,
+            },
+            other => other.clone(),
+        })
+        .collect()
+}
+
+/// A pop-up button over `items`. `value` is the chosen item's value for a pop-up (its title
+/// is the button's); `title` is a pull-down's fixed label and a pop-up's while nothing is
+/// chosen. `onpick` hears the value a pick asks for; the caller's `value` decides what is
+/// chosen. While the button holds the keyboard, letters choose the next item that starts with
+/// them.
+#[component]
+pub fn PopUpButton<T: Clone + PartialEq + 'static>(
+    items: Vec<MenuItem<T>>,
+    onpick: EventHandler<T>,
+    #[props(default)] kind: PopUpKind,
+    #[props(default)] value: Option<T>,
+    #[props(default)] title: Option<String>,
+    #[props(default)] size: ControlSize,
+    #[props(default)] availability: Availability,
+    #[props(default)] common: Common,
+) -> Element {
+    let mut open = use_signal(|| Shown::Hidden);
+    let mut element = use_signal(|| None::<MountedRef>);
+    let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
+    let live = availability == Availability::Enabled;
+    let label = match kind {
+        PopUpKind::PopUp => chosen_title(&items, value.as_ref()).or(title.clone()),
+        PopUpKind::PullDown => title.clone(),
+    }
+    .unwrap_or_default();
+    let widths: Vec<String> = match kind {
+        PopUpKind::PopUp => items
+            .iter()
+            .filter_map(|item| match item {
+                MenuItem::Item { title, .. } => Some(title.clone()),
+                _ => None,
+            })
+            .collect(),
+        PopUpKind::PullDown => Vec::new(),
+    };
+    let listed = match kind {
+        PopUpKind::PopUp => marked(&items, value.as_ref()),
+        PopUpKind::PullDown => items.clone(),
+    };
+    let chevrons = match kind {
+        PopUpKind::PopUp => Icon::ChevronsUpDown,
+        PopUpKind::PullDown => Icon::ChevronDown,
+    };
+    let mounted = common.clone();
+    let typed = items.clone();
+    let onkey = move |event: KeyboardEvent| match event.key() {
+        Key::ArrowDown | Key::ArrowUp if live => {
+            event.prevent_default();
+            open.set(Shown::Visible);
+        }
+        Key::Character(text)
+            if live
+                && kind == PopUpKind::PopUp
+                && !text.trim().is_empty()
+                && !event
+                    .modifiers()
+                    .intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META) =>
+        {
+            let choices: Vec<(&T, &str)> = typed
+                .iter()
+                .filter_map(|item| match item {
+                    MenuItem::Item {
+                        value,
+                        title,
+                        availability: Availability::Enabled,
+                        ..
+                    } => Some((value, title.as_str())),
+                    _ => None,
+                })
+                .collect();
+            let labels: Vec<&str> = choices.iter().map(|(_, title)| *title).collect();
+            let from = choices
+                .iter()
+                .position(|(own, _)| Some(*own) == value.as_ref())
+                .unwrap_or(choices.len().saturating_sub(1));
+            let mut buffer = typeahead;
+            let (next, found) = buffer.peek().clone().typed(&text, now(), &labels, from);
+            buffer.set(next);
+            if let Some((picked, _)) = found.and_then(|at| choices.get(at)) {
+                onpick.call((*picked).clone());
+            }
+        }
+        _ => {}
+    };
+    let anchor = element().map(Anchor::Mounted);
+    rsx! {
+        span {
+            class: "ds-popup",
+            "data-kind": kind.slug(),
+            "data-size": size.slug(),
+            onkeydown: onkey,
+            Button {
+                label: label.clone(),
+                bezel: Bezel::Push,
+                size,
+                availability,
+                trailing: Some(Trailing::Glyph(chevrons)),
+                shown: Some(open()),
+                onclick: move |_: Press| {
+                    if live {
+                        open.set(open().flipped());
+                    }
+                },
+                common: Common {
+                    mounted: Some(EventHandler::new(move |event: MountedEvent| {
+                        element.set(Some(MountedRef(event.data())));
+                        mounted.mounted(event);
+                    })),
+                    ..common.clone()
+                },
+            }
+            // A pop-up is as wide as its widest item, so choosing never resizes it.
+            for widest in widths {
+                span { class: "ds-popup-sizer", "aria-hidden": "true", "{widest}" }
+            }
+        }
+        if open() == Shown::Visible && let Some(anchor) = anchor {
+            Menu::<T> {
+                placement: MenuPlacement::Popup,
+                anchor,
+                items: listed,
+                onpick: move |picked: T| {
+                    open.set(Shown::Hidden);
+                    onpick.call(picked);
+                },
+                onclose: move |()| open.set(Shown::Hidden),
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{chosen_title, marked};
+    use crate::components::menus::item::item::MenuItem;
+    use ds_core::vocab::Check;
+
+    fn items() -> Vec<MenuItem<u8>> {
+        vec![
+            MenuItem::new(1, "Archive"),
+            MenuItem::Separator,
+            MenuItem::new(2, "Move"),
+        ]
+    }
+
+    #[test]
+    fn a_pop_up_shows_the_chosen_title_and_marks_only_that_item() {
+        assert_eq!(chosen_title(&items(), Some(&2)).as_deref(), Some("Move"));
+        assert_eq!(chosen_title(&items(), Some(&9)), None);
+        assert_eq!(chosen_title(&items(), None), None);
+        let checks: Vec<Option<Check>> = marked(&items(), Some(&2))
+            .iter()
+            .filter_map(|item| match item {
+                MenuItem::Item { check, .. } => Some(*check),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(checks, [Some(Check::Off), Some(Check::On)]);
+    }
+}

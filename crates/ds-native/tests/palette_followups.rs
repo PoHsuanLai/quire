@@ -7,10 +7,7 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    MenuTrail, Rect, Retain, ShortcutKey, Shown,
-};
+use ds::{Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey, Shown};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::rect;
@@ -26,21 +23,13 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title.to_string())
 }
 
-fn groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
-    vec![(
-        "Applications".to_string(),
+fn groups() -> Vec<ds::PaletteGroup<u8>> {
+    vec![ds::PaletteGroup::list(
+        "Applications",
         vec![item(1, "Files"), item(2, "Firefox"), item(3, "Terminal")],
     )]
 }
@@ -62,7 +51,7 @@ fn log(harness: &Harness) -> String {
 
 /// The `n`th row (from 1) of the palette's list: its group's header is the list's first child.
 fn nth_row(n: usize) -> String {
-    format!("#card .ds-menu-item:nth-child({})", n + 1)
+    format!("#card .ds-row:nth-child({})", n + 1)
 }
 
 /// A launcher panel logging the palette's selection and row rects; typing into the field
@@ -233,7 +222,7 @@ fn a_key_the_caller_takes_does_not_move_the_focus() {
 /// A launcher that keeps its palette mounted and shows it with a button (the shell's toggle),
 /// typing into its field on `f`.
 #[component]
-fn KeptPage(retain: Retain) -> Element {
+fn KeptPage() -> Element {
     let mut shown = use_signal(|| Shown::Hidden);
     let mut query = use_signal(String::new);
     rsx! {
@@ -264,7 +253,6 @@ fn KeptPage(retain: Retain) -> Element {
                     host: CommandPaletteHost::Surface,
                     id: "card".to_string(),
                     shown: shown(),
-                    retain,
                 }
             }
             p { class: "query", "[{query}]" }
@@ -274,12 +262,7 @@ fn KeptPage(retain: Retain) -> Element {
 
 #[allow(non_snake_case)]
 fn KeptFresh() -> Element {
-    rsx! { KeptPage { retain: Retain::Nothing } }
-}
-
-#[allow(non_snake_case)]
-fn KeptQuery() -> Element {
-    rsx! { KeptPage { retain: Retain::Query } }
+    rsx! { KeptPage {} }
 }
 
 fn toggle(harness: &mut Harness) {
@@ -393,21 +376,4 @@ fn a_kept_palette_replays_its_entrance_on_every_show() {
         0,
         "hidden again, nothing of the palette is painted"
     );
-}
-
-/// With `Retain::Query`: shown again, the palette keeps the query it had.
-#[test]
-fn a_kept_palette_can_retain_its_query() {
-    let mut harness = Harness::new(KeptQuery, VIEW);
-    harness.advance(ms(100));
-    toggle(&mut harness);
-    harness.advance(ms(100));
-    harness.key(ShortcutKey::Char('f'));
-    harness.advance(ms(50));
-    toggle(&mut harness);
-    harness.advance(ms(100));
-    toggle(&mut harness);
-    harness.advance(ms(100));
-    assert_eq!(harness.text_of(".query").as_deref(), Some("[f]"));
-    assert!(harness.is_focused("#card .ds-input"));
 }

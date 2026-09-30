@@ -1,25 +1,22 @@
-//! Lists: a live `AnimatedList` whose rows leave by each exit, heal, and come back on undo; a
-//! `LeavingList` of notification groups;
-//! sidebar items; account tiles; the hover strip; the appearance picker.
+//! Lists: a live `List` of mail rows whose rows leave by the roster, heal and come back on undo;
+//! the mail rows a search draws; `Row` in every state; a source list; the notification column;
+//! account tiles; the hover strip; the appearance picker.
 
-use super::scheduled::Scheduled;
-use super::{Section, Specimen};
+use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    AccountFace, AccountTile, ActionId, AnimatedList, AppearancePicker, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, DragGhost, DropLine,
-    Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, LeaveBy, ListRow, MarkProvider,
-    MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px, RosterSpec,
-    RowPitch, RowState, Selection, SidebarItem, StripAction, SystemPrefs, UndoToken, use_roster,
+    AccountFace, AccountTile, ActionId, AppearancePicker, Button, Check, Chip, ChipVariant, Colour,
+    DragGhost, Emphasis, Hex, HoverStrip, Icon, List, ListItem, MarkProvider, MarkSize, MarkStyle,
+    Point, ProviderMark, Px, RowState, Selection, StripAction, SystemPrefs, ThreadRow, UndoToken,
     use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
 
 /// One sample thread: sender, subject, snippet, time.
-type Thread = (&'static str, &'static str, &'static str, &'static str);
+type ThreadSample = (&'static str, &'static str, &'static str, &'static str);
 
-const THREADS: [Thread; 8] = [
+const THREADS: [ThreadSample; 8] = [
     (
         "Dana Okafor",
         "Re: UIDL stability across servers",
@@ -75,7 +72,7 @@ const THREADS: [Thread; 8] = [
 struct ThreadId(u32);
 
 impl ThreadId {
-    fn thread(self) -> Thread {
+    fn thread(self) -> ThreadSample {
         THREADS[self.0 as usize % THREADS.len()]
     }
 
@@ -89,20 +86,17 @@ impl ThreadId {
     }
 }
 
-/// A row's height plus the gap below it (design/04-COMPONENTS.md section 16).
-const PITCH: RowPitch = RowPitch(Px(79.0));
-
 /// The lists page.
 #[component]
 pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
-        super::lists_leaving::LeavingColumn {}
+        super::lists_rows::RowGallery {}
+        super::lists_headers::HeaderGallery {}
         super::lists_search::SearchRows {}
-        super::lists_mailo4::StripPress {}
-        Sidebar {}
-        super::lists_mailo4::DropPlaces {}
-        super::lists_mailo6::FolderTree {}
+        super::lists_strip::StripPress {}
+        super::lists_sidebar::Sidebar {}
+        super::lists_leaving::LeavingColumn {}
         Tiles {}
         Picker {}
     }
@@ -119,20 +113,12 @@ fn LiveList() -> Element {
     let mut selected = use_signal(|| None::<ThreadId>);
     let mut starred = use_signal(Vec::<ThreadId>::new);
     let toasts = use_toast_hub();
-    let spec = RosterSpec {
-        leave: LeaveBy::Action,
-        exit: Exit::Row,
-        pitch: PITCH,
-        on_settled: None,
-    };
-    let roster = use_roster(keys(), spec);
     let mut remove = move |text: &str| {
         let target = selected().or_else(|| keys.peek().first().copied());
         let Some(key) = target else { return };
         let Some(at) = keys.peek().iter().position(|shown| *shown == key) else {
             return;
         };
-        roster.leave(key);
         keys.with_mut(|keys| keys.retain(|shown| *shown != key));
         let token = UndoToken(u64::from(key.0));
         removed.with_mut(|removed| removed.push((at, key, token)));
@@ -159,10 +145,35 @@ fn LiveList() -> Element {
             restore(pulled);
         }
     });
+    let items: Vec<ListItem<ThreadId>> = keys()
+        .into_iter()
+        .map(|id| {
+            ListItem::row(
+                id,
+                id.thread().1,
+                rsx! {
+                    ThreadLine {
+                        id,
+                        selection: if selected() == Some(id) { Selection::Selected } else { Selection::Unselected },
+                        star: if starred().contains(&id) { Check::On } else { Check::Off },
+                        onselect: move |id| selected.set(Some(id)),
+                        onstar: move |(id, state)| {
+                            starred.with_mut(|starred| {
+                                starred.retain(|seen| *seen != id);
+                                if state == Check::On {
+                                    starred.push(id);
+                                }
+                            });
+                        },
+                    }
+                },
+            )
+        })
+        .collect();
     rsx! {
         Section {
-            title: "AnimatedList",
-            note: "Remove the selected row (or the first) The row fades and slides up. The rows below close into the gap; Undo, or pull the toast's tab, brings the row back.",
+            title: "List: rows that come and go",
+            note: "Remove the selected row (or the first) The row fades and slides up. The rows below close into the gap; Undo, or pull the toast's tab, brings the row back. Up and Down move the cursor and stop at the ends; letters jump to the next subject that starts with them.",
             div { class: "g-row",
                 Button { label: "Add a row", icon: Some(Icon::Plus),
                     onclick: move |_| {
@@ -175,26 +186,11 @@ fn LiveList() -> Element {
                 Button { bezel: Bezel::Inline, label: "Undo", icon: Some(Icon::Undo), onclick: move |_| restore(None) }
             }
             div { class: "g-list",
-                AnimatedList { label: "Threads",
-                    for entry in roster.entries() {
-                        ThreadRow {
-                            key: "{entry.key.0}",
-                            id: entry.key,
-                            presence: entry.presence,
-                            heal: entry.heal,
-                            selection: if selected() == Some(entry.key) { Selection::Selected } else { Selection::Unselected },
-                            star: if starred().contains(&entry.key) { Check::On } else { Check::Off },
-                            onselect: move |id| selected.set(Some(id)),
-                            onstar: move |(id, state)| {
-                                starred.with_mut(|starred| {
-                                    starred.retain(|seen| *seen != id);
-                                    if state == Check::On {
-                                        starred.push(id);
-                                    }
-                                });
-                            },
-                        }
-                    }
+                List::<ThreadId> {
+                    label: "Threads",
+                    items,
+                    cursor: selected(),
+                    onselect: move |id| selected.set(Some(id)),
                 }
             }
         }
@@ -202,10 +198,8 @@ fn LiveList() -> Element {
 }
 
 #[component]
-fn ThreadRow(
+fn ThreadLine(
     id: ThreadId,
-    presence: Presence,
-    heal: Option<Heal>,
     selection: Selection,
     star: Check,
     onselect: EventHandler<ThreadId>,
@@ -213,10 +207,8 @@ fn ThreadRow(
 ) -> Element {
     let (name, subject, snippet, time) = id.thread();
     rsx! {
-        ListRow {
+        ThreadRow {
             state: RowState { selection, emphasis: id.emphasis(), ..RowState::default() },
-            presence,
-            heal,
             name,
             via: rsx! {
                 ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
@@ -260,81 +252,6 @@ fn strip_actions() -> Vec<StripAction> {
         onclick: EventHandler::new(|_| {}),
     })
     .collect()
-}
-
-/// The places a sidebar offers.
-const PLACES: [(Icon, &str, Option<u32>); 4] = [
-    (Icon::Inbox, "Inbox", Some(12)),
-    (Icon::Star, "Starred", None),
-    (Icon::Clock, "Snoozed", Some(2)),
-    (Icon::Send, "Sent", None),
-];
-
-#[component]
-fn Sidebar() -> Element {
-    let mut here = use_signal(|| 0usize);
-    let mut today = use_signal(|| vec!["Dana Okafor", "Priya Raman"]);
-    let person = |name: &str| AvatarFace {
-        initial: name.chars().next().unwrap_or('?'),
-        size: AvatarSize::Size18,
-        tone: AvatarTone::Person(PersonHue::of(name)),
-        shape: AvatarShape::Round,
-    };
-    rsx! {
-        Section {
-            title: "SidebarItem",
-            note: "On the Space's frame colour. Click a place to move the seal; Today items close (each close is named for its row); the scheduled draft shows its time and cancels.",
-            div { class: "g-row g-row-top",
-                div { class: "g-side",
-                    for (index , (icon , label , count)) in PLACES.into_iter().enumerate() {
-                        SidebarItem {
-                            state: RowState { selection: if here() == index { Selection::Selected } else { Selection::Unselected }, ..RowState::default() },
-                            key: "{label}",
-                            kind: ItemKind::Place { icon },
-                            label,
-                            count,
-                            presence: Presence::Present,
-                            preview: None,
-                            onclick: move |_| {
-                                here.set(index);
-                            },
-                            onclose: None,
-                        }
-                    }
-                    SidebarItem {
-                        state: RowState { selection: Selection::Unselected, ..RowState::default() },
-                        kind: ItemKind::Pinned { avatar: person("Mei Chen") },
-                        label: "Mei Chen",
-                        count: Some(1),
-                        presence: Presence::Present,
-                        preview: Some(Preview::Destination),
-                        onclick: |_| {},
-                        onclose: None,
-                    }
-                    for name in today() {
-                        SidebarItem {
-                            state: RowState { selection: Selection::Unselected, ..RowState::default() },
-                            key: "{name}",
-                            kind: ItemKind::Today { avatar: person(name) },
-                            label: name,
-                            count: None,
-                            presence: Presence::Present,
-                            preview: None,
-                            onclick: |_| {},
-                            onclose: Some(EventHandler::new(move |()| today.with_mut(|today| today.retain(|seen| *seen != name)))),
-                        }
-                    }
-                    Scheduled { key: "{today().len()}" }
-                }
-                div { class: "g-col",
-                    Button { size: ControlSize::Mini, label: "Bring Today back", onclick: move |_| today.set(vec!["Dana Okafor", "Priya Raman"]) }
-                    Specimen { name: "DropLine",
-                        div { class: "g-list g-stage-pad", DropLine {} }
-                    }
-                }
-            }
-        }
-    }
 }
 
 #[component]

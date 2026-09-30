@@ -1,0 +1,21 @@
+/* Menu (design/30 section 2.4, `NSMenu`): one density for every placement (rows 22, separators 9,
+   inset 5, radius 8: design/29-SIZING.md section 5.4). The surface is `.ds-popover`'s. The menu
+   holds focus while open (its keys are its own), so it draws no ring of its own. A menu opens at
+   once; one closed by Escape, an outside click or a pick fades out before it goes (`menu-out`,
+   `--t-quick --e-exit`), taking no pointer while it does. */
+
+.ds-menu{ width:auto; min-width:186px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; }
+.ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
+.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); box-shadow:var(--shadow-2); }
+.ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+
+/* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no surface (no
+   `.ds-popover`) and no padding of its own; the card's box sizes it. */
+.ds-menu[*|data-flow=inline]{ width:auto; min-width:0; max-height:none; overflow:visible; padding:0; }
+
+/* A submenu (design/13 section 13.3.4) is a menu beside its parent row. */
+
+/* A separator is a hairline with the shell scale's margin above and below (5, design/13
+   section 13.3.3, settled 2026-09-24), inset to the rows' text. */
+.ds-menu-separator{ height:var(--hair); margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
+.ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }

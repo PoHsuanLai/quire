@@ -7,9 +7,9 @@ use dioxus::prelude::*;
 use ds::TextField;
 use ds::Word;
 use ds::{
-    Accent, AnimatedList, Availability, Button, Check, Chip, ChipVariant, Emphasis, Fraction, Icon,
-    ItemKind, LabelHue, ListRow, Material, Presence, RowState, Scheme, SegmentedControl, Selection,
-    SidebarItem, Slider, Surface, Toggle, Verdict,
+    Accent, Accessory, Availability, Button, Check, Chip, ChipVariant, Emphasis, Fraction, Icon,
+    LabelHue, List, ListItem, ListStyle, Material, Row, RowLeading, RowState, Scheme,
+    SegmentedControl, Selection, Slider, Surface, ThreadRow, Toggle, Verdict,
 };
 use ds::{Answers, Bezel, ButtonRole, ControlSize};
 use ds::{Choice, Tracking};
@@ -92,42 +92,41 @@ fn Cell(subject: Subject) -> Element {
             Slider { label: "Level", value: Fraction(600), onchange: |_| {} }
         },
         Subject::Row => rsx! {
-            AnimatedList { label: "Row",
-                ListRow {
-                    state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
-                    presence: Presence::Present,
-                    name: "Dana Okafor",
-                    via: None,
-                    subject: "Re: UIDL stability",
-                    snippet: None,
-                    time: "09:41",
-                    tags: rsx! {},
-                    star: None,
-                    strip: None,
-                    onclick: |_| {},
-                }
+            List::<u8> {
+                label: "Row",
+                items: vec![ListItem::row(
+                    0,
+                    "Re: UIDL stability",
+                    rsx! {
+                        ThreadRow {
+                            state: RowState { selection: Selection::Selected, emphasis: Emphasis::Strong, ..RowState::default() },
+                            name: "Dana Okafor",
+                            via: None,
+                            subject: "Re: UIDL stability",
+                            snippet: None,
+                            time: "09:41",
+                            tags: rsx! {},
+                            star: None,
+                            strip: None,
+                            onclick: |_| {},
+                        }
+                    },
+                )],
             }
         },
         Subject::Sidebar => rsx! {
-            SidebarItem {
-                state: RowState { selection: Selection::Selected, ..RowState::default() },
-                kind: ItemKind::Place { icon: Icon::Inbox },
-                label: "Inbox",
-                count: Some(12),
-                presence: Presence::Present,
-                preview: None,
-                onclick: |_| {},
-                onclose: None,
-            }
-            SidebarItem {
-                state: RowState { selection: Selection::Unselected, ..RowState::default() },
-                kind: ItemKind::Place { icon: Icon::Star },
-                label: "Starred",
-                count: None,
-                presence: Presence::Present,
-                preview: None,
-                onclick: |_| {},
-                onclose: None,
+            List::<u8> {
+                label: "Sidebar",
+                style: ListStyle::SourceList,
+                cursor: Some(0),
+                items: vec![
+                    ListItem::row(0, "Inbox", rsx! {
+                        Row { title: "Inbox", leading: RowLeading::Icon(Icon::Inbox), accessory: Accessory::Badge(12), state: RowState { selection: Selection::Selected, ..RowState::default() } }
+                    }),
+                    ListItem::row(1, "Starred", rsx! {
+                        Row { title: "Starred", leading: RowLeading::Icon(Icon::Star), state: RowState { selection: Selection::Unselected, ..RowState::default() } }
+                    }),
+                ],
             }
         },
         Subject::Tabs => rsx! {

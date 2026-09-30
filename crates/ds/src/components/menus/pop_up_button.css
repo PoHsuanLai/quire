@@ -1,0 +1,15 @@
+/* PopUpButton (design/30 section 2.1, `NSPopUpButton`): a push `Button` with a chevron well at its
+   end, as wide as its widest item so choosing never resizes it. The wrapper is a one-cell grid:
+   the button fills the cell and each hidden sizer (an item's title in the button's type and
+   padding, plus the well) stretches it. The pop-up's chevrons stand one over the other; a
+   pull-down's is one, down. Attribute selectors carry `*|` (spike S2). */
+
+.ds-popup{ display:inline-grid; vertical-align:middle; }
+.ds-popup > .ds-button{ grid-area:1 / 1; width:100%; justify-content:space-between; }
+.ds-popup-sizer{
+  grid-area:1 / 1; height:0; overflow:hidden; visibility:hidden; white-space:nowrap; box-sizing:border-box;
+  padding:0 calc(var(--ctl-pad-m) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-m); font-size:var(--ctl-fs-m); font-weight:var(--ctl-fw-m);
+}
+.ds-popup[*|data-size=mini] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-xs) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-xs); font-size:var(--ctl-fs-xs); font-weight:var(--ctl-fw-xs); }
+.ds-popup[*|data-size=small] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-s) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-s); font-size:var(--ctl-fs-s); font-weight:var(--ctl-fw-s); }
+.ds-popup[*|data-size=large] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-l) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-l); font-size:var(--ctl-fs-l); font-weight:var(--ctl-fw-l); }

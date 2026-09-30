@@ -8,8 +8,8 @@ use ds::{
 };
 use ds::{
     Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Chip, ChipVariant, Colour,
-    Common, ExternalIcon, FieldFocus, HeaderKind, Hex, Icon, IconPx, IconSize, IconSource, IconUrl,
-    IconView, LabelHue, PersonHue, SectionHeader, SegmentedControl, Slider, Toggle, Verdict,
+    Common, ExternalIcon, FieldFocus, Hex, Icon, IconPx, IconSize, IconSource, IconUrl, IconView,
+    LabelHue, PersonHue, SectionHeader, SegmentedControl, Slider, Toggle, Verdict,
 };
 use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
@@ -387,31 +387,36 @@ pub const CASES: &[Case] = &[
         state: "square-34",
         make: || rsx! { Avatar { initial: 'L', size: AvatarSize::Size34, tone: AvatarTone::Ink, shape: AvatarShape::Square } },
     },
-    // SectionHeader: four kinds, the value and the action.
+    // SectionHeader: one look, with a value, an action, and collapsing.
     Case {
         component: "section_header",
-        state: "frame",
-        make: || rsx! { SectionHeader { kind: HeaderKind::Frame, text: "Places" } },
+        state: "title",
+        make: || rsx! { SectionHeader { title: "Places" } },
     },
     Case {
         component: "section_header",
-        state: "frame-action",
-        make: || rsx! { SectionHeader { kind: HeaderKind::Frame, text: "Today", action: ("Clear".to_string(), EventHandler::new(|_| {})) } },
+        state: "value",
+        make: || rsx! { SectionHeader { title: "Grain", value: "35%".to_string() } },
     },
     Case {
         component: "section_header",
-        state: "group",
-        make: || rsx! { SectionHeader { kind: HeaderKind::Group, text: "Yesterday", value: "35".to_string() } },
+        state: "action",
+        make: || rsx! { SectionHeader { title: "Today", action: ("Clear".to_string(), EventHandler::new(|_| {})) } },
     },
     Case {
         component: "section_header",
-        state: "field",
-        make: || rsx! { SectionHeader { kind: HeaderKind::Field, text: "Grain", value: "35%".to_string() } },
+        state: "action-selected",
+        make: || rsx! { SectionHeader { title: "Files", action: ("Show More".to_string(), EventHandler::new(|_| {})), action_selection: ds::Selection::Selected } },
     },
     Case {
         component: "section_header",
-        state: "menu",
-        make: || rsx! { SectionHeader { kind: HeaderKind::Menu, text: "Snooze until" } },
+        state: "collapsible-open",
+        make: || rsx! { SectionHeader { title: "Favourites", collapse: (ds::Shown::Visible, EventHandler::new(|_| {})) } },
+    },
+    Case {
+        component: "section_header",
+        state: "collapsible-closed",
+        make: || rsx! { SectionHeader { title: "Favourites", collapse: (ds::Shown::Hidden, EventHandler::new(|_| {})) } },
     },
     // Count: both places, empty at zero.
     Case {

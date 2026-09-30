@@ -4,8 +4,7 @@
 //! Hidden, the card is `display:none` (nothing laid out or painted, as an empty `ToastHost`) and
 //! off the layer stack. Each time it is shown again it replays its entrance by swapping the
 //! keyframe's `X`/`X--b` alias (`data-pulse`, design/05-MOTION.md section 9 rule 2) and restarting
-//! the settle timer, starts over from an empty query and the first choice unless [`Retain`]
-//! says otherwise, and takes the keyboard.
+//! the settle timer, starts over from an empty query and the first choice, and takes the keyboard.
 
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
@@ -13,16 +12,6 @@ use ds_core::word::Word;
 use ds_motion::anim::Anim;
 use ds_motion::presence::Presence;
 use ds_motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
-
-/// What a palette shown again keeps from its last showing.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Retain {
-    /// Nothing: the query is emptied (through `oninput`) and the selection is the first choice.
-    #[default]
-    Nothing,
-    /// The query, and the selection made under it: the palette opens where it was left.
-    Query,
-}
 
 /// What one render's `shown` does to the palette.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
