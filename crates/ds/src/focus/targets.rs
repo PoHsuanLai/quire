@@ -4,7 +4,7 @@
 //! A host's focus write dispatches no `focus` or `blur` event (Blitz's `set_focus_to`), so a field
 //! focused by a [`FieldHandle`](crate::FieldHandle) or by
 //! [`focus_by_selector`](crate::focus_by_selector) would never hear it. Each mounted
-//! `TextInput` enters itself here with its own handlers; a focus that lands on it through a host
+//! `TextField` enters itself here with its own handlers; a focus that lands on it through a host
 //! calls them, the same told-path its `Focus::OnMount` takes.
 
 use crate::host::found::SameNode;

@@ -42,16 +42,16 @@ pub enum TreeShape {
 /// `label` is a [`Text`]; with `onselect` it is a button of its own that selects the place and
 /// does not toggle (mailo's folder name), without it a span, and a press on it toggles like the
 /// rest of the row. `glyph` is drawn before the label, `count` after it, then `trailing`: a slot
-/// for the ⋯ `IconButton`, fenced so no press in it reaches the summary (give the button
+/// for the ⋯ `Button`, fenced so no press in it reaches the summary (give the button
 /// `Propagation::Stop` as well; it costs nothing). `state` is the item's [`RowState`]: its
 /// `selection` marks the current place (`aria-current`, the sidebar item's current look) and its
 /// `drop` its part in a drag.
 ///
 /// `editing` is an in-place rename: given, it is drawn in the label's place (in
 /// `span.ds-tree-item-edit[data-slot=editing]`, at the label's metrics, so nothing on the row
-/// moves) instead of the label and its select button. Give it a `TextInput` with
-/// `variant: InputVariant::Bare` (it takes the row's face) and `focus: Focus::Controlled(request)`
-/// from `use_focus_request().with_select_all()` (or `Focus::OnMount`), and handle Enter and
+/// moves) instead of the label and its select button. Give it a `TextField` with
+/// `bezel: FieldBezel::Plain` (it takes the row's face) and `focus: FieldFocus::Controlled(request)`
+/// from `use_focus_request().with_select_all()` (or `FieldFocus::OnMount`), and handle Enter and
 /// Escape in its `onkey`; take the slot away to end the rename. A press in it never toggles or
 /// selects the row; keys are the field's (they start there), and bubble on as any key does.
 ///

@@ -1,4 +1,4 @@
-//! ModulePanel on a real Blitz document: a `LevelControl` inside a panel
+//! ModulePanel on a real Blitz document: a capsule `Slider` inside a panel
 //! on the grid takes a press and a drag (the panel adds no role or handler in its way), and the
 //! panel spans both columns inside the grid's padding.
 

@@ -1,6 +1,6 @@
-//! A caller's handle on one `TextInput`: give it the keyboard (selecting its
+//! A caller's handle on one `TextField`: give it the keyboard (selecting its
 //! text), take the keyboard from it, or read its mounted element, from any handler. The
-//! `TextInput`'s own `Focus::Controlled` asks for the focus by re-rendering; a handle acts at
+//! `TextField`'s own `FieldFocus::Controlled` asks for the focus by re-rendering; a handle acts at
 //! once, and hands out the element, which a request never did.
 
 use crate::focus::select::Select;

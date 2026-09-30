@@ -1,5 +1,5 @@
 //! RowAction: a button at the end of a menu or palette row that acts on that row without
-//! picking it (the × that removes a recent search). It is an `IconButton`, and
+//! picking it (the × that removes a recent search). It is an image-only toolbar `Button`, and
 //! its click, press and pointer moves stop inside it, so the row neither runs, closes its menu
 //! nor takes the selection while the pointer is on the button.
 

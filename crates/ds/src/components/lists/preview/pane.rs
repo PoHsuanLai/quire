@@ -26,7 +26,7 @@ use ds_motion::presence::Exit;
 use ds_motion::presence::spec::PresenceSpec;
 use ds_motion::presence::use_presence::{Presented, use_presence};
 
-/// One action under the preview: its words in the ink, then its keys as a plain [`Chord`] in
+/// One action under the preview: its words in the ink, then its keys as a plain [`KeyEquivalent`] in
 /// the secondary ink at the words' size (Spotlight's "Reveal in Files ⌘R"; an empty shortcut
 /// draws none).
 #[derive(Debug, Clone, PartialEq, Eq)]

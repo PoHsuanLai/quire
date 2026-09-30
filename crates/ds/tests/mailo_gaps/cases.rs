@@ -68,7 +68,7 @@ pub const CASES: &[Case] = &[
         golden: "controls/button/quiet-closed.html",
         make: || rsx! { Button { bezel: Bezel::Inline, label: "More", shown: Shown::Hidden, onclick: |_| {} } },
     },
-    // TextInput: a password, empty (the placeholder) and filled (the dots).
+    // TextField: a secure field, empty (the placeholder) and filled (the dots).
     Case {
         golden: "controls/text_field/password-empty.html",
         make: || rsx! { TextField { kind: FieldKind::Secure, label: "Password", value: "", placeholder: "App password", oninput: |_| {} } },

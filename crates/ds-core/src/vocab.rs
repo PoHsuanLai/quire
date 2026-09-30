@@ -274,7 +274,7 @@ pub enum ShortcutKey {
     ContextMenu,
 }
 
-/// A shape a key's glyph draws as, for `Kbd`'s `data-glyph`: a hook for a face rule that only
+/// A shape a key's glyph draws as, for `KeyEquivalent`'s `data-glyph`: a hook for a face rule that only
 /// some glyphs need. `Arrow` is the only member today — a Small cap's `data-glyph="arrow"`
 /// draws Up, Down, Left and Right larger than the rest of the small face (at 9.5 px
 /// an arrow's stroke reads as a dash).
@@ -347,7 +347,7 @@ impl ShortcutKey {
         }
     }
 
-    /// The `data-glyph` shape `Kbd` writes for this key, or `None` for every key whose glyph
+    /// The `data-glyph` shape `KeyEquivalent` writes for this key, or `None` for every key whose glyph
     /// needs no face rule of its own.
     pub fn glyph_kind(self) -> Option<GlyphKind> {
         match self {

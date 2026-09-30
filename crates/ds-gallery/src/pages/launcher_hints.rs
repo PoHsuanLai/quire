@@ -1,6 +1,6 @@
 //! The Overlays page's Spotlight hints (launcher chords): file rows whose action chord shows on
 //! the selected row only (`RowChord::on_selected`), beside a preview pane whose actions end in
-//! a plain chord (`Chord`) rather than key caps.
+//! a plain key equivalent (`KeyEquivalent`) rather than key caps.
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;

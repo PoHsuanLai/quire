@@ -1,6 +1,6 @@
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
-   `peek-in`, a SearchField over an embedded Rich menu (menu.css).
+   `peek-in`, a search `TextField` over an embedded Rich menu (menu.css).
    `.cmdk-list` and `.cmdk-g` are superseded and not ported. The wrap fades in over `--t-quick`
    (`S:231`, `Anim::PaletteFade`).
    Hosted in a surface of its own there is no wrap: the card fills its

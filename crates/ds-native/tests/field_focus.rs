@@ -1,4 +1,4 @@
-//! A `TextInput`'s `onfocus` and `onblur` on a real Blitz document. A
+//! A `TextField`'s `onfocus` and `onblur` on a real Blitz document. A
 //! click moves the caret and fires the renderer's own events; the focus seam
 //! (`Focus::Controlled`) moves it with no event, and the field reports it itself.
 

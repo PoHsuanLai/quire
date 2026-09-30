@@ -1,4 +1,4 @@
-//! design/30 section 1.4, Press: `data-pressed` is written on a Button and an IconButton from the
+//! design/30 section 1.4, Press: `data-pressed` is written on a Button (image-only included) from the
 //! pointer going down (primary only) or Space or Return going down until it is released, and
 //! is gone once the press ends.
 

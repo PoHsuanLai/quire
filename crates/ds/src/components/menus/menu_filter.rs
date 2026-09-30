@@ -4,7 +4,7 @@
 //! A `Typing` menu filters as keys arrive but shows nothing of what was typed, which suits a
 //! short context menu where the matches say enough. A picker with many rows (labels, folders,
 //! a From address) wants the query visible: `Field` draws it in a row at the top of the menu,
-//! styled as an inline `TextInput`. The row is drawn, not a real input: the menu keeps the
+//! styled as a plain `TextField`. The row is drawn, not a real input: the menu keeps the
 //! keyboard (its keys are the same under either filter), so a field there would only take the
 //! focus away from the cursor it drives.
 

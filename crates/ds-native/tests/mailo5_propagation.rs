@@ -1,5 +1,5 @@
-//! A press kept at its button, on a real Blitz document: a `Button` or
-//! `IconButton` with `propagation: Propagation::Stop` inside a `<summary>` fires its own
+//! A press kept at its button, on a real Blitz document: a `Button`
+//! (image-only included) with `propagation: Propagation::Stop` inside a `<summary>` fires its own
 //! `onclick` and leaves the `<details>` as it was, while a `Bubble` one (the default) lets the
 //! click reach the summary, which toggles its details.
 

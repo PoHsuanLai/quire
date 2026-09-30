@@ -18,7 +18,7 @@ use ds::{KeyEquivalent, KeyStyle};
 #[component]
 pub fn PowerMenu() -> Element {
     rsx! {
-        Section { title: "Power menu", note: "Sheet {{ placement: SheetPlacement::Centre, scrim: ScrimStrength::Modal }} in a Sheet root, light and dark: centred both ways, over --scrim-modal (.40 light, .55 dark). Buttons at ButtonSize::Regular: Cancel (Secondary), Restart (Danger), Shut Down (Primary), and Suspend unavailable (Availability::Disabled: .35, no hover, no press). The hints are Small Kbd caps; the left and right arrows come from Space Mono like the up and down. A sheet its host hides plays sheet-out and reports on_hidden at settle(SheetOut).",
+        Section { title: "Power menu", note: "Sheet {{ placement: SheetPlacement::Centre, scrim: ScrimStrength::Modal }} in a Sheet root, light and dark: centred both ways, over --scrim-modal (.40 light, .55 dark). Buttons at ControlSize::Regular: Cancel, Restart (destructive), Shut Down (the default button), and Suspend unavailable (Availability::Disabled: .35, no hover, no press). The hints are Mini key caps; the left and right arrows come from Space Mono like the up and down. A sheet its host hides plays sheet-out and reports on_hidden at settle(SheetOut).",
             div { class: "g-wall g-polish-cards", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for theme in [Theme::Light, Theme::Dark] {
                     Dialog { theme }
