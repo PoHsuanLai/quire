@@ -37,7 +37,7 @@ const PLATE_SHARE: f32 = 0.805;
 const REST_SIDE: Px = Px(48.0);
 
 /// The plate's side for a tile of `side`: whole pixels, at least one.
-pub(crate) fn plate_side(side: Px) -> IconPx {
+pub fn plate_side(side: Px) -> IconPx {
     IconPx((side.0 * PLATE_SHARE).round().clamp(1.0, 255.0) as u8)
 }
 
