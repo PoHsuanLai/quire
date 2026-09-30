@@ -584,7 +584,8 @@ state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, o
 or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its accessory.
 `List { label, items: Vec<ListItem<K>>, style: ListStyle }` roves with the arrows and Home/End.
 `Disclosure { title, shown, ontoggle, children }` collapses a body; `SectionHeader { title, value,
-action, collapse }` heads a group.
+actions: Vec<HeaderAction>, collapse }` heads a group (`HeaderAction::new(label, onclick)`, any
+number of them at its end).
 
 ### Overlays
 
@@ -638,9 +639,9 @@ Full catalogue (design doc section in parentheses):
 
 | Family | Components |
 | --- | --- |
-| Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
+| Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure, search and multi-line), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
-| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25) |
+| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow) |
 | Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
@@ -653,10 +654,20 @@ A few props worth knowing about before you read the signatures:
   mounts (the command palette's input, a bubble's link field); the default, `FieldFocus::Manual`, is
   what every other field wants; `FieldFocus::Controlled(request)` focuses it on mount and again at
   every `request.request()` (the launcher gaps, below).
+- `TextField { kind: FieldKind::Multiline, rows: FieldRows::Six }` is a `textarea`: Enter adds a line and
+  the caret leaving commits (`onchange`). `Label { severity: Some(Severity::Ok) }` sets a status
+  colour (`Severity` is `Info`, `Ok`, `Warn`, `Danger`, also the tone of `InlineBanner { severity, text,
+  detail, actions, onclose }`). `EmptyState`'s `description` is a `TextLine`, so a `RunTone::Code` run
+  can hold a command. `FactList { facts: vec![Fact::new("When", ..)] }` is a read-only list of labels
+  and values; a `FieldRow` takes one control or several, which wrap.
+- `Row { edit: Some(field) }` puts a field where the words stood (rename in place: a `TextField` with
+  `FieldBezel::Plain`); the keys and presses typed in it do not reach the `List` around it. `PinItem`
+  carries its own `mark: MarkStyle`; `TodayTab` its row's `common` and `onpointerenter`/`onpointerleave`.
+  A test builds an `EditPointer` with `EditPointer::new(phase, at)` and `Clicks(n)`.
 - `Row` takes `#[props(default)] drop: DropState` (`Idle`, `Target`,
   `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
   you are wiring up drag and drop for that row.
-- `SpaceEditor` takes two more optional props: `name: Option<String>` (the Space's own name
+- `SpaceEditor` (and `SpaceDot`) live in `ds`, not `ds-shell`, and take two more optional props: `name: Option<String>` (the Space's own name
   field, drawn inside the editor rather than beside it) and
   `on_active_dot: Option<EventHandler<ActiveDot>>` (fires when the person's focus moves to a
   different dot, separately from `onchange`, which fires on an actual edit).
