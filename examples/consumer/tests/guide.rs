@@ -2,7 +2,15 @@
 //! handler), compiled here so the guide cannot name an API that is gone. Each function carries
 //! the guide's text under the section named in its doc comment; the guide's self-contained
 //! snippets are doc tests of `src/lib.rs`.
-#![allow(dead_code, unused_variables, unused_imports, clippy::needless_return)]
+#![allow(
+    dead_code,
+    unused_variables,
+    unused_imports,
+    unused_mut,
+    clippy::derivable_impls,
+    clippy::needless_return,
+    clippy::redundant_closure
+)]
 
 use dioxus::prelude::*;
 use ds::prelude::*;
@@ -39,8 +47,8 @@ fn Controls() -> Element {
 /// Section 6, "Lists".
 #[component]
 fn Lists() -> Element {
-    use ds::components::app::thread_row::ThreadRow;
     use ds::base::vocab::RowState;
+    use ds::components::app::thread_row::ThreadRow;
 
     rsx! {
         ThreadRow {
@@ -131,7 +139,7 @@ fn pointer_buttons() -> impl Fn(Press) {
         PointerButton::Primary | PointerButton::Middle => activate(),
     }
 }
-use ds::base::press::{Press, PointerButton};
+use ds::base::press::{PointerButton, Press};
 
 /// Section 6, "A Blitz host that is not `ds_blitz::launch`".
 #[component]
@@ -177,7 +185,8 @@ fn EmbeddedPalette() -> Element {
     use ds::focus::request::use_focus_request;
     use ds::host::measure::Anchor;
 
-    let (label, placeholder, query, empty) = (String::new(), String::new(), String::new(), String::new());
+    let (label, placeholder, query, empty) =
+        (String::new(), String::new(), String::new(), String::new());
     let groups: Vec<ds::components::menus::palette::palette_group::PaletteGroup<Hit>> = Vec::new();
     let items: Vec<MenuItem<u8>> = Vec::new();
     let mut actions = use_signal(|| false);
@@ -226,7 +235,8 @@ fn KeptPalette() -> Element {
 fn ActionsKey() -> Element {
     use ds::focus::request::use_focus_request;
 
-    let (label, placeholder, query, empty) = (String::new(), String::new(), String::new(), String::new());
+    let (label, placeholder, query, empty) =
+        (String::new(), String::new(), String::new(), String::new());
     let groups: Vec<ds::components::menus::palette::palette_group::PaletteGroup<Hit>> = Vec::new();
     let items: Vec<MenuItem<u8>> = Vec::new();
     let mut actions = use_signal(|| false);
@@ -284,7 +294,10 @@ mod rule_two {
     #[test]
     fn no_raw_button_is_rendered() {
         let offences = markup(&render_ssr(), &full_css(), &LintConfig::new(&ds::kits()));
-        assert!(offences.iter().all(|o| o.rule != Rule::RawMarkup), "{offences:#?}");
+        assert!(
+            offences.iter().all(|o| o.rule != Rule::RawMarkup),
+            "{offences:#?}"
+        );
     }
 }
 
@@ -294,10 +307,18 @@ fn the_badge_times_out_on_ds_motions_own_clock() {
     use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
     use std::time::Duration;
 
-    let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
+    let resolved = resolve(
+        Appearance::default(),
+        SpaceLook::default().theme,
+        SystemPrefs::default(),
+    );
     let hold = settle(Anim::Fade, resolved.motion); // never a millisecond literal
 
-    let view = Viewport { width: 480, height: 360, scale_percent: 100 };
+    let view = Viewport {
+        width: 480,
+        height: 360,
+        scale_percent: 100,
+    };
     let mut harness = Harness::new(YourApp, HarnessConfig::new(view).with_clock(Clock::Virtual));
     if let Some(target) = harness.centre(".ds-button") {
         harness.send(Input::click(target));
@@ -334,10 +355,15 @@ fn easing_at() {
 /// Section 10, "Spaces store".
 #[test]
 fn space_store_looks() {
-    use ds::style::space::store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};
+    use ds::style::space::store::{
+        SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex,
+    };
 
     let store = SpaceStore::default();
-    let workspace = Workspace { id: Some(WorkspaceId("w1".to_owned())), index: WorkspaceIndex(0) };
+    let workspace = Workspace {
+        id: Some(WorkspaceId("w1".to_owned())),
+        index: WorkspaceIndex(0),
+    };
     let look = store.look_for_workspace(&workspace, SpaceDefaults::default());
     let store = store.with_look(&workspace, look);
     let _ = store.look_for(WorkspaceIndex(0), SpaceDefaults::default());
@@ -358,7 +384,9 @@ mod settings_files {
         const FORMAT: Format = Format::Toml;
     }
 
-    fn use_store(spawner: &dyn ds::base::spawner::Spawner) -> Result<(), Box<dyn std::error::Error>> {
+    fn use_store(
+        spawner: &dyn ds::base::spawner::Spawner,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
         let loaded = store.load::<YourFile>();
         store.save(&loaded.value)?;
@@ -387,19 +415,27 @@ mod schema {
     #[serde(default)]
     #[settings(file = "your-app/settings.toml", domain = "reader", page = Page::App("your-app".to_owned()))]
     pub struct ReaderSettings {
-        #[settings(label = "Open links", help = "Where a link in a message opens.", section = "Reader")]
+        #[settings(
+            label = "Open links",
+            help = "Where a link in a message opens.",
+            section = "Reader"
+        )]
         pub open_links: OpenLinks,
     }
 
     impl Default for ReaderSettings {
         fn default() -> Self {
-            ReaderSettings { open_links: OpenLinks::default() }
+            ReaderSettings {
+                open_links: OpenLinks::default(),
+            }
         }
     }
 
     fn main() {
         let args: Vec<String> = std::env::args().collect();
-        if ds_settings::schema::maybe_write_schema(&ReaderSettings::schema(), &args).unwrap_or(false) {
+        if ds_settings::schema::maybe_write_schema(&ReaderSettings::schema(), &args)
+            .unwrap_or(false)
+        {
             return;
         }
         // ...normal startup...

@@ -7,12 +7,12 @@
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
-use ds::prelude::*;
-use ds::host::measure::{Anchor, MountedRef};
 use ds::components::controls::button_model::Answers;
-use ds::root::common::Common;
 use ds::components::menus::item::item::MenuImage;
 use ds::focus::request::use_focus_request;
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_blitz::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
