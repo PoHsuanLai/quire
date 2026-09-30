@@ -17,7 +17,7 @@
 //! inks.
 //!
 //! `user_style` is the person's own stylesheet (`ds_settings::UserStyle`, ARCHITECTURE.md section
-//! 11): its text goes in `<style data-ds-user>` right after the design-system sheet, so a change
+//! 10): its text goes in `<style data-ds-user>` right after the design-system sheet, so a change
 //! to the signal restyles the document and a rule of theirs wins by order. An empty style draws no
 //! element at all.
 //!

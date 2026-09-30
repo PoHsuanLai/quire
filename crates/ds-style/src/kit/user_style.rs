@@ -1,5 +1,5 @@
 //! The person's own stylesheet as a value: the text of `style.css`, the last thing in the cascade
-//! (ARCHITECTURE.md section 11).
+//! (ARCHITECTURE.md section 10).
 
 use serde::{Deserialize, Serialize};
 
