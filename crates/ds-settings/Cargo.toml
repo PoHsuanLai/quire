@@ -25,6 +25,7 @@ toml = { workspace = true }
 workspace = true
 
 [dev-dependencies]
+ds = { workspace = true }
 # The tests' runtime and the `Spawner` they hand the watches; the crate itself names no runtime.
 tokio = { workspace = true }
 

@@ -1697,6 +1697,7 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "dioxus-ssr",
+ "ds",
  "ds-core",
  "ds-style",
 ]
@@ -1748,6 +1749,7 @@ name = "ds-settings"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "ds",
  "ds-core",
  "ds-settings-derive",
  "ds-style",
