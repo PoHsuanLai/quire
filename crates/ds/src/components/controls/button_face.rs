@@ -73,7 +73,7 @@ impl Trailing {
 
 /// A mark before the label, the counterpart of [`Trailing`]: a glyph, or an
 /// element the caller draws with quire's own components. The From dropdown shows the chosen
-/// account's provider as `Leading::Mark(rsx! { ProviderMark { size: MarkSize::Inline, .. } })`
+/// account's provider as `Leading::Mark(rsx! { ProviderMark { size: ControlSize::Small, .. } })`
 /// inside its value. The slot takes an `Element` rather than a `Provider` so any quire mark (an
 /// avatar, a person colour's dot) fits without a variant per kind; what goes in it is the
 /// caller's to keep to quire components, as for any children.

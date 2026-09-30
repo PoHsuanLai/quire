@@ -7,7 +7,7 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
     ActionId, AppearancePicker, Button, Check, Chip, ChipVariant, Colour, DragGhost, Emphasis, Hex,
-    HoverStrip, Icon, List, ListItem, MarkProvider, MarkSize, MarkStyle, PinFace, PinTile, Point,
+    HoverStrip, Icon, List, ListItem, MarkProvider, MarkStyle, PinFace, PinTile, Point,
     ProviderMark, Px, RowState, Selection, StripAction, SystemPrefs, ThreadRow, UndoToken,
     use_toast_hub,
 };
@@ -211,7 +211,7 @@ fn ThreadLine(
             state: RowState { selection, emphasis: id.emphasis(), ..RowState::default() },
             name,
             via: rsx! {
-                ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
+                ProviderMark { provider: MarkProvider::Google, size: ControlSize::Mini, style: MarkStyle::Letter }
                 "gmail"
             },
             subject,

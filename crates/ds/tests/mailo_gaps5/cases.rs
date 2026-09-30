@@ -3,8 +3,8 @@
 use dioxus::prelude::*;
 use ds::{Bezel, ControlSize};
 use ds::{
-    Button, Common, DataAttr, DataName, DropState, Icon, Leading, MarkProvider, MarkSize,
-    MarkStyle, ProviderMark, Row, RowLeading, RowState, RunTone, TextLine, TextRun, Trailing,
+    Button, Common, DataAttr, DataName, DropState, Icon, Leading, MarkProvider, MarkStyle,
+    ProviderMark, Row, RowLeading, RowState, RunTone, TextLine, TextRun, Trailing,
 };
 
 /// One state and its golden.
@@ -39,7 +39,7 @@ fn archive(drop: DropState) -> Element {
 /// The From dropdown's provider, drawn inline.
 fn google() -> Leading {
     Leading::Mark(
-        rsx! { ProviderMark { provider: MarkProvider::Google, size: MarkSize::Inline, style: MarkStyle::Letter } },
+        rsx! { ProviderMark { provider: MarkProvider::Google, size: ControlSize::Small, style: MarkStyle::Letter } },
     )
 }
 

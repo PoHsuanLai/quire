@@ -12,7 +12,7 @@ use ds::ControlSize;
 use ds::Word;
 use ds::{
     Availability, Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Check, Chip,
-    ChipVariant, Colour, CommandPill, Fraction, Hex, ImageSource, LabelHue, MarkProvider, MarkSize,
+    ChipVariant, Colour, CommandPill, Fraction, Hex, ImageSource, LabelHue, MarkProvider,
     MarkStyle, PersonHue, PinFace, PinTile, Progress, ProgressIndicator, ProgressStyle,
     ProviderMark, SegmentedControl, Selection, Shortcut, ShortcutKey, Slider, Toggle, Verdict,
 };
@@ -223,7 +223,7 @@ fn Marks() -> Element {
     };
     rsx! {
         Section { title: "ProviderMark and PinTile", note: "Letters at tile, row and inline size; tiles pressed and not (the tile desaturates its colour when not pressed), one showing the favicon the app supplies (mark: MarkStyle::Image), a local-folders account (Provider::Local: the neutral folder), and the Add account tile after them.",
-            for size in [MarkSize::Tile, MarkSize::Row, MarkSize::Inline] {
+            for size in [ControlSize::Regular, ControlSize::Mini, ControlSize::Small] {
                 div { class: "g-row",
                     for provider in PROVIDERS {
                         ProviderMark { provider, size, style: MarkStyle::Letter }

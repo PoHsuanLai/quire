@@ -3,10 +3,12 @@
 //! account, which has no provider, shows a neutral folder instead of a letter.
 
 use crate::components::content::image_source::ImageSource;
+use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconPx, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// A mail provider.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -26,17 +28,6 @@ pub enum MarkProvider {
     /// No provider: mail kept in local folders. Not a brand, so no letter: a
     /// folder glyph in the neutral IMAP grey, and no favicon even under `MarkStyle::Image`.
     Local,
-}
-
-/// Where a mark sits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub enum MarkSize {
-    /// 14, on an account tile.
-    Tile,
-    /// 11, in a row's via.
-    Row,
-    /// 13, inline.
-    Inline,
 }
 
 /// Letter or image.
@@ -88,62 +79,82 @@ impl MarkProvider {
     }
 }
 
-impl MarkSize {
-    /// The folder glyph inside a local mark: the chip less its padding (14, 11, 13 → 10, 8, 9).
-    fn glyph(self) -> IconSize {
-        match self {
-            MarkSize::Tile => IconSize::Px(IconPx(10)),
-            MarkSize::Row => IconSize::Px(IconPx(8)),
-            MarkSize::Inline => IconSize::Px(IconPx(9)),
-        }
+/// The folder glyph inside a local mark: the chip less its padding (11, 13, 14 becomes 8, 9, 10).
+fn folder_glyph(size: ControlSize) -> IconSize {
+    match size {
+        ControlSize::Mini => IconSize::Px(IconPx(8)),
+        ControlSize::Small => IconSize::Px(IconPx(9)),
+        ControlSize::Regular | ControlSize::Large => IconSize::Px(IconPx(10)),
     }
 }
 
 /// A local account's mark: the folder in the neutral grey, whatever `style` asks for, since
 /// there is no provider whose favicon an app could hold.
-fn local_mark(size: MarkSize) -> Element {
+fn local_mark(size: ControlSize, common: Common) -> Element {
     let colour = MarkProvider::Local.colour();
     let title = MarkProvider::Local.name();
+    let class = common.class("ds-provider");
+    let data = common.data_attributes();
     rsx! {
         span {
-            class: "ds-provider",
+            id: common.id.clone(),
+            class,
             "data-size": size.slug(),
             "data-kind": "local",
             style: "--pc:{colour}",
             title: "{title}",
-            Glyph { icon: Icon::Folder, size: size.glyph() }
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            Glyph { icon: Icon::Folder, size: folder_glyph(size) }
         }
     }
 }
 
-/// A provider mark. Static: no hover, focus or motion.
+/// A provider mark: the provider's glyph on a tile of the control ladder (Mini 11, Small 13,
+/// Regular 14; Large repeats Regular). Static: no hover, focus or motion.
 #[component]
-pub fn ProviderMark(provider: MarkProvider, size: MarkSize, style: MarkStyle) -> Element {
+pub fn ProviderMark(
+    provider: MarkProvider,
+    #[props(default)] size: ControlSize,
+    #[props(default = MarkStyle::Letter)] style: MarkStyle,
+    #[props(default)] common: Common,
+) -> Element {
     if provider == MarkProvider::Local {
-        return local_mark(size);
+        return local_mark(size, common);
     }
     let title = provider.name();
+    let class = common.class("ds-provider");
+    let data = common.data_attributes();
     match style {
         MarkStyle::Letter => {
             let colour = provider.colour();
             let letter = provider.letter();
             rsx! {
                 span {
-                    class: "ds-provider",
+                    id: common.id.clone(),
+                    class,
                     "data-size": size.slug(),
                     "data-kind": "letter",
                     style: "--pc:{colour}",
                     title: "{title}",
+                    "aria-label": common.aria_label.clone(),
+                    onmounted: move |event| common.mounted(event),
+                    ..data,
                     "{letter}"
                 }
             }
         }
         MarkStyle::Image(ImageSource(src)) => rsx! {
             span {
-                class: "ds-provider",
+                id: common.id.clone(),
+                class,
                 "data-size": size.slug(),
                 "data-kind": "image",
                 title: "{title}",
+                "aria-label": common.aria_label.clone(),
+                onmounted: move |event| common.mounted(event),
+                ..data,
                 img { alt: "", src }
             }
         },

@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{Bezel, ControlSize};
 use ds::{
-    Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider, MarkSize, MarkStyle, PinFace,
-    PinTile, ProviderMark, Selection, Trailing,
+    Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider, MarkStyle, PinFace, PinTile,
+    ProviderMark, Selection, Trailing,
 };
 use ds::{FieldBezel, FieldKind, TextField};
 
@@ -35,11 +35,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/provider_mark/local-row.html",
-        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: MarkSize::Row, style: MarkStyle::Letter } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: ControlSize::Mini, style: MarkStyle::Letter } },
     },
     Case {
         golden: "lists/provider_mark/local-image-ignored.html",
-        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: MarkSize::Inline, style: MarkStyle::Image(ds::ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: ControlSize::Small, style: MarkStyle::Image(ds::ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
     Case {
         golden: "controls/button/frame.html",

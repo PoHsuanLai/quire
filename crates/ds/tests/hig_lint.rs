@@ -286,7 +286,7 @@ fn quires_own_sheet_warns_only_where_reviewed() {
     const REVIEWED: &[(Rule, &str, &str)] = &[
         (
             Rule::MinFontSize,
-            ".ds-provider[*|data-size=row]",
+            ".ds-provider[*|data-size=mini]",
             "the in-row provider mark's letter is a drawing in an 11 px mark, not text",
         ),
         (
