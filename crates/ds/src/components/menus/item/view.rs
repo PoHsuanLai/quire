@@ -55,6 +55,8 @@ pub(crate) struct ItemView<'a> {
     pub title: &'a str,
     /// The image.
     pub image: Option<&'a MenuImage>,
+    /// The trailing hint.
+    pub hint: Option<&'a str>,
     /// The key equivalent.
     pub key: Option<&'a Shortcut>,
     /// The state mark.
@@ -120,6 +122,11 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
         },
         (Branch::Leaf, Keys::Hidden, _) | (Branch::Leaf, Keys::Shown, None) => rsx! {},
     };
+    let hint = view.hint.map(|hint| {
+        rsx! {
+            span { class: "ds-menu-hint", "{hint}" }
+        }
+    });
     rsx! {
         div {
             class: "ds-menu-item",
@@ -152,6 +159,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             {state}
             {image}
             span { class: "ds-menu-label", "{view.title}" }
+            {hint}
             {end}
         }
     }

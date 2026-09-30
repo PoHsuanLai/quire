@@ -1,11 +1,13 @@
 //! PopUpButton: a button that opens a menu of choices (`NSPopUpButton`, design/30 section 2.1).
 //! A pop-up shows the chosen item and marks it in its menu; a pull-down keeps a fixed title and
-//! marks nothing. It owns its chevrons, opens a `Menu`, and selects by typing while it holds the
-//! keyboard.
+//! marks nothing; an overflow is a pull-down drawn as the ⋯ image alone (Finder's Action button),
+//! for the extra commands of a row or a toolbar. It owns its chevrons, opens a `Menu`, and selects
+//! by typing while it holds the keyboard.
 
+use crate::components::content::icon_source::IconSource;
 use crate::components::controls::button::Button;
 use crate::components::controls::button_marks::Trailing;
-use crate::components::controls::button_model::Bezel;
+use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
@@ -28,6 +30,9 @@ pub enum PopUpKind {
     PopUp,
     /// It shows a fixed title; its menu marks nothing.
     PullDown,
+    /// It shows the ⋯ glyph alone, no title and no chevrons; its menu marks nothing. `title` is
+    /// its accessible name ("More" when absent).
+    Overflow,
 }
 
 /// The title of the item `value` names, if any.
@@ -50,25 +55,11 @@ fn marked<T: Clone + PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Vec
     items
         .iter()
         .map(|item| match item {
-            MenuItem::Item {
-                value: own,
-                title,
-                image,
-                key,
-                availability,
-                ..
-            } => MenuItem::Item {
-                value: own.clone(),
-                title: title.clone(),
-                image: image.clone(),
-                key: key.clone(),
-                check: Some(if Some(own) == value {
-                    Check::On
-                } else {
-                    Check::Off
-                }),
-                availability: *availability,
-            },
+            MenuItem::Item { value: own, .. } => item.clone().with_check(if Some(own) == value {
+                Check::On
+            } else {
+                Check::Off
+            }),
             other => other.clone(),
         })
         .collect()
@@ -97,6 +88,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     let label = match kind {
         PopUpKind::PopUp => chosen_title(&items, value.as_ref()).or(title.clone()),
         PopUpKind::PullDown => title.clone(),
+        PopUpKind::Overflow => title.clone().or_else(|| Some("More".to_string())),
     }
     .unwrap_or_default();
     let widths: Vec<String> = match kind {
@@ -107,15 +99,31 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 _ => None,
             })
             .collect(),
-        PopUpKind::PullDown => Vec::new(),
+        PopUpKind::PullDown | PopUpKind::Overflow => Vec::new(),
     };
     let listed = match kind {
         PopUpKind::PopUp => marked(&items, value.as_ref()),
-        PopUpKind::PullDown => items.clone(),
+        PopUpKind::PullDown | PopUpKind::Overflow => items.clone(),
     };
-    let chevrons = match kind {
-        PopUpKind::PopUp => Icon::ChevronsUpDown,
-        PopUpKind::PullDown => Icon::ChevronDown,
+    let (bezel, image, icon, trailing) = match kind {
+        PopUpKind::PopUp => (
+            Bezel::Push,
+            ImagePosition::Leading,
+            None,
+            Some(Trailing::Glyph(Icon::ChevronsUpDown)),
+        ),
+        PopUpKind::PullDown => (
+            Bezel::Push,
+            ImagePosition::Leading,
+            None,
+            Some(Trailing::Glyph(Icon::ChevronDown)),
+        ),
+        PopUpKind::Overflow => (
+            Bezel::Toolbar,
+            ImagePosition::Only,
+            Some(IconSource::Glyph(Icon::Ellipsis)),
+            None,
+        ),
     };
     let mounted = common.clone();
     let typed = items.clone();
@@ -167,10 +175,12 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             onkeydown: onkey,
             Button {
                 label: label.clone(),
-                bezel: Bezel::Push,
+                bezel,
+                image,
+                icon,
                 size,
                 availability,
-                trailing: Some(Trailing::Glyph(chevrons)),
+                trailing,
                 shown: Some(open()),
                 onclick: move |_: Press| {
                     if live {

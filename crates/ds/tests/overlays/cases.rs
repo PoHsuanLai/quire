@@ -27,7 +27,7 @@ use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
-use ds::stack::toast_hub::UndoToken;
+use ds::stack::toast_hub::{ToastAction, UndoToken};
 use ds_core::geometry::placement::Align;
 use ds_core::geometry::placement::Side;
 use ds_core::vocab::Dismiss;
@@ -113,6 +113,25 @@ fn snooze() -> Vec<MenuItem<u8>> {
         item(4, "Any day").with_check(Check::Mixed),
         MenuItem::Separator,
         item(5, "Pick a date…"),
+    ]
+}
+
+/// Snooze times with the time they land on as a trailing hint, one beside a key equivalent, one
+/// that stays open on a pick and one disabled.
+fn snooze_hints() -> Vec<MenuItem<u8>> {
+    vec![
+        item(1, "Later today").with_hint("6:00 PM"),
+        item(2, "Tomorrow").with_hint("Thu 8:00 AM"),
+        item(3, "Next week")
+            .with_hint("Mon 8:00 AM")
+            .with_key(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('n')])),
+        item(4, "Toggle flag")
+            .with_check(Check::On)
+            .with_hint("kept open")
+            .with_after(AfterPick::KeepOpen),
+        item(5, "Someday")
+            .with_hint("no date")
+            .with_availability(Availability::Disabled),
     ]
 }
 
@@ -336,6 +355,67 @@ fn Pushed(undo: Option<UndoToken>) -> Element {
     rsx! {}
 }
 
+/// The toast after an operation pushed it with a button of its own.
+#[component]
+fn PushedAction() -> Element {
+    let toasts = use_toasts();
+    use_hook(move || {
+        toasts.push_action(
+            "Sent to Travel".to_string(),
+            ToastAction::new("View").with_icon(Icon::ArrowRight),
+            EventHandler::new(|()| {}),
+        )
+    });
+    rsx! {}
+}
+
+/// A tip whose pointer the caller holds: the hub opens its key at once, as a caller's own hooks
+/// do through `use_hover_intent`.
+#[component]
+fn HookedTip() -> Element {
+    let hub = use_hover_hub();
+    let key = HoverKey("thread-time:1".to_string());
+    use_hook({
+        let key = key.clone();
+        move || {
+            hub.feed(HoverEvent::Over(
+                (key, HoverProfile::Tip),
+                HoverProfile::Tip,
+            ))
+        }
+    });
+    rsx! {
+        span { "3:42 PM" }
+        Tooltip { text: "Thursday, October 1, 2026 at 3:42 PM", hover_key: Some(key) }
+    }
+}
+
+/// The labels of a pick list: some on, the row that creates one under them.
+fn label_groups() -> Vec<PaletteGroup<u8>> {
+    let label = |value: u8, title: &str, on: Check| PaletteRow {
+        accessory: Accessory::Check(on),
+        after: AfterPick::KeepOpen,
+        ..PaletteRow::new(value, title)
+    };
+    vec![
+        PaletteGroup::list(
+            "Labels",
+            vec![
+                label(1, "Invoices", Check::On),
+                label(2, "Travel", Check::Off),
+                label(3, "Family", Check::Off),
+            ],
+        ),
+        PaletteGroup::list(
+            "",
+            vec![PaletteRow {
+                leading: RowLeading::Icon(Icon::Plus),
+                ..PaletteRow::new(4, "Create “Tra”")
+            }],
+        ),
+    ]
+}
+
 pub const CASES: &[Case] = &[
     // Menu: each placement, an empty list, disabled items and submenus, status lines.
     Case {
@@ -498,6 +578,26 @@ pub const CASES: &[Case] = &[
         make: || rsx! { PartsCard { parts: vec![person(), stats(), flag(FlagTone::Danger), foot(), actions()] } },
         wait: INTENT,
     },
+    // Menu hints: a trailing word before the key equivalent; a hint also shows in a context menu.
+    Case {
+        component: "menu",
+        state: "hints",
+        make: || rsx! { Menu { placement: MenuPlacement::Popup, anchor: Anchor::Rect(button_rect()), items: snooze_hints(), onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    // Pick list: a filterable list in a popover, toggle rows, a Create row; and nothing matching.
+    Case {
+        component: "pick_list",
+        state: "results",
+        make: || rsx! { PickList { anchor: Anchor::Rect(button_rect()), label: "Labels", placeholder: "Filter labels", query: "tra", groups: label_groups(), empty: "No label matches.", oninput: |_| {}, onpick: |_: u8| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "pick_list",
+        state: "empty",
+        make: || rsx! { PickList::<u8> { anchor: Anchor::Rect(button_rect()), label: "Move to", placeholder: "Filter folders", query: "zz", groups: PaletteGroups::default(), empty: "No folder matches.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
     // Tooltip: at rest under the pointer's wait, and caller-driven up and down.
     Case {
         component: "tooltip",
@@ -511,6 +611,13 @@ pub const CASES: &[Case] = &[
         state: "shown",
         make: || rsx! { Tooltip { text: "Terminal", shown: Some(Shown::Visible), span { "tile" } } },
         wait: NOW,
+    },
+    // Keyed by the caller's own hooks: nothing wrapped, the tip up while the hub holds its key.
+    Case {
+        component: "tooltip",
+        state: "hooked",
+        make: || rsx! { HookedTip {} },
+        wait: Duration::from_millis(1100),
     },
     Case {
         component: "tooltip",
@@ -529,6 +636,12 @@ pub const CASES: &[Case] = &[
         component: "toast",
         state: "shown",
         make: || rsx! { Pushed { undo: UndoToken(7) } },
+        wait: FRAME,
+    },
+    Case {
+        component: "toast",
+        state: "action",
+        make: || rsx! { PushedAction {} },
         wait: FRAME,
     },
     Case {

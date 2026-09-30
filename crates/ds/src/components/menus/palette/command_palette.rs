@@ -37,6 +37,8 @@ use ds_motion::anim::Anim;
 use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind};
+use crate::components::lists::row::size::RowSize;
+use crate::components::menus::item::item::AfterPick;
 use crate::components::menus::palette::palette_host::CommandPaletteHost;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
 use crate::components::menus::palette::palette_motion::PaletteHandle;
@@ -195,8 +197,10 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let run = {
         let all = all.clone();
         move |index: usize| match run_of(all.get(index)) {
-            Run::Pick(value) => {
-                onclose.call(());
+            Run::Pick(value, after) => {
+                if after == AfterPick::Close {
+                    onclose.call(());
+                }
                 onpick.call(value);
             }
             Run::Action(action) => {
@@ -270,6 +274,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     in_view.stop_mounted(index, MountedRef(event.data()));
                 }),
                 action_ran: EventHandler::new(move |()| actions.ran()),
+                size: RowSize::Settings,
             },
             &motion,
         )

@@ -15,7 +15,7 @@ use crate::components::menus::menu::cursor::MenuCursor;
 use crate::components::menus::menu::decide::{Decision, Level};
 use crate::components::menus::menu::hand_back::hand_back;
 use crate::components::menus::menu::panel::Panel;
-use crate::components::menus::menu::pick::{Closer, Closing, Gesture, picker};
+use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, picker};
 use crate::components::menus::menu::placement::{MENU_INSET, MenuPlacement};
 use crate::components::menus::menu::surface::{Surface, stacking};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
@@ -42,7 +42,8 @@ use ds_style::tokens::layer::ZLayer;
 /// key equivalents; a `Context` menu leaves out what cannot be picked and shows none. Every menu
 /// opens at once. A pick blinks the item twice, then calls `onpick`, fades the menu out over
 /// `--t-quick` and calls `onclose`; Escape and an outside click play the fade and call `onclose`.
-/// A list of toggles whose menu should stay open is a `Popover` of `Checkbox`es, as on the Mac.
+/// An item with `AfterPick::KeepOpen` (a toggle in a set of toggles) yields its value at once and
+/// leaves the menu up, with no blink; the caller redraws the items with the new state.
 /// `on_hover` hears which choice the pointer is over (`None` once it is over none),
 /// `on_release` every button released over a choice; a release over an enabled choice after a
 /// press that began outside the menu (press-drag-release) picks it.
@@ -234,7 +235,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
 /// parent stays open for its submenu, and a disabled item closes picking nothing.
 fn released<T: Clone + 'static>(
     picks: Vec<Choice<T>>,
-    pick: EventHandler<(T, u8)>,
+    pick: EventHandler<Picked<T>>,
     fade_out: EventHandler<()>,
     gesture: CopyValue<Gesture>,
     on_release: Option<EventHandler<Press>>,
@@ -248,10 +249,14 @@ fn released<T: Clone + 'static>(
         }
         match picks.get(index) {
             Some(Choice {
-                act: Act::Pick(value),
+                act: Act::Pick(value, after),
                 availability: Availability::Enabled,
                 ..
-            }) => pick.call((value.clone(), 0)),
+            }) => pick.call(Picked {
+                value: value.clone(),
+                depth: 0,
+                after: *after,
+            }),
             Some(Choice {
                 act: Act::Open(_),
                 availability: Availability::Enabled,

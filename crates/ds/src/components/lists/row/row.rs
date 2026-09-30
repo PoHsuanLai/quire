@@ -11,6 +11,7 @@ use crate::components::lists::row::accessory::{self, Accessory};
 use crate::components::lists::row::action::RowAction;
 use crate::components::lists::row::action::trailing as action_button;
 use crate::components::lists::row::chord::{RowChord, shown_chord};
+use crate::components::lists::row::confirm::{self, RowConfirm};
 use crate::components::lists::row::leading::{self, RowLeading};
 use crate::components::lists::row::marks::marked;
 use crate::components::lists::row::motion::RowMotion;
@@ -94,6 +95,10 @@ fn title_words(title: &TextLine, marks: &[usize]) -> Element {
 /// tags). `action` is a button at the end that acts without picking the row; `chord` is the keys
 /// of the row's first action, shown while the row is selected.
 ///
+/// `confirm` makes the row ask a question in its own line: the words give way to it, the accessory,
+/// chord and action to a Cancel and a confirming button, and the row is not picked meanwhile
+/// ([`RowConfirm`]).
+///
 /// `outline` makes the row a branch that opens its `children`, or a leaf that keeps the
 /// triangle's space; `on_toggle` hears the state a press on the triangle asks for. The pointer
 /// hooks hand the row's own pointer events to the caller (a drag over the sidebar). `motion` is
@@ -109,6 +114,7 @@ pub fn Row(
     #[props(default)] accessory: Accessory,
     #[props(default)] action: Option<RowAction>,
     #[props(default)] chord: RowChord,
+    #[props(default)] confirm: Option<RowConfirm>,
     #[props(default)] shape: RowShape,
     #[props(default)] state: RowState,
     #[props(default)] size: RowSize,
@@ -131,20 +137,23 @@ pub fn Row(
         availability,
         drop,
     } = state;
-    let live = availability == Availability::Enabled;
+    let asking = confirm.is_some();
+    let live = availability == Availability::Enabled && !asking;
     let listen = onclick.map(PressListeners::new);
-    let words = match content {
-        Some(content) => rsx! {
+    let words = match (&confirm, content) {
+        (Some(asked), _) => confirm::question(asked),
+        (None, Some(content)) => rsx! {
             span { class: "ds-row-words", {content} }
         },
-        None => shape_view::words(
+        (None, None) => shape_view::words(
             &shape,
             title_words(&title, &marks),
             detail.as_ref().map(text),
         ),
     };
-    let when = shape_view::when(&shape);
-    let keys = shown_chord(&chord, selection).cloned();
+    let when = shape_view::when(&shape).filter(|_| !asking);
+    let keys = shown_chord(&chord, selection).cloned().filter(|_| !asking);
+    let answer = confirm.as_ref().map(confirm::buttons);
     let expanded = match outline {
         Outline::Branch(shown) => Some(shown.aria()),
         Outline::None | Outline::Leaf => None,
@@ -193,6 +202,7 @@ pub fn Row(
             "data-shape": shape_view::slug(&shape),
             "data-trailing": accessory.slug(),
             "data-action": action.as_ref().map(|_| "true"),
+            "data-confirm": confirm.as_ref().map(|_| "true"),
             "data-row-motion": motion.attr(),
             onpointerenter: relay(onpointerenter),
             onpointerleave: relay(onpointerleave),
@@ -220,13 +230,16 @@ pub fn Row(
             {leading::draw(&leading, &shape)}
             {words}
             {when}
-            {accessory::draw(&accessory, &name, availability)}
+            if !asking {
+                {accessory::draw(&accessory, &name, availability)}
+            }
             if let Some(keys) = keys {
                 crate::components::controls::key_equivalent::KeyEquivalent { shortcut: keys, style: KeyStyle::Text }
             }
-            if let Some(action) = action.as_ref() {
+            if let (Some(action), false) = (action.as_ref(), asking) {
                 {action_button(action)}
             }
+            {answer}
         }
     };
     match outline {

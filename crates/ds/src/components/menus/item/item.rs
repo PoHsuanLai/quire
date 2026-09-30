@@ -16,6 +16,18 @@ pub enum MenuImage {
     Source(IconSource),
 }
 
+/// What a pick does to the menu that holds the item.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum AfterPick {
+    /// The item blinks twice, the menu yields the value and fades out: `NSMenu`'s way.
+    #[default]
+    Close,
+    /// The value is yielded at once and the menu stays up, so the person can pick again: a
+    /// toggle in a set of toggles (a label to add or remove), as SwiftUI's
+    /// `menuActionDismissBehavior(.disabled)` does on the Mac. Nothing blinks.
+    KeepOpen,
+}
+
 /// One line of a menu.
 #[derive(Debug, Clone, PartialEq)]
 pub enum MenuItem<T> {
@@ -29,12 +41,19 @@ pub enum MenuItem<T> {
         image: Option<MenuImage>,
         /// Its key equivalent, drawn as glyphs at the item's end. A context menu shows none.
         key: Option<Shortcut>,
+        /// A short faint word at the item's end, before the key equivalent: the time a snooze
+        /// lands on, what a trigger types. The Mac's menu has no second line; what it adds to a
+        /// title goes at the trailing end (design/30 section 2.4). Unlike a key equivalent, a
+        /// context menu shows it.
+        hint: Option<String>,
         /// Its state mark, for an item that is on, off or mixed: a check, a dash for `Mixed`.
         check: Option<Check>,
         /// Whether it can be picked. A disabled item is drawn at .35 opacity, skipped by the
         /// arrow keys and ignores the pointer; a context menu leaves it out (design/13 section
         /// 13.3.3).
         availability: Availability,
+        /// Whether a pick closes the menu.
+        after: AfterPick,
     },
     /// An item that opens a submenu of `children` beside it (design/13 section 13.3.4): on a
     /// 200 ms rest, or at once on Right, Enter or a click. It shows a chevron where an item
@@ -71,125 +90,63 @@ impl<T> MenuItem<T> {
             title: title.into(),
             image: None,
             key: None,
+            hint: None,
             check: None,
             availability: Availability::Enabled,
+            after: AfterPick::Close,
         }
     }
 
     /// The same item with `image`; a header, status line or rule has none to change.
-    pub fn with_image(self, image: MenuImage) -> Self {
-        match self {
-            MenuItem::Item {
-                value,
-                title,
-                key,
-                check,
-                availability,
-                ..
-            } => MenuItem::Item {
-                value,
-                title,
-                image: Some(image),
-                key,
-                check,
-                availability,
-            },
-            MenuItem::Submenu {
-                title,
-                availability,
-                children,
-                ..
-            } => MenuItem::Submenu {
-                title,
-                image: Some(image),
-                availability,
-                children,
-            },
-            other @ (MenuItem::Header(_) | MenuItem::Info { .. } | MenuItem::Separator) => other,
+    pub fn with_image(mut self, image: MenuImage) -> Self {
+        if let MenuItem::Item { image: slot, .. } | MenuItem::Submenu { image: slot, .. } =
+            &mut self
+        {
+            *slot = Some(image);
         }
+        self
     }
 
     /// The same item with the key equivalent `key`; only a command has one.
-    pub fn with_key(self, key: Shortcut) -> Self {
-        match self {
-            MenuItem::Item {
-                value,
-                title,
-                image,
-                check,
-                availability,
-                ..
-            } => MenuItem::Item {
-                value,
-                title,
-                image,
-                key: Some(key),
-                check,
-                availability,
-            },
-            other @ (MenuItem::Submenu { .. }
-            | MenuItem::Header(_)
-            | MenuItem::Info { .. }
-            | MenuItem::Separator) => other,
+    pub fn with_key(mut self, key: Shortcut) -> Self {
+        if let MenuItem::Item { key: slot, .. } = &mut self {
+            *slot = Some(key);
         }
+        self
+    }
+
+    /// The same item with the trailing `hint`; only a command has one.
+    pub fn with_hint(mut self, hint: impl Into<String>) -> Self {
+        if let MenuItem::Item { hint: slot, .. } = &mut self {
+            *slot = Some(hint.into());
+        }
+        self
     }
 
     /// The same item with the state mark `check`; only a command has one.
-    pub fn with_check(self, check: Check) -> Self {
-        match self {
-            MenuItem::Item {
-                value,
-                title,
-                image,
-                key,
-                availability,
-                ..
-            } => MenuItem::Item {
-                value,
-                title,
-                image,
-                key,
-                check: Some(check),
-                availability,
-            },
-            other @ (MenuItem::Submenu { .. }
-            | MenuItem::Header(_)
-            | MenuItem::Info { .. }
-            | MenuItem::Separator) => other,
+    pub fn with_check(mut self, check: Check) -> Self {
+        if let MenuItem::Item { check: slot, .. } = &mut self {
+            *slot = Some(check);
         }
+        self
     }
 
     /// The same item with `availability`; a header, status line or rule has none to change.
-    pub fn with_availability(self, to: Availability) -> Self {
-        match self {
-            MenuItem::Item {
-                value,
-                title,
-                image,
-                key,
-                check,
-                ..
-            } => MenuItem::Item {
-                value,
-                title,
-                image,
-                key,
-                check,
-                availability: to,
-            },
-            MenuItem::Submenu {
-                title,
-                image,
-                children,
-                ..
-            } => MenuItem::Submenu {
-                title,
-                image,
-                availability: to,
-                children,
-            },
-            other @ (MenuItem::Header(_) | MenuItem::Info { .. } | MenuItem::Separator) => other,
+    pub fn with_availability(mut self, to: Availability) -> Self {
+        if let MenuItem::Item { availability, .. } | MenuItem::Submenu { availability, .. } =
+            &mut self
+        {
+            *availability = to;
         }
+        self
+    }
+
+    /// The same item with `after` as what its pick does to the menu; only a command has one.
+    pub fn with_after(mut self, to: AfterPick) -> Self {
+        if let MenuItem::Item { after, .. } = &mut self {
+            *after = to;
+        }
+        self
     }
 
     /// Whether the keys may rest on it.

@@ -6,6 +6,13 @@
 //! `--t-quick`. A caller that runs its own machine passes `shown`: the tip then shows or hides
 //! on that say alone, at once, with no hover and no delay of its own.
 //!
+//! A caller that already has the pointer (a thread row's time, where the row's own hooks run)
+//! keys the tip on them instead: `hover_key` names the tip, the caller feeds
+//! [`HoverDriver::over`](crate::components::overlays::hover_card::intent::HoverDriver::over)
+//! with `HoverProfile::Tip` and the same key from its own pointer events (and `out` when it
+//! leaves), and the tip wraps nothing: `Tooltip { hover_key, text }` draws it while the hub has
+//! that key open, below the anchor the caller filed.
+//!
 //! [`Hint`] is the one implementation: a `Tooltip` is a `Hint` below its target on the Tip
 //! profile, and the shell's `DockLabel` is a `Hint` above its target on the Label profile.
 
@@ -44,19 +51,25 @@ impl HintSide {
 /// A tooltip on `children`. `shown` hands it to the caller: `None` follows the pointer (the Tip
 /// profile through the hover hub), `Some` shows or hides it at once.
 ///
+/// `hover_key` hands the pointer to the caller: the tip is keyed by it, wraps no children, and
+/// stands while the caller's own hooks hold that key open (see above). `shown` wins when both
+/// are given.
+///
 /// `common` goes on the tip's surface (`role="tooltip"`); its `aria_label` names it in place of
 /// its text.
 #[component]
 pub fn Tooltip(
     text: String,
     #[props(default)] shown: Option<Shown>,
+    #[props(default)] hover_key: Option<HoverKey>,
     #[props(default)] common: Common,
-    children: Element,
+    #[props(default)] children: Element,
 ) -> Element {
     rsx! {
         Hint {
             text,
             shown,
+            hover_key,
             profile: HoverProfile::Tip,
             side: HintSide::Below,
             root: "ds-tooltip",
@@ -77,13 +90,16 @@ fn own_key() -> HoverKey {
 pub fn Hint(
     text: String,
     #[props(default)] shown: Option<Shown>,
+    #[props(default)] hover_key: Option<HoverKey>,
     profile: HoverProfile,
     #[props(default)] side: HintSide,
     root: &'static str,
     #[props(default)] common: Common,
-    children: Element,
+    #[props(default)] children: Element,
 ) -> Element {
-    let key = use_hook(own_key);
+    let own = use_hook(own_key);
+    let hooked = hover_key.is_some();
+    let key = hover_key.unwrap_or(own);
     let hub = use_hover_hub();
     let element = use_signal(|| None::<MountedRef>);
     let mine = match shown {
@@ -96,11 +112,14 @@ pub fn Hint(
     };
     rsx! {
         {
-            match shown {
-                None => rsx! {
+            match (shown, hooked) {
+                (None, false) => rsx! {
                     HoverTarget { hover_key: key.clone(), profile, {children} }
                 },
-                Some(_) => rsx! {
+                (None, true) => rsx! {
+                    {children}
+                },
+                (Some(_), _) => rsx! {
                     Anchored { hover_key: key.clone(), element, {children} }
                 },
             }

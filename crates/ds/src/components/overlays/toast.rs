@@ -6,10 +6,10 @@
 //! slides in from past the right edge over `--t-move --e-out` and, when the hub hides it, slides
 //! out over `--t-quick --e-exit`; nothing is drawn while the hub is empty. The hold is
 //! `ToastHold` (5 s), and the pointer over the toast pauses it. A toast pushed with an undo has
-//! an action button (`Undo`); a swipe to the right dismisses it, from where the hand let go.
+//! an action button (`Undo`, or the consumer's own: [`ToastHub::push_action`]); a swipe to the right dismisses it, from where the hand let go.
 
 use crate::components::overlays::swipe_glue::{SwipeOn, use_swipe_glue};
-use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
+use crate::stack::toast_hub::{ToastAction, ToastHub, ToastState, use_toast_hub};
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
@@ -20,19 +20,11 @@ use ds_motion::presence::{
     use_presence::{Presented, use_presence},
 };
 use ds_motion::swipe::SwipeMetrics;
-use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
 /// The enclosing `Ds`'s toast manager: `push(text, undo)`, one visible at a time.
 pub fn use_toasts() -> ToastHub {
     use_toast_hub()
-}
-
-/// Whether the toast offers an action: only an operation with an undo does.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Undoable {
-    Yes,
-    No,
 }
 
 /// Renders the toast. `Ds` places it; consumers never do.
@@ -41,15 +33,10 @@ pub fn ToastHost() -> Element {
     let hub = use_toast_hub();
     // The toast keeps its last words while it slides away: a plain cell, written as the state
     // is read, so keeping them schedules no second render.
-    let mut last = use_hook(|| CopyValue::new((String::new(), Undoable::No)));
+    let mut last = use_hook(|| CopyValue::new((String::new(), None::<ToastAction>)));
     let shown = match hub.state() {
-        ToastState::Shown { text, undo } => {
-            let undoable = if undo.is_some() {
-                Undoable::Yes
-            } else {
-                Undoable::No
-            };
-            last.set((text, undoable));
+        ToastState::Shown { text, action, .. } => {
+            last.set((text, action));
             Shown::Visible
         }
         ToastState::Hidden => Shown::Hidden,
@@ -70,7 +57,7 @@ pub fn ToastHost() -> Element {
     let Some(drawn) = presence.drawn_slug() else {
         return rsx! {};
     };
-    let (text, undoable) = last.peek().clone();
+    let (text, action) = last.peek().clone();
     rsx! {
         div { class: "ds-overlay", "data-layer": "toast",
             div {
@@ -89,17 +76,19 @@ pub fn ToastHost() -> Element {
                 onpointermove: move |event| swipe.moved(&event),
                 onpointerup: move |event| swipe.released(&event),
                 span { class: "ds-toast-body", "{text}" }
-                if undoable == Undoable::Yes {
+                if let Some(action) = action {
                     button {
                         r#type: "button",
                         class: "ds-toast-action",
                         onclick: move |_| {
                             if swipe.click_passes() {
-                                hub.undo();
+                                hub.press_action();
                             }
                         },
-                        Glyph { icon: Icon::Undo, size: IconSize::Small }
-                        "Undo"
+                        if let Some(icon) = action.icon {
+                            Glyph { icon, size: IconSize::Small }
+                        }
+                        "{action.label}"
                     }
                 }
             }

@@ -189,26 +189,12 @@ impl<T: Clone> MenuBarModel<T> {
                 menu.items = menu
                     .items
                     .into_iter()
-                    .map(|item| match item {
-                        MenuItem::Item {
-                            value,
-                            title,
-                            image,
-                            key,
-                            check,
-                            ..
-                        } => {
-                            let availability = available(&value);
-                            MenuItem::Item {
-                                value,
-                                title,
-                                image,
-                                key,
-                                check,
-                                availability,
-                            }
+                    .map(|item| match &item {
+                        MenuItem::Item { value, .. } => {
+                            let availability = available(value);
+                            item.with_availability(availability)
                         }
-                        other => other,
+                        _ => item,
                     })
                     .collect();
                 menu

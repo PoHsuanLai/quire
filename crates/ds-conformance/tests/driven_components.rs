@@ -243,6 +243,8 @@ fn MenuDemo() -> Element {
             key: None,
             check: None,
             availability: Availability::Enabled,
+            hint: None,
+            after: AfterPick::Close,
         })
         .collect::<Vec<_>>();
     rsx! {

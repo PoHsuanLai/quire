@@ -16,12 +16,17 @@
 .ds-menu-label{ flex:1 1 auto; min-width:0; }
 .ds-menu-trailing{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-help); color:var(--ink-faint); }
 .ds-menu-trailing[*|data-mark=chevron]{ padding-left:var(--s-4); }
+/* A hint: a short faint word at the end (design/30 section 2.4; the Mac's menu has no second
+   line), before the key equivalent, which then keeps to it. */
+.ds-menu-hint{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-menu-hint + .ds-menu-trailing{ margin-left:0; }
 
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true],
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-hint,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--accent-ink); }
@@ -30,6 +35,7 @@
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-hint,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }

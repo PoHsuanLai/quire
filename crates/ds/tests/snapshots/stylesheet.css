@@ -1076,12 +1076,17 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-label{ flex:1 1 auto; min-width:0; }
 .ds-menu-trailing{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-help); color:var(--ink-faint); }
 .ds-menu-trailing[*|data-mark=chevron]{ padding-left:var(--s-4); }
+/* A hint: a short faint word at the end (design/30 section 2.4; the Mac's menu has no second
+   line), before the key equivalent, which then keeps to it. */
+.ds-menu-hint{ display:inline-flex; align-items:center; flex:none; margin-left:auto; padding-left:var(--s-12); font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
+.ds-menu-hint + .ds-menu-trailing{ margin-left:0; }
 
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true],
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-hint,
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--accent-ink); }
@@ -1090,6 +1095,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-state,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-image,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-trailing,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-hint,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-ic,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-trailing,
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-ic{ color:var(--ink); }
@@ -1220,6 +1226,15 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The drop line: the accent, in the gap before the tile a drag would take the place of. */
 .ds-pin-tile-drop{ position:absolute; top:var(--s-2); bottom:var(--s-2); left:calc(var(--s-4) * -1); width:var(--s-2); border-radius:var(--r-pill); background:var(--accent); pointer-events:none; }
+/* -- pick_list -- */
+/* PickList (design/30 section 2.4): a search field over a scrolling list of rows inside a
+   popover. The field is the popover's own inset from its edge; the rows are the palette's, at the
+   menu's inset, and the list scrolls past 264 px. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-pick-list{ display:flex; flex-direction:column; gap:var(--s-6); width:280px; padding:var(--s-8); box-sizing:border-box; }
+.ds-pick-list-rows{ overflow-y:auto; scrollbar-width:none; max-height:264px; outline:none; }
+.ds-pick-list-empty{ padding:var(--s-8); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* -- pdf_thumb -- */
 /* PdfThumb (design/04-COMPONENTS.md section 45; sill M9's launcher preview, design/20 section
    2.4's Quick Look). The room is sized inline from `size`; the sheet is placed inline at the
@@ -1459,6 +1474,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row .ds-key-equivalent{ flex:none; }
 .ds-row-action{ display:inline-flex; align-items:center; flex:none; }
 .ds-row-action .ds-button{ width:22px; height:22px; }
+/* A row asking (`RowConfirm`): the question in the words' place, Cancel and the confirming button at the end. */
+.ds-row-confirm{ display:inline-flex; align-items:center; flex:none; gap:var(--s-6); margin-left:auto; }
 
 /* An outline: the triangle's box, kept by a leaf, and the children one step in. */
 .ds-row-disclosure{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:var(--s-12); color:var(--ink-faint); }

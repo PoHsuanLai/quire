@@ -33,13 +33,11 @@ fn flat() -> SpaceLook {
 fn rows(mut log: Signal<Vec<String>>) -> Vec<PaletteGroup<u8>> {
     let entries = (1..=3u8)
         .map(|value| PaletteRow {
-            action: Some(RowAction {
-                icon: Icon::X,
-                label: "Remove from recent".to_string(),
-                on_press: EventHandler::new(move |_| {
-                    log.with_mut(|log| log.push(format!("remove:{value}")))
-                }),
-            }),
+            action: Some(RowAction::new(
+                Icon::X,
+                "Remove from recent",
+                EventHandler::new(move |_| log.with_mut(|log| log.push(format!("remove:{value}")))),
+            )),
             ..PaletteRow::new(value, format!("recent search {value}"))
         })
         .collect();

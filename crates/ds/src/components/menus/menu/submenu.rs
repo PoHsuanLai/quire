@@ -9,6 +9,7 @@ use crate::components::menus::menu::choices::choices;
 use crate::components::menus::menu::cursor::MenuCursor;
 use crate::components::menus::menu::decide::{Decision, Level};
 use crate::components::menus::menu::panel::Panel;
+use crate::components::menus::menu::pick::Picked;
 use crate::components::menus::menu::placement::{Keys, MENU_INSET};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
 use crate::components::overlays::popover::{Stacking, layer_slug, position_style, use_float};
@@ -34,7 +35,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
     depth: u8,
     blink: Blink,
     keys: Keys,
-    onpick: EventHandler<(T, u8)>,
+    onpick: EventHandler<Picked<T>>,
     onback: EventHandler<()>,
     onhover: EventHandler<Point>,
     onplaced: EventHandler<Rect>,

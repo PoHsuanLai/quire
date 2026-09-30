@@ -34,6 +34,7 @@ pub fn MenusPage() -> Element {
     rsx! {
         Menus {}
         Items {}
+        crate::pages::menus::pick::HintsAndPickList {}
         crate::pages::menus::field::FieldAndCard {}
         PopUps {}
     }
@@ -340,7 +341,7 @@ fn PopUps() -> Element {
     rsx! {
         Section {
             title: "PopUpButton",
-            note: "A pop-up shows the chosen item and marks it in its menu; a pull-down keeps a fixed title and marks nothing. Letters typed while the button holds the keyboard choose the next item that starts with them; Down opens the menu.",
+            note: "A pop-up shows the chosen item and marks it in its menu; a pull-down keeps a fixed title and marks nothing; an overflow is a pull-down drawn as the ⋯ alone (Finder's Action button), for a row's or toolbar's extra commands. Letters typed while the button holds the keyboard choose the next item that starts with them; Down opens the menu.",
             div { class: "g-row g-row-top",
                 for size in [ControlSize::Mini, ControlSize::Small, ControlSize::Regular, ControlSize::Large] {
                     Specimen { key: "{size:?}", name: format!("Pop-up, {size:?}"),
@@ -352,6 +353,14 @@ fn PopUps() -> Element {
                         kind: PopUpKind::PullDown,
                         items: options(),
                         title: Some("Actions".to_string()),
+                        onpick: move |value| pulled.set(format!("item {value}")),
+                    }
+                }
+                Specimen { name: "Overflow", code: "PopUpKind::Overflow".to_string(),
+                    PopUpButton::<u8> {
+                        kind: PopUpKind::Overflow,
+                        items: options(),
+                        title: Some("More".to_string()),
                         onpick: move |value| pulled.set(format!("item {value}")),
                     }
                 }

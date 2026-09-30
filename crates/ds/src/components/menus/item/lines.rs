@@ -75,6 +75,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                     title,
                     image,
                     key,
+                    hint,
                     check,
                     availability,
                     ..
@@ -83,6 +84,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                         title,
                         image: image.as_ref(),
                         key: key.as_ref(),
+                        hint: hint.as_deref(),
                         check: *check,
                         highlight: Selection::of(&Some(index), &drawn.selected),
                         availability: *availability,
@@ -102,6 +104,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                         title,
                         image: image.as_ref(),
                         key: None,
+                        hint: None,
                         check: None,
                         highlight: Selection::of(&Some(index), &drawn.selected),
                         availability: *availability,

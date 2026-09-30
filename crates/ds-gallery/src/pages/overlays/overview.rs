@@ -11,7 +11,7 @@ use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::components::overlays::popover::Arrow;
 use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
-use ds::stack::toast_hub::UndoToken;
+use ds::stack::toast_hub::ToastAction;
 use ds::stack::toast_hub::use_toast_hub;
 use ds::style::appearance::peek::PeekMode;
 use ds::style::tokens::control_size::ControlSize;
@@ -60,7 +60,11 @@ pub fn OverlaysPage() -> Element {
     let toasts = use_toast_hub();
     use_hook(move || {
         if showcase == Showcase::Posed {
-            toasts.push("Archived “Invoice #2291”".to_string(), Some(UndoToken(1)));
+            toasts.push_action(
+                "Sent to Travel".to_string(),
+                ToastAction::new("View").with_icon(Icon::ArrowRight),
+                EventHandler::new(|()| {}),
+            );
         }
     });
     let at = match (showcase, anchor()) {
@@ -93,6 +97,7 @@ pub fn OverlaysPage() -> Element {
         }
         Cards {}
         Pills { showcase }
+        crate::pages::overlays::tip_hooks::TipHooks {}
         crate::pages::overlays::launcher::EmbeddedPalette {}
         crate::pages::overlays::launcher_hints::SpotlightHints {}
         crate::pages::overlays::palette_and_menu::RecentPalette {}

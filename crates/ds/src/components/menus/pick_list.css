@@ -1,0 +1,8 @@
+/* PickList (design/30 section 2.4): a search field over a scrolling list of rows inside a
+   popover. The field is the popover's own inset from its edge; the rows are the palette's, at the
+   menu's inset, and the list scrolls past 264 px. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-pick-list{ display:flex; flex-direction:column; gap:var(--s-6); width:280px; padding:var(--s-8); box-sizing:border-box; }
+.ds-pick-list-rows{ overflow-y:auto; scrollbar-width:none; max-height:264px; outline:none; }
+.ds-pick-list-empty{ padding:var(--s-8); font-size:var(--fs-meta); color:var(--ink-faint); }

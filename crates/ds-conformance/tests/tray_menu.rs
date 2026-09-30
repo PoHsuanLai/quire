@@ -202,14 +202,7 @@ fn a_right_click_reports_a_secondary_press() {
 // ---- Submenus and disabled items ---------------------------------------------------------
 
 fn item(value: u8, title: &str, availability: Availability) -> MenuItem<u8> {
-    MenuItem::Item {
-        value,
-        title: title.to_string(),
-        image: None,
-        key: None,
-        check: None,
-        availability,
-    }
+    MenuItem::new(value, title).with_availability(availability)
 }
 
 fn entries() -> Vec<MenuItem<u8>> {
