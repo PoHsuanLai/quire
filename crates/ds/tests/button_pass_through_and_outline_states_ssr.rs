@@ -1,15 +1,16 @@
-//! The mail-app states (controls and tiles) and 3 (the muted avatar): each new prop or variant
-//! rendered through
-//! dioxus-ssr and compared with a golden under its component's directory, so the controls' and
-//! lists' class scans cover them too. Every state here is additive; the goldens of the states
-//! that existed before are in `components_controls.rs` and `components_lists.rs`.
+//! The mail-app states: each new prop, variant or component rendered through dioxus-ssr and
+//! compared with a golden under its component's directory, so the controls' and lists' class
+//! scans cover them too. The props are additive; SidebarItem's class list gained `ds-drop-place`
+//! (the drop styling it now shares with TreeItem), which the existing sidebar goldens show.
 //!
-//! `DS_BLESS=1 cargo test -p ds --test mailo_gaps_ssr` rewrites these goldens.
+//! `DS_BLESS=1 cargo test -p ds --test button_pass_through_and_outline_states_ssr` rewrites these goldens.
 
-#[path = "mailo_gaps/cases.rs"]
+#[path = "button_pass_through_and_outline_states/cases.rs"]
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;
@@ -38,7 +39,7 @@ fn render(make: fn() -> Element) -> String {
 }
 
 #[test]
-fn every_mailo_gap_state_matches_its_golden() {
+fn every_button_pass_through_and_outline_state_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|case| golden::check(case.golden, &render(case.make)).err())

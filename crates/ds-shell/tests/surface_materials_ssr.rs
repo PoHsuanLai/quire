@@ -1,9 +1,9 @@
-//! The macOS polish pass as markup (FINDINGS "Materials, blur and colour"): a plate, a squircle surface and
+//! The materials as markup (FINDINGS "Materials, blur and colour"): a plate, a squircle surface and
 //! root, the bar item, the workspace pills, the dock's dot and floor, the palette's squircle
-//! card. Each golden is `tests/snapshots/polish/<name>.html`, and every `ds-` class in it must
+//! card. Each golden is `tests/snapshots/materials/<name>.html`, and every `ds-` class in it must
 //! be styled by the stylesheet.
 //!
-//! `DS_BLESS=1 cargo test -p ds-shell --test polish_ssr` rewrites the goldens.
+//! `DS_BLESS=1 cargo test -p ds-shell --test surface_materials_ssr` rewrites the goldens.
 
 #[path = "../../ds/tests/support/golden.rs"]
 mod golden;
@@ -180,11 +180,11 @@ const CASES: &[Case] = &[
 ];
 
 #[test]
-fn every_polish_specimen_matches_its_golden() {
+fn every_material_specimen_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|(name, make)| {
-            golden::check(&format!("polish/{name}.html"), &render(*make)).err()
+            golden::check(&format!("materials/{name}.html"), &render(*make)).err()
         })
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));

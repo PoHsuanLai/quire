@@ -16,7 +16,7 @@ const INTENT: Duration = Duration::from_millis(570);
 
 const NOW: Duration = Duration::ZERO;
 
-pub const MAILO4_CASES: &[Case] = &[
+pub const HOVER_CARD_HOOK_CASES: &[Case] = &[
     Case {
         component: "menu",
         state: "inline",

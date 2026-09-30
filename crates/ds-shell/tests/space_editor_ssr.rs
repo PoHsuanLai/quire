@@ -13,10 +13,10 @@ mod css_scan;
 mod field_plane;
 #[path = "../../ds/tests/support/golden.rs"]
 mod golden;
-#[path = "lists/mailo_space.rs"]
-mod mailo_space;
 #[path = "lists/png.rs"]
 mod png;
+#[path = "lists/space_editor_rows.rs"]
+mod space_editor_rows;
 
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
@@ -144,7 +144,7 @@ fn every_space_editor_state_matches_its_golden() {
             golden::check(&name, &scrub(&render(case.make))).err()
         })
         .chain(
-            mailo_space::CASES
+            space_editor_rows::CASES
                 .iter()
                 .filter_map(|case| golden::check(case.golden, &render(case.make)).err()),
         )
@@ -180,7 +180,7 @@ const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 fn every_class_in_a_golden_is_styled_by_the_editors_sheets() {
     let goldens = golden::all_in("lists/space_editor");
     assert!(
-        goldens.len() >= CASES.len() + mailo_space::CASES.len(),
+        goldens.len() >= CASES.len() + space_editor_rows::CASES.len(),
         "only {} goldens",
         goldens.len()
     );

@@ -23,7 +23,7 @@ fn spoof(tone: FlagTone) -> HoverCardPart {
     )
 }
 
-pub const MAILO5_CASES: &[Case] = &[
+pub const HOVER_CARD_FLAG_CASES: &[Case] = &[
     Case {
         component: "hover_card",
         state: "part-flag-runs-danger",

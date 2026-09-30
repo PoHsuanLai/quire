@@ -63,7 +63,7 @@ fn groups() -> Vec<PaletteGroup<u8>> {
     vec![PaletteGroup::list("Recent", recent_rows())]
 }
 
-pub const MAILO_CASES: &[Case] = &[
+pub const PALETTE_AND_HOVER_CASES: &[Case] = &[
     Case {
         component: "command_palette",
         state: "runs-and-trailing",
