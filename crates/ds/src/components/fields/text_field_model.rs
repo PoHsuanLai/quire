@@ -21,6 +21,26 @@ pub enum FieldKind {
     /// A search field: a magnifier before the text and a clear button after it while there is
     /// text, with the operators that narrow the search as tokens under it.
     Search,
+    /// Several lines: Enter adds a line, the caret leaving commits, and the field is as tall as
+    /// its [`FieldRows`]. It has no mask, no clear button and no search tokens.
+    Multiline,
+}
+
+/// How many lines a [`FieldKind::Multiline`] field shows before its text scrolls, `data-rows`.
+/// A closed set, so each height is a stylesheet rule and no number reaches the markup.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum FieldRows {
+    /// Two lines.
+    Two,
+    /// Three lines.
+    #[default]
+    Three,
+    /// Four lines.
+    Four,
+    /// Six lines.
+    Six,
+    /// Ten lines.
+    Ten,
 }
 
 /// How the field's edge is drawn (`NSTextField.isBezeled`), `data-variant`.
@@ -108,7 +128,7 @@ impl FieldKind {
     pub(crate) fn input_type(self) -> &'static str {
         match self {
             FieldKind::Secure => "password",
-            FieldKind::Plain | FieldKind::Search => "text",
+            FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => "text",
         }
     }
 
@@ -116,7 +136,7 @@ impl FieldKind {
     pub(crate) fn data_kind(self) -> Option<&'static str> {
         match self {
             FieldKind::Plain => None,
-            FieldKind::Secure | FieldKind::Search => Some(self.slug()),
+            FieldKind::Secure | FieldKind::Search | FieldKind::Multiline => Some(self.slug()),
         }
     }
 
@@ -126,7 +146,7 @@ impl FieldKind {
             FieldKind::Secure if !value.is_empty() => {
                 Some(value.chars().map(|_| MASK_DOT).collect())
             }
-            FieldKind::Secure | FieldKind::Plain | FieldKind::Search => None,
+            FieldKind::Secure | FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => None,
         }
     }
 }

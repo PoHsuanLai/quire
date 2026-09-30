@@ -8,6 +8,7 @@ use ds::components::app::peek::Peek;
 use ds::components::app::send_pill::SendPill;
 use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
 use ds::components::content::label::LabelRole;
+use ds::components::content::text_runs::{RunTone, TextRun};
 use ds::components::content::label::LabelStyle;
 use ds::components::controls::button_model::Bezel;
 use ds::components::controls::button_model::ImagePosition;
@@ -763,7 +764,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "empty_state",
         state: "empty-action",
-        make: || rsx! { EmptyState { title: "No messages", description: Some("Mail you receive lands here.".to_string()), action: Some(rsx! { Button { answers: Answers::Return, label: "Compose", onclick: |_| {} } }) } },
+        make: || rsx! { EmptyState { title: "No messages", description: "Mail you receive lands here.", action: Some(rsx! { Button { answers: Answers::Return, label: "Compose", onclick: |_| {} } }) } },
         wait: NOW,
     },
     Case {
@@ -775,7 +776,13 @@ pub const CASES: &[Case] = &[
     Case {
         component: "empty_state",
         state: "failure-retry",
-        make: || rsx! { EmptyState { form: EmptyForm::Failure, title: "Couldn’t load your mail", description: Some("The server didn’t answer.".to_string()), onretry: |_| {} } },
+        make: || rsx! { EmptyState { form: EmptyForm::Failure, title: "Couldn’t load your mail", description: "The server didn’t answer.", onretry: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "empty_state",
+        state: "description-with-code",
+        make: || rsx! { EmptyState { title: "No accounts", description: TextLine::Runs(vec![TextRun::new("Run ", RunTone::Plain), TextRun::new("mailo add-account", RunTone::Code), TextRun::new(" to connect one.", RunTone::Plain)]) } },
         wait: NOW,
     },
     Case {

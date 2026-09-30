@@ -31,6 +31,9 @@ pub enum RunTone {
     Italic,
     /// Underlined: `data-tone="underline"` (a body's `<u>`).
     Underline,
+    /// Fixed pitch: `code.ds-run[data-tone="code"]`, a command or an address the person copies
+    /// (an empty state's "run `x`").
+    Code,
 }
 
 impl RunTone {
@@ -152,6 +155,9 @@ pub(crate) fn run(run: &TextRun) -> Element {
         (RunTone::Plain, _) => return rsx! { "{run.text}" },
         (RunTone::Mark, _) => rsx! {
             mark { class: "ds-mark", "{core}" }
+        },
+        (RunTone::Code, tone) => rsx! {
+            code { class: "ds-run", "data-tone": tone, "{core}" }
         },
         (RunTone::Strong | RunTone::Faint | RunTone::Italic | RunTone::Underline, tone) => rsx! {
             span { class: "ds-run", "data-tone": tone, "{core}" }

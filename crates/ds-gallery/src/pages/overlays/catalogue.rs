@@ -9,6 +9,7 @@ use crate::pages::{Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
+use ds::components::content::text_runs::RunTone;
 use ds::components::controls::button_model::Answers;
 use ds::components::overlays::empty_state::EmptyForm;
 use ds::components::overlays::popover::Arrow;
@@ -85,7 +86,7 @@ pub fn OverlaysCataloguePage() -> Element {
                     div { class: "g-stage g-stage-tall",
                         EmptyState {
                             title: "No messages",
-                            description: Some("Mail you receive lands here.".to_string()),
+                            description: "Mail you receive lands here.",
                             action: Some(rsx! { Button { answers: Answers::Return, label: "Compose", onclick: |_| {} } }),
                         }
                     }
@@ -95,7 +96,19 @@ pub fn OverlaysCataloguePage() -> Element {
                         EmptyState {
                             form: EmptyForm::NoResults,
                             title: "No results for “uidl”",
-                            description: Some("Check the spelling or try another search.".to_string()),
+                            description: "Check the spelling or try another search.",
+                        }
+                    }
+                }
+                Specimen { name: "description with a code run".to_string(),
+                    div { class: "g-stage g-stage-tall",
+                        EmptyState {
+                            title: "No accounts",
+                            description: TextLine::Runs(vec![
+                                TextRun::new("Run ", RunTone::Plain),
+                                TextRun::new("mailo add-account", RunTone::Code),
+                                TextRun::new(" to connect one.", RunTone::Plain),
+                            ]),
                         }
                     }
                 }
@@ -105,7 +118,7 @@ pub fn OverlaysCataloguePage() -> Element {
                             form: EmptyForm::Failure,
                             icon: Some(Icon::OctagonAlert),
                             title: "Couldn’t load your mail",
-                            description: Some("The server didn’t answer.".to_string()),
+                            description: "The server didn’t answer.",
                             onretry: |_| {},
                         }
                     }

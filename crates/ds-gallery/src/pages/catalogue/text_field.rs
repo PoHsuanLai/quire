@@ -3,7 +3,7 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::components::fields::text_field_model::Invalid;
+use ds::components::fields::text_field_model::{FieldRows, Invalid};
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
@@ -13,6 +13,7 @@ use ds::style::tokens::control_size::ControlSize;
 pub fn TextFieldSection() -> Element {
     let mut name = use_signal(|| "Dana Okafor".to_owned());
     let mut query = use_signal(|| "invoice".to_owned());
+    let mut note = use_signal(|| "Thanks for the quick reply.\nI will send the files on Monday.".to_owned());
     let mut secret = use_signal(String::new);
     let rejected = Validity::Invalid(Invalid {
         message: TextLine::from("That address is not valid."),
@@ -81,6 +82,16 @@ pub fn TextFieldSection() -> Element {
                 Specimen { name: "plain".to_owned(),
                     div { style: "width:190px; font-size:16px; font-weight:600",
                         TextField { label: "Title", value: "Renamed in place", bezel: FieldBezel::Plain, oninput: |_| {} }
+                    }
+                }
+                Specimen { name: "multiline, three rows".to_owned(),
+                    div { style: "width:250px",
+                        TextField { label: "Note", value: note(), kind: FieldKind::Multiline, placeholder: "Add a note", oninput: move |next| note.set(next) }
+                    }
+                }
+                Specimen { name: "multiline, empty, six rows".to_owned(),
+                    div { style: "width:250px",
+                        TextField { label: "Note", value: "", kind: FieldKind::Multiline, rows: FieldRows::Six, placeholder: "Add a note", oninput: |_| {} }
                     }
                 }
                 Specimen { name: "disabled".to_owned(),

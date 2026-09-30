@@ -13,11 +13,14 @@ mod cases_catalogue;
 mod css_scan;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::prelude::*;
+use scoped::Scoped;
 use ds_style::icon::render::Glyph;
 use ds_style::icon::shape::Shape;
 
@@ -33,9 +36,11 @@ impl PartialEq for HostProps {
     }
 }
 
-/// Renders a case inside a scope, so its handlers have a runtime to attach to.
+/// Renders a case inside a scope, so its handlers have a runtime to attach to and a component
+/// that reads the scope (a text field) draws instead of panicking.
 fn host(props: HostProps) -> Element {
-    (props.make)()
+    let case = (props.make)();
+    rsx! { Scoped { {case} } }
 }
 
 fn render(make: fn() -> Element) -> String {
