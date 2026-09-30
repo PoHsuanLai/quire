@@ -11,6 +11,7 @@
 //! the pointer, `--surface-2` while pressed or while its menu is open, with no transition (a bar
 //! menu switches in the same frame). A glyph item is as wide as the bar's status slot.
 
+use crate::bar::pointer::BarPointer;
 use dioxus::prelude::*;
 use ds::Common;
 use ds::components::content::icon_source::IconSource;
@@ -26,9 +27,9 @@ use ds_style::icon::render::IconSize;
 /// One bar item. `label` is the title, and the item's accessible name when it is drawn as a glyph
 /// only; `icon` puts a glyph before it (an `Icon`, or a layered status glyph), and
 /// `ImagePosition::Only` draws the glyph alone. `shown` says whether the item's menu is up
-/// (`aria-expanded`). `value` makes it a toggle. `onclick` hears the press (a bar menu's own
-/// presses arrive through its title slot, so a menu item passes a handler that does nothing).
-/// `title` is the hover hint.
+/// (`aria-expanded`). `value` makes it a toggle. `onclick` hears the press; `pointer` hears the
+/// raw pointer events, which a bar menu's session reads (it opens on the press, so it passes an
+/// `onclick` that does nothing). `title` is the hover hint.
 #[component]
 pub fn MenuBarItem(
     #[props(into)] label: TextLine,
@@ -40,6 +41,7 @@ pub fn MenuBarItem(
     #[props(default)] availability: Availability,
     #[props(default)] title: Option<String>,
     onclick: EventHandler<Press>,
+    #[props(default)] pointer: BarPointer,
     #[props(default)] common: Common,
 ) -> Element {
     let class = common.class("ds-menu-bar-item");
@@ -69,6 +71,15 @@ pub fn MenuBarItem(
             "aria-busy": availability.aria_busy(),
             disabled: disabled(availability),
             "data-pressed": if live { pressing.attr() } else { None },
+            onpointerdown: {
+                let pointer = pointer.clone();
+                move |event| pointer.pressed(event)
+            },
+            onpointerup: {
+                let pointer = pointer.clone();
+                move |event| pointer.released(event)
+            },
+            onpointerenter: move |event| pointer.entered(event),
             onmousedown: move |event| pressing.pointer_down(&event),
             onmouseleave: move |_| pressing.released(),
             onkeydown: move |event| {
