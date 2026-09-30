@@ -72,3 +72,27 @@ fn the_doc_page_is_the_table() {
         "docs/selectors.md is stale (DS_BLESS=1 rewrites it)"
     );
 }
+
+#[test]
+fn the_report_accepts_every_listed_selector_and_notes_one_that_is_not() {
+    let kits = ds::kits();
+    let listed: Vec<String> = COMPONENTS
+        .iter()
+        .flat_map(|c| std::iter::once(c.root_selector()).chain(c.part_selectors()))
+        .chain(
+            AXES.iter()
+                .filter(|a| !a.attribute.ends_with('*'))
+                .map(|a| format!("[*|{}]", a.attribute)),
+        )
+        .chain([
+            "[*|data-surface=bar]".to_owned(),
+            "[*|aria-label]".to_owned(),
+        ])
+        .collect();
+    for selector in listed {
+        let notes = ds_lint::user_stylesheet(&format!("{selector} {{ color: red }}"), &kits);
+        assert_eq!(notes, vec![], "{selector} is listed and must be accepted");
+    }
+    let notes = ds_lint::user_stylesheet(".ds-not-listed { color: red }", &kits);
+    assert_eq!(notes.len(), 1, "{notes:?}");
+}

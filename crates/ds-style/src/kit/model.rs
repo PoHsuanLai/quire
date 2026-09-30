@@ -57,6 +57,12 @@ pub struct Vocabulary {
     pub grammar_durations: &'static [DurationToken],
     /// The easings the details grammar plays a moment along.
     pub grammar_easings: &'static [EasingToken],
+    /// The class names a user stylesheet may select on (`ds-chip`, `ds-chip-remove`), without the
+    /// dot: the kit's public selector surface.
+    pub public_classes: fn() -> Vec<String>,
+    /// The attributes a user stylesheet may select on (`data-surface`); one ending in `*`
+    /// (`aria-*`) is a whole family.
+    pub public_attributes: fn() -> Vec<String>,
 }
 
 impl Vocabulary {
@@ -66,6 +72,8 @@ impl Vocabulary {
         inline_vars: Vec::new,
         grammar_durations: &[],
         grammar_easings: &[],
+        public_classes: Vec::new,
+        public_attributes: Vec::new,
     };
 }
 

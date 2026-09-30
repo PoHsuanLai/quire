@@ -167,6 +167,28 @@ pub const AXES: &[Axis] = &[
     },
 ];
 
+/// Every class a user stylesheet may select on, without the dot: `ds` (the root, where token
+/// overrides go), each component's root and each public part. The linter's copy of the table.
+pub fn classes() -> Vec<String> {
+    std::iter::once("ds".to_string())
+        .chain(COMPONENTS.iter().flat_map(|component| {
+            std::iter::once(component.root.to_string()).chain(
+                component
+                    .part_selectors()
+                    .into_iter()
+                    .map(|part| part[1..].to_string()),
+            )
+        }))
+        .collect()
+}
+
+/// Every attribute a user stylesheet may select on: the surface attribute and each axis.
+pub fn attributes() -> Vec<String> {
+    std::iter::once(SURFACE_ATTRIBUTE.to_string())
+        .chain(AXES.iter().map(|axis| axis.attribute.to_string()))
+        .collect()
+}
+
 /// The page `docs/selectors.md` holds: the table, as markdown.
 pub fn markdown() -> String {
     let mut page = String::from(

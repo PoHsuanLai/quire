@@ -23,6 +23,10 @@ pub struct KnownNames {
     pub grammar_durations: Vec<DurationToken>,
     /// The easings the details grammar plays a moment along.
     pub grammar_easings: Vec<EasingToken>,
+    /// Every class name a user stylesheet may select on, without the dot.
+    pub public_classes: HashSet<String>,
+    /// Every attribute a user stylesheet may select on; one ending in `*` is a family.
+    pub public_attributes: HashSet<String>,
 }
 
 impl Kits {
@@ -98,6 +102,16 @@ impl Kits {
                 .kits
                 .iter()
                 .flat_map(|kit| kit.vocabulary.grammar_easings.iter().copied())
+                .collect(),
+            public_classes: self
+                .kits
+                .iter()
+                .flat_map(|kit| (kit.vocabulary.public_classes)())
+                .collect(),
+            public_attributes: self
+                .kits
+                .iter()
+                .flat_map(|kit| (kit.vocabulary.public_attributes)())
                 .collect(),
         }
     }
