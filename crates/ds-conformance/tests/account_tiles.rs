@@ -8,7 +8,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::components::app::pin_tile::PinFace;
 use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::image_source::ImageSource;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
@@ -36,6 +37,7 @@ fn account(key: char, provider: MarkProvider) -> PinItem<char> {
             address: None,
         },
         unread: 0,
+        mark: MarkStyle::Letter,
     }
 }
 
@@ -51,7 +53,18 @@ fn Tiles() -> Element {
     };
     let items: Vec<PinItem<char>> = order()
         .into_iter()
-        .map(|key| account(key, MarkProvider::Fastmail))
+        .map(|key| {
+            let item = account(key, MarkProvider::Fastmail);
+            match key {
+                'W' => PinItem {
+                    mark: MarkStyle::Image(ImageSource(
+                        "data:image/png;base64,iVBORw0KGgo=".to_string(),
+                    )),
+                    ..item
+                },
+                _ => item,
+            }
+        })
         .collect();
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, look,
@@ -74,6 +87,32 @@ fn Tiles() -> Element {
             p { class: "log", {log().join(",")} }
         }
     }
+}
+
+/// A tile draws the mark its own item names: the one account with a favicon shows an image, the
+/// other two their letter.
+#[test]
+fn each_tile_draws_the_mark_its_item_names() {
+    let mut harness = Harness::new(Tiles, VIEW);
+    harness.advance(ms(50));
+    assert_eq!(
+        harness.count(".ds-pin-tile .ds-provider[*|data-kind=image]"),
+        1
+    );
+    assert_eq!(
+        harness.count(".ds-pin-tile .ds-provider[*|data-kind=letter]"),
+        2
+    );
+    let image = harness
+        .centre(".ds-provider[*|data-kind=image]")
+        .expect("the favicon");
+    let second = harness
+        .centre(".ds-pin-tile:nth-child(2)")
+        .expect("the second tile");
+    assert!(
+        (image.x.0 - second.x.0).abs() < 20.0,
+        "the favicon is on the second tile"
+    );
 }
 
 #[test]

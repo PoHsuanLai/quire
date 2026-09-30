@@ -11,10 +11,11 @@ use ds::components::app::pin_tile::{PinFace, PinTile};
 use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
 use ds::components::app::space_switch::{space_pressed, space_shortcut};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::menus::palette::palette_group::{GroupOrder, PaletteGroup, PaletteRow};
 use ds::prelude::*;
+use ds::root::common::Common;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds::style::tokens::shape::{Corner, Radius};
@@ -67,6 +68,10 @@ fn PinnedTiles() -> Element {
                 'W' => 120,
                 _ => 0,
             },
+            mark: match key {
+                'P' => MarkStyle::Image(crate::pages::controls::overview::favicon()),
+                _ => MarkStyle::Letter,
+            },
         })
         .collect();
     rsx! {
@@ -112,6 +117,9 @@ fn Today() -> Element {
             title: title.to_string(),
             leading: RowLeading::Icon(Icon::Globe),
             expires: start + Duration::from_secs(secs),
+            common: Common::default(),
+            onpointerenter: None,
+            onpointerleave: None,
         })
         .collect::<Vec<_>>()
     });

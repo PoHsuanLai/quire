@@ -4,6 +4,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::controls::disclosure::Disclosure;
+use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 
@@ -18,9 +19,12 @@ pub fn HeaderGallery() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "Title", div { class: "g-list", style: "width:240px", SectionHeader { title: "Recent" } } }
                 Specimen { name: "Value", div { class: "g-list", style: "width:240px", SectionHeader { title: "Grain", value: "12".to_string() } } }
-                Specimen { name: "Action", div { class: "g-list", style: "width:240px", SectionHeader { title: "Files", action: Some(("Show More".to_string(), EventHandler::new(|()| {}))) } } }
+                Specimen { name: "Action", div { class: "g-list", style: "width:240px", SectionHeader { title: "Files", actions: vec![HeaderAction::new("Show More", EventHandler::new(|()| {}))] } } }
                 Specimen { name: "Action selected", div { class: "g-list", style: "width:240px",
-                    SectionHeader { title: "Files", action: Some(("Show More".to_string(), EventHandler::new(|()| {}))), action_selection: Selection::Selected }
+                    SectionHeader { title: "Files", actions: vec![HeaderAction { selection: Selection::Selected, ..HeaderAction::new("Show More", EventHandler::new(|()| {})) }] }
+                } }
+                Specimen { name: "Two actions", div { class: "g-list", style: "width:240px",
+                    SectionHeader { title: "Labels", actions: vec![HeaderAction::new("Select All", EventHandler::new(|()| {})), HeaderAction::new("Clear", EventHandler::new(|()| {}))] }
                 } }
                 Specimen { name: "Collapsible", div { class: "g-list", style: "width:240px",
                     SectionHeader { title: "Favourites", collapse: Some((source(), EventHandler::new(move |to| source.set(to)))) }

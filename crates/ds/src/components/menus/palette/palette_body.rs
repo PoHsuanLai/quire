@@ -5,7 +5,7 @@
 use crate::components::lists::emoji_grid::grid::{CellEvents, draw_cells, grid_style};
 use crate::components::lists::row::row::{Row, RowMounted};
 use crate::components::lists::row::size::RowSize;
-use crate::components::lists::section_header::SectionHeader;
+use crate::components::lists::section_header::{HeaderAction, SectionHeader};
 use crate::components::menus::palette::palette_motion::ListMotion;
 use crate::components::menus::palette::palette_stops::{Body, ShownGroup};
 use dioxus::prelude::*;
@@ -143,20 +143,19 @@ fn draw_group<T>(
         rsx! {
         SectionHeader {
             title: shown.group.title.clone(),
-            action: shown.group.action.clone().map(|(label, run)| {
+            actions: shown.group.action.clone().into_iter().map(|(label, run)| {
                 let booked = EventHandler::new(move |()| {
                     events.action_ran.call(());
                     run.call(());
                 });
-                (label, booked)
-            }),
-            action_selection: match shown.group.action {
-                Some(_) => action_selection,
-                None => Selection::Unselected,
-            },
-            on_action_mounted: EventHandler::new(move |event: MountedEvent| {
-                events.action_mounted.call((first + size, event))
-            }),
+                HeaderAction {
+                    selection: action_selection,
+                    onmounted: Some(EventHandler::new(move |event: MountedEvent| {
+                        events.action_mounted.call((first + size, event))
+                    })),
+                    ..HeaderAction::new(label, booked)
+                }
+            }).collect::<Vec<_>>(),
         }
         }
     });

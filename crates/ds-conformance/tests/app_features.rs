@@ -9,6 +9,7 @@ use ds::components::app::edge_peek::EdgePeek;
 use ds::components::app::link_pill::{LinkPill, LinkTarget};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
 use ds::prelude::*;
+use ds::root::common::Common;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -87,11 +88,22 @@ fn a_click_on_the_strip_pins_the_sidebar() {
 #[allow(non_snake_case)]
 fn Today() -> Element {
     let start = now();
-    let tab = |key: u8, title: &str, secs: u64| TodayTab {
+    let mut hovered = use_signal(Vec::<String>::new);
+    let tab = move |key: u8, title: &str, secs: u64| TodayTab {
         key,
         title: title.to_string(),
         leading: RowLeading::None,
         expires: start + Duration::from_secs(secs),
+        common: Common {
+            id: Some(format!("tab-{key}")),
+            ..Common::default()
+        },
+        onpointerenter: Some(EventHandler::new(move |_: PointerEvent| {
+            hovered.with_mut(|log| log.push(format!("enter:{key}")))
+        })),
+        onpointerleave: Some(EventHandler::new(move |_: PointerEvent| {
+            hovered.with_mut(|log| log.push(format!("leave:{key}")))
+        })),
     };
     let mut tabs = use_signal(move || vec![tab(1, "Keeps", 3 * 3600), tab(2, "Goes", 3)]);
     rsx! {
@@ -103,8 +115,31 @@ fn Today() -> Element {
                 onclose: move |key| tabs.with_mut(|tabs| tabs.retain(|tab| tab.key != key)),
                 onexpire: move |key| tabs.with_mut(|tabs| tabs.retain(|tab| tab.key != key)),
             }
+            p { class: "hovered", {hovered().join(",")} }
         }
     }
+}
+
+/// Each tab's own `common` reaches its row, and the pointer hooks the caller gave it hear the
+/// pointer come and go for that tab alone.
+#[test]
+fn a_today_tab_carries_its_own_id_and_pointer_hooks() {
+    let mut harness = Harness::new(Today, VIEW);
+    harness.advance(ms(400));
+    assert_eq!(harness.count("#tab-1.ds-row"), 1, "{}", harness.html());
+    assert_eq!(harness.count("#tab-2.ds-row"), 1);
+    assert_eq!(harness.text_of(".hovered").as_deref(), Some(""));
+    let keeps = harness.centre("#tab-1").expect("the first tab");
+    harness.send(Input::pointer_move(keeps));
+    harness.advance(ms(50));
+    assert_eq!(harness.text_of(".hovered").as_deref(), Some("enter:1"));
+    let goes = harness.centre("#tab-2").expect("the second tab");
+    harness.send(Input::pointer_move(goes));
+    harness.advance(ms(50));
+    assert_eq!(
+        harness.text_of(".hovered").as_deref(),
+        Some("enter:1,leave:1,enter:2")
+    );
 }
 
 #[test]

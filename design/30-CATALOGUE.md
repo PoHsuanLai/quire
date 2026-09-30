@@ -282,8 +282,8 @@ hover appearance. Every entry inherits `Common` (R8).
 | Name | AppKit | Contract | Sizes | States | Public parts | Absorbs | St | Pri |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | List | `NSTableView` / `NSOutlineView` (view-based) | `Style {Plain, Inset, SourceList}`; single/multi selection; `Highlight` emphasized when focused in the active window, grey otherwise; Roving + Typeahead; outline through `Disclosure`; insert/remove by `Roster`; drop indicator line | rows 24 / 44; SourceList `SidebarSize` | selection, focus, drop | row, header, separator, drop-line | `AnimatedList`, `LeavingList`, `RowList`, `SettingsGroup`, tree containers | MERGE | P1 |
-| Row | `NSTableCellView` | leading image, title, detail, trailing accessory `Accessory {None, Check, Toggle, Chevron, Text, Glyph, Battery, Spinner, Badge}`; `RowState`; Busy shows the small spinner accessory then a check on completion; mail row, sidebar row, tree row, settings row, palette result and module tile are `Row` with content, not types; `RowAction` is the trailing button that acts without picking the row, with the consumer's `Common` (its `mounted` handle anchors a menu); a row's extra commands as one menu are a `PopUpButton` of `PopUpKind::Overflow` in its `Accessory::Slot`; `RowConfirm` makes the row ask a question in its own line (Cancel takes the keyboard, Escape answers it, only the confirming button confirms; a quire addition, R5: the Mac asks in an `Alert`) | Z- | `RowState` | leading, title, detail, trailing | `SettingsRow`, `SidebarItem`, `TreeItem`, `ListRow` layout, palette rows, `RowTrailing`, `RowDisc`, `RowBattery` | MERGE | P1 |
-| SectionHeader | table group row / source-list header | one look; collapsible in a SourceList | Z- | collapsed | title, trailing | `HeaderKind` Frame/Group/Field/Menu | KEEP | P1 |
+| Row | `NSTableCellView` | leading image, title, detail, trailing accessory `Accessory {None, Check, Toggle, Chevron, Text, Glyph, Battery, Spinner, Badge}`; `RowState`; `edit` holds a field where the words stood (rename in place: the keys and presses typed in it stay the field's, the row takes no press while `data-editing`); Busy shows the small spinner accessory then a check on completion; mail row, sidebar row, tree row, settings row, palette result and module tile are `Row` with content, not types; `RowAction` is the trailing button that acts without picking the row, with the consumer's `Common` (its `mounted` handle anchors a menu); a row's extra commands as one menu are a `PopUpButton` of `PopUpKind::Overflow` in its `Accessory::Slot`; `RowConfirm` makes the row ask a question in its own line (Cancel takes the keyboard, Escape answers it, only the confirming button confirms; a quire addition, R5: the Mac asks in an `Alert`) | Z- | `RowState` | leading, title, detail, trailing | `SettingsRow`, `SidebarItem`, `TreeItem`, `ListRow` layout, palette rows, `RowTrailing`, `RowDisc`, `RowBattery` | MERGE | P1 |
+| SectionHeader | table group row / source-list header | one look; collapsible in a SourceList; any number of `HeaderAction`s at the end (label, press, optional keyboard selection and mount hook) | Z- | collapsed | title, trailing | `HeaderKind` Frame/Group/Field/Menu | KEEP | P1 |
 | Table | `NSTableView` multi-column | columns, sort indicator, resize, alternating rows off | rows 24 | selection, sorted | header, column, cell | none | ADD | P2 |
 
 ### 2.7 Navigation and chrome
@@ -359,8 +359,8 @@ configurations plus the pieces below; their motion uses 1.3 only.
 
 | Feature | Contract | Built from | Where | St | Pri |
 | --- | --- | --- | --- | --- | --- |
-| Pinned tiles | a grid of square tiles above the sidebar list; drag to reorder; add tile | `PinTile` (from `AccountTile`, `AddAccountTile`) with `Badge`, `List` drop line | apps | MERGE | P1 |
-| Today tabs | temporary tabs under the pinned tiles that expire; enter and leave by `Roster` | `Row{Today}` in a SourceList | apps | MERGE | P1 |
+| Pinned tiles | a grid of square tiles above the sidebar list; drag to reorder; add tile; each `PinItem` names its own provider mark (`MarkStyle`: the letter or that account's favicon) | `PinTile` (from `AccountTile`, `AddAccountTile`) with `Badge`, `List` drop line | apps | MERGE | P1 |
+| Today tabs | temporary tabs under the pinned tiles that expire; enter and leave by `Roster`; each `TodayTab` carries its row's `Common` (id, data, mounted) and `onpointerenter`/`onpointerleave` for a hover card | `Row{Today}` in a SourceList | apps | MERGE | P1 |
 | Edge-peek sidebar | a hidden sidebar reveals on pointer at the window edge (`HoverIntent`, Slide(Left) by spring), pins on click | `EdgePeek` (from `EdgeStrip` and the sidebar's peek; `Peek`, mail's reader panel, and `HoverStrip`, the thread row's action strip, stay) | apps | MERGE | P1 |
 | Link pill | rounded pill showing the current link; hover-intent expands, click copies | `LinkPill` | apps | KEEP | P2 |
 | Grouped launcher commands | palette results grouped by kind with `SectionHeader`; group order per Space | `CommandPalette`, `List` | shell, apps | KEEP | P1 |
@@ -370,7 +370,7 @@ Mail-only (`ds::app`; mailo keeps its own look for now):
 
 | Name | AppKit | Contract | Absorbs | St | Pri |
 | --- | --- | --- | --- | --- | --- |
-| ThreadRow content | `NSTableCellView` | mail content inside `Row` (name, subject, snippet, time, tags, star, hover strip) | `ListRow` component | MERGE | mail |
+| ThreadRow content | `NSTableCellView` | mail content inside `Row` (name, subject, snippet, time, tags, star, hover strip); its `Common` (id, data, class, mounted) is the row element's, `.ds-row`, with every part a descendant | `ListRow` component | MERGE | mail |
 | SendPill | none | send countdown with `ProgressIndicator{Ring}` | ring, `SendPhase` | KEEP | mail |
 | CommandPill | none | compose command pill | none | KEEP | mail |
 | ProviderMark | none | provider glyph tile on the ladder | `MarkSize` | KEEP | mail |

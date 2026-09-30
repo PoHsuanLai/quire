@@ -39,6 +39,14 @@ pub struct TodayTab<K> {
     pub leading: RowLeading,
     /// When it expires, on the design system's clock.
     pub expires: Instant,
+    /// The tab's row's own `id`, `data-*`, classes and mount hook: a caller measures the row to
+    /// anchor a card to it, or finds it to test.
+    pub common: Common,
+    /// The pointer came over the tab's row, as the event, for a hover card keyed on the caller's
+    /// own hooks (`use_hover_intent`).
+    pub onpointerenter: Option<EventHandler<PointerEvent>>,
+    /// The pointer left the tab's row.
+    pub onpointerleave: Option<EventHandler<PointerEvent>>,
 }
 
 /// What a tab has left, in words: whole hours from an hour on, else minutes rounded up (at least
@@ -83,7 +91,7 @@ fn live<K: Clone>(tabs: &[TodayTab<K>], now: Instant) -> Vec<(TodayTab<K>, Durat
         .collect()
 }
 
-/// The Today tabs of a sidebar. `selected` is the open one; `onpick` hears a press on a tab,
+/// The Today tabs of a sidebar. Each tab's `common` and pointer hooks go to its row. `selected` is the open one; `onpick` hears a press on a tab,
 /// `onclose` its close button, and `onexpire` a tab whose time ran out (it stops being listed by
 /// itself, and leaves as a closed one does; the caller drops it from its own list).
 #[component]
@@ -135,6 +143,9 @@ pub fn TodayTabs<K: Clone + PartialEq + std::hash::Hash + 'static>(
                 key,
                 title,
                 leading,
+                common,
+                onpointerenter,
+                onpointerleave,
                 ..
             } = tab;
             let state = RowState {
@@ -154,6 +165,9 @@ pub fn TodayTabs<K: Clone + PartialEq + std::hash::Hash + 'static>(
                         EventHandler::new(move |_: Press| onclose.call(closed.clone())),
                     ),
                     onclick: move |_| onpick.call(picked.clone()),
+                    onpointerenter,
+                    onpointerleave,
+                    common,
                 }
             };
             ListItem::row(key, title.clone(), content)
@@ -174,7 +188,7 @@ pub fn TodayTabs<K: Clone + PartialEq + std::hash::Hash + 'static>(
 
 #[cfg(test)]
 mod tests {
-    use super::{Expiry, TodayTab, expiry_of, left_text, live, next_wait};
+    use super::{Common, Expiry, TodayTab, expiry_of, left_text, live, next_wait};
     use crate::components::lists::row::leading::RowLeading;
     use std::time::{Duration, Instant};
 
@@ -224,6 +238,9 @@ mod tests {
             title: String::new(),
             leading: RowLeading::None,
             expires: now + secs(left),
+            common: Common::default(),
+            onpointerenter: None,
+            onpointerleave: None,
         };
         let listed = live(&[tab(1, 0), tab(2, 90)], now);
         assert_eq!(listed.len(), 1);

@@ -45,6 +45,14 @@ pub const CASES: &[Case] = &[
         },
     },
     Case {
+        golden: "lists/row/edit-slot.html",
+        make: || {
+            rsx! {
+                Scoped { Row { title: "Receipts", detail: "12 messages", edit: rename("Receipts"), leading: RowLeading::Icon(Icon::Folder), onclick: |_| {}, accessory: Accessory::Slot(more("Receipts")) } }
+            }
+        },
+    },
+    Case {
         golden: "lists/row/outline-editing-leaf.html",
         make: || {
             rsx! {

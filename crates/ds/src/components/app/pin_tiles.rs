@@ -23,6 +23,8 @@ pub struct PinItem<K> {
     pub face: PinFace,
     /// The `Badge` on its corner; zero draws none.
     pub unread: u32,
+    /// How its provider is drawn: the letter, or the favicon the app supplies for that account.
+    pub mark: MarkStyle,
 }
 
 /// The tile after the items that adds one.
@@ -72,7 +74,6 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
     #[props(default)] add: Option<PinAdd>,
     onpick: EventHandler<K>,
     #[props(default)] onreorder: Option<EventHandler<Vec<K>>>,
-    #[props(default = MarkStyle::Letter)] mark: MarkStyle,
     #[props(default)] common: Common,
 ) -> Element {
     let drag = use_drag::<K>(DRAG_THRESHOLD);
@@ -98,7 +99,12 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
     let data = common.data_attributes();
     let name = common.aria_label.clone().unwrap_or(label);
     let tiles = items.into_iter().enumerate().map(|(index, item)| {
-        let PinItem { key, face, unread } = item;
+        let PinItem {
+            key,
+            face,
+            unread,
+            mark,
+        } = item;
         let selection = Selection::of(&Some(key.clone()), &selected);
         let state = drop_state(&phase, &key, index);
         let picked = key.clone();
@@ -118,7 +124,7 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
                 selection,
                 unread,
                 drop: state,
-                mark: mark.clone(),
+                mark,
                 onpointerdown: onreorder.map(|_| {
                     EventHandler::new(move |event: PointerEvent| {
                         if !matches!(event.trigger_button(), None | Some(MouseButton::Primary)) {

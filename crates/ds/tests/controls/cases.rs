@@ -9,6 +9,7 @@ use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::components::controls::segmented::Tracking;
+use ds::components::lists::section_header::HeaderAction;
 use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
@@ -396,12 +397,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "section_header",
         state: "action",
-        make: || rsx! { SectionHeader { title: "Today", action: ("Clear".to_string(), EventHandler::new(|_| {})) } },
+        make: || rsx! { SectionHeader { title: "Today", actions: vec![HeaderAction::new("Clear", EventHandler::new(|_| {}))] } },
     },
     Case {
         component: "section_header",
         state: "action-selected",
-        make: || rsx! { SectionHeader { title: "Files", action: ("Show More".to_string(), EventHandler::new(|_| {})), action_selection: Selection::Selected } },
+        make: || rsx! { SectionHeader { title: "Files", actions: vec![HeaderAction { selection: Selection::Selected, ..HeaderAction::new("Show More", EventHandler::new(|_| {})) }] } },
     },
     Case {
         component: "section_header",
