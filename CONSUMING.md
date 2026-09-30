@@ -151,7 +151,7 @@ fn App() -> Element {
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
 | `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; a shell passes `Some(ds_shell::stylesheet())` |
 | `typeface` | `Option<Typeface>` | `None`: the appearance's own | overrides the appearance's typeface for this root |
-| `user_style` | `ReadSignal<UserStyle>` | empty | the person's own stylesheet, drawn after the design system's (section 12) |
+| `user_style` | `ReadSignal<UserStyle>` | empty | the person's own stylesheet, drawn after the design system's, unlayered (section 12) |
 | `surface` | `Option<&'static str>` | `None` | stamped as `data-surface`, the name a user stylesheet selects this root by |
 | `chrome` | `Option<RootChrome>` | `None`: `RootChrome::of(material)` | `Painted` or `Transparent`: whether the root box paints its material. A Popover, Sheet or Toast root is transparent by default (it hosts floating cards, which paint the material themselves); pass `Painted` for a root that *is* the panel (the launcher) — section 6, "bar gaps" |
 | `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
@@ -348,6 +348,9 @@ fn our_css_is_clean() {
     });
 }
 ```
+
+`Rule::LayerDs`: a stylesheet that opens `@layer ds` (a block, an order statement or a sub-layer)
+is an offence: that layer is quire's, and `AppStyle` puts yours in `app`.
 
 Every exception needs a `reason`, and `assert_clean` panics listing which exceptions suppressed
 zero offences, so a stale one cannot hide silently. A `LintConfig` is made from the kits it lints
@@ -1032,7 +1035,6 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 
 | Blitz cannot | Finding | Use instead |
 | --- | --- | --- |
-| `[data-x=v]` attribute selectors (unprefixed) | S2 | write `[*|data-x=v]` — quire's own component CSS does this everywhere; `Rule::UnprefixedAttributeSelector` |
 | `backdrop-filter: blur()` | S15 | ask the compositor to blur behind the surface (`Material`/`BlurState`), not CSS |
 | CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds::style::icon::render::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::base::text::clip::clip_chars` for a real character-count ellipsis |
@@ -1047,7 +1049,7 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_blitz::pdf` (section 6, "PDF and printing") |
 
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom
-property cascade once selectors carry `*|` (S2), `@keyframes` including `var()` inside them (S3),
+property cascade with plain `[data-x=v]` attribute selectors (S2, fixed in the Blitz fork at `1b23fbd9`; quire's own sheet still writes `[*|data-x=v]`, which matches too), `@keyframes` including `var()` inside them (S3),
 `transition` on a `var()`-driven value (S4), restarting an animation by swapping its name (S5,
 what a keyframe pulse does), `futures-timer` sleeps from render or a handler (S10, what `ds::base::time::clock::sleep`
 and every quire timer uses), registering a bundled font through a shared `FontContext` (S11), and
@@ -1196,7 +1198,9 @@ shows as they save it (ARCHITECTURE.md section 10). quire owns the mechanism; yo
 **Load and watch it into `Ds`.** `ds_settings::UserStyle` is a `SettingsDoc` for `style.css`: a
 missing file is an empty style and no text is refused at load. `Ds` takes it as
 `user_style: ReadSignal<UserStyle>` and renders it in a `<style data-ds-user>` after the design
-system's own sheet, so a person's rule wins by order and never needs `!important`:
+system's own sheet. The design system is `@layer ds` and the person's text is unlayered, so a
+person's rule wins by the cascade whatever its specificity (`.ds-button { ... }` beats quire's
+`.ds-button[data-variant=push]`) and never needs `!important`:
 
 ```rust,ignore
 use ds_settings::{AppName, ConfigRoot, Store, UserStyle};
@@ -1227,6 +1231,14 @@ user stylesheet may use: `[data-surface=<name>]` (give a surface root `Ds { surf
 `data-size`, `data-state`, `aria-*` and every token variable. Renaming anything on it is a
 breaking change for the person's file; everything off it may change freely. Token overrides are
 the recommended form (`.ds { --accent: ...; }` restyles every surface consistently).
+
+**Put your own sheets in the `app` layer.** Your own stylesheets are unlayered unless you say
+otherwise, and an unlayered rule beats every `@layer ds` rule, so a `.card { ... }` of yours would
+beat quire's more specific rule where before it lost. Draw each one with `ds::prelude::AppStyle {
+css: MY_CSS }` instead of `style { {MY_CSS} }`: it wraps the text in `@layer app`, after `ds` and
+before the person's unlayered rules, so your rules and quire's keep the order and specificity they
+always had, and the person's still beat both (`ds_style::css::layers` holds the names). Never write
+`@layer ds` in a sheet of your own (`Rule::LayerDs`).
 
 **Report, never block.** `ds_lint::user_stylesheet(css, &ds::kits())` returns notes (unknown
 variables, selectors outside the public surface, `!important`, `url()` that is not a local `file:` or `data:`

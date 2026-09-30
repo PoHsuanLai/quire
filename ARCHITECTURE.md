@@ -721,8 +721,9 @@ every consumer (sill, mailo, any app on quire) gets it the same way.
 |---|---|---|
 | The file | `ds-style::kit::UserStyle`, `ds-settings::user_style` | `UserStyle(String)` (a value in `ds-style`, so `ds` can take it as a prop; re-exported by `ds-settings`), a `SettingsDoc` with `FILE = "style.css"` under the app's config dir (`~/.config/<app>/style.css`), `Format::Css` (raw text, never parsed at load). A missing file is an empty style. |
 | Live reload | `ds-settings::Store::watch::<UserStyle>()` | the same watch every settings file uses (rename-safe, debounced); each change publishes the whole text |
-| Cascade slot | `ds-style::kit::KitRank::User` | always after every kit, so a user rule wins over the design system by order, never by `!important` |
-| Rendering | `ds::prelude::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet (no element while the style is blank); every surface root re-renders when it changes |
+| Cascade layers | `ds-style::css::layers` (`DS`, `APP`, `ORDER`), `ds::prelude::AppStyle` | the whole design-system stylesheet (every kit) is `@layer ds { ... }`, opened by the statement `@layer ds, app;`; a consumer's own sheets are `@layer app` (`AppStyle { css }` writes the same statement, so the order holds whichever sheet parses first); the person's `<style data-ds-user>` is unlayered. An unlayered rule beats every layered rule and a later layer beats an earlier one, whatever the specificity, so the order of who wins is user, then app, then ds. Inside `ds` the kits keep the order and specificity they always had (the marker order below); there are no per-kit sub-layers, because a sub-layer would let a Shell rule beat a Components rule by rank alone. |
+| Cascade slot | `ds-style::kit::KitRank::User` | always after every kit: a user kit's sections are written after `@layer ds { }`, unlayered. A user rule wins over the design system by the cascade layer, never by `!important` or specificity |
+| Rendering | `ds::prelude::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet, unlayered (no element while the style is blank); every surface root re-renders when it changes |
 | Public selector surface | `ds::selectors` (a table, and its doc page) | what a user stylesheet may rely on: `[data-surface=<name>]` on every surface root; `.ds-<component>` on every component root; the parts each component lists as public (`.ds-<component>-<part>`); `data-variant`, `data-size`, `data-state`, `aria-*`; every token variable (`--<prefix><slug>`). Anything else is internal and may change without notice. |
 | Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers |
 
@@ -742,3 +743,9 @@ Rules:
   `ds::selectors`, add a gallery example that restyles it, and add a `lint::user_stylesheet`
   case that accepts it.
 
+- **A consumer's sheets go in `app`**: draw each with `ds::prelude::AppStyle`, never a bare
+  `style { {CSS} }`. A bare sheet is unlayered and would outrank every `ds` rule whatever its
+  specificity. `ds_lint::Rule::LayerDs` rejects a consumer sheet that opens `@layer ds`.
+- **Selector spelling**: an unprefixed attribute selector (`[data-surface=bar]`) matches on
+  Blitz since the fork's `1b23fbd9` (dioxus-native-dom writes attributes with no namespace, as
+  the DOM does); the `*|` form still matches, and quire's own generated sheet keeps writing it.

@@ -64,8 +64,9 @@ Upstream (pinned around; re-check at every toolchain bump):
   Move the pin back to DioxusLabs/blitz once upstream has it or an equivalent.
 - **dioxus-native-dom writes every attribute in the HTML namespace** (`qual_name(name, None)`).
   Unprefixed attribute selectors never match (S2), and a `details { open }` written by dioxus
-  never opens ("Selectors and cascade"). Worth an upstream report; quire writes `[*|…]` and
-  sets `open` itself.
+  never opens ("Selectors and cascade"). Fixed in our fork at `1b23fbd9` (branch
+  `g296-unprefixed-attr`, G296): attributes are written with no namespace, so the plain selector
+  matches and `[*|…]` still does. Not offered upstream (PRs on hold). quire's own sheet keeps `[*|…]`.
 - **`get_client_rect` borrows the document mutably** when a shared borrow would do, which is why
   rect reads can collide with the renderer ("Bar gaps"). Upstream report material.
 - **Hit test in an inline formatting context** returns the parent, not an atomic inline
@@ -241,8 +242,8 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
   are what is broken. dioxus-native-dom's mutation_writer.rs creates every attribute through
   `qual_name(name, None)`, in the HTML namespace, and Stylo's `attr_matches` compares
   namespaces, so `[data-theme=dark]`, `[aria-selected=true]` and `[data-variant=…]` never match
-  an attribute dioxus sets. `[*|data-theme=dark]` (valid CSS that browsers also match) and
-  classes do. Every attribute selector in quire's CSS is written with `*|`, and the lint flags
+  an attribute dioxus sets (fixed at fork rev `1b23fbd9`, G296: the plain form now matches).
+  `[*|data-theme=dark]` (valid CSS that browsers also match) and classes do. Every attribute selector in quire's CSS is written with `*|`, and the lint flags
   an unprefixed one under the Blitz profile. This is the most far-reaching finding.
 - **S3.** Keyframes with literal values, `var()` colours, `var()` distances and a `var()`
   duration all interpolate (a 1 s, 300 px linear move is at x = 90 at 0.3 s). motion.css and
@@ -342,8 +343,9 @@ adapter opens).
 
 ## Selectors and cascade
 
-- **Attribute selectors need `*|`** (S2), in stylesheets and in harness queries alike:
-  `[*|data-light=zoom]` matches, `[data-light=zoom]` matches nothing.
+- **Attribute selectors needed `*|`** (S2) until fork rev `1b23fbd9` (G296), in stylesheets and
+  in harness queries alike: `[*|data-light=zoom]` matched, `[data-light=zoom]` matched nothing.
+  Both match now; user rules and docs write the plain form.
 - **`details { open }` from dioxus stays closed.** blitz-dom's user-agent rule
   `details:not([open]) > :not(summary:first-of-type) { display:none !important }` matches only a
   null-namespace `open` (the one its own summary toggle writes), and an author rule cannot beat
