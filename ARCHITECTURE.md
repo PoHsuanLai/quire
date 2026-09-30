@@ -666,8 +666,13 @@ implements it (the traits build with `ds-harness` default features off).
   cargo clippy --workspace --all-targets --all-features -- -D warnings
   cargo test --workspace --all-features
   ./scripts/check-boundary.sh
+  ./scripts/check-consumer.sh
   cargo deny check licenses
   ```
+
+  `check-consumer.sh` builds, clippies (`-D warnings`) and tests `examples/consumer`, its own
+  cargo workspace that `--workspace` does not reach, so `CONSUMING.md`'s snippets and coherence
+  rules stay true to the public API.
 
 - **No `unsafe`** anywhere in the workspace; `unsafe_code = "deny"`.
 - **A Look is values only.** A Look supplies tokens (colour, radius, font family, grain, shadow), the
