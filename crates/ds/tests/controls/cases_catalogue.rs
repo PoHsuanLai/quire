@@ -76,6 +76,26 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "label",
+        state: "severity-info",
+        make: || rsx! { Label { text: "Signed by Dana", severity: Some(Severity::Info) } },
+    },
+    Case {
+        component: "label",
+        state: "severity-ok",
+        make: || rsx! { Label { text: "Signature verified", severity: Some(Severity::Ok) } },
+    },
+    Case {
+        component: "label",
+        state: "severity-warn",
+        make: || rsx! { Label { text: "Key expired", severity: Some(Severity::Warn), style: LabelStyle::Footnote } },
+    },
+    Case {
+        component: "label",
+        state: "severity-danger",
+        make: || rsx! { Label { text: "Signature does not match", severity: Some(Severity::Danger), role: LabelRole::Secondary } },
+    },
+    Case {
+        component: "label",
         state: "caption",
         make: || rsx! { Label { text: "Caption", style: LabelStyle::Caption } },
     },

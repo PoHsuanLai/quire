@@ -1,0 +1,8 @@
+/* FactList (design/30 section 2.2): FieldRow's Form layout without a control. Attribute selectors
+   carry `*|` (spike S2). The label column is FieldRow's 120 px, ending at the value, in the
+   secondary ink; the value takes the rest and wraps. */
+
+.ds-fact-list{ display:flex; flex-direction:column; gap:var(--s-4); margin:0; padding:var(--s-6) 0; min-width:0; }
+.ds-fact-list-item{ display:flex; align-items:baseline; gap:var(--s-12); min-width:0; }
+.ds-fact-list-label{ flex:none; width:120px; margin:0; font-size:var(--fs-control); line-height:1.3; color:var(--ink-soft); text-align:end; }
+.ds-fact-list-value{ flex:1 1 0; min-width:0; margin:0; font-size:var(--fs-control); line-height:1.3; color:var(--ink); }

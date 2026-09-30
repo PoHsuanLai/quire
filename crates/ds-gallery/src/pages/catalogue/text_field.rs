@@ -13,7 +13,8 @@ use ds::style::tokens::control_size::ControlSize;
 pub fn TextFieldSection() -> Element {
     let mut name = use_signal(|| "Dana Okafor".to_owned());
     let mut query = use_signal(|| "invoice".to_owned());
-    let mut note = use_signal(|| "Thanks for the quick reply.\nI will send the files on Monday.".to_owned());
+    let mut note =
+        use_signal(|| "Thanks for the quick reply.\nI will send the files on Monday.".to_owned());
     let mut secret = use_signal(String::new);
     let rejected = Validity::Invalid(Invalid {
         message: TextLine::from("That address is not valid."),

@@ -7,6 +7,7 @@ pub mod drag_ghost;
 pub mod empty_state;
 pub(crate) mod flow;
 pub mod hover_card;
+pub mod inline_banner;
 pub mod popover;
 pub(crate) mod scrim;
 pub mod sheet;

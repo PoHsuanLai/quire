@@ -1,9 +1,9 @@
 //! The one-line `input` a `TextField` draws: the input itself, the placeholder over it and, for a
 //! secure field, the dots and the caret that replace what the renderer would draw.
 
+use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
-use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::focus::targets::Told;
 use dioxus::prelude::*;

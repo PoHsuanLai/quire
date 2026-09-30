@@ -932,17 +932,27 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-empty-state-title{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
 .ds-empty-state-body{ max-width:32em; font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
 .ds-empty-state-action{ display:flex; gap:var(--s-8); align-items:center; justify-content:center; margin-top:var(--s-8); }
+/* -- fact_list -- */
+/* FactList (design/30 section 2.2): FieldRow's Form layout without a control. Attribute selectors
+   carry `*|` (spike S2). The label column is FieldRow's 120 px, ending at the value, in the
+   secondary ink; the value takes the rest and wraps. */
+
+.ds-fact-list{ display:flex; flex-direction:column; gap:var(--s-4); margin:0; padding:var(--s-6) 0; min-width:0; }
+.ds-fact-list-item{ display:flex; align-items:baseline; gap:var(--s-12); min-width:0; }
+.ds-fact-list-label{ flex:none; width:120px; margin:0; font-size:var(--fs-control); line-height:1.3; color:var(--ink-soft); text-align:end; }
+.ds-fact-list-value{ flex:1 1 0; min-width:0; margin:0; font-size:var(--fs-control); line-height:1.3; color:var(--ink); }
 /* -- field_row -- */
 /* FieldRow and FieldGroup (design/30 section 2.2, `NSGridView`). Attribute selectors carry `*|`
    (spike S2). A row is 36 px at least: the label column with its help under it, the control
-   column. In a group the rows are one card with a hairline between them. A disabled row draws at
+   column, whose controls wrap onto a second line when they do not fit (a field and its
+   buttons, a run of chips). In a group the rows are one card with a hairline between them. A disabled row draws at
    the disabled .35 and takes no pointer. */
 
 .ds-field-row{ display:flex; align-items:center; gap:var(--s-12); box-sizing:border-box; min-height:36px; padding:var(--s-6) var(--s-12); min-width:0; }
 .ds-field-row-label{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
 .ds-field-row-title{ font-size:var(--fs-control); color:var(--ink); line-height:1.3; }
 .ds-field-row-help{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-.ds-field-row-control{ display:flex; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
+.ds-field-row-control{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
 .ds-field-row[*|data-layout=form]{ padding-left:0; }
 .ds-field-row[*|data-layout=form] .ds-field-row-label{ flex:none; width:120px; align-items:flex-end; text-align:end; }
 .ds-field-row[*|data-layout=form] .ds-field-row-control{ flex:1 1 0; justify-content:flex-start; }
@@ -1058,6 +1068,25 @@ html,body{margin:0;padding:0;background:transparent}
    through: sill's idle service, not this overlay, owns waking the display. */
 
 .ds-idle-dim{ position:absolute; inset:0; pointer-events:none; background:var(--scrim-idle); }
+/* -- inline_banner -- */
+/* InlineBanner (design/30 section 2.9). Attribute selectors carry `*|` (spike S2). A band in the
+   flow: the severity's mark, the words, the caller's buttons and the close button in one row,
+   wrapping under the words when the pane is narrow. An Info banner is the quiet fill
+   (`--fill-quaternary`); Ok, Warn and Danger take their wash and the mark their colour. The words
+   keep the ink: the colour never says it alone. A hairline under it parts it from the content. */
+
+.ds-inline-banner{
+  --banner-mark:var(--accent-text);
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--s-8) var(--s-10); box-sizing:border-box; width:100%;
+  padding:var(--s-8) var(--s-12); background:var(--fill-quaternary); border-bottom:var(--hair) solid var(--line);
+  color:var(--ink); text-align:start;
+}
+.ds-inline-banner[*|data-severity=ok]{ --banner-mark:var(--ok); background:var(--ok-wash); }
+.ds-inline-banner[*|data-severity=warn]{ --banner-mark:var(--warn); background:var(--warn-wash); }
+.ds-inline-banner[*|data-severity=danger]{ --banner-mark:var(--danger); background:var(--danger-wash); }
+.ds-inline-banner-icon{ display:inline-flex; flex:none; line-height:0; color:var(--banner-mark); }
+.ds-inline-banner-body{ display:flex; flex-direction:column; flex:1 1 12em; min-width:0; gap:var(--s-1); }
+.ds-inline-banner-actions{ display:flex; flex:none; align-items:center; gap:var(--s-6); }
 /* -- key_equivalent -- */
 /* KeyEquivalent (design/30 section 2.1). Attribute selectors carry `*|` (spike S2).
    Text: the glyphs as plain text beside the words they belong to, the secondary ink, the face
@@ -1090,6 +1119,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-label[*|data-role=secondary]{ color:var(--ink-soft); }
 .ds-label[*|data-role=tertiary]{ color:var(--ink-faint); }
 .ds-label[*|data-role=quaternary]{ color:var(--ink-faint); opacity:.7; }
+
+/* A status tone: the status colour as text, after the role so it wins (a label's role is how
+   much it matters, its severity what kind of thing it says). Info is the accent as text. */
+.ds-label[*|data-severity=info]{ color:var(--accent-text); }
+.ds-label[*|data-severity=ok]{ color:var(--ok); }
+.ds-label[*|data-severity=warn]{ color:var(--warn); }
+.ds-label[*|data-severity=danger]{ color:var(--danger); }
 
 .ds-label[*|data-style=caption]{ font-size:var(--fs-caption); }
 .ds-label[*|data-style=footnote]{ font-size:var(--fs-help); }

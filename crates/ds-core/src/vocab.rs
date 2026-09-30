@@ -20,6 +20,22 @@ pub enum Availability {
     Busy,
 }
 
+/// How much attention a message asks for (design/30 section 2.9): the tone of an inline banner and
+/// of a status label. `Info` is the accent, the others are the status colours `--ok`, `--warn`
+/// and `--danger`. `data-severity`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Severity {
+    /// A note: the accent.
+    #[default]
+    Info,
+    /// It worked, it is fine.
+    Ok,
+    /// Take care.
+    Warn,
+    /// It failed, it is not what it says.
+    Danger,
+}
+
 /// Whether what a control shows or opens is up (design/30 section 1.5): a surface or a tooltip
 /// its caller drives, a menu, popover or disclosure a trigger opens (`aria-expanded`), a
 /// notification group's expansion.
@@ -519,7 +535,7 @@ mod fraction_tests {
 mod word_tests {
     use super::{
         Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, InputModality,
-        Muting, PressPhase, Selection, Shown,
+        Muting, PressPhase, Selection, Severity, Shown,
     };
     use crate::word::Word;
 
@@ -545,6 +561,7 @@ mod word_tests {
         round_trips::<Muting>();
         round_trips::<PressPhase>();
         round_trips::<Selection>();
+        round_trips::<Severity>();
         round_trips::<Shown>();
     }
 

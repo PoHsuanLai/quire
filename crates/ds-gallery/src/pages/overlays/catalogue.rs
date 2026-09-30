@@ -12,6 +12,7 @@ use ds::assembly::ds::Inject;
 use ds::components::content::text_runs::RunTone;
 use ds::components::controls::button_model::Answers;
 use ds::components::overlays::empty_state::EmptyForm;
+use ds::components::overlays::inline_banner::InlineBanner;
 use ds::components::overlays::popover::Arrow;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
@@ -121,6 +122,41 @@ pub fn OverlaysCataloguePage() -> Element {
                             description: "The server didn’t answer.",
                             onretry: |_| {},
                         }
+                    }
+                }
+            }
+        }
+        Section { title: "InlineBanner", note: "InlineBanner {{ severity, text, detail, icon, actions, onclose }}: a message in a pane's own flow, above the content it is about. Info is the quiet fill; Ok, Warn and Danger take their wash and mark; the words keep the ink. Danger is role=alert.",
+            div { class: "g-row g-row-top",
+                Specimen { name: "Info, with an action and close".to_string(),
+                    div { style: "width:440px",
+                        InlineBanner {
+                            text: "Remote images are blocked.",
+                            detail: "Loading them tells the sender you opened this.",
+                            actions: rsx! { Button { label: "Load images", size: ControlSize::Small, onclick: |_| {} } },
+                            onclose: |_| {},
+                        }
+                    }
+                }
+                Specimen { name: "Ok".to_string(),
+                    div { style: "width:440px",
+                        InlineBanner { severity: Severity::Ok, text: "You accepted this invitation." }
+                    }
+                }
+            }
+            div { class: "g-row g-row-top",
+                Specimen { name: "Warn, with an action".to_string(),
+                    div { style: "width:440px",
+                        InlineBanner {
+                            severity: Severity::Warn,
+                            text: "The sender asked for a read receipt.",
+                            actions: rsx! { Button { label: "Send receipt", size: ControlSize::Small, onclick: |_| {} } },
+                        }
+                    }
+                }
+                Specimen { name: "Danger".to_string(),
+                    div { style: "width:440px",
+                        InlineBanner { severity: Severity::Danger, text: "This message may not be from who it says." }
                     }
                 }
             }

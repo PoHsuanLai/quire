@@ -1,8 +1,12 @@
-//! FieldRow and FieldGroup: System Settings rows in a group, and a grid form.
+//! FieldRow and FieldGroup: System Settings rows in a group, a grid form (one control and several
+//! that wrap) and a FactList.
 
 use crate::pages::Section;
 use dioxus::prelude::*;
+use ds::components::content::text_runs::RunTone;
+use ds::components::controls::checkbox::Checkbox;
 use ds::components::controls::segmented::Tracking;
+use ds::components::fields::fact_list::{Fact, FactList};
 use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::prelude::*;
@@ -13,6 +17,7 @@ use ds::style::tokens::control_size::ControlSize;
 pub fn FieldRowSection() -> Element {
     let mut wifi = use_signal(|| Check::On);
     let mut mode = use_signal(|| 1u8);
+    let mut sign = use_signal(|| Check::On);
     let mut name = use_signal(|| "Dana's Laptop".to_owned());
     let mut language = use_signal(|| "en");
     let languages = || {
@@ -60,6 +65,23 @@ pub fn FieldRowSection() -> Element {
                         FieldRow { label: TextLine::from("Model"), layout: RowLayout::Form,
                             span { "Framework 13" }
                         }
+                        FieldRow { label: TextLine::from("Protection"), layout: RowLayout::Form,
+                            Checkbox { label: "Sign", value: sign(), onchange: move |next| sign.set(next) }
+                            Checkbox { label: "Encrypt", value: Check::Off, onchange: |_| {} }
+                            Button { label: "More options", size: ControlSize::Small, onclick: |_| {} }
+                        }
+                    }
+                }
+                div { style: "width:400px",
+                    FieldGroup { title: "Invitation, a FactList",
+                        FactList { facts: vec![
+                            Fact::new("When", "Tue 4 Nov, 10:00 to 11:00"),
+                            Fact::new("Where", "Room 4"),
+                            Fact::new("Who", TextLine::Runs(vec![
+                                TextRun::new("Dana", RunTone::Strong),
+                                TextRun::new(", Noor and 3 more", RunTone::Plain),
+                            ])),
+                        ] }
                     }
                 }
             }

@@ -7,6 +7,13 @@
 .ds-label[*|data-role=tertiary]{ color:var(--ink-faint); }
 .ds-label[*|data-role=quaternary]{ color:var(--ink-faint); opacity:.7; }
 
+/* A status tone: the status colour as text, after the role so it wins (a label's role is how
+   much it matters, its severity what kind of thing it says). Info is the accent as text. */
+.ds-label[*|data-severity=info]{ color:var(--accent-text); }
+.ds-label[*|data-severity=ok]{ color:var(--ok); }
+.ds-label[*|data-severity=warn]{ color:var(--warn); }
+.ds-label[*|data-severity=danger]{ color:var(--danger); }
+
 .ds-label[*|data-style=caption]{ font-size:var(--fs-caption); }
 .ds-label[*|data-style=footnote]{ font-size:var(--fs-help); }
 .ds-label[*|data-style=headline]{ font-weight:700; }
