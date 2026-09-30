@@ -71,11 +71,11 @@ EDGES=(
   "ds: ds-core ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
-  "ds-blitz: blitz-kit ds anyrender_pdfrum"
-  "ds-harness: blitz-kit ds ds-blitz"
-  "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
+  "ds-blitz: blitz-kit ds ds-core ds-style anyrender_pdfrum"
+  "ds-harness: blitz-kit ds ds-blitz ds-core ds-style"
+  "ds-gallery: ds ds-core ds-style ds-motion ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "ds-conformance:"
-  "icons: ds ds-settings"
+  "icons: ds ds-style ds-settings"
   "anyrender_pdfrum:"
 )
 for edge in "${EDGES[@]}"; do
@@ -92,10 +92,11 @@ for edge in "${EDGES[@]}"; do
   fi
 done
 
-# ds-conformance is test-only: no normal or build edge at all (the EDGES row above), and its
-# dev-dependencies are the crates it tests through, never the lower crates directly.
+# ds-conformance is test-only: no normal or build edge at all (the EDGES row above). Its
+# dev-dependencies are the crates it tests through, plus the lower crates whose home paths its
+# tests name (a name outside `ds::prelude` is reached by its owning crate's path).
 DEV_EDGES=(
-  "ds-conformance: ds ds-shell ds-lint ds-settings ds-blitz ds-harness"
+  "ds-conformance: ds ds-shell ds-lint ds-settings ds-blitz ds-harness ds-core ds-style ds-motion"
 )
 for edge in "${DEV_EDGES[@]}"; do
   crate="${edge%%:*}"
@@ -165,5 +166,25 @@ done
 if [ "$layered" -eq 0 ]; then
   echo "layers hold: host < hooks < stack < root < components < assembly; component groups in order"
 fi
+
+# The crate roots of ds and ds-shell hold declarations, `prelude` and the curated roots (the
+# stylesheet assembly) only: every other name has one path, its home module or the prelude. A new
+# `pub use` at either root introduces a name outside the allowed set below and fails here.
+ROOT_ALLOWED_DS="pub use crate assembly selectors kit KIT kits stylesheet component_sheets"
+ROOT_ALLOWED_DS_SHELL="pub use crate kit KIT kits stylesheet component_sheets"
+for root in "ds:$ROOT_ALLOWED_DS" "ds-shell:$ROOT_ALLOWED_DS_SHELL"; do
+  crate="${root%%:*}"
+  read -r -a allowed <<<"${root#*:}"
+  lib="crates/$crate/src/lib.rs"
+  # Every `pub use` statement, comments removed, reduced to its identifier tokens.
+  tokens=$(sed 's://.*$::' "$lib" | tr '\n' ' ' | grep -o 'pub use[^;]*;' | grep -o '[A-Za-z_][A-Za-z_0-9]*\|\*' | sort -u)
+  outside=$(comm -23 <(printf '%s\n' "$tokens") <(printf '%s\n' "${allowed[@]}" | sort -u))
+  if [ -n "$outside" ]; then
+    echo "ROOT: $lib re-exports [$(echo $outside)] at the crate root; put the name in the prelude or reach it by its home path"
+    fail=1
+  else
+    echo "root holds: $lib re-exports only the curated roots"
+  fi
+done
 
 exit "$fail"
