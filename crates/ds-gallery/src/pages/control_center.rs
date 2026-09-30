@@ -9,6 +9,7 @@ use super::Section;
 use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::Availability;
 use ds::Bezel;
 use ds::{
     Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, List,
@@ -18,7 +19,7 @@ use ds::{
 use ds::{AppearancePicker, Fraction, LevelGlyph, Muting, PickerLayout, Px, SystemPrefs};
 use ds::{Slider, SliderLook};
 use ds_shell::ModulePanel;
-use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile, TileSpan};
+use ds_shell::{ModuleGrid, ModuleTile, TileSpan};
 
 /// The module whose detail a chevron opened.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -96,30 +97,26 @@ fn Panel(theme: Theme, posed: Pane) -> Element {
 /// The root pane: the module tiles.
 #[component]
 fn Modules(on_open: EventHandler<Module>) -> Element {
-    let mut wifi = use_signal(|| ModuleState::On);
-    let mut bluetooth = use_signal(|| ModuleState::Off);
-    let mut focus = use_signal(|| ModuleState::Off);
+    let mut wifi = use_signal(|| Check::On);
+    let mut bluetooth = use_signal(|| Check::Off);
+    let mut focus = use_signal(|| Check::Off);
     let mut volume = use_signal(|| Fraction(400));
     let mut appearance = use_signal(Appearance::default);
     let percent = volume().0 / 10;
-    let flip = |state: ModuleState| match state {
-        ModuleState::On => ModuleState::Off,
-        ModuleState::Off | ModuleState::Busy => ModuleState::On,
-    };
     rsx! {
         // The panel's body pads both panes, so the grid adds none of its own.
         ModuleGrid { padding: Px(0.0),
             ModuleTile {
-                glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: wifi(), chevron: Chevron::Detail,
-                onclick: move |_| wifi.set(flip(wifi())), on_detail: move |_| on_open.call(Module::WiFi),
+                glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: wifi(),
+                onclick: move |_| wifi.set(wifi().flipped()), on_detail: move |_| on_open.call(Module::WiFi),
             }
             ModuleTile {
-                glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", state: bluetooth(), chevron: Chevron::Detail,
-                onclick: move |_| bluetooth.set(flip(bluetooth())), on_detail: move |_| on_open.call(Module::Bluetooth),
+                glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: bluetooth(),
+                onclick: move |_| bluetooth.set(bluetooth().flipped()), on_detail: move |_| on_open.call(Module::Bluetooth),
             }
-            ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Do Not Disturb", state: focus(), onclick: move |_| focus.set(flip(focus())) }
-            ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", state: ModuleState::Busy, onclick: |_| {} }
-            ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
+            ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Do Not Disturb", value: focus(), onclick: move |_| focus.set(focus().flipped()) }
+            ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", value: Check::Off, availability: Availability::Busy, onclick: |_| {} }
+            ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
             ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
                 Slider { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::CapsuleKnob, onchange: move |next| volume.set(next) }
             }

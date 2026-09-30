@@ -1,6 +1,10 @@
 //! ModuleTile: one control-center module, a glyph disc with its title and status on a tile, and
-//! the chevron that opens the module's detail pane (design/20-SURFACES.md
-//! section 1.5, design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
+//! the chevron that opens the module's detail pane (design/30 section 2.10,
+//! design/20-SURFACES.md section 1.5, design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
+//!
+//! Markup: `div.ds-module-tile[role=button][data-span][data-state][data-availability]` with
+//! `aria-pressed` (`mixed` while busy), `aria-busy` and `aria-disabled`; parts `.ds-module-disc`,
+//! `.ds-module-title`, `.ds-module-status` and `.ds-module-chevron`.
 //!
 //! The tile is a `div[role=button]` rather than a `button`, because the chevron inside it is a
 //! button of its own and a button may not hold another. The chevron keeps its press
@@ -9,22 +13,28 @@
 //! chevron prevents the default of the keys it takes, so a browser's synthesised click cannot
 //! run the same press twice.
 
-use crate::control_center::module_disc::ModuleDisc;
-use crate::control_center::module_tile_kind::{Chevron, ModuleState, TileSpan};
+use crate::control_center::module_disc::{Lighting, ModuleDisc};
+use crate::control_center::module_tile_kind::TileSpan;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::press::{PressListeners, Propagation};
+use ds::components::controls::press::{ActivationKeys, PressListeners, Propagation};
 use ds::focus::click::kept_click;
 use ds_core::press::Press;
-use ds_core::vocab::{Availability, Shown};
+use ds_core::vocab::{Availability, Check, Shown};
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
 /// A control-center module. `onclick` toggles it (a press on the tile, Enter or Space);
-/// `on_detail` opens its detail pane (a press on the chevron, Enter or Right on the chevron).
-/// `expanded` is the chevron's `aria-expanded`: whether that pane is showing.
+/// `value` is whether it is on. A module with a detail pane passes `on_detail`, which draws the
+/// chevron and hears a press on it (or Enter or Right on the chevron); `expanded` is the
+/// chevron's `aria-expanded`: whether that pane is showing.
+///
+/// `availability`: `Disabled` dims the tile and drops its presses; `Busy` is a module working
+/// towards a state it has not reached (connecting, scanning): the disc turns its ring, the tile
+/// takes no press and reads as `aria-pressed="mixed"`.
 ///
 /// `glyph` is an `Icon` (it converts) or any [`IconSource`]: `IconSource::Status` puts a layered
 /// status glyph in the disc (the Wi-Fi and Bluetooth modules), which plays its own
@@ -34,42 +44,50 @@ pub fn ModuleTile(
     #[props(into)] glyph: IconSource,
     #[props(into)] title: TextLine,
     status: Option<TextLine>,
-    state: ModuleState,
-    #[props(default)] chevron: Chevron,
+    #[props(default)] value: Check,
     #[props(default)] span: TileSpan,
     onclick: EventHandler<Press>,
     #[props(default)] on_detail: Option<EventHandler<Press>>,
     #[props(default)] expanded: Shown,
     #[props(default)] availability: Availability,
+    #[props(default)] common: Common,
 ) -> Element {
     let live = availability == Availability::Enabled;
     let listen = PressListeners::new(onclick);
-    let detail = match chevron {
-        Chevron::Detail => Some(chevron_button(&title, on_detail, expanded, availability)),
-        Chevron::None => None,
+    let lighting = Lighting::of(value, availability);
+    let pressed = match availability {
+        Availability::Busy => Check::Mixed,
+        Availability::Enabled | Availability::Disabled => value,
     };
+    let detail = on_detail.map(|open| chevron_button(&title, open, expanded, availability));
+    let class = common.class("ds-module-tile");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-module-tile",
+            id: common.id.clone(),
+            class,
             role: "button",
             tabindex: "0",
             "data-span": span.slug(),
-            "data-state": state.slug(),
-            "aria-pressed": state.aria_pressed(),
-            "aria-busy": state.aria_busy(),
+            "data-state": value.slug(),
+            "data-availability": availability.slug(),
+            "aria-label": common.aria_label.clone(),
+            "aria-pressed": pressed.aria(),
+            "aria-busy": availability.aria_busy(),
             "aria-disabled": availability.aria_disabled(),
+            onmounted: move |event| common.mounted(event),
             onclick: move |event| {
                 if live {
                     listen.click(&event);
                 }
             },
             onkeydown: move |event| {
-                if live && toggles(&event.key()) {
-                    event.prevent_default();
-                    onclick.call(Press::primary());
+                if live {
+                    listen.key_down(&event, ActivationKeys::ReturnAndSpace);
                 }
             },
-            ModuleDisc { glyph, state }
+            ..data,
+            ModuleDisc { glyph, lighting }
             span { class: "ds-module-words",
                 span { class: "ds-module-title", {text(&title)} }
                 if let Some(status) = status {
@@ -81,11 +99,6 @@ pub fn ModuleTile(
     }
 }
 
-/// Whether a key on the tile toggles it: Enter or Space, as a button's own keys.
-fn toggles(key: &Key) -> bool {
-    matches!(key, Key::Enter) || *key == Key::Character(" ".into())
-}
-
 /// Whether a key on the chevron opens the detail: Enter, or Right (into the pane).
 fn opens(key: &Key) -> bool {
     matches!(key, Key::Enter | Key::ArrowRight)
@@ -94,12 +107,12 @@ fn opens(key: &Key) -> bool {
 /// The chevron: its own hit target, named for the module, keeping every press it takes.
 fn chevron_button(
     title: &TextLine,
-    on_detail: Option<EventHandler<Press>>,
+    on_detail: EventHandler<Press>,
     expanded: Shown,
     availability: Availability,
 ) -> Element {
     let name = format!("{} details", title.plain_text());
-    let open = on_detail.filter(|_| availability == Availability::Enabled);
+    let open = Some(on_detail).filter(|_| availability == Availability::Enabled);
     let inert = open.map_or(Availability::Disabled, |_| Availability::Enabled);
     let listen = open.map(|open| PressListeners::new(open).with_propagation(Propagation::Stop));
     rsx! {
@@ -134,20 +147,19 @@ fn chevron_button(
 
 #[cfg(test)]
 mod tests {
-    use super::{opens, toggles};
+    use super::opens;
     use dioxus::prelude::Key;
 
     #[test]
-    fn the_tile_and_its_chevron_take_their_own_keys() {
+    fn the_chevron_opens_on_enter_and_right() {
         let cases = [
-            (Key::Enter, true, true),
-            (Key::Character(" ".into()), true, false),
-            (Key::ArrowRight, false, true),
-            (Key::ArrowLeft, false, false),
-            (Key::Tab, false, false),
+            (Key::Enter, true),
+            (Key::Character(" ".into()), false),
+            (Key::ArrowRight, true),
+            (Key::ArrowLeft, false),
+            (Key::Tab, false),
         ];
-        for (key, tile, chevron) in cases {
-            assert_eq!(toggles(&key), tile, "tile {key:?}");
+        for (key, chevron) in cases {
             assert_eq!(opens(&key), chevron, "chevron {key:?}");
         }
     }

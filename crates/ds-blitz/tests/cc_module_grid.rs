@@ -2,9 +2,11 @@
 //! props (`control_center.grid_*`), the columns share the width, and a Full tile spans them all.
 
 use dioxus::prelude::*;
+use ds::Check;
 use ds::{Appearance, Ds, Icon, Material, Px, Rect};
 use ds_harness::{Harness, Viewport};
 use ds_shell::{GridColumns, ModuleGrid, ModuleState, ModuleTile, TileSpan};
+use ds_shell::{GridColumns, ModuleGrid, ModuleTile, TileSpan};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -20,10 +22,10 @@ fn Three() -> Element {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid { columns: GridColumns(3), gap: Px(6.0), padding: Px(10.0),
-                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", state: ModuleState::On, onclick: |_| {} }
-                    ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", state: ModuleState::Off, onclick: |_| {} }
-                    ModuleTile { glyph: Icon::Moon, title: "Focus", state: ModuleState::Off, onclick: |_| {} }
-                    ModuleTile { glyph: Icon::Play, title: "Now Playing", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", value: Check::On, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", value: Check::Off, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Moon, title: "Focus", value: Check::Off, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Play, title: "Now Playing", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
                 }
             }
         }

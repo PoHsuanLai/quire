@@ -5,7 +5,7 @@ use ds::{
     Accessory, Appearance, Check, Ds, Icon, Inject, List, ListItem, Material, Pane, PaneSwitcher,
     Row, RowLeading, RowSize,
 };
-use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile, TileSpan};
+use ds_shell::{ModuleGrid, ModuleTile, TileSpan};
 
 #[derive(Props, Clone, PartialEq)]
 pub struct PaneProps {
@@ -22,9 +22,9 @@ pub fn panes(props: PaneProps) -> Element {
                 shown: props.shown,
                 root: rsx! {
                     ModuleGrid {
-                        ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
-                        ModuleTile { glyph: Icon::Moon, title: "Focus", state: ModuleState::Off, onclick: |_| {} }
-                        ModuleTile { glyph: Icon::Play, title: "Now Playing", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
+                        ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {}, on_detail: |_| {} }
+                        ModuleTile { glyph: Icon::Moon, title: "Focus", value: Check::Off, onclick: |_| {} }
+                        ModuleTile { glyph: Icon::Play, title: "Now Playing", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
                     }
                 },
                 detail: rsx! {

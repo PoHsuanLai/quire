@@ -7,6 +7,8 @@ use ds::{Appearance, Ds, Icon, Material, Motion, TextLine};
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{ModuleState, ModuleTile};
+use ds::{Appearance, Availability, Check, Ds, Icon, Material, Motion, TextLine};
+use ds_shell::ModuleTile;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -23,14 +25,14 @@ fn virtual_harness(app: fn() -> Element) -> Harness {
     Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
-static WIFI: GlobalSignal<ModuleState> = Signal::global(|| ModuleState::Off);
+/// The module's value and whether it is working towards it.
+type Lit = (Check, Availability);
+
+static WIFI: GlobalSignal<Lit> = Signal::global(|| (Check::Off, Availability::Enabled));
 static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
-fn flip(state: ModuleState) -> ModuleState {
-    match state {
-        ModuleState::Off => ModuleState::On,
-        ModuleState::On | ModuleState::Busy => ModuleState::Off,
-    }
+fn flip((value, _): Lit) -> Lit {
+    (value.flipped(), Availability::Enabled)
 }
 
 #[allow(non_snake_case)]
@@ -39,14 +41,14 @@ fn Tiles() -> Element {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "display:flex; gap:8px; width:340px",
                 div { id: "wifi", style: "flex:1",
-                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: Some(TextLine::from("On")), state: WIFI(), onclick: move |_| *WIFI.write() = flip(WIFI()) }
+                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: Some(TextLine::from("On")), value: WIFI().0, availability: WIFI().1, onclick: move |_| *WIFI.write() = flip(WIFI()) }
                 }
             }
         }
     }
 }
 
-fn set(harness: &mut Harness, state: ModuleState) {
+fn set(harness: &mut Harness, state: Lit) {
     harness.within(|| *WIFI.write() = state);
 }
 
@@ -59,7 +61,7 @@ fn a_busy_module_spins_its_ring_at_once_and_landing_on_takes_it_away() {
     let mut harness = virtual_harness(Tiles);
     assert_eq!(harness.count("#wifi .ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
-    set(&mut harness, ModuleState::Busy);
+    set(&mut harness, (Check::Off, Availability::Busy));
     harness.advance(ms(0));
     assert_eq!(
         harness.attr("#wifi .ds-progress", "data-pending"),
@@ -75,7 +77,7 @@ fn a_busy_module_spins_its_ring_at_once_and_landing_on_takes_it_away() {
         harness.attr("#wifi .ds-progress", "data-pending"),
         Some("step".to_owned())
     );
-    set(&mut harness, ModuleState::On);
+    set(&mut harness, (Check::On, Availability::Enabled));
     harness.advance(ms(0));
     assert_eq!(harness.count("#wifi .ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
@@ -86,7 +88,7 @@ fn reduced_keeps_the_ring_turning() {
     let mut harness = virtual_harness(Tiles);
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(ms(20));
-    set(&mut harness, ModuleState::Busy);
+    set(&mut harness, (Check::Off, Availability::Busy));
     harness.advance(ms(0));
     let first = turn(&harness);
     harness.advance(ms(83));

@@ -4,6 +4,7 @@
 //! reading the bar's `VolumeState`. Each motion ends at 0 frames.
 
 use dioxus::prelude::*;
+use ds::Check;
 use ds::ImagePosition;
 use ds::detail::EventStamp;
 use ds::{
@@ -15,7 +16,7 @@ use ds::{Slider, SliderLook};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::MenuBarItem;
-use ds_shell::{ModulePanel, ModuleState, ModuleTile};
+use ds_shell::{ModulePanel, ModuleTile};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -73,7 +74,7 @@ fn Bar() -> Element {
     }
 }
 
-const ITEM_SEL: &str = "#bar .ds-button";
+const ITEM_SEL: &str = "#bar .ds-menu-bar-item";
 
 fn side(harness: &Harness, selector: &str) -> (f32, f32) {
     let rect = harness
@@ -85,7 +86,7 @@ fn side(harness: &Harness, selector: &str) -> (f32, f32) {
 #[test]
 fn a_status_glyph_fills_the_status_items_glyph_square_with_its_label() {
     let mut harness = virtual_harness(Bar);
-    let glyph = format!("{ITEM_SEL} > .ds-button-icon > .ds-status-glyph[*|data-kind=wifi]");
+    let glyph = format!("{ITEM_SEL} > .ds-menu-bar-item-icon > .ds-status-glyph[*|data-kind=wifi]");
     assert_eq!(harness.count(&glyph), 1, "{}", harness.html());
     assert_eq!(
         side(&harness, ITEM_SEL),
@@ -98,14 +99,15 @@ fn a_status_glyph_fills_the_status_items_glyph_square_with_its_label() {
     let words = harness.within(|| ITEM.peek().words());
     assert_eq!(harness.attr(ITEM_SEL, "aria-label"), Some(words));
     assert_eq!(
-        harness.attr(ITEM_SEL, "data-variant").as_deref(),
-        Some("status-item")
+        harness.attr(ITEM_SEL, "data-image").as_deref(),
+        Some("only")
     );
 
     // The volume glyph sizes itself inline; the item's square still wins.
     harness.within(|| *ITEM.write() = StatusState::Volume(VolumeState::Heard(VolumeWaves::Two)));
     harness.advance(ms(0));
-    let volume = format!("{ITEM_SEL} > .ds-button-icon > .ds-status-glyph[*|data-kind=volume]");
+    let volume =
+        format!("{ITEM_SEL} > .ds-menu-bar-item-icon > .ds-status-glyph[*|data-kind=volume]");
     assert_eq!(side(&harness, &volume), (18.0, 18.0), "{}", harness.html());
     let wave = format!("{volume} .ds-level-part[*|data-part=wave-1]");
     assert_eq!(side(&harness, &wave), (18.0, 18.0));
@@ -161,12 +163,12 @@ fn Center() -> Element {
                     glyph: wifi,
                     title: "Wi-Fi",
                     status: Some(wifi.words().into()),
-                    state: ModuleState::On,
+                    value: Check::On,
                     onclick: |_| {},
                 }
             }
             div { id: "plain",
-                ModuleTile { glyph: Icon::Moon, title: "Focus", status: None, state: ModuleState::Off, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Moon, title: "Focus", status: None, value: Check::Off, onclick: |_| {} }
             }
         }
     }

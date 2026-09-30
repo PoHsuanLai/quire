@@ -11,4 +11,4 @@
   background:transparent; color:var(--ink-soft); font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-ws-pill:hover{ color:var(--ink); }
-.ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
+.ds-ws-pill[*|data-selected=selected]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }

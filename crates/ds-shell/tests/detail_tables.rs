@@ -3,25 +3,7 @@
 //! the ones that must not move.
 
 use ds::detail::{Moment, first_table, moment_table};
-use ds_shell::{ModuleState, PromptState};
-
-#[test]
-fn a_module_tiles_moments() {
-    use ModuleState::{Busy, Off, On};
-    moment_table(&[
-        (Off, Busy, Moment::Pending),
-        (On, Busy, Moment::Pending),
-        (Busy, On, Moment::Success),
-        (Busy, Off, Moment::Change),
-        (Off, On, Moment::Change),
-        (On, Off, Moment::Change),
-    ]);
-    first_table(&[
-        (Off, Moment::Rest),
-        (On, Moment::Rest),
-        (Busy, Moment::Pending),
-    ]);
-}
+use ds_shell::PromptState;
 
 #[test]
 fn a_lock_prompts_moments() {

@@ -2,14 +2,13 @@
 //! level in each scheme, a bare one, a three-column `ModuleGrid`, and the compact picker.
 
 use dioxus::prelude::*;
+use ds::Check;
 use ds::{
     Appearance, AppearancePicker, Ds, Fraction, Icon, Inject, LevelGlyph, Material, Muting,
     PickerLayout, Px, SystemPrefs, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_shell::{
-    GridColumns, ModuleGrid, ModulePanel, ModuleState, ModuleTile, PanelPlate, TileSpan,
-};
+use ds_shell::{GridColumns, ModuleGrid, ModulePanel, ModuleTile, PanelPlate, TileSpan};
 
 /// One specimen of this file.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -61,10 +60,10 @@ pub fn part(props: PartProps) -> Element {
         },
         PartCase::ThreeColumns => rsx! {
             ModuleGrid { columns: GridColumns(3), gap: Px(6.0), padding: Px(10.0),
-                ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", state: ModuleState::On, onclick: |_| {} }
-                ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", state: ModuleState::Off, onclick: |_| {} }
-                ModuleTile { glyph: Icon::Moon, title: "Focus", state: ModuleState::Off, onclick: |_| {} }
-                ModuleTile { glyph: Icon::Play, title: "Now Playing", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", value: Check::On, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", value: Check::Off, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Moon, title: "Focus", value: Check::Off, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Play, title: "Now Playing", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
             }
         },
         PartCase::Picker => rsx! {

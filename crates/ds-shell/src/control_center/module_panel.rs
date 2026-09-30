@@ -8,6 +8,7 @@
 
 use crate::control_center::module_tile_kind::TileSpan;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
@@ -41,12 +42,23 @@ pub fn ModulePanel(
     #[props(default = TileSpan::Full)] span: TileSpan,
     #[props(default)] plate: PanelPlate,
     #[props(default)] availability: Availability,
+    #[props(default)] common: Common,
     children: Element,
 ) -> Element {
     let head = header(glyph, title, trailing);
+    let class = common.class("ds-module-panel");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-module-panel", "data-span": span.slug(), "data-plate": plate.slug(),
+        div {
+            id: common.id.clone(),
+            class,
+            "data-span": span.slug(),
+            "data-plate": plate.slug(),
+            "data-availability": availability.slug(),
+            "aria-label": common.aria_label.clone(),
             "aria-disabled": availability.aria_disabled(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             {head}
             {children}
         }

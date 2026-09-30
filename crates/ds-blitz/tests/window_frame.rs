@@ -142,7 +142,7 @@ fn the_grain_changes_the_frame() {
 fn Switching() -> Element {
     let mut index = use_signal(|| 0usize);
     rsx! {
-        Ds { appearance: light(), look: look(index(), 0), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(index(), 0), material: Material::Window,
             style { {PROBE_CSS} }
             div { class: "room",
                 MenuBarItem {
@@ -174,7 +174,9 @@ fn a_space_switch_cross_fades_the_window() {
     let mut harness = Harness::new(Switching, VIEW);
     harness.advance(ms(60));
     let before = pixel(&harness.render().expect("renders"), 2, 2);
-    let button = harness.centre(".ds-button").expect("the switch is drawn");
+    let button = harness
+        .centre(".ds-menu-bar-item")
+        .expect("the switch is drawn");
     harness.click(button);
     harness.advance(quarter_of_the_curve());
     let halfway = harness.render().expect("renders");

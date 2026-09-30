@@ -4,14 +4,14 @@
 //! operation is derived from the state's own Pending moment).
 
 use dioxus::prelude::*;
-use ds::TextLine;
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material, person_hue,
 };
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds::{Availability, Check, TextLine};
 use ds_shell::ModuleTile;
-use ds_shell::{LockPrompt, LockUser, ModuleState, PromptState};
+use ds_shell::{LockPrompt, LockUser, PromptState};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -23,7 +23,8 @@ const VIEW: Viewport = Viewport {
 /// Long past where a cap used to hold a still frame.
 const PAST_CAP: Duration = Duration::from_millis(10_500);
 
-static MODULE: GlobalSignal<ModuleState> = Signal::global(|| ModuleState::Off);
+static MODULE: GlobalSignal<(Check, Availability)> =
+    Signal::global(|| (Check::Off, Availability::Enabled));
 static PROMPT: GlobalSignal<PromptState> = Signal::global(|| PromptState::Idle);
 
 #[allow(non_snake_case)]
@@ -31,7 +32,7 @@ fn Tile() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:300px;padding:12px",
-                ModuleTile { glyph: Icon::Wifi, title: TextLine::from("Wi-Fi"), status: None, state: MODULE(), onclick: |_| {} }
+                ModuleTile { glyph: Icon::Wifi, title: TextLine::from("Wi-Fi"), status: None, value: MODULE().0, availability: MODULE().1, onclick: |_| {} }
             }
         }
     }
@@ -61,9 +62,9 @@ fn spins_and_keeps_spinning(harness: &mut Harness) {
 fn a_busy_module_tile_spins_until_it_lands() {
     let mut harness =
         Harness::with_config(Tile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    harness.within(|| *MODULE.write() = ModuleState::Busy);
+    harness.within(|| *MODULE.write() = (Check::Off, Availability::Busy));
     spins_and_keeps_spinning(&mut harness);
-    harness.within(|| *MODULE.write() = ModuleState::On);
+    harness.within(|| *MODULE.write() = (Check::On, Availability::Enabled));
     harness.advance(Duration::from_millis(30));
     assert_eq!(harness.count(".ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);

@@ -2920,7 +2920,7 @@ html,body{margin:0;padding:0;background:transparent}
   background:transparent; color:var(--ink-soft); font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); cursor:default;
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-ws-pill:hover{ color:var(--ink); }
-.ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
+.ds-ws-pill[*|data-selected=selected]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
 /* -- detail_morph -- */
 /* MorphGlyph (design/26-DETAILS.md section 3.2): two stacked layers, each an `svg` in an HTML
    wrapper the stylesheet can move (Blitz's stylesheet does not reach inside an SVG). The incoming
@@ -3248,8 +3248,8 @@ html,body{margin:0;padding:0;background:transparent}
    the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
    hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
-   with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
-   pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`).
+   with `--accent-ink`. Busy: the Off disc with the progress ring around it. The tile does not
+   lift under the pointer (design/30 Part 4).
    A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
 
@@ -3257,14 +3257,12 @@ html,body{margin:0;padding:0;background:transparent}
   position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:var(--cc-tile-h); box-sizing:border-box;
   padding:0 var(--s-4) 0 var(--cc-pad); border:var(--hair) solid var(--line); border-radius:var(--cc-module-r);
   background:var(--surface-2); color:var(--ink); cursor:default; user-select:none;
-  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+  transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-tile:hover{ background:var(--raise); box-shadow:var(--shadow-1); }
 .ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
-.ds-module-tile[*|data-state=on]:hover{ background:var(--accent-soft); }
 .ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
-.ds-module-tile[*|aria-disabled=true]:hover{ background:var(--surface-2); box-shadow:none; transform:none; }
+.ds-module-tile[*|aria-busy=true]{ cursor:default; }
 
 .ds-module-disc > .ds-progress{ position:absolute; top:-4px; right:-4px; bottom:-4px; left:-4px; width:auto; height:auto; }
 .ds-module-disc{
