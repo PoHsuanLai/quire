@@ -11,9 +11,9 @@
 //! `--t-move` (design/30 section 1.3), recomputing its path each frame while it moves and never
 //! at rest. The low red and `aria-valuenow` follow the true level from the first frame.
 
-use crate::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
 use ds::components::content::text_runs::TextLine;
+use ds::components::controls::progress::arc::{RingSpan, arc_path};
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 use ds_motion::detail::tween::{TweenSpec, use_tween};

@@ -9,9 +9,8 @@ use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{Bezel, Button, ControlSize, IconSwap, ImagePosition};
-use ds::{
-    Fraction, Glyph, Icon, IconSize, LevelControl, LevelGlyph, LevelLook, LevelMode, Px, TextLine,
-};
+use ds::{Fraction, Glyph, Icon, IconSize, LevelGlyph, Px, TextLine};
+use ds::{Slider, SliderLook};
 use ds_shell::{
     DeviceBattery, ModuleGrid, ModulePanel, ModuleState, ModuleTile, NowPlayingTrack, Playback,
     RingMark, TrackPosition,
@@ -161,19 +160,18 @@ fn BatteryCell() -> Element {
 fn KeyboardCell() -> Element {
     let mut level = use_signal(|| Fraction(450));
     rsx! {
-        Cell { name: "Keyboard brightness", code: "LevelControl {{ glyph: LevelGlyph::KeyboardBrightness }}",
+        Cell { name: "Keyboard brightness", code: "Slider {{ glyph: LevelGlyph::KeyboardBrightness, look: CapsuleKnob }}",
             controls: rsx! {
                 {mini("Dim", move |_| level.set(Fraction(100)))}
                 {mini("Bright", move |_| level.set(Fraction(1000)))}
             },
             div { class: "g-detail g-detail-list",
                 ModulePanel { glyph: Some(Icon::Keyboard), title: Some(TextLine::from("Keyboard Brightness")), trailing: rsx! { "{(level().0 + 5) / 10}%" },
-                    LevelControl {
+                    Slider {
                         label: "Keyboard Brightness".to_owned(),
                         value: level(),
                         glyph: LevelGlyph::KeyboardBrightness,
-                        mode: LevelMode::Interactive,
-                        look: LevelLook::CapsuleKnob,
+                        look: SliderLook::CapsuleKnob,
                         onchange: move |next| level.set(next),
                     }
                 }

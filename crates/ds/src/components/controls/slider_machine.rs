@@ -1,4 +1,4 @@
-//! The level control's machine, pure (the user's brief of 2026-09-25): the press, the drag that
+//! The capsule slider's machine, pure (the user's brief of 2026-09-25): the press, the drag that
 //! follows the pointer, and the keys. The component measures the track and runs the effects; this
 //! decides.
 
@@ -126,5 +126,5 @@ pub(crate) fn keyed(value: Fraction, nudge: Nudge, step: KeyStep) -> Fraction {
 }
 
 #[cfg(test)]
-#[path = "machine_tests.rs"]
+#[path = "slider_machine_tests.rs"]
 mod tests;

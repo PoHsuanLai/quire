@@ -1,0 +1,13 @@
+/* LevelGlyph (design/26-DETAILS.md 5.2.7): the speaker, the sun and the keyboard light that follow
+   a level, drawn as stacked parts. `--f` is the level the enclosing control writes; a part shows
+   or not as the level says, and its change cross-fades over `--t-quick` (the sun's rays scale with
+   `--f`). Attribute selectors carry `*|` (spike S2). */
+
+.ds-level-glyph{ position:relative; display:block; flex:none; }
+.ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
+.ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
+.ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
+.ds-level-part[*|data-on=off]{ opacity:0; }
+.ds-level-part[*|data-part=rays]{ transform:scale(calc(.6 + .4 * var(--f))); }
+/* The keyboard light's rays grow from the rising sun's centre, (12, 9) on the 24 grid. */
+.ds-level-part[*|data-part=key-rays]{ transform-origin:50% 37.5%; transform:scale(calc(.6 + .4 * var(--f))); }

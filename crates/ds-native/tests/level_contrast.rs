@@ -9,10 +9,12 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::LevelStyle;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, Material,
-    Muting, PRESETS, RootChrome, Shown, SpaceLook, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, Material, Muting, PRESETS, RootChrome,
+    Shown, SpaceLook, Theme,
 };
+use ds::{Slider, SliderLook};
 use ds_native::{Harness, Viewport};
 use ds_shell::{ModulePanel, Osd, OsdLevel};
 use probe::rect;
@@ -47,7 +49,7 @@ fn work(theme: Theme) -> SpaceLook {
 
 fn level() -> Element {
     rsx! {
-        LevelControl { label: "Volume", value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} }
+        Slider { label: "Volume", value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {}, look: SliderLook::Capsule }
     }
 }
 
@@ -75,7 +77,7 @@ fn Specimen() -> Element {
             Ds { sheet: Some(ds_shell::stylesheet()), appearance, look: work(theme), material: Material::Window,
                 Ds { appearance, look: work(theme), material: Material::Osd, chrome: Some(RootChrome::Transparent),
                      blur: BlurState::Available, stylesheet: Inject::Host,
-                    Osd { shown: Shown::Visible, label: "Sound", look: LevelLook::Capsule,
+                    Osd { shown: Shown::Visible, label: "Sound", style: LevelStyle::Continuous,
                           level: OsdLevel { value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible) } }
                 }
             }

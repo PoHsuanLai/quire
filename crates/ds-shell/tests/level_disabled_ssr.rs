@@ -4,10 +4,8 @@
 //! swell; a `ModulePanel` whose content is disabled dims its header glyph and percentage.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Availability, Ds, Fraction, Icon, Inject, LevelControl, LevelGlyph, LevelLook,
-    Material, Muting,
-};
+use ds::{Appearance, Availability, Ds, Fraction, Icon, Inject, LevelGlyph, Material, Muting};
+use ds::{Slider, SliderLook};
 use ds_shell::ModulePanel;
 
 #[derive(Props, Clone)]
@@ -43,11 +41,11 @@ fn rooted(body: Element) -> Element {
 fn panel(availability: Availability) -> Element {
     rooted(rsx! {
         ModulePanel { glyph: Some(Icon::Sun), title: Some(ds::TextLine::from("Display")), trailing: rsx! { "40%" }, availability,
-            LevelControl {
+            Slider {
                 label: "Brightness",
                 value: Fraction(0),
                 glyph: LevelGlyph::Brightness,
-                look: LevelLook::CapsuleKnob,
+                look: SliderLook::CapsuleKnob,
                 availability,
             }
         }
@@ -72,12 +70,11 @@ const CASES: &[Case] = &[
         "disabled capsule",
         || {
             rooted(rsx! {
-                LevelControl {
+                Slider {
                     label: "Volume",
                     value: Fraction(0),
                     glyph: LevelGlyph::Volume(Muting::Audible),
-                    availability: Availability::Disabled,
-                }
+                    availability: Availability::Disabled, look: SliderLook::Capsule }
             })
         },
         Availability::Disabled,

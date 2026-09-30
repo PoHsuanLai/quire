@@ -3,9 +3,9 @@
 //! `--t-move`) and the number changes instantly (design/30 section 1.3).
 
 use crate::battery::level::{BOLT, RingLayer, RingMark, RingTone, given, ring, use_ring_share};
-use crate::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
 use ds::components::content::text_runs::TextLine;
+use ds::components::controls::progress::arc::{RingSpan, arc_path};
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 

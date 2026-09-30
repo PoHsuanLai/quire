@@ -6,11 +6,12 @@
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconSource, LevelControl,
-    LevelGlyph, LowAt, Material, Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves,
-    WifiBars, WifiReach, WifiState,
+    Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconSource, LevelGlyph, LowAt,
+    Material, Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves, WifiBars,
+    WifiReach, WifiState,
 };
 use ds::{Bezel, Button, ImagePosition};
+use ds::{Slider, SliderLook};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{ModulePanel, ModuleState, ModuleTile};
@@ -221,10 +222,10 @@ fn Sound() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "shared", style: "width: 300px",
-                LevelControl { label: "Volume", value: Fraction(500), glyph: VOLUME(), onchange: |_| {} }
+                Slider { label: "Volume", value: Fraction(500), glyph: VOLUME(), onchange: |_| {}, look: SliderLook::Capsule }
             }
             div { id: "own", style: "width: 300px",
-                LevelControl { label: "Output", value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} }
+                Slider { label: "Output", value: Fraction(500), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {}, look: SliderLook::Capsule }
             }
         }
     }

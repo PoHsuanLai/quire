@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 58] = [
+pub(crate) const SHEETS: [(&str, &str); 59] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
@@ -64,7 +64,14 @@ pub(crate) const SHEETS: [(&str, &str); 58] = [
     ("kbd", include_str!("../components/controls/kbd.css")),
     ("chord", include_str!("../components/controls/chord.css")),
     ("label", include_str!("../components/content/label.css")),
-    ("level", include_str!("../components/controls/level.css")),
+    (
+        "level_glyph",
+        include_str!("../components/content/level_glyph/glyph.css"),
+    ),
+    (
+        "level_indicator",
+        include_str!("../components/controls/level_indicator.css"),
+    ),
     ("link_pill", include_str!("../components/app/link_pill.css")),
     (
         "leaving_list",

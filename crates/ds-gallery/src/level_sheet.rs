@@ -1,5 +1,5 @@
-//! `--level-sheet DIR`: the level control's contact sheets for the user's pick (the brief of
-//! 2026-09-25). `level-variants.png`: each look (capsule, capsule and knob, segments) in light
+//! `--level-sheet DIR`: the level indicator's contact sheets for the user's pick (the brief of
+//! 2026-09-25). `level-variants.png`: each style (continuous, discrete) in light
 //! and dark, over the Work Space's tint and over a light ground, for volume at 0, 40 and 100 %,
 //! muted, and brightness at 30 %, at 1x and at 2x. `level-motion.png`: headless frames through a
 //! level set from outside, a press, a drag past the end and the release (`level_motion.rs`).
@@ -12,7 +12,7 @@ use crate::snapshot::progress_dir;
 use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{Appearance, Ds, LevelLook, Material, Scheme, Theme};
+use ds::{Appearance, Ds, LevelStyle, Material, Scheme, Theme};
 use ds_native::{Harness, Viewport};
 use image::{Rgba, RgbaImage, imageops};
 use std::cell::Cell;
@@ -28,26 +28,26 @@ const GAP: u32 = 24;
 
 thread_local! {
     /// The row [`Row`] draws: one look, scheme and ground.
-    static ROW: Cell<(LevelLook, Scheme, Ground)> =
-        const { Cell::new((LevelLook::Capsule, Scheme::Light, Ground::Work)) };
+    static ROW: Cell<(LevelStyle, Scheme, Ground)> =
+        const { Cell::new((LevelStyle::Continuous, Scheme::Light, Ground::Work)) };
 }
 
 /// One row of the sheet: its label, then a tile per state. A row is rendered on its own: Blitz's
 /// CPU renderer loses layers when one document holds every tile (FINDINGS "Design facts the code relies on").
 #[allow(non_snake_case)] // A component: the harness names it like a type.
 fn Row() -> Element {
-    let (look, scheme, ground) = ROW.get();
+    let (style, scheme, ground) = ROW.get();
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
             style { {style::CSS} }
             div { class: "g-level-sheet",
                 div { class: "g-row g-row-top",
                     div { class: "g-col g-level-label",
-                        span { class: "g-name", "{look.slug()}" }
+                        span { class: "g-name", "{style.slug()}" }
                         span { class: "g-code", "{scheme.slug()}, {ground.label()}" }
                     }
                     for state in STATES {
-                        LevelTile { look, scheme, ground, state }
+                        LevelTile { style, scheme, ground, state }
                     }
                 }
             }
@@ -56,7 +56,10 @@ fn Row() -> Element {
 }
 
 /// One row at `scale_percent`, cropped to its content.
-fn row_at(row: (LevelLook, Scheme, Ground), scale_percent: u16) -> Result<RgbaImage, GalleryError> {
+fn row_at(
+    row: (LevelStyle, Scheme, Ground),
+    scale_percent: u16,
+) -> Result<RgbaImage, GalleryError> {
     ROW.set(row);
     let viewport = Viewport {
         width: WIDTH,
@@ -78,17 +81,17 @@ fn row_at(row: (LevelLook, Scheme, Ground), scale_percent: u16) -> Result<RgbaIm
 
 /// Every row at `scale_percent`, look by look.
 fn variants_at(scale_percent: u16) -> Result<RgbaImage, GalleryError> {
-    let looks = LevelLook::ALL
+    let looks = LevelStyle::ALL
         .iter()
         .copied()
-        .map(|look| {
+        .map(|style| {
             let rows = [Scheme::Light, Scheme::Dark]
                 .into_iter()
                 .flat_map(|scheme| {
                     Ground::ALL
                         .iter()
                         .copied()
-                        .map(move |ground| (look, scheme, ground))
+                        .map(move |ground| (style, scheme, ground))
                 })
                 .map(|row| row_at(row, scale_percent))
                 .collect::<Result<Vec<_>, _>>()?;

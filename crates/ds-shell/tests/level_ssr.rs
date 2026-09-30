@@ -1,6 +1,6 @@
-//! The level control and the OSD card as markup (the user's brief of 2026-09-25):
-//! each look, each glyph state, read-only and interactive, and the OSD card shown at
-//! either anchor and hidden. Each golden is `tests/snapshots/level/<name>.html`, and every `ds-`
+//! The capsule slider, the level indicator and the OSD card as markup (the user's brief of
+//! 2026-09-25): each look and style, each glyph state, read-only and interactive, and the OSD
+//! card shown at either anchor and hidden. Each golden is `tests/snapshots/level/<name>.html`, and every `ds-`
 //! class in it must be styled by the stylesheet.
 //!
 //! `DS_BLESS=1 cargo test -p ds-shell --test level_ssr` rewrites the goldens.
@@ -10,8 +10,8 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, LevelMode, Material,
-    Muting, RootChrome, Shown,
+    Appearance, Ds, Fraction, Inject, LevelGlyph, LevelIndicator, LevelStyle, Material, Muting,
+    RootChrome, Shown, Slider, SliderLook,
 };
 use ds_shell::{Osd, OsdLevel, OsdPosition};
 
@@ -50,27 +50,29 @@ fn osd_root(body: Element) -> Element {
 type Case = (&'static str, fn() -> Element);
 
 const CASES: &[Case] = &[
-    ("capsule-volume-40", || {
-        osd_root(rsx! { LevelControl { label: "Volume", value: Fraction(400), glyph: HEARD } })
-    }),
-    ("capsule-knob-volume-40", || {
+    ("slider-capsule-volume-40", || {
         osd_root(
-            rsx! { LevelControl { label: "Volume", value: Fraction(400), glyph: HEARD, look: LevelLook::CapsuleKnob } },
+            rsx! { Slider { label: "Volume", value: Fraction(400), glyph: HEARD, look: SliderLook::Capsule } },
         )
     }),
-    ("segments-volume-40", || {
+    ("slider-capsule-knob-volume-40", || {
         osd_root(
-            rsx! { LevelControl { label: "Volume", value: Fraction(400), glyph: HEARD, look: LevelLook::Segments } },
+            rsx! { Slider { label: "Volume", value: Fraction(400), glyph: HEARD, look: SliderLook::CapsuleKnob } },
         )
     }),
-    ("capsule-muted", || {
+    ("indicator-discrete-volume-40", || {
         osd_root(
-            rsx! { LevelControl { label: "Volume", value: Fraction(400), glyph: LevelGlyph::Volume(Muting::Muted) } },
+            rsx! { LevelIndicator { label: "Volume", value: Fraction(400), glyph: HEARD, style: LevelStyle::Discrete } },
         )
     }),
-    ("capsule-brightness-30-read-only", || {
+    ("slider-capsule-muted", || {
         osd_root(
-            rsx! { LevelControl { label: "Brightness", value: Fraction(300), glyph: LevelGlyph::Brightness, mode: LevelMode::ReadOnly } },
+            rsx! { Slider { label: "Volume", value: Fraction(400), glyph: LevelGlyph::Volume(Muting::Muted), look: SliderLook::Capsule } },
+        )
+    }),
+    ("indicator-continuous-brightness-30", || {
+        osd_root(
+            rsx! { LevelIndicator { label: "Brightness", value: Fraction(300), glyph: LevelGlyph::Brightness } },
         )
     }),
     ("osd-top-right", || {
@@ -124,17 +126,17 @@ fn every_class_is_styled() {
 }
 
 #[test]
-fn a_read_only_level_takes_no_input_and_a_control_does() {
-    let read_only = render(CASES[4].1);
-    assert!(read_only.contains("role=\"progressbar\""), "{read_only}");
-    assert!(!read_only.contains("tabindex"), "{read_only}");
-    assert!(!read_only.contains("ds-level-hit"), "{read_only}");
-    let control = render(CASES[0].1);
+fn an_indicator_takes_no_input_and_a_slider_does() {
+    let indicator = render(CASES[4].1);
+    assert!(indicator.contains("role=\"meter\""), "{indicator}");
+    assert!(!indicator.contains("tabindex"), "{indicator}");
+    assert!(!indicator.contains("ds-slider-hit"), "{indicator}");
+    let slider = render(CASES[0].1);
     assert!(
-        control.contains("role=\"slider\"") && control.contains("tabindex=\"0\""),
-        "{control}"
+        slider.contains("role=\"slider\"") && slider.contains("tabindex=\"0\""),
+        "{slider}"
     );
-    assert!(control.contains("aria-valuenow=\"40\""), "{control}");
+    assert!(slider.contains("aria-valuenow=\"40\""), "{slider}");
 }
 
 #[test]
@@ -144,7 +146,12 @@ fn the_capsule_draws_its_glyph_twice_and_the_other_looks_once() {
     assert_eq!(parts(&render(CASES[1].1)), 1);
     assert_eq!(parts(&render(CASES[2].1)), 1);
     let segments = render(CASES[2].1);
-    assert_eq!(segments.matches("class=\"ds-level-seg\"").count(), 16);
+    assert_eq!(
+        segments
+            .matches("class=\"ds-level-indicator-segment\"")
+            .count(),
+        16
+    );
     assert_eq!(
         segments.matches("data-on=\"on\"").count() - 3,
         6,

@@ -1,33 +1,7 @@
-//! The level control's vocabulary: what it is for, how it looks, and which glyph it
-//! carries. Every choice is a named variant (no `bool`, CONVENTIONS section 4).
-
+//! The level glyph's vocabulary: which glyph a level carries and where it takes its state from.
+//! Every choice is a named variant (no `bool`, CONVENTIONS section 4).
 use crate::components::content::status::volume::VolumeState;
 use ds_core::vocab::{Fraction, Muting};
-use ds_core::word::Word;
-
-/// Whether the control takes input.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum LevelMode {
-    /// A control: pointer and keys move it (`role="slider"`, focusable).
-    #[default]
-    Interactive,
-    /// A read-only level (`role="progressbar"`, not focusable, no handlers): the OSD's.
-    ReadOnly,
-}
-
-/// How the level is drawn: three looks for the user to choose between (FINDINGS "Level control
-/// (2026-09-25)" has the references each follows).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum LevelLook {
-    /// A thick capsule whose fill is the material's bright ink, with the glyph inside at its left
-    /// end, two-toned where the fill covers it (recommended).
-    #[default]
-    Capsule,
-    /// The capsule with a separate round knob riding the fill's end, the glyph before it.
-    CapsuleKnob,
-    /// Sixteen rounded squares that fill in one by one, the glyph before them.
-    Segments,
-}
 
 /// The glyph a level carries, which follows the level.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -60,6 +34,26 @@ impl LevelSource {
             LevelSource::Glyph(glyph) => (glyph, value),
             LevelSource::Volume(state) => state.glyph(),
         }
+    }
+}
+
+/// Marks the two conversions below, so they do not collide with dioxus's own.
+#[doc(hidden)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct LevelSlot;
+
+/// `Slider { glyph: LevelGlyph::Brightness }`: a level glyph fills a slot that takes a
+/// [`LevelSource`].
+impl dioxus::core::SuperFrom<LevelGlyph, LevelSlot> for Option<LevelSource> {
+    fn super_from(glyph: LevelGlyph) -> Self {
+        Some(LevelSource::Glyph(glyph))
+    }
+}
+
+/// `Slider { glyph: volume_state }` too.
+impl dioxus::core::SuperFrom<VolumeState, LevelSlot> for Option<LevelSource> {
+    fn super_from(state: VolumeState) -> Self {
+        Some(LevelSource::Volume(state))
     }
 }
 

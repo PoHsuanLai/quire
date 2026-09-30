@@ -3,9 +3,8 @@
 //! panel spans both columns inside the grid's padding.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Fraction, Icon, LevelControl, LevelGlyph, Material, Muting, Point, Px, Rect,
-};
+use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
+use ds::{Slider, SliderLook};
 use ds_native::{Harness, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
@@ -32,12 +31,11 @@ fn Sound() -> Element {
                         glyph: Icon::Volume2,
                         title: "Speakers",
                         trailing: rsx! { "{percent}%" },
-                        LevelControl {
+                        Slider {
                             label: "Volume",
                             value: VALUE(),
                             glyph: LevelGlyph::Volume(Muting::Audible),
-                            onchange: move |next| *VALUE.write() = next,
-                        }
+                            onchange: move |next| *VALUE.write() = next, look: SliderLook::Capsule }
                     }
                 }
             }

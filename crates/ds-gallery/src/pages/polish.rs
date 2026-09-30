@@ -237,7 +237,7 @@ fn OsdSection() -> Element {
             div { class: "g-row g-row-top",
                 for scheme in [Scheme::Light, Scheme::Dark] {
                     for state in [STATES[1], STATES[4]] {
-                        LevelTile { look: ds::LevelLook::Capsule, scheme, ground: Ground::Work, state }
+                        LevelTile { style: ds::LevelStyle::Continuous, scheme, ground: Ground::Work, state }
                     }
                 }
             }

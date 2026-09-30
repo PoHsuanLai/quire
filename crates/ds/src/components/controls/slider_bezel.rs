@@ -1,47 +1,51 @@
-//! `LevelControl`: a level with a glyph that follows it, in one of three looks (the user's brief
-//! of 2026-09-25). The form [`crate::Slider`] stays for settings rows; this is
-//! the shell's volume and brightness control and the OSD's level.
+//! The capsule sliders (`SliderLook::Capsule` and `SliderLook::CapsuleKnob`): a level with a
+//! glyph that follows it, the control center's volume and brightness (the user's brief of
+//! 2026-09-25; design/30 section 2.1).
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
-//! from outside (a key, the OSD, the service) slides over `--t-quick --e-out`. Keys step by a
-//! sixteenth, Shift by a sixty-fourth. The machine is `machine.rs`; the drawing `look.rs`.
+//! from outside (a key, the service) slides over `--t-quick --e-out`. Keys step by a sixteenth,
+//! Shift by a sixty-fourth. The machine is `slider_machine.rs`; the drawing `level_draw.rs`.
 
-use super::look::{Drawn, body};
-use super::machine::{Hold, KeyStep, LevelInput, Nudge, step};
-use crate::components::content::level_glyph::glyph::LevelGlyphView;
-use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource};
+use crate::components::content::level_glyph::vocab::LevelSource;
+use crate::components::controls::level_draw::{Drawn, GlyphAt, SLIDER, Shape, body, lead};
+use crate::components::controls::slider_machine::{Hold, KeyStep, LevelInput, Nudge, step};
+use crate::components::controls::slider_model::SliderLook;
 use crate::host::measure::client_rect;
+use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Px, Rect, Size};
-use ds_core::vocab::{Availability, Fraction, PressPhase};
+use ds_core::geometry::units::{Point, Px, Rect, Size};
+use ds_core::vocab::{Availability, Fraction};
 use ds_core::word::Word;
-use ds_style::icon::render::IconSize;
+use ds_style::tokens::control_size::ControlSize;
 use std::rc::Rc;
 
-/// A level: the glyph that follows it and the capsule, knob or segments that show it.
-/// `onchange` is never called in `LevelMode::ReadOnly`, so a read-only level may leave it out.
-/// `Availability::Disabled` draws it plainly unavailable (a disabled level used to look like
-/// an enabled one at 0 %): the capsule and glyph at the disabled .35, no knob, the not-allowed
-/// cursor, no press, drag, key or swell, and out of the tab order.
-/// `glyph` is a `LevelGlyph` that follows `value`, or a `VolumeState` (both convert): then the
-/// speaker draws that state's waves and slash, as the bar's volume item does.
+/// The shape a capsule look draws.
+fn shape_of(look: SliderLook) -> Shape {
+    match look {
+        SliderLook::Linear | SliderLook::Capsule => Shape::Capsule,
+        SliderLook::CapsuleKnob => Shape::CapsuleKnob,
+    }
+}
+
+/// A level: the glyph that follows it and the capsule that shows it.
+/// `Availability::Disabled` draws it plainly unavailable: the capsule and glyph at the disabled
+/// .35, no knob, the not-allowed cursor, no press, drag or key, and out of the tab order.
 #[component]
-pub fn LevelControl(
+pub(crate) fn BezelSlider(
     label: String,
     value: Fraction,
-    #[props(into)] glyph: LevelSource,
-    #[props(default)] mode: LevelMode,
-    #[props(default)] look: LevelLook,
-    #[props(default)] availability: Availability,
-    #[props(default)] onchange: EventHandler<Fraction>,
+    look: SliderLook,
+    glyph: Option<LevelSource>,
+    size: ControlSize,
+    availability: Availability,
+    onchange: EventHandler<Fraction>,
+    common: Common,
 ) -> Element {
     let value = value.clamped();
-    let (glyph, glyph_level) = glyph.drawn(value);
     let mut state = use_signal(|| Hold::Idle);
     let mut rail = use_signal(|| None::<Rc<MountedData>>);
     let mut root = use_signal(|| None::<Rc<MountedData>>);
-    let now = state();
-    let takes_input = mode == LevelMode::Interactive && availability == Availability::Enabled;
+    let takes_input = availability == Availability::Enabled;
     let mut apply = move |input: LevelInput, at: Fraction| {
         let stepped = step(*state.peek(), at, input);
         state.set(stepped.state);
@@ -49,43 +53,43 @@ pub fn LevelControl(
             onchange.call(next);
         }
     };
+    let shape = shape_of(look);
     let drawn = Drawn {
-        look,
+        shape,
+        parts: SLIDER,
         value,
-        glyph,
-        glyph_level,
+        glyph: glyph.map(|source| {
+            let (glyph, level) = source.drawn(value);
+            GlyphAt { glyph, level }
+        }),
     };
-    let lead = match look {
-        LevelLook::Capsule => None,
-        LevelLook::CapsuleKnob | LevelLook::Segments => Some(glyph),
-    };
-    let live = match now.phase() {
-        PressPhase::Idle => "idle",
-        PressPhase::Pressed | PressPhase::Held => "live",
-    };
-    // A disabled level is not a stop in the tab order: it takes no key and no press.
-    let (role, tabindex) = match (mode, availability) {
-        (LevelMode::Interactive, Availability::Enabled) => ("slider", Some("0")),
-        (LevelMode::Interactive, Availability::Disabled | Availability::Busy) => ("slider", None),
-        (LevelMode::ReadOnly, _) => ("progressbar", None),
-    };
+    let leading = lead(&drawn);
+    let pressed = state().phase().attr();
     let fill = value.css();
+    let class = common.class("ds-slider");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-level",
+            id: common.id.clone(),
+            class,
             "data-look": look.slug(),
-            "data-mode": mode.slug(),
-            "data-drag": live,
-            role,
-            tabindex,
-            "aria-label": "{label}",
+            "data-size": size.slug(),
+            "data-availability": availability.slug(),
+            "data-pressed": pressed,
+            role: "slider",
+            // A disabled level is not a stop in the tab order: it takes no key and no press.
+            tabindex: if takes_input { Some("0") } else { None },
+            "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "aria-valuemin": "0",
             "aria-valuemax": "100",
             "aria-valuenow": "{percent(value)}",
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
             style: "--f:{fill}",
-            onmounted: move |event| root.set(Some(event.data())),
+            onmounted: move |event| {
+                root.set(Some(event.data()));
+                common.mounted(event);
+            },
             onpointerdown: move |event| {
                 if !takes_input {
                     return;
@@ -103,7 +107,7 @@ pub fn LevelControl(
                 if let Some(mounted) = rail() {
                     spawn(async move {
                         if let Some(measured) = client_rect(&mounted).await {
-                            apply(LevelInput::Measured { x, track: travel(measured, look) }, value);
+                            apply(LevelInput::Measured { x, track: travel(measured, shape) }, value);
                         }
                     });
                 }
@@ -122,32 +126,29 @@ pub fn LevelControl(
                     apply(LevelInput::Key { nudge, step }, value);
                 }
             },
-            if let Some(glyph) = lead {
-                span { class: "ds-level-lead",
-                    LevelGlyphView { glyph, value: glyph_level, size: IconSize::Bar }
-                }
-            }
+            ..data,
+            {leading}
             div {
-                class: "ds-level-rail",
+                class: "ds-slider-rail",
                 onmounted: move |event| rail.set(Some(event.data())),
                 {body(drawn)}
                 if takes_input {
-                    div { class: "ds-level-hit" }
+                    div { class: "ds-slider-hit" }
                 }
             }
         }
     }
 }
 
-/// The span the pointer travels for `look`: the whole rail, except under a knob, whose centre
+/// The span the pointer travels for `shape`: the whole rail, except under a knob, whose centre
 /// travels from half a knob in at each end.
-fn travel(rail: Rect, look: LevelLook) -> Rect {
-    match look {
-        LevelLook::Capsule | LevelLook::Segments => rail,
-        LevelLook::CapsuleKnob => {
+fn travel(rail: Rect, shape: Shape) -> Rect {
+    match shape {
+        Shape::Capsule | Shape::Segments => rail,
+        Shape::CapsuleKnob => {
             let inset = rail.size.height.0 / 2.0;
             Rect {
-                origin: ds_core::geometry::units::Point {
+                origin: Point {
                     x: Px(rail.origin.x.0 + inset),
                     y: rail.origin.y,
                 },
@@ -171,5 +172,5 @@ fn nudge(key: &Key) -> Option<Nudge> {
 
 /// `aria-valuenow`: the level on the 0..=100 scale the markup declares.
 fn percent(value: Fraction) -> u16 {
-    (value.clamped().0 + 5) / 10
+    value.whole_percent()
 }
