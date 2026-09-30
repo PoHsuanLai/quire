@@ -4,12 +4,11 @@
 //! opens from two lines to six, measured, and closes again when the pointer leaves.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, TextRun};
-use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
 use ds::{
     Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, ShortcutKey, TextRun,
 };
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
 
 const VIEW: Viewport = Viewport {

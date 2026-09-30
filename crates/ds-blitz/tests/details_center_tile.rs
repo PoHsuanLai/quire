@@ -3,11 +3,9 @@
 //! on, every moment ending at 0 frames (R3).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, Material, Motion, TextLine};
+use ds::{Appearance, Availability, Check, Ds, Icon, Material, Motion, TextLine};
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
-use ds_shell::{ModuleState, ModuleTile};
-use ds::{Appearance, Availability, Check, Ds, Icon, Material, Motion, TextLine};
 use ds_shell::ModuleTile;
 use std::time::Duration;
 

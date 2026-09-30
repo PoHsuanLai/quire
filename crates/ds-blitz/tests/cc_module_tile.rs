@@ -3,10 +3,8 @@
 //! (Enter or Space on the tile toggles; Enter or Right on the chevron opens the detail).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, Material, Point, ShortcutKey};
-use ds_harness::{Harness, Viewport};
-use ds_shell::{Chevron, ModuleState, ModuleTile, TileSpan};
 use ds::{Appearance, Check, Ds, Icon, Material, Point, ShortcutKey};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{ModuleTile, TileSpan};
 use std::time::Duration;
 

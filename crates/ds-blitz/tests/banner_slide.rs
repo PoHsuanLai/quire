@@ -11,9 +11,6 @@ use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px, Rect};
 use ds_harness::harness::settle_until;
 use ds_harness::{Harness, Viewport};
-use ds_shell::{
-    AppMark, Banner, BannerEntry, BannerKey, BannerStack, NotificationCard, NotificationSwipe,
-};
 use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
 use std::cell::Cell;
 use std::time::Duration;

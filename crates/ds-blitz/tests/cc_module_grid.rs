@@ -5,7 +5,6 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{Appearance, Ds, Icon, Material, Px, Rect};
 use ds_harness::{Harness, Viewport};
-use ds_shell::{GridColumns, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 use ds_shell::{GridColumns, ModuleGrid, ModuleTile, TileSpan};
 use std::time::Duration;
 

@@ -14,7 +14,6 @@ use ds::{
     FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement,
     Point, Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
-use ds::{Bezel, Button, ImagePosition};
 use ds_harness::{Backdrop, Harness, Viewport};
 use ds_shell::MenuBarItem;
 use image::RgbaImage;
