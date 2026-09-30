@@ -54,12 +54,7 @@ pub enum UserStyleNoteKind {
         /// The class, id or attribute as written: `.ds-chip-label`, `[data-x]`.
         selector: String,
     },
-    /// A public attribute written without the `*|` namespace, which Blitz never matches.
-    UnprefixedAttribute {
-        /// The attribute as written: `[data-surface]`.
-        selector: String,
-    },
-    /// `!important`: a user rule wins by coming last, so it is never needed.
+    /// `!important`: a user rule is unlayered and beats every design-system rule, so it is never needed.
     Important,
     /// A `url()` that is not a local `file:` or `data:` URL.
     NonLocalUrl {
@@ -101,14 +96,10 @@ impl fmt::Display for UserStyleNote {
                 f,
                 "{place}: note: `{selector}` is not on the public selector surface and may change without notice"
             ),
-            UserStyleNoteKind::UnprefixedAttribute { selector } => write!(
-                f,
-                "{place}: note: `{selector}` never matches on Blitz; write it with the `*|` namespace"
-            ),
             UserStyleNoteKind::Important => {
                 write!(
                     f,
-                    "{place}: note: `!important` is never needed: your rules come last"
+                    "{place}: note: `!important` is never needed: your rules beat the design system by the cascade layer"
                 )
             }
             UserStyleNoteKind::NonLocalUrl { url } => {

@@ -529,19 +529,33 @@ const CASES: &[Case] = &[
         rule: Rule::BlitzUnsupported,
         expect: false,
     },
-    // UnprefixedAttributeSelector
+    // LayerDs
     Case {
-        name: "unprefixed attribute: [data-open] fails",
-        css: "[data-open] { color: var(--ink); }",
+        name: "layer ds: a block naming ds fails",
+        css: "@layer ds { .chip { color: var(--ink); } }",
         profile: Profile::Strict,
-        rule: Rule::UnprefixedAttributeSelector,
+        rule: Rule::LayerDs,
         expect: true,
     },
     Case {
-        name: "unprefixed attribute: [*|data-open] passes",
-        css: "[*|data-open] { color: var(--ink); }",
+        name: "layer ds: an order statement naming ds fails",
+        css: "@layer base, ds;\n.chip { color: var(--ink); }",
         profile: Profile::Strict,
-        rule: Rule::UnprefixedAttributeSelector,
+        rule: Rule::LayerDs,
+        expect: true,
+    },
+    Case {
+        name: "layer ds: a sub-layer of ds fails",
+        css: "@layer ds.extra { .chip { color: var(--ink); } }",
+        profile: Profile::Strict,
+        rule: Rule::LayerDs,
+        expect: true,
+    },
+    Case {
+        name: "layer ds: another layer passes",
+        css: "@layer app { .chip { color: var(--ink); } }\n@layer dsx { .a { color: var(--ink); } }",
+        profile: Profile::Strict,
+        rule: Rule::LayerDs,
         expect: false,
     },
     // FocusPseudoClass

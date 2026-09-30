@@ -9,6 +9,7 @@ use super::kind;
 use super::rule::{Offence, Rule};
 use super::text::render;
 use super::tokenize::Located;
+use ds_style::css::layers;
 
 /// One property/value pair inside a rule's body.
 #[derive(Debug)]
@@ -45,12 +46,17 @@ pub fn walk(tokens: &[Located]) -> (Vec<CollectedRule>, Vec<Offence>) {
 fn walk_block(level: &[Located], rules: &mut Vec<CollectedRule>, offences: &mut Vec<Offence>) {
     let mut index = 0;
     while index < level.len() {
-        if level[index].text == ";" {
-            // A stray top-level semicolon: not a rule, skip it.
-            index += 1;
+        let semicolon = level[index..].iter().position(|t| t.text == ";");
+        let open = level[index..].iter().position(|t| t.text == "{");
+        if let Some(end) = semicolon
+            && open.is_none_or(|open| end < open)
+        {
+            // A block-less at-rule (`@layer a, b;`, `@import ...;`), or a stray semicolon.
+            layer_offence(kind::trim_trivia(&level[index..index + end]), offences);
+            index += end + 1;
             continue;
         }
-        let Some(offset) = level[index..].iter().position(|t| t.text == "{") else {
+        let Some(offset) = open else {
             // No further rules at this level; anything left over is not well-formed CSS.
             break;
         };
@@ -107,7 +113,12 @@ fn handle_rule(
                 walk_block(body, rules, offences);
                 return;
             }
-            "media" | "supports" | "layer" | "container" | "scope" | "starting-style" => {
+            "layer" => {
+                layer_offence(prelude, offences);
+                walk_block(body, rules, offences);
+                return;
+            }
+            "media" | "supports" | "container" | "scope" | "starting-style" => {
                 walk_block(body, rules, offences);
                 return;
             }
@@ -120,6 +131,28 @@ fn handle_rule(
         }
     }
     push_rule(prelude, body, rules);
+}
+
+/// [`Rule::LayerDs`] when `head` is an `@layer` naming `ds` or one of its sub-layers.
+fn layer_offence(head: &[Located], offences: &mut Vec<Offence>) {
+    let Some(first) = head.first() else { return };
+    if !first.text.eq_ignore_ascii_case("@layer") {
+        return;
+    }
+    let names = render(&head[1..]);
+    let names_ds = names.split(',').any(|name| {
+        let root = name.trim().split('.').next().unwrap_or_default();
+        root.eq_ignore_ascii_case(layers::DS)
+    });
+    if names_ds {
+        offences.push(Offence {
+            rule: Rule::LayerDs,
+            selector: render(head),
+            line: first.line,
+            column: first.column,
+            text: render(head),
+        });
+    }
 }
 
 fn push_rule(prelude: &[Located], body: &[Located], rules: &mut Vec<CollectedRule>) {

@@ -84,6 +84,8 @@ fn quires_own(offence: &Offence) -> bool {
             offence.selector.starts_with(".ds") || offence.selector.starts_with(":where(.ds)")
         }
         Rule::Keyframes => offence.selector.starts_with("@keyframes "),
+        // The sheet opens `@layer ds` itself.
+        Rule::LayerDs => offence.selector.starts_with("@layer ds"),
         // Judged sheet by sheet, with each allowed loop's reason, in `details_lint.rs`.
         Rule::InfiniteLoop | Rule::OffGrammarTiming => true,
         _ => false,
