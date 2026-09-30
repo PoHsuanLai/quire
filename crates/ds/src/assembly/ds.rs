@@ -47,7 +47,7 @@ use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
 use crate::focus::click::ClickRoot;
 use crate::host::signals::HostSignals;
-use crate::motion::hover_intent::HoverWarmth;
+use ds_motion::hover_intent::HoverWarmth;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
 use crate::root::typeface::{use_typeface, use_typeface_provider};

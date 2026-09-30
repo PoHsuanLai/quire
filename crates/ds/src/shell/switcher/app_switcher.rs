@@ -7,10 +7,10 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
-use crate::motion::anim::Anim;
-use crate::motion::detail::touch::Touch;
-use crate::motion::pulse_key::PulseKey;
-use crate::motion::{
+use ds_motion::anim::Anim;
+use ds_motion::detail::touch::Touch;
+use ds_motion::pulse_key::PulseKey;
+use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,
     use_spring::use_spring,

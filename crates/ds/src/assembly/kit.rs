@@ -27,7 +27,7 @@ pub(crate) static KIT: Kit = Kit {
 pub fn kits() -> Kits {
     Kits::of(&[
         &STYLE_KIT,
-        &crate::motion::kit::KIT,
+        &ds_motion::kit::KIT,
         &KIT,
         &crate::shell::kit::KIT,
     ])

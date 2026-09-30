@@ -4,8 +4,8 @@
 //! link and drops it on leave: no intent delay, no exit. It enters with `Anim::LinkPillIn`
 //! (`hc-in` at `--t-quick --e-out`, `S:433`), reported as `data-presence` like every entrance.
 
-use crate::motion::anim::Anim;
-use crate::motion::entrance::use_entrance;
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
 use dioxus::prelude::*;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
@@ -63,7 +63,7 @@ pub fn LinkPill(target: LinkTarget) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use crate::motion::anim::Anim;
+    use ds_motion::anim::Anim;
 
     const CSS: &str = include_str!("link_pill.css");
 

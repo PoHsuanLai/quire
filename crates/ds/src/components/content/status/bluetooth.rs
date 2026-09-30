@@ -4,7 +4,7 @@
 use super::bluetooth_state::BluetoothState;
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
-use crate::motion::detail::morph::Slashed;
+use ds_motion::detail::morph::Slashed;
 use dioxus::prelude::*;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;

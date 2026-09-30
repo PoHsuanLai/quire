@@ -6,7 +6,7 @@ use super::mood::{Mood, PictureSize};
 use super::picture::UserPicture;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::content::image_source::ImageSource;
-use crate::motion::wake::WakeStamp;
+use ds_motion::wake::WakeStamp;
 use crate::shell::emoji::AnimatedEmoji;
 use dioxus::prelude::*;
 use ds_core::word::Word;

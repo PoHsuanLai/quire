@@ -12,7 +12,7 @@
 //! at rest. The low red and `aria-valuenow` follow the true level from the first frame.
 
 use crate::components::content::text_runs::TextLine;
-use crate::motion::detail::tween::{TweenSpec, use_tween};
+use ds_motion::detail::tween::{TweenSpec, use_tween};
 use crate::shell::battery::ring::{RingSpan, arc_path};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;

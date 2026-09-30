@@ -1,7 +1,7 @@
 //! The small-state details (design/26-DETAILS.md): moments, their grammar and the hooks that
 //! play them.
 
-pub use crate::motion::detail::{
+pub use ds_motion::detail::{
     cue::Cue,
     detailed::{Detailed, first_table, moment_table},
     moment::Moment,

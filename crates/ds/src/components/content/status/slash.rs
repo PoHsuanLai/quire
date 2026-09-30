@@ -1,7 +1,7 @@
 //! A status glyph's slash, drawn on and off over `--t-quick --e-out` (design/26 5.1: Unavailable
 //! is `MorphGlyph{Slash}`), standing still on the first frame and jumping under Reduced (R7).
 
-use crate::motion::detail::{
+use ds_motion::detail::{
     morph::Slashed,
     tween::{TweenSpec, use_tween},
 };

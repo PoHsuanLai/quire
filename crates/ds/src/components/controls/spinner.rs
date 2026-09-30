@@ -3,7 +3,7 @@
 //! section 1.3): it spins at once while the operation runs, in twelve steps of `--t-spin-step`
 //! (a turn a second), and keeps turning under Reduced. It never loops without an [`Operation`].
 
-use crate::motion::detail::{
+use ds_motion::detail::{
     operation::Operation,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     use_pending::use_pending,

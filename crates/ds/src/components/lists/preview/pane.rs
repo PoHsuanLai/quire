@@ -14,13 +14,13 @@ use crate::components::controls::chord::Chord;
 use crate::components::controls::spinner::SPIN;
 use crate::components::lists::preview::content::{PaneContent, caption, media};
 use crate::components::lists::preview::cue::{PaneCue, pending_look};
-use crate::motion::anim::Anim;
-use crate::motion::detail::{
+use ds_motion::anim::Anim;
+use ds_motion::detail::{
     once::use_cross_fade, operation::Operation, pending::PendingFrame, use_pending::use_pending,
 };
-use crate::motion::presence::Exit;
-use crate::motion::presence::spec::PresenceSpec;
-use crate::motion::presence::use_presence::{Presented, use_presence};
+use ds_motion::presence::Exit;
+use ds_motion::presence::spec::PresenceSpec;
+use ds_motion::presence::use_presence::{Presented, use_presence};
 use dioxus::prelude::*;
 use ds_core::vocab::Shortcut;
 use ds_core::vocab::Shown;

@@ -196,7 +196,7 @@ pub use crate::host::{
     reveal::{ScrollSpan, Scrolled, nearest_scroll},
     signals::HostSignals,
 };
-pub use crate::motion::{
+pub use ds_motion::{
     anim::Anim,
     drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, WINDOW_DRAG_THRESHOLD, use_drag},
     hover_intent::{HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase},

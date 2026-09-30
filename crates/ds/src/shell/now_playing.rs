@@ -9,8 +9,8 @@ pub(crate) mod track_position;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
-use crate::motion::detail::level::use_level;
-use crate::motion::{
+use ds_motion::detail::level::use_level;
+use ds_motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
 };

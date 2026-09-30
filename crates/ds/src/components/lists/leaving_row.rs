@@ -3,9 +3,9 @@
 //! rows below it heal when it leaves.
 
 use crate::host::measure::client_rect;
-use crate::motion::presence::Presence;
-use crate::motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
-use crate::motion::use_roster::Pitches;
+use ds_motion::presence::Presence;
+use ds_motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
+use ds_motion::use_roster::Pitches;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::word::Word;
@@ -86,8 +86,8 @@ fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::motion_style;
-    use crate::motion::presence::{Exit, Presence};
-    use crate::motion::roster::{Heal, RosterEntry};
+    use ds_motion::presence::{Exit, Presence};
+    use ds_motion::roster::{Heal, RosterEntry};
     use ds_core::geometry::units::Px;
 
     #[test]

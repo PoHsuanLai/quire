@@ -3,7 +3,7 @@
 
 use super::model::Turn;
 use super::step::turn_after;
-use crate::motion::detail::level::use_level;
+use ds_motion::detail::level::use_level;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::time::FRAME_TICK;

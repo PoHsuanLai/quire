@@ -18,7 +18,7 @@ pub(crate) mod sheet;
 #[cfg(test)]
 mod tests;
 
-use crate::motion::wake::WakeStamp;
+use ds_motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::{Mood, PictureSize};
 use dioxus::prelude::*;
 use ds_style::scope::use_scope;

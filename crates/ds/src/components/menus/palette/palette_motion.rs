@@ -18,7 +18,7 @@ use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
 use crate::components::menus::palette::palette_stops::ShownGroup;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use crate::motion::{
+use ds_motion::{
     anim::Anim,
     timer::{MotionTimer, TimerPhase, use_motion_timer},
 };

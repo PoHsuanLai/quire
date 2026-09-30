@@ -10,8 +10,7 @@ base64, the `Spawner` trait): plain data and maths with no Dioxus, under everyth
 `ds-style` (appearance, tokens, materials, Space palettes, fonts, icons, the stylesheet's
 sections, the scope a component draws in, the tasks a scope owns; the scope, scale, task, busy and
 `Glyph` parts are its `dioxus` feature, which `ds-settings` leaves off). `ds` is laid out in the layers
-it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): `motion/` (animation data, timers,
-machines, the keyframes, and `motion/detail/`), `lint/`, then the host seams (`host/`, `focus/`,
+it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): `lint/`, then the host seams (`host/`, `focus/`,
 `edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then
 `shell/` (the shell surfaces' parts, the widgets and their catalog), and `assembly/` on top (the
 stylesheet's order, the one registration of every component sheet, and `Ds`). `lib.rs` and the
@@ -48,7 +47,7 @@ public surface, one path per item.
 | `ds-style/tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
 | `ds-style/tokens/hex.rs`, `ds-style/tokens/name.rs` | the value and name types every table uses |
 | `ds-style/tokens/{token,set}.rs`, `ds-core-derive` | `Token` (`#[derive(Word, Token)]`: a family's custom properties and values from its variants' attributes), `TokenScope`, `CssValue`, `TokenSet` (a family as data, placed in the `.ds` block) |
-| `ds-style/kit/`, `ds-style/kit/style_kit.rs`, `motion/kit.rs`, `assembly/kit.rs`, `shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`); `ds::kits()` is all four; `LintConfig::new(&ds::kits())` |
+| `ds-style/kit/`, `ds-style/kit/style_kit.rs`, `ds-motion/kit.rs`, `assembly/kit.rs`, `shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`); `ds::kits()` is all four; `LintConfig::new(&ds::kits())` |
 | `ds-style/tokens/timing.rs`, `ds-style/tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (`DurationToken`; `StyleDelay`, the two delays the stylesheet reads; `DelayToken`, the Rust-only timer lengths) |
 | `ds-style/tokens/easing.rs`, `ds-style/tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `ds-style/tokens/shape.rs` | 01-LAYOUT §10 |
@@ -62,7 +61,7 @@ public surface, one path per item.
 | `ds-style/css/shape_css.rs`, `ds-style/icon/{plate,family}.rs`, `ds-style/tokens/plate.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
 | `ds-style/kit/blocks.rs`, `ds-style/css/{accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
 | `ds-style/css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
-| `motion/css.rs`, `motion/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
+| `ds-motion/css.rs`, `ds-motion/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `ds-style/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
 | `ds-style/css/{reset,utilities}.css`, `ds-style/css/document.rs`, `assembly/stylesheet.rs`, `assembly/sheets.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
 | `ds-style/fonts.rs` | 02-TYPE §2 (faces as bytes) |
@@ -71,19 +70,19 @@ public surface, one path per item.
 
 | Module | Implements |
 | --- | --- |
-| `motion/anim.rs`, `motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 47 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10) and `MenuOut` (13 §13.3.2's close fade), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
-| `motion/settle.rs`, `ds-core/time/mod.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
-| `motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
+| `ds-motion/anim.rs`, `ds-motion/recipe.rs` | 05-MOTION §4, §5 (the recipe per assignment): 47 variants, the catalogue's 38 keyframes plus `FoldHeavy`, `CrumpleHeavy`, `CurlHeavy`, quire's `ChipFlash` (04-COMPONENTS §10) and `MenuOut` (13 §13.3.2's close fade), and four §5 rows that play a catalogue keyframe at their own recipe: `PaletteFade` (row 7), `LinkPillIn` (26), `BubblePop` (37), `PeekFullIn` (64); `recipe.rs` holds the table |
+| `ds-motion/settle.rs`, `ds-core/time/mod.rs` | 05-MOTION §7.1 (`settle`, `FRAME_SLACK`) |
+| `ds-motion/timer.rs` | 05-MOTION §7.2 (timers start in handlers) |
 | `ds-style/task.rs` | every task quire spawns belongs to its owner's scope and drops with it (`spawn_in` registers it through the scope's own `spawn`); its writes are `try_set`, so a timer that finds its owner gone stops (FINDINGS "Launcher gaps") |
 | `host/{document,no_host,parts,signals}.rs`, `host/{focused,caret,fallback,found,hand_back,ime,pasted,position,probe,captured,drop_hit}.rs` | the document seam: `DocumentHost` and its parts (`FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`), `NoHost`, `HostSignals`, and the vocabulary they speak |
 | `focus/{soon,request}.rs` | 06-INTERACTIONS §17: `focus_soon` (every focus change goes through the host and waits out a busy document) and `FocusRequest`/`use_focus_request` (`Focus::Controlled`, giving a field the keyboard back) |
-| `motion/{pulse,pulse_key}.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
-| `motion/presence/`, `motion/{roster,use_roster}.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Presence::{Hidden, Entering, Present, Leaving(Exit)}` and `use_presence` for a surface its caller shows and hides, `roster::Heal` for a row sliding into a gap, `Exit::{Row, BannerOut, OsdOut, ShotOut, PaneOut}`; `use_roster` (`LeaveBy`, `RosterSpec`) is the one hook for a list's rows |
-| `motion/timeline/` | 26-DETAILS §3.2, §4.1 (Rust-driven values): `Timeline` (`total`, `at`, `settled`) with the implementors `Ease`, `Glide`, `Spring` and `Pending`; `Playback` is the one frame driver (a frame every `FRAME_TICK` while a run moves, the last at exactly its total, none at rest) and `use_timeline` follows a timeline its caller recomputes |
-| `motion/hover_intent.rs` | 06-INTERACTIONS §3; 30 §1.4: `HoverProfile {Tip, Card, Label}` |
-| `motion/{long_press,rubber,use_collapse}.rs` | 30 §1.3-1.4: the long-press machine over `PressPhase`, `rubber::resist`, `use_collapse` |
+| `ds-motion/{pulse,pulse_key}.rs` | 05-MOTION §9 rule 2; 04-COMPONENTS vocabulary `PulseKey` (`Count` keeps its own bump, §14) |
+| `ds-motion/presence/`, `ds-motion/{roster,use_roster}.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Presence::{Hidden, Entering, Present, Leaving(Exit)}` and `use_presence` for a surface its caller shows and hides, `roster::Heal` for a row sliding into a gap, `Exit::{Row, BannerOut, OsdOut, ShotOut, PaneOut}`; `use_roster` (`LeaveBy`, `RosterSpec`) is the one hook for a list's rows |
+| `ds-motion/timeline/` | 26-DETAILS §3.2, §4.1 (Rust-driven values): `Timeline` (`total`, `at`, `settled`) with the implementors `Ease`, `Glide`, `Spring` and `Pending`; `Playback` is the one frame driver (a frame every `FRAME_TICK` while a run moves, the last at exactly its total, none at rest) and `use_timeline` follows a timeline its caller recomputes |
+| `ds-motion/hover_intent.rs` | 06-INTERACTIONS §3; 30 §1.4: `HoverProfile {Tip, Card, Label}` |
+| `ds-motion/{long_press,rubber,use_collapse}.rs` | 30 §1.3-1.4: the long-press machine over `PressPhase`, `rubber::resist`, `use_collapse` |
 | `stack/{roving,typeahead}.rs` | 30 §1.4: `Roving`, `Rove`, `Wrap`, `Typeahead` |
-| `motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
+| `ds-motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `ds-core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
 | `host/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `GeometryHost::measure` (ds-native's waits out a document the renderer holds; `NoHost` answers `Unknown`) (FINDINGS "Bar gaps") |
 | `stack/{host,layer_stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |

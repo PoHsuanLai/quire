@@ -12,12 +12,12 @@
 //! transition; a new drag mid-return picks it up where it is.
 
 use crate::components::controls::press::button_of;
-use crate::motion::anim::Anim;
-use crate::motion::detail::touch::{Contact, Touch};
-use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
-use crate::motion::timer::use_motion_timer;
-use crate::motion::use_swipe::{Swiper, use_swipe};
-use crate::motion::{
+use ds_motion::anim::Anim;
+use ds_motion::detail::touch::{Contact, Touch};
+use ds_motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
+use ds_motion::timer::use_motion_timer;
+use ds_motion::use_swipe::{Swiper, use_swipe};
+use ds_motion::{
     spring_spec::SpringSpec,
     timeline::spring::PxPerUnit,
     use_spring::{SpringMotion, use_spring_motion},

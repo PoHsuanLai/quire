@@ -2,7 +2,7 @@
 //! each goes against its anchor, its entrance and its item layout. Split from `menu`.
 
 use crate::components::menus::menu_item::Row;
-use crate::motion::anim::Anim;
+use ds_motion::anim::Anim;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},
     units::{Point, Px, Rect},

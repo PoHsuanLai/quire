@@ -25,7 +25,7 @@ use crate::components::content::rich_text::Rich;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::{PressListeners, Propagation};
-use crate::motion::swipe::SwipeMetrics;
+use ds_motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
 use crate::shell::notifications::body::NotificationBody;

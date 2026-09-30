@@ -1,6 +1,6 @@
 //! The Wi-Fi item's state and what each change of it means (design/26-DETAILS.md 5.1.1).
 
-use crate::motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
+use ds_motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 use ds_core::vocab::Fraction;
 
 /// How many arcs a joined network lights, quantised from its strength (R2: 67 then 68 % is the

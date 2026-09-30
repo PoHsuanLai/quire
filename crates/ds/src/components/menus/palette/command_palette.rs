@@ -32,7 +32,7 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
-use crate::motion::anim::Anim;
+use ds_motion::anim::Anim;
 use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
 

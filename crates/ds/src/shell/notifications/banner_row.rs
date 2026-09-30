@@ -13,9 +13,9 @@
 //! row writes `data-flight=swipe`, which points its exit right whatever the stack's entry edge.
 
 use crate::host::measure::client_rect;
-use crate::motion::presence::Presence;
-use crate::motion::roster::{Heal, RowPitch, presence_slug};
-use crate::motion::use_roster::Pitches;
+use ds_motion::presence::Presence;
+use ds_motion::roster::{Heal, RowPitch, presence_slug};
+use ds_motion::use_roster::Pitches;
 use crate::shell::notifications::banner_stack::{BannerKey, BannerPosition};
 use crate::shell::notifications::swipe::{Carried, Flight};
 use dioxus::core::current_scope_id;
@@ -95,7 +95,7 @@ fn heal_style(heal: Option<Heal>, position: BannerPosition) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::heal_style;
-    use crate::motion::roster::Heal;
+    use ds_motion::roster::Heal;
     use crate::shell::notifications::banner_stack::BannerPosition;
     use ds_core::geometry::units::Px;
 

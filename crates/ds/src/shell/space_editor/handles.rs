@@ -4,7 +4,7 @@
 
 use super::{Picker, dot_index, edit, field};
 use crate::host::measure::client_rect;
-use crate::motion::drag::{DragPhase, use_drag};
+use ds_motion::drag::{DragPhase, use_drag};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::vocab::Check;

@@ -9,8 +9,8 @@
 //! to. A label is drawn in the thumb's ink while the thumb is over it (`data-thumb`), not on a
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
-use crate::motion::detail::touch::Touch;
-use crate::motion::{
+use ds_motion::detail::touch::Touch;
+use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
