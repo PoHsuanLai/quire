@@ -42,12 +42,12 @@ impl TitleParts {
                         Glyph { icon, size: IconSize::Compact }
                     }
                 }
-                span { class: "ds-titlebar-name ds-truncate", "{title}" }
+                span { class: "ds-titlebar-name", "{title}" }
                 if self.document == DocumentState::Edited {
                     span { class: "ds-titlebar-edited", role: "img", "aria-label": "Edited" }
                 }
                 if let Some(subtitle) = self.subtitle.as_ref() {
-                    span { class: "ds-titlebar-subtitle ds-truncate", "{subtitle}" }
+                    span { class: "ds-titlebar-subtitle", "{subtitle}" }
                 }
             }
         }

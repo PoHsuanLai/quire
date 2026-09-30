@@ -2748,8 +2748,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toolbar-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-8); }
 .ds-toolbar-trailing{ margin-left:auto; }
 .ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
-.ds-toolbar-heading{ max-width:100%; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
-.ds-toolbar-subtitle{ max-width:100%; font-size:var(--fs-help); color:var(--ink-faint); }
+.ds-toolbar-heading{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-toolbar-subtitle{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-help); color:var(--ink-faint); }
 /* -- tooltip -- */
 /* Tooltip (design/30 section 2.5, `NSToolTip`): one line on the popover's surface, below its
    target, opened by the Tip profile through the hover hub (1 s cold, at once while the hub is
@@ -2864,8 +2864,8 @@ html,body{margin:0;padding:0;background:transparent}
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
-.ds-titlebar-name{ min-width:0; }
-.ds-titlebar-subtitle{ min-width:0; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
+.ds-titlebar-name{ min-width:0; overflow:hidden; }
+.ds-titlebar-subtitle{ min-width:0; overflow:hidden; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
 .ds-titlebar-proxy{ display:inline-flex; flex:none; line-height:0; color:var(--f-ink-soft); }
 .ds-titlebar[*|data-activity=inactive] .ds-titlebar-proxy{ opacity:.5; }
 /* The edited dot: the document has changes not saved. */

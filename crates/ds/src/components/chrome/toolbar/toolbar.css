@@ -12,5 +12,5 @@
 .ds-toolbar-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-8); }
 .ds-toolbar-trailing{ margin-left:auto; }
 .ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
-.ds-toolbar-heading{ max-width:100%; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
-.ds-toolbar-subtitle{ max-width:100%; font-size:var(--fs-help); color:var(--ink-faint); }
+.ds-toolbar-heading{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-toolbar-subtitle{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-help); color:var(--ink-faint); }

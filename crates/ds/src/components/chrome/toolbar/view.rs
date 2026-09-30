@@ -113,10 +113,10 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                     {center}
                 } else {
                     if let Some(title) = title.as_ref() {
-                        span { class: "ds-toolbar-heading ds-truncate", {text(title)} }
+                        span { class: "ds-toolbar-heading", {text(title)} }
                     }
                     if let Some(subtitle) = subtitle.as_ref() {
-                        span { class: "ds-toolbar-subtitle ds-truncate", {text(subtitle)} }
+                        span { class: "ds-toolbar-subtitle", {text(subtitle)} }
                     }
                 }
             }
