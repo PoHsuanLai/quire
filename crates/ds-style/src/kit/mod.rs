@@ -8,8 +8,10 @@ mod model;
 mod style_kit;
 #[cfg(test)]
 mod tests;
+mod user_style;
 
 pub use kits::{Kits, KnownNames};
 pub use model::{Kit, KitRank, Section, Sheet, Vocabulary};
+pub use user_style::UserStyle;
 
 pub use style_kit::KIT as STYLE_KIT;

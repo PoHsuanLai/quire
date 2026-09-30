@@ -8,12 +8,14 @@
 //! deserializes with it. A key `D` accepts but does not store back is one nobody reads: it is
 //! reported in [`Loaded::unknown`] and gone on the next save.
 
+mod text;
 mod wire;
 
 use crate::doc::{FileName, Format};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use std::fmt;
+pub(crate) use text::{FileText, file_text};
 use wire::{JsonWire, TomlWire, Wire};
 
 /// A settings file as read: the value, and everything in the file that did not become part of
@@ -128,6 +130,17 @@ where
     match format {
         Format::Toml => overlay::<D, TomlWire>(text),
         Format::Json => overlay::<D, JsonWire>(text),
+        Format::Css => raw::<D>(text),
+    }
+}
+
+/// `text` as the one string a raw document holds: every text is valid, so nothing is reported.
+fn raw<D: DeserializeOwned>(text: &str) -> Read<D> {
+    match serde_json::from_value(serde_json::Value::String(text.to_owned())) {
+        Ok(value) => Read::Loaded(Loaded::clean(value)),
+        Err(error) => Read::Garbled {
+            reason: error.to_string(),
+        },
     }
 }
 

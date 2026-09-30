@@ -5,7 +5,7 @@
 use crate::doc::{FileName, SettingsDoc};
 use crate::error::SettingsError;
 use crate::latest::{self, Receiver, Sender};
-use crate::lenient::{Loaded, Read, read};
+use crate::lenient::{FileText, Loaded, Read, file_text, read};
 use crate::store::Store;
 use ds_core::spawner::Spawner;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
@@ -139,13 +139,16 @@ async fn settle<D: SettingsDoc + Send>(
             }
             signals.catch_up();
         }
-        let loaded = match std::fs::read_to_string(&path).map(|text| read::<D>(&text, D::FORMAT)) {
-            Ok(Read::Garbled { reason }) => Loaded::garbled(good.clone(), reason),
-            Ok(Read::Loaded(loaded)) => {
-                good = loaded.value.clone();
-                loaded
-            }
-            Err(_) => {
+        let loaded = match file_text(&path) {
+            FileText::Text(text) => match read::<D>(&text, D::FORMAT) {
+                Read::Garbled { reason } => Loaded::garbled(good.clone(), reason),
+                Read::Loaded(loaded) => {
+                    good = loaded.value.clone();
+                    loaded
+                }
+            },
+            FileText::NotText(reason) => Loaded::garbled(good.clone(), reason),
+            FileText::Missing => {
                 good = D::default();
                 Loaded::default()
             }

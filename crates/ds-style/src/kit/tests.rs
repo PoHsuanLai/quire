@@ -76,3 +76,39 @@ fn a_family_sits_at_its_place_whichever_kit_declares_it() {
     let at = positions(&sheet, &["--s-1:1px;", "--t-quick:150ms;"]);
     assert!(at[0] < at[1], "{sheet}");
 }
+
+fn person(_: &Kits) -> Cow<'static, str> {
+    Cow::Borrowed(".person{}")
+}
+
+static PERSON: Kit = Kit {
+    rank: KitRank::User,
+    tokens: &[],
+    sections: &[Section {
+        name: "person",
+        css: person,
+    }],
+    sheets: &[],
+    vocabulary: Vocabulary::NONE,
+};
+
+#[test]
+fn a_user_kit_is_last_whatever_the_argument_order() {
+    for kits in [
+        Kits::of(&[&PERSON, &EARLY, &LATE]),
+        Kits::of(&[&LATE, &PERSON, &EARLY]),
+    ] {
+        let sheet = kits.stylesheet();
+        let at = positions(&sheet, &["== one ==", "== two ==", "== person =="]);
+        assert!(at.windows(2).all(|pair| pair[0] < pair[1]), "{sheet}");
+    }
+}
+
+#[test]
+fn the_user_rank_sorts_after_every_other_rank() {
+    use ds_core::word::Word;
+    let others = KitRank::ALL.iter().filter(|rank| **rank != KitRank::User);
+    for rank in others {
+        assert!(*rank < KitRank::User, "{}", rank.slug());
+    }
+}

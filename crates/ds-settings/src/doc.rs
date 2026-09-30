@@ -3,6 +3,7 @@
 use crate::error::SettingsError;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+use serde::ser::Error as _;
 
 /// A settings file's name inside its program's config directory: `appearance.toml`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -15,6 +16,9 @@ pub enum Format {
     Toml,
     /// JSON: machine-written stores such as `spaces.json`.
     Json,
+    /// Raw CSS text (`style.css`): one string, never parsed at load, so no text is ever refused.
+    /// A type stored this way is a newtype over `String`.
+    Css,
 }
 
 impl Format {
@@ -23,6 +27,10 @@ impl Format {
         Ok(match self {
             Format::Toml => toml::to_string(value)?,
             Format::Json => serde_json::to_string_pretty(value)? + "\n",
+            Format::Css => match serde_json::to_value(value)? {
+                serde_json::Value::String(text) => text,
+                _ => return Err(serde_json::Error::custom("a CSS document is one string").into()),
+            },
         })
     }
 }
