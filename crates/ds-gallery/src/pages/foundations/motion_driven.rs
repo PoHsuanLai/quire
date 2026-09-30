@@ -11,9 +11,9 @@ use ds::Tracking;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
-    Appearance, Attach, Check, DragReturnFrame, Ds, Fraction, Icon, IconSource, Inject, Material,
-    Pane, PaneSwitcher, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, Shown,
-    SidePanel, Slider, Toggle,
+    Appearance, Attach, Check, Ds, Fraction, Icon, IconSource, Inject, Material, Pane,
+    PaneSwitcher, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, Shown, SidePanel,
+    Slider, Toggle,
 };
 use ds_shell::{AppKey, AppMark, AppSwitcher, NotificationCard, NotificationSwipe, SwitcherApp};
 
@@ -240,7 +240,7 @@ fn DockCell() -> Element {
     let mut from = use_signal(|| None::<Point>);
     let mut meters = use_signal(|| (VelocityMeter::default(), VelocityMeter::default()));
     rsx! {
-        Cell { name: "Dock drag return", code: "DragReturn, DragReturnFrame",
+        Cell { name: "Dock drag return", code: "use_drag_return, DragReturn",
             controls: rsx! { {mini("Nudge", move |_| nudge(drag))} },
             div {
                 class: "g-detail",
@@ -268,7 +268,8 @@ fn DockCell() -> Element {
                         drag.home(Touch::Contact(Contact::from_event(&event)), release);
                     }
                 },
-                DragReturnFrame { drag,
+                div {
+                    style: "transform:translate({drag.offset().x.0:.2}px,{drag.offset().y.0:.2}px)",
                     div { class: "g-driven-tile", "Drag" }
                 }
             }

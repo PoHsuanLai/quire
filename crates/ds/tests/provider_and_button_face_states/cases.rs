@@ -4,8 +4,8 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{Bezel, ControlSize};
 use ds::{
-    Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider, MarkStyle, PinFace, PinTile,
-    ProviderMark, Selection, Trailing,
+    Button, Colour, Hex, Icon, MarkProvider, MarkStyle, PinFace, PinTile, ProviderMark, Selection,
+    Trailing,
 };
 use ds::{FieldBezel, FieldKind, TextField};
 
@@ -56,22 +56,6 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/mini-trailing-glyph.html",
         make: || rsx! { Button { size: ControlSize::Mini, label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} } },
-    },
-    Case {
-        golden: "controls/button/face-bold.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "Bold", face: ButtonFace::Bold, title: "Bold (Ctrl B)", value: Some(Check::On), onclick: |_| {} } },
-    },
-    Case {
-        golden: "controls/button/face-italic.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "Italic", face: ButtonFace::Italic, onclick: |_| {} } },
-    },
-    Case {
-        golden: "controls/button/face-underline.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "Underline", face: ButtonFace::Underline, onclick: |_| {} } },
-    },
-    Case {
-        golden: "controls/button/face-strike-named.html",
-        make: || rsx! { Button { common: Common { aria_label: Some("Strikethrough".to_string()), ..Common::default() }, bezel: Bezel::Inline, label: "Strike", face: ButtonFace::Strike, onclick: |_| {} } },
     },
     Case {
         golden: "controls/text_field/secret-value-unwritten.html",

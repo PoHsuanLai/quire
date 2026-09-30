@@ -113,7 +113,7 @@ mail's own, and `ds-shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`
 `user_picture`, `space_editor`, `osd`, `idle_dim`, `dock`, `widget`). Every file is the
 section of 04-COMPONENTS with the same name, one `.rs` and `.css` pair each (the controls and fields of
 30-CATALOGUE 2.1 to 2.3, 2.8 and 2.9 are directories or file groups by concept: `button` (with `button_model`
-and `button_face`; the image-only and toolbar buttons are `Button`, not a second component), `toggle`, `checkbox`,
+and `button_marks`; the image-only and toolbar buttons are `Button`, not a second component), `toggle`, `checkbox`,
 `radio_group`, `choice` (the option shape), `segmented` (with `segmented_thumb`; the tab strip is a
 `SegmentedControl`), `slider` (with `slider_linear`, `slider_bezel`, `slider_machine`, `slider_model`),
 `level_indicator` (with `level_draw`, shared with the capsule slider), `progress/` (`ProgressIndicator`, the

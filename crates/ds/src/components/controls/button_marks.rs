@@ -1,56 +1,18 @@
-//! What a `Button` shows besides its icon: its face, a word or a mark drawn in
-//! its own style, and a trailing glyph after it.
+//! What a `Button` shows besides its icon and label: a mark before the label and a trailing
+//! glyph after it.
 
-use crate::components::content::text_runs::{TextLine, text};
+use crate::components::content::text_runs::TextLine;
 use dioxus::prelude::*;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
-/// How a button's label is drawn. Every face but `Label` draws a one-letter mark in the style
-/// it names (the composer's B, I, U and S marks) and names the button
-/// to assistive technology by its `label` ("Bold") instead.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum ButtonFace {
-    /// The label itself, as words.
-    #[default]
-    Label,
-    /// `B` in bold.
-    Bold,
-    /// `i` in the serif italic (S's Georgia is `--font-serif`, design/02).
-    Italic,
-    /// `U` underlined.
-    Underline,
-    /// `S` struck through.
-    Strike,
-}
-
 /// What names a button to assistive technology when the caller gave no `aria_label`: the
-/// label's characters when a mark face hides them, or when runs split them into pieces (so the
-/// name is one string, whatever spans the tones need); nothing for a plain label, which names
-/// the button by its own text.
-pub(crate) fn spoken_label(face: ButtonFace, label: &TextLine) -> Option<String> {
-    match (face.is_mark(), label) {
-        (true, _) | (false, TextLine::Runs(_)) => Some(label.plain_text()),
-        (false, TextLine::Plain(_)) => None,
-    }
-}
-
-impl ButtonFace {
-    /// The letter a mark face shows and its `data-face` word; `None` for `Label`.
-    fn mark(self) -> Option<(&'static str, &'static str)> {
-        match self {
-            ButtonFace::Label => None,
-            ButtonFace::Bold => Some(("B", "bold")),
-            ButtonFace::Italic => Some(("i", "italic")),
-            ButtonFace::Underline => Some(("U", "underline")),
-            ButtonFace::Strike => Some(("S", "strike")),
-        }
-    }
-
-    /// Whether the face shows a mark rather than the label's words: then the label becomes the
-    /// button's `aria-label`.
-    pub(crate) fn is_mark(self) -> bool {
-        self.mark().is_some()
+/// label's characters when runs split them into pieces (so the name is one string, whatever
+/// spans the tones need); nothing for a plain label, which names the button by its own text.
+pub(crate) fn spoken_label(label: &TextLine) -> Option<String> {
+    match label {
+        TextLine::Runs(_) => Some(label.plain_text()),
+        TextLine::Plain(_) => None,
     }
 }
 
@@ -99,22 +61,6 @@ pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
     }
 }
 
-/// The label drawn in `face`: a span of words (runs in their tones), or the
-/// face's letter in its style. The mark is `aria-hidden`, since the button is named by its
-/// label. Usable on its own as a toolbar button's label, so the marks need no raw
-/// `b`, `i`, `u` or `s`.
-#[component]
-pub fn FaceMark(face: ButtonFace, #[props(into)] label: TextLine) -> Element {
-    match face.mark() {
-        None => rsx! {
-            span { class: "ds-button-label", {text(&label)} }
-        },
-        Some((letter, slug)) => rsx! {
-            span { class: "ds-button-face", "data-face": slug, "aria-hidden": "true", "{letter}" }
-        },
-    }
-}
-
 /// The trailing glyph, in its own span so the sheet can set it apart from the label.
 pub(crate) fn trailing(mark: Trailing, icon_size: IconSize) -> Element {
     let (icon, size) = mark.glyph(icon_size);
@@ -127,40 +73,21 @@ pub(crate) fn trailing(mark: Trailing, icon_size: IconSize) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::{ButtonFace, spoken_label};
+    use super::spoken_label;
     use crate::components::content::text_runs::{RunTone, TextLine, TextRun};
 
     #[test]
-    fn a_hidden_or_split_label_is_spoken_whole() {
+    fn a_split_label_is_spoken_whole() {
         let runs = TextLine::Runs(vec![
             TextRun::new("Dana Okafor", RunTone::Strong),
             TextRun::new(" wrote on Tue 22 Sep", RunTone::Faint),
         ]);
         let cases = [
-            (ButtonFace::Label, TextLine::from("Send"), None),
-            (ButtonFace::Bold, TextLine::from("Bold"), Some("Bold")),
-            (
-                ButtonFace::Label,
-                runs,
-                Some("Dana Okafor wrote on Tue 22 Sep"),
-            ),
+            (TextLine::from("Send"), None),
+            (runs, Some("Dana Okafor wrote on Tue 22 Sep")),
         ];
-        for (face, label, want) in cases {
-            assert_eq!(spoken_label(face, &label).as_deref(), want, "{label:?}");
-        }
-    }
-
-    #[test]
-    fn only_the_label_face_draws_words() {
-        const CASES: &[(ButtonFace, bool)] = &[
-            (ButtonFace::Label, false),
-            (ButtonFace::Bold, true),
-            (ButtonFace::Italic, true),
-            (ButtonFace::Underline, true),
-            (ButtonFace::Strike, true),
-        ];
-        for &(face, mark) in CASES {
-            assert_eq!(face.is_mark(), mark, "{face:?}");
+        for (label, want) in cases {
+            assert_eq!(spoken_label(&label).as_deref(), want, "{label:?}");
         }
     }
 }
