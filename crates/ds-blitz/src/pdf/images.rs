@@ -4,9 +4,9 @@
 //! its pixels (several times larger). An image from anywhere else (an app's fetcher) is drawn
 //! from its pixels.
 
-use anyrender_pdfrum::{EncodedImage, ImageSources};
 use blitz_dom::node::ImageData;
 use blitz_dom::{BaseDocument, LocalName};
+use pdfrum_anyrender::{EncodedImage, ImageSources};
 
 /// The traced sources of `doc`'s `<img>` elements and background images.
 pub(crate) fn collect(doc: &BaseDocument) -> ImageSources {

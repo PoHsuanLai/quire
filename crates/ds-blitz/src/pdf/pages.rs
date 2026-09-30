@@ -10,9 +10,9 @@ use crate::pdf::paginate::{Span, paginate};
 use crate::pdf::run_texts;
 use crate::pdf::spec::{ContentBox, PT_PER_PX};
 use anyrender::Scene;
-use anyrender_pdfrum::{GlyphArea, GlyphTally, Page, Sources};
 use blitz_dom::BaseDocument;
 use blitz_paint::paint_scene;
+use pdfrum_anyrender::{GlyphArea, GlyphTally, Page, Sources};
 use peniko::kurbo::{Affine, Rect, Size};
 
 /// How far above the cut a page's clip ends, in CSS pixels. What the next page starts with
@@ -48,7 +48,7 @@ pub(crate) fn print_from(
     let scrolled = doc.viewport_scroll();
     let pages: Vec<Page> = bands.iter().map(|band| page(doc, content, *band)).collect();
     doc.set_viewport_scroll(scrolled);
-    let written = anyrender_pdfrum::write(&pages, sources)
+    let written = pdfrum_anyrender::write(&pages, sources)
         .map_err(|error| PdfError::Write(error.to_string()))?;
     Ok(Printed {
         bytes: written.bytes,

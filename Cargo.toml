@@ -13,7 +13,6 @@ members = [
   "crates/ds-blitz",
   "crates/ds-harness",
   "crates/ds-conformance",
-  "crates/anyrender_pdfrum",
   "crates/ds-gallery",
   "tools/icons",
 ]
@@ -40,7 +39,6 @@ ds-core-derive     = { path = "crates/ds-core-derive" }
 ds-settings-derive = { path = "crates/ds-settings-derive" }
 ds-blitz           = { path = "crates/ds-blitz" }
 ds-harness         = { path = "crates/ds-harness" }
-anyrender_pdfrum   = { path = "crates/anyrender_pdfrum" }
 # The portable Blitz repairs, shared with shell-host (its own repo, a sibling checkout).
 blitz-kit          = { path = "../blitz-kit/crates/blitz-kit" }
 
@@ -123,20 +121,21 @@ toml = "1"
 dioxus-ssr = "0.7"
 # Named directly for image paints in custom widgets (blitz re-exports nothing).
 peniko = "0.6"
-# PDF output (ds-blitz `pdf`, the `anyrender_pdfrum` painter): pdfrum, the user's own pure-Rust
-# PDF library (github.com/PoHsuanLai/pdfrum, MIT OR Apache-2.0). pdfrum-edit writes the file
-# (canvas, glyph-run fonts subset and instanced at the layout's instance, gradients, JPEG and
-# PNG passthrough); `variable-fonts` lets its subsetter instance variable and CFF2 faces.
-# crates.io 0.4 (glyph runs, gradients, blank documents, PNG passthrough, instanced subsets
-# named after their instance).
-pdfrum-edit = { version = "0.4", features = ["variable-fonts"] }
-pdfrum-object = "0.4"
-pdfrum-common = "0.4"
-# Font tables read directly by the painter (cmap reversed, metrics at an instance): the version
-# parley already resolves at the blitz rev, so no second copy for this.
+# PDF output (ds-blitz `pdf`): pdfrum, the user's own pure-Rust PDF library
+# (github.com/PoHsuanLai/pdfrum, MIT OR Apache-2.0). `pdfrum-anyrender` is the anyrender painter
+# (scenes as vector PDF pages); it writes through pdfrum-edit (glyph-run fonts subset and
+# instanced, gradients, JPEG and PNG passthrough; `variable-fonts` lets the subsetter instance
+# variable and CFF2 faces). Every pdfrum crate is taken from one git rev so the tree holds one
+# copy of each; the rev is main after PR #100 (pdfrum-anyrender added).
+pdfrum-anyrender = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "613710405bcd239684e23fb8ad2bcb9aab329549" }
+pdfrum-edit = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "613710405bcd239684e23fb8ad2bcb9aab329549", features = ["variable-fonts"] }
+pdfrum-object = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "613710405bcd239684e23fb8ad2bcb9aab329549" }
+pdfrum-common = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "613710405bcd239684e23fb8ad2bcb9aab329549" }
+# Font tables read directly by ds-blitz's tests (cmap): the version parley already resolves at
+# the blitz rev. pdfrum pins its own skrifa for its painter; the two do not meet in a signature.
 skrifa = "0.44"
 # Reading PDFs back in tests (text, fonts, images, a rasterised page): dev-dependency only.
-pdfrum = { version = "0.4", default-features = false, features = ["vello-cpu"] }
+pdfrum = { git = "https://github.com/PoHsuanLai/pdfrum", rev = "613710405bcd239684e23fb8ad2bcb9aab329549", default-features = false, features = ["vello-cpu"] }
 # The print portal's fd, from a sealed anonymous file (ds-blitz's `print` feature, Linux only).
 memfd = "0.6"
 # Spellchecking (ds-blitz's `spell` feature): a pure-Rust Hunspell-compatible checker,
