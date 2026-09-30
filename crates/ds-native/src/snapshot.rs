@@ -22,6 +22,10 @@ const AT_REST: Duration = Duration::from_secs(10);
 /// toast was never drawn (gallery fix A).
 pub(crate) const MOUNT_SETTLE: Duration = Duration::from_millis(120);
 
+/// How many `MOUNT_SETTLE` rounds a snapshot waits before its first moment: a placement takes
+/// a few (measure the target, render, measure the surface, place).
+const SETTLE_ROUNDS: u32 = 8;
+
 /// The size and scale a snapshot renders at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Viewport {
@@ -61,7 +65,11 @@ pub fn snapshot_with(
     moments: &[Duration],
 ) -> Result<Vec<image::RgbaImage>, NativeError> {
     let mut harness = Harness::with_config(app, config);
-    harness.advance(MOUNT_SETTLE);
+    // Placements wait on layout (a hint or popover is hidden until its target and its own size
+    // are measured, each a frame after the last): give them rounds to land, then paint.
+    for _ in 0..SETTLE_ROUNDS {
+        harness.advance(MOUNT_SETTLE);
+    }
     moments
         .iter()
         .map(|&moment| harness.render_at(moment))
