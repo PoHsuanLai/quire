@@ -16,7 +16,7 @@ pub(crate) mod target;
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style, use_float};
 use crate::host::measure::MountedRef;
-use crate::host::measure::client_rect;
+use crate::host::measure::follow_rect;
 use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use dioxus::core::provide_root_context;
@@ -25,7 +25,6 @@ use ds_core::geometry::{
     placement::{Align, Placement, Side},
     units::{Point, Px, Rect},
 };
-use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
 use ds_motion::hover_intent::HoverEvent;
@@ -77,15 +76,11 @@ impl Anchors {
     fn record(self, key: HoverKey, element: MountedRef) {
         // On the root, not the caller's scope: a target that re-renders must not lose its answer.
         ds_style::task::spawn_in(ScopeId::ROOT, async move {
-            // Layout may not have reached the element yet: ask again a few frames running.
-            for _ in 0..60 {
-                sleep(FRAME_SLACK).await;
-                if let Some(rect) = client_rect(&element.0).await {
-                    let mut book = self.0;
-                    book.with_mut(|book| book.insert(key, rect));
-                    return;
-                }
-            }
+            let mut book = self.0;
+            follow_rect(&element.0, |rect| {
+                book.with_mut(|book| book.insert(key.clone(), rect));
+            })
+            .await;
         });
     }
 }
@@ -177,7 +172,11 @@ pub(crate) fn use_card(
     // A hint that stands beside its own target is not drawn until it is placed: the target's rect
     // and its own size are both measured, so it never paints at the overlay's corner first.
     let unplaced = (own.is_some() || !matches!(standing, Standing::Card(_)))
-        && (target.is_none() || float.surface().rect().is_none());
+        && (target.is_none()
+            || float
+                .surface()
+                .rect()
+                .is_none_or(|rect| rect.size.width.0 <= 0.0));
     let at = target.map_or(Point::default(), |(rect, want, gap)| {
         float.origin(Some(rect), want, gap)
     });

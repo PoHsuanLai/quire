@@ -178,6 +178,43 @@ pub(crate) async fn laid_out_now(element: &MountedData) -> Option<Rect> {
     client_rect(element).await.filter(|read| laid_out(*read))
 }
 
+/// How many frames running an element's rect must be unchanged before [`follow_rect`] takes it
+/// as settled.
+const STILL_FRAMES: u8 = 4;
+
+/// The most frames [`follow_rect`] follows an element for.
+const FOLLOW_FRAMES: u16 = 240;
+
+/// Follow `element`'s client rect frame by frame until it has held still for a few frames
+/// running, calling `placed` with each new one: layout may not have reached the element at first
+/// (a rect of no size, or none) and may move it after (fonts, siblings arriving), so the first
+/// reading is not the answer. This is the one "settle until stable" for every floating surface
+/// that places itself against an element (popovers, tooltips, hover cards, dock labels); a
+/// surface placed against the latest `placed` never stands at the origin or over its anchor.
+pub async fn follow_rect(element: &MountedData, mut placed: impl FnMut(Rect)) {
+    let mut last = None;
+    let mut still = 0u8;
+    for _ in 0..FOLLOW_FRAMES {
+        sleep(FRAME_SLACK).await;
+        let Some(rect) = client_rect(element).await else {
+            continue;
+        };
+        if rect.size.width.0 <= 0.0 || rect.size.height.0 <= 0.0 {
+            continue;
+        }
+        if last == Some(rect) {
+            still += 1;
+            if still >= STILL_FRAMES {
+                return;
+            }
+        } else {
+            still = 0;
+            last = Some(rect);
+            placed(rect);
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::{SLOW_RETRY, laid_out, layout_retry};

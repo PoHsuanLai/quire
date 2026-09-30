@@ -8,7 +8,7 @@
 //! one Escape or one outside click closes the topmost layer only (design/06-INTERACTIONS.md
 //! sections 5 and 18).
 
-use crate::host::measure::client_rect;
+use crate::host::measure::follow_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::root::common::Common;
 use crate::stack::host::{OverlayId, Overlays, use_overlays};
@@ -19,7 +19,6 @@ use ds_core::geometry::{
     placement::{Placed, Placement, Side, place},
     units::{Point, Px, Rect, Size},
 };
-use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::{Dismiss, Shown};
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
@@ -161,15 +160,8 @@ impl Float {
         }
         asked.set(Some(element.clone()));
         spawn(async move {
-            // Layout may not have reached the element yet: ask again a few frames running.
-            for _ in 0..60 {
-                sleep(FRAME_SLACK).await;
-                if let Some(rect) = client_rect(&element.0).await {
-                    let mut slot = slot;
-                    slot.set(Some(rect));
-                    return;
-                }
-            }
+            let mut slot = slot;
+            follow_rect(&element.0, |rect| slot.set(Some(rect))).await;
         });
     }
 
@@ -409,7 +401,7 @@ pub fn Popover(
                 "data-layer": layer_slug(layer),
                 "data-presence": presence.drawn_slug(),
                 "data-pulse": alias.slug(),
-                style: if placed.is_some() && probe.rect().is_some() {
+                style: if placed.is_some() && probe.rect().is_some_and(|rect| rect.size.width.0 > 0.0) {
                     position_style(at)
                 } else {
                     format!("{};visibility:hidden", position_style(at))
