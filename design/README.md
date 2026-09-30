@@ -32,6 +32,7 @@ against them.
 | `28-CUSTOMIZATION.md` | What the person chooses and places: every surface where the reference lets people pick items, order and place (widgets, launcher categories, control center and bar, dock, toolbars, share, previewers, actions, sidebars, notifications), the shared Registry/Placement/Picker pattern, D-Bus registration, order of work. |
 | `29-SIZING.md` | Draft: an audit of control heights, spacing and radii (quire and sill's bar and control center), the reference numbers with confidence, three principled systems with mockups, a recommendation, and the dark Monochrome/Muted plate fix. |
 | `30-CATALOGUE.md` | The settled inventory: foundations (timing, motion and interaction primitives, state vocabulary, size ladder), every component with its AppKit counterpart, the Mac and Arc Looks, the drop list, the deferred items. Wins over 04, 05, 07 and 21 where they disagree. |
+| `31-ACCOUNTS.md` | Proposed: the account and capability layer: the capability vocabulary, providers as data files, accountd/syncd/inferd, consent and secrets, Photos on Storage, the local-first AI broker, the sync contract, phasing and open decisions. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 
 ## 2. Reading order

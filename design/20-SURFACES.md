@@ -267,7 +267,7 @@ Photos, Files/Drive, Notes, Contacts) uses that account; several accounts side b
 | Seeds | mailo already has account discovery (autoconfig), OAuth, IMAP/SMTP/JMAP and CalDAV/CardDAV (`mail-domain`, `mail-proto`, `mail-pim`): extract the account core from mailo the way latchkey was extracted, coordinated with the mailo session | P |
 | UI | a Settings pane (accounts list, add account sheet, per-service toggles, sign-out), and the first-run "sign in" step | P |
 | Risk | Google's restricted scopes (Gmail, Drive) need a verified OAuth client and a security assessment; decide per provider whether we ship our own client ID or ask the user for one | P |
-| Milestone | before the app pass's first sync-using app; the design doc (28-ACCOUNTS) and research first | P |
+| Milestone | before the app pass's first sync-using app; the design doc `31-ACCOUNTS.md` | P |
 
 ## 2. Apps
 
