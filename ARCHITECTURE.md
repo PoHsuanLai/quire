@@ -708,7 +708,12 @@ implements it (the traits build with `ds-harness` default features off).
 - **Every `Host*` context is a `DocumentHost` part or `HostSignals`.** A new seam is a part,
   never a new context newtype or a partial `provide`.
 - **The pinned dependency block's source of truth is `docs/workspace-deps.toml`**; the root
-  `Cargo.toml` and every consumer copy it verbatim. `blitz-kit` copies it too.
+  `Cargo.toml` and every consumer copy it verbatim. `blitz-kit` copies it too. The block holds the
+  `blitz-kit` line, a git dependency at a pinned rev (public repo). Each workspace root that
+  builds it from a sibling checkout (quire, shell-host, sill) adds
+  `[patch."https://github.com/PoHsuanLai/blitz-kit"] blitz-kit = { path = "../blitz-kit/crates/blitz-kit" }`,
+  so local builds use one checkout while a git consumer of quire, whose `[patch]` is ignored,
+  gets the pinned rev. A blitz-kit bump is a rev change in the block, in all three repos.
 - **`docs/licensing-references.md`** is the verified licence table the borrowing rules cite.
 - **Docs:** `DESIGN.md` names each module as `crate::module` and moves with every crate move.
 
