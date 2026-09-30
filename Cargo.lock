@@ -1636,6 +1636,7 @@ dependencies = [
  "ds-core-derive",
  "futures-timer",
  "image",
+ "keyboard-types 0.7.0",
  "serde",
  "serde_json",
  "thiserror 2.0.20",

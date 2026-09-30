@@ -4,7 +4,7 @@
 //! `Activate(x, y)` want the point.
 
 use crate::core::geometry::units::Point;
-use dioxus::prelude::Modifiers;
+use keyboard_types::Modifiers;
 
 /// Which button pressed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
