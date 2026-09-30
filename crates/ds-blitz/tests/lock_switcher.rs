@@ -125,14 +125,14 @@ fn set_state(harness: &mut Harness, state: PromptState) {
 }
 
 fn shaking(harness: &Harness) -> bool {
-    harness.has_class(".ds-lock-field", "a-shake-x")
+    harness.has_class(".ds-lock-prompt .ds-password-field", "a-shake-x")
 }
 
 fn dots(harness: &Harness, field: &str) -> Option<String> {
     harness.text_of(&format!("{field} .ds-input-mask"))
 }
 
-const LOCK_INPUT: &str = ".ds-lock-field input";
+const LOCK_INPUT: &str = ".ds-lock-prompt .ds-password-field input";
 
 #[test]
 fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
@@ -142,7 +142,10 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
         "the field takes the keyboard"
     );
     type_text(&mut harness, "abc");
-    assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•••"));
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field").as_deref(),
+        Some("•••")
+    );
     assert!(!shaking(&harness), "nothing shakes before it was wrong");
 
     let shake = settle(Anim::ShakeX, MotionLevel::Standard);
@@ -152,13 +155,18 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     set_state(&mut harness, PromptState::Wrong);
     assert!(shaking(&harness), "{}", harness.html());
     assert_eq!(
-        harness.attr(".ds-lock-field", "data-pulse").as_deref(),
+        harness
+            .attr(".ds-lock-prompt .ds-password-field", "data-pulse")
+            .as_deref(),
         Some("a")
     );
     // Half the shake: still playing, and the field still holds what was typed.
     harness.advance(shake / 2);
     assert!(shaking(&harness), "still shaking at half the settle");
-    assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•••"));
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field").as_deref(),
+        Some("•••")
+    );
 
     let rested = settle_until(&mut harness, |h| !shaking(h));
     assert!(
@@ -166,7 +174,11 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
         "the shake rested only once it had played: {:?}",
         rested.duration_since(wrong)
     );
-    assert_eq!(dots(&harness, ".ds-lock-field"), None, "the field emptied");
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field"),
+        None,
+        "the field emptied"
+    );
     assert_eq!(
         harness.within(|| HEARD.peek().last().cloned()),
         Some(String::new()),
@@ -242,7 +254,11 @@ fn the_emoji_glances_winces_once_per_wrong_password_and_is_happy_when_accepted()
     // Shown once through, then the user's own; the field has emptied and the mood holds.
     face_becomes(&mut harness, "wink");
     settle_until(&mut harness, |h| !shaking(h));
-    assert_eq!(dots(&harness, ".ds-lock-field"), None, "the field emptied");
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field"),
+        None,
+        "the field emptied"
+    );
     assert_eq!(mood(&harness).as_deref(), Some("wince"), "held");
 
     // Typing again turns it attentive; the next wrong password winces once more, no harder.
@@ -321,10 +337,13 @@ fn the_arrow_submits_and_shows_only_once_something_is_typed() {
 fn escape_empties_the_field() {
     let mut harness = mounted(Lock);
     type_text(&mut harness, "abc");
-    assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•••"));
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field").as_deref(),
+        Some("•••")
+    );
     harness.key(ShortcutKey::Escape);
     harness.advance(ms(40));
-    assert_eq!(dots(&harness, ".ds-lock-field"), None);
+    assert_eq!(dots(&harness, ".ds-lock-prompt .ds-password-field"), None);
     assert_eq!(
         harness.within(|| HEARD.peek().last().cloned()),
         Some(String::new())
@@ -332,7 +351,10 @@ fn escape_empties_the_field() {
     assert!(harness.is_focused(LOCK_INPUT));
     // And it takes typing again from nothing.
     type_text(&mut harness, "z");
-    assert_eq!(dots(&harness, ".ds-lock-field").as_deref(), Some("•"));
+    assert_eq!(
+        dots(&harness, ".ds-lock-prompt .ds-password-field").as_deref(),
+        Some("•")
+    );
     assert_eq!(
         harness.within(|| HEARD.peek().last().cloned()),
         Some("z".to_owned())
@@ -367,7 +389,7 @@ fn checking_closes_the_field() {
 #[test]
 fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
     let mut harness = mounted(Polkit);
-    let input = ".ds-polkit-field input";
+    let input = ".ds-polkit .ds-password-field input";
     if !harness.is_focused(input) {
         harness.click(harness.centre(input).expect("the field"));
         harness.advance(ms(30));
@@ -380,11 +402,15 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
         vec!["pw".to_owned()]
     );
     set_state(&mut harness, PromptState::Wrong);
-    assert!(harness.has_class(".ds-polkit-field", "a-shake-x"));
+    assert!(harness.has_class(".ds-polkit .ds-password-field", "a-shake-x"));
     settle_until(&mut harness, |h| {
-        !h.has_class(".ds-polkit-field", "a-shake-x")
+        !h.has_class(".ds-polkit .ds-password-field", "a-shake-x")
     });
-    assert_eq!(dots(&harness, ".ds-polkit-field"), None, "emptied");
+    assert_eq!(
+        dots(&harness, ".ds-polkit .ds-password-field"),
+        None,
+        "emptied"
+    );
 
     let cancel = harness
         .centre(".ds-polkit-actions .ds-button[*|data-answers=escape]")
@@ -397,7 +423,7 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
 #[test]
 fn escape_in_the_polkit_field_cancels() {
     let mut harness = mounted(Polkit);
-    let input = ".ds-polkit-field input";
+    let input = ".ds-polkit .ds-password-field input";
     if !harness.is_focused(input) {
         harness.click(harness.centre(input).expect("the field"));
         harness.advance(ms(30));

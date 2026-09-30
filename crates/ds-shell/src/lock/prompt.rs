@@ -3,17 +3,16 @@
 //! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
 use crate::lock::mood::{Caret, Stir, prompt_mood, use_stir};
+use crate::lock::password::{Filled, use_password};
+use crate::lock::password_field::{Escape, Form, PasswordField};
 use crate::lock::picture::{AT_LOCK, prompt_picture};
-use crate::lock::secret_entry::{Filled, SecretEntry, use_secret_entry};
 use crate::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
 use crate::user_picture::{picture::UserPicture, portrait::Liveliness};
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
-use ds::components::fields::text_field::TextField;
-use ds::components::fields::text_field_focus::FieldFocus;
-use ds::components::fields::text_field_model::{FieldBezel, FieldKind};
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_motion::detail::{
@@ -51,41 +50,57 @@ pub fn LockPrompt(
     #[props(default)] wake: Option<WakeStamp>,
     oninput: EventHandler<String>,
     onsubmit: EventHandler<String>,
+    #[props(default)] common: Common,
 ) -> Element {
-    let entry = use_secret_entry(&state, oninput);
+    let password = use_password(&state, oninput);
     let mut caret = use_signal(|| Caret::In);
     let stir = use_stir();
     let lively = Lively::of(&user.picture);
     let life = Liveliness {
-        mood: prompt_mood(&state, entry.filled(), caret(), entry.pulse.phase()),
+        mood: prompt_mood(&state, password.filled(), caret(), password.shake.phase()),
         wake: stir.stamp(wake),
     };
     let line = hint_line(&state, hint);
     // Checking is an operation the prompt's own state starts.
     let operation = use_operation(use_detail(state.clone(), Touch::Remote).cue());
-    let field = Field {
-        entry,
-        caps,
-        placeholder: placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()),
-        onsubmit,
-        operation,
-        oncaret: EventHandler::new(move |at: Caret| {
-            if *caret.peek() != at {
-                caret.set(at);
-            }
-        }),
-    };
+    let availability = state.availability();
+    let go = EventHandler::new(move |()| {
+        if availability == Availability::Enabled {
+            password.submit(onsubmit);
+        }
+    });
+    let oncaret = EventHandler::new(move |at: Caret| {
+        if *caret.peek() != at {
+            caret.set(at);
+        }
+    });
+    let class = common.class("ds-lock-prompt");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-lock-prompt",
+            class,
+            id: common.id.clone(),
             "data-look": look.slug(),
             "data-state": state.slug(),
+            "aria-label": common.aria_label.clone(),
             onkeydown: move |_| lively.stir(stir),
             onmousemove: move |_| lively.stir(stir),
             onmousedown: move |_| lively.stir(stir),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             {prompt_picture(user.picture, AT_LOCK, life)}
             div { class: "ds-lock-name", "{user.name}" }
-            {lock_field(field, &state)}
+            PasswordField {
+                password,
+                availability,
+                caps,
+                form: Form::Pill,
+                placeholder: placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()),
+                escape: Escape::Clears,
+                onsubmit: go,
+                oncaret,
+                trailing: Some(go_button(&state, password.filled(), go, operation)),
+            }
             if let Some(line) = line {
                 div { class: "ds-lock-hint", {text(&line)} }
             }
@@ -120,82 +135,6 @@ impl Lively {
     fn stir(self, stir: Stir) {
         if self == Lively::Emoji {
             stir.stirred();
-        }
-    }
-}
-
-/// What the pill holds and reports.
-struct Field {
-    entry: SecretEntry,
-    caps: CapsLock,
-    placeholder: String,
-    onsubmit: EventHandler<String>,
-    /// The try the prompt's own state started: it bounds the arrow's spin (R4).
-    operation: Operation,
-    /// Where the caret went: into the field (focus, typing) or out of it.
-    oncaret: EventHandler<Caret>,
-}
-
-/// The pill: the secret field, the caps mark and the enter button, shaking as one.
-fn lock_field(field: Field, state: &PromptState) -> Element {
-    let Field {
-        entry,
-        caps,
-        placeholder,
-        onsubmit,
-        operation,
-        oncaret,
-    } = field;
-    let availability = state.availability();
-    let pulse = entry.pulse.attrs();
-    let class = match &pulse {
-        Some((anim, _)) => format!("ds-lock-field {anim}"),
-        None => "ds-lock-field".to_owned(),
-    };
-    let alias = pulse.map(|(_, alias)| alias);
-    let go = move || {
-        if availability == Availability::Enabled {
-            entry.submit(onsubmit);
-        }
-    };
-    rsx! {
-        div {
-            class,
-            "data-pulse": alias,
-            "data-filled": entry.filled().slug(),
-            "aria-disabled": availability.aria_disabled(),
-            for round in [entry.key()] {
-                TextField {
-                    key: "{round}",
-                    bezel: FieldBezel::Plain,
-                    kind: FieldKind::Secure,
-                    label: "Password",
-                    value: "",
-                    placeholder: placeholder.clone(),
-                    availability,
-                    focus: FieldFocus::OnMount,
-                    onfocus: move |()| oncaret.call(Caret::In),
-                    onblur: move |()| oncaret.call(Caret::Out),
-                    oninput: move |next: String| {
-                        oncaret.call(Caret::In);
-                        entry.input(next);
-                    },
-                    onkey: move |event: KeyboardEvent| match event.key() {
-                        Key::Enter => go(),
-                        Key::Escape => {
-                            event.prevent_default();
-                            entry.clear();
-                        }
-                        _ => {}
-                    },
-                }
-            }
-            if caps == CapsLock::On {
-                span { class: "ds-lock-caps", role: "img", "aria-label": "Caps Lock is on",
-                    Glyph { icon: Icon::CapsLock, size: IconSize::Compact }
-                }
-            }
-            {go_button(state, entry.filled(), EventHandler::new(move |()| go()), operation)}
         }
     }
 }

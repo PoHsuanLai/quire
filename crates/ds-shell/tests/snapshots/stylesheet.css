@@ -529,7 +529,7 @@ html,body{margin:0;padding:0;background:transparent}
    the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
    scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
    frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
-   tile plays `row-out` (`a-row-out`). Flat: no gloss on the panel or the selection. */
+   tile (`data-presence=leaving`) plays `row-out` at `--t-quick --e-exit`, held. Flat: no gloss on the panel or the selection. */
 
 .ds-switcher{ --switcher-cell:112px; --switcher-icon:96px; --switcher-gap:8px; --switcher-view:592px; --switcher-shift:0px; --switcher-at:0;
   position:relative; z-index:var(--z-raise); display:inline-flex; box-sizing:border-box; max-width:100%; padding:var(--s-16) var(--s-16) var(--s-10);
@@ -543,6 +543,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-switcher-ring{ position:absolute; left:0; top:0; width:var(--switcher-cell); height:var(--switcher-cell); border-radius:var(--r-tile); background:var(--f-pill);
   transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); }
 .ds-switcher-cell{ position:relative; display:grid; place-items:center; flex:none; width:var(--switcher-cell); height:var(--switcher-cell); cursor:default; }
+.ds-switcher-cell[*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-switcher-icon{ display:grid; place-items:center; width:var(--switcher-icon); height:var(--switcher-icon); }
 .ds-switcher-icon .ds-ext-icon{ width:var(--switcher-icon); height:var(--switcher-icon); }
 
@@ -1617,7 +1618,7 @@ html,body{margin:0;padding:0;background:transparent}
    sheet (`SheetWidth::Narrow`, 340) as the reference desktop's password alert: everything
    centred in one column, the person's picture at 48 (a face, a photo, or an animated emoji), a bold title (display 16/700), the program's message
    in the soft ink, "Details" in the accent with the detail as a hover card, the person's name
-   over a boxed secret field that shakes once when it was wrong (`a-shake-x`), and Cancel and
+   over a boxed secret field (`password_field.css`) that shakes once when it was wrong, and Cancel and
    Authenticate side by side at equal width. Flat: the sheet's own material, no extra shadow. */
 
 .ds-polkit{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
@@ -1628,9 +1629,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-polkit-details{ margin-top:var(--s-6); font-size:var(--fs-small); }
 .ds-polkit-details-word{ color:var(--accent-text); font-weight:600; cursor:default; }
 .ds-polkit-user{ align-self:stretch; margin-top:var(--s-16); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft); text-align:left; }
-.ds-polkit-field{ position:relative; display:flex; align-self:stretch; margin-top:var(--s-6); }
-.ds-polkit-field .ds-input-wrap{ flex:1 1 auto; }
-.ds-polkit-caps{ position:absolute; right:var(--s-10); top:0; bottom:0; display:flex; align-items:center; color:var(--ink-faint); pointer-events:none; }
 .ds-polkit-hint{ margin-top:var(--s-8); font-size:var(--fs-small); color:var(--danger); }
 .ds-polkit-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
 .ds-polkit-actions .ds-button{ width:100%; justify-content:center; }
@@ -3041,11 +3039,45 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-time{ font-family:var(--font-display); font-size:var(--fs-lock-clock); font-weight:700; letter-spacing:var(--tracking-lock-clock); line-height:1; font-variant-numeric:tabular-nums; color:var(--lock-ink); margin-top:var(--s-2); }
 
 .ds-lock-clock[*|data-look=space] .ds-lock-date{ background:var(--f-grad); color:var(--f-ink); border-radius:var(--r-pill); padding:var(--s-3) var(--s-14); margin-bottom:var(--s-8); }
+/* -- password_field -- */
+/* PasswordField (design/30 section 2.10): the secret field the lock screen and the polkit sheet
+   share, with the caps-lock mark beside it, shaking as one through its pulse class
+   (`a-shake-x`, `--t-shake --e-shake`) when a password was wrong. `data-form=pill` is the lock
+   screen's pill of flat white glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) with the
+   enter arrow inside it (`prompt.css`); `data-form=boxed` is the polkit sheet's bezeled field, the
+   caps mark at its right end. Attribute selectors carry `*|` (spike S2). */
+
+.ds-password-field{ display:flex; align-items:center; }
+.ds-password-caps{ display:inline-flex; flex:none; }
+.ds-password-field[*|data-form=boxed]{ position:relative; align-self:stretch; margin-top:var(--s-6); }
+.ds-password-field[*|data-form=boxed] .ds-input-wrap{ flex:1 1 auto; }
+.ds-password-field[*|data-form=boxed] .ds-password-caps{ position:absolute; right:var(--s-10); top:0; bottom:0; align-items:center; color:var(--ink-faint); pointer-events:none; }
+
+.ds-password-field[*|data-form=pill]{ display:flex; align-items:center; gap:var(--s-6); box-sizing:border-box; width:260px; height:38px; margin-top:var(--s-14);
+  padding:0 var(--s-5) 0 var(--s-16); border-radius:var(--r-pill); background:var(--lock-glass); color:var(--lock-ink);
+  transition:background-color var(--t-quick) var(--e-out); }
+.ds-password-field[*|data-form=pill]:hover{ background:var(--lock-glass-strong); }
+.ds-password-field[*|data-form=pill][*|aria-disabled=true]{ opacity:.6; }
+
+/* The inline field inside the pill: the pill's ink, a larger face so the dots read as dots. */
+.ds-password-field[*|data-form=pill] .ds-input-wrap{ flex:1 1 auto; min-width:0; }
+.ds-password-field[*|data-form=pill] .ds-input,
+.ds-password-field[*|data-form=pill] .ds-input-mask,
+.ds-password-field[*|data-form=pill] .ds-input-placeholder{ font-size:var(--fs-base); }
+.ds-password-field[*|data-form=pill] .ds-input[*|data-kind=secure]{ caret-color:var(--lock-ink); }
+/* The field draws its caret among the dots in their ink; the input's own stays hidden. */
+.ds-password-field[*|data-form=pill] .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
+/* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
+.ds-password-field[*|data-form=pill] .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
+.ds-password-field[*|data-form=pill] .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
+.ds-password-field[*|data-form=pill] .ds-input-placeholder{ color:var(--lock-ink-soft); }
+
+.ds-password-field[*|data-form=pill] .ds-password-caps{ color:var(--lock-ink-soft); }
 /* -- lock_prompt -- */
 /* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
    the reference lock screen: the person's picture at 64 (a face, a photo cropped round, or an
    animated emoji playing the prompt's mood), the name in white 16/700, a pill of flat white
-   glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
+   glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel; `password_field.css`) holding the secret field, the
    caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
    typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its
    pulse class (`a-shake-x`, `--t-shake --e-shake`) when a password was wrong. Under
@@ -3053,27 +3085,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-lock-prompt{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); }
 .ds-lock-name{ margin-top:var(--s-10); font-family:var(--font-ui); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--lock-ink); }
-
-.ds-lock-field{ display:flex; align-items:center; gap:var(--s-6); box-sizing:border-box; width:260px; height:38px; margin-top:var(--s-14);
-  padding:0 var(--s-5) 0 var(--s-16); border-radius:var(--r-pill); background:var(--lock-glass); color:var(--lock-ink);
-  transition:background-color var(--t-quick) var(--e-out); }
-.ds-lock-field:hover{ background:var(--lock-glass-strong); }
-.ds-lock-field[*|aria-disabled=true]{ opacity:.6; }
-
-/* The inline field inside the pill: the pill's ink, a larger face so the dots read as dots. */
-.ds-lock-field .ds-input-wrap{ flex:1 1 auto; min-width:0; }
-.ds-lock-field .ds-input,
-.ds-lock-field .ds-input-mask,
-.ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
-.ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--lock-ink); }
-/* The field draws its caret among the dots in their ink; the input's own stays hidden. */
-.ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-/* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
-.ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
-.ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
-.ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
-
-.ds-lock-caps{ display:inline-flex; flex:none; color:var(--lock-ink-soft); }
 
 .ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
   background:var(--lock-glass-strong); color:var(--lock-ink); cursor:default;
@@ -3086,13 +3097,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
 
 /* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
-.ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-caret::before{ background:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
-.ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
+.ds-lock-prompt[*|data-look=space] .ds-password-field{ background:var(--f-grad); color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-input[*|data-kind=secure]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-input-caret::before{ background:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-input-mask{ color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-input-placeholder,
+.ds-lock-prompt[*|data-look=space] .ds-password-field .ds-password-caps{ color:var(--f-ink-soft); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-progress-indicator{ background:var(--f-ink); }
 /* -- notification_card -- */

@@ -5,6 +5,7 @@
 
 use crate::lock::vocab::LockLook;
 use dioxus::prelude::*;
+use ds::Common;
 use ds_core::word::Word;
 
 /// The time and the date, as the caller words them ("9:41", "Friday 26 September"): the
@@ -15,13 +16,23 @@ pub fn LockClock(
     #[props(into)] time: String,
     #[props(into)] date: String,
     #[props(default)] look: LockLook,
+    #[props(default)] common: Common,
 ) -> Element {
+    let class = common.class("ds-lock-clock");
+    let data = common.data_attributes();
+    let label = common
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| format!("{date}, {time}"));
     rsx! {
         div {
-            class: "ds-lock-clock",
+            class,
+            id: common.id.clone(),
             "data-look": look.slug(),
             role: "group",
-            "aria-label": "{date}, {time}",
+            "aria-label": "{label}",
+            onmounted: move |event| common.mounted(event),
+            ..data,
             div { class: "ds-lock-date", "{date}" }
             div { class: "ds-lock-time", "{time}" }
         }

@@ -10,6 +10,7 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource, ImageSource,
     Inject, Material, PlateFamily, Px, RootChrome, TextLine, Theme, person_hue,
@@ -319,16 +320,16 @@ fn no_password_field_writes_a_value() {
     }
 }
 
-/// The markup says what the props say: the state, the shake on a wrong password, the caps
-/// mark, the closed field and the lock-out line; the switcher's fit and selection; a leaving
-/// tile's fold.
+/// The markup says what the props say: the state, the caps mark, the closed field and the
+/// lock-out line; the switcher's fit and selection. A shake plays on arriving at `Wrong`, not on
+/// mounting in it (`lock_switcher` in ds-native drives that).
 #[test]
 fn the_markup_carries_the_props() {
     let wrong = render(SPECIMENS[4].1);
     for want in [
         "data-state=\"wrong\"",
-        "class=\"ds-lock-field a-shake-x\"",
-        "data-pulse=\"a\"",
+        "class=\"ds-password-field\"",
+        "data-form=\"pill\"",
         "aria-label=\"Caps Lock is on\"",
         "data-size=\"64\"",
     ] {
@@ -421,7 +422,7 @@ fn polkit_named() -> Element {
                 oninput: |_| {},
                 onsubmit: |_| {},
                 oncancel: |_| {},
-                panel_id: Some("polkit-panel".to_owned()),
+                common: Common { id: Some("polkit-panel".to_owned()), ..Common::default() },
             }
         },
     )
@@ -437,5 +438,8 @@ fn the_polkit_sheet_carries_the_panel_id() {
         "{html}"
     );
     let plain = render(|| polkit(PromptState::Idle, CapsLock::Off));
-    assert!(!plain.contains(r#"id=""#), "no empty id without a panel_id");
+    assert!(
+        !plain.contains(r#"id=""#),
+        "no empty id without a common id"
+    );
 }
