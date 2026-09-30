@@ -24,7 +24,7 @@ name `ds`'s public surface, one path per item.
 | Module | Implements | Notes |
 | --- | --- | --- |
 | `ds-style/appearance/theme.rs` | 07-LOOKS §2 (Theme axis); 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
-| `ds-style/appearance/accent.rs` | 03-COLOR §5, open decision 6; 22-SETTINGS §3.1 `appearance.accent` | Postmark plus the five Candy hues (FINDINGS) |
+| `ds-style/appearance/accent.rs` | 03-COLOR §5, open decision 6; 22-SETTINGS §3.1 `appearance.accent` | the eight macOS accents |
 | `ds-style/appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference) and `MotionLevel` (resolved) |
 | `ds-style/look/mod.rs` | 30-CATALOGUE part 3; 07-LOOKS §2 | `Look` (values per Look live in `ds-style/tokens`) |
 | `ds-style/appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | lenient read |

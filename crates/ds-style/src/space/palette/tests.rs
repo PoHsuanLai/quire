@@ -288,7 +288,7 @@ fn gradient_matches_the_mockup() {
             accent_text: String::new(),
             accent_ring: String::new(),
             accent_roles: crate::tokens::accent_table::accent_of(
-                crate::appearance::accent::Accent::Postmark,
+                crate::appearance::accent::Accent::Blue,
                 Scheme::Light,
             ),
             capped: Capping::Uncapped,
@@ -323,7 +323,7 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
     use ds_core::colour::contrast::{Verdict, ratio};
     for scheme in [Scheme::Light, Scheme::Dark] {
         let dark = scheme == Scheme::Dark;
-        for accent in [CardAccent::SpaceHue, CardAccent::Postmark] {
+        for accent in [CardAccent::SpaceHue, CardAccent::Chosen] {
             let space = SpaceLook {
                 dots: HOME.to_vec(),
                 grain: Grain(35),
@@ -341,8 +341,8 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
             };
             let roles = match accent {
                 CardAccent::SpaceHue => palette.accent_roles,
-                CardAccent::Postmark => crate::tokens::accent_table::accent_of(
-                    crate::appearance::accent::Accent::Postmark,
+                CardAccent::Chosen => crate::tokens::accent_table::accent_of(
+                    crate::appearance::accent::Accent::Blue,
                     scheme,
                 ),
             };

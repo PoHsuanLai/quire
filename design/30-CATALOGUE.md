@@ -420,7 +420,7 @@ either Look.
 | Value | Mac (default) | Arc |
 | --- | --- | --- |
 | Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays) | Karla / Bricolage Grotesque / Space Mono |
-| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M) | Postmark #23508F / #7FA6E6 (S:11) |
+| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); the picker offers macOS's eight (Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite) | Postmark #23508F / #7FA6E6 (S:11) |
 | Paper (window) | #ECECEC / #1E1E1E (conf M) | #E9ECE6 / #151814 |
 | Surface (control / content) | #FFFFFF / #2A2A2A (conf M) | #F8F9F6 / #1D211B |
 | Ink / soft / faint | 85 %, 55 %, 25 % black or white (label, secondary, tertiary) | #1A1E1A, #586057, #676E65 / #E7EBE3, #A0A79B, #8A9284 |

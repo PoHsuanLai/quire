@@ -226,8 +226,16 @@ the `-l`/`-d` copies are deleted (`P:303-304`).
 
 ## 5. Card accent
 
-Inside the card the accent is either Postmark blue or a quiet echo of the Space's hue; each
-Space chooses.
+Inside the card the accent is either the accent the person picked or a quiet echo of the Space's hue;
+each Space chooses.
+
+**Settled 2026-09-30:** the pickable accents are macOS's own eight, in its order: Blue (the
+default, systemBlue `#007AFF` / `#0A84FF`), Purple, Pink, Red, Orange, Yellow, Green, Graphite (the
+Mac's neutral grey accent, `#8E8E93` / `#98989D`), each the system colour, ink white where white
+reads at 3:1 on the fill and the deep ink of the hue otherwise (yellow, orange, green). Postmark
+is removed (Blue is systemBlue); the old Candy-hue accents (Amber, Violet, teal Blue) are gone,
+and stored `postmark`, `amber`, `violet` are not migrated. The Postmark rows below and the
+statements about six accents in sections 20 and 15 are history.
 
 | Mode | `--accent` | `--accent-soft` | `--accent-ink` | Source |
 | --- | --- | --- | --- | --- |
@@ -848,7 +856,7 @@ Inside the band, Candy's Blue (260) came out 0.005 (OKLab) from Postmark (257): 
 twice in the picker. Blue now generates from 215, a sky blue (`#69CEE6` light, `#62C8DF`
 dark). It stands 0.07 from Postmark and 0.11 from Green, at least the picker's narrowest
 existing gap (Violet to Postmark, 0.064); `accent_band::tests::every_built_in_swatch_is_distinct`
-holds every pair at 0.06 or more in both schemes. Both slugs stay, so stored settings load
+holds every pair at 0.04 or more in both schemes (2026-09-30: the eight macOS accents; Apple's own Red and Pink stand 0.045 apart in light). Both slugs stay, so stored settings load
 unchanged; a stored `blue` now shows the sky blue. The hue strip at the foot of
 `accent-b-final-{light,dark}.png` shows the six.
 

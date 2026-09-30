@@ -187,7 +187,7 @@ mod tests {
         let env = use_signal(|| Scope {
             resolved: Resolved {
                 scheme: Scheme::Light,
-                accent: Accent::Postmark,
+                accent: Accent::Blue,
                 motion: MotionLevel::Standard,
             },
             scheme: Scheme::Light,

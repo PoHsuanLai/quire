@@ -3,7 +3,7 @@
 
 use crate::appearance::theme::Scheme;
 
-/// The card's own colours: Post, which a Space's hue never moves. Postmark's accent is not here:
+/// The card's own colours: Post, which a Space's hue never moves. the chosen accent is not here:
 /// it is generated like every accent (`tokens::accent_of`, design/03-COLOR.md section 20).
 ///
 /// The same literals as `tokens.css` and `tokens.dark.css`; `ui::style`'s tests hold the two

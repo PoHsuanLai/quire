@@ -57,7 +57,7 @@ fn every_accent_is_legible_in_both_schemes() {
 }
 
 /// Every `X` / `X-ink` pair: text on the accent, on `--ok`, on `--warn` and on `--danger`, in
-/// both schemes (the accent here is Postmark; `every_accent_is_legible_in_both_schemes` covers
+/// both schemes (the accent here is Blue; `every_accent_is_legible_in_both_schemes` covers
 /// the other five). Dark `--danger-ink` was white on `#E0705A`, 3.17:1.
 #[test]
 fn every_ink_on_its_colour_is_legible_in_both_schemes() {
@@ -91,7 +91,7 @@ fn every_ink_on_its_colour_is_legible_in_both_schemes() {
 
 /// The four gates for one Space, measured on what the root actually paints: the frame ink from
 /// [`FrameVars`], the stops the gradient is made of, and the card's accent (the Space's when it
-/// lends one, Postmark otherwise).
+/// lends one, Blue otherwise).
 fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
     let vars = FrameVars::of(look, scheme);
     let stops = derive(&look.dots, scheme).stops;
@@ -99,7 +99,7 @@ fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
     let ink = colour(ColourToken::Ink, scheme);
     let roles = vars
         .accent
-        .unwrap_or_else(|| accent_of(Accent::Postmark, scheme));
+        .unwrap_or_else(|| accent_of(Accent::Blue, scheme));
     let accent = roles.text.css();
     // The wash is translucent: laid over the card before the card's ink is measured on it.
     let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
@@ -152,7 +152,7 @@ fn every_preset_frame_is_legible() {
     let mut failures = Vec::new();
     for (index, preset) in PRESETS.iter().enumerate() {
         for scheme in Scheme::ALL.iter().copied() {
-            for card_accent in [CardAccent::Postmark, CardAccent::SpaceHue] {
+            for card_accent in [CardAccent::Chosen, CardAccent::SpaceHue] {
                 let look = SpaceLook {
                     dots: preset.dots.to_vec(),
                     grain: Grain(40),

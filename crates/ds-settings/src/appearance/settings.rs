@@ -133,7 +133,7 @@ impl Default for AppearanceSettings {
         AppearanceSettings {
             theme: Theme::System,
             look: Look::Mac,
-            accent: Accent::Postmark,
+            accent: Accent::Blue,
             motion_level: Motion::Standard,
             typeface: Typeface::System,
             material_tint_alpha: Percent(80),
@@ -168,7 +168,7 @@ impl AppearanceSettings {
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
 pub enum PlateGlyphPolicy {
-    /// WCAG-driven per family: red, blue, violet white; amber, green ink.
+    /// macOS rule per accent: white ink where it reads at 3:1 on the fill, the deep ink of the hue otherwise (yellow, orange, green).
     #[default]
     Auto,
     /// Always white.

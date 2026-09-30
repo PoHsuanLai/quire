@@ -34,7 +34,7 @@ use std::cell::Cell;
 use std::time::Duration;
 
 thread_local! {
-    static CASE: Cell<(Theme, Accent)> = const { Cell::new((Theme::Light, Accent::Postmark)) };
+    static CASE: Cell<(Theme, Accent)> = const { Cell::new((Theme::Light, Accent::Blue)) };
 }
 
 /// The three controls, each group's selector.
@@ -279,7 +279,7 @@ fn bytes(colour: Srgba) -> [u8; 4] {
 fn at_scale_2_the_painted_thumb_fills_the_selected_segment_to_its_edges() {
     for theme in [Theme::Light, Theme::Dark] {
         for group in GROUPS {
-            let mut harness = desk(200, theme, Accent::Postmark);
+            let mut harness = desk(200, theme, Accent::Blue);
             click(&mut harness, group, 3);
             harness.advance(Duration::from_millis(800));
             let frame = harness.render().expect("render");

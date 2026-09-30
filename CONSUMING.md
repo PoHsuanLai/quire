@@ -184,7 +184,7 @@ You almost never write more than one `Ds` per window: it is the root, not a per-
 use `Surface` (section 4) for a nested material, scheme, accent or blur state.
 
 **Only one `Ds` prop most consumers get wrong first:** `appearance: Appearance::default()` is
-fine for a first cut, but it means "System theme, Postmark accent, System motion" every time,
+fine for a first cut, but it means "System theme, Blue accent, System motion" every time,
 ignoring whatever the person picked last session. Section 3 below is how you read the real
 value.
 

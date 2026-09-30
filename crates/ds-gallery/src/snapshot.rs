@@ -21,9 +21,9 @@ pub const WIDTH: u32 = 1280;
 /// The schemes a sheet sweeps.
 pub const SCHEMES: [Scheme; 2] = [Scheme::Light, Scheme::Dark];
 
-/// The accents a sheet sweeps: Postmark, and green (the brief's "pine"; quire's six accents have
-/// no pine, and green is the nearest).
-pub const ACCENTS: [Accent; 2] = [Accent::Postmark, Accent::Green];
+/// The accents a sheet sweeps: Blue, the default, and pink (a hue far
+/// from it).
+pub const ACCENTS: [Accent; 2] = [Accent::Blue, Accent::Pink];
 
 /// When each picture is taken: long after every CSS entrance and transition has ended. Rust
 /// timers do not run in a snapshot (ds_native::snapshot), so a picture is CSS time only.
@@ -45,7 +45,7 @@ pub struct Shot {
 }
 
 impl Shot {
-    /// Its file name: `tokens-light-postmark.png`, with `-editorial` before the extension under
+    /// Its file name: `tokens-light-blue.png`, with `-editorial` before the extension under
     /// the Editorial typeface.
     pub fn file(&self) -> String {
         let typeface = match self.typeface {
@@ -191,6 +191,6 @@ mod tests {
         assert_eq!(shots.len(), Page::ALL.len() * SCHEMES.len() * ACCENTS.len());
         let files: HashSet<String> = shots.iter().map(|shot| shot.file()).collect();
         assert_eq!(files.len(), shots.len(), "two shots share a file name");
-        assert!(files.contains("motion-lab-dark-green.png"));
+        assert!(files.contains("motion-lab-dark-pink.png"));
     }
 }
