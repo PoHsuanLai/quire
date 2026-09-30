@@ -34,6 +34,10 @@ keyboard-types = { workspace = true }
 peniko = { workspace = true }
 thiserror = { workspace = true }
 
+[dev-dependencies]
+# The virtual-clock ask test wakes the document from a watch channel.
+tokio = { workspace = true }
+
 [features]
 # `pdf_app` and `Harness::pdf`: a harness's document printed as it is now.
 pdf = ["ds-blitz/pdf"]
