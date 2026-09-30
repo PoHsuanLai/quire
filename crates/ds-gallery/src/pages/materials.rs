@@ -13,6 +13,7 @@ use ds::{
     IconSize, Material, Slider, StatusMetrics, Surface, use_scope,
 };
 use ds::{Bezel, ControlSize, ImagePosition};
+use ds_shell::MenuBarItem;
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
@@ -119,8 +120,8 @@ fn Panel(material: Material) -> Element {
                 span { class: "g-name", "Files" }
                 span { class: "g-code", "{state}" }
                 span { class: "g-spacer" }
-                Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: Some(ds::Shown::Visible), onclick: |_| {} }
+                MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: ds::Shown::Visible, onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },

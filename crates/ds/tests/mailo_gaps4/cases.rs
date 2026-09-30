@@ -51,7 +51,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/quiet-caret.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Caret, shown: ds::Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Glyph(Icon::ChevronDown), shown: ds::Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/mini-trailing-glyph.html",

@@ -33,8 +33,8 @@ pub fn ButtonsMailo5() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "mark",
                     div { class: "g-row",
-                        Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Caret, onclick: |_| {} }
-                        Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
                         Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
                     }
                 }
@@ -44,7 +44,7 @@ pub fn ButtonsMailo5() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "runs",
                     div { class: "g-row",
-                        Button { bezel: Bezel::Inline, label: quoted_head(), trailing: Trailing::Caret, shown: open(),
+                        Button { bezel: Bezel::Inline, label: quoted_head(), trailing: Trailing::Glyph(Icon::ChevronDown), shown: open(),
                             onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
                         Button { size: ControlSize::Mini, label: quoted_head(), onclick: |_| {} }
                     }

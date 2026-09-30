@@ -16,9 +16,6 @@ pub enum Bezel {
     Inline,
     /// The help button: a round bezel with a question mark, drawn by the button itself.
     Help,
-    /// The menu bar's status item (`NSStatusItem` button): a slot as wide as the bar's status
-    /// item (`--bar-status-w`) and as tall as its box, holding a glyph the bar's settings size.
-    StatusItem,
 }
 
 /// What the button does to the thing it acts on (`NSButton.hasDestructiveAction`), `data-role`.

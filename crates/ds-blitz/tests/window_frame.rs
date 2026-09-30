@@ -8,12 +8,14 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::ImagePosition;
 use ds::{
     Appearance, Ds, DurationToken, EasingToken, Fraction, Grain, Icon, Material, MotionLevel,
     PRESETS, SpaceLook, Theme,
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_harness::{Harness, Viewport};
+use ds_shell::MenuBarItem;
 use image::RgbaImage;
 use probe::{distance, keep};
 use std::time::Duration;
@@ -143,8 +145,8 @@ fn Switching() -> Element {
         Ds { appearance: light(), look: look(index(), 0), material: Material::Window,
             style { {PROBE_CSS} }
             div { class: "room",
-                Button {
-                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
+                MenuBarItem {
+                    image: ImagePosition::Only,
                     icon: Icon::Grid,
                     label: "Next Space",
                     onclick: move |_| index.set(3),

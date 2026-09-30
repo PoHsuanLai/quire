@@ -9,6 +9,7 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::icon::{IconStyle, Tint};
 use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Corner, Ds, Emphasis, Icon, IconSize,
@@ -102,9 +103,9 @@ const CASES: &[Case] = &[
     }),
     ("bar-items", || {
         rsx! {
-            MenuBarItem { emphasis: Emphasis::Strong, span { "Files" } }
-            MenuBarItem { open: Shown::Visible, id: "file", span { "File" } }
-            MenuBarItem { span { "Edit" } }
+            MenuBarItem { emphasis: Emphasis::Strong, label: "Files", onclick: |_| {} }
+            MenuBarItem { shown: Shown::Visible, common: Common { id: Some("file".to_string()), ..Common::default() }, label: "File", onclick: |_| {} }
+            MenuBarItem { label: "Edit", onclick: |_| {} }
         }
     }),
     ("workspace-pills", || {

@@ -4,16 +4,17 @@
 //! reading the bar's `VolumeState`. Each motion ends at 0 frames.
 
 use dioxus::prelude::*;
+use ds::ImagePosition;
 use ds::detail::EventStamp;
 use ds::{
     Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconSource, LevelGlyph, LowAt,
     Material, Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves, WifiBars,
     WifiReach, WifiState,
 };
-use ds::{Bezel, Button, ImagePosition};
 use ds::{Slider, SliderLook};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::MenuBarItem;
 use ds_shell::{ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
 
@@ -61,8 +62,8 @@ fn Bar() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "bar", style: METRICS.style_attr(),
-                Button {
-                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
+                MenuBarItem {
+                    image: ImagePosition::Only,
                     icon: status,
                     label: status.words(),
                     onclick: |_| {},

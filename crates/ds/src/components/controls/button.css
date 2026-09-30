@@ -79,25 +79,3 @@
 /* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
    disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
-
-/* StatusItem: the bar's status item. The slot is the bar's 30 wide (`--bar-status-w`,
-   design/29-SIZING.md section 5.1: the glyph 7 in from each side) by the box's height; the box and
-   the glyph come from the consumer's settings through `--bar-status-box` and `--bar-status-glyph`
-   (`ds::StatusMetrics`), the fallbacks being the keys' defaults, 22 and 16. The glyph is sized
-   here because the size is a setting. Inks on the frame as a toolbar button's; pressed and open
-   on the pressed fill. The pill's radius is the shell scale's bar-item radius. */
-.ds-button[*|data-variant=status-item]{
-  width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); padding:0; border-radius:var(--r-shell-bar-item);
-  color:var(--ink-soft);
-}
-.ds-button[*|data-variant=status-item]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=status-item][*|data-pressed],
-.ds-button[*|data-variant=status-item][*|aria-pressed=true],
-.ds-button[*|data-variant=status-item][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
-/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level
-   parts) fill that square, so the glyph follows the setting as a single icon does. */
-.ds-button[*|data-variant=status-item] .ds-ic,
-.ds-button[*|data-variant=status-item] .ds-ext-icon,
-.ds-button[*|data-variant=status-item] .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
-.ds-button[*|data-variant=status-item] .ds-status-glyph > .ds-status-part,
-.ds-button[*|data-variant=status-item] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }

@@ -54,12 +54,11 @@ impl ButtonFace {
     }
 }
 
-/// A mark after the label: a dropdown's caret, or any glyph.
+/// A mark after the label: a glyph at the button's icon size (`Icon::ChevronDown` for a button
+/// that opens a menu).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Trailing {
-    /// The dropdown caret: `chevron-down` at 12, in the label's colour.
-    Caret,
-    /// Another glyph, at the button's icon size.
+    /// A glyph, at the button's icon size.
     Glyph(Icon),
 }
 
@@ -67,7 +66,6 @@ impl Trailing {
     /// The glyph and its size, given the button's own icon size.
     fn glyph(self, icon_size: IconSize) -> (Icon, IconSize) {
         match self {
-            Trailing::Caret => (Icon::ChevronDown, IconSize::Tiny),
             Trailing::Glyph(icon) => (icon, icon_size),
         }
     }

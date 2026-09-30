@@ -3,18 +3,19 @@
 
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
+use ds::ImagePosition;
 use ds::{
     BatteryPower, BatteryState, BluetoothState, Fraction, LowAt, StatusMetrics, StatusState,
     VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
 };
-use ds::{Bezel, Button, ImagePosition};
+use ds_shell::MenuBarItem;
 
 /// One status item, labelled with its state's words.
 #[component]
 fn Item(status: StatusState) -> Element {
     rsx! {
-        Button {
-            bezel: Bezel::StatusItem, image: ImagePosition::Only,
+        MenuBarItem {
+            image: ImagePosition::Only,
             icon: status,
             label: status.words(),
             onclick: |_| {},

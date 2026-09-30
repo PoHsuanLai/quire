@@ -8,6 +8,7 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::ImagePosition;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
     FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement,
@@ -15,6 +16,7 @@ use ds::{
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_harness::{Backdrop, Harness, Viewport};
+use ds_shell::MenuBarItem;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -132,8 +134,8 @@ fn SwitchingBar() -> Element {
         Ds { appearance: light(), look: look(index()), material: Material::Bar, blur: BlurState::Available,
             style { {PROBE_CSS} }
             div { class: "bar-fill",
-                Button {
-                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
+                MenuBarItem {
+                    image: ImagePosition::Only,
                     icon: Icon::Grid,
                     label: "Next Space",
                     onclick: move |_| index.set(3),
@@ -323,10 +325,10 @@ fn StatusItems() -> Element {
             style { {PROBE_CSS} }
             div { class: "bar-fill",
                 div { class: "large", style: large.style_attr(),
-                    Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
+                    MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
                 }
                 div { class: "plain",
-                    Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
+                    MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
                 }
             }
         }

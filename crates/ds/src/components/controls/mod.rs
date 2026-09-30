@@ -24,6 +24,5 @@ pub(crate) mod slider_bezel;
 pub(crate) mod slider_linear;
 pub(crate) mod slider_machine;
 pub mod slider_model;
-pub mod spinner;
 pub(crate) mod toggle;
 pub(crate) mod track;
