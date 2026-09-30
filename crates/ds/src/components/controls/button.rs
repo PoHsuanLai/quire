@@ -1,7 +1,8 @@
-//! Button: a labelled action in six variants (design/04-COMPONENTS.md section 1).
-//! Markup: `button.ds-button[data-variant]`, `aria-pressed` only for a toggle Mini; `title`,
-//! `aria-label` and `aria-expanded` only when the caller gives them (or a mark face names it);
-//! the consumer's own `data-*` and classes after quire's.
+//! Button: `NSButton` in its push, toolbar, inline and help bezels (design/30 section 2.1).
+//! Markup: `button.ds-button[data-variant=<bezel>][data-role][data-size][data-availability]`;
+//! `data-state` and `aria-pressed` only for a toggle button; `data-answers` for a button that
+//! answers Return or Escape; `data-image=only` when the label is not drawn; `data-pressed`
+//! while a press is under way; the consumer's own `data-*` and classes after quire's.
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
@@ -10,93 +11,74 @@ use crate::components::controls::button_face::{
     ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
     trailing as trailing_mark,
 };
-use crate::components::controls::button_size::{ButtonSize, disabled};
-use crate::components::controls::press::{PressListeners, Propagation, use_pressing};
+use crate::components::controls::button_model::{
+    Answers, Bezel, ButtonRole, IconSwap, ImagePosition,
+};
+use crate::components::controls::glyph::glyph_size;
+use crate::components::controls::press::{
+    ActivationKeys, PressListeners, Propagation, disabled, use_pressing,
+};
+use crate::components::controls::progress::busy::use_busy;
+use crate::components::controls::progress::model::{Progress, ProgressStyle};
+use crate::components::controls::progress::view::ProgressIndicator;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Shown};
 use ds_core::word::Word;
+use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_style::icon::render::IconSize;
+use ds_style::tokens::control_size::ControlSize;
 
-/// Which button.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub enum ButtonVariant {
-    /// Accent fill: Send, Compose.
-    Primary,
-    /// Surface-2 with a line: the ghost button.
-    Secondary,
-    /// Small, surface-2: Reply, RSVP, hover-card actions.
-    Mini,
-    /// Text only: the quiet link-button.
-    Quiet,
-    /// As Mini at rest; red only on hover.
-    Danger,
-    /// Words on the Space frame: the sidebar item's chrome, `--f-ink-soft` on
-    /// nothing at rest, `--f-ink` on `--f-pill-hover` under the pointer, on `--f-pill` while
-    /// pressed or held down. A frame word's contrast is the frame's, which no surface token
-    /// guarantees, so the other variants' `--ink` family does not belong there.
-    Frame,
-}
-
-impl ButtonVariant {
-    /// The icon size: 14 for every variant that the doc sizes. TODO(O-3): the Quiet icon is
-    /// "not specified" in design/04-COMPONENTS.md section 1; it takes the same 14.
-    fn icon_size(self) -> IconSize {
-        IconSize::Compact
+/// The size the busy spinner takes in the leading slot: one rung under the button's own, so
+/// it sits inside the label's line (design/30 section 2.9).
+fn spinner_size(size: ControlSize) -> ControlSize {
+    match size {
+        ControlSize::Mini | ControlSize::Small => ControlSize::Mini,
+        ControlSize::Regular | ControlSize::Large => ControlSize::Small,
     }
 }
 
-/// A labelled action. `icon` is a glyph or an external icon (an `Icon` or `Option<Icon>`
-/// converts). `id` is written as the element's `id`, so a popup can anchor to it by id.
-/// `onclick` hears the primary, secondary (right-click) and middle buttons, and the keyboard as
-/// primary. `mounted` hands over the element once it is in the document, so a floating
-/// component can anchor to it (`Anchor::Mounted`).
+/// A labelled action. A `Help` bezel draws a question mark and is named by `label`.
 ///
-/// `title` is the hover hint. `aria_label` names the button to assistive technology in place of
-/// its visible label, for a label that is a symbol or too terse to stand alone ("+" or "All").
-/// `expanded` says whether the menu or panel this button opens is showing (`aria-expanded`);
-/// leave it `None` on a button that opens nothing.
+/// `label` names the button; it is drawn unless `image` is `ImagePosition::Only`, when it is the
+/// button's accessible name instead (a runs label names it by its characters). `icon` is a glyph
+/// or an external icon (an `Icon` converts) at the ladder's glyph size for `size`.
+/// `onclick` hears the primary, secondary (right-click) and middle buttons, and the keyboard
+/// (Return or Space on the focused button) as primary. `common.mounted` hands over the element
+/// once it is in the document, so a floating component can anchor to it (`Anchor::Mounted`).
 ///
-/// `trailing` puts a mark after the label: `Trailing::Caret` for a dropdown showing its value,
-/// or a glyph. `leading` puts one before it: `Leading::Mark` holds an element
-/// such as a `ProviderMark`, for a From dropdown whose value shows the account's provider;
-/// `Leading::Glyph` a glyph (for a lone glyph, `icon` is the same thing). `face` draws the label as a styled letter (`ButtonFace::Bold` is a bold `B`)
-/// and then names the button by `label` through `aria-label`, unless `common.aria_label` says
-/// otherwise.
+/// `value` makes it a toggle button: `Check::On` draws it pressed in (`aria-pressed`). `shown`
+/// says whether the menu or panel this button opens is up (`aria-expanded`); leave it `None` on a
+/// button that opens nothing. `title` is the hover hint.
 ///
-/// `label` is a [`Text`]: a `String` or `&str` as before, or runs in their tones (a quoted
-/// message's head, "who" strong and "when" faint), drawn inside the label's span. A
-/// label of runs names the button by its characters (`Text::plain_text`) through `aria-label`,
-/// unless `aria_label` says otherwise.
+/// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an
+/// element such as a `ProviderMark`). `face` draws the label as a styled letter and then names
+/// the button by `label` through `aria-label`.
 ///
-/// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear
-/// the click (a header action inside a `<summary>` leaves the `<details>` as it was).
+/// `availability`: `Disabled` writes `aria-disabled` and `disabled`, draws the button at .35 and
+/// drops every press; `Busy` does the same for input, writes `aria-busy`, and shows a spinner in
+/// the leading slot, faded in over `--t-quick`.
 ///
-/// `common` puts the consumer's own `id`, `data-*` attributes and classes on the button itself,
-/// so it needs no wrapping `span`: `data-folder` for a drag that reads the place off the element
-/// under the pointer, a class for the consumer's own reveal or layout rule (see [`Common`]); its
-/// `aria_label` names the button where `label` does not, and `mounted` hands over the element for
-/// a menu or popover anchored to it.
+/// `swap: IconSwap::CrossFade` fades a changed `icon` into the new one.
 ///
-/// `size` draws the variant at another size: `Some(ButtonSize::Regular)` gives a
-/// Danger the Primary's geometry, so Restart sits level with Shut Down and Cancel beside it.
-/// `None` keeps the variant's own size (Danger and Mini are Mini-sized) and writes nothing.
-///
-/// `availability: Availability::Disabled` writes `aria-disabled` and `disabled`,
-/// draws the button at .35 with no hover and no press (design/13 section 13.3.3's disabled
-/// item), and drops every press: `onclick` never runs.
+/// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear the
+/// click (a header action inside a `<summary>` leaves the `<details>` as it was).
 #[component]
 pub fn Button(
-    variant: ButtonVariant,
-    #[props(default)] size: Option<ButtonSize>,
     #[props(into)] label: TextLine,
+    #[props(default)] bezel: Bezel,
+    #[props(default)] role: ButtonRole,
+    #[props(default)] answers: Answers,
+    #[props(default)] size: ControlSize,
+    #[props(default)] image: ImagePosition,
+    #[props(default)] swap: IconSwap,
     #[props(default)] icon: Option<IconSource>,
-    #[props(default)] pressed: Option<Check>,
+    #[props(default)] value: Option<Check>,
+    #[props(default)] shown: Option<Shown>,
     #[props(default)] availability: Availability,
     onclick: EventHandler<Press>,
     #[props(default)] title: Option<String>,
-    #[props(default)] expanded: Option<Shown>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] leading: Option<Leading>,
     #[props(default)] face: ButtonFace,
@@ -105,33 +87,48 @@ pub fn Button(
 ) -> Element {
     let class = common.class("ds-button");
     let data = common.data_attributes();
-    let aria_label = common
-        .aria_label
-        .clone()
-        .or_else(|| spoken_label(face, &label));
-    let pressed = pressed.map(|state| state.aria());
-    let expanded = expanded.map(Shown::aria);
+    let spoken = match (bezel, image) {
+        (Bezel::Help, _) | (_, ImagePosition::Only) => Some(label.plain_text()),
+        (_, ImagePosition::Leading) => spoken_label(face, &label),
+    };
+    let aria_label = common.aria_label.clone().or(spoken);
     let listen = PressListeners::new(onclick).with_propagation(propagation);
     let pressing = use_pressing();
+    let operation = use_busy(availability);
     let live = availability == Availability::Enabled;
+    let keys = match answers {
+        Answers::Escape => ActivationKeys::SpaceOnly,
+        Answers::Nothing | Answers::Return => ActivationKeys::ReturnAndSpace,
+    };
+    let glyph = glyph_size(size);
     rsx! {
         button {
             r#type: "button",
             id: common.id.clone(),
             class,
-            "data-variant": variant.slug(),
+            "data-variant": bezel.slug(),
+            "data-role": role.slug(),
+            "data-answers": answers.attr(),
+            "data-size": size.slug(),
+            "data-image": image.slug(),
+            "data-availability": availability.slug(),
+            "data-state": value.map(|state| state.slug()),
             title,
             "aria-label": aria_label,
-            "aria-pressed": pressed,
-            "aria-expanded": expanded,
+            "aria-pressed": value.map(Check::aria),
+            "aria-expanded": shown.map(Shown::aria),
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
             disabled: disabled(availability),
-            "data-size": size.map(ButtonSize::slug),
             "data-pressed": if live { pressing.attr() } else { None },
             onmousedown: move |event| pressing.pointer_down(&event),
             onmouseleave: move |_| pressing.released(),
-            onkeydown: move |event| pressing.key_down(&event),
+            onkeydown: move |event| {
+                if live {
+                    pressing.key_down(&event, keys);
+                    listen.key_down(&event, keys);
+                }
+            },
             onkeyup: move |_| pressing.released(),
             onblur: move |_| pressing.released(),
             onclick: move |event| {
@@ -153,19 +150,43 @@ pub fn Button(
             // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
             // attribute: the markup is the same with or without a handler.
             onmounted: move |event| common.mounted(event),
-            // The consumer's own `data-*`, last: a spread follows the named
-            // attributes.
+            // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
-            if let Some(mark) = leading {
-                {leading_mark(mark, variant.icon_size())}
+            if availability == Availability::Busy {
+                span { class: "ds-button-lead",
+                    ProgressIndicator {
+                        style: ProgressStyle::Spinner,
+                        progress: Progress::Unknown(operation),
+                        size: spinner_size(size),
+                    }
+                }
+            } else if let Some(mark) = leading {
+                {leading_mark(mark, glyph)}
             }
             if let Some(icon) = icon {
-                IconView { source: icon, size: variant.icon_size() }
+                span { class: "ds-button-icon", {icon_view(icon, glyph, swap)} }
             }
-            FaceMark { face, label }
+            if bezel == Bezel::Help {
+                span { class: "ds-button-label", "aria-hidden": "true", "?" }
+            } else if image == ImagePosition::Leading {
+                FaceMark { face, label }
+            }
             if let Some(mark) = trailing {
-                {trailing_mark(mark, variant.icon_size())}
+                {trailing_mark(mark, glyph)}
             }
         }
+    }
+}
+
+/// `icon` at `size`; a quire glyph under `IconSwap::CrossFade` fades into the next one it is
+/// given.
+fn icon_view(icon: IconSource, size: IconSize, swap: IconSwap) -> Element {
+    match (swap, icon) {
+        (IconSwap::CrossFade, IconSource::Glyph(icon)) => rsx! {
+            MorphGlyph { icon, size, style: MorphStyle::CrossFade }
+        },
+        (IconSwap::Instant, source) | (IconSwap::CrossFade, source) => rsx! {
+            IconView { source, size }
+        },
     }
 }

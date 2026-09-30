@@ -3,7 +3,6 @@
 //! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7).
 
 pub(crate) mod kind;
-pub(crate) mod play_pause;
 pub(crate) mod track_position;
 
 use dioxus::core::queue_effect;

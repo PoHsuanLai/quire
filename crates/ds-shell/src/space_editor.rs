@@ -12,6 +12,7 @@ pub(crate) mod rows;
 use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
 use ds::components::lists::section_header::{HeaderKind, SectionHeader};
+use ds::{Choice, Tracking};
 use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
 use ds_style::space::look::{CardAccent, SpaceLook};
@@ -109,8 +110,8 @@ pub fn SpaceEditor(
                 SectionHeader { kind: HeaderKind::Field, text: "Appearance" }
                 SegmentedControl::<Theme> {
                     label: "Appearance",
-                    options: Theme::ALL.iter().copied().map(|theme| (theme, theme.label().to_string())).collect::<Vec<_>>(),
-                    value: look.theme,
+                    choices: Choice::pairs(Theme::ALL.iter().copied().map(|theme| (theme, theme.label().to_string())).collect::<Vec<_>>()),
+                    tracking: Tracking::SelectOne(look.theme),
                     onchange: {
                         let look = look.clone();
                         move |theme| onchange.call(SpaceLook { theme, ..look.clone() })
@@ -124,11 +125,11 @@ pub fn SpaceEditor(
                 SectionHeader { kind: HeaderKind::Field, text: "Accent inside the card" }
                 SegmentedControl::<CardAccent> {
                     label: "Accent",
-                    options: vec![
+                    choices: Choice::pairs(vec![
                         (CardAccent::SpaceHue, "A hint of the Space".to_string()),
                         (CardAccent::Postmark, "Postmark".to_string()),
-                    ],
-                    value: look.card_accent,
+                    ]),
+                    tracking: Tracking::SelectOne(look.card_accent),
                     onchange: {
                         let look = look.clone();
                         move |card_accent| onchange.call(SpaceLook { card_accent, ..look.clone() })

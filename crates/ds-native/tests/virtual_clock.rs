@@ -6,9 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Ds, HoverCard, HoverKey, HoverKind, HoverTarget,
-    Material, MotionLevel, Panel, Point, Px, Rect, RootExtent, Shown, settle, use_hover_hub,
-    use_toasts,
+    Anim, Appearance, Button, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material,
+    MotionLevel, Panel, Point, Px, Rect, RootExtent, Shown, settle, use_hover_hub, use_toasts,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -56,7 +55,6 @@ fn SceneContent() -> Element {
                 span { "Dana Okafor" }
             }
             Button {
-                variant: ButtonVariant::Secondary,
                 label: "Archive",
                 onclick: move |_| toasts.push("Archived".into(), None),
             }

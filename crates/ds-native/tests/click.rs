@@ -10,7 +10,7 @@
 //! nor routes clicks itself.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Check, Ds, Material};
+use ds::{Appearance, Button, Check, Ds, Material};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -26,7 +26,6 @@ fn Clickable() -> Element {
     let mut state = use_signal(|| Check::Off);
     rsx! {
         Button {
-            variant: ButtonVariant::Secondary,
             label: format!("{:?}", state()),
             onclick: move |_| state.set(Check::On),
         }

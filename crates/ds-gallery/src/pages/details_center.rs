@@ -8,13 +8,13 @@ use super::details::{Cell, mini};
 use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
+use ds::{Bezel, Button, ControlSize, IconSwap, ImagePosition};
 use ds::{
-    Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize, LevelControl, LevelGlyph,
-    LevelLook, LevelMode, Px, TextLine,
+    Fraction, Glyph, Icon, IconSize, LevelControl, LevelGlyph, LevelLook, LevelMode, Px, TextLine,
 };
 use ds_shell::{
-    DeviceBattery, ModuleGrid, ModulePanel, ModuleState, ModuleTile, NowPlayingTrack,
-    PlayPauseButton, Playback, RingMark, TrackPosition,
+    DeviceBattery, ModuleGrid, ModulePanel, ModuleState, ModuleTile, NowPlayingTrack, Playback,
+    RingMark, TrackPosition,
 };
 use std::time::Duration;
 
@@ -101,7 +101,7 @@ fn PlayerCell() -> Element {
     let mut waits = use_signal(|| 0u32);
     let (title, by) = TRACKS[track() % TRACKS.len()];
     rsx! {
-        Cell { name: "Now Playing", code: "PlayPauseButton, NowPlayingTrack, TrackPosition",
+        Cell { name: "Now Playing", code: "NowPlayingTrack, TrackPosition",
             controls: rsx! {
                 {mini("Next track", move |_| *track.write() += 1)}
                 {mini("Buffer", move |_| { *waits.write() += 1; playback.set(Playback::Buffering(EventStamp(waits()))) })}
@@ -112,15 +112,20 @@ fn PlayerCell() -> Element {
                     div { class: "g-center-track",
                         NowPlayingTrack { title: TextLine::from(title), by: Some(TextLine::from(by)) }
                     }
-                    IconButton { variant: IconButtonVariant::Tool, icon: Icon::SkipBack, label: "Previous".to_owned(), onclick: move |_| *track.write() += 1 }
-                    PlayPauseButton {
-                        playback: playback(),
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::SkipBack, label: "Previous".to_owned(), onclick: move |_| *track.write() += 1 }
+                    Button {
+                        bezel: Bezel::Toolbar,
+                        size: ControlSize::Large,
+                        image: ImagePosition::Only,
+                        swap: IconSwap::CrossFade,
+                        icon: playback().next_action(),
+                        label: playback().label(),
                         onclick: move |_| playback.set(match playback() {
                             Playback::Paused => Playback::Playing,
                             Playback::Playing | Playback::Buffering(_) => Playback::Paused,
                         }),
                     }
-                    IconButton { variant: IconButtonVariant::Tool, icon: Icon::SkipForward, label: "Next".to_owned(), onclick: move |_| *track.write() += 1 }
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::SkipForward, label: "Next".to_owned(), onclick: move |_| *track.write() += 1 }
                 }
                 TrackPosition { at: Duration::from_secs(83), length: Duration::from_secs(301), playback: playback() }
             }

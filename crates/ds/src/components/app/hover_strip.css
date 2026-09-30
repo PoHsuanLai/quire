@@ -17,8 +17,11 @@
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
 
-.ds-strip .ds-icon-button{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
-.ds-row:hover .ds-strip .ds-icon-button{ opacity:1; }
+.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
+.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
+.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
+.ds-strip .ds-strip-action{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
+.ds-row:hover .ds-strip .ds-strip-action{ opacity:1; }
 
 .ds-strip .ds-fly{
   position:absolute; bottom:calc(100% + 7px); left:50%; transform:translateX(-50%) translateY(3px); white-space:nowrap;
@@ -26,13 +29,13 @@
   padding:var(--s-3) var(--s-7); border-radius:var(--r-small); opacity:0; pointer-events:none;
   transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
-.ds-strip .ds-icon-button:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); }
+.ds-strip .ds-strip-action:hover .ds-fly{ opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* Caller-driven: `data-shown=visible` shows the strip with no pointer on its row
    (a keyboard selection, or a row holding the focus: Blitz never matches `:focus-within`, spike
    S12, so the caller says so), the buttons fading in as on hover; `data-shown=hidden` keeps it
    down under the pointer. */
 .ds-strip[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
-.ds-strip[*|data-shown=visible] .ds-icon-button{ opacity:1; }
+.ds-strip[*|data-shown=visible] .ds-strip-action{ opacity:1; }
 .ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
-.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-icon-button{ opacity:0; }
+.ds-row:hover .ds-strip[*|data-shown=hidden] .ds-strip-action{ opacity:0; }

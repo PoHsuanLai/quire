@@ -1,14 +1,26 @@
-//! SegmentedControl: one choice out of two to four, all visible (design/04-COMPONENTS.md
-//! section 3).
+//! SegmentedControl: `NSSegmentedControl` (design/30 section 2.3): a few choices side by side
+//! in one well, text or image segments.
 //!
-//! The selection is one thumb that slides between equal segments (design/27 section 5.15),
-//! driven motion (design/05 section 14): a spring in Rust writes its place, so a second
-//! pick mid-slide redirects the thumb from where it is. The thumb stands in the selected
-//! segment's own grid cell (`--seg-col`) and is shifted from there by `--seg-dx` segments while
-//! it moves, so at rest it covers that segment exactly, whatever the layout rounded the cells
-//! to. A label is drawn in the thumb's ink while the thumb is over it (`data-thumb`), not on a
-//! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
+//! `SelectOne` selects one segment: the selection is one thumb that slides between equal
+//! segments (design/27 section 5.15), driven motion (design/05 section 14): a spring in Rust
+//! writes its place, so a second pick mid-slide redirects the thumb from where it is. The thumb
+//! stands in the selected segment's own grid cell (`--seg-col`) and is shifted from there by
+//! `--seg-dx` segments while it moves, so at rest it covers that segment exactly, whatever the
+//! layout rounded the cells to. A label is drawn in the thumb's ink while the thumb is over it
+//! (`data-thumb`), not on a timer of its own. `SelectAny` fills each selected segment and
+//! `Momentary` fills the one held down; neither has a thumb to slide.
+//!
+//! Markup: `div.ds-segmented[data-size][data-tracking]` of `button.ds-segmented-segment`
+//! (`icon`, `label`), then `span.ds-segmented-indicator`, the thumb, last so the segments keep
+//! their child positions.
 
+use crate::components::content::icon_view::IconView;
+use crate::components::content::text_runs::text;
+use crate::components::controls::choice::Choice;
+use crate::components::controls::glyph::glyph_size;
+use crate::components::controls::press::{ActivationKeys, activates, disabled, use_pressing};
+use crate::components::controls::segmented_thumb::{SEGMENT_PX, ThumbOver, group_style, index_of};
+use crate::root::common::Common;
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::*;
 use ds_core::vocab::{Availability, Check, Selection};
@@ -19,80 +31,83 @@ use ds_motion::{
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
+use ds_style::tokens::control_size::ControlSize;
 
-/// About how wide a segment draws, in pixels: what one of the thumb's units is when a hand's
-/// speed is scaled into it and when it is close enough to rest.
-const SEGMENT_PX: f32 = 64.0;
-
-/// The control's size: `.seg` or the reader's `.view-switch`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum SegSize {
-    /// `data-size="regular"`.
-    #[default]
-    Regular,
-    /// `data-size="small"`.
-    Small,
+/// How the segments select (`NSSegmentedControl.SwitchTracking`), with what is selected.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Tracking<T> {
+    /// One segment is selected; picking another moves the selection to it.
+    SelectOne(T),
+    /// Any number are selected; a pick reports the segment for the caller to add or remove.
+    SelectAny(Vec<T>),
+    /// None stays selected: a segment is down while it is pressed, and a pick reports it.
+    Momentary,
 }
 
-/// `aria-pressed` for a segment: the pressed fill marks the current choice.
-fn pressed(selection: Selection) -> Check {
-    match selection {
-        Selection::Selected => Check::On,
-        Selection::Unselected => Check::Off,
-    }
-}
-
-/// Closer than this to its cell, in segments, the thumb is drawn in it: a hundredth of a
-/// segment is under a pixel.
-const IN_CELL: f32 = 0.01;
-
-/// Whether the thumb is over a segment: `data-thumb`, which picks the label's ink.
+/// `data-tracking`: the tracking's word, apart from its payload.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-enum ThumbOver {
-    /// The thumb covers more than half of this segment: the label takes the thumb's ink.
-    Under,
-    /// The label stands on the track.
-    Clear,
+enum TrackingWord {
+    SelectOne,
+    SelectAny,
+    Momentary,
 }
 
-impl ThumbOver {
-    /// Where the thumb, at `position` segments from the start, stands against segment `index`.
-    fn of(position: f32, index: usize) -> ThumbOver {
-        if (position - index as f32).abs() < 0.5 {
-            ThumbOver::Under
-        } else {
-            ThumbOver::Clear
+impl<T> Tracking<T> {
+    fn word(&self) -> TrackingWord {
+        match self {
+            Tracking::SelectOne(_) => TrackingWord::SelectOne,
+            Tracking::SelectAny(_) => TrackingWord::SelectAny,
+            Tracking::Momentary => TrackingWord::Momentary,
         }
     }
 }
 
-/// The group's inline style: `count` segments, the thumb's home cell (`at`, 1-based for
-/// `grid-column`) and how far it stands from it, in segments.
-fn group_style(count: usize, at: usize, position: f32) -> String {
-    let shift = position - at as f32;
-    let shift = if shift.abs() < IN_CELL { 0.0 } else { shift };
-    format!("--seg-n:{count};--seg-col:{};--seg-dx:{shift:.3}", at + 1)
+impl<T: PartialEq> Tracking<T> {
+    /// Whether `value` is selected.
+    fn selects(&self, value: &T) -> Selection {
+        let selected = match self {
+            Tracking::SelectOne(one) => one == value,
+            Tracking::SelectAny(any) => any.contains(value),
+            Tracking::Momentary => false,
+        };
+        if selected {
+            Selection::Selected
+        } else {
+            Selection::Unselected
+        }
+    }
 }
 
-/// The index of `value` among `options`: where the thumb stands (the first when none matches).
-fn index_of<T: PartialEq>(options: &[(T, String)], value: &T) -> usize {
-    options
-        .iter()
-        .position(|(option, _)| option == value)
-        .unwrap_or_default()
+/// The segment the arrows and Home and End move to from `at`: the next enabled one, stopping at
+/// the ends.
+fn rove_to(availability: &[Availability], at: usize, rove: Rove) -> Option<usize> {
+    let items = availability.iter().copied().enumerate().collect();
+    Roving::new(items, Wrap::Stops)
+        .focus(&at)
+        .rove(rove)
+        .focused()
+        .copied()
+        .filter(|to| *to != at)
 }
 
-/// One choice out of a few.
+/// One choice out of a few, or several, or none held.
 #[component]
 pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
     label: String,
-    options: Vec<(T, String)>,
-    value: T,
-    #[props(default)] size: SegSize,
+    choices: Vec<Choice<T>>,
+    tracking: Tracking<T>,
+    #[props(default)] size: ControlSize,
+    #[props(default)] availability: Availability,
     onchange: EventHandler<T>,
+    #[props(default)] common: Common,
 ) -> Element {
-    let at = index_of(&options, &value);
-    let count = options.len().max(1);
+    let values: Vec<T> = choices.iter().map(|choice| choice.value.clone()).collect();
+    let lives: Vec<Availability> = choices.iter().map(|choice| choice.availability).collect();
+    let at = match &tracking {
+        Tracking::SelectOne(one) => index_of(&values, one),
+        Tracking::SelectAny(_) | Tracking::Momentary => 0,
+    };
+    let count = choices.len().max(1);
     let mut asked = use_signal(|| None::<(usize, Touch)>);
     let touch = match *asked.peek() {
         Some((wanted, touch)) if wanted == at => touch,
@@ -100,87 +115,166 @@ pub fn SegmentedControl<T: Clone + PartialEq + 'static>(
     };
     let spec = SpringSpec::for_touch(touch).response(SpringResponse::Quick);
     let thumb = use_spring(at as f32, spec, PxPerUnit(SEGMENT_PX));
-    let values: Vec<T> = options.iter().map(|(option, _)| option.clone()).collect();
+    let one = matches!(tracking, Tracking::SelectOne(_));
+    let live = availability == Availability::Enabled;
+    let class = common.class("ds-segmented");
+    let data = common.data_attributes();
+    let word = tracking.word();
     rsx! {
         div {
-            class: "ds-segmented",
+            id: common.id.clone(),
+            class,
+            role: if one { "radiogroup" } else { "group" },
+            "aria-label": common.aria_label.clone().unwrap_or(label),
             "data-size": size.slug(),
-            role: "group",
-            "aria-label": "{label}",
+            "data-tracking": word.slug(),
+            "data-availability": availability.slug(),
+            "aria-disabled": availability.aria_disabled(),
+            "aria-busy": availability.aria_busy(),
             style: group_style(count, at, thumb.position()),
-            onkeydown: move |event| {
-                let Some(rove) = Rove::of(&event.key()) else { return };
-                let set = Roving::new((0..values.len()).map(|index| (index, Availability::Enabled)).collect(), Wrap::Stops);
-                let to = set.focus(&at).rove(rove).focused().copied();
-                if let Some(to) = to.filter(|to| *to != at) {
-                    event.prevent_default();
-                    asked.set(Some((to, Touch::from_event(&event))));
-                    onchange.call(values[to].clone());
+            onkeydown: {
+                let values = values.clone();
+                move |event| {
+                    let Some(rove) = Rove::of(&event.key()) else { return };
+                    if !one || !live {
+                        return;
+                    }
+                    if let Some(to) = rove_to(&lives, at, rove) {
+                        event.prevent_default();
+                        asked.set(Some((to, Touch::from_event(&event))));
+                        onchange.call(values[to].clone());
+                    }
                 }
             },
-            for (index , (option , text)) in options.into_iter().enumerate() {
-                button {
-                    r#type: "button",
-                    class: "ds-segment",
-                    "aria-pressed": pressed(Selection::of(&option, &value)).aria(),
-                    "data-thumb": ThumbOver::of(thumb.position(), index).slug(),
-                    onclick: move |event| {
-                        asked.set(Some((index, Touch::from_event(&event))));
-                        onchange.call(option.clone());
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            for (index , choice) in choices.into_iter().enumerate() {
+                Segment {
+                    key: "{index}",
+                    selected: tracking.selects(&choice.value),
+                    thumb: if one { Some(ThumbOver::of(thumb.position(), index)) } else { None },
+                    enabled: choice.availability,
+                    group: availability,
+                    size,
+                    onpick: {
+                        let picked = choice.value.clone();
+                        move |touch: Touch| {
+                            if one {
+                                asked.set(Some((index, touch)));
+                            }
+                            onchange.call(picked.clone());
+                        }
                     },
-                    "{text}"
+                    choice,
                 }
             }
+            if one {
+                span { class: "ds-segmented-indicator", "aria-hidden": "true" }
+            }
+        }
+    }
+}
+
+/// One segment: its image and its label. `thumb` says whether the sliding thumb is over it (a
+/// `SelectOne` control only); `enabled` is the choice's own availability and `group` the
+/// control's: a segment takes input only when both do.
+#[component]
+fn Segment<T: Clone + PartialEq + 'static>(
+    choice: Choice<T>,
+    selected: Selection,
+    thumb: Option<ThumbOver>,
+    enabled: Availability,
+    group: Availability,
+    size: ControlSize,
+    onpick: EventHandler<Touch>,
+) -> Element {
+    let pressing = use_pressing();
+    let live = enabled == Availability::Enabled && group == Availability::Enabled;
+    let checked = match selected {
+        Selection::Selected => Check::On,
+        Selection::Unselected => Check::Off,
+    };
+    let under = match (thumb, selected) {
+        (Some(over), _) => over.slug(),
+        (None, Selection::Selected) => ThumbOver::Under.slug(),
+        (None, Selection::Unselected) => ThumbOver::Clear.slug(),
+    };
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-segmented-segment",
+            role: if thumb.is_some() { "radio" } else { "button" },
+            "aria-checked": if thumb.is_some() { Some(checked.aria()) } else { None },
+            "aria-pressed": if thumb.is_none() { Some(checked.aria()) } else { None },
+            "data-selected": selected.slug(),
+            "data-thumb": under,
+            "data-availability": enabled.slug(),
+            "data-pressed": if live { pressing.attr() } else { None },
+            "aria-disabled": enabled.aria_disabled(),
+            disabled: disabled(if group == Availability::Enabled { enabled } else { group }),
+            onmousedown: move |event| pressing.pointer_down(&event),
+            onmouseleave: move |_| pressing.released(),
+            onmouseup: move |_| pressing.released(),
+            onblur: move |_| pressing.released(),
+            onkeyup: move |_| pressing.released(),
+            onkeydown: move |event| {
+                if live && activates(&event, ActivationKeys::SpaceOnly) {
+                    event.prevent_default();
+                    event.stop_propagation();
+                    pressing.key_down(&event, ActivationKeys::SpaceOnly);
+                    onpick.call(Touch::from_event(&event));
+                }
+            },
+            onclick: move |event| {
+                if live {
+                    onpick.call(Touch::from_event(&event));
+                }
+            },
+            if let Some(source) = choice.icon {
+                span { class: "ds-segmented-icon",
+                    IconView { source, size: glyph_size(size) }
+                }
+            }
+            span { class: "ds-segmented-label", {text(&choice.label)} }
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{ThumbOver, group_style, index_of};
+    use super::{Tracking, rove_to};
+    use crate::stack::roving::{Edge, Rove, Step};
+    use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
+    use ds_core::vocab::Selection;
 
     #[test]
-    fn a_label_takes_the_thumbs_ink_only_while_the_thumb_is_over_it() {
-        const CASES: &[(f32, usize, ThumbOver)] = &[
-            (0.0, 0, ThumbOver::Under),
-            (0.0, 1, ThumbOver::Clear),
-            (0.49, 0, ThumbOver::Under),
-            (0.51, 0, ThumbOver::Clear),
-            (0.51, 1, ThumbOver::Under),
-            (1.2, 1, ThumbOver::Under),
-            (1.2, 2, ThumbOver::Clear),
-            // An overshoot past the last segment still covers it.
-            (2.3, 2, ThumbOver::Under),
+    fn the_arrows_skip_a_disabled_segment_and_stop_at_the_ends() {
+        // (availability, from, rove, to)
+        let cases: &[(&[_], usize, Rove, Option<usize>)] = &[
+            (&[E, E, E], 0, Rove::Step(Step::Down), Some(1)),
+            (&[E, D, E], 0, Rove::Step(Step::Down), Some(2)),
+            (&[E, E, E], 2, Rove::Step(Step::Down), None),
+            (&[E, E, E], 0, Rove::Step(Step::Up), None),
+            (&[E, E, E], 1, Rove::Edge(Edge::Last), Some(2)),
+            (&[E, E, E], 2, Rove::Edge(Edge::Last), None),
         ];
-        for &(position, index, want) in CASES {
-            assert_eq!(ThumbOver::of(position, index), want, "{position} {index}");
+        for &(live, from, rove, want) in cases {
+            assert_eq!(rove_to(live, from, rove), want, "{live:?} {from} {rove:?}");
         }
     }
 
     #[test]
-    fn the_thumb_stands_in_its_cell_and_is_shifted_while_it_moves() {
-        const CASES: &[(usize, f32, &str)] = &[
-            (0, 0.0, "--seg-n:3;--seg-col:1;--seg-dx:0.000"),
-            (2, 0.0, "--seg-n:3;--seg-col:3;--seg-dx:-2.000"),
-            (2, 1.25, "--seg-n:3;--seg-col:3;--seg-dx:-0.750"),
-            // Within a hundredth of its cell it is in it: no sub-pixel shift at rest.
-            (1, 1.004, "--seg-n:3;--seg-col:2;--seg-dx:0.000"),
+    fn each_tracking_selects_as_it_says() {
+        // (tracking, value, selected)
+        let cases = [
+            (Tracking::SelectOne(1), 1, Selection::Selected),
+            (Tracking::SelectOne(1), 2, Selection::Unselected),
+            (Tracking::SelectAny(vec![1, 3]), 3, Selection::Selected),
+            (Tracking::SelectAny(vec![1, 3]), 2, Selection::Unselected),
+            (Tracking::Momentary, 1, Selection::Unselected),
         ];
-        for &(at, position, want) in CASES {
-            assert_eq!(group_style(3, at, position), want, "{at} {position}");
-        }
-    }
-
-    #[test]
-    fn the_thumb_stands_on_the_value_or_the_first() {
-        let options = vec![
-            (1, "a".to_owned()),
-            (2, "b".to_owned()),
-            (3, "c".to_owned()),
-        ];
-        const CASES: &[(i32, usize)] = &[(1, 0), (3, 2), (9, 0)];
-        for &(value, want) in CASES {
-            assert_eq!(index_of(&options, &value), want, "{value}");
+        for (tracking, value, want) in cases {
+            assert_eq!(tracking.selects(&value), want, "{tracking:?} {value}");
         }
     }
 }

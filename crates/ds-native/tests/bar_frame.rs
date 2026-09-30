@@ -10,10 +10,11 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
-    FrameVars, Grain, Hex, Icon, IconButton, IconButtonVariant, Look, Material, Menu, MenuEntrance,
-    MenuEntry, MenuKind, MenuTile, MenuTrail, MotionLevel, PRESETS, Placement, Point, Popover, Px,
-    RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
+    FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuEntrance, MenuEntry, MenuKind, MenuTile,
+    MenuTrail, MotionLevel, PRESETS, Placement, Point, Popover, Px, RootChrome, Scheme, Side,
+    SpaceLook, StatusMetrics, Theme, derive,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::{Backdrop, Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
@@ -132,8 +133,8 @@ fn SwitchingBar() -> Element {
         Ds { appearance: light(), look: look(index()), material: Material::Bar, blur: BlurState::Available,
             style { {PROBE_CSS} }
             div { class: "bar-fill",
-                IconButton {
-                    variant: IconButtonVariant::Status,
+                Button {
+                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
                     icon: Icon::Grid,
                     label: "Next Space",
                     onclick: move |_| index.set(3),
@@ -164,9 +165,7 @@ fn a_look_change_cross_fades_the_tint() {
     let mut harness = Harness::new(SwitchingBar, BAR_VIEW);
     harness.advance(ms(50));
     let before = pixel(&harness.render().expect("renders"), 1, 1);
-    let button = harness
-        .centre(".ds-icon-button")
-        .expect("the switch is drawn");
+    let button = harness.centre(".ds-button").expect("the switch is drawn");
     harness.click(button);
     harness.advance(half_of_the_fade());
     let halfway = harness.render().expect("renders");
@@ -327,10 +326,10 @@ fn StatusItems() -> Element {
             style { {PROBE_CSS} }
             div { class: "bar-fill",
                 div { class: "large", style: large.style_attr(),
-                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
+                    Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
                 }
                 div { class: "plain",
-                    IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
+                    Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Network", onclick: |_| {} }
                 }
             }
         }
@@ -364,7 +363,7 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
     // (selector, box, glyph)
     const CASES: &[(&str, f32, f32)] = &[(".large", 30.0, 24.0), (".plain", 22.0, 16.0)];
     for &(scope, side, glyph) in CASES {
-        let button = rect(&harness, &format!("{scope} .ds-icon-button"));
+        let button = rect(&harness, &format!("{scope} .ds-button"));
         assert_eq!(
             (button.size.width, button.size.height),
             (Px(side.max(30.0)), Px(side)),
@@ -387,7 +386,7 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
 fn a_status_item_fills_under_the_pointer() {
     let mut harness = Harness::new(StatusItems, BAR_VIEW);
     harness.advance(ms(50));
-    let button = rect(&harness, ".plain .ds-icon-button");
+    let button = rect(&harness, ".plain .ds-button");
     let corner = |frame: &RgbaImage| {
         pixel(
             frame,
@@ -396,7 +395,7 @@ fn a_status_item_fills_under_the_pointer() {
         )
     };
     let rest = corner(&harness.render().expect("renders"));
-    harness.pointer_move(harness.centre(".plain .ds-icon-button").expect("drawn"));
+    harness.pointer_move(harness.centre(".plain .ds-button").expect("drawn"));
     harness.advance(ms(400));
     let hovered = corner(&harness.render().expect("renders"));
     assert!(

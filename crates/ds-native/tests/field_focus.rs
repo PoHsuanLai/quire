@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, FieldFocus, InputVariant, Material, TextInput,
-    TextInputKind, use_focus_request,
+    Appearance, Button, Ds, FieldFocus, InputVariant, Material, TextInput, TextInputKind,
+    use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -48,7 +48,7 @@ fn Fields() -> Element {
                         onfocus: move |()| note("focus:c"), onblur: move |()| note("blur:c") }
                 }
                 div { style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Back to C", onclick: move |_| request.request() }
+                    Button { label: "Back to C", onclick: move |_| request.request() }
                 }
             }
             p { class: "log", {log().join(",")} }

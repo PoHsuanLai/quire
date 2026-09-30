@@ -8,9 +8,9 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Availability, Button, ButtonVariant, Check, CommandPalette, CommandPaletteHost, Corner, Icon,
-    IconSize, Material, MenuEntry, MenuTile, MenuTrail, Radius, Retain, Shortcut, ShortcutKey,
-    Shown, Surface,
+    Availability, Button, Check, CommandPalette, CommandPaletteHost, Corner, Icon, IconSize,
+    Material, MenuEntry, MenuTile, MenuTrail, Radius, Retain, Shortcut, ShortcutKey, Shown,
+    Surface,
 };
 
 fn row(
@@ -144,9 +144,8 @@ fn WarmPalette() -> Element {
     rsx! {
         div { class: "g-col",
             Button {
-                variant: ButtonVariant::Secondary,
                 label: "Launcher",
-                pressed: Some(if shown() == Shown::Visible { Check::On } else { Check::Off }),
+                value: Some(if shown() == Shown::Visible { Check::On } else { Check::Off }),
                 onclick: move |_| shown.set(flipped),
             }
             div { class: "g-launcher",

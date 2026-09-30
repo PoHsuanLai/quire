@@ -4,7 +4,10 @@
 
 use dioxus::prelude::*;
 use ds::detail::{Operation, PendingToken};
-use ds::{Anim, Appearance, Button, ButtonVariant, Ds, Material, PulseKey, Spinner};
+use ds::{
+    Anim, Answers, Appearance, Button, ControlSize, Ds, Material, Progress, ProgressIndicator,
+    ProgressStyle, PulseKey,
+};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport, snapshot, snapshot_at};
 use image::RgbaImage;
@@ -20,8 +23,8 @@ const VIEW: Viewport = Viewport {
 fn ButtonApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
-            Spinner { operation: Operation::Idle }
+            Button { answers: Answers::Return, label: "Send", onclick: |_| {} }
+            ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(Operation::Idle), size: ControlSize::Small }
         }
     }
 }
@@ -84,7 +87,7 @@ fn SpinApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "position:relative; width:40px; height:40px; margin:20px",
-                Spinner { operation }
+                ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(operation), size: ControlSize::Regular }
             }
         }
     }

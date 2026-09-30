@@ -111,8 +111,10 @@ fn StripButton(
     rsx! {
         button {
             r#type: "button",
-            class: "ds-icon-button",
-            "data-variant": "strip",
+            class: "ds-button ds-strip-action",
+            "data-variant": "toolbar",
+            "data-size": "regular",
+            "data-image": "only",
             "data-op": "{id.0}",
             "aria-label": "{label}",
             title,

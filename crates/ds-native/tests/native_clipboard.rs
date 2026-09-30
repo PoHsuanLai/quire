@@ -3,9 +3,7 @@
 //! `ds_native::clipboard::{write_text, read_text}` reach the same clipboard.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, ButtonVariant, Ds, InputVariant, Material, Point, ShortcutKey, TextInput,
-};
+use ds::{Appearance, Button, Ds, InputVariant, Material, Point, ShortcutKey, TextInput};
 use ds_native::clipboard::{ClipboardError, read_text, write_text};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -45,11 +43,11 @@ fn Fields() -> Element {
                         oninput: move |value| to.set(value) }
                 }
                 div { id: "copy", style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Copy address",
+                    Button { label: "Copy address",
                         onclick: move |_| { let _ = write_text("ada@example.org"); } }
                 }
                 div { id: "paste", style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Paste",
+                    Button { label: "Paste",
                         onclick: move |_| pasted.set(read_text().unwrap_or_else(|e| format!("error: {e:?}"))) }
                 }
             }

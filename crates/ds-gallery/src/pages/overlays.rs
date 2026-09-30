@@ -6,11 +6,12 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonVariant,
-    Check, CommandPalette, Elevation, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind,
-    MenuTile, MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px,
-    Scrim, Sheet, Shortcut, ShortcutKey, Side, use_toast_hub,
+    Anchor, Availability, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Check,
+    CommandPalette, Elevation, Icon, Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile,
+    MenuTrail, MountedRef, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Scrim, Sheet,
+    Shortcut, ShortcutKey, Side, use_toast_hub,
 };
+use ds::{Answers, ControlSize};
 
 /// Everything the page can open, one at a time.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -87,9 +88,8 @@ pub fn OverlaysPage() -> Element {
     let button = move |what: Opened, label: &'static str| {
         rsx! {
             Button {
-                variant: ButtonVariant::Secondary,
                 label,
-                pressed: Some(if opened() == Some(what) { Check::On } else { Check::Off }),
+                value: Some(if opened() == Some(what) { Check::On } else { Check::Off }),
                 onclick: move |_| opened.set(Some(what)),
             }
         }
@@ -197,7 +197,7 @@ pub fn OverlaysPage() -> Element {
                     onclose: close,
                     div { class: "g-panel",
                         Specimen { name: format!("{elevation:?} elevation"), code: "Escape or an outside click closes".to_string(),
-                            Button { variant: ButtonVariant::Mini, label: "Close", onclick: move |_| opened.set(None) }
+                            Button { size: ControlSize::Mini, label: "Close", onclick: move |_| opened.set(None) }
                         }
                     }
                 }
@@ -215,7 +215,7 @@ pub fn OverlaysPage() -> Element {
                     div { class: "g-panel",
                         h2 { "A sheet" }
                         p { class: "g-note", "The general modal panel: Peek Center's surface, sized by its content." }
-                        Button { variant: ButtonVariant::Primary, label: "Done", onclick: move |_| opened.set(None) }
+                        Button { answers: Answers::Return, label: "Done", onclick: move |_| opened.set(None) }
                     }
                 }
             },

@@ -145,8 +145,9 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// The buttons in order, as `(label, variant)`.
-fn buttons(html: &str) -> Vec<(String, String)> {
+/// The buttons in order, as `(label, answers, role)`; `answers` is empty for a button that
+/// answers no key.
+fn buttons(html: &str) -> Vec<(String, String, String)> {
     html.split("<button")
         .skip(1)
         .filter(|tag| tag.contains("class=\"ds-button"))
@@ -159,12 +160,12 @@ fn buttons(html: &str) -> Vec<(String, String)> {
                     .to_owned()
             };
             let label = tag
-                .split("<span>")
+                .split("class=\"ds-button-label\">")
                 .nth(1)
                 .and_then(|rest| rest.split('<').next())
                 .unwrap_or_default()
                 .to_owned();
-            (label, attr("data-variant"))
+            (label, attr("data-answers"), attr("data-role"))
         })
         .collect()
 }
@@ -176,8 +177,16 @@ fn the_default_is_the_filled_button_on_the_right_unless_the_action_destroys() {
     assert_eq!(
         buttons(&plain),
         [
-            ("Cancel".to_owned(), "secondary".to_owned()),
-            ("Turn Off".to_owned(), "primary".to_owned())
+            (
+                "Cancel".to_owned(),
+                "escape".to_owned(),
+                "normal".to_owned()
+            ),
+            (
+                "Turn Off".to_owned(),
+                "return".to_owned(),
+                "normal".to_owned()
+            )
         ]
     );
     for want in [
@@ -191,8 +200,16 @@ fn the_default_is_the_filled_button_on_the_right_unless_the_action_destroys() {
     assert_eq!(
         buttons(&destructive),
         [
-            ("Cancel".to_owned(), "primary".to_owned()),
-            ("Turn Off".to_owned(), "danger".to_owned())
+            (
+                "Cancel".to_owned(),
+                "return".to_owned(),
+                "normal".to_owned()
+            ),
+            (
+                "Turn Off".to_owned(),
+                String::new(),
+                "destructive".to_owned()
+            )
         ]
     );
     assert!(destructive.contains("data-emphasis=\"destructive\""));

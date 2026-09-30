@@ -11,8 +11,8 @@ use super::level_tile::work;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, IconSource, Inject, Material, Panel, Px, Rich,
-    RichRun, RunTone, Shown, TextRun, Theme,
+    Appearance, Button, Ds, Icon, IconSource, Inject, Material, Panel, Px, Rich, RichRun, RunTone,
+    Shown, TextRun, Theme,
 };
 use ds_shell::{
     AppMark, Banner, BannerEntry, BannerKey, BannerStack, CardAction, GroupCount, GroupHeader,
@@ -76,7 +76,6 @@ fn Scene(theme: Theme) -> Element {
                         if showcase == Showcase::Live {
                             div { class: "g-row",
                                 Button {
-                                    variant: ButtonVariant::Secondary,
                                     label: "Post a notification",
                                     onclick: move |_| {
                                         let key = next();
@@ -85,12 +84,10 @@ fn Scene(theme: Theme) -> Element {
                                     },
                                 }
                                 Button {
-                                    variant: ButtonVariant::Secondary,
                                     label: entry_label(entry()),
                                     onclick: move |_| entry.set(match entry() { BannerEntry::FromRight => BannerEntry::FromBelow, BannerEntry::FromBelow => BannerEntry::FromRight }),
                                 }
                                 Button {
-                                    variant: ButtonVariant::Secondary,
                                     label: "Toggle the center",
                                     onclick: move |_| center.set(match center() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
                                 }

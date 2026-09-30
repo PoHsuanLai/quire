@@ -4,7 +4,8 @@
 
 use super::Specimen;
 use dioxus::prelude::*;
-use ds::{Button, ButtonVariant, Fraction, PillAction, SendMood, SendPhase, SendPill};
+use ds::ControlSize;
+use ds::{Button, Fraction, PillAction, SendMood, SendPhase, SendPill};
 
 /// The moods a person can play here, with the words the pill says in each.
 const MOODS: [(SendMood, &str, &str); 2] = [
@@ -29,7 +30,7 @@ pub fn Outbox() -> Element {
         Specimen { name: "failed: pick a mood",
             div { class: "g-stage-pad",
                 for (each , name , _) in MOODS {
-                    Button { variant: ButtonVariant::Mini, label: name, onclick: move |_| mood.set(each) }
+                    Button { size: ControlSize::Mini, label: name, onclick: move |_| mood.set(each) }
                 }
             }
             div { class: "g-stage",

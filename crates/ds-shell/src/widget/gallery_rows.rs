@@ -11,9 +11,10 @@ use crate::widget::registry::WidgetRegistry;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::button::{Button, ButtonVariant};
+use ds::components::controls::button::Button;
 use ds::host::measure::MountedRef;
 use ds::host::reveal::reveal;
+use ds::{ButtonRole, ControlSize};
 use ds_core::word::Word;
 use ds_style::task::spawn_in;
 use std::collections::BTreeSet;
@@ -121,7 +122,7 @@ fn PlacedRow(
                 });
             },
             span { class: "ds-widget-gallery-row-name", "{name}" }
-            Button { variant: ButtonVariant::Danger, label: remove,
+            Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: remove,
                 onclick: move |_| onedit.call(WidgetEdit::Remove(id)) }
         }
     }

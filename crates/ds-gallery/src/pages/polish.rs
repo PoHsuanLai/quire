@@ -12,11 +12,12 @@ use dioxus::prelude::*;
 use ds::Alpha;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
-    Emphasis, Icon, IconButton, IconButtonVariant, IconSize, IconSource, IconView, Inject,
-    Material, MaterialStack, MenuEntrance, MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily,
-    Point, Px, RootChrome, Scheme, Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface,
-    Theme, Tooltip, TooltipKind, use_scope,
+    Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuEntrance,
+    MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, Scheme,
+    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
+    use_scope,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_shell::{
     DockFloor, DockFloorSetting, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
     WorkspacePills,
@@ -147,7 +148,7 @@ const MENU_AT: Point = Point {
 fn MenuBarSection() -> Element {
     let showcase = use_context::<Signal<Axes>>().peek().showcase;
     rsx! {
-        Section { title: "Menu bar and a text menu", note: "MenuBarItem and IconButton {{ Status }} on a Bar root over the wallpaper: 13/500 text, the 4 px pill on hover and while open (File is open), the workspaces as one segmented group on the frame (WorkspacePills). Under it, a Slim menu on a Popover root at the shell scale: 22 px rows, the check column, 13 px text, a 6 px inset highlight, hairline separators with 5 px margins, a disabled row at .35.",
+        Section { title: "Menu bar and a text menu", note: "MenuBarItem and Button {{ Status }} on a Bar root over the wallpaper: 13/500 text, the 4 px pill on hover and while open (File is open), the workspaces as one segmented group on the frame (WorkspacePills). Under it, a Slim menu on a Popover root at the shell scale: 22 px rows, the check column, 13 px text, a 6 px inset highlight, hairline separators with 5 px margins, a disabled row at .35.",
             div { class: "g-wall g-polish-wall", style: "background-image:url(\"{wallpaper::uri()}\")",
                 Root { material: Material::Bar, style: "width:100%",
                     div { class: "g-polish-bar",
@@ -161,9 +162,9 @@ fn MenuBarSection() -> Element {
                         MenuBarItem { span { "Edit" } }
                         MenuBarItem { span { "View" } }
                         span { class: "g-spacer" }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Shown::Visible), onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Some(Shown::Visible), onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", onclick: |_| {} }
                         MenuBarItem { span { class: "ds-tabular", "Thu 24 Sep 09:41" } }
                     }
                 }

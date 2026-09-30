@@ -4,9 +4,8 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Activity, Button, ButtonVariant, Hex, ORB_PERIOD, OrbColour, OrbColours, Px, VoiceOrb, Word,
-};
+use ds::ControlSize;
+use ds::{Activity, Button, Hex, ORB_PERIOD, OrbColour, OrbColours, Px, VoiceOrb, Word};
 use std::time::Duration;
 
 /// The sizes of the ladder: under 30 (no mask), 30 to 50, 50 to 100 and 100 and over.
@@ -32,7 +31,7 @@ pub fn VoiceOrbPage() -> Element {
         Section { title: "Variants", note: "The three demo orbs. While active the glows turn once per period (20 s, 15 s for the custom one); at rest they hold where they stand and nothing runs. Reduced motion holds them still. Blitz paints the blur and the contrast on both renderers; the dot grid is a plain layer at reduced opacity, where a browser overlay-blends it.",
             div { class: "g-row",
                 Button {
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: format!("Set {}", next.slug()),
                     onclick: move |_| activity.set(next),
                 }

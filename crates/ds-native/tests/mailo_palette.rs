@@ -82,7 +82,7 @@ fn a_trailing_action_fires_without_picking_or_selecting_its_row() {
     harness.advance(ms(600));
     assert_eq!(harness.text_of(".log").as_deref(), Some("select:0"));
     // The second row's remove: the pointer crosses the row to reach it.
-    let remove = ".ds-menu-item:nth-child(3) .ds-menu-action .ds-icon-button";
+    let remove = ".ds-menu-item:nth-child(3) .ds-menu-action .ds-button";
     let at = harness.centre(remove).expect("the second row's remove");
     harness.click(at);
     harness.advance(ms(100));

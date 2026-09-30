@@ -5,6 +5,7 @@ pub mod avatar;
 pub mod icon_source;
 pub mod icon_view;
 pub mod image_source;
+pub mod label;
 pub mod level_glyph;
 pub(crate) mod muted;
 pub(crate) mod pdf_thumb;

@@ -12,15 +12,14 @@ pub const STYLES: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "icon_button",
-        &[
-            include_str!("../../src/components/controls/icon_button.css"),
-            include_str!("../../src/components/content/icon_view.css"),
-        ],
-    ),
-    (
         "icon_view",
         &[include_str!("../../src/components/content/icon_view.css")],
+    ),
+    (
+        "progress",
+        &[include_str!(
+            "../../src/components/controls/progress/progress.css"
+        )],
     ),
     (
         "segmented",
@@ -38,7 +37,7 @@ pub const STYLES: &[(&str, &[&str])] = &[
         "text_input",
         &[
             include_str!("../../src/components/fields/text_input.css"),
-            include_str!("../../src/components/controls/icon_button.css"),
+            include_str!("../../src/components/controls/button.css"),
             include_str!("../../src/components/content/icon_view.css"),
         ],
     ),
@@ -64,10 +63,6 @@ pub const STYLES: &[(&str, &[&str])] = &[
     (
         "avatar",
         &[include_str!("../../src/components/content/avatar.css")],
-    ),
-    (
-        "tabs",
-        &[include_str!("../../src/components/controls/tabs.css")],
     ),
     (
         "section_header",

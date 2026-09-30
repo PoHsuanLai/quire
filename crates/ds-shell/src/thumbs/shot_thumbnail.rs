@@ -26,10 +26,10 @@ use dioxus::prelude::*;
 use ds::components::content::image_source::{ImageSize, ImageSource};
 use ds::components::content::picture_fit::picture_style;
 use ds::components::content::text_runs::TextLine;
-use ds::components::controls::icon_button::{IconButton, IconButtonVariant};
 use ds::components::controls::press::Propagation;
 use ds::root::chrome::RootChrome;
 use ds::root::surface::Surface;
+use ds::{Bezel, Button, ImagePosition};
 use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
@@ -249,8 +249,8 @@ fn action_row(actions: Vec<ThumbAction>) -> Element {
         div { class: "ds-shot-actions", role: "toolbar", "aria-label": "Screenshot actions",
             for (j , action) in actions.into_iter().enumerate() {
                 span { key: "{j}", class: "ds-shot-action",
-                    IconButton {
-                        variant: IconButtonVariant::Strip,
+                    Button {
+                        bezel: Bezel::Toolbar, image: ImagePosition::Only,
                         icon: action.icon,
                         label: action.label.plain_text(),
                         propagation: Propagation::Stop,

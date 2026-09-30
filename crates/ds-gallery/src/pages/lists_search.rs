@@ -4,9 +4,10 @@
 
 use super::Section;
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::{
-    ActionId, Button, ButtonVariant, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState,
-    RunTone, Selection, Shown, StripAction, TextLine, TextRun, Titles,
+    ActionId, Button, Emphasis, HoverStrip, Icon, ListRow, Presence, RowState, RunTone, Selection,
+    Shown, StripAction, TextLine, TextRun, Titles,
 };
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
@@ -69,8 +70,8 @@ pub fn SearchRows() -> Element {
             title: "Search hits and a keyboard-shown strip",
             note: "Subject and snippet are Text runs the caller marked. The strip shows on the selected row through shown, not hover (Blitz never matches :focus-within); its buttons carry titles and the label button's menu is open.",
             div { class: "g-row",
-                Button { variant: ButtonVariant::Mini, label: "Up", onclick: move |_| at.set(0) }
-                Button { variant: ButtonVariant::Mini, label: "Down", onclick: move |_| at.set(1) }
+                Button { size: ControlSize::Mini, label: "Up", onclick: move |_| at.set(0) }
+                Button { size: ControlSize::Mini, label: "Down", onclick: move |_| at.set(1) }
             }
             ul { class: "g-list g-stage-pad",
                 for (index , (name , subject , snippet , time)) in hits().into_iter().enumerate() {

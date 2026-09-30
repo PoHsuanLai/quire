@@ -4,10 +4,12 @@
 //! Reduced (R7).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Motion, TextLine};
+use ds::{
+    Appearance, Bezel, Button, ControlSize, Ds, IconSwap, ImagePosition, Material, Motion, TextLine,
+};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
-use ds_shell::{NowPlayingTrack, PlayPauseButton, Playback, TrackPosition};
+use ds_shell::{NowPlayingTrack, Playback, TrackPosition};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -36,8 +38,13 @@ fn Player() -> Element {
             div { style: "width:340px",
                 div { id: "track", NowPlayingTrack { title: TextLine::from(TITLE()), by: Some(TextLine::from("Claude Debussy")) } }
                 div { id: "toggle",
-                    PlayPauseButton {
-                        playback: PLAYBACK(),
+                    Button {
+                        bezel: Bezel::Toolbar,
+                        size: ControlSize::Large,
+                        image: ImagePosition::Only,
+                        swap: IconSwap::CrossFade,
+                        icon: PLAYBACK().next_action(),
+                        label: PLAYBACK().label(),
                         onclick: move |_| *PLAYBACK.write() = match PLAYBACK() {
                             Playback::Paused => Playback::Playing,
                             Playback::Playing | Playback::Buffering(_) => Playback::Paused,

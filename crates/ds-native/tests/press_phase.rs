@@ -3,10 +3,8 @@
 //! is gone once the press ends.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, IconButton, IconButtonVariant, Material,
-    ShortcutKey,
-};
+use ds::{Appearance, Button, Ds, Icon, Material, ShortcutKey};
+use ds::{Bezel, ControlSize, ImagePosition};
 use ds_native::{Harness, Viewport};
 
 const VIEW: Viewport = Viewport {
@@ -19,8 +17,8 @@ const VIEW: Viewport = Viewport {
 fn Page() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            Button { variant: ButtonVariant::Secondary, label: "Save", onclick: move |_| {} }
-            IconButton { variant: IconButtonVariant::Tool, icon: Icon::Plus, label: "Add", onclick: move |_| {} }
+            Button { label: "Save", onclick: move |_| {} }
+            Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Plus, label: "Add", onclick: move |_| {} }
         }
     }
 }
@@ -44,10 +42,10 @@ fn a_pointer_down_presses_a_button_until_it_comes_up() {
 #[test]
 fn a_secondary_button_does_not_press() {
     let mut harness = Harness::new(Page, VIEW);
-    let at = harness.centre(".ds-icon-button").expect("the icon button");
+    let at = harness.centre(".ds-button").expect("the icon button");
     harness.pointer_move(at);
     harness.button_down(at, ds::PointerButton::Secondary);
-    assert_eq!(pressed(&harness, ".ds-icon-button"), None);
+    assert_eq!(pressed(&harness, ".ds-button"), None);
 }
 
 #[test]

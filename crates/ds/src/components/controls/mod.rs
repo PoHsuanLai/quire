@@ -3,17 +3,21 @@
 
 pub mod button;
 pub mod button_face;
-pub mod button_size;
+pub mod button_model;
+pub mod checkbox;
 pub mod chip;
+pub mod choice;
 pub(crate) mod chord;
 pub(crate) mod count;
-pub mod icon_button;
+pub(crate) mod glyph;
 pub(crate) mod kbd;
 pub mod level;
 pub mod press;
+pub mod progress;
+pub mod radio_group;
 pub mod segmented;
+pub(crate) mod segmented_thumb;
 pub mod slider;
 pub mod spinner;
-pub(crate) mod tabs;
 pub(crate) mod toggle;
 pub(crate) mod track;

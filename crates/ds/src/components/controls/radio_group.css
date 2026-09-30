@@ -1,0 +1,32 @@
+/* RadioGroup (design/30 section 2.3, `NSButton` radio buttons). Attribute selectors carry `*|`
+   (spike S2); the focus ring is the global one, on the focused item (spike S12). The indicator is
+   the ladder's checkbox size (`--check-*`) as a circle, its hairline an inset shadow; the checked
+   one fills with the accent and a dot in the accent's ink. The Row arrangement stands each item's
+   image over its label, side by side. */
+
+.ds-radio-group{ --rg:var(--check-m); --rg-fs:var(--ctl-fs-m); display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-6); }
+.ds-radio-group[*|data-size=mini]{ --rg:var(--check-xs); --rg-fs:var(--ctl-fs-xs); }
+.ds-radio-group[*|data-size=small]{ --rg:var(--check-s); --rg-fs:var(--ctl-fs-s); }
+.ds-radio-group[*|data-size=large]{ --rg:var(--check-l); --rg-fs:var(--ctl-fs-l); }
+.ds-radio-group[*|data-arrangement=row]{ flex-direction:row; align-items:flex-start; gap:var(--s-16); }
+
+.ds-radio-group-item{
+  display:inline-flex; align-items:center; gap:var(--s-6); box-sizing:border-box; padding:0; border:0; background:transparent;
+  font:inherit; font-size:var(--rg-fs); color:var(--ink); line-height:1; cursor:default; text-align:left;
+}
+.ds-radio-group[*|data-arrangement=row] .ds-radio-group-item{ flex-direction:column; gap:var(--s-6); }
+.ds-radio-group-indicator{
+  display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--rg); height:var(--rg);
+  border-radius:var(--r-pill); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1);
+  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+}
+.ds-radio-group-dot{ display:none; width:40%; height:40%; border-radius:var(--r-pill); background:var(--accent-ink); }
+.ds-radio-group-item[*|data-state=on] .ds-radio-group-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
+.ds-radio-group-item[*|data-state=on] .ds-radio-group-dot{ display:block; }
+.ds-radio-group-item[*|data-pressed] .ds-radio-group-indicator{ background:var(--surface); }
+.ds-radio-group-item[*|data-pressed][*|data-state=on] .ds-radio-group-indicator{ background:var(--accent-text); }
+.ds-radio-group-image{ display:inline-flex; line-height:0; color:var(--ink-soft); }
+.ds-radio-group-label{ min-width:0; }
+.ds-radio-group-item[*|aria-disabled=true],
+.ds-radio-group[*|aria-disabled=true],
+.ds-radio-group[*|aria-busy=true]{ opacity:.35; pointer-events:none; }

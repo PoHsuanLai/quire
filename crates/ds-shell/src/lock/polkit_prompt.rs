@@ -9,8 +9,9 @@ use crate::lock::secret_entry::{SecretEntry, use_secret_entry};
 use crate::lock::vocab::{CapsLock, LockUser, PromptState};
 use crate::user_picture::{mood::Mood, portrait::Liveliness};
 use dioxus::prelude::*;
+use ds::Answers;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::button::{Button, ButtonVariant};
+use ds::components::controls::button::Button;
 use ds::components::fields::{
     text_input::{InputVariant, TextInput},
     text_input_focus::FieldFocus,
@@ -91,8 +92,8 @@ pub fn PolkitPrompt(
                     div { class: "ds-polkit-hint", "{line}" }
                 }
                 div { class: "ds-polkit-actions",
-                    Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: move |_| oncancel.call(()) }
-                    Button { variant: ButtonVariant::Primary, label: "Authenticate", availability, onclick: move |_| go() }
+                    Button { label: "Cancel", onclick: move |_| oncancel.call(()) }
+                    Button { answers: Answers::Return, label: "Authenticate", availability, onclick: move |_| go() }
                 }
             }
         }

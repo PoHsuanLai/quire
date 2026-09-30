@@ -2,7 +2,7 @@
 //! launcher and tooltips, each size a tuned token a settings key can move. The defaults are
 //! the macOS numbers design/13-BEHAVIOUR-menus-windows.md section 13.2 records (menu bar text
 //! 13 pt, menu rows about 22 pt, 13 pt menu text) and the launcher's Spotlight-like scale
-//! (design/13 section 13.3.9); `IconButton { Status }`, `MenuBarItem`, `Menu`, `CommandPalette`
+//! (design/13 section 13.3.9); `Button { bezel: StatusItem }`, `MenuBarItem`, `Menu`, `CommandPalette`
 //! in a surface and `Tooltip` read them, so a consumer gets them with no prop.
 
 use crate::tokens::token::Token;

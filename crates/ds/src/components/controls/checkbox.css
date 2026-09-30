@@ -1,0 +1,28 @@
+/* Checkbox (design/30 section 2.3, `NSButton` checkbox). Attribute selectors carry `*|` (spike
+   S2); the focus ring is the global one, on the button (spike S12). The box is the ladder's
+   checkbox (10, 12, 14, 14: `--check-*`) at a 4 px radius, its hairline an inset shadow; on and
+   mixed fill it with the accent, the check mark and the dash in the accent's ink. Pressed darkens
+   the box; the label takes the rung's type. */
+
+.ds-checkbox{ --cb:var(--check-m); --cb-fs:var(--ctl-fs-m);
+  display:inline-flex; align-items:center; gap:var(--s-6); box-sizing:border-box; flex:none; padding:0; border:0; background:transparent;
+  font:inherit; font-size:var(--cb-fs); color:var(--ink); line-height:1; cursor:default; text-align:left;
+}
+.ds-checkbox[*|data-size=mini]{ --cb:var(--check-xs); --cb-fs:var(--ctl-fs-xs); }
+.ds-checkbox[*|data-size=small]{ --cb:var(--check-s); --cb-fs:var(--ctl-fs-s); }
+.ds-checkbox[*|data-size=large]{ --cb:var(--check-l); --cb-fs:var(--ctl-fs-l); }
+
+.ds-checkbox-indicator{
+  position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--cb); height:var(--cb);
+  border-radius:var(--r-micro); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1); color:var(--accent-ink);
+  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+}
+.ds-checkbox[*|data-state=on] .ds-checkbox-indicator,
+.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
+.ds-checkbox[*|data-pressed] .ds-checkbox-indicator{ background:var(--surface); }
+.ds-checkbox[*|data-pressed][*|data-state=on] .ds-checkbox-indicator,
+.ds-checkbox[*|data-pressed][*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent-text); }
+.ds-checkbox-dash{ display:block; width:60%; height:var(--s-2); border-radius:var(--r-pill); background:currentColor; }
+.ds-checkbox-label{ min-width:0; }
+.ds-checkbox[*|aria-disabled=true],
+.ds-checkbox[*|aria-busy=true]{ opacity:.35; pointer-events:none; }

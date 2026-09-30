@@ -3,15 +3,16 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    AccountFace, AccountTile, AddAccountTile, Button, ButtonVariant, Colour, Common, Fraction, Hex,
-    ImageSource, InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase,
-    SendPill, Shown, TextInput, TextInputKind,
+    AccountFace, AccountTile, AddAccountTile, Button, Colour, Common, Fraction, Hex, ImageSource,
+    InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase, SendPill,
+    Shown, TextInput, TextInputKind,
 };
 use ds::{Avatar, Muting};
 use ds::{
     AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, Selection,
     SidebarItem, TodayTrailing,
 };
+use ds::{Bezel, ControlSize};
 
 /// A scheduled draft's favicon.
 const CLOCKED: AvatarFace = AvatarFace {
@@ -61,11 +62,11 @@ pub const CASES: &[Case] = &[
     // Button: a hint, a name for assistive technology, and the open state of what it opens.
     Case {
         golden: "controls/button/mini-titled-open.html",
-        make: || rsx! { Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "+", title: "Add account…", expanded: Shown::Visible, onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "+", title: "Add account…", shown: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-closed.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "More", expanded: Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "More", shown: Shown::Hidden, onclick: |_| {} } },
     },
     // TextInput: a password, empty (the placeholder) and filled (the dots).
     Case {

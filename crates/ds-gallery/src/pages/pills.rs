@@ -6,12 +6,12 @@ use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
-    Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, ButtonVariant,
-    Check, Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd,
-    LinkPill, LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut,
-    ShortcutKey, TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub,
-    use_toast_hub,
+    Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, Check,
+    Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd, LinkPill,
+    LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut, ShortcutKey,
+    TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
+use ds::{Bezel, ControlSize};
 
 /// The hover targets, one per card kind.
 const TARGETS: [(HoverKind, &str, &str); 5] = [
@@ -49,23 +49,23 @@ pub fn Cards() -> Element {
             div { class: "g-row",
                 for (kind , key , text) in TARGETS {
                     HoverTarget { hover_key: HoverKey(key.to_string()), kind,
-                        Button { variant: ButtonVariant::Quiet, label: text, onclick: |_| {} }
+                        Button { bezel: Bezel::Inline, label: text, onclick: |_| {} }
                     }
                 }
             }
             ul { class: "g-list g-stage-pad",
                 for (key , name) in PINNED {
                     HoverTarget { key: "{key}", hover_key: HoverKey(key.to_string()), kind: HoverKind::Side, as_: TargetElement::Li,
-                        Button { variant: ButtonVariant::Quiet, label: format!("Pinned: {name} (li target)"), onclick: |_| {} }
+                        Button { bezel: Bezel::Inline, label: format!("Pinned: {name} (li target)"), onclick: |_| {} }
                     }
                 }
             }
             div { class: "g-row",
                 Tooltip { kind: TooltipKind::Fly, text: "Archive → out of Inbox",
-                    Button { variant: ButtonVariant::Mini, label: "Fly tooltip", onclick: |_| {} }
+                    Button { size: ControlSize::Mini, label: "Fly tooltip", onclick: |_| {} }
                 }
                 Tooltip { kind: TooltipKind::Card, text: "Snooze", sub: Some("Until tomorrow 08:00".to_string()),
-                    Button { variant: ButtonVariant::Mini, label: "Card tooltip", onclick: |_| {} }
+                    Button { size: ControlSize::Mini, label: "Card tooltip", onclick: |_| {} }
                 }
             }
             if let Some((key, HoverKind::Tip)) = open.clone() {
@@ -138,8 +138,8 @@ pub fn Bubble() -> Element {
                     onmounted: move |event| text.set(Some(MountedRef(event.data()))),
                     "Pretend this sentence is selected."
                 }
-                Button { variant: ButtonVariant::Mini, label: "Actions", onclick: move |_| open(Check::Off) }
-                Button { variant: ButtonVariant::Mini, label: "Link field", onclick: move |_| open(Check::On) }
+                Button { size: ControlSize::Mini, label: "Actions", onclick: move |_| open(Check::Off) }
+                Button { size: ControlSize::Mini, label: "Link field", onclick: move |_| open(Check::On) }
             }
             if let Some((anchor, link)) = shown() {
                 SelectionBubble {
@@ -176,14 +176,13 @@ pub fn Pills(showcase: Showcase) -> Element {
         Section { title: "Toast", note: "The undo toast springs up from the card's bottom edge; drag its tab right past 46 px, or tap it, to undo.",
             div { class: "g-row",
                 Button {
-                    variant: ButtonVariant::Secondary,
                     label: "Push a toast with undo",
                     onclick: move |_| {
                         toasts.push("Archived “Lunch on Thursday?”".to_string(), Some(UndoToken(next())));
                         next += 1;
                     },
                 }
-                Button { variant: ButtonVariant::Secondary, label: "Push one without", onclick: move |_| toasts.push("Saved".to_string(), None) }
+                Button { label: "Push one without", onclick: move |_| toasts.push("Saved".to_string(), None) }
                 span { class: "g-code", "last undo: {toasts.last_undo().map_or(\"none\".to_string(), |token| token.0.to_string())}" }
             }
         }
@@ -237,7 +236,7 @@ fn Countdown(showcase: Showcase) -> Element {
     };
     rsx! {
         div { class: "g-stage-pad",
-            Button { variant: ButtonVariant::Mini, label: "Send", onclick: start }
+            Button { size: ControlSize::Mini, label: "Send", onclick: start }
         }
         if run() > 0 || showcase == Showcase::Posed {
             SendPill {

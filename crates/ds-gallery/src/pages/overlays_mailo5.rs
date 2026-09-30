@@ -3,10 +3,8 @@
 
 use super::Section;
 use dioxus::prelude::*;
-use ds::{
-    Button, ButtonVariant, Flow, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow, Scrim, Trailing,
-    use_rect,
-};
+use ds::ControlSize;
+use ds::{Button, Flow, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow, Scrim, Trailing, use_rect};
 
 /// The folders a thread can move to.
 const FOLDERS: [&str; 6] = [
@@ -46,7 +44,7 @@ pub fn FieldFilterMenu() -> Element {
             note: "filter: Filter::Field {{ placeholder }} types and filters as Filter::Typing does, and draws the query in a field row at the top; the cursor stays on the rows. Open the picker and type.",
             div { class: "g-row g-row-top",
                 div { onmounted: move |event| trigger.on_mounted(event),
-                    Button { variant: ButtonVariant::Secondary, label: "Move to…", trailing: Trailing::Caret, onclick: move |_| open.set(true) }
+                    Button { label: "Move to…", trailing: Trailing::Caret, onclick: move |_| open.set(true) }
                 }
                 p { class: "g-note", "Moved to: {moved}" }
                 div { class: "g-menu-card",
@@ -94,7 +92,7 @@ pub fn InlineScrim() -> Element {
                     article { class: "g-peeked", "The peeked reader, above the veil." }
                 } else {
                     div { class: "g-stage-pad",
-                        Button { variant: ButtonVariant::Mini, label: "Peek again", onclick: move |_| peeked.set(true) }
+                        Button { size: ControlSize::Mini, label: "Peek again", onclick: move |_| peeked.set(true) }
                     }
                 }
             }

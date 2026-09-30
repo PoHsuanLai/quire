@@ -7,9 +7,10 @@ use dioxus::prelude::*;
 use dioxus_native::use_window_event;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
+use ds::Answers;
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Check, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Point, Px, use_toast_hub,
+    Anchor, Appearance, Availability, Button, Check, Ds, Material, Menu, MenuEntry, MenuKind,
+    MenuTrail, Point, Px, use_toast_hub,
 };
 use ds_native::{AppConfig, AppId, launch};
 use std::time::Duration;
@@ -53,9 +54,9 @@ fn Demo() -> Element {
     let toasts = use_toast_hub();
     rsx! {
         Button {
-            variant: ButtonVariant::Primary,
+            answers: Answers::Return,
             label: "Snooze…",
-            pressed: Some(open()),
+            value: Some(open()),
             onclick: move |_| {
                 open.set(Check::On);
                 toasts.push("Snoozed until tomorrow".into(), None);

@@ -2,14 +2,17 @@
 
 use dioxus::prelude::*;
 use ds::detail::{Operation, PendingToken};
-use ds::{Availability, Check, Fraction, Shortcut, ShortcutKey, Shown};
 use ds::{
-    Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, ButtonSize, ButtonVariant,
-    Chip, ChipVariant, Colour, Common, Count, CountPlace, ExternalIcon, FieldFocus, HeaderKind,
-    Hex, Icon, IconButton, IconButtonVariant, IconPx, IconSize, IconSource, IconUrl, IconView,
-    InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField, SectionHeader, SegSize,
-    SegmentedControl, Slider, Spinner, Tabs, TextInput, Toggle, Verdict,
+    Answers, Availability, Bezel, ButtonRole, Check, ControlSize, Fraction, ImagePosition,
+    Progress, ProgressIndicator, ProgressStyle, Shortcut, ShortcutKey, Shown,
 };
+use ds::{
+    Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Chip, ChipVariant, Colour,
+    Common, Count, CountPlace, ExternalIcon, FieldFocus, HeaderKind, Hex, Icon, IconPx, IconSize,
+    IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField,
+    SectionHeader, SegmentedControl, Slider, TextInput, Toggle, Verdict,
+};
+use ds::{Choice, Tracking};
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -56,136 +59,136 @@ pub const CASES: &[Case] = &[
     Case {
         component: "button",
         state: "primary",
-        make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} } },
+        make: || rsx! { Button { answers: Answers::Return, label: "Send", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "primary-icon",
-        make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", icon: Icon::Send, onclick: |_| {} } },
+        make: || rsx! { Button { answers: Answers::Return, label: "Send", icon: Icon::Send, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "secondary",
-        make: || rsx! { Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: |_| {} } },
+        make: || rsx! { Button { label: "Cancel", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "mini",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Reply", icon: Icon::Reply, onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "Reply", icon: Icon::Reply, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "mini-pressed",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Yes", pressed: Check::On, onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "Yes", value: Check::On, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "mini-unpressed",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "No", pressed: Check::Off, onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "No", value: Check::Off, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "quiet",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Show details", onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "Show details", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "danger",
-        make: || rsx! { Button { variant: ButtonVariant::Danger, label: "Delete", icon: Icon::Trash, onclick: |_| {} } },
+        make: || rsx! { Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: "Delete", icon: Icon::Trash, onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "disabled",
-        make: || rsx! { Button { variant: ButtonVariant::Primary, label: "Send", availability: Availability::Disabled, onclick: |_| {} } },
+        make: || rsx! { Button { answers: Answers::Return, label: "Send", availability: Availability::Disabled, onclick: |_| {} } },
     },
     // Sheet and modal parts: a size apart from the variant, and a disabled
     // Danger at Regular (a power menu's unavailable Suspend).
     Case {
         component: "button",
         state: "danger-regular",
-        make: || rsx! { Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Restart", onclick: |_| {} } },
+        make: || rsx! { Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Restart", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "primary-mini",
-        make: || rsx! { Button { variant: ButtonVariant::Primary, size: ButtonSize::Mini, label: "Send", onclick: |_| {} } },
+        make: || rsx! { Button { answers: Answers::Return, size: ControlSize::Mini, label: "Send", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "danger-regular-disabled",
-        make: || rsx! { Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} } },
+        make: || rsx! { Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} } },
     },
     // IconButton: four variants, expanded, pressed, tooltip, disabled.
     Case {
-        component: "icon_button",
-        state: "tool",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Archive, label: "Archive", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-tool",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Archive, label: "Archive", onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "tool-expanded",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Shown::Visible, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-tool-expanded",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Tag, label: "Labels", shown: Shown::Visible, onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "tool-collapsed",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Tag, label: "Labels", expanded: Shown::Hidden, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-tool-collapsed",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Tag, label: "Labels", shown: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "foot",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Foot, icon: Icon::PanelLeft, label: "Hide the sidebar", tooltip: "Hide the sidebar (Ctrl S)".to_string(), onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-foot",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::PanelLeft, label: "Hide the sidebar", title: "Hide the sidebar (Ctrl S)".to_string(), onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "strip",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Strip, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-strip",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "pin",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Check::Off, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-pin",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Inbox, label: "Inbox", value: Check::Off, onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "pin-pressed",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Pin, icon: Icon::Inbox, label: "Inbox", pressed: Check::On, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-pin-pressed",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Inbox, label: "Inbox", value: Check::On, onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "status",
-        make: || rsx! { IconButton { common: Common { id: Some("net".to_string()), ..Common::default() }, variant: IconButtonVariant::Status, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-status",
+        make: || rsx! { Button { common: Common { id: Some("net".to_string()), ..Common::default() }, bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "status-open",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryCharging, label: "Battery", expanded: Shown::Visible, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-status-open",
+        make: || rsx! { Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryCharging, label: "Battery", shown: Shown::Visible, onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "disabled",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-disabled",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
     },
     // IconButton with an external icon and an element id.
     Case {
-        component: "icon_button",
-        state: "symbolic",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: symbolic(), label: "Input method", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-symbolic",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: symbolic(), label: "Input method", onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "image",
-        make: || rsx! { IconButton { variant: IconButtonVariant::Tool, icon: image(), label: "Status", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-image",
+        make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: image(), label: "Status", onclick: |_| {} } },
     },
     Case {
-        component: "icon_button",
-        state: "with-id",
-        make: || rsx! { IconButton { common: Common { id: Some("tray-0".to_string()), ..Common::default() }, variant: IconButtonVariant::Tool, icon: Icon::Star, label: "Tray item", onclick: |_| {} } },
+        component: "button",
+        state: "toolbar-with-id",
+        make: || rsx! { Button { common: Common { id: Some("tray-0".to_string()), ..Common::default() }, bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Star, label: "Tray item", onclick: |_| {} } },
     },
     Case {
         component: "button",
         state: "with-id-symbolic",
-        make: || rsx! { Button { common: Common { id: Some("updates".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Updates", icon: symbolic(), onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { id: Some("updates".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "Updates", icon: symbolic(), onclick: |_| {} } },
     },
     // IconView: a glyph, a symbolic icon, an image.
     Case {
@@ -230,12 +233,12 @@ pub const CASES: &[Case] = &[
     Case {
         component: "segmented",
         state: "regular",
-        make: || rsx! { SegmentedControl { label: "Appearance", options: options(), value: 0u8, onchange: |_: u8| {} } },
+        make: || rsx! { SegmentedControl { label: "Appearance", choices: Choice::pairs(options()), tracking: Tracking::SelectOne(0u8), onchange: |_: u8| {} } },
     },
     Case {
         component: "segmented",
-        state: "small",
-        make: || rsx! { SegmentedControl { label: "View", options: options(), value: 2u8, size: SegSize::Small, onchange: |_: u8| {} } },
+        state: "mini",
+        make: || rsx! { SegmentedControl { label: "View", choices: Choice::pairs(options()), tracking: Tracking::SelectOne(2u8), size: ControlSize::Mini, onchange: |_: u8| {} } },
     },
     // Toggle: off, on, disabled.
     Case {
@@ -383,17 +386,6 @@ pub const CASES: &[Case] = &[
         state: "square-34",
         make: || rsx! { Avatar { initial: 'L', size: AvatarSize::Size34, tone: AvatarTone::Ink, shape: AvatarShape::Square } },
     },
-    // Tabs: each tab selected in turn.
-    Case {
-        component: "tabs",
-        state: "first",
-        make: || rsx! { Tabs { label: "Sections", tabs: vec![(1u8, "Inbox".to_string()), (2u8, "Motion catalogue".to_string())], value: 1u8, onchange: |_: u8| {} } },
-    },
-    Case {
-        component: "tabs",
-        state: "second",
-        make: || rsx! { Tabs { label: "Sections", tabs: vec![(1u8, "Inbox".to_string()), (2u8, "Motion catalogue".to_string())], value: 2u8, onchange: |_: u8| {} } },
-    },
     // SectionHeader: four kinds, the value and the action.
     Case {
         component: "section_header",
@@ -438,9 +430,9 @@ pub const CASES: &[Case] = &[
     },
     // Spinner.
     Case {
-        component: "spinner",
-        state: "spin",
-        make: || rsx! { Spinner { operation: running() } },
+        component: "progress",
+        state: "spinner",
+        make: || rsx! { ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(running()), size: ControlSize::Regular } },
     },
 ];
 

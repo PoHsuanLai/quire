@@ -94,8 +94,10 @@ pub fn AccountTile(
     rsx! {
         button {
             r#type: "button",
-            class: "ds-icon-button ds-account-tile",
-            "data-variant": "pin",
+            class: "ds-button ds-account-tile",
+            "data-variant": "toolbar",
+            "data-size": "large",
+            "data-image": "only",
             "aria-pressed": pressed.aria(),
             "aria-label": label,
             onclick: move |_| onclick.call(()),
@@ -118,8 +120,10 @@ pub fn AddAccountTile(
     rsx! {
         button {
             r#type: "button",
-            class: "ds-icon-button ds-account-tile",
-            "data-variant": "pin",
+            class: "ds-button ds-account-tile",
+            "data-variant": "toolbar",
+            "data-size": "large",
+            "data-image": "only",
             "data-face": "add",
             "aria-label": label,
             title,

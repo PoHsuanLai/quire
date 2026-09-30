@@ -8,10 +8,10 @@ use crate::registry;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Anchor, Availability, BlurState, Button, ButtonVariant, Check, Icon, Material, Menu,
-    MenuEntry, MenuKind, MenuTrail, MotionLevel, MountedRef, SegSize, SegmentedControl, Tabs,
-    Theme, Toggle, Typeface,
+    Accent, Anchor, Availability, BlurState, Button, Check, Icon, Material, Menu, MenuEntry,
+    MenuKind, MenuTrail, MotionLevel, MountedRef, SegmentedControl, Theme, Toggle, Typeface,
 };
+use ds::{Choice, ControlSize, Tracking};
 
 /// The toolbar.
 #[component]
@@ -57,27 +57,27 @@ pub fn Toolbar() -> Element {
     rsx! {
         div { class: "g-toolbar",
             Tool { name: "Theme",
-                SegmentedControl::<Theme> { label: "Theme", options: themes, value: now.theme, size: SegSize::Small,
+                SegmentedControl::<Theme> { label: "Theme", choices: Choice::pairs(themes), tracking: Tracking::SelectOne(now.theme), size: ControlSize::Mini,
                     onchange: move |theme| axes.with_mut(|axes| axes.theme = theme),
                 }
             }
             Tool { name: "Type",
-                SegmentedControl::<Typeface> { label: "Typeface", options: typefaces, value: now.typeface, size: SegSize::Small,
+                SegmentedControl::<Typeface> { label: "Typeface", choices: Choice::pairs(typefaces), tracking: Tracking::SelectOne(now.typeface), size: ControlSize::Mini,
                     onchange: move |typeface| axes.with_mut(|axes| axes.typeface = typeface),
                 }
             }
             Tool { name: "Accent",
-                SegmentedControl::<Accent> { label: "Accent", options: accents, value: now.accent, size: SegSize::Small,
+                SegmentedControl::<Accent> { label: "Accent", choices: Choice::pairs(accents), tracking: Tracking::SelectOne(now.accent), size: ControlSize::Mini,
                     onchange: move |accent| axes.with_mut(|axes| axes.accent = accent),
                 }
             }
             Tool { name: "Motion",
-                SegmentedControl::<ds::Motion> { label: "Motion level", options: levels, value: now.motion, size: SegSize::Small,
+                SegmentedControl::<ds::Motion> { label: "Motion level", choices: Choice::pairs(levels), tracking: Tracking::SelectOne(now.motion), size: ControlSize::Mini,
                     onchange: move |motion| axes.with_mut(|axes| axes.motion = motion),
                 }
             }
             Tool { name: "Material",
-                Choice::<Material> {
+                ChoiceMenu::<Material> {
                     label: "Material",
                     options: materials,
                     value: now.material,
@@ -95,7 +95,7 @@ pub fn Toolbar() -> Element {
                 }
             }
             Tool { name: "Space",
-                Choice::<PresetIndex> {
+                ChoiceMenu::<PresetIndex> {
                     label: "Space preset",
                     options: presets,
                     value: now.preset,
@@ -104,7 +104,7 @@ pub fn Toolbar() -> Element {
             }
         }
         div { class: "g-pages",
-            Tabs::<Page> { label: "Page", tabs: pages, value: now.page,
+            SegmentedControl::<Page> { label: "Page", choices: Choice::pairs(pages), tracking: Tracking::SelectOne(now.page),
                 onchange: move |page| axes.with_mut(|axes| axes.page = page),
             }
         }
@@ -124,7 +124,7 @@ fn Tool(name: String, children: Element) -> Element {
 
 /// A button showing the current choice, opening a dropdown menu of every choice.
 #[component]
-fn Choice<T: Clone + PartialEq + 'static>(
+fn ChoiceMenu<T: Clone + PartialEq + 'static>(
     label: String,
     options: Vec<(T, String)>,
     value: T,
@@ -158,10 +158,9 @@ fn Choice<T: Clone + PartialEq + 'static>(
     rsx! {
         span { class: "g-anchor", onmounted: move |event| anchor.set(Some(MountedRef(event.data()))),
             Button {
-                variant: ButtonVariant::Secondary,
                 label: current,
                 icon: Some(Icon::ChevronDown),
-                pressed: Some(open()),
+                value: Some(open()),
                 onclick: move |_| open.set(Check::On),
             }
         }

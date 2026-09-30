@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, FieldHandle, FocusError, InputVariant, Material, Select,
-    TextInput, focus_by_selector, use_field_handle,
+    Appearance, Button, Ds, FieldHandle, FocusError, InputVariant, Material, Select, TextInput,
+    focus_by_selector, use_field_handle,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -65,11 +65,11 @@ fn Page(reach: Reach) -> Element {
                     }
                 }
                 div { id: "go", style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Go",
+                    Button { label: "Go",
                         onclick: move |_| ask(reach, handle, log) }
                 }
                 div { id: "out", style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Out",
+                    Button { label: "Out",
                         onclick: move |_| handle.blur() }
                 }
                 p { class: "mounted", if handle.element().is_some() { "mounted" } }

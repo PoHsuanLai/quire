@@ -6,12 +6,13 @@
 
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
+use ds::{Answers, Bezel, ControlSize, ImagePosition};
 use ds::{
-    Appearance, Button, ButtonVariant, Check, Ds, Fraction, Icon, IconButton, IconButtonVariant,
-    IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook, Material, Muting,
-    PlateFamily, PlateTint, Px, Scheme, SegSize, SegmentedControl, Shown, Slider, StatusMetrics,
-    Surface, Theme, Toggle,
+    Appearance, Button, Check, Ds, Fraction, Icon, IconSize, IconSource, IconView, LevelControl,
+    LevelGlyph, LevelLook, Material, Muting, PlateFamily, PlateTint, Px, Scheme, SegmentedControl,
+    Shown, Slider, StatusMetrics, Surface, Theme, Toggle,
 };
+use ds::{Choice, Tracking};
 use ds_native::{Harness, Viewport};
 use ds_shell::{Chevron, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use std::path::PathBuf;
@@ -32,7 +33,7 @@ const PARTS: [&str; 16] = [
     ".ds-module-disc",
     ".ds-module-panel",
     ".ds-bar-item",
-    ".ds-icon-button",
+    ".ds-button",
     ".ds-plate",
 ];
 
@@ -101,9 +102,9 @@ fn Sheet(theme: Theme) -> Element {
                         MenuBarItem { open: Shown::Visible, "Files" }
                         MenuBarItem { "Edit" }
                         span { style: "flex:1" }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Volume2, label: "Volume", expanded: Some(Shown::Visible), onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Status, icon: Icon::Switches, label: "Control center", onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Some(Shown::Visible), onclick: |_| {} }
+                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Switches, label: "Control center", onclick: |_| {} }
                         MenuBarItem { "Sun 27 Sep 12:48" }
                     }
                 }
@@ -112,12 +113,12 @@ fn Sheet(theme: Theme) -> Element {
                         Toggle { label: "On", value: Check::On, onchange: |_| {} }
                         Toggle { label: "Off", value: Check::Off, onchange: |_| {} }
                         div { style: "width:160px", Slider { label: "Level", value: Fraction(600), onchange: |_| {} } }
-                        span { id: "btn-mini", Button { variant: ButtonVariant::Mini, label: "Mini", onclick: |_| {} } }
-                        span { id: "btn-regular", Button { variant: ButtonVariant::Primary, label: "Regular", onclick: |_| {} } }
+                        span { id: "btn-mini", Button { size: ControlSize::Mini, label: "Mini", onclick: |_| {} } }
+                        span { id: "btn-regular", Button { answers: Answers::Return, label: "Regular", onclick: |_| {} } }
                     }
                     div { style: "{row}",
-                        span { id: "seg-small", SegmentedControl { label: "Small", options: vec![(0, "System".to_owned()), (1, "Light".to_owned()), (2, "Dark".to_owned())], value: 0, size: SegSize::Small, onchange: |_| {} } }
-                        span { id: "seg-regular", SegmentedControl { label: "Regular", options: vec![(0, "System".to_owned()), (1, "Light".to_owned()), (2, "Dark".to_owned())], value: 0, size: SegSize::Regular, onchange: |_| {} } }
+                        span { id: "seg-small", SegmentedControl { label: "Small", choices: Choice::pairs(vec![(0, "System".to_owned()), (1, "Light".to_owned()), (2, "Dark".to_owned())]), tracking: Tracking::SelectOne(0), size: ControlSize::Mini, onchange: |_| {} } }
+                        span { id: "seg-regular", SegmentedControl { label: "Regular", choices: Choice::pairs(vec![(0, "System".to_owned()), (1, "Light".to_owned()), (2, "Dark".to_owned())]), tracking: Tracking::SelectOne(0), size: ControlSize::Regular, onchange: |_| {} } }
                     }
                 }
                 // The control center's modules at its 320 width, 12 padding, 8 gap.

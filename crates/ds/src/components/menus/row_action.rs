@@ -3,7 +3,8 @@
 //! its click, press and pointer moves stop inside it, so the row neither runs, closes its menu
 //! nor takes the selection while the pointer is on the button.
 
-use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
+use crate::components::controls::button::Button;
+use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::focus::click::kept_click;
 use dioxus::prelude::*;
 use ds_core::press::Press;
@@ -43,11 +44,11 @@ pub(crate) fn trailing(action: &RowAction) -> Element {
             onmouseup: move |event| event.stop_propagation(),
             // Pointing at the action does not move the selection onto its row.
             onmousemove: move |event| event.stop_propagation(),
-            IconButton {
-                variant: IconButtonVariant::Strip,
+            Button {
+                bezel: Bezel::Toolbar, image: ImagePosition::Only,
                 icon,
                 label: label.clone(),
-                tooltip: label,
+                title: label,
                 onclick: on_press,
             }
         }

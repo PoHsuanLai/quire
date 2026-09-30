@@ -1,4 +1,4 @@
-//! Press: what a Button or IconButton hands its `onclick`: which pointer button activated it,
+//! Press: what a Button hands its `onclick`: which pointer button activated it,
 //! the modifiers held and where it happened. A
 //! tray icon's right-click has to reach the app as a secondary press, its middle click as a
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
@@ -8,7 +8,7 @@ use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
 use ds_core::press::{PointerButton, Press};
-use ds_core::vocab::PressPhase;
+use ds_core::vocab::{Availability, PressPhase};
 
 /// The press a mouse event describes, as `button`.
 pub(crate) fn press_of(event: &MouseEvent, button: PointerButton) -> Press {
@@ -65,6 +65,49 @@ impl Propagation {
     }
 }
 
+/// What a control's availability writes on the element besides `aria-disabled`: `disabled`, so
+/// the platform neither focuses nor activates it. Present only when disabled, as an attribute
+/// string: a `bool` attribute reaches dioxus-native as `disabled="false"` on every enabled
+/// control, which Blitz reads as disabled (a click then no longer toggles an enclosing
+/// `<details>`). A busy control takes no input either, but stays where it is in the tab order.
+pub fn disabled(availability: Availability) -> Option<&'static str> {
+    match availability {
+        Availability::Enabled | Availability::Busy => None,
+        Availability::Disabled => Some("true"),
+    }
+}
+
+/// The keys that activate a focused control: a push button answers Return and Space; a button
+/// that answers Escape leaves Return to the dialog around it (the default button's key) and
+/// answers Space only, as does a switch, a checkbox, a radio button or a segment.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum ActivationKeys {
+    /// Return and Space.
+    #[default]
+    ReturnAndSpace,
+    /// Space alone.
+    SpaceOnly,
+}
+
+/// Whether `key` is Space.
+pub(crate) fn is_space(key: &Key) -> bool {
+    matches!(key, Key::Character(text) if text == " ")
+}
+
+/// Whether `key` activates a control that takes `keys`.
+pub(crate) fn is_activation_key(key: &Key, keys: ActivationKeys) -> bool {
+    match keys {
+        ActivationKeys::ReturnAndSpace => matches!(key, Key::Enter) || is_space(key),
+        ActivationKeys::SpaceOnly => is_space(key),
+    }
+}
+
+/// Whether `event` is a fresh activation for a control that takes `keys`: a held key's repeats
+/// are not.
+pub(crate) fn activates(event: &KeyboardEvent, keys: ActivationKeys) -> bool {
+    is_activation_key(&event.key(), keys) && !event.is_auto_repeating()
+}
+
 /// The three listeners a pressable control puts on its element, all reporting through `press`:
 /// `click` (primary, and keyboard activation), `contextmenu` (secondary: Blitz and browsers
 /// send a right-click as that and never as a click; its default is prevented), and `mouseup`
@@ -113,6 +156,22 @@ impl PressListeners {
         self.press.call(press_of(event, PointerButton::Secondary));
     }
 
+    /// A `keydown`: the `keys` that activate the control report a primary press at the origin
+    /// (a keyboard activation has no point). Blitz raises no `click` for a key on a focused
+    /// `button`, so the control reports the activation itself, and the key stays at the control:
+    /// what a key activates nothing around it hears as well. A held key does not repeat it.
+    pub fn key_down(&self, event: &KeyboardEvent, keys: ActivationKeys) {
+        if !activates(event, keys) {
+            return;
+        }
+        event.prevent_default();
+        event.stop_propagation();
+        self.press.call(Press {
+            modifiers: event.modifiers(),
+            ..Press::primary()
+        });
+    }
+
     /// A `mouseup`: only the middle button counts (the primary one arrives as `click`).
     pub fn mouse_up(&self, event: &MouseEvent) {
         if event.trigger_button() == Some(MouseButton::Auxiliary) {
@@ -158,11 +217,9 @@ impl Pressing {
         }
     }
 
-    /// A key went down: Space and Return press a control.
-    pub fn key_down(&self, event: &KeyboardEvent) {
-        if matches!(event.key(), Key::Enter)
-            || matches!(event.key(), Key::Character(ref text) if text == " ")
-        {
+    /// A key went down: the `keys` that activate the control press it.
+    pub fn key_down(&self, event: &KeyboardEvent, keys: ActivationKeys) {
+        if is_activation_key(&event.key(), keys) {
             self.set(PressPhase::Pressed);
         }
     }
@@ -175,9 +232,35 @@ impl Pressing {
 
 #[cfg(test)]
 mod tests {
-    use super::button_of;
+    use super::{ActivationKeys, button_of, disabled, is_activation_key};
     use dioxus::html::input_data::MouseButton;
+    use dioxus::prelude::Key;
     use ds_core::press::PointerButton;
+    use ds_core::vocab::Availability;
+
+    #[test]
+    fn only_a_disabled_control_is_disabled() {
+        assert_eq!(disabled(Availability::Disabled), Some("true"));
+        assert_eq!(disabled(Availability::Enabled), None);
+        assert_eq!(disabled(Availability::Busy), None);
+    }
+
+    #[test]
+    fn return_and_space_activate_and_nothing_else_does() {
+        use ActivationKeys::{ReturnAndSpace, SpaceOnly};
+        let cases = [
+            (Key::Enter, ReturnAndSpace, true),
+            (Key::Enter, SpaceOnly, false),
+            (Key::Character(" ".to_string()), ReturnAndSpace, true),
+            (Key::Character(" ".to_string()), SpaceOnly, true),
+            (Key::Character("a".to_string()), ReturnAndSpace, false),
+            (Key::Tab, ReturnAndSpace, false),
+            (Key::Escape, ReturnAndSpace, false),
+        ];
+        for (key, keys, want) in cases {
+            assert_eq!(is_activation_key(&key, keys), want, "{key:?} {keys:?}");
+        }
+    }
 
     #[test]
     fn a_trigger_names_its_button() {

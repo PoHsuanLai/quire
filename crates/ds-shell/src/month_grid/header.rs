@@ -1,5 +1,5 @@
 //! A MonthGrid's header: the month's title and, with `onstep`, the previous and next buttons
-//! (design/04-COMPONENTS.md section 39). The regular grid uses `IconButton { Tool }` (28 x 26);
+//! (design/04-COMPONENTS.md section 39). The regular grid uses `Button { Tool }` (28 x 26);
 //! that alone is taller than the compact grid can spare in a small widget's 140 px,
 //! so the compact grid draws plain 14 px glyph buttons (`ds-month-step`, an 11 px glyph).
 
@@ -7,7 +7,7 @@ use crate::month_grid::data::MonthStep;
 use crate::month_grid::density::Drawn;
 use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::icon_button::{IconButton, IconButtonVariant};
+use ds::{Bezel, Button, ControlSize, ImagePosition};
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
@@ -37,11 +37,11 @@ fn step_button(
 ) -> Element {
     match density {
         Drawn::Regular => rsx! {
-            IconButton {
-                variant: IconButtonVariant::Tool,
+            Button {
+                bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
                 icon,
                 label: step.label(),
-                tooltip: step.label().to_owned(),
+                title: step.label().to_owned(),
                 onclick: move |_| onstep.call(step),
             }
         },

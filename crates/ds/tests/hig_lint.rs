@@ -145,13 +145,13 @@ struct MarkupCase {
 const MARKUP_CASES: &[MarkupCase] = &[
     MarkupCase {
         name: "an icon button with nothing to say",
-        html: "<button class=\"ds-icon-button\"><svg class=\"ds-ic\" aria-hidden=\"true\"></svg></button>",
+        html: "<button class=\"ds-button\"><svg class=\"ds-ic\" aria-hidden=\"true\"></svg></button>",
         rule: Rule::UnnamedControl,
         expect: Fired::Yes,
     },
     MarkupCase {
         name: "an icon button with a label",
-        html: "<button class=\"ds-icon-button\" aria-label=\"Close\"><svg class=\"ds-ic\" aria-hidden=\"true\"></svg></button>",
+        html: "<button class=\"ds-button\" aria-label=\"Close\"><svg class=\"ds-ic\" aria-hidden=\"true\"></svg></button>",
         rule: Rule::UnnamedControl,
         expect: Fired::No,
     },

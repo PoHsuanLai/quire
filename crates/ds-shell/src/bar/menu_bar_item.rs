@@ -4,7 +4,7 @@
 //! `Emphasis::Strong`, 700); the pill is `--shell-bar-item` (22) high with the 5 px
 //! `--r-shell-bar-item` radius, `--f-pill-hover` under the pointer and `--f-pill` while its
 //! menu is open, with no transition (a bar menu switches in the same frame). A `Button { Quiet }`
-//! inside it gives up its own look and takes the item's; an `IconButton { Status }` draws the
+//! inside it gives up its own look and takes the item's; an `Button { Status }` draws the
 //! same pill itself and needs no wrapper.
 
 use dioxus::prelude::*;

@@ -8,7 +8,8 @@
 //! Danger render the same height side by side, at `ButtonSize::Regular` and at `ButtonSize::Mini`.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonSize, ButtonVariant, Ds, Material};
+use ds::{Answers, ButtonRole, ControlSize};
+use ds::{Appearance, Button, Ds, Material};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -25,23 +26,23 @@ fn Page() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "padding:20px; display:flex; gap:8px; align-items:flex-start",
                 span { class: "primary-regular",
-                    Button { variant: ButtonVariant::Primary, label: "Shut Down", onclick: move |_| {} }
+                    Button { answers: Answers::Return, label: "Shut Down", onclick: move |_| {} }
                 }
                 span { class: "secondary-regular",
-                    Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: move |_| {} }
+                    Button { label: "Cancel", onclick: move |_| {} }
                 }
                 span { class: "danger-regular",
-                    Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Restart", onclick: move |_| {} }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Restart", onclick: move |_| {} }
                 }
                 span { class: "primary-mini",
-                    Button { variant: ButtonVariant::Primary, size: ButtonSize::Mini, label: "Shut Down", onclick: move |_| {} }
+                    Button { answers: Answers::Return, size: ControlSize::Mini, label: "Shut Down", onclick: move |_| {} }
                 }
                 span { class: "secondary-mini",
-                    Button { variant: ButtonVariant::Secondary, size: ButtonSize::Mini, label: "Cancel", onclick: move |_| {} }
+                    Button { size: ControlSize::Mini, label: "Cancel", onclick: move |_| {} }
                 }
                 span { class: "danger-mini",
                     // No size: Danger's own size is Mini (design/04-COMPONENTS.md section 1).
-                    Button { variant: ButtonVariant::Danger, label: "Restart", onclick: move |_| {} }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: "Restart", onclick: move |_| {} }
                 }
             }
         }

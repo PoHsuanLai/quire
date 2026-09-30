@@ -9,9 +9,10 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, DurationToken, EasingToken, Fraction, Grain, Icon, IconButton,
-    IconButtonVariant, Material, MotionLevel, PRESETS, SpaceLook, Theme,
+    Appearance, Ds, DurationToken, EasingToken, Fraction, Grain, Icon, Material, MotionLevel,
+    PRESETS, SpaceLook, Theme,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep};
@@ -142,8 +143,8 @@ fn Switching() -> Element {
         Ds { appearance: light(), look: look(index(), 0), material: Material::Window,
             style { {PROBE_CSS} }
             div { class: "room",
-                IconButton {
-                    variant: IconButtonVariant::Status,
+                Button {
+                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
                     icon: Icon::Grid,
                     label: "Next Space",
                     onclick: move |_| index.set(3),
@@ -171,9 +172,7 @@ fn a_space_switch_cross_fades_the_window() {
     let mut harness = Harness::new(Switching, VIEW);
     harness.advance(ms(60));
     let before = pixel(&harness.render().expect("renders"), 2, 2);
-    let button = harness
-        .centre(".ds-icon-button")
-        .expect("the switch is drawn");
+    let button = harness.centre(".ds-button").expect("the switch is drawn");
     harness.click(button);
     harness.advance(quarter_of_the_curve());
     let halfway = harness.render().expect("renders");

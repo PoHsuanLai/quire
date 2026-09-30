@@ -9,10 +9,10 @@ use dioxus::prelude::*;
 use ds::Alpha;
 use ds::Word;
 use ds::{
-    Avatar, AvatarSize, AvatarTone, BlurState, Button, ButtonVariant, Chip, ChipVariant, Fraction,
-    Glyph, Icon, IconButton, IconButtonVariant, IconSize, Material, Slider, StatusMetrics, Surface,
-    use_scope,
+    Avatar, AvatarSize, AvatarTone, BlurState, Button, Chip, ChipVariant, Fraction, Glyph, Icon,
+    IconSize, Material, Slider, StatusMetrics, Surface, use_scope,
 };
+use ds::{Bezel, ControlSize, ImagePosition};
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
@@ -53,7 +53,7 @@ pub fn MaterialsPage() -> Element {
                     }
                 }
                 span { class: "g-code", "material_tint_alpha = {percent}" }
-                Button { variant: ButtonVariant::Mini, label: "Reset to 80", onclick: move |_| tint.set(Alpha(800)) }
+                Button { size: ControlSize::Mini, label: "Reset to 80", onclick: move |_| tint.set(Alpha(800)) }
             }
         }
         div { class: "g-grid2",
@@ -119,15 +119,15 @@ fn Panel(material: Material) -> Element {
                 span { class: "g-name", "Files" }
                 span { class: "g-code", "{state}" }
                 span { class: "g-spacer" }
-                IconButton { variant: IconButtonVariant::Status, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                IconButton { variant: IconButtonVariant::Status, icon: Icon::BatteryFull, label: "Battery", expanded: Some(ds::Shown::Visible), onclick: |_| {} }
+                Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: Some(ds::Shown::Visible), onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },
         Material::Dock => rsx! {
             div { class: "g-panel g-panel-dock g-row",
                 for icon in [Icon::Mail, Icon::Folder, Icon::Terminal, Icon::Camera] {
-                    IconButton { variant: IconButtonVariant::Pin, icon, label: "App", onclick: |_| {} }
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon, label: "App", onclick: |_| {} }
                 }
                 span { class: "g-code", "{state}" }
             }

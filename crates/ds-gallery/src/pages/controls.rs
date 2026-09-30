@@ -9,38 +9,16 @@ use super::plate_tints::PlateTints;
 use super::status_items::StatusItems;
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Availability, Avatar, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, CommandPill,
-    Common, Count, Fraction, HeaderKind, Hex, Icon, IconButton, IconButtonVariant, ImageSource,
-    Kbd, KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, ProviderMark,
-    SectionHeader, SegSize, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, Spinner, Tabs,
-    Toggle, Verdict,
+    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Count, Fraction,
+    HeaderKind, Hex, ImageSource, Kbd, KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle,
+    PersonHue, Progress, ProgressIndicator, ProgressStyle, ProviderMark, SectionHeader,
+    SegmentedControl, Shortcut, ShortcutKey, Slider, Toggle, Verdict,
 };
-
-const BUTTONS: [(ButtonVariant, &str); 5] = [
-    (ButtonVariant::Primary, "Primary"),
-    (ButtonVariant::Secondary, "Secondary"),
-    (ButtonVariant::Mini, "Mini"),
-    (ButtonVariant::Quiet, "Quiet"),
-    (ButtonVariant::Danger, "Danger"),
-];
-
-const ICON_BUTTONS: [(IconButtonVariant, &str); 4] = [
-    (IconButtonVariant::Tool, "Tool"),
-    (IconButtonVariant::Foot, "Foot"),
-    (IconButtonVariant::Strip, "Strip"),
-    (IconButtonVariant::Pin, "Pin"),
-];
-
-/// The states a button's props can put it in.
-const BUTTON_STATES: [(&str, Option<Check>, Availability); 4] = [
-    ("rest", None, Availability::Enabled),
-    ("pressed off", Some(Check::Off), Availability::Enabled),
-    ("pressed on", Some(Check::On), Availability::Enabled),
-    ("disabled", None, Availability::Disabled),
-];
+use ds::{Choice, Tracking};
 
 const PROVIDERS: [MarkProvider; 7] = [
     MarkProvider::Google,
@@ -89,37 +67,6 @@ pub fn ControlsPage() -> Element {
 #[component]
 fn Buttons() -> Element {
     rsx! {
-        Section { title: "Button", note: "Five variants, each at rest, pressed off and on, and disabled; with and without an icon. Named: a hover title and an assistive name over a terse label, and a trigger open and closed (aria-expanded).",
-            for (variant , name) in BUTTONS {
-                div { class: "g-row",
-                    span { class: "g-name g-type-name", "{name}" }
-                    for (state , pressed , availability) in BUTTON_STATES {
-                        Button { variant, label: state, pressed, availability, onclick: |_| {} }
-                    }
-                    Button { variant, label: "With icon", icon: Some(Icon::Archive), onclick: |_| {} }
-                }
-            }
-            div { class: "g-row",
-                span { class: "g-name g-type-name", "Named" }
-                Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "+", title: "Add account…", onclick: |_| {} }
-                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Visible, onclick: |_| {} }
-                Button { variant: ButtonVariant::Quiet, label: "More", icon: Some(Icon::ChevronDown), expanded: Shown::Hidden, onclick: |_| {} }
-            }
-        }
-        Section { title: "IconButton", note: "Four variants; rest, pressed on, expanded, disabled.",
-            div { class: "g-row",
-                for (variant , name) in ICON_BUTTONS {
-                    Specimen { name,
-                        div { class: "g-row",
-                            IconButton { variant, icon: Icon::Star, label: "{name} rest", onclick: |_| {} }
-                            IconButton { variant, icon: Icon::Star, label: "{name} pressed", pressed: Some(Check::On), onclick: |_| {} }
-                            IconButton { variant, icon: Icon::ChevronDown, label: "{name} expanded", expanded: Some(Shown::Visible), onclick: |_| {} }
-                            IconButton { variant, icon: Icon::Trash, label: "{name} disabled", availability: Availability::Disabled, onclick: |_| {} }
-                        }
-                    }
-                }
-            }
-        }
         Section { title: "CommandPill and Kbd",
             div { class: "g-row",
                 CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]), onclick: |_| {} }
@@ -152,12 +99,12 @@ fn Choosers() -> Element {
         .map(|(name, value)| (value, name.to_string()))
         .collect();
     rsx! {
-        Section { title: "SegmentedControl and Tabs", note: "Live: click to change.",
+        Section { title: "SegmentedControl", note: "Live: click to change.",
             div { class: "g-row",
-                SegmentedControl::<u8> { label: "View", options: views.clone(), value: view(), onchange: move |next| view.set(next) }
-                SegmentedControl::<u8> { label: "View", options: views, value: view(), size: SegSize::Small, onchange: move |next| view.set(next) }
+                SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views.clone()), tracking: Tracking::SelectOne(view()), onchange: move |next| view.set(next) }
+                SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views), tracking: Tracking::SelectOne(view()), size: ControlSize::Mini, onchange: move |next| view.set(next) }
             }
-            Tabs::<u8> { label: "Mailbox", tabs, value: tab(), onchange: move |next| tab.set(next) }
+            SegmentedControl::<u8> { label: "Mailbox", choices: Choice::pairs(tabs), tracking: Tracking::SelectOne(tab()), onchange: move |next| tab.set(next) }
         }
         Section { title: "Toggle and Slider",
             div { class: "g-row",
@@ -200,12 +147,12 @@ fn Choosers() -> Element {
         }
         Section { title: "Count, Spinner, SectionHeader", note: "Change the count to see it.",
             div { class: "g-row",
-                Button { variant: ButtonVariant::Mini, label: "+1", onclick: move |_| *count.write() += 1 }
-                Button { variant: ButtonVariant::Mini, label: "0", onclick: move |_| count.set(0) }
+                Button { size: ControlSize::Mini, label: "+1", onclick: move |_| *count.write() += 1 }
+                Button { size: ControlSize::Mini, label: "0", onclick: move |_| count.set(0) }
                 Specimen { name: "item",
                     Count { value: count() }
                 }
-                Specimen { name: "spin", Spinner { operation: busy } }
+                Specimen { name: "spin", ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(busy), size: ControlSize::Small } }
             }
             div { class: "g-grid4",
                 SectionHeader { kind: HeaderKind::Frame, text: "Frame" }

@@ -6,10 +6,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Anim, Appearance, Availability, Ds, Icon, IconButton, IconButtonVariant, Material,
-    Menu, MenuEntrance, MenuEntry, MenuKind, MenuTrail, MotionLevel, Point, PointerButton, Press,
-    Px, ShortcutKey, settle,
+    Anchor, Anim, Appearance, Availability, Ds, Icon, Material, Menu, MenuEntrance, MenuEntry,
+    MenuKind, MenuTrail, MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -306,8 +306,8 @@ fn PressAt() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; padding:20px 0 0 100px; height:60px",
-                IconButton {
-                    variant: IconButtonVariant::Status,
+                Button {
+                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
                     icon: Icon::Wifi,
                     label: "Network",
                     onclick: move |press: Press| {

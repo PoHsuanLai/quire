@@ -11,7 +11,8 @@
 //! heights, which are what the rule is about, and check the press only where the frame is sound.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, Material, Point, Rect};
+use ds::ControlSize;
+use ds::{Appearance, Button, Ds, Material, Point, Rect};
 use ds_native::{Harness, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
@@ -63,7 +64,7 @@ fn Page() -> Element {
         div { class: "frame",
             Ds { appearance: Appearance::default(), material: Material::Popover,
                 div { class: "card",
-                    Button { variant: ButtonVariant::Mini, label: "Press", onclick: move |_| *PRESSES.write() += 1 }
+                    Button { size: ControlSize::Mini, label: "Press", onclick: move |_| *PRESSES.write() += 1 }
                 }
             }
         }

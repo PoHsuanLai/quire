@@ -4,10 +4,8 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Button, ButtonVariant, Common, DataAttr, DataName, ExtraClass, Glyph, Icon, IconButton,
-    IconButtonVariant, IconSize, Propagation,
-};
+use ds::{Bezel, ControlSize, ImagePosition};
+use ds::{Button, Common, DataAttr, DataName, ExtraClass, Glyph, Icon, IconSize, Propagation};
 
 /// The two ellipses at the glyph sizes a row and a header use, and on the buttons that open a
 /// row's menu.
@@ -22,8 +20,8 @@ pub fn MoreGlyphs() -> Element {
                             Glyph { icon, size: IconSize::Compact }
                             Glyph { icon, size: IconSize::Base }
                             Glyph { icon, size: IconSize::Large }
-                            IconButton { variant: IconButtonVariant::Strip, icon, label: "More actions", onclick: |_| {} }
-                            IconButton { variant: IconButtonVariant::Tool, icon, label: "More actions", onclick: |_| {} }
+                            Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon, label: "More actions", onclick: |_| {} }
+                            Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon, label: "More actions", onclick: |_| {} }
                         }
                     }
                 }
@@ -50,15 +48,15 @@ pub fn PassThrough() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "data-folder", code: "data-folder=\"INBOX/Receipts\"",
                     div { class: "g-row",
-                        Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: ButtonVariant::Frame, label: "Receipts", onclick: |_| {} }
-                        IconButton { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} }
+                        Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, bezel: Bezel::Toolbar, label: "Receipts", onclick: |_| {} }
+                        Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} }
                     }
                 }
                 Specimen { name: "extra_class", code: "class=\"ds-button g-reveal\"",
                     div { class: "g-row g-reveal-row",
                         span { "Hover this row" }
-                        Button { common: Common { extra_class: reveal.clone(), ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
-                        IconButton { common: Common { extra_class: reveal, ..Common::default() }, variant: IconButtonVariant::Tool, icon: Icon::EllipsisVertical, label: "More", onclick: |_| {} }
+                        Button { common: Common { extra_class: reveal.clone(), ..Common::default() }, size: ControlSize::Mini, label: "Reply", onclick: |_| {} }
+                        Button { common: Common { extra_class: reveal, ..Common::default() }, bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::EllipsisVertical, label: "More", onclick: |_| {} }
                     }
                 }
             }

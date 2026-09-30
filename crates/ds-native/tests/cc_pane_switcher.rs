@@ -5,10 +5,11 @@
 //! never lands, and the switcher rests on the last pane asked for.
 
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::Word;
 use ds::{
-    Anim, Appearance, Button, ButtonVariant, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher,
-    RowTrailing, SettingsRow,
+    Anim, Appearance, Button, Check, Common, Ds, Icon, Material, Pane, PaneSwitcher, RowTrailing,
+    SettingsRow,
 };
 use ds::{MotionLevel, settle};
 use ds_native::harness::settle_until;
@@ -37,8 +38,8 @@ fn PanesApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover,
             div { class: "asks",
-                Button { common: Common { id: Some("to-root".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Root", onclick: move |_| shown.set(Pane::Root) }
-                Button { common: Common { id: Some("to-detail".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Detail", onclick: move |_| shown.set(Pane::Detail) }
+                Button { common: Common { id: Some("to-root".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "Root", onclick: move |_| shown.set(Pane::Root) }
+                Button { common: Common { id: Some("to-detail".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "Detail", onclick: move |_| shown.set(Pane::Detail) }
             }
             div { style: "width:320px",
                 PaneSwitcher {

@@ -20,8 +20,8 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::button::{Button, ButtonVariant};
-use crate::components::controls::button_size::ButtonSize;
+use crate::components::controls::button::Button;
+use crate::components::controls::button_model::{Answers, ButtonRole};
 use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
@@ -232,7 +232,7 @@ fn slot(slot: Slot<'_>) -> Element {
         press,
         mut buttons,
     } = slot;
-    let (variant, size) = face(button, emphasis);
+    let (answers, role) = face(button, emphasis);
     let starts = emphasis.default_button() == button;
     rsx! {
         span {
@@ -258,8 +258,8 @@ fn slot(slot: Slot<'_>) -> Element {
                         focus_soon(event.data());
                     }
                 })), ..Common::default() },
-                variant,
-                size,
+                answers,
+                role,
                 label: label.to_owned(),
                 onclick: move |_| press.call(button),
             }
@@ -267,15 +267,19 @@ fn slot(slot: Slot<'_>) -> Element {
     }
 }
 
-/// How a button is drawn: the default accent-filled, Cancel otherwise the ghost, a destructive
-/// action a Danger at the Regular size (its red label is the alert's rule).
-fn face(button: AlertButton, emphasis: AlertEmphasis) -> (ButtonVariant, Option<ButtonSize>) {
+/// How a button is drawn: the default answers Return and takes the accent, a Cancel that is not
+/// the default answers Escape, a destructive action that is not the default is a destructive
+/// button (its red label is the alert's rule).
+fn face(button: AlertButton, emphasis: AlertEmphasis) -> (Answers, ButtonRole) {
     match (button, emphasis.default_button() == button, emphasis) {
-        (_, true, _) => (ButtonVariant::Primary, None),
+        (_, true, _) => (Answers::Return, ButtonRole::Normal),
         (AlertButton::Action, false, AlertEmphasis::Destructive) => {
-            (ButtonVariant::Danger, Some(ButtonSize::Regular))
+            (Answers::Nothing, ButtonRole::Destructive)
         }
-        (AlertButton::Cancel | AlertButton::Action, false, _) => (ButtonVariant::Secondary, None),
+        (AlertButton::Cancel, false, _) => (Answers::Escape, ButtonRole::Normal),
+        (AlertButton::Action, false, AlertEmphasis::Default) => {
+            (Answers::Nothing, ButtonRole::Normal)
+        }
     }
 }
 
@@ -296,8 +300,7 @@ fn is_space(key: &Key) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{alert_key, face, is_space};
-    use crate::components::controls::button::ButtonVariant;
-    use crate::components::controls::button_size::ButtonSize;
+    use crate::components::controls::button_model::{Answers, ButtonRole};
     use crate::components::overlays::alert_vocab::{AlertButton, AlertEmphasis};
     use dioxus::prelude::Key;
 
@@ -318,24 +321,24 @@ mod tests {
     }
 
     #[test]
-    fn the_default_is_filled_and_a_destructive_action_is_red() {
+    fn the_default_answers_return_and_a_destructive_action_is_red() {
         use AlertButton::{Action, Cancel};
         use AlertEmphasis::{Default, Destructive};
         let cases = [
-            (Cancel, Default, ButtonVariant::Secondary, None),
-            (Action, Default, ButtonVariant::Primary, None),
-            (Cancel, Destructive, ButtonVariant::Primary, None),
+            (Cancel, Default, Answers::Escape, ButtonRole::Normal),
+            (Action, Default, Answers::Return, ButtonRole::Normal),
+            (Cancel, Destructive, Answers::Return, ButtonRole::Normal),
             (
                 Action,
                 Destructive,
-                ButtonVariant::Danger,
-                Some(ButtonSize::Regular),
+                Answers::Nothing,
+                ButtonRole::Destructive,
             ),
         ];
-        for (button, emphasis, variant, size) in cases {
+        for (button, emphasis, answers, role) in cases {
             assert_eq!(
                 face(button, emphasis),
-                (variant, size),
+                (answers, role),
                 "{button:?} {emphasis:?}"
             );
         }

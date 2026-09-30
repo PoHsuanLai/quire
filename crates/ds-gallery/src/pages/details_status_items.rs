@@ -1,19 +1,20 @@
 //! Details, the status glyphs in their slots: the bar's four status items as
-//! `IconButton { Status }` holding a status glyph, at the bar's metrics.
+//! `Button { Status }` holding a status glyph, at the bar's metrics.
 
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
 use ds::{
-    BatteryPower, BatteryState, BluetoothState, Fraction, IconButton, IconButtonVariant, LowAt,
-    StatusMetrics, StatusState, VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
+    BatteryPower, BatteryState, BluetoothState, Fraction, LowAt, StatusMetrics, StatusState,
+    VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
 };
+use ds::{Bezel, Button, ImagePosition};
 
 /// One status item, labelled with its state's words.
 #[component]
 fn Item(status: StatusState) -> Element {
     rsx! {
-        IconButton {
-            variant: IconButtonVariant::Status,
+        Button {
+            bezel: Bezel::StatusItem, image: ImagePosition::Only,
             icon: status,
             label: status.words(),
             onclick: |_| {},
@@ -39,7 +40,7 @@ pub fn ItemsCell() -> Element {
         reach: WifiReach::Internet,
     };
     rsx! {
-        Cell { name: "In the bar", code: "IconButton {{ variant: Status, icon: StatusState }}",
+        Cell { name: "In the bar", code: "Button {{ variant: Status, icon: StatusState }}",
             controls: rsx! {
                 {mini("80 %", move |_| battery.set(at(800)))}
                 {mini("15 %", move |_| battery.set(at(150)))}

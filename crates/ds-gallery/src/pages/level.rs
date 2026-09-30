@@ -6,10 +6,11 @@
 use super::level_tile::{Ground, LevelTile, STATES, theme, work};
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::Word;
 use ds::{
-    Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, LevelControl, LevelGlyph,
-    LevelLook, Material, Muting, RootChrome, Scheme, Shown, use_scope,
+    Appearance, BlurState, Button, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook,
+    Material, Muting, RootChrome, Scheme, Shown, use_scope,
 };
 use ds_shell::{Osd, OsdLevel, OsdMetrics, OsdPosition};
 
@@ -60,11 +61,11 @@ fn LiveSection() -> Element {
                 }
             }
             div { class: "g-row",
-                Button { variant: ButtonVariant::Mini, label: "Volume 0", onclick: move |_| volume.set(Fraction(0)) }
-                Button { variant: ButtonVariant::Mini, label: "Volume 40", onclick: move |_| volume.set(Fraction(400)) }
-                Button { variant: ButtonVariant::Mini, label: "Volume 100", onclick: move |_| volume.set(Fraction(1000)) }
+                Button { size: ControlSize::Mini, label: "Volume 0", onclick: move |_| volume.set(Fraction(0)) }
+                Button { size: ControlSize::Mini, label: "Volume 40", onclick: move |_| volume.set(Fraction(400)) }
+                Button { size: ControlSize::Mini, label: "Volume 100", onclick: move |_| volume.set(Fraction(1000)) }
                 Button {
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: "Mute",
                     onclick: move |_| {
                         let next = match muting() {
@@ -74,7 +75,7 @@ fn LiveSection() -> Element {
                         muting.set(next);
                     },
                 }
-                Button { variant: ButtonVariant::Mini, label: "Brightness 30", onclick: move |_| brightness.set(Fraction(300)) }
+                Button { size: ControlSize::Mini, label: "Brightness 30", onclick: move |_| brightness.set(Fraction(300)) }
             }
         }
     }
@@ -132,8 +133,8 @@ fn OsdSection() -> Element {
     rsx! {
         Section { title: "OSD at the top right", note: "The Osd card under the bar's reserve (osd.position TopRight, osd.margin_px 24): a title line over a read-only capsule, a control-center module's shape. Hide it: it fades and lifts over --t-move --e-exit, then on_hidden runs (the host unmaps the surface there); show it: it drops in over --t-quick --e-out. Showing it while it fades takes the hide back.",
             div { class: "g-row",
-                Button { variant: ButtonVariant::Mini, label: "Show", onclick: move |_| shown.set(Shown::Visible) }
-                Button { variant: ButtonVariant::Mini, label: "Hide", onclick: move |_| shown.set(Shown::Hidden) }
+                Button { size: ControlSize::Mini, label: "Show", onclick: move |_| shown.set(Shown::Visible) }
+                Button { size: ControlSize::Mini, label: "Hide", onclick: move |_| shown.set(Shown::Hidden) }
                 span { class: "g-code", "on_hidden ran {hidden_at} times" }
             }
             div { class: "g-grid2",

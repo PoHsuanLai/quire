@@ -8,9 +8,10 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Grain, HeaderKind, Icon, Material, PRESETS, Point, Px,
-    Rect, Scheme, SectionHeader, SpaceLook, Theme,
+    Appearance, Button, Ds, Grain, HeaderKind, Icon, Material, PRESETS, Point, Px, Rect, Scheme,
+    SectionHeader, SpaceLook, Theme,
 };
+use ds::{Bezel, ButtonRole, ControlSize};
 use ds_native::{Harness, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use image::RgbaImage;
@@ -234,13 +235,13 @@ fn ButtonsApp() -> Element {
         Root {
             div { style: "display:flex; flex-direction:column; align-items:flex-start; gap:20px; padding:20px",
                 div { class: "probe-quiet",
-                    Button { variant: ButtonVariant::Quiet, label: "With icon", icon: Some(Icon::Star), onclick: |_| {} }
+                    Button { bezel: Bezel::Inline, label: "With icon", icon: Some(Icon::Star), onclick: |_| {} }
                 }
                 div { class: "probe-mini",
-                    Button { variant: ButtonVariant::Mini, label: "Delete", onclick: |_| {} }
+                    Button { size: ControlSize::Mini, label: "Delete", onclick: |_| {} }
                 }
                 div { class: "probe-danger",
-                    Button { variant: ButtonVariant::Danger, label: "Delete", onclick: |_| {} }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: "Delete", onclick: |_| {} }
                 }
             }
         }

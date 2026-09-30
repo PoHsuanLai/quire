@@ -10,7 +10,8 @@ use super::widget_reference::cell;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, Fraction, Inject, Material, RootChrome, Theme};
+use ds::ControlSize;
+use ds::{Appearance, Button, Ds, Fraction, Inject, Material, RootChrome, Theme};
 use ds_shell::{
     BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device, RingMark,
     Seconds, Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
@@ -109,7 +110,7 @@ fn Battery(host: WidgetHost) -> Element {
     rsx! {
         div { class: "g-col",
             WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, host }
-            Button { variant: ButtonVariant::Mini, label: "Drain",
+            Button { size: ControlSize::Mini, label: "Drain",
                 onclick: move |_| level.set(Fraction(level().0.saturating_sub(100))) }
         }
     }

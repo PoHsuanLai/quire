@@ -5,7 +5,8 @@ use crate::control_center::module_tile_kind::ModuleState;
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
-use ds::components::controls::spinner::Spinner;
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds_motion::detail::{
     detailed::Detailed, moment::Moment, touch::Touch, use_detail::use_detail,
     use_operation::use_operation,
@@ -48,7 +49,10 @@ pub(crate) fn ModuleDisc(glyph: IconSource, state: ModuleState) -> Element {
         span { class: "ds-module-disc",
             IconView { source: glyph, size: IconSize::Base }
             if state == ModuleState::Busy {
-                Spinner { operation }
+                ProgressIndicator {
+                    style: ProgressStyle::Ring,
+                    progress: Progress::Unknown(operation),
+                }
             }
         }
     }

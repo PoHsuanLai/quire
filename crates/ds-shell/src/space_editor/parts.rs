@@ -3,7 +3,8 @@
 
 use super::{DotIndex, Picker, dot_index, edit};
 use dioxus::prelude::*;
-use ds::components::controls::button::{Button, ButtonVariant};
+use ds::ControlSize;
+use ds::components::controls::button::Button;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::controls::slider::Slider;
 use ds::components::lists::section_header::{HeaderKind, SectionHeader};
@@ -67,7 +68,7 @@ pub(super) fn Stops(
             }
             if room {
                 Button {
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: "Colour",
                     icon: Icon::Plus,
                     onclick: move |_| {

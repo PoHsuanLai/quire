@@ -8,12 +8,13 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
     AccountFace, AccountTile, ActionId, AnimatedList, AppearancePicker, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, ButtonVariant, Check, Chip, ChipVariant, Colour, DragGhost,
-    DropLine, Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, LeaveBy, ListRow,
-    MarkProvider, MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px,
-    RosterSpec, RowPitch, RowState, Selection, SidebarItem, StripAction, SystemPrefs, UndoToken,
-    use_roster, use_toast_hub,
+    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, DragGhost, DropLine,
+    Emphasis, Exit, Heal, Hex, HoverStrip, Icon, ItemKind, LeaveBy, ListRow, MarkProvider,
+    MarkSize, MarkStyle, PersonHue, Point, Presence, Preview, ProviderMark, Px, RosterSpec,
+    RowPitch, RowState, Selection, SidebarItem, StripAction, SystemPrefs, UndoToken, use_roster,
+    use_toast_hub,
 };
+use ds::{Bezel, ControlSize};
 
 /// One sample thread: sender, subject, snippet, time.
 type Thread = (&'static str, &'static str, &'static str, &'static str);
@@ -163,15 +164,15 @@ fn LiveList() -> Element {
             title: "AnimatedList",
             note: "Remove the selected row (or the first) The row fades and slides up. The rows below close into the gap; Undo, or pull the toast's tab, brings the row back.",
             div { class: "g-row",
-                Button { variant: ButtonVariant::Secondary, label: "Add a row", icon: Some(Icon::Plus),
+                Button { label: "Add a row", icon: Some(Icon::Plus),
                     onclick: move |_| {
                         let id = ThreadId(next());
                         next += 1;
                         keys.with_mut(|keys| keys.insert(0, id));
                     },
                 }
-                Button { variant: ButtonVariant::Secondary, label: "Archive", icon: Some(Icon::Archive), onclick: move |_| remove("Archived") }
-                Button { variant: ButtonVariant::Quiet, label: "Undo", icon: Some(Icon::Undo), onclick: move |_| restore(None) }
+                Button { label: "Archive", icon: Some(Icon::Archive), onclick: move |_| remove("Archived") }
+                Button { bezel: Bezel::Inline, label: "Undo", icon: Some(Icon::Undo), onclick: move |_| restore(None) }
             }
             div { class: "g-list",
                 AnimatedList { label: "Threads",
@@ -326,7 +327,7 @@ fn Sidebar() -> Element {
                     Scheduled { key: "{today().len()}" }
                 }
                 div { class: "g-col",
-                    Button { variant: ButtonVariant::Mini, label: "Bring Today back", onclick: move |_| today.set(vec!["Dana Okafor", "Priya Raman"]) }
+                    Button { size: ControlSize::Mini, label: "Bring Today back", onclick: move |_| today.set(vec!["Dana Okafor", "Priya Raman"]) }
                     Specimen { name: "DropLine",
                         div { class: "g-list g-stage-pad", DropLine {} }
                     }
@@ -350,9 +351,9 @@ fn Tiles() -> Element {
             p { class: "g-note", "The hover strip shows on row hover in the list above. The drag ghost is fixed to the window: it follows the pointer while a row is dragged; here it is pinned near the top right." }
             div { class: "g-row",
                 Button {
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: "Show the drag ghost",
-                    pressed: Some(ghost()),
+                    value: Some(ghost()),
                     onclick: move |_| ghost.set(ghost().flipped()),
                 }
             }

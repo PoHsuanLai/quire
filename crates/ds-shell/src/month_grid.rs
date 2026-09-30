@@ -1,7 +1,7 @@
 //! MonthGrid: a month of days in seven columns, the calendar widget's month (design/04-COMPONENTS.md
 //! section 39; design/20-SURFACES.md section 1.12). The shell computes the month;
 //! this draws it: a header with the month's title and, when the caller steps months, the
-//! previous and next `IconButton { Tool }`; the weekday heads; then the weeks, optionally led by
+//! previous and next `Button { Tool }`; the weekday heads; then the weeks, optionally led by
 //! their ISO week numbers, the neighbours' days quieter, today on the accent disc and a busy
 //! day's dot. A change of month slides the weeks in once (`month_grid_weeks`).
 //!

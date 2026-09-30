@@ -37,7 +37,7 @@
 .ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
 .ds-lock-go[*|aria-busy=true]{ opacity:1; }
 .ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
-.ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
+.ds-lock-busy .ds-progress-indicator{ background:var(--lock-ink); }
 
 .ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
 
@@ -50,4 +50,4 @@
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
 .ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-spinner{ border-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-progress-indicator{ background:var(--f-ink); }

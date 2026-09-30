@@ -1,107 +1,101 @@
-/* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
-   The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
-   Disabled takes design/13 section 13.3.3's settled disabled item, .35, rather than
-   O-1's unsigned .45 candidate: below. */
+/* Button (design/30 section 2.1, `NSButton`). Attribute selectors carry `*|` (spike S2). The
+   focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
 
-.ds-button{ font:inherit; }
+   Sized by the ladder (design/29-SIZING.md): the rung sets `--btn-*` once, every bezel reads
+   them, so a size is written in one place and every bezel follows it. Pressed (design/30
+   section 1.4) is a darker fill, never a scale: `data-pressed` is written for a pointer or a
+   key held down. Disabled and busy take no pointer and draw at the disabled .35 (design/13
+   section 13.3.3; busy keeps its spinner at full strength). */
 
-/* Heights come from the size ladder (design/29-SIZING.md R1): a Regular button is 22 tall with
-   the reference push button's radius 5 (`--ctl-r-m`) and its label centred on `line-height:1`;
-   padding sets only the side inset. Mini is the ladder's Small, 16 tall at radius 4.
-
-   Primary: `S:386-391`. Secondary shares its geometry and hover (`C:531`). Both carry a
-   `--hair` border: Primary's is transparent, so it draws exactly as it did with
-   `border:0` (the default `background-clip:border-box` still paints `--accent` under it), but
-   the box model gains the same border width Secondary and Danger already have, so all three
-   stand the same height at a given size instead of Primary sitting one `--hair` short top and
-   bottom. */
-.ds-button[*|data-variant=primary],
-.ds-button[*|data-variant=secondary]{
-  display:inline-flex; align-items:center; gap:var(--s-6); border:var(--hair) solid transparent; cursor:default; border-radius:var(--ctl-r-m);
-  height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); line-height:1; white-space:nowrap;
-  font-weight:700; font-size:var(--fs-control); background:var(--accent); color:var(--accent-ink); box-shadow:var(--shadow-1);
-  transition:box-shadow var(--t-quick) var(--e-out);
+.ds-button{
+  --btn-h:var(--ctl-h-m); --btn-r:var(--ctl-r-m); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
+  display:inline-flex; align-items:center; justify-content:center; gap:var(--s-6); box-sizing:border-box; flex:none;
+  height:var(--btn-h); padding:0 var(--btn-pad); border:var(--hair) solid transparent; border-radius:var(--btn-r);
+  font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
+  background:transparent; color:var(--ink-soft);
+  transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out);
 }
-.ds-button[*|data-variant=primary]:hover,
-.ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
-.ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
-/* Pressed (design/30 section 1.4): a darker fill, no scale. */
-.ds-button[*|data-variant=primary][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=secondary][*|data-pressed]{ background:var(--surface); box-shadow:var(--shadow-1); }
+.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-r:var(--ctl-r-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
+.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-r:var(--ctl-r-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
+.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-r:var(--ctl-r-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
 
-/* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
-.ds-button[*|data-variant=mini],
-.ds-button[*|data-variant=danger]{
-  display:inline-flex; align-items:center; gap:var(--s-6); line-height:1; white-space:nowrap;
-  border:var(--hair) solid var(--line); background:var(--surface-2); cursor:default;
-  border-radius:var(--ctl-r-xs); height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
-}
-.ds-button[*|data-variant=mini]:hover,
-.ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=mini][*|data-pressed],
-.ds-button[*|data-variant=danger][*|data-pressed]{ background:var(--surface); box-shadow:none; }
+/* Push: a raised rounded rectangle with a line; a toggle button that is on takes the accent. */
+.ds-button[*|data-variant=push]{ background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=push]:hover{ color:var(--ink); background:var(--raise); }
+.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--surface); box-shadow:none; }
+.ds-button[*|data-variant=push][*|data-state=on]{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent-text); }
+/* The default button answers Return and takes the accent; a pressed one darkens. */
+.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+.ds-button[*|data-variant=push][*|data-answers=return]:hover{ background:var(--accent); color:var(--accent-ink); }
+.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+/* Destructive: red under the pointer; a destructive default button is red at rest. */
+.ds-button[*|data-variant=push][*|data-role=destructive]:hover{ background:var(--danger-wash); color:var(--danger); }
+.ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]{ background:var(--danger); color:var(--danger-ink); }
+.ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]:hover{ background:var(--danger); color:var(--danger-ink); }
 
-/* Mini pressed: `S:523`, the RSVP row. */
-/* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
-   state also draws its edge in the text accent (3:1 or better on every ground). */
-.ds-button[*|data-variant=mini][*|aria-pressed=true]{ background:var(--accent); color:var(--accent-ink); border-color:var(--accent-text); }
+/* Toolbar: no bezel at rest, a fill under the pointer and while pressed or open. */
+.ds-button[*|data-variant=toolbar]{ color:var(--ink-faint); }
+.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--surface); }
+.ds-button[*|data-variant=toolbar][*|data-pressed],
+.ds-button[*|data-variant=toolbar][*|data-state=on],
+.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=toolbar][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
+/* An image-only button is a square of the rung's height. */
+.ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; }
 
-/* Danger (derived from `C:958-963`): red only on hover. */
-.ds-button[*|data-variant=danger]:hover{ background:var(--danger-wash); color:var(--danger); }
+/* Inline: words with no bezel; the quiet link-button. */
+.ds-button[*|data-variant=inline]{ color:var(--ink-faint); padding:0 var(--s-4); font-weight:var(--ctl-fw-m); }
+.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--surface); }
+.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=inline][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 
-/* Quiet: `S:601-602`. S's link-button has no icon, so no gap; with one it takes the gap every
-   other variant has (6), laid out as they are (polish pass: the glyph touched the label).
-   TODO(O-3): its icon size and active state are not specified. */
-.ds-button[*|data-variant=quiet]{ display:inline-flex; align-items:center; gap:var(--s-6); border:0; background:none; cursor:default; font-size:var(--fs-small); line-height:1; color:var(--ink-faint); height:var(--ctl-h-m); padding:0 var(--s-4); border-radius:var(--ctl-r-m); }
-.ds-button[*|data-variant=quiet]:hover{ color:var(--ink); background:var(--surface); }
+/* Help: a round bezel, the question mark drawn from the label's first letter. */
+.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=help]:hover{ color:var(--ink); background:var(--raise); }
+.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--surface); box-shadow:none; }
 
-/* Frame: words on the Space frame, in the sidebar item's chrome (`S:126-131`) and
-   the foot button's colours (`S:151-153`): `--f-ink-soft` on nothing, `--f-ink` on
-   `--f-pill-hover` under the pointer, `--f-pill` while held or pressed (a pressed one carries the
-   current item's `--shadow-current`, as `aria-current` does on an item). It starts at its left
-   edge, as an item does: Blitz's user-agent `button{justify-content:center}` would centre a
-   frame word stretched across the sidebar. */
-.ds-button[*|data-variant=frame]{
-  display:inline-flex; align-items:center; justify-content:flex-start; text-align:left; gap:var(--s-6); white-space:nowrap; border:0; background:transparent; cursor:default;
-  padding:var(--s-6) var(--s-8); border-radius:var(--r-item); font-size:var(--fs-body); font-weight:600; color:var(--f-ink-soft);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-button[*|data-variant=frame][*|data-pressed]{ background:var(--f-pill); color:var(--f-ink); }
-.ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
+/* The frame draws a toolbar or inline button in its own inks (`data-ground=frame` remaps them). */
 
-/* Size, after the variants so it wins at equal weight: `data-size` is written only
-   when the caller gives one, so a button with none keeps its variant's own geometry. Regular is
-   Primary's box (22, `--ctl-h-m`) at the variant's colours, so a Danger Restart stands level with
-   a Primary Shut Down beside it; Mini is Mini's; Large is 28. Quiet and Frame keep their own. */
-.ds-button[*|data-size=regular]{ height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border-radius:var(--ctl-r-m); font-size:var(--fs-control); font-weight:700; line-height:1; }
-.ds-button[*|data-size=mini]{ height:var(--ctl-h-xs); padding:0 var(--ctl-pad-xs); border-radius:var(--ctl-r-xs); font-size:var(--fs-small); font-weight:600; line-height:1; white-space:nowrap; }
-/* Large: the ladder's 28 (`--ctl-h-l`), still at the reference push button's radius 5. */
-.ds-button[*|data-size=large]{ height:var(--ctl-h-l); padding:0 var(--ctl-pad-l); font-size:var(--fs-control); font-weight:700; line-height:1; border-radius:var(--ctl-r-m); }
-
-/* Disabled (design/13 section 13.3.3's disabled item): .35, the default cursor, and no
-   pointer at all, so no variant's hover lift, wash or press squish can match; `disabled` and the
-   dropped handlers keep a press from firing. */
-.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
-/* A disabled default button stays the default: the Mac keeps its shape and edge at
-   the reduced opacity. Band B's pastel fill at .35 is barely apart from a disabled Secondary
-   beside it (design/03-COLOR.md section 20.4: no state on the fill's colour alone), so it keeps
-   an `--accent-text` edge, the pressed Mini's and the armed toast tab's. */
-.ds-button[*|data-variant=primary][*|aria-disabled=true]{ border-color:var(--accent-text); }
-
-/* A trailing mark: a dropdown's caret after its value, in the label's colour a
-   step quieter; `line-height:0` so the glyph does not stretch the line. */
+/* Parts: the icon and the label sit on the line; a mark face and a leading mark as before. */
+.ds-button-icon{ display:inline-flex; align-items:center; line-height:0; flex:none; }
+.ds-button-label{ min-width:0; }
+.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
-
-/* A mark face: the bubble's B, i, U and S (design/04 section 30), each in its own
-   style. S's italic is Georgia; the serif here is `--font-serif` (design/02). */
 .ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
 .ds-button-face[*|data-face=bold]{ font-weight:700; }
 .ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
 .ds-button-face[*|data-face=underline]{ text-decoration:underline; }
 .ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
-/* A leading mark: a glyph or a caller's mark (a provider's inline chip) before the
-   label, sitting on the line as the trailing mark does; the button's own gap spaces it. */
-.ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
+/* Disabled: .35, no pointer at all, so no hover or press matches. Busy: no input, the
+   label dims, the spinner in the leading slot stays clear. */
+.ds-button[*|aria-disabled=true]{ opacity:.35; cursor:default; pointer-events:none; }
+.ds-button[*|aria-busy=true]{ cursor:default; pointer-events:none; }
+.ds-button[*|aria-busy=true] > .ds-button-icon,
+.ds-button[*|aria-busy=true] > .ds-button-label,
+.ds-button[*|aria-busy=true] > .ds-button-trail{ opacity:.35; }
+/* A disabled default button keeps its accent edge: the pastel fill at .35 is barely apart from a
+   disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
+.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
+
+/* StatusItem: the bar's status item. The slot is the bar's 30 wide (`--bar-status-w`,
+   design/29-SIZING.md section 5.1: the glyph 7 in from each side) by the box's height; the box and
+   the glyph come from the consumer's settings through `--bar-status-box` and `--bar-status-glyph`
+   (`ds::StatusMetrics`), the fallbacks being the keys' defaults, 22 and 16. The glyph is sized
+   here because the size is a setting. Inks on the frame as a toolbar button's; pressed and open
+   on the pressed fill. The pill's radius is the shell scale's bar-item radius. */
+.ds-button[*|data-variant=status-item]{
+  width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); padding:0; border-radius:var(--r-shell-bar-item);
+  color:var(--ink-soft);
+}
+.ds-button[*|data-variant=status-item]:hover{ color:var(--ink); background:var(--surface); }
+.ds-button[*|data-variant=status-item][*|data-pressed],
+.ds-button[*|data-variant=status-item][*|aria-pressed=true],
+.ds-button[*|data-variant=status-item][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
+/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level
+   parts) fill that square, so the glyph follows the setting as a single icon does. */
+.ds-button[*|data-variant=status-item] .ds-ic,
+.ds-button[*|data-variant=status-item] .ds-ext-icon,
+.ds-button[*|data-variant=status-item] .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
+.ds-button[*|data-variant=status-item] .ds-status-glyph > .ds-status-part,
+.ds-button[*|data-variant=status-item] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }

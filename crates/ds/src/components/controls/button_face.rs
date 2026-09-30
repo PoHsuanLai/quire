@@ -109,7 +109,7 @@ pub(crate) fn leading(mark: Leading, icon_size: IconSize) -> Element {
 pub fn FaceMark(face: ButtonFace, #[props(into)] label: TextLine) -> Element {
     match face.mark() {
         None => rsx! {
-            span { {text(&label)} }
+            span { class: "ds-button-label", {text(&label)} }
         },
         Some((letter, slug)) => rsx! {
             span { class: "ds-button-face", "data-face": slug, "aria-hidden": "true", "{letter}" }

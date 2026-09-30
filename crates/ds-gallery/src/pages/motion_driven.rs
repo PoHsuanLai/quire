@@ -6,6 +6,8 @@ use super::Section;
 use super::details::{Cell, mini};
 use crate::axes::Axes;
 use dioxus::prelude::*;
+use ds::Choice;
+use ds::Tracking;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
@@ -63,7 +65,7 @@ fn SegmentCell() -> Element {
                 {mini("Month", move |_| pick.set(2))}
             },
             div { class: "g-detail",
-                SegmentedControl { label: "View", options, value: pick(), onchange: move |to| pick.set(to) }
+                SegmentedControl { label: "View", choices: Choice::pairs(options), tracking: Tracking::SelectOne(pick()), onchange: move |to| pick.set(to) }
             }
         }
     }

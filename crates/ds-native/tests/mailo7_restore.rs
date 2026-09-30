@@ -5,7 +5,7 @@
 //! focuses, and falls to the next focusable ancestor (`.app[tabindex]`).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, ButtonVariant, Ds, Material, Press, ShortcutKey};
+use ds::{Appearance, Button, Ds, Material, Press, ShortcutKey};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -34,7 +34,7 @@ fn Page(on_press: OnPress) -> Element {
                 onkeydown: move |event: KeyboardEvent| log.with_mut(|log| log.push(format!("key:{}", event.key()))),
                 div { class: "banner", style: "display:flex; height:40px",
                     if shown() {
-                        Button { variant: ButtonVariant::Secondary, label: "Show images",
+                        Button { label: "Show images",
                             onclick: move |_: Press| {
                                 log.with_mut(|log| log.push("show".to_owned()));
                                 if on_press == OnPress::Leaves {

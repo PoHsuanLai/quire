@@ -1,12 +1,12 @@
 //! The bar's status item geometry (design/22-SETTINGS.md section 3): the two custom
-//! properties `IconButton { Status }` reads, written from the shell's settings.
+//! properties `Button { bezel: StatusItem }` reads, written from the shell's settings.
 
 use crate::tokens::name::VarName;
 use ds_core::geometry::units::Px;
 
 /// A bar's status item geometry, from the shell's settings (design/22-SETTINGS.md section 3,
 /// `bar.status_icon_box_px`, `bar.status_glyph_px`, `bar.glyph_size_policy`): written as the
-/// two custom properties `IconButton { Status }` reads, on any element around the items.
+/// two custom properties `Button { bezel: StatusItem }` reads, on any element around the items.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct StatusMetrics {
     /// The item's height (`bar.status_icon_box_px`, default 22); its slot is `--bar-status-w`

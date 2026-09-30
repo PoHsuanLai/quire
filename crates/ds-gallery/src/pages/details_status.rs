@@ -41,7 +41,7 @@ fn battery(level: u16, power: BatteryPower) -> BatteryState {
 #[component]
 pub fn StatusSection() -> Element {
     rsx! {
-        Section { title: "Status glyphs", note: "The bar's status items as layers (D1). Wi-Fi searches one layer at a time while joining (after PendingGrace, held dimmed at PendingCap), fills once to its bars on joining, cross-fades its arcs, grows a \"!\" badge with no internet, shakes once on a failed join and draws its slash on when off. The battery's fill sweeps a step at a time, the bolt and plug grow in, and the fill turns red at the low threshold (never while charging). Bluetooth breathes while connecting and seals as its dots arrive. Volume is LevelGlyph's waves and slash. In the bar, each is an IconButton {{ Status }} holding its glyph; the battery item nudges once as it crosses into low on battery.",
+        Section { title: "Status glyphs", note: "The bar's status items as layers (D1). Wi-Fi searches one layer at a time while joining (after PendingGrace, held dimmed at PendingCap), fills once to its bars on joining, cross-fades its arcs, grows a \"!\" badge with no internet, shakes once on a failed join and draws its slash on when off. The battery's fill sweeps a step at a time, the bolt and plug grow in, and the fill turns red at the low threshold (never while charging). Bluetooth breathes while connecting and seals as its dots arrive. Volume is LevelGlyph's waves and slash. In the bar, each is an Button {{ Status }} holding its glyph; the battery item nudges once as it crosses into low on battery.",
             div { class: "g-detail-grid g-status-grid",
                 WifiCell {}
                 BatteryCell {}
