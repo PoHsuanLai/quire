@@ -2,9 +2,10 @@
 
 pub(crate) mod clock;
 pub(crate) mod mood;
+pub(crate) mod password;
+pub(crate) mod password_field;
 pub(crate) mod picture;
 pub(crate) mod polkit_prompt;
 pub(crate) mod prompt;
 pub(crate) mod screen;
-pub(crate) mod secret_entry;
 pub(crate) mod vocab;

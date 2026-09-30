@@ -73,23 +73,16 @@ impl PromptState {
 }
 
 impl Detailed for PromptState {
-    /// Checking is the pending try (its arrow spins, bounded, R4); Wrong after it is the failure
-    /// (the field shakes once, R6); a lock-out closes the prompt; Accepted is the success (the
+    /// Checking is the pending try (its arrow spins, bounded, R4); arriving at Wrong is the
+    /// failure (the field shakes once, R6); a lock-out closes the prompt; Accepted is the success (the
     /// picture's accept beat); anything else is a Change.
     fn moment(from: &Self, to: &Self) -> Moment {
         match (from, to) {
             (_, PromptState::Checking) => Moment::Pending,
-            (PromptState::Checking, PromptState::Wrong) => Moment::Failure,
+            (_, PromptState::Wrong) => Moment::Failure,
             (_, PromptState::LockedOut { .. }) => Moment::Unavailable,
             (_, PromptState::Accepted) => Moment::Success,
             (
-                PromptState::Idle
-                | PromptState::Wrong
-                | PromptState::LockedOut { .. }
-                | PromptState::Accepted,
-                PromptState::Wrong,
-            )
-            | (
                 PromptState::Idle
                 | PromptState::Checking
                 | PromptState::Wrong

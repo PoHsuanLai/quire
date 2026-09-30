@@ -4,6 +4,7 @@
 //! screen's layout, so a shell draws it without layout rules of its own.
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::image_source::ImageSource;
 use ds_style::icon::url::IconUrl;
 
@@ -17,10 +18,23 @@ pub fn LockScreen(
     #[props(default)] wallpaper: Option<ImageSource>,
     clock: Element,
     prompt: Element,
+    #[props(default)] common: Common,
 ) -> Element {
     let style = wallpaper.and_then(|source| wallpaper_style(&source));
+    let class = common.class("ds-lock");
+    let data = common.data_attributes();
+    let label = common
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| "Locked".to_owned());
     rsx! {
-        div { class: "ds-lock", role: "dialog", "aria-label": "Locked",
+        div {
+            class,
+            id: common.id.clone(),
+            role: "dialog",
+            "aria-label": "{label}",
+            onmounted: move |event| common.mounted(event),
+            ..data,
             div { class: "ds-lock-wallpaper", style, "aria-hidden": "true" }
             div { class: "ds-lock-veil", "aria-hidden": "true" }
             div { class: "ds-lock-top", {clock} }

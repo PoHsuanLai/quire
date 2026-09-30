@@ -4,8 +4,9 @@
 //! tooltip, the password in a boxed `Secret` field that shakes once when it was wrong, then Cancel
 //! and Authenticate.
 
+use crate::lock::password::use_password;
+use crate::lock::password_field::{Escape, Form, PasswordField};
 use crate::lock::picture::{AT_POLKIT, prompt_picture};
-use crate::lock::secret_entry::{SecretEntry, use_secret_entry};
 use crate::lock::vocab::{CapsLock, LockUser, PromptState};
 use crate::user_picture::{mood::Mood, portrait::Liveliness};
 use dioxus::prelude::*;
@@ -13,15 +14,10 @@ use ds::Answers;
 use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
-use ds::components::fields::text_field::TextField;
-use ds::components::fields::text_field_focus::FieldFocus;
-use ds::components::fields::text_field_model::FieldKind;
 use ds::components::overlays::tooltip::Tooltip;
 use ds::components::overlays::{sheet::Sheet, sheet_attach::Attach, sheet_width::SheetWidth};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
-use ds_style::icon::Icon;
-use ds_style::icon::render::{Glyph, IconSize};
 
 /// The title when the caller gives none.
 const AUTHENTICATE: &str = "Authentication Required";
@@ -33,8 +29,8 @@ const AUTHENTICATE: &str = "Authentication Required";
 /// and Cancel, Escape or a click on the scrim call `oncancel`. `state` is the caller's, as for
 /// [`crate::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
 /// the field once and empties it, `LockedOut` says when it opens again. `shown` and `on_hidden`
-/// are the sheet's own, for a host that unmaps its surface after the exit. `panel_id` names the
-/// sheet's panel, for a host whose blur region resolves an element id.
+/// are the sheet's own, for a host that unmaps its surface after the exit. `common` is the
+/// sheet's: its `id` names the panel, for a host whose blur region resolves an element id.
 #[component]
 pub fn PolkitPrompt(
     #[props(into)] action: TextLine,
@@ -48,13 +44,13 @@ pub fn PolkitPrompt(
     oncancel: EventHandler<()>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
-    #[props(default)] panel_id: Option<String>,
+    #[props(default)] common: Common,
 ) -> Element {
-    let entry = use_secret_entry(&state, oninput);
+    let password = use_password(&state, oninput);
     let availability = state.availability();
     let go = move || {
         if availability == Availability::Enabled {
-            entry.submit(onsubmit);
+            password.submit(onsubmit);
         }
     };
     let out = match &state {
@@ -69,7 +65,7 @@ pub fn PolkitPrompt(
             on_hidden,
             attach: Attach::Centre,
             width: SheetWidth::Narrow,
-            common: Common { id: panel_id, ..Common::default() },
+            common,
             div { class: "ds-polkit", "data-state": state.slug(),
                 {prompt_picture(user.picture, AT_POLKIT, polkit_life(&state))}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }
@@ -82,7 +78,15 @@ pub fn PolkitPrompt(
                     }
                 }
                 div { class: "ds-polkit-user", "{user.name}" }
-                {field(entry, availability, caps, EventHandler::new(move |()| go()))}
+                PasswordField {
+                    password,
+                    availability,
+                    caps,
+                    form: Form::Boxed,
+                    placeholder: "Password",
+                    escape: Escape::Passes,
+                    onsubmit: move |()| go(),
+                }
                 if let Some(line) = out {
                     div { class: "ds-polkit-hint", "{line}" }
                 }
@@ -106,47 +110,5 @@ fn polkit_life(state: &PromptState) -> Liveliness {
     Liveliness {
         mood,
         ..Liveliness::default()
-    }
-}
-
-/// The boxed secret field, shaking as one with its caps mark. Escape is left to the sheet,
-/// which cancels.
-fn field(
-    entry: SecretEntry,
-    availability: Availability,
-    caps: CapsLock,
-    submit: EventHandler<()>,
-) -> Element {
-    let pulse = entry.pulse.attrs();
-    let class = match &pulse {
-        Some((anim, _)) => format!("ds-polkit-field {anim}"),
-        None => "ds-polkit-field".to_owned(),
-    };
-    let alias = pulse.map(|(_, alias)| alias);
-    rsx! {
-        div { class, "data-pulse": alias,
-            for round in [entry.key()] {
-                TextField {
-                    key: "{round}",
-                    kind: FieldKind::Secure,
-                    label: "Password",
-                    value: "",
-                    placeholder: "Password",
-                    availability,
-                    focus: FieldFocus::OnMount,
-                    oninput: move |next: String| entry.input(next),
-                    onkey: move |event: KeyboardEvent| {
-                        if event.key() == Key::Enter {
-                            submit.call(());
-                        }
-                    },
-                }
-            }
-            if caps == CapsLock::On {
-                span { class: "ds-polkit-caps", role: "img", "aria-label": "Caps Lock is on",
-                    Glyph { icon: Icon::CapsLock, size: IconSize::Compact }
-                }
-            }
-        }
     }
 }
