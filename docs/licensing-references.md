@@ -56,7 +56,7 @@ renders are not committed; the exported PNGs are.
 
 | Asset | Source | Licence | How it is verified | How it ships |
 | --- | --- | --- | --- | --- |
-| `crates/ds/assets/emoji/*.png` (42 emoji x 128 and 256 px sprite sheets, 7.67 MB) | Noto Animated Emoji by Google, `https://fonts.gstatic.com/s/e/notoemoji/latest/<codepoint>/512.webp` as linked from googlefonts.github.io/noto-emoji-animation | CC BY 4.0 | the source site's FAQ, "Animated Noto Emoji is licensed under CC BY 4.0", linking the 4.0 legal code (read from the site bundle 2026-09-26) | `include_bytes!` into `ds`, with `ATTRIBUTION.txt` and `CC-BY-4.0.txt` beside the sheets; design/25-EMOJI.md section 2 carries the attribution line an about box or credits page shows |
+| `crates/ds-shell/assets/emoji/*.png` (42 emoji x 128 and 256 px sprite sheets, 7.67 MB) | Noto Animated Emoji by Google, `https://fonts.gstatic.com/s/e/notoemoji/latest/<codepoint>/512.webp` as linked from googlefonts.github.io/noto-emoji-animation | CC BY 4.0 | the source site's FAQ, "Animated Noto Emoji is licensed under CC BY 4.0", linking the 4.0 legal code (read from the site bundle 2026-09-26) | `include_bytes!` into `ds`, with `ATTRIBUTION.txt` and `CC-BY-4.0.txt` beside the sheets; design/25-EMOJI.md section 2 carries the attribution line an about box or credits page shows |
 
 CC BY 4.0 is a licence on the *data*, not on a crate: `cargo deny check licenses` reads only
 each crate's declared licence (`ds` stays MIT OR Apache-2.0 for its code), so it neither sees

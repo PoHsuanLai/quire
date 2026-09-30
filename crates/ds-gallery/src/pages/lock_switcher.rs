@@ -8,10 +8,12 @@ use crate::axes::Axes;
 use crate::{portrait, wallpaper};
 use dioxus::prelude::*;
 use ds::{
-    AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
-    EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
-    LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
-    TextLine, UserPicture, person_hue, use_scope,
+    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource, ImageSource,
+    Inject, Material, PlateFamily, Px, RootChrome, TextLine, person_hue, use_scope,
+};
+use ds_shell::{
+    AppKey, AppSwitcher, CapsLock, EmojiId, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
+    PolkitPrompt, PromptState, SwitcherApp, UserPicture,
 };
 
 /// The person's letter disc.

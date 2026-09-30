@@ -5,11 +5,9 @@
 //! idle-frame rule); under Reduced motion the ring is at its level at once.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BatteryFigure, BatteryLevel, Ds, DurationToken, Fraction, Material, Motion,
-    MotionLevel, RingMark, RootChrome,
-};
+use ds::{Appearance, Ds, DurationToken, Fraction, Material, Motion, MotionLevel, RootChrome};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{BatteryFigure, BatteryLevel, RingMark};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -22,7 +20,7 @@ static LEVEL: GlobalSignal<Fraction> = Signal::global(|| Fraction(930));
 /// A ring and its figure at `LEVEL`.
 fn stage(motion: Motion, mark: RingMark) -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
             BatteryLevel { level: LEVEL(), mark, label: "This computer" }
             span { id: "figure", BatteryFigure { level: LEVEL() } }
         }

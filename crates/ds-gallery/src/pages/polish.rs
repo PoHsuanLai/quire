@@ -11,12 +11,15 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Alpha;
 use ds::{
-    Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, DockFloor,
-    DockFloorSetting, DockMetrics, Ds, Emphasis, Icon, IconButton, IconButtonVariant, IconSize,
-    IconSource, IconView, Inject, Material, MaterialStack, MenuBarItem, MenuEntrance, MenuEntry,
-    MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, RunningDot, Scheme,
-    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
-    WorkspacePill, WorkspacePills, use_scope,
+    Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
+    Emphasis, Icon, IconButton, IconButtonVariant, IconSize, IconSource, IconView, Inject,
+    Material, MaterialStack, MenuEntrance, MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily,
+    Point, Px, RootChrome, Scheme, Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface,
+    Theme, Tooltip, TooltipKind, use_scope,
+};
+use ds_shell::{
+    DockFloor, DockFloorSetting, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
+    WorkspacePills,
 };
 
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is

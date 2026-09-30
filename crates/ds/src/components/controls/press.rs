@@ -70,7 +70,7 @@ impl Propagation {
 /// send a right-click as that and never as a click; its default is prevented), and `mouseup`
 /// for the middle button, which neither fires as a click on Blitz. Under
 /// [`Propagation::Stop`] each of them keeps its event at the control before reporting.
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct PressListeners {
     press: EventHandler<Press>,
     propagation: Propagation,
@@ -126,7 +126,7 @@ impl PressListeners {
 /// primary button or by Space or Return, until it is released, leaves the control or the control
 /// loses the keyboard. A control puts [`Pressing::listeners`] on its element and writes
 /// [`Pressing::attr`].
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct Pressing {
     phase: Signal<PressPhase>,
 }

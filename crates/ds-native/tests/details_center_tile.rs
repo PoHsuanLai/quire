@@ -3,9 +3,10 @@
 //! on, every moment ending at 0 frames (R3).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, Material, ModuleState, ModuleTile, Motion, TextLine};
+use ds::{Appearance, Ds, Icon, Material, Motion, TextLine};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{ModuleState, ModuleTile};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -35,7 +36,7 @@ fn flip(state: ModuleState) -> ModuleState {
 #[allow(non_snake_case)]
 fn Tiles() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "display:flex; gap:8px; width:340px",
                 div { id: "wifi", style: "flex:1",
                     ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: Some(TextLine::from("On")), state: WIFI(), onclick: move |_| *WIFI.write() = flip(WIFI()) }

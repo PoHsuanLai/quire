@@ -9,9 +9,10 @@ use super::level_tile::work;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, ImageSize, ImageSource, Inject, Material,
-    NotificationSwipe, ShotGhost, ShotThumbnail, Shown, Theme, ThumbAction,
+    Appearance, Button, ButtonVariant, Ds, Icon, ImageSize, ImageSource, Inject, Material, Shown,
+    Theme,
 };
+use ds_shell::{NotificationSwipe, ShotGhost, ShotThumbnail, ThumbAction};
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 

@@ -9,9 +9,10 @@ use super::Section;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    AppMark, Appearance, Button, ButtonVariant, Ds, GroupHeader, Icon, IconSource, Inject,
-    LeavingItem, LeavingList, Material, NotificationCard, Shown,
+    Appearance, Button, ButtonVariant, Ds, Icon, IconSource, Inject, LeavingItem, LeavingList,
+    Material, Shown,
 };
+use ds_shell::{AppMark, GroupHeader, NotificationCard};
 
 /// An app's group.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

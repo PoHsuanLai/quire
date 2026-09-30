@@ -5,15 +5,13 @@
 //! `calendar-compact-<tag>-<weeks>-<scheme>-<scale>.png` with `<tag>` from `QUIRE_CAL_TAG`
 //! (default `now`), for the progress gallery.
 
-#[path = "../../ds/tests/support/month_sample.rs"]
+#[path = "../../ds-shell/tests/support/month_sample.rs"]
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, DayKey, Ds, Material, MonthGrid, MonthKey, MonthStep, RootChrome, TextLine, Theme,
-    WidgetFrame, WidgetMetrics, WidgetSize,
-};
+use ds::{Appearance, Ds, Material, RootChrome, TextLine, Theme};
 use ds_native::{Harness, Viewport};
+use ds_shell::{DayKey, MonthGrid, MonthKey, MonthStep, WidgetFrame, WidgetMetrics, WidgetSize};
 use month_sample::{AUGUST, First, SEPTEMBER, month};
 use std::time::Duration;
 
@@ -59,7 +57,7 @@ fn Shot<const DARK: bool, const SIX: bool>() -> Element {
         "linear-gradient(135deg,#9fc7c4,#e6c79a 55%,#e48f7a)"
     };
     rsx! {
-        Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: "box-sizing:border-box;padding:12px;width:188px;height:188px;background:{wash}",
                 div { style: WidgetMetrics::default().style_attr(),
                     WidgetFrame { size: WidgetSize::Small,

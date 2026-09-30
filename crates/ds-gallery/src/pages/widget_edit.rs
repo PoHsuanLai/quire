@@ -9,11 +9,13 @@
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds::{
-    Appearance, BatteryWidget, CardPresence, Ds, Inject, Material, MonthWidget, Panel, PanelEdge,
-    Px, RootChrome, Shown, SpaceLook, Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost,
-    WidgetMetrics, WidgetSize, WorldClockWidget, use_scope,
+    Appearance, Ds, Inject, Material, Panel, PanelEdge, Px, RootChrome, Shown, SpaceLook, use_scope,
+};
+use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
+use ds_shell::{
+    BatteryWidget, CardPresence, MonthWidget, Timeline, Widget, WidgetCard, WidgetGallery,
+    WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 
 /// The desktop's grid: six columns of the 164 cell and 16 gap in the stage's 1120.
@@ -41,8 +43,8 @@ fn opening() -> WidgetLayout {
 }
 
 /// The size `kind` takes in `host`, from quire's registry.
-fn size_of(kind: &ds::WidgetKind, host: WidgetHost) -> WidgetSize {
-    ds::WidgetRegistry::quire()
+fn size_of(kind: &ds_shell::WidgetKind, host: WidgetHost) -> WidgetSize {
+    ds_shell::WidgetRegistry::quire()
         .get(kind)
         .map(|info| info.size_in(host))
         .unwrap_or_default()

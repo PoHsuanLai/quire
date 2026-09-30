@@ -6,12 +6,12 @@
 //! the frame never leaves 0 and no beat plays.
 
 use dioxus::prelude::*;
-use ds::{
-    AnimatedEmoji, Appearance, Ds, EmojiId, EmojiPlayback, Material, Mood, Motion, PictureSize,
-    Theme, UserPicture, UserPortrait,
-};
+use ds::{Appearance, Ds, Material, Motion, Theme};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{
+    AnimatedEmoji, EmojiId, EmojiPlayback, Mood, PictureSize, UserPicture, UserPortrait,
+};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -26,7 +26,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 #[allow(non_snake_case)]
 fn AttentiveStage() -> Element {
     rsx! {
-        Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
             AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood: Mood::Attentive }
         }
     }
@@ -35,7 +35,7 @@ fn AttentiveStage() -> Element {
 #[allow(non_snake_case)]
 fn Stage() -> Element {
     rsx! {
-        Ds { appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood: MOOD() }
         }
     }
@@ -172,7 +172,7 @@ fn under_reduced_motion_only_still_frames_show() {
 #[allow(non_snake_case)]
 fn StillStage() -> Element {
     rsx! {
-        Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
             AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Medium, playback: EmojiPlayback::Still }
         }
     }
@@ -230,7 +230,7 @@ static PICTURE_MOOD: GlobalSignal<Mood> = Signal::global(|| Mood::Idle);
 #[allow(non_snake_case)]
 fn PortraitStage() -> Element {
     rsx! {
-        Ds { appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme: Theme::Light, motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             UserPortrait { picture: UserPicture::Emoji(EmojiId::Wink), size: PictureSize::Medium, mood: PICTURE_MOOD() }
         }
     }

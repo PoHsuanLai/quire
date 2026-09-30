@@ -4,11 +4,9 @@
 //! Motion row in either layout (the user's decision, 2026-09-28). Measured on the laid-out rects.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, AppearancePicker, Ds, Material, ModuleGrid, ModulePanel, PickerLayout, Rect,
-    SystemPrefs,
-};
+use ds::{Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SystemPrefs};
 use ds_native::{Harness, Viewport};
+use ds_shell::{ModuleGrid, ModulePanel};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -26,7 +24,7 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn Panel() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid {
                     ModulePanel {

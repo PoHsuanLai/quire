@@ -7,13 +7,14 @@
 //! `QUIRE_GALLERY_SHOTS` names a directory, as `edit-widgets-<pose>.png`.
 
 use dioxus::prelude::*;
-use ds::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
-use ds::{
-    Appearance, BatteryCell, BatteryEntry, BatteryWidget, CardPresence, Device, Ds, Fraction,
-    Material, MonthWidget, Panel, PanelEdge, Px, RingMark, RootChrome, Shown, Timeline, Widget,
-    WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
-};
+use ds::{Appearance, Ds, Fraction, Material, Panel, PanelEdge, Px, RootChrome, Shown};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
+use ds_shell::{
+    BatteryCell, BatteryEntry, BatteryWidget, CardPresence, Device, MonthWidget, RingMark,
+    Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize,
+    WorldClockWidget,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -79,7 +80,7 @@ fn Stage() -> Element {
         .cloned()
         .collect();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent), extent: ds::RootExtent::Viewport,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent), extent: ds::RootExtent::Viewport,
             div { style: "position:absolute;inset:0;background:{WASH};{metrics}",
                 for item in placed {
                     Card { key: "{item.id.0}", item, presence: CardPresence::Placed, on_gone: |()| {} }
@@ -149,7 +150,7 @@ fn Row() -> Element {
         })
         .collect();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: "box-sizing:border-box;padding:12px;width:368px;height:188px;background:{WASH};{WidgetMetrics::default().style_attr()}",
                 WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryEntry::Devices(cells)), size: WidgetSize::Medium }
             }

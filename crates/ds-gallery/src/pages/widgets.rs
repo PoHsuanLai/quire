@@ -10,10 +10,10 @@ use super::widget_reference::cell;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BatteryEntry, BatteryWidget, Button, ButtonVariant, ClockCity, ClockEntry,
-    ClockTime, DayPhase, Device, Ds, Fraction, Inject, Material, RingMark, RootChrome, Seconds,
-    Theme, Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
+use ds::{Appearance, Button, ButtonVariant, Ds, Fraction, Inject, Material, RootChrome, Theme};
+use ds_shell::{
+    BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device, RingMark,
+    Seconds, Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 
 const TAIPEI: ClockTime = ClockTime {

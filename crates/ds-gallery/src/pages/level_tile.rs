@@ -5,9 +5,10 @@
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelLook, Material, Muting, Osd,
-    OsdLevel, PRESETS, RootChrome, Scheme, Shown, SpaceLook, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelLook, Material, Muting, PRESETS,
+    RootChrome, Scheme, Shown, SpaceLook, Theme,
 };
+use ds_shell::{Osd, OsdLevel};
 
 /// What the card sits on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

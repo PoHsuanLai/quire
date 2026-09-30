@@ -9,10 +9,11 @@ use crate::pages::level_tile::work;
 use crate::style;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, Material, Muting, Osd,
-    OsdPosition, Point, Px, RootChrome, Shown, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, Material, Muting, Point,
+    Px, RootChrome, Shown, Theme,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{Osd, OsdPosition};
 use image::{RgbaImage, imageops};
 use std::time::Duration;
 

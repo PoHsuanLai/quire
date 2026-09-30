@@ -6,7 +6,7 @@
 
 use std::path::PathBuf;
 
-/// Where the golden called `name` lives: `crates/ds/tests/snapshots/<name>`.
+/// Where the golden called `name` lives: `crates/<crate>/tests/snapshots/<name>`.
 pub fn path(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("tests")

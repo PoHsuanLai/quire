@@ -2,11 +2,9 @@
 //! props (`control_center.grid_*`), the columns share the width, and a Full tile spans them all.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, GridColumns, Icon, Material, ModuleGrid, ModuleState, ModuleTile, Px, Rect,
-    TileSpan,
-};
+use ds::{Appearance, Ds, Icon, Material, Px, Rect};
 use ds_native::{Harness, Viewport};
+use ds_shell::{GridColumns, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -19,7 +17,7 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn Three() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid { columns: GridColumns(3), gap: Px(6.0), padding: Px(10.0),
                     ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", state: ModuleState::On, onclick: |_| {} }

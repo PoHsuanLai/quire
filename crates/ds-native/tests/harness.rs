@@ -13,13 +13,11 @@ use ds::{
     Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState,
     Selection, ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
-use ds::{
-    DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
-    Theme,
-};
+use ds::{FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceLook, TextInput, Theme};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, TokioSpawner, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
+use ds_shell::{DotIndex, SpaceEditor};
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -33,7 +31,7 @@ const VIEW: Viewport = Viewport {
 #[component]
 fn Root(children: Element) -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, {children} }
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, {children} }
     }
 }
 

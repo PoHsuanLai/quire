@@ -4,10 +4,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Fraction, Icon, LevelControl, LevelGlyph, Material, ModuleGrid, ModulePanel,
-    ModuleState, ModuleTile, Muting, Point, Px, Rect,
+    Appearance, Ds, Fraction, Icon, LevelControl, LevelGlyph, Material, Muting, Point, Px, Rect,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(200));
@@ -23,7 +23,7 @@ const VIEW: Viewport = Viewport {
 fn Sound() -> Element {
     let percent = VALUE().0 / 10;
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid {
                     ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", state: ModuleState::On, onclick: |_| {} }

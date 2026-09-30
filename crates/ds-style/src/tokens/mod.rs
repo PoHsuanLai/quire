@@ -24,6 +24,8 @@ pub mod pixel;
 pub mod plate;
 pub mod set;
 pub mod shape;
+pub mod shell_scale;
+pub mod shell_type;
 #[cfg(test)]
 pub mod size_rules_tests;
 pub mod size_scale;
@@ -37,3 +39,4 @@ pub mod tuned;
 pub mod type_scale;
 pub mod type_voice;
 pub(crate) mod vibrancy;
+pub mod widget_paint;

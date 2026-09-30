@@ -4,12 +4,10 @@
 //! Reduced (R7).
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Material, Motion, NowPlayingTrack, PlayPauseButton, Playback, TextLine,
-    TrackPosition,
-};
+use ds::{Appearance, Ds, Material, Motion, TextLine};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{NowPlayingTrack, PlayPauseButton, Playback, TrackPosition};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -34,7 +32,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 #[allow(non_snake_case)]
 fn Player() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "width:340px",
                 div { id: "track", NowPlayingTrack { title: TextLine::from(TITLE()), by: Some(TextLine::from("Claude Debussy")) } }
                 div { id: "toggle",

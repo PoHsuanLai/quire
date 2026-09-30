@@ -6,7 +6,7 @@
 //! dark panel's days are pressable and report the day picked. Last, the compact grid:
 //! `MonthDensity::Auto` inside a small desktop `WidgetFrame`, a six-week August.
 
-#[path = "../../../ds/tests/support/month_sample.rs"]
+#[path = "../../../ds-shell/tests/support/month_sample.rs"]
 pub(crate) mod month_sample;
 
 use super::Section;
@@ -14,9 +14,9 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CardAccent, DayKey, Ds, FrameTint, Grain, Inject, Material, MonthGrid, MonthStep,
-    RootChrome, Theme, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize, default_look,
+    Appearance, CardAccent, Ds, FrameTint, Grain, Inject, Material, RootChrome, Theme, default_look,
 };
+use ds_shell::{DayKey, MonthGrid, MonthStep, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize};
 use month_sample::{AUGUST, First, SEPTEMBER, month as lay_out, sample, shift};
 
 /// The small widget's today and busy days, so its August shows the disc and the dots.

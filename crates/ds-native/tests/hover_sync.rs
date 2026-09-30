@@ -5,12 +5,10 @@
 //! harness's frame now dispatches that change (`ds_native`'s `hover_sync`).
 
 use dioxus::prelude::*;
-use ds::{
-    AppMark, Appearance, Banner, BannerKey, BannerStack, Ds, Icon, IconSource, Material,
-    NotificationCard, Point, Px,
-};
+use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
+use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -170,7 +168,7 @@ fn Stack() -> Element {
         })
         .collect();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Toast,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Toast,
             BannerStack { banners }
         }
     }

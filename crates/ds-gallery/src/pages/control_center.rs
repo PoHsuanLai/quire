@@ -10,14 +10,16 @@ use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, CardAccent, Check, Chevron, Ds, FrameTint, Grain, Icon,
-    Inject, Material, ModuleGrid, ModuleState, ModuleTile, Pane, PaneSwitcher, RootChrome,
-    RowTrailing, SettingsRow, TextLine, Theme, TileSpan, default_look,
+    Appearance, Button, ButtonVariant, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject,
+    Material, Pane, PaneSwitcher, RootChrome, RowTrailing, SettingsRow, TextLine, Theme,
+    default_look,
 };
 use ds::{
-    AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, ModulePanel, Muting,
-    PickerLayout, Px, SystemPrefs,
+    AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, Muting, PickerLayout, Px,
+    SystemPrefs,
 };
+use ds_shell::ModulePanel;
+use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 
 /// The module whose detail a chevron opened.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

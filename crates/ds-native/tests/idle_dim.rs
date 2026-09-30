@@ -4,9 +4,10 @@
 //! Reduced motion shows the level at once. Every case ends at 0 frames (R3).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, IdleDim, IdleDimPhase, Material, Motion, Percent};
+use ds::{Appearance, Ds, Material, Motion, Percent};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{IdleDim, IdleDimPhase};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -22,7 +23,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 #[allow(non_snake_case)]
 fn Overlay() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             OverlayBody {}
         }
     }

@@ -9,9 +9,12 @@ use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{
-    DeviceBattery, Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize, LevelControl,
-    LevelGlyph, LevelLook, LevelMode, ModuleGrid, ModulePanel, ModuleState, ModuleTile,
-    NowPlayingTrack, PlayPauseButton, Playback, Px, RingMark, TextLine, TrackPosition,
+    Fraction, Glyph, Icon, IconButton, IconButtonVariant, IconSize, LevelControl, LevelGlyph,
+    LevelLook, LevelMode, Px, TextLine,
+};
+use ds_shell::{
+    DeviceBattery, ModuleGrid, ModulePanel, ModuleState, ModuleTile, NowPlayingTrack,
+    PlayPauseButton, Playback, RingMark, TrackPosition,
 };
 use std::time::Duration;
 

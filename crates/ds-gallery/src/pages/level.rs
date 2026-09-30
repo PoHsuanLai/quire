@@ -9,9 +9,9 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{
     Appearance, BlurState, Button, ButtonVariant, Ds, Fraction, Inject, LevelControl, LevelGlyph,
-    LevelLook, Material, Muting, Osd, OsdLevel, OsdMetrics, OsdPosition, RootChrome, Scheme, Shown,
-    use_scope,
+    LevelLook, Material, Muting, RootChrome, Scheme, Shown, use_scope,
 };
+use ds_shell::{Osd, OsdLevel, OsdMetrics, OsdPosition};
 
 /// The Level page.
 #[component]

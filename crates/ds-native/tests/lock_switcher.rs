@@ -8,12 +8,14 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds,
-    EmojiId, Icon, IconSource, LockPrompt, LockUser, Material, MotionLevel, PlateFamily,
-    PolkitPrompt, PromptState, Px, RootChrome, ShortcutKey, SwitcherApp, person_hue, settle,
+    Anim, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource,
+    Material, MotionLevel, PlateFamily, Px, RootChrome, ShortcutKey, person_hue, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{
+    AppKey, AppSwitcher, EmojiId, LockPrompt, LockUser, PolkitPrompt, PromptState, SwitcherApp,
+};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -46,7 +48,7 @@ fn user() -> LockUser {
 #[allow(non_snake_case)]
 fn EmojiLock() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "display:flex; justify-content:center; padding:24px",
                 LockPrompt {
                     user: LockUser::new("Dana Reyes", EmojiId::Wink),
@@ -62,7 +64,7 @@ fn EmojiLock() -> Element {
 #[allow(non_snake_case)]
 fn Lock() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "display:flex; justify-content:center; padding:24px",
                 LockPrompt {
                     user: user(),
@@ -78,7 +80,7 @@ fn Lock() -> Element {
 #[allow(non_snake_case)]
 fn Polkit() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Sheet,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet,
             div { style: "height:400px" }
             PolkitPrompt {
                 action: "Authentication is required to change the system's time zone.",
@@ -442,7 +444,7 @@ fn Switcher() -> Element {
         })
         .collect();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Osd, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Osd, chrome: Some(RootChrome::Transparent),
             div { style: "display:flex; justify-content:center; padding:24px 0",
                 AppSwitcher {
                     apps,

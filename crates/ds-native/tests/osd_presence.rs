@@ -5,11 +5,12 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, Appearance, Ds, Fraction, LevelGlyph, Material, MotionLevel, Muting, Osd, OsdLevel,
-    RootChrome, Shown, settle,
+    Anim, Appearance, Ds, Fraction, LevelGlyph, Material, MotionLevel, Muting, RootChrome, Shown,
+    settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{Osd, OsdLevel};
 use std::time::Duration;
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
@@ -24,7 +25,7 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn Card() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Osd, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Osd, chrome: Some(RootChrome::Transparent),
             Osd {
                 shown: SHOWN(),
                 label: "Sound",

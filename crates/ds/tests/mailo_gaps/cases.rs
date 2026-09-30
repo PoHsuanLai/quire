@@ -12,10 +12,6 @@ use ds::{
     AvatarFace, AvatarShape, AvatarSize, AvatarTone, ItemKind, PersonHue, Presence, Selection,
     SidebarItem, TodayTrailing,
 };
-use ds::{
-    CardAccent, DotIndex, MeasuredIn, Motion, MotionChoice, PRESETS, Scheme, SpaceEditor,
-    SpaceLook, Theme,
-};
 
 /// A scheduled draft's favicon.
 const CLOCKED: AvatarFace = AvatarFace {
@@ -52,32 +48,6 @@ fn poh() -> AccountFace {
         colour: VIOLET,
         provider: MarkProvider::Google,
         address: Some("poh@acme.example".to_string()),
-    }
-}
-
-/// Preset `index` as a Space's look, in `theme`.
-fn look(index: usize, theme: Theme) -> SpaceLook {
-    SpaceLook {
-        dots: PRESETS[index].dots.to_vec(),
-        grain: ds::Grain(35),
-        theme,
-        card_accent: CardAccent::SpaceHue,
-    }
-}
-
-/// The editor with every mail-app row switched on, for a Space whose theme is `theme`.
-fn editor_rows(theme: Theme) -> Element {
-    rsx! {
-        SpaceEditor {
-            look: look(0, theme),
-            scheme: Scheme::Light,
-            active_dot: DotIndex(0),
-            onchange: |_| {},
-            name: "Work".to_string(),
-            on_rename: EventHandler::new(|_: String| {}),
-            motion: MotionChoice { level: Motion::Reduced, on_motion: EventHandler::new(|_: Motion| {}) },
-            measured: MeasuredIn::EachScheme,
-        }
     }
 }
 
@@ -132,20 +102,6 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "lists/sidebar_item/today-scheduled.html",
         make: scheduled,
-    },
-    // SpaceEditor: the name field, the Motion row and the readout per scheme (both for a
-    // System Space, one for a Dark one); an unnamed Space's field shows its placeholder.
-    Case {
-        golden: "lists/space_editor/rows-system.html",
-        make: || editor_rows(Theme::System),
-    },
-    Case {
-        golden: "lists/space_editor/rows-dark.html",
-        make: || editor_rows(Theme::Dark),
-    },
-    Case {
-        golden: "lists/space_editor/rename-unnamed.html",
-        make: || rsx! { SpaceEditor { look: look(2, Theme::Light), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, on_rename: EventHandler::new(|_: String| {}) } },
     },
     // Avatar: an account's colour muted (chroma .55, hue and lightness kept),
     // and a person's; a muted ink avatar is greyscale already and keeps its colours.

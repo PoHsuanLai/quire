@@ -4,10 +4,8 @@
 use super::{Caption, Section};
 use crate::axes::{Axes, PresetIndex};
 use dioxus::prelude::*;
-use ds::{
-    Chip, ChipVariant, DotIndex, FrameVars, MeasuredIn, MotionChoice, Selection, Shortcut,
-    ShortcutKey, SpaceDot, SpaceEditor, readout, use_scope,
-};
+use ds::{Chip, ChipVariant, FrameVars, Selection, Shortcut, ShortcutKey, readout, use_scope};
+use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
 
 /// The Space page.
 #[component]

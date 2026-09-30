@@ -7,13 +7,13 @@
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
 use ds::{
-    Appearance, Button, ButtonVariant, Check, Chevron, Ds, Fraction, Icon, IconButton,
-    IconButtonVariant, IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook,
-    Material, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile, Muting, PlateFamily,
-    PlateTint, Px, Scheme, SegSize, SegmentedControl, Shown, Slider, StatusMetrics, Surface, Theme,
-    Toggle,
+    Appearance, Button, ButtonVariant, Check, Ds, Fraction, Icon, IconButton, IconButtonVariant,
+    IconSize, IconSource, IconView, LevelControl, LevelGlyph, LevelLook, Material, Muting,
+    PlateFamily, PlateTint, Px, Scheme, SegSize, SegmentedControl, Shown, Slider, StatusMetrics,
+    Surface, Theme, Toggle,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{Chevron, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -93,7 +93,7 @@ fn Sheet(theme: Theme) -> Element {
     };
     let row = "display:flex;align-items:center;gap:12px;padding:10px 14px;";
     rsx! {
-        Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { theme, ..Appearance::default() }, material: Material::Window,
             div { style: "display:flex;flex-direction:column;gap:8px;padding:12px;",
                 // The bar: 32 tall as sill's default, a title pill, three status items, the clock.
                 Surface { material: Material::Bar, theme: Some(scheme),

@@ -7,7 +7,8 @@ use super::widget_reference::{BatteryGrid, BatteryRow, BatterySolo, ClockMedium,
 use crate::axes::Axes;
 use crate::wallpaper_vivid::{self, HEIGHT, WIDTH};
 use dioxus::prelude::*;
-use ds::{Appearance, BlurState, Ds, Inject, Material, RootChrome, SpaceLook, WidgetMetrics};
+use ds::{Appearance, BlurState, Ds, Inject, Material, RootChrome, SpaceLook};
+use ds_shell::WidgetMetrics;
 
 /// Where a card sits on the wall, in logical pixels from its top left.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

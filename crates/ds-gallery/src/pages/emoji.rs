@@ -7,10 +7,10 @@
 use super::{Caption, Section};
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{
-    AnimatedEmoji, AvatarFace, AvatarShape, AvatarSize, AvatarTone, DiscHue, EMOJI_ATTRIBUTION,
-    EmojiDisc, EmojiId, EmojiPlayback, Mood, PictureChoice, PictureSize, UserPicturePicker,
-    person_hue,
+use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue};
+use ds_shell::{
+    AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback, Mood,
+    PictureChoice, PictureSize, UserPicturePicker,
 };
 
 const STILL: EmojiPlayback = EmojiPlayback::Still;

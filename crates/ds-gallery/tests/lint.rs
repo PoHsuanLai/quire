@@ -13,7 +13,7 @@ fn the_gallery_stylesheet_is_clean_at_the_strict_profile() {
         GALLERY_CSS,
         &LintConfig {
             profile: Profile::Strict,
-            ..LintConfig::new(&ds::kits())
+            ..LintConfig::new(&ds_shell::kits())
         },
     )
     .into_iter()

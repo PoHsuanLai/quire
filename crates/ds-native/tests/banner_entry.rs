@@ -8,12 +8,12 @@
 //! entry side lands on the card while it is still sliding in, and never on the other side.
 
 use dioxus::prelude::*;
-use ds::{
-    AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerStack, Ds, Icon, IconSource,
-    Material, NotificationCard, NotificationSwipe, Point, Px, Rect,
-};
+use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px, Rect};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
+use ds_shell::{
+    AppMark, Banner, BannerEntry, BannerKey, BannerStack, NotificationCard, NotificationSwipe,
+};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -46,7 +46,7 @@ fn Stack() -> Element {
         })
         .collect();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Toast,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Toast,
             div { style: "width:420px",
                 BannerStack { banners, entry: ENTRY() }
             }

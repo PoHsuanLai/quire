@@ -6,9 +6,10 @@
 use dioxus::prelude::*;
 use ds::{
     Appearance, CardAccent, Ds, FrameVars, Grain, Material, PRESETS, Scheme, Selection, Shortcut,
-    ShortcutKey, SpaceDot, SpaceLook, Theme,
+    ShortcutKey, SpaceLook, Theme,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::SpaceDot;
 
 const VIEW: Viewport = Viewport {
     width: 200,
@@ -39,7 +40,7 @@ fn cases() -> [usize; 2] {
 #[allow(non_snake_case)]
 fn Dots() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             for (n , index) in cases().into_iter().enumerate() {
                 div { key: "{n}", style: "position:absolute;left:{40 + 60 * n}px;top:30px",
                     SpaceDot {

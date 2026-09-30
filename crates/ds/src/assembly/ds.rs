@@ -16,6 +16,10 @@
 //! the bar and the dock stamp `data-ground="frame"` so the components on them take the `--f-*`
 //! inks.
 //!
+//! `stylesheet` says how the stylesheet reaches the document (`Inject`); `sheet` is the text
+//! `Inject::Inline` writes: `None` is `ds::stylesheet()`, and a crate that adds components of its
+//! own passes the sheet its kits make (`ds_shell::stylesheet()`), so the root draws them too.
+//!
 //! The root also writes `--m-tint-alpha` inline: the materials' tint over blur scales by the
 //! `appearance.material_tint_alpha` settings key (design/22-SETTINGS.md section 3.1, default
 //! 80). A host passes the key as the `tint_alpha` prop (thousandths: 800
@@ -91,6 +95,7 @@ pub fn Ds(
     material: Material,
     #[props(default)] blur: BlurState,
     #[props(default)] stylesheet: Inject,
+    #[props(default)] sheet: Option<&'static str>,
     #[props(default)] tint_alpha: Option<Alpha>,
     #[props(default)] chrome: Option<RootChrome>,
     #[props(default)] ground: Option<Ground>,
@@ -169,7 +174,7 @@ pub fn Ds(
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
             onclick: move |event: MouseEvent| click_root.clicked(&event),
             if stylesheet == Inject::Inline {
-                style { {crate::assembly::stylesheet::stylesheet()} }
+                style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
             }
             match frame_tint {
                 FrameTint::Opaque => frame_layers(layers),

@@ -8,8 +8,10 @@ use ds::Word;
 use ds::{
     Accent, Appearance, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
     CommandPalette, CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile,
-    MenuTrail, ModuleGrid, ModuleState, ModuleTile, MonthGrid, Radius, RootChrome, Scheme,
-    SegmentedControl, Surface, Theme, Toggle, WidgetFrame, WidgetMetrics, WidgetSize, accent_of,
+    MenuTrail, Radius, RootChrome, Scheme, SegmentedControl, Surface, Theme, Toggle, accent_of,
+};
+use ds_shell::{
+    ModuleGrid, ModuleState, ModuleTile, MonthGrid, WidgetFrame, WidgetMetrics, WidgetSize,
 };
 
 /// The colours an accent lends its surfaces, as CSS.
@@ -142,18 +144,18 @@ pub fn Specimens(scheme: Scheme) -> Element {
     }
 }
 
-const TODAY: ds::DayKey = ds::DayKey {
+const TODAY: ds_shell::DayKey = ds_shell::DayKey {
     year: 2026,
     month: 8,
     day: 14,
 };
-const BUSY: [ds::DayKey; 2] = [
-    ds::DayKey {
+const BUSY: [ds_shell::DayKey; 2] = [
+    ds_shell::DayKey {
         year: 2026,
         month: 8,
         day: 5,
     },
-    ds::DayKey {
+    ds_shell::DayKey {
         year: 2026,
         month: 8,
         day: 27,

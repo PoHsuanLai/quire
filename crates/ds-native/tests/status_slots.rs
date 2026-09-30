@@ -7,12 +7,12 @@ use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{
     Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconButton, IconButtonVariant,
-    IconSource, LevelControl, LevelGlyph, LowAt, Material, ModulePanel, ModuleState, ModuleTile,
-    Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves, WifiBars, WifiReach,
-    WifiState,
+    IconSource, LevelControl, LevelGlyph, LowAt, Material, Muting, Px, StatusMetrics, StatusState,
+    VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -57,7 +57,7 @@ static ITEM: GlobalSignal<StatusState> = Signal::global(|| {
 fn Bar() -> Element {
     let status = ITEM();
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "bar", style: METRICS.style_attr(),
                 IconButton {
                     variant: IconButtonVariant::Status,
@@ -147,7 +147,7 @@ fn Center() -> Element {
         reach: WifiReach::NoInternet,
     });
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "panel",
                 ModulePanel { glyph: IconSource::Status(status), title: "Battery",
                     p { "93 %" }
@@ -218,7 +218,7 @@ static VOLUME: GlobalSignal<VolumeState> = Signal::global(|| VolumeState::Muted)
 #[allow(non_snake_case)]
 fn Sound() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "shared", style: "width: 300px",
                 LevelControl { label: "Volume", value: Fraction(500), glyph: VOLUME(), onchange: |_| {} }
             }

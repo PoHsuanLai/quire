@@ -23,6 +23,8 @@ pub mod scale;
 #[cfg(feature = "dioxus")]
 pub mod scope;
 pub mod space;
+#[cfg(test)]
+mod stored_words;
 #[cfg(feature = "dioxus")]
 pub mod task;
 pub mod tokens;
