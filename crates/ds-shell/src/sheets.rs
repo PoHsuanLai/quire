@@ -14,7 +14,7 @@ pub(crate) const SHEETS: [Sheet; 31] = [
     Sheet {
         name: "app_switcher",
         css: include_str!("switcher/app_switcher.css"),
-        after: "appearance_picker",
+        after: "alert",
     },
     Sheet {
         name: "banner_stack",

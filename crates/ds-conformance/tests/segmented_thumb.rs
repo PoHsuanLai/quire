@@ -23,8 +23,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SegmentedControl,
-    SystemPrefs, Theme,
+    Accent, Appearance, Arrangement, Ds, Material, RadioGroup, Rect, SectionHeader,
+    SegmentedControl, Theme,
 };
 use ds::{Choice, ControlSize, Tracking};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
@@ -40,7 +40,7 @@ thread_local! {
 /// The three controls, each group's selector.
 const GROUPS: [&str; 3] = [
     ".compact .ds-segmented",
-    ".full .ds-appearance-row:nth-child(1) .ds-segmented",
+    ".full .ds-segmented",
     ".power .ds-segmented",
 ];
 
@@ -68,29 +68,59 @@ fn Desk() -> Element {
         (2, "Performance".to_owned()),
     ];
     rsx! {
-        Ds { sheet: Some(ds_shell::stylesheet()), appearance: appearance(), material: Material::Popover,
-            div { style: "width:320px",
-                ModuleGrid {
-                    ModulePanel {
-                        div { class: "compact",
-                            AppearancePicker { value: appearance(), system: SystemPrefs::default(),
-                                onchange: move |next| appearance.set(next), layout: PickerLayout::Compact }
+            Ds { sheet: Some(ds_shell::stylesheet()), appearance: appearance(), material: Material::Popover,
+                div { style: "width:320px",
+                    ModuleGrid {
+                        ModulePanel {
+                            div { class: "compact",
+    div { style: "display:grid;gap:14px",
+                        SectionHeader { title: "Theme" }
+                        SegmentedControl::<Theme> {
+                            label: "Theme",
+                            choices: Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label()))),
+                            tracking: Tracking::SelectOne(appearance().theme),
+                            onchange: move |theme| appearance.set(Appearance { theme, ..appearance() }),
+                        }
+                        SectionHeader { title: "Accent" }
+                        RadioGroup::<Accent> {
+                            label: "Accent",
+                            arrangement: Arrangement::Swatches,
+                            choices: Accent::ALL.iter().map(|accent| Choice::accent(*accent)).collect(),
+                            value: appearance().accent,
+                            onchange: move |accent| appearance.set(Appearance { accent, ..appearance() }),
                         }
                     }
-                    ModulePanel {
-                        div { class: "power",
-                            SegmentedControl::<u8> { label: "Power Mode", size: ControlSize::Mini, choices: Choice::pairs(profiles),
-                                tracking: Tracking::SelectOne(profile()), onchange: move |next| profile.set(next) }
+                            }
+                        }
+                        ModulePanel {
+                            div { class: "power",
+                                SegmentedControl::<u8> { label: "Power Mode", size: ControlSize::Mini, choices: Choice::pairs(profiles),
+                                    tracking: Tracking::SelectOne(profile()), onchange: move |next| profile.set(next) }
+                            }
                         }
                     }
-                }
-                div { class: "full",
-                    AppearancePicker { value: appearance(), system: SystemPrefs::default(),
-                        onchange: move |next| appearance.set(next) }
+                    div { class: "full",
+    div { style: "display:grid;gap:14px",
+                        SectionHeader { title: "Theme" }
+                        SegmentedControl::<Theme> {
+                            label: "Theme",
+                            choices: Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label()))),
+                            tracking: Tracking::SelectOne(appearance().theme),
+                            onchange: move |theme| appearance.set(Appearance { theme, ..appearance() }),
+                        }
+                        SectionHeader { title: "Accent" }
+                        RadioGroup::<Accent> {
+                            label: "Accent",
+                            arrangement: Arrangement::Swatches,
+                            choices: Accent::ALL.iter().map(|accent| Choice::accent(*accent)).collect(),
+                            value: appearance().accent,
+                            onchange: move |accent| appearance.set(Appearance { accent, ..appearance() }),
+                        }
+                    }
+                    }
                 }
             }
         }
-    }
 }
 
 fn desk(scale_percent: u16, theme: Theme, accent: Accent) -> Harness {

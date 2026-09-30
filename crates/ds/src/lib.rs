@@ -125,7 +125,6 @@ pub use crate::components::{
         text_field_model::{FieldBezel, FieldKind, Invalid, Validity},
     },
     lists::{
-        appearance_picker::{AppearancePicker, PickerLayout},
         emoji_grid::grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid},
         list::{
             list::List,

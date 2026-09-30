@@ -7,7 +7,6 @@
    O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
-   The Space dot is also the AppearancePicker's accent swatch (section 26).
    `.ds-field` is this editor's colour field only (a text field's wrapper is `.ds-input-wrap`, not `.ds-field`, and
    its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
    22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which

@@ -30,3 +30,12 @@
 .ds-radio-group-item[*|aria-disabled=true],
 .ds-radio-group[*|aria-disabled=true],
 .ds-radio-group[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+
+/* Swatches: colour circles five apart, each 22 with a 2 ring that is transparent until checked, then the
+   ink. The words only name the button (`.ds-radio-group-name`, visually hidden). */
+.ds-radio-group[*|data-arrangement=swatches]{ flex-direction:row; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
+.ds-radio-group-swatch{ display:block; flex:none; box-sizing:border-box; width:22px; height:22px; border-radius:var(--r-pill); border:2px solid transparent;
+  transition:border-color var(--t-quick) var(--e-in-out); }
+.ds-radio-group-item[*|data-state=on] .ds-radio-group-swatch{ border-color:var(--ink); }
+.ds-radio-group-item[*|data-pressed] .ds-radio-group-swatch{ opacity:.8; }
+.ds-radio-group-name{ position:absolute; width:var(--hair); height:var(--hair); overflow:hidden; }

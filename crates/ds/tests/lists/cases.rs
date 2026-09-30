@@ -3,7 +3,6 @@
 
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{Accent, Appearance, AppearancePicker, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use ds::{
     Colour, CommandPill, DragGhost, DropLine, DropState, EdgePeek, Expiry, Hex, HoverStrip,
     ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Row, RowShape,
@@ -136,37 +135,5 @@ pub const CASES: &[Case] = &[
         component: "hover_strip",
         state: "default",
         make: || rsx! { HoverStrip { actions: strip_actions() } },
-    },
-    // AppearancePicker.
-    Case {
-        component: "appearance_picker",
-        state: "default",
-        make: || rsx! { AppearancePicker { value: Appearance::default(), system: SystemPrefs::default(), onchange: |_| {} } },
-    },
-    Case {
-        component: "appearance_picker",
-        state: "system-dark-reduced",
-        make: || {
-            rsx! {
-                AppearancePicker {
-                    value: Appearance::default(),
-                    system: SystemPrefs { scheme: Scheme::Dark, motion: ReducedMotion::Reduce, ..SystemPrefs::default() },
-                    onchange: |_| {},
-                }
-            }
-        },
-    },
-    Case {
-        component: "appearance_picker",
-        state: "dark-red-calm",
-        make: || {
-            rsx! {
-                AppearancePicker {
-                    value: Appearance { theme: Theme::Dark, accent: Accent::Red, motion: Motion::Reduced },
-                    system: SystemPrefs::default(),
-                    onchange: |_| {},
-                }
-            }
-        },
     },
 ];

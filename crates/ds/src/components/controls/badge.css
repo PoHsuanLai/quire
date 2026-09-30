@@ -1,6 +1,6 @@
 /* Badge (design/30 section 2.9): a capsule with a count, or a dot. Attribute selectors carry
-   `*|` (spike S2). The count is in the data face, tabular. Alert is `--danger` with its ink
-   (`--danger-ink`); Quiet is a neutral capsule (`--surface-2`, a hairline, `--ink-soft`). No bump:
+   `*|` (spike S2). The count is in the data face, tabular. Alert is systemRed (the red accent's own
+   `--swatch-red`, #FF3B30 light and #FF453A dark, not the muted `--danger` that reads as text) with white ink (`--on-hue`); Quiet is a neutral capsule (`--surface-2`, a hairline, `--ink-soft`). No bump:
    a count changes as any text does. Placement is the parent's (`margin-left:auto` in a row, a
    corner of a tile). */
 
@@ -11,7 +11,7 @@
 }
 .ds-badge[*|data-size=mini]{ --bd-h:var(--s-12); --bd-fs:var(--fs-nano); padding:0 var(--s-3); }
 .ds-badge[*|data-size=small]{ --bd-h:var(--s-14); --bd-fs:var(--fs-caption); }
-.ds-badge[*|data-tone=alert]{ background:var(--danger); color:var(--danger-ink); }
+.ds-badge[*|data-tone=alert]{ background:var(--swatch-red); color:var(--on-hue); }
 .ds-badge[*|data-tone=quiet]{ background:var(--surface-2); color:var(--ink-soft); box-shadow:inset 0 0 0 var(--hair) var(--line); }
 /* The dot has no number: a circle of the badge's height, less the label's inset. */
 .ds-badge[*|data-content=dot]{ min-width:0; width:calc(var(--bd-h) / 2); height:calc(var(--bd-h) / 2); padding:0; }

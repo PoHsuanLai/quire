@@ -116,7 +116,6 @@ fn sheets(component: &str) -> Vec<&'static str> {
         ],
         "pin_tile" => &["pin_tile", "avatar", "provider_mark", "badge"],
         "hover_strip" => &["hover_strip", "icon_button"],
-        "appearance_picker" => &["appearance_picker", "section_header", "segmented"],
         "drag" => &["drag_ghost"],
         other => return sheet(other).into_iter().collect(),
     };
@@ -178,7 +177,6 @@ const OWN: &[&str] = &[
     "list",
     "disclosure",
     "hover_strip",
-    "appearance_picker",
     "command_pill",
     "pin_tile",
     "provider_mark",

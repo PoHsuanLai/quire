@@ -12,11 +12,14 @@ use dioxus::prelude::*;
 use ds::Availability;
 use ds::Bezel;
 use ds::{
+    Accent, Arrangement, Choice, Fraction, LevelGlyph, Muting, Px, RadioGroup, SectionHeader,
+    SegmentedControl, Tracking, Word,
+};
+use ds::{
     Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, List,
     ListItem, Material, Pane, PaneSwitcher, RootChrome, Row, RowLeading, RowSize, TextLine, Theme,
     default_look,
 };
-use ds::{AppearancePicker, Fraction, LevelGlyph, Muting, PickerLayout, Px, SystemPrefs};
 use ds::{Slider, SliderLook};
 use ds_shell::ModulePanel;
 use ds_shell::{ModuleGrid, ModuleTile, TileSpan};
@@ -104,31 +107,47 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
     let mut appearance = use_signal(Appearance::default);
     let percent = volume().0 / 10;
     rsx! {
-        // The panel's body pads both panes, so the grid adds none of its own.
-        ModuleGrid { padding: Px(0.0),
-            ModuleTile {
-                glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: wifi(),
-                onclick: move |_| wifi.set(wifi().flipped()), on_detail: move |_| on_open.call(Module::WiFi),
-            }
-            ModuleTile {
-                glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: bluetooth(),
-                onclick: move |_| bluetooth.set(bluetooth().flipped()), on_detail: move |_| on_open.call(Module::Bluetooth),
-            }
-            ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Do Not Disturb", value: focus(), onclick: move |_| focus.set(focus().flipped()) }
-            ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", value: Check::Off, availability: Availability::Busy, onclick: |_| {} }
-            ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
-            ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
-                Slider { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::CapsuleKnob, onchange: move |next| volume.set(next) }
-            }
-            // A level that cannot move (no brightness control on this display) says so.
-            ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: ds::Availability::Disabled,
-                Slider { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: SliderLook::CapsuleKnob, availability: ds::Availability::Disabled }
-            }
-            ModulePanel {
-                AppearancePicker { value: appearance(), system: SystemPrefs::default(), onchange: move |next| appearance.set(next), layout: PickerLayout::Compact }
+            // The panel's body pads both panes, so the grid adds none of its own.
+            ModuleGrid { padding: Px(0.0),
+                ModuleTile {
+                    glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: wifi(),
+                    onclick: move |_| wifi.set(wifi().flipped()), on_detail: move |_| on_open.call(Module::WiFi),
+                }
+                ModuleTile {
+                    glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: bluetooth(),
+                    onclick: move |_| bluetooth.set(bluetooth().flipped()), on_detail: move |_| on_open.call(Module::Bluetooth),
+                }
+                ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Do Not Disturb", value: focus(), onclick: move |_| focus.set(focus().flipped()) }
+                ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", value: Check::Off, availability: Availability::Busy, onclick: |_| {} }
+                ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", value: Check::Off, span: TileSpan::Full, onclick: |_| {} }
+                ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
+                    Slider { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::CapsuleKnob, onchange: move |next| volume.set(next) }
+                }
+                // A level that cannot move (no brightness control on this display) says so.
+                ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: ds::Availability::Disabled,
+                    Slider { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: SliderLook::CapsuleKnob, availability: ds::Availability::Disabled }
+                }
+                ModulePanel {
+    div { style: "display:grid;gap:14px",
+                        SectionHeader { title: "Theme" }
+                        SegmentedControl::<Theme> {
+                            label: "Theme",
+                            choices: Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label()))),
+                            tracking: Tracking::SelectOne(appearance().theme),
+                            onchange: move |theme| appearance.set(ds::Appearance { theme, ..appearance() }),
+                        }
+                        SectionHeader { title: "Accent" }
+                        RadioGroup::<Accent> {
+                            label: "Accent",
+                            arrangement: Arrangement::Swatches,
+                            choices: Accent::ALL.iter().map(|accent| Choice::accent(*accent)).collect(),
+                            value: appearance().accent,
+                            onchange: move |accent| appearance.set(ds::Appearance { accent, ..appearance() }),
+                        }
+                    }
+                }
             }
         }
-    }
 }
 
 /// The detail pane: a back button and the module's list.

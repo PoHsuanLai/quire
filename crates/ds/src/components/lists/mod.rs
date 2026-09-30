@@ -1,7 +1,6 @@
 //! Lists: rows and the list they live in, section headers, the emoji grid, the preview pane and
 //! the appearance picker.
 
-pub(crate) mod appearance_picker;
 pub mod emoji_grid;
 pub(crate) mod list;
 pub(crate) mod preview;
