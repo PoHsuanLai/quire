@@ -48,7 +48,7 @@ pub enum DurationToken {
     /// (`idle.dim_level_pct`), Rust-driven like a `Sweep` rather than a keyframe, because waking
     /// must snap mid-fade and a CSS animation cannot retarget that way without a restyle
     /// (design/22-SETTINGS.md section 3.24 `idle.dim_s`/`idle.dim_level_pct`;
-    /// `ds::detail::idle_dim`). Reduced: 60 ms like every other transition by this table, but the
+    /// `ds::motion::detail::idle_dim`). Reduced: 60 ms like every other transition by this table, but the
     /// primitive itself never plays it that long — Reduced jumps straight to the level, the way
     /// `Sweep`'s own `Stand` plan does (R7, design/26 section 3.3).
     IdleDim,

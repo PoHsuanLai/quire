@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::base::time::FRAME_TICK;
-use ds::detail::Touch;
+use ds::motion::detail::touch::Touch;
 use ds::motion::projection::Throw;
 use ds::motion::spring::SpringPhase;
 use ds::motion::spring_spec::{SpringResponse, SpringSpec};

@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::components::fields::text_field_model::Invalid;
-use ds::detail::EventStamp;
+use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;

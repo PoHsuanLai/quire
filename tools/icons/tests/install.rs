@@ -1,7 +1,7 @@
 //! `icons install` run as a user runs it: the repository's set lands under
 //! `--to`, every app in every style and size, and `ds_settings`'s lookup finds a file there.
 
-use ds::icon::IconStyle;
+use ds::style::icon::retint::IconStyle;
 use ds_settings::Px;
 use ds_settings::icon_assets::{APP_ICON_PX, AppIconName, Presence, find_app_icon};
 use std::path::Path;

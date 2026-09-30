@@ -50,9 +50,9 @@ fn Listener() -> Element {
         };
         spawn(async move {
             while feed.changed().await.is_ok() {
-                heard.set(Some(ds::time::now()));
+                heard.set(Some(ds::base::time::clock::now()));
                 sleep(ANSWER_AFTER).await;
-                answered.set(Some(ds::time::now()));
+                answered.set(Some(ds::base::time::clock::now()));
             }
         });
     });

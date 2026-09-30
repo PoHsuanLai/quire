@@ -22,8 +22,9 @@ use ds::components::overlays::hover_card::parts::{
 use ds::components::overlays::hover_card::target::HoverTarget;
 use ds::components::overlays::popover::Arrow;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::detail::{Operation, PendingToken};
 use ds::host::measure::Anchor;
+use ds::motion::detail::operation::Operation;
+use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds::stack::toast_hub::UndoToken;

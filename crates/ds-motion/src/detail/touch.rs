@@ -24,7 +24,7 @@ impl Handled for PointerData {}
 ///
 /// ```
 /// use dioxus::prelude::{Event, MouseData};
-/// use ds::detail::{Contact, Touch};
+/// use ds::motion::detail::touch::{Contact, Touch};
 ///
 /// fn touched(event: &Event<MouseData>) -> Touch {
 ///     Touch::Contact(Contact::from_event(event))
@@ -35,7 +35,7 @@ impl Handled for PointerData {}
 ///
 /// ```compile_fail,E0451
 /// // A contact cannot be written by hand: its fields are private.
-/// let forged = ds::detail::Contact { proof: () };
+/// let forged = ds::motion::detail::touch::Contact { proof: () };
 /// ```
 ///
 /// A contact also carries the velocity the hand had when it let go (design/27 section 3.12):

@@ -9,16 +9,13 @@
 
 pub mod assembly;
 pub mod components;
-pub mod detail;
 pub mod edit;
 pub mod file_drop;
 pub mod focus;
 pub mod host;
-pub mod icon;
 pub mod root;
 pub mod spell;
 pub mod stack;
-pub mod time;
 pub mod window;
 
 pub mod prelude;

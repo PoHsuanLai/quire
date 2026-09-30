@@ -4,7 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::components::app::send_pill::SendPill;
-use ds::detail::{Operation, PendingToken};
+use ds::motion::detail::operation::Operation;
+use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
 use ds::style::space::look::CardAccent;

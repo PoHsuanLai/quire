@@ -3,9 +3,9 @@
 
 use std::path::Path;
 
-use ds::icon::IconStyle;
-use ds::icon::Tint as DsTint;
-use ds::icon::retint as ds_retint;
+use ds::style::icon::retint::IconStyle;
+use ds::style::icon::retint::Tint as DsTint;
+use ds::style::icon::retint::retint as ds_retint;
 use ds_style::space::presets::PRESETS;
 use icons::{
     Cell, IconsError, Manifest, Prepared, SHIP_PX, Sheet, SheetStyle, Source, Style, Template,
@@ -59,7 +59,7 @@ fn tinted(path: &Path, tint: DsTint) -> Result<Rgba32FImage, IconsError> {
 }
 
 /// The contact sheet from the exported files: the shipped (Colour) set, the Muted set, and the
-/// neutral Monochrome set tinted by `ds::icon::retint` for the Work and Home Spaces.
+/// neutral Monochrome set tinted by `ds::style::icon::retint::retint` for the Work and Home Spaces.
 pub fn sheet(manifest_path: &Path, out_dir: &Path, sheet: &Path) -> Result<(), IconsError> {
     let m: Manifest = toml::from_str(&std::fs::read_to_string(manifest_path)?)?;
     let space = |preset: usize| DsTint::space(PRESETS[preset].dots);

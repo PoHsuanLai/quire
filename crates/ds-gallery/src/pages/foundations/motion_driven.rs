@@ -10,7 +10,8 @@ use ds::assembly::ds::Inject;
 use ds::components::controls::segmented::Tracking;
 use ds::components::lists::preview::switcher::PaneSwitcher;
 use ds::components::overlays::sheet_attach::Attach;
-use ds::detail::{Contact, Touch};
+use ds::motion::detail::touch::Contact;
+use ds::motion::detail::touch::Touch;
 use ds::motion::drag_return::{DragReturn, use_drag_return};
 use ds::motion::pane_slide::Pane;
 use ds::motion::spring_point::Release;
@@ -254,21 +255,21 @@ fn DockCell() -> Element {
                     let at = event.client_coordinates();
                     let at = Point { x: Px(at.x as f32), y: Px(at.y as f32) };
                     from.set(Some(at));
-                    let now = ds::time::now();
+                    let now = ds::base::time::clock::now();
                     meters.set((VelocityMeter::default().moved(at.x, now), VelocityMeter::default().moved(at.y, now)));
                 },
                 onpointermove: move |event| {
                     let Some(start) = from() else { return };
                     let at = event.client_coordinates();
                     let at = Point { x: Px(at.x as f32), y: Px(at.y as f32) };
-                    let now = ds::time::now();
+                    let now = ds::base::time::clock::now();
                     let (mx, my) = meters();
                     meters.set((mx.moved(at.x, now), my.moved(at.y, now)));
                     drag.follow(Point { x: Px(at.x.0 - start.x.0), y: Px(at.y.0 - start.y.0) });
                 },
                 onpointerup: move |event| {
                     if from.take().is_some() {
-                        let now = ds::time::now();
+                        let now = ds::base::time::clock::now();
                         let (mx, my) = meters();
                         let release = Release { x: mx.released(now), y: my.released(now) };
                         drag.home(Touch::Contact(Contact::from_event(&event)), release);

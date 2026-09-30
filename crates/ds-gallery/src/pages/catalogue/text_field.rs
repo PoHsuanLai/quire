@@ -4,7 +4,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::fields::text_field_model::Invalid;
-use ds::detail::EventStamp;
+use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 

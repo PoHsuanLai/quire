@@ -3,7 +3,9 @@
 //! each ends at 0 frames (R2, R3, R7).
 
 use dioxus::prelude::*;
-use ds::detail::{MorphGlyph, MorphStyle, Slashed};
+use ds::motion::detail::morph::MorphStyle;
+use ds::motion::detail::morph::Slashed;
+use ds::motion::detail::morph_glyph::MorphGlyph;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};

@@ -87,7 +87,11 @@ fn Choosers() -> Element {
     let mut count = use_signal(|| 3u32);
     // The spinner runs an operation started as the page opens (design/26 R4); the Details page
     // replays one.
-    let busy = use_hook(|| ds::detail::Operation::Running(ds::detail::PendingToken::start()));
+    let busy = use_hook(|| {
+        ds::motion::detail::operation::Operation::Running(
+            ds::motion::detail::operation::PendingToken::start(),
+        )
+    });
     let views: Vec<(u8, String)> = ["List", "Columns", "Cards"]
         .into_iter()
         .zip(0..)

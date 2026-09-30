@@ -8,7 +8,8 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::press::Propagation;
-use ds::detail::{Operation, PendingToken};
+use ds::motion::detail::operation::Operation;
+use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_core::vocab::Muting;

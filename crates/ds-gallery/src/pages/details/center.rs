@@ -11,7 +11,7 @@ use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
 use ds::components::controls::button_model::{Bezel, IconSwap, ImagePosition};
 use ds::components::controls::slider_model::SliderLook;
-use ds::detail::EventStamp;
+use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds::style::icon::render::Glyph;
 use ds::style::tokens::control_size::ControlSize;

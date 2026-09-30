@@ -64,13 +64,13 @@ pub enum Rule {
     /// component (coherence rule 2).
     RawMarkup,
     /// `animation-iteration-count: infinite`, or `infinite` in the `animation` shorthand: a loop
-    /// never lets the surface idle. A pending state is a bounded loop (`ds::detail::use_pending`)
+    /// never lets the surface idle. A pending state is a bounded loop (`ds::motion::detail::use_pending::use_pending`)
     /// that holds still at its deadline (design/26-DETAILS.md R3, R4). Every profile.
     InfiniteLoop,
     /// Under [`Profile::Details`]: an `animation` or `transition` timed by a duration or easing
     /// token the details grammar does not play (`--t-ambient`, `--t-spin`, `--t-float`,
     /// `--t-awake`, `--t-sail`, `--t-boat-return`, `--t-send-ring`, `--t-flash`,
-    /// `--t-count-step`, `--t-fill`): moments are timed by the grammar's tokens (`ds::detail::grammar`,
+    /// `--t-count-step`, `--t-fill`): moments are timed by the grammar's tokens (`ds::motion::detail::grammar`,
     /// design/26-DETAILS.md sections 3.1 and 3.4).
     OffGrammarTiming,
     /// `cursor: pointer` on a rule whose subject is not a link: controls use the arrow, and the

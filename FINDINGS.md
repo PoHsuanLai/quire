@@ -406,7 +406,7 @@ adapter opens).
 - **External icons.** `IconUrl` accepts `data:` and `file:` only, percent-encodes `"`, `\` and
   control characters so the URL cannot leave its CSS string, and draws a symbolic icon as a
   `mask-image` over `background-color: currentColor` and an image as `background-image`, each at
-  its own resolved size. The symbolic test (`ds::icon::classify`) is OKLab by Ottosson's
+  its own resolved size. The symbolic test (`ds::style::icon::classify`) is OKLab by Ottosson's
   matrices, opaque meaning alpha >= 128, with the limit from `icons.symbolic_chroma_max`
   (default 0.04, range 0..0.2).
 - **Glyph strokes at a fractional scale** are an even number of device pixels (`icon/stroke.rs`,
@@ -418,7 +418,7 @@ adapter opens).
   At 16 px a ring knob would touch its track, so a knob is a stroked point, as Lucide draws dots.
 - **App icons.** The shipped set is in design/08 section 2.11 (`assets/icons/apps/`): thirteen
   sizes, three styles (Colour, Muted, Monochrome). Monochrome ships neutral and is tinted at run
-  time by `ds::icon::retint`, so one set serves every Space. The lookup
+  time by `ds::style::icon::retint::retint`, so one set serves every Space. The lookup
   (`ds_settings::app_icon_path`) tries `$QUIRE_ICON_ASSETS` (the apps directory itself),
   `$XDG_DATA_HOME/quire/icons/apps`, each `$XDG_DATA_DIRS/quire/icons/apps`, then the
   repository's `assets/icons/apps` in development; the first existing directory wins whole; the
@@ -908,7 +908,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   check may use a fixed elapsed time only at or under half the window. Take the start instant
   *before* the action that starts the timer (`show()`/`click()` call `advance` themselves).
   Samples of a continuous, monotonic value on the animation clock (`resolve(t)`) are safe.
-- **The virtual clock.** `ds::time` owns time (`now()`, `since()`, `sleep()` read a thread-local
+- **The virtual clock.** `ds::base::time::clock` owns time (`now()`, `since()`, `sleep()` read a thread-local
   clock, the wall clock by default); `tests/clock_rule.rs` forbids a direct `Instant::now()` or
   `futures_timer` in ds. `HarnessConfig::with_clock(Clock::Virtual)` installs a `VirtualClock`;
   `advance(d)` resolves at the current instant first, then stops at each timer due before the

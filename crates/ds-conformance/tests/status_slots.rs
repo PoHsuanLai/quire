@@ -11,7 +11,7 @@ use ds::components::content::status::volume::{VolumeState, VolumeWaves};
 use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
 use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::slider_model::SliderLook;
-use ds::detail::EventStamp;
+use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds::style::tokens::status::StatusMetrics;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
