@@ -11,6 +11,8 @@ publish.workspace = true
 [dependencies]
 ds = { workspace = true }
 ds-blitz = { workspace = true }
+# `AdapterPref`, the GPU ranking and device request the hybrid painter opens its device with.
+blitz-kit = { workspace = true, features = ["adapter"] }
 dioxus = { workspace = true }
 blitz-dom = { workspace = true }
 blitz-paint = { workspace = true }
