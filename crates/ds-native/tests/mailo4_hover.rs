@@ -9,8 +9,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DocumentHost, Ds, Flow, HoverAnchor, HoverCard, HoverKey, HoverKind, Material,
-    MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
+    Appearance, DocumentHost, Ds, Flow, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile,
+    Material, MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -59,10 +59,6 @@ fn Pin(index: usize, name: &'static str, placing: Placing) -> Element {
     let driver = use_hover_intent();
     let mut element = use_signal(|| None::<MountedRef>);
     let key = HoverKey(format!("pin:{index}"));
-    let kind = match placing {
-        Placing::Point => HoverKind::Sender,
-        Placing::Element | Placing::Unplaced => HoverKind::Side,
-    };
     rsx! {
         li {
             class: "pin",
@@ -74,7 +70,7 @@ fn Pin(index: usize, name: &'static str, placing: Placing) -> Element {
                     (Placing::Point, _) => HoverAnchor::Rect(at_pointer(&event)),
                     (Placing::Element, None) | (Placing::Unplaced, _) => HoverAnchor::Unplaced,
                 };
-                driver.over(key.clone(), kind, anchor);
+                driver.over(key.clone(), HoverProfile::Card, anchor);
             },
             onpointerleave: move |_| driver.out(),
             onpointerdown: move |_| driver.press(),
@@ -94,7 +90,11 @@ fn Page(placing: Placing) -> Element {
         Placing::Unplaced => Flow::Inline,
         Placing::Element | Placing::Point => Flow::Floating,
     };
-    let card = open.map(|(key, kind)| {
+    let kind = match placing {
+        Placing::Point => HoverKind::Sender,
+        Placing::Element | Placing::Unplaced => HoverKind::Side,
+    };
+    let card = open.map(|(key, _)| {
         rsx! {
             HoverCard { key: "{key.0}", kind, flow,
                 p { class: "card-of", "{key.0}" }

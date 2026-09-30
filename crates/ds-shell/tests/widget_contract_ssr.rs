@@ -12,9 +12,10 @@ mod golden;
 use dioxus::prelude::*;
 use ds::LabelHue;
 use ds::Word;
+use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{
-    Appearance, Ds, Fraction, IconSize, Inject, Material, Motion, Panel, PanelEdge, Px, RootChrome,
-    RootExtent, Shown, Theme,
+    Appearance, Attach, Ds, Fraction, IconSize, Inject, Material, Motion, RootChrome, RootExtent,
+    Sheet, Theme,
 };
 use ds_lint::{LintConfig, markup};
 use ds_shell::widget::{WidgetEdit, WidgetLayout};
@@ -47,6 +48,11 @@ fn host(props: HostProps) -> Element {
 fn render(make: fn() -> Element) -> String {
     let mut dom = VirtualDom::new_with_props(host, HostProps { make });
     dom.rebuild_in_place();
+    // Floating surfaces (a sheet) arrive through the overlay host once the effects that register
+    // them have run.
+    for _ in 0..3 {
+        dom.render_immediate(&mut dioxus::core::NoOpMutations);
+    }
     dioxus_ssr::render(&dom)
 }
 
@@ -339,8 +345,8 @@ const CASES: &[Case] = &[
     ("edit-widgets-sheet", || {
         rsx! {
             Ds { appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Sheet, extent: RootExtent::Viewport, stylesheet: Inject::Host,
-                Panel { label: "Edit Widgets", shown: Shown::Visible, edge: PanelEdge::Bottom, width: Px(1040.0), height: Px(330.0), material: Material::Sheet,
-                    div { style: WidgetMetrics::default().style_attr(),
+                Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide,
+                    div { style: "{WidgetMetrics::default().style_attr()};height:330px",
                         WidgetGallery { layout: WidgetLayout::default(), onedit: |_| {} }
                     }
                 }
@@ -724,23 +730,21 @@ fn the_gallery_offers_one_size_per_widget() {
     assert!(gallery.contains(">Batteries<"), "the placed row: {gallery}");
 }
 
-/// Edit Widgets' sheet at the bottom edge: the panel says its edge and carries the
-/// width and the height it was given; the stylesheet holds it under half the root and plays the
-/// sheet's `peek-in` on its first showing.
+/// Edit Widgets' sheet at the bottom edge: the sheet says its attachment and its width; the
+/// stylesheet holds it under half the root and slides it in from below.
 #[test]
-fn the_bottom_sheet_says_its_edge_and_its_extent() {
+fn the_bottom_sheet_says_its_attachment_and_its_width() {
     let sheet = html("edit-widgets-sheet");
-    assert!(sheet.contains("data-edge=\"bottom\""), "{sheet}");
-    assert!(sheet.contains("width:1040px;height:330px;"), "{sheet}");
+    assert!(sheet.contains("data-attach=\"bottom\""), "{sheet}");
+    assert!(sheet.contains("data-width=\"wide\""), "{sheet}");
+    assert!(sheet.contains("height:330px"), "{sheet}");
     assert!(sheet.contains("ds-widget-gallery"), "{sheet}");
     let css = ds_shell::stylesheet();
     assert!(
         css.contains("max-height:calc(50% - var(--s-8))"),
         "never taller than half the root"
     );
-    assert!(css.contains(
-        ".ds-panel-stage[*|data-edge=bottom] > .ds-panel[*|data-presence=present]{ animation:peek-in var(--t-move) var(--e-out); }"
-    ));
+    assert!(css.contains("--sheet-dy:calc(100% + var(--s-36))"));
 }
 
 /// A card its host removed says it is leaving and plays its exit on its pulse class;

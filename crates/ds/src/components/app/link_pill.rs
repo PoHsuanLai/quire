@@ -77,11 +77,10 @@ mod tests {
             recipe.easing.var().reference()
         );
         assert!(CSS.contains(&want), "link_pill.css does not play {want}");
-        let hover_card = Anim::HcIn.recipe();
         assert_ne!(
-            (hover_card.duration, hover_card.easing),
-            (recipe.duration, recipe.easing),
-            "the pill must not borrow the hover card's recipe"
+            Anim::PaletteFade.recipe().keyframes,
+            recipe.keyframes,
+            "the pill must not borrow the popover's fade"
         );
     }
 

@@ -11,11 +11,11 @@
 
 use super::{Anchors, use_anchors};
 use crate::host::measure::MountedRef;
-use crate::stack::hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub};
+use crate::stack::hover_hub::{HoverHub, HoverKey, use_hover_hub};
 use crate::stack::layer_stack::LayerStack;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Rect;
-use ds_motion::hover_intent::HoverEvent;
+use ds_motion::hover_intent::{HoverEvent, HoverProfile};
 
 /// What a hook-keyed card is placed against.
 #[derive(Debug, Clone, PartialEq)]
@@ -56,15 +56,24 @@ pub fn use_hover_intent() -> HoverDriver {
 }
 
 impl HoverDriver {
-    /// The pointer came over `key`'s target, a card of `kind`, placed against `anchor`. While a
-    /// peek, the palette or a menu is open no card opens (`S:1790`).
-    pub fn over(&self, key: HoverKey, kind: HoverKind, anchor: HoverAnchor) {
-        if self.stack.is_some_and(|stack| stack.peek().top().is_some()) {
+    /// The pointer came over `key`'s target, a hover interface waiting by `profile`, placed
+    /// against `anchor`. While a peek, the palette or a menu is open no card opens (`S:1790`); a
+    /// tooltip or a label still does, as on macOS.
+    pub fn over(&self, key: HoverKey, profile: HoverProfile, anchor: HoverAnchor) {
+        let suppressed = profile == HoverProfile::Card
+            && self.stack.is_some_and(|stack| stack.peek().top().is_some());
+        if suppressed {
             self.hub.feed(HoverEvent::OverSuppressed);
             return;
         }
         self.anchors.file(key.clone(), anchor);
-        self.hub.feed(HoverEvent::Over((key, kind), kind.profile()));
+        self.hub.feed(HoverEvent::Over((key, profile), profile));
+    }
+
+    /// File `anchor` under `key` without feeding the machine: a surface its caller shows itself
+    /// still needs a place to stand.
+    pub(crate) fn anchor(&self, key: HoverKey, anchor: HoverAnchor) {
+        self.anchors.file(key, anchor);
     }
 
     /// The pointer left the target: the card closes after 150 ms unless it comes back or

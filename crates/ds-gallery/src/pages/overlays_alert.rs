@@ -1,14 +1,15 @@
 //! The Overlays page's alerts: the Mac's pre-Liquid-Glass alert, "Turn Bluetooth
 //! off?", drawn in place inside a 320 px control-center popover (`Flow::Inline`) and centred in a
-//! whole window (`Flow::Floating`), in light and dark, and a destructive one whose default is
-//! Cancel. Live, Cancel, Escape, the scrim and the action close it and the button opens it again.
+//! whole window (`Flow::Floating`), in light and dark; a destructive one whose default is Cancel;
+//! one button; three buttons, stacked, in the Warning style. Live, every button and Escape (Cancel)
+//! close it and the button opens it again.
 
 use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertEmphasis, Appearance, Button, Ds, Flow, Icon, IconSource, Inject, Material, Px,
-    TextLine, Theme,
+    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Button, Ds, Flow, Icon, IconSource,
+    Inject, Material, Px, TextLine, Theme,
 };
 use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile};
 
@@ -19,15 +20,19 @@ const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disc
 #[component]
 pub fn Alerts() -> Element {
     rsx! {
-        Section { title: "Alert", note: "Alert {{ title, message, action, cancel, emphasis, flow }}: the narrow sheet (340, or 88 % of a smaller root) over the modal scrim, one centred column (optional icon at 48, title 16/700, message in the soft ink), Cancel and the action in two equal columns, the action on the right. Enters with peek-in (--t-big --e-spring); hidden, it springs out as a sheet does. The default button is filled: the action, or Cancel when the action is destructive (its label red), and the keyboard starts there. Return presses the default, Escape and the scrim cancel, Space presses the focused button, Tab moves between the two. Flow::Inline stands in the nearest positioned ancestor: here a 320 px control-center popover. Flow::Floating centres it in the whole root.",
+        Section { title: "Alert", note: "Alert {{ title, message, buttons, style, icon, flow }}: the narrow sheet (340, or 88 % of a smaller root), dimming nothing, one centred column (optional icon at 48, title 16/700, body in the soft ink), then the buttons: one or two side by side with the default on the right, three or more stacked with the default on top. It slides in as a sheet does. The default button is filled: the first that is not destructive (a destructive one has its label red), and the keyboard starts there. Return presses the default, Escape the Cancel button, Space presses the focused button, Tab and Shift+Tab move between the buttons. Flow::Inline stands in the nearest positioned ancestor: here a 320 px control-center popover. Flow::Floating centres it in the whole root.",
             div { class: "g-row g-alert-row",
                 for theme in [Theme::Light, Theme::Dark] {
                     InPopover { theme }
                 }
             }
             div { class: "g-row g-alert-row",
-                Windowed { theme: Theme::Light, emphasis: AlertEmphasis::Default }
-                Windowed { theme: Theme::Dark, emphasis: AlertEmphasis::Destructive }
+                Windowed { theme: Theme::Light, case: Case::Ask }
+                Windowed { theme: Theme::Dark, case: Case::Erase }
+            }
+            div { class: "g-row g-alert-row",
+                Windowed { theme: Theme::Light, case: Case::Notice }
+                Windowed { theme: Theme::Dark, case: Case::Save }
             }
         }
     }
@@ -64,10 +69,11 @@ fn InPopover(theme: Theme) -> Element {
                         Alert {
                             title: TITLE,
                             message: Some(TextLine::from(MESSAGE)),
-                            action: "Turn Off",
+                            buttons: vec![
+                                AlertButton::new("Turn Off", AlertRole::Normal, EventHandler::new(move |()| open.set(false))),
+                                AlertButton::new("Cancel", AlertRole::Cancel, EventHandler::new(move |()| open.set(false))),
+                            ],
                             flow: Flow::Inline,
-                            onaction: move |_| open.set(false),
-                            oncancel: move |_| open.set(false),
                         }
                     }
                 }
@@ -76,18 +82,64 @@ fn InPopover(theme: Theme) -> Element {
     }
 }
 
+/// Which alert a window shows.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Case {
+    /// Two buttons, the action the default.
+    Ask,
+    /// A destructive action: Cancel is the default.
+    Erase,
+    /// One button.
+    Notice,
+    /// Three buttons, stacked, in the Warning style.
+    Save,
+}
+
 /// The alert centred in a small window.
 #[component]
-fn Windowed(theme: Theme, emphasis: AlertEmphasis) -> Element {
+fn Windowed(theme: Theme, case: Case) -> Element {
     let appearance = appearance(theme);
     let mut open = use_signal(|| true);
-    let (title, message, action, icon) = match emphasis {
-        AlertEmphasis::Default => (TITLE, MESSAGE, "Turn Off", None),
-        AlertEmphasis::Destructive => (
+    let close = EventHandler::new(move |()| open.set(false));
+    let button = move |label: &str, role| AlertButton::new(label, role, close);
+    let (title, message, style, icon, buttons) = match case {
+        Case::Ask => (
+            TITLE,
+            MESSAGE,
+            AlertStyle::Informational,
+            None,
+            vec![
+                button("Turn Off", AlertRole::Normal),
+                button("Cancel", AlertRole::Cancel),
+            ],
+        ),
+        Case::Erase => (
             "Erase “Backup”?",
             "Everything on the disk will be lost. This can’t be undone.",
-            "Erase",
+            AlertStyle::Critical,
             Some(IconSource::Glyph(Icon::Trash)),
+            vec![
+                button("Erase", AlertRole::Destructive),
+                button("Cancel", AlertRole::Cancel),
+            ],
+        ),
+        Case::Notice => (
+            "Bluetooth is off",
+            "Turn it on in Control Center to connect a keyboard.",
+            AlertStyle::Informational,
+            None,
+            vec![button("OK", AlertRole::Normal)],
+        ),
+        Case::Save => (
+            "Do you want to save the changes?",
+            "Your changes will be lost if you don’t save them.",
+            AlertStyle::Warning,
+            None,
+            vec![
+                button("Save", AlertRole::Normal),
+                button("Don’t Save", AlertRole::Destructive),
+                button("Cancel", AlertRole::Cancel),
+            ],
         ),
     };
     rsx! {
@@ -100,11 +152,9 @@ fn Windowed(theme: Theme, emphasis: AlertEmphasis) -> Element {
                     Alert {
                         title,
                         message: Some(TextLine::from(message)),
-                        action,
-                        emphasis,
+                        buttons,
+                        style,
                         icon,
-                        onaction: move |_| open.set(false),
-                        oncancel: move |_| open.set(false),
                     }
                 }
             }

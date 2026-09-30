@@ -116,9 +116,9 @@ pub enum IntentEffect<K> {
     },
     /// Cancel the close timer.
     CancelClose,
-    /// Remove any open card instantly and open `key`'s card (`hc-in`).
+    /// Remove any open card instantly and open `key`'s card.
     Open(K),
-    /// Play `hc-out` on `key`'s card and unmount it at `settle(HcOut)`; the hub is warm.
+    /// Fade `key`'s card out (`Exit::Fade`) and unmount it once that settles; the hub is warm.
     Close(K),
     /// Remove `key`'s card instantly, no exit, not warm.
     Remove(K),

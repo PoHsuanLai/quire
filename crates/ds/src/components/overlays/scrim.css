@@ -1,23 +1,6 @@
-/* Scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the overlay, dims
-   with `--scrim` and fades in; a click closes. Hover is not specified; the focus ring is the
-   global one (it is a button). */
+/* The peek's scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the
+   overlay, dims with `--scrim` and fades in; a click closes. Hover is not specified; the focus
+   ring is the global one (it is a button). */
 
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
-
-/* Inline (`flow: Flow::Inline`, `data-flow=inline`): the same rule, drawn in the
-   caller's container at the caller's stacking level, so `inset:0` covers the nearest positioned
-   ancestor. It sets no z-index: content the caller renders after it in that container paints
-   over it, and every overlay layer stays above it. */
-/* An inline scrim's own layer (`layer: Some(ZLayer)`) is written on the element as
-   `z-index: var(--z-…)`, the caller's pick among the layer tokens: above its positioned rows,
-   below its floating surfaces. With none it stays at z-index auto, as above. */
-
-/* Modal (sheet and modal parts): `--scrim-modal`, .40 light and .55 dark, behind a dialog that
-   asks for a decision; design/03 section 17. */
-.ds-scrim[*|data-strength=modal]{ background:var(--scrim-modal); }
-
-/* Leaving with its sheet: `menu-out`, the fade a closing menu plays, at `--t-quick
-   --e-exit`, so the dimming has lifted before the sheet has finished settling away; it takes no
-   pointer while it goes. */
-.ds-scrim[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }

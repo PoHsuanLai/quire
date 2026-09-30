@@ -1,5 +1,5 @@
 //! The dock gaps on a real Blitz document: a material's corner set by
-//! the caller, icons at the dock's sizes, and a Fly tooltip shown and hidden by the caller.
+//! the caller, icons at the dock's sizes, and a dock label shown and hidden by the caller.
 
 #[path = "support/probe.rs"]
 mod probe;
@@ -7,11 +7,12 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Corner, Ds, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Scheme,
-    Shown, Surface, Tooltip, TooltipKind,
+    Shown, Surface,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::DockLabel;
 use image::{Rgba, RgbaImage};
-use probe::{centred, rect};
+use probe::rect;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -108,7 +109,7 @@ fn icons_take_the_docks_sizes() {
     }
 }
 
-/// Three tiles with a Fly label each: one left to the pointer, one shown and one hidden by the
+/// Three tiles with a dock label each: one left to the pointer, one shown and one hidden by the
 /// caller.
 #[allow(non_snake_case)]
 fn Labels() -> Element {
@@ -116,17 +117,17 @@ fn Labels() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "display:flex; gap:120px; padding:80px 60px",
                 div { class: "hovered",
-                    Tooltip { kind: TooltipKind::Fly, text: "Files",
+                    DockLabel { text: "Files",
                         div { style: "width:48px; height:48px" }
                     }
                 }
                 div { class: "shown",
-                    Tooltip { kind: TooltipKind::Fly, text: "Terminal", shown: Some(Shown::Visible),
+                    DockLabel { text: "Terminal", shown: Some(Shown::Visible),
                         div { style: "width:48px; height:48px" }
                     }
                 }
                 div { class: "hidden",
-                    Tooltip { kind: TooltipKind::Fly, text: "Firefox", shown: Some(Shown::Hidden),
+                    DockLabel { text: "Firefox", shown: Some(Shown::Hidden),
                         div { style: "width:48px; height:48px" }
                     }
                 }
@@ -135,48 +136,49 @@ fn Labels() -> Element {
     }
 }
 
-/// The luma of a label's left padding, where it paints its ground and no text.
-fn label(frame: &RgbaImage, harness: &Harness, tile: &str) -> u32 {
-    let fly = format!("{tile} .ds-fly");
-    let at = centred(harness, &fly, &fly);
-    luma(*frame.get_pixel(
-        at.origin.x.0 as u32 + 2,
-        (at.origin.y.0 + at.size.height.0 / 2.0) as u32,
-    ))
-}
-
-/// `Shown::Visible` shows the label with no pointer on it; `Shown::Hidden` keeps it down
-/// under the pointer, where an uncontrolled label shows after its delay.
+/// `Shown::Visible` shows the label with no pointer on it; `Shown::Hidden` keeps it down under
+/// the pointer, where an uncontrolled label shows after the Label profile's 100 ms.
 #[test]
-fn a_caller_shows_and_hides_a_fly_label() {
+fn a_caller_shows_and_hides_a_dock_label() {
     let mut harness = Harness::new(Labels, VIEW);
     harness.advance(ms(40));
-    let at_rest = harness.render().expect("a frame");
-    let ground = label(&at_rest, &harness, ".hovered");
-    assert!(
-        ground > 180,
-        "an uncontrolled label is down at rest: {ground}"
+    assert_eq!(
+        harness.count(".ds-dock-label"),
+        1,
+        "only the label its caller shows is up at rest"
     );
-    let shown = label(&at_rest, &harness, ".shown");
-    assert!(shown < 80, "a shown label is up with no pointer: {shown}");
+    let tile = harness.rect(".shown .ds-hover-target").expect("the tile");
+    let label = harness
+        .rect(".ds-dock-label")
+        .expect("the label is laid out");
+    assert!(
+        label.origin.y.0 + label.size.height.0 <= tile.origin.y.0,
+        "the label stands above its tile: {label:?} {tile:?}"
+    );
     let hidden_target = harness
-        .centre(".hidden .ds-fly-target")
+        .centre(".hidden .ds-hover-target")
         .expect("the hidden tile");
     harness.pointer_move(hidden_target);
-    harness.advance(ms(1300));
-    let hovered_hidden = harness.render().expect("a frame");
-    let hidden = label(&hovered_hidden, &harness, ".hidden");
-    assert!(
-        hidden > 180,
-        "a hidden label stays down under the pointer: {hidden}"
+    harness.advance(ms(400));
+    assert_eq!(
+        harness.count(".ds-dock-label"),
+        1,
+        "a label its caller hides stays down under the pointer"
     );
-    let target = harness.centre(".hovered .ds-fly-target").expect("the tile");
+    let target = harness
+        .centre(".hovered .ds-hover-target")
+        .expect("the tile");
     harness.pointer_move(target);
-    harness.advance(ms(1300));
-    let hovered = harness.render().expect("a frame");
-    let up = label(&hovered, &harness, ".hovered");
-    assert!(
-        up < 80,
-        "an uncontrolled label shows under the pointer: {up}"
+    harness.advance(ms(60));
+    assert_eq!(
+        harness.count(".ds-dock-label"),
+        1,
+        "the Label profile waits 100 ms: not yet at 60"
+    );
+    harness.advance(ms(120));
+    assert_eq!(
+        harness.count(".ds-dock-label"),
+        2,
+        "an uncontrolled label shows under the pointer after 100 ms"
     );
 }

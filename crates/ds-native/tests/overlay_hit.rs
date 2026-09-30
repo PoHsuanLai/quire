@@ -7,8 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, ListRow, Material,
-    OverlayId, PartHooks, Point, Presence, Px, Rect, RowState, Selection, Size, ZLayer,
+    Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile, ListRow,
+    Material, OverlayId, PartHooks, Point, Presence, Px, Rect, RowState, Selection, Size, ZLayer,
     use_hover_intent, use_overlays,
 };
 use ds_native::harness::settle_until;
@@ -202,7 +202,7 @@ fn MailRow(i: usize, log: Signal<Vec<String>>) -> Element {
     let thread = move || {
         driver.over(
             HoverKey(format!("thread:{i}")),
-            HoverKind::Thread,
+            HoverProfile::Card,
             HoverAnchor::Unplaced,
         );
     };
@@ -223,7 +223,7 @@ fn MailRow(i: usize, log: Signal<Vec<String>>) -> Element {
             };
             driver.over(
                 HoverKey(format!("sender:{i}")),
-                HoverKind::Sender,
+                HoverProfile::Card,
                 HoverAnchor::Rect(line),
             );
         }),
@@ -275,8 +275,8 @@ fn MailPage() -> Element {
                 MailRow { key: "{i}", i, log }
             }
         }
-        if let Some((key, kind)) = open {
-            HoverCard { key: "{key.0}", kind,
+        if let Some((key, _)) = open {
+            HoverCard { key: "{key.0}", kind: if key.0.starts_with("thread") { HoverKind::Thread } else { HoverKind::Sender },
                 p { class: "card-of", "{key.0}" }
                 button {
                     class: "pin",

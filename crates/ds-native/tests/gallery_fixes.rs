@@ -141,21 +141,25 @@ fn ToastApp() -> Element {
 }
 
 #[test]
-fn the_toast_tab_shows_its_label() {
+fn the_toast_action_shows_its_label() {
     let mut harness = Harness::new(ToastApp, VIEW);
     harness.advance(Duration::from_millis(700));
     assert_eq!(
-        harness.attr(".ds-toast", "data-shown").as_deref(),
-        Some("shown")
+        harness.attr(".ds-toast", "data-presence").as_deref(),
+        Some("present")
     );
-    assert_eq!(harness.text_of(".ds-toast-tab").as_deref(), Some("Undo"));
+    assert_eq!(harness.text_of(".ds-toast-action").as_deref(), Some("Undo"));
     let frame = harness.render().expect("renders");
-    // The tab is `--paper` with `--ink` text: its label and icon are ink on the tab's ground.
-    // With the label in the toast's own `--paper` there was nothing to see.
-    keep(&frame, "toast-tab");
-    let tab = pixels(&frame, centred(&harness, ".ds-toast", ".ds-toast-tab"), 3.0);
-    let label = ink(&tab, 60);
-    assert!(label > 40, "the tab's label painted {label} pixels");
+    // The action is `--paper` with `--ink` text: its label and icon are ink on the action's
+    // ground. With the label in the toast's own `--paper` there was nothing to see.
+    keep(&frame, "toast-action");
+    let action = pixels(
+        &frame,
+        centred(&harness, ".ds-toast", ".ds-toast-action"),
+        3.0,
+    );
+    let label = ink(&action, 60);
+    assert!(label > 40, "the action's label painted {label} pixels");
 }
 
 #[allow(non_snake_case)]

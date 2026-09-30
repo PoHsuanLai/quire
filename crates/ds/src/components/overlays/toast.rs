@@ -1,196 +1,97 @@
-//! Toast: the undo toast, one dark pill with a pull tab (design/04-COMPONENTS.md section 23,
-//! design/06-INTERACTIONS.md section 9).
+//! Toast: a short notice that slides in from the right, holds, and slides out (design/30 section
+//! 2.9, design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9). It is not a
+//! macOS component; it moves like a notification banner.
 //!
-//! `Ds` renders `ToastHost` after the overlay host. It draws the hub's toast, which springs up
-//! from below the card edge on `data-shown`, and nothing at all while the hub is empty: a hidden
-//! toast mounts below the edge for a frame, rises, and after it sinks again is dropped (gallery
-//! fix A: a laid-out hidden toast showed as a pill at the bottom of every root). It drives the
-//! pull tab with
-//! [`crate::PullTab`]: pulled right past 46 px it arms, and a release while
-//! armed, or a tap that moved under 3 px, undoes.
+//! `Ds` renders `ToastHost` after the overlay host. It draws the hub's toast, one at a time: it
+//! slides in from past the right edge over `--t-move --e-out` and, when the hub hides it, slides
+//! out over `--t-quick --e-exit`; nothing is drawn while the hub is empty. The hold is
+//! `ToastHold` (5 s), and the pointer over the toast pauses it. A toast pushed with an undo has
+//! an action button (`Undo`); a swipe to the right dismisses it, from where the hand let go.
 
-use crate::stack::pull_tab::{Pull, PullPhase, PullTab};
+use crate::components::overlays::toast_swipe::use_toast_swipe;
 use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
 use dioxus::prelude::*;
-use ds_core::geometry::units::Px;
-use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
+use ds_motion::presence::{
+    Exit,
+    spec::PresenceSpec,
+    use_presence::{Presented, use_presence},
+};
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
-use ds_style::scope::use_scope_signal;
-use ds_style::tokens::timing::DurationToken;
 
 /// The enclosing `Ds`'s toast manager: `push(text, undo)`, one visible at a time.
 pub fn use_toasts() -> ToastHub {
     use_toast_hub()
 }
 
-/// Whether the toast offers the pull tab: only an operation with an undo does.
+/// Whether the toast offers an action: only an operation with an undo does.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Undoable {
     Yes,
     No,
 }
 
-/// `data-drag`: live while the tab follows the pointer (its transition off).
-fn drag_slug(phase: PullPhase) -> &'static str {
-    match phase {
-        PullPhase::Idle => "idle",
-        PullPhase::Dragging { .. } => "live",
-    }
-}
-
-/// What the host draws: nothing, or the toast below the edge or up.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Stage {
-    /// No toast is laid out.
-    Gone,
-    /// Mounted below the edge for one frame, so the rise starts there.
-    Rising,
-    /// Up.
-    Up,
-    /// Sliding back below the edge; dropped once the spring has settled.
-    Sinking,
-}
-
-/// Whether the hub has a toast up.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Showing {
-    Yes,
-    No,
-}
-
-/// The timer a stage change starts.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Follow {
-    /// Nothing to wait for.
-    Nothing,
-    /// Rise after a frame: `Rising` becomes `Up`.
-    Rise,
-    /// Drop once the sink has played: `Sinking` becomes `Gone`.
-    Drop,
-}
-
-impl Stage {
-    /// The stage the hub's news moves this one to, and the timer that follows.
-    fn next(self, showing: Showing) -> (Stage, Follow) {
-        match (self, showing) {
-            (Stage::Gone, Showing::Yes) => (Stage::Rising, Follow::Rise),
-            (Stage::Sinking, Showing::Yes) => (Stage::Up, Follow::Nothing),
-            (Stage::Up, Showing::No) => (Stage::Sinking, Follow::Drop),
-            (Stage::Rising, Showing::No) => (Stage::Gone, Follow::Nothing),
-            (stage, _) => (stage, Follow::Nothing),
-        }
-    }
-
-    /// `data-shown`, or `None` when nothing is drawn.
-    fn shown(self) -> Option<&'static str> {
-        match self {
-            Stage::Gone => None,
-            Stage::Rising | Stage::Sinking => Some("hidden"),
-            Stage::Up => Some("shown"),
-        }
-    }
-}
-
-/// The stage the host is at, moved by the hub and by the timers each move starts.
-fn use_stage(hub: ToastHub) -> Stage {
-    let mut stage = use_signal(|| Stage::Gone);
-    let env = use_scope_signal();
-    use_effect(move || {
-        let showing = match hub.state() {
-            ToastState::Shown { .. } => Showing::Yes,
-            ToastState::Hidden => Showing::No,
-        };
-        let (next, follow) = stage.peek().next(showing);
-        if next != *stage.peek() {
-            stage.set(next);
-        }
-        let (wait, from, to) = match follow {
-            Follow::Nothing => return,
-            Follow::Rise => (FRAME_SLACK, Stage::Rising, Stage::Up),
-            Follow::Drop => {
-                let level = env.peek().resolved.motion;
-                (
-                    DurationToken::Big.duration(level) + FRAME_SLACK,
-                    Stage::Sinking,
-                    Stage::Gone,
-                )
-            }
-        };
-        spawn(async move {
-            sleep(wait).await;
-            if *stage.peek() == from {
-                stage.set(to);
-            }
-        });
-    });
-    stage()
-}
-
 /// Renders the toast. `Ds` places it; consumers never do.
 #[component]
 pub fn ToastHost() -> Element {
     let hub = use_toast_hub();
-    let mut tab = use_signal(PullTab::default);
     // The toast keeps its last words while it slides away: a plain cell, written as the state
     // is read, so keeping them schedules no second render.
     let mut last = use_hook(|| CopyValue::new((String::new(), Undoable::No)));
-    if let ToastState::Shown { text, undo } = hub.state() {
-        let undoable = if undo.is_some() {
-            Undoable::Yes
-        } else {
-            Undoable::No
-        };
-        last.set((text, undoable));
-    }
-    let Some(shown) = use_stage(hub).shown() else {
+    let shown = match hub.state() {
+        ToastState::Shown { text, undo } => {
+            let undoable = if undo.is_some() {
+                Undoable::Yes
+            } else {
+                Undoable::No
+            };
+            last.set((text, undoable));
+            Shown::Visible
+        }
+        ToastState::Hidden => Shown::Hidden,
+    };
+    let Presented { presence, alias } = use_presence(
+        shown,
+        PresenceSpec {
+            enter: Anim::PanelIn,
+            exit: Exit::PanelOut,
+        },
+        None,
+    );
+    let swipe = use_toast_swipe(EventHandler::new(move |()| hub.hide()));
+    let Some(drawn) = presence.drawn_slug() else {
         return rsx! {};
     };
     let (text, undoable) = last.peek().clone();
-    let pull = tab();
-    let undo = move |pull: Pull| {
-        if pull == Pull::Undo {
-            hub.undo();
-        }
-    };
     rsx! {
         div { class: "ds-overlay", "data-layer": "toast",
-            div { class: "ds-toast", role: "status", "data-shown": shown,
-                span { class: "ds-toast-text", "{text}" }
+            div {
+                class: "ds-toast",
+                role: "status",
+                "data-presence": drawn,
+                "data-pulse": alias.slug(),
+                "data-swipe": swipe.look(),
+                style: swipe.style(),
+                onmouseenter: move |_| hub.pause(),
+                onmouseleave: move |_| {
+                    swipe.left();
+                    hub.resume();
+                },
+                onpointerdown: move |event| swipe.down(&event),
+                onpointermove: move |event| swipe.moved(&event),
+                onpointerup: move |event| swipe.released(&event),
+                span { class: "ds-toast-body", "{text}" }
                 if undoable == Undoable::Yes {
-                    span { class: "ds-toast-hint", "pull →" }
                     button {
                         r#type: "button",
-                        class: "ds-toast-tab",
-                        "data-drag": drag_slug(pull.phase()),
-                        "data-armed": pull.arm().slug(),
-                        style: "transform:translateX({pull.dx().0}px)",
-                        onpointerdown: move |event| {
-                            let x = event.client_coordinates().x as f32;
-                            let next = tab.peek().down(Px(x));
-                            tab.set(next);
-                        },
-                        onpointermove: move |event| {
-                            let x = event.client_coordinates().x as f32;
-                            let next = tab.peek().moved(Px(x));
-                            if next != *tab.peek() {
-                                tab.set(next);
-                            }
-                        },
-                        onpointerup: move |_| {
-                            let (next, pull) = tab.peek().up();
-                            tab.set(next);
-                            undo(pull);
-                        },
-                        onpointercancel: move |_| {
-                            let (next, _) = tab.peek().up();
-                            tab.set(next);
-                        },
+                        class: "ds-toast-action",
                         onclick: move |_| {
-                            let (next, pull) = tab.peek().click();
-                            tab.set(next);
-                            undo(pull);
+                            if swipe.click_passes() {
+                                hub.undo();
+                            }
                         },
                         Glyph { icon: Icon::Undo, size: IconSize::Small }
                         "Undo"
@@ -198,32 +99,5 @@ pub fn ToastHost() -> Element {
                 }
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{Follow, Showing, Stage};
-
-    #[test]
-    fn nothing_is_drawn_until_a_toast_rises_and_after_it_sinks() {
-        #[rustfmt::skip]
-        const CASES: &[(Stage, Showing, Stage, Follow)] = &[
-            (Stage::Gone, Showing::No, Stage::Gone, Follow::Nothing),
-            (Stage::Gone, Showing::Yes, Stage::Rising, Follow::Rise),
-            (Stage::Rising, Showing::Yes, Stage::Rising, Follow::Nothing),
-            (Stage::Rising, Showing::No, Stage::Gone, Follow::Nothing),
-            (Stage::Up, Showing::Yes, Stage::Up, Follow::Nothing),
-            (Stage::Up, Showing::No, Stage::Sinking, Follow::Drop),
-            (Stage::Sinking, Showing::No, Stage::Sinking, Follow::Nothing),
-            (Stage::Sinking, Showing::Yes, Stage::Up, Follow::Nothing),
-        ];
-        for &(from, showing, to, follow) in CASES {
-            assert_eq!(from.next(showing), (to, follow), "{from:?} {showing:?}");
-        }
-        assert_eq!(Stage::Gone.shown(), None);
-        assert_eq!(Stage::Rising.shown(), Some("hidden"));
-        assert_eq!(Stage::Up.shown(), Some("shown"));
-        assert_eq!(Stage::Sinking.shown(), Some("hidden"));
     }
 }

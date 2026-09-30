@@ -565,7 +565,7 @@ Full catalogue (design doc section in parentheses):
 | --- | --- |
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `ListRow` (§16), `HoverStrip` (§17), `SidebarItem` (§19), `AnimatedList` (§16) |
-| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuEntry` (§20), `Popover` (§21), `Toast`/`use_toasts` (§23), `Scrim`/`Sheet`/`Peek` (§24), `CommandPalette<T>` (§25) |
+| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuEntry` (§20), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24, §55), `EmptyState`/`Skeleton`, `CommandPalette<T>` (§25) |
 | Frame | `AppearancePicker` (§26), `AccountTile` (§27), `ProviderMark` (§28), `LinkPill` (§29), `SelectionBubble` (§30), `SendPill` (§31), `SpaceEditor` (§32), `EdgeStrip` (§33), `DragGhost` (§34), `SyncHalo` (§35) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
@@ -811,10 +811,11 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
 - **Icon sizes for tiles.** `IconSize::Tile48` (48), `IconSize::Tile96` (96) and
   `IconSize::Px(IconPx(n))` for any size a caller resolves (a magnified dock tile): an icon is
   drawn at that size, not scaled from 22.
-- **A caller-driven tooltip.** `Tooltip { shown: Some(Shown::Visible | Shown::Hidden), .. }`
-  shows or hides the label on the caller's say alone, at once, whatever the pointer does (the
-  dock's label machine: hide on press, while a menu is open, while dragging). `None` is the
-  hover behaviour as before. A Card tooltip follows `shown` the same way.
+- **A caller-driven tooltip or label.** `Tooltip { shown: Some(Shown::Visible | Shown::Hidden), .. }`
+  (and the shell's `DockLabel`) shows or hides on the caller's say alone, at once, whatever the
+  pointer does (the dock's label machine: hide on press, while a menu is open, while dragging).
+  `None` follows the pointer through the hover hub: a tooltip waits by the Tip profile (1 s), a
+  dock label by the Label profile (100 ms), both at once while the hub is warm.
 
 Palette behaviour:
 

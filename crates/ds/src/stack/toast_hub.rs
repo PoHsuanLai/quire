@@ -1,5 +1,6 @@
-//! The undo toast's state: one visible at a time, each push restarting the 5000 ms hold
-//! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
+//! The toast's state: one visible at a time, each push restarting the 5000 ms hold, which the
+//! pointer over the toast pauses (design/30 section 2.9, design/04-COMPONENTS.md section 23,
+//! design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
 //! `try_set`, so a hold that finds the hub gone stops (`ds_style::task`).
@@ -75,6 +76,11 @@ impl ToastHub {
     ) -> Result<(), Gone> {
         try_set(self.on_undo, on_undo)?;
         try_set(self.state, ToastState::Shown { text, undo })?;
+        self.start_hold()
+    }
+
+    /// (Re)start the hold: the toast hides when it has run out.
+    fn start_hold(&self) -> Result<(), Gone> {
         self.stop_hold()?;
         let hold = DelayToken::ToastHold.delay();
         let hub = *self;
@@ -87,12 +93,24 @@ impl ToastHub {
         try_set(self.hold, Some(started))
     }
 
+    /// The pointer came over the toast: the hold stops, so it stays up while it is read.
+    pub fn pause(&self) {
+        let _ = self.stop_hold();
+    }
+
+    /// The pointer left the toast: the hold starts over, in full, if a toast is up.
+    pub fn resume(&self) {
+        if matches!(*self.state.peek(), ToastState::Shown { .. }) {
+            let _ = self.start_hold();
+        }
+    }
+
     /// The toast as it is now.
     pub fn state(&self) -> ToastState {
         self.state.read().clone()
     }
 
-    /// The pull tab was released armed, or clicked: hide at once, call the push's `on_undo`
+    /// The toast's action was pressed: hide at once, call the push's `on_undo`
     /// with the token, and report it.
     ///
     /// `None`, and nothing hidden, when no toast is up. The token is also kept as the last

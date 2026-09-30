@@ -114,11 +114,13 @@
 /* The control center specimen: the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
+.g-cat-wide{width:1120px}
+.g-cat-wide .g-modal-stage{height:520px}
 .g-alert-row{align-items:flex-start;gap:var(--s-22)}
-.g-alert-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
-.g-alert-cc-body{position:relative;padding:var(--cc-pad);min-height:300px}
+.g-alert-cc{width:var(--cc-width,320px);border-radius:var(--r-panel);overflow:hidden}
+.g-alert-cc-body{position:relative;padding:var(--s-12);min-height:300px}
 .g-alert-stage{height:360px;padding:var(--s-14)}
-.g-cc{width:var(--cc-width);border-radius:var(--cc-panel-r);overflow:hidden}
+.g-cc{width:var(--cc-width,320px);border-radius:var(--r-panel);overflow:hidden}
 .g-cc-body{padding:var(--cc-pad)}
 /* The notifications specimen: per scheme, the Work tint holding the banners
    and a posed mid-drag card on the left, and the center's edge panel on the right, in a stage the

@@ -16,6 +16,12 @@ pub enum Exit {
     ShotOut,
     /// A preview pane sliding out to the right: `pane-out`.
     PaneOut,
+    /// A popover, tooltip or hover card fading away: `menu-out`, `--t-quick`.
+    Fade,
+    /// A sheet sliding back up past the top edge: `sheet-out`.
+    SheetOut,
+    /// A side panel or a toast sliding out to the right: `panel-out`.
+    PanelOut,
 }
 
 impl Exit {
@@ -27,6 +33,9 @@ impl Exit {
             Exit::OsdOut => Anim::OsdOut,
             Exit::ShotOut => Anim::ShotOut,
             Exit::PaneOut => Anim::PaneOutR,
+            Exit::Fade => Anim::MenuOut,
+            Exit::SheetOut => Anim::SheetOut,
+            Exit::PanelOut => Anim::PanelOut,
         }
     }
 }

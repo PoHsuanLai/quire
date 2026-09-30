@@ -1,22 +1,18 @@
-/* Toast (design/04-COMPONENTS.md section 23), verbatim `S:360-370` plus C's grabbing cursor
-   (`C:572`). Shown and hidden by `data-shown` (a transform transition, `--t-big --e-spring`);
-   the tab follows the pointer with its transition off while `data-drag=live`, and fills with
-   the accent while `data-armed=armed`. Tab hover is not specified.
-   Nothing is laid out while the hub is empty: `ToastHost` renders no toast then, and a rising
-   toast mounts hidden, so its first frame is below the edge and the spring runs from there
-   (gallery fix A: the hidden pill showed at the bottom of every root). The tab's rule names the
-   toast, as S's `.toast .tab` does. */
+/* Toast (design/30 section 2.9, design/04-COMPONENTS.md section 23): one dark pill at the
+   bottom right that moves like a notification banner: it slides in from past the right edge with
+   `panel-in` (`--t-move --e-out`) and out with `panel-out` (`--t-quick --e-exit`), holding its
+   last frame until the host drops it; a swipe to the right carries it along (`--swipe-dx`, its
+   exit starts there). Nothing is laid out while the hub is empty. The action is a quiet button
+   inside the pill, in the accent's ink on the pill. A hide taken back plays `hold`. */
 
-.ds-toast{ position:absolute; left:50%; bottom:14px; transform:translateX(-50%) translateY(160%);
-  display:flex; align-items:center; gap:var(--s-2); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
-  padding:var(--s-5) var(--s-5) var(--s-5) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto;
-  transition:transform var(--t-big) var(--e-out); }
-.ds-toast[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
-.ds-toast-text{ min-width:0; overflow:hidden; }
-.ds-toast-hint{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); opacity:.7; letter-spacing:.06em; padding:0 var(--s-6) 0 var(--s-10); }
-.ds-toast .ds-toast-tab{ display:flex; align-items:center; gap:var(--s-6); cursor:grab; background:var(--paper); color:var(--ink); border:0;
-  border-radius:var(--r-pill); padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; touch-action:none;
-  transition:transform var(--t-move) var(--e-out), background-color var(--t-quick) var(--e-out); }
-.ds-toast-tab:active{ cursor:grabbing; }
-.ds-toast-tab[*|data-drag=live]{ transition:none; }
-.ds-toast-tab[*|data-armed=armed]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
+.ds-toast{ position:absolute; right:var(--s-14); bottom:var(--s-14); transform:translateX(var(--swipe-dx,0px));
+  display:flex; align-items:center; gap:var(--s-8); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
+  padding:var(--s-6) var(--s-6) var(--s-6) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto; touch-action:none; }
+.ds-toast[*|data-presence=entering],.ds-toast[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-toast[*|data-presence=entering][*|data-pulse=b],.ds-toast[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
+.ds-toast[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-toast[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-toast-body{ min-width:0; overflow:hidden; }
+.ds-toast .ds-toast-action{ display:flex; align-items:center; gap:var(--s-6); background:var(--paper); color:var(--ink); border:0; border-radius:var(--r-pill);
+  padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; cursor:default;
+  transition:background-color var(--t-quick) var(--e-in-out); }

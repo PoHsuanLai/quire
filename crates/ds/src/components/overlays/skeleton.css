@@ -1,0 +1,12 @@
+/* Skeleton (design/30 section 2.9): a placeholder in the quiet fill, static (no shimmer), that
+   fades in and out over `--t-quick` (the content cross-fades against it). A line is one line
+   tall and as wide as it is put; a block takes the card radius; a circle is round. */
+
+.ds-skeleton{ display:block; background:var(--line); }
+.ds-skeleton[*|data-shape=line]{ height:1em; border-radius:var(--r-item); }
+.ds-skeleton[*|data-shape=block]{ min-height:var(--s-36); border-radius:var(--r-card); }
+.ds-skeleton[*|data-shape=circle]{ border-radius:var(--r-pill); }
+.ds-skeleton[*|data-presence=entering],.ds-skeleton[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-skeleton[*|data-presence=entering][*|data-pulse=b],.ds-skeleton[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds-skeleton[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-skeleton[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }

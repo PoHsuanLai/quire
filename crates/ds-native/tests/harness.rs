@@ -173,7 +173,7 @@ fn HoverHubApp() -> Element {
 #[allow(non_snake_case)]
 fn HoverHubProbe() -> Element {
     let hub = use_hover_hub();
-    let card = (HoverKey("thread:1".into()), HoverKind::Thread);
+    let card = (HoverKey("thread:1".into()), HoverProfile::Card);
     let state = match hub.open() {
         Some(_) => "open",
         None => "closed",
@@ -285,8 +285,8 @@ fn HoverCardDemo() -> Element {
         HoverTarget { hover_key: HoverKey("sender:3".into()), kind: HoverKind::Sender,
             span { "Dana Okafor" }
         }
-        if let Some((_, kind)) = hub.open() {
-            HoverCard { kind, p { "dana@example.com" } }
+        if hub.open().is_some() {
+            HoverCard { kind: HoverKind::Sender, p { "dana@example.com" } }
         }
     }
 }
@@ -335,15 +335,15 @@ fn a_toast_hides_after_its_hold() {
         ToastApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
-    let shown = |harness: &Harness| harness.attr(".ds-toast", "data-shown");
+    let shown = |harness: &Harness| harness.attr(".ds-toast", "data-presence");
     let pushed = harness.now();
     harness.click(centre(&harness, ".ds-button"));
-    // It mounts below the edge for a frame, so the spring rises from there (gallery fix A).
-    assert_eq!(shown(&harness).as_deref(), Some("hidden"));
-    harness.advance(ms(100));
-    assert_eq!(shown(&harness).as_deref(), Some("shown"));
+    // It arrives sliding in from the right, and is present once that has settled.
+    assert_eq!(shown(&harness).as_deref(), Some("entering"));
+    harness.advance(ms(400));
+    assert_eq!(shown(&harness).as_deref(), Some("present"));
     assert_eq!(
-        harness.text_of(".ds-toast-text").as_deref(),
+        harness.text_of(".ds-toast-body").as_deref(),
         Some("Archived")
     );
     // Half the 5000 ms hold, not all of it (FINDINGS "Timing tests"): a check at the deadline
@@ -351,16 +351,16 @@ fn a_toast_hides_after_its_hold() {
     harness.advance(ms(2500));
     assert_eq!(
         shown(&harness).as_deref(),
-        Some("shown"),
+        Some("present"),
         "hid well before the hold ends"
     );
-    let hidden = settle_until(&mut harness, |h| shown(h).as_deref() == Some("hidden"));
+    let hidden = settle_until(&mut harness, |h| shown(h).as_deref() == Some("leaving"));
     assert!(
         hidden.duration_since(pushed) >= ms(5000),
         "hid only once the full hold had run: {:?}",
         hidden.duration_since(pushed)
     );
-    // Sunk: after `--t-big` and a frame nothing is laid out.
+    // Slid out: after `--t-quick` and a frame nothing is laid out.
     harness.advance(ms(500));
     assert_eq!(harness.count(".ds-toast"), 0);
 }

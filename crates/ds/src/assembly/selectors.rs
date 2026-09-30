@@ -58,7 +58,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Alert",
         root: "ds-alert",
-        parts: &["icon", "title"],
+        parts: &["icon", "title", "body", "footer"],
     },
     ComponentSelectors {
         component: "Avatar",
@@ -84,6 +84,16 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         component: "Chip",
         root: "ds-chip",
         parts: &["remove"],
+    },
+    ComponentSelectors {
+        component: "EmptyState",
+        root: "ds-empty-state",
+        parts: &["icon", "title", "body", "action"],
+    },
+    ComponentSelectors {
+        component: "HoverCard",
+        root: "ds-hovercard",
+        parts: &["body"],
     },
     ComponentSelectors {
         component: "KeyEquivalent",
@@ -113,7 +123,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Popover",
         root: "ds-popover",
-        parts: &[],
+        parts: &["body", "arrow"],
     },
     ComponentSelectors {
         component: "ProgressIndicator",
@@ -143,6 +153,16 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Sheet",
         root: "ds-sheet",
+        parts: &["body"],
+    },
+    ComponentSelectors {
+        component: "SidePanel",
+        root: "ds-side-panel",
+        parts: &["header", "body"],
+    },
+    ComponentSelectors {
+        component: "Skeleton",
+        root: "ds-skeleton",
         parts: &[],
     },
     ComponentSelectors {
@@ -158,12 +178,17 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Toast",
         root: "ds-toast",
-        parts: &[],
+        parts: &["body", "action"],
     },
     ComponentSelectors {
         component: "Toggle",
         root: "ds-toggle",
         parts: &["track", "indicator"],
+    },
+    ComponentSelectors {
+        component: "Tooltip",
+        root: "ds-tooltip",
+        parts: &[],
     },
 ];
 

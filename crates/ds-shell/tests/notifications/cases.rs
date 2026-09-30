@@ -2,8 +2,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Icon, IconSource, Inject, Material, Panel, PanelScrim, Px, Rich, RichRun,
-    RichText, RootExtent, RunTone, ScrimStrength, Shown, TextRun, Theme,
+    Appearance, Ds, Icon, IconSource, Inject, Material, Px, Rich, RichRun, RichText, RootExtent,
+    RunTone, Shown, SidePanel, TextRun, Theme,
 };
 use ds_shell::{
     AppMark, Banner, BannerEntry, BannerKey, BannerPosition, BannerStack, CardAction, GroupCount,
@@ -26,7 +26,7 @@ pub const SPECIMENS: &[Specimen] = &[
     ("stack-bottom-right-dark", stack_bottom_right_dark),
     ("stack-entry-below", stack_entry_below),
     ("center-light", center_light),
-    ("center-dark-scrim", center_dark_scrim),
+    ("center-dark", center_dark),
 ];
 
 /// `body` in a Toast root in `theme`.
@@ -193,10 +193,10 @@ pub fn stack_entry_below() -> Element {
 }
 
 /// The center in `theme`: a group header over two cards, in a Popover root.
-fn center(theme: Theme, scrim: PanelScrim) -> Element {
+fn center(theme: Theme) -> Element {
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Popover, stylesheet: Inject::Host, extent: RootExtent::Viewport,
-            Panel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0), scrim, onclose: |_| {},
+            SidePanel { label: "Notification Center", shown: Shown::Visible, width: Px(384.0), onclose: |_| {},
                 GroupHeader { icon: IconSource::Glyph(Icon::Mail), name: "Mail", count: 2, expanded: Shown::Visible, on_toggle: |_| {}, on_clear: |_| {} }
                 NotificationCard { app: mail(), age: "9:41", summary: "Grace Hopper", body: "Are we still on for Thursday?", on_close: |_| {}, on_open: |_| {} }
                 NotificationCard { app: mail(), age: "9:12", summary: "Ada Lovelace", on_close: |_| {}, on_open: |_| {} }
@@ -205,12 +205,12 @@ fn center(theme: Theme, scrim: PanelScrim) -> Element {
     }
 }
 
-/// Light, no scrim.
+/// Light.
 pub fn center_light() -> Element {
-    center(Theme::Light, PanelScrim::None)
+    center(Theme::Light)
 }
 
-/// Dark, over a standard scrim.
-pub fn center_dark_scrim() -> Element {
-    center(Theme::Dark, PanelScrim::Dim(ScrimStrength::Standard))
+/// Dark.
+pub fn center_dark() -> Element {
+    center(Theme::Dark)
 }

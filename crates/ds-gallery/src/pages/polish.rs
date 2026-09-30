@@ -14,12 +14,11 @@ use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
     Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuEntrance,
     MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, Scheme,
-    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, Tooltip, TooltipKind,
-    use_scope,
+    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, use_scope,
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_shell::{
-    DockFloor, DockFloorSetting, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
+    DockFloor, DockFloorSetting, DockLabel, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
     WorkspacePills,
 };
 
@@ -314,8 +313,7 @@ fn DockSection() -> Element {
                                 div { class: "g-polish-tiles",
                                     for (index , (family , icon , label , running)) in families.into_iter().enumerate() {
                                         div { class: "g-polish-tile",
-                                            Tooltip {
-                                                kind: TooltipKind::Fly,
+                                            DockLabel {
                                                 text: label,
                                                 shown: Some(if index == 1 { Shown::Visible } else { Shown::Hidden }),
                                                 IconView { source: IconSource::Glyph(icon), size: IconSize::Tile48, plate: Some(family) }

@@ -1,12 +1,11 @@
-//! The mail-app overlay cases: a scrim drawn inline in the pane it dims, under the reader
-//! the pane draws after it; a menu whose filter draws its query line; a hover card's flag whose
+//! The mail-app overlay cases: a menu whose filter draws its query line; a hover card's flag whose
 //! words are runs.
 
 use crate::cases::{Case, PartsCard};
 use dioxus::prelude::*;
 use ds::{
     Anchor, FlagTone, Flow, HoverCardPart, Icon, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow,
-    Point, Px, RunTone, Scrim, TextLine, TextRun,
+    Point, Px, RunTone, TextLine, TextRun,
 };
 use std::time::Duration;
 
@@ -74,20 +73,6 @@ pub const MAILO5_CASES: &[Case] = &[
         component: "menu",
         state: "filter-field-inline",
         make: || rsx! { div { Menu { kind: MenuKind::Rich, anchor: Anchor::Point(Point::default()), entries: labels(), filter: field(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline } } },
-        wait: NOW,
-    },
-    Case {
-        component: "scrim",
-        state: "inline",
-        make: || {
-            rsx! {
-                div { style: "position:relative",
-                    p { "The list." }
-                    Scrim { label: "Close peek", onclose: |_| {}, flow: Flow::Inline }
-                    article { "The peeked reader." }
-                }
-            }
-        },
         wait: NOW,
     },
 ];

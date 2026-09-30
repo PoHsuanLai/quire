@@ -12,6 +12,7 @@ use super::kind_slug;
 use crate::host::measure::MountedRef;
 use crate::stack::hover_hub::{HoverKey, HoverKind};
 use dioxus::prelude::*;
+use ds_motion::hover_intent::HoverProfile;
 
 /// The element a hover target is drawn as.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -31,7 +32,7 @@ struct Hooks {
     driver: HoverDriver,
     element: Signal<Option<MountedRef>>,
     key: HoverKey,
-    kind: HoverKind,
+    profile: HoverProfile,
 }
 
 impl Hooks {
@@ -50,7 +51,7 @@ impl Hooks {
             .peek()
             .clone()
             .map_or(HoverAnchor::Unplaced, HoverAnchor::Element);
-        self.driver.over(self.key.clone(), self.kind, anchor);
+        self.driver.over(self.key.clone(), self.profile, anchor);
     }
 
     /// The pointer left the target.
@@ -64,14 +65,18 @@ impl Hooks {
     }
 }
 
-/// Wraps whatever a card hooks, drawn as `as_`: feeds the hover hub.
+/// Wraps whatever a hover interface hooks, drawn as `as_`: feeds the hover hub, which opens the
+/// card, tooltip or label after `profile`'s delay.
+///
+/// `kind` is a card's content kind (`data-kind`); a tooltip or a label has none.
 ///
 /// The component doc names the first prop `key`; dioxus reserves `key` for list identity and
 /// rejects a prop of that name, so it is `hover_key` (FINDINGS.md).
 #[component]
 pub fn HoverTarget(
     hover_key: HoverKey,
-    kind: HoverKind,
+    #[props(default, into)] kind: Option<HoverKind>,
+    #[props(default)] profile: HoverProfile,
     #[props(default)] as_: TargetElement,
     children: Element,
 ) -> Element {
@@ -79,16 +84,19 @@ pub fn HoverTarget(
         driver: use_hover_intent(),
         element: use_signal(|| None::<MountedRef>),
         key: hover_key.clone(),
-        kind,
+        profile,
     };
     let (mount, over, out, down) = (hooks.clone(), hooks.clone(), hooks.clone(), hooks);
-    let slug = kind_slug(kind);
+    let slug = kind.map(kind_slug);
+    // A hint (tooltip, label) wraps a control, so it is a flex box that is as big as the control.
+    let hint = (profile != HoverProfile::Card).then_some("true");
     match as_ {
         TargetElement::Span => rsx! {
             span {
                 class: "ds-hover-target",
                 "data-hover-key": "{hover_key.0}",
                 "data-kind": slug,
+                "data-hint": hint,
                 onmounted: move |event| mount.mounted(event),
                 onmouseover: move |event| over.over(event),
                 onmouseleave: move |_| out.out(),
@@ -101,6 +109,7 @@ pub fn HoverTarget(
                 class: "ds-hover-target",
                 "data-hover-key": "{hover_key.0}",
                 "data-kind": slug,
+                "data-hint": hint,
                 "data-as": "div",
                 onmounted: move |event| mount.mounted(event),
                 onmouseover: move |event| over.over(event),
@@ -114,6 +123,7 @@ pub fn HoverTarget(
                 class: "ds-hover-target",
                 "data-hover-key": "{hover_key.0}",
                 "data-kind": slug,
+                "data-hint": hint,
                 "data-as": "li",
                 onmounted: move |event| mount.mounted(event),
                 onmouseover: move |event| over.over(event),

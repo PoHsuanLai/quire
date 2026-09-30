@@ -8,7 +8,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material, Point, Px,
-    TargetElement, use_hover_hub,
+    TargetElement, Tooltip, use_hover_hub,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -44,17 +44,12 @@ fn Page() -> Element {
                     }
                 }
             }
-            p { style: "margin-top:40px",
-                HoverTarget { hover_key: HoverKey("time:1".into()), kind: HoverKind::Tip, "09:41" }
+            p { style: "margin:40px 0 0 200px",
+                Tooltip { text: "Wed 23 Sep 2026, 09:41", "09:41" }
             }
         }
-        if let Some((open, kind)) = hub.open() {
-            HoverCard { key: "{open.0}", kind,
-                match kind {
-                    HoverKind::Tip => rsx! { "Wed 23 Sep 2026, 09:41, 10:41 their time (Lagos)" },
-                    _ => rsx! { p { class: "card-of", "{open.0}" } },
-                }
-            }
+        if let Some((open, _)) = hub.open().filter(|(key, _)| key.0.starts_with("pin:")) {
+            HoverCard { key: "{open.0}", kind: HoverKind::Side, p { class: "card-of", "{open.0}" } }
         }
     }
 }
@@ -128,22 +123,29 @@ fn a_time_tip_opens_small_on_one_line_below_its_time() {
     harness.advance(ms(50));
     let time = "p .ds-hover-target";
     harness.pointer_move(centre(&harness, time));
+    // Well under the Tip profile's second: nothing yet.
+    harness.advance(ms(400));
+    assert_eq!(harness.count(".ds-tooltip"), 0, "{}", harness.html());
     // The Tip profile waits a second.
-    harness.advance(ms(1100));
-    assert_eq!(
-        harness.attr(".ds-hovercard", "data-kind").as_deref(),
-        Some("tip"),
-        "{}",
-        harness.html()
-    );
+    harness.advance(ms(800));
+    assert_eq!(harness.count(".ds-tooltip"), 1, "{}", harness.html());
     let target = rect(&harness, time);
-    let tip = rect(&harness, ".ds-hovercard");
+    let tip = rect(&harness, ".ds-tooltip");
     assert!(
-        near(tip.origin.x, target.origin.x.0)
-            && near(tip.origin.y, target.origin.y.0 + target.size.height.0 + 6.0),
-        "{tip:?} under {target:?}"
+        near(
+            Px(tip.origin.x.0 + tip.size.width.0 / 2.0),
+            target.origin.x.0 + target.size.width.0 / 2.0
+        ) && near(tip.origin.y, target.origin.y.0 + target.size.height.0 + 6.0),
+        "{tip:?} centred under {target:?}"
     );
-    // At most 260 wide, and one 12 px line in 6 px of padding: two lines would pass 45.
+    // At most 260 wide, and one 12 px line in 3 px of padding: two lines would pass 45.
     assert!(tip.size.width.0 <= 260.0, "tooltip-sized: {tip:?}");
     assert!(tip.size.height.0 < 36.0, "one line: {tip:?}");
+    // Gone the moment the pointer leaves.
+    harness.pointer_move(Point {
+        x: Px(700.0),
+        y: Px(400.0),
+    });
+    harness.advance(ms(400));
+    assert_eq!(harness.count(".ds-tooltip"), 0, "closes with the pointer");
 }

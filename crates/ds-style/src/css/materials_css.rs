@@ -113,7 +113,7 @@ const CARDS: [&str; 7] = [
     ".ds-sheet",
     ".ds-notification-plate",
     ".ds-notification-layer",
-    ".ds-panel",
+    ".ds-side-panel",
     ".ds-widget[*|data-host=desktop]",
     ".ds-shot-plate",
 ];
@@ -320,7 +320,7 @@ mod tests {
             ".ds[*|data-material][*|data-frame=tinted]{background:transparent;position:relative;z-index:var(--z-raise);}",
             ".ds[*|data-material][*|data-frame=tinted][*|data-blur=off] > .ds-frame{opacity:.94;}",
             ".ds[*|data-material][*|data-chrome=transparent]{background:transparent;box-shadow:none;}",
-            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
+            ".ds[*|data-material][*|data-chrome=transparent] .ds-popover,.ds[*|data-material][*|data-chrome=transparent] .ds-sheet,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-plate,.ds[*|data-material][*|data-chrome=transparent] .ds-notification-layer,.ds[*|data-material][*|data-chrome=transparent] .ds-side-panel,.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop],.ds[*|data-material][*|data-chrome=transparent] .ds-shot-plate{background:var(--m-tint-solid);border-color:transparent;box-shadow:var(--m-box);}",
         ];
         for want in WANT {
             assert!(css.contains(want), "missing {want}\n{css}");

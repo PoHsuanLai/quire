@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 21] = [
+pub const REGISTRY: [Entry; 22] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -63,6 +63,13 @@ pub const REGISTRY: [Entry; 21] = [
         lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
         height: 10800,
         body: pages::overlays::OverlaysPage,
+    },
+    Entry {
+        page: Page::Feedback,
+        title: "Overlays and feedback",
+        lede: "Popover under each dismiss policy and with its arrow, Sheet hung from the window, centred and at the bottom, the alerts, SidePanel, Tooltip and DockLabel up and down, hover cards, the toast, EmptyState in its three forms and Skeleton in its three shapes, each with the states it can express.",
+        height: 5200,
+        body: pages::overlays_catalogue::OverlaysCataloguePage,
     },
     Entry {
         page: Page::Materials,

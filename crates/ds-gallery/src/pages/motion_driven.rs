@@ -11,9 +11,9 @@ use ds::Tracking;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
-    Appearance, Check, DragReturnFrame, Ds, Fraction, Icon, IconSource, Inject, Material, Pane,
-    PaneSwitcher, Panel, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet,
-    SheetPlacement, Shown, Slider, Toggle,
+    Appearance, Attach, Check, DragReturnFrame, Ds, Fraction, Icon, IconSource, Inject, Material,
+    Pane, PaneSwitcher, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, Shown,
+    SidePanel, Slider, Toggle,
 };
 use ds_shell::{AppKey, AppMark, AppSwitcher, NotificationCard, NotificationSwipe, SwitcherApp};
 
@@ -198,14 +198,14 @@ fn SheetCell() -> Element {
         })
     };
     rsx! {
-        Cell { name: "Sheet", code: "present / dismiss on --present-p",
+        Cell { name: "Sheet", code: "sheet-in / sheet-out",
             controls: rsx! { {mini("Show / hide", flip)} },
             Stage { material: Material::Sheet,
                 Sheet {
                     label: "Rename",
                     onclose: move |_| shown.set(Shown::Hidden),
                     shown: Some(shown()),
-                    placement: SheetPlacement::Centre,
+                    attach: Attach::Centre,
                     div { class: "g-panel", p { class: "g-note", "Hide it and show it again mid-way." } }
                 }
             }
@@ -223,10 +223,10 @@ fn PanelCell() -> Element {
         })
     };
     rsx! {
-        Cell { name: "Edge panel", code: "panel-in on mount, then --present-p",
+        Cell { name: "Side panel", code: "panel-in / panel-out",
             controls: rsx! { {mini("Show / hide", flip)} },
             Stage { material: Material::Window,
-                Panel { label: "Notification Center", shown: shown(), width: Px(160.0),
+                SidePanel { label: "Notification Center", shown: shown(), width: Px(160.0),
                     p { class: "g-note", "Nothing new." }
                 }
             }

@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 57] = [
+pub(crate) const SHEETS: [(&str, &str); 59] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
@@ -50,6 +50,10 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
         include_str!("../components/lists/emoji_grid/grid.css"),
     ),
     (
+        "empty_state",
+        include_str!("../components/overlays/empty_state.css"),
+    ),
+    (
         "hover_card",
         include_str!("../components/overlays/hover_card.css"),
     ),
@@ -89,7 +93,6 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
         "pane_switcher",
         include_str!("../components/lists/preview/switcher.css"),
     ),
-    ("panel", include_str!("../components/overlays/panel.css")),
     (
         "radio_group",
         include_str!("../components/controls/radio_group.css"),
@@ -131,8 +134,16 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
     ),
     ("sheet", include_str!("../components/overlays/sheet.css")),
     (
+        "side_panel",
+        include_str!("../components/overlays/side_panel.css"),
+    ),
+    (
         "sidebar_item",
         include_str!("../components/app/sidebar_item.css"),
+    ),
+    (
+        "skeleton",
+        include_str!("../components/overlays/skeleton.css"),
     ),
     ("slider", include_str!("../components/controls/slider.css")),
     (

@@ -51,7 +51,7 @@ pub use crate::{
         module_tile::ModuleTile,
         module_tile_kind::{Chevron, ModuleState, TileSpan},
     },
-    dock_parts::{DockFloor, RunningDot},
+    dock_parts::{DockFloor, DockLabel, RunningDot},
     emoji::{
         AnimatedEmoji, EMOJI_ATTRIBUTION,
         disc::{DiscHue, EmojiDisc, EmojiPlayback},

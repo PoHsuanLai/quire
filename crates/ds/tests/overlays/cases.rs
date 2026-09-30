@@ -4,18 +4,22 @@
 
 use dioxus::prelude::*;
 use ds::ControlSize;
+use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{Align, Availability, Button};
 use ds::{
-    Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
-    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, FlagTone,
-    Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
+    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
+    BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
+    HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
     HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
     Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, Peek, PeekMode,
-    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble,
-    SendPhase, SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip, TooltipKind, UndoToken,
-    use_hover_hub, use_toasts,
+    PersonHue, Placement, Point, Popover, Px, Rect, SelectionBubble, SendPhase, SendPill, Sheet,
+    Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
 };
-use ds::{Check, Fraction, Shortcut, ShortcutKey};
+
+use ds::{
+    Answers, Attach, Check, EmptyForm, EmptyState, Fraction, Shortcut, ShortcutKey, SidePanel,
+    Skeleton, SkeletonShape,
+};
 use std::time::Duration;
 
 /// One component in one state.
@@ -248,7 +252,12 @@ fn SenderCard(kind: HoverKind) -> Element {
     let key = HoverKey("sender:3".to_string());
     use_hook({
         let key = key.clone();
-        move || hub.feed(HoverEvent::Over((key, kind), kind.profile()))
+        move || {
+            hub.feed(HoverEvent::Over(
+                (key, HoverProfile::Card),
+                HoverProfile::Card,
+            ))
+        }
     });
     let open = hub.open().or(hub.leaving());
     rsx! {
@@ -291,8 +300,8 @@ pub fn PartsCard(parts: Vec<HoverCardPart>) -> Element {
         let key = key.clone();
         move || {
             hub.feed(HoverEvent::Over(
-                (key, HoverKind::Sender),
-                HoverKind::Sender.profile(),
+                (key, HoverProfile::Card),
+                HoverProfile::Card,
             ))
         }
     });
@@ -478,23 +487,29 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: status_lines(), entrance: MenuEntrance::Instant, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
-    // Popover: one per elevation and dismissal.
+    // Popover: each dismiss policy, and the arrow.
     Case {
         component: "popover",
-        state: "pop",
+        state: "transient",
         make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Bottom, Align::Start), gap: Px(6.0), onclose: |_| {}, "Anything" } },
         wait: NOW,
     },
     Case {
         component: "popover",
-        state: "bubble-esc-only",
-        make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Top, Align::Center), gap: Px(8.0), elevation: Elevation::Bubble, dismiss: Dismiss::Semitransient, onclose: |_| {}, "Anything" } },
+        state: "semitransient-esc-only",
+        make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Top, Align::Center), gap: Px(8.0), dismiss: Dismiss::Semitransient, onclose: |_| {}, "Anything" } },
         wait: NOW,
     },
     Case {
         component: "popover",
-        state: "sheet-owner-closes",
-        make: || rsx! { Popover { anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), placement: Placement::new(Side::Right, Align::End), gap: Px(0.0), elevation: Elevation::Sheet, dismiss: Dismiss::Manual, onclose: |_| {}, "Anything" } },
+        state: "manual-owner-closes",
+        make: || rsx! { Popover { anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), placement: Placement::new(Side::Right, Align::End), gap: Px(0.0), dismiss: Dismiss::Manual, onclose: |_| {}, "Anything" } },
+        wait: NOW,
+    },
+    Case {
+        component: "popover",
+        state: "arrow",
+        make: || rsx! { Popover { anchor: Anchor::Rect(button_rect()), placement: Placement::new(Side::Bottom, Align::Center), gap: Px(2.0), arrow: Arrow::Arrow, onclose: |_| {}, "Anything" } },
         wait: NOW,
     },
     // HoverCard: the target at rest, then each kind of card open after the intent.
@@ -584,37 +599,25 @@ pub const CASES: &[Case] = &[
         make: || rsx! { PartsCard { parts: vec![person(), stats(), flag(FlagTone::Danger), foot(), actions()] } },
         wait: INTENT,
     },
-    // Tooltip: the fly label, and the card closed and open.
+    // Tooltip: at rest under the pointer's wait, and caller-driven up and down.
     Case {
         component: "tooltip",
-        state: "fly",
-        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Snooze until…", ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
+        state: "rest",
+        make: || rsx! { Tooltip { text: "Snooze until…", ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
         wait: NOW,
     },
     // Caller-driven: shown with no pointer, hidden under one.
     Case {
         component: "tooltip",
-        state: "fly-shown",
-        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Terminal", shown: Some(Shown::Visible), span { "tile" } } },
+        state: "shown",
+        make: || rsx! { Tooltip { text: "Terminal", shown: Some(Shown::Visible), span { "tile" } } },
         wait: NOW,
     },
     Case {
         component: "tooltip",
-        state: "fly-hidden",
-        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Terminal", shown: Some(Shown::Hidden), span { "tile" } } },
+        state: "hidden",
+        make: || rsx! { Tooltip { text: "Terminal", shown: Some(Shown::Hidden), span { "tile" } } },
         wait: NOW,
-    },
-    Case {
-        component: "tooltip",
-        state: "card-closed",
-        make: || rsx! { Tooltip { kind: TooltipKind::Card, text: "Wed 23 Sep 2026, 09:41", sub: "10:41 their time (Lagos)", "09:41" } },
-        wait: NOW,
-    },
-    Case {
-        component: "tooltip",
-        state: "card-open",
-        make: || rsx! { TipOpen {} },
-        wait: INTENT,
     },
     // Toast: hidden (every root), up with an undo, up without one.
     Case {
@@ -635,19 +638,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Pushed { undo: None } },
         wait: FRAME,
     },
-    // Scrim, Peek (both modes), Sheet.
-    Case {
-        component: "scrim",
-        state: "default",
-        make: || rsx! { Scrim { label: "Close peek", onclose: |_| {} } },
-        wait: NOW,
-    },
-    Case {
-        component: "scrim",
-        state: "modal",
-        make: || rsx! { Scrim { label: "Cancel", onclose: |_| {}, strength: ScrimStrength::Modal } },
-        wait: NOW,
-    },
+    // Peek (both modes), Sheet.
     Case {
         component: "peek",
         state: "center",
@@ -662,7 +653,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "sheet",
-        state: "default",
+        state: "window",
         make: || rsx! { Sheet { label: "Accounts", onclose: |_| {}, p { "Settings." } } },
         wait: NOW,
     },
@@ -670,7 +661,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "sheet",
         state: "centre",
-        make: || rsx! { Sheet { label: "Power", onclose: |_| {}, placement: SheetPlacement::Centre, p { "Shut down?" } } },
+        make: || rsx! { Sheet { label: "Power", onclose: |_| {}, attach: Attach::Centre, p { "Shut down?" } } },
         wait: SETTLED,
     },
     Case {
@@ -687,9 +678,15 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "sheet",
-        state: "modal-scrim",
-        make: || rsx! { Sheet { label: "Power", onclose: |_| {}, scrim: ScrimStrength::Modal, placement: SheetPlacement::Centre, p { "Shut down?" } } },
-        wait: NOW,
+        state: "bottom-wide",
+        make: || rsx! { Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide, p { "Gallery." } } },
+        wait: SETTLED,
+    },
+    Case {
+        component: "sheet",
+        state: "narrow",
+        make: || rsx! { Sheet { label: "Alert", onclose: |_| {}, attach: Attach::Centre, width: SheetWidth::Narrow, p { "Password?" } } },
+        wait: SETTLED,
     },
     // CommandPalette: results with a query and tokens, and nothing found.
     Case {
@@ -763,22 +760,79 @@ pub const CASES: &[Case] = &[
         make: || rsx! { SendPill { text: "Sent", progress: Fraction(1000), phase: SendPhase::Done, onundo: |_| {} } },
         wait: FRAME,
     },
+    // EmptyState: each form, with an action and with Retry.
+    Case {
+        component: "empty_state",
+        state: "empty-action",
+        make: || rsx! { EmptyState { title: "No messages", description: Some("Mail you receive lands here.".to_string()), action: Some(rsx! { Button { answers: Answers::Return, label: "Compose", onclick: |_| {} } }) } },
+        wait: NOW,
+    },
+    Case {
+        component: "empty_state",
+        state: "no-results",
+        make: || rsx! { EmptyState { form: EmptyForm::NoResults, title: "No results for “uidl”" } },
+        wait: NOW,
+    },
+    Case {
+        component: "empty_state",
+        state: "failure-retry",
+        make: || rsx! { EmptyState { form: EmptyForm::Failure, title: "Couldn’t load your mail", description: Some("The server didn’t answer.".to_string()), onretry: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "empty_state",
+        state: "retry-only-on-failure",
+        make: || rsx! { EmptyState { title: "No messages", onretry: |_| {} } },
+        wait: NOW,
+    },
+    // Skeleton: each shape, sized, and hidden.
+    Case {
+        component: "skeleton",
+        state: "line",
+        make: || rsx! { Skeleton {} },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton",
+        state: "line-sized",
+        make: || rsx! { Skeleton { width: Some(Px(120.0)) } },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton",
+        state: "block",
+        make: || rsx! { Skeleton { shape: SkeletonShape::Block, width: Some(Px(160.0)), height: Some(Px(80.0)) } },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton",
+        state: "circle",
+        make: || rsx! { Skeleton { shape: SkeletonShape::Circle, width: Some(Px(40.0)), height: Some(Px(99.0)) } },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton",
+        state: "hidden",
+        make: || rsx! { Skeleton { shown: Shown::Hidden } },
+        wait: NOW,
+    },
+    // SidePanel: shown, with a header, and mounted hidden.
+    Case {
+        component: "side_panel",
+        state: "shown",
+        make: || rsx! { SidePanel { label: "Notification Center", shown: Shown::Visible, p { "Nothing new." } } },
+        wait: NOW,
+    },
+    Case {
+        component: "side_panel",
+        state: "header",
+        make: || rsx! { SidePanel { label: "Notification Center", shown: Shown::Visible, header: Some(rsx! { strong { "Today" } }), p { "Nothing new." } } },
+        wait: NOW,
+    },
+    Case {
+        component: "side_panel",
+        state: "hidden",
+        make: || rsx! { SidePanel { label: "Notification Center", shown: Shown::Hidden, p { "Nothing new." } } },
+        wait: NOW,
+    },
 ];
-
-/// A Card tooltip whose target the pointer came over.
-#[component]
-fn TipOpen() -> Element {
-    let hub = use_hover_hub();
-    use_hook(move || {
-        hub.feed(HoverEvent::Over(
-            (
-                HoverKey("tip:Wed 23 Sep 2026, 09:41".to_string()),
-                HoverKind::Sender,
-            ),
-            HoverProfile::Card,
-        ))
-    });
-    rsx! {
-        Tooltip { kind: TooltipKind::Card, text: "Wed 23 Sep 2026, 09:41", sub: "10:41 their time (Lagos)", "09:41" }
-    }
-}
