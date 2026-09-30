@@ -16,16 +16,18 @@ that rev.
 
 ## Open items
 
-- **Timing tokens that design/30 section 1.2 deletes still have users.** `--t-tap`,
-  `--t-ambient`, `--t-big-heavy`, `--t-crumple-heavy`, `--t-spark`, `--t-curl`,
-  `--t-curl-heavy`, `--t-send`, `--t-float`, `--t-sail`, `--t-boat-return`, `--t-spin`,
-  `--t-nudge`, `--t-park`, `--t-fill`, `--t-sweep`, `--t-flash`, `--t-count-step`,
-  `--t-pending-step`, `--t-send-ring`, `--e-spring`, the scalars (`--overshoot`, `--squish`,
-  `--lift`, `--tilt`, `--stagger`, `--pickup`), `StyleDelay` (`--d-fly`, `--d-heal`) and the
-  delays `PendingGrace`, `PendingCap`, `SettleHold`, `SendCountdown`, `SendTick` are read by
-  keyframes and components that the motion primitives of step 4a.3 replace; each goes with its
-  last user. `--t-spin-step` and the interaction delays (`LongPress`, `SubmenuOpen`,
-  `TriangleTimeout`, `TypeaheadReset`) have no reader until then.
+- **Motion and interaction primitives of step 4a.3 have consumers still to move.** Two
+  primitives have no caller in quire yet: `use_collapse` waits for the `Disclosure` of step 4a.5
+  (`TreeItem` is a native `details`), and `LongPress` waits for the dock and titlebar menus in
+  sill. `rubber::resist` is read by the host's scroll; `Swipe` keeps its own `swipe_damping`
+  setting (a quarter, not `.55`) until design/22 decides the key. The tooltip's Fly label is
+  CSS, so its delay is 2.5 x `--t-big` (1 s, the Tip profile's) until the Fly is driven by
+  `HoverProfile::Tip`. `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
+  (`MenuTiming` carries its own). The pressed appearance (`data-pressed`) is written by `Button`
+  and `IconButton` only; the other controls lose the deleted press squish until step 4a.4
+  rebuilds them. `--focus-ring` (2.5 px) is read only by the preview pane; the global ring is
+  `--ring` with `--focus-gap`, and the ring's fade over `--t-quick` waits for Blitz to
+  transition `outline`.
 - **The Mac Look applies part of design/30 section 3.2.** `Look::Mac` carries the neutral
   colours (paper, surface, raise, ink, lines) and the radii the table names; the ink levels
   are firmer than macOS's 85, 55 and 25 % because the legibility gates hold them (design/03

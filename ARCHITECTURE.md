@@ -258,7 +258,7 @@ The single place a concept lives. Extend it; never write a second one.
 | --- | --- | --- | --- | --- |
 | `Word` | `ds-core` | every closed vocabulary enum (derived) | a new closed set | never |
 | `Token` | `ds-style` | each token family; shell families in `ds-shell` | a new family | never |
-| `Timeline` | `ds-motion` | `Ease`, `Spring`, `Sweep`, `Glide`, `CountUp`, `Pending` | a Rust-driven animation | never |
+| `Timeline` | `ds-motion` | `Ease`, `Spring`, `Glide`, `Pending` | a Rust-driven animation | never |
 | `Detailed` | `ds-motion` | 13 component state enums | a component with moments | never |
 | `Widget` | `ds-shell` | battery, world clock, month, and each widget kind | a new widget kind | never |
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
@@ -731,7 +731,7 @@ path each, until step 12 replaces them with the prelude.
        Motion levels reduced to Standard and Reduced;
     2. vocabulary: (done) (1.5) `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
        `RowState`, `Activity`, `FocusStyle`; the `Common` props; `ds::selectors`;
-    3. motion primitives (1.3): `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
+    3. motion primitives: (done) (1.3) `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
        deleted keyframes, scalars and tokens; then interaction primitives (1.4): `LongPress`,
        `Roving` + `Typeahead`, `HoverIntent` profiles, focus ring and `Highlight`, drag threshold;
     4. P1 controls and fields: `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,

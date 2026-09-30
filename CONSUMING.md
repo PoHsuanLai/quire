@@ -399,19 +399,19 @@ crate. `examples/consumer` never needed this escape hatch; note in your own repo
 Never `std::thread::sleep`, `tokio::time::sleep` or a hand-rolled `setTimeout`-equivalent to
 drive a class toggle. Use `ds::use_pulse` (restart a keyframe: `Pulse::fire()`) or
 `ds::use_motion_timer` (`MotionTimer::start(on_settled)`, which runs for exactly
-`ds::settle(anim, level, index)`); both read the enclosing `Ds`'s resolved motion level, so
+`ds::settle(anim, level)`); both read the enclosing `Ds`'s resolved motion level, so
 `MotionLevel::Reduced` collapses them automatically. Prove it with `ds_native::Harness`, which
 drives a real Blitz document on a real (if fast-forwarded) clock — the test below is
 `examples/consumer/tests/coherence.rs::the_sent_badge_times_out_on_ds_motions_own_clock`,
 shortened:
 
 ```rust
-use ds::{resolve, settle, Anim, Appearance, SpaceLook, StaggerIndex, SystemPrefs};
+use ds::{resolve, settle, Anim, Appearance, SpaceLook, SystemPrefs};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
-let hold = settle(Anim::Fade, resolved.motion, StaggerIndex::default()); // never a millisecond literal
+let hold = settle(Anim::Fade, resolved.motion); // never a millisecond literal
 
 let mut harness = Harness::new(YourApp, Viewport { width: 480, height: 360, scale_percent: 100 });
 // ...trigger the state change...
@@ -491,13 +491,12 @@ rsx! {
 ### Lists
 
 ```rust
-use ds::{ListRow, Selection, Emphasis, StaggerIndex, Presence, PulseKey};
+use ds::{ListRow, Selection, Emphasis, Presence, PulseKey};
 
 rsx! {
     ListRow {
         selection: Selection::Unselected,
         emphasis: Emphasis::Plain,
-        index: StaggerIndex::new(0),
         presence: Presence::Present,
         name: "Ada Lovelace".to_owned(),
         via: None,
