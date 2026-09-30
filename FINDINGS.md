@@ -1178,8 +1178,8 @@ What Blitz at the pinned rev paints (48 px, headless):
   them, so one inline write reaches every nested scope): bar 13/500, pill 24, radius 4; text
   menus 22 px rows, 13/400, highlight radius 6, 5 px separator margins; launcher field 22/500
   with a 20 px glyph, rows 14/12; tooltips 12.
-- **The level control** defaults to `LevelLook::Capsule` (the current macOS form: glyph, level
-  and mute in one shape); `CapsuleKnob` and `Segments` remain. The two-tone glyph is drawn twice,
+- **The capsule slider** defaults to `SliderLook::Capsule` (the current macOS form: glyph, level
+  and mute in one shape); `CapsuleKnob` remains, and the sixteen squares are the discrete `LevelIndicator`. The two-tone glyph is drawn twice,
   once clipped by the fill. The rubber band past an end is `6 x d / (d + 12)` px, off under
   Reduced; keys step on a 16 or 64 grid.
 - **The OSD's motion** reads a signed `--osd-dy` per position (-8 px top right, 8 px bottom

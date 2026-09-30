@@ -80,7 +80,7 @@ pub(crate) fn trailing_slot(element: Element) -> Element {
     }
 }
 
-/// The editing slot: the caller's field (a Bare `TextInput` focused on mount,
+/// The editing slot: the caller's field (a plain `TextField` focused on mount,
 /// its text selected) drawn where the label is, taking the label's free space so nothing on the
 /// row moves. A click in it never reaches the summary, so it neither toggles nor selects the
 /// row; the press's own pointer-down still puts the caret in the field (Blitz focuses a text

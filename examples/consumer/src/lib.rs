@@ -1,6 +1,6 @@
 //! A minimal page proving quire's coherence rules from outside the quire workspace
 //! (`../../CONSUMING.md` "The consumer example"): one `Ds` root, a page built only from quire
-//! components (`Button`, `TextInput`, `Menu`, `Toast`), a stylesheet of its own, and motion
+//! components (`Button`, `TextField`, `Menu`, `Toast`), a stylesheet of its own, and motion
 //! driven only by `ds::motion` timers, never an ad-hoc sleep.
 //!
 //! `tests/coherence.rs` is the point of this crate: it runs the four coherence rules from

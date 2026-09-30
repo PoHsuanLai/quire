@@ -38,7 +38,7 @@ pub enum Family {
     #[token(value = "\"Noto Serif\",Georgia,\"Times New Roman\",serif")]
     Serif,
     /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
-    /// code, `Kbd`, aligned logs.
+    /// code, `KeyEquivalent` caps, aligned logs.
     #[token(value = "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
     Code,
 }

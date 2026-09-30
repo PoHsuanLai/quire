@@ -15,7 +15,7 @@ use ds_lint::{Exception, LintConfig, Offence, Profile, Rule, stylesheet};
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
 /// Space dot's stops (`SpaceDot` and the Space editor's dots), and a tinted plate's
 /// stops and ink per scheme (`IconView { plate_tint }`), and the level
-/// control's rubber band and segment stagger (`LevelControl`).
+/// control's rubber band and segment stagger (the capsule `Slider`).
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
     "--av-fg",

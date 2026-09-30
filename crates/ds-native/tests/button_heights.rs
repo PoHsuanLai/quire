@@ -1,11 +1,9 @@
-//! `ButtonVariant::Primary` drew with `border:0` while Secondary
-//! and Danger carry a `--hair` border, so a Primary stood one `--hair` short top and bottom of
-//! a Secondary or a Danger beside it — 36 px against 38 px at `ButtonSize::Regular`. Primary
-//! (and Secondary, which shares its rule) now carries `border:var(--hair) solid transparent`
-//! (button.css): the box model matches Danger's own `--hair` border, the paint does not
-//! (`background-clip:border-box`'s default already paints `--accent` under a transparent
-//! border, so Primary looks exactly as it did). This measures that Primary, Secondary and
-//! Danger render the same height side by side, at `ButtonSize::Regular` and at `ButtonSize::Mini`.
+//! A default button (`Answers::Return`) draws its accent fill under a transparent `--hair` border,
+//! as a plain push button and a destructive one carry a visible one, so all three stand the same
+//! height (button.css): the box model matches, the paint does not differ
+//! (`background-clip:border-box`'s default already paints `--accent` under a transparent border).
+//! This measures that a default, a plain and a destructive push button render the same height side by
+//! side, at `ControlSize::Regular` and at `ControlSize::Mini`.
 
 use dioxus::prelude::*;
 use ds::{Answers, ButtonRole, ControlSize};

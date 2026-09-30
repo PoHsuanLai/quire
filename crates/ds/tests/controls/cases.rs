@@ -119,7 +119,7 @@ pub const CASES: &[Case] = &[
         state: "danger-regular-disabled",
         make: || rsx! { Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} } },
     },
-    // IconButton: four variants, expanded, pressed, tooltip, disabled.
+    // Toolbar buttons with only an image: four variants, expanded, pressed, tooltip, disabled.
     Case {
         component: "button",
         state: "toolbar-tool",
@@ -170,7 +170,7 @@ pub const CASES: &[Case] = &[
         state: "toolbar-disabled",
         make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
     },
-    // IconButton with an external icon and an element id.
+    // A toolbar button with an external icon and an element id.
     Case {
         component: "button",
         state: "toolbar-symbolic",
@@ -288,7 +288,7 @@ pub const CASES: &[Case] = &[
         state: "focus-on-mount",
         make: || rsx! { TextField { bezel: FieldBezel::Plain, label: "Link", value: "", placeholder: "Paste a link", focus: FieldFocus::OnMount, oninput: |_| {} } },
     },
-    // SearchField: empty, and typed with tokens.
+    // A search field: empty, and typed with tokens.
     Case {
         component: "text_field",
         state: "search-empty",
@@ -299,7 +299,7 @@ pub const CASES: &[Case] = &[
         state: "search-tokens",
         make: || rsx! { TextField { label: "Search", value: "uidl", placeholder: "Search mail, people, actions", tokens: vec!["from dana".to_string(), "has:attachment".to_string()], oninput: |_| {}, onkey: |_| {} , kind: FieldKind::Search, bezel: FieldBezel::Plain} },
     },
-    // Kbd: both sizes, every modifier.
+    // Key caps: each size, every modifier.
     Case {
         component: "key_equivalent",
         state: "regular",

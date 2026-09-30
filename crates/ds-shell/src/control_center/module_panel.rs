@@ -3,7 +3,7 @@
 //! plate of its own (design/13-BEHAVIOUR-menus-windows.md section 13.3.7).
 //!
 //! A tile is a toggle with a glyph, a title and a status; a panel is not pressable at all: its
-//! content (a `LevelControl`, a picker, buttons) takes every press, so the panel is a plain
+//! content (a `Slider`, a picker, buttons) takes every press, so the panel is a plain
 //! `div` with no role. It spans the whole grid row by default, as a slider module does.
 
 use crate::control_center::module_tile_kind::TileSpan;

@@ -91,10 +91,10 @@ pub fn RadioGroup<T: Clone + PartialEq + 'static>(
                 if let Some(to) = rove_to(&keyed, &current, rove) {
                     event.prevent_default();
                     event.stop_propagation();
-                    if let Some(index) = values.iter().position(|value| *value == to) {
-                        if let Some(Some(element)) = items.peek().get(index) {
-                            focus_soon(element.clone());
-                        }
+                    if let Some(index) = values.iter().position(|value| *value == to)
+                        && let Some(Some(element)) = items.peek().get(index)
+                    {
+                        focus_soon(element.clone());
                     }
                     onchange.call(to);
                 }

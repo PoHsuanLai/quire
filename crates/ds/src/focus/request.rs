@@ -12,7 +12,7 @@ use ds_style::task::{try_get, try_set};
 pub struct FocusTicket(pub u32);
 
 /// A caller's handle on a field's focus: pass it as `Focus::Controlled(request)` to a
-/// `TextInput` (or as `focus` to a `SearchField`'s palette), then call [`FocusRequest::request`]
+/// `TextField` (or as `focus` to a palette's search field), then call [`FocusRequest::request`]
 /// from a handler whenever the field should have the keyboard again.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct FocusRequest {

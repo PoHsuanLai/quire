@@ -1,6 +1,6 @@
 //! CommandPalette: "the same menu, just bigger and centred" (design/04-COMPONENTS.md section 25).
 //!
-//! A SearchField over an embedded Rich menu. Keys come from the search field
+//! A search `TextField` over an embedded Rich menu. Keys come from the search field
 //! (design/06-INTERACTIONS.md section 2.3): Up and Down move the selection CLAMPED, Enter closes
 //! and then runs the selection, Escape closes the topmost layer only; every key then reaches
 //! the caller's `onkey` as the event itself, so the caller can `prevent_default` a key it takes. Ranking and grouping are the consumer's

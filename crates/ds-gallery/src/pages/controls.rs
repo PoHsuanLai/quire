@@ -65,7 +65,7 @@ pub fn ControlsPage() -> Element {
 #[component]
 fn Buttons() -> Element {
     rsx! {
-        Section { title: "CommandPill and Kbd",
+        Section { title: "CommandPill and KeyEquivalent",
             div { class: "g-row",
                 CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]), onclick: |_| {} }
                 KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Shift, ShortcutKey::Super, ShortcutKey::Char('p')]) , style: KeyStyle::Cap}

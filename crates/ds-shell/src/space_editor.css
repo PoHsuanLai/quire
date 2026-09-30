@@ -8,7 +8,7 @@
    transform transition. The handle's white border is `--mark-ground` and its shadow
    `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
    The Space dot is also the AppearancePicker's accent swatch (section 26).
-   `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
+   `.ds-field` is this editor's colour field only (a text field's wrapper is `.ds-input-wrap`, not `.ds-field`, and
    its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
    22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
    in a wide panel drew 140 px discs. The stop's remove button names the stop, as
@@ -64,7 +64,7 @@
 .ds-space-dot:hover{ transform:scale(1.12); }
 .ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
 
-/* The title as a name field (`on_rename`): the inline TextInput takes the title's
+/* The title as a name field (`on_rename`): the plain TextField takes the title's
    display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
    scheme's rows under a heading in the data face, upper case, as the field headers are. */
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }

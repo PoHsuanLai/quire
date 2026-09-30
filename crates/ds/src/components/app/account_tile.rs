@@ -60,7 +60,7 @@ fn label(account: &AccountFace) -> String {
     }
 }
 
-/// An account tile: a Pin IconButton holding the account's avatar, its provider mark and its
+/// An account tile: a toolbar Button holding the account's avatar, its provider mark and its
 /// unread count. Pressed when it is the list's filter, or the Space's only account.
 ///
 /// `mark` is how the provider is drawn, the letter or the favicon the app supplies: the caller's

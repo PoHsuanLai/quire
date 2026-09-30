@@ -32,7 +32,7 @@ mod probe;
 
 use probe::{centred, distance, ink, keep, pixels, rect};
 
-// ---- 1. TextInput is one line tall ----------------------------------------------------------
+// ---- 1. TextField is one line tall ----------------------------------------------------------
 
 #[allow(non_snake_case)]
 fn FieldsApp() -> Element {
