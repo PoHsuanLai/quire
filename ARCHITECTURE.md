@@ -489,7 +489,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Geometry | `Px`, `Point`, `Size`, `Rect`, `Scale`, `Placement`, `Alpha` |
 | Icons | `Icon`, `IconSource`, `IconView`, `IconSize`, `ExternalIcon`, `StatusState`, `BatteryGlyph`, `WifiGlyph`, `VolumeGlyph`, `BluetoothGlyph` |
 | `Cursor` (menus) | `MenuCursor` |
-| Fields | `TextField`, `FieldKind`, `FieldBezel`, `Validity`, `FieldFocus`, `SelectionBubble`, `EditSurface`, `SpellMarks` |
+| Fields | `TextField`, `FieldKind`, `FieldBezel`, `Validity`, `FieldFocus`, `EditSurface`, `SpellMarks` |
 | Overlays | `Alert`, `Popover`, `Sheet`, `Tooltip`, `TooltipKind`, `HoverCard`, `Toast`, `ToastHost`, `Scrim`, `Panel`, `DragGhost`, `use_overlays`, `use_toasts` |
 | Lists and content | `List`, `ListItem`, `Row`, `RowLeading`, `Accessory`, `RowAction`, `RowChord`, `SectionHeader`, `Avatar`, `ImageSource`, `RichText`, `TextLine`, `TextRun`, `ProviderMark`, `PreviewPane`, `EmojiGrid`, `PdfThumb` |
 | Chrome | `WindowFrame`, `TrafficLights`, `WindowHost`, `ResizeEdge`, `WindowState` |
@@ -746,7 +746,8 @@ path each, until step 12 replaces them with the prelude.
        `ds-shell::battery`);
     6. overlays and feedback: (done) `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
-    7. shell-only pieces (done: 30 section 2.10) and app features (30 section 2.11), then the P2 components;
+    7. shell-only pieces (done: 30 section 2.10) and app features (30 section 2.11), then the P2 components
+       (the app features and mail-only half, 4a.7b: done);
     8. sill's switch-over (the local pieces L1-L16 of the component inventory) and the Arc Look;
        the gallery and goldens per component; delete every name in 30 Part 4.
 5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes

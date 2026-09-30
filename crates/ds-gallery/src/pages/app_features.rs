@@ -165,7 +165,7 @@ fn Edge() -> Element {
 fn Link() -> Element {
     let mut copied = use_signal(String::new);
     rsx! {
-        Section { title: "Link pill", note: "Collapsed it names the registered domain; resting the pointer on it expands to the whole address (a lying link says where it goes and what the text claimed); a press hands the address to the caller and the pill says Copied until the pointer leaves.",
+        Section { title: "Link pill", note: "Collapsed it names the registered domain; resting the pointer on it expands to the whole address (a lying link says where it goes and what the text claimed); a press hands the address to the caller and the pill says Copied for a few seconds.",
             div { class: "g-stage-row",
                 div { class: "g-stage",
                     LinkPill {
