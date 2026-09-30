@@ -3285,7 +3285,7 @@ content: `Small` draws compact; `Medium`, `Large` or no frame draws regular. `Re
 | Title | the UI face at `--fs-micro` 9.5, `--fw-caps` (600), tracked, upper, `--accent`; its left edge 4 in (`--s-4`), where a two-digit first column's number starts | the reference: month name top left in the accent, small caps weight |
 | Header | 14 high, no gap under it; the step buttons are plain 14 px `button.ds-month-step` round an 11 px glyph (`--ink-faint`, `--surface-2` under the pointer, squish pressed), since the Tool button's 28 x 26 would take a fifth of the height | Q190 |
 | Week numbers | never drawn, whatever `weeks` says (`data-weeks=hide`): a column would not fit | Q190 |
-| Snapshots | `tools/progress/shots/gallery/calendar-compact-{before,after}-{5wk,6wk}-{light,dark}-{1x,4x}.png`, from `ds-native/tests/month_grid_shots.rs` (`QUIRE_CAL_SHOTS=<dir> QUIRE_CAL_TAG=<tag>`) | |
+| Snapshots | `tools/progress/shots/gallery/calendar-compact-{before,after}-{5wk,6wk}-{light,dark}-{1x,4x}.png`, from `ds-conformance/tests/month_grid_shots.rs` (`QUIRE_CAL_SHOTS=<dir> QUIRE_CAL_TAG=<tag>`) | |
 
 **States.**
 
@@ -3668,7 +3668,7 @@ inside) calls `onpick` with the new choice; `choice` is the caller's and marks o
 
 **Tests.** `ds/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
 and the picker; lint; the serde round trip; the `resolve_picture` table), `ds/src/components/
-user_picture/picker.rs` (cells and marks), `ds-native/tests/lock_switcher.rs` (the emoji's moods
+user_picture/picker.rs` (cells and marks), `ds-conformance/tests/lock_switcher.rs` (the emoji's moods
 in the lock prompt; the letter's beat).
 
 ### 45. PdfThumb and PdfFileThumb (a PDF's first page; sill M9 launcher v2, 2026-09-26; values proposed)
@@ -3744,9 +3744,9 @@ encrypted file that opens with the empty user password draws; one that needs a p
 `Failed(Locked)`.
 
 **Tests.** `ds/tests/pdf_thumb_ssr.rs` (a golden of each state, lint), `ds/src/components/
-pdf_thumb.rs` (the sheet's fit), `ds-native/tests/pdf_thumb.rs` (a generated PDF rasterised in
+pdf_thumb.rs` (the sheet's fit), `ds-blitz/tests/pdf_thumb.rs` (a generated PDF rasterised in
 its colour and aspect, the cache hit and the mtime miss, the failures, a document painting the
-page), `ds-native/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
+page), `ds-blitz/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
 last), `ds-native/src/pdf_thumb/cache.rs` (eviction).
 
 ### 46. EmojiGrid (sill M9 launcher v2, Q291, 2026-09-26; values proposed)
@@ -3804,7 +3804,7 @@ for cell 0.
 
 **Tests.** `ds/src/components/emoji_grid_nav.rs` (the moves), `ds/src/components/palette_stops.rs`
 (entering and leaving in a palette), `ds/tests/launcher_parts_ssr.rs` (`grid-in-palette`,
-`grid-alone`), `ds-native/tests/launcher_v2.rs` (the palette walk and the grid on its own).
+`grid-alone`), `ds-conformance/tests/palette_grid_pane.rs` (the palette walk and the grid on its own).
 
 ### 47. PreviewPane (sill M9 launcher v2, Q292, 2026-09-26; values proposed)
 
@@ -3891,10 +3891,10 @@ Operation` is the load the media waits on (Q371): `use_pending` with a Spin ring
 section 13.3.9's keys are the caller's, through the palette's `claim`, section 49), so `focused`
 draws which action the caller's Tab has reached. A click on an action calls `onaction(i)`.
 
-**Tests.** `ds/tests/launcher_parts_ssr.rs` (`pane-*`, `palette-aside`), `ds-native/tests/
-launcher_v2.rs` (the card widening over a window, the results narrowing in a surface, the exit
-settling before `on_hidden`), `ds-native/tests/pdf_thumb.rs` (a pane drawing a PDF through
-`use_pdf_page`), `ds-native/tests/launcher_pane_cues.rs` (each moment, Reduced, 0 frames).
+**Tests.** `ds/tests/launcher_parts_ssr.rs` (`pane-*`, `palette-aside`), `ds-conformance/tests/
+palette_grid_pane.rs` (the card widening over a window, the results narrowing in a surface, the exit
+settling before `on_hidden`), `ds-blitz/tests/pdf_thumb.rs` (a pane drawing a PDF through
+`use_pdf_page`), `ds-conformance/tests/launcher_pane_cues.rs` (each moment, Reduced, 0 frames).
 
 ### 48. RowShape: file and clipboard rows in the palette (sill M9 launcher v2, Q290, 2026-09-26; values proposed)
 
@@ -4005,9 +4005,9 @@ render; the callback asks at the moment with the caret in hand. It is a new prop
 
 **Tests.** `ds/src/components/palette_stops.rs` (the stop order and the moves),
 `ds/src/focus/caret.rs` (the caret's place), `ds/tests/launcher_parts_ssr.rs` (`show-more`,
-`show-more-selected`), `ds-native/tests/launcher_v2.rs` (Show More reached and run by keyboard;
+`show-more-selected`), `ds-conformance/tests/palette_grid_pane.rs` (Show More reached and run by keyboard;
 Space taken only while browsing, Right only at the end), `ds/src/components/palette_expand.rs`
-(what is an expand), `ds-native/tests/launcher_palette_cues.rs` (the rise, the expand and the
+(what is an expand), `ds-conformance/tests/launcher_palette_cues.rs` (the rise, the expand and the
 collapse, Reduced, 0 frames).
 
 ### 50. EditSurface spelling (mailo's composer, 2026-09-27; values proposed)
@@ -4101,8 +4101,8 @@ pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
 CJK blocks), `marks_tests.rs` (marks following an edit, the word being typed), `lang.rs`;
 `ds/tests/edit_surface_ssr.rs` (`spell-on.html`, `spell-marked.html`);
 `ds-native/src/spell/choose.rs` (dictionary fallback, the locale);
-`ds-native/tests/spell_worker.rs` (a temporary `.aff`/`.dic`: check, suggest, ignore, learn and
-read back, the system's en_US only where installed); `ds-native/tests/spell_edit.rs` (typed
+`ds-blitz/tests/spell_worker.rs` (a temporary `.aff`/`.dic`: check, suggest, ignore, learn and
+read back, the system's en_US only where installed); `ds-blitz/tests/spell_edit.rs` (typed
 misspelling marked after the debounce, the typed word held, right-click and pick, undo restores
 it, Ignore, the context-menu key and Learn).
 
@@ -4135,7 +4135,7 @@ shell reads from `bar.battery_low_percent` (design/26 G10, proposed; sill's key)
 **Tests.** `ds/tests/status_tables.rs` (every catalogue row as a `moment_table`, the first frames,
 the quantising: bars by thirds, waves by thirds, the fill's steps, the low threshold);
 `ds/src/components/status/{wifi.rs, battery_state.rs}` (layers per state, frame and fill; steps and
-tone); `ds-native/tests/status_wifi.rs`, `status_battery.rs`, `status_bluetooth_volume.rs` (each
+tone); `ds-conformance/tests/status_wifi.rs`, `status_battery.rs`, `status_bluetooth_volume.rs` (each
 moment on a real Blitz document ending in `assert_settles_to_zero_frames`, the join's grace and
 its cap, a repeated stamp that does not shake, and Reduced: the still frame at once, the slash and
 the fill jumping, no shake). Gallery: Details, "Status glyphs".
@@ -4165,7 +4165,7 @@ outline drawn with `Shape::Solid` (filled and stroked, so its silhouette is the 
 
 **Tests.** `ds/tests/center_tables.rs` (the row and playback tables, the filled moon, the spring
 recipe); unit tables beside `Lighting`, `Percent`, `Reading` and `Playback`;
-`ds-native/tests/details_center_{tile,rows,player,battery}.rs`, all on `Clock::Virtual`, every
+`ds-conformance/tests/details_center_{tile,rows,player,battery}.rs`, all on `Clock::Virtual`, every
 moment ending in `assert_settles_to_zero_frames`, each with a Reduced case. Gallery: Details,
 "Control center modules".
 
@@ -4256,7 +4256,7 @@ never fades in either: it jumps straight to the level, the way `Sweep`'s own `St
 Ends at 0 frames once landed (R3).
 
 **Tests.** `ds/src/detail/idle_dim.rs` (the plan table: waking and a settings edit always snap,
-dimming fades except under Reduced); `ds-native/tests/idle_dim.rs` on `Clock::Virtual` (the fade
+dimming fades except under Reduced); `ds-conformance/tests/idle_dim.rs` on `Clock::Virtual` (the fade
 lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
 shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md
 "Idle dim".
@@ -4376,7 +4376,7 @@ positioned ancestor, so render it last in that container.
 **Tests.** `ds/src/components/alert.rs` and `alert_vocab.rs` (the default button and faces, the
 keys, as tables); `ds/tests/alert_ssr.rs` (goldens under `tests/snapshots/alert/`: floating light
 and dark, inline in a 320 px popover, destructive, destructive with an icon, hidden both ways; lint
-clean; every class styled; the default is the filled button); `ds-native/tests/alert.rs` on
+clean; every class styled; the default is the filled button); `ds-conformance/tests/alert.rs` on
 `Clock::Virtual` (focus starts on the default, Cancel when destructive; Return presses the
 default wherever the focus is; Escape and the scrim cancel in both flows; Space presses the
 focused button; Tab stays inside; inline it fits inside a 320 px popover, floating it is centred in

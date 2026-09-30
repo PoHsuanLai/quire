@@ -619,7 +619,7 @@ are reached as `ds::app::X`, not through the prelude.
 ### Add a conformance test
 
 1. `crates/ds-conformance/tests/<component>.rs`, named for the component (never a work item).
-2. Build `Harness` through `tests/support::app(...)`, drive with `Driver::send`, read with
+2. Build `Harness::new(app, viewport_or_config)`, drive with `Driver::send`, read with
    `Query`; the assertion names the difference the action makes (`CONVENTIONS.md` §8).
 3. Timing on the wall clock uses `settle_until`; virtual-clock tests assert the boundary exactly.
 
@@ -766,7 +766,7 @@ path each, until step 12 replaces them with the prelude.
    `spell` become features; `tokio` is named only in `launch`.
 10. **`Driver`/`DocQuery`** (done): replace the five constructors and `_with` pairs with `Input`;
     `Query` extension trait.
-11. **`ds-conformance`**: move `ds-native/tests` by the section 3 rules, renaming work-named
+11. **`ds-conformance`** (done): move `ds-native/tests` by the section 3 rules, renaming work-named
     files; move SSR tests beside their crates; `ds-gallery` pages regrouped.
 12. **`ds::prelude`** replaces the root re-exports; a mechanical import rewrite in sill in the
     same change; `ds_shell::prelude` likewise.
@@ -802,7 +802,7 @@ Rules:
   file: it updates `ds::selectors`, and the consumer's release notes name it. Everything off the
   table stays freely renamable.
 - **The reload path is the `<style>` element**: Blitz re-parses a `<style>` whose text changes
-  and restyles the document (`ds-native/tests/user_style_reload.rs` proves colours, custom
+  and restyles the document (`ds-blitz/tests/user_style_reload.rs` proves colours, custom
   property overrides and an emptied sheet), so no host call is involved.
 - **Recipe, expose a new public part**: add the part's class to the component, add its row to
   `ds::selectors`, add a gallery example that restyles it, and add a `lint::user_stylesheet`

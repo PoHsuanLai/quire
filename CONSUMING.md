@@ -175,7 +175,7 @@ nothing paints and in the shell no press lands.
   `Ds { extent: RootExtent::Viewport }`, or put the floor on your frame: `display:grid; width:100vw; min-height:100vh` in flow, the
   room around the card as the frame's padding; the grid's one cell stretches the `Ds` root to
   fill it, so the root has the viewport's height too. The same floor holds even if the frame is
-  absolutely placed (`crates/ds-blitz/tests/root_frame.rs` measures all three).
+  absolutely placed (`crates/ds-conformance/tests/root_frame.rs` measures all three).
 - **The surface is sized by its content** (a bar, a dock, an OSD card's surface): leave the
   content in flow; a card that must be positioned is positioned inside a frame that has a height.
 - **Debug it** with the Harness before looking at the compositor: `harness.rect("html")`,
@@ -235,7 +235,7 @@ process-wide, lazily built Tokio runtime (multi-thread, two workers;
 `ds_harness::Harness` enters it (`ds_blitz::enter_runtime`) in `Harness::new` for the harness's own life, so `current()` works
 in anything launched with `launch` or rendered inside a `Harness`. A test never reaches the real
 config or the session bus: it passes `ConfigRoot::Scratch(dir)` and
-`SystemPrefsSource::Fixed(prefs)` (`crates/ds-blitz/tests/harness.rs::
+`SystemPrefsSource::Fixed(prefs)` (`crates/ds-conformance/tests/driven_components.rs::
 use_environment_does_not_panic_under_the_harness`). `examples/consumer::App` shows the real
 wiring.
 
@@ -693,7 +693,7 @@ For a bar (FINDINGS "Bar gaps"):
   shadow on its own box (`data-chrome="transparent"`); the `.ds-popover`/`.ds-menu` and
   `.ds-sheet` cards inside paint the material's tint (`--m-tint` over blur, `--m-tint-solid`
   without), edge and drop (`--m-box`). A popup document keeps `Material::Popover` and its
-  spare room is alpha 0 (`crates/ds-blitz/tests/bar_frame.rs` proves it over
+  spare room is alpha 0 (`crates/ds-conformance/tests/bar_frame.rs` proves it over
   `Harness::render_over(Backdrop::Clear)`).
 - **The frame ground.** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
   Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
@@ -878,7 +878,7 @@ Palette behaviour:
   the menu and hand the field the keyboard back. The palette's `onkey` must stop the first
   Ctrl+K as well as prevent it: the key it opens the menu on bubbles on to the same root
   handler, which would see the menu open and close it at once
-  (`crates/ds-blitz/tests/palette_actions_key.rs`):
+  (`crates/ds-conformance/tests/palette_actions_key.rs`):
 
   ```rust
   div {
@@ -1002,7 +1002,7 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::clip_chars` for a real character-count ellipsis |
 | `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_blitz::launch` track modality for you; `Rule::FocusPseudoClass` |
 | `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::use_rect()` — measures one frame later, never inside the handler; to anchor an overlay, `Anchor::Mounted` does this for you |
-| a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-blitz/tests/click.rs`, FINDINGS "Polish pass") |
+| a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-conformance/tests/button_click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_blitz::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
