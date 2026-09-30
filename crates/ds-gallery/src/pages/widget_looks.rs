@@ -13,22 +13,24 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::LabelHue;
 use ds::Word;
-use ds::{Appearance, Ds, IconSize, Inject, Material, RootChrome, SpaceLook, use_scope};
+use ds::{
+    Appearance, BatteryPower, Ds, IconSize, Inject, Material, RootChrome, SpaceLook, use_scope,
+};
 use ds_shell::{
     BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
-    DeviceGlyph, Lift, MonthEntry, MonthIntent, MonthWidget, RingMark, Seconds, Timeline,
-    WeekNumbers, Widget, WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics,
-    WidgetSize, WidgetSlotGuide, WorldClockWidget,
+    DeviceGlyph, Lift, MonthEntry, MonthIntent, MonthWidget, Seconds, Timeline, WeekNumbers,
+    Widget, WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize,
+    WidgetSlotGuide, WorldClockWidget,
 };
 use ds_shell::{EventLine, MonthFace, TodayLine};
 
 /// The medium widget's four: critical, half, full, and low but charging.
 fn devices() -> BatteryEntry {
     BatteryEntry::Devices(vec![
-        cell("Mouse", Device::Mouse, 80, RingMark::Plain),
-        cell("Headphones", Device::Headphones, 450, RingMark::Plain),
-        cell("Keyboard", Device::Keyboard, 1000, RingMark::Plain),
-        cell("This computer", Device::Laptop, 150, RingMark::Charging),
+        cell("Mouse", Device::Mouse, 80, BatteryPower::Battery),
+        cell("Headphones", Device::Headphones, 450, BatteryPower::Battery),
+        cell("Keyboard", Device::Keyboard, 1000, BatteryPower::Battery),
+        cell("This computer", Device::Laptop, 150, BatteryPower::Charging),
     ])
 }
 
@@ -65,7 +67,7 @@ pub fn WidgetLooksPage() -> Element {
         "This computer",
         Device::Laptop,
         840,
-        RingMark::Plain,
+        BatteryPower::Battery,
     )]);
     let taipei = ClockEntry::Cities(vec![city("Taipei", at(10, 9), DayPhase::Day, "Today")]);
     rsx! {

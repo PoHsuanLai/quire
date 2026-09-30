@@ -10,7 +10,7 @@ pub mod catalog;
 pub(crate) mod clock;
 pub(crate) mod control_center;
 pub(crate) mod date_picker;
-pub(crate) mod dock_parts;
+pub(crate) mod dock;
 pub mod emoji;
 pub(crate) mod idle_dim;
 pub(crate) mod kept;
@@ -38,10 +38,8 @@ pub use crate::{
         workspace_pills::{WorkspacePill, WorkspacePills},
     },
     battery::{
-        device_battery::DeviceBattery,
         device_glyph::{Device, DeviceGlyph},
-        figure::BatteryFigure,
-        level::{BatteryLevel, RingMark},
+        ring::{BatteryRing, Readout, percent_text},
     },
     clock::{
         face::ClockFace,
@@ -57,7 +55,10 @@ pub use crate::{
         model::{DateValue, Elements, PickerStyle, Segment, TimeOfDay},
         view::DatePicker,
     },
-    dock_parts::{DockFloor, DockLabel, RunningDot},
+    dock::{
+        parts::{DockFloor, DockLabel, RunningDot},
+        tile::DockTile,
+    },
     emoji::{
         AnimatedEmoji, EMOJI_ATTRIBUTION,
         disc::{DiscHue, EmojiDisc, EmojiPlayback},
@@ -111,10 +112,9 @@ pub use crate::{
     },
     user_picture::{
         choice::{FaceFile, PictureChoice, resolve_picture},
-        mood::{Mood, PictureSize},
         picker::UserPicturePicker,
         picture::UserPicture,
-        portrait::UserPortrait,
+        size::PictureSize,
     },
     widget::{
         battery::{BatteryCell, BatteryEntry, BatteryWidget},
@@ -122,7 +122,6 @@ pub use crate::{
         card::WidgetCard,
         clock::{ClockCity, ClockEntry, WorldClockWidget},
         contract::{NoIntent, Widget, WidgetContext, WidgetKind},
-        exit::CardPresence,
         frame::WidgetFrame,
         gallery::WidgetGallery,
         kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle},

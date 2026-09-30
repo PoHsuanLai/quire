@@ -12,11 +12,11 @@ use dioxus::prelude::*;
 use ds::Common;
 use ds::icon::{IconStyle, Tint};
 use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Corner, Ds, Emphasis, Icon, IconSize,
-    IconSource, IconView, Inject, Material, PRESETS, PlateFamily, PlateTint, Px, Selection, Shown,
-    Surface, Theme,
+    Activity, Appearance, BadgeContent, CommandPalette, CommandPaletteHost, Corner, Ds, Emphasis,
+    Fraction, Icon, IconSize, IconSource, IconView, Inject, Material, PRESETS, PlateFamily,
+    PlateTint, Px, Selection, Shown, Surface, Theme,
 };
-use ds_shell::{DockFloor, MenuBarItem, RunningDot, WorkspacePill, WorkspacePills};
+use ds_shell::{DockFloor, DockTile, MenuBarItem, RunningDot, WorkspacePill, WorkspacePills};
 
 /// The Work Space's Monochrome plate tint.
 fn work() -> Option<PlateTint> {
@@ -98,6 +98,48 @@ const CASES: &[Case] = &[
             Ds { appearance: Appearance::default(), material: Material::Dock, stylesheet: Inject::Host, radius: Some(Corner::Squircle(Px(18.0))),
                 DockFloor {}
                 div { style: "position:relative", RunningDot {} }
+            }
+        }
+    }),
+    ("dock-tile", || {
+        rsx! {
+            DockTile { icon: IconSource::Glyph(Icon::Folder), plate: Some(PlateFamily::Blue), label: "Files", onclick: |_| {} }
+        }
+    }),
+    ("dock-tile-running-badge-label", || {
+        rsx! {
+            DockTile {
+                icon: IconSource::Glyph(Icon::Mail),
+                plate: Some(PlateFamily::Blue),
+                running: Activity::Active,
+                badge: Some(BadgeContent::Number(3)),
+                label: "Mail",
+                label_shown: Some(Shown::Visible),
+                onclick: |_| {},
+            }
+        }
+    }),
+    ("dock-tile-progress-magnified", || {
+        rsx! {
+            DockTile {
+                icon: IconSource::Glyph(Icon::Download),
+                plate: Some(PlateFamily::Green),
+                progress: Some(Fraction(400)),
+                side: Px(80.0),
+                label: "Downloads",
+                onclick: |_| {},
+            }
+        }
+    }),
+    ("dock-tile-muted-dot-badge", || {
+        rsx! {
+            DockTile {
+                icon: IconSource::Glyph(Icon::Folder),
+                plate: Some(PlateFamily::Neutral),
+                plate_tint: Some(PlateTint::Muted),
+                badge: Some(BadgeContent::Dot),
+                label: "Files",
+                onclick: |_| {},
             }
         }
     }),

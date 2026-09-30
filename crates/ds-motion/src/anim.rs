@@ -18,13 +18,13 @@
 //! `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
 //! step, plus `SheetOut`, the sheet's exit, plus `PanelIn` and `PanelOut`, the slide in and out
 //! of an edge panel, a notification banner, a toast and a screenshot thumbnail, plus
-//! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7), plus the small-state details' eight (design/26-DETAILS.md
-//! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
+//! the small-state details' eight (design/26-DETAILS.md
+//! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`,
 //! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
 //! plays so the restyle that drops a running animation starts another, plus
 //! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5), plus
 //! `MorphInSpring`, `morph-in` on the glyph the person pressed (design/26 R5, play/pause, a
-//! Focus disc), plus `WidgetOut`, a widget's card leaving when the person removes it.
+//! Focus disc).
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -109,10 +109,6 @@ pub enum Anim {
     MorphFadeIn,
     /// `morph-fade-out`: a cross-fade's outgoing glyph.
     MorphFadeOut,
-    /// `roll-in`: a changed digit rolling into place (`RollDigits`).
-    RollIn,
-    /// `roll-out`: the digit it replaces rolling away.
-    RollOut,
     /// `hold`: moves nothing, for `--t-tap`. A state that comes after an animated one (a
     /// surface present after its entrance, a hide taken back, a row at rest) plays it, so the
     /// restyle that drops the running animation always starts another one. Blitz at the pinned
@@ -126,15 +122,11 @@ pub enum Anim {
     /// person's own press caused (design/26 R5, play/pause, the Focus disc); `MorphIn` is the
     /// same growth at `--e-out` for a change from elsewhere.
     MorphInSpring,
-    /// `widget-out` at `--t-move --e-exit`, forwards: a widget's card shrinking and fading as
-    /// the person removes it from the desktop, held gone until the host drops it at
-    /// `settle(WidgetOut)`.
-    WidgetOut,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 39] = [
+    pub const ALL: [Anim; 36] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -168,12 +160,9 @@ impl Anim {
         Anim::MorphOut,
         Anim::MorphFadeIn,
         Anim::MorphFadeOut,
-        Anim::RollIn,
-        Anim::RollOut,
         Anim::Hold,
         Anim::PaneInROut,
         Anim::MorphInSpring,
-        Anim::WidgetOut,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -212,12 +201,9 @@ impl Anim {
             Anim::MorphOut => "a-morph-out",
             Anim::MorphFadeIn => "a-morph-fade-in",
             Anim::MorphFadeOut => "a-morph-fade-out",
-            Anim::RollIn => "a-roll-in",
-            Anim::RollOut => "a-roll-out",
             Anim::Hold => "a-hold",
             Anim::PaneInROut => "a-pane-in-r-out",
             Anim::MorphInSpring => "a-morph-in-spring",
-            Anim::WidgetOut => "a-widget-out",
         }
     }
 }

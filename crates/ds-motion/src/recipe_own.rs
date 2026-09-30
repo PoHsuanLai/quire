@@ -115,17 +115,6 @@ pub(super) const SHEET_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `widget-out`: a widget's card leaving when the person removes it, at `--t-move
-/// --e-exit` (design/05 principle 3: exits accelerate), holding its last, transparent frame
-/// until the host drops the card at `settle(WidgetOut)`.
-pub(super) const WIDGET_OUT: Recipe = recipe(
-    "widget-out",
-    DurationToken::Move,
-    EasingToken::Exit,
-    Fill::Forwards,
-    Iteration::Once,
-);
-
 /// `panel-in`: the notification center's edge panel slides in at `--t-move --e-out`.
 /// Opening it is not contact with the panel, and a spring's overshoot would lift it off the edge
 /// it is anchored to, so it decelerates in (design/05 principle 2). An entrance; it holds

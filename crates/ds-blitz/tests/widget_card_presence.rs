@@ -1,17 +1,14 @@
-//! A desktop widget's exit on a real Blitz document and the virtual clock: the host
-//! says the card is leaving and keeps it drawn; the card plays `widget-out` (shrinks and fades,
-//! `--t-move --e-exit`), takes no pointer, and calls `on_gone` exactly at `settle(WidgetOut)`,
-//! not a millisecond before; the host drops it and nothing asks for a frame. Under Reduced the
-//! exit is a fade over Reduced's short settle. Taken back before it ends, it never calls
-//! `on_gone`.
+//! A desktop widget's presence on a real Blitz document and the virtual clock: the host turns
+//! the card `Hidden` and keeps it drawn; the card fades out (`menu-out`, `--t-quick --e-exit`),
+//! takes no pointer, and calls `on_hidden` exactly at the exit's settle, not a millisecond
+//! before; the host drops it and nothing asks for a frame. Taken back before it ends, it never
+//! calls `on_hidden`.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Ds, Material, Motion, MotionLevel, RootChrome, settle};
+use ds::{Anim, Appearance, Ds, Material, Motion, MotionLevel, RootChrome, Shown, settle};
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
-use ds_shell::{
-    BatteryWidget, CardPresence, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize,
-};
+use ds_shell::{BatteryWidget, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -20,7 +17,7 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-static PRESENCE: GlobalSignal<CardPresence> = Signal::global(CardPresence::default);
+static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
 static GONE: GlobalSignal<u32> = Signal::global(|| 0);
 static DRAWN: GlobalSignal<bool> = Signal::global(|| true);
 
@@ -33,8 +30,8 @@ fn desktop(motion: Motion) -> Element {
                         widget: BatteryWidget,
                         timeline: Timeline::now(BatteryWidget::preview(WidgetSize::Small)),
                         size: WidgetSize::Small,
-                        presence: PRESENCE(),
-                        on_gone: move |()| {
+                        shown: SHOWN(),
+                        on_hidden: move |()| {
                             *GONE.write() += 1;
                             *DRAWN.write() = false;
                         },
@@ -62,8 +59,8 @@ fn harness(app: fn() -> Element) -> Harness {
     harness
 }
 
-fn leave(harness: &mut Harness, presence: CardPresence) {
-    harness.within(|| *PRESENCE.write() = presence);
+fn show(harness: &mut Harness, shown: Shown) {
+    harness.within(|| *SHOWN.write() = shown);
     harness.advance(Duration::ZERO);
 }
 
@@ -72,62 +69,59 @@ fn gone(harness: &mut Harness) -> u32 {
 }
 
 #[test]
-fn a_removed_card_plays_its_exit_and_is_gone_at_settle() {
+fn a_removed_card_fades_out_and_is_gone_at_settle() {
     let mut harness = harness(Standard);
     assert_eq!(harness.count(".ds-widget"), 1);
-    assert_eq!(harness.attr(".ds-widget", "data-presence"), None);
+    assert_eq!(
+        harness.attr(".ds-widget", "data-presence").as_deref(),
+        Some("present")
+    );
     assert_settles_to_zero_frames(&mut harness);
-    leave(&mut harness, CardPresence::Leaving);
-    assert!(harness.has_class(".ds-widget", "a-widget-out"));
+    show(&mut harness, Shown::Hidden);
     assert_eq!(
         harness.attr(".ds-widget", "data-presence").as_deref(),
         Some("leaving")
     );
     assert!(harness.is_animating(), "the exit is playing");
-    let out = settle(Anim::WidgetOut, MotionLevel::Standard);
+    let out = settle(Anim::MenuOut, MotionLevel::Standard);
     harness.advance(out - Duration::from_millis(1));
-    assert_eq!(gone(&mut harness), 0, "not before settle(WidgetOut)");
+    assert_eq!(gone(&mut harness), 0, "not before the exit's settle");
     assert_eq!(harness.count(".ds-widget"), 1, "the host keeps it drawn");
     harness.advance(Duration::from_millis(1));
-    assert_eq!(gone(&mut harness), 1, "at settle(WidgetOut)");
+    assert_eq!(gone(&mut harness), 1, "at the exit's settle");
     assert_eq!(harness.count(".ds-widget"), 0, "the host dropped it");
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(gone(&mut harness), 1, "once");
 }
 
 #[test]
-fn under_reduced_the_exit_is_a_short_fade() {
+fn under_reduced_the_exit_is_still_a_short_fade() {
     let mut harness = harness(Reduced);
-    leave(&mut harness, CardPresence::Leaving);
-    assert!(harness.has_class(".ds-widget", "a-widget-out"));
-    let sheet = ds_shell::stylesheet();
-    assert!(
-        sheet.contains(
-            ".ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=a]{animation-name:menu-out;}"
-        ),
-        "Reduced plays the fade, not the shrink"
-    );
-    let out = settle(Anim::WidgetOut, MotionLevel::Reduced);
-    let standard = settle(Anim::WidgetOut, MotionLevel::Standard);
-    assert!(out < standard, "{out:?} {standard:?}");
+    show(&mut harness, Shown::Hidden);
+    let out = settle(Anim::MenuOut, MotionLevel::Reduced);
+    let standard = settle(Anim::MenuOut, MotionLevel::Standard);
+    assert!(out <= standard, "{out:?} {standard:?}");
     harness.advance(out);
     assert_eq!(gone(&mut harness), 1);
     assert_settles_to_zero_frames(&mut harness);
 }
 
 #[test]
-fn a_leave_taken_back_never_reports_gone() {
+fn a_hide_taken_back_never_reports_hidden() {
     let mut harness = harness(Standard);
-    leave(&mut harness, CardPresence::Leaving);
-    let out = settle(Anim::WidgetOut, MotionLevel::Standard);
+    show(&mut harness, Shown::Hidden);
+    let out = settle(Anim::MenuOut, MotionLevel::Standard);
     harness.advance(out / 2);
-    leave(&mut harness, CardPresence::Placed);
-    assert!(!harness.has_class(".ds-widget", "a-widget-out"));
-    assert!(
-        harness.has_class(".ds-widget", "a-hold"),
-        "the exit's value is dropped"
+    show(&mut harness, Shown::Visible);
+    assert_eq!(
+        harness.attr(".ds-widget", "data-presence").as_deref(),
+        Some("present")
     );
-    assert_eq!(harness.attr(".ds-widget", "data-presence"), None);
+    assert_eq!(
+        harness.attr(".ds-widget", "data-pulse").as_deref(),
+        Some("held"),
+        "the exit's value is dropped for a hold"
+    );
     harness.advance(out);
     assert_eq!(gone(&mut harness), 0);
     assert_eq!(harness.count(".ds-widget"), 1);

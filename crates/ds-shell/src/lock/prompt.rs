@@ -2,12 +2,11 @@
 //! design/04-COMPONENTS.md section 42). The person's picture, the name, a pill field of flat
 //! white glass with an enter arrow inside it, a caps-lock mark, and a hint line under it.
 
-use crate::lock::mood::{Caret, Stir, prompt_mood, use_stir};
 use crate::lock::password::{Filled, use_password};
 use crate::lock::password_field::{Escape, Form, PasswordField};
-use crate::lock::picture::{AT_LOCK, prompt_picture};
+use crate::lock::picture::AT_LOCK;
 use crate::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
-use crate::user_picture::{picture::UserPicture, portrait::Liveliness};
+use crate::user_picture::draw::drawn;
 use dioxus::prelude::*;
 use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
@@ -18,7 +17,6 @@ use ds_core::word::Word;
 use ds_motion::detail::{
     operation::Operation, touch::Touch, use_detail::use_detail, use_operation::use_operation,
 };
-use ds_motion::wake::WakeStamp;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::tokens::control_size::ControlSize;
@@ -26,7 +24,7 @@ use ds_style::tokens::control_size::ControlSize;
 /// The placeholder when the caller gives none.
 const ENTER_PASSWORD: &str = "Enter Password";
 
-/// The lock screen's prompt. The password is a `Secret` field: its text never reaches the
+/// The lock screen's prompt. The password is a `Secure` field: its text never reaches the
 /// markup, and there is no `value` prop. `oninput` hears every change (an empty string when the
 /// prompt empties the field itself); Enter or the arrow hands the text to `onsubmit`; Escape
 /// empties the field. `state` is the caller's: `Checking` spins the arrow and closes the field,
@@ -34,11 +32,8 @@ const ENTER_PASSWORD: &str = "Enter Password";
 /// field and says when it opens. `caps` marks caps lock; `hint` is the line under the field
 /// ("Touch the key or enter your password"). The field takes the keyboard as it mounts.
 ///
-/// `user.picture` is drawn at 64 and plays the prompt's own mood (attentive while typing or
-/// checking, a wince when `Wrong`, happy when `Accepted`, idle otherwise): every kind plays the
-/// accept beat on `Accepted`; an emoji plays each mood (design/25-EMOJI.md section 5), woken by
-/// any key or pointer activity in the prompt and by each new `wake` the caller passes (a
-/// display coming back on).
+/// `user.picture` is drawn at 64: a face, a photo, or an emoji playing its own animation once as
+/// the prompt appears.
 #[component]
 pub fn LockPrompt(
     user: LockUser,
@@ -47,19 +42,11 @@ pub fn LockPrompt(
     #[props(default)] look: LockLook,
     #[props(default)] placeholder: Option<String>,
     #[props(default)] hint: Option<TextLine>,
-    #[props(default)] wake: Option<WakeStamp>,
     oninput: EventHandler<String>,
     onsubmit: EventHandler<String>,
     #[props(default)] common: Common,
 ) -> Element {
     let password = use_password(&state, oninput);
-    let mut caret = use_signal(|| Caret::In);
-    let stir = use_stir();
-    let lively = Lively::of(&user.picture);
-    let life = Liveliness {
-        mood: prompt_mood(&state, password.filled(), caret(), password.shake.phase()),
-        wake: stir.stamp(wake),
-    };
     let line = hint_line(&state, hint);
     // Checking is an operation the prompt's own state starts.
     let operation = use_operation(use_detail(state.clone(), Touch::Remote).cue());
@@ -67,11 +54,6 @@ pub fn LockPrompt(
     let go = EventHandler::new(move |()| {
         if availability == Availability::Enabled {
             password.submit(onsubmit);
-        }
-    });
-    let oncaret = EventHandler::new(move |at: Caret| {
-        if *caret.peek() != at {
-            caret.set(at);
         }
     });
     let class = common.class("ds-lock-prompt");
@@ -83,12 +65,9 @@ pub fn LockPrompt(
             "data-look": look.slug(),
             "data-state": state.slug(),
             "aria-label": common.aria_label.clone(),
-            onkeydown: move |_| lively.stir(stir),
-            onmousemove: move |_| lively.stir(stir),
-            onmousedown: move |_| lively.stir(stir),
             onmounted: move |event| common.mounted(event),
             ..data,
-            {prompt_picture(user.picture, AT_LOCK, life)}
+            {drawn(user.picture, AT_LOCK)}
             div { class: "ds-lock-name", "{user.name}" }
             PasswordField {
                 password,
@@ -98,7 +77,6 @@ pub fn LockPrompt(
                 placeholder: placeholder.unwrap_or_else(|| ENTER_PASSWORD.to_owned()),
                 escape: Escape::Clears,
                 onsubmit: go,
-                oncaret,
                 trailing: Some(go_button(&state, password.filled(), go, operation)),
             }
             if let Some(line) = line {
@@ -113,29 +91,6 @@ fn hint_line(state: &PromptState, hint: Option<TextLine>) -> Option<TextLine> {
     match state {
         PromptState::LockedOut { until } => Some(TextLine::from(format!("Try again at {until}"))),
         _ => hint,
-    }
-}
-
-/// Whether the prompt's picture is woken by activity: only an emoji, so a face or a photo
-/// costs no render per pointer move.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Lively {
-    Emoji,
-    Still,
-}
-
-impl Lively {
-    fn of(picture: &UserPicture) -> Self {
-        match picture {
-            UserPicture::Emoji(_) => Lively::Emoji,
-            UserPicture::Face(_) | UserPicture::Photo(_) => Lively::Still,
-        }
-    }
-
-    fn stir(self, stir: Stir) {
-        if self == Lively::Emoji {
-            stir.stirred();
-        }
     }
 }
 

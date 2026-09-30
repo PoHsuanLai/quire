@@ -10,22 +10,23 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::LabelHue;
 use ds::Word;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{
-    Appearance, Attach, Ds, Fraction, IconSize, Inject, Material, Motion, RootChrome, RootExtent,
-    Sheet, Theme,
+    Appearance, Attach, BatteryPower, BatteryState, Ds, Fraction, IconSize, Inject, LowAt,
+    Material, Motion, RootChrome, RootExtent, Sheet, Theme,
 };
 use ds_lint::{LintConfig, markup};
 use ds_shell::widget::{WidgetEdit, WidgetLayout};
 use ds_shell::widget::{WireRefresh, WireTimeline};
 use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, CardPresence, ClockCity, ClockEntry, ClockTime,
-    DayKey, DayMark, DayPhase, DayPlace, Device, DeviceGlyph, Eventful, IsoWeek, Lift, MonthDay,
-    MonthEntry, MonthGridData, MonthKey, MonthWeek, MonthWidget, RingMark, Seconds, Timeline,
-    WeekNumbers, Widget, WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetRegistry,
-    WidgetSize, WidgetSlotGuide, WorldClockWidget,
+    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayKey, DayMark,
+    DayPhase, DayPlace, Device, DeviceGlyph, Eventful, IsoWeek, Lift, MonthDay, MonthEntry,
+    MonthGridData, MonthKey, MonthWeek, MonthWidget, Seconds, Timeline, WeekNumbers, Widget,
+    WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetRegistry, WidgetSize,
+    WidgetSlotGuide, WorldClockWidget,
 };
 use ds_shell::{EventLine, MonthFace, TodayLine};
 use std::time::{Duration, Instant};
@@ -74,21 +75,24 @@ fn center(body: Element) -> Element {
     }
 }
 
-fn cell(name: &str, device: Device, level: u16, mark: RingMark) -> BatteryCell {
+fn cell(name: &str, device: Device, level: u16, power: BatteryPower) -> BatteryCell {
     BatteryCell {
         name: name.to_owned(),
         device,
-        level: Fraction(level),
-        mark,
+        state: BatteryState {
+            level: Fraction(level),
+            power,
+            low_at: LowAt::default(),
+        },
     }
 }
 
 fn four() -> BatteryEntry {
     BatteryEntry::Devices(vec![
-        cell("Phone", Device::Phone, 830, RingMark::Plain),
-        cell("Watch", Device::Watch, 130, RingMark::Plain),
-        cell("Earbuds", Device::Earbuds, 990, RingMark::Charging),
-        cell("Keyboard", Device::Keyboard, 960, RingMark::Plain),
+        cell("Phone", Device::Phone, 830, BatteryPower::Battery),
+        cell("Watch", Device::Watch, 130, BatteryPower::Battery),
+        cell("Earbuds", Device::Earbuds, 990, BatteryPower::Charging),
+        cell("Keyboard", Device::Keyboard, 960, BatteryPower::Battery),
     ])
 }
 
@@ -182,17 +186,21 @@ type Case = (&'static str, fn() -> Element);
 
 const CASES: &[Case] = &[
     ("battery-solo", || {
-        let entry =
-            BatteryEntry::Devices(vec![cell("MacBook", Device::Laptop, 930, RingMark::Plain)]);
+        let entry = BatteryEntry::Devices(vec![cell(
+            "MacBook",
+            Device::Laptop,
+            930,
+            BatteryPower::Battery,
+        )]);
         desktop(
             Theme::Light,
-            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, id: "widget-battery" } },
+            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, common: Common { id: Some("widget-battery".to_string()), ..Common::default() } } },
         )
     }),
     ("battery-grid", || {
         let entry = BatteryEntry::Devices(vec![
-            cell("MacBook", Device::Laptop, 930, RingMark::Plain),
-            cell("Headphones", Device::Headphones, 800, RingMark::Plain),
+            cell("MacBook", Device::Laptop, 930, BatteryPower::Battery),
+            cell("Headphones", Device::Headphones, 800, BatteryPower::Battery),
         ]);
         desktop(
             Theme::Dark,
@@ -206,8 +214,12 @@ const CASES: &[Case] = &[
         )
     }),
     ("battery-row-one", || {
-        let entry =
-            BatteryEntry::Devices(vec![cell("MacBook", Device::Laptop, 930, RingMark::Plain)]);
+        let entry = BatteryEntry::Devices(vec![cell(
+            "MacBook",
+            Device::Laptop,
+            930,
+            BatteryPower::Battery,
+        )]);
         desktop(
             Theme::Light,
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Medium } },
@@ -215,8 +227,8 @@ const CASES: &[Case] = &[
     }),
     ("battery-row-two", || {
         let entry = BatteryEntry::Devices(vec![
-            cell("MacBook", Device::Laptop, 930, RingMark::Plain),
-            cell("Headphones", Device::Headphones, 800, RingMark::Plain),
+            cell("MacBook", Device::Laptop, 930, BatteryPower::Battery),
+            cell("Headphones", Device::Headphones, 800, BatteryPower::Battery),
         ]);
         desktop(
             Theme::Light,
@@ -309,12 +321,6 @@ const CASES: &[Case] = &[
         desktop(
             Theme::Light,
             rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, lift: Lift::Lifted } },
-        )
-    }),
-    ("battery-leaving", || {
-        desktop(
-            Theme::Light,
-            rsx! { WidgetCard { widget: BatteryWidget, timeline: Timeline::now(four()), size: WidgetSize::Medium, presence: CardPresence::Leaving, on_gone: |()| {} } },
         )
     }),
     ("slot-guide", || {
@@ -461,7 +467,7 @@ fn the_batteries_lay_out_as_the_reference() {
         row.contains("data-tone=\"low\""),
         "the watch at 13 %: {row}"
     );
-    assert!(row.contains("data-mark=\"charging\""), "{row}");
+    assert!(row.contains("data-power=\"charging\""), "{row}");
     for (name, batteries) in [
         ("battery-row-one", 1),
         ("battery-row-two", 2),
@@ -745,20 +751,4 @@ fn the_bottom_sheet_says_its_attachment_and_its_width() {
         "never taller than half the root"
     );
     assert!(css.contains("--sheet-dy:calc(100% + var(--s-36))"));
-}
-
-/// A card its host removed says it is leaving and plays its exit on its pulse class;
-/// a placed card says nothing.
-#[test]
-fn a_leaving_card_plays_its_exit() {
-    let leaving = html("battery-leaving");
-    assert!(
-        leaving.contains("class=\"ds-widget a-widget-out\""),
-        "{leaving}"
-    );
-    assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");
-    assert!(leaving.contains("data-pulse=\"a\""), "{leaving}");
-    let placed = html("battery-row");
-    assert!(!placed.contains("data-presence"), "{placed}");
-    assert!(!placed.contains("a-widget-out"), "{placed}");
 }

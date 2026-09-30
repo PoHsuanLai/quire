@@ -29,7 +29,7 @@ pub fn SpacePage() -> Element {
                         key: "{index}",
                         name: candidate.label(),
                         frame: FrameVars::of(&candidate.look(), scheme),
-                        here: if candidate == preset { Selection::Selected } else { Selection::Unselected },
+                        selection: if candidate == preset { Selection::Selected } else { Selection::Unselected },
                         shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char(char::from(b'1' + candidate.0))]),
                         onclick: move |_| axes.with_mut(|axes| *axes = axes.clone().with_preset(candidate)),
                     }

@@ -3,11 +3,13 @@
 //! keyboard-brightness level's glyph. Each ends at 0 frames; Reduced shows the level at once.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Fraction, LevelGlyph, Material, Motion};
+use ds::{
+    Appearance, BatteryPower, BatteryState, Ds, Fraction, LevelGlyph, LowAt, Material, Motion,
+};
 use ds::{Slider, SliderLook};
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
-use ds_shell::{DeviceBattery, RingMark};
+use ds_shell::{BatteryRing, Readout};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -31,7 +33,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 fn Module() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
-            div { id: "mac", DeviceBattery { level: LEVEL(), mark: RingMark::Charging, label: "This computer" } }
+            div { id: "mac", BatteryRing { state: BatteryState { level: LEVEL(), power: BatteryPower::Charging, low_at: LowAt::default() }, label: "This computer", readout: Readout::Under } }
             div { id: "keys", Slider { label: "Keyboard Brightness".to_owned(), value: Fraction(500), glyph: LevelGlyph::KeyboardBrightness, look: SliderLook::Capsule } }
         }
     }
@@ -45,7 +47,7 @@ fn figure(harness: &Harness) -> Option<u32> {
 
 /// The level's arc, absent while it is empty.
 fn arc(harness: &Harness) -> Option<String> {
-    harness.attr("#mac .ds-battery-arc path", "d")
+    harness.attr("#mac .ds-battery .ds-progress-fill path", "d")
 }
 
 #[test]
@@ -55,7 +57,9 @@ fn the_ring_stands_at_its_level_and_a_later_level_moves_it_while_the_figure_chan
     let full = arc(&harness);
     assert!(full.is_some(), "the arc is drawn at its level");
     assert_eq!(
-        harness.attr("#mac .ds-battery", "aria-valuenow").as_deref(),
+        harness
+            .attr("#mac .ds-battery .ds-progress", "aria-valuenow")
+            .as_deref(),
         Some("93"),
         "the true level is stated from the first frame (R8)"
     );

@@ -10,6 +10,7 @@ pub(crate) mod parts;
 pub(crate) mod rows;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::controls::segmented::SegmentedControl;
 use ds::components::lists::section_header::SectionHeader;
 use ds::{Choice, Tracking};
@@ -88,6 +89,7 @@ pub fn SpaceEditor(
     #[props(default)] on_rename: Option<EventHandler<String>>,
     #[props(default)] motion: Option<MotionChoice>,
     #[props(default)] measured: MeasuredIn,
+    #[props(default)] common: Common,
 ) -> Element {
     let picked = use_signal(|| None::<(DotIndex, DotIndex)>);
     let picker = Picker {
@@ -97,8 +99,19 @@ pub fn SpaceEditor(
     };
     let dots = look.dots.len();
     let current = active(active_dot, picked(), dots);
+    let class = common.class("ds-space-editor");
+    let data = common.data_attributes();
+    let label = common
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| "Space editor".to_owned());
     rsx! {
-        aside { class: "ds-space-editor", "aria-label": "Space editor",
+        aside {
+            class,
+            id: common.id.clone(),
+            "aria-label": "{label}",
+            onmounted: move |event| common.mounted(event),
+            ..data,
             Title { dots: look.dots.clone(), scheme, name, on_rename }
             div {
                 SectionHeader { title: "Colour", value: "drag a dot".to_string() }

@@ -1,9 +1,8 @@
 /* UserPicture (design/25-EMOJI.md section 7): a letter disc (`.ds-avatar`), an animated emoji
-   (`.ds-emoji`) or the user's photo, inside `.ds-user-picture`, the wrapper that plays the
-   accept beat (`a-picture-accept`, a pulse the picture's timer puts on and takes off) when the
-   mood turns happy. The wrapper adds no box of its own: it is the picture's size. */
+   (`.ds-emoji`) or the user's photo, inside `.ds-user-picture`, the wrapper that adds no box of
+   its own: it is the picture's size. */
 
-.ds-user-picture{ display:inline-flex; flex:none; transform-origin:50% 100%; }
+.ds-user-picture{ display:inline-flex; flex:none; }
 
 /* UserPicture::Photo: the user's own picture, cropped round. The disc clips (overflow hidden
    under the pill radius) and the image covers it (`object-fit:cover`, centred), so a portrait

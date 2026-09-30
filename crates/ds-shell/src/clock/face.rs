@@ -13,6 +13,7 @@ use crate::clock::angles::hands;
 use crate::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
 use crate::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds_core::word::Word;
 
@@ -24,18 +25,24 @@ pub fn ClockFace(
     #[props(default)] phase: DayPhase,
     #[props(default)] look: ClockLook,
     #[props(into)] label: TextLine,
+    #[props(default)] common: Common,
 ) -> Element {
+    let class = common.class("ds-clock");
+    let data = common.data_attributes();
     let (face, mark) = match look {
         ClockLook::Analog => (rsx! { AnalogDial { time } }, None),
         ClockLook::Digital => (rsx! { Digits { time } }, Some(phase_mark(phase))),
     };
     rsx! {
         div {
-            class: "ds-clock",
+            class,
+            id: common.id.clone(),
             "data-look": look.slug(),
             "data-phase": phase.slug(),
             role: "img",
-            "aria-label": "{label.plain_text()} {time.digits()}",
+            "aria-label": common.aria_label.clone().unwrap_or_else(|| format!("{} {}", label.plain_text(), time.digits())),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             {face}
             span { class: "ds-clock-label",
                 {mark}

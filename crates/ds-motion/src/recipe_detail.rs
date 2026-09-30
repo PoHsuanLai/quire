@@ -52,24 +52,6 @@ pub(super) const MORPH_FADE_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `roll-in` at `--t-quick --e-out`: a changed digit rolling into place.
-pub(super) const ROLL_IN: Recipe = recipe(
-    "roll-in",
-    DurationToken::Quick,
-    EasingToken::Out,
-    Fill::Backwards,
-    Iteration::Once,
-);
-
-/// `roll-out` at `--t-quick --e-out`: the digit it replaces rolling away.
-pub(super) const ROLL_OUT: Recipe = recipe(
-    "roll-out",
-    DurationToken::Quick,
-    EasingToken::Out,
-    Fill::Forwards,
-    Iteration::Once,
-);
-
 /// `slide-r` at `--t-move --e-out`: the preview pane's entrance when nothing the person touched
 /// showed it (R5: `Anim::PaneInR` springs, on contact only).
 pub(super) const PANE_IN_R_OUT: Recipe = recipe(

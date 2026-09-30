@@ -1,5 +1,4 @@
-//! The user's picture as markup (design/25-EMOJI.md section 7): the letter, an emoji at rest, a
-//! photo and the picker match goldens under `tests/snapshots/user_picture/`, lint clean, and use
+//! The user's picture picker as markup (design/25-EMOJI.md section 7): the picker matches its golden under `tests/snapshots/user_picture/`, lint clean, and use
 //! only `ds-` classes the stylesheet styles. A sheet's `data:` URI is replaced in the goldens by
 //! its length, so a golden stays readable and still notices a different sheet. The stored
 //! choice round-trips through serde by its stable names, and `resolve_picture` follows its table.
@@ -16,10 +15,7 @@ use ds::{
     Theme, person_hue,
 };
 use ds_lint::{LintConfig, markup};
-use ds_shell::{
-    EmojiId, FaceFile, PictureChoice, PictureSize, UserPicture, UserPicturePicker, UserPortrait,
-    resolve_picture,
-};
+use ds_shell::{EmojiId, FaceFile, PictureChoice, UserPicture, UserPicturePicker, resolve_picture};
 
 fn letter() -> AvatarFace {
     AvatarFace {
@@ -42,27 +38,18 @@ fn root(body: Element) -> Element {
     }
 }
 
-fn portrait(picture: UserPicture) -> Element {
-    root(rsx! { UserPortrait { picture, size: PictureSize::Medium } })
-}
-
 /// A named specimen and how to build it.
 type Specimen = (&'static str, fn() -> Element);
 
-const SPECIMENS: &[Specimen] = &[
-    ("letter", || portrait(letter().into())),
-    ("emoji-rest", || portrait(EmojiId::HeartEyes.into())),
-    ("photo", || portrait(photo().into())),
-    ("picker", || {
-        root(rsx! {
-            UserPicturePicker {
-                letter: letter(),
-                choice: PictureChoice::Emoji(EmojiId::Fox),
-                onpick: |_| {},
-            }
-        })
-    }),
-];
+const SPECIMENS: &[Specimen] = &[("picker", || {
+    root(rsx! {
+        UserPicturePicker {
+            letter: letter(),
+            choice: PictureChoice::Emoji(EmojiId::Fox),
+            onpick: |_| {},
+        }
+    })
+})];
 
 fn render(make: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(make);
@@ -140,32 +127,6 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     }
     failures.dedup();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-/// Each kind draws in the same wrapper, in the same 64 px place: the letter as the avatar's
-/// disc (its look unchanged), the emoji at its rest frame, the photo cropped round.
-#[test]
-fn each_kind_is_drawn_in_the_same_place() {
-    let letter = by_name("letter");
-    assert!(letter.contains("class=\"ds-user-picture\""), "{letter}");
-    assert!(
-        letter.contains("class=\"ds-avatar\"") && letter.contains("data-size=\"64\""),
-        "{letter}"
-    );
-    let emoji = by_name("emoji-rest");
-    for want in [
-        "class=\"ds-user-picture\"",
-        "class=\"ds-emoji\" data-size=\"64\" data-mood=\"idle\"",
-        "data-emoji=\"heart-eyes\"",
-        "data-frame=\"0\"",
-    ] {
-        assert!(emoji.contains(want), "{want} in {}", redacted(&emoji));
-    }
-    let photo = by_name("photo");
-    assert!(
-        photo.contains("class=\"ds-user-photo\" data-size=\"64\""),
-        "{photo}"
-    );
 }
 
 /// The picker offers the letter and the whole set, still, with the current choice checked.

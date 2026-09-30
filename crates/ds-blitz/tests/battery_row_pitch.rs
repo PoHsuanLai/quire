@@ -4,11 +4,13 @@
 //! each place left over, so two batteries never spread to the card's ends with the middle empty.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Fraction, Material, Motion, RootChrome};
+use ds::{
+    Appearance, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, Motion, RootChrome,
+};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, Device, RingMark, Timeline, WidgetCard,
-    WidgetMetrics, WidgetSize,
+    BatteryCell, BatteryEntry, BatteryWidget, Device, Timeline, WidgetCard, WidgetMetrics,
+    WidgetSize,
 };
 use std::time::Duration;
 
@@ -36,8 +38,11 @@ fn entry(count: usize) -> BatteryEntry {
             .map(|(at, device)| BatteryCell {
                 name: format!("device {at}"),
                 device,
-                level: Fraction(500),
-                mark: RingMark::Plain,
+                state: BatteryState {
+                    level: Fraction(500),
+                    power: BatteryPower::Battery,
+                    low_at: LowAt::default(),
+                },
             })
             .collect(),
     )

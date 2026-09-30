@@ -10,13 +10,15 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{
-    Appearance, Ds, Fraction, Glyph, Icon, IconSize, Inject, Material, Motion, RootChrome, Theme,
+    Appearance, BatteryPower, BatteryState, Ds, Fraction, Glyph, Icon, IconSize, Inject, Label,
+    LowAt, Material, Motion, RootChrome, Theme,
 };
 use ds_lint::{LintConfig, markup};
 use ds_shell::{
-    BatteryFigure, BatteryLevel, CardTint, ClockFace, ClockLook, ClockTime, DayPhase, RingMark,
-    Seconds, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
+    BatteryRing, CardTint, ClockFace, ClockLook, ClockTime, DayPhase, Seconds, WidgetFrame,
+    WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle, percent_text,
 };
 
 #[derive(Props, Clone)]
@@ -87,6 +89,23 @@ const LATE: ClockTime = ClockTime {
 
 type Case = (&'static str, fn() -> Element);
 
+/// A draining battery at `level` permille.
+fn at(level: u16) -> BatteryState {
+    BatteryState {
+        level: Fraction(level),
+        power: BatteryPower::Battery,
+        low_at: LowAt::default(),
+    }
+}
+
+/// A charging battery at `level` permille.
+fn charging(level: u16) -> BatteryState {
+    BatteryState {
+        power: BatteryPower::Charging,
+        ..at(level)
+    }
+}
+
 const CASES: &[Case] = &[
     ("frame-small-desktop", || {
         desktop(
@@ -97,7 +116,7 @@ const CASES: &[Case] = &[
     ("frame-medium-desktop-titled", || {
         desktop(
             Theme::Light,
-            rsx! { WidgetFrame { size: WidgetSize::Medium, title: batteries(), id: "widget-battery", "84%" } },
+            rsx! { WidgetFrame { size: WidgetSize::Medium, title: batteries(), common: Common { id: Some("widget-battery".to_string()), ..Common::default() }, "84%" } },
         )
     }),
     ("frame-large-desktop-dark", || {
@@ -162,25 +181,25 @@ const CASES: &[Case] = &[
     ("battery-8", || {
         settled(
             Theme::Light,
-            rsx! { BatteryLevel { level: Fraction(80), label: "Mouse" } },
+            rsx! { BatteryRing { state: at(80), label: "Mouse" } },
         )
     }),
     ("battery-45", || {
         settled(
             Theme::Light,
-            rsx! { BatteryLevel { level: Fraction(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } } },
+            rsx! { BatteryRing { state: at(450), label: "Headphones", Glyph { icon: Icon::Headphones, size: IconSize::Base } } },
         )
     }),
     ("battery-100", || {
         settled(
             Theme::Dark,
-            rsx! { BatteryLevel { level: Fraction(1000), label: "Keyboard" } },
+            rsx! { BatteryRing { state: at(1000), label: "Keyboard" } },
         )
     }),
     ("battery-charging-15", || {
         settled(
             Theme::Light,
-            rsx! { BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" } },
+            rsx! { BatteryRing { state: charging(150), label: "This computer" } },
         )
     }),
 ];
@@ -326,7 +345,7 @@ fn the_battery_draws_its_level_and_tone() {
         (
             "battery-8",
             "M50.00 4.65A45.35 45.35 0 0 1 71.85 10.26",
-            "critical",
+            "low",
             "8",
         ),
         (
@@ -362,7 +381,7 @@ fn the_battery_draws_its_level_and_tone() {
         assert!(!html.contains("a-bump"), "{name}: nothing bumps on mount");
     }
     let charging = html("battery-charging-15");
-    assert!(charging.contains("data-mark=\"charging\""), "{charging}");
+    assert!(charging.contains("data-power=\"charging\""), "{charging}");
     assert!(charging.contains("ds-battery-bolt"), "{charging}");
     assert!(
         charging.contains("d=\"M61.35 6.09A45.35 45.35 0 1 1 38.65 6.09\""),
@@ -379,17 +398,17 @@ fn a_battery_first_draws_at_its_level() {
         desktop(
             Theme::Light,
             rsx! {
-                BatteryLevel { level: Fraction(80), label: "Mouse" }
-                BatteryLevel { level: Fraction(150), mark: RingMark::Charging, label: "This computer" }
-                BatteryFigure { level: Fraction(930) }
+                BatteryRing { state: at(80), label: "Mouse" }
+                BatteryRing { state: charging(150), label: "This computer" }
+                Label { text: percent_text(Fraction(930)) }
             },
         )
     });
-    assert!(first.contains("ds-battery-arc"), "{first}");
+    assert!(first.contains("ds-progress-fill"), "{first}");
     assert!(first.contains("ds-battery-bolt"), "{first}");
     assert!(first.contains("aria-valuenow=\"8\""), "{first}");
     assert!(first.contains("aria-valuenow=\"15\""), "{first}");
-    assert!(first.contains("data-tone=\"critical\""), "{first}");
+    assert!(first.contains("data-tone=\"low\""), "{first}");
     assert!(
         first.contains(">93%<"),
         "the figure shows the level: {first}"

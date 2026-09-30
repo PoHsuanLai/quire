@@ -6,9 +6,9 @@
 
 use crate::lock::password::use_password;
 use crate::lock::password_field::{Escape, Form, PasswordField};
-use crate::lock::picture::{AT_POLKIT, prompt_picture};
+use crate::lock::picture::AT_POLKIT;
 use crate::lock::vocab::{CapsLock, LockUser, PromptState};
-use crate::user_picture::{mood::Mood, portrait::Liveliness};
+use crate::user_picture::draw::drawn;
 use dioxus::prelude::*;
 use ds::Answers;
 use ds::Common;
@@ -67,7 +67,7 @@ pub fn PolkitPrompt(
             width: SheetWidth::Narrow,
             common,
             div { class: "ds-polkit", "data-state": state.slug(),
-                {prompt_picture(user.picture, AT_POLKIT, polkit_life(&state))}
+                {drawn(user.picture, AT_POLKIT)}
                 div { class: "ds-polkit-title", {title.unwrap_or_else(|| AUTHENTICATE.to_owned())} }
                 div { class: "ds-polkit-action", {text(&action)} }
                 if let Some(detail) = detail {
@@ -96,19 +96,5 @@ pub fn PolkitPrompt(
                 }
             }
         }
-    }
-}
-
-/// What the sheet's picture plays: the accept beat once accepted, a wince when wrong, else at
-/// rest. Nothing in the sheet wakes it; it is on screen for a moment.
-fn polkit_life(state: &PromptState) -> Liveliness {
-    let mood = match state {
-        PromptState::Accepted => Mood::Happy,
-        PromptState::Wrong => Mood::Wince,
-        PromptState::Idle | PromptState::Checking | PromptState::LockedOut { .. } => Mood::Idle,
-    };
-    Liveliness {
-        mood,
-        ..Liveliness::default()
     }
 }

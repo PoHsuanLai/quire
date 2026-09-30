@@ -10,14 +10,19 @@
 //! `--widget-cell` and `--widget-gap` (`WidgetMetrics`).
 
 use crate::widget::contract::WidgetKind;
-use crate::widget::exit::{CardPresence, use_card_exit};
 use crate::widget::kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::widget::scope::use_frame_provider;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::text_runs::text;
 use ds::root::chrome::RootChrome;
 use ds::root::surface::Surface;
+use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
+use ds_motion::presence::Exit;
+use ds_motion::presence::spec::PresenceSpec;
+use ds_motion::presence::use_presence::{Presented, use_presence};
 use ds_style::appearance::material::Material;
 use ds_style::icon::render::{Glyph, IconSize};
 
@@ -26,47 +31,56 @@ use ds_style::icon::render::{Glyph, IconSize};
 /// `data-widget` (a `WidgetCard` passes its widget's kind). `lift` picks the card up while a
 /// host moves it.
 /// `title` draws a glyph and a name above the content (the Batteries and Clock widgets take
-/// none: their content fills the card). `id` names the card for the layer's input and blur
-/// regions.
+/// none: their content fills the card). `common.id` names the card for the layer's input and
+/// blur regions.
 ///
 /// The frame provides its `size` to its content (`widget_scope`), so content that must fit
 /// the frame, a `MonthGrid` at `MonthDensity::Auto`, fits itself without being told.
 ///
-/// `presence: CardPresence::Leaving` plays the card's exit: it shrinks and fades
-/// (`widget-out`, a fade alone under Reduced) and `on_gone` runs once at `settle(WidgetOut)`,
-/// when the host stops drawing it. The host keeps the card until then.
+/// `shown` plays the card in and out like any surface: it fades in as it mounts shown, and out
+/// when the host turns it `Hidden` (a widget the person removes); `on_hidden` runs once the exit
+/// has settled, when the host stops drawing it. The host keeps the card until then.
 #[component]
 pub fn WidgetFrame(
     #[props(default)] size: WidgetSize,
     #[props(default)] host: WidgetHost,
     #[props(default)] tint: CardTint,
     #[props(default)] title: Option<WidgetTitle>,
-    #[props(default)] id: Option<String>,
     #[props(default)] kind: Option<WidgetKind>,
     #[props(default)] lift: Lift,
-    #[props(default)] presence: CardPresence,
-    #[props(default)] on_gone: Option<EventHandler<()>>,
+    #[props(default = Shown::Visible)] shown: Shown,
+    #[props(default)] on_hidden: Option<EventHandler<()>>,
+    #[props(default)] common: Common,
     children: Element,
 ) -> Element {
     use_frame_provider(size);
-    let motion = use_card_exit(presence, on_gone);
-    let class = match motion.pulse() {
-        Some(pulse) => format!("ds-widget {pulse}"),
-        None => "ds-widget".to_owned(),
-    };
+    let Presented { presence, alias } = use_presence(
+        shown,
+        PresenceSpec {
+            enter: Anim::PaletteFade,
+            exit: Exit::Fade,
+        },
+        on_hidden,
+    );
     let tint = tint.on(host);
     let kind = kind.map(|kind| kind.as_str().to_owned());
+    let class = common.class("ds-widget");
+    let data = common.data_attributes();
     let card = rsx! {
         div {
             class,
-            id,
+            id: common.id.clone(),
             "data-size": size.slug(),
             "data-host": host.slug(),
             "data-tint": tint.attr(),
             "data-widget": kind,
             "data-lift": lift.attr(),
-            "data-presence": motion.presence(),
-            "data-pulse": motion.pulse().map(|_| "a"),
+            "data-shown": presence.shown().slug(),
+            "data-presence": presence.drawn_slug(),
+            "data-pulse": alias.slug(),
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             if tint == CardTint::Space {
                 div { class: "ds-frame" }
             }

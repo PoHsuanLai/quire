@@ -1,4 +1,4 @@
-//! Animated emoji as markup (design/25-EMOJI.md): a pick at each size, each mood, with and
+//! Animated emoji as markup (design/25-EMOJI.md): a pick at each size, with and
 //! without its disc, in both schemes, match goldens under `tests/snapshots/emoji/`, lint clean,
 //! and use only `ds-` classes the stylesheet styles. The sheet's `data:` URI is replaced in the
 //! goldens by its length, so a golden stays readable and still notices a different sheet.
@@ -9,16 +9,14 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Word;
 use ds::{Appearance, Ds, Inject, Material, Theme};
 use ds_lint::{LintConfig, markup};
-use ds_shell::{AnimatedEmoji, DiscHue, EmojiDisc, EmojiId, Mood, PictureSize};
+use ds_shell::{AnimatedEmoji, DiscHue, EmojiDisc, EmojiId, PictureSize};
 
 #[derive(Props, Clone, PartialEq)]
 struct SpecimenProps {
     emoji: EmojiId,
     size: PictureSize,
-    mood: Mood,
     disc: EmojiDisc,
     theme: Theme,
 }
@@ -27,7 +25,7 @@ struct SpecimenProps {
 fn Specimen(props: SpecimenProps) -> Element {
     rsx! {
         Ds { appearance: Appearance { theme: props.theme, ..Appearance::default() }, material: Material::Window, stylesheet: Inject::Host,
-            AnimatedEmoji { emoji: props.emoji, size: props.size, mood: props.mood, disc: props.disc }
+            AnimatedEmoji { emoji: props.emoji, size: props.size, disc: props.disc }
         }
     }
 }
@@ -53,31 +51,23 @@ fn redacted(html: &str) -> String {
     out
 }
 
-fn large(emoji: EmojiId, mood: Mood) -> SpecimenProps {
+fn large(emoji: EmojiId) -> SpecimenProps {
     SpecimenProps {
         emoji,
         size: PictureSize::Large,
-        mood,
         disc: EmojiDisc::None,
         theme: Theme::Light,
     }
 }
 
 fn specimens() -> Vec<(String, SpecimenProps)> {
-    let mut all: Vec<(String, SpecimenProps)> = Mood::ALL
-        .iter()
-        .map(|mood| {
-            (
-                format!("default-{}", mood.slug()),
-                large(EmojiId::default(), *mood),
-            )
-        })
-        .collect();
+    let mut all: Vec<(String, SpecimenProps)> =
+        vec![("default-large".into(), large(EmojiId::default()))];
     all.push((
         "wink-small".into(),
         SpecimenProps {
             size: PictureSize::Small,
-            ..large(EmojiId::Wink, Mood::Idle)
+            ..large(EmojiId::Wink)
         },
     ));
     all.push((
@@ -85,7 +75,7 @@ fn specimens() -> Vec<(String, SpecimenProps)> {
         SpecimenProps {
             size: PictureSize::Medium,
             disc: EmojiDisc::Tinted(DiscHue::Teal),
-            ..large(EmojiId::HeartEyes, Mood::Idle)
+            ..large(EmojiId::HeartEyes)
         },
     ));
     all.push((
@@ -93,7 +83,7 @@ fn specimens() -> Vec<(String, SpecimenProps)> {
         SpecimenProps {
             disc: EmojiDisc::Tinted(DiscHue::Plum),
             theme: Theme::Dark,
-            ..large(EmojiId::Fox, Mood::Idle)
+            ..large(EmojiId::Fox)
         },
     ));
     all
@@ -140,27 +130,15 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// Asleep draws the sleeping face; every other mood draws the pick at its rest frame (the
-/// first render, before any timer).
+/// The first render, before any timer, draws the pick at its rest frame.
 #[test]
-fn a_mood_picks_the_face_at_rest() {
-    for mood in Mood::ALL.iter().copied() {
-        let html = render(large(EmojiId::Wink, mood));
-        let face = if mood == Mood::Asleep {
-            "sleeping"
-        } else {
-            "wink"
-        };
-        assert!(
-            html.contains(&format!("data-emoji=\"{face}\"")),
-            "{mood:?}: {}",
-            redacted(&html)
-        );
-        assert!(html.contains("data-frame=\"0\""), "{mood:?}");
-        assert!(
-            html.contains("background-position:0% 0%"),
-            "{}",
-            redacted(&html)
-        );
-    }
+fn a_pick_is_drawn_at_its_rest_frame() {
+    let html = render(large(EmojiId::Wink));
+    assert!(html.contains("data-emoji=\"wink\""), "{}", redacted(&html));
+    assert!(html.contains("data-frame=\"0\""), "{}", redacted(&html));
+    assert!(
+        html.contains("background-position:0% 0%"),
+        "{}",
+        redacted(&html)
+    );
 }

@@ -12,19 +12,22 @@ use super::widget_blur::BlurWall;
 use super::widget_looks::Wall;
 use dioxus::prelude::*;
 use ds::ControlSize;
-use ds::{Button, Common, Fraction, WakeStamp};
+use ds::{BatteryPower, BatteryState, Button, Common, Fraction, LowAt, WakeStamp};
 use ds_shell::{
     BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
-    RingMark, Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
+    Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
 };
 
 /// One battery on the widgets.
-pub(super) fn cell(name: &str, device: Device, level: u16, mark: RingMark) -> BatteryCell {
+pub(super) fn cell(name: &str, device: Device, level: u16, mark: BatteryPower) -> BatteryCell {
     BatteryCell {
         name: name.to_owned(),
         device,
-        level: Fraction(level),
-        mark,
+        state: BatteryState {
+            level: Fraction(level),
+            power: mark,
+            low_at: LowAt::default(),
+        },
     }
 }
 
@@ -32,10 +35,10 @@ pub(super) fn cell(name: &str, device: Device, level: u16, mark: RingMark) -> Ba
 /// 99, their case at 96 (our set draws the case as a speaker-like "other").
 fn row() -> Vec<BatteryCell> {
     vec![
-        cell("Phone", Device::Phone, 830, RingMark::Plain),
-        cell("Watch", Device::Watch, 130, RingMark::Plain),
-        cell("Earbuds", Device::Earbuds, 990, RingMark::Charging),
-        cell("Case", Device::Other, 960, RingMark::Plain),
+        cell("Phone", Device::Phone, 830, BatteryPower::Battery),
+        cell("Watch", Device::Watch, 130, BatteryPower::Battery),
+        cell("Earbuds", Device::Earbuds, 990, BatteryPower::Charging),
+        cell("Case", Device::Other, 960, BatteryPower::Battery),
     ]
 }
 
@@ -94,7 +97,7 @@ pub(super) fn BatterySolo(#[props(default)] wake: WakeStamp) -> Element {
         "This computer",
         Device::Laptop,
         930,
-        RingMark::Plain,
+        BatteryPower::Battery,
     )]);
     rsx! {
         WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, wake }
@@ -104,8 +107,8 @@ pub(super) fn BatterySolo(#[props(default)] wake: WakeStamp) -> Element {
 #[component]
 pub(super) fn BatteryGrid(#[props(default)] wake: WakeStamp) -> Element {
     let entry = BatteryEntry::Devices(vec![
-        cell("This computer", Device::Laptop, 930, RingMark::Plain),
-        cell("Headphones", Device::Headphones, 800, RingMark::Plain),
+        cell("This computer", Device::Laptop, 930, BatteryPower::Battery),
+        cell("Headphones", Device::Headphones, 800, BatteryPower::Battery),
     ]);
     rsx! {
         WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry), size: WidgetSize::Small, wake }

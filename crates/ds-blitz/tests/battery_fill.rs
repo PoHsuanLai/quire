@@ -5,9 +5,12 @@
 //! idle-frame rule); under Reduced motion the ring is at its level at once.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, DurationToken, Fraction, Material, Motion, MotionLevel, RootChrome};
+use ds::{
+    Appearance, BatteryPower, BatteryState, Ds, DurationToken, Fraction, Label, LowAt, Material,
+    Motion, MotionLevel, RootChrome,
+};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
-use ds_shell::{BatteryFigure, BatteryLevel, RingMark};
+use ds_shell::{BatteryRing, percent_text};
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {
@@ -18,34 +21,34 @@ const VIEW: Viewport = Viewport {
 
 static LEVEL: GlobalSignal<Fraction> = Signal::global(|| Fraction(930));
 /// A ring and its figure at `LEVEL`.
-fn stage(motion: Motion, mark: RingMark) -> Element {
+fn stage(motion: Motion, power: BatteryPower) -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
-            BatteryLevel { level: LEVEL(), mark, label: "This computer" }
-            span { id: "figure", BatteryFigure { level: LEVEL() } }
+            BatteryRing { state: BatteryState { level: LEVEL(), power, low_at: LowAt::default() }, label: "This computer" }
+            span { id: "figure", Label { text: percent_text(LEVEL()) } }
         }
     }
 }
 
 #[allow(non_snake_case)]
 fn Stage() -> Element {
-    stage(Motion::Standard, RingMark::Plain)
+    stage(Motion::Standard, BatteryPower::Battery)
 }
 
 #[allow(non_snake_case)]
 fn ReducedStage() -> Element {
-    stage(Motion::Reduced, RingMark::Plain)
+    stage(Motion::Reduced, BatteryPower::Battery)
 }
 
 #[allow(non_snake_case)]
 fn ChargingStage() -> Element {
-    stage(Motion::Standard, RingMark::Charging)
+    stage(Motion::Standard, BatteryPower::Charging)
 }
 
 /// How much of the circle the arc draws, in thousandths: 0 with no arc, 1000 for the whole
 /// circle, else its end's angle clockwise from twelve (the arc starts at twelve).
 fn drawn(harness: &Harness) -> u16 {
-    let Some(d) = harness.attr(".ds-battery-arc path", "d") else {
+    let Some(d) = harness.attr(".ds-battery .ds-progress-fill path", "d") else {
         return 0;
     };
     if d.ends_with('Z') {
@@ -90,10 +93,16 @@ fn travel() -> Duration {
 /// Settled for good: the same arc after a while, and nothing woke the document (no Rust timer
 /// asked for a frame).
 fn assert_rests(harness: &mut Harness) {
-    let before = (harness.attr(".ds-battery-arc path", "d"), harness.wakes());
+    let before = (
+        harness.attr(".ds-battery .ds-progress-fill path", "d"),
+        harness.wakes(),
+    );
     harness.advance(Duration::from_millis(300));
     assert_eq!(
-        (harness.attr(".ds-battery-arc path", "d"), harness.wakes()),
+        (
+            harness.attr(".ds-battery .ds-progress-fill path", "d"),
+            harness.wakes()
+        ),
         before,
         "a settled ring asks for frames"
     );
@@ -103,7 +112,9 @@ fn assert_rests(harness: &mut Harness) {
 fn a_ring_stands_at_its_level_and_shows_its_figure_at_once() {
     let mut harness = Harness::new(Stage, VIEW);
     assert_eq!(
-        harness.attr(".ds-battery", "aria-valuenow").as_deref(),
+        harness
+            .attr(".ds-battery .ds-progress", "aria-valuenow")
+            .as_deref(),
         Some("93")
     );
     assert!(
@@ -124,7 +135,9 @@ fn a_new_level_moves_the_arc_linearly_and_the_figure_changes_at_once() {
     harness.advance(Duration::from_millis(1));
     assert_eq!(figure(&harness), "40%", "a number changes instantly");
     assert_eq!(
-        harness.attr(".ds-battery", "aria-valuenow").as_deref(),
+        harness
+            .attr(".ds-battery .ds-progress", "aria-valuenow")
+            .as_deref(),
         Some("40")
     );
     let (arcs, rested) = samples(&mut harness, 400);

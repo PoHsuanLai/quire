@@ -6,12 +6,13 @@
 //! ([`crate::DeviceGlyph`]).
 
 use crate::battery::device_glyph::{Device, DeviceGlyph};
-use crate::battery::figure::BatteryFigure;
-use crate::battery::level::{BatteryLevel, RingMark};
+use crate::battery::ring::{BatteryRing, percent_text};
 use crate::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind};
 use crate::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;
+use ds::components::content::label::{Label, LabelStyle};
 use ds::components::content::text_runs::TextLine;
+use ds::{BatteryPower, BatteryState, LowAt};
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 use ds_style::icon::render::IconSize;
@@ -28,10 +29,8 @@ pub struct BatteryCell {
     pub name: String,
     /// Its glyph.
     pub device: Device,
-    /// Its charge, in thousandths.
-    pub level: Fraction,
-    /// Charging or not.
-    pub mark: RingMark,
+    /// Its charge, its power and where it reads low: the one state every battery drawing takes.
+    pub state: BatteryState,
 }
 
 /// One moment of the Batteries widget.
@@ -109,8 +108,11 @@ impl Widget for BatteryWidget {
         let cell = |name: &str, device, level| BatteryCell {
             name: name.to_owned(),
             device,
-            level: Fraction(level),
-            mark: RingMark::Plain,
+            state: BatteryState {
+                level: Fraction(level),
+                power: BatteryPower::Battery,
+                low_at: LowAt::default(),
+            },
         };
         let laptop = cell("Laptop", Device::Laptop, 820);
         match size {
@@ -147,16 +149,23 @@ impl Widget for BatteryWidget {
 /// One battery's ring, its device's glyph inside.
 fn ring(cell: &BatteryCell) -> Element {
     rsx! {
-        BatteryLevel { key: "{cell.name}", level: cell.level, mark: cell.mark, label: cell.name.clone(),
+        BatteryRing { key: "{cell.name}", state: cell.state, label: cell.name.clone(),
             DeviceGlyph { device: cell.device, size: IconSize::Base }
         }
+    }
+}
+
+/// The percentage, set in the widget's own size and face (the wrapper's; the label inherits).
+fn figure(cell: &BatteryCell) -> Element {
+    rsx! {
+        Label { text: percent_text(cell.state.level), style: LabelStyle::Display }
     }
 }
 
 /// An empty place: the bare track.
 fn empty(key: usize) -> Element {
     rsx! {
-        BatteryLevel { key: "empty-{key}", level: Fraction(0), label: "" }
+        BatteryRing { key: "empty-{key}", state: BatteryState::default(), label: "" }
     }
 }
 
@@ -164,7 +173,7 @@ fn solo(cell: &BatteryCell) -> Element {
     rsx! {
         div { class: "ds-batteries", "data-layout": BatteryLayout::Solo.slug(),
             {ring(cell)}
-            span { class: "ds-batteries-hero", BatteryFigure { level: cell.level } }
+            span { class: "ds-batteries-hero", {figure(cell)} }
         }
     }
 }
@@ -191,7 +200,7 @@ fn row(cells: &[BatteryCell]) -> Element {
             for cell in cells {
                 div { key: "{cell.name}", class: "ds-batteries-cell",
                     {ring(cell)}
-                    span { class: "ds-batteries-figure", BatteryFigure { level: cell.level } }
+                    span { class: "ds-batteries-figure", {figure(cell)} }
                 }
             }
             for place in cells.len()..MAX_RINGS {

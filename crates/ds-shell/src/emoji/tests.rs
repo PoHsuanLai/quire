@@ -1,11 +1,8 @@
 use super::id::EmojiId;
-use super::script::{IDLE_REST, MoodChange, Pace, Playing, Shown, Step, pace, reaction, script};
+use super::play::animation;
 use super::sheet::{MANIFEST_JSON, SheetPx, durations, png, position, timing};
-use crate::user_picture::mood::Mood;
 use ds_core::word::Word;
 use std::time::Duration;
-
-const WINDOW: Duration = Duration::from_secs(20);
 
 #[test]
 fn the_manifest_lists_every_emoji_in_order() {
@@ -69,155 +66,21 @@ fn a_frame_is_a_share_of_the_sheet() {
     assert!(below.starts_with("0% "), "{below}");
 }
 
-fn waited(steps: &[Step]) -> Duration {
-    steps
-        .iter()
-        .map(|step| match step {
-            Step::Wait(hold) => *hold,
-            Step::Show(_) => Duration::ZERO,
-        })
-        .sum()
-}
-
-fn shown(steps: &[Step]) -> Vec<Shown> {
-    steps
-        .iter()
-        .filter_map(|step| match step {
-            Step::Show(frame) => Some(*frame),
-            Step::Wait(_) => None,
-        })
-        .collect()
-}
-
 #[test]
-fn every_script_rests_inside_the_window() {
-    let moods = [
-        Mood::Idle,
-        Mood::Attentive,
-        Mood::Wince,
-        Mood::Happy,
-        Mood::Asleep,
-    ];
-    for user in EmojiId::ALL.iter().copied() {
-        for mood in moods {
-            for change in [MoodChange::Changed, MoodChange::Same] {
-                for playing in [Playing::Frames, Playing::Stills] {
-                    let steps = script(user, mood, change, playing, WINDOW);
-                    assert!(waited(&steps) <= WINDOW, "{user:?} {mood:?}");
-                    let last = shown(&steps).last().copied().expect("a frame");
-                    assert_eq!(last.frame, 0, "{user:?} {mood:?} ends mid-loop");
-                    if playing == Playing::Stills {
-                        assert!(shown(&steps).iter().all(|f| f.frame == 0), "{user:?}");
-                    }
-                }
-            }
-        }
+fn an_animation_is_every_frame_once_at_the_assets_own_durations() {
+    for emoji in EmojiId::ALL.iter().copied() {
+        let played = animation(emoji);
+        let frames = timing(emoji).frames;
+        assert_eq!(played.len(), usize::from(frames), "{emoji:?}");
+        assert!(
+            played
+                .iter()
+                .enumerate()
+                .all(|(at, held)| usize::from(held.frame) == at),
+            "{emoji:?}: frames in order from the rest pose"
+        );
+        let total: Duration = played.iter().map(|held| held.hold).sum();
+        let assets: Duration = durations(emoji).into_iter().sum();
+        assert_eq!(total, assets, "{emoji:?}: the asset's own timing");
     }
-}
-
-/// How many of `emoji`'s loops a script plays: each loop shows its frame 1 once.
-fn passes(steps: &[Step], emoji: EmojiId) -> usize {
-    shown(steps)
-        .iter()
-        .filter(|f| f.emoji == emoji && f.frame == 1)
-        .count()
-}
-
-#[test]
-fn idle_plays_the_users_loop_now_and_then() {
-    let steps = script(
-        EmojiId::Wink,
-        Mood::Idle,
-        MoodChange::Same,
-        Playing::Frames,
-        WINDOW,
-    );
-    let loop_length: Duration = durations(EmojiId::Wink).into_iter().sum();
-    let count = passes(&steps, EmojiId::Wink);
-    // One loop, a rest, another: as many as fit, with a rest between each.
-    let cycle = loop_length + IDLE_REST;
-    let fit = (WINDOW + IDLE_REST).as_millis() / cycle.as_millis();
-    assert_eq!(count as u128, fit, "{count} loops");
-    assert!(count >= 2, "idle plays more than once");
-    assert!(shown(&steps).iter().all(|f| f.emoji == EmojiId::Wink));
-    assert!(
-        steps.contains(&Step::Wait(IDLE_REST)),
-        "idle rests between loops"
-    );
-}
-
-#[test]
-fn attentive_glances_then_plays_steadily() {
-    let steps = script(
-        EmojiId::Wink,
-        Mood::Attentive,
-        MoodChange::Changed,
-        Playing::Frames,
-        WINDOW,
-    );
-    let frames = shown(&steps);
-    let glance = timing(EmojiId::ATTENTIVE).frames as usize;
-    assert!(frames[..glance].iter().all(|f| f.emoji == EmojiId::Eyes));
-    assert!(frames[glance..].iter().all(|f| f.emoji == EmojiId::Wink));
-    assert!(
-        !steps.contains(&Step::Wait(IDLE_REST)),
-        "attentive never rests"
-    );
-    let loop_length: Duration = durations(EmojiId::Wink).into_iter().sum();
-    assert!(
-        waited(&steps) + loop_length > WINDOW,
-        "attentive fills the window"
-    );
-}
-
-/// The mapping, one row per mood: the emoji a change to it swaps in, and the pace after.
-#[test]
-fn every_mood_has_its_reaction_and_pace() {
-    const CASES: [(Mood, Option<EmojiId>, Pace); 5] = [
-        (Mood::Idle, None, Pace::Slow),
-        (Mood::Attentive, Some(EmojiId::Eyes), Pace::Steady),
-        (Mood::Wince, Some(EmojiId::Confounded), Pace::Slow),
-        (Mood::Happy, Some(EmojiId::Partying), Pace::Slow),
-        (Mood::Asleep, None, Pace::Still),
-    ];
-    for (mood, swap, speed) in CASES {
-        assert_eq!(reaction(mood), swap, "{mood:?}");
-        assert_eq!(pace(mood), speed, "{mood:?}");
-    }
-}
-
-#[test]
-fn a_wince_plays_the_reaction_once_then_the_users_own() {
-    let steps = script(
-        EmojiId::Wink,
-        Mood::Wince,
-        MoodChange::Changed,
-        Playing::Frames,
-        WINDOW,
-    );
-    let frames = shown(&steps);
-    let reaction = timing(EmojiId::WRONG).frames as usize;
-    assert!(frames[..reaction].iter().all(|f| f.emoji == EmojiId::WRONG));
-    assert!(frames[reaction..].iter().all(|f| f.emoji == EmojiId::Wink));
-    // Unchanged mood (a new wake stamp while wincing): no reaction.
-    let again = script(
-        EmojiId::Wink,
-        Mood::Wince,
-        MoodChange::Same,
-        Playing::Frames,
-        WINDOW,
-    );
-    assert!(shown(&again).iter().all(|f| f.emoji == EmojiId::Wink));
-}
-
-#[test]
-fn asleep_is_the_sleeping_face_still() {
-    let steps = script(
-        EmojiId::Wink,
-        Mood::Asleep,
-        MoodChange::Changed,
-        Playing::Frames,
-        WINDOW,
-    );
-    assert_eq!(steps, vec![Step::Show(Shown::rest(EmojiId::ASLEEP))]);
 }

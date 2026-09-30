@@ -7,6 +7,7 @@ pub(crate) mod track_position;
 
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
@@ -42,6 +43,7 @@ pub fn NowPlayingTrack(
     #[props(default)] art: Option<IconSource>,
     #[props(into)] title: TextLine,
     #[props(default)] by: Option<TextLine>,
+    #[props(default)] common: Common,
 ) -> Element {
     let face = Face { art, title, by };
     let timer = use_motion_timer(Anim::MorphFadeIn);
@@ -80,8 +82,15 @@ pub fn NowPlayingTrack(
         "a"
     };
     let round = faces.round;
+    let class = common.class("ds-track");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-track",
+        div {
+            class,
+            id: common.id.clone(),
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             span { class: "ds-track-art",
                 if let Some(before) = &fading {
                     span { key: "art-out-{round}", class: "ds-track-layer a-morph-fade-out", "data-morph": "out", "data-pulse": alias,

@@ -197,12 +197,9 @@ impl Anim {
             Anim::MorphOut => detail::MORPH_OUT,
             Anim::MorphFadeIn => detail::MORPH_FADE_IN,
             Anim::MorphFadeOut => detail::MORPH_FADE_OUT,
-            Anim::RollIn => detail::ROLL_IN,
-            Anim::RollOut => detail::ROLL_OUT,
             Anim::Hold => own::HOLD,
             Anim::PaneInROut => detail::PANE_IN_R_OUT,
             Anim::MorphInSpring => detail::MORPH_IN_SPRING,
-            Anim::WidgetOut => own::WIDGET_OUT,
         }
     }
 }

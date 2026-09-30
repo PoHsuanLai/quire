@@ -5,7 +5,7 @@
 use ds_style::kit::Sheet;
 
 /// The shell's sheets, in cascade order.
-pub(crate) const SHEETS: [Sheet; 29] = [
+pub(crate) const SHEETS: [Sheet; 30] = [
     Sheet {
         name: "date_picker",
         css: include_str!("date_picker/style.css"),
@@ -22,8 +22,8 @@ pub(crate) const SHEETS: [Sheet; 29] = [
         after: "avatar",
     },
     Sheet {
-        name: "battery_level",
-        css: include_str!("battery/level.css"),
+        name: "battery_ring",
+        css: include_str!("battery/ring.css"),
         after: "avatar",
     },
     Sheet {
@@ -38,7 +38,12 @@ pub(crate) const SHEETS: [Sheet; 29] = [
     },
     Sheet {
         name: "dock_parts",
-        css: include_str!("dock_parts.css"),
+        css: include_str!("dock/parts.css"),
+        after: "count",
+    },
+    Sheet {
+        name: "dock_tile",
+        css: include_str!("dock/tile.css"),
         after: "count",
     },
     Sheet {

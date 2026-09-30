@@ -6,6 +6,7 @@
 
 use crate::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;
+use ds::Common;
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
 
@@ -15,13 +16,19 @@ use ds_motion::anim::Anim;
 pub fn WidgetSlotGuide(
     #[props(default)] size: WidgetSize,
     #[props(default)] host: WidgetHost,
+    #[props(default)] common: Common,
 ) -> Element {
+    let class = common.class(&format!("ds-widget-slot {}", Anim::Fade.class()));
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-widget-slot {Anim::Fade.class()}",
+            class,
+            id: common.id.clone(),
             "data-size": size.slug(),
             "data-host": host.slug(),
             "aria-hidden": "true",
+            onmounted: move |event| common.mounted(event),
+            ..data,
         }
     }
 }
