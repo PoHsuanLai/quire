@@ -1,19 +1,22 @@
 //! LinkPill: the link under the pointer, as a rounded pill (design/30 section 2.11). It shows the
 //! real destination's registered domain; when the pointer rests on it (`HoverIntent`, the `Label`
 //! profile) it expands to the whole address, and a click hands the address to the caller to copy
-//! and says "Copied" until the pointer leaves. The honest or lying decision is mailo's: a lying
+//! and says "Copied" for the toast's hold. The honest or lying decision is mailo's: a lying
 //! link turns the pill loud. The consumer mounts it in the reader the moment the pointer is over
 //! a link; it fades in over `--t-quick` like every floating surface.
 
 use crate::components::app::hover_open::use_hover_open;
 use crate::root::common::Common;
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use ds_core::vocab::Shown;
 use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
 use ds_motion::hover_intent::HoverProfile;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::task::try_set;
+use ds_style::tokens::delay::DelayToken;
 
 /// Where a link goes, as mail decided it.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -109,15 +112,18 @@ pub fn LinkPill(
             title: "Copy link",
             onmounted: move |event| common.mounted(event),
             onpointerenter: move |_| hover.over(),
-            onpointerleave: move |_| {
-                hover.out();
-                copied.set(Copied::No);
-            },
+            onpointerleave: move |_| hover.out(),
             onclick: {
                 let href = href.clone();
                 move |_| {
                     copied.set(Copied::Yes);
                     oncopy.call(href.clone());
+                    // The pill shrinks to "Copied" and the pointer is no longer over it, so the
+                    // word cannot wait for a leave: it stays for the toast's hold.
+                    spawn(async move {
+                        sleep(DelayToken::ToastHold.delay()).await;
+                        let _ = try_set(copied, Copied::No);
+                    });
                 }
             },
             ..data,

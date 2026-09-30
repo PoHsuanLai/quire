@@ -578,7 +578,7 @@ Full catalogue (design doc section in parentheses):
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::app`), `HoverStrip` (§17) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25) |
-| Frame | `AppearancePicker` (§26), `AccountTile` (§27), `ProviderMark` (§28), `LinkPill` (§29), `SelectionBubble` (§30), `SendPill` (§31), `SpaceEditor` (§32), `EdgeStrip` (§33), `DragGhost` (§34), `SyncHalo` (§35) |
+| Frame | `AppearancePicker` (§26), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` (§32), `EdgePeek`, `TodayTabs`, `GroupOrder`, `space_pressed` (§2.11), `DragGhost` (§34), `SyncHalo` (§35) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
 `crates/ds/src/components/<name>.rs` — read that, not this table, before wiring one up; this doc
@@ -597,12 +597,10 @@ A few props worth knowing about before you read the signatures:
   field, drawn inside the editor rather than beside it) and
   `on_active_dot: Option<EventHandler<ActiveDot>>` (fires when the person's focus moves to a
   different dot, separately from `onchange`, which fires on an actual edit).
-- `AccountFace::One` gained an `address: Option<String>` field — an `AccountTile`'s
-  accessible name falls back to its letter and provider without one; pass the account's address
-  when you have it.
-- `SelectionBubble`'s `BubbleAction` is now `{Button(BubbleButton), Separator}` rather than a
-  bare list of buttons — insert `BubbleAction::Separator` between groups instead of styling a
-  gap yourself.
+- `PinFace::Account` has an `address: Option<String>` field — a `PinTile`'s accessible name falls
+  back to its letter and provider without one; pass the account's address when you have it.
+  (`PinTile` replaced `AccountTile` and `AddAccountTile`; `SelectionBubble` is gone: use a context
+  menu.)
 
 Anchors, hover-card parts and undo:
 

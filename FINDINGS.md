@@ -1209,8 +1209,26 @@ What Blitz at the pinned rev paints (48 px, headless):
   rebuilds the card. (7) Skeleton has no `-shape` part: the root is the shape (`data-shape`).
   (8) Public parts are in `ds::selectors`; the gallery example that restyles each and the
   `lint::user_stylesheet` cases wait for step 16.
-- **Step 4a.5 leftovers.** `Anim::MenuPop` stays because `SelectionBubble` still plays it; delete both
-  with the bubble. `PopUpButton` takes `MenuItem`s and draws its own face; it should compose the 4a.4
+- **Step 4a.5 leftovers.** `Anim::MenuPop` and `SelectionBubble` are deleted (step 4a.7b). `PopUpButton` takes `MenuItem`s and draws its own face; it should compose the 4a.4
   `Button` and take `Choice<T>` once that lands. `Row`'s `Accessory::Slot` (a caller's element, click and
   mousedown fenced) is an addition beyond design/30 for `⋯` buttons and similar. `DropLine` still lives with
   the app rows. `SubmenuOpen` and `TriangleTimeout` are now read by `MenuTrack` through the menu panels only.
+
+- **Step 4a.7b (app features and mail-only) decisions.** (1) design/30 2.11 says `EdgePeek` comes
+  from `Peek`, `EdgeStrip` and `HoverStrip`, but `Peek` is mail's reader panel over the card and
+  `HoverStrip` is the thread row's action strip (2.11 lists "hover strip" as `ThreadRow` content):
+  only `EdgeStrip` and the sidebar's `data-side` peek became `EdgePeek`; `Peek` and `HoverStrip`
+  stay (mail features), for the user to settle. (2) `PinTile` keeps its `Badge` and takes a
+  `DropState`; its drop line is its own `.ds-pin-tile-drop`. A `Row`'s `data-drop=target` is still
+  "lit and grown" (a 4a.5 leftover: the list drop line of 30 2.11 should replace the scale).
+  (3) `Row { shape: RowShape::Today }` is the Today tab; `TodayTabs` lists what is not expired and
+  calls `onexpire`. (4) `SendPill` takes an `Operation` (`Running` counts, `Idle` is sent) in place
+  of `SendPhase`; its ring is a `ProgressIndicator { Ring }` showing what is left. `--t-send-ring`
+  has no user any more and can go with the token pass. (5) `ProviderMark` is on the `ControlSize`
+  ladder (Mini 11, Small 13, Regular 14, Large as Regular). (6) `RichText` and `TextRuns` draw
+  inline runs with no element of their own, so they take no `Common`. (7) `LinkPill` takes
+  `href` and `oncopy` (quire has no clipboard write on the `DocumentHost`); "Copied" shows for the
+  toast hold, not until the pointer leaves, since the pill shrinks out from under it.
+  (8) `space_pressed` reads Ctrl+1..9; the Space colour cross-fade over `--t-big` is the frame's,
+  already built. (9) `Anim::{MenuPop, BubblePop, PillUp, RingDrain, LinkPillIn}` and their keyframes
+  are deleted.
