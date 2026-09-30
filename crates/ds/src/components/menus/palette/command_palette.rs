@@ -48,12 +48,12 @@ use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::host::caret::{Caret, InitialCaret};
 use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::measure::MountedRef;
-use crate::style::tokens::{layer::ZLayer, shape::Corner};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Px, Rect};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
+use ds_style::tokens::{layer::ZLayer, shape::Corner};
 
 /// The launcher's preview pane width (design/13 section 13.3.9, proposed): what `aside_width`
 /// is when not given.

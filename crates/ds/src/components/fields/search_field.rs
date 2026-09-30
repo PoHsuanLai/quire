@@ -7,9 +7,9 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
 };
 use crate::focus::field::FieldHandle;
-use crate::style::icon::Icon;
-use crate::style::icon::render::Glyph;
 use dioxus::prelude::*;
+use ds_style::icon::Icon;
+use ds_style::icon::render::Glyph;
 
 /// The command menu's and the launcher's search row. `focus` is the field's
 /// ([`Focus::Controlled`] in the command palette); `onkey` hears each key as the event itself.

@@ -1635,6 +1635,7 @@ dependencies = [
  "dioxus-ssr",
  "ds-core",
  "ds-core-derive",
+ "ds-style",
  "futures-timer",
  "image",
  "keyboard-types 0.7.0",
@@ -1745,6 +1746,19 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "ds-style"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "dioxus-ssr",
+ "ds-core",
+ "ds-core-derive",
+ "image",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

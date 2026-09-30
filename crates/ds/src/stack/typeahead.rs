@@ -3,7 +3,7 @@
 //! forgotten once `TypeaheadReset` has passed since the last letter. A single letter typed again
 //! and again steps through the items that start with it.
 
-use crate::style::tokens::delay::DelayToken;
+use ds_style::tokens::delay::DelayToken;
 use std::time::Instant;
 
 /// The letters typed so far and when the last one came.
@@ -64,7 +64,7 @@ impl Typeahead {
 #[cfg(test)]
 mod tests {
     use super::Typeahead;
-    use crate::style::tokens::delay::DelayToken;
+    use ds_style::tokens::delay::DelayToken;
     use std::time::{Duration, Instant};
 
     const LABELS: &[&str] = &["Archive", "Move", "Mute", "Music", "Reply"];

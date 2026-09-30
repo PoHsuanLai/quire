@@ -11,11 +11,11 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::Propagation;
 use crate::root::common::Common;
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_style::icon::render::IconSize;
 
 /// The toggle's words: "Show less" while the group is open; while folded to its newest, how
 /// many are hidden ("2 more"), or nothing when there is nothing to show.

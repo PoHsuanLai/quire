@@ -14,10 +14,10 @@
 use crate::components::content::text_runs::TextLine;
 use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::shell::battery::ring::{RingSpan, arc_path};
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 use serde::{Deserialize, Serialize};
 
 /// How the arc follows its level: linearly over `--t-move`.

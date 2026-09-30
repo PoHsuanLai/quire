@@ -6,10 +6,10 @@ use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;
 use crate::motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
 use crate::motion::use_roster::Pitches;
-use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::task::spawn_in;
 use std::rc::Rc;
 
 /// One row in the list.

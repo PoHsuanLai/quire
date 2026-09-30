@@ -7,9 +7,9 @@
 use crate::shell::widget::contract::{Widget, fit};
 use crate::shell::widget::kind::WidgetSize;
 use crate::shell::widget::timeline::{RefreshAsk, Timeline, Wake};
-use crate::style::task::{spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_style::task::{spawn_in, try_get, try_set};
 use std::time::Instant;
 
 /// The entry `W` shows now from `timeline` at `size`: the timeline's current entry, or `W`'s

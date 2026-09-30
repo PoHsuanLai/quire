@@ -7,9 +7,9 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::shell::month_grid::data::MonthStep;
 use crate::shell::month_grid::density::Drawn;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// The header row at `density`.
 pub(crate) fn header(

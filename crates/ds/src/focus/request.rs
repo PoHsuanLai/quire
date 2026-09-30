@@ -4,8 +4,8 @@
 
 use crate::focus::select::{Landing, Select};
 use crate::host::caret::InitialCaret;
-use crate::style::task::{try_get, try_set};
 use dioxus::prelude::*;
+use ds_style::task::{try_get, try_set};
 
 /// How many times focus has been asked for: a field serves each new ticket once.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]

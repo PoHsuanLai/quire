@@ -4,10 +4,10 @@
 //! recomputed per frame only while they move (design/26-DETAILS.md section 3.2).
 
 use crate::motion::detail::pending::Lit;
-use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
+use ds_style::icon::shape::Shape;
 
 /// How much of a part shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

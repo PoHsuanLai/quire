@@ -2,15 +2,15 @@
 //! handler (design/05-MOTION.md section 7, the Blitz risk table: "timers start in handlers").
 //!
 //! The settle task belongs to the hook's owner and is dropped with it: a palette unmounted
-//! before its entrance settles takes its timer with it (`crate::style::task`).
+//! before its entrance settles takes its timer with it (`ds_style::task`).
 
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
-use crate::style::scope::{Scope, use_scope_signal};
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::scope::{Scope, use_scope_signal};
+use ds_style::task::{Gone, spawn_in, try_get, try_set};
 
 /// Where a motion timer is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

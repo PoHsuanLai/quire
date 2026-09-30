@@ -8,9 +8,9 @@ use super::declaration::push;
 use super::kind;
 use super::rule::{Offence, Profile, Rule};
 use super::walk::Decl;
-use crate::style::kit::KnownNames;
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use ds_core::word::Word;
+use ds_style::kit::KnownNames;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The properties whose `var()`s time an animation or a transition.
 const TIMING_PROPERTIES: &[&str] = &[

@@ -5,11 +5,11 @@ use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::muted::muted;
 use crate::components::content::provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark};
 use crate::components::controls::count::{Count, CountPlace};
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::tokens::hex::Colour;
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::hex::Colour;
 
 /// Whose tile.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -134,8 +134,8 @@ pub fn AddAccountTile(
 #[cfg(test)]
 mod tests {
     use super::tile_colour;
-    use crate::style::tokens::hex::{Colour, Hex};
     use ds_core::vocab::Check;
+    use ds_style::tokens::hex::{Colour, Hex};
 
     #[test]
     fn only_an_unpressed_tile_is_desaturated() {

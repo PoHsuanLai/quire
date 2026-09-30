@@ -6,7 +6,7 @@
 use super::spring::{Millis, Ratio, SpringTuning};
 use super::velocity::Velocity;
 use crate::motion::detail::touch::Touch;
-use crate::style::appearance::motion::MotionLevel;
+use ds_style::appearance::motion::MotionLevel;
 
 /// A release slower than this, in pixels per second, carries no momentum: a press that barely
 /// moved, not a flick.
@@ -108,7 +108,7 @@ mod tests {
         spring::{Millis, Ratio},
         velocity::Velocity,
     };
-    use crate::style::appearance::motion::MotionLevel;
+    use ds_style::appearance::motion::MotionLevel;
 
     fn thrown(v: i32) -> Touch {
         Touch::Contact(Contact::for_tests().with_velocity(Velocity(v)))

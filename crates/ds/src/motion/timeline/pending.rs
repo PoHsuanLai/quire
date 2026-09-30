@@ -5,7 +5,7 @@
 
 use super::Timeline;
 use crate::motion::detail::pending::{PendingFrame, SPIN_STEPS};
-use crate::style::tokens::timing::DurationToken;
+use ds_style::tokens::timing::DurationToken;
 use std::time::Duration;
 
 /// An operation's pending loop, one frame at a time: from the operation's age `from` to the
@@ -23,7 +23,7 @@ pub enum Pending {
 
 /// One step of the loop, the same at every motion level.
 fn step() -> Duration {
-    DurationToken::SpinStep.duration(crate::style::appearance::motion::MotionLevel::Standard)
+    DurationToken::SpinStep.duration(ds_style::appearance::motion::MotionLevel::Standard)
 }
 
 impl Timeline for Pending {

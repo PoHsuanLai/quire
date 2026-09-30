@@ -4,10 +4,10 @@
 //! concentric with the menu). The item heights, paddings and highlight a settings key can move
 //! stay [`ShellMetrics`](super::ShellMetrics) tokens; these are the fixed ones.
 
-use crate::style::tokens::control_size::ControlSize;
-use crate::style::tokens::size_scale::WholePx;
-use crate::style::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::size_scale::WholePx;
+use ds_style::tokens::token::{CssValue, Token, TokenScope};
 
 /// The bar and text menus' fixed sizes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -2,9 +2,9 @@
 //! tinted circle on one of the icon palette's eight hues (design/08 section 2.10), pale on light
 //! and deep on dark.
 
-use crate::style::appearance::theme::Scheme;
 use ds_core::colour::fit::oklch_hex;
 use ds_core::word::Word;
+use ds_style::appearance::theme::Scheme;
 use serde::{Deserialize, Serialize};
 
 /// One of the icon palette's eight hues, for a tinted disc. Stored by its name (`"teal"`).

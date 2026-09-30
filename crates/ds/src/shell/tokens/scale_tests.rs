@@ -2,8 +2,9 @@
 //! (design/29-SIZING.md section 6, R6 and R7).
 
 use crate::shell::tokens::{control_center::CONTROL_CENTER, shell_scale::SHELL_SCALE};
-use crate::style::tokens::{
-    control_size::ControlSize, size_rules_tests::on_grid, size_scale::WholePx,
+use ds_style::tokens::{
+    control_size::ControlSize,
+    size_scale::{WholePx, on_grid},
 };
 
 #[test]

@@ -10,11 +10,11 @@ use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::scrim_button;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::style::appearance::peek::PeekMode;
-use crate::style::icon::Icon;
-use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 use ds_core::vocab::Dismiss;
+use ds_style::appearance::peek::PeekMode;
+use ds_style::icon::Icon;
+use ds_style::tokens::layer::ZLayer;
 
 /// The `data-mode` word.
 fn mode_slug(mode: PeekMode) -> &'static str {

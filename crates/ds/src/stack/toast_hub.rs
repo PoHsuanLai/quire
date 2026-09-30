@@ -2,14 +2,14 @@
 //! (design/04-COMPONENTS.md section 23, design/06-INTERACTIONS.md section 9).
 //!
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
-//! `try_set`, so a hold that finds the hub gone stops (`crate::style::task`).
+//! `try_set`, so a hold that finds the hub gone stops (`ds_style::task`).
 
-use crate::style::scope::Scope;
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::scope::Scope;
+use ds_style::task::{Gone, spawn_in, try_get, try_set};
+use ds_style::tokens::delay::DelayToken;
 
 /// What an undo would restore, as the consumer's own token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -120,7 +120,7 @@ impl ToastHub {
     /// Hide at once.
     pub fn hide(&self) {
         if self.stop_hold().is_ok() {
-            let _ = crate::style::task::try_set_if_changed(self.state, ToastState::Hidden);
+            let _ = ds_style::task::try_set_if_changed(self.state, ToastState::Hidden);
         }
     }
 
@@ -156,13 +156,13 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
-    use crate::style::appearance::{
-        accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
-    };
-    use crate::style::appearance::{blur::BlurState, material::Material};
-    use crate::style::scope::Scope;
     use dioxus::prelude::*;
     use ds_core::vocab::{Activity, InputModality};
+    use ds_style::appearance::{
+        accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
+    };
+    use ds_style::appearance::{blur::BlurState, material::Material};
+    use ds_style::scope::Scope;
     use std::cell::RefCell;
     use std::rc::Rc;
 

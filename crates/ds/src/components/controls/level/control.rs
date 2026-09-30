@@ -11,11 +11,11 @@ use super::machine::{Hold, KeyStep, LevelInput, Nudge, step};
 use crate::components::content::level_glyph::glyph::LevelGlyphView;
 use crate::components::content::level_glyph::vocab::{LevelLook, LevelMode, LevelSource};
 use crate::host::measure::client_rect;
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Px, Rect, Size};
 use ds_core::vocab::{Availability, Fraction, PressPhase};
 use ds_core::word::Word;
+use ds_style::icon::render::IconSize;
 use std::rc::Rc;
 
 /// A level: the glyph that follows it and the capsule, knob or segments that show it.

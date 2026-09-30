@@ -8,8 +8,8 @@
 
 use crate::host::document::use_document_host;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use crate::style::busy::wait_out_busy;
 use dioxus::prelude::*;
+use ds_style::busy::wait_out_busy;
 
 /// One attempt at scrolling a scroller.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

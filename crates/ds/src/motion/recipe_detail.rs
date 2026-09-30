@@ -3,7 +3,7 @@
 //! one plays once; the grammar has no loop outside a bounded pending step.
 
 use super::recipe::{Fill, Iteration, Recipe, recipe};
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// `morph-in` at `--t-quick --e-out`: the incoming glyph of a DownUp or OffUp morph.
 pub(super) const MORPH_IN: Recipe = recipe(

@@ -13,11 +13,11 @@ use crate::components::controls::button_face::{
 use crate::components::controls::button_size::{ButtonSize, disabled};
 use crate::components::controls::press::{PressListeners, Propagation, use_pressing};
 use crate::root::common::Common;
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Shown};
 use ds_core::word::Word;
+use ds_style::icon::render::IconSize;
 
 /// Which button.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

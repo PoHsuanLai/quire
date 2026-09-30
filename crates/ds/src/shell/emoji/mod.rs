@@ -20,8 +20,8 @@ mod tests;
 
 use crate::motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::{Mood, PictureSize};
-use crate::style::scope::use_scope;
 use dioxus::prelude::*;
+use ds_style::scope::use_scope;
 use sheet::{SheetPx, position, timing, uri};
 
 /// The attribution a surface that shows these emoji carries in its credits (design/25

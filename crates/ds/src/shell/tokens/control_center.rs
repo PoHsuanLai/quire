@@ -4,10 +4,10 @@
 //! a 16 header, a 6 gap and a Regular capsule. sill sizes its popup from these (R9) rather than
 //! from its own copies.
 
-use crate::style::tokens::control_size::ControlSize;
-use crate::style::tokens::size_scale::WholePx;
-use crate::style::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::size_scale::WholePx;
+use ds_style::tokens::token::{CssValue, Token, TokenScope};
 
 /// The control center's sizes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

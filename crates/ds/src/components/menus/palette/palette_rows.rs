@@ -10,10 +10,10 @@
 
 use crate::host::measure::MountedRef;
 use crate::host::measure::{laid_out_now, laid_out_rect};
-use crate::style::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Rect;
+use ds_style::task::spawn_in;
 
 /// The selection as a choice number and the line that choice is drawn on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

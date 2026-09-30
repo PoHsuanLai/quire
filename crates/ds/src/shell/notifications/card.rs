@@ -31,12 +31,12 @@ use crate::root::surface::Surface;
 use crate::shell::notifications::body::NotificationBody;
 use crate::shell::notifications::parts::{AppMark, CardAction, GroupCount, Hover};
 use crate::shell::notifications::swipe::{NotificationSwipe, use_card_swipe};
-use crate::style::appearance::material::Material;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::word::Word;
+use ds_style::appearance::material::Material;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconPx, IconSize};
 
 /// One notification. `app`, `age` (the caller's words: "now", "2m") and `summary` are its first
 /// line; `body` (runs and links, clamped) is optional, as are the group's `count` and the

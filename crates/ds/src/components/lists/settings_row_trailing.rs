@@ -6,11 +6,11 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::toggle::Toggle;
 use crate::components::lists::row_battery::RowBattery;
 use crate::focus::click::kept_click;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::tokens::control_size::ControlSize;
 use dioxus::prelude::*;
 use ds_core::vocab::{Availability, Check, Fraction};
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// A settings row's trailing mark.
 #[derive(Debug, Clone, PartialEq, Default)]

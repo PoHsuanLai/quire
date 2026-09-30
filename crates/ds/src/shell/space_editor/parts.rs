@@ -7,18 +7,18 @@ use crate::components::controls::chip::{Chip, ChipVariant};
 use crate::components::controls::slider::Slider;
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
 use crate::focus::click::kept_click;
-use crate::style::appearance::theme::Scheme;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::space::dot_paint::DotPaint;
-use crate::style::space::{
+use dioxus::prelude::*;
+use ds_core::colour::contrast::Verdict;
+use ds_core::vocab::Fraction;
+use ds_style::appearance::theme::Scheme;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::space::dot_paint::DotPaint;
+use ds_style::space::{
     look::{Grain, SpaceLook},
     palette::{Capping, derive, readout::readout},
     presets::PRESETS,
 };
-use dioxus::prelude::*;
-use ds_core::colour::contrast::Verdict;
-use ds_core::vocab::Fraction;
 
 /// The stop chips under the field and the "+ Colour" button.
 #[component]

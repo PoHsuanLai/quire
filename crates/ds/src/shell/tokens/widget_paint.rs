@@ -4,8 +4,8 @@
 //! (design/23 section 1.1): a bright green ring on a track that is the plate darkened, a red
 //! ring when low, white day dials and dark night dials with an orange seconds hand.
 
-use crate::style::tokens::token::Token;
 use ds_core::word::Word;
+use ds_style::tokens::token::Token;
 
 /// One widget paint token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -40,9 +40,9 @@ pub enum WidgetPaint {
 #[cfg(test)]
 mod tests {
     use super::WidgetPaint;
-    use crate::style::appearance::theme::Scheme;
-    use crate::style::tokens::token::{Token, TokenScope};
     use ds_core::word::Word;
+    use ds_style::appearance::theme::Scheme;
+    use ds_style::tokens::token::{Token, TokenScope};
     use std::collections::HashSet;
 
     #[test]

@@ -2,7 +2,7 @@
 //! (design/06-INTERACTIONS.md section 3). Pure: an event and the time in, the next state and
 //! one effect out.
 
-use crate::style::tokens::delay::DelayToken;
+use ds_style::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
 /// Which hover interface the pointer is resting on, and so how long it waits (design/30

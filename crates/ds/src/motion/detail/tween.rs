@@ -6,10 +6,10 @@
 use super::level::use_level;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::use_timeline::use_timeline;
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How a tween moves: a duration token along an easing token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

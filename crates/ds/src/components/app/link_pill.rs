@@ -6,9 +6,9 @@
 
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// Where a link goes, as mail decided it.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -2,8 +2,8 @@
 //! stamps it again, because the stylesheet declares the family tokens on every `.ds` and a
 //! nested scope without `data-typeface` would reset to the default.
 
-use crate::style::appearance::typeface::Typeface;
 use dioxus::prelude::*;
+use ds_style::appearance::typeface::Typeface;
 
 /// The enclosing root's typeface, as `Ds` provides it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

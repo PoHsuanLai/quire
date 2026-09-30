@@ -18,11 +18,11 @@ use crate::motion::roster::{Heal, RowPitch, presence_slug};
 use crate::motion::use_roster::Pitches;
 use crate::shell::notifications::banner_stack::{BannerKey, BannerPosition};
 use crate::shell::notifications::swipe::{Carried, Flight};
-use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::word::Word;
+use ds_style::task::spawn_in;
 use std::rc::Rc;
 
 /// One banner in the stack.

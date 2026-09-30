@@ -3,9 +3,9 @@
 //! one effect out; the caller owns the timer. The dock's menu, the green button's menu and a
 //! toolbar pull-down are long presses, and the state is the shared [`PressPhase`].
 
-use crate::style::tokens::delay::DelayToken;
 use ds_core::geometry::units::Point;
 use ds_core::vocab::PressPhase;
+use ds_style::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
 /// How far a press may move and still be held still, in pixels.
@@ -113,9 +113,9 @@ fn travelled(from: Point, to: Point) -> f32 {
 #[cfg(test)]
 mod tests {
     use super::{LongPress, LongPressEffect as Effect, LongPressEvent as Event};
-    use crate::style::tokens::delay::DelayToken;
     use ds_core::geometry::units::{Point, Px};
     use ds_core::vocab::PressPhase::{Held, Idle, Pressed};
+    use ds_style::tokens::delay::DelayToken;
     use std::time::{Duration, Instant};
 
     fn at(x: f32, y: f32) -> Point {

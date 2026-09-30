@@ -2,10 +2,10 @@
 //! from `list_row` so the row's own file holds the row.
 
 use crate::focus::click::kept_click;
-use crate::style::icon::Icon;
-use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
+use ds_style::icon::Icon;
+use ds_style::icon::shape::Shape;
 
 /// The star's glyph: the outline, filled with its own colour once starred. `Glyph` only
 /// strokes, and a CSS `fill` never reaches SVG on Blitz (spike S6), so the fill is written as an

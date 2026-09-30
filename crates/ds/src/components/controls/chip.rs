@@ -1,12 +1,12 @@
 //! Chip: a small label that states a fact (design/04-COMPONENTS.md section 10).
 
 use crate::components::content::avatar::{AvatarFace, face};
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::label_hue::LabelHue;
 
 /// Which chip.
 #[derive(Debug, Clone, PartialEq)]

@@ -14,7 +14,6 @@ use crate::motion::anim::Anim;
 use crate::motion::timer::use_motion_timer;
 use crate::stack::host::{OverlayId, Overlays, use_overlays};
 use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
-use crate::style::tokens::layer::ZLayer;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::{
@@ -24,6 +23,7 @@ use ds_core::geometry::{
 use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
+use ds_style::tokens::layer::ZLayer;
 
 /// Which surface a popover draws.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -261,7 +261,7 @@ impl Float {
         if let Some(stack) = self.stack {
             let next = stack.peek().clone().remove(self.layer_id);
             if *stack.peek() != next {
-                let _ = crate::style::task::try_set(stack, next);
+                let _ = ds_style::task::try_set(stack, next);
             }
         }
     }
@@ -271,7 +271,7 @@ impl Float {
     pub(crate) fn rejoin(&self) {
         if let (Stacking::Layer(dismiss), Some(stack)) = (self.stacking, self.stack) {
             let next = stack.peek().clone().push(self.layer_id, dismiss);
-            let _ = crate::style::task::try_set(stack, next);
+            let _ = ds_style::task::try_set(stack, next);
         }
     }
 

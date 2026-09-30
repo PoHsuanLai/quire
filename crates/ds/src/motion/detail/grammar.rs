@@ -2,8 +2,8 @@
 //! 3.4, and the exits design/05 sections 8 and 10 give Dismiss), as data: what the lint's
 //! `Rule::OffGrammarTiming` checks a component's `animation` and `transition` against.
 
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use ds_core::word::Word;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// Durations a moment may play for. Left out on purpose: the loops (`--t-awake`), the spinner's
 /// step (`--t-spin-step`), the holds that are not motion (`--t-send-ring`) and the idle overlay's

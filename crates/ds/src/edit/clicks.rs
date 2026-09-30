@@ -2,8 +2,8 @@
 //! default action from running (it would start Blitz's own text selection), so it cannot use
 //! the renderer's click count and keeps its own: within 500 ms and 4 px of the last press.
 
-use crate::style::tokens::delay::DelayToken;
 use ds_core::geometry::units::Point;
+use ds_style::tokens::delay::DelayToken;
 use std::time::Instant;
 
 /// Which press of a quick run this is: 1, 2, 3, then 1 again.

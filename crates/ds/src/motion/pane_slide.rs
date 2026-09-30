@@ -122,7 +122,7 @@ mod tests {
         for anim in [Anim::PaneInR, Anim::PaneInL, Anim::PaneOutL, Anim::PaneOutR] {
             assert_eq!(
                 anim.recipe().duration,
-                crate::style::tokens::timing::DurationToken::Move,
+                ds_style::tokens::timing::DurationToken::Move,
                 "{anim:?}"
             );
         }

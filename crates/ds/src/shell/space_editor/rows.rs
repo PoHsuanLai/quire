@@ -5,17 +5,17 @@ use super::parts::CheckRows;
 use crate::components::controls::segmented::SegmentedControl;
 use crate::components::fields::text_input::{InputVariant, TextInput};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::style::appearance::{
+use dioxus::prelude::*;
+use ds_core::word::Word;
+use ds_style::appearance::{
     motion::Motion,
     theme::{Scheme, Theme},
 };
-use crate::style::space::dot_paint::DotPaint;
-use crate::style::space::{
+use ds_style::space::dot_paint::DotPaint;
+use ds_style::space::{
     look::SpaceLook,
     palette::{Dot, derive},
 };
-use dioxus::prelude::*;
-use ds_core::word::Word;
 
 /// The Motion row's value and where a pick goes. The Space's own motion is the person's
 /// choice, which the consumer passes on as its root's `appearance.motion`.
@@ -113,7 +113,7 @@ pub(super) fn EachScheme(look: SpaceLook) -> Element {
 #[cfg(test)]
 mod tests {
     use super::schemes_of;
-    use crate::style::appearance::theme::{Scheme, Theme};
+    use ds_style::appearance::theme::{Scheme, Theme};
 
     #[test]
     fn a_system_space_is_measured_in_both_schemes_and_a_fixed_one_in_its_own() {

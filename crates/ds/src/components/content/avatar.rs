@@ -6,10 +6,10 @@
 //! is [`AvatarFace`].
 
 use crate::components::content::muted::muted;
-use crate::style::tokens::hex::{Colour, Hex};
 use dioxus::prelude::*;
 use ds_core::vocab::Muting;
 use ds_core::word::Word;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// An avatar's size, in logical pixels (`data-size`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

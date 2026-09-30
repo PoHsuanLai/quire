@@ -1,8 +1,8 @@
 //! The motion level a detail plays at, read when it starts (R7 lives inside every primitive).
 
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::scope::Scope;
 use dioxus::prelude::*;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::scope::Scope;
 
 /// The enclosing root's motion level, if there is a root; Standard outside one (a golden render
 /// of a bare component).

@@ -5,10 +5,10 @@
 //! (design/13 section 13.3.9); `IconButton { Status }`, `MenuBarItem`, `Menu`, `CommandPalette`
 //! in a surface and `Tooltip` read them, so a consumer gets them with no prop.
 
-use crate::style::tokens::token::Token;
-use crate::style::tokens::tuned::px;
 use ds_core::geometry::units::Px;
 use ds_core::word::Word;
+use ds_style::tokens::token::Token;
+use ds_style::tokens::tuned::px;
 
 /// One token of the shell type scale, each a tuned token a settings key can move.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -201,8 +201,8 @@ impl ShellMetrics {
 #[cfg(test)]
 mod tests {
     use super::{ShellMetrics, ShellType};
-    use crate::style::tokens::token::TokenScope;
     use ds_core::word::Word;
+    use ds_style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

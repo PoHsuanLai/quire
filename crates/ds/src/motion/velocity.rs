@@ -4,7 +4,7 @@
 //! `Hash`.
 
 use super::swipe::Speed;
-use crate::style::tokens::delay::DelayToken;
+use ds_style::tokens::delay::DelayToken;
 
 /// A release velocity in logical pixels per second.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

@@ -5,11 +5,11 @@ use super::bluetooth_state::BluetoothState;
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use crate::motion::detail::morph::Slashed;
-use crate::style::icon::render::IconSize;
-use crate::style::icon::shape::Shape;
-use crate::style::icon::stroke::stroke_width;
-use crate::style::scale::use_scale;
 use dioxus::prelude::*;
+use ds_style::icon::render::IconSize;
+use ds_style::icon::shape::Shape;
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
 
 /// Lucide `bluetooth`'s rune.
 const RUNE: &[Shape] = &[Shape::Path("m7 7 10 10-5 5V2l5 5L7 17")];

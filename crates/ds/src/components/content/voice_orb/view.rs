@@ -2,12 +2,12 @@
 
 use super::io::use_turn;
 use super::model::{OrbColour, OrbColours, OrbMask, OrbMetrics, Turn};
-use crate::style::tokens::colour::ColourToken;
-use crate::style::tokens::orb as vars;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Activity;
 use ds_core::word::Word;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::orb as vars;
 use std::time::Duration;
 
 /// How long the glows take to turn once, unless the caller says.

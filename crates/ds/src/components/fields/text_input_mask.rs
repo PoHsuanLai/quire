@@ -12,10 +12,10 @@
 use crate::components::fields::text_input_kind::MASK_DOT;
 use crate::host::caret::FieldSelection;
 use crate::host::document::DocumentHost;
-use crate::style::task::{spawn_in, try_set_if_changed};
 use dioxus::core::ScopeId;
 use dioxus::prelude::*;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_style::task::{spawn_in, try_set_if_changed};
 use std::rc::Rc;
 
 /// How many frames a read waits out a busy document before it gives up.

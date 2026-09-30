@@ -3,9 +3,9 @@
 //! instantly).
 
 use crate::components::content::status::{battery::BatteryGlyph, battery_state::BatteryState};
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
+use ds_style::icon::render::IconSize;
 
 /// The glyph and the percentage, `84%` in tabular figures.
 #[component]

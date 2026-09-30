@@ -3,10 +3,10 @@
 //! `peek-in`, C's `cmdk-in`, or an opaque spring. Split from `command_palette`.
 
 use crate::components::overlays::popover::Float;
-use crate::style::tokens::shape::Corner;
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_style::tokens::shape::Corner;
 
 /// Where the palette draws.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

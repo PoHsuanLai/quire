@@ -16,10 +16,10 @@ use crate::components::content::text_runs::TextLine;
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::focus::click::kept_click;
-use crate::style::icon::Icon;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{RowState, Shown};
+use ds_style::icon::Icon;
 
 /// Whether an item can hold others. A leaf has no `details` to open: it is drawn as a plain
 /// row with the chevron's space kept, so its label lines up with its siblings'.
@@ -95,7 +95,7 @@ pub fn TreeItem(
     let count = count.map(|value| rsx! { Count { value, place: CountPlace::Item } });
     let body = rsx! {
         if let Some(icon) = glyph {
-            crate::style::icon::render::Glyph { icon, size: crate::style::icon::render::IconSize::Base }
+            ds_style::icon::render::Glyph { icon, size: ds_style::icon::render::IconSize::Base }
         }
         {label_part(label, onselect, editing)}
         {count}
@@ -143,7 +143,7 @@ pub fn TreeItem(
                         kept_click(&event);
                     },
                     span { class: "ds-tree-item-chevron", "aria-hidden": "true",
-                        crate::style::icon::render::Glyph { icon: Icon::ChevronRight, size: crate::style::icon::render::IconSize::Tiny }
+                        ds_style::icon::render::Glyph { icon: Icon::ChevronRight, size: ds_style::icon::render::IconSize::Tiny }
                     }
                     {body}
                 }

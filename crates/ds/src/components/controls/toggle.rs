@@ -12,10 +12,10 @@ use crate::motion::{
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
-use crate::style::tokens::control_size::ControlSize;
 use dioxus::prelude::*;
 use ds_core::vocab::{Availability, Check};
 use ds_core::word::Word;
+use ds_style::tokens::control_size::ControlSize;
 
 /// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of
 /// its travel (the track less its two knob insets and the knob, design/29-SIZING.md R3).
@@ -80,8 +80,8 @@ pub fn Toggle(
 #[cfg(test)]
 mod tests {
     use super::{knob_at, refuse_mixed};
-    use crate::style::tokens::control_size::ControlSize;
     use ds_core::vocab::Check;
+    use ds_style::tokens::control_size::ControlSize;
 
     #[test]
     fn the_knob_travels_the_track_less_the_knob_and_its_insets() {

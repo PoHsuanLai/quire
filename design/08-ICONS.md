@@ -692,8 +692,8 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 
 | Item | Licence | What to record |
 | --- | --- | --- |
-| Lucide | ISC | notice file `crates/ds/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
-| Tabler Icons | MIT | notice file `crates/ds/assets/icons/LICENSE-tabler.txt` (open: not added yet, though `Icon::Brightness` is Tabler's `brightness-half`), list of imported glyph names, version |
+| Lucide | ISC | notice file `crates/ds-style/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
+| Tabler Icons | MIT | notice file `crates/ds-style/assets/icons/LICENSE-tabler.txt` (open: not added yet, though `Icon::Brightness` is Tabler's `brightness-half`), list of imported glyph names, version |
 | Our glyphs | our licence | author, date |
 | Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |
 | FLUX.2 Klein 4B weights | FLUX.2 Klein licence | exact licence text and whether outputs may be used commercially; verify before shipping |

@@ -11,7 +11,6 @@ use crate::components::fields::{
 use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
-use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},
@@ -19,6 +18,7 @@ use ds_core::geometry::{
 };
 use ds_core::vocab::Check;
 use ds_core::vocab::Dismiss;
+use ds_style::tokens::layer::ZLayer;
 
 /// One bubble button.
 #[derive(Debug, Clone, PartialEq)]

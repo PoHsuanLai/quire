@@ -420,7 +420,7 @@ adapter opens).
 - **Inter is the system typeface** (`Typeface::System`; `Editorial` is Bricolage, Karla and Space
   Mono). Blitz sets no optical size from the font size (no `font-optical-sizing`), so Inter's
   `opsz` is pinned into two families: Inter (opsz 14, wght 400..700, italic 400) and Inter
-  Display (opsz 32, wght 500..800), cut from Inter 4.1 (`crates/ds/scripts/cut-inter.sh`
+  Display (opsz 32, wght 500..800), cut from Inter 4.1 (`crates/ds-style/scripts/cut-inter.sh`
   records the release hash). parley applies `font-variant-numeric`, so `tnum` works; the layout
   features kept are `kern mark mkmk ccmp locl calt case tnum pnum zero`. Inter's `tnum` also
   makes `-` and `:` tabular, so a date under `.ds-mono` reads a little open; accepted, it keeps

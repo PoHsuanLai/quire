@@ -6,7 +6,7 @@ use crate::motion::{
     css::{ALIAS, motion_css},
     detail::grammar::{GRAMMAR_DURATIONS, GRAMMAR_EASINGS},
 };
-use crate::style::kit::{Kit, KitRank, Kits, Section, Vocabulary};
+use ds_style::kit::{Kit, KitRank, Kits, Section, Vocabulary};
 use std::borrow::Cow;
 
 /// The motion layer's contribution to the stylesheet and the linter.

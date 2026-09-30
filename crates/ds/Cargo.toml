@@ -11,6 +11,7 @@ publish.workspace = true
 [dependencies]
 ds-core = { workspace = true }
 ds-core-derive = { workspace = true }
+ds-style = { workspace = true }
 dioxus = { workspace = true }
 keyboard-types = { workspace = true }
 serde = { workspace = true }

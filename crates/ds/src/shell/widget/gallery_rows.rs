@@ -12,10 +12,10 @@ use crate::shell::widget::gallery::GalleryWords;
 use crate::shell::widget::kind::WidgetHost;
 use crate::shell::widget::layout::{WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement};
 use crate::shell::widget::registry::WidgetRegistry;
-use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::task::spawn_in;
 use std::collections::BTreeSet;
 
 /// The placements on `host`, in their order there.

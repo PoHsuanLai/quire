@@ -4,7 +4,9 @@
 //! variant in kebab-case, or the enum's `#[word(case = snake)]`, or a variant's
 //! `#[word(slug = "x")]`) and `label` (the variant's words in sentence case, or a variant's
 //! `#[word(label = "x")]`). `parse` is the trait's provided method. The generated code names the
-//! trait as `::ds_core::word::Word`, which is why `ds` declares `extern crate self as ds`.
+//! trait as `::ds_core::word::Word`, so a crate that derives it depends on `ds-core`; `Token` names
+//! `::ds_style::tokens`, so a crate that derives it depends on `ds-style`. Each of the two crates
+//! declares `extern crate self` under its own name to derive inside itself.
 
 mod attrs;
 mod case;

@@ -2,9 +2,9 @@
 //! its own style, and a trailing glyph after it.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// How a button's label is drawn. Every face but `Label` draws a one-letter mark in the style
 /// it names (the selection bubble's B, I, U and S, design/04 section 30) and names the button

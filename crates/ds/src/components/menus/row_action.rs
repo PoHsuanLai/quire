@@ -5,9 +5,9 @@
 
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
 use crate::focus::click::kept_click;
-use crate::style::icon::Icon;
 use dioxus::prelude::*;
 use ds_core::press::Press;
+use ds_style::icon::Icon;
 
 /// A row's trailing action.
 #[derive(Debug, Clone, PartialEq)]

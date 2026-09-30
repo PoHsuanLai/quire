@@ -5,8 +5,8 @@ use crate::shell::tokens::{
     osd::OsdToken, shell_scale::ShellSize, shell_type::ShellType, widget_paint::WidgetPaint,
     widgets::WidgetGrid,
 };
-use crate::style::kit::{Kit, KitRank, Vocabulary};
-use crate::style::tokens::set::{Place, TokenSet};
+use ds_style::kit::{Kit, KitRank, Vocabulary};
+use ds_style::tokens::set::{Place, TokenSet};
 
 /// The shell's contribution to the stylesheet and the linter.
 pub static KIT: Kit = Kit {

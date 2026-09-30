@@ -5,12 +5,12 @@
 use super::{Picker, dot_index, edit, field};
 use crate::host::measure::client_rect;
 use crate::motion::drag::{DragPhase, use_drag};
-use crate::style::appearance::theme::Scheme;
-use crate::style::space::dot_paint::DotPaint;
-use crate::style::space::{look::SpaceLook, palette::derive};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::vocab::Check;
+use ds_style::appearance::theme::Scheme;
+use ds_style::space::dot_paint::DotPaint;
+use ds_style::space::{look::SpaceLook, palette::derive};
 use edit::Nudge;
 use std::rc::Rc;
 
