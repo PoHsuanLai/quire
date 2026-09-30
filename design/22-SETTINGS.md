@@ -157,7 +157,7 @@ that registration is not done yet (see FINDINGS "Settings and schema").
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `bar.height_px` | `Px` | `24` | 24-32 (macOS 24pt; items 22, status slots 30x22) | `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28`; `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | settled 2026-09-28 (user: 24) |
-| `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | proposed |
+| `bar.title_hit_height_px` | `Px` | `24` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry` | RETIRING: no reader; a bar item's hit box is the item's own (`BarPointer`, design/30 section 2.10) |
 | `bar.title_padding_px` | `Px` | `8` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.open_title_pill_height_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `bar.status_icon_box_px` | `Px` | `22` | | `13-BEHAVIOUR-menus-windows.md#13-3-1-bar-geometry`; `20-SURFACES.md#1-1-bar-spec-tier-1` (`IconSize::Bar`) | proposed |

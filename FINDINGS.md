@@ -16,6 +16,15 @@ that rev.
 
 ## Open items
 
+- **Part 4 names still alive after step 4a.8.** `AppearancePicker` and `PickerLayout` stay: sill's
+  Appearance module and the gallery still draw the theme and accent choice with them, and their
+  replacement does not exist yet. `RadioGroup` takes an `IconSource` as a choice's image, which
+  cannot be a colour disc, so an accent swatch has no form in it; the Theme half is a
+  `SegmentedControl` already. It needs one decision: an `IconSource` variant (or a `Choice` image)
+  that paints an accent, or a settled Appearance pane in the macOS style (light, dark, auto
+  thumbnails) that drops the swatch row. `use_pulse`, `PulseKey` and `Pulse` stay in `ds-motion` as
+  the alias machinery of the one shake (`use_shake`); they are no longer a way to flourish, and
+  `use_once` is private. `PaneSlide` stays because `PaneSwitcher` draws from it.
 - **Lower crates' CSS names variables the shell declares.** `ds-motion`'s keyframes read
   `--osd-dy`, `--banner-dx` and `--banner-dy`, and `ds-style`'s shapes read `--dock-floor`, all
   declared by `ds-shell`'s kit, so the stylesheet of `ds` alone (`ds::stylesheet()`) lints with
@@ -55,7 +64,7 @@ that rev.
   list; the file and multiline kinds and `Password` are gone (a mail signature editor is a `TextView`).
   `Label` is built and the plain spans, `StatusLine`s and header fields are not yet moved onto it (each
   moves with its component). `RadioGroup` can draw the Appearance choice, but `AppearancePicker` stays
-  until sill's control center switches over (step 4a.8). The battery rings of `ds-shell` draw their own
+  (see "Part 4 names still alive"). The battery rings of `ds-shell` draw their own
   SVG on the arc geometry `ProgressIndicator` now owns; step 4a.7 recomposes them from it. The hover card's
   `KeyHint` still draws its own key cap; step 4a.6 uses `KeyEquivalent`. A `Badge` at zero draws nothing,
   so a row that reserved its width for the count no longer does.
