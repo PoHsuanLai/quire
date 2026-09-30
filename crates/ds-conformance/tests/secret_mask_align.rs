@@ -11,12 +11,13 @@
 //! paints no caret.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Material, Rect, ShortcutKey,
-    person_hue,
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
-use ds_shell::{LockUser, PolkitPrompt};
+use ds_shell::lock::vocab::LockUser;
+use ds_shell::prelude::*;
 use image::RgbaImage;
 use std::time::Duration;
 

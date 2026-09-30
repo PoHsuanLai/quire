@@ -6,7 +6,7 @@ use crate::axes::{Axes, Showcase, start_with};
 use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
-use ds::Word;
+use ds::prelude::*;
 use ds_harness::{Viewport, snapshot_at};
 use ds_lint::{Exception, LintConfig, Profile, markup};
 use std::time::Duration;

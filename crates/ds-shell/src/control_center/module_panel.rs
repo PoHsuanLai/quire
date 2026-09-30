@@ -8,10 +8,10 @@
 
 use crate::control_center::module_tile_kind::TileSpan;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
+use ds::root::common::Common;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_style::icon::render::IconSize;

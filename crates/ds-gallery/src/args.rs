@@ -5,8 +5,7 @@
 
 use crate::page::Page;
 use crate::progress_copy::ProgressCopy;
-use ds::Typeface;
-use ds::Word;
+use ds::prelude::*;
 use std::path::PathBuf;
 
 /// What the gallery was asked to do.
@@ -162,7 +161,7 @@ mod tests {
     use super::{Args, parse};
     use crate::page::Page;
     use crate::progress_copy::ProgressCopy;
-    use ds::Word;
+    use ds::prelude::*;
     use std::path::PathBuf;
 
     /// A command line and what it parses to: the arguments, or the start of the error.
@@ -256,7 +255,7 @@ mod tests {
             (
                 &["--typeface", "editorial"],
                 Ok(Args {
-                    typeface: Some(ds::Typeface::Editorial),
+                    typeface: Some(Typeface::Editorial),
                     ..args(None, None)
                 }),
             ),

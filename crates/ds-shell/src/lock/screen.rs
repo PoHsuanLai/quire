@@ -4,15 +4,15 @@
 //! screen's layout, so a shell draws it without layout rules of its own.
 
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::image_source::ImageSource;
+use ds::root::common::Common;
 use ds_style::icon::url::IconUrl;
 
 /// The lock screen's stage. Put it in a root that fills its surface (`Ds { material:
 /// Material::Window, extent: RootExtent::Viewport, .. }`, one per output); `wallpaper` is the
 /// output's picture, ideally already blurred by the caller (Blitz blurs nothing, spike S15),
-/// drawn to cover the stage under `--lock-veil`. `clock` is a [`crate::LockClock`] and `prompt`
-/// a [`crate::LockPrompt`].
+/// drawn to cover the stage under `--lock-veil`. `clock` is a [`crate::lock::clock::LockClock`] and `prompt`
+/// a [`crate::lock::prompt::LockPrompt`].
 #[component]
 pub fn LockScreen(
     #[props(default)] wallpaper: Option<ImageSource>,

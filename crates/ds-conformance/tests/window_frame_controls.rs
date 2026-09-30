@@ -7,11 +7,10 @@
 //! and Escape closes it.
 
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Appearance, Ds, HostWindow, Material, Maximized, Point, Px, ResizeEdge, ShortcutKey, Support,
-    TileError, TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,
-};
+use ds::prelude::*;
+use ds::window::host::use_window_host_provider;
+use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
+use ds_core::press::PointerButton;
 use ds_harness::{
     Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
 };
@@ -243,7 +242,7 @@ fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
 fn a_placement_the_host_cannot_make_is_unavailable() {
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
-    harness.send(Input::press(green, ds::PointerButton::Secondary));
+    harness.send(Input::press(green, PointerButton::Secondary));
     harness.advance(ms(60));
     // The header is the menu's first child; the rows follow it.
     let rows: Vec<(String, Option<String>)> = (2..=5)
@@ -351,14 +350,14 @@ fn with_option_held_the_green_light_only_zooms() {
     let mut harness = start(Normal);
     let green = centre(&harness, ".ds-light[*|data-light=zoom]");
     harness.send(alt(green, PointerAction::Move));
-    harness.send(alt(green, PointerAction::Down(ds::PointerButton::Primary)));
+    harness.send(alt(green, PointerAction::Down(PointerButton::Primary)));
     harness.advance(ms(600));
     assert_eq!(
         harness.count(".ds-menu"),
         0,
         "a hold with Option opens no menu"
     );
-    harness.send(alt(green, PointerAction::Up(ds::PointerButton::Primary)));
+    harness.send(alt(green, PointerAction::Up(PointerButton::Primary)));
     harness.advance(ms(60));
     assert_eq!(log(&harness), "zoom:Toggle");
 }

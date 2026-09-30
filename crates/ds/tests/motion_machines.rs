@@ -2,9 +2,10 @@
 //! section 3), drag and the pull tab (sections 6 and 9.2).
 
 use ds::motion::fraction_along;
-use ds::{
-    DRAG_THRESHOLD, Drag, DragPhase, Fraction, HoverEvent, HoverIntent, HoverProfile, HoverWarmth,
-    IntentEffect, IntentPhase, Point, Px, Rect, Size, WINDOW_DRAG_THRESHOLD,
+use ds::prelude::*;
+use ds_motion::drag::{DRAG_THRESHOLD, Drag, DragPhase, WINDOW_DRAG_THRESHOLD};
+use ds_motion::hover_intent::{
+    HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
 use std::time::{Duration, Instant};
 

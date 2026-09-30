@@ -4,11 +4,13 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{
-    ActionId, Button, Emphasis, HoverStrip, Icon, List, ListItem, RowState, RunTone, Selection,
-    Shown, StripAction, TextLine, TextRun, ThreadRow, Titles,
-};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction, Titles};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
 fn hits() -> [(&'static str, TextLine, TextLine, &'static str); 2] {
@@ -102,7 +104,7 @@ pub fn SearchRows() -> Element {
                                                 expanded: vec![(ActionId("label".to_string()), if at() == index { Shown::Visible } else { Shown::Hidden })],
                                             }
                                         },
-                                        common: ds::Common { aria_label: Some(format!("Open {}", subject.plain_text())), ..ds::Common::default() },
+                                        common: Common { aria_label: Some(format!("Open {}", subject.plain_text())), ..Common::default() },
                                         onclick: move |_| at.set(index),
                                     }
                                 },

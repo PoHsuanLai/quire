@@ -2,8 +2,8 @@
 //! listening (design/30 section 2.9).
 
 pub(crate) mod io;
-pub(crate) mod model;
+pub mod model;
 pub(crate) mod step;
 #[cfg(test)]
 mod tests;
-pub(crate) mod view;
+pub mod view;

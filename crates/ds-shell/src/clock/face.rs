@@ -13,8 +13,8 @@ use crate::clock::angles::hands;
 use crate::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
 use crate::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
+use ds::root::common::Common;
 use ds_core::word::Word;
 
 /// A clock showing `time`, for `phase`, drawn as `look`, with `label` (the city) under it. A

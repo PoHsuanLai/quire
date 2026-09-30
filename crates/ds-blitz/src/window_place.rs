@@ -2,7 +2,7 @@
 //! arithmetic is tested without a window. winit reports no work area (the output minus the
 //! panels), so a half covers the whole output's height, panels included (FINDINGS "Window frame").
 
-use ds::WindowTile;
+use ds::window::vocab::WindowTile;
 
 /// A rectangle on the desktop, in physical pixels.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -52,7 +52,7 @@ fn offset(length: u32) -> i32 {
 #[cfg(test)]
 mod tests {
     use super::{Area, placement};
-    use ds::WindowTile;
+    use ds::window::vocab::WindowTile;
 
     const OUTPUT: Area = Area {
         x: 1920,

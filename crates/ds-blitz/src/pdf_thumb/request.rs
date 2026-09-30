@@ -2,7 +2,8 @@
 
 use super::cache;
 use super::raster::rasterise;
-use ds::{PdfPage, PdfTrouble, Scale, Size};
+use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
+use ds::prelude::*;
 use std::path::PathBuf;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::SystemTime;
@@ -17,9 +18,9 @@ const LARGEST_SIDE: u32 = 2048;
 pub struct ThumbRequest {
     /// The PDF.
     pub path: PathBuf,
-    /// The room the page is fitted into, as `ds::PdfThumb`'s `size`.
+    /// The room the page is fitted into, as `ds::prelude::PdfThumb`'s `size`.
     pub size: Size,
-    /// The device scale (`ds::use_scale()`).
+    /// The device scale (`ds_style::scale::use_scale()`).
     pub scale: Scale,
 }
 

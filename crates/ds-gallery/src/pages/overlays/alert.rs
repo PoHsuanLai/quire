@@ -7,12 +7,13 @@
 use crate::axes::Axes;
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Check;
-use ds::{
-    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Button, CardAccent, Ds, Flow, FrameTint,
-    Icon, IconSource, Inject, Material, Px, RootChrome, TextLine, Theme, default_look,
-};
-use ds_shell::{ModuleGrid, ModuleTile};
+use ds::assembly::ds::Inject;
+use ds::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyle};
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_shell::prelude::*;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::default_look;
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";
@@ -59,7 +60,7 @@ fn InPopover(theme: Theme) -> Element {
         div { class: "g-alert-cc",
             Ds {
                 appearance,
-                look: ds::SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
+                look: SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
                 material: Material::Popover,
                 stylesheet: Inject::Host,
                 chrome: Some(RootChrome::Painted),

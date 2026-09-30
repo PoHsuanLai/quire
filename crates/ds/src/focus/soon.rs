@@ -5,7 +5,7 @@
 //! mutation writer holds that borrow, so a focus change made from such a task panicked
 //! ("RefCell already borrowed", a palette's field focusing on mount while its
 //! results re-rendered). Every focus change goes through [`focus_soon`]: the host's
-//! [`FocusHost`](crate::FocusHost) answers [`Focused::Busy`] instead, and the change is tried again
+//! [`FocusHost`](crate::host::parts::FocusHost) answers [`Focused::Busy`] instead, and the change is tried again
 //! once that render has ended (`ds_style::busy`), then a frame later.
 
 use crate::focus::select::{Landing, Select};
@@ -30,7 +30,7 @@ pub fn focus_soon(element: Rc<MountedData>) {
 
 /// As [`focus_soon`], then do `select` with the element's text once the caret is in it:
 /// [`Select::All`] selects a field's whole value through the host's
-/// [`FocusHost::select`](crate::FocusHost::select).
+/// [`FocusHost::select`](crate::host::parts::FocusHost::select).
 pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
     spawn(async move {
         let _ = focus_selecting(&element, select.into()).await;
@@ -61,8 +61,8 @@ pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> 
 }
 
 /// Put the caret of the focused field `element` at `caret`, through the host: a whole-value
-/// selection through [`FocusHost::select`](crate::FocusHost::select), an end through
-/// [`CaretHost::place_caret`](crate::CaretHost::place_caret).
+/// selection through [`FocusHost::select`](crate::host::parts::FocusHost::select), an end through
+/// [`CaretHost::place_caret`](crate::host::parts::CaretHost::place_caret).
 async fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused {
     let host = use_document_host();
     match caret {

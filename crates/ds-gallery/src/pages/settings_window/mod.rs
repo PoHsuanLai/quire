@@ -6,12 +6,15 @@ mod panes;
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    ControlSize, FieldKind, Icon, ListItem, PaneSpec, Px, Row, RowLeading, RowState, SectionHeader,
-    Selection, Shown, Sidebar, SidebarSize, SplitPane, SplitView, TextField, TextLine, Toolbar,
-    ToolbarItem, ToolbarRoom, WindowTitlebar,
-};
+use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
+use ds::components::chrome::split_view::view::SplitView;
+use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
+use ds::components::chrome::toolbar::view::Toolbar;
+use ds::components::chrome::window_frame::WindowTitlebar;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::{ControlSize, SidebarSize};
 
 /// What the sidebar lists.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
@@ -113,15 +116,15 @@ pub fn SettingsWindowPage() -> Element {
     let leading = vec![
         ToolbarItem::new("sidebar", "Sidebar", Icon::PanelLeft),
         ToolbarItem::new("back", "Back", Icon::ChevronLeft).with(if at() == 0 {
-            ds::Availability::Disabled
+            Availability::Disabled
         } else {
-            ds::Availability::Enabled
+            Availability::Enabled
         }),
         ToolbarItem::new("forward", "Forward", Icon::ChevronRight).with(
             if at() + 1 >= history().len() {
-                ds::Availability::Disabled
+                Availability::Disabled
             } else {
-                ds::Availability::Enabled
+                Availability::Enabled
             },
         ),
     ];

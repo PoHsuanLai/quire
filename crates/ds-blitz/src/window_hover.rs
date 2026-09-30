@@ -8,7 +8,7 @@ use crate::frame_hit::link_under;
 use crate::frame_hover::{FrameLinkHover, HoverTracker};
 use dioxus_native::winit::event::WindowEvent;
 use dioxus_native_dom::NodeHandle;
-use ds::{Point, Px};
+use ds::prelude::*;
 
 /// The link the window's pointer is on, and where the pointer last was.
 pub(crate) struct WindowHover {

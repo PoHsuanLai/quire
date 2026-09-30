@@ -4,7 +4,8 @@
 //! else a shell does (a cursor, a title, a redraw) has anywhere to go headless.
 
 use blitz_traits::shell::{ClipboardError, ShellProvider};
-use ds::{ImeSwitch, Point, Px, Rect, Size};
+use ds::host::ime::ImeSwitch;
+use ds::prelude::*;
 use std::sync::{Mutex, PoisonError};
 
 /// A shell whose clipboard and IME state are in memory.

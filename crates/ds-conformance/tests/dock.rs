@@ -5,12 +5,11 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Corner, Ds, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Scheme,
-    Shown, Surface,
-};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::DockLabel;
+use ds_shell::prelude::*;
+use ds_style::icon::render::IconPx;
+use ds_style::tokens::shape::Corner;
 use image::{Rgba, RgbaImage};
 use probe::rect;
 use std::time::Duration;

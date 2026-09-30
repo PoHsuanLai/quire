@@ -3,7 +3,7 @@
 //! already wired.
 
 use dioxus::prelude::*;
-use ds::{DocumentHost, use_document_host};
+use ds::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 

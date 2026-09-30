@@ -16,11 +16,11 @@
 use crate::control_center::module_disc::{Lighting, ModuleDisc};
 use crate::control_center::module_tile_kind::TileSpan;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::press::{ActivationKeys, PressListeners, Propagation};
 use ds::focus::click::kept_click;
+use ds::root::common::Common;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Shown};
 use ds_core::word::Word;

@@ -10,16 +10,18 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource, ImageSource,
-    Inject, Material, PlateFamily, Px, RootChrome, TextLine, Theme, person_hue,
+use ds::assembly::ds::Inject;
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{
-    AppKey, AppSwitcher, CapsLock, EmojiId, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    PolkitPrompt, PromptState, SwitcherApp,
-};
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
+use ds_shell::prelude::*;
+use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
+use ds_style::icon::family::PlateFamily;
 
 fn user() -> LockUser {
     LockUser::new(

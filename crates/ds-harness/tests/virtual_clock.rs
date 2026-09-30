@@ -5,10 +5,9 @@
 //! entrance (a stalled first frame).
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Button, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material,
-    MotionLevel, Point, Px, Rect, RootExtent, Shown, SidePanel, settle, use_hover_hub, use_toasts,
-};
+use ds::components::overlays::hover_card::target::HoverTarget;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::hash::{DefaultHasher, Hash, Hasher};

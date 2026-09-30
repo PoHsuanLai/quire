@@ -1,7 +1,7 @@
 //! The units settings keys are written in (design/22-SETTINGS.md section 4, "Shared
 //! newtypes"). `Fraction` is `ds`'s own, so a settings gain and a slider value are one type.
 //!
-//! `Px` here is a whole number of logical pixels, as a key stores it; `ds::Px` is the
+//! `Px` here is a whole number of logical pixels, as a key stores it; `ds::prelude::Px` is the
 //! renderer's fractional layout length.
 
 use serde::{Deserialize, Serialize};

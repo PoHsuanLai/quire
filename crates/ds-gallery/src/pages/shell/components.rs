@@ -9,16 +9,23 @@ use crate::pages::shell::chrome_targets::Root;
 use crate::pages::{Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{
-    Activity, Availability, BadgeContent, BatteryPower, BatteryState, Check, Common, Emphasis,
-    Fraction, Icon, IconSize, IconSource, ImagePosition, LowAt, Material, PlateFamily, PlateTint,
-    Px, Selection, Shown,
-};
-use ds_shell::{
-    AnimatedEmoji, BatteryRing, CardTint, Device, DeviceGlyph, DockTile, EmojiId, EmojiPlayback,
-    Lift, MenuBarItem, ModuleGrid, ModulePanel, ModuleTile, PanelPlate, PictureSize, Readout,
-    TileSpan, WidgetFrame, WidgetHost, WidgetSize, WidgetTitle, WorkspacePill, WorkspacePills,
-};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::controls::badge::BadgeContent;
+use ds::components::controls::button_model::ImagePosition;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::vocab::Activity;
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::battery::ring::Readout;
+use ds_shell::control_center::module_panel::PanelPlate;
+use ds_shell::control_center::module_tile_kind::TileSpan;
+use ds_shell::emoji::disc::EmojiPlayback;
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::prelude::*;
+use ds_shell::user_picture::size::PictureSize;
+use ds_shell::widget::kind::{CardTint, Lift, WidgetTitle};
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::plate_tint::PlateTint;
 
 /// The page.
 #[component]
@@ -110,7 +117,7 @@ fn cell(name: &str, level: u16, power: BatteryPower, device: Device, readout: Re
 fn BatteryRings() -> Element {
     rsx! {
         Section { title: "BatteryRing", note: "A `ProgressIndicator` ring with the device's filled glyph in the middle, drawn from one `BatteryState` (level, power, where low begins). Draining at or under a fifth reads low (`--battery-low`); charging notches the ring at twelve for the bolt and is never low; Held is plugged in and draws as a normal battery. `Readout::Under` puts the percentage under the ring in a Label.",
-            Root { material: Material::Widget, chrome: Some(ds::RootChrome::Transparent),
+            Root { material: Material::Widget, chrome: Some(RootChrome::Transparent),
                 div { class: "g-row g-row-top",
                     {cell("Draining 82%", 820, BatteryPower::Battery, Device::Laptop, Readout::Under)}
                     {cell("Low 15%", 150, BatteryPower::Battery, Device::Phone, Readout::Under)}
@@ -171,7 +178,7 @@ fn WidgetFrames() -> Element {
     let title = || Some(WidgetTitle::new(Icon::Clock, "Widget"));
     rsx! {
         Section { title: "WidgetFrame", note: "The card every widget is drawn on: Small is one cell, Medium two by one, Large two by two, in the Desktop host (the Widget material's plate with the Space's tint) or as a Tile on the notification center's Popover. `lift: Lifted` swaps the resting drop for the drag shadow. A frame leaves by Presence: `shown: Hidden` fades it out over --t-quick and calls `on_hidden`; hidden and settled it lays nothing out (the last cell is one, empty).",
-            Root { material: Material::Widget, chrome: Some(ds::RootChrome::Transparent), style: "width:100%",
+            Root { material: Material::Widget, chrome: Some(RootChrome::Transparent), style: "width:100%",
                 div { class: "g-row g-row-top",
                     Specimen { name: "Small, Desktop".to_string(),
                         WidgetFrame { size: WidgetSize::Small, title: title(), span { class: "g-name", "content" } }

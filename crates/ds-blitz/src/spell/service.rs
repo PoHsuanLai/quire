@@ -1,4 +1,4 @@
-//! [`NativeSpell`]: `ds::SpellService` on Blitz, over the worker.
+//! [`NativeSpell`]: `ds::prelude::SpellService` on Blitz, over the worker.
 
 use super::choose::locale_lang;
 use super::config::SpellConfig;
@@ -6,7 +6,10 @@ use super::paragraphs::paragraphs;
 use super::worker::{Job, start};
 use dioxus::prelude::MountedData;
 use dioxus_native_dom::NodeHandle;
-use ds::{Lang, Learned, Paragraph, Probe, SpellFuture, SpellService};
+use ds::host::probe::Probe;
+use ds::prelude::*;
+use ds::spell::lang::Lang;
+use ds::spell::service::{Learned, Paragraph, SpellFuture};
 use std::sync::mpsc::Sender;
 use std::sync::{LazyLock, Mutex, PoisonError};
 use tokio::sync::oneshot;

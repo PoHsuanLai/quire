@@ -3,10 +3,9 @@
 //! its own element.
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{
-    Appearance, Button, Ds, FieldFocus, Material, ShortcutKey, focus_soon, use_focus_request,
-};
+use ds::focus::request::use_focus_request;
+use ds::focus::soon::focus_soon;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;

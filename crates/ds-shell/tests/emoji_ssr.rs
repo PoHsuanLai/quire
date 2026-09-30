@@ -9,9 +9,13 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Inject, Material, Theme};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{AnimatedEmoji, DiscHue, EmojiDisc, EmojiId, PictureSize};
+use ds_shell::emoji::disc::{DiscHue, EmojiDisc};
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::prelude::*;
+use ds_shell::user_picture::size::PictureSize;
 
 #[derive(Props, Clone, PartialEq)]
 struct SpecimenProps {

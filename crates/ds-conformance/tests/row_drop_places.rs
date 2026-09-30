@@ -4,11 +4,10 @@
 //! 6.1).
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Common, DataAttr, DataName, Ds, Icon, Material, Point, Px, Row, RowLeading,
-    RowState,
-};
-use ds::{DropState, Selection};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName};
+use ds_core::vocab::RowState;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

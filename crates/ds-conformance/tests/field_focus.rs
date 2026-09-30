@@ -3,8 +3,8 @@
 //! (`Focus::Controlled`) moves it with no event, and the field reports it itself.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, FieldFocus, Material, use_focus_request};
-use ds::{FieldKind, TextField};
+use ds::focus::request::use_focus_request;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -116,7 +116,7 @@ fn a_secure_field_draws_dots_not_what_is_typed() {
     );
     assert_eq!(harness.attr("#c input", "value"), None, "no value written");
     for c in "secret".chars() {
-        harness.send(Input::key(ds::ShortcutKey::Char(c)));
+        harness.send(Input::key(ShortcutKey::Char(c)));
         harness.advance(ms(20));
     }
     assert_eq!(

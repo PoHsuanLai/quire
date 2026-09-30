@@ -1,13 +1,13 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::Check;
-use ds::{Bezel, ControlSize};
-use ds::{
-    Button, Colour, Hex, Icon, MarkProvider, MarkStyle, PinFace, PinTile, ProviderMark, Selection,
-    Trailing,
-};
-use ds::{FieldBezel, FieldKind, TextField};
+use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::controls::button_marks::Trailing;
+use ds::components::controls::button_model::Bezel;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// An account colour.
 const SLATE: Colour = Colour::Solid(Hex([0x2f, 0x7f, 0x6e]));
@@ -39,7 +39,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/provider_mark/local-image-ignored.html",
-        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: ControlSize::Small, style: MarkStyle::Image(ds::ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: ControlSize::Small, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
     Case {
         golden: "controls/button/frame.html",
@@ -51,7 +51,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/quiet-caret.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Glyph(Icon::ChevronDown), shown: ds::Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Glyph(Icon::ChevronDown), shown: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/mini-trailing-glyph.html",

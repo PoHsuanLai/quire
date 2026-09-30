@@ -1,7 +1,7 @@
 //! A click on nothing focusable, on Blitz (Native focus): the nearest focusable ancestor keeps
 //! or takes the keyboard, as in a browser, where Blitz would clear it (`handle_click`'s "nothing
-//! matched"). `ds::Ds`'s root hands every click nothing inside took to the host's
-//! `ds::ClickFocusHost`, after the app's handlers and before Blitz's default action.
+//! matched"). `ds::prelude::Ds`'s root hands every click nothing inside took to the host's
+//! `ds::host::parts::ClickFocusHost`, after the app's handlers and before Blitz's default action.
 //!
 //! The default is never prevented: it also dispatches `dblclick` and the `blur` of a field the
 //! click leaves. So when the ancestor already has the focus, it is cleared here without events
@@ -23,7 +23,8 @@ use crate::focus_chain::{Candidates, ChainNode, Target};
 use crate::node_ref::{NodeRef, Written};
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
-use ds::{Fallback, Focused};
+use ds::host::fallback::Fallback;
+use ds::prelude::*;
 use std::rc::Rc;
 
 /// Where the keyboard goes after a click on nothing focusable, for a window or a harness.

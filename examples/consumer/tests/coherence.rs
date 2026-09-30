@@ -11,7 +11,7 @@
 //! 4. [`the_sent_badge_times_out_on_ds_motions_own_clock`]: motion is timed by `ds`'s timers.
 
 use consumer::{App, STYLE};
-use ds::{Anim, Appearance, SpaceLook, SystemPrefs, resolve, settle};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_lint::{LintConfig, Profile, Rule, assert_clean, markup};
 

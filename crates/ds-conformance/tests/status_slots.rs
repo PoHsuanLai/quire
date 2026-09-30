@@ -4,19 +4,19 @@
 //! reading the bar's `VolumeState`. Each motion ends at 0 frames.
 
 use dioxus::prelude::*;
-use ds::Check;
-use ds::ImagePosition;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::content::status::volume::{VolumeState, VolumeWaves};
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
+use ds::components::controls::button_model::ImagePosition;
+use ds::components::controls::slider_model::SliderLook;
 use ds::detail::EventStamp;
-use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconSource, LevelGlyph, LowAt,
-    Material, Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves, WifiBars,
-    WifiReach, WifiState,
-};
-use ds::{Slider, SliderLook};
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::MenuBarItem;
-use ds_shell::{ModulePanel, ModuleTile};
+use ds_shell::prelude::*;
+use ds_style::tokens::status::StatusMetrics;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

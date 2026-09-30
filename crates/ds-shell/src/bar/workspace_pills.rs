@@ -8,8 +8,8 @@
 
 use crate::bar::pointer::BarPointer;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::controls::press::{ActivationKeys, PressListeners};
+use ds::root::common::Common;
 use ds_core::press::Press;
 use ds_core::vocab::Selection;
 use ds_core::word::Word;

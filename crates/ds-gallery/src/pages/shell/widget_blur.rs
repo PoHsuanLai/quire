@@ -9,8 +9,10 @@ use crate::pages::shell::widget_reference::{
 };
 use crate::wallpaper_vivid::{self, HEIGHT, WIDTH};
 use dioxus::prelude::*;
-use ds::{Appearance, BlurState, Ds, Inject, Material, RootChrome, SpaceLook};
-use ds_shell::WidgetMetrics;
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_style::appearance::blur::BlurState;
 
 /// Where a card sits on the wall, in logical pixels from its top left.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

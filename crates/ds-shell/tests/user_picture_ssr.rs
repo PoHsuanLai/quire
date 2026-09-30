@@ -9,13 +9,16 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, ImageSource, Inject, Material,
-    Theme, person_hue,
+use ds::assembly::ds::Inject;
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{EmojiId, FaceFile, PictureChoice, UserPicture, UserPicturePicker, resolve_picture};
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::prelude::*;
+use ds_shell::user_picture::choice::{FaceFile, PictureChoice, resolve_picture};
+use ds_shell::user_picture::picture::UserPicture;
 
 fn letter() -> AvatarFace {
     AvatarFace {

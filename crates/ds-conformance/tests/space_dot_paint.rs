@@ -4,12 +4,12 @@
 //! for a two-stop and a three-stop preset.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CardAccent, Ds, FrameVars, Material, PRESETS, Scheme, Selection, Shortcut,
-    ShortcutKey, SpaceLook, Theme,
-};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Viewport};
-use ds_shell::SpaceDot;
+use ds_shell::prelude::*;
+use ds_style::space::frame_vars::FrameVars;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::PRESETS;
 
 const VIEW: Viewport = Viewport {
     width: 200,

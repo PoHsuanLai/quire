@@ -4,6 +4,6 @@
 
 pub(crate) mod grab;
 pub(crate) mod hold;
-pub(crate) mod host;
+pub mod host;
 pub(crate) mod timing;
-pub(crate) mod vocab;
+pub mod vocab;

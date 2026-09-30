@@ -4,133 +4,36 @@
 //! widgets with their catalog, over `ds` (the generic components and the document seam), and the
 //! shell's own tokens and sheets, which `kits()` and `stylesheet()` add to the design system's.
 
-pub(crate) mod bar;
+pub mod bar;
 pub mod battery;
 pub mod catalog;
-pub(crate) mod clock;
-pub(crate) mod control_center;
-pub(crate) mod date_picker;
-pub(crate) mod dock;
+pub mod clock;
+pub mod control_center;
+pub mod date_picker;
+pub mod dock;
 pub mod emoji;
-pub(crate) mod idle_dim;
+pub mod idle_dim;
 pub(crate) mod kept;
 pub(crate) mod kit;
-pub(crate) mod lock;
-pub(crate) mod month_grid;
-pub(crate) mod notifications;
-pub(crate) mod now_playing;
-pub(crate) mod osd;
+pub mod lock;
+pub mod month_grid;
+pub mod notifications;
+pub mod now_playing;
+pub mod osd;
 pub(crate) mod sheets;
-pub(crate) mod space_editor;
+pub mod space_editor;
 #[cfg(test)]
 mod stored_words;
-pub(crate) mod switcher;
-pub(crate) mod thumbs;
-pub(crate) mod tokens;
-pub(crate) mod user_picture;
+pub mod switcher;
+pub mod thumbs;
+pub mod tokens;
+pub mod user_picture;
 #[cfg(test)]
 mod vocabulary_tests;
 pub mod widget;
 
-pub use crate::{
-    bar::{
-        menu_bar_item::MenuBarItem,
-        pointer::BarPointer,
-        workspace_pills::{WorkspacePill, WorkspacePills},
-    },
-    battery::{
-        device_glyph::{Device, DeviceGlyph},
-        ring::{BatteryRing, Readout, percent_text},
-    },
-    clock::{
-        face::ClockFace,
-        kind::{ClockLook, ClockTime, DayPhase, Seconds},
-    },
-    control_center::{
-        module_grid::{GridColumns, ModuleGrid},
-        module_panel::{ModulePanel, PanelPlate},
-        module_tile::ModuleTile,
-        module_tile_kind::TileSpan,
-        pane::{PaneFooter, PaneHeader},
-    },
-    date_picker::{
-        model::{DateValue, Elements, PickerStyle, Segment, TimeOfDay},
-        view::DatePicker,
-    },
-    dock::{
-        parts::{DockFloor, DockLabel, RunningDot},
-        tile::{DockTile, plate_side},
-    },
-    emoji::{
-        AnimatedEmoji, EMOJI_ATTRIBUTION,
-        disc::{DiscHue, EmojiDisc, EmojiPlayback},
-        id::EmojiId,
-    },
-    idle_dim::{IdleDim, IdleDimPhase},
-    lock::{
-        clock::LockClock,
-        polkit_prompt::PolkitPrompt,
-        prompt::LockPrompt,
-        screen::LockScreen,
-        vocab::{CapsLock, LockLook, LockUser, PromptState},
-    },
-    month_grid::{
-        MonthGrid,
-        data::{
-            DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey,
-            MonthStep, MonthWeek, WeekNumbers,
-        },
-        density::MonthDensity,
-    },
-    notifications::{
-        banner_stack::{Banner, BannerKey, BannerPosition, BannerStack},
-        card::NotificationCard,
-        group_header::GroupHeader,
-        parts::{AppMark, CardAction, GroupCount, Hover, StackLayers},
-        swipe::NotificationSwipe,
-    },
-    now_playing::{NowPlayingTrack, kind::Playback, track_position::TrackPosition},
-    osd::{Osd, OsdLevel, OsdPosition},
-    space_editor::{
-        DotIndex, SpaceEditor,
-        dot::SpaceDot,
-        rows::{MeasuredIn, MotionChoice},
-    },
-    switcher::{
-        app_switcher::{AppKey, AppSwitcher, SwitcherApp},
-        switcher_fit::SwitcherMetrics,
-    },
-    thumbs::{
-        shot_ghost::ShotGhost,
-        shot_press::DragStart,
-        shot_thumbnail::{ShotThumbnail, ThumbAction},
-    },
-    tokens::{
-        control_center::{CONTROL_CENTER, ControlCenterSize},
-        dock::{DockFloorSetting, DockMetrics, DockToken},
-        notifications::{NotificationMetrics, NotificationToken},
-        osd::{OsdMetrics, OsdToken},
-        widgets::{WidgetGrid, WidgetMetrics},
-    },
-    user_picture::{
-        choice::{FaceFile, PictureChoice, resolve_picture},
-        picker::UserPicturePicker,
-        picture::UserPicture,
-        size::PictureSize,
-    },
-    widget::{
-        battery::{BatteryCell, BatteryEntry, BatteryWidget},
-        calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
-        card::WidgetCard,
-        clock::{ClockCity, ClockEntry, WorldClockWidget},
-        contract::{NoIntent, Widget, WidgetContext, WidgetKind},
-        frame::WidgetFrame,
-        gallery::WidgetGallery,
-        kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle},
-        registry::{WidgetRegistry, provide_widget_registry},
-        slot::WidgetSlotGuide,
-        timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
-    },
-};
+pub mod prelude;
 
+// The curated roots: the shell's stylesheet assembly. Every other name is in `prelude` or at its
+// home path.
 pub use crate::kit::{KIT, component_sheets, kits, stylesheet};

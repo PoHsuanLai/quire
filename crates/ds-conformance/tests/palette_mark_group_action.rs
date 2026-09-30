@@ -1,7 +1,7 @@
 //! Not every run of a command palette group's action goes through the palette's own
 //! Enter or click — `sill debug launcher-key enter` steps the keyboard machine directly, a demo
 //! may run the action from its own button — and hands the palette the next `groups` with no
-//! Enter or click of its own for the palette to have seen. `ds::PaletteHandle::mark_group_action`
+//! Enter or click of its own for the palette to have seen. `ds::components::menus::palette::palette_motion::PaletteHandle::mark_group_action`
 //! (from `use_palette_handle`) lets that caller book the change first: the palette then plays
 //! that group's Show More or Show Less exactly as it would its own (design/26 section 5.6).
 //! Unmarked, the same caller-driven change plays nothing, as any other new result set does.
@@ -9,10 +9,10 @@
 //! Run on the virtual clock for exact timing. Every moment ends at 0 frames.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, PaletteGroup, PaletteGroups,
-    PaletteHandle, use_palette_handle,
-};
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
+use ds::components::menus::palette::palette_motion::{PaletteHandle, use_palette_handle};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
@@ -31,8 +31,8 @@ fn virtual_harness(app: fn() -> Element) -> Harness {
     Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
-fn item(value: u8, title: String) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title)
+fn item(value: u8, title: String) -> PaletteRow<u8> {
+    PaletteRow::new(value, title)
 }
 
 /// The "Applications" group's rows: never grown or shrunk by the palette itself — the test steps

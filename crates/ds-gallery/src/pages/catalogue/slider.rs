@@ -2,8 +2,11 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Availability, ControlSize, Fraction, LevelGlyph, Muting, Slider, SliderLook, Ticks};
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::slider_model::{SliderLook, Ticks};
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The Slider section.
 #[component]

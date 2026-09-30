@@ -7,9 +7,7 @@
 //! halfway through `panel-out`; neither may leave the panel off its resting box.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Ds, Material, MotionLevel, Point, Px, RootExtent, Shown, SidePanel, settle,
-};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;

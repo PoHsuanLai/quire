@@ -7,10 +7,10 @@
 use crate::kept::use_kept;
 use crate::switcher::switcher_fit::{SwitcherMetrics, fit};
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::overlays::tooltip::{Hint, HintSide};
+use ds::root::common::Common;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::{Selection, Shown};
 use ds_core::word::Word;

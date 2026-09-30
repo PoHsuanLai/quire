@@ -7,7 +7,7 @@ use crate::driver::{DocQuery, first, rect_of};
 use crate::harness::Harness;
 use blitz_dom::{BaseDocument, NodeId};
 use blitz_kit::paint_rect::painted_rect as painted_bounds_of;
-use ds::{Point, Px, Rect, Size};
+use ds::prelude::*;
 
 /// A computed colour in sRGB, each channel and alpha in 0..=1.
 #[derive(Debug, Clone, Copy, PartialEq)]

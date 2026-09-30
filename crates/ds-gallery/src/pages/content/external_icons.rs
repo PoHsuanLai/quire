@@ -3,8 +3,10 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Bezel, ControlSize, ImagePosition};
-use ds::{Button, ExternalIcon, Icon, IconSize, IconSource, IconUrl, IconView, Shown};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::prelude::*;
+use ds_style::icon::url::IconUrl;
+use ds_style::tokens::control_size::ControlSize;
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 use std::path::Path;

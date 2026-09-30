@@ -2,8 +2,13 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Bezel, ControlSize, ImagePosition};
-use ds::{Button, Common, DataAttr, DataName, ExtraClass, Glyph, Icon, IconSize, Propagation};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The two ellipses at the glyph sizes a row and a header use, and on the buttons that open a
 /// row's menu.

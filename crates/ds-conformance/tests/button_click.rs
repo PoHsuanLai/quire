@@ -10,7 +10,7 @@
 //! nor routes clicks itself.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Check, Ds, Material};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

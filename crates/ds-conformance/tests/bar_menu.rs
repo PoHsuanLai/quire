@@ -5,14 +5,14 @@
 //! a status line is drawn and never selected; a press reports where it happened.
 
 use dioxus::prelude::*;
-use ds::ImagePosition;
-use ds::{
-    Anchor, Anim, Appearance, Availability, Ds, Icon, Material, Menu, MenuItem, MenuPlacement,
-    MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
-};
+use ds::components::controls::button_model::ImagePosition;
+use ds::host::measure::Anchor;
+use ds::host::measure::use_rect;
+use ds::prelude::*;
+use ds_core::press::{PointerButton, Press};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::MenuBarItem;
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -314,7 +314,7 @@ fn a_press_reports_where_it_happened() {
 fn MeasuredRoot() -> Element {
     // What a shell-host surface's root does, where `ds_blitz::launch` did not provide it.
     ds_blitz::provide_host();
-    let probe = ds::use_rect();
+    let probe = use_rect();
     let width = probe.rect().map_or(0.0, |rect| rect.size.width.0);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Bar,

@@ -4,8 +4,9 @@
 use super::parts::CheckRows;
 use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
+use ds::components::controls::segmented::Tracking;
 use ds::components::lists::section_header::SectionHeader;
-use ds::{Choice, FieldBezel, TextField, Tracking};
+use ds::prelude::*;
 use ds_core::word::Word;
 use ds_style::appearance::{
     motion::Motion,

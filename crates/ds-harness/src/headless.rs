@@ -17,7 +17,8 @@ use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
-use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
+use ds::file_drop::board::FileDropBoard;
+use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameHover;
 use ds_blitz::clipboard::Memory;
@@ -35,6 +36,7 @@ use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
 use ds_blitz::seam::{HoverTracker, link_under, live_frames, report_frame_hover};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
+use ds_core::vocab::{Activity, InputModality};
 use peniko::Color;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -261,7 +263,7 @@ impl Headless {
     }
 
     /// The pointer moved to `at`: tell the app if it came onto or left a link in a frame.
-    pub(crate) fn hover_at(&mut self, at: ds::Point) {
+    pub(crate) fn hover_at(&mut self, at: Point) {
         let (hover, tracker) = &mut self.hover;
         if let FrameHover::Ignore = hover {
             return;

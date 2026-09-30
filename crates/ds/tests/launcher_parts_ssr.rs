@@ -10,12 +10,15 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL,
-    EMOJI_COLUMNS, EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource,
-    Inject, Material, PaletteGroup, PaletteGroups, PaletteRow, PaneAction, PaneContent, PaneMono,
-    PdfPage, PreviewPane, Px, RowChord, RowLeading, RowShape, Shortcut, ShortcutKey,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::image_source::ImageSize;
+use ds::components::content::pdf_thumb::PdfPage;
+use ds::components::lists::emoji_grid::grid::{EMOJI_CELL, EMOJI_COLUMNS, EmojiCell, EmojiCells};
+use ds::components::lists::preview::content::{PaneContent, PaneMono};
+use ds::components::lists::preview::pane::PaneAction;
+use ds::components::lists::row::shape::{ClipBody, RowShape};
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
 
 fn root(body: Element) -> Element {

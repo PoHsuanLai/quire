@@ -3,13 +3,24 @@
 //! exactly its four, each picker swatch is its accent's own colour, and every variable the
 //! stylesheet reads is declared by it or written inline by the root.
 
-use ds::Word;
-use ds::{
-    Accent, ColourToken, DurationToken, EasingToken, Family, FontSize, FrameVars, LabelHue, Radius,
-    Scheme, Shadow, SpaceLook, SpacingToken, ZLayer, accent_of,
-};
-use ds::{HueMember, Token, TokenScope};
+use ds::prelude::*;
 use ds_shell::stylesheet;
+use ds_style::space::frame_vars::FrameVars;
+use ds_style::space::look::CardAccent;
+use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::elevation::Shadow;
+use ds_style::tokens::label_hue::HueMember;
+use ds_style::tokens::label_hue::LabelHue;
+use ds_style::tokens::layer::ZLayer;
+use ds_style::tokens::person::PersonSwatch;
+use ds_style::tokens::shape::Radius;
+use ds_style::tokens::spacing::SpacingToken;
+use ds_style::tokens::timing::DurationToken;
+use ds_style::tokens::token::{Token, TokenScope};
+use ds_style::tokens::type_scale::{Family, FontSize};
+use ds_style::tokens::widget_paint::WidgetPaint;
 use std::collections::{BTreeMap, BTreeSet};
 
 /// Every rule outside `@keyframes`, as its selector and its declarations in order.
@@ -233,7 +244,7 @@ fn the_token_block_holds_the_rust_table() {
 fn the_person_swatches_are_declared_in_both_schemes_alike() {
     let light = token_block();
     let dark = block(".ds[*|data-theme=dark]");
-    for swatch in ds::PersonSwatch::ALL.iter().copied() {
+    for swatch in PersonSwatch::ALL.iter().copied() {
         let name = swatch.var().as_str();
         assert_eq!(light.get(name), Some(&swatch.hex().css()), "{name}");
         assert_eq!(dark.get(name), None, "{name} is redeclared in dark");
@@ -251,7 +262,7 @@ fn every_table_name_is_declared_on_the_root() {
         .chain(Radius::ALL.iter().map(|t| t.var()))
         .chain(SpacingToken::ALL.iter().map(|t| t.var()))
         .chain(Shadow::ALL.iter().map(|t| t.var()))
-        .chain(ds::WidgetPaint::ALL.iter().map(|t| t.var()))
+        .chain(WidgetPaint::ALL.iter().map(|t| t.var()))
         .chain(FontSize::ALL.iter().map(|t| t.var()))
         .chain(ZLayer::ALL.iter().map(|t| t.var()))
         .chain(Family::ALL.iter().map(|t| t.var()));
@@ -324,7 +335,7 @@ fn every_var_the_stylesheet_reads_is_declared() {
         .collect();
     // What the root writes inline: ask the program, not a copy of its list.
     let look = SpaceLook {
-        card_accent: ds::CardAccent::SpaceHue,
+        card_accent: CardAccent::SpaceHue,
         ..SpaceLook::default()
     };
     let inline: BTreeSet<String> = FrameVars::of(&look, Scheme::Light)

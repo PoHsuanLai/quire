@@ -1,7 +1,7 @@
 //! What a focus change does with a field's text once the caret is in it: a
 //! rename field opened on a folder's name selects it, so typing replaces the name. Blitz has no
 //! script to call `input.select()` with, so the host does it
-//! ([`FocusHost::select`](crate::FocusHost::select)), after its focus write has landed.
+//! ([`FocusHost::select`](crate::host::parts::FocusHost::select)), after its focus write has landed.
 
 use crate::host::caret::InitialCaret;
 

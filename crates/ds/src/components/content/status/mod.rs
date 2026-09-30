@@ -3,12 +3,12 @@
 //! `Detailed` state, so every change plays the moment its table names and then paints 0 frames.
 
 pub(crate) mod battery;
-pub(crate) mod battery_state;
+pub mod battery_state;
 pub(crate) mod bluetooth;
-pub(crate) mod bluetooth_state;
+pub mod bluetooth_state;
 pub(crate) mod family;
 pub(crate) mod part;
 pub(crate) mod slash;
-pub(crate) mod volume;
+pub mod volume;
 pub(crate) mod wifi;
-pub(crate) mod wifi_state;
+pub mod wifi_state;

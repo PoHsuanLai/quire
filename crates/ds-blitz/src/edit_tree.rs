@@ -3,7 +3,7 @@
 //! takes the document the caller already holds.
 
 use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
-use ds::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode};
+use ds::host::position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditNode};
 
 /// A stretch of a surface in reading order: an inline root's laid-out text, or a block atom.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

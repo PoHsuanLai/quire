@@ -13,7 +13,7 @@ use ds_core::spawner::Spawner;
 use ds_style::appearance::system::SystemPrefs;
 use std::sync::Arc;
 
-/// The inputs to [`ds::resolve`], as they are now.
+/// The inputs to [`ds::prelude::resolve`], as they are now.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub struct Environment {
     /// `appearance.toml`.
@@ -28,7 +28,7 @@ impl Environment {
     ///
     /// ```no_run
     /// use dioxus::prelude::*;
-    /// use ds::{Ds, Material, Spawner};
+    /// use ds::prelude::*; use ds_core::spawner::Spawner;
     /// use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
     /// use std::sync::Arc;
     ///

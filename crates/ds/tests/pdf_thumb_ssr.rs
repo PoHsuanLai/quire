@@ -9,10 +9,10 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, ImageSize, ImageSource, Inject, Material, PdfPage, PdfThumb, PdfTrouble, Px,
-    Size, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::image_source::ImageSize;
+use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
 use std::pin::pin;
 use std::sync::Arc;

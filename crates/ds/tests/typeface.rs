@@ -5,11 +5,14 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Appearance, Ds, Family, Inject, Material, Surface, Token, TokenScope, Typeface, VoiceToken,
-    stylesheet, use_typeface,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds::root::typeface::use_typeface;
+use ds::stylesheet;
+use ds_style::tokens::token::{Token, TokenScope};
+use ds_style::tokens::type_scale::Family;
+use ds_style::tokens::type_scale::FontSize;
+use ds_style::tokens::type_voice::VoiceToken;
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {
@@ -204,9 +207,9 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
     };
     // A floored step (the dial) is raised to the 10 px floor under System instead (design/27
     // section 3.16).
-    let fitted = ds::FontSize::CAP_FITTED
+    let fitted = FontSize::CAP_FITTED
         .into_iter()
-        .filter(|size| !ds::FontSize::FLOORED.contains(size));
+        .filter(|size| !FontSize::FLOORED.contains(size));
     for size in fitted {
         let editorial = px(&size.css_in(Typeface::Editorial));
         let system = px(&size.css_in(Typeface::System));
@@ -221,8 +224,8 @@ fn the_cap_fitted_sizes_keep_the_measured_caps() {
             "{size:?} on the .5 px grid"
         );
     }
-    for size in ds::FontSize::ALL.iter().copied() {
-        if !ds::FontSize::CAP_FITTED.contains(&size) && !ds::FontSize::FLOORED.contains(&size) {
+    for size in FontSize::ALL.iter().copied() {
+        if !FontSize::CAP_FITTED.contains(&size) && !FontSize::FLOORED.contains(&size) {
             assert_eq!(
                 size.css_in(Typeface::System),
                 size.css_in(Typeface::Editorial)

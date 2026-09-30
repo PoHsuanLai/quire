@@ -20,11 +20,14 @@ mod space_editor_rows;
 
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
-use ds::{
-    Capping, CardAccent, Dot, PRESETS, Scheme, Selection, Shortcut, ShortcutKey, SpaceLook, Theme,
-    Verdict, derive, readout, swatch,
-};
-use ds_shell::{DotIndex, SpaceDot, SpaceEditor};
+use ds::prelude::*;
+use ds_core::colour::contrast::Verdict;
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_style::space::look::CardAccent;
+use ds_style::space::palette::readout::readout;
+use ds_style::space::palette::{Capping, Dot, derive, swatch};
+use ds_style::space::presets::PRESETS;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -126,11 +129,11 @@ const CASES: &[Case] = &[
     // SpaceDot.
     Case {
         state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: ds::FrameVars::of(&preset_look(0), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Work", frame: ds_style::space::frame_vars::FrameVars::of(&preset_look(0), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
     },
     Case {
         state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: ds::FrameVars::of(&preset_look(1), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Home", frame: ds_style::space::frame_vars::FrameVars::of(&preset_look(1), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
 ];
 

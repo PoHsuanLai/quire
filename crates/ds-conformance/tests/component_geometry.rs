@@ -3,14 +3,15 @@
 //! markup side of each fix is in ds's goldens; these are the pictures the goldens cannot show.
 
 use dioxus::prelude::*;
+use ds::components::app::send_pill::SendPill;
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Accessory, Appearance, Ds, Fraction, Icon, Material, PRESETS, Rect, Row, RowLeading, Scheme,
-    SectionHeader, SendPill, SpaceLook, Theme, use_toasts,
-};
-use ds::{FieldBezel, FieldKind, TextField};
+use ds::prelude::*;
+use ds::stack::toast_hub::UndoToken;
 use ds_harness::{Driver, Harness, Query, Viewport};
-use ds_shell::{DotIndex, SpaceEditor};
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::PRESETS;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -87,8 +88,8 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
 /// look's 35 is visible noise, and this test asks only that no pill is drawn on a flat ground.
 #[allow(non_snake_case)]
 fn EmptyApp() -> Element {
-    let look = ds::SpaceLook {
-        ..ds::SpaceLook::default()
+    let look = SpaceLook {
+        ..SpaceLook::default()
     };
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, look,
@@ -105,13 +106,13 @@ fn a_root_with_an_empty_hub_lays_out_no_toast() {
     // No pill in the picture either: the root's bottom edge is one flat ground.
     let frame = harness.render().expect("renders");
     let bottom = Rect {
-        origin: ds::Point {
-            x: ds::Px(120.0),
-            y: ds::Px(280.0),
+        origin: Point {
+            x: Px(120.0),
+            y: Px(280.0),
         },
-        size: ds::Size {
-            width: ds::Px(240.0),
-            height: ds::Px(58.0),
+        size: Size {
+            width: Px(240.0),
+            height: Px(58.0),
         },
     };
     keep(&frame, "empty-root");
@@ -126,7 +127,7 @@ fn a_root_with_an_empty_hub_lays_out_no_toast() {
 #[component]
 fn Push() -> Element {
     let toasts = use_toasts();
-    use_hook(move || toasts.push("Archived".to_string(), Some(ds::UndoToken(1))));
+    use_hook(move || toasts.push("Archived".to_string(), Some(UndoToken(1))));
     rsx! {}
 }
 
@@ -277,7 +278,7 @@ fn EditorApp() -> Element {
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
         theme: Theme::System,
-        card_accent: ds::CardAccent::SpaceHue,
+        card_accent: CardAccent::SpaceHue,
     };
     rsx! {
         Root {

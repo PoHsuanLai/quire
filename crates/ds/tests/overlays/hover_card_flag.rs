@@ -2,7 +2,9 @@
 
 use crate::cases::{Case, PartsCard};
 use dioxus::prelude::*;
-use ds::{FlagTone, HoverCardPart, Icon, RunTone, TextLine, TextRun};
+use ds::components::content::text_runs::RunTone;
+use ds::components::overlays::hover_card::parts::{FlagTone, HoverCardPart};
+use ds::prelude::*;
 use std::time::Duration;
 
 /// Past the 500 ms hover intent.

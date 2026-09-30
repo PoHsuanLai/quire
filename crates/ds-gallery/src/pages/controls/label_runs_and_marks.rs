@@ -3,11 +3,12 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Bezel, ControlSize};
-use ds::{
-    Button, Icon, Leading, MarkProvider, MarkStyle, ProviderMark, RunTone, Shown, TextLine,
-    TextRun, Trailing,
-};
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::content::text_runs::RunTone;
+use ds::components::controls::button_marks::{Leading, Trailing};
+use ds::components::controls::button_model::Bezel;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// A provider's inline mark, for a From value.
 fn mark(provider: MarkProvider) -> Leading {

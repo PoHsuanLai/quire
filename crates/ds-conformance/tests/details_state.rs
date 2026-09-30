@@ -5,10 +5,10 @@
 
 use dioxus::prelude::*;
 use ds::detail::{
-    Detailed, EventStamp, Moment, Operation, PendingLayers, PendingSpec, PendingStyle,
-    PendingToken, Touch, use_detail, use_pending, use_shake,
+    EventStamp, Operation, PendingLayers, PendingSpec, PendingStyle, PendingToken, Touch,
+    use_pending, use_shake,
 };
-use ds::{Appearance, Ds, Material, Motion};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;

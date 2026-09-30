@@ -3,8 +3,12 @@
 //! row alone. Each is a golden under `lists/space_editor`.
 
 use dioxus::prelude::*;
-use ds::{CardAccent, Motion, PRESETS, Scheme, SpaceLook, Theme};
-use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceEditor};
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_shell::space_editor::rows::{MeasuredIn, MotionChoice};
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::PRESETS;
 
 /// Preset `index` as a Space's look, in `theme`.
 fn look(index: usize, theme: Theme) -> SpaceLook {

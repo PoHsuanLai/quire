@@ -9,12 +9,9 @@
 //! [`Hint`] is the one implementation: a `Tooltip` is a `Hint` below its target on the Tip
 //! profile, and the shell's `DockLabel` is a `Hint` above its target on the Label profile.
 
-use crate::components::overlays::hover_card::{
-    Standing,
-    intent::{HoverAnchor, use_hover_intent},
-    target::HoverTarget,
-    use_card,
-};
+use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
+use crate::components::overlays::hover_card::target::HoverTarget;
+use crate::components::overlays::hover_card::{Standing, use_card};
 use crate::host::measure::{MountedRef, client_rect};
 use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, use_hover_hub};

@@ -8,12 +8,12 @@
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::settle;
-use ds::{Anim, Appearance, Ds, Material, MotionLevel};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::WeekNumbers;
-use ds_shell::{DayKey, MonthGrid, MonthStep};
+use ds_shell::month_grid::data::WeekNumbers;
+use ds_shell::month_grid::data::{DayKey, MonthStep};
+use ds_shell::prelude::*;
 use month_sample::{First, SEPTEMBER, sample, shift};
 use std::time::Duration;
 

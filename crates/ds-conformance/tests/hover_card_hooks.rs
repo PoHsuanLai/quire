@@ -8,12 +8,14 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, DocumentHost, Ds, Flow, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile,
-    Material, MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
-};
+use ds::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
+use ds::host::measure::MountedRef;
+use ds::host::no_host::NoHost;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_motion::hover_intent::HoverProfile;
 use probe::rect;
 use std::rc::Rc;
 use std::time::Duration;

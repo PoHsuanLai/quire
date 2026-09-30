@@ -13,12 +13,12 @@
 
 use crate::bar::pointer::BarPointer;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::press::{ActivationKeys, PressListeners, disabled, use_pressing};
+use ds::root::common::Common;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Emphasis, Shown};
 use ds_core::word::Word;

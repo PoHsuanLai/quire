@@ -3,7 +3,7 @@
 //! of its parent's text.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, FieldBezel, FieldKind, Material, ShortcutKey, TextField};
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

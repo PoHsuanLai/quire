@@ -10,7 +10,7 @@
 //! Paths only: a drag that carries no `file:` URI (a link or text dragged out of a browser) is
 //! refused, and no target lights for it.
 
-pub(crate) mod board;
-pub(crate) mod drag;
-pub(crate) mod hook;
+pub mod board;
+pub mod drag;
+pub mod hook;
 pub(crate) mod track;

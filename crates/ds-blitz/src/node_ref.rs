@@ -1,13 +1,13 @@
 //! One node of a Blitz document, however the app's handle on it was made: the `NodeHandle` a
 //! component's `onmounted` gives, or a [`FoundNode`] ds-blitz makes for an element found by
-//! selector (`ds::focus_by_selector`), which dioxus-native-dom has no public way
+//! selector (`ds::focus::selector::focus_by_selector`), which dioxus-native-dom has no public way
 //! to make a `NodeHandle` for. The focus writes (`crate::focus`) take either.
 
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::html::RenderedElementBacking;
 use dioxus::prelude::MountedData;
 use dioxus_native_dom::NodeHandle;
-use ds::SameNode;
+use ds::host::found::SameNode;
 use std::cell::RefCell;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::rc::Rc;
@@ -113,7 +113,7 @@ impl RenderedElementBacking for FoundNode {
     }
 }
 
-/// Whether two handles name the same node (`ds::GeometryHost::same`).
+/// Whether two handles name the same node (`ds::host::parts::GeometryHost::same`).
 pub(crate) fn same(a: &MountedData, b: &MountedData) -> SameNode {
     match (NodeRef::of(a), NodeRef::of(b)) {
         (Some(a), Some(b)) if a.node == b.node => SameNode::Same,

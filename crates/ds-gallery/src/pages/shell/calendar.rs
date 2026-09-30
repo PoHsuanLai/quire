@@ -13,10 +13,14 @@ use crate::axes::Axes;
 use crate::pages::Section;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CardAccent, Ds, FrameTint, Inject, Material, RootChrome, Theme, default_look,
-};
-use ds_shell::{DayKey, MonthGrid, MonthStep, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_shell::month_grid::data::{DayKey, MonthStep, WeekNumbers};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::default_look;
 use month_sample::{AUGUST, First, SEPTEMBER, month as lay_out, sample, shift};
 
 /// The small widget's today and busy days, so its August shows the disc and the dots.
@@ -72,7 +76,7 @@ fn Month(theme: Theme, weeks: WeekNumbers) -> Element {
         div { class: "g-cc",
             Ds {
                 appearance: Appearance { theme, accent, motion },
-                look: ds::SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
+                look: SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
                 material: Material::Popover,
                 blur,
                 stylesheet: Inject::Host,

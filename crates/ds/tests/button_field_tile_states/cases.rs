@@ -1,15 +1,19 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
+use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::send_mood::SendMood;
+use ds::components::app::send_pill::{PillAction, SendPill};
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Accessory, Button, Colour, Common, Fraction, Hex, Icon, ImageSource, MarkProvider, MarkStyle,
-    PillAction, PinFace, PinTile, Propagation, Row, RowLeading, Selection, SendMood, SendPill,
-    Shown,
-};
-use ds::{Avatar, Muting};
-use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
-use ds::{Bezel, ControlSize, FieldKind, ImagePosition, TextField};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::vocab::Muting;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// A scheduled draft's favicon.
 const CLOCKED: AvatarFace = AvatarFace {

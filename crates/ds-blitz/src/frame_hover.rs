@@ -6,7 +6,7 @@ use crate::frame_book::FrameBook;
 use crate::frame_hit::LinkUnder;
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
-use ds::Point;
+use ds::prelude::*;
 use std::fmt;
 use std::sync::Arc;
 

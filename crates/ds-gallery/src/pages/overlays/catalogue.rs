@@ -8,14 +8,21 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::{Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::assembly::ds::Inject;
+use ds::components::controls::button_model::Answers;
+use ds::components::overlays::empty_state::EmptyForm;
+use ds::components::overlays::popover::Arrow;
+use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{
-    Align, Anchor, Appearance, Arrow, Attach, Button, Common, Dismiss, Ds, EmptyForm, EmptyState,
-    Icon, Inject, Material, MountedRef, Placement, Popover, Px, Sheet, Shown, Side, SidePanel,
-    Skeleton, SkeletonShape, Theme, Tooltip, UndoToken, use_toast_hub,
-};
-use ds::{Answers, ControlSize};
-use ds_shell::DockLabel;
+use ds::components::overlays::skeleton::{Skeleton, SkeletonShape};
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds_core::geometry::placement::{Align, Side};
+use ds_core::vocab::Dismiss;
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The page.
 #[component]

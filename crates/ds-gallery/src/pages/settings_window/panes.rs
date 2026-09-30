@@ -2,12 +2,19 @@
 
 use super::Category;
 use dioxus::prelude::*;
-use ds::{
-    Arrangement, Availability, Check, Checkbox, Choice, ControlSize, FieldGroup, FieldRow,
-    Fraction, MenuItem, PopUpButton, RadioGroup, SegmentedControl, Slider, StepRange, Stepper,
-    TabView, TextField, TextLine, Toggle, Tracking,
-};
-use ds_shell::{DatePicker, DateValue, DayKey, Elements, PickerStyle, TimeOfDay};
+use ds::components::chrome::tab_view::TabView;
+use ds::components::controls::checkbox::Checkbox;
+use ds::components::controls::radio_group::Arrangement;
+use ds::components::controls::segmented::Tracking;
+use ds::components::fields::field_row::{FieldGroup, FieldRow};
+use ds::components::fields::stepper::model::StepRange;
+use ds::components::fields::stepper::view::Stepper;
+use ds::components::menus::pop_up_button::PopUpButton;
+use ds::prelude::*;
+use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
+use ds_shell::month_grid::data::DayKey;
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The pane for `category`.
 pub(super) fn pane(category: Category) -> Element {

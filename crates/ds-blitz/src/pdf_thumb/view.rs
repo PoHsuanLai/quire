@@ -1,11 +1,13 @@
-//! `PdfFileThumb`: a path and a size in, `ds::PdfThumb` out.
+//! `PdfFileThumb`: a path and a size in, `ds::prelude::PdfThumb` out.
 
 use super::cache::pdf_thumb_cached;
 use super::request::ThumbRequest;
 use super::worker::{Slot, ask};
 use dioxus::core::Task;
 use dioxus::prelude::*;
-use ds::{PdfPage, PdfThumb, Size, use_scale};
+use ds::components::content::pdf_thumb::PdfPage;
+use ds::prelude::*;
+use ds_style::scale::use_scale;
 use std::path::PathBuf;
 
 /// A page that came back from the worker, for the request it answers.
@@ -15,7 +17,7 @@ struct Arrived {
     page: PdfPage,
 }
 
-/// The first page of the PDF at `path`, fitted into `size` on a paper sheet (`ds::PdfThumb`).
+/// The first page of the PDF at `path`, fitted into `size` on a paper sheet (`ds::prelude::PdfThumb`).
 /// A page already cached for the file as it is now (same modification time, device size and
 /// scale) draws at once; otherwise the request joins the one PDF thumbnail worker's queue, the
 /// thumbnail loading meanwhile (nothing for 400 ms, then the pending look). A new path or size
@@ -31,7 +33,7 @@ pub fn PdfFileThumb(path: PathBuf, size: Size, #[props(default)] label: Option<S
 
 /// The first page of the PDF at `path` for a `size` box, as `PdfFileThumb` reads it (cached, else
 /// asked of the worker, `Loading` until it lands), for a part that draws the page itself: the
-/// preview pane's `PaneContent::Pdf { page, name }` with `ds::PANE_MEDIA`. `None`
+/// preview pane's `PaneContent::Pdf { page, name }` with `ds::components::lists::preview::content::PANE_MEDIA`. `None`
 /// for no path, so a pane that shows a PDF only some of the time calls the hook on every render
 /// (hooks keep their order) and passes the path only while it shows one; a path that goes away
 /// leaves a request already queued to finish into the cache.

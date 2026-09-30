@@ -95,7 +95,7 @@ impl Candidates {
     }
 }
 
-/// Candidates as a mounted handle, so `ds::ClickFocusHost::restore` receives the whole run the
+/// Candidates as a mounted handle, so `ds::host::parts::ClickFocusHost::restore` receives the whole run the
 /// click found rather than one element that may be gone by the time it runs.
 #[derive(Clone)]
 pub(crate) struct ChainNode {

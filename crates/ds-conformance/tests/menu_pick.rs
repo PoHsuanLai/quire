@@ -3,11 +3,11 @@
 //! stack, and picks as a menu does.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px, ShortcutKey,
-};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_style::tokens::delay::DelayToken;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -105,7 +105,7 @@ fn a_pick_blinks_its_item_twice_then_yields_and_closes() {
     assert!(lit(&harness, 2), "the pointer highlights the row");
     harness.send(Input::click(second));
     // The blink is out, back, out, back: each half is half of `MenuBlink` (35 ms).
-    let half = ds::DelayToken::MenuBlink.delay() / 2;
+    let half = DelayToken::MenuBlink.delay() / 2;
     let mut seen = Vec::new();
     for _ in 0..4 {
         seen.push(lit(&harness, 2));

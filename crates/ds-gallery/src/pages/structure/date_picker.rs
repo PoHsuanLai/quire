@@ -3,10 +3,11 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Availability, ControlSize};
-use ds_shell::DayKey;
-use ds_shell::{DatePicker, DateValue, Elements, PickerStyle, TimeOfDay};
+use ds::prelude::*;
+use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
+use ds_shell::month_grid::data::DayKey;
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The moment the pickers start on.
 fn start() -> DateValue {

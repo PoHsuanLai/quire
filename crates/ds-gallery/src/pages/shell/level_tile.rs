@@ -3,12 +3,15 @@
 //! the Work Space's frame or a light, wallpaper-like ground.
 
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelStyle, Material, Muting, PRESETS,
-    RootChrome, Scheme, Shown, SpaceLook, Theme,
-};
-use ds_shell::{Osd, OsdLevel};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::level_indicator::LevelStyle;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_shell::osd::OsdLevel;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::space::presets::PRESETS;
 
 /// What the card sits on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

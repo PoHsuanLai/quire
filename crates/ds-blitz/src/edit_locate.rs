@@ -7,7 +7,7 @@ use crate::edit_tree::{
     root_texts, text_of,
 };
 use blitz_dom::{BaseDocument, NodeId};
-use ds::{EditKind, TextPosition};
+use ds::host::position::{EditKind, TextPosition};
 
 /// A position as the layout knows it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

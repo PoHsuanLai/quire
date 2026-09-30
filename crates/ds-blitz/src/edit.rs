@@ -1,4 +1,4 @@
-//! The host's edit seam (`ds::EditHost`, `ds::ImeHost`) on Blitz: hit-testing, caret and selection
+//! The host's edit seam (`ds::host::parts::EditHost`, `ds::host::parts::ImeHost`) on Blitz: hit-testing, caret and selection
 //! rects over an edit surface's own inline layout, the window's IME, and IME routing (FINDINGS
 //! "Edit surface"). Every read answers `Probe::Busy` while the renderer holds the document, as
 //! `crate::measure` does.
@@ -15,9 +15,11 @@ use crate::edit_tree::segments;
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
-use ds::{
-    CapturedPointer, ImeEvent, ImeListener, ImeSwitch, Point, Probe, Rect, TextPosition, TextRange,
-};
+use ds::host::captured::CapturedPointer;
+use ds::host::ime::{ImeEvent, ImeListener, ImeSwitch};
+use ds::host::position::{TextPosition, TextRange};
+use ds::host::probe::Probe;
+use ds::prelude::*;
 
 /// Read the surface's document, if it is free and the element is a Blitz node.
 fn read<T>(

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::detail::{MorphGlyph, MorphStyle, Slashed};
-use ds::{Appearance, Ds, Icon, IconSize, Material, Motion};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;

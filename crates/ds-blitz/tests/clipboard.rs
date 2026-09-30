@@ -3,8 +3,7 @@
 //! `ds_blitz::clipboard::{write_text, read_text}` reach the same clipboard.
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{Appearance, Button, Ds, Material, Point, ShortcutKey};
+use ds::prelude::*;
 use ds_blitz::clipboard::{ClipboardError, read_text, write_text};
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;

@@ -3,7 +3,9 @@
 //! knows how each reaches the document.
 
 use crate::harness_input::modifier;
-use ds::{FileDragInput, Point, PointerButton, Px, ShortcutKey};
+use ds::file_drop::drag::FileDragInput;
+use ds::prelude::*;
+use ds_core::press::PointerButton;
 use keyboard_types::Modifiers;
 
 /// One thing done to the document under test.

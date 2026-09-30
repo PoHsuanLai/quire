@@ -10,12 +10,17 @@ use crate::pages::Section;
 use crate::pages::shell::widget_reference::cell;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{Appearance, BatteryPower, Button, Ds, Fraction, Inject, Material, RootChrome, Theme};
-use ds_shell::{
-    BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device, Seconds,
-    Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::status::battery_state::BatteryPower;
+use ds::prelude::*;
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::{BatteryEntry, BatteryWidget};
+use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
+use ds_shell::widget::timeline::Timeline;
+use ds_style::tokens::control_size::ControlSize;
 
 const TAIPEI: ClockTime = ClockTime {
     hour: 9,

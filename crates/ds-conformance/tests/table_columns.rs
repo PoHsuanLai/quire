@@ -3,7 +3,9 @@
 //! least.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Point, Px, Sort, SortDirection, Table, TableColumn, TableRow};
+use ds::components::lists::table::model::{Sort, SortDirection, TableColumn, TableRow};
+use ds::components::lists::table::view::Table;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 

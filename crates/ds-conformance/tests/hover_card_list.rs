@@ -6,10 +6,9 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material, Point, Px,
-    TargetElement, Tooltip, use_hover_hub,
-};
+use ds::components::overlays::hover_card::target::{HoverTarget, TargetElement};
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;

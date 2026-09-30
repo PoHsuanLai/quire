@@ -6,17 +6,19 @@
 //! animation once as the prompt appears and then rests.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource,
-    Material, MotionLevel, PlateFamily, Px, RootChrome, ShortcutKey, person_hue, settle,
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{
     ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport,
 };
-use ds_shell::{
-    AppKey, AppSwitcher, EmojiId, LockPrompt, LockUser, PolkitPrompt, PromptState, SwitcherApp,
-};
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::lock::vocab::{LockUser, PromptState};
+use ds_shell::prelude::*;
+use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
+use ds_style::icon::family::PlateFamily;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

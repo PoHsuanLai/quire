@@ -4,11 +4,9 @@
 //! no typing and shows a spinner.
 
 use dioxus::prelude::*;
+use ds::components::fields::text_field_model::Invalid;
 use ds::detail::EventStamp;
-use ds::{
-    Appearance, Availability, Ds, FieldKind, Invalid, Material, ShortcutKey, TextField, TextLine,
-    Validity,
-};
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

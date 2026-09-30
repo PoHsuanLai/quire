@@ -7,7 +7,8 @@
 //! `on_hidden`, and the sheet plays its exit before it is gone.
 
 use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
-use crate::components::overlays::{sheet_attach::Attach, sheet_width::SheetWidth};
+use crate::components::overlays::sheet_attach::Attach;
+use crate::components::overlays::sheet_width::SheetWidth;
 use crate::root::common::Common;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;

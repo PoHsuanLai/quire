@@ -4,11 +4,13 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::HoverProfile;
-use ds::{
-    Anchor, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
-    MenuImage, MenuItem, MenuPlacement, Point, Px, Rect, Size, use_hover_intent,
-};
+use ds::components::menus::item::item::MenuImage;
+use ds::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
+use ds::components::overlays::hover_card::parts::HoverCardPart;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind};
+use ds_motion::hover_intent::HoverProfile;
 use std::time::Duration;
 
 /// Past the 500 ms hover intent.

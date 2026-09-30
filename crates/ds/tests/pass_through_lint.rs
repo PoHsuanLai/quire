@@ -4,9 +4,11 @@
 //! `data-*` name: `DataName` refuses `ds-…` and the names quire writes itself.
 
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{Button, Common, DataAttr, DataName, ExtraClass, PassThroughError};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName, ExtraClass, PassThroughError};
 use ds_lint::{LintConfig, Rule, markup, stylesheet};
+use ds_style::tokens::control_size::ControlSize;
 
 /// The consumer's own rule for its class: a reveal on the row's hover.
 const CONSUMER_CSS: &str = ".row-reveal { opacity: 0; transition: opacity var(--t-quick) var(--e-out); }\n.row:hover .row-reveal { opacity: 1; }";

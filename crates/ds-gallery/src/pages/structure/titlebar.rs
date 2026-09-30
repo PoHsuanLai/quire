@@ -2,7 +2,9 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{DocumentState, Icon, TitleParts, TrafficLights, WindowTitlebar};
+use ds::components::chrome::titlebar_parts::{DocumentState, TitleParts};
+use ds::components::chrome::window_frame::WindowTitlebar;
+use ds::prelude::*;
 
 /// The WindowTitlebar section.
 #[component]

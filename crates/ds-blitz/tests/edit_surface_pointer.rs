@@ -4,11 +4,17 @@
 //! width, and the app's own class and data on the surface.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Common, Composition, DataAttr, DataName, Ds, EditFocus, EditHandle, EditInput,
-    EditPointer, EditSurface, Extend, ExtraClass, ImeSwitch, KeyInput, Material, Point,
-    PointerPhase, Probe, Px, ShortcutKey, TextPosition, use_edit_handle,
-};
+use ds::edit::handle::{EditHandle, use_edit_handle};
+use ds::edit::input::{Composition, EditInput, KeyInput};
+use ds::edit::pointer::{EditFocus, EditPointer, Extend};
+use ds::host::captured::PointerPhase;
+use ds::host::ime::ImeSwitch;
+use ds::host::position::TextPosition;
+use ds::host::probe::Probe;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
+use ds_core::press::PointerButton;
 use ds_harness::{
     ClassPresence, Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
 };
@@ -141,7 +147,7 @@ fn shift_click_extends_from_the_anchor() {
     let two = harness.rect("#two").expect("the second paragraph");
     let point = at(two.origin.x.0 + 1.0, two.origin.y.0 + 10.0);
     harness.send(Input::Pointer(
-        PointerInput::new(point, PointerAction::Click(ds::PointerButton::Primary))
+        PointerInput::new(point, PointerAction::Click(PointerButton::Primary))
             .with_mods(Modifiers::SHIFT),
     ));
     let log = drain(&POINTER);
@@ -159,7 +165,7 @@ fn a_drag_across_two_nodes_reports_each_with_the_button_held() {
     let to = at(two.origin.x.0 + 400.0 - 150.0, two.origin.y.0 + 10.0);
     harness.send(Input::pointer_move(from));
     harness.send(Input::pointer_down(from));
-    assert!(harness.held_buttons().contains(ds::PointerButton::Primary));
+    assert!(harness.held_buttons().contains(PointerButton::Primary));
     harness.send(Input::pointer_move(to));
     harness.send(Input::pointer_up(to));
     assert!(harness.held_buttons().is_empty());

@@ -6,7 +6,8 @@ use crate::edit_geometry::{border_box, content_box, content_origin};
 use crate::edit_locate::{Side, named, position_at};
 use crate::edit_tree::{Segment, is_within, mark_of, nearest_marked, segments};
 use blitz_dom::{BaseDocument, NodeId};
-use ds::{EditKind, Point, Rect, TextPosition};
+use ds::host::position::{EditKind, TextPosition};
+use ds::prelude::*;
 use parley::Cursor;
 
 /// The position under `at` in `surface`, or `None` where nothing addressable is near.

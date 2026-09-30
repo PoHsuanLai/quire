@@ -4,9 +4,12 @@
 //! swell; a `ModulePanel` whose content is disabled dims its header glyph and percentage.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Availability, Ds, Fraction, Icon, Inject, LevelGlyph, Material, Muting};
-use ds::{Slider, SliderLook};
-use ds_shell::ModulePanel;
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_shell::prelude::*;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -40,7 +43,7 @@ fn rooted(body: Element) -> Element {
 
 fn panel(availability: Availability) -> Element {
     rooted(rsx! {
-        ModulePanel { glyph: Some(Icon::Sun), title: Some(ds::TextLine::from("Display")), trailing: rsx! { "40%" }, availability,
+        ModulePanel { glyph: Some(Icon::Sun), title: Some(TextLine::from("Display")), trailing: rsx! { "40%" }, availability,
             Slider {
                 label: "Brightness",
                 value: Fraction(0),

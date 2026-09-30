@@ -7,11 +7,12 @@
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Anim, Answers, Button, Common, Ds, FieldFocus, Icon, Material, Menu, MenuImage,
-    MenuItem, MenuPlacement, MountedRef, Shown, TextField, use_focus_request, use_motion_timer,
-    use_toasts,
-};
+use ds::prelude::*;
+use ds::host::measure::{Anchor, MountedRef};
+use ds::components::controls::button_model::Answers;
+use ds::root::common::Common;
+use ds::components::menus::item::item::MenuImage;
+use ds::focus::request::use_focus_request;
 use ds_blitz::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
@@ -59,7 +60,7 @@ fn items() -> Vec<MenuItem<Action>> {
 }
 
 /// A subject field, a `Send` button whose "Sent" confirmation is timed by
-/// `ds::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
+/// `ds::prelude::use_motion_timer` rather than a sleep, and a "More" button that opens a quire `Menu`
 /// anchored to the button itself: `Button`'s `common.mounted` hands over its element and the menu
 /// takes it as `Anchor::Mounted`, measured when placing (`CONSUMING.md` §4, "Overlays"). No
 /// wrapper element is measured in its place. The subject field has the keyboard as the page

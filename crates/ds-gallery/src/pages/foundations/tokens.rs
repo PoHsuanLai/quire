@@ -3,11 +3,15 @@
 
 use crate::pages::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Accent, ColourToken, HueMember, LabelHue, Material, Radius, Scheme, Shadow, Surface, Token,
-    TokenScope, ZLayer, accent_of,
-};
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::elevation::Shadow;
+use ds_style::tokens::label_hue::{HueMember, LabelHue};
+use ds_style::tokens::layer::ZLayer;
+use ds_style::tokens::shape::Radius;
+use ds_style::tokens::token::{Token, TokenScope};
 
 /// design/01-LAYOUT.md section 2's common steps. The design names these values and quire has no
 /// token for them (a limit the Blitz limits page lists): every padding is a raw length today.
@@ -103,7 +107,7 @@ fn AccentRoles(accent: Accent) -> Element {
         div { class: "g-col",
             span { class: "g-name", "{accent.label()}" }
             for scheme in Scheme::ALL.iter().copied() {
-                Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
+                Scope { scheme, accent, material: Material::Popover, frame: Some(FrameTint::None),
                     div { class: "g-cell",
                         div { class: "g-row",
                             for (name , hex) in role_parts(accent, scheme) {

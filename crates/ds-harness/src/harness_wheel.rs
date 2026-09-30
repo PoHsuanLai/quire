@@ -6,7 +6,7 @@ use crate::harness::Harness;
 use crate::input::PointerAction;
 use crate::input::PointerInput;
 use blitz_traits::events::{BlitzWheelDelta, BlitzWheelEvent, PointerCoords, UiEvent};
-use ds::{Point, Px};
+use ds::prelude::*;
 use keyboard_types::Modifiers;
 
 impl Harness {

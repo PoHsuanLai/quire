@@ -4,7 +4,9 @@
 
 use crate::edit_tree::{is_hidden, mark_of};
 use blitz_dom::{BaseDocument, NodeId};
-use ds::{EditKind, Paragraph, WordSpan};
+use ds::host::position::EditKind;
+use ds::spell::service::Paragraph;
+use ds::spell::words::WordSpan;
 
 /// Elements whose text is code, not prose.
 const CODE: &[&str] = &["code", "pre", "kbd", "samp", "tt", "var"];

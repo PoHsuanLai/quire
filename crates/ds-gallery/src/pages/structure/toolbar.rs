@@ -3,10 +3,10 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    Availability, Check, Choice, Icon, Px, SegmentedControl, TextLine, Toolbar, ToolbarItem,
-    ToolbarRoom, Tracking,
-};
+use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
+use ds::components::chrome::toolbar::view::Toolbar;
+use ds::components::controls::segmented::Tracking;
+use ds::prelude::*;
 
 /// The items either side of the title.
 fn leading() -> Vec<ToolbarItem<&'static str>> {

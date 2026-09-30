@@ -1,9 +1,10 @@
 //! `#[derive(Token)]`: a family's custom properties and values come from its variants'
 //! attributes, for every dimension a value can follow.
 
-use ds::{
-    CssValue, MotionLevel, Scheme, Token, TokenKind, TokenScope, TokenSet, Typeface, VarName, Word,
-};
+use ds::prelude::*;
+use ds_style::tokens::name::VarName;
+use ds_style::tokens::set::TokenSet;
+use ds_style::tokens::token::{CssValue, Token, TokenKind, TokenScope};
 
 /// One variant per way a value is written.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

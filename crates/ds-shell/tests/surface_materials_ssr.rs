@@ -9,17 +9,20 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Common;
+use ds::assembly::ds::Inject;
+use ds::components::controls::badge::BadgeContent;
+use ds::components::controls::button_model::Bezel;
+use ds::components::menus::palette::palette_group::PaletteGroups;
 use ds::icon::{IconStyle, Tint};
-use ds::{
-    Activity, Appearance, BadgeContent, CommandPalette, CommandPaletteHost, Corner, Ds, Emphasis,
-    Fraction, Icon, IconSize, IconSource, IconView, Inject, Material, PRESETS, PlateFamily,
-    PlateTint, Px, Selection, Shown, Surface, Theme,
-};
-use ds_shell::{
-    DockFloor, DockTile, MenuBarItem, PaneFooter, PaneHeader, RunningDot, WorkspacePill,
-    WorkspacePills,
-};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::press::Press;
+use ds_core::vocab::Activity;
+use ds_shell::prelude::*;
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::plate_tint::PlateTint;
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::shape::Corner;
 
 /// The Work Space's Monochrome plate tint.
 fn work() -> Option<PlateTint> {
@@ -162,7 +165,7 @@ const CASES: &[Case] = &[
         rsx! {
             PaneHeader {
                 title: "Wi-Fi",
-                back: Some(EventHandler::new(|_: ds::Press| {})),
+                back: Some(EventHandler::new(|_: Press| {})),
                 trailing: rsx! { span { "switch" } },
             }
         }
@@ -175,7 +178,7 @@ const CASES: &[Case] = &[
     ("pane-footer", || {
         rsx! {
             PaneFooter {
-                ds::Button { bezel: ds::Bezel::Inline, label: "Wi-Fi Settings…", onclick: |_| {} }
+                Button { bezel: Bezel::Inline, label: "Wi-Fi Settings…", onclick: |_| {} }
             }
         }
     }),
@@ -202,7 +205,7 @@ const CASES: &[Case] = &[
                 placeholder: "Search",
                 query: "",
                 tokens: Vec::new(),
-                groups: ds::PaletteGroups::default(),
+                groups: PaletteGroups::default(),
                 empty: "Nothing",
                 oninput: |_| {},
                 onpick: |_| {},

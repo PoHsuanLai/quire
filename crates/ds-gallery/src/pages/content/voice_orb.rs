@@ -4,8 +4,12 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{Activity, Button, Hex, ORB_PERIOD, OrbColour, OrbColours, Px, VoiceOrb, Word};
+use ds::components::content::voice_orb::model::{OrbColour, OrbColours};
+use ds::components::content::voice_orb::view::{ORB_PERIOD, VoiceOrb};
+use ds::prelude::*;
+use ds_core::vocab::Activity;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::Hex;
 use std::time::Duration;
 
 /// The sizes of the ladder: under 30 (no mask), 30 to 50, 50 to 100 and 100 and over.

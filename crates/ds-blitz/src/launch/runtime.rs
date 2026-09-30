@@ -21,7 +21,7 @@
 //! threads) without leaking an ever-growing stack of entries: each `Harness` enters once and
 //! exits when it is dropped.
 
-use ds::Spawner;
+use ds_core::spawner::Spawner;
 use std::future::Future;
 use std::pin::Pin;
 use std::sync::OnceLock;

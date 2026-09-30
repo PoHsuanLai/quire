@@ -5,10 +5,12 @@
 //! at once anchors to that row.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey,
-    use_focus_request,
-};
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::focus::request::use_focus_request;
+use ds::focus::soon::focus_soon;
+use ds::prelude::*;
+use ds_core::time::clock::sleep;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
@@ -49,7 +51,7 @@ fn Listener() -> Element {
         spawn(async move {
             while feed.changed().await.is_ok() {
                 heard.set(Some(ds::time::now()));
-                ds::sleep(ANSWER_AFTER).await;
+                sleep(ANSWER_AFTER).await;
                 answered.set(Some(ds::time::now()));
             }
         });
@@ -104,7 +106,7 @@ fn Mounting() -> Element {
             id: "target",
             tabindex: "0",
             onmounted: move |event: MountedEvent| {
-                ds::focus_soon(event.data());
+                focus_soon(event.data());
                 mounts += 1;
             },
             "Key target"
@@ -182,8 +184,8 @@ fn a_focus_asked_from_a_press_lands_in_the_same_frame_every_run() {
 
 // ---- the palette's selected row, reported in the frame of the selection ---------------
 
-fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title.to_string())
+fn item(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title.to_string())
 }
 
 static ROW: GlobalSignal<Option<Rect>> = Signal::global(|| None);
@@ -199,7 +201,7 @@ fn Palette() -> Element {
                     placeholder: "Search".to_string(),
                     query: String::new(),
                     tokens: Vec::new(),
-                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox"), item(3, "Fonts")])],
+                    groups: vec![PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox"), item(3, "Fonts")])],
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
                     onpick: move |_| {},

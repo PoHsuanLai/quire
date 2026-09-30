@@ -4,11 +4,13 @@
 //! pane beside the results widening the card.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EmojiCell,
-    EmojiCells, FieldKey, Material, PaletteGroup, PaletteGroups, PaneContent, PreviewPane,
-    ShortcutKey,
-};
+use ds::components::lists::emoji_grid::grid::{EMOJI_CELL, EmojiCell, EmojiCells};
+use ds::components::lists::preview::content::PaneContent;
+use ds::components::menus::palette::palette_claim::{Claim, FieldKey};
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
+use ds::host::caret::Caret;
+use ds::prelude::*;
 use ds_harness::{
     ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport,
 };
@@ -24,8 +26,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title.to_string())
+fn item(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title.to_string())
 }
 
 /// Ten cells, four to a row: stops 2..=11 after the two rows above.
@@ -138,7 +140,7 @@ fn MorePalette() -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut note = move |line: String| log.with_mut(|log| log.push(line));
     let mut more = use_signal(|| false);
-    let apps: Vec<ds::PaletteRow<u8>> = match more() {
+    let apps: Vec<PaletteRow<u8>> = match more() {
         false => vec![item(1, "Files"), item(2, "Firefox")],
         true => vec![item(1, "Files"), item(2, "Firefox"), item(3, "Terminal")],
     };
@@ -272,7 +274,7 @@ fn ClaimPalette() -> Element {
                     placeholder: "Search",
                     query: query(),
                     tokens: Vec::new(),
-                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
+                    groups: vec![ds::components::menus::palette::palette_group::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
                     empty: "Nothing",
                     oninput: move |text: String| query.set(text),
                     onpick: move |_| {},
@@ -362,7 +364,7 @@ fn AsidePalette(host: CommandPaletteHost) -> Element {
                     placeholder: "Search",
                     query: String::new(),
                     tokens: Vec::new(),
-                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files")])],
+                    groups: vec![ds::components::menus::palette::palette_group::PaletteGroup::list("Applications", vec![item(1, "Files")])],
                     empty: "Nothing",
                     oninput: move |_| {},
                     onpick: move |_| {},
@@ -460,7 +462,7 @@ fn LoneGrid() -> Element {
     let mut picked = use_signal(|| None::<u8>);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
-            ds::EmojiGrid::<u8> {
+            EmojiGrid::<u8> {
                 cells: grid().cells,
                 columns: 4,
                 selected: at(),
@@ -513,11 +515,11 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
 
 #[allow(non_snake_case)]
 fn LeavingPane() -> Element {
-    let mut shown = use_signal(|| ds::Shown::Visible);
+    let mut shown = use_signal(|| Shown::Visible);
     let mut gone = use_signal(|| false);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
-            button { class: "hide", onclick: move |_| shown.set(ds::Shown::Hidden), "Hide" }
+            button { class: "hide", onclick: move |_| shown.set(Shown::Hidden), "Hide" }
             if !gone() {
                 PreviewPane {
                     content: PaneContent::Web { host: "duckduckgo.com".to_string(), url: "https://duckduckgo.com".to_string() },

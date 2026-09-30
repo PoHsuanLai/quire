@@ -12,7 +12,7 @@ use crate::components::controls::progress::view::ProgressIndicator;
 use dioxus::prelude::*;
 use ds_motion::detail::{cue::Cue, operation::Operation, touch::Touch};
 
-/// What a [`PreviewPane`](crate::PreviewPane) knows of its latest change: the cue the caller's
+/// What a [`PreviewPane`](crate::components::lists::preview::pane::PreviewPane) knows of its latest change: the cue the caller's
 /// own `use_detail` made for the pane's state (its entrance's touch, and the in-place changes it
 /// cross-fades), or only the touch that showed it (no cross-fades). Either converts in with
 /// `.into()`; the default is a remote showing.

@@ -2,9 +2,7 @@
 //! play them.
 
 pub use ds_motion::detail::{
-    cue::Cue,
-    detailed::{Detailed, first_table, moment_table},
-    moment::Moment,
+    detailed::{first_table, moment_table},
     morph::{MorphStyle, Slashed},
     morph_glyph::MorphGlyph,
     once::use_shake,
@@ -12,7 +10,7 @@ pub use ds_motion::detail::{
     pending::{PendingLayers, PendingSpec, PendingStyle},
     stamp::EventStamp,
     touch::{Contact, Handled, Touch},
-    use_detail::{Detail, use_detail},
+    use_detail::Detail,
     use_operation::use_operation,
     use_pending::use_pending,
 };

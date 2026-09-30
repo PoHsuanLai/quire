@@ -5,12 +5,14 @@
 //! `content` takes the title's place and moves nothing.
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, Button, Common, DataAttr, DataName, DropState, Ds, FieldBezel,
-    FieldFocus, Icon, Material, Outline, Point, Propagation, Px, Row, RowLeading, RowState,
-    ShortcutKey, Shown, TextField, use_focus_request,
-};
-use ds::{Bezel, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::components::lists::row::row::Outline;
+use ds::focus::request::use_focus_request;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName};
+use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -169,7 +171,7 @@ fn a_branch_opens_over_the_move_duration_from_its_measured_height() {
     let open = body(&harness, PROJECTS);
     let triangle = centre(&harness, &format!("{PROJECTS} .ds-row-disclosure"));
     harness.send(Input::click(triangle));
-    harness.advance(ds::settle(ds::Anim::Heal, ds::MotionLevel::Standard) / 3);
+    harness.advance(settle(Anim::Heal, MotionLevel::Standard) / 3);
     let mid = body(&harness, PROJECTS);
     assert!(
         mid > 0.0 && mid < open,
@@ -214,7 +216,7 @@ fn the_drop_states_are_written_and_painted_by_the_rows_own_rules() {
     // The target is lit: its fill differs from an idle row's.
     let target = harness.rect(ARCHIVE).expect("archive");
     let image = harness.render().expect("a frame");
-    let sample = |rect: ds::Rect| {
+    let sample = |rect: Rect| {
         let x = (rect.origin.x + rect.size.width - Px(40.0)).0 as u32;
         let y = (rect.origin.y + Px(rect.size.height.0 / 2.0)).0 as u32;
         *image.get_pixel(x, y)

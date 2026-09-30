@@ -5,12 +5,12 @@
 //! idle-frame rule); under Reduced motion the ring is at its level at once.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, DurationToken, Fraction, Label, LowAt, Material,
-    Motion, MotionLevel, RootChrome,
-};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::{BatteryRing, percent_text};
+use ds_shell::battery::ring::percent_text;
+use ds_shell::prelude::*;
+use ds_style::tokens::timing::DurationToken;
 use std::time::{Duration, Instant};
 
 const VIEW: Viewport = Viewport {

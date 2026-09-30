@@ -5,10 +5,13 @@
 //! calls `on_hidden`.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Ds, Material, Motion, MotionLevel, RootChrome, Shown, settle};
+use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::{BatteryWidget, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::BatteryWidget;
+use ds_shell::widget::timeline::Timeline;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

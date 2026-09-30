@@ -2,8 +2,9 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{ControlSize, KeyEquivalent, KeyStyle, Shortcut, ShortcutKey};
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The KeyEquivalent section.
 #[component]

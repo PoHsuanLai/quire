@@ -12,8 +12,10 @@ use ds::components::content::label::{Label, LabelStyle};
 use ds::components::content::text_runs::TextLine;
 use ds::components::controls::button::Button;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
-use ds::{Common, ControlSize, Icon};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_core::press::Press;
+use ds_style::tokens::control_size::ControlSize;
 
 /// A detail pane's header: `back` draws a back button that calls it (a module's own dropdown, which
 /// has nothing to go back to, passes none), then `title`, then `trailing` at the far end.

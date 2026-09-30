@@ -3,7 +3,8 @@
 //! keyframes with their aliases and pulse classes, utilities, then every
 //! component sheet in its fixed order (`assembly::sheets`).
 
-use crate::assembly::{kit::kits, sheets::SHEETS};
+use crate::assembly::kit::kits;
+use crate::assembly::sheets::SHEETS;
 use ds_style::css::document::placed;
 use std::sync::LazyLock;
 

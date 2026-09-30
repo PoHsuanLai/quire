@@ -10,16 +10,18 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, Fraction, Glyph, Icon, IconSize, Inject, Label,
-    LowAt, Material, Motion, RootChrome, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{
-    BatteryRing, CardTint, ClockFace, ClockLook, ClockTime, DayPhase, Seconds, WidgetFrame,
-    WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle, percent_text,
-};
+use ds_shell::battery::ring::percent_text;
+use ds_shell::clock::face::ClockFace;
+use ds_shell::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::kind::{CardTint, WidgetTitle};
+use ds_style::icon::render::Glyph;
 
 #[derive(Props, Clone)]
 struct HostProps {

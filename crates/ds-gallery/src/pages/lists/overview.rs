@@ -4,12 +4,17 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    ActionId, Button, Check, Chip, ChipVariant, Colour, DragGhost, Emphasis, Hex, HoverStrip, Icon,
-    List, ListItem, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, RowState,
-    Selection, StripAction, ThreadRow, UndoToken, use_toast_hub,
-};
-use ds::{Bezel, ControlSize};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
+use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::controls::button_model::Bezel;
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::prelude::*;
+use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// One sample thread: sender, subject, snippet, time.
 type ThreadSample = (&'static str, &'static str, &'static str, &'static str);

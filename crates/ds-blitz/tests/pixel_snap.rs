@@ -12,9 +12,12 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::host::measure::Anchor;
 use ds::icon::stroke_device_pixels;
-use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuItem, Point, Px, Scale};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::pixel::PixelToken;
 use image::RgbaImage;
 use probe::{keep, rect};
 use std::ops::Range;
@@ -39,7 +42,7 @@ fn Fixture() -> Element {
         image: None,
         key: None,
         check: None,
-        availability: ds::Availability::Enabled,
+        availability: Availability::Enabled,
     };
     let entries = vec![
         item(1, "New Window"),
@@ -57,9 +60,9 @@ fn Fixture() -> Element {
                 div { class: "raw" }
                 span { class: "icon", Glyph { icon: Icon::Plus, size: IconSize::Base } }
             }
-            ds::Menu::<i32> {
-                placement: ds::MenuPlacement::Popup,
-                anchor: ds::Anchor::Point(Point { x: Px(191.0), y: Px(81.0) }),
+            Menu::<i32> {
+                placement: MenuPlacement::Popup,
+                anchor: Anchor::Point(Point { x: Px(191.0), y: Px(81.0) }),
                 items: entries,
                 onpick: move |_| {},
                 onclose: move |_| {},
@@ -169,7 +172,7 @@ fn fixed_lines() -> [Line; 5] {
 
 /// Device rows a `--hair` line covers: one at a fractional scale, two at 2x.
 fn hair_rows(scale: u16) -> usize {
-    ds::PixelToken::Hair
+    PixelToken::Hair
         .device_pixels(Scale::from_percent(scale))
         .map_or(0, |rows| rows as usize)
 }

@@ -8,12 +8,13 @@
 //! it. Under `FocusFallback::BlitzDefault` nothing changes: the negative control.
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, ActionId, Appearance, Ds, FieldBezel, FieldFocus, HoverStrip, Icon, Material,
-    Outline, Press, Row, RowLeading, ShortcutKey, Shown, StripAction, TextField, use_focus_request,
-};
-use ds::{Bezel, Button, ImagePosition};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::lists::row::row::Outline;
+use ds::focus::request::use_focus_request;
+use ds::prelude::*;
 use ds_blitz::FocusFallback;
+use ds_core::press::Press;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

@@ -4,9 +4,11 @@
 
 use crate::pages::Specimen;
 use dioxus::prelude::*;
-use ds::ControlSize;
+use ds::components::app::send_mood::SendMood;
+use ds::components::app::send_pill::{PillAction, SendPill};
 use ds::detail::{Operation, PendingToken};
-use ds::{Button, Fraction, PillAction, SendMood, SendPill};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The moods a person can play here, with the words the pill says in each.
 const MOODS: [(SendMood, &str, &str); 2] = [

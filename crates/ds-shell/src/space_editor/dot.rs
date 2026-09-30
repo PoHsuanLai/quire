@@ -2,7 +2,7 @@
 //! section 32, `S:147-150`).
 
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::vocab::{Check, Selection, Shortcut};
 use ds_core::word::Word;
 use ds_style::space::dot_paint::DotPaint;

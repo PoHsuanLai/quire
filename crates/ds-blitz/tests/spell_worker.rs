@@ -6,7 +6,9 @@
 #[path = "support/spell_dict.rs"]
 mod spell_dict;
 
-use ds::{Lang, Learned, SpellService};
+use ds::prelude::*;
+use ds::spell::lang::Lang;
+use ds::spell::service::Learned;
 use ds_blitz::spell::{NativeSpell, SpellConfig};
 use std::future::Future;
 use std::path::Path;

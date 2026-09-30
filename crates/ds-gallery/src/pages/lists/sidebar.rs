@@ -4,12 +4,16 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Accessory, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Common, DataAttr, DataName,
-    DropState, Icon, List, ListItem, ListStyle, Outline, PersonHue, Propagation, Row, RowLeading,
-    RowState, SectionHeader, Selection, Shown, SidebarSize,
-};
-use ds::{Bezel, Button, ImagePosition};
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::components::lists::list::model::ListStyle;
+use ds::components::lists::row::row::Outline;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName};
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::SidebarSize;
 
 /// The places a sidebar offers.
 const PLACES: [(Icon, &str, u32); 4] = [

@@ -11,18 +11,22 @@ use crate::pages::shell::calendar::month_sample::{First, SEPTEMBER, sample, shif
 use crate::pages::shell::widget_reference::cell;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::LabelHue;
-use ds::Word;
-use ds::{
-    Appearance, BatteryPower, Ds, IconSize, Inject, Material, RootChrome, SpaceLook, use_scope,
-};
-use ds_shell::{
-    BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
-    DeviceGlyph, Lift, MonthEntry, MonthIntent, MonthWidget, Seconds, Timeline, WeekNumbers,
-    Widget, WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize,
-    WidgetSlotGuide, WorldClockWidget,
-};
-use ds_shell::{EventLine, MonthFace, TodayLine};
+use ds::assembly::ds::Inject;
+use ds::components::content::status::battery_state::BatteryPower;
+use ds::prelude::*;
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
+use ds_shell::month_grid::data::WeekNumbers;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::{BatteryEntry, BatteryWidget};
+use ds_shell::widget::calendar::{EventLine, MonthFace, TodayLine};
+use ds_shell::widget::calendar::{MonthEntry, MonthIntent, MonthWidget};
+use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
+use ds_shell::widget::kind::{CardTint, Lift};
+use ds_shell::widget::timeline::Timeline;
+use ds_style::icon::render::IconPx;
+use ds_style::tokens::label_hue::LabelHue;
 
 /// The medium widget's four: critical, half, full, and low but charging.
 fn devices() -> BatteryEntry {
@@ -105,7 +109,7 @@ pub fn WidgetLooksPage() -> Element {
                 for device in Device::ALL.iter().copied() {
                     div { key: "{device.slug()}", class: "g-wl-device",
                         DeviceGlyph { device, size: IconSize::Base }
-                        DeviceGlyph { device, size: IconSize::Px(ds::IconPx(32)) }
+                        DeviceGlyph { device, size: IconSize::Px(IconPx(32)) }
                         span { class: "g-wl-device-name", "{device.slug()}" }
                     }
                 }

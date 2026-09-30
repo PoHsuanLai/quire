@@ -8,7 +8,7 @@ use crate::harness_style::{Part, Srgba};
 use crate::input::Input;
 use blitz_dom::util::ToColorColor;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
-use ds::{Point, Px, Rect, Size};
+use ds::prelude::*;
 use std::time::Duration;
 
 /// What sends input to a document under test and moves its time.

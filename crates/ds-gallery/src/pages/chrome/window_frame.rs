@@ -7,10 +7,11 @@ use crate::pages::Section;
 use crate::pages::Specimen;
 use crate::pages::shell::chrome_targets::Root;
 use dioxus::prelude::*;
-use ds::{
-    Activation, HostWindow, Material, Maximized, ResizeEdge, Support, TileError, TilePose,
-    WindowState, WindowTile, WindowTitlebar, Zoom, use_window_host_provider,
-};
+use ds::components::chrome::traffic_lights::TilePose;
+use ds::components::chrome::window_frame::WindowTitlebar;
+use ds::prelude::*;
+use ds::window::host::use_window_host_provider;
+use ds::window::vocab::{Activation, Maximized, Support, TileError, WindowTile, Zoom};
 use std::rc::Rc;
 
 /// A host that reports `state` and can only fill, as a Wayland window's.

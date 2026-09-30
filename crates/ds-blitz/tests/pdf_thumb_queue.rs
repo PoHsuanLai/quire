@@ -5,7 +5,7 @@
 //! raster count is this test's alone.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Px, Size};
+use ds::prelude::*;
 use ds_blitz::{PdfFileThumb, pdf_thumb_rasters};
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Query, Viewport};

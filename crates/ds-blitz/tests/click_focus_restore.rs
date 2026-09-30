@@ -5,7 +5,8 @@
 //! focuses, and falls to the next focusable ancestor (`.app[tabindex]`).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, Material, Press, ShortcutKey};
+use ds::prelude::*;
+use ds_core::press::Press;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

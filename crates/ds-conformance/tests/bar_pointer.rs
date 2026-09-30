@@ -3,9 +3,10 @@
 //! reorders by a press on one pill released over another.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Selection};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
-use ds_shell::{BarPointer, MenuBarItem, WorkspacePill, WorkspacePills};
+use ds_shell::bar::pointer::BarPointer;
+use ds_shell::prelude::*;
 use std::cell::RefCell;
 use std::time::Duration;
 

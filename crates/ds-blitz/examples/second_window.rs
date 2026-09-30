@@ -10,14 +10,17 @@
 //!
 //! `QUIRE_AUTOPILOT=1` drives it without a person: it prints the host contexts each window's
 //! document sees, opens a message window, focuses it, closes it by its handle, opens one that
-//! closes itself through its frame's close (`ds::WindowHost`), opens a third and then closes the
+//! closes itself through its frame's close (`ds::prelude::WindowHost`), opens a third and then closes the
 //! first window with that one still open, printing each step. The process exits 0 once `launch`
 //! returns.
 
 use dioxus::prelude::*;
-use ds::Answers;
-use ds::{Appearance, Button, Ds, FileDropBoard, Found, HostSignals, Material, use_document_host};
+use ds::components::controls::button_model::Answers;
+use ds::file_drop::board::FileDropBoard;
+use ds::host::found::Found;
+use ds::prelude::*;
 use ds_blitz::{AppConfig, AppId, WindowHandle, WindowSpec, launch, open_window_with};
+use ds_core::time::clock::sleep;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
@@ -58,10 +61,7 @@ fn seams(window: &str) -> String {
             "FileDropBoard",
             try_consume_context::<FileDropBoard>().is_some(),
         ),
-        (
-            "WindowHost",
-            try_consume_context::<ds::WindowHost>().is_some(),
-        ),
+        ("WindowHost", try_consume_context::<WindowHost>().is_some()),
         (
             "Opens (app context)",
             try_consume_context::<Opens>().is_some(),
@@ -128,7 +128,7 @@ fn First() -> Element {
 
 /// The autopilot's steps, in the first window's scope.
 async fn drive() {
-    let pause = |ms| ds::sleep(Duration::from_millis(ms));
+    let pause = |ms| sleep(Duration::from_millis(ms));
     pause(600).await;
     let Some(first) = open_message("autopilot one") else {
         return;
@@ -163,8 +163,8 @@ async fn drive() {
 }
 
 /// The first window's host, read from the root context (a task has no hooks).
-fn window_host_here() -> Option<ds::WindowHost> {
-    try_consume_context::<ds::WindowHost>()
+fn window_host_here() -> Option<WindowHost> {
+    try_consume_context::<WindowHost>()
 }
 
 #[allow(non_snake_case)]
@@ -179,7 +179,7 @@ fn Message(subject: String) -> Element {
     use_hook(move || {
         if closes_itself {
             spawn(async {
-                ds::sleep(Duration::from_millis(800)).await;
+                sleep(Duration::from_millis(800)).await;
                 if let Some(host) = window_host_here() {
                     host.host().close();
                 }

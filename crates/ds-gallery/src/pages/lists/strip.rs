@@ -2,10 +2,10 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    ActionId, Emphasis, HoverStrip, Icon, List, ListItem, RowState, Selection, Shown, StripAction,
-    ThreadRow,
-};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
+use ds::components::app::thread_row::ThreadRow;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 
 /// Archive and snooze, each doing nothing on its measured click: the press says what happened.
 fn actions() -> Vec<StripAction> {

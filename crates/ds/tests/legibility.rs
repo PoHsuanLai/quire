@@ -2,13 +2,21 @@
 //! preset frame; and the materials' text over the two worst backdrops, black and white
 //! (design/21-SPACES.md section 7, the plan's `material-legible-over-black-and-white`).
 
-use ds::Alpha;
-use ds::Hex;
-use ds::Word;
-use ds::{
-    Accent, CardAccent, ColourToken, Dot, FrameVars, Material, PRESETS, Scheme, SpaceLook, Theme,
-    accent_of, derive, ratio, recipe,
-};
+use ds::components::content::avatar::muting_colour;
+use ds::prelude::*;
+use ds::root::chrome::Ground;
+use ds_core::colour::contrast::ratio;
+use ds_style::material::recipe::recipe;
+use ds_style::space::frame_vars::FrameVars;
+use ds_style::space::look::CardAccent;
+use ds_style::space::palette::{Dot, derive};
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::hex::Colour;
+use ds_style::tokens::hex::Hex;
+use ds_style::tokens::token::Token;
+use ds_style::tokens::token::TokenScope;
 
 /// The alpha the settings key ships with (`appearance.material_tint_alpha = 80`).
 const DEFAULT_TINT_ALPHA: Alpha = Alpha(800);
@@ -302,7 +310,8 @@ fn fill_over(fill: &str, stop: &str) -> String {
     if fill.starts_with('#') {
         return fill.to_owned();
     }
-    let ds::Hex(under) = ds::Hex::parse(stop).unwrap_or_else(|| panic!("{stop} is not hex"));
+    let ds_style::tokens::hex::Hex(under) =
+        ds_style::tokens::hex::Hex::parse(stop).unwrap_or_else(|| panic!("{stop} is not hex"));
     over(fill, under)
 }
 
@@ -352,9 +361,9 @@ fn tint_alpha(material: Material, scheme: Scheme) -> f64 {
 
 /// The ink each tinted chrome material draws in, over its own gradient.
 fn chrome_ink(material: Material, vars: &FrameVars, scheme: Scheme) -> String {
-    match ds::Ground::of(material) {
-        ds::Ground::Frame => vars.ink.clone(),
-        ds::Ground::Paper => colour(ColourToken::Ink, scheme),
+    match Ground::of(material) {
+        Ground::Frame => vars.ink.clone(),
+        Ground::Paper => colour(ColourToken::Ink, scheme),
     }
 }
 
@@ -392,7 +401,8 @@ fn tinted_chrome_failures(alpha_of: impl Fn(Material, Scheme) -> f64) -> Vec<Str
                 let vars = FrameVars::of(&look, scheme);
                 let ink = chrome_ink(material, &vars, scheme);
                 for stop in derive(&look.dots, scheme).stops {
-                    let ds::Hex([r, g, b]) = ds::Hex::parse(&stop).expect("hex stop");
+                    let ds_style::tokens::hex::Hex([r, g, b]) =
+                        ds_style::tokens::hex::Hex::parse(&stop).expect("hex stop");
                     let tint = format!("rgba({r},{g},{b},{alpha})");
                     for (name, backdrop) in [("black", BLACK), ("white", WHITE)] {
                         let ground = over(&tint, backdrop);
@@ -438,13 +448,15 @@ fn the_tinted_chrome_holds_its_ink_over_blur() {
 /// a person hue every 5 degrees; the letter is `--on-hue`, the grounds a tile or chip sits on.
 #[test]
 fn a_muted_avatar_is_as_legible_as_a_plain_one() {
-    use ds::{Muting, PersonHue, PersonSwatch};
-    let discs: Vec<ds::Colour> = PersonSwatch::ALL
+    use ds::components::content::avatar::PersonHue;
+    use ds_core::vocab::Muting;
+    use ds_style::tokens::person::PersonSwatch;
+    let discs: Vec<Colour> = PersonSwatch::ALL
         .iter()
         .map(|swatch| swatch.colour())
         .chain((0..360).step_by(5).map(|hue| PersonHue(hue).colour()))
         .collect();
-    let muted = |disc: &ds::Colour| ds::muting_colour(Muting::Muted, *disc).css();
+    let muted = |disc: &Colour| muting_colour(Muting::Muted, *disc).css();
     let mut failures = Vec::new();
     for scheme in [Scheme::Light, Scheme::Dark] {
         let letter = colour(ColourToken::OnHue, scheme);
@@ -462,7 +474,7 @@ fn a_muted_avatar_is_as_legible_as_a_plain_one() {
         }
         for ground in [ColourToken::Paper, ColourToken::Surface, ColourToken::Raise] {
             let under = colour(ground, scheme);
-            let floor = |paint: &dyn Fn(&ds::Colour) -> String| {
+            let floor = |paint: &dyn Fn(&Colour) -> String| {
                 discs
                     .iter()
                     .map(|disc| measured(&under, &paint(disc)))
@@ -682,11 +694,11 @@ fn selection_paint(
 /// `--sel-bg-quiet` at 4.5:1. Every accent, both schemes, on each ground a list sits on.
 #[test]
 fn a_selected_row_keeps_its_ink() {
-    use ds::SelectionToken;
+    use ds_style::tokens::selection::SelectionToken;
     let mut failures = Vec::new();
     for scheme in Scheme::ALL.iter().copied() {
-        let scope = ds::TokenScope::BASE.in_scheme(scheme);
-        let css = |token: SelectionToken| ds::Token::css_value(token, scope).to_string();
+        let scope = TokenScope::BASE.in_scheme(scheme);
+        let css = |token: SelectionToken| Token::css_value(token, scope).to_string();
         for accent in Accent::ALL.iter().copied() {
             let roles = accent_of(accent, scheme);
             for ground in [ColourToken::Paper, ColourToken::Surface, ColourToken::Raise] {

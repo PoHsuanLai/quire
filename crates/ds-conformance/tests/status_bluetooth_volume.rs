@@ -2,11 +2,10 @@
 //! connected) and the volume glyph on `LevelGlyph`; each ends at 0 frames (R3).
 
 use dioxus::prelude::*;
+use ds::components::content::status::bluetooth_state::BluetoothState;
+use ds::components::content::status::volume::{VolumeState, VolumeWaves};
 use ds::detail::EventStamp;
-use ds::{
-    Appearance, BluetoothGlyph, BluetoothState, Ds, Material, Motion, VolumeGlyph, VolumeState,
-    VolumeWaves,
-};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Driver, Harness, Query, Viewport};
 use std::time::Duration;

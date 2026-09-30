@@ -2,7 +2,9 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{Anchor, BarCommand, BarMenu, BarSection, Flow, Menu, MenuBarModel, MenuPlacement, Point};
+use ds::components::menus::menu_bar::{BarCommand, BarMenu, BarSection, MenuBarModel};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 
 /// One menu of the model as an inline `Menu`.
 #[component]

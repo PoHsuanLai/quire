@@ -3,13 +3,23 @@
 //! `tests/snapshots/structure/<component>/<state>.html`.
 
 use dioxus::prelude::*;
-use ds::{
-    Availability, CellAlign, Check, Choice, ControlSize, DocumentState, DragCount, DragGhost,
-    FieldGroup, FieldRow, Icon, ListItem, PaneSpec, Point, Px, Readout, Row, RowLayout, RowLeading,
-    RowState, Selection, Shown, Sidebar, SidebarSize, Sort, SortDirection, SplitPane, SplitView,
-    StepRange, Stepper, TabView, Table, TableColumn, TableRow, TextLine, TitleParts, Toolbar,
-    ToolbarItem, ToolbarRoom, TrafficLights, WindowTitlebar,
-};
+use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
+use ds::components::chrome::split_view::view::SplitView;
+use ds::components::chrome::tab_view::TabView;
+use ds::components::chrome::titlebar_parts::{DocumentState, TitleParts};
+use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
+use ds::components::chrome::toolbar::view::Toolbar;
+use ds::components::chrome::window_frame::WindowTitlebar;
+use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
+use ds::components::fields::stepper::model::{Readout, StepRange};
+use ds::components::fields::stepper::view::Stepper;
+use ds::components::lists::table::model::{CellAlign, Sort, SortDirection, TableColumn, TableRow};
+use ds::components::lists::table::view::Table;
+use ds::components::overlays::drag_ghost::DragCount;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::{ControlSize, SidebarSize};
 
 /// One component in one state.
 pub struct Case {

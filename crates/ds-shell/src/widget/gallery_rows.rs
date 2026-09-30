@@ -12,11 +12,13 @@ use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
+use ds::components::controls::button_model::ButtonRole;
 use ds::host::measure::MountedRef;
 use ds::host::reveal::reveal;
-use ds::{ButtonRole, ControlSize, SectionHeader};
+use ds::prelude::*;
 use ds_core::word::Word;
 use ds_style::task::spawn_in;
+use ds_style::tokens::control_size::ControlSize;
 use std::collections::BTreeSet;
 
 /// The placements on `host`, in their order there.
@@ -131,11 +133,12 @@ fn PlacedRow(
 #[cfg(test)]
 mod tests {
     use super::{at_key, on_host};
+    use crate::widget::battery::BatteryWidget;
+    use crate::widget::calendar::MonthWidget;
+    use crate::widget::clock::WorldClockWidget;
+    use crate::widget::contract::Widget;
     use crate::widget::kind::{WidgetHost, WidgetSize};
     use crate::widget::layout::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-    use crate::widget::{
-        battery::BatteryWidget, calendar::MonthWidget, clock::WorldClockWidget, contract::Widget,
-    };
 
     #[test]
     fn each_surface_lists_only_its_own_in_their_order() {

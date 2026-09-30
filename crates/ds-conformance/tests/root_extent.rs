@@ -3,7 +3,7 @@
 //! document, and the sheet it hosts has that area to be placed in.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, RootExtent, Sheet};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 

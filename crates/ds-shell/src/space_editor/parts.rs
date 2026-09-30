@@ -3,7 +3,6 @@
 
 use super::{DotIndex, Picker, dot_index, edit};
 use dioxus::prelude::*;
-use ds::ControlSize;
 use ds::components::controls::button::Button;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::lists::section_header::SectionHeader;
@@ -18,6 +17,7 @@ use ds_style::space::{
     palette::{Capping, derive, readout::readout},
     presets::PRESETS,
 };
+use ds_style::tokens::control_size::ControlSize;
 
 /// The stop chips under the field and the "+ Colour" button.
 #[component]

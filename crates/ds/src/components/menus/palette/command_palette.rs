@@ -37,10 +37,9 @@ use ds_motion::anim::Anim;
 use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind};
+use crate::components::menus::palette::palette_host::CommandPaletteHost;
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
-use crate::components::menus::palette::{
-    palette_host::CommandPaletteHost, palette_motion::PaletteHandle,
-};
+use crate::components::menus::palette::palette_motion::PaletteHandle;
 use crate::components::overlays::popover::{Float, Stacking, use_float};
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
@@ -88,7 +87,7 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// `aside` is drawn beside the results, under the field, past a hairline divider, `aside_width`
 /// wide: over the window the card widens by that much; in a surface the card still fills its
 /// container, so the host widens the surface (sill's launcher panel) and the results column
-/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::PreviewPane).
+/// narrows by it otherwise. Use it for a [`PreviewPane`](crate::components::lists::preview::pane::PreviewPane).
 ///
 /// `shown` keeps the palette mounted while hidden: `Some(Shown::Hidden)` lays out nothing and
 /// leaves the layer stack, and each change to `Some(Shown::Visible)` replays the entrance,

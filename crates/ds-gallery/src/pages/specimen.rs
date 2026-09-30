@@ -2,11 +2,10 @@
 
 use crate::axes::Axes;
 use dioxus::prelude::*;
-use ds::Alpha;
-use ds::{
-    Accent, Appearance, BlurState, Ds, FrameTint, Inject, Material, RootChrome, Scheme,
-    SectionHeader, SpaceLook, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_style::appearance::blur::BlurState;
 
 /// A titled group of specimens, with an optional note under the title.
 #[component]

@@ -4,12 +4,13 @@
 use crate::pages::Section;
 use crate::pages::details::overview::{Cell, mini};
 use dioxus::prelude::*;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::content::status::bluetooth_state::BluetoothState;
+use ds::components::content::status::volume::{VolumeState, VolumeWaves};
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
 use ds::detail::EventStamp;
-use ds::{
-    BatteryGlyph, BatteryPower, BatteryState, BluetoothGlyph, BluetoothState, Fraction, IconPx,
-    IconSize, LowAt, VolumeGlyph, VolumeState, VolumeWaves, WifiBars, WifiGlyph, WifiReach,
-    WifiState,
-};
+use ds::prelude::*;
+use ds_style::icon::render::IconPx;
 
 /// The live specimen's size: twice the bar's, so its layers read on the page.
 const LIVE: IconSize = IconSize::Px(IconPx(44));

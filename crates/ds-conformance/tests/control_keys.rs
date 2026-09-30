@@ -5,11 +5,13 @@
 //! a segment; the arrows check the neighbouring radio button and move the focus with it.
 
 use dioxus::prelude::*;
-use ds::{
-    Answers, Appearance, Bezel, Button, Check, Checkbox, Choice, ControlSize, Ds, Icon,
-    ImagePosition, Material, RadioGroup, SegmentedControl, ShortcutKey, Toggle, Tracking,
-};
+use ds::components::controls::button_model::{Answers, Bezel, ImagePosition};
+use ds::components::controls::checkbox::Checkbox;
+use ds::components::controls::segmented::Tracking;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -166,8 +168,8 @@ fn the_arrows_check_the_next_radio_button_and_the_group_has_one_tab_stop() {
 fn Pills() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            ds_shell::WorkspacePills { label: "Workspaces",
-                ds_shell::WorkspacePill { label: "Work", onclick: move |_| PRESSES.set(PRESSES.get() + 1) }
+            WorkspacePills { label: "Workspaces",
+                WorkspacePill { label: "Work", onclick: move |_| PRESSES.set(PRESSES.get() + 1) }
             }
         }
     }

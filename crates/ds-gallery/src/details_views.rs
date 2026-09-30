@@ -3,8 +3,9 @@
 
 use crate::details_states::Net;
 use dioxus::prelude::*;
-use ds::detail::{MorphGlyph, MorphStyle, Slashed, Touch, use_detail, use_shake};
-use ds::{Icon, IconSize, WifiBars, WifiGlyph, WifiReach, WifiState};
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
+use ds::detail::{MorphGlyph, MorphStyle, Slashed, Touch, use_shake};
+use ds::prelude::*;
 
 /// `class` with a pulse's class and alias when it plays.
 fn pulsed(class: &str, key: Option<(String, &'static str)>) -> (String, Option<&'static str>) {

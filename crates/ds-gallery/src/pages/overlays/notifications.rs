@@ -9,14 +9,15 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::Section;
 use crate::pages::shell::level_tile::work;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, Ds, Icon, IconSource, Inject, Material, Px, Rich, RichRun, RunTone, Shown,
-    SidePanel, TextRun, Theme,
-};
-use ds_shell::{
-    AppMark, Banner, BannerKey, BannerStack, CardAction, GroupCount, GroupHeader, NotificationCard,
-    NotificationMetrics, NotificationSwipe, StackLayers,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::rich_text::{Rich, RichRun};
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
+use ds_shell::notifications::banner_stack::{Banner, BannerKey};
+use ds_shell::notifications::parts::{AppMark, CardAction, GroupCount, StackLayers};
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
+use ds_shell::tokens::notifications::NotificationMetrics;
 
 /// The notifications section.
 #[component]

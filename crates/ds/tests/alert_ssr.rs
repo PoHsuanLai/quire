@@ -10,10 +10,9 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::{
-    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Check, Ds, Flow, Icon, IconSource,
-    Inject, Material, RootExtent, Shown, Suppression, TextLine, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyle, Suppression};
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
 
 const TITLE: &str = "Turn Bluetooth off?";

@@ -15,9 +15,10 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Shortcut, ShortcutKey};
-use ds::{ControlSize, KeyEquivalent, KeyStyle};
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use image::RgbaImage;
 use probe::{distance, modal, rect};
 use std::time::Duration;

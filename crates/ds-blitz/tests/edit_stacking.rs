@@ -5,7 +5,9 @@
 //! is not positioned is painted in step 3/7, under every positioned box.
 
 use dioxus::prelude::*;
-use ds::{Common, EditSurface, ExtraClass};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::ExtraClass;
 use ds_harness::{Driver, Harness, Viewport};
 
 const VIEW: Viewport = Viewport {

@@ -4,12 +4,13 @@
 //! Reduced (R7).
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Bezel, Button, ControlSize, Ds, IconSwap, ImagePosition, Material, Motion, TextLine,
-};
+use ds::components::controls::button_model::{Bezel, IconSwap, ImagePosition};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::{NowPlayingTrack, Playback, TrackPosition};
+use ds_shell::now_playing::kind::Playback;
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

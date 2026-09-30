@@ -5,10 +5,14 @@
 //! frame never leaves 0.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Motion, Theme, WakeStamp};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::{AnimatedEmoji, EmojiId, EmojiPlayback, PictureSize};
+use ds_motion::wake::WakeStamp;
+use ds_shell::emoji::disc::EmojiPlayback;
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::prelude::*;
+use ds_shell::user_picture::size::PictureSize;
 use std::collections::BTreeSet;
 use std::time::Duration;
 

@@ -7,12 +7,11 @@
 //! to a mounted element gives the keyboard back to that element itself.
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{
-    Anchor, Appearance, Button, Common, Ds, Material, Menu, MenuItem, MountedRef, Point, Press, Px,
-    ShortcutKey,
-};
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_blitz::FocusFallback;
+use ds_core::press::Press;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -63,7 +62,7 @@ fn MenuPage(anchored: Anchored) -> Element {
             }
             if open() {
                 Menu::<u8> {
-                    placement: ds::MenuPlacement::Bar,
+                    placement: MenuPlacement::Bar,
                     anchor,
                     items: entries(),
                     onpick: |_| {},

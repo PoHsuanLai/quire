@@ -4,8 +4,11 @@
 //! `Material::Widget` alone is held to [`WIDGET_FLOOR`] rather than [`FLOOR`] (the contrast-relax
 //! pass, 2026-09-26; see [`floor_for`]).
 
-use ds::Alpha;
-use ds::{ColourToken, Material, Scheme, Verdict, ratio, recipe};
+use ds::prelude::*;
+use ds_core::colour::contrast::{Verdict, ratio};
+use ds_style::material::recipe::recipe;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::hex::Hex;
 
 /// WCAG AA for body text: what every floor has to clear.
 pub const FLOOR: f64 = 4.5;
@@ -122,7 +125,7 @@ pub fn floors(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Vec<Floo
 
 /// A colour as `ds` writes one: `rgba(r,g,b,a)` or `#rrggbb` (alpha 1).
 fn rgba(css: &str) -> Option<([u8; 3], f64)> {
-    if let Some(hex) = ds::Hex::parse(css) {
+    if let Some(hex) = Hex::parse(css) {
         return Some((hex.0, 1.0));
     }
     let inner = css.strip_prefix("rgba(")?.strip_suffix(')')?;
@@ -144,7 +147,7 @@ fn over((rgb, alpha): ([u8; 3], f64), backdrop: [u8; 3]) -> String {
             .round()
             .clamp(0.0, 255.0) as u8
     };
-    ds::Hex([
+    Hex([
         mix(rgb[0], backdrop[0]),
         mix(rgb[1], backdrop[1]),
         mix(rgb[2], backdrop[2]),
@@ -155,9 +158,8 @@ fn over((rgb, alpha): ([u8; 3], f64), backdrop: [u8; 3]) -> String {
 #[cfg(test)]
 mod tests {
     use super::{Backdrop, Tint, floors, over, rgba};
-    use ds::Alpha;
-    use ds::Word;
-    use ds::{Material, Scheme, Verdict};
+    use ds::prelude::*;
+    use ds_core::colour::contrast::Verdict;
 
     /// A colour's CSS, and its channels and alpha when it is one.
     type Case = (&'static str, Option<([u8; 3], f64)>);

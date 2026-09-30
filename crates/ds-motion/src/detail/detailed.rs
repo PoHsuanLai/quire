@@ -12,7 +12,7 @@ use std::fmt::Debug;
 /// person sees (three bars, 80 %), not the raw value (R2).
 ///
 /// ```
-/// use ds::detail::{Detailed, Moment};
+/// use ds::prelude::*;
 ///
 /// #[derive(Debug, Clone, PartialEq)]
 /// enum Link { Off, Joining, Joined }
@@ -44,7 +44,7 @@ use std::fmt::Debug;
 /// A variant the table does not decide is a compile error, not a silent `Rest`:
 ///
 /// ```compile_fail,E0004
-/// use ds::detail::{Detailed, Moment};
+/// use ds::prelude::*;
 ///
 /// #[derive(Debug, Clone, PartialEq)]
 /// enum Link { Off, Joining, Joined }

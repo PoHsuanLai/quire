@@ -6,10 +6,11 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::{
-    Activity, Appearance, Ds, Glyph, HostSignals, Icon, IconSize, Inject, InputModality, Material,
-    PixelToken, Scale, Surface,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds_core::vocab::{Activity, InputModality};
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::pixel::PixelToken;
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {

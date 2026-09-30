@@ -8,10 +8,13 @@
 //! lands on the card while it is still sliding in, and never once it rests.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px, Rect};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
+use ds_shell::notifications::banner_stack::{Banner, BannerKey};
+use ds_shell::notifications::parts::AppMark;
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
 use std::cell::Cell;
 use std::time::Duration;
 

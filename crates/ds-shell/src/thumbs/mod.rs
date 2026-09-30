@@ -2,5 +2,5 @@
 
 pub(crate) mod shot_frame;
 pub(crate) mod shot_ghost;
-pub(crate) mod shot_press;
-pub(crate) mod shot_thumbnail;
+pub mod shot_press;
+pub mod shot_thumbnail;

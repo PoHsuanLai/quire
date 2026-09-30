@@ -4,9 +4,9 @@
 //! beside its target.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, RootExtent, Shown, Tooltip};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::DockLabel;
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

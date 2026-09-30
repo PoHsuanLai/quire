@@ -4,15 +4,18 @@
 use crate::pages::shell::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::Answers;
-use ds::Word;
-use ds::{
-    Accent, Appearance, Button, Check, Chip, ChipVariant, CommandPalette, CommandPaletteHost,
-    Corner, Ds, Icon, Inject, Material, PaletteRow, Radius, RootChrome, RowLeading, Scheme,
-    SegmentedControl, Surface, Theme, Toggle, accent_of,
-};
-use ds::{Choice, Tracking};
-use ds_shell::{ModuleGrid, ModuleTile, MonthGrid, WidgetFrame, WidgetMetrics, WidgetSize};
+use ds::assembly::ds::Inject;
+use ds::components::controls::button_model::Answers;
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::segmented::Tracking;
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::prelude::*;
+use ds_shell::month_grid::data::DayKey;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::shape::{Corner, Radius};
 
 /// The colours an accent lends its surfaces, as CSS.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -144,18 +147,18 @@ pub fn Specimens(scheme: Scheme) -> Element {
     }
 }
 
-const TODAY: ds_shell::DayKey = ds_shell::DayKey {
+const TODAY: DayKey = DayKey {
     year: 2026,
     month: 8,
     day: 14,
 };
-const BUSY: [ds_shell::DayKey; 2] = [
-    ds_shell::DayKey {
+const BUSY: [DayKey; 2] = [
+    DayKey {
         year: 2026,
         month: 8,
         day: 5,
     },
-    ds_shell::DayKey {
+    DayKey {
         year: 2026,
         month: 8,
         day: 27,
@@ -201,7 +204,7 @@ fn Controls() -> Element {
                 span { class: "g-acc-sub", "Re: the accent band" }
             }
         }
-        ModuleGrid { padding: ds::Px(0.0),
+        ModuleGrid { padding: Px(0.0),
             ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {} }
             ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: Check::Off, onclick: |_| {} }
         }
@@ -231,7 +234,7 @@ fn Launcher(vars: String) -> Element {
                 placeholder: "Search apps",
                 query: "",
                 tokens: Vec::new(),
-                groups: vec![ds::PaletteGroup::list("Applications", rows)],
+                groups: vec![PaletteGroup::list("Applications", rows)],
                 empty: "Nothing matches.",
                 oninput: |_| {},
                 onpick: |_| {},

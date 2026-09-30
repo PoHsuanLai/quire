@@ -3,9 +3,11 @@
 //! is gone once the press ends.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, Icon, Material, ShortcutKey};
-use ds::{Bezel, ControlSize, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::prelude::*;
+use ds_core::press::PointerButton;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 
 const VIEW: Viewport = Viewport {
     width: 240,
@@ -44,7 +46,7 @@ fn a_secondary_button_does_not_press() {
     let mut harness = Harness::new(Page, VIEW);
     let at = harness.centre(".ds-button").expect("the icon button");
     harness.send(Input::pointer_move(at));
-    harness.send(Input::button_down(at, ds::PointerButton::Secondary));
+    harness.send(Input::button_down(at, PointerButton::Secondary));
     assert_eq!(pressed(&harness, ".ds-button"), None);
 }
 

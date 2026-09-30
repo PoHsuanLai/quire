@@ -2,11 +2,14 @@
 
 use crate::scoped::Scoped;
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Button, Common, DataAttr, DataName, DropState, ExtraClass, Icon, Outline,
-    Propagation, Row, RowLeading, RowState, Selection, Shown,
-};
-use ds::{Bezel, ControlSize, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::components::lists::row::row::Outline;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
 
 /// One state and its golden.
 pub struct Case {

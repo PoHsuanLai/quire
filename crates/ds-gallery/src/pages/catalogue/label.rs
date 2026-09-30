@@ -2,8 +2,9 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Availability, Label, LabelRole, LabelStyle, RunTone, TextLine, TextRun};
+use ds::components::content::label::{LabelRole, LabelStyle};
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
 
 /// The Label section.
 #[component]

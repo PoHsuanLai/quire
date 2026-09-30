@@ -29,7 +29,9 @@ use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _};
 use blitz_traits::events::UiEvent;
 use dioxus::prelude::*;
-use ds::{DropAcceptance, Point, Px};
+use ds::file_drop::drag::DropAcceptance;
+use ds::prelude::*;
+use ds_core::time::clock::VirtualClock;
 use std::time::{Duration, Instant};
 
 /// A headless document under test.
@@ -134,7 +136,7 @@ impl Harness {
 
     /// The virtual clock this harness's timers run on, if [`Clock::Virtual`]: for a settle check
     /// that needs to see every sleep still pending, not just poll the harness for silence.
-    pub(crate) fn virtual_clock(&self) -> Option<ds::VirtualClock> {
+    pub(crate) fn virtual_clock(&self) -> Option<VirtualClock> {
         self.time.virtual_clock()
     }
 
@@ -163,7 +165,7 @@ impl Harness {
     }
 
     /// Run `f` inside the app's runtime, as its handlers run: a test reads an app-facing handle
-    /// (`ds::EditHandle::caret_rect`) the way the app would.
+    /// (`ds::edit::handle::EditHandle::caret_rect`) the way the app would.
     pub fn within<T>(&mut self, f: impl FnOnce() -> T) -> T {
         self.doc.doc.vdom.in_runtime(f)
     }

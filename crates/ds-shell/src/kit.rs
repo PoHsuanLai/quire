@@ -1,10 +1,11 @@
 //! The shell's kit: its metric tokens and paints. Its component sheets are placed in the components section, each after the sheet it follows.
 
 use crate::sheets::SHEETS;
-use crate::tokens::{
-    control_center::ControlCenterSize, dock::DockToken, notifications::NotificationToken,
-    osd::OsdToken, widgets::WidgetGrid,
-};
+use crate::tokens::control_center::ControlCenterSize;
+use crate::tokens::dock::DockToken;
+use crate::tokens::notifications::NotificationToken;
+use crate::tokens::osd::OsdToken;
+use crate::tokens::widgets::WidgetGrid;
 use ds_style::css::document::placed;
 use ds_style::kit::{Kit, KitRank, Kits, Vocabulary};
 use ds_style::tokens::set::{Place, TokenSet};

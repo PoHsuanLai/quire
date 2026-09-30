@@ -2,7 +2,8 @@
 //! standing in for the icon files an icon theme lookup returns.
 
 use ds::icon::{IconStyle, Tint, retint};
-use ds::{ExternalIcon, IconSize, IconSource, IconUrl};
+use ds::prelude::*;
+use ds_style::icon::url::IconUrl;
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 

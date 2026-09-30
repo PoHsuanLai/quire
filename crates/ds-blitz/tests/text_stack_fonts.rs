@@ -2,7 +2,7 @@
 //! the stack `"Inter","Noto Color Emoji",system-ui,sans-serif` is laid out here through the font
 //! context shell-host builds for every surface (`shell_host::dom::fonts::SharedFonts::system`:
 //! `FontContext::new()` and Blitz's bullet face, nothing else) and through quire's own
-//! (`ds_blitz::font_context`, which registers `ds::FACES`).
+//! (`ds_blitz::font_context`, which registers `ds_style::fonts::FACES`).
 //!
 //! Under quire's context Inter is a family, maps every character of ordinary text, and the stack
 //! lays out exactly as `"Inter"` alone. Under shell-host's there is no family called Inter (it is

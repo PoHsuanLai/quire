@@ -10,12 +10,12 @@
 //! the bolt) and, under `Readout::Under`, the percentage in a `Label`.
 
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::label::{Label, LabelRole, LabelStyle};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState};
 use ds::components::content::text_runs::TextLine;
 use ds::components::controls::progress::model::{Progress, ProgressStyle, RingGap};
 use ds::components::controls::progress::view::ProgressIndicator;
-use ds::{BatteryPower, BatteryState};
+use ds::root::common::Common;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 

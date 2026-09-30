@@ -2,8 +2,9 @@
 //! wave, as data (design/26-DETAILS.md section 4.2; CHECKLIST 5b): every transition, including
 //! the ones that must not move.
 
-use ds::detail::{Moment, first_table, moment_table};
-use ds_shell::PromptState;
+use ds::detail::{first_table, moment_table};
+use ds::prelude::*;
+use ds_shell::lock::vocab::PromptState;
 
 #[test]
 fn a_lock_prompts_moments() {

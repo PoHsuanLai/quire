@@ -3,7 +3,7 @@
 //! `selected`, is brought to the nearest edge of the list, never centred.
 //!
 //! Blitz's own `scroll_into_view` scrolls the document's viewport only, never the list, so the
-//! host does it: [`GeometryHost::reveal`](crate::GeometryHost::reveal) reads the item's place in
+//! host does it: [`GeometryHost::reveal`](crate::host::parts::GeometryHost::reveal) reads the item's place in
 //! the list's layout and sets the list's scroll offset.
 
 use crate::host::document::use_document_host;

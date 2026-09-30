@@ -4,7 +4,7 @@
 //! once per crossing, at the pointer's point in the app's document.
 
 use dioxus::prelude::*;
-use ds::{Point, Px};
+use ds::prelude::*;
 use ds_blitz::{FrameLink, FrameLinkHover, FrameLinks, FrameTag, HoverPhase};
 use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};

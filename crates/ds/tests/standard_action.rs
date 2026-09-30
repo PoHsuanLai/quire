@@ -1,7 +1,8 @@
 //! The standard shortcut table (design/27-HIG-PARITY.md section 6.2): every combination is
 //! reserved once, drawn in the Mac's order, and refused to `Shortcut::custom`.
 
-use ds::{Reserved, Shortcut, ShortcutKey, SpaceNumber, StandardAction};
+use ds::prelude::*;
+use ds_core::standard_action::{Reserved, SpaceNumber, StandardAction};
 
 #[test]
 fn no_two_actions_share_a_combination() {

@@ -8,9 +8,13 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::Section;
 use crate::pages::shell::level_tile::work;
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{Appearance, Button, Ds, Icon, ImageSize, ImageSource, Inject, Material, Shown, Theme};
-use ds_shell::{NotificationSwipe, ShotGhost, ShotThumbnail, ThumbAction};
+use ds::assembly::ds::Inject;
+use ds::components::content::image_source::ImageSize;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
+use ds_shell::thumbs::shot_thumbnail::ThumbAction;
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 

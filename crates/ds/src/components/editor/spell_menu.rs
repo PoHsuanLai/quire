@@ -1,4 +1,4 @@
-//! The spelling menu and the marks' layer of an [`EditSurface`](crate::EditSurface)
+//! The spelling menu and the marks' layer of an [`EditSurface`](crate::components::editor::surface::EditSurface)
 //! (design/04-COMPONENTS.md section 50). A right-click, or the context-menu key with the caret
 //! on a marked word, opens quire's context [`Menu`] with up to five suggestions, then "Ignore
 //! Spelling" (this session) and "Learn Spelling" (the user's dictionary). A suggestion reaches
@@ -6,7 +6,8 @@
 
 use crate::components::editor::spell::{SpellCtx, draw, touch};
 use crate::components::menus::item::item::MenuItem;
-use crate::components::menus::menu::{menu::Menu, placement::MenuPlacement};
+use crate::components::menus::menu::menu::Menu;
+use crate::components::menus::menu::placement::MenuPlacement;
 use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
 use crate::spell::marks::{Misspelt, SpellReplace};

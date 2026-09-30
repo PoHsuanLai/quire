@@ -10,12 +10,14 @@ use crate::lock::picture::AT_POLKIT;
 use crate::lock::vocab::{CapsLock, LockUser, PromptState};
 use crate::user_picture::draw::drawn;
 use dioxus::prelude::*;
-use ds::Answers;
-use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
+use ds::components::controls::button_model::Answers;
+use ds::components::overlays::sheet::Sheet;
+use ds::components::overlays::sheet_attach::Attach;
+use ds::components::overlays::sheet_width::SheetWidth;
 use ds::components::overlays::tooltip::Tooltip;
-use ds::components::overlays::{sheet::Sheet, sheet_attach::Attach, sheet_width::SheetWidth};
+use ds::root::common::Common;
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
 
@@ -27,7 +29,7 @@ const AUTHENTICATE: &str = "Authentication Required";
 /// shows as a hover card on "Details". The password is a `Secret` field (no `value` prop, its
 /// text never in the markup): `oninput` hears it, Enter or Authenticate hands it to `onsubmit`,
 /// and Cancel, Escape or a click on the scrim call `oncancel`. `state` is the caller's, as for
-/// [`crate::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
+/// [`crate::lock::prompt::LockPrompt`]: `Checking` closes the field and the buttons but Cancel, `Wrong` shakes
 /// the field once and empties it, `LockedOut` says when it opens again. `shown` and `on_hidden`
 /// are the sheet's own, for a host that unmaps its surface after the exit. `common` is the
 /// sheet's: its `id` names the panel, for a host whose blur region resolves an element id.

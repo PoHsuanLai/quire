@@ -10,6 +10,9 @@ publish.workspace = true
 
 [dev-dependencies]
 ds = { workspace = true }
+ds-core = { workspace = true }
+ds-style = { workspace = true }
+ds-motion = { workspace = true }
 ds-shell = { workspace = true }
 ds-blitz = { workspace = true }
 ds-harness = { workspace = true }

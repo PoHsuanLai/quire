@@ -1,5 +1,5 @@
 //! A notification card's swipe to dismiss: whether the card takes one, and how its flight ends,
-//! over the swipe glue a toast shares (`ds::SwipeGlue`).
+//! over the swipe glue a toast shares (`ds::components::overlays::swipe_glue::SwipeGlue`).
 //!
 //! When a swipe ends past a threshold the card flies out to the right from where it is. Alone,
 //! it plays `panel-out` itself and reports `on_dismiss` at `settle(PanelOut)`, so a caller that
@@ -8,7 +8,7 @@
 //! the row slide out from that offset (the two transforms compose), then the rows below heal.
 
 use dioxus::prelude::*;
-use ds::{SwipeGlue, SwipeOn, use_swipe_glue};
+use ds::components::overlays::swipe_glue::{SwipeGlue, SwipeOn, use_swipe_glue};
 use ds_motion::anim::Anim;
 use ds_motion::swipe::SwipeMetrics;
 use ds_motion::timer::use_motion_timer;

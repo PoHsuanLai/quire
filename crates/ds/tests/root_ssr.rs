@@ -4,11 +4,13 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::{
-    Accent, Activity, Appearance, BlurState, Ds, FrameVars, HostSignals, Inject, InputModality,
-    Material, Motion, ReducedMotion, Scale, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds_core::vocab::{Activity, InputModality};
 use ds_lint::{LintConfig, Rule, markup};
+use ds_style::appearance::blur::BlurState;
+use ds_style::appearance::system::ReducedMotion;
+use ds_style::space::frame_vars::FrameVars;
 use std::collections::BTreeMap;
 
 #[derive(Props, Clone, PartialEq)]

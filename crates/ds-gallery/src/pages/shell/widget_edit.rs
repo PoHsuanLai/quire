@@ -9,15 +9,17 @@
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::assembly::ds::Inject;
+use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{
-    Appearance, Attach, Ds, Inject, Material, RootChrome, Sheet, Shown, SpaceLook, use_scope,
-};
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::BatteryWidget;
+use ds_shell::widget::calendar::MonthWidget;
+use ds_shell::widget::clock::WorldClockWidget;
+use ds_shell::widget::timeline::Timeline;
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
-use ds_shell::{
-    BatteryWidget, MonthWidget, Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost,
-    WidgetMetrics, WidgetSize, WorldClockWidget,
-};
 
 /// The desktop's grid: six columns of the 164 cell and 16 gap in the stage's 1120.
 const GRID: DesktopGrid = DesktopGrid {
@@ -44,8 +46,8 @@ fn opening() -> WidgetLayout {
 }
 
 /// The size `kind` takes in `host`, from quire's registry.
-fn size_of(kind: &ds_shell::WidgetKind, host: WidgetHost) -> WidgetSize {
-    ds_shell::WidgetRegistry::quire()
+fn size_of(kind: &WidgetKind, host: WidgetHost) -> WidgetSize {
+    WidgetRegistry::quire()
         .get(kind)
         .map(|info| info.size_in(host))
         .unwrap_or_default()

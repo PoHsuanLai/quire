@@ -8,11 +8,12 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Common, DataAttr, DataName, EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind, EditSurface, ExtraClass,
-    Point, Px, Rect, Size, Spell, SpellMarks,
-};
+use ds::components::editor::spell_menu::SpellMarks;
+use ds::host::position::{EDIT_KIND_ATTR, EDIT_NODE_ATTR, EditKind};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
+use ds::spell::lang::Spell;
 
 #[derive(Props, Clone)]
 struct HostProps {

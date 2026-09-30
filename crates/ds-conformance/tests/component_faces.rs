@@ -7,13 +7,14 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, Ds, Icon, Material, PRESETS, Point, Px, Rect, Scheme, SectionHeader,
-    SpaceLook, Theme,
-};
-use ds::{Bezel, ButtonRole, ControlSize};
+use ds::components::controls::button_model::{Bezel, ButtonRole};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Viewport};
-use ds_shell::{DotIndex, SpaceEditor};
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::control_size::ControlSize;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -97,7 +98,7 @@ fn look() -> SpaceLook {
     SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
         theme: Theme::System,
-        card_accent: ds::CardAccent::SpaceHue,
+        card_accent: CardAccent::SpaceHue,
     }
 }
 

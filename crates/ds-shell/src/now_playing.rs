@@ -2,15 +2,15 @@
 //! A new track cross-fades in over `--t-quick` (the old art and titles fade out over the
 //! new, which fade in); the same track restated plays nothing (R2); Reduced snaps (R7).
 
-pub(crate) mod kind;
+pub mod kind;
 pub(crate) mod track_position;
 
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
+use ds::root::common::Common;
 use ds_motion::detail::level::use_level;
 use ds_motion::{
     anim::Anim,

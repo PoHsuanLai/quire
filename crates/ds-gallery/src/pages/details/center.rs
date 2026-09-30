@@ -7,17 +7,17 @@ use crate::pages::Section;
 use crate::pages::details::center_rows::{DeviceRows, NetworkRows, OutputRows};
 use crate::pages::details::overview::{Cell, mini};
 use dioxus::prelude::*;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::controls::button_model::{Bezel, IconSwap, ImagePosition};
+use ds::components::controls::slider_model::SliderLook;
 use ds::detail::EventStamp;
-use ds::{
-    Availability, BatteryPower, BatteryState, Check, Fraction, Glyph, Icon, IconSize, LevelGlyph,
-    LowAt, Px, TextLine,
-};
-use ds::{Bezel, Button, ControlSize, IconSwap, ImagePosition};
-use ds::{Slider, SliderLook};
-use ds_shell::{
-    BatteryRing, ModuleGrid, ModulePanel, ModuleTile, NowPlayingTrack, Playback, Readout,
-    TrackPosition,
-};
+use ds::prelude::*;
+use ds_shell::battery::ring::Readout;
+use ds_shell::now_playing::kind::Playback;
+use ds_shell::prelude::*;
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 /// The section.

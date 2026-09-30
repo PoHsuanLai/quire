@@ -6,6 +6,7 @@
 //! check, reproduced directly against a minimal component instead of a whole check mark.
 
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
@@ -27,7 +28,7 @@ fn LongHold() -> Element {
     let mut fired = use_signal(|| false);
     use_hook(|| {
         spawn(async move {
-            ds::sleep(Duration::from_millis(900)).await;
+            sleep(Duration::from_millis(900)).await;
             fired.set(true);
         });
     });

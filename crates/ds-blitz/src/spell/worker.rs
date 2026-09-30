@@ -4,7 +4,8 @@
 
 use super::books::Books;
 use super::config::SpellConfig;
-use ds::{Lang, Learned};
+use ds::spell::lang::Lang;
+use ds::spell::service::Learned;
 use std::sync::mpsc::{Sender, channel};
 use tokio::sync::oneshot;
 

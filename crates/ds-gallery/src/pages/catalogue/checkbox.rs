@@ -2,8 +2,9 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Availability, Check, Checkbox, ControlSize};
+use ds::components::controls::checkbox::Checkbox;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The Checkbox section.
 #[component]

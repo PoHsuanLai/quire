@@ -2,7 +2,10 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{Check, Checkbox, Choice, ControlSize, TabView, Toggle};
+use ds::components::chrome::tab_view::TabView;
+use ds::components::controls::checkbox::Checkbox;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The TabView section.
 #[component]

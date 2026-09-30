@@ -9,7 +9,7 @@ use crate::widget::kind::{Lift, WidgetHost, WidgetSize};
 use crate::widget::timeline::{RefreshAsk, Timeline};
 use crate::widget::use_widget::use_widget;
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::vocab::Shown;
 use ds_motion::wake::WakeStamp;
 

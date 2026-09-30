@@ -5,11 +5,9 @@
 //! frames (R3).
 
 use dioxus::prelude::*;
-use ds::detail::{Detailed, Moment};
-use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Motion, PaletteGroup,
-    PaletteGroups, ShortcutKey,
-};
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
@@ -57,8 +55,8 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 /// Rows the Apps group gains with no action run (a query widening it).
 static WIDER: GlobalSignal<u8> = Signal::global(|| 0);
 
-fn item(value: u8, title: String) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title)
+fn item(value: u8, title: String) -> PaletteRow<u8> {
+    PaletteRow::new(value, title)
 }
 
 fn groups(list: List, wider: u8) -> PaletteGroups<u8> {

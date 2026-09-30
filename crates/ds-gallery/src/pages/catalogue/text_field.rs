@@ -3,12 +3,10 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
+use ds::components::fields::text_field_model::Invalid;
 use ds::detail::EventStamp;
-use ds::{
-    Availability, ControlSize, FieldBezel, FieldKind, Icon, IconView, Invalid, TextField, TextLine,
-    Validity,
-};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The TextField section.
 #[component]

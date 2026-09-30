@@ -8,10 +8,10 @@ use crate::lock::picture::AT_LOCK;
 use crate::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
 use crate::user_picture::draw::drawn;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
+use ds::root::common::Common;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_motion::detail::{

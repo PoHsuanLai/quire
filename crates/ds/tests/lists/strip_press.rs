@@ -4,7 +4,8 @@
 use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{ActionId, HoverStrip, Shown};
+use ds::components::app::hover_strip::{ActionId, HoverStrip};
+use ds::prelude::*;
 
 pub const STRIP_PRESS_CASES: &[Case] = &[Case {
     component: "hover_strip",

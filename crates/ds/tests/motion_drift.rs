@@ -3,8 +3,10 @@
 //! `transition` uses table tokens, and the token blocks resolve, level by level, to the values
 //! the Rust table gives `settle()` (design/05-MOTION.md section 7.1).
 
-use ds::Word;
-use ds::{Anim, DurationToken, EasingToken, MotionLevel, settle, stylesheet};
+use ds::prelude::*;
+use ds::stylesheet;
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::timing::DurationToken;
 use std::collections::BTreeMap;
 use std::time::Duration;
 

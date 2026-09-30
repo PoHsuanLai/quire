@@ -8,9 +8,11 @@
 use crate::axes::{Axes, Showcase};
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Bezel;
-use ds::{Appearance, Button, Ds, Icon, IconSource, Inject, List, ListItem, Material, Shown};
-use ds_shell::{AppMark, GroupHeader, NotificationCard};
+use ds::assembly::ds::Inject;
+use ds::components::controls::button_model::Bezel;
+use ds::prelude::*;
+use ds_shell::notifications::parts::AppMark;
+use ds_shell::prelude::*;
 
 /// An app's group.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

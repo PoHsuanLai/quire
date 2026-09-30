@@ -2,7 +2,7 @@
 //! design/13-BEHAVIOUR-menus-windows.md section 13.3.11): a titlebar across the top that moves
 //! the window when dragged and zooms it on a double-click, the three traffic lights at its start
 //! (`traffic_lights`), and grab zones along every edge that resize it (`resize_edges`). Every
-//! request goes to the host's [`HostWindow`](crate::HostWindow); without one the frame draws and
+//! request goes to the host's [`HostWindow`](crate::window::host::HostWindow); without one the frame draws and
 //! does nothing.
 //!
 //! `Ds { window: WindowFrame::Titlebar { .. } }` draws it: the root becomes a column of the
@@ -14,11 +14,9 @@ use crate::components::chrome::titlebar_parts::TitleParts;
 use crate::components::chrome::traffic_lights::{TilePose, TrafficLightGroup};
 use crate::root::common::Common;
 use crate::window::grab::{Grab, GrabEffect};
-use crate::window::{
-    host::{WindowHost, use_window_host, use_window_state},
-    timing::FrameTiming,
-    vocab::Zoom,
-};
+use crate::window::host::{WindowHost, use_window_host, use_window_state};
+use crate::window::timing::FrameTiming;
+use crate::window::vocab::Zoom;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};

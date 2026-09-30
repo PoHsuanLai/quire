@@ -9,18 +9,17 @@ use crate::pages::content::app_icons::{APPS, app_icon};
 use crate::pages::{Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::Alpha;
-use ds::ImagePosition;
-use ds::{
-    Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
-    Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuItem,
-    MenuPlacement, PaletteGroup, PaletteRow, PlateFamily, Point, Px, RootChrome, RowLeading,
-    Scheme, Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, use_scope,
-};
-use ds_shell::{
-    DockFloor, DockFloorSetting, DockLabel, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
-    WorkspacePills,
-};
+use ds::assembly::ds::Inject;
+use ds::components::controls::button_model::ImagePosition;
+use ds::components::controls::level_indicator::LevelStyle;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_shell::tokens::dock::{DockFloorSetting, DockMetrics};
+use ds_style::icon::family::PlateFamily;
+use ds_style::material::stack::MaterialStack;
+use ds_style::tokens::shape::Corner;
 
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is
 /// the material's own (a Popover root is transparent and its cards paint), unlike `Scope`'s.
@@ -139,7 +138,7 @@ fn MenuBarSection() -> Element {
                 }
                 Root { material: Material::Popover, style: "height:250px",
                     if showcase == Showcase::Posed {
-                        ds::Menu::<u8> {
+                        Menu::<u8> {
                             placement: MenuPlacement::Bar,
                             anchor: Anchor::Point(MENU_AT),
                             items: menu_entries(),
@@ -205,7 +204,7 @@ fn OsdSection() -> Element {
             div { class: "g-row g-row-top",
                 for scheme in [Scheme::Light, Scheme::Dark] {
                     for state in [STATES[1], STATES[4]] {
-                        LevelTile { style: ds::LevelStyle::Continuous, scheme, ground: Ground::Work, state }
+                        LevelTile { style: LevelStyle::Continuous, scheme, ground: Ground::Work, state }
                     }
                 }
             }

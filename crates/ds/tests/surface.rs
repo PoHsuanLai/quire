@@ -8,8 +8,9 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Accent, Appearance, BlurState, Corner, Ds, Material, Radius, Scheme, Surface, use_scope};
+use ds::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::tokens::shape::{Corner, Radius};
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {

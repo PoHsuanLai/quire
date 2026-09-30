@@ -3,8 +3,8 @@
 //! `--dock-dot-gap`, `--dock-floor`) its `DockMetrics` writes.
 
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::overlays::tooltip::{Hint, HintSide};
+use ds::root::common::Common;
 use ds_core::vocab::Shown;
 use ds_motion::hover_intent::HoverProfile;
 

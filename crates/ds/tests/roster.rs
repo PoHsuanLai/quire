@@ -2,7 +2,9 @@
 //! An inserted row enters, a removed one leaves by `row-out` and is dropped when the exit settles,
 //! and the rows below heal by the heights the dropped rows measured.
 
-use ds::{Exit, Heal, Presence, Px, RosterState, RowPitch, StayError, Stayed};
+use ds::prelude::*;
+use ds_motion::presence::{Exit, Presence};
+use ds_motion::roster::{Heal, RosterState, RowPitch, StayError, Stayed};
 
 const PITCH: RowPitch = RowPitch(Px(79.0));
 
@@ -129,10 +131,13 @@ mod hook {
     use super::{Life, PITCH};
     use dioxus::core::{NoOpMutations, VirtualDom};
     use dioxus::prelude::*;
-    use ds::{
-        Accent, Activity, BlurState, Exit, InputModality, LeaveBy, Material, MotionLevel, Resolved,
-        Roster, RosterSpec, Scheme, Scope, use_roster,
-    };
+    use ds::prelude::*;
+    use ds_core::vocab::{Activity, InputModality};
+    use ds_motion::presence::Exit;
+    use ds_motion::use_roster::{LeaveBy, Roster, RosterSpec, use_roster};
+    use ds_style::appearance::blur::BlurState;
+    use ds_style::appearance::resolve::Resolved;
+    use ds_style::scope::Scope;
     use std::cell::Cell;
     use std::future::Future;
     use std::pin::pin;

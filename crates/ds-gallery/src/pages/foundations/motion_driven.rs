@@ -6,16 +6,20 @@ use crate::axes::Axes;
 use crate::pages::Section;
 use crate::pages::details::overview::{Cell, mini};
 use dioxus::prelude::*;
-use ds::Choice;
-use ds::Tracking;
+use ds::assembly::ds::Inject;
+use ds::components::controls::segmented::Tracking;
+use ds::components::lists::preview::switcher::PaneSwitcher;
+use ds::components::overlays::sheet_attach::Attach;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
-use ds::{
-    Appearance, Attach, Check, Ds, Fraction, Icon, IconSource, Inject, Material, Pane,
-    PaneSwitcher, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, Shown, SidePanel,
-    Slider, Toggle,
-};
-use ds_shell::{AppKey, AppMark, AppSwitcher, NotificationCard, NotificationSwipe, SwitcherApp};
+use ds::prelude::*;
+use ds_core::time::clock::sleep;
+use ds_motion::pane_slide::Pane;
+use ds_shell::notifications::parts::AppMark;
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
+use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
+use ds_style::icon::family::PlateFamily;
 
 /// The section on the Motion page.
 #[component]
@@ -284,7 +288,7 @@ fn nudge(drag: DragReturn) {
         y: Px(-24.0),
     });
     spawn(async move {
-        ds::sleep(std::time::Duration::from_millis(120)).await;
+        sleep(std::time::Duration::from_millis(120)).await;
         drag.home(Touch::Remote, Release::default());
     });
 }

@@ -2,8 +2,10 @@
 //! (live, disabled with the tile, absent, open).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Availability, Check, Ds, Icon, Inject, Material, Shown, Theme};
-use ds_shell::{ModuleTile, TileSpan};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds_shell::control_center::module_tile_kind::TileSpan;
+use ds_shell::prelude::*;
 
 /// One tile specimen.
 #[derive(Props, Clone, PartialEq)]

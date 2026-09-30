@@ -3,12 +3,14 @@
 
 use crate::pages::details::overview::{Cell, mini};
 use dioxus::prelude::*;
-use ds::ImagePosition;
-use ds::{
-    BatteryPower, BatteryState, BluetoothState, Fraction, LowAt, StatusMetrics, StatusState,
-    VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
-};
-use ds_shell::MenuBarItem;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::content::status::bluetooth_state::BluetoothState;
+use ds::components::content::status::volume::{VolumeState, VolumeWaves};
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
+use ds::components::controls::button_model::ImagePosition;
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_style::tokens::status::StatusMetrics;
 
 /// One status item, labelled with its state's words.
 #[component]

@@ -9,9 +9,9 @@
 //! 1.3: no spring). Its content is a list of [`HoverCardPart`]s (the section's blocks as data),
 //! then any children.
 
-pub(crate) mod intent;
-pub(crate) mod parts;
-pub(crate) mod target;
+pub mod intent;
+pub mod parts;
+pub mod target;
 
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style, use_float};

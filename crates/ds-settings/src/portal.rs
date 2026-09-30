@@ -1,9 +1,9 @@
 //! The desktop's preferences from the settings portal:
 //! `org.freedesktop.portal.Settings.ReadAll(["org.freedesktop.appearance"])` and
-//! `SettingChanged`, mapped to [`ds::SystemPrefs`]. The mappings are pure tables, tested
+//! `SettingChanged`, mapped to [`ds::prelude::SystemPrefs`]. The mappings are pure tables, tested
 //! against a fake `ReadAll`/`SettingChanged` payload with no bus involved; only
 //! [`SystemPrefsSource::Portal`] touches `zbus`, and only on Linux — a desktop without the portal, or a
-//! build for a platform that has none, simply answers [`ds::SystemPrefs::default`].
+//! build for a platform that has none, simply answers [`ds::prelude::SystemPrefs::default`].
 
 use crate::latest::{self, Receiver};
 use ds_core::spawner::Spawner;

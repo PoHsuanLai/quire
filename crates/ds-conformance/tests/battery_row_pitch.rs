@@ -4,14 +4,14 @@
 //! each place left over, so two batteries never spread to the card's ends with the middle empty.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, Motion, RootChrome,
-};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, Device, Timeline, WidgetCard, WidgetMetrics,
-    WidgetSize,
-};
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::{BatteryCell, BatteryEntry, BatteryWidget};
+use ds_shell::widget::timeline::Timeline;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -7,7 +7,9 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey, Shown};
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Layout, Query, Viewport};
 use image::RgbaImage;
 use probe::rect;
@@ -23,12 +25,12 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title.to_string())
+fn item(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title.to_string())
 }
 
-fn groups() -> Vec<ds::PaletteGroup<u8>> {
-    vec![ds::PaletteGroup::list(
+fn groups() -> Vec<PaletteGroup<u8>> {
+    vec![PaletteGroup::list(
         "Applications",
         vec![item(1, "Files"), item(2, "Firefox"), item(3, "Terminal")],
     )]
@@ -283,13 +285,13 @@ fn differing(a: &RgbaImage, b: &RgbaImage, area: Rect) -> usize {
 /// Where the card's container is: the card starts at its corner and spans its width, as tall as
 /// its content.
 const CARD: Rect = Rect {
-    origin: ds::Point {
-        x: ds::Px(20.0),
-        y: ds::Px(20.0),
+    origin: Point {
+        x: Px(20.0),
+        y: Px(20.0),
     },
-    size: ds::Size {
-        width: ds::Px(560.0),
-        height: ds::Px(360.0),
+    size: Size {
+        width: Px(560.0),
+        height: Px(360.0),
     },
 };
 

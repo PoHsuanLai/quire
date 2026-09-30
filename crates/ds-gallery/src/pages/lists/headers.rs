@@ -3,7 +3,9 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Availability, ControlSize, Disclosure, SectionHeader, Selection, Shown};
+use ds::components::controls::disclosure::Disclosure;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The headers and the disclosures.
 #[component]

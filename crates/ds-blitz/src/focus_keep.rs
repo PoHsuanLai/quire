@@ -7,7 +7,7 @@
 //! each settled frame (the harness) or window event (the window, before the document hears the
 //! event), and when the element it last saw focused is gone and the focus is nowhere, focuses
 //! the nearest focusable ancestor that element had, remembered while it was there (Blitz severs
-//! a removed node from its parent). A surface a component registered through `ds::HandBack`
+//! a removed node from its parent). A surface a component registered through `ds::host::hand_back::HandBack`
 //! (a floating menu's panel, whose own ancestors are the overlay layer) gives it to the element
 //! it named first (the menu's anchor). After those, the element focused before the removed one
 //! and then the element under the pointer when the keyboard moved to it (the button whose press
@@ -60,7 +60,7 @@ pub struct FocusKeeper {
     /// The candidates of the element focused before the last one, then those under the pointer
     /// when the focus moved.
     before: Candidates,
-    /// Surfaces that give the keyboard back to a named element (`ds::HandBack`).
+    /// Surfaces that give the keyboard back to a named element (`ds::host::hand_back::HandBack`).
     returns: Vec<HandBack>,
 }
 
@@ -184,10 +184,10 @@ pub enum Kept {
     Still,
 }
 
-/// The `ds::HandBack` that records into `keeper`. A registration made while the keeper is
+/// The `ds::host::hand_back::HandBack` that records into `keeper`. A registration made while the keeper is
 /// busy looking is dropped; the keeper's own fallbacks still apply.
-pub(crate) fn hand_back_seam(keeper: Rc<RefCell<FocusKeeper>>) -> ds::HandBack {
-    ds::HandBack::recording(Rc::new(
+pub(crate) fn hand_back_seam(keeper: Rc<RefCell<FocusKeeper>>) -> ds::host::hand_back::HandBack {
+    ds::host::hand_back::HandBack::recording(Rc::new(
         move |surface: &MountedData, opener: &MountedData| {
             if let (Some(surface), Some(opener), Ok(mut keeper)) = (
                 NodeRef::of(surface),

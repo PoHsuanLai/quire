@@ -1,5 +1,5 @@
 //! The host's side of a file drag: the targets the app registered, the drag the host feeds in,
-//! and the host's own hit test through the document ([`FileDropHost`](crate::FileDropHost)).
+//! and the host's own hit test through the document ([`FileDropHost`](crate::host::parts::FileDropHost)).
 
 use crate::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop};
 use crate::file_drop::track::{DragTrack, Over, Step, TargetView, acceptance, step, target_view};
@@ -12,9 +12,9 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 /// The file drags of one window, provided as root context by whatever feeds them (`launch`'s
-/// window and the harness): every mounted [`use_file_drop`](crate::use_file_drop) target enters
+/// window and the harness): every mounted [`use_file_drop`](crate::file_drop::hook::use_file_drop) target enters
 /// it, and the host feeds it the drag as the platform reports it, finding targets through its
-/// [`FileDropHost`](crate::FileDropHost).
+/// [`FileDropHost`](crate::host::parts::FileDropHost).
 #[derive(Clone)]
 pub struct FileDropBoard {
     board: Rc<RefCell<Board>>,

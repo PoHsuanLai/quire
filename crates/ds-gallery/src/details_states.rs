@@ -1,7 +1,8 @@
 //! The demo states the Details page and its frames play, each with its own `Detailed` table
 //! written as an exhaustive match (design/26-DETAILS.md section 4.2).
 
-use ds::detail::{Detailed, EventStamp, Moment};
+use ds::detail::EventStamp;
+use ds::prelude::*;
 
 /// A Wi-Fi item's state.
 #[derive(Debug, Clone, PartialEq)]
@@ -43,7 +44,8 @@ impl Detailed for Net {
 #[cfg(test)]
 mod tests {
     use super::Net;
-    use ds::detail::{EventStamp, Moment, moment_table};
+    use ds::detail::{EventStamp, moment_table};
+    use ds::prelude::*;
 
     #[test]
     fn the_demo_tables() {
