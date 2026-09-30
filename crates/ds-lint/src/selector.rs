@@ -1,5 +1,5 @@
 //! Rules that look at a qualified rule's selector prelude, not its declarations:
-//! [`Rule::RootSelector`], [`Rule::DsInternals`], [`Rule::UnprefixedAttributeSelector`],
+//! [`Rule::RootSelector`], [`Rule::DsInternals`],
 //! [`Rule::FocusPseudoClass`], and the "does this selector reach into an SVG's children"
 //! question [`Rule::SvgPaintInCss`] asks about a `stroke`/`fill` declaration.
 
@@ -45,7 +45,6 @@ pub fn offences(prelude: &[Located]) -> Vec<Offence> {
     let mut out = Vec::new();
     root_selector(prelude, &mut out);
     ds_internals(prelude, &mut out);
-    unprefixed_attribute(prelude, &mut out);
     focus_pseudo(prelude, &mut out);
     let selector = render(kind::trim_trivia(prelude));
     for offence in &mut out {
@@ -129,30 +128,6 @@ fn ds_internals(prelude: &[Located], out: &mut Vec<Offence>) {
                     text: format!("[{}]", name.text),
                 });
             }
-        }
-    }
-}
-
-fn unprefixed_attribute(prelude: &[Located], out: &mut Vec<Offence>) {
-    for (index, token) in prelude.iter().enumerate() {
-        if token.text != "[" {
-            continue;
-        }
-        let Some((name, prefixed)) = attribute_name(prelude, index) else {
-            continue;
-        };
-        if prefixed {
-            continue;
-        }
-        let lower = name.text.to_ascii_lowercase();
-        if lower.starts_with("data-") || lower.starts_with("aria-") {
-            out.push(Offence {
-                rule: Rule::UnprefixedAttributeSelector,
-                selector: String::new(),
-                line: token.line,
-                column: token.column,
-                text: format!("[{}]", name.text),
-            });
         }
     }
 }

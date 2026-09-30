@@ -48,9 +48,10 @@ pub enum Rule {
     /// `backdrop-filter`, `mix-blend-mode`, `position: sticky`, `text-overflow`, `line-clamp`,
     /// `text-shadow`, `scroll-behavior: smooth` (design/11-BEHAVIOUR-scroll.md#11-3-1-ownership).
     BlitzUnsupported,
-    /// An attribute selector without the `*|` namespace: `[data-theme=dark]` never matches on
-    /// Blitz, `[*|data-theme=dark]` matches there and in browsers (spike S2).
-    UnprefixedAttributeSelector,
+    /// A `@layer` naming `ds` (`@layer ds { ... }`, `@layer ds, x;`, `@layer ds.x`): that layer
+    /// is the design system's own, opened by its stylesheet. A consumer's sheets go in `app`
+    /// (`ds_style::css::layers::app`).
+    LayerDs,
     /// `:focus-visible` or `:focus-within`, hard-coded false in blitz-dom (spike S12). Focus
     /// rings are `.ds[*|data-modality=keyboard] :focus`.
     FocusPseudoClass,
@@ -116,7 +117,7 @@ impl Rule {
         Rule::UndeclaredVar,
         Rule::Important,
         Rule::BlitzUnsupported,
-        Rule::UnprefixedAttributeSelector,
+        Rule::LayerDs,
         Rule::FocusPseudoClass,
         Rule::SvgPaintInCss,
         Rule::UnstyledClass,

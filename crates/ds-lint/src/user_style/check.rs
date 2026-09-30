@@ -56,17 +56,10 @@ fn selector_notes(selector: &[Located], known: &KnownNames, out: &mut Vec<UserSt
         } else if token.text.starts_with('#') && token.text.len() > 1 {
             out.push(note(token, internal(token.text.clone())));
         } else if token.text == "["
-            && let Some((name, prefixed)) = attribute_name(selector, index)
+            && let Some((name, _prefixed)) = attribute_name(selector, index)
+            && !public_attribute(&name.text, known)
         {
-            let written = format!("[{}]", name.text);
-            if !public_attribute(&name.text, known) {
-                out.push(note(token, internal(written)));
-            } else if !prefixed {
-                out.push(note(
-                    token,
-                    UserStyleNoteKind::UnprefixedAttribute { selector: written },
-                ));
-            }
+            out.push(note(token, internal(format!("[{}]", name.text))));
         }
     }
 }

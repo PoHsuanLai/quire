@@ -41,7 +41,7 @@ fn cases() -> Vec<Case> {
         ),
         case(
             "a surface, a component root, its part and an axis are public",
-            "[*|data-surface=bar] .ds-slider-thumb, .ds-button[*|data-variant=primary] { color: red }",
+            "[data-surface=bar] .ds-slider-thumb, .ds-button[data-variant=primary] { color: red }",
             vec![],
         ),
         case(
@@ -82,16 +82,6 @@ fn cases() -> Vec<Case> {
                 (2, internal("#main")),
                 (3, internal("[data-theme]")),
             ],
-        ),
-        case(
-            "a public attribute without the namespace never matches on Blitz",
-            "[data-surface=bar] { color: red }",
-            vec![(
-                1,
-                UnprefixedAttribute {
-                    selector: "[data-surface]".to_owned(),
-                },
-            )],
         ),
         case(
             "important is noted and the rule still stands",
