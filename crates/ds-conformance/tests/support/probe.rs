@@ -1,3 +1,24 @@
+//! How a driven test is written, and how one written against the old per-input `Harness`
+//! methods converts (the traits are `ds_harness::{Driver, Input, Query}`; import the ones a file
+//! uses):
+//!
+//! | old | now |
+//! |---|---|
+//! | `Harness::new(app, vp)`, `Harness::with_config(app, config)` | `Harness::new(app, vp)`, `Harness::new(app, config)` (a bare `Viewport` is a config) |
+//! | `Harness::with_contexts(app, vp, ctx)` | `Harness::new(app, HarnessConfig::new(vp).with_contexts(ctx))` |
+//! | `Harness::unmapped(app, vp)` | `Harness::new(app, HarnessConfig::new(vp).with_layout(Layout::Held))` |
+//! | `Harness::try_with_config(app, config)` | `Harness::try_new(app, config)` |
+//! | `h.click(p)`, `h.press(p, b)`, `h.pointer_move(p)`, `h.pointer_down(p)`, `h.pointer_up(p)`, `h.button_down(p, b)`, `h.button_up(p, b)`, `h.drag(a, b, n)` | `h.send(Input::click(p))`, `Input::press(p, b)`, `Input::pointer_move(p)`, `Input::pointer_down(p)`, `Input::pointer_up(p)`, `Input::button_down(p, b)`, `Input::button_up(p, b)`, `Input::drag(a, b, n)` |
+//! | `h.key(k)`, `h.chord(&[held], k)`, `h.wheel(p, dx, dy)` | `h.send(Input::key(k))`, `Input::chord(&[held], k)`, `Input::wheel(p, dx, dy)` |
+//! | `h.ime_start()`, `ime_update(t, c)`, `ime_commit(t)`, `ime_end()`, `h.paste_html(html, text)` | `h.send(Input::ime_start())`, `Input::ime_update(t, c)`, `Input::ime_commit(t)`, `Input::ime_end()`, `Input::paste(html, text)` |
+//! | `h.file_drag(step)` (returned the answer) | `h.send(Input::FileDrag(step))`, then `h.drop_answer()` |
+//! | `h.pointer_move_with(p, mods)`, `button_down_with`, `button_up_with`, `click_with` | `h.send(Input::Pointer(PointerInput::new(p, action).with_mods(mods)))` |
+//! | `h.is_focused(sel)` | `h.focus_of(sel) == FocusState::Focused` (or `assert_eq!` against it) |
+//! | `h.has_class(sel, c)` | `h.has_class(sel, c) == ClassPresence::Present` |
+//! | `h.advance(d)`, `h.render()` | unchanged, from `Driver` |
+//! | `h.rect`, `text_of`, `attr`, `count`, `ink_of`, `fill_of` | unchanged, from `Query` |
+//! | `ds_blitz::NativeError` | `ds_harness::HarnessError` |
+//!
 //! Probes shared by the headless tests: a laid-out rect, the pixels inside it, and how far
 //! they stand out from their own ground. Each test crate uses some of them.
 

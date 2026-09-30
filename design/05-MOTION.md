@@ -680,7 +680,7 @@ the fill is driven from Rust (`ds::use_level_run`, as the animated emoji drives 
 each new `WakeStamp` the arc sweeps from empty to the level over `--t-fill` (800 ms, a new token)
 at `--e-out`; on a new level, from the level drawn last. The path is recomputed on a 16 ms tick
 and written only when it changes; the task ends when the sweep and its tail are done, so a ring
-at rest re-renders nothing and paints 0 frames (tested in `ds-native/tests/battery_fill.rs`
+at rest re-renders nothing and paints 0 frames (tested in `ds-conformance/tests/battery_fill.rs`
 with `Harness::is_animating`). Its tail: a charging bolt fades in over `--t-quick`, linear,
 after an entrance fill. `BatteryFigure` counts the percentage in step. Under Reduced there is no
 sweep at all (not a 60 ms one): the first frame is the final state. This replaces the ring's

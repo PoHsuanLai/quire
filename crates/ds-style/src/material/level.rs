@@ -48,7 +48,7 @@ pub(crate) struct LevelInks {
 /// brighter of the two on the light tint: at .10 the fill stood off the well by only 1.37:1 on
 /// the control center's module plate (1.55 on the paper, 1.64 over the Work tint); .18 holds it
 /// at 1.6:1 or more on all three (1.66, 1.85, 1.93;
-/// `ds-blitz/tests/level_contrast.rs`); dark: a white fill over a white .14 well on the dark
+/// `ds-conformance/tests/level_contrast.rs`); dark: a white fill over a white .14 well on the dark
 /// tint. The glyph on the fill is a dark ink in both, which is what makes it read as knocked out.
 pub(crate) fn inks(scheme: Scheme) -> LevelInks {
     match scheme {

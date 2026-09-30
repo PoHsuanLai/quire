@@ -74,6 +74,7 @@ EDGES=(
   "ds-blitz: blitz-kit ds anyrender_pdfrum"
   "ds-harness: blitz-kit ds ds-blitz"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
+  "ds-conformance:"
   "icons: ds ds-settings"
   "anyrender_pdfrum:"
 )
@@ -88,6 +89,25 @@ for edge in "${EDGES[@]}"; do
     fail=1
   else
     echo "edges hold: $crate depends on [${found% }]"
+  fi
+done
+
+# ds-conformance is test-only: no normal or build edge at all (the EDGES row above), and its
+# dev-dependencies are the crates it tests through, never the lower crates directly.
+DEV_EDGES=(
+  "ds-conformance: ds ds-shell ds-lint ds-settings ds-blitz ds-harness"
+)
+for edge in "${DEV_EDGES[@]}"; do
+  crate="${edge%%:*}"
+  read -r -a allowed <<<"${edge#*:}"
+  found=$(cargo tree -p "$crate" --depth 1 -e dev --prefix none --all-features 2>/dev/null \
+    | grep '(/' | awk '{print $1}' | grep -vx "$crate" | sort -u)
+  outside=$(comm -23 <(printf '%s\n' "$found") <(printf '%s\n' "${allowed[@]}" | sort -u))
+  if [ -n "$outside" ]; then
+    echo "DEV EDGE: $crate dev-depends on [$(echo $outside)], the table allows [${allowed[*]}]"
+    fail=1
+  else
+    echo "dev edges hold: $crate dev-depends on [$(echo $found)]"
   fi
 done
 

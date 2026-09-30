@@ -137,7 +137,7 @@ rim and highlight are `--hair`.
   `[data-kind=image]` with the URL as `background-image`, `background-size:100% 100%`. Both are
   squares of `--ic-size` (the `ExternalIcon`'s size). Proved on Blitz with a PNG mask (the
   opaque pixels take `--ink`, the transparent ones show the ground) and an RGB PNG (keeps its
-  red), `crates/ds-native/tests/tray_gaps.rs`. Step 3 (`--warn` for `NeedsAttention`) stays
+  red), `crates/ds-conformance/tests/tray_menu.rs`. Step 3 (`--warn` for `NeedsAttention`) stays
   the caller's: it sets the colour of the icon's parent.
 - Settled (bar gaps): step 2's test is `ds::icon::classify(png_bytes) -> Result<IconKind::{Symbolic,
   Image}, DsError>`: symbolic when every pixel with alpha >= 128 has OKLCH chroma below the

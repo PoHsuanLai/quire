@@ -71,7 +71,7 @@ Upstream (pinned around; re-check at every toolchain bump):
 - **`get_client_rect` borrows the document mutably** when a shared borrow would do, which is why
   rect reads can collide with the renderer ("Bar gaps"). Upstream report material.
 - **Hit test in an inline formatting context** returns the parent, not an atomic inline
-  (`inline-flex`) Button ("Polish pass"). `crates/ds-native/tests/click.rs` keeps the failing
+  (`inline-flex`) Button ("Polish pass"). `crates/ds-conformance/tests/button_click.rs` keeps the failing
   shape as an ignored reproduction for an upstream report.
 - **Paint and hit order of `z-index: auto` positioned boxes** is ranked per parent, not across
   the stacking context as CSS 2.1 Appendix E step 8 says ("Hit testing"). The fix (hoist them
@@ -217,7 +217,7 @@ Not built, or limited, in quire:
 
 Each case was rendered headlessly at 400 x 300 on anyrender_vello_cpu (S15 and S16 also on
 anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` and
-`handle_ui_event`. The gallery's Gaps page restates the table.
+`handle_ui_event`. The gallery's Blitz limits page restates the table.
 
 | id | question | result |
 |----|----------|--------|
@@ -297,7 +297,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 
 ## CSS `filter`
 
-Measured by `ds-native/tests/css_filter.rs`: one swatch per function, and per filter list, beside an
+Measured by `ds-blitz/tests/css_filter.rs`: one swatch per function, and per filter list, beside an
 unfiltered control, read back from the pixels of each backend (the hybrid cases skip where no GPU
 adapter opens).
 
@@ -337,7 +337,7 @@ adapter opens).
 
 - `conic-gradient(from calc(var(--a) * 2) at 25% 70%, ...)` with transparent stops paints and
   turns with the variable; `mask-image: radial-gradient(...)` masks; several layered conics under
-  `border-radius` clip to the circle (`ds-native/tests/voice_orb.rs`).
+  `border-radius` clip to the circle (`ds-conformance/tests/voice_orb.rs`).
 - `@property --angle` with `@keyframes { to { --angle: 360deg } }` animates a conic gradient on the
   headless harness exactly as a `rotate()` keyframe does (`registered_property_animation.rs`); not
   measured in a window. The voice orb drives its turn from Rust regardless (design/30 `VoiceOrb`).
@@ -827,7 +827,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   Button alone, beside a placeholder, or beside inline text) the parent is an inline formatting
   context, and blitz-dom's `Node::hit` returns the parent, so the click goes to the parent. A
   block sibling or a flex parent gives the Button its own box. Every quire container is a flex
-  row; a consumer puts a lone button in one. `crates/ds-native/tests/click.rs` pins both working
+  row; a consumer puts a lone button in one. `crates/ds-conformance/tests/button_click.rs` pins both working
   shapes and keeps the failing one ignored.
 
 ### Hover under a resting pointer
@@ -1043,7 +1043,7 @@ What Blitz at the pinned rev paints (48 px, headless):
 | Noto Emoji (monochrome), named | monochrome outlines | |
 
 - **COLRv1 needs no change in quire**: glifo interprets the paint graphs (layers, gradients,
-  clips) on either backend. `tests/colour_emoji.rs` keeps it as a regression test (skipped where
+  clips) on either backend. `ds-blitz/tests/colour_emoji.rs` keeps it as a regression test (skipped where
   the font is not installed).
 - **CBDT must stay off.** glifo decodes CBDT only with its `png` feature (anyrender_vello_cpu
   turns vello_cpu's defaults off); turning it on crashes the window renderer on the first bitmap
@@ -1055,7 +1055,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   nothing for "2#". `--font-emoji` (`"Inter","Noto Color Emoji",system-ui,sans-serif`) and
   `.ds-emoji-text` are for emoji content only (the emoji grid, the preview glyph); the text
   stacks name no emoji face while shell-host lacks quire's faces (Open items).
-  `tests/text_stack_fonts.rs` lays the stack out under both font contexts: under shell-host's,
+  `ds-blitz/tests/text_stack_fonts.rs` lays the stack out under both font contexts: under shell-host's,
   "00:22" is 84 px against 45 for Inter and 41 for system-ui.
 - **For an emoji grid**: COLRv1 by name for the whole set; AnimatedEmoji's still first frames
   (`EmojiPlayback::Still`) where a cell must match the picture it becomes; pre-rendered sprite

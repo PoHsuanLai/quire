@@ -1,6 +1,6 @@
 //! The edit surface's markup (FINDINGS "Edit surface"), rendered through dioxus-ssr and compared
 //! with goldens under `controls/edit_surface/`, so the controls' class scan covers it. The
-//! surface's behaviour needs a document and is proved in `ds-blitz/tests/native_edit.rs`.
+//! surface's behaviour needs a document and is proved in `ds-blitz/tests/edit_surface.rs`.
 //!
 //! `DS_BLESS=1 cargo test -p ds --test edit_surface_ssr` rewrites these goldens.
 

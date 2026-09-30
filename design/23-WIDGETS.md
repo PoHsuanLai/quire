@@ -662,7 +662,7 @@ pub struct WidgetContext<I> { pub size: WidgetSize, pub host: WidgetHost, pub wa
   with a timeline already due cannot spin the host. It wakes for nothing else: a pushed widget
   costs no frame between pushes (the idle-frame rule). A new timeline (by value) replaces the
   old at once; an equal one passed again changes nothing. Proven on the virtual clock
-  (`ds-native/tests/widget_timeline.rs`).
+  (`ds-conformance/tests/widget_timeline.rs`).
 - **A size a widget does not draw** is never asked of it: `fit::<W>(size)` holds it to the first
   of `W::sizes()`.
 
@@ -805,14 +805,14 @@ use, no frame-accurate recording found).
   (`--line` fill and hairline) in the card's corner, faded in (`a-fade`) as the drag reaches the
   cell, `aria-hidden`. The host places it at the snap cell; quire draws it.
 
-Both settle to zero frames (`ds-native/tests/widget_edit.rs`, on the virtual clock).
+Both settle to zero frames (`ds-conformance/tests/widget_edit.rs`, on the virtual clock).
 
 **Leaving (sill G423, 2026-09-28).** A desktop widget removed in Edit Widgets used to vanish in a
 frame. `WidgetCard { shown: Shown::Hidden, on_hidden }` (and `WidgetFrame`) plays the
 card's exit through `Presence` (design/30 section 1.3: a fade over `--t-quick`, `Exit::Fade`), takes no
 pointer (`data-presence="leaving"`), and calls `on_hidden` once at the exit's settle. The host keeps
 drawing the removed card until then and drops it there; passing `Shown::Visible` again before then takes
-the exit back and `on_hidden` never runs (`ds-blitz/tests/widget_card_presence.rs`). `CardPresence` and
+the exit back and `on_hidden` never runs (`ds-conformance/tests/widget_card_presence.rs`). `CardPresence` and
 the `widget-out` shrink are gone.
 
 ### 9.9 What sill changes

@@ -2,7 +2,7 @@
 //! and compared with a golden under its component's directory, so the controls' and lists'
 //! class scans cover them too. Every state here is additive; the goldens of the states that
 //! existed before are in `components_controls.rs`, `components_lists.rs` and
-//! `mailo_gaps_ssr.rs` and `mailo_gaps4_ssr.rs`; the overlays are in `components_overlays.rs`.
+//! `button_field_tile_states_ssr.rs` and `provider_and_button_face_states_ssr.rs`; the overlays are in `components_overlays.rs`.
 //!
 //! `DS_BLESS=1 cargo test -p ds --test button_leading_and_label_run_states_ssr` rewrites these goldens.
 
