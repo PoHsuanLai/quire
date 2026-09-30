@@ -1,6 +1,7 @@
 //! The components' kit (the utilities, then every component sheet in its one registered order),
 //! and the kits a surface is drawn with.
 
+use crate::assembly::selectors;
 use crate::assembly::sheets::SHEETS;
 use ds_style::css::document::{placed, sheets, utilities_css};
 use ds_style::kit::{Kit, KitRank, Kits, STYLE_KIT, Section, Vocabulary};
@@ -21,7 +22,11 @@ pub static KIT: Kit = Kit {
         },
     ],
     sheets: &[],
-    vocabulary: Vocabulary::NONE,
+    vocabulary: Vocabulary {
+        public_classes: selectors::classes,
+        public_attributes: selectors::attributes,
+        ..Vocabulary::NONE
+    },
 };
 
 /// Every kit the design system ships: style, motion and the components. A crate that adds its own

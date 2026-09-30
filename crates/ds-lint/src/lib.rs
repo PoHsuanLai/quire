@@ -35,6 +35,7 @@ pub(crate) mod severity;
 pub(crate) mod stylesheet;
 pub(crate) mod text;
 pub mod tokenize;
+pub(crate) mod user_style;
 pub mod walk;
 
 pub use assert::assert_clean;
@@ -42,3 +43,4 @@ pub use markup::{markup, markup_warnings};
 pub use rule::{Exception, LintConfig, Offence, Profile, Rule};
 pub use severity::{Severity, WARNINGS};
 pub use stylesheet::{stylesheet, warnings};
+pub use user_style::{ParseFault, UserStyleNote, UserStyleNoteKind, user_stylesheet};

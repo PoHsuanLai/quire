@@ -159,7 +159,7 @@ fn unprefixed_attribute(prelude: &[Located], out: &mut Vec<Offence>) {
 
 /// The attribute-name token right after `prelude[open]` (a `[`), skipping a `*|` namespace
 /// prefix if there is one. `true` means the namespace prefix was present.
-fn attribute_name(prelude: &[Located], open: usize) -> Option<(&Located, bool)> {
+pub(crate) fn attribute_name(prelude: &[Located], open: usize) -> Option<(&Located, bool)> {
     let mut index = open + 1;
     let prefixed = prelude.get(index).map(|t| t.text.as_str()) == Some("*")
         && prelude.get(index + 1).map(|t| t.text.as_str()) == Some("|");
