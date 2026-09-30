@@ -108,7 +108,13 @@ fn measure(ground: Ground, theme: Theme) -> ([u8; 4], [u8; 4], f64) {
     CASE.set((ground, theme));
     let mut harness = Harness::new(Specimen, VIEW);
     harness.advance(Duration::from_millis(600));
-    let track = rect(&harness, ".ds-level-track");
+    let track = rect(
+        &harness,
+        match ground {
+            Ground::Paper | Ground::Module => ".ds-slider-track",
+            Ground::WorkOsd => ".ds-level-indicator-track",
+        },
+    );
     let frame = harness.render().expect("renders");
     probe::keep(&frame, &format!("level-contrast-{ground:?}-{theme:?}"));
     let row = (track.origin.y.0 + track.size.height.0 / 2.0) as u32;

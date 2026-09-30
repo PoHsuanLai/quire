@@ -29,7 +29,7 @@ use ds::components::content::icon_view::IconView;
 use ds::components::content::rich_text::Rich;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
-use ds::components::controls::press::{PressListeners, Propagation};
+use ds::components::controls::press::{ActivationKeys, PressListeners, Propagation};
 use ds::root::chrome::RootChrome;
 use ds::root::surface::Surface;
 use ds_core::press::Press;
@@ -185,6 +185,7 @@ fn close_button(on_close: EventHandler<Press>) -> Element {
             class: "ds-notification-close",
             "aria-label": "Close",
             onclick: move |event| close.click(&event),
+            onkeydown: move |event| close.key_down(&event, ActivationKeys::ReturnAndSpace),
             Glyph { icon: Icon::X, size: IconSize::Micro }
         }
     }

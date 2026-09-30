@@ -111,3 +111,10 @@
 /* A plain field's line height is its parent's, so its caret spans the text's ascent and descent;
    its tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=plain] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
+
+/* A plain search field is the query row of a palette or a launcher (`S:235-236`): a row of its
+   own with a hairline under it, the glyph in the faint ink, the query at the title size and one
+   line tall. */
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-text-field-frame{ padding:var(--s-12) var(--s-14); gap:var(--s-9); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input{ font-size:var(--fs-title); color:var(--ink); }
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-title); }

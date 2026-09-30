@@ -84,7 +84,7 @@ fn side(harness: &Harness, selector: &str) -> (f32, f32) {
 #[test]
 fn a_status_glyph_fills_the_status_items_glyph_square_with_its_label() {
     let mut harness = virtual_harness(Bar);
-    let glyph = format!("{ITEM_SEL} > .ds-status-glyph[*|data-kind=wifi]");
+    let glyph = format!("{ITEM_SEL} > .ds-button-icon > .ds-status-glyph[*|data-kind=wifi]");
     assert_eq!(harness.count(&glyph), 1, "{}", harness.html());
     assert_eq!(
         side(&harness, ITEM_SEL),
@@ -98,13 +98,13 @@ fn a_status_glyph_fills_the_status_items_glyph_square_with_its_label() {
     assert_eq!(harness.attr(ITEM_SEL, "aria-label"), Some(words));
     assert_eq!(
         harness.attr(ITEM_SEL, "data-variant").as_deref(),
-        Some("status")
+        Some("status-item")
     );
 
     // The volume glyph sizes itself inline; the item's square still wins.
     harness.within(|| *ITEM.write() = StatusState::Volume(VolumeState::Heard(VolumeWaves::Two)));
     harness.advance(ms(0));
-    let volume = format!("{ITEM_SEL} > .ds-status-glyph[*|data-kind=volume]");
+    let volume = format!("{ITEM_SEL} > .ds-button-icon > .ds-status-glyph[*|data-kind=volume]");
     assert_eq!(side(&harness, &volume), (18.0, 18.0), "{}", harness.html());
     let wave = format!("{volume} .ds-level-part[*|data-part=wave-1]");
     assert_eq!(side(&harness, &wave), (18.0, 18.0));
@@ -233,7 +233,7 @@ fn Sound() -> Element {
 
 fn part_on(harness: &Harness, root: &str, part: &str) -> Option<String> {
     harness.attr(
-        &format!("{root} .ds-level-in .ds-level-part[*|data-part={part}]"),
+        &format!("{root} .ds-slider-icon .ds-level-part[*|data-part={part}]"),
         "data-on",
     )
 }
@@ -263,7 +263,7 @@ fn a_level_given_a_volume_state_draws_that_states_waves_and_slash() {
     );
     assert_eq!(
         harness
-            .attr("#shared .ds-level", "aria-valuenow")
+            .attr("#shared .ds-slider", "aria-valuenow")
             .as_deref(),
         Some("50"),
         "the capsule still shows the value"

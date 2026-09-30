@@ -734,7 +734,7 @@ path each, until step 12 replaces them with the prelude.
     3. motion primitives: (done) (1.3) `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
        deleted keyframes, scalars and tokens; then interaction primitives (1.4): `LongPress`,
        `Roving` + `Typeahead`, `HoverIntent` profiles, focus ring and `Highlight`, drag threshold;
-    4. P1 controls and fields: `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,
+    4. P1 controls and fields: (done) `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,
        `RadioGroup`, `SegmentedControl`, `Slider`, `TextField`, `ProgressIndicator`,
        `LevelIndicator`, `Badge`, `KeyEquivalent`;
     5. menus and lists: `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,

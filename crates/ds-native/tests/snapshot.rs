@@ -95,25 +95,19 @@ fn SpinApp() -> Element {
 
 #[test]
 fn the_spinner_turns() {
-    // Three steps apart the dashed ring has turned a further 90 degrees (a twelfth per
-    // `--t-spin-step`), so its dashes sit elsewhere. With a base `transform:scale(1)` a turn
-    // interpolated between two identity matrices and the ring never moved; the ring's angle is
-    // written as it is, a step at a time.
+    // Three steps apart the lit spoke has gone a further quarter round (a twelfth per
+    // `--t-spin-step`), so the spokes' shades sit elsewhere. The step is written as it is, a step
+    // at a time, so the loop has nothing to interpolate.
     let mut harness = Harness::new(SpinApp, VIEW);
     let step = |h: &Harness| {
-        h.attr(".ds-spinner", "style").and_then(|style| {
-            style
-                .strip_prefix("--turn:")?
-                .strip_suffix("deg")?
-                .parse::<u32>()
-                .ok()
-        })
+        h.attr(".ds-progress", "style")
+            .and_then(|style| style.strip_prefix("--step:")?.parse::<u32>().ok())
     };
     settle_until(&mut harness, |h| step(h).is_some());
     let first = harness.render().expect("renders");
     let at = step(&harness).unwrap_or(0);
     settle_until(&mut harness, |h| {
-        step(h).is_some_and(|turn| (turn + 360 - at) % 360 >= 90)
+        step(h).is_some_and(|now| (now + 12 - at) % 12 >= 3)
     });
     let later = harness.render().expect("renders");
     for (frame, name) in [(&first, "spin-first"), (&later, "spin-later")] {

@@ -371,9 +371,9 @@ fn the_launcher_card_is_as_tall_as_its_content() {
     let card = rect(&harness, ".ds-palette");
     assert_eq!(card.size.width, Px(600.0));
     assert!(card.size.height.0 < 160.0, "{card:?}");
-    let glyph = rect(&harness, ".ds-search > .ds-ic");
+    let glyph = rect(&harness, ".ds-text-field-icon .ds-ic");
     assert_eq!(glyph.size.width, Px(20.0));
-    let field = rect(&harness, ".ds-search");
+    let field = rect(&harness, ".ds-text-field");
     assert!(field.size.height.0 >= 56.0, "{field:?}");
 }
 

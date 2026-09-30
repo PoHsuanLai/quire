@@ -252,7 +252,7 @@ fn ButtonsApp() -> Element {
 fn a_quiet_buttons_glyph_is_six_px_from_its_label() {
     let harness = Harness::new(ButtonsApp, VIEW);
     let glyph = rect(&harness, ".probe-quiet .ds-ic");
-    let label = rect(&harness, ".probe-quiet .ds-button > span");
+    let label = rect(&harness, ".probe-quiet .ds-button-label");
     let gap = label.origin.x.0 - (glyph.origin.x.0 + glyph.size.width.0);
     assert!(
         (gap - 6.0).abs() <= 0.5,

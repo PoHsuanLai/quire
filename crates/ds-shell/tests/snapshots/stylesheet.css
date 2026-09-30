@@ -495,11 +495,11 @@ html,body{margin:0;padding:0;background:transparent}
    no `filter`); opacity .85 stays here. The avatar's hover turn is `--t-quick --e-spring`.
    TODO(O-3): `rotate(-6deg) scale(1.08)` have no tokens. */
 
-.ds-account-tile{
+.ds-button.ds-account-tile{
   position:relative; width:auto; height:auto; aspect-ratio:1; padding:0; border-radius:var(--r-tile); background:var(--f-pill-hover); color:var(--f-ink);
 }
-.ds-account-tile:hover{ background:var(--f-pill); color:var(--f-ink); }
-.ds-account-tile[*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
+.ds-button.ds-account-tile:hover{ background:var(--f-pill); color:var(--f-ink); }
+.ds-button.ds-account-tile[*|aria-pressed=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
 .ds-account-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); margin-top:var(--s-12); }
 
 .ds-account-tile .ds-avatar{ font-size:var(--fs-meta); transition:transform var(--t-quick) var(--e-out); }
@@ -518,6 +518,9 @@ html,body{margin:0;padding:0;background:transparent}
   transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out);
 }
 .ds-account-tile:hover .ds-avatar[*|data-tone=add]{ color:var(--f-ink); border-color:var(--f-ink); }
+
+/* The unread count: a badge in the tile's corner, over the avatar (`S:356-357`). */
+.ds-account-tile .ds-badge{ position:absolute; top:var(--s-2); right:var(--s-2); }
 /* -- alert -- */
 /* Alert (design/04-COMPONENTS.md section 55): the Mac's pre-Liquid-Glass alert in the
    narrow sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred over a modal
@@ -949,10 +952,10 @@ html,body{margin:0;padding:0;background:transparent}
    query at 22/500 (`--fs-shell-field`) beside a 20 px search glyph (`--shell-field-glyph`);
    row titles 14 and details 12 (`--fs-shell-row`, `--fs-shell-detail`). Its shadow is the
    material stack's contact and ambient pair (`--m-box`). */
-.ds-palette[*|data-host=surface] .ds-search{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
-.ds-palette[*|data-host=surface] .ds-search > .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
-.ds-palette[*|data-host=surface] .ds-search .ds-input[*|data-variant=inline],
-.ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
+.ds-palette[*|data-host=surface] .ds-text-field-frame{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
+.ds-palette[*|data-host=surface] .ds-text-field-icon .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
+.ds-palette[*|data-host=surface] .ds-text-field .ds-input[*|data-variant=plain],
+.ds-palette[*|data-host=surface] .ds-text-field .ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
 /* Kept mounted while hidden: nothing is laid out, and each showing replays
@@ -965,12 +968,11 @@ html,body{margin:0;padding:0;background:transparent}
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
    pane; in a surface it still fills its container, which the host widens. */
 .ds-palette{ --aside:0px; }
-.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto auto minmax(0, 1fr); }
+.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto minmax(0, 1fr); }
 .ds-palette[*|data-host=overlay][*|data-aside=shown]{ width:min(calc(540px + var(--aside)), 96%); }
-.ds-palette[*|data-aside=shown] > .ds-search{ grid-row:1; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
-.ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
+.ds-palette[*|data-aside=shown] > .ds-text-field{ grid-row:1; grid-column:1 / -1; }
+.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:2; grid-column:1; min-width:0; }
+.ds-palette-aside{ grid-row:2; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
    it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
    row kept up from `--dy`, the height the removed rows took, set on the list while it plays. At
@@ -1170,9 +1172,9 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
 
-.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
-.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
-.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
+.ds-button.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
+.ds-button.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
+.ds-button.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
 .ds-strip .ds-strip-action{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
 .ds-row:hover .ds-strip .ds-strip-action{ opacity:1; }
 
@@ -1470,7 +1472,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-lock-field .ds-input,
 .ds-lock-field .ds-input-mask,
 .ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
-.ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
+.ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--lock-ink); }
 /* The field draws its caret among the dots in their ink; the input's own stays hidden. */
 .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
 /* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
@@ -1492,7 +1494,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
 .ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
+.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secure]{ caret-color:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-caret::before{ background:var(--f-ink); }
 .ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
@@ -1542,7 +1544,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 /* The query line of `filter: Filter::Field`: the typed text in a row at the top of
-   the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
+   the menu, drawn as a plain TextField is (`.ds-input[data-variant=plain]`: body size, 1.55
    line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
    the field's caret colour, and the placeholder takes the field's `--ink-faint`. */
@@ -2595,6 +2597,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+
+/* The unread count: a quiet badge at the end of the row. */
+.ds-sidebar-item .ds-badge{ margin-left:auto; }
 /* -- slider -- */
 /* Slider (design/30 section 2.1, `NSSlider`; sized by design/29-SIZING.md). Attribute selectors
    carry `*|` (spike S2); the focus ring is the global one, on `.ds-slider` (spike S12). The level
@@ -2820,13 +2825,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-progress-indicator[*|data-age="11"]{ opacity:.13; }
 
 /* Ring: the track and the arc share one box; the arc's colour is the accent, the track's the
-   line. Unknown, the arc is turned by the loop's step (`--turn`). */
+   line. Unknown, the arc is turned by the loop's step. */
 .ds-progress[*|data-style=ring]{ width:var(--pg-box); height:var(--pg-box); }
 .ds-progress[*|data-style=ring] .ds-progress-track,
 .ds-progress[*|data-style=ring] .ds-progress-fill{ position:absolute; top:0; left:0; width:100%; height:100%; }
 .ds-progress[*|data-style=ring] .ds-progress-track{ color:var(--line); }
 .ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--accent); }
-.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(var(--turn)); }
+.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(calc(var(--step) * 30deg)); }
 .ds-progress-glyph{ position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
@@ -2978,6 +2983,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* A plain field's line height is its parent's, so its caret spans the text's ascent and descent;
    its tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=plain] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
+
+/* A plain search field is the query row of a palette or a launcher (`S:235-236`): a row of its
+   own with a hairline under it, the glyph in the faint ink, the query at the title size and one
+   line tall. */
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-text-field-frame{ padding:var(--s-12) var(--s-14); gap:var(--s-9); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input{ font-size:var(--fs-title); color:var(--ink); }
+.ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-title); }
 /* -- text_runs -- */
 /* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
@@ -3131,6 +3143,9 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The children, one indent step in, the same rhythm as the sidebar's items. */
 .ds-tree-item-children{ display:flex; flex-direction:column; gap:var(--s-2); padding-left:var(--s-12); }
+
+/* The unread count: a quiet badge at the end of the row. */
+.ds-tree-item .ds-badge{ margin-left:auto; }
 /* -- voice_orb -- */
 /* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
    speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`

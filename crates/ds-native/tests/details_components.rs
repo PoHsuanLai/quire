@@ -38,7 +38,7 @@ fn Tile() -> Element {
 }
 
 fn pending(harness: &Harness) -> Option<String> {
-    harness.attr(".ds-spinner", "data-pending")
+    harness.attr(".ds-progress", "data-pending")
 }
 
 /// The spinner turns at once and is still turning well past where a cap used to stop it.
@@ -46,7 +46,7 @@ fn spins_and_keeps_spinning(harness: &mut Harness) {
     harness.advance(Duration::from_millis(50));
     assert_eq!(pending(harness).as_deref(), Some("step"), "no grace");
     harness.advance(PAST_CAP);
-    let turn = harness.attr(".ds-spinner", "style");
+    let turn = harness.attr(".ds-progress", "style");
     assert_eq!(
         pending(harness).as_deref(),
         Some("step"),
@@ -54,7 +54,7 @@ fn spins_and_keeps_spinning(harness: &mut Harness) {
         harness.html()
     );
     harness.advance(Duration::from_millis(83));
-    assert_ne!(harness.attr(".ds-spinner", "style"), turn, "still turning");
+    assert_ne!(harness.attr(".ds-progress", "style"), turn, "still turning");
 }
 
 #[test]
@@ -65,7 +65,7 @@ fn a_busy_module_tile_spins_until_it_lands() {
     spins_and_keeps_spinning(&mut harness);
     harness.within(|| *MODULE.write() = ModuleState::On);
     harness.advance(Duration::from_millis(30));
-    assert_eq!(harness.count(".ds-spinner"), 0);
+    assert_eq!(harness.count(".ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -99,6 +99,6 @@ fn a_checking_lock_prompt_spins_until_the_try_ends() {
     // The try fails: the ring goes, the field shakes once, and the prompt rests.
     harness.within(|| *PROMPT.write() = PromptState::Wrong);
     harness.advance(Duration::from_millis(30));
-    assert_eq!(harness.count(".ds-spinner"), 0);
+    assert_eq!(harness.count(".ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }

@@ -206,6 +206,12 @@ fn Segment<T: Clone + PartialEq + 'static>(
             role: if thumb.is_some() { "radio" } else { "button" },
             "aria-checked": if thumb.is_some() { Some(checked.aria()) } else { None },
             "aria-pressed": if thumb.is_none() { Some(checked.aria()) } else { None },
+            // A `SelectOne` control is one stop in the tab order, its selected segment; the arrows
+            // move within it.
+            tabindex: match (thumb, selected) {
+                (Some(_), Selection::Unselected) => Some("-1"),
+                (Some(_), Selection::Selected) | (None, _) => None,
+            },
             "data-selected": selected.slug(),
             "data-thumb": under,
             "data-availability": enabled.slug(),

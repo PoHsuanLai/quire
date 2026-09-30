@@ -66,7 +66,7 @@ fn a_level_inside_a_panel_on_the_grid_takes_a_press_and_a_drag() {
         (10.0, 300.0),
         "the panel spans both columns inside the grid's padding (10, design/29-SIZING.md)"
     );
-    let rail = rect(&harness, ".ds-level-rail");
+    let rail = rect(&harness, ".ds-slider-rail");
     let at = |share: f32| Point {
         x: Px(rail.origin.x.0 + rail.size.width.0 * share),
         y: Px(rail.origin.y.0 + rail.size.height.0 / 2.0),

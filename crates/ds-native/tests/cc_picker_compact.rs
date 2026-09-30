@@ -98,11 +98,11 @@ fn every_compact_row_fits_the_module_and_no_segment_is_squeezed() {
     // not fit would run past the content box above rather than clip a label.
     let last = rect(
         &harness,
-        ".ds-appearance-row:nth-child(1) .ds-segment:last-child",
+        ".ds-appearance-row:nth-child(1) .ds-segmented-segment:nth-last-child(2)",
     );
     assert_eq!(
         harness
-            .text_of(".ds-appearance-row:nth-child(1) .ds-segment:last-child")
+            .text_of(".ds-appearance-row:nth-child(1) .ds-segmented-segment:nth-last-child(2)")
             .as_deref(),
         Some("Dark")
     );

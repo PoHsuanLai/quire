@@ -62,13 +62,13 @@ fn typing_in_the_title_renames_the_space() {
 fn the_motion_row_reports_a_pick() {
     let mut harness = Harness::new(Editor, VIEW);
     assert_eq!(harness.text_of(".motion").as_deref(), Some("standard"));
-    let reduced = "[*|aria-label=Motion] .ds-segment:nth-child(2)";
+    let reduced = "[*|aria-label=Motion] .ds-segmented-segment:nth-child(2)";
     assert_eq!(harness.text_of(reduced).as_deref(), Some("Reduced"));
     harness.click(harness.centre(reduced).expect("Reduced"));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".motion").as_deref(), Some("reduced"));
     assert_eq!(
-        harness.attr(reduced, "aria-pressed").as_deref(),
+        harness.attr(reduced, "aria-checked").as_deref(),
         Some("true")
     );
 }

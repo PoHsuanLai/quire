@@ -17,9 +17,9 @@
 }
 .ds-row:hover .ds-strip{ opacity:1; pointer-events:auto; }
 
-.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
-.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
-.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
+.ds-button.ds-strip-action{ position:relative; width:26px; height:26px; border-radius:var(--r-pill); color:var(--ink-soft); }
+.ds-button.ds-strip-action:hover{ background:var(--accent-soft); color:var(--ink); }
+.ds-button.ds-strip-action[*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
 .ds-strip .ds-strip-action{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
 .ds-row:hover .ds-strip .ds-strip-action{ opacity:1; }
 

@@ -61,3 +61,6 @@
 .ds-sidebar-item[*|data-kind=today][*|data-presence=entering]{ animation:row-in var(--t-move) var(--e-out); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-sidebar-item[*|data-kind=today][*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+
+/* The unread count: a quiet badge at the end of the row. */
+.ds-sidebar-item .ds-badge{ margin-left:auto; }

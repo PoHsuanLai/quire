@@ -107,19 +107,19 @@ fn desk(scale_percent: u16, theme: Theme, accent: Accent) -> Harness {
 }
 
 fn segment(group: &str, index: usize) -> String {
-    format!("{group} .ds-segment:nth-child({index})")
+    format!("{group} .ds-segmented-segment:nth-child({index})")
 }
 
 /// The 1-based index of the pressed segment.
 fn selected(harness: &Harness, group: &str) -> usize {
-    (1..=harness.count(&format!("{group} .ds-segment")))
-        .find(|&i| harness.attr(&segment(group, i), "aria-pressed").as_deref() == Some("true"))
+    (1..=harness.count(&format!("{group} .ds-segmented-segment")))
+        .find(|&i| harness.attr(&segment(group, i), "aria-checked").as_deref() == Some("true"))
         .unwrap_or_else(|| panic!("{group}: nothing pressed:\n{}", harness.html()))
 }
 
 fn thumb(harness: &Harness, group: &str) -> Rect {
     harness
-        .painted_rect(group, Part::Before)
+        .painted_rect(&format!("{group} .ds-segmented-indicator"), Part::Element)
         .unwrap_or_else(|| panic!("{group} has no thumb"))
 }
 
@@ -175,9 +175,11 @@ fn assert_legible(harness: &Harness, group: &str, case: &str) {
         track.0[3] > 0.99,
         "{case} {group}: the track is not opaque: {track:?}"
     );
-    let fill = harness.fill_of(group, Part::Before).expect("thumb fill");
+    let fill = harness
+        .fill_of(&format!("{group} .ds-segmented-indicator"), Part::Element)
+        .expect("thumb fill");
     let thumb = thumb(harness, group);
-    for i in 1..=harness.count(&format!("{group} .ds-segment")) {
+    for i in 1..=harness.count(&format!("{group} .ds-segmented-segment")) {
         let label = segment(group, i);
         let ink = harness.ink_of(&label).expect("label ink");
         let covered = overlap(thumb, rect(harness, &label));
@@ -282,7 +284,11 @@ fn at_scale_2_the_painted_thumb_fills_the_selected_segment_to_its_edges() {
             harness.advance(Duration::from_millis(800));
             let frame = harness.render().expect("render");
             let seg = rect(&harness, &segment(group, 3));
-            let thumb = bytes(harness.fill_of(group, Part::Before).expect("thumb fill"));
+            let thumb = bytes(
+                harness
+                    .fill_of(&format!("{group} .ds-segmented-indicator"), Part::Element)
+                    .expect("thumb fill"),
+            );
             let track = pixel(&frame, seg, seg.origin.x.0 - 1.0, 2.0);
             assert!(
                 distance(thumb, track) > 60,

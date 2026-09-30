@@ -18,18 +18,26 @@ re-theme every surface consistently, and every token variable
 | --- | --- | --- |
 | Alert | `.ds-alert` | `.ds-alert-icon`, `.ds-alert-title` |
 | Avatar | `.ds-avatar` | none yet |
-| Button | `.ds-button` | none yet |
+| Badge | `.ds-badge` | `.ds-badge-label` |
+| Button | `.ds-button` | `.ds-button-icon`, `.ds-button-label` |
+| Checkbox | `.ds-checkbox` | `.ds-checkbox-indicator`, `.ds-checkbox-label` |
 | Chip | `.ds-chip` | `.ds-chip-remove` |
+| KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
+| Label | `.ds-label` | none yet |
+| LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |
 | List | `.ds-list` | none yet |
 | Menu | `.ds-menu` | `.ds-menu-item`, `.ds-menu-separator` |
 | Popover | `.ds-popover` | none yet |
+| ProgressIndicator | `.ds-progress` | `.ds-progress-track`, `.ds-progress-fill`, `.ds-progress-indicator`, `.ds-progress-glyph` |
+| RadioGroup | `.ds-radio-group` | `.ds-radio-group-item`, `.ds-radio-group-indicator`, `.ds-radio-group-label`, `.ds-radio-group-image` |
 | Row | `.ds-row` | none yet |
 | SectionHeader | `.ds-section-header` | none yet |
-| SegmentedControl | `.ds-segmented` | none yet |
+| SegmentedControl | `.ds-segmented` | `.ds-segmented-segment`, `.ds-segmented-indicator`, `.ds-segmented-label`, `.ds-segmented-icon` |
 | Sheet | `.ds-sheet` | none yet |
-| Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb` |
+| Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb`, `.ds-slider-icon`, `.ds-slider-tick` |
+| TextField | `.ds-text-field` | `.ds-text-field-frame`, `.ds-text-field-icon`, `.ds-text-field-suffix`, `.ds-text-field-help`, `.ds-text-field-tokens` |
 | Toast | `.ds-toast` | none yet |
-| Toggle | `.ds-toggle` | none yet |
+| Toggle | `.ds-toggle` | `.ds-toggle-track`, `.ds-toggle-indicator` |
 
 ## Attributes
 
@@ -41,6 +49,8 @@ re-theme every surface consistently, and every token variable
 | `data-selected` | `Selection` |
 | `data-busy` | `Availability::Busy` |
 | `data-availability` | `Availability`: enabled, disabled, busy |
+| `data-pressed` | `PressPhase`: present while a pointer or a key holds the control down |
+| `data-role` | a button's role: normal or destructive |
 | `data-focus` | `FocusStyle`: ring, highlight |
 | `data-activity` | `Activity`, on `.ds`: written as `inactive` while the window is not the one focused, absent while it is |
 | `aria-*` | the state an element exposes to assistive technology |

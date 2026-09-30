@@ -77,9 +77,9 @@ fn ink_columns(shot: &RgbaImage, field: Rect) -> Vec<u32> {
         .collect()
 }
 
-/// The mask's leading padding (the field's 8 inset plus its hairline, design/29-SIZING.md): where
-/// its first dot's advance starts.
-const MASK_PAD: f32 = 9.0;
+/// The mask's leading padding: none, as the mask sits inside the frame's inset (8 plus its
+/// hairline, design/29-SIZING.md); its first dot's advance starts at its own left edge.
+const MASK_PAD: f32 = 0.0;
 
 /// A column of ink at least this many pixels tall is the caret (a line high); a dot is a few.
 const CARET_ROWS: usize = 10;

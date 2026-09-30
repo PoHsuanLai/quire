@@ -162,3 +162,24 @@ fn the_arrows_check_the_next_radio_button_and_the_group_has_one_tab_stop() {
     harness.key(ShortcutKey::Home);
     assert_eq!(state(&harness), "off off 0 0");
 }
+
+#[allow(non_snake_case)]
+fn Pills() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            ds_shell::WorkspacePills { label: "Workspaces",
+                ds_shell::WorkspacePill { label: "Work", onclick: move |_| PRESSES.set(PRESSES.get() + 1) }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_workspace_pill_takes_return_and_space_too() {
+    PRESSES.set(0);
+    let mut harness = harness(Pills);
+    harness.key(ShortcutKey::Tab);
+    harness.key(ShortcutKey::Enter);
+    harness.key(ShortcutKey::Space);
+    assert_eq!(PRESSES.get(), 2, "one press for each key");
+}

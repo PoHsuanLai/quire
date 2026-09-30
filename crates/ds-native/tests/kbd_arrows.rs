@@ -87,9 +87,12 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
     harness.advance(Duration::from_millis(50));
     let frame = harness.render().expect("the page renders");
     probe::keep(&frame, "kbd-arrows");
-    let (up_w, up_h) = ink_box(&harness, &frame, ".up .ds-kbd");
+    let (up_w, up_h) = ink_box(&harness, &frame, ".up .ds-key-equivalent-key");
     assert!(up_h >= 5, "the up arrow is drawn: {up_w} x {up_h}");
-    for side in [".left .ds-kbd", ".right .ds-kbd"] {
+    for side in [
+        ".left .ds-key-equivalent-key",
+        ".right .ds-key-equivalent-key",
+    ] {
         let (width, height) = ink_box(&harness, &frame, side);
         // 5 px still read as a dash; the arrow face (`--fs-control`) asks for at least 7.
         assert!(width >= 7, "{side}: the arrow is {width} px long");
@@ -114,12 +117,15 @@ fn a_small_arrow_caps_box_is_the_same_height_as_a_plain_small_cap() {
     let mut harness = Harness::new(Page, VIEW);
     harness.advance(Duration::from_millis(50));
     harness.render().expect("the page renders");
-    let plain_height = rect(&harness, ".plain .ds-kbd").size.height.0;
+    let plain_height = rect(&harness, ".plain .ds-key-equivalent-key")
+        .size
+        .height
+        .0;
     for side in [
-        ".left .ds-kbd",
-        ".right .ds-kbd",
-        ".up .ds-kbd",
-        ".down .ds-kbd",
+        ".left .ds-key-equivalent-key",
+        ".right .ds-key-equivalent-key",
+        ".up .ds-key-equivalent-key",
+        ".down .ds-key-equivalent-key",
     ] {
         let height = rect(&harness, side).size.height.0;
         assert!(

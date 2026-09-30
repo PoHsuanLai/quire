@@ -2,7 +2,7 @@
 //! fenced trailing slot. Apart from the component so each stays short.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::press::{PressListeners, Propagation};
+use crate::components::controls::press::{ActivationKeys, PressListeners, Propagation};
 use crate::focus::click::kept_click;
 use dioxus::core::{Attribute, AttributeValue};
 use dioxus::prelude::*;
@@ -41,6 +41,7 @@ pub(crate) fn label_part(
                     r#type: "button",
                     class: "ds-tree-item-label",
                     onclick: move |event| listen.click(&event),
+                    onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
                     oncontextmenu: move |event| listen.context_menu(&event),
                     onmouseup: move |event| listen.mouse_up(&event),
                     {text(&label)}

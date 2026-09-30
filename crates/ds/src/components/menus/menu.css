@@ -39,7 +39,7 @@
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 /* The query line of `filter: Filter::Field`: the typed text in a row at the top of
-   the menu, drawn as the inline TextInput is (`.ds-input[data-variant=inline]`: body size, 1.55
+   the menu, drawn as a plain TextField is (`.ds-input[data-variant=plain]`: body size, 1.55
    line, 3/2 padding, no box of its own; a Large control's 28, design/29-SIZING.md R1) over a hairline that sets it apart from the rows. The
    menu holds the keyboard, so the row is drawn, not a field; its caret is a bar in `--accent`,
    the field's caret colour, and the placeholder takes the field's `--ink-faint`. */

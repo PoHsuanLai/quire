@@ -72,7 +72,7 @@ fn where_the_chord_is(harness: &Harness) -> (Option<String>, Option<String>) {
         .enumerate()
         .find(|(at, _)| {
             let row = format!("#card .ds-menu-item:nth-of-type({})", at + 2);
-            harness.count(&format!("{row} .ds-chord")) == 1
+            harness.count(&format!("{row} .ds-key-equivalent")) == 1
         })
         .map(|(_, title)| title.to_string());
     (selected, chorded)
@@ -82,13 +82,19 @@ fn where_the_chord_is(harness: &Harness) -> (Option<String>, Option<String>) {
 fn moving_the_selection_moves_the_chord() {
     let mut harness = Harness::new(Files, VIEW);
     harness.advance(ms(200));
-    assert_eq!(harness.count("#card .ds-chord"), 1, "one chord at rest");
+    assert_eq!(
+        harness.count("#card .ds-key-equivalent"),
+        1,
+        "one chord at rest"
+    );
     assert_eq!(
         where_the_chord_is(&harness),
         (Some("One.pdf".into()), Some("One.pdf".into()))
     );
     assert_eq!(
-        harness.text_of(&format!("{SELECTED} .ds-chord")).as_deref(),
+        harness
+            .text_of(&format!("{SELECTED} .ds-key-equivalent"))
+            .as_deref(),
         Some("⌘R")
     );
     assert_eq!(
@@ -98,7 +104,11 @@ fn moving_the_selection_moves_the_chord() {
     );
     harness.key(ShortcutKey::Down);
     harness.advance(ms(100));
-    assert_eq!(harness.count("#card .ds-chord"), 1, "still one chord");
+    assert_eq!(
+        harness.count("#card .ds-key-equivalent"),
+        1,
+        "still one chord"
+    );
     assert_eq!(
         where_the_chord_is(&harness),
         (Some("Two.pdf".into()), Some("Two.pdf".into()))
@@ -113,7 +123,7 @@ fn moving_the_selection_moves_the_chord() {
         .rect(&format!("{SELECTED} .ds-menu-when"))
         .expect("the time is drawn");
     let chord = harness
-        .rect(&format!("{SELECTED} .ds-chord"))
+        .rect(&format!("{SELECTED} .ds-key-equivalent"))
         .expect("the chord is drawn");
     let gap = chord.origin.x.0 - (when.origin.x.0 + when.size.width.0);
     assert!(
@@ -145,16 +155,21 @@ fn Pane() -> Element {
 fn a_pane_action_draws_its_chord_as_plain_text_beside_its_label() {
     let mut harness = Harness::new(Pane, VIEW);
     harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-preview-action .ds-kbd"), 0);
     assert_eq!(
-        harness.text_of(".ds-preview-action .ds-chord").as_deref(),
+        harness.count(".ds-preview-action .ds-key-equivalent-key"),
+        0
+    );
+    assert_eq!(
+        harness
+            .text_of(".ds-preview-action .ds-key-equivalent")
+            .as_deref(),
         Some("⌘R")
     );
     let label = harness
         .rect(".ds-preview-action-label")
         .expect("the label is drawn");
     let chord = harness
-        .rect(".ds-preview-action .ds-chord")
+        .rect(".ds-preview-action .ds-key-equivalent")
         .expect("the chord is drawn");
     assert!(
         (label.size.height.0 - chord.size.height.0).abs() < 0.5,

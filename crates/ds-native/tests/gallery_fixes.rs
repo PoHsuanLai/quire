@@ -42,7 +42,7 @@ fn FieldsApp() -> Element {
                 div { class: "probe-boxed",
                     TextField { label: "To", value: "", placeholder: "Add a person", oninput: |_| {} }
                 }
-                div { class: "probe-inline",
+                div { class: "probe-inline", style: "font-size:13.5px",
                     TextField { bezel: FieldBezel::Plain, label: "To", value: "dana@example.org", oninput: |_| {} }
                 }
                 div { class: "probe-search",
@@ -56,12 +56,13 @@ fn FieldsApp() -> Element {
 #[test]
 fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
     let harness = Harness::new(FieldsApp, VIEW);
-    // design/04-COMPONENTS.md section 6: Boxed is a Regular control, 22 (design/29-SIZING.md);
-    // Inline is one 13.5 px line at the base line height 1.55, plus its 3 + 3 padding and the
-    // 1 px border; the search row's is 16 px with no padding or border (section 7).
+    // A bezeled field's frame is a Regular control, 22 (design/29-SIZING.md), and its input fills
+    // it inside the two hairlines; a plain field is one line of its parent's text (13.5 px at the
+    // base line height 1.55); the search row's is 16 px.
     const CASES: &[(&str, f32)] = &[
-        (".probe-boxed .ds-input", 22.0),
-        (".probe-inline .ds-input", 13.5 * 1.55 + 8.0),
+        (".probe-boxed .ds-text-field-frame", 22.0),
+        (".probe-boxed .ds-input", 20.0),
+        (".probe-inline .ds-input", 13.5 * 1.55),
         (".probe-search .ds-input", 16.0 * 1.55),
     ];
     for &(selector, want) in CASES {
@@ -72,7 +73,7 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
         );
     }
     // Width 100% inside the wrapper: the boxed field is as wide as the 240 px column.
-    let boxed = rect(&harness, ".probe-boxed .ds-input");
+    let boxed = rect(&harness, ".probe-boxed .ds-text-field-frame");
     assert!(
         (boxed.size.width.0 - 240.0).abs() <= 1.0,
         "the boxed field is {} px wide, want the column's 240",

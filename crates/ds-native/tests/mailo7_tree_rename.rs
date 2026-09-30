@@ -128,8 +128,8 @@ fn the_field_takes_the_labels_place_and_moves_nothing() {
         "the row keeps its height"
     );
     assert_eq!(
-        edit.rect(".ds-count").map(|count| count.origin),
-        read.rect(".ds-count").map(|count| count.origin),
+        edit.rect(".ds-badge").map(|count| count.origin),
+        read.rect(".ds-badge").map(|count| count.origin),
         "the count stays put"
     );
     assert_eq!(
