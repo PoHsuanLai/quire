@@ -37,7 +37,7 @@ image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
 # PDF output (the `pdf` feature): the painter, which writes through pdfrum.
-anyrender_pdfrum = { workspace = true, optional = true }
+pdfrum-anyrender = { workspace = true, optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
 # PDF thumbnails (part of the `pdf` feature): pdfrum's reader and CPU rasteriser.
@@ -59,7 +59,7 @@ print = ["dep:zbus", "dep:memfd"]
 # PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
 # thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
 # PDF builds no PDF writer or reader.
-pdf = ["dep:anyrender_pdfrum", "dep:pdfrum"]
+pdf = ["dep:pdfrum-anyrender", "dep:pdfrum"]
 # `ds_blitz::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
 # dictionaries checked on one worker thread. Off by default, so an app that never checks
 # spelling builds no checker.

@@ -6,12 +6,12 @@
 //! a parley run's glyphs are its visual clusters' glyphs in order, each cluster knowing its
 //! byte range in the layout's text. So each glyph run's glyphs are paired with their clusters'
 //! text here, before painting, and keyed as the painter will see the run
-//! (`anyrender_pdfrum::RunKey`).
+//! (`pdfrum_anyrender::RunKey`).
 
-use anyrender_pdfrum::{GlyphSource, RunKey, RunText, RunTexts};
 use blitz_dom::BaseDocument;
 use blitz_dom::node::{ListItemLayoutPosition, Marker, TextBrush};
 use parley::{Layout, PositionedLayoutItem, Run};
+use pdfrum_anyrender::{GlyphSource, RunKey, RunText, RunTexts};
 use std::ops::Range;
 
 /// The run texts of every layout in `doc`, in document order.
