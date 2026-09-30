@@ -112,3 +112,19 @@ fn a_changed_signal_redraws_the_text_and_emptying_it_removes_the_element() {
         }
     }
 }
+
+#[allow(non_snake_case)]
+fn Named() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Popover, surface: Some("bar-menu") }
+    }
+}
+
+#[test]
+fn a_named_root_carries_data_surface_and_an_unnamed_one_does_not() {
+    let mut vdom = VirtualDom::new(Named);
+    vdom.rebuild_in_place();
+    let named = dioxus_ssr::render(&vdom);
+    assert!(named.contains("data-surface=\"bar-menu\""), "{named}");
+    assert!(!html("", Inject::Host).contains("data-surface"));
+}

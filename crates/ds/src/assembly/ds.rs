@@ -21,6 +21,9 @@
 //! to the signal restyles the document and a rule of theirs wins by order. An empty style draws no
 //! element at all.
 //!
+//! `surface` is the consumer's name for the surface this root is (`[data-surface=bar]`, the public
+//! selector surface a user stylesheet targets, `selectors::SURFACE_ATTRIBUTE`).
+//!
 //! `stylesheet` says how the stylesheet reaches the document (`Inject`); `sheet` is the text
 //! `Inject::Inline` writes: `None` is `ds::stylesheet()`, and a crate that adds components of its
 //! own passes the sheet its kits make (`ds_shell::stylesheet()`), so the root draws them too.
@@ -113,6 +116,7 @@ pub fn Ds(
     #[props(default)] extent: RootExtent,
     #[props(default)] typeface: Option<Typeface>,
     #[props(default)] user_style: ReadSignal<UserStyle>,
+    #[props(default)] surface: Option<&'static str>,
     children: Element,
 ) -> Element {
     let typeface = typeface.unwrap_or(use_typeface());
@@ -176,6 +180,7 @@ pub fn Ds(
             "data-corner": radius.and_then(Corner::attribute),
             "data-window-frame": framing,
             "data-extent": extent.attribute(),
+            "data-surface": surface,
             style,
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
