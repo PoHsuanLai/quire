@@ -768,7 +768,7 @@ path each, until step 12 replaces them with the prelude.
     `Query` extension trait.
 11. **`ds-conformance`** (done): move `ds-native/tests` by the section 3 rules, renaming work-named
     files; move SSR tests beside their crates; `ds-gallery` pages regrouped.
-12. **`ds::prelude`** replaces the root re-exports; a mechanical import rewrite in sill in the
+12. **`ds::prelude`** (done) replaces the root re-exports; a mechanical import rewrite in sill in the
     same change; `ds_shell::prelude` likewise.
 13. **`blitz-kit`** (done) (cross-repo): create the repo from the section 3 rows, switch `ds-blitz` and
     shell-host to it, delete both copies.

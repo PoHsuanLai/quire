@@ -17,7 +17,7 @@ the keyframes, and `ds-motion/detail/`), `ds-lint` (the linter: strings in, offe
 of every component sheet, and `Ds`), and `ds-shell` (the shell surfaces' parts, the widgets and
 their catalog, the shell's tokens and sheets). Inside `ds` the layers are directories named in
 that order. `lib.rs` and the public module files (`detail.rs`, `icon.rs`, `time.rs`, `motion.rs`)
-name `ds`'s public surface, one path per item.
+name `ds`'s public surface, one path per item: `ds::prelude` and `ds_shell::prelude` hold what a consumer draws with, and every other name is at its home path (the root keeps only the stylesheet assembly).
 
 ## `ds`: appearance, space, material
 
@@ -169,7 +169,7 @@ PaletteEntrance{PeekIn, CmdkIn}`, `id`, `focus`, `selected`, `on_select`, `on_se
 | `ds-settings/src/{appearance,units,lenient}` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read and the unknown-key report) |
 | `ds-settings/src/{watch,latest}.rs` | 22-SETTINGS §2 "Live reload", §6.3 (`Store::watch` on a `Spawner`) |
 | `ds-settings/src/{portal,environment}.rs` | the plan's `ds-settings` design (portal, `use_environment`); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
-| `ds-blitz` | the plan's `ds-blitz` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `blitz_host.rs` is `ds::DocumentHost` on Blitz, which `launch` and the harness wire and `ds_blitz::provide_host()` gives any other Blitz host whole; `measure.rs` and `focus.rs` are its geometry and focus parts; features `pdf`, `print` and `spell` (`pdf-thumb` and `spellcheck` folded in); `tokio` is named by `launch/runtime.rs` alone (plus `tokio::sync` channels in the workers) |
+| `ds-blitz` | the plan's `ds-blitz` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `blitz_host.rs` is `ds::prelude::DocumentHost` on Blitz, which `launch` and the harness wire and `ds_blitz::provide_host()` gives any other Blitz host whole; `measure.rs` and `focus.rs` are its geometry and focus parts; features `pdf`, `print` and `spell` (`pdf-thumb` and `spellcheck` folded in); `tokio` is named by `launch/runtime.rs` alone (plus `tokio::sync` channels in the workers) |
 | `ds-harness` | the plan's test driver, split out of `ds-native` (migration step 9): `Harness` (`Driver` sends every `Input`, `DocQuery` and `Query` read the document; `render_over(Backdrop::Clear)` paints a document's own coverage), `HarnessConfig`, `HarnessError`, `Clock::Virtual`, `snapshot*`, the painters; it builds its document from `ds_blitz::seam`, what a window's is built from; feature `pdf`: `pdf_app`, `Harness::pdf` |
 | `ds-conformance` | `tests/<component>.rs`: every component's behaviour through `ds-harness` on a real Blitz document (`tests/support/probe.rs` is the shared probes and the how-to-write-a-test note); test-only, no code of its own |
 | `ds-gallery` | the plan's gallery (axes, `pages/<group>/<component>.rs`, `--snapshot`) |
