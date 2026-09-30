@@ -106,4 +106,12 @@ mod tests {
         let choice = Choice::new('a', "A").with_availability(Availability::Disabled);
         assert_eq!(choice.availability, Availability::Disabled);
     }
+
+    #[test]
+    fn an_accent_choice_is_its_own_colour_circle() {
+        use ds_style::appearance::accent::Accent;
+        let choice = Choice::accent(Accent::Red);
+        assert_eq!(choice.swatch.as_deref(), Some("--swatch-red"));
+        assert_eq!(choice.value, Accent::Red);
+    }
 }
