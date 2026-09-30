@@ -105,7 +105,7 @@ impl VirtualClock {
     }
 
     /// The due instant of every sleep still waiting, earliest first: for a diagnostic when a
-    /// settle check gives up on this clock (`ds_native::assert_settles_to_zero_frames`).
+    /// settle check gives up on this clock (`ds_blitz::assert_settles_to_zero_frames`).
     pub fn due_times(&self) -> Vec<Duration> {
         self.queue.due_times()
     }

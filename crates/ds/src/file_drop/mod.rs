@@ -4,7 +4,7 @@
 //!
 //! `ds` stays renderer-free: the host hears the platform's drag, turns it into
 //! [`FileDragInput`]s and feeds them to a [`FileDropBoard`], which it provides as root context, and
-//! the board finds targets through the host's own hit test in the document. ds-native does both, for `launch`'s window and for the
+//! the board finds targets through the host's own hit test in the document. ds-blitz does both, for `launch`'s window and for the
 //! harness (`Harness::file_drag`). Without a host a target simply never lights.
 //!
 //! Paths only: a drag that carries no `file:` URI (a link or text dragged out of a browser) is

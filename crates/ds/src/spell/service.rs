@@ -1,6 +1,6 @@
 //! The service an [`EditSurface`](crate::EditSurface) checks spelling through. `ds` stays
 //! effect-free: reading dictionaries, checking on a worker thread and writing the user's
-//! dictionary are `ds_native::spell`'s (its `spellcheck` feature), which provides an
+//! dictionary are `ds_blitz::spell`'s (its `spellcheck` feature), which provides an
 //! `Rc<dyn SpellService>` as root context. Without one a surface with
 //! [`Spell::On`](super::Spell) checks nothing and draws nothing.
 
@@ -35,7 +35,7 @@ pub enum Learned {
     SessionOnly,
 }
 
-/// A spellchecker. Two implementations: `ds_native::spell`'s (system Hunspell dictionaries on a
+/// A spellchecker. Two implementations: `ds_blitz::spell`'s (system Hunspell dictionaries on a
 /// worker thread) and a test's fake.
 pub trait SpellService {
     /// The languages a surface with no language of its own checks in: the locale's.

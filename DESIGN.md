@@ -54,7 +54,7 @@ name `ds`'s public surface, one path per item.
 | `ds-style/tokens/easing.rs`, `ds-style/tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `ds-style/tokens/shape.rs` | 01-LAYOUT §10 |
 | `ds-style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
-| `ds-style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `ds-style/scale.rs`, `ds-style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_native::snap` |
+| `ds-style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `ds-style/scale.rs`, `ds-style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_blitz::snap` |
 | `ds-style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `ds-style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `ds-style/tokens/layer.rs` | 01-LAYOUT §12 |
@@ -86,7 +86,7 @@ name `ds`'s public surface, one path per item.
 | `stack/{roving,typeahead}.rs` | 30 §1.4: `Roving`, `Rove`, `Wrap`, `Typeahead` |
 | `ds-motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `ds-core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |
-| `host/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `GeometryHost::measure` (ds-native's waits out a document the renderer holds; `NoHost` answers `Unknown`) (FINDINGS "Bar gaps") |
+| `host/measure.rs` | spike S9 (two-phase `use_rect`); every rect read goes through `client_rect`, which uses the host's `GeometryHost::measure` (ds-blitz's waits out a document the renderer holds; `NoHost` answers `Unknown`) (FINDINGS "Bar gaps") |
 | `stack/{host,layer_stack}.rs` | 05-MOTION §9 rule 10; 06-INTERACTIONS §5, §18 |
 | `stack/hover_hub.rs` | 06-INTERACTIONS §3; 04-COMPONENTS O-11 (`data-hover="warm\|cold"`, which `Ds` stamps on the root) |
 | `stack/toast_hub.rs` | 06-INTERACTIONS §9; 04-COMPONENTS §23 (`push_undoable` calls the push's `on_undo` handler) |
@@ -164,7 +164,7 @@ PaletteEntrance{PeekIn, CmdkIn}`, `id`, `focus`, `selected`, `on_select`, `on_se
 | `ds-settings/src/{appearance,units,lenient}` | 22-SETTINGS §3.1-3.3, §4 (`AppearanceFile`, `AppearanceSettings`, `IconsSettings`, the unit newtypes, lenient read and the unknown-key report) |
 | `ds-settings/src/{watch,latest}.rs` | 22-SETTINGS §2 "Live reload", §6.3 (`Store::watch` on a `Spawner`) |
 | `ds-settings/src/{portal,environment}.rs` | the plan's `ds-settings` design (portal, `use_environment`); `Environment::tint_alpha` feeds `Ds{tint_alpha}` |
-| `ds-native` | the plan's `ds-native` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `blitz_host.rs` is `ds::DocumentHost` on Blitz, which `launch` and the harness wire and `ds_native::provide_host()` gives any other Blitz host whole; `measure.rs` and `focus.rs` are its geometry and focus parts; `Harness::is_focused`; `Harness::render_over(Backdrop::Clear)` paints a document's own coverage |
+| `ds-blitz` | the plan's `ds-blitz` design; spike S7/S8 (`data:` net provider), S11 (font registration), S12 (modality); `blitz_host.rs` is `ds::DocumentHost` on Blitz, which `launch` and the harness wire and `ds_blitz::provide_host()` gives any other Blitz host whole; `measure.rs` and `focus.rs` are its geometry and focus parts; `Harness::is_focused`; `Harness::render_over(Backdrop::Clear)` paints a document's own coverage |
 | `ds-gallery` | the plan's gallery (axes, pages, `--snapshot`) |
 
 The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`, `Settings`,

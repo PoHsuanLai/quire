@@ -12,9 +12,9 @@ Citations below follow `design/README.md#3-citation-convention`:
 ## 1. Adding quire
 
 **Rust version.** quire's minimum is `rust-version = "1.92"`: pdfrum's crates (PDF output,
-`ds-native`) declare 1.92, above the 1.91 blitz needs at the pinned rev. The toolchain quire
+`ds-blitz`) declare 1.92, above the 1.91 blitz needs at the pinned rev. The toolchain quire
 builds and tests on stays pinned at 1.98.1 (`rust-toolchain.toml`); a consumer on an older
-compiler than 1.92 cannot build `ds-native`.
+compiler than 1.92 cannot build `ds-blitz`.
 
 **zbus and your executor.** `ds-settings` builds zbus with its default `async-io` backend, which
 works under any executor, tokio included. Do not enable `zbus/tokio` in an app: Cargo unifies
@@ -30,7 +30,7 @@ it by path, the way `examples/consumer/Cargo.toml` does:
 [dependencies]
 ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings" }
-ds-native   = { path = "../quire/crates/ds-native" }   # only if you run on Blitz
+ds-blitz   = { path = "../quire/crates/ds-blitz" }   # only if you run on Blitz
 
 [dev-dependencies]
 ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
@@ -47,7 +47,7 @@ ds = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.1.0" }
 ```
 
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
-and for `ds-native`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
+and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
 a path dependency does not inherit your workspace's `[workspace.dependencies]`, because
 `crates/ds/Cargo.toml` has no `[workspace]` of its own and so joins whichever ancestor manifest
 does (quire's root, not yours). You only need to pin the lines **you** name directly: at minimum
@@ -55,8 +55,8 @@ does (quire's root, not yours). You only need to pin the lines **you** name dire
 (section 5). Copy those lines **verbatim** from `quire/docs/workspace-deps.toml`
 (`CONVENTIONS.md#10-change-discipline`: "the pinned block ... is copied verbatim into
 every workspace"; `docs/workspace-deps.toml` is quire's own copy of the source of truth, not
-owned by this doc). If you also run on Blitz (`ds-native`), your own crate that calls
-`dioxus_native::*` directly (rare — most consumers only call `ds_native::launch`) needs the
+owned by this doc). If you also run on Blitz (`ds-blitz`), your own crate that calls
+`dioxus_native::*` directly (rare — most consumers only call `ds_blitz::launch`) needs the
 `dioxus-native`/`blitz-*` lines too, exactly as pinned, never a different revision.
 
 **If your own crate sits inside a Cargo workspace tree it does not own** (as `examples/consumer`
@@ -69,7 +69,7 @@ it as an orphaned member of the workspace above it.
 surface) still carries Blitz's user-agent stylesheet, which sets `body { margin: 8px }`: its
 content never reaches the true (0, 0) corner, and `position: absolute`/`fixed` with `inset: 0`
 paints nothing on it (sill hot corners, 2026-09-26). shell-host injects `body { margin: 0 }`
-into every document it hosts; a bare document elsewhere (`ds_native::launch`,
+into every document it hosts; a bare document elsewhere (`ds_blitz::launch`,
 a test) must cancel the margin itself or draw inside a `Ds`.
 
 Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COLOR.md
@@ -117,7 +117,7 @@ fn App() -> Element {
 | `tint_alpha` | `Option<Alpha>` | `None` (the tint's default alpha) | the materials' tint alpha over compositor blur (design/22-SETTINGS.md §3.1 `appearance.material_tint_alpha`); pass `ds_settings::Environment::tint_alpha()` (thousandths: `Alpha(800)` is 80%) once you are reading a live `Environment` (section 3) rather than leaving it at the default |
 | `stack` | `Option<MaterialStack>` | `None` (the keys' defaults) | the material stack's six alphas (highlight and hairline per scheme, shadow strength, vibrancy; design/22-SETTINGS.md §3.1 `appearance.material_*`); pass `ds_settings::Environment::material_stack()` once you read a live `Environment`, as with `tint_alpha` |
 | `extent` | `RootExtent` | `RootExtent::Content` | `Content`: as tall as the root's content (a window, the bar, a card). `Viewport`: at least the viewport (`min-height:100vh; min-width:100vw`), **the option for an overlay surface** (an OSD, a sheet, a click catcher) whose content is all positioned and would otherwise leave the root, and everything it places, 0 px tall (FINDINGS "Root height") |
-| `scale` | `Option<Scale>` | `None`: the host's `ds::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_native::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-native` passes `scale` |
+| `scale` | `Option<Scale>` | `None`: the host's `ds::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_blitz::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-blitz` passes `scale` |
 | `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::HostWindow` — section 6, "Window frame" |
 
 ### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
@@ -127,7 +127,7 @@ full row and one half row. Three pieces keep every line whole device pixels (des
 §2.1; FINDINGS "Pixel snapping"):
 
 1. **The root knows the scale.** `Ds { scale: Some(Scale(180)) }` (or the scale in the `ds::HostSignals`
-   ds-native provides) makes the root write the pixel tokens' inputs inline. With no scale, or
+   ds-blitz provides) makes the root write the pixel tokens' inputs inline. With no scale, or
    at `Scale::ONE`, it writes nothing and every token is its 1x value, so nothing changes.
 2. **Lines read the pixel tokens** (`ds::PixelToken`, on `.ds`):
 
@@ -145,10 +145,10 @@ full row and one half row. Three pieces keep every line whole device pixels (des
    and a box whose whole `width`/`height` is `1px`, and names the token to use.
 3. **The layout is snapped to the device grid.** Blitz rounds every box to whole *logical*
    pixels, so at 1.5 a box at y 11 starts at device y 16.5 whatever its width.
-   `ds_native::snap_to_device(&mut BaseDocument)` re-rounds the laid-out document on the device
+   `ds_blitz::snap_to_device(&mut BaseDocument)` re-rounds the laid-out document on the device
    grid (and rounds a pure translation to whole device pixels). `Harness` and `snapshot` run it
    every frame. **A host that resolves its own documents (shell-host) calls it after every
-   `resolve` and before painting**; it does nothing at a whole scale. `ds_native::launch`'s
+   `resolve` and before painting**; it does nothing at a whole scale. `ds_blitz::launch`'s
    window cannot (blitz-shell resolves and paints in one call), so there the tokens apply but a
    line may still sit half a device pixel off.
 
@@ -171,7 +171,7 @@ nothing paints and in the shell no press lands.
   `Ds { extent: RootExtent::Viewport }`, or put the floor on your frame: `display:grid; width:100vw; min-height:100vh` in flow, the
   room around the card as the frame's padding; the grid's one cell stretches the `Ds` root to
   fill it, so the root has the viewport's height too. The same floor holds even if the frame is
-  absolutely placed (`crates/ds-native/tests/root_frame.rs` measures all three).
+  absolutely placed (`crates/ds-blitz/tests/root_frame.rs` measures all three).
 - **The surface is sized by its content** (a bar, a dock, an OSD card's surface): leave the
   content in flow; a card that must be positioned is positioned inside a frame that has a height.
 - **Debug it** with the Harness before looking at the compositor: `harness.rect("html")`,
@@ -203,7 +203,7 @@ next save.
 ```rust
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds::{Ds, Material};
-use ds_native::TokioSpawner;
+use ds_blitz::TokioSpawner;
 use dioxus::prelude::*;
 use std::sync::Arc;
 
@@ -225,13 +225,13 @@ fn App() -> Element {
 
 **Nothing here names a runtime.** The file watch and the portal watch are tasks handed to the
 `ds::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
-On Blitz, `ds_native::TokioSpawner::current()` is the implementor: `ds_native::launch` enters a
+On Blitz, `ds_blitz::TokioSpawner::current()` is the implementor: `ds_blitz::launch` enters a
 process-wide, lazily built Tokio runtime (multi-thread, two workers;
-`crates/ds-native/src/runtime.rs`) and holds the guard for the process's life, and
-`ds_native::Harness` enters it in `Harness::new` for the harness's own life, so `current()` works
+`crates/ds-blitz/src/runtime.rs`) and holds the guard for the process's life, and
+`ds_blitz::Harness` enters it in `Harness::new` for the harness's own life, so `current()` works
 in anything launched with `launch` or rendered inside a `Harness`. A test never reaches the real
 config or the session bus: it passes `ConfigRoot::Scratch(dir)` and
-`SystemPrefsSource::Fixed(prefs)` (`crates/ds-native/tests/harness.rs::
+`SystemPrefsSource::Fixed(prefs)` (`crates/ds-blitz/tests/harness.rs::
 use_environment_does_not_panic_under_the_harness`). `examples/consumer::App` shows the real
 wiring.
 
@@ -403,14 +403,14 @@ Never `std::thread::sleep`, `tokio::time::sleep` or a hand-rolled `setTimeout`-e
 drive a class toggle. Use `ds::use_pulse` (restart a keyframe: `Pulse::fire()`) or
 `ds::use_motion_timer` (`MotionTimer::start(on_settled)`, which runs for exactly
 `ds::settle(anim, level)`); both read the enclosing `Ds`'s resolved motion level, so
-`MotionLevel::Reduced` collapses them automatically. Prove it with `ds_native::Harness`, which
+`MotionLevel::Reduced` collapses them automatically. Prove it with `ds_blitz::Harness`, which
 drives a real Blitz document on a real (if fast-forwarded) clock — the test below is
 `examples/consumer/tests/coherence.rs::the_sent_badge_times_out_on_ds_motions_own_clock`,
 shortened:
 
 ```rust
 use ds::{resolve, settle, Anim, Appearance, SpaceLook, SystemPrefs};
-use ds_native::{Harness, Viewport};
+use ds_blitz::{Harness, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
@@ -438,7 +438,7 @@ order, runs the renders that queued and resolves the CSS at that same instant, a
 once. The two assertions above then hold exactly, every run:
 
 ```rust
-use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
 
 let config = HarnessConfig::new(Viewport { width: 480, height: 360, scale_percent: 100 })
     .with_clock(Clock::Virtual);
@@ -626,7 +626,7 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
   symbolic; anything coloured is an image) and is the caller's decision. `Button { icon }`
   takes an `IconSource`, and an `Icon` (or `Option<Icon>` for `Button`)
   still converts, so existing call sites are unchanged. `ds::IconView { source, size }` draws one
-  anywhere else. The URL loads through the document's net provider (ds-native and shell-host's
+  anywhere else. The URL loads through the document's net provider (ds-blitz and shell-host's
   `LocalNet` answer `data:` and `file:`), one frame late.
 
   ```rust
@@ -665,8 +665,8 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
 
 For a bar (FINDINGS "Bar gaps"):
 
-- **A Blitz host that is not `ds_native::launch`** (shell-host's surfaces, a popup's document)
-  calls `ds_native::provide_host()` at the top of its root component, before any quire
+- **A Blitz host that is not `ds_blitz::launch`** (shell-host's surfaces, a popup's document)
+  calls `ds_blitz::provide_host()` at the top of its root component, before any quire
   component reads the document. It installs every part of `ds::DocumentHost` at once (rects,
   focus, caret, scroll, edit, drop), so a root can never hold a subset; a root under a window's
   or the harness's host keeps that one. Drop your own copy of the twelve-line measurer. With no
@@ -676,7 +676,7 @@ For a bar (FINDINGS "Bar gaps"):
   ```rust
   #[component]
   fn BarRoot() -> Element {
-      ds_native::provide_host();
+      ds_blitz::provide_host();
       rsx! { Ds { appearance, material: Material::Bar, look, /* … */ } }
   }
   ```
@@ -691,7 +691,7 @@ For a bar (FINDINGS "Bar gaps"):
   shadow on its own box (`data-chrome="transparent"`); the `.ds-popover`/`.ds-menu` and
   `.ds-sheet` cards inside paint the material's tint (`--m-tint` over blur, `--m-tint-solid`
   without), edge and drop (`--m-box`). A popup document keeps `Material::Popover` and its
-  spare room is alpha 0 (`crates/ds-native/tests/bar_frame.rs` proves it over
+  spare room is alpha 0 (`crates/ds-blitz/tests/bar_frame.rs` proves it over
   `Harness::render_over(Backdrop::Clear)`).
 - **The frame ground.** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
   Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
@@ -757,12 +757,12 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
 - **Focus waits out a busy document.** `Focus::OnMount`, a menu taking the keyboard and every
   other focus change go through the host's `ds::FocusHost` (`Focused::{Done, Busy, Unknown}`),
   tried again a frame later while the renderer holds the document. A Blitz host that is not
-  `ds_native::launch` provides it with the rest of the host:
+  `ds_blitz::launch` provides it with the rest of the host:
 
   ```rust
   #[component]
   fn LauncherRoot() -> Element {
-      ds_native::provide_host();
+      ds_blitz::provide_host();
       rsx! { Ds { appearance, material: Material::Sheet, look, /* … */ } }
   }
   ```
@@ -876,7 +876,7 @@ Palette behaviour:
   the menu and hand the field the keyboard back. The palette's `onkey` must stop the first
   Ctrl+K as well as prevent it: the key it opens the menu on bubbles on to the same root
   handler, which would see the menu open and close it at once
-  (`crates/ds-native/tests/palette_actions_key.rs`):
+  (`crates/ds-blitz/tests/palette_actions_key.rs`):
 
   ```rust
   div {
@@ -908,16 +908,16 @@ measured numbers.
 
 | Need | API | Notes |
 | --- | --- | --- |
-| An HTML document as a PDF | `ds_native::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
-| A Dioxus tree as a PDF | `ds_native::pdf_app(app, HarnessConfig::new(viewport), spec)` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
+| An HTML document as a PDF | `ds_blitz::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
+| A Dioxus tree as a PDF | `ds_blitz::pdf_app(app, HarnessConfig::new(viewport), spec)` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
 | In a test | `Harness::pdf(spec) -> Result<Vec<u8>, PdfError>` | Prints the harness's document as it is now, at the page width with `@media print`; the harness's own viewport and media come back afterwards. Read the PDF back with `pdfrum` (dev-dependency) to assert on text. |
 | The sheet | `PageSpec { size, margins }`; `PageSize::{A4, Letter, Custom { width: Pt, height: Pt }}`; `Margins { top, right, bottom, left }`, `Margins::uniform(Pt)`, `Margins::symmetric(vertical, horizontal)`; `Pt::from_mm`, `Pt::from_inches` | `PageSpec::default()` is A4 with 18 mm above and below, 16 mm at the sides. `@page` is not read: the spec's margins are the only ones. `PdfError::NoContentArea` when the margins meet. |
 | Start a new page at an element | `"data-break-before": "page"` | CSS `break-before`/`page-break-before` do nothing on Blitz (stylo drops them). A marker at the document's top makes no blank page. |
 | Keep a box on one page | `"data-break-inside": "avoid"` | Moved whole to the next page when it would straddle the cut, unless it is taller than a page (then it is cut between its lines). Lines, images, `svg`, `canvas`, `iframe` and table rows are kept whole on their own; a text block keeps its first two and last two lines together (orphans and widows of 2). |
 | Screen-only or print-only styling | `@media print { .. }` | Applies in `pdf`, `pdf_app` and `Harness::pdf`. |
 | CJK text | name the family: `font-family: "Noto Sans CJK TC", sans-serif` | Otherwise fontique's fallback picks (DroidSansFallback on this machine). A variable face prints at the instance the layout used. |
-| Print it | `ds_native::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
-| Try it by hand | `cargo run --release -p ds-native --example pdf -- out.pdf`; `cargo run -p ds-native --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
+| Print it | `ds_blitz::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
+| Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
 | The painter alone | `anyrender_pdfrum::write(&[Page { size, scene, placement, clip, area }], &sources)` | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
@@ -998,15 +998,15 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | `backdrop-filter: blur()` | S15 | ask the compositor to blur behind the surface (`Material`/`BlurState`), not CSS |
 | CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::clip_chars` for a real character-count ellipsis |
-| `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_native::launch` track modality for you; `Rule::FocusPseudoClass` |
+| `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_blitz::launch` track modality for you; `Rule::FocusPseudoClass` |
 | `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::use_rect()` — measures one frame later, never inside the handler; to anchor an overlay, `Anchor::Mounted` does this for you |
-| a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
-| `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_native::launch`/`Harness` already install one; nothing to do if you use them |
+| a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-blitz/tests/click.rs`, FINDINGS "Polish pass") |
+| `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_blitz::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
 | a wheel phase (a touchpad gesture's end) | notification parts | treat a quiet spell after the last delta as the end (`DelayToken::SwipeQuiet`, `use_swipe`) |
 | a clean removal of a running animation | notification parts | Blitz keeps the last animated value when an animation is taken off an element before a frame resolved past its end: put an entrance on an element that mounts with it rather than on a presence attribute that changes (`BannerStack`) |
-| `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_native::pdf` (section 6, "PDF and printing") |
+| `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_blitz::pdf` (section 6, "PDF and printing") |
 
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom
 property cascade once selectors carry `*|` (S2), `@keyframes` including `var()` inside them (S3),

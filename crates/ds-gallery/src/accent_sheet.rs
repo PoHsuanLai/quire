@@ -13,7 +13,7 @@ use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{Appearance, Ds, Material, Scheme, Theme};
-use ds_native::{Harness, Viewport};
+use ds_blitz::{Harness, Viewport};
 use image::{RgbaImage, imageops};
 use std::cell::Cell;
 use std::path::{Path, PathBuf};

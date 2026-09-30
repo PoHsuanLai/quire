@@ -2,7 +2,7 @@
 //! launcher preview, and design/20 section 2.4's Quick Look later).
 //!
 //! ds draws; it never reads a file or rasterises (it is renderer-free, `scripts/check-boundary.sh`).
-//! The caller hands it the page as a [`PdfPage`]: a Blitz app uses `ds_native::PdfFileThumb`,
+//! The caller hands it the page as a [`PdfPage`]: a Blitz app uses `ds_blitz::PdfFileThumb`,
 //! which takes a path, rasterises off the UI thread and caches, and feeds this component. The
 //! page is a paper sheet (`--foreign-ground`, white in both schemes) with a hairline edge, fitted
 //! into `size` at the page's own aspect and centred ([`sheet_rect`]). While the page is being read

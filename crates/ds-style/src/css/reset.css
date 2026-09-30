@@ -17,7 +17,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-extent=viewport]{min-height:100vh;min-width:100vw}
 /* The focus ring (design/30 section 1.4, Ring): a 3 px translucent accent outline one pixel off the
    element, on keyboard focus only. Blitz never matches the visible-focus pseudo
-   class, so ds-native stamps the input modality on the root and the ring keys on it (spike
+   class, so ds-blitz stamps the input modality on the root and the ring keys on it (spike
    S12). */
 .ds[*|data-modality=keyboard] :focus{outline:var(--ring) solid var(--accent-ring);outline-offset:var(--focus-gap);border-radius:var(--r-tiny)}
 /* Highlight is the element's own fill (menu rows), never a ring. */

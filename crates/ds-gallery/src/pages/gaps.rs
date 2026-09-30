@@ -48,7 +48,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
     (
         "S7",
         "mask-image: url(data:…) paints only with a data: net provider.",
-        "ds-native installs one; the truncation fade and masks work.",
+        "ds-blitz installs one; the truncation fade and masks work.",
     ),
     (
         "S8",
@@ -68,7 +68,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
     (
         "S11",
         "Registered TTFs are picked by font-family.",
-        "ds-native registers the six faces once (the Type page).",
+        "ds-blitz registers the six faces once (the Type page).",
     ),
     (
         "S12",
@@ -110,7 +110,7 @@ const DS_GAPS: [(&str, &str); 3] = [
         "Open items",
     ),
     (
-        "A click never reaches a Button whose parent holds only inline content (the Button alone, beside an if placeholder or inline text): blitz-dom hits the parent. A flex row or a block after it makes it land (ds-native tests/click.rs).",
+        "A click never reaches a Button whose parent holds only inline content (the Button alone, beside an if placeholder or inline text): blitz-dom hits the parent. A flex row or a block after it makes it land (ds-blitz tests/click.rs).",
         "Polish pass",
     ),
 ];

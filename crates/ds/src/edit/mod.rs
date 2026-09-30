@@ -5,7 +5,7 @@
 //! The app keeps its document model and draws its own caret and selection. The surface only
 //! owns the focus, turns keys, IME composition and clipboard shortcuts into [`EditInput`]s,
 //! resolves a pointer to a [`TextPosition`] in the app's own markup, and answers caret and
-//! selection rects through the host (`ds_native::edit`). Positions name the app's elements by
+//! selection rects through the host (`ds_blitz::edit`). Positions name the app's elements by
 //! their `data-edit-node` value, so the app never sees a renderer's node ids.
 
 pub(crate) mod clicks;

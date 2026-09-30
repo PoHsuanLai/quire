@@ -1,8 +1,8 @@
 //! Which device scale a root draws for: the `Ds { scale }` prop, else the host's, else 1x.
 //!
-//! `ds-native` knows the scale it renders at (a snapshot's viewport, a window's scale factor)
+//! `ds-blitz` knows the scale it renders at (a snapshot's viewport, a window's scale factor)
 //! and provides it in `HostSignals` root context, beside the input modality; a
-//! host that is not `ds-native` (shell-host) passes `scale` to `Ds` itself. The root resolves
+//! host that is not `ds-blitz` (shell-host) passes `scale` to `Ds` itself. The root resolves
 //! it once and provides it to its subtree, so a `Glyph` can snap its stroke.
 
 use dioxus::prelude::*;

@@ -3,7 +3,7 @@
 //! Blitz's text editor ignores `font-family` and `letter-spacing`, so the hidden
 //! text of a `Password` or `Secret` field is measured in another face than its Inter dots tracked
 //! .1em, and Blitz's caret drifted off the last dot as the text grew (two dots short at eleven).
-//! Where the host reads the field's selection ([`CaretHost::selection`](crate::CaretHost::selection), ds-native), the field hides
+//! Where the host reads the field's selection ([`CaretHost::selection`](crate::CaretHost::selection), ds-blitz), the field hides
 //! Blitz's caret (`caret-color: transparent`) and the mask draws its own: a 1.5 px bar the height
 //! of the line, as Blitz's is, placed between the dots at the caret's character. A selected
 //! range is a highlight over its dots and shows no caret. Without the host the renderer's

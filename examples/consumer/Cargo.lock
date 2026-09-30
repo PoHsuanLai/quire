@@ -908,7 +908,7 @@ dependencies = [
  "dioxus-ssr",
  "ds",
  "ds-lint",
- "ds-native",
+ "ds-blitz",
  "ds-settings",
 ]
 
@@ -1580,7 +1580,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ds-native"
+name = "ds-blitz"
 version = "0.1.0"
 dependencies = [
  "anyrender",

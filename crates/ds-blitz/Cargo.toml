@@ -1,0 +1,119 @@
+[package]
+name = "ds-blitz"
+description = "Blitz glue for quire: launch, fonts, headless snapshots, PDF output and printing, test harness."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds = { workspace = true }
+dioxus = { workspace = true }
+blitz-dom = { workspace = true }
+blitz-paint = { workspace = true }
+blitz-traits = { workspace = true }
+blitz-html = { workspace = true }
+dioxus-native-dom = { workspace = true }
+# `html`: an `<iframe srcdoc>` in the window parses into a real sub-document (G4). `clipboard`:
+# copy and paste in every text field, and `ds_blitz::clipboard` (G5).
+dioxus-native = { workspace = true, features = ["html", "clipboard"] }
+# `open_window`: a second window on the same event loop, each with its own VirtualDom
+# (`crate::windows`), and the two providers dioxus-native keeps private (`crate::native_providers`).
+blitz-shell = { workspace = true }
+dioxus-asset-resolver = { workspace = true }
+webbrowser = { workspace = true }
+# `text/html` from the system clipboard for an edit surface's paste.
+arboard = { workspace = true }
+anyrender = { workspace = true }
+anyrender_vello_hybrid = { workspace = true }
+anyrender_vello_cpu = { workspace = true }
+parley = { workspace = true }
+wgpu = { workspace = true }
+# The hybrid harness backend (`crate::gpu_paint`): vello_hybrid driven directly on an offscreen
+# device, its image ids, and the device handle anyrender_vello_hybrid paints with.
+vello_hybrid = { workspace = true }
+vello_common = { workspace = true }
+wgpu_context = { workspace = true }
+rustc-hash = { workspace = true }
+image = { workspace = true }
+keyboard-types = { workspace = true }
+peniko = { workspace = true }
+# PDF output: the painter, which writes through pdfrum.
+anyrender_pdfrum = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+# PDF thumbnails (the `pdf-thumb` feature): pdfrum's reader and CPU rasteriser.
+pdfrum = { workspace = true, optional = true }
+# Spellchecking (the `spellcheck` feature): the checker, and XDG data for the user dictionary.
+spellbook = { workspace = true, optional = true }
+dirs = { workspace = true, optional = true }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+# The print portal (the `print` feature): zbus with quire's async-io default (no executor is
+# forced on the app), and a sealed memfd for the PDF's file descriptor.
+zbus = { workspace = true, optional = true }
+memfd = { workspace = true, optional = true }
+
+[features]
+# `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
+# Off by default, so an app that never prints builds no D-Bus client for it.
+print = ["dep:zbus", "dep:memfd"]
+# `PdfFileThumb`: a PDF's first page rasterised off the UI thread and cached, drawn by
+# `ds::PdfThumb`. Off by default, so an app that shows no PDF builds no PDF reader.
+pdf-thumb = ["dep:pdfrum"]
+# `ds_blitz::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
+# dictionaries checked on one worker thread. Off by default, so an app that never checks
+# spelling builds no checker.
+spellcheck = ["dep:spellbook", "dep:dirs"]
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+ds-shell = { workspace = true }
+# Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
+pdfrum = { workspace = true }
+# Writing PDFs for the thumbnail tests (a filled page, an encrypted one).
+pdfrum-edit = { workspace = true }
+pdfrum-common = { workspace = true }
+# Glyph ids from the cmap, for the colour-emoji and font-stack tests.
+skrifa = { workspace = true }
+# The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
+ds-settings = { workspace = true, features = ["dioxus"] }
+
+[[example]]
+name = "window"
+
+[[example]]
+name = "edit"
+
+[[example]]
+name = "second_window"
+
+[[example]]
+name = "file_drop"
+
+[[example]]
+name = "pdf"
+
+[[example]]
+name = "print"
+required-features = ["print"]
+
+[[test]]
+name = "pdf_thumb"
+required-features = ["pdf-thumb"]
+
+[[test]]
+name = "spell_worker"
+required-features = ["spellcheck"]
+
+[[test]]
+name = "spell_edit"
+required-features = ["spellcheck"]
+
+[[test]]
+name = "pdf_thumb_queue"
+required-features = ["pdf-thumb"]

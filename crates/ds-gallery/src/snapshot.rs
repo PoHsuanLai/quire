@@ -11,7 +11,7 @@ use crate::registry;
 use crate::sheet;
 use ds::Word;
 use ds::{Accent, Motion, Scheme, Theme, Typeface};
-use ds_native::{Viewport, snapshot_placed};
+use ds_blitz::{Viewport, snapshot_placed};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
 
@@ -26,7 +26,7 @@ pub const SCHEMES: [Scheme; 2] = [Scheme::Light, Scheme::Dark];
 pub const ACCENTS: [Accent; 2] = [Accent::Blue, Accent::Pink];
 
 /// When each picture is taken: long after every CSS entrance and transition has ended. Rust
-/// timers do not run in a snapshot (ds_native::snapshot), so a picture is CSS time only.
+/// timers do not run in a snapshot (ds_blitz::snapshot), so a picture is CSS time only.
 const AT: Duration = Duration::from_secs(10);
 
 /// One picture on the sheet.
@@ -121,7 +121,7 @@ pub fn render(shot: &Shot) -> Result<image::RgbaImage, GalleryError> {
         })?;
     frames.pop().ok_or_else(|| GalleryError::Render {
         name: shot.file(),
-        source: ds_native::NativeError::Renderer("no frame".into()),
+        source: ds_blitz::NativeError::Renderer("no frame".into()),
     })
 }
 

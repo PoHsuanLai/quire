@@ -2,7 +2,7 @@
 //! only through `WidgetCard`, each size and state they take, with the card quire owns around
 //! them. Each golden is `tests/snapshots/widget-contract/<name>.html`; each lints clean and
 //! every `ds-` class in it is styled by the stylesheet. The timeline's clock behaviour is
-//! proven on the virtual clock in `ds-native/tests/widget_timeline.rs`.
+//! proven on the virtual clock in `ds-blitz/tests/widget_timeline.rs`.
 //!
 //! `DS_BLESS=1 cargo test -p ds --features lint --test widget_contract_ssr` rewrites the goldens.
 

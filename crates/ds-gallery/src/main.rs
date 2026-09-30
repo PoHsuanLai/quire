@@ -30,7 +30,7 @@ mod wallpaper_vivid;
 mod tests;
 
 use axes::{Axes, start_with};
-use ds_native::{AppConfig, launch};
+use ds_blitz::{AppConfig, launch};
 
 fn main() {
     let args = args::parse(std::env::args().skip(1));
