@@ -81,9 +81,10 @@ sides. Verbatim:
 }
 .win.no-side{ grid-template-columns:0 minmax(0,1fr); padding-left:8px; }
 .layer{ position:absolute; inset:0; z-index:-2; transition:opacity 380ms var(--e-out); }
+.grain{ position:absolute; inset:0; z-index:-1; pointer-events:none; mix-blend-mode:overlay; background-size:128px 128px; }
 ```
 
-`S:77-86`; the prototype's `.grain` layer (`S:87`) is not drawn (03 section 8)
+`S:77-87`
 
 | Property | Value | Source |
 | --- | --- | --- |
@@ -93,7 +94,7 @@ sides. Verbatim:
 | Columns | sidebar 232, card `minmax(0,1fr)` | `S:81` |
 | Padding | top 8, right 8, bottom 8, left 0 (the sidebar supplies its own left padding) | `S:81` |
 | Sidebar hidden | columns `0 minmax(0,1fr)`, padding-left 8 | `S:85` |
-| Frame layers | two `.layer` elements (a and b) for the Space cross-fade, then content | `S:835-838` |
+| Frame layers | two `.layer` elements (a and b) for the Space cross-fade, then `.grain`, then content | `S:835-838` |
 
 `C` has no frame. Its shell is one bordered panel with three columns
 `206px minmax(0,1fr) minmax(0,1.05fr)`, height `min(72vh,700px)`, min-height 560, border 1 px
@@ -389,6 +390,7 @@ Inside a window, z-index values are fixed; overlays are children of the window.
 | z | Layer | Source |
 | --- | --- | --- |
 | -2 | frame `.layer` (a, b) | `S:86` |
+| -1 | `.grain` | `S:87` |
 | 7 | link pill | `S:431` |
 | 8 | undo toast | `S:360` |
 | 9 | floating composer, send pill | `S:373`, `S:706` |

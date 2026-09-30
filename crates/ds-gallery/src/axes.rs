@@ -35,7 +35,7 @@ impl PresetIndex {
 
     /// The look this preset ships as: its dots and grain, the system theme, the chosen accent.
     pub fn look(self) -> SpaceLook {
-        default_look(usize::from(self.0), CardAccent::Chosen)
+        default_look(usize::from(self.0), Grain::default(), CardAccent::Chosen)
     }
 }
 

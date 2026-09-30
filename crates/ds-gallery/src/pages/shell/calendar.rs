@@ -76,7 +76,7 @@ fn Month(theme: Theme, weeks: WeekNumbers) -> Element {
         div { class: "g-cc",
             Ds {
                 appearance: Appearance { theme, accent, motion },
-                look: SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
+                look: SpaceLook { theme, ..default_look(0, Grain(35), CardAccent::SpaceHue) },
                 material: Material::Popover,
                 blur,
                 stylesheet: Inject::Host,

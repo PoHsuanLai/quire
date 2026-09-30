@@ -41,7 +41,7 @@ pub fn SpacePage() -> Element {
                 }
             }
         }
-        Section { title: "SpaceEditor", note: "Edits the Space the whole gallery is framed in: drag a dot, pick a preset. Rename it in the title; the Motion row drives the gallery's motion; the readout measures each scheme the Space's theme can show.",
+        Section { title: "SpaceEditor", note: "Edits the Space the whole gallery is framed in: drag a dot, change the grain, pick a preset. Rename it in the title; the Motion row drives the gallery's motion; the readout measures each scheme the Space's theme can show.",
             SpaceEditor {
                 look: look.clone(),
                 scheme,
@@ -72,6 +72,7 @@ pub fn SpacePage() -> Element {
                 Caption { name: "--f-pill-hover", code: frame.pill_hover.clone() }
                 Caption { name: "--f-line", code: frame.line.clone() }
                 Caption { name: "--f-solid", code: frame.solid.clone() }
+                Caption { name: "--f-grain", code: frame.grain_opacity.clone() }
                 Caption {
                     name: "card accent",
                     code: frame.accent.as_ref().map_or("chosen accent (the card keeps its own)".to_string(), |roles| format!("{} / {} / {} / {}", roles.fill.css(), roles.wash_colour().css(), roles.text.css(), roles.ink.css())),

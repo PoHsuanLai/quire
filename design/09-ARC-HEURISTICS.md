@@ -42,7 +42,7 @@ meeting.
 ## 3. Visual principles the article names (already ours)
 
 - "Clean, with soft gradients, purposeful typography, and a layout that respects space. The
-  design creates mental calm." → the Space frame gradient (03 §Palette), three
+  design creates mental calm." → the Space frame gradient with grain (03 §Palette), three
   faces with every pair fixed (02), the spacing scale and 8 px clamp (01). No new rule.
 - "Minimal and frictionless ... clear, structured, and responsive." → the four rules (00 §3) and
   the motion principle "springs only on contact" (00 §4).

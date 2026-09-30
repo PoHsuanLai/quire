@@ -11,7 +11,7 @@ against them.
 | `00-PRINCIPLES.md` | The stance in the prototypes' words; which parts are Arc, which are Mac; one design system for every surface. |
 | `01-LAYOUT.md` | Window grid, pane widths, row heights, spacing scale, z-order. |
 | `02-TYPE.md` | Three faces, every size/weight/tracking pair, truncation. |
-| `03-COLOR.md` | Light/dark tokens, usage map, Space palette, Candy hues, materials. |
+| `03-COLOR.md` | Light/dark tokens, usage map, Space palette, grain, Candy hues, materials. |
 | `04-COMPONENTS.md` | Every component: markup skeleton, sizes, every state. |
 | `05-MOTION.md` | Every keyframe, transition, timing token and level; the motion rules. |
 | `06-INTERACTIONS.md` | Every behaviour as a state machine: keys, hover intent, menus, drag, Escape. |

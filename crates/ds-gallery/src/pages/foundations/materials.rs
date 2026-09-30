@@ -19,7 +19,7 @@ use ds_shell::prelude::*;
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
     match material {
-        Material::Window => "App windows: the Space gradient and its layers",
+        Material::Window => "App windows: the Space gradient, its layers and grain",
         Material::Bar => {
             "The menu bar: the Space gradient at the bar's tint (data-frame=tinted), status items and text on the frame ground"
         }

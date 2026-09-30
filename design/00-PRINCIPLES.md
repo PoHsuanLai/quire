@@ -147,7 +147,7 @@ missing.
 
 | Lineage | Elements | Source |
 | --- | --- | --- |
-| Arc | OKLCH gradient frame (the prototype's grain is not drawn), calibrated to Arc's own `--arc-palette-*` exports | `S:908-912`, `S:986-991` |
+| Arc | OKLCH gradient frame plus grain, calibrated to Arc's own `--arc-palette-*` exports | `S:908-912`, `S:986-991` |
 | Arc | Sidebar drawn straight on the colour with translucent white pills | `S:89-153` |
 | Arc | Command pill "Search or run a command" with `Ctrl T` | `S:841` |
 | Arc | Grouped command menu, "like Arc's" | `S:1590` |
@@ -157,7 +157,7 @@ missing.
 | Arc | Hide sidebar (`Ctrl S`) plus edge peek | `S:450-454`, `S:1841-1843` |
 | Arc | Link pill as a status bar | `S:430-437` |
 | Arc | Card inset 8 px inside the frame, with its own radius | `S:81`, `S:156-160` |
-| Arc | Space editor: hue x chroma field, up to 3 dots, presets (the prototype's grain slider is dropped) | `S:243-279` |
+| Arc | Space editor: hue x chroma field, up to 3 dots, grain slider, presets | `S:243-279` |
 | Mac / conventional | Sidebar, list, reader three-pane order | `S:840-860` |
 | Mac / conventional | List toolbar; reader header with a tool row | `S:162-164`, `S:202-207` |
 | Mac / conventional | Centred peek over a scrim (sheet) | `S:220-226` |
@@ -282,7 +282,7 @@ than resolved here. Behaviour numbers live in `10-BEHAVIOUR-dock.md`, `11-BEHAVI
    (`C:1122`); the app-icon decision makes app icons full-colour gradients (`P:810-814`). The
    boundary (dock tiles and launcher results coloured; everything else one colour) is the reading
    in 8.3 but is not stated in the plan.
-10. **Wallpaper and the Space.** Whether the wallpaper shows the Space gradient, or a
+10. **Wallpaper and the Space.** Whether the wallpaper shows the Space gradient and grain, or a
     picture, or both, is not specified.
 11. **Material and zone for control center, notifications, OSD and widgets** are not specified.
 

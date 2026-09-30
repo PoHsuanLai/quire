@@ -44,15 +44,20 @@ fn light() -> Appearance {
     }
 }
 
-fn look(index: usize) -> SpaceLook {
+fn look(index: usize, grain: u8) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
+        grain: Grain(grain),
         ..SpaceLook::default()
     }
 }
 
 fn pixel(frame: &RgbaImage, x: u32, y: u32) -> [u8; 4] {
     frame.get_pixel(x, y).0
+}
+
+fn luma(pixel: [u8; 4]) -> i32 {
+    (i32::from(pixel[0]) * 3 + i32::from(pixel[1]) * 6 + i32::from(pixel[2])) / 10
 }
 
 fn render(app: fn() -> Element) -> RgbaImage {
@@ -75,12 +80,12 @@ fn window(look: SpaceLook, extra: &'static str) -> Element {
 
 #[allow(non_snake_case)]
 fn Plain() -> Element {
-    window(look(0), "")
+    window(look(0, 0), "")
 }
 
 #[allow(non_snake_case)]
 fn Red() -> Element {
-    window(look(0), RED_LAYERS)
+    window(look(0, 0), RED_LAYERS)
 }
 
 /// Red layers turn the frame red: the layers are what the window shows.
@@ -99,13 +104,97 @@ fn the_frame_layers_paint_over_the_root() {
     assert!(distance(at_plain, at_red) > 60, "{at_plain:?} {at_red:?}");
 }
 
-// ---- No grain ------------------------------------------------------------------------------
+// ---- The grain shows -----------------------------------------------------------------------
 
-/// No grain is painted: the window's document has no grain layer.
+#[allow(non_snake_case)]
+fn Grainless() -> Element {
+    window(look(0, 0), "")
+}
+
+#[allow(non_snake_case)]
+fn Grainy() -> Element {
+    window(look(0, 100), "")
+}
+
+/// Grain 100 changes the luminance of the window's pixels where grain 0 leaves the gradient.
 #[test]
-fn the_window_frame_paints_no_grain() {
-    let harness = Harness::new(|| window(look(0), ""), VIEW);
-    assert!(!harness.html().contains("grain"), "{}", harness.html());
+fn the_grain_changes_the_frame() {
+    let smooth = render(Grainless);
+    let grainy = render(Grainy);
+    keep(&grainy, "window-frame-grain");
+    let changed = (0..40u32)
+        .flat_map(|y| (0..40u32).map(move |x| (x, y)))
+        .map(|(x, y)| (luma(pixel(&smooth, x, y)) - luma(pixel(&grainy, x, y))).abs())
+        .collect::<Vec<_>>();
+    let moved = changed.iter().filter(|d| **d >= 2).count();
+    let most = changed.iter().max().copied().unwrap_or(0);
+    println!("grain moved {moved} of 1600 pixels, the most by {most}");
+    assert!(
+        moved > 100,
+        "grain moved {moved} of 1600 pixels (most {most})"
+    );
+}
+
+// ---- The grain's pixel variance -------------------------------------------------------------
+
+fn dark_window(look: SpaceLook) -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme: Theme::Dark, ..Appearance::default() }, look, material: Material::Window,
+            style { {PROBE_CSS} }
+            div { class: "room" }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+fn LightGrain0() -> Element {
+    window(look(0, 0), "")
+}
+
+#[allow(non_snake_case)]
+fn LightGrain55() -> Element {
+    window(look(0, 55), "")
+}
+
+#[allow(non_snake_case)]
+fn DarkGrain0() -> Element {
+    dark_window(look(0, 0))
+}
+
+#[allow(non_snake_case)]
+fn DarkGrain55() -> Element {
+    dark_window(look(0, 55))
+}
+
+/// The luminance variance over the window's top-left 64 x 64 pixels.
+fn variance(frame: &RgbaImage) -> f64 {
+    let lumas: Vec<f64> = (0..64u32)
+        .flat_map(|y| (0..64u32).map(move |x| (x, y)))
+        .map(|(x, y)| f64::from(luma(pixel(frame, x, y))))
+        .collect();
+    let mean = lumas.iter().sum::<f64>() / lumas.len() as f64;
+    lumas.iter().map(|l| (l - mean).powi(2)).sum::<f64>() / lumas.len() as f64
+}
+
+/// Grain 55 roughens the frame where grain 0 leaves the smooth gradient, in both schemes; the
+/// four frames are kept for review.
+#[test]
+fn grain_55_has_more_pixel_variance_than_grain_0_in_both_schemes() {
+    let cases: [(&str, fn() -> Element, fn() -> Element); 2] = [
+        ("light", LightGrain0, LightGrain55),
+        ("dark", DarkGrain0, DarkGrain55),
+    ];
+    for (scheme, smooth, grainy) in cases {
+        let (smooth, grainy) = (render(smooth), render(grainy));
+        keep(&smooth, &format!("grain-0-{scheme}"));
+        keep(&grainy, &format!("grain-55-{scheme}"));
+        let (v0, v55) = (variance(&smooth), variance(&grainy));
+        println!("{scheme}: variance grain 0 {v0:.3}, grain 55 {v55:.3}");
+        assert!(
+            v55 > v0 + 0.5,
+            "{scheme}: grain 55 {v55} is not above grain 0 {v0}"
+        );
+    }
 }
 
 // ---- The cross-fade -------------------------------------------------------------------------
@@ -114,7 +203,7 @@ fn the_window_frame_paints_no_grain() {
 fn Switching() -> Element {
     let mut index = use_signal(|| 0usize);
     rsx! {
-        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(index()), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(index(), 0), material: Material::Window,
             style { {PROBE_CSS} }
             div { class: "room",
                 MenuBarItem {

@@ -5,7 +5,7 @@
 //!   root that only hosts overlays (a shell popup holding a menu) is a zero-height, full-width
 //!   box; painting the material there drew a shadow band across the popup. The card paints
 //!   itself instead.
-//! - [`FrameTint`]: whether the root draws the Space gradient, and how: opaque
+//! - [`FrameTint`]: whether the root draws the Space gradient, and how: opaque with its grain
 //!   on a window, at the material's tint alpha on shell chrome (design/21-SPACES.md sections 3
 //!   and 5).
 //! - [`Ground`]: whether components are drawn on paper (the Post inks) or on the frame colour
@@ -53,10 +53,10 @@ impl RootChrome {
 /// How a painted root draws the Space gradient.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum FrameTint {
-    /// The window's frame: the gradient opaque and its two layers (design/03-COLOR.md
-    /// section 4.5).
+    /// The window's frame: the gradient opaque, its two layers and grain (design/03-COLOR.md
+    /// sections 4.5 and 8).
     Opaque,
-    /// Shell chrome: the gradient and its layers as one group at the material's tint
+    /// Shell chrome: the gradient, its layers and grain as one group at the material's tint
     /// alpha over compositor blur (`data-blur=on`), or at the solid floor .94 without it
     /// (design/21-SPACES.md section 3).
     Tinted,

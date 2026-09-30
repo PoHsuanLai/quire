@@ -60,7 +60,7 @@ fn InPopover(theme: Theme) -> Element {
         div { class: "g-alert-cc",
             Ds {
                 appearance,
-                look: SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
+                look: SpaceLook { theme, ..default_look(0, Grain(35), CardAccent::SpaceHue) },
                 material: Material::Popover,
                 stylesheet: Inject::Host,
                 chrome: Some(RootChrome::Painted),

@@ -1,14 +1,14 @@
 //! The `--f-*` variables a `.ds` root carries inline, computed in Rust for the resolved scheme
 //! (design/03-COLOR.md sections 4.5 and 8, design/21-SPACES.md section 2).
 //!
-//! Replaces mailo's `ui/paint.rs` `push_palette`; the `-l`/`-d` copies
+//! Replaces mailo's `ui/paint.rs` `push_palette` and `grain_opacity`; the `-l`/`-d` copies
 //! and `SYSTEM_ACCENT` are deleted.
 //!
-//! The arithmetic is mailo's `push_palette` and `push_accent` for an explicit
+//! The arithmetic is mailo's `push_palette`, `push_accent` and `grain_opacity` for an explicit
 //! theme: the palette `derive` makes, the first stop as `--f-solid`, the gradient, the scheme's
-//! `--f-line`. mailo's `--f-hover` is written `--f-pill-hover`.
+//! `--f-line`, and the grain as an opacity. mailo's `--f-hover` is written `--f-pill-hover`.
 
-use super::look::{CardAccent, SpaceLook};
+use super::look::{CardAccent, Grain, SpaceLook};
 use super::palette::{derive, gradient};
 use crate::appearance::theme::Scheme;
 use crate::tokens::accent_band::roles::AccentRoles;
@@ -35,6 +35,8 @@ pub struct FrameVars {
     /// The gradient's stops, one colour per dot, left to right: what a `SpaceDot`
     /// hands its stylesheet as `--dot-c1..3`. Not written on the root.
     pub stops: Vec<String>,
+    /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.
+    pub grain_opacity: String,
     /// The accent roles when the card borrows the Space's hue; written as `--accent`,
     /// `--accent-ink`, `--accent-soft`, `--accent-text`, `--accent-text-material`,
     /// `--accent-ring` and `--seal`.
@@ -65,6 +67,7 @@ impl FrameVars {
             solid,
             gradient,
             stops: palette.stops.clone(),
+            grain_opacity: grain_opacity(look.grain, scheme),
             accent,
         }
     }
@@ -93,6 +96,7 @@ impl FrameVars {
             ("--f-line", self.line.clone()),
             ("--f-solid", self.solid.clone()),
             ("--f-grad", self.gradient.clone()),
+            ("--f-grain", self.grain_opacity.clone()),
         ];
         if let Some(roles) = &self.accent {
             pairs.extend([
@@ -109,18 +113,63 @@ impl FrameVars {
     }
 }
 
+/// Grain as a CSS opacity: the stored 0-100 times .20 in light and .16 in dark
+/// (design/03-COLOR.md section 8), written with no trailing zeros: 35 is `.07` light and
+/// `.056` dark.
+fn grain_opacity(grain: Grain, scheme: Scheme) -> String {
+    let per_step: u32 = match scheme {
+        Scheme::Light => 20,
+        Scheme::Dark => 16,
+    };
+    // In ten-thousandths: grain 100 x 20 = 2000 is .2.
+    let value = u32::from(grain.0) * per_step;
+    let whole = value / 10_000;
+    let fraction = value % 10_000;
+    if fraction == 0 {
+        return whole.to_string();
+    }
+    let digits = format!("{fraction:04}");
+    let digits = digits.trim_end_matches('0');
+    if whole == 0 {
+        format!(".{digits}")
+    } else {
+        format!("{whole}.{digits}")
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::FrameVars;
+    use super::{FrameVars, grain_opacity};
     use crate::appearance::theme::{Scheme, Theme};
-    use crate::space::look::{CardAccent, SpaceLook};
+    use crate::space::look::{CardAccent, Grain, SpaceLook};
     use crate::space::palette::NEUTRAL_DOT;
     use crate::space::presets::PRESETS;
+
+    #[test]
+    fn grain_is_a_fraction_of_the_scheme_ceiling() {
+        const CASES: &[(u8, Scheme, &str)] = &[
+            (35, Scheme::Light, ".07"),
+            (35, Scheme::Dark, ".056"),
+            (55, Scheme::Light, ".11"),
+            (0, Scheme::Dark, "0"),
+            (100, Scheme::Light, ".2"),
+            (100, Scheme::Dark, ".16"),
+            (255, Scheme::Light, ".51"),
+        ];
+        for &(grain, scheme, want) in CASES {
+            assert_eq!(
+                grain_opacity(Grain(grain), scheme),
+                want,
+                "{grain} {scheme:?}"
+            );
+        }
+    }
 
     #[test]
     fn the_style_attribute_names_every_variable_once() {
         let look = SpaceLook {
             dots: vec![NEUTRAL_DOT],
+            grain: Grain(35),
             theme: crate::appearance::theme::Theme::System,
             card_accent: CardAccent::SpaceHue,
         };
@@ -142,6 +191,7 @@ mod tests {
                 "--f-line",
                 "--f-solid",
                 "--f-grad",
+                "--f-grain",
                 "--accent",
                 "--accent-ink",
                 "--accent-soft",
@@ -186,6 +236,7 @@ mod tests {
             let preset = PRESETS[index];
             let look = SpaceLook {
                 dots: preset.dots.to_vec(),
+                grain: Grain(preset.grain.unwrap_or(40)),
                 theme: Theme::System,
                 card_accent: CardAccent::SpaceHue,
             };

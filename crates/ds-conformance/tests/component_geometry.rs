@@ -278,6 +278,7 @@ fn a_row_without_an_accessory_keeps_its_title_left() {
 fn EditorApp() -> Element {
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
+        grain: Grain(35),
         theme: Theme::System,
         card_accent: CardAccent::SpaceHue,
     };

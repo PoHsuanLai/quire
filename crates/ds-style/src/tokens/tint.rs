@@ -47,6 +47,7 @@ pub(crate) fn flat_tint(material: Material, scheme: Scheme) -> Option<(Hex, Alph
         Material::Osd if light => (SURFACE, 720),
         // .66 -> .68 (settled 2026-09-24, over blur, as the dark bar and dock).
         Material::Osd => (PAPER_DARK, 680),
+        // The widget adds grain over its tint; the grain is the component's, not the recipe's.
         // .50 -> .54 (light, over black) -> .60 (settled 2026-09-24, over blur: held
         // 3.91:1 over black at .54, the worst of the six) -> **.48** (the user's decision,
         // 2026-09-26, "relax the contrast then": design/23-WIDGETS.md section 1.1 M27-M28 fit

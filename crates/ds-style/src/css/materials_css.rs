@@ -9,7 +9,7 @@
 //! transparent root paints the same edge and drop.
 //!
 //! Then the root chrome (`RootChrome`, `FrameTint`): a window's root
-//! (`data-frame=opaque`) is its own stacking context, so its frame layers paint over
+//! (`data-frame=opaque`) is its own stacking context, so its frame layers and grain paint over
 //! its background; a root drawing the tinted
 //! frame (`data-frame=tinted`) paints no tint of its own, and its `.ds-frame` group shows the
 //! Space gradient at `--m-frame-alpha` over blur and at the solid floor without it; a
@@ -134,8 +134,8 @@ fn chrome_css(material: &str) -> String {
     [
         // A window's root keeps its gradient as its own background, under both layers, so the
         // window stays opaque through a cross-fade; as its own stacking context the layers
-        // (z -2) paint over that background instead of beneath it, where the switch was an
-        // instant swap.
+        // (z -2) and the grain (z -1) paint over that background instead of beneath it, where
+        // the switch was an instant swap and the grain never showed.
         rule(
             &opaque,
             &[
