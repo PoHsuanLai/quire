@@ -48,8 +48,6 @@ impl Anim {
             | Anim::SlideR
             | Anim::SlideL
             | Anim::MenuIn
-            | Anim::MenuPop
-            | Anim::BubblePop
             | Anim::PeekIn
             | Anim::PeekFullIn
             | Anim::SheetIn

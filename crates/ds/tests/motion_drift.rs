@@ -213,7 +213,6 @@ fn the_settle_table() {
         // 37 and 64).
         (Anim::PaletteFade, MotionLevel::Standard, 184),
         (Anim::LinkPillIn, MotionLevel::Standard, 184),
-        (Anim::BubblePop, MotionLevel::Standard, 184),
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
         // The four keyframes the catalogue had no motion for.
         (Anim::PillUp, MotionLevel::Standard, 434),

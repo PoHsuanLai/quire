@@ -210,7 +210,7 @@ pub enum MenuTrackEvent<K> {
 /// How a menu appears or leaves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum MenuAnim {
-    /// `menu-pop --t-move --e-spring`: only the first menu of a tracking session.
+    /// The first menu of a tracking session.
     Pop,
     /// `fade --t-quick --e-exit`.
     Fade,
