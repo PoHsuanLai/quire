@@ -67,11 +67,23 @@ that never lints does not pull in `cssparser`. The shell's parts are `ds-shell`,
 depends on next to `ds` and draws with `Ds { sheet: Some(ds_shell::stylesheet()) }`; it lints
 against `ds_shell::kits()` where an app lints against `ds::kits()`.
 
-A git dependency has the same shape once quire is tagged (shell-host and sill use it):
+**A git dependency** is how a program outside this checkout takes quire, from a tag:
 
 ```toml
-ds = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.1.0" }
+ds       = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.2.1" }
+ds-blitz = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.2.1" }  # only if you run on Blitz
 ```
+
+Cargo finds each crate by name in the one repository, so the crates of a tag share one revision.
+Nothing else is needed for quire's own dependencies: `blitz-kit` (its own public repo,
+github.com/PoHsuanLai/blitz-kit) comes transitively at the rev quire's `Cargo.toml` pins, and so
+does the rest of the pinned block. Do not add a `[patch]` for it unless you develop `blitz-kit`
+alongside: quire's own `[patch]` table (its local `blitz-kit` checkout, the vello and anyrender
+forks) applies only when quire is the workspace root, never to a consumer, so a consumer that
+needs the forks' behaviour (the CSS `filter` functions) copies the `[patch.crates-io]` block
+from quire's root `Cargo.toml` into its own workspace root. shell-host and sill add, for their
+local checkouts, `[patch."https://github.com/PoHsuanLai/blitz-kit"]` pointing at a sibling
+`blitz-kit` so every path-linked repo builds one copy.
 
 **Launching on Blitz.** `ds_blitz::launch(app, AppConfig::new(title, width, height))` runs `app`
 until its window closes. It enters the process-wide Tokio runtime that `ds_blitz::TokioSpawner`
