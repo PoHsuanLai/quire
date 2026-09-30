@@ -25,26 +25,27 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub theme: Theme,
-    /// `appearance.accent`: one of six.
+    /// `appearance.accent`: one of macOS's eight.
     #[settings(
         label = "Accent",
-        help = "The card's accent colour.",
+        help = "The colour of buttons, selection, switches and focus rings across the desktop.",
         section = "Appearance"
     )]
     pub accent: Accent,
     /// `appearance.motion_level`: Standard, which the desktop's reduce-motion preference still
-    /// overrides, or Reduced.
+    /// overrides, or Reduced. Read as macOS's "Reduce motion": a switch that is on for Reduced.
     #[settings(
-        label = "Motion",
-        help = "How much the window moves: Standard, or reduce motion to cross-fades.",
+        label = "Reduce motion",
+        help = "Replace slides, scales and springs with cross-fades. The desktop's own \
+                reduce-motion setting always applies.",
         section = "Appearance"
     )]
     pub motion_level: Motion,
     /// `appearance.typeface`: System (Inter) unless the person picks mail's editorial faces.
     #[settings(
         label = "Typeface",
-        help = "The desktop's face, Inter, or mail's editorial faces: Bricolage Grotesque, \
-                Karla and Space Mono.",
+        help = "The text face of the desktop's windows and controls: System is Inter; \
+                Editorial is mail's Bricolage Grotesque and Karla. Code stays in Space Mono.",
         section = "Appearance"
     )]
     pub typeface: Typeface,

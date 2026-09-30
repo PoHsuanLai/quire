@@ -32,7 +32,7 @@ mod watch;
 
 pub use appearance::{
     AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
-    PlateGlyphPolicy,
+    PlateGlyphPolicy, quire_schema,
 };
 pub use doc::{FileName, Format, SettingsDoc};
 pub use ds_settings_derive::SettingsSchema;

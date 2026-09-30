@@ -2,8 +2,10 @@
 //! [`crate::SettingsDoc`], and the settings structs it holds.
 
 mod file;
+mod schema;
 mod settings;
 
+pub use schema::quire_schema;
 pub use settings::{
     AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
     PlateGlyphPolicy,
