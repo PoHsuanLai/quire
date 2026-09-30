@@ -29,6 +29,11 @@
   box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--tf-r);
   transition:border-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
 }
+/* A bezeled search field is NSSearchField: a rounded field filled with the quaternary wash, its
+   hairline transparent (it keeps the box the ring needs), the magnifier in the secondary ink.
+   The ring below still draws on focus. A plain search field keeps its own row (further down). */
+.ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-frame{ background:var(--fill-quaternary); border-color:transparent; }
+.ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-icon{ color:var(--ink-soft); }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
 .ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ border-color:var(--accent-text); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
 .ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ border-color:var(--danger); }

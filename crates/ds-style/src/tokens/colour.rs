@@ -52,6 +52,9 @@ pub enum ColourToken {
     InkFaint,
     /// `--line`: borders and dividers.
     Line,
+    /// `--fill-quaternary`: NSColor's quaternarySystemFill, the wash a search field takes for its
+    /// ground: black at .06 in light, white at .10 in dark, over whatever lies beneath.
+    FillQuaternary,
     /// `--line-soft`: inner dividers.
     LineSoft,
     /// `--accent`: the accent's solid fill (the primary button, the today disc, a toggle on).
@@ -193,6 +196,7 @@ impl ColourToken {
             ColourToken::InkFaint => (solid(0x858585), solid(0x858585)),
             ColourToken::Line => (solid(0xD9D9D9), solid(0x444444)),
             ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
+            ColourToken::FillQuaternary => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
             ColourToken::Ok => (solid(0x2C7A57), solid(0x5EB489)),
             ColourToken::Warn => (solid(0xA5761A), solid(0xD2A249)),
             ColourToken::Danger => (solid(0xB03A2A), solid(0xE0705A)),

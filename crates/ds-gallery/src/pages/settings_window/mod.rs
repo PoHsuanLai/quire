@@ -140,7 +140,7 @@ pub fn SettingsWindowPage() -> Element {
                 }
             },
             header: rsx! {
-                TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Small, oninput: move |next| query.set(next) }
+                TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Regular, oninput: move |next| query.set(next) }
             },
         }
     };

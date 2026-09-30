@@ -73,6 +73,11 @@ pub fn TextFieldSection() -> Element {
                         TextField { label: "Search", value: "from:dana", kind: FieldKind::Search, tokens: vec!["from:dana".to_owned(), "has:file".to_owned()], oninput: |_| {} }
                     }
                 }
+                Specimen { name: "search, filled".to_owned(),
+                    div { style: "width:250px",
+                        TextField { label: "Search", value: "Dana", kind: FieldKind::Search, placeholder: "Search", oninput: |_| {} }
+                    }
+                }
                 Specimen { name: "plain".to_owned(),
                     div { style: "width:190px; font-size:16px; font-weight:600",
                         TextField { label: "Title", value: "Renamed in place", bezel: FieldBezel::Plain, oninput: |_| {} }
