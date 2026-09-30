@@ -5,3 +5,4 @@ pub(crate) mod module_grid;
 pub(crate) mod module_panel;
 pub(crate) mod module_tile;
 pub(crate) mod module_tile_kind;
+pub(crate) mod pane;
