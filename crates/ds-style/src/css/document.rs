@@ -2,17 +2,27 @@
 //! component sheet under `/* -- name -- */`. The assembly decides which sections and sheets go
 //! in, and in what order.
 
-use crate::css::UTILITIES;
+use crate::css::{UTILITIES, layers};
 use crate::kit::Sheet;
 
-/// The whole stylesheet: the header, then each `(section, body)` in the order given.
-pub(crate) fn document(sections: &[(&str, String)]) -> String {
+/// The whole stylesheet: the header, the order of the layers, every `(section, body)` of
+/// `layered` inside `@layer ds { ... }`, then each of `unlayered` after it (a user kit's, which
+/// beats the layer whatever its specificity). The blocks are not indented, so the text diffs
+/// line by line.
+pub(crate) fn document(layered: &[(&str, String)], unlayered: &[(&str, String)]) -> String {
     let mut css =
         String::from("/* ds::stylesheet(), generated from the token table. Do not edit. */\n");
+    css.push_str(&format!("{}\n@layer {} {{\n", layers::ORDER, layers::DS));
+    push_sections(&mut css, layered);
+    css.push_str("}\n");
+    push_sections(&mut css, unlayered);
+    css
+}
+
+fn push_sections(css: &mut String, sections: &[(&str, String)]) {
     for (name, body) in sections {
         css.push_str(&format!("/* == {name} == */\n{}\n", body.trim_end()));
     }
-    css
 }
 
 /// `own`, in its order, with each of `extra` placed right after the sheet it names, the sheets

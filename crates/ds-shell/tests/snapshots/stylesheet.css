@@ -1,4 +1,6 @@
 /* ds::stylesheet(), generated from the token table. Do not edit. */
+@layer ds, app;
+@layer ds {
 /* == reset == */
 /* reset.css: the document stays transparent and `.ds` carries the base text (design/02-TYPE.md
    section 3). A shell surface shows the desktop through `html` and `body`; whatever a surface
@@ -3317,3 +3319,4 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-track-position{ display:flex; flex-direction:column; gap:var(--s-4); min-width:0; }
 .ds-track-times{ display:flex; justify-content:space-between; white-space:nowrap; font-variant-numeric:tabular-nums; }
+}

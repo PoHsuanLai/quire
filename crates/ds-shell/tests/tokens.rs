@@ -30,6 +30,11 @@ fn rules(css: &str) -> Vec<(String, Vec<(String, String)>)> {
     let mut rest = css.as_str();
     while let Some(open) = rest.find('{') {
         let selector = rest[..open].trim().to_owned();
+        if selector.starts_with("@layer") {
+            // The design system's layer: its rules are the ones read, so step inside.
+            rest = &rest[open + 1..];
+            continue;
+        }
         let Some(close) = matching(&rest[open..]) else {
             break;
         };

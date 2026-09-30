@@ -112,3 +112,20 @@ fn the_user_rank_sorts_after_every_other_rank() {
         assert!(*rank < KitRank::User, "{}", rank.slug());
     }
 }
+
+#[test]
+fn the_design_system_is_one_layer_and_a_user_kit_stays_outside_it() {
+    let sheet = Kits::of(&[&PERSON, &EARLY, &LATE]).stylesheet();
+    let at = positions(
+        &sheet,
+        &[
+            "@layer ds, app;",
+            "@layer ds {",
+            "== one ==",
+            "== two ==",
+            "\n}\n",
+            "== person ==",
+        ],
+    );
+    assert!(at.windows(2).all(|pair| pair[0] < pair[1]), "{sheet}");
+}
