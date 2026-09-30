@@ -11,6 +11,7 @@ use crate::components::menus::menu::choices::{Act, Choice, liveness};
 use crate::components::menus::menu::cursor::{MenuCursor, highlighted, seed};
 use crate::components::menus::menu::decide::{Child, Decision, Level, decide};
 use crate::components::menus::menu::keys::{KeyAct, key_act};
+use crate::components::menus::menu::pick::Picked;
 use crate::components::menus::menu::placement::Keys;
 use crate::components::menus::menu::submenu::SubMenu;
 use crate::components::menus::menu::tracker::{Tracker, Via, target};
@@ -37,8 +38,8 @@ pub(crate) struct Panel<T: 'static> {
     /// Whether key equivalents show.
     pub keys: Keys,
     /// A pick of a choice of the panel at this depth: the menu blinks, yields the value, then
-    /// closes.
-    pub onpick: EventHandler<(T, u8)>,
+    /// closes; an item that keeps the menu open yields at once and nothing else happens.
+    pub onpick: EventHandler<Picked<T>>,
     /// A submenu tells its parent where the pointer is, so the parent's safe triangle and
     /// highlight hold while the pointer is inside the submenu.
     pub onhover: Option<EventHandler<Point>>,
@@ -86,9 +87,13 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                 keys: self.keys,
                 onpick: EventHandler::new(move |index: usize| match choices.get(index) {
                     Some(Choice {
-                        act: Act::Pick(value),
+                        act: Act::Pick(value, after),
                         ..
-                    }) => onpick.call((value.clone(), depth)),
+                    }) => onpick.call(Picked {
+                        value: value.clone(),
+                        depth,
+                        after: *after,
+                    }),
                     Some(Choice {
                         act: Act::Open(_), ..
                     }) => tracker.expand(index, Via::Pointer),
@@ -142,7 +147,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         };
         let own = matches!(
             decision,
-            Decision::Select(_) | Decision::Pick(_) | Decision::Expand(_) | Decision::CloseSub
+            Decision::Select(_) | Decision::Pick(..) | Decision::Expand(_) | Decision::CloseSub
         );
         if own || matches!(decision, Decision::Back) {
             event.prevent_default();
@@ -150,7 +155,11 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
         }
         match &decision {
             Decision::Select(index) => self.select(*index),
-            Decision::Pick(value) => self.onpick.call((value.clone(), self.depth)),
+            Decision::Pick(value, after) => self.onpick.call(Picked {
+                value: value.clone(),
+                depth: self.depth,
+                after: *after,
+            }),
             Decision::Expand(index) => self.tracker.expand(*index, Via::Keyboard),
             Decision::CloseSub => self.tracker.close_sub(),
             Decision::Back | Decision::CloseMenu | Decision::Nothing => {}

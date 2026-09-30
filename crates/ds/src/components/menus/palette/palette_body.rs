@@ -35,6 +35,8 @@ pub(crate) struct StopEvents {
     pub action_mounted: EventHandler<(usize, MountedEvent)>,
     /// A header action was clicked (before it runs).
     pub action_ran: EventHandler<()>,
+    /// The rows' height: the palette's are `Settings`, a popover's list `Compact`.
+    pub size: RowSize,
 }
 
 /// Every drawn group, the stop `current` highlighted, each group's rows playing their part in
@@ -91,7 +93,7 @@ fn draw_group<T>(
                             shape: row.shape.clone(),
                             action: row.action.clone(),
                             state,
-                            size: RowSize::Settings,
+                            size: events.size,
                             motion: motion.of(at),
                             onclick: move |_| events.pick.call(first + at),
                             onpointermove: move |_| events.point.call(first + at),
@@ -136,7 +138,9 @@ fn draw_group<T>(
         }
     };
     let action_selection = Selection::of(&Some(first + size), &Some(current));
-    rsx! {
+    // An untitled group with no action has no header band to draw.
+    let header = (!shown.group.title.is_empty() || shown.group.action.is_some()).then(|| {
+        rsx! {
         SectionHeader {
             title: shown.group.title.clone(),
             action: shown.group.action.clone().map(|(label, run)| {
@@ -154,6 +158,10 @@ fn draw_group<T>(
                 events.action_mounted.call((first + size, event))
             }),
         }
+        }
+    });
+    rsx! {
+        {header}
         {body}
     }
 }

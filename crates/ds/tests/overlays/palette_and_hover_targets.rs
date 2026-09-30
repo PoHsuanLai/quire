@@ -17,11 +17,7 @@ const NOW: Duration = Duration::ZERO;
 
 /// A remove button that does nothing.
 pub fn remove() -> RowAction {
-    RowAction {
-        icon: Icon::X,
-        label: "Remove from recent".to_string(),
-        on_press: EventHandler::new(|_| {}),
-    }
+    RowAction::new(Icon::X, "Remove from recent", EventHandler::new(|_| {}))
 }
 
 /// Recent searches: a name stronger than its path, a caller's mark, a plain title the query

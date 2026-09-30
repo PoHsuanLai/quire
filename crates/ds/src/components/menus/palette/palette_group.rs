@@ -9,6 +9,7 @@ use crate::components::lists::row::action::RowAction;
 use crate::components::lists::row::chord::RowChord;
 use crate::components::lists::row::leading::RowLeading;
 use crate::components::lists::row::shape::RowShape;
+use crate::components::menus::item::item::AfterPick;
 use dioxus::prelude::*;
 use ds_core::vocab::Availability;
 
@@ -33,6 +34,8 @@ pub struct PaletteRow<T> {
     pub availability: Availability,
     /// A button at its end that acts without picking it.
     pub action: Option<RowAction>,
+    /// Whether picking it closes the palette or pick list: a row that toggles a label stays.
+    pub after: AfterPick,
     /// How it draws beyond its title and detail: `Plain`, or a file's or a clipboard entry's
     /// shape.
     pub shape: RowShape,
@@ -51,6 +54,7 @@ impl<T> PaletteRow<T> {
             chord: RowChord::default(),
             availability: Availability::Enabled,
             action: None,
+            after: AfterPick::Close,
             shape: RowShape::Plain,
         }
     }

@@ -27,13 +27,11 @@ fn recent_row(index: usize, mut kept: Signal<Vec<usize>>) -> PaletteRow<u8> {
             TextRun::new("today", RunTone::Plain),
         ])),
         leading: RowLeading::Icon(Icon::Clock),
-        action: Some(RowAction {
-            icon: Icon::X,
-            label: "Remove from recent".to_string(),
-            on_press: EventHandler::new(move |_| {
-                kept.with_mut(|kept| kept.retain(|at| *at != index))
-            }),
-        }),
+        action: Some(RowAction::new(
+            Icon::X,
+            "Remove from recent",
+            EventHandler::new(move |_| kept.with_mut(|kept| kept.retain(|at| *at != index))),
+        )),
         ..PaletteRow::new(
             u8::try_from(index).unwrap_or_default(),
             TextLine::Runs(vec![

@@ -12,7 +12,7 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
-use crate::components::menus::item::item::{MenuImage, MenuItem};
+use crate::components::menus::item::item::{AfterPick, MenuImage, MenuItem};
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
 use crate::host::measure::{Anchor, MountedRef, use_rect};
@@ -54,8 +54,10 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
             title: item.label.clone(),
             image: Some(MenuImage::Icon(item.icon)),
             key: None,
+            hint: None,
             check: item.check,
             availability: item.availability,
+            after: AfterPick::Close,
         })
         .collect()
 }

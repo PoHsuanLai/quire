@@ -17,7 +17,7 @@ use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
-use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds::stack::toast_hub::{ToastAction, UndoToken, use_toast_hub};
 use ds::style::icon::render::Glyph;
 use ds::style::tokens::control_size::ControlSize;
 use ds_core::time::clock::sleep;
@@ -128,7 +128,7 @@ pub fn Pills(showcase: Showcase) -> Element {
     let toasts = use_toast_hub();
     let mut next = use_signal(|| 10u64);
     rsx! {
-        Section { title: "Toast", note: "The toast slides in from the right edge, holds for 5 s (the pointer over it pauses the hold) and slides out; swipe it to the right to dismiss it, or press Undo.",
+        Section { title: "Toast", note: "The toast slides in from the right edge, holds for 5 s (the pointer over it pauses the hold) and slides out; swipe it to the right to dismiss it, or press Undo, or the consumer's own button (ToastHub::push_action, here View).",
             div { class: "g-row",
                 Button {
                     label: "Push a toast with undo",
@@ -138,6 +138,14 @@ pub fn Pills(showcase: Showcase) -> Element {
                     },
                 }
                 Button { label: "Push one without", onclick: move |_| toasts.push("Saved".to_string(), None) }
+                Button {
+                    label: "Push one with View",
+                    onclick: move |_| toasts.push_action(
+                        "Sent to Travel".to_string(),
+                        ToastAction::new("View").with_icon(Icon::ArrowRight),
+                        EventHandler::new(|()| {}),
+                    ),
+                }
                 span { class: "g-code", "last undo: {toasts.last_undo().map_or(\"none\".to_string(), |token| token.0.to_string())}" }
             }
         }

@@ -148,11 +148,11 @@ pub fn TodayTabs<K: Clone + PartialEq + std::hash::Hash + 'static>(
                     leading,
                     shape: RowShape::Today { left: left_text(left), expiry: expiry_of(left) },
                     state,
-                    action: RowAction {
-                        icon: Icon::X,
-                        label: format!("Close {title}"),
-                        on_press: EventHandler::new(move |_: Press| onclose.call(closed.clone())),
-                    },
+                    action: RowAction::new(
+                        Icon::X,
+                        format!("Close {title}"),
+                        EventHandler::new(move |_: Press| onclose.call(closed.clone())),
+                    ),
                     onclick: move |_| onpick.call(picked.clone()),
                 }
             };

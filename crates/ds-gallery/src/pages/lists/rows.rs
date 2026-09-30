@@ -28,6 +28,7 @@ pub fn RowGallery() -> Element {
         Leadings {}
         States {}
         Shapes {}
+        crate::pages::lists::row_actions::RowActions {}
     }
 }
 
@@ -192,11 +193,11 @@ fn Shapes() -> Element {
         age: "2 min".to_string(),
     };
     let keys = Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')]);
-    let action = RowAction {
-        icon: Icon::X,
-        label: "Remove from recent".to_string(),
-        on_press: EventHandler::new(move |_| removed += 1),
-    };
+    let action = RowAction::new(
+        Icon::X,
+        "Remove from recent",
+        EventHandler::new(move |_| removed += 1),
+    );
     rsx! {
         Section {
             title: "Row: shapes, chords and actions",

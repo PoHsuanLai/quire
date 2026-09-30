@@ -10,6 +10,7 @@
 
 use crate::components::lists::emoji_grid::grid::EmojiCells;
 use crate::components::lists::emoji_grid::nav::{GridEdge, GridMove, GridStep, grid_step};
+use crate::components::menus::item::item::AfterPick;
 use crate::components::menus::palette::palette_group::{GroupEntries, PaletteGroup};
 use crate::components::menus::palette::palette_lines::{MarkedRow, marked};
 use crate::stack::roving::{Step, Wrap, moved_live};
@@ -67,8 +68,8 @@ fn stop_count<T: Clone>(shown: &ShownGroup<'_, T>) -> usize {
 /// Where the cursor can rest.
 #[derive(Clone, PartialEq)]
 pub(crate) enum Stop<T> {
-    /// A row: what picking it yields, and whether it can be picked.
-    Row(T, Availability),
+    /// A row: what picking it yields, whether it can be picked, and whether a pick closes.
+    Row(T, Availability, AfterPick),
     /// An emoji cell, yielding this value.
     Cell(T),
     /// A group's header action.
@@ -79,7 +80,7 @@ impl<T> Stop<T> {
     /// Whether the cursor may rest here: a disabled row is skipped.
     pub(crate) fn availability(&self) -> Availability {
         match self {
-            Stop::Row(_, availability) => *availability,
+            Stop::Row(_, availability, _) => *availability,
             Stop::Cell(_) | Stop::Action(_) => Availability::Enabled,
         }
     }
@@ -93,7 +94,13 @@ pub(crate) fn stops<T: Clone>(shown: &[ShownGroup<'_, T>]) -> Vec<Stop<T>> {
             let body: Vec<Stop<T>> = match &group.body {
                 Body::Rows(rows) => rows
                     .iter()
-                    .map(|marked| Stop::Row(marked.row.value.clone(), marked.row.availability))
+                    .map(|marked| {
+                        Stop::Row(
+                            marked.row.value.clone(),
+                            marked.row.availability,
+                            marked.row.after,
+                        )
+                    })
                     .collect(),
                 Body::Grid(grid) => grid
                     .cells
@@ -187,8 +194,8 @@ fn in_grid(span: GridSpan, current: usize, travel: Travel, live: &[Availability]
 
 /// What Enter does on a stop.
 pub(crate) enum Run<T> {
-    /// Close, then pick this value.
-    Pick(T),
+    /// Pick this value, closing first unless the row keeps the list open.
+    Pick(T, AfterPick),
     /// Run a header action; the palette stays.
     Action(EventHandler<()>),
     /// Nothing: a disabled row, or no stop.
@@ -198,8 +205,8 @@ pub(crate) enum Run<T> {
 /// What Enter (or a click) does on `stop`.
 pub(crate) fn run_of<T: Clone>(stop: Option<&Stop<T>>) -> Run<T> {
     match stop {
-        Some(Stop::Row(value, Availability::Enabled)) => Run::Pick(value.clone()),
-        Some(Stop::Cell(value)) => Run::Pick(value.clone()),
+        Some(Stop::Row(value, Availability::Enabled, after)) => Run::Pick(value.clone(), *after),
+        Some(Stop::Cell(value)) => Run::Pick(value.clone(), AfterPick::Close),
         Some(Stop::Action(run)) => Run::Action(*run),
         Some(Stop::Row(..)) | None => Run::Nothing,
     }

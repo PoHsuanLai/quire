@@ -9,9 +9,11 @@ use ds::components::app::thread_row::ThreadRow;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::status::battery_state::BatteryState;
 use ds::components::controls::button_model::Bezel;
+use ds::components::controls::button_model::ButtonRole;
 use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::lists::list::model::ListStyle;
+use ds::components::lists::row::confirm::RowConfirm;
 use ds::components::lists::row::motion::RowMotion;
 use ds::components::lists::row::shape::{ClipBody, RowShape};
 use ds::components::lists::row::size::RowSize;
@@ -419,7 +421,18 @@ pub const ROW_CASES: &[Case] = &[
     Case {
         component: "row",
         state: "action",
-        make: || rsx! { Row { title: "from:dana", action: RowAction { icon: Icon::X, label: "Remove from recent".to_string(), on_press: EventHandler::new(|_| {}) } } },
+        make: || rsx! { Row { title: "from:dana", action: RowAction::new(Icon::X, "Remove from recent", EventHandler::new(|_| {})) } },
+    },
+    // A row's action with the consumer's own handle on it; the row asking.
+    Case {
+        component: "row",
+        state: "action-common",
+        make: || rsx! { Row { title: "Receipts", action: RowAction::new(Icon::Ellipsis, "More", EventHandler::new(|_| {})).with_common(Common { id: Some("receipts-more".to_string()), ..Common::default() }) } },
+    },
+    Case {
+        component: "row",
+        state: "confirm",
+        make: || rsx! { Row { title: "Receipts", accessory: Accessory::Badge(12), confirm: Some(RowConfirm { question: "Delete “Receipts” and its 12 messages?".to_string(), confirm: "Delete".to_string(), role: ButtonRole::Destructive, on_confirm: EventHandler::new(|()| {}), on_cancel: EventHandler::new(|()| {}) }) } },
     },
     // List: each style, a heading among rows, and an item's exit.
     Case {

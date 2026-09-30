@@ -8,6 +8,7 @@
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::icon::Icon;
 use ds_style::scope::Scope;
 use ds_style::task::{Gone, spawn_in, try_get, try_set};
 use ds_style::tokens::delay::DelayToken;
@@ -15,6 +16,39 @@ use ds_style::tokens::delay::DelayToken;
 /// What an undo would restore, as the consumer's own token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct UndoToken(pub u64);
+
+/// The button a toast offers: what it says and its glyph. An undo's is `Undo` with the undo arrow;
+/// any other is the consumer's ("View", "Open", "Retry").
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ToastAction {
+    /// Its words.
+    pub label: String,
+    /// The glyph before them, if any.
+    pub icon: Option<Icon>,
+}
+
+impl ToastAction {
+    /// A button of `label` with no glyph.
+    pub fn new(label: impl Into<String>) -> Self {
+        ToastAction {
+            label: label.into(),
+            icon: None,
+        }
+    }
+
+    /// The same button with `icon` before its words.
+    pub fn with_icon(self, icon: Icon) -> Self {
+        ToastAction {
+            icon: Some(icon),
+            ..self
+        }
+    }
+
+    /// The undo's own button.
+    fn undo() -> Self {
+        ToastAction::new("Undo").with_icon(Icon::Undo)
+    }
+}
 
 /// The toast as it is now.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -26,8 +60,10 @@ pub enum ToastState {
     Shown {
         /// What just happened: "Archived".
         text: String,
-        /// What pulling the tab undoes.
+        /// What pressing its action undoes, when the action is an undo.
         undo: Option<UndoToken>,
+        /// Its button: `Undo` when `undo` is set, else the consumer's own, else none.
+        action: Option<ToastAction>,
     },
 }
 
@@ -37,6 +73,7 @@ pub struct ToastHub {
     state: Signal<ToastState>,
     undone: Signal<Option<UndoToken>>,
     on_undo: Signal<Option<EventHandler<UndoToken>>>,
+    on_action: Signal<Option<EventHandler<()>>>,
     hold: Signal<Option<Task>>,
     env: Signal<Scope>,
     scope: ScopeId,
@@ -59,24 +96,52 @@ impl ToastHub {
         self.show(text, Some(undo), Some(on_undo));
     }
 
+    /// Show `text` with `action` as its button, replacing any toast, and restart the hold; when
+    /// the person presses the button, `on_press` is called and the toast goes.
+    ///
+    /// The handler is the push's own and belongs to the scope that created it, like
+    /// [`ToastHub::push_undoable`]'s: push from a component that outlives the toast.
+    pub fn push_action(&self, text: String, action: ToastAction, on_press: EventHandler<()>) {
+        let _ = self.try_show(text, Push::Action(action, on_press));
+    }
+
     fn show(
         &self,
         text: String,
         undo: Option<UndoToken>,
         on_undo: Option<EventHandler<UndoToken>>,
     ) {
-        let _ = self.try_show(text, undo, on_undo);
+        let _ = self.try_show(text, Push::Undo(undo, on_undo));
     }
 
-    fn try_show(
-        &self,
-        text: String,
-        undo: Option<UndoToken>,
-        on_undo: Option<EventHandler<UndoToken>>,
-    ) -> Result<(), Gone> {
+    fn try_show(&self, text: String, shown: Push) -> Result<(), Gone> {
+        let (undo, action, on_undo, on_action) = match shown {
+            Push::Undo(undo, on_undo) => (undo, undo.map(|_| ToastAction::undo()), on_undo, None),
+            Push::Action(action, on_press) => (None, Some(action), None, Some(on_press)),
+        };
         try_set(self.on_undo, on_undo)?;
-        try_set(self.state, ToastState::Shown { text, undo })?;
+        try_set(self.on_action, on_action)?;
+        try_set(self.state, ToastState::Shown { text, undo, action })?;
         self.start_hold()
+    }
+
+    /// The toast's button was pressed: an undo runs as [`ToastHub::undo`]; a consumer's action
+    /// hides the toast at once and calls the push's handler.
+    ///
+    /// Nothing happens when no toast is up.
+    pub fn press_action(&self) {
+        let ToastState::Shown { undo, .. } = self.state.peek().clone() else {
+            return;
+        };
+        if undo.is_some() {
+            self.undo();
+            return;
+        }
+        self.hide();
+        let mut handler = self.on_action;
+        if let Some(handler) = handler.take() {
+            handler.call(());
+        }
     }
 
     /// (Re)start the hold: the toast hides when it has run out.
@@ -153,6 +218,12 @@ impl ToastHub {
     }
 }
 
+/// What a push brings: an optional undo with its handler, or a consumer's own action.
+enum Push {
+    Undo(Option<UndoToken>, Option<EventHandler<UndoToken>>),
+    Action(ToastAction, EventHandler<()>),
+}
+
 /// A new hub for `Ds` to provide, timing its hold at the root's motion level.
 pub fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
     let scope = use_hook(current_scope_id);
@@ -160,6 +231,7 @@ pub fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
         state: Signal::new(ToastState::Hidden),
         undone: Signal::new(None),
         on_undo: Signal::new(None),
+        on_action: Signal::new(None),
         hold: Signal::new(None),
         env,
         scope,
@@ -173,7 +245,7 @@ pub fn use_toast_hub() -> ToastHub {
 
 #[cfg(test)]
 mod tests {
-    use super::{ToastHub, UndoToken, use_toast_hub_provider};
+    use super::{ToastAction, ToastHub, UndoToken, use_toast_hub_provider};
     use dioxus::prelude::*;
     use ds_core::vocab::{Activity, InputModality};
     use ds_style::appearance::{
@@ -230,12 +302,24 @@ mod tests {
             hub.push("Moved".into(), Some(UndoToken(3)));
             log.note(format!("undo {:?}", hub.undo().map(|t| t.0)));
             log.note(format!("last {:?}", hub.last_undo().map(|t| t.0)));
+            // A consumer's action: pressing it calls its handler once, then nothing is left.
+            let ran = log.clone();
+            hub.push_action(
+                "Sent".into(),
+                ToastAction::new("View"),
+                EventHandler::new(move |()| ran.note("view".into())),
+            );
+            hub.press_action();
+            hub.press_action();
+            // Pressed through an undo toast it is the undo.
+            hub.push_undoable("Moved".into(), UndoToken(4), heard(log.clone()));
+            hub.press_action();
         });
         rsx! {}
     }
 
     #[test]
-    fn an_undo_calls_the_handler_its_push_gave() {
+    fn a_press_calls_the_handler_its_push_gave() {
         let log = Log::default();
         let mut dom = VirtualDom::new_with_props(Script, ScriptProps { log: log.clone() });
         dom.rebuild_in_place();
@@ -246,7 +330,9 @@ mod tests {
                 "undo Some(1)",
                 "undo None",
                 "undo Some(3)",
-                "last Some(3)"
+                "last Some(3)",
+                "view",
+                "heard 4"
             ]
         );
     }

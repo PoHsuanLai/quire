@@ -78,6 +78,8 @@
 .ds-row .ds-key-equivalent{ flex:none; }
 .ds-row-action{ display:inline-flex; align-items:center; flex:none; }
 .ds-row-action .ds-button{ width:22px; height:22px; }
+/* A row asking (`RowConfirm`): the question in the words' place, Cancel and the confirming button at the end. */
+.ds-row-confirm{ display:inline-flex; align-items:center; flex:none; gap:var(--s-6); margin-left:auto; }
 
 /* An outline: the triangle's box, kept by a leaf, and the children one step in. */
 .ds-row-disclosure{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:var(--s-12); color:var(--ink-faint); }

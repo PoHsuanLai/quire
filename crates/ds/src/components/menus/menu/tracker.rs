@@ -89,7 +89,7 @@ pub(crate) fn target<T>(index: usize, choice: &Choice<T>) -> MenuTarget<()> {
             Availability::Disabled | Availability::Busy => Pickable::Inert,
         },
         branch: match choice.act {
-            Act::Pick(_) => Branch::Leaf,
+            Act::Pick(..) => Branch::Leaf,
             Act::Open(_) => Branch::Submenu,
         },
     }

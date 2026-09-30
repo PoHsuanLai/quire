@@ -26,6 +26,8 @@ fn item(value: u8, title: &str) -> MenuItem<u8> {
         key: None,
         check: None,
         availability: Availability::Enabled,
+        hint: None,
+        after: AfterPick::Close,
     }
 }
 
