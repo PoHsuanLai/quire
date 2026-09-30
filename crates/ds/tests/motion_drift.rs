@@ -226,21 +226,16 @@ fn the_settle_table() {
         (Anim::PaneOutR, MotionLevel::Standard, 284),
         // The OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
-        (Anim::OsdIn, MotionLevel::Standard, 184),
         (Anim::OsdOut, MotionLevel::Standard, 284),
         // The sheet's exit at --t-move, which only Reduced shortens.
         (Anim::SheetOut, MotionLevel::Standard, 284),
         // The banner's exit at --t-move, which only Reduced shortens.
-        (Anim::BannerOut, MotionLevel::Standard, 284),
-        (Anim::BannerIn, MotionLevel::Standard, 284),
         // The edge panel and the toast: in at --t-move, out at --t-quick; a sheet: in at
         // --t-big, out at --t-move.
         (Anim::PanelIn, MotionLevel::Standard, 284),
         (Anim::PanelOut, MotionLevel::Standard, 184),
         (Anim::SheetIn, MotionLevel::Standard, 434),
         // The screenshot thumbnail slides in and out at --t-move.
-        (Anim::ShotIn, MotionLevel::Standard, 284),
-        (Anim::ShotOut, MotionLevel::Standard, 284),
     ];
     for &(anim, level, ms) in CASES {
         assert_eq!(

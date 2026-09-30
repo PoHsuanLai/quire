@@ -1,24 +1,20 @@
 //! BannerStack: the notification banners on screen, newest first (design/20 section
 //! 1.6, design/13 section 13.3.6). The caller lists the banners it shows; the stack plays each
-//! arrival in from its `entry` edge (`Anim::BannerIn`, `--t-move --e-spring`), and each banner
-//! the caller stops listing back out past it (`Anim::BannerOut`, `--t-move --e-exit`), keeping
+//! arrival in from past the right edge (`Anim::PanelIn`, `--t-move --e-out`), and each banner
+//! the caller stops listing back out past it (`Anim::PanelOut`, `--t-quick --e-exit`), keeping
 //! it in the tree until its exit settles; the banners after it then heal into its place, by
 //! the height it measured. `on_hidden` hears each banner's key once its exit has settled, so a
 //! host whose list is empty then can unmap the surface. The hold timer, the stack's cap and
-//! grouping are the caller's.
-//!
-//! `entry` is `notifications.banner_entry_direction` (design/05 section 12 item 7): from the
-//! right by default, or rising from below. Both play the one `banner-in`/`banner-out` pair,
-//! which translates by `--banner-dx`/`--banner-dy`; the stack's `data-entry` sets them, so the
-//! edge is a setting and not a second set of keyframes (and of `Anim` variants to settle).
+//! grouping are the caller's (design/30 section 2.10: a banner slides like a toast and a side
+//! panel).
 //!
 //! A card swiped away inside the stack holds where the finger left it and reports at once; the
-//! caller's removal makes its row slide out from there, to the right whatever the entry edge,
-//! since it leaves along the swipe (`NotificationCard`'s swipe, the row's `data-flight`).
+//! caller's removal makes its row slide out from there (`NotificationCard`'s swipe).
 
 use crate::notifications::banner_row::BannerRow;
 use crate::tokens::notifications::NotificationToken;
 use dioxus::prelude::*;
+use ds::Common;
 use ds_core::geometry::units::Px;
 use ds_core::word::Word;
 use ds_motion::presence::Exit;
@@ -60,31 +56,18 @@ impl BannerPosition {
     }
 }
 
-/// Which edge a banner enters from and leaves by (`notifications.banner_entry_direction`).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
-pub enum BannerEntry {
-    /// From past the surface's right edge, the edge the stack stands at.
-    #[default]
-    #[word(slug = "right")]
-    FromRight,
-    /// Rising from below its place, and sinking back down as it fades out.
-    #[word(slug = "below")]
-    FromBelow,
-}
-
 /// The pitch a banner that measured nothing heals by: the least banner and the gap.
 const FALLBACK_PITCH: RowPitch = RowPitch(Px(64.0 + 8.0));
 
 /// The banners, newest first. `gap` overrides `--notifications-stack-gap` (the
-/// `notifications.stack_gap_px` a `NotificationMetrics` around the stack writes); `entry` is the
-/// edge banners come in from.
+/// `notifications.stack_gap_px` a `NotificationMetrics` around the stack writes).
 #[component]
 pub fn BannerStack(
     banners: Vec<Banner>,
     #[props(default)] position: BannerPosition,
-    #[props(default)] entry: BannerEntry,
     #[props(default)] gap: Option<Px>,
     #[props(default)] on_hidden: Option<EventHandler<BannerKey>>,
+    #[props(default)] common: Common,
 ) -> Element {
     let keys: Vec<BannerKey> = banners.iter().map(|banner| banner.key).collect();
     let cards = use_cards(&banners);
@@ -92,7 +75,7 @@ pub fn BannerStack(
         keys,
         RosterSpec {
             leave: LeaveBy::Delist,
-            exit: Exit::BannerOut,
+            exit: Exit::PanelOut,
             pitch: FALLBACK_PITCH,
             on_settled: Some(EventHandler::new(move |key| {
                 cards.forget(key);
@@ -104,14 +87,18 @@ pub fn BannerStack(
     );
     let pitches = roster.pitches();
     let style = gap.map(|gap| NotificationToken::StackGap.write(&format!("{}px", gap.0)));
+    let class = common.class("ds-banner-stack");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-banner-stack",
+            class,
+            id: common.id.clone(),
             "data-position": position.slug(),
-            "data-entry": entry.slug(),
             role: "log",
             "aria-label": "Notifications",
             style,
+            onmounted: move |event| common.mounted(event),
+            ..data,
             for entry in roster.entries() {
                 BannerRow {
                     key: "{entry.key.0}",

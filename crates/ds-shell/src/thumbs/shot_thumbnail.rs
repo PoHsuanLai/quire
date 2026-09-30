@@ -4,8 +4,8 @@
 //! The picture sits letterboxed in a card of the Toast material ([`shot_frame`]), inside a
 //! transparent Toast scope, so the card paints the material wherever its root is (as
 //! `NotificationCard` does). Showing and hiding are the caller's (`shown`), since it owns the
-//! hold (`screenshot.thumbnail_hold_ms`) and knows when a dismissal happened; the card rises in
-//! (`Anim::ShotIn`), slides out to the right (`Anim::ShotOut`) and calls `on_hidden` once that
+//! hold (`screenshot.thumbnail_hold_ms`) and knows when a dismissal happened; the card slides in
+//! (`Anim::PanelIn`), slides out to the right (`Anim::PanelOut`) and calls `on_hidden` once that
 //! exit has settled, so the host can unmap the surface. The pointer's arrival and departure go
 //! to `onhover`, so the caller's hold can pause while the card is looked at, and show the
 //! actions. A press on the picture opens it on its click, or, once it has travelled
@@ -23,7 +23,6 @@ use crate::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use crate::thumbs::shot_frame::shot_frame;
 use crate::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPress};
 use dioxus::prelude::*;
-use ds::SwipeGlue;
 use ds::components::content::image_source::{ImageSize, ImageSource};
 use ds::components::content::picture_fit::picture_style;
 use ds::components::content::text_runs::TextLine;
@@ -31,6 +30,7 @@ use ds::components::controls::press::Propagation;
 use ds::root::chrome::RootChrome;
 use ds::root::surface::Surface;
 use ds::{Bezel, Button, ImagePosition};
+use ds::{Common, SwipeGlue};
 use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
@@ -55,8 +55,9 @@ pub struct ThumbAction {
 }
 
 /// The screenshot thumbnail. `image` is drawn at `width` (240 by default, sill's surface) in a
-/// box of `size`'s ratio held between 2:1 and 16:10. `id` names the card for the host's input
-/// and blur region (`Element("thumb")`). `swipe` turns swipe to dismiss on, with
+/// box of `size`'s ratio held between 2:1 and 16:10. `common.id` names the card's plate for the
+/// host's input and blur region (`Element("thumb")`); the consumer's classes and data go on its
+/// root. `swipe` turns swipe to dismiss on, with
 /// `swipe_metrics` from the `notifications.swipe_*` keys.
 #[component]
 pub fn ShotThumbnail(
@@ -69,13 +70,13 @@ pub fn ShotThumbnail(
     #[props(default)] onopen: Option<EventHandler<()>>,
     #[props(default)] ondrag: Option<EventHandler<DragStart>>,
     #[props(default)] onhover: Option<EventHandler<Hover>>,
-    #[props(default)] id: Option<String>,
+    #[props(default)] common: Common,
     #[props(default)] swipe: NotificationSwipe,
     #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
     let spec = PresenceSpec {
-        enter: Anim::ShotIn,
-        exit: Exit::ShotOut,
+        enter: Anim::PanelIn,
+        exit: Exit::PanelOut,
     };
     let Presented { presence, alias } = use_presence(shown, spec, Some(on_hidden));
     rsx! {
@@ -94,7 +95,7 @@ pub fn ShotThumbnail(
                 onopen,
                 ondrag,
                 onhover,
-                id,
+                common,
                 swipe,
                 swipe_metrics,
             }
@@ -114,7 +115,7 @@ fn ShotCard(
     onopen: Option<EventHandler<()>>,
     ondrag: Option<EventHandler<DragStart>>,
     onhover: Option<EventHandler<Hover>>,
-    id: Option<String>,
+    common: Common,
     swipe: NotificationSwipe,
     swipe_metrics: SwipeMetrics,
 ) -> Element {
@@ -134,9 +135,12 @@ fn ShotCard(
         }
     };
     let frame = shot_frame(width, size);
+    let class = common.class("ds-shot");
+    let data = common.data_attributes();
+    let plate_id = common.id.clone();
     rsx! {
         div {
-            class: "ds-shot",
+            class,
             "data-shown": presence.shown().slug(),
             "data-presence": presence.drawn_slug(),
             "data-pulse": alias.slug(),
@@ -152,9 +156,11 @@ fn ShotCard(
             onpointermove: move |event| swiper.moved(&event),
             onpointerup: move |event| swiper.released(&event),
             onwheel: move |event| swiper.wheel(&event),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             div {
                 class: "ds-shot-plate",
-                id,
+                id: plate_id,
                 role: "group",
                 "aria-label": "Screenshot",
                 style: "height:{frame.card.height.0}px",

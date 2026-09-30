@@ -1,13 +1,14 @@
 //! The notification parts' specimens, each in a Toast root of its scheme.
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{
     Appearance, Ds, Icon, IconSource, Inject, Material, Px, Rich, RichRun, RichText, RootExtent,
     RunTone, Shown, SidePanel, TextRun, Theme,
 };
 use ds_shell::{
-    AppMark, Banner, BannerEntry, BannerKey, BannerPosition, BannerStack, CardAction, GroupCount,
-    GroupHeader, NotificationCard, StackLayers,
+    AppMark, Banner, BannerKey, BannerPosition, BannerStack, CardAction, GroupCount, GroupHeader,
+    NotificationCard, StackLayers,
 };
 
 /// A specimen: its golden name and how it is made.
@@ -24,7 +25,6 @@ pub const SPECIMENS: &[Specimen] = &[
     ("card-popover-root", card_popover_root),
     ("stack-top-right", stack_top_right),
     ("stack-bottom-right-dark", stack_bottom_right_dark),
-    ("stack-entry-below", stack_entry_below),
     ("center-light", center_light),
     ("center-dark", center_dark),
 ];
@@ -136,7 +136,7 @@ pub fn card_group() -> Element {
                 on_close: |_| {},
                 on_open: |_| {},
                 on_link: |_| {},
-                id: "toast-7",
+                common: Common { id: Some("toast-7".to_string()), ..Common::default() },
             }
         },
     )
@@ -151,8 +151,8 @@ pub fn card_popover_root() -> Element {
     }
 }
 
-/// Two banners in a stack at `position` in `theme`, entering from `entry`.
-fn stack(theme: Theme, position: BannerPosition, entry: BannerEntry) -> Element {
+/// Two banners in a stack at `position` in `theme`.
+fn stack(theme: Theme, position: BannerPosition) -> Element {
     let banners = [(2, "Grace Hopper", "9:41"), (1, "Ada Lovelace", "now")]
         .into_iter()
         .map(|(n, who, age)| Banner {
@@ -162,34 +162,17 @@ fn stack(theme: Theme, position: BannerPosition, entry: BannerEntry) -> Element 
             },
         })
         .collect::<Vec<_>>();
-    toast(theme, rsx! { BannerStack { banners, position, entry } })
+    toast(theme, rsx! { BannerStack { banners, position } })
 }
 
 /// Top right, light.
 pub fn stack_top_right() -> Element {
-    stack(
-        Theme::Light,
-        BannerPosition::TopRight,
-        BannerEntry::FromRight,
-    )
+    stack(Theme::Light, BannerPosition::TopRight)
 }
 
 /// Bottom right, dark.
 pub fn stack_bottom_right_dark() -> Element {
-    stack(
-        Theme::Dark,
-        BannerPosition::BottomRight,
-        BannerEntry::FromRight,
-    )
-}
-
-/// Top right, light, rising from below (`notifications.banner_entry_direction`).
-pub fn stack_entry_below() -> Element {
-    stack(
-        Theme::Light,
-        BannerPosition::TopRight,
-        BannerEntry::FromBelow,
-    )
+    stack(Theme::Dark, BannerPosition::BottomRight)
 }
 
 /// The center in `theme`: a group header over two cards, in a Popover root.

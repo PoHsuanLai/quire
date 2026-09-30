@@ -14,12 +14,10 @@
 //! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus four for the
 //! control center's pane switch: `PaneInR` and `PaneInL` play `slide-r` and
 //! `slide-l` at `--t-move` (design/13 section 13.3.7) where the catalogue's rows are `--t-big`,
-//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's pair:
-//! `OsdIn` and `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
-//! step, plus `SheetOut`, the sheet's exit, plus `BannerOut`, a
-//! notification banner's slide out by its entry edge, and `BannerIn`, its
-//! slide in, plus `PanelIn` and `PanelOut`, the notification center's edge panel,
-//! plus `ShotIn` and `ShotOut`, the screenshot thumbnail's pair, plus
+//! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's exit:
+//! `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
+//! step, plus `SheetOut`, the sheet's exit, plus `PanelIn` and `PanelOut`, the slide in and out
+//! of an edge panel, a notification banner, a toast and a screenshot thumbnail, plus
 //! `PictureAccept`, the user picture's accept beat on unlock (design/25-EMOJI.md section 7), plus the small-state details' eight (design/26-DETAILS.md
 //! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`, `RollIn`, `RollOut`,
 //! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
@@ -86,14 +84,8 @@ pub enum Anim {
     PaneOutL,
     /// `pane-out-r`: a detail pane leaving to the right as the root comes back.
     PaneOutR,
-    /// `osd-in`: the OSD card comes in from `--osd-dy` (8 px above it at the top right, below
-    /// it at the bottom centre) and fades in, from a .96 scale, over `--t-quick --e-out`:
-    /// `pop-in`'s entrance without its overshoot, since a level shown under a key press must not
-    /// bounce (design/20 section 1.7).
-    OsdIn,
-    /// `osd-out`: the OSD card fades out and moves half of `--osd-dy` back the way it came (a
-    /// lift at the top right, a drop at the bottom centre) over `--t-move --e-exit`, the exit
-    /// design/05 section 10 gives shell chrome, once its hold ends.
+    /// `osd-out`: the OSD card fades out over `--t-move --e-exit` once its hold ends
+    /// (design/30 section 1.3: the OSD enters with `PaletteFade`, `--t-quick`).
     OsdOut,
     /// `sheet-in` at `--t-big --e-out`: a sheet slides down from the top edge (design/30
     /// section 1.3: Slide(Top), the tween a sheet plays when it is not spring-driven).
@@ -101,16 +93,6 @@ pub enum Anim {
     /// `sheet-out`: a sheet slides back up past the top edge over `--t-move --e-exit` (design/30
     /// section 1.3: exits accelerate).
     SheetOut,
-    /// `banner-out`: a notification banner slides out by its stack's entry edge (to the right
-    /// by default, `--banner-dx`/`--banner-dy`) from wherever a swipe left it (`--swipe-dx`)
-    /// and fades, over `--t-move --e-exit`, the exit design/05 section 10
-    /// gives shell chrome; the rows below it then heal.
-    BannerOut,
-    /// `banner-in`: a notification banner slides in from its stack's entry edge (past the right
-    /// edge by default, or from below; `--banner-dx`/`--banner-dy`) to its place,
-    /// over `--t-move --e-spring` (design/13 section 13.3.6's entrance, at the
-    /// stack's `--t-move` so a banner that arrives as another leaves moves with it).
-    BannerIn,
     /// `panel-in`: an edge panel (the notification center) slides in from past the right edge
     /// over `--t-move --e-out`: a large surface decelerates in, since a spring's overshoot would
     /// pull it off the edge it is anchored to.
@@ -119,13 +101,6 @@ pub enum Anim {
     /// `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
     /// unmaps it at `settle(PanelOut)`.
     PanelOut,
-    /// `rise` at `--t-big --e-spring`: the screenshot thumbnail arrives as a surface, at the
-    /// toast's spring rather than a row's `--t-move --e-out` (design/20 section 1.13).
-    ShotIn,
-    /// `shot-out`: the screenshot thumbnail slides out to the right past its own width and
-    /// fades, over `--t-move --e-exit`, holding its last frame until the host unmaps it at
-    /// `settle(ShotOut)` (design/20 section 1.13: "slide-r out").
-    ShotOut,
     /// `morph-in`: a glyph growing into a new state (design/26 `MorphGlyph`).
     MorphIn,
     /// `morph-out`: the glyph it replaces shrinking away.
@@ -159,7 +134,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 44] = [
+    pub const ALL: [Anim; 39] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -184,16 +159,11 @@ impl Anim {
         Anim::PaneInL,
         Anim::PaneOutL,
         Anim::PaneOutR,
-        Anim::OsdIn,
         Anim::OsdOut,
         Anim::SheetIn,
         Anim::SheetOut,
-        Anim::BannerOut,
-        Anim::BannerIn,
         Anim::PanelIn,
         Anim::PanelOut,
-        Anim::ShotIn,
-        Anim::ShotOut,
         Anim::MorphIn,
         Anim::MorphOut,
         Anim::MorphFadeIn,
@@ -233,16 +203,11 @@ impl Anim {
             Anim::PaneInL => "a-pane-in-l",
             Anim::PaneOutL => "a-pane-out-l",
             Anim::PaneOutR => "a-pane-out-r",
-            Anim::OsdIn => "a-osd-in",
             Anim::OsdOut => "a-osd-out",
             Anim::SheetIn => "a-sheet-in",
             Anim::SheetOut => "a-sheet-out",
-            Anim::BannerOut => "a-banner-out",
-            Anim::BannerIn => "a-banner-in",
             Anim::PanelIn => "a-panel-in",
             Anim::PanelOut => "a-panel-out",
-            Anim::ShotIn => "a-shot-in",
-            Anim::ShotOut => "a-shot-out",
             Anim::MorphIn => "a-morph-in",
             Anim::MorphOut => "a-morph-out",
             Anim::MorphFadeIn => "a-morph-fade-in",

@@ -7,6 +7,9 @@ use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, TextRun};
 use ds_harness::harness::settle_until;
 use ds_harness::{Harness, Viewport};
+use ds::{
+    Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, ShortcutKey, TextRun,
+};
 use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
 
 const VIEW: Viewport = Viewport {
@@ -159,4 +162,39 @@ fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves(
     harness.within(|| {
         assert!(LOG.peek().contains(&"hover Away".to_owned()));
     });
+}
+
+/// Tab until `selector` has the keyboard, at most `limit` presses.
+fn tab_to(harness: &mut Harness, selector: &str, limit: usize) -> bool {
+    (0..limit).any(|_| {
+        harness.key(ShortcutKey::Tab);
+        harness.is_focused(selector)
+    })
+}
+
+#[test]
+fn the_close_button_takes_the_keyboard_and_closes_on_enter_and_space() {
+    let mut harness = Harness::new(Card, VIEW);
+    harness.within(|| LOG.write().clear());
+    assert!(
+        tab_to(&mut harness, ".ds-notification-close", 6),
+        "Tab reaches the close button"
+    );
+    let closes = |harness: &mut Harness| {
+        log(harness)
+            .iter()
+            .filter(|entry| entry.as_str() == "close")
+            .count()
+    };
+    let before = closes(&mut harness);
+    harness.key(ShortcutKey::Enter);
+    harness.advance(std::time::Duration::from_millis(50));
+    assert_eq!(closes(&mut harness), before + 1, "Enter closes");
+    harness.key(ShortcutKey::Space);
+    harness.advance(std::time::Duration::from_millis(50));
+    assert_eq!(closes(&mut harness), before + 2, "Space closes");
+    assert!(
+        !log(&mut harness).contains(&"open".to_owned()),
+        "a key on the close button never opens the card"
+    );
 }

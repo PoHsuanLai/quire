@@ -59,17 +59,9 @@
 @keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 
-/* osd-in and osd-out (quire's): the OSD card's pair, following its anchor through
-   `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
-   the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
-   centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
-   rest, at `--t-quick --e-out` (design/20 section 1.7): `pop-in`'s entrance with no overshoot,
-   since a level shown under a key press settles, it does not bounce. Out: to half of `--osd-dy`
-   and transparent at `--t-move --e-exit` (design/05 section 10), holding that last frame until
-   the host unmaps the surface. Played outside the card (its `a-osd-in` pulse class), the offset
-   is the top right's, the default position. */
-@keyframes osd-in{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
-@keyframes osd-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+/* osd-out (quire's): the OSD card's exit, a fade to transparent at `--t-move --e-exit`
+   (design/30 section 1.3), holding that last frame until the host unmaps the surface. */
+@keyframes osd-out{ from{ opacity:1; } to{ opacity:0; } }
 
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
@@ -86,30 +78,13 @@
    it only fades (`menu-out`). */
 @keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 
-/* banner-out (quire's): a notification banner slides out, from the offset a
-   swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
-   `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
-   edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
-   frame until the stack drops the row and the rows below heal. */
-@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
-
-/* banner-in (quire's): a notification banner slides in from its entry edge's vector
-   (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
-   `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
-@keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
-
 /* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
    back out at `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
-   unmaps it. A toast slides the same way. */
+   unmaps it. A toast, a notification banner and a screenshot thumbnail slide the same way. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
-/* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
-   width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
-   out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
-   --e-spring`. */
-@keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 
 /* morph-in, morph-out: a glyph that changes state grows in from .7 as the old one shrinks to .7
    and fades (MorphStyle::DownUp; OffUp plays only morph-in). */

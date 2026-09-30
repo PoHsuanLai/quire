@@ -1,10 +1,10 @@
 //! The screenshot thumbnail on a real Blitz document: shown, the card rises in
 //! (`data-presence="entering"`, `rise` at `--t-big`) and comes to rest; hidden, it slides out and
-//! `on_hidden` runs only once `settle(ShotOut)` has passed. A press on the picture that travels
+//! `on_hidden` runs only once `settle(PanelOut)` has passed. A press on the picture that travels
 //! the drag threshold calls `ondrag` once and does not open; one that stays under it opens on its
 //! click. The pointer on the card is told to `onhover` and shows the actions. With swipe to
 //! dismiss on, a drag to the right is the swipe's (it flies out and reports at
-//! `settle(BannerOut)`, never a drag out), while a drag to the left still starts a drag out.
+//! `settle(PanelOut)`, never a drag out), while a drag to the left still starts a drag out.
 
 use dioxus::prelude::*;
 use ds::{
@@ -119,7 +119,7 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
     let card = harness.rect(".ds-shot").expect("the card is laid out");
     assert!((card.size.width.0 - 240.0).abs() < 0.5, "{card:?}");
     let before = read(&mut harness, &HIDDEN);
-    let out = settle(Anim::ShotOut, MotionLevel::Standard);
+    let out = settle(Anim::PanelOut, MotionLevel::Standard);
     let hiding = harness.now();
     harness.within(|| *SHOWN.write() = Shown::Hidden);
     harness.advance(Duration::from_millis(1));
@@ -128,7 +128,7 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
     assert_eq!(
         read(&mut harness, &HIDDEN),
         before,
-        "not at half of settle(ShotOut)"
+        "not at half of settle(PanelOut)"
     );
     let gone = settle_until(&mut harness, |h| presence(h).is_none());
     assert!(
@@ -233,7 +233,7 @@ fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
     );
     assert_eq!(read(&mut harness, &SWIPED), 0);
     // Right, past the dismiss distance: the swipe's.
-    let flight = settle(Anim::BannerOut, MotionLevel::Standard);
+    let flight = settle(Anim::PanelOut, MotionLevel::Standard);
     let released = slow_drag(&mut harness, from, 100.0);
     assert_eq!(
         harness.attr(".ds-shot", "data-swipe").as_deref(),

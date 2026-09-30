@@ -6,6 +6,7 @@
 
 use crate::thumbs::shot_frame::shot_frame;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::image_source::{ImageSize, ImageSource};
 use ds::components::content::picture_fit::picture_style;
 use ds::root::chrome::RootChrome;
@@ -18,14 +19,19 @@ const GHOST_WIDTH: Px = Px(120.0);
 
 /// The drag ghost of a thumbnail showing `image` of `size`.
 #[component]
-pub fn ShotGhost(image: ImageSource, size: ImageSize) -> Element {
+pub fn ShotGhost(image: ImageSource, size: ImageSize, #[props(default)] common: Common) -> Element {
     let frame = shot_frame(GHOST_WIDTH, size);
+    let class = common.class("ds-shot-ghost");
+    let data = common.data_attributes();
     rsx! {
         Surface { material: Material::Toast, chrome: RootChrome::Transparent,
             div {
-                class: "ds-shot-ghost",
+                class,
+                id: common.id.clone(),
                 "aria-hidden": "true",
                 style: "width:{frame.card.width.0}px",
+                onmounted: move |event| common.mounted(event),
+                ..data,
                 div { class: "ds-shot-plate", style: "height:{frame.card.height.0}px",
                     img { class: "ds-shot-image", alt: "", src: image.0, style: picture_style(frame.picture) }
                 }

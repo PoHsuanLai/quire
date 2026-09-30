@@ -24,6 +24,7 @@ use crate::notifications::body::NotificationBody;
 use crate::notifications::parts::{AppMark, CardAction, GroupCount, Hover};
 use crate::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use dioxus::prelude::*;
+use ds::Common;
 use ds::ControlSize;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::rich_text::Rich;
@@ -43,8 +44,8 @@ use ds_style::icon::render::{Glyph, IconPx, IconSize};
 /// line; `body` (runs and links, clamped) is optional, as are the group's `count` and the
 /// `actions`. `on_open` hears a press on the card, Enter or Space; `on_close` a press on the
 /// close button; `on_link` a press on a link in the body. `icon_size` is the icon's side
-/// (`notifications.icon_px`, 32); `id` names the plate for its blur region
-/// (`Element("toast-<id>")`). `swipe` turns swipe to dismiss on, with `swipe_metrics` from the
+/// (`notifications.icon_px`, 32). `common.id` names the plate, the painted box, for its blur region
+/// (`Element("toast-<id>")`); the consumer's classes, data and label go on the card's root. `swipe` turns swipe to dismiss on, with `swipe_metrics` from the
 /// `notifications.swipe_*` keys.
 #[component]
 pub fn NotificationCard(
@@ -60,7 +61,7 @@ pub fn NotificationCard(
     #[props(default)] on_hover: Option<EventHandler<Hover>>,
     #[props(default = Material::Toast)] material: Material,
     #[props(default = IconPx(32))] icon_size: IconPx,
-    #[props(default)] id: Option<String>,
+    #[props(default)] common: Common,
     #[props(default)] swipe: NotificationSwipe,
     #[props(default)] swipe_metrics: SwipeMetrics,
 ) -> Element {
@@ -75,7 +76,11 @@ pub fn NotificationCard(
         }
     };
     let layers = count.map_or(0, |group| group.layers.drawn());
-    let label = format!("{}: {}", app.name.plain_text(), summary.plain_text());
+    let spoken = format!("{}: {}", app.name.plain_text(), summary.plain_text());
+    let label = common.aria_label.clone().unwrap_or(spoken);
+    let class = common.class("ds-notification");
+    let data = common.data_attributes();
+    let plate_id = common.id.clone();
     let open = PressListeners::new(on_open);
     let style = [
         (layers > 0).then(|| format!("--layers:{layers}")),
@@ -88,7 +93,7 @@ pub fn NotificationCard(
     rsx! {
         Surface { material, chrome: RootChrome::Transparent,
             div {
-                class: "ds-notification",
+                class,
                 "data-hover": hover().slug(),
                 "data-swipe": swiper.look(),
                 style,
@@ -101,12 +106,14 @@ pub fn NotificationCard(
                 onpointermove: move |event| swiper.moved(&event),
                 onpointerup: move |event| swiper.released(&event),
                 onwheel: move |event| swiper.wheel(&event),
+                onmounted: move |event| common.mounted(event),
+                ..data,
                 for n in (1..=layers).rev() {
                     div { key: "{n}", class: "ds-notification-layer", "aria-hidden": "true", style: "--i:{n}" }
                 }
                 div {
                     class: "ds-notification-plate",
-                    id,
+                    id: plate_id,
                     role: "button",
                     tabindex: "0",
                     "aria-label": "{label}",

@@ -3,7 +3,7 @@
    `data-exit`); the item is a flow root, so its content's margins stay inside it and its measured
    height is the whole distance the rows below heal. An arriving item plays `row-in` (fades and
    slides down over `--t-move`); a leaving one plays its exit forwards and takes no pointer
-   (`row-out`, fades and slides up over `--t-quick`; a notification banner's `banner-out`); the
+   (`row-out`, fades and slides up over `--t-quick`); the
    rows below a settled batch heal from `--dy` over `--t-move`. At rest an item plays `hold`, which
    moves nothing. Under Reduced motion an entrance is `fade`, an exit `menu-out`, and a heal
    `hold`. The list takes the keyboard itself, so it draws no ring. Attribute selectors carry
@@ -18,7 +18,6 @@
 
 .ds-list-item[*|data-presence=leaving]{ pointer-events:none; }
 .ds-list-item[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
-.ds-list-item[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
 
 .ds-list-item[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 

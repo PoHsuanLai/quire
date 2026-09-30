@@ -8,6 +8,7 @@ use super::Section;
 use super::level_tile::work;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{Appearance, Button, Ds, Icon, ImageSize, ImageSource, Inject, Material, Shown, Theme};
 use ds_shell::{NotificationSwipe, ShotGhost, ShotThumbnail, ThumbAction};
 use image::{ImageFormat, Rgba, RgbaImage};
@@ -93,7 +94,7 @@ fn ShotScene(theme: Theme) -> Element {
                         size: DESKTOP,
                         shown: shown(),
                         actions,
-                        id: "thumb",
+                        common: Common { id: Some("thumb".to_string()), ..Common::default() },
                         swipe: NotificationSwipe::Dismiss(EventHandler::new(move |()| shown.set(Shown::Hidden))),
                     }
                     ShotThumbnail { image: tall, size: PORTRAIT, shown: Shown::Visible }
