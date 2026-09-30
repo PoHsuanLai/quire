@@ -46,9 +46,15 @@ An empty `dots` list reads as the neutral dot `{hue 250, chroma .06}` (palette.r
 
 Inputs: `k = dots[0].chroma`, `h0 = dots[0].hue`, `dark` from the resolved scheme.
 
+**Quiet tint (settled 2026-10-01).** The frame's max chroma is about 40 % of the prototype's
+(light .052 to .022, dark .042 to .018): the Space colour behind the chrome is a quiet wash,
+because the reference moved from Arc to Dia, which is closer to the Mac. The lightness
+steps, the gradient, the card inset, the contrast loop and the grain opacity are unchanged, and
+so is the Space-mode accent derivation (03-COLOR section 4.2).
+
 | Quantity | Light | Dark | palette.rs |
 | --- | --- | --- | --- |
-| Frame L, step per stop, max C | L .936, step -.012, C .052 | L .215, step +.014, C .042 | 83-94 |
+| Frame L, step per stop, max C (quiet tint) | L .936, step -.012, C .022 | L .215, step +.014, C .018 | 83-94 |
 | ink (`--f-ink`) | `oklch(.22, .06k, h0)` | `oklch(.93, .018k, h0)` | 132-136 |
 | soft (`--f-ink-soft`) | `oklch(.40, .05k, h0)` | `oklch(.80, .03k, h0)` | 137-141 |
 | faint (`--f-ink-faint`) | `oklch(.52, .05k, h0)` | `oklch(.66, .035k, h0)` | 142-146 |

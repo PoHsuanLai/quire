@@ -103,22 +103,24 @@ struct Frame {
 /// `#2E1000` (L 0.22, C 0.06) and pick `#EF8C62` (C 0.13). A mint gradient
 /// runs `#D2F3E5`→`#D2EBF3` (L 0.93, C 0.03–0.04). Dark is `#001E15` (L 0.21).
 ///
-/// A light frame therefore sits at L 0.936 with chroma 0.052, and a dark one
-/// at L 0.215 with chroma 0.042. Fitting a colour into sRGB steps chroma down
+/// The Arc calibration gave a light frame chroma 0.052 and a dark one 0.042. The design settled
+/// on a quiet tint (2026-10-01, design/03 section 4.2): the reference moved from Arc to Dia, which
+/// is closer to the Mac, so the chroma factors are about 40 % of those, a light frame at L 0.936
+/// with chroma 0.022 and a dark one at L 0.215 with chroma 0.018. Fitting a colour into sRGB steps chroma down
 /// by [`GAMUT_STEP`] (0.002). The contrast cap steps it by [`CAP_STEP`] (0.003).
 /// Those two steps are the approved mockup's; the accent's own steps are the band's
 /// (`tokens::accent_band::floors`).
 const FRAME_LIGHT: Frame = Frame {
     lightness: 0.936,
     step: -0.012,
-    chroma: 0.052,
+    chroma: 0.022,
 };
 
 /// The dark frame. See [`FRAME_LIGHT`] for where the numbers come from.
 const FRAME_DARK: Frame = Frame {
     lightness: 0.215,
     step: 0.014,
-    chroma: 0.042,
+    chroma: 0.018,
 };
 
 /// Lightness of the swatch on a dot. The peach pick `#EF8C62` was C 0.13;

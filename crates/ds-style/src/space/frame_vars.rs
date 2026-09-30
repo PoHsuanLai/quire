@@ -207,27 +207,28 @@ mod tests {
         );
     }
     /// Each preset in each scheme, computed by the mockup's own JavaScript arithmetic
-    /// (design/03-COLOR.md sections 4.3-4.4, ported line for line outside this crate):
+    /// (design/03-COLOR.md sections 4.3-4.4, ported line for line outside this crate), with the
+    /// gradient at the quiet tint's chroma (design/03-COLOR.md section 4.2):
     /// `[ink, soft, faint, hover, gradient]`. The Space accent is no longer the mockup's: it is
     /// the settled band's (design/03-COLOR.md section 20), checked against `derive` below.
     #[rustfmt::skip]
     const MOCKUP: &[(usize, Scheme, [&str; 5])] = &[
-        (0, Scheme::Light, ["#12192f", "#3f475c", "#60697e", "#d3d9e9", "linear-gradient(135deg,#e1eafe 0%,#eee0f3 100%)"]),
-        (0, Scheme::Dark, ["#e4e8f1", "#b8becc", "#8b92a2", "rgba(255,255,255,.06)", "linear-gradient(135deg,#131928 0%,#211924 100%)"]),
-        (1, Scheme::Light, ["#0c1f12", "#3b4d40", "#5c6e60", "#d0ddd3", "linear-gradient(135deg,#dbf1df 0%,#f5e2d3 50%,#f3dcd8 100%)"]),
-        (1, Scheme::Dark, ["#e3eae4", "#b5c1b8", "#89968c", "rgba(255,255,255,.06)", "linear-gradient(135deg,#101d13 0%,#251a11 50%,#291c1a 100%)"]),
-        (2, Scheme::Light, ["#001f28", "#324c55", "#536e77", "#cadde3", "linear-gradient(135deg,#d0f0fb,#d0f0fb)"]),
-        (2, Scheme::Dark, ["#dfeaee", "#b0c1c7", "#82969d", "rgba(255,255,255,.06)", "linear-gradient(135deg,#081d23,#081d23)"]),
-        (3, Scheme::Light, ["#2a1313", "#584140", "#7b6261", "#e7d4d3", "linear-gradient(135deg,#fee2e1 0%,#f7e1d3 100%)"]),
-        (3, Scheme::Dark, ["#f0e5e4", "#cab9b8", "#a08d8c", "rgba(255,255,255,.06)", "linear-gradient(135deg,#251414 0%,#261a11 100%)"]),
-        (4, Scheme::Light, ["#02201e", "#354d4b", "#556f6d", "#cbdedc", "linear-gradient(135deg,#d3f1ee 0%,#d6e9f7 100%)"]),
-        (4, Scheme::Dark, ["#e0eae9", "#b1c2c0", "#849795", "rgba(255,255,255,.06)", "linear-gradient(135deg,#0a1d1c 0%,#131e27 100%)"]),
-        (5, Scheme::Light, ["#261420", "#53424d", "#75626e", "#e3d4dd", "linear-gradient(135deg,#f9e2f0 0%,#e5e3f7 100%)"]),
-        (5, Scheme::Dark, ["#ede5ea", "#c6b9c1", "#9c8d96", "rgba(255,255,255,.06)", "linear-gradient(135deg,#21151d 0%,#1c1b26 100%)"]),
-        (6, Scheme::Light, ["#1f1a09", "#4c4839", "#6d6959", "#dcd9cd", "linear-gradient(135deg,#efead7,#efead7)"]),
-        (6, Scheme::Dark, ["#eae8e1", "#c0beb3", "#959286", "rgba(255,255,255,.06)", "linear-gradient(135deg,#1c190e,#1c190e)"]),
-        (7, Scheme::Light, ["#191b1c", "#464849", "#68696b", "#d6d9dd", "linear-gradient(135deg,#e8eaec,#e8eaec)"]),
-        (7, Scheme::Dark, ["#e7e8e8", "#bdbebf", "#919293", "rgba(255,255,255,.06)", "linear-gradient(135deg,#191a1b,#191a1b)"]),
+        (0, Scheme::Light, ["#12192f", "#3f475c", "#60697e", "#d3d9e9", "linear-gradient(135deg,#e5eaf5 0%,#e9e3eb 100%)"]),
+        (0, Scheme::Dark, ["#e4e8f1", "#b8becc", "#8b92a2", "rgba(255,255,255,.06)", "linear-gradient(135deg,#171920 0%,#1f1b20 100%)"]),
+        (1, Scheme::Light, ["#0c1f12", "#3b4d40", "#5c6e60", "#d0ddd3", "linear-gradient(135deg,#e4ede5 0%,#ece4de 50%,#e9dfde 100%)"]),
+        (1, Scheme::Dark, ["#e3eae4", "#b5c1b8", "#89968c", "rgba(255,255,255,.06)", "linear-gradient(135deg,#161b17 0%,#201c18 50%,#241e1e 100%)"]),
+        (2, Scheme::Light, ["#001f28", "#324c55", "#536e77", "#cadde3", "linear-gradient(135deg,#dfedf1,#dfedf1)"]),
+        (2, Scheme::Dark, ["#dfeaee", "#b0c1c7", "#82969d", "rgba(255,255,255,.06)", "linear-gradient(135deg,#131b1d,#131b1d)"]),
+        (3, Scheme::Light, ["#2a1313", "#584140", "#7b6261", "#e7d4d3", "linear-gradient(135deg,#f4e6e6 0%,#ede4de 100%)"]),
+        (3, Scheme::Dark, ["#f0e5e4", "#cab9b8", "#a08d8c", "rgba(255,255,255,.06)", "linear-gradient(135deg,#1f1717 0%,#211b18 100%)"]),
+        (4, Scheme::Light, ["#02201e", "#354d4b", "#556f6d", "#cbdedc", "linear-gradient(135deg,#e1edec 0%,#dfe7ed 100%)"]),
+        (4, Scheme::Dark, ["#e0eae9", "#b1c2c0", "#849795", "rgba(255,255,255,.06)", "linear-gradient(135deg,#141b1a 0%,#191d21 100%)"]),
+        (5, Scheme::Light, ["#261420", "#53424d", "#75626e", "#e3d4dd", "linear-gradient(135deg,#f0e7ed 0%,#e5e5ed 100%)"]),
+        (5, Scheme::Dark, ["#ede5ea", "#c6b9c1", "#9c8d96", "rgba(255,255,255,.06)", "linear-gradient(135deg,#1d181b 0%,#1c1c21 100%)"]),
+        (6, Scheme::Light, ["#1f1a09", "#4c4839", "#6d6959", "#dcd9cd", "linear-gradient(135deg,#eceae2,#eceae2)"]),
+        (6, Scheme::Dark, ["#eae8e1", "#c0beb3", "#959286", "rgba(255,255,255,.06)", "linear-gradient(135deg,#1b1915,#1b1915)"]),
+        (7, Scheme::Light, ["#191b1c", "#464849", "#68696b", "#d6d9dd", "linear-gradient(135deg,#e9eaeb,#e9eaeb)"]),
+        (7, Scheme::Dark, ["#e7e8e8", "#bdbebf", "#919293", "rgba(255,255,255,.06)", "linear-gradient(135deg,#19191a,#19191a)"]),
     ];
 
     #[test]

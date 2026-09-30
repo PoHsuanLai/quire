@@ -116,15 +116,26 @@ Before the palette is applied, `.win` carries these defaults:
 | `--f-pill-hover` | `oklch(0.885, 0.026·k + 0.004, h0)` | `rgba(255,255,255,.06)` | `S:1008` |
 | `--f-line` | `rgba(0,0,0,.08)` | `rgba(255,255,255,.09)` | `S:1193` |
 | `--f-solid` | first gradient stop | first gradient stop | `S:1191` |
-| gradient stop `i` | `oklch(0.936 - 0.012·i, dot_i.c × 0.052, dot_i.h)` | `oklch(0.215 + 0.014·i, dot_i.c × 0.042, dot_i.h)`, each capped (4.3) | `S:990`, `S:1001-1007` |
+| gradient stop `i` | `oklch(0.936 - 0.012·i, dot_i.c × 0.022, dot_i.h)` | `oklch(0.215 + 0.014·i, dot_i.c × 0.018, dot_i.h)`, each capped (4.3) | `S:990`, `S:1001-1007` |
 
 `k` is the first dot's chroma (0..1 on the field) and `h0` its hue in degrees (`S:996`). Every
 oklch value goes through `hex()`: gamut-fit, then sRGB-encode and round to `#rrggbb` (4.4).
+
+**Quiet tint (settled 2026-10-01).** The frame's chroma factor is about 40 % of the prototype's
+(light .052 to .022, dark .042 to .018), so the Space colour behind the chrome is a quiet wash,
+not a saturated one: the reference moved from Arc to Dia, which sits closer to the Mac, and a
+loud frame fought the paper card and the Mac controls on it. The lightness steps, the gradient,
+the card inset and the contrast loop (4.3: ink >= 4.5, faint >= 3.0 on every stop) are unchanged,
+and so is the grain's opacity (8) and the Space-mode accent derivation (5). The verbatim script
+below keeps the prototype's `FRAME`; the port's constants are the quiet ones above
+(`ds-style/space/palette.rs`).
 
 The light hover is a solid colour darker than the frame; the dark hover is a white overlay. The
 pill is always a white overlay.
 
 ### 4.3 The derivation, verbatim
+
+The prototype's script; the port's `FRAME` chroma is the quiet tint's (4.2).
 
 ```js
 const FRAME = {light:{L:0.936, step:-0.012, C:0.052}, dark:{L:0.215, step:0.014, C:0.042}};

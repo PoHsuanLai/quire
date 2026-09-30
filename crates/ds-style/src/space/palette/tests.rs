@@ -44,35 +44,35 @@ struct Case {
 const CASES: &[Case] = &[
     Case {
         dots: WORK,
-        line: r##"{"space":"work","dark":false,"stops":["#e1eafe","#eee0f3"],"picked":["#8da8f0","#c19bcd"],"ink":"#12192f","soft":"#3f475c","faint":"#60697e","hover":"#d3d9e9","accent":"#44547d","accentSoft":"#e4e9f6","accentInk":"#FFFFFF","capped":false}"##,
+        line: r##"{"space":"work","dark":false,"stops":["#e5eaf5","#e9e3eb"],"picked":["#8da8f0","#c19bcd"],"ink":"#12192f","soft":"#3f475c","faint":"#60697e","hover":"#d3d9e9","accent":"#44547d","accentSoft":"#e4e9f6","accentInk":"#FFFFFF","capped":false}"##,
     },
     Case {
         dots: WORK,
-        line: r##"{"space":"work","dark":true,"stops":["#131928","#211924"],"picked":["#8da8f0","#c19bcd"],"ink":"#e4e8f1","soft":"#b8becc","faint":"#8b92a2","hover":"rgba(255,255,255,.06)","accent":"#a1b3e2","accentSoft":"#252b3b","accentInk":"#12161f","capped":false}"##,
+        line: r##"{"space":"work","dark":true,"stops":["#171920","#1f1b20"],"picked":["#8da8f0","#c19bcd"],"ink":"#e4e8f1","soft":"#b8becc","faint":"#8b92a2","hover":"rgba(255,255,255,.06)","accent":"#a1b3e2","accentSoft":"#252b3b","accentInk":"#12161f","capped":false}"##,
     },
     Case {
         dots: HOME,
-        line: r##"{"space":"home","dark":false,"stops":["#dbf1df","#f5e2d3","#f3dcd8"],"picked":["#7dbc8e","#d19f74","#d69991"],"ink":"#0c1f12","soft":"#3b4d40","faint":"#5c6e60","hover":"#d0ddd3","accent":"#376043","accentSoft":"#e1ede4","accentInk":"#FFFFFF","capped":false}"##,
+        line: r##"{"space":"home","dark":false,"stops":["#e4ede5","#ece4de","#e9dfde"],"picked":["#7dbc8e","#d19f74","#d69991"],"ink":"#0c1f12","soft":"#3b4d40","faint":"#5c6e60","hover":"#d0ddd3","accent":"#376043","accentSoft":"#e1ede4","accentInk":"#FFFFFF","capped":false}"##,
     },
     Case {
         dots: HOME,
-        line: r##"{"space":"home","dark":true,"stops":["#101d13","#251a11","#291c1a"],"picked":["#7dbc8e","#d19f74","#d69991"],"ink":"#e3eae4","soft":"#b5c1b8","faint":"#89968c","hover":"rgba(255,255,255,.06)","accent":"#95c1a0","accentSoft":"#203024","accentInk":"#0f1912","capped":false}"##,
+        line: r##"{"space":"home","dark":true,"stops":["#161b17","#201c18","#241e1e"],"picked":["#7dbc8e","#d19f74","#d69991"],"ink":"#e3eae4","soft":"#b5c1b8","faint":"#89968c","hover":"rgba(255,255,255,.06)","accent":"#95c1a0","accentSoft":"#203024","accentInk":"#0f1912","capped":false}"##,
     },
     Case {
         dots: GREY,
-        line: r##"{"space":"grey","dark":false,"stops":["#e8eaec"],"picked":["#a7abb0"],"ink":"#191b1c","soft":"#464849","faint":"#68696b","hover":"#d6d9dd","accent":"#41576f","accentSoft":"#e1ebf5","accentInk":"#FFFFFF","capped":false}"##,
+        line: r##"{"space":"grey","dark":false,"stops":["#e9eaeb"],"picked":["#a7abb0"],"ink":"#191b1c","soft":"#464849","faint":"#68696b","hover":"#d6d9dd","accent":"#41576f","accentSoft":"#e1ebf5","accentInk":"#FFFFFF","capped":false}"##,
     },
     Case {
         dots: GREY,
-        line: r##"{"space":"grey","dark":true,"stops":["#191a1b"],"picked":["#a7abb0"],"ink":"#e7e8e8","soft":"#bdbebf","faint":"#919293","hover":"rgba(255,255,255,.06)","accent":"#9eb7d2","accentSoft":"#202d3a","accentInk":"#0f171f","capped":false}"##,
+        line: r##"{"space":"grey","dark":true,"stops":["#19191a"],"picked":["#a7abb0"],"ink":"#e7e8e8","soft":"#bdbebf","faint":"#919293","hover":"rgba(255,255,255,.06)","accent":"#9eb7d2","accentSoft":"#202d3a","accentInk":"#0f171f","capped":false}"##,
     },
     Case {
         dots: HOT,
-        line: r##"{"space":"hot","dark":false,"stops":["#fae8c3"],"picked":["#d6a20a"],"ink":"#251800","soft":"#544627","faint":"#766747","hover":"#e2d8c3","accent":"#6a5118","accentSoft":"#efe9dc","accentInk":"#FFFFFF","capped":false}"##,
+        line: r##"{"space":"hot","dark":false,"stops":["#f1e9da"],"picked":["#d6a20a"],"ink":"#251800","soft":"#544627","faint":"#766747","hover":"#e2d8c3","accent":"#6a5118","accentSoft":"#efe9dc","accentInk":"#FFFFFF","capped":false}"##,
     },
     Case {
         dots: HOT,
-        line: r##"{"space":"hot","dark":true,"stops":["#221801"],"picked":["#d6a20a"],"ink":"#ede7db","soft":"#c7bda8","faint":"#9c917a","hover":"rgba(255,255,255,.06)","accent":"#ccb178","accentSoft":"#322a1a","accentInk":"#1a150b","capped":false}"##,
+        line: r##"{"space":"hot","dark":true,"stops":["#1d1910"],"picked":["#d6a20a"],"ink":"#ede7db","soft":"#c7bda8","faint":"#9c917a","hover":"rgba(255,255,255,.06)","accent":"#ccb178","accentSoft":"#322a1a","accentInk":"#1a150b","capped":false}"##,
     },
 ];
 
@@ -259,18 +259,18 @@ fn gradient_matches_the_mockup() {
     let cases = [
         (
             "one stop",
-            &["#e8eaec"][..],
-            "linear-gradient(135deg,#e8eaec,#e8eaec)",
+            &["#e9eaeb"][..],
+            "linear-gradient(135deg,#e9eaeb,#e9eaeb)",
         ),
         (
             "two stops",
-            &["#e1eafe", "#eee0f3"][..],
-            "linear-gradient(135deg,#e1eafe 0%,#eee0f3 100%)",
+            &["#e5eaf5", "#e9e3eb"][..],
+            "linear-gradient(135deg,#e5eaf5 0%,#e9e3eb 100%)",
         ),
         (
             "three stops",
-            &["#dbf1df", "#f5e2d3", "#f3dcd8"][..],
-            "linear-gradient(135deg,#dbf1df 0%,#f5e2d3 50%,#f3dcd8 100%)",
+            &["#e4ede5", "#ece4de", "#e9dfde"][..],
+            "linear-gradient(135deg,#e4ede5 0%,#ece4de 50%,#e9dfde 100%)",
         ),
     ];
     for (name, stops, want) in cases {
