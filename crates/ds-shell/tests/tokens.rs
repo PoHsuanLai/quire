@@ -302,8 +302,10 @@ const PER_ELEMENT: &[&str] = &[
     "--swipe-dx",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
-    // A stepping spinner's angle (`Spinner`, design/26 R4).
+    // A stepping spinner's angle (`ProgressIndicator`, design/26 R4).
     "--turn",
+    // A running loop's step: the barber pole's slide (`ProgressIndicator`).
+    "--step",
     // The voice orb's size, size-derived look values and turn (`VoiceOrb`, design/30 section 2.9).
     "--orb-size",
     "--orb-blur",

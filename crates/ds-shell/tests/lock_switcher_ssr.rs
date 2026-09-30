@@ -324,7 +324,7 @@ fn no_password_field_writes_a_value() {
             .nth(1)
             .and_then(|rest| rest.split('>').next())
             .unwrap_or_else(|| panic!("{name}: a field in {html}"));
-        assert!(field.contains("data-kind=\"secret\""), "{name}: {field}");
+        assert!(field.contains("data-kind=\"secure\""), "{name}: {field}");
         assert!(!field.contains("value="), "{name}: {field}");
     }
 }
@@ -348,7 +348,11 @@ fn the_markup_carries_the_props() {
     assert!(!idle.contains("a-shake-x"), "{idle}");
     assert!(!idle.contains("Caps Lock"), "{idle}");
     let checking = render(SPECIMENS[3].1);
-    for want in ["aria-busy=\"true\"", "ds-spinner", "aria-disabled=\"true\""] {
+    for want in [
+        "aria-busy=\"true\"",
+        "ds-progress",
+        "aria-disabled=\"true\"",
+    ] {
         assert!(checking.contains(want), "{want} in {checking}");
     }
     let out = render(SPECIMENS[5].1);

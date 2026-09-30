@@ -69,9 +69,9 @@ fn no_sheet_loops_or_times_off_the_grammar_but_the_listed_ones() {
 }
 
 #[test]
-fn the_details_primitives_and_the_spinner_never_loop() {
+fn the_details_primitives_and_the_progress_indicator_never_loop() {
     for (name, css) in sheets() {
-        if !(name.starts_with("detail_") || name == "spinner") {
+        if !(name.starts_with("detail_") || name == "spinner" || name == "progress") {
             continue;
         }
         let offences: Vec<_> = stylesheet(&css, &details())

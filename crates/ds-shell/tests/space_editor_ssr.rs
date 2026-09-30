@@ -163,7 +163,9 @@ fn sheets() -> Vec<&'static str> {
         "slider",
         "button",
         "chip",
-        "text_input",
+        "text_field",
+        "label",
+        "progress",
     ]
     .iter()
     .filter_map(|name| all.iter().find(|(n, _)| n == name).map(|(_, css)| *css))
@@ -183,7 +185,7 @@ fn every_class_in_a_golden_is_styled_by_the_editors_sheets() {
         goldens.len()
     );
     let css = sheets();
-    assert_eq!(css.len(), 7, "a sheet the editor draws with is missing");
+    assert_eq!(css.len(), 9, "a sheet the editor draws with is missing");
     let mut failures = Vec::new();
     for (name, html) in &goldens {
         for class in classes(html) {
