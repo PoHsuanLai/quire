@@ -7,6 +7,11 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
+use crate::shell::switcher::switcher_fit::{SwitcherMetrics, fit};
+use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::Selection;
+use ds_core::vocab::Shown;
 use ds_motion::anim::Anim;
 use ds_motion::detail::touch::Touch;
 use ds_motion::pulse_key::PulseKey;
@@ -15,11 +20,6 @@ use ds_motion::{
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
-use crate::shell::switcher::switcher_fit::{SwitcherMetrics, fit};
-use dioxus::prelude::*;
-use ds_core::geometry::units::Px;
-use ds_core::vocab::Selection;
-use ds_core::vocab::Shown;
 use ds_style::icon::family::PlateFamily;
 use ds_style::icon::render::{IconPx, IconSize};
 

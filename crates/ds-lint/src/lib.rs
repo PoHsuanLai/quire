@@ -5,7 +5,7 @@
 //! A consumer's test, with one reviewed exception:
 //!
 //! ```
-//! use ds::lint::{Exception, LintConfig, Rule, assert_clean};
+//! use ds_lint::{Exception, LintConfig, Rule, assert_clean};
 //!
 //! const OUR_CSS: &str = ".row { color: var(--ink); }\n.fade { mask-image: linear-gradient(#000, transparent); }";
 //! const EXCEPTIONS: &[Exception] = &[Exception {

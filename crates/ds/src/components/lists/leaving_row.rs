@@ -3,12 +3,12 @@
 //! rows below it heal when it leaves.
 
 use crate::host::measure::client_rect;
-use ds_motion::presence::Presence;
-use ds_motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
-use ds_motion::use_roster::Pitches;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_motion::presence::Presence;
+use ds_motion::roster::{Heal, RosterEntry, RowPitch, presence_slug};
+use ds_motion::use_roster::Pitches;
 use ds_style::task::spawn_in;
 use std::rc::Rc;
 
@@ -86,9 +86,9 @@ fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::motion_style;
+    use ds_core::geometry::units::Px;
     use ds_motion::presence::{Exit, Presence};
     use ds_motion::roster::{Heal, RosterEntry};
-    use ds_core::geometry::units::Px;
 
     #[test]
     fn only_a_healing_row_writes_its_distance() {

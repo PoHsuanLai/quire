@@ -10,6 +10,9 @@
 //! the panes turn back without a jump, and the switcher rests (and `on_settled` hears the pane)
 //! when the spring does. Under Reduced the spring is critically damped and the panes only
 //! cross-fade.
+use dioxus::core::queue_effect;
+use dioxus::prelude::*;
+use ds_core::word::Word;
 use ds_motion::detail::touch::Touch;
 use ds_motion::pane_slide::{Pane, PaneRole, PaneRound, PaneSlide};
 use ds_motion::{
@@ -18,9 +21,6 @@ use ds_motion::{
     timeline::spring::{PxPerUnit, SpringFrame},
     use_spring::use_spring,
 };
-use dioxus::core::queue_effect;
-use dioxus::prelude::*;
-use ds_core::word::Word;
 
 /// How many pixels the whole switch spans for the spring's rest: the panes move 26 px and fade,
 /// so a hundredth of the switch is well under a visible step.

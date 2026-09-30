@@ -10,12 +10,12 @@
 //! another. [`plan`] plays the same role `ds_motion::detail::sweep::plan` does for a sweep.
 
 use super::model::IdleDimPhase;
-use ds_motion::detail::level::use_level;
-use ds_motion::timeline::glide::Glide;
-use ds_motion::timeline::playback::use_playback;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::vocab::{Fraction, Percent};
+use ds_motion::detail::level::use_level;
+use ds_motion::timeline::glide::Glide;
+use ds_motion::timeline::playback::use_playback;
 use ds_style::appearance::motion::MotionLevel;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 

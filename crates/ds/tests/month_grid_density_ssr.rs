@@ -11,11 +11,11 @@ mod golden;
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, Ds, Inject, Material, MonthDensity, MonthGrid, MonthStep, RootChrome, WeekNumbers,
     WidgetFrame, WidgetMetrics, WidgetSize,
 };
+use ds_lint::{LintConfig, markup};
 use month_sample::{AUGUST, First, sample};
 
 /// One specimen.

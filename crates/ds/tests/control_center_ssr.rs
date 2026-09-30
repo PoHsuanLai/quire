@@ -18,8 +18,8 @@ mod tiles;
 use dioxus::prelude::*;
 use ds::GlyphProps;
 use ds::Word;
-use ds::lint::{LintConfig, Profile, markup};
 use ds::{Glyph, Icon, IconSize};
+use ds_lint::{LintConfig, Profile, markup};
 
 /// `icon` at the bar's 22 px, rendered alone.
 fn glyph(icon: Icon) -> String {

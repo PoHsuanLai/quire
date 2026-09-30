@@ -5,10 +5,10 @@ use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::focus::click::kept_click;
-use ds_motion::presence::Presence;
 use dioxus::prelude::*;
 use ds_core::vocab::{RowState, Selection};
 use ds_core::word::Word;
+use ds_motion::presence::Presence;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 

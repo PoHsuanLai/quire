@@ -10,11 +10,11 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::Word;
-use ds::lint::{LintConfig, markup};
 use ds::{
     AnimatedEmoji, Appearance, DiscHue, Ds, EmojiDisc, EmojiId, Inject, Material, Mood,
     PictureSize, Theme,
 };
+use ds_lint::{LintConfig, markup};
 
 #[derive(Props, Clone, PartialEq)]
 struct SpecimenProps {

@@ -4,8 +4,8 @@
 //! `data-*` name: `DataName` refuses `ds-…` and the names quire writes itself.
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, Rule, markup, stylesheet};
 use ds::{Button, ButtonVariant, Common, DataAttr, DataName, ExtraClass, PassThroughError};
+use ds_lint::{LintConfig, Rule, markup, stylesheet};
 
 /// The consumer's own rule for its class: a reveal on the row's hover.
 const CONSUMER_CSS: &str = ".row-reveal { opacity: 0; transition: opacity var(--t-quick) var(--e-out); }\n.row:hover .row-reveal { opacity: 1; }";

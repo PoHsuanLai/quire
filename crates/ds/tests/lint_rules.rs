@@ -1,10 +1,10 @@
-//! Table-driven coverage of every `ds::lint::Rule`: one passing and one failing case each, on
+//! Table-driven coverage of every `ds_lint::Rule`: one passing and one failing case each, on
 //! the `cssparser` token stream (never a substring search — CONVENTIONS §14 "Substrings are
 //! not tokens"). `mailo_cases` ports the case tables from
 //! `mail-app/src/ui/style/mod.rs`'s `every_var_is_declared`, `no_colour_outside_the_palette`,
 //! `current_color_is_only_a_stroke_or_fill_value` and `a_class_with_no_rule_is_named`.
 
-use ds::lint::{LintConfig, Offence, Profile, Rule, markup, stylesheet};
+use ds_lint::{LintConfig, Offence, Profile, Rule, markup, stylesheet};
 
 fn lint(css: &str, profile: Profile) -> Vec<Offence> {
     stylesheet(
@@ -804,7 +804,7 @@ fn every_rule_variant_is_covered() {
     let mut missing = Vec::new();
     for rule in Rule::ALL
         .into_iter()
-        .filter(|rule| rule.severity() == ds::lint::Severity::Error)
+        .filter(|rule| rule.severity() == ds_lint::Severity::Error)
     {
         if !seen.contains(&(rule, true)) {
             missing.push(format!("{rule:?} has no failing case"));

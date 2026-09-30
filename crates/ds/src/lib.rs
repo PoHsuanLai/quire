@@ -17,8 +17,6 @@ mod file_drop;
 mod focus;
 mod host;
 pub mod icon;
-#[cfg(feature = "lint")]
-pub mod lint;
 pub mod motion;
 mod root;
 mod shell;
@@ -196,24 +194,6 @@ pub use crate::host::{
     reveal::{ScrollSpan, Scrolled, nearest_scroll},
     signals::HostSignals,
 };
-pub use ds_motion::{
-    anim::Anim,
-    drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, WINDOW_DRAG_THRESHOLD, use_drag},
-    hover_intent::{HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase},
-    long_press::{LONG_PRESS_SLOP, LongPress, LongPressEffect, LongPressEvent},
-    pane_slide::Pane,
-    presence::{Exit, Presence},
-    pulse_key::{PulseKey, PulsePhase},
-    recipe::{Fill, Iteration},
-    roster::{Heal, RosterState, RowPitch, StayError, Stayed},
-    rubber::{RUBBER_SHARE, resist},
-    settle::settle,
-    swipe::{Speed, SwipeMetrics},
-    timer::{TimerPhase, use_motion_timer},
-    use_collapse::{Collapse, use_collapse},
-    use_roster::{LeaveBy, Pitches, Roster, RosterSpec, use_roster},
-    wake::WakeStamp,
-};
 pub use crate::root::{
     chrome::{FrameTint, Ground, RootChrome},
     common::Common,
@@ -370,6 +350,24 @@ pub use ds_core::{
         Shown,
     },
 };
+pub use ds_motion::{
+    anim::Anim,
+    drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, WINDOW_DRAG_THRESHOLD, use_drag},
+    hover_intent::{HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase},
+    long_press::{LONG_PRESS_SLOP, LongPress, LongPressEffect, LongPressEvent},
+    pane_slide::Pane,
+    presence::{Exit, Presence},
+    pulse_key::{PulseKey, PulsePhase},
+    recipe::{Fill, Iteration},
+    roster::{Heal, RosterState, RowPitch, StayError, Stayed},
+    rubber::{RUBBER_SHARE, resist},
+    settle::settle,
+    swipe::{Speed, SwipeMetrics},
+    timer::{TimerPhase, use_motion_timer},
+    use_collapse::{Collapse, use_collapse},
+    use_roster::{LeaveBy, Pitches, Roster, RosterSpec, use_roster},
+    wake::WakeStamp,
+};
 pub use ds_style::{
     appearance::{
         accent::Accent,
@@ -433,6 +431,3 @@ pub use ds_style::{
 use futures_timer as _;
 use serde_json as _;
 use thiserror as _;
-
-#[cfg(feature = "lint")]
-use cssparser as _;

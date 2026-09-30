@@ -4,12 +4,12 @@
 //! empties it, and a `Wrong` arrival plays `shake-x` once and empties it when the shake settles
 //! ("Errors shake once and hold still", design/05 principle 7).
 
-use ds_motion::pulse_key::PulseKey;
-use ds_motion::{anim::Anim, settle::settle};
 use crate::shell::lock::vocab::PromptState;
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
 use ds_core::word::Word;
+use ds_motion::pulse_key::PulseKey;
+use ds_motion::{anim::Anim, settle::settle};
 use ds_style::appearance::motion::MotionLevel;
 use ds_style::scope::Scope;
 

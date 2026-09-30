@@ -12,7 +12,6 @@ mod golden;
 use dioxus::prelude::*;
 use ds::LabelHue;
 use ds::Word;
-use ds::lint::{LintConfig, markup};
 use ds::widget::{WidgetEdit, WidgetLayout};
 use ds::widget::{WireRefresh, WireTimeline};
 use ds::{
@@ -24,6 +23,7 @@ use ds::{
     WidgetMetrics, WidgetRegistry, WidgetSize, WidgetSlotGuide, WorldClockWidget,
 };
 use ds::{EventLine, MonthFace, TodayLine};
+use ds_lint::{LintConfig, markup};
 use std::time::{Duration, Instant};
 
 #[derive(Props, Clone)]

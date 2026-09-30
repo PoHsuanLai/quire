@@ -8,6 +8,11 @@
 
 use crate::components::controls::track::fraction_at;
 use crate::host::measure::client_rect;
+use dioxus::core::queue_effect;
+use dioxus::html::geometry::ClientPoint;
+use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect};
+use ds_core::vocab::{Availability, Fraction};
 use ds_motion::detail::touch::{Contact, Touch};
 use ds_motion::drag::{DragPhase, use_drag};
 use ds_motion::{
@@ -17,11 +22,6 @@ use ds_motion::{
     use_spring::{SpringMotion, use_spring_motion},
     velocity::{Velocity, VelocityMeter},
 };
-use dioxus::core::queue_effect;
-use dioxus::html::geometry::ClientPoint;
-use dioxus::prelude::*;
-use ds_core::geometry::units::{Point, Px, Rect};
-use ds_core::vocab::{Availability, Fraction};
 use std::rc::Rc;
 
 /// A release slower than this, in pixels per second, sets the value where the thumb was let go;

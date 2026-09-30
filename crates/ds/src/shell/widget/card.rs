@@ -3,7 +3,6 @@
 //! (`use_widget`), and draws it through the widget's own `view` inside a `WidgetFrame`, whose
 //! corner, inset, material, Space tint and title row are quire's alone.
 
-use ds_motion::wake::WakeStamp;
 use crate::shell::widget::contract::{Widget, WidgetContext, fit};
 use crate::shell::widget::exit::CardPresence;
 use crate::shell::widget::frame::WidgetFrame;
@@ -11,6 +10,7 @@ use crate::shell::widget::kind::{Lift, WidgetHost, WidgetSize};
 use crate::shell::widget::timeline::{RefreshAsk, Timeline};
 use crate::shell::widget::use_widget::use_widget;
 use dioxus::prelude::*;
+use ds_motion::wake::WakeStamp;
 
 /// `widget` at `size` (held to the sizes it draws) in `host`, showing `timeline`'s entry for
 /// now. `wake` replays the widget's appear motion when it changes (a host passes a new stamp as

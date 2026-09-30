@@ -3,7 +3,7 @@
 //! rules"). Every margin, padding and gap is a `--s-*` step (`Rule::RawSpacing`); the three lengths
 //! the scale lacked (20, 28, 40) took the step below (18, 26, 36) in the polish pass.
 
-use ds::lint::{LintConfig, Profile, stylesheet};
+use ds_lint::{LintConfig, Profile, stylesheet};
 
 const GALLERY_CSS: &str = include_str!("../src/gallery.css");
 

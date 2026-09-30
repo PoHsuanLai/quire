@@ -6,14 +6,14 @@
 //! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
 //! (`ds_style::task`).
 
+use dioxus::core::{Task, current_scope_id};
+use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use ds_motion::anim::Anim;
 use ds_motion::hover_intent::{
     HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
 use ds_motion::settle::settle;
-use dioxus::core::{Task, current_scope_id};
-use dioxus::prelude::*;
-use ds_core::time::clock::sleep;
 use ds_style::scope::Scope;
 use ds_style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use ds_style::tokens::delay::DelayToken;

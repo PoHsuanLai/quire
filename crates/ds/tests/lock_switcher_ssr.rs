@@ -10,13 +10,13 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     AppKey, AppSwitcher, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CapsLock, Ds,
     EmojiId, Icon, IconSource, ImageSource, Inject, LockClock, LockLook, LockPrompt, LockScreen,
     LockUser, Material, PlateFamily, PolkitPrompt, PromptState, Px, RootChrome, SwitcherApp,
     TextLine, Theme, TilePresence, person_hue,
 };
+use ds_lint::{LintConfig, markup};
 
 fn user() -> LockUser {
     LockUser::new(

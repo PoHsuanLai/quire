@@ -1,8 +1,8 @@
 //! The words a `ModuleTile` is described in: whether the module is on, whether it has a detail
 //! pane, and how many grid columns it takes.
 
-use ds_motion::detail::{detailed::Detailed, moment::Moment};
 use ds_core::word::Word;
+use ds_motion::detail::{detailed::Detailed, moment::Moment};
 
 /// Where a module is: off, on, or on its way (connecting, scanning).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

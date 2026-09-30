@@ -1,11 +1,11 @@
 //! A status glyph's slash, drawn on and off over `--t-quick --e-out` (design/26 5.1: Unavailable
 //! is `MorphGlyph{Slash}`), standing still on the first frame and jumping under Reduced (R7).
 
+use ds_core::vocab::Fraction;
 use ds_motion::detail::{
     morph::Slashed,
     tween::{TweenSpec, use_tween},
 };
-use ds_core::vocab::Fraction;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How the slash moves.

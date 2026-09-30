@@ -12,7 +12,7 @@
 #[allow(dead_code)] // Only the directory scan is used here.
 mod golden;
 
-use ds::lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet};
+use ds_lint::{Exception, LintConfig, Offence, Profile, Rule, markup, stylesheet};
 
 /// Custom properties a component writes inline per element, which no stylesheet block declares:
 /// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the

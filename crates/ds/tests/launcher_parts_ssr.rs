@@ -10,13 +10,13 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, ClipBody, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EMOJI_COLUMNS,
     EmojiCell, EmojiCells, EmojiGrid, Icon, IconSource, ImageSize, ImageSource, Inject, Material,
     MenuEntry, MenuRow, MenuTile, MenuTrail, PaletteGroup, PaletteGroups, PaneAction, PaneContent,
     PaneMono, PdfPage, PreviewPane, Px, RowChord, RowShape, Shortcut, ShortcutKey,
 };
+use ds_lint::{LintConfig, markup};
 
 fn root(body: Element) -> Element {
     rsx! {

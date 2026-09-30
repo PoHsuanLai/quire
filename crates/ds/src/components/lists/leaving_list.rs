@@ -12,10 +12,10 @@
 //! height is the whole distance the rows below it move.
 
 use crate::components::lists::leaving_row::LeavingRow;
+use dioxus::prelude::*;
 use ds_motion::presence::Exit;
 use ds_motion::roster::RowPitch;
 use ds_motion::use_roster::{LeaveBy, RosterSpec, use_roster};
-use dioxus::prelude::*;
 use std::hash::Hash;
 
 /// One row the consumer lists: its key and what it draws.

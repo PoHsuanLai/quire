@@ -9,11 +9,11 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Alert, AlertEmphasis, Appearance, Ds, Flow, Icon, IconSource, Inject, Material, RootExtent,
     Shown, TextLine, Theme,
 };
+use ds_lint::{LintConfig, markup};
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";

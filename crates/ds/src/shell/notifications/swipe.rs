@@ -12,6 +12,14 @@
 //! transition; a new drag mid-return picks it up where it is.
 
 use crate::components::controls::press::button_of;
+use dioxus::core::queue_effect;
+use dioxus::html::geometry::WheelDelta;
+use dioxus::html::input_data::MouseButton;
+use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::press::PointerButton;
+use ds_core::vocab::PressPhase;
+use ds_core::word::Word;
 use ds_motion::anim::Anim;
 use ds_motion::detail::touch::{Contact, Touch};
 use ds_motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
@@ -23,14 +31,6 @@ use ds_motion::{
     use_spring::{SpringMotion, use_spring_motion},
     velocity::VelocityMeter,
 };
-use dioxus::core::queue_effect;
-use dioxus::html::geometry::WheelDelta;
-use dioxus::html::input_data::MouseButton;
-use dioxus::prelude::*;
-use ds_core::geometry::units::Px;
-use ds_core::press::PointerButton;
-use ds_core::vocab::PressPhase;
-use ds_core::word::Word;
 
 /// Whether a card can be swiped away, and who hears it.
 #[derive(Debug, Clone, PartialEq, Default)]

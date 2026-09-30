@@ -9,11 +9,11 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, Banner, BannerKey, BannerPosition, BannerStack, Ds, Icon, ImageSize, ImageSource,
     Inject, Material, NotificationSwipe, Px, ShotGhost, ShotThumbnail, Shown, Theme, ThumbAction,
 };
+use ds_lint::{LintConfig, markup};
 
 /// A picture's source: a stand-in URI, since only the markup is compared.
 fn picture() -> ImageSource {

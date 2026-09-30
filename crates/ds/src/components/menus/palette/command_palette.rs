@@ -32,9 +32,9 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
-use ds_motion::anim::Anim;
 use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
 
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::FieldFocus;

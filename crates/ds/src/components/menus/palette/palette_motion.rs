@@ -18,14 +18,14 @@ use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
 use crate::components::menus::palette::palette_stops::ShownGroup;
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
-use ds_motion::{
-    anim::Anim,
-    timer::{MotionTimer, TimerPhase, use_motion_timer},
-};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_motion::{
+    anim::Anim,
+    timer::{MotionTimer, TimerPhase, use_motion_timer},
+};
 use ds_style::task::spawn_in;
 
 /// Whether a group's action ran since the results last changed: through the palette itself, or

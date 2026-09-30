@@ -9,16 +9,16 @@
 //! to. A label is drawn in the thumb's ink while the thumb is over it (`data-thumb`), not on a
 //! timer of its own: the words change colour where the thumb is, never ahead of it or after it.
 
+use crate::stack::roving::{Rove, Roving, Wrap};
+use dioxus::prelude::*;
+use ds_core::vocab::{Availability, Check, Selection};
+use ds_core::word::Word;
 use ds_motion::detail::touch::Touch;
 use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
-use crate::stack::roving::{Rove, Roving, Wrap};
-use dioxus::prelude::*;
-use ds_core::vocab::{Availability, Check, Selection};
-use ds_core::word::Word;
 
 /// About how wide a segment draws, in pixels: what one of the thumb's units is when a hand's
 /// speed is scaled into it and when it is close enough to rest.

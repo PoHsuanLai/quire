@@ -9,11 +9,11 @@ mod golden;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, Ds, ImageSize, ImageSource, Inject, Material, PdfPage, PdfThumb, PdfTrouble, Px,
     Size, Theme,
 };
+use ds_lint::{LintConfig, markup};
 use std::pin::pin;
 use std::sync::Arc;
 use std::task::{Context, Poll, Wake, Waker};

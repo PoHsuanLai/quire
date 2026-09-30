@@ -16,14 +16,14 @@
 //! caller's removal makes its row slide out from there, to the right whatever the entry edge,
 //! since it leaves along the swipe (`NotificationCard`'s swipe, the row's `data-flight`).
 
-use ds_motion::presence::Exit;
-use ds_motion::roster::RowPitch;
-use ds_motion::use_roster::{LeaveBy, RosterSpec, use_roster};
 use crate::shell::notifications::banner_row::BannerRow;
 use crate::shell::tokens::notifications::NotificationToken;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::word::Word;
+use ds_motion::presence::Exit;
+use ds_motion::roster::RowPitch;
+use ds_motion::use_roster::{LeaveBy, RosterSpec, use_roster};
 
 /// A banner's identity: the notification's id, which the server gives.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

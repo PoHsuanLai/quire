@@ -1,0 +1,20 @@
+[package]
+name = "ds-lint"
+description = "The design system's stylesheet and markup linter: reads its vocabulary from Kits and tokenizes with cssparser."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds-core = { workspace = true }
+ds-style = { workspace = true }
+cssparser = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+ds = { workspace = true }

@@ -10,7 +10,7 @@ base64, the `Spawner` trait): plain data and maths with no Dioxus, under everyth
 `ds-style` (appearance, tokens, materials, Space palettes, fonts, icons, the stylesheet's
 sections, the scope a component draws in, the tasks a scope owns; the scope, scale, task, busy and
 `Glyph` parts are its `dioxus` feature, which `ds-settings` leaves off). `ds` is laid out in the layers
-it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): `lint/`, then the host seams (`host/`, `focus/`,
+it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): the host seams (`host/`, `focus/`,
 `edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then
 `shell/` (the shell surfaces' parts, the widgets and their catalog), and `assembly/` on top (the
 stylesheet's order, the one registration of every component sheet, and `Ds`). `lib.rs` and the
@@ -99,7 +99,7 @@ public surface, one path per item.
 | `components/content/icon_source.rs`, `ds-style/icon/url.rs` | 08-ICONS §1.5 (settled mechanics): `IconSource`, `ExternalIcon`; `IconUrl` (`data:`/`file:` only) |
 | `ds-style/icon/classify.rs` | 08-ICONS §1.5 step 2: `classify_with(png, limit) -> Result<IconKind::{Symbolic, Image}>`, OKLCH chroma < 0.04 on every half-covered pixel (`ChromaLimit`) |
 | `ds-core/error.rs` | CONVENTIONS §7: `DsError`, the crate's one error enum (a refused icon URL, an unreadable icon PNG) |
-| `lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the vocabulary (variables, keyframes, grammar timing) is `Kits::vocabulary()`, read into `LintConfig::new(&kits)`, and `lint` names no motion module |
+| `ds-lint/*` | the coherence rules (ARCHITECTURE.md "Repo rules"); spike S2, S6, S12 rules. 24 `Rule`s: the stylesheet rules (`RawSpacing` and `RawHairline` the Strict-profile spacing and line-width rules), plus `UnstyledClass` and `RawMarkup` for markup; inline custom properties on a `ds`/`ds-*` element and an `<svg>` marked `data-ds-svg` are quire's own, not offences (`ds-lint/inline_style.rs`); `Exception{rule, selector, reason}` in `LintConfig.exceptions`; the vocabulary (variables, keyframes, grammar timing) is `Kits::vocabulary()`, read into `LintConfig::new(&kits)`, and `ds-lint` names no motion crate |
 
 ## `ds`: components
 
