@@ -337,3 +337,21 @@ fn the_lights_take_tab_arrow_down_opens_the_menu_and_escape_closes_it() {
     assert_eq!(harness.count(".ds-menu"), 0);
     assert_eq!(log(&harness), "");
 }
+
+#[test]
+fn with_option_held_the_green_light_only_zooms() {
+    use dioxus::html::Modifiers;
+    let mut harness = start(Normal);
+    let green = centre(&harness, ".ds-light[*|data-light=zoom]");
+    harness.pointer_move_with(green, Modifiers::ALT);
+    harness.button_down_with(green, ds::PointerButton::Primary, Modifiers::ALT);
+    harness.advance(ms(600));
+    assert_eq!(
+        harness.count(".ds-menu"),
+        0,
+        "a hold with Option opens no menu"
+    );
+    harness.button_up_with(green, ds::PointerButton::Primary, Modifiers::ALT);
+    harness.advance(ms(60));
+    assert_eq!(log(&harness), "zoom:Toggle");
+}
