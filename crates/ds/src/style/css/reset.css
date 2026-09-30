@@ -15,7 +15,10 @@ html,body{margin:0;padding:0;background:transparent}
 /* An overlay root (`RootExtent::Viewport`): at least the viewport, since a root of
    positioned content lays out nothing and Taffy places a fixed box against its parent. */
 .ds[*|data-extent=viewport]{min-height:100vh;min-width:100vw}
-/* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
+/* The focus ring (design/30 section 1.4, Ring): a 3 px translucent accent outline one pixel off the
+   element, on keyboard focus only. Blitz never matches the visible-focus pseudo
    class, so ds-native stamps the input modality on the root and the ring keys on it (spike
    S12). */
-.ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent-ring);outline-offset:2px;border-radius:var(--r-tiny)}
+.ds[*|data-modality=keyboard] :focus{outline:var(--ring) solid var(--accent-ring);outline-offset:var(--focus-gap);border-radius:var(--r-tiny)}
+/* Highlight is the element's own fill (menu rows), never a ring. */
+.ds[*|data-modality=keyboard] [*|data-focus=highlight]:focus{outline:none}

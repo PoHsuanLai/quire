@@ -64,7 +64,7 @@ impl HoverDriver {
             return;
         }
         self.anchors.file(key.clone(), anchor);
-        self.hub.feed(HoverEvent::Over((key, kind)));
+        self.hub.feed(HoverEvent::Over((key, kind), kind.profile()));
     }
 
     /// The pointer left the target: the card closes after 150 ms unless it comes back or

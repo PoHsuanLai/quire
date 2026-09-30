@@ -25,6 +25,9 @@
 .ds-button[*|data-variant=primary]:hover,
 .ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
 .ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
+/* Pressed (design/30 section 1.4): a darker fill, no scale. */
+.ds-button[*|data-variant=primary][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=secondary][*|data-pressed]{ background:var(--surface); box-shadow:var(--shadow-1); }
 
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
 .ds-button[*|data-variant=mini],
@@ -36,6 +39,8 @@
 }
 .ds-button[*|data-variant=mini]:hover,
 .ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=mini][*|data-pressed],
+.ds-button[*|data-variant=danger][*|data-pressed]{ background:var(--surface); box-shadow:none; }
 
 /* Mini pressed: `S:523`, the RSVP row. */
 /* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
@@ -63,7 +68,7 @@
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); }
+.ds-button[*|data-variant=frame][*|data-pressed]{ background:var(--f-pill); color:var(--f-ink); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
 /* Size, after the variants so it wins at equal weight: `data-size` is written only

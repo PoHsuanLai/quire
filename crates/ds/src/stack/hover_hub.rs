@@ -10,7 +10,7 @@ use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::core::time::clock::sleep;
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{
-    HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
+    HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
 use crate::motion::settle::settle;
 use crate::style::scope::Scope;
@@ -40,6 +40,18 @@ pub enum HoverKind {
     /// A value's small tip (a row's time, design/06-INTERACTIONS.md section 3 `time`): one line,
     /// tooltip-sized, placed below like a sender card, on the same intent timing as every card.
     Tip,
+}
+
+impl HoverKind {
+    /// The profile this kind waits by: a tip is a tooltip, every other kind a card.
+    pub fn profile(self) -> HoverProfile {
+        match self {
+            HoverKind::Tip => HoverProfile::Tip,
+            HoverKind::Thread | HoverKind::Sender | HoverKind::Account | HoverKind::Side => {
+                HoverProfile::Card
+            }
+        }
+    }
 }
 
 /// The hover manager, provided as context by `Ds`.

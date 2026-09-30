@@ -225,8 +225,9 @@ pub use crate::host::{
 };
 pub use crate::motion::{
     anim::Anim,
-    drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, use_drag},
-    hover_intent::{HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase},
+    drag::{DRAG_THRESHOLD, Drag, DragPhase, DragTracker, WINDOW_DRAG_THRESHOLD, use_drag},
+    hover_intent::{HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase},
+    long_press::{LONG_PRESS_SLOP, LongPress, LongPressEffect, LongPressEvent},
     pane_slide::Pane,
     presence::{Exit, Presence},
     pulse_key::{PulseKey, PulsePhase},

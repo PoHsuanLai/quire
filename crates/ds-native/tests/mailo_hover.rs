@@ -128,7 +128,8 @@ fn a_time_tip_opens_small_on_one_line_below_its_time() {
     harness.advance(ms(50));
     let time = "p .ds-hover-target";
     harness.pointer_move(centre(&harness, time));
-    harness.advance(ms(600));
+    // The Tip profile waits a second.
+    harness.advance(ms(1100));
     assert_eq!(
         harness.attr(".ds-hovercard", "data-kind").as_deref(),
         Some("tip"),

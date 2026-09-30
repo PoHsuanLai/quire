@@ -172,14 +172,14 @@ mod tests {
     fn a_drag_starts_once_past_the_threshold_and_its_click_does_not_open() {
         let crossed = DragStart {
             from: at(10.0, 10.0),
-            at: at(15.0, 13.0),
+            at: at(13.0, 10.0),
         };
         #[rustfmt::skip]
         let cases: [(&str, Vec<I>, Vec<DragStart>, bool); 6] = [
             ("a tap", vec![I::Down(at(10.0, 10.0)), I::Up], vec![], true),
-            ("7 px is still a tap", vec![I::Down(at(10.0, 10.0)), I::Moved(at(14.0, 13.0)), I::Up], vec![], true),
-            ("8 px drags", vec![I::Down(at(10.0, 10.0)), I::Moved(at(15.0, 13.0)), I::Up], vec![crossed], false),
-            ("once", vec![I::Down(at(10.0, 10.0)), I::Moved(at(15.0, 13.0)), I::Moved(at(40.0, 40.0)), I::Up], vec![crossed], false),
+            ("2 px is still a tap", vec![I::Down(at(10.0, 10.0)), I::Moved(at(11.0, 11.0)), I::Up], vec![], true),
+            ("3 px drags", vec![I::Down(at(10.0, 10.0)), I::Moved(at(13.0, 10.0)), I::Up], vec![crossed], false),
+            ("once", vec![I::Down(at(10.0, 10.0)), I::Moved(at(13.0, 10.0)), I::Moved(at(40.0, 40.0)), I::Up], vec![crossed], false),
             ("a move with no press", vec![I::Moved(at(40.0, 40.0))], vec![], true),
             ("the next press is a tap again", vec![I::Down(at(10.0, 10.0)), I::Moved(at(30.0, 10.0)), I::Up, I::Down(at(5.0, 5.0)), I::Up], vec![DragStart { from: at(10.0, 10.0), at: at(30.0, 10.0) }], true),
         ];

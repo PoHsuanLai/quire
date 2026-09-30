@@ -15,7 +15,8 @@ use crate::components::menus::row_chord::{RowChord, shown_chord};
 use crate::components::menus::row_shape::RowShape;
 use crate::core::geometry::units::{Point, Px};
 use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::{Availability, Check, Selection, Shortcut, Shown};
+use crate::core::vocab::{Availability, Check, FocusStyle, Selection, Shortcut, Shown};
+use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
@@ -165,6 +166,7 @@ pub(crate) fn item(view: ItemView<'_>, row: Row, events: RowEvents) -> Element {
             class: "ds-menu-item",
             role: "option",
             "aria-selected": view.selection.aria(),
+            "data-focus": FocusStyle::Highlight.slug(),
             "aria-checked": checked,
             "aria-disabled": view.availability.aria_disabled(),
             "aria-busy": view.availability.aria_busy(),

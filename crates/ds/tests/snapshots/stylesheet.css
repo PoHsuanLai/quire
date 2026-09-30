@@ -17,10 +17,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* An overlay root (`RootExtent::Viewport`): at least the viewport, since a root of
    positioned content lays out nothing and Taffy places a fixed box against its parent. */
 .ds[*|data-extent=viewport]{min-height:100vh;min-width:100vw}
-/* The focus ring (`S:55`) on keyboard focus only. Blitz never matches the visible-focus pseudo
+/* The focus ring (design/30 section 1.4, Ring): a 3 px translucent accent outline one pixel off the
+   element, on keyboard focus only. Blitz never matches the visible-focus pseudo
    class, so ds-native stamps the input modality on the root and the ring keys on it (spike
    S12). */
-.ds[*|data-modality=keyboard] :focus{outline:var(--focus-ring) solid var(--accent-ring);outline-offset:2px;border-radius:var(--r-tiny)}
+.ds[*|data-modality=keyboard] :focus{outline:var(--ring) solid var(--accent-ring);outline-offset:var(--focus-gap);border-radius:var(--r-tiny)}
+/* Highlight is the element's own fill (menu rows), never a ring. */
+.ds[*|data-modality=keyboard] [*|data-focus=highlight]:focus{outline:none}
 /* == tokens == */
 .ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#1e1e1e;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--ink:#e8e8e8;--ink-soft:#a3a3a3;--line:#444444;--line-soft:#383838;--accent:#8ebaf7;--accent-soft:rgba(142,186,247,.2);--accent-text:#94c0fe;--accent-text-material:#d5e6fe;--seal:#8ebaf7;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#3f3930;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(148,192,254,.55);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--orb-bg:#1b1f29;--orb-c1:#df6aa6;--orb-c2:#04bbc3;--orb-c3:#8d92f9;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
@@ -703,6 +706,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-variant=primary]:hover,
 .ds-button[*|data-variant=secondary]:hover{ transform:translateY(-1px) scale(1.015); box-shadow:var(--shadow-2); }
 .ds-button[*|data-variant=secondary]{ background:var(--surface-2); color:var(--ink-soft); border:var(--hair) solid var(--line); }
+/* Pressed (design/30 section 1.4): a darker fill, no scale. */
+.ds-button[*|data-variant=primary][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=secondary][*|data-pressed]{ background:var(--surface); box-shadow:var(--shadow-1); }
 
 /* Mini: `S:165-173`; `color` joins the transition (`C:354`). Danger is Mini at rest. */
 .ds-button[*|data-variant=mini],
@@ -714,6 +720,8 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-button[*|data-variant=mini]:hover,
 .ds-button[*|data-variant=danger]:hover{ color:var(--ink); background:var(--raise); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=mini][*|data-pressed],
+.ds-button[*|data-variant=danger][*|data-pressed]{ background:var(--surface); box-shadow:none; }
 
 /* Mini pressed: `S:523`, the RSVP row. */
 /* The Airy fill stands only 1.5:1 off the card (design/03-COLOR.md section 20.4), so the pressed
@@ -741,7 +749,7 @@ html,body{margin:0;padding:0;background:transparent}
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-variant=frame]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
-.ds-button[*|data-variant=frame]:active{ background:var(--f-pill); color:var(--f-ink); }
+.ds-button[*|data-variant=frame][*|data-pressed]{ background:var(--f-pill); color:var(--f-ink); }
 .ds-button[*|data-variant=frame][*|aria-pressed=true]{ background:var(--f-pill); color:var(--f-ink); box-shadow:var(--shadow-current); }
 
 /* Size, after the variants so it wins at equal weight: `data-size` is written only
@@ -1182,14 +1190,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=foot]:hover{ background:var(--f-pill-hover); color:var(--f-ink); }
 
 /* Strip: the button half of `S:312-323`; the reveal and `pop-in` belong to HoverStrip (section 17).
-   TODO(O-3, O-10): `.88` has no scalar token; `!important` is dropped (HoverStrip settles pop-in). */
+   TODO(O-3, O-10): `!important` is dropped (HoverStrip settles pop-in). */
 .ds-icon-button[*|data-variant=strip]{
   position:relative; width:26px; height:26px; border:0; border-radius:var(--r-pill); background:transparent; cursor:default;
   display:grid; place-items:center; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-icon-button[*|data-variant=strip]:hover{ background:var(--accent-soft); color:var(--ink); }
-.ds-icon-button[*|data-variant=strip]:active{ transform:scale(.88); }
+.ds-icon-button[*|data-variant=tool][*|data-pressed],
+.ds-icon-button[*|data-variant=pin][*|data-pressed]{ background:var(--surface-2); color:var(--ink); }
+.ds-icon-button[*|data-variant=strip][*|data-pressed]{ background:var(--accent-soft); color:var(--ink); }
 
 /* Pin: `S:108-114`, `S:118`; the current-item shadow is `--shadow-current` (O-3). */
 .ds-icon-button[*|data-variant=pin]{
@@ -1221,7 +1231,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-icon-button[*|data-variant=status] .ds-status-glyph > .ds-status-part,
 .ds-icon-button[*|data-variant=status] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
 .ds-icon-button[*|data-variant=status]:hover{ color:var(--f-ink); background:var(--f-pill-hover); }
-.ds-icon-button[*|data-variant=status]:active,
+.ds-icon-button[*|data-variant=status][*|data-pressed],
 .ds-icon-button[*|data-variant=status][*|aria-pressed=true],
 .ds-icon-button[*|data-variant=status][*|aria-expanded=true]{ color:var(--f-ink); background:var(--f-pill); }
 
@@ -1600,6 +1610,27 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:default; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
+/* Highlight (design/30 section 1.4, `FocusStyle::Highlight`): the selected row is filled with the
+   accent and drawn in the accent's ink while its window is the active one; in an inactive window
+   it is the grey wash. */
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--ink); }
 .ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:var(--hair) solid var(--line); background:var(--surface); display:grid; place-items:center;
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
@@ -1651,6 +1682,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
 .ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+/* A dropdown keeps its grey hover look: the highlight's inks do not apply in it. */
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-title,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-detail,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-trail,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-chevron .ds-ic{ color:inherit; }
 
 /* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no hover,
    no selection and the arrow keys pass it. */

@@ -5,6 +5,38 @@
 use crate::style::tokens::delay::DelayToken;
 use std::time::{Duration, Instant};
 
+/// Which hover interface the pointer is resting on, and so how long it waits (design/30
+/// section 1.2): the three profiles of one machine.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum HoverProfile {
+    /// A tooltip: opens after 1 s, closes at once.
+    Tip,
+    /// A hover card: opens after 500 ms, closes after 150 ms.
+    #[default]
+    Card,
+    /// A dock label: opens after 100 ms, closes at once.
+    Label,
+}
+
+impl HoverProfile {
+    /// How long the pointer rests before it opens, cold.
+    pub fn open(self) -> Duration {
+        match self {
+            HoverProfile::Tip => DelayToken::TipOpen.delay(),
+            HoverProfile::Card => DelayToken::CardOpen.delay(),
+            HoverProfile::Label => DelayToken::LabelOpen.delay(),
+        }
+    }
+
+    /// How long after the pointer leaves it closes.
+    pub fn close(self) -> Duration {
+        match self {
+            HoverProfile::Card => DelayToken::CardClose.delay(),
+            HoverProfile::Tip | HoverProfile::Label => Duration::ZERO,
+        }
+    }
+}
+
 /// Whether cards and fly labels open at once.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum HoverWarmth {
@@ -44,8 +76,8 @@ pub enum IntentPhase<K> {
 /// Something that happened to the hover machine.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum HoverEvent<K> {
-    /// The pointer came over the innermost target `key`.
-    Over(K),
+    /// The pointer came over the innermost target `key`, whose interface is `profile`.
+    Over(K, HoverProfile),
     /// The pointer came over a target while cards are suppressed (a leaving row, an open peek
     /// or palette).
     OverSuppressed,
@@ -99,6 +131,7 @@ pub enum IntentEffect<K> {
 pub struct HoverIntent<K> {
     phase: IntentPhase<K>,
     warm_until: Option<Instant>,
+    profile: HoverProfile,
 }
 
 impl<K> Default for HoverIntent<K> {
@@ -106,27 +139,48 @@ impl<K> Default for HoverIntent<K> {
         HoverIntent {
             phase: IntentPhase::Idle,
             warm_until: None,
+            profile: HoverProfile::default(),
+        }
+    }
+}
+
+impl<K> HoverIntent<K> {
+    /// A machine in `phase`, on the default profile: `step` sets the profile after.
+    fn of(phase: IntentPhase<K>, warm_until: Option<Instant>) -> Self {
+        HoverIntent {
+            phase,
+            warm_until,
+            profile: HoverProfile::default(),
         }
     }
 }
 
 impl<K: Clone + PartialEq> HoverIntent<K> {
-    /// Apply `event` at `now` (500 ms open, 150 ms close, 400 ms warm).
+    /// Apply `event` at `now` (the profile's open and close, 400 ms warm).
     ///
     /// Timer events carry no key, so a stale timer is recognised by its time: `OpenDue` and
     /// `CloseDue` act only once `now` has reached the phase's own `due`.
     pub fn step(self, event: HoverEvent<K>, now: Instant) -> (Self, IntentEffect<K>) {
         let warm = self.warmth(now);
-        let HoverIntent { phase, warm_until } = self;
-        let keep = |phase| (HoverIntent { phase, warm_until }, IntentEffect::None);
-        match (phase, event) {
+        let held = self.profile;
+        let profile = match &event {
+            HoverEvent::Over(_, profile) => *profile,
+            _ => held,
+        };
+        let HoverIntent {
+            phase, warm_until, ..
+        } = self;
+        let keep = |phase| (HoverIntent::of(phase, warm_until), IntentEffect::None);
+        let (next, effect) = match (phase, event) {
             (phase, HoverEvent::OverSuppressed) => keep(phase),
-            (phase, HoverEvent::Over(key)) => over(phase, key, warm_until, warm, now),
+            (phase, HoverEvent::Over(key, profile)) => {
+                over(phase, key, profile, warm_until, warm, now)
+            }
             (IntentPhase::Pending { .. }, HoverEvent::Out) => {
                 to(IntentPhase::Idle, warm_until, IntentEffect::CancelOpen)
             }
             (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => {
-                let after = DelayToken::CardClose.delay();
+                let after = held.close();
                 let due = now + after;
                 to(
                     IntentPhase::Closing { key, due },
@@ -162,7 +216,8 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
                 IntentEffect::Peek(key),
             ),
             (phase, _) => keep(phase),
-        }
+        };
+        (HoverIntent { profile, ..next }, effect)
     }
 
     /// Where the machine is.
@@ -190,6 +245,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
 fn over<K: Clone + PartialEq>(
     phase: IntentPhase<K>,
     key: K,
+    profile: HoverProfile,
     warm_until: Option<Instant>,
     warm: HoverWarmth,
     now: Instant,
@@ -213,7 +269,7 @@ fn over<K: Clone + PartialEq>(
         _ => {
             let after = match warm {
                 HoverWarmth::Warm => Duration::ZERO,
-                HoverWarmth::Cold => DelayToken::CardOpen.delay(),
+                HoverWarmth::Cold => profile.open(),
             };
             to(
                 IntentPhase::Pending {
@@ -232,5 +288,5 @@ fn to<K>(
     warm_until: Option<Instant>,
     effect: IntentEffect<K>,
 ) -> (HoverIntent<K>, IntentEffect<K>) {
-    (HoverIntent { phase, warm_until }, effect)
+    (HoverIntent::of(phase, warm_until), effect)
 }

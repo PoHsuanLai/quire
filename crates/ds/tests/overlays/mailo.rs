@@ -117,7 +117,12 @@ fn TimeTip() -> Element {
     let key = HoverKey("time:88".to_string());
     use_hook({
         let key = key.clone();
-        move || hub.feed(HoverEvent::Over((key, HoverKind::Tip)))
+        move || {
+            hub.feed(HoverEvent::Over(
+                (key, HoverKind::Tip),
+                HoverKind::Tip.profile(),
+            ))
+        }
     });
     let open = hub.open().or(hub.leaving());
     rsx! {

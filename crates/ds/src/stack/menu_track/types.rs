@@ -1,21 +1,13 @@
 //! The menu tracker's vocabulary: what it remembers, what it is told, what it asks for.
 
 use crate::core::geometry::units::Point;
+use crate::core::vocab::PressPhase;
 use std::time::{Duration, Instant};
 
 /// An item, by its index at each nesting level: `[2, 0]` is the first item of the third
 /// item's submenu.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ItemPath(pub Vec<u16>);
-
-/// Whether the button that opened the menu is still down.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum MenuHold {
-    /// Down: a release picks, or closes (press-drag-release).
-    Held,
-    /// Released on the title: click mode, the menu stays open.
-    Released,
-}
 
 /// How the open menu came to show: by a press on its own title, or by the pointer entering its
 /// title while another menu was open (the hover switch). A press on the title of a menu the
@@ -121,7 +113,7 @@ pub struct Session<K> {
     /// How it came to show.
     pub shown: ShownBy,
     /// Whether the opening press is still down.
-    pub held: MenuHold,
+    pub held: PressPhase,
     /// Whether the pointer has been inside the menu.
     pub entered: Entered,
     /// The highlighted item (always a pickable one).

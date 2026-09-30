@@ -1,14 +1,17 @@
-//! Dragging without HTML5 drag events: a Rust tracker owns the pointer, the 8 px Manhattan
+//! Dragging without HTML5 drag events: a Rust tracker owns the pointer, the Euclidean drag
 //! threshold and the drop-target hit test (design/06-INTERACTIONS.md section 6).
 
 use crate::core::geometry::units::{Point, Px, Rect};
 use crate::core::vocab::Fraction;
 use dioxus::prelude::*;
 
-/// How far a press travels, `|dx| + |dy|`, before it is a drag rather than a click: 8 px, the
-/// prototypes' threshold (design/04-COMPONENTS.md section 34). Named so a component that hands
-/// its drag to the host (the screenshot thumbnail) and its test agree on one number.
-pub const DRAG_THRESHOLD: Px = Px(8.0);
+/// How far a press travels, straight-line, before content becomes a drag rather than a click:
+/// 3 px (design/30-CATALOGUE.md section 1.4). Named so a component that hands its drag to the
+/// host (the screenshot thumbnail) and its test agree on one number.
+pub const DRAG_THRESHOLD: Px = Px(3.0);
+
+/// The same for dragging a window by its titlebar: 4 px.
+pub const WINDOW_DRAG_THRESHOLD: Px = Px(4.0);
 
 /// Where a drag is.
 #[derive(Debug, Clone, PartialEq)]
@@ -42,7 +45,7 @@ pub struct Drag<K> {
 }
 
 impl<K: Clone + PartialEq> Drag<K> {
-    /// A drag that goes live after `threshold` of Manhattan movement.
+    /// A drag that goes live after `threshold` of straight-line movement.
     pub fn new(threshold: Px) -> Self {
         Drag {
             phase: DragPhase::Idle,
@@ -63,7 +66,7 @@ impl<K: Clone + PartialEq> Drag<K> {
     pub fn moved(self, at: Point) -> Self {
         let phase = match self.phase {
             DragPhase::Idle => DragPhase::Idle,
-            DragPhase::Pending { key, from } if manhattan(from, at) < self.threshold.0 => {
+            DragPhase::Pending { key, from } if distance(from, at) < self.threshold.0 => {
                 DragPhase::Pending { key, from }
             }
             DragPhase::Pending { key, .. } | DragPhase::Live { key, .. } => DragPhase::Live {
@@ -168,16 +171,17 @@ impl<K: Clone + PartialEq + 'static> DragTracker<K> {
     }
 }
 
-/// A drag tracker with a Manhattan `threshold` (8 px in the prototypes).
+/// A drag tracker with a straight-line `threshold` ([`DRAG_THRESHOLD`], or
+/// [`WINDOW_DRAG_THRESHOLD`] for a window).
 pub fn use_drag<K: Clone + PartialEq + 'static>(threshold: Px) -> DragTracker<K> {
     DragTracker {
         drag: use_signal(|| Drag::new(threshold)),
     }
 }
 
-/// `|dx| + |dy|` between two points.
-fn manhattan(from: Point, to: Point) -> f32 {
-    (to.x.0 - from.x.0).abs() + (to.y.0 - from.y.0).abs()
+/// The straight-line distance between two points.
+fn distance(from: Point, to: Point) -> f32 {
+    (to.x.0 - from.x.0).hypot(to.y.0 - from.y.0)
 }
 
 /// The first target containing `at`: left and top edges inside, right and bottom outside.
