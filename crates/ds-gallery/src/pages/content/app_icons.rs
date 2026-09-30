@@ -3,7 +3,7 @@
 
 use ds::icon::{IconStyle, Tint, retint};
 use ds::prelude::*;
-use ds_style::icon::url::IconUrl;
+use ds::style::icon::url::IconUrl;
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 

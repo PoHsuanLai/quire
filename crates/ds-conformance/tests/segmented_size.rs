@@ -5,8 +5,8 @@
 use dioxus::prelude::*;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Driver, Harness, Query, Viewport};
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 #[allow(non_snake_case)]

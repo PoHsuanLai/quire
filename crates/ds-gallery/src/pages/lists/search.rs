@@ -9,8 +9,8 @@ use ds::components::app::thread_row::ThreadRow;
 use ds::components::content::text_runs::RunTone;
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::ControlSize;
 
 /// A search's rows: sender, the subject and snippet as runs around the hit, time.
 fn hits() -> [(&'static str, TextLine, TextLine, &'static str); 2] {

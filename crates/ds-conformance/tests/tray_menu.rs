@@ -7,15 +7,15 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::base::press::{PointerButton, Press};
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_core::press::{PointerButton, Press};
+use ds::style::icon::url::IconUrl;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_style::icon::url::IconUrl;
-use ds_style::tokens::control_size::ControlSize;
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;

@@ -8,8 +8,8 @@ use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{Operation, PendingToken};
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -6,6 +6,7 @@
 //! `cargo run -p ds-blitz --example edit`
 
 use dioxus::prelude::*;
+use ds::base::time::clock::sleep;
 use ds::edit::handle::use_edit_handle;
 use ds::edit::input::EditInput;
 use ds::edit::pointer::EditPointer;
@@ -14,7 +15,6 @@ use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_blitz::{AppConfig, AppId, launch};
-use ds_core::time::clock::sleep;
 use std::time::Duration;
 
 fn main() {

@@ -13,8 +13,8 @@ use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::chrome::window_frame::WindowTitlebar;
 use ds::prelude::*;
+use ds::style::tokens::control_size::{ControlSize, SidebarSize};
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::{ControlSize, SidebarSize};
 
 /// What the sidebar lists.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

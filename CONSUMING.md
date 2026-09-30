@@ -28,8 +28,8 @@ axes, the vocabulary, geometry, icons, the overlays, lists, fields and the commo
 program adds `use ds_shell::prelude::*;`. The crate roots hold nothing else but the stylesheet
 assembly (`ds::stylesheet()`, `ds::kits()`, `ds::component_sheets()`, `ds::KIT`, `ds::selectors`, and
 the same four in `ds_shell`). Every other name is reached by its home path (`ds::components::..`,
-`ds::host::..`, `ds_style::..`, `ds_core::..`, `ds_motion::..`), one path each, so a program that
-names one adds that crate as a dependency (`scripts/check-boundary.sh` lists which crate may).
+`ds::host::..`, `ds::style::..`, `ds::base::..`, `ds::motion::..`), one path each. A program depends on `ds` alone: `ds::base`, `ds::style` and `ds::motion` are the
+three crates under it, re-exported as modules.
 
 **Today: a path dependency.** quire has no published version yet, so every consumer depends on
 it by path, the way `examples/consumer/Cargo.toml` does:
@@ -141,7 +141,7 @@ full row and one half row. Three pieces keep every line whole device pixels (des
 1. **The root knows the scale.** `Ds { scale: Some(Scale(180)) }` (or the scale in the `ds::prelude::HostSignals`
    ds-blitz provides) makes the root write the pixel tokens' inputs inline. With no scale, or
    at `Scale::ONE`, it writes nothing and every token is its 1x value, so nothing changes.
-2. **Lines read the pixel tokens** (`ds_style::tokens::pixel::PixelToken`, on `.ds`):
+2. **Lines read the pixel tokens** (`ds::style::tokens::pixel::PixelToken`, on `.ds`):
 
    | Token | 1x | 1.25 / 1.5 / 1.75 | 2x | Use it for |
    | --- | --- | --- | --- | --- |
@@ -236,7 +236,7 @@ fn App() -> Element {
 ```
 
 **Nothing here names a runtime.** The file watch and the portal watch are tasks handed to the
-`ds_core::spawner::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
+`ds::base::spawner::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
 On Blitz, `ds_blitz::TokioSpawner::current()` is the implementor: `ds_blitz::launch` enters a
 process-wide, lazily built Tokio runtime (multi-thread, two workers;
 `crates/ds-blitz/src/launch/runtime.rs`) and holds the guard for the process's life, and
@@ -266,7 +266,7 @@ re-stamps `data-theme`/`data-typeface`/`data-accent`/`data-motion`/`data-materia
 
 ```rust
 use ds::prelude::*;
-use ds_style::appearance::blur::BlurState;
+use ds::style::appearance::blur::BlurState;
 
 rsx! {
     Surface { material: Material::Popover, theme: Some(Scheme::Dark),
@@ -331,7 +331,7 @@ table exists to prevent.
 
 Strict also runs `Rule::RawSpacing`: a literal `px` in `margin`, `padding` (their sides and
 logical forms included) or `gap`/`row-gap`/`column-gap` is an offence; `0`, `auto`, a
-percentage, an `em` and `var()` pass. The steps are `ds_style::tokens::spacing::SpacingToken`, emitted on `.ds` as
+percentage, an `em` and `var()` pass. The steps are `ds::style::tokens::spacing::SpacingToken`, emitted on `.ds` as
 `--s-1`, `--s-1-5`, `--s-2` … `--s-12`, `--s-13`, `--s-14`, `--s-15`, `--s-16`, `--s-18`,
 `--s-22`, `--s-26`, `--s-36`, each named by its pixel value (design/01-LAYOUT.md §2). A length
 between steps takes the nearest one; quire's own sheets and the gallery's do (FINDINGS "Polish
@@ -413,8 +413,7 @@ crate. `examples/consumer` never needed this escape hatch; note in your own repo
 ### Rule 4 — motion only through quire's own timers
 
 Never `std::thread::sleep`, `tokio::time::sleep` or a hand-rolled `setTimeout`-equivalent to
-drive a class toggle. Use `ds::use_pulse` (restart a keyframe: `Pulse::fire()`) or
-`ds::prelude::use_motion_timer` (`MotionTimer::start(on_settled)`, which runs for exactly
+drive a class toggle. Use `ds::prelude::use_motion_timer` (`MotionTimer::start(on_settled)`, which runs for exactly
 `ds::prelude::settle(anim, level)`); both read the enclosing `Ds`'s resolved motion level, so
 `MotionLevel::Reduced` collapses them automatically. Prove it with `ds_harness::Harness`, which
 drives a real Blitz document on a real (if fast-forwarded) clock — the test below is
@@ -462,8 +461,8 @@ let mut harness = Harness::new(YourApp, config);
 | --- | --- | --- |
 | Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall` (unchanged). `Harness::clock() -> Clock` |
 | "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
-| Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds_core::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
-| Install a virtual clock yourself (another harness) | `ds_core::time::clock::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
+| Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds::base::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
+| Install a virtual clock yourself (another harness) | `ds::base::time::clock::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
 
 Not on the virtual clock: work off the harness's thread (a Tokio task such as `ds_settings`'
 file watch, a D-Bus reply, a resource fetched by a custom `AppNet` on another thread).
@@ -509,7 +508,7 @@ rsx! {
 
 ```rust
 use ds::app::ThreadRow;
-use ds_core::vocab::RowState;
+use ds::base::vocab::RowState;
 
 rsx! {
     ThreadRow {
@@ -647,14 +646,14 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
 
   ```rust
   let icon = ds::prelude::IconSource::Symbolic(ds::prelude::ExternalIcon {
-      url: ds_style::icon::url::IconUrl::file(&theme_path)?,
+      url: ds::style::icon::url::IconUrl::file(&theme_path)?,
       size: ds::prelude::IconSize::Base,
   });
   rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon, label: title, onclick } }
   ```
 - **Pointer buttons and ids.** `Button` takes `common.id: Option<String>`, written as
   the element's `id` (a popup anchors to `tray-3` with no wrapper span). Their `onclick` is
-  `EventHandler<ds_core::press::Press>`, `Press { button: PointerButton::{Primary, Secondary, Middle},
+  `EventHandler<ds::base::press::Press>`, `Press { button: PointerButton::{Primary, Secondary, Middle},
   modifiers }`: a right-click (which Blitz and browsers deliver as `contextmenu`, never as a
   click; its default is prevented) arrives as `Secondary`, the middle button as `Middle`, and
   Enter or Space on the focused control as `Primary`. A closure written `move |_| ...` compiles
@@ -719,7 +718,7 @@ For a bar (FINDINGS "Bar gaps"):
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
   `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items
-  with `ds_style::tokens::status::StatusMetrics`, filled from your settings:
+  with `ds::style::tokens::status::StatusMetrics`, filled from your settings:
 
   ```rust
   let metrics = StatusMetrics {
@@ -1012,13 +1011,13 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | --- | --- | --- |
 | `[data-x=v]` attribute selectors (unprefixed) | S2 | write `[*|data-x=v]` — quire's own component CSS does this everywhere; `Rule::UnprefixedAttributeSelector` |
 | `backdrop-filter: blur()` | S15 | ask the compositor to blur behind the surface (`Material`/`BlurState`), not CSS |
-| CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds_style::icon::render::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
-| `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds_core::text::clip::clip_chars` for a real character-count ellipsis |
+| CSS `stroke`/`fill` reaching `<svg>` children | S6 | `ds::style::icon::render::Glyph` (renders `.ds-ic` with `stroke="currentColor"` as an attribute, not a rule); `Rule::SvgPaintInCss` |
+| `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::base::text::clip::clip_chars` for a real character-count ellipsis |
 | `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_blitz::launch` track modality for you; `Rule::FocusPseudoClass` |
 | `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::host::measure::use_rect()` — measures one frame later, never inside the handler; to anchor an overlay, `Anchor::Mounted` does this for you |
 | a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-conformance/tests/button_click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_blitz::launch`/`Harness` already install one; nothing to do if you use them |
-| `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds_core::text::clip::clip_chars` covers the line-clamp case |
+| `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::base::text::clip::clip_chars` covers the line-clamp case |
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
 | a wheel phase (a touchpad gesture's end) | notification parts | treat a quiet spell after the last delta as the end (`DelayToken::SwipeQuiet`, `use_swipe`) |
 | a clean removal of a running animation | notification parts | Blitz keeps the last animated value when an animation is taken off an element before a frame resolved past its end: put an entrance on an element that mounts with it rather than on a presence attribute that changes (`BannerStack`) |
@@ -1027,7 +1026,7 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 What *does* work and needs no fallback: a `<style>` in the body (S1), the `.ds[data-*]` custom
 property cascade once selectors carry `*|` (S2), `@keyframes` including `var()` inside them (S3),
 `transition` on a `var()`-driven value (S4), restarting an animation by swapping its name (S5,
-what `ds::use_pulse` does), `futures-timer` sleeps from render or a handler (S10, what `ds_core::time::clock::sleep`
+what a keyframe pulse does), `futures-timer` sleeps from render or a handler (S10, what `ds::base::time::clock::sleep`
 and every quire timer uses), registering a bundled font through a shared `FontContext` (S11), and
 `color-mix()` (S14, though quire precomputes washes instead, for determinism).
 
@@ -1083,7 +1082,7 @@ than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in tho
 `CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
 1000.
 
-**Spaces store** (`ds_style::space::store::SpaceStore`, `crates/ds/src/space/store.rs`; design/21 §4, §10). Which
+**Spaces store** (`ds::style::space::store::SpaceStore`, `crates/ds/src/space/store.rs`; design/21 §4, §10). Which
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
@@ -1162,6 +1161,6 @@ default) lints clean.
 **`--scroll-thumb`**: the colour the host paints its overlay scrollbar thumb in
 (design/11 section 11.3.12) — `--ink` at .5 alpha over the layer's own .8 opacity (effective .4)
 in light, `--paper`'s equivalent (white at the same effective alpha) in dark. It is a token like
-any other (`ds_style::tokens::colour::ColourToken::ScrollThumb`, registered in the lint's known-variable table the same
+any other (`ds::style::tokens::colour::ColourToken::ScrollThumb`, registered in the lint's known-variable table the same
 way every other colour is); quire's stylesheet declares it, the host reads it, and no component
 CSS references it directly, since no ds component paints the thumb itself.

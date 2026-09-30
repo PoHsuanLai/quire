@@ -5,10 +5,10 @@
 //! pass, 2026-09-26; see [`floor_for`]).
 
 use ds::prelude::*;
+use ds::style::material::recipe::recipe;
+use ds::style::tokens::colour::ColourToken;
+use ds::style::tokens::hex::Hex;
 use ds_core::colour::contrast::{Verdict, ratio};
-use ds_style::material::recipe::recipe;
-use ds_style::tokens::colour::ColourToken;
-use ds_style::tokens::hex::Hex;
 
 /// WCAG AA for body text: what every floor has to clear.
 pub const FLOOR: f64 = 4.5;

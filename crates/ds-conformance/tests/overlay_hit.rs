@@ -6,17 +6,17 @@
 //! on the row"; `ThreadRow`'s `onpointerback` says that only when it is so.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::app::thread_row_hooks::PartHooks;
 use ds::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
+use ds::motion::hover_intent::HoverProfile;
 use ds::prelude::*;
 use ds::stack::host::OverlayId;
 use ds::stack::hover_hub::{HoverKey, HoverKind};
-use ds_core::vocab::RowState;
+use ds::style::tokens::layer::ZLayer;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_motion::hover_intent::HoverProfile;
-use ds_style::tokens::layer::ZLayer;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

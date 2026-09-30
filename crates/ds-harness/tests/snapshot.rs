@@ -7,11 +7,11 @@ use ds::components::controls::button_model::Answers;
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{Operation, PendingToken};
+use ds::motion::pulse_key::PulseKey;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Query, Viewport, snapshot, snapshot_at};
-use ds_motion::pulse_key::PulseKey;
-use ds_style::tokens::control_size::ControlSize;
 use image::RgbaImage;
 use std::time::Duration;
 

@@ -6,9 +6,9 @@ use crate::pages::content::app_icons::{APPS, app_icon};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::icon::render::IconPx;
+use ds::style::tokens::shape::Corner;
 use ds_shell::prelude::*;
-use ds_style::icon::render::IconPx;
-use ds_style::tokens::shape::Corner;
 
 /// An app's icon at `size`, or the window glyph when it cannot be drawn.
 fn icon(hue: [u8; 3], size: IconSize) -> IconSource {

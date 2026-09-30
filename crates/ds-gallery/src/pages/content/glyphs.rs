@@ -4,7 +4,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_style::icon::render::Glyph;
+use ds::style::icon::render::Glyph;
 
 /// The sets in `Icon::ALL`'s order, each with its heading.
 const SETS: [(&str, &[Icon]); 4] = [

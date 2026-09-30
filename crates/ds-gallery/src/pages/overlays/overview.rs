@@ -13,11 +13,11 @@ use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
 use ds::stack::toast_hub::use_toast_hub;
+use ds::style::appearance::peek::PeekMode;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::geometry::placement::Align;
 use ds_core::geometry::placement::Side;
 use ds_core::vocab::Dismiss;
-use ds_style::appearance::peek::PeekMode;
-use ds_style::tokens::control_size::ControlSize;
 
 /// Everything the page can open, one at a time.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

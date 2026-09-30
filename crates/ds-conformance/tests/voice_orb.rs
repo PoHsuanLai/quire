@@ -3,9 +3,9 @@
 //! stays still under Reduced motion, and an idle orb wakes the document for nothing.
 
 use dioxus::prelude::*;
+use ds::base::vocab::Activity;
 use ds::components::content::voice_orb::view::VoiceOrb;
 use ds::prelude::*;
-use ds_core::vocab::Activity;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Backdrop, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;

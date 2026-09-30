@@ -3,11 +3,11 @@
 //! is gone once the press ends.
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::prelude::*;
-use ds_core::press::PointerButton;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_style::tokens::control_size::ControlSize;
 
 const VIEW: Viewport = Viewport {
     width: 240,

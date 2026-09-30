@@ -9,9 +9,9 @@ use ds::components::controls::button_model::{Answers, Bezel, ImagePosition};
 use ds::components::controls::checkbox::Checkbox;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

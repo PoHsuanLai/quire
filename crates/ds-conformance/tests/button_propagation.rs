@@ -7,8 +7,8 @@ use dioxus::prelude::*;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::press::Propagation;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

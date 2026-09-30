@@ -11,10 +11,10 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::lists::list::model::ListStyle;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::label_hue::LabelHue;
 use ds_core::colour::contrast::Verdict;
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::label_hue::LabelHue;
 
 /// What the matrix can show.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

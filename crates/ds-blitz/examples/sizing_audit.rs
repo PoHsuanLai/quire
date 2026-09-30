@@ -5,19 +5,19 @@
 //! `cargo run --release -p ds-blitz --example sizing_audit -- OUT_DIR`
 
 use dioxus::prelude::*;
+use ds::base::vocab::Muting;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::button_model::{Answers, ImagePosition};
 use ds::components::controls::segmented::Tracking;
 use ds::components::controls::slider_model::SliderLook;
 use ds::icon::{IconStyle, Tint};
 use ds::prelude::*;
-use ds_core::vocab::Muting;
+use ds::style::icon::family::PlateFamily;
+use ds::style::icon::plate_tint::PlateTint;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::status::StatusMetrics;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use ds_shell::prelude::*;
-use ds_style::icon::family::PlateFamily;
-use ds_style::icon::plate_tint::PlateTint;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::status::StatusMetrics;
 use std::path::PathBuf;
 use std::time::Duration;
 

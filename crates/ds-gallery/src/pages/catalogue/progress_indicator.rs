@@ -7,7 +7,7 @@ use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{Operation, PendingToken};
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The ProgressIndicator section.
 #[component]

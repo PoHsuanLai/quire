@@ -9,8 +9,8 @@ use dioxus::prelude::*;
 use ds::components::controls::segmented::Tracking;
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::prelude::*;
-use ds_style::appearance::blur::BlurState;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::appearance::blur::BlurState;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The toolbar.
 #[component]

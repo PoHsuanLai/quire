@@ -15,12 +15,12 @@
 //! returns.
 
 use dioxus::prelude::*;
+use ds::base::time::clock::sleep;
 use ds::components::controls::button_model::Answers;
 use ds::file_drop::board::FileDropBoard;
 use ds::host::found::Found;
 use ds::prelude::*;
 use ds_blitz::{AppConfig, AppId, WindowHandle, WindowSpec, launch, open_window_with};
-use ds_core::time::clock::sleep;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;

@@ -11,10 +11,10 @@ use ds::components::fields::stepper::model::StepRange;
 use ds::components::fields::stepper::view::Stepper;
 use ds::components::menus::pop_up_button::PopUpButton;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
 use ds_shell::month_grid::data::DayKey;
 use ds_shell::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The pane for `category`.
 pub(super) fn pane(category: Category) -> Element {

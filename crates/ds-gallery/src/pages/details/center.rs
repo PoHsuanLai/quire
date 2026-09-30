@@ -13,11 +13,11 @@ use ds::components::controls::button_model::{Bezel, IconSwap, ImagePosition};
 use ds::components::controls::slider_model::SliderLook;
 use ds::detail::EventStamp;
 use ds::prelude::*;
+use ds::style::icon::render::Glyph;
+use ds::style::tokens::control_size::ControlSize;
 use ds_shell::battery::ring::Readout;
 use ds_shell::now_playing::kind::Playback;
 use ds_shell::prelude::*;
-use ds_style::icon::render::Glyph;
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 /// The section.

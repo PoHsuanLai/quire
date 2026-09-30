@@ -3,11 +3,11 @@
 //! own entry and press, and the strip shows on the caller's say with no pointer on the row.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::app::thread_row_hooks::PartHooks;
 use ds::prelude::*;
-use ds_core::vocab::RowState;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

@@ -5,13 +5,13 @@ use crate::pages::{Caption, Scope, Section, Specimen};
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
-use ds_style::tokens::accent_table::accent_of;
-use ds_style::tokens::colour::ColourToken;
-use ds_style::tokens::elevation::Shadow;
-use ds_style::tokens::label_hue::{HueMember, LabelHue};
-use ds_style::tokens::layer::ZLayer;
-use ds_style::tokens::shape::Radius;
-use ds_style::tokens::token::{Token, TokenScope};
+use ds::style::tokens::accent_table::accent_of;
+use ds::style::tokens::colour::ColourToken;
+use ds::style::tokens::elevation::Shadow;
+use ds::style::tokens::label_hue::{HueMember, LabelHue};
+use ds::style::tokens::layer::ZLayer;
+use ds::style::tokens::shape::Radius;
+use ds::style::tokens::token::{Token, TokenScope};
 
 /// design/01-LAYOUT.md section 2's common steps. The design names these values and quire has no
 /// token for them (a limit the Blitz limits page lists): every padding is a raw length today.

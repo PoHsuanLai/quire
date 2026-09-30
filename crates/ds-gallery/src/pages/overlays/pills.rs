@@ -17,9 +17,9 @@ use ds::detail::{Operation, PendingToken};
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds::style::icon::render::Glyph;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::time::clock::sleep;
-use ds_style::icon::render::Glyph;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The hover targets, one per card kind.
 const TARGETS: [(HoverKind, &str, &str); 4] = [

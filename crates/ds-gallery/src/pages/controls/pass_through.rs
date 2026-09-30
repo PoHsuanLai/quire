@@ -7,8 +7,8 @@ use ds::components::controls::press::Propagation;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
-use ds_style::icon::render::Glyph;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::icon::render::Glyph;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The two ellipses at the glyph sizes a row and a header use, and on the buttons that open a
 /// row's menu.

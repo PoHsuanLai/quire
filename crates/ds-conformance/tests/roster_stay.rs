@@ -3,9 +3,9 @@
 //! heal, even after the fold's settle time has long passed.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
-use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

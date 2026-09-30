@@ -3,10 +3,10 @@
 //! from where it is, and under Reduced it is instant. Once settled nothing asks for a frame.
 
 use dioxus::prelude::*;
+use ds::motion::use_collapse::use_collapse;
 use ds::prelude::*;
+use ds::style::tokens::timing::DurationToken;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_motion::use_collapse::use_collapse;
-use ds_style::tokens::timing::DurationToken;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

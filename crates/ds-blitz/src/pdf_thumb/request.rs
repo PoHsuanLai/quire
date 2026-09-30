@@ -20,7 +20,7 @@ pub struct ThumbRequest {
     pub path: PathBuf,
     /// The room the page is fitted into, as `ds::prelude::PdfThumb`'s `size`.
     pub size: Size,
-    /// The device scale (`ds_style::scale::use_scale()`).
+    /// The device scale (`ds::style::scale::use_scale()`).
     pub scale: Scale,
 }
 

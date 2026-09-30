@@ -45,7 +45,8 @@ impl SpringResponse {
 ///
 /// ```
 /// use ds::detail::Touch;
-/// use ds::motion::{Ratio, SpringResponse, SpringSpec};
+/// use ds::motion::spring::Ratio;
+/// use ds::motion::spring_spec::{SpringResponse, SpringSpec};
 /// use ds::prelude::*;
 ///
 /// let remote = SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick);

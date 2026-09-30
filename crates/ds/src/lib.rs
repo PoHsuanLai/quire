@@ -15,7 +15,6 @@ pub mod file_drop;
 pub mod focus;
 pub mod host;
 pub mod icon;
-pub mod motion;
 pub mod root;
 pub mod spell;
 pub mod stack;
@@ -23,6 +22,12 @@ pub mod time;
 pub mod window;
 
 pub mod prelude;
+
+// The three crates under `ds`, as facades: a consumer names `ds::base::..`, `ds::style::..` and
+// `ds::motion::..` and depends on `ds` alone.
+pub use ds_core as base;
+pub use ds_motion as motion;
+pub use ds_style as style;
 
 // The curated roots: the stylesheet assembly a host installs. Every other name is in
 // `prelude` or at its home path.

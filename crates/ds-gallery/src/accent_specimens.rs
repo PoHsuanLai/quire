@@ -11,11 +11,11 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
+use ds::style::tokens::accent_table::accent_of;
+use ds::style::tokens::shape::{Corner, Radius};
 use ds_shell::month_grid::data::DayKey;
 use ds_shell::prelude::*;
 use ds_shell::tokens::widgets::WidgetMetrics;
-use ds_style::tokens::accent_table::accent_of;
-use ds_style::tokens::shape::{Corner, Radius};
 
 /// The colours an accent lends its surfaces, as CSS.
 #[derive(Debug, Clone, PartialEq, Eq)]

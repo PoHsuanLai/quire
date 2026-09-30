@@ -11,9 +11,9 @@ use ds::assembly::ds::Inject;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyle};
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::default_look;
 use ds_shell::prelude::*;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::default_look;
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";

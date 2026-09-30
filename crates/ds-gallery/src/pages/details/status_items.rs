@@ -9,8 +9,8 @@ use ds::components::content::status::volume::{VolumeState, VolumeWaves};
 use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
 use ds::components::controls::button_model::ImagePosition;
 use ds::prelude::*;
+use ds::style::tokens::status::StatusMetrics;
 use ds_shell::prelude::*;
-use ds_style::tokens::status::StatusMetrics;
 
 /// One status item, labelled with its state's words.
 #[component]

@@ -9,9 +9,9 @@ use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::icon::{IconStyle, Tint};
 use ds::prelude::*;
-use ds_style::icon::family::PlateFamily;
-use ds_style::icon::plate_tint::PlateTint;
-use ds_style::space::presets::PRESETS;
+use ds::style::icon::family::PlateFamily;
+use ds::style::icon::plate_tint::PlateTint;
+use ds::style::space::presets::PRESETS;
 
 /// One column: its caption and the style and tint it draws in.
 struct Column {

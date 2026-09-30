@@ -10,8 +10,8 @@ use ds::components::app::pin_tile::PinFace;
 use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
 use ds::components::content::provider_mark::MarkProvider;
 use ds::prelude::*;
+use ds::style::tokens::hex::{Colour, Hex};
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_style::tokens::hex::{Colour, Hex};
 use probe::rect;
 use std::time::Duration;
 

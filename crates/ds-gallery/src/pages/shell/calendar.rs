@@ -16,11 +16,11 @@ use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::default_look;
 use ds_shell::month_grid::data::{DayKey, MonthStep, WeekNumbers};
 use ds_shell::prelude::*;
 use ds_shell::tokens::widgets::WidgetMetrics;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::default_look;
 use month_sample::{AUGUST, First, SEPTEMBER, month as lay_out, sample, shift};
 
 /// The small widget's today and busy days, so its August shows the disc and the dots.

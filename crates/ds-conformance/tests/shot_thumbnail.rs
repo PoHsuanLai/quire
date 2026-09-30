@@ -8,10 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::components::content::image_source::ImageSize;
+use ds::motion::drag::DRAG_THRESHOLD;
 use ds::prelude::*;
 use ds_harness::harness::{SETTLE_BOUND, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_motion::drag::DRAG_THRESHOLD;
 use ds_shell::notifications::parts::Hover;
 use ds_shell::notifications::swipe::NotificationSwipe;
 use ds_shell::prelude::*;

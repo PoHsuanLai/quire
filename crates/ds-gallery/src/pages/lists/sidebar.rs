@@ -12,8 +12,8 @@ use ds::components::lists::row::row::Outline;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName};
+use ds::style::tokens::control_size::SidebarSize;
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::SidebarSize;
 
 /// The places a sidebar offers.
 const PLACES: [(Icon, &str, u32); 4] = [

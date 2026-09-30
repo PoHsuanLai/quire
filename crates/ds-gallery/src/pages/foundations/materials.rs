@@ -10,11 +10,11 @@ use ds::components::content::avatar::{AvatarSize, AvatarTone};
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::prelude::*;
+use ds::style::appearance::blur::BlurState;
+use ds::style::icon::render::Glyph;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::status::StatusMetrics;
 use ds_shell::prelude::*;
-use ds_style::appearance::blur::BlurState;
-use ds_style::icon::render::Glyph;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::status::StatusMetrics;
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {

@@ -9,9 +9,9 @@ use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{EventStamp, MorphGlyph, MorphStyle, Operation, PendingToken, Slashed};
 use ds::prelude::*;
+use ds::style::icon::render::Glyph;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::press::Press;
-use ds_style::icon::render::Glyph;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The page.
 #[component]

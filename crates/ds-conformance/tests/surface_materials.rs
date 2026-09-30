@@ -8,21 +8,21 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::base::geometry::placement::Align;
+use ds::base::geometry::placement::Flip;
+use ds::base::geometry::placement::Side;
 use ds::components::menus::item::item::MenuImage;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_core::geometry::placement::Align;
-use ds_core::geometry::placement::Flip;
-use ds_core::geometry::placement::Side;
+use ds::style::appearance::blur::BlurState;
+use ds::style::icon::family::PlateFamily;
+use ds::style::material::stack::MaterialStack;
+use ds::style::tokens::shape::Corner;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::prelude::*;
-use ds_style::appearance::blur::BlurState;
-use ds_style::icon::family::PlateFamily;
-use ds_style::material::stack::MaterialStack;
-use ds_style::tokens::shape::Corner;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;

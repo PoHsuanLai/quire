@@ -7,11 +7,11 @@ use ds::components::app::send_pill::SendPill;
 use ds::detail::{Operation, PendingToken};
 use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::PRESETS;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use ds_shell::prelude::*;
 use ds_shell::space_editor::DotIndex;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::PRESETS;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

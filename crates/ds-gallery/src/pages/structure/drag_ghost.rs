@@ -5,8 +5,8 @@ use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::overlays::drag_ghost::DragCount;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::press::Press;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The DragGhost section.
 #[component]

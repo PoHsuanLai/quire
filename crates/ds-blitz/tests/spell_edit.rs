@@ -8,6 +8,7 @@
 mod spell_dict;
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
 use ds::edit::input::{EditInput, KeyInput};
 use ds::host::position::TextPosition;
 use ds::prelude::*;
@@ -15,7 +16,6 @@ use ds::root::common::Common;
 use ds::spell::lang::{Lang, Spell};
 use ds::spell::marks::SpellReplace;
 use ds_blitz::spell::{SpellConfig, provide_with};
-use ds_core::press::PointerButton;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::cell::RefCell;

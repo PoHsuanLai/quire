@@ -9,11 +9,11 @@ use dioxus::prelude::*;
 use ds::host::measure::use_rect;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
+use ds::style::appearance::blur::BlurState;
+use ds::style::icon::render::Glyph;
 use ds_core::text::clip::clip_chars;
 use ds_core::time::clock::sleep;
 use ds_core::vocab::InputModality;
-use ds_style::appearance::blur::BlurState;
-use ds_style::icon::render::Glyph;
 use std::time::Duration;
 
 /// Each spike finding: its id, what Blitz does, and what quire does about it.

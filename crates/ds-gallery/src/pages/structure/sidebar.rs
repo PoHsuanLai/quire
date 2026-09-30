@@ -4,9 +4,9 @@ use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::SidebarSize;
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::control_size::SidebarSize;
 
 /// The places, with a heading before each group.
 fn places(here: &'static str, onselect: EventHandler<&'static str>) -> Vec<ListItem<&'static str>> {

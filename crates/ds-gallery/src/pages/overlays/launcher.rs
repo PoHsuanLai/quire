@@ -10,7 +10,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
-use ds_style::tokens::shape::{Corner, Radius};
+use ds::style::tokens::shape::{Corner, Radius};
 
 fn row(
     value: u8,
