@@ -701,28 +701,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
    disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
-
-/* StatusItem: the bar's status item. The slot is the bar's 30 wide (`--bar-status-w`,
-   design/29-SIZING.md section 5.1: the glyph 7 in from each side) by the box's height; the box and
-   the glyph come from the consumer's settings through `--bar-status-box` and `--bar-status-glyph`
-   (`ds::StatusMetrics`), the fallbacks being the keys' defaults, 22 and 16. The glyph is sized
-   here because the size is a setting. Inks on the frame as a toolbar button's; pressed and open
-   on the pressed fill. The pill's radius is the shell scale's bar-item radius. */
-.ds-button[*|data-variant=status-item]{
-  width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); padding:0; border-radius:var(--r-shell-bar-item);
-  color:var(--ink-soft);
-}
-.ds-button[*|data-variant=status-item]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=status-item][*|data-pressed],
-.ds-button[*|data-variant=status-item][*|aria-pressed=true],
-.ds-button[*|data-variant=status-item][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
-/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level
-   parts) fill that square, so the glyph follows the setting as a single icon does. */
-.ds-button[*|data-variant=status-item] .ds-ic,
-.ds-button[*|data-variant=status-item] .ds-ext-icon,
-.ds-button[*|data-variant=status-item] .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
-.ds-button[*|data-variant=status-item] .ds-status-glyph > .ds-status-part,
-.ds-button[*|data-variant=status-item] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
 /* -- checkbox -- */
 /* Checkbox (design/30 section 2.3, `NSButton` checkbox). Attribute selectors carry `*|` (spike
    S2); the focus ring is the global one, on the button (spike S12). The box is the ladder's
@@ -1357,17 +1335,39 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-menu-separator{ height:var(--hair); margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
 .ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 /* -- menu_bar_item -- */
-/* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
-   a bar item's text at the shell scale, and the pill behind it on hover and while its menu is
-   open: a Regular control, 22 tall at radius 5 (design/29-SIZING.md), centred in the 24 bar. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
+/* MenuBarItem (design/30 section 2.10; design/13-BEHAVIOUR-menus-windows.md section 13.3.1): a bar
+   item's text at the shell scale, and the pill behind it on hover, while pressed and while its
+   menu is open: a Regular control, 22 tall at radius 5 (design/29-SIZING.md), centred in the 24
+   bar. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. A glyph item
+   is the bar's status slot (`--bar-status-w`, design/29-SIZING.md section 5.1: the glyph 7 in from
+   each side) by the box's height; the box and the glyph come from the consumer's settings through
+   `--bar-status-box` and `--bar-status-glyph` (`ds::StatusMetrics`), the fallbacks being the keys'
+   defaults, 22 and 16. */
 
-.ds-bar-item{ display:inline-flex; align-items:center; height:var(--shell-bar-item); padding:0 var(--shell-bar-pad); border-radius:var(--r-shell-bar-item);
+.ds-menu-bar-item{ font:inherit; display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); height:var(--shell-bar-item); box-sizing:border-box;
+  padding:0 var(--shell-bar-pad); border:0; border-radius:var(--r-shell-bar-item); background:transparent;
   font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); color:var(--ink); white-space:nowrap; cursor:default; }
-.ds-bar-item[*|data-emphasis=strong]{ font-weight:700; }
-.ds-bar-item:hover{ background:var(--surface); }
-.ds-bar-item[*|aria-expanded=true]{ background:var(--surface-2); }
-.ds-bar-item .ds-button[*|data-variant=quiet]{ font-size:inherit; font-weight:inherit; color:inherit; padding:0; background:transparent; border-radius:0; }
-.ds-bar-item .ds-button[*|data-variant=quiet]:hover{ background:transparent; color:inherit; }
+.ds-menu-bar-item[*|data-emphasis=strong]{ font-weight:700; }
+.ds-menu-bar-item:hover{ background:var(--surface); }
+.ds-menu-bar-item[*|data-pressed],
+.ds-menu-bar-item[*|aria-pressed=true],
+.ds-menu-bar-item[*|aria-expanded=true]{ background:var(--surface-2); }
+.ds-menu-bar-item[*|aria-disabled=true]{ opacity:.35; pointer-events:none; }
+.ds-menu-bar-item-icon{ display:inline-flex; align-items:center; line-height:0; flex:none; }
+
+.ds-menu-bar-item[*|data-image=only]{ width:max(var(--bar-status-w),var(--bar-status-box,22px)); height:var(--bar-status-box,22px); padding:0; color:var(--ink-soft); }
+.ds-menu-bar-item[*|data-image=only]:hover,
+.ds-menu-bar-item[*|data-image=only][*|data-pressed],
+.ds-menu-bar-item[*|data-image=only][*|aria-pressed=true],
+.ds-menu-bar-item[*|data-image=only][*|aria-expanded=true]{ color:var(--ink); }
+/* A status glyph takes the same square as an icon; its stacked parts (and a volume glyph's level
+   parts) fill that square, so the glyph follows the setting as a single icon does. */
+.ds-menu-bar-item[*|data-image=only] .ds-ic,
+.ds-menu-bar-item[*|data-image=only] .ds-ext-icon,
+.ds-menu-bar-item[*|data-image=only] .ds-status-glyph{ width:var(--bar-status-glyph,16px); height:var(--bar-status-glyph,16px); }
+.ds-menu-bar-item[*|data-image=only] .ds-status-glyph > .ds-status-part,
+.ds-menu-bar-item[*|data-image=only] .ds-status-glyph .ds-level-part{ width:100%; height:100%; }
+.ds-menu-bar-item-title{ min-width:0; }
 /* -- menu_item -- */
 /* MenuItem (design/30 section 2.4, `NSMenuItem`): a row of 22 (`--shell-menu-row`) in the text
    menu's type (`--fs-shell-menu` at 400), with the state column (a check, a dash for mixed), the
@@ -1624,7 +1624,7 @@ html,body{margin:0;padding:0;background:transparent}
    starting another. An in-place change fades the media in (`a-morph-fade-in`,
    `--t-quick`); at rest the media box plays `hold` (moves nothing), so the fade's
    settle never drops it midway. A running load swaps the media for the pending look:
-   the dashed ring (`.ds-spinner`, stepping) over the words "Loading…", in `--ink-faint`.
+   the spinner over the words "Loading…", in `--ink-faint`.
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
 .ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
@@ -1640,7 +1640,7 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--surface); border:var(--hair) solid var(--line-soft); border-radius:var(--r-small); color:var(--ink-soft); }
 .ds-preview-text[*|data-face=mono]{ font-family:var(--font-code); font-size:var(--fs-help); }
 .ds-preview-pending{ display:flex; flex-direction:column; align-items:center; gap:var(--s-12); color:var(--ink-faint); font-size:var(--fs-small); }
-.ds-preview-pending-mark{ position:relative; display:block; width:20px; height:20px; }
+.ds-preview-pending-mark{ display:block; }
 .ds-preview-pending-words{ display:block; }
 .ds-preview-emoji{ font-size:var(--fs-emoji-preview); line-height:1; }
 
@@ -2263,20 +2263,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--accent); }
 .ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(calc(var(--step) * 30deg)); }
 .ds-progress-glyph{ position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }
-/* -- spinner -- */
-/* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
-   (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a pending loop.
-   A Rust step timer (`use_pending`) writes `data-pending` and, while it steps, `--turn`: a
-   twelfth of a turn a step, in steps of `--t-spin-step`, so the ring turns once a second. The
-   angle is drawn as it is written, with no transition, so the ring steps as a spoked spinner
-   does. Attribute selectors carry `*|` (spike S2). Idle: not shown. TODO(O-9): standalone size
-   not specified. */
-
-.ds-spinner{
-  position:absolute; inset:-4px; border-radius:var(--r-pill); border:2px dashed var(--accent-text);
-  opacity:0; transform:scale(.85);
-}
-.ds-spinner[*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); }
 /* -- split_view -- */
 /* SplitView (design/30 section 2.7, `NSSplitView`). Attribute selectors carry `*|` (spike S2). A
    row of panes: each before the last is as wide as `--pane-w` (a spring in Rust writes it while a
