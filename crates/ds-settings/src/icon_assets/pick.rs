@@ -39,7 +39,7 @@ pub fn sizes_to_try(size: Px) -> Vec<u16> {
 }
 
 /// The style's subdirectory: none for Colour, `muted`, `monochrome` (a neutral grey set that
-/// the caller then re-colours with `ds::icon::retint`).
+/// the caller then re-colours with `ds::style::icon::retint::retint`).
 fn style_dir(style: IconStyle) -> Option<&'static str> {
     match style {
         IconStyle::Colour => None,

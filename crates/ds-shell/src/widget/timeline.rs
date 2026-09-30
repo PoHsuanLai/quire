@@ -11,7 +11,7 @@ use std::time::{Duration, Instant};
 pub enum EntryDate {
     /// From the moment the timeline arrives.
     Start,
-    /// From this instant on the design system's clock (`ds::time::now`).
+    /// From this instant on the design system's clock (`ds::base::time::clock::now`).
     At(Instant),
 }
 

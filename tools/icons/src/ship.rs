@@ -77,7 +77,7 @@ impl Style {
 }
 
 /// The look an app takes in a style. Monochrome is exported neutral (no hue): it is tinted at
-/// run time by `ds::icon::retint` from `icons.monochrome_tint`.
+/// run time by `ds::style::icon::retint::retint` from `icons.monochrome_tint`.
 pub fn style_look(app: &ShipApp, style: Style, m: &Manifest) -> Look {
     match style {
         Style::Colour => Look {

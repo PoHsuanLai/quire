@@ -4,6 +4,7 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
+use ds::base::time::clock::now;
 use ds::components::app::edge_peek::EdgePeek;
 use ds::components::app::link_pill::{LinkPill, LinkTarget};
 use ds::components::app::pin_tile::{PinFace, PinTile};
@@ -17,7 +18,6 @@ use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds::style::tokens::shape::{Corner, Radius};
-use ds::time::now;
 use ds_core::standard_action::SpaceNumber;
 use std::time::Duration;
 

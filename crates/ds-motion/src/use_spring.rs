@@ -1,5 +1,5 @@
 //! The spring driver (design/05-MOTION.md section 14): a [`Spring`] played on a `Playback`, on
-//! this thread's frame clock (`ds::time`), asking for a frame every `FRAME_TICK` while it moves
+//! this thread's frame clock (`ds::base::time::clock`), asking for a frame every `FRAME_TICK` while it moves
 //! and nothing once it rests (design/26 R3). A new target mid-flight starts a new leg from the
 //! exact state the old one has at that instant, so position and velocity never jump; a hand's
 //! release hands its velocity to the leg (design/27 section 3.12).

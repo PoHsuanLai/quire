@@ -4,7 +4,11 @@
 use crate::details_states::Net;
 use dioxus::prelude::*;
 use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
-use ds::detail::{MorphGlyph, MorphStyle, Slashed, Touch, use_shake};
+use ds::motion::detail::morph::MorphStyle;
+use ds::motion::detail::morph::Slashed;
+use ds::motion::detail::morph_glyph::MorphGlyph;
+use ds::motion::detail::once::use_shake;
+use ds::motion::detail::touch::Touch;
 use ds::prelude::*;
 
 /// `class` with a pulse's class and alias when it plays.
@@ -29,7 +33,7 @@ fn words(net: &Net) -> &'static str {
 fn wifi(net: &Net) -> WifiState {
     match net {
         Net::Off => WifiState::Off,
-        Net::Joining => WifiState::Joining(ds::detail::EventStamp(1)),
+        Net::Joining => WifiState::Joining(ds::motion::detail::stamp::EventStamp(1)),
         Net::Joined => WifiState::Joined {
             bars: WifiBars::Three,
             reach: WifiReach::Internet,

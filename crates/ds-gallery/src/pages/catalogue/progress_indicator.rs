@@ -5,7 +5,8 @@ use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
-use ds::detail::{Operation, PendingToken};
+use ds::motion::detail::operation::Operation;
+use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 

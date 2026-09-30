@@ -44,7 +44,7 @@ impl SpringResponse {
 /// A spring chosen by the touch that moved it.
 ///
 /// ```
-/// use ds::detail::Touch;
+/// use ds::motion::detail::touch::Touch;
 /// use ds::motion::spring::Ratio;
 /// use ds::motion::spring_spec::{SpringResponse, SpringSpec};
 /// use ds::prelude::*;

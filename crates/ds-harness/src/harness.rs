@@ -128,7 +128,7 @@ impl Harness {
     }
 
     /// Now on this harness's clock: the wall clock's now, or the virtual clock's (which
-    /// `ds::time::now` also reads on this thread). Compare it with other instants from the same
+    /// `ds::base::time::clock::now` also reads on this thread). Compare it with other instants from the same
     /// harness, e.g. the one [`settle_until`] returns.
     pub fn now(&self) -> Instant {
         self.time.now()

@@ -1,5 +1,5 @@
 //! The clock rule, held over the design system's sources (`ds`, `ds-core`, `ds-style`, `ds-motion`,
-//! `ds-shell`): the design system reads time only through `ds::time` (`now`, `since`, `sleep`), so a harness's virtual clock reaches every timer and
+//! `ds-shell`): the design system reads time only through `ds::base::time::clock` (`now`, `since`, `sleep`), so a harness's virtual clock reaches every timer and
 //! every "now". A direct `Instant::now()` (or `.elapsed()` on an `Instant`, which this scan
 //! cannot tell from a tween's own `elapsed`, so review catches it) or a
 //! `futures_timer` sleep would stay on the wall clock and drift from the harness again.
@@ -66,7 +66,7 @@ fn ds_reads_time_only_through_ds_time() {
         .collect();
     assert!(
         found.is_empty(),
-        "read the time through ds::time::{{now, since, sleep}} instead:\n{}",
+        "read the time through ds::base::time::clock::{{now, since, sleep}} instead:\n{}",
         found.join("\n")
     );
 }

@@ -1,16 +1,17 @@
 //! The Controls page's tinted plates: a neutral plate under
 //! `IconView { plate_tint }` in the Work and the Home Space's Monochrome tint and in Muted, beside
 //! the untinted plate, in the light scheme and the dark. The third-party raster on each is
-//! re-coloured by `ds::icon::retint` with the same style and tint, so plate and icon read as one
+//! re-coloured by `ds::style::icon::retint::retint` with the same style and tint, so plate and icon read as one
 //! hue; the glyph takes the tinted ink.
 
 use crate::pages::content::app_icons::{APPS, app_icon_in};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::icon::{IconStyle, Tint};
 use ds::prelude::*;
 use ds::style::icon::family::PlateFamily;
 use ds::style::icon::plate_tint::PlateTint;
+use ds::style::icon::retint::IconStyle;
+use ds::style::icon::retint::Tint;
 use ds::style::space::presets::PRESETS;
 
 /// One column: its caption and the style and tint it draws in.

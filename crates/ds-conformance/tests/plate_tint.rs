@@ -7,10 +7,11 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::icon::{IconStyle, Tint};
 use ds::prelude::*;
 use ds::style::icon::family::PlateFamily;
 use ds::style::icon::plate_tint::PlateTint;
+use ds::style::icon::retint::IconStyle;
+use ds::style::icon::retint::Tint;
 use ds::style::space::presets::PRESETS;
 use ds_harness::{Driver, Harness, Viewport};
 use image::{Rgba, RgbaImage};

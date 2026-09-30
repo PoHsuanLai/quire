@@ -11,7 +11,7 @@ use super::touch::Touch;
 ///
 /// ```compile_fail,E0451
 /// // A cue cannot be written by hand.
-/// let cue = ds::detail::Cue { moment: ds::detail::Moment::Appear, touch: ds::detail::Touch::Remote, serial: 1 };
+/// let cue = ds::motion::detail::cue::Cue { moment: ds::motion::detail::moment::Moment::Appear, touch: ds::motion::detail::touch::Touch::Remote, serial: 1 };
 /// ```
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Cue {

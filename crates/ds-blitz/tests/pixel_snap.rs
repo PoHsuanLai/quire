@@ -13,9 +13,9 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::host::measure::Anchor;
-use ds::icon::stroke_device_pixels;
 use ds::prelude::*;
 use ds::style::icon::render::Glyph;
+use ds::style::icon::stroke::stroke_device_pixels;
 use ds::style::tokens::pixel::PixelToken;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use image::RgbaImage;

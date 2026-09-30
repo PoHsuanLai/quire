@@ -37,8 +37,8 @@ the same four in `ds_shell`) and the three facades. Every other name is reached 
 (`ds::components::..`, `ds::host::..`, `ds::stack::..`, `ds::style::..`, `ds::base::..`,
 `ds::motion::..`), one path each. A program depends on `ds` alone: `ds::base` (`ds-core`),
 `ds::style` (`ds-style`) and `ds::motion` (`ds-motion`) are the three crates under it,
-re-exported as modules. One exception: `#[derive(Word)]` expands to `::ds_core::word::Word`, so a
-crate that derives it also names `ds-core` in its manifest (section 7).
+re-exported as modules. `#[derive(Word)]` and `#[derive(Token)]` find the crate they name through
+your manifest, so a crate that depends on `ds` alone derives them (`::ds::base`, `::ds::style`).
 
 **A path dependency.** quire has no published version, so every consumer depends on it by
 path, the way `examples/consumer/Cargo.toml` does:
@@ -497,7 +497,7 @@ for the defaults) and renders the first frame. A test sends `Input` and lets tim
 | --- | --- | --- |
 | Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall`. `Harness::clock() -> Clock` |
 | "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
-| Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds::base::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
+| Read the time in your own component | `ds::base::time::clock::now()`, `ds::base::time::clock::since(instant)`, `ds::base::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
 | Install a virtual clock yourself (another harness) | `ds::base::time::clock::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
 
 Not on the virtual clock: work off the harness's thread (a Tokio task such as `ds_settings`'
@@ -776,7 +776,7 @@ For a bar (FINDINGS "Bar gaps"):
   point); a keyboard activation reports the origin. `Press` is `PartialEq`, not `Eq`. Hand
   `at.x`, `at.y` (converted to screen coordinates if you know the surface's origin) to SNI's
   `Activate` and `ContextMenu`.
-- **Symbolic or image.** `ds::icon::classify_with(&png_bytes, ChromaLimit::default()) ->
+- **Symbolic or image.** `ds::style::icon::classify::classify_with(&png_bytes, ChromaLimit::default()) ->
   Result<IconKind, DsError>` (`IconKind::{Symbolic, Image}`; `ChromaLimit` is
   `ds::style::icon::classify::ChromaLimit`) is design/08-ICONS.md §1.5 step 2: symbolic when every
   pixel with at least half coverage has OKLCH chroma below the limit; `ChromaLimit(n)` takes

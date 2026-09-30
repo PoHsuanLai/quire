@@ -34,7 +34,7 @@ use std::fmt::Debug;
 ///     }
 /// }
 ///
-/// ds::detail::moment_table(&[
+/// ds::motion::detail::detailed::moment_table(&[
 ///     (Link::Off, Link::Joining, Moment::Pending),
 ///     (Link::Joining, Link::Joined, Moment::Success),
 ///     (Link::Joined, Link::Off, Moment::Unavailable),

@@ -10,7 +10,7 @@ use std::time::{Duration, Instant};
 /// new start restarts the loop.
 ///
 /// ```
-/// use ds::detail::{Operation, PendingToken};
+/// use ds::motion::detail::operation::{Operation, PendingToken};
 ///
 /// let joining = Operation::Running(PendingToken::start());
 /// # let _ = joining;
@@ -18,7 +18,7 @@ use std::time::{Duration, Instant};
 ///
 /// ```compile_fail,E0451
 /// // A token cannot be written by hand.
-/// let token = ds::detail::PendingToken {
+/// let token = ds::motion::detail::operation::PendingToken {
 ///     serial: 1,
 ///     started: std::time::Instant::now(),
 /// };

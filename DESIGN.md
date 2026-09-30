@@ -182,7 +182,7 @@ The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`,
 | Module | Implements | Notes |
 | --- | --- | --- |
 | `ds-shell/widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
-| `ds-shell/widget/timeline.rs`, `ds-shell/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::time` (virtual in tests) |
+| `ds-shell/widget/timeline.rs`, `ds-shell/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::base::time::clock` (virtual in tests) |
 | `ds-shell/widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
 | `ds-shell/widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
 | `ds-shell/widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |

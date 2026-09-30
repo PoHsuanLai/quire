@@ -4,10 +4,15 @@
 //! plays no shake (R3, R4, R6, R7).
 
 use dioxus::prelude::*;
-use ds::detail::{
-    EventStamp, Operation, PendingLayers, PendingSpec, PendingStyle, PendingToken, Touch,
-    use_pending, use_shake,
-};
+use ds::motion::detail::once::use_shake;
+use ds::motion::detail::operation::Operation;
+use ds::motion::detail::operation::PendingToken;
+use ds::motion::detail::pending::PendingLayers;
+use ds::motion::detail::pending::PendingSpec;
+use ds::motion::detail::pending::PendingStyle;
+use ds::motion::detail::stamp::EventStamp;
+use ds::motion::detail::touch::Touch;
+use ds::motion::detail::use_pending::use_pending;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};

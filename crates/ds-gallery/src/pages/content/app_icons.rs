@@ -1,8 +1,10 @@
 //! App icons for the gallery's launcher and dock specimens: coloured rounded squares, PNG-encoded,
 //! standing in for the icon files an icon theme lookup returns.
 
-use ds::icon::{IconStyle, Tint, retint};
 use ds::prelude::*;
+use ds::style::icon::retint::IconStyle;
+use ds::style::icon::retint::Tint;
+use ds::style::icon::retint::retint;
 use ds::style::icon::url::IconUrl;
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
@@ -12,7 +14,7 @@ pub fn app_icon(hue: [u8; 3], size: IconSize) -> Option<IconSource> {
     app_icon_in(hue, size, IconStyle::Colour, Tint::NEUTRAL)
 }
 
-/// The same icon re-coloured for `style` by `ds::icon::retint`, as a shell re-colours a
+/// The same icon re-coloured for `style` by `ds::style::icon::retint::retint`, as a shell re-colours a
 /// third-party icon before it sits on a tinted plate.
 pub fn app_icon_in(
     hue: [u8; 3],

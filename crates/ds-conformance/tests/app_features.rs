@@ -4,11 +4,11 @@
 //! and hands its address over on a click.
 
 use dioxus::prelude::*;
+use ds::base::time::clock::now;
 use ds::components::app::edge_peek::EdgePeek;
 use ds::components::app::link_pill::{LinkPill, LinkTarget};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
 use ds::prelude::*;
-use ds::time::now;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

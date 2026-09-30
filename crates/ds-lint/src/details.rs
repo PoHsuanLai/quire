@@ -2,7 +2,7 @@
 //! [`Rule::InfiniteLoop`] rejects `animation-iteration-count: infinite` and `infinite` in the
 //! `animation` shorthand, in every profile; [`Rule::OffGrammarTiming`] rejects, under
 //! [`Profile::Details`], an `animation` or `transition` whose duration or easing token is not one
-//! the grammar plays (`ds::detail::grammar`). Raw values are `RawDuration` and `RawEasing`'s.
+//! the grammar plays (`ds::motion::detail::grammar`). Raw values are `RawDuration` and `RawEasing`'s.
 
 use super::declaration::push;
 use super::kind;
