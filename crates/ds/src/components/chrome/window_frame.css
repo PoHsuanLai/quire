@@ -18,8 +18,8 @@
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
-.ds-titlebar-name{ min-width:0; }
-.ds-titlebar-subtitle{ min-width:0; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
+.ds-titlebar-name{ min-width:0; overflow:hidden; }
+.ds-titlebar-subtitle{ min-width:0; overflow:hidden; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
 .ds-titlebar-proxy{ display:inline-flex; flex:none; line-height:0; color:var(--f-ink-soft); }
 .ds-titlebar[*|data-activity=inactive] .ds-titlebar-proxy{ opacity:.5; }
 /* The edited dot: the document has changes not saved. */
