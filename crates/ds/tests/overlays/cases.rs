@@ -5,15 +5,15 @@
 use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{Align, Availability, Button};
+use ds::{Accessory, Align, Availability, Button, RowLeading};
 use ds::{
     Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
     BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
     HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
     HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
-    Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, Peek, PeekMode,
-    PersonHue, Placement, Point, Popover, Px, Rect, SelectionBubble, SendPhase, SendPill, Sheet,
-    Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
+    Menu, MenuImage, MenuItem, MenuPlacement, PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue,
+    Placement, Point, Popover, Px, Rect, SelectionBubble, SendPhase, SendPill, Sheet, Shown, Side,
+    Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
 };
 
 use ds::{
@@ -59,116 +59,63 @@ fn button_rect() -> Rect {
     }
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        availability: Availability::Enabled,
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-    }
+fn item(value: u8, title: &str) -> MenuItem<u8> {
+    MenuItem::new(value, title)
 }
 
 /// A bar status menu (bar gaps): two status lines, a rule, one item.
-fn status_lines() -> Vec<MenuEntry<u8>> {
+fn status_lines() -> Vec<MenuItem<u8>> {
     vec![
-        MenuEntry::Info {
+        MenuItem::Info {
             title: "Wired: connected".to_string(),
             detail: Some("192.168.1.4".to_string()),
         },
-        MenuEntry::Info {
+        MenuItem::Info {
             title: "Battery 82%".to_string(),
             detail: None,
         },
-        MenuEntry::Separator,
+        MenuItem::Separator,
         item(1, "Network settings…"),
     ]
 }
 
-/// The snooze menu: a header, three timed items with tiles and trails, a rule, one more.
-fn snooze() -> Vec<MenuEntry<u8>> {
+/// The file menu: a header, items with images, key equivalents and every check state, a rule,
+/// one more.
+fn snooze() -> Vec<MenuItem<u8>> {
     vec![
-        MenuEntry::Header("Snooze until".to_string()),
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: 1,
-            title: "Later today".to_string(),
-            detail: Some("18:00".to_string()),
-            tile: Some(MenuTile::Icon(Icon::Clock)),
-            trail: MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('l')])),
-            check: None,
-        },
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: 2,
-            title: "Tomorrow".to_string(),
-            detail: Some("08:00".to_string()),
-            tile: Some(MenuTile::Text("T".to_string())),
-            trail: MenuTrail::Note("Thu".to_string()),
-            check: Some(Check::On),
-        },
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: 3,
-            title: "Dana Okafor".to_string(),
-            detail: None,
-            tile: Some(MenuTile::Avatar(DANA)),
-            trail: MenuTrail::None,
-            check: Some(Check::Off),
-        },
-        MenuEntry::Separator,
-        item(4, "Pick a date…"),
+        MenuItem::Header("Snooze until".to_string()),
+        item(1, "Later today")
+            .with_image(MenuImage::Icon(Icon::Clock))
+            .with_key(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('l')])),
+        item(2, "Tomorrow").with_check(Check::On),
+        item(3, "Next week").with_check(Check::Off),
+        item(4, "Any day").with_check(Check::Mixed),
+        MenuItem::Separator,
+        item(5, "Pick a date…"),
     ]
 }
 
-fn group_by() -> Vec<MenuEntry<u8>> {
+fn group_by() -> Vec<MenuItem<u8>> {
     vec![
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: 1,
-            title: "Date".to_string(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::Note("D".to_string()),
-            check: Some(Check::On),
-        },
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: 2,
-            title: "Sender".to_string(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
-            check: Some(Check::Off),
-        },
+        item(1, "Date").with_check(Check::On),
+        item(2, "Sender").with_check(Check::Off),
     ]
 }
 
 /// A disabled item, a submenu parent and a disabled submenu parent.
-fn nested() -> Vec<MenuEntry<u8>> {
-    let off = |value: u8, title: &str| MenuEntry::Item {
-        availability: Availability::Disabled,
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-    };
+fn nested() -> Vec<MenuItem<u8>> {
     vec![
         item(1, "Open"),
-        off(2, "Pause"),
-        MenuEntry::Submenu {
+        item(2, "Pause").with_availability(Availability::Disabled),
+        MenuItem::Submenu {
             title: "More".to_string(),
-            tile: Some(MenuTile::Icon(Icon::Settings)),
+            image: Some(MenuImage::Icon(Icon::Settings)),
             availability: Availability::Enabled,
             children: vec![item(10, "About")],
         },
-        MenuEntry::Submenu {
+        MenuItem::Submenu {
             title: "Services".to_string(),
-            tile: None,
+            image: None,
             availability: Availability::Disabled,
             children: vec![item(20, "Restart")],
         },
@@ -176,18 +123,13 @@ fn nested() -> Vec<MenuEntry<u8>> {
 }
 
 /// Applications with their own icons: an image and a symbolic one.
-fn app_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
-    let app = |value: u8, title: &str, tile: IconSource| MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: Some(MenuTile::Source(tile)),
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
+fn app_groups() -> Vec<PaletteGroup<u8>> {
+    let app = |value: u8, title: &str, icon: IconSource| PaletteRow {
+        leading: RowLeading::Source(icon),
+        ..PaletteRow::new(value, title)
     };
-    vec![(
-        "Applications".to_string(),
+    vec![PaletteGroup::list(
+        "Applications",
         vec![
             app(
                 1,
@@ -209,37 +151,28 @@ fn app_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
     )]
 }
 
-fn palette_groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
+fn palette_groups() -> Vec<PaletteGroup<u8>> {
     vec![
-        (
-            "Top hit".to_string(),
-            vec![MenuEntry::Item {
-                availability: Availability::Enabled,
-                value: 1,
-                title: "Re: UIDL stability".to_string(),
-                detail: Some("Treat UIDL as a hint, not an identity".to_string()),
-                tile: Some(MenuTile::Avatar(AvatarFace {
+        PaletteGroup::list(
+            "Top hit",
+            vec![PaletteRow {
+                detail: Some("Treat UIDL as a hint, not an identity".into()),
+                leading: RowLeading::Avatar(AvatarFace {
                     size: AvatarSize::Size34,
                     ..DANA
-                })),
-                trail: MenuTrail::Shortcut(Shortcut(vec![
-                    ShortcutKey::Ctrl,
-                    ShortcutKey::Char('1'),
-                ])),
-                check: None,
+                }),
+                accessory: Accessory::Text(
+                    Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]).glyphs(),
+                ),
+                ..PaletteRow::new(1, "Re: UIDL stability")
             }],
         ),
-        ("People".to_string(), Vec::new()),
-        (
-            "Actions".to_string(),
-            vec![MenuEntry::Item {
-                availability: Availability::Enabled,
-                value: 2,
-                title: "Sync now".to_string(),
-                detail: None,
-                tile: Some(MenuTile::Icon(Icon::Refresh)),
-                trail: MenuTrail::None,
-                check: None,
+        PaletteGroup::list("People", Vec::new()),
+        PaletteGroup::list(
+            "Actions",
+            vec![PaletteRow {
+                leading: RowLeading::Icon(Icon::Refresh),
+                ..PaletteRow::new(2, "Sync now")
             }],
         ),
     ]
@@ -432,59 +365,53 @@ fn selection() -> Rect {
 }
 
 pub const CASES: &[Case] = &[
-    // Menu: the four kinds, an empty list, and settled after its entrance.
+    // Menu: each placement, an empty list, disabled items and submenus, status lines.
     Case {
         component: "menu",
-        state: "rich",
-        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: Anchor::Rect(button_rect()), entries: snooze(), onpick: |_| {}, onclose: |_| {} } },
+        state: "popup",
+        make: || rsx! { Menu { placement: MenuPlacement::Popup, anchor: Anchor::Rect(button_rect()), items: snooze(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "menu",
-        state: "rich-present",
-        make: || rsx! { Menu { kind: MenuKind::Rich, anchor: Anchor::Rect(button_rect()), entries: snooze(), onpick: |_| {}, onclose: |_| {} } },
+        state: "popup-present",
+        make: || rsx! { Menu { placement: MenuPlacement::Popup, anchor: Anchor::Rect(button_rect()), items: snooze(), onpick: |_| {}, onclose: |_| {} } },
         wait: SETTLED,
     },
     Case {
         component: "menu",
-        state: "slim-typing",
-        make: || rsx! { Menu { kind: MenuKind::Slim, anchor: Anchor::Rect(button_rect()), entries: snooze(), filter: MenuFilter::Typing, onpick: |_| {}, onclose: |_| {} } },
-        wait: NOW,
-    },
-    Case {
-        component: "menu",
-        state: "dropdown",
-        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: group_by(), onpick: |_| {}, onclose: |_| {} } },
+        state: "bar",
+        make: || rsx! { Menu { placement: MenuPlacement::Bar, anchor: Anchor::Rect(button_rect()), items: group_by(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "menu",
         state: "context",
-        make: || rsx! { Menu { kind: MenuKind::Context, anchor: Anchor::Point(Point { x: Px(420.0), y: Px(310.0) }), entries: vec![item(1, "Archive"), item(2, "Snooze…")], onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { Menu { placement: MenuPlacement::Context, anchor: Anchor::Point(Point { x: Px(420.0), y: Px(310.0) }), items: vec![item(1, "Archive"), item(2, "Snooze…")], onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "menu",
+        state: "context-hides-the-unavailable",
+        make: || rsx! { Menu { placement: MenuPlacement::Context, anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), items: nested(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "menu",
         state: "empty",
-        make: || rsx! { Menu::<u8> { kind: MenuKind::Slim, anchor: Anchor::Rect(button_rect()), entries: Vec::new(), onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { Menu::<u8> { placement: MenuPlacement::Popup, anchor: Anchor::Rect(button_rect()), items: Vec::new(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "menu",
         state: "disabled-and-submenu",
-        make: || rsx! { Menu { kind: MenuKind::Context, anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }), entries: nested(), onpick: |_| {}, onclose: |_| {} } },
-        wait: NOW,
-    },
-    Case {
-        component: "menu",
-        state: "dropdown-disabled-and-submenu",
-        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: nested(), onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { Menu { placement: MenuPlacement::Popup, anchor: Anchor::Rect(button_rect()), items: nested(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "menu",
         state: "bar-status-lines",
-        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Rect(button_rect()), entries: status_lines(), entrance: MenuEntrance::Instant, onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { Menu { placement: MenuPlacement::Bar, anchor: Anchor::Rect(button_rect()), items: status_lines(), onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // Popover: each dismiss policy, and the arrow.

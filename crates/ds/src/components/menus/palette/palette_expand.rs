@@ -4,7 +4,6 @@
 //! (Show Less), with every other group as it was. Anything else is a new result set, which
 //! replaces in place with no motion (R1, R12).
 
-use crate::components::menus::menu_entry::MenuEntry;
 use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey};
 
 /// How one group's rows changed.
@@ -51,12 +50,12 @@ pub(crate) fn resized<T: PartialEq>(
     };
     let resize = match (was.len(), now.len()) {
         (w, n) if w < n && now.starts_with(was) => Resize::Grew {
-            kept: choice_count(was),
-            added: choice_count(&now[w..]),
+            kept: was.len(),
+            added: now.len() - w,
         },
         (w, n) if n < w && was.starts_with(now) => Resize::Shrank {
-            kept: choice_count(now),
-            removed: choice_count(&was[n..]),
+            kept: now.len(),
+            removed: was.len() - n,
         },
         _ => return None,
     };
@@ -66,37 +65,14 @@ pub(crate) fn resized<T: PartialEq>(
     })
 }
 
-/// How many of `entries` are rows the cursor rests on.
-fn choice_count<T>(entries: &[MenuEntry<T>]) -> usize {
-    entries
-        .iter()
-        .filter(|entry| {
-            matches!(
-                entry,
-                MenuEntry::Item { .. } | MenuEntry::Row(_) | MenuEntry::Submenu { .. }
-            )
-        })
-        .count()
-}
-
 #[cfg(test)]
 mod tests {
     use super::{GroupResize, Resize, resized};
     use crate::components::lists::emoji_grid::grid::{EMOJI_CELL, EmojiCells};
-    use crate::components::menus::menu_entry::{MenuEntry, MenuTrail};
-    use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey};
-    use ds_core::vocab::Availability;
+    use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey, PaletteRow};
 
-    fn item(value: u8) -> MenuEntry<u8> {
-        MenuEntry::Item {
-            value,
-            title: format!("row {value}"),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
-            check: None,
-            availability: Availability::Enabled,
-        }
+    fn item(value: u8) -> PaletteRow<u8> {
+        PaletteRow::new(value, format!("row {value}"))
     }
 
     fn rows(

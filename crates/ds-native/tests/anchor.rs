@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, Button, Check, Common, Ds, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, MountedRef, Rect,
+    Anchor, Appearance, Availability, Button, Check, Common, Ds, Material, Menu, MenuItem,
+    MountedRef, Rect,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -20,7 +20,7 @@ const VIEW: Viewport = Viewport {
 fn AnchorApp() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            // Room on the left so the menu's `left - 8` is not clamped to the 8 px margin. The
+            // Room on the left so the menu is not clamped to the 8 px margin. The
             // spacer gives height: the overlay bounds are the root's box, as tall as its
             // content, and a content-high root has no room below the button, so the menu flips.
             div { style: "padding:40px 0 0 60px",
@@ -38,14 +38,13 @@ fn Anchored() -> Element {
     let entries = ["Later today", "Tomorrow"]
         .into_iter()
         .zip(0u8..)
-        .map(|(title, value)| MenuEntry::Item {
-            availability: Availability::Enabled,
+        .map(|(title, value)| MenuItem::Item {
             value,
             title: title.into(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
+            image: None,
+            key: None,
             check: None,
+            availability: Availability::Enabled,
         })
         .collect::<Vec<_>>();
     rsx! {
@@ -59,9 +58,9 @@ fn Anchored() -> Element {
         p { "Snooze this thread" }
         if let (Check::On, Some(button)) = (open(), element()) {
             Menu {
-                kind: MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: Anchor::Mounted(button),
-                entries,
+                items: entries,
                 onpick: move |_: u8| open.set(Check::Off),
                 onclose: move |_| open.set(Check::Off),
             }
@@ -91,16 +90,16 @@ fn a_menu_anchored_to_a_buttons_mounted_handle_opens_below_it() {
     assert_eq!(harness.count(".ds-menu"), 1, "{}", harness.html());
     let menu = rect(&harness, ".ds-menu");
     let bottom = button.origin.y.0 + button.size.height.0;
-    // Slim menus sit 6 below the anchor and 8 left of it (design/04-COMPONENTS.md section 20).
+    // A pop-up menu hangs 2 below its anchor, on the anchor's left edge (design/30 section 2.4).
     let near = |got: f32, want: f32| (got - want).abs() <= 1.0;
     assert!(
-        near(menu.origin.y.0, bottom + 6.0),
-        "the menu's top {} is not 6 below the button's bottom {bottom}",
+        near(menu.origin.y.0, bottom + 2.0),
+        "the menu's top {} is not 2 below the button's bottom {bottom}",
         menu.origin.y.0
     );
     assert!(
-        near(menu.origin.x.0, button.origin.x.0 - 8.0),
-        "the menu's left {} is not 8 left of the button's {}",
+        near(menu.origin.x.0, button.origin.x.0),
+        "the menu's left {} is not the button's {}",
         menu.origin.x.0,
         button.origin.x.0
     );

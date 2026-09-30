@@ -11,8 +11,9 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Bezel;
 use ds::{
-    Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, Material, Pane,
-    PaneSwitcher, RootChrome, RowTrailing, SettingsRow, TextLine, Theme, default_look,
+    Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, List,
+    ListItem, Material, Pane, PaneSwitcher, RootChrome, Row, RowLeading, RowSize, TextLine, Theme,
+    default_look,
 };
 use ds::{AppearancePicker, Fraction, LevelGlyph, Muting, PickerLayout, Px, SystemPrefs};
 use ds::{Slider, SliderLook};
@@ -139,26 +140,39 @@ fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
     let mut chosen = use_signal(|| 0usize);
     let mut headphones = use_signal(|| Check::On);
     let check = move |index: usize| {
-        RowTrailing::Check(if chosen() == index {
+        Accessory::Check(if chosen() == index {
             Check::On
         } else {
             Check::Off
         })
     };
+    let item = |title: &'static str, row: Element| ListItem::row(title, title, row);
     let list = match module {
         Module::WiFi => rsx! {
-            SettingsRow { glyph: Icon::Wifi, title: "Home", detail: "Connected", trailing: check(0), onclick: move |_| chosen.set(0) }
-            SettingsRow { glyph: Icon::WifiHigh, title: "Studio 5G", detail: "Secured", trailing: check(1), onclick: move |_| chosen.set(1) }
-            SettingsRow { glyph: Icon::WifiLow, title: TextLine::from("Café Guest"), trailing: check(2), onclick: move |_| chosen.set(2) }
+            List::<&'static str> {
+                label: "Networks",
+                items: vec![
+                    item("Home", rsx! { Row { leading: RowLeading::Icon(Icon::Wifi), title: "Home", detail: TextLine::from("Connected"), accessory: check(0), size: RowSize::Settings, onclick: move |_| chosen.set(0) } }),
+                    item("Studio 5G", rsx! { Row { leading: RowLeading::Icon(Icon::WifiHigh), title: "Studio 5G", detail: TextLine::from("Secured"), accessory: check(1), size: RowSize::Settings, onclick: move |_| chosen.set(1) } }),
+                    item("Café Guest", rsx! { Row { leading: RowLeading::Icon(Icon::WifiLow), title: TextLine::from("Café Guest"), accessory: check(2), size: RowSize::Settings, onclick: move |_| chosen.set(2) } }),
+                ],
+            }
         },
         Module::Bluetooth => rsx! {
-            SettingsRow {
-                glyph: Icon::Headphones, title: "Headphones", detail: "Battery 84%",
-                trailing: RowTrailing::Toggle { value: headphones(), on_toggle: EventHandler::new(move |next| headphones.set(next)) },
-                onclick: |_| {},
+            List::<&'static str> {
+                label: "Devices",
+                items: vec![
+                    item("Headphones", rsx! {
+                        Row {
+                            leading: RowLeading::Icon(Icon::Headphones), title: "Headphones", detail: TextLine::from("Battery 84%"),
+                            accessory: Accessory::Toggle { value: headphones(), on_toggle: EventHandler::new(move |next| headphones.set(next)) },
+                            size: RowSize::Settings,
+                        }
+                    }),
+                    item("Mouse", rsx! { Row { leading: RowLeading::Icon(Icon::Mouse), title: "Mouse", detail: TextLine::from("Not connected"), accessory: Accessory::Chevron, size: RowSize::Settings } }),
+                    item("Phone", rsx! { Row { leading: RowLeading::Icon(Icon::Phone), title: "Phone", accessory: Accessory::Text("Paired".to_string()), size: RowSize::Settings } }),
+                ],
             }
-            SettingsRow { glyph: Icon::Mouse, title: "Mouse", detail: "Not connected", trailing: RowTrailing::Chevron, onclick: |_| {} }
-            SettingsRow { glyph: Icon::Phone, title: "Phone", trailing: RowTrailing::Text(TextLine::from("Paired")), onclick: |_| {} }
         },
     };
     rsx! {

@@ -11,7 +11,7 @@ pub(crate) mod rows;
 
 use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
-use ds::components::lists::section_header::{HeaderKind, SectionHeader};
+use ds::components::lists::section_header::SectionHeader;
 use ds::{Choice, Tracking};
 use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
@@ -101,13 +101,13 @@ pub fn SpaceEditor(
         aside { class: "ds-space-editor", "aria-label": "Space editor",
             Title { dots: look.dots.clone(), scheme, name, on_rename }
             div {
-                SectionHeader { kind: HeaderKind::Field, text: "Colour", value: "drag a dot".to_string() }
+                SectionHeader { title: "Colour", value: "drag a dot".to_string() }
                 Field { look: look.clone(), scheme, current, picker, onchange }
                 Stops { look: look.clone(), scheme, current, picker, onchange }
             }
             GrainRow { look: look.clone(), onchange }
             div {
-                SectionHeader { kind: HeaderKind::Field, text: "Appearance" }
+                SectionHeader { title: "Appearance" }
                 SegmentedControl::<Theme> {
                     label: "Appearance",
                     choices: Choice::pairs(Theme::ALL.iter().copied().map(|theme| (theme, theme.label().to_string())).collect::<Vec<_>>()),
@@ -122,7 +122,7 @@ pub fn SpaceEditor(
                 MotionRow { choice }
             }
             div {
-                SectionHeader { kind: HeaderKind::Field, text: "Accent inside the card" }
+                SectionHeader { title: "Accent inside the card" }
                 SegmentedControl::<CardAccent> {
                     label: "Accent",
                     choices: Choice::pairs(vec![

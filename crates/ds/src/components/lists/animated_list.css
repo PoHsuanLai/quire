@@ -1,5 +1,0 @@
-/* AnimatedList (design/04-COMPONENTS.md section 16 markup): the `ul` the rows live in. Its
-   `data-presence` only selects which entrance an entering row plays (list_row.css); the list
-   itself does not move. */
-
-.ds-list{ list-style:none; margin:0; padding:0; }

@@ -1,15 +1,10 @@
-//! The mail-app overlay cases: a menu whose filter draws its query line; a hover card's flag whose
-//! words are runs.
+//! The mail-app overlay cases: a hover card's flag whose words are runs.
 
 use crate::cases::{Case, PartsCard};
 use dioxus::prelude::*;
-use ds::{
-    Anchor, FlagTone, Flow, HoverCardPart, Icon, Menu, MenuEntry, MenuFilter, MenuKind, MenuRow,
-    Point, Px, RunTone, TextLine, TextRun,
-};
+use ds::{FlagTone, HoverCardPart, Icon, RunTone, TextLine, TextRun};
 use std::time::Duration;
 
-const NOW: Duration = Duration::ZERO;
 /// Past the 500 ms hover intent.
 const INTENT: Duration = Duration::from_millis(570);
 
@@ -26,22 +21,6 @@ fn spoof(tone: FlagTone) -> HoverCardPart {
             TextRun::new(".", RunTone::Plain),
         ]),
     )
-}
-
-/// The labels a thread can carry.
-fn labels() -> Vec<MenuEntry<u8>> {
-    ["Invoices", "Travel", "Family"]
-        .into_iter()
-        .zip(0u8..)
-        .map(|(name, value)| MenuEntry::Row(MenuRow::new(value, name)))
-        .collect()
-}
-
-/// A label picker whose filter is a drawn field.
-fn field() -> MenuFilter {
-    MenuFilter::Field {
-        placeholder: "Filter labels…".to_string(),
-    }
 }
 
 pub const MAILO5_CASES: &[Case] = &[
@@ -62,17 +41,5 @@ pub const MAILO5_CASES: &[Case] = &[
         state: "part-flag-text-plain",
         make: || rsx! { PartsCard { parts: vec![HoverCardPart::flag(FlagTone::Danger, Icon::OctagonAlert, "Not the address Dana usually writes from.")] } },
         wait: INTENT,
-    },
-    Case {
-        component: "menu",
-        state: "filter-field",
-        make: || rsx! { Menu { kind: MenuKind::Dropdown, anchor: Anchor::Point(Point { x: Px(20.0), y: Px(20.0) }), entries: labels(), filter: field(), onpick: |_: u8| {}, onclose: |_| {} } },
-        wait: NOW,
-    },
-    Case {
-        component: "menu",
-        state: "filter-field-inline",
-        make: || rsx! { div { Menu { kind: MenuKind::Rich, anchor: Anchor::Point(Point::default()), entries: labels(), filter: field(), onpick: |_: u8| {}, onclose: |_| {}, flow: Flow::Inline } } },
-        wait: NOW,
     },
 ];

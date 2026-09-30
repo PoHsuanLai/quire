@@ -3,10 +3,7 @@
 //! row reaches it, and Escape closes it. Without the mode the same root measures nothing.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Ds, Material, Menu, MenuEntry, MenuKind, MenuRow, Point, Px, RootExtent,
-    ShortcutKey,
-};
+use ds::{Anchor, Appearance, Ds, Material, Menu, MenuItem, Point, Px, RootExtent, ShortcutKey};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -31,12 +28,12 @@ fn Popup(extent: RootExtent) -> Element {
             Ds { appearance: Appearance::default(), material: Material::Popover, extent,
                 if open() {
                     Menu::<usize> {
-                        kind: MenuKind::Dropdown,
+                        placement: ds::MenuPlacement::Bar,
                         anchor: Anchor::Point(Point { x: Px(200.0), y: Px(150.0) }),
-                        entries: ["Open", "Quit"]
+                        items: ["Open", "Quit"]
                             .into_iter()
                             .enumerate()
-                            .map(|(value, name)| MenuEntry::Row(MenuRow::new(value, name)))
+                            .map(|(value, name)| MenuItem::new(value, name))
                             .collect::<Vec<_>>(),
                         onpick: move |value: usize| log.set(format!("pick:{value}")),
                         onclose: move |()| open.set(false),
@@ -100,7 +97,7 @@ fn without_the_mode_the_same_root_is_not_the_card() {
 fn a_press_on_a_row_reaches_it_and_escape_closes() {
     let mut harness = laid_out(Fitted);
     let second = harness
-        .centre(".ds-menu-item:nth-child(2) .ds-menu-title")
+        .centre(".ds-menu-item:nth-child(2) .ds-menu-label")
         .expect("the second row");
     harness.pointer_move(second);
     harness.click(second);

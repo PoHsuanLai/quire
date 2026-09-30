@@ -10,8 +10,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    MenuTrail, PaletteGroup, PaletteGroups, PaletteHandle, use_palette_handle,
+    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, PaletteGroup, PaletteGroups,
+    PaletteHandle, use_palette_handle,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -31,16 +31,8 @@ fn virtual_harness(app: fn() -> Element) -> Harness {
     Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
-fn item(value: u8, title: String) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title,
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: String) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title)
 }
 
 /// The "Applications" group's rows: never grown or shrunk by the palette itself — the test steps
@@ -129,7 +121,7 @@ fn set_unmarked(harness: &mut Harness, rows: Rows) {
 fn opened(harness: &mut Harness) {
     harness.advance(ms(50));
     assert_eq!(
-        harness.count("#card .ds-menu-item"),
+        harness.count("#card .ds-row"),
         3,
         "collapsed to start (2 apps, 1 setting)"
     );
@@ -142,7 +134,7 @@ fn a_caller_marked_show_more_rises_the_added_rows_like_the_palettes_own_enter() 
     opened(&mut harness);
 
     mark_and_set(&mut harness, "Applications", Rows::Grown);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     assert_eq!(
         harness.count("[*|data-row-motion=in]"),
         4,
@@ -158,13 +150,15 @@ fn a_caller_marked_show_less_heals_by_the_removed_rows_height_like_the_palettes_
     // Grown first, marked, so the added rows' span gets measured (what Show Less heals by):
     // the same setup the palette's own Enter needs before it can play a heal.
     mark_and_set(&mut harness, "Applications", Rows::Grown);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     settle(&mut harness);
 
     mark_and_set(&mut harness, "Applications", Rows::Collapsed);
-    assert_eq!(harness.count("#card .ds-menu-item"), 3);
+    assert_eq!(harness.count("#card .ds-row"), 3);
     assert_eq!(harness.count("[*|data-row-motion=heal-from]"), 1);
-    let style = harness.attr("#card .ds-menu", "style").unwrap_or_default();
+    let style = harness
+        .attr("#card .ds-palette-list", "style")
+        .unwrap_or_default();
     let dy: f32 = style
         .strip_prefix("--dy:")
         .and_then(|rest| rest.strip_suffix("px"))
@@ -180,7 +174,7 @@ fn an_unmarked_caller_driven_change_plays_nothing() {
     opened(&mut harness);
 
     set_unmarked(&mut harness, Rows::Grown);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     assert_eq!(motion_count(&harness), 0, "no mark, no motion");
     settle(&mut harness);
 }
@@ -192,7 +186,7 @@ fn a_mark_for_the_wrong_group_plays_nothing() {
 
     // "Settings" never resizes; the mark names a group other than the one that actually grew.
     mark_and_set(&mut harness, "Settings", Rows::Grown);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     assert_eq!(
         motion_count(&harness),
         0,

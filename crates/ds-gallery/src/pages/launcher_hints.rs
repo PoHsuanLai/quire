@@ -5,26 +5,26 @@
 use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{
-    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Material, MenuEntry,
-    MenuRow, MenuTile, PaletteGroup, PaletteGroups, PaneAction, PaneContent, PreviewPane, Radius,
-    RowChord, RowShape, Shortcut, ShortcutKey, Surface,
+    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Material,
+    PaletteGroup, PaletteGroups, PaletteRow, PaneAction, PaneContent, PreviewPane, Radius,
+    RowChord, RowLeading, RowShape, Shortcut, ShortcutKey, Surface,
 };
 
 fn reveal() -> Shortcut {
     Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
 }
 
-fn file(value: u8, title: &str, modified: &str) -> MenuEntry<u8> {
-    MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::File)),
+fn file(value: u8, title: &str, modified: &str) -> PaletteRow<u8> {
+    PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_owned(),
             modified: modified.to_owned(),
         },
         chord: RowChord::on_selected(reveal()),
-        ..MenuRow::new(value, title)
-    })
+        ..PaletteRow::new(value, title)
+    }
 }
 
 fn groups() -> PaletteGroups<u8> {
@@ -79,7 +79,7 @@ pub fn SpotlightHints() -> Element {
         }
     };
     rsx! {
-        Section { title: "Spotlight hints", note: "A row's action chord (MenuRow.chord, RowChord::on_selected) shows only on the selected row, after its time, as plain text in --ink-soft; the other rows show their time alone. The preview pane's actions end in a plain Chord, not key caps.",
+        Section { title: "Spotlight hints", note: "A row's action chord (PaletteRow.chord, RowChord::on_selected) shows only on the selected row, after its time, as plain text in --ink-soft; the other rows show their time alone. The preview pane's actions end in a plain Chord, not key caps.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Selected row shows ⌘R; pane actions as plain chords", code: "chord: RowChord::on_selected(⌘R); PaneAction { label, shortcut }".to_string(),
                     div { class: "g-launcher-wide",

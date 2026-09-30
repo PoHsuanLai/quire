@@ -18,10 +18,7 @@
 //! panel), where it draws no scrim and its card fills its container. A
 //! caller may keep it mounted and say whether it is `shown` (`palette_shown`).
 
-use crate::components::fields::text_field::TextField;
-use crate::components::fields::text_field_model::FieldBezel;
-use crate::components::fields::text_field_model::FieldKind;
-use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
+use crate::components::menus::palette::palette_body::{Life, StopEvents, draw_groups};
 use crate::components::menus::palette::palette_claim::{Claim, FieldKey};
 use crate::components::menus::palette::palette_group::PaletteGroups;
 use crate::components::menus::palette::palette_lines::{PaletteKey, palette_key};
@@ -29,9 +26,7 @@ use crate::components::menus::palette::palette_motion::{Book, use_action_book, u
 use crate::components::menus::palette::palette_reveal::{Reveal, use_reveal};
 use crate::components::menus::palette::palette_rows::{SelectedLine, use_revision, use_row_rects};
 use crate::components::menus::palette::palette_select::{PaletteSelection, use_palette_selection};
-use crate::components::menus::palette::palette_shown::{
-    Change, Retain, Seen, Showing, use_showing,
-};
+use crate::components::menus::palette::palette_shown::{Change, Seen, Showing, use_showing};
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
@@ -39,7 +34,9 @@ use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
 
+use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
+use crate::components::fields::text_field_model::{FieldBezel, FieldKind};
 use crate::components::menus::palette::palette_host::{card_corner, hosted};
 use crate::components::menus::palette::{
     palette_host::CommandPaletteHost, palette_motion::PaletteHandle,
@@ -56,6 +53,8 @@ use ds_core::geometry::units::{Px, Rect};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
 use ds_style::tokens::{layer::ZLayer, shape::Corner};
+use std::cell::Cell;
+use std::rc::Rc;
 
 /// The launcher's preview pane width (design/13 section 13.3.9, proposed): what `aside_width`
 /// is when not given.
@@ -67,7 +66,7 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 /// mounts.
 ///
 /// `groups` are [`PaletteGroups`]: a `Vec<PaletteGroup<T>>` (rows or an emoji grid, each with an
-/// optional header action), or the older `Vec<(String, Vec<MenuEntry<T>>)>`. The cursor rests
+/// optional header action). The cursor rests
 /// on *stops*: each row, each emoji cell, and each header action, numbered in order with a
 /// group's action after its last row or cell (`palette_stops`).
 ///
@@ -93,8 +92,8 @@ pub const ASIDE_WIDTH: Px = Px(360.0);
 ///
 /// `shown` keeps the palette mounted while hidden: `Some(Shown::Hidden)` lays out nothing and
 /// leaves the layer stack, and each change to `Some(Shown::Visible)` replays the entrance,
-/// empties the query (through `oninput`) and goes back to the first stop unless `retain` is
-/// `Retain::Query`, and gives the field the keyboard. `None` is always shown.
+/// empties the query (through `oninput`), goes back to the first stop and gives the field the
+/// keyboard. `None` is always shown.
 ///
 /// `initial_caret` is where the field's caret goes each time the palette gives it the keyboard
 /// (as it mounts, as it is shown again, and when `focus` asks): after the query by default, as
@@ -138,7 +137,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] onkey: Option<EventHandler<KeyboardEvent>>,
     #[props(default)] claim: Option<Callback<FieldKey, Claim>>,
     #[props(default)] shown: Option<Shown>,
-    #[props(default)] retain: Retain,
     #[props(default)] corner: Option<Corner>,
     #[props(default)] aside: Option<Element>,
     #[props(default = ASIDE_WIDTH)] aside_width: Px,
@@ -146,6 +144,11 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::Semitransient));
+    let alive = use_hook(|| Rc::new(Cell::new(Life::Up)));
+    use_drop({
+        let alive = alive.clone();
+        move || alive.set(Life::Gone)
+    });
     let showing = use_showing(shown, Anim::PeekIn);
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);
@@ -186,7 +189,6 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
             selection: selection.clone(),
             rects,
             reveal: in_view,
-            retain,
             oninput,
             request,
         },
@@ -244,13 +246,14 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     };
     let body = if count == 0 {
         rsx! {
-            div { class: "ds-menu-empty", "{empty}" }
+            div { class: "ds-palette-empty", "{empty}" }
         }
     } else {
         draw_groups(
             &shown_groups,
             current,
             StopEvents {
+                alive: alive.clone(),
                 pick: EventHandler::new(run),
                 point: EventHandler::new({
                     let live = live.clone();
@@ -311,9 +314,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 focus: field,
                 handle: Some(handle), kind: FieldKind::Search, bezel: FieldBezel::Plain }
             div {
-                class: "ds-menu",
-                "data-kind": "rich",
-                "data-embed": "palette",
+                class: "ds-palette-list",
                 role: "listbox",
                 onmousedown: move |event| event.prevent_default(),
                 style: motion.heal_style(),
@@ -376,14 +377,12 @@ struct Turn {
     selection: PaletteSelection,
     rects: crate::components::menus::palette::palette_rows::RowRects,
     reveal: Reveal,
-    retain: Retain,
     oninput: EventHandler<String>,
     request: FocusRequest,
 }
 
 /// After a render that showed or hid the palette: shown again, it rejoins the layer stack,
-/// replays its entrance, reports its row afresh, starts over unless it retains the query, and
-/// takes the keyboard; hidden, it leaves the stack and drops a row read still waiting.
+/// replays its entrance, reports its row afresh, starts over and takes the keyboard; hidden, it leaves the stack and drops a row read still waiting.
 fn follow_showing(showing: Showing, turn: Turn) {
     match showing.change {
         Change::Stay => {}
@@ -397,10 +396,8 @@ fn follow_showing(showing: Showing, turn: Turn) {
             showing.replay();
             turn.rects.forget();
             turn.reveal.forget();
-            if turn.retain == Retain::Nothing {
-                turn.selection.reset();
-                turn.oninput.call(String::new());
-            }
+            turn.selection.reset();
+            turn.oninput.call(String::new());
             turn.request.request();
         }),
     }

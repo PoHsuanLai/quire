@@ -1,19 +1,17 @@
 //! Where the command palette's cursor can rest, and how the keys move it:
 //! pure, beside `command_palette`.
 //!
-//! A *stop* is a row (an item or a submenu parent, as a menu's choice), an emoji cell, or a
-//! group's header action ("Show More"). Stops are numbered in drawing order, each group's
+//! A *stop* is a row, an emoji cell, or a group's header action ("Show More"). Stops are numbered in drawing order, each group's
 //! action after its last row or cell: the palette's `selected`, `on_select` and
 //! `on_select_rect` name a stop by that number, which for a palette of plain rows is the
-//! choice number it always was. Up and Down walk the stops clamped, skipping disabled rows; in
+//! row's number. Up and Down walk the stops clamped, skipping disabled rows; in
 //! a grid they move a row in two dimensions and leave it past its top and bottom rows; Left and
 //! Right move only inside a grid (elsewhere they are the field's).
 
 use crate::components::lists::emoji_grid::grid::EmojiCells;
 use crate::components::lists::emoji_grid::nav::{GridEdge, GridMove, GridStep, grid_step};
-use crate::components::menus::menu_lines::{Act, Choice, Line, choices, choices_len};
 use crate::components::menus::palette::palette_group::{GroupEntries, PaletteGroup};
-use crate::components::menus::palette::palette_lines::marked;
+use crate::components::menus::palette::palette_lines::{MarkedRow, marked};
 use crate::stack::roving::{Step, Wrap, moved_live};
 use dioxus::prelude::EventHandler;
 use ds_core::vocab::Availability;
@@ -31,7 +29,7 @@ pub(crate) struct ShownGroup<'a, T: 'static> {
 /// A drawn group's body.
 pub(crate) enum Body<'a, T> {
     /// Its rows, marked where the query matches.
-    Rows(Vec<Line<'a, T>>),
+    Rows(Vec<MarkedRow<'a, T>>),
     /// Its grid.
     Grid(&'a EmojiCells<T>),
 }
@@ -57,10 +55,10 @@ pub(crate) fn shown_groups<'a, T: Clone>(
         .collect()
 }
 
-/// How many stops a drawn group holds: its choices or cells, and its action.
+/// How many stops a drawn group holds: its rows or cells, and its action.
 fn stop_count<T: Clone>(shown: &ShownGroup<'_, T>) -> usize {
     let body = match &shown.body {
-        Body::Rows(lines) => choices_len(lines),
+        Body::Rows(rows) => rows.len(),
         Body::Grid(grid) => grid.cells.len(),
     };
     body + usize::from(shown.group.action.is_some())
@@ -69,8 +67,8 @@ fn stop_count<T: Clone>(shown: &ShownGroup<'_, T>) -> usize {
 /// Where the cursor can rest.
 #[derive(Clone, PartialEq)]
 pub(crate) enum Stop<T> {
-    /// A row: what picking it does, and whether it can.
-    Row(Choice<T>),
+    /// A row: what picking it yields, and whether it can be picked.
+    Row(T, Availability),
     /// An emoji cell, yielding this value.
     Cell(T),
     /// A group's header action.
@@ -81,7 +79,7 @@ impl<T> Stop<T> {
     /// Whether the cursor may rest here: a disabled row is skipped.
     pub(crate) fn availability(&self) -> Availability {
         match self {
-            Stop::Row(choice) => choice.availability,
+            Stop::Row(_, availability) => *availability,
             Stop::Cell(_) | Stop::Action(_) => Availability::Enabled,
         }
     }
@@ -93,7 +91,10 @@ pub(crate) fn stops<T: Clone>(shown: &[ShownGroup<'_, T>]) -> Vec<Stop<T>> {
         .iter()
         .flat_map(|group| {
             let body: Vec<Stop<T>> = match &group.body {
-                Body::Rows(lines) => choices(lines).into_iter().map(Stop::Row).collect(),
+                Body::Rows(rows) => rows
+                    .iter()
+                    .map(|marked| Stop::Row(marked.row.value.clone(), marked.row.availability))
+                    .collect(),
                 Body::Grid(grid) => grid
                     .cells
                     .iter()
@@ -190,21 +191,17 @@ pub(crate) enum Run<T> {
     Pick(T),
     /// Run a header action; the palette stays.
     Action(EventHandler<()>),
-    /// Nothing: a disabled row, a submenu parent, or no stop.
+    /// Nothing: a disabled row, or no stop.
     Nothing,
 }
 
 /// What Enter (or a click) does on `stop`.
 pub(crate) fn run_of<T: Clone>(stop: Option<&Stop<T>>) -> Run<T> {
     match stop {
-        Some(Stop::Row(Choice {
-            act: Act::Pick(value),
-            availability: Availability::Enabled,
-            ..
-        })) => Run::Pick(value.clone()),
+        Some(Stop::Row(value, Availability::Enabled)) => Run::Pick(value.clone()),
         Some(Stop::Cell(value)) => Run::Pick(value.clone()),
         Some(Stop::Action(run)) => Run::Action(*run),
-        Some(Stop::Row(_)) | None => Run::Nothing,
+        Some(Stop::Row(..)) | None => Run::Nothing,
     }
 }
 

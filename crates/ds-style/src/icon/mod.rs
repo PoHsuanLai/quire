@@ -183,6 +183,8 @@ pub enum Icon {
     ChevronUp,
     /// Lucide `chevron-down`.
     ChevronDown,
+    /// Lucide `chevrons-up-down`: a pop-up button's pair.
+    ChevronsUpDown,
     /// Lucide `folder`.
     Folder,
     /// Lucide `file`.

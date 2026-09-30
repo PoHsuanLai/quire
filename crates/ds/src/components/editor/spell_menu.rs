@@ -5,8 +5,8 @@
 //! the app as one [`SpellReplace`], which it applies as one undoable edit.
 
 use crate::components::editor::spell::{SpellCtx, draw, touch};
-use crate::components::menus::menu_entry::{MenuEntry, MenuRow};
-use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
+use crate::components::menus::item::item::MenuItem;
+use crate::components::menus::menu::{menu::Menu, placement::MenuPlacement};
 use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
 use crate::spell::marks::{Misspelt, SpellReplace};
@@ -121,14 +121,14 @@ fn open(
 }
 
 /// The rows: the suggestions (or "No Guesses Found"), a rule, Ignore and Learn.
-fn entries(opened: &Opened, replaces: Replaces) -> Vec<MenuEntry<SpellPick>> {
-    let guesses: Vec<MenuEntry<SpellPick>> = match (replaces, opened.suggestions.is_empty()) {
+fn entries(opened: &Opened, replaces: Replaces) -> Vec<MenuItem<SpellPick>> {
+    let guesses: Vec<MenuItem<SpellPick>> = match (replaces, opened.suggestions.is_empty()) {
         (Replaces::Yes, false) => opened
             .suggestions
             .iter()
-            .map(|word| MenuRow::new(SpellPick::Replace(word.clone()), word.clone()).into())
+            .map(|word| MenuItem::new(SpellPick::Replace(word.clone()), word.clone()))
             .collect(),
-        (Replaces::Yes, true) | (Replaces::No, _) => vec![MenuEntry::Info {
+        (Replaces::Yes, true) | (Replaces::No, _) => vec![MenuItem::Info {
             title: "No Guesses Found".to_owned(),
             detail: None,
         }],
@@ -136,9 +136,9 @@ fn entries(opened: &Opened, replaces: Replaces) -> Vec<MenuEntry<SpellPick>> {
     guesses
         .into_iter()
         .chain([
-            MenuEntry::Separator,
-            MenuRow::new(SpellPick::Ignore, "Ignore Spelling").into(),
-            MenuRow::new(SpellPick::Learn, "Learn Spelling").into(),
+            MenuItem::Separator,
+            MenuItem::new(SpellPick::Ignore, "Ignore Spelling"),
+            MenuItem::new(SpellPick::Learn, "Learn Spelling"),
         ])
         .collect()
 }
@@ -253,9 +253,9 @@ fn spell_menu(link: &SpellLink, mut menu: Signal<Option<Opened>>, opened: Opened
     let mark = opened.mark.clone();
     rsx! {
         Menu::<SpellPick> {
-            kind: MenuKind::Context,
+            placement: MenuPlacement::Context,
             anchor: Anchor::Point(opened.at),
-            entries,
+            items: entries,
             onpick: move |pick| picked(&picking.ctx(), &mark, pick, picking.on_replace),
             onclose: move |()| {
                 menu.set(None);
@@ -307,7 +307,7 @@ impl PartialEq for SpellLink {
 #[cfg(test)]
 mod tests {
     use super::{Opened, Replaces, SpellPick, entries};
-    use crate::components::menus::menu_entry::MenuEntry;
+    use crate::components::menus::item::item::MenuItem;
     use crate::host::position::EditNode;
     use crate::spell::marks::Misspelt;
     use crate::spell::words::WordSpan;
@@ -328,12 +328,12 @@ mod tests {
         }
     }
 
-    fn values(rows: &[MenuEntry<SpellPick>]) -> Vec<String> {
+    fn values(rows: &[MenuItem<SpellPick>]) -> Vec<String> {
         rows.iter()
             .map(|row| match row {
-                MenuEntry::Row(row) => format!("{:?}", row.value),
-                MenuEntry::Info { title, .. } => title.clone(),
-                MenuEntry::Separator => "---".to_owned(),
+                MenuItem::Item { value, .. } => format!("{value:?}"),
+                MenuItem::Info { title, .. } => title.clone(),
+                MenuItem::Separator => "---".to_owned(),
                 other => format!("{other:?}"),
             })
             .collect()

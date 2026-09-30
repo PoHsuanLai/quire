@@ -7,7 +7,7 @@ use crate::style;
 use crate::toolbar::Toolbar;
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{Ds, Ground, HeaderKind, RootChrome, SectionHeader};
+use ds::{Ds, Ground, RootChrome, SectionHeader};
 
 /// The gallery, starting from the axes this thread was handed (`crate::axes::start_with`).
 #[allow(non_snake_case)] // A component: launch and snapshot name it like a type.
@@ -49,7 +49,7 @@ fn PageBody(page: Page) -> Element {
     #[allow(non_snake_case)] // Rendered as a component.
     let Body = entry.body;
     rsx! {
-        SectionHeader { kind: HeaderKind::Frame, text: entry.title }
+        SectionHeader { title: entry.title }
         p { class: "g-lede", "{entry.lede}" }
         Body {}
     }

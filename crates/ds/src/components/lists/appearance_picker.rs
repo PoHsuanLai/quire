@@ -5,7 +5,7 @@
 
 use crate::components::controls::choice::Choice;
 use crate::components::controls::segmented::{SegmentedControl, Tracking};
-use crate::components::lists::section_header::{HeaderKind, SectionHeader};
+use crate::components::lists::section_header::SectionHeader;
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
 use ds_core::word::Word;
@@ -63,7 +63,7 @@ pub fn AppearancePicker(
     rsx! {
         div { class: "ds-appearance", role: "group", "aria-label": "Appearance", "data-layout": layout.slug(),
             div { class: "ds-appearance-row",
-                SectionHeader { kind: HeaderKind::Field, text: "Theme", value: theme_hint(value.theme, system) }
+                SectionHeader { title: "Theme", value: theme_hint(value.theme, system) }
                 SegmentedControl::<Theme> {
                     label: "Theme",
                     choices: themes,
@@ -72,7 +72,7 @@ pub fn AppearancePicker(
                 }
             }
             div { class: "ds-appearance-row",
-                SectionHeader { kind: HeaderKind::Field, text: "Accent" }
+                SectionHeader { title: "Accent" }
                 div { class: "ds-appearance-swatches", role: "group", "aria-label": "Accent",
                     for accent in Accent::ALL.iter().copied() {
                         button {

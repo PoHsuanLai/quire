@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 22] = [
+pub const REGISTRY: [Entry; 23] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -53,14 +53,21 @@ pub const REGISTRY: [Entry; 22] = [
     Entry {
         page: Page::Lists,
         title: "Lists",
-        lede: "A live AnimatedList: add rows, remove them with each exit and watch the rows below heal, then undo. A LeavingList of notification groups that clear, fold and heal by measured heights. Search hits with a keyboard-shown strip, sidebar items, tiles, the hover strip and the appearance picker.",
+        lede: "A live List: add rows, remove them with each exit and watch the rows below heal, then undo. Row with every accessory, leading element, height and state; section headers and disclosures; a source list at each sidebar size with an outline and drop places; a List of notification groups that clear, fold and heal by measured heights; search hits with a keyboard-shown strip, tiles, the hover strip and the appearance picker.",
         height: 3950,
         body: pages::lists::ListsPage,
     },
     Entry {
+        page: Page::Menus,
+        title: "Menus",
+        lede: "Open each menu placement, the submenus and the status lines; every item state with its highlight posed; the pop-up button at each size. A pick blinks its item twice.",
+        height: 3400,
+        body: pages::menus::MenusPage,
+    },
+    Entry {
         page: Page::Overlays,
         title: "Overlays",
-        lede: "Open each menu kind, the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
+        lede: "Open the palette, popovers, peek and sheet, the toast with its pull tab; hover the targets for cards and tooltips.",
         height: 10800,
         body: pages::overlays::OverlaysPage,
     },

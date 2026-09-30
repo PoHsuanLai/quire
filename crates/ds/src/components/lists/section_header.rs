@@ -1,64 +1,57 @@
-//! SectionHeader: a small-caps label that names a group (design/04-COMPONENTS.md section 13).
+//! SectionHeader: the row that names a group of rows (`NSTableView` group row, a source list's
+//! header; design/30 section 2.6). One look; collapsible in a source list.
 
+use crate::components::controls::disclosure::indicator;
+use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::vocab::Selection;
-use ds_core::word::Word;
+use ds_core::vocab::{Selection, Shown};
 
-/// Where the header sits.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
-pub enum HeaderKind {
-    /// Sidebar groups on the frame, with a trailing rule and an optional action.
-    Frame,
-    /// List groups on the card, with a count and a trailing rule.
-    Group,
-    /// A label above a control, with an optional value.
-    Field,
-    /// A group title inside a menu or palette.
-    Menu,
-}
-
-impl HeaderKind {
-    /// Whether a trailing rule follows the text: Frame and Group draw one.
-    fn rule(self) -> Rule {
-        match self {
-            HeaderKind::Frame | HeaderKind::Group => Rule::Drawn,
-            HeaderKind::Field | HeaderKind::Menu => Rule::None,
-        }
-    }
-}
-
-/// Whether a header draws its trailing rule.
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum Rule {
-    Drawn,
-    None,
-}
-
-/// A group's name. The visual order is text, value, rule, action (S puts the rule between the
-/// text and the Frame's action button, `S:120-125`). `action_selection: Selected` draws the
+/// A group's name. The order is title, value, action. `collapse` makes the header a source
+/// list's: a triangle before the title and a press anywhere on it asks for the flipped state
+/// through its handler (the caller's `Shown` decides). `action_selection: Selected` draws the
 /// action as a keyboard selection (`data-selected`): a command palette's cursor resting on a
-/// group's "Show More". `on_action_mounted` hears the action's element as it mounts:
-/// the palette keeps it in view when its cursor rests there.
+/// group's "Show More". `on_action_mounted` hears the action's element as it mounts: the palette
+/// keeps it in view when its cursor rests there.
 #[component]
 pub fn SectionHeader(
-    kind: HeaderKind,
-    text: String,
+    title: String,
     #[props(default)] value: Option<String>,
     #[props(default)] action: Option<(String, EventHandler<()>)>,
     #[props(default)] action_selection: Selection,
     #[props(default)] on_action_mounted: Option<EventHandler<MountedEvent>>,
+    #[props(default)] collapse: Option<(Shown, EventHandler<Shown>)>,
+    #[props(default)] common: Common,
 ) -> Element {
     let selected = (action_selection == Selection::Selected).then_some("true");
-    // The rule is a real span, not `::after`: pseudo-elements are unverified in Blitz (O-22's
-    // fallback, `ds-section-header-rule`).
+    let data = common.data_attributes();
+    let expanded = collapse.as_ref().map(|(shown, _)| shown.aria());
+    let head = match collapse {
+        Some((shown, on_toggle)) => rsx! {
+            button {
+                r#type: "button",
+                class: "ds-section-header-toggle",
+                "aria-expanded": shown.aria(),
+                onclick: move |_| on_toggle.call(shown.flipped()),
+                {indicator(shown)}
+                span { class: "ds-section-header-title", "{title}" }
+            }
+        },
+        None => rsx! {
+            span { class: "ds-section-header-title", "{title}" }
+        },
+    };
     rsx! {
-        div { class: "ds-section-header", "data-kind": kind.slug(),
-            span { class: "ds-section-header-text", "{text}" }
+        div {
+            class: common.class("ds-section-header"),
+            id: common.id.clone(),
+            role: "presentation",
+            "aria-label": common.aria_label.clone(),
+            "data-collapsible": expanded,
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            {head}
             if let Some(value) = value {
                 span { class: "ds-section-header-value", "{value}" }
-            }
-            if kind.rule() == Rule::Drawn {
-                span { class: "ds-section-header-rule" }
             }
             if let Some((label, onclick)) = action {
                 button {

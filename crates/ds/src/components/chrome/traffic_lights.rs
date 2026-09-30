@@ -7,8 +7,8 @@
 //! a light never starts the titlebar's move, and a double-click on one never zooms.
 
 use crate::components::chrome::light_mark::{LightMark, Mark};
-use crate::components::menus::menu_entry::{MenuEntry, MenuTile, MenuTrail};
-use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
+use crate::components::menus::item::item::{MenuImage, MenuItem};
+use crate::components::menus::menu::{menu::Menu, placement::MenuPlacement};
 use crate::host::measure::{Anchor, MountedRef};
 use crate::window::hold::{Click, Hold, Opens, Waiting};
 use crate::window::{
@@ -124,9 +124,9 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
         }
         if let (TileMenu::Open(support), Some(anchor)) = (menu(), anchor()) {
             Menu::<WindowTile> {
-                kind: MenuKind::Slim,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Mounted(anchor),
-                entries: entries(support),
+                items: entries(support),
                 onpick: move |tile| with(pick.as_ref(), |host| place(host, tile)),
                 onclose: move |()| menu.set(TileMenu::Closed),
             }
@@ -216,24 +216,23 @@ fn cancel(mut hold: CopyValue<Hold>) {
 
 /// The menu's rows: a header, then each placement with its glyph, unavailable where the host
 /// said it cannot.
-fn entries(support: [Support; 4]) -> Vec<MenuEntry<WindowTile>> {
+fn entries(support: [Support; 4]) -> Vec<MenuItem<WindowTile>> {
     let rows = WindowTile::ALL
         .iter()
         .copied()
         .zip(support)
-        .map(|(tile, support)| MenuEntry::Item {
+        .map(|(tile, support)| MenuItem::Item {
             value: tile,
             title: tile.label().to_owned(),
-            detail: None,
-            tile: Some(MenuTile::Icon(glyph(tile))),
-            trail: MenuTrail::None,
+            image: Some(MenuImage::Icon(glyph(tile))),
+            key: None,
             check: None,
             availability: match support {
                 Support::Yes => Availability::Enabled,
                 Support::No => Availability::Disabled,
             },
         });
-    std::iter::once(MenuEntry::Header("Move & Resize".to_owned()))
+    std::iter::once(MenuItem::Header("Move & Resize".to_owned()))
         .chain(rows)
         .collect()
 }

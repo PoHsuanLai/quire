@@ -3,16 +3,12 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 59] = [
+pub(crate) const SHEETS: [(&str, &str); 57] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
     ),
     ("alert", include_str!("../components/overlays/alert.css")),
-    (
-        "animated_list",
-        include_str!("../components/lists/animated_list.css"),
-    ),
     (
         "appearance_picker",
         include_str!("../components/lists/appearance_picker.css"),
@@ -32,6 +28,10 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
     (
         "command_pill",
         include_str!("../components/app/command_pill.css"),
+    ),
+    (
+        "disclosure",
+        include_str!("../components/controls/disclosure.css"),
     ),
     (
         "drag_ghost",
@@ -79,15 +79,11 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         include_str!("../components/controls/level_indicator.css"),
     ),
     ("link_pill", include_str!("../components/app/link_pill.css")),
+    ("list", include_str!("../components/lists/list/list.css")),
+    ("menu", include_str!("../components/menus/menu/menu.css")),
     (
-        "leaving_list",
-        include_str!("../components/lists/leaving_list.css"),
-    ),
-    ("list_row", include_str!("../components/lists/list_row.css")),
-    ("menu", include_str!("../components/menus/menu.css")),
-    (
-        "menu_entry",
-        include_str!("../components/menus/menu_entry.css"),
+        "menu_item",
+        include_str!("../components/menus/item/item.css"),
     ),
     (
         "pane_switcher",
@@ -107,6 +103,10 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         include_str!("../components/overlays/popover.css"),
     ),
     (
+        "pop_up_button",
+        include_str!("../components/menus/pop_up_button.css"),
+    ),
+    (
         "preview_pane",
         include_str!("../components/lists/preview/pane.css"),
     ),
@@ -114,6 +114,7 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         "provider_mark",
         include_str!("../components/content/provider_mark.css"),
     ),
+    ("row", include_str!("../components/lists/row/row.css")),
     ("scrim", include_str!("../components/overlays/scrim.css")),
     (
         "section_header",
@@ -128,18 +129,10 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         include_str!("../components/fields/selection_bubble.css"),
     ),
     ("send_pill", include_str!("../components/app/send_pill.css")),
-    (
-        "settings_row",
-        include_str!("../components/lists/settings_row.css"),
-    ),
     ("sheet", include_str!("../components/overlays/sheet.css")),
     (
         "side_panel",
         include_str!("../components/overlays/side_panel.css"),
-    ),
-    (
-        "sidebar_item",
-        include_str!("../components/app/sidebar_item.css"),
     ),
     (
         "skeleton",
@@ -166,13 +159,16 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         "text_runs",
         include_str!("../components/content/text_runs.css"),
     ),
+    (
+        "thread_row",
+        include_str!("../components/app/thread_row.css"),
+    ),
     ("toast", include_str!("../components/overlays/toast.css")),
     ("toggle", include_str!("../components/controls/toggle.css")),
     (
         "tooltip",
         include_str!("../components/overlays/tooltip.css"),
     ),
-    ("tree_item", include_str!("../components/app/tree_item.css")),
     (
         "voice_orb",
         include_str!("../components/content/voice_orb/style.css"),
@@ -180,12 +176,6 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
     (
         "window_frame",
         include_str!("../components/chrome/window_frame.css"),
-    ),
-    // Last: the drop states SidebarItem and TreeItem share must win over either
-    // item's hover and current rules, which have the same specificity.
-    (
-        "drop_place",
-        include_str!("../components/app/drop_place.css"),
     ),
     ("detail_morph", ds_motion::detail::morph::CSS),
 ];

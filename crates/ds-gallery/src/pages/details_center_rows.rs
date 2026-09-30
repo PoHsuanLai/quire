@@ -1,86 +1,104 @@
-//! Details, the control center's detail-pane rows (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8):
-//! a network joined, a device connected, an output switched, each through its `RowPhase`.
+//! Details, the control center's detail-pane rows (design/26-DETAILS.md 5.2.2, 5.2.3, 5.2.8; design/30
+//! section 2.9): a network joined, a device connected, an output switched. A row working on its
+//! item is `Availability::Busy`: it takes no press and shows the small spinner where its accessory
+//! is; when the work ends it is enabled again with no flourish and shows its accessory.
 
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
-use ds::detail::EventStamp;
-use ds::{Check, Fraction, Icon, RowDisc, RowPhase, RowTrailing, SettingsRow, TextLine};
+use ds::{
+    Accessory, Availability, BatteryState, Check, Fraction, Icon, List, ListItem, Row, RowLeading,
+    RowState, Selection, TextLine,
+};
 
-/// A row's operation over a run of stamps: each press mints the next.
+/// Where an operation on a row's item stands.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-struct Run {
-    phase: RowPhase,
-    stamp: u32,
+enum Run {
+    Rest,
+    Working,
+    Done,
+    Failed,
 }
 
 impl Run {
-    fn start() -> Run {
-        Run {
-            phase: RowPhase::Rest,
-            stamp: 0,
-        }
-    }
-
-    fn pending(self) -> Run {
-        let stamp = self.stamp + 1;
-        Run {
-            phase: RowPhase::Pending(EventStamp(stamp)),
-            stamp,
-        }
-    }
-
-    fn succeeded(self) -> Run {
-        Run {
-            phase: RowPhase::Succeeded(EventStamp(self.stamp)),
-            ..self
-        }
-    }
-
-    fn failed(self) -> Run {
-        let stamp = self.stamp + 1;
-        Run {
-            phase: RowPhase::Failed(EventStamp(stamp)),
-            stamp,
+    /// The row's availability: working is busy.
+    fn availability(self) -> Availability {
+        match self {
+            Run::Working => Availability::Busy,
+            Run::Rest | Run::Done | Run::Failed => Availability::Enabled,
         }
     }
 
     /// Whether the item ended in use.
     fn in_use(self) -> Check {
-        match self.phase {
-            RowPhase::Succeeded(_) => Check::On,
-            RowPhase::Rest | RowPhase::Pending(_) | RowPhase::Failed(_) => Check::Off,
+        match self {
+            Run::Done => Check::On,
+            Run::Rest | Run::Working | Run::Failed => Check::Off,
+        }
+    }
+
+    /// The words under a row's title (R8: the still state carries the reason).
+    fn detail(self, done: &str) -> Option<TextLine> {
+        match self {
+            Run::Rest => None,
+            Run::Working => Some(TextLine::from("Connecting…")),
+            Run::Done => Some(TextLine::from(done)),
+            Run::Failed => Some(TextLine::from("Couldn't connect")),
         }
     }
 }
 
-/// The words under a row's title (R8: the still state carries the moment).
-fn detail(run: Run, done: &str) -> Option<TextLine> {
-    match run.phase {
-        RowPhase::Rest => None,
-        RowPhase::Pending(_) => Some(TextLine::from("Connecting…")),
-        RowPhase::Succeeded(_) => Some(TextLine::from(done)),
-        RowPhase::Failed(_) => Some(TextLine::from("Couldn't connect")),
+/// A row of the pane.
+fn pane_row(
+    key: &'static str,
+    leading: RowLeading,
+    run: Run,
+    done: &str,
+    accessory: Accessory,
+    press: EventHandler<()>,
+) -> ListItem<&'static str> {
+    ListItem::row(
+        key,
+        key,
+        rsx! {
+            Row {
+                title: key,
+                detail: run.detail(done),
+                leading,
+                accessory,
+                state: RowState { availability: run.availability(), selection: Selection::Unselected, ..RowState::default() },
+                size: ds::RowSize::Settings,
+                onclick: move |_| press.call(()),
+            }
+        },
+    )
+}
+
+fn disc(run: Run) -> Selection {
+    match run.in_use() {
+        Check::On => Selection::Selected,
+        Check::Off | Check::Mixed => Selection::Unselected,
     }
 }
 
 #[component]
 pub fn NetworkRows() -> Element {
-    let mut home = use_signal(|| Run::start().pending().succeeded());
-    let mut cafe = use_signal(Run::start);
-    let disc = |run: Run| match run.in_use() {
-        Check::On => RowDisc::On,
-        Check::Off | Check::Mixed => RowDisc::Off,
-    };
+    let mut home = use_signal(|| Run::Done);
+    let mut cafe = use_signal(|| Run::Rest);
     rsx! {
-        Cell { name: "Network rows", code: "SettingsRow {{ phase, disc }}",
+        Cell { name: "Network rows", code: "Row {{ state.availability: Busy, leading: Disc }}",
             controls: rsx! {
-                {mini("Join Café", move |_| cafe.set(cafe().pending()))}
-                {mini("Joined", move |_| cafe.set(cafe().succeeded()))}
-                {mini("Wrong password", move |_| cafe.set(cafe().failed()))}
+                {mini("Join Café", move |_| cafe.set(Run::Working))}
+                {mini("Joined", move |_| cafe.set(Run::Done))}
+                {mini("Wrong password", move |_| cafe.set(Run::Failed))}
             },
             div { class: "g-detail g-detail-list",
-                SettingsRow { glyph: Some(Icon::Wifi), title: "Home", detail: detail(home(), "Connected"), phase: home().phase, disc: disc(home()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| home.set(home().pending()) }
-                SettingsRow { glyph: Some(Icon::Wifi), title: "Café", detail: detail(cafe(), "Connected"), phase: cafe().phase, disc: disc(cafe()), trailing: RowTrailing::Glyph(Icon::Lock), onclick: move |_| cafe.set(cafe().pending()) }
+                List::<&'static str> {
+                    label: "Networks",
+                    items: vec![
+                        pane_row("Home", RowLeading::Disc(Icon::Wifi, disc(home())), home(), "Connected", Accessory::Glyph(Icon::Lock), EventHandler::new(move |()| home.set(Run::Working))),
+                        pane_row("Café", RowLeading::Disc(Icon::Wifi, disc(cafe())), cafe(), "Connected", Accessory::Glyph(Icon::Lock), EventHandler::new(move |()| cafe.set(Run::Working))),
+                    ],
+                }
             }
         }
     }
@@ -88,24 +106,30 @@ pub fn NetworkRows() -> Element {
 
 #[component]
 pub fn DeviceRows() -> Element {
-    let mut phones = use_signal(|| Run::start().pending().succeeded());
-    let mut mouse = use_signal(Run::start);
-    let row = |run: Run, level: u16| match run.in_use() {
-        Check::On => (RowDisc::On, RowTrailing::Battery(Fraction(level))),
-        Check::Off | Check::Mixed => (RowDisc::Off, RowTrailing::None),
+    let mut phones = use_signal(|| Run::Done);
+    let mut mouse = use_signal(|| Run::Rest);
+    let battery = |run: Run, level: u16| match run.in_use() {
+        Check::On => Accessory::Battery(BatteryState {
+            level: Fraction(level),
+            ..BatteryState::default()
+        }),
+        Check::Off | Check::Mixed => Accessory::None,
     };
-    let (phones_disc, phones_trail) = row(phones(), 840);
-    let (mouse_disc, mouse_trail) = row(mouse(), 420);
     rsx! {
-        Cell { name: "Device rows", code: "SettingsRow {{ phase, disc, trailing: RowTrailing::Battery }}",
+        Cell { name: "Device rows", code: "Row {{ accessory: Accessory::Battery }}",
             controls: rsx! {
-                {mini("Connect mouse", move |_| mouse.set(mouse().pending()))}
-                {mini("Connected", move |_| mouse.set(mouse().succeeded()))}
-                {mini("Fail", move |_| mouse.set(mouse().failed()))}
+                {mini("Connect mouse", move |_| mouse.set(Run::Working))}
+                {mini("Connected", move |_| mouse.set(Run::Done))}
+                {mini("Fail", move |_| mouse.set(Run::Failed))}
             },
             div { class: "g-detail g-detail-list",
-                SettingsRow { glyph: Some(Icon::Headphones), title: "Headphones", detail: detail(phones(), "Connected"), phase: phones().phase, disc: phones_disc, trailing: phones_trail, onclick: move |_| phones.set(phones().pending()) }
-                SettingsRow { glyph: Some(Icon::Mouse), title: "Mouse", detail: detail(mouse(), "Connected"), phase: mouse().phase, disc: mouse_disc, trailing: mouse_trail, onclick: move |_| mouse.set(mouse().pending()) }
+                List::<&'static str> {
+                    label: "Devices",
+                    items: vec![
+                        pane_row("Headphones", RowLeading::Disc(Icon::Headphones, disc(phones())), phones(), "Connected", battery(phones(), 840), EventHandler::new(move |()| phones.set(Run::Working))),
+                        pane_row("Mouse", RowLeading::Disc(Icon::Mouse, disc(mouse())), mouse(), "Connected", battery(mouse(), 420), EventHandler::new(move |()| mouse.set(Run::Working))),
+                    ],
+                }
             }
         }
     }
@@ -113,18 +137,21 @@ pub fn DeviceRows() -> Element {
 
 #[component]
 pub fn OutputRows() -> Element {
-    let mut speakers = use_signal(Run::start);
-    let chosen = move || speakers().in_use();
-    let other = move || chosen().flipped();
+    let mut speakers = use_signal(|| Run::Rest);
     rsx! {
-        Cell { name: "Output rows", code: "SettingsRow {{ phase, trailing: RowTrailing::Check }}",
+        Cell { name: "Output rows", code: "Row {{ accessory: Accessory::Check }}",
             controls: rsx! {
-                {mini("Switch to Speakers", move |_| speakers.set(speakers().pending()))}
-                {mini("Switched", move |_| speakers.set(speakers().succeeded()))}
+                {mini("Switch to Speakers", move |_| speakers.set(Run::Working))}
+                {mini("Switched", move |_| speakers.set(Run::Done))}
             },
             div { class: "g-detail g-detail-list",
-                SettingsRow { glyph: Some(Icon::Monitor), title: "Display Audio", detail: None, trailing: RowTrailing::Check(other()), onclick: move |_| speakers.set(Run::start()) }
-                SettingsRow { glyph: Some(Icon::Speaker), title: "Speakers", detail: detail(speakers(), "In use"), phase: speakers().phase, trailing: RowTrailing::Check(chosen()), onclick: move |_| speakers.set(speakers().pending()) }
+                List::<&'static str> {
+                    label: "Outputs",
+                    items: vec![
+                        pane_row("Display Audio", RowLeading::Icon(Icon::Monitor), Run::Rest, "", Accessory::Check(speakers().in_use().flipped()), EventHandler::new(move |()| speakers.set(Run::Rest))),
+                        pane_row("Speakers", RowLeading::Icon(Icon::Speaker), speakers(), "In use", Accessory::Check(speakers().in_use()), EventHandler::new(move |()| speakers.set(Run::Working))),
+                    ],
+                }
             }
         }
     }

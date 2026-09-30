@@ -1,32 +1,24 @@
-/* SectionHeader (design/04-COMPONENTS.md section 13): Frame `S:120-125`, Group `C:1026-1032`,
-   Field `S:250-251`, Menu `S:668`. The rule is a real span (O-22's fallback for `::after`).
-   Attribute selectors carry `*|` (spike S2). Only the Frame's action has a state.
-   A header heads its group: it is a full-width row of its own, spanning every column when its
-   container is a grid (gallery fix A: four headers in a grid read as one run-on row). The
-   eyebrow never wraps; the rule takes the free space. The action's rule names the header, as
-   S's `.s-h button` does. The action always ends the row: after the rule it has no free space
-   to take, and in a header without a rule (Field, Menu) its `margin-left:auto` does what the
-   rule would (polish pass: a Menu header's action sat against its eyebrow). */
+/* SectionHeader (design/30 section 2.6): one look, the data face in capitals over the list's
+   ink. A header heads its group: a full-width row of its own, spanning every column when its
+   container is a grid. The title never wraps; the action always ends the row through its
+   `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
+   Attribute selectors carry `*|` (spike S2). */
 
-.ds-section-header{ display:flex; align-items:center; width:100%; grid-column:1 / -1; font-family:var(--font-data); font-weight:var(--fw-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
-.ds-section-header[*|data-kind=frame]{ gap:var(--s-6); padding:var(--s-14) var(--s-6) var(--s-5); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); color:var(--f-ink-faint); }
-.ds-section-header[*|data-kind=group]{ gap:var(--s-8); padding:var(--s-12) var(--s-6) var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps-narrow); }
-.ds-section-header[*|data-kind=field]{ margin-bottom:var(--s-6); font-size:var(--fs-caption); letter-spacing:var(--tracking-caps); }
-.ds-section-header[*|data-kind=menu]{ padding:var(--s-7) var(--s-8) var(--s-3); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); }
-
-.ds-section-header-text{ white-space:nowrap; }
-.ds-section-header-rule{ flex:1; min-width:0; height:var(--hair); }
-.ds-section-header[*|data-kind=frame] .ds-section-header-rule{ background:var(--f-line); }
-.ds-section-header[*|data-kind=group] .ds-section-header-rule{ background:var(--line-soft); }
-
-.ds-section-header-value{ font-variant-numeric:tabular-nums; }
-.ds-section-header[*|data-kind=field] .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
-
+.ds-section-header{
+  display:flex; align-items:center; gap:var(--s-6); width:100%; grid-column:1 / -1; box-sizing:border-box; padding:var(--s-7) var(--s-8) var(--s-3);
+  font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps);
+  text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint);
+}
+.ds-section-header-title{ white-space:nowrap; }
+.ds-section-header-toggle{
+  display:flex; align-items:center; gap:var(--s-4); border:0; background:none; padding:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:default;
+}
+.ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
 .ds-section-header .ds-section-header-action{
   margin-left:auto; border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
-  color:var(--f-ink-faint); padding:0 var(--s-2); text-transform:none;
+  color:var(--ink-faint); padding:0 var(--s-2); text-transform:none;
 }
-.ds-section-header .ds-section-header-action:hover{ color:var(--f-ink); }
-/* A palette's cursor on a group's action ("Show More"): the rows' selection look,
-   `--accent-soft` behind the words, which take the ink. */
+.ds-section-header .ds-section-header-action:hover{ color:var(--ink); }
+.ds-section-header-value + .ds-section-header-action{ margin-left:0; }
+/* A palette's cursor on a group's action ("Show More"): the rows' selection look. */
 .ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }

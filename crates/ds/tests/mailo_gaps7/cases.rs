@@ -1,9 +1,9 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
+use crate::scoped::Scoped;
 use dioxus::prelude::*;
-use ds::{Bezel, Button, ImagePosition};
-use ds::{FieldBezel, TextField};
-use ds::{FieldFocus, Icon, PlaceId, Propagation, Shown, TreeItem, TreeShape};
+use ds::{Accessory, Button, FieldFocus, Icon, Outline, Propagation, Row, RowLeading, Shown};
+use ds::{Bezel, FieldBezel, ImagePosition, TextField};
 
 /// One state and its golden.
 pub struct Case {
@@ -27,29 +27,26 @@ fn more(name: &str) -> Element {
 
 pub const CASES: &[Case] = &[
     Case {
-        golden: "lists/tree_item/editing-branch.html",
+        golden: "lists/row/outline-editing-branch.html",
         make: || {
             rsx! {
-                TreeItem {
-                    label: "Projects",
-                    open: Shown::Visible,
+                Scoped { Row {
+                    title: "Projects",
+                    content: rename("Projects"),
+                    leading: RowLeading::Icon(Icon::Folder),
+                    outline: Outline::Branch(Shown::Visible),
                     on_toggle: |_| {},
-                    glyph: Icon::Folder,
-                    count: 3,
-                    onselect: |_| {},
-                    editing: rename("Projects"),
-                    trailing: more("Projects"),
-                    place: PlaceId("INBOX/Projects".to_string()),
-                    TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder }
-                }
+                    accessory: Accessory::Slot(more("Projects")),
+                    Row { title: "Quire", leading: RowLeading::Icon(Icon::Folder), outline: Outline::Leaf }
+                } }
             }
         },
     },
     Case {
-        golden: "lists/tree_item/editing-leaf.html",
+        golden: "lists/row/outline-editing-leaf.html",
         make: || {
             rsx! {
-                TreeItem { label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, editing: rename("Receipts") }
+                Scoped { Row { title: "Receipts", content: rename("Receipts"), leading: RowLeading::Icon(Icon::Folder), outline: Outline::Leaf } }
             }
         },
     },

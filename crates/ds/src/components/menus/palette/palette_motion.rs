@@ -12,7 +12,7 @@
 //! resize of that same group plays; anything else (a new result set, or another group's) plays
 //! nothing, as an unmarked caller-driven change always has.
 
-use crate::components::menus::menu_rows::RowsMotion;
+use crate::components::lists::row::motion::RowMotion;
 use crate::components::menus::palette::palette_expand::{GroupResize, Resize, resized};
 use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
@@ -106,6 +106,36 @@ impl PaletteHandle {
     /// This handle's book, for the palette it names.
     pub(crate) fn book(self) -> ActionBook {
         self.0
+    }
+}
+
+/// A motion of some of a group's rows, by row number (a palette group's Show More or Less).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RowsMotion {
+    /// None.
+    Still,
+    /// The rows from `from` on come in as inserted rows do.
+    Enter {
+        /// The first added row.
+        from: usize,
+    },
+    /// Everything after row `at` heals up to it.
+    HealAfter {
+        /// The last row kept.
+        at: usize,
+    },
+}
+
+impl RowsMotion {
+    /// Row `index`'s part.
+    pub(crate) fn of(self, index: usize) -> RowMotion {
+        match self {
+            RowsMotion::Enter { from } if index >= from => RowMotion::In,
+            RowsMotion::HealAfter { at } if index == at => RowMotion::HealFrom,
+            RowsMotion::Still | RowsMotion::Enter { .. } | RowsMotion::HealAfter { .. } => {
+                RowMotion::Still
+            }
+        }
     }
 }
 

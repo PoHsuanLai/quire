@@ -1,13 +1,16 @@
-//! The row cases: ListRow in every weight, star and motion state, and AnimatedList, with the
-//! helpers that draw a thread row the way a consumer does.
+//! The row cases: ThreadRow in every weight and star state, Row in every accessory, leading
+//! element and state, and List, with the helpers that draw a thread row the way a consumer does.
 
 use crate::cases::Case;
+use crate::scoped::Scoped;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, AnimatedList, Chip, ChipVariant, Exit, Heal, HoverStrip, Icon, ListRow, MarkProvider,
-    MarkSize, MarkStyle, Presence, ProviderMark, Px, RowState, StripAction,
+    Accessory, ActionId, Availability, BatteryState, Chip, ChipVariant, ClipBody, Fraction,
+    HoverStrip, Icon, List, ListItem, ListStyle, MarkProvider, MarkSize, MarkStyle, ProviderMark,
+    Row, RowAction, RowChord, RowLeading, RowMotion, RowShape, RowSize, RowState, StripAction,
+    TextLine, ThreadRow,
 };
-use ds::{Check, DropState, Emphasis, Selection};
+use ds::{Check, DropState, Emphasis, Selection, Shortcut, ShortcutKey};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -34,34 +37,26 @@ pub fn strip_actions() -> Vec<StripAction> {
     .collect()
 }
 
-/// A thread row in `presence`, unread or read, with the via, tags and strip filled.
-pub fn row(presence: Presence, emphasis: Emphasis, selection: Selection, star: Check) -> Element {
-    row_in_drag(presence, emphasis, selection, star, DropState::Idle)
+/// A thread row, unread or read, with the via, tags and strip filled.
+pub fn thread(emphasis: Emphasis, selection: Selection, star: Check) -> Element {
+    thread_in_drag(emphasis, selection, star, DropState::Idle)
 }
 
-/// A present read row playing `drop` in a drag.
-fn dragged_row(drop: DropState) -> Element {
-    row_in_drag(
-        Presence::Present,
-        Emphasis::Plain,
-        Selection::Unselected,
-        Check::Off,
-        drop,
-    )
+/// A read thread row playing `drop` in a drag.
+fn dragged_thread(drop: DropState) -> Element {
+    thread_in_drag(Emphasis::Plain, Selection::Unselected, Check::Off, drop)
 }
 
-/// [`row`], playing `drop` in a drag.
-fn row_in_drag(
-    presence: Presence,
+/// [`thread`], playing `drop` in a drag.
+fn thread_in_drag(
     emphasis: Emphasis,
     selection: Selection,
     star: Check,
     drop: DropState,
 ) -> Element {
     rsx! {
-        ListRow {
+        ThreadRow {
             state: RowState { selection, emphasis, drop, ..RowState::default() },
-            presence,
             name: "Dana Okafor",
             via: rsx! {
                 ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
@@ -78,121 +73,87 @@ fn row_in_drag(
     }
 }
 
-/// A read, unselected, unstarred row: what a roster draws per entry, keyed by the consumer.
-#[component]
-pub fn Row(presence: Presence, heal: Option<Heal>, emphasis: Emphasis) -> Element {
-    match heal {
-        Some(heal) => healed_row(heal, emphasis),
-        None => row(presence, emphasis, Selection::Unselected, Check::Off),
-    }
+/// A read thread row in a list: what a roster draws per entry, keyed by the consumer.
+pub fn listed_thread(key: &'static str, emphasis: Emphasis) -> ListItem<&'static str> {
+    ListItem::row(
+        key,
+        key,
+        thread(emphasis, Selection::Unselected, Check::Off),
+    )
 }
 
-fn plain_row(presence: Presence, emphasis: Emphasis) -> Element {
-    row(presence, emphasis, Selection::Unselected, Check::Off)
+/// A row named `title` with `accessory`, at settings height.
+fn with_accessory(title: &'static str, accessory: Accessory) -> Element {
+    rsx! { Scoped { Row { title, size: RowSize::Settings, accessory } } }
 }
 
-/// A read row sliding into a gap by `heal`.
-fn healed_row(heal: Heal, emphasis: Emphasis) -> Element {
+/// A row in `state`.
+fn in_state(state: RowState) -> Element {
+    rsx! { Scoped { Row { title: "Inbox", leading: RowLeading::Icon(Icon::Inbox), state } } }
+}
+
+/// A place named for a drag, playing `drop`.
+fn place(drop: DropState) -> Element {
     rsx! {
-        ListRow {
-            state: RowState { selection: Selection::Unselected, emphasis, ..RowState::default() },
-            presence: Presence::Present,
-            heal: Some(heal),
-            name: "Dana Okafor",
-            via: rsx! {
-                ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
-                "gmail"
-            },
-            subject: "Re: UIDL stability across servers",
-            snippet: "Treat UIDL as stable only while UIDVALIDITY holds.".to_string(),
-            time: "09:41",
-            tags: rsx! { Chip { variant: ChipVariant::Accent, text: "spec" } },
-            star: (Check::Off, EventHandler::new(|_| {})),
-            strip: rsx! { HoverStrip { actions: strip_actions() } },
-            onclick: |_| {},
+        Row {
+            title: "Archive",
+            leading: RowLeading::Icon(Icon::Archive),
+            state: RowState { drop, ..RowState::default() },
+            common: ds::Common { data: place_name("archive"), ..ds::Common::default() },
+            onpointerenter: |_| {},
+            onpointerleave: |_| {},
+            onpointerup: |_| {},
         }
     }
 }
 
-/// A row 79 px below its place.
-fn healing_row() -> Element {
-    healed_row(Heal { dy: Px(79.0) }, Emphasis::Plain)
+/// `data-place="<name>"`.
+fn place_name(name: &str) -> Vec<ds::DataAttr> {
+    match ds::DataName::parse("place") {
+        Ok(attribute) => vec![ds::DataAttr::new(attribute, name)],
+        Err(error) => panic!("{error}"),
+    }
 }
 
 pub const ROW_CASES: &[Case] = &[
-    // ListRow: weight, selection, star, and every motion state.
+    // ThreadRow: weight, selection, star, and a drag.
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "unread",
-        make: || plain_row(Presence::Present, Emphasis::Strong),
+        make: || thread(Emphasis::Strong, Selection::Unselected, Check::Off),
     },
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "read",
-        make: || plain_row(Presence::Present, Emphasis::Plain),
+        make: || thread(Emphasis::Plain, Selection::Unselected, Check::Off),
     },
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "selected",
-        make: || {
-            row(
-                Presence::Present,
-                Emphasis::Plain,
-                Selection::Selected,
-                Check::Off,
-            )
-        },
+        make: || thread(Emphasis::Plain, Selection::Selected, Check::Off),
     },
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "starred-at-rest",
-        make: || {
-            row(
-                Presence::Present,
-                Emphasis::Plain,
-                Selection::Unselected,
-                Check::On,
-            )
-        },
+        make: || thread(Emphasis::Plain, Selection::Unselected, Check::On),
     },
     Case {
-        component: "list_row",
-        state: "entering",
-        make: || plain_row(Presence::Entering, Emphasis::Strong),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-row",
-        make: || plain_row(Presence::Leaving(Exit::Row), Emphasis::Plain),
-    },
-    Case {
-        component: "list_row",
-        state: "leaving-row-unread",
-        make: || plain_row(Presence::Leaving(Exit::Row), Emphasis::Strong),
-    },
-    Case {
-        component: "list_row",
+        component: "thread_row",
         state: "drag-source",
-        make: || dragged_row(DropState::Source),
+        make: || dragged_thread(DropState::Source),
     },
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "drop-target",
-        make: || dragged_row(DropState::Target),
+        make: || dragged_thread(DropState::Target),
     },
     Case {
-        component: "list_row",
-        state: "healing",
-        make: healing_row,
-    },
-    Case {
-        component: "list_row",
+        component: "thread_row",
         state: "bare",
         make: || {
             rsx! {
-                ListRow {
+                ThreadRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    presence: Presence::Present,
                     name: "Sam Lindqvist",
                     via: None,
                     subject: "Notes from the sync review",
@@ -209,13 +170,12 @@ pub const ROW_CASES: &[Case] = &[
     // Gallery fix A: a name longer than the column's 26-character budget fades; "bare" above
     // is the one that fits and does not.
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "name-overflowing",
         make: || {
             rsx! {
-                ListRow {
+                ThreadRow {
                     state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    presence: Presence::Present,
                     name: "Maximilian Alexander von Hohenberg-Wittelsbach",
                     via: None,
                     subject: "Notes from the sync review",
@@ -229,15 +189,246 @@ pub const ROW_CASES: &[Case] = &[
             }
         },
     },
-    // AnimatedList.
+    // Row: each accessory.
     Case {
-        component: "animated_list",
-        state: "entering",
-        make: || rsx! { AnimatedList { label: "Threads", {plain_row(Presence::Entering, Emphasis::Strong)} } },
+        component: "row",
+        state: "accessory-none",
+        make: || with_accessory("None", Accessory::None),
     },
     Case {
-        component: "animated_list",
-        state: "present",
-        make: || rsx! { AnimatedList { label: "Threads", {plain_row(Presence::Present, Emphasis::Plain)} } },
+        component: "row",
+        state: "accessory-check-on",
+        make: || with_accessory("Home", Accessory::Check(Check::On)),
+    },
+    Case {
+        component: "row",
+        state: "accessory-check-mixed",
+        make: || with_accessory("Some", Accessory::Check(Check::Mixed)),
+    },
+    Case {
+        component: "row",
+        state: "accessory-check-off",
+        make: || with_accessory("Café", Accessory::Check(Check::Off)),
+    },
+    Case {
+        component: "row",
+        state: "accessory-toggle",
+        make: || {
+            with_accessory(
+                "Headphones",
+                Accessory::Toggle {
+                    value: Check::On,
+                    on_toggle: EventHandler::new(|_| {}),
+                },
+            )
+        },
+    },
+    Case {
+        component: "row",
+        state: "accessory-chevron",
+        make: || with_accessory("Mouse", Accessory::Chevron),
+    },
+    Case {
+        component: "row",
+        state: "accessory-text",
+        make: || with_accessory("Phone", Accessory::Text("Paired".to_string())),
+    },
+    Case {
+        component: "row",
+        state: "accessory-glyph",
+        make: || with_accessory("Studio 5G", Accessory::Glyph(Icon::Lock)),
+    },
+    Case {
+        component: "row",
+        state: "accessory-battery",
+        make: || {
+            with_accessory(
+                "Headphones",
+                Accessory::Battery(BatteryState {
+                    level: Fraction(840),
+                    ..BatteryState::default()
+                }),
+            )
+        },
+    },
+    Case {
+        component: "row",
+        state: "accessory-spinner",
+        make: || with_accessory("Café", Accessory::Spinner),
+    },
+    Case {
+        component: "row",
+        state: "accessory-badge",
+        make: || with_accessory("Inbox", Accessory::Badge(12)),
+    },
+    Case {
+        component: "row",
+        state: "accessory-slot",
+        make: || {
+            with_accessory(
+                "Projects",
+                Accessory::Slot(
+                    rsx! { ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions", onclick: |_| {} } },
+                ),
+            )
+        },
+    },
+    // Row: leading elements and heights.
+    Case {
+        component: "row",
+        state: "leading-icon",
+        make: || rsx! { Row { title: "Wi-Fi", leading: RowLeading::Icon(Icon::Wifi) } },
+    },
+    Case {
+        component: "row",
+        state: "leading-disc-on",
+        make: || rsx! { Row { title: "Home", leading: RowLeading::Disc(Icon::Wifi, Selection::Selected), size: RowSize::Settings } },
+    },
+    Case {
+        component: "row",
+        state: "leading-disc-off",
+        make: || rsx! { Row { title: "Café", leading: RowLeading::Disc(Icon::Wifi, Selection::Unselected), size: RowSize::Settings } },
+    },
+    Case {
+        component: "row",
+        state: "leading-text",
+        make: || rsx! { Row { title: "Quire", leading: RowLeading::Text("Q".to_string()), size: RowSize::Settings } },
+    },
+    Case {
+        component: "row",
+        state: "settings-detail",
+        make: || rsx! { Row { title: "Home", detail: TextLine::from("Connected"), leading: RowLeading::Icon(Icon::Wifi), size: RowSize::Settings } },
+    },
+    // Row: states.
+    Case {
+        component: "row",
+        state: "selected",
+        make: || {
+            in_state(RowState {
+                selection: Selection::Selected,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "unread",
+        make: || {
+            in_state(RowState {
+                emphasis: Emphasis::Strong,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "disabled",
+        make: || {
+            in_state(RowState {
+                availability: Availability::Disabled,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "busy",
+        make: || {
+            in_state(RowState {
+                availability: Availability::Busy,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "drag-source",
+        make: || {
+            in_state(RowState {
+                drop: DropState::Source,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "drop-target",
+        make: || {
+            in_state(RowState {
+                drop: DropState::Target,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "drop-accepts",
+        make: || {
+            in_state(RowState {
+                drop: DropState::Accepts,
+                ..RowState::default()
+            })
+        },
+    },
+    Case {
+        component: "row",
+        state: "place-named",
+        make: || place(DropState::Idle),
+    },
+    Case {
+        component: "row",
+        state: "place-drop-target",
+        make: || place(DropState::Target),
+    },
+    Case {
+        component: "row",
+        state: "marked-title",
+        make: || rsx! { Row { title: "Uidl notes", marks: vec![0, 1, 2, 3] } },
+    },
+    Case {
+        component: "row",
+        state: "motion-in",
+        make: || rsx! { Row { title: "Added", motion: RowMotion::In } },
+    },
+    Case {
+        component: "row",
+        state: "chord-selected",
+        make: || rsx! { Row { title: "Invoice.pdf", state: RowState { selection: Selection::Selected, ..RowState::default() }, chord: RowChord::on_selected(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])) } },
+    },
+    Case {
+        component: "row",
+        state: "shape-file",
+        make: || rsx! { Row { title: "Invoice.pdf", shape: RowShape::File { thumb: None, location: "~/Documents".to_string(), modified: "Yesterday".to_string() }, size: RowSize::Settings } },
+    },
+    Case {
+        component: "row",
+        state: "shape-clip-text",
+        make: || rsx! { Row { title: "Copied", shape: RowShape::Clip { body: ClipBody::Text { excerpt: "fn main() {}".to_string(), lines: 2 }, age: "2 min".to_string() } } },
+    },
+    Case {
+        component: "row",
+        state: "action",
+        make: || rsx! { Row { title: "from:dana", action: RowAction { icon: Icon::X, label: "Remove from recent".to_string(), on_press: EventHandler::new(|_| {}) } } },
+    },
+    // List: each style, a heading among rows, and an item's exit.
+    Case {
+        component: "list",
+        state: "plain",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Threads", items: vec![listed_thread("a", Emphasis::Strong)] } } },
+    },
+    Case {
+        component: "list",
+        state: "inset",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Networks", style: ListStyle::Inset, items: vec![ListItem::row("Home", "Home", with_accessory("Home", Accessory::Check(Check::On))), ListItem::row("Café", "Café", with_accessory("Café", Accessory::Chevron))] } } },
+    },
+    Case {
+        component: "list",
+        state: "source-list",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Places", style: ListStyle::SourceList, sidebar: ds::SidebarSize::Large, items: vec![ListItem::heading("Favourites", rsx! { ds::SectionHeader { title: "Favourites" } }), ListItem::row("Inbox", "Inbox", in_state(RowState::default()))] } } },
+    },
+    Case {
+        component: "list",
+        state: "cursor-held",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Places", cursor: Some("Inbox"), items: vec![ListItem::row("Inbox", "Inbox", in_state(RowState { selection: Selection::Selected, ..RowState::default() }))] } } },
     },
 ];

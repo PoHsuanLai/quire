@@ -7,8 +7,8 @@
 use dioxus::prelude::*;
 use ds::detail::{Detailed, Moment};
 use ds::{
-    Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, Material, MenuEntry,
-    MenuTrail, Motion, PaletteGroup, PaletteGroups, ShortcutKey,
+    Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Motion, PaletteGroup,
+    PaletteGroups, ShortcutKey,
 };
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Harness, Viewport};
@@ -57,16 +57,8 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 /// Rows the Apps group gains with no action run (a query widening it).
 static WIDER: GlobalSignal<u8> = Signal::global(|| 0);
 
-fn item(value: u8, title: String) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title,
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: String) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title)
 }
 
 fn groups(list: List, wider: u8) -> PaletteGroups<u8> {
@@ -161,9 +153,7 @@ fn a_result_set_replaces_the_last_in_place() {
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, rows(2));
     assert_eq!(
-        harness
-            .text_of("#card .ds-menu-item .ds-menu-title")
-            .as_deref(),
+        harness.text_of("#card .ds-row .ds-row-title").as_deref(),
         Some("App 2.0")
     );
     assert_eq!(harness.count("[*|data-row-motion]"), 0);
@@ -175,7 +165,7 @@ fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
     let mut harness = Harness::new(Launcher, VIEW);
     open_quietly(&mut harness);
     run_action(&mut harness);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     assert_eq!(
         harness.count("[*|data-row-motion=in]"),
         4,
@@ -185,16 +175,18 @@ fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
     assert_settles_to_zero_frames(&mut harness);
 
     run_action(&mut harness);
-    assert_eq!(harness.count("#card .ds-menu-item"), 3);
+    assert_eq!(harness.count("#card .ds-row"), 3);
     assert_eq!(harness.count("[*|data-row-motion=heal-from]"), 1);
     assert_eq!(
         harness
-            .text_of("[*|data-row-motion=heal-from] .ds-menu-title")
+            .text_of("[*|data-row-motion=heal-from] .ds-row-title")
             .as_deref(),
         Some("App 1.1"),
         "the last row kept"
     );
-    let style = harness.attr("#card .ds-menu", "style").unwrap_or_default();
+    let style = harness
+        .attr("#card .ds-palette-list", "style")
+        .unwrap_or_default();
     let dy: f32 = style
         .strip_prefix("--dy:")
         .and_then(|rest| rest.strip_suffix("px"))
@@ -202,7 +194,7 @@ fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
         .unwrap_or_else(|| panic!("the list heals by --dy: {style:?}"));
     assert!(dy > 4.0 * 20.0, "four rows' height, not {dy}");
     settle_until(&mut harness, |h| h.count("[*|data-row-motion]") == 0);
-    assert_eq!(harness.attr("#card .ds-menu", "style"), None);
+    assert_eq!(harness.attr("#card .ds-palette-list", "style"), None);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -225,7 +217,7 @@ fn a_group_growing_without_its_action_is_a_new_result_set() {
     open_quietly(&mut harness);
     harness.within(|| *WIDER.write() = 3);
     harness.advance(ms(20));
-    assert_eq!(harness.count("#card .ds-menu-item"), 6);
+    assert_eq!(harness.count("#card .ds-row"), 6);
     assert_eq!(harness.count("[*|data-row-motion]"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }
@@ -238,6 +230,6 @@ fn reduced_plays_the_expand_at_its_own_tokens_and_settles() {
     assert_settles_to_zero_frames(&mut harness);
     run_action(&mut harness);
     settle_until(&mut harness, |h| h.count("[*|data-row-motion]") == 0);
-    assert_eq!(harness.count("#card .ds-menu-item"), 7);
+    assert_eq!(harness.count("#card .ds-row"), 7);
     assert_settles_to_zero_frames(&mut harness);
 }

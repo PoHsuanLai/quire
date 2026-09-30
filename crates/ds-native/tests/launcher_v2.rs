@@ -5,9 +5,9 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL,
-    EmojiCell, EmojiCells, FieldKey, Material, MenuEntry, MenuTrail, PaletteGroup, PaletteGroups,
-    PaneContent, PreviewPane, ShortcutKey,
+    Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, EMOJI_CELL, EmojiCell,
+    EmojiCells, FieldKey, Material, PaletteGroup, PaletteGroups, PaneContent, PreviewPane,
+    ShortcutKey,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -22,16 +22,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title.to_string())
 }
 
 /// Ten cells, four to a row: stops 2..=11 after the two rows above.
@@ -88,7 +80,7 @@ fn GridPalette() -> Element {
 fn selected(harness: &Harness) -> String {
     harness
         .attr(".ds-emoji-cell[*|aria-selected=true]", "aria-label")
-        .or_else(|| harness.text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title"))
+        .or_else(|| harness.text_of(".ds-row[*|aria-selected=true] .ds-row-title"))
         .unwrap_or_default()
 }
 
@@ -142,7 +134,7 @@ fn MorePalette() -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut note = move |line: String| log.with_mut(|log| log.push(line));
     let mut more = use_signal(|| false);
-    let apps: Vec<MenuEntry<u8>> = match more() {
+    let apps: Vec<ds::PaletteRow<u8>> = match more() {
         false => vec![item(1, "Files"), item(2, "Firefox")],
         true => vec![item(1, "Files"), item(2, "Firefox"), item(3, "Terminal")],
     };
@@ -192,7 +184,7 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
     harness.key(ShortcutKey::Down);
     harness.key(ShortcutKey::Down);
     harness.advance(ms(20));
-    assert_eq!(harness.count(".ds-menu-item[*|aria-selected=true]"), 0);
+    assert_eq!(harness.count(".ds-row[*|aria-selected=true]"), 0);
     assert_eq!(
         harness
             .text_of(".ds-section-header-action[*|data-selected=true]")
@@ -200,11 +192,11 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
         Some("Show More"),
         "the cursor rests on the header's action"
     );
-    let rows_before = harness.count("#card .ds-menu-item");
+    let rows_before = harness.count("#card .ds-row");
     harness.key(ShortcutKey::Enter);
     harness.advance(ms(20));
     assert_eq!(log(&harness), "more", "the action ran and nothing closed");
-    assert_eq!(harness.count("#card .ds-menu-item"), rows_before + 1);
+    assert_eq!(harness.count("#card .ds-row"), rows_before + 1);
     assert_eq!(
         harness.text_of(".ds-section-header-action").as_deref(),
         Some("Show Less")
@@ -212,7 +204,7 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
     // The action is now after the third row: stop 3; the cursor, still at stop 2, is on Terminal.
     assert_eq!(
         harness
-            .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of(".ds-row[*|aria-selected=true] .ds-row-title")
             .as_deref(),
         Some("Terminal")
     );
@@ -221,7 +213,7 @@ fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
     harness.advance(ms(20));
     assert_eq!(
         harness
-            .text_of(".ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of(".ds-row[*|aria-selected=true] .ds-row-title")
             .as_deref(),
         Some("Displays")
     );
@@ -276,7 +268,7 @@ fn ClaimPalette() -> Element {
                     placeholder: "Search",
                     query: query(),
                     tokens: Vec::new(),
-                    groups: vec![("Applications".to_string(), vec![item(1, "Files"), item(2, "Firefox")])],
+                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
                     empty: "Nothing",
                     oninput: move |text: String| query.set(text),
                     onpick: move |_| {},
@@ -366,7 +358,7 @@ fn AsidePalette(host: CommandPaletteHost) -> Element {
                     placeholder: "Search",
                     query: String::new(),
                     tokens: Vec::new(),
-                    groups: vec![("Applications".to_string(), vec![item(1, "Files")])],
+                    groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files")])],
                     empty: "Nothing",
                     oninput: move |_| {},
                     onpick: move |_| {},
@@ -412,7 +404,7 @@ fn a_pane_beside_the_results_widens_the_card_by_its_width() {
     let mut harness = Harness::new(OverlayAside, VIEW);
     harness.advance(ms(200));
     let card = width(&harness, "#card");
-    let list = width(&harness, "#card > .ds-menu");
+    let list = width(&harness, "#card > .ds-palette-list");
     toggle(&mut harness);
     assert_eq!(harness.count("#card .ds-preview"), 1);
     assert!(
@@ -420,10 +412,10 @@ fn a_pane_beside_the_results_widens_the_card_by_its_width() {
         "{card}"
     );
     assert!((width(&harness, "#card .ds-palette-aside") - 360.0).abs() < 1.0);
-    assert!((width(&harness, "#card > .ds-menu") - list).abs() < 1.0);
+    assert!((width(&harness, "#card > .ds-palette-list") - list).abs() < 1.0);
     let field = harness.rect("#card .ds-text-field").expect("field");
     let pane = harness.rect("#card .ds-palette-aside").expect("pane");
-    let results = harness.rect("#card > .ds-menu").expect("results");
+    let results = harness.rect("#card > .ds-palette-list").expect("results");
     assert!(
         pane.origin.y.0 >= field.origin.y.0 + field.size.height.0 - 1.0,
         "under the field"
@@ -448,7 +440,7 @@ fn in_a_surface_the_results_narrow_by_the_pane() {
     let card = width(&harness, "#card");
     toggle(&mut harness);
     assert!((width(&harness, "#card") - card).abs() < 1.0);
-    let list = width(&harness, "#card > .ds-menu");
+    let list = width(&harness, "#card > .ds-palette-list");
     let pane = width(&harness, "#card .ds-palette-aside");
     assert!((pane - 360.0).abs() < 1.0);
     // The card's hairline border is inside its width, one on each side.

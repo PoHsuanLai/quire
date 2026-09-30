@@ -50,7 +50,7 @@
 .g-stage-pad{padding:var(--s-14)}
 .g-leave{width:360px;border-radius:var(--r-panel);overflow:hidden}
 .g-leave-row{padding:var(--s-4) var(--s-8)}
-.g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);box-shadow:inset 0 0 0 var(--hair) var(--line-soft);padding:var(--s-4) 0}
+.g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);border:var(--hair) solid var(--line-soft);padding:var(--s-4) 0}
 /* A title a bare field edits in place. */
 .g-bare-title{display:flex;font-size:var(--fs-title);color:var(--ink)}
 .g-side{display:flex;flex-direction:column;gap:var(--s-2);width:232px;padding:var(--s-10);border-radius:var(--r-panel);background:var(--f-solid);color:var(--f-ink)}
@@ -198,3 +198,9 @@
 .g-seal{width:36px;height:36px;border-radius:var(--r-pill);background:var(--accent)}
 .g-spin-well{position:relative;display:grid;place-items:center;width:32px;height:32px;margin:var(--s-6);border-radius:var(--r-pill);background:var(--paper);color:var(--ink-soft)}
 .g-reveal-row{padding:var(--s-4) var(--s-10);border-radius:var(--r-small);background:var(--surface-2);font-size:var(--fs-small);margin-bottom:var(--s-4)}
+
+.g-stage-row{display:flex;gap:var(--s-16);flex-wrap:wrap;margin:var(--s-12) 0}
+.g-stage{position:relative;width:300px;height:290px}
+
+.g-stage-caption{position:absolute;left:0;bottom:0;margin:0}
+.g-stage[*|data-wide=true]{width:520px}

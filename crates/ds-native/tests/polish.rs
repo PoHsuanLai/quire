@@ -8,8 +8,8 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, Ds, Grain, HeaderKind, Icon, Material, PRESETS, Point, Px, Rect, Scheme,
-    SectionHeader, SpaceLook, Theme,
+    Appearance, Button, Ds, Grain, Icon, Material, PRESETS, Point, Px, Rect, Scheme, SectionHeader,
+    SpaceLook, Theme,
 };
 use ds::{Bezel, ButtonRole, ControlSize};
 use ds_native::{Harness, Viewport};
@@ -193,36 +193,28 @@ fn ActionHeadersApp() -> Element {
     rsx! {
         Root {
             div { class: "probe-headers", style: "width:400px",
-                SectionHeader { kind: HeaderKind::Frame, text: "Frame", action: action() }
-                SectionHeader { kind: HeaderKind::Group, text: "Group", value: Some("12".to_string()), action: action() }
-                SectionHeader { kind: HeaderKind::Field, text: "Field", value: Some("Light".to_string()), action: action() }
-                SectionHeader { kind: HeaderKind::Menu, text: "Menu", action: action() }
+                SectionHeader { title: "Title", action: action() }
+                SectionHeader { title: "Value", value: Some("12".to_string()), action: action() }
             }
         }
     }
 }
 
 #[test]
-fn a_section_headers_action_sits_at_its_right_edge_in_every_kind() {
+fn a_section_headers_action_sits_at_its_right_edge_with_and_without_a_value() {
     let harness = Harness::new(ActionHeadersApp, VIEW);
-    // The inline end padding of each kind (design/04-COMPONENTS.md section 13): Frame 14px 6px
-    // 5px, Group 12px 6px 6px, Field none, Menu 7px 8px 3px.
-    for (n, kind, padding) in [
-        (1, "frame", 6.0),
-        (2, "group", 6.0),
-        (3, "field", 0.0),
-        (4, "menu", 8.0),
-    ] {
+    // The inline end padding is 8 (`--s-8`).
+    for (n, name) in [(1, "title"), (2, "value")] {
         let header = rect(&harness, &format!(".probe-headers > :nth-child({n})"));
         let action = rect(
             &harness,
             &format!(".probe-headers > :nth-child({n}) .ds-section-header-action"),
         );
-        let edge = header.origin.x.0 + header.size.width.0 - padding;
+        let edge = header.origin.x.0 + header.size.width.0 - 8.0;
         let right = action.origin.x.0 + action.size.width.0;
         assert!(
             (right - edge).abs() <= 1.0,
-            "{kind}: the action ends at {right}, the header's content at {edge}"
+            "{name}: the action ends at {right}, the header's content at {edge}"
         );
     }
 }

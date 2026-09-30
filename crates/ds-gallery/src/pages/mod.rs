@@ -24,13 +24,17 @@ pub mod launcher_hints;
 pub mod level;
 pub mod level_tile;
 pub mod lists;
+pub mod lists_headers;
 pub mod lists_leaving;
-pub mod lists_mailo4;
-pub mod lists_mailo6;
+pub mod lists_rows;
 pub mod lists_search;
+pub mod lists_sidebar;
+pub mod lists_strip;
 pub mod lock_switcher;
 pub mod materials;
 pub mod matrix;
+pub mod menus;
+pub mod menus_field;
 pub mod motion;
 pub mod motion_driven;
 pub mod motion_lab;
@@ -40,7 +44,6 @@ pub mod overlays_alert;
 pub mod overlays_catalogue;
 pub mod overlays_mailo;
 pub mod overlays_mailo4;
-pub mod overlays_mailo5;
 pub mod overlays_notifications;
 pub mod overlays_sheet;
 pub mod overlays_shot;
@@ -48,7 +51,6 @@ pub mod pills;
 pub mod plate_tints;
 pub mod polish;
 pub mod polish_window;
-pub mod scheduled;
 pub mod space;
 pub mod status_items;
 pub mod tokens;
@@ -64,7 +66,7 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::Alpha;
 use ds::{
-    Accent, Appearance, BlurState, Ds, FrameTint, HeaderKind, Inject, Material, RootChrome, Scheme,
+    Accent, Appearance, BlurState, Ds, FrameTint, Inject, Material, RootChrome, Scheme,
     SectionHeader, SpaceLook, Theme,
 };
 
@@ -77,7 +79,7 @@ pub fn Section(
 ) -> Element {
     rsx! {
         section { class: "g-section",
-            SectionHeader { kind: HeaderKind::Group, text: title }
+            SectionHeader { title }
             if let Some(note) = note {
                 p { class: "g-note", "{note}" }
             }

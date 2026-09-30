@@ -3,12 +3,12 @@
 //! are `position: relative` takes the pointer and the click, whether it is `position: fixed`
 //! after the rows, `position: absolute` with a z-index before or after them, or drawn through
 //! quire's overlay host. What swapped mailo's card was the name's leave, which it read as "back
-//! on the row"; `ListRow`'s `onpointerback` says that only when it is so.
+//! on the row"; `ThreadRow`'s `onpointerback` says that only when it is so.
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile, ListRow,
-    Material, OverlayId, PartHooks, Point, Presence, Px, Rect, RowState, Selection, Size, ZLayer,
+    Appearance, Ds, Emphasis, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile, Material,
+    OverlayId, PartHooks, Point, Px, Rect, RowState, Selection, Size, ThreadRow, ZLayer,
     use_hover_intent, use_overlays,
 };
 use ds_native::harness::settle_until;
@@ -231,9 +231,8 @@ fn MailRow(i: usize, log: Signal<Vec<String>>) -> Element {
     };
     rsx! {
         div { class: "mrow m{i}",
-            ListRow {
+            ThreadRow {
                 state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Strong, ..RowState::default() },
-                presence: Presence::Present,
                 name: "Sender {i}",
                 via: None,
                 subject: "Subject {i}",
@@ -301,7 +300,7 @@ fn MailApp() -> Element {
 fn sender_card_open() -> (Harness, Point) {
     let mut harness = Harness::new(MailApp, VIEW);
     harness.advance(ms(50));
-    let name = centre(&harness, ".m1 .ds-row-name");
+    let name = centre(&harness, ".m1 .ds-thread-name");
     harness.pointer_move(name);
     settle_until(&mut harness, |h| {
         h.text_of(".card-of").as_deref() == Some("sender:1")
@@ -370,7 +369,7 @@ fn leaving_the_name_for_its_row_reopens_the_thread_card() {
     let row = harness.rect(".m1 .ds-row").expect("row 1");
     let on_row = Point {
         x: Px(card.origin.x.0 + card.size.width.0 + 8.0),
-        y: centre(&harness, ".m1 .ds-row-sub").y,
+        y: centre(&harness, ".m1 .ds-thread-sub").y,
     };
     assert!(
         on_row.x.0 < row.origin.x.0 + row.size.width.0 - 60.0,

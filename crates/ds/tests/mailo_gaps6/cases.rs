@@ -1,11 +1,12 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
+use crate::scoped::Scoped;
 use dioxus::prelude::*;
-use ds::{Bezel, ControlSize, ImagePosition};
 use ds::{
-    Button, Common, DataAttr, DataName, DropState, ExtraClass, Icon, PlaceId, Propagation,
-    RowState, Selection, Shown, TreeItem, TreeShape,
+    Accessory, Button, Common, DataAttr, DataName, DropState, ExtraClass, Icon, Outline,
+    Propagation, Row, RowLeading, RowState, Selection, Shown,
 };
+use ds::{Bezel, ControlSize, ImagePosition};
 
 /// One state and its golden.
 pub struct Case {
@@ -36,21 +37,19 @@ fn more(name: &str) -> Element {
     }
 }
 
-/// mailo's Projects folder with one subfolder, `open`, in `drop` state.
+/// Projects, `open`, in `drop` state, over one subfolder.
 fn projects(open: Shown, drop: DropState) -> Element {
     rsx! {
-        TreeItem {
+        Scoped { Row {
             state: RowState { drop, ..RowState::default() },
-            label: "Projects",
-            open,
+            title: "Projects",
+            leading: RowLeading::Icon(Icon::Folder),
+            outline: Outline::Branch(open),
             on_toggle: |_| {},
-            glyph: Icon::Folder,
-            count: 3,
-            trailing: more("Projects"),
-            place: PlaceId("INBOX/Projects".to_string()),
-            onselect: |_| {},
-            TreeItem { label: "Quire", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, glyph: Icon::Folder, place: PlaceId("INBOX/Projects/Quire".to_string()) }
-        }
+            accessory: Accessory::Slot(more("Projects")),
+            onclick: |_| {},
+            Row { title: "Quire", leading: RowLeading::Icon(Icon::Folder), outline: Outline::Leaf }
+        } }
     }
 }
 
@@ -68,39 +67,39 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Button { common: Common { data: folder("INBOX/Receipts"), extra_class: class("fold-more"), ..Common::default() }, bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} } },
     },
     Case {
-        golden: "lists/tree_item/open-idle.html",
+        golden: "lists/row/outline-open-idle.html",
         make: || projects(Shown::Visible, DropState::Idle),
     },
     Case {
-        golden: "lists/tree_item/open-accepts.html",
+        golden: "lists/row/outline-open-accepts.html",
         make: || projects(Shown::Visible, DropState::Accepts),
     },
     Case {
-        golden: "lists/tree_item/open-target.html",
+        golden: "lists/row/outline-open-target.html",
         make: || projects(Shown::Visible, DropState::Target),
     },
     Case {
-        golden: "lists/tree_item/open-source.html",
+        golden: "lists/row/outline-open-source.html",
         make: || projects(Shown::Visible, DropState::Source),
     },
     Case {
-        golden: "lists/tree_item/closed-idle.html",
+        golden: "lists/row/outline-closed-idle.html",
         make: || projects(Shown::Hidden, DropState::Idle),
     },
     Case {
-        golden: "lists/tree_item/closed-accepts.html",
+        golden: "lists/row/outline-closed-accepts.html",
         make: || projects(Shown::Hidden, DropState::Accepts),
     },
     Case {
-        golden: "lists/tree_item/closed-target.html",
+        golden: "lists/row/outline-closed-target.html",
         make: || projects(Shown::Hidden, DropState::Target),
     },
     Case {
-        golden: "lists/tree_item/closed-source.html",
+        golden: "lists/row/outline-closed-source.html",
         make: || projects(Shown::Hidden, DropState::Source),
     },
     Case {
-        golden: "lists/tree_item/leaf-current.html",
-        make: || rsx! { TreeItem { state: RowState { selection: Selection::Selected, ..RowState::default() }, label: "Receipts", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, count: 0, trailing: more("Receipts") } },
+        golden: "lists/row/outline-leaf-current.html",
+        make: || rsx! { Row { state: RowState { selection: Selection::Selected, ..RowState::default() }, title: "Receipts", outline: Outline::Leaf, accessory: Accessory::Slot(more("Receipts")) } },
     },
 ];

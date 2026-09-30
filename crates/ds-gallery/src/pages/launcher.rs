@@ -8,70 +8,66 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Availability, Button, Check, CommandPalette, CommandPaletteHost, Corner, Icon, IconSize,
-    Material, MenuEntry, MenuTile, MenuTrail, Radius, Retain, Shortcut, ShortcutKey, Shown,
-    Surface,
+    Accessory, Button, Check, CommandPalette, CommandPaletteHost, Corner, Icon, IconSize, Material,
+    PaletteRow, Radius, RowLeading, Shortcut, ShortcutKey, Shown, Surface,
 };
 
 fn row(
     value: u8,
     title: &str,
     detail: Option<&str>,
-    tile: MenuTile,
-    trail: MenuTrail,
-) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: detail.map(str::to_string),
-        tile: Some(tile),
-        trail,
-        check: None,
-        availability: Availability::Enabled,
+    leading: RowLeading,
+    accessory: Accessory,
+) -> PaletteRow<u8> {
+    PaletteRow {
+        detail: detail.map(|detail| detail.into()),
+        leading,
+        accessory,
+        ..PaletteRow::new(value, title)
     }
 }
 
 /// The apps whose names hold `typed` as rows, their own icons in the tiles; with something typed,
 /// the first is the top hit and shows the Enter hint.
-fn apps(typed: &str) -> Vec<MenuEntry<u8>> {
+fn apps(typed: &str) -> Vec<PaletteRow<u8>> {
     APPS.iter()
         .filter(|(name, _)| name.to_lowercase().contains(typed))
         .zip(1u8..)
         .map(|(&(name, hue), value)| {
-            let tile = app_icon(hue, IconSize::Tile48)
-                .map_or(MenuTile::Icon(Icon::Window), MenuTile::Source);
-            let trail = match (typed.is_empty(), value) {
-                (false, 1) => MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Enter])),
-                _ => MenuTrail::None,
+            let leading = app_icon(hue, IconSize::Tile48)
+                .map_or(RowLeading::Icon(Icon::Window), RowLeading::Source);
+            let accessory = match (typed.is_empty(), value) {
+                (false, 1) => Accessory::Text(Shortcut(vec![ShortcutKey::Enter]).glyphs()),
+                _ => Accessory::None,
             };
-            row(value, name, None, tile, trail)
+            row(value, name, None, leading, accessory)
         })
         .collect()
 }
 
 /// What an empty query lists: system actions and recent apps.
-fn actions() -> Vec<MenuEntry<u8>> {
+fn actions() -> Vec<PaletteRow<u8>> {
     vec![
         row(
             10,
             "Lock",
             None,
-            MenuTile::Icon(Icon::Lock),
-            MenuTrail::None,
+            RowLeading::Icon(Icon::Lock),
+            Accessory::None,
         ),
         row(
             11,
             "Log Out",
             Some("Closes every app"),
-            MenuTile::Icon(Icon::Power),
-            MenuTrail::None,
+            RowLeading::Icon(Icon::Power),
+            Accessory::None,
         ),
     ]
 }
 
 /// One embedded palette in a Sheet surface of the launcher's panel shape.
 #[component]
-fn Panel(query: String, groups: Vec<(String, Vec<MenuEntry<u8>>)>) -> Element {
+fn Panel(query: String, groups: Vec<ds::PaletteGroup<u8>>) -> Element {
     rsx! {
         div { class: "g-launcher",
             Surface { material: Material::Sheet, radius: Some(Corner::Token(Radius::Panel)),
@@ -97,20 +93,20 @@ fn Panel(query: String, groups: Vec<(String, Vec<MenuEntry<u8>>)>) -> Element {
 #[component]
 pub fn EmbeddedPalette() -> Element {
     rsx! {
-        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (Tile::Source), drawn as it is, filling the tile.",
+        Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (RowLeading::Source), drawn as it is, filling the tile.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Typed \"f\": app icons, cmdk-in",
-                    Panel { query: "f", groups: vec![("Applications".to_string(), apps("f"))] }
+                    Panel { query: "f", groups: vec![ds::PaletteGroup::list("Applications", apps("f"))] }
                 }
                 Specimen { name: "Empty query: actions and recent apps, peek-in",
                     Panel {
                         query: "",
-                        groups: vec![("Actions".to_string(), actions()), ("Recent".to_string(), apps(""))],
+                        groups: vec![ds::PaletteGroup::list("Actions", actions()), ds::PaletteGroup::list("Recent", apps(""))],
                     }
                 }
             }
             div { class: "g-row g-row-top",
-                Specimen { name: "Warm: kept mounted, shown by the button", code: "shown: Some(Shown::Visible | Shown::Hidden), retain: Retain::Nothing".to_string(),
+                Specimen { name: "Warm: kept mounted, shown by the button", code: "shown: Some(Shown::Visible | Shown::Hidden)".to_string(),
                     WarmPalette {}
                 }
             }
@@ -131,11 +127,11 @@ fn WarmPalette() -> Element {
     let typed = query().to_lowercase();
     let groups = if typed.is_empty() {
         vec![
-            ("Actions".to_string(), actions()),
-            ("Recent".to_string(), apps("")),
+            ds::PaletteGroup::list("Actions", actions()),
+            ds::PaletteGroup::list("Recent", apps("")),
         ]
     } else {
-        vec![("Applications".to_string(), apps(&typed))]
+        vec![ds::PaletteGroup::list("Applications", apps(&typed))]
     };
     let flipped = match shown() {
         Shown::Visible => Shown::Hidden,
@@ -163,7 +159,6 @@ fn WarmPalette() -> Element {
                         host: CommandPaletteHost::Surface,
                         id: "gallery-warm-launcher",
                         shown: shown(),
-                        retain: Retain::Nothing,
                     }
                 }
             }

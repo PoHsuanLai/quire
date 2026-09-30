@@ -12,9 +12,9 @@ use dioxus::prelude::*;
 use ds::Alpha;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
-    Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuEntrance,
-    MenuEntry, MenuKind, MenuTile, MenuTrail, PlateFamily, Point, Px, RootChrome, Scheme,
-    Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, use_scope,
+    Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuItem,
+    MenuPlacement, PaletteGroup, PaletteRow, PlateFamily, Point, Px, RootChrome, RowLeading,
+    Scheme, Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, use_scope,
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds_shell::{
@@ -93,47 +93,17 @@ fn target(ours: &str, macos: &str) -> String {
     format!("ours: {ours}  |  macOS: {macos}")
 }
 
-fn menu_entries() -> Vec<MenuEntry<u8>> {
-    let item = |value: u8, title: &str, check: Option<Check>, trail: MenuTrail, availability| {
-        MenuEntry::Item {
-            value,
-            title: title.to_owned(),
-            detail: None,
-            tile: None,
-            trail,
-            check,
-            availability,
-        }
-    };
-    let keys =
-        |key: char| MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char(key)]));
+fn menu_entries() -> Vec<MenuItem<u8>> {
+    let keys = |key: char| Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char(key)]);
     vec![
-        item(1, "New Window", None, keys('N'), Availability::Enabled),
-        item(2, "New Tab", None, keys('T'), Availability::Enabled),
-        item(
-            3,
-            "Open Recent",
-            None,
-            MenuTrail::None,
-            Availability::Disabled,
-        ),
-        MenuEntry::Separator,
-        item(
-            4,
-            "Show Sidebar",
-            Some(Check::On),
-            MenuTrail::None,
-            Availability::Enabled,
-        ),
-        item(
-            5,
-            "Show Path Bar",
-            Some(Check::Off),
-            MenuTrail::None,
-            Availability::Enabled,
-        ),
-        MenuEntry::Separator,
-        item(6, "Close Window", None, keys('W'), Availability::Enabled),
+        MenuItem::new(1, "New Window").with_key(keys('N')),
+        MenuItem::new(2, "New Tab").with_key(keys('T')),
+        MenuItem::new(3, "Open Recent").with_availability(Availability::Disabled),
+        MenuItem::Separator,
+        MenuItem::new(4, "Show Sidebar").with_check(Check::On),
+        MenuItem::new(5, "Show Path Bar").with_check(Check::Off),
+        MenuItem::Separator,
+        MenuItem::new(6, "Close Window").with_key(keys('W')),
     ]
 }
 
@@ -170,10 +140,9 @@ fn MenuBarSection() -> Element {
                 Root { material: Material::Popover, style: "height:250px",
                     if showcase == Showcase::Posed {
                         ds::Menu::<u8> {
-                            kind: MenuKind::Slim,
+                            placement: MenuPlacement::Bar,
                             anchor: Anchor::Point(MENU_AT),
-                            entries: menu_entries(),
-                            entrance: MenuEntrance::Instant,
+                            items: menu_entries(),
                             onpick: move |_| {},
                             onclose: move |_| {},
                         }
@@ -341,17 +310,11 @@ fn LauncherSection() -> Element {
     let apps = APPS
         .iter()
         .zip(1u8..)
-        .map(|(&(name, hue), value)| MenuEntry::Item {
-            value,
-            title: name.to_owned(),
-            detail: Some("Application".to_owned()),
-            tile: Some(
-                app_icon(hue, IconSize::Tile48)
-                    .map_or(MenuTile::Icon(Icon::Window), MenuTile::Source),
-            ),
-            trail: MenuTrail::None,
-            check: None,
-            availability: Availability::Enabled,
+        .map(|(&(name, hue), value)| PaletteRow {
+            detail: Some("Application".into()),
+            leading: app_icon(hue, IconSize::Tile48)
+                .map_or(RowLeading::Icon(Icon::Window), RowLeading::Source),
+            ..PaletteRow::new(value, name)
         })
         .collect::<Vec<_>>();
     rsx! {
@@ -363,7 +326,7 @@ fn LauncherSection() -> Element {
                         placeholder: "Search",
                         query: "",
                         tokens: Vec::new(),
-                        groups: vec![("Applications".to_owned(), apps)],
+                        groups: vec![PaletteGroup::list("Applications", apps)],
                         empty: "Nothing matches.",
                         oninput: |_| {},
                         onpick: |_| {},

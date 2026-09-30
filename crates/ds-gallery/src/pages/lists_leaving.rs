@@ -1,4 +1,4 @@
-//! Lists: the notification center's column as a `LeavingList`, in a Popover root.
+//! Lists: the notification center's column as a `List`, in a Popover root.
 //! Each group is its `GroupHeader` over its cards. A card's close dismisses it (a batch of one);
 //! a header's Clear drops the whole group in one render, so its rows fold one after another and
 //! the groups below heal by the group's summed height; folding a group hides all but its newest
@@ -9,9 +9,7 @@ use super::Section;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::Bezel;
-use ds::{
-    Appearance, Button, Ds, Icon, IconSource, Inject, LeavingItem, LeavingList, Material, Shown,
-};
+use ds::{Appearance, Button, Ds, Icon, IconSource, Inject, List, ListItem, Material, Shown};
 use ds_shell::{AppMark, GroupHeader, NotificationCard};
 
 /// An app's group.
@@ -118,13 +116,16 @@ pub fn LeavingColumn() -> Element {
     let mut posted = use_signal(|| 0usize);
     let items = rows(&notes(), &folded())
         .into_iter()
-        .map(|row| LeavingItem {
-            key: row,
-            row: draw(row, &notes(), &folded(), notes, folded),
+        .map(|row| {
+            let content = draw(row, &notes(), &folded(), notes, folded);
+            match row {
+                Row::Head(_) => ListItem::heading(row, content),
+                Row::Card(id) => ListItem::row(row, format!("Notification {id}"), content),
+            }
         })
         .collect::<Vec<_>>();
     rsx! {
-        Section { title: "LeavingList",
+        Section { title: "List: rows that leave in batches",
             note: "The notification center's column: GroupHeaders over NotificationCards in a Popover root, 360 wide. A card's close dismisses it: it folds (--t-big --e-exit) and the rows below heal by the height it measured. A header's Clear drops its group in one render: the rows fold one after another (--i x --stagger, capped at 12) and are dropped together once the last has settled, and the groups below heal by the group's summed height. Folding a group (N more) hides all but its newest card the same way. Clear all folds every row. Post adds a card that enters with row-in (--t-big --e-spring). Under Reduced a row fades out and in and the rows below take their places without sliding.",
             if showcase == Showcase::Live {
                 div { class: "g-row",
@@ -148,7 +149,7 @@ pub fn LeavingColumn() -> Element {
             }
             div { class: "g-leave",
                 Ds { appearance, material: Material::Popover, stylesheet: Inject::Host,
-                    LeavingList::<Row> { label: "Notifications", items }
+                    List::<Row> { label: "Notifications", items }
                 }
             }
         }

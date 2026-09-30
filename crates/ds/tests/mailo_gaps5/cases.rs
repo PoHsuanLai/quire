@@ -3,10 +3,9 @@
 use dioxus::prelude::*;
 use ds::{Bezel, ControlSize};
 use ds::{
-    Button, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle, PlaceId, Presence,
-    ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
+    Button, Common, DataAttr, DataName, DropState, Icon, Leading, MarkProvider, MarkSize,
+    MarkStyle, ProviderMark, Row, RowLeading, RowState, RunTone, TextLine, TextRun, Trailing,
 };
-use ds::{DropState, Selection};
 
 /// One state and its golden.
 pub struct Case {
@@ -24,17 +23,15 @@ fn quoted_head() -> TextLine {
 
 /// The Archive place during a drag, in `drop` state.
 fn archive(drop: DropState) -> Element {
+    let place = DataName::parse("place")
+        .map(|name| vec![DataAttr::new(name, "archive")])
+        .unwrap_or_default();
     rsx! {
-        SidebarItem {
-            state: RowState { selection: Selection::Unselected, drop, ..RowState::default() },
-            kind: ItemKind::Place { icon: Icon::Archive },
-            label: "Archive",
-            count: None,
-            presence: Presence::Present,
-            preview: None,
-            onclick: |_| {},
-            onclose: None,
-            place: PlaceId("archive".to_string()),
+        Row {
+            title: "Archive",
+            leading: RowLeading::Icon(Icon::Archive),
+            state: RowState { drop, ..RowState::default() },
+            common: Common { data: place, ..Common::default() },
         }
     }
 }
@@ -56,7 +53,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} } },
     },
     Case {
-        golden: "lists/sidebar_item/place-drop-accepts.html",
+        golden: "lists/row/place-drop-accepts.html",
         make: || archive(DropState::Accepts),
     },
     Case {

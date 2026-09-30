@@ -1,10 +1,10 @@
-//! SettingsRow's specimens: each trailing mark, a row with no glyph or detail, a disabled row,
-//! and a list of three networks in both schemes.
+//! `Row`'s settings-height specimens: each accessory, a row with no leading element or detail, a
+//! disabled row, and a list of three networks in both schemes.
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Check, Ds, Icon, Inject, Material, RowTrailing, RunTone, SettingsRow,
-    TextLine, TextRun, Theme,
+    Accessory, Appearance, Availability, Check, Ds, Icon, Inject, List, ListItem, Material, Row,
+    RowLeading, RowSize, RowState, RunTone, TextLine, TextRun, Theme,
 };
 
 /// Which specimen.
@@ -42,33 +42,40 @@ pub const CASES: [(RowCase, &str); 11] = [
 ];
 
 /// The trailing mark a single-row case ends in.
-fn mark(case: RowCase) -> RowTrailing {
+fn mark(case: RowCase) -> Accessory {
     match case {
-        RowCase::CheckOn => RowTrailing::Check(Check::On),
-        RowCase::CheckOff => RowTrailing::Check(Check::Off),
-        RowCase::Toggle => RowTrailing::Toggle {
+        RowCase::CheckOn => Accessory::Check(Check::On),
+        RowCase::CheckOff => Accessory::Check(Check::Off),
+        RowCase::Toggle => Accessory::Toggle {
             value: Check::On,
             on_toggle: EventHandler::new(|_| {}),
         },
-        RowCase::Chevron => RowTrailing::Chevron,
-        RowCase::Value => RowTrailing::Text(TextLine::from("84%")),
-        RowCase::Glyph => RowTrailing::Glyph(Icon::Lock),
-        RowCase::None | RowCase::Bare | RowCase::Disabled | RowCase::Networks(_) => {
-            RowTrailing::None
-        }
+        RowCase::Chevron => Accessory::Chevron,
+        RowCase::Value => Accessory::Text("84%".to_string()),
+        RowCase::Glyph => Accessory::Glyph(Icon::Lock),
+        RowCase::None | RowCase::Bare | RowCase::Disabled | RowCase::Networks(_) => Accessory::None,
     }
 }
 
 /// The three networks a Wi-Fi detail lists: the one in use checked, a secured one, an open one.
 fn networks() -> Element {
+    let item = |title: &'static str, row: Element| ListItem::row(title, title, row);
     rsx! {
-        SettingsRow { glyph: Icon::Wifi, title: "Home", detail: "Connected", trailing: RowTrailing::Check(Check::On), onclick: |_| {} }
-        SettingsRow { glyph: Icon::WifiHigh, title: "Studio 5G", trailing: RowTrailing::Glyph(Icon::Lock), onclick: |_| {} }
-        SettingsRow {
-            glyph: Icon::WifiLow,
-            title: TextLine::Runs(vec![TextRun::new("Café ", RunTone::Plain), TextRun::new("Guest", RunTone::Faint)]),
-            trailing: RowTrailing::Check(Check::Off),
-            onclick: |_| {},
+        List::<&'static str> {
+            label: "Networks",
+            items: vec![
+                item("Home", rsx! { Row { leading: RowLeading::Icon(Icon::Wifi), title: "Home", detail: TextLine::from("Connected"), accessory: Accessory::Check(Check::On), size: RowSize::Settings, onclick: |_| {} } }),
+                item("Studio 5G", rsx! { Row { leading: RowLeading::Icon(Icon::WifiHigh), title: "Studio 5G", accessory: Accessory::Glyph(Icon::Lock), size: RowSize::Settings, onclick: |_| {} } }),
+                item("Café Guest", rsx! {
+                    Row {
+                        leading: RowLeading::Icon(Icon::WifiLow),
+                        title: TextLine::Runs(vec![TextRun::new("Café ", RunTone::Plain), TextRun::new("Guest", RunTone::Faint)]),
+                        accessory: Accessory::Check(Check::Off),
+                        size: RowSize::Settings,
+                        onclick: |_| {},
+                    }
+                }),
+            ],
         }
     }
 }
@@ -82,20 +89,21 @@ pub fn row(props: RowProps) -> Element {
     let body = match props.case {
         RowCase::Networks(_) => networks(),
         RowCase::Bare => rsx! {
-            SettingsRow { title: "Show in menu bar", onclick: |_| {} }
+            Row { title: "Show in menu bar", size: RowSize::Settings, onclick: |_| {} }
         },
         RowCase::Disabled => rsx! {
-            SettingsRow {
-                glyph: Icon::Bluetooth,
+            Row {
+                leading: RowLeading::Icon(Icon::Bluetooth),
                 title: "Keyboard",
-                detail: "Not connected",
-                trailing: RowTrailing::Chevron,
-                availability: Availability::Disabled,
+                detail: TextLine::from("Not connected"),
+                accessory: Accessory::Chevron,
+                state: RowState { availability: Availability::Disabled, ..RowState::default() },
+                size: RowSize::Settings,
                 onclick: |_| {},
             }
         },
         case => rsx! {
-            SettingsRow { glyph: Icon::Headphones, title: "Headphones", detail: "Battery 84%", trailing: mark(case), onclick: |_| {} }
+            Row { leading: RowLeading::Icon(Icon::Headphones), title: "Headphones", detail: TextLine::from("Battery 84%"), accessory: mark(case), size: RowSize::Settings, onclick: |_| {} }
         },
     };
     rsx! {

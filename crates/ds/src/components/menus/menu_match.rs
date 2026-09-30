@@ -1,45 +1,5 @@
-//! Matching a menu title against the typed query: the command menu's fuzzy ranker
-//! (design/06-INTERACTIONS.md section 11.2) and the `mark` runs it draws.
-
-use dioxus::prelude::*;
-
-/// `text` with the characters at `marks` wrapped in `mark` runs.
-pub(crate) fn marked(text: &str, marks: &[usize]) -> Element {
-    let runs = runs(text, marks);
-    rsx! {
-        for (index , (run , hit)) in runs.into_iter().enumerate() {
-            if hit == Hit::Marked {
-                mark { key: "{index}", "{run}" }
-            } else {
-                Fragment { key: "{index}", "{run}" }
-            }
-        }
-    }
-}
-
-/// Whether a run of a title matched the query.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Hit {
-    Marked,
-    Plain,
-}
-
-/// `text` split into maximal runs of marked and unmarked characters.
-fn runs(text: &str, marks: &[usize]) -> Vec<(String, Hit)> {
-    let mut out: Vec<(String, Hit)> = Vec::new();
-    for (index, c) in text.chars().enumerate() {
-        let hit = if marks.contains(&index) {
-            Hit::Marked
-        } else {
-            Hit::Plain
-        };
-        match out.last_mut() {
-            Some((run, last)) if *last == hit => run.push(c),
-            _ => out.push((c.to_string(), hit)),
-        }
-    }
-    out
-}
+//! Matching a title against the typed query: the command palette's fuzzy ranker
+//! (design/06-INTERACTIONS.md section 11.2).
 
 /// A fuzzy match: its score and the matched characters of the text, by char index.
 #[derive(Debug, Clone, PartialEq)]
@@ -115,7 +75,7 @@ fn word_start(t: &[char], index: usize) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{Hit, fuzzy, runs};
+    use super::fuzzy;
 
     /// A match's score and marks, or no match.
     type Want = Option<(f32, &'static [usize])>;
@@ -148,16 +108,5 @@ mod tests {
                 _ => panic!("{query} in {text}: {got:?}, want {want:?}"),
             }
         }
-    }
-
-    #[test]
-    fn marks_split_a_title_into_runs() {
-        assert_eq!(
-            runs("Re: UIDL", &[4, 5, 6, 7]),
-            vec![
-                ("Re: ".to_string(), Hit::Plain),
-                ("UIDL".to_string(), Hit::Marked)
-            ]
-        );
     }
 }

@@ -4,9 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, Fraction, Grain, HeaderKind, Icon, ItemKind, Material, PRESETS, Presence, Rect,
-    RowState, Scheme, SectionHeader, Selection, SendPhase, SendPill, SidebarItem, SpaceLook, Theme,
-    use_toasts,
+    Accessory, Appearance, Ds, Fraction, Grain, Icon, Material, PRESETS, Rect, Row, RowLeading,
+    Scheme, SectionHeader, SendPhase, SendPill, SpaceLook, Theme, use_toasts,
 };
 use ds::{FieldBezel, FieldKind, TextField};
 use ds_native::{Harness, Viewport};
@@ -199,10 +198,10 @@ fn HeadersApp() -> Element {
     rsx! {
         Root {
             div { class: "probe-grid", style: "display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); width:400px",
-                SectionHeader { kind: HeaderKind::Frame, text: "Frame" }
-                SectionHeader { kind: HeaderKind::Group, text: "Group", value: Some("12".to_string()) }
-                SectionHeader { kind: HeaderKind::Field, text: "Field", value: Some("Light".to_string()) }
-                SectionHeader { kind: HeaderKind::Menu, text: "Menu" }
+                SectionHeader { title: "Title" }
+                SectionHeader { title: "Value", value: Some("12".to_string()) }
+                SectionHeader { title: "Another", value: Some("Light".to_string()) }
+                SectionHeader { title: "Last" }
             }
         }
     }
@@ -233,7 +232,7 @@ fn each_section_header_is_a_full_width_row_of_its_own() {
     }
 }
 
-// ---- 6. SidebarItem without a count starts at the left -------------------------------------
+// ---- 6. A Row without an accessory starts at the left --------------------------------------
 
 #[allow(non_snake_case)]
 fn ItemsApp() -> Element {
@@ -241,10 +240,10 @@ fn ItemsApp() -> Element {
         Root {
             div { style: "width:220px",
                 div { class: "probe-counted",
-                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Inbox }, label: "Inbox", count: Some(12), presence: Presence::Present, preview: None, onclick: |_| {}, onclose: None }
+                    Row { leading: RowLeading::Icon(Icon::Inbox), title: "Inbox", accessory: Accessory::Badge(12), onclick: |_| {} }
                 }
                 div { class: "probe-bare",
-                    SidebarItem { state: RowState { selection: Selection::Unselected, ..RowState::default() }, kind: ItemKind::Place { icon: Icon::Star }, label: "Starred", count: None, presence: Presence::Present, preview: None, onclick: |_| {}, onclose: None }
+                    Row { leading: RowLeading::Icon(Icon::Star), title: "Starred", onclick: |_| {} }
                 }
             }
         }
@@ -252,16 +251,16 @@ fn ItemsApp() -> Element {
 }
 
 #[test]
-fn a_sidebar_item_without_a_count_keeps_its_label_left() {
+fn a_row_without_an_accessory_keeps_its_title_left() {
     let harness = Harness::new(ItemsApp, VIEW);
-    let counted = rect(&harness, ".probe-counted .ds-sidebar-item-text");
-    let bare = rect(&harness, ".probe-bare .ds-sidebar-item-text");
-    let item = rect(&harness, ".probe-bare .ds-sidebar-item");
-    // Padding 8, icon 16, gap 9: the label starts 33 px in, with or without a count.
+    let counted = rect(&harness, ".probe-counted .ds-row-title");
+    let bare = rect(&harness, ".probe-bare .ds-row-title");
+    let item = rect(&harness, ".probe-bare .ds-row");
+    // Padding 8, leading column 22, gap 8: the title starts 38 px in, with or without a count.
     let start = bare.origin.x.0 - item.origin.x.0;
     assert!(
-        (start - 33.0).abs() <= 1.0,
-        "the label starts {start} px in, want 33"
+        (start - 38.0).abs() <= 1.0,
+        "the title starts {start} px in, want 38"
     );
     assert!(
         (bare.origin.x.0 - counted.origin.x.0).abs() <= 0.5,

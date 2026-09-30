@@ -7,9 +7,9 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, CommandPalette, CommandPaletteHost, Ds, ExternalIcon,
-    FocusRequest, IconSize, IconSource, IconUrl, Material, Menu, MenuEntry, MenuKind, MenuTile,
-    MenuTrail, Px, Rect, ShortcutKey, use_focus_request,
+    Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, ExternalIcon, FocusRequest,
+    IconSize, IconSource, IconUrl, Material, Menu, MenuItem, MenuPlacement, PaletteGroup,
+    PaletteRow, Px, Rect, RowLeading, ShortcutKey, use_focus_request,
 };
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use probe::rect;
@@ -25,22 +25,14 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn row(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title)
 }
 
-fn groups() -> Vec<(String, Vec<MenuEntry<u8>>)> {
-    vec![(
-        "Applications".to_string(),
-        vec![item(1, "Files"), item(2, "Firefox"), item(3, "Terminal")],
+fn groups() -> Vec<PaletteGroup<u8>> {
+    vec![PaletteGroup::list(
+        "Applications",
+        vec![row(1, "Files"), row(2, "Firefox"), row(3, "Terminal")],
     )]
 }
 
@@ -126,9 +118,9 @@ fn Panel(selection: Selection, give_back: GiveBack) -> Element {
             p { class: "log", {log().join(",")} }
             if actions() {
                 Menu::<u8> {
-                    kind: MenuKind::Slim,
+                    placement: MenuPlacement::Popup,
                     anchor: Anchor::Rect(row().unwrap_or_default()),
-                    entries: vec![item(9, "Quit")],
+                    items: vec![MenuItem::new(9, "Quit")],
                     onpick: move |_| {},
                     onclose: move |()| {
                         actions.set(false);
@@ -168,7 +160,7 @@ fn log(harness: &Harness) -> String {
 
 /// The `n`th row (from 1) of the palette's list: its group's header is the list's first child.
 fn nth_row(n: usize) -> String {
-    format!("#launcher-card .ds-menu-item:nth-child({})", n + 1)
+    format!("#launcher-card .ds-row:nth-child({})", n + 1)
 }
 
 /// Let the palette mount, measure and report.
@@ -276,8 +268,8 @@ fn open_and_close_actions(harness: &mut Harness) {
     let menu = rect(harness, ".ds-popover.ds-menu");
     let row = rect(harness, &nth_row(1));
     assert!(
-        (menu.origin.y.0 - (row.origin.y.0 + row.size.height.0 + 6.0)).abs() < 1.0,
-        "the menu hangs 6 px under the selected row: {menu:?} {row:?}"
+        (menu.origin.y.0 - (row.origin.y.0 + row.size.height.0 + 2.0)).abs() < 1.0,
+        "the menu hangs 2 px under the selected row: {menu:?} {row:?}"
     );
     harness.key(ShortcutKey::Escape);
     harness.advance(ms(400));
@@ -350,17 +342,9 @@ fn AppIconRow() -> Element {
                     placeholder: "Search".to_string(),
                     query: String::new(),
                     tokens: Vec::new(),
-                    groups: vec![(
-                        "Applications".to_string(),
-                        vec![MenuEntry::Item {
-                            value: 1,
-                            title: "Firefox".to_string(),
-                            detail: None,
-                            tile: Some(MenuTile::Source(icon)),
-                            trail: MenuTrail::None,
-                            check: None,
-                            availability: Availability::Enabled,
-                        }],
+                    groups: vec![PaletteGroup::list(
+                        "Applications",
+                        vec![PaletteRow { leading: RowLeading::Source(icon), ..PaletteRow::new(1, "Firefox") }],
                     )],
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
@@ -378,8 +362,8 @@ fn AppIconRow() -> Element {
 fn an_app_icon_fills_its_rows_tile() {
     let mut harness = Harness::new(AppIconRow, VIEW);
     harness.advance(ms(700));
-    let tile = rect(&harness, ".ds-menu-tile[*|data-tile=image]");
-    let icon = rect(&harness, ".ds-menu-tile > .ds-ext-icon");
+    let tile = rect(&harness, ".ds-row-leading[*|data-leading=image]");
+    let icon = rect(&harness, ".ds-row-leading > .ds-ext-icon");
     assert_eq!(tile.size.width, Px(34.0));
     assert_eq!(icon, tile, "the icon fills the tile");
     let frame = harness.render().expect("a frame");

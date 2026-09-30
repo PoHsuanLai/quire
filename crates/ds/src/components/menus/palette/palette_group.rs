@@ -1,12 +1,60 @@
-//! A command palette's groups: a titled run of rows or an emoji grid, with an
-//! optional action on its header ("Show More"). `CommandPalette { groups }` takes
-//! [`PaletteGroups`], which a `Vec` of groups converts into, and so does the older
-//! `Vec<(String, Vec<MenuEntry<T>>)>`: every call site written before groups had actions still
-//! compiles as it was.
+//! A command palette's groups: a titled run of rows or an emoji grid, with an optional action on
+//! its header ("Show More"). `CommandPalette { groups }` takes [`PaletteGroups`], which a `Vec`
+//! of groups converts into.
 
+use crate::components::content::text_runs::TextLine;
 use crate::components::lists::emoji_grid::grid::EmojiCells;
-use crate::components::menus::menu_entry::MenuEntry;
+use crate::components::lists::row::accessory::Accessory;
+use crate::components::lists::row::action::RowAction;
+use crate::components::lists::row::chord::RowChord;
+use crate::components::lists::row::leading::RowLeading;
+use crate::components::lists::row::shape::RowShape;
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+
+/// A result the palette lists: what picking it yields and how its `Row` draws.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PaletteRow<T> {
+    /// What picking it yields.
+    pub value: T,
+    /// Its name. A plain title is marked where the query matches it; runs are drawn as given (the
+    /// caller's marks win).
+    pub title: TextLine,
+    /// One line of help.
+    pub detail: Option<TextLine>,
+    /// What leads it.
+    pub leading: RowLeading,
+    /// What ends it.
+    pub accessory: Accessory,
+    /// The keys of its action, after the accessory: by default only while it is the selection
+    /// (Spotlight's hint, [`RowChord::on_selected`]); none when empty.
+    pub chord: RowChord,
+    /// Whether it can be picked.
+    pub availability: Availability,
+    /// A button at its end that acts without picking it.
+    pub action: Option<RowAction>,
+    /// How it draws beyond its title and detail: `Plain`, or a file's or a clipboard entry's
+    /// shape.
+    pub shape: RowShape,
+}
+
+impl<T> PaletteRow<T> {
+    /// An enabled row yielding `value`, named `title`, with nothing else. Set what differs:
+    /// `PaletteRow { accessory, ..PaletteRow::new(hit, title) }`.
+    pub fn new(value: T, title: impl Into<TextLine>) -> Self {
+        PaletteRow {
+            value,
+            title: title.into(),
+            detail: None,
+            leading: RowLeading::None,
+            accessory: Accessory::None,
+            chord: RowChord::default(),
+            availability: Availability::Enabled,
+            action: None,
+            shape: RowShape::Plain,
+        }
+    }
+}
 
 /// One group: its title (a `SectionHeader`), what it lists, and the header's trailing action.
 #[derive(Clone, PartialEq)]
@@ -24,8 +72,8 @@ pub struct PaletteGroup<T: 'static> {
 /// What a group lists.
 #[derive(Debug, Clone, PartialEq)]
 pub enum GroupEntries<T> {
-    /// Rows, as a menu's entries.
-    List(Vec<MenuEntry<T>>),
+    /// Rows.
+    List(Vec<PaletteRow<T>>),
     /// An emoji grid, moved through in two dimensions.
     Grid(EmojiCells<T>),
 }
@@ -42,7 +90,7 @@ impl<T> GroupEntries<T> {
 
 impl<T> PaletteGroup<T> {
     /// A group of rows with no action.
-    pub fn list(title: impl Into<String>, entries: Vec<MenuEntry<T>>) -> Self {
+    pub fn list(title: impl Into<String>, entries: Vec<PaletteRow<T>>) -> Self {
         PaletteGroup {
             title: title.into(),
             entries: GroupEntries::List(entries),
@@ -68,15 +116,8 @@ impl<T> PaletteGroup<T> {
     }
 }
 
-impl<T> From<(String, Vec<MenuEntry<T>>)> for PaletteGroup<T> {
-    fn from((title, entries): (String, Vec<MenuEntry<T>>)) -> Self {
-        PaletteGroup::list(title, entries)
-    }
-}
-
-/// A palette's groups, in order: what `CommandPalette { groups }` takes. Built from a
-/// `Vec<PaletteGroup<T>>` or, as before groups had actions and grids, from a
-/// `Vec<(String, Vec<MenuEntry<T>>)>`.
+/// A palette's groups, in order: what `CommandPalette { groups }` takes, built from a
+/// `Vec<PaletteGroup<T>>`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PaletteGroups<T: 'static>(pub Vec<PaletteGroup<T>>);
 
@@ -100,8 +141,7 @@ impl<T: Clone> PaletteGroups<T> {
     }
 }
 
-/// No groups: the palette shows its `empty` line. (`groups: Vec::new()` no longer names its
-/// element type now that two kinds of `Vec` convert; write `PaletteGroups::default()`.)
+/// No groups: the palette shows its `empty` line.
 impl<T> Default for PaletteGroups<T> {
     fn default() -> Self {
         PaletteGroups(Vec::new())
@@ -111,12 +151,6 @@ impl<T> Default for PaletteGroups<T> {
 impl<T> From<Vec<PaletteGroup<T>>> for PaletteGroups<T> {
     fn from(groups: Vec<PaletteGroup<T>>) -> Self {
         PaletteGroups(groups)
-    }
-}
-
-impl<T> From<Vec<(String, Vec<MenuEntry<T>>)>> for PaletteGroups<T> {
-    fn from(groups: Vec<(String, Vec<MenuEntry<T>>)>) -> Self {
-        PaletteGroups(groups.into_iter().map(PaletteGroup::from).collect())
     }
 }
 

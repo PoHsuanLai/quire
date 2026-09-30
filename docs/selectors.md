@@ -27,13 +27,15 @@ re-theme every surface consistently, and every token variable
 | KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
 | Label | `.ds-label` | none yet |
 | LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |
-| List | `.ds-list` | none yet |
-| Menu | `.ds-menu` | `.ds-menu-item`, `.ds-menu-separator` |
+| Disclosure | `.ds-disclosure` | `.ds-disclosure-indicator`, `.ds-disclosure-body` |
+| List | `.ds-list` | `.ds-list-item` |
+| Menu | `.ds-menu` | `.ds-menu-item`, `.ds-menu-separator`, `.ds-menu-header` |
 | Popover | `.ds-popover` | `.ds-popover-body`, `.ds-popover-arrow` |
 | ProgressIndicator | `.ds-progress` | `.ds-progress-track`, `.ds-progress-fill`, `.ds-progress-indicator`, `.ds-progress-glyph` |
 | RadioGroup | `.ds-radio-group` | `.ds-radio-group-item`, `.ds-radio-group-indicator`, `.ds-radio-group-label`, `.ds-radio-group-image` |
-| Row | `.ds-row` | none yet |
-| SectionHeader | `.ds-section-header` | none yet |
+| PopUpButton | `.ds-popup` | `.ds-popup-sizer` |
+| Row | `.ds-row` | `.ds-row-leading`, `.ds-row-title`, `.ds-row-detail`, `.ds-row-trailing` |
+| SectionHeader | `.ds-section-header` | `.ds-section-header-title`, `.ds-section-header-value`, `.ds-section-header-action` |
 | SegmentedControl | `.ds-segmented` | `.ds-segmented-segment`, `.ds-segmented-indicator`, `.ds-segmented-label`, `.ds-segmented-icon` |
 | Sheet | `.ds-sheet` | `.ds-sheet-body` |
 | SidePanel | `.ds-side-panel` | `.ds-side-panel-header`, `.ds-side-panel-body` |

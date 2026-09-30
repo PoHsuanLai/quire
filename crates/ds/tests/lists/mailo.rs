@@ -1,4 +1,4 @@
-//! The mail-app row cases: a search hit's runs in the subject and snippet, a row named for
+//! The mail-app thread row cases: a search hit's runs in the subject and snippet, a row named for
 //! a screen reader, and the strip revealed or held down by its caller, titled, with a button
 //! whose menu is open.
 
@@ -6,7 +6,7 @@ use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{
-    ActionId, HoverStrip, ListRow, Presence, RowState, RunTone, Shown, TextLine, TextRun, Titles,
+    ActionId, Common, HoverStrip, RowState, RunTone, Shown, TextLine, TextRun, ThreadRow, Titles,
 };
 use ds::{Emphasis, Selection};
 
@@ -23,9 +23,8 @@ fn marked_subject() -> TextLine {
 /// A read row carrying `strip`, its subject and snippet marked.
 fn row_with(strip: Option<Element>) -> Element {
     rsx! {
-        ListRow {
+        ThreadRow {
             state: RowState { selection: Selection::Selected, emphasis: Emphasis::Plain, ..RowState::default() },
-            presence: Presence::Present,
             name: "Dana Okafor",
             via: None,
             subject: marked_subject(),
@@ -39,7 +38,7 @@ fn row_with(strip: Option<Element>) -> Element {
             star: None,
             strip,
             onclick: |_| {},
-            aria_label: "Open Re: UIDL stability across servers".to_string(),
+            common: Common { aria_label: Some("Open Re: UIDL stability across servers".to_string()), ..Common::default() },
         }
     }
 }
@@ -61,12 +60,12 @@ fn caller_strip(shown: Shown) -> Element {
 
 pub const MAILO_CASES: &[Case] = &[
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "marked-runs",
         make: || row_with(None),
     },
     Case {
-        component: "list_row",
+        component: "thread_row",
         state: "strip-shown-by-caller",
         make: || row_with(Some(caller_strip(Shown::Visible))),
     },

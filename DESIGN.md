@@ -143,7 +143,7 @@ built once per scheme, and the mapping between a dot and its place on it, O-19),
 `ds-core/png.rs`'s, as is the grain tile (`ds-style/css/grain.rs`).
 
 Props worth knowing: `TextField`
-`focus: FieldFocus{OnMount, Manual, Controlled}`; `ListRow` and `SidebarItem` `drop:
+`focus: FieldFocus{OnMount, Manual, Controlled}`; `Row` `drop:
 DropState{Idle, Target, Source}` (`ds-core/vocab.rs`, §34); `BubbleAction::{Button(BubbleButton),
 Separator}`; `AccountFace::One{address}`; `SpaceEditor` `name` and `on_active_dot:
 EventHandler<ActiveDot>`; `Ds` `tint_alpha: Option<Alpha>`, fed by

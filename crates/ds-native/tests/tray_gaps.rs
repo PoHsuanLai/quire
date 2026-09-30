@@ -9,8 +9,8 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, Button, Common, Ds, ExternalIcon, IconSize, IconSource,
-    IconUrl, IconView, Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, PointerButton, Press,
-    Px, ShortcutKey, Theme,
+    IconUrl, IconView, Material, Menu, MenuItem, Point, PointerButton, Press, Px, ShortcutKey,
+    Theme,
 };
 use ds::{Bezel, ControlSize, ImagePosition};
 use ds_native::harness::settle_until;
@@ -200,26 +200,25 @@ fn a_right_click_reports_a_secondary_press() {
 
 // ---- Submenus and disabled items ---------------------------------------------------------
 
-fn item(value: u8, title: &str, availability: Availability) -> MenuEntry<u8> {
-    MenuEntry::Item {
+fn item(value: u8, title: &str, availability: Availability) -> MenuItem<u8> {
+    MenuItem::Item {
         value,
         title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
+        image: None,
+        key: None,
         check: None,
         availability,
     }
 }
 
-fn entries() -> Vec<MenuEntry<u8>> {
+fn entries() -> Vec<MenuItem<u8>> {
     vec![
         item(1, "Open", Availability::Enabled),
         item(2, "Pause", Availability::Disabled),
         item(3, "Quit", Availability::Enabled),
-        MenuEntry::Submenu {
+        MenuItem::Submenu {
             title: "More".to_string(),
-            tile: None,
+            image: None,
             availability: Availability::Enabled,
             children: vec![
                 item(10, "About", Availability::Enabled),
@@ -242,9 +241,9 @@ fn MenuApp() -> Element {
             }
             if open() {
                 Menu::<u8> {
-                    kind: MenuKind::Context,
+                    placement: ds::MenuPlacement::Popup,
                     anchor: Anchor::Point(Point { x: Px(40.0), y: Px(60.0) }),
-                    entries: entries(),
+                    items: entries(),
                     onpick: move |value| picked.set(value),
                     onclose: move |()| open.set(false),
                 }
@@ -256,7 +255,7 @@ fn MenuApp() -> Element {
 /// The selected row's title.
 fn selected(harness: &Harness) -> String {
     harness
-        .text_of(".ds-menu-item[*|aria-selected=true]")
+        .text_of(".ds-menu-item[*|data-selected=true] .ds-menu-label")
         .unwrap_or_default()
 }
 
@@ -353,15 +352,13 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
     }
     assert_eq!(selected(&harness), "More");
     harness.key(ShortcutKey::Right);
-    harness.advance(ms(120));
-    assert_eq!(
-        harness.count(SUBMENU),
-        1,
-        "Right opened it without the delay"
-    );
+    // Without the 200 ms rest: it opens as soon as its row and panel have been measured and
+    // hold still (a few frames), then it is placed and shown.
+    settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
     // The keyboard opened it, so it has the focus: Down moves inside it, Enter picks.
     harness.key(ShortcutKey::Down);
     harness.key(ShortcutKey::Enter);
+    settle_until(&mut harness, |h| h.count(".ds-menu") == 0);
     assert_eq!(harness.text_of(".picked").as_deref(), Some("11"));
     assert_eq!(
         harness.count(".ds-menu"),
@@ -378,12 +375,7 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
         harness.key(ShortcutKey::Down);
     }
     harness.key(ShortcutKey::Enter);
-    harness.advance(ms(120));
-    assert_eq!(
-        harness.count(SUBMENU),
-        1,
-        "Enter on a parent opens its submenu"
-    );
+    settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
     harness.key(ShortcutKey::Escape);
     assert_eq!(harness.count(SUBMENU), 0, "Escape closed the submenu");
     assert_eq!(harness.count(".ds-menu"), 1, "the menu stays");

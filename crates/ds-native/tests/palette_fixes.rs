@@ -4,9 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Availability, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, FieldKey, Icon,
-    InitialCaret, Material, MenuEntry, MenuRow, MenuTile, MenuTrail, PaletteGroup, PaletteGroups,
-    Rect, RowShape, Shortcut, ShortcutKey,
+    Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, FieldKey, Icon, InitialCaret,
+    Material, PaletteGroup, PaletteGroups, Rect, RowShape, Shortcut, ShortcutKey,
 };
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -21,16 +20,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> MenuEntry<u8> {
-    MenuEntry::Item {
-        value,
-        title: title.to_string(),
-        detail: None,
-        tile: None,
-        trail: MenuTrail::None,
-        check: None,
-        availability: Availability::Enabled,
-    }
+fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
+    ds::PaletteRow::new(value, title.to_string())
 }
 
 /// Twenty rows in one group with a "Show More" after them (stop 20): far more than the list's
@@ -96,7 +87,7 @@ fn LongPalette() -> Element {
 /// The selected stop's rect: a row, or the header's action.
 fn selected_rect(harness: &Harness) -> Rect {
     harness
-        .rect("#card .ds-menu-item[*|aria-selected=true]")
+        .rect("#card .ds-row[*|aria-selected=true]")
         .or_else(|| harness.rect("#card .ds-section-header-action[*|data-selected=true]"))
         .expect("a stop is selected")
 }
@@ -124,8 +115,10 @@ fn the_list_keeps_the_callers_selection_in_view() {
     harness.advance(ms(200));
     // At rest the list is not scrolled, so its rect now is its scrollport. (Blitz moves an
     // element's own client rect by its own scroll offset, so it is read before any scroll.)
-    let view = harness.rect("#card .ds-menu").expect("the list is drawn");
-    let row = |n: usize| format!("#card .ds-menu-item:nth-of-type({})", n + 2);
+    let view = harness
+        .rect("#card .ds-palette-list")
+        .expect("the list is drawn");
+    let row = |n: usize| format!("#card .ds-row:nth-of-type({})", n + 2);
     let far = harness.rect(&row(15)).expect("row 15 is laid out");
     assert!(top(far) > bottom(view), "row 15 starts below the fold");
 
@@ -134,7 +127,7 @@ fn the_list_keeps_the_callers_selection_in_view() {
     let shown = selected_rect(&harness);
     assert_eq!(
         harness
-            .text_of("#card .ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of("#card .ds-row[*|aria-selected=true] .ds-row-title")
             .as_deref(),
         Some("Row 15")
     );
@@ -219,9 +212,11 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
     }
     let mut harness = Harness::new(Own, VIEW);
     harness.advance(ms(200));
-    let view = harness.rect("#card .ds-menu").expect("the list is drawn");
+    let view = harness
+        .rect("#card .ds-palette-list")
+        .expect("the list is drawn");
     let row_11 = harness
-        .rect("#card .ds-menu-item:nth-of-type(13)")
+        .rect("#card .ds-row:nth-of-type(13)")
         .expect("row 11 is laid out");
     assert!(top(row_11) > bottom(view), "row 11 starts below the fold");
     for _ in 0..11 {
@@ -231,7 +226,7 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
     harness.advance(ms(100));
     assert_eq!(
         harness
-            .text_of("#card .ds-menu-item[*|aria-selected=true] .ds-menu-title")
+            .text_of("#card .ds-row[*|aria-selected=true] .ds-row-title")
             .as_deref(),
         Some("Row 11")
     );
@@ -279,7 +274,7 @@ fn Opened(initial_caret: Option<InitialCaret>) -> Element {
                 placeholder: "Search",
                 query: query(),
                 tokens: Vec::new(),
-                groups: vec![("Applications".to_string(), rows)],
+                groups: vec![ds::PaletteGroup::list("Applications", rows)],
                 empty: "Nothing",
                 oninput: move |text: String| query.set(text),
                 onpick: move |_| {},
@@ -295,7 +290,7 @@ fn Opened(initial_caret: Option<InitialCaret>) -> Element {
                 placeholder: "Search",
                 query: query(),
                 tokens: Vec::new(),
-                groups: vec![("Applications".to_string(), rows)],
+                groups: vec![ds::PaletteGroup::list("Applications", rows)],
                 empty: "Nothing",
                 oninput: move |text: String| query.set(text),
                 onpick: move |_| {},
@@ -370,16 +365,16 @@ fn a_palette_opened_on_a_query_puts_the_caret_where_it_is_asked() {
 
 #[allow(non_snake_case)]
 fn KeyedRow() -> Element {
-    let row = MenuEntry::Row(MenuRow {
-        tile: Some(MenuTile::Icon(Icon::File)),
+    let row = ds::PaletteRow {
+        leading: ds::RowLeading::Icon(Icon::File),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_string(),
             modified: "00:33".to_string(),
         },
-        trail: MenuTrail::Shortcut(Shortcut(vec![ShortcutKey::Enter])),
-        ..MenuRow::new(1, "Invoice.pdf")
-    });
+        accessory: ds::Accessory::Text((Shortcut(vec![ShortcutKey::Enter])).glyphs()),
+        ..ds::PaletteRow::new(1, "Invoice.pdf")
+    };
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "width:600px; height:600px",
@@ -407,10 +402,10 @@ fn a_rows_time_and_its_shortcut_keep_their_gap() {
     let mut harness = Harness::new(KeyedRow, VIEW);
     harness.advance(ms(200));
     let when = harness
-        .rect("#card .ds-menu-when")
+        .rect("#card .ds-row-when")
         .expect("the time is drawn");
     let keys = harness
-        .rect("#card .ds-menu-keys")
+        .rect("#card .ds-row-trailing")
         .expect("the shortcut is drawn");
     let gap = keys.origin.x.0 - (when.origin.x.0 + when.size.width.0);
     assert!(

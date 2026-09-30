@@ -232,7 +232,7 @@ fn a_long_press_on_the_green_light_opens_the_menu_and_fill_maximizes() {
     );
     let fill = centre(&harness, ".ds-menu .ds-menu-item");
     harness.click(fill);
-    harness.advance(ms(300));
+    harness.advance(ms(700));
     assert_eq!(log(&harness), "zoom:Maximize");
     assert_eq!(harness.count(".ds-menu"), 0);
 }
@@ -248,7 +248,7 @@ fn a_placement_the_host_cannot_make_is_unavailable() {
         .map(|n| {
             let row = format!(".ds-menu > :nth-child({n})");
             let title = harness
-                .text_of(&format!("{row} .ds-menu-title"))
+                .text_of(&format!("{row} .ds-menu-label"))
                 .unwrap_or_default();
             (title, harness.attr(&row, "aria-disabled"))
         })

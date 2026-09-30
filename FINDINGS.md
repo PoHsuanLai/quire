@@ -26,9 +26,8 @@ that rev.
   whose rules are in `ds-shell`'s `space_editor` sheet, so under `ds::stylesheet()` alone the
   dot is unstyled (`STYLED_ABOVE` in `ds/tests/components_lists.rs`). Ends when those rules move
   to a sheet `ds` owns, which reorders the stylesheet golden.
-- **Motion and interaction primitives of step 4a.3 have consumers still to move.** Two
-  primitives have no caller in quire yet: `use_collapse` waits for the `Disclosure` of step 4a.5
-  (`TreeItem` is a native `details`), and `LongPress` waits for the dock and titlebar menus in
+- **Motion and interaction primitives of step 4a.3 have consumers still to move.** One
+  primitive has no caller in quire yet: `LongPress` waits for the dock and titlebar menus in
   sill. `rubber::resist` is read by the host's scroll; `Swipe` keeps its own `swipe_damping`
   setting (a quarter, not `.55`) until design/22 decides the key. The tooltip is driven by
   `HoverProfile::Tip` since step 4a.6 (the CSS Fly and its `2.5 x --t-big` delay are gone). `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
@@ -1211,3 +1210,8 @@ What Blitz at the pinned rev paints (48 px, headless):
   rebuilds the card. (7) Skeleton has no `-shape` part: the root is the shape (`data-shape`).
   (8) Public parts are in `ds::selectors`; the gallery example that restyles each and the
   `lint::user_stylesheet` cases wait for step 16.
+- **Step 4a.5 leftovers.** `Anim::MenuPop` stays because `SelectionBubble` still plays it; delete both
+  with the bubble. `PopUpButton` takes `MenuItem`s and draws its own face; it should compose the 4a.4
+  `Button` and take `Choice<T>` once that lands. `Row`'s `Accessory::Slot` (a caller's element, click and
+  mousedown fenced) is an addition beyond design/30 for `⋯` buttons and similar. `DropLine` still lives with
+  the app rows. `SubmenuOpen` and `TriangleTimeout` are now read by `MenuTrack` through the menu panels only.

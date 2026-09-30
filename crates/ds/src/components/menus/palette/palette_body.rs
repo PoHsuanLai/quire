@@ -3,19 +3,28 @@
 //! its stop number (`palette_stops`). Split from `command_palette`.
 
 use crate::components::lists::emoji_grid::grid::{CellEvents, draw_cells, grid_style};
-use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::components::menus::menu_kind::MenuKind;
-use crate::components::menus::menu_lines::choices_len;
-use crate::components::menus::menu_rows::{Drawn, render_lines};
+use crate::components::lists::row::row::{Row, RowMounted};
+use crate::components::lists::row::size::RowSize;
+use crate::components::lists::section_header::SectionHeader;
 use crate::components::menus::palette::palette_motion::ListMotion;
 use crate::components::menus::palette::palette_stops::{Body, ShownGroup};
 use dioxus::prelude::*;
-use ds_core::geometry::units::Point;
-use ds_core::vocab::Selection;
+use ds_core::vocab::{RowState, Selection};
+use std::cell::Cell;
+use std::rc::Rc;
+
+/// Whether the palette that draws the rows is still mounted.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Life {
+    Up,
+    Gone,
+}
 
 /// What the drawn stops report, by stop number.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub(crate) struct StopEvents {
+    /// Whether the palette is still up: a row mounts after it may be gone.
+    pub alive: Rc<Cell<Life>>,
     /// A click on a row or a cell.
     pub pick: EventHandler<usize>,
     /// The pointer moved over a row or a cell.
@@ -38,7 +47,7 @@ pub(crate) fn draw_groups<T>(
 ) -> Element {
     let drawn: Vec<Element> = shown
         .iter()
-        .map(|group| draw_group(group, current, events, motion))
+        .map(|group| draw_group(group, current, events.clone(), motion))
         .collect();
     rsx! {
         for (key , group) in drawn.into_iter().enumerate() {
@@ -57,26 +66,48 @@ fn draw_group<T>(
     let first = shown.first;
     let local = current.checked_sub(first);
     let (body, size) = match &shown.body {
-        Body::Rows(lines) => {
-            let size = choices_len(lines);
-            let body = render_lines(
-                lines,
-                MenuKind::Rich.row(),
-                Drawn {
-                    selected: local,
-                    open: None,
-                    onpick: EventHandler::new(move |at: usize| events.pick.call(first + at)),
-                    onpoint: EventHandler::new(move |(at, _): (usize, Point)| {
-                        events.point.call(first + at)
-                    }),
-                    onmounted: EventHandler::new(move |(at, event): (usize, MountedEvent)| {
-                        events.mounted.call((first + at, event))
-                    }),
-                    onrelease: None,
-                    motion: motion.rows_of(&shown.group.title),
-                },
-            );
-            (body, size)
+        Body::Rows(rows) => {
+            let size = rows.len();
+            let motion = motion.rows_of(&shown.group.title);
+            let drawn: Vec<Element> = rows
+                .iter()
+                .enumerate()
+                .map(|(at, marked)| {
+                    let row = marked.row;
+                    let state = RowState {
+                        selection: Selection::of(&Some(at), &local),
+                        availability: row.availability,
+                        ..RowState::default()
+                    };
+                    rsx! {
+                        Row {
+                            key: "{at}",
+                            leading: row.leading.clone(),
+                            title: row.title.clone(),
+                            marks: marked.marks.clone(),
+                            detail: row.detail.clone(),
+                            accessory: row.accessory.clone(),
+                            chord: row.chord.clone(),
+                            shape: row.shape.clone(),
+                            action: row.action.clone(),
+                            state,
+                            size: RowSize::Settings,
+                            motion: motion.of(at),
+                            onclick: move |_| events.pick.call(first + at),
+                            onpointermove: move |_| events.point.call(first + at),
+                            onmounted: {
+                                let alive = events.alive.clone();
+                                RowMounted::new(move |event: MountedEvent| {
+                                    if alive.get() == Life::Up {
+                                        events.mounted.call((first + at, event));
+                                    }
+                                })
+                            },
+                        }
+                    }
+                })
+                .collect();
+            (rsx! { {drawn.into_iter()} }, size)
         }
         Body::Grid(grid) => {
             let cells = draw_cells(
@@ -107,8 +138,7 @@ fn draw_group<T>(
     let action_selection = Selection::of(&Some(first + size), &Some(current));
     rsx! {
         SectionHeader {
-            kind: HeaderKind::Menu,
-            text: shown.group.title.clone(),
+            title: shown.group.title.clone(),
             action: shown.group.action.clone().map(|(label, run)| {
                 let booked = EventHandler::new(move |()| {
                     events.action_ran.call(());

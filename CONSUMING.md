@@ -494,13 +494,12 @@ rsx! {
 ### Lists
 
 ```rust
-use ds::{ListRow, Selection, Emphasis, Presence, PulseKey};
+use ds::app::ThreadRow;
+use ds::RowState;
 
 rsx! {
-    ListRow {
-        selection: Selection::Unselected,
-        emphasis: Emphasis::Plain,
-        presence: Presence::Present,
+    ThreadRow {
+        state: RowState::default(),
         name: "Ada Lovelace".to_owned(),
         via: None,
         subject: "Re: the analytical engine".to_owned(),
@@ -515,10 +514,19 @@ rsx! {
 }
 ```
 
+`ThreadRow` is the mail-only row (`ds::app`), built on `Row`. Everything else that lists uses `List`
+of `Row`s: `Row { leading: RowLeading::Icon(..), title, detail, accessory: Accessory::Chevron,
+state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, onclick }`, where
+`Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`
+or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its accessory.
+`List { label, items: Vec<ListItem<K>>, style: ListStyle }` roves with the arrows and Home/End.
+`Disclosure { title, shown, ontoggle, children }` collapses a body; `SectionHeader { title, value,
+action, collapse }` heads a group.
+
 ### Overlays
 
 ```rust
-use ds::{Anchor, Button, Common, Menu, MenuKind, MountedRef, Shown, UndoToken, use_toasts};
+use ds::{Anchor, Button, Common, Menu, MenuPlacement, MountedRef, Shown, UndoToken, use_toasts};
 
 let toasts = use_toasts();
 toasts.push("Sent".to_owned(), None);   // ToastHost is already rendered by Ds — nothing else to mount
@@ -538,7 +546,7 @@ rsx! {
         },
     }
     if let (Shown::Visible, Some(button)) = (open(), more()) {
-        Menu { kind: MenuKind::Rich, anchor: Anchor::Mounted(button), entries, onpick, onclose: move |()| open.set(Shown::Hidden) }
+        Menu { placement: MenuPlacement::Popup, anchor: Anchor::Mounted(button), items, onpick, onclose: move |()| open.set(Shown::Hidden) }
     }
 }
 ```
@@ -564,8 +572,8 @@ Full catalogue (design doc section in parentheses):
 | Family | Components |
 | --- | --- |
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
-| Lists | `ListRow` (§16), `HoverStrip` (§17), `SidebarItem` (§19), `AnimatedList` (§16) |
-| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuEntry` (§20), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24, §55), `EmptyState`/`Skeleton`, `CommandPalette<T>` (§25) |
+| Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::app`), `HoverStrip` (§17) |
+| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25) |
 | Frame | `AppearancePicker` (§26), `AccountTile` (§27), `ProviderMark` (§28), `LinkPill` (§29), `SelectionBubble` (§30), `SendPill` (§31), `SpaceEditor` (§32), `EdgeStrip` (§33), `DragGhost` (§34), `SyncHalo` (§35) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
@@ -578,7 +586,7 @@ A few props worth knowing about before you read the signatures:
   mounts (the command palette's input, a bubble's link field); the default, `Focus::Manual`, is
   what every other field wants; `FieldFocus::Controlled(request)` focuses it on mount and again at
   every `request.request()` (the launcher gaps, below).
-- `ListRow` and `SidebarItem` take `#[props(default)] drop: DropState` (`Idle`, `Target`,
+- `Row` takes `#[props(default)] drop: DropState` (`Idle`, `Target`,
   `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
   you are wiring up drag and drop for that row.
 - `SpaceEditor` takes two more optional props: `name: Option<String>` (the Space's own name
@@ -643,9 +651,9 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
       PointerButton::Primary | PointerButton::Middle => activate(),
   },
   ```
-- **Menu submenus and disabled items.** `MenuEntry::Item` gained `availability: Availability`;
+- **Menu submenus and disabled items.** `MenuItem::Item` has `availability: Availability` (`with_availability`);
   a disabled item is drawn at .35 opacity with `aria-disabled="true"`, skipped by Up and Down,
-  and a click on it does nothing. `MenuEntry::Submenu { title, tile, availability, children }`
+  and a click on it does nothing. `MenuItem::Submenu { title, image, availability, children }`
   is a row with a chevron that opens `children` beside the menu on a 200 ms rest, or at once on
   Right, Enter or a click; Left or Escape closes one level, and a picked child's value reaches
   the menu's `onpick` (the whole menu closes first). Submenus nest to any depth. The timing is
@@ -719,7 +727,7 @@ For a bar (FINDINGS "Bar gaps"):
   release over an enabled item after a press that began outside the menu picks it
   (press-drag-release); over a disabled item, a header or the padding it closes picking
   nothing. The owner removing the menu (a hover switch) is immediate, no fade.
-- **Status lines.** `MenuEntry::Info { title, detail: Option<String> }` is a row at an item's
+- **Status lines.** `MenuItem::Info { title, detail: Option<String> }` is a row at an item's
   weight without the header's eyebrow, never a choice: keys, hover and picks pass it by. Use it
   for a network's address or a battery's time left, instead of headers.
 - **`Press { button, modifiers, at }`**: `at` is the surface-local point (the event's client
@@ -800,14 +808,14 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
           },
       }
       if let (true, Some(rect)) = (actions(), row()) {
-          Menu { kind: MenuKind::Rich, anchor: Anchor::Rect(rect), entries, onpick,
+          Menu { placement: MenuPlacement::Popup, anchor: Anchor::Rect(rect), items, onpick,
                  onclose: move |()| { actions.set(false); field.request(); } }
       }
   }
   ```
-- **App icons in rows.** `Tile::Source(IconSource)` puts any icon in a menu or palette row: an
-  `Image` (an app's icon file) fills the tile with no plate under it, whatever size it was
-  resolved at; a `Symbolic` sits on the plate in the text colour; a `Glyph` is `Tile::Icon`'s.
+- **App icons in rows.** `RowLeading::Source(IconSource)` (and `MenuImage::Source` in a menu) puts any icon in a
+  row: an `Image` (an app's icon file) is drawn as it is with no plate under it, whatever size it was
+  resolved at; a `Symbolic` is drawn in the text colour; a `Glyph` is `RowLeading::Icon`'s.
 - **Icon sizes for tiles.** `IconSize::Tile48` (48), `IconSize::Tile96` (96) and
   `IconSize::Px(IconPx(n))` for any size a caller resolves (a magnified dock tile): an icon is
   drawn at that size, not scaled from 22.
@@ -832,13 +840,13 @@ Palette behaviour:
   moves the focus off the field). A closure typed `|key: KeyboardData|` becomes
   `|key: KeyboardEvent|`; `key.key()`, `key.modifiers()` read as before.
 - **A palette kept mounted.** `CommandPalette { shown: Some(Shown::Visible | Shown::Hidden),
-  retain: Retain::Nothing | Retain::Query }` (`Shown` is the tooltip's). Hidden, the card is
+  }` (`Shown` is the tooltip's). Hidden, the card is
   `display:none` (nothing laid out or painted, no scrim) and leaves the layer stack, while its
   rows and field stay in the document. Each change to `Visible` replays the entrance
   (`cmdk-in`/`peek-in`, restarted through the keyframe's `X--b` alias), reports the selected
-  row's rect afresh, gives the field the keyboard and, under `Retain::Nothing` (the default),
-  asks for an empty query through `oninput("")` and goes back to the first choice (a controlled
-  selection is asked for 0 through `on_select`); `Retain::Query` keeps both. A palette mounted
+  row's rect afresh, gives the field the keyboard and, asks for an
+  empty query through `oninput("")` and goes back to the first choice (a controlled selection is
+  asked for 0 through `on_select`); a re-shown palette always resets. A palette mounted
   hidden does not take the keyboard until it is first shown. `None` (the default) is the
   palette as before: shown, its entrance played as it mounts.
 
@@ -853,7 +861,6 @@ Palette behaviour:
           host: CommandPaletteHost::Surface,
           entrance: PaletteEntrance::CmdkIn,
           shown: shown(),
-          retain: Retain::Nothing,
       }
   }
   ```

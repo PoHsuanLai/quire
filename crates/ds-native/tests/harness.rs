@@ -9,10 +9,9 @@
 use dioxus::prelude::*;
 use ds::TextField;
 use ds::{
-    Anchor, AnimatedList, Appearance, Availability, Button, Check, Ds, Emphasis, Exit, HoverCard,
-    HoverEvent, HoverKey, HoverKind, HoverProfile, HoverTarget, LeaveBy, ListRow, Material, Menu,
-    MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState, Selection,
-    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Anchor, Appearance, Availability, Button, Check, Ds, Emphasis, HoverCard, HoverEvent, HoverKey,
+    HoverKind, HoverProfile, HoverTarget, List, ListItem, Material, Menu, MenuItem, Point, Px,
+    RowState, Selection, ShortcutKey, ThreadRow, Toggle, use_hover_hub, use_toast_hub, use_toasts,
 };
 use ds::{FieldFocus, Grain, PRESETS, Scheme, SpaceLook, Theme};
 use ds_native::harness::settle_until;
@@ -231,14 +230,13 @@ fn MenuDemo() -> Element {
     let entries = ["Later today", "Tomorrow", "Next week"]
         .into_iter()
         .zip(0u8..)
-        .map(|(title, value)| MenuEntry::Item {
-            availability: Availability::Enabled,
+        .map(|(title, value)| MenuItem::Item {
             value,
             title: title.into(),
-            detail: None,
-            tile: None,
-            trail: MenuTrail::None,
+            image: None,
+            key: None,
             check: None,
+            availability: Availability::Enabled,
         })
         .collect::<Vec<_>>();
     rsx! {
@@ -248,9 +246,9 @@ fn MenuDemo() -> Element {
         }
         if open() == Check::On {
             Menu {
-                kind: MenuKind::Slim,
+                placement: ds::MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(64.0) }),
-                entries,
+                items: entries,
                 onpick: move |_: u8| open.set(Check::Off),
                 onclose: move |_| open.set(Check::Off),
             }
@@ -375,39 +373,31 @@ fn ListApp() -> Element {
 #[allow(non_snake_case)]
 fn ListDemo() -> Element {
     let mut keys = use_signal(|| vec![1u32, 2, 3]);
-    let roster = use_roster(
-        keys(),
-        RosterSpec {
-            leave: LeaveBy::Action,
-            exit: Exit::Row,
-            pitch: RowPitch(Px(79.0)),
-            on_settled: None,
-        },
-    );
+    let items: Vec<ListItem<u32>> = keys()
+        .into_iter()
+        .map(|key| {
+            ListItem::row(
+                key,
+                format!("Subject {key}"),
+                rsx! {
+                    ThreadRow {
+                        state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
+                        name: format!("Sender {key}"),
+                        via: None,
+                        subject: format!("Subject {key}"),
+                        snippet: None,
+                        time: "09:41",
+                        tags: rsx! {},
+                        star: None,
+                        strip: None,
+                        onclick: move |_| keys.retain(|shown| *shown != key),
+                    }
+                },
+            )
+        })
+        .collect();
     rsx! {
-        AnimatedList { label: "Threads",
-            for entry in roster.entries() {
-                ListRow {
-                    state: RowState { selection: Selection::Unselected, emphasis: Emphasis::Plain, ..RowState::default() },
-                    key: "{entry.key}",
-                    presence: entry.presence,
-                    heal: entry.heal,
-                    name: format!("Sender {}", entry.key),
-                    via: None,
-                    subject: format!("Subject {}", entry.key),
-                    snippet: None,
-                    time: "09:41",
-                    tags: rsx! {},
-                    star: None,
-
-                    strip: None,
-                    onclick: move |_| {
-                        roster.leave(entry.key);
-                        keys.retain(|key| *key != entry.key);
-                    },
-                }
-            }
-        }
+        List::<u32> { label: "Threads", items }
     }
 }
 
@@ -416,18 +406,18 @@ fn a_row_leaves_and_the_rows_below_heal() {
     let mut harness = Harness::new(ListApp, VIEW);
     // Let the first-show entrance settle.
     harness.advance(ms(1500));
-    assert_eq!(harness.count(".ds-row"), 3);
+    assert_eq!(harness.count(".ds-list-item"), 3);
     let first_top = harness
-        .rect(".ds-row:nth-child(1)")
+        .rect(".ds-list-item:nth-child(1)")
         .map(|rect| rect.origin.y);
     let presence = |harness: &Harness, n: usize| {
-        harness.attr(&format!(".ds-row:nth-child({n})"), "data-presence")
+        harness.attr(&format!(".ds-list-item:nth-child({n})"), "data-presence")
     };
 
-    harness.click(centre(&harness, ".ds-row:nth-child(1)"));
+    harness.click(centre(&harness, ".ds-list-item:nth-child(1)"));
     assert_eq!(presence(&harness, 1).as_deref(), Some("leaving"));
     assert_eq!(
-        harness.count(".ds-row"),
+        harness.count(".ds-list-item"),
         3,
         "dropped before its exit played"
     );
@@ -435,7 +425,7 @@ fn a_row_leaves_and_the_rows_below_heal() {
     // The exit settles at `settle(Anim::RowOut)`: the row is gone and the rows below slide up
     // into its place, healing for `settle(Anim::Heal)` more.
     harness.advance(ds::settle(ds::Anim::RowOut, ds::MotionLevel::Standard) + ms(20));
-    assert_eq!(harness.count(".ds-row"), 2, "{}", harness.html());
+    assert_eq!(harness.count(".ds-list-item"), 2, "{}", harness.html());
     assert_eq!(presence(&harness, 1).as_deref(), Some("healing"));
     assert_eq!(presence(&harness, 2).as_deref(), Some("healing"));
 
@@ -444,7 +434,7 @@ fn a_row_leaves_and_the_rows_below_heal() {
     assert_eq!(presence(&harness, 2).as_deref(), Some("present"));
     assert_eq!(
         harness
-            .rect(".ds-row:nth-child(1)")
+            .rect(".ds-list-item:nth-child(1)")
             .map(|rect| rect.origin.y),
         first_top,
         "the row below did not take the removed row's place"
