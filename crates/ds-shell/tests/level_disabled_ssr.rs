@@ -1,4 +1,4 @@
-//! A disabled `LevelControl` looked exactly like an enabled capsule at 0 %, so a brightness
+//! A disabled capsule `Slider` looked exactly like an enabled one at 0 %, so a brightness
 //! level that could not move read as broken. Each state as markup, and the stylesheet rules that
 //! draw the disabled one: the rail and lead glyph at .35, no knob, the not-allowed cursor, no
 //! swell; a `ModulePanel` whose content is disabled dims its header glyph and percentage.
@@ -87,7 +87,7 @@ fn a_disabled_level_says_so_and_leaves_the_tab_order() {
     for (name, make, availability) in CASES {
         let html = render(*make);
         let level = html
-            .split("class=\"ds-level\"")
+            .split("class=\"ds-slider\"")
             .nth(1)
             .and_then(|rest| rest.split('>').next())
             .unwrap_or_else(|| panic!("{name}: no level in {html}"));
@@ -121,9 +121,9 @@ fn a_disabled_level_says_so_and_leaves_the_tab_order() {
 fn the_stylesheet_draws_the_disabled_level_apart() {
     let css = ds_shell::stylesheet();
     const RULES: &[&str] = &[
-        ".ds-level[*|aria-disabled=true]{ cursor:not-allowed; }",
-        ".ds-level[*|aria-disabled=true] .ds-level-lead{ opacity:.35; }",
-        ".ds-level[*|aria-disabled=true] .ds-level-knob{ display:none; }",
+        ".ds-slider[*|aria-disabled=true]{ cursor:not-allowed; }",
+        ".ds-slider[*|aria-disabled=true] .ds-slider-icon-lead{ opacity:.35; }",
+        ".ds-slider[*|aria-disabled=true] .ds-slider-thumb{ display:none; }",
         ".ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }",
     ];
     for rule in RULES {

@@ -22,7 +22,7 @@
 .ds-checkbox[*|data-pressed] .ds-checkbox-indicator{ background:var(--surface); }
 .ds-checkbox[*|data-pressed][*|data-state=on] .ds-checkbox-indicator,
 .ds-checkbox[*|data-pressed][*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent-text); }
-.ds-checkbox-dash{ display:block; width:60%; height:var(--s-2); border-radius:var(--r-pill); background:currentColor; }
+.ds-checkbox-dash{ display:block; width:60%; height:var(--s-2); border-radius:var(--r-pill); background:var(--accent-ink); }
 .ds-checkbox-label{ min-width:0; }
 .ds-checkbox[*|aria-disabled=true],
 .ds-checkbox[*|aria-busy=true]{ opacity:.35; pointer-events:none; }

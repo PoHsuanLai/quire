@@ -161,7 +161,7 @@ fn the_density_resolves_and_says_so() {
     );
     assert!(large.contains("data-weeks=\"show\""));
     assert_eq!(large.matches("class=\"ds-month-week\"").count(), 1 + 6);
-    assert_eq!(large.matches("data-variant=\"tool\"").count(), 2);
+    assert_eq!(large.matches("data-variant=\"toolbar\"").count(), 2);
     assert!(!large.contains("ds-month-step"));
     assert!(
         !render(Case::Compact).contains("data-fit"),

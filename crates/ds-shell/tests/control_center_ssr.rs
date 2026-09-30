@@ -158,7 +158,7 @@ fn a_tile_writes_its_state_span_and_chevron() {
             "{name}"
         );
         assert_eq!(
-            html.contains("ds-spinner"),
+            html.contains("ds-progress"),
             state == "busy",
             "{name}: breathe only while busy"
         );
