@@ -505,6 +505,7 @@ fn EditorApp() -> Element {
     let mut active = use_signal(|| DotIndex(0));
     let mut look = use_signal(|| SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
+        grain: Grain(35),
         theme: Theme::System,
         card_accent: CardAccent::SpaceHue,
     });

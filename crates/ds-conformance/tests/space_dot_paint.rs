@@ -20,6 +20,7 @@ const VIEW: Viewport = Viewport {
 fn frame(index: usize) -> FrameVars {
     let look = SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
+        grain: Grain(0),
         theme: Theme::Light,
         card_accent: CardAccent::Chosen,
     };

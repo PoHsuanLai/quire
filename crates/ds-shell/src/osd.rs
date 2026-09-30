@@ -83,7 +83,9 @@ pub fn Osd(
             "data-presence": now.drawn_slug(),
             "data-pulse": alias.slug(),
             ..data,
-            div { class: "ds-frame" }
+            div { class: "ds-frame",
+                div { class: "ds-grain" }
+            }
             if let Some(title) = label {
                 div { class: "ds-osd-title", "{title}" }
             }

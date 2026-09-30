@@ -2,6 +2,7 @@
 //! (design/04-COMPONENTS.md section 32 behaviour, design/06-INTERACTIONS.md section 2.8).
 
 use dioxus::prelude::Key;
+use ds_core::vocab::Fraction;
 use ds_style::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
 
 /// A Space holds at most three dots (`S:1425`).
@@ -116,7 +117,7 @@ pub(super) fn removed(look: &SpaceLook, index: usize) -> SpaceLook {
     }
 }
 
-/// `look` with preset `index`'s dots; theme and accent stay (`S:1471`).
+/// `look` with preset `index`'s dots; grain, theme and accent stay (`S:1471`).
 pub(super) fn preset(look: &SpaceLook, index: usize) -> SpaceLook {
     match PRESETS.get(index) {
         Some(preset) => SpaceLook {
@@ -127,9 +128,16 @@ pub(super) fn preset(look: &SpaceLook, index: usize) -> SpaceLook {
     }
 }
 
+/// The grain a slider fraction stands for: thousandths to 0..=100, rounded.
+pub(super) fn grain_of(fraction: Fraction) -> u8 {
+    // At most 1000 after the clamp, so the quotient is at most 100.
+    u8::try_from((fraction.clamped().0 + 5) / 10).unwrap_or(100)
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{Nudge, added, nudged, preset, removed};
+    use super::{Nudge, added, grain_of, nudged, preset, removed};
+    use ds_core::vocab::Fraction;
     use ds_style::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
 
     fn look(dots: &[(f32, f32)]) -> SpaceLook {
@@ -190,11 +198,26 @@ mod tests {
     #[test]
     fn a_preset_replaces_only_the_dots() {
         let before = SpaceLook {
-            theme: ds_style::appearance::theme::Theme::Dark,
+            grain: ds_style::space::look::Grain(80),
             ..look(&[(10.0, 0.5)])
         };
         let after = preset(&before, 1);
         assert_eq!(after.dots, PRESETS[1].dots);
-        assert_eq!(after.theme, before.theme);
+        assert_eq!(after.grain, before.grain);
+    }
+
+    #[test]
+    fn grain_rounds_from_thousandths() {
+        const CASES: &[(u16, u8)] = &[
+            (0, 0),
+            (350, 35),
+            (354, 35),
+            (355, 36),
+            (1000, 100),
+            (4000, 100),
+        ];
+        for &(permille, want) in CASES {
+            assert_eq!(grain_of(Fraction(permille)), want, "{permille}");
+        }
     }
 }

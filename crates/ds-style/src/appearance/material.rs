@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Word)]
 #[serde(rename_all = "snake_case")]
 pub enum Material {
-    /// App windows: the Space gradient, its layers, no blur.
+    /// App windows: the Space gradient, its layers and grain, no blur.
     Window,
     /// The menu bar.
     Bar,

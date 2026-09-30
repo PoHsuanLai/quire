@@ -73,7 +73,7 @@ pub fn recipe(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Material
                 Colour::Alpha(hex, SOLID_ALPHA).css(),
             )
         }
-        // The window paints the Space gradient with its layers, never a tint.
+        // The window paints the Space gradient with its layers and grain, never a tint.
         None => ("var(--f-grad)".to_owned(), "var(--f-grad)".to_owned()),
     };
     let stack = layers(material, scheme);

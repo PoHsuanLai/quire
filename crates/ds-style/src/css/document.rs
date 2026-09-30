@@ -2,7 +2,9 @@
 //! component sheet under `/* -- name -- */`. The assembly decides which sections and sheets go
 //! in, and in what order.
 
+use crate::css::grain::grain_uri;
 use crate::css::{UTILITIES, layers};
+use crate::emit::{property, rule};
 use crate::kit::Sheet;
 
 /// The whole stylesheet: the header, the order of the layers, every `(section, body)` of
@@ -66,9 +68,16 @@ pub fn sheets(sheets: &[(&str, &str)]) -> String {
         .collect()
 }
 
-/// `.ds-truncate` and the other utilities.
+/// `.ds-truncate` and the other utilities, then the grain tile on `.ds-grain`.
 pub fn utilities_css() -> String {
-    UTILITIES.trim_end().to_owned()
+    let grain = rule(
+        ".ds-grain",
+        &[property(
+            "background-image",
+            &format!("url(\"{}\")", grain_uri()),
+        )],
+    );
+    format!("{}\n{grain}", UTILITIES.trim_end())
 }
 
 #[cfg(test)]

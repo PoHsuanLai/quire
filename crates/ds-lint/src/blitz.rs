@@ -11,7 +11,7 @@ pub fn unsupported(property: &str, value: &str) -> Option<&'static str> {
              ask the compositor to blur behind the surface through a Material instead",
         ),
         "mix-blend-mode" => Some(
-            "mix-blend-mode is not exercised by the Blitz spike; use a PNG layer or a precomputed blend instead",
+            "mix-blend-mode is not exercised by the Blitz spike; use a PNG grain layer or a precomputed blend instead",
         ),
         "position" if value.split(',').any(|part| part.trim() == "sticky") => {
             Some("position: sticky is banned outright; keep headers outside the scroller instead")

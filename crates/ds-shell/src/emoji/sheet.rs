@@ -2,7 +2,7 @@
 //! emoji draws from at a size, its grid, and how long each frame is held.
 //!
 //! The sheets are `tools/emoji`'s output under `assets/emoji/`, compiled in with
-//! `include_bytes!` and handed to the renderer as `data:` URIs, as the Space field's tiles are: a quire
+//! `include_bytes!` and handed to the renderer as `data:` URIs, as the grain tile is: a quire
 //! document fetches nothing.
 
 use super::id::EmojiId;

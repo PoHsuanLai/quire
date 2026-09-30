@@ -262,8 +262,8 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
   blitz-shell's `DataUriNetProvider`, behind a feature not in the pinned set) it paints. The
   image arrives one resolve late, so the first frame is blank. Every ds-blitz document installs
   a `data:` provider and a `NetWaker` that requests a redraw.
-- **S8.** The same condition as S7; with the provider an 8 x 8 PNG tiles correctly. The gallery
-  wallpaper relies on it.
+- **S8.** The same condition as S7; with the provider an 8 x 8 PNG tiles correctly. The grain
+  tile and the gallery wallpaper rely on it.
 - **S9.** Mounted events are flushed in `initial_build`/`poll` before any layout, so a rect read
   inside `onmounted` is `0 x 0 at (0,0)`; the same `MountedData` read after the first resolve is
   right. `use_rect` keeps the handle and reads it after the next frame, never inside `onmounted`.
@@ -933,7 +933,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **Tint alphas** are design/03 section 17.2's, each the smallest `.02` step at which every
   material's ink holds 4.5:1 over pure black and pure white, with and without compositor blur
   (`tests/legibility.rs`); the worst margin is the dark Widget, preset 2, over white, 4.551:1.
-- **Frame layers.** A tinted chrome root draws the window's two gradient layers inside
+- **Frame layers.** A tinted chrome root draws the window's two gradient layers and grain inside
   one `.ds-frame` at `--m-frame-alpha` (the material's tint alpha scaled by the settings key)
   with blur, .94 without; the group's background is the current gradient, so it stays opaque
   through a Space cross-fade. The symmetric layer fade weighs the old Space `(1 - p)^2`, so at

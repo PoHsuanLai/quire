@@ -11,10 +11,6 @@ round) or copied from the prototypes/code; **proposed** = open until signed off.
 S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/src/palette.rs`
 (moves verbatim into `crates/ds-style/src/space/palette.rs`).
 
-> **No grain.** A Space has no grain: no grain tile, layer, token, editor control or `spaces.default_grain`
-> key is drawn or read anywhere. A stored `grain` key is reported as unknown. (Removed 2026-09-30; the
-> grain passages below are history.)
-
 ## 1. The model (settled)
 
 - Each COSMIC workspace owns one `SpaceLook`.
@@ -25,7 +21,7 @@ S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/sr
 - Switching workspace cross-fades the colour over `--t-big`.
 
 ```rust
-pub struct SpaceLook { dots: Vec<Dot>, theme: Theme, card_accent: CardAccent }
+pub struct SpaceLook { dots: Vec<Dot>, grain: Grain(u8), theme: Theme, card_accent: CardAccent }
 pub struct Dot { hue: f32, chroma: f32 }        // palette.rs:16-23; chroma is 0..1 of the frame max
 impl FrameVars { pub fn of(look: &SpaceLook, scheme: Scheme) -> Self; pub fn style_attr(&self) -> String }
 ```
@@ -33,6 +29,7 @@ impl FrameVars { pub fn of(look: &SpaceLook, scheme: Scheme) -> Self; pub fn sty
 | Field | Meaning | Range |
 | --- | --- | --- |
 | `dots` | 1-3 colours, left to right across the gradient (S editor: up to 3 dots) | hue 0-360, chroma 0-1 |
+| `grain` | noise strength | 0-100 |
 | `theme` | this Space's appearance: System / Light / Dark (S editor "Appearance" segment) | enum |
 | `card_accent` | the chosen accent (`Chosen`), or the Space's hue (S editor "Accent" segment) | enum |
 
@@ -71,6 +68,7 @@ Frame tokens that are not in palette.rs (settled in S:1188-1193; `FrameVars` add
 | --- | --- | --- |
 | `--f-line` | `rgba(0,0,0,.08)` | `rgba(255,255,255,.09)` |
 | `--f-solid` | `stops[0]` | `stops[0]` |
+| grain opacity | `grain/100 x .20` | `grain/100 x .16` |
 
 Port notes (settled finding, fix in quire): palette.rs:177 hard-codes the card surface as
 `#F8F9F6` / `#1D211B`; in quire it reads the `surface` token from the token table.
@@ -90,7 +88,7 @@ material and take their ink from the material (design/30 §3.3).
 | OSD | yes (settled 2026-09-24) | Space gradient at material tint alpha over blur | `--f-ink*` |
 | Notifications, power menu, lock, polkit | no (proposed) | their Material over paper tokens | `--ink` |
 | Apps | no (paper) | paper tokens | `--ink` |
-| Mail window frame | yes (opt-in, §9) | Space gradient | `--f-ink*` |
+| Mail window frame | yes (opt-in, §9) | Space gradient + grain | `--f-ink*` |
 
 Settled: bar, dock, launcher, control center and OSD (PLAN "UX decisions settled", this doc's
 brief, and the OSD call below). The "no" row for notifications, power menu, lock and polkit
@@ -103,7 +101,7 @@ run against both.
 
 Settled implementation: a `Ds` root in Bar, Dock, Osd or Widget, or a Popover root that is itself
 a panel (`chrome: Painted`, the launcher), stamps `data-frame="tinted"` and draws §5's two layers
-as one `.ds-frame` group at the material's own tint alpha from 03-COLOR §17.2
+and the grain as one `.ds-frame` group at the material's own tint alpha from 03-COLOR §17.2
 scaled by `appearance.material_tint_alpha` (`--m-frame-alpha`: the bar .70 light, .68 dark at the
 default) with blur, and at .94 without. The OSD is tinted like the bar (coherence across chrome
 wins), as the goldens (`crates/ds/tests/snapshots/root/chrome/osd.html`) and the Materials gallery
@@ -117,8 +115,8 @@ The 8 presets (settled, S; Appendix A3):
 
 | # | dots `[{hue, chroma}]` | Name (`Preset::name`, settled) | Sample Space in S |
 | --- | --- | --- | --- |
-| 1 | `[{268,.72},{318,.55}]` | Dusk | Work |
-| 2 | `[{152,.62},{62,.55},{28,.5}]` | Orchard | Home |
+| 1 | `[{268,.72},{318,.55}]` | Dusk | Work (grain 35) |
+| 2 | `[{152,.62},{62,.55},{28,.5}]` | Orchard | Home (grain 55) |
 | 3 | `[{220,.7}]` | Harbour | |
 | 4 | `[{20,.66},{55,.6}]` | Ember | |
 | 5 | `[{190,.6},{240,.55}]` | Lagoon | |
@@ -133,6 +131,7 @@ Postmark, Graphite, Pine, Indigo, Oxblood, Vermilion) are not in quire's eight.
 
 Default `SpaceLook` for a workspace with no stored look (proposed):
 - `dots = PRESETS[index % 8]`, index = the workspace's 0-based position on its output.
+- `grain`: 35 for preset 1, 55 for preset 2 (settled values), 40 for presets 3-8 (proposed).
 - `theme = System`; `card_accent = Chosen` (proposed).
 
 ## 5. Workspace switch (settled model)
@@ -142,13 +141,13 @@ The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
 1. Each tinted surface has two background layers, `.ds-layer` (front) and `.ds-layer.back`
    (settled for every tinted root, bar gaps: on shell chrome they sit in `.ds-frame`, whose own
    background is the current gradient, so the group is opaque inside through the fade). The
-   window's root (`data-frame=opaque`) holds them directly, and is its own
+   window's root (`data-frame=opaque`) holds them directly, with the grain, and is its own
    stacking context so they paint over its background, which is the current gradient too
    (settled, mailo gaps 2026-09-24; before, they painted beneath it and the switch was an
    instant swap). Neither layer takes the pointer.
 2. On switch, the hidden layer gets the new gradient and opacity 1; the front goes to
    opacity 0; the roles swap. Transition `opacity` over `--t-big`.
-3. (Grain was removed: no grain is painted anywhere.)
+3. Grain opacity transitions over the same `--t-big` (proposed).
 4. Text colours (`--f-ink*`) change as values on `.ds`: if spike S4 (transition on
    var-driven values) passes, `color` transitions over `--t-big`; if not, they swap at
    the cross-fade's midpoint (200 ms, proposed).
@@ -176,6 +175,7 @@ Pieces (settled, Appendix A4 "Space editor", from 04-COMPONENTS):
 | field | h 176, r 12, crosshair; canvas 540 x 352, bg `#f3f4f1` / `#1b1d1a`, dot step 18, r 5.2, colour `oklch(dark .66 : .74, (1 - y/H)·.15, x/W·360)` |
 | handle | 22 circle, border 3 white, shadow `0 0 0 1px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.35)`, `role=slider`, keys left/right hue 5deg, up/down chroma .05 |
 | stops | pill chips pad `3 5 3 4`, 14 disc + degrees + x 11; up to 3 dots |
+| grain | `Slider` 0-100 |
 | segments | `SegmentedControl`s: Appearance (System/Light/Dark), Accent (Space hue vs the chosen accent) |
 | presets | 8 cols gap 6, round, border line |
 | checks | pills ok/bad at 16 % wash: the four guarantees of §7 |
@@ -208,7 +208,7 @@ repaint on every switch and would compete with the tint as the Space's colour cl
 ## 9. Apps opting in
 
 - Default: apps do not show the Space colour (paper only).
-- Mail's window frame does (settled design): it renders its own `.ds-layer` A/B
+- Mail's window frame does (settled design): it renders its own `.ds-layer` A/B and grain
   from a `SpaceLook`.
 - Opt-in API (proposed): `Ds { look: Some(look) , material: Window }` on the app root; a
   running app learns the workspace's look through `ds-settings` (`use_environment`), keyed by
@@ -228,7 +228,7 @@ position".
   "version": 1,
   "by_id": {
     "<cosmic workspace id>": { "dots": [{"hue": 268, "chroma": 0.72}, {"hue": 318, "chroma": 0.55}],
-                               "theme": "system", "card_accent": "chosen" }
+                               "grain": 35, "theme": "system", "card_accent": "chosen" }
   },
   "by_index": [ { "...": "SpaceLook for workspace 0 on its output" } ]
 }
@@ -244,6 +244,7 @@ still finds a look.
 1. Mail has its own Spaces (Work, Home). Does mail's frame follow its own Space, the desktop
    workspace's, or its own unless unset? Proposed: its own, falling back to the workspace's.
 2. Tint alpha over blur (.80 proposed).
+3. Grain default 40 for presets 3-8.
 4. Do notifications, OSD and power menu take the tint? Proposed no.
 5. Per-output workspaces: which look does a dock spanning one output use when the focused
    window is on another? Proposed: the dock's own output.
@@ -254,7 +255,7 @@ still finds a look.
 
 - PLAN "UX decisions settled with the user (2026-09-23, second round)", "Spaces on the
   desktop"; "Design: `<ds>`" (`SpaceLook`, `FrameVars`, `Ds`, `BlurState`); Appendix A3
-  (derivation, presets), A4 (Space editor), A6 (Space switch).
+  (derivation, presets, grain), A4 (Space editor), A6 (Space switch).
 - `~/mailo/crates/mail-app/src/palette.rs` lines cited in §2.
 - `~/mailo-design/mailo-spaces.html` lines 816 (headline), 1180-1193 (layer swap, `--f-*`).
 - SPEC "Workspaces" (cctk, pinning, naming, reorder).

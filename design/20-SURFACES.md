@@ -279,7 +279,7 @@ paper (`--paper`). Only mail's frame shows the Space colour (21-SPACES §9).
 | Field | Value | St |
 | --- | --- | --- |
 | Role | toplevel; migrates webview → Blitz (Phase A path dep, Phase B Blitz) | S |
-| Material | `Window` with Space frame (`.ds-layer` A/B cross-fade) around the card | S |
+| Material | `Window` with Space frame (`.ds-layer` A/B cross-fade + `.ds-grain`) around the card | S |
 | Layout | S `.win` grid 232 px + card, card inset 8 (01-LAYOUT) | S |
 | Components | `CommandPill`, `Row` (`List{SourceList}` for the sidebar), `SectionHeader`, `HoverCard`, `Tooltip`, `Menu`, `CommandPalette`, `ToastHost`, `EdgePeek`, `SegmentedControl`, `Chip`, `Avatar`, `Badge`, `Button`, `TextField`, `RadioGroup`, Space editor pieces | S |
 | Motion | design/30 §1.3 only; the A5 keyframe set is retired (design/30 Part 4); the Space layer cross-fades `--t-big` | S |

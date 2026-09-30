@@ -177,6 +177,7 @@ fn every_preset_frame_is_legible() {
             for card_accent in [CardAccent::Chosen, CardAccent::SpaceHue] {
                 let look = SpaceLook {
                     dots: preset.dots.to_vec(),
+                    grain: Grain(40),
                     theme: Theme::System,
                     card_accent,
                 };

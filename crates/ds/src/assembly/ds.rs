@@ -1,6 +1,6 @@
 //! The root: `div.ds` carrying `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
 //! `data-material`, `data-blur`, `data-modality` and the hover hub's `data-hover`, with the frame's `--f-*`
-//! inline; then the stylesheet (when inlined), the frame layers, the children, the
+//! inline; then the stylesheet (when inlined), the frame layers and grain, the children, the
 //! overlay host and the toast host. It provides `Scope`, `HoverHub`, `ToastHub`, `LayerStack`
 //! and `Overlays` as context. Its click handler, the last to hear a click, hands a click that
 //! landed on nothing focusable to the host's `ClickFocusHost` (FINDINGS "Native focus"), and it
@@ -8,9 +8,9 @@
 //! themselves (`focus::click::kept_click`).
 //!
 //! What the root paints follows its material (`chrome.rs`): a Window draws the Space gradient
-//! opaque with its A/B layers (`data-frame="opaque"`, its own stacking context so the
+//! opaque with its A/B layers and grain (`data-frame="opaque"`, its own stacking context so the
 //! layers paint over its background); the bar, the dock, a popover panel, the OSD and a
-//! widget draw the same layers as one group at the material's tint alpha
+//! widget draw the same layers and grain as one group at the material's tint alpha
 //! (`data-frame="tinted"`, design/21-SPACES.md sections 3 and 5); a Popover, Sheet or Toast root
 //! paints nothing on its own box (`data-chrome="transparent"`) and its cards paint the material;
 //! the bar and the dock stamp `data-ground="frame"` so the components on them take the `--f-*`
@@ -208,7 +208,7 @@ pub fn Ds(
     }
 }
 
-/// The two gradient layers.
+/// The two gradient layers and the grain over them.
 fn frame_layers(layers: [(&'static str, Option<&'static str>, String); 2]) -> Element {
     rsx! {
         for (slot , data_layer , gradient) in layers {
@@ -219,6 +219,7 @@ fn frame_layers(layers: [(&'static str, Option<&'static str>, String); 2]) -> El
                 style: "--f-grad:{gradient}",
             }
         }
+        div { class: "ds-grain" }
     }
 }
 

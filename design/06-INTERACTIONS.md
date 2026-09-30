@@ -348,7 +348,7 @@ port should close it on edge leave unless the pointer entered the sidebar).
 5. The reader re-renders (a draft open in the composer is parked silently, S:1385).
 6. The frame colour cross-fades: the back layer receives the new gradient and goes to opacity 1,
    the front goes to 0, and they swap roles (S:1181-1187); 380 ms `--e-out`. The `--f-*` frame
-   tokens and the card's Post tokens switch instantly.
+   tokens, grain opacity and the card's Post tokens switch instantly.
 
 Undo across Spaces: the undo entry records its Space; undo is ignored in another Space
 (S:1555), and the toast is not hidden on a switch. Proposed: hide the toast on switch.

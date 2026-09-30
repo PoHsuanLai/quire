@@ -6,6 +6,7 @@
 
 pub mod accents_css;
 pub mod document;
+pub(crate) mod grain;
 pub(crate) mod ground_css;
 pub mod layers;
 pub(crate) mod materials_css;

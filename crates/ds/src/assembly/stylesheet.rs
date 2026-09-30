@@ -1,6 +1,6 @@
 //! The whole stylesheet, generated once from the kits in their cascade order: reset, tokens (with
 //! the level blocks), accents, materials, the shapes (squircle, plates, floor), the frame ground,
-//! keyframes with their aliases and pulse classes, utilities, then every
+//! keyframes with their aliases and pulse classes, utilities with the grain tile, then every
 //! component sheet in its fixed order (`assembly::sheets`).
 
 use crate::assembly::kit::kits;

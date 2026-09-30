@@ -64,6 +64,7 @@ fn light() -> Appearance {
 fn look(index: usize) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
+        grain: Grain(0),
         ..SpaceLook::default()
     }
 }

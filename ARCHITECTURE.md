@@ -474,7 +474,7 @@ point.
 
 Every crate re-exports its public items once, at its root or from one public module; modules are
 private; no glob re-exports; no `#[doc(hidden)]`. An item another crate needs is `pub` at its
-home module (`ds_style::css::document`), one path, and absent from every prelude.
+home module (`ds_style::css::grain`), one path, and absent from every prelude.
 
 `ds` re-exports its three lower crates as facade modules, `ds::base` (`ds-core`), `ds::style`
 (`ds-style`) and `ds::motion` (`ds-motion`), the only three root re-exports besides the stylesheet

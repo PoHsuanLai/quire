@@ -56,7 +56,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
     (
         "S8",
         "background-image: url(data:…) tiles, the same condition.",
-        "This page's wallpaper and the Space editor's field are data: PNGs.",
+        "The grain tile and this page's wallpaper are data: PNGs.",
     ),
     (
         "S9",
@@ -132,6 +132,7 @@ pub fn BlitzLimitsPage() -> Element {
             }
         }
         Truncation {}
+        Grain {}
         BlurOff {}
         Icons {}
         Live {}
@@ -161,6 +162,20 @@ fn Truncation() -> Element {
                 Specimen { name: "neither: a hard clip", code: "overflow:hidden alone".to_string(),
                     div { style: "width:220px;overflow:hidden;white-space:nowrap", "{TEXT}" }
                 }
+            }
+        }
+    }
+}
+
+/// S8: the grain tile over the frame gradient, at the Space's own strength.
+#[component]
+fn Grain() -> Element {
+    let grain = use_context::<Signal<Axes>>().read().look.grain.0;
+    rsx! {
+        Section { title: "S8: grain tile", note: "The generated 128 px alpha-noise PNG, at --f-grain over the Space gradient. Change the grain on the Space page.",
+            div { class: "g-stage", style: "background:var(--f-grad)",
+                div { class: "ds-grain" }
+                p { class: "g-note g-stage-pad", "grain {grain}" }
             }
         }
     }

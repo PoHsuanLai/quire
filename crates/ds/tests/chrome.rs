@@ -30,6 +30,7 @@ struct Setup {
 fn Root(setup: Setup) -> Element {
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
+        grain: Grain(35),
         ..SpaceLook::default()
     };
     rsx! {

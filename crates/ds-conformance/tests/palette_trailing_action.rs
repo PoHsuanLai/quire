@@ -24,6 +24,7 @@ fn ms(n: u64) -> Duration {
 /// A flat ground, so a pixel differs only where something is painted over it.
 fn flat() -> SpaceLook {
     SpaceLook {
+        grain: Grain(0),
         ..SpaceLook::default()
     }
 }

@@ -346,7 +346,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 | Battery widgets | Batteries widget | `BatteryGlyph` + `ProgressIndicator{Ring}` + `Label`, one `BatteryState`, one arc geometry | none | glyph, ring | `BatteryLevel`, `BatteryFigure`, `DeviceBattery`, `RowBattery`, `DeviceGlyph` duplicates | MERGE | P1 |
 | IdleDim | display dim | `IdleDim` token | none | overlay | none | KEEP | P2 |
 | Dock: DockTile, DockLabel, RunningDot, DockFloor | Dock | `DockTile` = plate + `Badge` + `ProgressIndicator{Bar}` + running dot; `DockLabel` uses `HoverIntent` Label; magnification and bounce in sill | hover (magnify) | tile, label, dot | sill `Tile`, `.sill-dock-label` (L14), `TooltipKind::Fly` | ADD | P1 |
-| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | dots, theme | none | dot | none | KEEP | P2 |
+| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | dots, grain, theme | none | dot | none | KEEP | P2 |
 | AnimatedEmoji | Messages reactions (design/25) | the asset's own animation; no quire loop | none | image | none | KEEP | P2 |
 
 ### 2.11 App features and mail-only
@@ -416,7 +416,7 @@ behaviour or a default keyboard binding. User styles (ARCHITECTURE section 10) a
 | Radii ctl / field / seg well / seg / menu / popover / sheet / notification | 5 / 5 / 6 / 5 / 8 / 10 / 10 / 16 |
 | Card radius | 10 (group box 6) |
 | Window / panel | window 10, Control Center panel 18, module 8 |
-| Grain | none: no grain is painted anywhere |
+| Grain | a feature (3.3), not a Look value: the Space's own grain (0..100) over its colour backdrop, none of the Look's |
 | Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop |
 | Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) |
 | Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark |
@@ -440,7 +440,9 @@ Features, available to every surface (R6), not values:
   with frame inks (`--f-*`) derived from its dots (21 section 2);
 - the command pill, pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
   launcher commands and Ctrl+1-9 Space switching (section 2.11);
-- the sidebar on colour: a source list draws on the Space's frame.
+- the sidebar on colour: a source list draws on the Space's frame;
+- grain: the Space's own noise tile over its colour backdrop (the Window root and the chrome roots
+  the gradient is drawn on), never on a control or the paper card (03 section 8, 21 section 2).
 
 ---
 
