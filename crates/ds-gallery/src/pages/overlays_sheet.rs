@@ -9,9 +9,10 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::{Answers, ButtonRole, ControlSize};
 use ds::{
-    Appearance, Availability, Button, Ds, Inject, Kbd, KbdSize, Material, ScrimStrength, Sheet,
-    SheetPlacement, Shortcut, ShortcutKey, Theme,
+    Appearance, Availability, Button, Ds, Inject, Material, ScrimStrength, Sheet, SheetPlacement,
+    Shortcut, ShortcutKey, Theme,
 };
+use ds::{KeyEquivalent, KeyStyle};
 
 /// The power menu section.
 #[component]
@@ -57,12 +58,12 @@ fn Dialog(theme: Theme) -> Element {
                             Button { answers: Answers::Return, label: "Shut Down", onclick: |_| {} }
                         }
                         div { class: "g-row g-note",
-                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Left]), size: KbdSize::Small }
-                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Right]), size: KbdSize::Small }
+                            KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Left]), style: KeyStyle::Cap, size: ControlSize::Mini}
+                            KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Right]), style: KeyStyle::Cap, size: ControlSize::Mini}
                             span { "move" }
-                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Enter]), size: KbdSize::Small }
+                            KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Enter]), style: KeyStyle::Cap, size: ControlSize::Mini}
                             span { "confirm" }
-                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Escape]), size: KbdSize::Small }
+                            KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Escape]), style: KeyStyle::Cap, size: ControlSize::Mini}
                             span { "close" }
                         }
                     }

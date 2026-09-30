@@ -15,7 +15,8 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Kbd, KbdSize, Material, Shortcut, ShortcutKey};
+use ds::{Appearance, Ds, Material, Shortcut, ShortcutKey};
+use ds::{ControlSize, KeyEquivalent, KeyStyle};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, modal, rect};
@@ -43,7 +44,7 @@ fn Page() -> Element {
             div { style: "padding:20px; display:flex; gap:12px; align-items:flex-start",
                 for (name, key) in keys {
                     span { key: "{name}", class: "{name}",
-                        Kbd { shortcut: Shortcut(vec![key]), size: KbdSize::Small }
+                        KeyEquivalent { shortcut: Shortcut(vec![key]), style: KeyStyle::Cap, size: ControlSize::Mini}
                     }
                 }
             }

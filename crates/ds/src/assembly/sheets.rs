@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 59] = [
+pub(crate) const SHEETS: [(&str, &str); 58] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
@@ -18,6 +18,7 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         include_str!("../components/lists/appearance_picker.css"),
     ),
     ("avatar", include_str!("../components/content/avatar.css")),
+    ("badge", include_str!("../components/controls/badge.css")),
     ("button", include_str!("../components/controls/button.css")),
     (
         "checkbox",
@@ -32,7 +33,6 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         "command_pill",
         include_str!("../components/app/command_pill.css"),
     ),
-    ("count", include_str!("../components/controls/count.css")),
     (
         "drag_ghost",
         include_str!("../components/overlays/drag_ghost.css"),
@@ -61,8 +61,10 @@ pub(crate) const SHEETS: [(&str, &str); 59] = [
         "icon_view",
         include_str!("../components/content/icon_view.css"),
     ),
-    ("kbd", include_str!("../components/controls/kbd.css")),
-    ("chord", include_str!("../components/controls/chord.css")),
+    (
+        "key_equivalent",
+        include_str!("../components/controls/key_equivalent.css"),
+    ),
     ("label", include_str!("../components/content/label.css")),
     (
         "level_glyph",

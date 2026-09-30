@@ -272,7 +272,7 @@ fn SenderCard(kind: HoverKind) -> Element {
                 }
                 div { class: "ds-hovercard-foot",
                     "stays unread while you look"
-                    span { class: "ds-hovercard-keys", ds::Kbd { shortcut: Shortcut(vec![ShortcutKey::Space]) } " peek" }
+                    span { class: "ds-hovercard-keys", ds::KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]), style: ds::KeyStyle::Cap } " peek" }
                 }
                 div { class: "ds-hovercard-actions",
                     Button { size: ControlSize::Mini, label: "Reply", onclick: |_| {} }

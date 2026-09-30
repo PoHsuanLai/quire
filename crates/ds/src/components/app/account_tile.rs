@@ -4,11 +4,14 @@
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::muted::muted;
 use crate::components::content::provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark};
-use crate::components::controls::count::{Count, CountPlace};
+use crate::components::controls::badge::Badge;
+use crate::components::controls::badge::BadgeContent;
+use crate::components::controls::badge::BadgeTone;
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 use ds_style::tokens::hex::Colour;
 
 /// Whose tile.
@@ -102,7 +105,7 @@ pub fn AccountTile(
             "aria-label": label,
             onclick: move |_| onclick.call(()),
             {face}
-            Count { value: unread, place: CountPlace::Tile }
+            Badge { content: BadgeContent::Number(unread), tone: BadgeTone::Alert, size: ControlSize::Mini}
         }
     }
 }

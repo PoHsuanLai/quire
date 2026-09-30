@@ -50,8 +50,10 @@ pub const STYLES: &[(&str, &[&str])] = &[
         ],
     ),
     (
-        "kbd",
-        &[include_str!("../../src/components/controls/kbd.css")],
+        "key_equivalent",
+        &[include_str!(
+            "../../src/components/controls/key_equivalent.css"
+        )],
     ),
     (
         "chip",
@@ -71,8 +73,8 @@ pub const STYLES: &[(&str, &[&str])] = &[
         )],
     ),
     (
-        "count",
-        &[include_str!("../../src/components/controls/count.css")],
+        "badge",
+        &[include_str!("../../src/components/controls/badge.css")],
     ),
     (
         "edit_surface",

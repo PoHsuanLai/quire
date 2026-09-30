@@ -7,11 +7,12 @@ use crate::axes::Showcase;
 use dioxus::prelude::*;
 use ds::{
     Avatar, AvatarSize, AvatarTone, BubbleAction, BubbleButton, BubbleMode, Button, Check,
-    Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, Kbd, LinkPill,
+    Fraction, Glyph, HoverCard, HoverKey, HoverKind, HoverTarget, Icon, IconSize, LinkPill,
     LinkTarget, MountedRef, Rect, SelectionBubble, SendPhase, SendPill, Shortcut, ShortcutKey,
     TargetElement, Tooltip, TooltipKind, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
+use ds::{KeyEquivalent, KeyStyle};
 
 /// The hover targets, one per card kind.
 const TARGETS: [(HoverKind, &str, &str); 5] = [
@@ -90,7 +91,7 @@ pub fn Cards() -> Element {
                     div { class: "ds-hovercard-foot",
                         "stays unread while you look"
                         span { class: "ds-hovercard-keys",
-                            Kbd { shortcut: Shortcut(vec![ShortcutKey::Space]) }
+                            KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]) , style: KeyStyle::Cap}
                             " peek"
                         }
                     }

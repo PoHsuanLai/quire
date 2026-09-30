@@ -1,0 +1,22 @@
+/* KeyEquivalent (design/30 section 2.1). Attribute selectors carry `*|` (spike S2).
+   Text: the glyphs as plain text beside the words they belong to, the secondary ink, the face
+   and size of the surroundings (no code face, no cap) so a modifier glyph draws as large as a
+   letter; a block of its own so a gap before it holds in Blitz.
+   Cap: each key a cap in the code face (`--font-code`: a key cap is fixed pitch), with a rim and a
+   heavier foot. `inline-block` on the cap: Blitz lays out an inline box's text but not its padding or
+   border, so an inline cap was its glyph on a patch of `--surface-2`, caps run together; a
+   block-level box keeps the rim and the sides. Static: no hover, active, focus or motion. */
+
+.ds-key-equivalent[*|data-style=text]{ display:inline-block; color:var(--ink-soft); white-space:nowrap; }
+.ds-key-equivalent[*|data-style=cap]{ --kc-fs:var(--fs-note); display:inline-flex; align-items:center; }
+.ds-key-equivalent[*|data-style=cap][*|data-size=mini]{ --kc-fs:var(--fs-micro); }
+.ds-key-equivalent[*|data-style=cap][*|data-size=small]{ --kc-fs:var(--fs-caption); }
+.ds-key-equivalent-key{
+  display:inline-block; font-family:var(--font-code); font-size:var(--kc-fs); border:var(--hair) solid var(--line); border-bottom-width:2px;
+  border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
+}
+/* A mini cap's arrow glyphs: at that size an arrow's stroke reads as a dash. Drawn at `--fs-control`
+   (13) with a tighter line-height so the extra line-box the bigger face would ask for is absorbed
+   instead of growing the cap: the cap's height comes from its padding and border, not the glyph,
+   as long as the line box the glyph sits in is no taller than the one the rest of the face draws. */
+.ds-key-equivalent[*|data-style=cap][*|data-size=mini] .ds-key-equivalent-key[*|data-glyph=arrow]{ font-size:var(--fs-control); line-height:1.13; }
