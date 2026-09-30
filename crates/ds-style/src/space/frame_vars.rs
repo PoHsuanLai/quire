@@ -35,7 +35,7 @@ pub struct FrameVars {
     /// The gradient's stops, one colour per dot, left to right: what a `SpaceDot`
     /// hands its stylesheet as `--dot-c1..3`. Not written on the root.
     pub stops: Vec<String>,
-    /// `--f-grain`: the grain tile's opacity, `grain / 100 x .20` light, `x .16` dark.
+    /// `--f-grain`: the grain tile's opacity, `grain / 100 x .10` light, `x .08` dark.
     pub grain_opacity: String,
     /// The accent roles when the card borrows the Space's hue; written as `--accent`,
     /// `--accent-ink`, `--accent-soft`, `--accent-text`, `--accent-text-material`,
@@ -113,15 +113,15 @@ impl FrameVars {
     }
 }
 
-/// Grain as a CSS opacity: the stored 0-100 times .20 in light and .16 in dark
-/// (design/03-COLOR.md section 8), written with no trailing zeros: 35 is `.07` light and
+/// Grain as a CSS opacity: the stored 0-100 times .10 in light and .08 in dark
+/// (design/03-COLOR.md section 8), written with no trailing zeros: 35 is `.035` light and
 /// `.056` dark.
 fn grain_opacity(grain: Grain, scheme: Scheme) -> String {
     let per_step: u32 = match scheme {
-        Scheme::Light => 20,
-        Scheme::Dark => 16,
+        Scheme::Light => 10,
+        Scheme::Dark => 8,
     };
-    // In ten-thousandths: grain 100 x 20 = 2000 is .2.
+    // In ten-thousandths: grain 100 x 10 = 1000 is .1.
     let value = u32::from(grain.0) * per_step;
     let whole = value / 10_000;
     let fraction = value % 10_000;
@@ -148,13 +148,13 @@ mod tests {
     #[test]
     fn grain_is_a_fraction_of_the_scheme_ceiling() {
         const CASES: &[(u8, Scheme, &str)] = &[
-            (35, Scheme::Light, ".07"),
-            (35, Scheme::Dark, ".056"),
-            (55, Scheme::Light, ".11"),
+            (35, Scheme::Light, ".035"),
+            (35, Scheme::Dark, ".028"),
+            (55, Scheme::Light, ".055"),
             (0, Scheme::Dark, "0"),
-            (100, Scheme::Light, ".2"),
-            (100, Scheme::Dark, ".16"),
-            (255, Scheme::Light, ".51"),
+            (100, Scheme::Light, ".1"),
+            (100, Scheme::Dark, ".08"),
+            (255, Scheme::Light, ".255"),
         ];
         for &(grain, scheme, want) in CASES {
             assert_eq!(
