@@ -1,5 +1,5 @@
 //! BannerStack on a real Blitz document: a banner the caller lists slides in and
-//! comes to rest; one it stops listing slides out and stays drawn until `settle(BannerOut)`,
+//! comes to rest; one it stops listing slides out and stays drawn until `settle(PanelOut)`,
 //! then the banners after it heal into its place by the height it measured, and `on_hidden`
 //! hears its key; the banners before it never move; an empty stack reports every key.
 
@@ -100,7 +100,7 @@ fn a_banner_listed_slides_in_and_comes_to_rest() {
 fn one_removed_from_the_middle_leaves_and_those_after_it_heal() {
     let mut harness = start_on(&[3, 2, 1], Clock::Virtual);
     let pitch = harness.rect(&row(2)).expect("row 2").size.height.0;
-    let out = settle(Anim::BannerOut, MotionLevel::Standard);
+    let out = settle(Anim::PanelOut, MotionLevel::Standard);
     let removed = harness.now();
     show(&mut harness, &[3, 1]);
     assert_eq!(presence(&harness, 2).as_deref(), Some("leaving"));

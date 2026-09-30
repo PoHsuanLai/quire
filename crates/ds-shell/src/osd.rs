@@ -1,9 +1,8 @@
 //! `Osd`: the on-screen display's card and its fade (design/20 section 1.7).
 //! One card, a title line over a [`LevelIndicator`], in the Osd material with the
 //! Space gradient at its tint, styled as a control-center module (`--r-tile`, the grid's padding,
-//! design/13 section 13.3.7). It enters with `Anim::OsdIn` and leaves with `Anim::OsdOut`, whose
-//! direction follows [`OsdPosition`] through `--osd-dy`, and calls `on_hidden` when the exit has
-//! settled, so the host can unmap the surface. The hold is the caller's: it knows `osd.hold_ms`.
+//! design/13 section 13.3.7). It fades in with `Anim::PaletteFade` and fades out with `Anim::OsdOut`, and calls
+//! `on_hidden` when the exit has settled, so the host can unmap the surface. The hold is the caller's: it knows `osd.hold_ms`.
 //!
 //! **Where it goes.** Put it directly inside a transparent Osd root:
 //! `Ds { material: Material::Osd, chrome: Some(RootChrome::Transparent), stack, tint_alpha, look,
@@ -15,6 +14,7 @@
 //! surface to the card, its margins and the material's shadow, anchored to that edge.
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::level_indicator::{LevelIndicator, LevelStyle};
 use ds_core::vocab::Fraction;
@@ -56,11 +56,11 @@ pub fn Osd(
     #[props(default)] on_hidden: EventHandler<()>,
     #[props(default)] position: OsdPosition,
     #[props(default)] style: LevelStyle,
-    #[props(default)] id: Option<String>,
+    #[props(default)] common: Common,
     children: Element,
 ) -> Element {
     let spec = PresenceSpec {
-        enter: Anim::OsdIn,
+        enter: Anim::PaletteFade,
         exit: Exit::OsdOut,
     };
     let Presented {
@@ -68,17 +68,21 @@ pub fn Osd(
         alias,
     } = use_presence(shown, spec, Some(on_hidden));
     let level_label = label.clone().unwrap_or_else(|| "Level".to_owned());
-    let named = label.clone();
+    let named = common.aria_label.clone().or_else(|| label.clone());
+    let class = common.class("ds-osd");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-osd",
-            id,
+            class,
+            id: common.id.clone(),
             role: "status",
             "aria-label": named,
+            onmounted: move |event| common.mounted(event),
             "data-position": position.slug(),
             "data-shown": now.shown().slug(),
             "data-presence": now.drawn_slug(),
             "data-pulse": alias.slug(),
+            ..data,
             div { class: "ds-frame",
                 div { class: "ds-grain" }
             }

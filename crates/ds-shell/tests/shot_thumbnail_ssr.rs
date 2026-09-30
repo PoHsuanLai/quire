@@ -9,6 +9,7 @@
 mod golden;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{Appearance, Ds, Icon, ImageSize, ImageSource, Inject, Material, Px, Shown, Theme};
 use ds_lint::{LintConfig, markup};
 use ds_shell::{
@@ -37,7 +38,7 @@ fn root(theme: Theme, body: Element) -> Element {
 fn shown() -> Element {
     root(
         Theme::Light,
-        rsx! { ShotThumbnail { image: picture(), size: WIDE, shown: Shown::Visible, id: "thumb" } },
+        rsx! { ShotThumbnail { image: picture(), size: WIDE, shown: Shown::Visible, common: Common { id: Some("thumb".to_string()), ..Common::default() } } },
     )
 }
 

@@ -173,17 +173,9 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes pane-out-l{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
 
-/* osd-in and osd-out (quire's): the OSD card's pair, following its anchor through
-   `--osd-dy`, a signed offset the card declares for its position (as `--dy` drives heal): -8px at
-   the top right, so the card drops in from above and lifts back up as it goes; 8px at the bottom
-   centre, so it rises in and drops away. In: from `--osd-dy` at a .96 scale and transparent, to
-   rest, at `--t-quick --e-out` (design/20 section 1.7): `pop-in`'s entrance with no overshoot,
-   since a level shown under a key press settles, it does not bounce. Out: to half of `--osd-dy`
-   and transparent at `--t-move --e-exit` (design/05 section 10), holding that last frame until
-   the host unmaps the surface. Played outside the card (its `a-osd-in` pulse class), the offset
-   is the top right's, the default position. */
-@keyframes osd-in{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
-@keyframes osd-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+/* osd-out (quire's): the OSD card's exit, a fade to transparent at `--t-move --e-exit`
+   (design/30 section 1.3), holding that last frame until the host unmaps the surface. */
+@keyframes osd-out{ from{ opacity:1; } to{ opacity:0; } }
 
 /* level-tick (quire's, the level control): the fill edge's mark shows and goes at `--t-tap`,
    a quiet sign that the level crossed a step; the edge rests invisible. */
@@ -200,30 +192,13 @@ html,body{margin:0;padding:0;background:transparent}
    it only fades (`menu-out`). */
 @keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 
-/* banner-out (quire's): a notification banner slides out, from the offset a
-   swipe left it at (`--swipe-dx`, 0 when none) to its entry edge's vector (`--banner-dx`,
-   `--banner-dy`, which the stack's `data-entry` sets; past its own width and the surface's right
-   edge when unset), fading, at `--t-move --e-exit` (design/13 section 13.3.6), holding its last
-   frame until the stack drops the row and the rows below heal. */
-@keyframes banner-out{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
-
-/* banner-in (quire's): a notification banner slides in from its entry edge's vector
-   (`--banner-dx`, `--banner-dy`; past the surface's right edge when unset) to its place at
-   `--t-move --e-spring` (design/13 section 13.3.6), opaque from its first frame. */
-@keyframes banner-in{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
-
 /* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
    back out at `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
-   unmaps it. A toast slides the same way. */
+   unmaps it. A toast, a notification banner and a screenshot thumbnail slide the same way. */
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
-/* shot-out (quire's): the screenshot thumbnail slides out to the right, past its own
-   width and the surface's edge, fading, at `--t-move --e-exit` (design/20 section 1.13: "slide-r
-   out"), holding its last frame until the host unmaps it. Its entrance is `rise` at `--t-big
-   --e-spring`. */
-@keyframes shot-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 
 /* morph-in, morph-out: a glyph that changes state grows in from .7 as the old one shrinks to .7
    and fades (MorphStyle::DownUp; OffUp plays only morph-in). */
@@ -269,16 +244,12 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes pane-out-l--b{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
-@keyframes osd-in--b{ from{ opacity:0; transform:translateY(var(--osd-dy,-8px)) scale(.96); } to{ opacity:1; transform:none; } }
-@keyframes osd-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(calc(var(--osd-dy,-8px) * .5)); } }
+@keyframes osd-out--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-in--b{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
 @keyframes sheet-out--b{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
 @keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
-@keyframes banner-out--b{ from{ opacity:1; transform:translateX(var(--swipe-dx,0px)); } to{ opacity:0; transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } }
-@keyframes banner-in--b{ from{ transform:translate(var(--banner-dx,calc(100% + var(--s-16))),var(--banner-dy,0px)); } to{ transform:none; } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
-@keyframes shot-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes morph-in--b{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
 @keyframes morph-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
 @keyframes morph-fade-out--b{ from{ opacity:1; } to{ opacity:0; } }
@@ -336,26 +307,16 @@ html,body{margin:0;padding:0;background:transparent}
 .a-pane-out-l[*|data-pulse=b]{animation:pane-out-l--b var(--t-move) var(--e-exit) forwards;}
 .a-pane-out-r[*|data-pulse=a]{animation:pane-out-r var(--t-move) var(--e-exit) forwards;}
 .a-pane-out-r[*|data-pulse=b]{animation:pane-out-r--b var(--t-move) var(--e-exit) forwards;}
-.a-osd-in[*|data-pulse=a]{animation:osd-in var(--t-quick) var(--e-out);}
-.a-osd-in[*|data-pulse=b]{animation:osd-in--b var(--t-quick) var(--e-out);}
 .a-osd-out[*|data-pulse=a]{animation:osd-out var(--t-move) var(--e-exit) forwards;}
 .a-osd-out[*|data-pulse=b]{animation:osd-out--b var(--t-move) var(--e-exit) forwards;}
 .a-sheet-in[*|data-pulse=a]{animation:sheet-in var(--t-big) var(--e-out);}
 .a-sheet-in[*|data-pulse=b]{animation:sheet-in--b var(--t-big) var(--e-out);}
 .a-sheet-out[*|data-pulse=a]{animation:sheet-out var(--t-move) var(--e-exit) forwards;}
 .a-sheet-out[*|data-pulse=b]{animation:sheet-out--b var(--t-move) var(--e-exit) forwards;}
-.a-banner-out[*|data-pulse=a]{animation:banner-out var(--t-move) var(--e-exit) forwards;}
-.a-banner-out[*|data-pulse=b]{animation:banner-out--b var(--t-move) var(--e-exit) forwards;}
-.a-banner-in[*|data-pulse=a]{animation:banner-in var(--t-move) var(--e-out);}
-.a-banner-in[*|data-pulse=b]{animation:banner-in--b var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=a]{animation:panel-in var(--t-move) var(--e-out);}
 .a-panel-in[*|data-pulse=b]{animation:panel-in--b var(--t-move) var(--e-out);}
 .a-panel-out[*|data-pulse=a]{animation:panel-out var(--t-quick) var(--e-exit) forwards;}
 .a-panel-out[*|data-pulse=b]{animation:panel-out--b var(--t-quick) var(--e-exit) forwards;}
-.a-shot-in[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
-.a-shot-in[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
-.a-shot-out[*|data-pulse=a]{animation:shot-out var(--t-move) var(--e-exit) forwards;}
-.a-shot-out[*|data-pulse=b]{animation:shot-out--b var(--t-move) var(--e-exit) forwards;}
 .a-morph-in[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
 .a-morph-in[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
 .a-morph-out[*|data-pulse=a]{animation:morph-out var(--t-quick) var(--e-out) forwards;}
@@ -415,26 +376,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-pane-out-l[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-pane-out-r[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-pane-out-r[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-osd-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-osd-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-osd-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-sheet-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-sheet-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-sheet-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-banner-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-banner-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-banner-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-banner-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-panel-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-panel-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-panel-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-panel-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-shot-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-shot-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-shot-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=a]{animation-name:menu-out;}
@@ -632,30 +583,24 @@ html,body{margin:0;padding:0;background:transparent}
 /* BannerStack (design/13 section 13.3.6): the banners in a column at the right edge,
    newest first; at the bottom right the column runs upwards. Each row pads itself by the stack's
    gap (`--notifications-stack-gap`) on the side away from the edge it grows from, so its measured
-   height is its whole pitch. A row's card enters with `banner-in` as it mounts (on the inner
+   height is its whole pitch. A row's card enters with `panel-in` as it mounts (on the inner
    element, not on `data-presence=entering`: Blitz keeps the last animated value when an
    animation is taken off, so a presence turned `present` early would freeze it mid-slide), and
-   the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
+   the row leaves with `panel-out` (`--t-quick`, from where a swipe left it), held until the stack drops it; the rows after it then heal from `--dy` (signed by
    the position) with the heal ripple. A row at rest plays `hold`, which moves nothing, so a
    heal settled or an exit taken back never drops an animation without starting another.
    A card swiped away inside a row holds its offset while the
    row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
    (spike S2).
-   The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector
-   `banner-in` starts from and `banner-out` ends at: past the right edge by `--s-16`, or its own
-   height and `--s-16` below its place. A row whose card was swiped (`data-flight=swipe`) takes
-   the right-edge vector back, so it leaves along the swipe whatever the entry edge. */
+*/
 
 .ds-banner-stack{ display:flex; flex-direction:column; align-items:flex-end; }
 .ds-banner-stack[*|data-position=bottom-right]{ flex-direction:column-reverse; }
-.ds-banner-stack[*|data-entry=right]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
-.ds-banner-stack[*|data-entry=below]{ --banner-dx:0px; --banner-dy:calc(100% + var(--s-16)); }
-.ds-banner[*|data-flight=swipe]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
 .ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
 .ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
-.ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-out); }
+.ds-banner-card{ display:flex; justify-content:flex-end; animation:panel-in var(--t-move) var(--e-out); }
 .ds-banner[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-banner[*|data-presence=leaving]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-banner[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 .ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
 /* -- battery_level -- */
@@ -1391,7 +1336,7 @@ html,body{margin:0;padding:0;background:transparent}
    `data-exit`); the item is a flow root, so its content's margins stay inside it and its measured
    height is the whole distance the rows below heal. An arriving item plays `row-in` (fades and
    slides down over `--t-move`); a leaving one plays its exit forwards and takes no pointer
-   (`row-out`, fades and slides up over `--t-quick`; a notification banner's `banner-out`); the
+   (`row-out`, fades and slides up over `--t-quick`); the
    rows below a settled batch heal from `--dy` over `--t-move`. At rest an item plays `hold`, which
    moves nothing. Under Reduced motion an entrance is `fade`, an exit `menu-out`, and a heal
    `hold`. The list takes the keyboard itself, so it draws no ring. Attribute selectors carry
@@ -1406,7 +1351,6 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-list-item[*|data-presence=leaving]{ pointer-events:none; }
 .ds-list-item[*|data-presence=leaving][*|data-exit=row]{ animation:row-out var(--t-quick) var(--e-exit) forwards; }
-.ds-list-item[*|data-presence=leaving][*|data-exit=banner-out]{ animation:banner-out var(--t-move) var(--e-exit) forwards; }
 
 .ds-list-item[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
 
@@ -2035,9 +1979,9 @@ html,body{margin:0;padding:0;background:transparent}
    corners follow the card's less the 4 px mat (`--s-4`, the same number as `shot_frame::MAT`).
    Attribute selectors carry `*|` (spike S2).
 
-   Motion. Entering, `slide-r` at `--t-move --e-out` (`Anim::ShotIn`), restarted under its other
-   name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
-   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
+   Motion. Entering, `panel-in` at `--t-move --e-out` (`Anim::PanelIn`), restarted under its other
+   name on each showing (`data-pulse`); leaving, `panel-out` at `--t-quick --e-exit`, held
+   (`Anim::PanelOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
    declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
    take-back drops an animation without starting another. 
 
@@ -2046,10 +1990,10 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
 .ds-shot[*|data-shown=hidden]{ display:none; }
-.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
-.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
+.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
+.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
 .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-shot[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 .ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
 .ds-shot-picture{ position:absolute; inset:0; cursor:default; }
@@ -2066,14 +2010,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* Swipe to dismiss (`data-swipe` on a card that can be swiped; `notification_swipe`, as a
    notification card's). The card is drawn `--swipe-dx` off its place: following a drag or a
    scroll 1:1 (`live`), springing back home on a spring in Rust (design/05 section 14), and flying
-   out to the right from where it was (`gone`, `banner-out`). A card that flew out is already
+   out to the right from where it was (`gone`, `panel-out`). A card that flew out is already
    gone when its caller hides it, so its leaving plays nothing and stays invisible, rather than
-   `shot-out` starting over from its place.
+   `panel-out` starting over from its place.
    Reduced motion is decided here, never by a caller: the spring back is critically damped, and the entrance
    neither lifts nor leaves by sliding; it fades in and out (the motion tokens already shorten
    both to Reduced's length). */
 .ds-shot[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
-.ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-shot[*|data-swipe=gone]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present]{ animation-name:fade; }
 .ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
@@ -3210,12 +3154,12 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Swipe to dismiss (`data-swipe` on a card that can be swiped). The card is drawn
    `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
-   (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
+   (`rest`), and flying out to the right from where it was (`gone`, `panel-out`). The way back
    is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by
    frame from the release's position and velocity (critically damped under Reduced), so nothing
    here transitions the transform. */
 .ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
-.ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-notification[*|data-swipe=gone]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 /* -- osd -- */
 /* Osd (design/20 section 1.7): the on-screen display's card inside a
    transparent Osd root. It paints what a tinted root paints on its own box: the material's box
@@ -3225,21 +3169,20 @@ html,body{margin:0;padding:0;background:transparent}
    its width a module spanning both columns of the 320 panel. Attribute selectors carry `*|`
    (spike S2).
 
-   Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
-   showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
-   `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
-   centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
+   Motion (design/30 section 1.3). A fade in over `--t-quick` (`fade`, restarted under
+   its other name on each showing: `data-pulse`); `osd-out` at `--t-move --e-exit`, held, while
+   leaving. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
    timer never cancels an entrance the frame clock is still playing; present again after a hide
    was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
    in the same restyle. */
 
 .ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
   width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
-.ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
-.ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
+.ds-osd[*|data-position=top-right]{ margin:var(--osd-margin) var(--s-12) 0 auto; }
+.ds-osd[*|data-position=bottom-centre]{ margin:0 auto var(--osd-margin); }
 .ds-osd[*|data-shown=hidden]{ display:none; }
-.ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
-.ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
+.ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
 .ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
 .ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }

@@ -83,19 +83,9 @@ pub(super) const PANE_OUT_R: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `osd-in`: the OSD card's entrance at design/20 section 1.7's `--t-quick
-/// --e-out`. An entrance, so it holds nothing; the card is at rest when it ends.
-pub(super) const OSD_IN: Recipe = recipe(
-    "osd-in",
-    DurationToken::Quick,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `osd-out`: the OSD card's exit at `--t-move --e-exit` (design/20 section
-/// 1.7, design/05 section 10). It holds its last, transparent frame until the host unmaps the
-/// surface at `settle(OsdOut)`, so the card never flashes back between the two.
+/// `osd-out`: the OSD card's exit, a fade at `--t-move --e-exit` (design/30 section 1.3). It
+/// holds its last, transparent frame until the host unmaps the surface at `settle(OsdOut)`, so
+/// the card never flashes back between the two.
 pub(super) const OSD_OUT: Recipe = recipe(
     "osd-out",
     DurationToken::Move,
@@ -136,30 +126,6 @@ pub(super) const WIDGET_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `banner-out`: a banner's exit at `--t-move --e-exit` (design/13 section
-/// 13.3.6: "timeout and dismiss both slide right, `--t-move --e-exit`"), from the offset a swipe
-/// left it at. It holds its last, transparent frame until the stack drops the row at
-/// `settle(BannerOut)` and the rows below heal.
-pub(super) const BANNER_OUT: Recipe = recipe(
-    "banner-out",
-    DurationToken::Move,
-    EasingToken::Exit,
-    Fill::Forwards,
-    Iteration::Once,
-);
-
-/// `banner-in`: a banner's entrance at `--t-move --e-out`. design/13 section
-/// 13.3.6 proposed `--t-big` (the design toast's); the stack plays it at `--t-move`, the length
-/// of the exit and the heal it may arrive beside, so the stack moves as one. An entrance, so it
-/// holds nothing.
-pub(super) const BANNER_IN: Recipe = recipe(
-    "banner-in",
-    DurationToken::Move,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
 /// `panel-in`: the notification center's edge panel slides in at `--t-move --e-out`.
 /// Opening it is not contact with the panel, and a spring's overshoot would lift it off the edge
 /// it is anchored to, so it decelerates in (design/05 principle 2). An entrance; it holds
@@ -177,27 +143,6 @@ pub(super) const PANEL_IN: Recipe = recipe(
 pub(super) const PANEL_OUT: Recipe = recipe(
     "panel-out",
     DurationToken::Quick,
-    EasingToken::Exit,
-    Fill::Forwards,
-    Iteration::Once,
-);
-
-/// `slide-r` at `--t-move --e-out`: the screenshot thumbnail's entrance, as a notification
-/// banner's (design/30 section 1.3). An entrance; it holds nothing.
-pub(super) const SHOT_IN: Recipe = recipe(
-    "slide-r",
-    DurationToken::Move,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `shot-out`: the thumbnail slides out to the right at `--t-move --e-exit`
-/// (design/05 section 10: exits accelerate), holding its last frame until the host unmaps it at
-/// `settle(ShotOut)`.
-pub(super) const SHOT_OUT: Recipe = recipe(
-    "shot-out",
-    DurationToken::Move,
     EasingToken::Exit,
     Fill::Forwards,
     Iteration::Once,

@@ -39,10 +39,19 @@ pub fn GroupHeader(
     #[props(default)] expanded: Shown,
     on_toggle: EventHandler<Press>,
     on_clear: EventHandler<Press>,
+    #[props(default)] common: Common,
 ) -> Element {
     let clear = format!("Clear {}", name.plain_text());
+    let class = common.class("ds-group-header");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-group-header", "data-expanded": expanded.slug(),
+        div {
+            class,
+            id: common.id.clone(),
+            "data-expanded": expanded.slug(),
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
             span { class: "ds-group-header-icon",
                 IconView { source: icon, size: IconSize::Base }
             }

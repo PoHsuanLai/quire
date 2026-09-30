@@ -1,5 +1,5 @@
 //! One row of a `BannerStack`: the card in a `div.ds-banner` that plays the row's
-//! exit and heal (`banner-out`, `heal`), with the entrance (`banner-in`) on the `div.ds-banner-card`
+//! exit and heal (`panel-out`, `heal`), with the entrance (`panel-in`) on the `div.ds-banner-card`
 //! inside it, and the height it measures, which is how far the rows after it heal when it
 //! leaves. The gap to the next banner is the row's own padding, so the measured height is the
 //! whole pitch.
@@ -9,11 +9,11 @@
 //! taken off an element, so a presence that turned `present` before a frame had been resolved
 //! past the entrance's end (a loaded machine, a snapshot's clock) froze the row mid-slide.
 //!
-//! The row hands its card a `Carried` holding its `Flight`: a card swiped away marks it, and the
-//! row writes `data-flight=swipe`, which points its exit right whatever the stack's entry edge.
+//! The row marks its card `Carried`: a card swiped away reports at once and the row's own exit
+//! flies it on from where the hand left it.
 
 use crate::notifications::banner_stack::{BannerKey, BannerPosition};
-use crate::notifications::swipe::{Carried, Flight};
+use crate::notifications::swipe::Carried;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds::host::measure::client_rect;
@@ -38,8 +38,7 @@ pub(crate) fn BannerRow(
     let mut element = use_signal(|| None::<Rc<MountedData>>);
     let mut leaving_seen = use_hook(|| CopyValue::new(Seen::No));
     let scope = use_hook(current_scope_id);
-    let flight = use_signal(|| Flight::Edge);
-    use_context_provider(|| Carried(flight));
+    use_context_provider(|| Carried);
     // A task of the row's own scope: the read also runs from an effect, which has none.
     let measure = move || {
         if let Some(mounted) = element.peek().clone() {
@@ -61,7 +60,6 @@ pub(crate) fn BannerRow(
             "data-banner": "{banner.0}",
             "data-presence": presence_slug(presence, heal),
             "data-exit": exit_slug(presence),
-            "data-flight": flight().attr(),
             style: heal_style(heal, position),
             onmounted: move |event| {
                 element.set(Some(event.data()));

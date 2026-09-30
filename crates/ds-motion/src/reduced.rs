@@ -59,10 +59,7 @@ impl Anim {
             | Anim::PaneInR
             | Anim::PaneInL
             | Anim::PaneInROut
-            | Anim::OsdIn
-            | Anim::BannerIn
             | Anim::PanelIn
-            | Anim::ShotIn
             | Anim::MorphIn
             | Anim::MorphInSpring
             | Anim::RollIn => CrossFade(In),
@@ -70,9 +67,7 @@ impl Anim {
             | Anim::PaneOutR
             | Anim::OsdOut
             | Anim::SheetOut
-            | Anim::BannerOut
             | Anim::PanelOut
-            | Anim::ShotOut
             | Anim::MorphOut
             | Anim::RollOut
             | Anim::RowOut

@@ -8,12 +8,8 @@ use ds_core::word::Word;
 pub enum Exit {
     /// A list row leaving (archive, delete, dismissed): it fades and slides up, `row-out`.
     Row,
-    /// A notification banner leaving: `banner-out`, a slide to the right.
-    BannerOut,
     /// The OSD card fading and lifting away: `osd-out`.
     OsdOut,
-    /// A screenshot thumbnail sliding out to the right: `shot-out`.
-    ShotOut,
     /// A preview pane sliding out to the right: `pane-out`.
     PaneOut,
     /// A popover, tooltip or hover card fading away: `menu-out`, `--t-quick`.
@@ -29,9 +25,7 @@ impl Exit {
     pub(crate) fn anim(self) -> Anim {
         match self {
             Exit::Row => Anim::RowOut,
-            Exit::BannerOut => Anim::BannerOut,
             Exit::OsdOut => Anim::OsdOut,
-            Exit::ShotOut => Anim::ShotOut,
             Exit::PaneOut => Anim::PaneOutR,
             Exit::Fade => Anim::MenuOut,
             Exit::SheetOut => Anim::SheetOut,

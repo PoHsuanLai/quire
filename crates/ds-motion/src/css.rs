@@ -154,25 +154,6 @@ mod tests {
     }
 
     #[test]
-    fn the_osd_pair_follows_the_cards_anchor() {
-        // One pair for both positions: each keyframe moves by `--osd-dy`, which the
-        // card declares per position, so the top right drops in and the bottom centre rises.
-        let bodies = keyframes(MOTION);
-        for anim in [Anim::OsdIn, Anim::OsdOut] {
-            let name = anim.recipe().keyframes;
-            let body = bodies
-                .iter()
-                .find(|(found, _)| *found == name)
-                .map(|(_, body)| *body)
-                .unwrap_or_default();
-            assert!(
-                body.contains("var(--osd-dy"),
-                "{anim:?}: @keyframes {name} is fixed"
-            );
-        }
-    }
-
-    #[test]
     fn the_alias_is_the_same_text_under_the_second_name() {
         let css = motion_css();
         for (name, body) in keyframes(MOTION) {

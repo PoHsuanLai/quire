@@ -79,7 +79,7 @@ pub use crate::{
         density::MonthDensity,
     },
     notifications::{
-        banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack},
+        banner_stack::{Banner, BannerKey, BannerPosition, BannerStack},
         card::NotificationCard,
         group_header::GroupHeader,
         parts::{AppMark, CardAction, GroupCount, Hover, StackLayers},

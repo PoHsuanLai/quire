@@ -2,9 +2,8 @@
 //! tint, a `BannerStack` of three banners in a Toast root (one grouped, with its count chip and
 //! two layers behind it; one with a link and actions), a card posed as if dragged 56 px to the
 //! right, and the notification center, a `SidePanel` at the right edge whose first group has a
-//! `GroupHeader`. Live, the banners dismiss on close or swipe, the button posts another, another
-//! switches the entry edge (`BannerEntry`: from the right, or from below), and the center slides
-//! out and in.
+//! `GroupHeader`. Live, the banners dismiss on close or swipe, the button posts another, and the
+//! center slides out and in.
 
 use super::Section;
 use super::level_tile::work;
@@ -15,15 +14,15 @@ use ds::{
     SidePanel, TextRun, Theme,
 };
 use ds_shell::{
-    AppMark, Banner, BannerEntry, BannerKey, BannerStack, CardAction, GroupCount, GroupHeader,
-    NotificationCard, NotificationMetrics, NotificationSwipe, StackLayers,
+    AppMark, Banner, BannerKey, BannerStack, CardAction, GroupCount, GroupHeader, NotificationCard,
+    NotificationMetrics, NotificationSwipe, StackLayers,
 };
 
 /// The notifications section.
 #[component]
 pub fn Notifications() -> Element {
     rsx! {
-        Section { title: "Notifications", note: "Over the Work Space's tint, light and dark. Left: a BannerStack (newest first; banner-in from the right at --t-move --e-spring, banner-out to the right at --t-move --e-exit, or up from below and back down with entry: BannerEntry::FromBelow (Live: the entry button), the rows below heal by the height the leaving one measured) of NotificationCards in the Toast material: a group of three with its count chip and two layers 4 px apart behind it, a body with a link (a.ds-run-link keeps its press) and Mini actions that open on hover with the body (two lines to six) and the 18 px close button at the top left. Under it, a card posed as mid-drag, 56 px right; a drag follows 1:1 right and a quarter left, springs back under 80 px and flies out past it or at 600 px/s, and a horizontal scroll does the same once its deltas stop. Right: the notification center, a SidePanel of the Popover material 8 in from the right edge (panel-in, --t-move --e-out), with a GroupHeader (the icon at 16, the name in the group type, Show less and Clear).",
+        Section { title: "Notifications", note: "Over the Work Space's tint, light and dark. Left: a BannerStack (newest first; each slides in from the right at --t-move --e-out and out to the right at --t-quick --e-exit, the rows below heal by the height the leaving one measured) of NotificationCards in the Toast material: a group of three with its count chip and two layers 4 px apart behind it, a body with a link (a.ds-run-link keeps its press) and Mini actions that open on hover with the body (two lines to six) and the 18 px close button at the top left. Under it, a card posed as mid-drag, 56 px right; a drag follows 1:1 right and a quarter left, springs back under 80 px and flies out past it or at 600 px/s, and a horizontal scroll does the same once its deltas stop. Right: the notification center, a SidePanel of the Popover material 8 in from the right edge (panel-in, --t-move --e-out), with a GroupHeader (the icon at 16, the name in the group type, Show less and Clear).",
             div { class: "g-notif-row",
                 for theme in [Theme::Light, Theme::Dark] {
                     Scene { theme }
@@ -49,7 +48,6 @@ fn Scene(theme: Theme) -> Element {
     let mut keys = use_signal(|| vec![3u32, 2, 1]);
     let mut next = use_signal(|| 4u32);
     let mut center = use_signal(|| Shown::Visible);
-    let mut entry = use_signal(BannerEntry::default);
     let banners = keys()
         .into_iter()
         .map(|key| banner(key, keys))
@@ -60,7 +58,7 @@ fn Scene(theme: Theme) -> Element {
                 div { class: "g-notif-ground", style: NotificationMetrics::default().style_attr(),
                     div { class: "g-notif-left",
                         Ds { appearance, look: work(theme), material: Material::Toast, blur, stylesheet: Inject::Host,
-                            BannerStack { banners, entry: entry() }
+                            BannerStack { banners }
                             div { class: "g-notif-swiped",
                                 NotificationCard {
                                     app: AppMark { icon: IconSource::Glyph(Icon::Terminal), name: "Terminal".into() },
@@ -84,10 +82,6 @@ fn Scene(theme: Theme) -> Element {
                                     },
                                 }
                                 Button {
-                                    label: entry_label(entry()),
-                                    onclick: move |_| entry.set(match entry() { BannerEntry::FromRight => BannerEntry::FromBelow, BannerEntry::FromBelow => BannerEntry::FromRight }),
-                                }
-                                Button {
                                     label: "Toggle the center",
                                     onclick: move |_| center.set(match center() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
                                 }
@@ -105,14 +99,6 @@ fn Scene(theme: Theme) -> Element {
                 }
             }
         }
-    }
-}
-
-/// The entry button's label: the edge the next banner will come in from.
-fn entry_label(entry: BannerEntry) -> &'static str {
-    match entry {
-        BannerEntry::FromRight => "Entry: from the right",
-        BannerEntry::FromBelow => "Entry: from below",
     }
 }
 
