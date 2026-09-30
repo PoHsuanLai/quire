@@ -2,9 +2,9 @@
 
 use crate::components::fields::text_input_mask::MaskCaret;
 use crate::components::fields::text_input_parts::{Field, Handlers, area, file, line};
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 use crate::components::fields::text_input_focus::FieldFocuser;
 use crate::components::fields::{text_input_focus::FieldFocus, text_input_kind::TextInputKind};

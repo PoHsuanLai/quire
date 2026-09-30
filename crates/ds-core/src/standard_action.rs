@@ -6,7 +6,7 @@
 //! [`Shortcut::standard`] binds one of these; [`Shortcut::custom`] refuses any combination in
 //! the table, so an app cannot repurpose Cmd+S for a sidebar again.
 
-use crate::core::vocab::{Shortcut, ShortcutKey};
+use crate::vocab::{Shortcut, ShortcutKey};
 
 /// A standard action and its reserved keys.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

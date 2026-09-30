@@ -8,8 +8,8 @@
 //! section's other odd values (40, 46, 50, 56) belong to mail surfaces quire does not draw; the
 //! floating clamp margin and the card inset are both `--s-8`.
 
-use crate::core::word::Word;
 use crate::style::tokens::token::{Token, TokenScope};
+use ds_core::word::Word;
 
 /// One step of the spacing scale.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Word, Token)]
@@ -92,8 +92,8 @@ impl SpacingToken {
 #[cfg(test)]
 mod tests {
     use super::SpacingToken;
-    use crate::core::word::Word;
     use crate::style::tokens::token::{Token, TokenScope};
+    use ds_core::word::Word;
 
     #[test]
     fn each_name_is_its_own_value() {

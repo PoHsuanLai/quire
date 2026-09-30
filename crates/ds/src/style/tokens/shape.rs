@@ -2,9 +2,9 @@
 //! (design/01-LAYOUT.md section 10); the rest name the literals design/04-COMPONENTS.md O-3 says
 //! the table must absorb.
 
-use crate::core::word::Word;
 use crate::style::look::Look;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
+use ds_core::word::Word;
 
 /// One radius token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -80,12 +80,12 @@ pub enum Corner {
     /// One of the radius tokens.
     Token(Radius),
     /// A length in logical pixels.
-    Px(crate::core::geometry::units::Px),
+    Px(ds_core::geometry::units::Px),
     /// A squircle corner (design/08-ICONS.md section 2.1's `n = 5` superellipse) of this nominal
     /// radius: it reaches `2 r` along each edge and, at 45 degrees, sits nearer the box's corner
     /// than a circle of radius `r` does. Drawn as a `mask-image` (`data-corner="squircle"`);
     /// the element's shadows and hairline follow the circle that touches it at 45 degrees.
-    Squircle(crate::core::geometry::units::Px),
+    Squircle(ds_core::geometry::units::Px),
 }
 
 impl Corner {
@@ -124,7 +124,7 @@ impl Corner {
 }
 
 /// The circle a squircle of nominal radius `length` is inscribed in at 45 degrees.
-fn squircle_shadow_radius(length: crate::core::geometry::units::Px) -> f64 {
+fn squircle_shadow_radius(length: ds_core::geometry::units::Px) -> f64 {
     round2(f64::from(length.0) * crate::style::tokens::plate::shadow_radius_share())
 }
 

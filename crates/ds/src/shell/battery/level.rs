@@ -12,12 +12,12 @@
 //! at rest. The low red and `aria-valuenow` follow the true level from the first frame.
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::shell::battery::ring::{RingSpan, arc_path};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// How the arc follows its level: linearly over `--t-move`.
@@ -163,7 +163,7 @@ pub(crate) fn given(children: Element) -> Option<Element> {
 #[cfg(test)]
 mod tests {
     use super::{RingMark, RingTone};
-    use crate::core::vocab::Fraction;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn a_battery_reads_low_only_while_draining() {

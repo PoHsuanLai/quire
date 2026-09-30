@@ -10,7 +10,7 @@ pub mod use_presence;
 
 pub use exit::Exit;
 
-use crate::core::vocab::Shown;
+use ds_core::vocab::Shown;
 
 /// An item's motion state: `data-presence`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

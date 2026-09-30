@@ -11,9 +11,9 @@ use super::rule::{Offence, Profile, Rule};
 use super::text::render;
 use super::tokenize::Located;
 use super::walk::Decl;
-use crate::core::word::Word;
 use crate::style::kit::KnownNames;
 use crate::style::tokens::type_scale::Family;
+use ds_core::word::Word;
 
 /// Colour functions: `rgb()`, `rgba()`, `hsl()`, `hwb()`, `oklch()`, `color-mix()`, ...
 pub(super) const COLOUR_FUNCTIONS: &[&str] = &[

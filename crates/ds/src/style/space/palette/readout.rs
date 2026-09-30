@@ -6,11 +6,11 @@
 //! A pass or fail is a [`Verdict`] (design/03-COLOR.md section 6).
 
 use super::derive;
-use crate::core::colour::contrast::{Verdict, ratio};
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::space::look::{CardAccent, SpaceLook};
 use crate::style::space::palette::card::card;
 use crate::style::tokens::{accent_table::accent_of, hex::Hex};
+use ds_core::colour::contrast::{Verdict, ratio};
 
 /// One measured pair, and the floor it has to clear.
 #[derive(Debug, Clone, PartialEq)]

@@ -1,7 +1,7 @@
 use super::{Capping, Dot, derive, gradient};
-use crate::core::colour::fit::js_round;
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::hex::Hex;
+use ds_core::colour::fit::js_round;
 
 const WORK: &[Dot] = &[
     Dot {
@@ -178,7 +178,7 @@ fn derive_matches_the_mockup() {
 
 #[test]
 fn every_pick_is_legible() {
-    use crate::core::colour::contrast::ratio;
+    use ds_core::colour::contrast::ratio;
 
     let mut failures = Vec::new();
     let mut cases = 0_u32;
@@ -315,12 +315,12 @@ fn half_rounds_the_way_javascript_does() {
 fn the_readout_is_the_ratio_of_the_derived_tokens() {
     // A fixed pick, measured here the long way from `derive` and `ratio`. The readout must say
     // exactly these numbers: the editor shows nothing it computed on its own.
-    use crate::core::colour::contrast::{Verdict, ratio};
     use crate::style::space::look::{CardAccent, Grain, SpaceLook};
     use crate::style::space::palette::{
         card::{POST_DARK, POST_LIGHT},
         readout::readout,
     };
+    use ds_core::colour::contrast::{Verdict, ratio};
     for scheme in [Scheme::Light, Scheme::Dark] {
         let dark = scheme == Scheme::Dark;
         for accent in [CardAccent::SpaceHue, CardAccent::Postmark] {

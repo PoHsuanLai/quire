@@ -1,7 +1,7 @@
 //! The words a `ClockFace` is described in (design/04-COMPONENTS.md "Widgets"):
 //! the time it shows, whether it is day or night there, and how it is drawn.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Whether a clock shows its seconds, and which second it is.

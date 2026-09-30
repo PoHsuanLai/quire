@@ -3,13 +3,13 @@
 
 use super::chrome::{Ground, RootChrome};
 use super::typeface::use_typeface;
-use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, resolve::Resolved, theme::Scheme};
 use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::scope::{Scope, use_scope, use_scope_provider};
 use crate::style::tokens::accent_band::text_grounds::{TextOn, text_on};
 use crate::style::tokens::shape::Corner;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// A subtree in `material`, optionally forcing `theme`, `accent` or `blur`: a nested `div.ds`
 /// stamping the scope's theme, the root's typeface, and the scope's accent, motion, material and

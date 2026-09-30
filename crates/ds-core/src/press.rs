@@ -3,7 +3,7 @@
 //! secondary press, its middle click as a middle one, and SNI's `ContextMenu(x, y)` and
 //! `Activate(x, y)` want the point.
 
-use crate::core::geometry::units::Point;
+use crate::geometry::units::Point;
 use keyboard_types::Modifiers;
 
 /// Which button pressed.

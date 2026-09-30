@@ -17,16 +17,16 @@ use crate::components::menus::palette::palette_expand::{GroupResize, Resize, res
 use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
 use crate::components::menus::palette::palette_stops::ShownGroup;
-use crate::core::geometry::units::Px;
-use crate::style::task::spawn_in;
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
 use crate::motion::{
     anim::Anim,
     timer::{MotionTimer, TimerPhase, use_motion_timer},
 };
+use crate::style::task::spawn_in;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 
 /// Whether a group's action ran since the results last changed: through the palette itself, or
 /// marked by the caller.
@@ -324,7 +324,7 @@ async fn span(stops: Stops, first: usize, last: usize) -> Option<Px> {
 #[cfg(test)]
 mod tests {
     use super::{Span, healed_by};
-    use crate::core::geometry::units::Px;
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn show_less_heals_by_the_share_of_the_span_it_removes() {

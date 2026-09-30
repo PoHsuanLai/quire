@@ -3,10 +3,10 @@
 //! and each non-standard `.ds[data-motion=..]`, so every name a variant block sets is also
 //! declared on `.ds` (tests/tokens.rs).
 
-use crate::core::word::Word;
 use crate::style::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::tokens::{set::TokenSet, token::TokenScope};
+use ds_core::word::Word;
 
 /// The blocks for `sets`, in the order given.
 pub(super) fn token_blocks(sets: &[TokenSet]) -> String {

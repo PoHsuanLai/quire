@@ -32,9 +32,9 @@ use crate::components::menus::palette::palette_shown::{
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
-use crate::core::vocab::Dismiss;
-use crate::core::word::Word;
 use crate::motion::anim::Anim;
+use ds_core::vocab::Dismiss;
+use ds_core::word::Word;
 
 use crate::components::fields::search_field::SearchField;
 use crate::components::fields::text_input_focus::FieldFocus;
@@ -43,9 +43,6 @@ use crate::components::menus::palette::{
     palette_host::CommandPaletteHost, palette_motion::PaletteHandle,
 };
 use crate::components::overlays::popover::{Float, Stacking, use_float};
-use crate::core::geometry::units::{Px, Rect};
-use crate::core::vocab::Availability;
-use crate::core::vocab::Shown;
 use crate::focus::field::{FieldHandle, use_field_handle};
 use crate::focus::request::{FocusRequest, use_focus_request};
 use crate::host::caret::{Caret, InitialCaret};
@@ -54,6 +51,9 @@ use crate::host::measure::MountedRef;
 use crate::style::tokens::{layer::ZLayer, shape::Corner};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Px, Rect};
+use ds_core::vocab::Availability;
+use ds_core::vocab::Shown;
 
 /// The launcher's preview pane width (design/13 section 13.3.9, proposed): what `aside_width`
 /// is when not given.

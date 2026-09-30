@@ -58,7 +58,7 @@ impl Stir {
     /// Something happened in the prompt: advance the stamp, unless it advanced under
     /// [`GRAIN`] ago.
     pub(crate) fn stirred(self) {
-        let now = crate::core::time::clock::now();
+        let now = ds_core::time::clock::now();
         let mut last = self.last;
         let due = last
             .peek()

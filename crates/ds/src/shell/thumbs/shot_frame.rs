@@ -5,7 +5,7 @@
 //! box the host sizes its surface for is a number a test can read.
 
 use crate::components::content::image_source::ImageSize;
-use crate::core::geometry::units::{Point, Px, Rect, Size};
+use ds_core::geometry::units::{Point, Px, Rect, Size};
 
 /// The mat between the card's edge and the picture box: `--s-4`, which the stylesheet's picture
 /// radius subtracts from the card's.
@@ -86,8 +86,8 @@ fn fit(room: Size, ratio: Option<f32>) -> Rect {
 mod tests {
     use super::{MAT, shot_frame};
     use crate::components::content::image_source::ImageSize;
-    use crate::core::geometry::units::{Point, Px, Rect, Size};
     use crate::style::tokens::spacing::SpacingToken;
+    use ds_core::geometry::units::{Point, Px, Rect, Size};
 
     fn rect(left: f32, top: f32, width: f32, height: f32) -> Rect {
         Rect {

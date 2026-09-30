@@ -9,16 +9,16 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
 };
 use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
-use crate::core::geometry::{
-    placement::{Align, Placement, Side},
-    units::{Px, Rect},
-};
-use crate::core::vocab::Check;
-use crate::core::vocab::Dismiss;
 use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
+use ds_core::geometry::{
+    placement::{Align, Placement, Side},
+    units::{Px, Rect},
+};
+use ds_core::vocab::Check;
+use ds_core::vocab::Dismiss;
 
 /// One bubble button.
 #[derive(Debug, Clone, PartialEq)]

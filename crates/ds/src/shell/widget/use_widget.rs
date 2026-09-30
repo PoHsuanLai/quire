@@ -4,10 +4,10 @@
 //! timeline holds (the next entry's date, the refresh) and sleeps on nothing else: a widget whose
 //! provider pushes one entry at a time costs no frame between pushes (the idle-frame rule).
 
-use crate::style::task::{spawn_in, try_get, try_set};
 use crate::shell::widget::contract::{Widget, fit};
 use crate::shell::widget::kind::WidgetSize;
 use crate::shell::widget::timeline::{RefreshAsk, Timeline, Wake};
+use crate::style::task::{spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use std::time::Instant;
@@ -38,7 +38,7 @@ pub fn use_widget<W: Widget>(
             scope,
             follow(
                 timeline.clone(),
-                crate::core::time::clock::now(),
+                ds_core::time::clock::now(),
                 tick,
                 onrefresh,
             ),
@@ -49,7 +49,7 @@ pub fn use_widget<W: Widget>(
         }));
     }
     timeline
-        .current(crate::core::time::clock::now())
+        .current(ds_core::time::clock::now())
         .cloned()
         .unwrap_or_else(|| W::placeholder(fit::<W>(size)))
 }
@@ -69,11 +69,11 @@ async fn follow<E: 'static>(
     onrefresh: Option<EventHandler<RefreshAsk>>,
 ) {
     loop {
-        let now = crate::core::time::clock::now();
+        let now = ds_core::time::clock::now();
         let Some(wake) = timeline.next_wake(now, arrived) else {
             return;
         };
-        crate::core::time::clock::sleep(wake.at().saturating_duration_since(now)).await;
+        ds_core::time::clock::sleep(wake.at().saturating_duration_since(now)).await;
         let Ok(count) = try_get(tick) else {
             return;
         };

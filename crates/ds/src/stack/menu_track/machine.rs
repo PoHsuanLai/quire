@@ -5,8 +5,8 @@ use super::types::{
     Branch, Entered, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming,
     MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session, ShownBy, Submenu,
 };
-use crate::core::geometry::units::Point;
-use crate::core::vocab::PressPhase;
+use ds_core::geometry::units::Point;
+use ds_core::vocab::PressPhase;
 use std::time::Instant;
 
 /// The effects of one step, in order.

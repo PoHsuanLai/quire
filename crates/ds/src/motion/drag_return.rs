@@ -9,8 +9,8 @@
 use super::spring::SpringPhase;
 use super::spring_point::{Release, SpringPointMotion, use_spring_point_motion};
 use super::spring_spec::SpringResponse;
-use crate::core::geometry::units::{Point, Px};
 use crate::motion::detail::touch::Touch;
+use ds_core::geometry::units::{Point, Px};
 
 /// Its place: no offset.
 const HOME: Point = Point {

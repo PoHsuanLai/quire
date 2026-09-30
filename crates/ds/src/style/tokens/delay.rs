@@ -1,7 +1,7 @@
 //! The Rust-only timer lengths (design/30-CATALOGUE.md section 1.2): intent and reading time,
 //! never scaled by the motion level.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use std::time::Duration;
 
 /// A timer length only Rust reads: intent and reading time, never scaled by the level

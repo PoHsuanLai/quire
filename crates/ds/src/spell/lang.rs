@@ -1,6 +1,6 @@
 //! Which dictionary a surface checks against, and whether it checks at all.
 
-use crate::core::error::DsError;
+use ds_core::error::DsError;
 use serde::{Deserialize, Serialize};
 
 /// A dictionary's language, as Hunspell names its files: `en_US` for `en_US.aff`/`en_US.dic`,

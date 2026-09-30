@@ -10,7 +10,7 @@
 //! included, it stays the design's 2, so every picture at 1x and 2x is what it was.
 
 use super::render::IconSize;
-use crate::core::geometry::scale::{Grid, Scale};
+use ds_core::geometry::scale::{Grid, Scale};
 
 /// The design stroke in grid units.
 const DESIGN: u64 = 2;
@@ -52,8 +52,8 @@ fn snapped(size: IconSize, scale: Scale) -> String {
 #[cfg(test)]
 mod tests {
     use super::{stroke_device_pixels, stroke_width};
-    use crate::core::geometry::scale::Scale;
     use crate::style::icon::render::{IconPx, IconSize};
+    use ds_core::geometry::scale::Scale;
 
     /// A size and fractional scale, the attribute and the device pixels it covers.
     const CASES: &[(IconSize, Scale, &str, u64)] = &[

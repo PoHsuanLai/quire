@@ -3,9 +3,9 @@
 //! (`plate.rs`) filled with its family's gradient, with the section 2.5 inner highlight and rim
 //! and a drop shadow; until the generated app icons arrive, a placeholder tile is a glyph on one.
 
-use crate::core::word::Word;
 use crate::style::tokens::hex::Hex;
 use crate::style::tokens::token::Token;
+use ds_core::word::Word;
 
 /// One plate gradient family.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
@@ -70,7 +70,7 @@ pub enum PlateShare {
 #[cfg(test)]
 mod tests {
     use super::PlateFamily;
-    use crate::core::word::Word;
+    use ds_core::word::Word;
 
     #[test]
     fn white_glyphs_sit_on_red_blue_and_violet_and_ink_on_the_rest() {

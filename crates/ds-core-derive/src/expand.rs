@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::{Data, DeriveInput, Fields};
 
-/// `impl ::ds::Word for X`, or the reason `X` cannot have one.
+/// `impl ::ds_core::word::Word for X`, or the reason `X` cannot have one.
 pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
     let Data::Enum(data) = &input.data else {
         return Err(syn::Error::new_spanned(
@@ -45,7 +45,7 @@ pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
         idents.push(&variant.ident);
     }
     Ok(quote! {
-        impl ::ds::Word for #name {
+        impl ::ds_core::word::Word for #name {
             const ALL: &'static [Self] = &[#(#name::#idents),*];
 
             fn slug(self) -> &'static str {

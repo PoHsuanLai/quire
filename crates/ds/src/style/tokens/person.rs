@@ -5,7 +5,7 @@
 
 use super::hex::{Colour, Hex};
 use super::token::{CssValue, Token, TokenScope};
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// One of the eight person swatches.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

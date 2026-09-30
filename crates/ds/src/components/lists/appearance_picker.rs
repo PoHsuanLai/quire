@@ -5,8 +5,6 @@
 
 use crate::components::controls::segmented::{SegSize, SegmentedControl};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::core::vocab::Check;
-use crate::core::word::Word;
 use crate::style::appearance::{
     accent::Accent,
     appearance::Appearance,
@@ -15,6 +13,8 @@ use crate::style::appearance::{
 };
 use crate::style::css::accents_css::swatch_var;
 use dioxus::prelude::*;
+use ds_core::vocab::Check;
+use ds_core::word::Word;
 
 /// What "System" answers to right now, shown as the Theme header's value while the theme
 /// follows the desktop. Not specified (O-16): the doc gives `system` no role of its own.

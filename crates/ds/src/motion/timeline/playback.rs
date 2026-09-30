@@ -4,9 +4,9 @@
 
 use super::Timeline;
 use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::core::time::{FRAME_TICK, clock};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::time::{FRAME_TICK, clock};
 use std::time::{Duration, Instant};
 
 /// The run in progress: its timeline, when it started and which run it is.

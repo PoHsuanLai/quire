@@ -4,7 +4,7 @@
 //! The root writes it as `data-typeface` on `.ds`, like the theme; the stylesheet's
 //! `.ds[data-typeface=editorial]` block maps the family tokens back to the editorial faces.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Which faces `--font-display`, `--font-ui` and `--font-data` name.
@@ -22,7 +22,7 @@ pub enum Typeface {
 #[cfg(test)]
 mod tests {
     use super::Typeface;
-    use crate::core::word::Word;
+    use ds_core::word::Word;
 
     #[test]
     fn the_slug_is_the_stored_word() {

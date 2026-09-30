@@ -10,12 +10,12 @@
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected
 //! hue on every button.
 
-use crate::core::word::Word;
 use crate::style::appearance::{accent::Accent, theme::Scheme};
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::tokens::{
     accent_band::roles::AccentRoles, accent_table::accent_of, colour::ColourToken,
 };
+use ds_core::word::Word;
 
 /// The accent quads, light and dark.
 pub fn accents_css() -> String {

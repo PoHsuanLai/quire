@@ -5,8 +5,6 @@
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
-use crate::style::task::spawn_in;
-use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::host::reveal::reveal;
 use crate::shell::catalog::placement::PlacementId;
@@ -14,8 +12,10 @@ use crate::shell::widget::gallery::GalleryWords;
 use crate::shell::widget::kind::WidgetHost;
 use crate::shell::widget::layout::{WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement};
 use crate::shell::widget::registry::WidgetRegistry;
+use crate::style::task::spawn_in;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use std::collections::BTreeSet;
 
 /// The placements on `host`, in their order there.

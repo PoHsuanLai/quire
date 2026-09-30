@@ -1,9 +1,9 @@
 //! Easing curves per motion level (design/05-MOTION.md sections 3.1-3.4).
 
 use super::hex::thousandths;
-use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
+use ds_core::word::Word;
 
 /// A `cubic-bezier()`, control points in thousandths: `(.22,.9,.3,1)` is
 /// `[220, 900, 300, 1000]`. Integers, so a curve is `Eq`.

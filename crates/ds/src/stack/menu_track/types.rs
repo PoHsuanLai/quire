@@ -1,7 +1,7 @@
 //! The menu tracker's vocabulary: what it remembers, what it is told, what it asks for.
 
-use crate::core::geometry::units::Point;
-use crate::core::vocab::PressPhase;
+use ds_core::geometry::units::Point;
+use ds_core::vocab::PressPhase;
 use std::time::{Duration, Instant};
 
 /// An item, by its index at each nesting level: `[2, 0]` is the first item of the third

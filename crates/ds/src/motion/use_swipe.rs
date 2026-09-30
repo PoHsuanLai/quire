@@ -3,14 +3,14 @@
 //! pure (`swipe.rs`); this owns the time.
 
 use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
-use crate::core::geometry::units::Px;
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::core::time::clock::sleep;
-use crate::core::vocab::PressPhase;
 use crate::style::scope::{Scope, use_scope_signal};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::time::clock::sleep;
+use ds_core::vocab::PressPhase;
 use std::time::Instant;
 
 /// A live swipe: read its state in render, feed it from the card's listeners.
@@ -56,7 +56,7 @@ impl Swiper {
 
     /// Now, as the machine's stamp.
     pub fn now(&self) -> Stamp {
-        Stamp(crate::core::time::clock::since(self.origin))
+        Stamp(ds_core::time::clock::since(self.origin))
     }
 
     fn try_feed(&self, input: SwipeInput) -> Result<(), Gone> {
@@ -99,7 +99,7 @@ pub fn use_swipe(metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> Swiper 
         quiet: use_signal(|| None),
         env: use_scope_signal(),
         scope: use_hook(current_scope_id),
-        origin: use_hook(crate::core::time::clock::now),
+        origin: use_hook(ds_core::time::clock::now),
         metrics,
         on_dismiss,
     }

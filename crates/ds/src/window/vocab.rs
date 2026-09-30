@@ -2,7 +2,7 @@
 //! `WindowTile`) and what the host reports back (`WindowState`, `Support`, `TileError`). Closed
 //! sets, so a host that is not ds-native (shell-host's `SurfaceHandle`) maps each one exhaustively.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// The edge or corner an interactive resize grabs (the xdg-shell `resize_edge` set, winit's
 /// `ResizeDirection`).

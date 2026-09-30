@@ -7,7 +7,7 @@
 //! While charging, a gap is cut at twelve for the bolt: [`GAP`] degrees between the ends'
 //! centres, so the visible gap between the round caps is about 17 degrees, as measured.
 
-use crate::core::vocab::Fraction;
+use ds_core::vocab::Fraction;
 
 /// The stroke's width in the 100-unit box.
 pub const STROKE: f32 = 9.3;
@@ -84,7 +84,7 @@ pub fn arc_path(span: RingSpan) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{RingSpan, arc_path};
-    use crate::core::vocab::Fraction;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn an_arc_fills_its_share_of_the_span() {

@@ -5,9 +5,6 @@
 //! ([`check`]); then the marks' boxes are measured and drawn ([`draw`]). None of it re-renders
 //! the app's content: the state is in cells, and only the layer reads the boxes.
 
-use crate::core::geometry::units::{Point, Rect};
-use crate::style::task::{spawn_in, try_set_if_changed};
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::document::DocumentHost;
 use crate::host::measure::{BUSY_ATTEMPTS, client_rect};
 use crate::host::parts::EditHost;
@@ -17,9 +14,12 @@ use crate::spell::lang::{Lang, Spell};
 use crate::spell::marks::{Edit, Misspelt, Typing, marks_for, reconcile, shown, typing_after};
 use crate::spell::service::{Paragraph, SpellService};
 use crate::spell::words::words;
+use crate::style::task::{spawn_in, try_set_if_changed};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{ScopeId, Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Rect};
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, HashSet};
 use std::rc::Rc;

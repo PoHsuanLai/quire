@@ -6,11 +6,11 @@ use crate::components::fields::text_input::InputVariant;
 use crate::components::fields::text_input_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_input_kind::{Rows, TextInputKind};
 use crate::components::fields::text_input_mask::{CaretMark, MaskCaret, MaskParts};
-use crate::core::vocab::Availability;
-use crate::core::word::Word;
 use crate::focus::targets::Told;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+use ds_core::word::Word;
 
 /// Where a field's events go. `onchange` takes no value: the field already knows it.
 #[derive(Clone, Copy)]

@@ -4,9 +4,9 @@
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Stacking, use_float};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::core::vocab::Dismiss;
 use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
+use ds_core::vocab::Dismiss;
 
 /// The scrim button itself, for a modal that draws its own (`Peek`, `Sheet`): a click closes
 /// when `closes()` says the modal is the topmost layer.

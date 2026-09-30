@@ -45,9 +45,6 @@
 
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
-use crate::core::geometry::scale::Scale;
-use crate::core::vocab::{Activity, InputModality};
-use crate::core::word::Word;
 use crate::focus::click::ClickRoot;
 use crate::host::signals::HostSignals;
 use crate::motion::hover_intent::HoverWarmth;
@@ -70,6 +67,9 @@ use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::style::tokens::hex::Alpha;
 use crate::style::tokens::{pixel::PixelToken, shape::Corner};
 use dioxus::prelude::*;
+use ds_core::geometry::scale::Scale;
+use ds_core::vocab::{Activity, InputModality};
+use ds_core::word::Word;
 use std::rc::Rc;
 
 /// How the stylesheet reaches the document.

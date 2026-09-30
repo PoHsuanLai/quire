@@ -3,9 +3,6 @@
 //! keyboard, its element and its IME registration. Kept in cells, not signals: changing any of it
 //! must not re-render the app's content.
 
-use crate::core::geometry::units::{Point, Rect};
-use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::core::vocab::PressPhase;
 use crate::edit::clicks::{Clicks, LastPress, clicks_after};
 use crate::edit::composition::Composing;
 use crate::edit::pointer::EditFocus;
@@ -15,6 +12,9 @@ use crate::host::measure::BUSY_ATTEMPTS;
 use crate::host::parts::EditHost;
 use crate::host::probe::Probe;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Rect};
+use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_core::vocab::PressPhase;
 use std::cell::{Cell, RefCell};
 use std::rc::Rc;
 
@@ -59,7 +59,7 @@ impl Default for SurfaceState {
 impl SurfaceState {
     /// Count a press at `at` now, remembering it for the next.
     pub(crate) fn press(&self, at: Point) -> Clicks {
-        let when = crate::core::time::clock::now();
+        let when = ds_core::time::clock::now();
         let clicks = clicks_after(self.last_press.get(), at, when);
         self.last_press.set(Some(LastPress { at, when, clicks }));
         self.pressing.set(PressPhase::Pressed);

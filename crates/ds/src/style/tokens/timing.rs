@@ -5,9 +5,9 @@
 //! keeps its Standard value instead (a held state, or the spinner's step, is not something that
 //! moves, so shortening it would make it unreadable rather than calmer).
 
-use crate::core::word::Word;
 use crate::style::appearance::motion::MotionLevel;
 use crate::style::tokens::token::{CssValue, Token, TokenScope};
+use ds_core::word::Word;
 use std::time::Duration;
 
 /// Whether Reduced motion shortens a [`DurationToken`] to `--t-quick`, or the token times a held

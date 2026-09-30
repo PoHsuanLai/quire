@@ -10,11 +10,12 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-# ds is renderer-free and effect-free; ds-settings does I/O but never renders, and takes a Spawner
+# ds-core is plain data and maths, so sill's pure crates can use it: not even dioxus. ds is renderer-free and effect-free; ds-settings does I/O but never renders, and takes a Spawner
 # instead of naming a runtime.
 # ds-native reaches D-Bus only through its opt-in `print` feature, so an app that never prints
 # builds no D-Bus client for it; anyrender_pdfrum stays Blitz-free so it can go upstream.
 RULES=(
+  "ds-core: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-settings: tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-native: zbus memfd"
@@ -47,6 +48,34 @@ for rule in "${RULES[@]}"; do
   fi
 done
 
+# The allowed edges between our own crates (ARCHITECTURE.md section 1): each crate's direct normal
+# and build dependencies that live in this workspace, and nothing else. A dependency on a crate
+# not listed here is a leak; so is one the crate no longer has, so the table stays exact.
+EDGES=(
+  "ds-core-derive:"
+  "ds-settings-derive:"
+  "ds-core: ds-core-derive"
+  "ds: ds-core ds-core-derive"
+  "ds-settings: ds ds-core ds-settings-derive"
+  "ds-native: ds anyrender_pdfrum"
+  "ds-gallery: ds ds-core ds-settings ds-native"
+  "icons: ds ds-settings"
+  "anyrender_pdfrum:"
+)
+for edge in "${EDGES[@]}"; do
+  crate="${edge%%:*}"
+  read -r -a allowed <<<"${edge#*:}"
+  found=$(cargo tree -p "$crate" --depth 1 -e normal,build --prefix none --all-features 2>/dev/null \
+    | grep '(/' | awk '{print $1}' | grep -vx "$crate" | sort -u | tr '\n' ' ')
+  want=$(printf '%s\n' "${allowed[@]}" | grep . | sort -u | tr '\n' ' ')
+  if [ "$found" != "$want" ]; then
+    echo "EDGE: $crate depends on [${found% }], the table allows [${want% }]"
+    fail=1
+  else
+    echo "edges hold: $crate depends on [${found% }]"
+  fi
+done
+
 # Layers inside ds, the crates it will split into (core, style, motion, lint, ds, shell), with
 # assembly on top. A file in a layer may name (`crate::<module>`) only its own layer and the
 # ones below it; mail's own components (components::app) are named by nothing but themselves
@@ -55,7 +84,6 @@ done
 # components < shell < assembly (ARCHITECTURE.md section 2).
 DS=crates/ds/src
 LAYERS=(
-  "core: style motion lint host focus edit file_drop spell window stack root components shell assembly"
   "style: motion lint host focus edit file_drop spell window stack root components shell assembly"
   "motion: lint host focus edit file_drop spell window stack root components shell assembly"
   "lint: motion host focus edit file_drop spell window stack root components shell assembly"
@@ -104,7 +132,7 @@ for i in "${!COMPONENT_GROUPS[@]}"; do
   fi
 done
 if [ "$layered" -eq 0 ]; then
-  echo "layers hold: core < style < motion < lint, ds < shell < assembly; component groups in order"
+  echo "layers hold: style < motion < lint, ds < shell < assembly; component groups in order"
 fi
 
 # No `pub(crate)` module or item may be named from another layer: it becomes `pub` at its home

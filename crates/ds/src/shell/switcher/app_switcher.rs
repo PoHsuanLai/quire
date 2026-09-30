@@ -7,9 +7,6 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
-use crate::core::geometry::units::Px;
-use crate::core::vocab::Selection;
-use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::Touch;
 use crate::motion::pulse_key::PulseKey;
@@ -22,6 +19,9 @@ use crate::shell::switcher::switcher_fit::{SwitcherMetrics, fit};
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::Selection;
+use ds_core::vocab::Shown;
 
 /// An application in the switcher, by the shell's own id for it (its app id).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

@@ -16,8 +16,6 @@ use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
 use crate::components::overlays::{
     sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
 };
-use crate::core::vocab::Availability;
-use crate::core::vocab::Shown;
 use crate::shell::lock::picture::{AT_POLKIT, prompt_picture};
 use crate::shell::lock::secret_entry::{SecretEntry, use_secret_entry};
 use crate::shell::lock::vocab::{CapsLock, LockUser, PromptState};
@@ -25,6 +23,8 @@ use crate::shell::user_picture::{mood::Mood, portrait::Liveliness};
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
+use ds_core::vocab::Shown;
 
 /// The title when the caller gives none.
 const AUTHENTICATE: &str = "Authentication Required";

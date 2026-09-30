@@ -10,7 +10,6 @@
 //! `shown`, and the entrance timer's phase and the spring's frames are what re-render the
 //! surface.
 
-use crate::core::vocab::Shown;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::Touch;
 use crate::motion::timer::{MotionTimer, TimerPhase, use_motion_timer};
@@ -22,6 +21,7 @@ use crate::motion::{
 };
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
 
 /// How many pixels the whole showing spans, for the spring's rest: a hundredth of it is well
 /// under a visible step of a slide or a fade.
@@ -188,7 +188,7 @@ pub fn use_spring_presence(
 #[cfg(test)]
 mod tests {
     use super::{Stage, Step, step};
-    use crate::core::vocab::Shown;
+    use ds_core::vocab::Shown;
 
     #[test]
     fn each_stage_steps_by_what_the_host_asks() {

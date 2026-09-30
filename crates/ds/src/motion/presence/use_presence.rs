@@ -8,11 +8,11 @@
 use super::Presence;
 use super::spec::PresenceSpec;
 use super::step::{PresenceEffect, PresenceInput, input, step};
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::motion::timer::{MotionTimer, use_motion_timer};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 
 /// Which of its entrance's two names a surface plays: flipped on each showing, so the entrance
 /// restarts even where the engine kept the element's styles (design/05 section 9 rule 2). A

@@ -3,12 +3,12 @@
 //! tray icon's right-click has to reach the app as a secondary press, its middle click as a
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
-use crate::core::geometry::units::{Point, Px};
-use crate::core::press::{PointerButton, Press};
-use crate::core::vocab::PressPhase;
 use crate::focus::click::kept_click;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
+use ds_core::press::{PointerButton, Press};
+use ds_core::vocab::PressPhase;
 
 /// The press a mouse event describes, as `button`.
 pub(crate) fn press_of(event: &MouseEvent, button: PointerButton) -> Press {
@@ -176,8 +176,8 @@ impl Pressing {
 #[cfg(test)]
 mod tests {
     use super::button_of;
-    use crate::core::press::PointerButton;
     use dioxus::html::input_data::MouseButton;
+    use ds_core::press::PointerButton;
 
     #[test]
     fn a_trigger_names_its_button() {

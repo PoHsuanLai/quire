@@ -1,15 +1,15 @@
 //! HoverStrip: a pill of icon buttons that appears on a hovered row, each previewing its
 //! result through a Fly tooltip (design/04-COMPONENTS.md section 17).
 
-use crate::core::geometry::units::Rect;
-use crate::core::vocab::Selection;
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
+use ds_core::vocab::Selection;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 use std::rc::Rc;
 
 /// Which action a strip button is, by the consumer's own name: `archive`, `snooze`.

@@ -10,12 +10,12 @@ use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::Propagation;
-use crate::core::press::Press;
-use crate::core::vocab::Shown;
-use crate::core::word::Word;
 use crate::root::common::Common;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 
 /// The toggle's words: "Show less" while the group is open; while folded to its newest, how
 /// many are hidden ("2 more"), or nothing when there is nothing to show.
@@ -74,7 +74,7 @@ pub fn GroupHeader(
 #[cfg(test)]
 mod tests {
     use super::toggle_label;
-    use crate::core::vocab::Shown;
+    use ds_core::vocab::Shown;
 
     #[test]
     fn the_toggle_names_what_it_will_do() {

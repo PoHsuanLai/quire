@@ -15,13 +15,13 @@ pub(crate) mod header;
 pub(crate) mod weeks;
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::core::word::Word;
 use crate::shell::month_grid::data::{DayKey, MonthGridData, MonthKey, MonthStep, WeekNumbers};
 use crate::shell::month_grid::density::{Drawn, MonthDensity};
 use crate::shell::month_grid::header::header;
 use crate::shell::month_grid::weeks::{MonthSlide, MonthWeeks};
 use crate::shell::widget::scope::use_enclosing_frame;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// A month. `data` is the month as the shell laid it out; `weeks` whether each row leads with
 /// its ISO week. With `onstep` the header ends in the previous and next buttons, which call it

@@ -1,5 +1,5 @@
 use super::*;
-use crate::core::geometry::units::{Point, Size};
+use ds_core::geometry::units::{Point, Size};
 
 /// A 200 px track from x 100.
 fn track() -> Rect {

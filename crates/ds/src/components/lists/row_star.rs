@@ -1,11 +1,11 @@
 //! A thread row's star (design/04-COMPONENTS.md section 16): the button that toggles it. Split
 //! from `list_row` so the row's own file holds the row.
 
-use crate::core::vocab::Check;
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use crate::style::icon::shape::Shape;
 use dioxus::prelude::*;
+use ds_core::vocab::Check;
 
 /// The star's glyph: the outline, filled with its own colour once starred. `Glyph` only
 /// strokes, and a CSS `fill` never reaches SVG on Blitz (spike S6), so the fill is written as an

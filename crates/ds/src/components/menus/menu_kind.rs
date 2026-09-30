@@ -2,12 +2,12 @@
 //! each goes against its anchor, its entrance and its item layout. Split from `menu`.
 
 use crate::components::menus::menu_item::Row;
-use crate::core::geometry::{
+use crate::motion::anim::Anim;
+use ds_core::geometry::{
     placement::{Align, Placement, Side},
     units::{Point, Px, Rect},
 };
-use crate::core::word::Word;
-use crate::motion::anim::Anim;
+use ds_core::word::Word;
 
 /// Which menu shape.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

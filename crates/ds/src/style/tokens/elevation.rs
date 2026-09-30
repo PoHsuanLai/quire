@@ -6,8 +6,8 @@
 //! `--shadow-pop` and `--shadow-sheet` take section 17.2's proposed values, and the names past
 //! the plan's four are proposed.
 
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
+use ds_core::word::Word;
 
 /// One shadow token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

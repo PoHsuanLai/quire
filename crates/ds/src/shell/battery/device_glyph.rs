@@ -4,10 +4,10 @@
 //! grid (`device_forms.rs`), one path in `currentColor`, no stroke, so they sit in the same
 //! `svg.ds-ic` box as every other glyph and size the same way.
 
-use crate::core::word::Word;
 use crate::shell::battery::device_forms::{form_of, path_of};
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// A device that reports a battery.

@@ -4,13 +4,13 @@
 //! The settle task belongs to the hook's owner and is dropped with it: a palette unmounted
 //! before its entrance settles takes its timer with it (`crate::style::task`).
 
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::core::time::clock::sleep;
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;
 use crate::style::scope::{Scope, use_scope_signal};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 
 /// Where a motion timer is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

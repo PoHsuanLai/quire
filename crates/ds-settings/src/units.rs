@@ -6,7 +6,7 @@
 
 use serde::{Deserialize, Serialize};
 
-pub use ds::Fraction;
+pub use ds_core::vocab::Fraction;
 
 /// Logical pixels, as a key stores them.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]

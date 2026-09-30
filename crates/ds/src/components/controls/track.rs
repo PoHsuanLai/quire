@@ -1,8 +1,8 @@
 //! Where a pointer lands on a horizontal track, shared by the form slider and the level control:
 //! the one piece of their machines that is the same.
 
-use crate::core::geometry::units::{Px, Rect};
-use crate::core::vocab::Fraction;
+use ds_core::geometry::units::{Px, Rect};
+use ds_core::vocab::Fraction;
 
 /// The value under the pointer at `x` on a track occupying `rect`, clamped to its ends.
 pub(crate) fn fraction_at(rect: Rect, x: Px) -> Fraction {

@@ -10,10 +10,10 @@ use super::spring_spec::{SpringResponse, SpringSpec};
 use super::timeline::spring::PxPerUnit;
 use super::use_spring::{SpringMotion, use_spring_motion};
 use super::velocity::Velocity;
-use crate::core::geometry::units::{Point, Px};
 use crate::motion::detail::touch::Touch;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px};
 
 /// How the hand was moving when it let go, per axis, in pixels per second.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -156,8 +156,8 @@ pub fn use_spring_point(target: Point, spec: SpringSpec) -> PointFrame {
 #[cfg(test)]
 mod tests {
     use super::{PointThrow, Release};
-    use crate::core::geometry::units::{Point, Px};
     use crate::motion::velocity::Velocity;
+    use ds_core::geometry::units::{Point, Px};
 
     fn pt(x: f32, y: f32) -> Point {
         Point { x: Px(x), y: Px(y) }

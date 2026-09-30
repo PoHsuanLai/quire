@@ -1,8 +1,8 @@
 //! The bar's status item geometry (design/22-SETTINGS.md section 3): the two custom
 //! properties `IconButton { Status }` reads, written from the shell's settings.
 
-use crate::core::geometry::units::Px;
 use crate::style::tokens::name::VarName;
+use ds_core::geometry::units::Px;
 
 /// A bar's status item geometry, from the shell's settings (design/22-SETTINGS.md section 3,
 /// `bar.status_icon_box_px`, `bar.status_glyph_px`, `bar.glyph_size_policy`): written as the
@@ -47,8 +47,8 @@ impl Default for StatusMetrics {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::geometry::units::Px;
     use crate::style::tokens::status::StatusMetrics;
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn the_metrics_write_both_properties() {

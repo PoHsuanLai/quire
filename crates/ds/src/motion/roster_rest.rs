@@ -13,9 +13,9 @@ use super::roster::RosterState;
 use super::settle::settle;
 use super::use_roster::Roster;
 use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::core::time::clock::sleep;
 use dioxus::core::{Task, queue_effect};
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use std::time::Instant;
 
 /// Whether a rest is waiting for the effect that schedules it.
@@ -73,7 +73,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         else {
             return Ok(());
         };
-        let due = crate::core::time::clock::now() + length;
+        let due = ds_core::time::clock::now() + length;
         if let Some(pending) = try_get(self.rest)? {
             if pending.due >= due {
                 return Ok(());
@@ -82,7 +82,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         }
         let roster = *self;
         let task = spawn_in(self.scope, async move {
-            sleep(due.saturating_duration_since(crate::core::time::clock::now())).await;
+            sleep(due.saturating_duration_since(ds_core::time::clock::now())).await;
             if try_set(roster.rest, None).is_ok() {
                 let _ = roster.update(RosterState::rest);
             }

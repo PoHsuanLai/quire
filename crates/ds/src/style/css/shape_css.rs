@@ -10,13 +10,13 @@
 //! `.ds-frame`; the palette's card does as a surface does. Colours live in custom properties
 //! declared here, as the materials' do.
 
-use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, presence_selector, property, rule};
 use crate::style::icon::family::{NEUTRAL_DARK, PlateFamily};
 use crate::style::icon::plate::{Quadrant, fill_mask, plate_mask, quadrant_mask};
 use crate::style::icon::plate_tint::PLATE_TINT_VARS;
 use crate::style::tokens::{hex::Hex, layer::ZLayer, name::VarName};
+use ds_core::word::Word;
 
 /// What a squircle element writes inline (`Corner::squircle_style`): its extent and the circle
 /// its shadows follow.

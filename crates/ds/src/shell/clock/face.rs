@@ -10,11 +10,11 @@
 //! `clock_dial.rs`.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::core::word::Word;
 use crate::shell::clock::angles::hands;
 use crate::shell::clock::dial::{hands_svg, numerals, phase_mark, pin_svg, second_svg, ticks_svg};
 use crate::shell::clock::kind::{ClockLook, ClockTime, DayPhase, Seconds};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// A clock showing `time`, for `phase`, drawn as `look`, with `label` (the city) under it. A
 /// digital face shows the digits; an analog one moves its hands.

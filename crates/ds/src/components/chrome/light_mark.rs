@@ -3,8 +3,8 @@
 //! lights' own marks at a third of a glyph's size, with no Lucide equivalent for the pairs of
 //! corners, and they are drawn in the light's deep ink rather than the text colour's weight.
 
-use crate::core::word::Word;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// Which mark a light shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

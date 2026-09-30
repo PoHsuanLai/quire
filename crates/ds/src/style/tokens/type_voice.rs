@@ -6,8 +6,8 @@
 //! monospace face wants in caps) and the caps labels' weight (a monospace label reads at 400;
 //! Inter caps at that size need 600 to hold the line).
 
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
+use ds_core::word::Word;
 
 /// One typeface-dependent value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]

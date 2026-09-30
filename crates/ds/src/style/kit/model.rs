@@ -1,8 +1,8 @@
 //! `Kit`: one layer's contribution to the stylesheet and the linter.
 
 use super::kits::Kits;
-use crate::core::word::Word;
 use crate::style::tokens::{easing::EasingToken, set::TokenSet, timing::DurationToken};
+use ds_core::word::Word;
 use std::borrow::Cow;
 
 /// Where a kit's sections sit in the cascade, first to last. A user's own style is last, so its

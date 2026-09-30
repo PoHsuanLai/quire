@@ -1,13 +1,13 @@
 //! What an accent is measured against: the card's grounds, and how far a colour stands out on
 //! them.
 
-use crate::core::colour::contrast::ratio;
 use crate::style::appearance::theme::Scheme;
 use crate::style::look::Look;
 use crate::style::tokens::{
     colour::ColourToken,
     hex::{Colour, Hex},
 };
+use ds_core::colour::contrast::ratio;
 
 /// The card's grounds an accent may lie on: `--paper`, `--surface`, `--surface-2`, `--raise`.
 pub fn card_grounds(scheme: Scheme) -> [Hex; 4] {

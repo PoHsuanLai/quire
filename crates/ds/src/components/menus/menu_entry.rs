@@ -9,8 +9,8 @@ use crate::components::content::text_runs::TextLine;
 use crate::components::menus::row_action::RowAction;
 use crate::components::menus::row_chord::RowChord;
 use crate::components::menus::row_shape::RowShape;
-use crate::core::vocab::{Availability, Check, Shortcut};
 use crate::style::icon::Icon;
+use ds_core::vocab::{Availability, Check, Shortcut};
 
 /// The tile at an item's start.
 #[derive(Debug, Clone, PartialEq)]

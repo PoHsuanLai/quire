@@ -14,9 +14,9 @@ use crate::components::lists::emoji_grid::nav::{GridEdge, GridMove, GridStep, gr
 use crate::components::menus::menu_lines::{Act, Choice, Line, choices, choices_len};
 use crate::components::menus::palette::palette_group::{GroupEntries, PaletteGroup};
 use crate::components::menus::palette::palette_lines::marked;
-use crate::core::vocab::Availability;
 use crate::stack::roving::{Step, Wrap, moved_live};
 use dioxus::prelude::EventHandler;
+use ds_core::vocab::Availability;
 
 /// A group as drawn: its rows marked for the query, or its grid, and its first stop.
 pub(crate) struct ShownGroup<'a, T: 'static> {
@@ -211,8 +211,8 @@ pub(crate) fn run_of<T: Clone>(stop: Option<&Stop<T>>) -> Run<T> {
 #[cfg(test)]
 mod tests {
     use super::{GridSpan, Travel, travel};
-    use crate::core::vocab::Availability::{Disabled as D, Enabled as E};
     use crate::stack::roving::Step::{Down, Up};
+    use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
 
     #[test]
     fn the_cursor_walks_rows_enters_a_grid_and_leaves_it() {

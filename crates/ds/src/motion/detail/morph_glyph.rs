@@ -4,7 +4,6 @@
 
 use super::level::use_level;
 use super::morph::{MorphStyle, Slashed};
-use crate::core::word::Word;
 use crate::motion::timeline::glide::Glide;
 use crate::motion::timeline::playback::{Playback, use_playback};
 use crate::motion::{
@@ -19,6 +18,7 @@ use crate::style::scale::use_scale;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The incoming glyph's fade.
 const FADE_IN: Anim = Anim::MorphFadeIn;

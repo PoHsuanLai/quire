@@ -3,10 +3,10 @@
 //! account, which has no provider, shows a neutral folder instead of a letter.
 
 use crate::components::content::image_source::ImageSource;
-use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// A mail provider.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

@@ -2,10 +2,10 @@
 //! text position the host resolved there, so the app moves its own caret or extends its own
 //! selection.
 
-use crate::core::geometry::units::Point;
 use crate::edit::clicks::Clicks;
 use crate::host::captured::PointerPhase;
 use crate::host::position::TextPosition;
+use ds_core::geometry::units::Point;
 
 /// A pointer event over the surface.
 #[derive(Debug, Clone, PartialEq)]

@@ -1633,9 +1633,22 @@ dependencies = [
  "cssparser",
  "dioxus",
  "dioxus-ssr",
+ "ds-core",
  "ds-core-derive",
  "futures-timer",
  "image",
+ "keyboard-types 0.7.0",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "ds-core"
+version = "0.1.0"
+dependencies = [
+ "ds-core-derive",
+ "futures-timer",
  "keyboard-types 0.7.0",
  "serde",
  "serde_json",
@@ -1658,6 +1671,7 @@ dependencies = [
  "dioxus",
  "dioxus-ssr",
  "ds",
+ "ds-core",
  "ds-native",
  "ds-settings",
  "image",
@@ -1712,6 +1726,7 @@ version = "0.1.0"
 dependencies = [
  "dioxus",
  "ds",
+ "ds-core",
  "ds-settings-derive",
  "futures-timer",
  "notify",

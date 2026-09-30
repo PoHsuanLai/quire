@@ -9,15 +9,15 @@
 //! centre (10, 12) at radii 5, 8.25 and 11.5, spaced so a 2-unit stroke leaves a gap between them.
 
 use super::vocab::LevelGlyph;
-use crate::core::vocab::Fraction;
-use crate::core::vocab::Muting;
-use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::IconSize;
 use crate::style::icon::shape::Shape;
 use crate::style::icon::stroke::stroke_width;
 use crate::style::scale::use_scale;
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
+use ds_core::vocab::Muting;
+use ds_core::word::Word;
 
 const WAVE_1: &[Shape] = &[Shape::Path("M13.83 8.79a5 5 0 0 1 0 6.42")];
 const WAVE_2: &[Shape] = &[Shape::Path("M16.32 6.7a8.25 8.25 0 0 1 0 10.6")];
@@ -191,8 +191,8 @@ fn shape_child(shape: &Shape) -> Element {
 mod tests {
     use super::{Part, Showing, showing, waves};
     use crate::components::content::level_glyph::vocab::LevelGlyph;
-    use crate::core::vocab::Fraction;
-    use crate::core::vocab::Muting;
+    use ds_core::vocab::Fraction;
+    use ds_core::vocab::Muting;
 
     #[test]
     fn the_waves_follow_the_level_and_mute_brings_the_slash() {

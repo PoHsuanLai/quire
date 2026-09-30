@@ -5,7 +5,7 @@
 //! section 15). The five hue names are this freeze's reading of "Accent(6)" and are recorded
 //! in FINDINGS.md; the token values live in `tokens::accent_table`.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// The card's accent, one of six.

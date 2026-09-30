@@ -5,7 +5,6 @@ use super::parts::CheckRows;
 use crate::components::controls::segmented::SegmentedControl;
 use crate::components::fields::text_input::{InputVariant, TextInput};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::core::word::Word;
 use crate::style::appearance::{
     motion::Motion,
     theme::{Scheme, Theme},
@@ -16,6 +15,7 @@ use crate::style::space::{
     palette::{Dot, derive},
 };
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The Motion row's value and where a pick goes. The Space's own motion is the person's
 /// choice, which the consumer passes on as its root's `appearance.motion`.

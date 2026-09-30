@@ -3,8 +3,6 @@
 //! the attribute value or CSS word each one is written as, and the label a person reads.
 
 #[cfg(test)]
-pub mod testing;
-#[cfg(test)]
 mod tests;
 
 pub use ds_core_derive::Word;

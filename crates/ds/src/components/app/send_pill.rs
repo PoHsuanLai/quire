@@ -12,11 +12,11 @@
 //! text.
 
 use crate::components::app::send_mood::SendMood;
-use crate::core::time::{FRAME_SLACK, clock::sleep};
-use crate::core::vocab::Fraction;
-use crate::core::word::Word;
 use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_core::vocab::Fraction;
+use ds_core::word::Word;
 use std::time::Duration;
 
 /// How long an undo-send countdown runs (proposed), the consumer's to count.
@@ -186,7 +186,7 @@ pub fn SendPill(
 #[cfg(test)]
 mod tests {
     use super::drained;
-    use crate::core::vocab::Fraction;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn the_ring_drains_with_progress() {

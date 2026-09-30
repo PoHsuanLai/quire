@@ -3,8 +3,8 @@
 //! section 2.4; design/13-BEHAVIOUR-menus-windows.md sections 13.3.2-13.3.4).
 
 use crate::components::menus::menu_lines::{Act, Choice, KeyAct, liveness};
-use crate::core::vocab::Availability;
 use crate::stack::roving::{Wrap, edge_live, moved_live};
+use ds_core::vocab::Availability;
 
 /// Which panel: the menu itself, or a submenu (whose Escape and Left go back one level).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -86,8 +86,8 @@ pub(crate) fn decide<T: Clone>(
 mod tests {
     use super::{Child, Decision, Level, decide};
     use crate::components::menus::menu_lines::{Act, Choice, KeyAct};
-    use crate::core::vocab::Availability;
     use crate::stack::roving::Step;
+    use ds_core::vocab::Availability;
 
     fn pick(value: u8) -> Choice<u8> {
         Choice {

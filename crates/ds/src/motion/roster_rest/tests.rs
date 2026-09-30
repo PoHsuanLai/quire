@@ -1,8 +1,6 @@
 //! The rest timer starts after the render, never from it, and two reconciles before the effect
 //! runs start one timer.
 
-use crate::core::geometry::units::Px;
-use crate::core::vocab::{Activity, InputModality};
 use crate::motion::{
     presence::{Exit, Presence},
     roster::RowPitch,
@@ -15,6 +13,8 @@ use crate::style::appearance::{blur::BlurState, material::Material};
 use crate::style::scope::Scope;
 use dioxus::core::{NoOpMutations, VirtualDom};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::{Activity, InputModality};
 use std::cell::Cell;
 
 thread_local! {

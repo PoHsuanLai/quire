@@ -1,9 +1,9 @@
 //! What the host tells the tree as it changes: how the person last drove it, the device scale of
 //! the output it is on, and whether its window is the one they are working in.
 
-use crate::core::geometry::scale::Scale;
-use crate::core::vocab::{Activity, InputModality};
 use dioxus::prelude::*;
+use ds_core::geometry::scale::Scale;
+use ds_core::vocab::{Activity, InputModality};
 
 /// The host's live values, provided as root context by whatever sees the raw input and the window
 /// (`launch`, the harness, a shell's surface root). `Ds` stamps them on `.ds` and sizes the pixel

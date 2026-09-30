@@ -4,13 +4,13 @@
 //! compositor takes the pointer from the press. Not drawn while the window is maximized or
 //! fullscreen, where resizing is the compositor's.
 
-use crate::core::word::Word;
 use crate::window::{
     host::{use_window_host, use_window_state},
     vocab::ResizeEdge,
 };
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The eight grab zones, or nothing while the window fills its output.
 #[component]

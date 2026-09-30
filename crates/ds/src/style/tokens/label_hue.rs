@@ -6,8 +6,8 @@
 
 use super::hex::Hex;
 use super::token::{CssValue, Token, TokenScope};
-use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// One label hue.

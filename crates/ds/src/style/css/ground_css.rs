@@ -6,11 +6,11 @@
 //! Overlays opened from the frame (`.ds-overlay`, rendered at the end of the root) are paper
 //! cards, so they take the paper values back, per scheme, from the token table.
 
-use crate::core::word::Word;
 use crate::style::appearance::theme::Scheme;
 use crate::style::emit::{attr_selector, declaration, rule};
 use crate::style::look::Look;
 use crate::style::tokens::{colour::ColourToken, name::VarName};
+use ds_core::word::Word;
 
 /// Each paper token a frame ground redirects, and the frame variable it reads instead: the text
 /// inks to the frame inks, the hover fill (`--surface`, Tool's hover) to `--f-pill-hover`, the

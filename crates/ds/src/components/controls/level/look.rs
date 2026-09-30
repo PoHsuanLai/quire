@@ -5,9 +5,9 @@
 
 use crate::components::content::level_glyph::glyph::LevelGlyphView;
 use crate::components::content::level_glyph::vocab::{LevelGlyph, LevelLook};
-use crate::core::vocab::Fraction;
 use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
 
 /// How many squares the segmented look draws: a volume key's sixteen steps.
 pub(crate) const SEGMENTS: u16 = 16;
@@ -82,7 +82,7 @@ fn segments(value: Fraction) -> Element {
 #[cfg(test)]
 mod tests {
     use super::filled;
-    use crate::core::vocab::Fraction;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn a_level_fills_the_nearest_sixteenth() {

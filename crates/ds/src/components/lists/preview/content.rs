@@ -6,11 +6,11 @@ use crate::components::content::icon_view::IconView;
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::pdf_thumb::{PdfPage, PdfThumb, sheet_rect};
 use crate::components::content::picture_fit::picture_style;
-use crate::core::geometry::units::{Px, Size};
 use crate::style::icon::Icon;
 use crate::style::icon::family::PlateFamily;
 use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Px, Size};
 
 /// The pane's media box: a picture or a page is fitted into it at its own aspect, and a PDF's
 /// page is rasterised for it (`ds_native::use_pdf_page(path, PANE_MEDIA)`). 328 is a 360 pane's

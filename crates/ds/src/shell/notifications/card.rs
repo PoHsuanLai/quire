@@ -25,8 +25,6 @@ use crate::components::content::rich_text::Rich;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
 use crate::components::controls::press::{PressListeners, Propagation};
-use crate::core::press::Press;
-use crate::core::word::Word;
 use crate::motion::swipe::SwipeMetrics;
 use crate::root::chrome::RootChrome;
 use crate::root::surface::Surface;
@@ -37,6 +35,8 @@ use crate::style::appearance::material::Material;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconPx, IconSize};
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::word::Word;
 
 /// One notification. `app`, `age` (the caller's words: "now", "2m") and `summary` are its first
 /// line; `body` (runs and links, clamped) is optional, as are the group's `count` and the

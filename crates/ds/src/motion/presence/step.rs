@@ -3,7 +3,7 @@
 //! effects; everything that decides is here, so the rules are a table.
 
 use super::{Exit, Presence};
-use crate::core::vocab::Shown;
+use ds_core::vocab::Shown;
 
 /// What happened to the surface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -72,8 +72,8 @@ pub(crate) fn step(
 #[cfg(test)]
 mod tests {
     use super::{Presence as P, PresenceEffect as E, PresenceInput as I, input, step};
-    use crate::core::vocab::Shown;
     use crate::motion::presence::Exit;
+    use ds_core::vocab::Shown;
 
     const OUT: P = P::Leaving(Exit::OsdOut);
 

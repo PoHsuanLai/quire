@@ -8,9 +8,9 @@
 
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
 use crate::components::overlays::tooltip::{Tooltip, TooltipKind};
-use crate::core::geometry::units::Px;
-use crate::core::vocab::Selection;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::Selection;
 
 /// One emoji: what picking it yields, the characters drawn, and its name.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -189,8 +189,8 @@ fn is_pick(key: &Key) -> bool {
 #[cfg(test)]
 mod tests {
     use super::{grid_style, is_pick};
-    use crate::core::geometry::units::Px;
     use dioxus::prelude::Key;
+    use ds_core::geometry::units::Px;
 
     #[test]
     fn the_grid_lays_its_columns_at_the_cell_side() {

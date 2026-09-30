@@ -5,7 +5,7 @@
 //! `System` to a `prefers-color-scheme` media guard (design/05-MOTION.md section 9 rule 11,
 //! [`crate::resolve`]).
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// Which palette the window resolves to.

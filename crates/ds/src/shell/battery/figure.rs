@@ -2,8 +2,8 @@
 //! (the ring draws none), so it is offered as a small component, [`BatteryFigure`], that writes
 //! it as `93%` in tabular figures. A number changes instantly (design/30 section 1.3).
 
-use crate::core::vocab::Fraction;
 use dioxus::prelude::*;
+use ds_core::vocab::Fraction;
 
 /// `span.ds-battery-figure`: the percentage, `{n}%`, in tabular figures. Its size and face are
 /// the caller's (a hero figure or a row's).

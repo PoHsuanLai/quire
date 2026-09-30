@@ -2,7 +2,7 @@
 //! text. The app renders `data-edit-node="{key}"` on every paragraph and object it can address
 //! (mailo's `data-n`), so a position is in the app's vocabulary, not the renderer's.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// The attribute that makes an element addressable; its value is the element's [`EditNode`].
 pub const EDIT_NODE_ATTR: &str = "data-edit-node";
@@ -69,7 +69,7 @@ impl EditKind {
 #[cfg(test)]
 mod tests {
     use super::EditKind;
-    use crate::core::word::Word;
+    use ds_core::word::Word;
 
     #[test]
     fn a_kind_round_trips_through_its_slug() {

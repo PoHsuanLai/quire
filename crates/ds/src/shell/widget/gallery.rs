@@ -11,8 +11,6 @@
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::{Button, ButtonVariant};
-use crate::core::press::Press;
-use crate::core::word::Word;
 use crate::host::measure::MountedRef;
 use crate::shell::widget::contract::WidgetKind;
 use crate::shell::widget::gallery_book::Book;
@@ -21,6 +19,8 @@ use crate::shell::widget::kind::{Lift, WidgetHost, WidgetSize};
 use crate::shell::widget::layout::{WidgetEdit, WidgetLayout};
 use crate::shell::widget::registry::{WidgetInfo, use_widget_registry};
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::word::Word;
 
 /// The gallery's words, the host's to translate; English by default.
 #[derive(Debug, Clone, PartialEq)]

@@ -7,7 +7,6 @@
 //! [`MonthIntent::Step`], and the provider answers with the next month's timeline.
 
 use crate::components::content::text_runs::TextLine;
-use crate::core::word::Word;
 use crate::shell::month_grid::MonthGrid;
 use crate::shell::month_grid::data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthStep,
@@ -17,6 +16,7 @@ use crate::shell::widget::contract::{Widget, WidgetContext, WidgetKind};
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
 use crate::style::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
 /// The month widget.

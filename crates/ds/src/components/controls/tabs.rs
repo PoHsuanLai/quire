@@ -1,8 +1,8 @@
 //! Tabs: switch between pages of one surface, with a spring underline
 //! (design/04-COMPONENTS.md section 12).
 
-use crate::core::vocab::Selection;
 use dioxus::prelude::*;
+use ds_core::vocab::Selection;
 
 /// A tab bar.
 #[component]

@@ -9,9 +9,9 @@
 use crate::components::menus::menu_filter::MenuFilter;
 use crate::components::menus::menu_filter::Typed;
 use crate::components::menus::{menu_entry::MenuEntry, menu_match::fuzzy};
-use crate::core::vocab::Availability;
 use crate::stack::roving::{Edge, Step};
 use dioxus::prelude::*;
+use ds_core::vocab::Availability;
 
 /// What a key does in a menu panel, before the panel decides what that means for the choice
 /// under the selection.

@@ -4,10 +4,10 @@
 //! shell lays the dock out itself; these are the numbers it and quire's dock pieces
 //! (`RunningDot`, `DockFloor`, an `IconView` plate) share.
 
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
 use crate::style::tokens::tuned::px;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// One dock geometry token, each a tuned token its settings key moves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -113,9 +113,9 @@ impl DockMetrics {
 #[cfg(test)]
 mod tests {
     use super::{DockFloorSetting, DockMetrics, DockToken};
-    use crate::core::geometry::units::Px;
-    use crate::core::word::Word;
     use crate::style::tokens::token::TokenScope;
+    use ds_core::geometry::units::Px;
+    use ds_core::word::Word;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

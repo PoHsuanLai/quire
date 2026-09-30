@@ -6,7 +6,6 @@
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
 use super::part::{Paint, Part, Pen, Show, part_svg};
-use crate::core::word::Word;
 use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::style::icon::render::IconSize;
 use crate::style::icon::shape::Shape;
@@ -14,6 +13,7 @@ use crate::style::icon::stroke::stroke_width;
 use crate::style::scale::use_scale;
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// Lucide `battery`'s outline: the body and the terminal.
 const OUTLINE: &[Shape] = &[

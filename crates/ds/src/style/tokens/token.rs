@@ -6,9 +6,9 @@
 //! linter's vocabulary (`TokenSet::of::<T>()` lists them all).
 
 use super::name::VarName;
-use crate::core::word::Word;
 use crate::style::appearance::{motion::MotionLevel, theme::Scheme, typeface::Typeface};
 use crate::style::look::Look;
+use ds_core::word::Word;
 use std::borrow::Cow;
 
 pub use ds_core_derive::Token;

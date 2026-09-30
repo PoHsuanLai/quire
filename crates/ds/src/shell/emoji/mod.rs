@@ -4,7 +4,7 @@
 //! image and plays no Lottie; quire plays them by moving the sheet's `background-position`
 //! from a Rust timer, only inside the 20 s awake window.
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 use {
     disc::{EmojiDisc, EmojiPlayback},
     id::EmojiId,

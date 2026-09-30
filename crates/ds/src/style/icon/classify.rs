@@ -10,9 +10,9 @@
 //! register the key in its own
 //! settings crate and pass the parsed value through (FINDINGS "Settings and schema").
 
-use crate::core::colour::oklab::{Oklab, Oklch};
-use crate::core::colour::srgb::Srgb;
-use crate::core::error::DsError;
+use ds_core::colour::oklab::{Oklab, Oklch};
+use ds_core::colour::srgb::Srgb;
+use ds_core::error::DsError;
 
 /// How an external icon should be drawn: the `IconSource` variant it belongs in.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

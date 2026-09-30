@@ -4,11 +4,11 @@
 //! buffering, the bar holds at 0 frames. Mounted only while the panel is open, so it costs one
 //! frame a second only while someone can see it.
 
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::core::time::clock::sleep;
 use crate::shell::now_playing::kind::{Playback, PositionClock};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 use std::time::{Duration, Instant};
 
 /// A position report: where, out of how long, and whether it runs.
@@ -34,7 +34,7 @@ impl Ticker {
         if let Some(running) = try_get(self.task)? {
             running.cancel();
         }
-        try_set(self.origin, (report, crate::core::time::clock::now()))?;
+        try_set(self.origin, (report, ds_core::time::clock::now()))?;
         try_set(self.task, None)?;
         if report.clock == PositionClock::Held {
             return Ok(());
@@ -49,7 +49,7 @@ impl Ticker {
     async fn run(self) -> Result<(), Gone> {
         loop {
             let (report, since) = try_get(self.origin)?;
-            let now = position(report, crate::core::time::clock::since(since));
+            let now = position(report, ds_core::time::clock::since(since));
             if now >= report.length {
                 return Ok(());
             }
@@ -100,7 +100,7 @@ pub fn TrackPosition(
         clock: playback.clock(),
     };
     let ticker = Ticker {
-        origin: use_signal(|| (report, crate::core::time::clock::now())),
+        origin: use_signal(|| (report, ds_core::time::clock::now())),
         beats: use_signal(|| 0),
         task: use_signal(|| None),
         scope: use_hook(current_scope_id),
@@ -116,7 +116,7 @@ pub fn TrackPosition(
     let _ = (ticker.beats)();
     let (anchored, since) = *ticker.origin.peek();
     let shown = if anchored == report {
-        position(report, crate::core::time::clock::since(since))
+        position(report, ds_core::time::clock::since(since))
     } else {
         report.at
     };

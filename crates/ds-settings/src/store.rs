@@ -9,7 +9,7 @@ use crate::error::SettingsError;
 use crate::lenient::{Loaded, Read, read};
 use crate::root::{AppName, ConfigRoot};
 use crate::watch::Watch;
-use ds::Spawner;
+use ds_core::spawner::Spawner;
 use std::path::{Path, PathBuf};
 
 /// One program's settings directory.

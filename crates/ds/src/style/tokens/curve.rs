@@ -6,8 +6,8 @@
 //! machine and the result is `Eq`: the curve parameter is found by bisection on x in 1/2^24
 //! steps (x is monotonic because CSS keeps `x1, x2` in 0..=1), and y is read at it.
 
-use crate::core::vocab::Fraction;
 use crate::style::tokens::easing::{CubicBezier, Easing};
+use ds_core::vocab::Fraction;
 
 /// Bisection steps: the parameter's resolution is 1/2^24, far below one thousandth.
 const STEPS: u32 = 24;
@@ -74,10 +74,10 @@ fn solve_x(x1: i128, x2: i128, t: i128) -> i128 {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::vocab::Fraction;
-    use crate::core::word::Word;
     use crate::style::appearance::motion::MotionLevel;
     use crate::style::tokens::easing::{CubicBezier, Easing, EasingToken};
+    use ds_core::vocab::Fraction;
+    use ds_core::word::Word;
 
     const QUARTERS: [u16; 5] = [0, 250, 500, 750, 1000];
 

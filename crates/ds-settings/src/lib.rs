@@ -3,7 +3,7 @@
 //! the settings portal, and the icon-theme lookup (design/22-SETTINGS.md sections 2 and 4).
 //!
 //! `ds` stays effect-free; everything here touches the disk or the bus. A watch or the portal
-//! runs as a task on the [`ds::Spawner`] it is handed: no runtime is named here. Feature `dioxus`
+//! runs as a task on the [`ds_core::spawner::Spawner`] it is handed: no runtime is named here. Feature `dioxus`
 //! adds [`use_environment`], the one signal a surface resolves its look from.
 
 // `#[derive(SettingsSchema)]`'s generated code always writes `::ds_settings::schema::...`, so

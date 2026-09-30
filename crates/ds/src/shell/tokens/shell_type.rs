@@ -5,10 +5,10 @@
 //! (design/13 section 13.3.9); `IconButton { Status }`, `MenuBarItem`, `Menu`, `CommandPalette`
 //! in a surface and `Tooltip` read them, so a consumer gets them with no prop.
 
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
 use crate::style::tokens::token::Token;
 use crate::style::tokens::tuned::px;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// One token of the shell type scale, each a tuned token a settings key can move.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -201,8 +201,8 @@ impl ShellMetrics {
 #[cfg(test)]
 mod tests {
     use super::{ShellMetrics, ShellType};
-    use crate::core::word::Word;
     use crate::style::tokens::token::TokenScope;
+    use ds_core::word::Word;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {
@@ -216,7 +216,7 @@ mod tests {
     #[test]
     fn a_changed_key_moves_only_its_input() {
         let mut metrics = ShellMetrics::default();
-        metrics.menu.row = crate::core::geometry::units::Px(24.0);
+        metrics.menu.row = ds_core::geometry::units::Px(24.0);
         let written = metrics.style_attr();
         assert!(written.contains("--shell-menu-row-h:24px;"));
         assert!(written.contains("--shell-menu-font:13px;"));

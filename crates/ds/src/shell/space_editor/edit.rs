@@ -1,9 +1,9 @@
 //! The editor's edits as pure functions: a look in, the edited look out
 //! (design/04-COMPONENTS.md section 32 behaviour, design/06-INTERACTIONS.md section 2.8).
 
-use crate::core::vocab::Fraction;
 use crate::style::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
 use dioxus::prelude::Key;
+use ds_core::vocab::Fraction;
 
 /// A Space holds at most three dots (`S:1425`).
 pub(super) const MAX_DOTS: usize = 3;
@@ -137,8 +137,8 @@ pub(super) fn grain_of(fraction: Fraction) -> u8 {
 #[cfg(test)]
 mod tests {
     use super::{Nudge, added, grain_of, nudged, preset, removed};
-    use crate::core::vocab::Fraction;
     use crate::style::space::{look::SpaceLook, palette::Dot, presets::PRESETS};
+    use ds_core::vocab::Fraction;
 
     fn look(dots: &[(f32, f32)]) -> SpaceLook {
         SpaceLook {

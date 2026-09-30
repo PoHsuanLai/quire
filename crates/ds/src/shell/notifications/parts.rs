@@ -4,9 +4,9 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::TextLine;
-use crate::core::press::Press;
-use crate::core::word::Word;
 use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::word::Word;
 
 /// The app a notification came from: its icon (drawn at `--notifications-icon`, 32) and its
 /// name (read to assistive technology before the summary).

@@ -5,7 +5,7 @@
 //! `KeySpec` per field, built from `#[settings(...)]` and the field's own type
 //! (`crate::gen_struct`): text by type (`String`, `PathBuf`, `Cow<str>`) or `#[settings(text)]`,
 //! a number only with `range` (without one, a `MissingRange { field }` error). A field whose type
-//! is a closed enum reads its variant words from the enum's own `Word` (`ds::Word`), so an
+//! is a closed enum reads its variant words from the enum's own `Word` (`ds_core::word::Word`), so an
 //! enum needs no derive of this crate's.
 //! Every malformed `#[settings(...)]` is caught in `crate::attrs`, which is unit-tested
 //! directly — there is no `trybuild` in this workspace's lockfile to drive a UI test instead.

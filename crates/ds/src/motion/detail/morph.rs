@@ -1,6 +1,6 @@
 //! How one glyph gives way to the next (design/26-DETAILS.md section 3.2, A5).
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// How a glyph morphs into the next.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

@@ -5,8 +5,6 @@
 //! it takes when a colour would leave sRGB or fail its contrast floor
 //! (design/03-COLOR.md section 4).
 
-use crate::core::colour::contrast::ratio;
-use crate::core::colour::fit::{js_round, oklch_hex as hex};
 use crate::style::appearance::theme::Scheme;
 use crate::style::tokens::accent_band::{
     band::{AccentPick, BandWeight, Hue},
@@ -14,6 +12,8 @@ use crate::style::tokens::accent_band::{
     picked::BAND,
     roles::AccentRoles,
 };
+use ds_core::colour::contrast::ratio;
+use ds_core::colour::fit::{js_round, oklch_hex as hex};
 use serde::{Deserialize, Serialize};
 
 pub(crate) mod card;

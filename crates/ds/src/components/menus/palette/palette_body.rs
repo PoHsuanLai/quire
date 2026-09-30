@@ -9,9 +9,9 @@ use crate::components::menus::menu_lines::choices_len;
 use crate::components::menus::menu_rows::{Drawn, render_lines};
 use crate::components::menus::palette::palette_motion::ListMotion;
 use crate::components::menus::palette::palette_stops::{Body, ShownGroup};
-use crate::core::geometry::units::Point;
-use crate::core::vocab::Selection;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Point;
+use ds_core::vocab::Selection;
 
 /// What the drawn stops report, by stop number.
 #[derive(Clone, Copy)]

@@ -29,7 +29,7 @@ impl Velocity {
 /// One pointer position along a drag axis, and when.
 #[derive(Debug, Clone, Copy, PartialEq)]
 struct Sample {
-    at: crate::core::geometry::units::Px,
+    at: ds_core::geometry::units::Px,
     when: std::time::Instant,
 }
 
@@ -47,7 +47,7 @@ impl VelocityMeter {
     /// before, so the speed is still measured over time that passed.
     pub fn moved(
         self,
-        at: crate::core::geometry::units::Px,
+        at: ds_core::geometry::units::Px,
         when: std::time::Instant,
     ) -> VelocityMeter {
         let same_instant = self.last.is_some_and(|last| last.when >= when);
@@ -81,7 +81,7 @@ impl VelocityMeter {
 #[cfg(test)]
 mod tests {
     use super::{Velocity, VelocityMeter};
-    use crate::core::geometry::units::Px;
+    use ds_core::geometry::units::Px;
     use std::time::{Duration, Instant};
 
     #[test]

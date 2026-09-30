@@ -2,10 +2,10 @@
 //! its height and opacity over `--t-move --e-in-out`, from the height the caller measured.
 //! Under Reduced it is instant.
 
-use crate::core::geometry::units::Px;
-use crate::core::vocab::{Fraction, Shown};
 use crate::motion::detail::tween::{TweenSpec, use_tween};
 use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
+use ds_core::geometry::units::Px;
+use ds_core::vocab::{Fraction, Shown};
 
 /// How open the content is, thousandths: 0 closed, 1000 open.
 const OPEN: Fraction = Fraction(1000);
@@ -69,8 +69,8 @@ pub fn use_collapse(shown: Shown) -> Collapse {
 #[cfg(test)]
 mod tests {
     use super::{Collapse, OPEN};
-    use crate::core::geometry::units::Px;
-    use crate::core::vocab::Fraction;
+    use ds_core::geometry::units::Px;
+    use ds_core::vocab::Fraction;
 
     #[test]
     fn a_collapse_draws_its_share_of_the_measured_height() {

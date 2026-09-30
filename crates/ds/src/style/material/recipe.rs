@@ -227,11 +227,11 @@ fn radius(material: Material) -> String {
 #[cfg(test)]
 mod tests {
     use super::{DEFAULT_TINT_ALPHA, recipe};
-    use crate::core::word::Word;
     use crate::style::appearance::material::Material;
     use crate::style::appearance::theme::Scheme;
     use crate::style::tokens::hex::{Alpha, Hex};
     use crate::style::tokens::tint::flat_tint;
+    use ds_core::word::Word;
 
     #[test]
     fn the_flat_tints_are_section_17_2() {

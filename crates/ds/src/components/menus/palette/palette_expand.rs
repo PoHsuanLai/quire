@@ -85,7 +85,7 @@ mod tests {
     use crate::components::lists::emoji_grid::grid::{EMOJI_CELL, EmojiCells};
     use crate::components::menus::menu_entry::{MenuEntry, MenuTrail};
     use crate::components::menus::palette::palette_group::{GroupEntries, GroupsKey};
-    use crate::core::vocab::Availability;
+    use ds_core::vocab::Availability;
 
     fn item(value: u8) -> MenuEntry<u8> {
         MenuEntry::Item {

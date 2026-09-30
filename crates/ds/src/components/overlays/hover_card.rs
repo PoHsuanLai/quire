@@ -14,11 +14,6 @@ pub(crate) mod target;
 
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style, use_float};
-use crate::core::geometry::{
-    placement::{Align, Placement, Side},
-    units::{Point, Px, Rect},
-};
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::measure::MountedRef;
 use crate::host::measure::client_rect;
 use crate::motion::anim::Anim;
@@ -28,6 +23,11 @@ use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use crate::style::tokens::layer::ZLayer;
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
+use ds_core::geometry::{
+    placement::{Align, Placement, Side},
+    units::{Point, Px, Rect},
+};
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::collections::BTreeMap;
 use {intent::HoverAnchor, parts::HoverCardPart};
 
@@ -199,11 +199,11 @@ pub fn HoverCard(
 #[cfg(test)]
 mod tests {
     use super::card_placement;
-    use crate::core::geometry::{
+    use crate::stack::hover_hub::HoverKind;
+    use ds_core::geometry::{
         placement::place,
         units::{Point, Px, Rect, Size},
     };
-    use crate::stack::hover_hub::HoverKind;
 
     fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
         Rect {

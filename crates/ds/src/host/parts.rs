@@ -2,7 +2,6 @@
 //! implements them all (`DocumentHost`), and every method answers `Busy` or `Unknown` rather than
 //! panicking when the renderer holds the document or the element is not its own.
 
-use crate::core::geometry::units::{Point, Rect};
 use crate::host::captured::CapturedPointer;
 use crate::host::caret::{Caret, FieldSelection, InitialCaret};
 use crate::host::drop_hit::DropHit;
@@ -17,6 +16,7 @@ use crate::host::position::{TextPosition, TextRange};
 use crate::host::probe::Probe;
 use crate::host::reveal::Scrolled;
 use dioxus::prelude::{EventHandler, MountedData};
+use ds_core::geometry::units::{Point, Rect};
 use std::rc::Rc;
 
 /// Moving the keyboard focus into and out of an element, and where it goes when its holder leaves.

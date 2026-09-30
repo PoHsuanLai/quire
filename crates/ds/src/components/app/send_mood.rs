@@ -1,6 +1,6 @@
 //! How the send pill wears a failed send (design/04-COMPONENTS.md section 31, C's outbox).
 
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// How a send is going, as the pill wears it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

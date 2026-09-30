@@ -1,9 +1,9 @@
 //! The voice orb's data: its colours, how far round it has turned, and the look values that
 //! follow from its size.
 
-use crate::core::geometry::units::Px;
-use crate::core::vocab::Percent;
 use crate::style::tokens::hex::Hex;
+use ds_core::geometry::units::Px;
+use ds_core::vocab::Percent;
 
 /// One of the orb's four colours: the design token's value, which follows the scheme and the
 /// Look, or a colour the caller brings.

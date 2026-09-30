@@ -10,11 +10,11 @@ use super::choice::PictureChoice;
 use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::lists::emoji_grid::grid::grid_style;
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
-use crate::core::geometry::units::Px;
-use crate::core::word::Word;
 use crate::shell::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
 use crate::shell::user_picture::mood::PictureSize;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Px;
+use ds_core::word::Word;
 
 /// A picker cell's side: the 64 px disc and 6 px around it.
 pub const PICTURE_CELL: Px = Px(76.0);
@@ -150,9 +150,9 @@ fn cell_body(cell: Cell, letter: AvatarFace) -> Element {
 #[cfg(test)]
 mod tests {
     use super::{cells, marked};
-    use crate::core::word::Word;
     use crate::shell::emoji::id::EmojiId;
     use crate::shell::user_picture::choice::PictureChoice;
+    use ds_core::word::Word;
 
     #[test]
     fn the_letter_comes_first_then_the_whole_set() {

@@ -5,7 +5,6 @@
 //! same writes a field's own focus does, and a `TextInput` found this way hears its `onfocus` once, as through
 //! `Focus::OnMount`.
 
-use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::focus::select::Select;
 use crate::focus::soon::focus_selecting;
 use crate::focus::targets::FocusTargets;
@@ -14,6 +13,7 @@ use crate::host::focused::Focused;
 use crate::host::found::Found;
 use crate::host::parts::GeometryHost;
 use dioxus::prelude::*;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use std::rc::Rc;
 
 /// Frames a selector waits for its element to be drawn: a field asked for in the handler that

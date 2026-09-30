@@ -9,6 +9,7 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
+ds-core = { workspace = true }
 ds = { workspace = true, features = ["lint"] }
 ds-settings = { workspace = true }
 # `pdf-thumb`: so a workspace build compiles and tests `PdfFileThumb` (its tests need it).

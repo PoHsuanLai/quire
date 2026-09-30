@@ -1,8 +1,6 @@
 //! design/13 section 13.4's table and section 13.8 tests 1-5 as input sequences (ported from
 //! sill's `bar/menu_track/tests.rs`).
 
-use crate::core::geometry::units::{Point, Px};
-use crate::core::vocab::PressPhase;
 use crate::stack::menu_track::{
     triangle::{inside, shielded},
     types::{
@@ -11,6 +9,8 @@ use crate::stack::menu_track::{
         Submenu,
     },
 };
+use ds_core::geometry::units::{Point, Px};
+use ds_core::vocab::PressPhase;
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
 

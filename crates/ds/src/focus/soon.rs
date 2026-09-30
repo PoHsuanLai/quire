@@ -8,12 +8,12 @@
 //! [`FocusHost`](crate::FocusHost) answers [`Focused::Busy`] instead, and the change is tried again
 //! once that render has ended (`crate::style::busy`), then a frame later.
 
-use crate::style::busy::wait_out_busy;
 use crate::focus::select::{Landing, Select};
 use crate::host::caret::InitialCaret;
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::measure::BUSY_ATTEMPTS;
+use crate::style::busy::wait_out_busy;
 use dioxus::prelude::*;
 use std::rc::Rc;
 

@@ -13,9 +13,9 @@ pub fn px(value: u16) -> String {
 
 #[cfg(test)]
 mod tests {
-    use crate::core::word::Word;
     use crate::style::tokens::pixel::PixelToken;
     use crate::style::tokens::token::TokenScope;
+    use ds_core::word::Word;
 
     #[test]
     fn a_tuned_token_reads_its_input_with_the_default_behind_it() {

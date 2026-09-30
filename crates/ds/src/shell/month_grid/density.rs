@@ -4,8 +4,8 @@
 //! restyle the grid (its classes are quire's), so the density is a prop, and by default it
 //! follows the `WidgetFrame` the grid sits in.
 
-use crate::core::word::Word;
 use crate::shell::widget::kind::WidgetSize;
+use ds_core::word::Word;
 
 /// The density a caller asks for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

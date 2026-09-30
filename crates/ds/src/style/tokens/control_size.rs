@@ -3,7 +3,7 @@
 //! comes from [`SizeScale`], computed from its height by the design/29-SIZING.md section 6 rules.
 
 use super::size_scale::{SizeScale, WholePx};
-use crate::core::word::Word;
+use ds_core::word::Word;
 
 /// How big a control is drawn: its height and everything derived from it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

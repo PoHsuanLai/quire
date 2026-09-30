@@ -6,7 +6,8 @@
 //! build for a platform that has none, simply answers [`ds::SystemPrefs::default`].
 
 use crate::latest::{self, Receiver};
-use ds::{Contrast, ReducedMotion, Scheme, Spawner, SystemPrefs};
+use ds::{Contrast, ReducedMotion, Scheme, SystemPrefs};
+use ds_core::spawner::Spawner;
 use std::collections::HashMap;
 use zbus::zvariant::OwnedValue;
 

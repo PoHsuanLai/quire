@@ -2,7 +2,7 @@
 //!
 //! No floats, so every colour is `Eq` and a token table can be compared in a test.
 
-use crate::core::colour::srgb::Srgb;
+use ds_core::colour::srgb::Srgb;
 
 /// An 8-bit sRGB colour, written `#rrggbb`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

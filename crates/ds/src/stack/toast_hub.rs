@@ -4,12 +4,12 @@
 //! The hold is a task of the root that provides the hub and drops with it; it writes through
 //! `try_set`, so a hold that finds the hub gone stops (`crate::style::task`).
 
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::core::time::clock::sleep;
 use crate::style::scope::Scope;
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_core::time::clock::sleep;
 
 /// What an undo would restore, as the consumer's own token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -156,13 +156,13 @@ pub fn use_toast_hub() -> ToastHub {
 #[cfg(test)]
 mod tests {
     use super::{ToastHub, UndoToken, use_toast_hub_provider};
-    use crate::core::vocab::{Activity, InputModality};
     use crate::style::appearance::{
         accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
     };
     use crate::style::appearance::{blur::BlurState, material::Material};
     use crate::style::scope::Scope;
     use dioxus::prelude::*;
+    use ds_core::vocab::{Activity, InputModality};
     use std::cell::RefCell;
     use std::rc::Rc;
 

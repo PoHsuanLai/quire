@@ -3,9 +3,9 @@
 //! `--fs-lock-clock`, heavy, in white over the wallpaper: the reference lock screen's order,
 //! where the day sits above a very large time.
 
-use crate::core::word::Word;
 use crate::shell::lock::vocab::LockLook;
 use dioxus::prelude::*;
+use ds_core::word::Word;
 
 /// The time and the date, as the caller words them ("9:41", "Friday 26 September"): the
 /// caller owns the clock, the locale and the 12 or 24 hour choice, and re-renders on each new

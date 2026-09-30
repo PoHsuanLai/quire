@@ -4,10 +4,10 @@
 //! nor takes the selection while the pointer is on the button.
 
 use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
-use crate::core::press::Press;
 use crate::focus::click::kept_click;
 use crate::style::icon::Icon;
 use dioxus::prelude::*;
+use ds_core::press::Press;
 
 /// A row's trailing action.
 #[derive(Debug, Clone, PartialEq)]

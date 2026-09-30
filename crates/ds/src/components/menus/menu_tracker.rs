@@ -9,12 +9,6 @@
 //! panel's own business (a ds menu closes and picks itself), so they are ignored here.
 
 use crate::components::menus::menu_lines::{Act, Choice};
-use crate::core::geometry::units::{Point, Px, Rect, Size};
-use crate::core::time::{
-    FRAME_SLACK,
-    clock::{now, sleep},
-};
-use crate::core::vocab::Availability;
 use crate::host::measure::MountedRef;
 use crate::host::measure::client_rect;
 use crate::stack::menu_track::types::{
@@ -23,6 +17,12 @@ use crate::stack::menu_track::types::{
 };
 use crate::stack::typeahead::Typeahead;
 use dioxus::prelude::*;
+use ds_core::geometry::units::{Point, Px, Rect, Size};
+use ds_core::time::{
+    FRAME_SLACK,
+    clock::{now, sleep},
+};
+use ds_core::vocab::Availability;
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
 /// the focus where it is.
@@ -212,7 +212,7 @@ impl Tracker {
     fn feed(&self, event: MenuTrackEvent<()>) {
         let mut track = self.track;
         let current = track.peek().clone();
-        let (next, effects) = current.step(event, crate::core::time::clock::now());
+        let (next, effects) = current.step(event, ds_core::time::clock::now());
         track.set(next);
         for effect in effects {
             self.apply(effect);
@@ -242,7 +242,7 @@ impl Tracker {
             MenuTrackEffect::RequestTick(at) => {
                 let tracker = *self;
                 spawn(async move {
-                    sleep(at.saturating_duration_since(crate::core::time::clock::now())).await;
+                    sleep(at.saturating_duration_since(ds_core::time::clock::now())).await;
                     tracker.feed(MenuTrackEvent::Tick);
                 });
             }

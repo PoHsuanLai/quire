@@ -6,11 +6,11 @@
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::text_runs::{TextLine, text as runs};
 use crate::components::controls::kbd::Kbd;
-use crate::core::vocab::Shortcut;
-use crate::core::word::Word;
 use crate::style::icon::Icon;
 use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
+use ds_core::vocab::Shortcut;
+use ds_core::word::Word;
 
 /// One block of a hover card.
 #[derive(Debug, Clone, PartialEq)]
