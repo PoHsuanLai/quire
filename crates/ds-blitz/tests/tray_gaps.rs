@@ -13,8 +13,8 @@ use ds::{
     Theme,
 };
 use ds::{Bezel, ControlSize, ImagePosition};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;

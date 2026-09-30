@@ -1,12 +1,13 @@
-//! Blitz glue for quire: launching an app, registering the faces, headless snapshots to PNG,
-//! PDF output (`pdf`, `pdf_app`, and `print_dialog` behind the `print` feature), a harness for
-//! event-driven tests, and the device-pixel layout snap (`snap`). The only quire crate that
-//! names the blitz crates.
+//! Blitz glue for quire: launching an app and opening its windows, registering the faces, the
+//! clipboard and the host seams (`provide_host`), PDF output (feature `pdf`), printing (feature
+//! `print`), spellchecking (feature `spell`), and the device-pixel layout snap (`snap`). The only
+//! quire crate that names the blitz crates; the test driver lives in `ds-harness`, which builds
+//! its document from the parts in [`seam`].
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
-//! forbids it to `ds`): `launch` and `Harness` each enter a process-wide runtime (`crate::
-//! runtime`) so the `TokioSpawner` it hands `ds_settings::use_environment` has a runtime to run its
-//! portal and file-watch tasks on.
+//! forbids it to `ds`): `launch` owns the process-wide runtime (`launch::runtime`), so the
+//! `TokioSpawner` it hands `ds_settings::use_environment` has a runtime to run its portal and
+//! file-watch tasks on, and `enter_runtime` lends it to a test driver.
 
 mod app_id;
 mod blitz_host;
@@ -35,22 +36,8 @@ mod frame_hover;
 mod frame_links;
 mod frame_tag;
 mod frame_tree;
-mod frame_view;
 pub mod frames;
 mod gpu_adapter;
-mod gpu_paint;
-pub mod harness;
-mod harness_backend;
-mod harness_clock;
-mod harness_config;
-mod harness_drop;
-mod harness_edit;
-mod harness_hit;
-mod harness_input;
-mod harness_settle;
-mod harness_style;
-mod harness_wheel;
-mod headless;
 mod host;
 mod hover_replay;
 mod hover_sync;
@@ -64,22 +51,19 @@ mod net_policy;
 mod node_ref;
 mod open_window;
 mod origin;
-mod painter;
+#[cfg(feature = "pdf")]
 mod pdf;
-#[cfg(feature = "pdf-thumb")]
+#[cfg(feature = "pdf")]
 mod pdf_thumb;
 #[cfg(feature = "print")]
 mod print;
 mod reveal;
 mod route;
-mod runtime;
 mod scheme;
+pub mod seam;
 mod setup;
 pub mod snap;
-#[cfg(test)]
-mod snap_tests;
-pub mod snapshot;
-#[cfg(feature = "spellcheck")]
+#[cfg(feature = "spell")]
 pub mod spell;
 mod wake;
 pub mod window;
@@ -99,31 +83,24 @@ pub use fonts::{font_context, register_fonts};
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_tag::FrameTag;
-pub use frame_view::FrameView;
 pub use gpu_adapter::{ADAPTER_ENV, AdapterPref};
-pub use harness::Harness;
-pub use harness_backend::Backend;
-pub use harness_clock::Clock;
-pub use harness_config::HarnessConfig;
-pub use harness_input::HeldButtons;
-pub use harness_style::{Part, Srgba};
-pub use headless::Backdrop;
-pub use launch::{AppConfig, launch};
+pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with};
 pub use origin::{FrameId, RequestOrigin};
-pub use painter::PaintTime;
-pub use pdf::{Margins, PageSize, PageSpec, PdfError, Pt, pdf, pdf_app};
-#[cfg(feature = "pdf-thumb")]
+#[cfg(feature = "pdf")]
+pub use pdf::{
+    ContentPx, Margins, PageSize, PageSpec, PdfError, Pt, content_size, pdf, print_document,
+    print_viewport,
+};
+#[cfg(feature = "pdf")]
 pub use pdf_thumb::{
     DeviceBox, PdfFileThumb, QUEUE_DEPTH, THUMB_CACHE_ENTRIES, ThumbKey, ThumbRequest,
     pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached, pdf_thumb_rasters, use_pdf_page,
 };
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
-pub use runtime::TokioSpawner;
 pub use snap::snap_to_device;
-pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};
 pub use window::{Decorations, WinitWindow};
 pub use window_requests::WindowLife;
 

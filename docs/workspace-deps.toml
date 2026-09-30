@@ -92,7 +92,7 @@ skrifa = "0.44"
 pdfrum = { version = "0.4", default-features = false, features = ["vello-cpu"] }
 # The print portal's fd, from a sealed anonymous file (ds-blitz's `print` feature, Linux only).
 memfd = "0.6"
-# Spellchecking (ds-blitz's `spellcheck` feature): a pure-Rust Hunspell-compatible checker,
+# Spellchecking (ds-blitz's `spell` feature): a pure-Rust Hunspell-compatible checker,
 # MPL-2.0 (file-level copyleft, allowed by deny.toml), used unmodified. Dictionaries are the
 # system's (/usr/share/hunspell); none is bundled.
 spellbook = "0.4"

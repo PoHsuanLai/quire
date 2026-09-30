@@ -5,7 +5,8 @@
 mod pdf_read;
 
 use dioxus::prelude::*;
-use ds_blitz::{Harness, HarnessConfig, PageSpec, Viewport, pdf_app};
+use ds_blitz::PageSpec;
+use ds_harness::{Harness, HarnessConfig, Viewport, pdf_app};
 
 fn app() -> Element {
     rsx! {

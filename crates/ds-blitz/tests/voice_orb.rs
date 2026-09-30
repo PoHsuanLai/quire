@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{Activity, Appearance, Ds, Material, Motion, Px, VoiceOrb};
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Backdrop, Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Backdrop, Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

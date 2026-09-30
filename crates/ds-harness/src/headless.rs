@@ -5,26 +5,8 @@
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
-use crate::blitz_host::{Provided, Wiring};
-use crate::click_focus::FocusFallback;
-use crate::clipboard::Memory;
-use crate::edit_ime::EditListeners;
-use crate::error::NativeError;
-use crate::focus_keep::{FocusKeeper, Kept, keep};
-use crate::fonts::font_context;
-use crate::frame_book::FrameBook;
-use crate::frame_hover::{FrameHover, HoverTracker};
-use crate::frame_links::{LinkInbox, frame_links, read_link};
-use crate::frames::FrameParser;
-use crate::hover_replay::{RestingPointer, Synced};
-use crate::memory_shell::MemoryShell;
-use crate::net::DsNet;
-use crate::node_ref::DocRef;
 use crate::painter::{Canvas, PaintTime, Painter};
-use crate::scheme;
-use crate::setup::Setup;
 use crate::snapshot::Viewport;
-use crate::wake::Wakeup;
 use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
 use blitz_html::HtmlProvider;
 use blitz_traits::events::UiEvent;
@@ -33,6 +15,25 @@ use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport}
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
+use ds_blitz::FocusFallback;
+use ds_blitz::FrameHover;
+use ds_blitz::NativeError;
+use ds_blitz::clipboard::Memory;
+use ds_blitz::font_context;
+use ds_blitz::seam::DocRef;
+use ds_blitz::seam::DsNet;
+use ds_blitz::seam::EditListeners;
+use ds_blitz::seam::FrameBook;
+use ds_blitz::seam::FrameParser;
+use ds_blitz::seam::MemoryShell;
+use ds_blitz::seam::Setup;
+use ds_blitz::seam::Wakeup;
+use ds_blitz::seam::follow_scheme;
+use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
+use ds_blitz::seam::{HoverTracker, link_under, live_frames, report_frame_hover};
+use ds_blitz::seam::{LinkInbox, frame_links, read_link};
+use ds_blitz::seam::{Provided, Wiring};
+use ds_blitz::seam::{RestingPointer, Synced, sync_hover};
 use peniko::Color;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -140,7 +141,7 @@ impl Headless {
                 Keeper::Ancestor(shared) => Some(Rc::clone(shared)),
                 Keeper::Off => None,
             },
-            find: Some(crate::focus::finder(move || Some(found.clone()))),
+            find: Some(focus_finder(move || Some(found.clone()))),
             clipboard: Rc::new(Memory(Arc::clone(&shell))),
             listeners: listeners.clone(),
         });
@@ -213,7 +214,7 @@ impl Headless {
             if self.layout == Layout::Held {
                 return;
             }
-            let restyled = scheme::follow_root(&mut self.doc.inner.borrow_mut()).is_some();
+            let restyled = follow_scheme(&mut self.doc.inner.borrow_mut()).is_some();
             let fetched = self.wakeup.fetched();
             let synced = self.resolve(at);
             let landed = self.wakeup.fetched() != fetched;
@@ -236,9 +237,9 @@ impl Headless {
         let mut inner = self.doc.inner.borrow_mut();
         let before = inner.get_hover_node_id();
         inner.resolve(at.as_secs_f64());
-        crate::snap::snap_to_device(&mut inner);
+        ds_blitz::snap_to_device(&mut inner);
         drop(inner);
-        crate::hover_replay::sync(&mut self.doc, before, self.resting.as_ref())
+        sync_hover(&mut self.doc, before, self.resting.as_ref())
     }
 
     /// Hand the keyboard to a focusable ancestor of a focused element the renders removed.
@@ -255,7 +256,7 @@ impl Headless {
     /// Find the frames the renders attached under their `iframe`s, so their requests reach the
     /// app tagged. The document is free by then: the app's `decide` may touch it.
     fn find_frames(&mut self) {
-        let live = crate::frame_tree::live_frames(&self.doc.inner.borrow());
+        let live = live_frames(&self.doc.inner.borrow());
         self.book.bind(live);
     }
 
@@ -265,9 +266,9 @@ impl Headless {
         if let FrameHover::Ignore = hover {
             return;
         }
-        let under = crate::frame_hit::link_under(&self.doc.inner.borrow(), at);
+        let under = link_under(&self.doc.inner.borrow(), at);
         let crossings = tracker.step(under, at, &self.book);
-        crate::frame_hover::report(hover, crossings);
+        report_frame_hover(hover, crossings);
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.

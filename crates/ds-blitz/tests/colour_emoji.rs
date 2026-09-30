@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";

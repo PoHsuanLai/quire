@@ -28,25 +28,20 @@ webbrowser = { workspace = true }
 arboard = { workspace = true }
 anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
-anyrender_vello_cpu = { workspace = true }
 parley = { workspace = true }
 wgpu = { workspace = true }
-# The hybrid harness backend (`crate::gpu_paint`): vello_hybrid driven directly on an offscreen
-# device, its image ids, and the device handle anyrender_vello_hybrid paints with.
-vello_hybrid = { workspace = true }
-vello_common = { workspace = true }
+# The device handle anyrender_vello_hybrid paints with (`crate::gpu_adapter`).
 wgpu_context = { workspace = true }
-rustc-hash = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }
-# PDF output: the painter, which writes through pdfrum.
-anyrender_pdfrum = { workspace = true }
+# PDF output (the `pdf` feature): the painter, which writes through pdfrum.
+anyrender_pdfrum = { workspace = true, optional = true }
 thiserror = { workspace = true }
 tokio = { workspace = true }
-# PDF thumbnails (the `pdf-thumb` feature): pdfrum's reader and CPU rasteriser.
+# PDF thumbnails (part of the `pdf` feature): pdfrum's reader and CPU rasteriser.
 pdfrum = { workspace = true, optional = true }
-# Spellchecking (the `spellcheck` feature): the checker, and XDG data for the user dictionary.
+# Spellchecking (the `spell` feature): the checker, and XDG data for the user dictionary.
 spellbook = { workspace = true, optional = true }
 dirs = { workspace = true, optional = true }
 
@@ -60,18 +55,22 @@ memfd = { workspace = true, optional = true }
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
 print = ["dep:zbus", "dep:memfd"]
-# `PdfFileThumb`: a PDF's first page rasterised off the UI thread and cached, drawn by
-# `ds::PdfThumb`. Off by default, so an app that shows no PDF builds no PDF reader.
-pdf-thumb = ["dep:pdfrum"]
+# PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
+# thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
+# PDF builds no PDF writer or reader.
+pdf = ["dep:anyrender_pdfrum", "dep:pdfrum"]
 # `ds_blitz::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
 # dictionaries checked on one worker thread. Off by default, so an app that never checks
 # spelling builds no checker.
-spellcheck = ["dep:spellbook", "dep:dirs"]
+spell = ["dep:spellbook", "dep:dirs"]
 
 [lints]
 workspace = true
 
 [dev-dependencies]
+# The driver every test in this crate runs through (its tests move to ds-conformance and
+# `ds-blitz/tests/<topic>.rs` in migration step 11).
+ds-harness = { workspace = true, features = ["pdf"] }
 ds-shell = { workspace = true }
 # Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
 pdfrum = { workspace = true }
@@ -97,6 +96,7 @@ name = "file_drop"
 
 [[example]]
 name = "pdf"
+required-features = ["pdf"]
 
 [[example]]
 name = "print"
@@ -104,16 +104,16 @@ required-features = ["print"]
 
 [[test]]
 name = "pdf_thumb"
-required-features = ["pdf-thumb"]
+required-features = ["pdf"]
 
 [[test]]
 name = "spell_worker"
-required-features = ["spellcheck"]
+required-features = ["spell"]
 
 [[test]]
 name = "spell_edit"
-required-features = ["spellcheck"]
+required-features = ["spell"]
 
 [[test]]
 name = "pdf_thumb_queue"
-required-features = ["pdf-thumb"]
+required-features = ["pdf"]

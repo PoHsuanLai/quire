@@ -13,8 +13,8 @@ use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Ds, Material, PaletteGroup, PaletteGroups,
     PaletteHandle, use_palette_handle,
 };
-use ds_blitz::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

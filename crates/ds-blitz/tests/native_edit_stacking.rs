@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds::{Common, EditSurface, ExtraClass};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,

@@ -7,8 +7,8 @@ use dioxus::prelude::*;
 use ds::detail::Touch;
 use ds::motion::{PxPerUnit, SpringPhase, SpringResponse, SpringSpec, Throw, Velocity, use_spring};
 use ds::{Appearance, Check, Ds, Fraction, Material, Point, Px, RootExtent, Slider, Toggle};
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -86,7 +86,7 @@ fn a_spring_redirected_at_forty_percent_keeps_its_position_and_velocity() {
     assert!(x3 > x2, "it carried on outward first: {x2} -> {x3}");
     assert!(harness.wakes() > wakes, "a moving spring asks for frames");
 
-    ds_blitz::harness::settle_until(&mut harness, |h| {
+    ds_harness::harness::settle_until(&mut harness, |h| {
         h.attr(".spring", "data-phase").as_deref() == Some("rest")
     });
     assert_eq!(read(&harness, "data-x"), -50.0);

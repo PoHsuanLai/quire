@@ -14,11 +14,17 @@ use std::rc::Rc;
 
 /// The document a node lives in.
 #[derive(Clone)]
-pub(crate) enum DocRef {
+pub enum DocRef {
     /// Reached through a mounted element of the window's document (the host's hidden element).
     Handle(NodeHandle),
     /// Held directly: the harness's own document.
     Cell(Rc<RefCell<BaseDocument>>),
+}
+
+impl std::fmt::Debug for DocRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DocRef").finish_non_exhaustive()
+    }
 }
 
 impl DocRef {

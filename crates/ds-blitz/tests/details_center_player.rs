@@ -7,8 +7,8 @@ use dioxus::prelude::*;
 use ds::{
     Appearance, Bezel, Button, ControlSize, Ds, IconSwap, ImagePosition, Material, Motion, TextLine,
 };
-use ds_blitz::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{NowPlayingTrack, Playback, TrackPosition};
 use std::time::Duration;
 

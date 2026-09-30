@@ -19,7 +19,7 @@ use ds::{Caret, Collapsed, FieldSelection, Focused, Found, InitialCaret, caret_a
 use std::rc::Rc;
 
 /// The selector lookup over the document `source` reaches, once it has one.
-pub(crate) fn finder(source: impl Fn() -> Option<DocRef> + 'static) -> FindDocument {
+pub fn finder(source: impl Fn() -> Option<DocRef> + 'static) -> FindDocument {
     Rc::new(move |selector| match source() {
         Some(doc) => lookup(doc, selector),
         None => Found::Busy,

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Anchor, Appearance, Ds, Material, Menu, MenuItem, Point, Px, RootExtent, ShortcutKey};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

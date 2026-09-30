@@ -10,7 +10,7 @@ use ds::{
     Alert, AlertButton, AlertRole, Appearance, Ds, Flow, Material, Motion, Point, Px, RootExtent,
     ShortcutKey, TextLine,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

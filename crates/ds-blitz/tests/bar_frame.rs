@@ -14,7 +14,7 @@ use ds::{
     Point, Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
 use ds::{Bezel, Button, ImagePosition};
-use ds_blitz::{Backdrop, Harness, Viewport};
+use ds_harness::{Backdrop, Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;

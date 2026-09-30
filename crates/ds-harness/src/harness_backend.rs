@@ -2,13 +2,13 @@
 //! surfaces use, so a test can see and time what a surface would paint. Pixel assertions and
 //! PNG captures read the same premultiplied RGBA from either.
 
-use crate::error::NativeError;
 use crate::gpu_paint::GpuPainter;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use crate::headless::{Backdrop, physical};
 use crate::painter::{PaintTime, Painter};
 use dioxus::prelude::Element;
+use ds_blitz::NativeError;
 
 /// Which renderer a [`Harness`] paints with ([`HarnessConfig::with_backend`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

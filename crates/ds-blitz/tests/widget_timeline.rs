@@ -7,8 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Motion, RootChrome};
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::widget::REFRESH_FLOOR;
 use ds_shell::{
     ClockCity, ClockEntry, ClockTime, Dated, DayPhase, EntryDate, Refresh, RefreshAsk, Seconds,

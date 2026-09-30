@@ -9,7 +9,7 @@ use ds::{
     Answers, Appearance, Bezel, Button, Check, Checkbox, Choice, ControlSize, Ds, Icon,
     ImagePosition, Material, RadioGroup, SegmentedControl, ShortcutKey, Toggle, Tracking,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

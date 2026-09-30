@@ -9,7 +9,7 @@ use ds::{
     Appearance, Availability, Button, ControlSize, Ds, Fraction, Material, Progress,
     ProgressIndicator, ProgressStyle,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

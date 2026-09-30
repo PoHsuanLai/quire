@@ -12,8 +12,8 @@ use ds::{
     Row, RowLeading, RowSize,
 };
 use ds::{MotionLevel, settle};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 // `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are
@@ -21,7 +21,7 @@ use std::time::Duration;
 // `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
 // of, so a test racing an instant against a bound runs on `Clock::Virtual` instead,
 // whose `advance` fires every ds timer at its exact due instant; a test that only polls with
-// `ds_blitz::harness::settle_until` up to a bound and asserts order stays on the default `Wall`.
+// `ds_harness::harness::settle_until` up to a bound and asserts order stays on the default `Wall`.
 
 const VIEW: Viewport = Viewport {
     width: 480,

@@ -47,7 +47,7 @@ pub enum PaneContent {
         mono: PaneMono,
     },
     /// A PDF's first page, as `PdfThumb` draws it. ds reads no file: a Blitz app gets the page
-    /// from `ds_blitz::use_pdf_page(Some(path), PANE_MEDIA)` (feature `pdf-thumb`).
+    /// from `ds_blitz::use_pdf_page(Some(path), PANE_MEDIA)` (feature `pdf`).
     Pdf {
         /// The page, or where its reading is.
         page: PdfPage,

@@ -75,7 +75,7 @@ impl FrameLinks {
     }
 
     /// Whether the pointer crossing a link is reported.
-    pub(crate) fn hover(&self) -> FrameHover {
+    pub fn hover(&self) -> FrameHover {
         match self {
             FrameLinks::Inert => FrameHover::Ignore,
             FrameLinks::Intercept { hover, .. } => hover.clone(),
@@ -130,17 +130,23 @@ impl NavigationProvider for FrameNav {
 }
 
 /// Where the clicks a document's frames report are delivered to the app.
-pub(crate) struct LinkInbox {
+pub struct LinkInbox {
     receiver: UnboundedReceiver<Clicked>,
     handler: Option<FrameLinkHandler>,
     /// Where the clicked frame's tag is read.
     book: FrameBook,
 }
 
+impl std::fmt::Debug for LinkInbox {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("LinkInbox").finish_non_exhaustive()
+    }
+}
+
 impl LinkInbox {
     /// Hand every click waiting to the app, now: the headless document calls it each frame.
     /// `read` finds what the link says; it must release the document before it returns.
-    pub(crate) fn drain(&mut self, read: &dyn Fn(FrameId, &str) -> LinkFacts) {
+    pub fn drain(&mut self, read: &dyn Fn(FrameId, &str) -> LinkFacts) {
         while let Ok(link) = self.receiver.try_recv() {
             self.deliver(link, read);
         }
@@ -169,7 +175,7 @@ impl LinkInbox {
 
 /// The frame documents' navigation provider for `links`, and the inbox its clicks arrive in,
 /// tagged from `book`.
-pub(crate) fn frame_links(
+pub fn frame_links(
     links: &FrameLinks,
     book: FrameBook,
 ) -> (Arc<dyn NavigationProvider>, LinkInbox) {
@@ -189,7 +195,7 @@ pub(crate) fn frame_links(
 }
 
 /// What the link clicked toward `href` in `frame` says, read from `top`'s frames.
-pub(crate) fn read_link(top: &blitz_dom::BaseDocument, frame: FrameId, href: &str) -> LinkFacts {
+pub fn read_link(top: &blitz_dom::BaseDocument, frame: FrameId, href: &str) -> LinkFacts {
     crate::frame_tree::in_frame(top, frame, &|doc| crate::frame_anchor::clicked(doc, href))
         .unwrap_or_else(|| LinkFacts::bare(href))
 }

@@ -8,8 +8,8 @@ use ds::{
     Anim, Appearance, Ds, Fraction, LevelGlyph, Material, MotionLevel, Muting, RootChrome, Shown,
     settle,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{Osd, OsdLevel};
 use std::time::Duration;
 

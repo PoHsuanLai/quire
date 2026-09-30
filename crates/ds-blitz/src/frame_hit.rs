@@ -10,7 +10,7 @@ use ds::Point;
 
 /// A link under the pointer, inside a frame.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct LinkUnder {
+pub struct LinkUnder {
     /// The frame's document.
     pub(crate) frame: FrameId,
     /// The anchor element in it: the same link while this stays the same.
@@ -21,7 +21,7 @@ pub(crate) struct LinkUnder {
 
 /// The link under `at` (the app document's client coordinates) inside a frame, if any. A link
 /// in the app's own document is the app's to track.
-pub(crate) fn link_under(top: &BaseDocument, at: Point) -> Option<LinkUnder> {
+pub fn link_under(top: &BaseDocument, at: Point) -> Option<LinkUnder> {
     let scroll = top.viewport_scroll();
     let page = (at.x.0 + scroll.x as f32, at.y.0 + scroll.y as f32);
     descend(top, page, None)

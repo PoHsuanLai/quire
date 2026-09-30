@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Fraction, Material, Motion, RootChrome};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{
     BatteryCell, BatteryEntry, BatteryWidget, Device, RingMark, Timeline, WidgetCard,
     WidgetMetrics, WidgetSize,

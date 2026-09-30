@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::{Answers, ButtonRole, ControlSize};
 use ds::{Appearance, Button, Ds, Material};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

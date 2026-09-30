@@ -27,7 +27,7 @@ use ds::{
     SystemPrefs, Theme,
 };
 use ds::{Choice, ControlSize, Tracking};
-use ds_blitz::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel};
 use probe::{distance, rect};
 use std::cell::Cell;

@@ -1,4 +1,4 @@
-//! Spellchecking for `ds::EditSurface` (the `spellcheck` feature; design/04-COMPONENTS.md
+//! Spellchecking for `ds::EditSurface` (the `spell` feature; design/04-COMPONENTS.md
 //! section 50): `ds::SpellService` on Blitz. The system's Hunspell dictionaries
 //! (`/usr/share/hunspell`; nothing is bundled) are read and checked by `spellbook`, unmodified
 //! (MPL-2.0), on a worker thread; learned words go to `~/.local/share/quire/spelling/<lang>.dic`.

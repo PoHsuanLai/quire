@@ -7,7 +7,8 @@
 use dioxus::prelude::*;
 use ds::TextField;
 use ds::{Appearance, Common, Ds, EditSurface, Material, ShortcutKey};
-use ds_blitz::{FocusFallback, Harness, HarnessConfig, Viewport};
+use ds_blitz::FocusFallback;
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

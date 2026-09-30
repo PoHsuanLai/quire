@@ -55,7 +55,7 @@ impl Seen {
 
 /// The host's memory of the focus, one per document.
 #[derive(Debug, Clone, Default)]
-pub(crate) struct FocusKeeper {
+pub struct FocusKeeper {
     seen: Seen,
     /// The candidates of the element focused before the last one, then those under the pointer
     /// when the focus moved.
@@ -157,7 +157,7 @@ fn focused(doc: &BaseDocument) -> Option<Held> {
 
 /// Look at the document behind `doc` and focus what the keeper answers. A document the renderer
 /// holds is looked at next time.
-pub(crate) fn keep(keeper: &mut FocusKeeper, doc: &DocRef) -> Kept {
+pub fn keep(keeper: &mut FocusKeeper, doc: &DocRef) -> Kept {
     let before = keeper.clone();
     let Some(Some(next)) = doc.read(|read| keeper.look(read)) else {
         return Kept::Still;
@@ -177,7 +177,7 @@ pub(crate) fn keep(keeper: &mut FocusKeeper, doc: &DocRef) -> Kept {
 
 /// Whether the keeper moved the focus.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Kept {
+pub enum Kept {
     /// It focused an ancestor of a removed element.
     Moved,
     /// Nothing to do.

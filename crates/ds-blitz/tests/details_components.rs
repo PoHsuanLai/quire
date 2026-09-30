@@ -8,8 +8,8 @@ use ds::TextLine;
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material, person_hue,
 };
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::ModuleTile;
 use ds_shell::{LockPrompt, LockUser, ModuleState, PromptState};
 use std::time::Duration;

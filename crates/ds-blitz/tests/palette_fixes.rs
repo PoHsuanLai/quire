@@ -7,7 +7,7 @@ use ds::{
     Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, FieldKey, Icon, InitialCaret,
     Material, PaletteGroup, PaletteGroups, Rect, RowShape, Shortcut, ShortcutKey,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -6,7 +6,7 @@ use blitz_dom::{BaseDocument, LocalName, NodeId};
 
 /// One link's destination, text and title.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
-pub(crate) struct LinkFacts {
+pub struct LinkFacts {
     /// The target, resolved against the frame's base URL.
     pub(crate) href: String,
     /// The anchor's text content, runs of whitespace collapsed to one space and trimmed.

@@ -7,8 +7,8 @@ use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
+use ds_harness::{Viewport, snapshot_at};
 use ds_lint::{Exception, LintConfig, Profile, markup};
-use ds_blitz::{Viewport, snapshot_at};
 use std::time::Duration;
 
 /// Offences in quire's own markup the gallery lives with: none. Every one would be drawn by a

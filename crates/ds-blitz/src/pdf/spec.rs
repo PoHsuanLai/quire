@@ -157,14 +157,22 @@ impl ContentBox {
         )
     }
 
-    /// The same box as a quire `Viewport`, for building a harness at page width.
-    pub(crate) fn logical(self) -> crate::Viewport {
-        crate::Viewport {
+    /// The same box in whole logical pixels, for building a harness at page width.
+    pub(crate) fn logical(self) -> ContentPx {
+        ContentPx {
             width: self.width,
             height: self.height.floor() as u32,
-            scale_percent: 100,
         }
     }
+}
+
+/// A page's content box in whole logical pixels (scale 1).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ContentPx {
+    /// Across.
+    pub width: u32,
+    /// Down.
+    pub height: u32,
 }
 
 #[cfg(test)]

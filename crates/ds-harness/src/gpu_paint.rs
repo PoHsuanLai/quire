@@ -4,12 +4,13 @@
 //! images live across frames, as in a window. Every frame is submitted and waited for, so a
 //! frame's time includes the GPU finishing it.
 
-use crate::error::NativeError;
-use crate::gpu_adapter::{AdapterPref, open_device};
 use crate::painter::{Canvas, PaintTime, draw};
 use anyrender::ResourceId;
 use anyrender_vello_hybrid::{ImageManager, VelloHybridScenePainter};
 use blitz_dom::BaseDocument;
+use ds_blitz::AdapterPref;
+use ds_blitz::NativeError;
+use ds_blitz::seam::open_device;
 use rustc_hash::FxHashMap;
 use std::time::{Duration, Instant};
 use vello_common::paint::ImageId;

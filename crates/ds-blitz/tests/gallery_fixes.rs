@@ -8,7 +8,7 @@ use ds::{
     Scheme, SectionHeader, SendPhase, SendPill, SpaceLook, Theme, use_toasts,
 };
 use ds::{FieldBezel, FieldKind, TextField};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use std::time::Duration;
 

@@ -8,8 +8,8 @@ use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel, Point, Px, settle,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{AppMark, NotificationCard, NotificationSwipe};
 use std::cell::Cell;
 use std::time::{Duration, Instant};
@@ -127,7 +127,7 @@ fn a_drag_released_under_the_threshold_springs_back() {
         style(&harness)
     );
     settle_until(&mut harness, |h| !style(h).contains("--swipe-dx"));
-    ds_blitz::harness::assert_settles_to_zero_frames(&mut harness);
+    ds_harness::harness::assert_settles_to_zero_frames(&mut harness);
     harness.advance(ms(400));
     let entries = log(&mut harness);
     assert!(

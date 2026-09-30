@@ -11,6 +11,7 @@ members = [
   "crates/ds-shell",
   "crates/ds-settings-derive",
   "crates/ds-blitz",
+  "crates/ds-harness",
   "crates/anyrender_pdfrum",
   "crates/ds-gallery",
   "tools/icons",
@@ -37,6 +38,7 @@ ds-shell           = { path = "crates/ds-shell" }
 ds-core-derive     = { path = "crates/ds-core-derive" }
 ds-settings-derive = { path = "crates/ds-settings-derive" }
 ds-blitz           = { path = "crates/ds-blitz" }
+ds-harness         = { path = "crates/ds-harness" }
 anyrender_pdfrum   = { path = "crates/anyrender_pdfrum" }
 
 # ---- BEGIN PINNED BLOCK (source of truth: quire/docs/workspace-deps.toml) ----
@@ -134,7 +136,7 @@ skrifa = "0.44"
 pdfrum = { version = "0.4", default-features = false, features = ["vello-cpu"] }
 # The print portal's fd, from a sealed anonymous file (ds-blitz's `print` feature, Linux only).
 memfd = "0.6"
-# Spellchecking (ds-blitz's `spellcheck` feature): a pure-Rust Hunspell-compatible checker,
+# Spellchecking (ds-blitz's `spell` feature): a pure-Rust Hunspell-compatible checker,
 # MPL-2.0 (file-level copyleft, allowed by deny.toml), used unmodified. Dictionaries are the
 # system's (/usr/share/hunspell); none is bundled.
 spellbook = "0.4"

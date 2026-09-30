@@ -9,7 +9,7 @@ use ds::{
     Align, Anchor, Appearance, Arrow, Dismiss, Ds, Flip, Material, Placement, Point, Popover, Px,
     RootExtent, ShortcutKey, Side,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

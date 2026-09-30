@@ -44,8 +44,17 @@ fn runtime() -> &'static Runtime {
 
 /// Enter the process-wide runtime on the calling thread. The caller holds the returned guard
 /// for as long as a spawned task must keep working there.
-pub(crate) fn enter() -> EnterGuard<'static> {
-    runtime().enter()
+pub fn enter_runtime() -> RuntimeGuard {
+    RuntimeGuard {
+        _entered: runtime().enter(),
+    }
+}
+
+/// A runtime entered on this thread, until it drops (see [`enter_runtime`]).
+#[derive(Debug)]
+#[must_use = "the runtime is entered only while the guard is alive"]
+pub struct RuntimeGuard {
+    _entered: EnterGuard<'static>,
 }
 
 /// The [`Spawner`] every library below `ds-blitz` is given: it starts tasks on a Tokio runtime.

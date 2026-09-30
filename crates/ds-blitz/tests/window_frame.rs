@@ -13,7 +13,7 @@ use ds::{
     PRESETS, SpaceLook, Theme,
 };
 use ds::{Bezel, Button, ImagePosition};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep};
 use std::time::Duration;

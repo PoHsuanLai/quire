@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::Point;
-use ds_blitz::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

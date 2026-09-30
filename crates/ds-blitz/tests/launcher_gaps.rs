@@ -11,7 +11,8 @@ use ds::{
     IconSize, IconSource, IconUrl, Material, Menu, MenuItem, MenuPlacement, PaletteGroup,
     PaletteRow, Px, Rect, RowLeading, ShortcutKey, use_focus_request,
 };
-use ds_blitz::{FocusFallback, Harness, HarnessConfig, Viewport};
+use ds_blitz::FocusFallback;
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use probe::rect;
 use std::time::Duration;
 

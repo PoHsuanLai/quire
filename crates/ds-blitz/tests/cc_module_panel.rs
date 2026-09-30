@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
 use ds::{Slider, SliderLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
 

@@ -6,7 +6,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{Appearance, CommandPalette, Ds, Grain, Icon, Material, RowAction, SpaceLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

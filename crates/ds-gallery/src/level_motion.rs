@@ -13,7 +13,7 @@ use ds::{
     RootChrome, Shown, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{Osd, OsdPosition};
 use image::{RgbaImage, imageops};
 use std::time::Duration;

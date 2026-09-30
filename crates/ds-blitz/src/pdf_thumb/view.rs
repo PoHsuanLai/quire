@@ -17,7 +17,7 @@ struct Arrived {
 
 /// The first page of the PDF at `path`, fitted into `size` on a paper sheet (`ds::PdfThumb`).
 /// A page already cached for the file as it is now (same modification time, device size and
-/// scale) draws at once; otherwise the request joins the one `pdf-thumb` worker's queue, the
+/// scale) draws at once; otherwise the request joins the one PDF thumbnail worker's queue, the
 /// thumbnail loading meanwhile (nothing for 400 ms, then the pending look). A new path or size
 /// replaces this thumbnail's queued request that has not started; one already running
 /// finishes into the cache but is not shown. `label` is read by a screen reader (the file's name, say).

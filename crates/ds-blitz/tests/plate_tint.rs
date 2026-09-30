@@ -13,7 +13,7 @@ use ds::{
     Appearance, Ds, Icon, IconSize, IconSource, IconView, Material, PRESETS, PlateFamily,
     PlateTint, Scheme, Surface,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;

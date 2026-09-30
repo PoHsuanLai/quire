@@ -13,7 +13,7 @@
 use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::{Appearance, Button, Ds, Material, Point, Rect};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

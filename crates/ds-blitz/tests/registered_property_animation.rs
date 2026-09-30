@@ -6,7 +6,7 @@
 //! the fact, measured only on the headless path, not in a window.
 
 use dioxus::prelude::*;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

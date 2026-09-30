@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Fraction, Material, Point, Px, ShortcutKey, Slider, Ticks};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(0));

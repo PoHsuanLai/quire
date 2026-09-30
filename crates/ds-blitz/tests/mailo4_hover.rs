@@ -12,8 +12,8 @@ use ds::{
     Appearance, DocumentHost, Ds, Flow, HoverAnchor, HoverCard, HoverKey, HoverKind, HoverProfile,
     Material, MountedRef, NoHost, Point, Px, Rect, Size, use_hover_intent,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use probe::rect;
 use std::rc::Rc;
 use std::time::Duration;

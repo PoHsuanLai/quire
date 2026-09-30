@@ -18,7 +18,7 @@ use blitz_traits::net::{Bytes, NetHandler, NetProvider, NetWaker, Request};
 use std::sync::Arc;
 
 /// Serves one kind of document under the app's policy.
-pub(crate) struct DsNet {
+pub struct DsNet {
     /// The app's document or a frame's.
     served: Served,
     /// The app's choice.
@@ -29,9 +29,15 @@ pub(crate) struct DsNet {
     waker: Option<Arc<dyn NetWaker>>,
 }
 
+impl std::fmt::Debug for DsNet {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("DsNet").finish_non_exhaustive()
+    }
+}
+
 impl DsNet {
     /// The app document's provider: under `Local`, other schemes go to `fallback`.
-    pub(crate) fn top(
+    pub fn top(
         policy: NetPolicy,
         fallback: Option<Arc<dyn NetProvider>>,
         waker: Option<Arc<dyn NetWaker>>,
@@ -45,7 +51,7 @@ impl DsNet {
     }
 
     /// Every frame document's provider.
-    pub(crate) fn frame(
+    pub fn frame(
         policy: NetPolicy,
         waker: Option<Arc<dyn NetWaker>>,
         book: FrameBook,

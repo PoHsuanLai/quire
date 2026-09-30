@@ -2,12 +2,12 @@
 //! host's hit test and IME requests read back. The IME events go through the same routing the
 //! window uses (`crate::edit_ime`): to the surface that has the keyboard.
 
-use crate::edit_hit::hit;
 use crate::harness::{Harness, first};
 use blitz_traits::events::{MouseEventButton, UiEvent};
 use ds::{
     CapturedPointer, ImeEvent, ImeSwitch, Point, PointerPhase, Px, Rect, ShortcutKey, TextPosition,
 };
+use ds_blitz::seam::edit_hit as hit;
 
 impl Harness {
     /// The IME attaches to the focused surface (winit's `Ime::Enabled`); a composition starts

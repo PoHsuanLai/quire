@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, FieldFocus, Material, use_focus_request};
 use ds::{FieldKind, TextField};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

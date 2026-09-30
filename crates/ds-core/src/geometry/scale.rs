@@ -30,7 +30,7 @@ impl Scale {
     /// 1x, what a root draws at when no one says otherwise.
     pub const ONE: Scale = Scale(Scale::DENOMINATOR);
 
-    /// A scale given in hundredths (`ds_blitz::Viewport::scale_percent`): 150 is `Scale(180)`.
+    /// A scale given in hundredths (`ds_harness::Viewport::scale_percent`): 150 is `Scale(180)`.
     /// Exact for every multiple of 5 %, which covers every scale a desktop offers.
     pub fn from_percent(percent: u16) -> Scale {
         Scale(u32::from(percent) * Scale::DENOMINATOR / 100)

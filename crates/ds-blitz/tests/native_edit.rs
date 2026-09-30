@@ -8,7 +8,7 @@ use ds::{
     EditSurface, ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect,
     ShortcutKey, Size, TextPosition, TextRange, use_edit_handle,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

@@ -4,10 +4,8 @@
 //! ds-blitz, whatever the policy.
 
 use dioxus::prelude::*;
-use ds_blitz::{
-    AppNet, Harness, HarnessConfig, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin,
-    Viewport,
-};
+use ds_blitz::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
 

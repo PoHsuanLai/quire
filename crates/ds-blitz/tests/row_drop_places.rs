@@ -9,7 +9,7 @@ use ds::{
     RowState,
 };
 use ds::{DropState, Selection};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

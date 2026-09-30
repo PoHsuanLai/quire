@@ -7,7 +7,7 @@ use crate::origin::FrameId;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
 
 /// Every frame document inside `doc`, nested ones included, with its `iframe`'s tag.
-pub(crate) fn live_frames(doc: &BaseDocument) -> Vec<(FrameId, Option<FrameTag>)> {
+pub fn live_frames(doc: &BaseDocument) -> Vec<(FrameId, Option<FrameTag>)> {
     let mut found = Vec::new();
     collect(doc, &mut found);
     found

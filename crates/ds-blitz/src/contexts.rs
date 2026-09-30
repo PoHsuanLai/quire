@@ -40,7 +40,7 @@ impl RootContexts {
     }
 
     /// Provide every value at `vdom`'s root, in the order they were added.
-    pub(crate) fn install(&self, vdom: &mut VirtualDom) {
+    pub fn install(&self, vdom: &mut VirtualDom) {
         for factory in &self.factories {
             vdom.insert_any_root_context(factory());
         }

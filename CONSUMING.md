@@ -30,10 +30,11 @@ it by path, the way `examples/consumer/Cargo.toml` does:
 [dependencies]
 ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings" }
-ds-blitz   = { path = "../quire/crates/ds-blitz" }   # only if you run on Blitz
+ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`
 
 [dev-dependencies]
 ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
+ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harness`, `snapshot` (feature `pdf`: `pdf_app`)
 ```
 
 The linter is its own crate, `ds-lint` (coherence rules 1 and 2, section 5 below), so a consumer
@@ -227,8 +228,8 @@ fn App() -> Element {
 `ds::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
 On Blitz, `ds_blitz::TokioSpawner::current()` is the implementor: `ds_blitz::launch` enters a
 process-wide, lazily built Tokio runtime (multi-thread, two workers;
-`crates/ds-blitz/src/runtime.rs`) and holds the guard for the process's life, and
-`ds_blitz::Harness` enters it in `Harness::new` for the harness's own life, so `current()` works
+`crates/ds-blitz/src/launch/runtime.rs`) and holds the guard for the process's life, and
+`ds_harness::Harness` enters it (`ds_blitz::enter_runtime`) in `Harness::new` for the harness's own life, so `current()` works
 in anything launched with `launch` or rendered inside a `Harness`. A test never reaches the real
 config or the session bus: it passes `ConfigRoot::Scratch(dir)` and
 `SystemPrefsSource::Fixed(prefs)` (`crates/ds-blitz/tests/harness.rs::
@@ -403,14 +404,14 @@ Never `std::thread::sleep`, `tokio::time::sleep` or a hand-rolled `setTimeout`-e
 drive a class toggle. Use `ds::use_pulse` (restart a keyframe: `Pulse::fire()`) or
 `ds::use_motion_timer` (`MotionTimer::start(on_settled)`, which runs for exactly
 `ds::settle(anim, level)`); both read the enclosing `Ds`'s resolved motion level, so
-`MotionLevel::Reduced` collapses them automatically. Prove it with `ds_blitz::Harness`, which
+`MotionLevel::Reduced` collapses them automatically. Prove it with `ds_harness::Harness`, which
 drives a real Blitz document on a real (if fast-forwarded) clock — the test below is
 `examples/consumer/tests/coherence.rs::the_sent_badge_times_out_on_ds_motions_own_clock`,
 shortened:
 
 ```rust
 use ds::{resolve, settle, Anim, Appearance, SpaceLook, SystemPrefs};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
@@ -438,7 +439,7 @@ order, runs the renders that queued and resolves the CSS at that same instant, a
 once. The two assertions above then hold exactly, every run:
 
 ```rust
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 
 let config = HarnessConfig::new(Viewport { width: 480, height: 360, scale_percent: 100 })
     .with_clock(Clock::Virtual);
@@ -908,8 +909,8 @@ measured numbers.
 
 | Need | API | Notes |
 | --- | --- | --- |
-| An HTML document as a PDF | `ds_blitz::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
-| A Dioxus tree as a PDF | `ds_blitz::pdf_app(app, HarnessConfig::new(viewport), spec)` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
+| An HTML document as a PDF | feature `pdf`: `ds_blitz::pdf(&html, PageSpec::default()) -> Result<Vec<u8>, PdfError>` | A whole document (`<!DOCTYPE html>...`). quire's faces are registered; the network is sealed: only `data:` URLs load (no `file:`, no fetch). `@media print` applies. Laid out once at the page's content width, at scale 1. |
+| A Dioxus tree as a PDF | `ds_harness::pdf_app(app, HarnessConfig::new(viewport), spec)`, ds-harness feature `pdf` | Built as `config` says (its contexts and `NetPolicy`; the viewport is replaced by the page's content box), rendered until its mount-time work and images have landed (as `snapshot`), then printed. |
 | In a test | `Harness::pdf(spec) -> Result<Vec<u8>, PdfError>` | Prints the harness's document as it is now, at the page width with `@media print`; the harness's own viewport and media come back afterwards. Read the PDF back with `pdfrum` (dev-dependency) to assert on text. |
 | The sheet | `PageSpec { size, margins }`; `PageSize::{A4, Letter, Custom { width: Pt, height: Pt }}`; `Margins { top, right, bottom, left }`, `Margins::uniform(Pt)`, `Margins::symmetric(vertical, horizontal)`; `Pt::from_mm`, `Pt::from_inches` | `PageSpec::default()` is A4 with 18 mm above and below, 16 mm at the sides. `@page` is not read: the spec's margins are the only ones. `PdfError::NoContentArea` when the margins meet. |
 | Start a new page at an element | `"data-break-before": "page"` | CSS `break-before`/`page-break-before` do nothing on Blitz (stylo drops them). A marker at the document's top makes no blank page. |

@@ -7,7 +7,7 @@ use ds::{
     Accessory, Appearance, Availability, Check, Ds, Icon, Material, Point, Row, RowLeading,
     RowSize, RowState, TextLine,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

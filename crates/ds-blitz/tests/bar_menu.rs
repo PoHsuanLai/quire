@@ -10,8 +10,8 @@ use ds::{
     MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
 };
 use ds::{Bezel, Button, ImagePosition};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

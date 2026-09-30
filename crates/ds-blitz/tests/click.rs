@@ -11,7 +11,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Check, Ds, Material};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

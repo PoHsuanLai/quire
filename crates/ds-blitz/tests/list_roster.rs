@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Ds, List, ListItem, Material, Motion, MotionLevel, settle};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
 

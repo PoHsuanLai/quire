@@ -4,7 +4,8 @@
 //! which the tolerance allows for, not layout.
 
 use dioxus::prelude::*;
-use ds_blitz::{Harness, Margins, PageSize, PageSpec, Pt, Viewport};
+use ds_blitz::{Margins, PageSize, PageSpec, Pt};
+use ds_harness::{Harness, Viewport};
 use pdfrum::{Document, RenderOptions, VelloCpuBackend};
 
 /// The content box: 480 x 360 CSS px, 64 px (48 pt) of margin all round.

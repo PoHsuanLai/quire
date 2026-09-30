@@ -12,8 +12,9 @@ use ds::{
     Anchor, Appearance, Button, Common, Ds, Material, Menu, MenuItem, MountedRef, Point, Press, Px,
     ShortcutKey,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{FocusFallback, Harness, HarnessConfig, Viewport};
+use ds_blitz::FocusFallback;
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

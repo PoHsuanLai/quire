@@ -3,12 +3,12 @@
 //! [`HarnessConfig::with_backend`](crate::HarnessConfig::with_backend). Both paint the same
 //! scene, [`draw`], and hand back the same premultiplied RGBA bytes.
 
-use crate::error::NativeError;
 use crate::gpu_paint::GpuPainter;
 use anyrender::{PaintScene, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::BaseDocument;
 use blitz_paint::paint_scene;
+use ds_blitz::NativeError;
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
 use std::time::{Duration, Instant};

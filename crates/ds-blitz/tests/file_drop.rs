@@ -8,7 +8,7 @@ use ds::{
     Appearance, DropAcceptance, Ds, FileDrag, FileDragInput, FileDrop, Material, Offer, Point,
     use_file_drop,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::path::PathBuf;
 
 const VIEW: Viewport = Viewport {

@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::Choice;
 use ds::{Appearance, Ds, Material, SegmentedControl, ShortcutKey};
 use ds::{ControlSize, Tracking};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

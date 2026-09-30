@@ -10,8 +10,8 @@ use ds::{
     Appearance, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material, Point, Px,
     TargetElement, Tooltip, use_hover_hub,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use probe::rect;
 use std::time::Duration;
 

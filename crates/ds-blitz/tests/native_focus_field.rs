@@ -8,7 +8,7 @@ use ds::{
     Appearance, Button, Ds, FieldHandle, FocusError, Material, Select, focus_by_selector,
     use_field_handle,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

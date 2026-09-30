@@ -1,15 +1,15 @@
 //! How a [`Harness`](crate::Harness) builds its document: the viewport, and the same providers
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
-use crate::click_focus::FocusFallback;
-use crate::contexts::RootContexts;
-use crate::frame_links::FrameLinks;
-use crate::gpu_adapter::AdapterPref;
 use crate::harness_backend::Backend;
 use crate::harness_clock::Clock;
-use crate::net_policy::NetPolicy;
-use crate::setup::Setup;
 use crate::snapshot::Viewport;
+use ds_blitz::AdapterPref;
+use ds_blitz::FocusFallback;
+use ds_blitz::FrameLinks;
+use ds_blitz::NetPolicy;
+use ds_blitz::RootContexts;
+use ds_blitz::seam::Setup;
 
 /// A headless document's size and providers: build it with [`HarnessConfig::new`] and the
 /// `with_*` methods, then pass it to [`Harness::with_config`](crate::Harness::with_config) or
@@ -106,6 +106,7 @@ impl HarnessConfig {
     }
 
     /// The same providers at `viewport`.
+    #[cfg(feature = "pdf")]
     pub(crate) fn with_viewport(mut self, viewport: Viewport) -> Self {
         self.viewport = viewport;
         self

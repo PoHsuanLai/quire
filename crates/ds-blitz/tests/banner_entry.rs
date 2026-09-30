@@ -9,8 +9,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px, Rect};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use ds_shell::{
     AppMark, Banner, BannerEntry, BannerKey, BannerStack, NotificationCard, NotificationSwipe,
 };

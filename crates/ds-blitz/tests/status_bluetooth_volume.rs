@@ -7,8 +7,8 @@ use ds::{
     Appearance, BluetoothGlyph, BluetoothState, Ds, Material, Motion, VolumeGlyph, VolumeState,
     VolumeWaves,
 };
-use ds_blitz::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
