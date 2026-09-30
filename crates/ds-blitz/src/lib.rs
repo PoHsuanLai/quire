@@ -14,7 +14,6 @@ mod blitz_host;
 mod click_focus;
 pub mod clipboard;
 mod contexts;
-mod data_url;
 mod drop_hit;
 mod edit;
 mod edit_align;

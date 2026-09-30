@@ -40,6 +40,8 @@ ds-settings-derive = { path = "crates/ds-settings-derive" }
 ds-blitz           = { path = "crates/ds-blitz" }
 ds-harness         = { path = "crates/ds-harness" }
 anyrender_pdfrum   = { path = "crates/anyrender_pdfrum" }
+# The portable Blitz repairs, shared with shell-host (its own repo, a sibling checkout).
+blitz-kit          = { path = "../blitz-kit/crates/blitz-kit" }
 
 # ---- BEGIN PINNED BLOCK (source of truth: quire/docs/workspace-deps.toml) ----
 # Copied verbatim into [workspace.dependencies] of quire, shell-host and sill. Bumped only by a

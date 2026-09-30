@@ -8,12 +8,12 @@
 //! A frame's request for the app waits in the document's `FrameBook` until the frame is found
 //! under its `iframe`, so it reaches the app with the frame's tag (`crate::frame_book`).
 
-use crate::data_url;
 use crate::frame_book::FrameBook;
 use crate::frame_tag::FrameTag;
 use crate::net_policy::{NetDecision, NetPolicy, NetReply, NetRequest};
 use crate::origin::{FrameId, RequestOrigin};
 use crate::route::{Document, Policy, Route, route};
+use blitz_kit::net::LocalSource;
 use blitz_traits::net::{Bytes, NetHandler, NetProvider, NetWaker, Request};
 use std::sync::Arc;
 
@@ -154,16 +154,9 @@ impl NetProvider for DsNet {
             request.url.scheme(),
             Policy::of(&self.policy),
         ) {
-            Route::Data => {
-                let bytes = data_url::decode(request.url.as_str());
-                self.answer(doc_id, request.url.to_string(), bytes, handler);
-            }
-            Route::File => {
-                let bytes = request
-                    .url
-                    .to_file_path()
-                    .ok()
-                    .and_then(|path| std::fs::read(path).ok());
+            // The same reads the kit's `LocalNet` makes, answered on this thread.
+            Route::Data | Route::File => {
+                let bytes = LocalSource::of(&request.url).read();
                 self.answer(doc_id, request.url.to_string(), bytes, handler);
             }
             Route::Fallback => {
