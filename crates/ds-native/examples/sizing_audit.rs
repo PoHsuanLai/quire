@@ -5,12 +5,13 @@
 //! `cargo run --release -p ds-native --example sizing_audit -- OUT_DIR`
 
 use dioxus::prelude::*;
+use ds::SliderLook;
 use ds::icon::{IconStyle, Tint};
 use ds::{Answers, Bezel, ControlSize, ImagePosition};
 use ds::{
-    Appearance, Button, Check, Ds, Fraction, Icon, IconSize, IconSource, IconView, LevelControl,
-    LevelGlyph, LevelLook, Material, Muting, PlateFamily, PlateTint, Px, Scheme, SegmentedControl,
-    Shown, Slider, StatusMetrics, Surface, Theme, Toggle,
+    Appearance, Button, Check, Ds, Fraction, Icon, IconSize, IconSource, IconView, LevelGlyph,
+    Material, Muting, PlateFamily, PlateTint, Px, Scheme, SegmentedControl, Shown, Slider,
+    StatusMetrics, Surface, Theme, Toggle,
 };
 use ds::{Choice, Tracking};
 use ds_native::{Harness, Viewport};
@@ -128,7 +129,7 @@ fn Sheet(theme: Theme) -> Element {
                             ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
                             ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", state: ModuleState::Off, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
                             ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "60%" },
-                                LevelControl { label: "Display", value: Fraction(600), glyph: LevelGlyph::Volume(Muting::Audible), look: LevelLook::Capsule }
+                                Slider { label: "Display", value: Fraction(600), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::Capsule }
                             }
                         }
                     }

@@ -1,5 +1,5 @@
 //! `Osd`: the on-screen display's card and its fade (design/20 section 1.7).
-//! One card, a title line over a read-only [`LevelControl`], in the Osd material with the
+//! One card, a title line over a [`LevelIndicator`], in the Osd material with the
 //! Space gradient at its tint, styled as a control-center module (`--r-tile`, the grid's padding,
 //! design/13 section 13.3.7). It enters with `Anim::OsdIn` and leaves with `Anim::OsdOut`, whose
 //! direction follows [`OsdPosition`] through `--osd-dy`, and calls `on_hidden` when the exit has
@@ -15,8 +15,8 @@
 //! surface to the card, its margins and the material's shadow, anchored to that edge.
 
 use dioxus::prelude::*;
-use ds::components::content::level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode};
-use ds::components::controls::level::control::LevelControl;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::level_indicator::{LevelIndicator, LevelStyle};
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
@@ -55,7 +55,7 @@ pub fn Osd(
     #[props(default)] label: Option<String>,
     #[props(default)] on_hidden: EventHandler<()>,
     #[props(default)] position: OsdPosition,
-    #[props(default)] look: LevelLook,
+    #[props(default)] style: LevelStyle,
     #[props(default)] id: Option<String>,
     children: Element,
 ) -> Element {
@@ -86,7 +86,12 @@ pub fn Osd(
                 div { class: "ds-osd-title", "{title}" }
             }
             if let Some(OsdLevel { value, glyph }) = level {
-                LevelControl { label: level_label, value, glyph, mode: LevelMode::ReadOnly, look }
+                LevelIndicator {
+                    label: level_label,
+                    value,
+                    glyph,
+                    style,
+                }
             }
             {children}
         }

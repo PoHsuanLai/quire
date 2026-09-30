@@ -6,4 +6,3 @@ pub(crate) mod device_forms;
 pub mod device_glyph;
 pub(crate) mod figure;
 pub(crate) mod level;
-pub(crate) mod ring;

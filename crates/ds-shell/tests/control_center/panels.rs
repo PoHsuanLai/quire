@@ -3,9 +3,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, AppearancePicker, Ds, Fraction, Icon, Inject, LevelControl, LevelGlyph, Material,
-    Muting, PickerLayout, Px, SystemPrefs, Theme,
+    Appearance, AppearancePicker, Ds, Fraction, Icon, Inject, LevelGlyph, Material, Muting,
+    PickerLayout, Px, SystemPrefs, Theme,
 };
+use ds::{Slider, SliderLook};
 use ds_shell::{
     GridColumns, ModuleGrid, ModulePanel, ModuleState, ModuleTile, PanelPlate, TileSpan,
 };
@@ -49,13 +50,13 @@ pub fn part(props: PartProps) -> Element {
         PartCase::Panel(_) => rsx! {
             ModuleGrid {
                 ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "40%" },
-                    LevelControl { label: "Volume", value: Fraction(400), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} }
+                    Slider { label: "Volume", value: Fraction(400), glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {}, look: SliderLook::Capsule }
                 }
             }
         },
         PartCase::Bare => rsx! {
             ModulePanel { plate: PanelPlate::Bare, span: TileSpan::Half,
-                LevelControl { label: "Brightness", value: Fraction(300), glyph: LevelGlyph::Brightness, onchange: |_| {} }
+                Slider { label: "Brightness", value: Fraction(300), glyph: LevelGlyph::Brightness, onchange: |_| {}, look: SliderLook::Capsule }
             }
         },
         PartCase::ThreeColumns => rsx! {

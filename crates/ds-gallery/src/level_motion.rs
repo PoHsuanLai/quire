@@ -9,9 +9,10 @@ use crate::pages::level_tile::work;
 use crate::style;
 use dioxus::prelude::*;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, Material, Muting, Point,
-    Px, RootChrome, Shown, Theme,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, Material, Muting, Point, Px,
+    RootChrome, Shown, Theme,
 };
+use ds::{Slider, SliderLook};
 use ds_native::{Harness, Viewport};
 use ds_shell::{Osd, OsdPosition};
 use image::{RgbaImage, imageops};
@@ -42,11 +43,12 @@ fn Motion() -> Element {
                     blur: BlurState::Unavailable,
                     stylesheet: Inject::Host,
                     Osd { shown: Shown::Visible, label: CAPTION(), position: OsdPosition::BottomCentre,
-                        LevelControl {
+                        Slider {
                             label: "Volume",
                             value: VALUE(),
                             glyph: LevelGlyph::Volume(Muting::Audible),
                             onchange: move |next| *VALUE.write() = next,
+                            look: SliderLook::Capsule,
                         }
                     }
                 }
@@ -57,7 +59,7 @@ fn Motion() -> Element {
 
 /// The frames: (caption, what to do first, how long to wait before the picture).
 fn frames(harness: &mut Harness) -> Vec<RgbaImage> {
-    let rail = harness.rect(".ds-level-rail");
+    let rail = harness.rect(".ds-slider-rail");
     let (left, width, middle) = rail.map_or((40.0, 300.0, 60.0), |rect| {
         (
             rect.origin.x.0,

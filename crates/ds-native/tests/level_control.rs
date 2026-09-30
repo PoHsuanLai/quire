@@ -8,9 +8,10 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, DurationToken, EasingToken, Fraction, LevelControl, LevelGlyph, Material,
-    Motion, MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
+    Appearance, Ds, DurationToken, EasingToken, Fraction, LevelGlyph, Material, Motion,
+    MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
 };
+use ds::{Slider, SliderLook};
 use ds_native::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
@@ -40,12 +41,11 @@ fn Level() -> Element {
             material: Material::Osd,
             style { {PROBE_CSS} }
             div { class: "bar",
-                LevelControl {
+                Slider {
                     label: "Volume",
                     value: VALUE(),
                     glyph: LevelGlyph::Volume(Muting::Audible),
-                    onchange: move |next| *VALUE.write() = next,
-                }
+                    onchange: move |next| *VALUE.write() = next, look: SliderLook::Capsule }
             }
         }
     }

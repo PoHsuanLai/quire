@@ -14,10 +14,8 @@ use ds::{
     Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, Material, Pane,
     PaneSwitcher, RootChrome, RowTrailing, SettingsRow, TextLine, Theme, default_look,
 };
-use ds::{
-    AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, Muting, PickerLayout, Px,
-    SystemPrefs,
-};
+use ds::{AppearancePicker, Fraction, LevelGlyph, Muting, PickerLayout, Px, SystemPrefs};
+use ds::{Slider, SliderLook};
 use ds_shell::ModulePanel;
 use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 
@@ -122,11 +120,11 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
             ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Connecting…", state: ModuleState::Busy, onclick: |_| {} }
             ModuleTile { glyph: Icon::Play, title: "Nocturne in E-flat", status: "Paused", state: ModuleState::Off, span: TileSpan::Full, onclick: |_| {} }
             ModulePanel { glyph: Icon::Volume2, title: "Speakers", trailing: rsx! { "{percent}%" },
-                LevelControl { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: LevelLook::CapsuleKnob, onchange: move |next| volume.set(next) }
+                Slider { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::CapsuleKnob, onchange: move |next| volume.set(next) }
             }
             // A level that cannot move (no brightness control on this display) says so.
             ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: ds::Availability::Disabled,
-                LevelControl { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: LevelLook::CapsuleKnob, availability: ds::Availability::Disabled }
+                Slider { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: SliderLook::CapsuleKnob, availability: ds::Availability::Disabled }
             }
             ModulePanel {
                 AppearancePicker { value: appearance(), system: SystemPrefs::default(), onchange: move |next| appearance.set(next), layout: PickerLayout::Compact }

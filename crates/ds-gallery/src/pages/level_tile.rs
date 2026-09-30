@@ -1,11 +1,11 @@
 //! One level specimen on its ground, shared by the Level page and the `--level-sheet` contact
-//! sheet: an OSD card (title and a read-only `LevelControl`) in a transparent Osd root over either
+//! sheet: an OSD card (title and a `LevelIndicator`) in a transparent Osd root over either
 //! the Work Space's frame or a light, wallpaper-like ground.
 
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelLook, Material, Muting, PRESETS,
+    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, LevelStyle, Material, Muting, PRESETS,
     RootChrome, Scheme, Shown, SpaceLook, Theme,
 };
 use ds_shell::{Osd, OsdLevel};
@@ -88,9 +88,9 @@ pub fn theme(scheme: Scheme) -> Theme {
     }
 }
 
-/// `state` in `look`, on an OSD card in `scheme` over `ground`.
+/// `state` drawn as `style`, on an OSD card in `scheme` over `ground`.
 #[component]
-pub fn LevelTile(look: LevelLook, scheme: Scheme, ground: Ground, state: State) -> Element {
+pub fn LevelTile(style: LevelStyle, scheme: Scheme, ground: Ground, state: State) -> Element {
     let theme = theme(scheme);
     let (ground_look, ground_theme) = match ground {
         Ground::Work => (work(theme), theme),
@@ -114,7 +114,7 @@ pub fn LevelTile(look: LevelLook, scheme: Scheme, ground: Ground, state: State) 
                         Osd {
                             shown: Shown::Visible,
                             label: state.title,
-                            look,
+                            style,
                             level: OsdLevel { value: state.value, glyph: state.glyph },
                         }
                     }

@@ -25,7 +25,7 @@ fn held() -> Hold {
 
 #[test]
 fn press_drag_release() {
-    use crate::components::controls::level::machine::LevelInput as I;
+    use crate::components::controls::slider_machine::LevelInput as I;
     #[rustfmt::skip]
     let cases = [
         // The press holds at once; its measurement jumps the level to the pointer.
@@ -53,8 +53,8 @@ fn press_drag_release() {
 
 #[test]
 fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
-    use crate::components::controls::level::machine::KeyStep::{Coarse, Fine};
-    use crate::components::controls::level::machine::Nudge::{Down, Up};
+    use crate::components::controls::slider_machine::KeyStep::{Coarse, Fine};
+    use crate::components::controls::slider_machine::Nudge::{Down, Up};
     #[rustfmt::skip]
     let cases = [
         (500, Up, Coarse, 563),

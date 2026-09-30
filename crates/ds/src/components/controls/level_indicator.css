@@ -1,0 +1,40 @@
+/* LevelIndicator (design/30 section 2.9, `NSLevelIndicator`): a read-only level, drawn as the
+   capsule slider is, without a knob or a hit area. The inks are the material's level inks
+   (`--m-level-*`, per scheme, `material/level.rs`); the capsule is a control of the rung's height
+   (`--ctl-h-*`); `--f` is the level, written inline by the component. Attribute selectors carry
+   `*|` (spike S2). A level set from outside slides over `--t-move --e-linear`: a value a person
+   reads as it moves. The bands colour the fill: warning and critical draw in their own inks. */
+
+.ds-level-indicator{ --level-h:var(--ctl-h-m); display:flex; align-items:center; gap:var(--s-10); width:100%; box-sizing:border-box; }
+.ds-level-indicator[*|data-size=mini]{ --level-h:var(--ctl-h-xs); }
+.ds-level-indicator[*|data-size=small]{ --level-h:var(--ctl-h-s); }
+.ds-level-indicator[*|data-size=large]{ --level-h:var(--ctl-h-l); }
+.ds-level-indicator-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
+.ds-level-indicator-icon-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
+
+/* The capsule: a translucent well with an inner shade, the fill in the bright ink. */
+.ds-level-indicator-track{ position:absolute; top:0; bottom:0; left:0; right:0; overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-well); box-shadow:var(--m-level-shade);
+}
+.ds-level-indicator-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); overflow:hidden; border-radius:var(--r-pill);
+  background:var(--m-level-fill); transition:width var(--t-move) var(--e-linear); }
+
+/* The glyph inside the capsule, twice at the same place: on the well in the well's ink, and in
+   the fill in the dark ink, clipped by the fill, so it is knocked out where the fill covers it. */
+.ds-level-indicator-track > .ds-level-indicator-icon,
+.ds-level-indicator-fill > .ds-level-indicator-icon{ position:absolute; top:0; bottom:0; left:var(--s-6); display:flex; align-items:center; }
+.ds-level-indicator-track > .ds-level-indicator-icon{ color:var(--m-level-glyph); }
+.ds-level-indicator-fill > .ds-level-indicator-icon{ color:var(--m-level-glyph-fill); }
+
+/* Sixteen squares. */
+.ds-level-indicator[*|data-style=discrete] .ds-level-indicator-rail{ height:auto; }
+.ds-level-indicator-segments{ display:flex; gap:var(--s-2); }
+.ds-level-indicator-segment{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
+  transition:background-color var(--t-quick) var(--e-in-out); }
+.ds-level-indicator-segment[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
+
+/* Bands: the fill (and each lit square) takes the band's ink. */
+.ds-level-indicator[*|data-band=warning] .ds-level-indicator-fill,
+.ds-level-indicator[*|data-band=warning] .ds-level-indicator-segment[*|data-on=on]{ background:var(--warn); }
+.ds-level-indicator[*|data-band=critical] .ds-level-indicator-fill,
+.ds-level-indicator[*|data-band=critical] .ds-level-indicator-segment[*|data-on=on]{ background:var(--danger); }

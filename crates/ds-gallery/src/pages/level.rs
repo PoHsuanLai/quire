@@ -1,6 +1,6 @@
-//! The Level page (the user's brief of 2026-09-25): the level control's three looks to choose
-//! between, live on an OSD card and as a grid of states on two grounds, and the OSD card at the
-//! top right, shown and hidden with its fade. The same grid, in both schemes and at 1x and 2x, is
+//! The Level page (the user's brief of 2026-09-25): the capsule slider's two looks live on an OSD
+//! card, the level indicator's two styles as a grid of states on two grounds, and the OSD card at
+//! the top right, shown and hidden with its fade. The same grid, in both schemes and at 1x and 2x, is
 //! `ds-gallery --level-sheet DIR`'s contact sheet.
 
 use super::level_tile::{Ground, LevelTile, STATES, theme, work};
@@ -9,8 +9,8 @@ use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::Word;
 use ds::{
-    Appearance, BlurState, Button, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook,
-    Material, Muting, RootChrome, Scheme, Shown, use_scope,
+    Appearance, BlurState, Button, Ds, Fraction, Inject, LevelGlyph, LevelStyle, Material, Muting,
+    RootChrome, Scheme, Shown, Slider, SliderLook, use_scope,
 };
 use ds_shell::{Osd, OsdLevel, OsdMetrics, OsdPosition};
 
@@ -24,17 +24,29 @@ pub fn LevelPage() -> Element {
     }
 }
 
-/// A look's caption.
-fn describe(look: LevelLook) -> &'static str {
+/// A slider look's caption.
+fn describe_look(look: SliderLook) -> &'static str {
     match look {
-        LevelLook::Capsule => {
-            "Capsule (recommended): a 26 px capsule, the fill in the material's bright ink, the glyph inside at the left, knocked out where the fill covers it"
+        SliderLook::Linear => {
+            "Linear: a thin track under a round knob, the form slider of a settings row"
         }
-        LevelLook::CapsuleKnob => {
+        SliderLook::Capsule => {
+            "Capsule (recommended): a capsule, the fill in the material's bright ink, the glyph inside at the left, knocked out where the fill covers it"
+        }
+        SliderLook::CapsuleKnob => {
             "Capsule and knob: the capsule with a round knob riding the fill's end, the glyph before it"
         }
-        LevelLook::Segments => {
-            "Segments: sixteen rounded squares that fill in one --stagger after another, the glyph before them"
+    }
+}
+
+/// A level indicator style's caption.
+fn describe_style(style: LevelStyle) -> &'static str {
+    match style {
+        LevelStyle::Continuous => {
+            "Continuous: a capsule, the fill in the material's bright ink, the glyph inside at the left"
+        }
+        LevelStyle::Discrete => {
+            "Discrete: sixteen rounded squares that fill in one after another, the glyph before them"
         }
     }
 }
@@ -47,14 +59,14 @@ fn LiveSection() -> Element {
     let mut muting = use_signal(|| Muting::Audible);
     let glyph = LevelGlyph::Volume(muting());
     rsx! {
-        Section { title: "Live", note: "Drag, or focus and use the arrows (Shift for fine steps). Under the pointer the fill follows with no easing; a press swells the track; past either end the capsule stretches and springs back on release. The buttons set the level from outside, which slides over --t-quick --e-out. Each control ticks as it crosses a sixteenth.",
+        Section { title: "Live", note: "Drag, or focus and use the arrows (Shift for fine steps). Under the pointer the fill follows with no easing. The buttons set the level from outside, which slides over --t-quick --e-out.",
             div { class: "g-row g-row-top",
-                for look in LevelLook::ALL.iter().copied() {
-                    Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
+                for look in [SliderLook::Capsule, SliderLook::CapsuleKnob] {
+                    Specimen { name: look.slug().to_owned(), code: describe_look(look).to_owned(),
                         OsdCard { scheme, title: "Sound",
                             div { class: "g-level-live",
-                                LevelControl { label: "Volume", value: volume(), glyph, look, onchange: move |next| volume.set(next) }
-                                LevelControl { label: "Brightness", value: brightness(), glyph: LevelGlyph::Brightness, look, onchange: move |next| brightness.set(next) }
+                                Slider { label: "Volume", value: volume(), glyph, look, onchange: move |next| volume.set(next) }
+                                Slider { label: "Brightness", value: brightness(), glyph: LevelGlyph::Brightness, look, onchange: move |next| brightness.set(next) }
                             }
                         }
                     }
@@ -102,14 +114,14 @@ fn OsdCard(scheme: Scheme, title: String, children: Element) -> Element {
 fn LooksSection() -> Element {
     let scheme = use_scope().scheme;
     rsx! {
-        Section { title: "Looks", note: "Each look at volume 0, 40 and 100 %, muted, and brightness 30 %, on the OSD card over the Work Space's frame and over a light ground. The speaker shows a wave per third of the range and a slash when muted; the sun's rays grow with the level.",
-            for look in LevelLook::ALL.iter().copied() {
-                Specimen { name: look.slug().to_owned(), code: describe(look).to_owned(),
+        Section { title: "Styles", note: "Each style at volume 0, 40 and 100 %, muted, and brightness 30 %, on the OSD card over the Work Space's frame and over a light ground. The speaker shows a wave per third of the range and a slash when muted; the sun's rays grow with the level.",
+            for style in LevelStyle::ALL.iter().copied() {
+                Specimen { name: style.slug().to_owned(), code: describe_style(style).to_owned(),
                     div { class: "g-level-grid",
                         for ground in Ground::ALL.iter().copied() {
                             div { class: "g-row g-row-top",
                                 for state in STATES {
-                                    LevelTile { look, scheme, ground, state }
+                                    LevelTile { style, scheme, ground, state }
                                 }
                             }
                         }
@@ -139,7 +151,7 @@ fn OsdSection() -> Element {
             }
             div { class: "g-grid2",
                 for (glyph , title , value) in cards {
-                    Specimen { name: title.to_owned(), code: "Osd { position: TopRight, look: Capsule }".to_owned(),
+                    Specimen { name: title.to_owned(), code: "Osd { position: TopRight, style: Continuous }".to_owned(),
                         div { class: "g-level-screen", style: OsdMetrics::default().style_attr(),
                             Ds {
                                 appearance: Appearance { theme, ..Appearance::default() },
