@@ -7,9 +7,9 @@ use dioxus::prelude::*;
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material, person_hue,
 };
+use ds::{Availability, Check, TextLine};
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
-use ds::{Availability, Check, TextLine};
 use ds_shell::ModuleTile;
 use ds_shell::{LockPrompt, LockUser, PromptState};
 use std::time::Duration;

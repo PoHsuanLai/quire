@@ -15,7 +15,6 @@ use ds::{
 };
 use ds::{Choice, Tracking};
 use ds_harness::{Harness, Viewport};
-use ds_shell::{Chevron, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use ds_shell::{MenuBarItem, ModuleGrid, ModulePanel, ModuleTile};
 use std::path::PathBuf;
 use std::time::Duration;

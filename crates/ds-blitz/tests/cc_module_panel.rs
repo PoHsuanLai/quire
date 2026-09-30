@@ -7,7 +7,6 @@ use ds::Check;
 use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
 use ds::{Slider, SliderLook};
 use ds_harness::{Harness, Viewport};
-use ds_shell::{ModuleGrid, ModulePanel, ModuleState, ModuleTile};
 use ds_shell::{ModuleGrid, ModulePanel, ModuleTile};
 use std::time::Duration;
 

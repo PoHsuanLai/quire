@@ -13,7 +13,6 @@ use ds::{
     Appearance, Ds, DurationToken, EasingToken, Fraction, Grain, Icon, Material, MotionLevel,
     PRESETS, SpaceLook, Theme,
 };
-use ds::{Bezel, Button, ImagePosition};
 use ds_harness::{Harness, Viewport};
 use ds_shell::MenuBarItem;
 use image::RgbaImage;
