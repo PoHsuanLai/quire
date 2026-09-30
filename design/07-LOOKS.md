@@ -379,7 +379,7 @@ conflict with C's Post.
 | Accent soft | #F2DCD5 / #3A201A | #DCE5F3 / #1E2A44 |
 | Seal | = accent, painted with `--seal` | declared = accent, but the seal is painted with `--f-ink` on the frame (S:346) |
 | `--accent-2` | #2E5AA6 / #7FA6E6 | absent |
-| Accent option | fixed | per Space: "Postmark" or "A hint of the Space" (an OKLCH accent derived from the Space's first dot, contrast-checked against the card; S:1201-1203, `03-COLOR.md`) |
+| Accent option | fixed | per Space: "Your accent" or "Space colour" (an OKLCH accent derived from the Space's first dot, contrast-checked against the card; S:1201-1203, `03-COLOR.md`) |
 | `--scrim` | none; the scrim is `--ink` at opacity .16 (C:1054) | `rgba(0,0,0,.22)` (S:15) |
 | Grain | `--grain` token .035/.05, unused | a real 128x128 noise tile on the frame, overlay blend, opacity = grain/100 x (.16 dark, .20 light) (S:87, S:1162-1169, S:1188) |
 | The frame | none: the shell is a bordered panel on paper (C:262-268) | `.win`: Space gradient layers, grain, sidebar drawn on the colour with `--f-*` tokens, the card inset 8 px (S:77-87, S:156-160) |

@@ -140,8 +140,8 @@ pub fn SpaceEditor(
                 SegmentedControl::<CardAccent> {
                     label: "Accent",
                     choices: Choice::pairs(vec![
-                        (CardAccent::SpaceHue, "A hint of the Space".to_string()),
-                        (CardAccent::Chosen, "The accent".to_string()),
+                        (CardAccent::SpaceHue, "Space colour".to_string()),
+                        (CardAccent::Chosen, "Your accent".to_string()),
                     ]),
                     tracking: Tracking::SelectOne(look.card_accent),
                     onchange: {
