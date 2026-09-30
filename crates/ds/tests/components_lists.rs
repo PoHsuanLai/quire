@@ -233,9 +233,8 @@ fn list_stylesheets_use_tokens_only() {
 
 /// What these components write inline that a consumer may not: colours computed per account,
 /// provider or Space. Each is data the palette or the app computes, not a theme colour.
-#[cfg(feature = "lint")]
-const MARKUP_EXCEPTIONS: &[ds::lint::Exception] = {
-    use ds::lint::{Exception, Rule};
+const MARKUP_EXCEPTIONS: &[ds_lint::Exception] = {
+    use ds_lint::{Exception, Rule};
     &[
         Exception {
             rule: Rule::HexColour,
@@ -277,10 +276,9 @@ const MARKUP_EXCEPTIONS: &[ds::lint::Exception] = {
 
 /// Coherence rule 2 on these components' output: every golden uses only classes the stylesheet
 /// styles, no hand-written SVG or form control, and no colour inline beyond the exceptions.
-#[cfg(feature = "lint")]
 #[test]
 fn every_list_golden_lints_clean() {
-    use ds::lint::{LintConfig, markup};
+    use ds_lint::{LintConfig, markup};
     let config = LintConfig {
         exceptions: MARKUP_EXCEPTIONS,
         ..LintConfig::new(&ds::kits())

@@ -14,6 +14,10 @@ use crate::components::controls::chord::Chord;
 use crate::components::controls::spinner::SPIN;
 use crate::components::lists::preview::content::{PaneContent, caption, media};
 use crate::components::lists::preview::cue::{PaneCue, pending_look};
+use dioxus::prelude::*;
+use ds_core::vocab::Shortcut;
+use ds_core::vocab::Shown;
+use ds_core::word::Word;
 use ds_motion::anim::Anim;
 use ds_motion::detail::{
     once::use_cross_fade, operation::Operation, pending::PendingFrame, use_pending::use_pending,
@@ -21,10 +25,6 @@ use ds_motion::detail::{
 use ds_motion::presence::Exit;
 use ds_motion::presence::spec::PresenceSpec;
 use ds_motion::presence::use_presence::{Presented, use_presence};
-use dioxus::prelude::*;
-use ds_core::vocab::Shortcut;
-use ds_core::vocab::Shown;
-use ds_core::word::Word;
 
 /// One action under the preview: its words in the ink, then its keys as a plain [`Chord`] in
 /// the secondary ink at the words' size (Spotlight's "Reveal in Files ⌘R"; an empty shortcut

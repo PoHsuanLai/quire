@@ -10,12 +10,12 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, BatteryFigure, BatteryLevel, CardTint, ClockFace, ClockLook, ClockTime, DayPhase,
     Ds, Fraction, Glyph, Icon, IconSize, Inject, Material, Motion, RingMark, RootChrome, Seconds,
     Theme, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetTitle,
 };
+use ds_lint::{LintConfig, markup};
 
 #[derive(Props, Clone)]
 struct HostProps {

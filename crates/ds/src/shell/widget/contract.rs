@@ -5,9 +5,9 @@
 //! so every widget, ours and other apps', sits on the same card.
 
 use crate::components::content::text_runs::TextLine;
-use ds_motion::wake::WakeStamp;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize, WidgetTitle};
 use dioxus::prelude::*;
+use ds_motion::wake::WakeStamp;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;

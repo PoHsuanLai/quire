@@ -21,6 +21,7 @@ RULES=(
   "ds-core: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-style: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-motion: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
+  "ds-lint: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-settings: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-native: zbus memfd"
@@ -62,10 +63,11 @@ EDGES=(
   "ds-core: ds-core-derive"
   "ds-style: ds-core ds-core-derive"
   "ds-motion: ds-core ds-style"
+  "ds-lint: ds-core ds-style"
   "ds: ds-core ds-core-derive ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
   "ds-native: ds anyrender_pdfrum"
-  "ds-gallery: ds ds-core ds-settings ds-native"
+  "ds-gallery: ds ds-core ds-lint ds-native ds-settings"
   "icons: ds ds-settings"
   "anyrender_pdfrum:"
 )
@@ -91,13 +93,12 @@ done
 # components < shell < assembly (ARCHITECTURE.md section 2).
 DS=crates/ds/src
 LAYERS=(
-  "lint: host focus edit file_drop spell window stack root components shell assembly"
-  "host: focus edit file_drop spell window stack root components lint shell assembly"
-  "focus edit file_drop spell window: stack root components lint shell assembly"
-  "stack: root components lint shell assembly"
-  "root: components lint shell assembly"
-  "components: lint shell assembly components::app"
-  "shell: lint assembly"
+  "host: focus edit file_drop spell window stack root components shell assembly"
+  "focus edit file_drop spell window: stack root components shell assembly"
+  "stack: root components shell assembly"
+  "root: components shell assembly"
+  "components: shell assembly components::app"
+  "shell: assembly"
 )
 layered=0
 for rule in "${LAYERS[@]}"; do
@@ -137,7 +138,7 @@ for i in "${!COMPONENT_GROUPS[@]}"; do
   fi
 done
 if [ "$layered" -eq 0 ]; then
-  echo "layers hold: lint, ds < shell < assembly; component groups in order"
+  echo "layers hold: ds < shell < assembly; component groups in order"
 fi
 
 # No `pub(crate)` module or item may be named from another layer: it becomes `pub` at its home

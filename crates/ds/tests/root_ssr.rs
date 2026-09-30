@@ -4,11 +4,11 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, Rule, markup};
 use ds::{
     Accent, Activity, Appearance, BlurState, Ds, FrameVars, HostSignals, Inject, InputModality,
     Material, Motion, ReducedMotion, Scale, Scheme, SpaceLook, Surface, SystemPrefs, Theme,
 };
+use ds_lint::{LintConfig, Rule, markup};
 use std::collections::BTreeMap;
 
 #[derive(Props, Clone, PartialEq)]

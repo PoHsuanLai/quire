@@ -27,15 +27,15 @@ use crate::components::menus::{
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
 use crate::host::measure::{Anchor, MountedRef};
-use ds_motion::anim::Anim;
-use ds_motion::entrance::use_entrance;
-use ds_motion::presence::Presence;
-use ds_motion::timer::use_motion_timer;
 use crate::stack::menu_track::types::MenuTiming;
 use dioxus::prelude::*;
 use ds_core::press::{PointerButton, Press};
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
+use ds_motion::presence::Presence;
+use ds_motion::timer::use_motion_timer;
 use ds_style::tokens::layer::ZLayer;
 
 /// A floating list of choices. `timing` is the submenu delay and safe-triangle timeout, read

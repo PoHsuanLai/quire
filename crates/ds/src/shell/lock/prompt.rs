@@ -9,10 +9,6 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
     text_input_kind::TextInputKind,
 };
-use ds_motion::detail::{
-    operation::Operation, touch::Touch, use_detail::use_detail, use_operation::use_operation,
-};
-use ds_motion::wake::WakeStamp;
 use crate::shell::lock::mood::{Caret, Stir, prompt_mood, use_stir};
 use crate::shell::lock::picture::{AT_LOCK, prompt_picture};
 use crate::shell::lock::secret_entry::{Filled, SecretEntry, use_secret_entry};
@@ -21,6 +17,10 @@ use crate::shell::user_picture::{picture::UserPicture, portrait::Liveliness};
 use dioxus::prelude::*;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
+use ds_motion::detail::{
+    operation::Operation, touch::Touch, use_detail::use_detail, use_operation::use_operation,
+};
+use ds_motion::wake::WakeStamp;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 

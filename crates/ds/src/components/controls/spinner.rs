@@ -3,12 +3,12 @@
 //! section 1.3): it spins at once while the operation runs, in twelve steps of `--t-spin-step`
 //! (a turn a second), and keeps turning under Reduced. It never loops without an [`Operation`].
 
+use dioxus::prelude::*;
 use ds_motion::detail::{
     operation::Operation,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     use_pending::use_pending,
 };
-use dioxus::prelude::*;
 
 /// The loop a spinner plays: one ring, a twelfth of a turn a step.
 pub(crate) const SPIN: PendingSpec = PendingSpec {

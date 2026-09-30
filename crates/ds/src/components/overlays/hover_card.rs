@@ -16,9 +16,6 @@ use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style, use_float};
 use crate::host::measure::MountedRef;
 use crate::host::measure::client_rect;
-use ds_motion::anim::Anim;
-use ds_motion::entrance::use_entrance;
-use ds_motion::hover_intent::HoverEvent;
 use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
@@ -27,6 +24,9 @@ use ds_core::geometry::{
     units::{Point, Px, Rect},
 };
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
+use ds_motion::hover_intent::HoverEvent;
 use ds_style::tokens::layer::ZLayer;
 use std::collections::BTreeMap;
 use {intent::HoverAnchor, parts::HoverCardPart};

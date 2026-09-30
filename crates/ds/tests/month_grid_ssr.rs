@@ -10,8 +10,8 @@ mod golden;
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{Appearance, DayKey, Ds, Inject, Material, MonthGrid, MonthStep, Theme, WeekNumbers};
+use ds_lint::{LintConfig, markup};
 use month_sample::{First, SEPTEMBER, sample};
 
 /// One specimen.

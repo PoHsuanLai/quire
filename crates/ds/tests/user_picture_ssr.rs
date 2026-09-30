@@ -11,12 +11,12 @@ mod golden;
 
 use dioxus::prelude::*;
 use ds::Word;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, EmojiId, FaceFile,
     ImageSource, Inject, Material, PictureChoice, PictureSize, Theme, UserPicture,
     UserPicturePicker, UserPortrait, person_hue, resolve_picture,
 };
+use ds_lint::{LintConfig, markup};
 
 fn letter() -> AvatarFace {
     AvatarFace {

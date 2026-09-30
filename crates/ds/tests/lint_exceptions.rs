@@ -2,7 +2,7 @@
 //! stylesheet and in markup, and `assert_clean` says how much each one silenced and fails on
 //! one that silenced nothing.
 
-use ds::lint::{Exception, LintConfig, Rule, assert_clean, markup, stylesheet};
+use ds_lint::{Exception, LintConfig, Rule, assert_clean, markup, stylesheet};
 
 const TRUNCATE_MASK: &[Exception] = &[Exception {
     rule: Rule::HexColour,

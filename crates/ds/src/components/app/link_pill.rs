@@ -4,9 +4,9 @@
 //! link and drops it on leave: no intent delay, no exit. It enters with `Anim::LinkPillIn`
 //! (`hc-in` at `--t-quick --e-out`, `S:433`), reported as `data-presence` like every entrance.
 
+use dioxus::prelude::*;
 use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
-use dioxus::prelude::*;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 

@@ -6,15 +6,15 @@
 //! the speed it has, instead of restarting a transition. A click is a contact with no velocity:
 //! critically damped, no bounce.
 
+use dioxus::prelude::*;
+use ds_core::vocab::{Availability, Check};
+use ds_core::word::Word;
 use ds_motion::detail::touch::Touch;
 use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,
     use_spring::use_spring,
 };
-use dioxus::prelude::*;
-use ds_core::vocab::{Availability, Check};
-use ds_core::word::Word;
 use ds_style::tokens::control_size::ControlSize;
 
 /// Where the knob stands for `value` on a switch of `size`: off at the start, on at the end of

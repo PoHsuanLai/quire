@@ -16,14 +16,14 @@
 
 use crate::components::content::level_glyph::vocab::{LevelGlyph, LevelLook, LevelMode};
 use crate::components::controls::level::control::LevelControl;
-use ds_motion::anim::Anim;
-use ds_motion::presence::Exit;
-use ds_motion::presence::spec::PresenceSpec;
-use ds_motion::presence::use_presence::{Presented, use_presence};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
+use ds_motion::presence::Exit;
+use ds_motion::presence::spec::PresenceSpec;
+use ds_motion::presence::use_presence::{Presented, use_presence};
 
 /// The level an OSD shows: the value and the glyph that follows it.
 #[derive(Debug, Clone, Copy, PartialEq)]

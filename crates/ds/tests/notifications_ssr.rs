@@ -10,7 +10,7 @@ mod cases;
 mod golden;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
+use ds_lint::{LintConfig, markup};
 
 fn render(make: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(make);

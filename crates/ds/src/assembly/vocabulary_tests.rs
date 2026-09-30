@@ -1,7 +1,7 @@
 //! The vocabulary the kits give the linter, checked against the stylesheet they generate.
 
 use crate::assembly::kit::kits;
-use crate::lint::{tokenize, walk};
+use ds_lint::{tokenize, walk};
 
 /// Every custom property the generated sections declare on a `.ds` root block (the reset, token,
 /// accent, material, shape and ground sections), asked of the generated CSS itself.

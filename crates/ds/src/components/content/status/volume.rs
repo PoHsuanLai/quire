@@ -4,10 +4,10 @@
 
 use crate::components::content::level_glyph::glyph::{LevelGlyphView, waves};
 use crate::components::content::level_glyph::vocab::LevelGlyph;
-use ds_motion::detail::{detailed::Detailed, moment::Moment};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Muting;
+use ds_motion::detail::{detailed::Detailed, moment::Moment};
 use ds_style::icon::render::IconSize;
 
 /// How many waves a heard speaker shows: none at 0, then by thirds (as `LevelGlyph`).

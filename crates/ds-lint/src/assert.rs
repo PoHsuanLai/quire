@@ -5,7 +5,7 @@ use std::collections::BTreeMap;
 use super::rule::{Exception, LintConfig, Rule};
 use super::severity;
 use super::stylesheet::every_offence;
-use crate::lint::rule::Offence;
+use crate::rule::Offence;
 
 /// Panic, listing every offence with its line and column, unless `css` is clean once
 /// `config.exceptions` are applied and every exception suppressed at least one offence. An

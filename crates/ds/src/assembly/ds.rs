@@ -47,7 +47,6 @@ use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::toast::ToastHost;
 use crate::focus::click::ClickRoot;
 use crate::host::signals::HostSignals;
-use ds_motion::hover_intent::HoverWarmth;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
 use crate::root::typeface::{use_typeface, use_typeface_provider};
@@ -59,6 +58,7 @@ use dioxus::prelude::*;
 use ds_core::geometry::scale::Scale;
 use ds_core::vocab::{Activity, InputModality};
 use ds_core::word::Word;
+use ds_motion::hover_intent::HoverWarmth;
 use ds_style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };

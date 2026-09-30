@@ -30,11 +30,11 @@ use crate::components::overlays::{
     sheet::Sheet, sheet_placement::SheetPlacement, sheet_width::SheetWidth,
 };
 use crate::focus::soon::focus_soon;
-use ds_motion::anim::Anim;
-use ds_motion::presence::spring::use_spring_presence;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
+use ds_motion::anim::Anim;
+use ds_motion::presence::spring::use_spring_presence;
 use ds_style::icon::render::IconSize;
 use std::rc::Rc;
 

@@ -2,7 +2,7 @@
 //! per warning rule, that they stay warnings (never in `stylesheet` or `markup`, never failing
 //! `assert_clean`), that Standard does not run them, and quire's own stylesheet under them.
 
-use ds::lint::{
+use ds_lint::{
     Exception, LintConfig, Offence, Profile, Rule, Severity, WARNINGS, assert_clean, markup,
     markup_warnings, stylesheet, warnings,
 };

@@ -7,7 +7,7 @@ use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
 use ds::Word;
-use ds::lint::{Exception, LintConfig, Profile, markup};
+use ds_lint::{Exception, LintConfig, Profile, markup};
 use ds_native::{Viewport, snapshot_at};
 use std::time::Duration;
 

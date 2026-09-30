@@ -1,7 +1,7 @@
 //! The battery item's state and what each change of it means (design/26-DETAILS.md 5.1.3).
 
-use ds_motion::detail::{detailed::Detailed, moment::Moment};
 use ds_core::vocab::Fraction;
+use ds_motion::detail::{detailed::Detailed, moment::Moment};
 
 /// Where the power comes from.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

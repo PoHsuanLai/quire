@@ -9,8 +9,6 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
 };
 use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
-use ds_motion::anim::Anim;
-use ds_motion::entrance::use_entrance;
 use dioxus::prelude::*;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},
@@ -18,6 +16,8 @@ use ds_core::geometry::{
 };
 use ds_core::vocab::Check;
 use ds_core::vocab::Dismiss;
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
 use ds_style::tokens::layer::ZLayer;
 
 /// One bubble button.

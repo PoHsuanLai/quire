@@ -1,5 +1,5 @@
 //! `Rule::UnknownAnimation`: the keyframes an `animation-name` or an `animation` shorthand
-//! names must be ones an [`crate::Anim`] plays. The shorthand was read only as
+//! names must be ones an `Anim` plays. The shorthand was read only as
 //! `animation-name` before, so `animation: sparkle 1s` passed; now each of its
 //! comma-separated animations is parsed for its name: the first identifier that is not one of
 //! the shorthand's keywords (an easing, an iteration count, a direction, a fill mode, a play

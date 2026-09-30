@@ -7,9 +7,9 @@
 //! and plays `hold`, so the restyle that drops the exit leaves no half-faded value behind
 //!. Independent of any list: a card on the desktop is not a row.
 
+use dioxus::prelude::*;
 use ds_motion::anim::Anim;
 use ds_motion::timer::use_motion_timer;
-use dioxus::prelude::*;
 
 /// Whether a placed widget's card stays or is on its way out.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]

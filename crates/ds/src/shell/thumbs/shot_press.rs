@@ -6,8 +6,8 @@
 //! ([`DragLane::NotRight`]), a press that crosses the threshold heading mostly right is the
 //! swipe's, not a drag: it starts none and does not open either.
 
-use ds_motion::drag::{DRAG_THRESHOLD, Drag, DragPhase};
 use ds_core::geometry::units::Point;
+use ds_motion::drag::{DRAG_THRESHOLD, Drag, DragPhase};
 
 /// A drag out of the thumbnail began: the press point, and where the pointer crossed the
 /// threshold. Client coordinates, as the pointer events report them.

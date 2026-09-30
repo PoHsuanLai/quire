@@ -2,9 +2,9 @@
 //! (design/04-COMPONENTS.md section 34).
 
 use crate::host::measure::client_rect;
-use ds_motion::drag_return::DragReturn;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
+use ds_motion::drag_return::DragReturn;
 use std::rc::Rc;
 
 /// Where the ghost's corner sits relative to the pointer: `(x - 40, y - 18)` (`C:2053-2054`).

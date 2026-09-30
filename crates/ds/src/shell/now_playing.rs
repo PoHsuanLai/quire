@@ -9,13 +9,13 @@ pub(crate) mod track_position;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
+use dioxus::core::queue_effect;
+use dioxus::prelude::*;
 use ds_motion::detail::level::use_level;
 use ds_motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
 };
-use dioxus::core::queue_effect;
-use dioxus::prelude::*;
 use ds_style::appearance::motion::MotionLevel;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};

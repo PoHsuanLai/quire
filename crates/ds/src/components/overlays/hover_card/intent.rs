@@ -11,11 +11,11 @@
 
 use super::{Anchors, use_anchors};
 use crate::host::measure::MountedRef;
-use ds_motion::hover_intent::HoverEvent;
 use crate::stack::hover_hub::{HoverHub, HoverKey, HoverKind, use_hover_hub};
 use crate::stack::layer_stack::LayerStack;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Rect;
+use ds_motion::hover_intent::HoverEvent;
 
 /// What a hook-keyed card is placed against.
 #[derive(Debug, Clone, PartialEq)]

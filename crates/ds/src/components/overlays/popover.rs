@@ -10,8 +10,6 @@
 
 use crate::host::measure::client_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
-use ds_motion::anim::Anim;
-use ds_motion::timer::use_motion_timer;
 use crate::stack::host::{OverlayId, Overlays, use_overlays};
 use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
 use dioxus::core::{current_scope_id, queue_effect};
@@ -23,6 +21,8 @@ use ds_core::geometry::{
 use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
+use ds_motion::anim::Anim;
+use ds_motion::timer::use_motion_timer;
 use ds_style::tokens::layer::ZLayer;
 
 /// Which surface a popover draws.

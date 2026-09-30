@@ -10,5 +10,5 @@ pub(crate) mod stylesheet;
 
 #[cfg(test)]
 mod stored_words;
-#[cfg(all(test, feature = "lint"))]
+#[cfg(test)]
 mod vocabulary_tests;

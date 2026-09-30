@@ -2,8 +2,8 @@
 //! 5.2.2, 5.2.3, 5.2.8): joining a network, connecting a device, switching the
 //! sound output.
 
-use ds_motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 use ds_core::word::Word;
+use ds_motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 
 /// An operation on the row's item, stamped by the service that runs it: the same stamp is the
 /// same event, so a re-poll plays nothing and a repeated failure never shakes again (R6).

@@ -4,11 +4,11 @@
 
 use crate::components::controls::button_size::disabled;
 use crate::components::controls::press::PressListeners;
-use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use crate::shell::now_playing::kind::Playback;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::Availability;
+use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_style::icon::render::IconSize;
 
 /// Play or pause as `playback` offers next, named for that action ("Play", "Pause").

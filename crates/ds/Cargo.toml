@@ -21,95 +21,28 @@ thiserror = { workspace = true }
 futures-timer = { workspace = true }
 # Decoding a status icon's PNG to decide symbolic or image (design/08-ICONS.md section 1.5).
 image = { workspace = true }
-cssparser = { workspace = true, optional = true }
 
 [lints]
 workspace = true
 
 [dev-dependencies]
 dioxus-ssr = { workspace = true }
+ds-lint = { workspace = true }
 ds-core = { workspace = true, features = ["testing"] }
 
-[features]
-# The stylesheet linter; downstream crates enable it in their tests.
-lint = ["dep:cssparser"]
 
-# root_ssr's frame-layer case lints an SSR render, so it needs the linter too.
-[[test]]
-name = "root_ssr"
-required-features = ["lint"]
 
-# The linter's own tests need the linter.
-[[test]]
-name = "lint_rules"
-required-features = ["lint"]
 
-[[test]]
-name = "lint_exceptions"
-required-features = ["lint"]
 
-[[test]]
-name = "self_lint"
-required-features = ["lint"]
 
-# The HIG guardrails, warnings for now (design/27 section 7, H0).
-[[test]]
-name = "hig_lint"
-required-features = ["lint"]
 
-# A consumer class on a quire button, linted (mailo gaps 6).
-[[test]]
-name = "pass_through_lint"
-required-features = ["lint"]
 
-[[test]]
-name = "control_center_ssr"
-required-features = ["lint"]
 
-[[test]]
-name = "widgets_ssr"
-required-features = ["lint"]
 
-# The widget contract's cards, linted (design/23 section 9).
-[[test]]
-name = "widget_contract_ssr"
-required-features = ["lint"]
 
-# The notification parts, linted (sill Q120-Q125).
-[[test]]
-name = "notifications_ssr"
-required-features = ["lint"]
 
-# MonthGrid, linted (sill Q180).
-[[test]]
-name = "month_grid_ssr"
-required-features = ["lint"]
 
-# The screenshot thumbnail, linted (sill Q181).
-[[test]]
-name = "shot_thumbnail_ssr"
-required-features = ["lint"]
 
-# The lock screen, polkit prompt and app switcher, linted (M11).
-[[test]]
-name = "lock_switcher_ssr"
-required-features = ["lint"]
 
-# The user's picture and its picker, linted (design/25-EMOJI.md section 7).
-[[test]]
-name = "user_picture_ssr"
-required-features = ["lint"]
 
-# Animated emoji, linted (design/25-EMOJI.md).
-[[test]]
-name = "emoji_ssr"
-required-features = ["lint"]
 
-# The PDF thumbnail, linted (sill M9).
-[[test]]
-name = "pdf_thumb_ssr"
-required-features = ["lint"]
-
-[[test]]
-name = "voice_orb_ssr"
-required-features = ["lint"]

@@ -4,12 +4,12 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::spinner::Spinner;
+use crate::shell::control_center::module_tile_kind::ModuleState;
+use dioxus::prelude::*;
 use ds_motion::detail::{
     detailed::Detailed, moment::Moment, touch::Touch, use_detail::use_detail,
     use_operation::use_operation,
 };
-use crate::shell::control_center::module_tile_kind::ModuleState;
-use dioxus::prelude::*;
 use ds_style::icon::render::IconSize;
 
 /// The disc's own reading of the module's state: what the disc plays is its Pending ring.
@@ -57,11 +57,11 @@ pub(crate) fn ModuleDisc(glyph: IconSource, state: ModuleState) -> Element {
 #[cfg(test)]
 mod tests {
     use super::Lighting;
+    use crate::shell::control_center::module_tile_kind::ModuleState::{Busy, Off, On};
     use ds_motion::detail::{
         detailed::{first_table, moment_table},
         moment::Moment,
     };
-    use crate::shell::control_center::module_tile_kind::ModuleState::{Busy, Off, On};
 
     #[test]
     fn the_disc_reads_coming_on_as_its_success() {

@@ -8,11 +8,11 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::lint::{LintConfig, markup};
 use ds::{
     Activity, Appearance, Ds, Hex, Inject, Material, ORB_PERIOD, OrbColour, OrbColours, Px,
     VoiceOrb,
 };
+use ds_lint::{LintConfig, markup};
 use std::time::Duration;
 
 fn root(body: Element) -> Element {

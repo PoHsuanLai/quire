@@ -6,6 +6,7 @@
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use super::wifi_state::{WifiReach, WifiState};
+use dioxus::prelude::*;
 use ds_motion::detail::{
     morph::Slashed,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
@@ -14,7 +15,6 @@ use ds_motion::detail::{
     use_operation::use_operation,
     use_pending::use_pending,
 };
-use dioxus::prelude::*;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
 use ds_style::icon::stroke::stroke_width;

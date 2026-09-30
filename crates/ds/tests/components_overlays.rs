@@ -368,10 +368,9 @@ fn overlay_stylesheets_use_tokens_only() {
 
 /// Coherence rule 2 on the overlay goldens: every class is one the stylesheet styles and no
 /// element is hand-written markup, except what quire's own components must write inline.
-#[cfg(feature = "lint")]
 #[test]
 fn every_overlay_golden_lints_clean() {
-    use ds::lint::{Exception, LintConfig, Rule, markup};
+    use ds_lint::{Exception, LintConfig, Rule, markup};
     const EXCEPTIONS: &[Exception] = &[
         Exception {
             rule: Rule::HexColour,

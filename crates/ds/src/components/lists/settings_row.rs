@@ -15,13 +15,13 @@ use crate::components::controls::press::PressListeners;
 use crate::components::controls::spinner::{SPIN, ring};
 use crate::components::lists::settings_row_phase::{RowDisc, RowPhase};
 use crate::components::lists::settings_row_trailing::{RowTrailing, trailing as trailing_mark};
+use dioxus::prelude::*;
+use ds_core::press::Press;
+use ds_core::vocab::Availability;
 use ds_motion::detail::{
     pending::PendingFrame, touch::Touch, use_detail::use_detail, use_operation::use_operation,
     use_pending::use_pending,
 };
-use dioxus::prelude::*;
-use ds_core::press::Press;
-use ds_core::vocab::Availability;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
