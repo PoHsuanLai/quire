@@ -6,7 +6,7 @@
 //! Both are written to DIR, and with `--progress` copied to the progress page's shots.
 
 use crate::error::GalleryError;
-use crate::pages::level_tile::{Ground, LevelTile, STATES};
+use crate::pages::shell::level_tile::{Ground, LevelTile, STATES};
 use crate::progress_copy::ProgressCopy;
 use crate::snapshot::progress_dir;
 use crate::style;

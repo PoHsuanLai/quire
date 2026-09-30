@@ -5,7 +5,7 @@
 
 use crate::error::GalleryError;
 use crate::level_sheet::stacked;
-use crate::pages::level_tile::work;
+use crate::pages::shell::level_tile::work;
 use crate::style;
 use dioxus::prelude::*;
 use ds::{

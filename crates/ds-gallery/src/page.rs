@@ -40,14 +40,15 @@ pub enum Page {
     Motion,
     /// The Space editor and the eight presets.
     Space,
-    /// What is missing: components and tokens the design names and quire does not draw yet.
-    Gaps,
+    /// What Blitz cannot do and what quire draws instead, and what the design names that quire
+    /// does not draw yet.
+    BlitzLimits,
     /// Every component in every state, one grid.
     Matrix,
     /// Fire each animation; the Rust `settle` beside the CSS declaration.
     MotionLab,
     /// The shell chrome beside the macOS numbers it targets.
-    Polish,
+    ChromeTargets,
     /// The edit surface over an app's own text, with the caret the app draws from its rect.
     Edit,
     /// The level control's three looks and the OSD card that carries it.
