@@ -60,7 +60,7 @@ pub fn SidebarSection() -> Element {
                                 items: places(here(), EventHandler::new(move |key| here.set(key))),
                                 onselect: move |key| here.set(key),
                                 header: rsx! {
-                                    TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Small, oninput: move |next| query.set(next) }
+                                    TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Regular, oninput: move |next| query.set(next) }
                                 },
                             }
                         }
