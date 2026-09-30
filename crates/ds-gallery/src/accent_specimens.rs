@@ -103,7 +103,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
         paint.fill, paint.ink, paint.text, paint.text_material, paint.wash, paint.ring
     );
     rsx! {
-        style { {CSS} }
+        AppStyle { css: CSS }
         div { class: "g-acc",
             div { class: "g-acc-head",
                 span { class: "g-name", "Accent band B (Airy), Blue — {scheme.slug()}" }

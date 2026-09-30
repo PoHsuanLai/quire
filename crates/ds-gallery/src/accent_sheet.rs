@@ -40,7 +40,7 @@ fn Sheet() -> Element {
     };
     rsx! {
         Ds { appearance: Appearance { theme, ..Appearance::default() }, material: Material::Window,
-            style { {style::CSS} }
+            AppStyle { css: style::CSS }
             Specimens { scheme }
         }
     }

@@ -2,6 +2,7 @@
 //! component sheet registered in one ordered list, and the `Ds` root that draws the overlay and
 //! toast hosts and the window frame around a surface.
 
+pub mod app_style;
 pub mod ds;
 pub(crate) mod kit;
 pub mod selectors;

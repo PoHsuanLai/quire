@@ -31,7 +31,7 @@ pub fn App() -> Element {
             // paints, and its components stay on paper.
             chrome: Some(RootChrome::Painted),
             ground: Some(Ground::Paper),
-            style { {style::CSS} }
+            AppStyle { css: style::CSS }
             div { class: "g-app",
                 Toolbar {}
                 div { class: "g-card",
