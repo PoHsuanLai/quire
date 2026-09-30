@@ -19,6 +19,10 @@
 .ds-notification{ position:relative; box-sizing:border-box; width:var(--notifications-banner-width); max-width:100%; color:var(--ink);
   padding-bottom:calc(var(--layers,0) * var(--notifications-group-offset)); }
 
+/* The keyboard's cursor on a card of a list (`data-focus=ring`, which the list's owner writes: its
+   rows are not focus targets, the list keeps the cursor): the focus ring, as a focused control's. */
+.ds-notification[*|data-focus=ring]{ outline:var(--ring) solid var(--accent-ring); outline-offset:var(--focus-gap); border-radius:var(--m-radius); }
+
 .ds-notification-layer{ position:absolute; top:calc(var(--i) * var(--notifications-group-offset)); bottom:calc((var(--layers) - var(--i)) * var(--notifications-group-offset));
   left:calc(var(--i) * var(--s-6)); right:calc(var(--i) * var(--s-6)); border-radius:var(--m-radius); opacity:calc(1 - var(--i) * .2); pointer-events:none; }
 
