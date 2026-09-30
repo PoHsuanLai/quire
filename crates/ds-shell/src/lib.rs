@@ -9,6 +9,7 @@ pub mod battery;
 pub mod catalog;
 pub(crate) mod clock;
 pub(crate) mod control_center;
+pub(crate) mod date_picker;
 pub(crate) mod dock_parts;
 pub mod emoji;
 pub(crate) mod idle_dim;
@@ -50,6 +51,10 @@ pub use crate::{
         module_panel::{ModulePanel, PanelPlate},
         module_tile::ModuleTile,
         module_tile_kind::{Chevron, ModuleState, TileSpan},
+    },
+    date_picker::{
+        model::{DateValue, Elements, PickerStyle, Segment, TimeOfDay},
+        view::DatePicker,
     },
     dock_parts::{DockFloor, DockLabel, RunningDot},
     emoji::{

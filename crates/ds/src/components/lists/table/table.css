@@ -1,0 +1,33 @@
+/* Table (design/30 section 2.6, `NSTableView`). Attribute selectors carry `*|` (spike S2). The
+   header and every row lay their cells on the grid `--table-cols` the root carries, so a resize
+   moves one number and every row follows. No row is striped; the header sits on a hairline and a
+   column's title darkens under the pointer (the one hover a table shows). The edge between two
+   headers is a 6 px drag zone with the resize cursor and a hairline at its middle. */
+
+.ds-table{ --table-cols:1fr; display:flex; flex-direction:column; min-width:0; }
+.ds-table-header{
+  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:24px;
+  border-bottom:var(--hair) solid var(--line); position:relative;
+}
+.ds-table-column{
+  display:flex; align-items:center; gap:var(--s-4); min-width:0; padding:0 var(--s-8); border:0; background:transparent;
+  font:inherit; font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); text-align:start; cursor:default;
+}
+.ds-table-column[*|data-align=trailing]{ justify-content:flex-end; }
+.ds-table-column:hover{ color:var(--ink); }
+.ds-table-column[*|aria-disabled=true]:hover{ color:var(--ink-soft); }
+.ds-table-column[*|aria-sort=ascending],
+.ds-table-column[*|aria-sort=descending]{ color:var(--ink); }
+.ds-table-sort{ display:inline-flex; flex:none; line-height:0; color:var(--ink-faint); }
+.ds-table-title{ min-width:0; overflow:hidden; white-space:nowrap; }
+
+.ds-table-head{ position:relative; display:flex; min-width:0; }
+.ds-table-head > .ds-table-column{ flex:1 1 auto; }
+.ds-table-resize{ position:absolute; top:0; bottom:0; right:-3px; width:6px; z-index:var(--z-raise); cursor:ew-resize; }
+.ds-table-resize::after{ content:""; position:absolute; top:5px; bottom:5px; left:3px; width:var(--hair); background:var(--line); }
+
+.ds-table-cells{ display:grid; grid-template-columns:var(--table-cols); align-items:center; flex:1 1 auto; min-width:0; }
+.ds-table-cell{ min-width:0; padding:0 var(--s-8); }
+.ds-table-cell[*|data-align=trailing]{ text-align:end; }
+.ds-table .ds-row{ padding:0; }
+.ds-table .ds-row-words{ display:flex; flex-direction:row; }

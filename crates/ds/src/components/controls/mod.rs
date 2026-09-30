@@ -9,6 +9,7 @@ pub mod checkbox;
 pub mod chip;
 pub mod choice;
 pub mod disclosure;
+pub(crate) mod edge_grab;
 pub(crate) mod glyph;
 pub mod key_equivalent;
 pub(crate) mod level_draw;

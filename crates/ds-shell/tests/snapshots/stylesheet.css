@@ -1032,8 +1032,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-disclosure-content{ display:flow-root; }
 /* -- drag_ghost -- */
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
-   The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
-   `.ds-truncate`. No enter or exit animation. The dragged source is
+   The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)), 1:1 with the pointer and
+   flat (design/30 section 2.5: no tilt); its title and sub truncate with `.ds-truncate`; a drag of
+   several things puts the count badge on its corner. No enter or exit animation. The dragged source is
    `[data-drag=source]` at .35 and a hovered drop target `[data-drop=target]`, both written from
    `DropState` by ListRow and SidebarItem, whose stylesheets carry the rules. */
 
@@ -1041,8 +1042,9 @@ html,body{margin:0;padding:0;background:transparent}
   position:fixed; z-index:var(--z-drag); pointer-events:none; width:250px; box-sizing:border-box; padding:var(--s-9) var(--s-11);
   border-radius:var(--r-card); background:var(--raise); border:var(--hair) solid var(--line);
   box-shadow:var(--shadow-drag); font-size:var(--fs-control); font-weight:700; color:var(--ink);
-  transform:scale(1.02);
 }
+.ds-drag-ghost-title{ display:block; }
+.ds-drag-ghost-count{ position:absolute; top:calc(-1 * var(--s-6)); right:calc(-1 * var(--s-6)); line-height:0; }
 .ds-drag-ghost-sub{ font-weight:500; color:var(--ink-faint); font-size:var(--fs-small); }
 
 .ds-grip{
@@ -1147,6 +1149,26 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-empty-state-title{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
 .ds-empty-state-body{ max-width:32em; font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
 .ds-empty-state-action{ display:flex; gap:var(--s-8); align-items:center; justify-content:center; margin-top:var(--s-8); }
+/* -- field_row -- */
+/* FieldRow and FieldGroup (design/30 section 2.2, `NSGridView`). Attribute selectors carry `*|`
+   (spike S2). A row is 36 px at least: the label column with its help under it, the control
+   column. In a group the rows are one card with a hairline between them. A disabled row draws at
+   the disabled .35 and takes no pointer. */
+
+.ds-field-row{ display:flex; align-items:center; gap:var(--s-12); box-sizing:border-box; min-height:36px; padding:var(--s-6) var(--s-12); min-width:0; }
+.ds-field-row-label{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
+.ds-field-row-title{ font-size:var(--fs-control); color:var(--ink); line-height:1.3; }
+.ds-field-row-help{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+.ds-field-row-control{ display:flex; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
+.ds-field-row[*|data-layout=form]{ padding-left:0; }
+.ds-field-row[*|data-layout=form] .ds-field-row-label{ flex:none; width:120px; align-items:flex-end; text-align:end; }
+.ds-field-row[*|data-layout=form] .ds-field-row-control{ flex:1 1 0; justify-content:flex-start; }
+.ds-field-row[*|aria-disabled=true],
+.ds-field-row[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+
+.ds-field-group{ display:flex; flex-direction:column; min-width:0; }
+.ds-field-group-rows{ border-radius:var(--r-card); background:var(--surface); box-shadow:inset 0 0 0 var(--hair) var(--line); overflow:hidden; }
+.ds-field-group-rows > .ds-field-row + .ds-field-row{ border-top:var(--hair) solid var(--line); }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
    the side card `S:428`, the live dot `S:561`. It fades in over `--t-quick` (design/30 section
@@ -2079,6 +2101,15 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-side-panel[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-side-panel-header{ display:flex; align-items:center; flex:none; }
 .ds-side-panel-body{ display:flex; flex-direction:column; gap:var(--s-8); flex:1; min-height:0; }
+/* -- sidebar -- */
+/* Sidebar (design/30 section 2.7): the sidebar ground (`--aside`) down the pane's whole height, the
+   header above the list, the list scrolling under it. */
+
+.ds-sidebar{ display:flex; flex-direction:column; box-sizing:border-box; height:100%; min-height:0; background:var(--aside); color:var(--ink); }
+.ds-sidebar-header{ flex:none; padding:var(--s-12) var(--s-10) var(--s-8); }
+.ds-sidebar-body{ flex:1 1 0; min-height:0; overflow-y:auto; padding:0 var(--s-10) var(--s-10); }
+.ds-sidebar-header + .ds-sidebar-body{ padding-top:0; }
+.ds-sidebar > .ds-sidebar-body:first-child{ padding-top:var(--s-12); }
 /* -- skeleton -- */
 /* Skeleton (design/30 section 2.9): a placeholder in the quiet fill, static (no shimmer), that
    fades in and out over `--t-quick` (the content cross-fades against it). A line is one line
@@ -2339,6 +2370,58 @@ html,body{margin:0;padding:0;background:transparent}
   opacity:0; transform:scale(.85);
 }
 .ds-spinner[*|data-pending=step]{ opacity:.9; transform:rotate(var(--turn)); }
+/* -- split_view -- */
+/* SplitView (design/30 section 2.7, `NSSplitView`). Attribute selectors carry `*|` (spike S2). A
+   row of panes: each before the last is as wide as `--pane-w` (a spring in Rust writes it while a
+   pane folds, the pointer while a divider is held) and clips its body, which keeps the width the
+   pane has when open (`--pane-open`), so folding slides the body away instead of squeezing it.
+   The divider is a 6 px zone, the resize cursor over it, with the hairline in its middle; it
+   takes the accent while held or focused. */
+
+.ds-split{ display:flex; align-items:stretch; min-width:0; min-height:0; height:100%; }
+.ds-split-pane{ --pane-w:0px; --pane-open:0px; position:relative; flex:none; width:var(--pane-w); min-width:0; overflow:hidden; }
+.ds-split-pane[*|data-shown=hidden]{ pointer-events:none; }
+.ds-split-pane-body{ box-sizing:border-box; width:var(--pane-open); height:100%; }
+.ds-split-rest{ flex:1 1 0; min-width:0; min-height:0; }
+
+.ds-split-divider{ position:relative; flex:none; width:6px; margin:0 calc(-1 * var(--s-3)); z-index:var(--z-raise); cursor:ew-resize; outline:none; }
+.ds-split-divider::after{
+  content:""; position:absolute; top:0; bottom:0; left:3px; width:var(--hair); background:var(--line);
+  transition:background-color var(--t-quick) var(--e-in-out);
+}
+.ds-split[*|data-dragging=true] .ds-split-divider::after,
+.ds-split-divider:focus::after{ background:var(--accent); }
+/* -- stepper -- */
+/* Stepper (design/30 section 2.1, `NSStepper`). Attribute selectors carry `*|` (spike S2); the
+   focus ring is the global one, on the pair (spike S12). The pair is one bezel the rung's height
+   tall and 60% of that wide, split into two halves by a hairline; a half under the pointer's
+   press darkens, and one that cannot go further dims. With a field the pair sits right after it. */
+
+.ds-stepper{ --stp-h:var(--ctl-h-m); --stp-r:var(--ctl-r-m);
+  display:inline-flex; align-items:center; gap:var(--s-4); flex:none; vertical-align:middle;
+}
+.ds-stepper[*|data-size=mini]{ --stp-h:var(--ctl-h-xs); --stp-r:var(--ctl-r-xs); }
+.ds-stepper[*|data-size=small]{ --stp-h:var(--ctl-h-s); --stp-r:var(--ctl-r-s); }
+.ds-stepper[*|data-size=large]{ --stp-h:var(--ctl-h-l); --stp-r:var(--ctl-r-l); }
+.ds-stepper .ds-text-field{ width:56px; }
+
+.ds-stepper-pair{
+  display:flex; flex-direction:column; box-sizing:border-box; flex:none; width:calc(var(--stp-h) * .62); height:var(--stp-h);
+  border-radius:var(--stp-r); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1);
+  overflow:hidden; cursor:default; user-select:none; color:var(--ink-soft);
+}
+.ds-stepper-up,
+.ds-stepper-down{
+  display:grid; place-items:center; flex:1 1 0; min-height:0; line-height:0;
+  transition:background-color var(--t-quick) var(--e-in-out);
+}
+.ds-stepper-down{ border-top:var(--hair) solid var(--line); }
+.ds-stepper-up[*|data-pressed],
+.ds-stepper-down[*|data-pressed]{ background:var(--surface); }
+.ds-stepper-up[*|aria-disabled=true],
+.ds-stepper-down[*|aria-disabled=true]{ opacity:.35; }
+.ds-stepper[*|aria-busy=true] .ds-stepper-pair,
+.ds-stepper .ds-stepper-pair[*|aria-disabled=true]{ opacity:.35; pointer-events:none; }
 /* -- status_glyph -- */
 /* The status glyphs (design/26-DETAILS.md 5.1): each glyph a stack of parts, one `svg`
    per part, so the stylesheet can move each part (it cannot reach inside an SVG on Blitz, spike
@@ -2361,6 +2444,50 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-status-glyph[*|data-pending=low]{ opacity:.45; }
 .ds-status-glyph[*|data-kind=volume]{ width:var(--ic-size); height:var(--ic-size); }
 .ds-status-glyph > .ds-level-glyph{ width:100%; height:100%; }
+/* -- tab_view -- */
+/* TabView (design/30 section 2.7): the strip centred over a body framed by a hairline on the
+   surface. The body is the tab's, so its padding is `--s-12`. */
+
+.ds-tab-view{ display:flex; flex-direction:column; align-items:stretch; gap:var(--s-8); min-width:0; }
+.ds-tab-view-strip{ display:flex; justify-content:center; }
+.ds-tab-view-body{
+  box-sizing:border-box; min-width:0; padding:var(--s-12); border-radius:var(--r-card); background:var(--surface);
+  box-shadow:inset 0 0 0 var(--hair) var(--line);
+}
+/* -- table -- */
+/* Table (design/30 section 2.6, `NSTableView`). Attribute selectors carry `*|` (spike S2). The
+   header and every row lay their cells on the grid `--table-cols` the root carries, so a resize
+   moves one number and every row follows. No row is striped; the header sits on a hairline and a
+   column's title darkens under the pointer (the one hover a table shows). The edge between two
+   headers is a 6 px drag zone with the resize cursor and a hairline at its middle. */
+
+.ds-table{ --table-cols:1fr; display:flex; flex-direction:column; min-width:0; }
+.ds-table-header{
+  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:24px;
+  border-bottom:var(--hair) solid var(--line); position:relative;
+}
+.ds-table-column{
+  display:flex; align-items:center; gap:var(--s-4); min-width:0; padding:0 var(--s-8); border:0; background:transparent;
+  font:inherit; font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); text-align:start; cursor:default;
+}
+.ds-table-column[*|data-align=trailing]{ justify-content:flex-end; }
+.ds-table-column:hover{ color:var(--ink); }
+.ds-table-column[*|aria-disabled=true]:hover{ color:var(--ink-soft); }
+.ds-table-column[*|aria-sort=ascending],
+.ds-table-column[*|aria-sort=descending]{ color:var(--ink); }
+.ds-table-sort{ display:inline-flex; flex:none; line-height:0; color:var(--ink-faint); }
+.ds-table-title{ min-width:0; overflow:hidden; white-space:nowrap; }
+
+.ds-table-head{ position:relative; display:flex; min-width:0; }
+.ds-table-head > .ds-table-column{ flex:1 1 auto; }
+.ds-table-resize{ position:absolute; top:0; bottom:0; right:-3px; width:6px; z-index:var(--z-raise); cursor:ew-resize; }
+.ds-table-resize::after{ content:""; position:absolute; top:5px; bottom:5px; left:3px; width:var(--hair); background:var(--line); }
+
+.ds-table-cells{ display:grid; grid-template-columns:var(--table-cols); align-items:center; flex:1 1 auto; min-width:0; }
+.ds-table-cell{ min-width:0; padding:0 var(--s-8); }
+.ds-table-cell[*|data-align=trailing]{ text-align:end; }
+.ds-table .ds-row{ padding:0; }
+.ds-table .ds-row-words{ display:flex; flex-direction:row; }
 /* -- text_field -- */
 /* TextField (design/30 section 2.2, `NSTextField`, `NSSecureTextField`, `NSSearchField`).
    Attribute selectors carry `*|` (spike S2). The root holds the field and the notes under it; the
@@ -2606,6 +2733,23 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-toggle[*|data-pressed][*|aria-checked=true] .ds-toggle-track{ background:var(--accent-text); }
 .ds-toggle[*|aria-disabled=true],
 .ds-toggle[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+/* -- toolbar -- */
+/* Toolbar (design/30 section 2.7, `NSToolbar`). Attribute selectors carry `*|` (spike S2). A 52
+   px band: the leading items at the start, the title centred in what is left, the trailing items
+   at the end, `--s-12` in from each edge. The title is 13 pt semibold over an optional subtitle
+   in the faint ink; a control put in its place is centred the same way. Items are toolbar
+   buttons, each 40 px with its gap (the pitch the overflow rule counts by). */
+
+.ds-toolbar{
+  display:flex; align-items:center; box-sizing:border-box; flex:none; height:52px; padding:0 var(--s-12); gap:var(--s-8);
+  min-width:0; color:var(--ink); user-select:none;
+}
+.ds-toolbar-leading,
+.ds-toolbar-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-8); }
+.ds-toolbar-trailing{ margin-left:auto; }
+.ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
+.ds-toolbar-heading{ max-width:100%; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-toolbar-subtitle{ max-width:100%; font-size:var(--fs-help); color:var(--ink-faint); }
 /* -- tooltip -- */
 /* Tooltip (design/30 section 2.5, `NSToolTip`): one line on the popover's surface, below its
    target, opened by the Tip profile through the hover hub (1 s cold, at once while the hub is
@@ -2714,12 +2858,18 @@ html,body{margin:0;padding:0;background:transparent}
   position:relative; flex:0 0 auto; display:flex; align-items:center; height:28px; padding:0 var(--s-13);
   color:var(--f-ink-soft); cursor:default; user-select:none;
 }
-.ds-titlebar[*|data-activation=inactive]{ color:var(--f-ink-faint); }
+.ds-titlebar[*|data-activity=inactive]{ color:var(--f-ink-faint); }
 .ds-titlebar-title{
-  position:absolute; top:0; left:84px; right:84px; line-height:28px; text-align:center;
+  position:absolute; top:0; left:84px; right:84px; height:28px; display:flex; align-items:center; justify-content:center; gap:var(--s-6);
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
+.ds-titlebar-name{ min-width:0; }
+.ds-titlebar-subtitle{ min-width:0; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
+.ds-titlebar-proxy{ display:inline-flex; flex:none; line-height:0; color:var(--f-ink-soft); }
+.ds-titlebar[*|data-activity=inactive] .ds-titlebar-proxy{ opacity:.5; }
+/* The edited dot: the document has changes not saved. */
+.ds-titlebar-edited{ flex:none; width:var(--s-6); height:var(--s-6); border-radius:var(--r-pill); background:var(--f-ink-faint); }
 
 .ds-lights{ position:relative; display:flex; align-items:center; gap:var(--s-8); }
 .ds-light{
@@ -2733,11 +2883,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-theme=dark] .ds-light[*|data-light=close]{ color:var(--c-red-soft); }
 .ds[*|data-theme=dark] .ds-light[*|data-light=minimize]{ color:var(--c-amber-soft); }
 .ds[*|data-theme=dark] .ds-light[*|data-light=zoom]{ color:var(--c-green-soft); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=close],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=close],
 .ds-lights:hover .ds-light[*|data-light=close]{ background:var(--c-red); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=minimize],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=minimize],
 .ds-lights:hover .ds-light[*|data-light=minimize]{ background:var(--c-amber); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=zoom],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=zoom],
 .ds-lights:hover .ds-light[*|data-light=zoom],
 .ds-light[*|data-light=zoom][*|aria-expanded=true]{ background:var(--c-green); }
 .ds-light-mark{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }
@@ -2877,6 +3027,33 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
+/* -- date_picker -- */
+/* DatePicker (design/30 section 2.3, `NSDatePicker`). Attribute selectors carry `*|` (spike S2). The
+   textual style is one bezel like a text field's, the segments in it side by side, the selected
+   one on the accent under its ink, and the stepper after it. The graphical style stacks the
+   month grid over the time field. */
+
+.ds-date-picker{ --dp-h:var(--ctl-h-m); --dp-r:var(--ctl-r-m); --dp-fs:var(--ctl-fs-m);
+  display:inline-flex; align-items:center; gap:var(--s-4); flex:none; font-size:var(--dp-fs);
+}
+.ds-date-picker[*|data-size=mini]{ --dp-h:var(--ctl-h-xs); --dp-r:var(--ctl-r-xs); --dp-fs:var(--ctl-fs-xs); }
+.ds-date-picker[*|data-size=small]{ --dp-h:var(--ctl-h-s); --dp-r:var(--ctl-r-s); --dp-fs:var(--ctl-fs-s); }
+.ds-date-picker[*|data-size=large]{ --dp-h:var(--ctl-h-l); --dp-r:var(--ctl-r-l); --dp-fs:var(--ctl-fs-l); }
+.ds-date-picker[*|data-style=graphical]{ flex-direction:column; align-items:stretch; gap:var(--s-8); }
+
+.ds-date-picker-field{
+  display:inline-flex; align-items:center; box-sizing:border-box; height:var(--dp-h); padding:0 var(--s-4);
+  background:var(--surface); border-radius:var(--dp-r); box-shadow:inset 0 0 0 var(--hair) var(--line);
+  color:var(--ink); white-space:nowrap;
+}
+.ds-date-picker-segment{
+  box-sizing:border-box; height:calc(var(--dp-h) - var(--s-4)); padding:0 var(--s-2); border:0; border-radius:var(--r-micro);
+  background:transparent; color:inherit; font:inherit; font-variant-numeric:tabular-nums; line-height:1; cursor:default;
+}
+.ds-date-picker-segment[*|data-selected=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-date-picker-sep{ color:var(--ink-faint); }
+.ds-date-picker-time{ display:flex; align-items:center; justify-content:center; gap:var(--s-4); }
+.ds-date-picker[*|aria-disabled=true] .ds-date-picker-field{ opacity:.35; pointer-events:none; }
 /* -- device_glyph -- */
 /* DeviceGlyph (design/23-WIDGETS.md section 4.4): a filled device solid in `currentColor`, the
    same `svg.ds-ic` box as every glyph (its size from its attributes), so a battery ring's

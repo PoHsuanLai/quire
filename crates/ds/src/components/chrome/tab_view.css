@@ -1,0 +1,9 @@
+/* TabView (design/30 section 2.7): the strip centred over a body framed by a hairline on the
+   surface. The body is the tab's, so its padding is `--s-12`. */
+
+.ds-tab-view{ display:flex; flex-direction:column; align-items:stretch; gap:var(--s-8); min-width:0; }
+.ds-tab-view-strip{ display:flex; justify-content:center; }
+.ds-tab-view-body{
+  box-sizing:border-box; min-width:0; padding:var(--s-12); border-radius:var(--r-card); background:var(--surface);
+  box-shadow:inset 0 0 0 var(--hair) var(--line);
+}

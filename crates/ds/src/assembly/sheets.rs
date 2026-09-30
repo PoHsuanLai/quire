@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 57] = [
+pub(crate) const SHEETS: [(&str, &str); 64] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
@@ -52,6 +52,10 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
     (
         "empty_state",
         include_str!("../components/overlays/empty_state.css"),
+    ),
+    (
+        "field_row",
+        include_str!("../components/fields/field_row.css"),
     ),
     (
         "hover_card",
@@ -134,6 +138,7 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
         "side_panel",
         include_str!("../components/overlays/side_panel.css"),
     ),
+    ("sidebar", include_str!("../components/chrome/sidebar.css")),
     (
         "skeleton",
         include_str!("../components/overlays/skeleton.css"),
@@ -148,9 +153,22 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
         include_str!("../components/controls/spinner.css"),
     ),
     (
+        "split_view",
+        include_str!("../components/chrome/split_view/split_view.css"),
+    ),
+    (
+        "stepper",
+        include_str!("../components/fields/stepper/stepper.css"),
+    ),
+    (
         "status_glyph",
         include_str!("../components/content/status_glyph.css"),
     ),
+    (
+        "tab_view",
+        include_str!("../components/chrome/tab_view.css"),
+    ),
+    ("table", include_str!("../components/lists/table/table.css")),
     (
         "text_field",
         include_str!("../components/fields/text_field.css"),
@@ -165,6 +183,10 @@ pub(crate) const SHEETS: [(&str, &str); 57] = [
     ),
     ("toast", include_str!("../components/overlays/toast.css")),
     ("toggle", include_str!("../components/controls/toggle.css")),
+    (
+        "toolbar",
+        include_str!("../components/chrome/toolbar/toolbar.css"),
+    ),
     (
         "tooltip",
         include_str!("../components/overlays/tooltip.css"),

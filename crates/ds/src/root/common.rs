@@ -45,17 +45,17 @@ impl fmt::Debug for Common {
 
 impl Common {
     /// `own` (quire's class list) with the consumer's classes after it.
-    pub(crate) fn class(&self, own: &str) -> String {
+    pub fn class(&self, own: &str) -> String {
         class_list(own, self.extra_class.as_ref())
     }
 
     /// The consumer's `data-*` attributes, for an element's spread.
-    pub(crate) fn data_attributes(&self) -> Vec<Attribute> {
+    pub fn data_attributes(&self) -> Vec<Attribute> {
         attributes(&self.data)
     }
 
     /// Hand `event` to the consumer's `mounted` handler, if it gave one.
-    pub(crate) fn mounted(&self, event: MountedEvent) {
+    pub fn mounted(&self, event: MountedEvent) {
         if let Some(mounted) = &self.mounted {
             mounted.call(event);
         }

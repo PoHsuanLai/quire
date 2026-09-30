@@ -1,0 +1,30 @@
+/* Stepper (design/30 section 2.1, `NSStepper`). Attribute selectors carry `*|` (spike S2); the
+   focus ring is the global one, on the pair (spike S12). The pair is one bezel the rung's height
+   tall and 60% of that wide, split into two halves by a hairline; a half under the pointer's
+   press darkens, and one that cannot go further dims. With a field the pair sits right after it. */
+
+.ds-stepper{ --stp-h:var(--ctl-h-m); --stp-r:var(--ctl-r-m);
+  display:inline-flex; align-items:center; gap:var(--s-4); flex:none; vertical-align:middle;
+}
+.ds-stepper[*|data-size=mini]{ --stp-h:var(--ctl-h-xs); --stp-r:var(--ctl-r-xs); }
+.ds-stepper[*|data-size=small]{ --stp-h:var(--ctl-h-s); --stp-r:var(--ctl-r-s); }
+.ds-stepper[*|data-size=large]{ --stp-h:var(--ctl-h-l); --stp-r:var(--ctl-r-l); }
+.ds-stepper .ds-text-field{ width:56px; }
+
+.ds-stepper-pair{
+  display:flex; flex-direction:column; box-sizing:border-box; flex:none; width:calc(var(--stp-h) * .62); height:var(--stp-h);
+  border-radius:var(--stp-r); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1);
+  overflow:hidden; cursor:default; user-select:none; color:var(--ink-soft);
+}
+.ds-stepper-up,
+.ds-stepper-down{
+  display:grid; place-items:center; flex:1 1 0; min-height:0; line-height:0;
+  transition:background-color var(--t-quick) var(--e-in-out);
+}
+.ds-stepper-down{ border-top:var(--hair) solid var(--line); }
+.ds-stepper-up[*|data-pressed],
+.ds-stepper-down[*|data-pressed]{ background:var(--surface); }
+.ds-stepper-up[*|aria-disabled=true],
+.ds-stepper-down[*|aria-disabled=true]{ opacity:.35; }
+.ds-stepper[*|aria-busy=true] .ds-stepper-pair,
+.ds-stepper .ds-stepper-pair[*|aria-disabled=true]{ opacity:.35; pointer-events:none; }

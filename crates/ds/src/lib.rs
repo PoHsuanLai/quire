@@ -45,6 +45,17 @@ pub use crate::components::{
         thread_row_hooks::PartHooks,
     },
     chrome::{
+        sidebar::Sidebar,
+        split_view::{
+            model::{Collapsing, DividerDrag, PaneSpec, SplitPane},
+            view::SplitView,
+        },
+        tab_view::{TAB_LIMIT, TabView},
+        titlebar_parts::{DocumentState, TitleParts},
+        toolbar::{
+            model::{ITEM_PITCH, Kept, TITLE_ROOM, ToolbarItem, ToolbarRoom},
+            view::Toolbar,
+        },
         traffic_lights::TilePose,
         window_frame::{TrafficLights, WindowFrame, WindowTitlebar},
     },
@@ -101,7 +112,12 @@ pub use crate::components::{
     },
     editor::{spell_menu::SpellMarks, surface::EditSurface},
     fields::{
+        field_row::{FieldGroup, FieldRow, RowLayout},
         selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
+        stepper::{
+            model::{Readout, StepDirection, StepRange},
+            view::Stepper,
+        },
         text_field::TextField,
         text_field_focus::FieldFocus,
         text_field_model::{FieldBezel, FieldKind, Invalid, Validity},
@@ -129,10 +145,15 @@ pub use crate::components::{
             size::RowSize,
         },
         section_header::SectionHeader,
+        table::{
+            model::{CellAlign, Sort, SortDirection, Sorting, TableColumn, TableRow},
+            view::Table,
+        },
     },
     menus::{
         item::item::{MenuImage, MenuItem},
         menu::{cursor::MenuCursor, menu::Menu, placement::MenuPlacement},
+        menu_bar::{BarCommand, BarMenu, BarSection, MenuBarModel, opens},
         palette::{
             command_palette::CommandPalette,
             palette_claim::{Claim, FieldKey},
@@ -145,7 +166,7 @@ pub use crate::components::{
     overlays::{
         alert::Alert,
         alert_model::{AlertButton, AlertRole, AlertStyle, Suppression},
-        drag_ghost::{DragGhost, DragReturnFrame, DropLine, Grip},
+        drag_ghost::{DragCount, DragGhost, DragReturnFrame, DropLine, Grip},
         empty_state::{EmptyForm, EmptyState},
         flow::Flow,
         hover_card::{
