@@ -3,11 +3,10 @@
 //! keyboard-brightness level's glyph. Each ends at 0 frames; Reduced shows the level at once.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, DeviceBattery, Ds, Fraction, LevelControl, LevelGlyph, Material, Motion, RingMark,
-};
+use ds::{Appearance, Ds, Fraction, LevelControl, LevelGlyph, Material, Motion};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{DeviceBattery, RingMark};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -30,7 +29,7 @@ static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 #[allow(non_snake_case)]
 fn Module() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { id: "mac", DeviceBattery { level: LEVEL(), mark: RingMark::Charging, label: "This computer" } }
             div { id: "keys", LevelControl { label: "Keyboard Brightness".to_owned(), value: Fraction(500), glyph: LevelGlyph::KeyboardBrightness } }
         }

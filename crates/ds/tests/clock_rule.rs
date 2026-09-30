@@ -1,9 +1,9 @@
-//! The clock rule, held over the design system's sources: ds reads time only through
-//! `ds::time` (`now`, `since`, `sleep`), so a harness's virtual clock reaches every timer and
+//! The clock rule, held over the design system's sources (`ds`, `ds-core`, `ds-style`, `ds-motion`,
+//! `ds-shell`): the design system reads time only through `ds::time` (`now`, `since`, `sleep`), so a harness's virtual clock reaches every timer and
 //! every "now". A direct `Instant::now()` (or `.elapsed()` on an `Instant`, which this scan
 //! cannot tell from a tween's own `elapsed`, so review catches it) or a
 //! `futures_timer` sleep would stay on the wall clock and drift from the harness again.
-//! `src/time/` itself and test modules (everything from a file's `#[cfg(test)]` on, and
+//! `ds-core`'s `src/time/` itself and test modules (everything from a file's `#[cfg(test)]` on, and
 //! `*tests.rs` files) are exempt; comments are skipped.
 
 use std::path::{Path, PathBuf};
@@ -47,13 +47,22 @@ fn offences(path: &Path) -> Vec<String> {
         .collect()
 }
 
+/// The crates whose sources the rule covers, next to this one.
+const CRATES: &[&str] = &["ds", "ds-core", "ds-style", "ds-motion", "ds-shell"];
+
 #[test]
 fn ds_reads_time_only_through_ds_time() {
-    let src = Path::new(env!("CARGO_MANIFEST_DIR")).join("src");
-    let found: Vec<String> = sources(&src)
-        .into_iter()
-        .filter(|path| !exempt(path.strip_prefix(&src).unwrap_or(path)))
-        .flat_map(|path| offences(&path))
+    let crates = Path::new(env!("CARGO_MANIFEST_DIR")).join("..");
+    let found: Vec<String> = CRATES
+        .iter()
+        .flat_map(|name| {
+            let src = crates.join(name).join("src");
+            sources(&src)
+                .into_iter()
+                .filter(|path| !exempt(path.strip_prefix(&src).unwrap_or(path)))
+                .flat_map(|path| offences(&path))
+                .collect::<Vec<_>>()
+        })
         .collect();
     assert!(
         found.is_empty(),

@@ -7,7 +7,7 @@ use ds_style::kit::{Kit, KitRank, Kits, STYLE_KIT, Section, Vocabulary};
 use std::borrow::Cow;
 
 /// The components' contribution to the stylesheet.
-pub(crate) static KIT: Kit = Kit {
+pub static KIT: Kit = Kit {
     rank: KitRank::Components,
     tokens: &[],
     sections: &[
@@ -24,14 +24,10 @@ pub(crate) static KIT: Kit = Kit {
     vocabulary: Vocabulary::NONE,
 };
 
-/// Every kit the design system ships: style, motion, the components and the shell.
+/// Every kit the design system ships: style, motion and the components. A crate that adds its own
+/// (`ds_shell::kits()`) lists these and its own.
 pub fn kits() -> Kits {
-    Kits::of(&[
-        &STYLE_KIT,
-        &ds_motion::kit::KIT,
-        &KIT,
-        &crate::shell::kit::KIT,
-    ])
+    Kits::of(&[&STYLE_KIT, &ds_motion::kit::KIT, &KIT])
 }
 
 fn utilities(_: &Kits) -> Cow<'static, str> {

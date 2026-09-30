@@ -1,6 +1,6 @@
 """emojitool build: fetch the curated set and write the sheets and manifest quire ships.
 
-    cd tools/emoji && uv run emojitool build --out ../../crates/ds/assets/emoji
+    cd tools/emoji && uv run emojitool build --out ../../crates/ds-shell/assets/emoji
 """
 
 from __future__ import annotations

@@ -12,10 +12,11 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, LockUser, Material,
-    PolkitPrompt, Rect, ShortcutKey, person_hue,
+    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Material, Rect, ShortcutKey,
+    person_hue,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{LockUser, PolkitPrompt};
 use image::RgbaImage;
 use std::time::Duration;
 
@@ -31,7 +32,7 @@ const TYPED: &str = "hunter2x";
 #[allow(non_snake_case)]
 fn Polkit() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Sheet,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet,
             // The root is as tall as its content; the sheet is drawn over this.
             div { style: "height:400px" }
             PolkitPrompt {

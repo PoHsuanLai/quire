@@ -9,11 +9,11 @@ use dioxus::prelude::*;
 use ds::detail::{Contact, Touch};
 use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
 use ds::{
-    AppKey, AppMark, AppSwitcher, Appearance, Check, DragReturnFrame, Ds, Fraction, Icon,
-    IconSource, Inject, Material, NotificationCard, NotificationSwipe, Pane, PaneSwitcher, Panel,
-    PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet, SheetPlacement, Shown, Slider,
-    SwitcherApp, Toggle,
+    Appearance, Check, DragReturnFrame, Ds, Fraction, Icon, IconSource, Inject, Material, Pane,
+    PaneSwitcher, Panel, PlateFamily, Point, Px, RootChrome, SegmentedControl, Sheet,
+    SheetPlacement, Shown, Slider, Toggle,
 };
+use ds_shell::{AppKey, AppMark, AppSwitcher, NotificationCard, NotificationSwipe, SwitcherApp};
 
 /// The section on the Motion page.
 #[component]

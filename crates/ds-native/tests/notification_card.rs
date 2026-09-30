@@ -4,12 +4,10 @@
 //! opens from two lines to six, measured, and closes again when the pointer leaves.
 
 use dioxus::prelude::*;
-use ds::{
-    AppMark, Appearance, CardAction, Ds, Hover, Icon, IconSource, Material, NotificationCard,
-    Point, Rich, RichRun, RunTone, TextRun,
-};
+use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, TextRun};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
+use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -40,7 +38,7 @@ fn body() -> Rich {
 #[allow(non_snake_case)]
 fn Card() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Toast,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Toast,
             div { style: "padding:24px",
                 NotificationCard {
                     app: AppMark { icon: IconSource::Glyph(Icon::Mail), name: "Mail".into() },

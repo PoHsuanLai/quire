@@ -5,13 +5,14 @@
 //! button, and shows the layout the host hands back.
 
 use dioxus::prelude::*;
-use ds::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-use ds::{
-    Appearance, BatteryWidget, Ds, Lift, Material, RootChrome, Timeline, Widget, WidgetCard,
-    WidgetGallery, WidgetMetrics, WidgetSize, WidgetSlotGuide,
-};
+use ds::{Appearance, Ds, Material, RootChrome};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
+use ds_shell::{
+    BatteryWidget, Lift, Timeline, Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize,
+    WidgetSlotGuide,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -29,7 +30,7 @@ const GRID: DesktopGrid = DesktopGrid {
 
 fn desktop(body: Element) -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(), {body} }
         }
     }

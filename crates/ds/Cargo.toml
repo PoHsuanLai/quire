@@ -10,17 +10,11 @@ publish.workspace = true
 
 [dependencies]
 ds-core = { workspace = true }
-ds-core-derive = { workspace = true }
 ds-motion = { workspace = true }
 ds-style = { workspace = true, features = ["dioxus"] }
 dioxus = { workspace = true }
-keyboard-types = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
 thiserror = { workspace = true }
-futures-timer = { workspace = true }
-# Decoding a status icon's PNG to decide symbolic or image (design/08-ICONS.md section 1.5).
-image = { workspace = true }
 
 [lints]
 workspace = true
@@ -29,20 +23,3 @@ workspace = true
 dioxus-ssr = { workspace = true }
 ds-lint = { workspace = true }
 ds-core = { workspace = true, features = ["testing"] }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -8,6 +8,7 @@ members = [
   "crates/ds",
   "crates/ds-core-derive",
   "crates/ds-settings",
+  "crates/ds-shell",
   "crates/ds-settings-derive",
   "crates/ds-native",
   "crates/anyrender_pdfrum",
@@ -32,6 +33,7 @@ ds-motion          = { path = "crates/ds-motion" }
 ds-lint            = { path = "crates/ds-lint" }
 ds                 = { path = "crates/ds" }
 ds-settings        = { path = "crates/ds-settings" }
+ds-shell           = { path = "crates/ds-shell" }
 ds-core-derive     = { path = "crates/ds-core-derive" }
 ds-settings-derive = { path = "crates/ds-settings-derive" }
 ds-native          = { path = "crates/ds-native" }

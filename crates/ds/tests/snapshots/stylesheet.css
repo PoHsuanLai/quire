@@ -25,7 +25,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* Highlight is the element's own fill (menu rows), never a ring. */
 .ds[*|data-modality=keyboard] [*|data-focus=highlight]:focus{outline:none}
 /* == tokens == */
-.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--cc-width:320px;--cc-pad:10px;--cc-gap:10px;--cc-module-r:8px;--cc-panel-r:18px;--cc-tile-h:56px;--cc-head:16px;--cc-head-gap:6px;--cc-level-h:64px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--dock-tile:var(--dock-tile-px,48px);--dock-gap:var(--dock-gap-px,8px);--dock-pad:var(--dock-pad-px,6px);--dock-dot:var(--dock-dot-px,4px);--dock-dot-gap:var(--dock-dot-gap-px,3px);--dock-floor:var(--dock-floor-on,0);--osd-margin:var(--osd-margin-px,24px);--notifications-banner-width:var(--notifications-banner-width-px,360px);--notifications-banner-min-height:var(--notifications-banner-min-height-px,64px);--notifications-banner-padding:var(--notifications-banner-padding-px,12px);--notifications-icon:var(--notifications-icon-px,32px);--notifications-close:var(--notifications-close-px,18px);--notifications-stack-gap:var(--notifications-stack-gap-px,8px);--notifications-group-offset:var(--notifications-group-offset-px,4px);--notifications-center-width:var(--notifications-center-width-px,384px);--widget-cell:var(--widget-cell-px,164px);--widget-gap:var(--widget-gap-px,16px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
+.ds{--paper:#ececec;--surface:#ffffff;--surface-2:#f5f5f5;--raise:#ffffff;--ink:#202020;--ink-soft:#5c5c5c;--ink-faint:#858585;--line:#d9d9d9;--line-soft:#e6e6e6;--accent:#94c0fe;--accent-ink:#111b28;--accent-soft:rgba(148,192,254,.31);--accent-text:#396198;--accent-text-material:#295086;--seal:#94c0fe;--ok:#2c7a57;--warn:#a5761a;--danger:#b03a2a;--scrim:rgba(0,0,0,.22);--foreign-ground:#ffffff;--ok-wash:rgba(44,122,87,.16);--warn-wash:#f2ebe1;--danger-wash:rgba(176,58,42,.16);--accent-ring:rgba(57,97,152,.75);--danger-ink:#ffffff;--mark-ground:#ffffff;--handle-ring:rgba(0,0,0,.25);--on-hue:#ffffff;--ok-ink:#ffffff;--warn-ink:#140d03;--scrim-modal:rgba(0,0,0,.4);--scroll-thumb:rgba(0,0,0,.4);--lock-ink:#ffffff;--lock-ink-soft:rgba(255,255,255,.78);--lock-glass:rgba(255,255,255,.24);--lock-glass-strong:rgba(255,255,255,.38);--lock-veil:rgba(0,0,0,.12);--spell-mark:#b03a2a;--scrim-idle:#000000;--knob-fill:#ffffff;--orb-bg:#e8effc;--orb-c1:#f383bb;--orb-c2:#43d5dc;--orb-c3:#a9affe;--c-red:#e8483c;--c-red-deep:#b7352b;--c-red-soft:#fbe3e1;--c-amber:#f0a81e;--c-amber-deep:#8e5a05;--c-amber-soft:#faebd2;--c-green:#28b24a;--c-green-deep:#1a7a33;--c-green-soft:#dcf1e1;--c-blue:#2b7cff;--c-blue-deep:#0b5fe0;--c-blue-soft:#e2ebff;--c-violet:#8b5cf0;--c-violet-deep:#6b3fcc;--c-violet-soft:#ece4fb;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 1px 2px rgba(26,30,26,.1);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.7) inset,0 6px 16px -6px rgba(26,30,26,.3);--shadow-pop:0 18px 40px -16px rgba(0,0,0,.45);--shadow-sheet:0 24px 50px -18px rgba(0,0,0,.55);--shadow-drag:0 18px 30px -12px rgba(26,30,26,.4);--shadow-bubble:0 12px 28px -12px rgba(0,0,0,.45);--shadow-current:0 var(--hair) 0 rgba(255,255,255,.4) inset,0 2px 6px -3px rgba(0,0,0,.25);--shadow-pill-inset:0 var(--hair) 0 rgba(255,255,255,.35) inset;--shadow-window:0 1px 3px rgba(0,0,0,.12),0 24px 64px -16px rgba(0,0,0,.4);--shadow-card:0 0 0 var(--hair) rgba(0,0,0,.06),0 10px 30px -14px rgba(0,0,0,.45);--shadow-handle:0 0 0 var(--hair) rgba(0,0,0,.25),0 3px 8px rgba(0,0,0,.35);--shadow-mark:0 0 0 var(--hair) rgba(0,0,0,.08);--shadow-mark-tile:0 0 0 1.5px var(--f-pill),0 1px 2px rgba(0,0,0,.2);--battery-fill:#28cd41;--battery-low:#ff3b30;--battery-track:rgba(0,0,0,.12);--clock-face-day:#ffffff;--clock-face-night:#343436;--clock-ink-day:#1c1c1e;--clock-ink-night:#ffffff;--clock-seconds:#ff9500;--r-panel:10px;--r-card:10px;--r-btn:5px;--r-chip:6px;--r-pill:999px;--r-field:5px;--r-menu:8px;--r-item:6px;--r-tile:10px;--r-window:10px;--r-menu-item:8px;--r-bubble-button:7px;--r-small:6px;--r-kbd:5px;--r-tiny:4px;--r-micro:3px;--r-media:10px;--ctl-h-xs:16px;--ctl-r-xs:4px;--ctl-cap-r-xs:8px;--ctl-glyph-xs:12px;--ctl-pad-xs:6px;--ctl-fs-xs:9px;--ctl-fw-xs:600;--knob-xs:14px;--switch-w-xs:26px;--switch-h-xs:15px;--switch-r-xs:7.5px;--switch-knob-xs:13px;--slider-track-xs:3px;--slider-knob-xs:12px;--check-xs:10px;--spinner-xs:10px;--progress-xs:4px;--seg-well-r-xs:4px;--seg-h-xs:14px;--seg-r-xs:3px;--ctl-h-s:19px;--ctl-r-s:5px;--ctl-cap-r-s:9.5px;--ctl-glyph-s:14px;--ctl-pad-s:8px;--ctl-fs-s:11px;--ctl-fw-s:500;--knob-s:17px;--switch-w-s:32px;--switch-h-s:18px;--switch-r-s:9px;--switch-knob-s:16px;--slider-track-s:4px;--slider-knob-s:14px;--check-s:12px;--spinner-s:16px;--progress-s:6px;--seg-well-r-s:6px;--seg-h-s:17px;--seg-r-s:5px;--ctl-h-m:22px;--ctl-r-m:5px;--ctl-cap-r-m:11px;--ctl-glyph-m:16px;--ctl-pad-m:10px;--ctl-fs-m:13px;--ctl-fw-m:500;--knob-m:20px;--switch-w-m:38px;--switch-h-m:22px;--switch-r-m:11px;--switch-knob-m:20px;--slider-track-m:4px;--slider-knob-m:20px;--check-m:14px;--spinner-m:32px;--progress-m:6px;--seg-well-r-m:6px;--seg-h-m:20px;--seg-r-m:5px;--ctl-h-l:28px;--ctl-r-l:5px;--ctl-cap-r-l:14px;--ctl-glyph-l:20px;--ctl-pad-l:12px;--ctl-fs-l:15px;--ctl-fw-l:600;--knob-l:26px;--switch-w-l:38px;--switch-h-l:22px;--switch-r-l:11px;--switch-knob-l:20px;--slider-track-l:4px;--slider-knob-l:20px;--check-l:14px;--spinner-l:32px;--progress-l:6px;--seg-well-r-l:6px;--seg-h-l:26px;--seg-r-l:5px;--knob-inset:1px;--shell-bar-h:24px;--bar-status-w:30px;--r-shell-menu:8px;--shell-menu-inset:5px;--c-person-1:#5b4fc4;--c-person-2:#2f7f6e;--c-person-3:#b0662e;--c-person-4:#3c8a5b;--c-person-5:#7a4a9e;--c-person-6:#c0782e;--c-person-7:#2e7f8c;--c-person-8:#6d7a3a;--s-1:1px;--s-1-5:1.5px;--s-2:2px;--s-3:3px;--s-4:4px;--s-5:5px;--s-6:6px;--s-7:7px;--s-8:8px;--s-9:9px;--s-10:10px;--s-11:11px;--s-12:12px;--s-13:13px;--s-14:14px;--s-15:15px;--s-16:16px;--s-18:18px;--s-22:22px;--s-26:26px;--s-36:36px;--fs-pico:7.5px;--fs-caption:10px;--fs-note:10.5px;--fs-eyebrow:11px;--fs-help:11.5px;--fs-small:12px;--fs-meta:12.5px;--fs-control:13px;--fs-body:13.5px;--fs-reading:14px;--fs-compose:14.5px;--fs-base:15px;--fs-subhead:15.5px;--fs-title:16px;--fs-heading-3:16.5px;--fs-subject:20px;--fs-heading:21px;--fs-amount:22px;--fs-day:24px;--fs-display:26px;--fs-emoji-cell:30px;--fs-emoji-preview:96px;--z-scene:-2;--z-grain:-1;--z-raise:1;--z-link-pill:7;--z-toast:8;--z-send-pill:9;--z-scrim:10;--z-peek:11;--z-focus-page:12;--z-edge:14;--z-side-peek:15;--z-palette:20;--z-card:30;--z-menu:40;--z-bubble:41;--z-drag:50;--veil:.16;--fs-shell-bar:var(--shell-bar-font,13px);--fw-shell-bar:var(--shell-bar-weight,500);--shell-bar-item:var(--shell-bar-item-h,22px);--shell-bar-pad:var(--shell-bar-pad-x,8px);--r-shell-bar-item:var(--shell-bar-radius,5px);--fs-shell-menu:var(--shell-menu-font,13px);--shell-menu-row:var(--shell-menu-row-h,22px);--shell-menu-sep:var(--shell-menu-sep-m,5px);--r-shell-highlight:var(--shell-highlight-radius,5px);--fs-shell-field:var(--shell-field-font,22px);--fw-shell-field:var(--shell-field-weight,500);--shell-field-glyph:var(--shell-field-glyph-px,20px);--fs-shell-row:var(--shell-row-font,14px);--fs-shell-detail:var(--shell-detail-font,12px);--fs-shell-tip:var(--shell-tip-font,12px);--plate-glyph:var(--icons-glyph-share,56%);--plate-inset:var(--icons-inset-share,72%);--dpr:var(--scale-dpr,1);--px:var(--scale-px,1px);--hair:var(--scale-hair,1px);--hairline:var(--scale-hairline,.5px);--ring:var(--scale-ring,3px);--focus-ring:var(--scale-focus-ring,2.5px);--caret-w:var(--scale-caret-w,1px);--focus-gap:var(--scale-focus-gap,1px);--font-emoji:"Inter","Noto Color Emoji",system-ui,sans-serif;--font-display:"Inter Display","Inter",system-ui,sans-serif;--font-ui:"Inter",system-ui,sans-serif;--font-data:"Inter",system-ui,sans-serif;--font-serif:"Noto Serif",Georgia,"Times New Roman",serif;--font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.02em;--tracking-lock-clock:-.02em;--tracking-lock-date:-.01em;--tracking-caps:.06em;--tracking-caps-narrow:.06em;--fw-caps:600;--fs-caps:var(--fs-micro);--tracking-mono:0;--fs-mono:.86em;--fs-dial:10px;--fs-nano:10px;--fs-micro:10px;--fs-dial-large:16.5px;--fs-widget-figure:18px;--fs-widget-hero:42.5px;--fs-lock-clock:127px;--t-quick:150ms;--t-move:250ms;--t-big:400ms;--t-spin-step:83ms;--t-shake:420ms;--t-send-ring:5000ms;--t-awake:20000ms;--t-idle-dim:2000ms;--e-out:cubic-bezier(.22,.9,.3,1);--e-exit:cubic-bezier(.55,0,.75,.2);--e-shake:cubic-bezier(.36,.07,.19,.97);--e-linear:linear;--e-in-out:cubic-bezier(.42,0,.58,1);color-scheme:light;}
 .ds[*|data-theme=dark]{--paper:#1e1e1e;--surface:#2a2a2a;--surface-2:#242424;--raise:#323232;--ink:#e8e8e8;--ink-soft:#a3a3a3;--line:#444444;--line-soft:#383838;--accent:#8ebaf7;--accent-soft:rgba(142,186,247,.2);--accent-text:#94c0fe;--accent-text-material:#d5e6fe;--seal:#8ebaf7;--ok:#5eb489;--warn:#d2a249;--danger:#e0705a;--ok-wash:rgba(94,180,137,.16);--warn-wash:#3f3930;--danger-wash:rgba(224,112,90,.16);--accent-ring:rgba(148,192,254,.55);--danger-ink:#1a0b08;--handle-ring:rgba(255,255,255,.25);--ok-ink:#0b1a12;--scrim-modal:rgba(0,0,0,.55);--scroll-thumb:rgba(255,255,255,.4);--lock-glass:rgba(255,255,255,.18);--lock-glass-strong:rgba(255,255,255,.3);--lock-veil:rgba(0,0,0,.28);--spell-mark:#e0705a;--orb-bg:#1b1f29;--orb-c1:#df6aa6;--orb-c2:#04bbc3;--orb-c3:#8d92f9;--c-red:#ff6b60;--c-red-deep:#ff8a80;--c-red-soft:#3a1e1c;--c-amber:#f5bc4e;--c-amber-deep:#f0b84a;--c-amber-soft:#3a2c12;--c-green:#4fd06a;--c-green-deep:#6edb86;--c-green-soft:#153520;--c-blue:#4c9bff;--c-blue-deep:#6fb0ff;--c-blue-soft:#14263f;--c-violet:#a98bff;--c-violet-deep:#b69bff;--c-violet-soft:#271c42;--shadow-1:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 2px 4px rgba(0,0,0,.45);--shadow-2:0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7);--shadow-sheet:0 30px 60px -20px rgba(0,0,0,.7);--shadow-drag:0 22px 34px -14px rgba(0,0,0,.8);--shadow-window:0 1px 3px rgba(0,0,0,.4),0 24px 64px -16px rgba(0,0,0,.66);--battery-fill:#32d74b;--battery-low:#ff453a;--battery-track:rgba(255,255,255,.14);--clock-seconds:#ff9f0a;color-scheme:dark;}
 .ds[*|data-typeface=editorial]{--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.015em;--tracking-lock-clock:-.035em;--tracking-lock-date:.01em;--tracking-caps:.14em;--tracking-caps-narrow:.12em;--fw-caps:400;--fs-caps:var(--fs-eyebrow);--tracking-mono:-.02em;--fs-mono:.78em;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-widget-hero:47px;--fs-lock-clock:140px;}
 .ds[*|data-motion=reduced]{--t-move:150ms;--t-big:150ms;--t-shake:150ms;--t-awake:150ms;--t-idle-dim:150ms;}
@@ -556,38 +556,6 @@ html,body{margin:0;padding:0;background:transparent}
    segment's width, missed the selected one). */
 .ds-appearance[*|data-layout=compact] .ds-segmented{ display:grid; }
 .ds-appearance[*|data-layout=compact] .ds-segmented .ds-segment{ padding-left:var(--s-4); padding-right:var(--s-4); }
-/* -- app_switcher -- */
-/* AppSwitcher (design/04-COMPONENTS.md section 43; design/13 section 13.3.5; design/20 section
-   1.11): one row on the Osd material, painted as the OSD card is (the Space gradient at the
-   frame alpha, the material's hairline and drop, `--m-radius` 18), padding 16, cells `--switcher-cell` (112) with icons
-   `--switcher-icon` (96) and `--switcher-gap` (8) between them, all written inline from
-   `SwitcherMetrics` and the output's width. The selection is one rounded square of `--f-pill`
-   (`--r-tile`, 12) behind the row that moves to the selected cell by `--switcher-at`, a
-   fractional cell index a spring in Rust writes (design/05 section 14, H1); nothing here
-   transitions it. The selected app's name is its Fly, drawn under the tile in
-   the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
-   scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
-   frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
-   tile plays `row-out` (`a-row-out`). Flat: no gloss on the panel or the selection. */
-
-.ds-switcher{ --switcher-cell:112px; --switcher-icon:96px; --switcher-gap:8px; --switcher-view:592px; --switcher-shift:0px; --switcher-at:0;
-  position:relative; z-index:var(--z-raise); display:inline-flex; box-sizing:border-box; max-width:100%; padding:var(--s-16) var(--s-16) var(--s-10);
-  border-radius:var(--m-radius); box-shadow:var(--m-box); color:var(--f-ink); animation:fade var(--t-quick) var(--e-out); }
-/* The panel paints what the OSD card paints (design/20 section 1.7, the same material): the
-   Space gradient at the frame alpha, the solid floor without blur, the inner pair over it. */
-.ds-switcher > .ds-frame::after{ content:""; position:absolute; inset:0; border-radius:inherit; box-shadow:var(--m-inner); }
-.ds[*|data-blur=off] .ds-switcher > .ds-frame{ opacity:.94; }
-.ds-switcher-view{ width:var(--switcher-view); overflow:hidden; padding-bottom:var(--s-26); }
-.ds-switcher-row{ position:relative; display:flex; gap:var(--switcher-gap); width:max-content; margin-left:calc(-1 * var(--switcher-shift)); }
-.ds-switcher-ring{ position:absolute; left:0; top:0; width:var(--switcher-cell); height:var(--switcher-cell); border-radius:var(--r-tile); background:var(--f-pill);
-  transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); }
-.ds-switcher-cell{ position:relative; display:grid; place-items:center; flex:none; width:var(--switcher-cell); height:var(--switcher-cell); cursor:default; }
-.ds-switcher-icon{ display:grid; place-items:center; width:var(--switcher-icon); height:var(--switcher-icon); }
-.ds-switcher-icon .ds-ext-icon{ width:var(--switcher-icon); height:var(--switcher-icon); }
-
-/* The name under the selected tile: the Fly moved below its target and set in the UI face. */
-.ds-switcher-cell .ds-fly{ top:calc(100% + var(--s-14)); bottom:auto; padding:0; background:transparent; color:var(--f-ink);
-  font-family:var(--font-ui); font-size:var(--fs-control); font-weight:600; border-radius:0; }
 /* -- avatar -- */
 /* Avatar (design/04-COMPONENTS.md section 11). Colours arrive inline as `--av-bg`/`--av-fg`
    (hexes computed in Rust, O-7). Attribute selectors carry `*|`, and a value starting with a
@@ -618,66 +586,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* The event attendee stack: `S:519-521`. */
 .ds-avatar[*|data-tone=stack]{ font-size:var(--fs-micro); border:2px solid var(--surface); }
 .ds-avatar[*|data-tone=stack] + .ds-avatar[*|data-tone=stack]{ margin-left:calc(var(--s-6) * -1); }
-/* -- banner_stack -- */
-/* BannerStack (design/13 section 13.3.6): the banners in a column at the right edge,
-   newest first; at the bottom right the column runs upwards. Each row pads itself by the stack's
-   gap (`--notifications-stack-gap`) on the side away from the edge it grows from, so its measured
-   height is its whole pitch. A row's card enters with `banner-in` as it mounts (on the inner
-   element, not on `data-presence=entering`: Blitz keeps the last animated value when an
-   animation is taken off, so a presence turned `present` early would freeze it mid-slide), and
-   the row leaves with `banner-out` (both `--t-move`), held until the stack drops it; the rows after it then heal from `--dy` (signed by
-   the position) with the heal ripple. A row at rest plays `hold`, which moves nothing, so a
-   heal settled or an exit taken back never drops an animation without starting another.
-   A card swiped away inside a row holds its offset while the
-   row carries it out (the card's own flight is for a card alone). Attribute selectors carry `*|`
-   (spike S2).
-   The entry edge (`data-entry`, `notifications.banner_entry_direction`) sets the vector
-   `banner-in` starts from and `banner-out` ends at: past the right edge by `--s-16`, or its own
-   height and `--s-16` below its place. A row whose card was swiped (`data-flight=swipe`) takes
-   the right-edge vector back, so it leaves along the swipe whatever the entry edge. */
-
-.ds-banner-stack{ display:flex; flex-direction:column; align-items:flex-end; }
-.ds-banner-stack[*|data-position=bottom-right]{ flex-direction:column-reverse; }
-.ds-banner-stack[*|data-entry=right]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
-.ds-banner-stack[*|data-entry=below]{ --banner-dx:0px; --banner-dy:calc(100% + var(--s-16)); }
-.ds-banner[*|data-flight=swipe]{ --banner-dx:calc(100% + var(--s-16)); --banner-dy:0px; }
-.ds-banner{ display:flex; justify-content:flex-end; padding-bottom:var(--notifications-stack-gap); }
-.ds-banner-stack[*|data-position=bottom-right] > .ds-banner{ padding-bottom:0; padding-top:var(--notifications-stack-gap); }
-.ds-banner-card{ display:flex; justify-content:flex-end; animation:banner-in var(--t-move) var(--e-out); }
-.ds-banner[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-banner[*|data-presence=leaving]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-.ds-banner[*|data-presence=healing]{ animation:heal var(--t-move) var(--e-in-out) backwards; }
-.ds-banner .ds-notification[*|data-swipe=gone]{ animation:none; }
-/* -- battery_level -- */
-/* BatteryLevel (design/23-WIDGETS.md sections 2 and 4.1; design/04 "Widgets"):
-   a flat, bright ring, 64 across (the reference's ring in a small and a medium widget).
-   The track is a full circle in `--battery-track`, the plate darkened; over it the level's arc
-   from twelve, clockwise, round-capped, in `--battery-fill`, `--battery-low` at a fifth or less
-   (low and critical alike); the stroke is .093 of the ring's diameter. The device's glyph sits
-   in the middle at .47 of the ring in `--ink`. While charging, a bolt in `--ink`, .16 of the
-   ring tall, sits on the stroke at twelve in the gap the ring leaves for it. Each vector takes
-   its colour from its own element (spike S6). The arc follows its level from Rust (the path
-   changes each frame while it moves; no keyframe, no transition). */
-
-.ds-battery{ position:relative; display:block; flex:none; width:64px; height:64px; color:var(--ink); }
-.ds-battery-track,
-.ds-battery-arc{ position:absolute; inset:0; display:block; width:100%; height:100%; }
-.ds-battery-track{ color:var(--battery-track); }
-.ds-battery-arc{ color:var(--battery-fill); }
-.ds-battery[*|data-tone=low] .ds-battery-arc,
-.ds-battery[*|data-tone=critical] .ds-battery-arc{ color:var(--battery-low); }
-.ds-battery-device{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--ink); }
-.ds-battery-device .ds-ic{ width:47%; height:47%; }
-.ds-battery-bolt{ position:absolute; left:45%; top:-3.35%; display:block; width:10%; height:16%; color:var(--ink); }
-
-/* BatteryFigure: the percentage; the caller sets its size and face, tabular so its width holds
-   as the number changes. */
-.ds-battery-figure{ font-variant-numeric:tabular-nums; }
-
-/* DeviceBattery (design/26-DETAILS.md 5.2.9): the ring over its percentage, centred, the
-   control center's Battery module's one device. */
-.ds-device-battery{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); flex:none; }
-.ds-device-battery .ds-battery-figure{ font-size:var(--fs-help); color:var(--ink-soft); }
 /* -- button -- */
 /* Button (design/04-COMPONENTS.md section 1). Attribute selectors carry `*|` (spike S2).
    The focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -825,56 +733,6 @@ html,body{margin:0;padding:0;background:transparent}
   font-family:var(--font-ui); font-size:var(--fs-meta); color:var(--ink);
 }
 .ds-chip-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
-/* -- clock_face -- */
-/* ClockFace (design/23-WIDGETS.md sections 2 and 4.2; design/04 "Widgets"). 
-   The analog dial is flat, as the reference measures: 62 across in a row (four fit a medium
-   widget), and in a small widget as large as the card less 8 at each side, with the city
-   dropped (the reference's small clock has none). The face is `--clock-face-day` or
-   `--clock-face-night`; numerals, ticks and hands take `--clock-ink-day` or `--clock-ink-night`.
-   Twelve numerals in the display face at its heaviest, centred on .82 of the radius (.73 on the
-   large dial, whose sixty ticks stand outside them; a row's dial has no ticks). The seconds hand
-   and its ring are `--clock-seconds`, the pin in the ring the face's colour. The vectors fill
-   the dial and take their colour from their own element (CSS does not reach inside an SVG on
-   Blitz, spike S6). The digital face is the display face, tabular, the hero size in a small
-   widget and a step down anywhere else, and bumps on each new minute; its city wears the
-   phase's mark, a sun disc in `--warn` or a crescent moon in `--ink-faint`. The city is the UI
-   face, bold, under either. */
-
-.ds-clock{ display:flex; flex-direction:column; align-items:center; gap:var(--s-4); min-width:0; color:var(--ink); }
-.ds-clock-dial{ position:relative; flex:none; width:62px; height:62px; border-radius:var(--r-pill);
-  background:var(--clock-face-day); color:var(--clock-ink-day); }
-.ds-clock[*|data-phase=night] .ds-clock-dial{ background:var(--clock-face-night); color:var(--clock-ink-night); }
-.ds-clock-ticks,
-.ds-clock-hands,
-.ds-clock-second,
-.ds-clock-pin{ position:absolute; inset:0; display:block; width:100%; height:100%; }
-.ds-clock-ticks{ display:none; }
-.ds-clock-second{ color:var(--clock-seconds); }
-.ds-clock-pin{ color:var(--clock-face-day); }
-.ds-clock[*|data-phase=night] .ds-clock-pin{ color:var(--clock-face-night); }
-.ds-clock-numerals{ position:absolute; inset:9%; }
-.ds-clock-numeral{ position:absolute; width:2em; height:1em; margin-left:-1em; margin-top:-.5em; text-align:center;
-  font-family:var(--font-display); font-size:var(--fs-dial); font-weight:800; line-height:1; }
-
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog]{ flex:1; justify-content:center; }
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-dial{ width:calc(var(--widget-cell) - 2 * var(--s-8));
-  height:calc(var(--widget-cell) - 2 * var(--s-8)); margin:calc(-1 * var(--s-4)) 0; }
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-ticks{ display:block; }
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-numerals{ inset:13.5%; }
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-numeral{ font-size:var(--fs-dial-large); }
-.ds-widget[*|data-size=small] .ds-clock[*|data-look=analog] .ds-clock-label{ display:none; }
-
-.ds-clock[*|data-look=digital]{ align-items:flex-start; gap:var(--s-4); }
-.ds-clock-digits{ display:inline-block; font-family:var(--font-display); font-variant-numeric:tabular-nums; font-size:var(--fs-subject);
-  font-weight:800; letter-spacing:-.02em; line-height:1; }
-.ds-widget[*|data-size=small] .ds-clock-digits{ font-size:var(--fs-widget-hero); }
-.ds-clock-label{ display:flex; align-items:center; gap:var(--s-4); max-width:100%; font-family:var(--font-ui); font-size:var(--fs-small);
-  font-weight:700; line-height:1.2; color:var(--ink); }
-.ds-clock-city{ white-space:nowrap; overflow:hidden; }
-.ds-clock-sun,
-.ds-clock-moon{ display:block; flex:none; width:12px; height:12px; }
-.ds-clock-sun{ color:var(--warn); }
-.ds-clock-moon{ color:var(--ink-faint); }
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
@@ -956,19 +814,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-count{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
 .ds-count[*|data-place=item]{ margin-left:auto; font-size:var(--fs-note); color:var(--f-ink-faint); }
 .ds-count[*|data-place=tile]{ position:absolute; top:4px; right:5px; font-size:var(--fs-nano); color:var(--f-ink-soft); }
-/* -- device_glyph -- */
-/* DeviceGlyph (design/23-WIDGETS.md section 4.4): a filled device solid in `currentColor`, the
-   same `svg.ds-ic` box as every glyph (its size from its attributes), so a battery ring's
-   `.ds-battery-device .ds-ic` rule sizes it at .47 of the ring. It never shrinks in a row. */
-
-.ds-device-glyph{ display:block; flex:none; }
-/* -- dock_parts -- */
-/* The dock's running dot and floor (the macOS polish pass; design/10-BEHAVIOUR-dock.md section
-   10.3.2). The floor's paint and mask are generated with the shapes (`css/shape_css.rs`). */
-
-.ds-running-dot{ position:absolute; left:50%; top:calc(100% + var(--dock-dot-gap) - var(--dock-dot) * .5); width:var(--dock-dot); height:var(--dock-dot);
-  margin-left:calc(var(--dock-dot) * -.5); border-radius:var(--r-pill); background:var(--ink); pointer-events:none;
-  animation:fade var(--t-quick) var(--e-out); }
 /* -- drag_ghost -- */
 /* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)); its sub truncates with
@@ -1034,22 +879,6 @@ html,body{margin:0;padding:0;background:transparent}
    a misspelling. */
 .ds-spell-layer{ position:absolute; width:0; height:0; margin:0; padding:0; pointer-events:none; }
 .ds-spell-mark{ position:absolute; box-sizing:border-box; border-bottom:calc(var(--hair) * 2) dotted var(--spell-mark); }
-/* -- emoji -- */
-/* Animated emoji (design/25-EMOJI.md): one sprite sheet per emoji on `.ds-emoji-face`, the
-   frame chosen by `background-position`, which the component's Rust timer moves only inside
-   the 20 s awake window. The sheet, its size and its position arrive as inline style properties
-   computed in Rust (the sheet is a `data:` URI; no colour or duration is written inline). An
-   optional disc (`data-disc=tinted`) takes its derived colour as `--em-disc` and insets the
-   emoji on it. Nothing here animates: no transition, no keyframes. */
-
-.ds-emoji{ position:relative; flex:none; box-sizing:border-box; border-radius:var(--r-pill); }
-.ds-emoji[*|data-size="28"]{ width:28px; height:28px; }
-.ds-emoji[*|data-size="64"]{ width:64px; height:64px; }
-.ds-emoji[*|data-size="128"]{ width:128px; height:128px; }
-.ds-emoji[*|data-disc=tinted]{ background:var(--em-disc); }
-
-.ds-emoji-face{ position:absolute; inset:0; background-repeat:no-repeat; }
-.ds-emoji[*|data-disc=tinted] .ds-emoji-face{ inset:14%; }
 /* -- emoji_grid -- */
 /* EmojiGrid (design/04-COMPONENTS.md section 46): cells at the caller's side in the
    caller's columns (inline `grid-template-columns` and `grid-auto-rows`), each emoji centred at
@@ -1061,20 +890,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-emoji-cell{ display:grid; place-items:center; min-width:0; box-sizing:border-box; border-radius:var(--r-menu-item); cursor:default; }
 .ds-emoji-cell[*|aria-selected=true]{ background:var(--accent-soft); }
 .ds-emoji-glyph{ display:block; font-size:var(--fs-emoji-cell); line-height:1; }
-/* -- group_header -- */
-/* GroupHeader (design/20 section 1.6, design/13 section 13.3.6): one app's head in
-   the notification center. The words are `SectionHeader`'s group type (the data face in
-   capitals, `--fs-caption`, .12em apart, `--ink-faint`) with the app's name a step stronger in
-   `--ink-soft`; the icon is 16 in its own column; the count is tabular; the trailing pair (the
-   fold toggle and Clear, Quiet buttons) ends the row. */
-
-.ds-group-header{ display:flex; align-items:center; gap:var(--s-8); width:100%; box-sizing:border-box; padding:var(--s-12) var(--s-6) var(--s-6);
-  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
-.ds-group-header-icon{ display:flex; flex:none; line-height:0; }
-.ds-group-header-name{ min-width:0; overflow:hidden; white-space:nowrap; color:var(--ink-soft); }
-.ds-group-header-count{ font-variant-numeric:tabular-nums; }
-.ds-group-header-actions{ display:flex; align-items:center; gap:var(--s-2); margin-left:auto; flex:none;
-  font-family:var(--font-ui); letter-spacing:0; text-transform:none; }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
    the side card `S:428`, the live dot `S:561`. Enters with `hc-in`; while the hub reports it
@@ -1248,15 +1063,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-ext-icon{ display:inline-block; flex:none; width:var(--ic-size); height:var(--ic-size); vertical-align:middle; }
 .ds-ext-icon[*|data-kind=symbolic]{ background-color:currentColor; mask-size:100% 100%; mask-repeat:no-repeat; mask-position:center; }
 .ds-ext-icon[*|data-kind=image]{ background-size:100% 100%; background-repeat:no-repeat; background-position:center; }
-/* -- idle_dim -- */
-/* IdleDim (design/22-SETTINGS.md section 3.24; sill FINDINGS "sill idle"): a full-
-   screen scrim, black at the level (`--scrim-idle`), never real brightness. Its own share is
-   driven from Rust (`ds::detail::idle_dim`, a Sweep-style tween, never a keyframe: it must snap
-   on input, which a CSS animation cannot do mid-flight without a restyle), written as a plain
-   inline `opacity` the way a battery's tail fade is (`battery_level.css`). Pointer events pass
-   through: sill's idle service, not this overlay, owns waking the display. */
-
-.ds-idle-dim{ position:absolute; inset:0; pointer-events:none; background:var(--scrim-idle); }
 /* -- kbd -- */
 /* Kbd (design/04-COMPONENTS.md section 9): `S:67-68`; Small is the hint row's 9.5 (`S:662`).
    In the code face (`--font-code`, Space Mono in either typeface): a key cap is fixed pitch.
@@ -1462,84 +1268,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row:hover .ds-star, .ds-star[*|aria-pressed=true]{ opacity:1; }
 .ds-star[*|aria-pressed=true]{ color:var(--warn); }
 .ds-star-glyph{ display:grid; place-items:center; }
-/* -- lock_screen -- */
-/* LockScreen (design/04-COMPONENTS.md section 42; design/20 section 1.9): the wallpaper covering
-   the stage under `--lock-veil`, the clock 7 % of the width from the top and the prompt 6 % from
-   the bottom, centred across, as the reference lock screen stands. The stage fills its root
-   (`RootExtent::Viewport` for a surface). */
-
-.ds-lock{ position:relative; display:flex; flex-direction:column; align-items:center; justify-content:space-between; box-sizing:border-box;
-  width:100%; height:100%; min-height:100%; overflow:hidden; padding:7% var(--s-16) 5%; color:var(--lock-ink); }
-.ds-lock-wallpaper{ position:absolute; inset:0; background-size:cover; background-position:center; background-repeat:no-repeat; }
-.ds-lock-veil{ position:absolute; inset:0; background:var(--lock-veil); }
-.ds-lock-top,
-.ds-lock-bottom{ position:relative; display:flex; justify-content:center; width:100%; }
-/* -- lock_clock -- */
-/* LockClock (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright: white
-   type over the wallpaper, no shadow, no bevel. The date is the display face at 600, a quiet
-   white; the time the display face at `--fs-lock-clock` (140), 700, tight, tabular so a changing
-   minute does not shift it. Under `data-look=space` the date sits in a pill of the Space
-   gradient in the frame's ink (Arc's colour on the small surfaces; the time stays white). */
-
-.ds-lock-clock{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); text-align:center; }
-.ds-lock-date{ font-family:var(--font-display); font-size:var(--fs-amount); font-weight:600; letter-spacing:var(--tracking-lock-date); line-height:1.2; color:var(--lock-ink-soft); }
-.ds-lock-time{ font-family:var(--font-display); font-size:var(--fs-lock-clock); font-weight:700; letter-spacing:var(--tracking-lock-clock); line-height:1; font-variant-numeric:tabular-nums; color:var(--lock-ink); margin-top:var(--s-2); }
-
-.ds-lock-clock[*|data-look=space] .ds-lock-date{ background:var(--f-grad); color:var(--f-ink); border-radius:var(--r-pill); padding:var(--s-3) var(--s-14); margin-bottom:var(--s-8); }
-/* -- lock_prompt -- */
-/* LockPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.9). Flat and bright, as
-   the reference lock screen: the person's picture at 64 (a face, a photo cropped round, or an
-   animated emoji playing the prompt's mood), the name in white 16/700, a pill of flat white
-   glass 260 x 38 (`--lock-glass`, no blur assumed, no bevel) holding the secret field, the
-   caps-lock mark and a 28 px enter arrow in a brighter glass disc that shows once something is
-   typed, and a small hint line in `--lock-ink-soft`. The pill plays `shake-x` once through its
-   pulse class (`a-shake-x`, `--t-shake --e-shake`) when a password was wrong. Under
-   `data-look=space` the pill is the Space gradient in the frame's ink. */
-
-.ds-lock-prompt{ display:flex; flex-direction:column; align-items:center; color:var(--lock-ink); }
-.ds-lock-name{ margin-top:var(--s-10); font-family:var(--font-ui); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--lock-ink); }
-
-.ds-lock-field{ display:flex; align-items:center; gap:var(--s-6); box-sizing:border-box; width:260px; height:38px; margin-top:var(--s-14);
-  padding:0 var(--s-5) 0 var(--s-16); border-radius:var(--r-pill); background:var(--lock-glass); color:var(--lock-ink);
-  transition:background-color var(--t-quick) var(--e-out); }
-.ds-lock-field:hover{ background:var(--lock-glass-strong); }
-.ds-lock-field[*|aria-disabled=true]{ opacity:.6; }
-
-/* The inline field inside the pill: the pill's ink, a larger face so the dots read as dots. */
-.ds-lock-field .ds-input-wrap{ flex:1 1 auto; min-width:0; }
-.ds-lock-field .ds-input,
-.ds-lock-field .ds-input-mask,
-.ds-lock-field .ds-input-placeholder{ font-size:var(--fs-base); }
-.ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--lock-ink); }
-/* The field draws its caret among the dots in their ink; the input's own stays hidden. */
-.ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-/* Half the pill's .14em tracking back, so the caret stays centred in the gap. */
-.ds-lock-field .ds-input-caret::before{ left:calc(-.07em - .75px); background:var(--lock-ink); }
-.ds-lock-field .ds-input-mask{ color:var(--lock-ink); letter-spacing:.14em; }
-.ds-lock-field .ds-input-placeholder{ color:var(--lock-ink-soft); }
-
-.ds-lock-caps{ display:inline-flex; flex:none; color:var(--lock-ink-soft); }
-
-.ds-lock-go{ display:grid; place-items:center; flex:none; width:28px; height:28px; padding:0; border:0; border-radius:var(--r-pill);
-  background:var(--lock-glass-strong); color:var(--lock-ink); cursor:default;
-  transition:opacity var(--t-quick) var(--e-out); }
-.ds-lock-go[*|data-filled=empty]{ opacity:0; pointer-events:none; }
-.ds-lock-go[*|aria-busy=true]{ opacity:1; }
-.ds-lock-busy{ position:relative; display:block; width:14px; height:14px; }
-.ds-lock-busy .ds-spinner{ inset:0; border-color:var(--lock-ink); }
-
-.ds-lock-hint{ margin-top:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-small); font-weight:500; color:var(--lock-ink-soft); text-align:center; }
-
-/* The Space's colour (`LockLook::Space`): the pill is the Space gradient, in the frame's ink. */
-.ds-lock-prompt[*|data-look=space] .ds-lock-field{ background:var(--f-grad); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-kind=secret]{ caret-color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input[*|data-caret=drawn]{ caret-color:transparent; }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-caret::before{ background:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-mask{ color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-field .ds-input-placeholder,
-.ds-lock-prompt[*|data-look=space] .ds-lock-caps{ color:var(--f-ink-soft); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-go{ background:var(--f-pill); color:var(--f-ink); }
-.ds-lock-prompt[*|data-look=space] .ds-lock-busy .ds-spinner{ border-color:var(--f-ink); }
 /* -- menu -- */
 /* Menu (design/04-COMPONENTS.md section 20): Rich and Slim `S:665-680`, `S:787-791`; Dropdown
    `C:1003-1023`; Context is Slim at the pointer. The surface is `.ds-popover`'s. The menu holds
@@ -1590,18 +1318,6 @@ html,body{margin:0;padding:0;background:transparent}
   border-bottom:var(--hair) solid var(--line-soft); font-size:var(--fs-body); line-height:1.55; color:var(--ink); white-space:nowrap; overflow:hidden; }
 .ds-menu-filter-placeholder{ color:var(--ink-faint); }
 .ds-menu-filter-caret{ display:inline-block; width:var(--hair); height:1.2em; background:var(--accent-text); flex:none; }
-/* -- menu_bar_item -- */
-/* MenuBarItem (the macOS polish pass; design/13-BEHAVIOUR-menus-windows.md section 13.3.1):
-   a bar item's text at the shell scale, and the pill behind it on hover and while its menu is
-   open: a Regular control, 22 tall at radius 5 (design/29-SIZING.md), centred in the 24 bar. Inks are the paper names, which the bar's frame ground redirects to `--f-*`. */
-
-.ds-bar-item{ display:inline-flex; align-items:center; height:var(--shell-bar-item); padding:0 var(--shell-bar-pad); border-radius:var(--r-shell-bar-item);
-  font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); color:var(--ink); white-space:nowrap; cursor:default; }
-.ds-bar-item[*|data-emphasis=strong]{ font-weight:700; }
-.ds-bar-item:hover{ background:var(--surface); }
-.ds-bar-item[*|aria-expanded=true]{ background:var(--surface-2); }
-.ds-bar-item .ds-button[*|data-variant=quiet]{ font-size:inherit; font-weight:inherit; color:inherit; padding:0; background:transparent; border-radius:0; }
-.ds-bar-item .ds-button[*|data-variant=quiet]:hover{ background:transparent; color:inherit; }
 /* -- menu_entry -- */
 /* Menu items (design/04-COMPONENTS.md section 20): the Rich grid `S:667-673`, Slim `S:678-680`,
    checked `S:787-788`, Dropdown `C:1011-1023`. A pointer over a Rich, Slim or Context item
@@ -1721,286 +1437,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* A row's chord (launcher chords, `RowChord`): after the trail's data in the secondary ink, at
    the trail's size; shown on the selected row only unless the row asks for every row. */
 .ds-menu-keys + .ds-chord{ margin-left:var(--s-6); }
-/* -- notification_card -- */
-/* NotificationCard (design/20 section 1.6, design/13 section 13.3.6). The card is a
-   plate in its material, inside a transparent scope of that material, so the plate and its
-   group's layers paint the material's tint, edge and drop (the transparent-root card rule in the
-   materials section). Geometry is the `--notifications-*` tokens `NotificationMetrics` writes:
-   360 wide, at least 64 tall, padded 12, the icon 32, the close button 18. Attribute selectors
-   carry `*|` (spike S2).
-
-   Hover (`data-hover=on`, set from the pointer in Rust so the caller hears it too): the body
-   opens from two lines to six (`max-height` in whole lines of 1.35em, `--t-move --e-out`; Blitz
-   has no line-clamp), the actions row opens under it, and the close button fades in at the top
-   left corner. The body's fade is drawn only where the component measured text being cut
-   (`data-clip`). A group's layers (`--layers`, each layer's `--i`) sit under the plate, each one
-   `--notifications-group-offset` lower and 6 narrower each side, a step fainter.
-
-   Blitz hit-tests the lines a clamp hides (overflow clips the paint, not the hit test), so the
-   body's text takes no pointer (a press on it lands on the plate, as it would anyway) except its
-   links, and the actions row is raised above the hidden lines that run under it. */
-
-.ds-notification{ position:relative; box-sizing:border-box; width:var(--notifications-banner-width); max-width:100%; color:var(--ink);
-  padding-bottom:calc(var(--layers,0) * var(--notifications-group-offset)); }
-
-.ds-notification-layer{ position:absolute; top:calc(var(--i) * var(--notifications-group-offset)); bottom:calc((var(--layers) - var(--i)) * var(--notifications-group-offset));
-  left:calc(var(--i) * var(--s-6)); right:calc(var(--i) * var(--s-6)); border-radius:var(--m-radius); opacity:calc(1 - var(--i) * .2); pointer-events:none; }
-
-.ds-notification-plate{ position:relative; display:flex; align-items:flex-start; gap:var(--s-10); box-sizing:border-box;
-  min-height:var(--notifications-banner-min-height); padding:var(--notifications-banner-padding); border-radius:var(--m-radius); cursor:default; }
-.ds-notification-icon{ display:flex; align-items:center; justify-content:center; flex:none; width:var(--notifications-icon); height:var(--notifications-icon); line-height:0; }
-.ds-notification-words{ display:flex; flex-direction:column; gap:var(--s-2); flex:1; min-width:0; }
-
-.ds-notification-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; }
-.ds-notification-summary{ flex:1; font-size:var(--fs-shell-menu); font-weight:700; line-height:1.35; color:var(--ink); }
-.ds-notification-count{ flex:none; padding:0 var(--s-5); border-radius:var(--r-pill); background:var(--accent-soft); color:var(--ink);
-  font-size:var(--fs-nano); font-weight:700; line-height:1.6; font-variant-numeric:tabular-nums; }
-.ds-notification-age{ flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); white-space:nowrap; }
-
-.ds-notification-body{ position:relative; overflow:hidden; max-height:calc(2 * 1.35em); font-size:var(--fs-shell-menu); line-height:1.35; color:var(--ink);
-  transition:max-height var(--t-move) var(--e-out); }
-.ds-notification[*|data-hover=on] .ds-notification-body{ max-height:calc(6 * 1.35em); }
-.ds-notification[*|data-hover=off] .ds-notification-body[*|data-clip=rest],
-.ds-notification-body[*|data-clip=always]{ mask-image:linear-gradient(to bottom,var(--ink) calc(100% - .9em),transparent); }
-.ds-notification-body-text{ overflow-wrap:break-word; pointer-events:none; }
-.ds-notification-body-text .ds-run-link{ pointer-events:auto; }
-.ds-notification-body-line{ position:absolute; top:0; left:0; opacity:0; pointer-events:none; }
-
-.ds-notification-actions{ position:relative; z-index:var(--z-raise); display:flex; flex-wrap:wrap; gap:var(--s-6); max-height:0; margin-top:0; opacity:0; overflow:hidden; pointer-events:none;
-  transition:max-height var(--t-move) var(--e-out), margin-top var(--t-move) var(--e-out), opacity var(--t-quick) var(--e-out); }
-.ds-notification[*|data-hover=on] .ds-notification-actions{ max-height:calc(2 * var(--s-36)); margin-top:var(--s-6); opacity:1; pointer-events:auto; }
-
-.ds-notification .ds-notification-close{ position:absolute; top:calc(-1 * var(--s-6)); left:calc(-1 * var(--s-6)); z-index:var(--z-raise);
-  display:flex; align-items:center; justify-content:center; box-sizing:border-box; width:var(--notifications-close); height:var(--notifications-close); padding:0;
-  border:var(--hair) solid var(--line); border-radius:var(--r-pill); background:var(--raise); color:var(--ink-soft); box-shadow:var(--shadow-1); cursor:default;
-  opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
-.ds-notification[*|data-hover=on] .ds-notification-close,
-.ds[*|data-modality=keyboard] .ds-notification-close:focus{ opacity:1; pointer-events:auto; }
-.ds-notification .ds-notification-close:hover{ color:var(--ink); }
-
-/* Swipe to dismiss (`data-swipe` on a card that can be swiped). The card is drawn
-   `--swipe-dx` off its place: following a drag or a scroll 1:1 (`live`), springing back home
-   (`rest`), and flying out to the right from where it was (`gone`, `banner-out`). The way back
-   is driven motion (design/05 section 14, H1): a spring in Rust writes `--swipe-dx` frame by
-   frame from the release's position and velocity (critically damped under Reduced), so nothing
-   here transitions the transform. */
-.ds-notification[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
-.ds-notification[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-/* -- osd -- */
-/* Osd (design/20 section 1.7): the on-screen display's card inside a
-   transparent Osd root. It paints what a tinted root paints on its own box: the material's box
-   shadow, and a `.ds-frame` group of the Space gradient at the frame alpha (the solid floor
-   without blur and the inner pair over it are in the materials section). Its shape and padding
-   are a control-center module's (design/13 section 13.3.7: `--r-tile`, the grid's 12 padding);
-   its width a module spanning both columns of the 320 panel. Attribute selectors carry `*|`
-   (spike S2).
-
-   Motion. `osd-in` at `--t-quick --e-out` while entering, restarted under its other name on each
-   showing (`data-pulse`); `osd-out` at `--t-move --e-exit`, held, while leaving. Both move by
-   `--osd-dy`, which follows the anchor: from above at the top right, from below at the bottom
-   centre. Hidden, nothing is laid out. Present keeps the entrance declared, so the settle
-   timer never cancels an entrance the frame clock is still playing; present again after a hide
-   was taken back (`data-pulse=held`), it plays `hold`, so dropping `osd-out` starts an animation
-   in the same restyle. */
-
-.ds-osd{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box;
-  width:296px; max-width:100%; padding:var(--s-12); border-radius:var(--r-tile); box-shadow:var(--m-box); color:var(--ink); }
-.ds-osd[*|data-position=top-right]{ --osd-dy:-8px; margin:var(--osd-margin) var(--s-12) 0 auto; }
-.ds-osd[*|data-position=bottom-centre]{ --osd-dy:8px; margin:0 auto var(--osd-margin); }
-.ds-osd[*|data-shown=hidden]{ display:none; }
-.ds-osd[*|data-presence=entering],.ds-osd[*|data-presence=present]{ animation:osd-in var(--t-quick) var(--e-out); }
-.ds-osd[*|data-presence=entering][*|data-pulse=b],.ds-osd[*|data-presence=present][*|data-pulse=b]{ animation-name:osd-in--b; }
-.ds-osd[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-osd[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; }
-.ds-osd-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); white-space:nowrap; overflow:hidden; }
-/* -- module_tile -- */
-/* ModuleTile (design/20 section 1.5, design/13 section 13.3.7): a module on
-   the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
-   (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
-   hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
-   with `--accent-ink`. Busy: the Off disc with the Spinner's breathe around it. Under the
-   pointer the tile lifts as the Mini does (`--raise`, `--shadow-1`).
-   A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
-   its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
-
-.ds-module-tile{
-  position:relative; display:flex; align-items:center; gap:var(--s-6); min-width:0; min-height:var(--cc-tile-h); box-sizing:border-box;
-  padding:0 var(--s-4) 0 var(--cc-pad); border:var(--hair) solid var(--line); border-radius:var(--cc-module-r);
-  background:var(--surface-2); color:var(--ink); cursor:default; user-select:none;
-  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
-}
-.ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-tile:hover{ background:var(--raise); box-shadow:var(--shadow-1); }
-.ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
-.ds-module-tile[*|data-state=on]:hover{ background:var(--accent-soft); }
-.ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
-.ds-module-tile[*|aria-disabled=true]:hover{ background:var(--surface-2); box-shadow:none; transform:none; }
-
-.ds-module-disc{
-  position:relative; display:grid; place-items:center; flex:none; width:var(--ctl-h-l); height:var(--ctl-h-l); border-radius:var(--r-pill);
-  background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-module-tile[*|data-state=on] .ds-module-disc{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }
-
-.ds-module-words{ display:flex; flex-direction:column; flex:1; min-width:0; }
-/* Clipped, not faded: `.ds-truncate`'s fade covers the last 1.5em of the column whether the
-   words reach it or not, and a half tile's column is about as wide as "Bluetooth". */
-.ds-module-title,
-.ds-module-status{ white-space:nowrap; overflow:hidden; }
-.ds-module-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:var(--cc-head); }
-.ds-module-status{ font-size:var(--fs-help); color:var(--ink-faint); line-height:var(--s-14); }
-
-.ds-module-chevron{
-  font:inherit; display:grid; place-items:center; flex:none; width:18px; height:var(--ctl-h-l); padding:0; border:0; border-radius:var(--ctl-r-m);
-  background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-module-chevron:hover{ color:var(--ink); background:var(--surface); }
-.ds-module-chevron[*|aria-disabled=true]{ opacity:.35; cursor:default; }
-.ds-module-chevron[*|aria-disabled=true]:hover{ background:transparent; color:var(--ink-faint); }
-
-/* ModuleGrid (design/13 section 13.3.7): `--grid-columns` equal columns
-   (2), `--grid-gap` apart (10), `--grid-padding` inside (10); the component writes all three
-   inline from `control_center.grid_*`, and these are the control center's sizes
-   (`--cc-gap`, `--cc-pad`, design/29-SIZING.md). */
-.ds-module-grid{ --grid-columns:2; --grid-gap:var(--cc-gap); --grid-padding:var(--cc-pad); display:grid;
-  grid-template-columns:repeat(var(--grid-columns),minmax(0,1fr)); gap:var(--grid-gap); padding:var(--grid-padding); }
-/* -- module_panel -- */
-/* ModulePanel (design/13 section 13.3.7; sized by design/29-SIZING.md): a
-   module with content of its own on the tile's frame: the control center's module radius 8
-   (`--cc-module-r`), the Off tile's plate (`--surface-2`, a hairline drawn inset so it takes no
-   room) and the control center's padding of 10 (`--cc-pad`). A level module is then its padding,
-   a 16 header, a 6 gap and the Regular 22 capsule: 64 (`--cc-level-h`). Not pressable, so no
-   hover lift: its content takes the presses. The header row: a 16 px glyph in `--ink-soft`, the
-   title in the tile's type (13/600), the trailing slot at the far end in the tile's status type
-   (`--fs-help`, `--ink-faint`, tabular figures, for a level's percentage). Full by default: it
-   spans every grid column. `Bare` drops the plate where a popover card already is the module's.
-   Attribute selectors carry `*|` (spike S2). */
-
-.ds-module-panel{
-  display:flex; flex-direction:column; gap:var(--cc-head-gap); min-width:0; box-sizing:border-box;
-  padding:var(--cc-pad); border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); border-radius:var(--cc-module-r);
-  background:var(--surface-2); color:var(--ink);
-}
-.ds-module-panel[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-panel[*|data-plate=bare]{ padding:0; box-shadow:none; background:none; }
-
-.ds-module-panel-head{ display:flex; align-items:center; gap:var(--s-6); min-width:0; height:var(--cc-head); }
-.ds-module-panel-glyph{ display:flex; align-items:center; flex:none; color:var(--ink-soft); }
-.ds-module-panel-title{ flex:1 1 0; min-width:0; white-space:nowrap; overflow:hidden;
-  font-size:var(--fs-shell-menu); font-weight:600; line-height:var(--cc-head); }
-.ds-module-panel-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-4);
-  font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
-
-/* A module whose content is unavailable (`availability: Disabled`): the header's glyph and
-   trailing figure (a level's percentage) at the disabled .35 beside the dimmed level; the title
-   stays legible so the module is still named. */
-.ds-module-panel[*|aria-disabled=true] .ds-module-panel-glyph,
-.ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }
-/* -- month_grid -- */
-/* MonthGrid (design/04-COMPONENTS.md section 39; design/20 section 1.12): the
-   calendar widget's month. The title in the data face, upper and tracked .12em, in `--accent`
-   (design/02 sections 4-5, "calendar month"); the weekday heads in the data face at
-   `--fs-micro`, upper and tracked as a menu's section header. Seven 32 px columns, led by a
-   24 px week-number column under `data-weeks=show`. A day is its number on a 24 px disc: the
-   neighbours' days in `--ink-faint`, today on `--accent` in `--accent-ink`, a busy day with a
-   4 px dot under it (`--accent`; `--ink-soft` on a neighbour's day). A pressable day
-   (`data-kind=pressable`) takes `--surface-2` on its disc under the pointer.
-   The weeks slide in by the utility classes `a-slide-l`/`a-slide-r` (design/05).
-
-   Compact (`data-density=compact`, the compact-spacing pass of 2026-09-27): a
-   small desktop widget's content box is 140 x 140, which the regular grid (224 wide, 254 tall
-   for six weeks) overflows. The month fills that box as the reference's small Month widget
-   does (design/23 section 5.1): a 14 px header (the title in the UI face at `--fs-micro`,
-   `--fw-caps`, tracked, upper, `--accent`, its left edge 4 in, where a two-digit first column
-   starts; the plain 14 px `ds-month-step` glyph buttons), 12 px heads at `--fs-nano` in the UI
-   face, then the weeks sharing the rest evenly: seven columns across the width (20 each in
-   140) and the rows over the height, 118 / 6 = 19.67 for six weeks, 118 / 5 = 23.6 for five.
-   The weeks run 4 past the box's foot so the last row's numbers end as far from the card's
-   foot as the title's caps start from its top (about 15 and 17: an optical inset, the 12 of
-   padding measured to ink, not to line boxes). The number at `--fs-caption` on a disc of twice
-   its size (20) sits in the middle of its row; a 3 px dot inside the disc's foot (tucked
-   4, with 1 under it so a busy day's stack is the disc's 20 and centres alike), `--accent-ink`
-   on today's disc. The compact grid never draws week numbers. */
-
-.ds-month{ display:flex; flex-direction:column; align-items:flex-start; color:var(--ink); user-select:none; }
-
-.ds-month-header{ display:flex; align-items:center; gap:var(--s-2); align-self:stretch; min-height:28px; margin-bottom:var(--s-4); }
-.ds-month-title{
-  flex:1; min-width:0; white-space:nowrap; overflow:hidden; padding-left:var(--s-6);
-  font-family:var(--font-data); font-size:var(--fs-caption); font-weight:700; letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--accent-text);
-}
-
-.ds-month-weeks{ display:flex; flex-direction:column; }
-.ds-month-row{ display:grid; grid-template-columns:repeat(7,32px); }
-.ds-month[*|data-weeks=show] .ds-month-row{ grid-template-columns:24px repeat(7,32px); }
-
-.ds-month-head,
-.ds-month-week{
-  display:grid; place-items:center; font-family:var(--font-data); font-size:var(--fs-micro); font-variant-numeric:tabular-nums; color:var(--ink-faint);
-}
-.ds-month-head{ height:18px; font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; }
-.ds-month-week{ height:24px; align-self:start; }
-
-.ds-month-day{
-  font:inherit; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:var(--s-2);
-  height:30px; padding:0; border:0; background:transparent; color:var(--ink);
-}
-.ds-month-day[*|data-place=before],
-.ds-month-day[*|data-place=after]{ color:var(--ink-faint); }
-
-.ds-month-num{
-  display:grid; place-items:center; width:24px; height:24px; border-radius:var(--r-pill);
-  font-size:var(--fs-help); font-weight:500; line-height:1.3; font-variant-numeric:tabular-nums;
-  transition:background-color var(--t-quick) var(--e-out);
-}
-.ds-month-day[*|aria-current=date] .ds-month-num{ background:var(--accent); color:var(--accent-ink); font-weight:700; }
-
-.ds-month-day[*|data-kind=pressable]{ cursor:default; }
-.ds-month-day[*|data-kind=pressable]:hover .ds-month-num{ background:var(--surface-2); }
-.ds-month-day[*|data-kind=pressable][*|aria-current=date]:hover .ds-month-num{ background:var(--accent); }
-
-.ds-month-dot{ flex:none; width:4px; height:4px; border-radius:var(--r-pill); background:var(--accent-text); }
-.ds-month-day[*|data-place=before] .ds-month-dot,
-.ds-month-day[*|data-place=after] .ds-month-dot{ background:var(--ink-soft); }
-
-.ds-month-step{
-  font:inherit; display:grid; place-items:center; width:14px; height:14px; padding:0; border:0; border-radius:var(--r-pill);
-  background:transparent; color:var(--ink-faint); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
-}
-.ds-month-step:hover{ color:var(--ink); background:var(--surface-2); }
-
-/* Compact: the month fills the small frame's content box (flex:1 in `.ds-widget-body`); the
-   header and heads keep their heights and the weeks share the rest, so a five-week month's rows
-   are taller than a six-week one's. */
-.ds-month[*|data-density=compact]{ flex:1; min-height:0; align-items:stretch; }
-.ds-month[*|data-density=compact] .ds-month-header{ height:var(--s-14); min-height:0; gap:var(--s-1); margin-bottom:0; }
-.ds-month[*|data-density=compact] .ds-month-title{
-  font-family:var(--font-ui); font-size:var(--fs-micro); font-weight:var(--fw-caps); line-height:1; padding-left:var(--s-4);
-}
-.ds-month[*|data-density=compact] .ds-month-row{ grid-template-columns:repeat(7,minmax(calc(2 * var(--fs-caption)),1fr)); }
-.ds-month[*|data-density=compact] .ds-month-head{ height:var(--s-12); font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1; }
-.ds-month[*|data-density=compact] .ds-month-weeks{ flex:1; min-height:0; margin-bottom:calc(-1 * var(--s-4)); }
-/* Basis 19, one under the disc: unstretched (a wrapper that does not fill the frame, sill's `.sill-cal`), six weeks come to 14 + 12 + 6 x 19 - 4 = 136 and still fit 140. */
-.ds-month[*|data-density=compact] .ds-month-weeks > .ds-month-row{
-  flex:1 1 calc(2 * var(--fs-caption) - var(--s-1)); min-height:0; grid-template-rows:minmax(0,1fr);
-}
-.ds-month[*|data-density=compact] .ds-month-day{ height:auto; min-height:0; gap:0; justify-content:center; }
-.ds-month[*|data-density=compact] .ds-month-num{
-  flex:none; width:calc(2 * var(--fs-caption)); height:calc(2 * var(--fs-caption)); font-size:var(--fs-caption); line-height:1;
-}
-.ds-month[*|data-density=compact] .ds-month-dot{
-  width:var(--s-3); height:var(--s-3); margin:calc(-1 * var(--s-4)) 0 var(--s-1);
-}
-.ds-month[*|data-density=compact] .ds-month-day[*|aria-current=date] .ds-month-dot{ background:var(--accent-ink); }
-
-/* In a widget's card (`data-fit=frame`, design/23-WIDGETS.md section 5.2): the compact month
-   fills its box as above (the Small card's, or the Medium card's 140 x 140 right half); the
-   regular month keeps its own pitch (32 px columns, 30 px rows: the reference's large calendar
-   sits near 28-32) and is centred in the room left, never spread over it. */
-.ds-month[*|data-fit=frame][*|data-density=regular]{ flex:none; align-self:center; }
 /* -- pane_switcher -- */
 /* PaneSwitcher (design/13 section 13.3.7): the arriving pane slides in (the
    detail from the right, the root from the left) and the outgoing one leaves the other way,
@@ -2091,33 +1527,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pdf-thumb[*|data-state=pending] .ds-pdf-thumb-sheet{ opacity:.5; }
 .ds-pdf-thumb-page{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; }
 .ds-pdf-thumb-plate{ position:absolute; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
-/* -- user_picture -- */
-/* UserPicture (design/25-EMOJI.md section 7): a letter disc (`.ds-avatar`), an animated emoji
-   (`.ds-emoji`) or the user's photo, inside `.ds-user-picture`, the wrapper that plays the
-   accept beat (`a-picture-accept`, a pulse the picture's timer puts on and takes off) when the
-   mood turns happy. The wrapper adds no box of its own: it is the picture's size. */
-
-.ds-user-picture{ display:inline-flex; flex:none; transform-origin:50% 100%; }
-
-/* UserPicture::Photo: the user's own picture, cropped round. The disc clips (overflow hidden
-   under the pill radius) and the image covers it (`object-fit:cover`, centred), so a portrait
-   or landscape photo fills the disc without stretching. The sizes are the avatar's and the
-   emoji's: 28, 48 (the polkit prompt), 64 and 128; --surface-2 shows until the image lands. */
-.ds-user-photo{ position:relative; flex:none; box-sizing:border-box; overflow:hidden; border-radius:var(--r-pill);
-  background:var(--surface-2); }
-.ds-user-photo[*|data-size="28"]{ width:28px; height:28px; }
-.ds-user-photo[*|data-size="48"]{ width:48px; height:48px; }
-.ds-user-photo[*|data-size="64"]{ width:64px; height:64px; }
-.ds-user-photo[*|data-size="128"]{ width:128px; height:128px; }
-.ds-user-photo-image{ display:block; width:100%; height:100%; object-fit:cover; object-position:50% 50%; }
-
-/* UserPicturePicker: the letter and the emoji set as 64 px discs in 76 px cells (inline
-   `grid-template-columns` and `grid-auto-rows`), one radio group. The chosen cell takes the
-   emoji grid's selection look, `--accent-soft` on the item radius; the group shows no focus
-   ring of its own, its choice being the mark. */
-.ds-picture-picker{ display:grid; gap:0; outline:none; cursor:default; }
-.ds-picture-cell{ display:grid; place-items:center; min-width:0; box-sizing:border-box; border-radius:var(--r-menu-item); cursor:default; }
-.ds-picture-cell[*|aria-checked=true]{ background:var(--accent-soft); }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
    card and the bubble, and the overlay wrapper every floating component renders into at the end
@@ -2153,28 +1562,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* Closed by Escape or an outside click, a popover fades out before it goes, as a menu does
    (`menu-out`, `--t-quick --e-exit`; the macOS polish pass), taking no pointer while it does. */
 .ds-popover[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
-/* -- polkit_prompt -- */
-/* PolkitPrompt (design/04-COMPONENTS.md section 42; design/20 section 1.10): a narrow centred
-   sheet (`SheetWidth::Narrow`, 340) as the reference desktop's password alert: everything
-   centred in one column, the person's picture at 48 (a face, a photo, or an animated emoji), a bold title (display 16/700), the program's message
-   in the soft ink, "Details" in the accent with the detail as a hover card, the person's name
-   over a boxed secret field that shakes once when it was wrong (`a-shake-x`), and Cancel and
-   Authenticate side by side at equal width. Flat: the sheet's own material, no extra shadow. */
-
-.ds-polkit{ display:flex; flex-direction:column; align-items:center; box-sizing:border-box; width:100%; padding:var(--s-22) var(--s-22) var(--s-18); text-align:center; color:var(--ink); }
-/* An emoji is drawn at Medium and set in a 48 box: its sheet is sized in shares of its box. */
-.ds-polkit .ds-emoji[*|data-size]{ width:48px; height:48px; }
-.ds-polkit-title{ margin-top:var(--s-12); font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; line-height:1.3; color:var(--ink); }
-.ds-polkit-action{ margin-top:var(--s-6); font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
-.ds-polkit-details{ margin-top:var(--s-6); font-size:var(--fs-small); }
-.ds-polkit-details-word{ color:var(--accent-text); font-weight:600; cursor:default; }
-.ds-polkit-user{ align-self:stretch; margin-top:var(--s-16); font-size:var(--fs-small); font-weight:600; color:var(--ink-soft); text-align:left; }
-.ds-polkit-field{ position:relative; display:flex; align-self:stretch; margin-top:var(--s-6); }
-.ds-polkit-field .ds-input-wrap{ flex:1 1 auto; }
-.ds-polkit-caps{ position:absolute; right:var(--s-10); top:0; bottom:0; display:flex; align-items:center; color:var(--ink-faint); pointer-events:none; }
-.ds-polkit-hint{ margin-top:var(--s-8); font-size:var(--fs-small); color:var(--danger); }
-.ds-polkit-actions{ display:grid; grid-template-columns:1fr 1fr; gap:var(--s-8); align-self:stretch; margin-top:var(--s-18); }
-.ds-polkit-actions .ds-button{ width:100%; justify-content:center; }
 /* -- preview_pane -- */
 /* PreviewPane (design/04-COMPONENTS.md section 47): a column filling the palette's
    aside, 16 px in: the media box (220 tall; a picture or page fitted at its aspect, text
@@ -2431,32 +1818,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-settings-row-spin{ position:relative; display:block; width:6px; height:6px; }
 .ds-settings-row-trail[*|data-mark=battery]{ gap:var(--s-4); }
 .ds-settings-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
-/* -- now_playing -- */
-/* Now Playing (design/26-DETAILS.md 5.2.10). NowPlayingTrack: the art in a 48 px well at
-   `--r-media` beside the title (`--fs-shell-menu` 600) over the `by` line (`--fs-help`,
-   `--ink-faint`). A new track cross-fades: the outgoing layer sits over the incoming one and each
-   plays its fade once (`a-morph-fade-out`, `a-morph-fade-in`, `--t-quick`). TrackPosition: a 4 px bar, the played share
-   (`--f`, written each whole second from Rust, no transition: a clock-paced report steps) in
-   `--ink-soft` over `--m-level-well`, the times under it in tabular figures. Nothing loops. */
-
-.ds-track{ display:flex; align-items:center; gap:var(--s-12); min-width:0; }
-.ds-track-art{
-  position:relative; display:grid; place-items:center; flex:none; width:48px; height:48px; overflow:hidden;
-  border-radius:var(--r-media);
-}
-.ds-track-words{ position:relative; display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
-.ds-track-layer{ display:flex; flex-direction:column; min-width:0; }
-.ds-track-art > .ds-track-layer{ display:grid; place-items:center; width:100%; height:100%; }
-.ds-track-layer[*|data-morph=out]{ position:absolute; left:0; top:0; right:0; }
-.ds-track-none{ display:grid; place-items:center; width:100%; height:100%; background:var(--surface); color:var(--ink-faint); }
-.ds-track-title{ font-size:var(--fs-shell-menu); font-weight:600; line-height:1.3; }
-.ds-track-by{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-
-.ds-track-position{ display:flex; flex-direction:column; gap:var(--s-4); min-width:0; }
-.ds-track-bar{ position:relative; display:block; height:4px; border-radius:var(--r-pill); background:var(--m-level-well); overflow:hidden; }
-.ds-track-bar-fill{ position:absolute; left:0; top:0; bottom:0; width:calc(var(--f) * 100%); border-radius:var(--r-pill); background:var(--ink-soft); }
-.ds-track-time{ white-space:nowrap; }
-.ds-track-times{ display:flex; justify-content:space-between; font-size:var(--fs-help); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 /* -- sheet -- */
 /* Sheet (design/04-COMPONENTS.md section 24, derived from Peek Center): the peek's surface,
    centred, `min(560px, 88%)` wide, as tall as its content up to the peek's 36px inset.
@@ -2485,59 +1846,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* Narrow (`SheetWidth::Narrow`, M11): an alert's column, as the reference desktop's password
    prompt; the rest of the sheet is as above. */
 .ds-sheet[*|data-width=narrow]{ width:min(340px, 88%); }
-/* -- shot_thumbnail -- */
-/* ShotThumbnail and ShotGhost (design/04-COMPONENTS.md section 39, design/20 section 1.13).
-   The card is a plate in the Toast material inside a transparent Toast scope (the
-   transparent-root card rule in the materials section paints its tint, edge and drop); its
-   width and height are written inline from `shot_frame`, and so is the picture's letterboxed
-   rect inside it, so the bars round a picture outside 2:1..16:10 are the material. The picture's
-   corners follow the card's less the 4 px mat (`--s-4`, the same number as `shot_frame::MAT`).
-   Attribute selectors carry `*|` (spike S2).
-
-   Motion. Entering, `slide-r` at `--t-move --e-out` (`Anim::ShotIn`), restarted under its other
-   name on each showing (`data-pulse`); leaving, `shot-out` at `--t-move --e-exit`, held
-   (`Anim::ShotOut`), taking no pointer; hidden, nothing is laid out. Present keeps the entrance
-   declared and plays `hold` after a taken-back hide (`data-pulse=held`), so no settle or
-   take-back drops an animation without starting another. 
-
-   Hover (`data-hover=on`, set from the pointer in Rust so the caller's hold hears it too): the
-   actions row fades in at the bottom right over `--t-quick --e-out`. The ghost is the plate at 120 wide and .8 opaque, with no motion. */
-
-.ds-shot{ position:relative; box-sizing:border-box; max-width:100%; color:var(--ink); }
-.ds-shot[*|data-shown=hidden]{ display:none; }
-.ds-shot[*|data-presence=entering],.ds-shot[*|data-presence=present]{ animation:slide-r var(--t-move) var(--e-out); }
-.ds-shot[*|data-presence=entering][*|data-pulse=b],.ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:slide-r--b; }
-.ds-shot[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-shot[*|data-presence=leaving]{ animation:shot-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-
-.ds-shot-plate{ position:relative; box-sizing:border-box; width:100%; border-radius:var(--m-radius); overflow:hidden; }
-.ds-shot-picture{ position:absolute; inset:0; cursor:default; }
-.ds-shot-image{ position:absolute; display:block; border-radius:calc(var(--m-radius) - var(--s-4)); pointer-events:none; user-select:none; }
-
-.ds-shot-actions{ position:absolute; right:var(--s-6); bottom:var(--s-6); z-index:var(--z-raise); display:flex; gap:var(--s-3); padding:var(--s-3);
-  border-radius:var(--r-pill); background:var(--raise); border:var(--hair) solid var(--line); box-shadow:var(--shadow-2);
-  opacity:0; pointer-events:none; transition:opacity var(--t-quick) var(--e-out); }
-.ds-shot[*|data-hover=on] .ds-shot-actions{ opacity:1; pointer-events:auto; }
-.ds-shot-action{ display:flex; }
-
-.ds-shot-ghost{ position:relative; box-sizing:border-box; opacity:.8; pointer-events:none; }
-
-/* Swipe to dismiss (`data-swipe` on a card that can be swiped; `notification_swipe`, as a
-   notification card's). The card is drawn `--swipe-dx` off its place: following a drag or a
-   scroll 1:1 (`live`), springing back home on a spring in Rust (design/05 section 14), and flying
-   out to the right from where it was (`gone`, `banner-out`). A card that flew out is already
-   gone when its caller hides it, so its leaving plays nothing and stays invisible, rather than
-   `shot-out` starting over from its place.
-   Reduced motion is decided here, never by a caller: the spring back is critically damped, and the entrance
-   neither lifts nor leaves by sliding; it fades in and out (the motion tokens already shorten
-   both to Reduced's length). */
-.ds-shot[*|data-swipe]{ transform:translateX(var(--swipe-dx,0px)); touch-action:none; }
-.ds-shot[*|data-swipe=gone]{ animation:banner-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
-.ds-shot[*|data-swipe=gone][*|data-presence=leaving]{ animation:none; opacity:0; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present]{ animation-name:fade; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=entering][*|data-pulse=b],.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=present][*|data-pulse=held]{ animation-name:hold; }
-.ds[*|data-motion=reduced] .ds-shot[*|data-presence=leaving]{ animation-name:menu-out; }
 /* -- sidebar_item -- */
 /* SidebarItem (design/04-COMPONENTS.md section 19): `S:126-143`, `S:339-353`, `S:447-448`, C's
    drop target (`C:320-323`). Attribute selectors carry `*|` (spike S2). The seal is a real span
@@ -2623,91 +1931,6 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); cursor:grab;
 }
 .ds-slider-thumb[*|data-drag=live]{ transform:scale(1.15); }
-/* -- space_editor -- */
-/* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
-   Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from
-   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field is
-   two PNGs built in Rust per scheme (O-19): a colour plane stretched to fit, and a tiled dot
-   cell over it (`space_editor/field.rs`), so the dots stay round where S's scaled canvas
-   would stretch them.
-   O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
-   transform transition. The handle's white border is `--mark-ground` and its shadow
-   `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
-   The Space dot is also the AppearancePicker's accent swatch (section 26).
-   `.ds-field` is this editor's colour field only (TextInput's wrapper was also `.ds-field`, and
-   its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
-   22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
-   in a wide panel drew 140 px discs. The stop's remove button names the stop, as
-   S's `.stop .rm` does. */
-
-.ds-space-editor{
-  border:var(--hair) solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
-  padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
-}
-.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
-.ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
-
-.ds-field{
-  position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
-  border:var(--hair) solid var(--line);
-}
-/* The colours stretch; the dots are a tiled cell of the ground with a round hole, 9 px as S's
-   18 px canvas cell is at its half scale, so they stay round at any field width. */
-.ds-field-plane{ position:absolute; inset:0; background-size:100% 100%; background-repeat:no-repeat; }
-.ds-field-dots{ position:absolute; inset:0; background-size:9px 9px; background-repeat:repeat; }
-.ds-handle{
-  position:absolute; width:22px; height:22px; margin:calc(var(--s-11) * -1) 0 0 calc(var(--s-11) * -1); box-sizing:border-box; border-radius:var(--r-pill);
-  border:3px solid var(--mark-ground); box-shadow:var(--shadow-handle); cursor:grab; touch-action:none;
-}
-.ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
-
-.ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
-.ds-stop{
-  display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
-  color:var(--ink-soft); cursor:default;
-}
-.ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
-.ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
-.ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
-
-.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
-.ds-preset{
-  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-out);
-}
-.ds-preset:hover{ transform:scale(1.1); }
-
-.ds-checks{ display:grid; gap:var(--s-5); font-size:var(--fs-small); }
-.ds-check{ display:flex; align-items:center; gap:var(--s-8); color:var(--ink-soft); }
-.ds-check-value{ margin-left:auto; font-family:var(--font-data); font-size:var(--fs-note); font-variant-numeric:tabular-nums; }
-.ds-capnote{ margin:0; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.45; }
-
-.ds-space-dot{
-  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:2px solid transparent; cursor:default; padding:0;
-  transition:transform var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
-}
-.ds-space-dot:hover{ transform:scale(1.12); }
-.ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
-
-/* The title as a name field (`on_rename`): the inline TextInput takes the title's
-   display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
-   scheme's rows under a heading in the data face, upper case, as the field headers are. */
-.ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
-.ds-space-editor-title .ds-input-wrap{ flex:1; }
-.ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
-.ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
-
-/* A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
-   `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
-   `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
-   three. A handle and a stop disc are one picked colour. */
-.ds-space-dot[*|data-stops="1"], .ds-preset[*|data-stops="1"], .ds-space-swatch[*|data-stops="1"]{ background:var(--dot-c1); }
-.ds-space-dot[*|data-stops="2"], .ds-preset[*|data-stops="2"], .ds-space-swatch[*|data-stops="2"]{
-  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
-.ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
-  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
-.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
 /* -- spinner -- */
 /* Spinner (design/04-COMPONENTS.md section 15; design/26-DETAILS.md R4): C's sync halo
    (`C:284-292`), a ring at `inset:-4px` around a positioned parent, played as a pending loop.
@@ -3066,57 +2289,6 @@ html,body{margin:0;padding:0;background:transparent}
   mask-image:radial-gradient(var(--ink) var(--orb-mask), transparent 75%);
 }
 .ds-voice-orb[*|data-mask=off] .ds-voice-orb-dots { mask-image:none; }
-/* -- widget_frame -- */
-/* WidgetFrame (design/04 "Widgets"; design/20 section 1.14, design/22 section 3.20).
-   A small widget is one `--widget-cell` square (164), a medium two cells and a
-   gap wide (344 x 164), a large two by two (344 square); `WidgetMetrics` writes both tokens from
-   `widgets.desktop_cell_px` and `desktop_gap_px`. The desktop card is the Widget material's
-   plate (its tint, hairline and drop come from the transparent-root card rule in the materials
-   section) with the material's own corner (20, .12 of the small card, as measured), padded 12
-   (the reference's inset, design/23 section 1.1). With a Space tint the Space's gradient lies
-   over the plate at the material's frame alpha (`.ds-frame`), under the content; the card stacks
-   its own layers so the frame's `--z-scene` lands above the plate, not behind it. The tile sits
-   on the Popover it is in, a ModuleTile's plate: `--surface-2`, a hairline, `--r-tile` 12,
-   padded 12. The optional title row is quiet (design/23-WIDGETS.md section 4.3): the glyph at
-   12 and the name in the UI face at `--fs-caption` 600, both `--ink-soft`, so the widget's own
-   value leads. Attribute selectors carry `*|` (spike S2). */
-
-.ds-widget{ position:relative; display:flex; flex-direction:column; gap:var(--s-8); box-sizing:border-box; overflow:hidden;
-  width:var(--widget-cell); height:var(--widget-cell); color:var(--ink); }
-.ds-widget[*|data-size=medium]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget[*|data-size=large]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); height:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget[*|data-host=desktop]{ padding:var(--s-12); border-radius:var(--m-radius); }
-.ds-widget[*|data-tint=space]{ z-index:var(--z-raise); }
-.ds-widget[*|data-host=tile]{ padding:var(--s-12); border:var(--hair) solid var(--line); border-radius:var(--r-tile); background:var(--surface-2); }
-
-.ds-widget-title{ position:relative; z-index:var(--z-raise); display:flex; align-items:center; gap:var(--s-5); flex:none; min-width:0;
-  font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:600; line-height:1.25; color:var(--ink-soft); }
-.ds-widget-title-text{ white-space:nowrap; overflow:hidden; }
-.ds-widget-body{ position:relative; z-index:var(--z-raise); display:flex; flex-direction:column; flex:1; min-width:0; min-height:0; }
-
-
-/* Picked up (`data-lift=lifted`, design/23 section 9.8): the card
-   trades its resting drop gives way to `--shadow-drag` (replaced, not stacked: the rule restates
-   the transparent root's card selector so it wins over `--m-box`), above the other widgets on
-   `--z-drag`. Put down, it settles back over the same `--t-quick` at `--e-out`; at rest nothing
-   runs. */
-.ds-widget{ transition:box-shadow var(--t-quick) var(--e-out); }
-.ds-widget[*|data-lift=lifted]{ z-index:var(--z-drag); box-shadow:var(--shadow-drag); }
-.ds[*|data-material][*|data-chrome=transparent] .ds-widget[*|data-host=desktop][*|data-lift=lifted]{ box-shadow:var(--shadow-drag); }
-
-/* Leaving: a card its host removed plays `widget-out` on its pulse class (shrinks to
-   .85 and fades at `--t-move --e-exit`; a fade alone under Reduced) and takes no pointer while
-   it goes; the host drops it at `settle(WidgetOut)`. */
-.ds-widget[*|data-presence=leaving]{ pointer-events:none; }
-
-/* WidgetSlotGuide (design/23 section 9.8): where a dragged widget will land, the
-   card's footprint at the snap cell, a quiet translucent plate in the card's corner with no
-   content, faded in (`a-fade`) as the drag reaches the cell. */
-.ds-widget-slot{ box-sizing:border-box; width:var(--widget-cell); height:var(--widget-cell); border-radius:var(--m-radius);
-  background:var(--line); border:var(--hair) solid var(--line); pointer-events:none; }
-.ds-widget-slot[*|data-size=medium]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget-slot[*|data-size=large]{ width:calc(2 * var(--widget-cell) + var(--widget-gap)); height:calc(2 * var(--widget-cell) + var(--widget-gap)); }
-.ds-widget-slot[*|data-host=tile]{ border-radius:var(--r-tile); }
 /* -- window_frame -- */
 /* Window frame (design/04-COMPONENTS.md "Window frame"; design/13-BEHAVIOUR-menus-windows.md
    section 13.3.11). A framed root is a column: the 28 px titlebar, then `.ds-window-body` taking
@@ -3174,21 +2346,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-resize-edge[*|data-edge=top-right]{ top:0; right:0; width:12px; height:12px; cursor:nesw-resize; }
 .ds-resize-edge[*|data-edge=bottom-left]{ bottom:0; left:0; width:12px; height:12px; cursor:nesw-resize; }
 .ds-resize-edge[*|data-edge=bottom-right]{ bottom:0; right:0; width:12px; height:12px; cursor:nwse-resize; }
-/* -- workspace_pills -- */
-/* WorkspacePills (the macOS polish pass): one segmented group on the frame, not a row of
-   buttons. The track is the frame's hover fill; the current workspace is the raised pressed
-   fill with the current-item shadow (`S:118`); the others are soft ink, hovered to full ink.
-   Text is the bar's shell size. Inks are the paper names the frame ground redirects. The track is
-   a bar item (22, radius 5); each pill sits 2 inside it at the concentric radius, 5 - 2 = 3
-   (design/29-SIZING.md R6). */
-
-.ds-ws-pills{ display:inline-flex; align-items:center; gap:var(--s-2); padding:var(--s-2); height:var(--shell-bar-item); box-sizing:border-box;
-  border-radius:var(--r-shell-bar-item); background:var(--surface); }
-.ds-ws-pill{ font:inherit; display:inline-grid; place-items:center; min-width:var(--s-22); height:100%; padding:0 var(--s-7); border:0; border-radius:calc(var(--r-shell-bar-item) - var(--s-2));
-  background:transparent; color:var(--ink-soft); font-size:var(--fs-shell-bar); font-weight:var(--fw-shell-bar); cursor:default;
-  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
-.ds-ws-pill:hover{ color:var(--ink); }
-.ds-ws-pill[*|aria-current=true]{ background:var(--surface-2); color:var(--ink); box-shadow:var(--shadow-current); }
 /* -- drop_place -- */
 /* A drop place: the drop states SidebarItem and TreeItem share, one rule set for
    both (design/04-COMPONENTS.md section 34, C's drop target `C:320-323`). Last in the component
@@ -3215,99 +2372,3 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-morph-layer{ display:block; }
 .ds-morph-layer[*|data-morph=out]{ position:absolute; left:0; top:0; }
 .ds-morph-slash{ position:absolute; left:0; top:0; }
-/* -- widget_views -- */
-/* The widgets' content on the card (design/23-WIDGETS.md sections 3.3, 4.1, 4.2 and 9.6): the
-   compositions the reference measures, moved into quire with the widget contract so no host
-   lays out a widget's content. The card itself (corner, inset, material, tint) is
-   `widget_frame`'s. Batteries: Small with one device, the ring top left and the hero figure
-   bottom left (M13); Small with several, a 2 x 2 grid of rings (M14); Medium, four places on the
-   reference's fixed 80 pitch (a 64 ring and a 16 gap, the row centred so the first sits 20 in),
-   the figure 18 under each and a bare track with an empty figure line in a place with no battery
-   (M15). World Clock: Medium, four dials across with the city and the
-   notes under each (M19, M24); Small, the large dial alone (clock_face's small-card rules).
-   Attribute selectors carry `*|` (spike S2). */
-
-.ds-batteries{ display:flex; flex:1; min-width:0; min-height:0; }
-.ds-batteries[*|data-layout=solo]{ flex-direction:column; justify-content:space-between; }
-.ds-batteries[*|data-layout=grid]{ flex-wrap:wrap; justify-content:space-between; align-content:space-between; }
-.ds-batteries[*|data-layout=row]{ justify-content:center; align-items:center; gap:var(--s-16); }
-.ds-batteries[*|data-layout=absent]{ align-items:center; justify-content:center; }
-.ds-batteries-hero{ margin-bottom:calc(-1 * var(--s-6)); font-family:var(--font-display); font-size:var(--fs-widget-hero);
-  font-weight:500; line-height:1; letter-spacing:-.01em; color:var(--ink); }
-.ds-batteries-cell{ display:flex; flex:none; width:64px; flex-direction:column; align-items:center; gap:var(--s-18); }
-.ds-batteries-figure{ min-height:1em; font-family:var(--font-display); font-size:var(--fs-widget-figure); font-weight:500; line-height:1; color:var(--ink); }
-.ds-batteries-quiet,
-.ds-world-clock-quiet{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700; line-height:1.2; color:var(--ink-faint); }
-
-.ds-world-clock{ display:flex; justify-content:space-between; align-items:center; flex:1; min-width:0; padding:0 var(--s-6); }
-.ds-world-clock-city{ display:flex; flex-direction:column; align-items:center; min-width:0; }
-.ds-world-clock-note{ max-width:100%; white-space:nowrap; overflow:hidden; font-family:var(--font-ui); font-size:var(--fs-small);
-  font-weight:700; line-height:1.2; color:var(--ink-faint); }
-
-/* The month widget (design/23 section 5.2), the reference's layouts rather than one grid
-   stretched over the card. Medium (`data-layout=split`): the today column on the left, the
-   compact month in a 140 x 140 box on the right, the small card's own metrics (20 px columns,
-   19-24 px rows). Large (`data-layout=stack`): the regular month at its own pitch (32 px columns,
-   30 px rows), centred, over the day's events. The weekday and the title take the card's title
-   colour on the desktop (below). An event is its calendar's 3 px bar, its title (UI face 600 at
-   `--fs-help`) and its time (`--fs-nano`, `--ink-soft`). */
-.ds-month-widget{ display:flex; flex:1; min-width:0; min-height:0; }
-.ds-month-widget[*|data-layout=split]{ gap:var(--s-16); }
-.ds-month-widget[*|data-layout=stack]{ flex-direction:column; align-items:center; gap:var(--s-8); }
-.ds-month-widget-month{ display:flex; flex-direction:column; flex:none; width:calc(7 * 2 * var(--fs-caption)); }
-.ds-month-today{ display:flex; flex-direction:column; flex:1; min-width:0; gap:var(--s-2); padding-left:var(--s-4); }
-.ds-month-weekday{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700; text-transform:uppercase;
-  letter-spacing:var(--tracking-caps-narrow); color:var(--accent-text); }
-.ds-month-date{ margin-bottom:var(--s-8); font-family:var(--font-display); font-size:var(--fs-widget-hero); font-weight:500; line-height:1; color:var(--ink); }
-.ds-month-events{ display:flex; flex-direction:column; align-self:stretch; gap:var(--s-4); padding:0 var(--s-6); }
-.ds-month-event{ display:flex; flex-direction:column; min-width:0; padding-left:var(--s-8); border-left:var(--s-3) solid var(--c-blue); }
-.ds-month-event[*|data-hue=red]{ border-left-color:var(--c-red); }
-.ds-month-event[*|data-hue=amber]{ border-left-color:var(--c-amber); }
-.ds-month-event[*|data-hue=green]{ border-left-color:var(--c-green); }
-.ds-month-event[*|data-hue=violet]{ border-left-color:var(--c-violet); }
-.ds-month-event-title{ white-space:nowrap; overflow:hidden; font-family:var(--font-ui); font-size:var(--fs-help); font-weight:600; line-height:1.25; color:var(--ink); }
-.ds-month-event-time{ font-family:var(--font-ui); font-size:var(--fs-nano); line-height:1.25; color:var(--ink-soft); }
-.ds-month-quiet{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
-
-/* The month's title on a desktop card (option (b), the default pending the
-   user's pick, design/23 section 4.3): `--ink-soft`, not the accent as text, which the
-   see-through card cannot hold at 4.5:1 over the wallpaper. Today's disc and the busy dots keep
-   the accent. */
-.ds-widget[*|data-host=desktop] .ds-month-title,
-.ds-widget[*|data-host=desktop] .ds-month-weekday{ color:var(--ink-soft); }
-/* -- widget_gallery -- */
-/* WidgetGallery, "Edit Widgets" (design/23-WIDGETS.md section 9.7): the reference's widget
-   gallery in three columns, laid out for a wide sheet at the bottom of the desktop. At the left,
-   the registry's widgets as a list, each its name (UI face 600) over its description
-   (`--ink-soft`), the one looked at on `--accent-soft`. In the middle, that widget drawn once, at
-   the one size it takes, with its preview entry on the real card over `--surface-2`, and the two
-   buttons that add it. At the right, what is placed on the desktop and in the notification
-   center, one row each: the name and Remove. The gallery fills the height it is given
-   (`flex:1` in a column, or its grid row), and the placed column scrolls on its own, so a new
-   row can be brought into view without moving the rest. Attribute selectors carry `*|`
-   (spike S2). */
-
-.ds-widget-gallery{ display:grid; grid-template-columns:minmax(0,200px) minmax(0,1fr) minmax(0,280px); grid-template-rows:minmax(0,1fr);
-  flex:1; min-height:0; gap:var(--s-16); color:var(--ink); }
-.ds-widget-gallery-kinds{ display:flex; flex-direction:column; gap:var(--s-2); min-height:0; overflow-y:auto; scrollbar-width:none; }
-.ds-widget-gallery-kind{ font:inherit; display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-2); padding:var(--s-8) var(--s-10);
-  border:0; border-radius:var(--r-tile); background:transparent; color:var(--ink); text-align:left; cursor:default;
-  transition:background-color var(--t-quick) var(--e-out); }
-.ds-widget-gallery-kind:hover{ background:var(--surface-2); }
-.ds-widget-gallery-kind[*|aria-selected=true]{ background:var(--accent-soft); }
-.ds-widget-gallery-name{ font-family:var(--font-ui); font-size:var(--fs-body); font-weight:600; }
-.ds-widget-gallery-description{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-soft); }
-
-.ds-widget-gallery-detail{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--s-16); min-width:0; min-height:0;
-  padding:var(--s-16); border-radius:var(--r-panel); background:var(--surface-2); }
-.ds-widget-gallery-preview{ display:flex; justify-content:center; }
-.ds-widget-gallery-actions{ display:flex; flex-wrap:wrap; justify-content:center; gap:var(--s-8); }
-.ds-widget-gallery-actions > .ds-button{ flex:none; white-space:nowrap; }
-
-.ds-widget-gallery-placed{ display:flex; flex-direction:column; gap:var(--s-16); min-height:0; padding:0 var(--s-6); overflow-y:auto; scrollbar-width:none; }
-.ds-widget-gallery-surface{ display:flex; flex-direction:column; gap:var(--s-6); }
-.ds-widget-gallery-heading{ font-family:var(--font-ui); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps);
-  text-transform:uppercase; color:var(--ink-faint); }
-.ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
-.ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
-.ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }

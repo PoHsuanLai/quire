@@ -7,9 +7,10 @@ use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertEmphasis, Appearance, Button, ButtonVariant, Chevron, Ds, Flow, Icon, IconSource,
-    Inject, Material, ModuleGrid, ModuleState, ModuleTile, Px, TextLine, Theme,
+    Alert, AlertEmphasis, Appearance, Button, ButtonVariant, Ds, Flow, Icon, IconSource, Inject,
+    Material, Px, TextLine, Theme,
 };
+use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile};
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";

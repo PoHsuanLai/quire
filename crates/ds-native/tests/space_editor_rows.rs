@@ -4,11 +4,9 @@
 
 use dioxus::prelude::*;
 use ds::Word;
-use ds::{
-    Appearance, DotIndex, Ds, Material, MeasuredIn, Motion, MotionChoice, Scheme, ShortcutKey,
-    SpaceEditor, SpaceLook,
-};
+use ds::{Appearance, Ds, Material, Motion, Scheme, ShortcutKey, SpaceLook};
 use ds_native::{Harness, Viewport};
+use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceEditor};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -27,7 +25,7 @@ fn Editor() -> Element {
     let mut name = use_signal(|| "Work".to_string());
     let mut motion = use_signal(|| Motion::Standard);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Sheet,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet,
             p { class: "name", "{name}" }
             p { class: "motion", "{motion().slug()}" }
             div { style: "width:380px",

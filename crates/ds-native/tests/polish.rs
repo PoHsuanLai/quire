@@ -8,10 +8,11 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, DotIndex, Ds, Grain, HeaderKind, Icon, Material, PRESETS,
-    Point, Px, Rect, Scheme, SectionHeader, SpaceEditor, SpaceLook, Theme,
+    Appearance, Button, ButtonVariant, Ds, Grain, HeaderKind, Icon, Material, PRESETS, Point, Px,
+    Rect, Scheme, SectionHeader, SpaceLook, Theme,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{DotIndex, SpaceEditor};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -26,7 +27,7 @@ const VIEW: Viewport = Viewport {
 #[component]
 fn Root(children: Element) -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, {children} }
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, {children} }
     }
 }
 

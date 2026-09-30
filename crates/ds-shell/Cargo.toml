@@ -1,0 +1,28 @@
+[package]
+name = "ds-shell"
+description = "The design system's shell parts: lock, switcher, bar, control center, notifications, OSD, clocks, batteries, emoji and the desktop widgets, with the shell's tokens and sheets."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds = { workspace = true }
+ds-core = { workspace = true }
+ds-motion = { workspace = true }
+ds-style = { workspace = true, features = ["dioxus"] }
+dioxus = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+image = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+dioxus-ssr = { workspace = true }
+ds-lint = { workspace = true }
+ds-core = { workspace = true, features = ["testing"] }

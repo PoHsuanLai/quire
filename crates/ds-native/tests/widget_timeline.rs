@@ -6,13 +6,14 @@
 //! the dates are exact whatever the machine's load.
 
 use dioxus::prelude::*;
-use ds::widget::REFRESH_FLOOR;
-use ds::{
-    Appearance, ClockCity, ClockEntry, ClockTime, Dated, DayPhase, Ds, EntryDate, Material, Motion,
-    Refresh, RefreshAsk, RootChrome, Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
-};
+use ds::{Appearance, Ds, Material, Motion, RootChrome};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::widget::REFRESH_FLOOR;
+use ds_shell::{
+    ClockCity, ClockEntry, ClockTime, Dated, DayPhase, EntryDate, Refresh, RefreshAsk, Seconds,
+    Timeline, WidgetCard, WidgetSize, WorldClockWidget,
+};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -52,7 +53,7 @@ fn stage(timeline: fn() -> Timeline<ClockEntry>) -> Element {
     let mounted = use_hook(timeline);
     let timeline = NEXT().unwrap_or(mounted);
     rsx! {
-        Ds { appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
             WidgetCard { widget: WorldClockWidget, timeline, size: WidgetSize::Small,
                 onrefresh: |ask| ASKS.with(|asks| asks.borrow_mut().push(ask)) }
         }

@@ -76,7 +76,7 @@ fn click_handlers(text: &str) -> Vec<(usize, String)> {
 #[test]
 fn every_click_a_component_stops_is_handed_to_the_click_focus() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let broken: Vec<String> = ["src/components", "src/shell"]
+    let broken: Vec<String> = ["src/components", "../ds-shell/src"]
         .iter()
         .flat_map(|dir| sources(&root.join(dir)))
         .collect::<Vec<_>>()

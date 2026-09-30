@@ -23,10 +23,11 @@ mod probe;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Appearance, AppearancePicker, Ds, Material, ModuleGrid, ModulePanel, PickerLayout,
-    Rect, SegSize, SegmentedControl, SystemPrefs, Theme,
+    Accent, Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SegSize,
+    SegmentedControl, SystemPrefs, Theme,
 };
 use ds_native::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
+use ds_shell::{ModuleGrid, ModulePanel};
 use probe::{distance, rect};
 use std::cell::Cell;
 use std::time::Duration;
@@ -66,7 +67,7 @@ fn Desk() -> Element {
         (2, "Performance".to_owned()),
     ];
     rsx! {
-        Ds { appearance: appearance(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: appearance(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid {
                     ModulePanel {

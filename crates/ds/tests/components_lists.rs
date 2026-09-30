@@ -22,21 +22,16 @@ mod mailo;
 mod mailo4;
 #[path = "lists/motion.rs"]
 mod motion;
-#[path = "lists/png.rs"]
-mod png;
 #[path = "lists/rows.rs"]
 mod rows;
-#[path = "lists/editor.rs"]
-mod space_editor;
 
-use cases::{CASES, Case, editor, preset_look};
+use cases::{CASES, Case};
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::Emphasis;
 use ds::{
-    Anim, AnimatedList, Capping, Dot, DragGhost, DragPhase, DragTracker, Exit, Grain, Point, Px,
-    Rect, RosterState, RowPitch, Scheme, Size, SpaceLook, Verdict, derive, readout, swatch,
-    use_drag,
+    Anim, AnimatedList, DragGhost, DragPhase, DragTracker, Exit, Point, Px, Rect, RosterState,
+    RowPitch, Size, use_drag,
 };
 use mailo::MAILO_CASES;
 use mailo4::MAILO4_CASES;
@@ -65,30 +60,6 @@ fn render(make: fn() -> Element) -> String {
     dioxus_ssr::render(&dom)
 }
 
-const PLANE: &str = "data:image/png;base64,";
-
-/// The field plane's data URI, and `html` with its payload replaced by a marker: the plane is
-/// checked by decoding it (below), not by 60 kB of base64 in a golden.
-fn scrub(html: &str) -> String {
-    let mut out = String::new();
-    let mut rest = html;
-    while let Some(at) = rest.find(PLANE) {
-        let payload = &rest[at + PLANE.len()..];
-        let end = payload
-            .find(|c: char| !(c.is_ascii_alphanumeric() || c == '+' || c == '/' || c == '='))
-            .unwrap_or(payload.len());
-        out.push_str(&rest[..at + PLANE.len()]);
-        out.push_str(if end > 64 {
-            "[field plane]"
-        } else {
-            &payload[..end]
-        });
-        rest = &payload[end..];
-    }
-    out.push_str(rest);
-    out
-}
-
 fn golden_name(case: &Case) -> String {
     format!("lists/{}/{}.html", case.component, case.state)
 }
@@ -100,7 +71,7 @@ fn every_list_component_matches_its_golden() {
         .chain(ROW_CASES)
         .chain(MAILO_CASES)
         .chain(MAILO4_CASES)
-        .filter_map(|case| golden::check(&golden_name(case), &scrub(&render(case.make))).err())
+        .filter_map(|case| golden::check(&golden_name(case), &render(case.make)).err())
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
@@ -134,21 +105,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "text_input",
         ],
         "hover_strip" => &["hover_strip", "icon_button"],
-        "appearance_picker" => &[
-            "appearance_picker",
-            "section_header",
-            "segmented",
-            "space_editor",
-        ],
-        "space_editor" => &[
-            "space_editor",
-            "section_header",
-            "segmented",
-            "slider",
-            "button",
-            "chip",
-            "text_input",
-        ],
+        "appearance_picker" => &["appearance_picker", "section_header", "segmented"],
         "drag" => &["drag_ghost"],
         other => return sheet(other).into_iter().collect(),
     };
@@ -167,6 +124,10 @@ fn sheet(name: &str) -> Option<&'static str> {
 /// by its attributes, spike S6) and the `.ds-truncate` utility.
 const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 
+/// A class a component here draws that a sheet above `ds` styles: the picker's Space dot is
+/// `ds-shell`'s `space_editor` sheet (FINDINGS "The picker's Space dot").
+const STYLED_ABOVE: &[&str] = &["ds-space-dot"];
+
 #[test]
 fn every_class_in_a_golden_is_styled_by_its_component() {
     let goldens = golden::all_in("lists");
@@ -184,7 +145,8 @@ fn every_class_in_a_golden_is_styled_by_its_component() {
             continue;
         }
         for class in classes(html) {
-            if SHARED.contains(&class) || !class.starts_with("ds-") {
+            if SHARED.contains(&class) || STYLED_ABOVE.contains(&class) || !class.starts_with("ds-")
+            {
                 continue;
             }
             if !css.iter().any(|sheet| styles_class(sheet, class)) {
@@ -197,7 +159,7 @@ fn every_class_in_a_golden_is_styled_by_its_component() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// This wave's twelve stylesheets.
+/// The stylesheets of the components listed here.
 const OWN: &[&str] = &[
     "list_row",
     "hover_strip",
@@ -209,7 +171,6 @@ const OWN: &[&str] = &[
     "provider_mark",
     "drag_ghost",
     "edge_strip",
-    "space_editor",
     "text_runs",
 ];
 
@@ -249,26 +210,6 @@ const MARKUP_EXCEPTIONS: &[ds_lint::Exception] = {
         },
         Exception {
             rule: Rule::HexColour,
-            selector: "div.ds-handle",
-            reason: "a handle is filled with its dot's pick colour from space::palette",
-        },
-        Exception {
-            rule: Rule::HexColour,
-            selector: "i.ds-stop-disc",
-            reason: "a stop's disc is its dot's pick colour from space::palette",
-        },
-        Exception {
-            rule: Rule::HexColour,
-            selector: "span.ds-space-swatch",
-            reason: "the title swatch is the Space's gradient from space::palette",
-        },
-        Exception {
-            rule: Rule::HexColour,
-            selector: "button.ds-preset",
-            reason: "a preset is painted with its own derived gradient",
-        },
-        Exception {
-            rule: Rule::HexColour,
             selector: "button.ds-space-dot",
             reason: "a Space dot is painted with its FrameVars gradient",
         },
@@ -290,17 +231,15 @@ fn every_list_golden_lints_clean() {
         "only {} goldens",
         goldens.len()
     );
+    // The picker's Space dot is styled by a sheet above `ds`; a stand-in rule defines its class.
+    let css = format!("{}\n.ds-space-dot{{}}", ds::stylesheet());
     let failures: Vec<String> = goldens
         .iter()
         .flat_map(|(name, html)| {
-            markup(html, ds::stylesheet(), &config)
+            markup(html, &css, &config)
                 .into_iter()
                 .map(move |offence| format!("{name}: {:?} {}", offence.rule, offence.text))
         })
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-    // The plane's payload is scrubbed from the goldens; the real markup must lint clean too.
-    let real = render(|| editor(preset_look(0, Grain(35)), Scheme::Light, 0));
-    let offences = markup(&real, ds::stylesheet(), &config);
-    assert!(offences.is_empty(), "{offences:?}");
 }

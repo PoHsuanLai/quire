@@ -7,13 +7,14 @@
 //! `settle(BannerOut)`, never a drag out), while a drag to the left still starts a drag out.
 
 use dioxus::prelude::*;
-use ds::NotificationSwipe;
 use ds::{
-    Anim, Appearance, DRAG_THRESHOLD, DragStart, Ds, Hover, Icon, ImageSize, ImageSource, Material,
-    MotionLevel, Point, Px, ShotThumbnail, Shown, ThumbAction, settle,
+    Anim, Appearance, DRAG_THRESHOLD, Ds, Icon, ImageSize, ImageSource, Material, MotionLevel,
+    Point, Px, Shown, settle,
 };
 use ds_native::harness::{SETTLE_BOUND, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::NotificationSwipe;
+use ds_shell::{DragStart, Hover, ShotThumbnail, ThumbAction};
 use std::time::{Duration, Instant};
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
@@ -48,7 +49,7 @@ fn Thumb() -> Element {
         onpress: EventHandler::new(|()| *DELETED.write() += 1),
     }];
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             ShotThumbnail {
                 image: picture(),
                 size: ImageSize { width: 16, height: 9 },
@@ -66,7 +67,7 @@ fn Thumb() -> Element {
 #[allow(non_snake_case)]
 fn Swipeable() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "padding-left:80px",
                 ShotThumbnail {
                     image: picture(),

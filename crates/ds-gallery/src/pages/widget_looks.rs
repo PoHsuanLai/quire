@@ -13,14 +13,14 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::LabelHue;
 use ds::Word;
-use ds::{
-    Appearance, BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase,
-    Device, DeviceGlyph, Ds, IconSize, Inject, Lift, Material, MonthEntry, MonthIntent,
-    MonthWidget, RingMark, RootChrome, Seconds, SpaceLook, Timeline, WeekNumbers, Widget,
-    WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics, WidgetSize, WidgetSlotGuide,
-    WorldClockWidget, use_scope,
+use ds::{Appearance, Ds, IconSize, Inject, Material, RootChrome, SpaceLook, use_scope};
+use ds_shell::{
+    BatteryEntry, BatteryWidget, CardTint, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
+    DeviceGlyph, Lift, MonthEntry, MonthIntent, MonthWidget, RingMark, Seconds, Timeline,
+    WeekNumbers, Widget, WidgetCard, WidgetContext, WidgetFrame, WidgetHost, WidgetMetrics,
+    WidgetSize, WidgetSlotGuide, WorldClockWidget,
 };
-use ds::{EventLine, MonthFace, TodayLine};
+use ds_shell::{EventLine, MonthFace, TodayLine};
 
 /// The medium widget's four: critical, half, full, and low but charging.
 fn devices() -> BatteryEntry {

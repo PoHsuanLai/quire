@@ -11,9 +11,10 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, BlurState, Ds, Fraction, Inject, LevelControl, LevelGlyph, LevelLook, Material,
-    ModulePanel, Muting, Osd, OsdLevel, PRESETS, RootChrome, Shown, SpaceLook, Theme,
+    Muting, PRESETS, RootChrome, Shown, SpaceLook, Theme,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{ModulePanel, Osd, OsdLevel};
 use probe::rect;
 use std::cell::Cell;
 use std::time::Duration;
@@ -59,19 +60,19 @@ fn Specimen() -> Element {
     };
     match ground {
         Ground::Paper => rsx! {
-            Ds { appearance, material: Material::Window,
+            Ds { sheet: Some(ds_shell::stylesheet()), appearance, material: Material::Window,
                 div { style: "width:296px;padding:20px", {level()} }
             }
         },
         Ground::Module => rsx! {
-            Ds { appearance, material: Material::Popover, chrome: Some(RootChrome::Painted),
+            Ds { sheet: Some(ds_shell::stylesheet()), appearance, material: Material::Popover, chrome: Some(RootChrome::Painted),
                 div { style: "width:296px;padding:20px",
                     ModulePanel { title: "Speakers", {level()} }
                 }
             }
         },
         Ground::WorkOsd => rsx! {
-            Ds { appearance, look: work(theme), material: Material::Window,
+            Ds { sheet: Some(ds_shell::stylesheet()), appearance, look: work(theme), material: Material::Window,
                 Ds { appearance, look: work(theme), material: Material::Osd, chrome: Some(RootChrome::Transparent),
                      blur: BlurState::Available, stylesheet: Inject::Host,
                     Osd { shown: Shown::Visible, label: "Sound", look: LevelLook::Capsule,

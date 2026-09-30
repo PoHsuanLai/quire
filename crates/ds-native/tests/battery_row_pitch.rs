@@ -4,11 +4,12 @@
 //! each place left over, so two batteries never spread to the card's ends with the middle empty.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BatteryCell, BatteryEntry, BatteryWidget, Device, Ds, Fraction, Material, Motion,
-    RingMark, RootChrome, Timeline, WidgetCard, WidgetMetrics, WidgetSize,
-};
+use ds::{Appearance, Ds, Fraction, Material, Motion, RootChrome};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{
+    BatteryCell, BatteryEntry, BatteryWidget, Device, RingMark, Timeline, WidgetCard,
+    WidgetMetrics, WidgetSize,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -45,7 +46,7 @@ fn entry(count: usize) -> BatteryEntry {
 #[allow(non_snake_case)]
 fn Row() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: Motion::Reduced, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: "padding:20px;{WidgetMetrics::default().style_attr()}",
                 WidgetCard { widget: BatteryWidget, timeline: Timeline::now(entry(COUNT())), size: WidgetSize::Medium }
             }

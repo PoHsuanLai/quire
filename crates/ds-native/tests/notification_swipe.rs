@@ -6,11 +6,11 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AppMark, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel,
-    NotificationCard, NotificationSwipe, Point, Px, settle,
+    Anim, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel, Point, Px, settle,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{AppMark, NotificationCard, NotificationSwipe};
 use std::cell::Cell;
 use std::time::{Duration, Instant};
 
@@ -29,7 +29,7 @@ thread_local! {
 #[allow(non_snake_case)]
 fn Card() -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion: MOTION.with(Cell::get), ..Appearance::default() }, material: Material::Toast,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion: MOTION.with(Cell::get), ..Appearance::default() }, material: Material::Toast,
             div { style: "padding:24px",
                 NotificationCard {
                     app: AppMark { icon: IconSource::Glyph(Icon::Mail), name: "Mail".into() },

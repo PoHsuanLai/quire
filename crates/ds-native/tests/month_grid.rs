@@ -4,14 +4,16 @@
 //! and drop it once the slide settles, never before `settle(Anim::SlideR)`; and a pressable day
 //! hands its key to `onpick`.
 
-#[path = "../../ds/tests/support/month_sample.rs"]
+#[path = "../../ds-shell/tests/support/month_sample.rs"]
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, DayKey, Ds, Material, MonthGrid, MonthStep, MotionLevel};
-use ds::{WeekNumbers, settle};
+use ds::settle;
+use ds::{Anim, Appearance, Ds, Material, MotionLevel};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::WeekNumbers;
+use ds_shell::{DayKey, MonthGrid, MonthStep};
 use month_sample::{First, SEPTEMBER, sample, shift};
 use std::time::Duration;
 
@@ -31,7 +33,7 @@ fn MonthApp() -> Element {
     let mut month = use_signal(|| SEPTEMBER);
     let mut log = use_signal(Vec::<String>::new);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             MonthGrid {
                 data: sample(month(), First::Monday),
                 weeks: WeekNumbers::Show,

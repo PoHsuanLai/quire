@@ -36,6 +36,12 @@ pub struct ClickRoot {
     element: CopyValue<Option<Rc<MountedData>>>,
 }
 
+impl std::fmt::Debug for ClickRoot {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ClickRoot").finish_non_exhaustive()
+    }
+}
+
 impl ClickRoot {
     /// The document's host, and the root's element, once mounted.
     pub fn of(element: CopyValue<Option<Rc<MountedData>>>) -> ClickRoot {

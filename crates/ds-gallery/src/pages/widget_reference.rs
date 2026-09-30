@@ -11,10 +11,10 @@ use super::Section;
 use super::widget_blur::BlurWall;
 use super::widget_looks::Wall;
 use dioxus::prelude::*;
-use ds::{
-    BatteryCell, BatteryEntry, BatteryWidget, Button, ButtonVariant, ClockCity, ClockEntry,
-    ClockTime, Common, DayPhase, Device, Fraction, RingMark, Seconds, Timeline, WakeStamp,
-    WidgetCard, WidgetSize, WorldClockWidget,
+use ds::{Button, ButtonVariant, Common, Fraction, WakeStamp};
+use ds_shell::{
+    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
+    RingMark, Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
 };
 
 /// One battery on the widgets.

@@ -10,9 +10,10 @@ mod probe;
 use dioxus::prelude::*;
 use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
-    MenuBarItem, MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Shown, Surface,
+    MenuEntry, MenuTile, MenuTrail, PlateFamily, Px, Scheme, Shown, Surface,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::MenuBarItem;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;
@@ -52,7 +53,7 @@ fn bare_stack() -> MaterialStack {
 #[allow(non_snake_case)]
 fn Corners() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, stack: Some(bare_stack()),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, stack: Some(bare_stack()),
             div { style: "display:flex; gap:40px; padding:40px; background:#ffffff",
                 div { class: "squircle", style: "width:240px; height:200px",
                     Surface { material: Material::Dock, theme: Some(Scheme::Dark), radius: Some(Corner::Squircle(Px(40.0))),
@@ -102,7 +103,7 @@ fn a_squircle_corner_is_fuller_than_a_circle_at_45_degrees() {
 #[allow(non_snake_case)]
 fn Card() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "padding:60px; background:#b4b4b4; height:400px",
                 div { class: "card", style: "width:240px; height:120px",
                     Surface { material: Material::Popover, theme: Some(Scheme::Dark),
@@ -144,7 +145,7 @@ fn a_card_stacks_a_hairline_a_highlight_and_two_shadows() {
 #[allow(non_snake_case)]
 fn Plates() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "display:flex; gap:24px; padding:40px; background:#ffffff",
                 span { class: "blue", IconView { source: IconSource::Glyph(Icon::Terminal), size: IconSize::Tile96, plate: Some(PlateFamily::Blue) } }
                 span { class: "amber", IconView { source: IconSource::Glyph(Icon::Folder), size: IconSize::Tile48, plate: Some(PlateFamily::Amber) } }
@@ -185,7 +186,7 @@ fn a_plate_is_a_gradient_superellipse_with_its_glyph_at_56_percent() {
 #[allow(non_snake_case)]
 fn Bar() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Bar,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; gap:8px; padding:4px 8px",
                 MenuBarItem { id: "open", open: Shown::Visible, span { "Files" } }
                 MenuBarItem { id: "shut", span { "Edit" } }
@@ -245,7 +246,7 @@ fn SlimMenu() -> Element {
         },
     ];
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "anchor", style: "width:20px; height:20px; margin:20px" }
             ds::Menu::<i32> {
                 kind: ds::MenuKind::Slim,
@@ -280,7 +281,7 @@ fn DockPill() -> Element {
     rsx! {
         div { style: "padding:40px",
             div { class: "pill", style: "width:300px; height:60px",
-                Ds {
+                Ds { sheet: Some(ds_shell::stylesheet()),
                     appearance: Appearance::default(),
                     material: Material::Dock,
                     blur: ds::BlurState::Available,
@@ -341,7 +342,7 @@ fn Launcher() -> Element {
         }],
     )];
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Sheet, blur: ds::BlurState::Available,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet, blur: ds::BlurState::Available,
             div { class: "panel", style: "width:600px; height:400px",
                 ds::CommandPalette::<u8> {
                     label: "Launch".to_owned(),
@@ -382,7 +383,7 @@ fn the_launcher_card_is_as_tall_as_its_content() {
 fn Pop() -> Element {
     let mut open = use_signal(|| true);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { style: "padding:40px",
                 span { id: "state", if open() { "open" } else { "closed" } }
             }

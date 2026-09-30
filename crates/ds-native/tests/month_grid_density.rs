@@ -6,15 +6,13 @@
 //! month's rows are taller than a six-week one's (the compact-spacing pass, 2026-09-27); today's
 //! disc is round and roomy enough for two digits. A layout, not a timing, so one look.
 
-#[path = "../../ds/tests/support/month_sample.rs"]
+#[path = "../../ds-shell/tests/support/month_sample.rs"]
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Material, MonthGrid, MonthStep, Rect, RootChrome, WeekNumbers, WidgetFrame,
-    WidgetMetrics, WidgetSize,
-};
+use ds::{Appearance, Ds, Material, Rect, RootChrome};
 use ds_native::{Harness, Viewport};
+use ds_shell::{MonthGrid, MonthStep, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize};
 use month_sample::{AUGUST, First, SEPTEMBER, sample};
 use std::time::Duration;
 
@@ -28,7 +26,7 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn SmallCalendar() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(),
                 WidgetFrame { size: WidgetSize::Small,
                     MonthGrid {
@@ -185,7 +183,7 @@ fn a_five_week_month_spreads_its_rows_over_the_height() {
 #[allow(non_snake_case)]
 fn SmallSeptember() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(),
                 WidgetFrame { size: WidgetSize::Small,
                     MonthGrid { data: sample(SEPTEMBER, First::Monday), onstep: move |_: MonthStep| {} }
@@ -228,7 +226,7 @@ fn todays_compact_disc_is_a_circle_twice_its_number() {
 #[allow(non_snake_case)]
 fn WrappedSmallCalendar() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: WidgetMetrics::default().style_attr(),
                 WidgetFrame { size: WidgetSize::Small,
                     div { style: "display:flex; justify-content:center;",

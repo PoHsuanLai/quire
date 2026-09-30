@@ -13,7 +13,7 @@ the emoji is one kind of user picture beside the letter and the photo (section 7
 
 `ds::AnimatedEmoji` (the picture), `ds::EmojiId` (which emoji, user data), `ds::EmojiDisc`
 (none, or a tinted disc on a `DiscHue`), `ds::EmojiPlayback` (awake or still),
-`ds::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds/assets/emoji/`, and the
+`ds::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds-shell/assets/emoji/`, and the
 pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `UserPicture`,
 `UserPortrait`, `PictureChoice`, `resolve_picture`, `UserPicturePicker`, `Mood`, `WakeStamp`,
 `PictureSize` and the accept beat `Anim::PictureAccept`.
@@ -26,14 +26,14 @@ pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `Us
 - **Licence: CC BY 4.0**, verified 2026-09-26 from the source site's own FAQ ("Can I use these
   animated assets commercially…?": "Animated Noto Emoji is licensed under CC BY 4.0. See the
   full license for all details.", linking https://creativecommons.org/licenses/by/4.0/legalcode).
-  The full legal code is committed as `crates/ds/assets/emoji/CC-BY-4.0.txt`.
+  The full legal code is committed as `crates/ds-shell/assets/emoji/CC-BY-4.0.txt`.
 - **Attribution** (required; `ds::EMOJI_ATTRIBUTION` carries it, and a surface that shows these
   emoji puts it in its about box or credits):
 
   > Animated emoji: Noto Animated Emoji by Google, CC BY 4.0
   > (https://creativecommons.org/licenses/by/4.0/); frames resampled and packed.
 
-- `crates/ds/assets/emoji/ATTRIBUTION.txt` states the same beside the files, with what we
+- `crates/ds-shell/assets/emoji/ATTRIBUTION.txt` states the same beside the files, with what we
   changed (CC BY asks that changes be indicated). `docs/licensing-references.md` has the row.
 - **cargo deny**: `cargo deny check licenses` reads crate licences only. `ds`'s code stays
   MIT OR Apache-2.0; the sheets are data under their own licence, as the OFL fonts beside them
@@ -71,7 +71,7 @@ pre-rendered frames itself.
 `tools/emoji` (Python through uv, `pillow` only; never run by cargo):
 
 ```bash
-cd tools/emoji && uv run emojitool build --out ../../crates/ds/assets/emoji
+cd tools/emoji && uv run emojitool build --out ../../crates/ds-shell/assets/emoji
 ```
 
 1. **Fetch** each emoji's `512.webp` (the animation) and `512.png` (the still, used only to find

@@ -7,8 +7,3 @@ pub(crate) mod kit;
 pub mod selectors;
 pub(crate) mod sheets;
 pub(crate) mod stylesheet;
-
-#[cfg(test)]
-mod stored_words;
-#[cfg(test)]
-mod vocabulary_tests;

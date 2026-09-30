@@ -4,11 +4,12 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, DotIndex, Ds, Fraction, Grain, HeaderKind, Icon, InputVariant, ItemKind, Material,
-    PRESETS, Presence, Rect, RowState, Scheme, SearchField, SectionHeader, Selection, SendPhase,
-    SendPill, SidebarItem, SpaceEditor, SpaceLook, TextInput, Theme, use_toasts,
+    Appearance, Ds, Fraction, Grain, HeaderKind, Icon, InputVariant, ItemKind, Material, PRESETS,
+    Presence, Rect, RowState, Scheme, SearchField, SectionHeader, Selection, SendPhase, SendPill,
+    SidebarItem, SpaceLook, TextInput, Theme, use_toasts,
 };
 use ds_native::{Harness, Viewport};
+use ds_shell::{DotIndex, SpaceEditor};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -21,7 +22,7 @@ const VIEW: Viewport = Viewport {
 #[component]
 fn Root(children: Element) -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, {children} }
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, {children} }
     }
 }
 
@@ -89,7 +90,7 @@ fn EmptyApp() -> Element {
         ..ds::SpaceLook::default()
     };
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, look,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window, look,
             div { style: "height:340px" }
         }
     }

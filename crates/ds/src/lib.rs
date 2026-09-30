@@ -1,35 +1,34 @@
-//! quire's renderer-free design system: tokens, palette, icons, components and motion.
-//!
-//! The crate is layered as the crates it will split into: `core` (vocabulary, geometry, time,
-//! tasks, colour), `style` (appearance, tokens, materials, palettes, fonts, icons, the
-//! stylesheet's sections), `motion` (animation data, timers, machines and the details), the
-//! linter, then the components with the host seams under them, `shell` for the shell's own
-//! parts, and `assembly` on top. A layer names only the layers below it
-//! (`scripts/check-boundary.sh`). Every public item has one path: a root name, or a name in one
-//! of the modules below. DESIGN.md maps each module to the design doc section it implements.
+//! quire's renderer-free design system: the host seams, the overlay stack, the root, the generic
+//! components, and the assembly of the stylesheet and `Ds`. It sits over three crates and re-exports
+//! their names, one path each: `ds-core` (vocabulary, geometry, time, the `Spawner`, colour),
+//! `ds-style` (appearance, tokens, materials, palettes, fonts, icons, the stylesheet's sections)
+//! and `ds-motion` (animation data, timers, machines and the details); its tests lint with
+//! `ds-lint`. `ds-shell` builds the shell's own parts on top of this crate. Inside the crate a layer names
+//! only the layers below it (`scripts/check-boundary.sh`). Every public item has one path: a root
+//! name, or a name in one of the modules below. DESIGN.md maps each module to the design doc
+//! section it implements.
 
 mod assembly;
-pub mod catalog;
-mod components;
+// `ds-shell` names the layers it builds on by path (`ds::components::controls::button::Button`); a
+// consumer takes the root names below.
+pub mod components;
 pub mod detail;
 mod edit;
 mod file_drop;
-mod focus;
-mod host;
+pub mod focus;
+pub mod host;
 pub mod icon;
 pub mod motion;
-mod root;
-mod shell;
+pub mod root;
 mod spell;
 mod stack;
 pub mod time;
-pub mod widget;
 mod window;
 
 pub use crate::assembly::selectors;
 pub use crate::assembly::{
     ds::{Ds, Inject},
-    kit::kits,
+    kit::{KIT, kits},
     stylesheet::{component_sheets, stylesheet},
 };
 pub use crate::components::{
@@ -202,106 +201,6 @@ pub use crate::root::{
     surface::Surface,
     typeface::use_typeface,
 };
-pub use crate::shell::{
-    bar::{
-        menu_bar_item::MenuBarItem,
-        workspace_pills::{WorkspacePill, WorkspacePills},
-    },
-    battery::{
-        device_battery::DeviceBattery,
-        device_glyph::{Device, DeviceGlyph},
-        figure::BatteryFigure,
-        level::{BatteryLevel, RingMark},
-    },
-    clock::{
-        face::ClockFace,
-        kind::{ClockLook, ClockTime, DayPhase, Seconds},
-    },
-    control_center::{
-        module_grid::{GridColumns, ModuleGrid},
-        module_panel::{ModulePanel, PanelPlate},
-        module_tile::ModuleTile,
-        module_tile_kind::{Chevron, ModuleState, TileSpan},
-    },
-    dock_parts::{DockFloor, RunningDot},
-    emoji::{
-        AnimatedEmoji, EMOJI_ATTRIBUTION,
-        disc::{DiscHue, EmojiDisc, EmojiPlayback},
-        id::EmojiId,
-    },
-    idle_dim::{IdleDim, IdleDimPhase},
-    lock::{
-        clock::LockClock,
-        polkit_prompt::PolkitPrompt,
-        prompt::LockPrompt,
-        screen::LockScreen,
-        vocab::{CapsLock, LockLook, LockUser, PromptState},
-    },
-    month_grid::{
-        MonthGrid,
-        data::{
-            DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey,
-            MonthStep, MonthWeek, WeekNumbers,
-        },
-        density::MonthDensity,
-    },
-    notifications::{
-        banner_stack::{Banner, BannerEntry, BannerKey, BannerPosition, BannerStack},
-        card::NotificationCard,
-        group_header::GroupHeader,
-        parts::{AppMark, CardAction, GroupCount, Hover, StackLayers},
-        swipe::NotificationSwipe,
-    },
-    now_playing::{
-        NowPlayingTrack, kind::Playback, play_pause::PlayPauseButton, track_position::TrackPosition,
-    },
-    osd::{Osd, OsdLevel, OsdPosition},
-    space_editor::{
-        DotIndex, SpaceEditor,
-        dot::SpaceDot,
-        rows::{MeasuredIn, MotionChoice},
-    },
-    switcher::{
-        app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence},
-        switcher_fit::SwitcherMetrics,
-    },
-    thumbs::{
-        shot_ghost::ShotGhost,
-        shot_press::DragStart,
-        shot_thumbnail::{ShotThumbnail, ThumbAction},
-    },
-    tokens::{
-        control_center::{CONTROL_CENTER, ControlCenterSize},
-        dock::{DockFloorSetting, DockMetrics, DockToken},
-        notifications::{NotificationMetrics, NotificationToken},
-        osd::{OsdMetrics, OsdToken},
-        shell_scale::{SHELL_SCALE, ShellSize},
-        shell_type::{FontWeight, ShellMetrics, ShellType},
-        widget_paint::WidgetPaint,
-        widgets::{WidgetGrid, WidgetMetrics},
-    },
-    user_picture::{
-        choice::{FaceFile, PictureChoice, resolve_picture},
-        mood::{Mood, PictureSize},
-        picker::UserPicturePicker,
-        picture::UserPicture,
-        portrait::UserPortrait,
-    },
-    widget::{
-        battery::{BatteryCell, BatteryEntry, BatteryWidget},
-        calendar::{EventLine, MonthEntry, MonthFace, MonthIntent, MonthWidget, TodayLine},
-        card::WidgetCard,
-        clock::{ClockCity, ClockEntry, WorldClockWidget},
-        contract::{NoIntent, Widget, WidgetContext, WidgetKind},
-        exit::CardPresence,
-        frame::WidgetFrame,
-        gallery::WidgetGallery,
-        kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle},
-        registry::{WidgetRegistry, provide_widget_registry},
-        slot::WidgetSlotGuide,
-        timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline},
-    },
-};
 pub use crate::spell::{
     lang::{Lang, Spell},
     marks::SpellReplace,
@@ -418,6 +317,8 @@ pub use ds_style::{
         pixel::PixelToken,
         set::{Only, Place, TokenSet},
         shape::{Corner, Radius},
+        shell_scale::{SHELL_SCALE, ShellSize},
+        shell_type::{FontWeight, ShellMetrics, ShellType},
         size_scale::WholePx,
         spacing::SpacingToken,
         status::StatusMetrics,
@@ -425,9 +326,6 @@ pub use ds_style::{
         token::{CssValue, Token, TokenKind, TokenScope},
         type_scale::{Family, FontSize},
         type_voice::VoiceToken,
+        widget_paint::WidgetPaint,
     },
 };
-
-use futures_timer as _;
-use serde_json as _;
-use thiserror as _;

@@ -33,11 +33,11 @@ fn rendered(page: Page) -> String {
 
 #[test]
 fn every_page_renders_quire_markup_only() {
-    let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
+    let css = format!("{}\n{}", ds_shell::stylesheet(), style::CSS);
     let config = LintConfig {
         profile: Profile::Strict,
         exceptions: EXCEPTIONS,
-        ..LintConfig::new(&ds::kits())
+        ..LintConfig::new(&ds_shell::kits())
     };
     let mut failures = Vec::new();
     for page in Page::ALL.iter().copied() {
@@ -62,10 +62,10 @@ fn every_page_renders_quire_markup_only() {
 /// exception: every Space colour is a custom property its stylesheet paints.
 #[test]
 fn the_space_page_is_clean_under_strict() {
-    let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
+    let css = format!("{}\n{}", ds_shell::stylesheet(), style::CSS);
     let strict = LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::new(&ds::kits())
+        ..LintConfig::new(&ds_shell::kits())
     };
     let html = rendered(Page::Space);
     assert!(
@@ -79,10 +79,10 @@ fn the_space_page_is_clean_under_strict() {
 
 #[test]
 fn every_exception_still_suppresses_something() {
-    let css = format!("{}\n{}", ds::stylesheet(), style::CSS);
+    let css = format!("{}\n{}", ds_shell::stylesheet(), style::CSS);
     let bare = LintConfig {
         profile: Profile::Strict,
-        ..LintConfig::new(&ds::kits())
+        ..LintConfig::new(&ds_shell::kits())
     };
     let offences: Vec<_> = Page::ALL
         .iter()

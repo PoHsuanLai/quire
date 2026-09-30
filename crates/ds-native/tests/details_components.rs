@@ -4,13 +4,14 @@
 //! operation is derived from the state's own Pending moment).
 
 use dioxus::prelude::*;
+use ds::TextLine;
 use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, LockPrompt, LockUser,
-    Material, ModuleState, PromptState, person_hue,
+    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material, person_hue,
 };
-use ds::{ModuleTile, TextLine};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::ModuleTile;
+use ds_shell::{LockPrompt, LockUser, ModuleState, PromptState};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -28,7 +29,7 @@ static PROMPT: GlobalSignal<PromptState> = Signal::global(|| PromptState::Idle);
 #[allow(non_snake_case)]
 fn Tile() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:300px;padding:12px",
                 ModuleTile { glyph: Icon::Wifi, title: TextLine::from("Wi-Fi"), status: None, state: MODULE(), onclick: |_| {} }
             }
@@ -83,7 +84,7 @@ fn user() -> LockUser {
 #[allow(non_snake_case)]
 fn Lock() -> Element {
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             LockPrompt { user: user(), state: PROMPT(), oninput: |_| {}, onsubmit: |_| {} }
         }
     }

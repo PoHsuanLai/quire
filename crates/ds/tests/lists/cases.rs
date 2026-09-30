@@ -4,8 +4,8 @@
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{
-    Accent, Appearance, AppearancePicker, CardAccent, DotIndex, FrameVars, Grain, Motion, PRESETS,
-    ReducedMotion, RowState, Scheme, SpaceDot, SpaceEditor, SpaceLook, SystemPrefs, Theme,
+    Accent, Appearance, AppearancePicker, Motion, ReducedMotion, RowState, Scheme, SystemPrefs,
+    Theme,
 };
 use ds::{
     AccountFace, AccountTile, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Colour, CommandPill,
@@ -284,64 +284,4 @@ pub const CASES: &[Case] = &[
             }
         },
     },
-    // SpaceEditor: the two sample Spaces in each scheme and a one-dot Postmark Space.
-    Case {
-        component: "space_editor",
-        state: "work-light",
-        make: || editor(preset_look(0, Grain(35)), Scheme::Light, 0),
-    },
-    Case {
-        component: "space_editor",
-        state: "work-dark",
-        make: || editor(preset_look(0, Grain(35)), Scheme::Dark, 1),
-    },
-    Case {
-        component: "space_editor",
-        state: "home-light",
-        make: || editor(preset_look(1, Grain(55)), Scheme::Light, 2),
-    },
-    Case {
-        component: "space_editor",
-        state: "one-dot-postmark",
-        make: || {
-            editor(
-                SpaceLook {
-                    card_accent: CardAccent::Postmark,
-                    ..preset_look(2, Grain(40))
-                },
-                Scheme::Light,
-                0,
-            )
-        },
-    },
-    Case {
-        component: "space_editor",
-        state: "named",
-        make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), name: "Work".to_string(), onchange: |_| {}, on_active_dot: |_| {} } },
-    },
-    // SpaceDot.
-    Case {
-        component: "space_editor",
-        state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
-    },
-    Case {
-        component: "space_editor",
-        state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
-    },
 ];
-
-/// Preset `index` as a Space that lends its hue to the card.
-pub fn preset_look(index: usize, grain: Grain) -> SpaceLook {
-    SpaceLook {
-        dots: PRESETS[index].dots.to_vec(),
-        grain,
-        theme: Theme::System,
-        card_accent: CardAccent::SpaceHue,
-    }
-}
-
-pub fn editor(look: SpaceLook, scheme: Scheme, active: u8) -> Element {
-    rsx! { SpaceEditor { look, scheme, active_dot: DotIndex(active), onchange: |_| {} } }
-}

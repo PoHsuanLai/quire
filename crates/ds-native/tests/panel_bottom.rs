@@ -5,13 +5,14 @@
 //! it leaves on the sheet's spring and `on_hidden` runs once it rests.
 
 use dioxus::prelude::*;
-use ds::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-use ds::{
-    Appearance, BatteryWidget, Ds, Material, Panel, PanelEdge, Px, RootExtent, Shown, Timeline,
-    Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize, WorldClockWidget,
-};
+use ds::{Appearance, Ds, Material, Panel, PanelEdge, Px, RootExtent, Shown};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
+use ds_shell::{
+    BatteryWidget, Timeline, Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize,
+    WorldClockWidget,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -33,7 +34,7 @@ const GRID: DesktopGrid = DesktopGrid {
 fn Desktop() -> Element {
     let mut layout = use_signal(WidgetLayout::default);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Sheet, extent: RootExtent::Viewport,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet, extent: RootExtent::Viewport,
             div { class: "desk", style: "position:absolute;top:8px;right:8px;display:flex;gap:16px;{WidgetMetrics::default().style_attr()}",
                 WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(WidgetSize::Medium)), size: WidgetSize::Medium }
                 WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(WidgetSize::Small)), size: WidgetSize::Small }

@@ -31,12 +31,15 @@ use crate::tokens::{
     pixel::PixelToken,
     set::{Only, Place, TokenSet},
     shape::Radius,
+    shell_scale::ShellSize,
+    shell_type::ShellType,
     size_vars::SizeToken,
     spacing::SpacingToken,
     status::StatusMetrics,
     timing::DurationToken,
     type_scale::{Family, FontSize},
     type_voice::VoiceToken,
+    widget_paint::WidgetPaint,
 };
 use ds_core::word::Word;
 use std::borrow::Cow;
@@ -48,8 +51,11 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<ColourToken>().at(Place::Scheme),
         TokenSet::of::<HueColour>().at(Place::Scheme),
         TokenSet::of::<Shadow>().at(Place::Scheme),
+        TokenSet::of::<WidgetPaint>().at(Place::Scheme),
         TokenSet::of::<Radius>().at(Place::Shape),
         TokenSet::of::<SizeToken>().at(Place::Ladder),
+        TokenSet::of::<ShellSize>().at(Place::Ladder),
+        TokenSet::of::<ShellType>().at(Place::Metrics),
         TokenSet::of::<PersonSwatch>().at(Place::Scale),
         TokenSet::of::<SpacingToken>().at(Place::Scale),
         TokenSet::of::<FontSize>()

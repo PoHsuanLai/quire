@@ -4,12 +4,10 @@
 //! hears its key; the banners before it never move; an empty stack reports every key.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, AppMark, Appearance, Banner, BannerKey, BannerStack, Ds, Icon, IconSource, Material,
-    MotionLevel, NotificationCard, NotificationSwipe, Point, Px, settle,
-};
+use ds::{Anim, Appearance, Ds, Icon, IconSource, Material, MotionLevel, Point, Px, settle};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -46,7 +44,7 @@ fn Stack() -> Element {
         .collect::<Vec<_>>()
         .join(",");
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Toast,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Toast,
             BannerStack { banners, on_hidden: move |key: BannerKey| HIDDEN.write().push(key.0) }
             p { class: "hidden", "{hidden}" }
         }

@@ -11,10 +11,12 @@ use super::level_tile::work;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    AppMark, Appearance, Banner, BannerEntry, BannerKey, BannerStack, Button, ButtonVariant,
-    CardAction, Ds, GroupCount, GroupHeader, Icon, IconSource, Inject, Material, NotificationCard,
-    NotificationMetrics, NotificationSwipe, Panel, Px, Rich, RichRun, RunTone, Shown, StackLayers,
-    TextRun, Theme,
+    Appearance, Button, ButtonVariant, Ds, Icon, IconSource, Inject, Material, Panel, Px, Rich,
+    RichRun, RunTone, Shown, TextRun, Theme,
+};
+use ds_shell::{
+    AppMark, Banner, BannerEntry, BannerKey, BannerStack, CardAction, GroupCount, GroupHeader,
+    NotificationCard, NotificationMetrics, NotificationSwipe, StackLayers,
 };
 
 /// The notifications section.

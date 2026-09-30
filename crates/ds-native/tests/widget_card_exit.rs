@@ -6,12 +6,12 @@
 //! `on_gone`.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, BatteryWidget, CardPresence, Ds, Material, Motion, MotionLevel, RootChrome,
-    Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize, settle,
-};
+use ds::{Anim, Appearance, Ds, Material, Motion, MotionLevel, RootChrome, settle};
 use ds_native::harness::assert_settles_to_zero_frames;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::{
+    BatteryWidget, CardPresence, Timeline, Widget, WidgetCard, WidgetMetrics, WidgetSize,
+};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -26,7 +26,7 @@ static DRAWN: GlobalSignal<bool> = Signal::global(|| true);
 
 fn desktop(motion: Motion) -> Element {
     rsx! {
-        Ds { appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance { motion, ..Appearance::default() }, material: Material::Widget, chrome: Some(RootChrome::Transparent),
             div { style: "padding:20px;{WidgetMetrics::default().style_attr()}",
                 if DRAWN() {
                     WidgetCard {
@@ -100,7 +100,7 @@ fn under_reduced_the_exit_is_a_short_fade() {
     let mut harness = harness(Reduced);
     leave(&mut harness, CardPresence::Leaving);
     assert!(harness.has_class(".ds-widget", "a-widget-out"));
-    let sheet = ds::stylesheet();
+    let sheet = ds_shell::stylesheet();
     assert!(
         sheet.contains(
             ".ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=a]{animation-name:menu-out;}"

@@ -3,10 +3,9 @@
 //! (Enter or Space on the tile toggles; Enter or Right on the chevron opens the detail).
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Chevron, Ds, Icon, Material, ModuleState, ModuleTile, Point, ShortcutKey, TileSpan,
-};
+use ds::{Appearance, Ds, Icon, Material, Point, ShortcutKey};
 use ds_native::{Harness, Viewport};
+use ds_shell::{Chevron, ModuleState, ModuleTile, TileSpan};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -21,7 +20,7 @@ fn TileApp() -> Element {
     let mut state = use_signal(|| ModuleState::Off);
     let mut log = use_signal(Vec::<&'static str>::new);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Popover,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:300px;padding:12px",
                 ModuleTile {
                     glyph: Icon::Wifi,
