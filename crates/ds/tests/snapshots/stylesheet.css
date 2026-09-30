@@ -1403,7 +1403,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-preview-action-label{ white-space:nowrap; }
 .ds-preview-action[*|data-focused=true]{ box-shadow:0 0 0 var(--focus-ring) var(--accent-ring); }
 /* -- provider_mark -- */
-/* ProviderMark (design/04-COMPONENTS.md section 28): `S:552-560`. The white chip is
+/* ProviderMark (design/04-COMPONENTS.md section 28): `S:552-560`. The tile is on the control
+   ladder (`data-size` mini 11, small 13, regular 14; large repeats regular); where a mark sits on
+   a `PinTile` is that tile's rule. The white chip is
    `--mark-ground` and the provider's identity colour arrives inline as `--pc` (O-3); the rings
    are `--shadow-mark` and `--shadow-mark-tile`. Attribute selectors carry `*|` (spike S2).
    `object-fit:contain` on the favicon is unverified on Blitz; the app pre-sizes the image if it
@@ -1416,11 +1418,10 @@ html,body{margin:0;padding:0;background:transparent}
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-nano); line-height:1;
   box-shadow:var(--shadow-mark); flex:none;
 }
-.ds-provider[*|data-size=tile]{
-  position:absolute; right:7px; bottom:7px; width:14px; height:14px;
-  font-size:var(--fs-micro); border-radius:var(--r-kbd); box-shadow:var(--shadow-mark-tile);
+.ds-provider[*|data-size=regular],.ds-provider[*|data-size=large]{
+  width:14px; height:14px; font-size:var(--fs-micro); border-radius:var(--r-kbd);
 }
-.ds-provider[*|data-size=row]{
+.ds-provider[*|data-size=mini]{
   width:11px; height:11px; font-size:var(--fs-pico); border-radius:var(--r-micro);
   margin-right:var(--s-4); vertical-align:-1px; box-shadow:0 0 0 var(--hair) var(--line);
 }

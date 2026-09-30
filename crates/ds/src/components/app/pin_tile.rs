@@ -4,7 +4,7 @@
 //! line at its leading edge. Grouping, reordering and the Add tile's place are `PinTiles`.
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
-use crate::components::content::provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark};
+use crate::components::content::provider_mark::{MarkProvider, MarkStyle, ProviderMark};
 use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use crate::components::controls::press::{PressListeners, use_pressing};
 use crate::root::common::Common;
@@ -126,7 +126,7 @@ pub fn PinTile(
                 tone: AvatarTone::Account(colour),
                 muting: muting(selection),
             }
-            ProviderMark { provider, size: MarkSize::Tile, style: mark }
+            ProviderMark { provider, size: ControlSize::Regular, style: mark }
         },
         PinFace::Add { .. } => rsx! {
             span { class: "ds-pin-tile-face", Glyph { icon: Icon::Plus, size: IconSize::Compact } }

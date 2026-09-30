@@ -71,7 +71,7 @@ pub use crate::components::{
         label::{Label, LabelRole, LabelStyle},
         level_glyph::vocab::{LevelGlyph, LevelSource},
         pdf_thumb::{PdfPage, PdfThumb, PdfTrouble},
-        provider_mark::{MarkProvider, MarkSize, MarkStyle, ProviderMark},
+        provider_mark::{MarkProvider, MarkStyle, ProviderMark},
         rich_text::{Rich, RichRun, RichText},
         status::{
             battery::BatteryGlyph,

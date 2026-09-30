@@ -6,10 +6,9 @@ use dioxus::prelude::*;
 use ds::{Accent, Appearance, AppearancePicker, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use ds::{
     Colour, CommandPill, DragGhost, DropLine, DropState, EdgeStrip, Grip, Hex, HoverStrip,
-    ImageSource, MarkProvider, MarkSize, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px,
-    Selection,
+    ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Selection,
 };
-use ds::{Shortcut, ShortcutKey};
+use ds::{ControlSize, Shortcut, ShortcutKey};
 
 /// One component in one state.
 pub struct Case {
@@ -20,7 +19,7 @@ pub struct Case {
 
 const VIOLET: Colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
 
-fn mark(provider: MarkProvider, size: MarkSize) -> Element {
+fn mark(provider: MarkProvider, size: ControlSize) -> Element {
     rsx! { ProviderMark { provider, size, style: MarkStyle::Letter } }
 }
 
@@ -35,37 +34,37 @@ pub const CASES: &[Case] = &[
     Case {
         component: "provider_mark",
         state: "google-tile",
-        make: || mark(MarkProvider::Google, MarkSize::Tile),
+        make: || mark(MarkProvider::Google, ControlSize::Regular),
     },
     Case {
         component: "provider_mark",
         state: "microsoft-row",
-        make: || mark(MarkProvider::Microsoft, MarkSize::Row),
+        make: || mark(MarkProvider::Microsoft, ControlSize::Mini),
     },
     Case {
         component: "provider_mark",
         state: "fastmail-inline",
-        make: || mark(MarkProvider::Fastmail, MarkSize::Inline),
+        make: || mark(MarkProvider::Fastmail, ControlSize::Small),
     },
     Case {
         component: "provider_mark",
         state: "icloud-inline",
-        make: || mark(MarkProvider::ICloud, MarkSize::Inline),
+        make: || mark(MarkProvider::ICloud, ControlSize::Small),
     },
     Case {
         component: "provider_mark",
         state: "yahoo-row",
-        make: || mark(MarkProvider::Yahoo, MarkSize::Row),
+        make: || mark(MarkProvider::Yahoo, ControlSize::Mini),
     },
     Case {
         component: "provider_mark",
         state: "imap-tile",
-        make: || mark(MarkProvider::Imap, MarkSize::Tile),
+        make: || mark(MarkProvider::Imap, ControlSize::Regular),
     },
     Case {
         component: "provider_mark",
         state: "image",
-        make: || rsx! { ProviderMark { provider: MarkProvider::Google, size: MarkSize::Tile, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+        make: || rsx! { ProviderMark { provider: MarkProvider::Google, size: ControlSize::Regular, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
     },
     // PinTile: All, one selected, one not (its colour muted), nothing unread, the Add tile, a drop line.
     Case {

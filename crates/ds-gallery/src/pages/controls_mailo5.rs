@@ -6,14 +6,14 @@ use super::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::{Bezel, ControlSize};
 use ds::{
-    Button, Icon, Leading, MarkProvider, MarkSize, MarkStyle, ProviderMark, RunTone, Shown,
-    TextLine, TextRun, Trailing,
+    Button, Icon, Leading, MarkProvider, MarkStyle, ProviderMark, RunTone, Shown, TextLine,
+    TextRun, Trailing,
 };
 
 /// A provider's inline mark, for a From value.
 fn mark(provider: MarkProvider) -> Leading {
     Leading::Mark(rsx! {
-        ProviderMark { provider, size: MarkSize::Inline, style: MarkStyle::Letter }
+        ProviderMark { provider, size: ControlSize::Small, style: MarkStyle::Letter }
     })
 }
 

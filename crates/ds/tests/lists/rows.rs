@@ -6,11 +6,11 @@ use crate::scoped::Scoped;
 use dioxus::prelude::*;
 use ds::{
     Accessory, ActionId, Availability, BatteryState, Chip, ChipVariant, ClipBody, Fraction,
-    HoverStrip, Icon, List, ListItem, ListStyle, MarkProvider, MarkSize, MarkStyle, ProviderMark,
-    Row, RowAction, RowChord, RowLeading, RowMotion, RowShape, RowSize, RowState, StripAction,
-    TextLine, ThreadRow,
+    HoverStrip, Icon, List, ListItem, ListStyle, MarkProvider, MarkStyle, ProviderMark, Row,
+    RowAction, RowChord, RowLeading, RowMotion, RowShape, RowSize, RowState, StripAction, TextLine,
+    ThreadRow,
 };
-use ds::{Check, DropState, Emphasis, Selection, Shortcut, ShortcutKey};
+use ds::{Check, ControlSize, DropState, Emphasis, Selection, Shortcut, ShortcutKey};
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -59,7 +59,7 @@ fn thread_in_drag(
             state: RowState { selection, emphasis, drop, ..RowState::default() },
             name: "Dana Okafor",
             via: rsx! {
-                ProviderMark { provider: MarkProvider::Google, size: MarkSize::Row, style: MarkStyle::Letter }
+                ProviderMark { provider: MarkProvider::Google, size: ControlSize::Mini, style: MarkStyle::Letter }
                 "gmail"
             },
             subject: "Re: UIDL stability across servers",
