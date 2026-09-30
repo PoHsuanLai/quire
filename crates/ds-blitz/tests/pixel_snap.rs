@@ -8,7 +8,7 @@
 //! as one full row and one half row (255 then 128 of ink), at 1.25 as 128 then 191, and at 1.75
 //! as 128, 255, 64: Blitz rounds boxes to whole logical pixels, never device ones.
 
-#[path = "support/probe.rs"]
+#[path = "../../ds-conformance/tests/support/probe.rs"]
 mod probe;
 
 use dioxus::prelude::*;

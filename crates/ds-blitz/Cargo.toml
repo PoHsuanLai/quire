@@ -69,8 +69,7 @@ spell = ["dep:spellbook", "dep:dirs"]
 workspace = true
 
 [dev-dependencies]
-# The driver every test in this crate runs through (its tests move to ds-conformance and
-# `ds-blitz/tests/<topic>.rs` in migration step 11).
+# The driver every host test in this crate runs through.
 ds-harness = { workspace = true, features = ["pdf"] }
 ds-shell = { workspace = true }
 # Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
@@ -80,8 +79,6 @@ pdfrum-edit = { workspace = true }
 pdfrum-common = { workspace = true }
 # Glyph ids from the cmap, for the colour-emoji and font-stack tests.
 skrifa = { workspace = true }
-# The harness case proving `use_environment` works under `Harness` (`crate::runtime`).
-ds-settings = { workspace = true, features = ["dioxus"] }
 
 [[example]]
 name = "window"
