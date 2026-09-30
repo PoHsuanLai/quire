@@ -92,7 +92,11 @@ fn title_words(title: &TextLine, marks: &[usize]) -> Element {
 /// is `Strong`), `availability` (`Busy` swaps the accessory for the small spinner and takes no
 /// press) and `drop` (its part in a drag). `marks` are the title's matched characters, by index.
 /// `content` replaces the title and detail with the caller's own (a mail row's name, subject and
-/// tags). `action` is a button at the end that acts without picking the row; `chord` is the keys
+/// tags). `edit` is the same place held by a field the person types in (a folder renamed where it
+/// stands: a `TextField` with `FieldBezel::Plain` takes the row's own face): the row keeps its
+/// leading, accessory and action, takes no press or context menu while it is there
+/// (`data-editing`), and the keys, presses and drags inside the field stay the field's, so
+/// the list around it neither moves its cursor, jumps by typeahead nor picks on them. `action` is a button at the end that acts without picking the row; `chord` is the keys
 /// of the row's first action, shown while the row is selected.
 ///
 /// `confirm` makes the row ask a question in its own line: the words give way to it, the accessory,
@@ -111,6 +115,7 @@ pub fn Row(
     #[props(default)] marks: Vec<usize>,
     #[props(default)] detail: Option<TextLine>,
     #[props(default)] content: Option<Element>,
+    #[props(default)] edit: Option<Element>,
     #[props(default)] accessory: Accessory,
     #[props(default)] action: Option<RowAction>,
     #[props(default)] chord: RowChord,
@@ -138,14 +143,30 @@ pub fn Row(
         drop,
     } = state;
     let asking = confirm.is_some();
-    let live = availability == Availability::Enabled && !asking;
+    let editing = edit.is_some();
+    let live = availability == Availability::Enabled && !asking && !editing;
     let listen = onclick.map(PressListeners::new);
-    let words = match (&confirm, content) {
-        (Some(asked), _) => confirm::question(asked),
-        (None, Some(content)) => rsx! {
+    let words = match (&confirm, edit, content) {
+        (Some(asked), _, _) => confirm::question(asked),
+        (None, Some(field), _) => rsx! {
+            span {
+                class: "ds-row-words ds-row-edit",
+                onkeydown: |event| event.stop_propagation(),
+                onkeyup: |event| event.stop_propagation(),
+                onclick: |event| {
+                    event.stop_propagation();
+                    kept_click(&event);
+                },
+                oncontextmenu: |event| event.stop_propagation(),
+                onmousedown: |event| event.stop_propagation(),
+                onpointerdown: |event| event.stop_propagation(),
+                {field}
+            }
+        },
+        (None, None, Some(content)) => rsx! {
             span { class: "ds-row-words", {content} }
         },
-        (None, None) => shape_view::words(
+        (None, None, None) => shape_view::words(
             &shape,
             title_words(&title, &marks),
             detail.as_ref().map(text),
@@ -203,6 +224,7 @@ pub fn Row(
             "data-trailing": accessory.slug(),
             "data-action": action.as_ref().map(|_| "true"),
             "data-confirm": confirm.as_ref().map(|_| "true"),
+            "data-editing": editing.then_some("true"),
             "data-row-motion": motion.attr(),
             onpointerenter: relay(onpointerenter),
             onpointerleave: relay(onpointerleave),

@@ -8,6 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::components::controls::button_model::{Bezel, ButtonRole};
+use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
@@ -190,12 +191,12 @@ fn the_space_editor_dots_stay_round_in_a_narrow_and_a_wide_panel() {
 
 #[allow(non_snake_case)]
 fn ActionHeadersApp() -> Element {
-    let action = || Some(("Clear".to_string(), EventHandler::new(|()| {})));
+    let action = || vec![HeaderAction::new("Clear", EventHandler::new(|()| {}))];
     rsx! {
         Root {
             div { class: "probe-headers", style: "width:400px",
-                SectionHeader { title: "Title", action: action() }
-                SectionHeader { title: "Value", value: Some("12".to_string()), action: action() }
+                SectionHeader { title: "Title", actions: action() }
+                SectionHeader { title: "Value", value: Some("12".to_string()), actions: action() }
             }
         }
     }

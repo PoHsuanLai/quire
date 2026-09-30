@@ -1723,6 +1723,10 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* The words: the title over its detail. Emphasis Strong is an unread row. */
 .ds-row-words{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
+/* An inline edit (`edit`): the field stands where the words stood, in the row's own face, and
+   the row is not a press target while it is there. */
+.ds-row[*|data-editing=true]{ cursor:text; }
+.ds-row-edit{ justify-content:center; }
 .ds-row-title{ display:block; font-weight:400; line-height:1.3; }
 .ds-row[*|data-emphasis=strong] .ds-row-title{ font-weight:600; }
 .ds-row-detail{ display:block; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
@@ -1794,8 +1798,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- section_header -- */
 /* SectionHeader (design/30 section 2.6): one look, the data face in capitals over the list's
    ink. A header heads its group: a full-width row of its own, spanning every column when its
-   container is a grid. The title never wraps; the action always ends the row through its
-   `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
+   container is a grid. The title never wraps; the actions, one or several side by side, always end the row through
+   their `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-section-header{
@@ -1808,12 +1812,13 @@ html,body{margin:0;padding:0;background:transparent}
   display:flex; align-items:center; gap:var(--s-4); border:0; background:none; padding:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:default;
 }
 .ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
+.ds-section-header-actions{ display:flex; align-items:center; gap:var(--s-6); margin-left:auto; }
 .ds-section-header .ds-section-header-action{
-  margin-left:auto; border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
+  border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
   color:var(--ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--ink); }
-.ds-section-header-value + .ds-section-header-action{ margin-left:0; }
+.ds-section-header-value + .ds-section-header-actions{ margin-left:0; }
 /* A palette's cursor on a group's action ("Show More"): the rows' selection look. */
 .ds-section-header .ds-section-header-action[*|data-selected=true]{ background:var(--accent-soft); color:var(--ink); border-radius:var(--r-tiny); }
 /* -- segmented -- */

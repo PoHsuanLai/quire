@@ -29,6 +29,40 @@ pub fn RowGallery() -> Element {
         States {}
         Shapes {}
         crate::pages::lists::row_actions::RowActions {}
+        Rename {}
+    }
+}
+
+/// A row renamed in place: its `edit` slot holds a plain `TextField`.
+#[component]
+fn Rename() -> Element {
+    let mut name = use_signal(|| "Receipts".to_owned());
+    rsx! {
+        Section {
+            title: "Row: rename in place",
+            note: "edit: a field where the words stood, in the row's own face; the leading and the accessory stay, and the keys and presses typed in it stay the field's (the list does not move its cursor, jump or pick).",
+            div { class: "g-list g-stage-pad", style: "width:320px",
+                List::<&'static str> {
+                    label: "Folders",
+                    style: ListStyle::SourceList,
+                    cursor: Some("Receipts"),
+                    items: vec![
+                        item("Inbox", rsx! { Row { title: "Inbox", leading: RowLeading::Icon(Icon::Inbox), onclick: |_| {} } }),
+                        item("Receipts", rsx! {
+                            Row {
+                                title: "Receipts",
+                                leading: RowLeading::Icon(Icon::Folder),
+                                state: RowState { selection: Selection::Selected, ..RowState::default() },
+                                edit: rsx! {
+                                    TextField { bezel: FieldBezel::Plain, label: "Rename folder", value: name(), oninput: move |next| name.set(next) }
+                                },
+                                onclick: |_| {},
+                            }
+                        }),
+                    ],
+                }
+            }
+        }
     }
 }
 

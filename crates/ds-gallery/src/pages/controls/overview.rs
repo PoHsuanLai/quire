@@ -250,7 +250,7 @@ fn Marks() -> Element {
 }
 
 /// A stand-in favicon, as an app would supply one: a data URI quire never fetches.
-fn favicon() -> ImageSource {
+pub(crate) fn favicon() -> ImageSource {
     let svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><circle cx='8' cy='8' r='7' fill='#1A73E8'/><circle cx='8' cy='8' r='3' fill='#FFFFFF'/></svg>";
     ImageSource(format!(
         "data:image/svg+xml;base64,{}",
