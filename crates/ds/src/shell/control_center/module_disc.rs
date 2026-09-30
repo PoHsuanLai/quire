@@ -4,7 +4,7 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::spinner::Spinner;
-use crate::motion::detail::{
+use ds_motion::detail::{
     detailed::Detailed, moment::Moment, touch::Touch, use_detail::use_detail,
     use_operation::use_operation,
 };
@@ -57,7 +57,7 @@ pub(crate) fn ModuleDisc(glyph: IconSource, state: ModuleState) -> Element {
 #[cfg(test)]
 mod tests {
     use super::Lighting;
-    use crate::motion::detail::{
+    use ds_motion::detail::{
         detailed::{first_table, moment_table},
         moment::Moment,
     };

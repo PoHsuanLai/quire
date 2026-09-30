@@ -8,9 +8,9 @@
 
 use crate::components::controls::track::fraction_at;
 use crate::host::measure::client_rect;
-use crate::motion::detail::touch::{Contact, Touch};
-use crate::motion::drag::{DragPhase, use_drag};
-use crate::motion::{
+use ds_motion::detail::touch::{Contact, Touch};
+use ds_motion::drag::{DragPhase, use_drag};
+use ds_motion::{
     projection::Throw,
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,

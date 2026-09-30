@@ -4,7 +4,7 @@
 
 use crate::components::controls::button_size::disabled;
 use crate::components::controls::press::PressListeners;
-use crate::motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
+use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use crate::shell::now_playing::kind::Playback;
 use dioxus::prelude::*;
 use ds_core::press::Press;

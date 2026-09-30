@@ -8,7 +8,7 @@
 //! `--t-quick` instead of replaying the entrance; under Reduced it snaps (R7).
 
 use crate::components::controls::spinner::ring;
-use crate::motion::detail::{cue::Cue, pending::PendingFrame, touch::Touch};
+use ds_motion::detail::{cue::Cue, pending::PendingFrame, touch::Touch};
 use dioxus::prelude::*;
 
 /// What a [`PreviewPane`](crate::PreviewPane) knows of its latest change: the cue the caller's

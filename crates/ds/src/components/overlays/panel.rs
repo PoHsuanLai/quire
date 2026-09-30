@@ -19,8 +19,8 @@
 
 use crate::components::overlays::scrim::{ScrimLook, scrim_button_as};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::motion::anim::Anim;
-use crate::motion::presence::spring::use_spring_presence;
+use ds_motion::anim::Anim;
+use ds_motion::presence::spring::use_spring_presence;
 use crate::root::surface::ClassedScope;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;

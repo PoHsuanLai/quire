@@ -1,0 +1,20 @@
+[package]
+name = "ds-motion"
+description = "The design system's motion: animation data and recipes, keyframes, presence, timelines, rosters, gestures, pulse and the details grammar."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds-core = { workspace = true }
+ds-style = { workspace = true, features = ["dioxus"] }
+dioxus = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+dioxus-ssr = { workspace = true }

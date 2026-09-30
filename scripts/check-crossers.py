@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """No `pub(crate)` module or item may be named from another layer of `ds`.
 
-`ds` is layered as the crates it will split into: motion, lint, ds (host, focus,
+`ds` is layered as the crates it will split into: lint, ds (host, focus,
 edit, file_drop, spell, window, stack, root, components), shell, assembly. `pub(crate)` stops
 at a crate boundary, so anything another layer names is `pub` at its home module. This finds
 every module-level `pub(crate)` item, and every `pub(crate) mod`, that a file in another layer
@@ -15,7 +15,7 @@ import sys
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "crates", "ds", "src")
 DS_LAYER = ("host", "focus", "edit", "file_drop", "spell", "window", "stack", "root", "components")
-OWN_LAYER = ("motion", "lint", "shell", "assembly")
+OWN_LAYER = ("lint", "shell", "assembly")
 
 ITEM = re.compile(
     r"^(?:#\[[^\]]*\]\s*)*pub\(crate\)\s+(?:(?:async|unsafe|const)\s+)*"

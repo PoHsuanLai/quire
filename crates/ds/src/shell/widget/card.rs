@@ -3,7 +3,7 @@
 //! (`use_widget`), and draws it through the widget's own `view` inside a `WidgetFrame`, whose
 //! corner, inset, material, Space tint and title row are quire's alone.
 
-use crate::motion::wake::WakeStamp;
+use ds_motion::wake::WakeStamp;
 use crate::shell::widget::contract::{Widget, WidgetContext, fit};
 use crate::shell::widget::exit::CardPresence;
 use crate::shell::widget::frame::WidgetFrame;

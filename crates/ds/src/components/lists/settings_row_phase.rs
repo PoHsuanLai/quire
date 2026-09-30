@@ -2,7 +2,7 @@
 //! 5.2.2, 5.2.3, 5.2.8): joining a network, connecting a device, switching the
 //! sound output.
 
-use crate::motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
+use ds_motion::detail::{detailed::Detailed, moment::Moment, stamp::EventStamp};
 use ds_core::word::Word;
 
 /// An operation on the row's item, stamped by the service that runs it: the same stamp is the

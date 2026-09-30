@@ -2,7 +2,7 @@
 //! (design/20-SURFACES.md sections 1.9 and 1.10; design/04-COMPONENTS.md section 42): whose it
 //! is, how the asking is going, whether caps lock is on, and where the Space's colour reaches.
 
-use crate::motion::detail::{detailed::Detailed, moment::Moment};
+use ds_motion::detail::{detailed::Detailed, moment::Moment};
 use crate::shell::user_picture::picture::UserPicture;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;

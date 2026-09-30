@@ -4,8 +4,8 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::lists::row_click::snapshot;
 use crate::components::lists::row_hooks::{PartHooks, relay, use_back};
 use crate::components::lists::row_star::star_button;
-use crate::motion::presence::Presence;
-use crate::motion::roster::{Heal, presence_slug};
+use ds_motion::presence::Presence;
+use ds_motion::roster::{Heal, presence_slug};
 use dioxus::prelude::*;
 use ds_core::text::clip::clip_chars;
 use ds_core::vocab::{Availability, Check, Emphasis, RowState};
@@ -180,8 +180,8 @@ pub fn ListRow(
 #[cfg(test)]
 mod tests {
     use super::{NAME_BUDGET, NameFit, exit, row_style};
-    use crate::motion::presence::{Exit, Presence};
-    use crate::motion::roster::Heal;
+    use ds_motion::presence::{Exit, Presence};
+    use ds_motion::roster::Heal;
     use ds_core::geometry::units::Px;
 
     #[test]

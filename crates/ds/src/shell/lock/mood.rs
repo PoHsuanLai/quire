@@ -4,8 +4,8 @@
 //! once it was accepted, idle otherwise; and a [`WakeStamp`] that any key or pointer activity in
 //! the prompt advances, so an emoji rests again 20 s after the last of it.
 
-use crate::motion::pulse_key::PulsePhase;
-use crate::motion::wake::WakeStamp;
+use ds_motion::pulse_key::PulsePhase;
+use ds_motion::wake::WakeStamp;
 use crate::shell::lock::secret_entry::Filled;
 use crate::shell::lock::vocab::PromptState;
 use crate::shell::user_picture::mood::Mood;
@@ -90,7 +90,7 @@ pub(crate) fn use_stir() -> Stir {
 #[cfg(test)]
 mod tests {
     use super::{Caret, prompt_mood};
-    use crate::motion::pulse_key::PulsePhase;
+    use ds_motion::pulse_key::PulsePhase;
     use crate::shell::lock::secret_entry::Filled;
     use crate::shell::lock::vocab::PromptState;
     use crate::shell::user_picture::mood::Mood;

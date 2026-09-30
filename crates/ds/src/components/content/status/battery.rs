@@ -6,7 +6,7 @@
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
 use super::part::{Paint, Part, Pen, Show, part_svg};
-use crate::motion::detail::tween::{TweenSpec, use_tween};
+use ds_motion::detail::tween::{TweenSpec, use_tween};
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::icon::render::IconSize;

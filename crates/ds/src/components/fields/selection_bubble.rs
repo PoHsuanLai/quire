@@ -9,8 +9,8 @@ use crate::components::fields::{
     text_input_focus::FieldFocus,
 };
 use crate::components::overlays::popover::{Stacking, escape_closes, position_style, use_float};
-use crate::motion::anim::Anim;
-use crate::motion::entrance::use_entrance;
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
 use dioxus::prelude::*;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},

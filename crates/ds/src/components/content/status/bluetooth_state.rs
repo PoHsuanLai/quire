@@ -1,6 +1,6 @@
 //! The Bluetooth item's state (design/26-DETAILS.md 5.1.2).
 
-use crate::motion::detail::stamp::EventStamp;
+use ds_motion::detail::stamp::EventStamp;
 
 /// What the Bluetooth item shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

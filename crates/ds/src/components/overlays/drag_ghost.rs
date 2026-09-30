@@ -2,7 +2,7 @@
 //! (design/04-COMPONENTS.md section 34).
 
 use crate::host::measure::client_rect;
-use crate::motion::drag_return::DragReturn;
+use ds_motion::drag_return::DragReturn;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
 use std::rc::Rc;

@@ -27,10 +27,10 @@ use crate::components::menus::{
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
 use crate::host::measure::{Anchor, MountedRef};
-use crate::motion::anim::Anim;
-use crate::motion::entrance::use_entrance;
-use crate::motion::presence::Presence;
-use crate::motion::timer::use_motion_timer;
+use ds_motion::anim::Anim;
+use ds_motion::entrance::use_entrance;
+use ds_motion::presence::Presence;
+use ds_motion::timer::use_motion_timer;
 use crate::stack::menu_track::types::MenuTiming;
 use dioxus::prelude::*;
 use ds_core::press::{PointerButton, Press};

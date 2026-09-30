@@ -15,7 +15,7 @@ use crate::components::controls::press::PressListeners;
 use crate::components::controls::spinner::{SPIN, ring};
 use crate::components::lists::settings_row_phase::{RowDisc, RowPhase};
 use crate::components::lists::settings_row_trailing::{RowTrailing, trailing as trailing_mark};
-use crate::motion::detail::{
+use ds_motion::detail::{
     pending::PendingFrame, touch::Touch, use_detail::use_detail, use_operation::use_operation,
     use_pending::use_pending,
 };

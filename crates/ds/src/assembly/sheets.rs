@@ -221,7 +221,7 @@ pub(crate) const SHEETS: [(&str, &str); 83] = [
         "drop_place",
         include_str!("../components/app/drop_place.css"),
     ),
-    ("detail_morph", include_str!("../motion/detail/morph.css")),
+    ("detail_morph", ds_motion::detail::morph::CSS),
     ("widget_views", include_str!("../shell/widget/views.css")),
     (
         "widget_gallery",

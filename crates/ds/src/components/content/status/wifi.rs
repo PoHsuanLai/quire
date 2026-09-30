@@ -6,7 +6,7 @@
 use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use super::wifi_state::{WifiReach, WifiState};
-use crate::motion::detail::{
+use ds_motion::detail::{
     morph::Slashed,
     pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
     touch::Touch,
@@ -140,7 +140,7 @@ mod tests {
     use super::layer_shows;
     use crate::components::content::status::part::Show;
     use crate::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
-    use crate::motion::detail::{pending::PendingFrame, stamp::EventStamp};
+    use ds_motion::detail::{pending::PendingFrame, stamp::EventStamp};
 
     #[test]
     fn each_state_and_frame_shows_its_layers() {

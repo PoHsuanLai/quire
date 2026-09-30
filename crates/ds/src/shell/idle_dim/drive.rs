@@ -7,12 +7,12 @@
 //! Not built on `Detailed`/`Cue`: those classify an arbitrary state change into
 //! one of the grammar's moments, but this primitive already knows exactly what a phase change
 //! means (dim, or wake), so the extra layer would only translate one two-state enum into
-//! another. [`plan`] plays the same role `crate::motion::detail::sweep::plan` does for a sweep.
+//! another. [`plan`] plays the same role `ds_motion::detail::sweep::plan` does for a sweep.
 
 use super::model::IdleDimPhase;
-use crate::motion::detail::level::use_level;
-use crate::motion::timeline::glide::Glide;
-use crate::motion::timeline::playback::use_playback;
+use ds_motion::detail::level::use_level;
+use ds_motion::timeline::glide::Glide;
+use ds_motion::timeline::playback::use_playback;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::vocab::{Fraction, Percent};

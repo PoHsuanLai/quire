@@ -7,7 +7,7 @@
 use super::disc::EmojiPlayback;
 use super::id::EmojiId;
 use super::script::{MoodChange, Playing, Shown, Step, resting, script};
-use crate::motion::wake::WakeStamp;
+use ds_motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::Mood;
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;

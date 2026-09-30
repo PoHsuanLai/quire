@@ -6,8 +6,8 @@
 //! the speed it has, instead of restarting a transition. A click is a contact with no velocity:
 //! critically damped, no bounce.
 
-use crate::motion::detail::touch::Touch;
-use crate::motion::{
+use ds_motion::detail::touch::Touch;
+use ds_motion::{
     spring_spec::{SpringResponse, SpringSpec},
     timeline::spring::PxPerUnit,
     use_spring::use_spring,

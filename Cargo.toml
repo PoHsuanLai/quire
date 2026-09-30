@@ -3,6 +3,7 @@ resolver = "3"
 members = [
   "crates/ds-core",
   "crates/ds-style",
+  "crates/ds-motion",
   "crates/ds",
   "crates/ds-core-derive",
   "crates/ds-settings",
@@ -26,6 +27,7 @@ publish = false
 [workspace.dependencies]
 ds-core            = { path = "crates/ds-core" }
 ds-style           = { path = "crates/ds-style" }
+ds-motion          = { path = "crates/ds-motion" }
 ds                 = { path = "crates/ds" }
 ds-settings        = { path = "crates/ds-settings" }
 ds-core-derive     = { path = "crates/ds-core-derive" }
