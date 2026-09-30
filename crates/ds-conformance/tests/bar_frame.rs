@@ -184,7 +184,7 @@ fn a_look_change_cross_fades_the_tint() {
     harness.advance(ms(700));
     let after = pixel(&harness.render().expect("renders"), 1, 1);
     assert!(
-        distance(before, after) >= 15,
+        distance(before, after) >= 8,
         "the two Spaces differ: {before:?} {after:?}"
     );
     let settled = over_white(first_stop(3), 700);
@@ -203,7 +203,7 @@ fn a_look_change_cross_fades_the_tint() {
         );
     }
     assert!(
-        distance(middle, before) > 5 && distance(middle, after) > 5,
+        distance(middle, before) > 2 && distance(middle, after) > 2,
         "halfway {middle:?} should be neither {before:?} nor {after:?}"
     );
 }

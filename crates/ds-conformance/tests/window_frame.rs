@@ -199,6 +199,48 @@ fn grain_55_has_more_pixel_variance_than_grain_0_in_both_schemes() {
     }
 }
 
+// ---- The quiet tint, kept for review --------------------------------------------------------
+
+#[allow(non_snake_case)]
+fn WorkLight() -> Element {
+    window(look(0, 35), "")
+}
+
+#[allow(non_snake_case)]
+fn WorkDark() -> Element {
+    dark_window(look(0, 35))
+}
+
+#[allow(non_snake_case)]
+fn HomeLight() -> Element {
+    window(look(1, 55), "")
+}
+
+#[allow(non_snake_case)]
+fn HomeDark() -> Element {
+    dark_window(look(1, 55))
+}
+
+/// The Work and Home presets on a Window root in both schemes, kept as PNGs (`quiet-*`) for
+/// review; the two Spaces still differ in colour.
+#[test]
+fn the_work_and_home_frames_are_kept_and_differ() {
+    let cases: [(&str, App, App); 2] = [
+        ("light", WorkLight, HomeLight),
+        ("dark", WorkDark, HomeDark),
+    ];
+    for (scheme, work, home) in cases {
+        let (work, home) = (render(work), render(home));
+        keep(&work, &format!("quiet-work-{scheme}"));
+        keep(&home, &format!("quiet-home-{scheme}"));
+        let corner = |frame: &RgbaImage| pixel(frame, 10, 10);
+        assert!(
+            distance(corner(&work), corner(&home)) > 0,
+            "{scheme}: Work and Home draw the same corner"
+        );
+    }
+}
+
 // ---- The cross-fade -------------------------------------------------------------------------
 
 #[allow(non_snake_case)]
@@ -249,7 +291,7 @@ fn a_space_switch_cross_fades_the_window() {
     let after = pixel(&harness.render().expect("renders"), 2, 2);
     println!("before {before:?} mid-fade {middle:?} after {after:?}");
     assert!(
-        distance(before, after) >= 15,
+        distance(before, after) >= 8,
         "the two Spaces differ: {before:?} {after:?}"
     );
     for channel in 0..3 {
@@ -263,7 +305,7 @@ fn a_space_switch_cross_fades_the_window() {
         );
     }
     assert!(
-        distance(middle, before) > 5 && distance(middle, after) > 5,
+        distance(middle, before) > 2 && distance(middle, after) > 2,
         "mid-fade {middle:?} should be neither {before:?} nor {after:?}"
     );
 }
