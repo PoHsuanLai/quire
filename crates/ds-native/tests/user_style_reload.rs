@@ -35,6 +35,30 @@ fn App() -> Element {
     }
 }
 
+/// The root as `Ds` draws it: the `<style>` exists only while the style has text, so an emptied
+/// file removes the element and the next edit adds one back.
+#[allow(non_snake_case)]
+fn Toggled() -> Element {
+    let mut step = use_signal(|| 0usize);
+    let text = TOGGLES[step()];
+    rsx! {
+        div { class: "ds",
+            if !text.is_empty() {
+                style { "{text}" }
+            }
+            button { class: "next", onclick: move |_| step += 1, "next" }
+            div { class: "probe" }
+        }
+    }
+}
+
+const TOGGLES: [&str; 4] = [
+    ".probe { background: rgb(255,0,0); width: 60px; height: 60px }",
+    "",
+    ".probe { background: rgb(0,255,0); width: 60px; height: 60px }",
+    ".probe { background: rgb(0,0,255); width: 60px; height: 60px }",
+];
+
 fn harness() -> Harness {
     Harness::with_config(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
@@ -87,4 +111,30 @@ fn removing_every_rule_returns_to_the_default() {
     }
     assert_eq!(fill(&harness), [0, 0, 0, 0], "transparent again");
     assert_eq!(harness.rect(".probe").expect("probe").size.height.0, 0.0);
+}
+
+#[test]
+fn removing_the_style_element_returns_to_the_default_and_adding_one_restyles() {
+    let mut harness =
+        Harness::with_config(Toggled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    assert_eq!(
+        fill(&harness),
+        [255, 0, 0, 255],
+        "red while the element exists"
+    );
+    next(&mut harness);
+    assert_eq!(
+        fill(&harness),
+        [0, 0, 0, 0],
+        "transparent once the element is gone"
+    );
+    next(&mut harness);
+    assert_eq!(fill(&harness), [0, 255, 0, 255], "a new element restyles");
+    assert_eq!(pixel(&mut harness), [0, 255, 0, 255], "green pixel");
+    next(&mut harness);
+    assert_eq!(
+        fill(&harness),
+        [0, 0, 255, 255],
+        "and its text change restyles again"
+    );
 }

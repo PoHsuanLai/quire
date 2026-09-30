@@ -16,6 +16,11 @@
 //! the bar and the dock stamp `data-ground="frame"` so the components on them take the `--f-*`
 //! inks.
 //!
+//! `user_style` is the person's own stylesheet (`ds_settings::UserStyle`, ARCHITECTURE.md section
+//! 11): its text goes in `<style data-ds-user>` right after the design-system sheet, so a change
+//! to the signal restyles the document and a rule of theirs wins by order. An empty style draws no
+//! element at all.
+//!
 //! `stylesheet` says how the stylesheet reaches the document (`Inject`); `sheet` is the text
 //! `Inject::Inline` writes: `None` is `ds::stylesheet()`, and a crate that adds components of its
 //! own passes the sheet its kits make (`ds_shell::stylesheet()`), so the root draws them too.
@@ -67,6 +72,7 @@ use ds_style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
 use ds_style::appearance::{blur::BlurState, material::Material};
+use ds_style::kit::UserStyle;
 use ds_style::material::recipe::DEFAULT_TINT_ALPHA;
 use ds_style::material::stack::MaterialStack;
 use ds_style::scale::use_root_scale;
@@ -106,6 +112,7 @@ pub fn Ds(
     #[props(default)] window: WindowFrame,
     #[props(default)] extent: RootExtent,
     #[props(default)] typeface: Option<Typeface>,
+    #[props(default)] user_style: ReadSignal<UserStyle>,
     children: Element,
 ) -> Element {
     let typeface = typeface.unwrap_or(use_typeface());
@@ -175,6 +182,10 @@ pub fn Ds(
             onclick: move |event: MouseEvent| click_root.clicked(&event),
             if stylesheet == Inject::Inline {
                 style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
+            }
+            // After the design-system sheet, so a rule of the person's wins by order.
+            if !user_style.read().is_blank() {
+                style { "data-ds-user": "", {user_style.read().0.clone()} }
             }
             match frame_tint {
                 FrameTint::Opaque => frame_layers(layers),
