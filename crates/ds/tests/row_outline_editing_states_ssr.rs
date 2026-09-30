@@ -1,15 +1,16 @@
-//! The mail-app states (controls): each new prop or variant rendered through dioxus-ssr
-//! and compared with a golden under its component's directory, so the controls' and lists'
-//! class scans cover them too. Every state here is additive; the goldens of the states that
-//! existed before are in `components_controls.rs`, `components_lists.rs` and
-//! `mailo_gaps_ssr.rs`.
+//! The mail-app states: a tree item renamed in place (its editing slot in the label's place)
+//! rendered through dioxus-ssr and compared with a golden under the lists' directory, so the
+//! lists' class scans cover the new class too. The trailing slot's `data-slot="trailing"` shows
+//! in these and in the mail-app tree goldens.
 //!
-//! `DS_BLESS=1 cargo test -p ds --test mailo_gaps4_ssr` rewrites these goldens.
+//! `DS_BLESS=1 cargo test -p ds --test row_outline_editing_states_ssr` rewrites these goldens.
 
-#[path = "mailo_gaps4/cases.rs"]
+#[path = "row_outline_editing_states/cases.rs"]
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;
@@ -38,7 +39,7 @@ fn render(make: fn() -> Element) -> String {
 }
 
 #[test]
-fn every_mailo_gap_4_state_matches_its_golden() {
+fn every_row_outline_editing_state_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|case| golden::check(case.golden, &render(case.make)).err())

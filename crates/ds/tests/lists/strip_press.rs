@@ -6,7 +6,7 @@ use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{ActionId, HoverStrip, Shown};
 
-pub const MAILO4_CASES: &[Case] = &[Case {
+pub const STRIP_PRESS_CASES: &[Case] = &[Case {
     component: "hover_strip",
     state: "on-press",
     make: || rsx! { HoverStrip { actions: strip_actions(), shown: Shown::Visible, on_press: |_: ActionId| {} } },

@@ -1,16 +1,15 @@
-//! The mail-app states: a tree item renamed in place (its editing slot in the label's place)
-//! rendered through dioxus-ssr and compared with a golden under the lists' directory, so the
-//! lists' class scans cover the new class too. The trailing slot's `data-slot="trailing"` shows
-//! in these and in the mail-app tree goldens.
+//! The mail-app states (controls and lists): each new prop or variant rendered through dioxus-ssr
+//! and compared with a golden under its component's directory, so the controls' and lists'
+//! class scans cover them too. Every state here is additive; the goldens of the states that
+//! existed before are in `components_controls.rs`, `components_lists.rs` and
+//! `mailo_gaps_ssr.rs` and `mailo_gaps4_ssr.rs`; the overlays are in `components_overlays.rs`.
 //!
-//! `DS_BLESS=1 cargo test -p ds --test mailo_gaps7_ssr` rewrites these goldens.
+//! `DS_BLESS=1 cargo test -p ds --test button_leading_and_label_run_states_ssr` rewrites these goldens.
 
-#[path = "mailo_gaps7/cases.rs"]
+#[path = "button_leading_and_label_run_states/cases.rs"]
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
-#[path = "support/scoped.rs"]
-mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;
@@ -39,7 +38,7 @@ fn render(make: fn() -> Element) -> String {
 }
 
 #[test]
-fn every_mailo_gap_7_state_matches_its_golden() {
+fn every_button_leading_and_label_run_state_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|case| golden::check(case.golden, &render(case.make)).err())

@@ -12,12 +12,12 @@ mod cases;
 mod css_scan;
 #[path = "support/golden.rs"]
 mod golden;
-#[path = "overlays/mailo.rs"]
-mod mailo;
-#[path = "overlays/mailo4.rs"]
-mod mailo4;
-#[path = "overlays/mailo5.rs"]
-mod mailo5;
+#[path = "overlays/hover_card_flag.rs"]
+mod hover_card_flag;
+#[path = "overlays/hover_card_hooks.rs"]
+mod hover_card_hooks;
+#[path = "overlays/palette_and_hover_targets.rs"]
+mod palette_and_hover_targets;
 
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
@@ -124,9 +124,9 @@ fn golden_name(case: &Case) -> String {
 fn every_overlay_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
-        .chain(mailo::MAILO_CASES)
-        .chain(mailo4::MAILO4_CASES)
-        .chain(mailo5::MAILO5_CASES)
+        .chain(palette_and_hover_targets::PALETTE_AND_HOVER_CASES)
+        .chain(hover_card_hooks::HOVER_CARD_HOOK_CASES)
+        .chain(hover_card_flag::HOVER_CARD_FLAG_CASES)
         .filter_map(|case| {
             let dom = built(case.make, None, case.wait);
             golden::check(&golden_name(case), &inside_root(&dom)).err()

@@ -1,12 +1,12 @@
-//! The mail-app states (controls and lists): each new prop or variant rendered through dioxus-ssr
+//! The mail-app states (controls): each new prop or variant rendered through dioxus-ssr
 //! and compared with a golden under its component's directory, so the controls' and lists'
 //! class scans cover them too. Every state here is additive; the goldens of the states that
 //! existed before are in `components_controls.rs`, `components_lists.rs` and
-//! `mailo_gaps_ssr.rs` and `mailo_gaps4_ssr.rs`; the overlays are in `components_overlays.rs`.
+//! `mailo_gaps_ssr.rs`.
 //!
-//! `DS_BLESS=1 cargo test -p ds --test mailo_gaps5_ssr` rewrites these goldens.
+//! `DS_BLESS=1 cargo test -p ds --test provider_and_button_face_states_ssr` rewrites these goldens.
 
-#[path = "mailo_gaps5/cases.rs"]
+#[path = "provider_and_button_face_states/cases.rs"]
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
@@ -38,7 +38,7 @@ fn render(make: fn() -> Element) -> String {
 }
 
 #[test]
-fn every_mailo_gap_5_state_matches_its_golden() {
+fn every_provider_and_button_face_state_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|case| golden::check(case.golden, &render(case.make)).err())

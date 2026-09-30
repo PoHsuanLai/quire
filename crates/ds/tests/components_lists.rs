@@ -16,24 +16,24 @@ mod css_scan;
 mod golden;
 #[path = "lists/live.rs"]
 mod live;
-#[path = "lists/mailo.rs"]
-mod mailo;
-#[path = "lists/mailo4.rs"]
-mod mailo4;
 #[path = "lists/motion.rs"]
 mod motion;
 #[path = "lists/rows.rs"]
 mod rows;
 #[path = "support/scoped.rs"]
 mod scoped;
+#[path = "lists/strip_press.rs"]
+mod strip_press;
+#[path = "lists/thread_row.rs"]
+mod thread_row;
 
 use cases::{CASES, Case};
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::{Anim, DragGhost, DragPhase, DragTracker, Exit, Point, Px, Rect, Size, use_drag};
-use mailo::MAILO_CASES;
-use mailo4::MAILO4_CASES;
 use rows::ROW_CASES;
+use strip_press::STRIP_PRESS_CASES;
+use thread_row::THREAD_ROW_CASES;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -67,8 +67,8 @@ fn every_list_component_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .chain(ROW_CASES)
-        .chain(MAILO_CASES)
-        .chain(MAILO4_CASES)
+        .chain(THREAD_ROW_CASES)
+        .chain(STRIP_PRESS_CASES)
         .filter_map(|case| golden::check(&golden_name(case), &render(case.make)).err())
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
@@ -143,7 +143,8 @@ const STYLED_ABOVE: &[&str] = &["ds-space-dot"];
 fn every_class_in_a_golden_is_styled_by_its_component() {
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len() + MAILO4_CASES.len(),
+        goldens.len()
+            >= CASES.len() + ROW_CASES.len() + THREAD_ROW_CASES.len() + STRIP_PRESS_CASES.len(),
         "only {} goldens",
         goldens.len()
     );
@@ -239,7 +240,8 @@ fn every_list_golden_lints_clean() {
     };
     let goldens = golden::all_in("lists");
     assert!(
-        goldens.len() >= CASES.len() + ROW_CASES.len() + MAILO_CASES.len() + MAILO4_CASES.len(),
+        goldens.len()
+            >= CASES.len() + ROW_CASES.len() + THREAD_ROW_CASES.len() + STRIP_PRESS_CASES.len(),
         "only {} goldens",
         goldens.len()
     );

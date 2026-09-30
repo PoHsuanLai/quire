@@ -58,7 +58,7 @@ fn caller_strip(shown: Shown) -> Element {
     }
 }
 
-pub const MAILO_CASES: &[Case] = &[
+pub const THREAD_ROW_CASES: &[Case] = &[
     Case {
         component: "thread_row",
         state: "marked-runs",
