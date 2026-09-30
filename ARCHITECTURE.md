@@ -232,6 +232,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Menu data | `ds::menus::{MenuItem, MenuPlacement, MenuImage}` |
 | Menu pointer tracking | `ds::stack::menu_track` |
 | Popup menu view | `ds::menus::Menu` |
+| A filterable list in a popover | `ds::menus::pick_list::PickList` (its rows and keys are the palette's) |
 | Toasts | `ds::overlays::toast` + `ds::stack::toast_hub` |
 | The root component and stylesheet assembly | `ds::assembly::{Ds, stylesheet}` |
 | A status glyph and its state (Wi-Fi, battery, Bluetooth, volume) | `ds::content::status` |
