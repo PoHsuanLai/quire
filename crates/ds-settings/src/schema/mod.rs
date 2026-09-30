@@ -13,7 +13,8 @@ mod traits;
 
 pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
-    Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget, kind_from_variants,
+    Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget, WordLabels,
+    kind_from_variants,
 };
 pub use program::{
     AppId, FilePath, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,

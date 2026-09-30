@@ -176,6 +176,7 @@ mod tests {
                 page: Page::Appearance,
                 section: crate::schema::Section("Appearance".to_owned()),
                 exposure: Exposure::Basic,
+                labels: Default::default(),
             }],
         }
     }
