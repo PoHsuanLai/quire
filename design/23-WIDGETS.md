@@ -219,15 +219,16 @@ digital time 800, tabular, tracked -.02em. Labels are the UI face 700 at `--fs-s
 
 ## 4. Specification per widget
 
-### 4.1 Battery (`BatteryLevel`)
+### 4.1 Battery (`BatteryRing`)
 
-`BatteryLevel { level: Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, children }`,
-`wake` defaults. Markup: `div.ds-battery[data-tone][data-mark]
-[role=progressbar][aria-valuenow][data-pulse]`, 64 x 64, holding `svg.ds-battery-track`, `svg.ds-battery-arc`
-(absent while it draws 0), `span.ds-battery-device` around `children` when given, and `svg.ds-battery-bolt`
-while charging, once the fill has arrived. The percentage the widget draws is
-`BatteryFigure { level, wake }` (`span.ds-battery-figure`, `{n}%`, tabular) or, for a host that
-draws its own text, `use_battery_figure(level, wake) -> u16`.
+Status (design/30 section 2.10, step 4a.7): the ring is `BatteryRing { state: BatteryState, label: Text,
+readout: Readout, children }`, a `ProgressIndicator { Ring }` (one arc geometry, notched at twelve while
+`state.power` is `Charging`) with the device's glyph as `children`; `BatteryLevel`, `BatteryFigure`,
+`DeviceBattery` and `RingMark` are gone, and the percentage is a `Label` (`percent_text(level)`). Markup:
+`div.ds-battery-ring[data-tone][data-power]` holding `div.ds-battery` (64 x 64: the `.ds-progress` ring
+and `svg.ds-battery-bolt` while charging) and, under `Readout::Under`, `span.ds-battery-figure`. The
+low tone follows `BatteryState::is_low`; the arc follows its level with the progress tween (linear over
+`--t-move`) and the number changes at once.
 
 | Part | Drawing | From |
 | --- | --- | --- |
@@ -807,12 +808,12 @@ use, no frame-accurate recording found).
 Both settle to zero frames (`ds-native/tests/widget_edit.rs`, on the virtual clock).
 
 **Leaving (sill G423, 2026-09-28).** A desktop widget removed in Edit Widgets used to vanish in a
-frame. `WidgetCard { presence: CardPresence::Leaving, on_gone }` (and `WidgetFrame`) plays the
-card's exit, `widget-out` (design/05 section 4.14: shrinks to .85 and fades at `--t-move
---e-exit`; a fade alone under Reduced), takes no pointer (`data-presence="leaving"`), and calls
-`on_gone` once at `settle(WidgetOut)`. The host keeps drawing the removed card until then and
-drops it there; passing `Placed` again before then takes the exit back and `on_gone` never runs
-(`ds-native/tests/widget_card_exit.rs`).
+frame. `WidgetCard { shown: Shown::Hidden, on_hidden }` (and `WidgetFrame`) plays the
+card's exit through `Presence` (design/30 section 1.3: a fade over `--t-quick`, `Exit::Fade`), takes no
+pointer (`data-presence="leaving"`), and calls `on_hidden` once at the exit's settle. The host keeps
+drawing the removed card until then and drops it there; passing `Shown::Visible` again before then takes
+the exit back and `on_hidden` never runs (`ds-blitz/tests/widget_card_presence.rs`). `CardPresence` and
+the `widget-out` shrink are gone.
 
 ### 9.9 What sill changes
 

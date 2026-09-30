@@ -110,7 +110,7 @@ name `ds`'s public surface, one path per item.
 fields,menus,menus/palette,overlays,lists,content,chrome}` hold the general ones, `components/app`
 mail's own, and `ds-shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
 `notifications`, `thumbs`, `now_playing`, `month_grid`, `clock`, `battery`, `emoji`,
-`user_picture`, `space_editor`, `osd`, `idle_dim`, `dock_parts`, `widget`). Every file is the
+`user_picture`, `space_editor`, `osd`, `idle_dim`, `dock`, `widget`). Every file is the
 section of 04-COMPONENTS with the same name, one `.rs` and `.css` pair each (the controls and fields of
 30-CATALOGUE 2.1 to 2.3, 2.8 and 2.9 are directories or file groups by concept: `button` (with `button_model`
 and `button_face`; the image-only and toolbar buttons are `Button`, not a second component), `toggle`, `checkbox`,
@@ -127,14 +127,18 @@ fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s s
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `account_tile` §27,
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
-`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` reports, and the keys that activate a control, FINDINGS "Pointer events", "Bar gaps"), `Button`'s `StatusItem` bezel and `StatusMetrics` (`ds-style/tokens/status.rs`; 13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
+`press` (`Press{button, modifiers, at}`, `PointerButton`: what `Button` reports, and the keys that activate a control, FINDINGS "Pointer events", "Bar gaps"), `StatusMetrics` (`ds-style/tokens/status.rs`, read by `MenuBarItem`; 13 §13.3.1; FINDINGS "Bar gaps"), `selection_bubble` §30, `send_pill` §31, `space_editor`
 §32, `edge_strip` §33, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
-(13 §13.3.1), `workspace_pills` §37 and `dock_parts` §38 (`RunningDot`, `DockFloor`; 10 §10.3.2).
+(13 §13.3.1, the bar's item button, title or glyph), `workspace_pills` §37 and `dock/` §38 (`DockTile`,
+`DockLabel`, `RunningDot`, `DockFloor`; 10 §10.3.2).
 The P2 components of 30-CATALOGUE 2.1 to 2.7: `fields/stepper/` (`Stepper`, `StepRange`, the hold-repeat machine), `fields/field_row` (`FieldRow`, `FieldGroup`), `lists/table/` (`Table` over `List`, column widths), `chrome/toolbar/` (`Toolbar`, the overflow rule), `chrome/split_view/` (`SplitView`, its spring pane), `chrome/sidebar` (`Sidebar`), `chrome/tab_view` (`TabView`), `chrome/titlebar_parts` (subtitle, proxy icon, edited dot beside `WindowTitlebar`'s title), `controls/edge_grab` (the drag of a column edge or a divider), `menus/menu_bar` (`MenuBarModel`, data only) and `overlays/drag_ghost` (`DragGhost` with its count badge); `ds-shell/date_picker/` is `DatePicker`, over the shell's `MonthGrid`.
-`user_picture` is a directory and 25-EMOJI section 7: `UserPicture`/`UserPortrait`, `Mood`,
-`PictureSize`, the accept beat, `PictureChoice`/`resolve_picture` and `UserPicturePicker`.
+`user_picture` is a directory and 25-EMOJI section 7: `UserPicture`, `PictureSize`, the drawing the
+lock and polkit prompts share (`draw.rs`), `PictureChoice`/`resolve_picture` and `UserPicturePicker`.
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
-manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that plays it (`life.rs`).
+manifest (`sheet.rs`) and the task that plays the asset's animation once (`play.rs`).
+`lock` holds the password field the lock screen and the polkit sheet share (`password_field.rs`,
+`password.rs`); `battery` the ring (`ring.rs`) and the device glyphs; `kept.rs` the book a banner
+stack and the app switcher keep their leaving rows in.
 
 `ds-shell/space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),

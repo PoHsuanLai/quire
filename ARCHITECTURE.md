@@ -86,7 +86,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
-| `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock_parts`, `space_editor`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
+| `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `space_editor`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, requests, hover, drop, shell) < `launch`, `open_window` < features `pdf`, `print`, `spell` |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot` |
@@ -165,8 +165,8 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | `components/content/status/*`, `status_glyph.rs` | stay: `ds::content::status` |
 | `components/lists/row_battery.rs` | `ds-shell::battery` (composes `BatteryGlyph`) |
 | `assembly/{ds,sheets,stylesheet}.rs` | `ds::assembly::{ds, sheets, stylesheet}`; `ds.rs` loses its `WindowFrame`/`ToastHost` imports by naming them from `chrome`/`overlays` (assembly is above both) |
-| `shell/{bar,battery,clock,control_center,emoji,lock,month_grid*,notifications,now_playing*,osd*,space_editor*,switcher,thumbs,user_picture*,dock_parts*,idle_dim*}` | `ds-shell::` same names |
-| `shell/widget/{contract,registry,scope,slot,layout,kind,exit,wire,card,frame,gallery*,use_widget,timeline}.rs`, `shell/catalog/*` | `ds-shell::widgets::{contract, registry, scope, slot, layout, kind, exit, wire, card, frame, gallery, use_widget, timeline, catalog}` |
+| `shell/{bar,battery,clock,control_center,emoji,lock,month_grid*,notifications,now_playing*,osd*,space_editor*,switcher,thumbs,user_picture*,dock*,idle_dim*}` | `ds-shell::` same names |
+| `shell/widget/{contract,registry,scope,slot,layout,kind,wire,card,frame,gallery*,use_widget,timeline}.rs`, `shell/catalog/*` | `ds-shell::widgets::{contract, registry, scope, slot, layout, kind, wire, card, frame, gallery, use_widget, timeline, catalog}` |
 | `shell/widget/{battery,calendar,clock}.rs` | `ds-shell::widgets::{battery, calendar, clock}/` (one directory each) |
 | `style/tokens/{control_center,dock,notifications,osd,shell,shell_scale,widgets,widget_paint}.rs` | `ds-shell::tokens::*`, each implementing `Token` and listed in `ds_shell::KIT` |
 | `lib.rs` root re-exports | deleted; replaced by `ds::prelude` and each crate's curated root |
@@ -746,7 +746,7 @@ path each, until step 12 replaces them with the prelude.
        `ds-shell::battery`);
     6. overlays and feedback: (done) `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
-    7. shell-only pieces and app features (30 sections 2.10 and 2.11), then the P2 components;
+    7. shell-only pieces (done: 30 section 2.10) and app features (30 section 2.11), then the P2 components;
     8. sill's switch-over (the local pieces L1-L16 of the component inventory) and the Arc Look;
        the gallery and goldens per component; delete every name in 30 Part 4.
 5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes

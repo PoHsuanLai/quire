@@ -181,7 +181,7 @@ fn edit_widgets_paints_each_pose() {
     save(&mut harness, "opened");
 
     let clock = harness
-        .centre(".ds-widget-gallery-kind:nth-child(3)")
+        .centre(".ds-widget-gallery .ds-list-item:nth-child(3) .ds-row")
         .expect("Calendar in the list");
     harness.click(clock);
     harness.advance(Duration::from_millis(50));

@@ -46,10 +46,9 @@ that rev.
   Look's values; the second Look (step 4a.8) threads `TokenScope::look` to them and adds
   `Look::Arc` from the Post values recorded in design/30 section 3.2.
 - **Controls and fields of step 4a.4 have consumers and pieces still to move.**
-  `Button` keeps `Trailing::Caret` and `spinner::ring` (the halo a settings row and the preview pane
-  draw) until `PopUpButton` and `Row` (step 4a.5) take them; a button's `answers` (Return for the
+  A button's `answers` (Return for the
   default button, Escape for Cancel) marks it and the dialog routes the key (`Alert` does; `Sheet` in step
-  4a.6); the bar's `Bezel::StatusItem` ends when `MenuBarItem` (step 4a.7) lands; the Help bezel draws its
+  4a.6); the Help bezel draws its
   question mark as text because the icon set has no help glyph. `TextField` has no edit menu (Undo, Cut,
   Copy, Paste, Select All) until `Menu{Popup}` (step 4a.5) and no truncation tooltip until `Tooltip`
   (step 4a.6), and its search kind has neither the cancel button of a window's toolbar nor a suggestions

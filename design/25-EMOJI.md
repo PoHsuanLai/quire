@@ -9,6 +9,13 @@ proprietary; we use Google's open **Noto Animated Emoji** instead. Code, classes
 2026-09-26 (branch `user-picture-emoji`): the persona is removed, and
 the emoji is one kind of user picture beside the letter and the photo (section 7).
 
+Status, step 4a.7 (design/30 section 2.10 wins): the moods, the 20 s awake window, the idle loops, the
+accept beat, `UserPortrait` and `Mood` are gone. `AnimatedEmoji` plays the asset's own animation once
+through when it appears (and on each new `WakeStamp` or pick), then rests on frame 0;
+`EmojiPlayback` is `Once` or `Still`. The lock and polkit prompts draw the picture without a mood
+(`user_picture/draw.rs`); sections 5 and 7 below describe what came before where they speak of
+moods, `Mood`, `UserPortrait`, the accept beat and `accept.rs`.
+
 ## 1. What this governs
 
 `ds::AnimatedEmoji` (the picture), `ds::EmojiId` (which emoji, user data), `ds::EmojiDisc`

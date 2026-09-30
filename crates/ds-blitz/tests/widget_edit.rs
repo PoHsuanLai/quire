@@ -99,7 +99,7 @@ fn the_slot_guide_fades_in_then_asks_for_nothing() {
 #[test]
 fn the_gallery_draws_one_size_and_edits_the_layout() {
     let mut harness = harness(Gallery);
-    assert_eq!(harness.count(".ds-widget-gallery-kind"), 3);
+    assert_eq!(harness.count(".ds-widget-gallery .ds-list-item"), 3);
     assert_eq!(
         harness.count(".ds-widget-gallery-preview .ds-widget"),
         1,
@@ -118,7 +118,7 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
         "no size control anywhere"
     );
     let clock = harness
-        .centre(".ds-widget-gallery-kind:nth-child(2)")
+        .centre(".ds-widget-gallery .ds-list-item:nth-child(2) .ds-row")
         .expect("World Clock in the list");
     harness.click(clock);
     harness.advance(Duration::ZERO);
