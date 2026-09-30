@@ -936,10 +936,29 @@ pub struct KeySpec {
 pub struct Schema { pub app: AppId, pub file: FilePath, pub keys: Vec<KeySpec> }
 ```
 
-Widget by kind, fixed: a two-variant enum is a `Toggle`; three to five variants a
-`SegmentedControl`; more a `Menu`; `Bounded` a `Slider` with its unit; `Text` a `TextInput`;
-`Colour` the appearance picker's swatch row; `Shortcut` a key-capture field; `List` a rows
-editor. All from `04-COMPONENTS.md`; the Settings app has no widgets of its own.
+Widget by kind, fixed:
+
+| Kind | Widget |
+| --- | --- |
+| one-variant enum | read-only label |
+| two-variant enum whose words are an on/off pair (below) | `Toggle` |
+| two-variant enum whose words are not (`ring`/`bar`, `bottom`/`left`, `system`/`editorial`) | `SegmentedControl` with two segments |
+| three to five variants | `SegmentedControl` |
+| more than five | `Menu` |
+| `Bounded` | `Slider` with its unit |
+| `Text` | `TextInput` |
+| `Colour` | the appearance picker's swatch row |
+| `Shortcut` | key-capture field |
+| `List` | rows editor |
+
+The schema's `kind` for a two-variant enum stays `toggle`; the Settings app decides between
+switch and segments from the words, so a program writes nothing extra. Two words are an on/off
+pair when either is `off`, `hide`, `never`, `none` or `nothing` (the other is the on side), or
+when they are one of `natural`/`traditional` (natural on) or `reduced`/`standard` (reduced on: a
+switch labelled like macOS's "Reduce motion", on for the reduced value). Everything else is a
+choice between two things, not a switch. The rule and its table test live in detent's
+`detent-model` (`control.rs`). All widgets are from `04-COMPONENTS.md`; the Settings app has no
+widgets of its own.
 
 ### 9.2 Where the schema lives
 
@@ -947,7 +966,9 @@ The derive's build step writes `target/.../<app-id>.settings.toml` and the packa
 to `$XDG_DATA_DIRS/quire/settings/<app-id>.settings.toml`, next to the `.desktop` file, the way
 GSettings ships schemas. The file is TOML, one `[[key]]` table per `KeySpec`, plus `app`,
 `file` and `version`. Developers run `cargo run -p <app> -- --write-schema <dir>` for a local
-install. A schema without a program (a stale file) is skipped with a warning.
+install. quire's own schema (`quire.settings.toml`: the `appearance` and `icons` domains of
+`quire/appearance.toml`) has no app binary, so it is written by the `ds-settings` example
+`write_schema` (`cargo run -p ds-settings --example write_schema -- --write-schema <dir>`). A schema without a program (a stale file) is skipped with a warning.
 
 ### 9.3 What the Settings app does
 
@@ -955,7 +976,8 @@ install. A schema without a program (a stale file) is skipped with a warning.
    `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
    above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
    and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, plus one page per third-party app
-   id). "Advanced" keys render under a disclosure at the end of their section.
+   id). Every "Advanced" key of a page renders under one "Advanced" disclosure at the end of the
+   page, grouped by section inside it, so a section with only Advanced keys shows no empty header.
 2. Read the current value from the key's `file` through the shared lenient loader; write with
    the atomic writer; the owning program's directory watch applies it live (section 2).
    The Settings app never talks to the program.

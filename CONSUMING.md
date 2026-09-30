@@ -1021,9 +1021,11 @@ fn main() {
 `cargo run -p your-app -- --write-schema target/schema` writes `<app-id>.settings.toml`
 (section 9.2); install it to `$XDG_DATA_DIRS/quire/settings/` for a local dev loop, or ship it
 next to your `.desktop` file. `KeyKind` picks the widget for you — a two-variant enum is a
-`Toggle`, three to five a `SegmentedControl`, more a `Menu`, a `#[settings(range = "..")]` newtype
-a `Slider` — see `ds_settings::schema::KeyKind::widget` (design/22-SETTINGS.md section 9.1) for
-the full table; you never choose a widget yourself.
+`Toggle` when its words are an on/off pair and two segments otherwise, three to five a
+`SegmentedControl`, more a `Menu`, a `#[settings(range = "..")]` newtype a `Slider` — see
+`ds_settings::schema::KeyKind::widget` (design/22-SETTINGS.md section 9.1) for the full table; you
+never choose a widget yourself. quire's own schema is written the same way by the `ds-settings`
+example: `cargo run -p ds-settings --example write_schema -- --write-schema target/schema`.
 
 ## 8. What Blitz cannot do, and what to use instead
 
