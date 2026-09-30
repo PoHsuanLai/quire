@@ -360,8 +360,8 @@ pub use crate::stack::{
     hover_hub::{HoverKey, HoverKind, use_hover_hub},
     layer_stack::{Dismissal, LayerId, LayerStack},
     menu_track::types::{
-        ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack,
-        MenuTrackEffect, MenuTrackEvent, ShownBy,
+        Branch, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming,
+        MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, ShownBy,
     },
     pull_tab::{Pull, PullTab, TabArm},
     roving::{Rove, Roving, Wrap},
