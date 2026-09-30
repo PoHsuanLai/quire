@@ -6,7 +6,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{Appearance, CommandPalette, Ds, Grain, Icon, Material, RowAction, SpaceLook};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -80,7 +80,7 @@ fn a_trailing_action_fires_without_picking_or_selecting_its_row() {
     // The second row's remove: the pointer crosses the row to reach it.
     let remove = ".ds-row:nth-child(3) .ds-row-action .ds-button";
     let at = harness.centre(remove).expect("the second row's remove");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(100));
     assert_eq!(
         harness.text_of(".log").as_deref(),

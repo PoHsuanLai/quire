@@ -8,7 +8,7 @@ use ds::{
     PersonHue, Propagation, Row, RowLeading,
 };
 use ds::{Bezel, Button, ImagePosition};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -67,14 +67,16 @@ fn log(harness: &Harness) -> String {
 fn cancel_cancels_without_opening_and_the_label_still_opens() {
     let mut harness = Harness::new(Scheduled, VIEW);
     assert_eq!(log(&harness), "");
-    harness.click(
+    harness.send(Input::click(
         harness
             .centre(".ds-button[*|aria-label=\"Cancel sending Q3 notes\"]")
             .expect("the cancel"),
-    );
+    ));
     harness.advance(Duration::from_millis(30));
     assert_eq!(log(&harness), "cancel");
-    harness.click(harness.centre(".ds-row-title").expect("the title"));
+    harness.send(Input::click(
+        harness.centre(".ds-row-title").expect("the title"),
+    ));
     harness.advance(Duration::from_millis(30));
     assert_eq!(log(&harness), "cancel,open");
     assert_eq!(harness.text_of(".when").as_deref(), Some("Mon 9:00"));

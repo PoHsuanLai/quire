@@ -1,7 +1,7 @@
 //! Which clock a [`Harness`](crate::Harness) runs on.
 //!
 //! On the [`Clock::Wall`] (the default) quire's timers are real `futures-timer` sleeps and
-//! `Harness::advance` really lets the time pass; only CSS animation time is the harness's own.
+//! `Driver::advance` really lets the time pass; only CSS animation time is the harness's own.
 //! Under load the two drift apart, so a timer can end an entrance before or after the frame a
 //! test expects.
 //!

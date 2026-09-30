@@ -11,7 +11,7 @@ use ds::{
     Anchor, Anim, Appearance, CommandPalette, Ds, Material, Menu, MenuItem, MenuPlacement, Motion,
     MotionLevel, PaletteGroup, PaletteRow, Point, Px, settle, sleep,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

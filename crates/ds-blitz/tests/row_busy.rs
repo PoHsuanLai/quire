@@ -11,7 +11,7 @@ use ds::{
     Row, RowLeading, RowSize, RowState, Selection,
 };
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -25,7 +25,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 /// Where an operation on a row's item stands.
@@ -154,14 +154,14 @@ fn working_puts_a_spinner_where_the_lock_was_at_once_and_it_turns_until_the_work
 fn a_busy_row_takes_no_press() {
     let mut harness = virtual_harness(Rows);
     let at = harness.centre("#net .ds-row-title").expect("the title");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(20));
     assert_eq!(
         harness.attr("#net .ds-row", "aria-busy").as_deref(),
         Some("true"),
         "the press started the work"
     );
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(20));
     assert_eq!(
         harness.count("#net .ds-progress"),

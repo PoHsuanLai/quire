@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, FieldFocus, Material, use_focus_request};
 use ds::{FieldKind, TextField};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -61,16 +61,16 @@ fn a_click_and_the_seam_both_report_focus_and_a_click_reports_blur() {
     let mut harness = Harness::new(Fields, VIEW);
     harness.advance(ms(100));
     assert_eq!(log(&harness), "focus:c", "the seam focused c on mount");
-    assert!(harness.is_focused("#c input"));
+    assert_eq!(harness.focus_of("#c input"), FocusState::Focused);
 
     let a = harness.centre("#a input").expect("the field");
-    harness.click(a);
+    harness.send(Input::click(a));
     harness.advance(ms(50));
     assert_eq!(log(&harness), "focus:c,blur:c,focus:a");
-    assert!(harness.is_focused("#a input"));
+    assert_eq!(harness.focus_of("#a input"), FocusState::Focused);
 
     let b = harness.centre("#b input").expect("the field");
-    harness.click(b);
+    harness.send(Input::click(b));
     harness.advance(ms(50));
     assert_eq!(log(&harness), "focus:c,blur:c,focus:a,blur:a,focus:b");
 }
@@ -82,15 +82,20 @@ fn a_controlled_request_still_focuses_and_reports_it() {
     let mut harness = Harness::new(Fields, VIEW);
     harness.advance(ms(100));
     let b = harness.centre("#b input").expect("the field");
-    harness.click(b);
+    harness.send(Input::click(b));
     harness.advance(ms(50));
     let before = log(&harness);
     assert_eq!(before, "focus:c,blur:c,focus:b");
 
     let button = harness.centre(".ds-button").expect("the request button");
-    harness.click(button);
+    harness.send(Input::click(button));
     harness.advance(ms(100));
-    assert!(harness.is_focused("#c input"), "{}", harness.html());
+    assert_eq!(
+        harness.focus_of("#c input"),
+        FocusState::Focused,
+        "{}",
+        harness.html()
+    );
     let after = log(&harness);
     let added = after.strip_prefix(&before).unwrap_or(&after);
     assert!(
@@ -111,7 +116,7 @@ fn a_secure_field_draws_dots_not_what_is_typed() {
     );
     assert_eq!(harness.attr("#c input", "value"), None, "no value written");
     for c in "secret".chars() {
-        harness.key(ds::ShortcutKey::Char(c));
+        harness.send(Input::key(ds::ShortcutKey::Char(c)));
         harness.advance(ms(20));
     }
     assert_eq!(

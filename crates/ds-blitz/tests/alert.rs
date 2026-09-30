@@ -10,7 +10,7 @@ use ds::{
     Alert, AlertButton, AlertRole, Appearance, Ds, Flow, Material, Motion, Point, Px, RootExtent,
     ShortcutKey, TextLine,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -61,7 +61,7 @@ fn start(action: AlertRole, flow: Flow) -> Harness {
     ACTION_ROLE.with(|cell| cell.set(action));
     FLOW.with(|cell| cell.set(flow));
     let config = HarnessConfig::new(VIEW).with_clock(Clock::Virtual);
-    let mut harness = Harness::with_config(Page, config);
+    let mut harness = Harness::new(Page, config);
     harness.within(|| LOG.write().clear());
     // Past the entrance, and past the focus that waits for the document.
     harness.advance(Duration::from_millis(600));
@@ -78,17 +78,22 @@ const ACTION: &str = ".ds-alert-slot:nth-child(1) > .ds-button";
 const CANCEL: &str = ".ds-alert-slot:nth-child(2) > .ds-button";
 
 fn press(harness: &mut Harness, key: ShortcutKey) {
-    harness.key(key);
+    harness.send(Input::key(key));
     harness.advance(Duration::from_millis(20));
 }
 
 #[test]
 fn it_opens_with_the_keyboard_on_the_default_button() {
     let harness = start(AlertRole::Normal, Flow::Floating);
-    assert!(harness.is_focused(ACTION), "the action is the default");
+    assert_eq!(
+        harness.focus_of(ACTION),
+        FocusState::Focused,
+        "the action is the default"
+    );
     let harness = start(AlertRole::Destructive, Flow::Floating);
-    assert!(
-        harness.is_focused(CANCEL),
+    assert_eq!(
+        harness.focus_of(CANCEL),
+        FocusState::Focused,
         "a destructive action is not the default: Cancel is"
     );
 }
@@ -101,10 +106,15 @@ fn return_presses_the_default_wherever_the_keyboard_is() {
 
     let mut harness = start(AlertRole::Normal, Flow::Floating);
     press(&mut harness, ShortcutKey::Tab);
-    assert!(harness.is_focused(CANCEL), "Tab moves to Cancel");
+    assert_eq!(
+        harness.focus_of(CANCEL),
+        FocusState::Focused,
+        "Tab moves to Cancel"
+    );
     press(&mut harness, ShortcutKey::Tab);
-    assert!(
-        harness.is_focused(ACTION),
+    assert_eq!(
+        harness.focus_of(ACTION),
+        FocusState::Focused,
         "and back: the keyboard stays in the alert"
     );
     press(&mut harness, ShortcutKey::Tab);
@@ -145,16 +155,16 @@ fn a_press_outside_does_nothing_and_a_button_press_is_its_own() {
         let mut harness = start(AlertRole::Normal, flow);
         let panel = harness.rect(".ds-sheet").expect("the panel");
         // Just above the panel: nothing dims and nothing catches the click for the alert.
-        harness.click(Point {
+        harness.send(Input::click(Point {
             x: panel.origin.x + Px(20.0),
             y: panel.origin.y - Px(8.0),
-        });
+        }));
         harness.advance(Duration::from_millis(20));
         assert_eq!(log(&harness), "", "{flow:?}");
 
         let mut harness = start(AlertRole::Normal, flow);
         let at = harness.centre(ACTION).expect("the action");
-        harness.click(at);
+        harness.send(Input::click(at));
         harness.advance(Duration::from_millis(20));
         assert_eq!(log(&harness), "action", "{flow:?}");
     }

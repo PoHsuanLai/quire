@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::Choice;
 use ds::{Appearance, Ds, Material, SegmentedControl, ShortcutKey};
 use ds::{ControlSize, Tracking};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -37,18 +37,17 @@ fn value(harness: &Harness) -> String {
 
 #[test]
 fn arrows_move_the_choice_and_stop_at_the_ends() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(value(&harness), "2");
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     assert_eq!(value(&harness), "2", "the end stops");
-    harness.key(ShortcutKey::Left);
+    harness.send(Input::key(ShortcutKey::Left));
     assert_eq!(value(&harness), "1");
-    harness.key(ShortcutKey::Home);
+    harness.send(Input::key(ShortcutKey::Home));
     assert_eq!(value(&harness), "0");
-    harness.key(ShortcutKey::End);
+    harness.send(Input::key(ShortcutKey::End));
     assert_eq!(value(&harness), "2");
 }

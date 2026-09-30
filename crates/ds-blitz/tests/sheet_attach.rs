@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{Appearance, Attach, Ds, Material, RootExtent, Sheet};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -39,8 +39,7 @@ fn Page() -> Element {
 fn start(attach: Attach, width: SheetWidth) -> Harness {
     ATTACH.with(|cell| cell.set(attach));
     WIDTH.with(|cell| cell.set(width));
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),

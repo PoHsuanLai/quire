@@ -9,7 +9,7 @@ use ds::{
     Appearance, Corner, Ds, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Scheme,
     Shown, Surface,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::DockLabel;
 use image::{Rgba, RgbaImage};
 use probe::rect;
@@ -140,8 +140,7 @@ fn Labels() -> Element {
 /// the pointer, where an uncontrolled label shows after the Label profile's 100 ms.
 #[test]
 fn a_caller_shows_and_hides_a_dock_label() {
-    let mut harness =
-        Harness::with_config(Labels, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Labels, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(400));
     assert_eq!(
         harness.count(".ds-dock-label"),
@@ -159,7 +158,7 @@ fn a_caller_shows_and_hides_a_dock_label() {
     let hidden_target = harness
         .centre(".hidden .ds-hover-target")
         .expect("the hidden tile");
-    harness.pointer_move(hidden_target);
+    harness.send(Input::pointer_move(hidden_target));
     harness.advance(ms(400));
     assert_eq!(
         harness.count(".ds-dock-label"),
@@ -169,7 +168,7 @@ fn a_caller_shows_and_hides_a_dock_label() {
     let target = harness
         .centre(".hovered .ds-hover-target")
         .expect("the tile");
-    harness.pointer_move(target);
+    harness.send(Input::pointer_move(target));
     harness.advance(ms(60));
     assert_eq!(
         harness.count(".ds-dock-label"),

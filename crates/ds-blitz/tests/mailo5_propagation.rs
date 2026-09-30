@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Icon, Material, Point, Propagation};
 use ds::{Bezel, ControlSize, ImagePosition};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -84,13 +84,13 @@ fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
         assert!(!is_open(&harness, section), "{section} starts closed");
     }
     let stop = centre(&harness, "details.stop .ds-button");
-    harness.click(stop);
+    harness.send(Input::click(stop));
     harness.advance(Duration::from_millis(50));
     assert!(!is_open(&harness, "stop"), "a Stop press does not toggle");
     assert_eq!(harness.text_of(".log").as_deref(), Some("press:stop"));
 
     let glyph = centre(&harness, "details.glyph .ds-button");
-    harness.click(glyph);
+    harness.send(Input::click(glyph));
     harness.advance(Duration::from_millis(50));
     assert!(
         !is_open(&harness, "glyph"),
@@ -102,7 +102,7 @@ fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
     );
 
     let bubble = centre(&harness, "details.bubble .ds-button");
-    harness.click(bubble);
+    harness.send(Input::click(bubble));
     harness.advance(Duration::from_millis(50));
     assert!(is_open(&harness, "bubble"), "a Bubble press toggles");
     assert_eq!(
@@ -113,10 +113,10 @@ fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
     let header = harness
         .rect("details.stop summary")
         .expect("the summary is laid out");
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: header.origin.x + ds::Px(20.0),
         y: header.origin.y + ds::Px(header.size.height.0 / 2.0),
-    });
+    }));
     harness.advance(Duration::from_millis(50));
     assert!(
         is_open(&harness, "stop"),

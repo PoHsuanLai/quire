@@ -12,7 +12,7 @@ use ds::{
     SpaceLook, Theme,
 };
 use ds::{Bezel, ButtonRole, ControlSize};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
@@ -265,7 +265,7 @@ fn fill(harness: &mut Harness, probe: &str, hover: Hover) -> [u8; 4] {
             y: Px(350.0),
         },
     };
-    harness.pointer_move(point);
+    harness.send(Input::pointer_move(point));
     // The background transition is `--t-quick`.
     harness.advance(Duration::from_millis(400));
     let frame = harness.render().expect("renders");

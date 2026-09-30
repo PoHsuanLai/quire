@@ -11,7 +11,7 @@ pub enum GalleryError {
         /// The picture being made.
         name: String,
         /// What the renderer said.
-        source: ds_blitz::NativeError,
+        source: ds_harness::HarnessError,
     },
     /// A picture or the sheet could not be written.
     #[error("writing {path}: {source}")]

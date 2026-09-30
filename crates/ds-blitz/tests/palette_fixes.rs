@@ -7,7 +7,7 @@ use ds::{
     Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, FieldKey, Icon, InitialCaret,
     Material, PaletteGroup, PaletteGroups, Rect, RowShape, Shortcut, ShortcutKey,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -122,7 +122,7 @@ fn the_list_keeps_the_callers_selection_in_view() {
     let far = harness.rect(&row(15)).expect("row 15 is laid out");
     assert!(top(far) > bottom(view), "row 15 starts below the fold");
 
-    harness.key(ShortcutKey::Char('j'));
+    harness.send(Input::key(ShortcutKey::Char('j')));
     harness.advance(ms(100));
     let shown = selected_rect(&harness);
     assert_eq!(
@@ -138,7 +138,7 @@ fn the_list_keeps_the_callers_selection_in_view() {
     );
 
     // Back up to row 1, above the view now: it lands against the top edge.
-    harness.key(ShortcutKey::Char('n'));
+    harness.send(Input::key(ShortcutKey::Char('n')));
     harness.advance(ms(100));
     let up = selected_rect(&harness);
     assert!(inside(up, view), "row 1 in view: {up:?} in {view:?}");
@@ -149,9 +149,9 @@ fn the_list_keeps_the_callers_selection_in_view() {
 
     // The group's "Show More" sits in its header, above the rows: from row 15 the list goes back
     // up to show it.
-    harness.key(ShortcutKey::Char('j'));
+    harness.send(Input::key(ShortcutKey::Char('j')));
     harness.advance(ms(100));
-    harness.key(ShortcutKey::Char('m'));
+    harness.send(Input::key(ShortcutKey::Char('m')));
     harness.advance(ms(100));
     assert_eq!(
         harness
@@ -166,7 +166,7 @@ fn the_list_keeps_the_callers_selection_in_view() {
     );
 
     // Row 0 is in view with the header's action: the list does not move for it.
-    harness.key(ShortcutKey::Char('k'));
+    harness.send(Input::key(ShortcutKey::Char('k')));
     harness.advance(ms(100));
     let first = selected_rect(&harness);
     assert!(inside(first, view), "row 0 in view: {first:?} in {view:?}");
@@ -220,7 +220,7 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
         .expect("row 11 is laid out");
     assert!(top(row_11) > bottom(view), "row 11 starts below the fold");
     for _ in 0..11 {
-        harness.key(ShortcutKey::Down);
+        harness.send(Input::key(ShortcutKey::Down));
         harness.advance(ms(20));
     }
     harness.advance(ms(100));
@@ -237,7 +237,7 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
         "against the bottom edge: {shown:?} in {view:?}"
     );
     for _ in 0..8 {
-        harness.key(ShortcutKey::Up);
+        harness.send(Input::key(ShortcutKey::Up));
         harness.advance(ms(20));
     }
     harness.advance(ms(100));
@@ -336,7 +336,7 @@ fn SelectAllCaret() -> Element {
 fn first_caret(app: fn() -> Element) -> String {
     let mut harness = Harness::new(app, VIEW);
     harness.advance(ms(200));
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     harness.advance(ms(20));
     harness.text_of(".log").unwrap_or_default()
 }
@@ -358,7 +358,7 @@ fn a_palette_opened_on_a_query_puts_the_caret_where_it_is_asked() {
     );
     let mut harness = Harness::new(SelectAllCaret, VIEW);
     harness.advance(ms(200));
-    harness.key(ShortcutKey::Char('x'));
+    harness.send(Input::key(ShortcutKey::Char('x')));
     harness.advance(ms(20));
     assert_eq!(harness.text_of(".query").as_deref(), Some("[x]"));
 }

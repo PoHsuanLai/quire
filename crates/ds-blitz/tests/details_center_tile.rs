@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Availability, Check, Ds, Icon, Material, Motion, TextLine};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::ModuleTile;
 use std::time::Duration;
 
@@ -20,7 +20,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 /// The module's value and whether it is working towards it.

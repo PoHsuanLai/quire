@@ -14,7 +14,7 @@ use ds::{
     FrameVars, Grain, Hex, Icon, Look, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement,
     Point, Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
-use ds_harness::{Backdrop, Harness, Viewport};
+use ds_harness::{Backdrop, Driver, Harness, Input, Viewport};
 use ds_shell::MenuBarItem;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
@@ -168,7 +168,7 @@ fn a_look_change_cross_fades_the_tint() {
     let button = harness
         .centre(".ds-menu-bar-item")
         .expect("the switch is drawn");
-    harness.click(button);
+    harness.send(Input::click(button));
     harness.advance(half_of_the_fade());
     let halfway = harness.render().expect("renders");
     keep(&halfway, "bar-cross-fade-halfway");
@@ -395,7 +395,9 @@ fn a_status_item_fills_under_the_pointer() {
         )
     };
     let rest = corner(&harness.render().expect("renders"));
-    harness.pointer_move(harness.centre(".plain .ds-menu-bar-item").expect("drawn"));
+    harness.send(Input::pointer_move(
+        harness.centre(".plain .ds-menu-bar-item").expect("drawn"),
+    ));
     harness.advance(ms(400));
     let hovered = corner(&harness.render().expect("renders"));
     assert!(

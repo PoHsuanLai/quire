@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Availability, Button, Ds, Icon, Material};
 use ds::{Bezel, ButtonRole, ControlSize, ImagePosition};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -73,13 +73,13 @@ fn a_press_on_a_disabled_button_fires_nothing() {
     let mut harness = page();
     for selector in [".suspend .ds-button", ".lock .ds-button"] {
         let at = harness.centre(selector).expect("the button is laid out");
-        harness.click(at);
+        harness.send(Input::click(at));
         harness.advance(Duration::from_millis(50));
     }
     assert_eq!(harness.text_of(".log").as_deref(), Some(""));
     // The same press on the enabled neighbour is heard, so the silence is the button's.
     let restart = harness.centre(".restart .ds-button").expect("laid out");
-    harness.click(restart);
+    harness.send(Input::click(restart));
     harness.advance(Duration::from_millis(50));
     assert_eq!(harness.text_of(".log").as_deref(), Some("restart"));
 }

@@ -12,7 +12,7 @@ use ds::{
     Appearance, Attach, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, RootChrome,
     Sheet, Shown,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds_shell::{
     BatteryCell, BatteryEntry, BatteryWidget, Device, MonthWidget, Timeline, Widget, WidgetCard,
@@ -175,20 +175,19 @@ fn save(harness: &mut Harness, name: &str) {
 
 #[test]
 fn edit_widgets_paints_each_pose() {
-    let mut harness =
-        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(1500));
     save(&mut harness, "opened");
 
     let clock = harness
         .centre(".ds-widget-gallery .ds-list-item:nth-child(3) .ds-row")
         .expect("Calendar in the list");
-    harness.click(clock);
+    harness.send(Input::click(clock));
     harness.advance(Duration::from_millis(50));
     let add = harness
         .centre(".ds-widget-gallery-actions .ds-button")
         .expect("Add to Desktop");
-    harness.click(add);
+    harness.send(Input::click(add));
     harness.advance(Duration::from_millis(120));
     save(&mut harness, "added-moment");
     harness.advance(Duration::from_millis(400));
@@ -198,7 +197,7 @@ fn edit_widgets_paints_each_pose() {
     let remove = harness
         .centre(".ds-widget-gallery-surface[*|data-host=desktop] .ds-widget-gallery-row .ds-button")
         .expect("Remove");
-    harness.click(remove);
+    harness.send(Input::click(remove));
     harness.advance(Duration::from_millis(200));
     save(&mut harness, "removed-leaving");
     harness.advance(Duration::from_millis(540));
@@ -209,7 +208,7 @@ fn edit_widgets_paints_each_pose() {
         height: 188,
         scale_percent: 200,
     };
-    let mut row = Harness::with_config(Row, HarnessConfig::new(view).with_clock(Clock::Virtual));
+    let mut row = Harness::new(Row, HarnessConfig::new(view).with_clock(Clock::Virtual));
     for count in 1..=4 {
         row.within(|| *COUNT.write() = count);
         row.advance(Duration::from_millis(1200));

@@ -9,7 +9,7 @@ use ds::{
     Anim, Appearance, Ds, Icon, IconSource, Material, Motion, MotionLevel, Point, Px, settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::{AppMark, NotificationCard, NotificationSwipe};
 use std::cell::Cell;
 use std::time::{Duration, Instant};
@@ -59,7 +59,7 @@ fn start(motion: Motion) -> (Harness, Point) {
 /// `start`, on `clock`.
 fn start_on(motion: Motion, clock: Clock) -> (Harness, Point) {
     MOTION.with(|cell| cell.set(motion));
-    let mut harness = Harness::with_config(Card, HarnessConfig::new(VIEW).with_clock(clock));
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(clock));
     harness.within(|| LOG.write().clear());
     harness.advance(ms(1));
     let at = harness
@@ -99,10 +99,10 @@ fn dismissed(harness: &Harness) -> bool {
 /// Drag from `at` to `dx` in four slow steps (100 ms apart: 10 px steps are 100 px/s, far under
 /// the fling speed), then release there; the instant just before the release.
 fn drag(harness: &mut Harness, at: Point, dx: f32) -> Instant {
-    harness.pointer_down(at);
+    harness.send(Input::pointer_down(at));
     for step in 1..=4u8 {
         harness.advance(ms(100));
-        harness.pointer_move(right(at, dx * f32::from(step) / 4.0));
+        harness.send(Input::pointer_move(right(at, dx * f32::from(step) / 4.0)));
     }
     assert_eq!(swipe(harness).as_deref(), Some("live"));
     assert!(
@@ -111,7 +111,7 @@ fn drag(harness: &mut Harness, at: Point, dx: f32) -> Instant {
         style(harness)
     );
     let released = harness.now();
-    harness.pointer_up(right(at, dx));
+    harness.send(Input::pointer_up(right(at, dx)));
     released
 }
 
@@ -164,8 +164,8 @@ fn a_drag_released_past_the_threshold_flies_out_and_reports_at_settle() {
 fn a_horizontal_scroll_is_summed_and_decided_when_it_stops() {
     let (mut harness, at) = start(Motion::Standard);
     // Short: 30 + 20 px, then quiet. Back to its place.
-    harness.wheel(at, Px(30.0), Px(0.0));
-    harness.wheel(at, Px(20.0), Px(1.0));
+    harness.send(Input::wheel(at, Px(30.0), Px(0.0)));
+    harness.send(Input::wheel(at, Px(20.0), Px(1.0)));
     assert!(
         style(&harness).contains("--swipe-dx:50px"),
         "{}",
@@ -177,7 +177,7 @@ fn a_horizontal_scroll_is_summed_and_decided_when_it_stops() {
 
     // Far: three deltas of 30 px summed to 90, then quiet: dismissed.
     for _ in 0..3 {
-        harness.wheel(at, Px(30.0), Px(0.0));
+        harness.send(Input::wheel(at, Px(30.0), Px(0.0)));
         harness.advance(ms(16));
     }
     assert!(

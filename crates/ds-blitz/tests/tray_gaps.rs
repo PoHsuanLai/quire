@@ -14,7 +14,7 @@ use ds::{
 };
 use ds::{Bezel, ControlSize, ImagePosition};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;
@@ -190,11 +190,11 @@ fn a_right_click_reports_a_secondary_press() {
         (PointerButton::Middle, "Middle"),
     ];
     for &(button, want) in CASES {
-        harness.press(icon, button);
+        harness.send(Input::press(icon, button));
         assert_eq!(seen(&harness), want, "{button:?} on the icon button");
     }
     let mini = centre(&harness, "#mini");
-    harness.press(mini, PointerButton::Secondary);
+    harness.send(Input::press(mini, PointerButton::Secondary));
     assert_eq!(seen(&harness), "Secondary", "a right-click on a Button");
 }
 
@@ -273,16 +273,16 @@ fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
         Some("true")
     );
     assert_eq!(selected(&harness), "Open");
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(
         selected(&harness),
         "Quit",
         "Down skipped the disabled Pause"
     );
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::key(ShortcutKey::Up));
     assert_eq!(selected(&harness), "Open", "Up skipped it too");
     let disabled = centre(&harness, ".ds-menu-item[*|aria-disabled=true]");
-    harness.click(disabled);
+    harness.send(Input::click(disabled));
     assert_eq!(
         harness.text_of(".picked").as_deref(),
         Some("0"),
@@ -293,12 +293,11 @@ fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
 
 #[test]
 fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
-    let mut harness =
-        Harness::with_config(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
     let parent = centre(&harness, PARENT);
     let armed = harness.now();
-    harness.pointer_move(parent);
+    harness.send(Input::pointer_move(parent));
     assert_eq!(
         selected(&harness),
         "More",
@@ -338,7 +337,7 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
         (sub.origin.y.0 - (row.origin.y.0 - 5.0)).abs() <= 1.0,
         "the submenu's top is the parent row's top less 5: {sub:?} for {row:?}"
     );
-    harness.key(ShortcutKey::Left);
+    harness.send(Input::key(ShortcutKey::Left));
     assert_eq!(harness.count(SUBMENU), 0, "Left closed the submenu");
     assert_eq!(harness.count(".ds-menu"), 1, "and only the submenu");
 }
@@ -348,16 +347,16 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
     let mut harness = Harness::new(MenuApp, VIEW);
     harness.advance(ms(80));
     for _ in 0..2 {
-        harness.key(ShortcutKey::Down);
+        harness.send(Input::key(ShortcutKey::Down));
     }
     assert_eq!(selected(&harness), "More");
-    harness.key(ShortcutKey::Right);
+    harness.send(Input::key(ShortcutKey::Right));
     // Without the 200 ms rest: it opens as soon as its row and panel have been measured and
     // hold still (a few frames), then it is placed and shown.
     settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
     // The keyboard opened it, so it has the focus: Down moves inside it, Enter picks.
-    harness.key(ShortcutKey::Down);
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Down));
+    harness.send(Input::key(ShortcutKey::Enter));
     settle_until(&mut harness, |h| h.count(".ds-menu") == 0);
     assert_eq!(harness.text_of(".picked").as_deref(), Some("11"));
     assert_eq!(
@@ -372,16 +371,16 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
     let mut harness = Harness::new(MenuApp, VIEW);
     harness.advance(ms(80));
     for _ in 0..2 {
-        harness.key(ShortcutKey::Down);
+        harness.send(Input::key(ShortcutKey::Down));
     }
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     assert_eq!(harness.count(SUBMENU), 0, "Escape closed the submenu");
     assert_eq!(harness.count(".ds-menu"), 1, "the menu stays");
     // The menu takes the focus back a frame later.
     harness.advance(ms(80));
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     // It fades out first (`Anim::MenuOut`, bar gaps), then closes.
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),

@@ -2,7 +2,8 @@
 //! document, so the harness's own queries never see into it (the isolation mailo's reader relies
 //! on) and a test that wants its contents asks the frame.
 
-use crate::harness::{Harness, first};
+use crate::driver::{DocQuery, first};
+use crate::harness::Harness;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
 use ds::{Point, Px};
 use ds_blitz::FrameId;
@@ -83,7 +84,7 @@ impl<'h> FrameView<'h> {
     }
 
     /// The centre of the frame's first element matching `selector`, in the app document's
-    /// coordinates: where a test clicks it with [`Harness::click`].
+    /// coordinates: where a test clicks it with [`Input::click`](crate::Input::click).
     pub fn centre(&self, selector: &str) -> Option<Point> {
         self.harness.with_doc(|doc| {
             let node = doc.get_node(self.iframe)?;

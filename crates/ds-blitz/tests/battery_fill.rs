@@ -9,7 +9,7 @@ use ds::{
     Appearance, BatteryPower, BatteryState, Ds, DurationToken, Fraction, Label, LowAt, Material,
     Motion, MotionLevel, RootChrome,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{BatteryRing, percent_text};
 use std::time::{Duration, Instant};
 
@@ -128,8 +128,7 @@ fn a_ring_stands_at_its_level_and_shows_its_figure_at_once() {
 
 #[test]
 fn a_new_level_moves_the_arc_linearly_and_the_figure_changes_at_once() {
-    let mut harness =
-        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let changed = harness.now();
     harness.within(|| *LEVEL.write() = Fraction(400));
     harness.advance(Duration::from_millis(1));

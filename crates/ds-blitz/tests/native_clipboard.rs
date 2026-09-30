@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::TextField;
 use ds::{Appearance, Button, Ds, Material, Point, ShortcutKey};
 use ds_blitz::clipboard::{ClipboardError, read_text, write_text};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -62,18 +62,18 @@ fn Fields() -> Element {
 fn ctrl_c_on_a_selection_then_ctrl_v_into_a_second_field() {
     let mut harness = Harness::new(Fields, VIEW);
     let from = centre(&harness, "#from input");
-    harness.click(from);
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('a'));
+    harness.send(Input::click(from));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('a')));
     assert_eq!(
         harness.selected_text("#from input").as_deref(),
         Some("hello quire")
     );
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c'));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c')));
     assert_eq!(harness.clipboard_text().as_deref(), Some("hello quire"));
 
     let to = centre(&harness, "#to input");
-    harness.click(to);
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v'));
+    harness.send(Input::click(to));
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v')));
     harness.advance(ms(20));
     assert_eq!(harness.text_of(".to").as_deref(), Some("hello quire"));
 }
@@ -82,12 +82,12 @@ fn ctrl_c_on_a_selection_then_ctrl_v_into_a_second_field() {
 fn the_apps_write_and_read_reach_the_same_clipboard() {
     let mut harness = Harness::new(Fields, VIEW);
     let copy = centre(&harness, "#copy .ds-button");
-    harness.click(copy);
+    harness.send(Input::click(copy));
     assert_eq!(harness.clipboard_text().as_deref(), Some("ada@example.org"));
 
     harness.set_clipboard_text("from another app");
     let paste = centre(&harness, "#paste .ds-button");
-    harness.click(paste);
+    harness.send(Input::click(paste));
     assert_eq!(
         harness.text_of(".pasted").as_deref(),
         Some("from another app")

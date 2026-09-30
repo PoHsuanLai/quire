@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -85,8 +85,7 @@ fn Inline() -> Element {
 /// its parent row, never at the origin. Once it settles it sits right of the menu, its top level
 /// with the parent row's.
 fn watch(app: fn() -> Element) {
-    let mut harness =
-        Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let mut seen = false;
     for _ in 0..120 {
         harness.advance(Duration::from_millis(16));

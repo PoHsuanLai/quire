@@ -12,7 +12,7 @@ use ds::{
     Point, Px, Shown, settle,
 };
 use ds_harness::harness::{SETTLE_BOUND, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::NotificationSwipe;
 use ds_shell::{DragStart, Hover, ShotThumbnail, ThumbAction};
 use std::time::{Duration, Instant};
@@ -112,8 +112,7 @@ fn offset(at: Point, dx: f32, dy: f32) -> Point {
 
 #[test]
 fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
-    let mut harness =
-        Harness::with_config(Thumb, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Thumb, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let card = harness.rect(".ds-shot").expect("the card is laid out");
@@ -147,17 +146,17 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
 fn a_press_drags_only_past_the_threshold_and_then_does_not_open() {
     let mut harness = rested();
     let from = picture_centre(&harness);
-    harness.pointer_move(from);
-    harness.pointer_down(from);
+    harness.send(Input::pointer_move(from));
+    harness.send(Input::pointer_down(from));
     // One short of the threshold (straight-line): still a press.
     let short = DRAG_THRESHOLD.0 - 1.0;
-    harness.pointer_move(offset(from, 0.0, short));
+    harness.send(Input::pointer_move(offset(from, 0.0, short)));
     harness.advance(Duration::from_millis(1));
     assert!(read(&mut harness, &DRAGS).is_empty(), "under the threshold");
     let crossed = offset(from, 0.0, DRAG_THRESHOLD.0);
-    harness.pointer_move(crossed);
-    harness.pointer_move(offset(from, 30.0, 3.0));
-    harness.pointer_up(offset(from, 30.0, 3.0));
+    harness.send(Input::pointer_move(crossed));
+    harness.send(Input::pointer_move(offset(from, 30.0, 3.0)));
+    harness.send(Input::pointer_up(offset(from, 30.0, 3.0)));
     harness.advance(Duration::from_millis(1));
     assert_eq!(
         read(&mut harness, &DRAGS),
@@ -166,7 +165,7 @@ fn a_press_drags_only_past_the_threshold_and_then_does_not_open() {
     );
     assert_eq!(read(&mut harness, &OPENED), 0, "a drag does not open");
     // A tap opens.
-    harness.click(from);
+    harness.send(Input::click(from));
     harness.advance(Duration::from_millis(1));
     assert_eq!(read(&mut harness, &OPENED), 1);
     assert_eq!(read(&mut harness, &DRAGS).len(), 1);
@@ -179,7 +178,7 @@ fn the_pointer_on_the_card_is_told_and_shows_the_actions() {
         harness.attr(".ds-shot", "data-hover").as_deref(),
         Some("off")
     );
-    harness.pointer_move(picture_centre(&harness));
+    harness.send(Input::pointer_move(picture_centre(&harness)));
     harness.advance(Duration::from_millis(1));
     assert_eq!(read(&mut harness, &HOVERS), vec![Hover::Over]);
     assert_eq!(
@@ -189,14 +188,14 @@ fn the_pointer_on_the_card_is_told_and_shows_the_actions() {
     let delete = harness
         .centre(".ds-shot-action .ds-button")
         .expect("the action is laid out");
-    harness.click(delete);
+    harness.send(Input::click(delete));
     harness.advance(Duration::from_millis(1));
     assert_eq!(read(&mut harness, &DELETED), 1);
     assert_eq!(read(&mut harness, &OPENED), 0, "an action does not open");
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(390.0),
         y: Px(290.0),
-    });
+    }));
     harness.advance(Duration::from_millis(1));
     assert_eq!(read(&mut harness, &HOVERS), vec![Hover::Over, Hover::Away]);
 }
@@ -204,20 +203,24 @@ fn the_pointer_on_the_card_is_told_and_shows_the_actions() {
 /// Drag from `from` by `dx` in four slow steps (100 ms apart, far under the fling speed), then
 /// release there.
 fn slow_drag(harness: &mut Harness, from: Point, dx: f32) -> Instant {
-    harness.pointer_move(from);
-    harness.pointer_down(from);
+    harness.send(Input::pointer_move(from));
+    harness.send(Input::pointer_down(from));
     for step in 1..=4u8 {
         harness.advance(Duration::from_millis(100));
-        harness.pointer_move(offset(from, dx * f32::from(step) / 4.0, 0.0));
+        harness.send(Input::pointer_move(offset(
+            from,
+            dx * f32::from(step) / 4.0,
+            0.0,
+        )));
     }
     let released = harness.now();
-    harness.pointer_up(offset(from, dx, 0.0));
+    harness.send(Input::pointer_up(offset(from, dx, 0.0)));
     released
 }
 
 #[test]
 fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Swipeable,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );

@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, RootChrome};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
 use ds_shell::{
     BatteryWidget, Lift, Timeline, Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize,
@@ -64,7 +64,7 @@ fn Gallery() -> Element {
 }
 
 fn harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 #[test]
@@ -120,7 +120,7 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
     let clock = harness
         .centre(".ds-widget-gallery .ds-list-item:nth-child(2) .ds-row")
         .expect("World Clock in the list");
-    harness.click(clock);
+    harness.send(Input::click(clock));
     harness.advance(Duration::ZERO);
     assert_eq!(harness.count(".ds-widget-gallery-preview .ds-widget"), 1);
     assert_eq!(
@@ -133,7 +133,7 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
     let add = harness
         .centre(".ds-widget-gallery-actions .ds-button")
         .expect("Add to Desktop");
-    harness.click(add);
+    harness.send(Input::click(add));
     harness.advance(Duration::ZERO);
     assert_eq!(
         harness.count(".ds-widget-gallery-surface[*|data-host=desktop] .ds-widget-gallery-row"),
@@ -153,7 +153,7 @@ fn the_gallery_draws_one_size_and_edits_the_layout() {
     let remove = harness
         .centre(".ds-widget-gallery-row .ds-button")
         .expect("Remove");
-    harness.click(remove);
+    harness.send(Input::click(remove));
     harness.advance(Duration::ZERO);
     assert_eq!(harness.count(".ds-widget-gallery-row"), 0);
     assert_settles_to_zero_frames(&mut harness);

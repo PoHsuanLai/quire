@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Common, DataAttr, DataName, Ds, Icon, Material, Row, RowLeading, RowState};
 use ds::{DropState, Selection};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

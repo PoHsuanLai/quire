@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Motion, Percent};
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{IdleDim, IdleDimPhase};
 use std::time::Duration;
 
@@ -46,7 +46,7 @@ fn read(harness: &Harness, selector: &str) -> i64 {
 }
 
 fn virtual_harness() -> Harness {
-    Harness::with_config(Overlay, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(Overlay, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 #[test]

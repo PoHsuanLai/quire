@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Icon, Material, ShortcutKey};
 use ds::{Bezel, ControlSize, ImagePosition};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 240,
@@ -32,10 +32,10 @@ fn a_pointer_down_presses_a_button_until_it_comes_up() {
     let mut harness = Harness::new(Page, VIEW);
     let at = harness.centre(".ds-button").expect("the button");
     assert_eq!(pressed(&harness, ".ds-button"), None);
-    harness.pointer_move(at);
-    harness.pointer_down(at);
+    harness.send(Input::pointer_move(at));
+    harness.send(Input::pointer_down(at));
     assert_eq!(pressed(&harness, ".ds-button").as_deref(), Some("true"));
-    harness.pointer_up(at);
+    harness.send(Input::pointer_up(at));
     assert_eq!(pressed(&harness, ".ds-button"), None);
 }
 
@@ -43,16 +43,16 @@ fn a_pointer_down_presses_a_button_until_it_comes_up() {
 fn a_secondary_button_does_not_press() {
     let mut harness = Harness::new(Page, VIEW);
     let at = harness.centre(".ds-button").expect("the icon button");
-    harness.pointer_move(at);
-    harness.button_down(at, ds::PointerButton::Secondary);
+    harness.send(Input::pointer_move(at));
+    harness.send(Input::button_down(at, ds::PointerButton::Secondary));
     assert_eq!(pressed(&harness, ".ds-button"), None);
 }
 
 #[test]
 fn space_presses_the_focused_button() {
     let mut harness = Harness::new(Page, VIEW);
-    harness.key(ShortcutKey::Tab);
-    harness.key(ShortcutKey::Space);
+    harness.send(Input::key(ShortcutKey::Tab));
+    harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(
         pressed(&harness, ".ds-button"),
         None,

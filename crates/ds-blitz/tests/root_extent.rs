@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, RootExtent, Sheet};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

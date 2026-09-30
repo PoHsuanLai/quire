@@ -5,6 +5,7 @@
 //! root context, and a waker to sleep on. Every frame's layout is snapped to the device pixel
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
+use crate::error::HarnessError;
 use crate::painter::{Canvas, PaintTime, Painter};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThreading};
@@ -19,7 +20,6 @@ use dioxus_native_dom::DioxusDocument;
 use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameHover;
-use ds_blitz::NativeError;
 use ds_blitz::clipboard::Memory;
 use ds_blitz::font_context;
 use ds_blitz::seam::DocRef;
@@ -47,7 +47,7 @@ const MAX_ROUNDS: usize = 64;
 
 /// Whether a document is laid out as it renders: a shell surface is not until it is mapped.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub(crate) enum Layout {
+pub enum Layout {
     /// Styled and laid out every frame.
     #[default]
     Running,
@@ -272,21 +272,21 @@ impl Headless {
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.
-    pub(crate) fn paint(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, NativeError> {
+    pub(crate) fn paint(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, HarnessError> {
         let canvas = self.canvas(backdrop);
         let mut inner = self.doc.inner.borrow_mut();
         let pixels = self.painter.picture(&mut inner, canvas)?;
         let (width, height) = (canvas.width, canvas.height);
         let length = pixels.len();
         image::RgbaImage::from_raw(width, height, pixels).ok_or_else(|| {
-            NativeError::Renderer(format!(
+            HarnessError::Renderer(format!(
                 "the renderer returned {length} bytes for {width}x{height}"
             ))
         })
     }
 
     /// Paint the document as it was last resolved, over `backdrop`, to the end, and time it.
-    pub(crate) fn paint_timed(&mut self, backdrop: Backdrop) -> Result<PaintTime, NativeError> {
+    pub(crate) fn paint_timed(&mut self, backdrop: Backdrop) -> Result<PaintTime, HarnessError> {
         let canvas = self.canvas(backdrop);
         let mut inner = self.doc.inner.borrow_mut();
         self.painter.time(&mut inner, canvas)

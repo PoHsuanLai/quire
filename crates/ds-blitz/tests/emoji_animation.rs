@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Motion, Theme, WakeStamp};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{AnimatedEmoji, EmojiId, EmojiPlayback, PictureSize};
 use std::collections::BTreeSet;
 use std::time::Duration;
@@ -68,8 +68,7 @@ fn frames_over(harness: &mut Harness, span: Duration) -> BTreeSet<String> {
 
 #[test]
 fn an_emoji_plays_its_animation_once_and_rests_on_frame_zero() {
-    let mut harness =
-        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let appeared = harness.now();
     let before = harness.render().expect("render");
     assert!(inked(&before) > 2000, "the emoji is not painted");
@@ -98,8 +97,7 @@ fn an_emoji_plays_its_animation_once_and_rests_on_frame_zero() {
 
 #[test]
 fn a_new_wake_stamp_plays_it_once_more() {
-    let mut harness =
-        Harness::with_config(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, moving);
     settle_until(&mut harness, |h| !moving(h));
     harness.within(|| {

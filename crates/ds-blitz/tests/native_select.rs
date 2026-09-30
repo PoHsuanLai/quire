@@ -7,7 +7,7 @@ use ds::TextField;
 use ds::{
     Appearance, Button, Ds, FieldFocus, Material, ShortcutKey, focus_soon, use_focus_request,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -65,12 +65,12 @@ fn Plain() -> Element {
 fn a_controlled_focus_with_select_all_selects_the_whole_value() {
     let mut harness = Harness::new(Rename, VIEW);
     harness.advance(ms(100));
-    assert!(harness.is_focused("#name input"));
+    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
     assert_eq!(
         harness.selected_text("#name input").as_deref(),
         Some("Archive")
     );
-    harness.key(ShortcutKey::Char('X'));
+    harness.send(Input::key(ShortcutKey::Char('X')));
     harness.advance(ms(20));
     assert_eq!(
         harness.text_of(".name").as_deref(),
@@ -84,13 +84,13 @@ fn a_request_after_moving_away_selects_it_again() {
     let mut harness = Harness::new(Rename, VIEW);
     harness.advance(ms(100));
     let other = harness.centre("#other input").expect("the other field");
-    harness.click(other);
+    harness.send(Input::click(other));
     harness.advance(ms(50));
-    assert!(harness.is_focused("#other input"));
+    assert_eq!(harness.focus_of("#other input"), FocusState::Focused);
     let again = harness.centre("#again .ds-button").expect("the button");
-    harness.click(again);
+    harness.send(Input::click(again));
     harness.advance(ms(100));
-    assert!(harness.is_focused("#name input"));
+    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
     assert_eq!(
         harness.selected_text("#name input").as_deref(),
         Some("Archive")
@@ -101,7 +101,7 @@ fn a_request_after_moving_away_selects_it_again() {
 fn a_controlled_focus_without_select_all_selects_nothing() {
     let mut harness = Harness::new(Plain, VIEW);
     harness.advance(ms(100));
-    assert!(harness.is_focused("#name input"));
+    assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
     assert_eq!(harness.selected_text("#name input"), None);
 }
 
@@ -124,9 +124,14 @@ fn Shell() -> Element {
 #[test]
 fn an_app_focuses_its_own_element_through_focus_soon() {
     let mut harness = Harness::new(Shell, VIEW);
-    assert!(!harness.is_focused(".app"));
+    assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
     let back = harness.centre("#back .ds-button").expect("the button");
-    harness.click(back);
+    harness.send(Input::click(back));
     harness.advance(ms(50));
-    assert!(harness.is_focused(".app"), "{}", harness.html());
+    assert_eq!(
+        harness.focus_of(".app"),
+        FocusState::Focused,
+        "{}",
+        harness.html()
+    );
 }

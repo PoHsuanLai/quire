@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::{
     Appearance, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, Motion, RootChrome,
 };
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{
     BatteryCell, BatteryEntry, BatteryWidget, Device, Timeline, WidgetCard, WidgetMetrics,
     WidgetSize,
@@ -76,8 +76,7 @@ fn ring_lefts(harness: &Harness) -> Vec<f32> {
 
 #[test]
 fn every_count_keeps_four_places_on_the_80_pitch_from_20_in() {
-    let mut harness =
-        Harness::with_config(Row, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Row, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     for count in [1, 2, 3, 4] {
         harness.within(|| *COUNT.write() = count);
         harness.advance(Duration::from_millis(50));

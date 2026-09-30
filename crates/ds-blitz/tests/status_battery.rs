@@ -7,7 +7,7 @@ use ds::{
     Appearance, BatteryGlyph, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, Motion,
 };
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -9,7 +9,7 @@ use ds::{
     RowState,
 };
 use ds::{DropState, Selection};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -88,11 +88,11 @@ fn a_place_names_itself_and_hands_its_pointer_to_the_caller() {
         Some("label:7")
     );
     let archive = centre(&harness, &item("archive"));
-    harness.pointer_move(archive);
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(archive));
+    harness.send(Input::pointer_move(Point {
         x: Px(archive.x.0 + 10.0),
         ..archive
-    });
+    }));
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         harness.attr(&item("archive"), "data-drop").as_deref(),
@@ -101,8 +101,8 @@ fn a_place_names_itself_and_hands_its_pointer_to_the_caller() {
     );
     assert_eq!(harness.attr(&item("inbox"), "data-drop"), None);
     let label = centre(&harness, &item("label:7"));
-    harness.pointer_move(label);
-    harness.pointer_up(label);
+    harness.send(Input::pointer_move(label));
+    harness.send(Input::pointer_up(label));
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         harness.text_of(".log").as_deref(),

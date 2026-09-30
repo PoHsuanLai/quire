@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Point, Px, Sort, SortDirection, Table, TableColumn, TableRow};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -38,8 +38,7 @@ fn Page() -> Element {
 }
 
 fn harness() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     harness
 }
@@ -51,12 +50,12 @@ fn a_header_press_sorts_ascending_and_the_next_flips_it() {
     let kind = harness
         .centre(".ds-table-head:nth-child(2) .ds-table-column")
         .expect("Kind header");
-    harness.click(kind);
+    harness.send(Input::click(kind));
     assert_eq!(
         harness.text_of(".sort").as_deref(),
         Some(&*format!("1-{:?}", SortDirection::Ascending))
     );
-    harness.click(kind);
+    harness.send(Input::click(kind));
     assert_eq!(
         harness.text_of(".sort").as_deref(),
         Some(&*format!("1-{:?}", SortDirection::Descending))
@@ -73,23 +72,23 @@ fn dragging_a_header_edge_resizes_the_column_and_stops_at_its_least() {
     };
     assert_eq!(head(&harness), 150.0);
     let edge = harness.centre(".ds-table-resize").expect("edge");
-    harness.drag(
+    harness.send(Input::drag(
         edge,
         Point {
             x: Px(edge.x.0 + 30.0),
             y: edge.y,
         },
         6,
-    );
+    ));
     assert_eq!(head(&harness), 180.0);
     let edge = harness.centre(".ds-table-resize").expect("edge");
-    harness.drag(
+    harness.send(Input::drag(
         edge,
         Point {
             x: Px(edge.x.0 - 300.0),
             y: edge.y,
         },
         6,
-    );
+    ));
     assert_eq!(head(&harness), 48.0, "held at the least");
 }

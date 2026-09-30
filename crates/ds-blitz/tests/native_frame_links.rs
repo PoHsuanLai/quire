@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, FrameLink, FrameLinks, NetDecision, NetPolicy, NetReply, NetRequest};
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 
 const VIEW: Viewport = Viewport {
@@ -56,11 +56,11 @@ fn click_the_link(links: FrameLinks) -> (Harness, ds_blitz::FrameId, Arc<Request
     let config = HarnessConfig::new(VIEW)
         .with_net(NetPolicy::Custom(requests.clone()))
         .with_frame_links(links);
-    let mut harness = Harness::with_config(Reader, config);
+    let mut harness = Harness::new(Reader, config);
     let frame = harness.frame("iframe.body").expect("a frame document");
     let before = frame.id();
     let at = frame.centre("a.link").expect("the link in the frame");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(std::time::Duration::from_millis(50));
     (harness, before, requests)
 }

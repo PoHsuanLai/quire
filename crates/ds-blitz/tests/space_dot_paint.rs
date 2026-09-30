@@ -8,7 +8,7 @@ use ds::{
     Appearance, CardAccent, Ds, FrameVars, Grain, Material, PRESETS, Scheme, Selection, Shortcut,
     ShortcutKey, SpaceLook, Theme,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Viewport};
 use ds_shell::SpaceDot;
 
 const VIEW: Viewport = Viewport {

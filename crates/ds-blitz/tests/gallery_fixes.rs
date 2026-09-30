@@ -9,7 +9,7 @@ use ds::{
     Scheme, SectionHeader, SendPill, SpaceLook, Theme, use_toasts,
 };
 use ds::{FieldBezel, FieldKind, TextField};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use std::time::Duration;
 

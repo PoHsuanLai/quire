@@ -9,7 +9,7 @@ use ds::{
     settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::{Osd, OsdLevel};
 use std::time::Duration;
 
@@ -55,8 +55,7 @@ fn show(harness: &mut Harness, shown: Shown) {
 
 #[test]
 fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
-    let mut harness =
-        Harness::with_config(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     harness.advance(ms(300));
     assert_eq!(presence(&harness).as_deref(), Some("present"));

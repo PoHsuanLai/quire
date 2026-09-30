@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Anim, Appearance, Attach, Ds, Material, MotionLevel, RootExtent, Sheet, Shown, settle};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

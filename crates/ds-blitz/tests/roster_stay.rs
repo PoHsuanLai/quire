@@ -8,7 +8,7 @@ use ds::{
     ThreadRow, settle,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -92,7 +92,7 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
         .map(|n| harness.rect(&row(n)).map(|rect| rect.origin.y))
         .collect();
 
-    harness.click(centre(&harness, &row(1)));
+    harness.send(Input::click(centre(&harness, &row(1))));
     assert_eq!(
         harness.attr(&row(1), "data-presence").as_deref(),
         Some("leaving")
@@ -102,7 +102,7 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
     // Undo well inside the exit: 100 ms of `settle(RowOut)`.
     let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
     harness.advance(ms(100));
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(
         harness.attr(&row(1), "data-presence").as_deref(),
         Some("present")
@@ -129,17 +129,16 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
 
 #[test]
 fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
-    let mut harness =
-        Harness::with_config(StayApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(StayApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(1500));
-    harness.click(centre(&harness, &row(2)));
+    harness.send(Input::click(centre(&harness, &row(2))));
     harness.advance(ms(100));
-    harness.click(centre(&harness, ".ds-button"));
+    harness.send(Input::click(centre(&harness, ".ds-button")));
     // Fold it again 150 ms later: the first fold's timer, had it survived the stay, would drop
     // the row about 100 ms into the second fold.
     harness.advance(ms(150));
     let refolded = harness.now();
-    harness.click(centre(&harness, &row(2)));
+    harness.send(Input::click(centre(&harness, &row(2))));
     // Well under half the second fold's own settle(Fold) (~454 ms), and comfortably past the
     // ~104 ms mark where the first fold's stale timer would have dropped the row had it
     // survived (fixed 2026-09-25, FINDINGS "Timing tests"): the old 250 ms check was 55 % of

@@ -8,7 +8,7 @@ use ds::{
     Appearance, Bezel, Button, ControlSize, Ds, IconSwap, ImagePosition, Material, Motion, TextLine,
 };
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::{NowPlayingTrack, Playback, TrackPosition};
 use std::time::Duration;
 
@@ -23,7 +23,7 @@ fn ms(n: u64) -> Duration {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 static PLAYBACK: GlobalSignal<Playback> = Signal::global(|| Playback::Paused);
@@ -100,7 +100,7 @@ fn play_pause_offers_the_next_action_cross_faded() {
         harness.html()
     );
     let at = harness.centre("#toggle button").expect("the button");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(0));
     assert_eq!(harness.within(|| *PLAYBACK.read()), Playback::Paused);
     assert_eq!(
@@ -171,10 +171,13 @@ fn a_new_track_cross_fades_and_a_restated_one_plays_nothing() {
         1
     );
     assert_eq!(harness.count("#track .ds-track-art [*|data-morph=out]"), 1);
-    assert!(harness.has_class(
-        "#track .ds-track-words [*|data-morph=in]",
-        "a-morph-fade-in"
-    ));
+    assert_eq!(
+        harness.has_class(
+            "#track .ds-track-words [*|data-morph=in]",
+            "a-morph-fade-in"
+        ),
+        ClassPresence::Present
+    );
     assert_eq!(
         harness
             .text_of("#track .ds-track-words [*|data-morph=out] .ds-track-title")

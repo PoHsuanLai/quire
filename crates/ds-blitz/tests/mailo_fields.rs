@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, FieldBezel, FieldKind, Material, ShortcutKey, TextField};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -24,7 +24,7 @@ fn type_text(harness: &mut Harness, text: &str) {
             '\n' => ShortcutKey::Enter,
             c => ShortcutKey::Char(c),
         };
-        harness.key(key);
+        harness.send(Input::key(key));
         harness.advance(ms(20));
     }
 }
@@ -52,9 +52,9 @@ fn Secret() -> Element {
 fn a_secret_is_typed_and_heard_but_never_written_into_the_markup() {
     let mut harness = Harness::new(Secret, VIEW);
     let field = "#secret input";
-    harness.click(harness.centre(field).expect("the field"));
+    harness.send(Input::click(harness.centre(field).expect("the field")));
     harness.advance(ms(30));
-    assert!(harness.is_focused(field));
+    assert_eq!(harness.focus_of(field), FocusState::Focused);
     assert_eq!(harness.attr(field, "value"), None, "no value before typing");
 
     type_text(&mut harness, "abc");
@@ -74,7 +74,7 @@ fn a_secret_is_typed_and_heard_but_never_written_into_the_markup() {
     assert!(!field_markup.contains("abc"), "{field_markup}");
 
     assert_eq!(harness.text_of(".changed").as_deref(), Some(""));
-    harness.key(ShortcutKey::Enter);
+    harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
     assert_eq!(
         harness.text_of(".changed").as_deref(),

@@ -9,7 +9,7 @@ use ds::{
     Appearance, Availability, Ds, FieldKind, Invalid, Material, ShortcutKey, TextField, TextLine,
     Validity,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -63,10 +63,14 @@ fn the_ring_follows_the_caret() {
     let mut harness = Harness::new(Page, VIEW);
     harness.advance(ms(50));
     assert_eq!(ring(&harness, "name"), None);
-    harness.click(harness.centre("#name input").expect("the field"));
+    harness.send(Input::click(
+        harness.centre("#name input").expect("the field"),
+    ));
     harness.advance(ms(30));
     assert_eq!(ring(&harness, "name").as_deref(), Some("ring"));
-    harness.click(harness.centre("#other input").expect("the other field"));
+    harness.send(Input::click(
+        harness.centre("#other input").expect("the other field"),
+    ));
     harness.advance(ms(30));
     assert_eq!(ring(&harness, "name"), None, "the caret left it");
     assert_eq!(ring(&harness, "other").as_deref(), Some("ring"));
@@ -83,7 +87,7 @@ fn a_search_field_clears_from_its_button_and_keeps_the_caret() {
     let clear = harness
         .centre("#search .ds-button")
         .expect("a clear button");
-    harness.click(clear);
+    harness.send(Input::click(clear));
     harness.advance(ms(80));
     assert_eq!(harness.attr("#search input", "value").as_deref(), Some(""));
     assert_eq!(
@@ -91,8 +95,9 @@ fn a_search_field_clears_from_its_button_and_keeps_the_caret() {
         0,
         "nothing left to clear"
     );
-    assert!(
-        harness.is_focused("#search input"),
+    assert_eq!(
+        harness.focus_of("#search input"),
+        FocusState::Focused,
         "the caret is back in the field"
     );
 }
@@ -121,9 +126,11 @@ fn a_rejected_value_says_why_and_a_busy_field_takes_no_typing() {
         1,
         "a spinner after the text"
     );
-    harness.click(harness.centre("#busy input").expect("the busy field"));
+    harness.send(Input::click(
+        harness.centre("#busy input").expect("the busy field"),
+    ));
     for c in "abc".chars() {
-        harness.key(ShortcutKey::Char(c));
+        harness.send(Input::key(ShortcutKey::Char(c)));
     }
     harness.advance(ms(30));
     assert_eq!(harness.attr("#busy input", "value").as_deref(), Some(""));

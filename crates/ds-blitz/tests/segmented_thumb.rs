@@ -27,7 +27,7 @@ use ds::{
     SystemPrefs, Theme,
 };
 use ds::{Choice, ControlSize, Tracking};
-use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel};
 use probe::{distance, rect};
 use std::cell::Cell;
@@ -100,8 +100,7 @@ fn desk(scale_percent: u16, theme: Theme, accent: Accent) -> Harness {
         height: 600,
         scale_percent,
     };
-    let mut harness =
-        Harness::with_config(Desk, HarnessConfig::new(view).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Desk, HarnessConfig::new(view).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     harness
 }
@@ -211,7 +210,7 @@ fn click(harness: &mut Harness, group: &str, index: usize) {
     let at = harness
         .centre(&segment(group, index))
         .unwrap_or_else(|| panic!("{group}: no segment {index}"));
-    harness.click(at);
+    harness.send(Input::click(at));
 }
 
 /// Slow picks, each watched to rest, then a burst of picks a frame or two apart.

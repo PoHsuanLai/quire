@@ -12,7 +12,7 @@ use ds::{
     PaletteRow, Px, Rect, RowLeading, ShortcutKey, use_focus_request,
 };
 use ds_blitz::FocusFallback;
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -203,7 +203,7 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
     settle_in(&mut harness);
     let first = show(rect(&harness, &nth_row(1)));
     assert_eq!(log(&harness), format!("select:0,rect:{first}"));
-    harness.key(ShortcutKey::Down);
+    harness.send(Input::key(ShortcutKey::Down));
     settle_in(&mut harness);
     let second = show(rect(&harness, &nth_row(2)));
     assert_eq!(
@@ -211,7 +211,9 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
         format!("select:0,rect:{first},select:1,rect:{second}")
     );
     let third = rect(&harness, &nth_row(3));
-    harness.pointer_move(harness.centre(&nth_row(3)).expect("the third row"));
+    harness.send(Input::pointer_move(
+        harness.centre(&nth_row(3)).expect("the third row"),
+    ));
     settle_in(&mut harness);
     assert_eq!(
         log(&harness),
@@ -232,7 +234,7 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
 fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
     let mut followed = Harness::new(FollowedSelection, VIEW);
     settle_in(&mut followed);
-    followed.key(ShortcutKey::Down);
+    followed.send(Input::key(ShortcutKey::Down));
     settle_in(&mut followed);
     assert!(log(&followed).starts_with("rect:"), "{}", log(&followed));
     assert!(log(&followed).contains(",select:1,"), "{}", log(&followed));
@@ -242,7 +244,7 @@ fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
     );
     let mut pinned = Harness::new(PinnedSelection, VIEW);
     settle_in(&mut pinned);
-    pinned.key(ShortcutKey::Down);
+    pinned.send(Input::key(ShortcutKey::Down));
     settle_in(&mut pinned);
     assert!(log(&pinned).ends_with(",select:1"), "{}", log(&pinned));
     assert_eq!(
@@ -255,15 +257,17 @@ fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
 /// Opens the actions menu with Tab (a key the palette hands on), checks the menu is at the
 /// selected row and has the keyboard, and closes it with Escape.
 fn open_and_close_actions(harness: &mut Harness) {
-    assert!(
-        harness.is_focused("#launcher-card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#launcher-card .ds-input"),
+        FocusState::Focused,
         "the field starts focused"
     );
-    harness.key(ShortcutKey::Tab);
+    harness.send(Input::key(ShortcutKey::Tab));
     settle_in(harness);
     assert!(log(harness).contains("key:Tab"), "{}", log(harness));
-    assert!(
-        harness.is_focused(".ds-popover.ds-menu"),
+    assert_eq!(
+        harness.focus_of(".ds-popover.ds-menu"),
+        FocusState::Focused,
         "the menu took the keyboard"
     );
     let menu = rect(harness, ".ds-popover.ds-menu");
@@ -272,7 +276,7 @@ fn open_and_close_actions(harness: &mut Harness) {
         (menu.origin.y.0 - (row.origin.y.0 + row.size.height.0 + 2.0)).abs() < 1.0,
         "the menu hangs 2 px under the selected row: {menu:?} {row:?}"
     );
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-popover.ds-menu"), 0, "the menu closed");
 }
@@ -291,8 +295,9 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
         Some("present")
     );
     open_and_close_actions(&mut harness);
-    assert!(
-        harness.is_focused("#launcher-card .ds-input"),
+    assert_eq!(
+        harness.focus_of("#launcher-card .ds-input"),
+        FocusState::Focused,
         "focus came back"
     );
     assert_eq!(
@@ -300,21 +305,23 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
         Some("present"),
         "the palette was not remounted"
     );
-    let mut kept = Harness::with_config(
+    let mut kept = Harness::new(
         KeptFocus,
         HarnessConfig::new(VIEW).with_focus_fallback(FocusFallback::BlitzDefault),
     );
     kept.advance(ms(700));
     open_and_close_actions(&mut kept);
-    assert!(
-        !kept.is_focused("#launcher-card .ds-input"),
+    assert_eq!(
+        kept.focus_of("#launcher-card .ds-input"),
+        FocusState::Unfocused,
         "without the request the field stays unfocused"
     );
     let mut handed = Harness::new(KeptFocus, VIEW);
     handed.advance(ms(700));
     open_and_close_actions(&mut handed);
-    assert!(
-        handed.is_focused("#launcher-card .ds-input"),
+    assert_eq!(
+        handed.focus_of("#launcher-card .ds-input"),
+        FocusState::Focused,
         "the host handed the removed menu's keyboard back to the field"
     );
 }

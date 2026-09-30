@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::detail::{Detailed, Moment, Touch, use_detail, use_operation};
 use ds::{Appearance, Ds, Material, Motion, PaneContent, PreviewPane, Shown};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -148,7 +148,7 @@ fn a_showing_slides_in_whoever_caused_it() {
     });
     assert_settles_to_zero_frames(&mut harness);
     let at = harness.centre(".look").expect("the button");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(ms(20));
     assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "entering");
     assert_settles_to_zero_frames(&mut harness);
@@ -178,7 +178,7 @@ fn another_kind_cross_fades_the_media_and_never_replays_the_entrance() {
 
 #[test]
 fn a_running_load_shows_the_pending_look_at_once_and_its_landing_cross_fades() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Launcher,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
@@ -223,7 +223,7 @@ fn a_failed_load_cross_fades_to_its_still_words() {
 
 #[test]
 fn a_stuck_load_keeps_turning_there_is_no_cap() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Launcher,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );

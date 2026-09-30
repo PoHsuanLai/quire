@@ -3,12 +3,12 @@
 //! [`HarnessConfig::with_backend`](crate::HarnessConfig::with_backend). Both paint the same
 //! scene, [`draw`], and hand back the same premultiplied RGBA bytes.
 
+use crate::error::HarnessError;
 use crate::gpu_paint::GpuPainter;
 use anyrender::{PaintScene, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::BaseDocument;
 use blitz_paint::paint_scene;
-use ds_blitz::NativeError;
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
 use std::time::{Duration, Instant};
@@ -69,7 +69,7 @@ impl Painter {
         &mut self,
         doc: &mut BaseDocument,
         canvas: Canvas,
-    ) -> Result<Vec<u8>, NativeError> {
+    ) -> Result<Vec<u8>, HarnessError> {
         match self {
             Painter::Cpu => Ok(render_to_buffer::<VelloCpuImageRenderer, _>(
                 |scene| draw(scene, doc, canvas),
@@ -77,7 +77,7 @@ impl Painter {
                 canvas.height,
             )),
             Painter::Gpu(gpu) => gpu.picture(doc, canvas),
-            Painter::Unavailable(why) => Err(NativeError::Renderer(why.clone())),
+            Painter::Unavailable(why) => Err(HarnessError::Renderer(why.clone())),
         }
     }
 
@@ -86,7 +86,7 @@ impl Painter {
         &mut self,
         doc: &mut BaseDocument,
         canvas: Canvas,
-    ) -> Result<PaintTime, NativeError> {
+    ) -> Result<PaintTime, HarnessError> {
         match self {
             Painter::Cpu => {
                 let started = Instant::now();
@@ -104,7 +104,7 @@ impl Painter {
                 Ok(PaintTime::new(scene_done.unwrap_or(total), total))
             }
             Painter::Gpu(gpu) => gpu.time(doc, canvas),
-            Painter::Unavailable(why) => Err(NativeError::Renderer(why.clone())),
+            Painter::Unavailable(why) => Err(HarnessError::Renderer(why.clone())),
         }
     }
 

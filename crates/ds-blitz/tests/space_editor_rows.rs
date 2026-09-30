@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{Appearance, Ds, Material, Motion, Scheme, ShortcutKey, SpaceLook};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceEditor};
 use std::time::Duration;
 
@@ -49,10 +49,10 @@ fn typing_in_the_title_renames_the_space() {
     let mut harness = Harness::new(Editor, VIEW);
     assert_eq!(harness.text_of(".name").as_deref(), Some("Work"));
     let field = ".ds-space-editor-title .ds-input";
-    harness.click(harness.centre(field).expect("the name field"));
+    harness.send(Input::click(harness.centre(field).expect("the name field")));
     harness.advance(ms(30));
-    assert!(harness.is_focused(field));
-    harness.key(ShortcutKey::Char('s'));
+    assert_eq!(harness.focus_of(field), FocusState::Focused);
+    harness.send(Input::key(ShortcutKey::Char('s')));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".name").as_deref(), Some("Works"));
     assert_eq!(harness.attr(field, "value").as_deref(), Some("Works"));
@@ -64,7 +64,7 @@ fn the_motion_row_reports_a_pick() {
     assert_eq!(harness.text_of(".motion").as_deref(), Some("standard"));
     let reduced = "[*|aria-label=Motion] .ds-segmented-segment:nth-child(2)";
     assert_eq!(harness.text_of(reduced).as_deref(), Some("Reduced"));
-    harness.click(harness.centre(reduced).expect("Reduced"));
+    harness.send(Input::click(harness.centre(reduced).expect("Reduced")));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".motion").as_deref(), Some("reduced"));
     assert_eq!(

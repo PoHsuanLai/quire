@@ -13,7 +13,7 @@ use ds::{
     Appearance, Ds, DurationToken, EasingToken, Fraction, Grain, Icon, Material, MotionLevel,
     PRESETS, SpaceLook, Theme,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Viewport};
 use ds_shell::MenuBarItem;
 use image::RgbaImage;
 use probe::{distance, keep};
@@ -176,7 +176,7 @@ fn a_space_switch_cross_fades_the_window() {
     let button = harness
         .centre(".ds-menu-bar-item")
         .expect("the switch is drawn");
-    harness.click(button);
+    harness.send(Input::click(button));
     harness.advance(quarter_of_the_curve());
     let halfway = harness.render().expect("renders");
     keep(&halfway, "window-cross-fade-halfway");

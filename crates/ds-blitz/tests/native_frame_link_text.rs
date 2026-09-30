@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Point, Px};
 use ds_blitz::{FrameLink, FrameLinkHover, FrameLinks, FrameTag, HoverPhase};
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
@@ -78,7 +78,7 @@ fn reader() -> (Harness, Arc<Heard>) {
             .push(hover);
     });
     let config = HarnessConfig::new(VIEW).with_frame_links(links);
-    (Harness::with_config(Reader, config), heard)
+    (Harness::new(Reader, config), heard)
 }
 
 /// The centre of `selector` in the frame, in the app document's coordinates.
@@ -101,9 +101,9 @@ fn nudged(point: Point, dx: f32) -> Point {
 fn a_click_carries_the_links_text_and_title() {
     let (mut harness, heard) = reader();
     let bank = at(&harness, "a.bank");
-    harness.click(bank);
+    harness.send(Input::click(bank));
     let offer = at(&harness, "a.offer");
-    harness.click(offer);
+    harness.send(Input::click(offer));
     harness.advance(Duration::from_millis(50));
     let said: Vec<_> = heard
         .clicks()
@@ -132,11 +132,11 @@ fn moving_onto_a_link_reports_enter_once_and_moving_off_reports_leave() {
     let (mut harness, heard) = reader();
     let bank = at(&harness, "a.bank");
     let frame = harness.frame("iframe.body").expect("the frame").id();
-    harness.pointer_move(bank);
-    harness.pointer_move(nudged(bank, 5.0));
-    harness.pointer_move(nudged(bank, -5.0));
+    harness.send(Input::pointer_move(bank));
+    harness.send(Input::pointer_move(nudged(bank, 5.0)));
+    harness.send(Input::pointer_move(nudged(bank, -5.0)));
     let plain = at(&harness, "p.plain");
-    harness.pointer_move(plain);
+    harness.send(Input::pointer_move(plain));
     let hovers = heard.hovers();
     let enter = FrameLinkHover {
         frame,
@@ -160,10 +160,10 @@ fn moving_from_one_link_to_another_leaves_then_enters() {
     let (mut harness, heard) = reader();
     let bank = at(&harness, "a.bank");
     let offer = at(&harness, "a.offer");
-    harness.pointer_move(bank);
-    harness.pointer_move(offer);
+    harness.send(Input::pointer_move(bank));
+    harness.send(Input::pointer_move(offer));
     let above = harness.centre("div.above").expect("the app's own text");
-    harness.pointer_move(above);
+    harness.send(Input::pointer_move(above));
     let crossings: Vec<_> = heard
         .hovers()
         .into_iter()
@@ -190,11 +190,10 @@ fn inert_links_report_no_hover() {
             .unwrap_or_else(PoisonError::into_inner)
             .push(hover);
     });
-    let mut harness =
-        Harness::with_config(Reader, HarnessConfig::new(VIEW).with_frame_links(links));
+    let mut harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_frame_links(links));
     let bank = at(&harness, "a.bank");
-    harness.pointer_move(bank);
+    harness.send(Input::pointer_move(bank));
     let plain = at(&harness, "p.plain");
-    harness.pointer_move(plain);
+    harness.send(Input::pointer_move(plain));
     assert_eq!(heard.hovers(), Vec::new());
 }

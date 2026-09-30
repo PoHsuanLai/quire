@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::detail::{MorphGlyph, MorphStyle, Slashed};
 use ds::{Appearance, Ds, Icon, IconSize, Material, Motion};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -39,8 +39,14 @@ fn a_cross_fade_stacks_two_layers_only_while_it_plays() {
     assert_eq!(harness.count("#down .ds-morph-layer"), 1);
     harness.within(|| *ICON.write() = Icon::VolumeX);
     settle_until(&mut harness, |h| h.count("#down [*|data-morph=out]") == 1);
-    assert!(harness.has_class("#down [*|data-morph=in]", "a-morph-fade-in"));
-    assert!(harness.has_class("#down [*|data-morph=out]", "a-morph-fade-out"));
+    assert_eq!(
+        harness.has_class("#down [*|data-morph=in]", "a-morph-fade-in"),
+        ClassPresence::Present
+    );
+    assert_eq!(
+        harness.has_class("#down [*|data-morph=out]", "a-morph-fade-out"),
+        ClassPresence::Present
+    );
     settle_until(&mut harness, |h| h.count("#down .ds-morph-layer") == 1);
     assert_eq!(
         harness
@@ -57,8 +63,7 @@ fn a_slash_draws_on_and_off() {
     // resolved at the harness's frame clock could drift from the settle timer's real wall clock,
     // so `settle_until`'s poll for a mid-draw offset (`> 0.0`) could land after the draw had
     // already settled to 0.
-    let mut harness =
-        Harness::with_config(Glyphs, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Glyphs, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.count("#slash .ds-morph-slash"), 0);
     harness.within(|| *SLASHED.write() = Slashed::On);
     let offset = |h: &Harness| {

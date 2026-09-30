@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
-use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds_harness::{Harness, HarnessConfig, Query, Viewport};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
 
@@ -96,7 +96,7 @@ fn the_app_document_gets_file_under_local_and_not_under_sealed() {
     let cases = [(NetPolicy::Local, 7.0), (NetPolicy::Sealed, 0.0)];
     for (policy, want) in cases {
         let name = format!("{policy:?}");
-        let harness = Harness::with_config(LocalImage, HarnessConfig::new(VIEW).with_net(policy));
+        let harness = Harness::new(LocalImage, HarnessConfig::new(VIEW).with_net(policy));
         assert_eq!(width(&harness, ".local"), want, "{name}");
     }
 }
@@ -107,7 +107,7 @@ fn a_custom_handler_sees_the_app_documents_request_and_answers_it() {
     for (decision, want) in cases {
         let recorder = Recorder::new(decision);
         let config = HarnessConfig::new(VIEW).with_net(NetPolicy::Custom(recorder.clone()));
-        let harness = Harness::with_config(RemoteImage, config);
+        let harness = Harness::new(RemoteImage, config);
         assert_eq!(
             recorder.seen(),
             vec![(
@@ -124,7 +124,7 @@ fn a_custom_handler_sees_the_app_documents_request_and_answers_it() {
 fn a_custom_policy_still_serves_the_app_its_own_files_without_asking() {
     let recorder = Recorder::new(NetDecision::Deny);
     let config = HarnessConfig::new(VIEW).with_net(NetPolicy::Custom(recorder.clone()));
-    let harness = Harness::with_config(LocalImage, config);
+    let harness = Harness::new(LocalImage, config);
     assert_eq!(width(&harness, ".local"), 7.0);
     assert!(recorder.seen().is_empty(), "{:?}", recorder.seen());
 }
@@ -168,7 +168,7 @@ fn a_frames_file_request_is_denied_while_the_app_documents_succeeds() {
 fn a_custom_handler_sees_the_frames_requests_with_the_frame_as_origin() {
     let recorder = Recorder::new(NetDecision::Allow);
     let config = HarnessConfig::new(VIEW).with_net(NetPolicy::Custom(recorder.clone()));
-    let harness = Harness::with_config(Framed, config);
+    let harness = Harness::new(Framed, config);
     let frame = harness.frame("iframe.body").expect("a frame document").id();
     let file = format!("file://{}", swatch().display());
     let mut seen = recorder.seen();
@@ -193,7 +193,7 @@ fn a_custom_handler_sees_the_frames_requests_with_the_frame_as_origin() {
 fn a_denied_frame_request_never_reaches_the_frame() {
     let recorder = Recorder::new(NetDecision::Deny);
     let config = HarnessConfig::new(VIEW).with_net(NetPolicy::Custom(recorder.clone()));
-    let harness = Harness::with_config(Framed, config);
+    let harness = Harness::new(Framed, config);
     assert_eq!(recorder.seen().len(), 2);
     assert_eq!(frame_width(&harness, ".remote"), 0.0);
     assert_eq!(frame_width(&harness, ".local"), 0.0);

@@ -3,12 +3,12 @@
 //! else [`AdapterPref`] ranks the kinds; Vulkan before GL, software rasterisers last. The first
 //! adapter that yields a device wins. The ranking and the device request are `blitz_kit::adapter`.
 
+use crate::error::HarnessError;
 use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref, block_on, ranked, request_device};
-use ds_blitz::NativeError;
 use wgpu_context::DeviceHandle;
 
 /// A device on the preferred adapter, and the adapter's `name (backend)`.
-pub(crate) fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), NativeError> {
+pub(crate) fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), HarnessError> {
     let pref = pref
         .clone()
         .with_env(std::env::var(ADAPTER_ENV).ok().as_deref());
@@ -35,7 +35,7 @@ pub(crate) fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), 
             Err(error) => failed.push(format!("{label}: {error}")),
         }
     }
-    Err(NativeError::Renderer(if failed.is_empty() {
+    Err(HarnessError::Renderer(if failed.is_empty() {
         "no GPU adapter".into()
     } else {
         format!("no GPU device: {}", failed.join("; "))

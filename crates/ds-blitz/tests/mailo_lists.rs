@@ -8,7 +8,7 @@ use ds::{
     StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -124,15 +124,15 @@ fn a_strip_click_does_not_open_the_row() {
     let mut harness = Harness::new(Hovered, VIEW);
     harness.advance(Duration::from_millis(50));
     // Over the row first, so the strip is revealed by hover and takes the pointer.
-    harness.pointer_move(centre(&harness, ".ds-thread-sub"));
+    harness.send(Input::pointer_move(centre(&harness, ".ds-thread-sub")));
     harness.advance(Duration::from_millis(400));
-    harness.click(strip_button(&harness));
+    harness.send(Input::click(strip_button(&harness)));
     harness.advance(Duration::from_millis(100));
     let seen = log(&harness);
     assert!(seen.contains("archive"), "the strip button acted: {seen}");
     assert!(!seen.contains("open"), "and the row did not open: {seen}");
     // The row itself still opens.
-    harness.click(centre(&harness, ".ds-thread-sub"));
+    harness.send(Input::click(centre(&harness, ".ds-thread-sub")));
     harness.advance(Duration::from_millis(50));
     assert!(log(&harness).ends_with("open"), "{}", log(&harness));
 }
@@ -141,16 +141,16 @@ fn a_strip_click_does_not_open_the_row() {
 fn the_name_the_time_and_the_row_hand_the_pointer_to_the_caller() {
     let mut harness = Harness::new(Bare, VIEW);
     harness.advance(Duration::from_millis(50));
-    harness.pointer_move(centre(&harness, ".ds-thread-name"));
-    harness.pointer_move(centre(&harness, ".ds-thread-sub"));
-    harness.pointer_move(centre(&harness, ".ds-thread-time"));
-    harness.pointer_move(AWAY);
+    harness.send(Input::pointer_move(centre(&harness, ".ds-thread-name")));
+    harness.send(Input::pointer_move(centre(&harness, ".ds-thread-sub")));
+    harness.send(Input::pointer_move(centre(&harness, ".ds-thread-time")));
+    harness.send(Input::pointer_move(AWAY));
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         log(&harness),
         "row-enter,sender-enter,sender-leave,time-enter,time-leave"
     );
-    harness.pointer_down(centre(&harness, ".ds-thread-sub"));
+    harness.send(Input::pointer_down(centre(&harness, ".ds-thread-sub")));
     harness.advance(Duration::from_millis(50));
     assert!(log(&harness).ends_with("row-down"), "{}", log(&harness));
 }
@@ -165,8 +165,8 @@ fn the_caller_shows_the_strip_with_no_pointer_on_the_row() {
     );
     // The pointer never came over the row; the revealed strip takes a click anyway.
     let button = strip_button(&harness);
-    harness.pointer_down(button);
-    harness.pointer_up(button);
+    harness.send(Input::pointer_down(button));
+    harness.send(Input::pointer_up(button));
     harness.advance(Duration::from_millis(100));
     let seen = log(&harness);
     assert!(seen.contains("archive"), "{seen}");

@@ -7,7 +7,7 @@ use ds::{
     Anchor, Appearance, Availability, Button, Check, Common, Ds, Material, Menu, MenuItem,
     MountedRef, Rect,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -81,7 +81,7 @@ fn a_menu_anchored_to_a_buttons_mounted_handle_opens_below_it() {
     let at = harness
         .centre(".ds-button")
         .expect("the button is on screen");
-    harness.click(at);
+    harness.send(Input::click(at));
     // Frames for the anchor's rect read (a task that waits a frame, then a render), and the
     // entrance to settle.
     for _ in 0..10 {

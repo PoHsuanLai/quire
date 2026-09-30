@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, ShortcutKey};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::{DatePicker, DateValue, DayKey, Elements, PickerStyle, TimeOfDay};
 use std::time::Duration;
 
@@ -50,8 +50,7 @@ fn Graphical() -> Element {
 }
 
 fn harness(page: fn() -> Element) -> Harness {
-    let mut harness =
-        Harness::with_config(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     harness
 }
@@ -62,8 +61,8 @@ fn a_selected_segment_steps_and_december_wraps_to_january() {
     let month = harness
         .centre(".ds-date-picker-segment")
         .expect("month segment");
-    harness.click(month);
-    harness.key(ShortcutKey::Up);
+    harness.send(Input::click(month));
+    harness.send(Input::key(ShortcutKey::Up));
     assert_eq!(
         harness.text_of(".day").as_deref(),
         Some("DayKey { year: 2026, month: 1, day: 14 }")
@@ -76,7 +75,7 @@ fn a_press_on_a_day_picks_it_and_the_arrow_shows_the_next_month() {
     let day = harness
         .centre(".ds-month-row:nth-child(3) button:nth-child(3)")
         .expect("a day");
-    harness.click(day);
+    harness.send(Input::click(day));
     let said = harness.text_of(".day").unwrap_or_default();
     assert!(
         said.contains("month: 12") && !said.contains("day: 14 "),
@@ -87,7 +86,7 @@ fn a_press_on_a_day_picks_it_and_the_arrow_shows_the_next_month() {
     let next = harness
         .centre(".ds-month-header .ds-button:last-child")
         .expect("next month");
-    harness.click(next);
+    harness.send(Input::click(next));
     harness.advance(Duration::from_millis(600));
     assert_eq!(title(&harness), "January 2027");
 }

@@ -4,7 +4,7 @@
 #![allow(dead_code)]
 
 use ds::Rect;
-use ds_harness::Harness;
+use ds_harness::{Harness, Query};
 use image::RgbaImage;
 
 pub fn rect(harness: &Harness, selector: &str) -> Rect {

@@ -13,7 +13,7 @@
 use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::{Appearance, Button, Ds, Material, Point, Rect};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -88,10 +88,10 @@ fn height(harness: &Harness, selector: &str) -> f32 {
 /// Press the button where it is drawn; how many presses the page heard.
 fn press(harness: &mut Harness) -> u32 {
     let button = harness.rect(".ds-button").expect("the button is laid out");
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: ds::Px(button.origin.x.0 + button.size.width.0 / 2.0),
         y: ds::Px(button.origin.y.0 + button.size.height.0 / 2.0),
-    });
+    }));
     harness.advance(Duration::from_millis(50));
     harness.within(|| *PRESSES.peek())
 }

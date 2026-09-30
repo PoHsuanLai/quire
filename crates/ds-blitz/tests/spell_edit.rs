@@ -14,7 +14,7 @@ use ds::{
 };
 use ds_blitz::spell::{SpellConfig, provide_with};
 use ds_harness::harness::settle_until;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};
@@ -117,7 +117,7 @@ fn fresh(name: &str) -> Harness {
     let mut harness = Harness::new(Editor, VIEW);
     harness.advance(Duration::from_millis(50));
     let editor = harness.centre("#editor").expect("the editor");
-    harness.click(editor);
+    harness.send(Input::click(editor));
     harness.advance(Duration::from_millis(50));
     harness
 }
@@ -125,8 +125,8 @@ fn fresh(name: &str) -> Harness {
 fn type_text(harness: &mut Harness, text: &str) {
     for c in text.chars() {
         match c {
-            ' ' => harness.key(ShortcutKey::Space),
-            c => harness.key(ShortcutKey::Char(c)),
+            ' ' => harness.send(Input::key(ShortcutKey::Space)),
+            c => harness.send(Input::key(ShortcutKey::Char(c))),
         }
     }
 }
@@ -212,7 +212,7 @@ fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
     type_text(&mut harness, "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
     let at = on_mark(&harness);
-    harness.press(at, PointerButton::Secondary);
+    harness.send(Input::press(at, PointerButton::Secondary));
     menu_open(&mut harness);
     assert_eq!(
         harness.text_of(".ds-menu-item").as_deref().map(str::trim),
@@ -220,10 +220,12 @@ fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
         "the best suggestion first"
     );
     let first = harness.centre(".ds-menu-item").expect("a suggestion");
-    harness.click(first);
+    harness.send(Input::click(first));
     settle_until(&mut harness, |h| paragraph(h) == "the cat");
-    settle_until(&mut harness, |h| marks(h) == 0 && h.is_focused("#editor"));
-    harness.chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('z'));
+    settle_until(&mut harness, |h| {
+        marks(h) == 0 && h.focus_of("#editor") == FocusState::Focused
+    });
+    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('z')));
     settle_until(&mut harness, |h| paragraph(h) == "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
 }
@@ -233,10 +235,10 @@ fn ignore_spelling_unmarks_the_word() {
     let mut harness = fresh("ignore");
     type_text(&mut harness, "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
-    harness.press(on_mark(&harness), PointerButton::Secondary);
+    harness.send(Input::press(on_mark(&harness), PointerButton::Secondary));
     menu_open(&mut harness);
     let ignore = menu_row(&harness, "Ignore Spelling");
-    harness.click(ignore);
+    harness.send(Input::click(ignore));
     settle_until(&mut harness, |h| {
         marks(h) == 0 && h.count(".ds-menu-item") == 0
     });
@@ -252,12 +254,12 @@ fn the_context_menu_key_on_a_marked_word_learns_it() {
     type_text(&mut harness, "teh cat");
     settle_until(&mut harness, |h| marks(h) == 1);
     for _ in 0..5 {
-        harness.key(ShortcutKey::Left);
+        harness.send(Input::key(ShortcutKey::Left));
     }
-    harness.key(ShortcutKey::ContextMenu);
+    harness.send(Input::key(ShortcutKey::ContextMenu));
     menu_open(&mut harness);
     let learn = menu_row(&harness, "Learn Spelling");
-    harness.click(learn);
+    harness.send(Input::click(learn));
     settle_until(&mut harness, |h| {
         marks(h) == 0 && h.count(".ds-menu-item") == 0
     });
@@ -279,7 +281,7 @@ fn a_right_click_off_a_marked_word_opens_nothing() {
         x: Px(line.origin.x.0 + 44.0),
         y: Px(line.origin.y.0 + 10.0),
     };
-    harness.press(on_cat, PointerButton::Secondary);
+    harness.send(Input::press(on_cat, PointerButton::Secondary));
     harness.advance(Duration::from_millis(200));
     assert_eq!(harness.count(".ds-menu-item"), 0);
 }

@@ -3,6 +3,7 @@
 
 use crate::harness_backend::Backend;
 use crate::harness_clock::Clock;
+use crate::headless::Layout;
 use crate::snapshot::Viewport;
 use ds_blitz::AdapterPref;
 use ds_blitz::FocusFallback;
@@ -12,7 +13,7 @@ use ds_blitz::RootContexts;
 use ds_blitz::seam::Setup;
 
 /// A headless document's size and providers: build it with [`HarnessConfig::new`] and the
-/// `with_*` methods, then pass it to [`Harness::with_config`](crate::Harness::with_config) or
+/// `with_*` methods, then pass it to [`Harness::new`](crate::Harness::new) or
 /// [`snapshot_with`](crate::snapshot::snapshot_with).
 #[derive(Debug, Clone)]
 pub struct HarnessConfig {
@@ -21,6 +22,7 @@ pub struct HarnessConfig {
     backend: Backend,
     adapter: AdapterPref,
     clock: Clock,
+    layout: Layout,
 }
 
 impl HarnessConfig {
@@ -32,6 +34,7 @@ impl HarnessConfig {
             backend: Backend::default(),
             adapter: AdapterPref::default(),
             clock: Clock::default(),
+            layout: Layout::default(),
         }
     }
 
@@ -90,9 +93,23 @@ impl HarnessConfig {
         self
     }
 
+    /// Whether the document is laid out as it renders (default [`Layout::Running`]).
+    /// [`Layout::Held`] builds it as a shell surface is built before it is mapped: its renders
+    /// run and its tasks are polled, but nothing is styled or laid out until
+    /// [`Harness::map`](crate::Harness::map) (every rect reads 0 x 0 until then).
+    pub fn with_layout(mut self, layout: Layout) -> Self {
+        self.layout = layout;
+        self
+    }
+
     /// The clock the harness's timers run on.
     pub fn clock(&self) -> Clock {
         self.clock
+    }
+
+    /// Whether the document is laid out as it renders.
+    pub fn layout(&self) -> Layout {
+        self.layout
     }
 
     /// The renderer the document paints with.
@@ -119,5 +136,11 @@ impl HarnessConfig {
 
     pub(crate) fn setup(&self) -> &Setup {
         &self.setup
+    }
+}
+
+impl From<Viewport> for HarnessConfig {
+    fn from(viewport: Viewport) -> Self {
+        HarnessConfig::new(viewport)
     }
 }

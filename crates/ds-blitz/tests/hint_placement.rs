@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, RootExtent, Shown, Tooltip};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::DockLabel;
 use std::time::Duration;
 
@@ -35,8 +35,7 @@ fn Page() -> Element {
 
 #[test]
 fn a_shown_hint_is_hidden_until_placed_and_never_at_the_origin() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     for selector in [".ds-tooltip", ".ds-dock-label"] {
         let style = harness.attr(selector, "style").unwrap_or_default();
         assert!(
@@ -80,8 +79,7 @@ fn Moving() -> Element {
 /// placed, the hint is placed again beside it.
 #[test]
 fn a_placed_hint_follows_its_target_when_the_target_moves() {
-    let mut harness =
-        Harness::with_config(Moving, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Moving, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(400));
     let before = harness.rect(".ds-tooltip").expect("the tooltip").origin.y.0;
     harness.within(|| *SHIFT.write() = 60);
@@ -102,8 +100,7 @@ fn a_placed_hint_follows_its_target_when_the_target_moves() {
 /// origin, never over the target.
 #[test]
 fn a_hint_is_never_painted_at_the_origin_or_over_its_target_on_any_frame() {
-    let mut harness =
-        Harness::with_config(Moving, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Moving, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let mut shown_frames = 0;
     for _ in 0..60 {
         harness.advance(Duration::from_millis(16));

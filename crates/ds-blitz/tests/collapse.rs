@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, DurationToken, Material, Motion, MotionLevel, Px, Shown, use_collapse};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -40,7 +40,7 @@ fn Reduced() -> Element {
 }
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 fn style(harness: &Harness) -> String {

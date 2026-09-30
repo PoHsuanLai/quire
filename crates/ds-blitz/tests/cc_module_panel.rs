@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
 use ds::{Slider, SliderLook};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel, ModuleTile};
 use std::time::Duration;
 
@@ -72,13 +72,13 @@ fn a_level_inside_a_panel_on_the_grid_takes_a_press_and_a_drag() {
         x: Px(rail.origin.x.0 + rail.size.width.0 * share),
         y: Px(rail.origin.y.0 + rail.size.height.0 / 2.0),
     };
-    harness.pointer_down(at(0.3));
+    harness.send(Input::pointer_down(at(0.3)));
     harness.advance(TICK);
     let pressed = level(&mut harness);
-    harness.pointer_move(at(0.8));
+    harness.send(Input::pointer_move(at(0.8)));
     harness.advance(TICK);
     let dragged = level(&mut harness);
-    harness.pointer_up(at(0.8));
+    harness.send(Input::pointer_up(at(0.8)));
     harness.advance(TICK);
     assert!(pressed.abs_diff(300) <= 20, "the press lands: {pressed}");
     assert!(dragged.abs_diff(800) <= 20, "the drag follows: {dragged}");

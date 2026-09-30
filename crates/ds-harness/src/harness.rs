@@ -3,7 +3,7 @@
 //! sees the hover card open, not before.
 //!
 //! Time. quire's timers are `futures-timer` sleeps and its hover intent reads `Instant::now()`,
-//! both on the wall clock, so a harness cannot fake time: [`Harness::advance`] really lets it
+//! both on the wall clock, so a harness cannot fake time: [`Driver::advance`] really lets it
 //! pass. It does not spin: it sleeps on a condition variable that the document's waker signals,
 //! so it wakes exactly when a timer fires (or a resource lands), runs the renders that queued,
 //! resolves the document at the matching animation time, and sleeps again until the deadline.
@@ -14,22 +14,22 @@
 //! `HarnessConfig::with_clock(Clock::Virtual)` runs quire's timers on the same clock as its CSS
 //! instead, and `advance` takes no wall-clock time at all (`crate::harness_clock`).
 
+use crate::driver::{DocQuery, Driver, Query, first};
+use crate::error::HarnessError;
 use crate::frame_view::FrameView;
 use crate::harness_clock::{Clock, HarnessClock};
 use crate::harness_config::HarnessConfig;
-use crate::harness_input::{HeldButtons, blitz_button, keyboard, modifier, pointer};
+use crate::harness_input::HeldButtons;
 pub use crate::harness_settle::{
     QUIET, SETTLE_BOUND, VIRTUAL_DRAIN_BOUND, assert_settles_to_zero_frames, settle_until,
 };
 use crate::headless::{Backdrop, Headless, Layout};
+use crate::input::Input;
 use crate::snapshot::Viewport;
-use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
-use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
+use blitz_dom::{BaseDocument, Document as _};
+use blitz_traits::events::UiEvent;
 use dioxus::prelude::*;
-use ds::{InputModality, Point, PointerButton, Px, Rect, ShortcutKey, Size};
-use ds_blitz::NativeError;
-use ds_blitz::RootContexts;
-use keyboard_types::{Location, Modifiers};
+use ds::{DropAcceptance, Point, Px};
 use std::time::{Duration, Instant};
 
 /// A headless document under test.
@@ -39,7 +39,9 @@ pub struct Harness {
     /// Animation time: the sum of every `advance`.
     clock: Duration,
     /// The mouse buttons down now.
-    held: HeldButtons,
+    pub(crate) held: HeldButtons,
+    /// What the window would have told the platform about the last file drag step.
+    drop_answer: DropAcceptance,
     /// Keeps a Tokio runtime entered on this thread for as long as the harness lives, so a
     /// component under test that calls `ds_settings::use_environment` does not panic; see
     /// `ds_blitz::enter_runtime`. Never read, only held: it does its work by staying alive and being
@@ -61,30 +63,12 @@ impl std::fmt::Debug for Harness {
 }
 
 impl Harness {
-    /// Build `app` at `viewport` and render its first frame.
-    pub fn new(app: fn() -> Element, viewport: Viewport) -> Self {
-        Harness::with_config(app, HarnessConfig::new(viewport))
-    }
-
-    /// Build `app` with `contexts` provided at its root, as `AppConfig::with_contexts` gives a
-    /// window, and render its first frame.
-    pub fn with_contexts(app: fn() -> Element, viewport: Viewport, contexts: RootContexts) -> Self {
-        Harness::with_config(app, HarnessConfig::new(viewport).with_contexts(contexts))
-    }
-
-    /// Build `app` as `config` says and render its first frame.
-    pub fn with_config(app: fn() -> Element, config: HarnessConfig) -> Self {
-        Harness::start(app, config, Layout::Running)
-    }
-
-    /// Build `app` at `viewport` as a shell surface is built before it is mapped: its renders
-    /// run and its tasks are polled, but nothing is styled or laid out until [`Harness::map`]
-    /// (every rect reads 0 x 0 until then).
-    pub fn unmapped(app: fn() -> Element, viewport: Viewport) -> Self {
-        Harness::start(app, HarnessConfig::new(viewport), Layout::Held)
-    }
-
-    fn start(app: fn() -> Element, config: HarnessConfig, layout: Layout) -> Self {
+    /// Build `app` as `config` says (a bare [`Viewport`] is a config with no contexts) and
+    /// render its first frame. A [`Backend::Hybrid`](crate::Backend::Hybrid) harness with no
+    /// GPU device to open returns the error from every picture; [`Harness::try_new`] returns it
+    /// at once.
+    pub fn new(app: fn() -> Element, config: impl Into<HarnessConfig>) -> Self {
+        let config = config.into();
         // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
         // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
         // would run.
@@ -94,7 +78,7 @@ impl Harness {
         let time = HarnessClock::start(config.clock());
         let viewport = config.viewport();
         let mut doc = Headless::new(app, viewport, config.setup());
-        doc.layout = layout;
+        doc.layout = config.layout();
         doc.painter = crate::harness_backend::painter(&config);
         let mut harness = Harness {
             viewport,
@@ -102,6 +86,7 @@ impl Harness {
             clock: Duration::ZERO,
             _runtime: runtime,
             held: HeldButtons::default(),
+            drop_answer: DropAcceptance::Refuse,
             time,
         };
         harness.settle();
@@ -114,68 +99,10 @@ impl Harness {
         self.settle();
     }
 
-    /// Move the pointer to `at`, with whatever buttons are down (a drag while one is). Coming
-    /// onto or leaving a link in a frame is reported as the window reports it
-    /// (`FrameLinks::with_hover`).
-    pub fn pointer_move(&mut self, at: Point) {
-        self.pointer_move_with(at, Modifiers::empty());
-    }
-
-    /// Move the pointer to `at` with `mods` held.
-    pub fn pointer_move_with(&mut self, at: Point, mods: Modifiers) {
-        self.send(UiEvent::PointerMove(pointer(
-            at,
-            MouseEventButton::Main,
-            self.held.blitz(),
-            mods,
-        )));
-        self.doc.hover_at(at);
-    }
-
-    /// Press the primary button at `at`. A pointer press makes the modality `pointer`.
-    pub fn pointer_down(&mut self, at: Point) {
-        self.button_down(at, PointerButton::Primary);
-    }
-
-    /// Release the primary button at `at`.
-    pub fn pointer_up(&mut self, at: Point) {
-        self.button_up(at, PointerButton::Primary);
-    }
-
-    /// Press `button` at `at`. A pointer press makes the modality `pointer`.
-    pub fn button_down(&mut self, at: Point, button: PointerButton) {
-        self.button_down_with(at, button, Modifiers::empty());
-    }
-
-    /// Press `button` at `at` with `mods` held (Shift+click is `Modifiers::SHIFT`); it stays
-    /// down until [`Harness::button_up_with`].
-    pub fn button_down_with(&mut self, at: Point, button: PointerButton, mods: Modifiers) {
-        self.doc.set_modality(InputModality::Pointer);
-        self.held = self.held.with(button);
-        let (which, _) = blitz_button(button);
-        self.send(UiEvent::PointerDown(pointer(
-            at,
-            which,
-            self.held.blitz(),
-            mods,
-        )));
-    }
-
-    /// Release `button` at `at`.
-    pub fn button_up(&mut self, at: Point, button: PointerButton) {
-        self.button_up_with(at, button, Modifiers::empty());
-    }
-
-    /// Release `button` at `at` with `mods` held.
-    pub fn button_up_with(&mut self, at: Point, button: PointerButton, mods: Modifiers) {
-        self.held = self.held.without(button);
-        let (which, _) = blitz_button(button);
-        self.send(UiEvent::PointerUp(pointer(
-            at,
-            which,
-            self.held.blitz(),
-            mods,
-        )));
+    /// What the window would have told the platform about the last [`Input::FileDrag`] step: a
+    /// copy over a drop target, a refusal elsewhere (a refusal before any step).
+    pub fn drop_answer(&self) -> DropAcceptance {
+        self.drop_answer
     }
 
     /// The mouse buttons down now.
@@ -183,83 +110,10 @@ impl Harness {
         self.held
     }
 
-    /// Press the primary button at `from`, move to `to` in `steps` even steps with it held, and
-    /// release it there: a drag selection.
-    pub fn drag(&mut self, from: Point, to: Point, steps: u16) {
-        self.pointer_move(from);
-        self.pointer_down(from);
-        let steps = steps.max(1);
-        for step in 1..=steps {
-            let part = f32::from(step) / f32::from(steps);
-            self.pointer_move(Point {
-                x: Px(from.x.0 + (to.x.0 - from.x.0) * part),
-                y: Px(from.y.0 + (to.y.0 - from.y.0) * part),
-            });
-        }
-        self.pointer_up(to);
-    }
-
-    /// Press and release the primary button at `at` with `mods` held, after moving there.
-    pub fn click_with(&mut self, at: Point, mods: Modifiers) {
-        self.pointer_move_with(at, mods);
-        self.button_down_with(at, PointerButton::Primary, mods);
-        self.button_up_with(at, PointerButton::Primary, mods);
-    }
-
-    /// Press and release `button` at `at`, after moving there: a right-click is
-    /// `press(at, PointerButton::Secondary)`, which Blitz delivers as `contextmenu`.
-    pub fn press(&mut self, at: Point, button: PointerButton) {
-        self.pointer_move(at);
-        self.button_down(at, button);
-        self.button_up(at, button);
-    }
-
-    /// Press and release the primary button at `at`, after moving there: the order a host
-    /// synthesises, so hover intent arms before the press.
-    pub fn click(&mut self, at: Point) {
-        self.pointer_move(at);
-        self.pointer_down(at);
-        self.pointer_up(at);
-    }
-
-    /// Press and release `key` with the focus where it is. A key makes the modality `keyboard`.
-    pub fn key(&mut self, key: ShortcutKey) {
-        self.chord(&[], key);
-    }
-
-    /// Press and release `key` while `held` modifiers (`ShortcutKey::Ctrl`, `Shift`, `Alt`, `Super`) are
-    /// down: `chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'))` is Ctrl+K. A key that is not a modifier in
-    /// `held` adds nothing.
-    pub fn chord(&mut self, held: &[ShortcutKey], key: ShortcutKey) {
-        self.doc.set_modality(InputModality::Keyboard);
-        let modifiers = held
-            .iter()
-            .copied()
-            .map(modifier)
-            .fold(Modifiers::empty(), |all, one| all | one);
-        let (key, code) = keyboard(key);
-        for state in [KeyState::Pressed, KeyState::Released] {
-            let event = BlitzKeyEvent {
-                key: key.clone(),
-                code,
-                modifiers,
-                location: Location::Standard,
-                is_auto_repeating: false,
-                is_composing: false,
-                state,
-                text: None,
-            };
-            self.send(match state {
-                KeyState::Pressed => UiEvent::KeyDown(event),
-                KeyState::Released => UiEvent::KeyUp(event),
-            });
-        }
-    }
-
     /// Let `time` pass: fire due timers and render. On the wall clock it takes `time` of
     /// wall-clock time; see the module documentation for why. On the virtual clock it steps to
     /// each timer's due instant in order, rendering and resolving at each, and returns at once.
-    pub fn advance(&mut self, time: Duration) {
+    pub(crate) fn pass(&mut self, time: Duration) {
         match self.time.virtual_clock() {
             Some(clock) => crate::harness_clock::advance(self, &clock, time),
             None => self.advance_wall(time),
@@ -319,50 +173,6 @@ impl Harness {
         self.with_doc(|doc| doc.root_element().outer_html())
     }
 
-    /// The border-box rect of the first element matching `selector`, if any.
-    pub fn rect(&self, selector: &str) -> Option<ds::Rect> {
-        self.with_doc(|doc| {
-            let found = doc.get_client_bounding_rect(first(doc, selector)?)?;
-            Some(Rect {
-                origin: Point {
-                    x: Px(found.x as f32),
-                    y: Px(found.y as f32),
-                },
-                size: Size {
-                    width: Px(found.width as f32),
-                    height: Px(found.height as f32),
-                },
-            })
-        })
-    }
-
-    /// The text inside the first element matching `selector`, if any.
-    pub fn text_of(&self, selector: &str) -> Option<String> {
-        self.with_doc(|doc| Some(doc.get_node(first(doc, selector)?)?.text_content()))
-    }
-
-    /// Attribute `name` of the first element matching `selector`, if both exist.
-    pub fn attr(&self, selector: &str, name: &str) -> Option<String> {
-        self.with_doc(|doc| {
-            let node = doc.get_node(first(doc, selector)?)?;
-            node.attr(LocalName::from(name)).map(str::to_owned)
-        })
-    }
-
-    /// Whether the first element matching `selector` carries `class` as a whole class token.
-    pub fn has_class(&self, selector: &str, class: &str) -> bool {
-        self.attr(selector, "class")
-            .is_some_and(|classes| classes.split_ascii_whitespace().any(|token| token == class))
-    }
-
-    /// How many elements match `selector`.
-    pub fn count(&self, selector: &str) -> usize {
-        self.with_doc(|doc| {
-            doc.query_selector_all(selector)
-                .map_or(0, |found| found.len())
-        })
-    }
-
     /// Whether the document would paint another frame on its own: a CSS animation or
     /// transition running, a canvas, a scroll animation. `false` is the idle-frame rule's
     /// "a surface at rest paints 0 frames" as the host sees it (it asks for no redraw).
@@ -378,13 +188,6 @@ impl Harness {
         self.doc.wakeup().generation()
     }
 
-    /// Whether the first element matching `selector` has the keyboard focus.
-    pub fn is_focused(&self, selector: &str) -> bool {
-        self.with_doc(|doc| {
-            first(doc, selector).is_some_and(|node| doc.get_focussed_node_id() == Some(node))
-        })
-    }
-
     /// The centre of the first element matching `selector`: where a test clicks it.
     pub fn centre(&self, selector: &str) -> Option<Point> {
         self.rect(selector).map(|rect| Point {
@@ -393,27 +196,21 @@ impl Harness {
         })
     }
 
-    /// Paint the document as it is now, at the harness's animation time, over the scheme's
-    /// ground.
-    pub fn render(&mut self) -> Result<image::RgbaImage, NativeError> {
-        self.doc.paint(Backdrop::Scheme)
-    }
-
     /// Paint the document as it is now over `backdrop`: [`Backdrop::Clear`] shows what a shell
     /// surface would, where every pixel the document leaves unpainted has alpha 0.
-    pub fn render_over(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, NativeError> {
+    pub fn render_over(&mut self, backdrop: Backdrop) -> Result<image::RgbaImage, HarnessError> {
         self.doc.paint(backdrop)
     }
 
     /// Resolve at `at` and paint: a snapshot at one motion moment.
-    pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, NativeError> {
+    pub(crate) fn render_at(&mut self, at: Duration) -> Result<image::RgbaImage, HarnessError> {
         self.clock = at;
         self.settle();
         self.doc.paint(Backdrop::Scheme)
     }
 
     /// Hand `event` to the document and bring it up to date.
-    pub(crate) fn send(&mut self, event: UiEvent) {
+    pub(crate) fn deliver(&mut self, event: UiEvent) {
         // An edit surface holding the pointer hears a move or the release first, wherever it is
         // (`crate::edit_ime`), as the window's hook delivers it before the document.
         self.route_captured(&event);
@@ -458,13 +255,31 @@ impl Harness {
     pub fn frame(&self, selector: &str) -> Option<FrameView<'_>> {
         FrameView::find(self, selector)
     }
+}
 
-    pub(crate) fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
+impl DocQuery for Harness {
+    fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
         read(&self.doc.doc.inner())
     }
 }
 
-/// The first element matching `selector`; an unparseable selector matches nothing.
-pub(crate) fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
-    doc.query_selector(selector).ok().flatten()
+impl Driver for Harness {
+    fn send(&mut self, input: Input) {
+        match input {
+            Input::Pointer(pointer) => self.pointer(pointer),
+            Input::Key(key) => self.key(key),
+            Input::Wheel { at, dx, dy } => self.wheel(at, dx, dy),
+            Input::FileDrag(step) => self.drop_answer = self.file_drag(step),
+            Input::Ime(ime) => self.ime(ime),
+            Input::Paste { html, text } => self.paste(&html, &text),
+        }
+    }
+
+    fn advance(&mut self, by: Duration) {
+        self.pass(by);
+    }
+
+    fn render(&mut self) -> Result<image::RgbaImage, HarnessError> {
+        self.doc.paint(Backdrop::Scheme)
+    }
 }

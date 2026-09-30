@@ -414,7 +414,7 @@ shortened:
 
 ```rust
 use ds::{resolve, settle, Anim, Appearance, SpaceLook, SystemPrefs};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
@@ -442,11 +442,11 @@ order, runs the renders that queued and resolves the CSS at that same instant, a
 once. The two assertions above then hold exactly, every run:
 
 ```rust
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 
 let config = HarnessConfig::new(Viewport { width: 480, height: 360, scale_percent: 100 })
     .with_clock(Clock::Virtual);
-let mut harness = Harness::with_config(YourApp, config);
+let mut harness = Harness::new(YourApp, config);
 ```
 
 | Want | Call | Notes |

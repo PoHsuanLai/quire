@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Material, Point, Px, RootExtent, UndoToken, use_toasts};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -47,11 +47,10 @@ fn Pusher() -> Element {
 }
 
 fn pushed() -> Harness {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| UNDONE.write().clear());
     let button = harness.centre(".ds-button").expect("the button");
-    harness.click(button);
+    harness.send(Input::click(button));
     harness.advance(ms(400));
     assert_eq!(
         harness.attr(".ds-toast", "data-presence").as_deref(),
@@ -68,7 +67,7 @@ fn presence(harness: &Harness) -> Option<String> {
 fn the_pointer_over_it_pauses_the_hold_and_leaving_starts_it_over() {
     let mut harness = pushed();
     let over = harness.centre(".ds-toast").expect("the toast");
-    harness.pointer_move(over);
+    harness.send(Input::pointer_move(over));
     // Well past the 5 s hold: still up, because the pointer is on it.
     harness.advance(ms(7000));
     assert_eq!(
@@ -76,10 +75,10 @@ fn the_pointer_over_it_pauses_the_hold_and_leaving_starts_it_over() {
         Some("present"),
         "paused while it is read"
     );
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(40.0),
         y: Px(40.0),
-    });
+    }));
     harness.advance(ms(2500));
     assert_eq!(
         presence(&harness).as_deref(),
@@ -98,14 +97,14 @@ fn a_swipe_to_the_right_past_80_px_dismisses_it() {
     let mut harness = pushed();
     let from = harness.centre(".ds-toast").expect("the toast");
     // Under the threshold: it springs back and stays.
-    harness.drag(
+    harness.send(Input::drag(
         from,
         Point {
             x: from.x + Px(40.0),
             y: from.y,
         },
         8,
-    );
+    ));
     harness.advance(ms(600));
     assert_eq!(
         presence(&harness).as_deref(),
@@ -113,14 +112,14 @@ fn a_swipe_to_the_right_past_80_px_dismisses_it() {
         "under 80 px it springs home"
     );
     let from = harness.centre(".ds-toast").expect("the toast");
-    harness.drag(
+    harness.send(Input::drag(
         from,
         Point {
             x: from.x + Px(140.0),
             y: from.y,
         },
         8,
-    );
+    ));
     harness.advance(ms(20));
     assert_eq!(
         presence(&harness).as_deref(),
@@ -135,7 +134,7 @@ fn a_swipe_to_the_right_past_80_px_dismisses_it() {
 fn undo_reports_its_token_and_dismisses() {
     let mut harness = pushed();
     let action = harness.centre(".ds-toast-action").expect("the action");
-    harness.click(action);
+    harness.send(Input::click(action));
     harness.advance(ms(20));
     assert_eq!(harness.within(|| UNDONE.peek().clone()), vec![7]);
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));

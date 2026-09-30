@@ -7,7 +7,7 @@
 
 use dioxus::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -17,7 +17,7 @@ const VIEW: Viewport = Viewport {
 };
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
-    Harness::with_config(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 /// A held sleep longer than `QUIET`, in the same shape as the check mark's `SettleHold`: starts

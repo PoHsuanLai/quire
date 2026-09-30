@@ -1068,7 +1068,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   back, so pixel assertions work on both backends (under 1 % of pixels differ by more than 24
   levels from vello_cpu, all anti-aliased edges). The adapter is chosen as shell-host chooses it
   (`AdapterPref`, `WGPU_ADAPTER_NAME`, reimplemented because quire cannot depend on shell-host);
-  with none, `try_with_config` returns `NativeError::Renderer`. `paint_timed()` waits for the GPU
+  with none, `try_new` returns `HarnessError::Renderer`. `paint_timed()` waits for the GPU
   before stopping the clock; `PaintTime::scene` is the CPU scene build. On vello_cpu the harness
   builds a renderer per picture, which its numbers include.
 - **Measured** (400 x 480 at 100 %, 300 COLRv1 cells of 32 px glyphs, about 90 visible, scrolled

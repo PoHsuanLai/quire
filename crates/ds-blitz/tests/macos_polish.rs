@@ -13,7 +13,7 @@ use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
     MenuItem, PlateFamily, Px, Scheme, Shown, Surface,
 };
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use ds_shell::MenuBarItem;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
@@ -400,14 +400,14 @@ fn a_popover_fades_out_before_it_closes() {
     let mut harness = Harness::new(Pop, VIEW);
     harness.advance(ms(300));
     assert_eq!(harness.count("#inside"), 1);
-    harness.pointer_down(ds::Point {
+    harness.send(Input::pointer_down(ds::Point {
         x: Px(500.0),
         y: Px(20.0),
-    });
-    harness.pointer_up(ds::Point {
+    }));
+    harness.send(Input::pointer_up(ds::Point {
         x: Px(500.0),
         y: Px(20.0),
-    });
+    }));
     harness.advance(ms(16));
     assert_eq!(
         harness.attr(".ds-popover", "data-presence").as_deref(),

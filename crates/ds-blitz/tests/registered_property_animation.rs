@@ -6,7 +6,7 @@
 //! the fact, measured only on the headless path, not in a window.
 
 use dioxus::prelude::*;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -48,8 +48,7 @@ fn probe(harness: &mut Harness, id: &str) -> [u8; 3] {
 
 #[test]
 fn an_animated_registered_property_turns_a_conic_gradient_like_a_rotation() {
-    let mut harness =
-        Harness::with_config(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let mut seen = Vec::new();
     for pause in [0, 500, 500] {
         harness.advance(Duration::from_millis(pause));

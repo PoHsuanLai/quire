@@ -11,7 +11,7 @@ use dioxus::prelude::*;
 use ds::settle;
 use ds::{Anim, Appearance, Ds, Material, MotionLevel};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::WeekNumbers;
 use ds_shell::{DayKey, MonthGrid, MonthStep};
 use month_sample::{First, SEPTEMBER, sample, shift};
@@ -58,7 +58,7 @@ fn press(harness: &mut Harness, selector: &str) {
     let at = harness
         .centre(selector)
         .unwrap_or_else(|| panic!("{selector} is missing:\n{}", harness.html()));
-    harness.click(at);
+    harness.send(Input::click(at));
 }
 
 fn log(harness: &Harness) -> String {
@@ -71,7 +71,7 @@ fn slide() -> Duration {
 }
 
 fn sliding(harness: &Harness, class: &str) -> bool {
-    harness.has_class(".ds-month-weeks", class)
+    harness.has_class(".ds-month-weeks", class) == ClassPresence::Present
 }
 
 /// Press a step button and watch its slide: present at once, gone only after a full slide.
@@ -104,13 +104,19 @@ fn step_and_watch(harness: &mut Harness, label: &str, class: &str) {
 
 #[test]
 fn a_step_slides_the_new_month_in_once() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         MonthApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(50));
-    assert!(!harness.has_class(".ds-month-weeks", "a-slide-r"));
-    assert!(!harness.has_class(".ds-month-weeks", "a-slide-l"));
+    assert_eq!(
+        harness.has_class(".ds-month-weeks", "a-slide-r"),
+        ClassPresence::Absent
+    );
+    assert_eq!(
+        harness.has_class(".ds-month-weeks", "a-slide-l"),
+        ClassPresence::Absent
+    );
     assert_eq!(
         harness.text_of(".ds-month-title").as_deref(),
         Some("September 2026")

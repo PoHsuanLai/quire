@@ -11,7 +11,7 @@ use ds::{
     TargetElement, Tooltip, use_hover_hub,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -74,8 +74,7 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 
 #[test]
 fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
-    let mut harness =
-        Harness::with_config(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness.count("ul.pins > li.ds-hover-target"),
@@ -85,7 +84,7 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
     );
     let second = "ul.pins > li:nth-child(2)";
     let entered = harness.now();
-    harness.pointer_move(centre(&harness, second));
+    harness.send(Input::pointer_move(centre(&harness, second)));
     // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
     // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
@@ -112,7 +111,10 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
         "{card:?} beside {item:?}"
     );
     // Warm: the next item's card replaces it at once.
-    harness.pointer_move(centre(&harness, "ul.pins > li:nth-child(3)"));
+    harness.send(Input::pointer_move(centre(
+        &harness,
+        "ul.pins > li:nth-child(3)",
+    )));
     harness.advance(ms(60));
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:2"));
 }
@@ -122,7 +124,7 @@ fn a_time_tip_opens_small_on_one_line_below_its_time() {
     let mut harness = Harness::new(App, VIEW);
     harness.advance(ms(50));
     let time = "p .ds-hover-target";
-    harness.pointer_move(centre(&harness, time));
+    harness.send(Input::pointer_move(centre(&harness, time)));
     // Well under the Tip profile's second: nothing yet.
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-tooltip"), 0, "{}", harness.html());
@@ -142,10 +144,10 @@ fn a_time_tip_opens_small_on_one_line_below_its_time() {
     assert!(tip.size.width.0 <= 260.0, "tooltip-sized: {tip:?}");
     assert!(tip.size.height.0 < 36.0, "one line: {tip:?}");
     // Gone the moment the pointer leaves.
-    harness.pointer_move(Point {
+    harness.send(Input::pointer_move(Point {
         x: Px(700.0),
         y: Px(400.0),
-    });
+    }));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-tooltip"), 0, "closes with the pointer");
 }

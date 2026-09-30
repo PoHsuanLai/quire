@@ -14,7 +14,7 @@ use ds::{
     StatusMetrics, Surface, Theme, Toggle,
 };
 use ds::{Choice, Tracking};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 use ds_shell::{MenuBarItem, ModuleGrid, ModulePanel, ModuleTile};
 use std::path::PathBuf;
 use std::time::Duration;

@@ -5,10 +5,11 @@
 //! A snapshot sees CSS time only: the document is resolved at each moment, but no wall-clock
 //! timer runs. Drive timers with [`crate::Harness`].
 
+use crate::driver::Driver;
+use crate::error::HarnessError;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use dioxus::prelude::*;
-use ds_blitz::NativeError;
 use std::time::Duration;
 
 /// The moment [`snapshot`] renders at: long after every entrance has settled (the longest
@@ -38,11 +39,14 @@ pub struct Viewport {
 }
 
 /// Render `app` once, after its fonts and images have landed, to an RGBA image.
-pub fn snapshot(app: fn() -> Element, viewport: Viewport) -> Result<image::RgbaImage, NativeError> {
+pub fn snapshot(
+    app: fn() -> Element,
+    viewport: Viewport,
+) -> Result<image::RgbaImage, HarnessError> {
     let mut frames = snapshot_at(app, viewport, &[AT_REST])?;
     frames
         .pop()
-        .ok_or_else(|| NativeError::Renderer("no frame rendered".into()))
+        .ok_or_else(|| HarnessError::Renderer("no frame rendered".into()))
 }
 
 /// Render `app` at each of `moments` of animation time (measured from its first frame, in
@@ -53,7 +57,7 @@ pub fn snapshot_at(
     app: fn() -> Element,
     viewport: Viewport,
     moments: &[Duration],
-) -> Result<Vec<image::RgbaImage>, NativeError> {
+) -> Result<Vec<image::RgbaImage>, HarnessError> {
     snapshot_with(app, HarnessConfig::new(viewport), moments)
 }
 
@@ -63,7 +67,7 @@ pub fn snapshot_with(
     app: fn() -> Element,
     config: HarnessConfig,
     moments: &[Duration],
-) -> Result<Vec<image::RgbaImage>, NativeError> {
+) -> Result<Vec<image::RgbaImage>, HarnessError> {
     snapshot_rounds(app, config, moments, 1)
 }
 
@@ -74,7 +78,7 @@ pub fn snapshot_placed(
     app: fn() -> Element,
     viewport: Viewport,
     moments: &[Duration],
-) -> Result<Vec<image::RgbaImage>, NativeError> {
+) -> Result<Vec<image::RgbaImage>, HarnessError> {
     snapshot_rounds(app, HarnessConfig::new(viewport), moments, SETTLE_ROUNDS)
 }
 
@@ -83,8 +87,8 @@ fn snapshot_rounds(
     config: HarnessConfig,
     moments: &[Duration],
     rounds: u32,
-) -> Result<Vec<image::RgbaImage>, NativeError> {
-    let mut harness = Harness::with_config(app, config);
+) -> Result<Vec<image::RgbaImage>, HarnessError> {
+    let mut harness = Harness::new(app, config);
     for _ in 0..rounds {
         harness.advance(MOUNT_SETTLE);
     }

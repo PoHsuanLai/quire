@@ -3,7 +3,7 @@
 //! through the app's document, and a `<script>` in it does nothing (Blitz runs no scripts).
 
 use dioxus::prelude::*;
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,

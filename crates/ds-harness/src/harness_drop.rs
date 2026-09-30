@@ -10,7 +10,7 @@ impl Harness {
     /// One step of a drag from outside the window (`FileDragInput::Entered`, `Offered`, `Moved`,
     /// `Dropped`, `Left`), then a render. Answers what the window would tell the platform: a copy
     /// over a drop target, a refusal elsewhere.
-    pub fn file_drag(&mut self, input: FileDragInput) -> DropAcceptance {
+    pub(crate) fn file_drag(&mut self, input: FileDragInput) -> DropAcceptance {
         let answer = self.within(|| {
             consume_context_from_scope::<FileDropBoard>(ScopeId::ROOT)
                 .map_or(DropAcceptance::Refuse, |host| host.feed(input))

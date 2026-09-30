@@ -11,7 +11,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Check, Ds, Material};
-use ds_harness::{Harness, Viewport};
+use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -77,7 +77,7 @@ fn label_after_click(app: fn() -> Element) -> String {
     let at = harness
         .centre(".ds-button")
         .expect("the button is on screen");
-    harness.click(at);
+    harness.send(Input::click(at));
     harness.advance(Duration::from_millis(50));
     harness.text_of(".ds-button").unwrap_or_default()
 }

@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{Appearance, Ds, Material, Motion, WifiBars, WifiGlyph, WifiReach, WifiState};
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -69,8 +69,7 @@ fn at_rest_a_joined_glyph_is_whole_and_a_repeat_plays_nothing() {
 
 #[test]
 fn joining_searches_at_once_and_a_join_lands_on_the_real_bars() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Idle);
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, WifiState::Joining(EventStamp(1)));
@@ -129,15 +128,17 @@ fn a_failed_join_leaves_the_fan_faint_and_shakes_nothing() {
     let mut harness = Harness::new(Page, VIEW);
     set(&mut harness, WifiState::Failed(EventStamp(1)));
     harness.advance(Duration::from_millis(60));
-    assert!(!harness.has_class("#wifi .ds-status-glyph", "a-shake-x"));
+    assert_eq!(
+        harness.has_class("#wifi .ds-status-glyph", "a-shake-x"),
+        ClassPresence::Absent
+    );
     assert_settles_to_zero_frames(&mut harness);
     assert_eq!(lit(&harness), 0, "the fan is faint");
 }
 
 #[test]
 fn the_radio_off_draws_the_slash_on_and_back_off() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Off);
     settle_until(&mut harness, |h| slash_offset(h).is_some_and(|o| o > 0.0));
     settle_until(&mut harness, |h| slash_offset(h) == Some(0.0));
@@ -150,8 +151,7 @@ fn the_radio_off_draws_the_slash_on_and_back_off() {
 
 #[test]
 fn reduced_keeps_the_search_turning_and_snaps_the_slash() {
-    let mut harness =
-        Harness::with_config(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(20));
     set(&mut harness, WifiState::Joining(EventStamp(3)));

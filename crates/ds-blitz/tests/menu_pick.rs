@@ -7,7 +7,7 @@ use ds::{
     Anchor, Appearance, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px, ShortcutKey,
 };
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -95,15 +95,15 @@ fn lit(harness: &Harness, n: usize) -> bool {
 
 #[test]
 fn a_pick_blinks_its_item_twice_then_yields_and_closes() {
-    let mut harness = Harness::with_config(
+    let mut harness = Harness::new(
         Floating,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
     harness.advance(ms(300));
     let second = row(&harness, 2);
-    harness.pointer_move(second);
+    harness.send(Input::pointer_move(second));
     assert!(lit(&harness, 2), "the pointer highlights the row");
-    harness.click(second);
+    harness.send(Input::click(second));
     // The blink is out, back, out, back: each half is half of `MenuBlink` (35 ms).
     let half = ds::DelayToken::MenuBlink.delay() / 2;
     let mut seen = Vec::new();
@@ -123,8 +123,8 @@ fn a_pick_blinks_its_item_twice_then_yields_and_closes() {
 fn a_second_pick_during_the_blink_is_ignored() {
     let mut harness = Harness::new(Floating, VIEW);
     harness.advance(ms(300));
-    harness.click(row(&harness, 2));
-    harness.click(row(&harness, 3));
+    harness.send(Input::click(row(&harness, 2)));
+    harness.send(Input::click(row(&harness, 3)));
     settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "pick:1,close");
 }
@@ -133,10 +133,10 @@ fn a_second_pick_during_the_blink_is_ignored() {
 fn an_outside_press_closes_without_a_pick() {
     let mut harness = Harness::new(Floating, VIEW);
     harness.advance(ms(300));
-    harness.click(Point {
+    harness.send(Input::click(Point {
         x: Px(650.0),
         y: Px(420.0),
-    });
+    }));
     harness.advance(ms(300));
     assert_eq!(log(&harness), "close");
     assert_eq!(harness.count(".ds-menu"), 0);
@@ -149,8 +149,9 @@ fn an_inline_menu_stands_in_its_card_off_the_overlay() {
     assert_eq!(harness.count(".card > .ds-menu[*|data-flow=inline]"), 1);
     assert_eq!(harness.count(".ds-overlay .ds-menu"), 0);
     assert_eq!(harness.count(".ds-overlay-catch"), 0, "no outside catcher");
-    assert!(
-        !harness.is_focused(".ds-menu"),
+    assert_eq!(
+        harness.focus_of(".ds-menu"),
+        FocusState::Unfocused,
         "the caller keeps the focus"
     );
     // The rows sit inside the card, where the flow put them.
@@ -161,10 +162,10 @@ fn an_inline_menu_stands_in_its_card_off_the_overlay() {
         "{first:?} in {card:?}"
     );
     // Escape is the caller's: nothing closes.
-    harness.key(ShortcutKey::Escape);
+    harness.send(Input::key(ShortcutKey::Escape));
     harness.advance(ms(300));
     assert_eq!(log(&harness), "");
-    harness.click(row(&harness, 3));
+    harness.send(Input::click(row(&harness, 3)));
     settle_until(&mut harness, |h| log(h).ends_with("close"));
     assert_eq!(log(&harness), "pick:2,close");
 }
