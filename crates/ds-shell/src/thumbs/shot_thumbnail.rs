@@ -19,10 +19,11 @@
 //! anchor), so a `BannerStack` or the caller's surface decides where it sits.
 
 use crate::notifications::parts::Hover;
-use crate::notifications::swipe::{CardSwipe, NotificationSwipe, use_card_swipe};
+use crate::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use crate::thumbs::shot_frame::shot_frame;
 use crate::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPress};
 use dioxus::prelude::*;
+use ds::SwipeGlue;
 use ds::components::content::image_source::{ImageSize, ImageSource};
 use ds::components::content::picture_fit::picture_style;
 use ds::components::content::text_runs::TextLine;
@@ -145,7 +146,7 @@ fn ShotCard(
             onpointerenter: move |_| point(Hover::Over),
             onpointerleave: move |_| {
                 point(Hover::Away);
-                swiper.up();
+                swiper.left();
             },
             onpointerdown: move |event| swiper.down(&event),
             onpointermove: move |event| swiper.moved(&event),
@@ -179,7 +180,7 @@ fn card_style(width: Px, swipe: Option<String>) -> String {
 #[derive(Clone, Copy)]
 struct Press {
     press: Signal<ShotPress>,
-    swiper: CardSwipe,
+    swiper: SwipeGlue,
     lane: DragLane,
     onopen: Option<EventHandler<()>>,
     ondrag: Option<EventHandler<DragStart>>,

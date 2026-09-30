@@ -95,7 +95,7 @@ pub fn NotificationCard(
                 onpointerenter: move |_| point(Hover::Over),
                 onpointerleave: move |_| {
                     point(Hover::Away);
-                    swiper.up();
+                    swiper.left();
                 },
                 onpointerdown: move |event| swiper.down(&event),
                 onpointermove: move |event| swiper.moved(&event),

@@ -180,6 +180,7 @@ pub use crate::components::{
         sheet_attach::Attach,
         side_panel::SidePanel,
         skeleton::{Skeleton, SkeletonShape},
+        swipe_glue::{SwipeGlue, SwipeOn, use_swipe_glue},
         toast::use_toasts,
         tooltip::Tooltip,
     },
