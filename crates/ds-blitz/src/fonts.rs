@@ -1,59 +1,32 @@
-//! Registering `ds::FACES` with the renderer's shared font context, once (spike S11).
+//! Registering `ds::FACES` with the renderer's shared font context, once (spike S11), through
+//! `blitz_kit::fonts::SharedFonts`.
 //!
-//! The faces' bytes are wrapped in blobs once per process, and the base context (system fonts,
-//! blitz's list-bullet face and every quire face) is built once and cloned: its collection and
-//! source cache are shared, so every window, snapshot and harness document resolves the same
-//! registered families without registering or parsing them again.
+//! The base context (system fonts, blitz's list-bullet face and every quire face) is built once
+//! and cloned: its collection and source cache are shared, so every window, snapshot and harness
+//! document resolves the same registered families without registering or parsing them again.
 
-use parley::FontContext;
-use parley::fontique::{Blob, Collection, CollectionOptions, SourceCache};
-use std::sync::{Arc, LazyLock, Mutex, PoisonError};
-
-/// Every quire face as a blob, made once, so each registration shares one allocation.
-static FACE_BLOBS: LazyLock<Vec<Blob<u8>>> = LazyLock::new(|| {
-    ds::FACES
-        .iter()
-        .map(|face| Blob::new(Arc::new(face.bytes) as _))
-        .collect()
-});
+use blitz_kit::fonts::{FontFaces, SharedFonts};
+use std::sync::LazyLock;
 
 /// The context every document starts from, built on first use.
-static BASE: LazyLock<Mutex<FontContext>> = LazyLock::new(|| Mutex::new(base_context()));
+static BASE: LazyLock<SharedFonts> = LazyLock::new(|| SharedFonts::system_with(&faces()));
 
-/// Register every quire face with `fonts`.
-pub fn register_fonts(fonts: &mut parley::FontContext) {
-    for blob in FACE_BLOBS.iter() {
-        fonts.collection.register_fonts(blob.clone(), None);
-    }
+/// Every quire face's bytes.
+fn faces() -> FontFaces {
+    FontFaces(ds::FACES.iter().map(|face| face.bytes).collect())
 }
 
 /// A font context with the system fonts and every quire face registered: what `launch`,
 /// `snapshot` and `Harness` hand their documents. Clones share one collection and one source
 /// cache, so the faces are registered once per process.
 pub fn font_context() -> parley::FontContext {
-    BASE.lock().unwrap_or_else(PoisonError::into_inner).clone()
-}
-
-/// System fonts, blitz's bullet face (a document given its own context does not get it
-/// otherwise) and the quire faces, in a shared collection and source cache.
-fn base_context() -> FontContext {
-    let mut fonts = FontContext {
-        collection: Collection::new(CollectionOptions {
-            shared: true,
-            system_fonts: true,
-        }),
-        source_cache: SourceCache::new_shared(),
-    };
-    fonts
-        .collection
-        .register_fonts(Blob::new(Arc::new(blitz_dom::BULLET_FONT) as _), None);
-    register_fonts(&mut fonts);
-    fonts
+    BASE.for_document()
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{font_context, register_fonts};
+    use super::{faces, font_context};
+    use blitz_kit::fonts::SharedFonts;
     use ds::Word;
     use ds::{Family, Typeface};
 
@@ -94,20 +67,7 @@ mod tests {
 
     #[test]
     fn every_family_resolves_after_registration() {
-        let mut fonts = parley::FontContext {
-            collection: parley::fontique::Collection::new(parley::fontique::CollectionOptions {
-                shared: false,
-                system_fonts: false,
-            }),
-            source_cache: parley::fontique::SourceCache::default(),
-        };
-        for (family, name) in names() {
-            assert!(
-                fonts.collection.family_by_name(&name).is_none(),
-                "{family:?}: {name} before registering"
-            );
-        }
-        register_fonts(&mut fonts);
+        let mut fonts = SharedFonts::bundled(&faces()).for_document();
         for (family, name) in names() {
             assert!(
                 fonts.collection.family_by_name(&name).is_some(),
