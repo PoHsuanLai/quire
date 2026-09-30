@@ -90,6 +90,7 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
 #[allow(non_snake_case)]
 fn EmptyApp() -> Element {
     let look = SpaceLook {
+        grain: Grain(0),
         ..SpaceLook::default()
     };
     rsx! {

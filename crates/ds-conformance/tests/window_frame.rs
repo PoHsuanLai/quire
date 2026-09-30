@@ -166,6 +166,8 @@ fn DarkGrain55() -> Element {
     dark_window(look(0, 55))
 }
 
+type App = fn() -> Element;
+
 /// The luminance variance over the window's top-left 64 x 64 pixels.
 fn variance(frame: &RgbaImage) -> f64 {
     let lumas: Vec<f64> = (0..64u32)
@@ -180,7 +182,7 @@ fn variance(frame: &RgbaImage) -> f64 {
 /// four frames are kept for review.
 #[test]
 fn grain_55_has_more_pixel_variance_than_grain_0_in_both_schemes() {
-    let cases: [(&str, fn() -> Element, fn() -> Element); 2] = [
+    let cases: [(&str, App, App); 2] = [
         ("light", LightGrain0, LightGrain55),
         ("dark", DarkGrain0, DarkGrain55),
     ];
