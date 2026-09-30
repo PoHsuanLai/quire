@@ -146,6 +146,7 @@ spellbook = "0.4"
 syn = { version = "2", features = ["full", "extra-traits"] }
 quote = "1"
 proc-macro2 = "1"
+proc-macro-crate = "3"
 
 # Shell-only (COSMIC).
 cosmic-client-toolkit = { git = "https://github.com/pop-os/cosmic-protocols", rev = "c0cff4db14c37ed954983158e4055aa94c7741d9" }
