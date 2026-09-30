@@ -7,8 +7,8 @@
 
 use super::id::EmojiId;
 use crate::shell::user_picture::mood::PictureSize;
-use crate::style::icon::url::IconUrl;
 use ds_core::word::Word;
+use ds_style::icon::url::IconUrl;
 use serde::Deserialize;
 use std::sync::{LazyLock, OnceLock};
 use std::time::Duration;

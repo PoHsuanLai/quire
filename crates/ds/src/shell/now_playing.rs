@@ -14,11 +14,11 @@ use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
 };
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// What the module shows of a track: compared whole, so a restated track is no moment.
 #[derive(Debug, Clone, PartialEq)]

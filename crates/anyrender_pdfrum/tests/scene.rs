@@ -9,7 +9,8 @@ use skrifa::{FontRef, MetadataProvider as _};
 use std::sync::{Arc, LazyLock};
 
 /// quire's Noto Serif (Latin subset), a variable face at its default instance here.
-static SERIF: &[u8] = include_bytes!("../../ds/assets/fonts/noto-serif-normal-400-700-latin.ttf");
+static SERIF: &[u8] =
+    include_bytes!("../../ds-style/assets/fonts/noto-serif-normal-400-700-latin.ttf");
 
 /// The face as a renderer holds it: one blob, whose id names the face in every run key.
 static FONT: LazyLock<FontData> = LazyLock::new(|| FontData::new(Blob::new(Arc::new(SERIF)), 0));

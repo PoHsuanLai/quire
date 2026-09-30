@@ -7,11 +7,11 @@
 use crate::motion::pulse_key::PulseKey;
 use crate::motion::{anim::Anim, settle::settle};
 use crate::shell::lock::vocab::PromptState;
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::scope::Scope;
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
 use ds_core::word::Word;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::scope::Scope;
 
 /// Whether the field holds anything: the enter button shows only once it does.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -106,9 +106,9 @@ fn clear(
 ) {
     let mut typed = typed;
     typed.set(String::new());
-    let _ = crate::style::task::try_set(filled, Filled::Empty);
-    if let Ok(round) = crate::style::task::try_get(generation) {
-        let _ = crate::style::task::try_set(generation, round.wrapping_add(1));
+    let _ = ds_style::task::try_set(filled, Filled::Empty);
+    if let Ok(round) = ds_style::task::try_get(generation) {
+        let _ = ds_style::task::try_set(generation, round.wrapping_add(1));
     }
     oninput.call(String::new());
 }
@@ -179,8 +179,8 @@ fn settle_later(
         sleep(settle(Anim::ShakeX, level)).await;
         // Only forward: an older firing's timer must not cut a newer shake short. A prompt that
         // unmounted meanwhile has nothing left to empty.
-        if crate::style::task::try_get(settled).is_ok_and(|done| done < round) {
-            let _ = crate::style::task::try_set(settled, round);
+        if ds_style::task::try_get(settled).is_ok_and(|done| done < round) {
+            let _ = ds_style::task::try_set(settled, round);
             empty();
         }
     });

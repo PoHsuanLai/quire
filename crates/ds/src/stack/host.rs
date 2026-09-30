@@ -1,8 +1,8 @@
 //! The overlay registry and the host that renders it at the end of `.ds`.
 
-use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::tokens::layer::ZLayer;
 
 /// Which overlay an entry is, so its owner can replace or remove it.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

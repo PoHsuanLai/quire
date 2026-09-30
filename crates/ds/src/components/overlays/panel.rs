@@ -22,11 +22,11 @@ use crate::components::overlays::scrim_strength::ScrimStrength;
 use crate::motion::anim::Anim;
 use crate::motion::presence::spring::use_spring_presence;
 use crate::root::surface::ClassedScope;
-use crate::style::appearance::material::Material;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_style::appearance::material::Material;
 
 /// Which edge a panel stands at.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

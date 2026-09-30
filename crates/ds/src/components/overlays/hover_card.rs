@@ -20,7 +20,6 @@ use crate::motion::anim::Anim;
 use crate::motion::entrance::use_entrance;
 use crate::motion::hover_intent::HoverEvent;
 use crate::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
-use crate::style::tokens::layer::ZLayer;
 use dioxus::core::provide_root_context;
 use dioxus::prelude::*;
 use ds_core::geometry::{
@@ -28,6 +27,7 @@ use ds_core::geometry::{
     units::{Point, Px, Rect},
 };
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_style::tokens::layer::ZLayer;
 use std::collections::BTreeMap;
 use {intent::HoverAnchor, parts::HoverCardPart};
 

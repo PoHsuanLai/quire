@@ -1,6 +1,6 @@
 //! The roster as one hook: [`RosterState`] in a signal, with the settle timers started for it.
 //! The timers belong to the hook's owner and drop with it; a timer that finds the roster gone
-//! stops (`crate::style::task`).
+//! stops (`ds_style::task`).
 //!
 //! Rows leave in batches: every key that starts leaving in one go plays the exit together, and
 //! when the exit has settled they are dropped at once and the rows below heal by the heights the
@@ -10,11 +10,11 @@ use super::presence::Exit;
 use super::roster::{RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use super::roster_rest::{RestQueue, RestTimer};
 use super::settle::settle;
-use crate::style::scope::{Scope, use_scope_signal};
-use crate::style::task::{Gone, spawn_in, try_get};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::scope::{Scope, use_scope_signal};
+use ds_style::task::{Gone, spawn_in, try_get};
 
 /// How a row leaves the roster.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -161,7 +161,7 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         let (next, stayed) = try_get(self.state)
             .map_err(|Gone| StayError::Unmounted)?
             .stay(&key);
-        crate::style::task::try_set(self.state, next).map_err(|Gone| StayError::Unmounted)?;
+        ds_style::task::try_set(self.state, next).map_err(|Gone| StayError::Unmounted)?;
         stayed
     }
 
@@ -225,10 +225,10 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         step: impl FnOnce(RosterState<K>) -> RosterState<K>,
     ) -> Result<(), Gone> {
         let next = step(try_get(self.state)?);
-        crate::style::task::try_set(self.state, next)
+        ds_style::task::try_set(self.state, next)
     }
 
-    pub(super) fn level(&self) -> Result<crate::style::appearance::motion::MotionLevel, Gone> {
+    pub(super) fn level(&self) -> Result<ds_style::appearance::motion::MotionLevel, Gone> {
         Ok(try_get(self.env)?.resolved.motion)
     }
 }

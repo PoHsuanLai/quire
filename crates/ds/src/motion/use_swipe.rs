@@ -3,14 +3,14 @@
 //! pure (`swipe.rs`); this owns the time.
 
 use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
-use crate::style::scope::{Scope, use_scope_signal};
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
-use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::clock::sleep;
 use ds_core::vocab::PressPhase;
+use ds_style::scope::{Scope, use_scope_signal};
+use ds_style::task::{Gone, spawn_in, try_get, try_set};
+use ds_style::tokens::delay::DelayToken;
 use std::time::Instant;
 
 /// A live swipe: read its state in render, feed it from the card's listeners.

@@ -14,9 +14,9 @@ use crate::shell::month_grid::data::{
 };
 use crate::shell::widget::contract::{Widget, WidgetContext, WidgetKind};
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
-use crate::style::tokens::label_hue::LabelHue;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::tokens::label_hue::LabelHue;
 use serde::{Deserialize, Serialize};
 
 /// The month widget.

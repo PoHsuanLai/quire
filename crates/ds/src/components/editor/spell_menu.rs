@@ -11,9 +11,9 @@ use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
 use crate::spell::marks::{Misspelt, SpellReplace};
 use crate::spell::service::Learned;
-use crate::style::task::{spawn_in, try_set};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
+use ds_style::task::{spawn_in, try_set};
 use std::rc::Rc;
 
 /// How many suggestions the menu lists, at most (the reference's count).

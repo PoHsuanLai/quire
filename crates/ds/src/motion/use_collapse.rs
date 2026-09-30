@@ -3,9 +3,9 @@
 //! Under Reduced it is instant.
 
 use crate::motion::detail::tween::{TweenSpec, use_tween};
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use ds_core::geometry::units::Px;
 use ds_core::vocab::{Fraction, Shown};
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How open the content is, thousandths: 0 closed, 1000 open.
 const OPEN: Fraction = Fraction(1000);

@@ -16,7 +16,7 @@ struct Member<'a> {
     values: Values,
 }
 
-/// `impl ::ds::Token for X`, or the reason `X` cannot have one.
+/// `impl ::ds_style::tokens::token::Token for X`, or the reason `X` cannot have one.
 pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
     let Data::Enum(data) = &input.data else {
         return Err(syn::Error::new_spanned(
@@ -55,35 +55,35 @@ pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
     let vars = members.iter().map(|m| {
         let (ident, var) = (m.ident, &m.var);
-        quote! { #name::#ident => ::ds::VarName(#var), }
+        quote! { #name::#ident => ::ds_style::tokens::name::VarName(#var), }
     });
     let tuned = tuned_members(name, &tokens, &members);
     let value_fn = value_fn(name, &tokens, &members);
     let prefix = &tokens.prefix;
     let kind = match tokens.kind {
-        Kind::Fixed => quote! { ::ds::TokenKind::Fixed },
-        Kind::Tuned => quote! { ::ds::TokenKind::Tuned },
+        Kind::Fixed => quote! { ::ds_style::tokens::token::TokenKind::Fixed },
+        Kind::Tuned => quote! { ::ds_style::tokens::token::TokenKind::Tuned },
     };
     let input_method = match tokens.kind {
         Kind::Fixed => quote! {},
         Kind::Tuned => {
-            quote! { fn input(self) -> Option<::ds::VarName> { Some(#name::input(self)) } }
+            quote! { fn input(self) -> Option<::ds_style::tokens::name::VarName> { Some(#name::input(self)) } }
         }
     };
     Ok(quote! {
         impl #name {
             /// The custom property this token is declared as.
-            pub const fn var(self) -> ::ds::VarName {
+            pub const fn var(self) -> ::ds_style::tokens::name::VarName {
                 match self { #(#vars)* }
             }
             #tuned
         }
 
-        impl ::ds::Token for #name {
+        impl ::ds_style::tokens::token::Token for #name {
             const PREFIX: &'static str = #prefix;
-            const KIND: ::ds::TokenKind = #kind;
+            const KIND: ::ds_style::tokens::token::TokenKind = #kind;
 
-            fn var(self) -> ::ds::VarName {
+            fn var(self) -> ::ds_style::tokens::name::VarName {
                 #name::var(self)
             }
 
@@ -130,7 +130,7 @@ fn tuned_members(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> Token
     }
     let inputs = members.iter().filter_map(|m| {
         let (ident, input) = (m.ident, m.input.as_ref()?);
-        Some(quote! { #name::#ident => ::ds::VarName(#input), })
+        Some(quote! { #name::#ident => ::ds_style::tokens::name::VarName(#input), })
     });
     let fallbacks = members.iter().filter_map(|m| {
         let ident = m.ident;
@@ -140,12 +140,12 @@ fn tuned_members(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> Token
     });
     quote! {
         /// The custom property a consumer writes to move this token.
-        pub const fn input(self) -> ::ds::VarName {
+        pub const fn input(self) -> ::ds_style::tokens::name::VarName {
             match self { #(#inputs)* }
         }
 
         /// The value the stylesheet falls back to when the consumer writes none.
-        pub fn fallback(self, scope: ::ds::TokenScope) -> &'static str {
+        pub fn fallback(self, scope: ::ds_style::tokens::token::TokenScope) -> &'static str {
             let _ = scope;
             match self { #(#fallbacks)* }
         }
@@ -226,20 +226,20 @@ fn value_expr(pick: &Pick) -> TokenStream {
         Pick::Fixed(value) => quote! { #value },
         Pick::Scheme { light, dark } => quote! {
             match scope.scheme {
-                ::ds::Scheme::Light => #light,
-                ::ds::Scheme::Dark => #dark,
+                ::ds_style::appearance::theme::Scheme::Light => #light,
+                ::ds_style::appearance::theme::Scheme::Dark => #dark,
             }
         },
         Pick::Typeface { system, editorial } => quote! {
             match scope.typeface {
-                ::ds::Typeface::System => #system,
-                ::ds::Typeface::Editorial => #editorial,
+                ::ds_style::appearance::typeface::Typeface::System => #system,
+                ::ds_style::appearance::typeface::Typeface::Editorial => #editorial,
             }
         },
         Pick::Level { standard, others } => {
             let arms = others.iter().map(|(level, text)| {
                 let level = Ident::new(level, proc_macro2::Span::call_site());
-                quote! { ::ds::MotionLevel::#level => #text, }
+                quote! { ::ds_style::appearance::motion::MotionLevel::#level => #text, }
             });
             quote! {
                 match scope.motion {
@@ -255,7 +255,7 @@ fn value_expr(pick: &Pick) -> TokenStream {
 fn value_fn(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> TokenStream {
     if let Some(path) = &tokens.css {
         return quote! {
-            fn css_value(self, scope: ::ds::TokenScope) -> ::ds::CssValue {
+            fn css_value(self, scope: ::ds_style::tokens::token::TokenScope) -> ::ds_style::tokens::token::CssValue {
                 #path(self, scope)
             }
         };
@@ -265,14 +265,14 @@ fn value_fn(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> TokenStrea
         let pick = resolve(&m.values, ident).ok()?;
         let value = value_expr(&pick);
         Some(match &m.input {
-            None => quote! { #name::#ident => ::ds::CssValue::fixed(#value), },
+            None => quote! { #name::#ident => ::ds_style::tokens::token::CssValue::fixed(#value), },
             Some(_) => quote! {
-                #name::#ident => ::ds::CssValue::tuned(#name::input(self), #name::fallback(self, scope)),
+                #name::#ident => ::ds_style::tokens::token::CssValue::tuned(#name::input(self), #name::fallback(self, scope)),
             },
         })
     });
     quote! {
-        fn css_value(self, scope: ::ds::TokenScope) -> ::ds::CssValue {
+        fn css_value(self, scope: ::ds_style::tokens::token::TokenScope) -> ::ds_style::tokens::token::CssValue {
             let _ = scope;
             match self { #(#arms)* }
         }

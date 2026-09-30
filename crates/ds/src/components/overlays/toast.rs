@@ -11,14 +11,14 @@
 
 use crate::stack::pull_tab::{Pull, PullPhase, PullTab};
 use crate::stack::toast_hub::{ToastHub, ToastState, use_toast_hub};
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::scope::use_scope_signal;
-use crate::style::tokens::timing::DurationToken;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::scope::use_scope_signal;
+use ds_style::tokens::timing::DurationToken;
 
 /// The enclosing `Ds`'s toast manager: `push(text, undo)`, one visible at a time.
 pub fn use_toasts() -> ToastHub {

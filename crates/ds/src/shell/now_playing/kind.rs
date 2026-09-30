@@ -1,7 +1,7 @@
 //! Where playback is (design/26-DETAILS.md 5.2.10).
 
 use crate::motion::detail::stamp::EventStamp;
-use crate::style::icon::Icon;
+use ds_style::icon::Icon;
 
 /// Where the player is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -55,7 +55,7 @@ pub(crate) enum PositionClock {
 mod tests {
     use super::Playback;
     use crate::motion::detail::stamp::EventStamp;
-    use crate::style::icon::Icon;
+    use ds_style::icon::Icon;
 
     #[test]
     fn the_button_offers_the_next_action() {

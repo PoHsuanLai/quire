@@ -86,8 +86,8 @@ fn fit(room: Size, ratio: Option<f32>) -> Rect {
 mod tests {
     use super::{MAT, shot_frame};
     use crate::components::content::image_source::ImageSize;
-    use crate::style::tokens::spacing::SpacingToken;
     use ds_core::geometry::units::{Point, Px, Rect, Size};
+    use ds_style::tokens::spacing::SpacingToken;
 
     fn rect(left: f32, top: f32, width: f32, height: f32) -> Rect {
         Rect {

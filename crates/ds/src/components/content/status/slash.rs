@@ -5,8 +5,8 @@ use crate::motion::detail::{
     morph::Slashed,
     tween::{TweenSpec, use_tween},
 };
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use ds_core::vocab::Fraction;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How the slash moves.
 const DRAW: TweenSpec = TweenSpec {

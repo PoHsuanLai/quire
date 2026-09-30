@@ -11,10 +11,10 @@
 //! answers [`Measured::Busy`] instead, and the read waits a frame.
 
 use crate::host::document::use_document_host;
-use crate::style::busy::{after_render, wait_out_busy};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_style::busy::{after_render, wait_out_busy};
 use std::rc::Rc;
 
 /// One attempt at reading an element's rect through the host.

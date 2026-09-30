@@ -8,9 +8,9 @@
 use crate::components::menus::palette::palette_rows::Revision;
 use crate::host::measure::MountedRef;
 use crate::host::reveal::reveal;
-use crate::style::task::spawn_in;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
+use ds_style::task::spawn_in;
 
 /// What was brought into view last: the stop, its element and the results it was among.
 type Shown = (usize, MountedRef, Revision);

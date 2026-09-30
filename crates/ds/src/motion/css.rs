@@ -11,9 +11,9 @@ use crate::motion::{
     anim::Anim,
     recipe::{Fill, Iteration, Recipe},
 };
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::emit::{attr_selector, property, rule};
 use ds_core::word::Word;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::emit::{attr_selector, property, rule};
 
 /// The canonical keyframes, verbatim from design/05-MOTION.md section 4 (without `filter`).
 pub const MOTION: &str = include_str!("motion.css");

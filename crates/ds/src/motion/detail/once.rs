@@ -12,9 +12,9 @@ use crate::motion::{
     pulse::use_pulse,
     timer::{TimerPhase, use_motion_timer},
 };
-use crate::style::appearance::motion::MotionLevel;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_style::appearance::motion::MotionLevel;
 
 /// `anim` once each time `cue` is a new change to one of `moments`, at rest otherwise (and with
 /// no cue at all). Render the key on the HTML wrapper that moves (`PulseKey::attrs`).

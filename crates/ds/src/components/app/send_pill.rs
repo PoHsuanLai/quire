@@ -12,11 +12,11 @@
 //! text.
 
 use crate::components::app::send_mood::SendMood;
-use crate::style::tokens::delay::DelayToken;
 use dioxus::prelude::*;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
+use ds_style::tokens::delay::DelayToken;
 use std::time::Duration;
 
 /// How long an undo-send countdown runs (proposed), the consumer's to count.

@@ -3,9 +3,9 @@
 //! recoloured to the text colour (symbolic) or as it is (an image), or a status glyph.
 
 use crate::components::content::status::family::StatusState;
-use crate::style::icon::Icon;
-use crate::style::icon::render::IconSize;
-use crate::style::icon::url::IconUrl;
+use ds_style::icon::Icon;
+use ds_style::icon::render::IconSize;
+use ds_style::icon::url::IconUrl;
 
 /// An external icon and the size it is drawn at, in the glyph scale.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

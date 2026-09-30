@@ -3,8 +3,8 @@
 
 use super::Timeline;
 use super::ease::Ease;
-use crate::style::tokens::easing::Easing;
 use ds_core::vocab::Fraction;
+use ds_style::tokens::easing::Easing;
 use std::time::Duration;
 
 /// A value gliding from `from` to `to` along `ease`. Values are in whatever unit the caller
@@ -73,8 +73,8 @@ impl Timeline for Glide {
 #[cfg(test)]
 mod tests {
     use super::{Glide, Timeline};
-    use crate::style::appearance::motion::MotionLevel;
-    use crate::style::tokens::easing::{Easing, EasingToken};
+    use ds_style::appearance::motion::MotionLevel;
+    use ds_style::tokens::easing::{Easing, EasingToken};
     use std::time::Duration;
 
     const MS: fn(u64) -> Duration = Duration::from_millis;

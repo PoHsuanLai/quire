@@ -4,19 +4,19 @@
 //!
 //! Its timers are tasks of the root that provides it and drop with it; every write a timer makes
 //! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
-//! (`crate::style::task`).
+//! (`ds_style::task`).
 
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{
     HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
 use crate::motion::settle::settle;
-use crate::style::scope::Scope;
-use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::scope::Scope;
+use ds_style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
+use ds_style::tokens::delay::DelayToken;
 use std::time::Duration;
 
 /// A card the hub is tracking: the consumer's key and the kind of card.

@@ -14,11 +14,11 @@ use crate::motion::detail::{
     use_operation::use_operation,
     use_pending::use_pending,
 };
-use crate::style::icon::render::IconSize;
-use crate::style::icon::shape::Shape;
-use crate::style::icon::stroke::stroke_width;
-use crate::style::scale::use_scale;
 use dioxus::prelude::*;
+use ds_style::icon::render::IconSize;
+use ds_style::icon::shape::Shape;
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
 
 /// The searching loop: the dot and the three arcs, one at a time (a step every `--t-spin-step`).
 pub(crate) const SEARCHING: PendingSpec = PendingSpec {

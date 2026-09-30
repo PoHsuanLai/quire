@@ -8,10 +8,10 @@ use super::spring::{Leg, SpringPhase, State};
 use super::spring_spec::SpringSpec;
 use super::timeline::playback::{Playback, use_playback};
 use super::timeline::spring::{PxPerUnit, Spring, SpringFrame};
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::scope::Scope;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::scope::Scope;
 
 /// A spring a component drives: read its frame in render, move it from a handler or an effect.
 #[derive(Debug, Clone, Copy, PartialEq)]

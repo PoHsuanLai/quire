@@ -19,11 +19,11 @@ use crate::motion::detail::{
     pending::PendingFrame, touch::Touch, use_detail::use_detail, use_operation::use_operation,
     use_pending::use_pending,
 };
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::Availability;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// One settings row. `onclick` hears a press on the row (a toggle's own press is the toggle's).
 ///

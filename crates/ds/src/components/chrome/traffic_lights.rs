@@ -10,7 +10,6 @@ use crate::components::chrome::light_mark::{LightMark, Mark};
 use crate::components::menus::menu_entry::{MenuEntry, MenuTile, MenuTrail};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::host::measure::{Anchor, MountedRef};
-use crate::style::icon::Icon;
 use crate::window::hold::{Click, Hold, Opens, Waiting};
 use crate::window::{
     host::{WindowHost, use_window_host, use_window_state},
@@ -22,6 +21,7 @@ use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
 use ds_core::vocab::{Availability, Shown};
 use ds_core::word::Word;
+use ds_style::icon::Icon;
 use std::time::Duration;
 
 /// Whether the tiling menu is open as the lights mount: `Open` poses it (a gallery, a picture).

@@ -5,10 +5,10 @@
 //! frame a second only while someone can see it.
 
 use crate::shell::now_playing::kind::{Playback, PositionClock};
-use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
+use ds_style::task::{Gone, spawn_in, try_get, try_set};
 use std::time::{Duration, Instant};
 
 /// A position report: where, out of how long, and whether it runs.

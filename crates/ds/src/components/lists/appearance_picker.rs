@@ -5,16 +5,16 @@
 
 use crate::components::controls::segmented::{SegSize, SegmentedControl};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
-use crate::style::appearance::{
+use dioxus::prelude::*;
+use ds_core::vocab::Check;
+use ds_core::word::Word;
+use ds_style::appearance::{
     accent::Accent,
     appearance::Appearance,
     system::SystemPrefs,
     theme::{Scheme, Theme},
 };
-use crate::style::css::accents_css::swatch_var;
-use dioxus::prelude::*;
-use ds_core::vocab::Check;
-use ds_core::word::Word;
+use ds_style::css::accents_css::swatch_var;
 
 /// What "System" answers to right now, shown as the Theme header's value while the theme
 /// follows the desktop. Not specified (O-16): the doc gives `system` no role of its own.
@@ -108,7 +108,7 @@ pub fn AppearancePicker(
 #[cfg(test)]
 mod tests {
     use super::theme_hint;
-    use crate::style::appearance::{
+    use ds_style::appearance::{
         system::{ReducedMotion, SystemPrefs},
         theme::{Scheme, Theme},
     };

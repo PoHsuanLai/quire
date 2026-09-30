@@ -1,6 +1,6 @@
 //! What the linter rejects, and how strictly.
 
-use crate::style::kit::{Kits, KnownNames};
+use ds_style::kit::{Kits, KnownNames};
 
 /// One thing a consumer stylesheet or markup may not do.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]

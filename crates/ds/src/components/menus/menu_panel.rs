@@ -16,7 +16,6 @@ use crate::components::menus::{
 use crate::components::overlays::popover::{Stacking, layer_slug, position_style, use_float};
 use crate::host::measure::MountedRef;
 use crate::stack::menu_track::types::{MenuTarget, MenuTiming};
-use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},
@@ -25,6 +24,7 @@ use ds_core::geometry::{
 use ds_core::press::Press;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
+use ds_style::tokens::layer::ZLayer;
 
 /// How far a submenu sits from its parent panel (design/13 section 13.3.4: "gap 2").
 const SUB_GAP: Px = Px(2.0);

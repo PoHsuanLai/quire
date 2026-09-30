@@ -6,15 +6,13 @@ use crate::motion::{
     roster::RowPitch,
     use_roster::{LeaveBy, RosterSpec, use_roster},
 };
-use crate::style::appearance::{
-    accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
-};
-use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::scope::Scope;
 use dioxus::core::{NoOpMutations, VirtualDom};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::{Activity, InputModality};
+use ds_style::appearance::{accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme};
+use ds_style::appearance::{blur::BlurState, material::Material};
+use ds_style::scope::Scope;
 use std::cell::Cell;
 
 thread_local! {

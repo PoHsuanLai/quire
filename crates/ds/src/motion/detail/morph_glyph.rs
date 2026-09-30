@@ -10,15 +10,15 @@ use crate::motion::{
     anim::Anim,
     timer::{TimerPhase, use_motion_timer},
 };
-use crate::style::appearance::motion::MotionLevel;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
-use crate::style::icon::stroke::stroke_width;
-use crate::style::scale::use_scale;
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::appearance::motion::MotionLevel;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The incoming glyph's fade.
 const FADE_IN: Anim = Anim::MorphFadeIn;

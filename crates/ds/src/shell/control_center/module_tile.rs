@@ -15,12 +15,12 @@ use crate::components::controls::press::{PressListeners, Propagation};
 use crate::focus::click::kept_click;
 use crate::shell::control_center::module_disc::ModuleDisc;
 use crate::shell::control_center::module_tile_kind::{Chevron, ModuleState, TileSpan};
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{Availability, Shown};
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// A control-center module. `onclick` toggles it (a press on the tile, Enter or Space);
 /// `on_detail` opens its detail pane (a press on the chevron, Enter or Right on the chevron).

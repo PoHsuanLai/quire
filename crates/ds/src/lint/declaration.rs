@@ -11,9 +11,9 @@ use super::rule::{Offence, Profile, Rule};
 use super::text::render;
 use super::tokenize::Located;
 use super::walk::Decl;
-use crate::style::kit::KnownNames;
-use crate::style::tokens::type_scale::Family;
 use ds_core::word::Word;
+use ds_style::kit::KnownNames;
+use ds_style::tokens::type_scale::Family;
 
 /// Colour functions: `rgb()`, `rgba()`, `hsl()`, `hwb()`, `oklch()`, `color-mix()`, ...
 pub(super) const COLOUR_FUNCTIONS: &[&str] = &[
@@ -227,7 +227,7 @@ fn is_face_reference(value: &[Located]) -> bool {
             Family::ALL
                 .iter()
                 .any(|family| family.var().as_str() == name)
-                || name == crate::style::tokens::emoji_face::FONT_EMOJI.as_str()
+                || name == ds_style::tokens::emoji_face::FONT_EMOJI.as_str()
         }
         _ => false,
     }

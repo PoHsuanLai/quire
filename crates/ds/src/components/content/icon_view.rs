@@ -5,11 +5,11 @@
 
 use crate::components::content::icon_source::{ExternalIcon, IconSource};
 use crate::components::content::status::family::StatusGlyph;
-use crate::style::icon::family::PlateFamily;
-use crate::style::icon::plate_tint::{PlateTint, tint_style};
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::plate_tint::{PlateTint, tint_style};
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// Which way an external icon is painted: the `data-kind` word and the property its URL is
 /// written into.
@@ -120,15 +120,15 @@ fn external_icon(external: &ExternalIcon, paint: Paint) -> Element {
 pub struct GlyphSlot;
 
 /// `Button { icon: Icon::Send }`: a bare glyph fills a slot that takes an [`IconSource`].
-impl dioxus::core::SuperFrom<crate::style::icon::Icon, GlyphSlot> for Option<IconSource> {
-    fn super_from(icon: crate::style::icon::Icon) -> Self {
+impl dioxus::core::SuperFrom<ds_style::icon::Icon, GlyphSlot> for Option<IconSource> {
+    fn super_from(icon: ds_style::icon::Icon) -> Self {
         Some(IconSource::Glyph(icon))
     }
 }
 
 /// `Button { icon: Some(Icon::Archive) }` too.
-impl dioxus::core::SuperFrom<Option<crate::style::icon::Icon>, GlyphSlot> for Option<IconSource> {
-    fn super_from(icon: Option<crate::style::icon::Icon>) -> Self {
+impl dioxus::core::SuperFrom<Option<ds_style::icon::Icon>, GlyphSlot> for Option<IconSource> {
+    fn super_from(icon: Option<ds_style::icon::Icon>) -> Self {
         icon.map(IconSource::Glyph)
     }
 }

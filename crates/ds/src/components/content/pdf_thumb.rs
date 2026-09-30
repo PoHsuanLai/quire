@@ -14,12 +14,12 @@ use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::image_source::{ImageSize, ImageSource};
 use crate::components::content::picture_fit::picture_style;
-use crate::style::icon::Icon;
-use crate::style::icon::family::PlateFamily;
-use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px, Rect, Size};
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::render::{IconPx, IconSize};
 
 /// A sheet whose page is not known yet (loading, or no pages): A4 portrait, in points.
 pub const PDF_DEFAULT_SHEET: ImageSize = ImageSize {

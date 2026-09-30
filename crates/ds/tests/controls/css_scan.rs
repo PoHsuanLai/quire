@@ -93,7 +93,7 @@ pub const STYLES: &[(&str, &[&str])] = &[
         "window_frame",
         &[
             include_str!("../../src/components/chrome/window_frame.css"),
-            include_str!("../../src/style/css/utilities.css"),
+            include_str!("../../../ds-style/src/css/utilities.css"),
         ],
     ),
 ];

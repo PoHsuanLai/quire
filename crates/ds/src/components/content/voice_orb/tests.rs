@@ -1,9 +1,9 @@
 use super::model::{Contrast, OrbColour, OrbColours, OrbMask, OrbMetrics, Turn};
 use super::step::turn_after;
 use super::view::style_attr;
-use crate::style::tokens::hex::Hex;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Percent;
+use ds_style::tokens::hex::Hex;
 use std::time::Duration;
 
 /// One size and every value it must give, worked by hand from the reference's formulas.

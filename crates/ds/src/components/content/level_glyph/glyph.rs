@@ -9,15 +9,15 @@
 //! centre (10, 12) at radii 5, 8.25 and 11.5, spaced so a 2-unit stroke leaves a gap between them.
 
 use super::vocab::LevelGlyph;
-use crate::style::icon::Icon;
-use crate::style::icon::render::IconSize;
-use crate::style::icon::shape::Shape;
-use crate::style::icon::stroke::stroke_width;
-use crate::style::scale::use_scale;
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Muting;
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::IconSize;
+use ds_style::icon::shape::Shape;
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
 
 const WAVE_1: &[Shape] = &[Shape::Path("M13.83 8.79a5 5 0 0 1 0 6.42")];
 const WAVE_2: &[Shape] = &[Shape::Path("M16.32 6.7a8.25 8.25 0 0 1 0 10.6")];

@@ -16,10 +16,10 @@ use crate::shell::widget::contract::WidgetKind;
 use crate::shell::widget::exit::{CardPresence, use_card_exit};
 use crate::shell::widget::kind::{CardTint, Lift, WidgetHost, WidgetSize, WidgetTitle};
 use crate::shell::widget::scope::use_frame_provider;
-use crate::style::appearance::material::Material;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::appearance::material::Material;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// `children` on a widget's card, `size` on the grid unit, for `host`, tinted with `tint` (the
 /// Space's by default; a tile never lays a second gradient, `CardTint::on`). `kind` writes

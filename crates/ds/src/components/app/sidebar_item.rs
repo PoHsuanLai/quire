@@ -6,11 +6,11 @@ use crate::components::controls::count::{Count, CountPlace};
 use crate::components::lists::row_hooks::relay;
 use crate::focus::click::kept_click;
 use crate::motion::presence::Presence;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::vocab::{RowState, Selection};
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// What kind of place.
 #[derive(Debug, Clone, PartialEq)]

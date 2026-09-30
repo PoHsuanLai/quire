@@ -2,7 +2,7 @@
 //! state the catalogue has no motion for. The catalogue's own rows are in `recipe.rs`.
 
 use super::recipe::{Fill, Iteration, Recipe, recipe};
-use crate::style::tokens::{easing::EasingToken, timing::DurationToken};
+use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// `menu-out` (design/13 section 13.3.2): "fade over `--t-quick` with `--e-exit`".
 pub(super) const MENU_OUT: Recipe = recipe(

@@ -55,21 +55,21 @@ use crate::stack::host::{OverlayHost, use_overlays_provider};
 use crate::stack::hover_hub::use_hover_hub_provider;
 use crate::stack::layer_stack::LayerStack;
 use crate::stack::toast_hub::use_toast_hub_provider;
-use crate::style::appearance::{
-    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
-};
-use crate::style::appearance::{blur::BlurState, material::Material};
-use crate::style::material::recipe::DEFAULT_TINT_ALPHA;
-use crate::style::material::stack::MaterialStack;
-use crate::style::scale::use_root_scale;
-use crate::style::scope::{Scope, use_scope_provider};
-use crate::style::space::{frame_vars::FrameVars, look::SpaceLook};
-use crate::style::tokens::hex::Alpha;
-use crate::style::tokens::{pixel::PixelToken, shape::Corner};
 use dioxus::prelude::*;
 use ds_core::geometry::scale::Scale;
 use ds_core::vocab::{Activity, InputModality};
 use ds_core::word::Word;
+use ds_style::appearance::{
+    appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
+};
+use ds_style::appearance::{blur::BlurState, material::Material};
+use ds_style::material::recipe::DEFAULT_TINT_ALPHA;
+use ds_style::material::stack::MaterialStack;
+use ds_style::scale::use_root_scale;
+use ds_style::scope::{Scope, use_scope_provider};
+use ds_style::space::{frame_vars::FrameVars, look::SpaceLook};
+use ds_style::tokens::hex::Alpha;
+use ds_style::tokens::{pixel::PixelToken, shape::Corner};
 use std::rc::Rc;
 
 /// How the stylesheet reaches the document.

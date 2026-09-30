@@ -4,7 +4,8 @@
 use crate::shell::battery::device_glyph::Device;
 use crate::shell::emoji::id::EmojiId;
 use crate::shell::widget::kind::{WidgetHost, WidgetSize};
-use crate::style::appearance::{
+use ds_core::testing::word_matches_serde;
+use ds_style::appearance::{
     accent::Accent,
     material::Material,
     motion::{Motion, MotionLevel},
@@ -12,9 +13,8 @@ use crate::style::appearance::{
     theme::{Scheme, Theme},
     typeface::Typeface,
 };
-use crate::style::look::Look;
-use crate::style::tokens::label_hue::LabelHue;
-use ds_core::testing::word_matches_serde;
+use ds_style::look::Look;
+use ds_style::tokens::label_hue::LabelHue;
 
 #[test]
 fn stored_vocabularies_serialise_as_their_slugs() {

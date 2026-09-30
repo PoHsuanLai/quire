@@ -22,11 +22,11 @@ use crate::motion::{
     anim::Anim,
     timer::{MotionTimer, TimerPhase, use_motion_timer},
 };
-use crate::style::task::spawn_in;
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_style::task::spawn_in;
 
 /// Whether a group's action ran since the results last changed: through the palette itself, or
 /// marked by the caller.

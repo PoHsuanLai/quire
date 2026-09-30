@@ -4,8 +4,8 @@
 //! screen's layout, so a shell draws it without layout rules of its own.
 
 use crate::components::content::image_source::ImageSource;
-use crate::style::icon::url::IconUrl;
 use dioxus::prelude::*;
+use ds_style::icon::url::IconUrl;
 
 /// The lock screen's stage. Put it in a root that fills its surface (`Ds { material:
 /// Material::Window, extent: RootExtent::Viewport, .. }`, one per output); `wallpaper` is the

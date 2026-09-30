@@ -8,9 +8,6 @@
 //! (`scripts/check-boundary.sh`). Every public item has one path: a root name, or a name in one
 //! of the modules below. DESIGN.md maps each module to the design doc section it implements.
 
-// The derive names the trait `::ds::Word`, so inside this crate `ds` is the crate itself.
-extern crate self as ds;
-
 mod assembly;
 pub mod catalog;
 mod components;
@@ -27,7 +24,6 @@ mod root;
 mod shell;
 mod spell;
 mod stack;
-mod style;
 pub mod time;
 pub mod widget;
 mod window;
@@ -345,7 +341,36 @@ pub use crate::stack::{
     toast_hub::{ToastState, UndoToken, use_toast_hub},
     typeahead::Typeahead,
 };
-pub use crate::style::{
+pub use crate::window::{
+    host::{HostWindow, WindowHost, use_window_host_provider},
+    vocab::{
+        Activation, Fullscreen, Maximized, ResizeEdge, Support, TileError, WindowState, WindowTile,
+        Zoom,
+    },
+};
+pub use ds_core::word::Word;
+pub use ds_core::{
+    colour::contrast::{Verdict, ratio},
+    geometry::{
+        placement::{Align, Flip, Placed, Placement, Side, place},
+        scale::Scale,
+        units::{Point, Px, Rect, Size},
+    },
+    press::{PointerButton, Press},
+    spawner::Spawner,
+    standard_action::{Reserved, SpaceNumber, StandardAction},
+    text::clip::clip_chars,
+    time::{
+        FRAME_SLACK, FRAME_TICK,
+        clock::{ClockGuard, VirtualClock, sleep},
+    },
+    vocab::{
+        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
+        InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
+        Shown,
+    },
+};
+pub use ds_style::{
     appearance::{
         accent::Accent,
         appearance::Appearance,
@@ -402,35 +427,6 @@ pub use crate::style::{
         token::{CssValue, Token, TokenKind, TokenScope},
         type_scale::{Family, FontSize},
         type_voice::VoiceToken,
-    },
-};
-pub use crate::window::{
-    host::{HostWindow, WindowHost, use_window_host_provider},
-    vocab::{
-        Activation, Fullscreen, Maximized, ResizeEdge, Support, TileError, WindowState, WindowTile,
-        Zoom,
-    },
-};
-pub use ds_core::word::Word;
-pub use ds_core::{
-    colour::contrast::{Verdict, ratio},
-    geometry::{
-        placement::{Align, Flip, Placed, Placement, Side, place},
-        scale::Scale,
-        units::{Point, Px, Rect, Size},
-    },
-    press::{PointerButton, Press},
-    spawner::Spawner,
-    standard_action::{Reserved, SpaceNumber, StandardAction},
-    text::clip::clip_chars,
-    time::{
-        FRAME_SLACK, FRAME_TICK,
-        clock::{ClockGuard, VirtualClock, sleep},
-    },
-    vocab::{
-        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, Fraction,
-        InputModality, Muting, Percent, PressPhase, RowState, Selection, Shortcut, ShortcutKey,
-        Shown,
     },
 };
 

@@ -1,9 +1,9 @@
 //! CommandPill: "Search or run a command", on the frame (design/04-COMPONENTS.md section 8).
 
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::vocab::Shortcut;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 
 /// The full-width pill that opens the command palette.
 #[component]

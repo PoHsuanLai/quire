@@ -2,8 +2,8 @@
 //! and the kits a surface is drawn with.
 
 use crate::assembly::sheets::SHEETS;
-use crate::style::css::document::{sheets, utilities_css};
-use crate::style::kit::{Kit, KitRank, Kits, STYLE_KIT, Section, Vocabulary};
+use ds_style::css::document::{sheets, utilities_css};
+use ds_style::kit::{Kit, KitRank, Kits, STYLE_KIT, Section, Vocabulary};
 use std::borrow::Cow;
 
 /// The components' contribution to the stylesheet.

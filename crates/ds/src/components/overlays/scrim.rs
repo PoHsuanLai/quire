@@ -4,9 +4,9 @@
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Stacking, use_float};
 use crate::components::overlays::scrim_strength::ScrimStrength;
-use crate::style::tokens::layer::ZLayer;
 use dioxus::prelude::*;
 use ds_core::vocab::Dismiss;
+use ds_style::tokens::layer::ZLayer;
 
 /// The scrim button itself, for a modal that draws its own (`Peek`, `Sheet`): a click closes
 /// when `closes()` says the modal is the topmost layer.
@@ -123,7 +123,7 @@ fn layer_style(layer: ZLayer) -> String {
 #[cfg(test)]
 mod tests {
     use super::layer_style;
-    use crate::style::tokens::layer::ZLayer;
+    use ds_style::tokens::layer::ZLayer;
 
     #[test]
     fn a_layer_is_written_as_its_token() {

@@ -16,12 +16,12 @@ use crate::motion::{
     use_spring::use_spring,
 };
 use crate::shell::switcher::switcher_fit::{SwitcherMetrics, fit};
-use crate::style::icon::family::PlateFamily;
-use crate::style::icon::render::{IconPx, IconSize};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
 use ds_core::vocab::Shown;
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::render::{IconPx, IconSize};
 
 /// An application in the switcher, by the shell's own id for it (its app id).
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]

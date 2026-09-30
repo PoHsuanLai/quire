@@ -3,13 +3,13 @@
 
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
-use crate::style::icon::Icon;
-use crate::style::icon::render::{Glyph, IconSize};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Rect;
 use ds_core::vocab::Selection;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{Glyph, IconSize};
 use std::rc::Rc;
 
 /// Which action a strip button is, by the consumer's own name: `archive`, `snooze`.

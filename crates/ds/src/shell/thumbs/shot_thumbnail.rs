@@ -34,12 +34,12 @@ use crate::shell::notifications::parts::Hover;
 use crate::shell::notifications::swipe::{CardSwipe, NotificationSwipe, use_card_swipe};
 use crate::shell::thumbs::shot_frame::shot_frame;
 use crate::shell::thumbs::shot_press::{DragLane, DragStart, PressInput, ShotPress};
-use crate::style::appearance::material::Material;
-use crate::style::icon::Icon;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Shown;
 use ds_core::word::Word;
+use ds_style::appearance::material::Material;
+use ds_style::icon::Icon;
 
 /// One action the thumbnail offers on hover: Delete now; Mark Up and Copy Text once the shell
 /// has them. Its press stays at its button: it never also opens the picture.

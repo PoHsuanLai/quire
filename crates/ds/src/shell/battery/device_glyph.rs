@@ -5,9 +5,9 @@
 //! `svg.ds-ic` box as every other glyph and size the same way.
 
 use crate::shell::battery::device_forms::{form_of, path_of};
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
 use ds_core::word::Word;
+use ds_style::icon::render::IconSize;
 use serde::{Deserialize, Serialize};
 
 /// A device that reports a battery.

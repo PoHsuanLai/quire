@@ -53,7 +53,7 @@ Editorial's faces, as the prototype loads them:
 
 Loading URLs: `S:4`, `C:4`. The design system ships the faces as subset TTFs (latin plus
 latin-ext) registered with the renderer, not as CSS `@font-face` (`P:289`, `P:306`, `P:324`).
-Inter is cut from the official Inter 4.1 release (`crates/ds/scripts/cut-inter.sh` records the
+Inter is cut from the official Inter 4.1 release (`crates/ds-style/scripts/cut-inter.sh` records the
 zip's SHA-256): the renderer sets no optical size from the font size, so the variable font's
 `opsz` axis is pinned into two families, Inter at 14 and Inter Display at 32, each keeping its
 `wght` range; the layout features kept are `kern`, `mark`, `mkmk`, `ccmp`, `locl`, `calt`,

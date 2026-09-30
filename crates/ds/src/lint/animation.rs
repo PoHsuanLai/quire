@@ -12,7 +12,7 @@ use super::kind;
 use super::rule::{Offence, Rule};
 use super::tokenize::Located;
 use super::walk::Decl;
-use crate::style::kit::KnownNames;
+use ds_style::kit::KnownNames;
 
 /// Every keyword the `animation` shorthand accepts that is not a keyframes name. `none` is here
 /// too: as a name it means no animation, which is always known.

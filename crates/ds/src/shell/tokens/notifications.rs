@@ -4,10 +4,10 @@
 //! width, each a tuned token its `notifications.*` key moves through one inline write
 //! ([`NotificationMetrics::style_attr`]) on any element around the banners or the center.
 
-use crate::style::tokens::token::Token;
-use crate::style::tokens::tuned::px;
 use ds_core::geometry::units::Px;
 use ds_core::word::Word;
+use ds_style::tokens::token::Token;
+use ds_style::tokens::tuned::px;
 
 /// One notification geometry token, each a tuned token its `notifications.*` key moves.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
@@ -133,9 +133,9 @@ impl NotificationMetrics {
 #[cfg(test)]
 mod tests {
     use super::{NotificationMetrics, NotificationToken};
-    use crate::style::tokens::token::TokenScope;
     use ds_core::geometry::units::Px;
     use ds_core::word::Word;
+    use ds_style::tokens::token::TokenScope;
 
     #[test]
     fn the_defaults_write_what_the_stylesheet_falls_back_to() {

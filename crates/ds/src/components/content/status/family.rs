@@ -8,8 +8,8 @@ use super::bluetooth_state::BluetoothState;
 use super::volume::{VolumeGlyph, VolumeState};
 use super::wifi::WifiGlyph;
 use super::wifi_state::WifiState;
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_style::icon::render::IconSize;
 
 /// One status item's state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]

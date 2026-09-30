@@ -9,8 +9,8 @@ use crate::motion::detail::{
     use_operation::use_operation,
 };
 use crate::shell::control_center::module_tile_kind::ModuleState;
-use crate::style::icon::render::IconSize;
 use dioxus::prelude::*;
+use ds_style::icon::render::IconSize;
 
 /// The disc's own reading of the module's state: what the disc plays is its Pending ring.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
