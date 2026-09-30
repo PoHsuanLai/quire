@@ -8,7 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{Activity, Appearance, Ds, Icon, IconSource, Material, PlateFamily, Px, Shown};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use ds_shell::DockTile;
 use probe::rect;
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -45,8 +45,7 @@ fn Tile() -> Element {
 
 fn laid_out(lift: u32) -> Harness {
     LIFT.store(lift, Ordering::Relaxed);
-    let mut harness =
-        Harness::with_config(Tile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Tile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(400));
     harness
 }

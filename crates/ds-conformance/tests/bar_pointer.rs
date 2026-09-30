@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Selection};
-use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::{BarPointer, MenuBarItem, WorkspacePill, WorkspacePills};
 use std::cell::RefCell;
 use std::time::Duration;
@@ -51,8 +51,7 @@ fn Bar() -> Element {
 
 fn started() -> Harness {
     HEARD.with(|log| log.borrow_mut().clear());
-    let mut harness =
-        Harness::with_config(Bar, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Bar, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     harness
 }
@@ -67,15 +66,15 @@ fn a_menu_bar_item_and_a_workspace_pill_hear_the_pointer_themselves() {
     let title = harness
         .centre(".ds-menu-bar-item")
         .expect("the item is laid out");
-    harness.pointer_move(title);
-    harness.click(title);
+    harness.send(Input::pointer_move(title));
+    harness.send(Input::click(title));
     let heard = log();
     for want in ["title enter", "title down", "title up"] {
         assert!(heard.contains(&want), "{want}: {heard:?}");
     }
     HEARD.with(|log| log.borrow_mut().clear());
     let pill = harness.centre(".ds-ws-pill").expect("the pill is laid out");
-    harness.click(pill);
+    harness.send(Input::click(pill));
     let heard = log();
     for want in ["pill down", "pill up"] {
         assert!(heard.contains(&want), "{want}: {heard:?}");
