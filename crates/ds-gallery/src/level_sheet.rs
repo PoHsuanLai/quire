@@ -39,7 +39,7 @@ fn Row() -> Element {
     let (style, scheme, ground) = ROW.get();
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window,
-            style { {style::CSS} }
+            AppStyle { css: style::CSS }
             div { class: "g-level-sheet",
                 div { class: "g-row g-row-top",
                     div { class: "g-col g-level-label",

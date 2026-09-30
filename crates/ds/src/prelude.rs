@@ -2,6 +2,7 @@
 //! name. Everything else is reached by its home path (ARCHITECTURE.md section 6).
 
 // Root and appearance
+pub use crate::assembly::app_style::AppStyle;
 pub use crate::assembly::ds::Ds;
 pub use crate::root::surface::Surface;
 pub use ds_style::appearance::accent::Accent;

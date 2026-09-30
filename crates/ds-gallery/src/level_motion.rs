@@ -35,7 +35,7 @@ const PER_ROW: usize = 5;
 fn Motion() -> Element {
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, look: work(Theme::Light), material: Material::Window,
-            style { {style::CSS} }
+            AppStyle { css: style::CSS }
             div { class: "g-level-ground",
                 Ds {
                     appearance: Appearance { theme: Theme::Light, ..Appearance::default() },

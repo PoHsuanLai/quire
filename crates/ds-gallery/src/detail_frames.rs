@@ -59,7 +59,7 @@ fn Stage() -> Element {
     };
     rsx! {
         Ds { appearance: Appearance { theme: Theme::Light, ..Appearance::default() }, material: Material::Window, stylesheet: Inject::Inline,
-            style { {style::CSS} }
+            AppStyle { css: style::CSS }
             div { style: "padding:30px", {body} }
         }
     }

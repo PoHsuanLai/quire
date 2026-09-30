@@ -17,8 +17,9 @@
 //! inks.
 //!
 //! `user_style` is the person's own stylesheet (`ds_settings::UserStyle`, ARCHITECTURE.md section
-//! 10): its text goes in `<style data-ds-user>` right after the design-system sheet, so a change
-//! to the signal restyles the document and a rule of theirs wins by order. An empty style draws no
+//! 10): its text goes in `<style data-ds-user>` right after the design-system sheet, unlayered, so
+//! a change to the signal restyles the document and a rule of theirs beats the design system's
+//! `@layer ds` (and a consumer's `@layer app`, `AppStyle`) whatever the specificity. An empty style draws no
 //! element at all.
 //!
 //! `surface` is the consumer's name for the surface this root is (`[data-surface=bar]`, the public
@@ -188,7 +189,8 @@ pub fn Ds(
             if stylesheet == Inject::Inline {
                 style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
             }
-            // After the design-system sheet, so a rule of the person's wins by order.
+            // Unlayered, so a rule of the person's beats every layered rule (the design system's `ds`
+            // and a consumer's `app`) whatever its specificity.
             if !user_style.read().is_blank() {
                 style { "data-ds-user": "", {user_style.read().0.clone()} }
             }
