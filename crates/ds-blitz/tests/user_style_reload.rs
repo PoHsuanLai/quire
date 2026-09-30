@@ -137,3 +137,37 @@ fn removing_the_style_element_returns_to_the_default_and_adding_one_restyles() {
         "and its text change restyles again"
     );
 }
+
+/// A user rule written with an unprefixed attribute selector (`[data-surface=bar]`, the form
+/// `ds::selectors` lists) matches the attribute Dioxus wrote; `[*|data-surface=bar]` still does.
+#[allow(non_snake_case)]
+fn Surfaced() -> Element {
+    rsx! {
+        div { class: "ds",
+            style {
+                ".probe[data-surface=bar] {{ background: rgb(0,255,0); width: 60px; height: 60px }} \
+                 .probe[*|data-surface=bar] {{ height: 40px }} \
+                 .probe[data-surface=baz] {{ background: rgb(255,0,0) }}"
+            }
+            div { class: "probe", "data-surface": "bar" }
+        }
+    }
+}
+
+#[test]
+fn an_unprefixed_attribute_selector_matches_a_dioxus_attribute() {
+    let harness = Harness::new(
+        Surfaced,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    assert_eq!(
+        fill(&harness),
+        [0, 255, 0, 255],
+        "the unprefixed rule matched"
+    );
+    assert_eq!(
+        harness.rect(".probe").expect("probe").size.height.0,
+        40.0,
+        "the prefixed rule matched too"
+    );
+}

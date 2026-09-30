@@ -82,12 +82,9 @@ fn the_report_accepts_every_listed_selector_and_notes_one_that_is_not() {
         .chain(
             AXES.iter()
                 .filter(|a| !a.attribute.ends_with('*'))
-                .map(|a| format!("[*|{}]", a.attribute)),
+                .map(|a| format!("[{}]", a.attribute)),
         )
-        .chain([
-            "[*|data-surface=bar]".to_owned(),
-            "[*|aria-label]".to_owned(),
-        ])
+        .chain(["[data-surface=bar]".to_owned(), "[aria-label]".to_owned()])
         .collect();
     for selector in listed {
         let notes = ds_lint::user_stylesheet(&format!("{selector} {{ color: red }}"), &kits);
