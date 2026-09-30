@@ -12,6 +12,7 @@ members = [
   "crates/ds-settings-derive",
   "crates/ds-blitz",
   "crates/ds-harness",
+  "crates/ds-conformance",
   "crates/anyrender_pdfrum",
   "crates/ds-gallery",
   "tools/icons",

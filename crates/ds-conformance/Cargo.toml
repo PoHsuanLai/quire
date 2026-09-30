@@ -1,0 +1,21 @@
+[package]
+name = "ds-conformance"
+description = "Behaviour tests for every quire component, driven through ds-harness on a real Blitz document. Test-only."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dev-dependencies]
+ds = { workspace = true }
+ds-shell = { workspace = true }
+ds-blitz = { workspace = true }
+ds-harness = { workspace = true }
+ds-settings = { workspace = true, features = ["dioxus"] }
+dioxus = { workspace = true }
+image = { workspace = true }
+
+[lints]
+workspace = true
