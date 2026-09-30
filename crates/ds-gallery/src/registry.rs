@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 25] = [
+pub const REGISTRY: [Entry; 26] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -179,7 +179,7 @@ pub const REGISTRY: [Entry; 25] = [
     Entry {
         page: Page::Emoji,
         title: "Emoji",
-        lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the reactions a mood swaps in, one pick in every mood, the sizes and the discs, and the user picture's picker.",
+        lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the sizes and the discs, and the user picture's picker; each plays its own animation once and rests.",
         height: 2500,
         body: pages::emoji::EmojiPage,
     },
@@ -196,6 +196,13 @@ pub const REGISTRY: [Entry; 25] = [
         lede: "The voice orb: the default at 192 px, a small one at 96 px and one with its own colours at 128 px on a 15 s period, all turning while active and at rest when not, and a ladder of sizes that crosses every threshold of its size-derived look.",
         height: 900,
         body: pages::voice_orb::VoiceOrbPage,
+    },
+    Entry {
+        page: Page::Shell,
+        title: "Shell",
+        lede: "The shell-only components rebuilt on the survivors, each in every state: MenuBarItem and WorkspacePills, ModuleGrid with its tiles and panels, BatteryRing, DockTile, WidgetFrame and AnimatedEmoji. The lock, notification, switcher, widget and emoji pages show the rest.",
+        height: 2600,
+        body: pages::shell::ShellPage,
     },
 ];
 

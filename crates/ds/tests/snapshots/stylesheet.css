@@ -186,12 +186,6 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes sheet-in{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
 @keyframes sheet-out{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
 
-/* widget-out (quire's): a widget's card leaving as the person removes it: it shrinks
-   to .85 about its centre and fades at `--t-move --e-exit` (design/05 principle 3: exits
-   accelerate), holding its transparent last frame until the host drops the card. Under Reduced
-   it only fades (`menu-out`). */
-@keyframes widget-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
-
 /* panel-in and panel-out (quire's): the notification center's edge panel slides in
    from past the right edge at `--t-move --e-out` (no overshoot: it is anchored to that edge) and
    back out at `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
@@ -208,11 +202,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* morph-fade-out: the outgoing glyph of a cross-fade (MorphStyle::CrossFade); the incoming one
    plays `fade`. */
 @keyframes morph-fade-out{ from{ opacity:1; } to{ opacity:0; } }
-
-/* roll-in, roll-out: a digit that changed rolls up into its place as the old one rolls out
-   above it (RollDigits). */
-@keyframes roll-in{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
-@keyframes roll-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
 
 /* hold (quire's): a keyframe that moves nothing. A resting state that follows an
    animated one (a surface present again after a hide was taken back, a row or a pane at rest)
@@ -247,14 +236,11 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes osd-out--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes sheet-in--b{ from{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } to{ transform:none; } }
 @keyframes sheet-out--b{ from{ transform:none; } to{ transform:translateY(var(--sheet-dy,calc(-100% - var(--s-36)))); } }
-@keyframes widget-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.85); } }
 @keyframes panel-in--b{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out--b{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 @keyframes morph-in--b{ from{ opacity:0; transform:scale(.7); } to{ opacity:1; transform:none; } }
 @keyframes morph-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:scale(.7); } }
 @keyframes morph-fade-out--b{ from{ opacity:1; } to{ opacity:0; } }
-@keyframes roll-in--b{ from{ opacity:0; transform:translateY(60%); } to{ opacity:1; transform:none; } }
-@keyframes roll-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-60%); } }
 @keyframes hold--b{ from{ } to{ } }
 @keyframes row-in--b{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 @keyframes row-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
@@ -325,18 +311,12 @@ html,body{margin:0;padding:0;background:transparent}
 .a-morph-fade-in[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out) backwards;}
 .a-morph-fade-out[*|data-pulse=a]{animation:morph-fade-out var(--t-quick) var(--e-out) forwards;}
 .a-morph-fade-out[*|data-pulse=b]{animation:morph-fade-out--b var(--t-quick) var(--e-out) forwards;}
-.a-roll-in[*|data-pulse=a]{animation:roll-in var(--t-quick) var(--e-out) backwards;}
-.a-roll-in[*|data-pulse=b]{animation:roll-in--b var(--t-quick) var(--e-out) backwards;}
-.a-roll-out[*|data-pulse=a]{animation:roll-out var(--t-quick) var(--e-out) forwards;}
-.a-roll-out[*|data-pulse=b]{animation:roll-out--b var(--t-quick) var(--e-out) forwards;}
 .a-hold[*|data-pulse=a]{animation:hold var(--t-quick) var(--e-linear);}
 .a-hold[*|data-pulse=b]{animation:hold--b var(--t-quick) var(--e-linear);}
 .a-pane-in-r-out[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
 .a-pane-in-r-out[*|data-pulse=b]{animation:slide-r--b var(--t-move) var(--e-out);}
 .a-morph-in-spring[*|data-pulse=a]{animation:morph-in var(--t-quick) var(--e-out) backwards;}
 .a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
-.a-widget-out[*|data-pulse=a]{animation:widget-out var(--t-move) var(--e-exit) forwards;}
-.a-widget-out[*|data-pulse=b]{animation:widget-out--b var(--t-move) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=b]{animation-name:fade--b;}
@@ -390,16 +370,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-morph-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=a]{animation-name:menu-out;}
 .ds[*|data-motion=reduced] .a-morph-out[*|data-pulse=b]{animation-name:menu-out--b;}
-.ds[*|data-motion=reduced] .a-roll-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-roll-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-roll-out[*|data-pulse=b]{animation-name:menu-out--b;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-pane-in-r-out[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=a]{animation-name:menu-out;}
-.ds[*|data-motion=reduced] .a-widget-out[*|data-pulse=b]{animation-name:menu-out--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which

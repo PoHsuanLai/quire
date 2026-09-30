@@ -97,7 +97,7 @@ fn poses() -> [Pose; 3] {
 pub fn LockSwitcherPage() -> Element {
     let [idle, wrong, checking] = poses();
     rsx! {
-        Section { title: "Lock screen", note: "LockScreen with a LockClock and a LockPrompt over the calm wallpaper under --lock-veil, drawn at a 16:10 output's proportions (1216 x 760; the two below at half scale). The date, then the time in the display face at --fs-lock-clock (140) 700, white; at the bottom the avatar at 64, the name 16/700, a 260 x 38 pill of flat white glass (--lock-glass) holding the Secret field, the caps-lock mark and the enter arrow (shown once something is typed), and the hint line. Wrong plays shake-x once (420 ms, --e-shake) and empties the field as it settles; Checking closes the field and spins the arrow; under LockLook::Space the date sits in a pill and the field is painted with the Space gradient.",
+        Section { title: "Lock screen", note: "LockScreen with a LockClock and a LockPrompt over the calm wallpaper under --lock-veil, drawn at a 16:10 output's proportions (1216 x 760; the two below at half scale). The date, then the time in the display face at --fs-lock-clock (140) 700, white; at the bottom the avatar at 64, the name 16/700, a 260 x 38 pill of flat white glass (--lock-glass) holding the Secret field, the caps-lock mark and the enter arrow (shown once something is typed), and the hint line. Wrong plays shake-x once (420 ms, --e-shake, use_shake) and empties the field as it settles; both prompts share one PasswordField; Checking closes the field and spins the arrow; under LockLook::Space the date sits in a pill and the field is painted with the Space gradient.",
             div { class: "g-lock-full",
                 LockStage { pose: idle }
             }
@@ -116,7 +116,7 @@ pub fn LockSwitcherPage() -> Element {
                 }
             }
         }
-        Section { title: "The person's picture", note: "LockUser {{ name, picture: UserPicture }}, built with LockUser::new(name, picture): a letter disc redrawn at 64, an animated emoji in the same place, or the user's own photo ($HOME/.face or AccountsService's icon, as ImageSource::file) cropped round with object-fit: cover (this stand-in is taller than wide). The mood is the prompt's own: attentive while typing or checking, a wince when Wrong, happy when Accepted, idle otherwise. Every kind lifts once on Accepted (picture-accept); the emoji also plays each mood, woken by a key or the pointer in the prompt, and rests again 20 s after. The polkit sheet draws the same three at 48.",
+        Section { title: "The person's picture", note: "LockUser {{ name, picture: UserPicture }}, built with LockUser::new(name, picture): a letter disc redrawn at 64, an animated emoji in the same place (it plays its own animation once as the prompt appears, then rests), or the user's own photo ($HOME/.face or AccountsService's icon, as ImageSource::file) cropped round with object-fit: cover (this stand-in is taller than wide). The polkit sheet draws the same three at 48.",
             div { class: "g-row g-row-top",
                 for (caption, picture) in pictures() {
                     div { class: "g-col",

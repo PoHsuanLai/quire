@@ -1,4 +1,4 @@
-//! The Controls page's status items on the frame: `Button { Status }` on a Bar root, as
+//! The Controls page's status items on the frame: `MenuBarItem { image: Only }` on a Bar root, as
 //! sill's bar draws them (bar gaps). The root draws the Space gradient at the
 //! bar's tint alpha (`data-frame=tinted`) and stamps the frame ground (`data-ground=frame`), so
 //! the items, the app name and the clock take the `--f-*` inks with no variant of their own.
@@ -38,7 +38,7 @@ pub fn StatusItems() -> Element {
     let accent = axes.read().accent;
     let scheme = use_scope().scheme;
     rsx! {
-        Section { title: "Status items on the frame", note: "Button {{ Status }} on a Bar root over the wallpaper, blur on and off: the Space gradient at the bar's tint, and the frame ground, so every item, the app name and the clock draw in --f-ink*. Each row: rest, open (its menu showing, --f-pill), pressed, disabled. The box and glyph come from StatusMetrics, which a shell fills from bar.status_icon_box_px, bar.status_glyph_px and bar.glyph_size_policy.",
+        Section { title: "Status items on the frame", note: "MenuBarItem {{ image: Only }} on a Bar root over the wallpaper, blur on and off: the Space gradient at the bar's tint, and the frame ground, so every item, the app name and the clock draw in --f-ink*. Each row: rest, open (its menu showing, --f-pill), pressed, disabled. The box and glyph come from StatusMetrics, which a shell fills from bar.status_icon_box_px, bar.status_glyph_px and bar.glyph_size_policy.",
             div { class: "g-wall", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for (policy , metrics) in METRICS {
                     for blur in [BlurState::Available, BlurState::Unavailable] {

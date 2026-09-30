@@ -52,6 +52,7 @@ pub mod plate_tints;
 pub mod polish;
 pub mod polish_window;
 pub mod settings_window;
+pub mod shell;
 pub mod space;
 pub mod status_items;
 pub mod structure;

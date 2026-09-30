@@ -53,7 +53,7 @@ fn desktop(size: ImageSize) -> Option<ImageSource> {
 #[component]
 pub fn ShotThumbnails() -> Element {
     rsx! {
-        Section { title: "Screenshot thumbnail", note: "ShotThumbnail over the Work Space's tint, light and dark: the picture letterboxed in a Toast-material card 240 wide (the box follows the picture between 2:1 and 16:10; the portrait one is pillarboxed), rising in with rise at --t-big --e-spring and sliding out to the right with shot-out at --t-move --e-exit (Live: the button). Hover shows its actions (Delete) popping in; a swipe right dismisses it as a notification's does; a click opens, a drag past 8 px hands the host a DragStart. Right: ShotGhost, the drag icon, 120 wide and .8 opaque.",
+        Section { title: "Screenshot thumbnail", note: "ShotThumbnail over the Work Space's tint, light and dark: the picture letterboxed in a Toast-material card 240 wide (the box follows the picture between 2:1 and 16:10; the portrait one is pillarboxed), sliding in from the right with panel-in at --t-move --e-out and out to the right with panel-out at --t-quick --e-exit (Live: the button). Hover shows its actions (Delete) popping in; a swipe right dismisses it as a notification's does; a click opens, a drag past 8 px hands the host a DragStart. Right: ShotGhost, the drag icon, 120 wide and .8 opaque.",
             div { class: "g-shot-row",
                 for theme in [Theme::Light, Theme::Dark] {
                     ShotScene { theme }
