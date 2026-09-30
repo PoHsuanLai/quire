@@ -62,7 +62,10 @@ owned by this doc). If you also run on Blitz (`ds-blitz`), your own crate that c
 
 **If your own crate sits inside a Cargo workspace tree it does not own** (as `examples/consumer`
 does, under quire's own directory), give it an empty `[workspace]` table so Cargo does not treat
-it as an orphaned member of the workspace above it.
+it as an orphaned member of the workspace above it. A workspace root is also the only place
+`[patch.crates-io]` applies, so a consumer that builds a renderer copies quire's root patch block
+(the vello and anyrender forks) verbatim into its own root manifest, as `examples/consumer/Cargo.toml`
+does; `scripts/check-consumer.sh` builds, lints and tests that example in the gate.
 
 ## 2. The `Ds` root
 

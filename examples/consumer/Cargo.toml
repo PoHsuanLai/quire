@@ -28,8 +28,27 @@ dioxus = { version = "0.7", default-features = false, features = ["macro", "html
 
 [dev-dependencies]
 dioxus-ssr = "0.7"
+# The test driver: a real Blitz document on a fast-forwarded clock (CONSUMING.md section 5, rule 4).
+ds-harness = { path = "../../crates/ds-harness" }
 # The linter: a consumer's own tests call it (CONSUMING.md section 5).
 ds-lint = { path = "../../crates/ds-lint" }
 
 [lints.rust]
 unsafe_code = "deny"
+
+# Patches apply only at a workspace root, so this root repeats quire's block verbatim.
+# vello and anyrender come from our forks (github.com/PoHsuanLai/vello and /anyrender, branch
+# quire-filters): the colour matrix filter, multi-threaded filter layers and CSS filter lists, so
+# every CSS `filter` function paints on both backends. Move back to crates.io once upstream has
+# them (blitz-kit docs/blitz-gaps.md tracks the PRs).
+[patch.crates-io]
+vello_common = { git = "https://github.com/PoHsuanLai/vello", rev = "1722f6234e10b95d574d2252698a6cc7cdcadb82" }
+vello_cpu = { git = "https://github.com/PoHsuanLai/vello", rev = "1722f6234e10b95d574d2252698a6cc7cdcadb82" }
+vello_hybrid = { git = "https://github.com/PoHsuanLai/vello", rev = "1722f6234e10b95d574d2252698a6cc7cdcadb82" }
+vello_sparse_shaders = { git = "https://github.com/PoHsuanLai/vello", rev = "1722f6234e10b95d574d2252698a6cc7cdcadb82" }
+glifo = { git = "https://github.com/PoHsuanLai/vello", rev = "1722f6234e10b95d574d2252698a6cc7cdcadb82" }
+anyrender = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
+anyrender_vello_cpu = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
+anyrender_vello_hybrid = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
+wgpu_context = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
+pixels_window_renderer = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }

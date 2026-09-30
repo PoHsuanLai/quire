@@ -6,10 +6,12 @@
 //! `tests/coherence.rs` is the point of this crate: it runs the four coherence rules from
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
-use ds::{TextField};
-use ds::{Answers};
 use dioxus::prelude::*;
-use ds::{Anchor, Anim, Availability, Button, Common, Ds, FieldFocus, Icon, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, use_focus_request, use_motion_timer, use_toasts};
+use ds::{
+    Anchor, Anim, Answers, Button, Common, Ds, FieldFocus, Icon, Material, Menu, MenuImage,
+    MenuItem, MenuPlacement, MountedRef, Shown, TextField, use_focus_request, use_motion_timer,
+    use_toasts,
+};
 use ds_blitz::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
@@ -25,7 +27,11 @@ pub const STYLE: &str = include_str!("style.css");
 #[component]
 pub fn App() -> Element {
     let store = Store::new(ConfigRoot::Xdg, AppName("consumer"));
-    let env = use_environment(store, SystemPrefsSource::Portal, Arc::new(TokioSpawner::current()));
+    let env = use_environment(
+        store,
+        SystemPrefsSource::Portal,
+        Arc::new(TokioSpawner::current()),
+    );
     let now = env();
     rsx! {
         Ds {
@@ -45,26 +51,10 @@ enum Action {
     Discard,
 }
 
-fn entries() -> Vec<MenuEntry<Action>> {
+fn items() -> Vec<MenuItem<Action>> {
     vec![
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: Action::Duplicate,
-            title: "Duplicate".to_owned(),
-            detail: None,
-            tile: Some(MenuTile::Icon(Icon::Mail)),
-            trail: MenuTrail::None,
-            check: None,
-        },
-        MenuEntry::Item {
-            availability: Availability::Enabled,
-            value: Action::Discard,
-            title: "Discard".to_owned(),
-            detail: None,
-            tile: Some(MenuTile::Icon(Icon::Trash)),
-            trail: MenuTrail::None,
-            check: None,
-        },
+        MenuItem::new(Action::Duplicate, "Duplicate").with_image(MenuImage::Icon(Icon::Mail)),
+        MenuItem::new(Action::Discard, "Discard").with_image(MenuImage::Icon(Icon::Trash)),
     ]
 }
 
@@ -77,7 +67,7 @@ fn entries() -> Vec<MenuEntry<Action>> {
 #[component]
 fn Page() -> Element {
     let mut subject = use_signal(String::new);
-    let mut menu_open = use_signal(|| false);
+    let mut menu_open = use_signal(|| Shown::Hidden);
     let mut more = use_signal(|| None::<MountedRef>);
     let toasts = use_toasts();
     let badge = use_motion_timer(Anim::Fade);
@@ -105,7 +95,7 @@ fn Page() -> Element {
                 }
                 Button {
                     label: "More".to_owned(),
-                    onclick: move |_| menu_open.set(true),
+                    onclick: move |_| menu_open.set(Shown::Visible),
                     common: Common {
                         mounted: Some(EventHandler::new(move |event: MountedEvent| {
                             more.set(Some(MountedRef(event.data())));
@@ -119,13 +109,13 @@ fn Page() -> Element {
                 "data-shown": if sent() { "shown" } else { "hidden" },
                 "Sent"
             }
-            if let (true, Some(button)) = (menu_open(), more()) {
+            if let (Shown::Visible, Some(button)) = (menu_open(), more()) {
                 Menu {
-                    kind: MenuKind::Rich,
+                    placement: MenuPlacement::Popup,
                     anchor: Anchor::Mounted(button),
-                    entries: entries(),
+                    items: items(),
                     onpick: move |action: Action| {
-                        menu_open.set(false);
+                        menu_open.set(Shown::Hidden);
                         field.request();
                         match action {
                             Action::Duplicate => subject.set(format!("{} (copy)", subject())),
@@ -133,7 +123,7 @@ fn Page() -> Element {
                         }
                     },
                     onclose: move |()| {
-                        menu_open.set(false);
+                        menu_open.set(Shown::Hidden);
                         field.request();
                     },
                 }
