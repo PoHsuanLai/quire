@@ -3,9 +3,10 @@
 //! selected workspace a raised segment with the current-item shadow, the rest quiet text.
 //! Markup: `div.ds-ws-pills[role=group]` holding `button.ds-ws-pill[data-selected][aria-current]`.
 //! Each pill reports its presses with the button (a click activates, a right-click opens the
-//! Space menu); a caller that drags pills to reorder them wraps each `WorkspacePill` in its own
-//! element and listens there.
+//! Space menu); a caller that drags pills to reorder them hears each pill's `BarPointer` press
+//! and release.
 
+use crate::bar::pointer::BarPointer;
 use dioxus::prelude::*;
 use ds::Common;
 use ds::components::controls::press::{ActivationKeys, PressListeners};
@@ -41,6 +42,7 @@ pub fn WorkspacePill(
     label: String,
     #[props(default)] current: Selection,
     onclick: EventHandler<Press>,
+    #[props(default)] pointer: BarPointer,
     #[props(default)] common: Common,
 ) -> Element {
     let listen = PressListeners::new(onclick);
@@ -54,6 +56,15 @@ pub fn WorkspacePill(
             "data-selected": current.slug(),
             "aria-current": current.aria_current(),
             onmounted: move |event| common.mounted(event),
+            onpointerdown: {
+                let pointer = pointer.clone();
+                move |event| pointer.pressed(event)
+            },
+            onpointerup: {
+                let pointer = pointer.clone();
+                move |event| pointer.released(event)
+            },
+            onpointerenter: move |event| pointer.entered(event),
             onclick: move |event| listen.click(&event),
             onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
             oncontextmenu: move |event| listen.context_menu(&event),

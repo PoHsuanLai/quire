@@ -35,6 +35,7 @@ pub mod widget;
 pub use crate::{
     bar::{
         menu_bar_item::MenuBarItem,
+        pointer::BarPointer,
         workspace_pills::{WorkspacePill, WorkspacePills},
     },
     battery::{
