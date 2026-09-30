@@ -14,8 +14,6 @@
 /* 4.3.3 fade */
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
-/* 4.3.8 hc-in: the link pill's entrance (a popover, tooltip and hover card fade instead) */
-@keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 
 
 /* 4.3.11 page-in */
@@ -34,17 +32,6 @@
 /* 4.4.11 menu-in */
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
-
-/* pill-up (quire's): a pill centred by `translateX(-50%)` (a toast, a send pill a
-   consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
-   `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
-   also carries them back down, and keep it. */
-@keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
-
-/* ring-drain (quire's): the undo-send ring's dash drains, linear, over
-   `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
-   dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
-@keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 
 /* 4.4.12 fade-in (C's): an ink veil fades to its resting `--veil` (.16), the
    opacity the veil itself rests at, so nothing snaps when the animation ends. */

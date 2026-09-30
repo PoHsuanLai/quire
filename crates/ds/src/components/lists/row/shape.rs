@@ -3,6 +3,17 @@
 //! section 2.4, absorbed from the menu's row shapes). Drawn by `shape_view`.
 
 use crate::components::content::image_source::{ImageSize, ImageSource};
+use ds_core::word::Word;
+
+/// How near a Today tab is to going (design/30 section 2.11).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Expiry {
+    /// Plenty of time left.
+    #[default]
+    Later,
+    /// About to expire: the row is drawn quieter.
+    Soon,
+}
 
 /// How a row draws.
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
@@ -20,6 +31,14 @@ pub enum RowShape {
         location: String,
         /// When it was last changed, already worded ("Yesterday", "12:04").
         modified: String,
+    },
+    /// A Today tab: a temporary row of a source list that expires (design/30 section 2.11). The
+    /// title is its page, and how long it has left is trailing data, before the row's trail.
+    Today {
+        /// What is left, already worded ("2 h", "12 min").
+        left: String,
+        /// Whether it is about to go.
+        expiry: Expiry,
     },
     /// A clipboard entry: its text in the code face (clipped to `lines`) or its picture, and its
     /// age as trailing data, before the row's trail.
@@ -57,7 +76,10 @@ impl RowShape {
             RowShape::File {
                 thumb: Some(thumb), ..
             } => Some(thumb.0.clone()),
-            RowShape::Plain | RowShape::File { .. } | RowShape::Clip { .. } => None,
+            RowShape::Plain
+            | RowShape::File { .. }
+            | RowShape::Today { .. }
+            | RowShape::Clip { .. } => None,
         }
     }
 }

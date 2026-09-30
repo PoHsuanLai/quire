@@ -1,0 +1,16 @@
+/* EdgePeek (design/30 section 2.11, design/06 section 7): the strip at the window's left edge and
+   the sidebar it peeks. The strip is rendered only while the sidebar is hidden, so it needs no
+   display toggle. The sidebar is `nav.ds-side[data-side=shown|hidden|peek]`; the window grid
+   change belongs to the host's layout. Peeking, it floats over the content at the left, inset,
+   in the frame's solid ground, and the spring in Rust (`--present-p`, 0 gone to 1 in place)
+   slides it in from past the left edge and back out: nothing here animates. Attribute selectors
+   carry `*|` (spike S2). */
+
+.ds-edge{ position:absolute; left:0; top:0; bottom:0; width:10px; z-index:var(--z-edge); }
+
+.ds-side[*|data-side=hidden]{ visibility:hidden; }
+.ds-side[*|data-side=peek]{
+  visibility:visible; position:absolute; left:var(--s-8); top:var(--s-8); bottom:var(--s-8); width:226px; z-index:var(--z-side-peek);
+  background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
+  transform:translateX(calc((1 - var(--present-p, 1)) * -110%));
+}

@@ -2,7 +2,7 @@
 //! face or its picture, and either one's time as trailing data. Called by `Row` for a row whose
 //! shape is not `Plain`.
 
-use crate::components::lists::row::shape::{ClipBody, RowShape, clip_box, clip_lines};
+use crate::components::lists::row::shape::{ClipBody, Expiry, RowShape, clip_box, clip_lines};
 use dioxus::prelude::*;
 
 /// The `data-shape` word, on a shaped row only (a plain row's markup is unchanged).
@@ -10,6 +10,14 @@ pub(crate) fn slug(shape: &RowShape) -> Option<&'static str> {
     match shape {
         RowShape::Plain => None,
         RowShape::File { .. } => Some("file"),
+        RowShape::Today {
+            expiry: Expiry::Later,
+            ..
+        } => Some("today"),
+        RowShape::Today {
+            expiry: Expiry::Soon,
+            ..
+        } => Some("today-soon"),
         RowShape::Clip {
             body: ClipBody::Text { .. },
             ..
@@ -24,7 +32,7 @@ pub(crate) fn slug(shape: &RowShape) -> Option<&'static str> {
 /// The words column: the title and detail as given, or the shape's own.
 pub(crate) fn words(shape: &RowShape, title: Element, detail: Option<Element>) -> Element {
     match shape {
-        RowShape::Plain => rsx! {
+        RowShape::Plain | RowShape::Today { .. } => rsx! {
             span { class: "ds-row-words",
                 b { class: "ds-row-title ds-truncate", {title} }
                 if let Some(detail) = detail {
@@ -77,6 +85,7 @@ pub(crate) fn when(shape: &RowShape) -> Option<Element> {
     let when = match shape {
         RowShape::Plain => return None,
         RowShape::File { modified, .. } => modified,
+        RowShape::Today { left, .. } => left,
         RowShape::Clip { age, .. } => age,
     };
     Some(rsx! {

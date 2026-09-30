@@ -214,3 +214,14 @@
 .g-window-body{flex:1 1 0;min-height:0}
 .g-window-content{display:flex;flex-direction:column;height:100%;min-width:0}
 .g-window-scroll{flex:1 1 0;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:var(--s-14);padding:var(--s-4) var(--s-22) var(--s-22)}
+
+/* App features page: the edge-peek stage's host grid, and the Space key's swatch. */
+.g-side-host{display:grid;height:100%;transition:grid-template-columns var(--t-move) var(--e-out)}
+.g-side-body{padding:var(--s-12);display:flex;flex-direction:column;gap:var(--s-6)}
+.g-side-content{display:grid;place-items:center;color:var(--ink-faint)}
+.g-space-key{padding:var(--s-8) var(--s-12);border-radius:var(--r-field);background:var(--surface-2);transition:background-color var(--t-big) var(--e-out)}
+.g-space-key[*|data-space="1"]{background:var(--c-blue-soft)}
+.g-space-key[*|data-space="2"]{background:var(--c-green-soft)}
+.g-space-key[*|data-space="3"]{background:var(--c-violet-soft)}
+.g-space-key[*|data-space="4"]{background:var(--c-amber-soft)}
+.g-space-key[*|data-space="5"]{background:var(--c-red-soft)}

@@ -5,7 +5,8 @@
 use super::Specimen;
 use dioxus::prelude::*;
 use ds::ControlSize;
-use ds::{Button, Fraction, PillAction, SendMood, SendPhase, SendPill};
+use ds::detail::{Operation, PendingToken};
+use ds::{Button, Fraction, PillAction, SendMood, SendPill};
 
 /// The moods a person can play here, with the words the pill says in each.
 const MOODS: [(SendMood, &str, &str); 2] = [
@@ -24,7 +25,7 @@ pub fn Outbox() -> Element {
     rsx! {
         Specimen { name: "scheduled: Cancel",
             div { class: "g-stage",
-                SendPill { text: "Scheduled for 9:00", progress: Fraction(0), phase: SendPhase::Counting, action: PillAction::Cancel, onundo: |_| {} }
+                SendPill { text: "Scheduled for 9:00", progress: Fraction(0), operation: Operation::Running(PendingToken::start()), action: PillAction::Cancel, onundo: |_| {} }
             }
         }
         Specimen { name: "failed: pick a mood",
@@ -34,12 +35,12 @@ pub fn Outbox() -> Element {
                 }
             }
             div { class: "g-stage",
-                SendPill { text, progress: Fraction(700), phase: SendPhase::Counting, mood: mood(), action: PillAction::Nothing, onundo: |_| {} }
+                SendPill { text, progress: Fraction(700), operation: Operation::Running(PendingToken::start()), mood: mood(), action: PillAction::Nothing, onundo: |_| {} }
             }
         }
         Specimen { name: "refused",
             div { class: "g-stage",
-                SendPill { text: "Not sent", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} }
+                SendPill { text: "Not sent", progress: Fraction(700), operation: Operation::Running(PendingToken::start()), mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} }
             }
         }
     }

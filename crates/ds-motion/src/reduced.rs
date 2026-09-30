@@ -51,9 +51,7 @@ impl Anim {
             | Anim::PeekIn
             | Anim::PeekFullIn
             | Anim::SheetIn
-            | Anim::LinkPillIn
             | Anim::PageIn
-            | Anim::PillUp
             | Anim::PaneInR
             | Anim::PaneInL
             | Anim::PaneInROut
@@ -71,7 +69,6 @@ impl Anim {
             Anim::MenuOut
             | Anim::Fade
             | Anim::PaletteFade
-            | Anim::RingDrain
             | Anim::FadeIn
             | Anim::MorphFadeIn
             | Anim::MorphFadeOut

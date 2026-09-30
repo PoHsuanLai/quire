@@ -128,8 +128,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.3.3 fade */
 @keyframes fade{ from{ opacity:0; } to{ opacity:1; } }
 
-/* 4.3.8 hc-in: the link pill's entrance (a popover, tooltip and hover card fade instead) */
-@keyframes hc-in{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 
 
 /* 4.3.11 page-in */
@@ -148,17 +146,6 @@ html,body{margin:0;padding:0;background:transparent}
 /* 4.4.11 menu-in */
 @keyframes menu-in{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
-
-/* pill-up (quire's): a pill centred by `translateX(-50%)` (a toast, a send pill a
-   consumer draws) springs up from below its edge; the centring is baked in, as `nudge` and
-   `shake` bake it in. quire's own SendPill and Toast slide by a `data-shown` transition, which
-   also carries them back down, and keep it. */
-@keyframes pill-up{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
-
-/* ring-drain (quire's): the undo-send ring's dash drains, linear, over
-   `--t-send-ring` (`S:2339`), for a ring CSS can reach (the webview). 57 is the SendPill's
-   dash, the ring's circumference; on Blitz the SendPill writes the offset as an attribute. */
-@keyframes ring-drain{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 
 /* 4.4.12 fade-in (C's): an ink veil fades to its resting `--veil` (.16), the
    opacity the veil itself rests at, so nothing snaps when the animation ends. */
@@ -217,15 +204,12 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes slide-r--b{ from{ transform:translateX(26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes fade--b{ from{ opacity:0; } to{ opacity:1; } }
-@keyframes hc-in--b{ from{ opacity:0; transform:translateY(4px) scale(.98); } to{ opacity:1; transform:none; } }
 @keyframes page-in--b{ from{ opacity:0; transform:translateY(10px) scale(.985); } to{ opacity:1; transform:none; } }
 @keyframes shake-x--b{ 20%{ transform:translateX(-6px); } 40%{ transform:translateX(5px); } 60%{ transform:translateX(-3px); } 80%{ transform:translateX(2px); } }
 @keyframes menu-out--b{ from{ opacity:1; } to{ opacity:0; } }
 @keyframes shake--b{ 0%,100%{ transform:translateX(-50%); } 20%{ transform:translateX(calc(-50% - 7px)); } 40%{ transform:translateX(calc(-50% + 6px)); } 60%{ transform:translateX(calc(-50% - 4px)); } 80%{ transform:translateX(calc(-50% + 2px)); } }
 @keyframes menu-in--b{ 0%{ opacity:0; transform:scale(.94) translateY(-6px); }
   100%{ opacity:1; transform:scale(1) translateY(0); } }
-@keyframes pill-up--b{ from{ transform:translate(-50%,160%); } to{ transform:translate(-50%,0); } }
-@keyframes ring-drain--b{ from{ stroke-dashoffset:0; } to{ stroke-dashoffset:57; } }
 @keyframes fade-in--b{ from{ opacity:0; } to{ opacity:var(--veil); } }
 @keyframes pane-out-l--b{ from{ transform:none; opacity:1; } to{ transform:translateX(-26px); opacity:0; } }
 @keyframes pane-out-r--b{ from{ transform:none; opacity:1; } to{ transform:translateX(26px); opacity:0; } }
@@ -263,18 +247,12 @@ html,body{margin:0;padding:0;background:transparent}
 .a-fade[*|data-pulse=b]{animation:fade--b var(--t-move) var(--e-out);}
 .a-palette-fade[*|data-pulse=a]{animation:fade var(--t-quick) var(--e-out);}
 .a-palette-fade[*|data-pulse=b]{animation:fade--b var(--t-quick) var(--e-out);}
-.a-link-pill-in[*|data-pulse=a]{animation:hc-in var(--t-quick) var(--e-out);}
-.a-link-pill-in[*|data-pulse=b]{animation:hc-in--b var(--t-quick) var(--e-out);}
 .a-page-in[*|data-pulse=a]{animation:page-in var(--t-big) var(--e-out);}
 .a-page-in[*|data-pulse=b]{animation:page-in--b var(--t-big) var(--e-out);}
 .a-shake-x[*|data-pulse=a]{animation:shake-x var(--t-shake) var(--e-shake);}
 .a-shake-x[*|data-pulse=b]{animation:shake-x--b var(--t-shake) var(--e-shake);}
 .a-shake[*|data-pulse=a]{animation:shake var(--t-shake) var(--e-shake);}
 .a-shake[*|data-pulse=b]{animation:shake--b var(--t-shake) var(--e-shake);}
-.a-pill-up[*|data-pulse=a]{animation:pill-up var(--t-big) var(--e-out);}
-.a-pill-up[*|data-pulse=b]{animation:pill-up--b var(--t-big) var(--e-out);}
-.a-ring-drain[*|data-pulse=a]{animation:ring-drain var(--t-send-ring) var(--e-linear) forwards;}
-.a-ring-drain[*|data-pulse=b]{animation:ring-drain--b var(--t-send-ring) var(--e-linear) forwards;}
 .a-fade-in[*|data-pulse=a]{animation:fade-in var(--t-move) var(--e-out);}
 .a-fade-in[*|data-pulse=b]{animation:fade-in--b var(--t-move) var(--e-out);}
 .a-pane-in-r[*|data-pulse=a]{animation:slide-r var(--t-move) var(--e-out);}
@@ -326,16 +304,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-peek-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-peek-full-in[*|data-pulse=b]{animation-name:fade--b;}
-.ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-link-pill-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-page-in[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-shake-x[*|data-pulse=b]{animation-name:hold--b;}
 .ds[*|data-motion=reduced] .a-shake[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-shake[*|data-pulse=b]{animation-name:hold--b;}
-.ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=a]{animation-name:fade;}
-.ds[*|data-motion=reduced] .a-pill-up[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-pane-in-r[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-pane-in-r[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-pane-in-l[*|data-pulse=a]{animation-name:fade;}
@@ -774,24 +748,22 @@ html,body{margin:0;padding:0;background:transparent}
 /* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
    off its place, written by two springs in Rust; nothing here transitions it. */
 .ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }
-/* -- edge_strip -- */
-/* EdgeStrip (design/04-COMPONENTS.md section 33): `S:85`, `S:91`, `S:451-454`. The strip is
-   rendered only while the sidebar is hidden, so it needs no display toggle. The sidebar
-   container is `nav.ds-side[data-side=shown|hidden|peek]`; the window grid change belongs to
-   the host's layout. The peek panel renders in place, not through OverlayHost, because it is
-   the sidebar itself.
-   TODO(O-3): the side peek's own shadow `0 20px 40px -16px rgba(0,0,0,.45)` has no token; it
-   takes `--shadow-pop` (`0 18px 40px -16px`, the same alpha).
-   Not specified: 05-MOTION section 5 row 28 plays `slide-r` at `--t-move` here, while the one
-   `Anim::SlideR` recipe is `--t-big` (row 1); the recipe wins so CSS and `settle()` agree. */
+/* -- edge_peek -- */
+/* EdgePeek (design/30 section 2.11, design/06 section 7): the strip at the window's left edge and
+   the sidebar it peeks. The strip is rendered only while the sidebar is hidden, so it needs no
+   display toggle. The sidebar is `nav.ds-side[data-side=shown|hidden|peek]`; the window grid
+   change belongs to the host's layout. Peeking, it floats over the content at the left, inset,
+   in the frame's solid ground, and the spring in Rust (`--present-p`, 0 gone to 1 in place)
+   slides it in from past the left edge and back out: nothing here animates. Attribute selectors
+   carry `*|` (spike S2). */
 
 .ds-edge{ position:absolute; left:0; top:0; bottom:0; width:10px; z-index:var(--z-edge); }
 
 .ds-side[*|data-side=hidden]{ visibility:hidden; }
 .ds-side[*|data-side=peek]{
-  visibility:visible; position:absolute; left:8px; top:8px; bottom:8px; width:226px; z-index:var(--z-side-peek);
+  visibility:visible; position:absolute; left:var(--s-8); top:var(--s-8); bottom:var(--s-8); width:226px; z-index:var(--z-side-peek);
   background:var(--f-solid); border-radius:var(--r-panel); box-shadow:var(--shadow-pop);
-  animation:slide-r var(--t-big) var(--e-out);
+  transform:translateX(calc((1 - var(--present-p, 1)) * -110%));
 }
 /* -- edit_surface -- */
 /* EditSurface (FINDINGS "Edit surface"): a block the app's own text lives in. The app draws the
@@ -1048,12 +1020,12 @@ html,body{margin:0;padding:0;background:transparent}
 /* LinkPill (design/04-COMPONENTS.md section 29), verbatim `S:431-437`: the destination at the
    reader's bottom-left, dimmed around the bold registered domain, loud (`--danger`,
    `--danger-ink`: S's `#fff` in light, a dark ink in dark) when the text lies. Blitz has no ellipsis: the path gives way
-   first and the registered domain never shrinks (O-30). It enters with `hc-in` at `--t-quick
-   --e-out` (`S:433`, `Anim::LinkPillIn`). */
+   first and the registered domain never shrinks (O-30). It fades in over `--t-quick`; it
+   takes the pointer (a pointing hand: hover expands it, a click copies). */
 
 .ds-link-pill{ position:absolute; left:12px; bottom:12px; z-index:var(--z-link-pill); max-width:calc(100% - 24px); display:flex; align-items:center; gap:var(--s-7);
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-5) var(--s-11) var(--s-5) var(--s-9); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-eyebrow);
-  white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:hc-in var(--t-quick) var(--e-out); pointer-events:none; }
+  white-space:nowrap; overflow:hidden; box-shadow:var(--shadow-2); animation:fade var(--t-quick) var(--e-out); pointer-events:auto; cursor:pointer; }
 .ds-link-pill b{ color:var(--paper); flex:none; }
 .ds-link-pill-dim{ opacity:.6; flex:none; }
 .ds-link-pill-dim[*|data-part=path]{ flex:0 1 auto; min-width:0; overflow:hidden; }
@@ -1519,6 +1491,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 .ds-row[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 
+/* A Today tab: what it has left is its trailing data; one about to expire is drawn quieter. */
+.ds-row[*|data-shape=today-soon]{ opacity:.6; }
+
 /* A palette group's Show More brings the rows it added in as inserted rows come. */
 .ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 /* -- scrim -- */
@@ -1612,8 +1587,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-segmented-label{ min-width:0; }
 /* -- send_pill -- */
 /* SendPill (design/04-COMPONENTS.md section 31), verbatim `S:706-715`: a dark pill at the
-   bottom centre that slides up on `data-shown`, a draining ring, and Undo while counting. The
-   ring's paint is SVG attributes (spike S6) and its drain an attribute Rust rewrites (O-20).
+   bottom centre that slides up on `data-shown=visible`, a `ProgressIndicator` ring that drains as the countdown runs
+   (inked for the dark pill), and Undo while counting.
    Undo hover is not specified. The Undo rule names the pill, as S's `.sendpill button` does.
    C's outbox states: `data-mood=fatal` turns the pill `--danger` with its ink. The refusal is a second, lighter line under the text, and may wrap. C's Fix
    button is the consumer's `PillAction`, not drawn here. */
@@ -1621,8 +1596,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill{ position:absolute; left:50%; bottom:14px; z-index:var(--z-send-pill); transform:translateX(-50%) translateY(160%); display:flex; align-items:center; gap:var(--s-10);
   background:var(--ink); color:var(--paper); border-radius:var(--r-pill); padding:var(--s-6) var(--s-6) var(--s-6) var(--s-12); font-size:var(--fs-meta); font-weight:600; box-shadow:var(--shadow-2);
   transition:transform var(--t-move) var(--e-out); white-space:nowrap; }
-.ds-send-pill[*|data-shown=shown]{ transform:translateX(-50%) translateY(0); }
-.ds-send-ring{ display:block; flex:none; }
+.ds-send-pill[*|data-shown=visible]{ transform:translateX(-50%) translateY(0); }
+.ds-send-pill .ds-progress[*|data-style=ring] .ds-progress-track{ color:var(--paper); opacity:.25; }
+.ds-send-pill .ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--paper); }
 .ds-send-pill .ds-send-pill-undo{ border:0; cursor:default; background:var(--paper); color:var(--ink); border-radius:var(--r-pill); padding:var(--s-4) var(--s-12); font-size:var(--fs-small); font-weight:700; }
 
 .ds-send-pill[*|data-mood=fatal]{ background:var(--danger); color:var(--danger-ink); }
@@ -2138,9 +2114,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-thread-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
-  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
+  transition:opacity var(--t-quick) var(--e-out);
 }
-.ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
+.ds-row[*|data-emphasis=plain] .ds-dot{ opacity:0; }
 
 /* Text (`S:189-197`). */
 .ds-thread-main{ min-width:0; }

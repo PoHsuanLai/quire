@@ -133,14 +133,6 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `S:433`.
-            Anim::LinkPillIn => recipe(
-                "hc-in",
-                DurationToken::Quick,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
             // `S:568`.
             Anim::PageIn => recipe(
                 "page-in",
@@ -165,8 +157,6 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            Anim::PillUp => own::PILL_UP,
-            Anim::RingDrain => own::RING_DRAIN,
             Anim::FadeIn => own::FADE_IN,
             Anim::PaneInR => own::PANE_IN_R,
             Anim::PaneInL => own::PANE_IN_L,

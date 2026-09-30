@@ -33,10 +33,7 @@ pub(crate) const SHEETS: [(&str, &str); 63] = [
         "drag_ghost",
         include_str!("../components/overlays/drag_ghost.css"),
     ),
-    (
-        "edge_strip",
-        include_str!("../components/app/edge_strip.css"),
-    ),
+    ("edge_peek", include_str!("../components/app/edge_peek.css")),
     (
         "edit_surface",
         include_str!("../components/editor/surface.css"),

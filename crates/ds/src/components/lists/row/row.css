@@ -86,5 +86,8 @@
 .ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 .ds-row[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 
+/* A Today tab: what it has left is its trailing data; one about to expire is drawn quieter. */
+.ds-row[*|data-shape=today-soon]{ opacity:.6; }
+
 /* A palette group's Show More brings the rows it added in as inserted rows come. */
 .ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }

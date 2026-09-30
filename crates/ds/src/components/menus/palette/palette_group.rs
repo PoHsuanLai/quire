@@ -121,6 +121,27 @@ impl<T> PaletteGroup<T> {
 #[derive(Debug, Clone, PartialEq)]
 pub struct PaletteGroups<T: 'static>(pub Vec<PaletteGroup<T>>);
 
+/// The order a Space wants its result groups in (design/30 section 2.11): the launcher's results
+/// come grouped by kind, each under its `SectionHeader`, and each Space lists the kinds it cares
+/// about first. `G` is the caller's own kind (`Apps`, `Files`, `Commands`).
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct GroupOrder<G>(pub Vec<G>);
+
+impl<G: PartialEq> GroupOrder<G> {
+    /// `groups`, each tagged with its kind, in this order: the kinds named here first, in the
+    /// order named, then any others in the order given. Groups of one kind keep their order.
+    pub fn arrange<T>(&self, groups: Vec<(G, PaletteGroup<T>)>) -> PaletteGroups<T> {
+        let rank = |kind: &G| self.0.iter().position(|named| named == kind);
+        let mut tagged: Vec<(usize, (G, PaletteGroup<T>))> =
+            groups.into_iter().enumerate().collect();
+        tagged.sort_by_key(|(given, (kind, _))| match rank(kind) {
+            Some(place) => (0, place, *given),
+            None => (1, 0, *given),
+        });
+        PaletteGroups(tagged.into_iter().map(|(_, (_, group))| group).collect())
+    }
+}
+
 /// What the groups draw, without the actions' handlers (a caller's render makes new ones each
 /// time, and a new handler is not a new result): what the palette's rect book compares.
 pub(crate) type GroupsKey<T> = Vec<(String, GroupEntries<T>, Option<String>)>;
@@ -167,5 +188,47 @@ where
                 &self.action.as_ref().map(|(label, _)| label.as_str()),
             )
             .finish()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{GroupOrder, PaletteGroup};
+
+    fn titles(order: &GroupOrder<char>, kinds: &[(char, &str)]) -> Vec<String> {
+        let groups = kinds
+            .iter()
+            .map(|(kind, title)| (*kind, PaletteGroup::<u8>::list(*title, Vec::new())))
+            .collect();
+        order
+            .arrange(groups)
+            .0
+            .into_iter()
+            .map(|group| group.title)
+            .collect()
+    }
+
+    #[test]
+    fn a_space_lists_its_kinds_first_and_the_rest_as_given() {
+        let given = [
+            ('a', "Apps"),
+            ('f', "Files"),
+            ('c', "Commands"),
+            ('e', "Emoji"),
+        ];
+        // (the Space's order, the titles that result)
+        let cases: &[(&[char], &[&str])] = &[
+            (&[], &["Apps", "Files", "Commands", "Emoji"]),
+            (&['c', 'a'], &["Commands", "Apps", "Files", "Emoji"]),
+            (&['e'], &["Emoji", "Apps", "Files", "Commands"]),
+            (&['x', 'f'], &["Files", "Apps", "Commands", "Emoji"]),
+        ];
+        for (order, want) in cases {
+            assert_eq!(
+                titles(&GroupOrder(order.to_vec()), &given),
+                *want,
+                "{order:?}"
+            );
+        }
     }
 }
