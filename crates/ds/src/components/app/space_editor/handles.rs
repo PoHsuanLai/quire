@@ -3,8 +3,8 @@
 //! (design/04-COMPONENTS.md section 32 behaviour).
 
 use super::{Picker, dot_index, edit, field};
+use crate::host::measure::client_rect;
 use dioxus::prelude::*;
-use ds::host::measure::client_rect;
 use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::vocab::Check;
 use ds_motion::drag::{DragPhase, use_drag};

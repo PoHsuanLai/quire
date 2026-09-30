@@ -91,6 +91,10 @@ pub use crate::components::lists::row::leading::RowLeading;
 pub use crate::components::lists::row::row::Row;
 pub use crate::components::lists::section_header::SectionHeader;
 
+// Spaces
+pub use crate::components::app::space_editor::SpaceEditor;
+pub use crate::components::app::space_editor::dot::SpaceDot;
+
 // Chrome
 pub use crate::components::chrome::window_frame::TrafficLights;
 pub use crate::components::chrome::window_frame::WindowFrame;

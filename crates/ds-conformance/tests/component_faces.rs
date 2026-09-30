@@ -7,6 +7,7 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::components::app::space_editor::DotIndex;
 use ds::components::controls::button_model::{Bezel, ButtonRole};
 use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
@@ -14,8 +15,6 @@ use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Driver, Harness, Input, Viewport};
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;

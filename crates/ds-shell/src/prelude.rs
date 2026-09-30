@@ -29,8 +29,6 @@ pub use crate::notifications::group_header::GroupHeader;
 pub use crate::now_playing::NowPlayingTrack;
 pub use crate::now_playing::track_position::TrackPosition;
 pub use crate::osd::Osd;
-pub use crate::space_editor::SpaceEditor;
-pub use crate::space_editor::dot::SpaceDot;
 pub use crate::switcher::app_switcher::AppSwitcher;
 pub use crate::thumbs::shot_ghost::ShotGhost;
 pub use crate::thumbs::shot_thumbnail::ShotThumbnail;

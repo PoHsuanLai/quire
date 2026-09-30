@@ -1,8 +1,8 @@
 //! One Space's dot in the sidebar foot, the switch between Spaces (design/04-COMPONENTS.md
 //! section 32, `S:147-150`).
 
+use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds::root::common::Common;
 use ds_core::vocab::{Check, Selection, Shortcut};
 use ds_core::word::Word;
 use ds_style::space::dot_paint::DotPaint;

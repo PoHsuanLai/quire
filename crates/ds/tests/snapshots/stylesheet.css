@@ -1811,6 +1811,90 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-slider[*|aria-disabled=true] .ds-slider-thumb{ display:none; }
 .ds-slider[*|data-look=linear][*|aria-disabled=true] .ds-slider-thumb{ display:block; }
 .ds-slider[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+/* -- space_editor -- */
+/* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
+   Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from
+   `space::palette` (the handle fills, stop discs, swatch and preset gradients); the field is
+   two PNGs built in Rust per scheme (O-19): a colour plane stretched to fit, and a tiled dot
+   cell over it (`space_editor/field.rs`), so the dots stay round where S's scaled canvas
+   would stretch them.
+   O-28: the panel is static, not sticky. O-29: the preset hover scale gets the Space dot's
+   transform transition. The handle's white border is `--mark-ground` and its shadow
+   `--shadow-handle` (O-3); TODO(O-3): the scales 1.15, 1.1, 1.12 and 1.08 have no tokens.
+   `.ds-field` is this editor's colour field only (a text field's wrapper is `.ds-input-wrap`, not `.ds-field`, and
+   its `display:inline-flex` collapsed this field to its border: gallery fix A). The presets are
+   22 px discs, the Space dot's size: S sizes them by `aspect-ratio:1` in its narrow editor, which
+   in a wide panel drew 140 px discs. The stop's remove button names the stop, as
+   S's `.stop .rm` does. */
+
+.ds-space-editor{
+  border:var(--hair) solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
+  padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
+}
+.ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
+.ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
+
+.ds-field{
+  position:relative; display:block; height:176px; border-radius:var(--r-tile); overflow:hidden; cursor:crosshair; touch-action:none;
+  border:var(--hair) solid var(--line);
+}
+/* The colours stretch; the dots are a tiled cell of the ground with a round hole, 9 px as S's
+   18 px canvas cell is at its half scale, so they stay round at any field width. */
+.ds-field-plane{ position:absolute; inset:0; background-size:100% 100%; background-repeat:no-repeat; }
+.ds-field-dots{ position:absolute; inset:0; background-size:9px 9px; background-repeat:repeat; }
+.ds-handle{
+  position:absolute; width:22px; height:22px; margin:calc(var(--s-11) * -1) 0 0 calc(var(--s-11) * -1); box-sizing:border-box; border-radius:var(--r-pill);
+  border:3px solid var(--mark-ground); box-shadow:var(--shadow-handle); cursor:grab; touch-action:none;
+}
+.ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
+
+.ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
+.ds-stop{
+  display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
+  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
+  color:var(--ink-soft); cursor:default;
+}
+.ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
+.ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
+.ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
+
+.ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
+.ds-preset{
+  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
+  transition:transform var(--t-quick) var(--e-out);
+}
+.ds-preset:hover{ transform:scale(1.1); }
+
+.ds-checks{ display:grid; gap:var(--s-5); font-size:var(--fs-small); }
+.ds-check{ display:flex; align-items:center; gap:var(--s-8); color:var(--ink-soft); }
+.ds-check-value{ margin-left:auto; font-family:var(--font-data); font-size:var(--fs-note); font-variant-numeric:tabular-nums; }
+.ds-capnote{ margin:0; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.45; }
+
+.ds-space-dot{
+  width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:2px solid transparent; cursor:default; padding:0;
+  transition:transform var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
+}
+.ds-space-dot:hover{ transform:scale(1.12); }
+.ds-space-dot[*|aria-pressed=true]{ border-color:var(--f-ink); transform:scale(1.08); }
+
+/* The title as a name field (`on_rename`): the plain TextField takes the title's
+   display face and size, not the field's body size. The per-scheme readout (`EachScheme`): each
+   scheme's rows under a heading in the data face, upper case, as the field headers are. */
+.ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
+.ds-space-editor-title .ds-input-wrap{ flex:1; }
+.ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
+.ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
+
+/* A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
+   `data-stops` counting them) and are painted here, never inline: the same 135deg gradient
+   `space::gradient` writes for the frame, flat for one stop, 0/100 % for two, 0/50/100 % for
+   three. A handle and a stop disc are one picked colour. */
+.ds-space-dot[*|data-stops="1"], .ds-preset[*|data-stops="1"], .ds-space-swatch[*|data-stops="1"]{ background:var(--dot-c1); }
+.ds-space-dot[*|data-stops="2"], .ds-preset[*|data-stops="2"], .ds-space-swatch[*|data-stops="2"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
+.ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
+  background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
+.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
 /* -- progress -- */
 /* ProgressIndicator (design/30 section 2.9). Attribute selectors carry `*|` (spike S2). Sized
    by the ladder: the bar's thickness is `--progress-*`, the spinner's and the ring's box
@@ -2152,9 +2236,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run[*|data-tone=underline]{ text-decoration:underline; }
 .ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
 .ds-run-link:hover{ color:var(--accent-text); }
-/* A code run: the fixed-pitch face (`--font-code`) a step under the line's size on a quiet ground, so
+/* A code run: the fixed-pitch face (`--font-code`) at `--fs-mono`, relative to the line, on a quiet ground, so
    a command or an address reads as something to copy. */
-.ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:.92em; background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
+.ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:var(--fs-mono); background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
 /* -- thread_row -- */
 /* ThreadRow (design/30 section 2.11): a mail row's content inside a `Row` of the Card density,
    `S:175-199`, `S:293-307`. The row is a card with the dot, the words and the tail in a grid. The

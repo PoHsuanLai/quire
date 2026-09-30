@@ -9,7 +9,6 @@ use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds_harness::{Driver, Harness, Viewport};
-use ds_shell::prelude::*;
 
 const VIEW: Viewport = Viewport {
     width: 200,

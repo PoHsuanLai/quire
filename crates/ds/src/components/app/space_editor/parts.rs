@@ -2,12 +2,12 @@
 //! contrast checks (design/04-COMPONENTS.md section 32).
 
 use super::{DotIndex, Picker, dot_index, edit};
+use crate::components::controls::button::Button;
+use crate::components::controls::chip::{Chip, ChipVariant};
+use crate::components::controls::slider::Slider;
+use crate::components::lists::section_header::SectionHeader;
+use crate::focus::click::kept_click;
 use dioxus::prelude::*;
-use ds::components::controls::button::Button;
-use ds::components::controls::chip::{Chip, ChipVariant};
-use ds::components::controls::slider::Slider;
-use ds::components::lists::section_header::SectionHeader;
-use ds::focus::click::kept_click;
 use ds_core::colour::contrast::Verdict;
 use ds_core::vocab::Fraction;
 use ds_style::appearance::theme::Scheme;

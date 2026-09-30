@@ -135,8 +135,8 @@ fn sheet(name: &str) -> Option<&'static str> {
 /// by its attributes, spike S6) and the `.ds-truncate` utility.
 const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 
-/// A class a component here draws that a sheet above `ds` styles: the picker's Space dot is
-/// `ds-shell`'s `space_editor` sheet (FINDINGS "The picker's Space dot").
+/// A class a component here draws that another component's sheet styles: the picker's Space dot
+/// is the `space_editor` sheet's (FINDINGS "The picker's Space dot").
 const STYLED_ABOVE: &[&str] = &["ds-space-dot"];
 
 #[test]

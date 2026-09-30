@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::app::send_pill::SendPill;
+use ds::components::app::space_editor::DotIndex;
 use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
@@ -11,8 +12,6 @@ use ds::stack::toast_hub::UndoToken;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds_harness::{Driver, Harness, Query, Viewport};
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

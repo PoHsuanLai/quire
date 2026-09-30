@@ -1,12 +1,11 @@
 //! The mail app's Space editor rows: the name field, the Motion row and the readout per scheme
 //! (both for a System Space, one for a Dark one), an unnamed Space's placeholder, and the Motion
-//! row alone. Each is a golden under `lists/space_editor`.
+//! row alone. Each is a golden under `space_editor`.
 
 use dioxus::prelude::*;
+use ds::components::app::space_editor::DotIndex;
+use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::prelude::*;
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
-use ds_shell::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds_style::space::look::CardAccent;
 use ds_style::space::presets::PRESETS;
 
@@ -44,19 +43,19 @@ pub struct Case {
 
 pub const CASES: &[Case] = &[
     Case {
-        golden: "lists/space_editor/rows-system.html",
+        golden: "space_editor/rows-system.html",
         make: || editor_rows(Theme::System),
     },
     Case {
-        golden: "lists/space_editor/rows-dark.html",
+        golden: "space_editor/rows-dark.html",
         make: || editor_rows(Theme::Dark),
     },
     Case {
-        golden: "lists/space_editor/rename-unnamed.html",
+        golden: "space_editor/rename-unnamed.html",
         make: || rsx! { SpaceEditor { look: look(2, Theme::Light), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, on_rename: EventHandler::new(|_: String| {}) } },
     },
     Case {
-        golden: "lists/space_editor/motion-row.html",
+        golden: "space_editor/motion-row.html",
         make: || {
             rsx! {
                 SpaceEditor {
