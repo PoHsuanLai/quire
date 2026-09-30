@@ -155,7 +155,7 @@ mod hook {
         use_context_provider(|| {
             let resolved = Resolved {
                 scheme: Scheme::Light,
-                accent: Accent::Postmark,
+                accent: Accent::Blue,
                 motion: MotionLevel::Standard,
             };
             Signal::new(Scope {

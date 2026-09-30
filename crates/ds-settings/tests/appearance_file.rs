@@ -56,7 +56,7 @@ fn a_file_round_trips() {
         AppearanceFile::default(),
         with(|f| {
             f.appearance.theme = Theme::Dark;
-            f.appearance.accent = Accent::Violet;
+            f.appearance.accent = Accent::Purple;
             f.appearance.motion_level = Motion::Reduced;
         }),
         with(|f| {

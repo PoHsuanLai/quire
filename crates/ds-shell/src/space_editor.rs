@@ -127,7 +127,7 @@ pub fn SpaceEditor(
                     label: "Accent",
                     choices: Choice::pairs(vec![
                         (CardAccent::SpaceHue, "A hint of the Space".to_string()),
-                        (CardAccent::Postmark, "Postmark".to_string()),
+                        (CardAccent::Chosen, "The accent".to_string()),
                     ]),
                     tracking: Tracking::SelectOne(look.card_accent),
                     onchange: {

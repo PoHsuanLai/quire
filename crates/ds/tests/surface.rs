@@ -34,7 +34,7 @@ fn Reads() -> Element {
 fn Root(setup: Setup) -> Element {
     rsx! {
         Ds {
-            appearance: Appearance { accent: Accent::Postmark, ..Appearance::default() },
+            appearance: Appearance { accent: Accent::Blue, ..Appearance::default() },
             material: Material::Popover,
             blur: BlurState::Unavailable,
             Surface {
@@ -75,17 +75,17 @@ fn each_override_is_stamped_and_read() {
                 blur: None,
                 radius: None,
             },
-            "light postmark sheet off",
+            "light blue sheet off",
         ),
         (
             "accent",
             Setup {
                 theme: None,
-                accent: Some(Accent::Violet),
+                accent: Some(Accent::Purple),
                 blur: None,
                 radius: None,
             },
-            "light violet sheet off",
+            "light purple sheet off",
         ),
         (
             "blur",
@@ -95,17 +95,17 @@ fn each_override_is_stamped_and_read() {
                 blur: Some(BlurState::Available),
                 radius: None,
             },
-            "light postmark sheet on",
+            "light blue sheet on",
         ),
         (
             "all",
             Setup {
                 theme: Some(Scheme::Dark),
-                accent: Some(Accent::Violet),
+                accent: Some(Accent::Purple),
                 blur: Some(BlurState::Available),
                 radius: None,
             },
-            "dark violet sheet on",
+            "dark purple sheet on",
         ),
         (
             "radius",
@@ -115,7 +115,7 @@ fn each_override_is_stamped_and_read() {
                 blur: None,
                 radius: Some(Corner::Token(Radius::Panel)),
             },
-            "light postmark sheet off",
+            "light blue sheet off",
         ),
     ];
     let mut failures = Vec::new();

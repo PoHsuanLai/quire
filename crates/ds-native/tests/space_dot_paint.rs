@@ -22,7 +22,7 @@ fn frame(index: usize) -> FrameVars {
         dots: PRESETS[index].dots.to_vec(),
         grain: Grain(0),
         theme: Theme::Light,
-        card_accent: CardAccent::Postmark,
+        card_accent: CardAccent::Chosen,
     };
     FrameVars::of(&look, Scheme::Light)
 }

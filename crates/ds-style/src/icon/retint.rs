@@ -57,7 +57,7 @@ impl Tint {
     };
 
     /// `icons.monochrome_tint = space`: the hue and chroma of the accent the Space derives
-    /// (its first dot at Postmark's weight, design/03-COLOR.md section 5), so the icons follow
+    /// (its first dot at Blue's weight, design/03-COLOR.md section 5), so the icons follow
     /// the frame. Capped at [`TINT_CHROMA_MAX`].
     pub fn space(dots: &[Dot]) -> Tint {
         Tint::from_hex(&derive(dots, Scheme::Light).accent).unwrap_or(Tint::NEUTRAL)

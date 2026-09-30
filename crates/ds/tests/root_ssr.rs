@@ -130,7 +130,7 @@ fn the_root_stamps_exactly_its_attributes() {
             setup: Setup {
                 appearance: Appearance {
                     theme: Theme::System,
-                    accent: Accent::Violet,
+                    accent: Accent::Purple,
                     motion: Motion::Standard,
                 },
                 system: dark_reduced,
@@ -138,7 +138,7 @@ fn the_root_stamps_exactly_its_attributes() {
                 ..Setup::default()
             },
             theme: "dark",
-            accent: "violet",
+            accent: "purple",
             motion: "reduced",
             material: "popover",
             blur: "on",
@@ -152,7 +152,7 @@ fn the_root_stamps_exactly_its_attributes() {
             setup: Setup {
                 appearance: Appearance {
                     theme: Theme::Light,
-                    accent: Accent::Postmark,
+                    accent: Accent::Blue,
                     motion: Motion::Standard,
                 },
                 system: dark_reduced,
@@ -160,7 +160,7 @@ fn the_root_stamps_exactly_its_attributes() {
                 ..Setup::default()
             },
             theme: "light",
-            accent: "postmark",
+            accent: "blue",
             motion: "reduced",
             material: "bar",
             blur: "off",
@@ -181,7 +181,7 @@ fn the_root_stamps_exactly_its_attributes() {
                 ..Setup::default()
             },
             theme: "dark",
-            accent: "postmark",
+            accent: "blue",
             motion: "standard",
             material: "popover",
             blur: "off",
@@ -359,7 +359,7 @@ fn a_surface_nests_a_scope_without_a_stylesheet() {
         ("class", "ds".to_owned()),
         ("data-theme", "dark".to_owned()),
         ("data-typeface", "system".to_owned()),
-        ("data-accent", "postmark".to_owned()),
+        ("data-accent", "blue".to_owned()),
         ("data-motion", "standard".to_owned()),
         ("data-material", "popover".to_owned()),
         ("data-blur", "off".to_owned()),

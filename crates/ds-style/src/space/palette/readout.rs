@@ -38,8 +38,8 @@ impl ContrastCheck {
 ///
 /// Sidebar ink and faint text on every stop of the frame, the card's accent text on the card,
 /// and the card's ink on the accent's wash laid over the card (the wash is translucent, so it
-/// is composited before it is measured). With [`CardAccent::Postmark`] the last two measure
-/// Postmark, since that is what the card then wears. A colour that is not a hex pair
+/// is composited before it is measured). With [`CardAccent::Chosen`] the last two measure
+/// the chosen accent, since that is what the card then wears. A colour that is not a hex pair
 /// measures 0, which fails, rather than being left out.
 pub fn readout(space: &SpaceLook, scheme: Scheme) -> Vec<ContrastCheck> {
     let palette = derive(&space.dots, scheme);
@@ -53,7 +53,7 @@ pub fn readout(space: &SpaceLook, scheme: Scheme) -> Vec<ContrastCheck> {
     };
     let roles = match space.card_accent {
         CardAccent::SpaceHue => palette.accent_roles,
-        CardAccent::Postmark => accent_of(Accent::Postmark, scheme),
+        CardAccent::Chosen => accent_of(Accent::Blue, scheme),
     };
     let wash = Hex::parse(post.surface)
         .map(|surface| roles.fill.over(roles.wash, surface).css())

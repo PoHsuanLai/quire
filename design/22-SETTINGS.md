@@ -100,7 +100,7 @@ control in v1.
 | --- | --- | --- | --- | --- | --- |
 | `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
 | `appearance.look` | `Look::{Mac}` (Arc joins with the second Look) | `Mac` | a Look is values only | `30-CATALOGUE.md` part 3 | settled (user, 2026-09-29) |
-| `appearance.accent` | `Accent` (6 variants) | `Postmark` | other 5 not named in any doc (03-COLOR open decision 6) — **could not find full default set**, see handback | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
+| `appearance.accent` | `Accent` (8 variants: `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`, `graphite`, macOS's own list in its picker order) | `Blue` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.typeface` | `Typeface::{System,Editorial}` | `System` | `System`: Inter for UI and data (tabular), Inter Display for display; `Editorial`: Bricolage Grotesque, Karla and Space Mono, mail's voice, as an opt-in for an app. Written as `data-typeface` on `.ds`. Code and `Kbd` stay in Space Mono (`--font-code`) either way | `02-TYPE.md#2-the-faces` | settled (user, 2026-09-26: "make this desktop use mostly inter") |
 | `appearance.material_tint_alpha` | `Percent` | `80` | | `21-SPACES.md#3-where-the-tokens-apply` ("`--m-tint` = ... alpha .80 (proposed)") | proposed |
@@ -420,7 +420,7 @@ data, not a key.
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.default_card_accent` | `CardAccent::{Postmark,SpaceHue}` | `Postmark` | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
+| `spaces.default_card_accent` | `CardAccent::{Chosen,SpaceHue}` | `Chosen` (the accent picked in `appearance.accent`) | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | RETIRING: no reader; the store lookup is not built |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
@@ -1006,10 +1006,8 @@ contacts register their account pages this way (`20-SURFACES.md`).
    `sill`'s schema or vice versa, which sill's crate boundaries (its ARCHITECTURE.md, "Crates":
    `sill-launcher`/`sill-ipc` must not reach several crates) argue against generalizing.
    Kept separate; revisit only if the two are shown to drift out of sync in practice.
-2. **`appearance.accent`'s other five variants are unnamed** (`03-COLOR.md#open-decisions` item
-   6) — no doc gives a set of 6 accent names beyond `Postmark`. Cannot default what is not
-   named; `ds`'s token table needs this filled in before `AppearancePicker` can render six
-   swatches.
+2. **`appearance.accent`'s set is settled (2026-09-30)**: macOS's eight, Blue the default; the
+   old Postmark/Amber/Violet words are not migrated.
 3. **`control_center.modules`'s order is plan-derived, not compared against the Claude Doc spec
    (rev 31)** (`13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 4) — the default above
    ships but is explicitly provisional.

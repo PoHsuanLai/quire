@@ -6,7 +6,7 @@
 //! whatever lies behind it. Each is measured here as a screen composites it.
 //!
 //! One text accent cannot serve both kinds of ground and stay the band's: over a black backdrop
-//! a light Popover is `#c7c7c7`, and text that reads there is Postmark's old navy (OKLCH L .43)
+//! a light Popover is `#c7c7c7`, and text that reads there is the old navy (OKLCH L .43)
 //! that band B was picked to leave; over a white one a dark Popover is `#585e56`, and text that
 //! reads there is nearly the ink. So there are two: [`TextOn::Card`], gated on the opaque
 //! grounds and the wash over them, and [`TextOn::Material`], gated on every ground here.

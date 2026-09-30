@@ -94,7 +94,7 @@ struct Case {
 }
 
 const CASES: &[Case] = &[
-    // SpaceEditor: the two sample Spaces in each scheme and a one-dot Postmark Space.
+    // SpaceEditor: the two sample Spaces in each scheme and a one-dot Space on the chosen accent.
     Case {
         state: "work-light",
         make: || editor(preset_look(0, Grain(35)), Scheme::Light, 0),
@@ -108,11 +108,11 @@ const CASES: &[Case] = &[
         make: || editor(preset_look(1, Grain(55)), Scheme::Light, 2),
     },
     Case {
-        state: "one-dot-postmark",
+        state: "one-dot-chosen",
         make: || {
             editor(
                 SpaceLook {
-                    card_accent: CardAccent::Postmark,
+                    card_accent: CardAccent::Chosen,
                     ..preset_look(2, Grain(40))
                 },
                 Scheme::Light,

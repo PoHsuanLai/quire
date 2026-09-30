@@ -31,7 +31,7 @@ impl FrameVars { pub fn of(look: &SpaceLook, scheme: Scheme) -> Self; pub fn sty
 | `dots` | 1-3 colours, left to right across the gradient (S editor: up to 3 dots) | hue 0-360, chroma 0-1 |
 | `grain` | noise strength | 0-100 |
 | `theme` | this Space's appearance: System / Light / Dark (S editor "Appearance" segment) | enum |
-| `card_accent` | Postmark blue, or the Space's hue (S editor "Accent" segment) | enum |
+| `card_accent` | the chosen accent (`Chosen`), or the Space's hue (S editor "Accent" segment) | enum |
 
 **Motion is not part of a Space (settled, 2026-09-24).** A `SpaceLook` has no motion field: how
 much a surface moves is global, the `Appearance`'s `motion` resolved with the system's
@@ -132,7 +132,7 @@ Postmark, Graphite, Pine, Indigo, Oxblood, Vermilion) are not in quire's eight.
 Default `SpaceLook` for a workspace with no stored look (proposed):
 - `dots = PRESETS[index % 8]`, index = the workspace's 0-based position on its output.
 - `grain`: 35 for preset 1, 55 for preset 2 (settled values), 40 for presets 3-8 (proposed).
-- `theme = System`; `card_accent = Postmark` (proposed).
+- `theme = System`; `card_accent = Chosen` (proposed).
 
 ## 5. Workspace switch (settled model)
 
@@ -176,7 +176,7 @@ Pieces (settled, Appendix A4 "Space editor", from 04-COMPONENTS):
 | handle | 22 circle, border 3 white, shadow `0 0 0 1px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.35)`, `role=slider`, keys left/right hue 5deg, up/down chroma .05 |
 | stops | pill chips pad `3 5 3 4`, 14 disc + degrees + x 11; up to 3 dots |
 | grain | `Slider` 0-100 |
-| segments | `SegmentedControl`s: Appearance (System/Light/Dark), Accent (Space hue vs Postmark) |
+| segments | `SegmentedControl`s: Appearance (System/Light/Dark), Accent (Space hue vs the chosen accent) |
 | presets | 8 cols gap 6, round, border line |
 | checks | pills ok/bad at 16 % wash: the four guarantees of §7 |
 | capnote | 11.5 px, shown when `capped` |
@@ -228,7 +228,7 @@ position".
   "version": 1,
   "by_id": {
     "<cosmic workspace id>": { "dots": [{"hue": 268, "chroma": 0.72}, {"hue": 318, "chroma": 0.55}],
-                               "grain": 35, "theme": "system", "card_accent": "postmark" }
+                               "grain": 35, "theme": "system", "card_accent": "chosen" }
   },
   "by_index": [ { "...": "SpaceLook for workspace 0 on its output" } ]
 }

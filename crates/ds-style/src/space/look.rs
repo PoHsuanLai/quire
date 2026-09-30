@@ -20,16 +20,16 @@ impl Default for Grain {
     }
 }
 
-/// Whether the card's accent follows the Space or stays Postmark
+/// Whether the card's accent follows the Space or stays the accent the person picked
 /// (design/22-SETTINGS.md section 3.14 `spaces.default_card_accent`).
 ///
 /// mailo called the Space variant `Hint`; the settings doc names it `SpaceHue`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum CardAccent {
-    /// The card keeps Postmark, whatever hue the Space is.
+    /// The card keeps the chosen accent, whatever hue the Space is.
     #[default]
-    Postmark,
+    Chosen,
     /// The card borrows the Space's hue at a quarter of a free accent's chroma.
     SpaceHue,
 }
@@ -49,13 +49,13 @@ pub struct SpaceLook {
 }
 
 impl Default for SpaceLook {
-    /// The neutral Space: the grey dot, the first-run grain, the system theme, Postmark.
+    /// The neutral Space: the grey dot, the first-run grain, the system theme, the chosen accent.
     fn default() -> Self {
         SpaceLook {
             dots: vec![NEUTRAL_DOT],
             grain: Grain::default(),
             theme: Theme::System,
-            card_accent: CardAccent::Postmark,
+            card_accent: CardAccent::Chosen,
         }
     }
 }

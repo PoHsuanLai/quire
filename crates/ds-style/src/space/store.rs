@@ -35,16 +35,16 @@ pub struct Workspace {
 pub struct SpaceDefaults {
     /// The grain for presets that ship none (proposed 40).
     pub grain: Grain,
-    /// The card accent (proposed Postmark).
+    /// The card accent (proposed: the chosen accent).
     pub card_accent: CardAccent,
 }
 
 impl Default for SpaceDefaults {
-    /// design/21 section 4's proposed defaults: grain 40, Postmark.
+    /// design/21 section 4's proposed defaults: grain 40, the chosen accent.
     fn default() -> Self {
         SpaceDefaults {
             grain: Grain(40),
-            card_accent: CardAccent::Postmark,
+            card_accent: CardAccent::Chosen,
         }
     }
 }
@@ -168,7 +168,7 @@ mod tests {
         for index in [0, 1, 2, 7, 8, 13] {
             let got = store.look_for(WorkspaceIndex(index), SpaceDefaults::default());
             assert_eq!(got.dots, PRESETS[index % 8].dots, "workspace {index}");
-            assert_eq!(got.card_accent, CardAccent::Postmark, "workspace {index}");
+            assert_eq!(got.card_accent, CardAccent::Chosen, "workspace {index}");
         }
     }
 

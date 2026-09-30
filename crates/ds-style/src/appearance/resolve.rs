@@ -118,14 +118,14 @@ mod tests {
     fn attrs_are_always_explicit() {
         let resolved = Resolved {
             scheme: Scheme::Dark,
-            accent: Accent::Violet,
+            accent: Accent::Purple,
             motion: MotionLevel::Reduced,
         };
         assert_eq!(
             resolved.attrs(),
             [
                 ("data-theme", "dark"),
-                ("data-accent", "violet"),
+                ("data-accent", "purple"),
                 ("data-motion", "reduced")
             ]
         );

@@ -62,7 +62,7 @@ fn env() -> Scope {
     Scope {
         resolved: Resolved {
             scheme: Scheme::Light,
-            accent: Accent::Postmark,
+            accent: Accent::Blue,
             motion: MotionLevel::Reduced,
         },
         scheme: Scheme::Light,

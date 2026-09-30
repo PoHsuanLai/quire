@@ -113,8 +113,8 @@ fn the_ink_is_deep() {
     }
 }
 
-/// The six swatches in the picker are six colours: every pair of built-in fills stands at least
-/// 0.06 apart in OKLab in both schemes (the narrowest gap, Violet to Postmark, is 0.064).
+/// The eight swatches in the picker are eight colours: every pair of built-in fills stands at least
+/// 0.04 apart in OKLab in both schemes (the narrowest gap is Apple's own, Red to Pink in light, 0.045).
 #[test]
 fn every_built_in_swatch_is_distinct() {
     for scheme in Scheme::ALL.iter().copied() {
@@ -128,7 +128,7 @@ fn every_built_in_swatch_is_distinct() {
                 let apart =
                     Oklab::from(Srgb::from(first)).distance(Oklab::from(Srgb::from(second)));
                 assert!(
-                    apart >= 0.06,
+                    apart >= 0.04,
                     "{scheme:?}: {one:?} {} and {other:?} {} are {apart:.3} apart",
                     first.css(),
                     second.css()
@@ -141,9 +141,9 @@ fn every_built_in_swatch_is_distinct() {
 /// The Mac Look's default accent is systemBlue with white ink, light then dark; the text accent,
 /// wash and ring are derived around it.
 #[test]
-fn postmark_is_system_blue() {
-    let light = accent_of(Accent::Postmark, Scheme::Light);
-    let dark = accent_of(Accent::Postmark, Scheme::Dark);
+fn blue_is_system_blue() {
+    let light = accent_of(Accent::Blue, Scheme::Light);
+    let dark = accent_of(Accent::Blue, Scheme::Dark);
     let got = [
         light.fill.css(),
         light.ink.css(),

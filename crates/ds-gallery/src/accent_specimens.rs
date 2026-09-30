@@ -42,7 +42,7 @@ impl Paint {
     }
 
     /// The custom properties that repaint a subtree on the card (each root already writes
-    /// Postmark's; a hue swatch writes its own).
+    /// Blue's; a hue swatch writes its own).
     fn vars(&self) -> String {
         self.vars_with(&self.text)
     }
@@ -93,7 +93,7 @@ fn theme_of(scheme: Scheme) -> Theme {
 /// The surfaces in `scheme`.
 #[component]
 pub fn Specimens(scheme: Scheme) -> Element {
-    let paint = Paint::of(Accent::Postmark, scheme);
+    let paint = Paint::of(Accent::Blue, scheme);
     let vars = paint.vars();
     let material_vars = paint.material_vars();
     let wall = format!("background-image:url(\"{}\")", wallpaper::calm_uri(scheme));
@@ -105,7 +105,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
         style { {CSS} }
         div { class: "g-acc",
             div { class: "g-acc-head",
-                span { class: "g-name", "Accent band B (Airy), Postmark — {scheme.slug()}" }
+                span { class: "g-name", "Accent band B (Airy), Blue — {scheme.slug()}" }
                 span { class: "g-code", "{summary}" }
             }
             div { class: "g-acc-wall", style: "{wall}",

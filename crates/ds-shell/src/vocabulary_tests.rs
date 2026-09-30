@@ -41,7 +41,7 @@ fn the_kits_reach_the_vocabulary() {
         "--handle-ring",
         "--t-quick",
         "--c-violet-soft",
-        "--swatch-postmark",
+        "--swatch-blue",
         "--f-grad",
         "--m-tint",
         "--m-tint-alpha",

@@ -84,11 +84,11 @@ mod tests {
             stored_words::<ds_style::appearance::accent::Accent>()
                 .first()
                 .map(String::as_str),
-            Some("postmark")
+            Some("blue")
         );
         assert_eq!(
             stored_words::<ds_style::appearance::accent::Accent>().len(),
-            6
+            8
         );
     }
 

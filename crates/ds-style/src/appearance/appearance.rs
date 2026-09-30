@@ -37,7 +37,7 @@ where
         .unwrap_or_default())
 }
 
-/// A stored accent. Anything that is not one of the six is [`Accent::default`].
+/// A stored accent. Anything that is not one of the eight is [`Accent::default`].
 fn de_accent<'de, D>(deserializer: D) -> Result<Accent, D::Error>
 where
     D: Deserializer<'de>,
@@ -117,10 +117,10 @@ mod tests {
             ),
             (
                 "every field",
-                r#"{"theme":"dark","accent":"violet","motion":"reduced","future":true}"#,
+                r#"{"theme":"dark","accent":"purple","motion":"reduced","future":true}"#,
                 Appearance {
                     theme: Theme::Dark,
-                    accent: Accent::Violet,
+                    accent: Accent::Purple,
                     motion: Motion::Reduced,
                 },
             ),

@@ -2478,7 +2478,7 @@ unchanged, and the system's reduced-motion preference still maps into it.
   <div class="ds-appearance-row">
     <div class="ds-section-header" data-kind="field">Accent</div>
     <div class="ds-appearance-swatches" role="group" aria-label="Accent">
-      <button type="button" class="ds-space-dot" aria-pressed="true" aria-label="Postmark" style="background:…"></button>
+      <button type="button" class="ds-space-dot" aria-pressed="true" aria-label="Blue" style="background:…"></button>
       …one per accent…
     </div>
   </div>

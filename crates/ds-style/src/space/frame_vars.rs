@@ -54,7 +54,7 @@ impl FrameVars {
             Scheme::Dark => "rgba(255,255,255,.09)",
         };
         let accent = match look.card_accent {
-            CardAccent::Postmark => None,
+            CardAccent::Chosen => None,
             CardAccent::SpaceHue => Some(palette.accent_roles),
         };
         FrameVars {
@@ -264,14 +264,17 @@ mod tests {
             assert_eq!([vars.pill.as_str(), &vars.line], [pill, line], "{case}");
             let lent = crate::space::palette::derive(&look.dots, scheme).accent_roles;
             assert_eq!(vars.accent, Some(lent), "{case}");
-            let postmark = FrameVars::of(
+            let chosen = FrameVars::of(
                 &SpaceLook {
-                    card_accent: CardAccent::Postmark,
+                    card_accent: CardAccent::Chosen,
                     ..look
                 },
                 scheme,
             );
-            assert_eq!(postmark.accent, None, "{case}: Postmark writes no accent");
+            assert_eq!(
+                chosen.accent, None,
+                "{case}: the chosen accent writes no accent"
+            );
         }
         assert_eq!(MOCKUP.len(), PRESETS.len() * 2);
     }
