@@ -340,7 +340,7 @@ language." What the language says, applied to an app icon:
 | One weight (00 3, C:1121) | Every line is one stroke: 2 units of the 24 glyph grid laid over the plate, round caps and joins. No hairlines, no second weight. |
 | Colour is a claim (00 3) | Four colours besides the plate: the family's `deep` and `soft` (or `base` on paper), paper, ink. No other hue. |
 | The cuteness is in the corner radius (C:1162) | Paper shapes take Post's card corner, `12 12 12 4` read as `3 3 3 1` (or `2.5 2.5 2.5 1`) grid units, so the small bottom-left corner recurs across the set. |
-| Grain (03 8) | The plate carries the frame's grain tile (Park-Miller seed 7, overlay, `grain / 100 x 0.20`) from 48 px up; cut-outs sit above it, like content over the frame. |
+| Grain (03 8) | The plate carries the frame's grain tile (Park-Miller seed 7, overlay, `grain / 100 x 0.10`) from 48 px up; cut-outs sit above it, like content over the frame. |
 | No illustration (C:968) | No lighting, no perspective, no gloss, no scene. One idea per icon, two to four shapes. |
 
 Cut-outs may carry a lift: Post `--shadow-1`'s drop (`0 1px 2px`) read in the grid at the 48 px

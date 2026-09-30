@@ -381,7 +381,7 @@ conflict with C's Post.
 | `--accent-2` | #2E5AA6 / #7FA6E6 | absent |
 | Accent option | fixed | per Space: "Your accent" or "Space colour" (an OKLCH accent derived from the Space's first dot, contrast-checked against the card; S:1201-1203, `03-COLOR.md`) |
 | `--scrim` | none; the scrim is `--ink` at opacity .16 (C:1054) | `rgba(0,0,0,.22)` (S:15) |
-| Grain | `--grain` token .035/.05, unused | a real 128x128 noise tile on the frame, overlay blend, opacity = grain/100 x (.16 dark, .20 light) (S:87, S:1162-1169, S:1188) |
+| Grain | `--grain` token .035/.05, unused | a real 128x128 noise tile on the frame, overlay blend, opacity = grain/100 x (.08 dark, .10 light) (S:87, S:1162-1169, S:1188) |
 | The frame | none: the shell is a bordered panel on paper (C:262-268) | `.win`: Space gradient layers, grain, sidebar drawn on the colour with `--f-*` tokens, the card inset 8 px (S:77-87, S:156-160) |
 | Candy shelf, `--wash` | present | absent: label chips are all `--accent-soft`; "Colour is a claim" is not carried into S |
 | Motion tokens | full set incl. `--t-ambient`, `--e-exit`, `--tilt`, `--shadow-drag` | only t-tap/quick/move/big, e-out, e-spring, overshoot, squish, lift, stagger (S:17-19); the exit curve is written inline |

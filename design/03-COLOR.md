@@ -220,7 +220,7 @@ Rust port must round to 8-bit before measuring to reproduce `capped` exactly.
 ### 4.5 Application
 
 ```js
-$("#grain").style.opacity = String(s.grain / 100 * (p.dark ? 0.16 : 0.2));
+$("#grain").style.opacity = String(s.grain / 100 * (p.dark ? 0.08 : 0.1));
 win.style.setProperty("--f-ink", p.ink); win.style.setProperty("--f-ink-soft", p.soft); win.style.setProperty("--f-ink-faint", p.faint);
 win.style.setProperty("--f-pill", p.pill);
 win.style.setProperty("--f-solid", p.stops[0]);
@@ -330,7 +330,7 @@ const grainURL = (() => { try{
 | Generator | Park-Miller (Lehmer) PRNG, seed 7, multiplier 16807, modulus 2147483647 | `S:1165` |
 | Pixel | grey `v = floor(rnd × 255)` in R, G and B; alpha 255 | `S:1166` |
 | Blend | `mix-blend-mode:overlay` | `S:87` |
-| Opacity | `grain / 100 × 0.20` light, `× 0.16` dark; grain is 0..100 | `S:1188`, `S:875` |
+| Opacity | `grain / 100 × 0.10` light, `× 0.08` dark; grain is 0..100 | `S:1188`, `S:875` |
 | Z | above the gradient layers (-1), below content | `S:87` |
 
 The design system replaces the overlay blend (unsupported in Blitz) with a pre-rendered PNG built

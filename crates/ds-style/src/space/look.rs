@@ -7,8 +7,8 @@ use serde::{Deserialize, Serialize};
 
 /// How loud the frame's grain is, 0 to 100.
 ///
-/// The value is a percentage of the full-strength tile: opacity is `grain / 100 x .20` light
-/// and `x .16` dark (design/03-COLOR.md section 8).
+/// The value is a percentage of the full-strength tile: opacity is `grain / 100 x .10` light
+/// and `x .08` dark (design/03-COLOR.md section 8).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Grain(pub u8);

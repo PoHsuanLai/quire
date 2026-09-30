@@ -74,7 +74,7 @@ Frame tokens that are not in palette.rs (settled in S:1188-1193; `FrameVars` add
 | --- | --- | --- |
 | `--f-line` | `rgba(0,0,0,.08)` | `rgba(255,255,255,.09)` |
 | `--f-solid` | `stops[0]` | `stops[0]` |
-| grain opacity | `grain/100 x .20` | `grain/100 x .16` |
+| grain opacity | `grain/100 x .10` | `grain/100 x .08` |
 
 Port notes (settled finding, fix in quire): palette.rs:177 hard-codes the card surface as
 `#F8F9F6` / `#1D211B`; in quire it reads the `surface` token from the token table.
