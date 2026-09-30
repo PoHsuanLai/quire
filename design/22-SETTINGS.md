@@ -181,7 +181,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.magnified_size_px` | `Px` | `96` | `tile_size..128` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
 | `dock.influence_radius_px` | `Px` | `96` | alt `144` | `10-BEHAVIOUR-dock.md#10-3-3-magnification`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 1 | proposed — **flagged for review** |
 | `dock.tile_gap_px` | `Px` | `8` | was 4 before the polish pass | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
-| `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | proposed |
+| `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | RETIRING: no reader; the Dock draws a bar under the icon, as macOS does (design/30 Part 4) |
 | `dock.autohide` | `AutoHide::{Off,On}` | `Off` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
 | `dock.autohide_delay_ms` | `Ms` | `200` | `0..1000` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
 | `dock.autohide_slide_ms` | `Ms` | `500` | `0..1500` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default |
@@ -195,10 +195,10 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.pill_radius_px` | `Px` | `22` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.edge_clamp_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.running_dot_diameter_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
-| `dock.badge_size_px` | `Px` | `18` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
-| `dock.badge_radius_px` | `Px` | `9` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
-| `dock.progress_ring_diameter_px` | `Px` | `20` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
-| `dock.progress_ring_stroke_px` | `Px` | `3` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
+| `dock.badge_size_px` | `Px` | `18` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
+| `dock.badge_radius_px` | `Px` | `9` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
+| `dock.progress_ring_diameter_px` | `Px` | `20` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
+| `dock.progress_ring_stroke_px` | `Px` | `3` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | RETIRING: no reader; quire's `Badge` and `ProgressIndicator` set their own sizes (`DockTile`) |
 | `dock.separator_height_px` | `Px` | `36` | | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator` | proposed |
 | `dock.magnify_enter_ms` | `Ms` | `120` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | proposed |
 | `dock.magnify_leave_ms` | `Ms` | `200` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | settled (~200ms), easing proposed |
@@ -375,7 +375,7 @@ found elsewhere in the file that are not yet in that table.
 | `notifications.banner_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.icon_px` | `Px` | `32` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.banner_hold_ms` | `Ms` | `5200` | fixed ~5s; app `expire_timeout` ignored except 0 | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications`; `05-MOTION.md#10-shell-motion` | settled (R8), preference-adjacent |
-| `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | unread since step 4a.7: a banner slides in from and out to the right (design/30 section 1.3) | `05-MOTION.md#12-open-decisions` item 7 | proposed |
+| `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | | `05-MOTION.md#12-open-decisions` item 7 | RETIRING: no reader; a banner slides in from and out to the right (design/30 section 1.3) |
 | `notifications.hover_min_remaining_ms` | `Ms` | `1500` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8), number proposed |
 | `notifications.close_button_px` | `Px` | `18` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.swipe_dismiss_px` | `Px` | `80` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
