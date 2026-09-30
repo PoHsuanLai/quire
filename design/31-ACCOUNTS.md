@@ -1,6 +1,8 @@
 # 31 Accounts: the account and capability layer
 
-Status: this whole document is **proposed** (2026-09-30) unless a line says settled. It
+Status: this whole document is **proposed** (2026-09-30) unless a line says settled. Its
+interfaces are **frozen** in the porter repo (section 11): where a frozen type differs from the
+first proposal, the text below already says the frozen form. It
 replaces the "28-ACCOUNTS" design doc promised by `20-SURFACES.md#117-accounts-system-service`
 (28 went to Customization). Status column: **P** = proposed, **S** = settled, **O** = option
 (a phased ambition the user has not decided; section 8). Confidence: **H** official source read
@@ -59,7 +61,7 @@ accounts too, discovered without sign-in, and win by default.
 | --- | --- | --- | --- | --- |
 | C1 | Google Photos Library API lost `photoslibrary`, `.readonly`, `.sharing` on 2025-03-31; only `appendonly`, `readonly.appcreateddata`, `edit.appcreateddata` remain; reading the user's existing library is only possible through the Picker API, one user-driven session at a time | H | developers.google.com/photos/support/updates (fetched 2026-09-30); [P] §2 Google | **R1** Google Photos declares `Photos { library_read: PickerOnly, upload: Yes, albums: AppCreated }`. It is an upload target and an import source, never a library mirror. The UI says "Backs up to Google Photos; cannot show your existing Google Photos library". |
 | C2 | Gmail `mail.google.com/`, `gmail.readonly`, `gmail.modify` are restricted; `gmail.send` is sensitive. Drive `drive`, `drive.readonly`, `drive.metadata*` are restricted; `drive.file` and `drive.appdata` are non-sensitive. Restricted scopes need verification, and a security assessment (CASA) at least every 12 months when the app can reach the data "from or through a third-party server" | H | developers.google.com/workspace/gmail/api/auth/scopes; .../drive/api/guides/api-specific-auth; .../production-readiness/restricted-scope-verification (all fetched 2026-09-30) | **R2** Google Drive is `Storage { scope: AppFolder }` via `drive.file` by default; `Full` only when the build's client is verified for `drive`. **R3** Google restricted data never touches a server of ours (no relay, no self-hosted server path, no cloud AI routing by default), so the build stays in the local-client case; whether that removes the CASA requirement is our reading of the policy, to be confirmed with Google during verification, and the plan does not depend on it. **R4** Each account carries `Restriction` metadata (§2.5) so the UI can show "limited: unverified build". |
-| C3 | Unverified Google apps: 100-user cap and a warning screen; Testing-mode refresh tokens expire after 7 days | M | [P] §2 Google, §3 | **R5** Client IDs are a registry per issuer per build channel (mailo `signin.rs` already does this) with a "bring your own client ID" override; `TokenLifetime::SevenDays` shows a re-sign-in reminder instead of a silent failure. |
+| C3 | Unverified Google apps: 100-user cap and a warning screen; Testing-mode refresh tokens expire after 7 days | M | [P] §2 Google, §3 | **R5** Client IDs are a registry per issuer per build channel (mailo's sign-in module already does this) with a "bring your own client ID" override; `TokenLifetime::SevenDays` shows a re-sign-in reminder instead of a silent failure. |
 | C4 | iCloud: no public Drive or Photos API; mail, contacts and calendars through IMAP/SMTP, CardDAV, CalDAV with app-specific passwords (2FA required, up to 25, all revoked when the Apple Account password changes); new-format Reminders not exposed | H (passwords), M (absence of API) | support.apple.com/en-us/102654 (fetched 2026-09-30); [P] §2 Apple | **R6** iCloud declares Mail, Calendar, Contacts only. Storage and Photos are `Absent` with the reason "Apple offers no access". Import from an Apple privacy export or a local folder is the Photos path. A revoked app password surfaces as `NeedsReauth`, not a sync error. |
 | C5 | Anthropic: OAuth is only for Claude plans in Claude Code and Anthropic's own apps; third parties may not offer Claude.ai login, route requests through plan credentials, or collect or store Claude.ai tokens; developers use API keys or a cloud provider | H | code.claude.com/docs/en/legal-and-compliance (fetched 2026-09-30); [A] §3 | **R7** Claude is reachable only by Console API key or Bedrock/Vertex/Foundry credentials. The add-account sheet offers no "Sign in with Claude" and says so. |
 | C6 | Google suspended Gemini/Antigravity subscribers whose Gemini CLI or Antigravity OAuth tokens were used by third-party tools (from Feb 2026) | M | github.com/google-gemini/gemini-cli/discussions/20632; winbuzzer.com/2026/02/23/google-bans-ai-subscribers-openclaw-no-refunds-xcxwbn; [A] §3 | **R8** Gemini only by AI Studio key or Vertex credentials. Never read another program's token store. |
@@ -94,8 +96,12 @@ pub enum Capability {
     Rerank(RerankCap), KeyValue(KeyValueCap), Push(PushCap),
 }
 pub enum CapabilityKind { Identity, Mail, Calendar, Contacts, Tasks, Notes, Storage, Photos,
-    Llm, Embeddings, Speech, ImageGen, Rerank, KeyValue, Push }   // implements `Word`
+    Llm, Embeddings, Speech, ImageGen, Rerank, KeyValue, Push }   // serde snake_case slug
 ```
+
+Every closed set's stable slug is its serde `snake_case` form (files, bus, consent store). porter
+does not depend on quire's `ds-core`, so these enums do not implement `Word`: the account core
+builds below the design system for mailo on every platform; UI crates map slugs to labels.
 
 Every field is an enum or a newtype; no `bool` (CONVENTIONS §4). Shared small enums:
 
@@ -126,7 +132,7 @@ rather than flags.
 
 | Kind | Fields | St |
 | --- | --- | --- |
-| `Llm` | `features: BTreeSet<LlmFeature {Chat, Tools, Vision, AudioIn, Pdf, StructuredOutput, Reasoning, PromptCache}>`, `context: Tokens`, `max_output: Tokens`, `wire: LlmWire {ChatCompletions, Responses, Messages, GenerateContent}` | P |
+| `Llm` | `features: BTreeSet<LlmFeature {Chat, Tools, Vision, AudioIn, Pdf, StructuredOutput, Reasoning, PromptCache}>`, `context: Tokens`, `max_output: Tokens`, `wire: LlmWire {ChatCompletions, Responses, Messages, GenerateContent, OllamaNative}` | P |
 | `Embeddings` | `dims: Dims`, `modalities: BTreeSet<Modality {Text, Image}>`, `max_input: Tokens` | P |
 | `Speech` | `modes: BTreeSet<SpeechMode {Stt, Tts, Realtime}>`, `languages: LanguageSet` | P |
 | `ImageGen` | `modes: BTreeSet<ImageMode {TextToImage, Edit, Inpaint}>`, `max_side: Px` | P |
@@ -138,7 +144,7 @@ Two more properties sit beside every AI capability, not inside it:
 | --- | --- | --- |
 | `Locality` | `OnDevice`, `LocalNetwork`, `Cloud { region: Option<Region> }` | the routing policy and the data-class rules read it (§5.5) |
 | `Tier` | `Fast`, `Balanced`, `Best` | the user maps tiers to models per account; apps ask for a tier, never a model id ([A] §7) |
-| `Billing` | `Free`, `Metered { price: PriceTable }`, `PlanBudget` | spend caps (§5.5) |
+| `Billing` | `Free`, `Metered(PriceTable { input_per_mtok, output_per_mtok: MicroUsd })`, `PlanBudget` | spend caps (§5.5) |
 
 ### 2.4 Provenance
 
@@ -155,6 +161,14 @@ Each effective capability records how it is known ([R] §3; mailo's `AccountPlan
 Effective capability = (Declared, refined by Curated and Discovered, corrected by Probed)
 minus the user's per-account toggles. A change emits `CapabilityChanged` ([R] pitfall 10).
 
+Frozen shape: a `Claim { subject: Subject {Account, Model(ModelId)}, offer: Offer, provenance }`
+where `Offer` is `Present(Capability)` or `Absent { kind, reason: AbsentReason {ProviderOffersNone,
+TenantConsent, UnverifiedBuild, TurnedOff, NotOnServer} }`; `effective(claims, toggles)` keeps one
+claim per (subject, kind), the highest provenance winning, and turns a kind toggled off into
+`Absent { TurnedOff }`. `matches(need, offer) -> Match {Fits, Short(Shortfall), Absent(reason),
+OtherKind}` is the one place a need meets an offer; `Shortfall` names the first field that falls
+short so the UI can say why (G9).
+
 ### 2.5 Restriction metadata
 
 ```rust
@@ -162,11 +176,12 @@ pub struct Restriction {
     pub verification: Verification,   // NotNeeded | Verified | Unverified { user_cap: Count }
     pub token_lifetime: TokenLifetime, // Standard | SevenDays | UntilPasswordChange
     pub consent: TenantConsent,        // User | AdminRequired | AdminGranted
-    pub limit_reason: Option<LimitReason>, // AppendOnly | PickerOnly | AppFolderOnly | ProviderOffersNone
-}
+    pub limits: Vec<Limit>,            // Limit { kind: CapabilityKind, reason: LimitReason }
+}                                      // LimitReason: AppendOnly | PickerOnly | AppFolderOnly | ProviderOffersNone
 ```
 
-The detent page (§5.6) turns each variant into one secondary line.
+The detent page (§5.6) turns each variant into one secondary line. Limits are per kind: one
+Google account is `PickerOnly` for Photos and `AppFolderOnly` for Storage at once.
 
 ## 3. Providers
 
@@ -180,24 +195,39 @@ win). It names **families**, which are code:
 id = "fastmail"
 label = "Fastmail"
 mark = "fastmail"                        # ProviderMark glyph (30 §2.11)
+
 [auth]
-kind = "oauth_pkce"                      # or app_password, login_flow_v2, local_bridge, key_pair, api_key, oauth_mints_key, cloud_identity, none
-issuer = "fastmail"
+kind = "oauth_pkce"                      # none | local_runtime | password | app_password | login_flow_v2 | local_bridge
+issuer = "fastmail"                      #   | key_pair | api_key | oauth_pkce | oauth_mints_key | oauth_plan | cloud_identity
+
 [discovery]
-kind = "jmap_session"                    # autoconfig | well_known | jmap_session | nextcloud_ocs | fixed | probe_ports
+kind = "jmap_session"                    # autoconfig | well_known | jmap_session | nextcloud_ocs | fixed | model_list
+                                         #   | probe_ports, with v = { ports = [11434] }
+
 [[capability]]
-kind = "mail"; family = "jmap"; delta = "push"
+family = "jmap"
+kind = "mail"
+v = { access = "read_write", send = "present", delta = "push", transport = "jmap", labels = "folders" }
+
 [[capability]]
-kind = "contacts"; family = "jmap"; delta = "push"
-[[capability]]
-kind = "storage"; family = "webdav"; endpoint = "https://myfiles.fastmail.com/"; delta = "poll"; scope = "full"
+family = "webdav"
+endpoint = "https://myfiles.fastmail.com/"
+kind = "storage"
+v = { access = "read_write", delta = "poll", quota = "reported", scope = "full", hashes = "none", ranges = "present", chunked_upload = "absent" }
 ```
+
+The file is the serde form of porter's `ProviderSpec`: each row names its `family`, an optional
+fixed `endpoint`, and the capability as `kind` plus `v` with **every** field written (a missing
+field refuses the file; nothing defaults). An `issuer` is required exactly for the OAuth kinds
+(`Issuer`: google, microsoft, dropbox, box, fastmail, openrouter, openai). A provider with AI
+rows adds `[ai]` with `locality` and `billing`, and only such a provider may. A user file with a
+system file's `id` replaces it. porter ships `providers/{nextcloud,google,ollama}.toml`.
 
 | Layer | Form | Closed? | Adding one needs |
 | --- | --- | --- | --- |
 | Capability kind | Rust enum (§2) | yes, versioned | a vocab bump |
 | Family (protocol engine) | Rust enum `Family` + one crate or module each | yes | code |
-| Auth kind | Rust enum `AuthKind` | yes | code |
+| Auth kind | Rust enum `AuthKind` (in `porter-core`) | yes | code |
 | Provider | TOML file | no | a file |
 | Account | row in accountd's store + secrets | no | the user |
 
@@ -273,33 +303,46 @@ All are user-session services, D-Bus activated on Linux, single-instance through
 The core comes out of mailo the way latchkey did, coordinated with the mailo session: mailo
 moves to depending on it in the same change (CONVENTIONS §3: no alias left behind).
 
+Frozen as the porter repo (`porter-*` crates; section 11). The proposal's `accounts-auth` and
+`accounts-discover` are not crates yet: no provider or AI vendor code exists by decision, and
+when it does it lives in per-family crates behind `porter_provider::Provider`.
+
+<!-- paths: skip -->
 | Crate | Content | From mailo | I/O | Portable |
 | --- | --- | --- | --- | --- |
-| `accounts-core` | `Account`, `AccountId`, `ProviderSpec`, `Capability` (§2), `Restriction`, `AuthKind`, `Credential`, `SecretKey`, `SecretPurpose`, `Grant`, `DataClass`, pure `step` functions (effective capabilities, grant decisions, routing policy) | `mail-domain/src/account.rs` (`AuthPlan`, `OAuthIssuer`, `Credential` with its redacting `Debug`, `SecretKey`, `SecretPurpose`), `presets/` | none | yes |
-| `accounts-auth` | OAuth PKCE, loopback listener, client registry, renewal, app passwords, Login Flow v2, OpenRouter key mint | `mail-runtime/src/{oauth,signin,renewal,loopback}.rs` | HTTP | yes |
-| `accounts-secrets` | `Secrets` trait (get, put, forget) + backends: oo7 (Linux Secret Service, MIT), `keyring` (macOS, Windows), map fake for tests | `mail-runtime/src/secrets.rs` | keyring | yes |
-| `accounts-discover` | autoconfig, `.well-known`, SRV, JMAP session, Nextcloud OCS, port probes | `mail-runtime/src/discover.rs`, `mail-proto/src/discover` | network | yes |
-| `accounts-client` | the app-facing API (§5.1); trait `AccountsLink` with three implementations: `DbusLink`, `LatchkeyLink`, `EmbeddedLink` | new | per link | yes |
+| `porter-core` | ids, `Account`, `Capability` (§2), `Need`, `matches`, `effective`, `Restriction`, `AuthKind`, `Credential`, `SecretKey`, `SecretPurpose`, `Grant`, `decide`, `DataClass`, `AppId`, the wire protocol | `mail-domain/src/account.rs` (`OAuthIssuer`, `Credential` with its redacting `Debug`, `SecretKey`, `SecretPurpose`) | none | yes |
+| `porter-provider` | `ProviderSpec` and the file parser, `ProviderSet`, `Family`, `Issuer`, the `Provider`/`ProviderSession` traits | `presets/` become provider files | none | yes |
+| `porter-secrets` | `Secrets` trait (get, put, delete, delete_account) + backends: oo7 (Linux, stubbed until `oo7` joins the pinned block), a keyring store (macOS, Windows), `MemorySecrets` for tests | `mail-runtime/src/secrets.rs` | keyring | yes |
+| `porter-service` | accountd's core over its seams (providers, secrets, `Prompter`, `Clock`): answers every request; hosted by accountd or in process | new | none | yes |
+| `porter-client` | the app-facing API (§5.1); trait `Transport` with `DbusTransport`, `SocketTransport` (latchkey), `InProcess` | new | per transport | yes |
+| `porter-dbus` | the three buses as zbus proxies and skeletons, `dbus/*.xml` | new | D-Bus | Linux |
 | `accountd` | zbus front end, consent store, probes; also serves the latchkey front end where D-Bus is absent | new | yes | Linux first |
-| `sync-core`, `syncd` | journal, `Replica` trait (§6.1), dataset models | new | SQLite | core yes |
-| `storage-*` | one per family: `webdav`, `graph`, `gdrive`, `dropbox`, `s3` | new (mailo's CardDAV WebDAV code reused) | HTTP | yes |
-| `infer-core`, `inferd` | typed request model, adapters (`ChatCompletions`, `Responses`, `Messages`, `GenerateContent`, `OllamaNative`, `ComfyWorkflow`), policy | new | HTTP | core yes |
+| `porter-sync`, `syncd` | `Replica` contract (§6.1), dataset kinds; journal and scheduler in syncd | new | SQLite | core yes |
+| `storage-*` (later) | one per family: `webdav`, `graph`, `gdrive`, `dropbox`, `s3` | new (mailo's CardDAV WebDAV code reused) | HTTP | yes |
+| `porter-infer`, `inferd` | typed request model, routing, policy, spend, audit, `Model` trait; adapters later (`ChatCompletions`, `Responses`, `Messages`, `GenerateContent`, `OllamaNative`, `ComfyWorkflow`) | new | HTTP (adapters) | core yes |
+| OAuth and discovery families (later) | OAuth PKCE, loopback, client registry, renewal, Login Flow v2, OpenRouter key mint; autoconfig, `.well-known`, JMAP session, Nextcloud OCS, port probes | `mail-runtime/src/{oauth,signin,renewal,loopback,discover}.rs`, `mail-proto/src/discover` | HTTP | yes |
 | `mail-proto`, `mail-pim` | stay in mailo, now "family" crates for Mail, Calendar, Contacts | unchanged | none | yes |
 
 `mail-domain` keeps mail-shaped types (`Incoming`, `Outgoing`, `AccountCaps` for IMAP detail);
-`AccountPlan` references an `accounts_core::AccountId` and a `Grant`. The OAuth client ID stays
-deployment config, never in the account (as mailo's `AuthPlan` comment already says).
+`AccountPlan` references a `porter_core::AccountId` and a `Grant`. The OAuth client ID stays
+deployment config, never in the account (as mailo's `AuthPlan` comment already says). porter's
+`ARCHITECTURE.md` section 8 maps every mailo type to its porter home; mail signing keys
+(OpenPGP, S/MIME, filed by fingerprint) stay mailo's.
+<!-- paths: end -->
 
 ### 4.3 Transports
 
 | Platform | Link | Who hosts the core | St |
 | --- | --- | --- | --- |
-| Linux, our desktop | `DbusLink` to `org.quire.Accounts1` | accountd | P |
-| Linux, another desktop; macOS; Windows | `LatchkeyLink` (framed messages over latchkey's socket / named pipe) | accountd built without zbus, or mailo's own agent hosting the core | P |
-| mailo standalone, tests | `EmbeddedLink` (in process) | the app | P |
+| Linux, our desktop | `DbusTransport` to `org.quire.Accounts1` | accountd | P |
+| Linux, another desktop; macOS; Windows | `SocketTransport` (framed messages over latchkey's socket / named pipe) | accountd built without zbus, or mailo's own agent hosting the core | P |
+| mailo standalone, tests | `InProcess` (in process) | the app | P |
 
-The request and reply types are one serde enum in `accounts-core`; D-Bus and latchkey both
-carry them, so there is one protocol with two carriers.
+The request and reply types are one serde enum each in `porter-core` (`AccountsRequest`,
+`AccountsReply` with `Refusal`); D-Bus and latchkey both carry them, so there is one protocol
+with two carriers. A socket frame is a 4-byte big-endian length and a JSON envelope
+`{ vocab, body }` (16 MiB at most). The caller's identity is never in a request: each transport
+derives it from the connection.
 
 ### 4.4 D-Bus API sketch
 
@@ -307,34 +350,41 @@ Bus name `org.quire.Accounts1`; root `/org/quire/Accounts1`. Shaped like a porta
 objects with a `Response` signal, `handle_token`), so a later `org.freedesktop.portal`
 proposal can reuse it ([R] §2 portals).
 
-| Interface | Member | Signature (sketch) | Notes |
+| Interface | Member | Signature (frozen) | Notes |
 | --- | --- | --- | --- |
-| `.Manager` | `Query(need: (sa{sv}), data_class: s) -> a(o s a{sv})` | candidates the caller **already holds a grant for**: account path, label, effective capability, `Restriction`, verdict | no bulk enumeration ([R] Android `GET_ACCOUNTS`) |
-| | `Availability(need) -> (s)` | `Granted`, `AvailableNeedsConsent`, `NeedsAccount`, `Unsupported` | reveals no identities |
-| | `Choose(need, data_class, parent_window: s, options) -> o` | Request; accounts-ui shows a chooser with only matching accounts; reply carries the account path and a new grant | the one way an app learns of a new account |
-| | `AddAccount(provider_hint: s, parent_window) -> o` | Request; opens the add sheet | apps offer "Add account…" |
-| `.Account` (per object) | properties `Id`, `Provider`, `Label`, `State` (`Ok`, `NeedsReauth`, `Offline`, `Limited`), `Capabilities` | readable only with a grant | |
-| | `Reauthenticate(parent_window) -> o` | Request | |
-| `.Grants` | `Revoke(grant: s)`; `List() -> a(...)` (caller's own) | | |
-| `.Tokens` | `IssueToken(grant: s, audience: s) -> (kind s, value s, expires x)` | `kind`: `Bearer`, `Xoauth2`, `ApiKeyHandle`; short-lived access tokens only | refresh tokens never leave (§4.6) |
+| `.Manager` | `Query(need: (sa{sv}), class: s, usage: s) -> a(osa{sv})` | candidates the caller **already holds a grant for**: account path, label, then provider, capability, restriction, grant by name | no bulk enumeration ([R] Android `GET_ACCOUNTS`) |
+| | `Availability(need, class, usage) -> s` | `granted`, `available_needs_consent`, `denied`, `needs_account`, `unsupported` | reveals no identities |
+| | `Choose(need, class, usage, parent_window: s, options: a{sv}) -> o` | Request; accounts-ui shows a chooser with only matching accounts; the `Response` carries the account path and a new grant | the one way an app learns of a new account |
+| | `AddAccount(provider_hint: s, parent_window: s, options: a{sv}) -> o` | Request; opens the add sheet | apps offer "Add Account…" |
+| `.Account` (per object, `/org/quire/Accounts1/account/<id>`) | properties `Id s`, `Provider s`, `Label s`, `State s` (`ok`, `needs_reauth`, `offline`, `limited`), `Capabilities a(sa{sv})` | readable only with a grant | |
+| | `Reauthenticate(parent_window: s, options: a{sv}) -> o` | Request | |
+| `.Grants` | `Revoke(grant: s)`; `List() -> a(sa{sv})` (caller's own) | | |
+| `.Tokens` | `IssueToken(grant: s, audience: s) -> (ssx)` | kind (`bearer`, `xoauth2`, `api_key_handle`), value, expiry; short-lived access tokens only | refresh tokens never leave (§4.6) |
 | | `OpenAuthenticated(grant: s, endpoint: s) -> h` | a socket fd to a daemon-side authenticated proxy (IMAP LOGIN, WebDAV basic, app passwords) | password protocols without releasing the password |
-| Signals | `AccountAdded(o)`, `AccountRemoved(o)`, `CapabilityChanged(o)`, `NeedsReauth(o)`, `GrantChanged(s)` | sent only to holders of a relevant grant (unicast) | |
-| `org.quire.SettingsModule1` | at `/org/quire/Accounts1/settings`: `Describe`, `Get`, `Set`, `Changed` | 22 §9.4 | detent reads it |
+| `.Request` (per sheet) | `Close()`; signal `Response(response: u, results: a{sv})` | 0 done, 1 cancelled, 2 other | the portal Request shape |
+| Signals on `.Manager` | `AccountAdded(o)`, `AccountRemoved(o)`, `CapabilityChanged(o)`, `NeedsReauth(o)`, `GrantChanged(s)` | sent only to holders of a relevant grant (unicast) | |
+| `org.quire.SettingsModule1` | at `/org/quire/Accounts1/settings`: `Describe`, `Get`, `Set`, `Changed` | 22 §9.4 (declared there, not in porter-dbus) | detent reads it |
 
-syncd serves `org.quire.Sync1` (`Datasets`, `Status(dataset)`, `Pause`, `Resume`, signals
-`Progress`, `Conflict`); inferd serves `org.quire.Inference1` (`Availability(need)`,
-`Open(need, data_class, tier) -> h` returning an fd that carries a framed request/stream
-session, `Usage`, `Rescan`).
+A need on the bus is `(sa{sv})`: the kind's slug and its fields by name, each field's value its
+slug; `class` and `usage` are `DataClass` and `Usage` slugs. The full introspection is porter's
+`dbus/org.quire.Accounts1.xml`, checked against the skeletons by a test.
+
+syncd serves `org.quire.Sync1` at `/org/quire/Sync1` (`Datasets() -> as`, `Status(dataset: s) ->
+a{sv}`, `Pause(s)`, `Resume(s)`, signals `Progress(s, a{sv})`, `Conflict(s, a{sv})`); inferd
+serves `org.quire.Inference1` at `/org/quire/Inference1` (`Availability(need, class) -> s`,
+`Open(need, class, tier) -> h` returning an fd that carries frames of `InferRequest` and
+`InferReply`, `Usage() -> a{sv}`, `Rescan()`).
 
 ### 4.5 Consent
 
 | Rule | Detail | St |
 | --- | --- | --- |
-| Unit | a grant is `(AppId, AccountId, CapabilityKind, DataClass) -> Allow | Deny` plus `Scope::{Once, Always}` | P |
+| Unit | a grant is `GrantKey { app: AppId, account, kind: CapabilityKind, class: DataClass, usage: Usage {Interactive, Background} } -> Decision {Allow, Deny}` plus `GrantScope {Once, Always}` and its time; the newest grant for exactly the key decides, a denial winning a tie (`decide`) | P |
+| Answers | "Allow" stores one grant for the account picked; "Don't Allow" stores an `Always` denial for every account offered, so the app is not prompted again until Settings changes it; closing the sheet stores nothing; a `Once` grant is spent by the first token issued under it | P |
 | Data classes | `AppOwn`, `Mail`, `Calendar`, `Contacts`, `Notes`, `Files`, `Photos`, `Clipboard`, `Screen`, `Public` (closed enum) | P |
 | Prompt | by capability, not by provider: "Photos wants to keep its library in your Nextcloud files" (`Alert` on a `Sheet{Centre}` from accounts-ui) | P |
 | First-party apps | Mail, Photos, Calendar, Notes, Files and the shell still get one prompt at first use; no silent pre-grant, so the per-app list in detent is complete | P |
-| Identity of caller | Flatpak: app id from the sandbox info of the caller's pid (`GetConnectionCredentials`, pidfd); native: the systemd `app-<id>-*.scope` cgroup, marked "unsandboxed" (R12) | P |
+| Identity of caller | `AppId { name: AppName (reverse DNS), isolation: Isolation {Flatpak, Unsandboxed, InProcess} }`, established by the transport, never sent by the caller. Flatpak: app id from the sandbox info of the caller's pid (`GetConnectionCredentials`, pidfd); native: the systemd `app-<id>-*.scope` cgroup, marked "unsandboxed" (R12) | P |
 | Flatpak reach | `--talk-name=org.quire.Accounts1` finish arg; consent is enforced inside the daemon | P |
 | Storage | the consent store is accountd's own table, PermissionStore-shaped, so a portal can adopt it | P |
 | Audit | grants, token issues, proxy opens: time, app, account, capability; never content | P |
@@ -354,27 +404,31 @@ session, `Usage`, `Rescan`).
 ### 5.1 The client library
 
 ```rust
-use accounts_client::{Accounts, Need, Found, DataClass};
+use porter_client::{Accounts, Found};
+use porter_core::{need::StorageNeed, DataClass, Need, consent::Usage};
 
-let accounts = Accounts::connect(&env).await?;              // picks Dbus, Latchkey or Embedded
+let accounts = Accounts::connect(&env).await?;       // the first reachable link in env: D-Bus, then the socket
+                                                     // (an app hosting the core: Accounts::over(InProcess::new(service, app)))
 let need = Need::Storage(StorageNeed {
     access: Access::ReadWrite,
-    delta: Delta::Poll,               // minimum
-    scope: ScopeNeed::AppFolderOrFull,
+    delta: Delta::Poll,                              // minimum
+    scope: StorageScope::AppFolder,                  // minimum: AppFolder accepts either scope
+    quota: QuotaReport::Unreported,
 });
-let handle = match accounts.find(&need, DataClass::Photos).await? {
-    Found::One(h) => h,
-    Found::Several(list) => accounts.choose(&need, DataClass::Photos, &window).await?,
-    Found::NeedsConsent(offer) => accounts.request(offer, &window).await?,
-    Found::None(why) => return Ok(View::NoAccount(why)),   // EmptyState + "Add Account…"
+let candidate = match accounts.find(&need, DataClass::Photos, Usage::Interactive).await? {
+    Found::One(candidate) => candidate,
+    Found::Several(list) => pick(list),              // AccountPicker over granted accounts, no daemon call
+    Found::NeedsConsent(offer) => accounts.request_grant(&offer, &window).await?,  // Manager.Choose
+    Found::None(why) => return Ok(View::NoAccount(why)),  // NeedsAccount | Denied | Unsupported
 };
-let drive: StorageClient = accounts.storage(&handle).await?; // typed family client, tokens renewed inside
+let token = accounts.token(&candidate, &Audience("webdav".into())).await?;  // short-lived; ask again on 401
 ```
 
 | Piece | Rule | St |
 | --- | --- | --- |
-| `Need` | mirrors `Capability` with minimums; one variant per kind | P |
+| `Need` | mirrors `Capability` with minimums; one variant per kind; protocol fields (transport, wire, hashes) are not asked for | P |
 | `Found` | closed enum; the app renders every arm | P |
+| `Accounts` | `connect`, `over`, `find`, `request_grant`, `add_account`, `token`, `grants`, `revoke`, `infer`; a refusal is `ClientError::Refused(Refusal)` or `InferRefused(InferRefusal)` | P |
 | Family clients | `StorageClient`, `MailClient` (mailo), `PimClient`, `LlmClient` (talks to inferd) | P |
 | UX pieces (quire) | `AccountPicker` (a `PopUpButton` listing granted accounts + "Add Account…"), `NoAccount` (`EmptyState` with an action), `AccountBadge` (`ProviderMark` + `Label`), `LimitedNote` (`Label{Secondary}` from `Restriction`) | P |
 
@@ -383,7 +437,7 @@ let drive: StorageClient = accounts.storage(&handle).await?; // typed family cli
 | Step | Change | St |
 | --- | --- | --- |
 | 1 | mailo's account add flow moves to accountd's add sheet; mailo calls `Choose`/`AddAccount` | P |
-| 2 | mailo's `Secrets`, OAuth, renewal come from `accounts-*`; on Linux via `DbusLink`, elsewhere `EmbeddedLink` | P |
+| 2 | mailo's `Secrets`, OAuth, renewal come from porter; on Linux via `DbusTransport`, elsewhere `InProcess` | P |
 | 3 | IMAP/JMAP/SMTP/Graph engines and protocol-native sync stay in mailo; `AccountCaps` stays mailo's discovered detail under `Capability::Mail` | P |
 | 4 | Contacts and calendars move to the Calendar app and a Contacts reader through the same grants | P |
 
@@ -427,13 +481,13 @@ Provider verdicts for the library home:
 
 | Aspect | Rule | St |
 | --- | --- | --- |
-| One API | apps send a typed request (messages, content parts, tools, schema, tier, `DataClass`) through `LlmClient`; wire formats stay inside inferd's adapters ([A] §4) | P |
-| Task layer | above raw chat: `summarise`, `rewrite`, `extract`, `classify`, `embed`, `transcribe`, `image`; the shell uses these, not model ids | P |
-| Routing | candidates = accounts with a matching capability and a grant; filter by policy; rank `OnDevice > LocalNetwork > Cloud`, then the user's per-tier choice, then cost | P |
-| Data-class policy | per class, a floor: `Mail`, `Photos`, `Notes`, `Files`, `Contacts`, `Screen`, `Clipboard` default to `OnDevice`; `Public` and `AppOwn` default to `Any`; a blocked request returns `RequiresCloud { class }`, never a silent downgrade to a cloud model | P |
+| One API | apps send a typed `InferRequest` (`Chat { messages, shape: Text | Json(schema), tier, class, usage }`, `Embed`, `Task`) through `Accounts::infer`; replies are `InferReply` with `ServedBy { account, model, locality }`; wire formats stay inside inferd's adapters ([A] §4); tool calls join the request with the MCP host | P |
+| Task layer | above raw chat: `Task {Summarise, Rewrite, Extract, Classify, Transcribe}` (embeddings and images are their own requests); the shell uses these, not model ids | P |
+| Routing | `route(ask, candidates, policy)`: drop cloud under local-only (nothing left: `Unavailable`), drop what the class floor forbids (nothing left: `RequiresCloud(class)`), keep granted ones (else `NeedsGrant` or `Denied`), drop stopped spend caps (else `OverBudget`); rank `OnDevice > LocalNetwork > Cloud`, then the user's per-tier choice, then price | P |
+| Data-class policy | per class, a `Floor {OnDevice, LocalNetwork, Anywhere}`: `Mail`, `Calendar`, `Photos`, `Notes`, `Files`, `Contacts`, `Screen`, `Clipboard` default to `OnDevice`; `Public` and `AppOwn` default to `Anywhere` (settings `ai.floor.<class>`, rows for 22 to add); a blocked request returns `RequiresCloud(class)`, never a silent downgrade to a cloud model | P |
 | Local-only switch | one setting (`ai.local_only`, default on) removes every Cloud account from every answer (R14) | P |
 | Per-app permission | grant per (app, AI kind, data class); background use (indexing) is a separate grant with a cheap-tier preference | P |
-| Spend caps | per account and per app, daily and monthly, from response usage and a price table (OpenRouter publishes prices); warn at 80 %, stop at 100 %; `PlanBudget` accounts count requests | P |
+| Spend caps | `SpendCap { scope: Account | App, period: Daily | Monthly, limit: MicroUsd, warn_at: Permille }` from response usage and a price table (OpenRouter publishes prices); warn at `ai.spend.warn_permille` (proposed 800), stop when a request would reach the limit; `PlanBudget` accounts count requests (not modelled yet) | P |
 | Rate and queue | token bucket per app and account; interactive first; `Retry-After`; GPU queue (§3.3) | P |
 | Indicator | a bar item shows when a request leaves the machine, naming the provider | P |
 | Audit | app, account, model, tokens, bytes, time; content never stored by default | P |
@@ -463,16 +517,23 @@ One small trait per backend family (File Provider and rclone shape, [R] §2 sync
 implemented by each `storage-*` crate and by the fake that tests drive (CONVENTIONS §5).
 
 ```rust
-pub trait Replica {
-    async fn changes(&self, from: Anchor) -> Result<ChangePage, ReplicaError>; // changes + next anchor + More|Done
+pub trait Replica: Send + Sync {   // porter-sync; async fns written as `-> impl Future + Send`
+    async fn changes(&self, from: Cursor) -> Result<ChangePage, ReplicaError>; // Cursor::{Start, At(Anchor)}; changes + next + More|Done
     async fn fetch(&self, item: &RemoteId, range: ByteRange) -> Result<Blob, ReplicaError>;
-    async fn put(&self, item: PutItem, base: BaseVersion) -> Result<RemoteVersion, PutRefused>;
-    async fn remove(&self, item: &RemoteId, base: BaseVersion) -> Result<(), PutRefused>;
+    async fn put(&self, item: PutItem, base: BaseVersion) -> Result<(RemoteId, RemoteVersion), PutRefused>;
+    async fn remove(&self, item: &RemoteId, base: BaseVersion) -> Result<RemoteVersion, PutRefused>;
     fn features(&self) -> StorageCap;
 }
+pub enum BaseVersion { Absent, At(RemoteVersion) }          // PutItem.target: New(ItemPath) | Existing(RemoteId)
+pub struct Conflict { item: RemoteId, base: BaseVersion, remote: RemoteSide } // Changed(v) | Deleted(v) | Exists(id, v)
 pub enum PutRefused { Conflict(Conflict), Quota, Forbidden, Transient(RetryAfter) }
 pub enum ReplicaError { AnchorExpired, Unauthorized, Transient(RetryAfter), Gone }
 ```
+
+`Cursor::Start` is a full listing of what exists, without tombstones: what a replica reads after
+`AnchorExpired`. A removal returns the tombstone's version and leaves `Change::Tombstone { id,
+version, deleted_at }` in the feed. porter-sync's `MemoryReplica` is the reference semantics the
+contract tests drive.
 
 | Rule | Detail | St |
 | --- | --- | --- |
@@ -521,7 +582,7 @@ those keys. v3, O.
 
 | Item | Scope | St |
 | --- | --- | --- |
-| Crates | `accounts-core`, `-auth`, `-secrets`, `-discover`, `-client` extracted from mailo; mailo builds on them on all three platforms | P |
+| Crates | porter's `porter-core`, `-provider`, `-secrets`, `-service`, `-client` (frozen), plus OAuth and discovery family crates extracted from mailo; mailo builds on them on all three platforms | P |
 | accountd | D-Bus API of §4.4 minus `OpenAuthenticated`; consent; Secret Service via oo7; settings module | P |
 | Kinds | Identity, Mail, Calendar, Contacts, Storage, Photos (upload/picker), Llm, Embeddings, ImageGen | P |
 | Providers | Nextcloud, Microsoft, Google (non-restricted scopes; Gmail only with a user-supplied client), generic IMAP/SMTP + DAV; AI: Ollama, llama.cpp, ComfyUI, Anthropic key, OpenAI key, OpenRouter | P |
@@ -539,7 +600,7 @@ Service and fake servers; the real system is never touched):
    `Absent { TenantConsent }` (probe path) and emits `CapabilityChanged`.
 3. No process other than accountd ever holds a refresh token (checked by scanning every IPC
    reply in the test harness).
-4. mailo passes its suite with `EmbeddedLink` (macOS/Windows CI) and with `DbusLink` (Linux).
+4. mailo passes its suite with `InProcess` (macOS/Windows CI) and with `DbusTransport` (Linux).
 5. Photos: 1 000 fixtures imported on machine A appear on machine B through a fake WebDAV;
    a favourite set on both while offline resolves by clock; a duplicate import stores one
    original; an expired anchor reconciles with zero re-uploads.
@@ -625,9 +686,11 @@ Service and fake servers; the real system is never touched):
   winbuzzer.com/2026/02/23/google-bans-ai-subscribers-openclaw-no-refunds-xcxwbn;
   macrumors.com/2026/05/05/ios-27-third-party-chatbots-apple-intelligence;
   theregister.com/software/2026/09/24/talk-of-ai-in-kde-sets-the-community-ablaze/5298854.
+<!-- paths: skip -->
 - Code (read-only): `~/mailo/crates/mail-domain/src/account.rs` (`AuthPlan`, `OAuthIssuer`,
   `AccountCaps`, `SecretKey`, `SecretPurpose`, `Credential`), `mail-runtime/src/{oauth,signin,renewal,secrets}.rs`,
   `latchkey/src/lib.rs`.
+<!-- paths: end -->
 - Our docs: 20 §1.17, §2.1, §2.3, §2.8, §2.9; 22 §9.4; 30 §2; quire `CONVENTIONS.md` §2-§7.
 
 ## 10. Decision list (short, for the user)
@@ -646,3 +709,34 @@ Service and fake servers; the real system is never touched):
 12. Repo: one new repo (`porter` suggested) for the account core, daemons and provider files.
 13. First-party apps also ask for consent once.
 14. Sign-in and consent sheets belong to the account service, not to detent or the app.
+
+## 11. Frozen interfaces (porter)
+
+The interfaces of sections 2 to 6 are frozen as code in the porter repo
+(github.com/PoHsuanLai/porter, private): types, traits, the provider file format, the wire
+protocol and the D-Bus signatures compile, pure logic is implemented with table tests, and
+behaviour that needs a provider, a vendor, a bus or a keyring is stubbed. porter's
+`ARCHITECTURE.md` is the map (section 5 there says what is built and what is stubbed; section 8
+maps mailo's types). This document stays the source of truth: a change to a frozen interface is
+an edit here and a change there in step.
+
+| Section here | porter crate | Frozen as |
+| --- | --- | --- |
+| §2 vocabulary, provenance, restrictions | `porter-core` | `Capability`, `CapabilityKind`, `VocabVersion(1)`, `Need`, `matches -> Match`, `Claim`/`Offer`/`Subject`/`Provenance`, `effective`, `Restriction`/`Limit`, `Locality`/`Tier`/`Billing` |
+| §3 providers | `porter-provider` | `ProviderSpec` (the TOML file), `parse_provider`, `ProviderSet`, `Family`, `Issuer`, `Discovery`, traits `Provider` and `ProviderSession` |
+| §4.1-4.3 core, transports | `porter-service`, `porter-client` | `AccountService` over `Provider`, `Secrets`, `Prompter`, `Clock`; `AccountsRequest`/`AccountsReply`; `Transport` with `DbusTransport`, `SocketTransport`, `InProcess` |
+| §4.4 D-Bus | `porter-dbus` | proxies and skeletons for `org.quire.Accounts1` (`Manager`, `Account`, `Grants`, `Tokens`, `Request`), `org.quire.Sync1`, `org.quire.Inference1`; `dbus/*.xml` |
+| §4.5 consent | `porter-core` `consent` | `Grant`, `GrantKey`, `decide -> Verdict`, `availability -> Availability`, `ConsentAsk`/`ConsentAnswer`, `AppId` |
+| §4.6 secrets | `porter-secrets` | `Secrets` (get, put, delete, delete_account), `attributes`, `MemorySecrets`, `Oo7Secrets` (stub) |
+| §5.1 client | `porter-client` | `Accounts`, `Found`, `ConsentOffer`, `NoAccount` |
+| §5.5 AI broker | `porter-infer` | `InferRequest`/`InferReply`, `Policy`/`Floor`, `route`, `SpendCap`/`spend_verdict`/`cost`, `AuditEntry`, trait `Model`, `Broker` (stub) |
+| §6 sync | `porter-sync` | `Replica`, `Cursor`, `ChangePage`, `Conflict`, `DatasetKind`/`ConflictRule`, `MemoryReplica` |
+| §4.1 processes | `accountd`, `syncd`, `inferd` | skeletons that build their service and exit "not implemented" |
+
+Frozen decisions that differ from the first proposal of this document, each already applied in
+its section: closed sets use serde slugs rather than `Word` (§2.1); `Restriction` holds per-kind
+`limits` (§2.5); every capability row in a provider file writes every field (§3.1); `Usage`
+(interactive or background) is part of every grant and query (§4.4, §4.5); `Availability` adds
+`denied`; `Found::Several` is picked app-side from granted accounts; `Calendar` joins the
+on-device floor; `Replica::changes` takes a `Cursor` and writes return versions (§6.1).
+
