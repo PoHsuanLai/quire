@@ -256,3 +256,4 @@ pub const PANEL_LEFT: &[Shape] = &[
 ];
 
 pub const PLUS: &[Shape] = &[Shape::Path("M5 12h14"), Shape::Path("M12 5v14")];
+pub const MINUS: &[Shape] = &[Shape::Path("M5 12h14")];

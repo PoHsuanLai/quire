@@ -111,6 +111,8 @@ impl Icon {
         Icon::Clipboard,
         Icon::Smile,
         Icon::Globe,
+        // A mixed check mark.
+        Icon::Minus,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -164,6 +166,7 @@ impl Icon {
         Icon::Settings,
         Icon::PanelLeft,
         Icon::Plus,
+        Icon::Minus,
         Icon::Wifi,
         Icon::WifiLow,
         Icon::WifiHigh,

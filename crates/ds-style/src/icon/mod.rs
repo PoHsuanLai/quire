@@ -111,6 +111,8 @@ pub enum Icon {
     PanelLeft,
     /// The mailo `Plus` glyph.
     Plus,
+    /// A horizontal dash: a mixed check mark.
+    Minus,
     /// Lucide `wifi`.
     Wifi,
     /// Lucide `wifi-low`.
@@ -297,6 +299,7 @@ impl Icon {
             Icon::Settings => SETTINGS,
             Icon::PanelLeft => PANEL_LEFT,
             Icon::Plus => PLUS,
+            Icon::Minus => MINUS,
             Icon::Printer => geometry_actions::PRINTER,
             Icon::FolderInput => geometry_actions::FOLDER_INPUT,
             Icon::Play

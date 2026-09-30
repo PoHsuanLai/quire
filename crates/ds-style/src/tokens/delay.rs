@@ -25,6 +25,9 @@ pub enum DelayToken {
     SubmenuOpen,
     /// 300 ms: how long a menu tracks the pointer inside the safe triangle toward a submenu.
     TriangleTimeout,
+    /// 70 ms: one half of a menu item's blink: it is lit for this long, then unlit for this
+    /// long, twice, before the menu closes on the pick.
+    MenuBlink,
     /// 500 ms: the system double-click time, the longest gap inside a run of clicks.
     MultiClick,
     /// 100 ms: a move older than this at the release says the pointer had stopped, so a drag
@@ -61,6 +64,7 @@ impl DelayToken {
             DelayToken::LongPress => 500,
             DelayToken::SubmenuOpen => 200,
             DelayToken::TriangleTimeout => 300,
+            DelayToken::MenuBlink => 70,
             DelayToken::MultiClick => 500,
             DelayToken::ReleaseWindow => 100,
             DelayToken::ToastHold => 5000,
