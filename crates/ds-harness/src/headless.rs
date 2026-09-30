@@ -7,8 +7,10 @@
 
 use crate::painter::{Canvas, PaintTime, Painter};
 use crate::snapshot::Viewport;
-use blitz_dom::{Document as _, DocumentConfig, StyleThreading};
+use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThreading};
 use blitz_html::HtmlProvider;
+use blitz_kit::hit::element_of;
+use blitz_kit::hover::{LastMove, Repaired, Shift, remember, repair};
 use blitz_traits::events::UiEvent;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
@@ -33,7 +35,6 @@ use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
 use ds_blitz::seam::{HoverTracker, link_under, live_frames, report_frame_hover};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
-use ds_blitz::seam::{RestingPointer, Synced, sync_hover};
 use peniko::Color;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -75,10 +76,15 @@ pub(crate) struct Headless {
     /// Under `FocusFallback::Ancestor`, where the keyboard goes when its element is removed.
     keeper: Keeper,
     /// The last pointer event, replayed when a resolve moves the hover by itself
-    /// (`crate::hover_sync`).
-    resting: Option<RestingPointer>,
+    /// (`blitz_kit::hover`).
+    resting: LastMove,
     /// What paints it: vello_cpu unless the harness asked for vello_hybrid.
     pub(crate) painter: Painter,
+}
+
+/// The hovered element (a hovered text node counts as its element, which carries the listeners).
+fn hovered(doc: &BaseDocument) -> Option<NodeId> {
+    element_of(doc, doc.get_hover_node_id()?)
 }
 
 /// Whether the document hands the keyboard on when its element is removed.
@@ -162,16 +168,14 @@ impl Headless {
             hover: (setup.frame_links.hover(), HoverTracker::default()),
             listeners,
             keeper,
-            resting: None,
+            resting: LastMove::Unknown,
             painter: Painter::Cpu,
         }
     }
 
     /// Remember where `event` leaves the pointer, if it is a pointer event.
     pub(crate) fn note_pointer(&mut self, event: &UiEvent) {
-        if let Some(resting) = RestingPointer::from_event(event) {
-            self.resting = Some(resting);
-        }
+        self.resting = remember(std::mem::take(&mut self.resting), event);
     }
 
     /// What wakes this document.
@@ -218,28 +222,24 @@ impl Headless {
             let fetched = self.wakeup.fetched();
             let synced = self.resolve(at);
             let landed = self.wakeup.fetched() != fetched;
-            if !(rendered
-                || restyled
-                || landed
-                || kept == Kept::Moved
-                || synced == Synced::Replayed)
-            {
+            if !(rendered || restyled || landed || kept == Kept::Moved || synced == Repaired::Yes) {
                 return;
             }
         }
     }
 
     /// Style and lay out at `at`, then dispatch the hover change the layout made under a
-    /// resting pointer, which Blitz's resolve records silently (`crate::hover_sync`). At most
+    /// resting pointer, which Blitz's resolve records silently (`blitz_kit::hover`). At most
     /// one replay per round: the replayed move leaves Blitz's hover where the next resolve
     /// finds it, so that one's re-hit-test changes nothing.
-    fn resolve(&mut self, at: Duration) -> Synced {
+    fn resolve(&mut self, at: Duration) -> Repaired {
         let mut inner = self.doc.inner.borrow_mut();
-        let before = inner.get_hover_node_id();
+        let before = hovered(&inner);
         inner.resolve(at.as_secs_f64());
         ds_blitz::snap_to_device(&mut inner);
+        let after = hovered(&inner);
         drop(inner);
-        sync_hover(&mut self.doc, before, self.resting.as_ref())
+        repair(&mut self.doc, &self.resting, Shift { before, after })
     }
 
     /// Hand the keyboard to a focusable ancestor of a focused element the renders removed.

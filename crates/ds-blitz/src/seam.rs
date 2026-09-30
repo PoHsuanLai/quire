@@ -14,7 +14,6 @@ pub use crate::frame_hover::{HoverTracker, report as report_frame_hover};
 pub use crate::frame_links::{LinkInbox, frame_links, read_link};
 pub use crate::frame_tree::live_frames;
 pub use crate::frames::FrameParser;
-pub use crate::hover_replay::{RestingPointer, Synced, sync as sync_hover};
 pub use crate::memory_shell::MemoryShell;
 pub use crate::net::DsNet;
 pub use crate::node_ref::DocRef;
