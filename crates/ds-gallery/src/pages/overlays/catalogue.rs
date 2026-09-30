@@ -19,10 +19,10 @@ use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::geometry::placement::{Align, Side};
 use ds_core::vocab::Dismiss;
 use ds_shell::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The page.
 #[component]

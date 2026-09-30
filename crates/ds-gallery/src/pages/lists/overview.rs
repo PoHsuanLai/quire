@@ -12,9 +12,9 @@ use ds::components::controls::button_model::Bezel;
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::prelude::*;
 use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::hex::{Colour, Hex};
 use ds_core::vocab::RowState;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::hex::{Colour, Hex};
 
 /// One sample thread: sender, subject, snippet, time.
 type ThreadSample = (&'static str, &'static str, &'static str, &'static str);

@@ -4,10 +4,15 @@
 //! stops asking for frames once it rests.
 
 use dioxus::prelude::*;
+use ds::base::time::FRAME_TICK;
 use ds::detail::Touch;
-use ds::motion::{PxPerUnit, SpringPhase, SpringResponse, SpringSpec, Throw, Velocity, use_spring};
+use ds::motion::projection::Throw;
+use ds::motion::spring::SpringPhase;
+use ds::motion::spring_spec::{SpringResponse, SpringSpec};
+use ds::motion::timeline::spring::PxPerUnit;
+use ds::motion::use_spring::use_spring;
+use ds::motion::velocity::Velocity;
 use ds::prelude::*;
-use ds_core::time::FRAME_TICK;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -235,7 +240,7 @@ static CELL: GlobalSignal<(f32, f32)> = Signal::global(|| (0.0, 0.0));
 fn Widget() -> Element {
     let (x, y) = CELL();
     let spec = SpringSpec::for_touch(Touch::Remote);
-    let frame = ds::motion::use_spring_point(Point { x: Px(x), y: Px(y) }, spec);
+    let frame = ds::motion::spring_point::use_spring_point(Point { x: Px(x), y: Px(y) }, spec);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
             div { class: "widget", "data-x": "{frame.at.x.0}", "data-y": "{frame.at.y.0}" }
@@ -280,7 +285,7 @@ fn a_widget_glides_into_its_cell_turns_on_a_new_one_and_rests() {
 
 #[test]
 fn a_thrown_widget_lands_in_the_cell_its_throw_projects() {
-    use ds::motion::{PointThrow, Release};
+    use ds::motion::spring_point::{PointThrow, Release};
     let cells = [
         Point {
             x: Px(0.0),

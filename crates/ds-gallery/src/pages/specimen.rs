@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
-use ds_style::appearance::blur::BlurState;
+use ds::style::appearance::blur::BlurState;
 
 /// A titled group of specimens, with an optional note under the title.
 #[component]

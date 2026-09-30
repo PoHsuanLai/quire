@@ -3,11 +3,11 @@
 //! acts; where the rect resolves, the measured `onclick` follows it.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::host::no_host::NoHost;
 use ds::prelude::*;
-use ds_core::vocab::RowState;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;

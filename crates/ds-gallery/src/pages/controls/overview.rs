@@ -18,10 +18,10 @@ use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::hex::{Colour, Hex};
+use ds::style::tokens::label_hue::LabelHue;
 use ds_core::colour::contrast::Verdict;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::hex::{Colour, Hex};
-use ds_style::tokens::label_hue::LabelHue;
 
 const PROVIDERS: [MarkProvider; 7] = [
     MarkProvider::Google,
@@ -121,13 +121,13 @@ fn Choosers() -> Element {
                     Toggle { label: "Off, disabled", value: Check::Off, availability: Availability::Disabled, onchange: |_| {} }
                 }
                 Specimen { name: "Mini (settings row), on", code: "26 x 15, knob 13".to_string(),
-                    Toggle { label: "Mini on", value: Check::On, size: ds_style::tokens::control_size::ControlSize::Mini, onchange: |_| {} }
+                    Toggle { label: "Mini on", value: Check::On, size: ds::style::tokens::control_size::ControlSize::Mini, onchange: |_| {} }
                 }
                 Specimen { name: "Small, on", code: "32 x 18, knob 16".to_string(),
-                    Toggle { label: "Small on", value: Check::On, size: ds_style::tokens::control_size::ControlSize::Small, onchange: |_| {} }
+                    Toggle { label: "Small on", value: Check::On, size: ds::style::tokens::control_size::ControlSize::Small, onchange: |_| {} }
                 }
                 Specimen { name: "Large, on", code: "38 x 22, knob 20".to_string(),
-                    Toggle { label: "Large on", value: Check::On, size: ds_style::tokens::control_size::ControlSize::Large, onchange: |_| {} }
+                    Toggle { label: "Large on", value: Check::On, size: ds::style::tokens::control_size::ControlSize::Large, onchange: |_| {} }
                 }
             }
             div { class: "g-grid4",

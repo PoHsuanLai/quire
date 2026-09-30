@@ -5,10 +5,10 @@ use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::typeface::use_typeface;
-use ds_style::fonts::Subset;
-use ds_style::fonts::{FACES, Face, FaceStyle};
-use ds_style::tokens::token::{Token, TokenScope};
-use ds_style::tokens::type_scale::{Family, FontSize};
+use ds::style::fonts::Subset;
+use ds::style::fonts::{FACES, Face, FaceStyle};
+use ds::style::tokens::token::{Token, TokenScope};
+use ds::style::tokens::type_scale::{Family, FontSize};
 
 /// The faces, in the order the stylesheet names them.
 const FAMILIES: &[Family] = Family::ALL;
@@ -21,7 +21,7 @@ const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";
 pub fn TypePage() -> Element {
     let typeface = use_typeface();
     rsx! {
-        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds_style::fonts::FACES ships for it.",
+        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds::style::fonts::FACES ships for it.",
             for family in FAMILIES.iter().copied() {
                 div { class: "g-col",
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:400", "{PANGRAM}" }

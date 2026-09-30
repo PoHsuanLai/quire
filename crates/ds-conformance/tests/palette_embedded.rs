@@ -10,9 +10,9 @@ use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::focus::request::{FocusRequest, use_focus_request};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
+use ds::style::icon::url::IconUrl;
 use ds_blitz::FocusFallback;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_style::icon::url::IconUrl;
 use probe::rect;
 use std::time::Duration;
 

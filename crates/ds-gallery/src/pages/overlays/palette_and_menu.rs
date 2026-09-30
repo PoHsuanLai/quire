@@ -9,7 +9,7 @@ use ds::components::content::text_runs::RunTone;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::host::measure::{Anchor, use_rect};
 use ds::prelude::*;
-use ds_style::tokens::shape::{Corner, Radius};
+use ds::style::tokens::shape::{Corner, Radius};
 
 /// The recent searches a panel starts with.
 const RECENT: [(&str, &str); 3] = [

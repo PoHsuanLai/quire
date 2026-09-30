@@ -1,7 +1,7 @@
 //! The pure motion machines as tables: the hover intent machine (design/06-INTERACTIONS.md
 //! section 3), drag and the pull tab (sections 6 and 9.2).
 
-use ds::motion::fraction_along;
+use ds::motion::drag::fraction_along;
 use ds::prelude::*;
 use ds_motion::drag::{DRAG_THRESHOLD, Drag, DragPhase, WINDOW_DRAG_THRESHOLD};
 use ds_motion::hover_intent::{

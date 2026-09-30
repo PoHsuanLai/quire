@@ -8,7 +8,7 @@ use ds::components::menus::item::item::MenuImage;
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The three placements, one at a time.
 const PLACEMENTS: [(MenuPlacement, &str); 3] = [

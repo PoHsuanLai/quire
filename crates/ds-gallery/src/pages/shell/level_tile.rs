@@ -7,11 +7,11 @@ use ds::assembly::ds::Inject;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::level_indicator::LevelStyle;
 use ds::prelude::*;
+use ds::style::appearance::blur::BlurState;
+use ds::style::space::presets::PRESETS;
 use ds_core::vocab::Muting;
 use ds_shell::osd::OsdLevel;
 use ds_shell::prelude::*;
-use ds_style::appearance::blur::BlurState;
-use ds_style::space::presets::PRESETS;
 
 /// What the card sits on.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

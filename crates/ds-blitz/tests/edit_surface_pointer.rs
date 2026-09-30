@@ -4,6 +4,7 @@
 //! width, and the app's own class and data on the surface.
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
 use ds::edit::handle::{EditHandle, use_edit_handle};
 use ds::edit::input::{Composition, EditInput, KeyInput};
 use ds::edit::pointer::{EditFocus, EditPointer, Extend};
@@ -14,7 +15,6 @@ use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
-use ds_core::press::PointerButton;
 use ds_harness::{
     ClassPresence, Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
 };

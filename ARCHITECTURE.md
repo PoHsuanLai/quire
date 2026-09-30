@@ -479,6 +479,12 @@ Every crate re-exports its public items once, at its root or from one public mod
 private; no glob re-exports; no `#[doc(hidden)]`. An item another crate needs is `pub` at its
 home module (`ds_style::css::document`), one path, and absent from every prelude.
 
+`ds` re-exports its three lower crates as facade modules, `ds::base` (`ds-core`), `ds::style`
+(`ds-style`) and `ds::motion` (`ds-motion`), the only three root re-exports besides the stylesheet
+assembly. A consumer that needs a name outside the prelude writes its home path under a facade
+(`ds::style::tokens::shape::Radius`, `ds::base::word::Word`) and depends on `ds` alone, which is
+why consumers never name `ds-core`, `ds-style` or `ds-motion` in their manifests.
+
 `ds::prelude` (about 150 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
 from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
@@ -712,7 +718,7 @@ implements it (the traits build with `ds-harness` default features off).
 
 Each step lands through the gate worktree, keeps master green, and compiles sill by path. A step
 never leaves a re-export "for callers" except the one named: `ds` keeps today's root names, one
-path each, until step 12 replaces them with the prelude.
+path each; step 12 replaced them with the prelude.
 
 1. **Rename collisions** (done) (section 6) and the group order of section 2 inside `ds` (moves of
    `emoji_grid`, `preview_*`, `level glyph`, `appearance_picker`, `edit_surface*`; `overlay` ->

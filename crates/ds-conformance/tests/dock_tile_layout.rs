@@ -7,11 +7,11 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::base::vocab::Activity;
 use ds::prelude::*;
-use ds_core::vocab::Activity;
+use ds::style::icon::family::PlateFamily;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use ds_shell::prelude::*;
-use ds_style::icon::family::PlateFamily;
 use probe::rect;
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::Duration;

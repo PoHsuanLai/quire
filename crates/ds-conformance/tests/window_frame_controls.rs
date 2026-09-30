@@ -7,10 +7,10 @@
 //! and Escape closes it.
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
 use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
-use ds_core::press::PointerButton;
 use ds_harness::{
     Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
 };

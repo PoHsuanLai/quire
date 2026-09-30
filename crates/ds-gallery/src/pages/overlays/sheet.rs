@@ -13,7 +13,7 @@ use ds::components::controls::button_model::{Answers, ButtonRole};
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::overlays::sheet_attach::Attach;
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The power menu section.
 #[component]

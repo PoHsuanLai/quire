@@ -5,8 +5,8 @@ use dioxus::prelude::*;
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::press::Press;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The SplitView section.
 #[component]

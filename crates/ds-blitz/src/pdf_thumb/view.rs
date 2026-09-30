@@ -7,7 +7,7 @@ use dioxus::core::Task;
 use dioxus::prelude::*;
 use ds::components::content::pdf_thumb::PdfPage;
 use ds::prelude::*;
-use ds_style::scale::use_scale;
+use ds::style::scale::use_scale;
 use std::path::PathBuf;
 
 /// A page that came back from the worker, for the request it answers.

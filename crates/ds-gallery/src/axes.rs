@@ -7,20 +7,20 @@
 
 use crate::page::Page;
 use ds::prelude::*;
+use ds::style::appearance::blur::BlurState;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::default_look;
 use ds_settings::AppearanceSettings;
-use ds_style::appearance::blur::BlurState;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::default_look;
 use std::cell::RefCell;
 
-/// One of the eight preset Spaces, by its place in `ds_style::space::presets::PRESETS`.
+/// One of the eight preset Spaces, by its place in `ds::style::space::presets::PRESETS`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct PresetIndex(pub u8);
 
 impl PresetIndex {
     /// Every preset, in the editor's order.
     pub fn all() -> impl Iterator<Item = PresetIndex> {
-        (0..ds_style::space::presets::PRESETS.len())
+        (0..ds::style::space::presets::PRESETS.len())
             .map(|index| PresetIndex(u8::try_from(index).unwrap_or(u8::MAX)))
     }
 
@@ -160,7 +160,7 @@ mod tests {
     use super::{Axes, PresetIndex, motion_of, start_with, starting};
     use crate::page::Page;
     use ds::prelude::*;
-    use ds_style::space::presets::PRESETS;
+    use ds::style::space::presets::PRESETS;
 
     #[test]
     fn a_preset_resets_the_space_to_its_own_dots() {

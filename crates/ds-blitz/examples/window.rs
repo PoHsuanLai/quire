@@ -7,12 +7,12 @@ use dioxus::prelude::*;
 use dioxus_native::use_window_event;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
+use ds::base::time::clock::sleep;
 use ds::components::controls::button_model::Answers;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::stack::toast_hub::use_toast_hub;
 use ds_blitz::{AppConfig, AppId, launch};
-use ds_core::time::clock::sleep;
 use std::time::Duration;
 
 /// How long the window stays up on its own.

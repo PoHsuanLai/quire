@@ -5,10 +5,10 @@
 //! reaches the row unless a shown strip is wider than half the row.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
-use ds_core::vocab::RowState;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

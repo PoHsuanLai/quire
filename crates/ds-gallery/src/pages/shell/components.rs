@@ -14,6 +14,8 @@ use ds::components::controls::badge::BadgeContent;
 use ds::components::controls::button_model::ImagePosition;
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::style::icon::family::PlateFamily;
+use ds::style::icon::plate_tint::PlateTint;
 use ds_core::vocab::Activity;
 use ds_shell::battery::device_glyph::Device;
 use ds_shell::battery::ring::Readout;
@@ -24,8 +26,6 @@ use ds_shell::emoji::id::EmojiId;
 use ds_shell::prelude::*;
 use ds_shell::user_picture::size::PictureSize;
 use ds_shell::widget::kind::{CardTint, Lift, WidgetTitle};
-use ds_style::icon::family::PlateFamily;
-use ds_style::icon::plate_tint::PlateTint;
 
 /// The page.
 #[component]

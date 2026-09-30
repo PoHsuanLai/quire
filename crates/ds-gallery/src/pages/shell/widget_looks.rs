@@ -14,6 +14,8 @@ use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::components::content::status::battery_state::BatteryPower;
 use ds::prelude::*;
+use ds::style::icon::render::IconPx;
+use ds::style::tokens::label_hue::LabelHue;
 use ds_shell::battery::device_glyph::Device;
 use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
 use ds_shell::month_grid::data::WeekNumbers;
@@ -25,8 +27,6 @@ use ds_shell::widget::calendar::{MonthEntry, MonthIntent, MonthWidget};
 use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
 use ds_shell::widget::kind::{CardTint, Lift};
 use ds_shell::widget::timeline::Timeline;
-use ds_style::icon::render::IconPx;
-use ds_style::tokens::label_hue::LabelHue;
 
 /// The medium widget's four: critical, half, full, and low but charging.
 fn devices() -> BatteryEntry {

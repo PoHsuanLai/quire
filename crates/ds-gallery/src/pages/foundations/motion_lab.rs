@@ -5,10 +5,10 @@
 use crate::pages::Section;
 use crate::pages::foundations::motion::{millis, recipe_text};
 use dioxus::prelude::*;
+use ds::motion::pulse_key::PulseKey;
+use ds::motion::timer::TimerPhase;
 use ds::prelude::*;
-use ds_motion::pulse_key::PulseKey;
-use ds_motion::timer::TimerPhase;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The motion lab page.
 #[component]

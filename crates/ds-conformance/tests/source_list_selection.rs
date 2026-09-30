@@ -7,9 +7,9 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::tokens::accent_table::accent_of;
+use ds::style::tokens::hex::Hex;
 use ds_harness::{Driver, Harness, Viewport};
-use ds_style::tokens::accent_table::accent_of;
-use ds_style::tokens::hex::Hex;
 use probe::{distance, keep, modal, pixels, rect};
 
 const VIEW: Viewport = Viewport {

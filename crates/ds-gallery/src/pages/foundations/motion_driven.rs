@@ -11,15 +11,17 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::lists::preview::switcher::PaneSwitcher;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::detail::{Contact, Touch};
-use ds::motion::{DragReturn, Release, VelocityMeter, use_drag_return};
+use ds::motion::drag_return::{DragReturn, use_drag_return};
+use ds::motion::pane_slide::Pane;
+use ds::motion::spring_point::Release;
+use ds::motion::velocity::VelocityMeter;
 use ds::prelude::*;
+use ds::style::icon::family::PlateFamily;
 use ds_core::time::clock::sleep;
-use ds_motion::pane_slide::Pane;
 use ds_shell::notifications::parts::AppMark;
 use ds_shell::notifications::swipe::NotificationSwipe;
 use ds_shell::prelude::*;
 use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
-use ds_style::icon::family::PlateFamily;
 
 /// The section on the Motion page.
 #[component]

@@ -10,10 +10,10 @@ use dioxus::prelude::*;
 use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::prelude::*;
+use ds::style::appearance::blur::BlurState;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::status::StatusMetrics;
 use ds_shell::prelude::*;
-use ds_style::appearance::blur::BlurState;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::status::StatusMetrics;
 
 /// The two metrics a shell writes from its settings: the keys' defaults (a 22 px box, a 16 px
 /// glyph), and `bar.glyph_size_policy = IconSizeBar22`, where the glyph fills the box.

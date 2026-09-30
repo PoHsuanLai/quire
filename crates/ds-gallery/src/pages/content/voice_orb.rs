@@ -7,9 +7,9 @@ use dioxus::prelude::*;
 use ds::components::content::voice_orb::model::{OrbColour, OrbColours};
 use ds::components::content::voice_orb::view::{ORB_PERIOD, VoiceOrb};
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::hex::Hex;
 use ds_core::vocab::Activity;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::hex::Hex;
 use std::time::Duration;
 
 /// The sizes of the ladder: under 30 (no mask), 30 to 50, 50 to 100 and 100 and over.

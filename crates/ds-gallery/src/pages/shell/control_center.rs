@@ -17,15 +17,15 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::controls::slider_model::SliderLook;
 use ds::components::lists::preview::switcher::PaneSwitcher;
 use ds::components::lists::row::size::RowSize;
+use ds::motion::pane_slide::Pane;
 use ds::prelude::*;
 use ds::root::chrome::FrameTint;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::default_look;
 use ds_core::press::Press;
 use ds_core::vocab::Muting;
-use ds_motion::pane_slide::Pane;
 use ds_shell::control_center::module_tile_kind::TileSpan;
 use ds_shell::prelude::*;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::default_look;
 
 /// The module whose detail a chevron opened.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

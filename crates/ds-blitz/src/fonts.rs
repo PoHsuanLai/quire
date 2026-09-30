@@ -1,4 +1,4 @@
-//! Registering `ds_style::fonts::FACES` with the renderer's shared font context, once (spike S11), through
+//! Registering `ds::style::fonts::FACES` with the renderer's shared font context, once (spike S11), through
 //! `blitz_kit::fonts::SharedFonts`.
 //!
 //! The base context (system fonts, blitz's list-bullet face and every quire face) is built once
@@ -6,7 +6,7 @@
 //! document resolves the same registered families without registering or parsing them again.
 
 use blitz_kit::fonts::{FontFaces, SharedFonts};
-use ds_style::fonts::FACES;
+use ds::style::fonts::FACES;
 use std::sync::LazyLock;
 
 /// The context every document starts from, built on first use.
@@ -29,7 +29,7 @@ mod tests {
     use super::{faces, font_context};
     use blitz_kit::fonts::SharedFonts;
     use ds::prelude::*;
-    use ds_style::tokens::type_scale::Family;
+    use ds::style::tokens::type_scale::Family;
 
     /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
     /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.

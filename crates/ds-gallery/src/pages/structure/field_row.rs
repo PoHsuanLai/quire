@@ -6,7 +6,7 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The FieldRow section.
 #[component]

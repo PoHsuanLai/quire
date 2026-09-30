@@ -5,6 +5,7 @@
 //! `content` takes the title's place and moves nothing.
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::press::Propagation;
 use ds::components::lists::row::row::Outline;
@@ -12,7 +13,6 @@ use ds::focus::request::use_focus_request;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName};
-use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

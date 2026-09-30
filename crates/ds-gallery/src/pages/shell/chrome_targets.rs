@@ -15,11 +15,11 @@ use ds::components::controls::level_indicator::LevelStyle;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
+use ds::style::icon::family::PlateFamily;
+use ds::style::material::stack::MaterialStack;
+use ds::style::tokens::shape::Corner;
 use ds_shell::prelude::*;
 use ds_shell::tokens::dock::{DockFloorSetting, DockMetrics};
-use ds_style::icon::family::PlateFamily;
-use ds_style::material::stack::MaterialStack;
-use ds_style::tokens::shape::Corner;
 
 /// A nested root in `material` with the page's look and blur state, as a shell surface's root: its chrome is
 /// the material's own (a Popover root is transparent and its cards paint), unlike `Scope`'s.

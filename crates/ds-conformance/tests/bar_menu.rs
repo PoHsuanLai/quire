@@ -5,11 +5,11 @@
 //! a status line is drawn and never selected; a press reports where it happened.
 
 use dioxus::prelude::*;
+use ds::base::press::{PointerButton, Press};
 use ds::components::controls::button_model::ImagePosition;
 use ds::host::measure::Anchor;
 use ds::host::measure::use_rect;
 use ds::prelude::*;
-use ds_core::press::{PointerButton, Press};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::prelude::*;

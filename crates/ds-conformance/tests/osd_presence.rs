@@ -4,9 +4,9 @@
 //! shown again while it fades, the hide is taken back and `on_hidden` never runs for it.
 
 use dioxus::prelude::*;
+use ds::base::vocab::Muting;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::prelude::*;
-use ds_core::vocab::Muting;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::osd::OsdLevel;

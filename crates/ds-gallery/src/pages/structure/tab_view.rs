@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::components::chrome::tab_view::TabView;
 use ds::components::controls::checkbox::Checkbox;
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The TabView section.
 #[component]

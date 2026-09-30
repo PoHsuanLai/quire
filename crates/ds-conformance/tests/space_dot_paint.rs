@@ -5,11 +5,11 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::space::frame_vars::FrameVars;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::PRESETS;
 use ds_harness::{Driver, Harness, Viewport};
 use ds_shell::prelude::*;
-use ds_style::space::frame_vars::FrameVars;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::PRESETS;
 
 const VIEW: Viewport = Viewport {
     width: 200,

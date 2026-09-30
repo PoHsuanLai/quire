@@ -4,6 +4,7 @@
 //! reading the bar's `VolumeState`. Each motion ends at 0 frames.
 
 use dioxus::prelude::*;
+use ds::base::vocab::Muting;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
 use ds::components::content::status::volume::{VolumeState, VolumeWaves};
@@ -12,11 +13,10 @@ use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::slider_model::SliderLook;
 use ds::detail::EventStamp;
 use ds::prelude::*;
-use ds_core::vocab::Muting;
+use ds::style::tokens::status::StatusMetrics;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::prelude::*;
-use ds_style::tokens::status::StatusMetrics;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

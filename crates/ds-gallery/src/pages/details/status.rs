@@ -10,7 +10,7 @@ use ds::components::content::status::volume::{VolumeState, VolumeWaves};
 use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
 use ds::detail::EventStamp;
 use ds::prelude::*;
-use ds_style::icon::render::IconPx;
+use ds::style::icon::render::IconPx;
 
 /// The live specimen's size: twice the bar's, so its layers read on the page.
 const LIVE: IconSize = IconSize::Px(IconPx(44));

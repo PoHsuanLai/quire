@@ -21,13 +21,13 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::base::time::FRAME_TICK;
 use ds::components::controls::radio_group::Arrangement;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
-use ds_core::time::FRAME_TICK;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
 use ds_shell::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
 use probe::{distance, rect};
 use std::cell::Cell;
 use std::time::Duration;

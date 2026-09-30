@@ -11,7 +11,7 @@ use ds::components::lists::preview::pane::PaneAction;
 use ds::components::lists::row::shape::RowShape;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
 use ds::prelude::*;
-use ds_style::tokens::shape::{Corner, Radius};
+use ds::style::tokens::shape::{Corner, Radius};
 
 fn reveal() -> Shortcut {
     Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])

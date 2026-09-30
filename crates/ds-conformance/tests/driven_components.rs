@@ -7,23 +7,23 @@
 //! Space editor reports the dot picked inside it).
 
 use dioxus::prelude::*;
+use ds::base::vocab::RowState;
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::overlays::hover_card::target::HoverTarget;
 use ds::host::measure::Anchor;
+use ds::motion::hover_intent::{HoverEvent, HoverProfile};
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds::stack::toast_hub::ToastState;
 use ds::stack::toast_hub::use_toast_hub;
+use ds::style::space::look::CardAccent;
+use ds::style::space::presets::PRESETS;
 use ds_blitz::TokioSpawner;
-use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_motion::hover_intent::{HoverEvent, HoverProfile};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds_shell::prelude::*;
 use ds_shell::space_editor::DotIndex;
-use ds_style::space::look::CardAccent;
-use ds_style::space::presets::PRESETS;
 use std::sync::Arc;
 use std::time::Duration;
 

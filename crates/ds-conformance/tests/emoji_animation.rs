@@ -5,10 +5,10 @@
 //! frame never leaves 0.
 
 use dioxus::prelude::*;
+use ds::motion::wake::WakeStamp;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_motion::wake::WakeStamp;
 use ds_shell::emoji::disc::EmojiPlayback;
 use ds_shell::emoji::id::EmojiId;
 use ds_shell::prelude::*;

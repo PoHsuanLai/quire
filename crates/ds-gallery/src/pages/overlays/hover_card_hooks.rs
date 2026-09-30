@@ -10,9 +10,9 @@ use ds::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent
 use ds::components::overlays::hover_card::parts::HoverCardPart;
 use ds::host::measure::Anchor;
 use ds::host::measure::MountedRef;
+use ds::motion::hover_intent::HoverProfile;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind};
-use ds_motion::hover_intent::HoverProfile;
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
 pub const HOOK_KEYED: &str = "hook:";

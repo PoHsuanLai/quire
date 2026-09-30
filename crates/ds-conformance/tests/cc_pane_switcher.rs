@@ -7,12 +7,12 @@
 use dioxus::prelude::*;
 use ds::components::lists::preview::switcher::PaneSwitcher;
 use ds::components::lists::row::size::RowSize;
+use ds::motion::pane_slide::Pane;
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_motion::pane_slide::Pane;
-use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 // `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are

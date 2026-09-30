@@ -10,8 +10,6 @@ publish.workspace = true
 
 [dependencies]
 ds = { workspace = true }
-ds-core = { workspace = true }
-ds-style = { workspace = true }
 # Portable Blitz repairs shared with shell-host: `data:` decoding, the local file read, hover sync,
 # fonts, pixel snap, adapter choice. `adapter`: `AdapterPref`, the GPU ranking.
 blitz-kit = { workspace = true, features = ["adapter"] }

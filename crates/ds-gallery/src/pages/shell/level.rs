@@ -11,12 +11,12 @@ use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::level_indicator::LevelStyle;
 use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
+use ds::style::appearance::blur::BlurState;
+use ds::style::tokens::control_size::ControlSize;
 use ds_core::vocab::Muting;
 use ds_shell::osd::{OsdLevel, OsdPosition};
 use ds_shell::prelude::*;
 use ds_shell::tokens::osd::OsdMetrics;
-use ds_style::appearance::blur::BlurState;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The Level page.
 #[component]

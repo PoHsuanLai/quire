@@ -5,7 +5,7 @@ use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::controls::button_model::{Answers, Bezel, ButtonRole, ImagePosition};
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// The Button section.
 #[component]

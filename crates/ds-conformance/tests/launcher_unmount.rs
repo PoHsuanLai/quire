@@ -7,10 +7,10 @@
 //! script inside the page, on the harness's clock, and passes only if nothing panics.
 
 use dioxus::prelude::*;
+use ds::base::time::clock::sleep;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_core::time::clock::sleep;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 

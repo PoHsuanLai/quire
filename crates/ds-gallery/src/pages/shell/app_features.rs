@@ -14,11 +14,11 @@ use ds::components::content::provider_mark::MarkProvider;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::menus::palette::palette_group::{GroupOrder, PaletteGroup, PaletteRow};
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::hex::{Colour, Hex};
+use ds::style::tokens::shape::{Corner, Radius};
 use ds::time::now;
 use ds_core::standard_action::SpaceNumber;
-use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::hex::{Colour, Hex};
-use ds_style::tokens::shape::{Corner, Radius};
 use std::time::Duration;
 
 /// The App features page.

@@ -8,7 +8,7 @@ use ds::components::content::text_runs::RunTone;
 use ds::components::controls::button_marks::{Leading, Trailing};
 use ds::components::controls::button_model::Bezel;
 use ds::prelude::*;
-use ds_style::tokens::control_size::ControlSize;
+use ds::style::tokens::control_size::ControlSize;
 
 /// A provider's inline mark, for a From value.
 fn mark(provider: MarkProvider) -> Leading {
