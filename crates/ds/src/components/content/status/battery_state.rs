@@ -2,9 +2,11 @@
 
 use ds_core::vocab::Fraction;
 use ds_motion::detail::{detailed::Detailed, moment::Moment};
+use serde::{Deserialize, Serialize};
 
 /// Where the power comes from.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum BatteryPower {
     /// On battery.
     #[default]
@@ -18,7 +20,7 @@ pub enum BatteryPower {
 /// The level at or under which a discharging battery's fill turns `--battery-low` (R15). The
 /// reference turns it at about a fifth; the shell reads it from `bar.battery_low_percent`
 /// (proposed, design/26), so it is the caller's.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct LowAt(pub Fraction);
 
 impl Default for LowAt {
@@ -28,8 +30,8 @@ impl Default for LowAt {
     }
 }
 
-/// What the battery item shows.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+/// What a battery shows, in the bar, a row, a ring or a widget: one state everywhere.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize)]
 pub struct BatteryState {
     /// The charge, in thousandths.
     pub level: Fraction,
@@ -59,14 +61,19 @@ pub(crate) struct Look {
 }
 
 impl BatteryState {
+    /// Whether the fill reads low: draining, at or under `low_at` (a charging battery is never
+    /// low).
+    pub fn is_low(self) -> bool {
+        self.power == BatteryPower::Battery && self.level.clamped().0 <= self.low_at.0.0
+    }
+
     /// What is drawn: the level quantised to the fill's steps, the mark, the tone.
     pub(crate) fn look(self) -> Look {
         let level = self.level.clamped().0;
-        let tone = match (self.power, level <= self.low_at.0.0) {
-            (BatteryPower::Battery, true) => Tone::Low,
-            (BatteryPower::Battery, false) | (BatteryPower::Charging | BatteryPower::Held, _) => {
-                Tone::Normal
-            }
+        let tone = if self.is_low() {
+            Tone::Low
+        } else {
+            Tone::Normal
         };
         // Any charge at all shows at least one step.
         let step = match level {

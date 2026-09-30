@@ -11,10 +11,10 @@ use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::ControlSize;
-use ds::{Appearance, Button, Ds, Fraction, Inject, Material, RootChrome, Theme};
+use ds::{Appearance, BatteryPower, Button, Ds, Fraction, Inject, Material, RootChrome, Theme};
 use ds_shell::{
-    BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device, RingMark,
-    Seconds, Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
+    BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device, Seconds,
+    Timeline, WidgetCard, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 
 const TAIPEI: ClockTime = ClockTime {
@@ -47,10 +47,10 @@ fn cities() -> ClockEntry {
 
 fn batteries() -> BatteryEntry {
     BatteryEntry::Devices(vec![
-        cell("Mouse", Device::Mouse, 80, RingMark::Plain),
-        cell("Headphones", Device::Headphones, 450, RingMark::Plain),
-        cell("Keyboard", Device::Keyboard, 1000, RingMark::Plain),
-        cell("This computer", Device::Laptop, 150, RingMark::Charging),
+        cell("Mouse", Device::Mouse, 80, BatteryPower::Battery),
+        cell("Headphones", Device::Headphones, 450, BatteryPower::Battery),
+        cell("Keyboard", Device::Keyboard, 1000, BatteryPower::Battery),
+        cell("This computer", Device::Laptop, 150, BatteryPower::Charging),
     ])
 }
 
@@ -105,7 +105,7 @@ fn Battery(host: WidgetHost) -> Element {
         "This computer",
         Device::Laptop,
         level().0,
-        RingMark::Plain,
+        BatteryPower::Battery,
     )]);
     rsx! {
         div { class: "g-col",

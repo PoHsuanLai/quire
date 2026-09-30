@@ -226,6 +226,15 @@ const SPECIMENS: &[Specimen] = &[
     }),
 ];
 
+/// The specimen called `name`.
+fn specimen(name: &str) -> fn() -> Element {
+    SPECIMENS
+        .iter()
+        .find(|(known, _)| *known == name)
+        .map(|(_, make)| *make)
+        .unwrap_or_else(|| panic!("no specimen {name}"))
+}
+
 /// Build the dom and flush the effects that register overlays, so a sheet is in the markup.
 fn render(make: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(make);
@@ -325,7 +334,7 @@ fn no_password_field_writes_a_value() {
 /// mounting in it (`lock_switcher` in ds-native drives that).
 #[test]
 fn the_markup_carries_the_props() {
-    let wrong = render(SPECIMENS[4].1);
+    let wrong = render(specimen("prompt-wrong-caps"));
     for want in [
         "data-state=\"wrong\"",
         "class=\"ds-password-field\"",
@@ -335,10 +344,10 @@ fn the_markup_carries_the_props() {
     ] {
         assert!(wrong.contains(want), "{want} in {wrong}");
     }
-    let idle = render(SPECIMENS[2].1);
+    let idle = render(specimen("prompt-idle"));
     assert!(!idle.contains("a-shake-x"), "{idle}");
     assert!(!idle.contains("Caps Lock"), "{idle}");
-    let checking = render(SPECIMENS[3].1);
+    let checking = render(specimen("prompt-checking"));
     for want in [
         "aria-busy=\"true\"",
         "ds-progress",
@@ -346,16 +355,16 @@ fn the_markup_carries_the_props() {
     ] {
         assert!(checking.contains(want), "{want} in {checking}");
     }
-    let out = render(SPECIMENS[5].1);
+    let out = render(specimen("prompt-locked-out"));
     assert!(out.contains("Try again at 9:52"), "{out}");
-    let polkit = render(SPECIMENS[11].1);
+    let polkit = render(specimen("polkit-locked-out"));
     assert!(
         polkit.contains("Too many tries. Try again at 9:52."),
         "{polkit}"
     );
     assert!(polkit.contains("data-width=\"narrow\""), "{polkit}");
 
-    let scrolled = render(SPECIMENS[14].1);
+    let scrolled = render(specimen("switcher-14-scrolled"));
     assert!(
         scrolled.contains(
             "--switcher-cell:64px;--switcher-icon:48px;--switcher-gap:8px;--switcher-view:704px;--switcher-shift:296px;--switcher-at:9"
@@ -363,17 +372,11 @@ fn the_markup_carries_the_props() {
         "{scrolled}"
     );
     assert_eq!(scrolled.matches("aria-selected=\"true\"").count(), 1);
-    let shrunk = render(SPECIMENS[13].1);
+    let shrunk = render(specimen("switcher-14-shrunk"));
     assert!(
         shrunk.contains("--switcher-cell:72px;--switcher-icon:56px"),
         "{shrunk}"
     );
-    let leaving = render(SPECIMENS[15].1);
-    assert!(
-        leaving.contains("class=\"ds-switcher-cell a-row-out\""),
-        "{leaving}"
-    );
-    assert!(leaving.contains("data-presence=\"leaving\""), "{leaving}");
 }
 
 /// A photo is cropped round at the face's size (64 at the lock, 48 in the polkit sheet), with
@@ -403,12 +406,15 @@ fn the_picture_is_the_kind_the_user_carries() {
     );
     let emoji = by_name("prompt-emoji");
     assert!(
-        emoji.contains("class=\"ds-emoji\" data-size=\"64\" data-mood=\"idle\""),
+        emoji.contains("class=\"ds-emoji\" data-size=\"64\""),
         "{emoji}"
     );
     assert!(!emoji.contains("ds-avatar"), "{emoji}");
+    assert!(
+        !emoji.contains("data-mood"),
+        "the picture has no mood: {emoji}"
+    );
     let accepted = by_name("prompt-emoji-accepted");
-    assert!(accepted.contains("data-mood=\"happy\""), "{accepted}");
     assert!(accepted.contains("data-state=\"accepted\""), "{accepted}");
 }
 

@@ -14,14 +14,24 @@
 use crate::idle_dim::drive::use_idle_dim;
 use crate::idle_dim::model::IdleDimPhase;
 use dioxus::prelude::*;
+use ds::Common;
 use ds_core::vocab::Percent;
 
 /// The idle dim overlay. `level` is `idle.dim_level_pct` (10..90); `phase` is the caller's own
 /// request, driven by sill's idle service.
 #[component]
-pub fn IdleDim(level: Percent, phase: IdleDimPhase) -> Element {
+pub fn IdleDim(level: Percent, phase: IdleDimPhase, #[props(default)] common: Common) -> Element {
     let share = use_idle_dim(level, phase);
+    let class = common.class("ds-idle-dim");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-idle-dim", "aria-hidden": "true", style: "opacity:{share.css()}" }
+        div {
+            class,
+            id: common.id.clone(),
+            "aria-hidden": "true",
+            style: "opacity:{share.css()}",
+            onmounted: move |event| common.mounted(event),
+            ..data,
+        }
     }
 }

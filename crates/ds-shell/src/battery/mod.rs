@@ -1,8 +1,5 @@
-//! Batteries: the ring, the counting figure, the device glyphs and the control center's device
-//! battery.
+//! Batteries: the ring and the device glyphs it holds.
 
-pub(crate) mod device_battery;
 pub(crate) mod device_forms;
 pub mod device_glyph;
-pub(crate) mod figure;
-pub(crate) mod level;
+pub mod ring;

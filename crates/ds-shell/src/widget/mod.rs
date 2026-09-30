@@ -13,7 +13,6 @@ pub(crate) mod calendar;
 pub(crate) mod card;
 pub(crate) mod clock;
 pub(crate) mod contract;
-pub(crate) mod exit;
 pub(crate) mod frame;
 pub(crate) mod gallery;
 pub(crate) mod gallery_book;

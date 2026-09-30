@@ -16,11 +16,13 @@ use crate::widget::kind::{Lift, WidgetHost, WidgetSize};
 use crate::widget::layout::{WidgetEdit, WidgetLayout};
 use crate::widget::registry::{WidgetInfo, use_widget_registry};
 use dioxus::prelude::*;
-use ds::components::content::text_runs::{TextLine, text};
+use ds::components::content::text_runs::TextLine;
 use ds::components::controls::button::Button;
 use ds::components::controls::button_model::Answers;
 use ds::host::measure::MountedRef;
+use ds::{Common, List, ListItem, Row, RowState};
 use ds_core::press::Press;
+use ds_core::vocab::Selection;
 use ds_core::word::Word;
 
 /// The gallery's words, the host's to translate; English by default.
@@ -68,6 +70,7 @@ pub fn WidgetGallery(
     layout: WidgetLayout,
     onedit: EventHandler<WidgetEdit>,
     #[props(default)] words: GalleryWords,
+    #[props(default)] common: Common,
 ) -> Element {
     let registry = use_widget_registry();
     let first = registry.all().first().map(|info| info.kind.clone());
@@ -83,24 +86,45 @@ pub fn WidgetGallery(
         onedit,
         words: &words,
     };
-    rsx! {
-        div { class: "ds-widget-gallery",
-            div { class: "ds-widget-gallery-kinds", role: "listbox",
-                for info in registry.all().iter().cloned() {
-                    button {
-                        key: "{info.kind.as_str()}",
-                        r#type: "button",
-                        class: "ds-widget-gallery-kind",
-                        role: "option",
-                        "aria-selected": if shown.as_ref().is_some_and(|on| on.kind == info.kind) { "true" } else { "false" },
-                        onclick: {
-                            let kind = info.kind.clone();
-                            move |_| looking.set(Some(kind.clone()))
+    let selected = shown.as_ref().map(|info| info.kind.clone());
+    let items = registry
+        .all()
+        .iter()
+        .map(|info| {
+            let kind = info.kind.clone();
+            let picked = kind.clone();
+            ListItem::row(
+                kind.clone(),
+                info.name.plain_text(),
+                rsx! {
+                    Row {
+                        title: info.name.clone(),
+                        detail: Some(info.description.clone()),
+                        state: RowState {
+                            selection: Selection::of(&Some(kind), &selected),
+                            ..RowState::default()
                         },
-                        span { class: "ds-widget-gallery-name", {text(&info.name)} }
-                        span { class: "ds-widget-gallery-description", {text(&info.description)} }
+                        onclick: move |_| looking.set(Some(picked.clone())),
                     }
-                }
+                },
+            )
+        })
+        .collect::<Vec<_>>();
+    let class = common.class("ds-widget-gallery");
+    let data = common.data_attributes();
+    rsx! {
+        div {
+            class,
+            id: common.id.clone(),
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            List::<WidgetKind> {
+                label: "Widgets",
+                items,
+                cursor: looking(),
+                onselect: move |kind: WidgetKind| looking.set(Some(kind)),
+                common: Common::default(),
             }
             if let Some(info) = shown {
                 {detail(info, onedit, &words)}

@@ -61,17 +61,14 @@ impl Anim {
             | Anim::PaneInROut
             | Anim::PanelIn
             | Anim::MorphIn
-            | Anim::MorphInSpring
-            | Anim::RollIn => CrossFade(In),
+            | Anim::MorphInSpring => CrossFade(In),
             Anim::PaneOutL
             | Anim::PaneOutR
             | Anim::OsdOut
             | Anim::SheetOut
             | Anim::PanelOut
             | Anim::MorphOut
-            | Anim::RollOut
-            | Anim::RowOut
-            | Anim::WidgetOut => CrossFade(Out),
+            | Anim::RowOut => CrossFade(Out),
             Anim::Heal | Anim::ShakeX | Anim::Shake => Still,
             Anim::MenuOut
             | Anim::Fade

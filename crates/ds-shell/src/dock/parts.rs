@@ -1,6 +1,5 @@
-//! The dock's own pieces (the macOS polish pass, 2026-09-24; design/10-BEHAVIOUR-dock.md
-//! section 10.3.2): the running dot under a tile, the label above it, and the optional reflective
-//! floor inside the pill. The shell lays out the tiles; these read the dock tokens (`--dock-dot`,
+//! The dock's smaller pieces (design/10-BEHAVIOUR-dock.md section 10.3.2): the running dot under a
+//! tile, the label above it, and the optional reflective floor inside the pill. The shell lays out the tiles; these read the dock tokens (`--dock-dot`,
 //! `--dock-dot-gap`, `--dock-floor`) its `DockMetrics` writes.
 
 use dioxus::prelude::*;
@@ -14,18 +13,34 @@ use ds_motion::hover_intent::HoverProfile;
 /// it inside the tile's box (a positioned element), and leave it out when the app has no
 /// window.
 #[component]
-pub fn RunningDot() -> Element {
+pub fn RunningDot(#[props(default)] common: Common) -> Element {
+    let class = common.class("ds-running-dot");
+    let data = common.data_attributes();
     rsx! {
-        span { class: "ds-running-dot", "aria-hidden": "true" }
+        span {
+            class,
+            id: common.id.clone(),
+            "aria-hidden": "true",
+            onmounted: move |event| common.mounted(event),
+            ..data,
+        }
     }
 }
 
 /// The reflective floor: a soft light rising from the pill's floor, off unless `dock.floor` is
 /// on (`--dock-floor`). Place it first inside the dock's root, under the tiles.
 #[component]
-pub fn DockFloor() -> Element {
+pub fn DockFloor(#[props(default)] common: Common) -> Element {
+    let class = common.class("ds-dock-floor");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-dock-floor", "aria-hidden": "true" }
+        div {
+            class,
+            id: common.id.clone(),
+            "aria-hidden": "true",
+            onmounted: move |event| common.mounted(event),
+            ..data,
+        }
     }
 }
 

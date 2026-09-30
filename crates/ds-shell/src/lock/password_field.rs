@@ -5,7 +5,6 @@
 //! shakes. `Form::Pill` is the lock screen's flat glass pill, `Form::Boxed` the polkit sheet's
 //! bezeled box.
 
-use crate::lock::mood::Caret;
 use crate::lock::password::Password;
 use crate::lock::vocab::CapsLock;
 use dioxus::prelude::*;
@@ -36,8 +35,8 @@ pub(crate) enum Escape {
     Passes,
 }
 
-/// The shared field. `trailing` is the caller's button after the caps mark; `oncaret` hears
-/// whether the caret is in the field; Enter calls `onsubmit`.
+/// The shared field. `trailing` is the caller's button after the caps mark; Enter calls
+/// `onsubmit`.
 #[component]
 pub(crate) fn PasswordField(
     password: Password,
@@ -47,7 +46,6 @@ pub(crate) fn PasswordField(
     #[props(into)] placeholder: String,
     escape: Escape,
     onsubmit: EventHandler<()>,
-    #[props(default)] oncaret: EventHandler<Caret>,
     #[props(default)] trailing: Option<Element>,
 ) -> Element {
     let pulse = password.shake.attrs();
@@ -77,12 +75,7 @@ pub(crate) fn PasswordField(
                     placeholder: placeholder.clone(),
                     availability,
                     focus: FieldFocus::OnMount,
-                    onfocus: move |()| oncaret.call(Caret::In),
-                    onblur: move |()| oncaret.call(Caret::Out),
-                    oninput: move |next: String| {
-                        oncaret.call(Caret::In);
-                        password.input(next);
-                    },
+                    oninput: move |next: String| password.input(next),
                     onkey: move |event: KeyboardEvent| match (event.key(), escape) {
                         (Key::Enter, _) => onsubmit.call(()),
                         (Key::Escape, Escape::Clears) => {

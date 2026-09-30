@@ -3,18 +3,20 @@
 //! `Sheet` (`Attach::Bottom`) holding `WidgetGallery`, no taller than half the desktop, so the
 //! top rows where a new widget lands stay in view. Live: Add places the widget on the desktop
 //! above the sheet at the size it takes there, and the gallery's own list shows it; Remove takes
-//! it away, the card on the desktop shrinking and fading out (`CardPresence::Leaving`)
+//! it away, the card on the desktop fading out (`Shown::Hidden`)
 //! before the page drops it.
 
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{Appearance, Attach, Ds, Inject, Material, RootChrome, Sheet, SpaceLook, use_scope};
+use ds::{
+    Appearance, Attach, Ds, Inject, Material, RootChrome, Sheet, Shown, SpaceLook, use_scope,
+};
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds_shell::{
-    BatteryWidget, CardPresence, MonthWidget, Timeline, Widget, WidgetCard, WidgetGallery,
-    WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
+    BatteryWidget, MonthWidget, Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost,
+    WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 
 /// The desktop's grid: six columns of the 164 cell and 16 gap in the stage's 1120.
@@ -85,11 +87,11 @@ pub(super) fn EditWidgetsStage() -> Element {
                 stylesheet: Inject::Host,
                 div { class: "g-we-desk", style: "{metrics}",
                     for item in on_desktop(&layout()) {
-                        DeskCard { key: "{item.id.0}", item, presence: CardPresence::Placed, on_gone: |()| {} }
+                        DeskCard { key: "{item.id.0}", item, shown: Shown::Visible, on_hidden: |()| {} }
                     }
                     for item in leaving() {
-                        DeskCard { key: "{item.id.0}", item: item.clone(), presence: CardPresence::Leaving,
-                            on_gone: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
+                        DeskCard { key: "{item.id.0}", item: item.clone(), shown: Shown::Hidden,
+                            on_hidden: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
                     }
                 }
                 Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide,
@@ -120,24 +122,24 @@ fn removed(before: &WidgetLayout, after: &WidgetLayout) -> Vec<WidgetPlacement> 
         .collect()
 }
 
-/// One placed widget at its cell, drawn with its preview entry, leaving when `presence` says.
+/// One placed widget at its cell, drawn with its preview entry, leaving when `shown` says.
 #[component]
-fn DeskCard(item: WidgetPlacement, presence: CardPresence, on_gone: EventHandler<()>) -> Element {
+fn DeskCard(item: WidgetPlacement, shown: Shown, on_hidden: EventHandler<()>) -> Element {
     let WidgetAt::Desktop(cell) = item.at else {
         return rsx! {};
     };
     let (left, top) = (8 + cell.column * PITCH, 8 + cell.row * PITCH);
     let size = item.size;
-    let on_gone = Some(on_gone);
+    let on_hidden = Some(on_hidden);
     let card = match item.kind.as_str() {
         "quire.battery" => rsx! {
-            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(size)), size, shown, on_hidden }
         },
         "quire.world-clock" => rsx! {
-            WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(size)), size, shown, on_hidden }
         },
         "quire.month" => rsx! {
-            WidgetCard { widget: MonthWidget, timeline: Timeline::now(MonthWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: MonthWidget, timeline: Timeline::now(MonthWidget::preview(size)), size, shown, on_hidden }
         },
         _ => rsx! {},
     };

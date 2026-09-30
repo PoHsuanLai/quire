@@ -8,12 +8,14 @@
 
 use super::choice::PictureChoice;
 use crate::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
-use crate::user_picture::mood::PictureSize;
+use crate::user_picture::size::PictureSize;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::avatar::{AvatarFace, AvatarSize, face};
 use ds::components::lists::emoji_grid::grid::grid_style;
 use ds::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
 use ds_core::geometry::units::Px;
+use ds_core::vocab::Selection;
 use ds_core::word::Word;
 
 /// A picker cell's side: the 64 px disc and 6 px around it.
@@ -82,6 +84,7 @@ pub fn UserPicturePicker(
     onpick: EventHandler<PictureChoice>,
     #[props(default = PICTURE_COLUMNS)] columns: u8,
     #[props(default = "Picture".to_string())] label: String,
+    #[props(default)] common: Common,
 ) -> Element {
     let all = cells();
     let count = all.len();
@@ -105,20 +108,27 @@ pub fn UserPicturePicker(
             }
         }
     };
+    let class = common.class("ds-picture-picker");
+    let data = common.data_attributes();
+    let name = common.aria_label.clone().unwrap_or(label);
     rsx! {
         div {
-            class: "ds-picture-picker",
+            class,
+            id: common.id.clone(),
             role: "radiogroup",
-            "aria-label": "{label}",
+            "aria-label": "{name}",
             tabindex: "0",
             style: grid_style(columns, PICTURE_CELL),
             onkeydown: keys,
+            onmounted: move |event| common.mounted(event),
+            ..data,
             for (index , cell) in all.into_iter().enumerate() {
                 div {
                     key: "{index}",
                     class: "ds-picture-cell",
                     role: "radio",
                     "aria-checked": if at == Some(index) { "true" } else { "false" },
+                    "data-selected": if at == Some(index) { Selection::Selected.slug() } else { Selection::Unselected.slug() },
                     "aria-label": cell_name(cell, letter.initial),
                     onclick: move |_| onpick.call(cell.choice()),
                     {cell_body(cell, letter)}

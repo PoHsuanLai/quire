@@ -8,13 +8,15 @@
 
 use dioxus::prelude::*;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{Appearance, Attach, Ds, Fraction, Material, RootChrome, Sheet};
+use ds::{
+    Appearance, Attach, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, RootChrome,
+    Sheet, Shown,
+};
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
 use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, CardPresence, Device, MonthWidget, RingMark,
-    Timeline, Widget, WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize,
-    WorldClockWidget,
+    BatteryCell, BatteryEntry, BatteryWidget, Device, MonthWidget, Timeline, Widget, WidgetCard,
+    WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
 };
 use std::time::Duration;
 
@@ -84,11 +86,11 @@ fn Stage() -> Element {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent), extent: ds::RootExtent::Viewport,
             div { style: "position:absolute;inset:0;background:{WASH};{metrics}",
                 for item in placed {
-                    Card { key: "{item.id.0}", item, presence: CardPresence::Placed, on_gone: |()| {} }
+                    Card { key: "{item.id.0}", item, shown: Shown::Visible, on_hidden: |()| {} }
                 }
                 for item in leaving() {
-                    Card { key: "{item.id.0}", item: item.clone(), presence: CardPresence::Leaving,
-                        on_gone: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
+                    Card { key: "{item.id.0}", item: item.clone(), shown: Shown::Hidden,
+                        on_hidden: move |()| leaving.with_mut(|going| going.retain(|gone| gone.id != item.id)) }
                 }
             }
             Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide,
@@ -101,7 +103,7 @@ fn Stage() -> Element {
 }
 
 #[component]
-fn Card(item: WidgetPlacement, presence: CardPresence, on_gone: EventHandler<()>) -> Element {
+fn Card(item: WidgetPlacement, shown: Shown, on_hidden: EventHandler<()>) -> Element {
     let WidgetAt::Desktop(cell) = item.at else {
         return rsx! {};
     };
@@ -110,16 +112,16 @@ fn Card(item: WidgetPlacement, presence: CardPresence, on_gone: EventHandler<()>
         8 + cell.row * PITCH,
     );
     let size = item.size;
-    let on_gone = Some(on_gone);
+    let on_hidden = Some(on_hidden);
     let card = match item.kind.as_str() {
         "quire.battery" => rsx! {
-            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: BatteryWidget, timeline: Timeline::now(BatteryWidget::preview(size)), size, shown, on_hidden }
         },
         "quire.world-clock" => rsx! {
-            WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: WorldClockWidget, timeline: Timeline::now(WorldClockWidget::preview(size)), size, shown, on_hidden }
         },
         "quire.month" => rsx! {
-            WidgetCard { widget: MonthWidget, timeline: Timeline::now(MonthWidget::preview(size)), size, presence, on_gone }
+            WidgetCard { widget: MonthWidget, timeline: Timeline::now(MonthWidget::preview(size)), size, shown, on_hidden }
         },
         _ => rsx! {},
     };
@@ -146,8 +148,11 @@ fn Row() -> Element {
         .map(|(at, device)| BatteryCell {
             name: format!("device {at}"),
             device,
-            level: Fraction(900 - 200 * at as u16),
-            mark: RingMark::Plain,
+            state: BatteryState {
+                level: Fraction(900 - 200 * at as u16),
+                power: BatteryPower::Battery,
+                low_at: LowAt::default(),
+            },
         })
         .collect();
     rsx! {

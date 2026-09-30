@@ -14,7 +14,7 @@ use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
 use ds::host::measure::MountedRef;
 use ds::host::reveal::reveal;
-use ds::{ButtonRole, ControlSize};
+use ds::{ButtonRole, ControlSize, SectionHeader};
 use ds_core::word::Word;
 use ds_style::task::spawn_in;
 use std::collections::BTreeSet;
@@ -67,7 +67,7 @@ pub(crate) fn placed(placed: Placed<'_>, mut list: CopyValue<Option<MountedRef>>
             onmounted: move |event: MountedEvent| list.set(Some(MountedRef(event.data()))),
             for (host, heading) in surfaces {
                 div { key: "{host.slug()}", class: "ds-widget-gallery-surface", "data-host": host.slug(),
-                    span { class: "ds-widget-gallery-heading", {text(&heading)} }
+                    SectionHeader { title: heading.plain_text() }
                     if on_host(layout, host).is_empty() {
                         span { class: "ds-widget-gallery-none", {text(&words.none)} }
                     }

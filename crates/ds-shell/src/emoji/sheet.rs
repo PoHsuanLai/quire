@@ -6,7 +6,7 @@
 //! document fetches nothing.
 
 use super::id::EmojiId;
-use crate::user_picture::mood::PictureSize;
+use crate::user_picture::size::PictureSize;
 use ds_core::word::Word;
 use ds_style::icon::url::IconUrl;
 use serde::Deserialize;

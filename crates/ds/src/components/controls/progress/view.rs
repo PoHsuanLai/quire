@@ -5,7 +5,7 @@
 //! [`Operation`](ds_motion::detail::operation::Operation).
 
 use super::arc::{RingSpan, arc_path};
-use super::model::{Progress, ProgressStyle};
+use super::model::{Progress, ProgressStyle, RingGap};
 use super::spokes::{SPIN, age, step_of};
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
@@ -28,7 +28,8 @@ const FOLLOW: TweenSpec = TweenSpec {
     easing: EasingToken::Linear,
 };
 
-/// Progress: `progress` drawn as `style` at `size`. A `Ring` takes an optional centre `glyph`.
+/// Progress: `progress` drawn as `style` at `size`. A `Ring` takes an optional centre `glyph`, or
+/// any `centre` element (a device's glyph), and may be `Notched` at twelve.
 ///
 /// A `Spinner` has no known amount, so it takes `Progress::Unknown` and draws nothing while the
 /// operation is idle; a `Bar` or `Ring` given `Unknown` is the barber pole or the turning arc.
@@ -39,6 +40,8 @@ pub fn ProgressIndicator(
     progress: Progress,
     #[props(default)] size: ControlSize,
     #[props(default)] glyph: Option<IconSource>,
+    #[props(default)] centre: Option<Element>,
+    #[props(default)] gap: RingGap,
     #[props(default)] common: Common,
 ) -> Element {
     let (share, operation) = match progress {
@@ -58,6 +61,7 @@ pub fn ProgressIndicator(
             role: "progressbar",
             "data-style": style.slug(),
             "data-size": size.slug(),
+            "data-gap": if style == ProgressStyle::Ring { Some(gap.slug()) } else { None },
             "data-pending": if known { None } else { Some(frame.slug()) },
             "aria-label": common.aria_label.clone(),
             "aria-valuemin": if known { Some("0") } else { None },
@@ -70,7 +74,7 @@ pub fn ProgressIndicator(
             match style {
                 ProgressStyle::Bar => bar(shown, frame),
                 ProgressStyle::Spinner => spinner(frame),
-                ProgressStyle::Ring => ring(shown, frame, glyph),
+                ProgressStyle::Ring => ring(shown, frame, glyph, centre, gap),
             }
         }
     }
@@ -107,13 +111,23 @@ fn spinner(frame: PendingFrame) -> Element {
 
 /// The ring: a full track and the arc over it, from twelve clockwise. Unknown, the arc is a
 /// quarter turned by the loop's step.
-fn ring(shown: Fraction, frame: PendingFrame, glyph: Option<IconSource>) -> Element {
+fn ring(
+    shown: Fraction,
+    frame: PendingFrame,
+    glyph: Option<IconSource>,
+    centre: Option<Element>,
+    gap: RingGap,
+) -> Element {
+    let whole = match gap {
+        RingGap::Closed => RingSpan::FULL,
+        RingGap::Notched => RingSpan::GAPPED,
+    };
     let span = match frame {
-        PendingFrame::Step(_) => RingSpan::FULL.filled(Fraction(250)),
-        PendingFrame::Idle => RingSpan::FULL.filled(shown),
+        PendingFrame::Step(_) => whole.filled(Fraction(250)),
+        PendingFrame::Idle => whole.filled(shown),
     };
     let arc = arc_path(span);
-    let track = arc_path(RingSpan::FULL);
+    let track = arc_path(whole);
     rsx! {
         svg { class: "ds-progress-track", "data-ds-svg": "progress", view_box: "0 0 100 100", "aria-hidden": "true",
             if let Some(d) = track {
@@ -140,7 +154,9 @@ fn ring(shown: Fraction, frame: PendingFrame, glyph: Option<IconSource>) -> Elem
                 }
             }
         }
-        if let Some(source) = glyph {
+        if let Some(centre) = centre {
+            span { class: "ds-progress-glyph", {centre} }
+        } else if let Some(source) = glyph {
             span { class: "ds-progress-glyph",
                 IconView { source, size: IconSize::Compact }
             }

@@ -127,11 +127,11 @@ const CASES: &[Case] = &[
     // SpaceDot.
     Case {
         state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: ds::FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), here: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Work", frame: ds::FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
     },
     Case {
         state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: ds::FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), here: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Home", frame: ds::FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
 ];
 

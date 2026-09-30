@@ -145,16 +145,3 @@ impl Default for EmojiId {
         EmojiId::Blush
     }
 }
-
-/// The emoji a mood swaps in for a moment (design/25-EMOJI.md section 5).
-impl EmojiId {
-    /// A wrong password: shown once through, then the user's own emoji again.
-    pub const WRONG: EmojiId = EmojiId::Confounded;
-    /// Unlocked: shown once through.
-    pub const UNLOCKED: EmojiId = EmojiId::Partying;
-    /// The display is off: its rest frame, still.
-    pub const ASLEEP: EmojiId = EmojiId::Sleeping;
-    /// Watching the field: a glance, shown once through when the user starts typing, then the
-    /// user's own emoji again, playing steadily.
-    pub const ATTENTIVE: EmojiId = EmojiId::Eyes;
-}

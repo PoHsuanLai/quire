@@ -1,7 +1,6 @@
 //! The lock screen and the polkit prompt: who is asked, the password, the picture and the clock.
 
 pub(crate) mod clock;
-pub(crate) mod mood;
 pub(crate) mod password;
 pub(crate) mod password_field;
 pub(crate) mod picture;

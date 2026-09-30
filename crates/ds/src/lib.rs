@@ -101,7 +101,7 @@ pub use crate::components::{
         level_indicator::{Bands, LevelIndicator, LevelStyle},
         press::Propagation,
         progress::{
-            model::{Progress, ProgressStyle},
+            model::{Progress, ProgressStyle, RingGap},
             view::ProgressIndicator,
         },
         radio_group::{Arrangement, RadioGroup},

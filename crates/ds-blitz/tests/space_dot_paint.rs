@@ -46,7 +46,7 @@ fn Dots() -> Element {
                     SpaceDot {
                         name: "Dot",
                         frame: frame(index),
-                        here: Selection::Unselected,
+                        selection: Selection::Unselected,
                         shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]),
                         onclick: |_| {},
                     }

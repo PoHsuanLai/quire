@@ -20,6 +20,7 @@ use crate::month_grid::header::header;
 use crate::month_grid::weeks::{MonthSlide, MonthWeeks};
 use crate::widget::scope::use_enclosing_frame;
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
 use ds_core::word::Word;
 
@@ -48,6 +49,7 @@ pub fn MonthGrid(
     #[props(default)] density: MonthDensity,
     #[props(default)] onstep: Option<EventHandler<MonthStep>>,
     #[props(default)] onpick: Option<EventHandler<DayKey>>,
+    #[props(default)] common: Common,
 ) -> Element {
     let slide = use_month_slide(data.month);
     let frame = use_enclosing_frame();
@@ -56,9 +58,22 @@ pub fn MonthGrid(
     // section 5.2): the rows share its height, the columns its width.
     let fit = frame.map(|_| "frame");
     let weeks = shown_weeks(weeks, drawn);
-    let label = data.title.plain_text();
+    let label = common
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| data.title.plain_text());
+    let class = common.class("ds-month");
+    let attrs = common.data_attributes();
     rsx! {
-        div { class: "ds-month", "data-weeks": weeks.slug(), "data-density": drawn.slug(), "data-fit": fit, "aria-label": "{label}",
+        div {
+            class,
+            id: common.id.clone(),
+            "data-weeks": weeks.slug(),
+            "data-density": drawn.slug(),
+            "data-fit": fit,
+            "aria-label": "{label}",
+            onmounted: move |event| common.mounted(event),
+            ..attrs,
             {header(&data.title, drawn, onstep)}
             {heads(&data.heads, weeks)}
             // A keyed list of one: a key only remounts inside a list, so a new month is a new

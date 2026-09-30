@@ -2,9 +2,8 @@
 //! wrong password shakes the field once and the field empties only after the shake has settled;
 //! Enter hands the typed secret to `onsubmit`, never writing it into the markup; Escape empties
 //! the field; the switcher reports the tile the pointer rests on and the one clicked, and keeps
-//! the selection inside its view when the row scrolls. An emoji in the lock prompt takes its
-//! mood from the prompt: attentive while typing, a wince once per wrong password, happy once
-//! accepted; every kind of picture plays the accept beat once accepted.
+//! the selection inside its view when the row scrolls. An emoji in the lock prompt plays its own
+//! animation once as the prompt appears and then rests.
 
 use dioxus::prelude::*;
 use ds::{
@@ -16,7 +15,7 @@ use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{
     AppKey, AppSwitcher, EmojiId, LockPrompt, LockUser, PolkitPrompt, PromptState, SwitcherApp,
 };
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
     width: 900,
@@ -198,34 +197,17 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     );
 }
 
-fn mood(harness: &Harness) -> Option<String> {
-    harness.attr(".ds-lock-prompt .ds-emoji", "data-mood")
-}
-
 fn face(harness: &Harness) -> Option<String> {
     harness.attr(".ds-lock-prompt .ds-emoji-face", "data-emoji")
 }
 
-/// Poll until the picture's mood is `want`, and say whether it got there.
-fn mood_becomes(harness: &mut Harness, want: &str) -> Option<String> {
-    settle_until(harness, |h| mood(h).as_deref() == Some(want));
-    mood(harness)
-}
-
-/// Poll until the emoji shown is `want`.
-fn face_becomes(harness: &mut Harness, want: &str) -> Instant {
-    settle_until(harness, |h| face(h).as_deref() == Some(want))
+fn frame(harness: &Harness) -> Option<String> {
+    harness.attr(".ds-lock-prompt .ds-emoji-face", "data-frame")
 }
 
 #[test]
-fn the_emoji_glances_winces_once_per_wrong_password_and_is_happy_when_accepted() {
+fn the_prompt_shows_the_users_emoji_at_64_and_it_plays_once_then_rests() {
     let mut harness = mounted(EmojiLock);
-    assert_eq!(
-        mood(&harness).as_deref(),
-        Some("idle"),
-        "{}",
-        harness.html()
-    );
     assert_eq!(
         harness
             .attr(".ds-lock-prompt .ds-emoji", "data-size")
@@ -233,61 +215,20 @@ fn the_emoji_glances_winces_once_per_wrong_password_and_is_happy_when_accepted()
         Some("64")
     );
     assert_eq!(face(&harness).as_deref(), Some("wink"));
-    type_text(&mut harness, "abc");
     assert_eq!(
-        mood_becomes(&mut harness, "attentive").as_deref(),
-        Some("attentive")
-    );
-    // Attentive: a glance with the eyes, once, then the user's own again.
-    face_becomes(&mut harness, "eyes");
-    face_becomes(&mut harness, "wink");
-
-    set_state(&mut harness, PromptState::Checking);
-    assert_eq!(mood(&harness).as_deref(), Some("attentive"), "checking");
-
-    set_state(&mut harness, PromptState::Wrong);
-    assert_eq!(
-        mood_becomes(&mut harness, "wince").as_deref(),
-        Some("wince")
-    );
-    face_becomes(&mut harness, "confounded");
-    // Shown once through, then the user's own; the field has emptied and the mood holds.
-    face_becomes(&mut harness, "wink");
-    settle_until(&mut harness, |h| !shaking(h));
-    assert_eq!(
-        dots(&harness, ".ds-lock-prompt .ds-password-field"),
+        harness.attr(".ds-lock-prompt .ds-emoji", "data-mood"),
         None,
-        "the field emptied"
+        "the picture has no mood"
     );
-    assert_eq!(mood(&harness).as_deref(), Some("wince"), "held");
-
-    // Typing again turns it attentive; the next wrong password winces once more, no harder.
-    type_text(&mut harness, "abd");
-    assert_eq!(
-        mood_becomes(&mut harness, "attentive").as_deref(),
-        Some("attentive")
-    );
+    settle_until(&mut harness, |h| frame(h).as_deref() != Some("0"));
+    settle_until(&mut harness, |h| frame(h).as_deref() == Some("0"));
+    // A wrong password shakes the field; the picture stays as it is.
+    type_text(&mut harness, "abc");
     set_state(&mut harness, PromptState::Checking);
     set_state(&mut harness, PromptState::Wrong);
-    assert_eq!(
-        mood_becomes(&mut harness, "wince").as_deref(),
-        Some("wince")
-    );
-    face_becomes(&mut harness, "confounded");
-    face_becomes(&mut harness, "wink");
-
-    type_text(&mut harness, "abe");
-    set_state(&mut harness, PromptState::Checking);
-    set_state(&mut harness, PromptState::Accepted);
-    assert_eq!(
-        mood_becomes(&mut harness, "happy").as_deref(),
-        Some("happy")
-    );
-    face_becomes(&mut harness, "partying");
-    assert_eq!(
-        harness.attr(".ds-lock-prompt", "data-state").as_deref(),
-        Some("accepted")
-    );
+    settle_until(&mut harness, |h| !shaking(h));
+    assert_eq!(face(&harness).as_deref(), Some("wink"));
+    assert_eq!(frame(&harness).as_deref(), Some("0"));
 }
 
 #[test]

@@ -75,9 +75,9 @@ pub(crate) fn tint(disc: DiscHue, scheme: Scheme) -> String {
 /// `Still`: 42 loops at once is motion nobody asked for.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum EmojiPlayback {
-    /// Plays inside the awake window after each wake.
+    /// Plays its own animation once through when it appears and on each wake.
     #[default]
-    Awake,
-    /// Rest frames only, as under Reduced motion; a mood's reaction is still shown, still.
+    Once,
+    /// The rest frame only, as under Reduced motion.
     Still,
 }

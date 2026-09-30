@@ -1,5 +1,4 @@
-//! The Emoji page (design/25-EMOJI.md): the whole shipped set at Large, the reactions a mood
-//! swaps in, one pick in every mood, the three sizes, the eight discs, and the user picture's
+//! The Emoji page (design/25-EMOJI.md): the whole shipped set at Large, the three sizes, the eight discs, and the user picture's
 //! picker. Every picture here
 //! is `EmojiPlayback::Still` (a sheet of 42 loops is what a picker must not do), so each shows
 //! its rest frame; the motion is proved by `ds-blitz/tests/emoji_life.rs`.
@@ -9,8 +8,8 @@ use dioxus::prelude::*;
 use ds::Word;
 use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue};
 use ds_shell::{
-    AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback, Mood,
-    PictureChoice, PictureSize, UserPicturePicker,
+    AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback, PictureChoice,
+    PictureSize, UserPicturePicker,
 };
 
 const STILL: EmojiPlayback = EmojiPlayback::Still;
@@ -26,17 +25,6 @@ const HUES: [DiscHue; 8] = [
     DiscHue::Rose,
 ];
 
-/// The reactions, with what shows them.
-const REACTIONS: [(EmojiId, &str); 4] = [
-    (EmojiId::WRONG, "Wince: a wrong password, once through"),
-    (EmojiId::UNLOCKED, "Happy: unlocked, once through"),
-    (EmojiId::ASLEEP, "Asleep: the display is off, still"),
-    (
-        EmojiId::ATTENTIVE,
-        "Attentive: a glance once, then the pick",
-    ),
-];
-
 /// The page.
 #[component]
 pub fn EmojiPage() -> Element {
@@ -47,26 +35,6 @@ pub fn EmojiPage() -> Element {
                     div { key: "{emoji.slug()}", class: "g-col g-emoji-cell",
                         AnimatedEmoji { emoji, size: PictureSize::Large, playback: STILL }
                         Caption { name: emoji.slug().to_string() }
-                    }
-                }
-            }
-        }
-        Section { title: "Reactions", note: "What a mood swaps in for a moment; the user's own emoji comes back after one loop.",
-            div { class: "g-row g-emoji-reactions",
-                for (emoji, note) in REACTIONS {
-                    div { key: "{emoji.slug()}", class: "g-col g-emoji-cell",
-                        AnimatedEmoji { emoji, size: PictureSize::Large, playback: STILL }
-                        Caption { name: emoji.slug().to_string(), code: note.to_string() }
-                    }
-                }
-            }
-        }
-        Section { title: "Moods at rest", note: "Wink in Idle, Attentive, Wince, Happy and Asleep, as the lock screen would leave each once its window has closed: the pick, except Asleep's sleeping face.",
-            div { class: "g-row g-emoji-reactions",
-                for mood in Mood::ALL.iter().copied() {
-                    div { key: "{mood.slug()}", class: "g-col g-emoji-cell",
-                        AnimatedEmoji { emoji: EmojiId::Wink, size: PictureSize::Large, mood, playback: STILL }
-                        Caption { name: mood.slug().to_string() }
                     }
                 }
             }

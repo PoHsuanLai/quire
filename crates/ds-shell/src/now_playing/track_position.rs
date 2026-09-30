@@ -1,14 +1,20 @@
-//! TrackPosition: the Now Playing position bar (design/26-DETAILS.md 5.2.10). A clock-paced
-//! report steps, it does not tween (3.1 Progress): while playing, the bar and the times repaint
-//! once a second, on the second, from the last position reported, and never between; paused or
-//! buffering, the bar holds at 0 frames. Mounted only while the panel is open, so it costs one
+//! TrackPosition: the Now Playing position, a `ProgressIndicator` bar with its elapsed and
+//! remaining times (design/26-DETAILS.md 5.2.10, design/30 section 2.10). A clock-paced report
+//! steps: while playing, the bar and the times move once a second, on the second, from the last
+//! position reported, and never between; paused or buffering, the bar holds at 0 frames. Mounted only while the panel is open, so it costs one
 //! frame a second only while someone can see it.
 
 use crate::now_playing::kind::{Playback, PositionClock};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
+use ds::Common;
+use ds::components::content::label::{Label, LabelRole, LabelStyle};
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds_core::time::clock::sleep;
+use ds_core::vocab::Fraction;
 use ds_style::task::{Gone, spawn_in, try_get, try_set};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::{Duration, Instant};
 
 /// A position report: where, out of how long, and whether it runs.
@@ -93,6 +99,7 @@ pub fn TrackPosition(
     at: Duration,
     length: Duration,
     #[props(default)] playback: Playback,
+    #[props(default)] common: Common,
 ) -> Element {
     let report = Report {
         at: at.min(length),
@@ -122,26 +129,29 @@ pub fn TrackPosition(
     };
     let whole = Duration::from_secs(shown.as_secs());
     let share = match length.as_millis() {
-        0 => 0.0,
-        total => whole.as_millis() as f64 / total as f64,
+        0 => Fraction(0),
+        total => Fraction((whole.as_millis() * 1000 / total).min(1000) as u16),
     };
     let left = length.saturating_sub(whole);
     let (elapsed, remaining) = (clock_text(whole), clock_text(left));
+    let spoken = format!("Position, {elapsed} of {}", clock_text(length));
+    let class = common.class("ds-track-position");
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-track-position",
-            role: "progressbar",
-            "aria-label": "Position",
-            "aria-valuemin": "0",
-            "aria-valuemax": "{length.as_secs()}",
-            "aria-valuenow": "{whole.as_secs()}",
-            "aria-valuetext": "{elapsed} of {clock_text(length)}",
-            span { class: "ds-track-bar", style: "--f:{share:.4}",
-                span { class: "ds-track-bar-fill" }
+            class,
+            id: common.id.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            ProgressIndicator {
+                style: ProgressStyle::Bar,
+                progress: Progress::Known(share),
+                size: ControlSize::Mini,
+                common: Common { aria_label: Some(spoken), ..Common::default() },
             }
             span { class: "ds-track-times",
-                span { class: "ds-track-time", "{elapsed}" }
-                span { class: "ds-track-time", "-{remaining}" }
+                Label { text: elapsed, role: LabelRole::Tertiary, style: LabelStyle::Footnote }
+                Label { text: format!("-{remaining}"), role: LabelRole::Tertiary, style: LabelStyle::Footnote }
             }
         }
     }

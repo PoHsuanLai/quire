@@ -8,11 +8,14 @@ use super::details::{Cell, mini};
 use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
-use ds::{Availability, Check, Fraction, Glyph, Icon, IconSize, LevelGlyph, Px, TextLine};
+use ds::{
+    Availability, BatteryPower, BatteryState, Check, Fraction, Glyph, Icon, IconSize, LevelGlyph,
+    LowAt, Px, TextLine,
+};
 use ds::{Bezel, Button, ControlSize, IconSwap, ImagePosition};
 use ds::{Slider, SliderLook};
 use ds_shell::{
-    DeviceBattery, ModuleGrid, ModulePanel, ModuleTile, NowPlayingTrack, Playback, RingMark,
+    BatteryRing, ModuleGrid, ModulePanel, ModuleTile, NowPlayingTrack, Playback, Readout,
     TrackPosition,
 };
 use std::time::Duration;
@@ -132,23 +135,32 @@ fn PlayerCell() -> Element {
     }
 }
 
+/// A battery at `level` permille on `power`.
+fn battery(level: u16, power: BatteryPower) -> BatteryState {
+    BatteryState {
+        level: Fraction(level),
+        power,
+        low_at: LowAt::default(),
+    }
+}
+
 #[component]
 fn BatteryCell() -> Element {
     let mut mouse = use_signal(|| Fraction(640));
     rsx! {
-        Cell { name: "Battery module", code: "DeviceBattery {{ level, mark }}",
+        Cell { name: "Battery module", code: "BatteryRing {{ state, readout }}",
             controls: rsx! {
                 {mini("Mouse 64 %", move |_| mouse.set(Fraction(640)))}
                 {mini("Mouse 31 %", move |_| mouse.set(Fraction(310)))}
             },
             div { class: "g-detail",
-                DeviceBattery { level: Fraction(930), mark: RingMark::Charging, label: "This computer",
+                BatteryRing { state: battery(930, BatteryPower::Charging), label: "This computer", readout: Readout::Under,
                     Glyph { icon: Icon::Monitor, size: IconSize::Base }
                 }
-                DeviceBattery { level: mouse(), label: "Mouse",
+                BatteryRing { state: battery(mouse().0, BatteryPower::Battery), label: "Mouse", readout: Readout::Under,
                     Glyph { icon: Icon::Mouse, size: IconSize::Base }
                 }
-                DeviceBattery { level: Fraction(150), label: "Headphones",
+                BatteryRing { state: battery(150, BatteryPower::Battery), label: "Headphones", readout: Readout::Under,
                     Glyph { icon: Icon::Headphones, size: IconSize::Base }
                 }
             }
