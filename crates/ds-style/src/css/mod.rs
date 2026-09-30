@@ -7,6 +7,7 @@
 pub mod accents_css;
 pub mod document;
 pub(crate) mod ground_css;
+pub mod layers;
 pub(crate) mod materials_css;
 pub(crate) mod shape_css;
 

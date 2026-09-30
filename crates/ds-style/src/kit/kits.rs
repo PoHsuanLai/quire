@@ -1,7 +1,7 @@
 //! `Kits`: the kits a surface is drawn with, in cascade order.
 
 use super::blocks::token_blocks;
-use super::model::{Kit, Sheet};
+use super::model::{Kit, KitRank, Sheet};
 use crate::css::document::document;
 use crate::tokens::{easing::EasingToken, set::TokenSet, timing::DurationToken};
 use std::collections::HashSet;
@@ -37,15 +37,20 @@ impl Kits {
         Kits { kits }
     }
 
-    /// The whole stylesheet: every kit's sections in cascade order, each under its marker.
+    /// The whole stylesheet: every kit's sections in cascade order, each under its marker, the
+    /// design system's inside `@layer ds` and a user kit's after it, unlayered.
     pub fn stylesheet(&self) -> String {
-        let sections: Vec<(&str, String)> = self
-            .kits
-            .iter()
-            .flat_map(|kit| kit.sections)
-            .map(|section| (section.name, (section.css)(self).into_owned()))
-            .collect();
-        document(&sections)
+        let section =
+            |section: &super::model::Section| (section.name, (section.css)(self).into_owned());
+        let (user, design): (Vec<&Kit>, Vec<&Kit>) =
+            self.kits.iter().partition(|kit| kit.rank == KitRank::User);
+        let sections = |kits: Vec<&Kit>| -> Vec<(&str, String)> {
+            kits.iter()
+                .flat_map(|kit| kit.sections)
+                .map(section)
+                .collect()
+        };
+        document(&sections(design), &sections(user))
     }
 
     /// The component sheets the kits add to the `components` section, in kit order.

@@ -1,4 +1,6 @@
 /* ds::stylesheet(), generated from the token table. Do not edit. */
+@layer ds, app;
+@layer ds {
 /* == reset == */
 /* reset.css: the document stays transparent and `.ds` carries the base text (design/02-TYPE.md
    section 3). A shell surface shows the desktop through `html` and `body`; whatever a surface
@@ -2308,3 +2310,4 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-morph-layer{ display:block; }
 .ds-morph-layer[*|data-morph=out]{ position:absolute; left:0; top:0; }
 .ds-morph-slash{ position:absolute; left:0; top:0; }
+}
