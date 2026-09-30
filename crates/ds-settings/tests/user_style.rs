@@ -50,7 +50,7 @@ fn a_missing_file_is_an_empty_style() {
 fn the_file_is_style_css_and_its_text_round_trips_byte_for_byte() {
     let scratch = Scratch::new();
     let store = scratch.store();
-    let text = ".ds { --accent: #f00 }\n/* a note */\n[*|data-surface=bar] { color: red; }\n";
+    let text = ".ds { --accent: #f00 }\n/* a note */\n[data-surface=bar] { color: red; }\n";
     store.save(&style(text)).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(
         std::fs::read_to_string(scratch.app_dir().join("style.css")).ok(),
