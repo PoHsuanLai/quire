@@ -8,7 +8,8 @@ is `crates/ds-core/src/colour/srgb.rs`).
 `ds-core` is a crate of its own (vocabulary, geometry units, time, errors, text, colour, PNG and
 base64, the `Spawner` trait): plain data and maths with no Dioxus, under everything else. So is
 `ds-style` (appearance, tokens, materials, Space palettes, fonts, icons, the stylesheet's
-sections, the scope a component draws in, the tasks a scope owns). `ds` is laid out in the layers
+sections, the scope a component draws in, the tasks a scope owns; the scope, scale, task, busy and
+`Glyph` parts are its `dioxus` feature, which `ds-settings` leaves off). `ds` is laid out in the layers
 it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): `motion/` (animation data, timers,
 machines, the keyframes, and `motion/detail/`), `lint/`, then the host seams (`host/`, `focus/`,
 `edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then

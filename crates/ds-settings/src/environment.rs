@@ -9,8 +9,8 @@ use crate::store::Store;
 use crate::units::Percent;
 use crate::watch::Watch;
 use dioxus::prelude::*;
-use ds::SystemPrefs;
 use ds_core::spawner::Spawner;
+use ds_style::appearance::system::SystemPrefs;
 use std::sync::Arc;
 
 /// The inputs to [`ds::resolve`], as they are now.
@@ -50,17 +50,20 @@ impl Environment {
     ///     }
     /// }
     /// ```
-    pub fn tint_alpha(&self) -> ds::Alpha {
-        ds::Alpha(u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10)
+    pub fn tint_alpha(&self) -> ds_style::tokens::hex::Alpha {
+        ds_style::tokens::hex::Alpha(
+            u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10,
+        )
     }
 
     /// The six `appearance.material_*` keys as the root's `stack` (`Ds { stack }`): highlight
     /// and hairline alphas per scheme, shadow strength and vibrancy, each a percent in
     /// thousandths like [`Environment::tint_alpha`].
-    pub fn material_stack(&self) -> ds::MaterialStack {
+    pub fn material_stack(&self) -> ds_style::material::stack::MaterialStack {
         let a = &self.settings.appearance;
-        let alpha = |percent: Percent| ds::Alpha(u16::from(percent.0.min(100)) * 10);
-        ds::MaterialStack {
+        let alpha =
+            |percent: Percent| ds_style::tokens::hex::Alpha(u16::from(percent.0.min(100)) * 10);
+        ds_style::material::stack::MaterialStack {
             highlight_light: alpha(a.material_highlight_light),
             highlight_dark: alpha(a.material_highlight_dark),
             hairline_light: alpha(a.material_hairline_light),
@@ -133,11 +136,15 @@ mod tests {
         for &(percent, want) in CASES {
             let mut env = Environment::default();
             env.settings.appearance.material_tint_alpha = Percent(percent);
-            assert_eq!(env.tint_alpha(), ds::Alpha(want), "{percent}%");
+            assert_eq!(
+                env.tint_alpha(),
+                ds_style::tokens::hex::Alpha(want),
+                "{percent}%"
+            );
         }
         assert_eq!(
             Environment::default().tint_alpha(),
-            ds::Alpha(800),
+            ds_style::tokens::hex::Alpha(800),
             "the key's default is the root's default"
         );
     }
@@ -145,6 +152,9 @@ mod tests {
     #[test]
     fn the_default_material_keys_are_the_stacks_defaults() {
         let env = Environment::default();
-        assert_eq!(env.material_stack(), ds::MaterialStack::default());
+        assert_eq!(
+            env.material_stack(),
+            ds_style::material::stack::MaterialStack::default()
+        );
     }
 }

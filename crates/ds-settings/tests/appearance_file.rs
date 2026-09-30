@@ -3,8 +3,12 @@
 
 mod support;
 
-use ds::{Accent, Motion, Theme};
+use ds_style::appearance::accent::Accent;
+
+use ds_style::appearance::motion::Motion;
+
 use ds_settings::{AppearanceFile, IconDarkVariant, Loaded, Percent, PlateGlyphPolicy};
+use ds_style::appearance::theme::Theme;
 use std::path::Path;
 use support::Scratch;
 

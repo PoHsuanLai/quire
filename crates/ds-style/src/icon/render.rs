@@ -3,10 +3,15 @@
 //!
 //! The stroke is written on the element, not by CSS.
 
+#[cfg(feature = "dioxus")]
 use super::Icon;
+#[cfg(feature = "dioxus")]
 use super::shape::Shape;
+#[cfg(feature = "dioxus")]
 use super::stroke::stroke_width;
+#[cfg(feature = "dioxus")]
 use crate::scale::use_scale;
+#[cfg(feature = "dioxus")]
 use dioxus::prelude::*;
 
 /// How big a glyph is drawn. Consumers pick a size; none writes an icon `width` in CSS.
@@ -64,6 +69,7 @@ impl IconSize {
     }
 }
 
+#[cfg(feature = "dioxus")]
 fn child(shape: &Shape) -> Element {
     match shape {
         Shape::Path(d) => rsx! { path { d: "{d}" } },
@@ -90,6 +96,7 @@ fn child(shape: &Shape) -> Element {
 /// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
 /// `data-size`), stroked in `currentColor` through attributes, never CSS (spike S6). At a
 /// fractional device scale the stroke is snapped to whole device pixels (`super::stroke`).
+#[cfg(feature = "dioxus")]
 #[component]
 pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
     let px = size.px();
