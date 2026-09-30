@@ -30,20 +30,24 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-typeface=editorial]{--font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;--font-ui:"Karla","Segoe UI",system-ui,sans-serif;--font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;--tracking-heading:-.015em;--tracking-lock-clock:-.035em;--tracking-lock-date:.01em;--tracking-caps:.14em;--tracking-caps-narrow:.12em;--fw-caps:400;--fs-caps:var(--fs-eyebrow);--tracking-mono:-.02em;--fs-mono:.78em;--fs-dial:9px;--fs-nano:9px;--fs-micro:9.5px;--fs-dial-large:18px;--fs-widget-figure:20px;--fs-widget-hero:47px;--fs-lock-clock:140px;}
 .ds[*|data-motion=reduced]{--t-move:150ms;--t-big:150ms;--t-shake:150ms;--t-awake:150ms;--t-idle-dim:150ms;}
 /* == accents == */
-.ds{--swatch-postmark:#007aff;--swatch-red:#ff3b30;--swatch-amber:#ff9500;--swatch-green:#34c759;--swatch-blue:#30b0c7;--swatch-violet:#af52de;}
-.ds[*|data-theme=dark]{--swatch-postmark:#0a84ff;--swatch-red:#ff453a;--swatch-amber:#ff9f0a;--swatch-green:#30d158;--swatch-blue:#40c8e0;--swatch-violet:#bf5af2;}
-.ds[*|data-accent=postmark]{--accent:#007aff;--accent-ink:#ffffff;--accent-soft:rgba(0,122,255,.18);--accent-text:#0058bd;--accent-text-material:#004394;--accent-ring:rgba(0,88,189,.7);--seal:#007aff;}
+.ds{--swatch-blue:#007aff;--swatch-purple:#af52de;--swatch-pink:#ff2d55;--swatch-red:#ff3b30;--swatch-orange:#ff9500;--swatch-yellow:#ffcc00;--swatch-green:#34c759;--swatch-graphite:#8e8e93;}
+.ds[*|data-theme=dark]{--swatch-blue:#0a84ff;--swatch-purple:#bf5af2;--swatch-pink:#ff375f;--swatch-red:#ff453a;--swatch-orange:#ff9f0a;--swatch-yellow:#ffd60a;--swatch-green:#30d158;--swatch-graphite:#98989d;}
+.ds[*|data-accent=blue]{--accent:#007aff;--accent-ink:#ffffff;--accent-soft:rgba(0,122,255,.18);--accent-text:#0058bd;--accent-text-material:#004394;--accent-ring:rgba(0,88,189,.7);--seal:#007aff;}
+.ds[*|data-accent=purple]{--accent:#af52de;--accent-ink:#ffffff;--accent-soft:rgba(175,82,222,.18);--accent-text:#8b29b7;--accent-text-material:#7603a0;--accent-ring:rgba(139,41,183,.65);--seal:#af52de;}
+.ds[*|data-accent=pink]{--accent:#ff2d55;--accent-ink:#ffffff;--accent-soft:rgba(255,45,85,.18);--accent-text:#b50033;--accent-text-material:#8e0026;--accent-ring:rgba(181,0,51,.6);--seal:#ff2d55;}
 .ds[*|data-accent=red]{--accent:#ff3b30;--accent-ink:#ffffff;--accent-soft:rgba(255,59,48,.18);--accent-text:#b70106;--accent-text-material:#950003;--accent-ring:rgba(183,1,6,.6);--seal:#ff3b30;}
-.ds[*|data-accent=amber]{--accent:#ff9500;--accent-ink:#25170b;--accent-soft:rgba(255,149,0,.21);--accent-text:#905203;--accent-text-material:#754100;--accent-ring:rgba(144,82,3,.75);--seal:#ff9500;}
+.ds[*|data-accent=orange]{--accent:#ff9500;--accent-ink:#25170b;--accent-soft:rgba(255,149,0,.21);--accent-text:#905203;--accent-text-material:#754100;--accent-ring:rgba(144,82,3,.75);--seal:#ff9500;}
+.ds[*|data-accent=yellow]{--accent:#ffcc00;--accent-ink:#201a09;--accent-soft:rgba(255,204,0,.49);--accent-text:#765d04;--accent-text-material:#655002;--accent-ring:rgba(118,93,4,.75);--seal:#ffcc00;}
 .ds[*|data-accent=green]{--accent:#34c759;--accent-ink:#111e12;--accent-soft:rgba(52,199,89,.21);--accent-text:#006e27;--accent-text-material:#005b1f;--accent-ring:rgba(0,110,39,.7);--seal:#34c759;}
-.ds[*|data-accent=blue]{--accent:#30b0c7;--accent-ink:#071e23;--accent-soft:rgba(48,176,199,.18);--accent-text:#046979;--accent-text-material:#025461;--accent-ring:rgba(4,105,121,.7);--seal:#30b0c7;}
-.ds[*|data-accent=violet]{--accent:#af52de;--accent-ink:#ffffff;--accent-soft:rgba(175,82,222,.18);--accent-text:#8b29b7;--accent-text-material:#7603a0;--accent-ring:rgba(139,41,183,.65);--seal:#af52de;}
-.ds[*|data-theme=dark][*|data-accent=postmark]{--accent:#0a84ff;--accent-ink:#ffffff;--accent-soft:rgba(10,132,255,.2);--accent-text:#7bb4fe;--accent-text-material:#cae0fe;--accent-ring:rgba(123,180,254,.6);--seal:#0a84ff;}
+.ds[*|data-accent=graphite]{--accent:#8e8e93;--accent-ink:#ffffff;--accent-soft:rgba(142,142,147,.18);--accent-text:#606064;--accent-text-material:#4a4a4e;--accent-ring:rgba(96,96,100,.75);--seal:#8e8e93;}
+.ds[*|data-theme=dark][*|data-accent=blue]{--accent:#0a84ff;--accent-ink:#ffffff;--accent-soft:rgba(10,132,255,.2);--accent-text:#7bb4fe;--accent-text-material:#cae0fe;--accent-ring:rgba(123,180,254,.6);--seal:#0a84ff;}
+.ds[*|data-theme=dark][*|data-accent=purple]{--accent:#bf5af2;--accent-ink:#ffffff;--accent-soft:rgba(191,90,242,.2);--accent-text:#d793fe;--accent-text-material:#efd7fe;--accent-ring:rgba(215,147,254,.6);--seal:#bf5af2;}
+.ds[*|data-theme=dark][*|data-accent=pink]{--accent:#ff375f;--accent-ink:#ffffff;--accent-soft:rgba(255,55,95,.2);--accent-text:#ff8892;--accent-text-material:#ffd1d2;--accent-ring:rgba(255,136,146,.65);--seal:#ff375f;}
 .ds[*|data-theme=dark][*|data-accent=red]{--accent:#ff453a;--accent-ink:#ffffff;--accent-soft:rgba(255,69,58,.2);--accent-text:#fe8b7d;--accent-text-material:#ffd2cb;--accent-ring:rgba(254,139,125,.65);--seal:#ff453a;}
-.ds[*|data-theme=dark][*|data-accent=amber]{--accent:#ff9f0a;--accent-ink:#24180b;--accent-soft:rgba(255,159,10,.2);--accent-text:#ffa83c;--accent-text-material:#fedebe;--accent-ring:rgba(255,168,60,.55);--seal:#ff9f0a;}
+.ds[*|data-theme=dark][*|data-accent=orange]{--accent:#ff9f0a;--accent-ink:#24180b;--accent-soft:rgba(255,159,10,.2);--accent-text:#ffa83c;--accent-text-material:#fedebe;--accent-ring:rgba(255,168,60,.55);--seal:#ff9f0a;}
+.ds[*|data-theme=dark][*|data-accent=yellow]{--accent:#ffd60a;--accent-ink:#1f1a09;--accent-soft:rgba(255,214,10,.2);--accent-text:#ebc400;--accent-text-material:#ffe47f;--accent-ring:rgba(235,196,0,.5);--seal:#ffd60a;}
 .ds[*|data-theme=dark][*|data-accent=green]{--accent:#30d158;--accent-ink:#111e12;--accent-soft:rgba(48,209,88,.2);--accent-text:#37d65d;--accent-text-material:#7dff91;--accent-ring:rgba(55,214,93,.55);--seal:#30d158;}
-.ds[*|data-theme=dark][*|data-accent=blue]{--accent:#40c8e0;--accent-ink:#071e23;--accent-soft:rgba(64,200,224,.2);--accent-text:#48cee6;--accent-text-material:#b1f1fe;--accent-ring:rgba(72,206,230,.55);--seal:#40c8e0;}
-.ds[*|data-theme=dark][*|data-accent=violet]{--accent:#bf5af2;--accent-ink:#ffffff;--accent-soft:rgba(191,90,242,.2);--accent-text:#d793fe;--accent-text-material:#efd7fe;--accent-ring:rgba(215,147,254,.6);--seal:#bf5af2;}
+.ds[*|data-theme=dark][*|data-accent=graphite]{--accent:#98989d;--accent-ink:#191828;--accent-soft:rgba(152,152,157,.2);--accent-text:#b4b4b9;--accent-text-material:#eaeaf0;--accent-ring:rgba(180,180,185,.6);--seal:#98989d;}
 /* == materials == */
 .ds[*|data-material=window]{--m-tint:var(--f-grad);--m-tint-solid:var(--f-grad);--m-edge:none;--m-shadow:none;--m-radius:0;--m-box:none;--m-frame-alpha:1;--m-highlight:none;--m-hairline:none;--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:none;border-radius:var(--m-radius);box-shadow:var(--m-box);}
 .ds[*|data-material=bar]{--m-tint:color-mix(in srgb,rgba(252,253,249,calc(.7*var(--m-tint-alpha,.8)/.8)) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,calc(.7*var(--m-tint-alpha,.8)/.8)));--m-tint-solid:color-mix(in srgb,rgba(252,253,249,.94) calc(var(--m-vibrancy,1)*100%),rgba(248,249,246,.94));--m-edge:inset 0 calc(-1 * var(--hairline)) 0 rgba(0,0,0,.08);--m-shadow:none;--m-radius:0;--m-box:var(--m-hairline),var(--m-edge);--m-frame-alpha:calc(.7*var(--m-tint-alpha,.8)/.8);--m-highlight:none;--m-hairline:0 var(--hairline) 0 rgba(0,0,0,var(--m-hairline-light,.14));--m-shadow-contact:none;--m-shadow-ambient:none;--m-inner:var(--m-edge);border-radius:var(--m-radius);box-shadow:var(--m-box);}
@@ -691,6 +695,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|aria-busy=true] > .ds-button-icon,
 .ds-button[*|aria-busy=true] > .ds-button-label,
 .ds-button[*|aria-busy=true] > .ds-button-trail{ opacity:.35; }
+/* The busy spinner of a default button reads on the accent fill: its spokes take the ink. */
+.ds-button[*|data-variant=push][*|data-answers=return][*|aria-busy=true] .ds-progress-indicator{ background:var(--accent-ink); }
 /* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
    disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
