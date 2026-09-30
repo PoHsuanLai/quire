@@ -8,10 +8,11 @@ use ds::{
 };
 use ds::{
     Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Chip, ChipVariant, Colour,
-    Common, Count, CountPlace, ExternalIcon, FieldFocus, HeaderKind, Hex, Icon, IconPx, IconSize,
-    IconSource, IconUrl, IconView, InputVariant, Kbd, KbdSize, LabelHue, PersonHue, SearchField,
-    SectionHeader, SegmentedControl, Slider, TextInput, Toggle, Verdict,
+    Common, ExternalIcon, FieldFocus, HeaderKind, Hex, Icon, IconPx, IconSize, IconSource, IconUrl,
+    IconView, InputVariant, LabelHue, PersonHue, SearchField, SectionHeader, SegmentedControl,
+    Slider, TextInput, Toggle, Verdict,
 };
+use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
 
 /// A symbolic SVG, 16 px.
@@ -300,19 +301,19 @@ pub const CASES: &[Case] = &[
     },
     // Kbd: both sizes, every modifier.
     Case {
-        component: "kbd",
+        component: "key_equivalent",
         state: "regular",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]) } },
+        make: || rsx! { KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]) , style: KeyStyle::Cap} },
     },
     Case {
-        component: "kbd",
+        component: "key_equivalent",
         state: "small",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Super, ShortcutKey::Char('s')]), size: KbdSize::Small } },
+        make: || rsx! { KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Super, ShortcutKey::Char('s')]), style: KeyStyle::Cap, size: ControlSize::Mini} },
     },
     Case {
-        component: "kbd",
+        component: "key_equivalent",
         state: "modifiers",
-        make: || rsx! { Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Shift, ShortcutKey::Alt, ShortcutKey::Ctrl, ShortcutKey::Enter]) } },
+        make: || rsx! { KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Shift, ShortcutKey::Alt, ShortcutKey::Ctrl, ShortcutKey::Enter]) , style: KeyStyle::Cap} },
     },
     // Chip: every variant, the removable person, a pulse at rest.
     Case {
@@ -414,19 +415,19 @@ pub const CASES: &[Case] = &[
     },
     // Count: both places, empty at zero.
     Case {
-        component: "count",
+        component: "badge",
         state: "item",
-        make: || rsx! { Count { value: 4 } },
+        make: || rsx! { Badge { content: BadgeContent::Number(4) , tone: BadgeTone::Quiet, size: ControlSize::Mini} },
     },
     Case {
-        component: "count",
+        component: "badge",
         state: "tile",
-        make: || rsx! { Count { value: 12, place: CountPlace::Tile } },
+        make: || rsx! { Badge { content: BadgeContent::Number(12), tone: BadgeTone::Alert, size: ControlSize::Mini} },
     },
     Case {
-        component: "count",
+        component: "badge",
         state: "zero",
-        make: || rsx! { Count { value: 0 } },
+        make: || rsx! { Badge { content: BadgeContent::Number(0) , tone: BadgeTone::Quiet, size: ControlSize::Mini} },
     },
     // Spinner.
     Case {

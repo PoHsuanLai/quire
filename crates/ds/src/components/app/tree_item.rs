@@ -13,13 +13,16 @@ use crate::components::app::tree_item_parts::{
     Row, label_part, leaf_chevron, open_attribute, trailing_slot,
 };
 use crate::components::content::text_runs::TextLine;
-use crate::components::controls::count::{Count, CountPlace};
+use crate::components::controls::badge::Badge;
+use crate::components::controls::badge::BadgeContent;
+use crate::components::controls::badge::BadgeTone;
 use crate::components::lists::row_hooks::relay;
 use crate::focus::click::kept_click;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{RowState, Shown};
 use ds_style::icon::Icon;
+use ds_style::tokens::control_size::ControlSize;
 
 /// Whether an item can hold others. A leaf has no `details` to open: it is drawn as a plain
 /// row with the chevron's space kept, so its label lines up with its siblings'.
@@ -92,7 +95,7 @@ pub fn TreeItem(
         drag_attr: drop.drag_attr(),
         place: place.map(|PlaceId(name)| name),
     };
-    let count = count.map(|value| rsx! { Count { value, place: CountPlace::Item } });
+    let count = count.map(|value| rsx! { Badge { content: BadgeContent::Number(value), tone: BadgeTone::Quiet, size: ControlSize::Mini } });
     let body = rsx! {
         if let Some(icon) = glyph {
             ds_style::icon::render::Glyph { icon, size: ds_style::icon::render::IconSize::Base }

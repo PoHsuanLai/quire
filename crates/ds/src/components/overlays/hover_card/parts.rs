@@ -5,7 +5,8 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::text_runs::{TextLine, text as runs};
-use crate::components::controls::kbd::Kbd;
+use crate::components::controls::key_equivalent::KeyEquivalent;
+use crate::components::controls::key_equivalent::KeyStyle;
 use dioxus::prelude::*;
 use ds_core::vocab::Shortcut;
 use ds_core::word::Word;
@@ -168,7 +169,7 @@ pub(super) fn part(part: HoverCardPart) -> Element {
                 "{text}"
                 if let Some(keys) = keys {
                     span { class: "ds-hovercard-keys",
-                        Kbd { shortcut: keys.shortcut }
+                        KeyEquivalent { shortcut: keys.shortcut , style: KeyStyle::Cap}
                         " {keys.label}"
                     }
                 }

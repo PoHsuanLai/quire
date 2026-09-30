@@ -2,7 +2,9 @@
 //! (design/04-COMPONENTS.md section 19).
 
 use crate::components::content::avatar::{AvatarFace, face};
-use crate::components::controls::count::{Count, CountPlace};
+use crate::components::controls::badge::Badge;
+use crate::components::controls::badge::BadgeContent;
+use crate::components::controls::badge::BadgeTone;
 use crate::components::lists::row_hooks::relay;
 use crate::focus::click::kept_click;
 use dioxus::prelude::*;
@@ -11,6 +13,7 @@ use ds_core::word::Word;
 use ds_motion::presence::Presence;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// What kind of place.
 #[derive(Debug, Clone, PartialEq)]
@@ -116,7 +119,7 @@ pub fn SidebarItem(
     let slug = kind.slug();
     let current = here.aria_current();
     let preview = preview.map(Preview::slug);
-    let count = count.map(|value| rsx! { Count { value, place: CountPlace::Item } });
+    let count = count.map(|value| rsx! { Badge { content: BadgeContent::Number(value), tone: BadgeTone::Quiet, size: ControlSize::Mini } });
     match kind {
         ItemKind::Place { icon } => rsx! {
             button {

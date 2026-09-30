@@ -13,11 +13,12 @@ use ds::ControlSize;
 use ds::Word;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Availability, Avatar, AvatarFace, AvatarShape,
-    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Count, Fraction,
-    HeaderKind, Hex, ImageSource, Kbd, KbdSize, LabelHue, MarkProvider, MarkSize, MarkStyle,
-    PersonHue, Progress, ProgressIndicator, ProgressStyle, ProviderMark, SectionHeader,
-    SegmentedControl, Shortcut, ShortcutKey, Slider, Toggle, Verdict,
+    AvatarSize, AvatarTone, Button, Check, Chip, ChipVariant, Colour, CommandPill, Fraction,
+    HeaderKind, Hex, ImageSource, LabelHue, MarkProvider, MarkSize, MarkStyle, PersonHue, Progress,
+    ProgressIndicator, ProgressStyle, ProviderMark, SectionHeader, SegmentedControl, Shortcut,
+    ShortcutKey, Slider, Toggle, Verdict,
 };
+use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
 use ds::{Choice, Tracking};
 
 const PROVIDERS: [MarkProvider; 7] = [
@@ -70,9 +71,9 @@ fn Buttons() -> Element {
         Section { title: "CommandPill and Kbd",
             div { class: "g-row",
                 CommandPill { label: "Search or run a command", shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]), onclick: |_| {} }
-                Kbd { shortcut: Shortcut(vec![ShortcutKey::Shift, ShortcutKey::Super, ShortcutKey::Char('p')]) }
-                Kbd { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Enter]), size: KbdSize::Small }
-                Kbd { shortcut: Shortcut(vec![ShortcutKey::Escape, ShortcutKey::Tab, ShortcutKey::Backspace, ShortcutKey::Up, ShortcutKey::Down, ShortcutKey::Left, ShortcutKey::Right, ShortcutKey::Space]), size: KbdSize::Small }
+                KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Shift, ShortcutKey::Super, ShortcutKey::Char('p')]) , style: KeyStyle::Cap}
+                KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Enter]), style: KeyStyle::Cap, size: ControlSize::Mini}
+                KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Escape, ShortcutKey::Tab, ShortcutKey::Backspace, ShortcutKey::Up, ShortcutKey::Down, ShortcutKey::Left, ShortcutKey::Right, ShortcutKey::Space]), style: KeyStyle::Cap, size: ControlSize::Mini}
             }
         }
     }
@@ -150,7 +151,7 @@ fn Choosers() -> Element {
                 Button { size: ControlSize::Mini, label: "+1", onclick: move |_| *count.write() += 1 }
                 Button { size: ControlSize::Mini, label: "0", onclick: move |_| count.set(0) }
                 Specimen { name: "item",
-                    Count { value: count() }
+                    Badge { content: BadgeContent::Number(count()) , tone: BadgeTone::Quiet, size: ControlSize::Mini}
                 }
                 Specimen { name: "spin", ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(busy), size: ControlSize::Small } }
             }

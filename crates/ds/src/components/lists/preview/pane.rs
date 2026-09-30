@@ -10,7 +10,7 @@
 //! Its moments come from the caller's cue (`preview_cue`): an in-place change cross-fades the
 //! media, and a running load shows the pending look in the media box.
 
-use crate::components::controls::chord::Chord;
+use crate::components::controls::key_equivalent::KeyEquivalent;
 use crate::components::controls::spinner::SPIN;
 use crate::components::lists::preview::content::{PaneContent, caption, media};
 use crate::components::lists::preview::cue::{PaneCue, pending_look};
@@ -107,7 +107,7 @@ pub fn PreviewPane(
                             onmousedown: move |event| event.prevent_default(),
                             onclick: move |_| onaction.call(index),
                             span { class: "ds-preview-action-label", "{action.label}" }
-                            Chord { shortcut: action.shortcut.clone() }
+                            KeyEquivalent { shortcut: action.shortcut.clone() }
                         }
                     }
                 }

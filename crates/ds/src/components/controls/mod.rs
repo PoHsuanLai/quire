@@ -1,16 +1,15 @@
 //! Controls: buttons, toggles, segmented controls, sliders, the level control, chips, key caps and
 //! the other things a person presses or drags.
 
+pub mod badge;
 pub mod button;
 pub mod button_face;
 pub mod button_model;
 pub mod checkbox;
 pub mod chip;
 pub mod choice;
-pub(crate) mod chord;
-pub(crate) mod count;
 pub(crate) mod glyph;
-pub(crate) mod kbd;
+pub mod key_equivalent;
 pub(crate) mod level_draw;
 pub mod level_indicator;
 pub mod press;

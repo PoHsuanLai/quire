@@ -3,7 +3,7 @@
 //! time as trailing data. Split from `menu_item`, which calls these for a row whose shape is not
 //! `Plain`.
 
-use crate::components::controls::chord::Chord;
+use crate::components::controls::key_equivalent::KeyEquivalent;
 use crate::components::menus::row_shape::{ClipBody, RowShape, clip_box, clip_lines};
 use dioxus::prelude::*;
 use ds_core::vocab::Shortcut;
@@ -111,7 +111,7 @@ pub(crate) fn trail(shape: &RowShape, text: String, chord: Option<Shortcut>) -> 
                 span { class: "ds-menu-keys", "{keys}" }
             }
             if let Some(shortcut) = chord {
-                Chord { shortcut }
+                KeyEquivalent { shortcut }
             }
         }
     }

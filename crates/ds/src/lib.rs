@@ -78,14 +78,14 @@ pub use crate::components::{
         },
     },
     controls::{
+        badge::{Badge, BadgeContent, BadgeTone},
         button::Button,
         button_face::{ButtonFace, Leading, Trailing},
         button_model::{Answers, Bezel, ButtonRole, IconSwap, ImagePosition},
         checkbox::Checkbox,
         chip::{Chip, ChipVariant},
         choice::Choice,
-        count::{Count, CountPlace},
-        kbd::{Kbd, KbdSize},
+        key_equivalent::{KeyEquivalent, KeyStyle},
         level_indicator::{Bands, LevelIndicator, LevelStyle},
         press::Propagation,
         progress::{
