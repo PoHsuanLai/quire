@@ -19,6 +19,8 @@ pub fn App() -> Element {
     let now = axes();
     rsx! {
         Ds {
+            // The gallery shows shell parts too: the root draws with the shell's whole sheet.
+            sheet: Some(ds_shell::stylesheet()),
             appearance: now.appearance(),
             look: now.look.clone(),
             material: now.material,

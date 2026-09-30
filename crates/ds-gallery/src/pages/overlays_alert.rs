@@ -8,8 +8,8 @@ use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Button, Ds, Flow, Icon, IconSource,
-    Inject, Material, Px, TextLine, Theme,
+    Alert, AlertButton, AlertRole, AlertStyle, Appearance, Button, CardAccent, Ds, Flow, FrameTint,
+    Grain, Icon, IconSource, Inject, Material, Px, RootChrome, TextLine, Theme, default_look,
 };
 use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile};
 
@@ -56,7 +56,13 @@ fn InPopover(theme: Theme) -> Element {
     let mut open = use_signal(|| true);
     rsx! {
         div { class: "g-alert-cc",
-            Ds { appearance, material: Material::Popover, stylesheet: Inject::Host,
+            Ds {
+                appearance,
+                look: ds::SpaceLook { theme, ..default_look(0, Grain(35), CardAccent::SpaceHue) },
+                material: Material::Popover,
+                stylesheet: Inject::Host,
+                chrome: Some(RootChrome::Painted),
+                frame: Some(FrameTint::Tinted),
                 div { class: "g-alert-cc-body",
                     ModuleGrid { padding: Px(0.0),
                         ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
