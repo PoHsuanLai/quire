@@ -4,9 +4,11 @@
 //! click reach the summary, which toggles its details.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, Icon, Material, Point, Propagation};
-use ds::{Bezel, ControlSize, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -114,8 +116,8 @@ fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
         .rect("details.stop summary")
         .expect("the summary is laid out");
     harness.send(Input::click(Point {
-        x: header.origin.x + ds::Px(20.0),
-        y: header.origin.y + ds::Px(header.size.height.0 / 2.0),
+        x: header.origin.x + Px(20.0),
+        y: header.origin.y + Px(header.size.height.0 / 2.0),
     }));
     harness.advance(Duration::from_millis(50));
     assert!(

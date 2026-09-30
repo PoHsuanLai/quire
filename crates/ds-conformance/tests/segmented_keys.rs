@@ -3,10 +3,10 @@
 //! to them.
 
 use dioxus::prelude::*;
-use ds::Choice;
-use ds::{Appearance, Ds, Material, SegmentedControl, ShortcutKey};
-use ds::{ControlSize, Tracking};
+use ds::components::controls::segmented::Tracking;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -3,23 +3,43 @@
 //! case's timers run first (a hover card's 450 ms intent, an entrance settling).
 
 use dioxus::prelude::*;
-use ds::ControlSize;
+use ds::components::app::link_pill::{LinkPill, LinkTarget};
+use ds::components::app::peek::Peek;
+use ds::components::app::send_pill::SendPill;
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::components::content::label::LabelRole;
+use ds::components::content::label::LabelStyle;
+use ds::components::controls::button_model::Bezel;
+use ds::components::controls::button_model::ImagePosition;
+use ds::components::controls::key_equivalent::KeyEquivalent;
+use ds::components::controls::key_equivalent::KeyStyle;
+use ds::components::menus::item::item::MenuImage;
+use ds::components::menus::palette::palette_group::PaletteGroups;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::components::overlays::hover_card::parts::{
+    FlagTone, HoverCardPart, HoverMessage, HoverStat,
+};
+use ds::components::overlays::hover_card::target::HoverTarget;
+use ds::components::overlays::popover::Arrow;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::detail::{Operation, PendingToken};
-use ds::{Accessory, Align, Availability, Button, RowLeading};
-use ds::{
-    Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette,
-    CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph, HoverCard, HoverCardPart,
-    HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile, HoverStat, HoverTarget, Icon,
-    IconSize, IconSource, IconUrl, LinkPill, LinkTarget, Menu, MenuImage, MenuItem, MenuPlacement,
-    PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Rect,
-    SendPill, Sheet, Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
-};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
+use ds::stack::toast_hub::UndoToken;
+use ds_core::geometry::placement::Align;
+use ds_core::geometry::placement::Side;
+use ds_core::vocab::Dismiss;
+use ds_motion::hover_intent::{HoverEvent, HoverProfile};
+use ds_style::appearance::peek::PeekMode;
+use ds_style::icon::render::Glyph;
+use ds_style::icon::url::IconUrl;
+use ds_style::tokens::control_size::ControlSize;
 
-use ds::{
-    Answers, Attach, Check, EmptyForm, EmptyState, Fraction, Shortcut, ShortcutKey, SidePanel,
-    Skeleton, SkeletonShape,
-};
+use ds::components::controls::button_model::Answers;
+use ds::components::overlays::empty_state::EmptyForm;
+use ds::components::overlays::sheet_attach::Attach;
+use ds::components::overlays::skeleton::{Skeleton, SkeletonShape};
 use std::time::Duration;
 
 /// One component in one state.
@@ -198,7 +218,7 @@ fn SenderCard(kind: HoverKind) -> Element {
         if let Some((open, _)) = open {
             HoverCard { key: "{open.0}", kind,
                 div { class: "ds-hovercard-person",
-                    ds::Avatar { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Ink }
+                    Avatar { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Ink }
                     div {
                         h5 { class: "ds-hovercard-title", "Dana Okafor" }
                         div { class: "ds-hovercard-sub", "dana@example.com" }
@@ -209,12 +229,12 @@ fn SenderCard(kind: HoverKind) -> Element {
                     span { b { "Mon" } "last wrote" }
                 }
                 div { class: "ds-hovercard-flag", "data-tone": "danger",
-                    Glyph { icon: Icon::OctagonAlert, size: ds::IconSize::Compact }
+                    Glyph { icon: Icon::OctagonAlert, size: IconSize::Compact }
                     span { "Not the address Dana usually writes from." }
                 }
                 div { class: "ds-hovercard-foot",
                     "stays unread while you look"
-                    span { class: "ds-hovercard-keys", ds::KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]), style: ds::KeyStyle::Cap, size: ds::ControlSize::Mini } ds::Label { text: "peek", role: ds::LabelRole::Tertiary, style: ds::LabelStyle::Caption } }
+                    span { class: "ds-hovercard-keys", KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Space]), style: KeyStyle::Cap, size: ds_style::tokens::control_size::ControlSize::Mini } Label { text: "peek", role: LabelRole::Tertiary, style: LabelStyle::Caption } }
                 }
                 div { class: "ds-hovercard-actions",
                     Button { size: ControlSize::Mini, label: "Reply", onclick: |_| {} }
@@ -481,7 +501,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "tooltip",
         state: "rest",
-        make: || rsx! { Tooltip { text: "Snooze until…", ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
+        make: || rsx! { Tooltip { text: "Snooze until…", Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
         wait: NOW,
     },
     // Caller-driven: shown with no pointer, hidden under one.
@@ -576,7 +596,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "command_palette",
         state: "empty",
-        make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: ds::PaletteGroups::default(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
+        make: || rsx! { CommandPalette::<u8> { label: "Search and commands", placeholder: "Search mail, people, actions", query: "zz", tokens: Vec::new(), groups: PaletteGroups::default(), empty: "Nothing in this Space matches. Search checks subjects, names, addresses and the text of every message.", oninput: |_| {}, onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
     // Embedded in a launcher surface: no scrim, `cmdk-in`, the card's id;

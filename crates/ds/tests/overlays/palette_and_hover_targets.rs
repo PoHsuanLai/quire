@@ -5,11 +5,12 @@
 
 use crate::cases::Case;
 use dioxus::prelude::*;
-use ds::{
-    Anchor, CommandPalette, HoverKey, HoverKind, HoverTarget, Icon, Menu, MenuCursor, MenuItem,
-    MenuPlacement, PaletteGroup, PaletteRow, Point, Px, RowAction, RowLeading, RunTone,
-    TargetElement, TextLine, TextRun,
-};
+use ds::components::content::text_runs::RunTone;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::components::overlays::hover_card::target::{HoverTarget, TargetElement};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind};
 use std::time::Duration;
 
 const NOW: Duration = Duration::ZERO;

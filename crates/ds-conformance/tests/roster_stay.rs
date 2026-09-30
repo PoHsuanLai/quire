@@ -3,10 +3,9 @@
 //! heal, even after the fold's settle time has long passed.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, Button, Ds, Emphasis, List, ListItem, Material, Point, RowState, Selection,
-    ThreadRow, settle,
-};
+use ds::components::app::thread_row::ThreadRow;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -100,7 +99,7 @@ fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
     assert_eq!(harness.attr(&row(1), "data-exit").as_deref(), Some("row"));
 
     // Undo well inside the exit: 100 ms of `settle(RowOut)`.
-    let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
+    let fold = settle(Anim::RowOut, MotionLevel::Standard);
     harness.advance(ms(100));
     harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(
@@ -153,7 +152,7 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
         harness.attr(&row(2), "data-presence").as_deref(),
         Some("leaving")
     );
-    let fold = settle(Anim::RowOut, ds::MotionLevel::Standard);
+    let fold = settle(Anim::RowOut, MotionLevel::Standard);
     let dropped = settle_until(&mut harness, |h| h.count(".ds-list-item") == 2);
     assert!(
         dropped.duration_since(refolded) >= fold,

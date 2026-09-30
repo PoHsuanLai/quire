@@ -7,12 +7,13 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, DurationToken, EasingToken, Fraction, LevelGlyph, Material, Motion,
-    MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
-};
-use ds::{Slider, SliderLook};
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::timing::DurationToken;
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;

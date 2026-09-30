@@ -5,12 +5,11 @@
 use crate::axes::{Axes, Showcase};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{
-    Anchor, Button, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon, Material, Menu,
-    MenuCursor, MenuItem, MenuPlacement, PaletteGroup, PaletteRow, Radius, RowAction, RowLeading,
-    RunTone, Surface, TextLine, TextRun, use_rect,
-};
+use ds::components::content::text_runs::RunTone;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::host::measure::{Anchor, use_rect};
+use ds::prelude::*;
+use ds_style::tokens::shape::{Corner, Radius};
 
 /// The recent searches a panel starts with.
 const RECENT: [(&str, &str); 3] = [

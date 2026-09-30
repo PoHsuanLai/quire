@@ -4,14 +4,21 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
+use ds::components::app::edge_peek::EdgePeek;
+use ds::components::app::link_pill::{LinkPill, LinkTarget};
+use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
+use ds::components::app::space_switch::{space_pressed, space_shortcut};
+use ds::components::app::today_tabs::{TodayTab, TodayTabs};
+use ds::components::content::provider_mark::MarkProvider;
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::components::menus::palette::palette_group::{GroupOrder, PaletteGroup, PaletteRow};
+use ds::prelude::*;
 use ds::time::now;
-use ds::{
-    Accessory, Button, Colour, CommandPalette, CommandPaletteHost, Corner, DropState, EdgePeek,
-    GroupOrder, Hex, Icon, LinkPill, LinkTarget, MarkProvider, Material, PaletteGroup, PaletteRow,
-    PinAdd, PinFace, PinItem, PinTile, PinTiles, Radius, RowLeading, Selection, Shown, Surface,
-    TodayTab, TodayTabs, space_pressed, space_shortcut,
-};
-use ds::{ControlSize, KeyEquivalent, KeyStyle};
+use ds_core::standard_action::SpaceNumber;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
+use ds_style::tokens::shape::{Corner, Radius};
 use std::time::Duration;
 
 /// The App features page.
@@ -281,7 +288,7 @@ fn Spaces() -> Element {
                     "Focus here, then press ⌃1 to ⌃9: Space {space}"
                 }
                 for n in 1u8..=3 {
-                    if let Some(number) = ds::SpaceNumber::new(n) {
+                    if let Some(number) = SpaceNumber::new(n) {
                         KeyEquivalent { shortcut: space_shortcut(number), style: KeyStyle::Cap, size: ControlSize::Small }
                     }
                 }

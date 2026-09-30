@@ -3,8 +3,8 @@
 //! stored choice ([`PictureChoice`]) and the rule that resolves it ([`resolve_picture`]); and
 //! [`UserPicturePicker`], where a person picks one.
 
-pub(crate) mod choice;
+pub mod choice;
 pub(crate) mod draw;
 pub(crate) mod picker;
-pub(crate) mod picture;
-pub(crate) mod size;
+pub mod picture;
+pub mod size;

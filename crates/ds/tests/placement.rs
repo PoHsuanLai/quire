@@ -1,7 +1,8 @@
 //! `place()`: flip when the wanted side overflows, clamp 8 px inside the bounds, hover cards
 //! never flip (design/01-LAYOUT.md section 8.2, design/06-INTERACTIONS.md sections 3 and 4).
 
-use ds::{Align, Placed, Placement, Point, Px, Rect, Side, Size, place};
+use ds::prelude::*;
+use ds_core::geometry::placement::{Align, Placed, Side, place};
 
 fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
     Rect {

@@ -4,10 +4,11 @@
 use crate::axes::{Axes, Showcase};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Availability, Button, Check, ControlSize, Flow, Icon, Menu, MenuCursor, MenuImage,
-    MenuItem, MenuPlacement, MountedRef, Point, PopUpButton, PopUpKind, Shortcut, ShortcutKey,
-};
+use ds::components::menus::item::item::MenuImage;
+use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The three placements, one at a time.
 const PLACEMENTS: [(MenuPlacement, &str); 3] = [

@@ -6,7 +6,8 @@
 use dioxus::prelude::*;
 use ds::detail::Touch;
 use ds::motion::{PxPerUnit, SpringPhase, SpringResponse, SpringSpec, Throw, Velocity, use_spring};
-use ds::{Appearance, Check, Ds, Fraction, Material, Point, Px, RootExtent, Slider, Toggle};
+use ds::prelude::*;
+use ds_core::time::FRAME_TICK;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -18,7 +19,7 @@ const VIEW: Viewport = Viewport {
 };
 
 /// One frame of the spring driver: the harness advances by these, so each read falls on a frame.
-const FRAME: Duration = ds::FRAME_TICK;
+const FRAME: Duration = FRAME_TICK;
 
 fn virtual_harness(app: fn() -> Element) -> Harness {
     Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))

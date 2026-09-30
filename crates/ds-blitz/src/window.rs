@@ -1,4 +1,4 @@
-//! The window seam (`ds::HostWindow`) over the winit window `launch` opens (FINDINGS "Window
+//! The window seam (`ds::prelude::HostWindow`) over the winit window `launch` opens (FINDINGS "Window
 //! frame"). Moves, resizes, zoom and minimize are winit's own requests; close goes through
 //! blitz-shell's `request_window_close`, which drops the window and ends the event loop as the
 //! compositor's close does. The left half, right half and centre placements need a client that
@@ -6,7 +6,7 @@
 //! Wayland and ignores `set_outer_position` there, so they are `Support::No` on Wayland and work
 //! on X11 (and wherever winit can place a window).
 //!
-//! `launch` provides it as `ds::WindowHost` and refreshes the state on every resize and focus
+//! `launch` provides it as `ds::prelude::WindowHost` and refreshes the state on every resize and focus
 //! change. Another Blitz host (shell-host's surfaces, through sill) provides its own
 //! `HostWindow` over its `SurfaceHandle` instead.
 
@@ -14,10 +14,8 @@ use crate::window_place::{Area, placement};
 use blitz_traits::shell::ShellProvider;
 use dioxus_native::winit::dpi::{PhysicalPosition, PhysicalSize};
 use dioxus_native::winit::window::{ResizeDirection, Window};
-use ds::{
-    Activation, Fullscreen, HostWindow, Maximized, ResizeEdge, Support, TileError, WindowState,
-    WindowTile, Zoom,
-};
+use ds::prelude::*;
+use ds::window::vocab::{Activation, Fullscreen, Maximized, Support, TileError, WindowTile, Zoom};
 use std::sync::Arc;
 
 /// The winit window, as the frame's host.
@@ -161,7 +159,7 @@ pub enum Decorations {
     /// `WindowFrame` of its own.
     #[default]
     Server,
-    /// The app: its root draws `ds::WindowFrame::Titlebar`, and the window asks for no
+    /// The app: its root draws `ds::prelude::WindowFrame::Titlebar`, and the window asks for no
     /// decorations.
     Client,
 }

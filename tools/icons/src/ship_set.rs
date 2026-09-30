@@ -3,8 +3,10 @@
 
 use std::path::Path;
 
-use ds::PRESETS;
-use ds::icon::{IconStyle, Tint as DsTint, retint as ds_retint};
+use ds::icon::IconStyle;
+use ds::icon::Tint as DsTint;
+use ds::icon::retint as ds_retint;
+use ds_style::space::presets::PRESETS;
 use icons::{
     Cell, IconsError, Manifest, Prepared, SHIP_PX, Sheet, SheetStyle, Source, Style, Template,
     build_sheet, grain_tile, klein_face, parse_spec, ship_icon, strip, style_look,

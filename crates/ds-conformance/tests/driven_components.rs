@@ -7,18 +7,23 @@
 //! Space editor reports the dot picked inside it).
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{
-    Anchor, Appearance, Availability, Button, Check, Ds, Emphasis, HoverCard, HoverEvent, HoverKey,
-    HoverKind, HoverProfile, HoverTarget, List, ListItem, Material, Menu, MenuItem, Point, Px,
-    RowState, Selection, ShortcutKey, ThreadRow, Toggle, use_hover_hub, use_toast_hub, use_toasts,
-};
-use ds::{FieldFocus, PRESETS, Scheme, SpaceLook, Theme};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::overlays::hover_card::target::HoverTarget;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
+use ds::stack::toast_hub::ToastState;
+use ds::stack::toast_hub::use_toast_hub;
 use ds_blitz::TokioSpawner;
+use ds_core::vocab::RowState;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_motion::hover_intent::{HoverEvent, HoverProfile};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
-use ds_shell::{DotIndex, SpaceEditor};
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::PRESETS;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -124,8 +129,8 @@ fn ToastHubApp() -> Element {
 fn ToastHubProbe() -> Element {
     let toasts = use_toast_hub();
     let state = match toasts.state() {
-        ds::ToastState::Hidden => "hidden",
-        ds::ToastState::Shown { .. } => "shown",
+        ToastState::Hidden => "hidden",
+        ToastState::Shown { .. } => "shown",
     };
     rsx! {
         Button {
@@ -247,7 +252,7 @@ fn MenuDemo() -> Element {
         }
         if open() == Check::On {
             Menu {
-                placement: ds::MenuPlacement::Popup,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(64.0) }),
                 items: entries,
                 onpick: move |_: u8| open.set(Check::Off),
@@ -425,7 +430,7 @@ fn a_row_leaves_and_the_rows_below_heal() {
 
     // The exit settles at `settle(Anim::RowOut)`: the row is gone and the rows below slide up
     // into its place, healing for `settle(Anim::Heal)` more.
-    harness.advance(ds::settle(ds::Anim::RowOut, ds::MotionLevel::Standard) + ms(20));
+    harness.advance(settle(Anim::RowOut, MotionLevel::Standard) + ms(20));
     assert_eq!(harness.count(".ds-list-item"), 2, "{}", harness.html());
     assert_eq!(presence(&harness, 1).as_deref(), Some("healing"));
     assert_eq!(presence(&harness, 2).as_deref(), Some("healing"));
@@ -501,7 +506,7 @@ fn EditorApp() -> Element {
     let mut look = use_signal(|| SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
         theme: Theme::System,
-        card_accent: ds::CardAccent::SpaceHue,
+        card_accent: CardAccent::SpaceHue,
     });
     rsx! {
         Root {
@@ -551,7 +556,7 @@ fn EnvironmentApp() -> Element {
         ConfigRoot::Scratch(std::env::temp_dir().join("ds-blitz-harness-environment")),
         AppName("consumer-test"),
     );
-    let system = SystemPrefsSource::Fixed(ds::SystemPrefs::default());
+    let system = SystemPrefsSource::Fixed(SystemPrefs::default());
     let env = use_environment(store, system, Arc::new(TokioSpawner::current()));
     let now = env();
     rsx! {

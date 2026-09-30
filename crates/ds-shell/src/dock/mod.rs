@@ -3,4 +3,4 @@
 //! and bounce; these draw what one tile is (design/30 section 2.10, design/10-BEHAVIOUR-dock.md).
 
 pub(crate) mod parts;
-pub(crate) mod tile;
+pub mod tile;

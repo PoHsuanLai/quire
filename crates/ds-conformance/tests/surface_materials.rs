@@ -8,13 +8,21 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{
-    Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
-    MenuItem, PlateFamily, Px, Scheme, Shown, Surface,
-};
+use ds::components::menus::item::item::MenuImage;
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::geometry::placement::Align;
+use ds_core::geometry::placement::Flip;
+use ds_core::geometry::placement::Side;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_shell::MenuBarItem;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::icon::family::PlateFamily;
+use ds_style::material::stack::MaterialStack;
+use ds_style::tokens::shape::Corner;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;
@@ -42,9 +50,9 @@ fn at(frame: &RgbaImage, harness: &Harness, selector: &str, dx: f32, dy: f32) ->
 /// No hairline and no shadow: only the shape paints outside the tint.
 fn bare_stack() -> MaterialStack {
     MaterialStack {
-        hairline_light: ds::Alpha(0),
-        hairline_dark: ds::Alpha(0),
-        shadow_strength: ds::Alpha(0),
+        hairline_light: Alpha(0),
+        hairline_dark: Alpha(0),
+        shadow_strength: Alpha(0),
         ..MaterialStack::default()
     }
 }
@@ -232,24 +240,24 @@ fn SlimMenu() -> Element {
             image: None,
             key: None,
             check: None,
-            availability: ds::Availability::Enabled,
+            availability: Availability::Enabled,
         },
         MenuItem::Separator,
         MenuItem::Item {
             value: 2,
             title: "Quit".to_owned(),
-            image: Some(ds::MenuImage::Icon(Icon::Power)),
+            image: Some(MenuImage::Icon(Icon::Power)),
             key: None,
             check: None,
-            availability: ds::Availability::Enabled,
+            availability: Availability::Enabled,
         },
     ];
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "anchor", style: "width:20px; height:20px; margin:20px" }
-            ds::Menu::<i32> {
-                placement: ds::MenuPlacement::Popup,
-                anchor: ds::Anchor::Point(ds::Point { x: Px(40.0), y: Px(40.0) }),
+            Menu::<i32> {
+                placement: MenuPlacement::Popup,
+                anchor: Anchor::Point(Point { x: Px(40.0), y: Px(40.0) }),
                 items: entries,
                 onpick: move |_| {},
                 onclose: move |_| {},
@@ -283,7 +291,7 @@ fn DockPill() -> Element {
                 Ds { sheet: Some(ds_shell::stylesheet()),
                     appearance: Appearance::default(),
                     material: Material::Dock,
-                    blur: ds::BlurState::Available,
+                    blur: BlurState::Available,
                     radius: Some(Corner::Squircle(Px(18.0))),
                     div { style: "width:300px; height:60px" }
                 }
@@ -328,17 +336,17 @@ fn a_squircle_dock_root_masks_its_frame_and_keeps_its_shadow() {
 
 #[allow(non_snake_case)]
 fn Launcher() -> Element {
-    let groups = vec![ds::PaletteGroup::list(
+    let groups = vec![PaletteGroup::list(
         "Applications",
-        vec![ds::PaletteRow {
+        vec![PaletteRow {
             detail: Some("File manager".into()),
-            ..ds::PaletteRow::new(1_u8, "Files")
+            ..PaletteRow::new(1_u8, "Files")
         }],
     )];
     rsx! {
-        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet, blur: ds::BlurState::Available,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Sheet, blur: BlurState::Available,
             div { class: "panel", style: "width:600px; height:400px",
-                ds::CommandPalette::<u8> {
+                CommandPalette::<u8> {
                     label: "Launch".to_owned(),
                     placeholder: "Search".to_owned(),
                     query: "fi".to_owned(),
@@ -348,7 +356,7 @@ fn Launcher() -> Element {
                     oninput: move |_| {},
                     onpick: move |_| {},
                     onclose: move |()| {},
-                    host: ds::CommandPaletteHost::Surface,
+                    host: CommandPaletteHost::Surface,
                     corner: Some(Corner::Squircle(Px(14.0))),
                 }
             }
@@ -382,9 +390,9 @@ fn Pop() -> Element {
                 span { id: "state", if open() { "open" } else { "closed" } }
             }
             if open() {
-                ds::Popover {
-                    anchor: ds::Anchor::Point(ds::Point { x: Px(60.0), y: Px(60.0) }),
-                    placement: ds::Placement { side: ds::Side::Bottom, align: ds::Align::Start, flip: ds::Flip::Allowed },
+                Popover {
+                    anchor: Anchor::Point(Point { x: Px(60.0), y: Px(60.0) }),
+                    placement: Placement { side: Side::Bottom, align: Align::Start, flip: Flip::Allowed },
                     gap: Px(4.0),
                     onclose: move |()| open.set(false),
                     button { id: "inside", "Inside" }
@@ -400,11 +408,11 @@ fn a_popover_fades_out_before_it_closes() {
     let mut harness = Harness::new(Pop, VIEW);
     harness.advance(ms(300));
     assert_eq!(harness.count("#inside"), 1);
-    harness.send(Input::pointer_down(ds::Point {
+    harness.send(Input::pointer_down(Point {
         x: Px(500.0),
         y: Px(20.0),
     }));
-    harness.send(Input::pointer_up(ds::Point {
+    harness.send(Input::pointer_up(Point {
         x: Px(500.0),
         y: Px(20.0),
     }));

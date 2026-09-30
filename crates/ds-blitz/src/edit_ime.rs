@@ -7,7 +7,8 @@
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::EventHandler;
 use dioxus_native::winit::event::Ime;
-use ds::{CapturedPointer, ImeEvent, ImeListener, PointerPhase};
+use ds::host::captured::{CapturedPointer, PointerPhase};
+use ds::host::ime::{ImeEvent, ImeListener};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -98,7 +99,7 @@ pub(crate) fn ime_of(event: &Ime) -> Option<ImeEvent> {
 mod tests {
     use super::ime_of;
     use dioxus_native::winit::event::Ime;
-    use ds::ImeEvent;
+    use ds::host::ime::ImeEvent;
 
     #[test]
     fn winit_ime_events_become_the_surfaces() {

@@ -4,7 +4,7 @@
 //! after Escape.
 //!
 //! The opener is the anchor when it is a mounted element (`Anchor::Mounted`). The panel tells
-//! the host as it mounts ([`HandBack`](crate::HandBack)); the host gives the keyboard to the opener (or its
+//! the host as it mounts ([`HandBack`](crate::host::hand_back::HandBack)); the host gives the keyboard to the opener (or its
 //! nearest focusable ancestor) when the panel is removed while it still has it. A menu anchored
 //! at a point or a rect names no element: ds-blitz then hands the keyboard to the element
 //! focused before the menu took it, or to where the pointer pressed to open it.

@@ -4,12 +4,12 @@
 //! and a busy button shows one in its leading slot and takes no press.
 
 use dioxus::prelude::*;
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Appearance, Availability, Button, ControlSize, Ds, Fraction, Material, Progress,
-    ProgressIndicator, ProgressStyle,
-};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -124,7 +124,7 @@ fn a_busy_button_shows_a_spinner_and_takes_no_press() {
     );
     let at = harness.centre("#button .ds-button").expect("the button");
     harness.send(Input::click(at));
-    harness.send(Input::key(ds::ShortcutKey::Enter));
+    harness.send(Input::key(ShortcutKey::Enter));
     assert_eq!(PRESSES.get(), 0, "no press while busy");
     harness.within(|| *AVAILABILITY.write() = Availability::Enabled);
     harness.advance(ms(0));

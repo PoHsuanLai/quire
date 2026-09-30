@@ -6,8 +6,8 @@ use crate::registry;
 use crate::style;
 use crate::toolbar::Toolbar;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Ds, Ground, RootChrome, SectionHeader};
+use ds::prelude::*;
+use ds::root::chrome::Ground;
 
 /// The gallery, starting from the axes this thread was handed (`crate::axes::start_with`).
 #[allow(non_snake_case)] // A component: launch and snapshot name it like a type.

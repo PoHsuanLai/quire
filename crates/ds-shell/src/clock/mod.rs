@@ -2,5 +2,5 @@
 
 pub(crate) mod angles;
 pub(crate) mod dial;
-pub(crate) mod face;
-pub(crate) mod kind;
+pub mod face;
+pub mod kind;

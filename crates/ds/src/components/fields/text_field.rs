@@ -74,11 +74,11 @@ fn clear_size(size: ControlSize) -> ControlSize {
 /// typing in a field" from "a key for the window". They fire for a click or Tab (the renderer's
 /// own events) and for the focus seam: when `FieldFocus::OnMount` or `FieldFocus::Controlled`
 /// puts the caret in the field through a host that dispatches no event (Blitz), the field calls
-/// `onfocus` itself. A range is [`Slider`](crate::Slider).
+/// `onfocus` itself. A range is [`Slider`](crate::components::controls::slider::Slider).
 ///
-/// `handle` ([`use_field_handle`](crate::use_field_handle)) is the caller's grip on the field
+/// `handle` ([`use_field_handle`](crate::focus::field::use_field_handle)) is the caller's grip on the field
 /// from any handler: `focus(Select)`, `blur()` and the mounted element. A focus or blur through
-/// it (or through [`focus_by_selector`](crate::focus_by_selector)) calls `onfocus`/`onblur` once
+/// it (or through [`focus_by_selector`](crate::focus::selector::focus_by_selector)) calls `onfocus`/`onblur` once
 /// on Blitz too.
 ///
 /// `kind` picks what it holds ([`FieldKind`]): `Secure` keeps its text out of the markup, `Search`

@@ -1,7 +1,7 @@
-//! The host's focus writes: keyboard focus moved into (`ds::FocusHost::focus`) and out of
+//! The host's focus writes: keyboard focus moved into (`ds::host::parts::FocusHost::focus`) and out of
 //! (`blur`) an element straight in the Blitz document, answering "busy" instead of panicking when
 //! the renderer holds the document; its select-all write, which selects a field's value once the
-//! caret is in it; the caret reads and writes (`ds::CaretHost`); and its selector lookup, so an
+//! caret is in it; the caret reads and writes (`ds::host::parts::CaretHost`); and its selector lookup, so an
 //! app focuses an element it holds no handle for.
 //!
 //! dioxus-native-dom's own `set_focus` borrows the document mutably when it is called. A task
@@ -15,7 +15,9 @@ use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
 use blitz_dom::Node;
 use dioxus::prelude::*;
-use ds::{Caret, Collapsed, FieldSelection, Focused, Found, InitialCaret, caret_at};
+use ds::host::caret::{Caret, Collapsed, FieldSelection, InitialCaret, caret_at};
+use ds::host::found::Found;
+use ds::prelude::*;
 use std::rc::Rc;
 
 /// The selector lookup over the document `source` reaches, once it has one.

@@ -5,7 +5,9 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, CommandPalette, Ds, Icon, Material, RowAction, SpaceLook};
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -27,9 +29,9 @@ fn flat() -> SpaceLook {
 }
 
 /// Three recent searches, each with a remove that logs its row.
-fn rows(mut log: Signal<Vec<String>>) -> Vec<ds::PaletteGroup<u8>> {
+fn rows(mut log: Signal<Vec<String>>) -> Vec<PaletteGroup<u8>> {
     let entries = (1..=3u8)
-        .map(|value| ds::PaletteRow {
+        .map(|value| PaletteRow {
             action: Some(RowAction {
                 icon: Icon::X,
                 label: "Remove from recent".to_string(),
@@ -37,10 +39,10 @@ fn rows(mut log: Signal<Vec<String>>) -> Vec<ds::PaletteGroup<u8>> {
                     log.with_mut(|log| log.push(format!("remove:{value}")))
                 }),
             }),
-            ..ds::PaletteRow::new(value, format!("recent search {value}"))
+            ..PaletteRow::new(value, format!("recent search {value}"))
         })
         .collect();
-    vec![ds::PaletteGroup::list("Recent", entries)]
+    vec![PaletteGroup::list("Recent", entries)]
 }
 
 #[component]

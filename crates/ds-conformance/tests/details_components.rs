@@ -4,14 +4,14 @@
 //! operation is derived from the state's own Pending moment).
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material, person_hue,
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
-use ds::{Availability, Check, TextLine};
+use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::ModuleTile;
-use ds_shell::{LockPrompt, LockUser, PromptState};
+use ds_shell::lock::vocab::{LockUser, PromptState};
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

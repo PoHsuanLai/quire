@@ -4,7 +4,7 @@
 pub mod host;
 pub mod hover_hub;
 pub mod layer_stack;
-pub(crate) mod menu_track;
+pub mod menu_track;
 pub mod roving;
 pub mod toast_hub;
 pub mod typeahead;

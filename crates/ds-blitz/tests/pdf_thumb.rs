@@ -7,7 +7,10 @@
 //! read on the worker lands and paints (the loading and pending states are `ds`'s SSR goldens).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, PdfPage, PdfTrouble, Px, Scale, Size};
+use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
+use ds::components::lists::preview::content::PANE_MEDIA;
+use ds::components::lists::preview::content::PaneContent;
+use ds::prelude::*;
 use ds_blitz::{DeviceBox, PdfFileThumb, ThumbRequest};
 use ds_blitz::{pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached};
 use ds_harness::harness::settle_until;
@@ -335,13 +338,13 @@ fn a_broken_file_lands_on_the_plate() {
 fn PanePreview() -> Element {
     let mut pdf = use_signal(|| false);
     let path = pdf().then(|| PANE_PATH.get().cloned().unwrap_or_default());
-    let page = ds_blitz::use_pdf_page(path, ds::PANE_MEDIA);
+    let page = ds_blitz::use_pdf_page(path, PANE_MEDIA);
     let content = match page {
-        Some(page) => ds::PaneContent::Pdf {
+        Some(page) => PaneContent::Pdf {
             page,
             name: "Pane.pdf".to_string(),
         },
-        None => ds::PaneContent::Web {
+        None => PaneContent::Web {
             host: "example.org".to_string(),
             url: "https://example.org".to_string(),
         },
@@ -349,7 +352,7 @@ fn PanePreview() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             button { class: "to-pdf", onclick: move |_| pdf.set(true), "PDF" }
-            ds::PreviewPane { content }
+            PreviewPane { content }
         }
     }
 }

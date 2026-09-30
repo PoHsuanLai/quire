@@ -4,15 +4,17 @@
 use crate::axes::Axes;
 use crate::pages::{Scope, Section};
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::Word;
-use ds::{
-    Accent, Accessory, Availability, Button, Check, Chip, ChipVariant, Emphasis, Fraction, Icon,
-    LabelHue, List, ListItem, ListStyle, Material, Row, RowLeading, RowState, Scheme,
-    SegmentedControl, Selection, Slider, Surface, ThreadRow, Toggle, Verdict,
-};
-use ds::{Answers, Bezel, ButtonRole, ControlSize};
-use ds::{Choice, Tracking};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::controls::button_model::{Answers, Bezel, ButtonRole};
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::segmented::Tracking;
+use ds::components::lists::list::model::ListStyle;
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_core::colour::contrast::Verdict;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::label_hue::LabelHue;
 
 /// What the matrix can show.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -55,7 +57,7 @@ pub fn MatrixPage() -> Element {
                     for accent in Accent::ALL.iter().copied() {
                         div { class: "g-col",
                             span { class: "g-code", "{accent.label()}" }
-                            Scope { scheme, accent, material: Material::Popover, frame: Some(ds::FrameTint::None),
+                            Scope { scheme, accent, material: Material::Popover, frame: Some(FrameTint::None),
                                 Surface { material,
                                     div { class: "g-cell",
                                         Cell { subject: subject() }

@@ -2,21 +2,27 @@
 //! switch, a spinner, a disclosure) finds light, Postmark and Reduced motion.
 
 use dioxus::prelude::*;
+use ds::prelude::*;
+use ds_core::vocab::Activity;
+use ds_core::vocab::InputModality;
+use ds_style::appearance::blur::BlurState;
+use ds_style::appearance::resolve::Resolved;
+use ds_style::scope::Scope;
 
 /// The scope a component reads when nothing above it is a `Ds`: light, Postmark, Reduced motion
 /// (every settle 94 ms).
-pub fn scope() -> ds::Scope {
-    ds::Scope {
-        resolved: ds::Resolved {
-            scheme: ds::Scheme::Light,
-            accent: ds::Accent::Blue,
-            motion: ds::MotionLevel::Reduced,
+pub fn scope() -> Scope {
+    Scope {
+        resolved: Resolved {
+            scheme: Scheme::Light,
+            accent: Accent::Blue,
+            motion: MotionLevel::Reduced,
         },
-        scheme: ds::Scheme::Light,
-        material: ds::Material::Window,
-        blur: ds::BlurState::default(),
-        modality: ds::InputModality::Pointer,
-        activity: ds::Activity::Active,
+        scheme: Scheme::Light,
+        material: Material::Window,
+        blur: BlurState::default(),
+        modality: InputModality::Pointer,
+        activity: Activity::Active,
     }
 }
 

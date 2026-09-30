@@ -1,7 +1,7 @@
 //! The widget contract (design/23-WIDGETS.md section 9): what a widget is, as one trait. A
 //! widget is data in, content out: it names its kind and the sizes it draws, gives a placeholder
 //! entry for a size, and draws an entry at a size. It never draws its card: the corner, the
-//! inset, the material, the Space's tint and the title row are quire's ([`crate::WidgetCard`]),
+//! inset, the material, the Space's tint and the title row are quire's ([`crate::widget::card::WidgetCard`]),
 //! so every widget, ours and other apps', sits on the same card.
 
 use crate::widget::kind::{WidgetHost, WidgetSize, WidgetTitle};
@@ -57,7 +57,7 @@ pub struct WidgetContext<I: 'static> {
 }
 
 /// A widget: one implementation per kind, a unit type (`Default`, so a registry can name it). quire's own are
-/// [`crate::BatteryWidget`], [`crate::WorldClockWidget`] and [`crate::MonthWidget`]; an app adds
+/// [`crate::widget::battery::BatteryWidget`], [`crate::widget::clock::WorldClockWidget`] and [`crate::widget::calendar::MonthWidget`]; an app adds
 /// its own the same way.
 ///
 /// `Entry` is everything one moment of the widget shows, as plain data (serde, so an app in
@@ -86,7 +86,7 @@ pub trait Widget: Clone + PartialEq + Default + 'static {
     /// The one size it takes in `host`: what Edit Widgets previews and adds (the user's decision,
     /// 2026-09-28: one size per widget, no size picker; design/23 section 9.7). The first of
     /// [`Widget::sizes`] unless the widget says otherwise; a host narrows it further with
-    /// [`crate::WidgetRegistry::sized`]. A size the widget does not draw is held to its first
+    /// [`crate::widget::registry::WidgetRegistry::sized`]. A size the widget does not draw is held to its first
     /// ([`fit`]).
     fn size_in(host: WidgetHost) -> WidgetSize {
         let _ = host;

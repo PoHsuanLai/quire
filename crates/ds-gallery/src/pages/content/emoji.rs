@@ -5,12 +5,16 @@
 
 use crate::pages::{Caption, Section};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue};
-use ds_shell::{
-    AnimatedEmoji, DiscHue, EMOJI_ATTRIBUTION, EmojiDisc, EmojiId, EmojiPlayback, PictureChoice,
-    PictureSize, UserPicturePicker,
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
+use ds::prelude::*;
+use ds_shell::emoji::EMOJI_ATTRIBUTION;
+use ds_shell::emoji::disc::{DiscHue, EmojiDisc, EmojiPlayback};
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::prelude::*;
+use ds_shell::user_picture::choice::PictureChoice;
+use ds_shell::user_picture::size::PictureSize;
 
 const STILL: EmojiPlayback = EmojiPlayback::Still;
 

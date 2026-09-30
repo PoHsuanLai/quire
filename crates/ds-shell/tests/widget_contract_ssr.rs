@@ -10,25 +10,33 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Common;
-use ds::LabelHue;
-use ds::Word;
+use ds::assembly::ds::Inject;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{
-    Appearance, Attach, BatteryPower, BatteryState, Ds, Fraction, IconSize, Inject, LowAt,
-    Material, Motion, RootChrome, RootExtent, Sheet, Theme,
-};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_lint::{LintConfig, markup};
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
+use ds_shell::month_grid::data::{
+    DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
+    WeekNumbers,
+};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::{BatteryCell, BatteryEntry, BatteryWidget};
+use ds_shell::widget::calendar::{EventLine, MonthFace, TodayLine};
+use ds_shell::widget::calendar::{MonthEntry, MonthWidget};
+use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
+use ds_shell::widget::kind::Lift;
+use ds_shell::widget::timeline::Dated;
+use ds_shell::widget::timeline::EntryDate;
+use ds_shell::widget::timeline::Refresh;
+use ds_shell::widget::timeline::Timeline;
 use ds_shell::widget::{WidgetEdit, WidgetLayout};
 use ds_shell::widget::{WireRefresh, WireTimeline};
-use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayKey, DayMark,
-    DayPhase, DayPlace, Device, DeviceGlyph, Eventful, IsoWeek, Lift, MonthDay, MonthEntry,
-    MonthGridData, MonthKey, MonthWeek, MonthWidget, Seconds, Timeline, WeekNumbers, Widget,
-    WidgetCard, WidgetGallery, WidgetHost, WidgetMetrics, WidgetRegistry, WidgetSize,
-    WidgetSlotGuide, WorldClockWidget,
-};
-use ds_shell::{EventLine, MonthFace, TodayLine};
+use ds_style::tokens::label_hue::LabelHue;
 use std::time::{Duration, Instant};
 
 #[derive(Props, Clone)]
@@ -635,13 +643,13 @@ fn a_timeline_crosses_the_wire_as_offsets() {
     let sent = Instant::now();
     let timeline = Timeline::new(
         vec![
-            ds_shell::Dated::new(ds_shell::EntryDate::Start, four()),
-            ds_shell::Dated::new(
-                ds_shell::EntryDate::At(sent + Duration::from_secs(60)),
+            Dated::new(EntryDate::Start, four()),
+            Dated::new(
+                EntryDate::At(sent + Duration::from_secs(60)),
                 BatteryEntry::Waiting,
             ),
         ],
-        ds_shell::Refresh::After(sent + Duration::from_secs(300)),
+        Refresh::After(sent + Duration::from_secs(300)),
     );
     let wire = WireTimeline::sent(timeline.clone(), sent);
     assert_eq!(wire.refresh, WireRefresh::AfterMs(300_000));
@@ -658,7 +666,7 @@ fn a_timeline_crosses_the_wire_as_offsets() {
     );
     assert_eq!(
         received.refresh(),
-        ds_shell::Refresh::After(arrived + Duration::from_secs(300))
+        Refresh::After(arrived + Duration::from_secs(300))
     );
 }
 

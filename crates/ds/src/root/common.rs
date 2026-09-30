@@ -15,8 +15,8 @@ use std::fmt;
 /// a `ds-` name or class, or a `data-*` name quire writes itself, is refused, so nothing added
 /// here can restyle the element through quire's rules.
 ///
-/// [`DataName::parse`]: crate::DataName::parse
-/// [`ExtraClass::parse`]: crate::ExtraClass::parse
+/// [`DataName::parse`]: crate::root::pass_through::DataName::parse
+/// [`ExtraClass::parse`]: crate::root::pass_through::ExtraClass::parse
 #[derive(Clone, PartialEq, Default)]
 pub struct Common {
     /// The element's `id`.

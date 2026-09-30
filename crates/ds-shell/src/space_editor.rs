@@ -7,13 +7,14 @@ pub(crate) mod edit;
 pub(crate) mod field;
 pub(crate) mod handles;
 pub(crate) mod parts;
-pub(crate) mod rows;
+pub mod rows;
 
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::controls::segmented::SegmentedControl;
+use ds::components::controls::segmented::Tracking;
 use ds::components::lists::section_header::SectionHeader;
-use ds::{Choice, Tracking};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
 use ds_style::space::look::{CardAccent, SpaceLook};

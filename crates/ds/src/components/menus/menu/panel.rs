@@ -5,7 +5,8 @@
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::lines::{Drawn, render_lines};
 use crate::components::menus::item::view::client_point;
-use crate::components::menus::menu::blink::{Blink, highlighted as lit};
+use crate::components::menus::menu::blink::Blink;
+use crate::components::menus::menu::blink::highlighted as lit;
 use crate::components::menus::menu::choices::{Act, Choice, liveness};
 use crate::components::menus::menu::cursor::{MenuCursor, highlighted, seed};
 use crate::components::menus::menu::decide::{Child, Decision, Level, decide};

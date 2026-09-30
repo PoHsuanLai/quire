@@ -3,10 +3,9 @@
 //! disabled row does neither.
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, Availability, Check, Ds, Icon, Material, Point, Row, RowLeading,
-    RowSize, RowState, TextLine,
-};
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

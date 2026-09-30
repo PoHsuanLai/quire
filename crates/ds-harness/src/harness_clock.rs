@@ -5,8 +5,8 @@
 //! Under load the two drift apart, so a timer can end an entrance before or after the frame a
 //! test expects.
 //!
-//! On the [`Clock::Virtual`] the harness installs a [`ds::VirtualClock`] on its thread for as
-//! long as it lives, so every `ds::time::now` and `ds::sleep` (motion timers, presence, hover
+//! On the [`Clock::Virtual`] the harness installs a [`ds_core::time::clock::VirtualClock`] on its thread for as
+//! long as it lives, so every `ds::time::now` and `ds_core::time::clock::sleep` (motion timers, presence, hover
 //! intent, toast holds, pending, detail tweens) reads the same clock the CSS resolves at, and
 //! `advance` moves that one clock: it steps to each timer's due instant in order, fires what is
 //! due, runs the renders that queued and resolves the document at that very instant. Nothing
@@ -21,7 +21,7 @@
 //! one spot are always a double click, however far apart the test advanced them.
 
 use crate::harness::Harness;
-use ds::{ClockGuard, VirtualClock};
+use ds_core::time::clock::{ClockGuard, VirtualClock};
 use std::time::{Duration, Instant};
 
 /// The clock a harness's timers run on; pass it to

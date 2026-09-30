@@ -9,8 +9,7 @@ use crate::page::Page;
 use crate::progress_copy::ProgressCopy;
 use crate::registry;
 use crate::sheet;
-use ds::Word;
-use ds::{Accent, Motion, Scheme, Theme, Typeface};
+use ds::prelude::*;
 use ds_harness::{Viewport, snapshot_placed};
 use std::path::{Path, PathBuf};
 use std::time::Duration;
@@ -182,7 +181,7 @@ pub fn run(
 mod tests {
     use super::{ACCENTS, SCHEMES, shots};
     use crate::page::Page;
-    use ds::Word;
+    use ds::prelude::*;
     use std::collections::HashSet;
 
     #[test]

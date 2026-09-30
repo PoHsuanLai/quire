@@ -2,11 +2,11 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Accessory, FieldKind, Icon, ListItem, Row, RowLeading, RowState, SectionHeader, Selection,
-    Sidebar, SidebarSize, TextField, TextLine,
-};
+use ds::components::chrome::sidebar::Sidebar;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::control_size::SidebarSize;
 
 /// The places, with a heading before each group.
 fn places(here: &'static str, onselect: EventHandler<&'static str>) -> Vec<ListItem<&'static str>> {
@@ -60,7 +60,7 @@ pub fn SidebarSection() -> Element {
                                 items: places(here(), EventHandler::new(move |key| here.set(key))),
                                 onselect: move |key| here.set(key),
                                 header: rsx! {
-                                    TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ds::ControlSize::Small, oninput: move |next| query.set(next) }
+                                    TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Small, oninput: move |next| query.set(next) }
                                 },
                             }
                         }

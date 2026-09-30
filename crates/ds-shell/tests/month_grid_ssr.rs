@@ -10,9 +10,15 @@ mod golden;
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Inject, Material, Theme};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{DayKey, MonthGrid, MonthStep, WeekNumbers};
+use ds_shell::month_grid::data::DayMark;
+use ds_shell::month_grid::data::DayPlace;
+use ds_shell::month_grid::data::IsoWeek;
+use ds_shell::month_grid::data::MonthKey;
+use ds_shell::month_grid::data::{DayKey, MonthStep, WeekNumbers};
+use ds_shell::prelude::*;
 use month_sample::{First, SEPTEMBER, sample};
 
 /// One specimen.
@@ -114,17 +120,17 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 fn the_sample_is_the_month_sill_pins() {
     let monday = sample(SEPTEMBER, First::Monday);
     assert_eq!(monday.weeks.len(), 5);
-    assert_eq!(monday.weeks[0].number, ds_shell::IsoWeek(36));
+    assert_eq!(monday.weeks[0].number, IsoWeek(36));
     assert_eq!(monday.weeks[0].days[0].key.day, 31);
-    assert_eq!(monday.weeks[0].days[0].place, ds_shell::DayPlace::Before);
-    assert_eq!(monday.weeks[3].days[5].mark, ds_shell::DayMark::Today);
+    assert_eq!(monday.weeks[0].days[0].place, DayPlace::Before);
+    assert_eq!(monday.weeks[3].days[5].mark, DayMark::Today);
     assert_eq!(monday.weeks[4].days[6].key.day, 4);
-    assert_eq!(monday.weeks[4].days[6].place, ds_shell::DayPlace::After);
+    assert_eq!(monday.weeks[4].days[6].place, DayPlace::After);
     let sunday = sample(SEPTEMBER, First::Sunday);
     assert_eq!(sunday.weeks[0].days[0].key.day, 30);
-    assert_eq!(sunday.weeks[0].number, ds_shell::IsoWeek(36));
+    assert_eq!(sunday.weeks[0].number, IsoWeek(36));
     let feb = sample(
-        ds_shell::MonthKey {
+        MonthKey {
             year: 2027,
             month: 2,
         },

@@ -1,10 +1,11 @@
 //! Files dragged into the harness's document from outside, as the window's hook feeds a drag
-//! from the platform (`crate::window_drop`): the same `ds::FileDropBoard`, the same hit test.
+//! from the platform (`crate::window_drop`): the same `ds::file_drop::board::FileDropBoard`, the same hit test.
 
 use crate::harness::Harness;
 use dioxus::core::consume_context_from_scope;
 use dioxus::prelude::ScopeId;
-use ds::{DropAcceptance, FileDragInput, FileDropBoard};
+use ds::file_drop::board::FileDropBoard;
+use ds::file_drop::drag::{DropAcceptance, FileDragInput};
 
 impl Harness {
     /// One step of a drag from outside the window (`FileDragInput::Entered`, `Offered`, `Moved`,

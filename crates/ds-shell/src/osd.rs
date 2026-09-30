@@ -10,13 +10,13 @@
 //! reads, the frame's `--f-*`, the material's `--m-*`, the stack and tint alpha); the card paints
 //! what a tinted root would on its own box. One root, not a painted root nested in a transparent
 //! one. The card's margin from its edge is `--osd-margin` (`osd.margin_px`,
-//! written by [`crate::OsdMetrics::style_attr`] on any element around it); a host sizes its
+//! written by [`crate::tokens::osd::OsdMetrics::style_attr`] on any element around it); a host sizes its
 //! surface to the card, its margins and the material's shadow, anchored to that edge.
 
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::level_indicator::{LevelIndicator, LevelStyle};
+use ds::root::common::Common;
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Shown;
 use ds_core::word::Word;

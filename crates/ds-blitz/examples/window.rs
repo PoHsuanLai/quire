@@ -7,12 +7,12 @@ use dioxus::prelude::*;
 use dioxus_native::use_window_event;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key, NamedKey};
-use ds::Answers;
-use ds::{
-    Anchor, Appearance, Availability, Button, Check, Ds, Material, Menu, MenuItem, Point, Px,
-    use_toast_hub,
-};
+use ds::components::controls::button_model::Answers;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::toast_hub::use_toast_hub;
 use ds_blitz::{AppConfig, AppId, launch};
+use ds_core::time::clock::sleep;
 use std::time::Duration;
 
 /// How long the window stays up on its own.
@@ -30,7 +30,7 @@ fn main() {
 fn App() -> Element {
     use_hook(|| {
         spawn(async {
-            ds::sleep(LIFETIME).await;
+            sleep(LIFETIME).await;
             std::process::exit(0);
         })
     });
@@ -64,7 +64,7 @@ fn Demo() -> Element {
         }
         if open() == Check::On {
             Menu {
-                placement: ds::MenuPlacement::Popup,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(24.0), y: Px(72.0) }),
                 items: entries(),
                 onpick: move |_: u8| open.set(Check::Off),

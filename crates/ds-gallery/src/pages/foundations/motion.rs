@@ -3,8 +3,11 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Anim, DelayToken, DurationToken, EasingToken, Fill, Iteration, MotionLevel, settle};
+use ds::prelude::*;
+use ds_motion::recipe::{Fill, Iteration};
+use ds_style::tokens::delay::DelayToken;
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::timing::DurationToken;
 use std::time::Duration;
 
 /// `170ms`, `5.2s`.

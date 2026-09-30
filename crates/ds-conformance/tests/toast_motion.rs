@@ -4,7 +4,8 @@
 //! undo token and dismisses it.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Button, Ds, Material, Point, Px, RootExtent, UndoToken, use_toasts};
+use ds::prelude::*;
+use ds::stack::toast_hub::UndoToken;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

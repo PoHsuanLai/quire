@@ -5,14 +5,15 @@
 //! button, and shows the layout the host hands back.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, RootChrome};
+use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::BatteryWidget;
+use ds_shell::widget::kind::Lift;
+use ds_shell::widget::timeline::Timeline;
 use ds_shell::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-use ds_shell::{
-    BatteryWidget, Lift, Timeline, Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize,
-    WidgetSlotGuide,
-};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

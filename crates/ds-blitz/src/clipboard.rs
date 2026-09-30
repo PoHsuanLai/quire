@@ -13,7 +13,7 @@
 use crate::memory_shell::MemoryShell;
 use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
-use ds::Pasted;
+use ds::host::pasted::Pasted;
 use std::cell::RefCell;
 use std::panic::{AssertUnwindSafe, catch_unwind};
 use std::rc::Rc;

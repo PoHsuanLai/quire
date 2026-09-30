@@ -1,13 +1,12 @@
 //! Files dragged in from outside the window (attachments dropped onto the
-//! composer), through the same `ds::FileDropBoard` and hit test the window's hook feeds: a target
+//! composer), through the same `ds::file_drop::board::FileDropBoard` and hit test the window's hook feeds: a target
 //! lights with `data-drop="target"` under the pointer and `accepts` elsewhere, the innermost
 //! target under a release hears its `ondrop` with the paths, and a URL lights nothing.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, DropAcceptance, Ds, FileDrag, FileDragInput, FileDrop, Material, Offer, Point,
-    use_file_drop,
-};
+use ds::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer};
+use ds::file_drop::hook::use_file_drop;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::path::PathBuf;
 
@@ -102,8 +101,8 @@ fn at(harness: &Harness, selector: &str) -> Point {
 fn composer_only(harness: &Harness) -> Point {
     let rect = harness.rect(".composer").expect("the composer is drawn");
     Point {
-        x: ds::Px(rect.origin.x.0 + rect.size.width.0 - 20.0),
-        y: ds::Px(rect.origin.y.0 + rect.size.height.0 - 10.0),
+        x: Px(rect.origin.x.0 + rect.size.width.0 - 20.0),
+        y: Px(rect.origin.y.0 + rect.size.height.0 - 10.0),
     }
 }
 

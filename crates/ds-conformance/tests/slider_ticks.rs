@@ -3,7 +3,8 @@
 //! marks are drawn where the value would stop.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Fraction, Material, Point, Px, ShortcutKey, Slider, Ticks};
+use ds::components::controls::slider_model::Ticks;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 

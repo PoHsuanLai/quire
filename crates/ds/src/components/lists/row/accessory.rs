@@ -2,7 +2,8 @@
 //! spinner in its place; a toggle's press and keys stay inside it, so flipping a row's switch
 //! never also runs the row.
 
-use crate::components::content::status::{battery::BatteryGlyph, battery_state::BatteryState};
+use crate::components::content::status::battery::BatteryGlyph;
+use crate::components::content::status::battery_state::BatteryState;
 use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;

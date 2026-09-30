@@ -6,7 +6,7 @@
 
 use crate::tokens::control_center::CONTROL_CENTER;
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::geometry::units::Px;
 
 /// How many equal columns the grid has; at least one (a zero is read as one).

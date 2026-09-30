@@ -1,7 +1,7 @@
 //! The root `launch` runs: the app, plus what a window host owes quire.
 //!
 //! - The input modality (spike S12): every key press (other than a lone modifier) makes it
-//!   `keyboard`, every pointer press makes it `pointer`; `Ds` reads it through `ds::HostSignals`
+//!   `keyboard`, every pointer press makes it `pointer`; `Ds` reads it through `ds::prelude::HostSignals`
 //!   and stamps `data-modality`.
 //! - The document's providers become the app's (`crate::install`): the net policy, for the
 //!   document and every frame it builds, waking the shell to paint when a resource lands
@@ -20,13 +20,13 @@
 //!   (`crate::edit_ime`).
 //! - Before each frame, the viewport's colour scheme (and the window's decorations) follow the
 //!   scheme the root `.ds` resolved.
-//! - The window itself, as `ds::WindowHost` over [`crate::window::WinitWindow`]: a frame's
+//! - The window itself, as `ds::prelude::WindowHost` over [`crate::window::WinitWindow`]: a frame's
 //!   titlebar moves, resizes, zooms, minimizes and closes it; its state is re-read on every
 //!   resize and focus change, so the frame redraws when the window is zoomed or deactivated.
 //! - Files dragged in from outside (winit's data-transfer events, which blitz-shell ignores), as
-//!   `ds::FileDropBoard`: the drag is hit-tested through the document and the target under a
+//!   `ds::file_drop::board::FileDropBoard`: the drag is hit-tested through the document and the target under a
 //!   release hears its `ondrop` (`crate::window_drop`, `crate::drop_hit`).
-//! - The window's scale factor, in `ds::HostSignals`, so `Ds` writes the pixel tokens for it and a
+//! - The window's scale factor, in `ds::prelude::HostSignals`, so `Ds` writes the pixel tokens for it and a
 //!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
 //!   fractional scale a line may still start half-way through a device pixel here.
@@ -60,7 +60,10 @@ use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
 use dioxus_native::winit::window::Theme;
 use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
-use ds::{Activity, FileDropBoard, HostSignals, InputModality, Scale};
+use ds::file_drop::board::FileDropBoard;
+use ds::prelude::*;
+use ds::window::host::use_window_host_provider;
+use ds_core::vocab::{Activity, InputModality};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -151,7 +154,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let shell = use_hook(consume_context::<Arc<dyn ShellProvider>>);
     let framed = {
         let window = Arc::clone(&window);
-        ds::use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
+        use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
     };
     let seen = Rc::clone(&document);
     let held = use_hook(|| Rc::new(std::cell::Cell::new(keyboard_types::Modifiers::empty())));
@@ -294,7 +297,7 @@ fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
     }
 }
 
-/// A winit scale factor in 120ths, the unit `ds::Scale` shares with the Wayland protocol.
+/// A winit scale factor in 120ths, the unit `ds::prelude::Scale` shares with the Wayland protocol.
 fn scale_of(factor: f64) -> Scale {
     Scale((factor * f64::from(Scale::DENOMINATOR)).round().max(1.0) as u32)
 }

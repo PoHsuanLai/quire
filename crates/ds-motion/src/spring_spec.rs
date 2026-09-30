@@ -46,7 +46,7 @@ impl SpringResponse {
 /// ```
 /// use ds::detail::Touch;
 /// use ds::motion::{Ratio, SpringResponse, SpringSpec};
-/// use ds::MotionLevel;
+/// use ds::prelude::*;
 ///
 /// let remote = SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick);
 /// assert_eq!(remote.spring(1.0, MotionLevel::Standard).damping(), Ratio::CRITICAL);

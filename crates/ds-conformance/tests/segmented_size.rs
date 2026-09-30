@@ -3,9 +3,10 @@
 //! (14, 17, 20, 26), all whole pixels, at scale 1 and 2. Measured on the laid-out rects.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, SegmentedControl};
-use ds::{Choice, ControlSize, Tracking};
+use ds::components::controls::segmented::Tracking;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 #[allow(non_snake_case)]

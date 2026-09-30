@@ -3,7 +3,8 @@
 
 use crate::date_picker::calendar::days_in_month;
 use crate::month_grid::data::DayKey;
-use ds::{StepDirection, StepRange, Word};
+use ds::components::fields::stepper::model::{StepDirection, StepRange};
+use ds::prelude::*;
 
 /// How the picker is drawn (`NSDatePicker.Style`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
@@ -146,7 +147,7 @@ impl DateValue {
 mod tests {
     use super::{DateValue, Segment, TimeOfDay};
     use crate::month_grid::data::DayKey;
-    use ds::StepDirection;
+    use ds::components::fields::stepper::model::StepDirection;
 
     fn value(year: i16, month: i8, day: i8, hour: u8, minute: u8) -> DateValue {
         DateValue {

@@ -4,10 +4,11 @@
 //! its own root, as CONSUMING.md "palette follow-ups" says.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Menu, Rect, ShortcutKey,
-    use_focus_request,
-};
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::focus::request::use_focus_request;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -21,8 +22,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title.to_string())
+fn item(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title.to_string())
 }
 
 /// Whether `event` is the actions key, Ctrl+K.
@@ -51,7 +52,7 @@ fn Launcher() -> Element {
                         placeholder: "Search".to_string(),
                         query: String::new(),
                         tokens: Vec::new(),
-                        groups: vec![ds::PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
+                        groups: vec![PaletteGroup::list("Applications", vec![item(1, "Files"), item(2, "Firefox")])],
                         empty: "Nothing".to_string(),
                         oninput: move |_| {},
                         onpick: move |_| {},
@@ -73,9 +74,9 @@ fn Launcher() -> Element {
                 }
                 if let (true, Some(rect)) = (actions(), row()) {
                     Menu::<u8> {
-                        placement: ds::MenuPlacement::Popup,
+                        placement: MenuPlacement::Popup,
                         anchor: Anchor::Rect(rect),
-                        items: vec![ds::MenuItem::new(9, "Open"), ds::MenuItem::new(10, "Quit")],
+                        items: vec![MenuItem::new(9, "Open"), MenuItem::new(10, "Quit")],
                         onpick: move |_| {},
                         onclose: move |()| {
                             actions.set(false);

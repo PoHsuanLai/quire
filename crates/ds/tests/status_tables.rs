@@ -1,11 +1,12 @@
 //! design/26: the status glyphs' moment tables as data, and the quantising each compares on
 //! (R2). Every (from, to) row of the catalogue's section 5.1 is here.
 
-use ds::detail::{EventStamp, Moment, first_table, moment_table};
-use ds::{
-    BatteryPower, BatteryState, BluetoothState, Fraction, LowAt, StatusState, VolumeState,
-    VolumeWaves, WifiBars, WifiReach, WifiState,
-};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::content::status::bluetooth_state::BluetoothState;
+use ds::components::content::status::volume::{VolumeState, VolumeWaves};
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
+use ds::detail::{EventStamp, first_table, moment_table};
+use ds::prelude::*;
 
 const ONE: EventStamp = EventStamp(1);
 const TWO: EventStamp = EventStamp(2);

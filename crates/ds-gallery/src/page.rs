@@ -1,6 +1,6 @@
 //! The gallery's pages.
 
-use ds::Word;
+use ds::prelude::*;
 
 /// One gallery page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

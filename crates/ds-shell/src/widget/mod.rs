@@ -8,21 +8,21 @@
 //! A trait and not an enum, unlike the closed vocabularies elsewhere: the set of widgets is
 //! open (every app may bring its own), and each kind has its own entry type.
 
-pub(crate) mod battery;
-pub(crate) mod calendar;
+pub mod battery;
+pub mod calendar;
 pub(crate) mod card;
-pub(crate) mod clock;
-pub(crate) mod contract;
+pub mod clock;
+pub mod contract;
 pub(crate) mod frame;
 pub(crate) mod gallery;
 pub(crate) mod gallery_book;
 pub(crate) mod gallery_rows;
 pub mod kind;
 pub(crate) mod layout;
-pub(crate) mod registry;
+pub mod registry;
 pub(crate) mod scope;
 pub(crate) mod slot;
-pub(crate) mod timeline;
+pub mod timeline;
 pub(crate) mod use_widget;
 pub(crate) mod wire;
 

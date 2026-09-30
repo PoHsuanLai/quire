@@ -54,7 +54,7 @@ impl FieldHandle {
         let _ = field.try_write().map(|mut slot| *slot = Some(target));
     }
 
-    /// The field's element, once mounted: for `ds::focus_soon`, a measurement or a scroll.
+    /// The field's element, once mounted: for `crate::focus::soon::focus_soon`, a measurement or a scroll.
     /// Read in render, it re-renders the reader as the field mounts.
     pub fn element(&self) -> Option<Rc<MountedData>> {
         self.field

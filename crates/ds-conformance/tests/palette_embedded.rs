@@ -6,13 +6,13 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, ExternalIcon, FocusRequest,
-    IconSize, IconSource, IconUrl, Material, Menu, MenuItem, MenuPlacement, PaletteGroup,
-    PaletteRow, Px, Rect, RowLeading, ShortcutKey, use_focus_request,
-};
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::focus::request::{FocusRequest, use_focus_request};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_style::icon::url::IconUrl;
 use probe::rect;
 use std::time::Duration;
 

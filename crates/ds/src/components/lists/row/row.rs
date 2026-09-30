@@ -8,7 +8,8 @@ use crate::components::controls::disclosure::{Collapsing, indicator};
 use crate::components::controls::key_equivalent::KeyStyle;
 use crate::components::controls::press::PressListeners;
 use crate::components::lists::row::accessory::{self, Accessory};
-use crate::components::lists::row::action::{RowAction, trailing as action_button};
+use crate::components::lists::row::action::RowAction;
+use crate::components::lists::row::action::trailing as action_button;
 use crate::components::lists::row::chord::{RowChord, shown_chord};
 use crate::components::lists::row::leading::{self, RowLeading};
 use crate::components::lists::row::marks::marked;
@@ -20,6 +21,7 @@ use crate::focus::click::kept_click;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
+use ds_core::vocab::Availability;
 use ds_core::vocab::{Emphasis, FocusStyle, RowState, Shown};
 use ds_core::word::Word;
 
@@ -129,7 +131,7 @@ pub fn Row(
         availability,
         drop,
     } = state;
-    let live = availability == ds_core::vocab::Availability::Enabled;
+    let live = availability == Availability::Enabled;
     let listen = onclick.map(PressListeners::new);
     let words = match content {
         Some(content) => rsx! {

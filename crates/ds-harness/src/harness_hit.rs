@@ -5,7 +5,7 @@
 use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
 use blitz_dom::{BaseDocument, NodeId};
-use ds::Point;
+use ds::prelude::*;
 
 impl Harness {
     /// Whether a press at `at` would target the first element matching `selector` or something

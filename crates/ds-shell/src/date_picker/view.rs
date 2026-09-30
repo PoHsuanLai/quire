@@ -16,7 +16,11 @@ use crate::month_grid::MonthGrid;
 use crate::month_grid::data::{MonthKey, MonthStep, WeekNumbers};
 use crate::month_grid::density::MonthDensity;
 use dioxus::prelude::*;
-use ds::{Availability, Common, ControlSize, Readout, StepDirection, Stepper, Word};
+use ds::components::fields::stepper::model::{Readout, StepDirection};
+use ds::components::fields::stepper::view::Stepper;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The segments `elements` shows, in reading order.
 fn segments(elements: Elements) -> Vec<Segment> {

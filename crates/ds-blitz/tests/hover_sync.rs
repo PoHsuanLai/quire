@@ -5,10 +5,12 @@
 //! harness's frame now dispatches that change (`blitz_kit::hover`).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard};
+use ds_shell::notifications::banner_stack::{Banner, BannerKey};
+use ds_shell::notifications::parts::AppMark;
+use ds_shell::prelude::*;
 use std::cell::RefCell;
 use std::time::Duration;
 

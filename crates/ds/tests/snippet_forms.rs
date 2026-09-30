@@ -2,7 +2,10 @@
 //! form draws the snippet it was given, or none.
 
 use dioxus::prelude::*;
-use ds::{Emphasis, RowState, RunTone, Selection, TextLine, TextRun, ThreadRow};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 
 /// A `ThreadRow` with everything fixed but its snippet, written as the expression given.
 macro_rules! row {

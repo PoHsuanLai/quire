@@ -6,11 +6,18 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Chip, ChipVariant, Common, EditHandle, EditInput, EditKind, EditPointer, EditSurface,
-    FRAME_SLACK, PointerPhase, Probe, Rect, Spell, TextPosition, sleep, use_edit_handle,
-};
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::edit::handle::{EditHandle, use_edit_handle};
+use ds::edit::input::EditInput;
+use ds::edit::pointer::EditPointer;
+use ds::host::captured::PointerPhase;
+use ds::host::position::{EditKind, TextPosition};
+use ds::host::probe::Probe;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::spell::lang::Spell;
+use ds_core::time::FRAME_SLACK;
+use ds_core::time::clock::sleep;
 
 /// How many frames the caret waits for a layout before giving up.
 const PLACE_ATTEMPTS: usize = 8;
@@ -78,7 +85,7 @@ async fn place(handle: EditHandle, at: &TextPosition) -> Option<Rect> {
             (handle.caret_rect(at), handle.bounds())
         {
             return Some(Rect {
-                origin: ds::Point {
+                origin: Point {
                     x: caret.origin.x - bounds.origin.x,
                     y: caret.origin.y - bounds.origin.y,
                 },

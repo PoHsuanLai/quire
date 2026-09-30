@@ -16,10 +16,11 @@ mod rows;
 mod tiles;
 
 use dioxus::prelude::*;
-use ds::GlyphProps;
-use ds::Word;
-use ds::{Glyph, Icon, IconSize};
+use ds::prelude::*;
 use ds_lint::{LintConfig, Profile, markup};
+use ds_motion::pane_slide::Pane;
+use ds_style::icon::render::Glyph;
+use ds_style::icon::render::GlyphProps;
 
 /// `icon` at the bar's 22 px, rendered alone.
 fn glyph(icon: Icon) -> String {
@@ -89,7 +90,7 @@ fn part_markup(case: panels::PartCase) -> String {
     dioxus_ssr::render(&dom)
 }
 
-fn pane_markup(shown: ds::Pane) -> String {
+fn pane_markup(shown: Pane) -> String {
     let mut dom = VirtualDom::new_with_props(panes::panes, panes::PaneProps { shown });
     dom.rebuild_in_place();
     dioxus_ssr::render(&dom)

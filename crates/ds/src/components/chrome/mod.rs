@@ -8,5 +8,5 @@ pub mod split_view;
 pub mod tab_view;
 pub mod titlebar_parts;
 pub mod toolbar;
-pub(crate) mod traffic_lights;
+pub mod traffic_lights;
 pub mod window_frame;

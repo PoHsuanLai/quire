@@ -2,10 +2,11 @@
 //! disabled row, and a list of three networks in both schemes.
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, Availability, Check, Ds, Icon, Inject, List, ListItem, Material, Row,
-    RowLeading, RowSize, RowState, RunTone, TextLine, TextRun, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::text_runs::RunTone;
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 
 /// Which specimen.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

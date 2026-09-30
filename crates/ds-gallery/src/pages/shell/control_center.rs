@@ -9,20 +9,23 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::Section;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::Availability;
-use ds::Bezel;
-use ds::{
-    Accent, Arrangement, Choice, Fraction, LevelGlyph, Muting, Px, RadioGroup, SectionHeader,
-    SegmentedControl, Tracking, Word,
-};
-use ds::{
-    Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Icon, Inject, List, ListItem,
-    Material, Pane, PaneSwitcher, RootChrome, Row, RowLeading, RowSize, TextLine, Theme,
-    default_look,
-};
-use ds::{Slider, SliderLook};
-use ds_shell::ModulePanel;
-use ds_shell::{ModuleGrid, ModuleTile, TileSpan};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::button_model::Bezel;
+use ds::components::controls::radio_group::Arrangement;
+use ds::components::controls::segmented::Tracking;
+use ds::components::controls::slider_model::SliderLook;
+use ds::components::lists::preview::switcher::PaneSwitcher;
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_core::press::Press;
+use ds_core::vocab::Muting;
+use ds_motion::pane_slide::Pane;
+use ds_shell::control_center::module_tile_kind::TileSpan;
+use ds_shell::prelude::*;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::default_look;
 
 /// The module whose detail a chevron opened.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -79,7 +82,7 @@ fn Panel(theme: Theme, posed: Pane) -> Element {
         div { class: "g-cc",
             Ds {
                 appearance: Appearance { theme, accent, motion },
-                look: ds::SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
+                look: SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
                 material: Material::Popover,
                 blur,
                 stylesheet: Inject::Host,
@@ -124,8 +127,8 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
                     Slider { label: "Volume", value: volume(), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::CapsuleKnob, onchange: move |next| volume.set(next) }
                 }
                 // A level that cannot move (no brightness control on this display) says so.
-                ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: ds::Availability::Disabled,
-                    Slider { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: SliderLook::CapsuleKnob, availability: ds::Availability::Disabled }
+                ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "0%" }, availability: Availability::Disabled,
+                    Slider { label: "Brightness", value: Fraction(0), glyph: LevelGlyph::Brightness, look: SliderLook::CapsuleKnob, availability: Availability::Disabled }
                 }
                 ModulePanel {
     div { style: "display:grid;gap:14px",
@@ -134,7 +137,7 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
                             label: "Theme",
                             choices: Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label()))),
                             tracking: Tracking::SelectOne(appearance().theme),
-                            onchange: move |theme| appearance.set(ds::Appearance { theme, ..appearance() }),
+                            onchange: move |theme| appearance.set(Appearance { theme, ..appearance() }),
                         }
                         SectionHeader { title: "Accent" }
                         RadioGroup::<Accent> {
@@ -142,7 +145,7 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
                             arrangement: Arrangement::Swatches,
                             choices: Accent::ALL.iter().map(|accent| Choice::accent(*accent)).collect(),
                             value: appearance().accent,
-                            onchange: move |accent| appearance.set(ds::Appearance { accent, ..appearance() }),
+                            onchange: move |accent| appearance.set(Appearance { accent, ..appearance() }),
                         }
                     }
                 }
@@ -152,7 +155,7 @@ fn Modules(on_open: EventHandler<Module>) -> Element {
 
 /// The detail pane: a back button and the module's list.
 #[component]
-fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
+fn Detail(module: Module, on_back: EventHandler<Press>) -> Element {
     let mut chosen = use_signal(|| 0usize);
     let mut headphones = use_signal(|| Check::On);
     let check = move |index: usize| {

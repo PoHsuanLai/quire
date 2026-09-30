@@ -2,7 +2,8 @@
 //! of a row's exit, and the ghost at each moment of a drag.
 
 use super::*;
-use ds::Word;
+use ds::prelude::*;
+use ds_motion::drag::DRAG_THRESHOLD;
 
 /// The list's markup at each moment of a key's arrival and exit, and each moment's presences.
 #[test]
@@ -54,7 +55,7 @@ struct NoProps {}
 /// A drag of thread 7 over one registered place, drawn as the consumer draws it: the ghost only
 /// while the drag is live, at the pointer.
 fn dragging(_: NoProps) -> Element {
-    let drag: DragTracker<u32> = use_drag(ds::DRAG_THRESHOLD);
+    let drag: DragTracker<u32> = use_drag(DRAG_THRESHOLD);
     use_context_provider(|| drag);
     rsx! {
         if let DragPhase::Live { at, target, .. } = drag.phase() {

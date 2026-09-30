@@ -2,10 +2,8 @@
 //! keyboard, the pointer only asks; a menu's own cursor is heard as it moves.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Ds, FieldFocus, Material, Menu, MenuCursor, MenuItem, MenuPlacement, Point,
-    Px, ShortcutKey, TextField,
-};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

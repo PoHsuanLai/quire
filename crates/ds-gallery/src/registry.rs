@@ -225,7 +225,7 @@ pub fn entry(page: Page) -> &'static Entry {
 mod tests {
     use super::REGISTRY;
     use crate::page::Page;
-    use ds::Word;
+    use ds::prelude::*;
 
     #[test]
     fn every_page_has_exactly_one_entry_in_the_page_order() {

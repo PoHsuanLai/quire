@@ -3,7 +3,7 @@
 //! device: the ring at the top left, the percentage as the card's hero figure. Small with
 //! several: a 2 x 2 grid of rings, no numbers, an empty place a bare track. Medium: a row of up
 //! to four rings, the percentage under each. Each ring holds the device's filled glyph
-//! ([`crate::DeviceGlyph`]).
+//! ([`crate::battery::device_glyph::DeviceGlyph`]).
 
 use crate::battery::device_glyph::{Device, DeviceGlyph};
 use crate::battery::ring::{BatteryRing, percent_text};
@@ -11,8 +11,8 @@ use crate::widget::contract::{NoIntent, Widget, WidgetContext, WidgetKind};
 use crate::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;
 use ds::components::content::label::{Label, LabelStyle};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
 use ds::components::content::text_runs::TextLine;
-use ds::{BatteryPower, BatteryState, LowAt};
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 use ds_style::icon::render::IconSize;

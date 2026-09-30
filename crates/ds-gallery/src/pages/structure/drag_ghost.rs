@@ -3,7 +3,10 @@
 use crate::axes::{Axes, Showcase};
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{Button, Check, ControlSize, DragCount, DragGhost, Point, Press, Px};
+use ds::components::overlays::drag_ghost::DragCount;
+use ds::prelude::*;
+use ds_core::press::Press;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The DragGhost section.
 #[component]

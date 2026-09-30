@@ -7,7 +7,7 @@
 //! with a note, where the font is not installed.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;
 

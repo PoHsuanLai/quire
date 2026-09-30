@@ -5,7 +5,7 @@
 //! click on a row. Blitz instead clears the focus (`events/pointer.rs`, `handle_click`'s
 //! "nothing matched"), and every later key goes to the document's root. The host owns the fix:
 //! the root's click handler, which runs after every handler inside it, hands the click to
-//! the host's [`ClickFocusHost`](crate::ClickFocusHost), which a host has unless the app asked
+//! the host's [`ClickFocusHost`](crate::host::parts::ClickFocusHost), which a host has unless the app asked
 //! for Blitz's own behaviour.
 //! A click whose default a component already took (an `EditSurface` focusing itself) is left to
 //! that component.
@@ -18,7 +18,7 @@
 //! afterwards, as a pressed button does in a browser. With the default left to run, Blitz clears
 //! the focus after the handlers, so the click goes through the host exactly as the root's does.
 //! With the default prevented, Blitz leaves the focus where it was, so the host's
-//! [`ClickFocusHost::press`](crate::ClickFocusHost::press) moves it now, inside the click, and a handler's own later focus (a
+//! [`ClickFocusHost::press`](crate::host::parts::ClickFocusHost::press) moves it now, inside the click, and a handler's own later focus (a
 //! `focus_soon`) still wins.
 
 use crate::focus::soon::retry_busy;

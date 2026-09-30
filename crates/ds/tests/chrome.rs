@@ -9,11 +9,12 @@ mod golden;
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Appearance, BlurState, Corner, Ds, Ground, Inject, Material, PRESETS, Px, RootChrome,
-    SpaceLook, Surface, Theme,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds::root::chrome::Ground;
+use ds_style::appearance::blur::BlurState;
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::shape::Corner;
 
 #[derive(Props, Clone, PartialEq)]
 struct Setup {

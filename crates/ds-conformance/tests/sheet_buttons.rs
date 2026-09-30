@@ -4,9 +4,10 @@
 //! darkest ink is far lighter than the same button's enabled.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Availability, Button, Ds, Icon, Material};
-use ds::{Bezel, ButtonRole, ControlSize, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ButtonRole, ImagePosition};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

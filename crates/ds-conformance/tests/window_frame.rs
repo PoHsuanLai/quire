@@ -8,13 +8,13 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::ImagePosition;
-use ds::{
-    Appearance, Ds, DurationToken, EasingToken, Fraction, Icon, Material, MotionLevel, PRESETS,
-    SpaceLook, Theme,
-};
+use ds::components::controls::button_model::ImagePosition;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Viewport};
-use ds_shell::MenuBarItem;
+use ds_shell::prelude::*;
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::timing::DurationToken;
 use image::RgbaImage;
 use probe::{distance, keep};
 use std::time::Duration;

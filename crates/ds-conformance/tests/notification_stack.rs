@@ -4,10 +4,13 @@
 //! hears its key; the banners before it never move; an empty stack reports every key.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Ds, Icon, IconSource, Material, MotionLevel, Point, Px, settle};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::{AppMark, Banner, BannerKey, BannerStack, NotificationCard, NotificationSwipe};
+use ds_shell::notifications::banner_stack::{Banner, BannerKey};
+use ds_shell::notifications::parts::AppMark;
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

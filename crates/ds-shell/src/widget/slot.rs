@@ -6,7 +6,7 @@
 
 use crate::widget::kind::{WidgetHost, WidgetSize};
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
 

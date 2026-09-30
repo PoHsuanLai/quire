@@ -10,7 +10,9 @@
 //! browser lights nothing and is refused. Escape or closing the window quits.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, FileDrag, FileDrop, Material, use_file_drop};
+use ds::file_drop::drag::{FileDrag, FileDrop};
+use ds::file_drop::hook::use_file_drop;
+use ds::prelude::*;
 use ds_blitz::{AppConfig, AppId, launch};
 
 fn main() {

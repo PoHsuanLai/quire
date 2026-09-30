@@ -11,11 +11,13 @@ mod golden;
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Inject, Material, RootChrome};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{
-    MonthDensity, MonthGrid, MonthStep, WeekNumbers, WidgetFrame, WidgetMetrics, WidgetSize,
-};
+use ds_shell::month_grid::data::{MonthStep, WeekNumbers};
+use ds_shell::month_grid::density::MonthDensity;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
 use month_sample::{AUGUST, First, sample};
 
 /// One specimen.

@@ -5,10 +5,11 @@
 //! when it is asked for.
 
 use dioxus::prelude::*;
-use ds::{
-    Align, Anchor, Appearance, Arrow, Dismiss, Ds, Flip, Material, Placement, Point, Popover, Px,
-    RootExtent, ShortcutKey, Side,
-};
+use ds::components::overlays::popover::Arrow;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds_core::geometry::placement::{Align, Flip, Side};
+use ds_core::vocab::Dismiss;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;

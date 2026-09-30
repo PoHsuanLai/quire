@@ -7,7 +7,7 @@
 //! Reduced's length.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Ds, List, ListItem, Material, Motion, MotionLevel, settle};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::cell::{Cell, RefCell};
 use std::time::Duration;

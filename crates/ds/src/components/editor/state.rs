@@ -1,4 +1,4 @@
-//! What an [`EditSurface`](crate::EditSurface) remembers between events, none of it drawn: the
+//! What an [`EditSurface`](crate::components::editor::surface::EditSurface) remembers between events, none of it drawn: the
 //! composition, the press in progress, the last press (for double clicks), whether it holds the
 //! keyboard, its element and its IME registration. Kept in cells, not signals: changing any of it
 //! must not re-render the app's content.
@@ -81,7 +81,7 @@ impl SurfaceState {
 }
 
 /// Run a host write against `element` from a task of the calling scope, a frame later whenever
-/// the document is busy (the same wait `ds::focus_soon` makes).
+/// the document is busy (the same wait `crate::focus::soon::focus_soon` makes).
 pub(crate) fn write_soon(
     host: Rc<dyn DocumentHost>,
     element: Rc<MountedData>,

@@ -3,11 +3,9 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Answers, Availability, Bezel, Button, ButtonRole, Check, ControlSize, Icon, ImagePosition,
-    Shown,
-};
+use ds::components::controls::button_model::{Answers, Bezel, ButtonRole, ImagePosition};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The Button section.
 #[component]

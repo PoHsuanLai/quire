@@ -2,8 +2,9 @@
 //! ending at 0 frames (R3), and under Reduced motion (R7).
 
 use dioxus::prelude::*;
+use ds::components::content::status::wifi_state::{WifiBars, WifiReach, WifiState};
 use ds::detail::EventStamp;
-use ds::{Appearance, Ds, Material, Motion, WifiBars, WifiGlyph, WifiReach, WifiState};
+use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;

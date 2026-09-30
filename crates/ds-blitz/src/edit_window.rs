@@ -5,7 +5,8 @@
 
 use dioxus_native::winit::event::{ButtonSource, ElementState, MouseButton, WindowEvent};
 use dioxus_native::winit::keyboard::ModifiersState;
-use ds::{CapturedPointer, Point, PointerPhase, Px};
+use ds::host::captured::{CapturedPointer, PointerPhase};
+use ds::prelude::*;
 use keyboard_types::Modifiers;
 
 /// The capture event a winit event makes, at display scale `scale`, with `held` modifiers.

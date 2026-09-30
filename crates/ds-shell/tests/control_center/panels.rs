@@ -2,13 +2,17 @@
 //! level in each scheme, a bare one, a three-column `ModuleGrid`, and the compact picker.
 
 use dioxus::prelude::*;
-use ds::Check;
-use ds::{
-    Accent, Appearance, Arrangement, Choice, Ds, Fraction, Icon, Inject, LevelGlyph, Material,
-    Muting, Px, RadioGroup, SectionHeader, SegmentedControl, Theme, Tracking, Word,
-};
-use ds::{Slider, SliderLook};
-use ds_shell::{GridColumns, ModuleGrid, ModulePanel, ModuleTile, PanelPlate, TileSpan};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::radio_group::Arrangement;
+use ds::components::controls::segmented::Tracking;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_shell::control_center::module_grid::GridColumns;
+use ds_shell::control_center::module_panel::PanelPlate;
+use ds_shell::control_center::module_tile_kind::TileSpan;
+use ds_shell::prelude::*;
 
 /// One specimen of this file.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -8,13 +8,15 @@ use crate::level_sheet::stacked;
 use crate::pages::shell::level_tile::work;
 use crate::style;
 use dioxus::prelude::*;
-use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, Material, Muting, Point, Px,
-    RootChrome, Shown, Theme,
-};
-use ds::{Slider, SliderLook};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_shell::{Osd, OsdPosition};
+use ds_shell::osd::OsdPosition;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
 use image::{RgbaImage, imageops};
 use std::time::Duration;
 

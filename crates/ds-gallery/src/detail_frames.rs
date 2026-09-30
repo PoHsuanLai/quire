@@ -8,9 +8,9 @@ use crate::details_views::{NetView, ShakeView, SlashView};
 use crate::error::GalleryError;
 use crate::style;
 use dioxus::prelude::*;
-use ds::Word;
+use ds::assembly::ds::Inject;
 use ds::detail::{EventStamp, Slashed};
-use ds::{Appearance, Ds, Inject, Material, Theme};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use image::{RgbaImage, imageops};
 use std::path::Path;
@@ -95,7 +95,7 @@ fn frames(strip: Strip) -> Vec<RgbaImage> {
 }
 
 /// `picture` cropped to the specimen with a margin.
-fn crop(picture: &RgbaImage, rect: Option<ds::Rect>, scale: f32) -> RgbaImage {
+fn crop(picture: &RgbaImage, rect: Option<Rect>, scale: f32) -> RgbaImage {
     let Some(rect) = rect else {
         return picture.clone();
     };

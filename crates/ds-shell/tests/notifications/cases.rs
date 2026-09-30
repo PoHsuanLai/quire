@@ -1,15 +1,14 @@
 //! The notification parts' specimens, each in a Toast root of its scheme.
 
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{
-    Appearance, Ds, Icon, IconSource, Inject, Material, Px, Rich, RichRun, RichText, RootExtent,
-    RunTone, Shown, SidePanel, TextRun, Theme,
-};
-use ds_shell::{
-    AppMark, Banner, BannerKey, BannerPosition, BannerStack, CardAction, GroupCount, GroupHeader,
-    NotificationCard, StackLayers,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::rich_text::{Rich, RichRun, RichText};
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_shell::notifications::banner_stack::{Banner, BannerKey, BannerPosition};
+use ds_shell::notifications::parts::{AppMark, CardAction, GroupCount, StackLayers};
+use ds_shell::prelude::*;
 
 /// A specimen: its golden name and how it is made.
 pub type Specimen = (&'static str, fn() -> Element);

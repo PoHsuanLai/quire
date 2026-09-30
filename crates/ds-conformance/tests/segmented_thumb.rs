@@ -21,14 +21,13 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Accent, Appearance, Arrangement, Ds, Material, RadioGroup, Rect, SectionHeader,
-    SegmentedControl, Theme,
-};
-use ds::{Choice, ControlSize, Tracking};
+use ds::components::controls::radio_group::Arrangement;
+use ds::components::controls::segmented::Tracking;
+use ds::prelude::*;
+use ds_core::time::FRAME_TICK;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
-use ds_shell::{ModuleGrid, ModulePanel};
+use ds_shell::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 use probe::{distance, rect};
 use std::cell::Cell;
 use std::time::Duration;
@@ -48,7 +47,7 @@ const GROUPS: [&str; 3] = [
 const LEGIBLE: f32 = 4.5;
 
 /// A frame of the spring driver.
-const FRAME: Duration = ds::FRAME_TICK;
+const FRAME: Duration = FRAME_TICK;
 
 /// Frames that let a Quick spring come to rest from two segments away.
 const SETTLE_FRAMES: usize = 40;

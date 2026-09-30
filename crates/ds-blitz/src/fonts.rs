@@ -1,4 +1,4 @@
-//! Registering `ds::FACES` with the renderer's shared font context, once (spike S11), through
+//! Registering `ds_style::fonts::FACES` with the renderer's shared font context, once (spike S11), through
 //! `blitz_kit::fonts::SharedFonts`.
 //!
 //! The base context (system fonts, blitz's list-bullet face and every quire face) is built once
@@ -6,6 +6,7 @@
 //! document resolves the same registered families without registering or parsing them again.
 
 use blitz_kit::fonts::{FontFaces, SharedFonts};
+use ds_style::fonts::FACES;
 use std::sync::LazyLock;
 
 /// The context every document starts from, built on first use.
@@ -13,7 +14,7 @@ static BASE: LazyLock<SharedFonts> = LazyLock::new(|| SharedFonts::system_with(&
 
 /// Every quire face's bytes.
 fn faces() -> FontFaces {
-    FontFaces(ds::FACES.iter().map(|face| face.bytes).collect())
+    FontFaces(FACES.iter().map(|face| face.bytes).collect())
 }
 
 /// A font context with the system fonts and every quire face registered: what `launch`,
@@ -27,8 +28,8 @@ pub fn font_context() -> parley::FontContext {
 mod tests {
     use super::{faces, font_context};
     use blitz_kit::fonts::SharedFonts;
-    use ds::Word;
-    use ds::{Family, Typeface};
+    use ds::prelude::*;
+    use ds_style::tokens::type_scale::Family;
 
     /// Every family name a token's `font-family` stack leads with, in either typeface: Inter,
     /// Inter Display, Bricolage Grotesque, Karla, Space Mono, Noto Serif.

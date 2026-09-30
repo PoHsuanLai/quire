@@ -3,11 +3,17 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Availability, BatteryPower, BatteryState, Check, ClipBody, DropState, Emphasis,
-    Fraction, Icon, List, ListItem, ListStyle, Row, RowAction, RowChord, RowLeading, RowShape,
-    RowSize, RowState, Selection, Shortcut, ShortcutKey, TextLine,
-};
+use ds::components::content::avatar::AvatarFace;
+use ds::components::content::avatar::AvatarShape;
+use ds::components::content::avatar::AvatarSize;
+use ds::components::content::avatar::AvatarTone;
+use ds::components::content::avatar::PersonHue;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState};
+use ds::components::lists::list::model::ListStyle;
+use ds::components::lists::row::shape::{ClipBody, RowShape};
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 
 /// One row of a specimen list: `key`, its `Row`.
 fn item(key: &'static str, row: Element) -> ListItem<&'static str> {
@@ -72,11 +78,11 @@ fn Accessories() -> Element {
 /// Every leading element and both heights.
 #[component]
 fn Leadings() -> Element {
-    let person = ds::AvatarFace {
+    let person = AvatarFace {
         initial: 'D',
-        size: ds::AvatarSize::Size18,
-        tone: ds::AvatarTone::Person(ds::PersonHue::of("Dana")),
-        shape: ds::AvatarShape::Round,
+        size: AvatarSize::Size18,
+        tone: AvatarTone::Person(PersonHue::of("Dana")),
+        shape: AvatarShape::Round,
     };
     let row = |title: &'static str, size: RowSize, leading: RowLeading| {
         item(

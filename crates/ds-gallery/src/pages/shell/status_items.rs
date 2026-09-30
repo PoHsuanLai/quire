@@ -7,10 +7,13 @@ use crate::axes::Axes;
 use crate::pages::{Scope, Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{Badge, BadgeContent, BadgeTone, ControlSize};
-use ds::{Bezel, ImagePosition};
-use ds::{BlurState, Button, Check, Icon, Material, Px, Shown, StatusMetrics, use_scope};
-use ds_shell::MenuBarItem;
+use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::status::StatusMetrics;
 
 /// The two metrics a shell writes from its settings: the keys' defaults (a 22 px box, a 16 px
 /// glyph), and `bar.glyph_size_policy = IconSizeBar22`, where the glyph fills the box.
@@ -50,7 +53,7 @@ pub fn StatusItems() -> Element {
                                     MenuBarItem { image: ImagePosition::Only, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} }
                                     MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", shown: Shown::Visible, onclick: |_| {} }
                                     MenuBarItem { image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", value: Some(Check::On), onclick: |_| {} }
-                                    MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryCharging, label: "Battery", availability: ds::Availability::Disabled, onclick: |_| {} }
+                                    MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryCharging, label: "Battery", availability: Availability::Disabled, onclick: |_| {} }
                                     Badge { content: BadgeContent::Number(3), tone: BadgeTone::Quiet, size: ControlSize::Mini}
                                     span { class: "ds-tabular", "09:41" }
                                 }

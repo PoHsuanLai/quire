@@ -3,7 +3,9 @@
 //! double-click returns it to its preferred width.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, PaneSpec, Point, Px, Shown, SplitPane, SplitView};
+use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
+use ds::components::chrome::split_view::view::SplitView;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -26,7 +28,7 @@ fn Page() -> Element {
                     p { "Content" }
                 }
             }
-            p { class: "shown", "{ds::Word::slug(shown())}" }
+            p { class: "shown", "{Word::slug(shown())}" }
         }
     }
 }

@@ -1,5 +1,5 @@
 //! Running a quire app on Blitz: the document, the font registration, the input modality
-//! (`ds::HostSignals`), a `data:` net provider for mask and background images (spike S7/S8),
+//! (`ds::prelude::HostSignals`), a `data:` net provider for mask and background images (spike S7/S8),
 //! and a redraw when a timer or an image lands.
 //!
 //! The window is blitz's portable `dioxus-native` shell (winit), so an app runs the same on any
@@ -62,7 +62,7 @@ impl AppConfig {
     }
 
     /// Who draws the window's frame (default [`Decorations::Server`]). An app whose root draws
-    /// `ds::WindowFrame::Titlebar` passes [`Decorations::Client`], so the window has no second
+    /// `ds::prelude::WindowFrame::Titlebar` passes [`Decorations::Client`], so the window has no second
     /// frame around it.
     pub fn with_decorations(mut self, decorations: Decorations) -> Self {
         self.decorations = decorations;

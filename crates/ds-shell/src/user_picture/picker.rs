@@ -7,13 +7,15 @@
 //! grid's arrow-key rule ([`grid_step`]) and its inline column style.
 
 use super::choice::PictureChoice;
-use crate::emoji::{AnimatedEmoji, disc::EmojiPlayback, id::EmojiId};
+use crate::emoji::AnimatedEmoji;
+use crate::emoji::disc::EmojiPlayback;
+use crate::emoji::id::EmojiId;
 use crate::user_picture::size::PictureSize;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::avatar::{AvatarFace, AvatarSize, face};
 use ds::components::lists::emoji_grid::grid::grid_style;
 use ds::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
+use ds::root::common::Common;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::Selection;
 use ds_core::word::Word;

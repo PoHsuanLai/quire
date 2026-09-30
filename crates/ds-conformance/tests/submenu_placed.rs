@@ -3,9 +3,8 @@
 //! inline in the caller's card.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Availability, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px,
-};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 

@@ -3,10 +3,12 @@
 //! between a shaped row's time and its shortcut.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Caret, Claim, CommandPalette, CommandPaletteHost, Ds, FieldKey, Icon, InitialCaret,
-    Material, PaletteGroup, PaletteGroups, Rect, RowShape, Shortcut, ShortcutKey,
-};
+use ds::components::lists::row::shape::RowShape;
+use ds::components::menus::palette::palette_claim::{Claim, FieldKey};
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
+use ds::host::caret::{Caret, InitialCaret};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -20,8 +22,8 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn item(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow::new(value, title.to_string())
+fn item(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow::new(value, title.to_string())
 }
 
 /// Twenty rows in one group with a "Show More" after them (stop 20): far more than the list's
@@ -274,7 +276,7 @@ fn Opened(initial_caret: Option<InitialCaret>) -> Element {
                 placeholder: "Search",
                 query: query(),
                 tokens: Vec::new(),
-                groups: vec![ds::PaletteGroup::list("Applications", rows)],
+                groups: vec![ds::components::menus::palette::palette_group::PaletteGroup::list("Applications", rows)],
                 empty: "Nothing",
                 oninput: move |text: String| query.set(text),
                 onpick: move |_| {},
@@ -290,7 +292,7 @@ fn Opened(initial_caret: Option<InitialCaret>) -> Element {
                 placeholder: "Search",
                 query: query(),
                 tokens: Vec::new(),
-                groups: vec![ds::PaletteGroup::list("Applications", rows)],
+                groups: vec![ds::components::menus::palette::palette_group::PaletteGroup::list("Applications", rows)],
                 empty: "Nothing",
                 oninput: move |text: String| query.set(text),
                 onpick: move |_| {},
@@ -365,15 +367,15 @@ fn a_palette_opened_on_a_query_puts_the_caret_where_it_is_asked() {
 
 #[allow(non_snake_case)]
 fn KeyedRow() -> Element {
-    let row = ds::PaletteRow {
-        leading: ds::RowLeading::Icon(Icon::File),
+    let row = PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_string(),
             modified: "00:33".to_string(),
         },
-        accessory: ds::Accessory::Text((Shortcut(vec![ShortcutKey::Enter])).glyphs()),
-        ..ds::PaletteRow::new(1, "Invoice.pdf")
+        accessory: Accessory::Text((Shortcut(vec![ShortcutKey::Enter])).glyphs()),
+        ..PaletteRow::new(1, "Invoice.pdf")
     };
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,

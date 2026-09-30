@@ -4,7 +4,8 @@
 
 use super::choose::pick;
 use super::config::SpellConfig;
-use ds::{Lang, Learned};
+use ds::spell::lang::Lang;
+use ds::spell::service::Learned;
 use spellbook::Dictionary;
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, OpenOptions};

@@ -5,8 +5,8 @@
 //! surface's own focus wins inside it.
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{Appearance, Common, Ds, EditSurface, Material, ShortcutKey};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_blitz::FocusFallback;
 use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

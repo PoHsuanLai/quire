@@ -5,9 +5,13 @@ use crate::details_states::Net;
 use crate::details_views::{NetView, ShakeView, SlashView};
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Press;
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{EventStamp, MorphGlyph, MorphStyle, Operation, PendingToken, Slashed};
-use ds::{Button, ControlSize, Glyph, Icon, IconSize, Progress, ProgressIndicator, ProgressStyle};
+use ds::prelude::*;
+use ds_core::press::Press;
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The page.
 #[component]

@@ -1,11 +1,15 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
-use ds::{Bezel, ControlSize};
-use ds::{
-    Button, Common, DataAttr, DataName, DropState, Icon, Leading, MarkProvider, MarkStyle,
-    ProviderMark, Row, RowLeading, RowState, RunTone, TextLine, TextRun, Trailing,
-};
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::content::text_runs::RunTone;
+use ds::components::controls::button_marks::{Leading, Trailing};
+use ds::components::controls::button_model::Bezel;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::{DataAttr, DataName};
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
 
 /// One state and its golden.
 pub struct Case {
@@ -46,7 +50,7 @@ fn google() -> Leading {
 pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/leading-mark.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: google(), trailing: Trailing::Glyph(Icon::ChevronDown), shown: ds::Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: google(), trailing: Trailing::Glyph(Icon::ChevronDown), shown: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/leading-glyph.html",

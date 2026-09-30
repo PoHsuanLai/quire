@@ -6,8 +6,10 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Hex, Material, Theme};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Viewport};
+use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::hex::Hex;
 use probe::{distance, keep, modal, pixels, rect};
 
 const VIEW: Viewport = Viewport {
@@ -43,7 +45,7 @@ fn the_selected_row_is_accent_while_active_and_grey_while_inactive() {
     let frame = harness.render().expect("renders");
     keep(&frame, "source-list-selection");
     let fill = |id: &str| modal(&pixels(&frame, rect(&harness, id), 2.0));
-    let blue = ds::accent_of(ds::Accent::Blue, ds::Scheme::Light).fill;
+    let blue = accent_of(Accent::Blue, Scheme::Light).fill;
     let Hex([r, g, b]) = blue;
     assert!(
         distance(fill("#active"), [r, g, b, 255]) <= 2,

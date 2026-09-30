@@ -31,7 +31,7 @@ impl std::fmt::Debug for FileDropHandle {
 /// target of its own).
 ///
 /// ```ignore
-/// let drop = ds::use_file_drop(move |files: ds::FileDrop| attach(files.paths));
+/// let drop = crate::file_drop::hook::use_file_drop(move |files: crate::file_drop::drag::FileDrop| attach(files.paths));
 /// rsx! {
 ///     div {
 ///         class: "composer",

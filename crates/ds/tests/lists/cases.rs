@@ -3,12 +3,16 @@
 
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{
-    Colour, CommandPill, DragGhost, DropLine, DropState, EdgePeek, Expiry, Hex, HoverStrip,
-    ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Row, RowShape,
-    Selection, Shown,
-};
-use ds::{ControlSize, Shortcut, ShortcutKey};
+use ds::components::app::command_pill::CommandPill;
+use ds::components::app::edge_peek::EdgePeek;
+use ds::components::app::hover_strip::HoverStrip;
+use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::lists::row::shape::{Expiry, RowShape};
+use ds::components::overlays::drag_ghost::DropLine;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// One component in one state.
 pub struct Case {

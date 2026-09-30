@@ -5,7 +5,9 @@ use crate::harness::Harness;
 use crate::harness_input::{blitz_button, keyboard, pointer};
 use crate::input::{KeyInput, PointerAction, PointerInput};
 use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
-use ds::{InputModality, Point, PointerButton, Px};
+use ds::prelude::*;
+use ds_core::press::PointerButton;
+use ds_core::vocab::InputModality;
 use keyboard_types::{Location, Modifiers};
 
 impl Harness {

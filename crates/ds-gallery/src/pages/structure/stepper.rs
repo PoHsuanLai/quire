@@ -2,8 +2,10 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Availability, ControlSize, Readout, StepRange, Stepper};
+use ds::components::fields::stepper::model::{Readout, StepRange};
+use ds::components::fields::stepper::view::Stepper;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The Stepper section.
 #[component]

@@ -3,7 +3,7 @@
 //! Quick Look window read the same file at different sizes, each its own entry).
 
 use super::request::{ThumbKey, ThumbRequest};
-use ds::PdfPage;
+use ds::components::content::pdf_thumb::PdfPage;
 use std::collections::{HashMap, VecDeque};
 use std::sync::{LazyLock, Mutex, PoisonError};
 
@@ -55,7 +55,8 @@ pub fn pdf_thumb_cached(request: &ThumbRequest) -> Option<PdfPage> {
 mod tests {
     use super::{Cache, THUMB_CACHE_ENTRIES};
     use crate::pdf_thumb::{DeviceBox, ThumbKey};
-    use ds::{PdfPage, Scale};
+    use ds::components::content::pdf_thumb::PdfPage;
+    use ds::prelude::*;
     use std::path::PathBuf;
     use std::time::SystemTime;
 

@@ -12,7 +12,7 @@
 
 pub(crate) mod machine;
 pub(crate) mod triangle;
-pub(crate) mod types;
+pub mod types;
 
 #[cfg(test)]
 mod keyboard_tests;

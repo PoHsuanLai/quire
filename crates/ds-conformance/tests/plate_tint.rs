@@ -7,13 +7,12 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::Word;
 use ds::icon::{IconStyle, Tint};
-use ds::{
-    Appearance, Ds, Icon, IconSize, IconSource, IconView, Material, PRESETS, PlateFamily,
-    PlateTint, Scheme, Surface,
-};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Viewport};
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::plate_tint::PlateTint;
+use ds_style::space::presets::PRESETS;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;

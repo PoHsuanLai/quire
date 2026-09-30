@@ -1,19 +1,23 @@
 //! Every control in every state, as data: the table the golden test walks.
 
 use dioxus::prelude::*;
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
+use ds::components::controls::button_model::{Answers, Bezel, ButtonRole, ImagePosition};
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
+use ds::components::controls::segmented::Tracking;
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Answers, Availability, Bezel, ButtonRole, Check, ControlSize, Fraction, ImagePosition,
-    Progress, ProgressIndicator, ProgressStyle, Shortcut, ShortcutKey, Shown,
-};
-use ds::{
-    Avatar, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Button, Chip, ChipVariant, Colour,
-    Common, ExternalIcon, FieldFocus, Hex, Icon, IconPx, IconSize, IconSource, IconUrl, IconView,
-    LabelHue, PersonHue, SectionHeader, SegmentedControl, Slider, Toggle, Verdict,
-};
-use ds::{Badge, BadgeContent, BadgeTone, KeyEquivalent, KeyStyle};
-use ds::{Choice, Tracking};
-use ds::{FieldBezel, FieldKind, TextField};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::colour::contrast::Verdict;
+use ds_style::icon::render::IconPx;
+use ds_style::icon::url::IconUrl;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
+use ds_style::tokens::label_hue::LabelHue;
 
 /// A symbolic SVG, 16 px.
 fn symbolic() -> IconSource {
@@ -396,17 +400,17 @@ pub const CASES: &[Case] = &[
     Case {
         component: "section_header",
         state: "action-selected",
-        make: || rsx! { SectionHeader { title: "Files", action: ("Show More".to_string(), EventHandler::new(|_| {})), action_selection: ds::Selection::Selected } },
+        make: || rsx! { SectionHeader { title: "Files", action: ("Show More".to_string(), EventHandler::new(|_| {})), action_selection: Selection::Selected } },
     },
     Case {
         component: "section_header",
         state: "collapsible-open",
-        make: || rsx! { SectionHeader { title: "Favourites", collapse: (ds::Shown::Visible, EventHandler::new(|_| {})) } },
+        make: || rsx! { SectionHeader { title: "Favourites", collapse: (Shown::Visible, EventHandler::new(|_| {})) } },
     },
     Case {
         component: "section_header",
         state: "collapsible-closed",
-        make: || rsx! { SectionHeader { title: "Favourites", collapse: (ds::Shown::Hidden, EventHandler::new(|_| {})) } },
+        make: || rsx! { SectionHeader { title: "Favourites", collapse: (Shown::Hidden, EventHandler::new(|_| {})) } },
     },
     // Count: both places, empty at zero.
     Case {

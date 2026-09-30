@@ -6,7 +6,7 @@
 //! `cargo test -p ds-blitz --release --test hybrid_backend -- --ignored --nocapture`
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Point, Px};
+use ds::prelude::*;
 use ds_blitz::AdapterPref;
 use ds_harness::{Backend, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::time::{Duration, Instant};

@@ -3,11 +3,12 @@
 //! panel spans both columns inside the grid's padding.
 
 use dioxus::prelude::*;
-use ds::Check;
-use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
-use ds::{Slider, SliderLook};
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
-use ds_shell::{ModuleGrid, ModulePanel, ModuleTile};
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(200));

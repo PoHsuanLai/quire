@@ -7,10 +7,10 @@
 use crate::now_playing::kind::{Playback, PositionClock};
 use dioxus::core::{Task, current_scope_id, queue_effect};
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::label::{Label, LabelRole, LabelStyle};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
+use ds::root::common::Common;
 use ds_core::time::clock::sleep;
 use ds_core::vocab::Fraction;
 use ds_style::task::{Gone, spawn_in, try_get, try_set};

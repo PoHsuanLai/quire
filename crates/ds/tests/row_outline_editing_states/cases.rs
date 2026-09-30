@@ -2,8 +2,10 @@
 
 use crate::scoped::Scoped;
 use dioxus::prelude::*;
-use ds::{Accessory, Button, FieldFocus, Icon, Outline, Propagation, Row, RowLeading, Shown};
-use ds::{Bezel, FieldBezel, ImagePosition, TextField};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::components::lists::row::row::Outline;
+use ds::prelude::*;
 
 /// One state and its golden.
 pub struct Case {

@@ -6,6 +6,7 @@ use ds_lint::{
     Exception, LintConfig, Offence, Profile, Rule, Severity, WARNINGS, assert_clean, markup,
     markup_warnings, stylesheet, warnings,
 };
+use ds_style::tokens::type_scale::FontSize;
 
 fn strict() -> LintConfig {
     LintConfig {
@@ -311,14 +312,14 @@ fn quires_own_sheet_warns_only_where_reviewed() {
 /// below it is a drawing.
 #[test]
 fn the_system_ramp_starts_at_the_floor() {
-    use ds::{Typeface, Word};
-    let under: Vec<ds::FontSize> = ds::FontSize::ALL
+    use ds::prelude::*;
+    let under: Vec<FontSize> = FontSize::ALL
         .iter()
         .copied()
-        .filter(|size| size.px_in(Typeface::System) < ds::FontSize::MIN_PX)
+        .filter(|size| size.px_in(Typeface::System) < FontSize::MIN_PX)
         .collect();
-    assert_eq!(under, [ds::FontSize::Pico]);
-    for size in ds::FontSize::FLOORED {
+    assert_eq!(under, [FontSize::Pico]);
+    for size in FontSize::FLOORED {
         assert_eq!(size.css_in(Typeface::System), "10px", "{size:?}");
     }
 }

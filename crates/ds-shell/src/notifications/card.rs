@@ -24,14 +24,13 @@ use crate::notifications::body::NotificationBody;
 use crate::notifications::parts::{AppMark, CardAction, GroupCount, Hover};
 use crate::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use dioxus::prelude::*;
-use ds::Common;
-use ds::ControlSize;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::rich_text::Rich;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
 use ds::components::controls::press::{ActivationKeys, PressListeners, Propagation};
 use ds::root::chrome::RootChrome;
+use ds::root::common::Common;
 use ds::root::surface::Surface;
 use ds_core::press::Press;
 use ds_core::word::Word;
@@ -39,6 +38,7 @@ use ds_motion::swipe::SwipeMetrics;
 use ds_style::appearance::material::Material;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconPx, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// One notification. `app`, `age` (the caller's words: "now", "2m") and `summary` are its first
 /// line; `body` (runs and links, clamped) is optional, as are the group's `count` and the

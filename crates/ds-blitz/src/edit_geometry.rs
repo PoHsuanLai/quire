@@ -5,7 +5,8 @@
 use crate::edit_locate::{Order, Side, Spot, order_of};
 use crate::edit_tree::Segment;
 use blitz_dom::{BaseDocument, Node, NodeId};
-use ds::{PixelToken, Point, Px, Rect, Scale, Size};
+use ds::prelude::*;
+use ds_style::tokens::pixel::PixelToken;
 use parley::{Affinity, BoundingBox, Cursor, Selection};
 
 /// The caret's box at `spot`: `--caret-w` wide from the insertion point, its line's height.
@@ -150,7 +151,7 @@ fn line_at(x: Px, y: Px, height: Px) -> Rect {
 }
 
 /// Where `node`'s border box starts, in the window's logical pixels: as
-/// `get_client_bounding_rect` (and so `ds::GeometryHost::measure`) reads it, from the unrounded layout, so
+/// `get_client_bounding_rect` (and so `ds::host::parts::GeometryHost::measure`) reads it, from the unrounded layout, so
 /// a caret rect and a measured container agree to the 64th of a pixel.
 fn border_origin(doc: &BaseDocument, node: &Node) -> (f32, f32) {
     let at = node.unrounded_absolute_position(0.0, 0.0);

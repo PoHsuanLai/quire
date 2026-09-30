@@ -4,11 +4,15 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::Bezel;
-use ds::{
-    Button, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, HoverProfile, Icon,
-    Menu, MenuImage, MenuItem, MenuPlacement, MountedRef, use_hover_intent,
-};
+use ds::components::controls::button_model::Bezel;
+use ds::components::menus::item::item::MenuImage;
+use ds::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
+use ds::components::overlays::hover_card::parts::HoverCardPart;
+use ds::host::measure::Anchor;
+use ds::host::measure::MountedRef;
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind};
+use ds_motion::hover_intent::HoverProfile;
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
 pub const HOOK_KEYED: &str = "hook:";
@@ -115,7 +119,7 @@ pub fn InlineActions() -> Element {
                 ],
                 Menu::<&'static str> {
                     placement: MenuPlacement::Popup,
-                    anchor: ds::Anchor::Point(ds::Point::default()),
+                    anchor: Anchor::Point(Point::default()),
                     items: actions,
                     onpick: move |title: &'static str| said.set(title.to_string()),
                     onclose: |()| {},

@@ -9,11 +9,14 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Fraction, Inject, LevelGlyph, LevelIndicator, LevelStyle, Material, Muting,
-    RootChrome, Shown, Slider, SliderLook,
-};
-use ds_shell::{Osd, OsdLevel, OsdPosition};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::level_indicator::{LevelIndicator, LevelStyle};
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_shell::osd::{OsdLevel, OsdPosition};
+use ds_shell::prelude::*;
 
 #[derive(Props, Clone)]
 struct HostProps {

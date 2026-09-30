@@ -8,9 +8,12 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Availability, Ds, Inject, Material};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{DatePicker, DateValue, DayKey, Elements, PickerStyle, TimeOfDay};
+use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
+use ds_shell::month_grid::data::DayKey;
+use ds_shell::prelude::*;
 
 const PICKER_CSS: &str = include_str!("../src/date_picker/style.css");
 

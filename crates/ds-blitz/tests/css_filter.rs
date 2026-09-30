@@ -9,7 +9,7 @@
 //! multi-threaded filters, so a case that reads `Ignored` means a fork regressed.
 
 use dioxus::prelude::*;
-use ds::Px;
+use ds::prelude::*;
 use ds_harness::{Backend, Driver, Harness, HarnessConfig, Query, Viewport};
 use image::RgbaImage;
 

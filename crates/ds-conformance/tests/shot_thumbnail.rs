@@ -7,14 +7,16 @@
 //! `settle(PanelOut)`, never a drag out), while a drag to the left still starts a drag out.
 
 use dioxus::prelude::*;
-use ds::{
-    Anim, Appearance, DRAG_THRESHOLD, Ds, Icon, ImageSize, ImageSource, Material, MotionLevel,
-    Point, Px, Shown, settle,
-};
+use ds::components::content::image_source::ImageSize;
+use ds::prelude::*;
 use ds_harness::harness::{SETTLE_BOUND, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::NotificationSwipe;
-use ds_shell::{DragStart, Hover, ShotThumbnail, ThumbAction};
+use ds_motion::drag::DRAG_THRESHOLD;
+use ds_shell::notifications::parts::Hover;
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
+use ds_shell::thumbs::shot_press::DragStart;
+use ds_shell::thumbs::shot_thumbnail::ThumbAction;
 use std::time::{Duration, Instant};
 
 static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);

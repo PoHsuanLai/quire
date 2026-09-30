@@ -4,10 +4,10 @@
 //! Reduced motion shows the level at once. Every case ends at 0 frames (R3).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Motion, Percent};
+use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use ds_shell::{IdleDim, IdleDimPhase};
+use ds_shell::idle_dim::{IdleDim, IdleDimPhase};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

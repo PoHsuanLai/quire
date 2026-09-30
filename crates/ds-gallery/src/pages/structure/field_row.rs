@@ -2,10 +2,11 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    Availability, Check, Choice, ControlSize, FieldGroup, FieldRow, MenuItem, PopUpButton,
-    PopUpKind, RowLayout, SegmentedControl, TextField, TextLine, Toggle, Tracking,
-};
+use ds::components::controls::segmented::Tracking;
+use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
+use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The FieldRow section.
 #[component]

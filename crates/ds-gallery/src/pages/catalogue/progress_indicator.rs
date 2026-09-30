@@ -3,11 +3,11 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Button, ControlSize, Fraction, Icon, IconSource, Progress, ProgressIndicator, ProgressStyle,
-};
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The ProgressIndicator section.
 #[component]

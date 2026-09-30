@@ -7,14 +7,17 @@ use crate::axes::Axes;
 use crate::pages::Section;
 use crate::{portrait, wallpaper};
 use dioxus::prelude::*;
-use ds::{
-    Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, IconSource, ImageSource,
-    Inject, Material, PlateFamily, Px, RootChrome, TextLine, person_hue, use_scope,
+use ds::assembly::ds::Inject;
+use ds::components::content::avatar::{
+    AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
-use ds_shell::{
-    AppKey, AppSwitcher, CapsLock, EmojiId, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    PolkitPrompt, PromptState, SwitcherApp, UserPicture,
-};
+use ds::prelude::*;
+use ds_shell::emoji::id::EmojiId;
+use ds_shell::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
+use ds_shell::prelude::*;
+use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
+use ds_shell::user_picture::picture::UserPicture;
+use ds_style::icon::family::PlateFamily;
 
 /// The person's letter disc.
 fn letter() -> AvatarFace {

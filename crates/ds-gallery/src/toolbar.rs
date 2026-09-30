@@ -6,12 +6,11 @@ use crate::axes::{Axes, PresetIndex, material_label, motion_of};
 use crate::page::Page;
 use crate::registry;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    Accent, BlurState, Check, Material, MenuItem, MotionLevel, PopUpButton, PopUpKind,
-    SegmentedControl, Theme, Toggle, Typeface,
-};
-use ds::{Choice, ControlSize, Tracking};
+use ds::components::controls::segmented::Tracking;
+use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
+use ds::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The toolbar.
 #[component]
@@ -72,7 +71,7 @@ pub fn Toolbar() -> Element {
                 }
             }
             Tool { name: "Motion",
-                SegmentedControl::<ds::Motion> { label: "Motion level", choices: Choice::pairs(levels), tracking: Tracking::SelectOne(now.motion), size: ControlSize::Mini,
+                SegmentedControl::<Motion> { label: "Motion level", choices: Choice::pairs(levels), tracking: Tracking::SelectOne(now.motion), size: ControlSize::Mini,
                     onchange: move |motion| axes.with_mut(|axes| axes.motion = motion),
                 }
             }

@@ -8,14 +8,13 @@
 
 use crate::components::chrome::light_mark::{LightMark, Mark};
 use crate::components::menus::item::item::{MenuImage, MenuItem};
-use crate::components::menus::menu::{menu::Menu, placement::MenuPlacement};
+use crate::components::menus::menu::menu::Menu;
+use crate::components::menus::menu::placement::MenuPlacement;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::window::hold::{Click, Hold, Opens, Waiting};
-use crate::window::{
-    host::{WindowHost, use_window_host, use_window_state},
-    timing::FrameTiming,
-    vocab::{Maximized, Support, WindowTile, Zoom},
-};
+use crate::window::host::{WindowHost, use_window_host, use_window_state};
+use crate::window::timing::FrameTiming;
+use crate::window::vocab::{Maximized, Support, WindowTile, Zoom};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;

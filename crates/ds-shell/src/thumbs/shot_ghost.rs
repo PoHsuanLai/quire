@@ -6,10 +6,10 @@
 
 use crate::thumbs::shot_frame::shot_frame;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::image_source::{ImageSize, ImageSource};
 use ds::components::content::picture_fit::picture_style;
 use ds::root::chrome::RootChrome;
+use ds::root::common::Common;
 use ds::root::surface::Surface;
 use ds_core::geometry::units::Px;
 use ds_style::appearance::material::Material;

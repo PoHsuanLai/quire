@@ -7,17 +7,19 @@
 //! `QUIRE_GALLERY_SHOTS` names a directory, as `edit-widgets-<pose>.png`.
 
 use dioxus::prelude::*;
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{
-    Appearance, Attach, BatteryPower, BatteryState, Ds, Fraction, LowAt, Material, RootChrome,
-    Sheet, Shown,
-};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
+use ds_shell::widget::battery::{BatteryCell, BatteryEntry, BatteryWidget};
+use ds_shell::widget::calendar::MonthWidget;
+use ds_shell::widget::clock::WorldClockWidget;
+use ds_shell::widget::timeline::Timeline;
 use ds_shell::widget::{DesktopGrid, WidgetAt, WidgetEdit, WidgetLayout, WidgetPlacement, apply};
-use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, Device, MonthWidget, Timeline, Widget, WidgetCard,
-    WidgetGallery, WidgetHost, WidgetMetrics, WidgetSize, WorldClockWidget,
-};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -83,7 +85,7 @@ fn Stage() -> Element {
         .cloned()
         .collect();
     rsx! {
-        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent), extent: ds::RootExtent::Viewport,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Widget, chrome: Some(RootChrome::Transparent), extent: RootExtent::Viewport,
             div { style: "position:absolute;inset:0;background:{WASH};{metrics}",
                 for item in placed {
                     Card { key: "{item.id.0}", item, shown: Shown::Visible, on_hidden: |()| {} }

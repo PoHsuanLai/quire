@@ -5,7 +5,7 @@
 use crate::month_grid::data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthWeek,
 };
-use ds::TextLine;
+use ds::prelude::*;
 
 const MONTHS: [&str; 12] = [
     "January",
@@ -165,6 +165,7 @@ pub(crate) fn month_grid(month: MonthKey, picked: DayKey) -> MonthGridData {
 mod tests {
     use super::{days_in_month, iso_week, month_after, month_grid, weekday};
     use crate::month_grid::data::{DayKey, DayMark, DayPlace, MonthKey};
+    use ds::prelude::*;
 
     fn day(year: i16, month: i8, day: i8) -> DayKey {
         DayKey { year, month, day }
@@ -297,6 +298,6 @@ mod tests {
         let last = grid.weeks[4].days;
         assert_eq!(last[6].key, day(2026, 10, 3));
         assert_eq!(last[6].place, DayPlace::After);
-        assert_eq!(grid.title, ds::TextLine::from("September 2026"));
+        assert_eq!(grid.title, TextLine::from("September 2026"));
     }
 }

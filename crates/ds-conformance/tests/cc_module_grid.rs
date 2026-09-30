@@ -2,10 +2,11 @@
 //! props (`control_center.grid_*`), the columns share the width, and a Full tile spans them all.
 
 use dioxus::prelude::*;
-use ds::Check;
-use ds::{Appearance, Ds, Icon, Material, Px, Rect};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Query, Viewport};
-use ds_shell::{GridColumns, ModuleGrid, ModuleTile, TileSpan};
+use ds_shell::control_center::module_grid::GridColumns;
+use ds_shell::control_center::module_tile_kind::TileSpan;
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

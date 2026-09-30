@@ -4,7 +4,7 @@
 //! out; shown again while it leaves, the hide is taken back.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Ds, Material, MotionLevel, Px, RootExtent, Shown, SidePanel, settle};
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;

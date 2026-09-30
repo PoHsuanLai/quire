@@ -2,7 +2,7 @@
 //! its contrast pills compared with `space::readout`.
 
 use super::*;
-use ds::Word;
+use ds::prelude::*;
 
 #[derive(Props, Clone, PartialEq)]
 struct Editing {

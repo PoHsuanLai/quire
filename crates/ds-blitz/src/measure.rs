@@ -1,4 +1,4 @@
-//! The host's rect read (`ds::GeometryHost::measure`): a mounted element's border box straight from the
+//! The host's rect read (`ds::host::parts::GeometryHost::measure`): a mounted element's border box straight from the
 //! Blitz document, answering "busy" instead of panicking when the renderer holds the document.
 //!
 //! dioxus-native-dom's own `get_client_rect` borrows the document mutably. A task that dioxus
@@ -13,7 +13,7 @@
 
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
-use ds::{Measured, Point, Px, Rect, Size};
+use ds::prelude::*;
 
 /// `element`'s border box, if the document is free and the element is a Blitz node.
 pub(crate) fn measure(element: &MountedData) -> Measured {

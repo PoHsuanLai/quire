@@ -9,8 +9,8 @@
 //! widget's 140 x 140 content box, which the regular grid (224 x 254 for six weeks) overflows.
 //! `MonthDensity::Auto` picks between them by the enclosing `WidgetFrame`.
 
-pub(crate) mod data;
-pub(crate) mod density;
+pub mod data;
+pub mod density;
 pub(crate) mod header;
 pub(crate) mod weeks;
 
@@ -20,8 +20,8 @@ use crate::month_grid::header::header;
 use crate::month_grid::weeks::{MonthSlide, MonthWeeks};
 use crate::widget::scope::use_enclosing_frame;
 use dioxus::prelude::*;
-use ds::Common;
 use ds::components::content::text_runs::{TextLine, text};
+use ds::root::common::Common;
 use ds_core::word::Word;
 
 /// A month. `data` is the month as the shell laid it out; `weeks` whether each row leads with

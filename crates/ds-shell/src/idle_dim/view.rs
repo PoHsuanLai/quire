@@ -14,7 +14,7 @@
 use crate::idle_dim::drive::use_idle_dim;
 use crate::idle_dim::model::IdleDimPhase;
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::vocab::Percent;
 
 /// The idle dim overlay. `level` is `idle.dim_level_pct` (10..90); `phase` is the caller's own

@@ -6,11 +6,12 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Colour, Ds, Hex, MarkProvider, Material, PinAdd, PinFace, PinItem, PinTiles,
-    SpaceLook,
-};
+use ds::components::app::pin_tile::PinFace;
+use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
+use ds::components::content::provider_mark::MarkProvider;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_style::tokens::hex::{Colour, Hex};
 use probe::rect;
 use std::time::Duration;
 
@@ -106,8 +107,8 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
         let tile = rect(&harness, tiles);
         // The third of four columns: two tile pitches along from the first.
         let pitch = (all.size.width.0 - tile.size.width.0) / 3.0;
-        ds::Point {
-            x: ds::Px(first.x.0 + 2.0 * pitch),
+        Point {
+            x: Px(first.x.0 + 2.0 * pitch),
             y: first.y,
         }
     };
@@ -115,8 +116,8 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
     harness.send(Input::pointer_down(first));
     harness.advance(ms(50));
     for part in [0.25f32, 0.5, 0.75, 1.0] {
-        harness.send(Input::pointer_move(ds::Point {
-            x: ds::Px(first.x.0 + (third.x.0 - first.x.0) * part),
+        harness.send(Input::pointer_move(Point {
+            x: Px(first.x.0 + (third.x.0 - first.x.0) * part),
             y: first.y,
         }));
         harness.advance(ms(20));

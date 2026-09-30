@@ -4,7 +4,7 @@
 //! behind a panel is blurred (spike S15: Blitz paints no `backdrop-filter`).
 
 use crate::data_uri;
-use ds::Scheme;
+use ds::prelude::*;
 use image::{ImageEncoder, Rgb, RgbImage, codecs::png::PngEncoder};
 use std::sync::LazyLock;
 
@@ -104,7 +104,7 @@ pub(crate) fn png(picture: &RgbImage) -> Vec<u8> {
 #[cfg(test)]
 mod tests {
     use super::{calm, calm_uri, picture, uri};
-    use ds::Scheme;
+    use ds::prelude::*;
 
     #[test]
     fn the_calm_wallpaper_is_light_or_dark_with_its_scheme() {

@@ -3,9 +3,12 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    FACES, Face, FaceStyle, Family, FontSize, Token, TokenScope, Typeface, Word, use_typeface,
-};
+use ds::prelude::*;
+use ds::root::typeface::use_typeface;
+use ds_style::fonts::Subset;
+use ds_style::fonts::{FACES, Face, FaceStyle};
+use ds_style::tokens::token::{Token, TokenScope};
+use ds_style::tokens::type_scale::{Family, FontSize};
 
 /// The faces, in the order the stylesheet names them.
 const FAMILIES: &[Family] = Family::ALL;
@@ -18,7 +21,7 @@ const PANGRAM: &str = "Sphinx of black quartz, judge my vow — 0123456789";
 pub fn TypePage() -> Element {
     let typeface = use_typeface();
     rsx! {
-        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds::FACES ships for it.",
+        Section { title: "Faces", note: "Each face at --fs-display, regular and bold, in the toolbar's typeface, with the files ds_style::fonts::FACES ships for it.",
             for family in FAMILIES.iter().copied() {
                 div { class: "g-col",
                     div { style: "font-family:{family.var().reference()};font-size:var(--fs-display);font-weight:400", "{PANGRAM}" }
@@ -83,8 +86,8 @@ fn describe(face: &Face) -> String {
         format!("{}-{}", face.weight.min, face.weight.max)
     };
     let subset = match face.subset {
-        ds::Subset::Latin => "latin",
-        ds::Subset::LatinExt => "latin-ext",
+        Subset::Latin => "latin",
+        Subset::LatinExt => "latin-ext",
     };
     format!("{style} {weight} {subset}")
 }

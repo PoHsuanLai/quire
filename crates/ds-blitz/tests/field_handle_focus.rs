@@ -3,11 +3,10 @@
 //! a handle's blur is heard once too; an unknown or unreadable selector is a typed error.
 
 use dioxus::prelude::*;
-use ds::TextField;
-use ds::{
-    Appearance, Button, Ds, FieldHandle, FocusError, Material, Select, focus_by_selector,
-    use_field_handle,
-};
+use ds::focus::field::{FieldHandle, use_field_handle};
+use ds::focus::select::Select;
+use ds::focus::selector::{FocusError, focus_by_selector};
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

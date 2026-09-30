@@ -17,8 +17,9 @@ mod golden;
 use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
-use ds::{Glyph, Icon, IconSize};
-use ds::{Shortcut, ShortcutKey};
+use ds::prelude::*;
+use ds_style::icon::render::Glyph;
+use ds_style::icon::shape::Shape;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -177,11 +178,11 @@ fn every_shell_glyph_has_geometry() {
     // Lucide 1.47.0 `wifi`, first path; Tabler `brightness-half` without its bounding path.
     assert_eq!(
         Icon::Wifi.shapes().first(),
-        Some(&ds::Shape::Path("M12 20h.01"))
+        Some(&Shape::Path("M12 20h.01"))
     );
     assert_eq!(
         Icon::Brightness.shapes().first(),
-        Some(&ds::Shape::Path("M12 9a3 3 0 0 0 0 6v-6"))
+        Some(&Shape::Path("M12 9a3 3 0 0 0 0 6v-6"))
     );
 }
 

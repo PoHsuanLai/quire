@@ -6,22 +6,22 @@
 //! reads its first state from this thread rather than from props.
 
 use crate::page::Page;
-use ds::Alpha;
-use ds::{
-    Accent, Appearance, BlurState, CardAccent, Material, Motion, MotionLevel, SpaceLook, Theme,
-    Typeface, default_look,
-};
+use ds::prelude::*;
 use ds_settings::AppearanceSettings;
+use ds_style::appearance::blur::BlurState;
+use ds_style::space::look::CardAccent;
+use ds_style::space::presets::default_look;
 use std::cell::RefCell;
 
-/// One of the eight preset Spaces, by its place in `ds::PRESETS`.
+/// One of the eight preset Spaces, by its place in `ds_style::space::presets::PRESETS`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub struct PresetIndex(pub u8);
 
 impl PresetIndex {
     /// Every preset, in the editor's order.
     pub fn all() -> impl Iterator<Item = PresetIndex> {
-        (0..ds::PRESETS.len()).map(|index| PresetIndex(u8::try_from(index).unwrap_or(u8::MAX)))
+        (0..ds_style::space::presets::PRESETS.len())
+            .map(|index| PresetIndex(u8::try_from(index).unwrap_or(u8::MAX)))
     }
 
     /// What the toolbar calls it: the two sample Spaces by name, the rest by number.
@@ -159,8 +159,8 @@ pub fn starting() -> Axes {
 mod tests {
     use super::{Axes, PresetIndex, motion_of, start_with, starting};
     use crate::page::Page;
-    use ds::Word;
-    use ds::{MotionLevel, PRESETS};
+    use ds::prelude::*;
+    use ds_style::space::presets::PRESETS;
 
     #[test]
     fn a_preset_resets_the_space_to_its_own_dots() {
@@ -185,7 +185,7 @@ mod tests {
                 ..Axes::default()
             }
             .appearance();
-            let resolved = ds::resolve(appearance, ds::Theme::System, ds::SystemPrefs::default());
+            let resolved = resolve(appearance, Theme::System, SystemPrefs::default());
             assert_eq!(resolved.motion, level);
         }
     }

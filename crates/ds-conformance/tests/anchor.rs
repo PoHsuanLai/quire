@@ -3,10 +3,9 @@
 //! wrapper, and the menu reads its rect after layout.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Availability, Button, Check, Common, Ds, Material, Menu, MenuItem,
-    MountedRef, Rect,
-};
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -58,7 +57,7 @@ fn Anchored() -> Element {
         p { "Snooze this thread" }
         if let (Check::On, Some(button)) = (open(), element()) {
             Menu {
-                placement: ds::MenuPlacement::Popup,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Mounted(button),
                 items: entries,
                 onpick: move |_: u8| open.set(Check::Off),

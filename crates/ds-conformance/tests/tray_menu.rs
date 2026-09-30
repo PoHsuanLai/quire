@@ -7,14 +7,15 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Appearance, Availability, Button, Common, Ds, ExternalIcon, IconSize, IconSource,
-    IconUrl, IconView, Material, Menu, MenuItem, Point, PointerButton, Press, Px, ShortcutKey,
-    Theme,
-};
-use ds::{Bezel, ControlSize, ImagePosition};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::press::{PointerButton, Press};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_style::icon::url::IconUrl;
+use ds_style::tokens::control_size::ControlSize;
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;
@@ -117,12 +118,12 @@ fn a_symbolic_mask_takes_the_ink_and_an_image_keeps_its_colour() {
     assert_eq!(symbolic.size.width, Px(18.0), "drawn at its own size");
     // The mask's opaque middle (4..12 of 16, so 4.5..13.5 of 18) is the ink; its transparent
     // ring shows the ground.
-    let middle = ds::Rect {
+    let middle = Rect {
         origin: Point {
             x: symbolic.origin.x + Px(6.0),
             y: symbolic.origin.y + Px(6.0),
         },
-        size: ds::Size {
+        size: Size {
             width: Px(6.0),
             height: Px(6.0),
         },
@@ -166,7 +167,7 @@ fn PressApp() -> Element {
                 Button {
                     common: Common { id: Some("tray-0".to_string()), ..Common::default() },
                     bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
-                    icon: ds::Icon::Star,
+                    icon: Icon::Star,
                     label: "Tray item",
                     onclick: record,
                 }
@@ -241,7 +242,7 @@ fn MenuApp() -> Element {
             }
             if open() {
                 Menu::<u8> {
-                    placement: ds::MenuPlacement::Popup,
+                    placement: MenuPlacement::Popup,
                     anchor: Anchor::Point(Point { x: Px(40.0), y: Px(60.0) }),
                     items: entries(),
                     onpick: move |value| picked.set(value),
@@ -387,7 +388,7 @@ fn escape_in_a_keyboard_submenu_closes_one_level() {
         Some("leaving"),
         "a second Escape starts the menu's exit"
     );
-    harness.advance(ds::settle(ds::Anim::MenuOut, ds::MotionLevel::Standard) + ms(40));
+    harness.advance(settle(Anim::MenuOut, MotionLevel::Standard) + ms(40));
     assert_eq!(
         harness.count(".ds-menu"),
         0,

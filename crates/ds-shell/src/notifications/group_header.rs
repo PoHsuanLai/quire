@@ -6,11 +6,11 @@
 //! that keep their press, so a header inside a pressable group row never also presses the row.
 
 use dioxus::prelude::*;
-use ds::Bezel;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::text_runs::{TextLine, text};
 use ds::components::controls::button::Button;
+use ds::components::controls::button_model::Bezel;
 use ds::components::controls::press::Propagation;
 use ds::root::common::Common;
 use ds_core::press::Press;

@@ -9,14 +9,17 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::LevelStyle;
-use ds::{
-    Appearance, BlurState, Ds, Fraction, Inject, LevelGlyph, Material, Muting, PRESETS, RootChrome,
-    Shown, SpaceLook, Theme,
-};
-use ds::{Slider, SliderLook};
+use ds::assembly::ds::Inject;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::level_indicator::LevelStyle;
+use ds::components::controls::slider_model::SliderLook;
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::{Driver, Harness, Viewport};
-use ds_shell::{ModulePanel, Osd, OsdLevel};
+use ds_shell::osd::OsdLevel;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::space::presets::PRESETS;
 use probe::rect;
 use std::cell::Cell;
 use std::time::Duration;

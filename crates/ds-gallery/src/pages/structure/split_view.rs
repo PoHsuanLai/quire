@@ -2,7 +2,11 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{Button, Check, ControlSize, PaneSpec, Press, Shown, SplitPane, SplitView};
+use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
+use ds::components::chrome::split_view::view::SplitView;
+use ds::prelude::*;
+use ds_core::press::Press;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The SplitView section.
 #[component]

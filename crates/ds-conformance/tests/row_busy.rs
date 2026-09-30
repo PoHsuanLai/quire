@@ -6,10 +6,10 @@
 //! turning (R7).
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, Availability, BatteryState, Check, Ds, Fraction, Icon, Material, Motion,
-    Row, RowLeading, RowSize, RowState, Selection,
-};
+use ds::components::content::status::battery_state::BatteryState;
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;

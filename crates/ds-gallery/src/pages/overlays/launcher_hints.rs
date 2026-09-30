@@ -4,11 +4,14 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    CommandPalette, CommandPaletteHost, Corner, Icon, ImageSize, ImageSource, Material,
-    PaletteGroup, PaletteGroups, PaletteRow, PaneAction, PaneContent, PreviewPane, Radius,
-    RowChord, RowLeading, RowShape, Shortcut, ShortcutKey, Surface,
-};
+use ds::components::content::image_source::ImageSize;
+use ds::components::content::pdf_thumb::PdfPage;
+use ds::components::lists::preview::content::PaneContent;
+use ds::components::lists::preview::pane::PaneAction;
+use ds::components::lists::row::shape::RowShape;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
+use ds::prelude::*;
+use ds_style::tokens::shape::{Corner, Radius};
 
 fn reveal() -> Shortcut {
     Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
@@ -69,7 +72,7 @@ pub fn SpotlightHints() -> Element {
     let aside = rsx! {
         PreviewPane {
             content: PaneContent::Pdf {
-                page: ds::PdfPage::Ready {
+                page: PdfPage::Ready {
                     image: page(),
                     sheet: ImageSize { width: 612, height: 792 },
                 },

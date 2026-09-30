@@ -144,7 +144,7 @@ impl AppearanceSettings {
         self.typeface
     }
 
-    /// The three choices a `ds::Ds` root resolves.
+    /// The three choices a `ds::prelude::Ds` root resolves.
     pub fn appearance(&self) -> Appearance {
         Appearance {
             theme: self.theme,

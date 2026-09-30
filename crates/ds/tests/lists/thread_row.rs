@@ -5,10 +5,12 @@
 use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
-use ds::{
-    ActionId, Common, HoverStrip, RowState, RunTone, Shown, TextLine, TextRun, ThreadRow, Titles,
-};
-use ds::{Emphasis, Selection};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, Titles};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_core::vocab::RowState;
 
 /// "Re: UIDL stability" with the hit marked and the prefix faint.
 fn marked_subject() -> TextLine {

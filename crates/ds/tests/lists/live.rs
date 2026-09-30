@@ -5,8 +5,8 @@
 use super::rows::listed_thread;
 use crate::scoped::scope;
 use dioxus::prelude::*;
-use ds::Emphasis;
-use ds::List;
+use ds::prelude::*;
+use ds_core::time::clock::sleep;
 use std::future::Future;
 use std::pin::pin;
 use std::sync::Arc;
@@ -42,7 +42,7 @@ fn pump(dom: &mut VirtualDom, length: Duration) {
         let left = end.saturating_duration_since(Instant::now());
         block_on(async {
             let mut work = pin!(dom.wait_for_work());
-            let mut deadline = pin!(ds::sleep(left));
+            let mut deadline = pin!(sleep(left));
             std::future::poll_fn(|cx| {
                 if work.as_mut().poll(cx).is_ready() || deadline.as_mut().poll(cx).is_ready() {
                     Poll::Ready(())

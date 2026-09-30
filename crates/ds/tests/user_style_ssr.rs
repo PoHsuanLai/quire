@@ -4,7 +4,8 @@
 
 use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Inject, Material};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
 use ds_style::kit::UserStyle;
 
 use std::cell::Cell;

@@ -10,10 +10,10 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, HostWindow, Inject, Material, Maximized, ResizeEdge, Support, TileError,
-    TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,
-};
+use ds::assembly::ds::Inject;
+use ds::prelude::*;
+use ds::window::host::use_window_host_provider;
+use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
 use std::rc::Rc;
 
 /// A host that does nothing and reports `maximized`.

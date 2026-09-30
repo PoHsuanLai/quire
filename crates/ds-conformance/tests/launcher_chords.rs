@@ -3,10 +3,12 @@
 //! preview pane's action ends in a plain chord at its label's size, not in key caps.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, CommandPalette, CommandPaletteHost, Ds, Icon, Material, PaletteGroup,
-    PaletteGroups, PaneAction, PaneContent, PreviewPane, RowChord, RowShape, Shortcut, ShortcutKey,
-};
+use ds::components::lists::preview::content::PaneContent;
+use ds::components::lists::preview::pane::PaneAction;
+use ds::components::lists::row::shape::RowShape;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -24,16 +26,16 @@ fn reveal() -> Shortcut {
     Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])
 }
 
-fn file(value: u8, title: &str) -> ds::PaletteRow<u8> {
-    ds::PaletteRow {
-        leading: ds::RowLeading::Icon(Icon::File),
+fn file(value: u8, title: &str) -> PaletteRow<u8> {
+    PaletteRow {
+        leading: RowLeading::Icon(Icon::File),
         shape: RowShape::File {
             thumb: None,
             location: "~/Documents".to_string(),
             modified: "13:00".to_string(),
         },
         chord: RowChord::on_selected(reveal()),
-        ..ds::PaletteRow::new(value, title)
+        ..PaletteRow::new(value, title)
     }
 }
 

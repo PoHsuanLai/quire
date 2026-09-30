@@ -8,11 +8,13 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::{
-    Activity, Appearance, Ds, Hex, Inject, Material, ORB_PERIOD, OrbColour, OrbColours, Px,
-    VoiceOrb,
-};
+use ds::assembly::ds::Inject;
+use ds::components::content::voice_orb::model::{OrbColour, OrbColours};
+use ds::components::content::voice_orb::view::{ORB_PERIOD, VoiceOrb};
+use ds::prelude::*;
+use ds_core::vocab::Activity;
 use ds_lint::{LintConfig, markup};
+use ds_style::tokens::hex::Hex;
 use std::time::Duration;
 
 fn root(body: Element) -> Element {

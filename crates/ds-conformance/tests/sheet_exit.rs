@@ -4,7 +4,8 @@
 //! stands in the middle of it.
 
 use dioxus::prelude::*;
-use ds::{Anim, Appearance, Attach, Ds, Material, MotionLevel, RootExtent, Sheet, Shown, settle};
+use ds::components::overlays::sheet_attach::Attach;
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, Harness, Query, Viewport};
 use std::time::Duration;

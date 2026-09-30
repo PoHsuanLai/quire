@@ -6,9 +6,10 @@ use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
 use crate::input::{ImeInput, KeyInput};
 use blitz_traits::events::{MouseEventButton, UiEvent};
-use ds::{
-    CapturedPointer, ImeEvent, ImeSwitch, Point, PointerPhase, Px, Rect, ShortcutKey, TextPosition,
-};
+use ds::host::captured::{CapturedPointer, PointerPhase};
+use ds::host::ime::{ImeEvent, ImeSwitch};
+use ds::host::position::TextPosition;
+use ds::prelude::*;
 use ds_blitz::seam::edit_hit as hit;
 use keyboard_types::Modifiers;
 

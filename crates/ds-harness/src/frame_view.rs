@@ -5,7 +5,7 @@
 use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
-use ds::{Point, Px};
+use ds::prelude::*;
 use ds_blitz::FrameId;
 
 /// One `iframe` of a harness's document and the sub-document it shows.

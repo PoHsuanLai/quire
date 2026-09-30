@@ -3,9 +3,11 @@
 //! the header steps months.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, ShortcutKey};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use ds_shell::{DatePicker, DateValue, DayKey, Elements, PickerStyle, TimeOfDay};
+use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
+use ds_shell::month_grid::data::DayKey;
+use ds_shell::prelude::*;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

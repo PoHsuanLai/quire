@@ -5,8 +5,8 @@
 
 #![allow(dead_code)]
 
-use ds::TextLine;
-use ds_shell::{
+use ds::prelude::*;
+use ds_shell::month_grid::data::{
     DayKey, DayMark, DayPlace, Eventful, IsoWeek, MonthDay, MonthGridData, MonthKey, MonthStep,
     MonthWeek,
 };

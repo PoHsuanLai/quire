@@ -5,14 +5,21 @@ use crate::axes::Showcase;
 use crate::pages::overlays::outbox::Outbox;
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::components::app::link_pill::{LinkPill, LinkTarget};
+use ds::components::app::send_pill::SEND_COUNTDOWN;
+use ds::components::app::send_pill::SEND_TICK;
+use ds::components::app::send_pill::SendPill;
+use ds::components::content::avatar::{AvatarSize, AvatarTone};
+use ds::components::controls::button_model::Bezel;
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::components::overlays::hover_card::target::{HoverTarget, TargetElement};
 use ds::detail::{Operation, PendingToken};
-use ds::{
-    Avatar, AvatarSize, AvatarTone, Button, Fraction, Glyph, HoverCard, HoverKey, HoverKind,
-    HoverTarget, Icon, IconSize, LinkPill, LinkTarget, SendPill, Shortcut, ShortcutKey,
-    TargetElement, Tooltip, UndoToken, sleep, use_hover_hub, use_toast_hub,
-};
-use ds::{Bezel, ControlSize};
-use ds::{KeyEquivalent, KeyStyle};
+use ds::prelude::*;
+use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
+use ds::stack::toast_hub::{UndoToken, use_toast_hub};
+use ds_core::time::clock::sleep;
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The hover targets, one per card kind.
 const TARGETS: [(HoverKind, &str, &str); 4] = [
@@ -169,10 +176,10 @@ fn Countdown(showcase: Showcase) -> Element {
         run += 1;
         let this = run();
         spawn(async move {
-            let ticks = ds::SEND_COUNTDOWN.as_millis() / ds::SEND_TICK.as_millis().max(1);
+            let ticks = SEND_COUNTDOWN.as_millis() / SEND_TICK.as_millis().max(1);
             let ticks = u16::try_from(ticks).unwrap_or(5).max(1);
             for tick in 1..=ticks {
-                sleep(ds::SEND_TICK).await;
+                sleep(SEND_TICK).await;
                 if run() != this || operation() == Operation::Idle {
                     return;
                 }

@@ -4,13 +4,24 @@
 use crate::cases::Case;
 use crate::scoped::Scoped;
 use dioxus::prelude::*;
-use ds::{
-    Accessory, ActionId, Availability, BatteryState, Chip, ChipVariant, ClipBody, Fraction,
-    HoverStrip, Icon, List, ListItem, ListStyle, MarkProvider, MarkStyle, ProviderMark, Row,
-    RowAction, RowChord, RowLeading, RowMotion, RowShape, RowSize, RowState, StripAction, TextLine,
-    ThreadRow,
-};
-use ds::{Check, ControlSize, DropState, Emphasis, Selection, Shortcut, ShortcutKey};
+use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
+use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::content::status::battery_state::BatteryState;
+use ds::components::controls::button_model::Bezel;
+use ds::components::controls::button_model::ImagePosition;
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::lists::list::model::ListStyle;
+use ds::components::lists::row::motion::RowMotion;
+use ds::components::lists::row::shape::{ClipBody, RowShape};
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds::root::pass_through::DataAttr;
+use ds::root::pass_through::DataName;
+use ds_core::vocab::RowState;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::control_size::SidebarSize;
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -99,7 +110,7 @@ fn place(drop: DropState) -> Element {
             title: "Archive",
             leading: RowLeading::Icon(Icon::Archive),
             state: RowState { drop, ..RowState::default() },
-            common: ds::Common { data: place_name("archive"), ..ds::Common::default() },
+            common: Common { data: place_name("archive"), ..Common::default() },
             onpointerenter: |_| {},
             onpointerleave: |_| {},
             onpointerup: |_| {},
@@ -108,9 +119,9 @@ fn place(drop: DropState) -> Element {
 }
 
 /// `data-place="<name>"`.
-fn place_name(name: &str) -> Vec<ds::DataAttr> {
-    match ds::DataName::parse("place") {
-        Ok(attribute) => vec![ds::DataAttr::new(attribute, name)],
+fn place_name(name: &str) -> Vec<DataAttr> {
+    match DataName::parse("place") {
+        Ok(attribute) => vec![DataAttr::new(attribute, name)],
         Err(error) => panic!("{error}"),
     }
 }
@@ -268,7 +279,7 @@ pub const ROW_CASES: &[Case] = &[
             with_accessory(
                 "Projects",
                 Accessory::Slot(
-                    rsx! { ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions", onclick: |_| {} } },
+                    rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions", onclick: |_| {} } },
                 ),
             )
         },
@@ -424,7 +435,7 @@ pub const ROW_CASES: &[Case] = &[
     Case {
         component: "list",
         state: "source-list",
-        make: || rsx! { Scoped { List::<&'static str> { label: "Places", style: ListStyle::SourceList, sidebar: ds::SidebarSize::Large, items: vec![ListItem::heading("Favourites", rsx! { ds::SectionHeader { title: "Favourites" } }), ListItem::row("Inbox", "Inbox", in_state(RowState::default()))] } } },
+        make: || rsx! { Scoped { List::<&'static str> { label: "Places", style: ListStyle::SourceList, sidebar: SidebarSize::Large, items: vec![ListItem::heading("Favourites", rsx! { SectionHeader { title: "Favourites" } }), ListItem::row("Inbox", "Inbox", in_state(RowState::default()))] } } },
     },
     Case {
         component: "list",

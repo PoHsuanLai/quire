@@ -10,6 +10,8 @@ publish.workspace = true
 
 [dependencies]
 ds = { workspace = true }
+ds-core = { workspace = true }
+ds-style = { workspace = true }
 ds-blitz = { workspace = true }
 # `AdapterPref`, the GPU ranking and device request the hybrid painter opens its device with.
 blitz-kit = { workspace = true, features = ["adapter"] }
@@ -35,6 +37,7 @@ peniko = { workspace = true }
 thiserror = { workspace = true }
 
 [dev-dependencies]
+ds-motion = { workspace = true }
 # The virtual-clock ask test wakes the document from a watch channel.
 tokio = { workspace = true }
 

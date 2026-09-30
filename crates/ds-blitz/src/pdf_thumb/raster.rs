@@ -1,7 +1,9 @@
 //! A PDF's first page as PNG pixels, through pdfrum's CPU rasteriser (vello_cpu).
 
 use super::request::DeviceBox;
-use ds::{ImageSize, ImageSource, PdfPage, PdfTrouble};
+use ds::components::content::image_source::ImageSize;
+use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
+use ds::prelude::*;
 use image::ImageEncoder;
 use image::codecs::png::PngEncoder;
 use pdfrum::{Document, Error, RenderOptions, VelloCpuBackend};

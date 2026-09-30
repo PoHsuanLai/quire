@@ -4,12 +4,13 @@
 //! opens from two lines to six, measured, and closes again when the pointer leaves.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, ShortcutKey, TextRun,
-};
+use ds::components::content::rich_text::{Rich, RichRun};
+use ds::components::content::text_runs::RunTone;
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
-use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
+use ds_shell::notifications::parts::{AppMark, CardAction, Hover};
+use ds_shell::prelude::*;
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -118,8 +119,8 @@ fn the_close_button_an_action_and_a_link_keep_their_press() {
     assert_eq!(log(&mut harness).iter().filter(|e| *e == "open").count(), 1);
     let text = harness.rect(".ds-notification-body").expect("a body");
     harness.send(Input::click(Point {
-        x: ds::Px(text.origin.x.0 + text.size.width.0 - 20.0),
-        y: ds::Px(text.origin.y.0 + 8.0),
+        x: Px(text.origin.x.0 + text.size.width.0 - 20.0),
+        y: Px(text.origin.y.0 + 8.0),
     }));
     assert_eq!(log(&mut harness).iter().filter(|e| *e == "open").count(), 2);
 }
@@ -150,8 +151,8 @@ fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves(
     });
 
     harness.send(Input::pointer_move(Point {
-        x: ds::Px(470.0),
-        y: ds::Px(350.0),
+        x: Px(470.0),
+        y: Px(350.0),
     }));
     settle_until(&mut harness, |h| (body_height(h) - rest).abs() < 0.5);
     assert_eq!(

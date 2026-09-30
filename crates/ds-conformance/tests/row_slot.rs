@@ -3,11 +3,10 @@
 //! whose it is.
 
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Icon, Material,
-    PersonHue, Propagation, Row, RowLeading,
-};
-use ds::{Bezel, Button, ImagePosition};
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::press::Propagation;
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 

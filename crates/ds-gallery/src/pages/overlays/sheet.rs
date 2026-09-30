@@ -8,12 +8,12 @@ use crate::axes::Axes;
 use crate::pages::Section;
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::{Answers, ButtonRole, ControlSize};
-use ds::{
-    Appearance, Attach, Availability, Button, Ds, Inject, Material, Sheet, Shortcut, ShortcutKey,
-    Theme,
-};
-use ds::{KeyEquivalent, KeyStyle};
+use ds::assembly::ds::Inject;
+use ds::components::controls::button_model::{Answers, ButtonRole};
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::components::overlays::sheet_attach::Attach;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The power menu section.
 #[component]

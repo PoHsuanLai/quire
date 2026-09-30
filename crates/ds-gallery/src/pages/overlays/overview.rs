@@ -5,12 +5,19 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::overlays::pills::{Cards, Pills};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Arrow, Availability, Button, Check, CommandPalette, Dismiss, Icon, MountedRef,
-    PaletteGroup, PaletteRow, Peek, PeekMode, Placement, Point, Popover, Px, RowLeading, Sheet,
-    Shortcut, ShortcutKey, Side, use_toast_hub,
-};
-use ds::{Answers, ControlSize};
+use ds::components::app::peek::Peek;
+use ds::components::controls::button_model::Answers;
+use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
+use ds::components::overlays::popover::Arrow;
+use ds::host::measure::{Anchor, MountedRef};
+use ds::prelude::*;
+use ds::stack::toast_hub::UndoToken;
+use ds::stack::toast_hub::use_toast_hub;
+use ds_core::geometry::placement::Align;
+use ds_core::geometry::placement::Side;
+use ds_core::vocab::Dismiss;
+use ds_style::appearance::peek::PeekMode;
+use ds_style::tokens::control_size::ControlSize;
 
 /// Everything the page can open, one at a time.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -53,10 +60,7 @@ pub fn OverlaysPage() -> Element {
     let toasts = use_toast_hub();
     use_hook(move || {
         if showcase == Showcase::Posed {
-            toasts.push(
-                "Archived “Invoice #2291”".to_string(),
-                Some(ds::UndoToken(1)),
-            );
+            toasts.push("Archived “Invoice #2291”".to_string(), Some(UndoToken(1)));
         }
     });
     let at = match (showcase, anchor()) {
@@ -106,7 +110,7 @@ pub fn OverlaysPage() -> Element {
                 Popover {
                     key: "{dismiss:?}",
                     anchor: at.clone(),
-                    placement: Placement::new(Side::Bottom, ds::Align::Start),
+                    placement: Placement::new(Side::Bottom, Align::Start),
                     gap: Px(8.0),
                     arrow,
                     dismiss,
@@ -146,7 +150,7 @@ fn Palette(onclose: EventHandler<()>) -> Element {
     let mut query = use_signal(String::new);
     let item = |value: u8, title: &str, icon: Icon, keys: Vec<ShortcutKey>| PaletteRow {
         leading: RowLeading::Icon(icon),
-        accessory: ds::Accessory::Text(Shortcut(keys).glyphs()),
+        accessory: Accessory::Text(Shortcut(keys).glyphs()),
         availability: Availability::Enabled,
         ..PaletteRow::new(value, title)
     };

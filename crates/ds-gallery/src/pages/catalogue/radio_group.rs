@@ -2,8 +2,9 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{Arrangement, Availability, Choice, ControlSize, Icon, RadioGroup};
+use ds::components::controls::radio_group::Arrangement;
+use ds::prelude::*;
+use ds_style::tokens::control_size::ControlSize;
 
 /// The RadioGroup section.
 #[component]

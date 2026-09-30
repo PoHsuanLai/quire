@@ -1,7 +1,7 @@
 //! Focusing an element named by a CSS selector: an app's panel opens and its
 //! field, or the window's own `.app`, should have the keyboard, and the caller holds no mounted
 //! handle for it. The host finds the element in its document
-//! ([`GeometryHost::find`](crate::GeometryHost::find)), the focus and the select-all go through the
+//! ([`GeometryHost::find`](crate::host::parts::GeometryHost::find)), the focus and the select-all go through the
 //! same writes a field's own focus does, and a `TextField` found this way hears its `onfocus` once, as through
 //! `Focus::OnMount`.
 
@@ -54,7 +54,7 @@ pub enum FocusError {
 /// found this way hears its `onfocus` once.
 ///
 /// Await it from a task of a scope that outlives the ask (the window's shell, when the panel
-/// asking is closing): `spawn(async move { let _ = ds::focus_by_selector(".find input",
+/// asking is closing): `spawn(async move { let _ = crate::focus::selector::focus_by_selector(".find input",
 /// Select::All).await; })`.
 pub async fn focus_by_selector(
     selector: impl Into<String>,

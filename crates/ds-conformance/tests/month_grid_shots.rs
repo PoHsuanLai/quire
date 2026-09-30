@@ -9,9 +9,11 @@
 mod month_sample;
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, RootChrome, TextLine, Theme};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Viewport};
-use ds_shell::{DayKey, MonthGrid, MonthKey, MonthStep, WidgetFrame, WidgetMetrics, WidgetSize};
+use ds_shell::month_grid::data::{DayKey, MonthKey, MonthStep};
+use ds_shell::prelude::*;
+use ds_shell::tokens::widgets::WidgetMetrics;
 use month_sample::{AUGUST, First, SEPTEMBER, month};
 use std::time::Duration;
 

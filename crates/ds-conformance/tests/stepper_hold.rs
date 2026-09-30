@@ -3,7 +3,9 @@
 //! of the range hold.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Readout, ShortcutKey, StepRange, Stepper};
+use ds::components::fields::stepper::model::{Readout, StepRange};
+use ds::components::fields::stepper::view::Stepper;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 

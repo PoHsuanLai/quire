@@ -6,10 +6,8 @@
 //! the whole window.
 
 use dioxus::prelude::*;
-use ds::{
-    Alert, AlertButton, AlertRole, Appearance, Ds, Flow, Material, Motion, Point, Px, RootExtent,
-    ShortcutKey, TextLine,
-};
+use ds::components::overlays::alert_model::{AlertButton, AlertRole};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
@@ -177,7 +175,7 @@ fn inline_it_fits_inside_the_popover() {
     let stage = harness.rect(".popover .ds-alert-stage").expect("its stage");
     assert_eq!(stage, popover, "the stage covers the popover exactly");
     let panel = harness.rect(".popover .ds-sheet").expect("the panel");
-    let inside = |outer: ds::Rect, inner: ds::Rect| {
+    let inside = |outer: Rect, inner: Rect| {
         inner.origin.x.0 >= outer.origin.x.0
             && inner.origin.y.0 >= outer.origin.y.0
             && inner.origin.x.0 + inner.size.width.0 <= outer.origin.x.0 + outer.size.width.0

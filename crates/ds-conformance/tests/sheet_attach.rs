@@ -4,8 +4,9 @@
 //! view; and a sheet dims nothing.
 
 use dioxus::prelude::*;
+use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds::{Appearance, Attach, Ds, Material, RootExtent, Sheet};
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;

@@ -4,15 +4,24 @@
 
 use super::cases::Case;
 use dioxus::prelude::*;
+use ds::components::content::label::{LabelRole, LabelStyle};
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::content::text_runs::RunTone;
+use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
+use ds::components::controls::button_model::{Answers, Bezel, ButtonRole, IconSwap, ImagePosition};
+use ds::components::controls::checkbox::Checkbox;
+use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
+use ds::components::controls::level_indicator::{Bands, LevelIndicator, LevelStyle};
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
+use ds::components::controls::radio_group::Arrangement;
+use ds::components::controls::segmented::Tracking;
+use ds::components::controls::slider_model::{SliderLook, Ticks};
+use ds::components::fields::text_field_model::Invalid;
 use ds::detail::{EventStamp, Operation, PendingToken};
-use ds::{
-    Answers, Arrangement, Availability, Badge, BadgeContent, BadgeTone, Bands, Bezel, Button,
-    ButtonRole, Check, Checkbox, Choice, ControlSize, FieldBezel, FieldKind, Fraction, Icon,
-    IconSwap, ImagePosition, Invalid, KeyEquivalent, KeyStyle, Label, LabelRole, LabelStyle,
-    LevelGlyph, LevelIndicator, LevelStyle, Muting, Progress, ProgressIndicator, ProgressStyle,
-    RadioGroup, RunTone, SegmentedControl, Shortcut, ShortcutKey, Shown, Slider, SliderLook,
-    TextField, TextLine, TextRun, Ticks, Toggle, Tracking, Validity,
-};
+use ds::prelude::*;
+use ds_core::vocab::Muting;
+use ds_style::tokens::control_size::ControlSize;
 
 /// An operation that has just started: a spinner's first frame is drawn before its timer runs, so
 /// it draws at rest.
@@ -415,7 +424,7 @@ pub const CASES: &[Case] = &[
                 TextField {
                     label: "Website",
                     value: "example",
-                    prefix: rsx! { ds::IconView { source: Icon::Globe.into() } },
+                    prefix: rsx! { IconView { source: Icon::Globe.into() } },
                     suffix: rsx! { span { ".com" } },
                     oninput: |_| {},
                 }
@@ -491,7 +500,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "progress",
         state: "ring-glyph",
-        make: || rsx! { ProgressIndicator { style: ProgressStyle::Ring, progress: Progress::Known(Fraction(600)), size: ControlSize::Large, glyph: ds::IconSource::Glyph(Icon::Download) } },
+        make: || rsx! { ProgressIndicator { style: ProgressStyle::Ring, progress: Progress::Known(Fraction(600)), size: ControlSize::Large, glyph: IconSource::Glyph(Icon::Download) } },
     },
     Case {
         component: "progress",

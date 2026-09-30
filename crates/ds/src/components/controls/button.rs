@@ -7,9 +7,9 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::button_marks::{
-    Leading, Trailing, leading as leading_mark, spoken_label, trailing as trailing_mark,
-};
+use crate::components::controls::button_marks::leading as leading_mark;
+use crate::components::controls::button_marks::trailing as trailing_mark;
+use crate::components::controls::button_marks::{Leading, Trailing, spoken_label};
 use crate::components::controls::button_model::{
     Answers, Bezel, ButtonRole, IconSwap, ImagePosition,
 };

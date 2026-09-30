@@ -4,7 +4,8 @@
 use blitz_traits::events::{
     BlitzPointerEvent, BlitzPointerId, MouseEventButton, MouseEventButtons, PointerCoords,
 };
-use ds::{Point, PointerButton, ShortcutKey};
+use ds::prelude::*;
+use ds_core::press::PointerButton;
 use keyboard_types::{Code, Key as DomKey, Modifiers};
 
 /// The Blitz button, and the held-buttons set while it is down, for a quire pointer button.
@@ -125,7 +126,7 @@ fn letter(c: char) -> Code {
 #[cfg(test)]
 mod tests {
     use super::{keyboard, letter, modifier};
-    use ds::ShortcutKey;
+    use ds::prelude::*;
     use keyboard_types::Code;
 
     const LETTERS: &[(char, Code)] = &[

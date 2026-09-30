@@ -21,7 +21,7 @@ use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use ds::components::controls::press::{ActivationKeys, PressListeners};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
-use ds::{Common, ControlSize};
+use ds::root::common::Common;
 use ds_core::geometry::units::Px;
 use ds_core::press::Press;
 use ds_core::vocab::{Activity, Fraction, Shown};
@@ -29,6 +29,7 @@ use ds_core::word::Word;
 use ds_style::icon::family::PlateFamily;
 use ds_style::icon::plate_tint::PlateTint;
 use ds_style::icon::render::{IconPx, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// The plate's share of the tile's side (design/08 section 2.2).
 const PLATE_SHARE: f32 = 0.805;

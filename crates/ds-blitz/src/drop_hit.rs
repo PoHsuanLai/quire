@@ -1,11 +1,12 @@
-//! The host's hit test for a file drag (`ds::FileDropHost`): the element under the pointer, as
+//! The host's hit test for a file drag (`ds::host::parts::FileDropHost`): the element under the pointer, as
 //! Blitz finds it for a press (`element_from_point`: transforms and `pointer-events` applied),
 //! and the innermost registered drop target on its ancestor chain.
 
 use crate::node_ref::NodeRef;
 use blitz_dom::{BaseDocument, NodeId};
 use dioxus::prelude::MountedData;
-use ds::{DropHit, Point};
+use ds::host::drop_hit::DropHit;
+use ds::prelude::*;
 use std::rc::Rc;
 
 /// The innermost of `targets` whose element is under `at` or an ancestor of what is.

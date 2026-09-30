@@ -6,11 +6,14 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::{Scope, Section, Specimen};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::Word;
-use ds::{
-    BlurState, Glyph, Icon, IconSize, InputModality, Material, clip_chars, sleep, use_rect,
-    use_scope,
-};
+use ds::host::measure::use_rect;
+use ds::prelude::*;
+use ds::root::chrome::FrameTint;
+use ds_core::text::clip::clip_chars;
+use ds_core::time::clock::sleep;
+use ds_core::vocab::InputModality;
+use ds_style::appearance::blur::BlurState;
+use ds_style::icon::render::Glyph;
 use std::time::Duration;
 
 /// Each spike finding: its id, what Blitz does, and what quire does about it.
@@ -63,7 +66,7 @@ const LIMITS: [(&str, &str, &str); 16] = [
     (
         "S10",
         "futures-timer sleeps wake the document.",
-        "Settle timers, hover intent and the toast hold run on ds::sleep (the ticker below).",
+        "Settle timers, hover intent and the toast hold run on ds_core::time::clock::sleep (the ticker below).",
     ),
     (
         "S11",
@@ -173,7 +176,7 @@ fn BlurOff() -> Element {
         Section { title: "S15: no backdrop blur", note: "Both panels sit over one-pixel stripes. With blur on the stripes show through the tint unblurred (the compositor blurs on the desktop, Blitz cannot); with blur off the solid tint hides them.",
             div { class: "g-wall g-grid2", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for blur in [BlurState::Available, BlurState::Unavailable] {
-                    Scope { scheme, accent, material: Material::Popover, blur, frame: Some(ds::FrameTint::None),
+                    Scope { scheme, accent, material: Material::Popover, blur, frame: Some(FrameTint::None),
                         div { class: "g-panel",
                             span { class: "g-name", "data-blur={blur.slug()}" }
                             span { "Popover tint over the wallpaper." }
@@ -243,7 +246,7 @@ fn Live() -> Element {
                 Specimen { name: "use_rect after layout", code: rect,
                     div { class: "g-stage", onmounted: move |event| probe.on_mounted(event) }
                 }
-                Specimen { name: "ds::sleep ticks", code: format!("{} s since this page opened", ticks()),
+                Specimen { name: "ds_core::time::clock::sleep ticks", code: format!("{} s since this page opened", ticks()),
                     div {}
                 }
                 Specimen { name: "data-modality", code: modality.to_string(),

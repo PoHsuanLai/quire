@@ -3,11 +3,17 @@
 //! through a real Blitz document.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Common, Composition, Ds, EditFocus, EditHandle, EditInput, EditPointer,
-    EditSurface, ImeSwitch, KeyInput, Material, Pasted, Point, PointerPhase, Probe, Px, Rect,
-    ShortcutKey, Size, TextPosition, TextRange, use_edit_handle,
-};
+use ds::edit::handle::{EditHandle, use_edit_handle};
+use ds::edit::input::PreeditCursor;
+use ds::edit::input::{Composition, EditInput, KeyInput};
+use ds::edit::pointer::{EditFocus, EditPointer};
+use ds::host::captured::PointerPhase;
+use ds::host::ime::ImeSwitch;
+use ds::host::pasted::Pasted;
+use ds::host::position::{TextPosition, TextRange};
+use ds::host::probe::Probe;
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
@@ -159,7 +165,7 @@ fn a_composition_arrives_as_start_updates_and_end_in_order() {
     let update = |text: &str, cursor: Option<usize>| {
         EditInput::Composition(Composition::Update {
             text: text.to_owned(),
-            cursor: cursor.map(|at| ds::PreeditCursor { start: at, end: at }),
+            cursor: cursor.map(|at| PreeditCursor { start: at, end: at }),
         })
     };
     assert_eq!(

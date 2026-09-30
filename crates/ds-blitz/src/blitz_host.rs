@@ -1,4 +1,4 @@
-//! `ds::DocumentHost` on Blitz, and [`provide_host`], the one call that gives a root all of it.
+//! `ds::prelude::DocumentHost` on Blitz, and [`provide_host`], the one call that gives a root all of it.
 //!
 //! The host is built from what a document's owner knows: whether the keyboard falls back to a
 //! focusable ancestor (and the keeper that watches removals for it), how to find an element by
@@ -18,12 +18,21 @@ use crate::measure::measure;
 use crate::node_ref::same;
 use crate::reveal::reveal;
 use dioxus::prelude::*;
-use ds::{
-    CapturedPointer, Caret, CaretHost, ClickFocusHost, DocumentHost, DropHit, EditHost, Fallback,
-    FieldSelection, FileDropHost, FocusHost, Focused, Found, GeometryHost, HandBack, ImeEvent,
-    ImeHost, ImeListener, ImeSwitch, InitialCaret, Measured, Pasted, Point, Probe, Rect, SameNode,
-    Scrolled, TextPosition, TextRange,
+use ds::host::captured::CapturedPointer;
+use ds::host::caret::{Caret, FieldSelection, InitialCaret};
+use ds::host::drop_hit::DropHit;
+use ds::host::fallback::Fallback;
+use ds::host::found::{Found, SameNode};
+use ds::host::hand_back::HandBack;
+use ds::host::ime::{ImeEvent, ImeListener, ImeSwitch};
+use ds::host::parts::{
+    CaretHost, ClickFocusHost, EditHost, FileDropHost, FocusHost, GeometryHost, ImeHost,
 };
+use ds::host::pasted::Pasted;
+use ds::host::position::{TextPosition, TextRange};
+use ds::host::probe::Probe;
+use ds::host::reveal::Scrolled;
+use ds::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -120,7 +129,7 @@ impl BlitzHost {
 }
 
 /// Give the calling root the whole Blitz host: the focus, caret, geometry, edit and drop parts of
-/// [`ds::DocumentHost`] and the clipboard, together, so no root holds a subset. Call it at the top
+/// [`ds::prelude::DocumentHost`] and the clipboard, together, so no root holds a subset. Call it at the top
 /// of a root `ds_blitz::launch` did not start (a shell's surface, a popup's document), before
 /// any quire component reads the document. A root that already has a host (a window's, the
 /// harness's) keeps it, so a component calling this under one takes what the window wired.

@@ -1,6 +1,7 @@
 //! design/26: the pieces the control center modules draw with: the filled moon.
 
-use ds::{Icon, Shape};
+use ds::prelude::*;
+use ds_style::icon::shape::Shape;
 
 #[test]
 fn the_filled_moon_is_the_outline_moon_filled() {

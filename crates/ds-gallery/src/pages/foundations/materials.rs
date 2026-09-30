@@ -6,14 +6,15 @@ use crate::legibility::floors;
 use crate::pages::{Scope, Section};
 use crate::wallpaper;
 use dioxus::prelude::*;
-use ds::Alpha;
-use ds::Word;
-use ds::{
-    Avatar, AvatarSize, AvatarTone, BlurState, Button, Chip, ChipVariant, Fraction, Glyph, Icon,
-    IconSize, Material, Slider, StatusMetrics, Surface, use_scope,
-};
-use ds::{Bezel, ControlSize, ImagePosition};
-use ds_shell::MenuBarItem;
+use ds::components::content::avatar::{AvatarSize, AvatarTone};
+use ds::components::controls::button_model::{Bezel, ImagePosition};
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::icon::render::Glyph;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::status::StatusMetrics;
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
@@ -121,7 +122,7 @@ fn Panel(material: Material) -> Element {
                 span { class: "g-code", "{state}" }
                 span { class: "g-spacer" }
                 MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: ds::Shown::Visible, onclick: |_| {} }
+                MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: Shown::Visible, onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },

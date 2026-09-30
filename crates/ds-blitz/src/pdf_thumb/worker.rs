@@ -9,7 +9,7 @@
 //! oldest is dropped, and its asker hears so and asks again at the back.
 
 use super::request::{ThumbRequest, pdf_thumb_blocking};
-use ds::PdfPage;
+use ds::components::content::pdf_thumb::PdfPage;
 use std::collections::VecDeque;
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::sync::{Condvar, LazyLock, Mutex, PoisonError};

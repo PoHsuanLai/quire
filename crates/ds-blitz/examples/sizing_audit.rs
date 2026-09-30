@@ -5,17 +5,19 @@
 //! `cargo run --release -p ds-blitz --example sizing_audit -- OUT_DIR`
 
 use dioxus::prelude::*;
-use ds::SliderLook;
+use ds::components::content::level_glyph::vocab::LevelGlyph;
+use ds::components::controls::button_model::{Answers, ImagePosition};
+use ds::components::controls::segmented::Tracking;
+use ds::components::controls::slider_model::SliderLook;
 use ds::icon::{IconStyle, Tint};
-use ds::{Answers, ControlSize, ImagePosition};
-use ds::{
-    Appearance, Button, Check, Ds, Fraction, Icon, IconSize, IconSource, IconView, LevelGlyph,
-    Material, Muting, PlateFamily, PlateTint, Px, Scheme, SegmentedControl, Shown, Slider,
-    StatusMetrics, Surface, Theme, Toggle,
-};
-use ds::{Choice, Tracking};
+use ds::prelude::*;
+use ds_core::vocab::Muting;
 use ds_harness::{Driver, Harness, Query, Viewport};
-use ds_shell::{MenuBarItem, ModuleGrid, ModulePanel, ModuleTile};
+use ds_shell::prelude::*;
+use ds_style::icon::family::PlateFamily;
+use ds_style::icon::plate_tint::PlateTint;
+use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::status::StatusMetrics;
 use std::path::PathBuf;
 use std::time::Duration;
 

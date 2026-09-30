@@ -5,10 +5,10 @@
 
 use crate::pages::details::overview::{Cell, mini};
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Availability, BatteryState, Check, Fraction, Icon, List, ListItem, Row, RowLeading,
-    RowState, Selection, TextLine,
-};
+use ds::components::content::status::battery_state::BatteryState;
+use ds::components::lists::row::size::RowSize;
+use ds::prelude::*;
+use ds_core::vocab::RowState;
 
 /// Where an operation on a row's item stands.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -66,7 +66,7 @@ fn pane_row(
                 leading,
                 accessory,
                 state: RowState { availability: run.availability(), selection: Selection::Unselected, ..RowState::default() },
-                size: ds::RowSize::Settings,
+                size: RowSize::Settings,
                 onclick: move |_| press.call(()),
             }
         },

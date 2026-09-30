@@ -1,4 +1,4 @@
-//! A key on an [`EditSurface`](crate::EditSurface): nothing while the IME composes (it owns the
+//! A key on an [`EditSurface`](crate::components::editor::surface::EditSurface): nothing while the IME composes (it owns the
 //! keys), else end a cleared composition, then hand over what the key means.
 
 use crate::components::editor::ctx::SurfaceCtx;

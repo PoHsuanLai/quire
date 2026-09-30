@@ -5,7 +5,7 @@
 
 use crate::lock::vocab::LockLook;
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_core::word::Word;
 
 /// The time and the date, as the caller words them ("9:41", "Friday 26 September"): the

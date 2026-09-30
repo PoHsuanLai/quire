@@ -3,7 +3,8 @@
 //! row reaches it, and Escape closes it. Without the mode the same root measures nothing.
 
 use dioxus::prelude::*;
-use ds::{Anchor, Appearance, Ds, Material, Menu, MenuItem, Point, Px, RootExtent, ShortcutKey};
+use ds::host::measure::Anchor;
+use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -28,7 +29,7 @@ fn Popup(extent: RootExtent) -> Element {
             Ds { appearance: Appearance::default(), material: Material::Popover, extent,
                 if open() {
                     Menu::<usize> {
-                        placement: ds::MenuPlacement::Bar,
+                        placement: MenuPlacement::Bar,
                         anchor: Anchor::Point(Point { x: Px(200.0), y: Px(150.0) }),
                         items: ["Open", "Quit"]
                             .into_iter()

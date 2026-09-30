@@ -7,10 +7,10 @@ use crate::axes::{Axes, Showcase};
 use crate::pages::content::app_icons::{APPS, app_icon};
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Accessory, Button, Check, CommandPalette, CommandPaletteHost, Corner, Icon, IconSize, Material,
-    PaletteRow, Radius, RowLeading, Shortcut, ShortcutKey, Shown, Surface,
-};
+use ds::components::menus::palette::palette_group::PaletteGroup;
+use ds::components::menus::palette::palette_group::PaletteRow;
+use ds::prelude::*;
+use ds_style::tokens::shape::{Corner, Radius};
 
 fn row(
     value: u8,
@@ -67,7 +67,7 @@ fn actions() -> Vec<PaletteRow<u8>> {
 
 /// One embedded palette in a Sheet surface of the launcher's panel shape.
 #[component]
-fn Panel(query: String, groups: Vec<ds::PaletteGroup<u8>>) -> Element {
+fn Panel(query: String, groups: Vec<PaletteGroup<u8>>) -> Element {
     rsx! {
         div { class: "g-launcher",
             Surface { material: Material::Sheet, radius: Some(Corner::Token(Radius::Panel)),
@@ -96,12 +96,12 @@ pub fn EmbeddedPalette() -> Element {
         Section { title: "Palette in a surface", note: "CommandPaletteHost::Surface: no scrim, the card spans its container's width, is as tall as its content (up to the container), carries the id a shell's blur region names, and paints the enclosing material. A row's tile takes an app's own icon (RowLeading::Source), drawn as it is, filling the tile.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Typed \"f\": app icons, cmdk-in",
-                    Panel { query: "f", groups: vec![ds::PaletteGroup::list("Applications", apps("f"))] }
+                    Panel { query: "f", groups: vec![PaletteGroup::list("Applications", apps("f"))] }
                 }
                 Specimen { name: "Empty query: actions and recent apps, peek-in",
                     Panel {
                         query: "",
-                        groups: vec![ds::PaletteGroup::list("Actions", actions()), ds::PaletteGroup::list("Recent", apps(""))],
+                        groups: vec![PaletteGroup::list("Actions", actions()), PaletteGroup::list("Recent", apps(""))],
                     }
                 }
             }
@@ -127,11 +127,11 @@ fn WarmPalette() -> Element {
     let typed = query().to_lowercase();
     let groups = if typed.is_empty() {
         vec![
-            ds::PaletteGroup::list("Actions", actions()),
-            ds::PaletteGroup::list("Recent", apps("")),
+            PaletteGroup::list("Actions", actions()),
+            PaletteGroup::list("Recent", apps("")),
         ]
     } else {
-        vec![ds::PaletteGroup::list("Applications", apps(&typed))]
+        vec![PaletteGroup::list("Applications", apps(&typed))]
     };
     let flipped = match shown() {
         Shown::Visible => Shown::Hidden,

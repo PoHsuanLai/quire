@@ -2,9 +2,10 @@
 
 use crate::pages::Section;
 use dioxus::prelude::*;
-use ds::{
-    CellAlign, Icon, IconView, Px, RowSize, Sort, SortDirection, Table, TableColumn, TableRow,
-};
+use ds::components::lists::row::size::RowSize;
+use ds::components::lists::table::model::{CellAlign, Sort, SortDirection, TableColumn, TableRow};
+use ds::components::lists::table::view::Table;
+use ds::prelude::*;
 
 /// One file the table lists.
 #[derive(Debug, Clone, Copy, PartialEq)]

@@ -22,10 +22,14 @@ mod palette_and_hover_targets;
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
-use ds::{
-    Alpha, Anchor, Appearance, Ds, Inject, LayerStack, Material, Menu, MenuItem, MenuPlacement,
-    Peek, PeekMode, Point, Px,
-};
+use ds::assembly::ds::Inject;
+use ds::components::app::peek::Peek;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::layer_stack::Dismissal;
+use ds::stack::layer_stack::LayerId;
+use ds::stack::layer_stack::LayerStack;
+use ds_style::appearance::peek::PeekMode;
 use std::cell::Cell;
 use std::future::Future;
 use std::pin::pin;
@@ -198,14 +202,8 @@ fn the_newest_layer_takes_the_escape() {
         let second = now.clone().remove(top).escape();
         (first, second)
     });
-    assert_eq!(
-        first,
-        ds::Dismissal::Close(ds::LayerId(stack_top(&dom, stack, 0)))
-    );
-    assert_eq!(
-        second,
-        ds::Dismissal::Close(ds::LayerId(stack_top(&dom, stack, 1)))
-    );
+    assert_eq!(first, Dismissal::Close(LayerId(stack_top(&dom, stack, 0))));
+    assert_eq!(second, Dismissal::Close(LayerId(stack_top(&dom, stack, 1))));
     assert_ne!(first, second);
 }
 
@@ -237,7 +235,7 @@ fn an_empty_hub_lays_out_no_toast() {
 fn the_root_renders_the_toast_host_after_the_overlay_host() {
     #[component]
     fn Pushed() -> Element {
-        let toasts = ds::use_toasts();
+        let toasts = use_toasts();
         use_hook(move || toasts.push("Archived".to_string(), None));
         rsx! {}
     }
@@ -255,7 +253,7 @@ fn the_root_renders_the_toast_host_after_the_overlay_host() {
 fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     #[component]
     fn Pushed() -> Element {
-        let toasts = ds::use_toasts();
+        let toasts = use_toasts();
         use_hook(move || toasts.push("Archived".to_string(), None));
         rsx! {}
     }

@@ -29,9 +29,11 @@ impl Book {
 #[cfg(test)]
 mod tests {
     use super::Book;
+    use crate::widget::battery::BatteryWidget;
+    use crate::widget::calendar::MonthWidget;
+    use crate::widget::contract::Widget;
     use crate::widget::kind::{WidgetHost, WidgetSize};
     use crate::widget::layout::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
-    use crate::widget::{battery::BatteryWidget, calendar::MonthWidget, contract::Widget};
 
     const GRID: DesktopGrid = DesktopGrid {
         columns: 4,

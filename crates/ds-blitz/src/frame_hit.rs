@@ -6,7 +6,7 @@
 use crate::frame_anchor::{LinkFacts, anchor_at};
 use crate::origin::FrameId;
 use blitz_dom::{BaseDocument, NodeId};
-use ds::Point;
+use ds::prelude::*;
 
 /// A link under the pointer, inside a frame.
 #[derive(Debug, Clone, PartialEq, Eq)]

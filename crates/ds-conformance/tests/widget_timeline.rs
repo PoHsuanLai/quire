@@ -6,14 +6,14 @@
 //! the dates are exact whatever the machine's load.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, Motion, RootChrome};
+use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
+use ds_shell::prelude::*;
 use ds_shell::widget::REFRESH_FLOOR;
-use ds_shell::{
-    ClockCity, ClockEntry, ClockTime, Dated, DayPhase, EntryDate, Refresh, RefreshAsk, Seconds,
-    Timeline, WidgetCard, WidgetSize, WorldClockWidget,
-};
+use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
+use ds_shell::widget::timeline::{Dated, EntryDate, Refresh, RefreshAsk, Timeline};
 use std::cell::RefCell;
 use std::time::Duration;
 

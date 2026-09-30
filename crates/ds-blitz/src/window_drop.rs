@@ -1,5 +1,5 @@
 //! The window's side of a file drag: winit 0.31's data-transfer events become
-//! `ds::FileDragInput`s, and `ds::FileDropBoard`'s answer goes back to the platform so the cursor
+//! `ds::file_drop::drag::FileDragInput`s, and `ds::file_drop::board::FileDropBoard`'s answer goes back to the platform so the cursor
 //! shows a copy over a target and a refusal elsewhere.
 //!
 //! winit reports a drag in four events plus the data (`DragEntered`, `DragPosition`,
@@ -14,7 +14,8 @@
 use dioxus_native::winit::data_transfer::{DataTransferId, TypeHint};
 use dioxus_native::winit::event::WindowEvent;
 use dioxus_native::winit::event_loop::{ActiveEventLoop, DndAction};
-use ds::{DropAcceptance, FileDragInput, Offer, Point, Px};
+use ds::file_drop::drag::{DropAcceptance, FileDragInput, Offer};
+use ds::prelude::*;
 use std::io::ErrorKind;
 
 /// The drag over this window, and what the platform was last told about it.

@@ -4,8 +4,13 @@
 use crate::axes::{Axes, PresetIndex};
 use crate::pages::{Caption, Section};
 use dioxus::prelude::*;
-use ds::{Chip, ChipVariant, FrameVars, Selection, Shortcut, ShortcutKey, readout, use_scope};
-use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceDot, SpaceEditor};
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::prelude::*;
+use ds_shell::prelude::*;
+use ds_shell::space_editor::DotIndex;
+use ds_shell::space_editor::rows::{MeasuredIn, MotionChoice};
+use ds_style::space::frame_vars::FrameVars;
+use ds_style::space::palette::readout::readout;
 
 /// The Space page.
 #[component]
@@ -48,7 +53,7 @@ pub fn SpacePage() -> Element {
                 measured: MeasuredIn::EachScheme,
             }
         }
-        Section { title: "Contrast readout", note: "ds::readout for this Space in the current scheme: the four gates every pick is held to.",
+        Section { title: "Contrast readout", note: "ds_style::space::palette::readout::readout for this Space in the current scheme: the four gates every pick is held to.",
             div { class: "g-row",
                 for check in checks {
                     Chip {

@@ -7,7 +7,7 @@
 
 use crate::driver::Driver;
 use crate::harness::Harness;
-use ds::VirtualClock;
+use ds_core::time::clock::VirtualClock;
 use std::time::{Duration, Instant};
 
 /// How long a settled document must stay quiet for [`assert_settles_to_zero_frames`]: longer
@@ -55,7 +55,7 @@ pub fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> I
 /// component with a `Detailed` state calls it at the end of each moment's test. Panics with the
 /// document's HTML if it never goes quiet.
 ///
-/// **[`Clock::Virtual`](crate::Clock::Virtual) is exact.** `ds::VirtualClock` knows the due
+/// **[`Clock::Virtual`](crate::Clock::Virtual) is exact.** `ds_core::time::clock::VirtualClock` knows the due
 /// instant of every sleep still waiting (`next_due`), so this drains them: it advances to each
 /// pending due instant in turn, earliest first, until none remain (bounded by
 /// [`VIRTUAL_DRAIN_BOUND`] of virtual time — a component that keeps rescheduling itself fails

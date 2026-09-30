@@ -7,4 +7,4 @@ pub(crate) mod picture;
 pub(crate) mod polkit_prompt;
 pub(crate) mod prompt;
 pub(crate) mod screen;
-pub(crate) mod vocab;
+pub mod vocab;

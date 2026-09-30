@@ -5,7 +5,8 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::label::{Label, LabelRole, LabelStyle};
-use crate::components::content::text_runs::{TextLine, text as runs};
+use crate::components::content::text_runs::TextLine;
+use crate::components::content::text_runs::text as runs;
 use crate::components::controls::key_equivalent::KeyEquivalent;
 use crate::components::controls::key_equivalent::KeyStyle;
 use dioxus::prelude::*;
@@ -111,7 +112,7 @@ pub struct HoverMessage {
     /// The sender's short name.
     pub name: String,
     /// The message's opening, clipped by the caller to two lines' worth
-    /// (`ds::clip_chars`; Blitz has no line clamp, the sheet's height is only the guard).
+    /// (`ds_core::text::clip::clip_chars`; Blitz has no line clamp, the sheet's height is only the guard).
     pub text: String,
 }
 

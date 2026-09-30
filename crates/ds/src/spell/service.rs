@@ -1,4 +1,4 @@
-//! The service an [`EditSurface`](crate::EditSurface) checks spelling through. `ds` stays
+//! The service an `EditSurface` checks spelling through. `ds` stays
 //! effect-free: reading dictionaries, checking on a worker thread and writing the user's
 //! dictionary are `ds_blitz::spell`'s (its `spell` feature), which provides an
 //! `Rc<dyn SpellService>` as root context. Without one a surface with

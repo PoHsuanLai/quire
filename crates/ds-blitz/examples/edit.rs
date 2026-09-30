@@ -6,11 +6,15 @@
 //! `cargo run -p ds-blitz --example edit`
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Common, Ds, EditInput, EditPointer, EditSurface, Material, PointerPhase, Probe,
-    Rect, use_edit_handle,
-};
+use ds::edit::handle::use_edit_handle;
+use ds::edit::input::EditInput;
+use ds::edit::pointer::EditPointer;
+use ds::host::captured::PointerPhase;
+use ds::host::probe::Probe;
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_blitz::{AppConfig, AppId, launch};
+use ds_core::time::clock::sleep;
 use std::time::Duration;
 
 fn main() {
@@ -26,7 +30,7 @@ fn App() -> Element {
     use_hook(|| {
         let seconds = std::env::var("QUIRE_EDIT_SECONDS").ok()?.parse().ok()?;
         Some(spawn(async move {
-            ds::sleep(Duration::from_secs(seconds)).await;
+            sleep(Duration::from_secs(seconds)).await;
             std::process::exit(0);
         }))
     });

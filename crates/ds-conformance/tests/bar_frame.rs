@@ -8,14 +8,22 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::ImagePosition;
-use ds::{
-    Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
-    FrameVars, Hex, Icon, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement, Point,
-    Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
-};
+use ds::components::controls::button_model::ImagePosition;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds_core::geometry::placement::Align;
+use ds_core::geometry::placement::Side;
 use ds_harness::{Backdrop, Driver, Harness, Input, Viewport};
-use ds_shell::MenuBarItem;
+use ds_shell::prelude::*;
+use ds_style::appearance::blur::BlurState;
+use ds_style::space::frame_vars::FrameVars;
+use ds_style::space::palette::derive;
+use ds_style::space::presets::PRESETS;
+use ds_style::tokens::colour::ColourToken;
+use ds_style::tokens::easing::EasingToken;
+use ds_style::tokens::hex::Hex;
+use ds_style::tokens::status::StatusMetrics;
+use ds_style::tokens::timing::DurationToken;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -211,7 +219,7 @@ fn entries() -> Vec<MenuItem<u8>> {
             image: None,
             key: None,
             check: None,
-            availability: ds::Availability::Enabled,
+            availability: Availability::Enabled,
         })
         .collect()
 }
@@ -222,7 +230,7 @@ fn popup(chrome: Option<RootChrome>) -> Element {
             style { {PROBE_CSS} }
             div { class: "room" }
             Menu::<u8> {
-                placement: ds::MenuPlacement::Popup,
+                placement: MenuPlacement::Popup,
                 anchor: Anchor::Point(Point { x: Px(80.0), y: Px(60.0) }),
                 items: entries(),
                 onpick: |_| {},
@@ -278,7 +286,7 @@ fn GroundedBar() -> Element {
             div { class: "bar-fill", span { class: "ink-probe on-frame" } }
             Popover {
                 anchor: Anchor::Point(Point { x: Px(20.0), y: Px(60.0) }),
-                placement: Placement::new(Side::Bottom, ds::Align::Start),
+                placement: Placement::new(Side::Bottom, Align::Start),
                 gap: Px(0.0),
                 onclose: |_| {},
                 div { style: "padding:12px", span { class: "ink-probe on-paper" } }
@@ -336,7 +344,7 @@ fn StatusItems() -> Element {
 }
 
 /// How wide the ink inside `box_rect` is: the glyph's drawn extent, not its element's.
-fn inked_width(frame: &RgbaImage, box_rect: ds::Rect) -> u32 {
+fn inked_width(frame: &RgbaImage, box_rect: Rect) -> u32 {
     let ground = modal(&pixels(frame, box_rect, 0.0));
     let x0 = box_rect.origin.x.0 as u32;
     let y0 = box_rect.origin.y.0 as u32;

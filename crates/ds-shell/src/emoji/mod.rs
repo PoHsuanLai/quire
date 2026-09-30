@@ -11,7 +11,7 @@ use {
     id::EmojiId,
 };
 
-pub(crate) mod disc;
+pub mod disc;
 pub mod id;
 pub(crate) mod play;
 pub(crate) mod sheet;
@@ -20,7 +20,7 @@ mod tests;
 
 use crate::user_picture::size::PictureSize;
 use dioxus::prelude::*;
-use ds::Common;
+use ds::root::common::Common;
 use ds_motion::wake::WakeStamp;
 use ds_style::scope::use_scope;
 use sheet::{SheetPx, position, timing, uri};

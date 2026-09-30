@@ -4,7 +4,7 @@
 //! empty stylesheet; the probe's computed fill and its painted pixel follow each step.
 
 use dioxus::prelude::*;
-use ds::Point;
+use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
 use std::time::Duration;
 

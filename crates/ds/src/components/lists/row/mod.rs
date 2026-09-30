@@ -3,12 +3,12 @@
 
 pub(crate) mod accessory;
 pub(crate) mod action;
-pub(crate) mod chord;
+pub mod chord;
 pub(crate) mod leading;
 pub(crate) mod marks;
-pub(crate) mod motion;
+pub mod motion;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
-pub(crate) mod row;
-pub(crate) mod shape;
+pub mod row;
+pub mod shape;
 pub(crate) mod shape_view;
-pub(crate) mod size;
+pub mod size;

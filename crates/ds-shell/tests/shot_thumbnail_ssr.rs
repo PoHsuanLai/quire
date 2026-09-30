@@ -9,13 +9,15 @@
 mod golden;
 
 use dioxus::prelude::*;
-use ds::Common;
-use ds::{Appearance, Ds, Icon, ImageSize, ImageSource, Inject, Material, Px, Shown, Theme};
+use ds::assembly::ds::Inject;
+use ds::components::content::image_source::ImageSize;
+use ds::prelude::*;
+use ds::root::common::Common;
 use ds_lint::{LintConfig, markup};
-use ds_shell::{
-    Banner, BannerKey, BannerPosition, BannerStack, NotificationSwipe, ShotGhost, ShotThumbnail,
-    ThumbAction,
-};
+use ds_shell::notifications::banner_stack::{Banner, BannerKey, BannerPosition};
+use ds_shell::notifications::swipe::NotificationSwipe;
+use ds_shell::prelude::*;
+use ds_shell::thumbs::shot_thumbnail::ThumbAction;
 
 /// A picture's source: a stand-in URI, since only the markup is compared.
 fn picture() -> ImageSource {

@@ -11,9 +11,9 @@
 //! heights, which are what the rule is about, and check the press only where the frame is sound.
 
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{Appearance, Button, Ds, Material, Point, Rect};
+use ds::prelude::*;
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_style::tokens::control_size::ControlSize;
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -89,8 +89,8 @@ fn height(harness: &Harness, selector: &str) -> f32 {
 fn press(harness: &mut Harness) -> u32 {
     let button = harness.rect(".ds-button").expect("the button is laid out");
     harness.send(Input::click(Point {
-        x: ds::Px(button.origin.x.0 + button.size.width.0 / 2.0),
-        y: ds::Px(button.origin.y.0 + button.size.height.0 / 2.0),
+        x: Px(button.origin.x.0 + button.size.width.0 / 2.0),
+        y: Px(button.origin.y.0 + button.size.height.0 / 2.0),
     }));
     harness.advance(Duration::from_millis(50));
     harness.within(|| *PRESSES.peek())

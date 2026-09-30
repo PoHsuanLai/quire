@@ -11,12 +11,17 @@ use crate::pages::Section;
 use crate::pages::shell::widget_blur::BlurWall;
 use crate::pages::shell::widget_looks::Wall;
 use dioxus::prelude::*;
-use ds::ControlSize;
-use ds::{BatteryPower, BatteryState, Button, Common, Fraction, LowAt, WakeStamp};
-use ds_shell::{
-    BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
-    Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
-};
+use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
+use ds::prelude::*;
+use ds::root::common::Common;
+use ds_motion::wake::WakeStamp;
+use ds_shell::battery::device_glyph::Device;
+use ds_shell::clock::kind::{ClockTime, DayPhase, Seconds};
+use ds_shell::prelude::*;
+use ds_shell::widget::battery::{BatteryCell, BatteryEntry, BatteryWidget};
+use ds_shell::widget::clock::{ClockCity, ClockEntry, WorldClockWidget};
+use ds_shell::widget::timeline::Timeline;
+use ds_style::tokens::control_size::ControlSize;
 
 /// One battery on the widgets.
 pub(super) fn cell(name: &str, device: Device, level: u16, mark: BatteryPower) -> BatteryCell {

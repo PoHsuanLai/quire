@@ -24,7 +24,7 @@
 
 #![allow(dead_code)]
 
-use ds::Rect;
+use ds::prelude::*;
 use ds_harness::{Harness, Query};
 use image::RgbaImage;
 
@@ -39,7 +39,7 @@ pub fn rect(harness: &Harness, selector: &str) -> Rect {
 pub fn centred(harness: &Harness, pill: &str, part: &str) -> Rect {
     let shift = rect(harness, pill).size.width.0 / 2.0;
     let mut at = rect(harness, part);
-    at.origin.x = ds::Px(at.origin.x.0 - shift);
+    at.origin.x = Px(at.origin.x.0 - shift);
     at
 }
 

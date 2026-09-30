@@ -1,6 +1,6 @@
 //! Which installed dictionary answers for a language, and the languages the locale names. Pure.
 
-use ds::Lang;
+use ds::spell::lang::Lang;
 
 /// Regions a bare language code means when its own `xx_XX` is not installed (`en` is `en_US`,
 /// not the alphabetically first `en_AG`).
@@ -44,7 +44,7 @@ pub fn locale_lang(lc_all: Option<&str>, lang: Option<&str>) -> Option<Lang> {
 #[cfg(test)]
 mod tests {
     use super::{locale_lang, pick};
-    use ds::Lang;
+    use ds::spell::lang::Lang;
 
     fn langs(names: &[&str]) -> Vec<Lang> {
         names

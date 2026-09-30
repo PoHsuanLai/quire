@@ -2,7 +2,8 @@
 //! redrawn at the prompt's size, a photo cropped round at it, or an animated emoji playing its
 //! own animation once as the prompt appears.
 
-use crate::user_picture::{draw::Sizes, size::PictureSize};
+use crate::user_picture::draw::Sizes;
+use crate::user_picture::size::PictureSize;
 use ds::components::content::avatar::AvatarSize;
 
 /// The lock screen's: 64 for all three.
