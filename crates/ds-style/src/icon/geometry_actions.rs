@@ -116,3 +116,33 @@ pub(super) const GLOBE: &[Shape] = &[
     Shape::Path("M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"),
     Shape::Path("M2 12h20"),
 ];
+
+// Status marks for a banner's and a label's severity.
+
+/// Lucide `info`.
+pub(super) const INFO: &[Shape] = &[
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "10",
+    },
+    Shape::Path("M12 16v-4"),
+    Shape::Path("M12 8h.01"),
+];
+
+/// Lucide `circle-check`.
+pub(super) const CIRCLE_CHECK: &[Shape] = &[
+    Shape::Circle {
+        cx: "12",
+        cy: "12",
+        r: "10",
+    },
+    Shape::Path("m16 9-5.5 5.5L8 12"),
+];
+
+/// Lucide `triangle-alert`.
+pub(super) const TRIANGLE_ALERT: &[Shape] = &[
+    Shape::Path("m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"),
+    Shape::Path("M12 9v4"),
+    Shape::Path("M12 17h.01"),
+];
