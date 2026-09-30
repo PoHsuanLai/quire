@@ -748,7 +748,7 @@ path each, until step 12 replaces them with the prelude.
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
     7. (done) shell-only pieces (30 section 2.10) and app features (30 section 2.11), then the P2 components
        (the app features and mail-only half, 4a.7b: done);
-    8. sill's switch-over (the local pieces L1-L16 of the component inventory) and the Arc Look;
+    8. sill's switch-over (done: the local pieces L1-L16 of the component inventory) and the Arc Look;
        the gallery and goldens per component; delete every name in 30 Part 4.
 5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes
    `pub` at its home module or moves to its only consumer; the boundary script keeps the list
