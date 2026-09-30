@@ -535,6 +535,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "blitz-kit"
+version = "0.1.0"
+dependencies = [
+ "blitz-dom",
+ "blitz-traits",
+ "parley",
+ "serde",
+ "tokio",
+ "wgpu",
+]
+
+[[package]]
 name = "blitz-paint"
 version = "0.3.0-beta.2"
 source = "git+https://github.com/PoHsuanLai/blitz?rev=bf58814298b829bb42673424e86926cbd2af8f07#bf58814298b829bb42673424e86926cbd2af8f07"
@@ -1447,6 +1459,7 @@ dependencies = [
  "arboard",
  "blitz-dom",
  "blitz-html",
+ "blitz-kit",
  "blitz-paint",
  "blitz-shell",
  "blitz-traits",
@@ -1463,7 +1476,6 @@ dependencies = [
  "tokio",
  "webbrowser",
  "wgpu",
- "wgpu_context",
 ]
 
 [[package]]
@@ -1495,6 +1507,7 @@ dependencies = [
  "anyrender_vello_hybrid",
  "blitz-dom",
  "blitz-html",
+ "blitz-kit",
  "blitz-paint",
  "blitz-traits",
  "dioxus",
