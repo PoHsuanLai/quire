@@ -15,5 +15,7 @@ pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
     Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget, kind_from_variants,
 };
-pub use program::{AppId, FilePath, Schema, data_dirs, discover, maybe_write_schema};
+pub use program::{
+    AppId, FilePath, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
+};
 pub use traits::{SettingsSchema, kind_of, to_value};

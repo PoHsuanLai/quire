@@ -110,7 +110,10 @@ pub fn data_dirs() -> Vec<PathBuf> {
     )
 }
 
-fn data_dirs_from(
+/// [`data_dirs`] with the environment handed in: `xdg_data_home` (else `home`'s `.local/share`)
+/// and `xdg_data_dirs` (else `/usr/local/share:/usr/share`), so a caller that owns its
+/// directories, or a test, names them itself.
+pub fn data_dirs_from(
     xdg_data_home: Option<std::ffi::OsString>,
     xdg_data_dirs: Option<std::ffi::OsString>,
     home: Option<std::ffi::OsString>,

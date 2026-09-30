@@ -44,6 +44,25 @@ pub enum Page {
     App(String),
 }
 
+impl Page {
+    /// The name a person reads for the page: a fixed page by its name in section 9.3, a
+    /// third-party page by its app id.
+    pub fn label(&self) -> &str {
+        match self {
+            Page::Appearance => "Appearance",
+            Page::Dock => "Dock",
+            Page::MouseAndGestures => "Mouse & Gestures",
+            Page::KeyboardAndShortcuts => "Keyboard & Shortcuts",
+            Page::Notifications => "Notifications",
+            Page::Spaces => "Spaces",
+            Page::Accounts => "Accounts",
+            Page::Power => "Power",
+            Page::Apps => "Apps",
+            Page::App(id) => id,
+        }
+    }
+}
+
 /// File-only in v1 (section 5: "Advanced" = no Settings UI control) versus rendered on its
 /// page. Not a `bool`: `CONVENTIONS.md#4-types`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -165,7 +184,7 @@ pub fn kind_from_variants(mut words: Vec<String>) -> KeyKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{KeyKind, Widget, kind_from_variants};
+    use super::{KeyKind, Page, Widget, kind_from_variants};
 
     #[test]
     fn two_variants_are_a_toggle() {
@@ -256,6 +275,28 @@ mod tests {
         assert_eq!(
             KeyKind::List(Box::new(KeyKind::Text)).widget(),
             Widget::RowsEditor
+        );
+    }
+
+    #[test]
+    fn a_page_is_labelled_as_the_settings_app_names_it() {
+        const CASES: &[(Page, &str)] = &[
+            (Page::Appearance, "Appearance"),
+            (Page::Dock, "Dock"),
+            (Page::MouseAndGestures, "Mouse & Gestures"),
+            (Page::KeyboardAndShortcuts, "Keyboard & Shortcuts"),
+            (Page::Notifications, "Notifications"),
+            (Page::Spaces, "Spaces"),
+            (Page::Accounts, "Accounts"),
+            (Page::Power, "Power"),
+            (Page::Apps, "Apps"),
+        ];
+        for (page, want) in CASES {
+            assert_eq!(page.label(), *want, "{page:?}");
+        }
+        assert_eq!(
+            Page::App("com.example.App".to_owned()).label(),
+            "com.example.App"
         );
     }
 }
