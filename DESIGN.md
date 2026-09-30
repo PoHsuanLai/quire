@@ -5,17 +5,19 @@ only says where in the code a section lives, so a reviewer can go from a paragra
 back. Paths are under `crates/ds/src/` unless another crate is named first (`ds-core/colour/srgb.rs`
 is `crates/ds-core/src/colour/srgb.rs`).
 
-`ds-core` is a crate of its own (vocabulary, geometry units, time, errors, text, colour, PNG and
-base64, the `Spawner` trait): plain data and maths with no Dioxus, under everything else. So is
-`ds-style` (appearance, tokens, materials, Space palettes, fonts, icons, the stylesheet's
-sections, the scope a component draws in, the tasks a scope owns; the scope, scale, task, busy and
-`Glyph` parts are its `dioxus` feature, which `ds-settings` leaves off). `ds` is laid out in the layers
-it will split into, each naming only the ones below it (`scripts/check-boundary.sh`): the host seams (`host/`, `focus/`,
-`edit/`, `file_drop/`, `spell/`, `window/`), `stack/`, `root/` and `components/`, then
-`shell/` (the shell surfaces' parts, the widgets and their catalog), and `assembly/` on top (the
-stylesheet's order, the one registration of every component sheet, and `Ds`). `lib.rs` and the
-public module files (`detail.rs`, `icon.rs`, `time.rs`, `widget.rs`, `catalog.rs`) name the
-public surface, one path per item.
+The design system is six crates, each naming only the ones below it (`scripts/check-boundary.sh`
+holds the allowed edges): `ds-core` (vocabulary, geometry units, time, errors, text, colour, PNG
+and base64, the `Spawner` trait: plain data and maths with no Dioxus), `ds-style` (appearance,
+tokens, materials, Space palettes, fonts, icons, the stylesheet's sections, the scope a component
+draws in, the tasks a scope owns; the scope, scale, task, busy and `Glyph` parts are its
+`dioxus` feature, which `ds-settings` leaves off), `ds-motion` (animation data, timers, machines,
+the keyframes, and `ds-motion/detail/`), `ds-lint` (the linter: strings in, offences out), `ds`
+(the host seams `host/`, `focus/`, `edit/`, `file_drop/`, `spell/`, `window/`, then `stack/`,
+`root/` and `components/`, and `assembly/` on top: the stylesheet's order, the one registration
+of every component sheet, and `Ds`), and `ds-shell` (the shell surfaces' parts, the widgets and
+their catalog, the shell's tokens and sheets). Inside `ds` the layers are directories named in
+that order. `lib.rs` and the public module files (`detail.rs`, `icon.rs`, `time.rs`, `motion.rs`)
+name `ds`'s public surface, one path per item.
 
 ## `ds`: appearance, space, material
 
@@ -47,7 +49,7 @@ public surface, one path per item.
 | `ds-style/tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
 | `ds-style/tokens/hex.rs`, `ds-style/tokens/name.rs` | the value and name types every table uses |
 | `ds-style/tokens/{token,set}.rs`, `ds-core-derive` | `Token` (`#[derive(Word, Token)]`: a family's custom properties and values from its variants' attributes), `TokenScope`, `CssValue`, `TokenSet` (a family as data, placed in the `.ds` block) |
-| `ds-style/kit/`, `ds-style/kit/style_kit.rs`, `ds-motion/kit.rs`, `assembly/kit.rs`, `shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`); `ds::kits()` is all four; `LintConfig::new(&ds::kits())` |
+| `ds-style/kit/`, `ds-style/kit/style_kit.rs`, `ds-motion/kit.rs`, `assembly/kit.rs`, `ds-shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections, component `Sheet`s each placed after the sheet it follows, and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`, `sheets`); `ds::kits()` is style, motion and the components; `ds_shell::kits()` adds the shell's, `ds_shell::stylesheet()` is the sheet a shell surface draws with (`Ds { sheet: Some(..) }`); `LintConfig::new(&ds_shell::kits())` |
 | `ds-style/tokens/timing.rs`, `ds-style/tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (`DurationToken`; `StyleDelay`, the two delays the stylesheet reads; `DelayToken`, the Rust-only timer lengths) |
 | `ds-style/tokens/easing.rs`, `ds-style/tokens/scalar.rs` | 05-MOTION §3.1-3.3 |
 | `ds-style/tokens/shape.rs` | 01-LAYOUT §10 |
@@ -56,14 +58,14 @@ public surface, one path per item.
 | `ds-style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
 | `ds-style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `ds-style/tokens/layer.rs` | 01-LAYOUT §12 |
-| `ds-style/tokens/tuned.rs`, `shell/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
-| `shell/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `shell/kit.rs` |
+| `ds-style/tokens/tuned.rs`, `ds-shell/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
+| `ds-shell/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `ds-shell/kit.rs` |
 | `ds-style/css/shape_css.rs`, `ds-style/icon/{plate,family}.rs`, `ds-style/tokens/plate.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
 | `ds-style/kit/blocks.rs`, `ds-style/css/{accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
 | `ds-style/css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
 | `ds-motion/css.rs`, `ds-motion/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `ds-style/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
-| `ds-style/css/{reset,utilities}.css`, `ds-style/css/document.rs`, `assembly/stylesheet.rs`, `assembly/sheets.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
+| `ds-style/css/{reset,utilities}.css`, `ds-style/css/document.rs`, `assembly/stylesheet.rs`, `assembly/sheets.rs`, `ds-shell/sheets.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
 | `ds-style/fonts.rs` | 02-TYPE §2 (faces as bytes) |
 
 ## `ds`: motion, geometry, overlays, root
@@ -106,7 +108,7 @@ public surface, one path per item.
 `ds-core/vocab.rs` is 30-CATALOGUE 1.5, the shared state vocabulary (`Check`, `Shown`, `Availability`, `Selection`, `Emphasis`, `Muting`, `PressPhase`, `Dismiss`, `Activity`, `FocusStyle`, `InputModality`, `RowState`; with `ds-core/press.rs` and
 `ds-core/standard_action.rs`). Components sit in directories by concept: `components/{controls,
 fields,menus,menus/palette,overlays,lists,content,chrome}` hold the general ones, `components/app`
-mail's own, and `shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
+mail's own, and `ds-shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
 `notifications`, `thumbs`, `now_playing`, `month_grid`, `clock`, `battery`, `emoji`,
 `user_picture`, `space_editor`, `osd`, `idle_dim`, `dock_parts`, `widget`). Every file is the
 section of 04-COMPONENTS with the same name, one `.rs` and `.css` pair each: `button` §1, `icon_button` §2,
@@ -128,7 +130,7 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
 manifest (`sheet.rs`), the pure wake script (`script.rs`) and the task that plays it (`life.rs`).
 
-`shell/space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
+`ds-shell/space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
 `space_editor/field.rs` (the hue x chroma colour plane and the tiled round-dot cell over it,
 built once per scheme, and the mapping between a dot and its place on it, O-19),
@@ -167,14 +169,14 @@ The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`,
 
 | Module | Implements | Notes |
 | --- | --- | --- |
-| `shell/widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
-| `shell/widget/timeline.rs`, `shell/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::time` (virtual in tests) |
-| `shell/widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
-| `shell/widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
-| `shell/widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |
-| `shell/widget/{battery,clock,calendar}.rs`, `shell/widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
-| `shell/widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
-| `shell/widget/gallery.rs`, `shell/widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
-| `shell/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placed`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
-| `shell/battery/device_glyph.rs`, `shell/battery/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
-| `shell/widget/slot.rs`, `shell/widget/frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |
+| `ds-shell/widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
+| `ds-shell/widget/timeline.rs`, `ds-shell/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::time` (virtual in tests) |
+| `ds-shell/widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
+| `ds-shell/widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
+| `ds-shell/widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |
+| `ds-shell/widget/{battery,clock,calendar}.rs`, `ds-shell/widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
+| `ds-shell/widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
+| `ds-shell/widget/gallery.rs`, `ds-shell/widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
+| `ds-shell/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placed`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
+| `ds-shell/battery/device_glyph.rs`, `ds-shell/battery/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
+| `ds-shell/widget/slot.rs`, `ds-shell/widget/frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |

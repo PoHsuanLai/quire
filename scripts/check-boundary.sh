@@ -22,6 +22,7 @@ RULES=(
   "ds-style: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-motion: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-lint: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
+  "ds-shell: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-settings: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-native: zbus memfd"
@@ -64,10 +65,11 @@ EDGES=(
   "ds-style: ds-core ds-core-derive"
   "ds-motion: ds-core ds-style"
   "ds-lint: ds-core ds-style"
-  "ds: ds-core ds-core-derive ds-motion ds-style"
+  "ds: ds-core ds-motion ds-style"
+  "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
   "ds-native: ds anyrender_pdfrum"
-  "ds-gallery: ds ds-core ds-lint ds-native ds-settings"
+  "ds-gallery: ds ds-core ds-lint ds-native ds-settings ds-shell"
   "icons: ds ds-settings"
   "anyrender_pdfrum:"
 )
@@ -85,20 +87,19 @@ for edge in "${EDGES[@]}"; do
   fi
 done
 
-# Layers inside ds, the crates it will split into (core, style, motion, lint, ds, shell), with
-# assembly on top. A file in a layer may name (`crate::<module>`) only its own layer and the
-# ones below it; mail's own components (components::app) are named by nothing but themselves
-# and the layers above the components. Doc links count: they would break at the split too.
-# Inside ds the order is: host < focus, edit, file_drop, spell, window < stack < root <
-# components < shell < assembly (ARCHITECTURE.md section 2).
+# The layers inside ds, the one crate that still has any: the host seams, the hooks over them, the
+# overlay stack, the root, the components and assembly on top. A file in a layer may name
+# (`crate::<module>`) only its own layer and the ones below it; mail's own components
+# (components::app) are named by nothing but themselves and assembly. Doc links count. The layers
+# that became crates (ds-core, ds-style, ds-motion, ds-lint, ds-shell) are kept by EDGES above and
+# by cargo itself: a `pub(crate)` item cannot be named across a crate boundary.
 DS=crates/ds/src
 LAYERS=(
-  "host: focus edit file_drop spell window stack root components shell assembly"
-  "focus edit file_drop spell window: stack root components shell assembly"
-  "stack: root components shell assembly"
-  "root: components shell assembly"
-  "components: shell assembly components::app"
-  "shell: assembly"
+  "host: focus edit file_drop spell window stack root components assembly"
+  "focus edit file_drop spell window: stack root components assembly"
+  "stack: root components assembly"
+  "root: components assembly"
+  "components: assembly components::app"
 )
 layered=0
 for rule in "${LAYERS[@]}"; do
@@ -138,11 +139,7 @@ for i in "${!COMPONENT_GROUPS[@]}"; do
   fi
 done
 if [ "$layered" -eq 0 ]; then
-  echo "layers hold: ds < shell < assembly; component groups in order"
+  echo "layers hold: host < hooks < stack < root < components < assembly; component groups in order"
 fi
-
-# No `pub(crate)` module or item may be named from another layer: it becomes `pub` at its home
-# module, because `pub(crate)` stops at the crate boundary the layers will become.
-python3 scripts/check-crossers.py || fail=1
 
 exit "$fail"

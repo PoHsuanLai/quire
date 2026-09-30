@@ -907,6 +907,7 @@ dependencies = [
  "dioxus",
  "dioxus-ssr",
  "ds",
+ "ds-lint",
  "ds-native",
  "ds-settings",
 ]
@@ -1532,13 +1533,22 @@ checksum = "d8b14ccef22fc6f5a8f4d7d768562a182c04ce9a3b3157b91390b52ddfdf1a76"
 name = "ds"
 version = "0.1.0"
 dependencies = [
- "cssparser",
  "dioxus",
+ "ds-core",
+ "ds-motion",
+ "ds-style",
+ "serde",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "ds-core"
+version = "0.1.0"
+dependencies = [
  "ds-core-derive",
  "futures-timer",
- "image",
+ "keyboard-types 0.7.0",
  "serde",
- "serde_json",
  "thiserror 2.0.20",
 ]
 
@@ -1549,6 +1559,24 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "ds-lint"
+version = "0.1.0"
+dependencies = [
+ "cssparser",
+ "ds-core",
+ "ds-style",
+]
+
+[[package]]
+name = "ds-motion"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "ds-core",
+ "ds-style",
 ]
 
 [[package]]
@@ -1589,8 +1617,9 @@ name = "ds-settings"
 version = "0.1.0"
 dependencies = [
  "dioxus",
- "ds",
+ "ds-core",
  "ds-settings-derive",
+ "ds-style",
  "futures-timer",
  "notify",
  "serde",
@@ -1607,6 +1636,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.119",
+]
+
+[[package]]
+name = "ds-style"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "ds-core",
+ "ds-core-derive",
+ "image",
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

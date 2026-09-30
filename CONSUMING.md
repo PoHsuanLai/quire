@@ -28,19 +28,22 @@ it by path, the way `examples/consumer/Cargo.toml` does:
 
 ```toml
 [dependencies]
-ds          = { path = "../quire/crates/ds", features = ["lint"] }
+ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings" }
 ds-native   = { path = "../quire/crates/ds-native" }   # only if you run on Blitz
+
+[dev-dependencies]
+ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
 ```
 
-Enable `ds`'s `lint` feature wherever your own tests call `ds::lint` (coherence rule 1 and 2,
-section 5 below) — it is off by default so a consumer that never lints does not pull in
-`cssparser`.
+The linter is its own crate, `ds-lint` (coherence rules 1 and 2, section 5 below), so a consumer
+that never lints does not pull in `cssparser`. The shell's parts are `ds-shell`, which a shell
+depends on next to `ds` and draws with `Ds { sheet: Some(ds_shell::stylesheet()) }`.
 
 **Later: a git dependency**, once quire is tagged, the same shape shell-host and sill will use:
 
 ```toml
-ds = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.1.0", features = ["lint"] }
+ds = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.1.0" }
 ```
 
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
@@ -283,7 +286,7 @@ tests/coherence.rs` is these four, verbatim, run against a real app.
 ### Rule 1 — no literal design values in your own CSS
 
 ```rust
-use ds::lint::{assert_clean, Exception, LintConfig, Profile, Rule};
+use ds_lint::{assert_clean, Exception, LintConfig, Profile, Rule};
 
 const OUR_CSS: &str = ".row { color: var(--ink); }\n.fade { mask-image: linear-gradient(#000, transparent); }";
 const EXCEPTIONS: &[Exception] = &[Exception {
@@ -305,7 +308,7 @@ fn our_css_is_clean() {
 Every exception needs a `reason`, and `assert_clean` panics listing which exceptions suppressed
 zero offences, so a stale one cannot hide silently (mailo gaps 3: before it, it only printed
 them). A consumer mid-migration that must keep an exception for code another branch is about to
-land sets `stale: Stale::Report` (`ds::lint::Stale`): the stale exception is printed and the
+land sets `stale: Stale::Report` (`ds_lint::Stale`): the stale exception is printed and the
 test passes. `Stale::Fail` is the default. A `LintConfig` is made from the kits it lints against (`LintConfig::new(&ds::kits())`), which
 give it the variables, keyframes and timing tokens it accepts; name only the fields you change
 and end with `..LintConfig::new(&ds::kits())`. Prefer `Profile::Strict` even though
@@ -341,7 +344,7 @@ markup lint runs on what your app *actually renders*, not on what you believe it
 
 ```rust
 use dioxus::core::VirtualDom;
-use ds::lint::{markup, LintConfig, Rule};
+use ds_lint::{markup, LintConfig, Rule};
 
 fn render_ssr() -> String {
     let mut dom = VirtualDom::new(YourApp);
@@ -374,7 +377,7 @@ class, or an `<svg>` that is neither `Glyph`'s `.ds-ic` nor marked `data-ds-svg`
 a quire component that draws its own vector writes, as the SendPill's ring does), and the
 inline-style rules below.
 
-Every `style` attribute is checked declaration by declaration (`ds::lint`'s `inline_style`): a
+Every `style` attribute is checked declaration by declaration (`ds_lint`'s `inline_style`): a
 literal colour (`Rule::HexColour`, `Rule::ColourFunction`, `Rule::NamedColour`) or a raw
 duration (`Rule::RawDuration`) is an offence. The one allowance is a custom property (`--*`) on
 an element carrying `ds` or a `ds-*` class: that is quire handing a value it computes per
@@ -977,8 +980,8 @@ the full table; you never choose a widget yourself.
 ## 8. What Blitz cannot do, and what to use instead
 
 Everything below is from `FINDINGS.md` spikes S1-S16 (blitz @ `e99fbdbd`, dioxus 0.7.10) — the
-authority; this table is a pointer. `ds::lint::Rule::BlitzUnsupported`
-(`crates/ds/src/lint/blitz.rs`) catches most of the CSS-level ones for you under
+authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
+(`crates/ds-lint/src/blitz.rs`) catches most of the CSS-level ones for you under
 `Profile::Strict` (well, under any profile — it is not one of the three raw-geometry rules
 `Profile::Standard` skips) if you write the banned property in your own stylesheet.
 
@@ -1128,7 +1131,7 @@ the excluded kinds; an un-marked container the host finds just clamps at its edg
 safer failure than defaulting to elastic.
 
 **`scroll-behavior: smooth` is banned**, in your own CSS as much as quire's:
-`ds::lint::Rule::BlitzUnsupported` flags it (`crates/ds/src/lint/blitz.rs`) because Blitz's own
+`ds_lint::Rule::BlitzUnsupported` flags it (`crates/ds-lint/src/blitz.rs`) because Blitz's own
 300 ms `ScrollTo` would fight the host's engine. Drive a programmatic scroll through the host's
 `ScrollCmd` instead (design/11 sections 11.3.1 and 11.3.11); `scroll-behavior: auto` (the
 default) lints clean.
