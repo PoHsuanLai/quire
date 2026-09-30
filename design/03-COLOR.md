@@ -4,7 +4,7 @@
 
 This file fixes every colour: the paper tokens inside the card (light and dark), the frame
 tokens around it and the arithmetic that derives them from a Space, the card accent, presets,
-grain, shadows, the precomputed washes, identity colours, the candy hues from `C`, which token
+shadows, the precomputed washes, identity colours, the candy hues from `C`, which token
 goes on which element, the materials for shell surfaces, and how a SpaceLook attaches to a
 desktop workspace. A colour that is not in this file does not exist; add it here first. Layout
 is `01-LAYOUT.md`, type is `02-TYPE.md`, looks other than Post are `07-LOOKS.md`. Source keys
@@ -92,7 +92,7 @@ them onto `#card` and `#win` and sets `color-scheme` to match (`S:1196-1205`).
 ## 4. Frame tokens
 
 The frame is derived, not chosen: a Space is up to three dots on a hue x chroma field plus a
-grain and a theme, and every frame colour follows from them.
+theme, and every frame colour follows from them.
 
 ### 4.1 Static fallback
 
@@ -287,10 +287,10 @@ Eight presets, each a list of one to three dots `{h, c}` with h in degrees and c
 
 The two sample Spaces are presets 0 and 1:
 
-| Space | Dots | Grain | Mode | Accent | Source |
-| --- | --- | --- | --- | --- | --- |
-| Work | `{268, .72}`, `{318, .55}` | 35 | system | space | `S:1027` |
-| Home | `{152, .62}`, `{62, .55}`, `{28, .5}` | 55 | system | space | `S:1086` |
+| Space | Dots | Mode | Accent | Source |
+| --- | --- | --- | --- | --- |
+| Work | `{268, .72}`, `{318, .55}` | system | space | `S:1027` |
+| Home | `{152, .62}`, `{62, .55}`, `{28, .5}` | system | space | `S:1086` |
 
 A Space's mode is `system`, `light` or `dark`; `system` follows the viewer's scheme
 (`S:1157-1159`). A Space holds at most three dots; a new dot starts 48 degrees past the last one
@@ -392,7 +392,7 @@ Both backends paint `saturate()` now (FINDINGS "CSS `filter`"), so the unselecte
 
 **As tokens (settled, 2026-09-24).** The person hash is `ds::person_hue(address) -> PersonHue`
 (painted by `AvatarTone::Person`, or `PersonHue::colour()`). The eight stored-colour swatches a
-consumer hands out in order are `--c-person-1..8` (`ds::PersonSwatch`), mailo's `AVATAR` order:
+consumer hands out in order are `--c-person-1..8` (`ds::style::tokens::person::PersonSwatch`), mailo's `AVATAR` order:
 `#5B4FC4`, `#2F7F6E`, `#B0662E`, `#3C8A5B`, `#7A4A9E`, `#C0782E`, `#2E7F8C`, `#6D7A3A` (the
 accounts and pins above). They are data, declared once and the same in both schemes. A
 consumer keeps no hex constants for people.
@@ -492,7 +492,6 @@ members (`C:841-924`); see `07-LOOKS.md`.
 | `--seal` | `#23508F` / `#7FA6E6` | `#C0402A` / `#E9684B` | `S:11`, `S:30`, `C:19`, `C:95` |
 | Seal colour in use | `--f-ink` (frame) | `--seal` | `S:346`, `C:317` |
 | Scrim | `--scrim rgba(0,0,0,.22)` | peek scrim `--ink` at opacity .16; command wrap `rgba(0,0,0,.22)` | `S:15`, `C:1054-1060` |
-| Grain | frame, per Space (section 8) | `--grain` token, unused | `S:87`, `C:34` |
 | `--shadow-drag` | none | light `0 18px 30px -12px rgba(26,30,26,.40)`, dark `0 22px 34px -14px rgba(0,0,0,.8)` | `C:33`, `C:98` |
 | Label chips | all `--accent-soft` | per-label candy in Candy look | `S:198`, `C:941-944` |
 | Reference PNGs | show `C`'s red accent | | `P:986-987` |
@@ -636,7 +635,7 @@ looked flat beside it. Stack v2 adds them to every card-like material (Dock, Pop
 Toast, Osd, Widget) and a bottom hairline to the Bar; the Window is unchanged. The tints' alphas
 (and the legibility gates on them) do not move. Each layer is a `--m-*` variable a material block
 declares and `--m-box` lists outside in; each alpha reads an input the root writes from a
-settings key (`ds::MaterialStack`, `Ds { stack }`), with the default below behind it.
+settings key (`ds::style::material::stack::MaterialStack`, `Ds { stack }`), with the default below behind it.
 
 | Layer | Variable | Light | Dark | Key (proposed name, design/22) |
 | --- | --- | --- | --- | --- |
@@ -908,15 +907,13 @@ do.
    `rgba(255,255,255,.58)` and `--f-pill-hover` to `rgba(255,255,255,.34)` (`S:79`); the derived
    light values are `.72` and a solid `oklch(0.885, …)` (`S:1008-1009`). Whether the port keeps a
    fallback at all is not specified.
-2. **Grain blend.** `S` blends an opaque grey tile with `overlay` (`S:87`, `S:1166`); the design
-   system plans "alpha noise" PNG without blending (`P:288`). The alpha mapping that reproduces the
-   overlay look is not specified.
+2. **Grain blend.** Closed: no grain is drawn (section 8).
 3. **Danger wash.** `S` has two danger mixes, 16% over transparent (`S:278`) and 12% over
    `--raise` (`S:421`); the plan names one `--danger-wash` (`P:294`). Not resolved.
 4. **Washes' precomputed values** for both schemes are not specified.
 5. **`--shadow-pop` and `--shadow-sheet`** values and which one-off shadows in section 10 they
    replace are not specified (`P:295`).
-6. **The six accents.** The design system carries mailo's `accents.css` "6 hues x 4 props"
+6. **The six accents.** The design system carries mailo's accents.css "6 hues x 4 props"
    (`P:59`) and the gallery has an Accent(6) axis (`P:269`); their values are not in either
    prototype. How the six accents relate to Postmark and the Space accent is not specified.
    Settled (2026-09-27): all of them generated from one band, B (Airy), section 20.

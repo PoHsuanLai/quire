@@ -25,8 +25,8 @@ and margin in `S`'s app surfaces is one of these values:
 
 `P:955-956`, derived from the `S` rules cited in the sections below.
 
-**Settled (Gallery fixes B, 2026-09-24).** The common steps are tokens: `ds::SpacingToken`
-(`crates/ds/src/tokens/spacing.rs`) emits `--s-1`, `--s-2`, … `--s-12`, `--s-14`, `--s-16`,
+**Settled (Gallery fixes B, 2026-09-24).** The common steps are tokens: `ds::style::tokens::spacing::SpacingToken`
+(`crates/ds-style/src/tokens/spacing.rs`) emits `--s-1`, `--s-2`, … `--s-12`, `--s-14`, `--s-16`,
 `--s-18`, `--s-22`, `--s-26`, `--s-36` on `.ds`, each named by its own pixel value, the same in
 both schemes and at every motion level. The lint's Strict profile has `Rule::RawSpacing`: a
 literal `px` in `margin`, `padding` (and their sides and logical forms) or a `gap` is an
@@ -47,7 +47,7 @@ composer at `70ch` (`S:574`).
 points per inch). macOS renders a fractional scale at 2x and downsamples; we render at the true
 scale, so a `1px` line would be 1.25-1.75 device pixels and blur into two half-ink rows. So:
 
-- Line widths come from the pixel tokens (`ds::PixelToken`), which the root writes for its
+- Line widths come from the pixel tokens (`ds::style::tokens::pixel::PixelToken`), which the root writes for its
   device scale (`Ds { scale }`, else the host's): `--hair` for a 1 px line (a border, a
   separator, a rule, a 1 px ring or inset highlight), one device pixel at 1.25-1.75 and 1 px at 1x
   and 2x; `--hairline` for the material stack's .5 px hairline, one device pixel everywhere but
@@ -55,15 +55,15 @@ scale, so a `1px` line would be 1.25-1.75 device pixels and blur into two half-i
   whole device pixels; `--dpr` the scale itself. At 1x every token is its design value, so
   nothing drawn at 1x changes.
 - Positions are snapped by the host: Blitz rounds boxes to whole logical pixels, which at a
-  fractional scale starts a box half-way through a device pixel. `ds_native::snap_to_device`
-  re-rounds the laid-out document on the device grid after every resolve (ds-native's snapshots
+  fractional scale starts a box half-way through a device pixel. `ds_blitz::snap_to_device`
+  re-rounds the laid-out document on the device grid after every resolve (ds-blitz's snapshots
   and harness do; a host that resolves its own documents calls it).
 - A glyph's stroke is an even number of device pixels at a fractional scale (08-ICONS §1.4.1).
 - No consumer stylesheet writes a literal `1px`/`.5px` line width: `Rule::RawHairline`.
 
 What stays unsnapped is recorded in FINDINGS "Pixel snapping": text, a transform that is not a
 pure translation (a motion part-way through), a glyph's diagonals and curves, and the portable
-`ds_native::launch` window, which has no hook between Blitz's resolve and its paint.
+`ds_blitz::launch` window, which has no hook between Blitz's resolve and its paint.
 
 ## 3. The window
 
@@ -81,10 +81,9 @@ sides. Verbatim:
 }
 .win.no-side{ grid-template-columns:0 minmax(0,1fr); padding-left:8px; }
 .layer{ position:absolute; inset:0; z-index:-2; transition:opacity 380ms var(--e-out); }
-.grain{ position:absolute; inset:0; z-index:-1; pointer-events:none; mix-blend-mode:overlay; background-size:128px 128px; }
 ```
 
-`S:77-87`
+`S:77-86`; the prototype's `.grain` layer (`S:87`) is not drawn (03 section 8)
 
 | Property | Value | Source |
 | --- | --- | --- |
@@ -94,7 +93,7 @@ sides. Verbatim:
 | Columns | sidebar 232, card `minmax(0,1fr)` | `S:81` |
 | Padding | top 8, right 8, bottom 8, left 0 (the sidebar supplies its own left padding) | `S:81` |
 | Sidebar hidden | columns `0 minmax(0,1fr)`, padding-left 8 | `S:85` |
-| Frame layers | two `.layer` elements (a and b) for the Space cross-fade, then `.grain`, then content | `S:835-838` |
+| Frame layers | two `.layer` elements (a and b) for the Space cross-fade, then content | `S:835-838` |
 
 `C` has no frame. Its shell is one bordered panel with three columns
 `206px minmax(0,1fr) minmax(0,1.05fr)`, height `min(72vh,700px)`, min-height 560, border 1 px
@@ -390,7 +389,6 @@ Inside a window, z-index values are fixed; overlays are children of the window.
 | z | Layer | Source |
 | --- | --- | --- |
 | -2 | frame `.layer` (a, b) | `S:86` |
-| -1 | `.grain` | `S:87` |
 | 7 | link pill | `S:431` |
 | 8 | undo toast | `S:360` |
 | 9 | floating composer, send pill | `S:373`, `S:706` |
@@ -467,7 +465,7 @@ The shell surfaces reuse the window's geometry language; only the values below a
 | Surface | Settled | Open |
 | --- | --- | --- |
 | Wallpaper | per output, Background layer, exclusive zone Ignore, empty input region (`P:577`) | none for layout |
-| Control center | uses `AppearancePicker` (`P:355`) | position, width, anchor, layer: not specified |
+| Control center | uses the appearance picker (`P:355`) | position, width, anchor, layer: not specified |
 | Notifications | none | position, width, stacking, gap: not specified (macOS reference: banners top-right, `P:1476`) |
 | OSD | a `Material::Osd` exists (`P:315`) | position, size: not specified |
 | Widgets | a `Material::Widget` exists (`P:315`) | grid, size classes, placement: not specified |

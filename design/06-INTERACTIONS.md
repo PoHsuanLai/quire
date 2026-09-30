@@ -29,7 +29,7 @@ Sections 2.1 to 2.8 record the prototype. The port writes every binding in Mac t
 is `Key::Super`, drawn `⌘`); the platform layer resolves Command (Toshy maps it to Ctrl), so a
 binding never says "Mod".
 
-- **Reserved.** `ds::StandardAction` is the table of the Mac's standard shortcuts and the ones
+- **Reserved.** `ds::base::standard_action::StandardAction` is the table of the Mac's standard shortcuts and the ones
   this desktop reserves (⌘Space launcher, ⌃1-⌃9 Spaces, ⌃⌘S sidebar, ⌘Y Quick Look, ⌘R reveal,
   ⌘C copy, …). `Shortcut::standard(action)` binds one; `Shortcut::custom(keys)` returns
   `Err(Reserved(action))` for a combination in the table, so no app repurposes Cmd+S or Cmd+T.
@@ -314,7 +314,7 @@ prototype uses HTML5 drag (S:2269-2275): drag start on a handle marks the object
 first child whose vertical midpoint is below the pointer (else at the end); drop replaces the
 line with the object; drag end clears. A click on the handle opens the object menu: Move up,
 Move down, Duplicate, Delete (S:2231-2236). The Rust editor replaces HTML5 drag with ds
-`DragTracker` (plan, `motion/drag.rs`); the 8 px threshold of 6.1 applies.
+`DragTracker` (plan, `ds-motion/drag.rs`); the 8 px threshold of 6.1 applies.
 
 ## 7. Sidebar hide and edge peek
 
@@ -348,7 +348,7 @@ port should close it on edge leave unless the pointer entered the sidebar).
 5. The reader re-renders (a draft open in the composer is parked silently, S:1385).
 6. The frame colour cross-fades: the back layer receives the new gradient and goes to opacity 1,
    the front goes to 0, and they swap roles (S:1181-1187); 380 ms `--e-out`. The `--f-*` frame
-   tokens, grain opacity and the card's Post tokens switch instantly.
+   tokens and the card's Post tokens switch instantly.
 
 Undo across Spaces: the undo entry records its Space; undo is ignored in another Space
 (S:1555), and the toast is not hidden on a switch. Proposed: hide the toast on switch.

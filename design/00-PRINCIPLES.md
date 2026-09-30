@@ -147,7 +147,7 @@ missing.
 
 | Lineage | Elements | Source |
 | --- | --- | --- |
-| Arc | OKLCH gradient frame plus grain, calibrated to Arc's own `--arc-palette-*` exports | `S:908-912`, `S:986-991` |
+| Arc | OKLCH gradient frame (the prototype's grain is not drawn), calibrated to Arc's own `--arc-palette-*` exports | `S:908-912`, `S:986-991` |
 | Arc | Sidebar drawn straight on the colour with translucent white pills | `S:89-153` |
 | Arc | Command pill "Search or run a command" with `Ctrl T` | `S:841` |
 | Arc | Grouped command menu, "like Arc's" | `S:1590` |
@@ -157,7 +157,7 @@ missing.
 | Arc | Hide sidebar (`Ctrl S`) plus edge peek | `S:450-454`, `S:1841-1843` |
 | Arc | Link pill as a status bar | `S:430-437` |
 | Arc | Card inset 8 px inside the frame, with its own radius | `S:81`, `S:156-160` |
-| Arc | Space editor: hue x chroma field, up to 3 dots, grain slider, presets | `S:243-279` |
+| Arc | Space editor: hue x chroma field, up to 3 dots, presets (the prototype's grain slider is dropped) | `S:243-279` |
 | Mac / conventional | Sidebar, list, reader three-pane order | `S:840-860` |
 | Mac / conventional | List toolbar; reader header with a tool row | `S:162-164`, `S:202-207` |
 | Mac / conventional | Centred peek over a scrim (sheet) | `S:220-226` |
@@ -185,7 +185,7 @@ The plan's enforcement, restated as principles (mechanics in the plan, `P:225-23
 3. A missing component or token is added to the design system first, never patched locally.
 4. Motion state is driven by the design system's timers, never by ad-hoc sleeps.
 
-The single appearance picker is shared: `AppearancePicker` is "THE one picker for mailo, control
+The single appearance picker is shared: it is "THE one picker for mailo, control
 center, settings" (`P:355`).
 
 ## 8. The desktop reading
@@ -236,7 +236,7 @@ Each row names which principle governs the surface and what is settled. Values a
 | Bar | Frame | Frame tokens over blur; one-colour glyphs; one menu shape for every bar menu | Per output, top, reserves its height, no keyboard focus, whole-surface blur; left: app name and workspace indicator; right: tray, volume, network, battery, clock; every menu is the design system's Menu in an xdg popup anchored to its button (`P:574-577`). |
 | Dock | Frame | Frame tokens over blur; app icons are the coloured thing; magnification without easing | Bottom, magnification on, 48 to 96, no auto-hide by default (`P:784-786`); indicator dots, LauncherEntry badge and progress ring; context menu: windows, desktop actions, Keep in Dock, Quit (`P:581-583`). |
 | Launcher | Frame | "the command menu is the same menu, just bigger and centred" (`S:792`); one menu shape | Centred Overlay panel, keyboard-exclusive, blurred, over a transparent full-screen catcher; closes on Esc, focus loss or catcher click (`P:586-589`). |
-| Control center | not specified | One field, one menu; the one appearance picker (`P:355`) | Uses `AppearancePicker`. Material and zone not specified. |
+| Control center | not specified | One field, one menu; the one appearance picker (`P:355`) | Uses the appearance picker. Material and zone not specified. |
 | Notifications | not specified | Acting exits, opening springs; no loops | Nothing settled beyond owning `org.freedesktop.Notifications` (`P:181-182`). |
 | OSD | not specified | Springs only on contact; one-colour glyphs | A `Material::Osd` exists (`P:315`); nothing else settled. |
 | Widgets | not specified | Coherence rule: same tokens, same components | A `Material::Widget` exists (`P:315`); nothing else settled. |
@@ -282,7 +282,7 @@ than resolved here. Behaviour numbers live in `10-BEHAVIOUR-dock.md`, `11-BEHAVI
    (`C:1122`); the app-icon decision makes app icons full-colour gradients (`P:810-814`). The
    boundary (dock tiles and launcher results coloured; everything else one colour) is the reading
    in 8.3 but is not stated in the plan.
-10. **Wallpaper and the Space.** Whether the wallpaper shows the Space gradient and grain, or a
+10. **Wallpaper and the Space.** Whether the wallpaper shows the Space gradient, or a
     picture, or both, is not specified.
 11. **Material and zone for control center, notifications, OSD and widgets** are not specified.
 

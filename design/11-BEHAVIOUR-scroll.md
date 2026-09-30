@@ -284,12 +284,12 @@ ever re-enabled). Wayland does not identify the device, so (settled rule, plan B
 - The engine requests frames only while Tracking with new deltas, Momentum, Rebound, Smooth,
   HeldKey, Spring, or while the thumb is fading/expanding. Idle = 0 frames.
 - Each frame: `resolve(t)`, write raw offsets, paint, then emit
-  `ScrollNotification{node, offset, phase}` on a `watch` channel; `ds_native::use_scroll(node)`
+  `ScrollNotification{node, offset, phase}` on a `watch` channel; `ds_blitz::use_scroll(node)`
   exposes it to components. Blitz's own `onscroll` does not fire for raw writes (B).
 
 ## 11.4 State machine
 
-Pure, `shell-host/src/scroll/engine.rs`. Geometry is passed in as values; the host reads it
+Pure, `shell-host/crates/shell-host/src/scroll/engine/`. Geometry is passed in as values; the host reads it
 from Blitz before calling `step` and applies effects after.
 
 ```rust
@@ -442,10 +442,10 @@ fade 240 ms, double-scroll grace 150 ms.
 
 | Concern | Owner |
 | --- | --- |
-| Engine, latching, rubber band, keyboard, thumb painting, frame requests | `shell-host/src/scroll/{engine,latch,rubber,keys,indicator}.rs` (pure except `indicator` paint) + `input/pointer.rs` (axis -> engine), `handlers/pointer.rs` (source, `axis_stop`, `axis_relative_direction`) |
+| Engine, latching, rubber band, keyboard, thumb painting, frame requests | `shell-host/src/scroll/{engine,latch,rubber,keys,indicator}.rs` (pure except `indicator` paint) + shell-host's input/pointer.rs (axis -> engine), shell-host's handlers (source, `axis_stop`, `axis_relative_direction`) |
 | palmrest client | `shell-host/src/input/palmrest.rs`: connects to the palmrest socket if present, sends `PointerOver`, feeds Gesture inputs; absent daemon = no-op |
 | Units to px, axis lock, gains | palmrest `feel` module (12 §12.3.8) |
-| Scroll notification hook | shell-host's `use_scroll` (beside `use_surface`: the host owns the engine, so the hook lives on its side, not `ds-native`'s) |
+| Scroll notification hook | shell-host's `use_scroll` (beside `use_surface`: the host owns the engine, so the hook lives on its side, not `ds-blitz`'s) |
 | `scrollbar-width: none`, `scroll-behavior` ban, `--scroll-thumb` token, `data-wheel="capture"`, `data-overscroll="band"` | quire (component CSS, `lint::Rule::BlitzUnsupported`, tokens, component markup — §11.3.7's table, §11.3.1 item 2) |
 | Settings UI | Settings app; writes both our keys and the compositor's natural-scroll keys |
 

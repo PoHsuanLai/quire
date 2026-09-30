@@ -113,7 +113,7 @@ control in v1.
 | `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | RETIRING: no reader; the panel is always a Sheet |
 | `launcher.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
 
-`notifications.banner_material` is stored under `appearance` (it names a `ds::Material`
+`notifications.banner_material` is stored under `appearance` (it names a `ds::prelude::Material`
 variant, appearance's vocabulary) but is *read* by `sill`'s notifications surface; see section
 7 for the cross-file read this implies.
 
@@ -144,7 +144,7 @@ per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICO
 | `icons.symbolic_chroma_max` | `Fraction` | `40` (0.04) | `0..200` (0.0..0.2) | `08-ICONS.md#15-colour` (step 2); `ds::icon::ChromaLimit` | proposed |
 
 `icons.symbolic_chroma_max` names the threshold `ds::icon::classify_with` already takes as a
-`ChromaLimit` (bar gaps, `crates/ds/src/icon/classify.rs`): a tray or app icon whose opaque
+`ChromaLimit` (bar gaps, `crates/ds-style/src/icon/classify.rs`): a tray or app icon whose opaque
 pixels all sit below this OKLCH chroma is drawn as a symbolic mask in the ink colour, rather
 than shown in its own colour. Advanced (file only, section 5); shown on the **Appearance** or
 **Dock** page if a later wave promotes it — both read icons live. `sill` registers the key in
@@ -938,7 +938,7 @@ pub struct Schema { pub app: AppId, pub file: FilePath, pub keys: Vec<KeySpec> }
 
 Widget by kind, fixed: a two-variant enum is a `Toggle`; three to five variants a
 `SegmentedControl`; more a `Menu`; `Bounded` a `Slider` with its unit; `Text` a `TextInput`;
-`Colour` the `AppearancePicker`'s swatch row; `Shortcut` a key-capture field; `List` a rows
+`Colour` the appearance picker's swatch row; `Shortcut` a key-capture field; `List` a rows
 editor. All from `04-COMPONENTS.md`; the Settings app has no widgets of its own.
 
 ### 9.2 Where the schema lives
@@ -979,7 +979,7 @@ contacts register their account pages this way (`20-SURFACES.md`).
 - Schema `version` follows the file `version` (section 2); a key removed from a struct leaves
   the schema with it.
 - No program renders its own settings UI for keys the schema covers (mailo's appearance
-  picker becomes the `AppearancePicker` component bound to `quire/appearance.toml`); an app
+  picker becomes the appearance picker component bound to `quire/appearance.toml`); an app
   may still embed the Settings app's rendering of its own schema in-app via the shared
   `SettingsPage` component (04, proposed).
 - Every "proposed" value in this doc is Basic or Advanced per section 5; nothing is file-only

@@ -9,7 +9,7 @@ COSMIC workspace's look: its colour tints the shell chrome around the apps, neve
 Status: **settled** = decided with the user (PLAN "UX decisions settled", 2026-09-23, second
 round) or copied from the prototypes/code; **proposed** = open until signed off.
 S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/src/palette.rs`
-(moves verbatim into `quire/crates/ds/src/space/palette.rs`).
+(moves verbatim into `crates/ds-style/src/space/palette.rs`).
 
 > **No grain.** A Space has no grain: no grain tile, layer, token, editor control or `spaces.default_grain`
 > key is drawn or read anywhere. A stored `grain` key is reported as unknown. (Removed 2026-09-30; the
@@ -218,7 +218,7 @@ repaint on every switch and would compete with the tint as the Space's colour cl
 
 `$XDG_CONFIG_HOME/quire/spaces.json`, atomic write (the `ds-settings` writer), watched with
 `notify` (rename replaces inode; debounce 30 ms). **Settled** (2026-09-24, sill gap Q3):
-`ds::SpaceStore` is this schema (`crates/ds/src/space/store.rs`); a consumer reads, writes and
+`ds::style::space::store::SpaceStore` is this schema (`crates/ds-style/src/space/store.rs`); a consumer reads, writes and
 watches it through `ds-settings`'s generic settings file API (`Settings<SpaceStore>` with
 `Format::Json`). A `null` in `by_index` means "no look stored at this
 position".

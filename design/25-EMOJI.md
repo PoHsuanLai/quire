@@ -14,13 +14,13 @@ accept beat, `UserPortrait` and `Mood` are gone. `AnimatedEmoji` plays the asset
 through when it appears (and on each new `WakeStamp` or pick), then rests on frame 0;
 `EmojiPlayback` is `Once` or `Still`. The lock and polkit prompts draw the picture without a mood
 (`user_picture/draw.rs`); sections 5 and 7 below describe what came before where they speak of
-moods, `Mood`, `UserPortrait`, the accept beat and `accept.rs`.
+moods, `Mood`, `UserPortrait`, the accept beat and the accept beat's file.
 
 ## 1. What this governs
 
-`ds::AnimatedEmoji` (the picture), `ds::EmojiId` (which emoji, user data), `ds::EmojiDisc`
-(none, or a tinted disc on a `DiscHue`), `ds::EmojiPlayback` (awake or still),
-`ds::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds-shell/assets/emoji/`, and the
+`ds_shell::prelude::AnimatedEmoji` (the picture), `ds_shell::emoji::id::EmojiId` (which emoji, user data), `ds_shell::emoji::disc::EmojiDisc`
+(none, or a tinted disc on a `DiscHue`), `ds_shell::emoji::disc::EmojiPlayback` (awake or still),
+`ds_shell::emoji::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds-shell/assets/emoji/`, and the
 pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `UserPicture`,
 `UserPortrait`, `PictureChoice`, `resolve_picture`, `UserPicturePicker`, `Mood`, `WakeStamp`,
 `PictureSize` and the accept beat `Anim::PictureAccept`.
@@ -34,7 +34,7 @@ pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `Us
   animated assets commercially…?": "Animated Noto Emoji is licensed under CC BY 4.0. See the
   full license for all details.", linking https://creativecommons.org/licenses/by/4.0/legalcode).
   The full legal code is committed as `crates/ds-shell/assets/emoji/CC-BY-4.0.txt`.
-- **Attribution** (required; `ds::EMOJI_ATTRIBUTION` carries it, and a surface that shows these
+- **Attribution** (required; `ds_shell::emoji::EMOJI_ATTRIBUTION` carries it, and a surface that shows these
   emoji puts it in its about box or credits):
 
   > Animated emoji: Noto Animated Emoji by Google, CC BY 4.0
@@ -108,8 +108,8 @@ The run is reproducible: a rebuild from the cache writes identical bytes.
 
 The caller sets the mood; the emoji plays it. Mounting, a new `wake: WakeStamp`, every mood
 change and a new pick **wake** it. Each wake computes a script (pure, `script.rs`) and a task
-owned by the component plays it (`life.rs`). The mapping (2026-09-26, the persona's moods on
-the emoji; `emoji/script.rs` `reaction` and `pace`, tested row by row in `emoji/tests.rs`):
+owned by the component plays it (`emoji/play.rs`). The mapping (2026-09-26, the persona's moods on
+the emoji; `emoji/play.rs`, tested row by row in `emoji/tests.rs`):
 
 | Mood | When (lock prompt) | On change, once through | Then, inside the 20 s window | At rest |
 | --- | --- | --- | --- | --- |
@@ -139,7 +139,7 @@ would have played, then the pick's.
 - **Idle rule** (design/CHECKLIST "Idle surface paints 0 frames"): the script plays whole loops
   only while they fit inside the 20 s window (`--t-awake`), so it ends on frame 0 with no jump,
   and then the task has ended: nothing is scheduled, no CSS animation or transition exists, and
-  the document asks for no frame. Tested in `ds-native/tests/emoji_life.rs`: frames advance
+  the document asks for no frame. Tested in `ds-conformance/tests/emoji_animation.rs`: frames advance
   within 2 s of the wake and (Attentive) are still advancing at 9 s; at 21 s the frame is 0,
   stays 0 for a further second, and `Harness::is_animating()` is false; Idle rests at least
   3.8 s between loops; as a `UserPortrait`, each mood shows its emoji and is at rest with no
@@ -206,8 +206,8 @@ group. It reuses the grid's step rule and column style.
 
 ## 8. Built (quire)
 
-- `crates/ds/src/components/emoji/`: `id.rs` (`EmojiId`), `sheet.rs` (sheets, manifest, the
-  frame position), `script.rs` (the wake script), `life.rs` (playing it), `disc.rs`
+- `crates/ds-shell/src/emoji/`: `id.rs` (`EmojiId`), `sheet.rs` (sheets, manifest, the
+  frame position), `script.rs` (the wake script), `emoji/play.rs` (playing it), `disc.rs`
   (`EmojiDisc`), `mod.rs` (`AnimatedEmoji`, `EMOJI_ATTRIBUTION`); `emoji.css`.
 - Markup: `div.ds-emoji[data-size][data-mood][data-disc]` with `--em-disc` inline when tinted,
   holding `div.ds-emoji-face[data-emoji][data-frame]` whose `background-size` is the grid in
@@ -222,12 +222,12 @@ group. It reuses the grid's step rule and column style.
   mood, the sizes and the discs, and the credit line; every picture there is `Still`, so the
   snapshot shows rest frames (a snapshot lets 120 ms of timers run at mount).
 
-- The user's picture (section 7): `crates/ds/src/components/user_picture/`: `picture.rs`
-  (`UserPicture`), `mood.rs` (`Mood`, `PictureSize`, `WakeStamp`), `portrait.rs`
-  (`UserPortrait` and the shared drawing), `accept.rs` (the accept beat), `choice.rs`
+- The user's picture (section 7): `crates/ds-shell/src/user_picture/`: `picture.rs`
+  (`UserPicture`), `user_picture/size.rs` (`Mood`, `PictureSize`, `WakeStamp`), `portrait.rs`
+  (`UserPortrait` and the shared drawing), the accept beat's file (the accept beat), `choice.rs`
   (`PictureChoice`, `FaceFile`, `resolve_picture`), `picker.rs` (`UserPicturePicker`);
   `user_picture.css`. Goldens: `tests/snapshots/user_picture/` (letter, emoji at rest, photo,
-  picker) and `tests/snapshots/lock_switcher/*-emoji*.html`; harness: `emoji_life.rs` and
+  picker) and `tests/snapshots/lock_switcher/*-emoji*.html`; harness: `emoji_animation.rs` and
   `lock_switcher.rs`. The picker is on the gallery's Emoji page, the three kinds in the
   prompt on Lock and switcher.
 

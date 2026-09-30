@@ -2,7 +2,7 @@
 
 Things only a person at the machine can verify. While the user is away they are assumed to
 work; each is ticked off with the date and what was seen. sill keeps its own queue at
-`sill/docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
+sill's `docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 
 ## Waiting on you (picks and checks, queued 2026-09-26)
 
@@ -31,7 +31,7 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
 ## quire
 
 - [ ] **EditSurface IME in a real window** (v0.1.7, FINDINGS "Edit surface"): with fcitx5 on
-  Chewing, run `cargo run -p ds-native --example edit`, click into the surface, type ㄋㄧˇㄏㄠˇ
+  Chewing, run `cargo run -p ds-blitz --example edit`, click into the surface, type ㄋㄧˇㄏㄠˇ
   and press Enter. Expect the printed inputs `Composition(Start)`, `Update("ㄋ")` …,
   `Update("")`, `End("你好")`, in that order, and no `Key`/`Text` while the preedit shows.
   No automated test drives winit's IME; re-check after every toolchain bump.
@@ -46,14 +46,14 @@ work; each is ticked off with the date and what was seen. sill keeps its own que
   dots only, and the caret follows; Ctrl+A/Ctrl+C then paste into a Text field pastes the
   secret (the clipboard is the app's own; documented).
 - [ ] **A real file drop from a file manager** (branch `drop-and-windows`, FINDINGS "File drops
-  and a second window"): `cargo run -p ds-native --example file_drop`, then drag two files from
+  and a second window"): `cargo run -p ds-blitz --example file_drop`, then drag two files from
   Dolphin onto the window. Expect the box's dashed outline to turn accent as the drag enters,
   solid accent and a copy cursor while over the box, a refused cursor off it, and on release over
   it "Attached 2 file(s)" with both absolute paths listed and printed. Drag a link out of a
   browser: nothing lights, the cursor refuses, nothing prints. Repeat once under X11
   (`WAYLAND_DISPLAY= cargo run …`): there the cursor may trail one move behind. No test drives
   winit's data-transfer events.
-- [ ] **A second window's compositor close and raise** (same branch): `cargo run -p ds-native
+- [ ] **A second window's compositor close and raise** (same branch): `cargo run -p ds-blitz
   --example second_window`, press "Open message" twice. Close one message window with its
   title-bar button (or Alt+F4): it goes, the terminal prints its `VirtualDom dropped`, the other
   windows stay. Close the first window with a message window open: both go and the process

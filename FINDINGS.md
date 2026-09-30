@@ -102,19 +102,19 @@ Upstream (pinned around; re-check at every toolchain bump):
 Not built, or limited, in quire:
 
 - **Other Blitz hosts get less than `launch` and the harness.** shell-host and sill call
-  `ds_native::provide_host()`, which installs every part of the document host, but do not
+  `ds_blitz::provide_host()`, which installs every part of the document host, but do not
   forward IME events or pointer capture to an `EditSurface`, have no click-focus fallback or
   hand-back, find no element by selector, and provide no spell checker
-  (`ds_native::spell::provide()`) or resting-pointer hover replay; they must call
-  `ds_native::snap_to_device` after each resolve themselves. Each needs a ds-native entry point
+  (`ds_blitz::spell::provide()`) or resting-pointer hover replay; they must call
+  `ds_blitz::snap_to_device` after each resolve themselves. Each needs a ds-blitz entry point
   the host calls.
 - **shell-host does not register quire's faces.** `SharedFonts::system()` never calls
   `SharedFonts::register`, and Inter is not installed system-wide, so sill draws system-ui
   wherever it asks for Inter, Inter Display, Bricolage, Karla, Space Mono or Noto Serif (its
   headless `Fonts::Bundled` registers only the first `.ttf` in quire's font folder). The fix is
-  shell-host's: register `ds::FACES` (`ds_native::register_fonts`). Until then, never put the
+  shell-host's: register `ds::style::fonts::FACES` (`ds_blitz::register_fonts`). Until then, never put the
   emoji face in a stack that carries ordinary text ("Colour emoji").
-- **`ds_native::launch` is not pixel-snapped and gets no hover replay**: blitz-shell resolves and
+- **`ds_blitz::launch` is not pixel-snapped and gets no hover replay**: blitz-shell resolves and
   paints in one redraw with no hook between.
 - **No tooltips for `title=` on the launch path.** Blitz draws none. Closing it means a host
   overlay that shows a quire `Tooltip` for a hovered element's `title`; meanwhile
@@ -125,7 +125,7 @@ Not built, or limited, in quire:
 - **`Slider` carries `data-wheel="capture"` but has no `onwheel` handler**, and whether a host
   reads `data-wheel`/`data-overscroll` correctly is shell-host's test to write.
 - **The window's IME route is proven by reading, not by a test** ("Edit surface"). Try it by
-  hand with fcitx5 or IBus (`cargo run -p ds-native --example edit` prints every input).
+  hand with fcitx5 or IBus (`cargo run -p ds-blitz --example edit` prints every input).
 - **Edit surface limits**: offsets are UTF-8 bytes, not graphemes; generated text that begins
   with the same character as the text after it (`1. ` before `1 apple`) can shift the
   DOM-to-layout map by one character; Tab moves the focus and cannot be kept for indentation; a
@@ -146,7 +146,7 @@ Not built, or limited, in quire:
   `CloseRequested` (apps act in `use_drop`); a `Signal` cannot cross windows (data goes by props
   or a shared `Arc`). The compositor's close of a second window and `handle.focus()` raising it
   are queued as manual checks.
-- **File drops from a real file manager** are unverified (`cargo run -p ds-native --example
+- **File drops from a real file manager** are unverified (`cargo run -p ds-blitz --example
   file_drop`, queued in `docs/manual-checks.md` for Wayland and X11).
 - **Frame link hover and click text in a window** are compiled but not driven by any test.
 - **The print dialog** is unparented on Wayland (neither winit nor `launch` exports an
@@ -168,7 +168,7 @@ Not built, or limited, in quire:
 - **Level control and swipe have no pointer capture**: leaving the control's hit zone (the rail
   and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there.
 - **`TreeItem` has no keyboard toggle of its own**; no harness test presses Enter on a summary.
-- **The virtual clock is opt-in** (`Clock::Virtual`): 24 ds-native tests assume the wall clock
+- **The virtual clock is opt-in** (`Clock::Virtual`): 24 ds-blitz tests assume the wall clock
   (they time with `Instant::now()`, sleep the thread, or click one spot twice with a long
   `advance` between). Off-thread work (the settings watch, D-Bus replies, an `AppNet` answering
   from another thread) is never on the virtual clock.
@@ -238,7 +238,7 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 
 - **S1.** A `style` element under `<main>` applies; `Ds { stylesheet: Inject::Inline }` works.
 - **S2.** Custom properties, `var()`, inheritance and nested scopes all work; attribute selectors
-  are what is broken. dioxus-native-dom's `mutation_writer.rs` creates every attribute through
+  are what is broken. dioxus-native-dom's mutation_writer.rs creates every attribute through
   `qual_name(name, None)`, in the HTML namespace, and Stylo's `attr_matches` compares
   namespaces, so `[data-theme=dark]`, `[aria-selected=true]` and `[data-variant=…]` never match
   an attribute dioxus sets. `[*|data-theme=dark]` (valid CSS that browsers also match) and
@@ -259,10 +259,10 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 - **S7.** With the default `DocumentConfig` (`DummyNetProvider`) a `data:` mask image never
   loads and the element is fully masked. With a `data:`-only `NetProvider` (the logic of
   blitz-shell's `DataUriNetProvider`, behind a feature not in the pinned set) it paints. The
-  image arrives one resolve late, so the first frame is blank. Every ds-native document installs
+  image arrives one resolve late, so the first frame is blank. Every ds-blitz document installs
   a `data:` provider and a `NetWaker` that requests a redraw.
-- **S8.** The same condition as S7; with the provider an 8 x 8 PNG tiles correctly. The grain
-  tile and the gallery wallpaper rely on it.
+- **S8.** The same condition as S7; with the provider an 8 x 8 PNG tiles correctly. The gallery
+  wallpaper relies on it.
 - **S9.** Mounted events are flushed in `initial_build`/`poll` before any layout, so a rect read
   inside `onmounted` is `0 x 0 at (0,0)`; the same `MountedData` read after the first resolve is
   right. `use_rect` keeps the handle and reads it after the next frame, never inside `onmounted`.
@@ -271,8 +271,8 @@ anyrender_vello_hybrid) as a `DioxusDocument` driven with `resolve(t)`, `poll` a
 - **S11.** `FontContext::new().collection.register_fonts(blob, None)` registers a face under the
   family name in the file, and `font-family` picks it. Faces are registered once in a shared
   `FontContext` cloned into each document.
-- **S12.** blitz-dom's `stylo.rs` hard-codes `NonTSPseudoClass::FocusVisible => false` and
-  `FocusWithin => false`, and pointer-down focuses only text inputs and checkboxes. ds-native
+- **S12.** blitz-dom's stylo.rs hard-codes `NonTSPseudoClass::FocusVisible => false` and
+  `FocusWithin => false`, and pointer-down focuses only text inputs and checkboxes. ds-blitz
   tracks input modality and stamps `data-modality=keyboard|pointer` on `.ds`; focus rings are
   `.ds[*|data-modality=keyboard] :focus`, and the lint bans `:focus-visible` and
   `:focus-within` in the Blitz profile. Anything that must show while focus is inside a row (the
@@ -368,12 +368,12 @@ adapter opens).
   every input).
 - **Cascade order matters at equal specificity**: components come after motion, so a component
   rule's `animation` outranks a pulse class unless it excludes it
-  (`.ds-chip[*|data-variant=person]:not(.a-chip-flash)`); `icon_button.css` comes after
-  `account_tile.css`, so the add tile's rule names both classes; the shared drop rules
-  (`drop_place.css`) sort last because they tie with the items' hover and current rules.
+  (`.ds-chip[*|data-variant=person]:not(.a-chip-flash)`); `button.css` comes after
+  `pin_tile.css`, so the add tile's rule names both classes; the shared drop rules
+  (the shared drop rules) sort last because they tie with the items' hover and current rules.
 - **`DsInternals`** forbids a consumer selector on quire's classes or root attributes
   (`data-theme`, `data-hover`, `data-extent`, …); `data-slot` is a consumer seam
-  (`CONSUMER_SEAMS` in `lint/selector.rs`). A type selector on a quire element trips the
+  (`CONSUMER_SEAMS` in `ds-lint/selector.rs`). A type selector on a quire element trips the
   consumer-only exemption, which keys on a selector starting `.ds`, so a `div`/`li` hover target
   carries `data-as`.
 - **A custom property on a `ds-*` element is how quire hands its sheet a per-instance colour**
@@ -466,7 +466,7 @@ adapter opens).
 - **No `line-clamp`.** A clamped body is a `max-height` of whole lines with a `max-height`
   transition, and whether its fade shows is decided by measuring its text against one line's
   height after layout.
-- **Blitz's text editor** (`create_text_editor`, `blitz-dom/src/layout/construct.rs`) clears the
+- **Blitz's text editor** (`create_text_editor`, blitz-dom's layout/construct.rs) clears the
   editor's styles and sets only font size, line height and brush. An input's text never takes
   `text-align`, `font-family`, `font-weight` or `letter-spacing`: `<div style="text-align:center">
   <input value="abc">` draws "abc" at the left (a browser centres it). `.ds-input-wrap` sets
@@ -505,15 +505,15 @@ adapter opens).
 
 ## Edit surface
 
-`ds::EditSurface` is a `div.ds-edit` (`role=textbox`, `tabindex=0`, `white-space: pre-wrap`)
+`ds::prelude::EditSurface` is a `div.ds-edit` (`role=textbox`, `tabindex=0`, `white-space: pre-wrap`)
 that delivers input and reports geometry for an app that owns its own editor core, drawing its
 own caret and selection. The route needs no Blitz fork.
 
 - **IME never reaches a dioxus handler.** blitz-shell converts winit `Ime` to `UiEvent::Ime`;
   blitz-dom's default action edits only a focused `input`/`textarea`; dioxus-native-dom maps
   `DomEventData::Ime(_)` to `None` and its composition converter is `unimplemented!()`.
-- **ds-native sees window events first.** dioxus-native runs every `use_window_event` handler
-  before passing the winit event to blitz-shell (`dioxus_application.rs`), so ds-native's `Host`
+- **ds-blitz sees window events first.** dioxus-native runs every `use_window_event` handler
+  before passing the winit event to blitz-shell (blitz-shell's dioxus_application.rs), so ds-blitz's `Host`
   takes `WindowEvent::Ime` there and routes it to the surface registered at the focused node or
   its nearest registered ancestor (`EditListeners`); blitz-dom's own IME handling then no-ops.
   The harness calls the same router. If a Blitz bump reorders `use_window_event` after the
@@ -534,7 +534,7 @@ own caret and selection. The route needs no Blitz fork.
   paragraphs or past a line's end still lands.
 - **The layout does not name text nodes.** A glyph run's brush is the element of its style span,
   and the layout text is every text node concatenated after white-space collapsing (plus case
-  transforms, list markers, `br` as `\n`). ds-native aligns DOM text nodes to the layout text
+  transforms, list markers, `br` as `\n`). ds-blitz aligns DOM text nodes to the layout text
   character by character, so a layout offset maps to (text node, byte) and back. A caret between
   two text nodes that an inline atom separates resolves to the later node's start.
 - **Focus.** A press would start Blitz's own document text selection and the click after it would
@@ -546,7 +546,7 @@ own caret and selection. The route needs no Blitz fork.
   window's hook hears winit's pointer events before the document (logical = physical / scale
   factor); while captured the surface ignores its own `pointermove`/`pointerup`.
 - **Clipboard HTML.** `ShellProvider` has text only; the window reads `text/html` through arboard
-  directly (`ds_native::clipboard::read_html()`). On Wayland arboard goes through XWayland, as
+  directly (`ds_blitz::clipboard::read_html()`). On Wayland arboard goes through XWayland, as
   blitz-shell's text clipboard does (`wayland-data-control` is off in both).
 - **Stacking with an app's layers follows CSS 2.1 Appendix E** here: a positioned (z-index auto)
   block paints over an earlier absolute layer, a static block under it, and a `z-index: -1` layer
@@ -567,7 +567,7 @@ own caret and selection. The route needs no Blitz fork.
   `onblur` itself; a node found by selector is matched to a mounted `TextField` through
   `GeometryHost::same` so it is told too.
 - **No `MountedData` can be built for a node found by selector**: `NodeHandle` has crate-private
-  fields and no constructor. ds-native wraps a found node in its own `RenderedElementBacking`
+  fields and no constructor. ds-blitz wraps a found node in its own `RenderedElementBacking`
   (`FoundNode`), which answers focus, blur and select only. `focus_by_selector` waits up to
   twenty frames for the element to be drawn.
 - **Keep-focus.** Under `FocusFallback::Ancestor` (the default), `Ds`'s root click handler asks
@@ -577,7 +577,7 @@ own caret and selection. The route needs no Blitz fork.
   already has the focus it is cleared first without events and refocused by a task, so a handler
   that moved the focus during the click wins. `BlitzDefault` switches the fallback off.
 - **The kept-click rule.** dioxus 0.7 has no capture phase and Blitz dispatches bottom-up only
-  (`events/driver.rs`), so a control that stops a click keeps it from the root. Every quire click
+  (blitz-dom's events/driver.rs), so a control that stops a click keeps it from the root. Every quire click
   handler that stops a click or prevents its default calls `focus::click::kept_click` last: with
   the default left to run it goes through `ClickFocusHost`; with the default prevented,
   `ClickFocusHost::press` gives the nearest focusable element from the pressed one up the keyboard at
@@ -610,7 +610,7 @@ own caret and selection. The route needs no Blitz fork.
 - **`NodeHandle::set_focus` borrows the document when called, not when polled.** dioxus polls a
   task woken in the same turn as a dirty scope inside `render_immediate`, while the mutation
   writer holds the document, so a focus from such a task panics "RefCell already borrowed". Every
-  focus change goes through `FocusHost` (ds-native's probes with `NodeHandle::try_doc` first and
+  focus change goes through `FocusHost` (ds-blitz's probes with `NodeHandle::try_doc` first and
   answers `Busy`); `Busy` retries. Without a host the call is guarded and a panic reads as busy.
 - **An `EventHandler` made inside `queue_effect` has no scope** and panics when called; timer
   handlers are made in render and started from an effect.
@@ -619,7 +619,7 @@ own caret and selection. The route needs no Blitz fork.
 
 - **Rect reads can collide with the renderer** the same way: dioxus-native-dom's
   `get_client_rect` borrows the document mutably on its first poll. Every rect read goes through
-  `geometry::measure::client_rect`, which asks the host's `GeometryHost::measure` (ds-native's answers
+  `geometry::measure::client_rect`, which asks the host's `GeometryHost::measure` (ds-blitz's answers
   `Measured::Busy` and the reader waits a frame); without a measurer the poll is guarded.
 - **Busy retries land in the same frame.** The first four `Busy` retries of a focus write, a rect
   read and a list scroll wait for `ds::busy::after_render` (an effect, which dioxus runs outside
@@ -632,14 +632,14 @@ own caret and selection. The route needs no Blitz fork.
 
 ### Other seams
 
-- **Every host seam is a part of `ds::DocumentHost`, `ds::HostSignals` or a trait**, provided by
-  `ds_native::launch`, the harness and `ds_native::provide_host()`: the host's `FocusHost`,
+- **Every host seam is a part of `ds::prelude::DocumentHost`, `ds::prelude::HostSignals` or a trait**, provided by
+  `ds_blitz::launch`, the harness and `ds_blitz::provide_host()`: the host's `FocusHost`,
   `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost` (with `ImeHost`) and `FileDropHost`;
   the `FileDropBoard` and `Rc<dyn Clipboard>` beside it; `HostSignals` (modality, scale,
   activity); `WindowHost`. `ds` names none of Blitz's types.
-- **`use_environment` runs its watches on a `Spawner`** (`ds::Spawner`; the portal watch and
-  the file watch are tasks it hands over). `ds_native::TokioSpawner::current` is the one
-  implementor; `ds_native::launch` and `Harness` enter a process-wide two-worker runtime for it.
+- **`use_environment` runs its watches on a `Spawner`** (`ds::base::spawner::Spawner`; the portal watch and
+  the file watch are tasks it hands over). `ds_blitz::TokioSpawner::current` is the one
+  implementor; `ds_blitz::launch` and `Harness` enter a process-wide two-worker runtime for it.
   `ds` and `ds-settings` may not depend on a renderer, and `scripts/check-boundary.sh` forbids
   `tokio` in both. The file watch's debounce is a `futures_timer` wait on the spawner's own thread:
   `ds::sleep` follows the clock installed on its caller's thread and is not `Send`.
@@ -651,34 +651,34 @@ own caret and selection. The route needs no Blitz fork.
 ## Frames and links
 
 - **A frame's document is built through the parent's HTML parser** with a config that inherits
-  the parent's net provider (`blitz-dom/src/iframe.rs`). ds-native wraps the parser, so every
+  the parent's net provider (blitz-dom's iframe.rs). ds-blitz wraps the parser, so every
   frame document (a `srcdoc`, a `src` load, a nested frame) is born with the frame's own net and
   navigation providers. The app renders one frame after the host installs its providers, so no
   frame is parsed with dioxus-native's.
 - **Network policy.** `data:` is always served; `about:` never fetches. The app's document gets
-  `file:` under `NetPolicy::Local` and `Custom`; a frame never gets `file:` from ds-native (under
+  `file:` under `NetPolicy::Local` and `Custom`; a frame never gets `file:` from ds-blitz (under
   `Local` and `Sealed` a frame gets `data:` only; under `Custom` everything else is put to
   `AppNet::decide`). An `<iframe src>` in the app's own markup is fetched by the app's document
   (`start_iframe_load` uses the parent's id and provider).
 - **A frame's first requests are made before it has an element**: `attach_iframe_document`
   parses the sub-document (where its images are requested) and attaches it afterwards, with the
-  parent mutably borrowed throughout. ds-native holds a frame's requests in a per-document
+  parent mutably borrowed throughout. ds-blitz holds a frame's requests in a per-document
   `FrameBook` until the next walk of the document's `iframe`s reads its `data-frame-tag`, then
   hands them to `AppNet::decide`. The lookups (`tag_of`, `frame_by_tag`) answer from a
   thread-local list on the UI thread.
 - **Parser.** blitz-html pulls html5ever, markup5ever and xml5ever 0.39.0 (pinned to match
-  stylo's `web_atoms`), not `markup5ever_rcdom`. No JS engine is in ds-native's graph. The
+  stylo's `web_atoms`), not `markup5ever_rcdom`. No JS engine is in ds-blitz's graph. The
   security boundary for mail stays ammonia upstream; the worst case of a parser differential is
   markup resurrected inside the frame's own document, where the network is sealed and navigation
   frozen.
 - **Links.** Blitz's `IframeNavigationProvider` reloads a frame with a clicked link's target;
-  ds-native replaces it, so a frame never navigates: `FrameLinks::Inert` does nothing, and
+  ds-blitz replaces it, so a frame never navigates: `FrameLinks::Inert` does nothing, and
   `Intercept` hands the app a `FrameLink { frame, tag, href, text, title }` through a channel,
   with the document free. The navigation provider hears only a URL, so the text is read at
   delivery (the anchor under the frame's hover node, else the focused one, else the first
   `a[href]` resolving to the same URL). Links in the app's own document open http(s) and mailto
   in the browser.
-- **Hover over frame links is hit-tested by ds-native**, not read from Blitz: Blitz forwards the
+- **Hover over frame links is hit-tested by ds-blitz**, not read from Blitz: Blitz forwards the
   move into the frame and keeps the hover state there, and the window hook hears a move before
   the document. `frame_hit.rs` goes into the frame's document as Blitz forwards events (minus the
   element's position, plus the frame's scroll); only a change of link is reported.
@@ -721,7 +721,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 
 - **dioxus-native has no public way for a running app to open a window**: `add_window` pushes
   onto `pending_windows`, drained only on resume, and such a window gets none of dioxus-native's
-  contexts (the `use_window_event` registry's type is crate-private). ds-native runs the event
+  contexts (the `use_window_event` registry's type is crate-private). ds-blitz runs the event
   loop itself, one `DioxusNativeApplication` per window under its own `ApplicationHandler`
   (`window_shell`), with its own copies of the two private providers (the `dioxus:` asset net
   provider and the link opener).
@@ -739,7 +739,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   release that arrives before the paths is held until they come. X11 gives no position on enter,
   proposes only `Copy`, and answers each position with the state set before it (the cursor
   trails by one move).
-- blitz-shell ignores the drag events and the document has no drag events; ds-native reads them
+- blitz-shell ignores the drag events and the document has no drag events; ds-blitz reads them
   in the same window hook as IME. A URI list with any non-`file:` entry is `Offer::Other`,
   refused. A target writes the existing `DropState` values (`target` over it, `accepts`
   elsewhere during a file drag).
@@ -747,7 +747,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 ### Clipboard
 
 - dioxus-native's `clipboard` feature is on (blitz-shell over arboard 3.6), so Ctrl+C/X/V work in
-  every field of a `launch` window. The app's calls answer `NoHost` outside a ds-native document,
+  every field of a `launch` window. The app's calls answer `NoHost` outside a ds-blitz document,
   or `Unavailable`. The harness keeps an in-memory clipboard with an HTML slot.
 
 ## Layout, hit testing and hover
@@ -764,7 +764,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **So no CSS value alone makes a crisp line at a fractional scale.** A black `height: 1px` line
   on white inks its device rows 255, 128 at 1.5 (y 10); 128, 191 at 1.25; 128, 255, 64 at 1.75;
   two full rows at 2.
-- **`ds_native::snap_to_device`** runs after every resolve in the harness and `snapshot`: it
+- **`ds_blitz::snap_to_device`** runs after every resolve in the harness and `snapshot`: it
   redoes taffy's cumulative rounding from each node's unrounded layout on the device grid,
   rounds border widths to whole device pixels (at least one), re-derives transforms and
   scrollable overflow, and rounds pure translations, through blitz-dom's public layout
@@ -815,7 +815,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **A hidden node keeps its last layout box**; read a following element to measure a collapse.
 - **An element's own client rect is offset by its own scroll offset** (`absolute_position`
   subtracts it), so a scrolled list's rect moves with its content.
-- **`scroll_into_view` scrolls the document viewport only.** ds-native's `GeometryHost::reveal` sets a
+- **`scroll_into_view` scrolls the document viewport only.** ds-blitz's `GeometryHost::reveal` sets a
   nested list's own offset (instant, clamped) by CSSOM's `block: nearest`
   (`ds::nearest_scroll`).
 
@@ -835,7 +835,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   without dispatching (a TODO says so); the next move's diff is then empty, so an element that
   slid under the pointer never hears `pointerover`/`pointerenter`, and the one left never hears
   `pointerout`/`pointerleave`.
-- **ds-native replays** (`hover_sync.rs` decides, `hover_replay.rs` acts, from
+- **blitz-kit replays** (`hover/decide.rs` decides, `hover/repair.rs` acts, from
   `Headless::resolve`): when the hovered node changed across a resolve and a pointer event has
   arrived, put Blitz's hover back on the old element without events (probe its rect's centre,
   then its corners inset 1 px, through `hit()` and `nearest_non_anonymous_ancestor`, then
@@ -901,7 +901,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   `advance`s) while ds timers and `Instant::now()` run on the wall clock, and `advance` only
   guarantees *at least* the time asked. Under load a check near a boundary lands on either side.
 - **The rule** (ARCHITECTURE.md "Repo rules"): never assert a state at one fixed instant near a
-  timer boundary. Poll with `ds_native::harness::settle_until` (10 ms steps, `SETTLE_BOUND` 3 s,
+  timer boundary. Poll with `ds_harness::harness::settle_until` (10 ms steps, `SETTLE_BOUND` 3 s,
   returns the instant the condition first held, panics with the document's HTML on timeout) and
   assert order, or that it landed at least the window after it was asked
   (`landed.duration_since(asked) >= window`, safe because real time only overshoots). A "not yet"
@@ -931,7 +931,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **Tint alphas** are design/03 section 17.2's, each the smallest `.02` step at which every
   material's ink holds 4.5:1 over pure black and pure white, with and without compositor blur
   (`tests/legibility.rs`); the worst margin is the dark Widget, preset 2, over white, 4.551:1.
-- **Frame layers.** A tinted chrome root draws the window's two gradient layers and grain inside
+- **Frame layers.** A tinted chrome root draws the window's two gradient layers inside
   one `.ds-frame` at `--m-frame-alpha` (the material's tint alpha scaled by the settings key)
   with blur, .94 without; the group's background is the current gradient, so it stays opaque
   through a Space cross-fade. The symmetric layer fade weighs the old Space `(1 - p)^2`, so at
@@ -956,9 +956,9 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 
 ## PDF output
 
-Blitz lays the document out, `crates/anyrender_pdfrum` replays anyrender's recording `Scene`
-onto a pdfrum canvas, and the result is a vector PDF. `anyrender_pdfrum` names only anyrender,
-peniko, pdfrum and skrifa (the boundary script enforces no Blitz and no parley).
+Blitz lays the document out, `pdfrum-anyrender` (a crate of the pdfrum repo, a git dependency of `ds-blitz`'s `pdf` feature pinned to pdfrum rev 61371040)
+replays anyrender's recording `Scene` onto a pdfrum canvas, and the result is a vector PDF. It
+names only anyrender, peniko, pdfrum and skrifa (no Blitz, no parley).
 
 - **Recording first**: anyrender's layers are a push/pop stack while pdfrum's `Canvas::saved`
   takes a closure, so a pushed layer's commands replay inside one saved state and no unbalanced
@@ -983,7 +983,7 @@ peniko, pdfrum and skrifa (the boundary script enforces no Blitz and no parley).
   (`Margins::default()` is 18 mm / 16 mm).
 - **The text behind each glyph**: blitz-paint hands anyrender glyph ids and positions only, but
   the parley layouts are public (`inline_layout_data`, a list item's marker, a text input's
-  editor). Before painting, ds-native pairs each glyph run's glyphs with their clusters' text,
+  editor). Before painting, ds-blitz pairs each glyph run's glyphs with their clusters' text,
   keyed by face blob id and index, size and each glyph's id and position bits
   (`pdf/run_texts.rs`); a ligature's continuation clusters join its glyph. pdfrum writes the text
   into `/ToUnicode`, or `/ActualText` where a mapping would conflict. The key includes the blob
@@ -1001,7 +1001,7 @@ peniko, pdfrum and skrifa (the boundary script enforces no Blitz and no parley).
   instance as `Karla_550wght`). Noto Sans CJK on this machine is one variable CFF2 collection
   (32 MB) whose default instance is Thin, so ignoring the coordinates prints Thin; it is shared
   into pdfrum without a copy and subset to about 20 KB.
-- **Images**: Blitz keeps only decoded RGBA, so ds-native re-decodes `data:` URLs to recover the
+- **Images**: Blitz keeps only decoded RGBA, so ds-blitz re-decodes `data:` URLs to recover the
   encoded bytes. JPEG and opaque PNG are written as-is; a PNG with alpha is drawn from pixels with
   an SMask; images an `AppNet` fetched are drawn from pixels. An image brush draws once, clipped;
   Blitz tiles backgrounds itself.
@@ -1112,7 +1112,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   preference maps to Light.
 - **Types.** `Motion` is the preference (Standard or Reduced, default Standard, with a `label()`; the
   desktop's reduce-motion preference makes Standard resolve to Reduced); `MotionLevel` is the
-  resolved pair, so a picker offers `Motion`. `ds::Px(f32)` is for layout, `ds_settings::Px(u16)` for stored keys; `ds::Percent`
+  resolved pair, so a picker offers `Motion`. `ds::prelude::Px(f32)` is for layout, `ds_settings::Px(u16)` for stored keys; `ds::prelude::Percent`
   and `ds_settings::Percent` agree by shape because `ds` may not depend on `ds-settings`. There
   is one unclamped `Fraction`; components clamp. `Secs(u16)` and `Mins(u16)` are unit newtypes
   like `Px`/`Ms`/`Count`, rendered as sliders from the field's own `#[settings(range, unit)]`.
@@ -1138,7 +1138,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   nothing rather than everything.
 - **ds stays pure**: tokenising, skip rules, the CJK test, mark tracking and the word being typed
   are pure functions in `ds::spell`; the seam is the `SpellService` trait with boxed futures, so
-  `ds` needs no executor; `ds_native::spell` (feature `spellcheck`) owns file access and the
+  `ds` needs no executor; `ds_blitz::spell` (feature `spellcheck`) owns file access and the
   worker thread.
 - **Marks are decoration**: a layer, last in the surface and absolutely positioned, holds a
   `border-bottom: dotted` box per line of each marked word from `EditHost::selection_rects`. It

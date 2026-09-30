@@ -250,7 +250,7 @@ hover appearance. Every entry inherits `Common` (R8).
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Toggle | `NSSwitch` | `Check` On/Off; knob moves by spring, track tint fades `--t-quick`; label in the row, not the switch | Z3 | CTL | track, indicator | `Switch`, `ControlSize` S/M/L | KEEP | P1 |
 | Checkbox | `NSButton` checkbox | `Check {Off, On, Mixed}`; label; Space toggles | Z3 | CTL | indicator, label | menu `Check` drawing | ADD | P1 |
-| RadioGroup<T> | `NSButton` radio group | one of N; arrows rove and select; image labels for the Appearance choice | Z3 | CTL per item | item, indicator, label | `AppearancePicker`, `PickerLayout` | ADD | P1 |
+| RadioGroup<T> | `NSButton` radio group | one of N; arrows rove and select; image labels for the Appearance choice | Z3 | CTL per item | item, indicator, label | the appearance picker, `PickerLayout` | ADD | P1 |
 | SegmentedControl<T> | `NSSegmentedControl` | `Tracking {SelectOne, SelectAny, Momentary}`; text or image segments; per-segment availability; the indicator slides by spring (crate-private `SelectionTrack`, also under `WorkspacePills`) | Z4 | CTL +H, selected | segment, indicator, label, icon | `Tabs`, `SegSize`, the `TabView` strip | MERGE | P1 |
 | DatePicker | `NSDatePicker` | `Style {Textual, Graphical}`; graphical is `MonthGrid` plus a time field | Z3 | CTL | field, calendar | none | ADD | P2 |
 
@@ -379,7 +379,7 @@ Mail-only (`ds::app`; mailo keeps its own look for now):
 | --- | --- | --- |
 | Button, PopUpButton, Slider, Stepper, Toggle, Checkbox, RadioGroup, SegmentedControl, TextField, DatePicker, Chip, Badge, KeyEquivalent, ProgressIndicator, LevelIndicator, Disclosure, TabView strip | Menu (row 22), Popover, Sheet, Alert, SidePanel, WindowTitlebar (28), Toolbar (52), Row (24 / 44), Sidebar (`SidebarSize`), Avatar and IconView (their ladders) | Label, EmptyState, Skeleton, Tooltip, HoverCard |
 
-Build order (ARCHITECTURE section 10, step 4a): 1 tokens and vocabulary; 2 motion and interaction
+Build order: 1 tokens and vocabulary; 2 motion and interaction
 primitives; 3 `Label`, `Button` (+ `IconButton` merge), `Toggle`, `Checkbox`, `RadioGroup`,
 `SegmentedControl`, `Slider`, `TextField`; 4 `ProgressIndicator`, `LevelIndicator`, `Badge`,
 `KeyEquivalent`, `VoiceOrb`; 5 `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`; 6 `List`, `Row`, `SectionHeader`;
@@ -401,7 +401,7 @@ key. What the design takes from the Arc prototype are features (3.3), not values
 Colour tokens (light and dark), radii, font families, the material recipes, shadows, the icon plate
 and the orb colours, all in `ds-style::tokens`; every component reads them and none carries a value
 of its own. The Look never sets a size (`SizeScale`), a duration, easing or motion level, a
-behaviour or a default keyboard binding. User styles (ARCHITECTURE section 11) apply after it.
+behaviour or a default keyboard binding. User styles (ARCHITECTURE section 10) apply after it.
 
 ### 3.2 The values
 
@@ -465,7 +465,7 @@ Each row is a DROP: name, then the reason.
 | Mailo-era tokens Spark, Send, Float, Sail, BoatReturn, Spin, Nudge, Park, ShakeLong | orphaned |
 | `PendingGrace`, `PendingCap` | macOS spinners spin at once |
 | Eight presence machines, three roster hooks, `Anim` variants not named in 1.3 | one `Presence`, one `Roster` |
-| `Tabs`, `AppearancePicker`, `PickerLayout` | `SegmentedControl` / `RadioGroup` |
+| `Tabs`, the appearance picker, `PickerLayout` | `SegmentedControl` / `RadioGroup` |
 | `IconButton`, `PlayPauseButton`, `ButtonVariant`, `ButtonSize`, `ButtonFace`, `Pin`/`Frame`/`Strip` variants | `Button` bezels and `ControlSize` |
 | `Spinner`, `RowBattery`, `BatteryLevel`, `BatteryFigure`, `DeviceBattery`, `TrackPosition` bar, dock ring | `ProgressIndicator`, `BatteryGlyph`, `Label` |
 | `Count`, `CountPlace` | `Badge` |
@@ -483,7 +483,7 @@ Each row is a DROP: name, then the reason.
 | Toast pull tab, `pill-up` | Toast slides like a banner |
 | Portrait moods and life animations, `UserPortrait` component | `Avatar` |
 | `Switch`, old `Check`, `Expanded`, `Disclosure`, `ListPresence`, `AvatarMuting`, three `Held`, `Here`, `FirstShow`, `Motion{Play,Still}`, `OsdPhase`, `ShownPhase` | section 1.5 survivors |
-| sill `easing.rs::ease`, `dock/label.rs` machine, `PDF_THUMB_GRACE`, `THROW_WINDOW`, `FLING_WINDOW`, `glide::FRAME`, `RUN_GAP` | one evaluator, one `HoverIntent`, shared tokens |
+| sill `easing.rs::ease`, sill's `sill-dock/src/dock/machine/label.rs` machine, `PDF_THUMB_GRACE`, `THROW_WINDOW`, `FLING_WINDOW`, `glide::FRAME`, `RUN_GAP` | one evaluator, one `HoverIntent`, shared tokens |
 | Not built, no consumer: `ComboBox`, `ColorWell`, `ImageWell`, `PathControl`, `RatingIndicator`, column views, charts, iOS patterns | macOS has them; no shell or mail need |
 
 ---

@@ -68,7 +68,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 | 23 | Toast (+ pull tab) | S `.toast` | undo | notifications (planned) |
 | 24 | Scrim, Sheet, Peek | S `.scrim` `.peek`; C `[data-peek]` | peek reader | dialogs, settings sheets |
 | 25 | CommandPalette | S `.cmdk` | Ctrl T / Ctrl K | launcher |
-| 26 | AppearancePicker | derived from S editor segs + C controls row | settings | control center, settings |
+| 26 | Appearance choice (`SegmentedControl` + `RadioGroup`) | derived from S editor segs + C controls row | settings | control center, settings |
 | 27 | AccountTile | S `.pin.acct` | sidebar tiles | user switcher (planned) |
 | 28 | ProviderMark | S `.prov` | tiles, rows, From picker | none |
 | 29 | LinkPill | S `.linkpill` | reader links | none |
@@ -92,7 +92,7 @@ Rules that apply to every section (from the plan's §11 addenda):
 
 ## Shared vocabulary
 
-### Props enums (`components/vocab.rs`)
+### Props enums (`ds-core/vocab.rs`)
 
 The plan names these; the mapping to attributes below is this document's proposal and is
 binding once 04 is approved.
@@ -378,7 +378,7 @@ takes the variant's size below.
 | Status | `--bar-status-box` square (default 22) | `--r-item` | `--f-ink-soft`, transparent; hover `--f-ink` on `--f-pill-hover`; pressed/expanded `--f-pill` | `--bar-status-glyph` (default 16), sized in CSS | Space frame (the bar) |
 
 Status is settled (bar gaps, sill Q12; 13 §13.3.1): a consumer writes the two properties with
-`ds::StatusMetrics` from `bar.status_icon_box_px`, `bar.status_glyph_px` and
+`ds::style::tokens::status::StatusMetrics` from `bar.status_icon_box_px`, `bar.status_glyph_px` and
 `bar.glyph_size_policy` (22-SETTINGS §3).
 
 **The frame ground** (settled, bar gaps): the sidebar item's pattern (§19, `--f-*` inks on the
@@ -454,7 +454,7 @@ Pin (verbatim, `S:108-114`, `S:118`):
 
 **Purpose.** One choice out of 2 to 4, all visible. Mail: Reader/Original (`S:1376`), Space
 editor Appearance / Accent / Provider marks (`S:879-893`). Shell: control center, settings.
-Also the building block of AppearancePicker (§26).
+Also the building block of the appearance choice (§26).
 
 **Markup.**
 
@@ -751,7 +751,7 @@ Verbatim, `S:781-786`:
 `S:1661`). `Focus::Controlled(FocusRequest)` (settled 2026-09-24, FINDINGS "Launcher gaps", sill
 Q44) focuses on mount and again at every `request()`: a menu that took the keyboard hands it
 back when it closes, without remounting the field. Every focus change waits out a document the
-renderer holds (`ds::FocusHost`, Q43). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
+renderer holds (`ds::host::parts::FocusHost`, Q43). Recipient inputs: Enter or `,` adds, Backspace on empty removes the last chip
 (`S:2265-2266`).
 
 **Blitz notes.** `::placeholder` must be verified in the spike; if unsupported, render the
@@ -770,7 +770,7 @@ is required so the global focus ring does not double the accent ring.
   field is `Secret`.
 - A masked field's caret (sill Q360b, 2026-09-27). Blitz measures a `Password` or `Secret`
   field's hidden text in its editor's face, untracked, so its caret drifts off the Inter dots.
-  Where the host reads the selection (`ds::CaretHost::selection`, ds-native's), the
+  Where the host reads the selection (`ds::host::parts::CaretHost::selection`, ds-blitz's), the
   input carries `data-caret=drawn` (`caret-color: transparent`) and `.ds-input-mask` draws the
   caret itself: `span.ds-input-caret` centred in the gap between the dots at the caret's
   character (half the tracking back; half a gap after the last dot at the end), Blitz's caret
@@ -1320,7 +1320,7 @@ size: not specified (O-9).
 (D0, design/26 R4: the ring is a bounded pending loop on `ds::detail::use_pending`: nothing for
 `PendingGrace`, a step every `--t-pending-step`, its still frame from the operation token's
 deadline; no `infinite` animation. The keyframe-loop CSS below is the prototype's, kept for
-reference; the shipped sheet is `components/spinner.css`.)
+reference; the shipped sheet is the progress indicator's sheet.)
 
 **Geometry.** absolute, `inset:-4px` of the host, radius 999px, 2px `--accent` border. Spin: border
 dashed, opacity .9.
@@ -2454,59 +2454,30 @@ row titles `--fs-shell-row` 14 and details `--fs-shell-detail` 12; its shadow is
 stack's contact and ambient pair (`--m-box`). `corner: Option<Corner>` gives the card another
 radius or a `Corner::Squircle` (the launcher's: `Squircle(14)`).
 
-### 26. AppearancePicker
+### 26. Appearance choice
 
-**Derived.** The plan: "THE one picker for mailo, control center, settings". Neither prototype
-has an appearance popover (A4: "NO appearance popover exists"; A8 #9). The pieces that exist:
-S's Space editor rows (field label + SegmentedControl: Appearance System/Light/Dark, Accent "A
-hint of the Space"/"Postmark", `S:877-888`) and C's controls row (label + segmented control
-for Look, Warmth, Motion, Theme, `C:1131-1157`).
+Not a component of its own (design/30 part 4 deletes `AppearancePicker`, a name that is gone): the appearance choice
+is a `SegmentedControl` for Theme (System, Light, Dark) over a `RadioGroup` of accent swatches
+(`Arrangement::Swatches`), stacked as two field rows, in the control center and the settings app.
+
+**Derived.** Neither prototype has an appearance popover (A4: "NO appearance popover exists";
+A8 #9). The pieces that exist: S's Space editor rows (field label + SegmentedControl:
+Appearance System/Light/Dark, `S:877-888`) and C's controls row (label + segmented control,
+`C:1131-1157`).
 
 **Purpose.** Pick Theme and Accent for an app or the whole shell (`Appearance` in
-`resolve(app, look_theme, system)`). Motion is not offered (the user's decision, 2026-09-28: the
-motion level need not be user-configurable): the picker passes `Appearance::motion` through
-unchanged, and the system's reduced-motion preference still maps into it.
-
-**Markup.**
-
-```html
-<div class="ds-appearance" role="group" aria-label="Appearance">
-  <div class="ds-appearance-row">
-    <div class="ds-section-header" data-kind="field">Theme</div>
-    <div class="ds-segmented" role="group" aria-label="Theme">…System | Light | Dark…</div>
-  </div>
-  <div class="ds-appearance-row">
-    <div class="ds-section-header" data-kind="field">Accent</div>
-    <div class="ds-appearance-swatches" role="group" aria-label="Accent">
-      <button type="button" class="ds-space-dot" aria-pressed="true" aria-label="Blue" style="background:…"></button>
-      …one per accent…
-    </div>
-  </div>
-</div>
-```
-
-**Props.**
-
-```rust
-#[component] pub fn AppearancePicker(value: Appearance, system: SystemPrefs,
-    onchange: EventHandler<Appearance>) -> Element
-```
+`resolve(app, look_theme, system)`). Motion is not offered (the user's decision: the motion
+level need not be user-configurable); the system's reduced-motion preference still maps into
+`Appearance::motion`.
 
 **Geometry.** Rows stacked; the Space editor's stack gap is 14 (`S:247`); a row is a Field
 SectionHeader (margin-bottom 6) over its control. Swatches reuse the Space dot (§32: 22 px
-circle, 2px border, gap 5 as in the sidebar foot `S:845`). Overall width not specified (O-16).
-Labels: Theme uses S's words (System, Light, Dark; C says Auto).
-
-**States.** Inherited from SegmentedControl (§3) and Space dot (§32). No states of its own.
-
-**Motion.** None of its own. Changing Theme cross-fades the frame (layer opacity 380 ms,
-`S:86`; 05-MOTION).
+circle, 2px border, gap 5 as in the sidebar foot `S:845`). Overall width is the host
+surface's (O-16). Labels: Theme uses S's words (System, Light, Dark; C says Auto).
 
 **Behaviour.** Changes apply at once and persist through ds-settings (atomic write). "System"
-follows the portal. The number of accents is the accent table's (03-COLOR); the plan says 6 in
-one place and has a test named "exactly-four-accent" in another (O-17).
-
-**Blitz notes.** None beyond its parts.
+follows the portal. The number of accents is the accent table's (03-COLOR). Changing Theme
+cross-fades the frame (layer opacity 380 ms, `S:86`; 05-MOTION).
 
 ### 27. AccountTile
 
@@ -3369,7 +3340,7 @@ and `svg.ds-clock-pin`. Every vector is on `currentColor` with `data-ds-svg`. Di
 `--font-display` 800 tabular (`09:41`, `09:41:07` with seconds), at `--fs-widget-hero` in a Small
 frame and `--fs-subject` elsewhere, bumping on each new minute; a sun (`svg.ds-clock-sun`,
 `--warn`) or moon (`svg.ds-clock-moon`, `--ink-faint`) before the city. The hand angles are pure
-(`clock_angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
+(`ds-shell/clock/angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
 second `6 x s`.
 
 **BatteryLevel**. `BatteryLevel { level:
@@ -3378,7 +3349,7 @@ Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, child
 full circle in `--battery-track`; `svg.ds-battery-arc`, clockwise from twelve as far as the level
 in `--battery-fill`, `--battery-low` at or under 20 % (`data-tone` `low`, and `critical` at or
 under 10 %, the same red); charging is never low; stroke .093 of the ring, round caps, the path
-computed in Rust (`battery_ring.rs`). `children` (the device glyph) sit centred in
+computed in Rust (`ds-shell/battery/ring.rs`). `children` (the device glyph) sit centred in
 `span.ds-battery-device` at .47 of the ring. `Charging` (`data-mark="charging"`) cuts a gap at
 twelve in both strokes and sets `svg.ds-battery-bolt` in it once the fill has arrived. The
 percentage is the caller's (design/23 section 4.1), counted in step with the fill by
@@ -3622,8 +3593,8 @@ steadily; Wince swaps in `EmojiId::WRONG` (confounded) once through, Happy `Emoj
 still (design/25 section 5). Reduced motion, or `playback: EmojiPlayback::Still` (a picker's
 grid): still frames only.
 
-**Tests.** `ds/tests/emoji_ssr.rs` (goldens, lint), `ds/src/components/emoji/tests.rs` (sheets,
-manifest, the script's idle rule, the mood mapping), `ds-native/tests/emoji_life.rs` (frames
+**Tests.** `ds-shell/tests/emoji_ssr.rs` (goldens, lint), `ds-shell/emoji/tests.rs` (sheets,
+manifest, the script's idle rule, the mood mapping), `ds-conformance/tests/emoji_animation.rs` (frames
 advance, rest at 21 s, idle's rests, the wince swap, each mood as a `UserPortrait`, Reduced).
 
 ### 44a. UserPicture, UserPortrait and UserPicturePicker (2026-09-26; design/25 section 7)
@@ -3666,7 +3637,7 @@ click or an arrow key (the emoji grid's `grid_step`: Left and Right wrap rows, U
 inside) calls `onpick` with the new choice; `choice` is the caller's and marks one cell (none for
 `Auto` or `Photo`). Nothing in the picker plays.
 
-**Tests.** `ds/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
+**Tests.** `ds-shell/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
 and the picker; lint; the serde round trip; the `resolve_picture` table), `ds/src/components/
 user_picture/picker.rs` (cells and marks), `ds-conformance/tests/lock_switcher.rs` (the emoji's moods
 in the lock prompt; the letter's beat).
@@ -3677,9 +3648,9 @@ in the lock prompt; the letter's beat).
 (design/20 section 2.4) later, the same part in both. The consumer passes a path and a size and
 never rasterises anything itself.
 
-**Split.** `ds::PdfThumb` draws a page it is handed (`PdfPage`) and reads no file: ds stays
+**Split.** `ds::prelude::PdfThumb` draws a page it is handed (`PdfPage`) and reads no file: ds stays
 renderer-free and effect-free (`scripts/check-boundary.sh`), and pdfrum's CPU rasteriser is a
-renderer. `ds_native::PdfFileThumb` (cargo feature `pdf-thumb`, off by default so an app that
+renderer. `ds_blitz::PdfFileThumb` (cargo feature `pdf`, off by default so an app that
 shows no PDF builds no PDF reader) takes the path, reads and rasterises page 1 with pdfrum 0.4's
 `VelloCpuBackend` on a worker thread, caches the result by (path, modification time, device
 size, scale), and feeds `PdfThumb`. A consumer that is not on Blitz (mailo on the webview)
@@ -3708,7 +3679,7 @@ pub const PDF_THUMB_GRACE: Duration;          // 400 ms, design/26 PendingGrace
 pub const PDF_DEFAULT_SHEET: ImageSize;       // A4 portrait, 595 x 842 pt
 pub fn sheet_rect(room: Size, shape: ImageSize) -> Rect;
 #[component] pub fn PdfThumb(page: PdfPage, size: Size, label: Option<String>) -> Element
-// ds-native, feature `pdf-thumb`:
+// ds-blitz, feature `pdf`:
 #[component] pub fn PdfFileThumb(path: PathBuf, size: Size, label: Option<String>) -> Element
 pub struct ThumbRequest { pub path: PathBuf, pub size: Size, pub scale: Scale }
 pub fn pdf_thumb_blocking(&ThumbRequest) -> PdfPage;    // cached, else read + raster now
@@ -3747,7 +3718,7 @@ encrypted file that opens with the empty user password draws; one that needs a p
 pdf_thumb.rs` (the sheet's fit), `ds-blitz/tests/pdf_thumb.rs` (a generated PDF rasterised in
 its colour and aspect, the cache hit and the mtime miss, the failures, a document painting the
 page), `ds-blitz/tests/pdf_thumb_queue.rs` (20 quick requests run at most 4 rasters and show the
-last), `ds-native/src/pdf_thumb/cache.rs` (eviction).
+last), `ds-blitz/pdf_thumb/cache.rs` (eviction).
 
 ### 46. EmojiGrid (sill M9 launcher v2, Q291, 2026-09-26; values proposed)
 
@@ -3802,7 +3773,7 @@ the selected cell and a click picks the cell clicked; the pointer over a cell as
 The selection is always the caller's (`selected`, `on_select`); from none, the first arrow asks
 for cell 0.
 
-**Tests.** `ds/src/components/emoji_grid_nav.rs` (the moves), `ds/src/components/palette_stops.rs`
+**Tests.** `ds/components/lists/emoji_grid/nav.rs` (the moves), `ds/components/menus/palette/palette_stops.rs`
 (entering and leaving in a palette), `ds/tests/launcher_parts_ssr.rs` (`grid-in-palette`,
 `grid-alone`), `ds-conformance/tests/palette_grid_pane.rs` (the palette walk and the grid on its own).
 
@@ -3850,12 +3821,12 @@ pub const PANE_MEDIA: Size;   // 328 x 220
 #[component] pub fn PreviewPane(content: PaneContent, actions: Vec<PaneAction>,
     focused: Option<usize>, onaction: EventHandler<usize>,
     shown: Shown /* Visible */, on_hidden: EventHandler<()>) -> Element
-// ds-native, feature `pdf-thumb`:
+// ds-blitz, feature `pdf`:
 pub fn use_pdf_page(path: Option<PathBuf>, size: Size) -> Option<PdfPage>
 ```
 
 **The PDF split.** ds reads no file (section 45), so `PaneContent::Pdf` takes the page, not the
-path. A Blitz app gets the page from `ds_native::use_pdf_page(path, ds::PANE_MEDIA)`, the hook
+path. A Blitz app gets the page from `ds_blitz::use_pdf_page(path, ds::components::lists::preview::content::PANE_MEDIA)`, the hook
 `PdfFileThumb` itself now runs on: cached, else asked of the one `pdf-thumb` worker, `Loading`
 until it lands. It takes an `Option` so the component that draws the pane calls it on every
 render and passes the path only while the content is a PDF: the pane stays one mounted element
@@ -3928,7 +3899,7 @@ pub enum ClipBody { Text { excerpt: String, lines: u8 }, Image { src: ImageSourc
 
 A plain row's markup is unchanged: no `data-shape`, no `ds-menu-when`.
 
-**Tests.** `ds/src/components/row_shape.rs` (the picture's box, the line budget),
+**Tests.** `ds/components/lists/row/shape.rs` (the picture's box, the line budget),
 `ds/tests/launcher_parts_ssr.rs` (`row-file`, `row-clip`).
 
 ### 49. PaletteGroup, "Show More" and the key claim (sill M9 launcher v2, Q294 and Q299, 2026-09-26)
@@ -3989,7 +3960,7 @@ first, with where the caret is:
 pub struct FieldKey { pub event: KeyboardEvent, pub caret: Caret }
 pub enum Claim { Take, Pass }
 pub enum Caret { AtEnd, Inside, Unknown }   // ds::host::caret; Unknown: no host, no field
-// the host's read: ds::CaretHost::caret, on ds_native's Blitz host
+// the host's read: ds::host::parts::CaretHost::caret, on ds_blitz's Blitz host
 ```
 
 `Claim::Take` keeps the key from everything else: the palette does not read it, its default is
@@ -3997,16 +3968,16 @@ prevented (the field types no Space, moves no caret) and `onkey` does not hear i
 as before. The caret is read from the field's editor when the key arrives: `AtEnd` for a bare
 caret after the last character (an empty field too), `Inside` for any other place or any
 selection. Blitz holds no borrow of the document while a handler runs, so the read is exact;
-without ds-native's `CaretHost` (a webview) it is `Unknown`. A verdict-returning callback was
+without ds-blitz's `CaretHost` (a webview) it is `Unknown`. A verdict-returning callback was
 chosen over a declarative `KeyPolicy`: whether Space is the pane's depends on the caller's own
 state (browsing or typing, sill F654), which a policy would have to mirror into props every
 render; the callback asks at the moment with the caret in hand. It is a new prop beside
 `onkey`, so no existing `onkey` changes.
 
-**Tests.** `ds/src/components/palette_stops.rs` (the stop order and the moves),
-`ds/src/focus/caret.rs` (the caret's place), `ds/tests/launcher_parts_ssr.rs` (`show-more`,
+**Tests.** `ds/components/menus/palette/palette_stops.rs` (the stop order and the moves),
+`ds/host/caret.rs` (the caret's place), `ds/tests/launcher_parts_ssr.rs` (`show-more`,
 `show-more-selected`), `ds-conformance/tests/palette_grid_pane.rs` (Show More reached and run by keyboard;
-Space taken only while browsing, Right only at the end), `ds/src/components/palette_expand.rs`
+Space taken only while browsing, Right only at the end), `ds/components/menus/palette/palette_expand.rs`
 (what is an expand), `ds-conformance/tests/launcher_palette_cues.rs` (the rise, the expand and the
 collapse, Reduced, 0 frames).
 
@@ -4020,10 +3991,10 @@ so a surface that says nothing draws exactly what it drew before.
 **Split.** `ds` holds the vocabulary and the pure rules: `Spell`, `Lang`, the tokeniser and its
 skip rules (`spell::words`), the CJK test (`spell::script`), how marks follow an edit and which
 word is being typed (`spell::marks`), and the seam `Rc<dyn SpellService>`, a root context.
-`ds_native::spell` (cargo feature `spellcheck`) implements the seam: the system's Hunspell
+`ds_blitz::spell` (cargo feature `spell`) implements the seam: the system's Hunspell
 dictionaries, checked and suggested by `spellbook` (MPL-2.0, used unmodified) on one worker
-thread per configuration; nothing is bundled. `ds_native::launch` provides it under the
-feature; another root calls `ds_native::spell::provide()`.
+thread per configuration; nothing is bundled. `ds_blitz::launch` provides it under the
+feature; another root calls `ds_blitz::spell::provide()`.
 
 **Markup.** The marks never touch the app's document: a layer is the surface's last child,
 absolutely positioned (out of the flow, so an app rule such as `.c-body > *` cannot move the
@@ -4054,7 +4025,7 @@ pub trait SpellService { fn languages(&self) -> Vec<Lang>;
     fn suggest(&self, Vec<Lang>, String) -> SpellFuture<Vec<String>>;
     fn ignore(&self, String); fn learn(&self, Lang, String) -> SpellFuture<Learned>; }
 pub const SPELL_SUGGESTIONS: usize;      // 5
-// ds-native, feature `spellcheck`:
+// ds-blitz, feature `spell`:
 pub fn provide() -> Rc<dyn SpellService>;   // system dictionaries, the locale's language
 pub fn provide_with(SpellConfig, Vec<Lang>) -> Rc<dyn SpellService>;
 pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
@@ -4100,7 +4071,7 @@ pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
 **Tests.** `ds/src/spell/words_tests.rs` (tokenisation, every skip rule, CJK), `script.rs` (the
 CJK blocks), `marks_tests.rs` (marks following an edit, the word being typed), `lang.rs`;
 `ds/tests/edit_surface_ssr.rs` (`spell-on.html`, `spell-marked.html`);
-`ds-native/src/spell/choose.rs` (dictionary fallback, the locale);
+`ds-blitz/spell/choose.rs` (dictionary fallback, the locale);
 `ds-blitz/tests/spell_worker.rs` (a temporary `.aff`/`.dic`: check, suggest, ignore, learn and
 read back, the system's en_US only where installed); `ds-blitz/tests/spell_edit.rs` (typed
 misspelling marked after the debounce, the typed word held, right-click and pick, undo restores
@@ -4171,9 +4142,9 @@ moment ending in `assert_settles_to_zero_frames`, each with a Reduced case. Gall
 
 ### Window frame: WindowFrame, the titlebar and the traffic lights (settled 2026-09-25)
 
-**Purpose.** The frame of a client-decorated window: our apps on `ds_native::launch` (mailo)
+**Purpose.** The frame of a client-decorated window: our apps on `ds_blitz::launch` (mailo)
 and, later, the shell's apps on shell-host toplevels. It moves, resizes and zooms the window
-through the host seam `ds::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
+through the host seam `ds::prelude::HostWindow` (design/13 section 13.3.11; FINDINGS "Window frame").
 **Props.** `Ds { window: WindowFrame }`. `WindowFrame::None` (default) draws nothing and leaves
 the root's markup as it was; `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown,
 Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes the settings'
@@ -4255,7 +4226,7 @@ frames, and so does a live settings edit that moves `level` while already dimmed
 never fades in either: it jumps straight to the level, the way `Sweep`'s own `Stand` plan does.
 Ends at 0 frames once landed (R3).
 
-**Tests.** `ds/src/detail/idle_dim.rs` (the plan table: waking and a settings edit always snap,
+**Tests.** `ds-shell/idle_dim/model.rs` (the plan table: waking and a settings edit always snap,
 dimming fades except under Reduced); `ds-conformance/tests/idle_dim.rs` on `Clock::Virtual` (the fade
 lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
 shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md
@@ -4316,7 +4287,7 @@ heal is not carried over), as `use_roster` does. A row whose own height changes 
 group's head gaining its stacked plates) moves the rows below it without a heal.
 
 **Tests.** `ds/tests/motion_machines.rs` (the batch as a table: stagger in list order, summed
-heal distances, a row taken back not dropped); `ds-native/tests/leaving_list.rs` on
+heal distances, a row taken back not dropped); `ds-gallery/pages/lists/leaving.rs` on
 `Clock::Virtual` (rows of five different heights: one leaves and the rows below heal by its
 height and end exactly one row higher; a Clear of two non-adjacent rows is dropped together at
 the second row's settle and heals by 40 then 95; clearing everything settles at the fourth row's
@@ -4373,7 +4344,7 @@ positioned ancestor, so render it last in that container.
 --e-out`); with `shown`, hidden, the driven spring fades and lowers it, the scrim plays `menu-out
 --t-quick --e-exit`, and `on_hidden` runs once the spring rests. Reduced: it only fades.
 
-**Tests.** `ds/src/components/alert.rs` and `alert_vocab.rs` (the default button and faces, the
+**Tests.** `ds/tests/alert_ssr.rs` and `ds-conformance/tests/alert.rs` (the default button and faces, the
 keys, as tables); `ds/tests/alert_ssr.rs` (goldens under `tests/snapshots/alert/`: floating light
 and dark, inline in a 320 px popover, destructive, destructive with an icon, hidden both ways; lint
 clean; every class styled; the default is the filled button); `ds-conformance/tests/alert.rs` on
@@ -4404,7 +4375,7 @@ suggestion.
 | O-13 | Menu item hover | S has none (keyboard only); C Dropdown uses `--surface-2`. | Pointer move over an item moves the selection (`--accent-soft`), so hover and keyboard look the same in Rich/Slim/Context; Dropdown keeps C. |
 | O-14 | Sheet size | Derived from Peek; no size given. | Candidate: width `min(560px, 88%)`, height by content, max = Peek Center inset. |
 | O-15 | Modal focus | Peek and Sheet do not move or trap focus in S. | Focus first focusable on open, restore on close, Tab trapped. Partly settled (focus on mount): `TextInput{focus: Focus::OnMount}` exists and the palette input and bubble link field use it; giving focus back is settled (2026-09-24, FINDINGS "Launcher gaps"): `Focus::Controlled(FocusRequest)` and `request()`. Peek and Sheet still neither move nor trap focus. |
-| O-16 | AppearancePicker contents | Whether Look and Warmth (C) are part of it; width. | Theme, Accent, Motion only (the plan's `Appearance`); width set by the host surface. |
+| O-16 | Appearance choice contents | Whether Look and Warmth (C) are part of it; width. | Theme, Accent, Motion only (the plan's `Appearance`); width set by the host surface. |
 | O-17 | Accent count | Plan: "Accent(6)" in the gallery and a moved test named "exactly-four-accent". | 03-COLOR decides; the picker renders the table. |
 | O-18 | S vs C contradictions | Resolved "S wins" in each section; listed here so nobody re-opens them silently: strip buttons 26 vs 28, gap 3 vs 4, icons 14 vs 15; star inset 6/7 vs 8/8, icon 14 vs 15; icon stroke 2 vs 1.7/1.8; toast hidden 160% vs 140%, hint opacity .7 vs .72; seg padding 5/11 12px vs 6/13 12.5px; Primary padding 14 vs 15; palette 540 vs 420, top 11% vs 14%, input 16 vs 14.5, list 360 vs 252, enter `peek-in` vs `cmdk-in`; peek inset `36px 12%` vs `34px 10%`, `peek-in` .95/12px vs .97/10px; scrim `--scrim` vs ink .16; row dot top 6 vs 5; stagger cap none (S, first show only; ds caps 12) vs 8; sidebar item radius 9 on the frame vs `--r-chip` on the card, seal -7 in `--f-ink` vs -10 in `--seal`; toast click-to-undo |dx| < 3 vs dx == 0; send ring 20 vs 22. | S wins, as written in each section. |
 | O-19 | Field plane | No canvas in Blitz. | PNG per scheme generated in Rust (static per scheme), handles as divs. |
