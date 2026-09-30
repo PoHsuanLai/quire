@@ -64,7 +64,7 @@ fn PinnedTiles() -> Element {
         .collect();
     rsx! {
         Section { title: "Pinned tiles", note: "PinTile: All, an account selected and not (its colour muted), a count, the drop line before a tile a drag would take the place of, the dragged tile dimmed, and the Add tile. Below, the live PinTiles: press to select, drag a tile onto another to reorder.",
-            div { class: "g-row",
+            div { class: "ds-pin-tiles", style: "width:260px",
                 PinTile { face: PinFace::All, selection: Selection::Selected, unread: 7, onclick: |_| {} }
                 PinTile { face: account('P', MarkProvider::Google), selection: Selection::Selected, unread: 3, onclick: |_| {} }
                 PinTile { face: account('W', MarkProvider::Microsoft), unread: 0, onclick: |_| {} }
@@ -252,7 +252,7 @@ fn Grouped() -> Element {
     };
     rsx! {
         Section { title: "Grouped launcher commands", note: "CommandPalette groups its results by kind, each under a SectionHeader; GroupOrder puts a Space's kinds first. Left: the Work Space (apps, files, commands). Right: the Home Space (commands first).",
-            div { class: "g-row g-row-top",
+            div { class: "g-row g-row-top", style: "min-height:460px",
                 {panel("Work", vec![Kind::Apps, Kind::Files, Kind::Commands])}
                 {panel("Home", vec![Kind::Commands, Kind::Apps])}
             }
