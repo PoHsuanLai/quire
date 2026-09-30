@@ -4,10 +4,6 @@
 
 /// `(sheet name, css)`, in cascade order.
 pub(crate) const SHEETS: [(&str, &str); 63] = [
-    (
-        "account_tile",
-        include_str!("../components/app/account_tile.css"),
-    ),
     ("alert", include_str!("../components/overlays/alert.css")),
     (
         "appearance_picker",
@@ -98,6 +94,7 @@ pub(crate) const SHEETS: [(&str, &str); 63] = [
         include_str!("../components/controls/radio_group.css"),
     ),
     ("peek", include_str!("../components/app/peek.css")),
+    ("pin_tile", include_str!("../components/app/pin_tile.css")),
     (
         "pdf_thumb",
         include_str!("../components/content/pdf_thumb.css"),

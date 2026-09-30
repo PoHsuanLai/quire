@@ -33,12 +33,13 @@ pub use crate::assembly::{
 };
 pub use crate::components::{
     app::{
-        account_tile::{AccountFace, AccountTile, AddAccountTile},
         command_pill::CommandPill,
         edge_strip::EdgeStrip,
         hover_strip::{ActionId, HoverStrip, StripAction, Titles},
         link_pill::{LinkPill, LinkTarget},
         peek::Peek,
+        pin_tile::{PinFace, PinTile},
+        pin_tiles::{PinAdd, PinItem, PinTiles},
         send_mood::SendMood,
         send_pill::{PillAction, SEND_COUNTDOWN, SEND_TICK, SendPhase, SendPill},
         thread_row::ThreadRow,

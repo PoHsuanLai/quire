@@ -1,14 +1,14 @@
 //! Lists: a live `List` of mail rows whose rows leave by the roster, heal and come back on undo;
 //! the mail rows a search draws; `Row` in every state; a source list; the notification column;
-//! account tiles; the hover strip; the appearance picker.
+//! pinned tiles; the hover strip; the appearance picker.
 
 use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    AccountFace, AccountTile, ActionId, AppearancePicker, Button, Check, Chip, ChipVariant, Colour,
-    DragGhost, Emphasis, Hex, HoverStrip, Icon, List, ListItem, MarkProvider, MarkSize, MarkStyle,
-    Point, ProviderMark, Px, RowState, Selection, StripAction, SystemPrefs, ThreadRow, UndoToken,
+    ActionId, AppearancePicker, Button, Check, Chip, ChipVariant, Colour, DragGhost, Emphasis, Hex,
+    HoverStrip, Icon, List, ListItem, MarkProvider, MarkSize, MarkStyle, PinFace, PinTile, Point,
+    ProviderMark, Px, RowState, Selection, StripAction, SystemPrefs, ThreadRow, UndoToken,
     use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
@@ -261,9 +261,9 @@ fn Tiles() -> Element {
     rsx! {
         Section { title: "Tiles, strip and drag ghost",
             div { class: "g-row",
-                AccountTile { account: AccountFace::All, pressed: Check::On, unread: 7, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Check::On, unread: 0, onclick: |_| {} }
-                AccountTile { account: AccountFace::One { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, pressed: Check::Off, unread: 4, onclick: |_| {} }
+                PinTile { face: PinFace::All, selection: Selection::Selected, unread: 7, onclick: |_| {} }
+                PinTile { face: PinFace::Account { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, selection: Selection::Selected, unread: 0, onclick: |_| {} }
+                PinTile { face: PinFace::Account { initial: 'F', colour, provider: MarkProvider::Fastmail, address: None }, unread: 4, onclick: |_| {} }
             }
             p { class: "g-note", "The hover strip shows on row hover in the list above. The drag ghost is fixed to the window: it follows the pointer while a row is dragged; here it is pinned near the top right." }
             div { class: "g-row",

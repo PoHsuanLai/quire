@@ -2,19 +2,19 @@
 
 use dioxus::prelude::*;
 use ds::Check;
-use ds::{
-    AccountFace, AccountTile, Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider,
-    MarkSize, MarkStyle, ProviderMark, Trailing,
-};
 use ds::{Bezel, ControlSize};
+use ds::{
+    Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider, MarkSize, MarkStyle, PinFace,
+    PinTile, ProviderMark, Selection, Trailing,
+};
 use ds::{FieldBezel, FieldKind, TextField};
 
 /// An account colour.
 const SLATE: Colour = Colour::Solid(Hex([0x2f, 0x7f, 0x6e]));
 
 /// A local-folders account: no provider, so the neutral folder mark.
-fn local() -> AccountFace {
-    AccountFace::One {
+fn local() -> PinFace {
+    PinFace::Account {
         initial: 'L',
         colour: SLATE,
         provider: MarkProvider::Local,
@@ -30,8 +30,8 @@ pub struct Case {
 
 pub const CASES: &[Case] = &[
     Case {
-        golden: "lists/account_tile/one-local.html",
-        make: || rsx! { AccountTile { account: local(), pressed: Check::On, unread: 2, onclick: |_| {} } },
+        golden: "lists/pin_tile/one-local.html",
+        make: || rsx! { PinTile { face: local(), selection: Selection::Selected, unread: 2, onclick: |_| {} } },
     },
     Case {
         golden: "lists/provider_mark/local-row.html",
