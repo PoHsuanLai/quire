@@ -8,7 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, Ds, Grain, Icon, Material, PRESETS, Point, Px, Rect, Scheme, SectionHeader,
+    Appearance, Button, Ds, Icon, Material, PRESETS, Point, Px, Rect, Scheme, SectionHeader,
     SpaceLook, Theme,
 };
 use ds::{Bezel, ButtonRole, ControlSize};
@@ -96,7 +96,6 @@ fn the_resets_where_scope_applies_and_a_lone_class_outranks_it() {
 fn look() -> SpaceLook {
     SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
-        grain: Grain(35),
         theme: Theme::System,
         card_accent: ds::CardAccent::SpaceHue,
     }

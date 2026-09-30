@@ -21,8 +21,8 @@ mod space_editor_rows;
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::{
-    Capping, CardAccent, Dot, Grain, PRESETS, Scheme, Selection, Shortcut, ShortcutKey, SpaceLook,
-    Theme, Verdict, derive, readout, swatch,
+    Capping, CardAccent, Dot, PRESETS, Scheme, Selection, Shortcut, ShortcutKey, SpaceLook, Theme,
+    Verdict, derive, readout, swatch,
 };
 use ds_shell::{DotIndex, SpaceDot, SpaceEditor};
 
@@ -74,10 +74,9 @@ fn scrub(html: &str) -> String {
 }
 
 /// Preset `index` as a Space that lends its hue to the card.
-fn preset_look(index: usize, grain: Grain) -> SpaceLook {
+fn preset_look(index: usize) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
-        grain,
         theme: Theme::System,
         card_accent: CardAccent::SpaceHue,
     }
@@ -97,15 +96,15 @@ const CASES: &[Case] = &[
     // SpaceEditor: the two sample Spaces in each scheme and a one-dot Space on the chosen accent.
     Case {
         state: "work-light",
-        make: || editor(preset_look(0, Grain(35)), Scheme::Light, 0),
+        make: || editor(preset_look(0), Scheme::Light, 0),
     },
     Case {
         state: "work-dark",
-        make: || editor(preset_look(0, Grain(35)), Scheme::Dark, 1),
+        make: || editor(preset_look(0), Scheme::Dark, 1),
     },
     Case {
         state: "home-light",
-        make: || editor(preset_look(1, Grain(55)), Scheme::Light, 2),
+        make: || editor(preset_look(1), Scheme::Light, 2),
     },
     Case {
         state: "one-dot-chosen",
@@ -113,7 +112,7 @@ const CASES: &[Case] = &[
             editor(
                 SpaceLook {
                     card_accent: CardAccent::Chosen,
-                    ..preset_look(2, Grain(40))
+                    ..preset_look(2)
                 },
                 Scheme::Light,
                 0,
@@ -122,16 +121,16 @@ const CASES: &[Case] = &[
     },
     Case {
         state: "named",
-        make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), name: "Work".to_string(), onchange: |_| {}, on_active_dot: |_| {} } },
+        make: || rsx! { SpaceEditor { look: preset_look(0), scheme: Scheme::Light, active_dot: DotIndex(0), name: "Work".to_string(), onchange: |_| {}, on_active_dot: |_| {} } },
     },
     // SpaceDot.
     Case {
         state: "space-dot-current",
-        make: || rsx! { SpaceDot { name: "Work", frame: ds::FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Work", frame: ds::FrameVars::of(&preset_look(0), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
     },
     Case {
         state: "space-dot-elsewhere",
-        make: || rsx! { SpaceDot { name: "Home", frame: ds::FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
+        make: || rsx! { SpaceDot { name: "Home", frame: ds::FrameVars::of(&preset_look(1), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
 ];
 
@@ -269,7 +268,7 @@ fn every_space_editor_golden_lints_clean() {
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
     // The plane's payload is scrubbed from the goldens; the real markup must lint clean too.
-    let real = render(|| editor(preset_look(0, Grain(35)), Scheme::Light, 0));
+    let real = render(|| editor(preset_look(0), Scheme::Light, 0));
     let offences = markup(&real, ds_shell::stylesheet(), &config);
     assert!(offences.is_empty(), "{offences:?}");
 }

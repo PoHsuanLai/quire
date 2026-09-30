@@ -16,8 +16,8 @@ use ds::{
     SegmentedControl, Tracking, Word,
 };
 use ds::{
-    Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, List,
-    ListItem, Material, Pane, PaneSwitcher, RootChrome, Row, RowLeading, RowSize, TextLine, Theme,
+    Accessory, Appearance, Button, CardAccent, Check, Ds, FrameTint, Icon, Inject, List, ListItem,
+    Material, Pane, PaneSwitcher, RootChrome, Row, RowLeading, RowSize, TextLine, Theme,
     default_look,
 };
 use ds::{Slider, SliderLook};
@@ -79,7 +79,7 @@ fn Panel(theme: Theme, posed: Pane) -> Element {
         div { class: "g-cc",
             Ds {
                 appearance: Appearance { theme, accent, motion },
-                look: ds::SpaceLook { theme, ..default_look(0, Grain(35), CardAccent::SpaceHue) },
+                look: ds::SpaceLook { theme, ..default_look(0, CardAccent::SpaceHue) },
                 material: Material::Popover,
                 blur,
                 stylesheet: Inject::Host,

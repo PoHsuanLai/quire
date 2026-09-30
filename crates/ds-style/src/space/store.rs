@@ -4,7 +4,7 @@
 //! Data and a pure lookup only; a consumer reads, writes and watches the file through
 //! `ds_settings`'s generic settings file API (ds stays effect-free).
 
-use super::look::{CardAccent, Grain, SpaceLook};
+use super::look::{CardAccent, SpaceLook};
 use super::presets::default_look;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::BTreeMap;
@@ -30,20 +30,17 @@ pub struct Workspace {
 }
 
 /// What a workspace with no stored look falls back to beyond its preset's dots: the settings
-/// keys `spaces.default_grain` and `spaces.default_card_accent`.
+/// key `spaces.default_card_accent`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SpaceDefaults {
-    /// The grain for presets that ship none (proposed 40).
-    pub grain: Grain,
     /// The card accent (proposed: the chosen accent).
     pub card_accent: CardAccent,
 }
 
 impl Default for SpaceDefaults {
-    /// design/21 section 4's proposed defaults: grain 40, the chosen accent.
+    /// design/21 section 4's proposed default: the chosen accent.
     fn default() -> Self {
         SpaceDefaults {
-            grain: Grain(40),
             card_accent: CardAccent::Chosen,
         }
     }
@@ -120,7 +117,7 @@ impl SpaceStore {
 
 /// The preset look for `index` (design/21 section 4).
 fn preset_look(index: WorkspaceIndex, defaults: SpaceDefaults) -> SpaceLook {
-    default_look(index.0, defaults.grain, defaults.card_accent)
+    default_look(index.0, defaults.card_accent)
 }
 
 /// `by_index`, one entry at a time: an entry that is not a look is `None`, and anything that
@@ -153,14 +150,13 @@ fn look_or_none(entry: serde_json::Value) -> Option<SpaceLook> {
 mod tests {
     use super::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};
     use crate::appearance::theme::Theme;
-    use crate::space::look::{CardAccent, Grain, SpaceLook};
+    use crate::space::look::{CardAccent, SpaceLook};
     use crate::space::palette::Dot;
     use crate::space::presets::PRESETS;
 
     fn look(hue: f32) -> SpaceLook {
         SpaceLook {
             dots: vec![Dot { hue, chroma: 0.5 }],
-            grain: Grain(70),
             theme: Theme::Dark,
             card_accent: CardAccent::SpaceHue,
         }
@@ -230,27 +226,38 @@ mod tests {
     #[test]
     fn a_stale_card_accent_costs_only_that_key() {
         let text = r#"{"by_index": [
-            {"grain": 20, "theme": "dark", "card_accent": "postmark"},
-            {"grain": 60, "card_accent": "space_hue"}]}"#;
+            {"theme": "dark", "card_accent": "postmark"},
+            {"card_accent": "space_hue"}]}"#;
         let store: SpaceStore = serde_json::from_str(text).unwrap_or_else(|e| panic!("{e}"));
         let first = store.by_index[0].as_ref().unwrap_or_else(|| panic!("lost"));
         assert_eq!(
-            (first.grain, first.theme, first.card_accent),
-            (Grain(20), Theme::Dark, CardAccent::Chosen)
+            (first.theme, first.card_accent),
+            (Theme::Dark, CardAccent::Chosen)
         );
         let second = store.by_index[1].as_ref().unwrap_or_else(|| panic!("lost"));
+        assert_eq!(second.card_accent, CardAccent::SpaceHue);
+    }
+
+    #[test]
+    fn a_stored_grain_costs_only_that_key() {
+        let text = r#"{"by_index": [{"grain": 20, "theme": "dark"}, {"theme": "light"}]}"#;
+        let store: SpaceStore = serde_json::from_str(text).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(
-            (second.grain, second.card_accent),
-            (Grain(60), CardAccent::SpaceHue)
+            store
+                .by_index
+                .iter()
+                .flatten()
+                .map(|l| l.theme)
+                .collect::<Vec<_>>(),
+            [Theme::Dark, Theme::Light]
         );
     }
 
     #[test]
     fn a_bad_index_entry_costs_only_that_position() {
-        let text = r#"{"by_index": [{"grain": 20}, "nonsense", null, {"theme": "dark"}]}"#;
+        let text = r#"{"by_index": ["nonsense", "nonsense", null, {"theme": "dark"}]}"#;
         let store: SpaceStore = serde_json::from_str(text).unwrap_or_else(|e| panic!("{e}"));
         assert_eq!(store.by_index.len(), 4);
-        assert_eq!(store.by_index[0].as_ref().map(|l| l.grain), Some(Grain(20)));
         assert_eq!(store.by_index[1], None);
         assert_eq!(store.by_index[2], None);
         assert_eq!(

@@ -110,7 +110,7 @@ fn App() -> Element {
 | --- | --- | --- | --- |
 | `appearance` | `Appearance` | required | theme, accent, motion preference — section 3 |
 | `system` | `SystemPrefs` | `SystemPrefs::default()` | the desktop's own scheme/motion/contrast, from `ds_settings::read_system_prefs` |
-| `look` | `SpaceLook` | `SpaceLook::default()` | the frame's dots, grain, theme override and card accent (design/21-SPACES.md §1) |
+| `look` | `SpaceLook` | `SpaceLook::default()` | the frame's dots, theme override and card accent (design/21-SPACES.md §1) |
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
@@ -684,7 +684,7 @@ For a bar (FINDINGS "Bar gaps"):
   ```
 - **Chrome materials draw the Space.** A `Ds` in `Bar`, `Dock`, `Osd`, `Widget` (and a
   `Popover` root passed `chrome: Some(RootChrome::Painted)`) draws the Space gradient, its A/B
-  layers and grain as one `.ds-frame` group at the material's tint alpha
+  layers as one `.ds-frame` group at the material's tint alpha
   (`--m-frame-alpha`, scaled by `appearance.material_tint_alpha`) with `data-blur=on`, and at
   the solid floor .94 without blur; a `look` change cross-fades it over `--t-scene`. Pass the
   workspace's `SpaceLook` as `look` and paint nothing yourself: delete any tint layer of your
@@ -1073,7 +1073,7 @@ than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in tho
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
-`spaces.default_grain` and `spaces.default_card_accent`. `store.with_look(&workspace, look)`
+`spaces.default_card_accent`. `store.with_look(&workspace, look)`
 records a look under the id (when there is one) and always under the position.
 
 **Settings files** (`ds_settings::{SettingsDoc, Store}`). A file is a serde type that names

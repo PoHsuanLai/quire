@@ -11,9 +11,6 @@ pub enum ZLayer {
     /// `--z-scene` -2: the frame's gradient layers.
     #[token(value = "-2")]
     Scene,
-    /// `--z-grain` -1: the grain tile.
-    #[token(value = "-1")]
-    Grain,
     /// `--z-raise` 1: a lifted row or control.
     #[token(value = "1")]
     Raise,

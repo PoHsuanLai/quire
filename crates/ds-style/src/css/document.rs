@@ -3,8 +3,6 @@
 //! in, and in what order.
 
 use crate::css::UTILITIES;
-use crate::css::grain::grain_uri;
-use crate::emit::{property, rule};
 use crate::kit::Sheet;
 
 /// The whole stylesheet: the header, then each `(section, body)` in the order given.
@@ -58,16 +56,9 @@ pub fn sheets(sheets: &[(&str, &str)]) -> String {
         .collect()
 }
 
-/// `.ds-truncate` and the other utilities, then the grain tile on `.ds-grain`.
+/// `.ds-truncate` and the other utilities.
 pub fn utilities_css() -> String {
-    let grain = rule(
-        ".ds-grain",
-        &[property(
-            "background-image",
-            &format!("url(\"{}\")", grain_uri()),
-        )],
-    );
-    format!("{}\n{grain}", UTILITIES.trim_end())
+    UTILITIES.trim_end().to_owned()
 }
 
 #[cfg(test)]

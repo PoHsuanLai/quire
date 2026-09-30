@@ -34,9 +34,9 @@ preferences:
    the "could not find a default" list in the handback report.
 3. **Per-workspace instance data is not a global default.** `21-SPACES.md#10-storage-settled-path-proposed-schema`'s
    `$XDG_CONFIG_HOME/quire/spaces.json` stores each workspace's chosen `SpaceLook` (its dots,
-   grain, theme, accent) — that is saved *state*, like `dock.json`'s pinned items, not a
+   theme, accent) — that is saved *state*, like `dock.json`'s pinned items, not a
    settings default. The *defaults* applied when a workspace has none (preset table, fallback
-   grain, fallback accent) are keys in the `spaces` domain below.
+   fallback accent) are keys in the `spaces` domain below.
 
 ## 2. Storage
 
@@ -418,7 +418,6 @@ data, not a key.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.default_card_accent` | `CardAccent::{Chosen,SpaceHue}` | `Chosen` (the accent picked in `appearance.accent`) | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | RETIRING: no reader; the store lookup is not built |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
@@ -862,7 +861,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.times`, `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Cosmic` they still render, disabled, so the row explains itself) |
-| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
+| **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 ## 6. Acceptance
 

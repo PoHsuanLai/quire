@@ -11,7 +11,7 @@ use dioxus::core::VirtualDom;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Appearance, BlurState, Corner, Ds, Grain, Ground, Inject, Material, PRESETS, Px, RootChrome,
+    Appearance, BlurState, Corner, Ds, Ground, Inject, Material, PRESETS, Px, RootChrome,
     SpaceLook, Surface, Theme,
 };
 
@@ -29,7 +29,6 @@ struct Setup {
 fn Root(setup: Setup) -> Element {
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
-        grain: Grain(35),
         ..SpaceLook::default()
     };
     rsx! {

@@ -1,6 +1,5 @@
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
-   design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
-   has the generated PNG. */
+   design/03-COLOR.md section 8). */
 
 /* One line, clipped, fading out at the end: the ellipsis Blitz cannot draw (spike S13). */
 .ds-truncate{white-space:nowrap;overflow:hidden;min-width:0;mask-image:linear-gradient(to right,#000 calc(100% - 1.5em),transparent)}
@@ -19,15 +18,14 @@
 .ds-emoji-text{font-family:var(--font-emoji)}
 /* Times, counts and numeric cells (design/02-TYPE.md section 9). */
 .ds-tabular{font-variant-numeric:tabular-nums}
-/* The window's frame: two gradient layers that cross-fade on a Space switch, and the grain over
-   them (design/03-COLOR.md sections 4.5 and 8). The back layer is the one a switch fades in.
+/* The window's frame: two gradient layers that cross-fade on a Space switch
+   (design/03-COLOR.md section 4.5). The back layer is the one a switch fades in.
    Neither takes the pointer: under a root that is its own stacking context they are hit
    before the content they sit behind unless they let it through. */
 .ds-layer{position:absolute;inset:0;z-index:var(--z-scene);pointer-events:none;background:var(--f-grad);transition:opacity var(--t-big) var(--e-out)}
 .ds-layer[*|data-layer=back]{opacity:0}
-.ds-grain{position:absolute;inset:0;z-index:var(--z-grain);pointer-events:none;opacity:var(--f-grain);background-size:128px 128px}
 /* Shell chrome's frame (`data-frame=tinted`, design/21-SPACES.md sections 3 and 5): the same two
-   layers and grain as the window's, grouped so the whole cross-fade sits at the material's tint
+   layers as the window's, grouped so the whole cross-fade sits at the material's tint
    alpha (`--m-frame-alpha`; the solid floor without blur). Its own background is the current
    gradient, under both layers, so the group stays opaque inside through a cross-fade and only
    the group's alpha lets the blur through. */

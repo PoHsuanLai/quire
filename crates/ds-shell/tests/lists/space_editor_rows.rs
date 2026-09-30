@@ -10,7 +10,6 @@ use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceEditor};
 fn look(index: usize, theme: Theme) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
-        grain: ds::Grain(35),
         theme,
         card_accent: CardAccent::SpaceHue,
     }

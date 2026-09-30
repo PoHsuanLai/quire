@@ -5,7 +5,7 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::{Appearance, CommandPalette, Ds, Grain, Icon, Material, RowAction, SpaceLook};
+use ds::{Appearance, CommandPalette, Ds, Icon, Material, RowAction, SpaceLook};
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -22,7 +22,6 @@ fn ms(n: u64) -> Duration {
 /// A flat ground, so a pixel differs only where something is painted over it.
 fn flat() -> SpaceLook {
     SpaceLook {
-        grain: Grain(0),
         ..SpaceLook::default()
     }
 }

@@ -43,7 +43,6 @@ pub(crate) enum Stacking {
 pub(crate) fn layer_slug(layer: ZLayer) -> &'static str {
     match layer {
         ZLayer::Scene => "scene",
-        ZLayer::Grain => "grain",
         ZLayer::Raise => "raise",
         ZLayer::LinkPill => "link-pill",
         ZLayer::Toast => "toast",

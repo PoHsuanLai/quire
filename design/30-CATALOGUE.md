@@ -346,7 +346,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 | Battery widgets | Batteries widget | `BatteryGlyph` + `ProgressIndicator{Ring}` + `Label`, one `BatteryState`, one arc geometry | none | glyph, ring | `BatteryLevel`, `BatteryFigure`, `DeviceBattery`, `RowBattery`, `DeviceGlyph` duplicates | MERGE | P1 |
 | IdleDim | display dim | `IdleDim` token | none | overlay | none | KEEP | P2 |
 | Dock: DockTile, DockLabel, RunningDot, DockFloor | Dock | `DockTile` = plate + `Badge` + `ProgressIndicator{Bar}` + running dot; `DockLabel` uses `HoverIntent` Label; magnification and bounce in sill | hover (magnify) | tile, label, dot | sill `Tile`, `.sill-dock-label` (L14), `TooltipKind::Fly` | ADD | P1 |
-| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | dots, grain, theme | none | dot | none | KEEP | P2 |
+| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | dots, theme | none | dot | none | KEEP | P2 |
 | AnimatedEmoji | Messages reactions (design/25) | the asset's own animation; no quire loop | none | image | none | KEEP | P2 |
 
 ### 2.11 App features and mail-only
@@ -416,7 +416,7 @@ behaviour or a default keyboard binding. User styles (ARCHITECTURE section 11) a
 | Radii ctl / field / seg well / seg / menu / popover / sheet / notification | 5 / 5 / 6 / 5 / 8 / 10 / 10 / 16 |
 | Card radius | 10 (group box 6) |
 | Window / panel | window 10, Control Center panel 18, module 8 |
-| Grain | the Space's own grain over its frame, no Look grain of its own |
+| Grain | none: no grain is painted anywhere |
 | Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop |
 | Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) |
 | Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark |

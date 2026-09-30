@@ -11,7 +11,7 @@ use dioxus::prelude::*;
 use ds::ImagePosition;
 use ds::{
     Anchor, Appearance, BlurState, ColourToken, Ds, DurationToken, EasingToken, Fraction,
-    FrameVars, Grain, Hex, Icon, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement, Point,
+    FrameVars, Hex, Icon, Material, Menu, MenuItem, MotionLevel, PRESETS, Placement, Point,
     Popover, Px, RootChrome, Scheme, Side, SpaceLook, StatusMetrics, Theme, derive,
 };
 use ds_harness::{Backdrop, Driver, Harness, Input, Viewport};
@@ -56,7 +56,6 @@ fn light() -> Appearance {
 fn look(index: usize) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
-        grain: Grain(0),
         ..SpaceLook::default()
     }
 }

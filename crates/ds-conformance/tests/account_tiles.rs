@@ -7,7 +7,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Colour, Ds, Grain, Hex, MarkProvider, Material, PinAdd, PinFace, PinItem, PinTiles,
+    Appearance, Colour, Ds, Hex, MarkProvider, Material, PinAdd, PinFace, PinItem, PinTiles,
     SpaceLook,
 };
 use ds_harness::{Driver, Harness, Input, Query, Viewport};
@@ -45,7 +45,6 @@ fn Tiles() -> Element {
     let mut log = use_signal(Vec::<String>::new);
     let mut order = use_signal(|| vec!['P', 'W', 'G']);
     let look = SpaceLook {
-        grain: Grain(0),
         ..SpaceLook::default()
     };
     let items: Vec<PinItem<char>> = order()

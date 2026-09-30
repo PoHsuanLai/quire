@@ -5,8 +5,8 @@
 use dioxus::prelude::*;
 use ds::detail::{Operation, PendingToken};
 use ds::{
-    Accessory, Appearance, Ds, Fraction, Grain, Icon, Material, PRESETS, Rect, Row, RowLeading,
-    Scheme, SectionHeader, SendPill, SpaceLook, Theme, use_toasts,
+    Accessory, Appearance, Ds, Fraction, Icon, Material, PRESETS, Rect, Row, RowLeading, Scheme,
+    SectionHeader, SendPill, SpaceLook, Theme, use_toasts,
 };
 use ds::{FieldBezel, FieldKind, TextField};
 use ds_harness::{Driver, Harness, Query, Viewport};
@@ -88,7 +88,6 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
 #[allow(non_snake_case)]
 fn EmptyApp() -> Element {
     let look = ds::SpaceLook {
-        grain: ds::Grain(0),
         ..ds::SpaceLook::default()
     };
     rsx! {
@@ -277,7 +276,6 @@ fn a_row_without_an_accessory_keeps_its_title_left() {
 fn EditorApp() -> Element {
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
-        grain: Grain(35),
         theme: Theme::System,
         card_accent: ds::CardAccent::SpaceHue,
     };

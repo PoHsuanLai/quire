@@ -1,4 +1,4 @@
-//! The editor's rows below the field: the stop chips, the grain, the presets and the measured
+//! The editor's rows below the field: the stop chips, the presets and the measured
 //! contrast checks (design/04-COMPONENTS.md section 32).
 
 use super::{DotIndex, Picker, dot_index, edit};
@@ -6,17 +6,15 @@ use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::components::controls::button::Button;
 use ds::components::controls::chip::{Chip, ChipVariant};
-use ds::components::controls::slider::Slider;
 use ds::components::lists::section_header::SectionHeader;
 use ds::focus::click::kept_click;
 use ds_core::colour::contrast::Verdict;
-use ds_core::vocab::Fraction;
 use ds_style::appearance::theme::Scheme;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::space::dot_paint::DotPaint;
 use ds_style::space::{
-    look::{Grain, SpaceLook},
+    look::SpaceLook,
     palette::{Capping, derive, readout::readout},
     presets::PRESETS,
 };
@@ -77,26 +75,6 @@ pub(super) fn Stops(
                         onchange.call(next);
                     },
                 }
-            }
-        }
-    }
-}
-
-/// The grain row: a Field header with the value, over a Slider (0-100 as thousandths).
-#[component]
-pub(super) fn GrainRow(look: SpaceLook, onchange: EventHandler<SpaceLook>) -> Element {
-    let grain = look.grain.0.min(100);
-    rsx! {
-        div {
-            SectionHeader { title: "Grain", value: grain.to_string() }
-            Slider {
-                label: "Grain",
-                value: Fraction(u16::from(grain) * 10),
-                step: Fraction(10),
-                onchange: move |fraction: Fraction| {
-                    let grain = Grain(edit::grain_of(fraction));
-                    onchange.call(SpaceLook { grain, ..look.clone() });
-                },
             }
         }
     }

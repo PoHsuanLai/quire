@@ -32,7 +32,7 @@ fn render_editor(look: SpaceLook, scheme: Scheme, active: u8) -> String {
 /// The field's images for `scheme`, decoded from the editor's own markup, in order: the
 /// colour plane, then the dot tile.
 fn plane(scheme: Scheme) -> (png::Image, png::Image) {
-    let html = render_editor(preset_look(0, Grain(35)), scheme, 0);
+    let html = render_editor(preset_look(0), scheme, 0);
     let mut images = html.match_indices(PLANE).map(|(at, _)| {
         let payload: String = html[at + PLANE.len()..]
             .chars()
@@ -130,13 +130,13 @@ fn pills(html: &str) -> Vec<(String, String, String)> {
 
 #[test]
 fn the_contrast_pills_are_the_readout() {
-    const CASES: &[(&str, usize, u8, Scheme, u8)] = &[
-        ("work light", 0, 35, Scheme::Light, 0),
-        ("home light", 1, 55, Scheme::Light, 2),
-        ("work dark", 0, 35, Scheme::Dark, 1),
+    const CASES: &[(&str, usize, Scheme, u8)] = &[
+        ("work light", 0, Scheme::Light, 0),
+        ("home light", 1, Scheme::Light, 2),
+        ("work dark", 0, Scheme::Dark, 1),
     ];
-    for &(name, index, grain, scheme, active) in CASES {
-        let look = preset_look(index, Grain(grain));
+    for &(name, index, scheme, active) in CASES {
+        let look = preset_look(index);
         let got = pills(&render_editor(look.clone(), scheme, active));
         let want: Vec<(String, String, String)> = readout(&look, scheme)
             .iter()
@@ -163,19 +163,19 @@ fn the_contrast_pills_are_the_readout() {
 #[test]
 fn the_cap_note_follows_the_derivation() {
     for (index, scheme) in [(0, Scheme::Light), (1, Scheme::Dark)] {
-        let look = preset_look(index, Grain(35));
+        let look = preset_look(index);
         assert_eq!(derive(&look.dots, scheme).capped, Capping::Uncapped);
     }
-    let uncapped = render(|| editor(preset_look(0, Grain(35)), Scheme::Light, 0));
+    let uncapped = render(|| editor(preset_look(0), Scheme::Light, 0));
     assert!(uncapped.contains("No capping needed"), "{uncapped}");
 }
 
 #[test]
 fn a_handle_sits_where_its_dot_is() {
     // Work's first dot {268, .72}: left 268 / 360, top 1 - .72.
-    let html = render(|| editor(preset_look(0, Grain(35)), Scheme::Light, 0));
+    let html = render(|| editor(preset_look(0), Scheme::Light, 0));
     assert!(html.contains("left:74.44%;top:28.00%"), "{html}");
-    let palette = derive(&preset_look(0, Grain(35)).dots, Scheme::Light);
+    let palette = derive(&preset_look(0).dots, Scheme::Light);
     for picked in &palette.picked {
         assert!(
             html.contains(&format!("--dot-c1:{picked};")),

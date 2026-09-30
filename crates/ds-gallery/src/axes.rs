@@ -8,8 +8,8 @@
 use crate::page::Page;
 use ds::Alpha;
 use ds::{
-    Accent, Appearance, BlurState, CardAccent, Grain, Material, Motion, MotionLevel, SpaceLook,
-    Theme, Typeface, default_look,
+    Accent, Appearance, BlurState, CardAccent, Material, Motion, MotionLevel, SpaceLook, Theme,
+    Typeface, default_look,
 };
 use ds_settings::AppearanceSettings;
 use std::cell::RefCell;
@@ -35,7 +35,7 @@ impl PresetIndex {
 
     /// The look this preset ships as: its dots and grain, the system theme, the chosen accent.
     pub fn look(self) -> SpaceLook {
-        default_look(usize::from(self.0), Grain::default(), CardAccent::Chosen)
+        default_look(usize::from(self.0), CardAccent::Chosen)
     }
 }
 
