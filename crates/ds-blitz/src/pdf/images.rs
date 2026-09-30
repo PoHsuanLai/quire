@@ -4,7 +4,6 @@
 //! its pixels (several times larger). An image from anywhere else (an app's fetcher) is drawn
 //! from its pixels.
 
-use crate::data_url;
 use anyrender_pdfrum::{EncodedImage, ImageSources};
 use blitz_dom::node::ImageData;
 use blitz_dom::{BaseDocument, LocalName};
@@ -35,5 +34,5 @@ pub(crate) fn collect(doc: &BaseDocument) -> ImageSources {
 }
 
 fn decode(url: &str) -> Option<EncodedImage> {
-    data_url::decode(url).and_then(EncodedImage::sniffed)
+    blitz_kit::data_url::decode(url).and_then(EncodedImage::sniffed)
 }
