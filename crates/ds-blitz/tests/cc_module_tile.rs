@@ -6,6 +6,8 @@ use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, Material, Point, ShortcutKey};
 use ds_harness::{Harness, Viewport};
 use ds_shell::{Chevron, ModuleState, ModuleTile, TileSpan};
+use ds::{Appearance, Check, Ds, Icon, Material, Point, ShortcutKey};
+use ds_shell::{ModuleTile, TileSpan};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -17,7 +19,7 @@ const VIEW: Viewport = Viewport {
 /// One Wi-Fi tile with a chevron; the page logs every toggle and every detail request.
 #[allow(non_snake_case)]
 fn TileApp() -> Element {
-    let mut state = use_signal(|| ModuleState::Off);
+    let mut state = use_signal(|| Check::Off);
     let mut log = use_signal(Vec::<&'static str>::new);
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
@@ -26,14 +28,10 @@ fn TileApp() -> Element {
                     glyph: Icon::Wifi,
                     title: "Wi-Fi",
                     status: "Home",
-                    state: state(),
-                    chevron: Chevron::Detail,
+                    value: state(),
                     span: TileSpan::Half,
                     onclick: move |_| {
-                        state.set(match state() {
-                            ModuleState::On => ModuleState::Off,
-                            ModuleState::Off | ModuleState::Busy => ModuleState::On,
-                        });
+                        state.set(state().flipped());
                         log.with_mut(|log| log.push("toggle"));
                     },
                     on_detail: move |_| log.with_mut(|log| log.push("detail")),

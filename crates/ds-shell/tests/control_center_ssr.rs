@@ -141,26 +141,36 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// A tile says what it is in its attributes: the state as `data-state` and `aria-pressed`
-/// (mixed while busy), the span, and the chevron's own name and `aria-expanded`.
+/// A tile says what it is in its attributes: the value as `data-state` and `aria-pressed`
+/// (mixed while busy), its availability, the span, and the chevron's own name and
+/// `aria-expanded`.
 #[test]
 fn a_tile_writes_its_state_span_and_chevron() {
+    // (the specimen's word, data-state, data-availability, aria-pressed, has a ring)
+    const CASES: &[(&str, &str, &str, &str, bool)] = &[
+        ("off", "off", "enabled", "false", false),
+        ("on", "on", "enabled", "true", false),
+        ("busy", "off", "busy", "mixed", true),
+    ];
     for (name, case) in tiles::grid() {
+        let &(word, state, availability, pressed, ring) = CASES
+            .iter()
+            .find(|row| name.starts_with(&format!("tile-{}-", row.0)))
+            .expect("a specimen of a known state");
         let html = tile_markup(case.clone());
-        let (state, pressed) = match case.state {
-            ds_shell::ModuleState::Off => ("off", "false"),
-            ds_shell::ModuleState::On => ("on", "true"),
-            ds_shell::ModuleState::Busy => ("busy", "mixed"),
-        };
         assert!(html.contains(&format!("data-state=\"{state}\"")), "{name}");
+        assert!(
+            html.contains(&format!("data-availability=\"{availability}\"")),
+            "{name} {word}"
+        );
         assert!(
             html.contains(&format!("aria-pressed=\"{pressed}\"")),
             "{name}"
         );
         assert_eq!(
             html.contains("ds-progress"),
-            state == "busy",
-            "{name}: breathe only while busy"
+            ring,
+            "{name}: the ring turns only while busy"
         );
         assert!(html.contains("aria-label=\"Wi-Fi details\""), "{name}");
         assert!(html.contains("aria-expanded=\"false\""), "{name}");

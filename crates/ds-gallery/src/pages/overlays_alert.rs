@@ -7,11 +7,12 @@
 use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
+use ds::Check;
 use ds::{
     Alert, AlertButton, AlertRole, AlertStyle, Appearance, Button, CardAccent, Ds, Flow, FrameTint,
     Grain, Icon, IconSource, Inject, Material, Px, RootChrome, TextLine, Theme, default_look,
 };
-use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile};
+use ds_shell::{ModuleGrid, ModuleTile};
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";
@@ -65,11 +66,11 @@ fn InPopover(theme: Theme) -> Element {
                 frame: Some(FrameTint::Tinted),
                 div { class: "g-alert-cc-body",
                     ModuleGrid { padding: Px(0.0),
-                        ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
-                        ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "On", state: ModuleState::On, chevron: Chevron::Detail,
+                        ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {}, on_detail: |_| {} }
+                        ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "On", value: Check::On,
                             onclick: move |_| open.set(true), on_detail: |_| {} }
-                        ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Off", state: ModuleState::Off, onclick: |_| {} }
-                        ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Off", state: ModuleState::Off, onclick: |_| {} }
+                        ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Off", value: Check::Off, onclick: |_| {} }
+                        ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Off", value: Check::Off, onclick: |_| {} }
                     }
                     if open() {
                         Alert {

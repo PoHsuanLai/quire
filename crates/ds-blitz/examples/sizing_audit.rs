@@ -16,6 +16,7 @@ use ds::{
 use ds::{Choice, Tracking};
 use ds_harness::{Harness, Viewport};
 use ds_shell::{Chevron, MenuBarItem, ModuleGrid, ModulePanel, ModuleState, ModuleTile};
+use ds_shell::{MenuBarItem, ModuleGrid, ModulePanel, ModuleTile};
 use std::path::PathBuf;
 use std::time::Duration;
 
@@ -126,8 +127,8 @@ fn Sheet(theme: Theme) -> Element {
                 Surface { material: Material::Popover, theme: Some(scheme),
                     div { style: "width:320px;",
                         ModuleGrid {
-                            ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
-                            ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", state: ModuleState::Off, chevron: Chevron::Detail, onclick: |_| {}, on_detail: |_| {} }
+                            ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {}, on_detail: |_| {} }
+                            ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: Check::Off, onclick: |_| {}, on_detail: |_| {} }
                             ModulePanel { glyph: Icon::Sun, title: "Display", trailing: rsx! { "60%" },
                                 Slider { label: "Display", value: Fraction(600), glyph: LevelGlyph::Volume(Muting::Audible), look: SliderLook::Capsule }
                             }

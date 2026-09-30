@@ -131,7 +131,7 @@ fn the_bar_at_rest_is_the_first_stop_at_the_material_alpha() {
 fn SwitchingBar() -> Element {
     let mut index = use_signal(|| 0usize);
     rsx! {
-        Ds { appearance: light(), look: look(index()), material: Material::Bar, blur: BlurState::Available,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(index()), material: Material::Bar, blur: BlurState::Available,
             style { {PROBE_CSS} }
             div { class: "bar-fill",
                 MenuBarItem {
@@ -166,7 +166,9 @@ fn a_look_change_cross_fades_the_tint() {
     let mut harness = Harness::new(SwitchingBar, BAR_VIEW);
     harness.advance(ms(50));
     let before = pixel(&harness.render().expect("renders"), 1, 1);
-    let button = harness.centre(".ds-button").expect("the switch is drawn");
+    let button = harness
+        .centre(".ds-menu-bar-item")
+        .expect("the switch is drawn");
     harness.click(button);
     harness.advance(half_of_the_fade());
     let halfway = harness.render().expect("renders");
@@ -273,7 +275,7 @@ fn a_popover_roots_corner_outside_its_card_is_transparent() {
 #[allow(non_snake_case)]
 fn GroundedBar() -> Element {
     rsx! {
-        Ds { appearance: light(), look: look(0), material: Material::Bar,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(0), material: Material::Bar,
             style { {PROBE_CSS} }
             div { class: "bar-fill", span { class: "ink-probe on-frame" } }
             Popover {
@@ -321,7 +323,7 @@ fn StatusItems() -> Element {
         glyph: Px(24.0),
     };
     rsx! {
-        Ds { appearance: light(), look: look(0), material: Material::Bar,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: light(), look: look(0), material: Material::Bar,
             style { {PROBE_CSS} }
             div { class: "bar-fill",
                 div { class: "large", style: large.style_attr(),
@@ -362,7 +364,7 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
     // (selector, box, glyph)
     const CASES: &[(&str, f32, f32)] = &[(".large", 30.0, 24.0), (".plain", 22.0, 16.0)];
     for &(scope, side, glyph) in CASES {
-        let button = rect(&harness, &format!("{scope} .ds-button"));
+        let button = rect(&harness, &format!("{scope} .ds-menu-bar-item"));
         assert_eq!(
             (button.size.width, button.size.height),
             (Px(side.max(30.0)), Px(side)),
@@ -385,7 +387,7 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
 fn a_status_item_fills_under_the_pointer() {
     let mut harness = Harness::new(StatusItems, BAR_VIEW);
     harness.advance(ms(50));
-    let button = rect(&harness, ".plain .ds-button");
+    let button = rect(&harness, ".plain .ds-menu-bar-item");
     let corner = |frame: &RgbaImage| {
         pixel(
             frame,
@@ -394,7 +396,7 @@ fn a_status_item_fills_under_the_pointer() {
         )
     };
     let rest = corner(&harness.render().expect("renders"));
-    harness.pointer_move(harness.centre(".plain .ds-button").expect("drawn"));
+    harness.pointer_move(harness.centre(".plain .ds-menu-bar-item").expect("drawn"));
     harness.advance(ms(400));
     let hovered = corner(&harness.render().expect("renders"));
     assert!(

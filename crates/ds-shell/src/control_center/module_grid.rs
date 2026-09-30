@@ -6,6 +6,7 @@
 
 use crate::tokens::control_center::CONTROL_CENTER;
 use dioxus::prelude::*;
+use ds::Common;
 use ds_core::geometry::units::Px;
 
 /// How many equal columns the grid has; at least one (a zero is read as one).
@@ -52,6 +53,7 @@ pub fn ModuleGrid(
     #[props(default)] columns: GridColumns,
     #[props(default = Px(f32::from(CONTROL_CENTER.gap.0)))] gap: Px,
     #[props(default = Px(f32::from(CONTROL_CENTER.padding.0)))] padding: Px,
+    #[props(default)] common: Common,
     children: Element,
 ) -> Element {
     let style = GridMetrics {
@@ -60,8 +62,18 @@ pub fn ModuleGrid(
         padding,
     }
     .style_attr();
+    let class = common.class("ds-module-grid");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-module-grid", style, {children} }
+        div {
+            id: common.id.clone(),
+            class,
+            style,
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            {children}
+        }
     }
 }
 

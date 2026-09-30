@@ -1,45 +1,64 @@
-//! WorkspacePills: the bar's workspace indicator as one segmented group on the frame ground (the
-//! macOS polish pass, 2026-09-24): a `--f-pill-hover` track with the pills inside it, the current
-//! workspace a raised `--f-pill` segment with the current-item shadow, the rest quiet text. It
-//! replaces a row of separate `Button { Mini }`s. Each pill reports its presses with the button
-//! (a click activates, a right-click opens the Space menu); a caller that drags pills to
-//! reorder them wraps each `WorkspacePill` in its own element and listens there.
+//! WorkspacePills: the bar's workspace indicator, Mission Control's Spaces bar as one segmented
+//! group on the frame ground (design/30 section 2.10): a track with the pills inside it, the
+//! selected workspace a raised segment with the current-item shadow, the rest quiet text.
+//! Markup: `div.ds-ws-pills[role=group]` holding `button.ds-ws-pill[data-selected][aria-current]`.
+//! Each pill reports its presses with the button (a click activates, a right-click opens the
+//! Space menu); a caller that drags pills to reorder them wraps each `WorkspacePill` in its own
+//! element and listens there.
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::components::controls::press::{ActivationKeys, PressListeners};
 use ds_core::press::Press;
 use ds_core::vocab::Selection;
+use ds_core::word::Word;
 
-/// The group: `children` are its `WorkspacePill`s (or the caller's wrappers around them).
+/// The group: `children` are its `WorkspacePill`s (or the caller's wrappers around them);
+/// `label` names it.
 #[component]
-pub fn WorkspacePills(label: String, children: Element) -> Element {
+pub fn WorkspacePills(
+    label: String,
+    #[props(default)] common: Common,
+    children: Element,
+) -> Element {
+    let class = common.class("ds-ws-pills");
+    let data = common.data_attributes();
     rsx! {
-        div { class: "ds-ws-pills", role: "group", "aria-label": "{label}", {children} }
+        div {
+            id: common.id.clone(),
+            class,
+            role: "group",
+            "aria-label": "{label}",
+            ..data,
+            {children}
+        }
     }
 }
 
-/// One workspace. `current` marks the workspace on screen (`aria-current`).
+/// One workspace. `current` marks the workspace on screen (`data-selected`, `aria-current`).
 #[component]
 pub fn WorkspacePill(
     label: String,
     #[props(default)] current: Selection,
     onclick: EventHandler<Press>,
-    #[props(default)] id: Option<String>,
+    #[props(default)] common: Common,
 ) -> Element {
     let listen = PressListeners::new(onclick);
+    let class = common.class("ds-ws-pill");
+    let data = common.data_attributes();
     rsx! {
         button {
             r#type: "button",
-            class: "ds-ws-pill",
-            id,
-            "aria-current": match current {
-                Selection::Selected => "true",
-                Selection::Unselected => "false",
-            },
+            id: common.id.clone(),
+            class,
+            "data-selected": current.slug(),
+            "aria-current": current.aria_current(),
+            onmounted: move |event| common.mounted(event),
             onclick: move |event| listen.click(&event),
             onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
             oncontextmenu: move |event| listen.context_menu(&event),
             onmouseup: move |event| listen.mouse_up(&event),
+            ..data,
             "{label}"
         }
     }

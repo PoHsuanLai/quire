@@ -3,10 +3,12 @@
 //! panel spans both columns inside the grid's padding.
 
 use dioxus::prelude::*;
+use ds::Check;
 use ds::{Appearance, Ds, Fraction, Icon, LevelGlyph, Material, Muting, Point, Px, Rect};
 use ds::{Slider, SliderLook};
 use ds_harness::{Harness, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel, ModuleState, ModuleTile};
+use ds_shell::{ModuleGrid, ModulePanel, ModuleTile};
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(200));
@@ -25,8 +27,8 @@ fn Sound() -> Element {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Popover,
             div { style: "width:320px",
                 ModuleGrid {
-                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", state: ModuleState::On, onclick: |_| {} }
-                    ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", state: ModuleState::Off, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", value: Check::On, onclick: |_| {} }
+                    ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", value: Check::Off, onclick: |_| {} }
                     ModulePanel {
                         glyph: Icon::Volume2,
                         title: "Speakers",

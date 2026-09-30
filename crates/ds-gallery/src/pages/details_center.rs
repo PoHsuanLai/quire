@@ -8,12 +8,12 @@ use super::details::{Cell, mini};
 use super::details_center_rows::{DeviceRows, NetworkRows, OutputRows};
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
+use ds::{Availability, Check, Fraction, Glyph, Icon, IconSize, LevelGlyph, Px, TextLine};
 use ds::{Bezel, Button, ControlSize, IconSwap, ImagePosition};
-use ds::{Fraction, Glyph, Icon, IconSize, LevelGlyph, Px, TextLine};
 use ds::{Slider, SliderLook};
 use ds_shell::{
-    DeviceBattery, ModuleGrid, ModulePanel, ModuleState, ModuleTile, NowPlayingTrack, Playback,
-    RingMark, TrackPosition,
+    DeviceBattery, ModuleGrid, ModulePanel, ModuleTile, NowPlayingTrack, Playback, RingMark,
+    TrackPosition,
 };
 use std::time::Duration;
 
@@ -35,23 +35,23 @@ pub fn CenterSection() -> Element {
     }
 }
 
-/// On and off, as a tile's state.
-fn flip(state: ModuleState) -> ModuleState {
-    match state {
-        ModuleState::Off => ModuleState::On,
-        ModuleState::On | ModuleState::Busy => ModuleState::Off,
-    }
+/// A tile's value and whether it is working towards it.
+type Lit = (Check, Availability);
+
+/// On and off, as a tile's state: a press on a busy tile does nothing, so this is never busy.
+fn flip((value, _): Lit) -> Lit {
+    (value.flipped(), Availability::Enabled)
 }
 
 #[component]
 fn TilesCell() -> Element {
-    let mut wifi = use_signal(|| ModuleState::On);
-    let mut focus = use_signal(|| ModuleState::Off);
+    let mut wifi = use_signal(|| (Check::On, Availability::Enabled));
+    let mut focus = use_signal(|| (Check::Off, Availability::Enabled));
     rsx! {
-        Cell { name: "Tile disc", code: "ModuleTile {{ state }}",
+        Cell { name: "Tile disc", code: "ModuleTile {{ value, availability }}",
             controls: rsx! {
-                {mini("Wi-Fi busy", move |_| wifi.set(ModuleState::Busy))}
-                {mini("Wi-Fi on", move |_| wifi.set(ModuleState::On))}
+                {mini("Wi-Fi busy", move |_| wifi.set((Check::Off, Availability::Busy)))}
+                {mini("Wi-Fi on", move |_| wifi.set((Check::On, Availability::Enabled)))}
                 {mini("Focus from elsewhere", move |_| focus.set(flip(focus())))}
             },
             div { class: "g-detail",
@@ -61,14 +61,14 @@ fn TilesCell() -> Element {
                         glyph: Icon::Wifi,
                         title: "Wi-Fi",
                         status: Some(TextLine::from(words(wifi()))),
-                        state: wifi(),
+                        value: wifi().0, availability: wifi().1,
                         onclick: move |_| wifi.set(flip(wifi())),
                     }
                     ModuleTile {
                         glyph: Icon::Moon,
                         title: "Focus",
                         status: Some(TextLine::from(words(focus()))),
-                        state: focus(),
+                        value: focus().0, availability: focus().1,
                         onclick: move |_| focus.set(flip(focus())),
                     }
                 }
@@ -79,11 +79,11 @@ fn TilesCell() -> Element {
 }
 
 /// A tile's status words (R8).
-fn words(state: ModuleState) -> &'static str {
-    match state {
-        ModuleState::Off => "Off",
-        ModuleState::On => "On",
-        ModuleState::Busy => "Turning on…",
+fn words((value, availability): Lit) -> &'static str {
+    match (availability, value) {
+        (Availability::Busy, _) => "Turning on…",
+        (_, Check::On) => "On",
+        (_, Check::Off | Check::Mixed) => "Off",
     }
 }
 

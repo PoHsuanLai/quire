@@ -12,9 +12,7 @@ use ds::{
     SegmentedControl, Surface, Theme, Toggle, accent_of,
 };
 use ds::{Choice, Tracking};
-use ds_shell::{
-    ModuleGrid, ModuleState, ModuleTile, MonthGrid, WidgetFrame, WidgetMetrics, WidgetSize,
-};
+use ds_shell::{ModuleGrid, ModuleTile, MonthGrid, WidgetFrame, WidgetMetrics, WidgetSize};
 
 /// The colours an accent lends its surfaces, as CSS.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -204,8 +202,8 @@ fn Controls() -> Element {
             }
         }
         ModuleGrid { padding: ds::Px(0.0),
-            ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", state: ModuleState::On, onclick: |_| {} }
-            ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", state: ModuleState::Off, onclick: |_| {} }
+            ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {} }
+            ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: Check::Off, onclick: |_| {} }
         }
     }
 }

@@ -1,53 +1,53 @@
-//! ModuleTile's specimens: every state in each span, in both schemes, and the chevron's three
-//! forms (live, inert, absent).
+//! ModuleTile's specimens: every state in each span, in both schemes, and the chevron's forms
+//! (live, disabled with the tile, absent, open).
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Icon, Inject, Material, Shown, Theme};
-use ds_shell::{Chevron, ModuleState, ModuleTile, TileSpan};
+use ds::{Appearance, Availability, Check, Ds, Icon, Inject, Material, Shown, Theme};
+use ds_shell::{ModuleTile, TileSpan};
 
 /// One tile specimen.
 #[derive(Props, Clone, PartialEq)]
 pub struct TileCase {
     pub theme: Theme,
-    pub state: ModuleState,
+    pub value: Check,
+    pub availability: Availability,
     pub span: TileSpan,
-    pub chevron: Chevron,
-    pub detail: Shown,
-    pub live: Live,
+    pub detail: Detail,
+    pub expanded: Shown,
 }
 
-/// Whether the specimen's chevron has a handler.
+/// Whether the specimen has a detail pane, and so a chevron.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Live {
-    Handled,
-    Unhandled,
+pub enum Detail {
+    Chevron,
+    Nothing,
 }
 
-pub const STATES: [(ModuleState, &str); 3] = [
-    (ModuleState::Off, "off"),
-    (ModuleState::On, "on"),
-    (ModuleState::Busy, "busy"),
+pub const STATES: [(Check, Availability, &str); 3] = [
+    (Check::Off, Availability::Enabled, "off"),
+    (Check::On, Availability::Enabled, "on"),
+    (Check::Off, Availability::Busy, "busy"),
 ];
 
 pub const SPANS: [(TileSpan, &str); 2] = [(TileSpan::Half, "half"), (TileSpan::Full, "full")];
 
 pub const THEMES: [(Theme, &str); 2] = [(Theme::Light, "light"), (Theme::Dark, "dark")];
 
-/// Every state in each span and scheme, with a live chevron: `tile-<state>-<span>-<scheme>`.
+/// Every state in each span and scheme, with a chevron: `tile-<state>-<span>-<scheme>`.
 pub fn grid() -> Vec<(String, TileCase)> {
     let mut cases = Vec::new();
     for (theme, scheme) in THEMES {
-        for (state, word) in STATES {
+        for (value, availability, word) in STATES {
             for (span, width) in SPANS {
                 cases.push((
                     format!("tile-{word}-{width}-{scheme}"),
                     TileCase {
                         theme,
-                        state,
+                        value,
+                        availability,
                         span,
-                        chevron: Chevron::Detail,
-                        detail: Shown::Hidden,
-                        live: Live::Handled,
+                        detail: Detail::Chevron,
+                        expanded: Shown::Hidden,
                     },
                 ));
             }
@@ -56,35 +56,35 @@ pub fn grid() -> Vec<(String, TileCase)> {
     cases
 }
 
-/// The chevron's other forms, in light: none, inert, and open.
+/// The chevron's other forms, in light: none, dimmed with a disabled tile, and open.
 pub fn chevrons() -> Vec<(String, TileCase)> {
     let base = TileCase {
         theme: Theme::Light,
-        state: ModuleState::Off,
+        value: Check::Off,
+        availability: Availability::Enabled,
         span: TileSpan::Half,
-        chevron: Chevron::Detail,
-        detail: Shown::Hidden,
-        live: Live::Handled,
+        detail: Detail::Chevron,
+        expanded: Shown::Hidden,
     };
     vec![
         (
             "tile-no-chevron".to_owned(),
             TileCase {
-                chevron: Chevron::None,
+                detail: Detail::Nothing,
                 ..base.clone()
             },
         ),
         (
             "tile-inert-chevron".to_owned(),
             TileCase {
-                live: Live::Unhandled,
+                availability: Availability::Disabled,
                 ..base.clone()
             },
         ),
         (
             "tile-open-chevron".to_owned(),
             TileCase {
-                detail: Shown::Visible,
+                expanded: Shown::Visible,
                 ..base
             },
         ),
@@ -93,9 +93,9 @@ pub fn chevrons() -> Vec<(String, TileCase)> {
 
 /// A tile in a Popover root of its scheme.
 pub fn tile(case: TileCase) -> Element {
-    let on_detail = match case.live {
-        Live::Handled => Some(EventHandler::new(|_| {})),
-        Live::Unhandled => None,
+    let on_detail = match case.detail {
+        Detail::Chevron => Some(EventHandler::new(|_| {})),
+        Detail::Nothing => None,
     };
     rsx! {
         Ds {
@@ -106,12 +106,12 @@ pub fn tile(case: TileCase) -> Element {
                 glyph: Icon::Wifi,
                 title: "Wi-Fi",
                 status: "Home",
-                state: case.state,
-                chevron: case.chevron,
+                value: case.value,
+                availability: case.availability,
                 span: case.span,
                 onclick: |_| {},
                 on_detail,
-                expanded: case.detail,
+                expanded: case.expanded,
             }
         }
     }

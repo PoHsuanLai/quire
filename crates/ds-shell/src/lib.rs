@@ -50,7 +50,7 @@ pub use crate::{
         module_grid::{GridColumns, ModuleGrid},
         module_panel::{ModulePanel, PanelPlate},
         module_tile::ModuleTile,
-        module_tile_kind::{Chevron, ModuleState, TileSpan},
+        module_tile_kind::TileSpan,
     },
     date_picker::{
         model::{DateValue, Elements, PickerStyle, Segment, TimeOfDay},

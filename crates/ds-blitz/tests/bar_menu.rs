@@ -275,7 +275,7 @@ fn a_menu_opens_with_no_entrance() {
 fn PressAt() -> Element {
     let mut seen = use_signal(|| "none".to_string());
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Bar,
+        Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; padding:20px 0 0 100px; height:60px",
                 MenuBarItem {
                     image: ImagePosition::Only,
