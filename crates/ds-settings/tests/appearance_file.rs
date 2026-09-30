@@ -94,7 +94,7 @@ fn a_damaged_file_is_the_defaults_and_says_so() {
     const CASES: &[(&str, &[u8], &[&str])] = &[
         ("empty", b"", &[]),
         ("prose", b"not toml [[[ = =", &[""]),
-        ("binary", &[0xff, 0xfe, b'['], &[]),
+        ("binary", &[0xff, 0xfe, b'['], &[""]),
     ];
     for &(name, bytes, want_invalid) in CASES {
         let scratch = Scratch::new();
