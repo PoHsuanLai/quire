@@ -291,7 +291,9 @@ fn at_scale_2_the_painted_thumb_fills_the_selected_segment_to_its_edges() {
             );
             let track = pixel(&frame, seg, seg.origin.x.0 - 1.0, 2.0);
             assert!(
-                distance(thumb, track) > 60,
+                // The Mac's thumb is a raised white (light) or a lighter grey (dark) on a grey
+                // well, a step of 20 or more, not the old ink-on-paper contrast.
+                distance(thumb, track) > 20,
                 "{theme:?} {group}: thumb {thumb:?}, track {track:?}"
             );
             for x in [seg.origin.x.0 + 1.0, right(seg) - 1.0] {

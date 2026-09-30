@@ -27,13 +27,14 @@ impl Hue {
 
 /// How far between the band's quiet and full chroma an accent sits, in thousandths.
 ///
-/// A built-in accent is [`BandWeight::FULL`]; a Space lends its first dot's chroma (0 to 1 on the
+/// A Space lends its first dot's chroma (0 to 1 on the
 /// editor's field), so a grey Space lends a grey-blue, never a vivid one.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct BandWeight(pub u16);
 
 impl BandWeight {
     /// The whole of the band's chroma.
+    #[cfg(test)]
     pub const FULL: BandWeight = BandWeight(1000);
 
     /// The weight as a fraction, clamped to 0..=1.
