@@ -2,9 +2,9 @@
 //! handler (design/05-MOTION.md section 7, the Blitz risk table: "timers start in handlers").
 //!
 //! The settle task belongs to the hook's owner and is dropped with it: a palette unmounted
-//! before its entrance settles takes its timer with it (`crate::core::task`).
+//! before its entrance settles takes its timer with it (`crate::style::task`).
 
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::motion::anim::Anim;
 use crate::motion::settle::settle;

@@ -7,7 +7,7 @@
 use super::disc::EmojiPlayback;
 use super::id::EmojiId;
 use super::script::{MoodChange, Playing, Shown, Step, resting, script};
-use crate::core::task::{spawn_in, try_get, try_set};
+use crate::style::task::{spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::motion::wake::WakeStamp;
 use crate::shell::user_picture::mood::Mood;

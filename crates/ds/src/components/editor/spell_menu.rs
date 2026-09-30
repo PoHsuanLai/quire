@@ -8,7 +8,7 @@ use crate::components::editor::spell::{SpellCtx, draw, touch};
 use crate::components::menus::menu_entry::{MenuEntry, MenuRow};
 use crate::components::menus::{menu::Menu, menu_kind::MenuKind};
 use crate::core::geometry::units::{Point, Rect};
-use crate::core::task::{spawn_in, try_set};
+use crate::style::task::{spawn_in, try_set};
 use crate::host::measure::Anchor;
 use crate::host::probe::Probe;
 use crate::spell::marks::{Misspelt, SpellReplace};

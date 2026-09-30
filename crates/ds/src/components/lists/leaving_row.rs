@@ -2,7 +2,7 @@
 //! that plays the row's entrance, exit and heal, and measures its height, which is how far the
 //! rows below it heal when it leaves.
 
-use crate::core::task::spawn_in;
+use crate::style::task::spawn_in;
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;

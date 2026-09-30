@@ -3,7 +3,7 @@
 //! from where the caller says (R10). [`use_playback`] is the handle a component moves by hand.
 
 use super::Timeline;
-use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
+use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::core::time::{FRAME_TICK, clock};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;

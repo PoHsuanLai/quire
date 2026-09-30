@@ -6,7 +6,7 @@
 //! the app's content: the state is in cells, and only the layer reads the boxes.
 
 use crate::core::geometry::units::{Point, Rect};
-use crate::core::task::{spawn_in, try_set_if_changed};
+use crate::style::task::{spawn_in, try_set_if_changed};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::document::DocumentHost;
 use crate::host::measure::{BUSY_ATTEMPTS, client_rect};

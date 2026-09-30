@@ -6,9 +6,9 @@
 //! ("RefCell already borrowed", a palette's field focusing on mount while its
 //! results re-rendered). Every focus change goes through [`focus_soon`]: the host's
 //! [`FocusHost`](crate::FocusHost) answers [`Focused::Busy`] instead, and the change is tried again
-//! once that render has ended (`crate::core::busy`), then a frame later.
+//! once that render has ended (`crate::style::busy`), then a frame later.
 
-use crate::core::busy::wait_out_busy;
+use crate::style::busy::wait_out_busy;
 use crate::focus::select::{Landing, Select};
 use crate::host::caret::InitialCaret;
 use crate::host::document::use_document_host;
@@ -88,7 +88,7 @@ pub(crate) async fn blur_element(element: &MountedData) -> Focused {
 
 /// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` tries: the first few
 /// as soon as the render that holds it ends, so the write lands in the frame it was asked in
-/// (`crate::core::busy`), the rest a frame apart.
+/// (`crate::style::busy`), the rest a frame apart.
 pub(crate) async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
     for attempt in 0..BUSY_ATTEMPTS {
         match write() {

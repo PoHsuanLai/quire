@@ -2,7 +2,7 @@
 //! and the palette's field should have it back without being remounted (which replays the
 //! palette's entrance).
 
-use crate::core::task::{try_get, try_set};
+use crate::style::task::{try_get, try_set};
 use crate::focus::select::{Landing, Select};
 use crate::host::caret::InitialCaret;
 use dioxus::prelude::*;

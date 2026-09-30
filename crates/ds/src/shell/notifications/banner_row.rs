@@ -13,7 +13,7 @@
 //! row writes `data-flight=swipe`, which points its exit right whatever the stack's entry edge.
 
 use crate::core::geometry::units::Px;
-use crate::core::task::spawn_in;
+use crate::style::task::spawn_in;
 use crate::core::word::Word;
 use crate::host::measure::client_rect;
 use crate::motion::presence::Presence;

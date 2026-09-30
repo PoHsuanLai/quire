@@ -4,7 +4,7 @@
 //! buffering, the bar holds at 0 frames. Mounted only while the panel is open, so it costs one
 //! frame a second only while someone can see it.
 
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use crate::shell::now_playing::kind::{Playback, PositionClock};
 use dioxus::core::{Task, current_scope_id, queue_effect};

@@ -18,7 +18,7 @@ use crate::components::menus::palette::palette_group::GroupsKey;
 use crate::components::menus::palette::palette_reveal::Reveal as Stops;
 use crate::components::menus::palette::palette_stops::ShownGroup;
 use crate::core::geometry::units::Px;
-use crate::core::task::spawn_in;
+use crate::style::task::spawn_in;
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::measure::{BUSY_ATTEMPTS, laid_out_rect};
 use crate::motion::{

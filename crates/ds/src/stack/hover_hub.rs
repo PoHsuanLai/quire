@@ -4,9 +4,9 @@
 //!
 //! Its timers are tasks of the root that provides it and drop with it; every write a timer makes
 //! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
-//! (`crate::core::task`).
+//! (`crate::style::task`).
 
-use crate::core::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
+use crate::style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use crate::core::time::clock::sleep;
 use crate::motion::anim::Anim;
 use crate::motion::hover_intent::{

@@ -134,8 +134,8 @@ impl Showing {
     /// Play the entrance again from its first frame. Call it from an effect or a handler.
     pub(crate) fn replay(&self) {
         let alias = self.alias;
-        if let Ok(now) = crate::core::task::try_get(alias) {
-            let _ = crate::core::task::try_set(alias, now.flipped());
+        if let Ok(now) = crate::style::task::try_get(alias) {
+            let _ = crate::style::task::try_set(alias, now.flipped());
         }
         self.timer.start(self.settled);
     }

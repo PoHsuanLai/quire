@@ -10,7 +10,7 @@
 //! ("RefCell already borrowed"). The host's [`GeometryHost::measure`](crate::GeometryHost::measure)
 //! answers [`Measured::Busy`] instead, and the read waits a frame.
 
-use crate::core::busy::{after_render, wait_out_busy};
+use crate::style::busy::{after_render, wait_out_busy};
 use crate::core::geometry::units::{Point, Rect};
 use crate::core::time::{FRAME_SLACK, clock::sleep};
 use crate::host::document::use_document_host;

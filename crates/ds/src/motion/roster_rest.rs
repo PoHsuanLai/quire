@@ -5,14 +5,14 @@
 //! that lists them), but the timer it needs is never spawned there: a task spawned from a render
 //! may never be polled, so the body only queues an
 //! effect, and the effect, which dioxus runs after the render on every renderer, spawns the
-//! timer as a task of the roster's owner (`crate::core::task::spawn_in`). Two
+//! timer as a task of the roster's owner (`crate::style::task::spawn_in`). Two
 //! reconciles before the effect runs queue it once, and a timer already due later than the new
 //! one is kept rather than joined by a second task.
 
 use super::roster::RosterState;
 use super::settle::settle;
 use super::use_roster::Roster;
-use crate::core::task::{Gone, spawn_in, try_get, try_set};
+use crate::style::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
 use dioxus::core::{Task, queue_effect};
 use dioxus::prelude::*;

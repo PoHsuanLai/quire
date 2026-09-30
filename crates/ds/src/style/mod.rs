@@ -1,7 +1,9 @@
-//! The style layer: appearance, the token table, materials, Space palettes, fonts, icons and the
-//! stylesheet's own sections, over `core` and nothing else.
+//! The style layer: appearance, the token table, materials, Space palettes, fonts, icons, the
+//! stylesheet's own sections and the tasks a scope owns (`task`, `busy`), over `core` and nothing
+//! else.
 
 pub mod appearance;
+pub mod busy;
 pub mod css;
 pub mod emit;
 pub(crate) mod fonts;
@@ -12,4 +14,5 @@ pub mod material;
 pub mod scale;
 pub mod scope;
 pub mod space;
+pub mod task;
 pub mod tokens;
