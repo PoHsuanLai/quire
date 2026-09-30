@@ -5,8 +5,9 @@ use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{Accent, Appearance, AppearancePicker, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use ds::{
-    Colour, CommandPill, DragGhost, DropLine, DropState, EdgeStrip, Grip, Hex, HoverStrip,
-    ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Selection,
+    Colour, CommandPill, DragGhost, DropLine, DropState, EdgePeek, Expiry, Grip, Hex, HoverStrip,
+    ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Row, RowShape,
+    Selection, Shown,
 };
 use ds::{ControlSize, Shortcut, ShortcutKey};
 
@@ -97,11 +98,27 @@ pub const CASES: &[Case] = &[
         state: "drag-source",
         make: || rsx! { PinTile { face: PinFace::All, drop: DropState::Source, onclick: |_| {} } },
     },
-    // EdgeStrip.
+    // EdgePeek: pinned in its column; hidden, with the strip at the edge waiting.
     Case {
-        component: "edge_strip",
-        state: "default",
-        make: || rsx! { EdgeStrip { onenter: |_| {} } },
+        component: "edge_peek",
+        state: "pinned",
+        make: || rsx! { EdgePeek { label: "Sidebar", pinned: Shown::Visible, onpin: |_| {}, "Inbox" } },
+    },
+    Case {
+        component: "edge_peek",
+        state: "hidden",
+        make: || rsx! { EdgePeek { label: "Sidebar", pinned: Shown::Hidden, onpin: |_| {}, "Inbox" } },
+    },
+    // A Today tab's row: what it has left, and about to expire.
+    Case {
+        component: "row",
+        state: "today",
+        make: || rsx! { Row { title: "RFC 1939", shape: RowShape::Today { left: "2 h".to_string(), expiry: Expiry::Later }, onclick: |_| {} } },
+    },
+    Case {
+        component: "row",
+        state: "today-soon",
+        make: || rsx! { Row { title: "RFC 1939", shape: RowShape::Today { left: "12 min".to_string(), expiry: Expiry::Soon }, onclick: |_| {} } },
     },
     // DragGhost, DropLine, Grip.
     Case {

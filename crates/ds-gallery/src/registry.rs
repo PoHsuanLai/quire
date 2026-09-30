@@ -93,6 +93,13 @@ pub const REGISTRY: [Entry; 26] = [
         body: pages::overlays_catalogue::OverlaysCataloguePage,
     },
     Entry {
+        page: Page::App,
+        title: "App features",
+        lede: "Pinned tiles (drag one onto another to reorder), Today tabs that expire, the edge-peek sidebar (rest the pointer on the left edge), the link pill, the launcher's commands grouped in a Space's order, and Control and a digit to switch Space.",
+        height: 2600,
+        body: pages::app_features::AppFeaturesPage,
+    },
+    Entry {
         page: Page::Materials,
         title: "Materials",
         lede: "The eight materials as chrome over a wallpaper, blur on and off, with the ink's four legibility floors measured live at the tint alpha below.",

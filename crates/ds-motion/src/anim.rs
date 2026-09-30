@@ -6,11 +6,10 @@
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring, plus four
 //! assignment rows that play a catalogue keyframe at another
 //! recipe (section 5 rows 7, 26, 37 and 64): `PaletteFade`,
-//! `LinkPillIn` and `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
+//! `PeekFullIn`, plus `MenuOut`, quire's own fade for a menu
 //! closed by Escape or an outside click (bar gaps), plus `CmdkRise`, `cmdk-in` without its fade,
 //! for a command panel that must be opaque on its first frame, plus four for
-//! states the catalogue has no motion for: `PillUp` (a centred pill's entrance),
-//! `RingDrain` (the send ring's countdown), `FadeIn` (C's veil, to `--veil`, where S's `fade`
+//! states the catalogue has no motion for: `FadeIn` (C's veil, to `--veil`, where S's `fade`
 //! runs to 1) and `Busy` (a legible pulse; `Breathe` fades to nothing), plus four for the
 //! control center's pane switch: `PaneInR` and `PaneInL` play `slide-r` and
 //! `slide-l` at `--t-move` (design/13 section 13.3.7) where the catalogue's rows are `--t-big`,
@@ -56,20 +55,12 @@ pub enum Anim {
     /// `fade` at `--t-quick`: the command palette's backdrop, and the fade in of a popover, a
     /// tooltip and a hover card (design/30 section 1.3).
     PaletteFade,
-    /// `hc-in` at `--t-quick --e-out`: the link pill (section 5 row 26).
-    LinkPillIn,
     /// `page-in`: composer page, inline reply.
     PageIn,
     /// `shake-x`: the To row with no recipient.
     ShakeX,
     /// `shake`: outbox needs sign-in (C).
     Shake,
-    /// `pill-up`: a pill centred by `translateX(-50%)` (a consumer's toast, a send pill of its
-    /// own) springs up from below.
-    PillUp,
-    /// `ring-drain`: a countdown ring's `stroke-dashoffset` drains over the send's grace
-    /// period, linear (on Blitz the SendPill writes the offset as an attribute).
-    RingDrain,
     /// `fade-in`: an ink veil fades in to `--veil` rather than to 1 (C:1055).
     FadeIn,
     /// `slide-r` at `--t-move --e-spring`: a detail pane arriving from the right.
@@ -122,7 +113,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 34] = [
+    pub const ALL: [Anim; 31] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -134,12 +125,9 @@ impl Anim {
         Anim::PeekFullIn,
         Anim::Fade,
         Anim::PaletteFade,
-        Anim::LinkPillIn,
         Anim::PageIn,
         Anim::ShakeX,
         Anim::Shake,
-        Anim::PillUp,
-        Anim::RingDrain,
         Anim::FadeIn,
         Anim::PaneInR,
         Anim::PaneInL,
@@ -173,12 +161,9 @@ impl Anim {
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",
             Anim::PaletteFade => "a-palette-fade",
-            Anim::LinkPillIn => "a-link-pill-in",
             Anim::PageIn => "a-page-in",
             Anim::ShakeX => "a-shake-x",
             Anim::Shake => "a-shake",
-            Anim::PillUp => "a-pill-up",
-            Anim::RingDrain => "a-ring-drain",
             Anim::FadeIn => "a-fade-in",
             Anim::PaneInR => "a-pane-in-r",
             Anim::PaneInL => "a-pane-in-l",

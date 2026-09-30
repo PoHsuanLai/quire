@@ -1,10 +1,11 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
+use ds::detail::{Operation, PendingToken};
 use ds::{
     Accessory, Button, Colour, Common, Fraction, Hex, Icon, ImageSource, MarkProvider, MarkStyle,
-    PillAction, PinFace, PinTile, Propagation, Row, RowLeading, Selection, SendMood, SendPhase,
-    SendPill, Shown,
+    PillAction, PinFace, PinTile, Propagation, Row, RowLeading, Selection, SendMood, SendPill,
+    Shown,
 };
 use ds::{Avatar, Muting};
 use ds::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
@@ -86,11 +87,11 @@ pub const CASES: &[Case] = &[
     // SendPill: Cancel for a held send, and a fatal refusal on two lines.
     Case {
         golden: "overlays/send_pill/cancel.html",
-        make: || rsx! { SendPill { text: "Scheduled for 9:00", progress: Fraction(0), phase: SendPhase::Counting, action: PillAction::Cancel, onundo: |_| {} } },
+        make: || rsx! { SendPill { text: "Scheduled for 9:00", progress: Fraction(0), operation: Operation::Running(PendingToken::start()), action: PillAction::Cancel, onundo: |_| {} } },
     },
     Case {
         golden: "overlays/send_pill/fatal-refused.html",
-        make: || rsx! { SendPill { text: "Not sent", progress: Fraction(700), phase: SendPhase::Counting, mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} } },
+        make: || rsx! { SendPill { text: "Not sent", progress: Fraction(700), operation: Operation::Running(PendingToken::start()), mood: SendMood::Fatal, refusal: "No recipients", onundo: |_| {} } },
     },
     // Row: a scheduled Today row with its time and cancel.
     Case {

@@ -22,6 +22,7 @@ const INLINE_VARS: &[&str] = &[
     "--f",
     "--a",
     "--dy",
+    "--present-p",
     "--ic-size",
     "--dot-c1",
     "--dot-c2",

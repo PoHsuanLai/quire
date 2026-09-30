@@ -5,9 +5,10 @@ use super::outbox::Outbox;
 use super::{Section, Specimen};
 use crate::axes::Showcase;
 use dioxus::prelude::*;
+use ds::detail::{Operation, PendingToken};
 use ds::{
     Avatar, AvatarSize, AvatarTone, Button, Fraction, Glyph, HoverCard, HoverKey, HoverKind,
-    HoverTarget, Icon, IconSize, LinkPill, LinkTarget, SendPhase, SendPill, Shortcut, ShortcutKey,
+    HoverTarget, Icon, IconSize, LinkPill, LinkTarget, SendPill, Shortcut, ShortcutKey,
     TargetElement, Tooltip, UndoToken, sleep, use_hover_hub, use_toast_hub,
 };
 use ds::{Bezel, ControlSize};
@@ -136,12 +137,12 @@ pub fn Pills(showcase: Showcase) -> Element {
             div { class: "g-grid3",
                 Specimen { name: "honest link",
                     div { class: "g-stage",
-                        LinkPill { target: LinkTarget::Honest { scheme_sub: "https://docs.".to_string(), registered: "example.org".to_string(), path: "/guides/imap/uidl".to_string() } }
+                        LinkPill { href: "https://www.example.org/a".to_string(), oncopy: |_| {}, target: LinkTarget::Honest { scheme_sub: "https://docs.".to_string(), registered: "example.org".to_string(), path: "/guides/imap/uidl".to_string() } }
                     }
                 }
                 Specimen { name: "lying link",
                     div { class: "g-stage",
-                        LinkPill { target: LinkTarget::Lying { registered: "examp1e-login.net".to_string(), shown: "example.org".to_string() } }
+                        LinkPill { href: "https://www.example.org/a".to_string(), oncopy: |_| {}, target: LinkTarget::Lying { registered: "examp1e-login.net".to_string(), shown: "example.org".to_string() } }
                     }
                 }
                 Specimen { name: "send, live",
@@ -160,11 +161,11 @@ fn Countdown(showcase: Showcase) -> Element {
         Showcase::Posed => Fraction(400),
         Showcase::Live => Fraction(0),
     });
-    let mut phase = use_signal(|| SendPhase::Counting);
+    let mut operation = use_signal(|| Operation::Running(PendingToken::start()));
     let mut run = use_signal(|| 0u32);
     let start = move |_| {
         elapsed.set(Fraction(0));
-        phase.set(SendPhase::Counting);
+        operation.set(Operation::Running(PendingToken::start()));
         run += 1;
         let this = run();
         spawn(async move {
@@ -172,12 +173,12 @@ fn Countdown(showcase: Showcase) -> Element {
             let ticks = u16::try_from(ticks).unwrap_or(5).max(1);
             for tick in 1..=ticks {
                 sleep(ds::SEND_TICK).await;
-                if run() != this || phase() == SendPhase::Done {
+                if run() != this || operation() == Operation::Idle {
                     return;
                 }
                 elapsed.set(Fraction(1000 * tick / ticks));
             }
-            phase.set(SendPhase::Done);
+            operation.set(Operation::Idle);
         });
     };
     rsx! {
@@ -187,12 +188,12 @@ fn Countdown(showcase: Showcase) -> Element {
         if run() > 0 || showcase == Showcase::Posed {
             SendPill {
                 key: "{run}",
-                text: match phase() { SendPhase::Counting => "Sending…", SendPhase::Done => "Sent" },
+                text: match operation() { Operation::Running(_) => "Sending…", Operation::Idle => "Sent" },
                 progress: elapsed(),
-                phase: phase(),
+                operation: operation(),
                 onundo: move |_| {
                     run += 1;
-                    phase.set(SendPhase::Done);
+                    operation.set(Operation::Idle);
                 },
             }
         }

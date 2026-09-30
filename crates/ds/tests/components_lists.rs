@@ -182,7 +182,7 @@ const OWN: &[&str] = &[
     "pin_tile",
     "provider_mark",
     "drag_ghost",
-    "edge_strip",
+    "edge_peek",
     "text_runs",
 ];
 

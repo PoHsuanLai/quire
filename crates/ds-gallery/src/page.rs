@@ -31,6 +31,9 @@ pub enum Page {
     /// Popover, sheet, alert, side panel, tooltip, dock label, hover card, toast, empty state and
     /// skeleton, in every state (design/30 sections 2.5 and 2.9).
     Feedback,
+    /// App features: pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
+    /// launcher commands and Space switching (design/30 section 2.11).
+    App,
     /// The eight materials over black, white and a wallpaper.
     Materials,
     /// Every animation at every level.

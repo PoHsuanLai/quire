@@ -212,11 +212,8 @@ fn the_settle_table() {
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
         (Anim::PaletteFade, MotionLevel::Standard, 184),
-        (Anim::LinkPillIn, MotionLevel::Standard, 184),
         (Anim::PeekFullIn, MotionLevel::Standard, 284),
         // The four keyframes the catalogue had no motion for.
-        (Anim::PillUp, MotionLevel::Standard, 434),
-        (Anim::RingDrain, MotionLevel::Standard, 5034),
         (Anim::FadeIn, MotionLevel::Standard, 284),
         // The pane switch, both panes at `--t-move`, so one timer settles the pair.
         (Anim::PaneInR, MotionLevel::Standard, 284),
@@ -243,22 +240,12 @@ fn the_settle_table() {
             "{anim:?} {level:?}"
         );
     }
-    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced, except a hold
-    // (`DurationToken::kind`): the send ring is the undo window.
-    for anim in Anim::ALL
-        .into_iter()
-        .filter(|anim| !matches!(anim, Anim::RingDrain))
-    {
+    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced.
+    for anim in Anim::ALL {
         assert_eq!(
             settle(anim, MotionLevel::Reduced),
             Duration::from_millis(184),
             "{anim:?} Reduced"
         );
     }
-    // The send ring is the undo window: a hold too.
-    assert_eq!(
-        settle(Anim::RingDrain, MotionLevel::Reduced),
-        Duration::from_millis(5034),
-        "RingDrain Reduced (a hold, unaffected by Reduced)"
-    );
 }

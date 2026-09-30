@@ -34,16 +34,18 @@ pub use crate::assembly::{
 pub use crate::components::{
     app::{
         command_pill::CommandPill,
-        edge_strip::EdgeStrip,
+        edge_peek::{EdgePeek, SideState},
         hover_strip::{ActionId, HoverStrip, StripAction, Titles},
         link_pill::{LinkPill, LinkTarget},
         peek::Peek,
         pin_tile::{PinFace, PinTile},
         pin_tiles::{PinAdd, PinItem, PinTiles},
         send_mood::SendMood,
-        send_pill::{PillAction, SEND_COUNTDOWN, SEND_TICK, SendPhase, SendPill},
+        send_pill::{PillAction, SEND_COUNTDOWN, SEND_TICK, SendPill},
+        space_switch::{space_pressed, space_shortcut},
         thread_row::ThreadRow,
         thread_row_hooks::PartHooks,
+        today_tabs::{TodayTab, TodayTabs, expiry_of, left_text},
     },
     chrome::{
         sidebar::Sidebar,
@@ -141,7 +143,7 @@ pub use crate::components::{
             leading::RowLeading,
             motion::RowMotion,
             row::{Outline, Row},
-            shape::{ClipBody, RowShape},
+            shape::{ClipBody, Expiry, RowShape},
             size::RowSize,
         },
         section_header::SectionHeader,
@@ -157,7 +159,7 @@ pub use crate::components::{
         palette::{
             command_palette::CommandPalette,
             palette_claim::{Claim, FieldKey},
-            palette_group::{GroupEntries, PaletteGroup, PaletteGroups, PaletteRow},
+            palette_group::{GroupEntries, GroupOrder, PaletteGroup, PaletteGroups, PaletteRow},
             palette_host::CommandPaletteHost,
             palette_motion::{PaletteHandle, use_palette_handle},
         },

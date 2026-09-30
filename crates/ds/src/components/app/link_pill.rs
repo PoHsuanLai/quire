@@ -1,12 +1,17 @@
-//! LinkPill: the real destination of a link, instant, and loud when the text lies
-//! (design/04-COMPONENTS.md section 29, design/06-INTERACTIONS.md section 13). The honest/lying
-//! decision is mailo's. The consumer mounts it in the reader the moment the pointer is over a
-//! link and drops it on leave: no intent delay, no exit. It enters with `Anim::LinkPillIn`
-//! (`hc-in` at `--t-quick --e-out`, `S:433`), reported as `data-presence` like every entrance.
+//! LinkPill: the link under the pointer, as a rounded pill (design/30 section 2.11). It shows the
+//! real destination's registered domain; when the pointer rests on it (`HoverIntent`, the `Label`
+//! profile) it expands to the whole address, and a click hands the address to the caller to copy
+//! and says "Copied" until the pointer leaves. The honest or lying decision is mailo's: a lying
+//! link turns the pill loud. The consumer mounts it in the reader the moment the pointer is over
+//! a link; it fades in over `--t-quick` like every floating surface.
 
+use crate::components::app::hover_open::use_hover_open;
+use crate::root::common::Common;
 use dioxus::prelude::*;
+use ds_core::vocab::Shown;
 use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
+use ds_motion::hover_intent::HoverProfile;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 
@@ -31,57 +36,134 @@ pub enum LinkTarget {
     },
 }
 
-/// The link's destination.
+/// Whether the pill has been pressed since the pointer came over it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Copied {
+    No,
+    Yes,
+}
+
+/// The link's destination. `href` is what a press hands to `oncopy`.
 #[component]
-pub fn LinkPill(target: LinkTarget) -> Element {
-    let presence = use_entrance(Anim::LinkPillIn).slug();
-    match target {
-        // The registered domain never truncates: the path gives way first (O-30).
-        LinkTarget::Honest {
-            scheme_sub,
-            registered,
-            path,
-        } => rsx! {
-            div { class: "ds-link-pill", "data-truth": "honest", "data-presence": presence, role: "status",
-                span { class: "ds-link-pill-dim", "{scheme_sub}" }
+pub fn LinkPill(
+    target: LinkTarget,
+    href: String,
+    oncopy: EventHandler<String>,
+    #[props(default)] common: Common,
+) -> Element {
+    let presence = use_entrance(Anim::PaletteFade).slug();
+    let hover = use_hover_open(HoverProfile::Label);
+    let mut copied = use_signal(|| Copied::No);
+    let expanded = hover.shown();
+    let (truth, words) = match (&target, copied()) {
+        (_, Copied::Yes) => (
+            truth(&target),
+            rsx! {
+                span { "Copied" }
+            },
+        ),
+        (
+            LinkTarget::Honest {
+                scheme_sub,
+                registered,
+                path,
+            },
+            _,
+        ) => (
+            "honest",
+            rsx! {
+                if expanded == Shown::Visible {
+                    span { class: "ds-link-pill-dim", "{scheme_sub}" }
+                }
                 b { "{registered}" }
-                span { class: "ds-link-pill-dim", "data-part": "path", "{path}" }
-            }
-        },
-        LinkTarget::Lying { registered, shown } => rsx! {
-            div { class: "ds-link-pill", "data-truth": "lying", "data-presence": presence, role: "status",
+                if expanded == Shown::Visible {
+                    span { class: "ds-link-pill-dim", "data-part": "path", "{path}" }
+                }
+            },
+        ),
+        (LinkTarget::Lying { registered, shown }, _) => (
+            "lying",
+            rsx! {
                 Glyph { icon: Icon::X, size: IconSize::Small }
                 span {
                     "Goes to "
                     b { "{registered}" }
-                    ", not {shown}"
+                    if expanded == Shown::Visible {
+                        ", not {shown}"
+                    }
                 }
-            }
-        },
+            },
+        ),
+    };
+    let class = common.class("ds-link-pill");
+    let data = common.data_attributes();
+    rsx! {
+        div {
+            id: common.id.clone(),
+            class,
+            role: "status",
+            "data-truth": truth,
+            "data-presence": presence,
+            "data-expanded": (expanded == Shown::Visible).then_some("true"),
+            "aria-label": common.aria_label.clone(),
+            title: "Copy link",
+            onmounted: move |event| common.mounted(event),
+            onpointerenter: move |_| hover.over(),
+            onpointerleave: move |_| {
+                hover.out();
+                copied.set(Copied::No);
+            },
+            onclick: {
+                let href = href.clone();
+                move |_| {
+                    copied.set(Copied::Yes);
+                    oncopy.call(href.clone());
+                }
+            },
+            ..data,
+            {words}
+        }
+    }
+}
+
+/// The `data-truth` word of `target`.
+fn truth(target: &LinkTarget) -> &'static str {
+    match target {
+        LinkTarget::Honest { .. } => "honest",
+        LinkTarget::Lying { .. } => "lying",
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use ds_motion::anim::Anim;
+    use super::{LinkTarget, truth};
 
     const CSS: &str = include_str!("link_pill.css");
 
     #[test]
-    fn the_pill_plays_its_own_recipe() {
-        let recipe = Anim::LinkPillIn.recipe();
-        let want = format!(
-            "animation:{} {} {};",
-            recipe.keyframes,
-            recipe.duration.var().reference(),
-            recipe.easing.var().reference()
-        );
-        assert!(CSS.contains(&want), "link_pill.css does not play {want}");
-        assert_ne!(
-            Anim::PaletteFade.recipe().keyframes,
-            recipe.keyframes,
-            "the pill must not borrow the popover's fade"
-        );
+    fn a_target_is_honest_or_lying() {
+        let honest = LinkTarget::Honest {
+            scheme_sub: "https://www.".to_string(),
+            registered: "acme.example".to_string(),
+            path: "/a".to_string(),
+        };
+        let lying = LinkTarget::Lying {
+            registered: "g00gle.xyz".to_string(),
+            shown: "google.com".to_string(),
+        };
+        assert_eq!(truth(&honest), "honest");
+        assert_eq!(truth(&lying), "lying");
+    }
+
+    #[test]
+    fn the_pill_fades_in_and_answers_the_pointer() {
+        for rule in [
+            "animation:fade var(--t-quick) var(--e-out);",
+            "cursor:pointer;",
+            "pointer-events:auto;",
+        ] {
+            assert!(CSS.contains(rule), "link_pill.css lacks {rule}");
+        }
     }
 
     #[test]

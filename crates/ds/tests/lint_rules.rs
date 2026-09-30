@@ -182,7 +182,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "unknown animation: a real Anim in the shorthand passes",
-        css: ".chip { animation: pill-up var(--t-big) var(--e-spring); }",
+        css: ".chip { animation: fade var(--t-big) var(--e-spring); }",
         profile: Profile::Strict,
         rule: Rule::UnknownAnimation,
         expect: false,

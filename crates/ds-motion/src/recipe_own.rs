@@ -13,27 +13,6 @@ pub(super) const MENU_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `pill-up`: a pill centred by `translateX(-50%)` springs up from below the
-/// edge, at `--t-big --e-out` (`S:706`). An entrance, so it holds nothing.
-pub(super) const PILL_UP: Recipe = recipe(
-    "pill-up",
-    DurationToken::Big,
-    EasingToken::Out,
-    Fill::None,
-    Iteration::Once,
-);
-
-/// `ring-drain`: the undo-send ring's dash drains over the send's grace period,
-/// linear (`S:2339`), and holds empty. `--t-send-ring` is a hold: Reduced does not shorten the
-/// time a person has to take a send back.
-pub(super) const RING_DRAIN: Recipe = recipe(
-    "ring-drain",
-    DurationToken::SendRing,
-    EasingToken::Linear,
-    Fill::Forwards,
-    Iteration::Once,
-);
-
 /// `fade-in` (C:1055): an ink veil fades to its resting `--veil` at `--t-move
 /// --e-out`, where `fade` runs to 1.
 pub(super) const FADE_IN: Recipe = recipe(

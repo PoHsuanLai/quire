@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use ds::ControlSize;
 use ds::components::overlays::sheet_width::SheetWidth;
+use ds::detail::{Operation, PendingToken};
 use ds::{Accessory, Align, Availability, Button, RowLeading};
 use ds::{
     Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette,
@@ -12,7 +13,7 @@ use ds::{
     HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile, HoverStat, HoverTarget, Icon,
     IconSize, IconSource, IconUrl, LinkPill, LinkTarget, Menu, MenuImage, MenuItem, MenuPlacement,
     PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue, Placement, Point, Popover, Px, Rect,
-    SendPhase, SendPill, Sheet, Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
+    SendPill, Sheet, Shown, Side, Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
 };
 
 use ds::{
@@ -596,32 +597,32 @@ pub const CASES: &[Case] = &[
     Case {
         component: "link_pill",
         state: "honest",
-        make: || rsx! { LinkPill { target: LinkTarget::Honest { scheme_sub: "https://www.".to_string(), registered: "rfc-editor.org".to_string(), path: "/rfc/rfc1939".to_string() } } },
+        make: || rsx! { LinkPill { href: "https://www.example.org/a".to_string(), oncopy: |_| {}, target: LinkTarget::Honest { scheme_sub: "https://www.".to_string(), registered: "rfc-editor.org".to_string(), path: "/rfc/rfc1939".to_string() } } },
         wait: NOW,
     },
     Case {
         component: "link_pill",
         state: "lying",
-        make: || rsx! { LinkPill { target: LinkTarget::Lying { registered: "g00gle-security.xyz".to_string(), shown: "google.com".to_string() } } },
+        make: || rsx! { LinkPill { href: "https://www.example.org/a".to_string(), oncopy: |_| {}, target: LinkTarget::Lying { registered: "g00gle-security.xyz".to_string(), shown: "google.com".to_string() } } },
         wait: NOW,
     },
     // SendPill: mounted below the edge, up a frame later, done.
     Case {
         component: "send_pill",
         state: "mounted",
-        make: || rsx! { SendPill { text: "Sending in 3 s", progress: Fraction(400), phase: SendPhase::Counting, onundo: |_| {} } },
+        make: || rsx! { SendPill { text: "Sending in 3 s", progress: Fraction(400), operation: Operation::Running(PendingToken::start()), onundo: |_| {} } },
         wait: NOW,
     },
     Case {
         component: "send_pill",
         state: "counting",
-        make: || rsx! { SendPill { text: "Sending in 3 s", progress: Fraction(400), phase: SendPhase::Counting, onundo: |_| {} } },
+        make: || rsx! { SendPill { text: "Sending in 3 s", progress: Fraction(400), operation: Operation::Running(PendingToken::start()), onundo: |_| {} } },
         wait: FRAME,
     },
     Case {
         component: "send_pill",
         state: "done",
-        make: || rsx! { SendPill { text: "Sent", progress: Fraction(1000), phase: SendPhase::Done, onundo: |_| {} } },
+        make: || rsx! { SendPill { text: "Sent", progress: Fraction(1000), operation: Operation::Idle, onundo: |_| {} } },
         wait: FRAME,
     },
     // EmptyState: each form, with an action and with Retry.

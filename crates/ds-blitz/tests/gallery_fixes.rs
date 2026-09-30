@@ -3,9 +3,10 @@
 //! markup side of each fix is in ds's goldens; these are the pictures the goldens cannot show.
 
 use dioxus::prelude::*;
+use ds::detail::{Operation, PendingToken};
 use ds::{
     Accessory, Appearance, Ds, Fraction, Grain, Icon, Material, PRESETS, Rect, Row, RowLeading,
-    Scheme, SectionHeader, SendPhase, SendPill, SpaceLook, Theme, use_toasts,
+    Scheme, SectionHeader, SendPill, SpaceLook, Theme, use_toasts,
 };
 use ds::{FieldBezel, FieldKind, TextField};
 use ds_harness::{Harness, Viewport};
@@ -166,7 +167,7 @@ fn SendApp() -> Element {
     rsx! {
         Root {
             div { style: "position:relative; height:340px",
-                SendPill { text: "Sending in 3 s", progress: Fraction(400), phase: SendPhase::Counting, onundo: |_| {} }
+                SendPill { text: "Sending in 3 s", progress: Fraction(400), operation: Operation::Running(PendingToken::start()), onundo: |_| {} }
             }
         }
     }

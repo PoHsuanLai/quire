@@ -21,9 +21,9 @@
 .ds-thread-dot{ padding-top:var(--s-6); }
 .ds-dot{
   display:block; width:8px; height:8px; border-radius:var(--r-pill); background:var(--accent-text);
-  transition:transform var(--t-quick) var(--e-out), opacity var(--t-quick) var(--e-out);
+  transition:opacity var(--t-quick) var(--e-out);
 }
-.ds-row[*|data-emphasis=plain] .ds-dot{ transform:scale(0) translateX(-6px); opacity:0; }
+.ds-row[*|data-emphasis=plain] .ds-dot{ opacity:0; }
 
 /* Text (`S:189-197`). */
 .ds-thread-main{ min-width:0; }

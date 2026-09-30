@@ -8,12 +8,7 @@ use ds_lint::{LintConfig, Profile, Rule, stylesheet};
 /// Sheets allowed to break the details rules, and why. Each is mail's (mailo pins quire by tag,
 /// so these change when mailo decides, design/05 section 12 item 4), or the keyframe table
 /// itself.
-const ALLOWED: &[(&str, Rule, &str)] = &[(
-    "motion",
-    Rule::OffGrammarTiming,
-    "the keyframe table's own pulse classes, each at its recipe's token (the send ring's \
-         countdown)",
-)];
+const ALLOWED: &[(&str, Rule, &str)] = &[];
 
 fn sheets() -> Vec<(&'static str, String)> {
     // The components' and the details' own sheets (the widgets' are linted with the widgets),
