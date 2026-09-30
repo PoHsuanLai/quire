@@ -50,6 +50,7 @@ pub use crate::{
         module_panel::{ModulePanel, PanelPlate},
         module_tile::ModuleTile,
         module_tile_kind::TileSpan,
+        pane::{PaneFooter, PaneHeader},
     },
     date_picker::{
         model::{DateValue, Elements, PickerStyle, Segment, TimeOfDay},
