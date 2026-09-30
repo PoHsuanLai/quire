@@ -28,8 +28,6 @@ dioxus = { version = "0.7", default-features = false, features = ["macro", "html
 
 [dev-dependencies]
 serde = { version = "1", features = ["derive"] }
-# `#[derive(Word)]` expands to `::ds_core::word::Word`, so a crate that derives it names ds-core.
-ds-core = { path = "../../crates/ds-core" }
 dioxus-ssr = "0.7"
 # The test driver: a real Blitz document on a fast-forwarded clock (CONSUMING.md section 5, rule 4).
 ds-harness = { path = "../../crates/ds-harness" }

@@ -3,14 +3,16 @@
 //! On a fieldless enum it emits `impl Word for X`: `ALL` in declaration order, `slug` (the
 //! variant in kebab-case, or the enum's `#[word(case = snake)]`, or a variant's
 //! `#[word(slug = "x")]`) and `label` (the variant's words in sentence case, or a variant's
-//! `#[word(label = "x")]`). `parse` is the trait's provided method. The generated code names the
-//! trait as `::ds_core::word::Word`, so a crate that derives it depends on `ds-core`; `Token` names
-//! `::ds_style::tokens`, so a crate that derives it depends on `ds-style`. Each of the two crates
+//! `#[word(label = "x")]`). `parse` is the trait's provided method. The
+//! generated code names the trait through the crate the caller depends on (`proc-macro-crate`):
+//! `::ds_core` (or `::ds_style` for `Token`) where the manifest names it, else `::ds::base` (or
+//! `::ds::style`), so a consumer that depends on `ds` alone can derive. Each of the two crates
 //! declares `extern crate self` under its own name to derive inside itself.
 
 mod attrs;
 mod case;
 mod expand;
+mod paths;
 mod token;
 mod token_attrs;
 

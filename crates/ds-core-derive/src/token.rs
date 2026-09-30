@@ -16,8 +16,9 @@ struct Member<'a> {
     values: Values,
 }
 
-/// `impl ::ds_style::tokens::token::Token for X`, or the reason `X` cannot have one.
+/// `impl <ds-style>::tokens::token::Token for X`, or the reason `X` cannot have one.
 pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
+    let style = crate::paths::style();
     let Data::Enum(data) = &input.data else {
         return Err(syn::Error::new_spanned(
             &input.ident,
@@ -55,35 +56,35 @@ pub(crate) fn expand(input: &DeriveInput) -> syn::Result<TokenStream> {
     let name = &input.ident;
     let vars = members.iter().map(|m| {
         let (ident, var) = (m.ident, &m.var);
-        quote! { #name::#ident => ::ds_style::tokens::name::VarName(#var), }
+        quote! { #name::#ident => #style::tokens::name::VarName(#var), }
     });
     let tuned = tuned_members(name, &tokens, &members);
     let value_fn = value_fn(name, &tokens, &members);
     let prefix = &tokens.prefix;
     let kind = match tokens.kind {
-        Kind::Fixed => quote! { ::ds_style::tokens::token::TokenKind::Fixed },
-        Kind::Tuned => quote! { ::ds_style::tokens::token::TokenKind::Tuned },
+        Kind::Fixed => quote! { #style::tokens::token::TokenKind::Fixed },
+        Kind::Tuned => quote! { #style::tokens::token::TokenKind::Tuned },
     };
     let input_method = match tokens.kind {
         Kind::Fixed => quote! {},
         Kind::Tuned => {
-            quote! { fn input(self) -> Option<::ds_style::tokens::name::VarName> { Some(#name::input(self)) } }
+            quote! { fn input(self) -> Option<#style::tokens::name::VarName> { Some(#name::input(self)) } }
         }
     };
     Ok(quote! {
         impl #name {
             /// The custom property this token is declared as.
-            pub const fn var(self) -> ::ds_style::tokens::name::VarName {
+            pub const fn var(self) -> #style::tokens::name::VarName {
                 match self { #(#vars)* }
             }
             #tuned
         }
 
-        impl ::ds_style::tokens::token::Token for #name {
+        impl #style::tokens::token::Token for #name {
             const PREFIX: &'static str = #prefix;
-            const KIND: ::ds_style::tokens::token::TokenKind = #kind;
+            const KIND: #style::tokens::token::TokenKind = #kind;
 
-            fn var(self) -> ::ds_style::tokens::name::VarName {
+            fn var(self) -> #style::tokens::name::VarName {
                 #name::var(self)
             }
 
@@ -125,12 +126,13 @@ fn check(tokens: &EnumTokens, members: &[Member], input: &DeriveInput) -> syn::R
 /// The inherent `input`, `fallback` and `write` of a tuned enum: the property a consumer writes,
 /// the value behind it, and the inline declaration that moves it.
 fn tuned_members(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> TokenStream {
+    let style = crate::paths::style();
     if tokens.kind == Kind::Fixed {
         return quote! {};
     }
     let inputs = members.iter().filter_map(|m| {
         let (ident, input) = (m.ident, m.input.as_ref()?);
-        Some(quote! { #name::#ident => ::ds_style::tokens::name::VarName(#input), })
+        Some(quote! { #name::#ident => #style::tokens::name::VarName(#input), })
     });
     let fallbacks = members.iter().filter_map(|m| {
         let ident = m.ident;
@@ -140,12 +142,12 @@ fn tuned_members(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> Token
     });
     quote! {
         /// The custom property a consumer writes to move this token.
-        pub const fn input(self) -> ::ds_style::tokens::name::VarName {
+        pub const fn input(self) -> #style::tokens::name::VarName {
             match self { #(#inputs)* }
         }
 
         /// The value the stylesheet falls back to when the consumer writes none.
-        pub fn fallback(self, scope: ::ds_style::tokens::token::TokenScope) -> &'static str {
+        pub fn fallback(self, scope: #style::tokens::token::TokenScope) -> &'static str {
             let _ = scope;
             match self { #(#fallbacks)* }
         }
@@ -222,24 +224,25 @@ fn resolve(values: &Values, ident: &Ident) -> syn::Result<Pick> {
 
 /// The one expression a variant's value is, given `scope` and the tuned input.
 fn value_expr(pick: &Pick) -> TokenStream {
+    let style = crate::paths::style();
     match pick {
         Pick::Fixed(value) => quote! { #value },
         Pick::Scheme { light, dark } => quote! {
             match scope.scheme {
-                ::ds_style::appearance::theme::Scheme::Light => #light,
-                ::ds_style::appearance::theme::Scheme::Dark => #dark,
+                #style::appearance::theme::Scheme::Light => #light,
+                #style::appearance::theme::Scheme::Dark => #dark,
             }
         },
         Pick::Typeface { system, editorial } => quote! {
             match scope.typeface {
-                ::ds_style::appearance::typeface::Typeface::System => #system,
-                ::ds_style::appearance::typeface::Typeface::Editorial => #editorial,
+                #style::appearance::typeface::Typeface::System => #system,
+                #style::appearance::typeface::Typeface::Editorial => #editorial,
             }
         },
         Pick::Level { standard, others } => {
             let arms = others.iter().map(|(level, text)| {
                 let level = Ident::new(level, proc_macro2::Span::call_site());
-                quote! { ::ds_style::appearance::motion::MotionLevel::#level => #text, }
+                quote! { #style::appearance::motion::MotionLevel::#level => #text, }
             });
             quote! {
                 match scope.motion {
@@ -253,9 +256,10 @@ fn value_expr(pick: &Pick) -> TokenStream {
 
 /// `fn css_value`: the css path's function, or a match over the variants' own values.
 fn value_fn(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> TokenStream {
+    let style = crate::paths::style();
     if let Some(path) = &tokens.css {
         return quote! {
-            fn css_value(self, scope: ::ds_style::tokens::token::TokenScope) -> ::ds_style::tokens::token::CssValue {
+            fn css_value(self, scope: #style::tokens::token::TokenScope) -> #style::tokens::token::CssValue {
                 #path(self, scope)
             }
         };
@@ -265,14 +269,14 @@ fn value_fn(name: &Ident, tokens: &EnumTokens, members: &[Member]) -> TokenStrea
         let pick = resolve(&m.values, ident).ok()?;
         let value = value_expr(&pick);
         Some(match &m.input {
-            None => quote! { #name::#ident => ::ds_style::tokens::token::CssValue::fixed(#value), },
+            None => quote! { #name::#ident => #style::tokens::token::CssValue::fixed(#value), },
             Some(_) => quote! {
-                #name::#ident => ::ds_style::tokens::token::CssValue::tuned(#name::input(self), #name::fallback(self, scope)),
+                #name::#ident => #style::tokens::token::CssValue::tuned(#name::input(self), #name::fallback(self, scope)),
             },
         })
     });
     quote! {
-        fn css_value(self, scope: ::ds_style::tokens::token::TokenScope) -> ::ds_style::tokens::token::CssValue {
+        fn css_value(self, scope: #style::tokens::token::TokenScope) -> #style::tokens::token::CssValue {
             let _ = scope;
             match self { #(#arms)* }
         }
