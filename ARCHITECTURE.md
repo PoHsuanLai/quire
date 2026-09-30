@@ -31,7 +31,6 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
 | `ds-gallery` | the visual reference binary: every component across theme, accent, motion, material |
 | `tools/icons` | app-icon post-process (binary) |
-| `anyrender_pdfrum` | anyrender scenes as vector PDF; leaves for the pdfrum repo as `pdfrum-anyrender` |
 | `blitz-kit` (own repo) | portable Blitz repairs shared with shell-host: hover sync, net provider, fonts, adapter, hit test, pixel snap; names no `ds*` crate |
 
 ### Allowed edges (workspace crates; everything else is forbidden)
@@ -46,12 +45,11 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds` | `ds-motion`, `ds-style`, `ds-core` |
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-settings-derive` |
-| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `anyrender_pdfrum` |
+| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
 | `ds-gallery` | `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` (snapshots) |
 | `tools/icons` | `ds-style`, `ds-core`, `ds-settings` |
-| `anyrender_pdfrum` | none of ours; no Blitz crate |
 
 Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds` with feature
 `testing`; `ds`, `ds-shell` and `ds-style` may dev-depend on `ds-lint`. Consumers (sill, mailo,
@@ -67,7 +65,6 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | `ds-core`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
-| `anyrender_pdfrum` | `blitz*`, `parley`, `stylo_taffy`, `dioxus*` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |
 
 `tokio` is named only by `ds-blitz` (the `launch` entry point owns the one runtime and hands a
