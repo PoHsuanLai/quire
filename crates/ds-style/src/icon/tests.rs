@@ -256,3 +256,30 @@ fn the_launcher_glyphs_are_lucides() {
         );
     }
 }
+
+/// The format bar's glyphs and the severity marks as Lucide 1.47.0 publishes them, in the actions
+/// set: `bold` is one outline, `italic` three strokes, `code` a pair of chevrons.
+#[test]
+fn the_format_and_severity_glyphs_are_lucides() {
+    const SHAPES: &[(Icon, usize)] = &[
+        (Icon::Bold, 1),
+        (Icon::Italic, 3),
+        (Icon::Underline, 2),
+        (Icon::Strike, 3),
+        (Icon::Code, 2),
+        (Icon::Info, 3),
+        (Icon::CircleCheck, 2),
+        (Icon::TriangleAlert, 3),
+    ];
+    for &(icon, count) in SHAPES {
+        assert_eq!(icon.shapes().len(), count, "{icon:?}");
+        assert!(
+            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
+            "{icon:?}"
+        );
+    }
+    assert_eq!(
+        Icon::Code.shapes().first(),
+        Some(&Shape::Path("m16 18 6-6-6-6"))
+    );
+}

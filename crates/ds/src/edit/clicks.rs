@@ -6,7 +6,8 @@ use ds_core::geometry::units::Point;
 use ds_style::tokens::delay::DelayToken;
 use std::time::Instant;
 
-/// Which press of a quick run this is: 1, 2, 3, then 1 again.
+/// Which press of a quick run this is: 1, 2, 3, then 1 again. A consumer's test builds one
+/// with `Clicks(2)`, for an `EditPointer`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Clicks(pub u8);
 

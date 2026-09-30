@@ -23,6 +23,7 @@ pub mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
 pub(crate) mod geometry_control;
+pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
 pub(crate) mod plate;
@@ -262,6 +263,23 @@ pub enum Icon {
     // design/26: quire's own glyph on Lucide's grid.
     /// Lucide `moon`'s outline, filled: the Focus module when it is on (`geometry_own`).
     MoonFilled,
+    // Text formatting (a format bar) and severity (a banner, a label).
+    /// Lucide `bold`.
+    Bold,
+    /// Lucide `italic`.
+    Italic,
+    /// Lucide `underline`.
+    Underline,
+    /// Lucide `strikethrough`.
+    Strike,
+    /// Lucide `code`: inline code.
+    Code,
+    /// Lucide `info`: a note.
+    Info,
+    /// Lucide `circle-check`: it worked.
+    CircleCheck,
+    /// Lucide `triangle-alert`: take care.
+    TriangleAlert,
 }
 
 impl Icon {
@@ -324,6 +342,14 @@ impl Icon {
             Icon::Clipboard => geometry_actions::CLIPBOARD,
             Icon::Smile => geometry_actions::SMILE,
             Icon::Globe => geometry_actions::GLOBE,
+            Icon::Bold => geometry_format::BOLD,
+            Icon::Italic => geometry_format::ITALIC,
+            Icon::Underline => geometry_format::UNDERLINE,
+            Icon::Strike => geometry_format::STRIKE,
+            Icon::Code => geometry_format::CODE,
+            Icon::Info => geometry_actions::INFO,
+            Icon::CircleCheck => geometry_actions::CIRCLE_CHECK,
+            Icon::TriangleAlert => geometry_actions::TRIANGLE_ALERT,
             shell => geometry_shell::shapes(shell),
         }
     }

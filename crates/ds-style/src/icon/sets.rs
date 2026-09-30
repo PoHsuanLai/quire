@@ -114,6 +114,16 @@ impl Icon {
         Icon::Globe,
         // A mixed check mark.
         Icon::Minus,
+        // A format bar: text styles.
+        Icon::Bold,
+        Icon::Italic,
+        Icon::Underline,
+        Icon::Strike,
+        Icon::Code,
+        // Severity: a banner's and a label's mark.
+        Icon::Info,
+        Icon::CircleCheck,
+        Icon::TriangleAlert,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -228,6 +238,14 @@ impl Icon {
         Icon::Clipboard,
         Icon::Smile,
         Icon::Globe,
+        Icon::Bold,
+        Icon::Italic,
+        Icon::Underline,
+        Icon::Strike,
+        Icon::Code,
+        Icon::Info,
+        Icon::CircleCheck,
+        Icon::TriangleAlert,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,

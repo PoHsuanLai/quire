@@ -8,7 +8,7 @@
 //! selection rects through the host (`ds_blitz::edit`). Positions name the app's elements by
 //! their `data-edit-node` value, so the app never sees a renderer's node ids.
 
-pub(crate) mod clicks;
+pub mod clicks;
 pub(crate) mod composition;
 pub mod handle;
 pub mod input;
