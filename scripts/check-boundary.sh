@@ -72,7 +72,7 @@ EDGES=(
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
   "ds-blitz: blitz-kit ds anyrender_pdfrum"
-  "ds-harness: ds ds-blitz"
+  "ds-harness: blitz-kit ds ds-blitz"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "icons: ds ds-settings"
   "anyrender_pdfrum:"

@@ -33,8 +33,6 @@ anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
 parley = { workspace = true }
 wgpu = { workspace = true }
-# The device handle anyrender_vello_hybrid paints with (`crate::gpu_adapter`).
-wgpu_context = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
 peniko = { workspace = true }

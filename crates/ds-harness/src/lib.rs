@@ -7,6 +7,7 @@
 //! ([`HarnessConfig::with_clock`]). Feature `pdf` adds [`pdf_app`] and [`Harness::pdf`].
 
 mod frame_view;
+mod gpu_device;
 mod gpu_paint;
 pub mod harness;
 mod harness_backend;
