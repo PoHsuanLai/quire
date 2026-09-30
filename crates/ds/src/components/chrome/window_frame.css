@@ -12,12 +12,18 @@
   position:relative; flex:0 0 auto; display:flex; align-items:center; height:28px; padding:0 var(--s-13);
   color:var(--f-ink-soft); cursor:default; user-select:none;
 }
-.ds-titlebar[*|data-activation=inactive]{ color:var(--f-ink-faint); }
+.ds-titlebar[*|data-activity=inactive]{ color:var(--f-ink-faint); }
 .ds-titlebar-title{
-  position:absolute; top:0; left:84px; right:84px; line-height:28px; text-align:center;
+  position:absolute; top:0; left:84px; right:84px; height:28px; display:flex; align-items:center; justify-content:center; gap:var(--s-6);
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
+.ds-titlebar-name{ min-width:0; }
+.ds-titlebar-subtitle{ min-width:0; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
+.ds-titlebar-proxy{ display:inline-flex; flex:none; line-height:0; color:var(--f-ink-soft); }
+.ds-titlebar[*|data-activity=inactive] .ds-titlebar-proxy{ opacity:.5; }
+/* The edited dot: the document has changes not saved. */
+.ds-titlebar-edited{ flex:none; width:var(--s-6); height:var(--s-6); border-radius:var(--r-pill); background:var(--f-ink-faint); }
 
 .ds-lights{ position:relative; display:flex; align-items:center; gap:var(--s-8); }
 .ds-light{
@@ -31,11 +37,11 @@
 .ds[*|data-theme=dark] .ds-light[*|data-light=close]{ color:var(--c-red-soft); }
 .ds[*|data-theme=dark] .ds-light[*|data-light=minimize]{ color:var(--c-amber-soft); }
 .ds[*|data-theme=dark] .ds-light[*|data-light=zoom]{ color:var(--c-green-soft); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=close],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=close],
 .ds-lights:hover .ds-light[*|data-light=close]{ background:var(--c-red); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=minimize],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=minimize],
 .ds-lights:hover .ds-light[*|data-light=minimize]{ background:var(--c-amber); }
-.ds-titlebar[*|data-activation=active] .ds-light[*|data-light=zoom],
+.ds-titlebar[*|data-activity=active] .ds-light[*|data-light=zoom],
 .ds-lights:hover .ds-light[*|data-light=zoom],
 .ds-light[*|data-light=zoom][*|aria-expanded=true]{ background:var(--c-green); }
 .ds-light-mark{ opacity:0; transition:opacity var(--t-quick) var(--e-out); }

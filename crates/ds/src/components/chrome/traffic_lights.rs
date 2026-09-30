@@ -1,7 +1,7 @@
 //! The traffic lights (design/04-COMPONENTS.md "Window frame"): close, minimize and zoom, 12 px
 //! discs 8 px apart at the titlebar's start. Coloured at rest in the active window, grey in an
 //! inactive one, and their marks appear while the pointer is over the group, as on macOS. The
-//! green one zooms on a click; held for `menu_press` or rested on for `menu_hover` (or
+//! green one zooms on a click, and always with Option held; held for `menu_press` or rested on for `menu_hover` (or
 //! right-clicked, or ArrowDown with the keyboard on it) it opens the tiling menu, whose
 //! placements the host cannot make are shown unavailable. Each light keeps its press: a press on
 //! a light never starts the titlebar's move, and a double-click on one never zooms.
@@ -86,7 +86,7 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
                     let opener = opener.clone();
                     move |event: PointerEvent| {
                         event.stop_propagation();
-                        if event.trigger_button() == Some(MouseButton::Primary) {
+                        if event.trigger_button() == Some(MouseButton::Primary) && !zooms(&event) {
                             after(hold, Waiting::Press, timing.menu_press, opener.clone());
                         }
                     }
@@ -94,7 +94,11 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
                 onpointerup: move |_| cancel(hold),
                 onpointerenter: {
                     let opener = opener.clone();
-                    move |_| after(hold, Waiting::Hover, timing.menu_hover, opener.clone())
+                    move |event: PointerEvent| {
+                        if !zooms(&event) {
+                            after(hold, Waiting::Hover, timing.menu_hover, opener.clone());
+                        }
+                    }
                 },
                 onpointerleave: move |_| cancel(hold),
                 ondoubleclick: move |event: MouseEvent| event.stop_propagation(),
@@ -132,6 +136,12 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
             }
         }
     }
+}
+
+/// Whether Option is held: the green light then only zooms, and neither a hold nor a rest on it
+/// opens the tiling menu (design/30 section 2.7).
+fn zooms(event: &PointerEvent) -> bool {
+    event.modifiers().contains(Modifiers::ALT)
 }
 
 /// A light that only acts on a click: close and minimize.

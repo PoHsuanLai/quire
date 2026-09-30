@@ -4180,7 +4180,7 @@ Hidden}, timing: FrameTiming }` (`WindowFrame::titlebar(title, lights)` takes th
 default timing). `WindowTitlebar { title, lights, timing, pose: TilePose::{Closed, Open} }` is
 the titlebar alone, for a gallery.
 **Markup.** The root stamps `data-window-frame="titlebar"` and becomes a column:
-`div.ds-titlebar[data-window][data-activation][data-first-mouse]` holding
+`div.ds-titlebar[data-window][data-activity][data-first-mouse]` holding
 `div.ds-lights[role=group]` (three `button.ds-light[data-light=close|minimize|zoom]`, each with
 an `svg.ds-light-mark`) and `span.ds-titlebar-title.ds-truncate`; then `div.ds-window-body`
 with the children; then eight `div.ds-resize-edge[data-edge]` (not while maximized or

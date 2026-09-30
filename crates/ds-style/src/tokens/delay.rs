@@ -50,6 +50,10 @@ pub enum DelayToken {
     /// 300 ms: an `EditSurface` checks the paragraphs that changed once the typing has paused
     /// this long (proposed, design/04-COMPONENTS.md section 50).
     SpellDebounce,
+    /// 500 ms: a held stepper button repeats once it has been down this long.
+    RepeatStart,
+    /// 70 ms: a held stepper button repeats at this pitch.
+    RepeatEvery,
 }
 
 impl DelayToken {
@@ -74,6 +78,8 @@ impl DelayToken {
             DelayToken::SwipeQuiet => 120,
             DelayToken::TypeaheadReset => 1000,
             DelayToken::SpellDebounce => 300,
+            DelayToken::RepeatStart => 500,
+            DelayToken::RepeatEvery => 70,
         })
     }
 }

@@ -10,7 +10,9 @@
 //! default, [`WindowFrame::None`], leaves the root's markup exactly as it was.
 
 use crate::components::chrome::resize_edges::ResizeEdges;
+use crate::components::chrome::titlebar_parts::TitleParts;
 use crate::components::chrome::traffic_lights::{TilePose, TrafficLightGroup};
+use crate::root::common::Common;
 use crate::window::grab::{Grab, GrabEffect};
 use crate::window::{
     host::{WindowHost, use_window_host, use_window_state},
@@ -20,6 +22,7 @@ use crate::window::{
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
+use ds_core::word::Word;
 
 /// Whether the window shows its traffic lights.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -42,6 +45,8 @@ pub enum WindowFrame {
     Titlebar {
         /// The window's title, centred and truncated.
         title: String,
+        /// What goes with the title: subtitle, proxy icon, the edited dot.
+        parts: TitleParts,
         /// Whether the lights are shown.
         lights: TrafficLights,
         /// The move threshold and the tiling menu's delays, from the settings.
@@ -54,8 +59,27 @@ impl WindowFrame {
     pub fn titlebar(title: impl Into<String>, lights: TrafficLights) -> Self {
         WindowFrame::Titlebar {
             title: title.into(),
+            parts: TitleParts::default(),
             lights,
             timing: FrameTiming::default(),
+        }
+    }
+
+    /// The same frame with `parts` beside its title; no frame has none.
+    pub fn with_parts(self, parts: TitleParts) -> Self {
+        match self {
+            WindowFrame::None => WindowFrame::None,
+            WindowFrame::Titlebar {
+                title,
+                lights,
+                timing,
+                ..
+            } => WindowFrame::Titlebar {
+                title,
+                parts,
+                lights,
+                timing,
+            },
         }
     }
 
@@ -75,10 +99,11 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
         WindowFrame::None => children,
         WindowFrame::Titlebar {
             title,
+            parts,
             lights,
             timing,
         } => rsx! {
-            WindowTitlebar { title, lights, timing }
+            WindowTitlebar { title, parts, lights, timing }
             div { class: "ds-window-body", {children} }
             ResizeEdges {}
         },
@@ -90,25 +115,32 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 /// on its empty area that travels past `timing.move_threshold` starts the move, once; a
 /// double-click zooms. Neither happens on a light, nor while the window is maximized or
 /// fullscreen. `data-first-mouse` lets the first click of an inactive window through
-/// (design/13 section 13.3.8).
+/// (design/13 section 13.3.8). `parts` are what goes with the title; `data-activity` says
+/// whether the window is the one the person works in.
 #[component]
 pub fn WindowTitlebar(
     title: String,
+    #[props(default)] parts: TitleParts,
     #[props(default)] lights: TrafficLights,
     #[props(default)] timing: FrameTiming,
     #[props(default)] pose: TilePose,
+    #[props(default)] common: Common,
 ) -> Element {
     let host = use_window_host();
     let state = use_window_state();
     let mut grab = use_hook(|| CopyValue::new(Grab::Idle));
     let movable = state.movable();
     let (on_move, on_leave) = (host.clone(), host.clone());
+    let data = common.data_attributes();
     rsx! {
         div {
-            class: "ds-titlebar",
+            id: common.id.clone(),
+            class: common.class("ds-titlebar"),
+            "aria-label": common.aria_label.clone(),
             "data-window": state.slug(),
-            "data-activation": state.activation_slug(),
+            "data-activity": state.activity().slug(),
             "data-first-mouse": "",
+            onmounted: move |event| common.mounted(event),
             onpointerdown: move |event: PointerEvent| {
                 let primary = event.trigger_button() == Some(MouseButton::Primary);
                 grab.set(match (primary, movable) {
@@ -131,10 +163,11 @@ pub fn WindowTitlebar(
                     host.host().zoom(Zoom::Toggle);
                 }
             },
+            ..data,
             if lights == TrafficLights::Shown {
                 TrafficLightGroup { timing, pose }
             }
-            span { class: "ds-titlebar-title ds-truncate", "{title}" }
+            {parts.view(&title)}
         }
     }
 }

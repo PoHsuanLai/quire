@@ -1,0 +1,16 @@
+/* Toolbar (design/30 section 2.7, `NSToolbar`). Attribute selectors carry `*|` (spike S2). A 52
+   px band: the leading items at the start, the title centred in what is left, the trailing items
+   at the end, `--s-12` in from each edge. The title is 13 pt semibold over an optional subtitle
+   in the faint ink; a control put in its place is centred the same way. Items are toolbar
+   buttons, each 40 px with its gap (the pitch the overflow rule counts by). */
+
+.ds-toolbar{
+  display:flex; align-items:center; box-sizing:border-box; flex:none; height:52px; padding:0 var(--s-12); gap:var(--s-8);
+  min-width:0; color:var(--ink); user-select:none;
+}
+.ds-toolbar-leading,
+.ds-toolbar-trailing{ display:flex; align-items:center; flex:none; gap:var(--s-8); }
+.ds-toolbar-trailing{ margin-left:auto; }
+.ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
+.ds-toolbar-heading{ max-width:100%; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
+.ds-toolbar-subtitle{ max-width:100%; font-size:var(--fs-help); color:var(--ink-faint); }
