@@ -22,7 +22,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
-| `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude`, `ds::testing` |
+| `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
 | `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
@@ -99,7 +99,8 @@ settings rows, headers, animated and leaving lists, preview pane, emoji grid, ap
 
 ## 3. From -> to (mechanical move)
 
-Paths are `crates/<crate>/src/...`. `ds/src/x` is today's location; the target is `crate::module`.
+<!-- paths: skip -->
+Where each old path went. Paths are `crates/<crate>/src/...`; `ds/src/x` is the old location, the target is `crate::module`.
 A name in `{...}` is a set of files. Anything not listed keeps its file name.
 
 ### `ds` -> `ds-core`
@@ -187,6 +188,7 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | `ds/tests/*_ssr.rs`, `ds/tests/{lint_*,self_lint,hig_lint,...}.rs`, `snapshots/` | beside the crate that owns the component (`ds`, `ds-shell`, `ds-lint`); `mailo_gaps*` files renamed by component |
 | `ds-native/examples/*` | `ds-blitz/examples/*` (pdf, print, window, edit, file_drop, second_window); `sizing_audit` -> `ds-gallery` |
 | `ds-gallery/src/pages/*_mailo*.rs`, `*_gaps.rs`, `polish*.rs` | `pages/<group>/<component>.rs` |
+<!-- paths: end -->
 
 ## 4. One home per concept
 
@@ -240,12 +242,12 @@ The single place a concept lives. Extend it; never write a second one.
 | Settings schema | `ds-settings::schema` (derived) |
 | Desktop preferences (portal) | `ds-settings::portal::SystemPrefsSource` |
 | Test driver, document queries | `ds-harness::{Driver, DocQuery, Query}` |
-| SSR rendering and golden files in tests | `ds::testing::{ssr, golden}` |
+| SSR rendering and golden files in tests | `crates/ds/tests/support/` (`golden.rs`, `scoped.rs`); `dioxus_ssr` |
 | Clipboard | `ds-blitz::clipboard::Clipboard` |
 | Net policy, `data:` URLs | `blitz-kit::net`, `blitz-kit::data_url` |
 | Hover sync, pixel snap, GPU adapter choice, transform-aware hit test | `blitz-kit::{hover, snap, adapter, hit}` |
 | PDF output, printing | `ds-blitz::{pdf, print}` |
-| Mail-only components | `ds::app` |
+| Mail-only components | `ds::components::app` |
 
 ## 5. Traits and closed enums
 
@@ -300,7 +302,7 @@ pub struct Vocabulary { pub keyframes: &'static [&'static str], pub inline_vars:
                         pub grammar_durations: &'static [DurationToken], pub grammar_easings: &'static [EasingToken] }
 pub struct Kit { pub rank: KitRank, pub tokens: &'static [TokenSet], pub sections: &'static [Section],
                  pub vocabulary: Vocabulary }
-pub enum KitRank { Style, Motion, Components, Shell, User }  // cascade order; fixed by rank, not by argument order; User is last (section 11)
+pub enum KitRank { Style, Motion, Components, Shell, User }  // cascade order; fixed by rank, not by argument order; User is last (section 10)
 pub struct Kits { ... }
 impl Kits { pub fn of(kits: &[&'static Kit]) -> Kits; pub fn stylesheet(&self) -> String;
             pub fn vocabulary(&self) -> Vocabulary; }
@@ -406,8 +408,6 @@ pub trait HostWindow { fn begin_move(&self); fn begin_resize(&self, edge: Resize
     fn zoom(&self, zoom: Zoom); fn minimize(&self); fn close(&self);
     fn tile(&self, tile: WindowTile) -> Result<(), TileError>;
     fn supports(&self, tile: WindowTile) -> Support; fn state(&self) -> WindowState; }
-// (HostWindow is 8 methods today and splits into `WindowMove { begin_move, begin_resize, state }`
-//  and `WindowPlace { zoom, minimize, close, tile, supports }` at the crate split.)
 
 // ds-core::spawner
 pub trait Spawner: Send + Sync {
@@ -482,30 +482,31 @@ assembly. A consumer that needs a name outside the prelude writes its home path 
 (`ds::style::tokens::shape::Radius`, `ds::base::word::Word`) and depends on `ds` alone, which is
 why consumers never name `ds-core`, `ds-style` or `ds-motion` in their manifests.
 
-`ds::prelude` (about 150 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
+`ds::prelude` (109 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
 from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
 | Group | Names |
 | --- | --- |
-| Root and appearance | `Ds`, `Surface`, `Kits`, `Theme`, `Accent`, `Motion`, `MotionLevel`, `Material`, `Scheme`, `SystemPrefs`, `Appearance`, `Resolved`, `Typeface`, `SpaceLook`, `Scope`, `use_scope` |
-| Vocabulary | `Word`, `Availability`, `Selection`, `Emphasis`, `Switch`, `Expanded`, `Check`, `Shown`, `Fraction`, `Percent`, `ShortcutKey`, `Shortcut`, `Here`, `DropState` |
-| Geometry | `Px`, `Point`, `Size`, `Rect`, `Scale`, `Placement`, `Alpha` |
-| Icons | `Icon`, `IconSource`, `IconView`, `IconSize`, `ExternalIcon`, `StatusState`, `BatteryGlyph`, `WifiGlyph`, `VolumeGlyph`, `BluetoothGlyph` |
-| `Cursor` (menus) | `MenuCursor` |
-| Fields | `TextField`, `FieldKind`, `FieldBezel`, `Validity`, `FieldFocus`, `EditSurface`, `SpellMarks` |
-| Overlays | `Alert`, `Popover`, `Sheet`, `Tooltip`, `TooltipKind`, `HoverCard`, `Toast`, `ToastHost`, `Scrim`, `Panel`, `DragGhost`, `use_overlays`, `use_toasts` |
-| Lists and content | `List`, `ListItem`, `Row`, `RowLeading`, `Accessory`, `RowAction`, `RowChord`, `SectionHeader`, `Avatar`, `ImageSource`, `RichText`, `TextLine`, `TextRun`, `ProviderMark`, `PreviewPane`, `EmojiGrid`, `PdfThumb` |
-| Chrome | `WindowFrame`, `TrafficLights`, `WindowHost`, `ResizeEdge`, `WindowState` |
-| Motion | `Anim`, `Presence`, `PresenceSpec`, `use_presence`, `Timeline`, `use_timeline`, `Exit`, `use_roster`, `use_pulse`, `use_swipe`, `use_drag`, `Detailed`, `Moment`, `use_detail`, `Cue` |
-| Host | `DocumentHost`, `use_document_host`, `SpellService`, `HostWindow`, `HostSignals`, `Focused`, `Measured` |
+| Root and appearance | `Ds`, `Surface`, `Accent`, `Appearance`, `Material`, `Motion`, `MotionLevel`, `SystemPrefs`, `Scheme`, `Theme`, `Typeface`, `use_scope`, `SpaceLook` |
+| Vocabulary | `Availability`, `Check`, `DropState`, `Emphasis`, `Fraction`, `Percent`, `Selection`, `Shortcut`, `ShortcutKey`, `Shown`, `Word` |
+| Geometry | `Placement`, `Scale`, `Point`, `Px`, `Rect`, `Size`, `Alpha` |
+| Icons | `ExternalIcon`, `IconSource`, `IconView`, `BatteryGlyph`, `BluetoothGlyph`, `StatusState`, `VolumeGlyph`, `WifiGlyph`, `Icon`, `IconSize` |
+| Menus | `MenuCursor` |
+| Fields | `EditSurface`, `TextField`, `FieldFocus`, `FieldBezel`, `FieldKind`, `Validity` |
+| Overlays | `Alert`, `DragGhost`, `HoverCard`, `Popover`, `Sheet`, `use_toasts`, `Tooltip`, `use_overlays` |
+| Lists and content | `Avatar`, `ImageSource`, `PdfThumb`, `ProviderMark`, `TextLine`, `TextRun`, `EmojiGrid`, `List`, `ListItem`, `PreviewPane`, `Accessory`, `RowAction`, `RowChord`, `RowLeading`, `Row`, `SectionHeader` |
+| Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
+| Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |
+| Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
+| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `EmptyState`, `Flow`, `SidePanel`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
 
-`ds_shell::prelude` (about 60 names) holds the shell components' names and `Widget`, `WidgetKind`,
-`WidgetRegistry`, `WidgetSize`, `WidgetHost`, `WidgetContext`. Mail-only components (`ds::app`)
-are reached as `ds::app::X`, not through the prelude.
+`ds_shell::prelude` (43 names) holds the shell components' names and `Widget`, `WidgetKind`,
+`WidgetRegistry`, `WidgetSize`, `WidgetHost`, `WidgetContext`. Mail-only components (`ds::components::app`)
+are reached as `ds::components::app::X`, not through the prelude.
 
 ### Renamed names (every public type name is unique per crate)
 
-| Today | Target |
+| Old | Current |
 | --- | --- |
 | `Layers` (`motion/detail/pending`) / (`shell/notifications/parts`) | `PendingLayers` / `StackLayers` |
 | `Placement` (`core/geometry`) / (`shell/catalog`, generic over kind, size, anchor) | `Placement` / `Placed` |
@@ -534,8 +535,8 @@ are reached as `ds::app::X`, not through the prelude.
    state `aria-*`.
 5. Add the name to `ds::prelude` only if a consumer draws it; otherwise it is reached by its
    group path.
-6. Tests: `crates/ds/tests/<name>_ssr.rs` (SSR through `ds::testing::ssr`, golden through
-   `ds::testing::golden`, then `ds_lint::assert_clean_markup`), and
+6. Tests: `crates/ds/tests/<name>_ssr.rs` (a `VirtualDom` rendered with `dioxus_ssr`, a golden through
+   `tests/support/golden.rs`, then `ds_lint::markup` filtered to the rule under test), and
    `crates/ds-conformance/tests/<name>.rs` when it responds to input or time (through `Driver`).
 7. Gallery: `crates/ds-gallery/src/pages/<group>/<name>.rs`, one `Page` registered in
    `registry.rs`. Add the `DESIGN.md` row that names the design section.
@@ -560,18 +561,18 @@ are reached as `ds::app::X`, not through the prelude.
    the crate's `KIT.tokens`. Nothing else: CSS emission and the lint vocabulary read `Kits`.
 3. A tuned token (a consumer writes its value inline) sets `KIND = Tuned` and its default is the
    settings key's default (`design/22-SETTINGS.md`).
-4. Tests: `ds-style/tests/tokens.rs` (every name a scheme or level block sets is declared on
+4. Tests: `ds-shell/tests/tokens.rs` (every name a scheme or level block sets is declared on
    `.ds`); a new token with a raw value fails `ds-lint` by design.
 
 ### Add a motion recipe or a Rust-driven animation
 
 1. Keyframes: add the `Anim` variant in `ds-motion/src/anim.rs` and one row in
-   `recipe/table.rs` (name, duration token, easing token, fill); the keyframes come from
-   `motion.css` and `keyframes.rs`. A variant a details moment plays is a row in `recipe/details.rs`.
+   `ds-motion/src/recipe.rs` (name, duration token, easing token, fill); the keyframes come from
+   `motion.css` and `css.rs`. A variant a details moment plays is a row in `recipe_detail.rs`.
 2. A Rust-driven value (level, count, glide): `impl Timeline` in
    `ds-motion/src/timeline/<name>.rs` and call `use_timeline`; never a new hook, never a `sleep`.
 3. Show/hide: `use_presence`; never a new phase enum.
-4. Tests: `ds-motion/tests/motion_drift.rs` (table against CSS), the implementor's `at` at
+4. Tests: `ds/tests/motion_drift.rs` (table against CSS), the implementor's `at` at
    `0`, `total/2`, `total` as a table test, and a conformance test with `Clock::Virtual`.
 
 ### Add a lint rule
@@ -637,8 +638,8 @@ are reached as `ds::app::X`, not through the prelude.
 | --- | --- | --- |
 | Pure function or step | table test: `const CASES: &[(Input, Expected)]`, one loop | beside the code |
 | Word, Token, Timeline, Detailed | table over `ALL` / sample instants / `moment_table` | the owning crate |
-| Component markup | SSR render, golden, `ds_lint::assert_clean_markup` | `crates/<crate>/tests/<component>_ssr.rs` |
-| Stylesheet | `ds_lint::assert_clean(css, &LintConfig::new(kits))` (`self_lint`) | `ds/tests/self_lint.rs`, `ds-shell/tests` |
+| Component markup | SSR render, golden, `ds_lint::markup` | `crates/<crate>/tests/<component>_ssr.rs` |
+| Stylesheet | `ds_lint::assert_clean(css, &LintConfig::new(kits))` (`self_lint`) | `ds-shell/tests/self_lint.rs` |
 | Component behaviour (pointer, keys, focus, time, paint) | `Harness` through `Driver` and `Query` | `ds-conformance/tests/<component>.rs` |
 | Host behaviour (frames, clipboard, edit, drop, spell, PDF) | `Harness` on the real `BlitzHost` | `ds-blitz/tests/<topic>.rs` |
 | Settings | `Store` on `ConfigRoot::Scratch`, `SystemPrefsSource::Fixed` | `ds-settings/tests` |
@@ -651,7 +652,7 @@ net, fonts and hover repair), so a test runs on the code production runs. Its cl
 `Clock::Wall` or `Clock::Virtual` (`with_clock`); a `Virtual` test asserts window boundaries
 exactly, a `Wall` test polls with `settle_until` and asserts order. Tests never touch the real
 system: no real XDG, no portal, no D-Bus, no clipboard, no GPU unless `Backend::Hybrid` is asked
-for. `SSR` needs no harness: `ds::testing::ssr` (feature `testing`) renders a component inside `Ds`.
+for. SSR needs no harness: a test renders a `VirtualDom` with `dioxus_ssr` (`crates/ds/tests/support/`).
 `sill` drives its surfaces through the same `Driver` trait once shell-host's headless surface
 implements it (the traits build with `ds-harness` default features off).
 
@@ -693,7 +694,7 @@ implements it (the traits build with `ds-harness` default features off).
   (HIG guardrails report as warnings); `Profile::Details` adds the details grammar's timing. Consumers read quire by path, so
   a new failing rule breaks every consumer's tests at once: tell their owners before it lands.
 - **Time in `ds*`** is read only through `ds_core::time::{now, since, sleep}`, never
-  `Instant::now()` or `futures_timer` directly (`ds-core/tests/clock_rule.rs`), so the virtual
+  `Instant::now()` or `futures_timer` directly (`ds/tests/clock_rule.rs`), so the virtual
   clock reaches it. Library crates never call `tokio::spawn`; they take a `Spawner`.
 - **Timing tests** on `Clock::Wall` never assert a state at one fixed instant near a settle,
   hover-intent, submenu or toast boundary: `Driver::advance` guarantees at least the time asked
@@ -711,77 +712,7 @@ implements it (the traits build with `ds-harness` default features off).
 - **`docs/licensing-references.md`** is the verified licence table the borrowing rules cite.
 - **Docs:** `DESIGN.md` names each module as `crate::module` and moves with every crate move.
 
-## 10. Migration order
-
-Each step lands through the gate worktree, keeps master green, and compiles sill by path. A step
-never leaves a re-export "for callers" except the one named: `ds` keeps today's root names, one
-path each; step 12 replaced them with the prelude.
-
-1. **Rename collisions** (done) (section 6) and the group order of section 2 inside `ds` (moves of
-   `emoji_grid`, `preview_*`, `level glyph`, `appearance_picker`, `edit_surface*`; `overlay` ->
-   `stack`); `check-boundary.sh` encodes the layers. sill is told the renames.
-2. **`Word`** (done): `ds-core-derive`, `ds_core::word` in-crate, then convert the 111 hand-written
-   `slug`s in batches by module; `SchemaVariants` and `schema/foreign.rs` go with the settings
-   derive (step 6).
-3. **`Token`, `TokenSet`, `Kit`, `Kits`** (done): `#[derive(Token)]` in `ds-core-derive`; every token
-   family converted to it (the hand-written `var`/`css` fns and hand-kept lint lists go); shell
-   metric tokens move to `shell/tokens/`, the stylesheet and `lint::registry` read `Kits`;
-   `lint` stops naming `motion`.
-4. **`Presence`, `Timeline`, `Shown`** (done): one `Presence` and `use_presence`, delete `osd_phase`,
-   `shown_phase`, `ListPresence`; one `use_timeline` with the six implementors; `Shown` to core;
-   `idle_dim` driver into `shell/`; `shot_frame` split; one battery drawing.
-4a. **Catalogue**: build design/30's merges and additions, foundations first, each sub-step through
-    the gate worktree:
-    1. tokens: (done) the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
-       Small, Regular, Large}` and `SizeScale` (1.6), the tokens as the one Look's values,
-       Motion levels reduced to Standard and Reduced;
-    2. vocabulary: (done) (1.5) `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
-       `RowState`, `Activity`, `FocusStyle`; the `Common` props; `ds::selectors`;
-    3. motion primitives: (done) (1.3) `Roster` (one hook), `use_collapse`, `rubber`, spring only, drop the
-       deleted keyframes, scalars and tokens; then interaction primitives (1.4): `LongPress`,
-       `Roving` + `Typeahead`, `HoverIntent` profiles, focus ring and `Highlight`, drag threshold;
-    4. P1 controls and fields: (done) `Label`, `Button` (+ `IconButton`), `Toggle`, `Checkbox`,
-       `RadioGroup`, `SegmentedControl`, `Slider`, `TextField`, `ProgressIndicator`,
-       `LevelIndicator`, `Badge`, `KeyEquivalent`;
-    5. menus and lists: (done) `Menu`, `MenuItem`, `PopUpButton`, `Disclosure`, `List`, `Row`,
-       `SectionHeader`; `RowBattery` became `Accessory::Battery`, composing `BatteryGlyph` (the device models stay in
-       `ds-shell::battery`);
-    6. overlays and feedback: (done) `Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`,
-       `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
-    7. (done) shell-only pieces (30 section 2.10) and app features (30 section 2.11), then the P2 components
-       (the app features and mail-only half, 4a.7b: done);
-    8. sill's switch-over (done: the local pieces L1-L16 of the component inventory) and one Look, Arc's ideas
-       as features (done);
-       the gallery and goldens per component; delete every name in 30 Part 4.
-5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes
-   `pub` at its home module or moves to its only consumer; the boundary script keeps the list
-   empty.
-6. **`ds-settings`** (done): `SettingsDoc`, `Store`, `ConfigRoot`, `SystemPrefsSource`, `Spawner` in
-   `ds-core::spawner`, `dioxus` as a feature, delete `diff.rs` and `test_dir.rs`; sill's settings
-   follow (unknown keys are reported).
-7. **`DocumentHost`** (done): the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
-   installing them all, `HostSignals`, delete every `Host*` newtype and the partial `provide`
-   sets, `Clipboard` trait; sill roots call `provide_host` (this fixes the partial seam).
-8. **Split bottom-up** (done), one crate per commit series, each with `ds` re-exporting: `ds-core`,
-   `ds-style`, `ds-motion`, `ds-lint`, then `ds-shell` (assembly stays in `ds`). Each split updates
-   the allowed-edges table in `check-boundary.sh` and `DESIGN.md`.
-9. **`ds-native` -> `ds-blitz` + `ds-harness`** (done): rename, then move the harness; `pdf`, `print`,
-   `spell` become features; `tokio` is named only in `launch`.
-10. **`Driver`/`DocQuery`** (done): replace the five constructors and `_with` pairs with `Input`;
-    `Query` extension trait.
-11. **`ds-conformance`** (done): move `ds-native/tests` by the section 3 rules, renaming work-named
-    files; move SSR tests beside their crates; `ds-gallery` pages regrouped.
-12. **`ds::prelude`** (done) replaces the root re-exports; a mechanical import rewrite in sill in the
-    same change; `ds_shell::prelude` likewise.
-13. **`blitz-kit`** (done) (cross-repo): create the repo from the section 3 rows, switch `ds-blitz` and
-    shell-host to it, delete both copies.
-14. **`anyrender_pdfrum`** moves to the pdfrum repo as `pdfrum-anyrender`; `ds-blitz`'s `pdf`
-    feature depends on it there.
-15. **Docs**: `CONSUMING.md` for the new crate names, `DESIGN.md` paths, delete this section.
-16. **User styles** (done) (section 11): `KitRank::User`, `UserStyle` + its watch in `ds-settings`, the
-    `user_style` prop on `Ds`, `ds::selectors`, `lint::user_stylesheet`.
-
-## 11. User styles
+## 10. User styles
 
 A person tunes their desktop in real time by editing one CSS file. quire owns the mechanism so
 every consumer (sill, mailo, any app on quire) gets it the same way.
@@ -791,7 +722,7 @@ every consumer (sill, mailo, any app on quire) gets it the same way.
 | The file | `ds-style::kit::UserStyle`, `ds-settings::user_style` | `UserStyle(String)` (a value in `ds-style`, so `ds` can take it as a prop; re-exported by `ds-settings`), a `SettingsDoc` with `FILE = "style.css"` under the app's config dir (`~/.config/<app>/style.css`), `Format::Css` (raw text, never parsed at load). A missing file is an empty style. |
 | Live reload | `ds-settings::Store::watch::<UserStyle>()` | the same watch every settings file uses (rename-safe, debounced); each change publishes the whole text |
 | Cascade slot | `ds-style::kit::KitRank::User` | always after every kit, so a user rule wins over the design system by order, never by `!important` |
-| Rendering | `ds::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet (no element while the style is blank); every surface root re-renders when it changes |
+| Rendering | `ds::prelude::Ds { user_style: ReadSignal<UserStyle> }` | the root renders the text in its own `<style data-ds-user>` after the design-system stylesheet (no element while the style is blank); every surface root re-renders when it changes |
 | Public selector surface | `ds::selectors` (a table, and its doc page) | what a user stylesheet may rely on: `[data-surface=<name>]` on every surface root; `.ds-<component>` on every component root; the parts each component lists as public (`.ds-<component>-<part>`); `data-variant`, `data-size`, `data-state`, `aria-*`; every token variable (`--<prefix><slug>`). Anything else is internal and may change without notice. |
 | Report | `ds-lint::user_stylesheet(css, &Kits) -> Vec<UserStyleNote>` | report-only, never blocks loading: unknown variables, selectors outside the public surface, `url()` that is not a local `file:`/`data:` URL, parse errors with line numbers |
 

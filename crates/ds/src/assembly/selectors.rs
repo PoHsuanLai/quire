@@ -1,4 +1,4 @@
-//! The public selector table: what a user stylesheet may rely on (ARCHITECTURE.md section 11,
+//! The public selector table: what a user stylesheet may rely on (ARCHITECTURE.md section 10,
 //! design/30 section 1.7).
 //!
 //! A person restyles their desktop by editing one CSS file after the design system's own. That

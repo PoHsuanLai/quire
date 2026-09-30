@@ -1,5 +1,5 @@
 //! A `<style>` whose text comes from a signal restyles the document when the signal changes
-//! (ARCHITECTURE.md section 11, "User styles": the reload path is verified in Blitz). A button
+//! (ARCHITECTURE.md section 10, "User styles": the reload path is verified in Blitz). A button
 //! steps the signal through red, green, a custom-property override, a changed override, and an
 //! empty stylesheet; the probe's computed fill and its painted pixel follow each step.
 
