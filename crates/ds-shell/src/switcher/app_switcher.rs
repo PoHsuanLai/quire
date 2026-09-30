@@ -131,9 +131,7 @@ pub fn AppSwitcher(
             style,
             onmounted: move |event| common.mounted(event),
             ..data,
-            div { class: "ds-frame",
-                div { class: "ds-grain" }
-            }
+            div { class: "ds-frame" }
             div { class: "ds-switcher-view",
                 div { class: "ds-switcher-row",
                     span { class: "ds-switcher-ring", "aria-hidden": "true" }

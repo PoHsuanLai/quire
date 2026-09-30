@@ -85,8 +85,11 @@ fn files() -> Vec<PathBuf> {
     ]
 }
 
+/// The window, settled: the targets' `onmounted` has run, so a drag entering finds them.
 fn harness() -> Harness {
-    Harness::new(Window, VIEW)
+    let mut harness = Harness::new(Window, VIEW);
+    harness.advance(std::time::Duration::from_millis(60));
+    harness
 }
 
 fn at(harness: &Harness, selector: &str) -> Point {

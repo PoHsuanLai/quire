@@ -251,23 +251,23 @@ fn the_stylesheet_is_inlined_only_when_asked() {
     assert!(!host.contains("<style"), "no <style> with Inject::Host");
 }
 
-/// Which materials draw the Space gradient's two layers and grain, and how: opaque and loose on
+/// Which materials draw the Space gradient's two layers, and how: opaque and loose on
 /// a window, grouped in `.ds-frame` (at the tint alpha) on shell chrome, not at all on a sheet,
 /// a toast, or a transparent root (design/21-SPACES.md sections 3 and 5).
 #[test]
 fn chrome_materials_draw_the_layers_in_a_tinted_frame() {
-    // (material, layers, grain, frame groups)
-    const CASES: &[(Material, usize, usize, usize)] = &[
-        (Material::Window, 2, 1, 0),
-        (Material::Bar, 2, 1, 1),
-        (Material::Dock, 2, 1, 1),
-        (Material::Popover, 0, 0, 0),
-        (Material::Sheet, 0, 0, 0),
-        (Material::Toast, 0, 0, 0),
-        (Material::Osd, 2, 1, 1),
-        (Material::Widget, 2, 1, 1),
+    // (material, layers, frame groups); no material draws grain
+    const CASES: &[(Material, usize, usize)] = &[
+        (Material::Window, 2, 0),
+        (Material::Bar, 2, 1),
+        (Material::Dock, 2, 1),
+        (Material::Popover, 0, 0),
+        (Material::Sheet, 0, 0),
+        (Material::Toast, 0, 0),
+        (Material::Osd, 2, 1),
+        (Material::Widget, 2, 1),
     ];
-    for &(material, layers, grain, frames) in CASES {
+    for &(material, layers, frames) in CASES {
         let root = render(Setup {
             material,
             ..Setup::default()
@@ -277,11 +277,7 @@ fn chrome_materials_draw_the_layers_in_a_tinted_frame() {
             layers,
             "{material:?}: {root}"
         );
-        assert_eq!(
-            root.matches("class=\"ds-grain\"").count(),
-            grain,
-            "{material:?}"
-        );
+        assert!(!root.contains("grain"), "{material:?} draws grain");
         assert_eq!(
             root.matches("class=\"ds-frame\"").count(),
             frames,
@@ -291,7 +287,7 @@ fn chrome_materials_draw_the_layers_in_a_tinted_frame() {
 }
 
 #[test]
-fn only_a_window_draws_the_frame_layers_and_grain() {
+fn only_a_window_draws_the_frame_layers_and_none_draws_grain() {
     let window = render(Setup {
         material: Material::Window,
         ..Setup::default()
@@ -299,7 +295,7 @@ fn only_a_window_draws_the_frame_layers_and_grain() {
     // Both layers share the one class; only the hidden one also carries `data-layer="back"`
     // (checked in `the_hidden_frame_layer_carries_the_back_attribute` below).
     assert_eq!(window.matches("class=\"ds-layer\"").count(), 2, "{window}");
-    assert_eq!(window.matches("class=\"ds-grain\"").count(), 1, "{window}");
+    assert!(!window.contains("grain"), "no grain on a window");
     let popover = render(Setup::default());
     assert!(!popover.contains("ds-layer"), "no layers on a popover");
     assert!(!popover.contains("ds-grain"), "no grain on a popover");

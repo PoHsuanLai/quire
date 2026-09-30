@@ -324,7 +324,7 @@ pub use ds_style::{
     scope::{Scope, use_scope},
     space::{
         frame_vars::FrameVars,
-        look::{CardAccent, Grain, SpaceLook},
+        look::{CardAccent, SpaceLook},
         palette::{Capping, Dot, derive, readout::readout, swatch},
         presets::{PRESETS, default_look},
         store::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex},

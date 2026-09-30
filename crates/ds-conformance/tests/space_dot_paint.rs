@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, CardAccent, Ds, FrameVars, Grain, Material, PRESETS, Scheme, Selection, Shortcut,
+    Appearance, CardAccent, Ds, FrameVars, Material, PRESETS, Scheme, Selection, Shortcut,
     ShortcutKey, SpaceLook, Theme,
 };
 use ds_harness::{Driver, Harness, Viewport};
@@ -20,7 +20,6 @@ const VIEW: Viewport = Viewport {
 fn frame(index: usize) -> FrameVars {
     let look = SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
-        grain: Grain(0),
         theme: Theme::Light,
         card_accent: CardAccent::Chosen,
     };

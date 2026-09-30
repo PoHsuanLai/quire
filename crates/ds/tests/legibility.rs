@@ -6,8 +6,8 @@ use ds::Alpha;
 use ds::Hex;
 use ds::Word;
 use ds::{
-    Accent, CardAccent, ColourToken, Dot, FrameVars, Grain, Material, PRESETS, Scheme, SpaceLook,
-    Theme, accent_of, derive, ratio, recipe,
+    Accent, CardAccent, ColourToken, Dot, FrameVars, Material, PRESETS, Scheme, SpaceLook, Theme,
+    accent_of, derive, ratio, recipe,
 };
 
 /// The alpha the settings key ships with (`appearance.material_tint_alpha = 80`).
@@ -169,7 +169,6 @@ fn every_preset_frame_is_legible() {
             for card_accent in [CardAccent::Chosen, CardAccent::SpaceHue] {
                 let look = SpaceLook {
                     dots: preset.dots.to_vec(),
-                    grain: Grain(40),
                     theme: Theme::System,
                     card_accent,
                 };

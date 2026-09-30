@@ -13,7 +13,7 @@ use ds::{
     HoverKind, HoverProfile, HoverTarget, List, ListItem, Material, Menu, MenuItem, Point, Px,
     RowState, Selection, ShortcutKey, ThreadRow, Toggle, use_hover_hub, use_toast_hub, use_toasts,
 };
-use ds::{FieldFocus, Grain, PRESETS, Scheme, SpaceLook, Theme};
+use ds::{FieldFocus, PRESETS, Scheme, SpaceLook, Theme};
 use ds_blitz::TokioSpawner;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -500,7 +500,6 @@ fn EditorApp() -> Element {
     let mut active = use_signal(|| DotIndex(0));
     let mut look = use_signal(|| SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
-        grain: Grain(35),
         theme: Theme::System,
         card_accent: ds::CardAccent::SpaceHue,
     });

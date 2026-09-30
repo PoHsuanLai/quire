@@ -1,4 +1,4 @@
-//! SpaceEditor: the field, dots, stops, grain, presets and contrast checks, plus the Space dots
+//! SpaceEditor: the field, dots, stops, presets and contrast checks, plus the Space dots
 //! that switch Spaces (design/04-COMPONENTS.md section 32, design/21-SPACES.md section 6).
 //! Every colour it shows comes from `space::palette`; it computes none.
 
@@ -18,7 +18,7 @@ use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
 use ds_style::space::look::{CardAccent, SpaceLook};
 use handles::Field;
-use parts::{Checks, GrainRow, Presets, Stops};
+use parts::{Checks, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};
 use rows::{MeasuredIn, MotionChoice};
 
@@ -118,7 +118,6 @@ pub fn SpaceEditor(
                 Field { look: look.clone(), scheme, current, picker, onchange }
                 Stops { look: look.clone(), scheme, current, picker, onchange }
             }
-            GrainRow { look: look.clone(), onchange }
             div {
                 SectionHeader { title: "Appearance" }
                 SegmentedControl::<Theme> {

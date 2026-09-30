@@ -16,7 +16,7 @@ Colour lives in two zones that never mix: the frame carries the Space, the card 
 
 | Zone | Tokens | Who sets them | Rule |
 | --- | --- | --- | --- |
-| Frame | `--f-ink`, `--f-ink-soft`, `--f-ink-faint`, `--f-pill`, `--f-pill-hover`, `--f-line`, `--f-solid`, plus the gradient layers and grain | derived from the Space's dots and theme (section 4) | Only frame elements use `--f-*`. |
+| Frame | `--f-ink`, `--f-ink-soft`, `--f-ink-faint`, `--f-pill`, `--f-pill-hover`, `--f-line`, `--f-solid`, plus the gradient layers | derived from the Space's dots and theme (section 4) | Only frame elements use `--f-*`. |
 | Card | `--paper`, `--surface`, `--surface-2`, `--raise`, `--ink*`, `--line*`, `--accent*`, `--seal`, `--ok`, `--warn`, `--danger`, `--shadow-*`, `--scrim` | fixed Post palette in the Space's theme (section 3), accent per section 5 | "The colour fills the window **around** the Post card, never inside it" (`S:818-819`). |
 
 `S:73-76` ("Every --f-* token is computed from the Space by the script."), `S:155` ("the card:
@@ -299,34 +299,10 @@ with the same chroma (`S:1425`, `S:1463`). Keyboard nudges on a handle: hue ±5 
 
 ## 8. Grain
 
-Grain is a 128 px grey-noise tile over the frame, its strength set per Space.
-
-```js
-const grainURL = (() => { try{
-  const c = document.createElement("canvas"); c.width = c.height = 128; const x = c.getContext("2d");
-  const img = x.createImageData(128, 128);
-  let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  for(let i = 0; i < img.data.length; i += 4){ const v = Math.floor(rnd()*255); img.data[i]=img.data[i+1]=img.data[i+2]=v; img.data[i+3]=255; }
-  x.putImageData(img, 0, 0); return c.toDataURL();
-}catch(e){ return ""; } })();
-```
-
-`S:1162-1168`
-
-| Property | Value | Source |
-| --- | --- | --- |
-| Tile | 128x128, repeated (`background-size:128px 128px`) | `S:87`, `S:1163` |
-| Generator | Park-Miller (Lehmer) PRNG, seed 7, multiplier 16807, modulus 2147483647 | `S:1165` |
-| Pixel | grey `v = floor(rnd × 255)` in R, G and B; alpha 255 | `S:1166` |
-| Blend | `mix-blend-mode:overlay` | `S:87` |
-| Opacity | `grain / 100 × 0.20` light, `× 0.16` dark; grain is 0..100 | `S:1188`, `S:875` |
-| Z | above the gradient layers (-1), below content | `S:87` |
-
-The design system replaces the overlay blend (unsupported in Blitz) with a pre-rendered PNG built
-from the same PRNG and seed as "128x128 alpha noise" (`P:288`, `P:421`).
-
-`C` defines `--grain:.035` light and `.05` dark for Post and 0 for the other looks, but no rule
-reads it (`C:34`, `C:99`, `P:1490-1491`).
+Removed (2026-09-30): no grain is painted anywhere (window frame, bar and dock chrome, Space previews). There is
+no grain tile, `.ds-grain` layer, `--f-grain` or `--z-grain` token, `Grain` type or editor control; a stored `grain` is an
+unknown key. The prototype's 128 px seeded noise tile (`S:1162-1168`) and its `grain / 100 x .20` opacity are
+history only.
 
 ## 9. The Space editor field
 
@@ -593,7 +569,7 @@ their sizes are unchanged, so they may be hard to read over very dark or very br
 
 | Material | Tint light | Tint dark | Edge | Shadow | Radius | Blur | Nearest precedent in `S` |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Window | `--f-grad` + `.ds-layer` + `.ds-grain` | same | none | none | 0 (the card inside keeps 12/12/12/4) | none | `.win` (`S:77-87`) |
+| Window | `--f-grad` + `.ds-layer` | same | none | none | 0 (the card inside keeps 12/12/12/4) | none | `.win` (`S:77-87`) |
 | Bar | `rgba(248,249,246,.70)` | `rgba(21,24,20,.68)` (settled 2026-09-24; .58 to .66 wave 1, to .68 over blur) | `inset 0 -0.5px 0 hairline` | none | 0 | behind | frame zone (section 4) |
 | Dock | `rgba(248,249,246,.59)` (settled 2026-09-24; was .55) | `rgba(21,24,20,.68)` (settled 2026-09-24; .50 to .66 wave 1, to .68 over blur) | `inset 0 0 0 .5px rgba(255,255,255,.55)` + highlight | `0 10px 30px -10px rgba(0,0,0,.35)` | 22 | behind | pinned tiles radius 12 (`S:109`) |
 | Popover | `rgba(255,255,255,.78)` | `rgba(42,47,40,.78)` | hairline + highlight | `--shadow-pop` = `0 18px 40px -16px rgba(0,0,0,.45)` | `--r-panel` 14 | behind | `.fmenu` (`S:665-666`) |
@@ -694,7 +670,7 @@ degrees and never leaves by more than .03 r.
 Each desktop workspace owns a SpaceLook, and the shell chrome takes its frame tokens.
 
 ```rust
-pub struct SpaceLook { dots: Vec<Dot>, grain: Grain(u8), theme: Theme, card_accent: CardAccent }
+pub struct SpaceLook { dots: Vec<Dot>, theme: Theme, card_accent: CardAccent }
 impl FrameVars { pub fn of(look:&SpaceLook, scheme:Scheme)->Self; pub fn style_attr(&self)->String }
 ```
 
@@ -703,7 +679,6 @@ impl FrameVars { pub fn of(look:&SpaceLook, scheme:Scheme)->Self; pub fn style_a
 | Field | Prototype equivalent | Range | Source |
 | --- | --- | --- | --- |
 | `dots` | `space.dots`, 1 to 3 `{h, c}` | h 0..360, c 0..1 | `S:1027`, `S:1425` |
-| `grain` | `space.grain` | 0..100 | `S:875`, `S:1027` |
 | `theme` | `space.mode`: system, light, dark | | `S:1027`, `S:1159` |
 | `card_accent` | `space.accent`: space, post | | `S:1027`, `S:1201-1203` |
 

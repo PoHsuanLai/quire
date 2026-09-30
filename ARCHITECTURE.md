@@ -477,7 +477,7 @@ point.
 
 Every crate re-exports its public items once, at its root or from one public module; modules are
 private; no glob re-exports; no `#[doc(hidden)]`. An item another crate needs is `pub` at its
-home module (`ds_style::css::grain`), one path, and absent from every prelude.
+home module (`ds_style::css::document`), one path, and absent from every prelude.
 
 `ds::prelude` (about 150 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
 from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:

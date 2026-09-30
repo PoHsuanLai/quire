@@ -34,8 +34,8 @@ name `ds`'s public surface, one path per item.
 | `ds-core/colour/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | `Verdict` |
 | `ds-core/colour/{srgb,oklab,fit}.rs` | 03-COLOR §4.2, §17.4, §20; 08-ICONS §1.5, §2.10 | `Srgb`, `LinearRgb`, `Oklab`, `Oklch` and their conversions, the one copy every colour computation uses; the prototype's gamut fit (`oklch_bytes`, `oklch_hex`) |
 | `ds-style/space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4.2-4.4, §5, §6, §9; 21-SPACES §2 | `Scheme`/`Capping` |
-| `ds-style/space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` |
-| `ds-style/space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | the frame's custom properties and grain opacity |
+| `ds-style/space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `CardAccent` |
+| `ds-style/space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | the frame's custom properties |
 | `ds-style/space/presets.rs` | 03-COLOR §7; 21-SPACES §4 | the eight presets as data; `default_look` |
 | `ds-style/appearance/{material,blur}.rs`, `ds-style/material/recipe.rs`, `ds-style/tokens/tint.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
 | `ds-style/material/{stack,layer}.rs`, `ds-style/tokens/vibrancy.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | `MaterialStack` (the highlight, hairline, shadow-strength and vibrancy keys, written inline by `Ds { stack }`); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
@@ -144,8 +144,8 @@ stack and the app switcher keep their leaving rows in.
 `SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
 `space_editor/field.rs` (the hue x chroma colour plane and the tiled round-dot cell over it,
 built once per scheme, and the mapping between a dot and its place on it, O-19),
-`space_editor/parts.rs` (stops, grain, presets, contrast checks); the field's PNGs are
-`ds-core/png.rs`'s, as is the grain tile (`ds-style/css/grain.rs`).
+`space_editor/parts.rs` (stops, presets, contrast checks); the field's PNGs are
+`ds-core/png.rs`'s.
 
 Props worth knowing: `TextField`
 `focus: FieldFocus{OnMount, Manual, Controlled}`; `Row` `drop:
