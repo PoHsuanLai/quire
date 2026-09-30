@@ -90,7 +90,7 @@ pub fn PolkitPrompt(
                     div { class: "ds-polkit-hint", "{line}" }
                 }
                 div { class: "ds-polkit-actions",
-                    Button { label: "Cancel", onclick: move |_| oncancel.call(()) }
+                    Button { answers: Answers::Escape, label: "Cancel", onclick: move |_| oncancel.call(()) }
                     Button { answers: Answers::Return, label: "Authenticate", availability, onclick: move |_| go() }
                 }
             }

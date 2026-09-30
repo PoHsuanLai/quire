@@ -6,7 +6,7 @@
 //! reorder them wraps each `WorkspacePill` in its own element and listens there.
 
 use dioxus::prelude::*;
-use ds::components::controls::press::PressListeners;
+use ds::components::controls::press::{ActivationKeys, PressListeners};
 use ds_core::press::Press;
 use ds_core::vocab::Selection;
 
@@ -37,6 +37,7 @@ pub fn WorkspacePill(
                 Selection::Unselected => "false",
             },
             onclick: move |event| listen.click(&event),
+            onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
             oncontextmenu: move |event| listen.context_menu(&event),
             onmouseup: move |event| listen.mouse_up(&event),
             "{label}"

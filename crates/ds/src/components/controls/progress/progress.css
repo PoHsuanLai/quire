@@ -54,11 +54,11 @@
 .ds-progress-indicator[*|data-age="11"]{ opacity:.13; }
 
 /* Ring: the track and the arc share one box; the arc's colour is the accent, the track's the
-   line. Unknown, the arc is turned by the loop's step (`--turn`). */
+   line. Unknown, the arc is turned by the loop's step. */
 .ds-progress[*|data-style=ring]{ width:var(--pg-box); height:var(--pg-box); }
 .ds-progress[*|data-style=ring] .ds-progress-track,
 .ds-progress[*|data-style=ring] .ds-progress-fill{ position:absolute; top:0; left:0; width:100%; height:100%; }
 .ds-progress[*|data-style=ring] .ds-progress-track{ color:var(--line); }
 .ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--accent); }
-.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(var(--turn)); }
+.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(calc(var(--step) * 30deg)); }
 .ds-progress-glyph{ position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }

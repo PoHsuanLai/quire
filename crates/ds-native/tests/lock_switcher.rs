@@ -387,7 +387,7 @@ fn the_polkit_prompt_submits_on_enter_shakes_when_wrong_and_cancels() {
     assert_eq!(dots(&harness, ".ds-polkit-field"), None, "emptied");
 
     let cancel = harness
-        .centre(".ds-polkit-actions .ds-button[*|data-variant=secondary]")
+        .centre(".ds-polkit-actions .ds-button[*|data-answers=escape]")
         .expect("Cancel");
     harness.click(cancel);
     harness.advance(ms(30));

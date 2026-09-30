@@ -99,14 +99,21 @@ fn a_controlled_request_still_focuses_and_reports_it() {
     );
 }
 
-/// The password never paints: the input holds the value, the mask holds one dot per character.
+/// A secure field never paints what is typed: the input is a password field that holds nothing in
+/// the markup, and the mask holds one dot per character.
 #[test]
-fn a_password_draws_dots_not_its_value() {
-    let harness = Harness::new(Fields, VIEW);
+fn a_secure_field_draws_dots_not_what_is_typed() {
+    let mut harness = Harness::new(Fields, VIEW);
+    harness.advance(ms(100));
     assert_eq!(
         harness.attr("#c input", "type").as_deref(),
         Some("password")
     );
+    assert_eq!(harness.attr("#c input", "value"), None, "no value written");
+    for c in "secret".chars() {
+        harness.key(ds::ShortcutKey::Char(c));
+        harness.advance(ms(20));
+    }
     assert_eq!(
         harness.text_of("#c .ds-input-mask").as_deref(),
         Some("••••••")

@@ -51,18 +51,18 @@ fn set(harness: &mut Harness, state: ModuleState) {
 }
 
 fn turn(harness: &Harness) -> Option<String> {
-    harness.attr("#wifi .ds-spinner", "style")
+    harness.attr("#wifi .ds-progress", "style")
 }
 
 #[test]
 fn a_busy_module_spins_its_ring_at_once_and_landing_on_takes_it_away() {
     let mut harness = virtual_harness(Tiles);
-    assert_eq!(harness.count("#wifi .ds-spinner"), 0);
+    assert_eq!(harness.count("#wifi .ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
     set(&mut harness, ModuleState::Busy);
     harness.advance(ms(0));
     assert_eq!(
-        harness.attr("#wifi .ds-spinner", "data-pending"),
+        harness.attr("#wifi .ds-progress", "data-pending"),
         Some("step".to_owned()),
         "no grace: the ring spins at once"
     );
@@ -72,12 +72,12 @@ fn a_busy_module_spins_its_ring_at_once_and_landing_on_takes_it_away() {
     // Ten seconds on it is still turning: there is no cap.
     harness.advance(ms(10_000));
     assert_eq!(
-        harness.attr("#wifi .ds-spinner", "data-pending"),
+        harness.attr("#wifi .ds-progress", "data-pending"),
         Some("step".to_owned())
     );
     set(&mut harness, ModuleState::On);
     harness.advance(ms(0));
-    assert_eq!(harness.count("#wifi .ds-spinner"), 0);
+    assert_eq!(harness.count("#wifi .ds-progress"), 0);
     assert_settles_to_zero_frames(&mut harness);
 }
 

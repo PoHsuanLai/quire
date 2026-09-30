@@ -66,14 +66,39 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &[],
     },
     ComponentSelectors {
+        component: "Badge",
+        root: "ds-badge",
+        parts: &["label"],
+    },
+    ComponentSelectors {
         component: "Button",
         root: "ds-button",
-        parts: &[],
+        parts: &["icon", "label"],
+    },
+    ComponentSelectors {
+        component: "Checkbox",
+        root: "ds-checkbox",
+        parts: &["indicator", "label"],
     },
     ComponentSelectors {
         component: "Chip",
         root: "ds-chip",
         parts: &["remove"],
+    },
+    ComponentSelectors {
+        component: "KeyEquivalent",
+        root: "ds-key-equivalent",
+        parts: &["key"],
+    },
+    ComponentSelectors {
+        component: "Label",
+        root: "ds-label",
+        parts: &[],
+    },
+    ComponentSelectors {
+        component: "LevelIndicator",
+        root: "ds-level-indicator",
+        parts: &["track", "fill", "icon"],
     },
     ComponentSelectors {
         component: "List",
@@ -91,6 +116,16 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &[],
     },
     ComponentSelectors {
+        component: "ProgressIndicator",
+        root: "ds-progress",
+        parts: &["track", "fill", "indicator", "glyph"],
+    },
+    ComponentSelectors {
+        component: "RadioGroup",
+        root: "ds-radio-group",
+        parts: &["item", "indicator", "label", "image"],
+    },
+    ComponentSelectors {
         component: "Row",
         root: "ds-row",
         parts: &[],
@@ -103,7 +138,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "SegmentedControl",
         root: "ds-segmented",
-        parts: &[],
+        parts: &["segment", "indicator", "label", "icon"],
     },
     ComponentSelectors {
         component: "Sheet",
@@ -113,7 +148,12 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Slider",
         root: "ds-slider",
-        parts: &["track", "fill", "thumb"],
+        parts: &["track", "fill", "thumb", "icon", "tick"],
+    },
+    ComponentSelectors {
+        component: "TextField",
+        root: "ds-text-field",
+        parts: &["frame", "icon", "suffix", "help", "tokens"],
     },
     ComponentSelectors {
         component: "Toast",
@@ -123,7 +163,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "Toggle",
         root: "ds-toggle",
-        parts: &[],
+        parts: &["track", "indicator"],
     },
 ];
 
@@ -152,6 +192,14 @@ pub const AXES: &[Axis] = &[
     Axis {
         attribute: "data-availability",
         meaning: "`Availability`: enabled, disabled, busy",
+    },
+    Axis {
+        attribute: "data-pressed",
+        meaning: "`PressPhase`: present while a pointer or a key holds the control down",
+    },
+    Axis {
+        attribute: "data-role",
+        meaning: "a button's role: normal or destructive",
     },
     Axis {
         attribute: "data-focus",

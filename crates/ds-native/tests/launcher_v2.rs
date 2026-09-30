@@ -421,7 +421,7 @@ fn a_pane_beside_the_results_widens_the_card_by_its_width() {
     );
     assert!((width(&harness, "#card .ds-palette-aside") - 360.0).abs() < 1.0);
     assert!((width(&harness, "#card > .ds-menu") - list).abs() < 1.0);
-    let field = harness.rect("#card .ds-search").expect("field");
+    let field = harness.rect("#card .ds-text-field").expect("field");
     let pane = harness.rect("#card .ds-palette-aside").expect("pane");
     let results = harness.rect("#card > .ds-menu").expect("results");
     assert!(

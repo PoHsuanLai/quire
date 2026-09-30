@@ -1,7 +1,7 @@
 //! ProgressIndicator (design/30 section 2.9, `NSProgressIndicator`): a bar, a spoke spinner or
 //! a ring. Markup: `div.ds-progress[data-style][data-size]` with `role="progressbar"`; a known
 //! share is `--f` on the fill and `aria-valuenow`; an operation without a known share is
-//! `data-pending` (`step` while it runs) and the loop's step, so nothing turns without an
+//! `data-pending` (`step` while it runs) and the loop's step as `--step` on the root, so nothing turns without an
 //! [`Operation`](ds_motion::detail::operation::Operation).
 
 use super::arc::{RingSpan, arc_path};
@@ -64,6 +64,7 @@ pub fn ProgressIndicator(
             "aria-valuemax": if known { Some("100") } else { None },
             "aria-valuenow": progress.valuenow().map(|now| now.to_string()),
             "aria-busy": if running { Some("true") } else { None },
+            style: step_of(frame).map(|step| format!("--step:{step}")),
             onmounted: move |event| common.mounted(event),
             ..data,
             match style {
@@ -83,10 +84,7 @@ fn bar(shown: Fraction, frame: PendingFrame) -> Element {
         div { class: "ds-progress-track",
             div {
                 class: "ds-progress-fill",
-                style: match step {
-                    Some(step) => format!("--step:{step}"),
-                    None => format!("--f:{}", shown.css()),
-                },
+                style: if step.is_some() { None } else { Some(format!("--f:{}", shown.css())) },
             }
         }
     }
@@ -110,12 +108,9 @@ fn spinner(frame: PendingFrame) -> Element {
 /// The ring: a full track and the arc over it, from twelve clockwise. Unknown, the arc is a
 /// quarter turned by the loop's step.
 fn ring(shown: Fraction, frame: PendingFrame, glyph: Option<IconSource>) -> Element {
-    let (span, turn) = match step_of(frame) {
-        Some(step) => (
-            RingSpan::FULL.filled(Fraction(250)),
-            Some(u16::from(step) * 30),
-        ),
-        None => (RingSpan::FULL.filled(shown), None),
+    let span = match frame {
+        PendingFrame::Step(_) => RingSpan::FULL.filled(Fraction(250)),
+        PendingFrame::Idle => RingSpan::FULL.filled(shown),
     };
     let arc = arc_path(span);
     let track = arc_path(RingSpan::FULL);
@@ -136,7 +131,6 @@ fn ring(shown: Fraction, frame: PendingFrame, glyph: Option<IconSource>) -> Elem
                 "data-ds-svg": "progress",
                 view_box: "0 0 100 100",
                 "aria-hidden": "true",
-                style: turn.map(|degrees| format!("--turn:{degrees}deg")),
                 path {
                     d,
                     fill: "none",

@@ -33,9 +33,10 @@ that rev.
   setting (a quarter, not `.55`) until design/22 decides the key. The tooltip's Fly label is
   CSS, so its delay is 2.5 x `--t-big` (1 s, the Tip profile's) until the Fly is driven by
   `HoverProfile::Tip`. `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
-  (`MenuTiming` carries its own). The pressed appearance (`data-pressed`) is written by `Button`
-  and `IconButton` only; the other controls lose the deleted press squish until step 4a.4
-  rebuilds them. `--focus-ring` (2.5 px) is read only by the preview pane; the global ring is
+  (`MenuTiming` carries its own). The pressed appearance (`data-pressed`) is written by `Button`,
+  `Toggle`, `Checkbox`, `RadioGroup`, `SegmentedControl` and `Slider`; rows, tiles and menu items
+  write it when steps 4a.5 and 4a.7 rebuild them, and no control writes `PressPhase::Held` until a
+  long-press consumer lands (the dock and titlebar menus). `--focus-ring` (2.5 px) is read only by the preview pane; the global ring is
   `--ring` with `--focus-gap`, and the ring's fade over `--t-quick` waits for Blitz to
   transition `outline`.
 - **The Mac Look applies part of design/30 section 3.2.** `Look::Mac` carries the neutral
@@ -46,6 +47,22 @@ that rev.
   (`accent_band::grounds`, `css::ground_css`, which read `Look::default()`) are not yet a
   Look's values; the second Look (step 4a.8) threads `TokenScope::look` to them and adds
   `Look::Arc` from the Post values recorded in design/30 section 3.2.
+- **Controls and fields of step 4a.4 have consumers and pieces still to move.**
+  `Button` keeps `Trailing::Caret` and `spinner::ring` (the halo a settings row and the preview pane
+  draw) until `PopUpButton` and `Row` (step 4a.5) take them; a button's `answers` (Return for the
+  default button, Escape for Cancel) marks it and the dialog routes the key (`Alert` does; `Sheet` in step
+  4a.6); the bar's `Bezel::StatusItem` ends when `MenuBarItem` (step 4a.7) lands; the Help bezel draws its
+  question mark as text because the icon set has no help glyph. `TextField` has no edit menu (Undo, Cut,
+  Copy, Paste, Select All) until `Menu{Popup}` (step 4a.5) and no truncation tooltip until `Tooltip`
+  (step 4a.6), and its search kind has neither the cancel button of a window's toolbar nor a suggestions
+  list; the file and multiline kinds and `Password` are gone (a mail signature editor is a `TextView`).
+  `Label` is built and the plain spans, `StatusLine`s and header fields are not yet moved onto it (each
+  moves with its component). `RadioGroup` can draw the Appearance choice, but `AppearancePicker` stays
+  until sill's control center switches over (step 4a.8). The battery rings of `ds-shell` draw their own
+  SVG on the arc geometry `ProgressIndicator` now owns; step 4a.7 recomposes them from it. The hover card's
+  `KeyHint` still draws its own key cap; step 4a.6 uses `KeyEquivalent`. A `Badge` at zero draws nothing,
+  so a row that reserved its width for the count no longer does.
+
 Upstream (pinned around; re-check at every toolchain bump):
 
 - **Blitz fork patch.** The restyle-on-cancelled-animation patch (`bf588142`) is not upstream.
@@ -106,7 +123,7 @@ Not built, or limited, in quire:
   paints in one redraw with no hook between.
 - **No tooltips for `title=` on the launch path.** Blitz draws none. Closing it means a host
   overlay that shows a quire `Tooltip` for a hovered element's `title`; meanwhile
-  `IconButton { tooltip }` and `HoverTarget` cover the places that matter.
+  `Button { title }` and `HoverTarget` cover the places that matter.
 - **Scrollbars on the launch path.** blitz-paint's `scrollbars` feature is off in the pinned
   block and quire's scroll containers set `scrollbar-width: none`; whether a window should draw
   a thumb (with `--scroll-thumb`) is a design decision not taken.
@@ -174,7 +191,7 @@ Not built, or limited, in quire:
   `use_sweep` (`--t-sweep` 700 ms) and should move onto it, as should the Batteries widget
   (whose `WakeStamp` contract sill's widgets use); until then `--t-fill` is outside the grammar's
   durations. `Touch::Contact` carries no velocity yet (design/27). `VolumeGlyph`'s slash fades
-  rather than draws on; drawing it would change `LevelControl` and the OSD too, left for the user
+  rather than draws on; drawing it would change the capsule `Slider`, the `LevelIndicator` and the OSD too, left for the user
   to ask.
 - **Widgets**: the month title on a see-through card defaults to `--ink-soft` (3.90:1 worst
   light, 5.19 dark) over the other option (the light card's tint at .96, 4.53:1); the user picks.
@@ -552,7 +569,7 @@ own caret and selection. The route needs no Blitz fork.
   dispatches `dblclick` and the blur of a field the click leaves.
 - **Programmatic focus dispatches no event** (Open items). Every host focus write that lands
   calls the target field's `onfocus` itself (`focus_soon_told`); `FieldHandle::blur()` calls
-  `onblur` itself; a node found by selector is matched to a mounted `TextInput` through
+  `onblur` itself; a node found by selector is matched to a mounted `TextField` through
   `GeometryHost::same` so it is told too.
 - **No `MountedData` can be built for a node found by selector**: `NodeHandle` has crate-private
   fields and no constructor. ds-native wraps a found node in its own `RenderedElementBacking`
@@ -840,7 +857,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - **Blitz sends a `click` to the release target even when the press began elsewhere**, so a
   press-drag-release onto a menu item would pick twice; the menu picks once.
 - **Right-click is `contextmenu`, never `click`; the middle button is `mouseup` only**
-  (`handle_pointerup`). `Button` and `IconButton` listen to all three and report a `Press`.
+  (`handle_pointerup`). `Button` listens to all three and reports a `Press`; a key (Return or Space on the focused button) reports one too, because Blitz raises no `click` for a key.
 - **Blitz's click default walks up to the first element with an action**, and a `summary` is
   one, so a button inside a summary toggles its `details` however propagation is stopped;
   `Propagation::Stop` also prevents the default (a `type=button` has none of its own). Pressing
@@ -1145,11 +1162,12 @@ What Blitz at the pinned rev paints (48 px, headless):
   the row less 9 legitimately covers the row's centre.
 - **List row name budget**: `NAME_BUDGET` = 26 characters, from a 980 px minimum window, about
   196 px of name column and about 7.4 px per character at ui 13.5 / 700.
-- **TextInput height** is `calc(1.55em + 16px)` boxed and `calc(1.55em + 8px)` inline (in `em`,
-  so larger fields stay one line).
-- **Button heights**: Primary carries a transparent `--hair` border so Primary, Secondary and
-  Danger share one height at each size (the background shows through a transparent border).
-  Danger at rest looks like Mini by design (design/04 section 1).
+- **TextField height**: a bezeled field's frame is the control size's height (`--ctl-h-*`, 22 at Regular) and its
+  input fills it inside the hairlines; a plain field has no height of its own and is one line of its parent's
+  text (its line height), so larger parents keep it one line.
+- **Button heights**: a push button carries a `--hair` border (transparent for the default button, so the
+  accent shows through it) so every push button stands the same height at a size; the size is the
+  control size's (16, 19, 22, 28), and Destructive is a role, not a smaller button.
 - **Compact month grid**: the today disc is `calc(2 * var(--fs-caption))` (20 px, the regular
   grid's digit-to-disc ratio); columns 20, rows 19; six weeks fit the small frame's 140 px
   content box.

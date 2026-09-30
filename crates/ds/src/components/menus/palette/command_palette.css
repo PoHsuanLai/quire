@@ -23,10 +23,10 @@
    query at 22/500 (`--fs-shell-field`) beside a 20 px search glyph (`--shell-field-glyph`);
    row titles 14 and details 12 (`--fs-shell-row`, `--fs-shell-detail`). Its shadow is the
    material stack's contact and ambient pair (`--m-box`). */
-.ds-palette[*|data-host=surface] .ds-search{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
-.ds-palette[*|data-host=surface] .ds-search > .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
-.ds-palette[*|data-host=surface] .ds-search .ds-input[*|data-variant=inline],
-.ds-palette[*|data-host=surface] .ds-search .ds-input-wrap[*|data-variant=inline] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
+.ds-palette[*|data-host=surface] .ds-text-field-frame{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
+.ds-palette[*|data-host=surface] .ds-text-field-icon .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
+.ds-palette[*|data-host=surface] .ds-text-field .ds-input[*|data-variant=plain],
+.ds-palette[*|data-host=surface] .ds-text-field .ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
 .ds-palette[*|data-host=surface] .ds-menu-title{ font-size:var(--fs-shell-row); }
 .ds-palette[*|data-host=surface] .ds-menu-detail{ font-size:var(--fs-shell-detail); }
 /* Kept mounted while hidden: nothing is laid out, and each showing replays
@@ -39,12 +39,11 @@
    hairline, `--aside` wide (the caller's `aside_width`). Over a window the card widens by the
    pane; in a surface it still fills its container, which the host widens. */
 .ds-palette{ --aside:0px; }
-.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto auto minmax(0, 1fr); }
+.ds-palette[*|data-aside=shown]{ display:grid; grid-template-columns:minmax(0, 1fr) auto; grid-template-rows:auto minmax(0, 1fr); }
 .ds-palette[*|data-host=overlay][*|data-aside=shown]{ width:min(calc(540px + var(--aside)), 96%); }
-.ds-palette[*|data-aside=shown] > .ds-search{ grid-row:1; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-search-tokens{ grid-row:2; grid-column:1 / -1; }
-.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:3; grid-column:1; min-width:0; }
-.ds-palette-aside{ grid-row:3; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
+.ds-palette[*|data-aside=shown] > .ds-text-field{ grid-row:1; grid-column:1 / -1; }
+.ds-palette[*|data-aside=shown] > .ds-menu{ grid-row:2; grid-column:1; min-width:0; }
+.ds-palette-aside{ grid-row:2; grid-column:2; display:flex; min-height:0; box-sizing:border-box; border-left:var(--hair) solid var(--line-soft); overflow:hidden; }
 /* The results' motions (design/26-DETAILS.md section 5.4): a group's Show More brings the rows
    it added in as inserted rows come (`row-in`); its Show Less heals everything after the last
    row kept up from `--dy`, the height the removed rows took, set on the list while it plays. At

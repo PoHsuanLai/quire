@@ -66,7 +66,7 @@ fn start(value: u16, motion: Motion) -> Harness {
 /// The painted fill's width: how far the fill's colour runs along the track's middle row from
 /// its left end, past the glyph.
 fn painted(harness: &mut Harness, name: &str) -> u32 {
-    let track = rect(harness, ".ds-level-track");
+    let track = rect(harness, ".ds-slider-track");
     let frame = harness.render().expect("renders");
     keep(&frame, name);
     // Below the glyph's ink (the volume glyph's spans about 6 to 16 in the 22 capsule), where the
@@ -107,9 +107,9 @@ fn a_level_set_from_outside_slides_over_t_quick() {
     harness.within(|| *VALUE.write() = Fraction(800));
     let quick = DurationToken::Quick.duration(MotionLevel::Standard);
     harness.advance(quick / 4);
-    let quarter = width(&harness, ".ds-level-fill");
+    let quarter = width(&harness, ".ds-slider-fill");
     harness.advance(quick / 4);
-    let half = width(&harness, ".ds-level-fill");
+    let half = width(&harness, ".ds-slider-fill");
     let half_painted = painted(&mut harness, "level-set-half");
     harness.advance(quick * 2);
     let after = painted(&mut harness, "level-set-after");
@@ -136,7 +136,7 @@ fn a_level_set_from_outside_slides_over_t_quick() {
 #[test]
 fn under_the_pointer_the_fill_follows_with_no_easing() {
     let mut harness = start(200, Motion::Standard);
-    let rail = rect(&harness, ".ds-level-rail");
+    let rail = rect(&harness, ".ds-slider-rail");
     let at = |share: f32| Point {
         x: Px(rail.origin.x.0 + rail.size.width.0 * share),
         y: Px(rail.origin.y.0 + 11.0),
@@ -144,16 +144,16 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
     harness.pointer_down(at(0.3));
     // The track is measured once per press, after layout; then the fill is the pointer's.
     harness.advance(ms(80));
-    let pressed = width(&harness, ".ds-level-fill");
+    let pressed = width(&harness, ".ds-slider-fill");
     harness.pointer_move(at(0.7));
     harness.advance(ms(16));
-    let moved = width(&harness, ".ds-level-fill");
+    let moved = width(&harness, ".ds-slider-fill");
     let followed = painted(&mut harness, "level-drag");
     println!("pressed at 30 %: {pressed:.1}; moved to 70 %: {moved:.1} (painted {followed})");
     assert_eq!(level(&mut harness), 700);
     assert_eq!(
-        harness.attr(".ds-level", "data-drag").as_deref(),
-        Some("live")
+        harness.attr(".ds-slider", "data-pressed").as_deref(),
+        Some("true")
     );
     assert!(
         (pressed - 60.0).abs() <= 1.0,
@@ -169,7 +169,7 @@ fn under_the_pointer_the_fill_follows_with_no_easing() {
 #[test]
 fn a_drag_past_the_end_never_stretches_the_track() {
     let mut harness = start(500, Motion::Standard);
-    let rail = rect(&harness, ".ds-level-rail");
+    let rail = rect(&harness, ".ds-slider-rail");
     let y = Px(rail.origin.y.0 + 13.0);
     harness.pointer_down(Point {
         x: Px(rail.origin.x.0 + 100.0),
@@ -181,14 +181,14 @@ fn a_drag_past_the_end_never_stretches_the_track() {
         y,
     });
     harness.advance(ms(16));
-    assert_eq!(width(&harness, ".ds-level-track"), rail.size.width.0);
-    assert_eq!(harness.attr(".ds-level", "data-over"), None);
+    assert_eq!(width(&harness, ".ds-slider-track"), rail.size.width.0);
+    assert_eq!(harness.attr(".ds-slider", "data-over"), None);
 }
 
 #[test]
 fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
     let mut harness = start(500, Motion::Standard);
-    let rail = rect(&harness, ".ds-level-rail");
+    let rail = rect(&harness, ".ds-slider-rail");
     let at = Point {
         x: Px(rail.origin.x.0 + 100.0),
         y: Px(rail.origin.y.0 + 11.0),
@@ -197,7 +197,7 @@ fn keys_step_by_sixteenths_and_shift_by_sixty_fourths() {
     harness.advance(ms(120));
     assert_eq!(level(&mut harness), 500, "a click at the middle keeps 50 %");
     assert!(
-        harness.is_focused(".ds-level"),
+        harness.is_focused(".ds-slider"),
         "the press focuses the control"
     );
     harness.key(ShortcutKey::Right);
