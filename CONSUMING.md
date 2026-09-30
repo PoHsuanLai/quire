@@ -479,11 +479,11 @@ table after it.
 ### Controls
 
 ```rust
-use ds::{Button, ButtonVariant};
+use ds::{Answers, Button};
 
 rsx! {
     Button {
-        variant: ButtonVariant::Primary,
+        answers: Answers::Return,
         label: "Send".to_owned(),
         icon: Some(ds::Icon::Send),
         onclick: move |_| send(),
@@ -518,7 +518,7 @@ rsx! {
 ### Overlays
 
 ```rust
-use ds::{Anchor, Button, ButtonVariant, Common, Menu, MenuKind, MountedRef, Shown, UndoToken, use_toasts};
+use ds::{Anchor, Button, Common, Menu, MenuKind, MountedRef, Shown, UndoToken, use_toasts};
 
 let toasts = use_toasts();
 toasts.push("Sent".to_owned(), None);   // ToastHost is already rendered by Ds — nothing else to mount
@@ -530,7 +530,6 @@ let mut open = use_signal(|| Shown::Hidden);
 let mut more = use_signal(|| None::<MountedRef>);
 rsx! {
     Button {
-        variant: ButtonVariant::Secondary,
         label: "More".to_owned(),
         onclick: move |_| open.set(Shown::Visible),
         common: Common {
@@ -564,7 +563,7 @@ Full catalogue (design doc section in parentheses):
 
 | Family | Components |
 | --- | --- |
-| Controls | `Button` (§1), `IconButton` (§2), `SegmentedControl<T>` (§3), `Toggle` (§4), `Slider` (§5), `TextInput` (§6), `SearchField` (§7), `CommandPill` (§8), `Kbd` (§9), `Chip` (§10), `Avatar` (§11), `Tabs<T>` (§12), `SectionHeader` (§13), `Count` (§14), `Spinner` (§15) |
+| Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `ListRow` (§16), `HoverStrip` (§17), `SidebarItem` (§19), `AnimatedList` (§16) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuEntry` (§20), `Popover` (§21), `Toast`/`use_toasts` (§23), `Scrim`/`Sheet`/`Peek` (§24), `CommandPalette<T>` (§25) |
 | Frame | `AppearancePicker` (§26), `AccountTile` (§27), `ProviderMark` (§28), `LinkPill` (§29), `SelectionBubble` (§30), `SendPill` (§31), `SpaceEditor` (§32), `EdgeStrip` (§33), `DragGhost` (§34), `SyncHalo` (§35) |
@@ -575,9 +574,9 @@ only orients you to which family a component is in and where its design spec liv
 
 A few props worth knowing about before you read the signatures:
 
-- `TextInput` takes `#[props(default)] focus: Focus` — `Focus::OnMount` focuses it as soon as it
+- `TextField` takes `#[props(default)] focus: FieldFocus` — `FieldFocus::OnMount` focuses it as soon as it
   mounts (the command palette's input, a bubble's link field); the default, `Focus::Manual`, is
-  what every other field wants; `Focus::Controlled(request)` focuses it on mount and again at
+  what every other field wants; `FieldFocus::Controlled(request)` focuses it on mount and again at
   every `request.request()` (the launcher gaps, below).
 - `ListRow` and `SidebarItem` take `#[props(default)] drop: DropState` (`Idle`, `Target`,
   `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
@@ -595,7 +594,7 @@ A few props worth knowing about before you read the signatures:
 
 Anchors, hover-card parts and undo:
 
-- `Button` and `IconButton` take `mounted: Option<EventHandler<MountedEvent>>`: the element
+- `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element
   itself, for `Anchor::Mounted` (the Overlays example above). It writes no attribute.
 - `HoverCard` takes `parts: Vec<HoverCardPart>` (`Title`, `Sub`, `Person`, `Stats`, `Flag`,
   `Messages`, `Foot`, `Actions`), drawn in order before its children: no hand-written
@@ -616,8 +615,8 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
   (`mask-image` over `currentColor`), so it follows `--ink`, hover, pressed and `--f-ink*` exactly
   like a glyph; `Image` shows the bitmap as it is. Which to use is design/08-ICONS.md §1.5's rule
   (freedesktop `*-symbolic`, or a pixmap whose opaque pixels all have OKLCH chroma < 0.04, is
-  symbolic; anything coloured is an image) and is the caller's decision. `IconButton { icon }`
-  and `Button { icon }` take an `IconSource`, and an `Icon` (or `Option<Icon>` for `Button`)
+  symbolic; anything coloured is an image) and is the caller's decision. `Button { icon }`
+  takes an `IconSource`, and an `Icon` (or `Option<Icon>` for `Button`)
   still converts, so existing call sites are unchanged. `ds::IconView { source, size }` draws one
   anywhere else. The URL loads through the document's net provider (ds-native and shell-host's
   `LocalNet` answer `data:` and `file:`), one frame late.
@@ -627,9 +626,9 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
       url: ds::IconUrl::file(&theme_path)?,
       size: ds::IconSize::Base,
   });
-  rsx! { IconButton { variant: IconButtonVariant::Tool, icon, label: title, onclick } }
+  rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon, label: title, onclick } }
   ```
-- **Pointer buttons and ids.** `Button` and `IconButton` take `id: Option<String>`, written as
+- **Pointer buttons and ids.** `Button` takes `common.id: Option<String>`, written as
   the element's `id` (a popup anchors to `tray-3` with no wrapper span). Their `onclick` is
   `EventHandler<ds::Press>`, `Press { button: PointerButton::{Primary, Secondary, Middle},
   modifiers }`: a right-click (which Blitz and browsers deliver as `contextmenu`, never as a
@@ -689,13 +688,13 @@ For a bar (FINDINGS "Bar gaps"):
 - **The frame ground.** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
   Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
   `--surface` is `--f-pill-hover`, `--surface-2` and `--raise` are `--f-pill`, `--line*` is
-  `--f-line`: `Button`, `IconButton`, `Chip`, `Count`, a menu's trigger and your text all draw in
+  `--f-line`: `Button`, `Chip`, `Badge`, a menu's trigger and your text all draw in
   the frame inks with no variant of their own. Overlays opened from it (menus, popovers,
   tooltips) are paper again.
-- **Status items.** `IconButton { variant: IconButtonVariant::Status, .. }` is a square of
+- **Status items.** `Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, .. }` is a square of
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
-  `pressed` or `expanded` is `On`. Write the two properties on any element around your items
+  `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items
   with `ds::StatusMetrics`, filled from your settings:
 
   ```rust
@@ -706,7 +705,7 @@ For a bar (FINDINGS "Bar gaps"):
           BarGlyphSize::IconSizeBar22 => bar.status_icon_box_px.0, // the glyph fills the box
       })),
   };
-  rsx! { div { class: "status", style: metrics.style_attr(), /* IconButton { Status } … */ } }
+  rsx! { div { class: "status", style: metrics.style_attr(), /* Button { bezel: StatusItem } … */ } }
   ```
   (`style_attr()` is `--bar-status-box:22px;--bar-status-glyph:16px;` at the defaults; custom
   properties with lengths on your own element pass the markup lint.) An external icon in a
@@ -760,7 +759,7 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
   }
   ```
 - **Giving a field the keyboard back.** `let field = ds::use_focus_request();` then
-  `TextInput { focus: Focus::Controlled(field), .. }` (or `CommandPalette { focus: Some(field),
+  `TextField { focus: FieldFocus::Controlled(field), .. }` (or `CommandPalette { focus: Some(field),
   .. }`), and `field.request()` from a handler (a menu's `onclose`) whenever the field should
   have the keyboard again. The field takes it as it mounts and at each request; nothing is
   remounted, so a palette does not replay its entrance.
@@ -827,7 +826,7 @@ Palette behaviour:
   one starts. Drop any "empty rect means unknown" fallback: `on_select_rect` never hands you
   one.
 - **`onkey` hands on the event.** `CommandPalette { onkey: Option<EventHandler<KeyboardEvent>> }`
-  (and `TextInput`'s and `SearchField`'s `onkey: EventHandler<KeyboardEvent>`): call
+  (and `TextField`'s `onkey: EventHandler<KeyboardEvent>`): call
   `event.prevent_default()` on a key you take, and Blitz does not also act on it (Tab no longer
   moves the focus off the field). A closure typed `|key: KeyboardData|` becomes
   `|key: KeyboardEvent|`; `key.key()`, `key.modifiers()` read as before.
@@ -993,7 +992,7 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | `text-overflow: ellipsis` | S13 | `.ds-truncate` (a mask-image fade) or `ds::clip_chars` for a real character-count ellipsis |
 | `:focus-visible` / `:focus-within` (hard-coded `false`) | S12 | `.ds[*|data-modality=keyboard] :focus` — `Ds`/`ds_native::launch` track modality for you; `Rule::FocusPseudoClass` |
 | `onmounted` + `get_client_rect()` inside the handler itself (returns 0×0) | S9 | `ds::use_rect()` — measures one frame later, never inside the handler; to anchor an overlay, `Anchor::Mounted` does this for you |
-| a click on a `Button`/`IconButton` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
+| a click on a `Button` whose parent holds only inline content (the button alone, or beside text) | blitz-dom hit test | put the button in a flex row (every quire container is one) or a block; the parent of an atomic inline is hit instead (`crates/ds-native/tests/click.rs`, FINDINGS "Polish pass") |
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_native::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::clip_chars` covers the line-clamp case |
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
@@ -1104,7 +1103,7 @@ offsets itself every frame, and it paints its own overlay scrollbar thumb. Every
 quire's side of that split (design/11 section 11.7); the engine itself is shell-host's.
 
 **Every scroll container hides Blitz's own scrollbar.** Every ds component whose content scrolls
-(`Menu`, `Panel`, `Sheet`, `TextInput`'s multiline kind) carries `scrollbar-width: none` in its own
+(`Menu`, `Panel`, `Sheet`, `EditSurface`) carries `scrollbar-width: none` in its own
 CSS. Blitz honours this at the DOM level (`blitz-dom`'s `Node::wants_scrollbar` returns `false`
 immediately when the computed `scrollbar-width` is `none`, before it even asks whether the content
 overflows) — the host's thumb is the only one that ever paints. Give your own scroll containers

@@ -7,7 +7,7 @@ use ds::{
     MarkSize, MarkStyle, ProviderMark, Trailing,
 };
 use ds::{Bezel, ControlSize};
-use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
+use ds::{FieldBezel, FieldKind, TextField};
 
 /// An account colour.
 const SLATE: Colour = Colour::Solid(Hex([0x2f, 0x7f, 0x6e]));
@@ -74,27 +74,11 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Button { common: Common { aria_label: Some("Strikethrough".to_string()), ..Common::default() }, bezel: Bezel::Inline, label: "Strike", face: ButtonFace::Strike, onclick: |_| {} } },
     },
     Case {
-        golden: "controls/text_input/secret-value-unwritten.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Secret, label: "App password", value: "hunter2", placeholder: "App password", oninput: |_| {} } },
+        golden: "controls/text_field/secret-value-unwritten.html",
+        make: || rsx! { TextField { kind: FieldKind::Secure, label: "App password", value: "hunter2", placeholder: "App password", oninput: |_| {} } },
     },
     Case {
-        golden: "controls/text_input/file-empty.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::File, label: "Signature image", value: "", placeholder: "No file chosen", oninput: |_| {}, on_pick: |()| {} } },
-    },
-    Case {
-        golden: "controls/text_input/file-chosen.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::File, label: "Signature image", value: "signature.png", oninput: |_| {}, on_pick: |()| {} } },
-    },
-    Case {
-        golden: "controls/text_input/multiline-fixed.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(3), grow: Grow::Fixed }, label: "Signature", value: "Poh\nAcme", placeholder: "Your signature", oninput: |_| {} } },
-    },
-    Case {
-        golden: "controls/text_input/multiline-grown.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Multiline { rows: Rows(2), grow: Grow::ToContent }, label: "Signature", value: "a\nb\nc\nd", oninput: |_| {} } },
-    },
-    Case {
-        golden: "controls/text_input/bare.html",
-        make: || rsx! { TextInput { variant: InputVariant::Bare, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
+        golden: "controls/text_field/bare.html",
+        make: || rsx! { TextField { bezel: FieldBezel::Plain, label: "Name", value: "Work", placeholder: "Name this Space", oninput: |_| {} } },
     },
 ];

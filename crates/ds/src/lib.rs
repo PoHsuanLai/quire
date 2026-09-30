@@ -100,11 +100,10 @@ pub use crate::components::{
     },
     editor::{spell_menu::SpellMarks, surface::EditSurface},
     fields::{
-        search_field::SearchField,
         selection_bubble::{BubbleAction, BubbleButton, BubbleMode, SelectionBubble},
-        text_input::{InputVariant, TextInput},
-        text_input_focus::FieldFocus,
-        text_input_kind::{Grow, Rows, TextInputKind},
+        text_field::TextField,
+        text_field_focus::FieldFocus,
+        text_field_model::{FieldBezel, FieldKind, Invalid, Validity},
     },
     lists::{
         animated_list::AnimatedList,

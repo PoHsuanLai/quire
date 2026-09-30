@@ -5,10 +5,11 @@
 use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
-    Anchor, Button, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon, InputVariant,
-    Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Radius, RowAction, RunTone,
-    Surface, TextInput, TextLine, TextRun, use_rect,
+    Anchor, Button, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon, Material, Menu,
+    MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Radius, RowAction, RunTone, Surface,
+    TextLine, TextRun, use_rect,
 };
 
 /// The recent searches a panel starts with.
@@ -121,8 +122,7 @@ pub fn FieldMenu() -> Element {
             note: "Cursor::Controlled: the field keeps the keyboard and its Up and Down move the highlight; the pointer only asks, through on_active. Each person's forget button acts without picking.",
             div { class: "g-row",
                 div { onmounted: move |event| field.on_mounted(event),
-                    TextInput {
-                        variant: InputVariant::Boxed,
+                    TextField {
                         label: "To",
                         value: String::new(),
                         placeholder: "Type a name, then Up and Down",

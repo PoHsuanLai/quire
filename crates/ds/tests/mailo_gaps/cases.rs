@@ -4,8 +4,7 @@ use dioxus::prelude::*;
 use ds::Check;
 use ds::{
     AccountFace, AccountTile, AddAccountTile, Button, Colour, Common, Fraction, Hex, ImageSource,
-    InputVariant, MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase, SendPill,
-    Shown, TextInput, TextInputKind,
+    MarkProvider, MarkStyle, PillAction, RowState, SendMood, SendPhase, SendPill, Shown,
 };
 use ds::{Avatar, Muting};
 use ds::{
@@ -13,6 +12,7 @@ use ds::{
     SidebarItem, TodayTrailing,
 };
 use ds::{Bezel, ControlSize};
+use ds::{FieldKind, TextField};
 
 /// A scheduled draft's favicon.
 const CLOCKED: AvatarFace = AvatarFace {
@@ -70,12 +70,12 @@ pub const CASES: &[Case] = &[
     },
     // TextInput: a password, empty (the placeholder) and filled (the dots).
     Case {
-        golden: "controls/text_input/password-empty.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Password, label: "Password", value: "", placeholder: "App password", oninput: |_| {} } },
+        golden: "controls/text_field/password-empty.html",
+        make: || rsx! { TextField { kind: FieldKind::Secure, label: "Password", value: "", placeholder: "App password", oninput: |_| {} } },
     },
     Case {
-        golden: "controls/text_input/password-filled.html",
-        make: || rsx! { TextInput { variant: InputVariant::Boxed, kind: TextInputKind::Password, label: "Password", value: "hunter2", oninput: |_| {} } },
+        golden: "controls/text_field/password-filled.html",
+        make: || rsx! { TextField { kind: FieldKind::Secure, label: "Password", value: "hunter2", oninput: |_| {} } },
     },
     // AccountTile: the favicon mark, and the Add account tile, with and without a hint.
     Case {

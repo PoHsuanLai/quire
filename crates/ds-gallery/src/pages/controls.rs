@@ -3,7 +3,6 @@
 use super::button_faces::ButtonFaces;
 use super::dock_tiles::DockTiles;
 use super::external_icons::ExternalIcons;
-use super::fields::{FieldKinds, Fields};
 use super::glyphs::Glyphs;
 use super::plate_tints::PlateTints;
 use super::status_items::StatusItems;
@@ -57,8 +56,6 @@ pub fn ControlsPage() -> Element {
         DockTiles {}
         PlateTints {}
         Choosers {}
-        Fields {}
-        FieldKinds {}
         Chips {}
         Faces {}
         Marks {}

@@ -7,13 +7,14 @@
 //! Space editor reports the dot picked inside it).
 
 use dioxus::prelude::*;
+use ds::TextField;
 use ds::{
     Anchor, AnimatedList, Appearance, Availability, Button, Check, Ds, Emphasis, Exit, HoverCard,
     HoverEvent, HoverKey, HoverKind, HoverProfile, HoverTarget, LeaveBy, ListRow, Material, Menu,
     MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState, Selection,
     ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
-use ds::{FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceLook, TextInput, Theme};
+use ds::{FieldFocus, Grain, PRESETS, Scheme, SpaceLook, Theme};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, TokioSpawner, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
@@ -474,8 +475,7 @@ fn ManualApp() -> Element {
 fn Field(focus: FieldFocus) -> Element {
     let mut text = use_signal(String::new);
     rsx! {
-        TextInput {
-            variant: InputVariant::Boxed,
+        TextField {
             label: "Link",
             value: text(),
             focus,

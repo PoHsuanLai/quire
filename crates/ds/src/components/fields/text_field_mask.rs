@@ -9,7 +9,7 @@
 //! range is a highlight over its dots and shows no caret. Without the host the renderer's
 //! caret stays.
 
-use crate::components::fields::text_input_kind::MASK_DOT;
+use crate::components::fields::text_field_model::MASK_DOT;
 use crate::host::caret::FieldSelection;
 use crate::host::document::DocumentHost;
 use dioxus::core::ScopeId;

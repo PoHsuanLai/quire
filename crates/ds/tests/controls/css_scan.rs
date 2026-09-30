@@ -34,19 +34,14 @@ pub const STYLES: &[(&str, &[&str])] = &[
         &[include_str!("../../src/components/controls/slider.css")],
     ),
     (
-        "text_input",
+        "text_field",
         &[
-            include_str!("../../src/components/fields/text_input.css"),
+            include_str!("../../src/components/fields/text_field.css"),
             include_str!("../../src/components/controls/button.css"),
             include_str!("../../src/components/content/icon_view.css"),
-        ],
-    ),
-    (
-        "search_field",
-        &[
-            include_str!("../../src/components/fields/search_field.css"),
-            include_str!("../../src/components/fields/text_input.css"),
+            include_str!("../../src/components/content/label.css"),
             include_str!("../../src/components/controls/chip.css"),
+            include_str!("../../src/components/controls/progress/progress.css"),
         ],
     ),
     (

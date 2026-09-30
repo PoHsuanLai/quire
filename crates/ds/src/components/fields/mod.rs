@@ -1,9 +1,8 @@
-//! Fields: the one text input, the search field and the bubble over a selection.
+//! Fields: the one text field and the bubble over a selection.
 
-pub(crate) mod search_field;
 pub(crate) mod selection_bubble;
-pub mod text_input;
-pub mod text_input_focus;
-pub mod text_input_kind;
-pub(crate) mod text_input_mask;
-pub(crate) mod text_input_parts;
+pub mod text_field;
+pub mod text_field_focus;
+pub(crate) mod text_field_mask;
+pub mod text_field_model;
+pub(crate) mod text_field_parts;

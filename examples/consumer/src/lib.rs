@@ -6,9 +6,10 @@
 //! `tests/coherence.rs` is the point of this crate: it runs the four coherence rules from
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
+use ds::{TextField};
 use ds::{Answers};
 use dioxus::prelude::*;
-use ds::{Anchor, Anim, Availability, Button, Common, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput, use_focus_request, use_motion_timer, use_toasts};
+use ds::{Anchor, Anim, Availability, Button, Common, Ds, FieldFocus, Icon, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, use_focus_request, use_motion_timer, use_toasts};
 use ds_native::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
@@ -85,8 +86,7 @@ fn Page() -> Element {
 
     rsx! {
         div { class: "page",
-            TextInput {
-                variant: InputVariant::Boxed,
+            TextField {
                 label: "Subject".to_owned(),
                 value: subject(),
                 oninput: move |value| subject.set(value),

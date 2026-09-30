@@ -11,7 +11,7 @@ use dioxus::core::Runtime;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
-/// A handle on one field: pass it as `TextInput { handle: Some(handle) }`, which fills it as the
+/// A handle on one field: pass it as `TextField { handle: Some(handle) }`, which fills it as the
 /// field mounts. Before that (or after the field unmounts) every call does nothing.
 ///
 /// A focus or blur through the host (Blitz) dispatches no event, so the handle calls the field's

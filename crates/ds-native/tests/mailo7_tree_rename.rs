@@ -5,9 +5,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Ds, FieldFocus, Icon, InputVariant, Material, PlaceId, ShortcutKey, Shown,
-    TextInput, TreeItem, TreeShape, use_focus_request,
+    Appearance, Ds, FieldFocus, Icon, Material, PlaceId, ShortcutKey, Shown, TreeItem, TreeShape,
+    use_focus_request,
 };
+use ds::{FieldBezel, TextField};
 use ds_native::harness::settle_until;
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
@@ -41,7 +42,7 @@ fn Page(start: Start) -> Element {
     let request = use_focus_request().with_select_all();
     let editing = renaming().then(|| {
         rsx! {
-            TextInput { variant: InputVariant::Bare, label: "Rename folder", value: name(),
+            TextField { bezel: FieldBezel::Plain, label: "Rename folder", value: name(),
                 focus: FieldFocus::Controlled(request),
                 oninput: move |next: String| name.set(next),
                 onkey: move |event: KeyboardEvent| match event.key() {
