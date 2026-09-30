@@ -1,9 +1,9 @@
 //! The two keyboard events a ds `Menu` feeds (`Select`, `Expand`) and the tracker that starts
 //! open (`MenuTrack::open`), where the Menu's submenus are driven by this machine.
 
+use crate::core::vocab::PressPhase;
 use crate::stack::menu_track::types::{
-    ItemPath, MenuHold, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,
-    Submenu,
+    ItemPath, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Submenu,
 };
 use std::sync::LazyLock;
 use std::time::{Duration, Instant};
@@ -50,7 +50,7 @@ fn an_open_tracker_is_in_click_mode() {
     let MenuPhase::Tracking(session) = &track.phase else {
         panic!("expected an open menu");
     };
-    assert_eq!(session.held, MenuHold::Released);
+    assert_eq!(session.held, PressPhase::Idle);
 }
 
 #[test]

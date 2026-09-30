@@ -5,6 +5,7 @@
 
 use crate::core::geometry::units::{Point, Px};
 use crate::core::press::{PointerButton, Press};
+use crate::core::vocab::PressPhase;
 use crate::focus::click::kept_click;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
@@ -118,6 +119,57 @@ impl PressListeners {
             self.propagation.apply(event);
             self.press.call(press_of(event, PointerButton::Middle));
         }
+    }
+}
+
+/// Where the press on a control stands, for `data-pressed` (design/30 section 1.4): down by the
+/// primary button or by Space or Return, until it is released, leaves the control or the control
+/// loses the keyboard. A control puts [`Pressing::listeners`] on its element and writes
+/// [`Pressing::attr`].
+#[derive(Clone, Copy)]
+pub struct Pressing {
+    phase: Signal<PressPhase>,
+}
+
+/// A [`Pressing`] for one control.
+pub fn use_pressing() -> Pressing {
+    Pressing {
+        phase: use_signal(PressPhase::default),
+    }
+}
+
+impl Pressing {
+    /// `data-pressed`: `"true"` while a press is under way.
+    pub fn attr(&self) -> Option<&'static str> {
+        self.phase.read().attr()
+    }
+
+    fn set(&self, next: PressPhase) {
+        let mut phase = self.phase;
+        if *phase.peek() != next {
+            phase.set(next);
+        }
+    }
+
+    /// The pointer went down.
+    pub fn pointer_down(&self, event: &MouseEvent) {
+        if button_of(event.trigger_button()) == Some(PointerButton::Primary) {
+            self.set(PressPhase::Pressed);
+        }
+    }
+
+    /// A key went down: Space and Return press a control.
+    pub fn key_down(&self, event: &KeyboardEvent) {
+        if matches!(event.key(), Key::Enter)
+            || matches!(event.key(), Key::Character(ref text) if text == " ")
+        {
+            self.set(PressPhase::Pressed);
+        }
+    }
+
+    /// The press ended, or left the control.
+    pub fn released(&self) {
+        self.set(PressPhase::Idle);
     }
 }
 

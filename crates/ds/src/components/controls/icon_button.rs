@@ -3,7 +3,7 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::button_size::disabled;
-use crate::components::controls::press::{PressListeners, Propagation};
+use crate::components::controls::press::{PressListeners, Propagation, use_pressing};
 use crate::core::press::Press;
 use crate::core::vocab::{Availability, Check, Shown};
 use crate::core::word::Word;
@@ -80,6 +80,7 @@ pub fn IconButton(
     let pressed = pressed.map(|state| state.aria());
     let expanded = expanded.map(|state| state.aria());
     let listen = PressListeners::new(onclick).with_propagation(propagation);
+    let pressing = use_pressing();
     let live = availability == Availability::Enabled;
     rsx! {
         button {
@@ -94,6 +95,12 @@ pub fn IconButton(
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
             disabled: disabled(availability),
+            "data-pressed": if live { pressing.attr() } else { None },
+            onmousedown: move |event| pressing.pointer_down(&event),
+            onmouseleave: move |_| pressing.released(),
+            onkeydown: move |event| pressing.key_down(&event),
+            onkeyup: move |_| pressing.released(),
+            onblur: move |_| pressing.released(),
             onclick: move |event| {
                 if live {
                     listen.click(&event);
@@ -105,6 +112,7 @@ pub fn IconButton(
                 }
             },
             onmouseup: move |event| {
+                pressing.released();
                 if live {
                     listen.mouse_up(&event);
                 }

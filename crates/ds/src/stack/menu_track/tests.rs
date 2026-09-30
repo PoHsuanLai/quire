@@ -2,12 +2,13 @@
 //! sill's `bar/menu_track/tests.rs`).
 
 use crate::core::geometry::units::{Point, Px};
+use crate::core::vocab::PressPhase;
 use crate::stack::menu_track::{
     triangle::{inside, shielded},
     types::{
-        Branch, ItemPath, MenuAnim, MenuDirection, MenuHold, MenuKey, MenuPhase, MenuTarget,
-        MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session,
-        ShownBy, Submenu,
+        Branch, ItemPath, MenuAnim, MenuDirection, MenuKey, MenuPhase, MenuTarget, MenuTiming,
+        MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session, ShownBy,
+        Submenu,
     },
 };
 use std::sync::LazyLock;
@@ -92,11 +93,11 @@ fn open_on_press_click_mode_and_toggle() {
     // Section 13.8 test 1.
     let (phase, effects) = run(vec![(0, Event::PressTitle(A))]);
     assert_eq!(effects, vec![Effect::Open(A, MenuAnim::Pop)]);
-    assert_eq!(session(&phase).held, MenuHold::Held);
+    assert_eq!(session(&phase).held, PressPhase::Pressed);
     let (phase, _) = run(click_open());
     assert_eq!(
         session(&phase).held,
-        MenuHold::Released,
+        PressPhase::Idle,
         "release on the title leaves it open"
     );
     let (phase, effects) = run([click_open(), vec![(500, Event::PressTitle(A))]].concat());
@@ -184,12 +185,12 @@ fn hover_switch_swaps_menus_in_one_step_without_animation() {
         vec![Effect::Open(A, MenuAnim::Pop), Effect::Check(B)]
     );
     let session = session(&phase);
-    assert_eq!((session.menu, session.held), (B, MenuHold::Released));
+    assert_eq!((session.menu, session.held), (B, PressPhase::Idle));
 }
 
 /// One row of the click-after-switch table: its name, the script, and the open menu with how it
 /// was shown and whether its press is still down (`None` when the tracker closed).
-type SwitchCase = (&'static str, Script, Option<(Key, ShownBy, MenuHold)>);
+type SwitchCase = (&'static str, Script, Option<(Key, ShownBy, PressPhase)>);
 
 /// With A open in click mode and the pointer switched to B (its title shows B, hover-shown).
 fn switched_to_b() -> Script {
@@ -208,12 +209,12 @@ fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
         (
             "switched to by hover",
             switched_to_b(),
-            Some((B, ShownBy::Hover, MenuHold::Released)),
+            Some((B, ShownBy::Hover, PressPhase::Idle)),
         ),
         (
             "a press on the switched title keeps it, held",
             [switched_to_b(), vec![(400, Event::PressTitle(B))]].concat(),
-            Some((B, ShownBy::Press, MenuHold::Held)),
+            Some((B, ShownBy::Press, PressPhase::Pressed)),
         ),
         (
             "released there: click mode",
@@ -225,7 +226,7 @@ fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
                 ],
             ]
             .concat(),
-            Some((B, ShownBy::Press, MenuHold::Released)),
+            Some((B, ShownBy::Press, PressPhase::Idle)),
         ),
         (
             "a second press closes it",
@@ -247,7 +248,7 @@ fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
                 vec![(400, Event::Move(pt(130.0, 60.0), item(1)))],
             ]
             .concat(),
-            Some((B, ShownBy::Hover, MenuHold::Released)),
+            Some((B, ShownBy::Hover, PressPhase::Idle)),
         ),
         (
             "a press-drag onto B released on its title makes it B's own",
@@ -256,7 +257,7 @@ fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
                 (100, Event::Move(pt(120.0, 10.0), MenuTarget::Title(B))),
                 (200, Event::Release(MenuTarget::Title(B))),
             ],
-            Some((B, ShownBy::Press, MenuHold::Released)),
+            Some((B, ShownBy::Press, PressPhase::Idle)),
         ),
         (
             "a press on A's own title still closes A",
@@ -266,7 +267,7 @@ fn a_press_on_a_title_the_pointer_switched_to_keeps_its_menu() {
         (
             "a press on another title opens it as pressed",
             [click_open(), vec![(300, Event::PressTitle(B))]].concat(),
-            Some((B, ShownBy::Press, MenuHold::Held)),
+            Some((B, ShownBy::Press, PressPhase::Pressed)),
         ),
     ];
     for (name, script, want) in cases {

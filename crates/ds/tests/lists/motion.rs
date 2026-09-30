@@ -132,7 +132,7 @@ struct NoProps {}
 /// A drag of thread 7 over one registered place, drawn as the consumer draws it: the ghost only
 /// while the drag is live, at the pointer.
 fn dragging(_: NoProps) -> Element {
-    let drag: DragTracker<u32> = use_drag(Px(8.0));
+    let drag: DragTracker<u32> = use_drag(ds::DRAG_THRESHOLD);
     use_context_provider(|| drag);
     rsx! {
         if let DragPhase::Live { at, target, .. } = drag.phase() {
@@ -145,7 +145,7 @@ fn dragging(_: NoProps) -> Element {
 }
 
 #[test]
-fn the_ghost_appears_past_eight_pixels_and_drops_on_its_target() {
+fn the_ghost_appears_past_three_pixels_and_drops_on_its_target() {
     let mut dom = VirtualDom::new_with_props(dragging, NoProps {});
     dom.rebuild_in_place();
     let step = |dom: &mut VirtualDom, act: &dyn Fn(DragTracker<u32>)| {
@@ -167,11 +167,11 @@ fn the_ghost_appears_past_eight_pixels_and_drops_on_its_target() {
     let armed = step(&mut dom, &|drag| {
         drag.set_targets(vec![place]);
         drag.down(7, at(300.0, 300.0));
-        drag.moved(at(304.0, 303.0));
+        drag.moved(at(301.0, 302.0));
     });
     assert!(
         !armed.contains("ds-drag-ghost"),
-        "7 px is not a drag: {armed}"
+        "2 px is not a drag: {armed}"
     );
     let live = step(&mut dom, &|drag| drag.moved(at(305.0, 303.0)));
     let over = step(&mut dom, &|drag| drag.moved(at(100.0, 110.0)));

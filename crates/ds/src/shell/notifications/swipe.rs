@@ -14,12 +14,13 @@
 use crate::components::controls::press::button_of;
 use crate::core::geometry::units::Px;
 use crate::core::press::PointerButton;
+use crate::core::vocab::PressPhase;
 use crate::core::word::Word;
 use crate::motion::anim::Anim;
 use crate::motion::detail::touch::{Contact, Touch};
 use crate::motion::swipe::{Click, SwipeInput, SwipeLook, SwipeMetrics, SwipeState};
 use crate::motion::timer::use_motion_timer;
-use crate::motion::use_swipe::{SwipeHold, Swiper, use_swipe};
+use crate::motion::use_swipe::{Swiper, use_swipe};
 use crate::motion::{
     spring_spec::SpringSpec,
     timeline::spring::PxPerUnit,
@@ -192,9 +193,9 @@ impl CardSwipe {
     pub(crate) fn moved(&self, event: &PointerEvent) {
         if let Some(swiper) = self.live() {
             let held = if event.held_buttons().contains(MouseButton::Primary) {
-                SwipeHold::Primary
+                PressPhase::Pressed
             } else {
-                SwipeHold::Nothing
+                PressPhase::Idle
             };
             let x = Px(event.client_coordinates().x as f32);
             let mut meter = self.back.meter;

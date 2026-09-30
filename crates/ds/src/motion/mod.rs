@@ -9,6 +9,7 @@ pub mod drag_return;
 pub mod entrance;
 pub mod hover_intent;
 pub mod kit;
+pub mod long_press;
 pub mod pane_slide;
 pub mod presence;
 pub mod projection;

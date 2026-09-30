@@ -7,11 +7,11 @@ use ds::{Align, Availability, Button, ButtonVariant};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
     BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, FlagTone,
-    Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverStat,
-    HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget, Menu,
-    MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, Peek, PeekMode, PersonHue,
-    Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble, SendPhase,
-    SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip, TooltipKind, UndoToken,
+    Glyph, HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
+    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
+    Menu, MenuEntrance, MenuEntry, MenuFilter, MenuKind, MenuTile, MenuTrail, Peek, PeekMode,
+    PersonHue, Placement, Point, Popover, Px, Rect, Scrim, ScrimStrength, SelectionBubble,
+    SendPhase, SendPill, Sheet, SheetPlacement, Shown, Side, Size, Tooltip, TooltipKind, UndoToken,
     use_hover_hub, use_toasts,
 };
 use ds::{Check, Fraction, Shortcut, ShortcutKey};
@@ -247,7 +247,7 @@ fn SenderCard(kind: HoverKind) -> Element {
     let key = HoverKey("sender:3".to_string());
     use_hook({
         let key = key.clone();
-        move || hub.feed(HoverEvent::Over((key, kind)))
+        move || hub.feed(HoverEvent::Over((key, kind), kind.profile()))
     });
     let open = hub.open().or(hub.leaving());
     rsx! {
@@ -288,7 +288,12 @@ pub fn PartsCard(parts: Vec<HoverCardPart>) -> Element {
     let key = HoverKey("sender:3".to_string());
     use_hook({
         let key = key.clone();
-        move || hub.feed(HoverEvent::Over((key, HoverKind::Sender)))
+        move || {
+            hub.feed(HoverEvent::Over(
+                (key, HoverKind::Sender),
+                HoverKind::Sender.profile(),
+            ))
+        }
     });
     let open = hub.open().or(hub.leaving());
     rsx! {
@@ -764,10 +769,13 @@ pub const CASES: &[Case] = &[
 fn TipOpen() -> Element {
     let hub = use_hover_hub();
     use_hook(move || {
-        hub.feed(HoverEvent::Over((
-            HoverKey("tip:Wed 23 Sep 2026, 09:41".to_string()),
-            HoverKind::Sender,
-        )))
+        hub.feed(HoverEvent::Over(
+            (
+                HoverKey("tip:Wed 23 Sep 2026, 09:41".to_string()),
+                HoverKind::Sender,
+            ),
+            HoverProfile::Card,
+        ))
     });
     rsx! {
         Tooltip { kind: TooltipKind::Card, text: "Wed 23 Sep 2026, 09:41", sub: "10:41 their time (Lagos)", "09:41" }

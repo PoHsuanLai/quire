@@ -5,6 +5,27 @@
 
 .ds-menu-item{ display:grid; grid-template-columns:34px 1fr auto; gap:var(--s-9); align-items:center; padding:var(--s-5) var(--s-7); border-radius:var(--r-menu-item); cursor:default; }
 .ds-menu-item[*|aria-selected=true]{ background:var(--accent-soft); }
+/* Highlight (design/30 section 1.4, `FocusStyle::Highlight`): the selected row is filled with the
+   accent and drawn in the accent's ink while its window is the active one; in an inactive window
+   it is the grey wash. */
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--accent); color:var(--accent-ink); }
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
+.ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true],
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-title,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-detail,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-trail .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-selected=true] .ds-menu-chevron .ds-ic,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-title,
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|aria-expanded=true] .ds-menu-chevron .ds-ic{ color:var(--ink); }
 .ds-menu-tile{ width:34px; height:34px; border-radius:var(--r-menu-item); border:var(--hair) solid var(--line); background:var(--surface); display:grid; place-items:center;
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-menu-tile[*|data-tile=avatar]{ border:0; background:transparent; border-radius:var(--r-pill); }
@@ -56,6 +77,11 @@
 .ds-menu-chevron .ds-ic{ color:var(--ink-faint); }
 .ds-menu-item[*|aria-expanded=true]{ background:var(--accent-soft); }
 .ds-menu[*|data-kind=dropdown] .ds-menu-item[*|aria-expanded=true]{ background:var(--surface-2); color:var(--ink); }
+/* A dropdown keeps its grey hover look: the highlight's inks do not apply in it. */
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-title,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-detail,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-trail,
+.ds-menu[*|data-kind=dropdown] .ds-menu-item[*|data-focus=highlight] .ds-menu-chevron .ds-ic{ color:inherit; }
 
 /* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no hover,
    no selection and the arrow keys pass it. */

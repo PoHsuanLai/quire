@@ -148,12 +148,12 @@ fn a_press_drags_only_past_the_threshold_and_then_does_not_open() {
     let from = picture_centre(&harness);
     harness.pointer_move(from);
     harness.pointer_down(from);
-    // One short of the threshold (Manhattan): still a press.
+    // One short of the threshold (straight-line): still a press.
     let short = DRAG_THRESHOLD.0 - 1.0;
-    harness.pointer_move(offset(from, short - 3.0, 3.0));
+    harness.pointer_move(offset(from, 0.0, short));
     harness.advance(Duration::from_millis(1));
     assert!(read(&mut harness, &DRAGS).is_empty(), "under the threshold");
-    let crossed = offset(from, DRAG_THRESHOLD.0 - 3.0, 3.0);
+    let crossed = offset(from, 0.0, DRAG_THRESHOLD.0);
     harness.pointer_move(crossed);
     harness.pointer_move(offset(from, 30.0, 3.0));
     harness.pointer_up(offset(from, 30.0, 3.0));

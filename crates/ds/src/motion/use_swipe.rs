@@ -6,6 +6,7 @@ use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeSta
 use crate::core::geometry::units::Px;
 use crate::core::task::{Gone, spawn_in, try_get, try_set};
 use crate::core::time::clock::sleep;
+use crate::core::vocab::PressPhase;
 use crate::style::scope::{Scope, use_scope_signal};
 use crate::style::tokens::delay::DelayToken;
 use dioxus::core::{Task, current_scope_id};
@@ -37,10 +38,12 @@ impl Swiper {
 
     /// The input a pointer move makes: a move while the primary button is down, or the release
     /// Blitz never delivered (the button came up outside the card; it has no pointer capture).
-    pub fn pointer_moved(&self, x: Px, held: SwipeHold) {
+    pub fn pointer_moved(&self, x: Px, held: PressPhase) {
         match held {
-            SwipeHold::Primary => self.feed(SwipeInput::Move { x, at: self.now() }),
-            SwipeHold::Nothing => self.feed(SwipeInput::Up { at: self.now() }),
+            PressPhase::Pressed | PressPhase::Held => {
+                self.feed(SwipeInput::Move { x, at: self.now() })
+            }
+            PressPhase::Idle => self.feed(SwipeInput::Up { at: self.now() }),
         }
     }
 
@@ -87,15 +90,6 @@ impl Swiper {
         });
         try_set(self.quiet, Some(task))
     }
-}
-
-/// Whether the primary button is down during a pointer move.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum SwipeHold {
-    /// It is down: the drag goes on.
-    Primary,
-    /// It is not: the release happened where the card could not hear it.
-    Nothing,
 }
 
 /// A swipe with `metrics`, calling `on_dismiss` the moment a gesture ends past a threshold.

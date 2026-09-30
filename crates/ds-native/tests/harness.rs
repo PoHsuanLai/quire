@@ -9,9 +9,9 @@
 use dioxus::prelude::*;
 use ds::{
     Anchor, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Ds, Emphasis,
-    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverTarget, LeaveBy, ListRow, Material,
-    Menu, MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState, Selection,
-    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverProfile, HoverTarget, LeaveBy, ListRow,
+    Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState,
+    Selection, ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{
     DotIndex, FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceEditor, SpaceLook, TextInput,
@@ -185,7 +185,7 @@ fn HoverHubProbe() -> Element {
         div {
             class: "probe-target",
             style: "width: 200px; height: 40px",
-            onmouseenter: move |_| hub.feed(HoverEvent::Over(card.clone())),
+            onmouseenter: move |_| hub.feed(HoverEvent::Over(card.clone(), HoverProfile::Card)),
             onmouseleave: move |_| hub.feed(HoverEvent::Out),
             "Dana Okafor"
         }

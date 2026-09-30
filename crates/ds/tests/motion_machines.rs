@@ -3,8 +3,8 @@
 
 use ds::motion::fraction_along;
 use ds::{
-    Drag, DragPhase, Fraction, HoverEvent, HoverIntent, HoverWarmth, IntentEffect, IntentPhase,
-    Point, Px, Rect, Size,
+    DRAG_THRESHOLD, Drag, DragPhase, Fraction, HoverEvent, HoverIntent, HoverProfile, HoverWarmth,
+    IntentEffect, IntentPhase, Point, Px, Rect, Size, WINDOW_DRAG_THRESHOLD,
 };
 use ds::{Pull, PullTab, TabArm};
 use std::time::{Duration, Instant};
@@ -52,7 +52,12 @@ fn close_after(n: u64) -> IntentEffect<u8> {
 /// Opens card 1 cold: over at 0, the timer fires at 500.
 fn opened() -> Vec<Step> {
     vec![
-        (0, HoverEvent::Over(1), Ph::Pending(1, 500), open_after(500)),
+        (
+            0,
+            HoverEvent::Over(1, HoverProfile::Card),
+            Ph::Pending(1, 500),
+            open_after(500),
+        ),
         (500, HoverEvent::OpenDue, Ph::Open(1), IntentEffect::Open(1)),
     ]
 }
@@ -80,21 +85,41 @@ fn hover_intent_sequences() {
         (
             "an early open timer is stale and ignored",
             vec![
-                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
+                (
+                    0,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 500),
+                    open_after(500),
+                ),
                 (499, OpenDue, Ph::Pending(1, 500), IntentEffect::None),
             ],
         ),
         (
             "moving within the pending target does not restart the wait",
             vec![
-                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
-                (100, Over(1), Ph::Pending(1, 500), IntentEffect::None),
+                (
+                    0,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 500),
+                    open_after(500),
+                ),
+                (
+                    100,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 500),
+                    IntentEffect::None,
+                ),
             ],
         ),
         (
             "leaving before the card opens cancels it",
             vec![
-                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
+                (
+                    0,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 500),
+                    open_after(500),
+                ),
                 (200, Out, Ph::Idle, IntentEffect::CancelOpen),
                 (500, OpenDue, Ph::Idle, IntentEffect::None),
             ],
@@ -103,7 +128,12 @@ fn hover_intent_sequences() {
             "a suppressed target changes nothing",
             vec![
                 (0, OverSuppressed, Ph::Idle, IntentEffect::None),
-                (10, Over(1), Ph::Pending(1, 510), open_after(500)),
+                (
+                    10,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 510),
+                    open_after(500),
+                ),
                 (100, OverSuppressed, Ph::Pending(1, 510), IntentEffect::None),
             ],
         ),
@@ -113,7 +143,12 @@ fn hover_intent_sequences() {
             then(
                 closed(),
                 [
-                    (800, Over(2), Ph::Pending(2, 800), open_after(0)),
+                    (
+                        800,
+                        Over(2, HoverProfile::Card),
+                        Ph::Pending(2, 800),
+                        open_after(0),
+                    ),
                     (800, OpenDue, Ph::Open(2), IntentEffect::Open(2)),
                 ],
             ),
@@ -122,7 +157,12 @@ fn hover_intent_sequences() {
             "warm ends 400 ms after the close",
             then(
                 closed(),
-                [(1050, Over(2), Ph::Pending(2, 1550), open_after(500))],
+                [(
+                    1050,
+                    Over(2, HoverProfile::Card),
+                    Ph::Pending(2, 1550),
+                    open_after(500),
+                )],
             ),
         ),
         (
@@ -130,7 +170,12 @@ fn hover_intent_sequences() {
             then(
                 opened(),
                 [
-                    (600, Over(2), Ph::Pending(2, 600), open_after(0)),
+                    (
+                        600,
+                        Over(2, HoverProfile::Card),
+                        Ph::Pending(2, 600),
+                        open_after(0),
+                    ),
                     (600, OpenDue, Ph::Open(2), IntentEffect::Open(2)),
                 ],
             ),
@@ -141,7 +186,12 @@ fn hover_intent_sequences() {
                 opened(),
                 [
                     (500, Out, Ph::Closing(1, 650), close_after(150)),
-                    (560, Over(2), Ph::Pending(2, 560), open_after(0)),
+                    (
+                        560,
+                        Over(2, HoverProfile::Card),
+                        Ph::Pending(2, 560),
+                        open_after(0),
+                    ),
                     (650, CloseDue, Ph::Pending(2, 560), IntentEffect::None),
                 ],
             ),
@@ -152,14 +202,27 @@ fn hover_intent_sequences() {
                 opened(),
                 [
                     (500, Out, Ph::Closing(1, 650), close_after(150)),
-                    (550, Over(1), Ph::Open(1), IntentEffect::CancelClose),
+                    (
+                        550,
+                        Over(1, HoverProfile::Card),
+                        Ph::Open(1),
+                        IntentEffect::CancelClose,
+                    ),
                     (650, CloseDue, Ph::Open(1), IntentEffect::None),
                 ],
             ),
         ),
         (
             "over the open card's own target changes nothing",
-            then(opened(), [(600, Over(1), Ph::Open(1), IntentEffect::None)]),
+            then(
+                opened(),
+                [(
+                    600,
+                    Over(1, HoverProfile::Card),
+                    Ph::Open(1),
+                    IntentEffect::None,
+                )],
+            ),
         ),
         (
             "into the card and out again",
@@ -192,7 +255,12 @@ fn hover_intent_sequences() {
                 opened(),
                 [
                     (600, ClickInList, Ph::Idle, IntentEffect::Remove(1)),
-                    (700, Over(2), Ph::Pending(2, 1200), open_after(500)),
+                    (
+                        700,
+                        Over(2, HoverProfile::Card),
+                        Ph::Pending(2, 1200),
+                        open_after(500),
+                    ),
                 ],
             ),
         ),
@@ -209,7 +277,12 @@ fn hover_intent_sequences() {
         (
             "a click in the list cancels a pending card",
             vec![
-                (0, Over(1), Ph::Pending(1, 500), open_after(500)),
+                (
+                    0,
+                    Over(1, HoverProfile::Card),
+                    Ph::Pending(1, 500),
+                    open_after(500),
+                ),
                 (100, ClickInList, Ph::Idle, IntentEffect::CancelOpen),
             ],
         ),
@@ -219,7 +292,12 @@ fn hover_intent_sequences() {
                 opened(),
                 [
                     (600, SpaceKey, Ph::Idle, IntentEffect::Peek(1)),
-                    (700, Over(2), Ph::Pending(2, 700), open_after(0)),
+                    (
+                        700,
+                        Over(2, HoverProfile::Card),
+                        Ph::Pending(2, 700),
+                        open_after(0),
+                    ),
                 ],
             ),
         ),
@@ -253,7 +331,7 @@ fn warmth_follows_the_card_and_the_warm_window() {
     let mut machine = HoverIntent::default();
     let mut warmth = Vec::new();
     for (at, event) in [
-        (0, HoverEvent::Over(1)),
+        (0, HoverEvent::Over(1, HoverProfile::Card)),
         (500, HoverEvent::OpenDue),
         (500, HoverEvent::Out),
         (650, HoverEvent::CloseDue),
@@ -284,17 +362,25 @@ fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
 }
 
 #[test]
-fn drag_starts_after_8px_manhattan() {
+fn drag_starts_after_the_euclidean_threshold() {
+    // (name, threshold, where the pointer went, whether the drag is live)
     let cases = [
-        ("still", pt(0.0, 0.0), false),
-        ("3 + 4 = 7", pt(3.0, 4.0), false),
-        ("0 + 7.9", pt(0.0, 7.9), false),
-        ("4 + 4 = 8", pt(4.0, 4.0), true),
-        ("-5 + 3 = 8", pt(-5.0, 3.0), true),
-        ("8 left", pt(-8.0, 0.0), true),
+        ("still", DRAG_THRESHOLD, pt(0.0, 0.0), false),
+        ("2 + 2 is 2.83", DRAG_THRESHOLD, pt(2.0, 2.0), false),
+        ("2.9 down", DRAG_THRESHOLD, pt(0.0, 2.9), false),
+        ("3 right", DRAG_THRESHOLD, pt(3.0, 0.0), true),
+        ("3 left", DRAG_THRESHOLD, pt(-3.0, 0.0), true),
+        ("3 + 4 is 5", DRAG_THRESHOLD, pt(3.0, 4.0), true),
+        (
+            "a window at 3.9",
+            WINDOW_DRAG_THRESHOLD,
+            pt(0.0, 3.9),
+            false,
+        ),
+        ("a window at 4", WINDOW_DRAG_THRESHOLD, pt(0.0, -4.0), true),
     ];
-    for (name, to, live) in cases {
-        let drag = Drag::new(Px(8.0)).down(7u32, pt(0.0, 0.0)).moved(to);
+    for (name, threshold, to, live) in cases {
+        let drag = Drag::new(threshold).down(7u32, pt(0.0, 0.0)).moved(to);
         let want = if live {
             DragPhase::Live {
                 key: 7,
@@ -473,4 +559,31 @@ fn slider_fraction_along_the_track() {
         Fraction(0),
         "a zero-width track"
     );
+}
+
+#[test]
+fn each_hover_profile_waits_by_its_own_open_and_close() {
+    let t0 = Instant::now();
+    // (profile, open delay, close delay)
+    const CASES: &[(HoverProfile, u64, u64)] = &[
+        (HoverProfile::Tip, 1000, 0),
+        (HoverProfile::Card, 500, 150),
+        (HoverProfile::Label, 100, 0),
+    ];
+    for &(profile, open, close) in CASES {
+        let machine = HoverIntent::default();
+        let (machine, effect) = machine.step(HoverEvent::Over(1u8, profile), t0);
+        assert_eq!(
+            effect,
+            IntentEffect::StartOpen { after: ms(open) },
+            "{profile:?} opens after {open} ms"
+        );
+        let (machine, _) = machine.step(HoverEvent::OpenDue, t0 + ms(open));
+        let (_, effect) = machine.step(HoverEvent::Out, t0 + ms(open + 10));
+        assert_eq!(
+            effect,
+            IntentEffect::StartClose { after: ms(close) },
+            "{profile:?} closes after {close} ms"
+        );
+    }
 }
