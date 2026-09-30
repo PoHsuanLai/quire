@@ -20,9 +20,9 @@ use cases::{CASES, Case, MOTION_CASES};
 use css_scan::{STYLES, classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::prelude::*;
-use scoped::Scoped;
 use ds_style::icon::render::Glyph;
 use ds_style::icon::shape::Shape;
+use scoped::Scoped;
 
 #[derive(Props, Clone)]
 struct HostProps {

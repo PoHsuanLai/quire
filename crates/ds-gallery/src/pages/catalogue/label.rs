@@ -1,4 +1,4 @@
-//! Label: every role at every step of the type scale, disabled, and runs in their tones.
+//! Label: every role at every step of the type scale, disabled, runs in their tones and each severity.
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
@@ -26,6 +26,13 @@ pub fn LabelSection() -> Element {
             }
             div { class: "g-row",
                 Specimen { name: "runs", Label { text: runs } }
+            }
+            div { class: "g-row",
+                for severity in Severity::ALL.iter().copied() {
+                    Specimen { name: format!("severity {}", severity.slug()),
+                        Label { text: format!("{} status", severity.slug()), severity: Some(severity) }
+                    }
+                }
             }
         }
     }

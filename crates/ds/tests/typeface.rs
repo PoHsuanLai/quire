@@ -138,6 +138,9 @@ fn editorial_restores_the_values_the_rules_carried() {
 /// and a preview pane's monospace text, both the words as they were copied.
 const COPIED_TEXT: &[&str] = &[".ds-row-clip{", ".ds-preview-text[*|data-face=mono]{"];
 
+/// A code run is code: the text run tone for a command or an address the person copies.
+const CODE_RUN: &str = ".ds-run[*|data-tone=code]{";
+
 #[test]
 fn only_code_and_key_caps_ask_for_the_code_face() {
     let css = stylesheet();
@@ -145,6 +148,7 @@ fn only_code_and_key_caps_ask_for_the_code_face() {
         .lines()
         .filter(|line| line.contains("font-family:var(--font-code)"))
         .filter(|line| !COPIED_TEXT.iter().any(|rule| line.starts_with(rule)))
+        .filter(|line| !line.starts_with(CODE_RUN))
         .collect();
     assert_eq!(code_rules.len(), 1, "{code_rules:#?}");
     for rule in COPIED_TEXT {
@@ -154,6 +158,11 @@ fn only_code_and_key_caps_ask_for_the_code_face() {
             "{rule}"
         );
     }
+    assert!(
+        css.lines()
+            .any(|line| line.starts_with(CODE_RUN) && line.contains("var(--font-code)")),
+        "{CODE_RUN}"
+    );
     assert!(css.contains(
         ".ds-key-equivalent-key{\n  display:inline-block; font-family:var(--font-code);"
     ));

@@ -10,6 +10,7 @@ pub const STYLES: &[(&str, &[&str])] = &[
             include_str!("../../src/components/content/text_runs.css"),
             include_str!("../../src/components/content/provider_mark.css"),
             include_str!("../../src/components/controls/progress/progress.css"),
+            include_str!("../../../ds-motion/src/detail/morph.css"),
         ],
     ),
     (

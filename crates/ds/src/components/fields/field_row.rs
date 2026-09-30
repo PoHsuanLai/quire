@@ -27,7 +27,8 @@ pub enum RowLayout {
     Form,
 }
 
-/// One row of a form: `label`, the `help` line under it, and the control in `children`. A
+/// One row of a form: `label`, the `help` line under it, and the controls in `children`: one, or
+/// several that wrap onto further lines when the row is too narrow for them. A
 /// disabled or busy row dims its label and takes no pointer.
 #[component]
 pub fn FieldRow(

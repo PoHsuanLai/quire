@@ -11,6 +11,9 @@ use ds::components::chrome::titlebar_parts::{DocumentState, TitleParts};
 use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::chrome::window_frame::WindowTitlebar;
+use ds::components::content::text_runs::RunTone;
+use ds::components::controls::checkbox::Checkbox;
+use ds::components::fields::fact_list::{Fact, FactList};
 use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
 use ds::components::fields::stepper::model::{Readout, StepRange};
 use ds::components::fields::stepper::view::Stepper;
@@ -192,6 +195,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "field_row",
+        state: "several-controls",
+        make: || rsx! { FieldRow { label: TextLine::from("Protection"), layout: RowLayout::Form, Checkbox { label: "Sign", value: Check::On, onchange: |_| {} } Checkbox { label: "Encrypt", value: Check::Off, onchange: |_| {} } Button { label: "Options", onclick: |_| {} } } },
+    },
+    Case {
+        component: "field_row",
         state: "disabled",
         make: || rsx! { FieldRow { label: TextLine::from("Airplane"), availability: Availability::Disabled, span { "control" } } },
     },
@@ -199,6 +207,16 @@ pub const CASES: &[Case] = &[
         component: "field_row",
         state: "group",
         make: || rsx! { FieldGroup { title: "Network", FieldRow { label: TextLine::from("A"), span { "a" } } FieldRow { label: TextLine::from("B"), span { "b" } } } },
+    },
+    Case {
+        component: "fact_list",
+        state: "invitation",
+        make: || rsx! { FactList { facts: vec![Fact::new("When", "Tue 4 Nov, 10:00 to 11:00"), Fact::new("Where", "Room 4"), Fact::new("Who", TextLine::Runs(vec![TextRun::new("Dana", RunTone::Strong), TextRun::new(", Noor and 3 more", RunTone::Plain)]))] } },
+    },
+    Case {
+        component: "fact_list",
+        state: "empty-value",
+        make: || rsx! { FactList { facts: vec![Fact::new("Where", "")] } },
     },
     Case {
         component: "drag_ghost",

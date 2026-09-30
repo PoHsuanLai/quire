@@ -23,7 +23,9 @@ re-theme every surface consistently, and every token variable
 | Checkbox | `.ds-checkbox` | `.ds-checkbox-indicator`, `.ds-checkbox-label` |
 | Chip | `.ds-chip` | `.ds-chip-remove` |
 | EmptyState | `.ds-empty-state` | `.ds-empty-state-icon`, `.ds-empty-state-title`, `.ds-empty-state-body`, `.ds-empty-state-action` |
+| FactList | `.ds-fact-list` | `.ds-fact-list-item`, `.ds-fact-list-label`, `.ds-fact-list-value` |
 | HoverCard | `.ds-hovercard` | `.ds-hovercard-body` |
+| InlineBanner | `.ds-inline-banner` | `.ds-inline-banner-icon`, `.ds-inline-banner-body`, `.ds-inline-banner-actions` |
 | KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
 | Label | `.ds-label` | none yet |
 | LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |
@@ -58,6 +60,7 @@ re-theme every surface consistently, and every token variable
 | `data-availability` | `Availability`: enabled, disabled, busy |
 | `data-pressed` | `PressPhase`: present while a pointer or a key holds the control down |
 | `data-role` | a button's role: normal or destructive |
+| `data-severity` | `Severity` of an inline banner or a label: info, ok, warn, danger |
 | `data-focus` | `FocusStyle`: ring, highlight |
 | `data-activity` | `Activity`, on `.ds`: written as `inactive` while the window is not the one focused, absent while it is |
 | `aria-*` | the state an element exposes to assistive technology |

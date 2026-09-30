@@ -1,13 +1,14 @@
 /* FieldRow and FieldGroup (design/30 section 2.2, `NSGridView`). Attribute selectors carry `*|`
    (spike S2). A row is 36 px at least: the label column with its help under it, the control
-   column. In a group the rows are one card with a hairline between them. A disabled row draws at
+   column, whose controls wrap onto a second line when they do not fit (a field and its
+   buttons, a run of chips). In a group the rows are one card with a hairline between them. A disabled row draws at
    the disabled .35 and takes no pointer. */
 
 .ds-field-row{ display:flex; align-items:center; gap:var(--s-12); box-sizing:border-box; min-height:36px; padding:var(--s-6) var(--s-12); min-width:0; }
 .ds-field-row-label{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; }
 .ds-field-row-title{ font-size:var(--fs-control); color:var(--ink); line-height:1.3; }
 .ds-field-row-help{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-.ds-field-row-control{ display:flex; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
+.ds-field-row-control{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
 .ds-field-row[*|data-layout=form]{ padding-left:0; }
 .ds-field-row[*|data-layout=form] .ds-field-row-label{ flex:none; width:120px; align-items:flex-end; text-align:end; }
 .ds-field-row[*|data-layout=form] .ds-field-row-control{ flex:1 1 0; justify-content:flex-start; }

@@ -74,6 +74,11 @@ const OWN_SHEETS: &[(&str, &str, &str)] = &[
         include_str!("../src/components/chrome/tab_view.css"),
     ),
     (
+        "fact_list",
+        "ds-fact-list",
+        include_str!("../src/components/fields/fact_list.css"),
+    ),
+    (
         "field_row",
         "ds-field-",
         include_str!("../src/components/fields/field_row.css"),

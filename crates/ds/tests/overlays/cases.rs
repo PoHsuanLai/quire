@@ -8,8 +8,8 @@ use ds::components::app::peek::Peek;
 use ds::components::app::send_pill::SendPill;
 use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
 use ds::components::content::label::LabelRole;
-use ds::components::content::text_runs::{RunTone, TextRun};
 use ds::components::content::label::LabelStyle;
+use ds::components::content::text_runs::{RunTone, TextRun};
 use ds::components::controls::button_model::Bezel;
 use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::key_equivalent::KeyEquivalent;
@@ -40,6 +40,7 @@ use ds_style::tokens::control_size::ControlSize;
 
 use ds::components::controls::button_model::Answers;
 use ds::components::overlays::empty_state::EmptyForm;
+use ds::components::overlays::inline_banner::InlineBanner;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::skeleton::{Skeleton, SkeletonShape};
 use std::time::Duration;
@@ -777,6 +778,43 @@ pub const CASES: &[Case] = &[
         component: "empty_state",
         state: "failure-retry",
         make: || rsx! { EmptyState { form: EmptyForm::Failure, title: "Couldn’t load your mail", description: "The server didn’t answer.", onretry: |_| {} } },
+        wait: NOW,
+    },
+    // InlineBanner: each severity, with actions, detail and a close button.
+    Case {
+        component: "inline_banner",
+        state: "info",
+        make: || rsx! { InlineBanner { text: "Remote images are blocked." } },
+        wait: NOW,
+    },
+    Case {
+        component: "inline_banner",
+        state: "info-action-close",
+        make: || rsx! { InlineBanner { text: "Remote images are blocked.", detail: "Loading them tells the sender you opened this.", actions: rsx! { Button { label: "Load images", size: ControlSize::Small, onclick: |_| {} } }, onclose: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "inline_banner",
+        state: "ok",
+        make: || rsx! { InlineBanner { severity: Severity::Ok, text: "You accepted this invitation." } },
+        wait: NOW,
+    },
+    Case {
+        component: "inline_banner",
+        state: "warn",
+        make: || rsx! { InlineBanner { severity: Severity::Warn, text: "The sender asked for a read receipt.", actions: rsx! { Button { label: "Send receipt", size: ControlSize::Small, onclick: |_| {} } } } },
+        wait: NOW,
+    },
+    Case {
+        component: "inline_banner",
+        state: "danger",
+        make: || rsx! { InlineBanner { severity: Severity::Danger, text: "This message may not be from who it says." } },
+        wait: NOW,
+    },
+    Case {
+        component: "inline_banner",
+        state: "own-icon",
+        make: || rsx! { InlineBanner { icon: Icon::Mail, text: "Mail from this sender goes to Junk." } },
         wait: NOW,
     },
     Case {

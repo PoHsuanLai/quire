@@ -91,9 +91,19 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["icon", "title", "body", "action"],
     },
     ComponentSelectors {
+        component: "FactList",
+        root: "ds-fact-list",
+        parts: &["item", "label", "value"],
+    },
+    ComponentSelectors {
         component: "HoverCard",
         root: "ds-hovercard",
         parts: &["body"],
+    },
+    ComponentSelectors {
+        component: "InlineBanner",
+        root: "ds-inline-banner",
+        parts: &["icon", "body", "actions"],
     },
     ComponentSelectors {
         component: "KeyEquivalent",
@@ -235,6 +245,10 @@ pub const AXES: &[Axis] = &[
     Axis {
         attribute: "data-role",
         meaning: "a button's role: normal or destructive",
+    },
+    Axis {
+        attribute: "data-severity",
+        meaning: "`Severity` of an inline banner or a label: info, ok, warn, danger",
     },
     Axis {
         attribute: "data-focus",

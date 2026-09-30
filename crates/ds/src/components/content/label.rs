@@ -1,11 +1,11 @@
 //! Label: `NSTextField` as a label, the one way to draw plain text (design/30 section 2.8).
-//! Markup: `span.ds-label[data-role][data-style]`, with `data-availability` and `aria-disabled`
-//! when it is not enabled; the text is a [`TextLine`], whole or as runs in their tones.
+//! Markup: `span.ds-label[data-role][data-style]`, with `data-severity` for a status tone and
+//! `data-availability` and `aria-disabled` when it is not enabled; the text is a [`TextLine`], whole or as runs in their tones.
 
 use crate::components::content::text_runs::{TextLine, text};
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::vocab::Availability;
+use ds_core::vocab::{Availability, Severity};
 use ds_core::word::Word;
 
 /// How much a label matters (`NSColor.labelColor` and its three secondary levels):
@@ -41,13 +41,16 @@ pub enum LabelStyle {
     Display,
 }
 
-/// A label: `text` in `role` at `style`. `Disabled` draws it at the disabled .35 and writes
+/// A label: `text` in `role` at `style`. `severity` sets it in a status colour (a signature that
+/// verified, a flag that warns) over the role's ink and writes `data-severity`; the colour never
+/// says it alone, so the words must. `Disabled` draws it at the disabled .35 and writes
 /// `aria-disabled`; a label is never busy, so `Busy` reads as `Enabled`.
 #[component]
 pub fn Label(
     #[props(into)] text: TextLine,
     #[props(default)] role: LabelRole,
     #[props(default)] style: LabelStyle,
+    #[props(default)] severity: Option<Severity>,
     #[props(default)] availability: Availability,
     #[props(default)] common: Common,
 ) -> Element {
@@ -60,6 +63,7 @@ pub fn Label(
             class,
             "data-role": role.slug(),
             "data-style": style.slug(),
+            "data-severity": severity.map(Severity::slug),
             "data-availability": if disabled { Some(availability.slug()) } else { None },
             "aria-label": common.aria_label.clone(),
             "aria-disabled": availability.aria_disabled(),

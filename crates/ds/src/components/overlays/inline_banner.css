@@ -1,0 +1,18 @@
+/* InlineBanner (design/30 section 2.9). Attribute selectors carry `*|` (spike S2). A band in the
+   flow: the severity's mark, the words, the caller's buttons and the close button in one row,
+   wrapping under the words when the pane is narrow. An Info banner is the quiet fill
+   (`--fill-quaternary`); Ok, Warn and Danger take their wash and the mark their colour. The words
+   keep the ink: the colour never says it alone. A hairline under it parts it from the content. */
+
+.ds-inline-banner{
+  --banner-mark:var(--accent-text);
+  display:flex; align-items:center; flex-wrap:wrap; gap:var(--s-8) var(--s-10); box-sizing:border-box; width:100%;
+  padding:var(--s-8) var(--s-12); background:var(--fill-quaternary); border-bottom:var(--hair) solid var(--line);
+  color:var(--ink); text-align:start;
+}
+.ds-inline-banner[*|data-severity=ok]{ --banner-mark:var(--ok); background:var(--ok-wash); }
+.ds-inline-banner[*|data-severity=warn]{ --banner-mark:var(--warn); background:var(--warn-wash); }
+.ds-inline-banner[*|data-severity=danger]{ --banner-mark:var(--danger); background:var(--danger-wash); }
+.ds-inline-banner-icon{ display:inline-flex; flex:none; line-height:0; color:var(--banner-mark); }
+.ds-inline-banner-body{ display:flex; flex-direction:column; flex:1 1 12em; min-width:0; gap:var(--s-1); }
+.ds-inline-banner-actions{ display:flex; flex:none; align-items:center; gap:var(--s-6); }

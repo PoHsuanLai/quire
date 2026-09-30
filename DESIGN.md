@@ -119,12 +119,12 @@ and `button_marks`; the image-only and toolbar buttons are `Button`, not a secon
 `SegmentedControl`), `slider` (with `slider_linear`, `slider_bezel`, `slider_machine`, `slider_model`),
 `level_indicator` (with `level_draw`, shared with the capsule slider), `progress/` (`ProgressIndicator`, the
 arc geometry, the spokes and the busy operation), `badge`, `key_equivalent`, `content/label`, and `fields/text_field`
-with its model, parts, mask and focus files): `command_pill` §8, `chip` §10, `avatar` §11, `section_header` §13,
+with its model, parts, mask, area (the multi-line `textarea`) and focus files): `command_pill` §8, `chip` §10, `avatar` §11, `section_header` §13,
 `list_row` and `animated_list` §16, `hover_strip` §17, `tooltip` §18, `sidebar_item` §19,
 `menu` and `menu_entry` §20 (with `menu_lines`, `menu_keys`, `menu_rows`, `menu_match`,
 `menu_tracker` and `menu_panel`: the choices and keyboard as pure tables, the row drawing, the
 fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s share; 13 §13.3.3-13.3.4),
-`popover` §21 (with `Arrow` and the `Dismiss` policy; `use_float` places every floating surface), `hover_card` §22 (`Standing`: a card kind, a tip or a label), `tooltip` §18 (`Tooltip` and `Hint`, the one implementation the shell's `DockLabel` shares), `toast` §23 (with `toast_swipe`), `alert` and `alert_model` §55, `sheet` (`Attach`, `SheetWidth`), `side_panel` (design/20 §1.6), `empty_state` and `skeleton` (design/30 §2.9), `scrim` (the peek's own button only) and
+`popover` §21 (with `Arrow` and the `Dismiss` policy; `use_float` places every floating surface), `hover_card` §22 (`Standing`: a card kind, a tip or a label), `tooltip` §18 (`Tooltip` and `Hint`, the one implementation the shell's `DockLabel` shares), `toast` §23 (with `toast_swipe`), `alert` and `alert_model` §55, `sheet` (`Attach`, `SheetWidth`), `side_panel` (design/20 §1.6), `empty_state`, `inline_banner` (`InlineBanner`, in a pane's flow) and `skeleton` (design/30 §2.9), `scrim` (the peek's own button only) and
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `pin_tile`, `pin_tiles` and `pin_order` (design/30 §2.11; the old `account_tile` §27),
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),
@@ -132,7 +132,7 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 §32, `edge_peek` (the old `edge_strip` §33), `today_tabs`, `space_switch`, `hover_open`, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1, the bar's item button, title or glyph), `workspace_pills` §37 and `dock/` §38 (`DockTile`,
 `DockLabel`, `RunningDot`, `DockFloor`; 10 §10.3.2).
-The P2 components of 30-CATALOGUE 2.1 to 2.7: `fields/stepper/` (`Stepper`, `StepRange`, the hold-repeat machine), `fields/field_row` (`FieldRow`, `FieldGroup`), `lists/table/` (`Table` over `List`, column widths), `chrome/toolbar/` (`Toolbar`, the overflow rule), `chrome/split_view/` (`SplitView`, its spring pane), `chrome/sidebar` (`Sidebar`), `chrome/tab_view` (`TabView`), `chrome/titlebar_parts` (subtitle, proxy icon, edited dot beside `WindowTitlebar`'s title), `controls/edge_grab` (the drag of a column edge or a divider), `menus/menu_bar` (`MenuBarModel`, data only) and `overlays/drag_ghost` (`DragGhost` with its count badge); `ds-shell/date_picker/` is `DatePicker`, over the shell's `MonthGrid`.
+The P2 components of 30-CATALOGUE 2.1 to 2.7: `fields/stepper/` (`Stepper`, `StepRange`, the hold-repeat machine), `fields/field_row` (`FieldRow`, `FieldGroup`), `fields/fact_list` (`FactList`, a read-only label and value list), `lists/table/` (`Table` over `List`, column widths), `chrome/toolbar/` (`Toolbar`, the overflow rule), `chrome/split_view/` (`SplitView`, its spring pane), `chrome/sidebar` (`Sidebar`), `chrome/tab_view` (`TabView`), `chrome/titlebar_parts` (subtitle, proxy icon, edited dot beside `WindowTitlebar`'s title), `controls/edge_grab` (the drag of a column edge or a divider), `menus/menu_bar` (`MenuBarModel`, data only) and `overlays/drag_ghost` (`DragGhost` with its count badge); `ds-shell/date_picker/` is `DatePicker`, over the shell's `MonthGrid`.
 `user_picture` is a directory and 25-EMOJI section 7: `UserPicture`, `PictureSize`, the drawing the
 lock and polkit prompts share (`draw.rs`), `PictureChoice`/`resolve_picture` and `UserPicturePicker`.
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
