@@ -7,7 +7,11 @@ use super::roles::AccentRoles;
 use super::text_grounds::{TextGround, TextOn, text_grounds};
 use crate::appearance::theme::Scheme;
 use crate::tokens::hex::{Alpha, Hex};
-use ds_core::colour::fit::oklch_bytes;
+use ds_core::colour::{
+    fit::oklch_bytes,
+    oklab::{Oklab, Oklch},
+    srgb::Srgb,
+};
 
 /// The hue and chroma one accent is drawn in; only lightness moves from here.
 #[derive(Debug, Clone, Copy)]
@@ -37,8 +41,39 @@ pub fn accent_roles(band: &AccentBand, pick: AccentPick, scheme: Scheme) -> Acce
         chroma: bounds.chroma.at(pick.weight),
         hue: pick.hue.degrees(),
     };
-    let grounds = card_grounds(scheme);
     let (fill, ink) = solid_fill(bounds, tone);
+    roles_around(bounds, tone, scheme, fill, ink)
+}
+
+/// The roles of the Mac Look's accent: `fill` is the system colour itself, its ink white when
+/// white reads on it at [`floors::INK_ON_SYSTEM_FILL`] (Apple's own blue button is 4.0:1) and the
+/// deep ink of the hue otherwise (macOS's rule for yellow); the text accent, wash and ring are
+/// derived around it in the fill's own hue and chroma.
+pub fn system_roles(band: &AccentBand, scheme: Scheme, fill: Hex) -> AccentRoles {
+    let bounds = band.scheme(scheme);
+    let own = Oklch::from(Oklab::from(Srgb::from(fill)));
+    let tone = Tone {
+        chroma: own.c,
+        hue: own.h.to_degrees().rem_euclid(360.0),
+    };
+    let white = Hex([0xFF, 0xFF, 0xFF]);
+    let ink = if contrast(white, fill) >= floors::INK_ON_SYSTEM_FILL {
+        white
+    } else {
+        tone_ink(tone)
+    };
+    roles_around(bounds, tone, scheme, fill, ink)
+}
+
+/// The text accent, wash and ring around a chosen fill and ink.
+fn roles_around(
+    bounds: &SchemeBand,
+    tone: Tone,
+    scheme: Scheme,
+    fill: Hex,
+    ink: Hex,
+) -> AccentRoles {
+    let grounds = card_grounds(scheme);
     let wash = wash_alpha(bounds.wash, fill, &grounds);
     let text_on = |on| text_accent(bounds, tone, scheme, &text_grounds(on, scheme, fill, wash));
     let text = text_on(TextOn::Card);

@@ -17,7 +17,7 @@
 .ds-segmented{ --seg-n:1; --seg-col:1; --seg-dx:0;
   --sg-h:var(--ctl-h-m); --sg-well-r:var(--seg-well-r-m); --sg-r:var(--seg-r-m); --sg-pad:var(--ctl-pad-m); --sg-fs:var(--ctl-fs-m);
   position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
-  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset); background:var(--surface-2);
+  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset); background:var(--line-soft);
   height:var(--sg-h); border-radius:var(--sg-well-r);
 }
 .ds-segmented[*|data-size=mini]{ --sg-h:var(--ctl-h-xs); --sg-well-r:var(--seg-well-r-xs); --sg-r:var(--seg-r-xs); --sg-pad:var(--ctl-pad-xs); --sg-fs:var(--ctl-fs-xs); }
@@ -29,7 +29,7 @@
    segment plus a gap per unit of `--seg-dx` (its own width is a segment's). */
 .ds-segmented-indicator{
   position:absolute; grid-row:1 / span 1; grid-column:var(--seg-col) / span 1; top:0; right:0; bottom:0; left:0;
-  border-radius:var(--sg-r); background:var(--ink); pointer-events:none;
+  border-radius:var(--sg-r); background:var(--raise); box-shadow:var(--shadow-1); pointer-events:none;
   transform:translateX(calc(var(--seg-dx) * (100% + var(--s-2))));
 }
 
@@ -39,12 +39,16 @@
   height:100%; padding:0 var(--sg-pad); border:0; border-radius:var(--sg-r); background:transparent; cursor:default;
 }
 .ds-segmented-segment:hover{ color:var(--ink); }
-.ds-segmented-segment[*|data-thumb=under]{ color:var(--paper); }
+.ds-segmented-segment[*|data-thumb=under]{ color:var(--ink); }
 .ds-segmented-icon{ display:inline-flex; line-height:0; }
-/* Without a thumb the selected segment carries its own fill: SelectAny keeps it, Momentary
-   shows it while the segment is down. */
-.ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected],
-.ds-segmented[*|data-tracking=momentary] .ds-segmented-segment[*|data-pressed]{ background:var(--ink); color:var(--paper); }
+/* Without a thumb the selected segment carries its own raised face, as the thumb is (SelectAny
+   keeps it); Momentary shows a grey pressed fill while the segment is down. */
+.ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected]{ background:var(--raise); color:var(--ink); box-shadow:var(--shadow-1); }
+.ds-segmented[*|data-tracking=momentary] .ds-segmented-segment[*|data-pressed]{ background:var(--line); color:var(--ink); }
+/* Dark: a darker well and a lighter grey face than the card's raise. */
+.ds[*|data-theme=dark] .ds-segmented{ background:var(--surface-2); }
+.ds[*|data-theme=dark] .ds-segmented-indicator,
+.ds[*|data-theme=dark] .ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected]{ background:var(--line); }
 .ds-segmented[*|data-tracking=select-one] .ds-segmented-segment[*|data-pressed]{ opacity:.85; }
 .ds-segmented-segment[*|aria-disabled=true],
 .ds-segmented[*|aria-disabled=true],

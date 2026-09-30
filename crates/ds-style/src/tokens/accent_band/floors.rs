@@ -11,6 +11,10 @@ use crate::tokens::hex::Alpha;
 /// Ink on the solid fill, the text accent on every card ground, the card's ink on the wash.
 pub const TEXT: f64 = 4.5;
 
+/// White ink on a Mac system fill: 3:1, the large-text floor (button labels are semibold);
+/// system blue and red hold it with white, orange, green and teal take a dark ink.
+pub const INK_ON_SYSTEM_FILL: f64 = 3.0;
+
 /// The focus ring against every card ground.
 pub const RING: f64 = 3.0;
 

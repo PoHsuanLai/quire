@@ -4,10 +4,11 @@ use super::band::{AccentPick, BandWeight, Hue, InkRule};
 use super::derive::accent_roles;
 use super::floors;
 use super::legibility::legibility;
-use super::picked::{BAND, hue_of};
+use super::picked::BAND;
 use super::roles::AccentRoles;
 use super::text_grounds::{BACKDROPS, TEXT_MATERIALS, TextOn, text_grounds, text_on};
 use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::tokens::accent_table::accent_of;
 use crate::tokens::hex::{Alpha, Hex};
 use ds_core::colour::{oklab::Oklab, srgb::Srgb};
 use ds_core::word::Word;
@@ -100,7 +101,7 @@ fn the_wash_stays_translucent() {
     }
 }
 
-/// Band B puts a deep ink of the hue on every fill, never white.
+/// Band B puts a deep ink of the hue on every generated fill, never white.
 #[test]
 fn the_ink_is_deep() {
     for scheme in Scheme::ALL.iter().copied() {
@@ -120,13 +121,7 @@ fn every_built_in_swatch_is_distinct() {
         let fills: Vec<(Accent, Hex)> = Accent::ALL
             .iter()
             .copied()
-            .map(|accent| {
-                let pick = AccentPick {
-                    hue: hue_of(accent),
-                    weight: BandWeight::FULL,
-                };
-                (accent, accent_roles(&BAND, pick, scheme).fill)
-            })
+            .map(|accent| (accent, accent_of(accent, scheme).fill))
             .collect();
         for (index, &(one, first)) in fills.iter().enumerate() {
             for &(other, second) in &fills[index + 1..] {
@@ -143,45 +138,36 @@ fn every_built_in_swatch_is_distinct() {
     }
 }
 
-/// The numbers design/03-COLOR.md section 20 quotes for Postmark's hue: fill, ink, the card's
-/// text, the material's text, wash and ring, light then dark.
+/// The Mac Look's default accent is systemBlue with white ink, light then dark; the text accent,
+/// wash and ring are derived around it.
 #[test]
-fn postmark_is_the_settled_airy_blue() {
-    let pick = AccentPick {
-        hue: hue_of(Accent::Postmark),
-        weight: BandWeight::FULL,
-    };
-    let light = accent_roles(&BAND, pick, Scheme::Light);
-    let dark = accent_roles(&BAND, pick, Scheme::Dark);
+fn postmark_is_system_blue() {
+    let light = accent_of(Accent::Postmark, Scheme::Light);
+    let dark = accent_of(Accent::Postmark, Scheme::Dark);
     let got = [
         light.fill.css(),
         light.ink.css(),
-        light.text.css(),
-        light.text_material.css(),
-        light.wash_colour().css(),
-        light.ring_colour().css(),
         dark.fill.css(),
         dark.ink.css(),
-        dark.text.css(),
-        dark.text_material.css(),
-        dark.wash_colour().css(),
-        dark.ring_colour().css(),
     ];
-    let want = [
-        "#94c0fe",
-        "#111b28",
-        "#396198",
-        "#295086",
-        "rgba(148,192,254,.31)",
-        "rgba(57,97,152,.75)",
-        "#8ebaf7",
-        "#111b28",
-        "#94c0fe",
-        "#d5e6fe",
-        "rgba(142,186,247,.2)",
-        "rgba(148,192,254,.55)",
-    ];
-    assert_eq!(got, want.map(str::to_owned));
+    assert_eq!(
+        got,
+        ["#007aff", "#ffffff", "#0a84ff", "#ffffff"].map(str::to_owned)
+    );
+}
+
+/// White where it reads at 3:1, the deep ink of the hue where it does not (orange, green, teal).
+#[test]
+fn the_ink_is_white_or_deep_by_the_mac_rule() {
+    for scheme in Scheme::ALL.iter().copied() {
+        for accent in Accent::ALL.iter().copied() {
+            let roles = accent_of(accent, scheme);
+            let white = Hex([0xFF, 0xFF, 0xFF]);
+            let white_reads =
+                super::grounds::contrast(white, roles.fill) >= floors::INK_ON_SYSTEM_FILL;
+            assert_eq!(roles.ink == white, white_reads, "{scheme:?} {accent:?}");
+        }
+    }
 }
 
 /// Compositing is per channel and exact at the ends.
