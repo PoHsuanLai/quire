@@ -753,7 +753,7 @@ path each, until step 12 replaces them with the prelude.
 7. **`DocumentHost`** (done): the part traits and `NoHost` in `ds::host`, `ds_native::provide_host`
    installing them all, `HostSignals`, delete every `Host*` newtype and the partial `provide`
    sets, `Clipboard` trait; sill roots call `provide_host` (this fixes the partial seam).
-8. **Split bottom-up**, one crate per commit series, each with `ds` re-exporting: `ds-core`,
+8. **Split bottom-up** (done), one crate per commit series, each with `ds` re-exporting: `ds-core`,
    `ds-style`, `ds-motion`, `ds-lint`, then `ds-shell` (assembly stays in `ds`). Each split updates
    the allowed-edges table in `check-boundary.sh` and `DESIGN.md`.
 9. **`ds-native` -> `ds-blitz` + `ds-harness`**: rename, then move the harness; `pdf`, `print`,

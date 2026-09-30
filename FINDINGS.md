@@ -16,6 +16,16 @@ that rev.
 
 ## Open items
 
+- **Lower crates' CSS names variables the shell declares.** `ds-motion`'s keyframes read
+  `--osd-dy`, `--banner-dx` and `--banner-dy`, and `ds-style`'s shapes read `--dock-floor`, all
+  declared by `ds-shell`'s kit, so the stylesheet of `ds` alone (`ds::stylesheet()`) lints with
+  `UndeclaredVar` and only `ds_shell::stylesheet()` lints clean (`ds-shell/tests/self_lint.rs`).
+  Nothing under `ds` alone draws the OSD, the banners or the dock floor, so the reads are inert
+  there. Ends when the keyframes and the floor shape move to `ds-shell`'s own sheets.
+- **The picker's Space dot is styled above `ds`.** `ds::AppearancePicker` draws `.ds-space-dot`,
+  whose rules are in `ds-shell`'s `space_editor` sheet, so under `ds::stylesheet()` alone the
+  dot is unstyled (`STYLED_ABOVE` in `ds/tests/components_lists.rs`). Ends when those rules move
+  to a sheet `ds` owns, which reorders the stylesheet golden.
 - **Motion and interaction primitives of step 4a.3 have consumers still to move.** Two
   primitives have no caller in quire yet: `use_collapse` waits for the `Disclosure` of step 4a.5
   (`TreeItem` is a native `details`), and `LongPress` waits for the dock and titlebar menus in

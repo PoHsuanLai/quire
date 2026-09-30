@@ -7,11 +7,7 @@
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
 use dioxus::prelude::*;
-use ds::{
-    Anchor, Anim, Availability, Button, ButtonVariant, Common, Ds, FieldFocus, Icon, InputVariant,
-    Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput,
-    use_focus_request, use_motion_timer, use_toasts,
-};
+use ds::{Anchor, Anim, Availability, Button, ButtonVariant, Common, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput, use_focus_request, use_motion_timer, use_toasts};
 use ds_native::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
