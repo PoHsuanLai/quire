@@ -770,7 +770,7 @@ path each, until step 12 replaces them with the prelude.
     files; move SSR tests beside their crates; `ds-gallery` pages regrouped.
 12. **`ds::prelude`** replaces the root re-exports; a mechanical import rewrite in sill in the
     same change; `ds_shell::prelude` likewise.
-13. **`blitz-kit`** (cross-repo): create the repo from the section 3 rows, switch `ds-blitz` and
+13. **`blitz-kit`** (done) (cross-repo): create the repo from the section 3 rows, switch `ds-blitz` and
     shell-host to it, delete both copies.
 14. **`anyrender_pdfrum`** moves to the pdfrum repo as `pdfrum-anyrender`; `ds-blitz`'s `pdf`
     feature depends on it there.
