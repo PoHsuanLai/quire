@@ -26,6 +26,7 @@ mod root;
 pub mod schema;
 mod store;
 mod units;
+mod user_style;
 mod watch;
 
 pub use appearance::{
@@ -34,6 +35,7 @@ pub use appearance::{
 };
 pub use doc::{FileName, Format, SettingsDoc};
 pub use ds_settings_derive::SettingsSchema;
+pub use ds_style::kit::UserStyle;
 #[cfg(feature = "dioxus")]
 pub use environment::{Environment, use_environment};
 pub use error::SettingsError;

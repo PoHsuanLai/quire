@@ -6,7 +6,7 @@
 
 use crate::doc::SettingsDoc;
 use crate::error::SettingsError;
-use crate::lenient::{Loaded, Read, read};
+use crate::lenient::{FileText, Loaded, Read, file_text, read};
 use crate::root::{AppName, ConfigRoot};
 use crate::watch::Watch;
 use ds_core::spawner::Spawner;
@@ -48,9 +48,10 @@ impl Store {
         let Some(path) = self.path::<D>() else {
             return Loaded::default();
         };
-        match std::fs::read_to_string(path) {
-            Ok(text) => Self::decode(&text),
-            Err(_) => Loaded::default(),
+        match file_text(&path) {
+            FileText::Text(text) => Self::decode(&text),
+            FileText::Missing => Loaded::default(),
+            FileText::NotText(reason) => Loaded::garbled(D::default(), reason),
         }
     }
 
