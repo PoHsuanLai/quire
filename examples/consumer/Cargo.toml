@@ -17,7 +17,7 @@ publish = false
 # a published version (CONSUMING.md "Adding quire").
 ds = { path = "../../crates/ds" }
 ds-settings = { path = "../../crates/ds-settings", features = ["dioxus"] }
-ds-native = { path = "../../crates/ds-native" }
+ds-blitz = { path = "../../crates/ds-blitz" }
 
 # ---- lines copied from quire/docs/workspace-deps.toml (pinned block, CONVENTIONS.md §10) ----
 # ds's own dependency tree (dioxus-native, blitz-*, anyrender, ...) resolves against quire's own

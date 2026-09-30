@@ -13,7 +13,7 @@ use ds::{
     RootChrome, Shown, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_native::{Harness, Viewport};
+use ds_blitz::{Harness, Viewport};
 use ds_shell::{Osd, OsdPosition};
 use image::{RgbaImage, imageops};
 use std::time::Duration;
@@ -149,7 +149,7 @@ pub fn strip() -> Result<RgbaImage, GalleryError> {
     if rows.is_empty() {
         return Err(GalleryError::Render {
             name: "level-motion".into(),
-            source: ds_native::NativeError::Renderer("no frame".into()),
+            source: ds_blitz::NativeError::Renderer("no frame".into()),
         });
     }
     Ok(stacked(&rows, 12))

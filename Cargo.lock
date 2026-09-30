@@ -1641,65 +1641,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "ds-core"
-version = "0.1.0"
-dependencies = [
- "ds-core-derive",
- "futures-timer",
- "keyboard-types 0.7.0",
- "serde",
- "serde_json",
- "thiserror 2.0.20",
-]
-
-[[package]]
-name = "ds-core-derive"
-version = "0.1.0"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.119",
-]
-
-[[package]]
-name = "ds-gallery"
-version = "0.1.0"
-dependencies = [
- "dioxus",
- "dioxus-ssr",
- "ds",
- "ds-core",
- "ds-lint",
- "ds-native",
- "ds-settings",
- "ds-shell",
- "image",
- "thiserror 2.0.20",
-]
-
-[[package]]
-name = "ds-lint"
-version = "0.1.0"
-dependencies = [
- "cssparser",
- "ds",
- "ds-core",
- "ds-style",
-]
-
-[[package]]
-name = "ds-motion"
-version = "0.1.0"
-dependencies = [
- "dioxus",
- "dioxus-ssr",
- "ds",
- "ds-core",
- "ds-style",
-]
-
-[[package]]
-name = "ds-native"
+name = "ds-blitz"
 version = "0.1.0"
 dependencies = [
  "anyrender",
@@ -1739,6 +1681,64 @@ dependencies = [
  "wgpu",
  "wgpu_context",
  "zbus",
+]
+
+[[package]]
+name = "ds-core"
+version = "0.1.0"
+dependencies = [
+ "ds-core-derive",
+ "futures-timer",
+ "keyboard-types 0.7.0",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "ds-core-derive"
+version = "0.1.0"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.119",
+]
+
+[[package]]
+name = "ds-gallery"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "dioxus-ssr",
+ "ds",
+ "ds-blitz",
+ "ds-core",
+ "ds-lint",
+ "ds-settings",
+ "ds-shell",
+ "image",
+ "thiserror 2.0.20",
+]
+
+[[package]]
+name = "ds-lint"
+version = "0.1.0"
+dependencies = [
+ "cssparser",
+ "ds",
+ "ds-core",
+ "ds-style",
+]
+
+[[package]]
+name = "ds-motion"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "dioxus-ssr",
+ "ds",
+ "ds-core",
+ "ds-style",
 ]
 
 [[package]]

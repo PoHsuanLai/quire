@@ -13,7 +13,7 @@ use ds_style::icon::family::PlateFamily;
 use ds_style::icon::render::{IconPx, IconSize};
 
 /// The pane's media box: a picture or a page is fitted into it at its own aspect, and a PDF's
-/// page is rasterised for it (`ds_native::use_pdf_page(path, PANE_MEDIA)`). 328 is a 360 pane's
+/// page is rasterised for it (`ds_blitz::use_pdf_page(path, PANE_MEDIA)`). 328 is a 360 pane's
 /// width inside its 16 px padding.
 pub const PANE_MEDIA: Size = Size {
     width: Px(328.0),
@@ -47,7 +47,7 @@ pub enum PaneContent {
         mono: PaneMono,
     },
     /// A PDF's first page, as `PdfThumb` draws it. ds reads no file: a Blitz app gets the page
-    /// from `ds_native::use_pdf_page(Some(path), PANE_MEDIA)` (feature `pdf-thumb`).
+    /// from `ds_blitz::use_pdf_page(Some(path), PANE_MEDIA)` (feature `pdf-thumb`).
     Pdf {
         /// The page, or where its reading is.
         page: PdfPage,

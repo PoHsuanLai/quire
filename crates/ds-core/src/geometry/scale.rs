@@ -2,7 +2,7 @@
 //!
 //! At a fractional scale (1.25, 1.5, 1.75) a one logical pixel line covers a fractional number of
 //! device pixels and blurs into two half-alpha rows; the pixel tokens (`pixel`)
-//! and the host's layout snap (`ds_native::snap`) are computed from this value so it does not.
+//! and the host's layout snap (`ds_blitz::snap`) are computed from this value so it does not.
 
 /// Device pixels per logical pixel, in 120ths: `Scale(120)` is 1x, `Scale(180)` is 1.5x.
 ///
@@ -30,7 +30,7 @@ impl Scale {
     /// 1x, what a root draws at when no one says otherwise.
     pub const ONE: Scale = Scale(Scale::DENOMINATOR);
 
-    /// A scale given in hundredths (`ds_native::Viewport::scale_percent`): 150 is `Scale(180)`.
+    /// A scale given in hundredths (`ds_blitz::Viewport::scale_percent`): 150 is `Scale(180)`.
     /// Exact for every multiple of 5 %, which covers every scale a desktop offers.
     pub fn from_percent(percent: u16) -> Scale {
         Scale(u32::from(percent) * Scale::DENOMINATOR / 100)

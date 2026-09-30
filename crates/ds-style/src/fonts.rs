@@ -2,7 +2,7 @@
 //! Display (the System typeface), Bricolage Grotesque, Karla and Space Mono (the Editorial
 //! typeface; Space Mono is also the code face in both), and Noto Serif.
 //!
-//! On Blitz the bytes are registered with the renderer's font context once (`ds-native`'s
+//! On Blitz the bytes are registered with the renderer's font context once (`ds-blitz`'s
 //! `register_fonts`); nothing about fonts is in the stylesheet.
 //!
 //! The files are subset TTFs (latin and latin-ext, Google Fonts' own split), made from mailo's

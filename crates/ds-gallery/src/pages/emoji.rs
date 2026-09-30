@@ -2,7 +2,7 @@
 //! swaps in, one pick in every mood, the three sizes, the eight discs, and the user picture's
 //! picker. Every picture here
 //! is `EmojiPlayback::Still` (a sheet of 42 loops is what a picker must not do), so each shows
-//! its rest frame; the motion is proved by `ds-native/tests/emoji_life.rs`.
+//! its rest frame; the motion is proved by `ds-blitz/tests/emoji_life.rs`.
 
 use super::{Caption, Section};
 use dioxus::prelude::*;

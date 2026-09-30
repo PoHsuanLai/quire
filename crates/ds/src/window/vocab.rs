@@ -1,6 +1,6 @@
 //! The window seam's vocabulary: what a frame asks of its host (`ResizeEdge`, `Zoom`,
 //! `WindowTile`) and what the host reports back (`WindowState`, `Support`, `TileError`). Closed
-//! sets, so a host that is not ds-native (shell-host's `SurfaceHandle`) maps each one exhaustively.
+//! sets, so a host that is not ds-blitz (shell-host's `SurfaceHandle`) maps each one exhaustively.
 
 use ds_core::word::Word;
 

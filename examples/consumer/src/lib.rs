@@ -10,7 +10,7 @@ use ds::{TextField};
 use ds::{Answers};
 use dioxus::prelude::*;
 use ds::{Anchor, Anim, Availability, Button, Common, Ds, FieldFocus, Icon, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, use_focus_request, use_motion_timer, use_toasts};
-use ds_native::TokioSpawner;
+use ds_blitz::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
 
@@ -21,7 +21,7 @@ pub const STYLE: &str = include_str!("style.css");
 ///
 /// Reads its settings through `ds_settings::use_environment` (`../../CONSUMING.md` "Reading
 /// appearance"), live file and portal watches included. Its watches run on the Tokio runtime
-/// that `ds_native::launch` enters, through `ds_native::TokioSpawner`.
+/// that `ds_blitz::launch` enters, through `ds_blitz::TokioSpawner`.
 #[component]
 pub fn App() -> Element {
     let store = Store::new(ConfigRoot::Xdg, AppName("consumer"));
