@@ -18,3 +18,4 @@ workspace = true
 
 [dev-dependencies]
 dioxus-ssr = { workspace = true }
+ds = { workspace = true }
