@@ -80,9 +80,7 @@ pub use crate::{
         parts::{AppMark, CardAction, GroupCount, Hover, StackLayers},
         swipe::NotificationSwipe,
     },
-    now_playing::{
-        NowPlayingTrack, kind::Playback, play_pause::PlayPauseButton, track_position::TrackPosition,
-    },
+    now_playing::{NowPlayingTrack, kind::Playback, track_position::TrackPosition},
     osd::{Osd, OsdLevel, OsdPosition},
     space_editor::{
         DotIndex, SpaceEditor,

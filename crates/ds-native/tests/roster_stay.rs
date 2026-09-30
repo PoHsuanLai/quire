@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anim, AnimatedList, Appearance, Button, ButtonVariant, Ds, Emphasis, Exit, LeaveBy, ListRow,
-    Material, Point, Px, RosterSpec, RowPitch, RowState, Selection, Stayed, settle, use_roster,
+    Anim, AnimatedList, Appearance, Button, Ds, Emphasis, Exit, LeaveBy, ListRow, Material, Point,
+    Px, RosterSpec, RowPitch, RowState, Selection, Stayed, settle, use_roster,
 };
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
@@ -44,7 +44,6 @@ fn StayList() -> Element {
     );
     rsx! {
         Button {
-            variant: ButtonVariant::Secondary,
             label: "Undo",
             onclick: move |_| {
                 if let Some(key) = last() {

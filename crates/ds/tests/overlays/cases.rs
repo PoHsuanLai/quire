@@ -3,7 +3,8 @@
 //! case's timers run first (a hover card's 450 ms intent, an entrance settling).
 
 use dioxus::prelude::*;
-use ds::{Align, Availability, Button, ButtonVariant};
+use ds::ControlSize;
+use ds::{Align, Availability, Button};
 use ds::{
     Anchor, AvatarFace, AvatarShape, AvatarSize, AvatarTone, BubbleAction, BubbleButton,
     BubbleMode, CommandPalette, CommandPaletteHost, Dismiss, Elevation, ExternalIcon, FlagTone,
@@ -274,7 +275,7 @@ fn SenderCard(kind: HoverKind) -> Element {
                     span { class: "ds-hovercard-keys", ds::Kbd { shortcut: Shortcut(vec![ShortcutKey::Space]) } " peek" }
                 }
                 div { class: "ds-hovercard-actions",
-                    Button { variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+                    Button { size: ControlSize::Mini, label: "Reply", onclick: |_| {} }
                 }
             }
         }
@@ -346,7 +347,7 @@ fn foot() -> HoverCardPart {
 
 fn actions() -> HoverCardPart {
     HoverCardPart::Actions(vec![rsx! {
-        Button { variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+        Button { size: ControlSize::Mini, label: "Reply", onclick: |_| {} }
     }])
 }
 
@@ -587,7 +588,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "tooltip",
         state: "fly",
-        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Snooze until…", ds::IconButton { variant: ds::IconButtonVariant::Strip, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
+        make: || rsx! { Tooltip { kind: TooltipKind::Fly, text: "Snooze until…", ds::Button { bezel: ds::Bezel::Toolbar, image: ds::ImagePosition::Only, icon: Icon::Clock, label: "Snooze", onclick: |_| {} } } },
         wait: NOW,
     },
     // Caller-driven: shown with no pointer, hidden under one.

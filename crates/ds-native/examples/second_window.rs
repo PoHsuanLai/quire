@@ -15,10 +15,8 @@
 //! returns.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, ButtonVariant, Ds, FileDropBoard, Found, HostSignals, Material,
-    use_document_host,
-};
+use ds::Answers;
+use ds::{Appearance, Button, Ds, FileDropBoard, Found, HostSignals, Material, use_document_host};
 use ds_native::{AppConfig, AppId, WindowHandle, WindowSpec, launch, open_window_with};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -116,7 +114,7 @@ fn First() -> Element {
         div { style: "padding:20px; display:flex; flex-direction:column; gap:12px",
             p { "{opened.read().len()} message windows opened" }
             Button {
-                variant: ButtonVariant::Primary,
+                answers: Answers::Return,
                 label: "Open message",
                 onclick: move |_| {
                     if let Some(handle) = open_message("Quarterly report") {
@@ -194,7 +192,6 @@ fn Message(subject: String) -> Element {
                 h2 { "{subject}" }
                 p { "Opens so far, shared by Arc: {opens.0.load(Ordering::SeqCst)}" }
                 Button {
-                    variant: ButtonVariant::Secondary,
                     label: "Close",
                     onclick: move |_| {
                         if let Some(host) = window_host_here() {

@@ -9,10 +9,10 @@ use super::Section;
 use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::Bezel;
 use ds::{
-    Appearance, Button, ButtonVariant, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject,
-    Material, Pane, PaneSwitcher, RootChrome, RowTrailing, SettingsRow, TextLine, Theme,
-    default_look,
+    Appearance, Button, CardAccent, Check, Ds, FrameTint, Grain, Icon, Inject, Material, Pane,
+    PaneSwitcher, RootChrome, RowTrailing, SettingsRow, TextLine, Theme, default_look,
 };
 use ds::{
     AppearancePicker, Fraction, LevelControl, LevelGlyph, LevelLook, Muting, PickerLayout, Px,
@@ -166,7 +166,7 @@ fn Detail(module: Module, on_back: EventHandler<ds::Press>) -> Element {
     rsx! {
         div { class: "g-col",
             div { class: "g-row",
-                Button { variant: ButtonVariant::Quiet, label: module.title(), icon: Some(Icon::ChevronLeft), onclick: on_back }
+                Button { bezel: Bezel::Inline, label: module.title(), icon: Some(Icon::ChevronLeft), onclick: on_back }
             }
             div { {list} }
         }

@@ -5,10 +5,8 @@
 //! darkest ink is far lighter than the same button's enabled.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Availability, Button, ButtonSize, ButtonVariant, Ds, Icon, IconButton,
-    IconButtonVariant, Material,
-};
+use ds::{Appearance, Availability, Button, Ds, Icon, Material};
+use ds::{Bezel, ButtonRole, ControlSize, ImagePosition};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -26,19 +24,19 @@ fn Page() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { class: "row", style: "padding:20px; display:flex; gap:8px; align-items:flex-start",
                 span { class: "cancel",
-                    Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: move |_| log.with_mut(|log| log.push("cancel")) }
+                    Button { label: "Cancel", onclick: move |_| log.with_mut(|log| log.push("cancel")) }
                 }
                 span { class: "restart",
-                    Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Restart", onclick: move |_| log.with_mut(|log| log.push("restart")) }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Restart", onclick: move |_| log.with_mut(|log| log.push("restart")) }
                 }
                 span { class: "mini-danger",
-                    Button { variant: ButtonVariant::Danger, label: "Delete", onclick: move |_| {} }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: "Delete", onclick: move |_| {} }
                 }
                 span { class: "suspend",
-                    Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: move |_| log.with_mut(|log| log.push("suspend")) }
+                    Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: move |_| log.with_mut(|log| log.push("suspend")) }
                 }
                 span { class: "lock",
-                    IconButton { variant: IconButtonVariant::Tool, icon: Icon::Lock, label: "Lock", availability: Availability::Disabled, onclick: move |_| log.with_mut(|log| log.push("lock")) }
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Lock, label: "Lock", availability: Availability::Disabled, onclick: move |_| log.with_mut(|log| log.push("lock")) }
                 }
             }
             p { class: "log", {log().join(",")} }
@@ -74,7 +72,7 @@ fn a_regular_danger_is_as_tall_as_the_secondary_beside_it() {
 #[test]
 fn a_press_on_a_disabled_button_fires_nothing() {
     let mut harness = page();
-    for selector in [".suspend .ds-button", ".lock .ds-icon-button"] {
+    for selector in [".suspend .ds-button", ".lock .ds-button"] {
         let at = harness.centre(selector).expect("the button is laid out");
         harness.click(at);
         harness.advance(Duration::from_millis(50));

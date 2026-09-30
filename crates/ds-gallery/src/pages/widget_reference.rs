@@ -11,7 +11,8 @@ use super::Section;
 use super::widget_blur::BlurWall;
 use super::widget_looks::Wall;
 use dioxus::prelude::*;
-use ds::{Button, ButtonVariant, Common, Fraction, WakeStamp};
+use ds::ControlSize;
+use ds::{Button, Common, Fraction, WakeStamp};
 use ds_shell::{
     BatteryCell, BatteryEntry, BatteryWidget, ClockCity, ClockEntry, ClockTime, DayPhase, Device,
     RingMark, Seconds, Timeline, WidgetCard, WidgetSize, WorldClockWidget,
@@ -70,7 +71,7 @@ pub fn WidgetReferencePage() -> Element {
             BlurWall {}
         }
         Section { title: "Batteries", note: "Small with one device (the ring at the top left, the percentage under it), small with four places, and medium with a row of four (13 % is low and red; 99 % is charging, with the bolt in the ring's gap). The device glyphs are the filled set (DeviceGlyph). Each ring fills from empty over --t-fill at --e-out as the page appears, its percentage counting alongside, and the bolt fades in when its ring has arrived (design/23 section 4.1); Replay passes the cards a new WakeStamp.",
-            Button { common: Common { id: Some("replay-fill".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Replay the fill",
+            Button { common: Common { id: Some("replay-fill".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "Replay the fill",
                 onclick: move |_| wake.set(wake().next()) }
             Wall {
                 BatterySolo { wake: wake() }

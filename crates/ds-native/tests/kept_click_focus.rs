@@ -9,10 +9,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    ActionId, Appearance, Ds, FieldFocus, HoverStrip, Icon, IconButton, IconButtonVariant,
-    InputVariant, Material, Press, ShortcutKey, Shown, StripAction, TextInput, TreeItem, TreeShape,
-    use_focus_request,
+    ActionId, Appearance, Ds, FieldFocus, HoverStrip, Icon, InputVariant, Material, Press,
+    ShortcutKey, Shown, StripAction, TextInput, TreeItem, TreeShape, use_focus_request,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::harness::settle_until;
 use ds_native::{FocusFallback, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
@@ -55,8 +55,8 @@ fn Page() -> Element {
                         glyph: Icon::Folder,
                         onselect: move |_: Press| note("select"),
                         trailing: rsx! {
-                            IconButton {
-                                variant: IconButtonVariant::Strip,
+                            Button {
+                                bezel: Bezel::Toolbar, image: ImagePosition::Only,
                                 icon: Icon::Ellipsis,
                                 label: "More",
                                 onclick: move |_: Press| note("more"),
@@ -93,9 +93,9 @@ fn click(harness: &mut Harness, selector: &str) {
     harness.click(at);
 }
 
-const STRIP_BUTTON: &str = ".row .ds-strip .ds-icon-button";
+const STRIP_BUTTON: &str = ".row .ds-strip .ds-button";
 const SELECT: &str = ".tree button.ds-tree-item-label";
-const TRAILING: &str = ".tree .ds-tree-item-trail .ds-icon-button";
+const TRAILING: &str = ".tree .ds-tree-item-trail .ds-button";
 const PLAIN_LABEL: &str = ".tree > .ds-tree-item:last-child > summary .ds-tree-item-label";
 const PLAIN_ROW: &str = ".tree > .ds-tree-item:last-child > summary";
 

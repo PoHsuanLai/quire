@@ -96,9 +96,9 @@
 .ds-menu[*|data-kind=slim] .ds-menu-item[*|data-trailing=action],
 .ds-menu[*|data-kind=context] .ds-menu-item[*|data-trailing=action]{ grid-template-columns:22px 1fr auto auto; }
 .ds-menu-action{ display:inline-flex; align-items:center; }
-.ds-menu[*|data-kind=slim] .ds-menu-action .ds-icon-button,
-.ds-menu[*|data-kind=context] .ds-menu-action .ds-icon-button,
-.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-icon-button{ width:22px; height:22px; }
+.ds-menu[*|data-kind=slim] .ds-menu-action .ds-button,
+.ds-menu[*|data-kind=context] .ds-menu-action .ds-button,
+.ds-menu[*|data-kind=dropdown] .ds-menu-action .ds-button{ width:22px; height:22px; }
 
 /* Shaped rows (`RowShape`): a file's thumbnail fills its tile with no plate; a
    clipboard text is drawn in the code face, clipped to its `--lines` (1 to 4) since Blitz has

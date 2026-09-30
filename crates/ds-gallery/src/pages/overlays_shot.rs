@@ -8,10 +8,7 @@ use super::Section;
 use super::level_tile::work;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, ImageSize, ImageSource, Inject, Material, Shown,
-    Theme,
-};
+use ds::{Appearance, Button, Ds, Icon, ImageSize, ImageSource, Inject, Material, Shown, Theme};
 use ds_shell::{NotificationSwipe, ShotGhost, ShotThumbnail, ThumbAction};
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
@@ -105,7 +102,6 @@ fn ShotScene(theme: Theme) -> Element {
                 if showcase == Showcase::Live {
                     div { class: "g-row",
                         Button {
-                            variant: ButtonVariant::Secondary,
                             label: "Toggle the thumbnail",
                             onclick: move |_| shown.set(match shown() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
                         }

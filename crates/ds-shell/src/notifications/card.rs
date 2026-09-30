@@ -24,10 +24,11 @@ use crate::notifications::body::NotificationBody;
 use crate::notifications::parts::{AppMark, CardAction, GroupCount, Hover};
 use crate::notifications::swipe::{NotificationSwipe, use_card_swipe};
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::components::content::icon_view::IconView;
 use ds::components::content::rich_text::Rich;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::button::{Button, ButtonVariant};
+use ds::components::controls::button::Button;
 use ds::components::controls::press::{PressListeners, Propagation};
 use ds::root::chrome::RootChrome;
 use ds::root::surface::Surface;
@@ -165,7 +166,7 @@ fn action_row(actions: &[CardAction]) -> Element {
             for (n , action) in actions.iter().cloned().enumerate() {
                 Button {
                     key: "{n}",
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: action.label,
                     propagation: Propagation::Stop,
                     onclick: move |press| action.on_press.call(press),

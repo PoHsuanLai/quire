@@ -7,9 +7,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Common, DataAttr, DataName, DropState, Ds, Icon, IconButton, IconButtonVariant,
-    Material, PlaceId, Point, Propagation, Px, RowState, Shown, TreeItem, TreeShape,
+    Appearance, Common, DataAttr, DataName, DropState, Ds, Icon, Material, PlaceId, Point,
+    Propagation, Px, RowState, Shown, TreeItem, TreeShape,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -49,7 +50,7 @@ fn Page() -> Element {
                     place: PlaceId("projects".to_string()),
                     onselect: move |_| note("select:projects".to_string()),
                     trailing: rsx! {
-                        IconButton { common: Common { data: folder("INBOX/Projects"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Projects",
+                        Button { common: Common { data: folder("INBOX/Projects"), ..Common::default() }, bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for Projects",
                             propagation: Propagation::Stop,
                             onclick: move |_| note("more:projects".to_string()) }
                     },
@@ -66,7 +67,7 @@ fn Page() -> Element {
                     glyph: Icon::Archive,
                     place: PlaceId("archive".to_string()),
                     trailing: rsx! {
-                        IconButton { common: Common { data: folder("Archive"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Archive", onclick: move |_| note("more:archive".to_string()) }
+                        Button { common: Common { data: folder("Archive"), ..Common::default() }, bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for Archive", onclick: move |_| note("more:archive".to_string()) }
                     },
                     TreeItem { label: "2025", open: Shown::Hidden, on_toggle: |_| {}, shape: TreeShape::Leaf, place: PlaceId("2025".to_string()) }
                 }
@@ -129,9 +130,9 @@ fn the_trailing_button_keeps_its_press_and_the_row_asks_the_app() {
     );
 
     // The ⋯ that stops its press, and the one that does not: neither toggles.
-    let more = centre(&harness, "summary[*|data-place=projects] .ds-icon-button");
+    let more = centre(&harness, "summary[*|data-place=projects] .ds-button");
     press(&mut harness, more);
-    let more = centre(&harness, "summary[*|data-place=archive] .ds-icon-button");
+    let more = centre(&harness, "summary[*|data-place=archive] .ds-button");
     press(&mut harness, more);
     assert_eq!(log(&harness), "more:projects,more:archive");
     assert!(is_open(&harness, "projects", "archive") && !is_open(&harness, "archive", "receipts"));
@@ -184,10 +185,7 @@ fn the_drop_states_and_the_consumer_data_render() {
     assert_eq!(harness.count(".ds-drop-place[*|data-drop]"), 2);
     assert_eq!(
         harness
-            .attr(
-                "summary[*|data-place=projects] .ds-icon-button",
-                "data-folder"
-            )
+            .attr("summary[*|data-place=projects] .ds-button", "data-folder")
             .as_deref(),
         Some("INBOX/Projects")
     );

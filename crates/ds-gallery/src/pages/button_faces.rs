@@ -4,7 +4,8 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{Button, ButtonFace, ButtonVariant, Check, Icon, Shown, Trailing};
+use ds::{Bezel, ControlSize};
+use ds::{Button, ButtonFace, Check, Icon, Shown, Trailing};
 
 /// The four mark faces with their labels and shortcuts, as the bubble titles them.
 const FACES: [(ButtonFace, &str, &str); 4] = [
@@ -32,23 +33,23 @@ pub fn ButtonFaces() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "frame",
                     div { class: "g-side",
-                        Button { variant: ButtonVariant::Frame, label: "Settings", icon: Some(Icon::Settings), onclick: |_| {} }
-                        Button { variant: ButtonVariant::Frame, label: "Today", pressed: Some(Check::On), onclick: |_| {} }
-                        Button { variant: ButtonVariant::Frame, label: "All mail", trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "Settings", icon: Some(Icon::Settings), onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "Today", value: Some(Check::On), onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "All mail", trailing: Trailing::Caret, onclick: |_| {} }
                     }
                 }
                 Specimen { name: "trailing",
                     div { class: "g-row",
-                        Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", trailing: Trailing::Caret, expanded: open(),
+                        Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Caret, shown: open(),
                             onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
-                        Button { variant: ButtonVariant::Mini, label: "Sends: Now", trailing: Trailing::Caret, onclick: |_| {} }
-                        Button { variant: ButtonVariant::Secondary, label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} }
+                        Button { size: ControlSize::Mini, label: "Sends: Now", trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} }
                     }
                 }
                 Specimen { name: "faces",
                     div { class: "g-row",
                         for (index , (face , label , title)) in FACES.into_iter().enumerate() {
-                            Button { variant: ButtonVariant::Quiet, label, face, title, pressed: Some(marks()[index]),
+                            Button { bezel: Bezel::Inline, label, face, title, value: Some(marks()[index]),
                                 onclick: move |_| marks.with_mut(|all| all[index] = flip(all[index])) }
                         }
                     }

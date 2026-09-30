@@ -8,10 +8,11 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Appearance, Availability, Button, ButtonVariant, Common, Ds, ExternalIcon, IconButton,
-    IconButtonVariant, IconSize, IconSource, IconUrl, IconView, Material, Menu, MenuEntry,
-    MenuKind, MenuTrail, Point, PointerButton, Press, Px, ShortcutKey, Theme,
+    Anchor, Appearance, Availability, Button, Common, Ds, ExternalIcon, IconSize, IconSource,
+    IconUrl, IconView, Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, PointerButton, Press,
+    Px, ShortcutKey, Theme,
 };
+use ds::{Bezel, ControlSize, ImagePosition};
 use ds_native::harness::settle_until;
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
@@ -162,14 +163,14 @@ fn PressApp() -> Element {
     rsx! {
         Root {
             div { style: "display:flex; gap:12px; padding:20px",
-                IconButton {
+                Button {
                     common: Common { id: Some("tray-0".to_string()), ..Common::default() },
-                    variant: IconButtonVariant::Tool,
+                    bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
                     icon: ds::Icon::Star,
                     label: "Tray item",
                     onclick: record,
                 }
-                Button { common: Common { id: Some("mini".to_string()), ..Common::default() }, variant: ButtonVariant::Mini, label: "Mini", onclick: record }
+                Button { common: Common { id: Some("mini".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "Mini", onclick: record }
             }
             p { class: "seen", "{seen}" }
         }
@@ -180,10 +181,7 @@ fn PressApp() -> Element {
 fn a_right_click_reports_a_secondary_press() {
     let mut harness = Harness::new(PressApp, VIEW);
     let seen = |harness: &Harness| harness.text_of(".seen").unwrap_or_default();
-    assert_eq!(
-        harness.attr(".ds-icon-button", "id").as_deref(),
-        Some("tray-0")
-    );
+    assert_eq!(harness.attr(".ds-button", "id").as_deref(), Some("tray-0"));
     let icon = centre(&harness, "#tray-0");
     // (button, what the handler heard)
     const CASES: &[(PointerButton, &str)] = &[

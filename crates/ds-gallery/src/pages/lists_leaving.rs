@@ -8,9 +8,9 @@
 use super::Section;
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
+use ds::Bezel;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, IconSource, Inject, LeavingItem, LeavingList,
-    Material, Shown,
+    Appearance, Button, Ds, Icon, IconSource, Inject, LeavingItem, LeavingList, Material, Shown,
 };
 use ds_shell::{AppMark, GroupHeader, NotificationCard};
 
@@ -128,7 +128,7 @@ pub fn LeavingColumn() -> Element {
             note: "The notification center's column: GroupHeaders over NotificationCards in a Popover root, 360 wide. A card's close dismisses it: it folds (--t-big --e-exit) and the rows below heal by the height it measured. A header's Clear drops its group in one render: the rows fold one after another (--i x --stagger, capped at 12) and are dropped together once the last has settled, and the groups below heal by the group's summed height. Folding a group (N more) hides all but its newest card the same way. Clear all folds every row. Post adds a card that enters with row-in (--t-big --e-spring). Under Reduced a row fades out and in and the rows below take their places without sliding.",
             if showcase == Showcase::Live {
                 div { class: "g-row",
-                    Button { variant: ButtonVariant::Secondary, label: "Post", icon: Some(Icon::Plus),
+                    Button { label: "Post", icon: Some(Icon::Plus),
                         onclick: move |_| {
                             let n = posted();
                             posted.set(n + 1);
@@ -137,8 +137,8 @@ pub fn LeavingColumn() -> Element {
                             notes.with_mut(|notes| notes.insert(0, Note { id, app, summary, body }));
                         },
                     }
-                    Button { variant: ButtonVariant::Secondary, label: "Clear all", onclick: move |_| notes.set(Vec::new()) }
-                    Button { variant: ButtonVariant::Quiet, label: "Reset",
+                    Button { label: "Clear all", onclick: move |_| notes.set(Vec::new()) }
+                    Button { bezel: Bezel::Inline, label: "Reset",
                         onclick: move |_| {
                             folded.set(Vec::new());
                             notes.set(START.iter().zip(0u32..).map(|(&(app, summary, body), id)| Note { id, app, summary, body }).collect());

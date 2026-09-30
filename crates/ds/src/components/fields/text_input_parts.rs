@@ -1,7 +1,8 @@
 //! The three shapes a `TextInput` draws: one line (text, password, secret), a `textarea`, and
 //! a file's name beside its "Choose…" button.
 
-use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
+use crate::components::controls::button::Button;
+use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::fields::text_input::InputVariant;
 use crate::components::fields::text_input_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_input_kind::{Rows, TextInputKind};
@@ -11,6 +12,7 @@ use dioxus::prelude::*;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_style::icon::Icon;
+use ds_style::tokens::control_size::ControlSize;
 
 /// Where a field's events go. `onchange` takes no value: the field already knows it.
 #[derive(Clone, Copy)]
@@ -209,11 +211,11 @@ pub(crate) fn file(field: Field, value: String, on_pick: EventHandler<()>) -> El
             if let Some(text) = shown {
                 span { class: "ds-input-placeholder", "aria-hidden": "true", "{text}" }
             }
-            IconButton {
-                variant: IconButtonVariant::Tool,
+            Button {
+                bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
                 icon: Icon::Folder,
                 label: "{label}: Choose…",
-                tooltip: "Choose…".to_string(),
+                title: "Choose…".to_string(),
                 availability,
                 onclick: move |_| pick(),
             }

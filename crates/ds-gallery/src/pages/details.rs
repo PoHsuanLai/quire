@@ -7,7 +7,7 @@ use crate::details_views::{NetView, ShakeView, SlashView};
 use dioxus::prelude::*;
 use ds::Press;
 use ds::detail::{EventStamp, MorphGlyph, MorphStyle, Operation, PendingToken, Slashed};
-use ds::{Button, ButtonVariant, Glyph, Icon, IconSize, Spinner};
+use ds::{Button, ControlSize, Glyph, Icon, IconSize, Progress, ProgressIndicator, ProgressStyle};
 
 /// The page.
 #[component]
@@ -37,7 +37,7 @@ pub(super) fn Cell(name: String, code: String, controls: Element, children: Elem
 
 /// A mini button.
 pub(super) fn mini(label: &'static str, onclick: impl FnMut(Press) + 'static) -> Element {
-    rsx! { Button { variant: ButtonVariant::Mini, label, onclick } }
+    rsx! { Button { size: ControlSize::Mini, label, onclick } }
 }
 
 #[component]
@@ -60,7 +60,7 @@ fn StateSection() -> Element {
                     },
                     NetView { net: net() }
                 }
-                Cell { name: "Spinner", code: "Spinner {{ operation }}",
+                Cell { name: "Spinner", code: "ProgressIndicator {{ Spinner, Unknown(operation) }}",
                     controls: rsx! {
                         {mini("Start", move |_| operation.set(Operation::Running(PendingToken::start())))}
                         {mini("End", move |_| operation.set(Operation::Idle))}
@@ -68,7 +68,7 @@ fn StateSection() -> Element {
                     div { class: "g-detail",
                         span { class: "g-spin-well",
                             Glyph { icon: Icon::Refresh, size: IconSize::Small }
-                            Spinner { operation: operation() }
+                            ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(operation()), size: ControlSize::Small }
                         }
                     }
                 }

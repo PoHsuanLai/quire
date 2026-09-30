@@ -153,7 +153,7 @@ fn the_choose_button_and_the_name_both_ask_the_host_to_pick() {
         harness.text_of("#file .ds-input-placeholder").as_deref(),
         Some("No file chosen")
     );
-    harness.click(harness.centre("#file .ds-icon-button").expect("Choose…"));
+    harness.click(harness.centre("#file .ds-button").expect("Choose…"));
     harness.advance(ms(30));
     assert_eq!(harness.text_of(".picks").as_deref(), Some("1"));
     harness.click(harness.centre("#file .ds-input").expect("the name"));

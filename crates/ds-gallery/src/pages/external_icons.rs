@@ -3,10 +3,8 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
-use ds::{
-    Button, ButtonVariant, ExternalIcon, Icon, IconButton, IconButtonVariant, IconSize, IconSource,
-    IconUrl, IconView, Shown,
-};
+use ds::{Bezel, ControlSize, ImagePosition};
+use ds::{Button, ExternalIcon, Icon, IconSize, IconSource, IconUrl, IconView, Shown};
 use image::{ImageFormat, Rgba, RgbaImage};
 use std::io::Cursor;
 use std::path::Path;
@@ -62,18 +60,18 @@ pub fn ExternalIcons() -> Element {
             div { class: "g-row",
                 Specimen { name: "Tool, symbolic data: SVG",
                     div { class: "g-row",
-                        IconButton { variant: IconButtonVariant::Tool, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications", onclick: |_| {} }
-                        IconButton { variant: IconButtonVariant::Tool, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications expanded", expanded: Some(Shown::Visible), onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications", onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: symbolic(bell.clone(), IconSize::Base), label: "Notifications expanded", shown: Some(Shown::Visible), onclick: |_| {} }
                     }
                 }
                 Specimen { name: "Tool, symbolic file: SVG",
-                    IconButton { variant: IconButtonVariant::Tool, icon: symbolic(keyboard.clone(), IconSize::Base), label: "Input method", onclick: |_| {} }
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: symbolic(keyboard.clone(), IconSize::Base), label: "Input method", onclick: |_| {} }
                 }
                 Specimen { name: "Tool, image data: PNG",
-                    IconButton { variant: IconButtonVariant::Tool, icon: image(IconSize::Base), label: "Status", onclick: |_| {} }
+                    Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: image(IconSize::Base), label: "Status", onclick: |_| {} }
                 }
                 Specimen { name: "Mini, symbolic",
-                    Button { variant: ButtonVariant::Mini, label: "Updates", icon: symbolic(bell.clone(), IconSize::Compact), onclick: |_| {} }
+                    Button { size: ControlSize::Mini, label: "Updates", icon: symbolic(bell.clone(), IconSize::Compact), onclick: |_| {} }
                 }
                 Specimen { name: "IconView at Bar: glyph, symbolic, image",
                     div { class: "g-row",

@@ -8,10 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Anchor, AnimatedList, Appearance, Availability, Button, ButtonVariant, Check, Ds, Emphasis,
-    Exit, HoverCard, HoverEvent, HoverKey, HoverKind, HoverProfile, HoverTarget, LeaveBy, ListRow,
-    Material, Menu, MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState,
-    Selection, ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
+    Anchor, AnimatedList, Appearance, Availability, Button, Check, Ds, Emphasis, Exit, HoverCard,
+    HoverEvent, HoverKey, HoverKind, HoverProfile, HoverTarget, LeaveBy, ListRow, Material, Menu,
+    MenuEntry, MenuKind, MenuTrail, Point, Px, RosterSpec, RowPitch, RowState, Selection,
+    ShortcutKey, Toggle, use_hover_hub, use_roster, use_toast_hub, use_toasts,
 };
 use ds::{FieldFocus, Grain, InputVariant, PRESETS, Scheme, SpaceLook, TextInput, Theme};
 use ds_native::harness::settle_until;
@@ -58,9 +58,8 @@ fn PressApp() -> Element {
     rsx! {
         Root {
             Button {
-                variant: ButtonVariant::Secondary,
                 label: "Pin",
-                pressed: Some(pinned()),
+                value: Some(pinned()),
                 onclick: move |_| pinned.set(flip(pinned())),
             }
         }
@@ -129,7 +128,6 @@ fn ToastHubProbe() -> Element {
     };
     rsx! {
         Button {
-            variant: ButtonVariant::Secondary,
             label: "Archive",
             onclick: move |_| toasts.push("Archived".into(), None),
         }
@@ -244,7 +242,6 @@ fn MenuDemo() -> Element {
         .collect::<Vec<_>>();
     rsx! {
         Button {
-            variant: ButtonVariant::Secondary,
             label: "Snooze",
             onclick: move |_| open.set(Check::On),
         }
@@ -325,7 +322,6 @@ fn ToastDemo() -> Element {
     let toasts = use_toasts();
     rsx! {
         Button {
-            variant: ButtonVariant::Secondary,
             label: "Archive",
             onclick: move |_| toasts.push("Archived".into(), None),
         }

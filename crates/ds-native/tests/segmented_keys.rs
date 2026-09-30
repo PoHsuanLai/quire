@@ -3,7 +3,9 @@
 //! to them.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, SegSize, SegmentedControl, ShortcutKey};
+use ds::Choice;
+use ds::{Appearance, Ds, Material, SegmentedControl, ShortcutKey};
+use ds::{ControlSize, Tracking};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
@@ -23,7 +25,7 @@ fn Page() -> Element {
     ];
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Popover,
-            SegmentedControl::<u8> { label: "Level", options, value: value(), size: SegSize::Regular, onchange: move |next| value.set(next) }
+            SegmentedControl::<u8> { label: "Level", choices: Choice::pairs(options), tracking: Tracking::SelectOne(value()), size: ControlSize::Regular, onchange: move |next| value.set(next) }
             p { class: "value", "{value()}" }
         }
     }

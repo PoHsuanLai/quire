@@ -7,8 +7,8 @@ use super::Section;
 use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::{
-    Alert, AlertEmphasis, Appearance, Button, ButtonVariant, Ds, Flow, Icon, IconSource, Inject,
-    Material, Px, TextLine, Theme,
+    Alert, AlertEmphasis, Appearance, Button, Ds, Flow, Icon, IconSource, Inject, Material, Px,
+    TextLine, Theme,
 };
 use ds_shell::{Chevron, ModuleGrid, ModuleState, ModuleTile};
 
@@ -94,7 +94,7 @@ fn Windowed(theme: Theme, emphasis: AlertEmphasis) -> Element {
         div { class: "g-modal",
             Ds { appearance, material: Material::Sheet, stylesheet: Inject::Host,
                 div { class: "g-modal-stage g-alert-stage",
-                    Button { variant: ButtonVariant::Secondary, label: "Show the alert", onclick: move |_| open.set(true) }
+                    Button { label: "Show the alert", onclick: move |_| open.set(true) }
                 }
                 if open() {
                     Alert {

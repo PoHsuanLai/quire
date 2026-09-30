@@ -161,7 +161,7 @@ fn the_strip_takes_the_pointer_where_its_rect_says() {
     let mut harness = settled(Visible);
     harness.pointer_move(harness.centre(".ds-row").expect("the row"));
     let strip = rect(&harness, ".ds-strip");
-    let button = rect(&harness, ".ds-strip .ds-icon-button");
+    let button = rect(&harness, ".ds-strip .ds-button");
     let inside = |x: f32, y: f32| Point { x: Px(x), y: Px(y) };
     let (x0, y0) = (strip.origin.x.0, strip.origin.y.0);
     let (x1, y1) = (x0 + strip.size.width.0, y0 + strip.size.height.0);
@@ -186,15 +186,13 @@ fn the_strip_takes_the_pointer_where_its_rect_says() {
         button.origin.x.0 + button.size.width.0 / 2.0,
         button.origin.y.0 + button.size.height.0 / 2.0,
     );
-    assert!(harness.hits(middle, ".ds-strip .ds-icon-button"));
+    assert!(harness.hits(middle, ".ds-strip .ds-button"));
 }
 
 #[test]
 fn a_hidden_strip_takes_no_hits_even_under_the_pointer() {
     let mut harness = settled(Hidden);
-    let button = harness
-        .centre(".ds-strip .ds-icon-button")
-        .expect("a button");
+    let button = harness.centre(".ds-strip .ds-button").expect("a button");
     harness.pointer_move(button);
     harness.advance(Duration::from_millis(400));
     assert!(!harness.hits(button, ".ds-strip"));

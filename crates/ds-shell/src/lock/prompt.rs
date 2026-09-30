@@ -9,7 +9,8 @@ use crate::lock::vocab::{CapsLock, LockLook, LockUser, PromptState};
 use crate::user_picture::{picture::UserPicture, portrait::Liveliness};
 use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::spinner::Spinner;
+use ds::components::controls::progress::model::{Progress, ProgressStyle};
+use ds::components::controls::progress::view::ProgressIndicator;
 use ds::components::fields::{
     text_input::{InputVariant, TextInput},
     text_input_focus::FieldFocus,
@@ -23,6 +24,7 @@ use ds_motion::detail::{
 use ds_motion::wake::WakeStamp;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// The placeholder when the caller gives none.
 const ENTER_PASSWORD: &str = "Enter Password";
@@ -220,7 +222,11 @@ fn go_button(
             onclick: move |_| onpress.call(()),
             if checking {
                 span { class: "ds-lock-busy",
-                    Spinner { operation }
+                    ProgressIndicator {
+                        style: ProgressStyle::Spinner,
+                        progress: Progress::Unknown(operation),
+                        size: ControlSize::Small,
+                    }
                 }
             } else {
                 Glyph { icon: Icon::ArrowRight, size: IconSize::Small }

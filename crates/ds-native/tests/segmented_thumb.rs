@@ -23,9 +23,10 @@ mod probe;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SegSize,
-    SegmentedControl, SystemPrefs, Theme,
+    Accent, Appearance, AppearancePicker, Ds, Material, PickerLayout, Rect, SegmentedControl,
+    SystemPrefs, Theme,
 };
+use ds::{Choice, ControlSize, Tracking};
 use ds_native::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
 use ds_shell::{ModuleGrid, ModulePanel};
 use probe::{distance, rect};
@@ -78,8 +79,8 @@ fn Desk() -> Element {
                     }
                     ModulePanel {
                         div { class: "power",
-                            SegmentedControl::<u8> { label: "Power Mode", size: SegSize::Small, options: profiles,
-                                value: profile(), onchange: move |next| profile.set(next) }
+                            SegmentedControl::<u8> { label: "Power Mode", size: ControlSize::Mini, choices: Choice::pairs(profiles),
+                                tracking: Tracking::SelectOne(profile()), onchange: move |next| profile.set(next) }
                         }
                     }
                 }

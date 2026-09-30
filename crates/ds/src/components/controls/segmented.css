@@ -1,41 +1,51 @@
-/* SegmentedControl (design/04-COMPONENTS.md section 3): Regular is S's `.seg` (`S:265-268`),
-   Small the reader's `.view-switch` (`S:537-539`); hover and active are C's (`C:233-237`).
-   Attribute selectors carry `*|` (spike S2). The focus ring is the global one (spike S12).
+/* SegmentedControl (design/30 section 2.3, `NSSegmentedControl`). Attribute selectors carry `*|`
+   (spike S2). The focus ring is the global one (spike S12).
    Driven motion (design/05 section 14, H1; design/27 section 5.15): the segments are equal, as
-   the Mac's are, and the pressed fill is one thumb behind them (the control's `::before`, so every
-   child is still a segment; the segments stack above it by `--z-raise`). The thumb is placed in
-   the selected segment's own grid cell (`--seg-col`), so at rest it covers exactly the box the
-   layout gave that segment at any scale, and a spring in Rust shifts it from there by `--seg-dx`
-   segments while it moves; nothing here transitions it. A label's ink follows the thumb, not a
-   transition: `data-thumb=under` while the thumb covers most of it (a colour transition ran on
-   its own clock, so a label went to the thumb's light ink on the light track before the thumb
-   arrived, and after a theme change every label faded from the old scheme's ink).
+   the Mac's are, and the selection of a SelectOne control is one thumb behind them (the control's
+   last child, so every other child is a segment; the segments stack above it by `--z-raise`). The
+   thumb is placed in the selected segment's own grid cell (`--seg-col`), so at rest it covers
+   exactly the box the layout gave that segment at any scale, and a spring in Rust shifts it from
+   there by `--seg-dx` segments while it moves; nothing here transitions it. A label's ink follows
+   the thumb, not a transition: `data-thumb=under` while the thumb covers most of it (a colour
+   transition ran on its own clock, so a label went to the thumb's light ink on the light track
+   before the thumb arrived).
    Size (design/29-SIZING.md, decision 5): a rounded rectangle on the ladder, not a capsule. The
-   well is a control's height (Regular 22, Small 16) at the well radius (6, 4); the thumb and
-   each segment fill it less the 1 px knob inset (20, 14) at the concentric radius (5, 3). The
-   well's hairline is an inset shadow, so it takes nothing from the inset.
-   TODO(O-1): disabled is not specified. */
+   well is a control's height (16, 19, 22, 28) at the well radius; the thumb and each segment fill
+   it less the 1 px knob inset at the concentric radius. The well's hairline is an inset shadow,
+   so it takes nothing from the inset. Disabled segments draw at .35. */
 
-.ds-segmented{ --seg-n:1; --seg-col:1; --seg-dx:0; position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
-  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset);
-  height:var(--ctl-h-m); border-radius:var(--seg-well-r-m); --seg-r:var(--seg-r-m); }
-.ds-segmented[*|data-size=regular]{ background:var(--surface-2); }
-.ds-segmented[*|data-size=small]{ height:var(--ctl-h-xs); border-radius:var(--seg-well-r-xs); --seg-r:var(--seg-r-xs); background:var(--surface); }
+.ds-segmented{ --seg-n:1; --seg-col:1; --seg-dx:0;
+  --sg-h:var(--ctl-h-m); --sg-well-r:var(--seg-well-r-m); --sg-r:var(--seg-r-m); --sg-pad:var(--ctl-pad-m); --sg-fs:var(--ctl-fs-m);
+  position:relative; display:inline-grid; grid-auto-flow:column; grid-auto-columns:1fr; gap:var(--s-2);
+  box-sizing:border-box; border:0; box-shadow:inset 0 0 0 var(--hair) var(--line); padding:var(--knob-inset); background:var(--surface-2);
+  height:var(--sg-h); border-radius:var(--sg-well-r);
+}
+.ds-segmented[*|data-size=mini]{ --sg-h:var(--ctl-h-xs); --sg-well-r:var(--seg-well-r-xs); --sg-r:var(--seg-r-xs); --sg-pad:var(--ctl-pad-xs); --sg-fs:var(--ctl-fs-xs); }
+.ds-segmented[*|data-size=small]{ --sg-h:var(--ctl-h-s); --sg-well-r:var(--seg-well-r-s); --sg-r:var(--seg-r-s); --sg-pad:var(--ctl-pad-s); --sg-fs:var(--ctl-fs-s); }
+.ds-segmented[*|data-size=large]{ --sg-h:var(--ctl-h-l); --sg-well-r:var(--seg-well-r-l); --sg-r:var(--seg-r-l); --sg-pad:var(--ctl-pad-l); --sg-fs:var(--ctl-fs-l); }
 
 /* The thumb: out of flow in the selected segment's cell, which is its containing block (both
    ends named: an abspos item's `auto` end line is the padding edge, not span 1), and one
    segment plus a gap per unit of `--seg-dx` (its own width is a segment's). */
-.ds-segmented::before{
-  content:""; position:absolute; grid-row:1 / span 1; grid-column:var(--seg-col) / span 1; top:0; right:0; bottom:0; left:0;
-  border-radius:var(--seg-r); background:var(--ink); pointer-events:none;
+.ds-segmented-indicator{
+  position:absolute; grid-row:1 / span 1; grid-column:var(--seg-col) / span 1; top:0; right:0; bottom:0; left:0;
+  border-radius:var(--sg-r); background:var(--ink); pointer-events:none;
   transform:translateX(calc(var(--seg-dx) * (100% + var(--s-2))));
 }
 
-.ds-segment{
-  position:relative; z-index:var(--z-raise); font:inherit; border:0; background:transparent; border-radius:var(--seg-r); font-weight:600; cursor:default; color:var(--ink-soft);
-  height:100%; line-height:1; white-space:nowrap;
+.ds-segmented-segment{
+  position:relative; z-index:var(--z-raise); display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4);
+  font:inherit; font-size:var(--sg-fs); font-weight:var(--ctl-fw-m); line-height:1; white-space:nowrap; color:var(--ink-soft);
+  height:100%; padding:0 var(--sg-pad); border:0; border-radius:var(--sg-r); background:transparent; cursor:default;
 }
-.ds-segmented[*|data-size=regular] .ds-segment{ padding:0 var(--ctl-pad-m); font-size:var(--fs-small); }
-.ds-segmented[*|data-size=small] .ds-segment{ padding:0 var(--ctl-pad-xs); font-size:var(--fs-help); }
-.ds-segment:hover{ color:var(--ink); }
-.ds-segment[*|data-thumb=under]{ color:var(--paper); }
+.ds-segmented-segment:hover{ color:var(--ink); }
+.ds-segmented-segment[*|data-thumb=under]{ color:var(--paper); }
+.ds-segmented-icon{ display:inline-flex; line-height:0; }
+/* Without a thumb the selected segment carries its own fill: SelectAny keeps it, Momentary
+   shows it while the segment is down. */
+.ds-segmented[*|data-tracking=select-any] .ds-segmented-segment[*|data-selected=selected],
+.ds-segmented[*|data-tracking=momentary] .ds-segmented-segment[*|data-pressed]{ background:var(--ink); color:var(--paper); }
+.ds-segmented[*|data-tracking=select-one] .ds-segmented-segment[*|data-pressed]{ opacity:.85; }
+.ds-segmented-segment[*|aria-disabled=true],
+.ds-segmented[*|aria-disabled=true],
+.ds-segmented[*|aria-busy=true]{ opacity:.35; pointer-events:none; }

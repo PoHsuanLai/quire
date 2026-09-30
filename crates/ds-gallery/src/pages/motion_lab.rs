@@ -5,8 +5,9 @@
 use super::Section;
 use super::motion::{millis, recipe_text};
 use dioxus::prelude::*;
+use ds::ControlSize;
 use ds::Word;
-use ds::{Anim, Button, ButtonVariant, PulseKey, TimerPhase, settle, use_motion_timer, use_scope};
+use ds::{Anim, Button, PulseKey, TimerPhase, settle, use_motion_timer, use_scope};
 
 /// The motion lab page.
 #[component]
@@ -48,7 +49,7 @@ fn LabCell(anim: Anim) -> Element {
             div { class, "data-pulse": alias, "Aa" }
             div { class: "g-col",
                 Button {
-                    variant: ButtonVariant::Mini,
+                    size: ControlSize::Mini,
                     label: format!("{anim:?}"),
                     onclick: move |_| {
                         pulse.set(pulse().fired());

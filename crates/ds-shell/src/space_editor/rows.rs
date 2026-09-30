@@ -6,6 +6,7 @@ use dioxus::prelude::*;
 use ds::components::controls::segmented::SegmentedControl;
 use ds::components::fields::text_input::{InputVariant, TextInput};
 use ds::components::lists::section_header::{HeaderKind, SectionHeader};
+use ds::{Choice, Tracking};
 use ds_core::word::Word;
 use ds_style::appearance::{
     motion::Motion,
@@ -86,8 +87,8 @@ pub(super) fn MotionRow(choice: MotionChoice) -> Element {
             SectionHeader { kind: HeaderKind::Field, text: "Motion" }
             SegmentedControl::<Motion> {
                 label: "Motion",
-                options: Motion::ALL.iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>(),
-                value: choice.level,
+                choices: Choice::pairs(Motion::ALL.iter().map(|&level| (level, level.label().to_string())).collect::<Vec<_>>()),
+                tracking: Tracking::SelectOne(choice.level),
                 onchange: move |level| choice.on_motion.call(level),
             }
         }

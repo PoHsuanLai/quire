@@ -77,7 +77,7 @@ fn sliding(harness: &Harness, class: &str) -> bool {
 /// Press a step button and watch its slide: present at once, gone only after a full slide.
 fn step_and_watch(harness: &mut Harness, label: &str, class: &str) {
     let pressed = harness.now();
-    press(harness, &format!(".ds-icon-button[*|aria-label='{label}']"));
+    press(harness, &format!(".ds-button[*|aria-label='{label}']"));
     harness.advance(ms(1));
     let looked = harness.now();
     assert!(

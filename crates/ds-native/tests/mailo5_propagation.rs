@@ -4,10 +4,8 @@
 //! click reach the summary, which toggles its details.
 
 use dioxus::prelude::*;
-use ds::{
-    Appearance, Button, ButtonVariant, Ds, Icon, IconButton, IconButtonVariant, Material, Point,
-    Propagation,
-};
+use ds::{Appearance, Button, Ds, Icon, Material, Point, Propagation};
+use ds::{Bezel, ControlSize, ImagePosition};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -29,7 +27,7 @@ fn Page() -> Element {
                 summary { onclick: move |_| note("summary:stop"),
                     "Quoted message "
                     Button {
-                        variant: ButtonVariant::Mini,
+                        size: ControlSize::Mini,
                         label: "Remove",
                         propagation: Propagation::Stop,
                         onclick: move |_| note("press:stop"),
@@ -41,7 +39,7 @@ fn Page() -> Element {
                 summary { onclick: move |_| note("summary:bubble"),
                     "Attachments "
                     Button {
-                        variant: ButtonVariant::Mini,
+                        size: ControlSize::Mini,
                         label: "Add",
                         onclick: move |_| note("press:bubble"),
                     }
@@ -51,8 +49,8 @@ fn Page() -> Element {
             details { class: "glyph",
                 summary { onclick: move |_| note("summary:glyph"),
                     "Signature "
-                    IconButton {
-                        variant: IconButtonVariant::Tool,
+                    Button {
+                        bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
                         icon: Icon::X,
                         label: "Remove signature",
                         propagation: Propagation::Stop,
@@ -91,7 +89,7 @@ fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
     assert!(!is_open(&harness, "stop"), "a Stop press does not toggle");
     assert_eq!(harness.text_of(".log").as_deref(), Some("press:stop"));
 
-    let glyph = centre(&harness, "details.glyph .ds-icon-button");
+    let glyph = centre(&harness, "details.glyph .ds-button");
     harness.click(glyph);
     harness.advance(Duration::from_millis(50));
     assert!(

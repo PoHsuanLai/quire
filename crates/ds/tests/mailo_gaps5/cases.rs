@@ -1,9 +1,10 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
+use ds::{Bezel, ControlSize};
 use ds::{
-    Button, ButtonVariant, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle,
-    PlaceId, Presence, ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
+    Button, Common, Icon, ItemKind, Leading, MarkProvider, MarkSize, MarkStyle, PlaceId, Presence,
+    ProviderMark, RowState, RunTone, SidebarItem, TextLine, TextRun, Trailing,
 };
 use ds::{DropState, Selection};
 
@@ -48,11 +49,11 @@ fn google() -> Leading {
 pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/leading-mark.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", leading: google(), trailing: Trailing::Caret, expanded: ds::Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: google(), trailing: Trailing::Caret, shown: ds::Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/leading-glyph.html",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} } },
     },
     Case {
         golden: "lists/sidebar_item/place-drop-accepts.html",
@@ -60,10 +61,10 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/label-runs.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: quoted_head(), onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: quoted_head(), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/label-runs-named.html",
-        make: || rsx! { Button { common: Common { aria_label: Some("Show the quoted message".to_string()), ..Common::default() }, variant: ButtonVariant::Quiet, label: quoted_head(), onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Show the quoted message".to_string()), ..Common::default() }, bezel: Bezel::Inline, label: quoted_head(), onclick: |_| {} } },
     },
 ];

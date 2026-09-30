@@ -88,7 +88,7 @@ fn press(app: fn() -> Element) -> String {
     harness.advance(Duration::from_millis(600));
     // The strip is centred by auto margins, so its layout rect is where it takes the pointer.
     let at = harness
-        .centre(".ds-strip .ds-icon-button")
+        .centre(".ds-strip .ds-button")
         .unwrap_or_else(|| panic!("no strip button:\n{}", harness.html()));
     harness.click(at);
     harness.advance(Duration::from_millis(200));

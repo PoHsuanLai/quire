@@ -169,7 +169,7 @@ fn a_trailing_action_in_a_menu_neither_picks_nor_closes() {
     let mut harness = Harness::new(OwnCursor, VIEW);
     harness.advance(ms(300));
     let remove = harness
-        .centre(".ds-menu-item:nth-child(2) .ds-menu-action .ds-icon-button")
+        .centre(".ds-menu-item:nth-child(2) .ds-menu-action .ds-button")
         .expect("the second row's remove");
     harness.click(remove);
     harness.advance(ms(300));

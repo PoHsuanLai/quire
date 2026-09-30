@@ -4,9 +4,10 @@
 
 use super::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::{Bezel, ControlSize};
 use ds::{
-    Button, ButtonVariant, Icon, Leading, MarkProvider, MarkSize, MarkStyle, ProviderMark, RunTone,
-    Shown, TextLine, TextRun, Trailing,
+    Button, Icon, Leading, MarkProvider, MarkSize, MarkStyle, ProviderMark, RunTone, Shown,
+    TextLine, TextRun, Trailing,
 };
 
 /// A provider's inline mark, for a From value.
@@ -32,9 +33,9 @@ pub fn ButtonsMailo5() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "mark",
                     div { class: "g-row",
-                        Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Caret, onclick: |_| {} }
-                        Button { variant: ButtonVariant::Frame, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Caret, onclick: |_| {} }
-                        Button { variant: ButtonVariant::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
+                        Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
                     }
                 }
             }
@@ -43,9 +44,9 @@ pub fn ButtonsMailo5() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "runs",
                     div { class: "g-row",
-                        Button { variant: ButtonVariant::Quiet, label: quoted_head(), trailing: Trailing::Caret, expanded: open(),
+                        Button { bezel: Bezel::Inline, label: quoted_head(), trailing: Trailing::Caret, shown: open(),
                             onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
-                        Button { variant: ButtonVariant::Mini, label: quoted_head(), onclick: |_| {} }
+                        Button { size: ControlSize::Mini, label: quoted_head(), onclick: |_| {} }
                     }
                 }
             }

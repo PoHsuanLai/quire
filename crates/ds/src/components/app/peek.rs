@@ -5,7 +5,8 @@
 //! peek is the topmost layer) closes it, at once. Center plays `peek-in` over `--t-big
 //! --e-spring`; Full covers the card and plays it over `--t-move --e-out` (`Anim::PeekFullIn`).
 
-use crate::components::controls::icon_button::{IconButton, IconButtonVariant};
+use crate::components::controls::button::Button;
+use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
 use crate::components::overlays::scrim::scrim_button;
 use dioxus::prelude::*;
@@ -14,6 +15,7 @@ use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
 use ds_style::appearance::peek::PeekMode;
 use ds_style::icon::Icon;
+use ds_style::tokens::control_size::ControlSize;
 use ds_style::tokens::layer::ZLayer;
 
 /// The `data-mode` word.
@@ -55,8 +57,8 @@ pub fn Peek(
                 "aria-label": "{label}",
                 onkeydown: move |event| escape_closes(float, &event, onclose),
                 div { class: "ds-peek-tools",
-                    IconButton {
-                        variant: IconButtonVariant::Tool,
+                    Button {
+                        bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only,
                         icon: Icon::X,
                         label: close.clone(),
                         onclick: move |_| onclose.call(()),

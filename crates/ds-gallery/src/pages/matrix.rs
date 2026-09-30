@@ -6,11 +6,12 @@ use crate::axes::Axes;
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{
-    Accent, AnimatedList, Availability, Button, ButtonVariant, Check, Chip, ChipVariant, Emphasis,
-    Fraction, Icon, InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, RowState,
-    Scheme, SegSize, SegmentedControl, Selection, SidebarItem, Slider, Surface, Tabs, TextInput,
-    Toggle, Verdict,
+    Accent, AnimatedList, Availability, Button, Check, Chip, ChipVariant, Emphasis, Fraction, Icon,
+    InputVariant, ItemKind, LabelHue, ListRow, Material, Presence, RowState, Scheme,
+    SegmentedControl, Selection, SidebarItem, Slider, Surface, TextInput, Toggle, Verdict,
 };
+use ds::{Answers, Bezel, ButtonRole, ControlSize};
+use ds::{Choice, Tracking};
 
 /// What the matrix can show.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -45,7 +46,7 @@ pub fn MatrixPage() -> Element {
         .collect::<Vec<_>>();
     rsx! {
         Section { title: "Component",
-            SegmentedControl::<Subject> { label: "Component", options, value: subject(), size: SegSize::Small, onchange: move |next| subject.set(next) }
+            SegmentedControl::<Subject> { label: "Component", choices: Choice::pairs(options), tracking: Tracking::SelectOne(subject()), size: ControlSize::Mini, onchange: move |next| subject.set(next) }
         }
         for scheme in Scheme::ALL.iter().copied() {
             Section { title: format!("{} scheme", scheme.slug()),
@@ -73,10 +74,10 @@ pub fn MatrixPage() -> Element {
 fn Cell(subject: Subject) -> Element {
     match subject {
         Subject::Buttons => rsx! {
-            Button { variant: ButtonVariant::Primary, label: "Send", onclick: |_| {} }
-            Button { variant: ButtonVariant::Secondary, label: "Pressed", pressed: Some(Check::On), onclick: |_| {} }
-            Button { variant: ButtonVariant::Quiet, label: "Quiet", icon: Some(Icon::Archive), onclick: |_| {} }
-            Button { variant: ButtonVariant::Danger, label: "Off", availability: Availability::Disabled, onclick: |_| {} }
+            Button { answers: Answers::Return, label: "Send", onclick: |_| {} }
+            Button { label: "Pressed", value: Some(Check::On), onclick: |_| {} }
+            Button { bezel: Bezel::Inline, label: "Quiet", icon: Some(Icon::Archive), onclick: |_| {} }
+            Button { role: ButtonRole::Destructive, size: ControlSize::Mini, label: "Off", availability: Availability::Disabled, onclick: |_| {} }
         },
         Subject::Chips => rsx! {
             Chip { variant: ChipVariant::Accent, text: "Accent" }
@@ -129,7 +130,7 @@ fn Cell(subject: Subject) -> Element {
             }
         },
         Subject::Tabs => rsx! {
-            Tabs::<u8> { label: "Tabs", tabs: vec![(0, "Inbox".to_string()), (1, "Sent".to_string())], value: 0, onchange: |_| {} }
+            SegmentedControl::<u8> { label: "Tabs", choices: Choice::pairs(vec![(0, "Inbox".to_string()), (1, "Sent".to_string())]), tracking: Tracking::SelectOne(0), onchange: |_| {} }
         },
         Subject::Field => rsx! {
             TextInput { variant: InputVariant::Boxed, label: "Name", value: "", placeholder: "Your name", oninput: |_| {} }

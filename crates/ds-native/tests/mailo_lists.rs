@@ -111,7 +111,7 @@ fn centre(harness: &Harness, selector: &str) -> Point {
 /// Where the strip's first button is: centred on its row by auto margins, so the layout rect
 /// Blitz reports is where it paints and takes the pointer (FINDINGS "Native focus").
 fn strip_button(harness: &Harness) -> Point {
-    centre(harness, ".ds-strip .ds-icon-button")
+    centre(harness, ".ds-strip .ds-button")
 }
 
 /// A point well outside the row.

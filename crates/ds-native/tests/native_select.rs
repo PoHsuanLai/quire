@@ -4,8 +4,8 @@
 
 use dioxus::prelude::*;
 use ds::{
-    Appearance, Button, ButtonVariant, Ds, FieldFocus, InputVariant, Material, ShortcutKey,
-    TextInput, focus_soon, use_focus_request,
+    Appearance, Button, Ds, FieldFocus, InputVariant, Material, ShortcutKey, TextInput, focus_soon,
+    use_focus_request,
 };
 use ds_native::{Harness, Viewport};
 use std::rc::Rc;
@@ -38,7 +38,7 @@ fn Rename() -> Element {
                     TextInput { variant: InputVariant::Boxed, label: "Other", value: "", oninput: |_| {} }
                 }
                 div { id: "again", style: "display:flex",
-                    Button { variant: ButtonVariant::Secondary, label: "Rename",
+                    Button { label: "Rename",
                         onclick: move |_| request.request() }
                 }
             }
@@ -113,7 +113,7 @@ fn Shell() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { class: "app", tabindex: "0", onmounted: move |event| shell.set(Some(event.data())),
                 div { id: "back", style: "display:flex; width:200px",
-                    Button { variant: ButtonVariant::Secondary, label: "Back",
+                    Button { label: "Back",
                         onclick: move |_| if let Some(element) = shell() { focus_soon(element) } }
                 }
             }

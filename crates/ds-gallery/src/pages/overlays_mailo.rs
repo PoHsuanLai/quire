@@ -6,9 +6,9 @@ use super::{Section, Specimen};
 use crate::axes::{Axes, Showcase};
 use dioxus::prelude::*;
 use ds::{
-    Anchor, Button, ButtonVariant, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon,
-    InputVariant, Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Radius,
-    RowAction, RunTone, Surface, TextInput, TextLine, TextRun, use_rect,
+    Anchor, Button, CommandPalette, CommandPaletteHost, Corner, FieldFocus, Icon, InputVariant,
+    Material, Menu, MenuCursor, MenuEntry, MenuKind, MenuRow, MenuTile, Radius, RowAction, RunTone,
+    Surface, TextInput, TextLine, TextRun, use_rect,
 };
 
 /// The recent searches a panel starts with.
@@ -135,7 +135,7 @@ pub fn FieldMenu() -> Element {
                         },
                     }
                 }
-                Button { variant: ButtonVariant::Secondary, label: "Open the people menu", onclick: move |_| open.set(true) }
+                Button { label: "Open the people menu", onclick: move |_| open.set(true) }
             }
             // Room under the field for the menu, inside the page.
             div { style: "height:230px" }

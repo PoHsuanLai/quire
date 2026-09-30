@@ -6,8 +6,9 @@
 //! `tests/coherence.rs` is the point of this crate: it runs the four coherence rules from
 //! `CONSUMING.md` section 5 against `App`'s own output, the way a real consumer's tests would.
 
+use ds::{Answers};
 use dioxus::prelude::*;
-use ds::{Anchor, Anim, Availability, Button, ButtonVariant, Common, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput, use_focus_request, use_motion_timer, use_toasts};
+use ds::{Anchor, Anim, Availability, Button, Common, Ds, FieldFocus, Icon, InputVariant, Material, Menu, MenuEntry, MenuKind, MenuTile, MenuTrail, MountedRef, TextInput, use_focus_request, use_motion_timer, use_toasts};
 use ds_native::TokioSpawner;
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
@@ -93,7 +94,7 @@ fn Page() -> Element {
             }
             div { class: "actions",
                 Button {
-                    variant: ButtonVariant::Primary,
+                    answers: Answers::Return,
                     label: "Send".to_owned(),
                     icon: Some(Icon::Send),
                     onclick: move |_| {
@@ -103,7 +104,6 @@ fn Page() -> Element {
                     },
                 }
                 Button {
-                    variant: ButtonVariant::Secondary,
                     label: "More".to_owned(),
                     onclick: move |_| menu_open.set(true),
                     common: Common {

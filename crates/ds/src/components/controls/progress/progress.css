@@ -1,0 +1,64 @@
+/* ProgressIndicator (design/30 section 2.9). Attribute selectors carry `*|` (spike S2). Sized
+   by the ladder: the bar's thickness is `--progress-*`, the spinner's and the ring's box
+   `--spinner-*`. A determinate value is `--f`, written from Rust (a tween, so it retargets from
+   where it stands); a running operation is `--step` (`data-pending=step`), a turn one twelfth a
+   step, so nothing here loops. */
+
+.ds-progress{ --pg-h:var(--progress-m); --pg-box:var(--spinner-m); position:relative; box-sizing:border-box; flex:none; }
+.ds-progress[*|data-size=mini]{ --pg-h:var(--progress-xs); --pg-box:var(--spinner-xs); }
+.ds-progress[*|data-size=small]{ --pg-h:var(--progress-s); --pg-box:var(--spinner-s); }
+.ds-progress[*|data-size=large]{ --pg-h:var(--progress-l); --pg-box:var(--spinner-l); }
+.ds-progress[*|data-pending=idle]{ visibility:hidden; }
+
+/* Bar: a capsule track, the fill in the accent. */
+.ds-progress[*|data-style=bar]{ width:100%; height:var(--pg-h); }
+.ds-progress[*|data-style=bar] .ds-progress-track{ height:100%; overflow:hidden; border-radius:var(--r-pill); background:var(--line); }
+.ds-progress[*|data-style=bar] .ds-progress-fill{ height:100%; width:calc(var(--f, 1) * 100%); border-radius:var(--r-pill); background:var(--accent); }
+/* The barber pole: diagonal stripes on a fill twice the track wide, slid a twelfth of their
+   horizontal period (24 px) a step. */
+.ds-progress[*|data-style=bar][*|data-pending=step] .ds-progress-fill{
+  width:200%; border-radius:0;
+  background-image:repeating-linear-gradient(135deg, var(--accent) 0, var(--accent) 8.5px, var(--accent-soft) 8.5px, var(--accent-soft) 17px);
+  transform:translateX(calc(var(--step) * -2px));
+}
+
+/* Spinner: twelve spokes round the centre, the lit one at age 0. */
+.ds-progress[*|data-style=spinner]{ width:var(--pg-box); height:var(--pg-box); }
+.ds-progress-indicator{
+  position:absolute; top:0; left:calc(50% - var(--pg-box) * .05); width:calc(var(--pg-box) * .1); height:calc(var(--pg-box) * .28);
+  border-radius:var(--r-pill); background:var(--ink-soft); transform-origin:50% calc(var(--pg-box) / 2);
+}
+.ds-progress-indicator[*|data-spoke="0"]{ transform:rotate(0deg); }
+.ds-progress-indicator[*|data-spoke="1"]{ transform:rotate(30deg); }
+.ds-progress-indicator[*|data-spoke="2"]{ transform:rotate(60deg); }
+.ds-progress-indicator[*|data-spoke="3"]{ transform:rotate(90deg); }
+.ds-progress-indicator[*|data-spoke="4"]{ transform:rotate(120deg); }
+.ds-progress-indicator[*|data-spoke="5"]{ transform:rotate(150deg); }
+.ds-progress-indicator[*|data-spoke="6"]{ transform:rotate(180deg); }
+.ds-progress-indicator[*|data-spoke="7"]{ transform:rotate(210deg); }
+.ds-progress-indicator[*|data-spoke="8"]{ transform:rotate(240deg); }
+.ds-progress-indicator[*|data-spoke="9"]{ transform:rotate(270deg); }
+.ds-progress-indicator[*|data-spoke="10"]{ transform:rotate(300deg); }
+.ds-progress-indicator[*|data-spoke="11"]{ transform:rotate(330deg); }
+.ds-progress-indicator[*|data-age="0"]{ opacity:1; }
+.ds-progress-indicator[*|data-age="1"]{ opacity:.85; }
+.ds-progress-indicator[*|data-age="2"]{ opacity:.72; }
+.ds-progress-indicator[*|data-age="3"]{ opacity:.6; }
+.ds-progress-indicator[*|data-age="4"]{ opacity:.5; }
+.ds-progress-indicator[*|data-age="5"]{ opacity:.42; }
+.ds-progress-indicator[*|data-age="6"]{ opacity:.35; }
+.ds-progress-indicator[*|data-age="7"]{ opacity:.29; }
+.ds-progress-indicator[*|data-age="8"]{ opacity:.24; }
+.ds-progress-indicator[*|data-age="9"]{ opacity:.2; }
+.ds-progress-indicator[*|data-age="10"]{ opacity:.16; }
+.ds-progress-indicator[*|data-age="11"]{ opacity:.13; }
+
+/* Ring: the track and the arc share one box; the arc's colour is the accent, the track's the
+   line. Unknown, the arc is turned by the loop's step (`--turn`). */
+.ds-progress[*|data-style=ring]{ width:var(--pg-box); height:var(--pg-box); }
+.ds-progress[*|data-style=ring] .ds-progress-track,
+.ds-progress[*|data-style=ring] .ds-progress-fill{ position:absolute; top:0; left:0; width:100%; height:100%; }
+.ds-progress[*|data-style=ring] .ds-progress-track{ color:var(--line); }
+.ds-progress[*|data-style=ring] .ds-progress-fill{ color:var(--accent); }
+.ds-progress[*|data-style=ring][*|data-pending=step] .ds-progress-fill{ transform:rotate(var(--turn)); }
+.ds-progress-glyph{ position:absolute; top:0; left:0; width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); }

@@ -3,7 +3,8 @@
 //! motion level need not be a choice (2026-09-28), so [`Appearance::motion`] rides through a
 //! change untouched and the system's reduced-motion preference still maps into it.
 
-use crate::components::controls::segmented::{SegSize, SegmentedControl};
+use crate::components::controls::choice::Choice;
+use crate::components::controls::segmented::{SegmentedControl, Tracking};
 use crate::components::lists::section_header::{HeaderKind, SectionHeader};
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
@@ -38,16 +39,6 @@ pub enum PickerLayout {
     Compact,
 }
 
-impl PickerLayout {
-    /// The segmented rows' size.
-    fn seg_size(self) -> SegSize {
-        match self {
-            PickerLayout::Full => SegSize::Regular,
-            PickerLayout::Compact => SegSize::Regular,
-        }
-    }
-}
-
 /// `aria-pressed` for a swatch.
 fn pressed(accent: Accent, value: Accent) -> Check {
     if accent == value {
@@ -68,21 +59,15 @@ pub fn AppearancePicker(
     onchange: EventHandler<Appearance>,
     #[props(default)] layout: PickerLayout,
 ) -> Element {
-    let size = layout.seg_size();
-    let themes: Vec<(Theme, String)> = Theme::ALL
-        .iter()
-        .copied()
-        .map(|theme| (theme, theme.label().to_string()))
-        .collect();
+    let themes = Choice::pairs(Theme::ALL.iter().map(|theme| (*theme, theme.label())));
     rsx! {
         div { class: "ds-appearance", role: "group", "aria-label": "Appearance", "data-layout": layout.slug(),
             div { class: "ds-appearance-row",
                 SectionHeader { kind: HeaderKind::Field, text: "Theme", value: theme_hint(value.theme, system) }
                 SegmentedControl::<Theme> {
                     label: "Theme",
-                    options: themes,
-                    value: value.theme,
-                    size,
+                    choices: themes,
+                    tracking: Tracking::SelectOne(value.theme),
                     onchange: move |theme| onchange.call(Appearance { theme, ..value }),
                 }
             }

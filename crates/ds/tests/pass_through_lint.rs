@@ -4,7 +4,8 @@
 //! `data-*` name: `DataName` refuses `ds-…` and the names quire writes itself.
 
 use dioxus::prelude::*;
-use ds::{Button, ButtonVariant, Common, DataAttr, DataName, ExtraClass, PassThroughError};
+use ds::ControlSize;
+use ds::{Button, Common, DataAttr, DataName, ExtraClass, PassThroughError};
 use ds_lint::{LintConfig, Rule, markup, stylesheet};
 
 /// The consumer's own rule for its class: a reveal on the row's hover.
@@ -17,7 +18,7 @@ fn Page() -> Element {
         .map(|name| vec![DataAttr::new(name, "INBOX")])
         .unwrap_or_default();
     rsx! {
-        Button { common: Common { extra_class: class, data, ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} }
+        Button { common: Common { extra_class: class, data, ..Common::default() }, size: ControlSize::Mini, label: "Reply", onclick: |_| {} }
     }
 }
 
@@ -57,7 +58,7 @@ fn the_class_is_unstyled_without_the_consumers_rule() {
 
 #[test]
 fn a_ds_class_or_name_is_refused_before_it_reaches_a_button() {
-    for class in ["ds-button", "row-reveal ds-icon-button", "ds-anything"] {
+    for class in ["ds-button", "row-reveal ds-button", "ds-anything"] {
         assert!(
             matches!(
                 ExtraClass::parse(class),

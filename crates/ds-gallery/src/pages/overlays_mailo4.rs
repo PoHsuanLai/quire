@@ -4,11 +4,11 @@
 
 use super::Section;
 use dioxus::prelude::*;
+use ds::Bezel;
 use ds::Check;
 use ds::{
-    Button, ButtonVariant, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon,
-    Menu, MenuEntry, MenuKind, MenuRow, MenuTile, MountedRef, PickDismiss, use_hover_intent,
-    use_rect,
+    Button, Flow, HoverAnchor, HoverCard, HoverCardPart, HoverKey, HoverKind, Icon, Menu,
+    MenuEntry, MenuKind, MenuRow, MenuTile, MountedRef, PickDismiss, use_hover_intent, use_rect,
 };
 
 /// The prefix of this section's hover keys: the page's other card section skips them.
@@ -40,7 +40,7 @@ fn Keyed(name: &'static str, placing: Placing) -> Element {
                 driver.over(key.clone(), HoverKind::Sender, anchor);
             },
             onpointerleave: move |_| driver.out(),
-            Button { variant: ButtonVariant::Quiet, label: name, onclick: |_| {} }
+            Button { bezel: Bezel::Inline, label: name, onclick: |_| {} }
         }
     }
 }
@@ -116,7 +116,7 @@ pub fn LabelChecklist() -> Element {
             note: "dismiss: PickDismiss::Stay. A pick toggles its label and the menu stays, the cursor on the row; Escape or a press outside closes it.",
             div { class: "g-row",
                 div { onmounted: move |event| trigger.on_mounted(event),
-                    Button { variant: ButtonVariant::Secondary, label: "Labels…", onclick: move |_| open.set(true) }
+                    Button { label: "Labels…", onclick: move |_| open.set(true) }
                 }
             }
             if let (true, Some(anchor)) = (open(), trigger.anchor()) {

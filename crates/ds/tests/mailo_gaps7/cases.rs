@@ -1,9 +1,9 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
+use ds::{Bezel, Button, ImagePosition};
 use ds::{
-    FieldFocus, Icon, IconButton, IconButtonVariant, InputVariant, PlaceId, Propagation, Shown,
-    TextInput, TreeItem, TreeShape,
+    FieldFocus, Icon, InputVariant, PlaceId, Propagation, Shown, TextInput, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -22,7 +22,7 @@ fn rename(value: &str) -> Element {
 /// The ⋯ for a folder row.
 fn more(name: &str) -> Element {
     rsx! {
-        IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for {name}", propagation: Propagation::Stop, onclick: |_| {} }
+        Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for {name}", propagation: Propagation::Stop, onclick: |_| {} }
     }
 }
 

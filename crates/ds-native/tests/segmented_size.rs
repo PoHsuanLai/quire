@@ -3,7 +3,8 @@
 //! whole pixels, at scale 1 and 2. Measured on the laid-out rects.
 
 use dioxus::prelude::*;
-use ds::{Appearance, Ds, Material, SegSize, SegmentedControl};
+use ds::{Appearance, Ds, Material, SegmentedControl};
+use ds::{Choice, ControlSize, Tracking};
 use ds_native::{Harness, Viewport};
 use std::time::Duration;
 
@@ -17,10 +18,10 @@ fn Both() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { class: "regular",
-                SegmentedControl::<u8> { label: "View", options: views.clone(), value: 1, onchange: |_| {} }
+                SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views.clone()), tracking: Tracking::SelectOne(1), onchange: |_| {} }
             }
             div { class: "small",
-                SegmentedControl::<u8> { label: "View", options: views, value: 1, size: SegSize::Small, onchange: |_| {} }
+                SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views), tracking: Tracking::SelectOne(1), size: ControlSize::Mini, onchange: |_| {} }
             }
         }
     }

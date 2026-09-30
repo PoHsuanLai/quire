@@ -1,0 +1,16 @@
+/* Label (design/30 section 2.8, `NSTextField` label). Attribute selectors carry `*|` (spike S2).
+   The role picks the ink (full, then three steps quieter), the style a step of the type scale;
+   nothing else: a label has no box of its own. */
+
+.ds-label{ color:var(--ink); font-size:var(--fs-control); }
+.ds-label[*|data-role=secondary]{ color:var(--ink-soft); }
+.ds-label[*|data-role=tertiary]{ color:var(--ink-faint); }
+.ds-label[*|data-role=quaternary]{ color:var(--ink-faint); opacity:.7; }
+
+.ds-label[*|data-style=caption]{ font-size:var(--fs-caption); }
+.ds-label[*|data-style=footnote]{ font-size:var(--fs-help); }
+.ds-label[*|data-style=headline]{ font-weight:700; }
+.ds-label[*|data-style=title]{ font-family:var(--font-display); font-size:var(--fs-title); font-weight:700; }
+.ds-label[*|data-style=display]{ font-family:var(--font-display); font-size:var(--fs-display); font-weight:700; }
+
+.ds-label[*|aria-disabled=true]{ opacity:.35; }

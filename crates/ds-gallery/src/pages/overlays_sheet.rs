@@ -7,9 +7,10 @@ use super::Section;
 use crate::axes::Axes;
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::{Answers, ButtonRole, ControlSize};
 use ds::{
-    Appearance, Availability, Button, ButtonSize, ButtonVariant, Ds, Inject, Kbd, KbdSize,
-    Material, ScrimStrength, Sheet, SheetPlacement, Shortcut, ShortcutKey, Theme,
+    Appearance, Availability, Button, Ds, Inject, Kbd, KbdSize, Material, ScrimStrength, Sheet,
+    SheetPlacement, Shortcut, ShortcutKey, Theme,
 };
 
 /// The power menu section.
@@ -50,10 +51,10 @@ fn Dialog(theme: Theme) -> Element {
                         h3 { "Shut down this computer?" }
                         p { class: "g-note", "Open windows close. Unsaved work may be lost." }
                         div { class: "g-row",
-                            Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: |_| {} }
-                            Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} }
-                            Button { variant: ButtonVariant::Danger, size: ButtonSize::Regular, label: "Restart", onclick: |_| {} }
-                            Button { variant: ButtonVariant::Primary, label: "Shut Down", onclick: |_| {} }
+                            Button { label: "Cancel", onclick: |_| {} }
+                            Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Suspend", availability: Availability::Disabled, onclick: |_| {} }
+                            Button { role: ButtonRole::Destructive, size: ControlSize::Regular, label: "Restart", onclick: |_| {} }
+                            Button { answers: Answers::Return, label: "Shut Down", onclick: |_| {} }
                         }
                         div { class: "g-row g-note",
                             Kbd { shortcut: Shortcut(vec![ShortcutKey::Left]), size: KbdSize::Small }

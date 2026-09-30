@@ -3,9 +3,10 @@
 use dioxus::prelude::*;
 use ds::Check;
 use ds::{
-    AccountFace, AccountTile, Button, ButtonFace, ButtonVariant, Colour, Common, Hex, Icon,
-    MarkProvider, MarkSize, MarkStyle, ProviderMark, Trailing,
+    AccountFace, AccountTile, Button, ButtonFace, Colour, Common, Hex, Icon, MarkProvider,
+    MarkSize, MarkStyle, ProviderMark, Trailing,
 };
+use ds::{Bezel, ControlSize};
 use ds::{Grow, InputVariant, Rows, TextInput, TextInputKind};
 
 /// An account colour.
@@ -42,35 +43,35 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/frame.html",
-        make: || rsx! { Button { variant: ButtonVariant::Frame, label: "Settings", icon: Some(Icon::Settings), onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Toolbar, label: "Settings", icon: Some(Icon::Settings), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/frame-pressed.html",
-        make: || rsx! { Button { variant: ButtonVariant::Frame, label: "Today", pressed: Some(Check::On), onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Toolbar, label: "Today", value: Some(Check::On), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-caret.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "poh@acme.example", trailing: Trailing::Caret, expanded: ds::Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Caret, shown: ds::Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/mini-trailing-glyph.html",
-        make: || rsx! { Button { variant: ButtonVariant::Mini, label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/face-bold.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Bold", face: ButtonFace::Bold, title: "Bold (Ctrl B)", pressed: Some(Check::On), onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "Bold", face: ButtonFace::Bold, title: "Bold (Ctrl B)", value: Some(Check::On), onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/face-italic.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Italic", face: ButtonFace::Italic, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "Italic", face: ButtonFace::Italic, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/face-underline.html",
-        make: || rsx! { Button { variant: ButtonVariant::Quiet, label: "Underline", face: ButtonFace::Underline, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "Underline", face: ButtonFace::Underline, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/face-strike-named.html",
-        make: || rsx! { Button { common: Common { aria_label: Some("Strikethrough".to_string()), ..Common::default() }, variant: ButtonVariant::Quiet, label: "Strike", face: ButtonFace::Strike, onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Strikethrough".to_string()), ..Common::default() }, bezel: Bezel::Inline, label: "Strike", face: ButtonFace::Strike, onclick: |_| {} } },
     },
     Case {
         golden: "controls/text_input/secret-value-unwritten.html",

@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 56] = [
+pub(crate) const SHEETS: [(&str, &str); 58] = [
     (
         "account_tile",
         include_str!("../components/app/account_tile.css"),
@@ -19,6 +19,10 @@ pub(crate) const SHEETS: [(&str, &str); 56] = [
     ),
     ("avatar", include_str!("../components/content/avatar.css")),
     ("button", include_str!("../components/controls/button.css")),
+    (
+        "checkbox",
+        include_str!("../components/controls/checkbox.css"),
+    ),
     ("chip", include_str!("../components/controls/chip.css")),
     (
         "command_palette",
@@ -54,15 +58,12 @@ pub(crate) const SHEETS: [(&str, &str); 56] = [
         include_str!("../components/app/hover_strip.css"),
     ),
     (
-        "icon_button",
-        include_str!("../components/controls/icon_button.css"),
-    ),
-    (
         "icon_view",
         include_str!("../components/content/icon_view.css"),
     ),
     ("kbd", include_str!("../components/controls/kbd.css")),
     ("chord", include_str!("../components/controls/chord.css")),
+    ("label", include_str!("../components/content/label.css")),
     ("level", include_str!("../components/controls/level.css")),
     ("link_pill", include_str!("../components/app/link_pill.css")),
     (
@@ -80,6 +81,10 @@ pub(crate) const SHEETS: [(&str, &str); 56] = [
         include_str!("../components/lists/preview/switcher.css"),
     ),
     ("panel", include_str!("../components/overlays/panel.css")),
+    (
+        "radio_group",
+        include_str!("../components/controls/radio_group.css"),
+    ),
     ("peek", include_str!("../components/app/peek.css")),
     (
         "pdf_thumb",
@@ -126,6 +131,10 @@ pub(crate) const SHEETS: [(&str, &str); 56] = [
     ),
     ("slider", include_str!("../components/controls/slider.css")),
     (
+        "progress",
+        include_str!("../components/controls/progress/progress.css"),
+    ),
+    (
         "spinner",
         include_str!("../components/controls/spinner.css"),
     ),
@@ -133,7 +142,6 @@ pub(crate) const SHEETS: [(&str, &str); 56] = [
         "status_glyph",
         include_str!("../components/content/status_glyph.css"),
     ),
-    ("tabs", include_str!("../components/controls/tabs.css")),
     (
         "text_input",
         include_str!("../components/fields/text_input.css"),

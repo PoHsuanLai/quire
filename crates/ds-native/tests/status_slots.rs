@@ -6,10 +6,11 @@
 use dioxus::prelude::*;
 use ds::detail::EventStamp;
 use ds::{
-    Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconButton, IconButtonVariant,
-    IconSource, LevelControl, LevelGlyph, LowAt, Material, Muting, Px, StatusMetrics, StatusState,
-    VolumeState, VolumeWaves, WifiBars, WifiReach, WifiState,
+    Appearance, BatteryPower, BatteryState, Ds, Fraction, Icon, IconSource, LevelControl,
+    LevelGlyph, LowAt, Material, Muting, Px, StatusMetrics, StatusState, VolumeState, VolumeWaves,
+    WifiBars, WifiReach, WifiState,
 };
+use ds::{Bezel, Button, ImagePosition};
 use ds_native::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_native::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{ModulePanel, ModuleState, ModuleTile};
@@ -59,8 +60,8 @@ fn Bar() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Window,
             div { id: "bar", style: METRICS.style_attr(),
-                IconButton {
-                    variant: IconButtonVariant::Status,
+                Button {
+                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
                     icon: status,
                     label: status.words(),
                     onclick: |_| {},
@@ -70,7 +71,7 @@ fn Bar() -> Element {
     }
 }
 
-const ITEM_SEL: &str = "#bar .ds-icon-button";
+const ITEM_SEL: &str = "#bar .ds-button";
 
 fn side(harness: &Harness, selector: &str) -> (f32, f32) {
     let rect = harness

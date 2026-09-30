@@ -4,7 +4,7 @@
 //! (spike S8). Both URLs load through the document's net provider, one frame late.
 
 use crate::components::content::icon_source::{ExternalIcon, IconSource};
-use crate::components::content::status::family::StatusGlyph;
+use crate::components::content::status::family::{StatusGlyph, StatusState};
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::icon::family::PlateFamily;
@@ -130,5 +130,12 @@ impl dioxus::core::SuperFrom<ds_style::icon::Icon, GlyphSlot> for Option<IconSou
 impl dioxus::core::SuperFrom<Option<ds_style::icon::Icon>, GlyphSlot> for Option<IconSource> {
     fn super_from(icon: Option<ds_style::icon::Icon>) -> Self {
         icon.map(IconSource::Glyph)
+    }
+}
+
+/// `Button { icon: status }`: a status glyph fills a slot that takes an [`IconSource`].
+impl dioxus::core::SuperFrom<StatusState, GlyphSlot> for Option<IconSource> {
+    fn super_from(state: StatusState) -> Self {
+        Some(IconSource::Status(state))
     }
 }

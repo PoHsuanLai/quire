@@ -4,12 +4,14 @@
 use crate::pages::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
+use ds::Answers;
 use ds::Word;
 use ds::{
-    Accent, Appearance, Availability, Button, ButtonVariant, Check, Chip, ChipVariant,
-    CommandPalette, CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile,
-    MenuTrail, Radius, RootChrome, Scheme, SegmentedControl, Surface, Theme, Toggle, accent_of,
+    Accent, Appearance, Availability, Button, Check, Chip, ChipVariant, CommandPalette,
+    CommandPaletteHost, Corner, Ds, Icon, Inject, Material, MenuEntry, MenuTile, MenuTrail, Radius,
+    RootChrome, Scheme, SegmentedControl, Surface, Theme, Toggle, accent_of,
 };
+use ds::{Choice, Tracking};
 use ds_shell::{
     ModuleGrid, ModuleState, ModuleTile, MonthGrid, WidgetFrame, WidgetMetrics, WidgetSize,
 };
@@ -172,18 +174,18 @@ fn Controls() -> Element {
         .collect();
     rsx! {
         div { class: "g-acc-line",
-            Button { variant: ButtonVariant::Primary, label: "Done", onclick: |_| {} }
-            Button { variant: ButtonVariant::Secondary, label: "Cancel", onclick: |_| {} }
+            Button { answers: Answers::Return, label: "Done", onclick: |_| {} }
+            Button { label: "Cancel", onclick: |_| {} }
             Toggle { label: "Wi-Fi", value: Check::On, onchange: |_| {} }
         }
         div { class: "g-acc-line",
-            SegmentedControl::<u8> { label: "View", options: views, value: 1, onchange: |_| {} }
+            SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views), tracking: Tracking::SelectOne(1), onchange: |_| {} }
         }
         div { class: "g-acc-line",
             Chip { variant: ChipVariant::Accent, text: "spec" }
             span { class: "g-acc-link", "A link" }
             span { class: "g-acc-focus",
-                Button { variant: ButtonVariant::Secondary, label: "Focused", onclick: |_| {} }
+                Button { label: "Focused", onclick: |_| {} }
             }
         }
         div { class: "g-acc-list",

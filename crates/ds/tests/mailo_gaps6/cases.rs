@@ -1,9 +1,10 @@
 //! The mail-app states, as data: the golden each renders to and how to make it.
 
 use dioxus::prelude::*;
+use ds::{Bezel, ControlSize, ImagePosition};
 use ds::{
-    Button, ButtonVariant, Common, DataAttr, DataName, DropState, ExtraClass, Icon, IconButton,
-    IconButtonVariant, PlaceId, Propagation, RowState, Selection, Shown, TreeItem, TreeShape,
+    Button, Common, DataAttr, DataName, DropState, ExtraClass, Icon, PlaceId, Propagation,
+    RowState, Selection, Shown, TreeItem, TreeShape,
 };
 
 /// One state and its golden.
@@ -31,7 +32,7 @@ fn class(list: &str) -> Option<ExtraClass> {
 /// The ⋯ for a folder row.
 fn more(name: &str) -> Element {
     rsx! {
-        IconButton { variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for {name}", propagation: Propagation::Stop, onclick: |_| {} }
+        Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for {name}", propagation: Propagation::Stop, onclick: |_| {} }
     }
 }
 
@@ -56,15 +57,15 @@ fn projects(open: Shown, drop: DropState) -> Element {
 pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/data-attr.html",
-        make: || rsx! { Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, variant: ButtonVariant::Frame, label: "Receipts", onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { data: folder("INBOX/Receipts"), ..Common::default() }, bezel: Bezel::Toolbar, label: "Receipts", onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/extra-class.html",
-        make: || rsx! { Button { common: Common { extra_class: class("row-reveal  quiet-until-hover"), ..Common::default() }, variant: ButtonVariant::Mini, label: "Reply", onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { extra_class: class("row-reveal  quiet-until-hover"), ..Common::default() }, size: ControlSize::Mini, label: "Reply", onclick: |_| {} } },
     },
     Case {
-        golden: "controls/icon_button/data-attr-extra-class.html",
-        make: || rsx! { IconButton { common: Common { data: folder("INBOX/Receipts"), extra_class: class("fold-more"), ..Common::default() }, variant: IconButtonVariant::Strip, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} } },
+        golden: "controls/button/data-attr-extra-class.html",
+        make: || rsx! { Button { common: Common { data: folder("INBOX/Receipts"), extra_class: class("fold-more"), ..Common::default() }, bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Ellipsis, label: "Actions for Receipts", propagation: Propagation::Stop, onclick: |_| {} } },
     },
     Case {
         golden: "lists/tree_item/open-idle.html",

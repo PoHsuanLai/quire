@@ -187,7 +187,7 @@ fn the_pointer_on_the_card_is_told_and_shows_the_actions() {
         Some("on")
     );
     let delete = harness
-        .centre(".ds-shot-action .ds-icon-button")
+        .centre(".ds-shot-action .ds-button")
         .expect("the action is laid out");
     harness.click(delete);
     harness.advance(Duration::from_millis(1));

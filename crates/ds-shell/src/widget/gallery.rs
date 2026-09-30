@@ -17,7 +17,8 @@ use crate::widget::layout::{WidgetEdit, WidgetLayout};
 use crate::widget::registry::{WidgetInfo, use_widget_registry};
 use dioxus::prelude::*;
 use ds::components::content::text_runs::{TextLine, text};
-use ds::components::controls::button::{Button, ButtonVariant};
+use ds::components::controls::button::Button;
+use ds::components::controls::button_model::Answers;
 use ds::host::measure::MountedRef;
 use ds_core::press::Press;
 use ds_core::word::Word;
@@ -116,14 +117,10 @@ fn detail(info: WidgetInfo, onedit: EventHandler<WidgetEdit>, words: &GalleryWor
     let buttons = [
         (
             WidgetHost::Desktop,
-            ButtonVariant::Primary,
+            Answers::Return,
             words.add_desktop.clone(),
         ),
-        (
-            WidgetHost::Tile,
-            ButtonVariant::Secondary,
-            words.add_center.clone(),
-        ),
+        (WidgetHost::Tile, Answers::Nothing, words.add_center.clone()),
     ];
     let add = move |kind: WidgetKind, host: WidgetHost, size: WidgetSize| {
         move |_: Press| {
@@ -140,10 +137,10 @@ fn detail(info: WidgetInfo, onedit: EventHandler<WidgetEdit>, words: &GalleryWor
                 {info.preview(size, WidgetHost::Desktop, Lift::Rest)}
             }
             div { class: "ds-widget-gallery-actions",
-                for (host, variant, label) in buttons {
+                for (host, answers, label) in buttons {
                     Button {
                         key: "{info.kind.as_str()}-{host.slug()}",
-                        variant,
+                        answers,
                         label,
                         onclick: add(info.kind.clone(), host, info.size_in(host)),
                     }
