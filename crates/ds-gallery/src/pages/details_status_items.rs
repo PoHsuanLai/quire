@@ -1,5 +1,5 @@
 //! Details, the status glyphs in their slots: the bar's four status items as
-//! `Button { Status }` holding a status glyph, at the bar's metrics.
+//! `MenuBarItem { image: Only }` holding a status glyph, at the bar's metrics.
 
 use super::details::{Cell, mini};
 use dioxus::prelude::*;
@@ -41,7 +41,7 @@ pub fn ItemsCell() -> Element {
         reach: WifiReach::Internet,
     };
     rsx! {
-        Cell { name: "In the bar", code: "Button {{ variant: Status, icon: StatusState }}",
+        Cell { name: "In the bar", code: "MenuBarItem {{ image: Only, icon: StatusState }}",
             controls: rsx! {
                 {mini("80 %", move |_| battery.set(at(800)))}
                 {mini("15 %", move |_| battery.set(at(150)))}

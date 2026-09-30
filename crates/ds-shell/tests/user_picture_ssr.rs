@@ -139,7 +139,7 @@ fn the_picker_offers_the_letter_and_every_emoji_still() {
     );
     assert_eq!(picker.matches("aria-checked=\"true\"").count(), 1);
     assert!(
-        picker.contains("aria-checked=\"true\" aria-label=\"Fox\""),
+        picker.contains("aria-checked=\"true\" data-selected=\"selected\" aria-label=\"Fox\""),
         "{}",
         redacted(&picker)
     );

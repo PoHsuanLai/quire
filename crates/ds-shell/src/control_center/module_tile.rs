@@ -112,7 +112,7 @@ fn chevron_button(
     availability: Availability,
 ) -> Element {
     let name = format!("{} details", title.plain_text());
-    let open = Some(on_detail).filter(|_| availability == Availability::Enabled);
+    let open = (availability == Availability::Enabled).then_some(on_detail);
     let inert = open.map_or(Availability::Disabled, |_| Availability::Enabled);
     let listen = open.map(|open| PressListeners::new(open).with_propagation(Propagation::Stop));
     rsx! {

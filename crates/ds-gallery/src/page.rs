@@ -57,10 +57,12 @@ pub enum Page {
     /// The shell's own lock screen, polkit prompt and app switcher (M11).
     #[word(slug = "lock")]
     LockSwitcher,
-    /// Animated emoji: the set, the reactions, sizes and discs.
+    /// Animated emoji: the set, sizes and discs.
     Emoji,
     /// The small-state details: every primitive of design/26 with a replay button.
     Details,
     /// The voice orb: the three demo variants and a size ladder over every metric threshold.
     VoiceOrb,
+    /// The shell-only components rebuilt on the survivors, each in every state (design/30 section 2.10).
+    Shell,
 }

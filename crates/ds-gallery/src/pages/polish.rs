@@ -117,7 +117,7 @@ const MENU_AT: Point = Point {
 fn MenuBarSection() -> Element {
     let showcase = use_context::<Signal<Axes>>().peek().showcase;
     rsx! {
-        Section { title: "Menu bar and a text menu", note: "MenuBarItem and Button {{ Status }} on a Bar root over the wallpaper: 13/500 text, the 4 px pill on hover and while open (File is open), the workspaces as one segmented group on the frame (WorkspacePills). Under it, a Slim menu on a Popover root at the shell scale: 22 px rows, the check column, 13 px text, a 6 px inset highlight, hairline separators with 5 px margins, a disabled row at .35.",
+        Section { title: "Menu bar and a text menu", note: "MenuBarItem (a title or a status glyph) on a Bar root over the wallpaper: 13/500 text, the 4 px pill on hover and while open (File is open), the workspaces as one segmented group on the frame (WorkspacePills). Under it, a Slim menu on a Popover root at the shell scale: 22 px rows, the check column, 13 px text, a 6 px inset highlight, hairline separators with 5 px margins, a disabled row at .35.",
             div { class: "g-wall g-polish-wall", style: "background-image:url(\"{wallpaper::uri()}\")",
                 Root { material: Material::Bar, style: "width:100%",
                     div { class: "g-polish-bar",
@@ -210,7 +210,7 @@ fn OsdSection() -> Element {
                 }
             }
             Specimen { name: "Targets",
-                code: target("card 296 wide, radius 12 (--r-tile), padding 12, title 13/600, capsule 26 high with the glyph inside; drops in over --t-quick --e-out, lifts away over --t-move --e-exit", "a small panel at the top right under the menu bar, a title and a capsule slider with the glyph inside (L)"),
+                code: target("card 296 wide, radius 12 (--r-tile), padding 12, title 13/600, capsule 26 high with the glyph inside; fades in over --t-quick and out over --t-move --e-exit", "a small panel at the top right under the menu bar, a title and a capsule slider with the glyph inside (L)"),
             }
         }
     }

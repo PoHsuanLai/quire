@@ -143,7 +143,7 @@ fn OsdSection() -> Element {
         (LevelGlyph::Brightness, "Display", Fraction(300)),
     ];
     rsx! {
-        Section { title: "OSD at the top right", note: "The Osd card under the bar's reserve (osd.position TopRight, osd.margin_px 24): a title line over a read-only capsule, a control-center module's shape. Hide it: it fades and lifts over --t-move --e-exit, then on_hidden runs (the host unmaps the surface there); show it: it drops in over --t-quick --e-out. Showing it while it fades takes the hide back.",
+        Section { title: "OSD at the top right", note: "The Osd card under the bar's reserve (osd.position TopRight, osd.margin_px 24): a title line over a read-only capsule, a control-center module's shape. Hide it: it fades over --t-move --e-exit, then on_hidden runs (the host unmaps the surface there); show it: it fades in over --t-quick. Showing it while it fades takes the hide back.",
             div { class: "g-row",
                 Button { size: ControlSize::Mini, label: "Show", onclick: move |_| shown.set(Shown::Visible) }
                 Button { size: ControlSize::Mini, label: "Hide", onclick: move |_| shown.set(Shown::Hidden) }

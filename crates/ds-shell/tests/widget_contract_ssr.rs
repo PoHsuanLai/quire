@@ -690,9 +690,9 @@ fn a_lifted_card_swaps_its_shadow_and_the_guide_is_a_footprint() {
 fn the_gallery_browses_the_registry_and_lists_the_layout() {
     let gallery = html("gallery");
     assert_eq!(
-        gallery.matches("class=\"ds-widget-gallery-kind\"").count(),
+        gallery.matches("class=\"ds-list-item\"").count(),
         3,
-        "{gallery}"
+        "one list row per registered widget: {gallery}"
     );
     assert!(
         gallery.contains(">See the charge of this computer and your devices.<"),
