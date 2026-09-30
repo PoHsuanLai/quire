@@ -59,7 +59,7 @@ pub use crate::{
     },
     dock::{
         parts::{DockFloor, DockLabel, RunningDot},
-        tile::DockTile,
+        tile::{DockTile, plate_side},
     },
     emoji::{
         AnimatedEmoji, EMOJI_ATTRIBUTION,
