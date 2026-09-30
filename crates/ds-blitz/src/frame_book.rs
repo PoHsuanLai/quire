@@ -28,7 +28,19 @@ struct Book {
 
 /// One quire document's frames, shared by its frame net provider and its walk.
 #[derive(Clone)]
-pub(crate) struct FrameBook(Arc<Mutex<Book>>);
+pub struct FrameBook(Arc<Mutex<Book>>);
+
+impl Default for FrameBook {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl std::fmt::Debug for FrameBook {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FrameBook").finish_non_exhaustive()
+    }
+}
 
 thread_local! {
     /// Every book of a document on this thread: the window's UI thread, or a test's.
@@ -37,7 +49,7 @@ thread_local! {
 
 impl FrameBook {
     /// An empty book, reachable from this thread's lookups for as long as it lives.
-    pub(crate) fn new() -> Self {
+    pub fn new() -> Self {
         let book = Arc::new(Mutex::new(Book::default()));
         BOOKS.with_borrow_mut(|books| {
             books.retain(|weak| weak.strong_count() > 0);
@@ -65,7 +77,7 @@ impl FrameBook {
 
     /// Record `live`, every frame now under an `iframe`: forget the frames gone (and whatever
     /// they still held), and put each newly found frame's held requests to the app with its tag.
-    pub(crate) fn bind(&self, live: Vec<(FrameId, Option<FrameTag>)>) {
+    pub fn bind(&self, live: Vec<(FrameId, Option<FrameTag>)>) {
         let released = {
             let mut guard = lock(&self.0);
             let book = &mut *guard;

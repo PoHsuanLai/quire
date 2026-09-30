@@ -6,8 +6,8 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px, ShortcutKey,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

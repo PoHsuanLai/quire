@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Icon, Material, Point, Propagation};
 use ds::{Bezel, ControlSize, ImagePosition};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

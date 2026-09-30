@@ -7,6 +7,10 @@
 //! event loop itself (`crate::window_shell`), one dioxus-native application per window, so the
 //! app can open more windows (`crate::open_window`).
 
+mod runtime;
+
+pub use runtime::{RuntimeGuard, TokioSpawner, enter_runtime};
+
 use crate::app_id::AppId;
 use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
@@ -104,8 +108,8 @@ impl AppConfig {
 /// it.
 pub fn launch(app: fn() -> Element, config: AppConfig) {
     // Held until this call returns, which does not happen until the window closes — i.e., for
-    // the process's life. See `crate::runtime` for why a host thread must enter Tokio at all.
-    let _runtime = crate::runtime::enter();
+    // the process's life. See `runtime` for why a host thread must enter Tokio at all.
+    let _runtime = enter_runtime();
     let event_loop = blitz_shell::create_default_event_loop();
     let waker = event_loop.create_proxy();
     let base = Base {

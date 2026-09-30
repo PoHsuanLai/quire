@@ -1,0 +1,39 @@
+[package]
+name = "ds-harness"
+description = "Test driver for quire documents on Blitz: Harness, Clock::Virtual, snapshots, painters. Dev-only."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds = { workspace = true }
+ds-blitz = { workspace = true }
+dioxus = { workspace = true }
+blitz-dom = { workspace = true }
+blitz-paint = { workspace = true }
+blitz-traits = { workspace = true }
+blitz-html = { workspace = true }
+dioxus-native-dom = { workspace = true }
+anyrender = { workspace = true }
+anyrender_vello_hybrid = { workspace = true }
+anyrender_vello_cpu = { workspace = true }
+wgpu = { workspace = true }
+# The hybrid backend (`gpu_paint`): vello_hybrid driven directly on an offscreen device, its image
+# ids, and the device handle anyrender_vello_hybrid paints with.
+vello_hybrid = { workspace = true }
+vello_common = { workspace = true }
+wgpu_context = { workspace = true }
+rustc-hash = { workspace = true }
+image = { workspace = true }
+keyboard-types = { workspace = true }
+peniko = { workspace = true }
+
+[features]
+# `pdf_app` and `Harness::pdf`: a harness's document printed as it is now.
+pdf = ["ds-blitz/pdf"]
+
+[lints]
+workspace = true

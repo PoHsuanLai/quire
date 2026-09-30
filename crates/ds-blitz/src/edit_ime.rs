@@ -13,7 +13,13 @@ use std::rc::Rc;
 
 /// The edit surfaces of one document listening for IME events, provided as root context.
 #[derive(Clone, Default)]
-pub(crate) struct EditListeners(Rc<RefCell<Registry>>);
+pub struct EditListeners(Rc<RefCell<Registry>>);
+
+impl std::fmt::Debug for EditListeners {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("EditListeners").finish_non_exhaustive()
+    }
+}
 
 #[derive(Default)]
 struct Registry {
@@ -51,7 +57,7 @@ impl EditListeners {
 
     /// The captured surface's sink for `phase`, released with it at the release. `None` when
     /// no surface holds the pointer.
-    pub(crate) fn captured(&self, phase: PointerPhase) -> Option<EventHandler<CapturedPointer>> {
+    pub fn captured(&self, phase: PointerPhase) -> Option<EventHandler<CapturedPointer>> {
         let mut registry = self.0.borrow_mut();
         match phase {
             PointerPhase::Release => registry.captured.take(),
@@ -60,7 +66,7 @@ impl EditListeners {
     }
 
     /// The listener for `doc`'s focused node: the one registered nearest above it.
-    pub(crate) fn target(&self, doc: &BaseDocument) -> Option<EventHandler<ImeEvent>> {
+    pub fn target(&self, doc: &BaseDocument) -> Option<EventHandler<ImeEvent>> {
         let registry = self.0.borrow();
         let mut at = doc.get_focussed_node_id();
         while let Some(id) = at {

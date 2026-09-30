@@ -141,7 +141,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         provide_context(provided.host)
     });
     // An `EditSurface { spell: Spell::On {..} }` checks through the system's dictionaries.
-    #[cfg(feature = "spellcheck")]
+    #[cfg(feature = "spell")]
     crate::spell::provide();
     use_hook(|| {
         if let Some(slot) = try_consume_context::<WindowSlot>() {

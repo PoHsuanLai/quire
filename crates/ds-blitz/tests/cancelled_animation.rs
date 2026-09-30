@@ -10,8 +10,8 @@ use dioxus::prelude::*;
 use ds::{
     Anim, Appearance, Ds, Material, MotionLevel, Point, Px, RootExtent, Shown, SidePanel, settle,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const CSS: &str = "@keyframes slide{ from{ transform:translateX(400px); } to{ transform:none; } }

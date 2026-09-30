@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::{Appearance, Attach, Ds, Material, RootExtent, Sheet};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

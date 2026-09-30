@@ -14,11 +14,11 @@ use ds::{Point, Px, Rect, Size};
 /// The last pointer event the document was sent: where the pointer rests, with the buttons and
 /// modifiers it last reported, so the replay is the move a real one there would be.
 #[derive(Debug, Clone)]
-pub(crate) struct RestingPointer(BlitzPointerEvent);
+pub struct RestingPointer(BlitzPointerEvent);
 
 impl RestingPointer {
     /// The pointer as `event` left it.
-    pub(crate) fn from_event(event: &UiEvent) -> Option<Self> {
+    pub fn from_event(event: &UiEvent) -> Option<Self> {
         match event {
             UiEvent::PointerMove(pointer)
             | UiEvent::PointerDown(pointer)
@@ -38,7 +38,7 @@ impl RestingPointer {
 
 /// Whether a sync replayed a move: then its handlers may have queued renders.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Synced {
+pub enum Synced {
     /// No: the hover had not moved by itself.
     Still,
     /// Yes.
@@ -47,7 +47,7 @@ pub(crate) enum Synced {
 
 /// After a resolve that left `doc` hovering something other than `before`, bring Blitz's hover
 /// back to `before` and replay `resting` so the change is dispatched.
-pub(crate) fn sync(
+pub fn sync(
     doc: &mut DioxusDocument,
     before: Option<NodeId>,
     resting: Option<&RestingPointer>,

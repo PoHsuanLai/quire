@@ -32,7 +32,7 @@ pub fn frame_by_tag(tag: &FrameTag) -> Option<FrameId> {
 }
 
 /// The document's parser, with every frame document it builds given `net`.
-pub(crate) struct FrameParser {
+pub struct FrameParser {
     /// The parser that does the work.
     inner: Arc<dyn HtmlParserProvider>,
     /// What every frame document fetches through.
@@ -41,9 +41,15 @@ pub(crate) struct FrameParser {
     nav: Arc<dyn NavigationProvider>,
 }
 
+impl std::fmt::Debug for FrameParser {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("FrameParser").finish_non_exhaustive()
+    }
+}
+
 impl FrameParser {
     /// `inner`, giving each frame document it builds `net` and `nav`.
-    pub(crate) fn shared(
+    pub fn shared(
         inner: Arc<dyn HtmlParserProvider>,
         net: Arc<dyn NetProvider>,
         nav: Arc<dyn NavigationProvider>,

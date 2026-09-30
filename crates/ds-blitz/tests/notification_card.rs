@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Rich, RichRun, RunTone, TextRun};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use ds_shell::{AppMark, CardAction, Hover, NotificationCard};
 
 const VIEW: Viewport = Viewport {

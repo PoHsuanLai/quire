@@ -9,7 +9,7 @@ use ds::{
     EditPointer, EditSurface, Extend, ExtraClass, ImeSwitch, KeyInput, Material, Point,
     PointerPhase, Probe, Px, ShortcutKey, TextPosition, use_edit_handle,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

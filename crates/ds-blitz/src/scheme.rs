@@ -17,7 +17,7 @@ pub(crate) fn resolved(doc: &BaseDocument) -> Option<ColorScheme> {
 }
 
 /// Point the viewport at the root's scheme; the scheme it changed to, when it changed.
-pub(crate) fn follow_root(doc: &mut BaseDocument) -> Option<ColorScheme> {
+pub fn follow_root(doc: &mut BaseDocument) -> Option<ColorScheme> {
     let wanted = resolved(doc)?;
     if doc.viewport().color_scheme == wanted {
         return None;

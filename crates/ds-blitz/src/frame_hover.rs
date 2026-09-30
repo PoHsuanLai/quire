@@ -76,14 +76,14 @@ impl fmt::Debug for FrameHoverHandler {
 
 /// The link the pointer was last reported on, if any.
 #[derive(Debug, Default)]
-pub(crate) struct HoverTracker {
+pub struct HoverTracker {
     over: Option<(LinkUnder, Option<FrameTag>)>,
 }
 
 impl HoverTracker {
     /// The pointer is at `at`, over `under`: the crossings since the last move, a leave before
     /// an enter. Nothing while it stays on the same link or off every link.
-    pub(crate) fn step(
+    pub fn step(
         &mut self,
         under: Option<LinkUnder>,
         at: Point,
@@ -129,7 +129,7 @@ fn crossing(
 }
 
 /// Hand each of `crossings` to the app, if it listens.
-pub(crate) fn report(hover: &FrameHover, crossings: Vec<FrameLinkHover>) {
+pub fn report(hover: &FrameHover, crossings: Vec<FrameLinkHover>) {
     if let FrameHover::Report(FrameHoverHandler(handler)) = hover {
         crossings.into_iter().for_each(|crossing| handler(crossing));
     }

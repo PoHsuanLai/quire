@@ -6,8 +6,8 @@
 //! check, reproduced directly against a minimal component instead of a whole check mark.
 
 use dioxus::prelude::*;
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

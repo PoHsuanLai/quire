@@ -6,8 +6,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, RootChrome};
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::widget::{DesktopGrid, WidgetEdit, WidgetLayout, apply};
 use ds_shell::{
     BatteryWidget, Lift, Timeline, Widget, WidgetCard, WidgetGallery, WidgetMetrics, WidgetSize,

@@ -14,8 +14,9 @@ use ds::{
     RowState, Selection, ShortcutKey, ThreadRow, Toggle, use_hover_hub, use_toast_hub, use_toasts,
 };
 use ds::{FieldFocus, Grain, PRESETS, Scheme, SpaceLook, Theme};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, TokioSpawner, Viewport};
+use ds_blitz::TokioSpawner;
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds_shell::{DotIndex, SpaceEditor};
 use std::sync::Arc;

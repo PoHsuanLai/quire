@@ -9,7 +9,7 @@ use ds::{
     AccountFace, AccountTile, AddAccountTile, Appearance, Check, Colour, Ds, Grain, Hex,
     MarkProvider, Material, SpaceLook,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use probe::rect;
 use std::time::Duration;
 

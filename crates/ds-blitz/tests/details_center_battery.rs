@@ -5,8 +5,8 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Fraction, LevelGlyph, Material, Motion};
 use ds::{Slider, SliderLook};
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{DeviceBattery, RingMark};
 use std::time::Duration;
 

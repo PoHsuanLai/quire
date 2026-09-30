@@ -12,7 +12,7 @@ use ds::{
     Appearance, Ds, HostWindow, Material, Maximized, Point, Px, ResizeEdge, ShortcutKey, Support,
     TileError, TrafficLights, WindowFrame, WindowState, WindowTile, Zoom, use_window_host_provider,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 

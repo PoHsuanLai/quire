@@ -2,7 +2,8 @@
 //! snapshot, as `AppConfig::with_context` gives them to the window.
 
 use dioxus::prelude::*;
-use ds_blitz::{Harness, HarnessConfig, RootContexts, Viewport, snapshot_with};
+use ds_blitz::RootContexts;
+use ds_harness::{Harness, HarnessConfig, Viewport, snapshot_with};
 use std::sync::Arc;
 use std::time::Duration;
 

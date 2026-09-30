@@ -9,7 +9,7 @@ use ds::{
     Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey,
     use_focus_request,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;

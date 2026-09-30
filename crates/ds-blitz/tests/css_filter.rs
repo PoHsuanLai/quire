@@ -10,7 +10,7 @@
 
 use dioxus::prelude::*;
 use ds::Px;
-use ds_blitz::{Backend, Harness, HarnessConfig, Viewport};
+use ds_harness::{Backend, Harness, HarnessConfig, Viewport};
 use image::RgbaImage;
 
 const VIEW: Viewport = Viewport {

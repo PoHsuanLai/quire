@@ -11,8 +11,8 @@ use ds::{
     OverlayId, PartHooks, Point, Px, Rect, RowState, Selection, Size, ThreadRow, ZLayer,
     use_hover_intent, use_overlays,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

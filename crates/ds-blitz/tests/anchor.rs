@@ -7,7 +7,7 @@ use ds::{
     Anchor, Appearance, Availability, Button, Check, Common, Ds, Material, Menu, MenuItem,
     MountedRef, Rect,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

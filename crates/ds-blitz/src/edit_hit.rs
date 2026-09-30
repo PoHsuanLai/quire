@@ -10,7 +10,7 @@ use ds::{EditKind, Point, Rect, TextPosition};
 use parley::Cursor;
 
 /// The position under `at` in `surface`, or `None` where nothing addressable is near.
-pub(crate) fn hit(doc: &BaseDocument, surface: NodeId, at: Point) -> Option<TextPosition> {
+pub fn hit(doc: &BaseDocument, surface: NodeId, at: Point) -> Option<TextPosition> {
     let marked = doc
         .hit(at.x.0, at.y.0)
         .and_then(|found| nearest_marked(doc, found.node_id, surface));

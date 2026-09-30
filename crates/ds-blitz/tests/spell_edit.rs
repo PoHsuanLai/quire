@@ -12,9 +12,9 @@ use ds::{
     Appearance, Common, Ds, EditInput, EditSurface, KeyInput, Lang, Material, Point, PointerButton,
     Px, RootExtent, ShortcutKey, Spell, SpellReplace, TextPosition,
 };
-use ds_blitz::harness::settle_until;
 use ds_blitz::spell::{SpellConfig, provide_with};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::time::{Duration, Instant};

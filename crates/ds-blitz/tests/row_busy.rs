@@ -10,8 +10,8 @@ use ds::{
     Accessory, Appearance, Availability, BatteryState, Check, Ds, Fraction, Icon, Material, Motion,
     Row, RowLeading, RowSize, RowState, Selection,
 };
-use ds_blitz::harness::assert_settles_to_zero_frames;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

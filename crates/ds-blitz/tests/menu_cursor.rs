@@ -6,7 +6,7 @@ use ds::{
     Anchor, Appearance, Ds, FieldFocus, Material, Menu, MenuCursor, MenuItem, MenuPlacement, Point,
     Px, ShortcutKey, TextField,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

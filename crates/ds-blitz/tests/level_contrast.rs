@@ -15,7 +15,7 @@ use ds::{
     Shown, SpaceLook, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{ModulePanel, Osd, OsdLevel};
 use probe::rect;
 use std::cell::Cell;

@@ -9,7 +9,7 @@ use ds::{
     EmojiCells, FieldKey, Material, PaletteGroup, PaletteGroups, PaneContent, PreviewPane,
     ShortcutKey,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -476,7 +476,7 @@ fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
     harness.advance(ms(100));
     let first = harness.centre(".ds-emoji-cell").expect("a cell");
     harness.click(first);
-    ds_blitz::harness::settle_until(&mut harness, |harness| harness.is_focused(".ds-emoji-grid"));
+    ds_harness::harness::settle_until(&mut harness, |harness| harness.is_focused(".ds-emoji-grid"));
     assert!(
         harness.is_focused(".ds-emoji-grid"),
         "the grid has the keyboard"
@@ -543,8 +543,9 @@ fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
         harness.attr(".ds-preview", "data-presence").as_deref(),
         Some("leaving")
     );
-    let dropped =
-        ds_blitz::harness::settle_until(&mut harness, |harness| harness.count(".ds-preview") == 0);
+    let dropped = ds_harness::harness::settle_until(&mut harness, |harness| {
+        harness.count(".ds-preview") == 0
+    });
     assert_eq!(harness.count(".ds-preview"), 0, "dropped at on_hidden");
     assert!(
         dropped.duration_since(asked) >= ms(250),

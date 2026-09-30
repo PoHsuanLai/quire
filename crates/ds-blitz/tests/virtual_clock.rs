@@ -9,8 +9,8 @@ use ds::{
     Anim, Appearance, Button, Ds, HoverCard, HoverKey, HoverKind, HoverTarget, Material,
     MotionLevel, Point, Px, Rect, RootExtent, Shown, SidePanel, settle, use_hover_hub, use_toasts,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::mpsc::{self, TryRecvError};
 use std::thread::JoinHandle;

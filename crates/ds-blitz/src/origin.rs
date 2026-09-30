@@ -9,7 +9,7 @@ pub struct FrameId(usize);
 
 impl FrameId {
     /// The frame whose Blitz document id is `document`.
-    pub(crate) fn of(document: usize) -> Self {
+    pub fn of(document: usize) -> Self {
         FrameId(document)
     }
 

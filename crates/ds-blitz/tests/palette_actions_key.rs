@@ -8,7 +8,7 @@ use ds::{
     Anchor, Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Menu, Rect, ShortcutKey,
     use_focus_request,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

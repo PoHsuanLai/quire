@@ -5,10 +5,10 @@
 //! A snapshot sees CSS time only: the document is resolved at each moment, but no wall-clock
 //! timer runs. Drive timers with [`crate::Harness`].
 
-use crate::error::NativeError;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use dioxus::prelude::*;
+use ds_blitz::NativeError;
 use std::time::Duration;
 
 /// The moment [`snapshot`] renders at: long after every entrance has settled (the longest

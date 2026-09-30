@@ -7,8 +7,8 @@ use ds::{
     Anim, Appearance, Button, Ds, Emphasis, List, ListItem, Material, Point, RowState, Selection,
     ThreadRow, settle,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

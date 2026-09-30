@@ -8,7 +8,7 @@ use ds::{
     StripAction, ThreadRow,
 };
 use ds::{Emphasis, Selection};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 

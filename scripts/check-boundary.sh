@@ -16,7 +16,9 @@ cd "$(dirname "$0")/.."
 # environment that provides them. ds is renderer-free and effect-free; ds-settings does I/O but
 # never renders, and takes a Spawner instead of naming a runtime.
 # ds-blitz reaches D-Bus only through its opt-in `print` feature, so an app that never prints
-# builds no D-Bus client for it; anyrender_pdfrum stays Blitz-free so it can go upstream.
+# builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
+# (it turns on `pdf` only for its own `pdf` feature). anyrender_pdfrum stays Blitz-free so it can
+# go upstream.
 RULES=(
   "ds-core: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-style: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
@@ -25,7 +27,8 @@ RULES=(
   "ds-shell: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
   "ds-settings: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg anyrender_pdfrum pdfrum-edit"
-  "ds-blitz: zbus memfd"
+  "ds-blitz: zbus memfd anyrender_pdfrum pdfrum pdfrum-edit"
+  "ds-harness: zbus memfd anyrender_pdfrum pdfrum pdfrum-edit"
   "ds-core-derive: dioxus zbus tokio"
   "ds-settings-derive: dioxus zbus tokio"
   "anyrender_pdfrum: blitz blitz-dom blitz-paint blitz-traits blitz-html parley stylo_taffy dioxus dioxus-native"
@@ -69,7 +72,8 @@ EDGES=(
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
   "ds-blitz: ds anyrender_pdfrum"
-  "ds-gallery: ds ds-core ds-lint ds-blitz ds-settings ds-shell"
+  "ds-harness: ds ds-blitz"
+  "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "icons: ds ds-settings"
   "anyrender_pdfrum:"
 )

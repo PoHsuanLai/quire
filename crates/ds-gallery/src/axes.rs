@@ -2,7 +2,7 @@
 //! material, blur and Space the root is drawn with.
 //!
 //! The window and each snapshot start from an [`Axes`] handed over through [`start_with`]:
-//! `ds_blitz::launch` and `ds_blitz::snapshot_at` take a plain `fn() -> Element`, so the root
+//! `ds_blitz::launch` and `ds_harness::snapshot_at` take a plain `fn() -> Element`, so the root
 //! reads its first state from this thread rather than from props.
 
 use crate::page::Page;

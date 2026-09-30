@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::Word;
 use ds::{Appearance, Ds, Material, Motion, Scheme, ShortcutKey, SpaceLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{DotIndex, MeasuredIn, MotionChoice, SpaceEditor};
 use std::time::Duration;
 

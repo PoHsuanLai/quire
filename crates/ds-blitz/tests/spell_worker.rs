@@ -1,4 +1,4 @@
-//! The spellchecker's worker (`ds_blitz::spell`, feature `spellcheck`) against a tiny test
+//! The spellchecker's worker (`ds_blitz::spell`, feature `spell`) against a tiny test
 //! dictionary: checking, suggestions, "Ignore Spelling", "Learn Spelling" written to the user's
 //! file and read back by a new checker, and a language with no dictionary. The system
 //! dictionary is checked only where it is installed.

@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Icon, Material, ShortcutKey};
 use ds::{Bezel, ControlSize, ImagePosition};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 240,

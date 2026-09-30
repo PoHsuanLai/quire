@@ -5,8 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Material, Point, Px, RootExtent, UndoToken, use_toasts};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::settle_until;
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

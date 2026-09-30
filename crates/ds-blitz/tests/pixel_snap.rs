@@ -14,7 +14,7 @@ mod probe;
 use dioxus::prelude::*;
 use ds::icon::stroke_device_pixels;
 use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material, MenuItem, Point, Px, Scale};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{keep, rect};
 use std::ops::Range;

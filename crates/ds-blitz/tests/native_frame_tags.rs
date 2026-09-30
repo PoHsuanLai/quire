@@ -6,9 +6,10 @@
 use dioxus::prelude::*;
 use ds_blitz::frames::{frame_by_tag, tag_of};
 use ds_blitz::{
-    AppNet, FrameLink, FrameLinks, FrameTag, Harness, HarnessConfig, NetDecision, NetPolicy,
-    NetReply, NetRequest, RequestOrigin, Viewport,
+    AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
+    RequestOrigin,
 };
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 

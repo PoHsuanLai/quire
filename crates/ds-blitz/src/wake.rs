@@ -8,7 +8,7 @@ use std::time::Duration;
 
 /// Counts wake-ups and lets one thread wait for the next.
 #[derive(Debug, Default)]
-pub(crate) struct Wakeup {
+pub struct Wakeup {
     /// Every wake so far, from any source.
     generation: Mutex<u64>,
     changed: Condvar,
@@ -18,7 +18,7 @@ pub(crate) struct Wakeup {
 
 impl Wakeup {
     /// How many wakes have happened; pass it to [`Wakeup::wait_past`].
-    pub(crate) fn generation(&self) -> u64 {
+    pub fn generation(&self) -> u64 {
         *self
             .generation
             .lock()
@@ -26,7 +26,7 @@ impl Wakeup {
     }
 
     /// Sleep until a wake after `seen`, or `limit` has passed.
-    pub(crate) fn wait_past(&self, seen: u64, limit: Duration) {
+    pub fn wait_past(&self, seen: u64, limit: Duration) {
         let guard = self
             .generation
             .lock()
@@ -38,12 +38,12 @@ impl Wakeup {
     }
 
     /// How many resources have landed so far.
-    pub(crate) fn fetched(&self) -> u64 {
+    pub fn fetched(&self) -> u64 {
         self.fetched.load(Ordering::SeqCst)
     }
 
     /// A resource landed.
-    pub(crate) fn note_fetch(&self) {
+    pub fn note_fetch(&self) {
         self.fetched.fetch_add(1, Ordering::SeqCst);
         self.bump();
     }

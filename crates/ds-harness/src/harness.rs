@@ -14,8 +14,6 @@
 //! `HarnessConfig::with_clock(Clock::Virtual)` runs quire's timers on the same clock as its CSS
 //! instead, and `advance` takes no wall-clock time at all (`crate::harness_clock`).
 
-use crate::contexts::RootContexts;
-use crate::error::NativeError;
 use crate::frame_view::FrameView;
 use crate::harness_clock::{Clock, HarnessClock};
 use crate::harness_config::HarnessConfig;
@@ -29,6 +27,8 @@ use blitz_dom::{BaseDocument, Document as _, LocalName, NodeId};
 use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
 use dioxus::prelude::*;
 use ds::{InputModality, Point, PointerButton, Px, Rect, ShortcutKey, Size};
+use ds_blitz::NativeError;
+use ds_blitz::RootContexts;
 use keyboard_types::{Location, Modifiers};
 use std::time::{Duration, Instant};
 
@@ -42,9 +42,9 @@ pub struct Harness {
     held: HeldButtons,
     /// Keeps a Tokio runtime entered on this thread for as long as the harness lives, so a
     /// component under test that calls `ds_settings::use_environment` does not panic; see
-    /// `crate::runtime`. Never read, only held: it does its work by staying alive and being
+    /// `ds_blitz::enter_runtime`. Never read, only held: it does its work by staying alive and being
     /// dropped with the harness.
-    _runtime: tokio::runtime::EnterGuard<'static>,
+    _runtime: ds_blitz::RuntimeGuard,
     /// The clock timers run on. Last, so a virtual clock stays installed while the document
     /// (and every task sleeping on it) drops.
     time: HarnessClock,
@@ -88,7 +88,7 @@ impl Harness {
         // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
         // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
         // would run.
-        let runtime = crate::runtime::enter();
+        let runtime = ds_blitz::enter_runtime();
         // Installed before the first render, so a hook that notes the time as it mounts reads
         // the harness's clock.
         let time = HarnessClock::start(config.clock());

@@ -12,7 +12,7 @@ use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
     MenuItem, PlateFamily, Px, Scheme, Shown, Surface,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::MenuBarItem;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
@@ -300,7 +300,7 @@ fn a_squircle_dock_root_masks_its_frame_and_keeps_its_shadow() {
     let mut harness = Harness::new(DockPill, VIEW);
     harness.advance(ms(60));
     let frame = harness
-        .render_over(ds_blitz::Backdrop::Clear)
+        .render_over(ds_harness::Backdrop::Clear)
         .expect("a frame");
     keep(&frame, "dock-squircle");
     let pill = ".pill > .ds";

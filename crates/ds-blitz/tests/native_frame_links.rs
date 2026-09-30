@@ -3,10 +3,8 @@
 //! default `Inert` nothing happens. Either way no request is made for the link's target.
 
 use dioxus::prelude::*;
-use ds_blitz::{
-    AppNet, FrameLink, FrameLinks, Harness, HarnessConfig, NetDecision, NetPolicy, NetReply,
-    NetRequest, Viewport,
-};
+use ds_blitz::{AppNet, FrameLink, FrameLinks, NetDecision, NetPolicy, NetReply, NetRequest};
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 
 const VIEW: Viewport = Viewport {

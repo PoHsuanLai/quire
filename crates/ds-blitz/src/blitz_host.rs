@@ -31,15 +31,21 @@ use std::rc::Rc;
 pub(crate) type FindDocument = Rc<dyn Fn(&str) -> Found>;
 
 /// What a document's owner knows, and the host is made of.
-pub(crate) struct Wiring {
+pub struct Wiring {
     /// Under `FocusFallback::Ancestor`, the keeper that hands a removed element's keyboard on.
-    pub(crate) keeper: Option<Rc<RefCell<FocusKeeper>>>,
+    pub keeper: Option<Rc<RefCell<FocusKeeper>>>,
     /// Selector lookup in the owner's document; absent where the owner cannot reach it.
-    pub(crate) find: Option<FindDocument>,
+    pub find: Option<FindDocument>,
     /// The clipboard the edit surfaces paste from.
-    pub(crate) clipboard: Rc<dyn Clipboard>,
+    pub clipboard: Rc<dyn Clipboard>,
     /// The edit surfaces the owner's window feeds IME events and captured pointers to.
-    pub(crate) listeners: EditListeners,
+    pub listeners: EditListeners,
+}
+
+impl std::fmt::Debug for Wiring {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Wiring").finish_non_exhaustive()
+    }
 }
 
 impl Wiring {
@@ -56,14 +62,20 @@ impl Wiring {
 }
 
 /// The contexts a document's root is given, made together.
-pub(crate) struct Provided {
-    pub(crate) host: Rc<dyn DocumentHost>,
-    pub(crate) clipboard: Rc<dyn Clipboard>,
+pub struct Provided {
+    pub host: Rc<dyn DocumentHost>,
+    pub clipboard: Rc<dyn Clipboard>,
+}
+
+impl std::fmt::Debug for Provided {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Provided").finish_non_exhaustive()
+    }
 }
 
 impl Provided {
     /// The host and clipboard `wiring` describes.
-    pub(crate) fn of(wiring: Wiring) -> Self {
+    pub fn of(wiring: Wiring) -> Self {
         let clipboard = Rc::clone(&wiring.clipboard);
         Provided {
             host: Rc::new(BlitzHost::new(wiring)),

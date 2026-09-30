@@ -8,7 +8,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::{Appearance, CommandPalette, CommandPaletteHost, Ds, Material, Rect, ShortcutKey, Shown};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::RgbaImage;
 use probe::rect;
 use std::time::Duration;

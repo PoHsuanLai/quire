@@ -9,7 +9,7 @@ use std::sync::{Mutex, PoisonError};
 
 /// A shell whose clipboard and IME state are in memory.
 #[derive(Debug)]
-pub(crate) struct MemoryShell {
+pub struct MemoryShell {
     clipboard: Mutex<Option<String>>,
     html: Mutex<Option<String>>,
     ime: Mutex<ImeState>,
@@ -41,7 +41,7 @@ fn lock<T>(mutex: &Mutex<T>) -> std::sync::MutexGuard<'_, T> {
 
 impl MemoryShell {
     /// What was last copied, if anything.
-    pub(crate) fn text(&self) -> Option<String> {
+    pub fn text(&self) -> Option<String> {
         lock(&self.clipboard).clone()
     }
 
@@ -51,24 +51,24 @@ impl MemoryShell {
     }
 
     /// Put `text` on the clipboard, as another app's copy would; it has no HTML.
-    pub(crate) fn put(&self, text: String) {
+    pub fn put(&self, text: String) {
         *lock(&self.clipboard) = Some(text);
         *lock(&self.html) = None;
     }
 
     /// Put `html` and its plain `text` on the clipboard, as a browser's copy would.
-    pub(crate) fn put_html(&self, html: String, text: String) {
+    pub fn put_html(&self, html: String, text: String) {
         *lock(&self.clipboard) = Some(text);
         *lock(&self.html) = Some(html);
     }
 
     /// Whether the document has the IME on.
-    pub(crate) fn ime_switch(&self) -> ImeSwitch {
+    pub fn ime_switch(&self) -> ImeSwitch {
         lock(&self.ime).switch
     }
 
     /// Where the document last put the IME's candidate window.
-    pub(crate) fn ime_area(&self) -> Option<Rect> {
+    pub fn ime_area(&self) -> Option<Rect> {
         lock(&self.ime).area
     }
 }

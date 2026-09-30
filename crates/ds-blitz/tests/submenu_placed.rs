@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::{
     Anchor, Appearance, Availability, Ds, Flow, Material, Menu, MenuItem, MenuPlacement, Point, Px,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

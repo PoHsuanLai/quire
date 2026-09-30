@@ -1,4 +1,4 @@
-//! Choosing and opening the GPU a hybrid [`Harness`](crate::Harness) paints on, as shell-host's
+//! Choosing and opening the GPU a hybrid `ds-harness` `Harness` paints on, as shell-host's
 //! offscreen context does (`GpuContext::offscreen`): a non-empty `WGPU_ADAPTER_NAME` names the
 //! adapter (a case-insensitive substring of its name), else [`AdapterPref`] ranks the kinds;
 //! Vulkan before GL, software rasterisers last. The first adapter that yields a device wins.
@@ -39,7 +39,7 @@ impl AdapterPref {
 }
 
 /// A device on the preferred adapter, and the adapter's `name (backend)`.
-pub(crate) fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), NativeError> {
+pub fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), NativeError> {
     let pref = pref
         .clone()
         .with_env(std::env::var(ADAPTER_ENV).ok().as_deref());
@@ -124,7 +124,7 @@ impl Wake for Unpark {
 }
 
 /// Drive wgpu's setup futures on this thread (they resolve without an executor on native).
-pub(crate) fn block_on<T>(future: impl Future<Output = T>) -> T {
+pub fn block_on<T>(future: impl Future<Output = T>) -> T {
     let waker = Waker::from(Arc::new(Unpark(std::thread::current())));
     let mut cx = Context::from_waker(&waker);
     let mut future = pin!(future);

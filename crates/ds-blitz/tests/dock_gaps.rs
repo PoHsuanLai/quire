@@ -9,7 +9,7 @@ use ds::{
     Appearance, Corner, Ds, Icon, IconPx, IconSize, IconSource, IconView, Material, Px, Scheme,
     Shown, Surface,
 };
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::DockLabel;
 use image::{Rgba, RgbaImage};
 use probe::rect;

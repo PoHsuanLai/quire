@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, Material, Px, Rect};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{GridColumns, ModuleGrid, ModuleState, ModuleTile, TileSpan};
 use std::time::Duration;
 

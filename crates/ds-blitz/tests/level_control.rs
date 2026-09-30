@@ -12,7 +12,7 @@ use ds::{
     MotionLevel, Muting, Point, Px, ShortcutKey, Theme,
 };
 use ds::{Slider, SliderLook};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;

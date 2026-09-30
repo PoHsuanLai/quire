@@ -3,13 +3,13 @@
 //! changes nothing at all.
 
 use crate::headless::Headless;
-use crate::setup::Setup;
-use crate::snap::snap_to_device;
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, NodeData};
 use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Glyph, Icon, IconSize, Material};
+use ds_blitz::seam::Setup;
+use ds_blitz::snap_to_device;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;

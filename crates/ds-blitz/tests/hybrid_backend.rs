@@ -7,7 +7,8 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, Point, Px};
-use ds_blitz::{AdapterPref, Backend, Harness, HarnessConfig, Viewport};
+use ds_blitz::AdapterPref;
+use ds_harness::{Backend, Harness, HarnessConfig, Viewport};
 use std::time::{Duration, Instant};
 
 const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";

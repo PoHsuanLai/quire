@@ -1,4 +1,4 @@
-//! PDF thumbnails from a path (the `pdf-thumb` feature; design/04-COMPONENTS.md section 45).
+//! PDF thumbnails from a path (the `pdf` feature; design/04-COMPONENTS.md section 45).
 //!
 //! `ds::PdfThumb` draws a page it is handed and never reads a file: ds stays renderer-free and
 //! effect-free (`scripts/check-boundary.sh` forbids it pdfrum and every renderer). Reading the

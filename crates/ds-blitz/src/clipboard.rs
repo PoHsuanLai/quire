@@ -91,7 +91,7 @@ impl Clipboard for System {
 
 /// The harness's clipboard: text and HTML in a shell's memory.
 #[derive(Debug)]
-pub(crate) struct Memory(pub(crate) Arc<MemoryShell>);
+pub struct Memory(pub Arc<MemoryShell>);
 
 impl Clipboard for Memory {
     fn read_text(&self) -> Option<String> {

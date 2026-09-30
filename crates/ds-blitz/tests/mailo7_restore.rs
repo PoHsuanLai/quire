@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Button, Ds, Material, Press, ShortcutKey};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -79,7 +79,7 @@ fn press_show(harness: &mut Harness) {
 fn a_button_that_removes_itself_leaves_the_keyboard_on_its_focusable_ancestor() {
     let mut harness = harness(OnPress::Leaves);
     press_show(&mut harness);
-    ds_blitz::harness::settle_until(&mut harness, |harness| harness.is_focused(".app"));
+    ds_harness::harness::settle_until(&mut harness, |harness| harness.is_focused(".app"));
     assert_eq!(harness.count(".banner .ds-button"), 0, "the button left");
     harness.key(ShortcutKey::Char('j'));
     assert_eq!(harness.text_of(".log").as_deref(), Some("show,key:j"));
@@ -89,7 +89,7 @@ fn a_button_that_removes_itself_leaves_the_keyboard_on_its_focusable_ancestor() 
 fn a_button_that_stays_keeps_the_keyboard() {
     let mut harness = harness(OnPress::Stays);
     press_show(&mut harness);
-    ds_blitz::harness::settle_until(&mut harness, |harness| {
+    ds_harness::harness::settle_until(&mut harness, |harness| {
         harness.is_focused(".banner .ds-button")
     });
     harness.key(ShortcutKey::Char('j'));

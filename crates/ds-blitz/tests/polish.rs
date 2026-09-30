@@ -12,7 +12,7 @@ use ds::{
     SpaceLook, Theme,
 };
 use ds::{Bezel, ButtonRole, ControlSize};
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{DotIndex, SpaceEditor};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};

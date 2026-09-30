@@ -9,13 +9,13 @@ use crate::net_policy::NetPolicy;
 
 /// The app's providers for one document.
 #[derive(Debug, Clone, Default)]
-pub(crate) struct Setup {
+pub struct Setup {
     /// Values provided at the root, read with `use_context`.
-    pub(crate) contexts: RootContexts,
+    pub contexts: RootContexts,
     /// Who answers the document's requests, and its frames'.
-    pub(crate) net: NetPolicy,
+    pub net: NetPolicy,
     /// What a link clicked in a frame does.
-    pub(crate) frame_links: FrameLinks,
+    pub frame_links: FrameLinks,
     /// Where the keyboard goes after a click on nothing focusable.
-    pub(crate) focus_fallback: FocusFallback,
+    pub focus_fallback: FocusFallback,
 }

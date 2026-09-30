@@ -8,9 +8,10 @@
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Material, PdfPage, PdfTrouble, Px, Scale, Size};
-use ds_blitz::harness::settle_until;
-use ds_blitz::{DeviceBox, Harness, PdfFileThumb, ThumbRequest, Viewport};
+use ds_blitz::{DeviceBox, PdfFileThumb, ThumbRequest};
 use ds_blitz::{pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, Encryption, SaveOptions, blank_document, save};
 use peniko::Color;

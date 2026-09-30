@@ -8,8 +8,8 @@ use ds::{
     Anim, Answers, Appearance, Button, ControlSize, Ds, Material, Progress, ProgressIndicator,
     ProgressStyle, PulseKey,
 };
-use ds_blitz::harness::settle_until;
-use ds_blitz::{Harness, Viewport, snapshot, snapshot_at};
+use ds_harness::harness::settle_until;
+use ds_harness::{Harness, Viewport, snapshot, snapshot_at};
 use image::RgbaImage;
 use std::time::Duration;
 

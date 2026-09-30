@@ -15,7 +15,7 @@ use ds::{
     Appearance, AvatarFace, AvatarShape, AvatarSize, AvatarTone, Ds, Material, Rect, ShortcutKey,
     person_hue,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use ds_shell::{LockUser, PolkitPrompt};
 use image::RgbaImage;
 use std::time::Duration;

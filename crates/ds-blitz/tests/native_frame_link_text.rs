@@ -5,9 +5,8 @@
 
 use dioxus::prelude::*;
 use ds::{Point, Px};
-use ds_blitz::{
-    FrameLink, FrameLinkHover, FrameLinks, FrameTag, Harness, HarnessConfig, HoverPhase, Viewport,
-};
+use ds_blitz::{FrameLink, FrameLinkHover, FrameLinks, FrameTag, HoverPhase};
+use ds_harness::{Harness, HarnessConfig, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 

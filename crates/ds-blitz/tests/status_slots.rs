@@ -12,8 +12,8 @@ use ds::{
 };
 use ds::{Bezel, Button, ImagePosition};
 use ds::{Slider, SliderLook};
-use ds_blitz::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::{ModulePanel, ModuleState, ModuleTile};
 use std::time::Duration;
 

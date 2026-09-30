@@ -11,8 +11,8 @@ use ds::{
     Anim, Appearance, DRAG_THRESHOLD, Ds, Icon, ImageSize, ImageSource, Material, MotionLevel,
     Point, Px, Shown, settle,
 };
-use ds_blitz::harness::{SETTLE_BOUND, settle_until};
-use ds_blitz::{Clock, Harness, HarnessConfig, Viewport};
+use ds_harness::harness::{SETTLE_BOUND, settle_until};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use ds_shell::NotificationSwipe;
 use ds_shell::{DragStart, Hover, ShotThumbnail, ThumbAction};
 use std::time::{Duration, Instant};

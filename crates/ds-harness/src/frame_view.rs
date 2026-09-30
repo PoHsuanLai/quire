@@ -3,9 +3,9 @@
 //! on) and a test that wants its contents asks the frame.
 
 use crate::harness::{Harness, first};
-use crate::origin::FrameId;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
 use ds::{Point, Px};
+use ds_blitz::FrameId;
 
 /// One `iframe` of a harness's document and the sub-document it shows.
 #[derive(Debug, Clone, Copy)]

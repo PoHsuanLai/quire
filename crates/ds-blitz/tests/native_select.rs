@@ -7,7 +7,7 @@ use ds::TextField;
 use ds::{
     Appearance, Button, Ds, FieldFocus, Material, ShortcutKey, focus_soon, use_focus_request,
 };
-use ds_blitz::{Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
