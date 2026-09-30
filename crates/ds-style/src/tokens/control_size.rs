@@ -19,6 +19,30 @@ pub enum ControlSize {
     Large,
 }
 
+/// How tall a source list's rows are (design/30 section 1.5): the sidebar's own ladder, chosen by
+/// `appearance.sidebar_size`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum SidebarSize {
+    /// 24 tall.
+    Small,
+    /// 28 tall.
+    #[default]
+    Medium,
+    /// 32 tall.
+    Large,
+}
+
+impl SidebarSize {
+    /// A row's height at this size.
+    pub fn row_height(self) -> WholePx {
+        WholePx(match self {
+            SidebarSize::Small => 24,
+            SidebarSize::Medium => 28,
+            SidebarSize::Large => 32,
+        })
+    }
+}
+
 impl ControlSize {
     /// This size's geometry.
     pub fn scale(self) -> SizeScale {
