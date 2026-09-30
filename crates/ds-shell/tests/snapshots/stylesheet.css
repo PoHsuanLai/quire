@@ -947,6 +947,8 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-group-header{ display:flex; align-items:center; gap:var(--s-8); width:100%; box-sizing:border-box; padding:var(--s-12) var(--s-6) var(--s-6);
   font-family:var(--font-data); font-size:var(--fs-caption); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps-narrow); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); }
+/* The keyboard's cursor on a header (`data-focus=ring`, written by the list's owner): the ring. */
+.ds-group-header[*|data-focus=ring]{ outline:var(--ring) solid var(--accent-ring); outline-offset:var(--focus-gap); border-radius:var(--r-btn); }
 .ds-group-header-icon{ display:flex; flex:none; line-height:0; }
 .ds-group-header-name{ min-width:0; overflow:hidden; white-space:nowrap; color:var(--ink-soft); }
 .ds-group-header-count{ font-variant-numeric:tabular-nums; }
@@ -2923,14 +2925,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- dock_tile -- */
 /* DockTile (design/30 section 2.10; design/08-ICONS.md section 2.2; design/10-BEHAVIOUR-dock.md
    section 10.3.2): a tile is a square of its side (written inline, the shell's magnification),
-   the plate centred in it at 80.5 % of it. The badge hangs off the plate's top right corner, the
+   the plate centred in it at 80.5 % of it (its `left` and `top` inline, less the bounce's lift, so its label follows). The badge hangs off the plate's top right corner, the
    progress bar sits inside its foot, both on the plate; the running dot is positioned against the
    tile's own box (`parts.css`), so a bouncing plate leaves it on the baseline. The tile draws
    no bezel of its own: no pressed fill, no lift, no hover state (the shell magnifies).
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-dock-tile{ position:relative; display:block; flex:none; box-sizing:border-box; padding:0; border:0; background:transparent; font:inherit; cursor:default; }
-.ds-dock-plate{ position:absolute; left:50%; top:50%; display:block; transform:translate(-50%,-50%); }
+.ds-dock-plate{ position:absolute; display:block; }
 .ds-dock-badge{ position:absolute; top:calc(var(--s-4) * -1); right:calc(var(--s-4) * -1); z-index:var(--z-raise); }
 .ds-dock-progress{ position:absolute; left:16%; right:16%; bottom:var(--s-6); z-index:var(--z-raise); }
 /* -- lock_screen -- */
@@ -3046,6 +3048,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-notification{ position:relative; box-sizing:border-box; width:var(--notifications-banner-width); max-width:100%; color:var(--ink);
   padding-bottom:calc(var(--layers,0) * var(--notifications-group-offset)); }
 
+/* The keyboard's cursor on a card of a list (`data-focus=ring`, which the list's owner writes: its
+   rows are not focus targets, the list keeps the cursor): the focus ring, as a focused control's. */
+.ds-notification[*|data-focus=ring]{ outline:var(--ring) solid var(--accent-ring); outline-offset:var(--focus-gap); border-radius:var(--m-radius); }
+
 .ds-notification-layer{ position:absolute; top:calc(var(--i) * var(--notifications-group-offset)); bottom:calc((var(--layers) - var(--i)) * var(--notifications-group-offset));
   left:calc(var(--i) * var(--s-6)); right:calc(var(--i) * var(--s-6)); border-radius:var(--m-radius); opacity:calc(1 - var(--i) * .2); pointer-events:none; }
 
@@ -3119,8 +3125,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* ModuleTile (design/20 section 1.5, design/13 section 13.3.7): a module on
    the control center's grid, 56 tall (two Large controls, `--cc-tile-h`) at the module radius 8
    (`--cc-module-r`, design/29-SIZING.md), its disc a Large control (28). Off: the Mini button's plate (`--surface-2` and a
-   hairline) with a paper disc in ink. On: the plate in `--accent-soft`, the disc in `--accent`
-   with `--accent-ink`. Busy: the Off disc with the progress ring around it. The tile does not
+   hairline) with a paper disc in ink. On: the same plate (the tile does not tint, as macOS's
+   does not), the disc in `--accent` with `--accent-ink`. Busy: the Off disc with the progress ring around it. The tile does not
    lift under the pointer (design/30 Part 4).
    A Full tile spans every grid column. The chevron is a quiet 18 x 28 hit target of
    its own (narrow, so a half tile's title keeps about 72 of its 144 px), `--ink-faint` until the pointer is on it. */
@@ -3132,7 +3138,6 @@ html,body{margin:0;padding:0;background:transparent}
   transition:background-color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-module-tile[*|data-span=full]{ grid-column:1 / -1; }
-.ds-module-tile[*|data-state=on]{ background:var(--accent-soft); border-color:transparent; }
 .ds-module-tile[*|aria-disabled=true]{ opacity:.35; cursor:default; }
 .ds-module-tile[*|aria-busy=true]{ cursor:default; }
 
@@ -3199,6 +3204,14 @@ html,body{margin:0;padding:0;background:transparent}
    stays legible so the module is still named. */
 .ds-module-panel[*|aria-disabled=true] .ds-module-panel-glyph,
 .ds-module-panel[*|aria-disabled=true] .ds-module-panel-trailing{ opacity:.35; }
+/* -- pane -- */
+/* PaneHeader and PaneFooter (design/30 section 2.10): the head and foot of a control-center
+   detail pane. The header is a row: an optional Large toolbar back button, the title (a Label
+   that takes the room left), the trailing element. The footer is one action under a hairline. */
+
+.ds-pane-header{ display:flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-2) var(--s-6); }
+.ds-pane-header > .ds-label{ flex:1 1 0; min-width:0; }
+.ds-pane-footer{ display:flex; padding-top:var(--s-6); border-top:var(--hair) solid var(--line-soft); }
 /* -- month_grid -- */
 /* MonthGrid (design/04-COMPONENTS.md section 39; design/20 section 1.12): the
    calendar widget's month. The title in the data face, upper and tracked .12em, in `--accent`
