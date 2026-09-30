@@ -5,6 +5,7 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::text_runs::{TextLine, text as runs};
+use crate::components::content::label::{Label, LabelRole, LabelStyle};
 use crate::components::controls::key_equivalent::KeyEquivalent;
 use crate::components::controls::key_equivalent::KeyStyle;
 use dioxus::prelude::*;
@@ -12,6 +13,7 @@ use ds_core::vocab::Shortcut;
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::control_size::ControlSize;
 
 /// One block of a hover card.
 #[derive(Debug, Clone, PartialEq)]
@@ -58,12 +60,13 @@ pub enum HoverCardPart {
     },
     /// A thread card's latest messages, each a 22 px avatar, a name and two lines of text.
     Messages(Vec<HoverMessage>),
-    /// The quiet line at the foot, with an optional key hint pushed to the right.
+    /// The quiet line at the foot, with an optional key beside its meaning pushed to the right:
+    /// a `KeyEquivalent` cap next to a `Label`.
     Foot {
         /// "stays unread while you look".
         text: String,
-        /// The key and what it does: `Space` peek.
-        keys: Option<KeyHint>,
+        /// The key and what it does: `Space` and "peek".
+        key: Option<(Shortcut, String)>,
     },
     /// Mini buttons, wrapping.
     Actions(Vec<Element>),
@@ -112,15 +115,6 @@ pub struct HoverMessage {
     pub text: String,
 }
 
-/// A key hint in [`HoverCardPart::Foot`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct KeyHint {
-    /// The keys.
-    pub shortcut: Shortcut,
-    /// What they do: "peek".
-    pub label: String,
-}
-
 /// One part, drawn.
 pub(super) fn part(part: HoverCardPart) -> Element {
     match part {
@@ -164,13 +158,13 @@ pub(super) fn part(part: HoverCardPart) -> Element {
                 }
             }
         },
-        HoverCardPart::Foot { text, keys } => rsx! {
+        HoverCardPart::Foot { text, key } => rsx! {
             div { class: "ds-hovercard-foot",
                 "{text}"
-                if let Some(keys) = keys {
+                if let Some((shortcut, meaning)) = key {
                     span { class: "ds-hovercard-keys",
-                        KeyEquivalent { shortcut: keys.shortcut , style: KeyStyle::Cap}
-                        " {keys.label}"
+                        KeyEquivalent { shortcut, style: KeyStyle::Cap, size: ControlSize::Mini }
+                        Label { text: meaning, role: LabelRole::Tertiary, style: LabelStyle::Caption }
                     }
                 }
             }

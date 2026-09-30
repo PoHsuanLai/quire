@@ -9,7 +9,7 @@ use ds::{Accessory, Align, Availability, Button, RowLeading};
 use ds::{
     Anchor, Arrow, AvatarFace, AvatarShape, AvatarSize, AvatarTone, CommandPalette, CommandPaletteHost, Dismiss, ExternalIcon, FlagTone, Glyph,
     HoverCard, HoverCardPart, HoverEvent, HoverKey, HoverKind, HoverMessage, HoverProfile,
-    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, KeyHint, LinkPill, LinkTarget,
+    HoverStat, HoverTarget, Icon, IconSize, IconSource, IconUrl, LinkPill, LinkTarget,
     Menu, MenuImage, MenuItem, MenuPlacement, PaletteGroup, PaletteRow, Peek, PeekMode, PersonHue,
     Placement, Point, Popover, Px, Rect, SendPhase, SendPill, Sheet, Shown, Side,
     Size, Tooltip, UndoToken, use_hover_hub, use_toasts,
@@ -279,10 +279,7 @@ fn flag(tone: FlagTone) -> HoverCardPart {
 fn foot() -> HoverCardPart {
     HoverCardPart::Foot {
         text: "stays unread while you look".to_string(),
-        keys: Some(KeyHint {
-            shortcut: Shortcut(vec![ShortcutKey::Space]),
-            label: "peek".to_string(),
-        }),
+        key: Some((Shortcut(vec![ShortcutKey::Space]), "peek".to_string())),
     }
 }
 

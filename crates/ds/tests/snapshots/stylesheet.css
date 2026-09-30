@@ -922,7 +922,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-hovercard-msg p{ font-size:var(--fs-small); color:var(--ink-soft); line-height:1.4; max-height:2.8em; overflow:hidden; }
 .ds-hovercard-foot{ margin-top:var(--s-10); padding-top:var(--s-8); border-top:var(--hair) solid var(--line-soft); display:flex; align-items:center; gap:var(--s-6);
   font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption); color:var(--ink-faint); }
-.ds-hovercard-keys{ margin-left:auto; }
+.ds-hovercard-keys{ margin-left:auto; display:flex; align-items:center; gap:var(--s-4); }
 .ds-hovercard-person{ display:flex; gap:var(--s-10); align-items:center; }
 .ds-hovercard-stats{ margin-top:var(--s-9); display:flex; gap:var(--s-14); font-size:var(--fs-small); color:var(--ink-soft); }
 .ds-hovercard-stats b{ display:block; font-family:var(--font-display); font-size:var(--fs-base); color:var(--ink); }

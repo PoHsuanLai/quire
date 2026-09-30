@@ -171,7 +171,7 @@ pub use crate::components::{
         hover_card::{
             HoverCard,
             intent::{HoverAnchor, use_hover_intent},
-            parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat, KeyHint},
+            parts::{FlagTone, HoverCardPart, HoverMessage, HoverStat},
             target::{HoverTarget, TargetElement},
         },
         popover::{Arrow, Popover},
