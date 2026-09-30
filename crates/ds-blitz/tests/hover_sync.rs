@@ -2,7 +2,7 @@
 //! position against the new layout and records the new hovered element without events, so an
 //! element that slides in under a pointer that is not moving never heard `pointerenter`, and
 //! what the pointer left never heard `pointerleave`, until the pointer went out and back. The
-//! harness's frame now dispatches that change (`ds_blitz`'s `hover_sync`).
+//! harness's frame now dispatches that change (`blitz_kit::hover`).
 
 use dioxus::prelude::*;
 use ds::{Appearance, Ds, Icon, IconSource, Material, Point, Px};

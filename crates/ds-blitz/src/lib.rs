@@ -37,8 +37,6 @@ mod frame_tag;
 mod frame_tree;
 pub mod frames;
 mod host;
-mod hover_replay;
-mod hover_sync;
 mod install;
 pub mod launch;
 mod measure;
