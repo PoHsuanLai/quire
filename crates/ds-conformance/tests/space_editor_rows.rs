@@ -91,3 +91,49 @@ fn a_system_space_is_measured_under_both_headings() {
     );
     assert_eq!(harness.count(".ds-checks-scheme .ds-check"), 8);
 }
+
+/// An editor whose look is kept here, with the card's accent shown beside it.
+#[allow(non_snake_case)]
+fn Accented() -> Element {
+    let mut look = use_signal(SpaceLook::default);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Sheet,
+            p { class: "accent", "{look().card_accent:?}" }
+            div { style: "width:380px",
+                SpaceEditor {
+                    look: look(),
+                    scheme: Scheme::Light,
+                    active_dot: DotIndex(0),
+                    onchange: move |next| look.set(next),
+                }
+            }
+        }
+    }
+}
+
+/// The card's accent reads "Space colour" and "Your accent", the second being the default, and a
+/// press on the first borrows the Space's hue.
+#[test]
+fn the_accent_segments_read_space_colour_and_your_accent() {
+    let mut harness = Harness::new(Accented, VIEW);
+    let segments = "[*|aria-label=Accent] .ds-segmented-segment";
+    assert_eq!(
+        harness
+            .text_of(&format!("{segments}:nth-child(1)"))
+            .as_deref(),
+        Some("Space colour")
+    );
+    assert_eq!(
+        harness
+            .text_of(&format!("{segments}:nth-child(2)"))
+            .as_deref(),
+        Some("Your accent")
+    );
+    assert_eq!(harness.text_of(".accent").as_deref(), Some("Chosen"));
+    let space = harness
+        .centre(&format!("{segments}:nth-child(1)"))
+        .expect("Space colour");
+    harness.send(Input::click(space));
+    harness.advance(ms(30));
+    assert_eq!(harness.text_of(".accent").as_deref(), Some("SpaceHue"));
+}
