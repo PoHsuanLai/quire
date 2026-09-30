@@ -3,11 +3,10 @@
 //! measured in both schemes.
 
 use dioxus::prelude::*;
+use ds::components::app::space_editor::DotIndex;
+use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::prelude::*;
 use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
-use ds_shell::space_editor::rows::{MeasuredIn, MotionChoice};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

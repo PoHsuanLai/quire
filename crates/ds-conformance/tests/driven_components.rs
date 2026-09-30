@@ -8,6 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::base::vocab::RowState;
+use ds::components::app::space_editor::DotIndex;
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::overlays::hover_card::target::HoverTarget;
 use ds::host::measure::Anchor;
@@ -22,8 +23,6 @@ use ds_blitz::TokioSpawner;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
 use std::sync::Arc;
 use std::time::Duration;
 

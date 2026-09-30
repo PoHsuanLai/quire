@@ -2,11 +2,13 @@
 //! Motion row, and the contrast measured in each scheme under its own heading.
 
 use super::parts::CheckRows;
+use crate::components::controls::choice::Choice;
+use crate::components::controls::segmented::SegmentedControl;
+use crate::components::controls::segmented::Tracking;
+use crate::components::fields::text_field::TextField;
+use crate::components::fields::text_field_model::FieldBezel;
+use crate::components::lists::section_header::SectionHeader;
 use dioxus::prelude::*;
-use ds::components::controls::segmented::SegmentedControl;
-use ds::components::controls::segmented::Tracking;
-use ds::components::lists::section_header::SectionHeader;
-use ds::prelude::*;
 use ds_core::word::Word;
 use ds_style::appearance::{
     motion::Motion,

@@ -4,13 +4,12 @@
 use crate::axes::{Axes, PresetIndex};
 use crate::pages::{Caption, Section};
 use dioxus::prelude::*;
+use ds::components::app::space_editor::DotIndex;
+use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::palette::readout::readout;
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
-use ds_shell::space_editor::rows::{MeasuredIn, MotionChoice};
 
 /// The Space page.
 #[component]

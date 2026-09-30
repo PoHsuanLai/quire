@@ -2,19 +2,19 @@
 //! that switch Spaces (design/04-COMPONENTS.md section 32, design/21-SPACES.md section 6).
 //! Every colour it shows comes from `space::palette`; it computes none.
 
-pub(crate) mod dot;
+pub mod dot;
 pub(crate) mod edit;
 pub(crate) mod field;
 pub(crate) mod handles;
 pub(crate) mod parts;
 pub mod rows;
 
+use crate::components::controls::choice::Choice;
+use crate::components::controls::segmented::SegmentedControl;
+use crate::components::controls::segmented::Tracking;
+use crate::components::lists::section_header::SectionHeader;
+use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds::components::controls::segmented::SegmentedControl;
-use ds::components::controls::segmented::Tracking;
-use ds::components::lists::section_header::SectionHeader;
-use ds::prelude::*;
-use ds::root::common::Common;
 use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
 use ds_style::space::look::{CardAccent, SpaceLook};

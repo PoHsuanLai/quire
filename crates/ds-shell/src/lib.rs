@@ -21,7 +21,6 @@ pub mod notifications;
 pub mod now_playing;
 pub mod osd;
 pub(crate) mod sheets;
-pub mod space_editor;
 #[cfg(test)]
 mod stored_words;
 pub mod switcher;

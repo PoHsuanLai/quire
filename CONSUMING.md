@@ -641,7 +641,7 @@ Full catalogue (design doc section in parentheses):
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25) |
-| Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` (§32, `ds-shell`), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
+| Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
 `crates/ds/src/components/<family>/<name>.rs` — read that, not this table, before wiring one up; this doc

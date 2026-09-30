@@ -2538,9 +2538,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-run[*|data-tone=underline]{ text-decoration:underline; }
 .ds-run-link{ color:inherit; font-weight:600; text-decoration:underline; text-decoration-color:var(--accent-text); cursor:pointer; }
 .ds-run-link:hover{ color:var(--accent-text); }
-/* A code run: the fixed-pitch face (`--font-code`) a step under the line's size on a quiet ground, so
+/* A code run: the fixed-pitch face (`--font-code`) at `--fs-mono`, relative to the line, on a quiet ground, so
    a command or an address reads as something to copy. */
-.ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:.92em; background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
+.ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:var(--fs-mono); background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
 /* -- thread_row -- */
 /* ThreadRow (design/30 section 2.11): a mail row's content inside a `Row` of the Card density,
    `S:175-199`, `S:293-307`. The row is a card with the dot, the words and the tail in a grid. The

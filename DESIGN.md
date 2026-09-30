@@ -111,7 +111,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 fields,menus,menus/palette,overlays,lists,content,chrome}` hold the general ones, `components/app`
 mail's own, and `ds-shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
 `notifications`, `thumbs`, `now_playing`, `month_grid`, `clock`, `battery`, `emoji`,
-`user_picture`, `space_editor`, `osd`, `idle_dim`, `dock`, `widget`). Every file is the
+`user_picture`, `osd`, `idle_dim`, `dock`, `widget`). Every file is the
 section of 04-COMPONENTS with the same name, one `.rs` and `.css` pair each (the controls and fields of
 30-CATALOGUE 2.1 to 2.3, 2.8 and 2.9 are directories or file groups by concept: `button` (with `button_model`
 and `button_marks`; the image-only and toolbar buttons are `Button`, not a second component), `toggle`, `checkbox`,
@@ -141,8 +141,8 @@ manifest (`sheet.rs`) and the task that plays the asset's animation once (`play.
 `password.rs`); `battery` the ring (`ring.rs`) and the device glyphs; `kept.rs` the book a banner
 stack and the app switcher keep their leaving rows in.
 
-`ds-shell/space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
-`SpaceDot`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
+`components/app/space_editor` is a directory: `space_editor.rs` (the panel, the field and its handles,
+`SpaceDot` in `space_editor/dot.rs`), `space_editor/edit.rs` (the pure edits a gesture makes to a `SpaceLook`),
 `space_editor/field.rs` (the hue x chroma colour plane and the tiled round-dot cell over it,
 built once per scheme, and the mapping between a dot and its place on it, O-19),
 `space_editor/parts.rs` (stops, grain, presets, contrast checks); the field's PNGs are

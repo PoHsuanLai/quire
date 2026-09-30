@@ -1,17 +1,17 @@
 //! The Space editor and the Space dot: every state rendered through dioxus-ssr and compared with
-//! a golden in `tests/snapshots/lists/space_editor/<state>.html`; the field plane decoded and
+//! a golden in `tests/snapshots/space_editor/<state>.html`; the field plane decoded and
 //! probed, the handles placed from the dots, the contrast pills against `space::readout`; and
 //! every golden's classes styled, its sheet on tokens, and its markup linted against the
-//! stylesheet the shell draws with.
+//! stylesheet the design system draws with.
 //!
-//! `DS_BLESS=1 cargo test -p ds-shell --test space_editor_ssr` rewrites the goldens.
+//! `DS_BLESS=1 cargo test -p ds --test space_editor_ssr` rewrites the goldens.
 
-#[path = "../../ds/tests/controls/css_scan.rs"]
+#[path = "controls/css_scan.rs"]
 #[allow(dead_code)] // The controls' STYLES table is not used here.
 mod css_scan;
 #[path = "lists/editor.rs"]
 mod field_plane;
-#[path = "../../ds/tests/support/golden.rs"]
+#[path = "support/golden.rs"]
 mod golden;
 #[path = "lists/png.rs"]
 mod png;
@@ -20,10 +20,9 @@ mod space_editor_rows;
 
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
+use ds::components::app::space_editor::DotIndex;
 use ds::prelude::*;
 use ds_core::colour::contrast::Verdict;
-use ds_shell::prelude::*;
-use ds_shell::space_editor::DotIndex;
 use ds_style::space::look::CardAccent;
 use ds_style::space::palette::readout::readout;
 use ds_style::space::palette::{Capping, Dot, derive, swatch};
@@ -143,7 +142,7 @@ fn every_space_editor_state_matches_its_golden() {
     let failures: Vec<String> = CASES
         .iter()
         .filter_map(|case| {
-            let name = format!("lists/space_editor/{}.html", case.state);
+            let name = format!("space_editor/{}.html", case.state);
             golden::check(&name, &scrub(&render(case.make))).err()
         })
         .chain(
@@ -158,7 +157,7 @@ fn every_space_editor_state_matches_its_golden() {
 /// The stylesheets that style the editor's markup: its own, then those of the components it
 /// renders.
 fn sheets() -> Vec<&'static str> {
-    let all = ds_shell::component_sheets();
+    let all = ds::component_sheets();
     [
         "space_editor",
         "section_header",
@@ -181,7 +180,7 @@ const SHARED: &[&str] = &["ds-ic", "ds-truncate"];
 
 #[test]
 fn every_class_in_a_golden_is_styled_by_the_editors_sheets() {
-    let goldens = golden::all_in("lists/space_editor");
+    let goldens = golden::all_in("space_editor");
     assert!(
         goldens.len() >= CASES.len() + space_editor_rows::CASES.len(),
         "only {} goldens",
@@ -207,7 +206,7 @@ fn every_class_in_a_golden_is_styled_by_the_editors_sheets() {
 
 #[test]
 fn the_space_editor_stylesheet_uses_tokens_only() {
-    let all = ds_shell::component_sheets();
+    let all = ds::component_sheets();
     let (_, css) = all
         .iter()
         .find(|(name, _)| *name == "space_editor")
@@ -259,13 +258,13 @@ fn every_space_editor_golden_lints_clean() {
     use ds_lint::{LintConfig, markup};
     let config = LintConfig {
         exceptions: MARKUP_EXCEPTIONS,
-        ..LintConfig::new(&ds_shell::kits())
+        ..LintConfig::new(&ds::kits())
     };
-    let goldens = golden::all_in("lists/space_editor");
+    let goldens = golden::all_in("space_editor");
     let failures: Vec<String> = goldens
         .iter()
         .flat_map(|(name, html)| {
-            markup(html, ds_shell::stylesheet(), &config)
+            markup(html, ds::stylesheet(), &config)
                 .into_iter()
                 .map(move |offence| format!("{name}: {:?} {}", offence.rule, offence.text))
         })
@@ -273,6 +272,6 @@ fn every_space_editor_golden_lints_clean() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
     // The plane's payload is scrubbed from the goldens; the real markup must lint clean too.
     let real = render(|| editor(preset_look(0, Grain(35)), Scheme::Light, 0));
-    let offences = markup(&real, ds_shell::stylesheet(), &config);
+    let offences = markup(&real, ds::stylesheet(), &config);
     assert!(offences.is_empty(), "{offences:?}");
 }
