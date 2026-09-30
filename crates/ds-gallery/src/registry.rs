@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 26] = [
+pub const REGISTRY: [Entry; 27] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
