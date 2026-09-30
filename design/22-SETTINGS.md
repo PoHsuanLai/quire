@@ -375,7 +375,7 @@ found elsewhere in the file that are not yet in that table.
 | `notifications.banner_padding_px` | `Px` | `12` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.icon_px` | `Px` | `32` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.banner_hold_ms` | `Ms` | `5200` | fixed ~5s; app `expire_timeout` ignored except 0 | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications`; `05-MOTION.md#10-shell-motion` | settled (R8), preference-adjacent |
-| `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | | `05-MOTION.md#12-open-decisions` item 7 | proposed |
+| `notifications.banner_entry_direction` | `BannerEntry::{FromRight,FromBelow}` | `FromRight` | unread since step 4a.7: a banner slides in from and out to the right (design/30 section 1.3) | `05-MOTION.md#12-open-decisions` item 7 | proposed |
 | `notifications.hover_min_remaining_ms` | `Ms` | `1500` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | settled (R8), number proposed |
 | `notifications.close_button_px` | `Px` | `18` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |
 | `notifications.swipe_dismiss_px` | `Px` | `80` | | `13-BEHAVIOUR-menus-windows.md#13-3-6-notifications` | proposed |

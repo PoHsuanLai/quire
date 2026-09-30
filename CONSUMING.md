@@ -703,7 +703,7 @@ For a bar (FINDINGS "Bar gaps"):
   `--f-line`: `Button`, `Chip`, `Badge`, a menu's trigger and your text all draw in
   the frame inks with no variant of their own. Overlays opened from it (menus, popovers,
   tooltips) are paper again.
-- **Status items.** `Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, .. }` is a square of
+- **Status items.** `ds_shell::MenuBarItem { image: ImagePosition::Only, icon, label, .. }` is a square of
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
   `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items
@@ -717,7 +717,7 @@ For a bar (FINDINGS "Bar gaps"):
           BarGlyphSize::IconSizeBar22 => bar.status_icon_box_px.0, // the glyph fills the box
       })),
   };
-  rsx! { div { class: "status", style: metrics.style_attr(), /* Button { bezel: StatusItem } … */ } }
+  rsx! { div { class: "status", style: metrics.style_attr(), /* MenuBarItem { image: Only, .. } … */ } }
   ```
   (`style_attr()` is `--bar-status-box:22px;--bar-status-glyph:16px;` at the defaults; custom
   properties with lengths on your own element pass the markup lint.) An external icon in a

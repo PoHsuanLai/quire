@@ -195,7 +195,7 @@ fn a_running_load_shows_the_pending_look_at_once_and_its_landing_cross_fades() {
         Some("Loading\u{2026}")
     );
     assert_eq!(
-        attr(&harness, ".ds-preview-pending .ds-spinner", "data-pending"),
+        attr(&harness, ".ds-preview-pending .ds-progress", "data-pending"),
         "step"
     );
     assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "present");
@@ -229,7 +229,7 @@ fn a_stuck_load_keeps_turning_there_is_no_cap() {
     );
     shown_remotely(&mut harness);
     remote(&mut harness, Pane::Pending);
-    let ring = ".ds-preview-pending .ds-spinner";
+    let ring = ".ds-preview-pending .ds-progress";
     harness.advance(ms(11_000));
     assert_eq!(attr(&harness, ring, "data-pending"), "step");
     let turn = attr(&harness, ring, "style");
@@ -253,7 +253,7 @@ fn reduced_snaps_the_media_and_keeps_the_ring_turning() {
     remote(&mut harness, Pane::Pending);
     assert_eq!(harness.count(".ds-preview-pending"), 1);
     assert_eq!(
-        attr(&harness, ".ds-preview-pending .ds-spinner", "data-pending"),
+        attr(&harness, ".ds-preview-pending .ds-progress", "data-pending"),
         "step"
     );
 }

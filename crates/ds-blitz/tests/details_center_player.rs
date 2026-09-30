@@ -111,7 +111,7 @@ fn play_pause_offers_the_next_action_cross_faded() {
 }
 
 fn elapsed(harness: &Harness) -> Option<String> {
-    harness.text_of("#position .ds-track-time")
+    harness.text_of("#position .ds-track-times .ds-label")
 }
 
 #[test]
@@ -126,19 +126,23 @@ fn the_position_steps_on_the_second_while_playing_and_holds_paused() {
     assert_eq!(elapsed(&harness).as_deref(), Some("1:01"));
     harness.advance(ms(1));
     assert_eq!(elapsed(&harness).as_deref(), Some("1:02"));
-    // One wake a second, no more: no tween between reports.
-    let wakes = harness.wakes();
+    // The bar follows each whole second over --t-move (design/30 section 1.3), then rests:
+    // between one second's step and the next nothing wakes.
     harness.advance(ms(3_000));
     assert_eq!(elapsed(&harness).as_deref(), Some("1:05"));
-    assert!(
-        harness.wakes() - wakes <= 3,
-        "{} wakes in 3 s",
-        harness.wakes() - wakes
+    harness.advance(ms(400));
+    let quiet = harness.wakes();
+    harness.advance(ms(300));
+    assert_eq!(
+        harness.wakes(),
+        quiet,
+        "the bar rests between one second's step and the next"
     );
+    assert_eq!(elapsed(&harness).as_deref(), Some("1:05"));
     let bar = harness
-        .attr("#position .ds-track-bar", "style")
+        .attr("#position .ds-progress-fill", "style")
         .unwrap_or_default();
-    assert!(bar.contains("--f:0.3250"), "{bar}");
+    assert!(bar.contains("--f:0.325"), "{bar}");
     // A new report re-anchors; paused, it holds at 0 frames.
     harness.within(|| *AT.write() = Duration::from_secs(120));
     set(&mut harness, Playback::Paused);
