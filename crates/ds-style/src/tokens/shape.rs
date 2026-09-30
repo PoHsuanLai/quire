@@ -1,8 +1,7 @@
-//! Radii, per Look (design/30-CATALOGUE.md section 3.2). The first nine are the plan's names
+//! Radii (design/30-CATALOGUE.md section 3.2). The first nine are the plan's names
 //! (design/01-LAYOUT.md section 10); the rest name the literals design/04-COMPONENTS.md O-3 says
 //! the table must absorb.
 
-use crate::look::Look;
 use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
 
@@ -45,28 +44,24 @@ pub enum Radius {
 }
 
 impl Radius {
-    /// The radius in `look`, as CSS. The Mac Look (design/30-CATALOGUE.md section 3.2) has
+    /// The radius as CSS. The Look (design/30-CATALOGUE.md section 3.2) has
     /// small, uniform radii: control and field 5, menu 8, popover, card and window 10.
-    pub fn value(self, look: Look) -> &'static str {
-        match look {
-            Look::Mac => match self {
-                Radius::Panel | Radius::Card | Radius::Tile | Radius::Window | Radius::Media => {
-                    "10px"
-                }
-                Radius::Btn | Radius::Field | Radius::Kbd => "5px",
-                Radius::Chip | Radius::Item | Radius::Small => "6px",
-                Radius::Pill => "999px",
-                Radius::Menu | Radius::MenuItem => "8px",
-                Radius::Tiny => "4px",
-                Radius::Micro => "3px",
-            },
+    pub fn value(self) -> &'static str {
+        match self {
+            Radius::Panel | Radius::Card | Radius::Tile | Radius::Window | Radius::Media => "10px",
+            Radius::Btn | Radius::Field | Radius::Kbd => "5px",
+            Radius::Chip | Radius::Item | Radius::Small => "6px",
+            Radius::Pill => "999px",
+            Radius::Menu | Radius::MenuItem => "8px",
+            Radius::Tiny => "4px",
+            Radius::Micro => "3px",
         }
     }
 }
 
-/// A radius token as the stylesheet writes it, in the scope's Look.
-fn radius_css(token: Radius, scope: TokenScope) -> CssValue {
-    CssValue::fixed(token.value(scope.look))
+/// A radius token as the stylesheet writes it.
+fn radius_css(token: Radius, _: TokenScope) -> CssValue {
+    CssValue::fixed(token.value())
 }
 
 /// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius

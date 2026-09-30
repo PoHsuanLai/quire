@@ -82,7 +82,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | Crate | Modules, lowest first |
 | --- | --- |
 | `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
-| `ds-style` | `look` (`Look`), `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
+| `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
@@ -212,7 +212,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The enclosing scope a component reads | `ds-style::scope::Scope` |
 | Material, blur, frame ground | `ds-style::material`; `ds::root::chrome` |
 | Space palettes and `SpaceLook` | `ds-style::space` |
-| Looks (Mac, Arc: values only) | `ds-style::look::Look`; token values per Look in `ds-style::tokens` |
+| The Look (one value set, the Mac values) | `ds-style::tokens` (no Look type; design/30 section 3) |
 | Glyphs (the `Icon` enum), plate, retint, classify | `ds-style::icon` |
 | Font faces as bytes | `ds-style::fonts`; registration with the renderer: `blitz-kit::fonts` |
 | Keyframes and recipes | `ds-motion::{anim, recipe, keyframes}` |
@@ -287,7 +287,7 @@ pub trait Token: Word {
     const PREFIX: &'static str;               // "dur-", "s-", "shell-"
     const KIND: TokenKind;                    // Fixed | Tuned (default declared, override written inline)
     fn var(self) -> VarName { ... }           // "--" + PREFIX + slug
-    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { look: Look, scheme: Scheme, motion: MotionLevel, typeface: Typeface }
+    fn css_value(self, scope: TokenScope) -> CssValue;   // TokenScope { scheme: Scheme, motion: MotionLevel, typeface: Typeface }
 }
 pub struct TokenSet { ... }
 impl TokenSet { pub const fn of<T: Token>() -> TokenSet; }
@@ -484,7 +484,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
 | Group | Names |
 | --- | --- |
-| Root and appearance | `Ds`, `Surface`, `Kits`, `Theme`, `Accent`, `Motion`, `MotionLevel`, `Material`, `Look`, `Scheme`, `SystemPrefs`, `Appearance`, `Resolved`, `Typeface`, `SpaceLook`, `Scope`, `use_scope` |
+| Root and appearance | `Ds`, `Surface`, `Kits`, `Theme`, `Accent`, `Motion`, `MotionLevel`, `Material`, `Scheme`, `SystemPrefs`, `Appearance`, `Resolved`, `Typeface`, `SpaceLook`, `Scope`, `use_scope` |
 | Vocabulary | `Word`, `Availability`, `Selection`, `Emphasis`, `Switch`, `Expanded`, `Check`, `Shown`, `Fraction`, `Percent`, `ShortcutKey`, `Shortcut`, `Here`, `DropState` |
 | Geometry | `Px`, `Point`, `Size`, `Rect`, `Scale`, `Placement`, `Alpha` |
 | Icons | `Icon`, `IconSource`, `IconView`, `IconSize`, `ExternalIcon`, `StatusState`, `BatteryGlyph`, `WifiGlyph`, `VolumeGlyph`, `BluetoothGlyph` |
@@ -675,9 +675,8 @@ implements it (the traits build with `ds-harness` default features off).
   rules stay true to the public API.
 
 - **No `unsafe`** anywhere in the workspace; `unsafe_code = "deny"`.
-- **A Look is values only.** A Look supplies tokens (colour, radius, font family, grain, shadow), the
-  material recipe and the backdrop (`design/30` section 3). It never swaps a component, adds a code
-  path or changes a size, duration or behaviour; no component stylesheet selects on the Look.
+- **One Look.** The token table is the Look's values (`design/30` section 3); there is no Look type
+  and no `data-look`. What the design takes from Arc are features, not values.
 - **Design-system rules:** every class is prefixed `ds-`; variants go in `data-variant` and
   `data-size`, state in `aria-*`; every colour, duration, easing, keyframe and font comes from
   the token table. A missing component or token is added here, never patched in a consumer.
@@ -731,7 +730,7 @@ path each, until step 12 replaces them with the prelude.
 4a. **Catalogue**: build design/30's merges and additions, foundations first, each sub-step through
     the gate worktree:
     1. tokens: (done) the pruned duration, delay and easing tables (30 section 1.2), `ControlSize {Mini,
-       Small, Regular, Large}` and `SizeScale` (1.6), `ds-style::look::Look` with the Mac values,
+       Small, Regular, Large}` and `SizeScale` (1.6), the tokens as the one Look's values,
        Motion levels reduced to Standard and Reduced;
     2. vocabulary: (done) (1.5) `Shown`, `Check`, `Availability::Busy`, `PressPhase`, `Muting`, `Dismiss`,
        `RowState`, `Activity`, `FocusStyle`; the `Common` props; `ds::selectors`;
@@ -748,7 +747,8 @@ path each, until step 12 replaces them with the prelude.
        `Toast`, `DockLabel`, `EmptyState`, `Skeleton`;
     7. (done) shell-only pieces (30 section 2.10) and app features (30 section 2.11), then the P2 components
        (the app features and mail-only half, 4a.7b: done);
-    8. sill's switch-over (done: the local pieces L1-L16 of the component inventory) and the Arc Look;
+    8. sill's switch-over (done: the local pieces L1-L16 of the component inventory) and one Look, Arc's ideas
+       as features (done);
        the gallery and goldens per component; delete every name in 30 Part 4.
 5. **Crate-private crossers** (done): every `pub(crate)` item that crosses a layer (33 today) becomes
    `pub` at its home module or moves to its only consumer; the boundary script keeps the list

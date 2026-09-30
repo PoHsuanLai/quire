@@ -21,7 +21,6 @@ const SILL_OWNED: &[&str] = &["notifications.banner_material", "launcher.materia
 /// here so the doc and the struct can be compared without runtime reflection.
 const APPEARANCE_SETTINGS_FIELDS: &[&str] = &[
     "theme",
-    "look",
     "accent",
     "motion_level",
     "typeface",

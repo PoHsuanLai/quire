@@ -22,6 +22,7 @@ pub mod orb;
 pub mod person;
 pub mod pixel;
 pub mod plate;
+pub mod selection;
 pub mod set;
 pub mod shape;
 pub mod shell_scale;

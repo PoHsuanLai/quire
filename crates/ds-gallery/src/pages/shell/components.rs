@@ -80,8 +80,8 @@ fn ModuleTiles() -> Element {
                     ModulePanel { glyph: Icon::Volume2, title: "Panel, Tile plate", trailing: rsx! { "40%" },
                         span { class: "g-name", "content of its own" }
                     }
-                    ModulePanel { title: "Panel, Bare", plate: PanelPlate::Bare, availability: Availability::Disabled,
-                        span { class: "g-name", "disabled, no plate" }
+                    ModulePanel { glyph: Icon::Volume2, title: "Panel, Bare", trailing: rsx! { "40%" }, plate: PanelPlate::Bare, availability: Availability::Disabled,
+                        span { class: "g-name", "disabled, no plate: the glyph and figure dim, the title names it" }
                     }
                 }
             }

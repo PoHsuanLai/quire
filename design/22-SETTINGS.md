@@ -99,7 +99,6 @@ control in v1.
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
-| `appearance.look` | `Look::{Mac}` (Arc joins with the second Look) | `Mac` | a Look is values only | `30-CATALOGUE.md` part 3 | settled (user, 2026-09-29) |
 | `appearance.accent` | `Accent` (8 variants: `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`, `graphite`, macOS's own list in its picker order) | `Blue` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
 | `appearance.typeface` | `Typeface::{System,Editorial}` | `System` | `System`: Inter for UI and data (tabular), Inter Display for display; `Editorial`: Bricolage Grotesque, Karla and Space Mono, mail's voice, as an opt-in for an app. Written as `data-typeface` on `.ds`. Code and `Kbd` stay in Space Mono (`--font-code`) either way | `02-TYPE.md#2-the-faces` | settled (user, 2026-09-26: "make this desktop use mostly inter") |
@@ -856,7 +855,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.look`, `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
+| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into COSMIC's `system_actions` and `custom` shortcut files, and the chord COSMIC already holds wins a clash, shown on the row (28 §7 decision 10) |

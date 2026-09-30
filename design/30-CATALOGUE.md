@@ -16,7 +16,7 @@ macOS number that could not be confirmed, shipped as the default and tuned again
 | R1 | Target: macOS Sonoma / Sequoia, pre-Liquid-Glass. Every component's look, sizes, states and behaviour follow the macOS default; the contract names its AppKit counterpart. Every open question takes the macOS default. |
 | R2 | One motion model: the macOS one. quire's own flourishes are gone: press squish, hover lift, overshoot and spring pops, tilt, stagger, first-show sweeps, mailo-era keyframes, infinite loops (the spinner is the one exception, and the voice orb's turn while it is `Active`). Motion levels are an accessibility preference only. |
 | R3 | One implementation per concept. Every MERGE names one survivor; the absorbed names are deleted, not aliased. |
-| R4 | A Look is values only (Part 3). The library is a strict superset of the Mac Look. |
+| R4 | There is one Look (Part 3), the Mac values; Arc's ideas are features (3.3), not values. |
 | R5 | Kept although macOS lacks them: skeleton, toast, busy state on buttons and rows, hover card, key-cap. They move the macOS way (section 2.9 and 2.5). |
 | R6 | Arc-style features (pinned tiles, Today tabs, edge-peek sidebar, link pill, grouped launcher commands, Ctrl+1-9 Space switching) exist in both Looks (section 2.11). |
 | R7 | No `bool` props; no `busy`/`open`/`muted` invented per component: the shared enums of section 1.5. |
@@ -205,7 +205,6 @@ Each is a `22-SETTINGS.md` row before it is read (ARCHITECTURE section 9).
 
 | Key | Values | Default |
 | --- | --- | --- |
-| `appearance.look` | Mac, Arc | Mac |
 | `appearance.motion` | Standard, Reduced (system preference resolves to Reduced) | Standard |
 | `appearance.keyboard_navigation` | All, TextAndLists | All |
 | `appearance.sidebar_size` | Small, Medium, Large | Medium |
@@ -352,7 +351,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 
 ### 2.11 App features and mail-only
 
-Features available in both Looks (R6). They are `Row`, `List`, `Popover` and `CommandPalette`
+Features available on every surface (R6). They are `Row`, `List`, `Popover` and `CommandPalette`
 configurations plus the pieces below; their motion uses 1.3 only.
 
 | Feature | Contract | Built from | Where | St | Pri |
@@ -387,68 +386,61 @@ primitives; 3 `Label`, `Button` (+ `IconButton` merge), `Toggle`, `Checkbox`, `R
 7 overlays (`Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`, `Toast`,
 `DockLabel`), `EmptyState`, `Skeleton`; 8 shell-only and app features; 9 P2 (Stepper, DatePicker,
 Table, Toolbar, SplitView, Sidebar, TabView, FieldRow, MenuBar model); 10 sill switch-over
-(L1-L16 of the component inventory) and the second Look (Arc).
+(L1-L16 of the component inventory); Arc's ideas arrive as features (section 3.3).
 
 ---
 
-## 3. Looks
+## 3. The Look
 
-A Look is a value set. The Mac Look is the default; Arc is the second. The library is a strict
-superset of Mac.
+There is one Look: the Mac values below. It is one value set, not a switch: the library has no
+Look type, no `data-look` and no per-Look stylesheet, and a stored `appearance.look` is an unknown
+key. What the design takes from the Arc prototype are features (3.3), not values.
 
-### 3.1 What a Look may vary (the whole list)
+### 3.1 What the Look supplies
 
-| # | Varies | Token family |
-| --- | --- | --- |
-| 1 | Colour tokens, light and dark | `--paper --surface --surface-2 --raise --ink --ink-soft --ink-faint --line --line-soft --accent --accent-ink --accent-soft --ok --warn --danger --sel-bg --sel-bg-quiet --sel-ink --scrim --orb-bg --orb-c1 --orb-c2 --orb-c3` |
-| 2 | Radius tokens | `--r-ctl --r-field --r-seg --r-menu --r-pop --r-sheet --r-card --r-pill --r-panel` |
-| 3 | Font family | `--font-ui --font-display --font-mono` |
-| 4 | Grain | `--grain` (0..100 scale) and the grain overlay opacity |
-| 5 | Material recipe | per `Material`: tint, edge, shadow, radius, blur intent |
-| 6 | Backdrop | where the Space colour goes (3.3) |
-| 7 | Shadow tokens | `--shadow-1 --shadow-2 --shadow-pop --shadow-sheet --shadow-drag` |
-| 8 | Icon plate treatment | plate tint recipe and gradient (design/08, 29 §11) |
+Colour tokens (light and dark), radii, font families, the material recipes, shadows, the icon plate
+and the orb colours, all in `ds-style::tokens`; every component reads them and none carries a value
+of its own. The Look never sets a size (`SizeScale`), a duration, easing or motion level, a
+behaviour or a default keyboard binding. User styles (ARCHITECTURE section 11) apply after it.
 
-A Look never varies: a component, a markup skeleton or class, a code path, a size (heights,
-knobs, rows: `SizeScale`), a duration, easing, motion level or a behaviour, a default keyboard
-binding, or a feature. Lint `LookValuesOnly` rejects a `data-look` selector in a component
-stylesheet; Looks live only in `ds-style::look`. User styles (ARCHITECTURE section 11) apply after
-either Look.
+### 3.2 The values
 
-### 3.2 Mac vs Arc values
-
-| Value | Mac (default) | Arc |
-| --- | --- | --- |
-| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays) | Karla / Bricolage Grotesque / Space Mono |
-| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); the picker offers macOS's eight (Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite) | Postmark #23508F / #7FA6E6 (S:11) |
-| Paper (window) | #ECECEC / #1E1E1E (conf M) | #E9ECE6 / #151814 |
-| Surface (control / content) | #FFFFFF / #2A2A2A (conf M) | #F8F9F6 / #1D211B |
-| Ink / soft / faint | 85 %, 55 %, 25 % black or white (label, secondary, tertiary) | #1A1E1A, #586057, #676E65 / #E7EBE3, #A0A79B, #8A9284 |
-| Selection | `--sel-bg` accent, `--sel-bg-quiet` neutral grey `rgba(128,128,128,.25)` | accent-soft wash, accent ink on strong selection |
-| Radii ctl / field / seg well / seg / menu / popover / sheet / notification | 5 / 5 / 6 / 5 / 8 / 10 / 10 / 16 | 9 / 10 / 10 / 8 / 12 / 14 / 18 / 16 |
-| Card radius | 10 (group box 6) | `12 12 12 4` (flap) |
-| Window / panel | window 10, Control Center panel 18, module 8 | frame 0, card 12, panel 14 |
-| Grain | 0 | Space grain 0..100 x .20 light / .16 dark opacity |
-| Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop | inset white highlight over a soft drop (`--shadow-1`, `--shadow-2` from 07 §3.2) |
-| Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) | today's 03 §17 table (Window carries the Space gradient) |
-| Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark | same recipe, Arc tones |
-| Orb colours (`--orb-bg --orb-c1 --orb-c2 --orb-c3`, light / dark) | oklch(95% .02 264.695), (75% .15 350), (80% .12 200), (78% .14 280) / the same hues at 24%, 68%, 72%, 70% lightness (dark conf L) | proposed: bg the Arc paper, glows the Postmark hue and two neighbours at the same lightness (conf L) |
-| Backdrop | the wallpaper and the Space colour sit behind the material; each material picks the tint up through its blur | the Space colour is painted on the chrome (frame tokens `--f-*`, gradient, grain); apps stay on paper |
+| Value | The Look |
+| --- | --- |
+| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays) |
+| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); the picker offers macOS's eight (Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite) |
+| Paper (window) | #ECECEC / #1E1E1E (conf M) |
+| Surface (control / content) | #FFFFFF / #2A2A2A (conf M) |
+| Ink / soft / faint | 85 %, 55 %, 25 % black or white (label, secondary, tertiary) |
+| Selection | `--sel-bg` accent, `--sel-bg-quiet` neutral grey `rgba(128,128,128,.25)` |
+| Radii ctl / field / seg well / seg / menu / popover / sheet / notification | 5 / 5 / 6 / 5 / 8 / 10 / 10 / 16 |
+| Card radius | 10 (group box 6) |
+| Window / panel | window 10, Control Center panel 18, module 8 |
+| Grain | the Space's own grain over its frame, no Look grain of its own |
+| Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop |
+| Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) |
+| Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark |
+| Orb colours (`--orb-bg --orb-c1 --orb-c2 --orb-c3`, light / dark) | oklch(95% .02 264.695), (75% .15 350), (80% .12 200), (78% .14 280) / the same hues at 24%, 68%, 72%, 70% lightness (dark conf L) |
+| Backdrop | the Space colour tints the chrome (its gradient over the wallpaper's blur, frame inks from the Space); apps stay on paper |
 
 Materials (`Material`): Window, Bar, Dock, Menu, Popover, Sheet, Sidebar, Toast, Osd, Widget
-(Menu and Sidebar are added; each Look supplies tint, edge, shadow and radius per material).
+(Menu and Sidebar are added). Material tints and shadows still carry the values landed before the
+Look was one; re-deriving them from the grey neutrals is open, and needs the accent band's grounds
+re-measured with them.
 
-### 3.3 The Space colour in each Look
+Selection is three tokens, `--sel-bg`, `--sel-bg-quiet` and `--sel-ink`, read by `Row`: an active
+window's selected row is the accent under its ink, an inactive window's (and a list that does not
+hold the keyboard, except a source list, which follows its window) the quiet grey.
 
-| | Mac | Arc |
-| --- | --- | --- |
-| Source | the Space's `SpaceLook` (dots, grain, theme) | the same |
-| Where it goes | into the backdrop layer behind the materials of bar, dock, launcher, control center | onto the chrome as `--f-*` frame tokens |
-| Ink on it | the material's own ink | `--f-ink` derived from the dots (21 §2) |
-| Grain | none | the Look's grain over the frame |
+### 3.3 What the design takes from Arc
 
-Both Looks derive from one `SpaceLook`; only the layer the colour is written to differs (values:
-a backdrop variable versus frame variables).
+Features, available to every surface (R6), not values:
+
+- the Space colour on the chrome: the bar, dock, launcher and control center tint from the Space,
+  with frame inks (`--f-*`) derived from its dots (21 section 2);
+- the command pill, pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
+  launcher commands and Ctrl+1-9 Space switching (section 2.11);
+- the sidebar on colour: a source list draws on the Space's frame.
 
 ---
 

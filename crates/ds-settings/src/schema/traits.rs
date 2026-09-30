@@ -75,7 +75,6 @@ mod tests {
                 stored_words::<ds_style::appearance::typeface::Typeface>(),
                 &["system", "editorial"],
             ),
-            ("look", stored_words::<ds_style::look::Look>(), &["mac"]),
         ];
         for (name, got, want) in cases {
             assert_eq!(got, want, "{name}");

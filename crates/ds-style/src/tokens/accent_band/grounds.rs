@@ -2,7 +2,6 @@
 //! them.
 
 use crate::appearance::theme::Scheme;
-use crate::look::Look;
 use crate::tokens::{
     colour::ColourToken,
     hex::{Colour, Hex},
@@ -17,12 +16,12 @@ pub fn card_grounds(scheme: Scheme) -> [Hex; 4] {
         ColourToken::Surface2,
         ColourToken::Raise,
     ]
-    .map(|token| solid(token.value(Look::default(), scheme)))
+    .map(|token| solid(token.value(scheme)))
 }
 
 /// The card's `--ink`, the text on a wash.
 pub fn card_ink(scheme: Scheme) -> Hex {
-    solid(ColourToken::Ink.value(Look::default(), scheme))
+    solid(ColourToken::Ink.value(scheme))
 }
 
 /// The WCAG ratio between two colours; a pair that cannot be measured reads as 1:1, failing.

@@ -5,7 +5,7 @@
 //! pass, 2026-09-26; see [`floor_for`]).
 
 use ds::Alpha;
-use ds::{ColourToken, Look, Material, Scheme, Verdict, ratio, recipe};
+use ds::{ColourToken, Material, Scheme, Verdict, ratio, recipe};
 
 /// WCAG AA for body text: what every floor has to clear.
 pub const FLOOR: f64 = 4.5;
@@ -99,7 +99,7 @@ impl Floor {
 /// paints the Space gradient rather than a tint.
 pub fn floors(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Vec<Floor> {
     let painted = recipe(material, scheme, tint_alpha);
-    let ink = ColourToken::Ink.value(Look::Mac, scheme).css();
+    let ink = ColourToken::Ink.value(scheme).css();
     let floor = floor_for(material);
     let tints = [
         (Tint::OverBlur, painted.tint),

@@ -8,7 +8,6 @@
 
 use crate::appearance::theme::Scheme;
 use crate::emit::{attr_selector, declaration, rule};
-use crate::look::Look;
 use crate::tokens::{colour::ColourToken, name::VarName};
 use ds_core::word::Word;
 
@@ -43,7 +42,7 @@ pub fn ground_css() -> String {
         };
         let paper = REMAP
             .iter()
-            .map(|(token, _)| declaration(token.var(), &token.value(Look::default(), scheme).css()))
+            .map(|(token, _)| declaration(token.var(), &token.value(scheme).css()))
             .collect::<Vec<_>>();
         css.push_str(&rule(
             &format!(
