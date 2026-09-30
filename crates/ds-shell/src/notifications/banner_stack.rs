@@ -11,6 +11,7 @@
 //! A card swiped away inside the stack holds where the finger left it and reports at once; the
 //! caller's removal makes its row slide out from there (`NotificationCard`'s swipe).
 
+use crate::kept::use_kept;
 use crate::notifications::banner_row::BannerRow;
 use crate::tokens::notifications::NotificationToken;
 use dioxus::prelude::*;
@@ -70,7 +71,12 @@ pub fn BannerStack(
     #[props(default)] common: Common,
 ) -> Element {
     let keys: Vec<BannerKey> = banners.iter().map(|banner| banner.key).collect();
-    let cards = use_cards(&banners);
+    let cards = use_kept(
+        banners
+            .iter()
+            .map(|banner| (banner.key, banner.card.clone()))
+            .collect(),
+    );
     let roster = use_roster(
         keys,
         RosterSpec {
@@ -78,7 +84,7 @@ pub fn BannerStack(
             exit: Exit::PanelOut,
             pitch: FALLBACK_PITCH,
             on_settled: Some(EventHandler::new(move |key| {
-                cards.forget(key);
+                cards.forget(&key);
                 if let Some(on_hidden) = on_hidden {
                     on_hidden.call(key);
                 }
@@ -107,50 +113,9 @@ pub fn BannerStack(
                     heal: entry.heal,
                     position,
                     pitches,
-                    card: cards.of(entry.key),
+                    card: cards.of(&entry.key).unwrap_or_else(|| rsx! {}),
                 }
             }
         }
     }
-}
-
-/// The last card each key was listed with, so a banner the caller has dropped still draws
-/// while it leaves.
-#[derive(Clone, Copy)]
-struct Cards(CopyValue<Vec<(BannerKey, Element)>>);
-
-impl Cards {
-    fn of(&self, key: BannerKey) -> Element {
-        self.0
-            .peek()
-            .iter()
-            .find(|(held, _)| *held == key)
-            .map_or_else(|| rsx! {}, |(_, card)| card.clone())
-    }
-
-    fn forget(&self, key: BannerKey) {
-        let mut book = self.0;
-        let _ = book
-            .try_write()
-            .map(|mut book| book.retain(|(held, _)| *held != key));
-    }
-}
-
-/// The book of cards, refreshed from this render's banners (a listed card is always the
-/// newest one; a dropped one keeps its last).
-fn use_cards(banners: &[Banner]) -> Cards {
-    let mut book = use_hook(|| CopyValue::new(Vec::<(BannerKey, Element)>::new()));
-    let mut next: Vec<(BannerKey, Element)> = banners
-        .iter()
-        .map(|banner| (banner.key, banner.card.clone()))
-        .collect();
-    let kept = book
-        .peek()
-        .iter()
-        .filter(|(key, _)| banners.iter().all(|banner| banner.key != *key))
-        .cloned()
-        .collect::<Vec<_>>();
-    next.extend(kept);
-    book.set(next);
-    Cards(book)
 }

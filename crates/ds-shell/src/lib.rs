@@ -13,6 +13,7 @@ pub(crate) mod date_picker;
 pub(crate) mod dock_parts;
 pub mod emoji;
 pub(crate) mod idle_dim;
+pub(crate) mod kept;
 pub(crate) mod kit;
 pub(crate) mod lock;
 pub(crate) mod month_grid;
@@ -93,7 +94,7 @@ pub use crate::{
         rows::{MeasuredIn, MotionChoice},
     },
     switcher::{
-        app_switcher::{AppKey, AppSwitcher, SwitcherApp, TilePresence},
+        app_switcher::{AppKey, AppSwitcher, SwitcherApp},
         switcher_fit::SwitcherMetrics,
     },
     thumbs::{

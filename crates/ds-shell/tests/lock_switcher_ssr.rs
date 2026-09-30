@@ -17,7 +17,7 @@ use ds::{
 use ds_lint::{LintConfig, markup};
 use ds_shell::{
     AppKey, AppSwitcher, CapsLock, EmojiId, LockClock, LockLook, LockPrompt, LockScreen, LockUser,
-    PolkitPrompt, PromptState, SwitcherApp, TilePresence,
+    PolkitPrompt, PromptState, SwitcherApp,
 };
 
 fn user() -> LockUser {
@@ -136,25 +136,20 @@ const APPS: [(&str, &str, Icon, PlateFamily); 14] = [
     ("display", "Displays", Icon::Monitor, PlateFamily::Amber),
 ];
 
-fn apps(count: usize, leaving: Option<&str>) -> Vec<SwitcherApp> {
+fn apps(count: usize) -> Vec<SwitcherApp> {
     APPS.iter()
         .take(count)
         .map(|(key, name, icon, family)| SwitcherApp {
             plate: Some(*family),
-            presence: if Some(*key) == leaving {
-                TilePresence::Leaving
-            } else {
-                TilePresence::Present
-            },
             ..SwitcherApp::new(*key, *name, IconSource::Glyph(*icon))
         })
         .collect()
 }
 
-fn switcher(count: usize, selected: &str, output: f32, leaving: Option<&str>) -> Element {
+fn switcher(count: usize, selected: &str, output: f32) -> Element {
     let body = rsx! {
         AppSwitcher {
-            apps: apps(count, leaving),
+            apps: apps(count),
             selected: AppKey(selected.to_owned()),
             output: Some(Px(output)),
             onhover: |_| {},
@@ -210,14 +205,9 @@ const SPECIMENS: &[Specimen] = &[
             CapsLock::Off,
         )
     }),
-    ("switcher-5", || switcher(5, "files", 1440.0, None)),
-    ("switcher-14-shrunk", || switcher(14, "files", 1216.0, None)),
-    ("switcher-14-scrolled", || {
-        switcher(14, "downloads", 800.0, None)
-    }),
-    ("switcher-leaving", || {
-        switcher(5, "terminal", 1440.0, Some("terminal"))
-    }),
+    ("switcher-5", || switcher(5, "files", 1440.0)),
+    ("switcher-14-shrunk", || switcher(14, "files", 1216.0)),
+    ("switcher-14-scrolled", || switcher(14, "downloads", 800.0)),
     ("prompt-photo", || {
         prompt_for(photo_user(), PromptState::Idle)
     }),

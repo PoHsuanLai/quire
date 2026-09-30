@@ -526,3 +526,19 @@ fn an_overflowing_row_keeps_the_selection_in_view() {
     let tile = harness.rect(&cell("camera")).expect("a tile");
     assert_eq!(tile.size.width.0, 64.0, "cells stop at the 48 px icon");
 }
+
+#[test]
+fn a_tile_the_shell_stops_listing_leaves_and_goes_when_its_exit_has_settled() {
+    let mut harness = switcher(5, 1440.0, "files");
+    assert_eq!(harness.count(".ds-switcher-cell"), 5);
+    harness.within(|| *COUNT.write() = 4);
+    harness.advance(ms(30));
+    assert_eq!(
+        harness.attr(&cell("photos"), "data-presence").as_deref(),
+        Some("leaving"),
+        "the dropped tile plays its exit and stays drawn"
+    );
+    assert_eq!(harness.count(".ds-switcher-cell"), 5);
+    settle_until(&mut harness, |h| h.count(&cell("photos")) == 0);
+    assert_eq!(harness.count(".ds-switcher-cell"), 4);
+}

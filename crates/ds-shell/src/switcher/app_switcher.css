@@ -9,7 +9,7 @@
    the UI face at 13/600 (not the Fly's usual dark label above). A row wider than its view is
    scrolled by `--switcher-shift`, at once (a transition there played on the panel's first
    frame on Blitz, sliding the row in as it appeared). It appears with `fade` at `--t-quick`, no pop; a quitting
-   tile plays `row-out` (`a-row-out`). Flat: no gloss on the panel or the selection. */
+   tile (`data-presence=leaving`) plays `row-out` at `--t-quick --e-exit`, held. Flat: no gloss on the panel or the selection. */
 
 .ds-switcher{ --switcher-cell:112px; --switcher-icon:96px; --switcher-gap:8px; --switcher-view:592px; --switcher-shift:0px; --switcher-at:0;
   position:relative; z-index:var(--z-raise); display:inline-flex; box-sizing:border-box; max-width:100%; padding:var(--s-16) var(--s-16) var(--s-10);
@@ -23,6 +23,7 @@
 .ds-switcher-ring{ position:absolute; left:0; top:0; width:var(--switcher-cell); height:var(--switcher-cell); border-radius:var(--r-tile); background:var(--f-pill);
   transform:translateX(calc(var(--switcher-at) * (var(--switcher-cell) + var(--switcher-gap)))); }
 .ds-switcher-cell{ position:relative; display:grid; place-items:center; flex:none; width:var(--switcher-cell); height:var(--switcher-cell); cursor:default; }
+.ds-switcher-cell[*|data-presence=leaving]{ animation:row-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-switcher-icon{ display:grid; place-items:center; width:var(--switcher-icon); height:var(--switcher-icon); }
 .ds-switcher-icon .ds-ext-icon{ width:var(--switcher-icon); height:var(--switcher-icon); }
 
