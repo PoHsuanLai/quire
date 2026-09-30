@@ -756,7 +756,7 @@ path each, until step 12 replaces them with the prelude.
 8. **Split bottom-up** (done), one crate per commit series, each with `ds` re-exporting: `ds-core`,
    `ds-style`, `ds-motion`, `ds-lint`, then `ds-shell` (assembly stays in `ds`). Each split updates
    the allowed-edges table in `check-boundary.sh` and `DESIGN.md`.
-9. **`ds-native` -> `ds-blitz` + `ds-harness`**: rename, then move the harness; `pdf`, `print`,
+9. **`ds-native` -> `ds-blitz` + `ds-harness`** (done): rename, then move the harness; `pdf`, `print`,
    `spell` become features; `tokio` is named only in `launch`.
 10. **`Driver`/`DocQuery`**: replace the five constructors and `_with` pairs with `Input`;
     `Query` extension trait.

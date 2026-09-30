@@ -63,7 +63,7 @@
    per character over it, where the placeholder would sit; the secret itself never paints.
    Blitz measures the hidden text in its editor's own face, untracked, so its caret drifts off
    the Inter dots tracked .1em (two dots short at eleven). Where the host reads the selection
-   (ds-blitz) the field draws its own caret among the dots: the input's is transparent
+   (ds-native) the field draws its own caret among the dots: the input's is transparent
    (`data-caret=drawn`) and `.ds-input-caret` is Blitz's caret redrawn, 1.5 px wide, the height of
    the line, in the dots' ink (`--ink`; the lock pill repeats its own), not blinking (Blitz's does not blink either), shown only while the
    field has the keyboard and nothing is selected. A selected range is `.ds-input-mask-selected`,
