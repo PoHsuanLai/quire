@@ -61,11 +61,6 @@
 .ds-button-label{ min-width:0; }
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
-.ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
-.ds-button-face[*|data-face=bold]{ font-weight:700; }
-.ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
-.ds-button-face[*|data-face=underline]{ text-decoration:underline; }
-.ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
 /* Disabled: .35, no pointer at all, so no hover or press matches. Busy: no input, the
    label dims, the spinner in the leading slot stays clear. */

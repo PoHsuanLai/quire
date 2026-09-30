@@ -1,4 +1,4 @@
-/* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
+/* DragGhost and DropLine (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)), 1:1 with the pointer and
    flat (design/30 section 2.5: no tilt); its title and sub truncate with `.ds-truncate`; a drag of
    several things puts the count badge on its corner. No enter or exit animation. The dragged source is
@@ -14,17 +14,4 @@
 .ds-drag-ghost-count{ position:absolute; top:calc(-1 * var(--s-6)); right:calc(-1 * var(--s-6)); line-height:0; }
 .ds-drag-ghost-sub{ font-weight:500; color:var(--ink-faint); font-size:var(--fs-small); }
 
-.ds-grip{
-  position:absolute; left:-24px; top:6px; width:20px; height:24px; border-radius:var(--r-small);
-  display:grid; place-items:center; color:var(--ink-faint); font-size:var(--fs-small);
-  cursor:grab; opacity:0; user-select:none;
-  transition:opacity var(--t-quick) var(--e-out), background-color var(--t-quick) var(--e-out);
-}
-.ds :hover > .ds-grip{ opacity:1; }
-.ds-grip:hover{ background:var(--surface); color:var(--ink); }
-
 .ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }
-
-/* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
-   off its place, written by two springs in Rust; nothing here transitions it. */
-.ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }

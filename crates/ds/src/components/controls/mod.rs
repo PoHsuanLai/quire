@@ -3,7 +3,7 @@
 
 pub mod badge;
 pub mod button;
-pub mod button_face;
+pub mod button_marks;
 pub mod button_model;
 pub mod checkbox;
 pub mod chip;

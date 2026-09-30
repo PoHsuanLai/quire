@@ -1,14 +1,11 @@
-//! DragGhost, DropLine and Grip: moving a thing by dragging, driven by `use_drag`
+//! DragGhost and DropLine: moving a thing by dragging, driven by `use_drag`
 //! (design/04-COMPONENTS.md section 34; design/30 section 2.5, `NSDraggingItem`).
 
 use crate::components::controls::badge::{Badge, BadgeContent};
-use crate::host::measure::client_rect;
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Point, Rect};
-use ds_motion::drag_return::DragReturn;
+use ds_core::geometry::units::Point;
 use ds_style::tokens::control_size::ControlSize;
-use std::rc::Rc;
 
 /// Where the ghost's corner sits relative to the pointer: `(x - 40, y - 18)` (`C:2053-2054`).
 const GHOST_OFFSET: Point = Point {
@@ -79,54 +76,11 @@ pub fn DragGhost(
     }
 }
 
-/// A dragged thing drawn off its place by `drag` (design/05 section 14): 1:1 while a
-/// hand holds it, springing home when it is let go where nothing took it (the dock's tile
-/// return). Put it inside the thing's own box, around what moves.
-#[component]
-pub fn DragReturnFrame(drag: DragReturn, children: Element) -> Element {
-    let offset = drag.offset();
-    rsx! {
-        div {
-            class: "ds-drag-return",
-            style: "--drag-dx:{offset.x.0:.2}px;--drag-dy:{offset.y.0:.2}px",
-            {children}
-        }
-    }
-}
-
 /// Where a dragged object will land.
 #[component]
 pub fn DropLine() -> Element {
     rsx! {
         div { class: "ds-drop-line" }
-    }
-}
-
-/// An object's drag handle; clicking it opens the object menu at its rect.
-///
-/// The rect is read in the click handler, after layout, never in `onmounted` (spike S9).
-#[component]
-pub fn Grip(label: String, onclick: EventHandler<Rect>) -> Element {
-    let mut element = use_signal(|| None::<Rc<MountedData>>);
-    rsx! {
-        span {
-            class: "ds-grip",
-            role: "button",
-            tabindex: "0",
-            title: "{label}",
-            "aria-label": "{label}",
-            onmounted: move |event| element.set(Some(event.data())),
-            onclick: move |_| {
-                if let Some(mounted) = element() {
-                    spawn(async move {
-                        if let Some(measured) = client_rect(&mounted).await {
-                            onclick.call(measured);
-                        }
-                    });
-                }
-            },
-            "⋮⋮"
-        }
     }
 }
 

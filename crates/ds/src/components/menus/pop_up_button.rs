@@ -4,7 +4,7 @@
 //! keyboard.
 
 use crate::components::controls::button::Button;
-use crate::components::controls::button_face::Trailing;
+use crate::components::controls::button_marks::Trailing;
 use crate::components::controls::button_model::Bezel;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;

@@ -6,10 +6,9 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
-use crate::components::content::text_runs::TextLine;
-use crate::components::controls::button_face::{
-    ButtonFace, FaceMark, Leading, Trailing, leading as leading_mark, spoken_label,
-    trailing as trailing_mark,
+use crate::components::content::text_runs::{TextLine, text};
+use crate::components::controls::button_marks::{
+    Leading, Trailing, leading as leading_mark, spoken_label, trailing as trailing_mark,
 };
 use crate::components::controls::button_model::{
     Answers, Bezel, ButtonRole, IconSwap, ImagePosition,
@@ -53,8 +52,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// button that opens nothing. `title` is the hover hint.
 ///
 /// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an
-/// element such as a `ProviderMark`). `face` draws the label as a styled letter and then names
-/// the button by `label` through `aria-label`.
+/// element such as a `ProviderMark`).
 ///
 /// `availability`: `Disabled` writes `aria-disabled` and `disabled`, draws the button at .35 and
 /// drops every press; `Busy` does the same for input, writes `aria-busy`, and shows a spinner in
@@ -81,7 +79,6 @@ pub fn Button(
     #[props(default)] title: Option<String>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] leading: Option<Leading>,
-    #[props(default)] face: ButtonFace,
     #[props(default)] propagation: Propagation,
     #[props(default)] common: Common,
 ) -> Element {
@@ -89,7 +86,7 @@ pub fn Button(
     let data = common.data_attributes();
     let spoken = match (bezel, image) {
         (Bezel::Help, _) | (_, ImagePosition::Only) => Some(label.plain_text()),
-        (_, ImagePosition::Leading) => spoken_label(face, &label),
+        (_, ImagePosition::Leading) => spoken_label(&label),
     };
     let aria_label = common.aria_label.clone().or(spoken);
     let listen = PressListeners::new(onclick).with_propagation(propagation);
@@ -169,7 +166,7 @@ pub fn Button(
             if bezel == Bezel::Help {
                 span { class: "ds-button-label", "aria-hidden": "true", "?" }
             } else if image == ImagePosition::Leading {
-                FaceMark { face, label }
+                span { class: "ds-button-label", {text(&label)} }
             }
             if let Some(mark) = trailing {
                 {trailing_mark(mark, glyph)}

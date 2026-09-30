@@ -5,7 +5,7 @@ use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::{Accent, Appearance, AppearancePicker, Motion, ReducedMotion, Scheme, SystemPrefs, Theme};
 use ds::{
-    Colour, CommandPill, DragGhost, DropLine, DropState, EdgePeek, Expiry, Grip, Hex, HoverStrip,
+    Colour, CommandPill, DragGhost, DropLine, DropState, EdgePeek, Expiry, Hex, HoverStrip,
     ImageSource, MarkProvider, MarkStyle, PinFace, PinTile, Point, ProviderMark, Px, Row, RowShape,
     Selection, Shown,
 };
@@ -120,7 +120,7 @@ pub const CASES: &[Case] = &[
         state: "today-soon",
         make: || rsx! { Row { title: "RFC 1939", shape: RowShape::Today { left: "12 min".to_string(), expiry: Expiry::Soon }, onclick: |_| {} } },
     },
-    // DragGhost, DropLine, Grip.
+    // DragGhost, DropLine.
     Case {
         component: "drag_ghost",
         state: "ghost",
@@ -130,11 +130,6 @@ pub const CASES: &[Case] = &[
         component: "drag_ghost",
         state: "drop-line",
         make: || rsx! { DropLine {} },
-    },
-    Case {
-        component: "drag_ghost",
-        state: "grip",
-        make: || rsx! { Grip { label: "Drag to move · click for options", onclick: |_| {} } },
     },
     // HoverStrip.
     Case {

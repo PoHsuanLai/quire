@@ -3,7 +3,6 @@
 use crate::pages::content::external_icons::ExternalIcons;
 use crate::pages::content::glyphs::Glyphs;
 use crate::pages::content::plate_tints::PlateTints;
-use crate::pages::controls::button_faces::ButtonFaces;
 use crate::pages::shell::dock_tiles::DockTiles;
 use crate::pages::shell::status_items::StatusItems;
 use crate::pages::{Section, Specimen};
@@ -45,7 +44,6 @@ const AVATAR_SIZES: [AvatarSize; 8] = [
 pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
-        ButtonFaces {}
         crate::pages::controls::label_runs_and_marks::LabelRunsAndMarks {}
         crate::pages::controls::pass_through::MoreGlyphs {}
         crate::pages::controls::pass_through::PassThrough {}

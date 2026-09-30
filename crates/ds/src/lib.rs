@@ -94,7 +94,7 @@ pub use crate::components::{
     controls::{
         badge::{Badge, BadgeContent, BadgeTone},
         button::Button,
-        button_face::{ButtonFace, Leading, Trailing},
+        button_marks::{Leading, Trailing},
         button_model::{Answers, Bezel, ButtonRole, IconSwap, ImagePosition},
         checkbox::Checkbox,
         chip::{Chip, ChipVariant},
@@ -168,7 +168,7 @@ pub use crate::components::{
     overlays::{
         alert::Alert,
         alert_model::{AlertButton, AlertRole, AlertStyle, Suppression},
-        drag_ghost::{DragCount, DragGhost, DragReturnFrame, DropLine, Grip},
+        drag_ghost::{DragCount, DragGhost, DropLine},
         empty_state::{EmptyForm, EmptyState},
         flow::Flow,
         hover_card::{
@@ -336,7 +336,7 @@ pub use ds_style::{
         colour::ColourToken,
         control_size::{ControlSize, SidebarSize},
         delay::DelayToken,
-        easing::{Easing, EasingToken},
+        easing::{CubicBezier, Easing, EasingToken},
         elevation::Shadow,
         hex::{Alpha, Colour, Hex},
         label_hue::{HueColour, HueMember, LabelHue},

@@ -609,11 +609,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button-label{ min-width:0; }
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
-.ds-button-face{ display:inline-block; min-width:1ch; text-align:center; }
-.ds-button-face[*|data-face=bold]{ font-weight:700; }
-.ds-button-face[*|data-face=italic]{ font-family:var(--font-serif); font-style:italic; }
-.ds-button-face[*|data-face=underline]{ text-decoration:underline; }
-.ds-button-face[*|data-face=strike]{ text-decoration:line-through; }
 
 /* Disabled: .35, no pointer at all, so no hover or press matches. Busy: no input, the
    label dims, the spinner in the leading slot stays clear. */
@@ -847,7 +842,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-disclosure-body[*|data-closed=true]{ visibility:hidden; pointer-events:none; }
 .ds-disclosure-content{ display:flow-root; }
 /* -- drag_ghost -- */
-/* DragGhost, DropLine and Grip (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
+/* DragGhost and DropLine (design/04-COMPONENTS.md section 34): `C:579-586`, `S:747-752`.
    The ghost goes through OverlayHost at a Rust point (pointer - (40, 18)), 1:1 with the pointer and
    flat (design/30 section 2.5: no tilt); its title and sub truncate with `.ds-truncate`; a drag of
    several things puts the count badge on its corner. No enter or exit animation. The dragged source is
@@ -863,20 +858,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-drag-ghost-count{ position:absolute; top:calc(-1 * var(--s-6)); right:calc(-1 * var(--s-6)); line-height:0; }
 .ds-drag-ghost-sub{ font-weight:500; color:var(--ink-faint); font-size:var(--fs-small); }
 
-.ds-grip{
-  position:absolute; left:-24px; top:6px; width:20px; height:24px; border-radius:var(--r-small);
-  display:grid; place-items:center; color:var(--ink-faint); font-size:var(--fs-small);
-  cursor:grab; opacity:0; user-select:none;
-  transition:opacity var(--t-quick) var(--e-out), background-color var(--t-quick) var(--e-out);
-}
-.ds :hover > .ds-grip{ opacity:1; }
-.ds-grip:hover{ background:var(--surface); color:var(--ink); }
-
 .ds-drop-line{ height:3px; border-radius:var(--r-micro); background:var(--accent-text); margin:var(--s-2) 0; }
-
-/* DragReturnFrame (design/05 section 14, H1): what a hand drags, drawn `--drag-dx`/`--drag-dy`
-   off its place, written by two springs in Rust; nothing here transitions it. */
-.ds-drag-return{ --drag-dx:0px; --drag-dy:0px; transform:translate(var(--drag-dx), var(--drag-dy)); }
 /* -- edge_peek -- */
 /* EdgePeek (design/30 section 2.11, design/06 section 7): the strip at the window's left edge and
    the sidebar it peeks. The strip is rendered only while the sidebar is hidden, so it needs no
