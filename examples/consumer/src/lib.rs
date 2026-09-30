@@ -132,3 +132,9 @@ fn Page() -> Element {
         }
     }
 }
+
+/// `../../CONSUMING.md` as doc tests: every snippet in the guide either compiles here or is
+/// marked `ignore` because it is a fragment that needs your own `YourApp`.
+#[cfg(doctest)]
+#[doc = include_str!("../../../CONSUMING.md")]
+struct ConsumingGuide;

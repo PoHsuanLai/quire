@@ -1,13 +1,19 @@
 # Consuming quire
 
 This is the guide for a program that draws with quire instead of hand-rolling its own CSS and
-markup: today that is `examples/consumer` (a minimal, fully worked example — read its
-`Cargo.toml`, `src/lib.rs` and `tests/coherence.rs` alongside this doc), sill and mailo. It assumes you have read
+markup: `examples/consumer` (a minimal, fully worked example — read its `Cargo.toml`,
+`src/lib.rs` and `tests/coherence.rs` alongside this doc), sill and mailo. It assumes you have read
 `design/README.md`'s reading order at least through `04-COMPONENTS.md`; this doc does not repeat
 what a component looks like, only how to reach it from your own crate.
 
 Citations below follow `design/README.md#3-citation-convention`:
 `design/<file>.md#<heading-anchor>`.
+
+**Every snippet here is compiled.** A block fenced `rust` is a doc test of `examples/consumer`
+(`cargo test --manifest-path examples/consumer/Cargo.toml`, run by `scripts/check-consumer.sh`).
+A fragment that needs an app around it (`YourApp`, `YourPage`, a handler you own) is fenced
+`rust,ignore` and has its compiled twin in `examples/consumer/tests/guide.rs`, under a doc
+comment naming the section. Change a snippet and its twin together.
 
 ## 1. Adding quire
 
@@ -27,33 +33,54 @@ deliberately.
 axes, the vocabulary, geometry, icons, the overlays, lists, fields and the common controls); a shell
 program adds `use ds_shell::prelude::*;`. The crate roots hold nothing else but the stylesheet
 assembly (`ds::stylesheet()`, `ds::kits()`, `ds::component_sheets()`, `ds::KIT`, `ds::selectors`, and
-the same four in `ds_shell`). Every other name is reached by its home path (`ds::components::..`,
-`ds::host::..`, `ds::style::..`, `ds::base::..`, `ds::motion::..`), one path each. A program depends on `ds` alone: `ds::base`, `ds::style` and `ds::motion` are the
-three crates under it, re-exported as modules.
+the same four in `ds_shell`) and the three facades. Every other name is reached by its home path
+(`ds::components::..`, `ds::host::..`, `ds::stack::..`, `ds::style::..`, `ds::base::..`,
+`ds::motion::..`), one path each. A program depends on `ds` alone: `ds::base` (`ds-core`),
+`ds::style` (`ds-style`) and `ds::motion` (`ds-motion`) are the three crates under it,
+re-exported as modules. One exception: `#[derive(Word)]` expands to `::ds_core::word::Word`, so a
+crate that derives it also names `ds-core` in its manifest (section 7).
 
-**Today: a path dependency.** quire has no published version yet, so every consumer depends on
-it by path, the way `examples/consumer/Cargo.toml` does:
+**A path dependency.** quire has no published version, so every consumer depends on it by
+path, the way `examples/consumer/Cargo.toml` does:
 
 ```toml
 [dependencies]
 ds          = { path = "../quire/crates/ds" }
-ds-settings = { path = "../quire/crates/ds-settings" }
+ds-settings = { path = "../quire/crates/ds-settings", features = ["dioxus"] }  # `dioxus`: `use_environment`; `tokio`: zbus on tokio
 ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`
+ds-shell    = { path = "../quire/crates/ds-shell" }    # only a shell program: the bar, dock, widgets, lock screen
 
 [dev-dependencies]
 ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
-ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harness`, `snapshot` (feature `pdf`: `pdf_app`)
+ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harness`, `Input`, `Query`, `snapshot` (feature `pdf`: `pdf_app`)
 ```
+
+The crates and what each holds: `ds` (the components, the `Ds` root, the host seams, the facades),
+`ds-shell` (shell components and widgets), `ds-settings` (settings files, the schema derive, the
+portal, `use_environment`), `ds-blitz` (the Blitz host: `launch`, windows, PDF, print, spell),
+`ds-lint` (the linter), `ds-harness` (the test driver). `ds-core`, `ds-style` and `ds-motion` sit
+under `ds` and are reached as `ds::base`, `ds::style` and `ds::motion`. `ds-conformance` and
+`ds-gallery` are quire's own tests and contact sheet (section 9), not for consumers.
 
 The linter is its own crate, `ds-lint` (coherence rules 1 and 2, section 5 below), so a consumer
 that never lints does not pull in `cssparser`. The shell's parts are `ds-shell`, which a shell
-depends on next to `ds` and draws with `Ds { sheet: Some(ds_shell::stylesheet()) }`.
+depends on next to `ds` and draws with `Ds { sheet: Some(ds_shell::stylesheet()) }`; it lints
+against `ds_shell::kits()` where an app lints against `ds::kits()`.
 
-**Later: a git dependency**, once quire is tagged, the same shape shell-host and sill will use:
+A git dependency has the same shape once quire is tagged (shell-host and sill use it):
 
 ```toml
 ds = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.1.0" }
 ```
+
+**Launching on Blitz.** `ds_blitz::launch(app, AppConfig::new(title, width, height))` runs `app`
+until its window closes. It enters the process-wide Tokio runtime that `ds_blitz::TokioSpawner`
+hands `use_environment`, registers quire's faces, provides the document host (`provide_host`,
+section 6, "For a bar"), and tracks the input modality. `AppConfig` also takes
+`with_app_id`, `with_decorations(Decorations::Client)` for an app whose root draws
+`WindowFrame::Titlebar`, `with_context(value)` (read with `use_context` anywhere in the app),
+`with_net`, `with_frame_links` and `with_focus_fallback`. `examples/consumer/src/main.rs` is the
+whole call.
 
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
 and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
@@ -61,7 +88,7 @@ a path dependency does not inherit your workspace's `[workspace.dependencies]`, 
 `crates/ds/Cargo.toml` has no `[workspace]` of its own and so joins whichever ancestor manifest
 does (quire's root, not yours). You only need to pin the lines **you** name directly: at minimum
 `dioxus` (to write `rsx!`), plus `dioxus-ssr` as a dev-dependency if you lint an SSR render
-(section 5). Copy those lines **verbatim** from `quire/docs/workspace-deps.toml`
+(section 5). Copy those lines **verbatim** from `docs/workspace-deps.toml` in quire
 (`CONVENTIONS.md#10-change-discipline`: "the pinned block ... is copied verbatim into
 every workspace"; `docs/workspace-deps.toml` is quire's own copy of the source of truth, not
 owned by this doc). If you also run on Blitz (`ds-blitz`), your own crate that calls
@@ -80,12 +107,12 @@ does; `scripts/check-consumer.sh` builds, lints and tests that example in the ga
 **A bare document, with no `Ds` root** (a never-painted input catcher, a 2 px hot-corner
 surface) still carries Blitz's user-agent stylesheet, which sets `body { margin: 8px }`: its
 content never reaches the true (0, 0) corner, and `position: absolute`/`fixed` with `inset: 0`
-paints nothing on it (sill hot corners, 2026-09-26). shell-host injects `body { margin: 0 }`
+paints nothing on it (sill's hot corners). shell-host injects `body { margin: 0 }`
 into every document it hosts; a bare document elsewhere (`ds_blitz::launch`,
 a test) must cancel the margin itself or draw inside a `Ds`.
 
-Every quire component must be drawn inside one `Ds` (`root/ds.rs`; design/03-COLOR.md
-section 17.1; `crates/ds/src/root/ds.rs`). It resolves your appearance to a scheme, an accent
+Every quire component must be drawn inside one `Ds` (design/03-COLOR.md
+section 17.1; `crates/ds/src/assembly/ds.rs`). It resolves your appearance to a scheme, an accent
 and a motion level; stamps `data-theme`, `data-typeface`, `data-accent`, `data-motion`,
 `data-material`, `data-blur`, `data-modality` and `data-hover` on its own `div.ds`; injects the stylesheet
 (unless you ask it not to); and provides the `Scope`, `HoverHub`, `ToastHub`, `LayerStack` and
@@ -95,7 +122,7 @@ out nothing while the hub is empty: a pushed toast mounts hidden for one frame a
 there, and is dropped again once it has sunk, so an idle root has
 no toast element in its markup or its picture.
 
-```rust
+```rust,ignore
 use ds::prelude::*;
 use dioxus::prelude::*;
 
@@ -117,11 +144,15 @@ fn App() -> Element {
 | Prop | Type | Default | What it does |
 | --- | --- | --- | --- |
 | `appearance` | `Appearance` | required | theme, accent, motion preference — section 3 |
-| `system` | `SystemPrefs` | `SystemPrefs::default()` | the desktop's own scheme/motion/contrast, from `ds_settings::read_system_prefs` |
+| `system` | `SystemPrefs` | `SystemPrefs::default()` | the desktop's own scheme/motion/contrast, from `use_environment`'s `Environment::system` (`SystemPrefsSource::Portal`) |
 | `look` | `SpaceLook` | `SpaceLook::default()` | the frame's dots, theme override and card accent (design/21-SPACES.md §1) |
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
+| `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; a shell passes `Some(ds_shell::stylesheet())` |
+| `typeface` | `Option<Typeface>` | `None`: the appearance's own | overrides the appearance's typeface for this root |
+| `user_style` | `ReadSignal<UserStyle>` | empty | the person's own stylesheet, drawn after the design system's (section 12) |
+| `surface` | `Option<&'static str>` | `None` | stamped as `data-surface`, the name a user stylesheet selects this root by |
 | `chrome` | `Option<RootChrome>` | `None`: `RootChrome::of(material)` | `Painted` or `Transparent`: whether the root box paints its material. A Popover, Sheet or Toast root is transparent by default (it hosts floating cards, which paint the material themselves); pass `Painted` for a root that *is* the panel (the launcher) — section 6, "bar gaps" |
 | `ground` | `Option<Ground>` | `None`: `Ground::of(material)` | `Paper` or `Frame`: which inks the content takes; Bar and Dock default to `Frame` |
 | `frame` | `Option<FrameTint>` | `None`: `FrameTint::of(material, chrome)` | `Opaque` (the window's frame), `Tinted` (the Space gradient at the tint alpha: bar, dock, a painted popover, OSD, widget) or `None` (the material's flat tint) |
@@ -132,7 +163,7 @@ fn App() -> Element {
 | `scale` | `Option<Scale>` | `None`: the host's `ds::prelude::HostSignals` scale, else 1x | the device scale this root draws for, in 120ths (`Scale(180)` is 1.5x, the `wp_fractional_scale_v1` unit and shell-host's `Scale`); the root writes the pixel tokens for it (below). `ds_blitz::launch`, `Harness` and `snapshot` provide `HostSignals` themselves; a host that is not `ds-blitz` passes `scale` |
 | `window` | `WindowFrame` | `WindowFrame::None`: the root is what it was | `WindowFrame::Titlebar { title, lights: TrafficLights::{Shown, Hidden}, timing }` (or `WindowFrame::titlebar(title, lights)`): the client-decorated window's frame, a 28 px titlebar that moves and zooms the window, the traffic lights, the body and eight resize edges, all acting through the host's `ds::prelude::HostWindow` — section 6, "Window frame" |
 
-### Pixel snapping: `scale`, the pixel tokens and `snap_to_device` (2026-09-25)
+### Pixel snapping: `scale`, the pixel tokens and `snap_to_device`
 
 At 1.25, 1.5 or 1.75 a `1px` line covers a fractional number of device pixels and paints as one
 full row and one half row. Three pieces keep every line whole device pixels (design/01-LAYOUT.md
@@ -167,7 +198,7 @@ full row and one half row. Three pieces keep every line whole device pixels (des
 Glyphs need nothing from you: under a root at a fractional scale `Glyph` writes a stroke width
 that is an even number of device pixels (design/08-ICONS.md §1.4.1).
 
-### A document's frame must have a height (2026-09-25)
+### A document's frame must have a height
 
 One rule for every surface whose document is a frame around a `Ds` root: a popup's frame, an
 overlay root, a wallpaper, the launcher's catcher. **The frame (the
@@ -212,7 +243,7 @@ portal (`SystemPrefsSource::Portal`), and watches it for changes, merging both i
 Unknown and invalid keys in the file are printed to stderr as they are read and dropped on the
 next save.
 
-```rust
+```rust,ignore
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use ds::prelude::*;
 use ds_blitz::TokioSpawner;
@@ -251,7 +282,7 @@ wiring.
 
 Inside any component under a `Ds`, `ds::prelude::use_scope() -> Scope` gives you what that scope resolved to:
 `resolved: Resolved{scheme, accent, motion}`, `scheme`, `material`, `blur`, `modality`
-(`style/scope.rs`). Components use this to size icons, choose overlay placement and read the motion
+(`crates/ds-style/src/scope.rs`). Components use this to size icons, choose overlay placement and read the motion
 level for their own timers (section 6); you will rarely need it directly unless you are building
 your own component.
 
@@ -264,7 +295,7 @@ re-stamps `data-theme`/`data-typeface`/`data-accent`/`data-motion`/`data-materia
 (the typeface is always the root's) and updates the
 `Scope` every component under it reads.
 
-```rust
+```rust,ignore
 use ds::prelude::*;
 use ds::style::appearance::blur::BlurState;
 
@@ -311,7 +342,7 @@ const EXCEPTIONS: &[Exception] = &[Exception {
 #[test]
 fn our_css_is_clean() {
     assert_clean(OUR_CSS, &LintConfig {
-        profile: Profile::Strict,   // Standard also allows raw font-size/radius/z-index; use Strict
+        profile: Profile::Strict,   // the default; `Profile::Details` adds the details grammar's timing
         exceptions: EXCEPTIONS,
         ..LintConfig::new(&ds::kits())
     });
@@ -319,43 +350,38 @@ fn our_css_is_clean() {
 ```
 
 Every exception needs a `reason`, and `assert_clean` panics listing which exceptions suppressed
-zero offences, so a stale one cannot hide silently (mailo gaps 3: before it, it only printed
-them). A consumer mid-migration that must keep an exception for code another branch is about to
-land sets `stale: Stale::Report` (`ds_lint::Stale`): the stale exception is printed and the
-test passes. `Stale::Fail` is the default. A `LintConfig` is made from the kits it lints against (`LintConfig::new(&ds::kits())`), which
-give it the variables, keyframes and timing tokens it accepts; name only the fields you change
-and end with `..LintConfig::new(&ds::kits())`. Prefer `Profile::Strict` even though
-`Profile::Standard` is the default: quire's own `self_lint` test runs Strict, and a raw
-`border-radius`/`font-size`/`z-index` your CSS writes is exactly the kind of drift the token
+zero offences, so a stale one cannot hide silently. A `LintConfig` is made from the kits it lints
+against (`LintConfig::new(&ds::kits())`), which give it the variables, keyframes and timing tokens
+it accepts; name only the fields you change and end with `..LintConfig::new(&ds::kits())`
+(`own_vars` lists the custom properties your own sheet declares). `Profile::Strict` is the
+default and runs every rule but `OffGrammarTiming`; quire's own `self_lint` tests run it, and a
+raw `border-radius`/`font-size`/`z-index` your CSS writes is exactly the kind of drift the token
 table exists to prevent.
 
-Strict also runs `Rule::RawSpacing`: a literal `px` in `margin`, `padding` (their sides and
+`Rule::RawSpacing`: a literal `px` in `margin`, `padding` (their sides and
 logical forms included) or `gap`/`row-gap`/`column-gap` is an offence; `0`, `auto`, a
 percentage, an `em` and `var()` pass. The steps are `ds::style::tokens::spacing::SpacingToken`, emitted on `.ds` as
 `--s-1`, `--s-1-5`, `--s-2` … `--s-12`, `--s-13`, `--s-14`, `--s-15`, `--s-16`, `--s-18`,
 `--s-22`, `--s-26`, `--s-36`, each named by its pixel value (design/01-LAYOUT.md §2). A length
-between steps takes the nearest one; quire's own sheets and the gallery's do (FINDINGS "Polish
-pass"). `examples/consumer/src/style.css` is Strict-clean.
+between steps takes the nearest one, as quire's own sheets and the gallery's do. `examples/consumer/src/style.css` is Strict-clean.
 
-`Rule::UnknownAnimation` reads the `animation` shorthand as well as `animation-name` (mailo gaps
-3): in each comma-separated animation the name is the first identifier that is not a keyword
+`Rule::UnknownAnimation` reads the `animation` shorthand as well as `animation-name`: in each comma-separated animation the name is the first identifier that is not a keyword
 (an easing, `infinite`, a direction, a fill mode, a play state, a CSS-wide keyword), with times,
-counts and functions skipped. `animation: sparkle 1s` is an offence now; a name only a `var()`
+counts and functions skipped. `animation: sparkle 1s` is an offence; a name only a `var()`
 holds, or one written as a string, is not judged.
 
-Strict also runs `Rule::RawHairline` (2026-09-25): a literal hairline (`1px`, `.5px`) as a
+`Rule::RawHairline`: a literal hairline (`1px`, `.5px`) as a
 `border*` or `outline*` width, or as a box's whole `width`/`height`, is an offence whose text
 names the token (`border: 1px (use var(--hair))`, `.5px` points at `var(--hairline)`). A 2 px
 border and a `border-radius: 1px` pass: stylo already floors a border width to whole device
-pixels, and only a line of one pixel or less goes blurry. sill's `.sill-dock-separator`
-(`width:1px`) is the one offence known downstream; it becomes `width: var(--hair)`.
+pixels, and only a line of one pixel or less goes blurry.
 
 ### Rule 2 — no raw markup, only quire components
 
 Two tests, both against an SSR render of a real page (never a hand-built HTML string — the
 markup lint runs on what your app *actually renders*, not on what you believe it renders):
 
-```rust
+```rust,ignore
 use dioxus::core::VirtualDom;
 use ds_lint::{markup, LintConfig, Rule};
 
@@ -420,16 +446,19 @@ drives a real Blitz document on a real (if fast-forwarded) clock — the test be
 `examples/consumer/tests/coherence.rs::the_sent_badge_times_out_on_ds_motions_own_clock`,
 shortened:
 
-```rust
+```rust,ignore
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
 let hold = settle(Anim::Fade, resolved.motion); // never a millisecond literal
 
-let mut harness = Harness::new(YourApp, Viewport { width: 480, height: 360, scale_percent: 100 });
-// ...trigger the state change...
+let view = Viewport { width: 480, height: 360, scale_percent: 100 };
+let mut harness = Harness::new(YourApp, HarnessConfig::new(view).with_clock(Clock::Virtual));
+if let Some(target) = harness.centre(".ds-button") {
+    harness.send(Input::click(target));
+}
 harness.advance(hold - Duration::from_millis(10));
 // assert it has NOT settled yet
 harness.advance(Duration::from_millis(20));
@@ -441,25 +470,32 @@ this a real test of rule 4: a `Duration::from_millis(1200)` literal would still 
 Fade`'s token were retuned tomorrow, which is exactly the drift `ds::motion` is supposed to make
 impossible.
 
-**Exact timing on a loaded machine: the virtual clock.** The harness above runs
-quire's timers on the wall clock, so `advance(hold - 10ms)` can overshoot the boundary under
-load. Build it on the virtual clock instead and `advance` moves one clock that drives both the
-CSS animations and every ds timer (motion timers, presence and roster rests, hover intent, toast
+**Exact timing: the virtual clock.** `Clock::Wall` (the default) runs quire's timers on the wall
+clock, so `advance(hold - 10ms)` can overshoot the boundary on a loaded machine. `Clock::Virtual`
+(`HarnessConfig::with_clock`, as above) makes `advance` move one clock that drives both the CSS
+animations and every ds timer (motion timers, presence and roster rests, hover intent, toast
 holds, pending, detail tweens, menu submenu delays): it steps to each timer's due instant in
 order, runs the renders that queued and resolves the CSS at that same instant, and returns at
-once. The two assertions above then hold exactly, every run:
+once. The two assertions above then hold exactly, every run.
 
-```rust
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+**Driving and reading.** `Harness::new(app, config)` takes a `HarnessConfig` (or a bare `Viewport`
+for the defaults) and renders the first frame. A test sends `Input` and lets time pass through the
+`Driver` trait (`send`, `advance`, `render`) and reads the document through the `Query` trait
+(both are in `ds_harness`; a second driver, such as a shell surface's headless host, gets
+`Query` by implementing `DocQuery`):
 
-let config = HarnessConfig::new(Viewport { width: 480, height: 360, scale_percent: 100 })
-    .with_clock(Clock::Virtual);
-let mut harness = Harness::new(YourApp, config);
-```
+| Want | Call |
+| --- | --- |
+| Click, press or move | `Input::click(point)`, `Input::press(point, PointerButton::Secondary)`, `Input::pointer_move(point)`, `Input::drag(from, to, steps)`, `Input::wheel(point, dx, dy)` |
+| Type | `Input::key(ShortcutKey::Enter)`, `Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'))`, `Input::paste(html, text)`, `Input::ime_commit(text)` |
+| Where something is | `harness.centre(selector) -> Option<Point>`, `harness.rect(selector)`, `harness.hits(point, selector)` |
+| What it says | `harness.text_of(selector)`, `harness.attr(selector, name)`, `harness.count(selector)`, `harness.has_class(selector, class)`, `harness.focus_of(selector)` |
+| How it looks | `harness.ink_of(selector)`, `harness.fill_of(selector, Part::..)`, `harness.render()`, `harness.html()` |
+| Pictures without a harness | `ds_harness::snapshot(app, viewport)` and `snapshot_at`, `snapshot_with`, `snapshot_placed` |
 
 | Want | Call | Notes |
 | --- | --- | --- |
-| Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall` (unchanged). `Harness::clock() -> Clock` |
+| Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall`. `Harness::clock() -> Clock` |
 | "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
 | Read the time in your own component | `ds::time::now()`, `ds::time::since(instant)`, `ds::base::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
 | Install a virtual clock yourself (another harness) | `ds::base::time::clock::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
@@ -473,7 +509,7 @@ host cannot set, so on the virtual clock two clicks at one spot are always a dou
 far apart the test advanced them; click a second spot in between, or keep that test on the wall
 clock.
 
-**`assert_settles_to_zero_frames` is only a strict check on `Clock::Virtual`.** It drains
+**`ds_harness::harness::assert_settles_to_zero_frames` is only a strict check on `Clock::Virtual`.** It drains
 `VirtualClock::next_due` — advancing straight to each pending sleep's due instant, earliest
 first, until none remain — then asserts a quiet window right after, so "at rest" means exactly
 design/26 R3: no CSS animation, no pending `ds` timer, nothing woke the document. On
@@ -490,7 +526,7 @@ table after it.
 
 ### Controls
 
-```rust
+```rust,ignore
 use ds::prelude::*;
 use ds::components::controls::button_model::Answers;
 
@@ -498,7 +534,7 @@ rsx! {
     Button {
         answers: Answers::Return,
         label: "Send".to_owned(),
-        icon: Some(ds::prelude::Icon::Send),
+        icon: Some(Icon::Send),
         onclick: move |_| send(),
     }
 }
@@ -506,8 +542,8 @@ rsx! {
 
 ### Lists
 
-```rust
-use ds::app::ThreadRow;
+```rust,ignore
+use ds::components::app::thread_row::ThreadRow;
 use ds::base::vocab::RowState;
 
 rsx! {
@@ -516,18 +552,17 @@ rsx! {
         name: "Ada Lovelace".to_owned(),
         via: None,
         subject: "Re: the analytical engine".to_owned(),
-        snippet: "I have translated the memoir...".to_owned(),
+        snippet: Some("I have translated the memoir...".into()),
         time: "2:14 PM".to_owned(),
         tags: rsx! {},
         star: None,
-        star_pulse: PulseKey::rest(ds::prelude::Anim::StarPop),
         strip: None,
         onclick: move |_| open_thread(),
     }
 }
 ```
 
-`ThreadRow` is the mail-only row (`ds::app`), built on `Row`. Everything else that lists uses `List`
+`ThreadRow` is the mail-only row (`ds::components::app`), built on `Row`. Everything else that lists uses `List`
 of `Row`s: `Row { leading: RowLeading::Icon(..), title, detail, accessory: Accessory::Chevron,
 state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, onclick }`, where
 `Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`
@@ -538,7 +573,7 @@ action, collapse }` heads a group.
 
 ### Overlays
 
-```rust
+```rust,ignore
 use ds::prelude::*;
 use ds::host::measure::{Anchor, MountedRef};
 use ds::root::common::Common;
@@ -571,15 +606,15 @@ rsx! {
 
 ### Frame
 
-```rust
+```rust,ignore
 use ds::prelude::*;
-use ds::AppearancePicker;
+use ds::components::app::command_pill::CommandPill;
 
 rsx! {
-    AppearancePicker {
-        value: current_appearance,
-        system: SystemPrefs::default(),
-        onchange: move |next: Appearance| save(next),
+    CommandPill {
+        label: "Search or run a command".to_owned(),
+        shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('k')]),
+        onclick: move |()| open_palette(),
     }
 }
 ```
@@ -589,18 +624,18 @@ Full catalogue (design doc section in parentheses):
 | Family | Components |
 | --- | --- |
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure and search), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
-| Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::app`), `HoverStrip` (§17) |
+| Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25) |
-| Frame | `AppearancePicker` (§26), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` (§32), `EdgePeek`, `TodayTabs`, `GroupOrder`, `space_pressed` (§2.11), `DragGhost` (§34), `SyncHalo` (§35) |
+| Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` (§32, `ds-shell`), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
-`crates/ds/src/components/<name>.rs` — read that, not this table, before wiring one up; this doc
+`crates/ds/src/components/<family>/<name>.rs` — read that, not this table, before wiring one up; this doc
 only orients you to which family a component is in and where its design spec lives.
 
 A few props worth knowing about before you read the signatures:
 
 - `TextField` takes `#[props(default)] focus: FieldFocus` — `FieldFocus::OnMount` focuses it as soon as it
-  mounts (the command palette's input, a bubble's link field); the default, `Focus::Manual`, is
+  mounts (the command palette's input, a bubble's link field); the default, `FieldFocus::Manual`, is
   what every other field wants; `FieldFocus::Controlled(request)` focuses it on mount and again at
   every `request.request()` (the launcher gaps, below).
 - `Row` takes `#[props(default)] drop: DropState` (`Idle`, `Target`,
@@ -612,8 +647,7 @@ A few props worth knowing about before you read the signatures:
   different dot, separately from `onchange`, which fires on an actual edit).
 - `PinFace::Account` has an `address: Option<String>` field — a `PinTile`'s accessible name falls
   back to its letter and provider without one; pass the account's address when you have it.
-  (`PinTile` replaced `AccountTile` and `AddAccountTile`; `SelectionBubble` is gone: use a context
-  menu.)
+  (A selection bubble is a context menu.)
 
 Anchors, hover-card parts and undo:
 
@@ -644,12 +678,12 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
   anywhere else. The URL loads through the document's net provider (ds-blitz and shell-host's
   `LocalNet` answer `data:` and `file:`), one frame late.
 
-  ```rust
+  ```rust,ignore
   let icon = ds::prelude::IconSource::Symbolic(ds::prelude::ExternalIcon {
-      url: ds::style::icon::url::IconUrl::file(&theme_path)?,
+      url: ds::style::icon::url::IconUrl::file(&theme_path).expect("an absolute path"),
       size: ds::prelude::IconSize::Base,
   });
-  rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon, label: title, onclick } }
+  rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(icon), label: title, onclick } }
   ```
 - **Pointer buttons and ids.** `Button` takes `common.id: Option<String>`, written as
   the element's `id` (a popup anchors to `tray-3` with no wrapper span). Their `onclick` is
@@ -660,7 +694,7 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
   unchanged and ignores the button; so does an `EventHandler<()>` you already hold (passed
   straight through). A closure written `move |()| ...` does not: write `move |_|`.
 
-  ```rust
+  ```rust,ignore
   onclick: move |press: Press| match press.button {
       PointerButton::Secondary => open_menu(),
       PointerButton::Primary | PointerButton::Middle => activate(),
@@ -688,7 +722,7 @@ For a bar (FINDINGS "Bar gaps"):
   host at all (`ds::host::no_host::NoHost`, a server render) a rect read answers unknown and the anchor is not
   placed.
 
-  ```rust
+  ```rust,ignore
   #[component]
   fn BarRoot() -> Element {
       ds_blitz::provide_host();
@@ -718,25 +752,18 @@ For a bar (FINDINGS "Bar gaps"):
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
   `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items
-  with `ds::style::tokens::status::StatusMetrics`, filled from your settings:
+  with `ds::style::tokens::status::StatusMetrics` (the bar's `status_icon_box_px` and `status_glyph_px` settings, 22 and 16 by default):
 
-  ```rust
-  let metrics = StatusMetrics {
-      box_size: Px(f32::from(bar.status_icon_box_px.0)),
-      glyph: Px(f32::from(match bar.glyph_size_policy {
-          BarGlyphSize::StatusIcon16 => bar.status_glyph_px.0,
-          BarGlyphSize::IconSizeBar22 => bar.status_icon_box_px.0, // the glyph fills the box
-      })),
-  };
+  ```rust,ignore
+  let metrics = StatusMetrics { box_size: Px(22.0), glyph: Px(16.0) };
   rsx! { div { class: "status", style: metrics.style_attr(), /* MenuBarItem { image: Only, .. } … */ } }
   ```
   (`style_attr()` is `--bar-status-box:22px;--bar-status-glyph:16px;` at the defaults; custom
   properties with lengths on your own element pass the markup lint.) An external icon in a
   status item is sized by the property too, whatever its `ExternalIcon::size`.
-- **Menu control.** `Menu` gained `on_hover: Option<EventHandler<Option<usize>>>` (the choice
+- **Menu control.** `Menu` takes `on_hover: Option<EventHandler<Option<usize>>>` (the choice
   under the pointer, numbered as `expanded` counts; `None` once it is over none),
   `on_release: Option<EventHandler<Press>>` (every button released over the menu),
-  `entrance: MenuEntrance::{Animated, Instant}` (a bar menu and a hover switch pass `Instant`)
   and plays `Anim::MenuOut` (`--t-quick --e-exit`, `data-presence="leaving"`) before `onclose`
   when Escape or an outside click closes it. A pick calls `onpick`, then `onclose`, once. A
   release over an enabled item after a press that began outside the menu picks it
@@ -746,19 +773,18 @@ For a bar (FINDINGS "Bar gaps"):
   weight without the header's eyebrow, never a choice: keys, hover and picks pass it by. Use it
   for a network's address or a battery's time left, instead of headers.
 - **`Press { button, modifiers, at }`**: `at` is the surface-local point (the event's client
-  point); a keyboard activation reports the origin. `Press` is `PartialEq` only now. Hand
+  point); a keyboard activation reports the origin. `Press` is `PartialEq`, not `Eq`. Hand
   `at.x`, `at.y` (converted to screen coordinates if you know the surface's origin) to SNI's
   `Activate` and `ContextMenu`.
-- **Symbolic or image.** `ds::icon::classify(&png_bytes) -> Result<IconKind, DsError>`
-  (`IconKind::{Symbolic, Image}`) is design/08-ICONS.md §1.5 step 2: symbolic when every pixel
-  with at least half coverage has OKLCH chroma below 0.04; `classify_with(&png,
-  ChromaLimit(n))` takes another threshold in thousandths. Pick `IconSource::Symbolic` or
-  `Image` from it; `NeedsAttention` still recolours through the parent's colour (`--warn`). The
+- **Symbolic or image.** `ds::icon::classify_with(&png_bytes, ChromaLimit::default()) ->
+  Result<IconKind, DsError>` (`IconKind::{Symbolic, Image}`; `ChromaLimit` is
+  `ds::style::icon::classify::ChromaLimit`) is design/08-ICONS.md §1.5 step 2: symbolic when every
+  pixel with at least half coverage has OKLCH chroma below the limit; `ChromaLimit(n)` takes
+  another threshold in thousandths. Pick `IconSource::Symbolic` or `Image` from it. The
   0.04 default is `ChromaLimit::default()`; a settings value (design/22-SETTINGS.md §3.3
   `icons.symbolic_chroma_max`, plain chroma, not thousandths) goes through
   `ChromaLimit::try_from(value)`, which refuses anything outside `0.0..=0.2`
-  (`DsError::ChromaLimitRange`). No caller reads the key yet — that is on the settings-owning
-  side.
+  (`DsError::ChromaLimitRange`); reading the key is the settings-owning side's job.
 - **New glyph**: `Icon::Ethernet` (Lucide `ethernet-port`) for a wired network.
 
 For a launcher and a dock (FINDINGS "Launcher gaps"):
@@ -774,7 +800,7 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
   tried again a frame later while the renderer holds the document. A Blitz host that is not
   `ds_blitz::launch` provides it with the rest of the host:
 
-  ```rust
+  ```rust,ignore
   #[component]
   fn LauncherRoot() -> Element {
       ds_blitz::provide_host();
@@ -789,9 +815,8 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
 - **An embedded palette.** `CommandPalette { host: CommandPaletteHost::Surface, .. }` draws no
   scrim and no overlay: the card fills its container (give the container the panel's size) and
   paints the enclosing material's tint, edge and radius-14 corner (`--r-panel`), its list taking
-  the height under the field. `id: Some("…")` goes on the card, for a blur region.
-  `entrance: PaletteEntrance::{PeekIn, CmdkIn}` picks the card's entrance. `Overlay` (the
-  default) is unchanged. Escape in the field still closes it through the layer stack, so a
+  the height under the field. `id: Some("…")` goes on the card, for a blur region. `Overlay` is
+  the default host. Escape in the field still closes it through the layer stack, so a
   menu opened over it takes Escape first.
 - **The palette's selection.** `selected: Option<usize>` makes it the caller's (choices counted
   as a menu's `expanded` counts them: items and submenu parents, not headers); Up, Down and
@@ -806,14 +831,13 @@ For a launcher and a dock (FINDINGS "Launcher gaps"):
   it (Tab, Ctrl+K), as the event itself, so nothing needs to listen at your root; call
   `event.prevent_default()` on a key you take. The pointer moving over a row selects it.
 
-  ```rust
+  ```rust,ignore
   let mut row = use_signal(|| None::<Rect>);
   let field = use_focus_request();
   rsx! {
       CommandPalette::<Hit> {
           label, placeholder, query, tokens: Vec::new(), groups, empty, oninput, onpick, onclose,
           host: CommandPaletteHost::Surface,
-          entrance: PaletteEntrance::CmdkIn,
           id: "launcher-card".to_string(),
           focus: field,
           on_select_rect: move |rect: Rect| row.set(Some(rect)),
@@ -865,7 +889,7 @@ Palette behaviour:
   hidden does not take the keyboard until it is first shown. `None` (the default) is the
   palette as before: shown, its entrance played as it mounts.
 
-  ```rust
+  ```rust,ignore
   let mut shown = use_signal(|| Shown::Hidden);
   // The shell's toggle: shown.set(Shown::Visible) on open, Shown::Hidden on hide.
   rsx! {
@@ -874,7 +898,6 @@ Palette behaviour:
           oninput: move |text: String| query.set(text),
           onpick, onclose: move |()| shown.set(Shown::Hidden),
           host: CommandPaletteHost::Surface,
-          entrance: PaletteEntrance::CmdkIn,
           shown: shown(),
       }
   }
@@ -893,7 +916,7 @@ Palette behaviour:
   handler, which would see the menu open and close it at once
   (`crates/ds-conformance/tests/palette_actions_key.rs`):
 
-  ```rust
+  ```rust,ignore
   div {
       onkeydown: move |event: KeyboardEvent| {
           if actions() && is_actions(&event) {
@@ -917,7 +940,7 @@ Palette behaviour:
 ### PDF and printing
 
 A quire document as a vector PDF, without a webview: Blitz lays it out, quire paginates it, and
-the `anyrender_pdfrum` painter writes it through pdfrum (text stays text in embedded, subsetted
+the `pdfrum-anyrender` painter writes it through pdfrum (text stays text in embedded, subsetted
 faces at the layout's variable instance; a JPEG or an opaque PNG is embedded as it arrived). FINDINGS.md "PDF output" has the reasons, the limits and the
 measured numbers.
 
@@ -933,7 +956,7 @@ measured numbers.
 | CJK text | name the family: `font-family: "Noto Sans CJK TC", sans-serif` | Otherwise fontique's fallback picks (DroidSansFallback on this machine). A variable face prints at the instance the layout used. |
 | Print it | `ds_blitz::print_dialog(&pdf, title) -> Result<PrintOutcome, PrintError>`, feature `print` | Linux: the desktop portal's print dialog (GTK or KDE backend), then the portal prints the PDF. No portal or no print backend, and other systems: the PDF is written to a temp file and opened in the viewer. `PrintOutcome::{Printed, Cancelled, Opened(PathBuf)}`, `PrintError::{Portal, Write, NoViewer}`. **Blocks** until the dialog is answered: call it off the UI thread. The dialog is not parented to the window. |
 | Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
-| The painter alone | `anyrender_pdfrum::write(&[Page { size, scene, placement, clip, area }], &sources)` | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `Sources { texts: RunTexts, images: ImageSources }` carry what anyrender does not: each run's text (`RunKey`, `RunText`) and each image's encoded bytes by decoded blob id. `GlyphArea::Within(rect)` drops glyphs whose box centre falls outside. |
+| The painter alone | the `pdfrum-anyrender` crate, in the pdfrum repo | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `ds-blitz`'s `pdf` feature depends on it as a git dependency pinned to pdfrum rev 61371040, so a consumer that only prints through `ds_blitz::pdf` names nothing new; one that calls the painter directly adds the same git dependency at the same rev. Its own docs describe its page and source types. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
@@ -949,7 +972,7 @@ the variant words to pick a widget by arity (`ds_settings::schema::kind_from_var
 macro re-exports at the crate root (`crates/ds-settings/tests/schema.rs` is quire's own worked
 example of both imports together):
 
-```rust
+```rust,ignore
 use ds::prelude::*;
 use ds_settings::SettingsSchema;               // the derive macro (macro namespace)
 use ds_settings::schema::{Page, SettingsSchema};   // the trait `.schema()` needs (type namespace)
@@ -982,7 +1005,7 @@ impl Default for ReaderSettings {
 Wire `--write-schema <dir>` into your `main`'s argument parsing with
 `ds_settings::schema::maybe_write_schema` (also in the `schema` module, not the crate root):
 
-```rust
+```rust,ignore
 fn main() {
     let args: Vec<String> = std::env::args().collect();
     if ds_settings::schema::maybe_write_schema(&ReaderSettings::schema(), &args).unwrap_or(false) {
@@ -1061,7 +1084,7 @@ press-drag-release, hover switch between open menus, the submenu delay and the s
 `K` is your menu key (a bar title id). Feed it events with the time; perform what it returns,
 in order.
 
-```rust
+```rust,ignore
 use ds::stack::menu_track::types::{MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent};
 use std::time::Instant;
 
@@ -1076,13 +1099,13 @@ Build `MenuTiming` from `menus.submenu_delay_ms` and `menus.submenu_triangle_tim
 keys inside a menu, wrap, disabled skipping and filtering stay with the `Menu` component; the
 machine takes `MenuKey::{Escape, Left, Right, Enter}` (map Space and Tab to `Enter`).
 
-**Curves** (`crates/ds/src/motion/curve.rs`). For motion you drive from a frame clock rather
+**Curves** (`crates/ds-style/src/tokens/curve.rs`). For motion you drive from a frame clock rather
 than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in thousandths at time
 `t` (thousandths). `Easing::curve()` gives the `CubicBezier` (`linear` is `(0,0,1,1)`), and
 `CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
 1000.
 
-**Spaces store** (`ds::style::space::store::SpaceStore`, `crates/ds/src/space/store.rs`; design/21 §4, §10). Which
+**Spaces store** (`ds::style::space::store::SpaceStore`, `crates/ds-style/src/space/store.rs`; design/21 §4, §10). Which
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
@@ -1093,7 +1116,7 @@ records a look under the id (when there is one) and always under the position.
 its file and format; a `Store` is one program's config directory, and the only way to load, save
 and watch it:
 
-```rust
+```rust,ignore
 use ds_settings::{AppName, ConfigRoot, FileName, Format, SettingsDoc, Store};
 
 impl SettingsDoc for YourFile {
@@ -1164,3 +1187,48 @@ in light, `--paper`'s equivalent (white at the same effective alpha) in dark. It
 any other (`ds::style::tokens::colour::ColourToken::ScrollThumb`, registered in the lint's known-variable table the same
 way every other colour is); quire's stylesheet declares it, the host reads it, and no component
 CSS references it directly, since no ds component paints the thumb itself.
+
+## 12. User styles
+
+A person restyles your app by editing one CSS file, `~/.config/<app>/style.css`, and the change
+shows as they save it (ARCHITECTURE.md section 10). quire owns the mechanism; you wire two things.
+
+**Load and watch it into `Ds`.** `ds_settings::UserStyle` is a `SettingsDoc` for `style.css`: a
+missing file is an empty style and no text is refused at load. `Ds` takes it as
+`user_style: ReadSignal<UserStyle>` and renders it in a `<style data-ds-user>` after the design
+system's own sheet, so a person's rule wins by order and never needs `!important`:
+
+```rust,ignore
+use ds_settings::{AppName, ConfigRoot, Store, UserStyle};
+
+let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
+let mut user_style = use_signal({
+    let store = store.clone();
+    move || store.load::<UserStyle>().value
+});
+use_future(move || {
+    let store = store.clone();
+    async move {
+        let spawner = ds_blitz::TokioSpawner::current();
+        let mut watch = store.watch::<UserStyle>(&spawner);
+        while let Some(loaded) = watch.changed().await {
+            user_style.set(loaded.value);
+        }
+    }
+});
+rsx! {
+    Ds { appearance: Appearance::default(), material: Material::Window, user_style, YourPage {} }
+}
+```
+
+**Publish what a person may rely on.** `ds::selectors` is the table of the selector surface a
+user stylesheet may use: `[data-surface=<name>]` (give a surface root `Ds { surface: Some("bar") }`),
+`.ds-<component>` on every component root, each component's listed parts, `data-variant`,
+`data-size`, `data-state`, `aria-*` and every token variable. Renaming anything on it is a
+breaking change for the person's file; everything off it may change freely. Token overrides are
+the recommended form (`.ds { --accent: ...; }` restyles every surface consistently).
+
+**Report, never block.** `ds_lint::user_stylesheet(css, &ds::kits())` returns notes (unknown
+variables, selectors outside the public surface, `!important`, `url()` that is not a local `file:` or `data:`
+URL, parse errors with line numbers). A settings page or a `--check-style` command can print
+them; loading never waits on them. User CSS is exempt from the design-system lint rules.

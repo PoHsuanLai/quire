@@ -27,9 +27,14 @@ ds-blitz = { path = "../../crates/ds-blitz" }
 dioxus = { version = "0.7", default-features = false, features = ["macro", "html", "hooks", "signals"] }
 
 [dev-dependencies]
+serde = { version = "1", features = ["derive"] }
+# `#[derive(Word)]` expands to `::ds_core::word::Word`, so a crate that derives it names ds-core.
+ds-core = { path = "../../crates/ds-core" }
 dioxus-ssr = "0.7"
 # The test driver: a real Blitz document on a fast-forwarded clock (CONSUMING.md section 5, rule 4).
 ds-harness = { path = "../../crates/ds-harness" }
+# A shell program's parts (CONSUMING.md section 6, "For a bar"): `MenuBarItem` and the shell prelude.
+ds-shell = { path = "../../crates/ds-shell" }
 # The linter: a consumer's own tests call it (CONSUMING.md section 5).
 ds-lint = { path = "../../crates/ds-lint" }
 
