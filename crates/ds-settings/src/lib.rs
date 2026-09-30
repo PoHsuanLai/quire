@@ -24,6 +24,7 @@ mod lenient;
 mod portal;
 mod root;
 pub mod schema;
+mod spaces_file;
 mod store;
 mod units;
 mod user_style;
