@@ -7,9 +7,10 @@
 //! a Change (a load landed) or a Failure (it did not) swaps the media in place with a `fade` at
 //! `--t-quick` instead of replaying the entrance; under Reduced it snaps (R7).
 
-use crate::components::controls::spinner::ring;
+use crate::components::controls::progress::model::{Progress, ProgressStyle};
+use crate::components::controls::progress::view::ProgressIndicator;
 use dioxus::prelude::*;
-use ds_motion::detail::{cue::Cue, pending::PendingFrame, touch::Touch};
+use ds_motion::detail::{cue::Cue, operation::Operation, touch::Touch};
 
 /// What a [`PreviewPane`](crate::PreviewPane) knows of its latest change: the cue the caller's
 /// own `use_detail` made for the pane's state (its entrance's touch, and the in-place changes it
@@ -60,12 +61,16 @@ impl PaneCue {
     }
 }
 
-/// What the media box holds while a load runs: the ring, stepping, over the words that say so
-/// (R8).
-pub(crate) fn pending_look(frame: PendingFrame) -> Element {
+/// What the media box holds while a load runs: the spinner over the words that say so (R8).
+pub(crate) fn pending_look(operation: Operation) -> Element {
     rsx! {
         div { class: "ds-preview-pending", role: "status",
-            span { class: "ds-preview-pending-mark", {ring(frame)} }
+            span { class: "ds-preview-pending-mark",
+                ProgressIndicator {
+                    style: ProgressStyle::Spinner,
+                    progress: Progress::Unknown(operation),
+                }
+            }
             span { class: "ds-preview-pending-words", "Loading\u{2026}" }
         }
     }

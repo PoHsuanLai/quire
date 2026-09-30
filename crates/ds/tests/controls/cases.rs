@@ -157,16 +157,6 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "button",
-        state: "toolbar-status",
-        make: || rsx! { Button { common: Common { id: Some("net".to_string()), ..Common::default() }, bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Ethernet, label: "Wired network", onclick: |_| {} } },
-    },
-    Case {
-        component: "button",
-        state: "toolbar-status-open",
-        make: || rsx! { Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryCharging, label: "Battery", shown: Shown::Visible, onclick: |_| {} } },
-    },
-    Case {
-        component: "button",
         state: "toolbar-disabled",
         make: || rsx! { Button { bezel: Bezel::Toolbar, size: ControlSize::Large, image: ImagePosition::Only, icon: Icon::Trash, label: "Delete", availability: Availability::Disabled, onclick: |_| {} } },
     },

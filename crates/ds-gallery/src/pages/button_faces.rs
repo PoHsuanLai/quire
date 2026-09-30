@@ -35,14 +35,14 @@ pub fn ButtonFaces() -> Element {
                     div { class: "g-side",
                         Button { bezel: Bezel::Toolbar, label: "Settings", icon: Some(Icon::Settings), onclick: |_| {} }
                         Button { bezel: Bezel::Toolbar, label: "Today", value: Some(Check::On), onclick: |_| {} }
-                        Button { bezel: Bezel::Toolbar, label: "All mail", trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "All mail", trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
                     }
                 }
                 Specimen { name: "trailing",
                     div { class: "g-row",
-                        Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Caret, shown: open(),
+                        Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Glyph(Icon::ChevronDown), shown: open(),
                             onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
-                        Button { size: ControlSize::Mini, label: "Sends: Now", trailing: Trailing::Caret, onclick: |_| {} }
+                        Button { size: ControlSize::Mini, label: "Sends: Now", trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
                         Button { label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} }
                     }
                 }

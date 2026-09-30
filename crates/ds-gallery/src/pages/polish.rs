@@ -10,13 +10,13 @@ use crate::axes::{Axes, Showcase};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::Alpha;
+use ds::ImagePosition;
 use ds::{
     Anchor, Appearance, Availability, Check, CommandPalette, CommandPaletteHost, Corner, Ds,
     Emphasis, Icon, IconSize, IconSource, IconView, Inject, Material, MaterialStack, MenuItem,
     MenuPlacement, PaletteGroup, PaletteRow, PlateFamily, Point, Px, RootChrome, RowLeading,
     Scheme, Selection, Shortcut, ShortcutKey, Shown, SpaceLook, Surface, Theme, use_scope,
 };
-use ds::{Bezel, Button, ImagePosition};
 use ds_shell::{
     DockFloor, DockFloorSetting, DockLabel, DockMetrics, MenuBarItem, RunningDot, WorkspacePill,
     WorkspacePills,
@@ -126,15 +126,15 @@ fn MenuBarSection() -> Element {
                             WorkspacePill { label: "2", onclick: |_| {} }
                             WorkspacePill { label: "3", onclick: |_| {} }
                         }
-                        MenuBarItem { emphasis: Emphasis::Strong, span { "Files" } }
-                        MenuBarItem { open: Shown::Visible, span { "File" } }
-                        MenuBarItem { span { "Edit" } }
-                        MenuBarItem { span { "View" } }
+                        MenuBarItem { emphasis: Emphasis::Strong, label: "Files", onclick: |_| {} }
+                        MenuBarItem { shown: Shown::Visible, label: "File", onclick: |_| {} }
+                        MenuBarItem { label: "Edit", onclick: |_| {} }
+                        MenuBarItem { label: "View", onclick: |_| {} }
                         span { class: "g-spacer" }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Some(Shown::Visible), onclick: |_| {} }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", onclick: |_| {} }
-                        MenuBarItem { span { class: "ds-tabular", "Thu 24 Sep 09:41" } }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Shown::Visible, onclick: |_| {} }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", onclick: |_| {} }
+                        MenuBarItem { label: "Thu 24 Sep 09:41", onclick: |_| {} }
                     }
                 }
                 Root { material: Material::Popover, style: "height:250px",

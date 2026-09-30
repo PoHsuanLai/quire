@@ -5,6 +5,7 @@
 //! a status line is drawn and never selected; a press reports where it happened.
 
 use dioxus::prelude::*;
+use ds::ImagePosition;
 use ds::{
     Anchor, Anim, Appearance, Availability, Ds, Icon, Material, Menu, MenuItem, MenuPlacement,
     MotionLevel, Point, PointerButton, Press, Px, ShortcutKey, settle,
@@ -12,6 +13,7 @@ use ds::{
 use ds::{Bezel, Button, ImagePosition};
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
+use ds_shell::MenuBarItem;
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -275,8 +277,8 @@ fn PressAt() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; padding:20px 0 0 100px; height:60px",
-                Button {
-                    bezel: Bezel::StatusItem, image: ImagePosition::Only,
+                MenuBarItem {
+                    image: ImagePosition::Only,
                     icon: Icon::Wifi,
                     label: "Network",
                     onclick: move |press: Press| {

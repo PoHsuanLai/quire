@@ -8,6 +8,7 @@
 mod probe;
 
 use dioxus::prelude::*;
+use ds::Common;
 use ds::{
     Appearance, Corner, Ds, Icon, IconSize, IconSource, IconView, Material, MaterialStack,
     MenuItem, PlateFamily, Px, Scheme, Shown, Surface,
@@ -188,8 +189,8 @@ fn Bar() -> Element {
     rsx! {
         Ds { sheet: Some(ds_shell::stylesheet()), appearance: Appearance::default(), material: Material::Bar,
             div { style: "display:flex; gap:8px; padding:4px 8px",
-                MenuBarItem { id: "open", open: Shown::Visible, span { "Files" } }
-                MenuBarItem { id: "shut", span { "Edit" } }
+                MenuBarItem { common: Common { id: Some("open".to_string()), ..Common::default() }, shown: Shown::Visible, label: "Files", onclick: |_| {} }
+                MenuBarItem { common: Common { id: Some("shut".to_string()), ..Common::default() }, label: "Edit", onclick: |_| {} }
             }
         }
     }

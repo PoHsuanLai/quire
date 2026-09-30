@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::SliderLook;
 use ds::icon::{IconStyle, Tint};
-use ds::{Answers, Bezel, ControlSize, ImagePosition};
+use ds::{Answers, ControlSize, ImagePosition};
 use ds::{
     Appearance, Button, Check, Ds, Fraction, Icon, IconSize, IconSource, IconView, LevelGlyph,
     Material, Muting, PlateFamily, PlateTint, Px, Scheme, SegmentedControl, Shown, Slider,
@@ -100,13 +100,13 @@ fn Sheet(theme: Theme) -> Element {
                 // The bar: 32 tall as sill's default, a title pill, three status items, the clock.
                 Surface { material: Material::Bar, theme: Some(scheme),
                     div { style: "display:flex;align-items:center;gap:4px;height:32px;padding:0 8px;{metrics.style_attr()}",
-                        MenuBarItem { open: Shown::Visible, "Files" }
-                        MenuBarItem { "Edit" }
+                        MenuBarItem { shown: Shown::Visible, label: "Files", onclick: |_| {} }
+                        MenuBarItem { label: "Edit", onclick: |_| {} }
                         span { style: "flex:1" }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Some(Shown::Visible), onclick: |_| {} }
-                        Button { bezel: Bezel::StatusItem, image: ImagePosition::Only, icon: Icon::Switches, label: "Control center", onclick: |_| {} }
-                        MenuBarItem { "Sun 27 Sep 12:48" }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::Volume2, label: "Volume", shown: Shown::Visible, onclick: |_| {} }
+                        MenuBarItem { image: ImagePosition::Only, icon: Icon::Switches, label: "Control center", onclick: |_| {} }
+                        MenuBarItem { label: "Sun 27 Sep 12:48", onclick: |_| {} }
                     }
                 }
                 Surface { material: Material::Popover, theme: Some(scheme),

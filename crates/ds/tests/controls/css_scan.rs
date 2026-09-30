@@ -104,10 +104,6 @@ pub const STYLES: &[(&str, &[&str])] = &[
         "edit_surface",
         &[include_str!("../../src/components/editor/surface.css")],
     ),
-    (
-        "spinner",
-        &[include_str!("../../src/components/controls/spinner.css")],
-    ),
     // The frame's own sheet, and the utilities its root and title take (`ds-layer`,
     // `ds-grain`, `ds-truncate`).
     (

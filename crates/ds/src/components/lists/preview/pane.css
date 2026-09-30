@@ -8,7 +8,7 @@
    starting another. An in-place change fades the media in (`a-morph-fade-in`,
    `--t-quick`); at rest the media box plays `hold` (moves nothing), so the fade's
    settle never drops it midway. A running load swaps the media for the pending look:
-   the dashed ring (`.ds-spinner`, stepping) over the words "Loading…", in `--ink-faint`.
+   the spinner over the words "Loading…", in `--ink-faint`.
    The actions never take the keyboard (the launcher's field keeps it): the one the caller's
    keys rest on shows the focus ring, and the pointer is the arrow (design/27 sections 6.3, 6.4). */
 .ds-preview{ display:flex; flex-direction:column; gap:var(--s-12); box-sizing:border-box; width:100%; height:100%; min-height:0; padding:var(--s-16); overflow:hidden; color:var(--ink); }
@@ -24,7 +24,7 @@
   background:var(--surface); border:var(--hair) solid var(--line-soft); border-radius:var(--r-small); color:var(--ink-soft); }
 .ds-preview-text[*|data-face=mono]{ font-family:var(--font-code); font-size:var(--fs-help); }
 .ds-preview-pending{ display:flex; flex-direction:column; align-items:center; gap:var(--s-12); color:var(--ink-faint); font-size:var(--fs-small); }
-.ds-preview-pending-mark{ position:relative; display:block; width:20px; height:20px; }
+.ds-preview-pending-mark{ display:block; }
 .ds-preview-pending-words{ display:block; }
 .ds-preview-emoji{ font-size:var(--fs-emoji-preview); line-height:1; }
 

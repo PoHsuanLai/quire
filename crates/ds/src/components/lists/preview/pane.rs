@@ -11,7 +11,7 @@
 //! media, and a running load shows the pending look in the media box.
 
 use crate::components::controls::key_equivalent::KeyEquivalent;
-use crate::components::controls::spinner::SPIN;
+use crate::components::controls::progress::spokes::SPIN;
 use crate::components::lists::preview::content::{PaneContent, caption, media};
 use crate::components::lists::preview::cue::{PaneCue, pending_look};
 use dioxus::prelude::*;
@@ -50,8 +50,7 @@ pub struct PaneAction {
 /// `fade` at `--t-quick`, never replaying the entrance.
 ///
 /// `operation` is the load the media waits on (a text file's head, a PDF's page): drawn with
-/// `use_pending`, the pending look replaces the media at once (a dashed ring stepping a twelfth
-/// of a turn per `--t-spin-step` over the words "Loading…"); the media comes back when it is
+/// `use_pending`, the pending look replaces the media at once (the spinner over the words "Loading…"); the media comes back when it is
 /// `Idle`.
 #[component]
 pub fn PreviewPane(
@@ -80,7 +79,7 @@ pub fn PreviewPane(
     };
     let shows = match frame {
         PendingFrame::Idle => media(&content),
-        PendingFrame::Step(_) => pending_look(frame),
+        PendingFrame::Step(_) => pending_look(operation),
     };
     let label = content.label();
     rsx! {
