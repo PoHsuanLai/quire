@@ -64,10 +64,28 @@ pub fn snapshot_with(
     config: HarnessConfig,
     moments: &[Duration],
 ) -> Result<Vec<image::RgbaImage>, NativeError> {
+    snapshot_rounds(app, config, moments, 1)
+}
+
+/// As [`snapshot_at`], after waiting for placements to land: a hint or popover is hidden until
+/// its target and its own size are measured, each a frame after the last, so a page with such
+/// surfaces (the gallery's) waits several settle rounds before its first moment.
+pub fn snapshot_placed(
+    app: fn() -> Element,
+    viewport: Viewport,
+    moments: &[Duration],
+) -> Result<Vec<image::RgbaImage>, NativeError> {
+    snapshot_rounds(app, HarnessConfig::new(viewport), moments, SETTLE_ROUNDS)
+}
+
+fn snapshot_rounds(
+    app: fn() -> Element,
+    config: HarnessConfig,
+    moments: &[Duration],
+    rounds: u32,
+) -> Result<Vec<image::RgbaImage>, NativeError> {
     let mut harness = Harness::with_config(app, config);
-    // Placements wait on layout (a hint or popover is hidden until its target and its own size
-    // are measured, each a frame after the last): give them rounds to land, then paint.
-    for _ in 0..SETTLE_ROUNDS {
+    for _ in 0..rounds {
         harness.advance(MOUNT_SETTLE);
     }
     moments
