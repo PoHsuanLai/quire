@@ -359,7 +359,7 @@ configurations plus the pieces below; their motion uses 1.3 only.
 | --- | --- | --- | --- | --- | --- |
 | Pinned tiles | a grid of square tiles above the sidebar list; drag to reorder; add tile | `PinTile` (from `AccountTile`, `AddAccountTile`) with `Badge`, `List` drop line | apps | MERGE | P1 |
 | Today tabs | temporary tabs under the pinned tiles that expire; enter and leave by `Roster` | `Row{Today}` in a SourceList | apps | MERGE | P1 |
-| Edge-peek sidebar | a hidden sidebar reveals on pointer at the window edge (`HoverIntent`, Slide(Left) by spring), pins on click | `EdgePeek` (from `Peek`, `EdgeStrip`, `HoverStrip`) | apps | MERGE | P1 |
+| Edge-peek sidebar | a hidden sidebar reveals on pointer at the window edge (`HoverIntent`, Slide(Left) by spring), pins on click | `EdgePeek` (from `EdgeStrip` and the sidebar's peek; `Peek`, mail's reader panel, and `HoverStrip`, the thread row's action strip, stay) | apps | MERGE | P1 |
 | Link pill | rounded pill showing the current link; hover-intent expands, click copies | `LinkPill` | apps | KEEP | P2 |
 | Grouped launcher commands | palette results grouped by kind with `SectionHeader`; group order per Space | `CommandPalette`, `List` | shell, apps | KEEP | P1 |
 | Space switching | Ctrl+1..9 (Cmd+1..9 left to apps; 27 §8.5); Space colour cross-fades `--t-big` | `StandardAction`, `Shortcut` | shell | KEEP | P1 |
