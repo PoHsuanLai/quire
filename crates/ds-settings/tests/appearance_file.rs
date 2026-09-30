@@ -135,6 +135,24 @@ fn a_bad_value_costs_only_its_own_field() {
             invalid: &["appearance.look"],
         },
         Case {
+            name: "the retired postmark accent falls back to blue and is reported",
+            text: "[appearance]\naccent = \"postmark\"\ntheme = \"dark\"\n",
+            want: with(|f| f.appearance.theme = Theme::Dark),
+            invalid: &["appearance.accent"],
+        },
+        Case {
+            name: "the retired amber accent falls back to blue and is reported",
+            text: "[appearance]\naccent = \"amber\"\n",
+            want: AppearanceFile::default(),
+            invalid: &["appearance.accent"],
+        },
+        Case {
+            name: "the retired violet accent falls back to blue and is reported",
+            text: "[appearance]\naccent = \"violet\"\n",
+            want: AppearanceFile::default(),
+            invalid: &["appearance.accent"],
+        },
+        Case {
             name: "an out-of-range percent is clamped, not refused",
             text: "[appearance]\nmaterial_tint_alpha = 255\n",
             want: with(|f| f.appearance.material_tint_alpha = Percent(100)),

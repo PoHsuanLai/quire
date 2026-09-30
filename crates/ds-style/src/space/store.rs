@@ -132,10 +132,21 @@ fn each_or_none<'de, D: Deserializer<'de>>(
     let serde_json::Value::Array(entries) = value else {
         return Ok(Vec::new());
     };
-    Ok(entries
-        .into_iter()
-        .map(|entry| serde_json::from_value::<Option<SpaceLook>>(entry).unwrap_or(None))
-        .collect())
+    Ok(entries.into_iter().map(look_or_none).collect())
+}
+
+/// One entry as a look. A value the look does not accept costs only that key: the entry is
+/// read again without `card_accent` (its old `postmark` is no longer a word), which then
+/// takes the default. An entry that is still not a look is `None`.
+fn look_or_none(entry: serde_json::Value) -> Option<SpaceLook> {
+    if let Ok(look) = serde_json::from_value::<Option<SpaceLook>>(entry.clone()) {
+        return look;
+    }
+    let serde_json::Value::Object(mut fields) = entry else {
+        return None;
+    };
+    fields.remove("card_accent")?;
+    serde_json::from_value(serde_json::Value::Object(fields)).ok()
 }
 
 #[cfg(test)]
@@ -214,6 +225,24 @@ mod tests {
         let back: SpaceStore =
             serde_json::from_str(&text).unwrap_or_else(|e| panic!("{text}: {e}"));
         assert_eq!(back, store, "{text}");
+    }
+
+    #[test]
+    fn a_stale_card_accent_costs_only_that_key() {
+        let text = r#"{"by_index": [
+            {"grain": 20, "theme": "dark", "card_accent": "postmark"},
+            {"grain": 60, "card_accent": "space_hue"}]}"#;
+        let store: SpaceStore = serde_json::from_str(text).unwrap_or_else(|e| panic!("{e}"));
+        let first = store.by_index[0].as_ref().unwrap_or_else(|| panic!("lost"));
+        assert_eq!(
+            (first.grain, first.theme, first.card_accent),
+            (Grain(20), Theme::Dark, CardAccent::Chosen)
+        );
+        let second = store.by_index[1].as_ref().unwrap_or_else(|| panic!("lost"));
+        assert_eq!(
+            (second.grain, second.card_accent),
+            (Grain(60), CardAccent::SpaceHue)
+        );
     }
 
     #[test]
