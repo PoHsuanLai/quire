@@ -7,6 +7,8 @@
 
 #[path = "controls/cases.rs"]
 mod cases;
+#[path = "controls/cases_catalogue.rs"]
+mod cases_catalogue;
 #[path = "controls/css_scan.rs"]
 mod css_scan;
 #[path = "support/golden.rs"]
@@ -58,6 +60,11 @@ fn every_control_matches_its_golden() {
 }
 
 #[test]
+fn every_catalogue_control_matches_its_golden() {
+    check_all(cases_catalogue::CASES);
+}
+
+#[test]
 fn motion_driven_controls_match_their_goldens() {
     check_all(MOTION_CASES);
 }
@@ -66,7 +73,7 @@ fn motion_driven_controls_match_their_goldens() {
 fn every_class_in_a_golden_is_styled_by_its_component() {
     let goldens = golden::all_in("controls");
     assert!(
-        goldens.len() >= CASES.len(),
+        goldens.len() >= CASES.len() + cases_catalogue::CASES.len(),
         "only {} goldens",
         goldens.len()
     );

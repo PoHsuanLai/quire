@@ -136,7 +136,7 @@ fn editorial_restores_the_values_the_rules_carried() {
 const COPIED_TEXT: &[&str] = &[".ds-menu-clip{", ".ds-preview-text[*|data-face=mono]{"];
 
 #[test]
-fn only_code_and_kbd_ask_for_the_code_face() {
+fn only_code_and_key_caps_ask_for_the_code_face() {
     let css = stylesheet();
     let code_rules: Vec<&str> = css
         .lines()
@@ -151,7 +151,9 @@ fn only_code_and_kbd_ask_for_the_code_face() {
             "{rule}"
         );
     }
-    assert!(css.contains(".ds-kbd{ display:inline-block;\n  font-family:var(--font-code);"));
+    assert!(css.contains(
+        ".ds-key-equivalent-key{\n  display:inline-block; font-family:var(--font-code);"
+    ));
 }
 
 #[test]

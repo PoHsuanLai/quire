@@ -49,3 +49,4 @@
 .ds-segmented-segment[*|aria-disabled=true],
 .ds-segmented[*|aria-disabled=true],
 .ds-segmented[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+.ds-segmented-label{ min-width:0; }

@@ -9,11 +9,36 @@ pub const STYLES: &[(&str, &[&str])] = &[
             include_str!("../../src/components/content/icon_view.css"),
             include_str!("../../src/components/content/text_runs.css"),
             include_str!("../../src/components/content/provider_mark.css"),
+            include_str!("../../src/components/controls/progress/progress.css"),
         ],
     ),
     (
         "icon_view",
         &[include_str!("../../src/components/content/icon_view.css")],
+    ),
+    (
+        "label",
+        &[
+            include_str!("../../src/components/content/label.css"),
+            include_str!("../../src/components/content/text_runs.css"),
+        ],
+    ),
+    (
+        "checkbox",
+        &[include_str!("../../src/components/controls/checkbox.css")],
+    ),
+    (
+        "radio_group",
+        &[include_str!(
+            "../../src/components/controls/radio_group.css"
+        )],
+    ),
+    (
+        "level_indicator",
+        &[
+            include_str!("../../src/components/controls/level_indicator.css"),
+            include_str!("../../src/components/content/level_glyph/glyph.css"),
+        ],
     ),
     (
         "progress",
@@ -31,7 +56,10 @@ pub const STYLES: &[(&str, &[&str])] = &[
     ),
     (
         "slider",
-        &[include_str!("../../src/components/controls/slider.css")],
+        &[
+            include_str!("../../src/components/controls/slider.css"),
+            include_str!("../../src/components/content/level_glyph/glyph.css"),
+        ],
     ),
     (
         "text_field",
