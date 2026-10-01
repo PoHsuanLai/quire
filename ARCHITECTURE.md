@@ -26,7 +26,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
-| `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard; features `pdf`, `print`, `spell` |
+| `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell` |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
 | `ds-gallery` | the visual reference binary: every component across theme, accent, motion, material |
@@ -61,9 +61,9 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 
 | Crate | Never reaches |
 | --- | --- |
-| `ds-core`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `pdfrum*`, `arboard` |
+| `ds-core`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*`, `arboard` |
 | `ds-core`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths: `::ds_core` or `::ds_style` where the caller's manifest names it, else `::ds::base` or `::ds::style`, found with `proc-macro-crate`) |
-| `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
+| `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |
 
@@ -85,7 +85,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (`use_machine`, `MachineRef`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `environment` (feature `dioxus`) < `icon_assets` < `units` |
-| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, requests, hover, drop, shell) < `launch`, `open_window` < features `pdf`, `print`, `spell` |
+| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, requests, hover, drop, shell) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell` |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot` |
 | `ds-conformance` | `tests/<component>.rs`, `tests/support/` |
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
@@ -247,6 +247,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Test driver, document queries | `ds-harness::{Driver, DocQuery, Query}` |
 | SSR rendering and golden files in tests | `crates/ds/tests/support/` (`golden.rs`, `scoped.rs`); `dioxus_ssr` |
 | Clipboard | `ds-blitz::clipboard::Clipboard` |
+| A GPU texture inside the document, the window's wgpu device, CPU pixels uploaded to it | `ds-blitz::texture_layer::{TextureLayer, use_gpu, Gpu, TextureHandle}`; headless device `ds-harness::Harness::gpu` |
 | Net policy, `data:` URLs | `blitz-kit::net`, `blitz-kit::data_url` |
 | Hover sync, pixel snap, GPU adapter choice, transform-aware hit test | `blitz-kit::{hover, snap, adapter, hit}` |
 | PDF output, printing | `ds-blitz::{pdf, print}` |
