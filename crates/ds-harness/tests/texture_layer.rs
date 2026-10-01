@@ -170,85 +170,89 @@ fn a_texture_of_known_colours_fills_the_box() {
     assert_eq!(at(&after, 98, 98), BLUE, "to the other corner");
 }
 
+/// (what is checked, a fit, a point inside the box, what is there) for a 2x1 picture, red then
+/// blue, in a 100x100 box.
+type Case = (&'static str, TextureFit, (u32, u32), [u8; 4]);
+
+const CASES: &[Case] = &[
+    (
+        "contain leaves ground above the picture",
+        TextureFit::Contain,
+        (50, 10),
+        CLEAR,
+    ),
+    (
+        "contain draws the picture in the middle band",
+        TextureFit::Contain,
+        (25, 50),
+        RED,
+    ),
+    (
+        "contain draws the other texel",
+        TextureFit::Contain,
+        (75, 50),
+        BLUE,
+    ),
+    (
+        "contain leaves ground below the picture",
+        TextureFit::Contain,
+        (50, 90),
+        CLEAR,
+    ),
+    (
+        "cover reaches the top edge",
+        TextureFit::Cover,
+        (30, 2),
+        RED,
+    ),
+    (
+        "cover reaches the bottom edge",
+        TextureFit::Cover,
+        (70, 97),
+        BLUE,
+    ),
+    (
+        "actual is one texel to a pixel, centred: the left texel",
+        TextureFit::Actual,
+        (49, 49),
+        RED,
+    ),
+    (
+        "actual, the right texel",
+        TextureFit::Actual,
+        (50, 49),
+        BLUE,
+    ),
+    (
+        "actual leaves the pixel beside it alone",
+        TextureFit::Actual,
+        (48, 49),
+        CLEAR,
+    ),
+    (
+        "tile repeats from the corner, texel 0",
+        TextureFit::Tile,
+        (0, 0),
+        RED,
+    ),
+    ("tile, texel 1", TextureFit::Tile, (1, 0), BLUE),
+    ("tile, texel 0 again", TextureFit::Tile, (2, 0), RED),
+    (
+        "tile reaches the far column",
+        TextureFit::Tile,
+        (99, 40),
+        BLUE,
+    ),
+    (
+        "tile stops at the most tiles, 4096 of these 5000",
+        TextureFit::Tile,
+        (99, 99),
+        CLEAR,
+    ),
+];
+
 #[test]
 fn each_fit_puts_the_picture_where_it_says() {
-    // (fit, a point inside the box, what is there)
-    let cases: &[(&str, TextureFit, (u32, u32), [u8; 4])] = &[
-        (
-            "contain leaves ground above the picture",
-            TextureFit::Contain,
-            (50, 10),
-            CLEAR,
-        ),
-        (
-            "contain draws the picture in the middle band",
-            TextureFit::Contain,
-            (25, 50),
-            RED,
-        ),
-        (
-            "contain draws the other texel",
-            TextureFit::Contain,
-            (75, 50),
-            BLUE,
-        ),
-        (
-            "contain leaves ground below the picture",
-            TextureFit::Contain,
-            (50, 90),
-            CLEAR,
-        ),
-        (
-            "cover reaches the top edge",
-            TextureFit::Cover,
-            (30, 2),
-            RED,
-        ),
-        (
-            "cover reaches the bottom edge",
-            TextureFit::Cover,
-            (70, 97),
-            BLUE,
-        ),
-        (
-            "actual is one texel to a pixel, centred: the left texel",
-            TextureFit::Actual,
-            (49, 49),
-            RED,
-        ),
-        (
-            "actual, the right texel",
-            TextureFit::Actual,
-            (50, 49),
-            BLUE,
-        ),
-        (
-            "actual leaves the pixel beside it alone",
-            TextureFit::Actual,
-            (48, 49),
-            CLEAR,
-        ),
-        (
-            "tile repeats from the corner, texel 0",
-            TextureFit::Tile,
-            (0, 0),
-            RED,
-        ),
-        ("tile, texel 1", TextureFit::Tile, (1, 0), BLUE),
-        ("tile, texel 0 again", TextureFit::Tile, (2, 0), RED),
-        (
-            "tile reaches the far column",
-            TextureFit::Tile,
-            (99, 40),
-            BLUE,
-        ),
-        (
-            "tile stops at the most tiles, 4096 of these 5000",
-            TextureFit::Tile,
-            (99, 99),
-            CLEAR,
-        ),
-    ];
     for fit in [
         TextureFit::Contain,
         TextureFit::Cover,
@@ -260,7 +264,7 @@ fn each_fit_puts_the_picture_where_it_says() {
         };
         pair(&handles[0], RED, BLUE);
         let image = shot(&mut harness);
-        for (name, case_fit, (x, y), want) in cases {
+        for (name, case_fit, (x, y), want) in CASES {
             if *case_fit == fit {
                 assert_eq!(at(&image, *x, *y), *want, "{name}");
             }

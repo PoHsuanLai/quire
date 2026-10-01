@@ -13,17 +13,21 @@ pub(crate) fn premultiplied<'a>(pixels: &Pixels<'a>) -> Cow<'a, [u8]> {
         PixelFormat::Rgba8Premultiplied => Cow::Borrowed(bytes),
         PixelFormat::Rgb8 => Cow::Owned(
             bytes
-                .chunks_exact(3)
-                .flat_map(|rgb| [rgb[0], rgb[1], rgb[2], u8::MAX])
+                .as_chunks::<3>()
+                .0
+                .iter()
+                .flat_map(|[red, green, blue]| [*red, *green, *blue, u8::MAX])
                 .collect(),
         ),
         PixelFormat::Rgba8Straight => Cow::Owned(
             bytes
-                .chunks_exact(4)
-                .flat_map(|rgba| {
-                    let alpha = u16::from(rgba[3]);
-                    let scaled = |channel: u8| ((u16::from(channel) * alpha + 127) / 255) as u8;
-                    [scaled(rgba[0]), scaled(rgba[1]), scaled(rgba[2]), rgba[3]]
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .flat_map(|[red, green, blue, alpha]| {
+                    let scaled =
+                        |channel: u8| ((u16::from(channel) * u16::from(*alpha) + 127) / 255) as u8;
+                    [scaled(*red), scaled(*green), scaled(*blue), *alpha]
                 })
                 .collect(),
         ),

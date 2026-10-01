@@ -30,7 +30,7 @@ pub(crate) fn visible_source(
     height: Texels,
 ) -> Option<TexelRect> {
     let Some(rect) = source else {
-        return Some(TexelRect::whole(width, height)).filter(|_| width.0 > 0 && height.0 > 0);
+        return (width.0 > 0 && height.0 > 0).then_some(TexelRect::whole(width, height));
     };
     let right = rect.x.0.saturating_add(rect.width.0).min(width.0);
     let bottom = rect.y.0.saturating_add(rect.height.0).min(height.0);
@@ -97,6 +97,9 @@ mod tests {
     use super::{Draw, MAX_TILES, TexelRect, Texels, TextureFit, place, visible_source};
     use peniko::kurbo::{Affine, Rect};
 
+    /// (name, fit, source, box, the draws wanted)
+    type Case = (&'static str, TextureFit, TexelRect, (f64, f64), Vec<Draw>);
+
     fn one(sx: f64, sy: f64, tx: f64, ty: f64, clip: Rect) -> Vec<Draw> {
         vec![Draw {
             transform: Affine::new([sx, 0.0, 0.0, sy, tx, ty]),
@@ -107,7 +110,7 @@ mod tests {
     #[test]
     fn each_fit_places_the_source_in_the_box() {
         let wide = TexelRect::new(0, 0, 100, 50);
-        let cases: Vec<(&str, TextureFit, TexelRect, (f64, f64), Vec<Draw>)> = vec![
+        let cases: Vec<Case> = vec![
             (
                 "contain letterboxes a wide picture",
                 TextureFit::Contain,
