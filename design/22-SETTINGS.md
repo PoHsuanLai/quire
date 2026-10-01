@@ -49,7 +49,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | File | Owner | Domains |
 | --- | --- | --- |
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
-| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners` |
+| `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners`, `keyboard` |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
 Rules, all three files:
@@ -549,6 +549,14 @@ sill's own idle service, replacing cosmic-idle in a sill session (the user's pic
 | `idle.lock` | `IdleLockAt::{ScreenOff,Never}` | `ScreenOff` |  | sill FINDINGS "sill idle (Q420 B)", F904 | proposed (Q441, 2026-09-27) |
 | `idle.locked_screen_off_s` | `Secs` | `60` | `0..=600`, 0 means the normal time; how soon a locked screen goes dark again | sill FINDINGS "sill idle (Q420 B)", F903 | proposed (Q441, 2026-09-27) |
 
+### 3.25 `keyboard` (sill/settings.toml)
+
+How sill treats the keyboard per app (keycap, the key-cap overlay: which keycap profile an app's keys are drawn with). Page Keyboard and Shortcuts, Advanced (§5).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `keyboard.overrides` | list of tables `{ app, profile }` | empty | one row per app: `app` is the desktop-entry id (`org.gnome.Nautilus`) and `profile` a keycap profile name (`[a-z0-9_-]{1,64}`); an invalid `profile` drops that row at load; beats the entry's `X-Keycap-Profile` and its category; a name keycap does not define resolves to `default` | keycap README "Profiles are open" | proposed (2026-10-01) |
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
@@ -812,6 +820,7 @@ pub struct ShellFile {               // sill/settings.toml
     pub power_menu: PowerMenuSettings,
     pub display: DisplaySettings,
     pub spaces: SpacesSettings,
+    pub keyboard: KeyboardSettings,
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -928,7 +937,7 @@ The derive emits, at build time, `KeySpec` values for every field:
 ```rust
 pub struct KeySpec {
     pub path: KeyPath,            // "dock.magnified_px"
-    pub kind: KeyKind,            // Enum{variants}, Bounded{min,max,unit}, Text, Colour, Shortcut, List(Box<KeyKind>)
+    pub kind: KeyKind,            // Enum{variants}, Bounded{min,max,unit}, Text, Colour, Shortcut, List(Box<KeyKind>), Rows{columns}
     pub default: toml::Value,
     pub label: Label, pub help: Help,
     pub page: Page, pub section: Section,
@@ -952,6 +961,7 @@ Widget by kind, fixed:
 | `Colour` | the appearance picker's swatch row |
 | `Shortcut` | key-capture field |
 | `List` | rows editor |
+| `Rows` | rows editor with one cell per column |
 
 `labels` (`[key.labels]`, word = "Label") is optional and absent from older schemas; a word
 without a label is shown as its own words (`workspace_prev` as "Workspace prev").
@@ -965,6 +975,34 @@ choice between two things, not a switch. The rule and its table test live in det
 `detent-model` (`control.rs`). All widgets are from `04-COMPONENTS.md`; the Settings app has no
 widgets of its own.
 
+A `Vec<T>` field takes its kind from `T`: `Vec<String>` is `List` of `Text`, `Vec<E>` for a
+`Word` enum `E` is `List` of `E`'s kind, and `Vec<R>` for a struct `R` that derives
+`SettingsRow` is `Rows`, a list of tables. The row struct is a plain serde struct; each field
+carries `#[settings(label = "...")]`, and a `String` field may add `pattern = "<regex>"`:
+
+```rust
+#[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize, SettingsRow)]
+pub struct KeyboardOverride {
+    #[settings(label = "App")]
+    pub app: String,
+    #[settings(label = "Profile", pattern = "[a-z0-9_-]{1,64}")]
+    pub profile: String,
+}
+
+pub struct KeyboardSettings {
+    #[settings(label = "Per-app profiles", section = "Profiles", advanced)]
+    pub overrides: Vec<KeyboardOverride>,       // -> Rows { app: text, profile: text(pattern) }
+}
+```
+
+A column is a `String` field (`text`, with its optional `pattern`) or a `Word` enum field
+(`choice`, one word per variant); a row cannot hold rows. A column's `name` is its field's
+name, so a row field carries no `#[serde(rename)]`. `pattern` is data for the Settings app to
+validate an edit with: the whole value must match; the owning program validates the file's
+rows again at load and decides what an invalid row costs (section 2 makes a bad *value* cost
+its key; a program may choose the finer rule of dropping only the row, and its row in section 3
+says so).
+
 ### 9.2 Where the schema lives
 
 The derive's build step writes `target/.../<app-id>.settings.toml` and the package installs it
@@ -974,6 +1012,53 @@ GSettings ships schemas. The file is TOML, one `[[key]]` table per `KeySpec`, pl
 install. quire's own schema (`quire.settings.toml`: the `appearance` and `icons` domains of
 `quire/appearance.toml`) has no app binary, so it is written by the `ds-settings` example
 `write_schema` (`cargo run -p ds-settings --example write_schema -- --write-schema <dir>`). A schema without a program (a stale file) is skipped with a warning.
+
+A `Rows` key is one `[[key]]` table whose `kind` carries one `[[key.kind.v.columns]]` table
+per column (`kind` = `"text"` or `"choice"`; `pattern` is absent when there is none), and whose
+`default` is the list of default rows:
+
+```toml
+[[key]]
+path = "keyboard.overrides"
+label = "Per-app profiles"
+help = ""
+section = "Profiles"
+exposure = "advanced"
+
+[key.kind]
+kind = "rows"
+
+[[key.kind.v.columns]]
+name = "app"
+label = "App"
+
+[key.kind.v.columns.kind]
+kind = "text"
+
+[key.kind.v.columns.kind.v]
+
+[[key.kind.v.columns]]
+name = "profile"
+label = "Profile"
+
+[key.kind.v.columns.kind]
+kind = "text"
+
+[key.kind.v.columns.kind.v]
+pattern = "[a-z0-9_-]{1,64}"
+
+[[key.default]]
+app = "org.gnome.Nautilus"
+profile = "files"
+
+[key.page]
+kind = "keyboard_and_shortcuts"
+```
+
+The `Rows` kind is additive: a schema without one is byte-for-byte what it was, so `version`
+stays 1 (section 2 bumps it for an *incompatible* change only). A Settings app that predates
+`Rows` fails to parse the `kind` of such a key; one that reads keys leniently shows it read-only
+as "edit in settings.toml".
 
 ### 9.3 What the Settings app does
 

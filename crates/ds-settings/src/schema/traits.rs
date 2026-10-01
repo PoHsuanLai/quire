@@ -5,6 +5,7 @@
 use ds_core::word::Word;
 use serde::Serialize;
 
+use super::column::{Column, ColumnKind};
 use super::key::{KeyKind, kind_from_variants};
 use super::program::Schema;
 
@@ -38,6 +39,35 @@ fn stored_words<T: Word + Serialize>() -> Vec<String> {
 /// a colour, a list, a number with `range`) nor a `Word` fails to compile here.
 pub fn kind_of<T: Word + Serialize>() -> KeyKind {
     kind_from_variants(stored_words::<T>())
+}
+
+/// The column kind for a row field whose type is the closed enum `T`: its stored words.
+pub fn choice_of<T: Word + Serialize>() -> ColumnKind {
+    ColumnKind::Choice {
+        variants: stored_words::<T>(),
+    }
+}
+
+/// A struct that is one row of a list-of-tables key. Implemented by `#[derive(SettingsRow)]`,
+/// never by hand (`crates/ds-settings-derive`).
+pub trait SettingsRow {
+    /// One column per field, in declaration order.
+    fn columns() -> Vec<Column>;
+}
+
+/// What `Vec<Self>` is as a settings key: the one seam the struct derive codes against for any
+/// list whose element is not text. A closed [`Word`] enum is a list of that enum's words; a
+/// `SettingsRow` struct is a list of tables. Implemented by `#[derive(SettingsRow)]` for rows
+/// and by the blanket impl for words, never by hand.
+pub trait ListElement {
+    /// The key kind of a `Vec<Self>` field.
+    fn list_kind() -> KeyKind;
+}
+
+impl<T: Word + Serialize> ListElement for T {
+    fn list_kind() -> KeyKind {
+        KeyKind::List(Box::new(kind_of::<T>()))
+    }
 }
 
 /// `value` as the `toml::Value` a `KeySpec::default` holds.

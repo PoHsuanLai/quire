@@ -100,12 +100,13 @@ fn kind_expr(shape: Shape, ty: &syn::Type, unit: Option<&str>) -> TokenStream {
         }
         Shape::Text => quote! { ::ds_settings::schema::KeyKind::Text },
         Shape::Colour => quote! { ::ds_settings::schema::KeyKind::Colour },
+        Shape::TextList => quote! {
+            ::ds_settings::schema::KeyKind::List(::std::boxed::Box::new(
+                ::ds_settings::schema::KeyKind::Text
+            ))
+        },
         Shape::List(inner) => {
-            quote! {
-                ::ds_settings::schema::KeyKind::List(::std::boxed::Box::new(
-                    ::ds_settings::schema::kind_of::<#inner>()
-                ))
-            }
+            quote! { <#inner as ::ds_settings::schema::ListElement>::list_kind() }
         }
         Shape::EnumType => quote! { ::ds_settings::schema::kind_of::<#ty>() },
     }
@@ -160,6 +161,21 @@ mod tests {
             let tokens = expanded(&source).unwrap_or_else(|e| panic!("{field}: {e}"));
             let text = tokens.to_string();
             assert!(text.contains("KeyKind :: Text"), "{field}: {text}");
+        }
+    }
+
+    #[test]
+    fn a_vec_is_a_list_of_text_or_whatever_its_element_says() {
+        const CASES: &[(&str, &str)] = &[
+            ("Vec<String>", "KeyKind :: List"),
+            ("Vec<Row>", "ListElement > :: list_kind"),
+        ];
+        for (ty, want) in CASES {
+            let source = format!("{HEAD} struct S {{ #[settings(label = \"L\")] f: {ty} }}");
+            let text = expanded(&source)
+                .unwrap_or_else(|e| panic!("{ty}: {e}"))
+                .to_string();
+            assert!(text.contains(want), "{ty}: {text}");
         }
     }
 
