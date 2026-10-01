@@ -75,6 +75,8 @@
 .ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }
 .ds-row-spin{ display:flex; align-items:center; justify-content:center; }
+/* The busy spinner fades in over --t-quick instead of popping (design/30 section 2.9). */
+.ds-row-spin[*|data-fade=in]{ animation:fade var(--t-quick) var(--e-out); }
 .ds-row-trailing[*|data-mark=text]{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
 .ds-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
 .ds-row-when{ display:inline-block; flex:none; margin-left:auto; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }

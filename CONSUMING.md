@@ -641,7 +641,7 @@ Full catalogue (design doc section in parentheses):
 | --- | --- |
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure, search and multi-line), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
-| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow) |
+| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow), `Skeleton`/`SkeletonRow` (static placeholders), `Loadable` (placeholder, content or failure by phase) |
 | Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
@@ -674,6 +674,31 @@ A few props worth knowing about before you read the signatures:
 - `PinFace::Account` has an `address: Option<String>` field — a `PinTile`'s accessible name falls
   back to its letter and provider without one; pass the account's address when you have it.
   (A selection bubble is a context menu.)
+
+Loading, failing and arriving (design/30 §2.9; all in `ds::prelude`, none moves except through the
+motion machinery, so Reduced is automatic):
+
+- `Loadable { phase, placeholder, onretry, children }` is the one place that picks what a pane
+  shows: `Phase::Loading(Operation)` draws `placeholder` (default: a centred `ProgressIndicator`
+  Spinner, Regular, which turns only while the `Operation` is `Running`: Rule 4's R4 lives in the
+  indicator), `Phase::Ready` draws `children`, `Phase::Failed { title, description }` draws an
+  `EmptyState` of form `Failure`, with Retry when `onretry` is given. A change of phase *kind* fades the
+  arriving layer in over `--t-quick`; a new `Operation` or a new title plays nothing. The root is
+  `aria-busy` while loading and a `region` when `common.aria_label` names it. Start the operation
+  in the handler that began the work (`Operation::Running(PendingToken::start())`), never in render.
+- `SkeletonRow { lines: SkeletonLines::{One, Two}, shown, on_hidden }` is a placeholder list row (avatar
+  circle, a wider title bar, a shorter second bar) at a settings row's height; pass several as a
+  `Loadable`'s `placeholder`. Static, no shimmer, like `Skeleton { shape: SkeletonShape::{Line, Block, Circle}, .. }`;
+  both fade in over `--t-quick` and, when `shown` goes `Hidden`, fade out and call `on_hidden` once
+  they have settled.
+- `InlineBanner` takes `shown: Shown` (default `Visible`, so an existing banner is unchanged) and
+  `on_hidden: Option<EventHandler<()>>`. Shown after being hidden, it fades in over `--t-quick` while
+  its height opens over `--t-move` and what is under it slides down; hidden, it fades out while its
+  height closes, and `on_hidden` runs once, when it has settled: drop the banner there. A show while
+  it closes takes the hide back. Under Reduced the height snaps and it cross-fades. Keep it mounted
+  and drive `shown` rather than wrapping it in an `if`, or there is nothing to animate out.
+- A `Button` or `Row` with `Availability::Busy` fades its spinner in over `--t-quick` (`data-fade="in"`
+  on `.ds-button-lead` and `.ds-row-spin`); nothing to wire.
 
 Anchors, hover-card parts and undo:
 

@@ -123,6 +123,17 @@ fn a_busy_button_shows_a_spinner_and_takes_no_press() {
         harness.attr("#button .ds-button", "aria-busy").as_deref(),
         Some("true")
     );
+    // The spinner fades in over --t-quick (design/30 section 2.9) rather than popping.
+    assert_eq!(
+        harness
+            .attr("#button .ds-button-lead", "data-fade")
+            .as_deref(),
+        Some("in")
+    );
+    assert!(
+        ds::stylesheet().contains(".ds-button-lead[*|data-fade=in]{ animation:fade var(--t-quick)"),
+        "the stylesheet fades it in over --t-quick"
+    );
     let at = harness.centre("#button .ds-button").expect("the button");
     harness.send(Input::click(at));
     harness.send(Input::key(ShortcutKey::Enter));

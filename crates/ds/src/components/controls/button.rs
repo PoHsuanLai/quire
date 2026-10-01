@@ -150,7 +150,7 @@ pub fn Button(
             // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
             if availability == Availability::Busy {
-                span { class: "ds-button-lead",
+                span { class: "ds-button-lead", "data-fade": "in",
                     ProgressIndicator {
                         style: ProgressStyle::Spinner,
                         progress: Progress::Unknown(operation),

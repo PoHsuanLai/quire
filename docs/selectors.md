@@ -25,12 +25,13 @@ re-theme every surface consistently, and every token variable
 | EmptyState | `.ds-empty-state` | `.ds-empty-state-icon`, `.ds-empty-state-title`, `.ds-empty-state-body`, `.ds-empty-state-action` |
 | FactList | `.ds-fact-list` | `.ds-fact-list-item`, `.ds-fact-list-label`, `.ds-fact-list-value` |
 | HoverCard | `.ds-hovercard` | `.ds-hovercard-body` |
-| InlineBanner | `.ds-inline-banner` | `.ds-inline-banner-icon`, `.ds-inline-banner-body`, `.ds-inline-banner-actions` |
+| InlineBanner | `.ds-inline-banner` | `.ds-inline-banner-frame`, `.ds-inline-banner-icon`, `.ds-inline-banner-body`, `.ds-inline-banner-actions` |
 | KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
 | Label | `.ds-label` | none yet |
 | LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |
 | Disclosure | `.ds-disclosure` | `.ds-disclosure-indicator`, `.ds-disclosure-body` |
 | List | `.ds-list` | `.ds-list-item` |
+| Loadable | `.ds-loadable` | `.ds-loadable-layer`, `.ds-loadable-spin` |
 | Menu | `.ds-menu` | `.ds-menu-item`, `.ds-menu-separator`, `.ds-menu-header` |
 | Popover | `.ds-popover` | `.ds-popover-body`, `.ds-popover-arrow` |
 | ProgressIndicator | `.ds-progress` | `.ds-progress-track`, `.ds-progress-fill`, `.ds-progress-indicator`, `.ds-progress-glyph` |
@@ -42,6 +43,7 @@ re-theme every surface consistently, and every token variable
 | Sheet | `.ds-sheet` | `.ds-sheet-body` |
 | SidePanel | `.ds-side-panel` | `.ds-side-panel-header`, `.ds-side-panel-body` |
 | Skeleton | `.ds-skeleton` | none yet |
+| SkeletonRow | `.ds-skeleton-row` | `.ds-skeleton-row-lines` |
 | Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb`, `.ds-slider-icon`, `.ds-slider-tick` |
 | TextField | `.ds-text-field` | `.ds-text-field-frame`, `.ds-text-field-icon`, `.ds-text-field-suffix`, `.ds-text-field-help`, `.ds-text-field-tokens` |
 | Toast | `.ds-toast` | `.ds-toast-body`, `.ds-toast-action` |

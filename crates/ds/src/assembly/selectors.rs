@@ -103,7 +103,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "InlineBanner",
         root: "ds-inline-banner",
-        parts: &["icon", "body", "actions"],
+        parts: &["frame", "icon", "body", "actions"],
     },
     ComponentSelectors {
         component: "KeyEquivalent",
@@ -129,6 +129,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         component: "List",
         root: "ds-list",
         parts: &["item"],
+    },
+    ComponentSelectors {
+        component: "Loadable",
+        root: "ds-loadable",
+        parts: &["layer", "spin"],
     },
     ComponentSelectors {
         component: "Menu",
@@ -184,6 +189,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         component: "Skeleton",
         root: "ds-skeleton",
         parts: &[],
+    },
+    ComponentSelectors {
+        component: "SkeletonRow",
+        root: "ds-skeleton-row",
+        parts: &["lines"],
     },
     ComponentSelectors {
         component: "Slider",

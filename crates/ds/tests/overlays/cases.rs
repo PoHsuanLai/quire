@@ -860,6 +860,56 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Skeleton { shown: Shown::Hidden } },
         wait: NOW,
     },
+    Case {
+        component: "inline_banner",
+        state: "hidden",
+        make: || rsx! { InlineBanner { text: "Remote images are blocked.", shown: Shown::Hidden } },
+        wait: NOW,
+    },
+    // SkeletonRow: two lines, one line, and hidden.
+    Case {
+        component: "skeleton_row",
+        state: "two-lines",
+        make: || rsx! { SkeletonRow {} },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton_row",
+        state: "one-line",
+        make: || rsx! { SkeletonRow { lines: SkeletonLines::One } },
+        wait: NOW,
+    },
+    Case {
+        component: "skeleton_row",
+        state: "hidden",
+        make: || rsx! { SkeletonRow { shown: Shown::Hidden } },
+        wait: NOW,
+    },
+    // Loadable: each phase (loading draws no spinner while the operation is idle).
+    Case {
+        component: "loadable",
+        state: "loading-idle",
+        make: || rsx! { Loadable { phase: Phase::Loading(Operation::Idle), p { "Content" } } },
+        wait: NOW,
+    },
+    Case {
+        component: "loadable",
+        state: "ready",
+        make: || rsx! { Loadable { phase: Phase::Ready, p { "Content" } } },
+        wait: NOW,
+    },
+    Case {
+        component: "loadable",
+        state: "failed-retry",
+        make: || rsx! { Loadable { phase: Phase::Failed { title: "Couldn’t load".to_owned(), description: Some("The server didn’t answer.".into()) }, onretry: |_| {}, p { "Content" } } },
+        wait: NOW,
+    },
+    Case {
+        component: "loadable",
+        state: "custom-placeholder",
+        make: || rsx! { Loadable { phase: Phase::Loading(Operation::Idle), placeholder: Some(rsx! { SkeletonRow {} }), p { "Content" } } },
+        wait: NOW,
+    },
     // SidePanel: shown, with a header, and mounted hidden.
     Case {
         component: "side_panel",

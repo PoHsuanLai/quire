@@ -129,6 +129,15 @@ fn working_puts_a_spinner_where_the_lock_was_at_once_and_it_turns_until_the_work
         harness.attr("#net .ds-row", "aria-busy").as_deref(),
         Some("true")
     );
+    // The spinner fades in over --t-quick (design/30 section 2.9) rather than popping.
+    assert_eq!(
+        harness.attr("#net .ds-row-spin", "data-fade").as_deref(),
+        Some("in")
+    );
+    assert!(
+        ds::stylesheet().contains(".ds-row-spin[*|data-fade=in]{ animation:fade var(--t-quick)"),
+        "the stylesheet fades it in over --t-quick"
+    );
     // Ten seconds on it still turns: there is no cap.
     harness.advance(ms(10_000));
     assert_eq!(

@@ -16,3 +16,13 @@
 .ds-inline-banner-icon{ display:inline-flex; flex:none; line-height:0; color:var(--banner-mark); }
 .ds-inline-banner-body{ display:flex; flex-direction:column; flex:1 1 12em; min-width:0; gap:var(--s-1); }
 .ds-inline-banner-actions{ display:flex; flex:none; align-items:center; gap:var(--s-6); }
+
+/* Presence (design/30 sections 1.3 and 2.9): the frame carries the height (Rust, `use_collapse`,
+   over `--t-move`); the banner fades in over `--t-quick` (`fade`, as `PaletteFade`) and out over
+   `--t-move` (`osd-out`, as `Exit::OsdOut`), holding its last frame until it is dropped. Under
+   Reduced the same keyframes run on the reduced tokens and the height snaps. */
+.ds-inline-banner-frame{ display:block; width:100%; }
+.ds-inline-banner[*|data-presence=entering],.ds-inline-banner[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-inline-banner[*|data-presence=entering][*|data-pulse=b],.ds-inline-banner[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds-inline-banner[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-inline-banner[*|data-presence=leaving]{ animation:osd-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }

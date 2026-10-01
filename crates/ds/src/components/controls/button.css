@@ -60,6 +60,9 @@
 .ds-button-icon{ display:inline-flex; align-items:center; line-height:0; flex:none; }
 .ds-button-label{ min-width:0; }
 .ds-button-lead{ display:inline-flex; align-items:center; line-height:0; flex:none; }
+/* The busy spinner fades in over --t-quick instead of popping (design/30 section 2.9); it mounts
+   with the element, so the keyframe plays once, from the first frame. */
+.ds-button-lead[*|data-fade=in]{ animation:fade var(--t-quick) var(--e-out); }
 .ds-button-trail{ display:inline-flex; line-height:0; opacity:.7; }
 
 /* Disabled: .35, no pointer at all, so no hover or press matches. Busy: no input, the
