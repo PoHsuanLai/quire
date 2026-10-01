@@ -1,10 +1,12 @@
 /* Loadable (design/30 sections 1.3 and 2.9): a column that fills its container and holds one
-   layer, the placeholder, the content or the failure. A layer that arrives on a change of phase
-   fades in over `--t-quick` (`fade`: it mounts with the element, which Blitz plays reliably).
-   The default placeholder is a spinner centred in the layer. */
+   layer, the placeholder, the content or the failure. The layer that arrives on a change of phase
+   plays the cross-fade primitive's `a-morph-fade-in` (`--t-quick`, from Rust: `use_cross_fade`;
+   nothing under Reduced). A custom placeholder that is still passed leaves over the arriving
+   layer by `menu-out` (`--t-quick`, `--e-exit`), then it is dropped. The default placeholder is a
+   spinner centred in the layer. */
 
-.ds-loadable{ display:flex; flex-direction:column; flex:1 1 auto; box-sizing:border-box; width:100%; min-height:0; }
+.ds-loadable{ position:relative; display:flex; flex-direction:column; flex:1 1 auto; box-sizing:border-box; width:100%; min-height:0; }
 .ds-loadable-layer{ display:flex; flex-direction:column; flex:1 1 auto; min-height:0; }
 .ds-loadable-layer[*|data-kind=ready]{ display:block; }
-.ds-loadable-layer[*|data-enter=fade]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-loadable-layer[*|data-presence=leaving]{ position:absolute; top:0; left:0; right:0; bottom:0; animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-loadable-spin{ display:flex; flex:1 1 auto; align-items:center; justify-content:center; padding:var(--s-22); }

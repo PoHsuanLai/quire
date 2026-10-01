@@ -1,11 +1,14 @@
 //! `Loadable` on a real Blitz document, on the virtual clock (design/30 sections 1.3 and 2.9): it
 //! draws the placeholder while `Loading` (the default spinner turns only while the `Operation`
 //! runs: R4), the children when `Ready`, and a Failure `EmptyState` whose Retry calls the
-//! caller's handler when `Failed`; a change of phase kind fades the arriving layer in
-//! (`data-enter="fade"`), and nothing else does: not the first render, not a new operation.
+//! caller's handler when `Failed`; a change of phase kind cross-fades the arriving layer in with
+//! the primitive's `a-morph-fade-in` and nothing else does (not the first render, not a new
+//! operation), a custom placeholder leaves by its own fade and is then dropped, and under
+//! Reduced the swap is at once (R7).
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -16,9 +19,12 @@ const VIEW: Viewport = Viewport {
 };
 
 static PHASE: GlobalSignal<Phase> = Signal::global(|| Phase::Loading(Operation::default()));
+static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
+static ACTION: GlobalSignal<bool> = Signal::global(|| false);
 static CUSTOM: GlobalSignal<bool> = Signal::global(|| false);
 thread_local! {
     static RETRIES: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
+    static DOCTOR: std::cell::Cell<u32> = const { std::cell::Cell::new(0) };
 }
 
 fn ms(n: u64) -> Duration {
@@ -28,12 +34,18 @@ fn ms(n: u64) -> Duration {
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let placeholder = CUSTOM().then(|| rsx! { SkeletonRow {} });
+    let action = ACTION().then(|| {
+        rsx! {
+            Button { label: "Connection Doctor\u{2026}", onclick: move |_| DOCTOR.set(DOCTOR.get() + 1) }
+        }
+    });
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { appearance: Appearance { motion: MOTION(), ..Appearance::default() }, material: Material::Window,
             div { style: "width:340px;height:240px;display:flex",
                 Loadable {
                     phase: PHASE(),
                     placeholder,
+                    action,
                     onretry: move |()| RETRIES.set(RETRIES.get() + 1),
                     p { id: "content", "Hello" }
                 }
@@ -131,36 +143,111 @@ fn the_spinner_turns_only_while_the_operation_runs() {
     );
 }
 
+fn fading(harness: &Harness, layer: &str) -> bool {
+    harness
+        .attr(layer, "class")
+        .is_some_and(|class| class.contains("a-morph-fade-in"))
+}
+
 #[test]
-fn a_change_of_kind_fades_the_arriving_layer_in_and_nothing_else_does() {
+fn a_change_of_kind_cross_fades_the_arriving_layer_in_and_nothing_else_does() {
     let mut harness = harness();
-    assert_eq!(
-        harness.attr(".ds-loadable-layer", "data-enter"),
-        None,
+    assert!(
+        !fading(&harness, ".ds-loadable-layer"),
         "the first render plays nothing"
     );
     go(&mut harness, running());
     go(&mut harness, running());
-    assert_eq!(
-        harness.attr(".ds-loadable-layer", "data-enter"),
-        None,
+    assert!(
+        !fading(&harness, ".ds-loadable-layer"),
         "a new operation of the same kind plays nothing"
     );
     go(&mut harness, Phase::Ready);
-    assert_eq!(
-        harness.attr(".ds-loadable-layer", "data-enter").as_deref(),
-        Some("fade")
+    assert!(
+        fading(&harness, ".ds-loadable-layer[data-kind=ready]"),
+        "the primitive's fade, on the arriving layer"
     );
+    assert_eq!(harness.attr(".ds-loadable-layer", "data-enter"), None);
+    settle_until(&mut harness, |h| {
+        !fading(h, ".ds-loadable-layer[data-kind=ready]")
+    });
     go(&mut harness, failed());
-    assert_eq!(
-        harness.attr(".ds-loadable-layer", "data-enter").as_deref(),
-        Some("fade")
+    assert!(fading(&harness, ".ds-loadable-layer[data-kind=failed]"));
+    settle_until(&mut harness, |h| {
+        !fading(h, ".ds-loadable-layer[data-kind=failed]")
+    });
+    go(&mut harness, failed());
+    assert!(
+        !fading(&harness, ".ds-loadable-layer"),
+        "a new title of the same kind plays nothing"
     );
-    harness.advance(settle(Anim::MorphFadeIn, MotionLevel::Standard) + ms(50));
-    assert_eq!(
-        harness.attr(".ds-loadable-layer", "data-kind").as_deref(),
-        Some("failed")
+    go(&mut harness, running());
+    assert!(
+        fading(&harness, ".ds-loadable-layer[data-kind=loading]"),
+        "the placeholder arriving fades in too"
     );
+    go(&mut harness, Phase::Loading(Operation::Idle));
+    assert_settles_to_zero_frames(&mut harness);
+}
+
+#[test]
+fn under_reduced_the_swap_is_the_final_state_at_once() {
+    let mut harness = harness();
+    harness.within(|| {
+        *MOTION.write() = Motion::Reduced;
+        *CUSTOM.write() = true;
+    });
+    go(&mut harness, running());
+    go(&mut harness, Phase::Ready);
+    assert!(
+        !fading(&harness, ".ds-loadable-layer"),
+        "nothing fades in under Reduced (R7)"
+    );
+    assert_eq!(harness.text_of("#content").as_deref(), Some("Hello"));
+    assert_eq!(
+        harness.count(".ds-skeleton-row"),
+        0,
+        "the placeholder goes at once"
+    );
+    assert_eq!(harness.count(".ds-loadable-layer"), 1);
+    assert_settles_to_zero_frames(&mut harness);
+}
+
+#[test]
+fn a_custom_placeholder_fades_out_over_the_arriving_layer_and_is_then_dropped() {
+    let mut harness = harness();
+    harness.within(|| *CUSTOM.write() = true);
+    go(&mut harness, running());
+    settle_until(&mut harness, |h| {
+        h.attr(".ds-skeleton-row", "data-presence").as_deref() == Some("present")
+    });
+    go(&mut harness, Phase::Ready);
+    assert_eq!(harness.text_of("#content").as_deref(), Some("Hello"));
+    assert_eq!(
+        harness.count(".ds-loadable-layer[data-presence=leaving] .ds-skeleton-row"),
+        1,
+        "the placeholder is still drawn, leaving"
+    );
+    assert_eq!(
+        harness.attr(".ds-skeleton-row", "data-presence").as_deref(),
+        Some("present"),
+        "the same rows, not a new set playing their entrance again"
+    );
+    assert_eq!(harness.count(".ds-loadable-layer"), 2);
+    harness.advance(settle(Anim::MenuOut, MotionLevel::Standard) + ms(20));
+    assert_eq!(harness.count(".ds-skeleton-row"), 0, "dropped once faded");
+    assert_eq!(harness.count(".ds-loadable-layer"), 1);
+    assert_eq!(harness.text_of("#content").as_deref(), Some("Hello"));
+    assert_settles_to_zero_frames(&mut harness);
+}
+
+#[test]
+fn the_default_spinner_is_replaced_by_the_arriving_layer() {
+    let mut harness = harness();
+    go(&mut harness, running());
+    go(&mut harness, Phase::Ready);
+    assert_eq!(harness.count(".ds-progress"), 0);
+    assert_eq!(harness.count(".ds-loadable-layer"), 1);
 }
 
 #[test]
@@ -183,4 +270,36 @@ fn a_placeholder_of_the_callers_replaces_the_spinner() {
     go(&mut harness, running());
     assert_eq!(harness.count(".ds-loadable .ds-skeleton-row"), 1);
     assert_eq!(harness.count(".ds-loadable .ds-progress"), 0);
+}
+
+#[test]
+fn the_failure_layer_takes_the_callers_action_beside_retry() {
+    RETRIES.set(0);
+    DOCTOR.set(0);
+    let mut harness = harness();
+    go(&mut harness, failed());
+    assert_eq!(
+        harness.count(".ds-empty-state-action .ds-button"),
+        1,
+        "Retry alone without an action"
+    );
+    harness.within(|| *ACTION.write() = true);
+    go(&mut harness, failed());
+    assert_eq!(
+        harness.count(".ds-loadable-layer[data-kind=failed] .ds-empty-state-action .ds-button"),
+        2,
+        "the caller's button and Retry"
+    );
+    let doctor = harness
+        .centre(".ds-empty-state-action .ds-button")
+        .expect("the caller's button, drawn first");
+    harness.send(Input::click(doctor));
+    harness.advance(ms(20));
+    assert_eq!((DOCTOR.get(), RETRIES.get()), (1, 0));
+    let retry = harness
+        .centre(".ds-empty-state-action .ds-button:last-child")
+        .expect("Retry");
+    harness.send(Input::click(retry));
+    harness.advance(ms(20));
+    assert_eq!((DOCTOR.get(), RETRIES.get()), (1, 1));
 }

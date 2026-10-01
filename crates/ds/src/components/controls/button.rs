@@ -17,7 +17,7 @@ use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
     ActivationKeys, PressListeners, Propagation, disabled, use_pressing,
 };
-use crate::components::controls::progress::busy::use_busy;
+use crate::components::controls::progress::busy::{busy_class, use_busy, use_busy_seen};
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::root::common::Common;
@@ -82,7 +82,8 @@ pub fn Button(
     #[props(default)] propagation: Propagation,
     #[props(default)] common: Common,
 ) -> Element {
-    let class = common.class("ds-button");
+    let seen = use_busy_seen(availability);
+    let class = busy_class(common.class("ds-button"), seen);
     let data = common.data_attributes();
     let spoken = match (bezel, image) {
         (Bezel::Help, _) | (_, ImagePosition::Only) => Some(label.plain_text()),
@@ -150,7 +151,7 @@ pub fn Button(
             // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
             if availability == Availability::Busy {
-                span { class: "ds-button-lead", "data-fade": "in",
+                span { class: "ds-button-lead",
                     ProgressIndicator {
                         style: ProgressStyle::Spinner,
                         progress: Progress::Unknown(operation),

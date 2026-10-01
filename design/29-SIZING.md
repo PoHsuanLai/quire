@@ -409,7 +409,8 @@ lint (`Rule::RawControlHeight`).
   24, `--bar-status-w` 30, `--r-shell-menu` 8, `--shell-menu-inset` 5) and `ControlCenterScale`
   (`--cc-width` 320, `--cc-pad` 10, `--cc-gap` 10, `--cc-module-r` 8, `--cc-panel-r` 18,
   `--cc-tile-h` 56, `--cc-head` 16, `--cc-head-gap` 6, `--cc-level-h` 64) are the Rust values
-  sill's size estimates should read (R9).
+  sill's size estimates should read (R9). The list row's fixed sizes are `RowScale` in `ds-style`
+  (`--row-settings-h` 44, `--row-avatar` 34), read by `Row` and `SkeletonRow`.
 - Where the build departs from section 7's table: the Small slider knob is 14 (the rule
   `h - 2`; the table said 16); push buttons keep radius 5 at Large as the reference's templates do
   (the ladder's Large radius 6 is for other rounded rectangles); Mini is the ladder's Small (16)

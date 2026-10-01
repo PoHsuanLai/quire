@@ -163,36 +163,33 @@ pub fn OverlaysCataloguePage() -> Element {
             }
         }
         SkeletonCase {}
-        BannerPresenceCase {}
+        BannerShownCase {}
         LoadableCase {}
     }
 }
 
-/// A banner that comes and goes with `shown`: it fades in while its height opens, so the text
-/// under it slides down, and out while it closes; `on_hidden` is counted.
+/// A banner switched in and out with `shown`: it appears and disappears in place, as Mail's
+/// remote-content bar does, and the text under it moves with it at once.
 #[component]
-fn BannerPresenceCase() -> Element {
+fn BannerShownCase() -> Element {
     let mut shown = use_signal(|| Shown::Visible);
-    let mut hidden = use_signal(|| 0u32);
     rsx! {
-        Section { title: "InlineBanner, shown and hidden", note: "InlineBanner {{ shown, on_hidden }}: shown, it fades in over --t-quick while its height opens over --t-move and what is under it slides down; hidden, it fades out and closes, and on_hidden runs once it has settled. Under Reduced the height snaps and it cross-fades.",
+        Section { title: "InlineBanner, shown and hidden", note: "InlineBanner {{ shown }}: static, as Mail's remote-content bar is. Visible (the default) draws it in the flow; Hidden draws nothing, and what is under it takes its place at once. There is no motion either way.",
             div { class: "g-row",
                 Button {
                     label: "Show / hide",
                     onclick: move |_| shown.set(match shown() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
                 }
-                span { class: "g-note", "on_hidden fired {hidden} time(s)" }
             }
-            Specimen { name: "shown, on_hidden".to_string(), code: Some("shown: Shown, on_hidden".to_string()),
+            Specimen { name: "shown".to_string(), code: Some("shown: Shown".to_string()),
                 div { style: "width:440px",
                     InlineBanner {
                         severity: Severity::Info,
                         text: "Remote images are blocked.",
                         detail: "Loading them tells the sender you opened this.",
                         shown: shown(),
-                        on_hidden: move |()| hidden += 1,
                     }
-                    p { class: "g-note", style: "padding:8px 12px", "The message starts here and slides down as the banner opens." }
+                    p { class: "g-note", style: "padding:8px 12px", "The message starts here and moves up when the banner goes." }
                 }
             }
         }
@@ -216,7 +213,7 @@ fn LoadableCase() -> Element {
         phase.set(next);
     };
     rsx! {
-        Section { title: "Loadable and SkeletonRow", note: "Loadable {{ phase, placeholder, onretry }}: the placeholder while Loading (a centred spinner that turns only while the Operation runs, or your own), the children when Ready, a Failure EmptyState with Retry when Failed. A change of phase fades the arriving layer in over --t-quick. SkeletonRow {{ lines }} is a static avatar and one or two bars at a settings row's size.",
+        Section { title: "Loadable and SkeletonRow", note: "Loadable {{ phase, placeholder, onretry }}: the placeholder while Loading (a centred spinner that turns only while the Operation runs, or your own), the children when Ready, a Failure EmptyState with Retry (and your own `action` beside it) when Failed. A change of phase cross-fades the arriving layer in over --t-quick (the section 1.3 primitive; it snaps under Reduced), and a skeleton placeholder fades out over it before it is dropped. SkeletonRow {{ lines }} is a static avatar and one or two bars at a settings row's size (--row-settings-h, --row-avatar).",
             div { class: "g-row",
                 Button { label: "Next phase", onclick: next }
             }
@@ -226,6 +223,7 @@ fn LoadableCase() -> Element {
                         Loadable {
                             phase: phase(),
                             onretry: move |()| phase.set(Phase::Loading(Operation::Running(PendingToken::start()))),
+                            action: Some(rsx! { Button { label: "Connection Doctor\u{2026}", onclick: |_| {} } }),
                             p { class: "g-note", style: "padding:12px", "The folder's contents." }
                         }
                     }

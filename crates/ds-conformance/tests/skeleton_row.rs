@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::tokens::row_scale::ROW_SCALE;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
@@ -31,6 +32,9 @@ fn Page() -> Element {
                 div { id: "one",
                     SkeletonRow { lines: SkeletonLines::One }
                 }
+                div { id: "real",
+                    Row { leading: RowLeading::Text("AB".to_owned()), title: "Alex", size: ds::components::lists::row::size::RowSize::Settings }
+                }
             }
         }
     }
@@ -50,8 +54,8 @@ fn it_draws_an_avatar_and_a_wide_and_a_short_bar_at_a_rows_height() {
     assert_eq!(harness.count("#one .ds-skeleton[data-shape=line]"), 1);
     let row = harness.rect("#two .ds-skeleton-row").expect("the row");
     assert!(
-        row.size.height.0 >= 43.5,
-        "a settings row's height: {row:?}"
+        (row.size.height.0 - f32::from(ROW_SCALE.settings_height.0)).abs() < 0.5,
+        "the settings row's token height: {row:?}"
     );
     let lines = harness
         .rect("#two .ds-skeleton-row-lines > .ds-skeleton:first-child")
@@ -69,6 +73,18 @@ fn it_draws_an_avatar_and_a_wide_and_a_short_bar_at_a_rows_height() {
     assert!(
         (circle.size.width.0 - circle.size.height.0).abs() < 0.5,
         "round: {circle:?}"
+    );
+    assert!(
+        (circle.size.width.0 - f32::from(ROW_SCALE.avatar.0)).abs() < 0.5,
+        "the row avatar's token size: {circle:?}"
+    );
+    let column = harness
+        .rect("#two .ds-skeleton-row-lines")
+        .expect("the text column");
+    assert!(
+        (lines.size.width.0 / column.size.width.0 - 0.62).abs() < 0.01
+            && (detail.size.width.0 / column.size.width.0 - 0.38).abs() < 0.01,
+        "the preset's proportions, 62% and 38% of the column: {lines:?} {detail:?} {column:?}"
     );
     assert_eq!(
         harness
@@ -99,4 +115,29 @@ fn hidden_it_fades_and_on_hidden_runs_once_after_it_settles() {
         1,
         "its sibling stays"
     );
+}
+
+#[test]
+fn it_is_as_tall_as_the_row_it_stands_for_both_reading_the_row_tokens() {
+    let harness = harness();
+    let real = harness.rect("#real .ds-row").expect("the row");
+    let skeleton = harness.rect("#two .ds-skeleton-row").expect("the skeleton");
+    assert!((real.size.height.0 - skeleton.size.height.0).abs() < 0.5);
+    let mark = harness.rect("#real .ds-row-leading").expect("the leading");
+    let circle = harness
+        .rect("#two .ds-skeleton[data-shape=circle]")
+        .expect("the avatar");
+    assert!((mark.size.width.0 - circle.size.width.0).abs() < 0.5);
+    assert!((mark.size.height.0 - f32::from(ROW_SCALE.avatar.0)).abs() < 0.5);
+    let css = ds::stylesheet();
+    assert!(css.contains("--row-settings-h:44px") && css.contains("--row-avatar:34px"));
+    for sheet in [
+        include_str!("../../ds/src/components/lists/row/row.css"),
+        include_str!("../../ds/src/components/overlays/skeleton_row.css"),
+    ] {
+        assert!(
+            !sheet.contains("44px") && !sheet.contains("34px"),
+            "neither sheet restates the settings row's size: both read the row tokens"
+        );
+    }
 }

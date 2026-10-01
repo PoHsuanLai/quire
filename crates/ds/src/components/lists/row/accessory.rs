@@ -77,12 +77,12 @@ impl Accessory {
 }
 
 /// The small spinner: it turns from the moment it is drawn, which is the moment the work it
-/// stands for is shown, and it fades in over `--t-quick` (`data-fade="in"`, design/30 section 2.9).
+/// stands for is shown, and it fades in over `--t-quick` (`row.css`, design/30 section 2.9).
 #[component]
 fn Busy() -> Element {
     let operation = use_hook(|| Operation::Running(PendingToken::start()));
     rsx! {
-        span { class: "ds-row-spin", "data-fade": "in", ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(operation), size: ControlSize::Mini } }
+        span { class: "ds-row-spin", ProgressIndicator { style: ProgressStyle::Spinner, progress: Progress::Unknown(operation), size: ControlSize::Mini } }
     }
 }
 

@@ -25,7 +25,7 @@ re-theme every surface consistently, and every token variable
 | EmptyState | `.ds-empty-state` | `.ds-empty-state-icon`, `.ds-empty-state-title`, `.ds-empty-state-body`, `.ds-empty-state-action` |
 | FactList | `.ds-fact-list` | `.ds-fact-list-item`, `.ds-fact-list-label`, `.ds-fact-list-value` |
 | HoverCard | `.ds-hovercard` | `.ds-hovercard-body` |
-| InlineBanner | `.ds-inline-banner` | `.ds-inline-banner-frame`, `.ds-inline-banner-icon`, `.ds-inline-banner-body`, `.ds-inline-banner-actions` |
+| InlineBanner | `.ds-inline-banner` | `.ds-inline-banner-icon`, `.ds-inline-banner-body`, `.ds-inline-banner-actions` |
 | KeyEquivalent | `.ds-key-equivalent` | `.ds-key-equivalent-key` |
 | Label | `.ds-label` | none yet |
 | LevelIndicator | `.ds-level-indicator` | `.ds-level-indicator-track`, `.ds-level-indicator-fill`, `.ds-level-indicator-icon` |

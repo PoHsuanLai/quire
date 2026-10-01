@@ -54,6 +54,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/tokens/timing.rs`, `ds-style/tokens/delay.rs` | 05-MOTION §3.1-3.4, §7.2 (`DurationToken`; `DelayToken`, the timer and delay lengths) |
 | `ds-style/tokens/easing.rs` | 05-MOTION §3.1-3.3 |
 | `ds-style/tokens/shape.rs` | 01-LAYOUT §10 |
+| `ds-style/tokens/row_scale.rs` | 30 §1.6 (the settings row's 44 height and 34 avatar as `--row-settings-h` and `--row-avatar`, emitted on `.ds` with the ladder; `Row` and `SkeletonRow` both read them) |
 | `ds-style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
 | `ds-style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `ds-style/scale.rs`, `ds-style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_blitz::snap` |
 | `ds-style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
@@ -124,7 +125,7 @@ with its model, parts, mask, area (the multi-line `textarea`) and focus files): 
 `menu` and `menu_entry` §20 (with `menu_lines`, `menu_keys`, `menu_rows`, `menu_match`,
 `menu_tracker` and `menu_panel`: the choices and keyboard as pure tables, the row drawing, the
 fuzzy matcher, the `MenuTrack` effects and the panel a menu and its `SubMenu`s share; 13 §13.3.3-13.3.4),
-`popover` §21 (with `Arrow` and the `Dismiss` policy; `use_float` places every floating surface), `hover_card` §22 (`Standing`: a card kind, a tip or a label), `tooltip` §18 (`Tooltip` and `Hint`, the one implementation the shell's `DockLabel` shares), `toast` §23 (with `toast_swipe`), `alert` and `alert_model` §55, `sheet` (`Attach`, `SheetWidth`), `side_panel` (design/20 §1.6), `empty_state`, `inline_banner` (`InlineBanner`, in a pane's flow, with presence and a collapsing height), `loadable` (`Loadable` and `Phase`: placeholder, content or Failure by phase) and `skeleton` with `skeleton_row` (design/30 §2.9), `scrim` (the peek's own button only) and
+`popover` §21 (with `Arrow` and the `Dismiss` policy; `use_float` places every floating surface), `hover_card` §22 (`Standing`: a card kind, a tip or a label), `tooltip` §18 (`Tooltip` and `Hint`, the one implementation the shell's `DockLabel` shares), `toast` §23 (with `toast_swipe`), `alert` and `alert_model` §55, `sheet` (`Attach`, `SheetWidth`), `side_panel` (design/20 §1.6), `empty_state`, `inline_banner` (`InlineBanner`, in a pane's flow, static), `loadable` (`Loadable` and `Phase`: placeholder, content or Failure by phase) and `skeleton` with `skeleton_row` (design/30 §2.9), `scrim` (the peek's own button only) and
 `peek` §24, `command_palette` §25, `appearance_picker` §26, `pin_tile`, `pin_tiles` and `pin_order` (design/30 §2.11; the old `account_tile` §27),
 `provider_mark` §28, `palette_lines`, `palette_select` and `palette_rows` (§25's pure lines, the
 selection, its own or the caller's, and the selected row's rect; FINDINGS "Launcher gaps"), `link_pill` §29, `icon_view` (08-ICONS §1.5: any icon slot's content),

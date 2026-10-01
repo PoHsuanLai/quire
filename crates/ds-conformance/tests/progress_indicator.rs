@@ -4,6 +4,7 @@
 //! and a busy button shows one in its leading slot and takes no press.
 
 use dioxus::prelude::*;
+use ds::components::controls::button_marks::Leading;
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
 use ds::motion::detail::operation::Operation;
@@ -42,6 +43,9 @@ fn Page() -> Element {
             }
             div { id: "button",
                 Button { label: "Send", availability: AVAILABILITY(), onclick: move |_| PRESSES.set(PRESSES.get() + 1) }
+            }
+            div { id: "marked",
+                Button { label: "Pin", leading: Leading::Glyph(Icon::Pin), availability: AVAILABILITY(), onclick: |_| {} }
             }
         }
     }
@@ -123,15 +127,16 @@ fn a_busy_button_shows_a_spinner_and_takes_no_press() {
         harness.attr("#button .ds-button", "aria-busy").as_deref(),
         Some("true")
     );
-    // The spinner fades in over --t-quick (design/30 section 2.9) rather than popping.
-    assert_eq!(
-        harness
-            .attr("#button .ds-button-lead", "data-fade")
-            .as_deref(),
-        Some("in")
-    );
+    // The spinner fades in over --t-quick (design/30 section 2.9) rather than popping: the
+    // button that has been busy wears `ds-busy-seen`, whose rule fades its lead as it mounts.
     assert!(
-        ds::stylesheet().contains(".ds-button-lead[*|data-fade=in]{ animation:fade var(--t-quick)"),
+        harness
+            .attr("#button .ds-button", "class")
+            .is_some_and(|class| class.contains("ds-busy-seen"))
+    );
+    assert_eq!(harness.attr("#button .ds-button-lead", "data-fade"), None);
+    assert!(
+        ds::stylesheet().contains(".ds-busy-seen > .ds-button-lead{ animation:fade var(--t-quick)"),
         "the stylesheet fades it in over --t-quick"
     );
     let at = harness.centre("#button .ds-button").expect("the button");
@@ -145,4 +150,39 @@ fn a_busy_button_shows_a_spinner_and_takes_no_press() {
         0,
         "the spinner goes with the work"
     );
+}
+
+#[test]
+fn busy_cross_fades_both_ways_over_t_quick_and_never_on_first_show() {
+    let mut harness = harness();
+    let lead = "#marked .ds-button-lead";
+    assert_eq!(harness.count(&format!("{lead} .ds-progress")), 0);
+    assert!(
+        harness
+            .attr("#marked .ds-button", "class")
+            .is_some_and(|class| !class.contains("ds-busy-seen")),
+        "a button that was never busy is as before"
+    );
+    assert!(
+        !harness.is_animating(),
+        "the leading mark does not fade in on first show"
+    );
+    // In: the spinner takes the mark's place and fades in as it mounts.
+    harness.within(|| *AVAILABILITY.write() = Availability::Busy);
+    harness.advance(ms(0));
+    assert_eq!(harness.count(&format!("{lead} .ds-progress")), 1);
+    assert!(harness.is_animating(), "the spinner fades in");
+    harness.advance(ms(400));
+    // Out: the mark comes back and fades in over --t-quick, the same mechanism.
+    harness.within(|| *AVAILABILITY.write() = Availability::Enabled);
+    harness.advance(ms(0));
+    assert_eq!(harness.count(&format!("{lead} .ds-progress")), 0);
+    assert_eq!(
+        harness.count(&format!("{lead} .ds-ic")),
+        1,
+        "the leading mark is back"
+    );
+    assert!(harness.is_animating(), "and fades in, it does not pop");
+    harness.advance(settle(Anim::Fade, MotionLevel::Standard) + ms(50));
+    assert!(!harness.is_animating());
 }

@@ -6,13 +6,13 @@
 mod probe;
 
 use dioxus::prelude::*;
-use ds::components::app::pin_tile::PinFace;
+use ds::components::app::pin_tile::{PinFace, PinStatus};
 use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
 use ds::components::content::image_source::ImageSource;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
 use ds::style::tokens::hex::{Colour, Hex};
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -28,17 +28,15 @@ fn ms(n: u64) -> Duration {
 
 /// An account's tile.
 fn account(key: char, provider: MarkProvider) -> PinItem<char> {
-    PinItem {
+    PinItem::new(
         key,
-        face: PinFace::Account {
+        PinFace::Account {
             initial: key,
             colour: Colour::Solid(Hex([0x5b, 0x4f, 0xc4])),
             provider,
             address: None,
         },
-        unread: 0,
-        mark: MarkStyle::Letter,
-    }
+    )
 }
 
 /// Three accounts and the Add account tile, in the pinned grid on a window with no grain, each
@@ -56,12 +54,9 @@ fn Tiles() -> Element {
         .map(|key| {
             let item = account(key, MarkProvider::Fastmail);
             match key {
-                'W' => PinItem {
-                    mark: MarkStyle::Image(ImageSource(
-                        "data:image/png;base64,iVBORw0KGgo=".to_string(),
-                    )),
-                    ..item
-                },
+                'W' => item.mark(MarkStyle::Image(ImageSource(
+                    "data:image/png;base64,iVBORw0KGgo=".to_string(),
+                ))),
                 _ => item,
             }
         })
@@ -198,4 +193,147 @@ fn the_add_tile_has_no_plate_at_rest() {
     let add = corner("[*|data-face=add]");
     assert_ne!(account, ground, "the account tile has a plate");
     assert_eq!(add, ground, "the add tile has none");
+}
+
+static RUNNING: GlobalSignal<bool> = Signal::global(|| true);
+
+/// Four accounts, one of each status: A needs attention, B is working, C is working with no
+/// operation running, D is quiet. Each pick, status press and new order is logged.
+#[allow(non_snake_case)]
+fn Statuses() -> Element {
+    let mut log = use_signal(Vec::<String>::new);
+    let operation = if RUNNING() {
+        Operation::Running(PendingToken::start())
+    } else {
+        Operation::Idle
+    };
+    let items: Vec<PinItem<char>> = ['A', 'B', 'C', 'D']
+        .into_iter()
+        .map(|key| {
+            let item = account(key, MarkProvider::Fastmail).unread(u32::from(key == 'A') * 4);
+            match key {
+                'A' => item.status(PinStatus::Attention {
+                    why: "Password rejected".to_owned(),
+                }),
+                'B' => item.status(PinStatus::Busy(operation)),
+                'C' => item.status(PinStatus::Busy(Operation::Idle)),
+                _ => item,
+            }
+        })
+        .collect();
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "width:240px; padding:12px",
+                PinTiles {
+                    label: "Accounts",
+                    items,
+                    onpick: move |key: char| log.with_mut(|log| log.push(format!("pick:{key}"))),
+                    onreorder: move |next: Vec<char>| log.with_mut(|log| log.push(format!("order:{}", next.iter().collect::<String>()))),
+                    onstatus: move |key: char| log.with_mut(|log| log.push(format!("status:{key}"))),
+                }
+            }
+            p { class: "log", {log().join(",")} }
+        }
+    }
+}
+
+fn statuses() -> Harness {
+    let mut harness = Harness::new(
+        Statuses,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(100));
+    harness
+}
+
+const ATTENTION: &str = ".ds-pin-tile[*|data-status=attention] .ds-pin-tile-status";
+
+/// The warning sits in the top-left corner, named by its reason; the unread count keeps the top
+/// right; a quiet tile has no mark.
+#[test]
+fn an_attention_mark_sits_top_left_named_by_its_reason() {
+    let harness = statuses();
+    assert_eq!(harness.count(".ds-pin-tile-status"), 3);
+    assert_eq!(
+        harness.attr(ATTENTION, "aria-label").as_deref(),
+        Some("Password rejected")
+    );
+    assert_eq!(harness.attr(ATTENTION, "role").as_deref(), Some("button"));
+    assert_eq!(harness.count(&format!("{ATTENTION} .ds-ic")), 1);
+    let tile = rect(&harness, ".ds-pin-tile[*|data-status=attention]");
+    let mark = rect(&harness, ATTENTION);
+    let badge = rect(&harness, ".ds-pin-tile[*|data-status=attention] .ds-badge");
+    let centre = |r: ds::base::geometry::units::Rect| r.origin.x.0 + r.size.width.0 / 2.0;
+    assert!(
+        centre(mark) < tile.origin.x.0 + tile.size.width.0 / 2.0,
+        "the mark is on the left half: {mark:?} {tile:?}"
+    );
+    assert!(
+        centre(badge) > tile.origin.x.0 + tile.size.width.0 / 2.0,
+        "the count is on the right half: {badge:?}"
+    );
+    assert!(
+        mark.origin.x.0 + mark.size.width.0 <= badge.origin.x.0,
+        "the two never overlap: {mark:?} {badge:?}"
+    );
+    assert_eq!(
+        harness.count(".ds-pin-tile:not([*|data-status]) .ds-pin-tile-status"),
+        0
+    );
+}
+
+/// Pressing the warning reports its tile once and is neither a pick nor the start of a drag;
+/// pressing the tile elsewhere still picks.
+#[test]
+fn pressing_the_warning_is_its_own_press_and_never_a_pick() {
+    let mut harness = statuses();
+    let at = harness.centre(ATTENTION).expect("the warning");
+    harness.send(Input::click(at));
+    harness.advance(ms(50));
+    assert_eq!(harness.text_of(".log").as_deref(), Some("status:A"));
+    // A press that drags from the warning moves nothing.
+    harness.send(Input::pointer_move(at));
+    harness.send(Input::pointer_down(at));
+    harness.advance(ms(50));
+    harness.send(Input::pointer_move(Point {
+        x: Px(at.x.0 + 80.0),
+        y: at.y,
+    }));
+    harness.advance(ms(50));
+    assert_eq!(harness.count(".ds-pin-tile[*|data-drag=source]"), 0);
+    harness.send(Input::pointer_up(at));
+    harness.advance(ms(50));
+    let tile = rect(&harness, ".ds-pin-tile[*|data-status=attention]");
+    let body = Point {
+        x: Px(tile.origin.x.0 + tile.size.width.0 * 0.6),
+        y: Px(tile.origin.y.0 + tile.size.height.0 * 0.6),
+    };
+    harness.send(Input::click(body));
+    harness.advance(ms(50));
+    let log = harness.text_of(".log").unwrap_or_default();
+    assert!(log.ends_with("pick:A") && !log.contains("order"), "{log}");
+    assert_eq!(log.matches("status:").count(), 1);
+}
+
+/// A busy tile's Mini spinner turns only while its operation runs (R4).
+#[test]
+fn a_busy_mark_turns_only_while_its_operation_runs() {
+    let mut harness = statuses();
+    let spin = |n: usize| format!(".ds-pin-tile:nth-child({n}) .ds-pin-tile-status .ds-progress");
+    assert_eq!(harness.attr(&spin(2), "data-size").as_deref(), Some("mini"));
+    assert_eq!(
+        harness.attr(&spin(2), "data-pending").as_deref(),
+        Some("step")
+    );
+    assert_eq!(
+        harness.attr(&spin(3), "data-pending").as_deref(),
+        Some("idle"),
+        "no running operation, no turning spinner"
+    );
+    harness.within(|| *RUNNING.write() = false);
+    harness.advance(ms(50));
+    assert_eq!(
+        harness.attr(&spin(2), "data-pending").as_deref(),
+        Some("idle")
+    );
 }

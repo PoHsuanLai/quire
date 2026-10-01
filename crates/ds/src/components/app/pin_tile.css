@@ -34,6 +34,14 @@
 /* The unread count, in the corner. */
 .ds-pin-tile .ds-badge{ position:absolute; top:var(--s-2); right:var(--s-2); }
 
+/* The account's problem mark, top left: the one corner free (the count is top right, the provider
+   bottom right). A `Mini` spinner while it works, the warning glyph in `--warn` when it needs the
+   person; the glyph sits in a `.ds-hover-target` (its tooltip), which takes the corner then. */
+.ds-pin-tile > .ds-pin-tile-status,
+.ds-pin-tile > .ds-hover-target{ position:absolute; top:var(--s-2); left:var(--s-2); display:inline-flex; line-height:0; }
+.ds-pin-tile-status{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+.ds-pin-tile-status[*|data-status=attention]{ color:var(--warn); cursor:default; }
+
 /* The provider's mark, bottom right (a `ProviderMark` on the tile's rung). */
 .ds-pin-tile .ds-provider{ position:absolute; right:var(--s-7); bottom:var(--s-7); box-shadow:var(--shadow-mark-tile); }
 

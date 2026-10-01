@@ -1,6 +1,8 @@
 //! SkeletonRow: the placeholder of one list row while the list is still loading (design/30
-//! section 2.9): an avatar-sized `Circle` and one or two `Line`s, the title wider than the line
-//! under it, at the size of a settings row (`RowSize::Settings`, `row.css`). Static, no shimmer,
+//! section 2.9): an avatar-sized `Circle` and one or two `Line`s, at the size of a settings row: its height
+//! and avatar are the row tokens `--row-settings-h` and `--row-avatar` that `row.css` reads too,
+//! and the title bar is 62% of the text column, the line under it 38% (the preset's proportions,
+//! named in design/30 section 2.9). Static, no shimmer,
 //! like every skeleton; the whole row fades in over `--t-quick` and, hidden, fades out and runs
 //! `on_hidden` once settled, exactly as a [`Skeleton`](super::skeleton::Skeleton) does.
 //!

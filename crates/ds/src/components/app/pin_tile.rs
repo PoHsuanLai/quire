@@ -2,15 +2,27 @@
 //! an account in this Space, the "All" tile, or the tile that adds one. One component for the
 //! three faces; the account's unread count is a `Badge`, and a drag over it draws the list's drop
 //! line at its leading edge. Grouping, reordering and the Add tile's place are `PinTiles`.
+//!
+//! An account's problem mark sits on its tile, as macOS Mail puts it beside the account: a
+//! [`PinStatus`] in the top-left corner, the one corner the tile leaves free (the unread `Badge`
+//! is top right, the provider's mark bottom right). `Attention` is the warning glyph, named by
+//! its reason (a tooltip and the glyph's `aria-label`) and, with `onstatus`, a press of its own
+//! that never also presses the tile or starts its drag; `Busy` is a Mini spinner that turns only
+//! while its `Operation` runs (R4).
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::provider_mark::{MarkProvider, MarkStyle, ProviderMark};
 use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use crate::components::controls::press::{PressListeners, use_pressing};
+use crate::components::controls::progress::model::{Progress, ProgressStyle};
+use crate::components::controls::progress::view::ProgressIndicator;
+use crate::components::overlays::tooltip::Tooltip;
+use crate::focus::click::kept_click;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::vocab::{DropState, Muting, Selection};
+use ds_motion::detail::operation::Operation;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::tokens::control_size::ControlSize;
@@ -41,6 +53,34 @@ pub enum PinFace {
         /// The hover hint ("Add account…"), when the app wants one.
         hint: Option<String>,
     },
+}
+
+/// An account's problem mark on its tile.
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+pub enum PinStatus {
+    /// Nothing to say: no mark.
+    #[default]
+    Quiet,
+    /// The account is working (syncing, signing in): a Mini spinner in the corner, turning only
+    /// while the `Operation` is `Running` (R4).
+    Busy(Operation),
+    /// The account needs the person (a rejected password, an unreachable server): the warning
+    /// glyph in the corner, with `why` as its tooltip and its accessible name.
+    Attention {
+        /// What is wrong, in a sentence.
+        why: String,
+    },
+}
+
+impl PinStatus {
+    /// The `data-status` word, none for a quiet tile.
+    fn slug(&self) -> Option<&'static str> {
+        match self {
+            PinStatus::Quiet => None,
+            PinStatus::Busy(_) => Some("busy"),
+            PinStatus::Attention { .. } => Some("attention"),
+        }
+    }
 }
 
 impl PinFace {
@@ -86,8 +126,9 @@ fn muting(selection: Selection) -> Muting {
 /// under it, and an account's colour at full strength); `unread` is the `Badge` on its corner
 /// (zero draws none). `drop` is its part in a drag: `Source` while it is the one being dragged,
 /// `Target` while a drop would land before it (the drop line). `mark` is how the provider is
-/// drawn, the letter or the favicon the app supplies. `onpointerdown` hears the press that may
-/// become a drag; `onclick` the press itself.
+/// drawn, the letter or the favicon the app supplies. `status` is the account's problem mark
+/// (top-left corner); `onstatus` hears a press on its `Attention` glyph, which is not a press on
+/// the tile. `onpointerdown` hears the press that may become a drag; `onclick` the press itself.
 #[component]
 pub fn PinTile(
     face: PinFace,
@@ -95,6 +136,8 @@ pub fn PinTile(
     #[props(default)] unread: u32,
     #[props(default)] drop: DropState,
     #[props(default = MarkStyle::Letter)] mark: MarkStyle,
+    #[props(default)] status: PinStatus,
+    #[props(default)] onstatus: Option<EventHandler<()>>,
     #[props(default)] onpointerdown: Option<EventHandler<PointerEvent>>,
     onclick: EventHandler<Press>,
     #[props(default)] common: Common,
@@ -106,6 +149,43 @@ pub fn PinTile(
     let data = common.data_attributes();
     let filter = !matches!(face, PinFace::Add { .. });
     let slug = face.slug();
+    let status_slug = status.slug();
+    let mark_of_status = match status {
+        PinStatus::Quiet => rsx! {},
+        PinStatus::Busy(operation) => rsx! {
+            span { class: "ds-pin-tile-status", "data-status": "busy",
+                ProgressIndicator {
+                    style: ProgressStyle::Spinner,
+                    progress: Progress::Unknown(operation),
+                    size: ControlSize::Mini,
+                    common: Common { aria_label: Some("Working".to_owned()), ..Common::default() },
+                }
+            }
+        },
+        PinStatus::Attention { why } => rsx! {
+            Tooltip { text: why.clone(),
+                span {
+                    class: "ds-pin-tile-status",
+                    "data-status": "attention",
+                    role: if onstatus.is_some() { "button" } else { "img" },
+                    "aria-label": why,
+                    // A press here is the badge's own: it neither presses the tile nor starts
+                    // its drag.
+                    onpointerdown: move |event| event.stop_propagation(),
+                    onmousedown: move |event| event.stop_propagation(),
+                    onmouseup: move |event| event.stop_propagation(),
+                    onclick: move |event| {
+                        event.stop_propagation();
+                        if let Some(onstatus) = onstatus {
+                            onstatus.call(());
+                        }
+                        kept_click(&event);
+                    },
+                    Glyph { icon: Icon::TriangleAlert, size: IconSize::Tiny }
+                }
+            }
+        },
+    };
     let hint = match &face {
         PinFace::Add { hint, .. } => hint.clone(),
         PinFace::All | PinFace::Account { .. } => None,
@@ -141,6 +221,7 @@ pub fn PinTile(
             "data-selected": (filter && selection == Selection::Selected).then_some("true"),
             "data-drop": drop.drop_attr(),
             "data-drag": drop.drag_attr(),
+            "data-status": status_slug,
             "data-pressed": pressing.attr(),
             "aria-pressed": filter.then(|| selection.aria()),
             "aria-label": name,
@@ -165,21 +246,32 @@ pub fn PinTile(
             }
             {picture}
             Badge { content: BadgeContent::Number(unread), tone: BadgeTone::Alert, size: ControlSize::Mini }
+            {mark_of_status}
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{PinFace, label, muting};
+    use super::{PinFace, PinStatus, label, muting};
     use crate::components::content::provider_mark::MarkProvider;
     use ds_core::vocab::{Muting, Selection};
+    use ds_motion::detail::operation::Operation;
     use ds_style::tokens::hex::{Colour, Hex};
 
     #[test]
     fn only_a_tile_that_is_not_the_filter_mutes_its_colour() {
         assert_eq!(muting(Selection::Selected), Muting::Audible);
         assert_eq!(muting(Selection::Unselected), Muting::Muted);
+    }
+
+    #[test]
+    fn a_tile_is_quiet_unless_it_has_a_status() {
+        assert_eq!(PinStatus::default(), PinStatus::Quiet);
+        assert_eq!(PinStatus::Quiet.slug(), None);
+        assert_eq!(PinStatus::Busy(Operation::Idle).slug(), Some("busy"));
+        let why = "Password rejected".to_string();
+        assert_eq!(PinStatus::Attention { why }.slug(), Some("attention"));
     }
 
     #[test]

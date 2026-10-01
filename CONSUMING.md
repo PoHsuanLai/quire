@@ -678,27 +678,42 @@ A few props worth knowing about before you read the signatures:
 Loading, failing and arriving (design/30 §2.9; all in `ds::prelude`, none moves except through the
 motion machinery, so Reduced is automatic):
 
-- `Loadable { phase, placeholder, onretry, children }` is the one place that picks what a pane
+- `Loadable { phase, placeholder, onretry, action, children }` is the one place that picks what a pane
   shows: `Phase::Loading(Operation)` draws `placeholder` (default: a centred `ProgressIndicator`
   Spinner, Regular, which turns only while the `Operation` is `Running`: Rule 4's R4 lives in the
   indicator), `Phase::Ready` draws `children`, `Phase::Failed { title, description }` draws an
-  `EmptyState` of form `Failure`, with Retry when `onretry` is given. A change of phase *kind* fades the
-  arriving layer in over `--t-quick`; a new `Operation` or a new title plays nothing. The root is
-  `aria-busy` while loading and a `region` when `common.aria_label` names it. Start the operation
-  in the handler that began the work (`Operation::Running(PendingToken::start())`), never in render.
+  `EmptyState` of form `Failure`, with Retry when `onretry` is given and your own `action` element (a
+  secondary "Connection Doctor…" button) in the same action row, before Retry. A change of phase *kind*
+  cross-fades the arriving layer in over `--t-quick` (the §1.3 cross-fade primitive, `use_cross_fade`;
+  a new `Operation` or a new title plays nothing, and under Reduced nothing fades: the swap is at
+  once). Keep passing a custom `placeholder` (a list of `SkeletonRow`s) while the phase leaves
+  `Loading` and it fades out over the arriving layer before it is dropped; the default spinner is
+  simply replaced. The root is `aria-busy` while loading and a `region` when `common.aria_label`
+  names it. Start the operation in the handler that began the work
+  (`Operation::Running(PendingToken::start())`), never in render.
 - `SkeletonRow { lines: SkeletonLines::{One, Two}, shown, on_hidden }` is a placeholder list row (avatar
-  circle, a wider title bar, a shorter second bar) at a settings row's height; pass several as a
-  `Loadable`'s `placeholder`. Static, no shimmer, like `Skeleton { shape: SkeletonShape::{Line, Block, Circle}, .. }`;
-  both fade in over `--t-quick` and, when `shown` goes `Hidden`, fade out and call `on_hidden` once
-  they have settled.
-- `InlineBanner` takes `shown: Shown` (default `Visible`, so an existing banner is unchanged) and
-  `on_hidden: Option<EventHandler<()>>`. Shown after being hidden, it fades in over `--t-quick` while
-  its height opens over `--t-move` and what is under it slides down; hidden, it fades out while its
-  height closes, and `on_hidden` runs once, when it has settled: drop the banner there. A show while
-  it closes takes the hide back. Under Reduced the height snaps and it cross-fades. Keep it mounted
-  and drive `shown` rather than wrapping it in an `if`, or there is nothing to animate out.
-- A `Button` or `Row` with `Availability::Busy` fades its spinner in over `--t-quick` (`data-fade="in"`
-  on `.ds-button-lead` and `.ds-row-spin`); nothing to wire.
+  circle, a title bar 62% of the text column, a second bar 38%) at a settings row's size (the row
+  tokens `--row-settings-h` 44 and `--row-avatar` 34, which `Row` at `RowSize::Settings` reads too);
+  pass several as a `Loadable`'s `placeholder`. Static, no shimmer, like
+  `Skeleton { shape: SkeletonShape::{Line, Block, Circle}, .. }`; both fade in over `--t-quick` and,
+  when `shown` goes `Hidden`, fade out and call `on_hidden` once they have settled.
+- `InlineBanner` is static, as Mail's remote-content bar is: it appears and disappears in place with
+  no motion. `shown: Shown` (default `Visible`) is only a render switch: `Hidden` draws nothing and
+  what is under it takes its place at once, so you may equally wrap it in an `if`. It needs no `Ds`
+  root of its own.
+- A `Button` or `Row` with `Availability::Busy` cross-fades both ways over `--t-quick`: its spinner
+  fades in, and when the work ends the leading mark (Button) or accessory (Row) it covered fades back
+  in; a control that was never busy plays nothing on first show. Nothing to wire (the control wears
+  a `ds-busy-seen` class once it has been busy).
+
+Account tiles (design/30 §2.11, `ds::components::app`): `PinTiles { label, items, selected, onpick,
+onreorder, onstatus, add }`, with `PinItem::new(key, face)` and its setters `.unread(n)`, `.mark(style)`
+and `.status(PinStatus)` (build items with these, not struct literals, so a new field does not break
+you). `PinStatus` is the account's problem mark, in the tile's top-left corner (the unread count has the
+top right, the provider mark the bottom right): `Quiet` (the default) draws none, `Busy(Operation)` a Mini
+spinner that turns only while the `Operation` is `Running`, `Attention { why }` the warning glyph with
+`why` as its tooltip and accessible name. `onstatus: Option<EventHandler<K>>` hears the key of a tile whose
+warning was pressed; that press is neither a pick (`onpick`) nor the start of a drag.
 
 Anchors, hover-card parts and undo:
 

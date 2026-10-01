@@ -103,7 +103,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "InlineBanner",
         root: "ds-inline-banner",
-        parts: &["frame", "icon", "body", "actions"],
+        parts: &["icon", "body", "actions"],
     },
     ComponentSelectors {
         component: "KeyEquivalent",
