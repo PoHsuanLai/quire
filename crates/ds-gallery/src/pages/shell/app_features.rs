@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::base::time::clock::now;
 use ds::components::app::edge_peek::EdgePeek;
 use ds::components::app::link_pill::{LinkPill, LinkTarget};
-use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::pin_tile::{PinFace, PinStatus, PinTile};
 use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
 use ds::components::app::space_switch::{space_pressed, space_shortcut};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
@@ -50,38 +50,51 @@ fn account(initial: char, provider: MarkProvider) -> PinFace {
 fn PinnedTiles() -> Element {
     let mut order = use_signal(|| vec!['P', 'W', 'G', 'L']);
     let mut selected = use_signal(|| Some('P'));
+    let mut flagged = use_signal(|| None::<char>);
+    let working = use_hook(|| Operation::Running(PendingToken::start()));
     let items: Vec<PinItem<char>> = order()
         .into_iter()
-        .map(|key| PinItem {
-            key,
-            face: account(
+        .map(|key| {
+            let item = PinItem::new(
                 key,
-                match key {
-                    'P' => MarkProvider::Google,
-                    'W' => MarkProvider::Microsoft,
-                    'G' => MarkProvider::Fastmail,
-                    _ => MarkProvider::Local,
-                },
-            ),
-            unread: match key {
+                account(
+                    key,
+                    match key {
+                        'P' => MarkProvider::Google,
+                        'W' => MarkProvider::Microsoft,
+                        'G' => MarkProvider::Fastmail,
+                        _ => MarkProvider::Local,
+                    },
+                ),
+            )
+            .unread(match key {
                 'P' => 3,
                 'W' => 120,
                 _ => 0,
-            },
-            mark: match key {
+            })
+            .mark(match key {
                 'P' => MarkStyle::Image(crate::pages::controls::overview::favicon()),
                 _ => MarkStyle::Letter,
-            },
+            });
+            match key {
+                'W' => item.status(PinStatus::Attention {
+                    why: "Password rejected. Press to sign in again.".to_owned(),
+                }),
+                'G' => item.status(PinStatus::Busy(working)),
+                _ => item,
+            }
         })
         .collect();
     rsx! {
-        Section { title: "Pinned tiles", note: "PinTile: All, an account selected and not (its colour muted), a count, the drop line before a tile a drag would take the place of, the dragged tile dimmed, and the Add tile. Below, the live PinTiles: press to select, drag a tile onto another to reorder.",
+        Section { title: "Pinned tiles", note: "PinTile: All, an account selected and not (its colour muted), a count, a problem mark in the top-left corner (the warning glyph with its reason as a tooltip, whose press is its own, or a Mini spinner while the account works), the drop line before a tile a drag would take the place of, the dragged tile dimmed, and the Add tile. Below, the live PinTiles: press to select, drag a tile onto another to reorder.",
             div { class: "ds-pin-tiles", style: "width:260px",
                 PinTile { face: PinFace::All, selection: Selection::Selected, unread: 7, onclick: |_| {} }
                 PinTile { face: account('P', MarkProvider::Google), selection: Selection::Selected, unread: 3, onclick: |_| {} }
                 PinTile { face: account('W', MarkProvider::Microsoft), unread: 0, onclick: |_| {} }
                 PinTile { face: account('G', MarkProvider::Fastmail), drop: DropState::Target, unread: 1, onclick: |_| {} }
                 PinTile { face: account('L', MarkProvider::Local), drop: DropState::Source, onclick: |_| {} }
+                PinTile { face: account('W', MarkProvider::Microsoft), unread: 2, status: PinStatus::Attention { why: "Password rejected".to_owned() }, onstatus: |()| {}, onclick: |_| {} }
+                PinTile { face: account('G', MarkProvider::Fastmail), status: PinStatus::Busy(working), onclick: |_| {} }
                 PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} }
             }
             div { style: "width:260px",
@@ -91,10 +104,12 @@ fn PinnedTiles() -> Element {
                     selected: selected(),
                     onpick: move |key| selected.set(Some(key)),
                     onreorder: move |next| order.set(next),
+                    onstatus: move |key| flagged.set(Some(key)),
                     add: PinAdd { label: "Add account".to_string(), hint: None, onadd: EventHandler::new(|()| {}) },
                 }
             }
             p { class: "g-note", "Order: {order().iter().collect::<String>()}" }
+            p { class: "g-note", "Status mark pressed on: {flagged():?}" }
         }
     }
 }

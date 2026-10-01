@@ -9,7 +9,7 @@
   border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none; list-style:none;
   font-size:var(--fs-shell-menu);
 }
-.ds-row[*|data-density=settings]{ min-height:44px; }
+.ds-row[*|data-density=settings]{ min-height:var(--row-settings-h); }
 .ds-row[*|aria-disabled=true]{ opacity:.35; }
 .ds-row[*|aria-busy=true]{ cursor:default; }
 
@@ -61,7 +61,7 @@
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=text],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
-.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:34px; height:34px; }
+.ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:var(--row-avatar); height:var(--row-avatar); }
 .ds-row-leading[*|data-leading=text]{ border:var(--hair) solid var(--line); border-radius:var(--r-shell-highlight); background:var(--surface);
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-row-leading[*|data-leading=avatar],
@@ -75,6 +75,10 @@
 .ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }
 .ds-row-spin{ display:flex; align-items:center; justify-content:center; }
+/* Busy cross-fades both ways over --t-quick (design/30 section 2.9): the spinner fades in as it
+   mounts and, when the work ends, the accessory fades back in as it mounts. Only a row that has
+   been busy wears `ds-busy-seen`, so a row's first show plays nothing. */
+.ds-busy-seen > .ds-row-trailing{ animation:fade var(--t-quick) var(--e-out); }
 .ds-row-trailing[*|data-mark=text]{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
 .ds-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
 .ds-row-when{ display:inline-block; flex:none; margin-left:auto; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }

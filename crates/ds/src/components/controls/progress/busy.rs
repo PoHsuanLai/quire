@@ -25,3 +25,25 @@ pub(crate) fn use_busy(availability: Availability) -> Operation {
         (Availability::Enabled | Availability::Disabled, None) => Operation::Idle,
     }
 }
+
+/// Whether the control has been busy at least once: the class its marks fade in under
+/// (`ds-busy-seen`, design/30 section 2.9). The spinner fades in as it mounts and, when the work
+/// ends, the mark it covered fades back in as it mounts, both over `--t-quick` (`fade`); a
+/// control that was never busy draws its marks as before, with no motion on first show. The flag
+/// is set in the render that turns the control busy, so the spinner already wears it.
+pub(crate) fn use_busy_seen(availability: Availability) -> bool {
+    let mut seen = use_hook(|| CopyValue::new(false));
+    if availability == Availability::Busy && !*seen.peek() {
+        seen.set(true);
+    }
+    *seen.peek()
+}
+
+/// `class` with `ds-busy-seen` added once the control has been busy.
+pub(crate) fn busy_class(class: String, seen: bool) -> String {
+    if seen {
+        format!("{class} ds-busy-seen")
+    } else {
+        class
+    }
+}

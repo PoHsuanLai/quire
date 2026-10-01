@@ -1,12 +1,12 @@
 //! `InlineBanner` on a real Blitz document: it sits in the pane's flow above what follows it,
 //! its action and its close button each report one press, and its severity picks the mark's
-//! colour.
+//! colour. `shown` only switches it in or out of the flow: no motion, no `Ds` root needed.
 
 use dioxus::prelude::*;
 use ds::components::overlays::inline_banner::InlineBanner;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -96,5 +96,46 @@ fn a_severity_colours_the_mark_and_a_danger_banner_is_an_alert() {
     assert_eq!(
         harness.attr("[data-severity=info]", "role").as_deref(),
         Some("status")
+    );
+}
+
+static SHOWN: GlobalSignal<Shown> = Signal::global(|| Shown::Visible);
+
+/// A banner over a paragraph with no `Ds` root: it needs none.
+#[allow(non_snake_case)]
+fn Bare() -> Element {
+    rsx! {
+        div { style: "width:480px",
+            InlineBanner { text: "Remote images are blocked.", shown: SHOWN() }
+            p { class: "body", "The message" }
+        }
+    }
+}
+
+#[test]
+fn shown_is_a_plain_switch_the_content_follows_at_once_with_no_motion() {
+    let mut harness = Harness::new(Bare, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(300));
+    assert_eq!(harness.count(".ds-inline-banner"), 1);
+    assert_eq!(harness.attr(".ds-inline-banner", "data-presence"), None);
+    assert_eq!(harness.count(".ds-inline-banner-frame"), 0);
+    let open = harness.rect(".body").expect("the message").origin.y.0;
+
+    harness.within(|| *SHOWN.write() = Shown::Hidden);
+    harness.advance(ms(20));
+    assert_eq!(harness.count(".ds-inline-banner"), 0, "gone in one frame");
+    let closed = harness.rect(".body").expect("the message").origin.y.0;
+    assert!(
+        closed < open,
+        "the message moved up at once: {closed} {open}"
+    );
+
+    harness.within(|| *SHOWN.write() = Shown::Visible);
+    harness.advance(ms(20));
+    assert_eq!(harness.count(".ds-inline-banner"), 1, "back in one frame");
+    let back = harness.rect(".body").expect("the message").origin.y.0;
+    assert!(
+        (back - open).abs() < 0.5,
+        "and the message with it: {back} {open}"
     );
 }

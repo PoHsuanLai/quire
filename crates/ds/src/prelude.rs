@@ -52,6 +52,14 @@ pub use crate::components::content::status::wifi::WifiGlyph;
 pub use ds_style::icon::Icon;
 pub use ds_style::icon::render::IconSize;
 
+// Progress and pending work
+pub use crate::components::controls::progress::model::Progress;
+pub use crate::components::controls::progress::model::ProgressStyle;
+pub use crate::components::controls::progress::model::RingGap;
+pub use crate::components::controls::progress::view::ProgressIndicator;
+pub use ds_motion::detail::operation::Operation;
+pub use ds_motion::detail::operation::PendingToken;
+
 // Menus
 pub use crate::components::menus::menu::cursor::MenuCursor;
 
@@ -67,8 +75,15 @@ pub use crate::components::fields::text_field_model::Validity;
 pub use crate::components::overlays::alert::Alert;
 pub use crate::components::overlays::drag_ghost::DragGhost;
 pub use crate::components::overlays::hover_card::HoverCard;
+pub use crate::components::overlays::inline_banner::InlineBanner;
+pub use crate::components::overlays::loadable::Loadable;
+pub use crate::components::overlays::loadable::Phase;
 pub use crate::components::overlays::popover::Popover;
 pub use crate::components::overlays::sheet::Sheet;
+pub use crate::components::overlays::skeleton::Skeleton;
+pub use crate::components::overlays::skeleton::SkeletonShape;
+pub use crate::components::overlays::skeleton_row::SkeletonLines;
+pub use crate::components::overlays::skeleton_row::SkeletonRow;
 pub use crate::components::overlays::toast::use_toasts;
 pub use crate::components::overlays::tooltip::Tooltip;
 pub use crate::stack::host::use_overlays;

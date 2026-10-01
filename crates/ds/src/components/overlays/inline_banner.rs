@@ -4,6 +4,11 @@
 //! shell's banners): it takes a place in the layout, stays until what it says stops being true or
 //! the person closes it, and never floats.
 //!
+//! It is static, as Mail's remote-content bar is: it appears and disappears in place with no
+//! motion (design/30 section 2.9, design/00 rule 10: a concession is dull). `shown` is only a
+//! render switch: `Hidden` draws nothing, and what follows takes its place at once. It needs no
+//! `Ds` root of its own.
+//!
 //! Markup: `div.ds-inline-banner[data-severity]` of `span.ds-inline-banner-icon`,
 //! `div.ds-inline-banner-body` (the `text`, the `detail` under it), `div.ds-inline-banner-actions`
 //! (the caller's buttons) and, when it can be closed, a close button. A `Danger` banner is
@@ -16,7 +21,7 @@ use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::vocab::Severity;
+use ds_core::vocab::{Severity, Shown};
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::tokens::control_size::ControlSize;
@@ -42,7 +47,8 @@ fn role_of(severity: Severity) -> &'static str {
 /// A banner in the flow. `text` says what is so and `detail` what follows from it; `icon`
 /// overrides the severity's glyph; `actions` is the caller's buttons (a `Button` at
 /// `ControlSize::Small` reads best) and `onclose` adds the close button. `common` puts the
-/// consumer's `id`, `data-*` and classes on the root and `aria_label` names it.
+/// consumer's `id`, `data-*` and classes on the root and `aria_label` names it. `shown` (default
+/// `Visible`) is whether it is drawn at all; there is no motion either way.
 #[component]
 pub fn InlineBanner(
     #[props(default)] severity: Severity,
@@ -51,8 +57,12 @@ pub fn InlineBanner(
     #[props(default)] icon: Option<Icon>,
     #[props(default)] actions: Option<Element>,
     #[props(default)] onclose: Option<EventHandler<()>>,
+    #[props(default = Shown::Visible)] shown: Shown,
     #[props(default)] common: Common,
 ) -> Element {
+    if shown == Shown::Hidden {
+        return rsx! {};
+    }
     let class = common.class("ds-inline-banner");
     let data = common.data_attributes();
     let icon = icon.unwrap_or_else(|| glyph_of(severity));

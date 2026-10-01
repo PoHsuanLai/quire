@@ -7,6 +7,7 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::disclosure::{Collapsing, indicator};
 use crate::components::controls::key_equivalent::KeyStyle;
 use crate::components::controls::press::PressListeners;
+use crate::components::controls::progress::busy::{busy_class, use_busy_seen};
 use crate::components::lists::row::accessory::{self, Accessory};
 use crate::components::lists::row::action::RowAction;
 use crate::components::lists::row::action::trailing as action_button;
@@ -142,6 +143,7 @@ pub fn Row(
         availability,
         drop,
     } = state;
+    let busy_seen = use_busy_seen(availability);
     let asking = confirm.is_some();
     let editing = edit.is_some();
     let live = availability == Availability::Enabled && !asking && !editing;
@@ -206,7 +208,7 @@ pub fn Row(
     let mounted = common.clone();
     let row = rsx! {
         div {
-            class: common.class("ds-row"),
+            class: busy_class(common.class("ds-row"), busy_seen),
             id: common.id.clone(),
             role: "option",
             "aria-label": common.aria_label.clone(),

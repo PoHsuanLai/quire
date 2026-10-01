@@ -483,7 +483,7 @@ assembly. A consumer that needs a name outside the prelude writes its home path 
 (`ds::style::tokens::shape::Radius`, `ds::base::word::Word`) and depends on `ds` alone, which is
 why consumers never name `ds-core`, `ds-style` or `ds-motion` in their manifests.
 
-`ds::prelude` (109 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
+`ds::prelude` (122 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
 from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
 | Group | Names |
@@ -494,7 +494,8 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Icons | `ExternalIcon`, `IconSource`, `IconView`, `BatteryGlyph`, `BluetoothGlyph`, `StatusState`, `VolumeGlyph`, `WifiGlyph`, `Icon`, `IconSize` |
 | Menus | `MenuCursor` |
 | Fields | `EditSurface`, `TextField`, `FieldFocus`, `FieldBezel`, `FieldKind`, `Validity` |
-| Overlays | `Alert`, `DragGhost`, `HoverCard`, `Popover`, `Sheet`, `use_toasts`, `Tooltip`, `use_overlays` |
+| Overlays | `Alert`, `DragGhost`, `HoverCard`, `InlineBanner`, `Loadable`, `Phase`, `Popover`, `Sheet`, `Skeleton`, `SkeletonShape`, `SkeletonLines`, `SkeletonRow`, `use_toasts`, `Tooltip`, `use_overlays` |
+| Progress and pending work | `ProgressIndicator`, `Progress`, `ProgressStyle`, `RingGap`, `Operation`, `PendingToken` |
 | Lists and content | `Avatar`, `ImageSource`, `PdfThumb`, `ProviderMark`, `TextLine`, `TextRun`, `EmojiGrid`, `List`, `ListItem`, `PreviewPane`, `Accessory`, `RowAction`, `RowChord`, `RowLeading`, `Row`, `SectionHeader` |
 | Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |

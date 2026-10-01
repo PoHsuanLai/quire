@@ -112,6 +112,11 @@ fn trail(harness: &Harness, row: &str) -> Option<String> {
 #[test]
 fn working_puts_a_spinner_where_the_lock_was_at_once_and_it_turns_until_the_work_ends() {
     let mut harness = virtual_harness(Rows);
+    harness.advance(ms(300));
+    assert!(
+        !harness.is_animating(),
+        "a row's accessory does not fade in on first show"
+    );
     assert_eq!(
         trail(&harness, "net").as_deref(),
         Some("glyph"),
@@ -129,6 +134,23 @@ fn working_puts_a_spinner_where_the_lock_was_at_once_and_it_turns_until_the_work
         harness.attr("#net .ds-row", "aria-busy").as_deref(),
         Some("true")
     );
+    // The spinner fades in over --t-quick (design/30 section 2.9) rather than popping: a row
+    // that has been busy wears `ds-busy-seen`, whose rule fades its accessory as it mounts.
+    assert!(
+        harness
+            .attr("#net .ds-row", "class")
+            .is_some_and(|class| class.contains("ds-busy-seen"))
+    );
+    assert_eq!(harness.attr("#net .ds-row-spin", "data-fade"), None);
+    assert!(
+        ds::stylesheet()
+            .contains(".ds-busy-seen > .ds-row-trailing{ animation:fade var(--t-quick)"),
+        "the stylesheet fades it in over --t-quick"
+    );
+    assert!(
+        harness.is_animating(),
+        "the spinner fades in, it does not pop"
+    );
     // Ten seconds on it still turns: there is no cap.
     harness.advance(ms(10_000));
     assert_eq!(
@@ -142,6 +164,10 @@ fn working_puts_a_spinner_where_the_lock_was_at_once_and_it_turns_until_the_work
         trail(&harness, "net").as_deref(),
         Some("glyph"),
         "the lock is back"
+    );
+    assert!(
+        harness.is_animating(),
+        "and it fades back in over --t-quick: the cross-fade runs both ways"
     );
     assert_eq!(
         harness.attr("#net .ds-row-leading", "data-disc").as_deref(),

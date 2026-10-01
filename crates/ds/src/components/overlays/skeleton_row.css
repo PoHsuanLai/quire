@@ -1,0 +1,15 @@
+/* SkeletonRow (design/30 section 2.9): a settings row's measures (`row.css`: `--row-settings-h` tall, the
+   `--row-avatar` leading, `--s-8` gap and inset) drawn in the skeleton's static fill. The preset's proportions are
+   named in design/30's SkeletonRow row: the title bar is 62% of the text column, the line under
+   it 38% and at the detail size (`--fs-help`). The whole row fades in and out
+   over `--t-quick`; its bars carry no presence of their own. */
+
+.ds-skeleton-row{ display:flex; align-items:center; gap:var(--s-8); box-sizing:border-box; min-height:var(--row-settings-h); padding:0 var(--s-8); font-size:var(--fs-shell-menu); }
+.ds-skeleton-row > .ds-skeleton[*|data-shape=circle]{ flex:none; width:var(--row-avatar); height:var(--row-avatar); }
+.ds-skeleton-row-lines{ display:flex; flex-direction:column; flex:1 1 0; min-width:0; gap:var(--s-6); }
+.ds-skeleton-row-lines > .ds-skeleton:first-child{ width:62%; }
+.ds-skeleton-row[*|data-lines=two] .ds-skeleton-row-lines > .ds-skeleton:last-child{ width:38%; font-size:var(--fs-help); }
+.ds-skeleton-row[*|data-presence=entering],.ds-skeleton-row[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-skeleton-row[*|data-presence=entering][*|data-pulse=b],.ds-skeleton-row[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds-skeleton-row[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-skeleton-row[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
