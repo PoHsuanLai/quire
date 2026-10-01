@@ -13,6 +13,7 @@ pub mod edit;
 pub mod file_drop;
 pub mod focus;
 pub mod host;
+pub mod machine;
 pub mod root;
 pub mod spell;
 pub mod stack;

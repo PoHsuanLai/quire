@@ -78,11 +78,11 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 
 | Crate | Modules, lowest first |
 | --- | --- |
-| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
+| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
-| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
+| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (`use_machine`, `MachineRef`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, requests, hover, drop, shell) < `launch`, `open_window` < features `pdf`, `print`, `spell` |
@@ -200,6 +200,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Colour maths (sRGB, linear, OKLab, OKLCH, contrast, gamut fit) | `ds-core::colour` |
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
+| A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); `ds-motion`'s gesture machines take the same `Stamp` |
+| A timed pure state machine and the one timer that drives it | `ds-core::machine` (`Machine`, `Elapsed`), `ds::machine` (`use_machine`, `MachineRef`) |
 | Scope-owned tasks, spawning | `ds-style::task` (`spawn_in`); the `Spawner` trait in `ds-core::spawner` |
 | Base vocabulary (`Availability`, `Switch`, `Shown`, `Fraction`) | `ds-core::vocab` |
 | PNG, base64 | `ds-core::codec` |
@@ -264,6 +266,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
+| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, switcher, OSD, banners, hot corners, ...; anyview) | a state that changes by input and by time | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |
 | `Driver`, `DocQuery` | `ds-harness` | `Harness`; later shell-host's headless surface | a new driver | never |
@@ -409,6 +412,18 @@ pub trait HostWindow { fn begin_move(&self); fn begin_resize(&self, edge: Resize
     fn zoom(&self, zoom: Zoom); fn minimize(&self); fn close(&self);
     fn tile(&self, tile: WindowTile) -> Result<(), TileError>;
     fn supports(&self, tile: WindowTile) -> Support; fn state(&self) -> WindowState; }
+
+// ds-core::machine (time is ds-core::time::stamp::Stamp: whole ms from the caller's origin)
+pub trait Machine: Clone + PartialEq + Default + 'static {
+    type In: From<Elapsed>;                   // what moves it; the clock alone can wake it
+    type Out: 'static;                        // what it wants done
+    type Params: Clone + PartialEq + 'static; // timing settings; a change applies from the next step
+    fn step(self, input: Self::In, at: Stamp, params: &Self::Params) -> (Self, Vec<Self::Out>);
+    fn wake(&self) -> Option<Stamp>;          // when to step again with no input; none at rest
+}
+// ds::machine: runs it on ds-core::time's clock, so a harness's virtual clock drives it.
+pub fn use_machine<M: Machine>(params: M::Params, on_out: impl FnMut(M::Out) + 'static) -> MachineRef<M>;
+impl<M: Machine> MachineRef<M> { pub fn send(&self, input: M::In); pub fn state(&self) -> ReadSignal<M>; }
 
 // ds-core::spawner
 pub trait Spawner: Send + Sync {
