@@ -77,7 +77,7 @@ impl Accessory {
 }
 
 /// The small spinner: it turns from the moment it is drawn, which is the moment the work it
-/// stands for is shown.
+/// stands for is shown, and it fades in over `--t-quick` (`row.css`, design/30 section 2.9).
 #[component]
 fn Busy() -> Element {
     let operation = use_hook(|| Operation::Running(PendingToken::start()));

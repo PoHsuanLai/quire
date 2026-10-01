@@ -3,7 +3,7 @@
 //! lands). The grid never reorders itself: it hands the new order to the caller, who owns it.
 
 use crate::components::app::pin_order::moved;
-use crate::components::app::pin_tile::{PinFace, PinTile};
+use crate::components::app::pin_tile::{PinFace, PinStatus, PinTile};
 use crate::components::content::provider_mark::MarkStyle;
 use crate::host::measure::client_rect;
 use crate::root::common::Common;
@@ -14,7 +14,9 @@ use ds_core::vocab::{DropState, Selection};
 use ds_motion::drag::{DRAG_THRESHOLD, DragPhase, use_drag};
 use std::rc::Rc;
 
-/// One pinned tile: its identity (an account's id), what it shows and its unread count.
+/// One pinned tile: its identity (an account's id), what it shows, its unread count and its
+/// problem mark. Build it with [`PinItem::new`] and the setters, so a field added later does not
+/// break the caller.
 #[derive(Debug, Clone, PartialEq)]
 pub struct PinItem<K> {
     /// The tile's identity, stable across renders; what `onpick` and `onreorder` speak in.
@@ -25,6 +27,36 @@ pub struct PinItem<K> {
     pub unread: u32,
     /// How its provider is drawn: the letter, or the favicon the app supplies for that account.
     pub mark: MarkStyle,
+    /// The account's problem mark, in the tile's top-left corner ([`PinStatus::Quiet`] draws none).
+    pub status: PinStatus,
+}
+
+impl<K> PinItem<K> {
+    /// A tile for `key` showing `face`: no unread count, the letter mark, a quiet status.
+    pub fn new(key: K, face: PinFace) -> Self {
+        PinItem {
+            key,
+            face,
+            unread: 0,
+            mark: MarkStyle::Letter,
+            status: PinStatus::Quiet,
+        }
+    }
+
+    /// With this unread count (zero draws no badge).
+    pub fn unread(self, unread: u32) -> Self {
+        PinItem { unread, ..self }
+    }
+
+    /// With this provider mark.
+    pub fn mark(self, mark: MarkStyle) -> Self {
+        PinItem { mark, ..self }
+    }
+
+    /// With this problem mark.
+    pub fn status(self, status: PinStatus) -> Self {
+        PinItem { status, ..self }
+    }
 }
 
 /// The tile after the items that adds one.
@@ -65,7 +97,8 @@ fn drop_state<K: PartialEq>(phase: &DragPhase<K>, key: &K, index: usize) -> Drop
 
 /// The grid of `items`, `selected` being the one that is the list's filter. `onpick` hears a
 /// press on a tile; with `onreorder` a tile can be dragged (past 3 px) onto another's place and
-/// the new order comes back as the keys in order. A drag never also picks.
+/// the new order comes back as the keys in order. A drag never also picks. `onstatus` hears the
+/// key of a tile whose `Attention` mark was pressed; that press is not a pick and starts no drag.
 #[component]
 pub fn PinTiles<K: Clone + PartialEq + 'static>(
     label: String,
@@ -74,6 +107,7 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
     #[props(default)] add: Option<PinAdd>,
     onpick: EventHandler<K>,
     #[props(default)] onreorder: Option<EventHandler<Vec<K>>>,
+    #[props(default)] onstatus: Option<EventHandler<K>>,
     #[props(default)] common: Common,
 ) -> Element {
     let drag = use_drag::<K>(DRAG_THRESHOLD);
@@ -104,11 +138,13 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
             face,
             unread,
             mark,
+            status,
         } = item;
         let selection = Selection::of(&Some(key.clone()), &selected);
         let state = drop_state(&phase, &key, index);
         let picked = key.clone();
         let held = key.clone();
+        let flagged = key.clone();
         let hook = EventHandler::new(move |event: MountedEvent| {
             let mut elements = elements;
             let mut list = elements.write();
@@ -125,6 +161,10 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
                 unread,
                 drop: state,
                 mark,
+                status,
+                onstatus: onstatus.map(|onstatus| {
+                    EventHandler::new(move |()| onstatus.call(flagged.clone()))
+                }),
                 onpointerdown: onreorder.map(|_| {
                     EventHandler::new(move |event: PointerEvent| {
                         if !matches!(event.trigger_button(), None | Some(MouseButton::Primary)) {

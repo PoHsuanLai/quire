@@ -2,7 +2,8 @@
 //! group in every state it can express. `Popover` under each dismiss policy and with its arrow,
 //! `Sheet` hung from the window, centred and standing at the bottom, `Alert` (the alerts
 //! section), `SidePanel`, `Tooltip` and `DockLabel` up and down, `HoverCard`, `Toast`,
-//! `EmptyState` in its three forms and `Skeleton` in its three shapes, shown and hidden.
+//! `EmptyState` in its three forms, `Skeleton` in its three shapes and as a row, the `InlineBanner`
+//! shown and hidden, and `Loadable` cycling its phases.
 
 use crate::axes::{Axes, Showcase};
 use crate::pages::{Section, Specimen};
@@ -162,6 +163,87 @@ pub fn OverlaysCataloguePage() -> Element {
             }
         }
         SkeletonCase {}
+        BannerShownCase {}
+        LoadableCase {}
+    }
+}
+
+/// A banner switched in and out with `shown`: it appears and disappears in place, as Mail's
+/// remote-content bar does, and the text under it moves with it at once.
+#[component]
+fn BannerShownCase() -> Element {
+    let mut shown = use_signal(|| Shown::Visible);
+    rsx! {
+        Section { title: "InlineBanner, shown and hidden", note: "InlineBanner {{ shown }}: static, as Mail's remote-content bar is. Visible (the default) draws it in the flow; Hidden draws nothing, and what is under it takes its place at once. There is no motion either way.",
+            div { class: "g-row",
+                Button {
+                    label: "Show / hide",
+                    onclick: move |_| shown.set(match shown() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }),
+                }
+            }
+            Specimen { name: "shown".to_string(), code: Some("shown: Shown".to_string()),
+                div { style: "width:440px",
+                    InlineBanner {
+                        severity: Severity::Info,
+                        text: "Remote images are blocked.",
+                        detail: "Loading them tells the sender you opened this.",
+                        shown: shown(),
+                    }
+                    p { class: "g-note", style: "padding:8px 12px", "The message starts here and moves up when the banner goes." }
+                }
+            }
+        }
+    }
+}
+
+/// `Loadable` stepping Loading, Ready, Failed and back (Retry returns to Loading), with a
+/// `SkeletonRow` placeholder beside the default spinner.
+#[component]
+fn LoadableCase() -> Element {
+    let mut phase = use_signal(|| Phase::Loading(Operation::Running(PendingToken::start())));
+    let next = move |_| {
+        let next = match phase() {
+            Phase::Loading(_) => Phase::Ready,
+            Phase::Ready => Phase::Failed {
+                title: "Could not load the folder".to_owned(),
+                description: Some("The server did not answer.".into()),
+            },
+            Phase::Failed { .. } => Phase::Loading(Operation::Running(PendingToken::start())),
+        };
+        phase.set(next);
+    };
+    rsx! {
+        Section { title: "Loadable and SkeletonRow", note: "Loadable {{ phase, placeholder, onretry }}: the placeholder while Loading (a centred spinner that turns only while the Operation runs, or your own), the children when Ready, a Failure EmptyState with Retry (and your own `action` beside it) when Failed. A change of phase cross-fades the arriving layer in over --t-quick (the section 1.3 primitive; it snaps under Reduced), and a skeleton placeholder fades out over it before it is dropped. SkeletonRow {{ lines }} is a static avatar and one or two bars at a settings row's size (--row-settings-h, --row-avatar).",
+            div { class: "g-row",
+                Button { label: "Next phase", onclick: next }
+            }
+            div { class: "g-row g-row-top",
+                Specimen { name: "Default placeholder".to_string(), code: Some("phase".to_string()),
+                    div { style: "width:320px;height:200px;display:flex",
+                        Loadable {
+                            phase: phase(),
+                            onretry: move |()| phase.set(Phase::Loading(Operation::Running(PendingToken::start()))),
+                            action: Some(rsx! { Button { label: "Connection Doctor\u{2026}", onclick: |_| {} } }),
+                            p { class: "g-note", style: "padding:12px", "The folder's contents." }
+                        }
+                    }
+                }
+                Specimen { name: "SkeletonRow placeholder".to_string(), code: Some("placeholder: Some(..)".to_string()),
+                    div { style: "width:320px;height:200px;display:flex",
+                        Loadable {
+                            phase: phase(),
+                            placeholder: Some(rsx! {
+                                SkeletonRow {}
+                                SkeletonRow { lines: SkeletonLines::One }
+                                SkeletonRow {}
+                            }),
+                            onretry: move |()| phase.set(Phase::Loading(Operation::Running(PendingToken::start()))),
+                            p { class: "g-note", style: "padding:12px", "The folder's contents." }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 

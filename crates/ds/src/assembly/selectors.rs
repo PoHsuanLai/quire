@@ -131,6 +131,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["item"],
     },
     ComponentSelectors {
+        component: "Loadable",
+        root: "ds-loadable",
+        parts: &["layer", "spin"],
+    },
+    ComponentSelectors {
         component: "Menu",
         root: "ds-menu",
         parts: &["item", "separator", "header"],
@@ -184,6 +189,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         component: "Skeleton",
         root: "ds-skeleton",
         parts: &[],
+    },
+    ComponentSelectors {
+        component: "SkeletonRow",
+        root: "ds-skeleton-row",
+        parts: &["lines"],
     },
     ComponentSelectors {
         component: "Slider",
