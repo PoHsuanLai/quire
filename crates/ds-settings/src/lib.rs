@@ -35,7 +35,7 @@ pub use appearance::{
     PlateGlyphPolicy, quire_schema,
 };
 pub use doc::{FileName, Format, SettingsDoc};
-pub use ds_settings_derive::SettingsSchema;
+pub use ds_settings_derive::{SettingsRow, SettingsSchema};
 pub use ds_style::kit::UserStyle;
 #[cfg(feature = "dioxus")]
 pub use environment::{Environment, use_environment};

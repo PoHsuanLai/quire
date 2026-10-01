@@ -22,8 +22,12 @@ pub(crate) enum Shape {
     Text,
     /// The field's type is exactly `Hex` (any path ending in that segment).
     Colour,
-    /// The field's type is `Vec<T>`: a list of `T`'s own kind. Boxed: `syn::Type` is large
-    /// enough on its own to blow up every other, data-less variant's size (`clippy::large_enum_variant`).
+    /// The field's type is `Vec<String>` (or `Vec<PathBuf>`, `Vec<Cow<str>>`): a list of text.
+    TextList,
+    /// The field's type is `Vec<T>` for any other `T`: what `T`'s `ListElement` says, a list of
+    /// words for a `Word` enum and a list of tables for a `SettingsRow`. Boxed: `syn::Type` is
+    /// large enough on its own to blow up every other, data-less variant's size
+    /// (`clippy::large_enum_variant`).
     List(Box<syn::Type>),
     /// Anything else: a closed enum, read through its `Word` at run time.
     EnumType,
@@ -75,10 +79,10 @@ pub(crate) fn shape_of(field: &str, ty: &syn::Type, hint: KindHint) -> Result<Sh
     };
     let name = segment.ident.to_string();
     Ok(match name.as_str() {
-        "String" | "PathBuf" => Shape::Text,
-        "Cow" if borrows_str(&segment.arguments) => Shape::Text,
+        _ if is_text_type(ty) => Shape::Text,
         "Hex" => Shape::Colour,
         "Vec" => match first_type(&segment.arguments) {
+            Some(inner) if is_text_type(inner) => Shape::TextList,
             Some(inner) => Shape::List(Box::new(inner.clone())),
             None => Shape::EnumType,
         },
@@ -89,6 +93,21 @@ pub(crate) fn shape_of(field: &str, ty: &syn::Type, hint: KindHint) -> Result<Sh
         }
         _ => Shape::EnumType,
     })
+}
+
+/// Whether `ty` is `String`, `PathBuf` or `Cow<str>` (any path ending in one).
+pub(crate) fn is_text_type(ty: &syn::Type) -> bool {
+    let syn::Type::Path(type_path) = ty else {
+        return false;
+    };
+    let Some(segment) = type_path.path.segments.last() else {
+        return false;
+    };
+    match segment.ident.to_string().as_str() {
+        "String" | "PathBuf" => true,
+        "Cow" => borrows_str(&segment.arguments),
+        _ => false,
+    }
 }
 
 /// The first type argument of `Name<T, ...>`.
@@ -171,6 +190,15 @@ mod tests {
             Ok(Shape::List(inner)) => assert_eq!(inner.to_token_stream().to_string(), "Accent"),
             _ => panic!("expected List"),
         }
+    }
+
+    #[test]
+    fn vec_of_text_is_a_text_list() {
+        assert!(matches!(infer("Vec<String>"), Ok(Shape::TextList)));
+        assert!(matches!(
+            infer("Vec<std::path::PathBuf>"),
+            Ok(Shape::TextList)
+        ));
     }
 
     #[test]

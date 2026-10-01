@@ -3,6 +3,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::column::Column;
+
 /// A dotted settings key path: `"dock.magnified_px"`. Always `<domain>.<field>`, the derive's
 /// own mechanical rule (`crates/ds-settings-derive/src/gen_struct.rs`).
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
@@ -114,7 +116,8 @@ pub enum Widget {
 /// Inferred from the field's own type by the derive (`crates/ds-settings-derive/src/shape.rs`):
 /// a one-variant enum is [`KeyKind::Fixed`], a two-variant enum [`KeyKind::Toggle`], three to five [`KeyKind::Segmented`], more
 /// [`KeyKind::Menu`]; a newtype with `range` is [`KeyKind::Bounded`]; `String`, `PathBuf`,
-/// `Cow<str>` or a field marked `#[settings(text)]` is [`KeyKind::Text`]; `Hex` is [`KeyKind::Colour`]; `Vec<_>` is [`KeyKind::List`].
+/// `Cow<str>` or a field marked `#[settings(text)]` is [`KeyKind::Text`]; `Hex` is [`KeyKind::Colour`]; `Vec<String>` and `Vec<Word enum>` are [`KeyKind::List`]; `Vec<T>` with
+/// `T: SettingsRow` is [`KeyKind::Rows`].
 /// [`KeyKind::Shortcut`] has no field-type rule yet (no settings key is a key binding today); a
 /// live D-Bus module (section 9.4) constructs it directly.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -143,6 +146,9 @@ pub enum KeyKind {
     Shortcut,
     /// A rows editor over a list of the boxed kind.
     List(Box<KeyKind>),
+    /// A rows editor over a list of tables, one cell per column. Derived from a `Vec<T>` field
+    /// whose `T` derives `SettingsRow`.
+    Rows { columns: Vec<Column> },
 }
 
 impl KeyKind {
@@ -159,7 +165,7 @@ impl KeyKind {
             KeyKind::Text => Widget::TextInput,
             KeyKind::Colour => Widget::AppearancePickerSwatch,
             KeyKind::Shortcut => Widget::ShortcutField,
-            KeyKind::List(_) => Widget::RowsEditor,
+            KeyKind::List(_) | KeyKind::Rows { .. } => Widget::RowsEditor,
         }
     }
 }
@@ -296,6 +302,13 @@ mod tests {
         assert_eq!(KeyKind::Shortcut.widget(), Widget::ShortcutField);
         assert_eq!(
             KeyKind::List(Box::new(KeyKind::Text)).widget(),
+            Widget::RowsEditor
+        );
+        assert_eq!(
+            KeyKind::Rows {
+                columns: Vec::new()
+            }
+            .widget(),
             Widget::RowsEditor
         );
     }
