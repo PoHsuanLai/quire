@@ -59,6 +59,12 @@ impl Harness {
         self.doc.paint_timed(Backdrop::Scheme)
     }
 
+    /// The GPU of a hybrid harness: the device it paints on, which the document's `use_gpu`
+    /// returns too. Textures made on it draw in this harness's frames. `None` on vello_cpu.
+    pub fn gpu(&self) -> Option<ds_blitz::Gpu> {
+        self.doc.painter.gpu()
+    }
+
     /// The GPU adapter painting, `name (backend)`, or `None` on vello_cpu.
     pub fn adapter(&self) -> Option<&str> {
         self.doc.painter.adapter()

@@ -11,6 +11,8 @@ use anyrender::ResourceId;
 use anyrender_vello_hybrid::{ImageManager, VelloHybridScenePainter};
 use blitz_dom::BaseDocument;
 use blitz_kit::adapter::AdapterPref;
+use ds_blitz::Gpu;
+use ds_blitz::seam::attached_gpu;
 use rustc_hash::FxHashMap;
 use std::time::{Duration, Instant};
 use vello_common::paint::ImageId;
@@ -24,6 +26,8 @@ const FORMAT: wgpu::TextureFormat = wgpu::TextureFormat::Rgba8Unorm;
 pub(crate) struct GpuPainter {
     handle: DeviceHandle,
     adapter: String,
+    /// The device as an app's `use_gpu` sees it: this device, attached before the first frame.
+    gpu: Gpu,
     renderer: Renderer,
     resources: Resources,
     scene: Scene,
@@ -102,7 +106,14 @@ impl GpuPainter {
             },
         );
         let target = Target::new(&handle.device, width, height);
+        let gpu = attached_gpu(
+            handle.instance.clone(),
+            handle.adapter.clone(),
+            handle.device.clone(),
+            handle.queue.clone(),
+        );
         Ok(GpuPainter {
+            gpu,
             renderer,
             resources: Resources::new(),
             scene: Scene::new(width as u16, height as u16),
@@ -112,6 +123,11 @@ impl GpuPainter {
             handle,
             adapter,
         })
+    }
+
+    /// The painting device as the app's GPU: textures made on it draw in this painter's frames.
+    pub(crate) fn gpu(&self) -> Gpu {
+        self.gpu.clone()
     }
 
     /// The adapter painting: `name (backend)`.
