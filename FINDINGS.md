@@ -1098,6 +1098,71 @@ What Blitz at the pinned rev paints (48 px, headless):
   it with the next frame's CPU work. Glyph size and scale were not varied; time the real cell
   size at 125 % and 150 % before relying on these numbers there.
 
+## Texture layer
+
+A GPU texture inside the document (`ds_blitz::TextureLayer`), for decoded images, PDF page tiles
+and video frames. The design note is the module doc of `crates/ds-blitz/src/texture_layer/mod.rs`;
+the decisions and what was verified:
+
+- **Feasible with the fork and anyrender as they are.** The route is a Blitz custom widget: the
+  component renders `<object data=widget>`, Blitz asks the widget for a scene at each paint, the
+  widget registers the app's texture with the renderer (`RenderContext::try_register_custom_resource`,
+  kept by anyrender_vello_hybrid as `ResourceId -> TextureView`) and records a fill whose paint is
+  `Paint::Resource`. vello_hybrid binds the view and samples it in the same pass as the rest of the
+  document, so layers, clips, opacity, `border-radius` and paint order apply and nothing is copied.
+  Widgets paint only with `blitz-paint/custom-widget` (ds-blitz had it); the shell also needs
+  `blitz-shell/custom-widget`, now on in ds-blitz's manifest, or a removed layer's texture stays in
+  the renderer's bindings and a suspended window never re-registers. Other routes were not needed:
+  an `<img>` with a decoded image copies through vello's image atlas (no external textures, no
+  per-frame upload), and a `<canvas>` is a CPU painter.
+- **The device** is the renderer's own. A widget is handed the renderer's context when it is first
+  painted (`can_create_surfaces`, and again on resume); `renderer_specific_context()` downcasts to
+  `wgpu_context::DeviceHandle` (instance, adapter, device, queue). `ds_blitz::Gpu` holds it,
+  `use_gpu()` returns it and re-renders the caller when it arrives or changes, and `Host` mounts a
+  one-pixel transparent `TextureLayer` so it arrives on the first frame with no app layer. One `Gpu`
+  per window (each window's renderer makes its own device; textures do not cross windows). `ds`
+  never sees it: `scripts/check-boundary.sh` now forbids `wgpu` and `wgpu_context` to every pure
+  crate as it already forbids `anyrender*`.
+- **Headless.** `Backend::Hybrid` paints through the same widget path, `VelloHybridScenePainter`
+  being a `RenderContext` with the harness device, so no harness code draws the layer. The harness
+  opens the device before the app's first render and provides a `Gpu` already attached to it
+  (`Harness::gpu()`, `use_gpu()` agree), which is how a test makes textures first.
+  `crates/ds-harness/tests/texture_layer.rs` checks pixels on llvmpipe (GL; no Vulkan ICD in this
+  sandbox) and skips with no adapter. The CPU painter has no device: a layer draws nothing there.
+- **What the renderer's texture paint cannot do, and how it is done.** `draw_texture_rects` always
+  samples the whole texture and ignores extend modes. A fit and a source rectangle are therefore
+  an affine transform of the whole texture plus a clip (`fit.rs`, pure, table-tested); tiling is
+  one draw per tile, capped at 4096 (a one-texel source in a large box stops short, at the
+  bottom). Several textures in one frame work (the renderer batches external-texture runs).
+- **Alpha.** The sampler reads a texel as premultiplied and composites it over what is beneath
+  (test: half-red `[128, 0, 0, 128]` over nothing reads back unchanged). `Pixels` says what the
+  bytes are: `Rgba8Premultiplied` (pdfrum's `Pixmap`) as is, `Rgb8` made opaque, `Rgba8Straight`
+  multiplied on the CPU with round-to-nearest. A texture the app registers must already be
+  premultiplied and not sRGB-tagged (an sRGB format is decoded to linear before blending on
+  encoded values). There is no GPU-side conversion for a straight-alpha texture.
+- **Frame pacing.** Painting stays the window's. `TextureHandle::redraw` calls
+  `ShellProvider::request_redraw` (thread-safe) on each window showing the handle; winit coalesces
+  to one paint per display refresh and the paint reads the texture as it is then, so a player
+  faster than the display never queues frames. `replace` and `update` redraw by themselves; a
+  write on the queue must be submitted before `redraw`. `Pace::EveryFrame` reports
+  `requires_redraw` and so makes the window repaint continuously.
+- **Lifetimes and resizing.** The handle owns the texture; the renderer's registration is replaced
+  when the handle's texture object changes (a same-size `update` writes in place and keeps it) and
+  dropped with the layer's node. The layer re-fits at every paint from the box's device size, so
+  resizing needs nothing from the app. A new device (`Gpu::generation`) stops old textures
+  drawing.
+- **Not verified here.** A real window. The sandbox has Xvfb but its llvmpipe GL adapter is
+  incompatible with an X11 surface and there is no Vulkan ICD, so `DioxusNativeWindowRenderer`
+  panics in `anyrender_vello_hybrid::window_renderer` creating its device (`RequestAdapterError`).
+  The window path was read, not run: the renderer context's downcast, `Host`'s probe and the
+  shell's resume and unregister hooks. `cargo run -p ds-blitz --example texture_layer` is the check
+  on a machine with a GPU: it should print the adapter and about 180 frames.
+- **Open.** (1) `AppConfig` has no way to ask the window's device for wgpu features or limits
+  (`dioxus_native::RendererOptions` carries them); a player needing an optional feature creates
+  its own device, which cannot share a texture with the window's. (2) A straight-alpha GPU texture
+  needs a conversion pass. (3) No gallery page: on the CPU snapshot backend the layer draws
+  nothing, so a golden would show an empty box.
+
 ## Settings and schema
 
 - **Settings files** are `quire/appearance.toml` (design/22) and `spaces.json`, each a
