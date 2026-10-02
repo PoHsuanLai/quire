@@ -21,7 +21,7 @@ clean-up phase has not changed yet, it says "target (clean-up phase)".
 4. Token docs: `01-LAYOUT.md`, `02-TYPE.md`, `03-COLOR.md`, `29-SIZING.md`.
 5. Behaviour: `05-MOTION.md` (what survives), `06-INTERACTIONS.md`, `10`-`13`, `26-DETAILS.md`.
 6. Spaces and settings: `21-SPACES.md`, `22-SETTINGS.md`, `28-CUSTOMIZATION.md`.
-7. Per surface: `20-SURFACES.md`, `23-WIDGETS.md`, `25-EMOJI.md`, `08-ICONS.md`, `31-ACCOUNTS.md`.
+7. Per surface: `20-SURFACES.md`, `23-WIDGETS.md`, `25-EMOJI.md`, `08-ICONS.md`, `31-ACCOUNTS.md`, `32-COMPANION.md`, `33-AGENT.md`.
 8. `04-COMPONENTS.md`: reference for its KEEP entries only.
 9. Workflow docs: `CHECKLIST.md`, this file, `ARCHITECTURE.md`, `DESIGN.md`, `CONSUMING.md`, `CONVENTIONS.md`, `FINDINGS.md`.
 10. `archive/`: read-only history.
@@ -55,6 +55,8 @@ clean-up phase has not changed yet, it says "target (clean-up phase)".
 | `29-SIZING.md` | Settled and built: an audit of control heights, spacing and radii (quire and sill's bar and control center), the reference numbers with confidence, three principled systems with mockups, a recommendation, and the dark Monochrome/Muted plate fix. |
 | `30-CATALOGUE.md` | The settled inventory: foundations (timing, motion and interaction primitives, state vocabulary, size ladder), every component with its AppKit counterpart, the one Look, the 2026-10-02 decisions, the drop list, the deferred items. The source of truth: wins over every other doc. |
 | `31-ACCOUNTS.md` | Proposed: the account and capability layer: the capability vocabulary, providers as data files, accountd/syncd/inferd, consent and secrets, Photos on Storage, the local-first AI broker, the sync contract, phasing and open decisions. |
+| `32-COMPANION.md` | Proposed: the companion: stance, the settled decisions, presence and the orb, the prompt and answer cards, runs, memory, confirmation, security, and where each piece lives. |
+| `33-AGENT.md` | Proposed: the agent machinery in one page each (repos, shared types, daemons, flows), summarising `agent/SPEC.md`; `agent/` holds the locked spec and the area specs as reference. |
 | `CHECKLIST.md` | The "design port means the whole look" review list, run at every wave gate. |
 | `archive/` | Read-only history: the Arc-era principles, 07 Looks, 09 Arc heuristics, 10's old keyframes, 03's Arc/Post/Candy sections. |
 
