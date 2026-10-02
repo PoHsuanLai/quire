@@ -4,7 +4,7 @@
 //! its fill; the types are complete.
 //!
 //! The presentational marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon
-//! values) live in `ds-intents` and are re-exported here, once.
+//! values and the voice marks) live in `ds-intents` and are re-exported here, once.
 
 pub mod activity;
 pub mod answer;
@@ -23,6 +23,6 @@ pub mod run_row;
 pub mod served_by;
 
 pub use ds_intents::{
-    ChipKind, ContextChip, ContextModel, FieldMode, Removal, SummonAnswerMark, SummonSerial,
-    ThingMark,
+    ChipKind, ContextChip, ContextModel, DictateSerial, FieldMode, HeardEndMark, HeardMark,
+    InputLevel, Removal, SummonAnswerMark, SummonOriginMark, SummonSerial, Tally, ThingMark,
 };

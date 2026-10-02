@@ -560,6 +560,11 @@ pub enum ActorMark {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct Tally(pub u32);
 
+/// How loud the microphone hears, in permille (0 to 1000): the view of the voice wire's level. It
+/// drives the orb's inline `--orb-level` only while the companion is listening.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
+pub struct InputLevel(pub u16);
+
 #[cfg(test)]
 mod percent_tests {
     use super::Percent;

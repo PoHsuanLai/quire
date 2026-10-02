@@ -232,7 +232,7 @@ Not built, or limited, in quire:
 The companion's types are frozen with placeholder views (design/32, design/33,
 30-CATALOGUE 2.13). Every behaviour behind a frozen signature is `todo!()`; each is a fill item.
 
-`todo!()` bodies (7):
+`todo!()` bodies (9):
 
 | Where | What it needs |
 | --- | --- |
@@ -242,6 +242,7 @@ The companion's types are frozen with placeholder views (design/32, design/33,
 | `ds::components::companion::plan::step::plan_step` | `design/agent/ux.md` section 3.4: `plan_step_table`, `excluded_steps_not_run`, `stop_keeps_done_steps`, `undo_all_only_after_run` |
 | `ds::components::companion::replace::step::replace_step` | `design/agent/ux.md` section 3.4: every phase against every input |
 | `ds::components::companion::port::NoPort::answers` | a signal that never changes, made in the caller's Dioxus scope |
+| `ds::components::companion::port::NoPort::heard`, `NoDictation::text` | the same: a signal that never changes (voice marks, voice.md section 3.6) |
 | `ds_shell::tokens::glow::glow_spec` | the glow values per look and scheme; none and waiting have no period |
 
 Placeholder views (each draws one root `div.ds-<name>` and its sheet is a comment): `CompanionOrb`,
