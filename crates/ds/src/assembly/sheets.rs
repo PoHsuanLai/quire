@@ -3,7 +3,7 @@
 //! reads the list to find one sheet by name.
 
 /// `(sheet name, css)`, in cascade order.
-pub(crate) const SHEETS: [(&str, &str); 67] = [
+pub(crate) const SHEETS: [(&str, &str); 76] = [
     ("alert", include_str!("../components/overlays/alert.css")),
     ("avatar", include_str!("../components/content/avatar.css")),
     ("badge", include_str!("../components/controls/badge.css")),
@@ -204,6 +204,42 @@ pub(crate) const SHEETS: [(&str, &str); 67] = [
     (
         "window_frame",
         include_str!("../components/chrome/window_frame.css"),
+    ),
+    (
+        "companion_orb",
+        include_str!("../components/companion/orb/style.css"),
+    ),
+    (
+        "context_chips",
+        include_str!("../components/companion/chips/style.css"),
+    ),
+    (
+        "answer_card",
+        include_str!("../components/companion/answer/style.css"),
+    ),
+    (
+        "plan_list",
+        include_str!("../components/companion/plan/style.css"),
+    ),
+    (
+        "replace_bar",
+        include_str!("../components/companion/replace/style.css"),
+    ),
+    (
+        "run_row",
+        include_str!("../components/companion/run_row/style.css"),
+    ),
+    (
+        "activity_strip",
+        include_str!("../components/companion/activity/style.css"),
+    ),
+    (
+        "memory_timeline",
+        include_str!("../components/companion/memory/style.css"),
+    ),
+    (
+        "served_by_chip",
+        include_str!("../components/companion/served_by/style.css"),
     ),
     ("detail_morph", ds_motion::detail::morph::CSS),
 ];
