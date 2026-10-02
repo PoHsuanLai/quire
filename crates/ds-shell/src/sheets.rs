@@ -5,7 +5,12 @@
 use ds_style::kit::Sheet;
 
 /// The shell's sheets, in cascade order.
-pub(crate) const SHEETS: [Sheet; 30] = [
+pub(crate) const SHEETS: [Sheet; 31] = [
+    Sheet {
+        name: "confirm_card",
+        css: include_str!("confirm/style.css"),
+        after: "served_by_chip",
+    },
     Sheet {
         name: "date_picker",
         css: include_str!("date_picker/style.css"),
