@@ -8,7 +8,7 @@ Status: **S** = settled (PLAN, SPEC or prototypes), **P** = proposed.
 Material enum (design/30 §3.2): `Window, Bar, Dock, Menu, Popover, Sheet, Sidebar, Toast, Osd, Widget`.
 Layer names are wlr-layer-shell layers; `KeyboardMode` and `RegionSpec`/`BlurSpec` are
 shell-host types (PLAN "Design: `shell-host`"). Milestones are SPEC "Milestones" 0-13.
-The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*` frame tokens in Arc (design/30 §3.3, 21-SPACES).
+One quiet Look (design/30 §3). Shell chrome is the Mac material alone and takes no Space tint; the Space tint reaches only a window's sidebar ground (21-SPACES §3). Where a row below still says "over the SpaceLook's colour", that is the code the clean-up phase changes: **target (clean-up phase)** is the material alone.
 
 ## 1. Shell surfaces
 
@@ -18,10 +18,10 @@ The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*`
 | --- | --- | --- |
 | Layer / role | layer-shell `Top`, one per output, anchor `TOP\|LEFT\|RIGHT`, `ExclusiveZone::Reserve(h)` | S |
 | Height | height token (value in 01-LAYOUT) | S |
-| Material | `Bar`, over the workspace SpaceLook's colour where the Look puts it (design/30 §3.3); `Ds` draws it (bar gaps) | S |
+| Material | `Bar`, the material alone (target (clean-up phase); the code still tints it with the workspace's colour); `Ds` draws it (bar gaps) | S |
 | Content | left: app name, workspace indicator (drag reorder); right: tray, then the module items `control_center.menu_bar_*` shows (sound, network, battery by default; each opens its module's detail pane), the control center item, clock (user direction 2026-09-25: controls at the top right as on macOS) | S |
-| Components | `MenuBarItem` per status item (box and glyph from `bar.status_*` through `StatusMetrics`) and around the app name, titles and clock (the 4 px hover and open pill, 13/500 text), `WorkspacePills` for the workspace indicator (one segmented group on the frame), `MenuItem` rows (status lines included), `Glyph` (`IconSize::Bar` 22, P), `Menu` with `Placement::Bar` for every menu (22 px rows, 13 px text), `Badge`, `Tooltip` (12 px) | S / P |
-| Motion | menus open Instant and close with a Fade `--t-quick`; hover background `--t-quick`; tint cross-fade `--t-big` (21-SPACES §5); no press scale | S |
+| Components | `MenuBarItem` per status item (box and glyph from `bar.status_*` through `StatusMetrics`) and around the app name, titles and clock (the 4 px hover and open pill, 13/500 text), `WorkspacePills` for the workspace indicator (one segmented group; the workspace's dot is its only colour), `MenuItem` rows (status lines included), `Glyph` (`IconSize::Bar` 22, P), `Menu` with `Placement::Bar` for every menu (22 px rows, 13 px text), `Badge`, `Tooltip` (12 px) | S / P |
+| Motion | menus open Instant and close with a Fade `--t-quick`; hover background `--t-quick`; the workspace dot cross-fades `--t-big` (21-SPACES §5); no press scale | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
 | Keyboard | `KeyboardMode::None`; a grabbing popup switches it to `OnDemand` until close | S |
 | Blur / input | blur `Whole`; input `Whole` | S |
@@ -33,10 +33,10 @@ The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*`
 | Field | Value | St |
 | --- | --- | --- |
 | Layer / role | `Top`, anchor `BOTTOM`, height = base x max magnification + padding, `Reserve(base + margin)` | S |
-| Material | `Dock`, over the SpaceLook's colour per Look; drawn by `Ds` like the bar (bar gaps) | S |
+| Material | `Dock`, the material alone (target (clean-up phase)); drawn by `Ds` like the bar (bar gaps) | S |
 | Components | `DockTile` (08-ICONS plate; `IconView { plate }` as the placeholder; `Badge` from LauncherEntry; `ProgressIndicator{Bar}`), `RunningDot`, optional `DockFloor`, `DockLabel` hover label, `Menu` with `Placement::Context` (windows, desktop actions, Keep in Dock, Quit), `Popover` for folder stacks; geometry from `DockMetrics` (48 tiles, 8 gaps, 6 padding) and the pill a `Corner::Squircle` | S / P |
-| Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10); launch bounce and attention bounce (10); a badge change swaps at once; the label fades `--t-quick`; the menu opens Instant | S |
-| Behaviours | 10-BEHAVIOUR-dock (Plank parabola, 48 → up to 96, neighbours slide apart, click/right-click, stacks, drag-out, badges); auto-hide off by default (0.2 s delay, ~0.5 s slide when on) | S |
+| Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10), capped at 72 px (30 §3.4); the Mac default bounce, while launching and when an app needs attention (10); a badge change swaps at once; the label fades `--t-quick`; the menu opens Instant | S |
+| Behaviours | 10-BEHAVIOUR-dock (Plank parabola, 48 → up to 72 (target (clean-up phase); was 96), neighbours slide apart, click/right-click, stacks, drag-out, badges); auto-hide off by default (0.2 s delay, ~0.5 s slide when on) | S |
 | Keyboard | `None` | S |
 | Blur / input | blur `Element("dock-pill")`; input `Element("dock-hit")`; both follow the pill during magnification | S |
 | Milestone | M3 | S |
@@ -46,7 +46,7 @@ The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*`
 | Field | Value | St |
 | --- | --- | --- |
 | Layer / role | two surfaces kept warm: catcher (`Overlay`, anchor all, painted once, never animated) + panel (`Overlay`, centred, ~680 x 460) | S |
-| Material | panel `Popover` over the SpaceLook's colour per Look, result list on `--raise` | P |
+| Material | panel `Popover`, the material alone (target (clean-up phase)), result list on `--raise` | P |
 | Components | `CommandPalette<T>` (`host: Surface`, sized to its content, the shell scale's 22 px field, `corner: Squircle(14)`), `TextField{Search}`, `Row`, `KeyEquivalent`, `SectionHeader` (groups), `Menu` for actions (Ctrl+K / Alt+K), `Chip{Accent}` operator tokens | S |
 | Motion | panel open: undecided (13 §13.9 item 9); rows appear with the panel, no stagger; close Fade `--t-quick` | S / P |
 | Behaviours | 06 (command menu search, up/down clamped, Enter, Esc, Tab cycles providers), 13 (Spotlight-style launcher appearance); open p95 < 100 ms | S |
@@ -75,7 +75,7 @@ The Space colour reaches chrome per Look: behind the material in Mac, as `--f-*`
 | Layer / role | xdg popup from the bar | P |
 | Material | `Popover` | P |
 | Content | Wi-Fi, Bluetooth, volume, brightness, Do Not Disturb, power profile, Now Playing (MPRIS), BT device batteries, focus modes | S |
-| Components | `ModuleGrid` of `ModuleTile`s (a module's disc, title, status and detail chevron; Off/On/Busy; Half or Full span), `PaneSwitcher` (the grid and a module's detail pane), `Row` (networks, devices, outputs: 44 px, the text menu's type, a check, toggle, chevron, value or glyph at the end), `Toggle`, `Slider`, `SegmentedControl` (power profile), `RadioGroup` with image labels (Appearance), `SectionHeader`, `Button` at `ControlSize::Mini`; glyphs from `Icon::CONTROL` (Now Playing's Play/Pause/SkipBack/SkipForward, device Headphones/Speaker/Mouse/Gamepad/Phone); `ModulePanel` for the modules with content (levels, Now Playing, Appearance, Battery) on the tile's frame, `ModuleGrid { columns, gap, padding }` from the settings, the bar item glyph `Icon::Switches`; the light level well is .18 (fill/well >= 1.6:1) (CONSUMING "Control center parts") | S |
+| Components | `ModuleGrid` of `ModuleTile`s (a module's disc, title, status and detail chevron; Off/On/Busy; Half or Full span), `PaneSwitcher` (the grid and a module's detail pane), `Row` (networks, devices, outputs: 44 px, the text menu's type, a check, toggle, chevron, value or glyph at the end), `Toggle`, `Slider`, `SegmentedControl` (power profile), `RadioGroup` with image labels (Appearance), a Dark Mode toggle and no accent picker (the accent is set in Settings, 30 §3.4), rings only here (battery and level gauges; every other surface shows a plain battery glyph with a number), `SectionHeader`, `Button` at `ControlSize::Mini`; glyphs from `Icon::CONTROL` (Now Playing's Play/Pause/SkipBack/SkipForward, device Headphones/Speaker/Mouse/Gamepad/Phone); `ModulePanel` for the modules with content (levels, Now Playing, Appearance, Battery) on the tile's frame, `ModuleGrid { columns, gap, padding }` from the settings, the bar item glyph `Icon::Switches`; the light level well is .18 (fill/well >= 1.6:1) (CONSUMING "Control center parts") | S |
 | Motion | open and close Fade `--t-quick` (a shell popover); toggle knob by a `Spring`, track tint fade `--t-quick`; a module's detail pane slides in by `PaneSwitcher` (a `Spring` on `--pane-p`, reversing mid-slide) | S / P |
 | Behaviours | 13 (control center), 06 (Escape, menus) | S |
 | Keyboard | popup grab → bar `OnDemand` | S |
@@ -214,7 +214,7 @@ and `ds_shell::tokens::osd::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSU
 | Layer / role | layer-shell `Top`, `KeyboardMode::OnDemand` (SPEC: normal windows cannot stay on top) | S |
 | Material | `Window` (paper: apps stay on paper, 21-SPACES §7) | P |
 | Components | editor (Notes' block editor), `CommandPalette` on Cmd+K, `TextField{Search}`, `Button{Toolbar}` | S / P |
-| Motion | show `page-in` `--t-big` `--e-spring`; hide `fade` `--t-quick` `--e-exit` | P |
+| Motion | show Fade `--t-quick`; hide Fade `--t-quick` `--e-exit` (`page-in` is a dead keyframe, removed in the clean-up phase) | P |
 | Behaviours | toggle on shortcut, Esc hides, never loses text (SPEC); 06 (Escape, command menu) | S |
 | Blur / input | none; input `Whole` | P |
 | Milestone | M12 with Notes P | P |
@@ -272,17 +272,17 @@ Photos, Files/Drive, Notes, Contacts) uses that account; several accounts side b
 ## 2. Apps
 
 All apps are xdg toplevels through shell-host (`spawn_toplevel`), `Material::Window`, on
-paper (`--paper`). Only mail's frame shows the Space colour (21-SPACES §9).
+paper (`--paper`), flush with their sidebar (no inset card, 30 §3.4). A window's sidebar ground shows the Space tint (21-SPACES §9); nothing else does.
 
 ### 2.1 Mail (first; exists)
 
 | Field | Value | St |
 | --- | --- | --- |
 | Role | toplevel; migrates webview → Blitz (Phase A path dep, Phase B Blitz) | S |
-| Material | `Window` with Space frame (`.ds-layer` A/B cross-fade + `.ds-grain`) around the card | S |
-| Layout | S `.win` grid 232 px + card, card inset 8 (01-LAYOUT) | S |
+| Material | `Window`, flush: sidebar on the Space's flat tint, content on paper (target (clean-up phase); the code still draws the frame and an inset card) | S |
+| Layout | sidebar 232 px + content, flush, no inset (01-LAYOUT §3) | S |
 | Components | `CommandPill`, `Row` (`List{SourceList}` for the sidebar), `SectionHeader`, `HoverCard`, `Tooltip`, `Menu`, `CommandPalette`, `ToastHost`, `EdgePeek`, `SegmentedControl`, `Chip`, `Avatar`, `Badge`, `Button`, `TextField`, `RadioGroup`, Space editor pieces | S |
-| Motion | design/30 §1.3 only; the A5 keyframe set is retired (design/30 Part 4); the Space layer cross-fades `--t-big` | S |
+| Motion | design/30 §1.3 only; the A5 keyframe set is retired (design/30 Part 4); the sidebar tint cross-fades `--t-big` | S |
 | Behaviours | 06 (all), 11 (scroll), 12 (back/forward swipe) | S |
 | Launcher | compose and search actions; reports verification codes to the shell | S |
 | Milestone | after quire W2 (Phase A), Blitz Phase B | S |
@@ -291,8 +291,8 @@ paper (`--paper`). Only mail's frame shows the Space colour (21-SPACES §9).
 
 | Field | Value | St |
 | --- | --- | --- |
-| Components | sidebar `Row`s in a `List{SourceList}`, `TextField{Search}`, `Row`, `Toggle`, `Slider`, `SegmentedControl`, `RadioGroup`, Space editor (21-SPACES §6), `Menu` | S / P |
-| Motion | page change `page-in` | P |
+| Components | sidebar `Row`s in a `List{SourceList}`, `TextField{Search}`, `Row`, `Toggle`, `Slider`, `SegmentedControl`, `RadioGroup`, Space editor (preset swatches and one hue slider, 21-SPACES §6), the accent picker (Settings is where the accent lives), `Menu` | S / P |
+| Motion | page change: Fade `--t-quick` (`page-in` is a dead keyframe, removed in the clean-up phase) | P |
 | Behaviours | every page deep-linkable from the launcher (SPEC); 06, 11 | S |
 | Milestone | M12 | S |
 
