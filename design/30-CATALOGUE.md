@@ -1,11 +1,31 @@
 # 30 Catalogue
 
 The settled inventory of the library: every component, motion primitive, interaction primitive,
-state enum and Look value. Later agents build it literally; where 04, 05, 06, 07, 21, 26, 27 or
-29 disagree, this file wins (each names the sections). HIG page names are cited, never quoted;
+state enum and Look value, and **the single source of truth for the design**. Later agents build it
+literally; where any other doc disagrees, this file wins. HIG page names are cited, never quoted;
 design/27 wins over the current HIG text; Liquid Glass is never adopted.
 
-Status: **settled** (decided with the user, 2026-09-29) except where a cell says "conf L": a
+The direction is one quiet Look: pre-Liquid-Glass macOS, with Dia as the reference browser for
+structure only (never for values). Nothing here describes an Arc Look, a second Look, a Space
+gradient or a frame; those are history (`archive/`).
+
+Where two docs disagree, the one lower in this list is wrong until fixed (only the user changes 30):
+
+1. `30-CATALOGUE.md`: rules, foundations, components, the one Look, the decisions (3.4), the drop list.
+2. `27-HIG-PARITY.md`: the Mac anchor; wins over the live HIG text.
+3. `00-PRINCIPLES.md`: the stance in one page.
+4. Token docs: `01-LAYOUT.md`, `02-TYPE.md`, `03-COLOR.md`, `29-SIZING.md`.
+5. Behaviour: `05-MOTION.md` (what survives), `06-INTERACTIONS.md`, `10`-`13`, `26-DETAILS.md`.
+6. Spaces and settings: `21-SPACES.md`, `22-SETTINGS.md`, `28-CUSTOMIZATION.md`.
+7. Per surface: `20-SURFACES.md`, `23-WIDGETS.md`, `25-EMOJI.md`, `08-ICONS.md`, `31-ACCOUNTS.md`.
+8. `04-COMPONENTS.md`: reference for its KEEP entries only.
+9. Workflow docs: `CHECKLIST.md`, `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `CONSUMING.md`, `CONVENTIONS.md`, `FINDINGS.md`.
+10. `archive/`: read-only history.
+
+Text that describes code the clean-up phase has not changed yet is marked "target (clean-up
+phase)"; the code follows the doc, not the other way round.
+
+Status: **settled** (decided with the user, 2026-09-29, extended 2026-10-02 in section 3.4) except where a cell says "conf L": a
 macOS number that could not be confirmed, shipped as the default and tuned against a real Mac
 (Deferred item 5).
 
@@ -16,9 +36,9 @@ macOS number that could not be confirmed, shipped as the default and tuned again
 | R1 | Target: macOS Sonoma / Sequoia, pre-Liquid-Glass. Every component's look, sizes, states and behaviour follow the macOS default; the contract names its AppKit counterpart. Every open question takes the macOS default. |
 | R2 | One motion model: the macOS one. quire's own flourishes are gone: press squish, hover lift, overshoot and spring pops, tilt, stagger, first-show sweeps, mailo-era keyframes, infinite loops (the spinner is the one exception, and the voice orb's turn while it is `Active`). Motion levels are an accessibility preference only. |
 | R3 | One implementation per concept. Every MERGE names one survivor; the absorbed names are deleted, not aliased. |
-| R4 | There is one Look (Part 3), the Mac values; Arc's ideas are features (3.3), not values. |
+| R4 | There is one Look (Part 3): quiet, pre-Liquid-Glass Mac values. Dia is the reference for structure; Arc's ideas are features (3.3), not values. |
 | R5 | Kept although macOS lacks them: skeleton, toast, busy state on buttons and rows, hover card, key-cap. They move the macOS way (section 2.9 and 2.5). |
-| R6 | Arc-style features (pinned tiles, Today tabs, edge-peek sidebar, link pill, grouped launcher commands, Ctrl+1-9 Space switching) exist in both Looks (section 2.11). |
+| R6 | The kept features (pinned tiles, Today tabs, edge-peek sidebar, link pill, grouped launcher commands, ⌃1-9 Space switching) exist on every surface, in their quieter form (sections 2.11, 3.3). |
 | R7 | No `bool` props; no `busy`/`open`/`muted` invented per component: the shared enums of section 1.5. |
 | R8 | Every component takes the `Common` props (`id`, `data`, `extra_class`, `aria_label`, `mounted`) and names its public parts (section 1.7). |
 
@@ -49,7 +69,7 @@ Durations (`DurationToken`); every duration in CSS and Rust comes from this tabl
 | --- | --- | --- | --- | --- |
 | Quick `--t-quick` | 150 | control state fades, menu close, focus ring, cross-fade (conf M) | colour, opacity, glyph swap, close of menu/popover/tooltip, hover-card out | was 170 |
 | Move `--t-move` | 250 | `NSAnimationContext` default | collapse, list insert/remove, pane slide, banner in, progress value change | kept |
-| Big `--t-big` | 400 | window / sheet class (conf L) | sheet and side-panel in when not spring-driven, Space colour cross-fade | was 420; absorbs Scene 380 |
+| Big `--t-big` | 400 | window / sheet class (conf L) | sheet and side-panel in when not spring-driven, Space tint cross-fade | was 420; absorbs Scene 380 |
 | Shake `--t-shake` | 420 | login shake (conf M) | the one shake | kept; absorbs ShakeLong |
 | SpinStep `--t-spin-step` | 83 | 12-spoke spinner, one turn per second (conf M) | spinner spoke step | replaces PendingStep |
 | Hold tokens | | | | |
@@ -127,7 +147,7 @@ Motion of the macOS surfaces, all built from the rows above:
 | Side panel, notification banner, toast | Slide(Right) `--t-move` `--e-out` | Slide(Right) `--t-quick` `--e-exit`; swipe right dismisses with the release velocity |
 | OSD | Fade `--t-quick` | Fade `--t-move` after its hold |
 | Pane switch | Spring on `--pane-p` | reverses mid-slide |
-| Space switch | colour cross-fade `--t-big` | |
+| Space switch | tint cross-fade `--t-big`, no slide | |
 
 ### 1.4 Interaction primitives
 
@@ -351,7 +371,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 | Battery widgets | Batteries widget | `BatteryGlyph` + `ProgressIndicator{Ring}` + `Label`, one `BatteryState`, one arc geometry | none | glyph, ring | `BatteryLevel`, `BatteryFigure`, `DeviceBattery`, `RowBattery`, `DeviceGlyph` duplicates | MERGE | P1 |
 | IdleDim | display dim | `IdleDim` token | none | overlay | none | KEEP | P2 |
 | Dock: DockTile, DockLabel, RunningDot, DockFloor | Dock | `DockTile` = plate + `Badge` + `ProgressIndicator{Bar}` + running dot; `DockLabel` uses `HoverIntent` Label; magnification and bounce in sill | hover (magnify) | tile, label, dot | sill `Tile`, `.sill-dock-label` (L14), `TooltipKind::Fly` | ADD | P1 |
-| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | dots, grain, theme; in `ds` (`components/app/space_editor`), so an app takes them without the shell's kit; the card-accent segments read "Space colour" (the card borrows the Space's hue) and "Your accent" (the default) | none | dot | none | KEEP | P2 |
+| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | target (clean-up phase): preset swatches plus one hue slider, a grain slider and the theme; no 2-D field, no gradient, no contrast readout (21-SPACES); in `ds` (`components/app/space_editor`), so an app takes them without the shell's kit; the card-accent segments and extra dots go | none | dot | none | KEEP | P2 |
 | AnimatedEmoji | Messages reactions (design/25) | the asset's own animation; no quire loop | none | image | none | KEEP | P2 |
 
 ### 2.11 App features and mail-only
@@ -366,7 +386,7 @@ configurations plus the pieces below; their motion uses 1.3 only.
 | Edge-peek sidebar | a hidden sidebar reveals on pointer at the window edge (`HoverIntent`, Slide(Left) by spring), pins on click | `EdgePeek` (from `EdgeStrip` and the sidebar's peek; `Peek`, mail's reader panel, and `HoverStrip`, the thread row's action strip, stay) | apps | MERGE | P1 |
 | Link pill | rounded pill showing the current link; hover-intent expands, click copies | `LinkPill` | apps | KEEP | P2 |
 | Grouped launcher commands | palette results grouped by kind with `SectionHeader`; group order per Space | `CommandPalette`, `List` | shell, apps | KEEP | P1 |
-| Space switching | Ctrl+1..9 (Cmd+1..9 left to apps; 27 §8.5); Space colour cross-fades `--t-big` | `StandardAction`, `Shortcut` | shell | KEEP | P1 |
+| Space switching | ⌃1..9 (Mac "Switch to Desktop N"; ⌘1..9 stay free for apps; 27 §8.5); the Space tint cross-fades `--t-big`, no slide | `StandardAction`, `Shortcut` | shell | KEEP | P1 |
 
 Mail-only (`ds::app`; mailo keeps its own look for now):
 
@@ -391,42 +411,48 @@ primitives; 3 `Label`, `Button` (+ `IconButton` merge), `Toggle`, `Checkbox`, `R
 7 overlays (`Popover`, `Sheet`, `Alert`, `SidePanel`, `Tooltip`, `HoverCard`, `Toast`,
 `DockLabel`), `EmptyState`, `Skeleton`; 8 shell-only and app features; 9 P2 (Stepper, DatePicker,
 Table, Toolbar, SplitView, Sidebar, TabView, FieldRow, MenuBar model); 10 sill switch-over
-(L1-L16 of the component inventory); Arc's ideas arrive as features (section 3.3).
+(L1-L16 of the component inventory); the kept ideas arrive as features (section 3.3).
 
 ---
 
 ## 3. The Look
 
-There is one Look: the Mac values below. It is one value set, not a switch: the library has no
-Look type, no `data-look` and no per-Look stylesheet, and a stored `appearance.look` is an unknown
-key. What the design takes from the Arc prototype are features (3.3), not values.
+There is one Look: quiet, pre-Liquid-Glass Mac values (design/27), with Dia as the reference
+browser for structure (a calm sidebar beside the content, one small set of surfaces). It is one
+value set, not a switch: the library has no Look type, no `data-look` and no per-Look stylesheet,
+and a stored `appearance.look` is an unknown key. What the design keeps from the Arc prototype are
+features (3.3), not values.
 
 ### 3.1 What the Look supplies
 
-Colour tokens (light and dark), radii, font families, the material recipes, shadows, the icon plate
-and the orb colours, all in `ds-style::tokens`; every component reads them and none carries a value
-of its own. The Look never sets a size (`SizeScale`), a duration, easing or motion level, a
-behaviour or a default keyboard binding. User styles (ARCHITECTURE section 10) apply after it.
+Colour tokens (light and dark), radii, font families, the material recipes, the four shadows, the
+icon plate and the orb colours, all in `ds-style::tokens`; every component reads them and none
+carries a value of its own. The Look never sets a size (`SizeScale`), a duration, easing or motion
+level, a behaviour or a default keyboard binding. User styles (ARCHITECTURE section 10) apply after
+it.
 
 ### 3.2 The values
 
 | Value | The Look |
 | --- | --- |
-| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays) |
-| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); the picker offers macOS's eight (Blue, Purple, Pink, Red, Orange, Yellow, Green, Graphite) |
+| Font UI / display / mono | Inter / Inter / Space Mono (Inter has no monospace; the bundled mono stays). One system face; there is no second "Editorial" face |
+| Accent (light / dark) | system blue #007AFF / #0A84FF (conf M); eight macOS accents (Blue default, Purple, Pink, Red, Orange, Yellow, Green, Graphite); the global accent is the desktop's, set in Settings |
 | Paper (window) | #ECECEC / #1E1E1E (conf M) |
 | Surface (control / content) | #FFFFFF / #2A2A2A (conf M) |
 | Ink / soft / faint | 85 %, 55 %, 25 % black or white (label, secondary, tertiary) |
+| Status ok / warn / danger | Mac system green / orange / red (light and dark variants) |
 | Selection | `--sel-bg` accent, `--sel-bg-quiet` neutral grey `rgba(128,128,128,.25)` |
 | Radii ctl / field / seg well / seg / menu / popover / sheet / notification | 5 / 5 / 6 / 5 / 8 / 10 / 10 / 16 |
 | Card radius | 10 (group box 6) |
 | Window / panel | window 10, Control Center panel 18, module 8 |
-| Grain | a feature (3.3), not a Look value: the Space's own grain (0..100) over its colour backdrop, none of the Look's |
-| Shadows | window `0 10px 30px -10px rgba(0,0,0,.35)`; menu and popover a hairline plus soft drop |
+| Window structure | sidebar and content flush, like a standard Mac window: no inset card, no frame, no card shadow |
+| Headings | sentence case, 11 px, secondary ink; no caps, no letter-spacing |
+| Grain | a feature (3.3), not a Look value: the Space's own grain (0..100), default none |
+| Shadows | four tokens: window `0 10px 30px -10px rgba(0,0,0,.35)`, popover (a hairline plus soft drop; menus use it), sheet, drag. Controls carry only the Mac push-button bezel, no shadow token |
 | Materials | translucent vibrancy tints; Menu, Popover, Sheet, Sidebar, Bar, Dock, Osd, Toast, Widget, Window (Window = flat `--paper`) |
-| Icon plate | abstract embossed plate, matte, per-app gradient, tone band in dark |
+| Icon plate | abstract embossed plate, matte, per-app gradient and per-app colour (apps are told apart by colour, as on the Mac), tone band in dark |
 | Orb colours (`--orb-bg --orb-c1 --orb-c2 --orb-c3`, light / dark) | oklch(95% .02 264.695), (75% .15 350), (80% .12 200), (78% .14 280) / the same hues at 24%, 68%, 72%, 70% lightness (dark conf L) |
-| Backdrop | the Space colour tints the chrome (its gradient over the wallpaper's blur, frame inks from the Space); apps stay on paper |
+| Space tint | one flat colour at about 40 % of the old chroma on the sidebar ground only (3.4, 21-SPACES); no gradient, no frame inks, no backdrop; apps and the content stay on paper |
 
 Materials (`Material`): Window, Bar, Dock, Menu, Popover, Sheet, Sidebar, Toast, Osd, Widget
 (Menu and Sidebar are added). Material tints and shadows still carry the values landed before the
@@ -437,17 +463,64 @@ Selection is three tokens, `--sel-bg`, `--sel-bg-quiet` and `--sel-ink`, read by
 window's selected row is the accent under its ink, an inactive window's (and a list that does not
 hold the keyboard, except a source list, which follows its window) the quiet grey.
 
-### 3.3 What the design takes from Arc
+### 3.3 What the design keeps from Arc
 
-Features, available to every surface (R6), not values:
+Features, available to every surface (R6), not values, each in its quieter form:
 
-- the Space colour on the chrome: the bar, dock, launcher and control center tint from the Space,
-  with frame inks (`--f-*`) derived from its dots (21 section 2);
-- the command pill, pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
-  launcher commands and Ctrl+1-9 Space switching (section 2.11);
-- the sidebar on colour: a source list draws on the Space's frame;
-- grain: the Space's own noise tile over its colour backdrop (the Window root and the chrome roots
-  the gradient is drawn on), never on a control or the paper card (03 section 8, 21 section 2).
+- the Space tint on the sidebar ground (flat, one colour; no frame, no gradient, no chrome inks);
+- the command pill, pinned tiles (smaller, badge only when unread), Today tabs (no header; time and
+  close on hover), the edge-peek sidebar (hairline edge), the link pill (a status pill like
+  Safari's status bar) and grouped launcher commands (section 2.11);
+- ⌃1-9 Space switching with a cross-fade, no slide;
+- grain: the Space's own noise tile over the sidebar tint, default none, never on a control or the
+  content (03 section 8, 21 section 2).
+
+### 3.4 Decisions, 2026-10-02
+
+Settled with the user unless marked "orchestrator" (the user may override those). Code that does
+not do this yet is **target (clean-up phase)**.
+
+Direction
+- One Look, quiet Dia/Mac. Eight Mac accents, Blue default; the global accent is the desktop's.
+
+Window and Space colour (user)
+- The window is flush: sidebar and content sit side by side like a standard Mac window. No inset
+  card, no frame, no card shadow. The frame model (`.ds-layer` A/B gradient, `.ds-frame`,
+  `data-ground=frame`, the inset card) goes; the Space tint colours the sidebar ground only, flat.
+- A Space has one flat tint at about 40 % of the old chroma. The Space editor is preset swatches
+  plus one hue slider: no 2-D field, no gradient, no visible contrast readout (contrast stays as
+  tests). The grain slider stays; grain defaults to none for new Spaces and every preset.
+- Avatars and account colours stay coloured; the per-row account mark shows only with more than one
+  account.
+- Widgets are muted: neutral plates, colour only where it means something. Ring gauges appear only
+  in the control centre; everywhere else a plain battery glyph with a number.
+- App icons carry per-app identity, like the Mac: distinct colours per app so apps are easy to
+  tell apart; no forced muted set.
+- Space switching is ⌃1-9 (Mac "Switch to Desktop N"); ⌘1-9 stays free for apps. mailo moves to ⌃.
+- The Dock uses the Mac default bounce (while launching and when an app needs attention).
+  Magnification stays on, capped at 72 px.
+- Kept features, quieter only: Today tabs (no header; time and close on hover), pinned tiles
+  (smaller, badge only when unread), Space switch (cross-fade, no slide), edge peek (hairline edge).
+- Deferred, map only: the one-input / companion / AI work (the command pill and list search stay).
+
+Orchestrator decisions
+- Old-direction docs are archived under `design/archive/` with "moved to" notes, never deleted.
+- Headings are sentence-case 11 px secondary text; no caps-tracked labels anywhere. (Title Case on
+  buttons, menu items and tabs stays: that is the Mac rule, 02 section 13.)
+- Four shadow tokens (window, popover, sheet, drag) replace the twelve; controls keep only the Mac
+  push-button bezel.
+- Status colours ok / warn / danger are the Mac system green / orange / red.
+- Kept, quieter: Quick-Look-style Peek, undo-send (`SendPill`), the link status pill. The outbox is
+  not part of the deferred one-input work.
+- The "Editorial" typeface is dropped.
+- Space migration: an existing Space keeps its first colour's hue; extra stops are dropped; a grain
+  value the user set is kept.
+- The control centre keeps a Dark Mode toggle and drops the accent picker (accent lives in Settings).
+- mailo's settings move to a Mac Settings window (⌘,); its hand-made modals become quire `Sheet` /
+  `Alert`.
+- Motion is the Mac's only: the dead keyframes (`slide-r/l`, `page-in`, `shake`, `morph`, and the
+  `--b` duplicates if unused) are removed; menus open without scale.
+- Copy is short Mac copy everywhere.
 
 ---
 
@@ -462,7 +535,7 @@ Each row is a DROP: name, then the reason.
 | Overshoot / spring pop keyframes, `--overshoot`, `--e-spring`, `menu-pop`, `pop-in`, `chip-in`, `chip-land`, `star-pop`, `seal-pop`, `cmdk-in`, `hc-in`, `osd-in` | R2: springs only on contact; menus open instantly |
 | `--tilt`, `--pickup`, `--stagger`, `Reveal`, `use_rise_on`, `StaggerIndex` | no macOS counterpart |
 | Motion levels Calm and Extra, per-Look motion tables (Post, Riso, Tide, Candy) | one model; levels are accessibility only |
-| Looks Post, Riso, Tide, Candy, warmth, Mochi | Mac and Arc are the two Looks; Arc values come from Post/S |
+| Looks Post, Riso, Tide, Candy, warmth, Mochi; the Arc Look; the Space gradient backdrop; the frame model (`.ds-layer`, `.ds-frame`, `--f-*`, the inset card); `CardAccent`; caps-tracked labels; the "Editorial" face; the twelve shadow tokens | one quiet Look (3.4); history is in `archive/` |
 | Curl, Crumple, Fold, TabOut, BannerOut exits; `*Heavy` durations | Roster fade and slide |
 | `use_pulse`, `PulseKey`, `use_nudge`, `use_bump_on`, `Bumped`, `use_once` public | emphasis flourishes |
 | `RollDigits`, `use_count_up`, `CountUp` | numbers change instantly |
@@ -499,7 +572,7 @@ Each row is a DROP: name, then the reason.
 
 | # | Item | Why it waits |
 | --- | --- | --- |
-| 1 | App layout: frameless Space-coloured window versus toolbar window, per app | decided as each app is built; not designed here |
+| 1 | App layout: sidebar-plus-content window versus toolbar window, per app (both flush) | decided as each app is built; not designed here |
 | 2 | Menu-bar transport for quire apps (push the `MenuBar` model to the shell over IPC, or draw in-window) | COSMIC has no global-menu protocol; 27 §8.6 covers foreign apps only |
 | 3 | mailo's move onto a Look and the density step it keeps (29 decision 9) | mailo keeps its current look for now |
 | 4 | HUD / inspector panel (`NSPanel`) | no app needs one yet |
