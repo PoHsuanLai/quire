@@ -3,15 +3,18 @@
 Run at every wave gate, by the reviewer, for every surface or app the wave touched. Tokens
 alone are not a port; type, layout, colour, components, motion, interaction and behaviour
 all have to match (mailo memory rule, PLAN "Findings: what mailo's design layer gives us").
+Derived from `30-CATALOGUE.md` (the source of truth): one quiet pre-Liquid-Glass Mac Look.
 
 Copy this list into the wave's review note, tick each box, and cite the doc section for
 anything that fails. A box that cannot be checked is a finding, not a skip.
 
 ## 1. Type
 
-- [ ] Only the three faces: display Bricolage Grotesque, ui Karla, data Space Mono.
-      Cite `02-TYPE.md`.
-- [ ] Every size/weight/tracking pair is one from 02's pairs table; no raw `font-size` in
+- [ ] Only the two faces: Inter (UI and display) and Space Mono (data); no second "Editorial"
+      face. Cite `02-TYPE.md`, `30-CATALOGUE.md` section 3.2.
+- [ ] Quiet: no caps-tracked or letter-spaced label anywhere; headings are sentence case, 11 px,
+      secondary ink. Cite `30-CATALOGUE.md` section 3.4.
+- [ ] Every size/weight pair is one from 02's pairs table; no raw `font-size` in
       consumer CSS (`lint` rule `RawFontSize`). Cite `02-TYPE.md`.
 - [ ] Truncation follows 02 (single-line mask fade `.ds-truncate`, 2-line clamp only where
       listed). Cite `02-TYPE.md`.
@@ -33,6 +36,8 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 ## 2. Layout
 
 - [ ] Grids, pane widths and row heights match 01. Cite `01-LAYOUT.md`.
+- [ ] The window is flush: sidebar and content side by side, no inset card, no frame, no card
+      shadow. Cite `30-CATALOGUE.md` section 3.4.
 - [ ] Spacing values come from the spacing scale; floating surfaces clamp 8 px from edges.
       Cite `01-LAYOUT.md`.
 - [ ] z-order uses `--z-*` tokens only (`lint` `RawZIndex`). Cite `01-LAYOUT.md`.
@@ -44,8 +49,12 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 - [ ] Each element uses the token the usage map assigns it. Cite `03-COLOR.md`.
 - [ ] "Colour is a claim": chrome is greyscale; every hue states a fact. Cite
       `00-PRINCIPLES.md`.
-- [ ] Contrast pairs pass in light and dark for all 6 accents (`every-pair-legible`).
+- [ ] Contrast pairs pass in light and dark for all eight accents (`every-pair-legible`).
       Cite `03-COLOR.md`.
+- [ ] Status colours are the Mac system green / orange / red (ok / warn / danger); no hue used for
+      decoration.
+- [ ] Shadows are the four tokens (window, popover, sheet, drag); no card shadow, no per-control
+      shadow beyond the Mac push-button bezel. Cite `30-CATALOGUE.md` section 3.2.
 
 ## 4. Components
 
@@ -57,28 +66,26 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       `04-COMPONENTS.md`.
 - [ ] The surface uses the components and Material listed for it. Cite `20-SURFACES.md`.
 
-## 4b. Workflow (09-ARC-HEURISTICS.md)
+## 4b. Short copy
 
-- [ ] The brief names which of H1..H7 the work serves; a surface serving none is kept small and
-      conventional. Cite `09-ARC-HEURISTICS.md#2-the-seven-heuristics`.
-- [ ] Everything the surface shows belongs to a Space and follows a Space switch (H1).
-- [ ] Navigation is a vertical list on the sidebar, never a horizontal tab strip (H2).
-- [ ] Every action has a key and shows it; the command menu lists it (H5).
-- [ ] Every default the surface introduces is a key in 22 (H6).
-- [ ] Any convention break has one skippable onboarding moment (H7).
+- [ ] Copy is short Mac copy: a label is a word or two, a hint one short sentence; no marketing
+      voice, no explanations a Mac would not show. Cite `30-CATALOGUE.md` section 3.4.
+- [ ] Every default the surface introduces is a key in 22.
 
 ## 5. Motion
 
 - [ ] Durations and easings are tokens only (`lint` `RawDuration`, `RawEasing`). Cite
       `05-MOTION.md`.
 - [ ] Keyframes come from quire's `motion.css` only (`lint` `Keyframes`,
-      `UnknownAnimation`). Cite `05-MOTION.md`.
+      `UnknownAnimation`), and only live ones. Cite `30-CATALOGUE.md` section 1.3.
 - [ ] State after an animation is driven by quire timers (`settle`, `use_motion_timer`,
       `use_pulse`), never ad-hoc sleeps. Cite `05-MOTION.md`.
-- [ ] Stagger only on first show, capped at 12 rows. Cite `05-MOTION.md`.
-- [ ] Springs only on contact; exits accelerate; nothing loops. Cite `00-PRINCIPLES.md`,
-      `05-MOTION.md`.
-- [ ] Reduced motion level checked once (60 ms everywhere). Cite `05-MOTION.md`.
+- [ ] No stagger, no first-show sweep, no overshoot, no hover lift or press squish. Cite
+      `30-CATALOGUE.md` R2.
+- [ ] Springs only on contact; exits accelerate; nothing loops but the spinner. Cite
+      `00-PRINCIPLES.md`, `30-CATALOGUE.md` section 1.3.
+- [ ] Reduced motion checked once (cross-fade at `--t-quick`, no springs). Cite
+      `30-CATALOGUE.md` section 1.1.
 
 ## 5b. State details (26-DETAILS.md)
 
@@ -112,7 +119,7 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
       `27-HIG-PARITY.md` section 6.3.
 - [ ] Shortcuts: standard ones bound through `Shortcut::standard(StandardAction)`, the app's own
       through `Shortcut::custom` (which refuses a reserved key); nothing repurposes a standard
-      combination (no Cmd+S sidebar, no Cmd+T command menu); modifiers drawn `⌃⌥⇧⌘`. Cite
+      combination (no Cmd+S sidebar, no Cmd+T command menu); modifiers drawn `⌃⌥⇧⌘`; Space switching is ⌃1-9 and ⌘1-9 stay free for apps. Cite
       `06-INTERACTIONS.md` section 2.0.
 - [ ] Tab reaches every control (the default `All`); a surface that traps Tab for its own use
       says so. Cite `06-INTERACTIONS.md` section 2.0.
@@ -121,7 +128,8 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 
 ## 7. Behaviour
 
-- [ ] Dock acceptance tests pass (if touched). Cite `10-BEHAVIOUR-dock.md`.
+- [ ] Dock acceptance tests pass (if touched): Mac bounce, magnification capped at 72 px. Cite
+      `10-BEHAVIOUR-dock.md`.
 - [ ] Scroll acceptance tests pass (if touched). Cite `11-BEHAVIOUR-scroll.md`.
 - [ ] Gesture acceptance tests pass (if touched). Cite `12-BEHAVIOUR-gestures.md`.
 - [ ] Menu, window, notification and launcher acceptance tests pass (if touched). Cite
@@ -140,12 +148,13 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 
 ## 9. Spaces
 
-- [ ] Tinted chrome uses `--f-*` frame tokens only; apps stay on Post tokens. Cite
-      `21-SPACES.md#3-where-the-tokens-apply`.
-- [ ] Workspace switch cross-fades over `--t-scene` (380 ms) with the A/B layers. Cite
-      `21-SPACES.md#5-workspace-switch-settled-model`.
-- [ ] Space contrast tests pass for all 8 presets in both schemes. Cite
-      `21-SPACES.md#7-contrast-guarantees-settled-floors-tests`.
+- [ ] The Space tint is one flat colour on the sidebar ground only; no gradient, no frame tokens,
+      no tint on the content or on a control. Cite `21-SPACES.md`.
+- [ ] A Space switch cross-fades the tint over `--t-big`; no slide, no A/B layers. Cite
+      `21-SPACES.md`.
+- [ ] Grain defaults to none for new Spaces and every preset; the slider stays.
+- [ ] Space contrast tests pass for every preset in both schemes (the readout is not shown in
+      the editor). Cite `21-SPACES.md`.
 
 ## 10. Lint
 
@@ -163,8 +172,8 @@ anything that fails. A box that cannot be checked is a finding, not a skip.
 - [ ] Gallery contact sheet (`cargo run -p ds-gallery --release -- --snapshot
       target/gallery`) reviewed: every touched component x theme x accent.
 - [ ] Nested-shell screenshots (`dev/shot.sh`) reviewed for every touched shell surface.
-- [ ] The screenshot is compared side by side with the prototype (`~/mailo-design/`) at
-      the same size, not from memory.
+- [ ] The screenshot is compared side by side with the Mac reference (a real Mac, or the
+      archived HIG snapshots in `27-HIG-PARITY.md`) at the same size, not from memory.
 
 ## 12. Findings
 
