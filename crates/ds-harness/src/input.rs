@@ -4,6 +4,7 @@
 
 use crate::harness_input::modifier;
 use ds::file_drop::drag::FileDragInput;
+use ds::host::gesture::Gesture;
 use ds::prelude::*;
 use ds_core::press::PointerButton;
 use keyboard_types::Modifiers;
@@ -26,6 +27,10 @@ pub enum Input {
         /// Vertical delta.
         dy: Px,
     },
+    /// A touchpad gesture (a pinch, or a scroll with its phase), as the window publishes it to the
+    /// components listening with `use_gestures`. A [`Input::Wheel`] publishes the scroll
+    /// itself; this is for what Blitz has no event for.
+    Gesture(Gesture),
     /// One step of a file drag from outside the window.
     FileDrag(FileDragInput),
     /// The input method.
@@ -181,6 +186,11 @@ impl Input {
     /// Scroll by `dx`, `dy` with the pointer at `at`.
     pub fn wheel(at: Point, dx: Px, dy: Px) -> Self {
         Input::Wheel { at, dx, dy }
+    }
+
+    /// `gesture` published to the window's listeners.
+    pub fn gesture(gesture: Gesture) -> Self {
+        Input::Gesture(gesture)
     }
 
     /// The IME attaches.

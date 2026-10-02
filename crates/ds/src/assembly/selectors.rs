@@ -76,6 +76,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["icon", "label"],
     },
     ComponentSelectors {
+        component: "Capsule",
+        root: "ds-capsule",
+        parts: &["readout", "divider"],
+    },
+    ComponentSelectors {
         component: "Checkbox",
         root: "ds-checkbox",
         parts: &["indicator", "label"],

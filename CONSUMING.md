@@ -642,7 +642,7 @@ Full catalogue (design doc section in parentheses):
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure, search and multi-line), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow), `Skeleton`/`SkeletonRow` (static placeholders), `Loadable` (placeholder, content or failure by phase) |
-| Frame | `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
+| Frame | `Capsule` (design/30 §2.7a), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
 `crates/ds/src/components/<family>/<name>.rs` — read that, not this table, before wiring one up; this doc
@@ -1029,6 +1029,23 @@ measured numbers.
 | Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
 | The painter alone | the `pdfrum-anyrender` crate, in the pdfrum repo | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `ds-blitz`'s `pdf` feature depends on it as a git dependency pinned to pdfrum rev 61371040, so a consumer that only prints through `ds_blitz::pdf` names nothing new; one that calls the painter directly adds the same git dependency at the same rev. Its own docs describe its page and source types. |
 
+### Pointer capture, gestures and the capsule
+
+For a viewer: a drag that keeps following the pointer outside its element, a touchpad's pinch and
+scroll with their phases, and the pill of controls that floats over content. FINDINGS "Events"
+has the reasons: Blitz has no pointer capture, no pinch event and no wheel phase, but the window
+sees winit's events before the document does, so ds-blitz publishes them and nothing in the
+Blitz fork is needed.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| A drag that leaves its element | `ds::host::pointer_capture::use_pointer_capture(on_pointer) -> PointerCapture`; wire `capture.on_mounted(event)` to `onmounted`, call `capture.begin() -> PointerHold` from `onpointerdown` | `on_pointer` hears every move (`PointerPhase::Drag`) and the primary release (`PointerPhase::Release`) in the window's logical pixels, wherever the pointer is, until the button comes up. `PointerHold::Local` means the host cannot (no host, not mounted yet): the element's own `onpointermove` and `onpointerup` are all there is. The edit surface uses the same route. |
+| A pinch or a phased scroll | `ds::host::gesture::use_gestures(on_gesture)`; `Gesture::Pinch { phase, by: Magnification, at }`, `Gesture::Scroll { phase, by: Point, at }`, `GesturePhase::{Began, Changed, Ended, Cancelled}` | A gesture reaches every listener with the pointer's place; the listener checks it is over its own element. `Magnification(50)` is 5% larger. A scroll's `by` is how far the content moves in logical pixels (winit's sign; a wheel detent is 20 px, and a wheel with no phases reports `Changed` only). Pinch exists on Wayland and macOS, where winit has it. |
+| In a test | `Input::gesture(Gesture::Pinch { .. })`; `Input::wheel(..)` publishes a scroll too | `ds_blitz::launch` and `Harness` provide the `GestureBus`; with no host `use_gestures` hears nothing. |
+| A measure that follows the window | `ds::host::measure::use_rect()` | It reads again after each `ds::host::resized::WindowResized` bump, which `launch` makes on every window resize or scale change; a host with no such source (a shell surface) never bumps, and the rect stays where it was measured. |
+| A machine whose parameters come from its own state | `MachineRef::set_params(params)` before `send` | `use_machine` takes parameters at each render, one render behind a machine whose parameters are derived from its state (a zoom step reads the scale the last step made): compute them from the state just read and set them, then send. |
+| A floating pill of controls | `ds::components::chrome::capsule::view::Capsule { label, slots: Vec<CapsuleSlot<T>>, shown, on_hidden, onpick, onpointerenter, onpointerleave }`; `CapsuleSlot::{Item(ToolbarItem<T>), Readout(String), Divider}` | Bottom centre of its parent, which must have a size and `position:relative`. A card in the `Osd` material; fades in and out over `--t-quick` by `shown` and calls `on_hidden` once it has gone. `onpointerenter` and `onpointerleave` are how an owner keeps it up while the pointer is on it. |
+
 ### GPU textures
 
 A GPU texture inside the document, for decoded images, PDF page tiles and video frames: a
@@ -1131,7 +1148,7 @@ authority; this table is a pointer. `ds_lint::Rule::BlitzUnsupported`
 | `mask-image:url(data:...)` / `background-image:url(data:...)` without a `data:` `NetProvider` | S7, S8 | `ds_blitz::launch`/`Harness` already install one; nothing to do if you use them |
 | `mix-blend-mode`, `position: sticky`, `line-clamp`, `text-shadow` | risk table | avoid outright; `ds::base::text::clip::clip_chars` covers the line-clamp case |
 | `line-clamp` for a multi-line clamp that opens on hover | notification parts | a `max-height` in whole `em` lines with a transition, and a fade decided by measuring (`NotificationCard`'s body); the hidden lines are still hit-tested, so give them `pointer-events:none` |
-| a wheel phase (a touchpad gesture's end) | notification parts | treat a quiet spell after the last delta as the end (`DelayToken::SwipeQuiet`, `use_swipe`) |
+| a wheel phase (a touchpad gesture's end), a pinch | notification parts | `ds::host::gesture::use_gestures` (above): winit's phased wheel and pinch, published by the window; a window with no such source still ends a swipe by a quiet spell (`DelayToken::SwipeQuiet`, `use_swipe`) |
 | a clean removal of a running animation | notification parts | Blitz keeps the last animated value when an animation is taken off an element before a frame resolved past its end: put an entrance on an element that mounts with it rather than on a presence attribute that changes (`BannerStack`) |
 | `break-before`, `break-inside`, `page-break-*`, `@page` (printing) | FINDINGS "PDF output" | `data-break-before="page"`, `data-break-inside="avoid"`, and `PageSpec` margins, read by `ds_blitz::pdf` (section 6, "PDF and printing") |
 

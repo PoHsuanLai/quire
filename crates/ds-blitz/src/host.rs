@@ -43,6 +43,7 @@ use crate::focus_keep::{FocusKeeper, keep};
 use crate::frame_book::FrameBook;
 use crate::frame_hover::report;
 use crate::frame_links::{frame_links, read_link};
+use crate::gesture_window::{gesture_of, pointer_at};
 use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::scheme;
@@ -63,6 +64,8 @@ use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
 use ds::base::vocab::{Activity, InputModality};
 use ds::file_drop::board::FileDropBoard;
+use ds::host::gesture::GestureBus;
+use ds::host::resized::WindowResized;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
 use std::cell::RefCell;
@@ -165,6 +168,14 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let hover = props.setup.frame_links.hover();
     let file_drop = use_context_provider(|| FileDropBoard::new(Rc::clone(&host)));
     use_context_provider(Gpu::empty);
+    let gestures = use_context_provider(GestureBus::default);
+    let resized = use_context_provider(WindowResized::new);
+    let last_pointer = use_hook(|| {
+        Rc::new(std::cell::Cell::new(Point {
+            x: Px(0.0),
+            y: Px(0.0),
+        }))
+    });
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
@@ -191,6 +202,12 @@ pub(crate) fn Host(props: HostProps) -> Element {
         ) {
             framed.refresh();
         }
+        if matches!(
+            event,
+            WindowEvent::SurfaceResized(_) | WindowEvent::ScaleFactorChanged { .. }
+        ) {
+            resized.bump();
+        }
         if let Some(next) = modality_after(event) {
             let mut current = signals.modality;
             if *current.peek() != next {
@@ -206,6 +223,12 @@ pub(crate) fn Host(props: HostProps) -> Element {
         }
         if let WindowEvent::ModifiersChanged(state) = event {
             held.set(modifiers_of(state.state()));
+        }
+        if let Some(moved) = pointer_at(event, window.scale_factor()) {
+            last_pointer.set(moved);
+        }
+        if let Some(gesture) = gesture_of(event, window.scale_factor(), last_pointer.get()) {
+            gestures.publish(gesture);
         }
         if let Some(pointer) = captured_of(event, window.scale_factor(), held.get())
             && let Some(sink) = listeners.captured(pointer.phase)
