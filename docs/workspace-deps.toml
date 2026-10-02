@@ -148,6 +148,9 @@ fastembed = "7.1"
 # The minor cosmic-comp's lock resolves.
 reis = "0.7"
 atspi = "0.30"
+# voiced (docket): the capture device through pipewire-rs, MIT (libpipewire through bindgen;
+# agent-spec voice.md section 2.3, spike V-A).
+pipewire = "0.10"
 # Dev-dependencies.
 proptest = "1"
 tempfile = "3"
