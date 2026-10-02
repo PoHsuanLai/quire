@@ -11,8 +11,6 @@
 
 use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
-use crate::focus::request::use_focus_request;
-use crate::host::caret::InitialCaret;
 use crate::components::fields::text_field_model::FieldKind;
 use crate::components::lists::row::size::RowSize;
 use crate::components::menus::item::item::AfterPick;
@@ -27,6 +25,8 @@ use crate::components::menus::palette::palette_stops::{
     Run, Travel, run_of, shown_groups, stops, travel,
 };
 use crate::components::overlays::popover::{Arrow, Popover};
+use crate::focus::request::use_focus_request;
+use crate::host::caret::InitialCaret;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::root::common::Common;
 use dioxus::prelude::*;
