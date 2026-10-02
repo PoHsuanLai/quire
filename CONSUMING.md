@@ -94,6 +94,21 @@ section 6, "For a bar"), and tracks the input modality. `AppConfig` also takes
 `with_net`, `with_frame_links` and `with_focus_fallback`. `examples/consumer/src/main.rs` is the
 whole call.
 
+**Windows and when the app ends.** Windows are independent: closing any window, the first
+included, closes only that one. The app's choice is `AppConfig::with_last_window(LastWindowClosed)`:
+`Exit` (the default: the loop ends and `launch` returns when the last window closes) or
+`StayFor(Duration)` (the loop runs on with no window for that long, so a daemon-like viewer stays
+warm for its next open, and ends then unless a window opened; the linger also counts from the
+start of a loop that began with no window). To open a window from outside any component (a D-Bus
+or tokio task, a timer), make an `AppHandle::new()` before `launch`, give clones to those
+threads and one to `AppConfig::with_handle`: `handle.open_window(spec, root)` and
+`open_window_with(spec, root, props)` (props are `Send`), `handle.redraw()` (asks every window to
+repaint and wakes the loop, the proxy a worker uses to have the UI thread look again) and
+`handle.quit()` (ends the app whatever the policy). Each answers `Err(AppEnded)` after the loop
+ended, and a request made before the loop runs waits for it. `launch_idle(config)` runs the loop
+with no first window, for an app that opens all of them through its handle. A window's root
+reads its app's handle with `use_app_handle()`; `open_window` still works from inside a window.
+
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
 and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
 a path dependency does not inherit your workspace's `[workspace.dependencies]`, because
