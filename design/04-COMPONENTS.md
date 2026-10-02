@@ -1,5 +1,7 @@
 # 04 Components
 
+> **KEEP entries only (stamp 2026-10-02): do not build from this file for anything else.** One quiet Mac Look (`30-CATALOGUE.md` wins). Use a section here only for a component whose 30 section 2 row is KEEP or MERGE, and then only for its markup skeleton and CSS, with 30's sizes, states and part names. The frame/card model, caps-tracked labels, spring pops, hover-strip icons, `AppearancePicker`, striped placeholders and every keyframe here are history (target (clean-up phase) to remove from the code).
+>
 > **Superseded in part by `30-CATALOGUE.md`.** 30 section 2 is the component inventory: names, sizes, variants, states and merges replace this file's per-component inventory, size tables and variant lists (every component absorbed or dropped in 30 sections 2 and 4 is not built from here). Markup skeletons and CSS here remain a source for KEEP entries only, with 30's sizes, states and part names. Where this file and 30 disagree, 30 wins.
 
 

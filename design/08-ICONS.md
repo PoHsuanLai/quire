@@ -1,5 +1,7 @@
 # 08 Icons
 
+> **Current direction (2026-10-02).** App icons carry per-app identity, like the Mac: each app has its own colour so apps are easy to tell apart, and there is no forced muted set (30 section 3.4). The Candy shelf is the origin of the gradient families, not a current palette; a Space no longer tints icons (`icons.monochrome_tint` defaults to `Accent`, 22). Plate and glyph recipes below stand.
+
 Two icon systems, one rule: glyphs are line drawings in one weight and one colour; app icons
 are objects on one plate shape. Nothing third-party is adopted wholesale.
 

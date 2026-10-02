@@ -1,5 +1,7 @@
 # 06 Interactions
 
+> **Current direction (2026-10-02).** One quiet Mac Look (`30-CATALOGUE.md` wins). Space switching is ⌃1-9 (the "Mod+1..9" rows below), with a tint cross-fade and no slide; Today tabs have no header and show time and close on hover; the edge-peek sidebar has a hairline edge and sits on the Sidebar material, not `--f-solid`; no stagger. The `slide-r/l`, `--e-spring` and stagger wording below is the Arc-era prototype (history, dead keyframes removed in the clean-up phase).
+
 Status: draft for review, 2026-09-23. `S` = `~/mailo-design/mailo-spaces.html` (newest; wins
 every conflict), `C` = `~/mailo-design/mailo-charm.html`. `S:123` means line 123 of S. "The
 plan" means `~/.claude/plans/vast-toasting-peach.md`; "Appendix A/C" are its appendices.
@@ -322,7 +324,7 @@ Move down, Duplicate, Delete (S:2231-2236). The Rust editor replaces HTML5 drag 
 | --- | --- | --- | --- | --- |
 | Shown | Mod+S, the sidebar's hide button, or entering focus mode | Hidden | window grid `0 1fr`, padding-left 8; sidebar `visibility:hidden`; a "Sidebar" mini button appears in the list bar; a 10 px `.edge` strip appears at the left | S:1584-1586, S:85, S:451-452 |
 | Hidden | Mod+S, the "Sidebar" button, leaving focus mode, parking, sending | Shown | reverse | S:1584, S:1992, S:2330 |
-| Hidden | pointer enters the edge strip | Peeking | sidebar floats at left 8, top 8, bottom 8, width 226, z 15, `--f-solid` ground, radius 14, `slide-r` | S:1842, S:453-454 |
+| Hidden | pointer enters the edge strip | Peeking | sidebar floats at left 8, top 8, bottom 8, width 226, z 15, Sidebar material, radius 14, a Slide(Left) by `Spring` (the `--f-solid` ground and `slide-r` are history) | S:1842, S:453-454 |
 | Peeking | pointer leaves the sidebar | Hidden | | S:1843 |
 
 The width change animates (`.win` transition, `05-MOTION.md#6-transitions`).
@@ -341,10 +343,9 @@ port should close it on edge leave unless the pointer entered the sidebar).
 1. No-op if `i` is the current Space or does not exist.
 2. `dir = +1` if `i > current`, else `-1`. Current Space = i; the active editor dot resets to
    0; the place resets to Inbox (the selected thread per Space is kept).
-3. The sidebar content re-renders and slides in (`slide-r` for +1, `slide-l` for -1; ±26 px,
-   `--t-big`, `--e-spring`). Counts do **not** bump on a switch (S:1262 only bumps when there is
+3. The sidebar tint cross-fades over `--t-big` and the sidebar content swaps with a cross-fade (settled 2026-10-02: no slide; the prototype's `slide-r`/`slide-l`, ±26 px, `--e-spring` are history). Counts do **not** bump on a switch (S:1262 only bumps when there is
    no direction).
-4. The list re-renders with `entering`: rows rise staggered.
+4. The list re-renders; rows do not rise or stagger (30 R2).
 5. The reader re-renders (a draft open in the composer is parked silently, S:1385).
 6. The frame colour cross-fades: the back layer receives the new gradient and goes to opacity 1,
    the front goes to 0, and they swap roles (S:1181-1187); 380 ms `--e-out`. The `--f-*` frame
