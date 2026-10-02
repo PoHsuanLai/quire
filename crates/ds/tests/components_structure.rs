@@ -44,6 +44,11 @@ fn name(case: &Case) -> String {
 /// The classes each component's own sheet styles, by the prefix its markup carries.
 const OWN_SHEETS: &[(&str, &str, &str)] = &[
     (
+        "capsule",
+        "ds-capsule",
+        include_str!("../src/components/chrome/capsule/capsule.css"),
+    ),
+    (
         "stepper",
         "ds-stepper",
         include_str!("../src/components/fields/stepper/stepper.css"),
