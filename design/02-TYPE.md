@@ -37,10 +37,17 @@ aligned logs).
 --font-display:"Inter Display","Inter",system-ui,sans-serif;
 --font-ui:"Inter",system-ui,sans-serif;
 --font-data:"Inter",system-ui,sans-serif;
---font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+--font-code:"Space Mono","Inter",ui-monospace,"SFMono-Regular",Menlo,monospace;
 ```
 
-History: the Editorial faces (Bricolage Grotesque, Karla) are not part of the design; the code that still ships or loads them goes in the clean-up phase (target).
+History: the Editorial faces (Bricolage Grotesque, Karla) are not part of the design; the code that still ships or loads them goes in the clean-up phase (target). While it ships, each Editorial stack names "Inter" right after its own face too.
+
+**Key-cap glyphs.** Google's latin range carries none of `⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟` (and Space Mono's
+lacks `← →`), so a `KeyEquivalent` fell to whatever face the system offered and U+2303 drew as a
+caret. Inter 4.1 draws all of them, so the upright Inter latin face keeps them
+(`cut-inter.sh`'s `KEYS`), and every stack names "Inter" right after its own face: a face that
+lacks a glyph hands it to Inter before the system. `ds-style`'s `fonts` tests check each
+`ShortcutKey` glyph against the shipped cmap and each stack for the fallback.
 
 The design system ships the faces as subset TTFs (latin plus
 latin-ext) registered with the renderer, not as CSS `@font-face` (`P:289`, `P:306`, `P:324`).

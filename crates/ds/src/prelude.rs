@@ -65,6 +65,7 @@ pub use crate::components::menus::menu::cursor::MenuCursor;
 
 // Fields
 pub use crate::components::editor::surface::EditSurface;
+pub use crate::components::fields::fact_list::{Fact, FactList};
 pub use crate::components::fields::text_field::TextField;
 pub use crate::components::fields::text_field_focus::FieldFocus;
 pub use crate::components::fields::text_field_model::FieldBezel;
@@ -93,6 +94,7 @@ pub use crate::components::content::avatar::Avatar;
 pub use crate::components::content::image_source::ImageSource;
 pub use crate::components::content::pdf_thumb::PdfThumb;
 pub use crate::components::content::provider_mark::ProviderMark;
+pub use crate::components::content::text_runs::RunTone;
 pub use crate::components::content::text_runs::TextLine;
 pub use crate::components::content::text_runs::TextRun;
 pub use crate::components::lists::emoji_grid::grid::EmojiGrid;
@@ -104,6 +106,7 @@ pub use crate::components::lists::row::action::RowAction;
 pub use crate::components::lists::row::chord::RowChord;
 pub use crate::components::lists::row::leading::RowLeading;
 pub use crate::components::lists::row::row::Row;
+pub use crate::components::lists::section_header::HeaderAction;
 pub use crate::components::lists::section_header::SectionHeader;
 
 // Spaces
@@ -151,6 +154,7 @@ pub use crate::components::overlays::empty_state::EmptyState;
 pub use crate::components::overlays::flow::Flow;
 pub use crate::components::overlays::side_panel::SidePanel;
 pub use crate::root::chrome::RootChrome;
+pub use crate::root::common::Common;
 pub use crate::root::extent::RootExtent;
 pub use ds_motion::settle::settle;
 pub use ds_motion::timer::use_motion_timer;

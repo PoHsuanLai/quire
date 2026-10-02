@@ -15,6 +15,11 @@
 //! Inter is cut from the official Inter 4.1 release by `scripts/cut-inter.sh` (version and
 //! SHA-256 recorded there): its variable font pinned to `opsz` 14 for Inter (400-700, italic
 //! 400) and to `opsz` 32 for Inter Display (500-800), since the renderer sets no optical size.
+//! The upright Inter text face also carries the key-cap glyphs (`⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟` and the
+//! arrows, `scripts/cut-inter.sh`), because Google's latin range has none of them and a
+//! `KeyEquivalent` fell to the system's face: U+2303 drew as a caret. Every stack names "Inter"
+//! after its own face (`tokens::type_scale::Family`), so the glyphs come from here in both
+//! typefaces, in the code face's key caps too.
 //! Licences are in `assets/fonts/OFL-*.txt`.
 
 use crate::tokens::type_scale::Family;
@@ -304,6 +309,75 @@ mod tests {
                         .iter()
                         .any(|face| face.name == name && face.style == FaceStyle::Normal),
                     "{family:?} under {typeface:?} leads with {name}, which ships no upright face"
+                );
+            }
+        }
+    }
+
+    /// The key-cap glyphs the shortcuts draw (design/30 section 2.1), each a character of a
+    /// shipped face, so a `KeyEquivalent` never depends on the system's fallback.
+    #[test]
+    fn every_key_cap_glyph_is_in_a_shipped_face() {
+        use ds_core::vocab::ShortcutKey;
+        use skrifa::{FontRef, MetadataProvider};
+        let keys = [
+            ShortcutKey::Ctrl,
+            ShortcutKey::Shift,
+            ShortcutKey::Alt,
+            ShortcutKey::Super,
+            ShortcutKey::Enter,
+            ShortcutKey::Tab,
+            ShortcutKey::Backspace,
+            ShortcutKey::Up,
+            ShortcutKey::Down,
+            ShortcutKey::Left,
+            ShortcutKey::Right,
+            ShortcutKey::Home,
+            ShortcutKey::End,
+            ShortcutKey::Delete,
+            ShortcutKey::PageUp,
+            ShortcutKey::PageDown,
+        ];
+        let inter = FACES
+            .iter()
+            .find(|face| {
+                face.name == "Inter"
+                    && face.style == FaceStyle::Normal
+                    && face.subset == Subset::Latin
+            })
+            .expect("the upright Inter latin face ships");
+        let charmap = FontRef::new(inter.bytes)
+            .expect("Inter is an sfnt")
+            .charmap();
+        // `↩` is the Return key Mac menus draw; `↵` is what `ShortcutKey::Enter` draws.
+        let glyphs = keys
+            .iter()
+            .flat_map(|key| key.glyph().chars().collect::<Vec<_>>())
+            .chain(['\u{21A9}']);
+        for glyph in glyphs {
+            assert!(
+                charmap.map(glyph).is_some(),
+                "U+{:04X} ({glyph}) is not in the shipped Inter face",
+                u32::from(glyph)
+            );
+        }
+    }
+
+    /// A glyph a face lacks falls to the next family in the stack, so each stack that leads with
+    /// another face names Inter next.
+    #[test]
+    fn every_stack_falls_back_to_inter_before_the_system() {
+        use crate::tokens::token::{Token, TokenScope};
+        for typeface in Typeface::ALL.iter().copied() {
+            for family in [Family::Display, Family::Ui, Family::Data, Family::Code] {
+                let value = family.css_value(TokenScope::BASE.in_typeface(typeface));
+                let stack: Vec<&str> = value.as_str().split(',').collect();
+                let at = stack
+                    .iter()
+                    .position(|name| name.trim_matches('"') == "Inter");
+                assert!(
+                    at.is_some_and(|at| at <= 1),
+                    "{family:?} under {typeface:?}: {value}"
                 );
             }
         }

@@ -23,6 +23,18 @@ pub fn SegmentedSection() -> Element {
                 .with_availability(Availability::Disabled),
         ]
     };
+    // An image alone says nothing in words, so each is named for assistive technology.
+    let image_only = || {
+        vec![
+            Choice::new(0u8, "").with_icon(Icon::Grid).with_name("Grid"),
+            Choice::new(1u8, "")
+                .with_icon(Icon::Columns)
+                .with_name("Columns"),
+            Choice::new(2u8, "")
+                .with_icon(Icon::Panel)
+                .with_name("Panel"),
+        ]
+    };
     rsx! {
         Section { title: "SegmentedControl", note: "NSSegmentedControl: SelectOne slides one thumb by a spring, SelectAny keeps each selected segment filled, Momentary fills the one held down; the arrows move a SelectOne choice and stop at the ends.",
             for size in ControlSize::ALL.iter().copied() {
@@ -36,6 +48,9 @@ pub fn SegmentedSection() -> Element {
             div { class: "g-row",
                 Specimen { name: "image segments, one disabled".to_owned(),
                     SegmentedControl::<u8> { label: "Layout", choices: icons(), tracking: Tracking::SelectOne(one()), onchange: move |next| one.set(next) }
+                }
+                Specimen { name: "image only, named by Choice::with_name".to_owned(),
+                    SegmentedControl::<u8> { label: "Layout", choices: image_only(), tracking: Tracking::SelectOne(one()), onchange: move |next| one.set(next) }
                 }
                 Specimen { name: "disabled".to_owned(),
                     SegmentedControl::<u8> { label: "View", choices: words(), tracking: Tracking::SelectOne(0), availability: Availability::Disabled, onchange: |_| {} }

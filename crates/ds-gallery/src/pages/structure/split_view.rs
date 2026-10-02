@@ -1,12 +1,17 @@
-//! SplitView: a sidebar pane and the content, dragged, collapsed and reset.
+//! SplitView: a sidebar pane and the content, dragged, collapsed and reset; and a pane whose body
+//! is an `EdgePeek`, which keeps its peek while folded.
 
 use crate::pages::Section;
 use dioxus::prelude::*;
+use ds::components::app::edge_peek::EdgePeek;
+use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds_core::press::Press;
+use ds_core::vocab::RowState;
 
 /// The SplitView section.
 #[component]
@@ -29,6 +34,65 @@ pub fn SplitViewSection() -> Element {
                         div { class: "g-split-side", "Sidebar" }
                     }).shown(sidebar())],
                     on_shown: move |(_, shown)| sidebar.set(shown),
+                    div { class: "g-split-main", "Content" }
+                }
+            }
+        }
+    }
+}
+
+/// The sidebar a peeking pane holds.
+fn places(here: &'static str, onselect: EventHandler<&'static str>) -> Vec<ListItem<&'static str>> {
+    [("inbox", "Inbox", Icon::Inbox), ("sent", "Sent", Icon::Send), ("trash", "Trash", Icon::Trash)]
+        .into_iter()
+        .map(|(key, title, icon)| {
+            ListItem::row(
+                key,
+                title,
+                rsx! {
+                    Row {
+                        title: TextLine::from(title),
+                        leading: RowLeading::Icon(icon),
+                        state: RowState { selection: Selection::of(&here, &key), ..RowState::default() },
+                        onclick: move |_| onselect.call(key),
+                    }
+                },
+            )
+        })
+        .collect()
+}
+
+/// A pane that hosts an `EdgePeek`.
+#[component]
+pub fn SplitViewPeekSection() -> Element {
+    let mut pinned = use_signal(|| Shown::Hidden);
+    let mut here = use_signal(|| "inbox");
+    let onselect = EventHandler::new(move |key: &'static str| here.set(key));
+    let body = rsx! {
+        EdgePeek { label: "Sidebar", pinned: pinned(), onpin: move |()| pinned.set(Shown::Visible),
+            Sidebar::<&'static str> {
+                label: "Mail",
+                cursor: Some(here()),
+                onselect,
+                sections: vec![SidebarSection::List(places(here(), onselect))],
+            }
+        }
+    };
+    rsx! {
+        Section { title: "SplitView: a pane that peeks", note: "SplitPane::peeking: the pane's body is an EdgePeek. Folded away (drag the divider shut, or press the button), the pane stops clipping: point at the left edge to float the sidebar over the content, click the edge to pin it again.",
+            div { class: "g-row",
+                Button {
+                    label: "Sidebar",
+                    size: ControlSize::Small,
+                    value: Some(if pinned() == Shown::Visible { Check::On } else { Check::Off }),
+                    onclick: move |_: Press| pinned.set(pinned().flipped()),
+                }
+            }
+            div { class: "g-stage g-split-stage",
+                SplitView {
+                    label: "Peeking example",
+                    panes: vec![SplitPane::new(PaneSpec::SIDEBAR, body).shown(pinned()).peeking()],
+                    on_shown: move |(_, shown)| pinned.set(shown),
                     div { class: "g-split-main", "Content" }
                 }
             }

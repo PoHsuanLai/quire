@@ -7,9 +7,10 @@ mod panes;
 use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
-use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
+use ds::components::chrome::toolbar::model::{Picked, ToolbarItem, ToolbarRoom};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::chrome::window_frame::WindowTitlebar;
 use ds::prelude::*;
@@ -133,7 +134,7 @@ pub fn SettingsWindowPage() -> Element {
             label: "Settings",
             size: SidebarSize::Medium,
             cursor: Some(category().slug()),
-            items: sidebar_items(category(), &query(), go),
+            sections: vec![SidebarSection::List(sidebar_items(category(), &query(), go))],
             onselect: move |key: &'static str| {
                 if let Some(next) = Category::parse(key) {
                     go.call(next);
@@ -158,7 +159,7 @@ pub fn SettingsWindowPage() -> Element {
                                 leading,
                                 title: Some(TextLine::from(category().label())),
                                 room: ToolbarRoom::Fixed(Px(680.0)),
-                                onpick: move |value: &'static str| match value {
+                                onpick: move |pick: Picked<&'static str>| match pick.value {
                                     "sidebar" => sidebar.set(sidebar().flipped()),
                                     "back" => steps.call(at().saturating_sub(1)),
                                     _ => steps.call(at() + 1),

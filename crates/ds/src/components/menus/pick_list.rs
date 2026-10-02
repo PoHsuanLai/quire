@@ -25,6 +25,8 @@ use crate::components::menus::palette::palette_stops::{
     Run, Travel, run_of, shown_groups, stops, travel,
 };
 use crate::components::overlays::popover::{Arrow, Popover};
+use crate::focus::request::use_focus_request;
+use crate::host::caret::InitialCaret;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -67,6 +69,8 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
         let alive = alive.clone();
         move || alive.set(Life::Gone)
     });
+    // A list opened on a query puts the caret after it, as the palette does.
+    let focus = use_focus_request().with_caret(InitialCaret::End);
     let selection = use_palette_selection(&query, None, None);
     let in_view = use_reveal();
     let revision = use_revision(&groups.key());
@@ -139,7 +143,7 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
                     value: query.clone(),
                     placeholder,
                     kind: FieldKind::Search,
-                    focus: FieldFocus::OnMount,
+                    focus: FieldFocus::Controlled(focus),
                     oninput,
                     onkey,
                 }

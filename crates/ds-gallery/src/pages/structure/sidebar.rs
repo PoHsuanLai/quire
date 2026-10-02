@@ -3,6 +3,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::control_size::SidebarSize;
@@ -44,7 +45,7 @@ fn places(here: &'static str, onselect: EventHandler<&'static str>) -> Vec<ListI
 
 /// The Sidebar section.
 #[component]
-pub fn SidebarSection() -> Element {
+pub fn SidebarListSection() -> Element {
     let mut here = use_signal(|| "inbox");
     let mut query = use_signal(String::new);
     rsx! {
@@ -57,7 +58,7 @@ pub fn SidebarSection() -> Element {
                                 label: "Mail",
                                 size,
                                 cursor: Some(here()),
-                                items: places(here(), EventHandler::new(move |key| here.set(key))),
+                                sections: vec![SidebarSection::List(places(here(), EventHandler::new(move |key| here.set(key))))],
                                 onselect: move |key| here.set(key),
                                 header: rsx! {
                                     TextField { label: "Search", value: query(), kind: FieldKind::Search, placeholder: "Search", size: ControlSize::Regular, oninput: move |next| query.set(next) }

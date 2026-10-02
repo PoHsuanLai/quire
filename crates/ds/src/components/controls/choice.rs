@@ -18,6 +18,9 @@ pub struct Choice<T> {
     pub label: TextLine,
     /// An image beside or above the label (a segment or a radio button with a picture).
     pub icon: Option<IconSource>,
+    /// What assistive technology reads for an option that shows no words (a segment that is an
+    /// image alone): the segment's accessible name. `None` leaves the label to name it.
+    pub name: Option<String>,
     /// A colour circle standing for the option, as the name of a custom property
     /// (`--swatch-blue`): a `RadioGroup` with `Arrangement::Swatches` draws it in place of the
     /// indicator and the words, which then only name the button.
@@ -33,6 +36,7 @@ impl<T> Choice<T> {
             value,
             label: label.into(),
             icon: None,
+            name: None,
             swatch: None,
             availability: Availability::Enabled,
         }
@@ -42,6 +46,15 @@ impl<T> Choice<T> {
     pub fn with_icon(self, icon: impl Into<IconSource>) -> Self {
         Choice {
             icon: Some(icon.into()),
+            ..self
+        }
+    }
+
+    /// The same choice named `name` for assistive technology: an image-only segment is
+    /// `Choice::new(value, "").with_icon(icon).with_name("Grid")`.
+    pub fn with_name(self, name: impl Into<String>) -> Self {
+        Choice {
+            name: Some(name.into()),
             ..self
         }
     }
@@ -99,6 +112,13 @@ mod tests {
                 .iter()
                 .all(|choice| choice.availability == Availability::Enabled && choice.icon.is_none())
         );
+    }
+
+    #[test]
+    fn a_choice_can_be_named_for_assistive_technology() {
+        let choice = Choice::new('g', "").with_name("Grid");
+        assert_eq!(choice.name.as_deref(), Some("Grid"));
+        assert_eq!(Choice::new('g', "Grid").name, None);
     }
 
     #[test]

@@ -23,6 +23,8 @@ workspace = true
 [dev-dependencies]
 dioxus-ssr = { workspace = true }
 ds-core = { workspace = true, features = ["testing"] }
+# Reading the shipped faces' cmaps in the key-glyph test.
+skrifa = { workspace = true }
 
 [dev-dependencies.ds-style]
 workspace = true

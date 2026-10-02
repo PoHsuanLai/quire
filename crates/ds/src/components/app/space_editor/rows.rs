@@ -30,6 +30,18 @@ pub struct MotionChoice {
     pub on_motion: EventHandler<Motion>,
 }
 
+/// Whether the editor draws its own card (a border, a ground, a shadow and padding) or only its
+/// rows, for a host that is already a surface: a `Sheet`, a popover, a pane.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum EditorFrame {
+    /// The editor is a card of its own.
+    #[default]
+    Card,
+    /// No card: the rows sit on the host's ground, edge to edge of the editor's box, so the host
+    /// sets the padding.
+    Frameless,
+}
+
 /// Which schemes the contrast readout measures.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum MeasuredIn {
