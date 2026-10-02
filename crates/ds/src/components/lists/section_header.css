@@ -1,22 +1,22 @@
-/* SectionHeader (design/30 section 2.6): one look, the data face in capitals over the list's
-   ink. A header heads its group: a full-width row of its own, spanning every column when its
+/* SectionHeader (design/30 section 2.6): one look, the heading type (sentence case, 11 px, secondary ink, not tracked)
+   over the list's ink. A header heads its group: a full-width row of its own, spanning every column when its
    container is a grid. The title never wraps; the actions, one or several side by side, always end the row through
    their `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-section-header{
   display:flex; align-items:center; gap:var(--s-6); width:100%; grid-column:1 / -1; box-sizing:border-box; padding:var(--s-7) var(--s-8) var(--s-3);
-  font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps);
-  text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint);
+  font-family:var(--font-ui); font-weight:600; font-size:var(--fs-eyebrow); letter-spacing:0;
+  font-variant-numeric:tabular-nums; color:var(--ink-soft);
 }
 .ds-section-header-title{ white-space:nowrap; }
 .ds-section-header-toggle{
   display:flex; align-items:center; gap:var(--s-4); border:0; background:none; padding:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:default;
 }
-.ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
+.ds-section-header-value{ margin-left:auto; letter-spacing:0; text-transform:none; }
 .ds-section-header-actions{ display:flex; align-items:center; gap:var(--s-6); margin-left:auto; }
 .ds-section-header .ds-section-header-action{
-  border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
+  border:0; background:none; cursor:default; font:inherit; letter-spacing:0;
   color:var(--ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--ink); }

@@ -263,6 +263,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
             && let Some(changed) = scheme::follow_root(&mut handle.doc_mut())
         {
             window.set_theme(Some(theme(changed)));
+            // The switch asked for one resolve that rebuilds every box (`scheme::follow_root`):
+            // nothing else would ask for it on an idle window.
+            window.request_redraw();
         }
     });
     let frame_nav = use_hook(|| {

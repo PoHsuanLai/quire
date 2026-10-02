@@ -348,9 +348,9 @@ html,body{margin:0;padding:0;background:transparent}
 /* Machine facts in the data face, a size smaller (`S:56`; .86em under the System typeface, whose
    data face is Inter and not a wide monospace). */
 .ds-mono{font-family:var(--font-data);font-size:var(--fs-mono);letter-spacing:var(--tracking-mono);font-variant-numeric:tabular-nums}
-/* The eyebrow over a section (`S:57`): under the System typeface Inter SemiBold caps at
-   `--fs-micro`, .06em apart; under Editorial the tracked mono of the prototype. */
-.ds-eyebrow{font-family:var(--font-data);font-size:var(--fs-caps);font-weight:var(--fw-caps);letter-spacing:var(--tracking-caps);text-transform:uppercase;font-variant-numeric:tabular-nums;color:var(--ink-faint)}
+/* The heading over a group of things (design/02-TYPE.md 2.1): sentence case, 11 px, secondary ink,
+   semibold, not tracked. */
+.ds-eyebrow{font-family:var(--font-ui);font-size:var(--fs-eyebrow);font-weight:600;letter-spacing:0;color:var(--ink-soft)}
 /* Every Glyph: a block that never shrinks in a flex row (design/04-COMPONENTS.md "Global rules",
    `S:58-59`). Size and stroke are the SVG's own attributes (spike S6), never CSS. */
 .ds-ic{display:block;flex:none}
@@ -1178,8 +1178,8 @@ html,body{margin:0;padding:0;background:transparent}
 /* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
 .ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
 
-/* A group title: the data face in capitals over the rows it heads. */
-.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); white-space:nowrap; }
+/* A group title: the heading type (sentence case, 11 px, secondary ink) over the rows it heads. */
+.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-ui); font-weight:600; font-size:var(--fs-eyebrow); letter-spacing:0; font-variant-numeric:tabular-nums; color:var(--ink-soft); white-space:nowrap; }
 
 /* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no selection
    and the arrow keys pass it. */
@@ -1600,25 +1600,25 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
 /* -- section_header -- */
-/* SectionHeader (design/30 section 2.6): one look, the data face in capitals over the list's
-   ink. A header heads its group: a full-width row of its own, spanning every column when its
+/* SectionHeader (design/30 section 2.6): one look, the heading type (sentence case, 11 px, secondary ink, not tracked)
+   over the list's ink. A header heads its group: a full-width row of its own, spanning every column when its
    container is a grid. The title never wraps; the actions, one or several side by side, always end the row through
    their `margin-left:auto`. In a source list the whole title is a button with a triangle before it.
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-section-header{
   display:flex; align-items:center; gap:var(--s-6); width:100%; grid-column:1 / -1; box-sizing:border-box; padding:var(--s-7) var(--s-8) var(--s-3);
-  font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps);
-  text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint);
+  font-family:var(--font-ui); font-weight:600; font-size:var(--fs-eyebrow); letter-spacing:0;
+  font-variant-numeric:tabular-nums; color:var(--ink-soft);
 }
 .ds-section-header-title{ white-space:nowrap; }
 .ds-section-header-toggle{
   display:flex; align-items:center; gap:var(--s-4); border:0; background:none; padding:0; font:inherit; letter-spacing:inherit; text-transform:inherit; color:inherit; cursor:default;
 }
-.ds-section-header-value{ margin-left:auto; letter-spacing:.02em; text-transform:none; }
+.ds-section-header-value{ margin-left:auto; letter-spacing:0; text-transform:none; }
 .ds-section-header-actions{ display:flex; align-items:center; gap:var(--s-6); margin-left:auto; }
 .ds-section-header .ds-section-header-action{
-  border:0; background:none; cursor:default; font:inherit; letter-spacing:.08em;
+  border:0; background:none; cursor:default; font:inherit; letter-spacing:0;
   color:var(--ink-faint); padding:0 var(--s-2); text-transform:none;
 }
 .ds-section-header .ds-section-header-action:hover{ color:var(--ink); }
@@ -1968,7 +1968,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-editor-title .ds-input, .ds-space-editor-title .ds-input-placeholder{ font-family:inherit; font-size:inherit; font-weight:inherit; }
 .ds-space-editor-title .ds-input-wrap{ flex:1; }
 .ds-checks-scheme{ display:grid; gap:var(--s-5); margin-bottom:var(--s-8); }
-.ds-checks-heading{ font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); font-weight:var(--fw-caps); letter-spacing:var(--tracking-caps); text-transform:uppercase; color:var(--ink-faint); }
+.ds-checks-heading{ font-family:var(--font-ui); font-variant-numeric:tabular-nums; font-size:var(--fs-eyebrow); font-weight:600; letter-spacing:0; color:var(--ink-soft); }
 
 /* A Space's colours reach its dots as custom properties (`--dot-c1..3`, with
    `data-stops` counting them) and are painted here, never inline: the same 135deg gradient

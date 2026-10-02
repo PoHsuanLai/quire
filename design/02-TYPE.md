@@ -73,8 +73,9 @@ values are tokens on `.ds`:
 Headings that group things (the old "eyebrow", section, group and weekday headers) are not caps and
 not tracked: sentence case, 11 px, secondary ink (`--ink-soft`), weight 500 or 600, tracking 0.
 The caps-tracked tokens `--tracking-caps`, `--tracking-caps-narrow`, `--fw-caps` and `--fs-caps`
-are deleted. Status: **target (clean-up phase)**; the code still emits them and the eyebrow rule
-still uppercases until the clean-up lands.
+are deleted. Status: the rules (eyebrow, section header, menu header, group header, month title,
+checks heading) are sentence case 11 px `--ink-soft`, weight 600, tracking 0; **target (clean-up phase)**:
+the four tokens themselves are still emitted until the last user goes.
 
 ## 3. Base text
 
