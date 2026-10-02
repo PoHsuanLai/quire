@@ -1,0 +1,18 @@
+[package]
+name = "ds-intents"
+description = "The companion's presentational context: the marks a quire app reports (a thing, a chip, a summon) and nothing of the agent's wire."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds-core = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+ds-core = { workspace = true, features = ["testing"] }

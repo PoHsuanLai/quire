@@ -50,6 +50,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | --- | --- | --- |
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
 | `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners`, `keyboard` |
+| `$XDG_CONFIG_HOME/<daemon>/…` | the companion's daemons: inferd (porter), intentd and companiond (docket), memoryd (almanac), cuad (cua); each repo names its file and ships its schema (section 9.2) | `ai`, `agent`, `memory`, `cua` (sections 3.26 to 3.29) |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
 Rules, all three files:
@@ -85,7 +86,7 @@ seconds and `Mins(u16)` minutes (added Q445: before this, a seconds or minutes k
 of its own and used `Count` with a unit label in prose; `Ms` is milliseconds and does not reach
 the tens-of-seconds to hours range idle timeouts need), `Scalar(f32)` a dimensionless physics
 constant that does not fit the above (momentum model exponents), `Units` a signed raw
-touchpad/report unit (device space, not px). Every enum is named; **no key is a `bool`**
+touchpad/report unit (device space, not px), `MicroUsd(u32)` millionths of a dollar (the companion's spend caps). Every enum is named; **no key is a `bool`**
 (`CONVENTIONS.md#4-types`).
 
 Status column values: **proposed** = doc marks the value proposed, this is the "make it a key"
@@ -418,7 +419,7 @@ data, not a key.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `spaces.default_grain` | `Count` (0..100) | `0` (none) | applies to every preset; the old 40 and the per-preset 35/55 are gone. A grain value a user already set on a stored Space is kept (21 section 10 migration). Target (clean-up phase): the code default is still 40 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | settled (user, 2026-10-02) |
+| `spaces.default_grain` | `Count` (0..100) | `0` (none) | applies to every preset; the old 40 and the per-preset 35/55 are gone. A grain value a user already set on a stored Space is kept (21 section 10 migration). Code default is 0 (current) | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | settled (user, 2026-10-02) |
 | `spaces.default_card_accent` | RETIRING | | A Space has no card accent: the accent is the desktop's, set in Settings. Remove with `CardAccent` (target (clean-up phase)) | `21-SPACES.md#1-the-model-settled` | settled; to retire in the clean-up phase (2026-10-02) |
 | `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-target-clean-up-phase-schema` | RETIRING: no reader; the store lookup is not built |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
@@ -556,6 +557,109 @@ How sill treats the keyboard per app (keycap, the key-cap overlay: which keycap 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `keyboard.overrides` | list of tables `{ app, profile }` | empty | one row per app: `app` is the desktop-entry id (`org.gnome.Nautilus`) and `profile` a keycap profile name (`[a-z0-9_-]{1,64}`); an invalid `profile` drops that row at load; beats the entry's `X-Keycap-Profile` and its category; a name keycap does not define resolves to `default` | keycap README "Profiles are open" | proposed (2026-10-01) |
+
+### 3.26 `ai` (inferd, through its settings module)
+
+The model layer: where data may go, which model fills each tier, how the engines are supervised. Page Intelligence, section Models (`ai.local_only`, `ai.floor.*`, `ai.model.*`) and Advanced (`ai.engine.*`, `ai.cua.*`). The owning daemon's repo names its file; the Intelligence page reads its schema (section 9.2) and the live picker rows (section 9.4).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `ai.local_only` | `LocalOnly::{Off,On}` | `Off` | `On` refuses every cloud backend whatever the per-class floor says | models.md section 3.8; ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.floor.<class>` | `Locality::{OnDevice,LocalNetwork,Cloud}`, one key per data class | porter's per-class floor (31 section 2.3) | `Screen` is always `OnDevice` and cannot be raised here | models.md section 3.8; actions.md | proposed (companion freeze, 2026-10-02) |
+| `ai.model.<kind>.<tier>` | text, `"<account>/<model>"`, one key per kind and tier | empty: the catalogue's own pick | written by the Intelligence page through inferd's settings module (22 section 9.4); the named roles (Planner, Reader, Reviewer, Operator) map onto tiers (QUESTIONS M3) | models.md section 3.8 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.idle_unload_s` | `Secs` | `600` | `0..=86400`, 0 never; the model stays warm while the companion is open (QUESTIONS M4) | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.start_timeout_s` | `Secs` | `180` | `10..=900`; vLLM's cold start | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.probe_ms` | `Ms` | `500` | `50..=5000`; the readiness probe interval | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.max_attempts` | `Count` | `3` | `1..=10`; restarts before the engine is marked unavailable | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.backoff_min_ms` | `Ms` | `2000` | `100..=60000`; the first wait between restarts | models.md section 3.7 ("2000 to 30000") | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.backoff_max_ms` | `Ms` | `30000` | `1000..=65000`; the longest wait | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.vram_headroom_mib` | `Count` | `1024` | `0..=16384` MiB left free when an engine loads | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.vllm.python` | text, a path | `~/vllm/.venv/bin/python` | the uv environment vLLM runs from | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.engine.llama_server.path` | text, a path | `llama-server` | looked up on the engine unit's `PATH` when it has no slash | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `ai.cua.history_frames` | `Count` | `3` | `1..=8`; screenshots a computer-use step keeps in the prompt | models.md section 3.8 | proposed (companion freeze, 2026-10-02) |
+| `ai.cua.repair_attempts` | `Count` | `1` | `0..=3`; re-asks after an unparseable step | models.md section 3.8 | proposed (companion freeze, 2026-10-02) |
+
+
+### 3.27 `agent` (docket)
+
+How far the companion may act on its own and what it may spend. Page Intelligence, section Privacy (`agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`); the rest Advanced. Every value of the budget table is a key, never a constant (QUESTIONS S5); the person may lower a budget, and only the person may raise the false-negative targets of the evaluation gates, which are not keys.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `agent.strictness` | `Strictness::{AskMore,Default,TrustMore}` | `Default` | per Space override; `TrustMore` is the only way outbound or destructive calls run without asking (QUESTIONS S1, S2) | actions.md section 3.9, addendum A3 | proposed (companion freeze, 2026-10-02) |
+| `agent.review.quick_ms` | `Ms` | `300` | `50..=10000`; a timeout is an Ask, never an Allow | actions-addendum.md (reviewers) | proposed (companion freeze, 2026-10-02) |
+| `agent.review.deliberate_ms` | `Ms` | `3000` | `50..=30000` | actions-addendum.md | proposed (companion freeze, 2026-10-02) |
+| `agent.review.second_ms` | `Ms` | `3000` | `50..=30000` | actions-addendum.md | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.calls` | `Count` | `200` | per session | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.writes` | `Count` | `100` | per session | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.outbound` | `Count` | `10` | per session | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.destructive` | `Count` | `5` | per session | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.per_minute` | `Count` | `30` | calls a minute | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.fan_out` | `Count` | `50` | entities one call may touch | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.chain` | `Count` | `4` | calls one call may start | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.wall_s` | `Secs` | `1800` | a session's wall time | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.reviews` | `Count` | `300` | reviewer calls a session | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.denials_in_a_row` | `Count` | `3` | then the session pauses for the person (the breaker) | actions.md section 3.7; SPEC C12 | proposed (companion freeze, 2026-10-02) |
+| `agent.budget.spend_microusd` | `MicroUsd` | `0` | 0 is local only; shared with inferd's spend cap | actions.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `agent.task_policy.max_min` | `Mins` | `60` | `1..=480`; a task policy lasts until the task ends, capped here (QUESTIONS S3) | QUESTIONS S3 | proposed (companion freeze, 2026-10-02) |
+| `agent.undo.keep_h` | `Count` | `24` | `1..=168` h; how long the undo journal keeps an entry | ux.md section 3.7, SPEC section 2 | proposed (companion freeze, 2026-10-02) |
+| `agent.mcp.expose` | `McpExpose::{Off,On}` | `Off` | whether external MCP clients see the actions (QUESTIONS S7) | QUESTIONS S7 | proposed (companion freeze, 2026-10-02) |
+
+
+### 3.28 `memory` (almanac)
+
+What the companion remembers and for how long. Page Intelligence, section Memory (`memory.files.at_rest`, `memory.consolidation.*`); the retention rows Advanced. Things (mail, files, events) are kept while their source exists and facts until forgotten; neither is a key.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `memory.files.at_rest` | `AtRest::{Sealed,Plain}` | `Sealed` | per Space; sealed files open in the editor through tmpfs (QUESTIONS Me1) | memory.md; QUESTIONS Me1 | proposed (companion freeze, 2026-10-02) |
+| `memory.retention.search_days` | `Count` | `30` | `1..=3650` d; searches and selections | memory.md section 3.2 | proposed (companion freeze, 2026-10-02) |
+| `memory.retention.file_unexplained_days` | `Count` | `7` | `1..=3650` d; file changes no app explained | memory.md section 3.2 | proposed (companion freeze, 2026-10-02) |
+| `memory.retention.session_days` | `Count` | `30` | `1..=3650` d; session and computer-use records | memory.md section 3.2 | proposed (companion freeze, 2026-10-02) |
+| `memory.retention.audit_body_days` | `Count` | `90` | `1..=3650` d; policy, consent and memory audit bodies | memory.md section 3.2 | proposed (companion freeze, 2026-10-02) |
+| `memory.retention.audit_header_days` | `Count` | `365` | `1..=3650` d; their headers | memory.md section 3.2 | proposed (companion freeze, 2026-10-02) |
+| `memory.pending_ttl_days` | `Count` | `14` | `1..=365` d; a pending fact waits this long for the person (QUESTIONS Me5) | memory.md; QUESTIONS Me5 | proposed (companion freeze, 2026-10-02) |
+| `memory.join_window_ms` | `Ms` | `2000` | `100..=10000`; the window in which a file change and an app's reason are one event | memory.md section 4.6 | proposed (companion freeze, 2026-10-02) |
+| `memory.consolidation.when` | `ConsolidateWhen::{Nightly,Manual,Never}` | `Nightly` |  | memory.md section 4.4 | proposed (companion freeze, 2026-10-02) |
+| `memory.consolidation.apply` | `ConsolidateApply::{Auto,Review}` | `Auto` | `Auto` applies tidy, stamp and trusted hunks, revertible, with the diff visible; `Review` waits for each hunk (QUESTIONS Me4) | memory.md; QUESTIONS Me4 | proposed (companion freeze, 2026-10-02) |
+
+
+### 3.29 `cua` (cua)
+
+Computer use, off by default and on per app. Page Intelligence, section Computer use (`cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`); the rest Advanced. The per-run `denials` budget is deleted: the router's breaker (`agent.budget.denials_in_a_row`) counts them (SPEC C12).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `cua.enabled` | `CuaEnabled::{Off,On}` | `Off` | while `Off` the computer-use provider is `Hidden` and no pixel step runs | cua.md section 3.8; QUESTIONS P2, P3 | proposed (companion freeze, 2026-10-02) |
+| `cua.apps` | list of tables `{ app, allow }` | empty: no app is on | `app` a desktop-entry id; `allow` is `ask`, `session` or `always`; a browser never takes `always` (QUESTIONS S9) | cua.md; QUESTIONS S9 | proposed (companion freeze, 2026-10-02) |
+| `cua.default_mode` | `CuaDefaultMode::{Auto,InPlace,AgentWorkspace}` | `Auto` | `Auto` is the agent workspace where the compositor supports it, else in place (QUESTIONS U11) | SPEC section 2; QUESTIONS U11 | proposed (companion freeze, 2026-10-02) |
+| `cua.autopause` | `CuaAutopause::{On,Off}` | `On` | pause a run that shares the seat when the person touches the window | cua.md section 4 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.steps` | `Count` | `40` | `1..=500` per run | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.active_s` | `Secs` | `600` | `10..=7200` | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.stall_frames` | `Count` | `3` | `1..=20`; identical frames before a run counts as stalled | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.actions_per_min` | `Count` | `60` | `1..=600` | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.model_failures` | `Count` | `2` | `0..=10` | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.budget.spend_microusd` | `MicroUsd` | `0` | 0 is local only | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.settle.quiet_ms` | `Ms` | `250` | `50..=2000`; the screen is settled after this much quiet | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.settle.timeout_ms` | `Ms` | `3000` | `500..=30000` | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.wait.max_ms` | `Ms` | `5000` | `500..=60000`; the longest a `Wait` action may ask | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
+| `cua.tree.max_nodes` | `Count` | `400` | `50..=5000`; accessibility nodes sent to the model | cua.md section 3 | proposed (companion freeze, 2026-10-02) |
+| `cua.screens.keep` | `CuaKeepScreens::{Off,On}` | `Off` | `On` keeps thumbnails of each step in the Space's encrypted store (QUESTIONS S11) | cua.md section 5; QUESTIONS S11 | proposed (companion freeze, 2026-10-02) |
+| `cua.screens.keep_days` | `Count` | `7` | `1..=365` d | cua.md section 5 | proposed (companion freeze, 2026-10-02) |
+
+
+### 3.30 `companion` (sill/settings.toml)
+
+The summon and the confirmation. Page Intelligence, sections Companion and Confirmations. The undo window, the default run place and the touch pause moved to `agent.undo.keep_h`, `cua.default_mode` and `cua.autopause` (SPEC section 2). `companion.double_tap_ms` and `companion.confirm_arm_ms` are Advanced.
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `companion.summon` | `SummonKey::{DoubleTapCommand,Off}` | `DoubleTapCommand` | a toggle: "Press ⌘ twice to ask" | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.in_field` | `InField::{Prompt,Launcher}` | `Prompt` | whether a summon in a text field makes the field the prompt or opens the launcher | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.double_tap_ms` | `Ms` | `350` | `150..=600`; conf L: tuned against a real keyboard | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.notify` | `NotifyWhen::{NeedsYou,Never}` | `NeedsYou` | a toggle: "Notify when it needs you" | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.confirm_arm_ms` | `Ms` | `500` | `300..=1500`; the buttons of a confirmation wait this long (QUESTIONS U6) | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+
 
 ## 4. Rust shape
 
@@ -871,6 +975,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.times`, `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Cosmic` they still render, disabled, so the row explains itself) |
+| **Intelligence** (the companion, design/32; sill's `companion` domain and the daemons' schemas) | Companion: `companion.summon`, `companion.in_field`, `companion.notify`; Models: `ai.local_only`, `ai.floor.<class>`, `ai.model.<kind>.<tier>` (the live picker, section 9.4); Memory: `memory.files.at_rest`, `memory.consolidation.when`, `memory.consolidation.apply`, and the memory view (a live module); Computer use: `cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`; Privacy: `agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`; Confirmations: `companion.confirm_arm_ms` is Advanced |
 | **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 ## 6. Acceptance
@@ -1065,7 +1170,7 @@ as "edit in settings.toml".
 1. Discover every `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/` (and
    `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
    above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
-   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, plus one page per third-party app
+   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, Intelligence, plus one page per third-party app
    id). Every "Advanced" key of a page renders under one "Advanced" disclosure at the end of the
    page, grouped by section inside it, so a section with only Advanced keys shows no empty header.
 2. Read the current value from the key's `file` through the shared lenient loader; write with

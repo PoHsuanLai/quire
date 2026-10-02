@@ -83,7 +83,7 @@ surfaces, with readiness states.
 ### 2.1 Shape
 
 A **closed set** (CONVENTIONS §4: closed sets are enums), **versioned** as a whole:
-`VocabVersion(1)`. Adding a kind or a field is a vocabulary bump, released with the daemon and
+`VocabVersion(2)`. Adding a kind or a field is a vocabulary bump, released with the daemon and
 the client crate together; an older client ignores kinds it does not know on the wire. This
 keeps GOA's lesson (a compiled list of *providers* is the trap, [R] pitfall 1) apart from the
 vocabulary: providers are data (§3); only a new *kind of thing an account can do* needs code.
@@ -137,6 +137,14 @@ rather than flags.
 | `Speech` | `modes: BTreeSet<SpeechMode {Stt, Tts, Realtime}>`, `languages: LanguageSet` | P |
 | `ImageGen` | `modes: BTreeSet<ImageMode {TextToImage, Edit, Inpaint}>`, `max_side: Px` | P |
 | `Rerank` | `max_docs: Count` | P |
+| `ComputerUse` | `environments: BTreeSet<CuaEnv {Desktop, Browser, Mobile}>`, `batching: CuaBatching {One, Many}`, `zoom: Offered`, `max_image: Px`, `wire: LlmWire` | P |
+
+`ComputerUse` is a model that operates a window from screenshots (a vision model with a
+computer-use dialect; the dialect detail stays in stoker's catalog and is not asked for). Its
+need is `CuaNeed { environments }`, a subset test. It joined with `VocabVersion(2)`, which also
+added `DataClass::Voice` and the Space dimension of a grant (§4.5). Speech is one capability
+kind with `modes`; the model picker splits it by direction (`AiKind::SpeechIn` for `Stt`,
+`SpeechOut` for `Tts`) because the two are chosen separately.
 
 Two more properties sit beside every AI capability, not inside it:
 
@@ -280,9 +288,10 @@ AI providers:
 | Probe | inferd (§4.1) probes the default ports above on `127.0.0.1` at start, on a D-Bus `Rescan`, and when a user unit named in settings starts; plus URLs the user listed | P |
 | Identify | the runtime's own endpoint names the runtime and its models (`/api/tags` + `/api/show`, `/props`, `/v1/models`) | P |
 | Account | each running runtime is an account with `Auth::None`, `Locality::OnDevice`, provenance `Discovered`; it appears in detent without a sign-in and disappears (state `Offline`, not deleted) when the process stops | P |
+| Supervised | engines inferd runs itself (llama.cpp, vLLM, a speech host; confined, no network) are one account, `local` (`Discovery::Supervised`, `providers/local.toml`); its models come from the catalog at provenance `Curated`, and the account is present while an engine is stopped (readiness `Loadable`), unlike a probed runtime, which goes `Offline` | P |
 | LAN | a URL on another host is `LocalNetwork` (e.g. a Tailscale peer); never auto-probed | P |
-| GPU arbitration | one 16 GB GPU (RTX 5070 Ti): inferd serialises local LLM and ComfyUI jobs, asks Ollama to unload idle models (`keep_alive`), exposes `GpuBusy` so apps show a queue state | P |
-| Readiness | `Availability {Ready, Downloadable, Downloading, Unavailable}` per capability, the pattern of the browser and Windows on-device APIs ([A] §5) | P |
+| GPU arbitration | one 16 GB GPU (RTX 5070 Ti): inferd serialises local LLM and ComfyUI jobs, asks Ollama to unload idle models (`keep_alive`), exposes the `Gpu` property (`idle`, `busy`, `loading`) so apps show a queue state; CPU engines (speech) cost no VRAM | P |
+| Readiness | `Readiness {Ready, Loading, Loadable, Downloading(Permille), Downloadable, Unavailable}` per model, the pattern of the browser and Windows on-device APIs ([A] §5); a session whose engine is loading gets `Waiting(Loading)` events and the app shows "working", never its own spinner | P |
 
 ## 4. Service architecture
 
@@ -292,7 +301,7 @@ AI providers:
 | --- | --- | --- | --- |
 | `accountd` | account registry, provider registry, token broker, secrets, consent store, discovery and probes, the Settings live module | the control plane; small, must never stall | P |
 | `syncd` | the sync journal, anchors, the polling scheduler, dataset plug-ins (Photos first) | a failing backend or a long upload cannot block sign-in ([R] §3) | P |
-| `inferd` | the AI broker: routing, policy, spend, audit, wire adapters, GPU queue, MCP host | streams and big payloads; restartable alone | P |
+| `inferd` | the AI broker: routing, policy, spend, audit, wire adapters, engine supervision, GPU queue, streaming sessions | streams and big payloads; restartable alone | P |
 | `accounts-ui` | the sheets accountd must draw itself: add account, consent prompt, chooser, re-auth | an app cannot draw its own consent; same split as portal backends ([R] §2 portals) | P |
 
 All are user-session services, D-Bus activated on Linux, single-instance through latchkey
@@ -371,22 +380,35 @@ slug; `class` and `usage` are `DataClass` and `Usage` slugs. The full introspect
 
 syncd serves `org.quire.Sync1` at `/org/quire/Sync1` (`Datasets() -> as`, `Status(dataset: s) ->
 a{sv}`, `Pause(s)`, `Resume(s)`, signals `Progress(s, a{sv})`, `Conflict(s, a{sv})`); inferd
-serves `org.quire.Inference1` at `/org/quire/Inference1` (`Availability(need, class) -> s`,
-`Open(need, class, tier) -> h` returning an fd that carries frames of `InferRequest` and
-`InferReply`, `Usage() -> a{sv}`, `Rescan()`).
+serves `org.quire.Inference1` at `/org/quire/Inference1`:
+
+| Member | Signature | Notes |
+| --- | --- | --- |
+| `Availability` | `(need, class) -> s` | `need` may be `computer_use` or `speech` |
+| `Open` | `(need, class, tier) -> h` | a Unix stream socket pinned to the one model the route chose. The client writes `ClientFrame` frames (`Request(InferRequest)`, `Cancel`, `Audio`, `EndOfAudio`); inferd writes `InferEvent` frames (`Routed`, `Waiting`, `TextDelta`, `ThoughtDelta`, `ToolCall`, `ActionProposed`, `Usage`, `Heard`, `Spoken`, exactly one `Finished` per turn). Framing is the `{vocab, body}` envelope of porter-core's wire (4-byte length, 16 MiB cap). `ImageSource::Attached(i)` names the i-th memfd received with SCM_RIGHTS on that frame, so screenshots are never base64 on the bus |
+| `Prepare` | `(need, class, tier) -> s` | warms the engine the route would pick and answers a `Readiness` slug (a refusal answers with its slug); no microphone, no request |
+| `Usage` | `() -> a{sv}` | |
+| `Rescan` | `()` | |
+| signal `EnginesChanged` | `()` | broadcast: engine state is not personal; listeners re-read readiness with `Prepare` or the settings module |
+| property `Gpu` | `s` | `idle`, `busy`, `loading` |
+| `org.quire.SettingsModule1` | at `/org/quire/Inference1/settings`: the picker rows per kind and the `ai.model.<kind>.<tier>` map | 22 §9.4 (declared there, not in porter-dbus) |
+
+Speech and computer-use steps travel on the `Open` fd, so the interface has no member for them.
+The full introspection is porter's `dbus/org.quire.Inference1.xml`, checked by the same test.
 
 ### 4.5 Consent
 
 | Rule | Detail | St |
 | --- | --- | --- |
-| Unit | a grant is `GrantKey { app: AppId, account, kind: CapabilityKind, class: DataClass, usage: Usage {Interactive, Background} } -> Decision {Allow, Deny}` plus `GrantScope {Once, Always}` and its time; the newest grant for exactly the key decides, a denial winning a tie (`decide`) | P |
+| Unit | a grant is `GrantKey { app: AppId, account, kind: CapabilityKind, class: DataClass, usage: Usage {Interactive, Background}, space: SpaceScope {Any, Only(SpaceId)} } -> Decision {Allow, Deny}` plus `GrantScope {Once, Always}` and its time; the newest grant for exactly the key decides, a denial winning a tie (`decide`). `Grant<K = GrantKey>` and `decide<K: Eq>` are generic over the key, so the action router keeps its own grants (an action, a caller, a Space) in the same shape; account grants made from the sheet cover `SpaceScope::Any` | P |
 | Answers | "Allow" stores one grant for the account picked; "Don't Allow" stores an `Always` denial for every account offered, so the app is not prompted again until Settings changes it; closing the sheet stores nothing; a `Once` grant is spent by the first token issued under it | P |
-| Data classes | `AppOwn`, `Mail`, `Calendar`, `Contacts`, `Notes`, `Files`, `Photos`, `Clipboard`, `Screen`, `Public` (closed enum) | P |
+| Data classes | `AppOwn`, `Mail`, `Calendar`, `Contacts`, `Notes`, `Files`, `Photos`, `Clipboard`, `Screen`, `Voice`, `Public` (closed enum; `Voice` is the person's own voice audio) | P |
 | Prompt | by capability, not by provider: "Photos wants to keep its library in your Nextcloud files" (`Alert` on a `Sheet{Centre}` from accounts-ui) | P |
 | First-party apps | Mail, Photos, Calendar, Notes, Files and the shell still get one prompt at first use; no silent pre-grant, so the per-app list in detent is complete | P |
 | Identity of caller | `AppId { name: AppName (reverse DNS), isolation: Isolation {Flatpak, Unsandboxed, InProcess} }`, established by the transport, never sent by the caller. Flatpak: app id from the sandbox info of the caller's pid (`GetConnectionCredentials`, pidfd); native: the systemd `app-<id>-*.scope` cgroup, marked "unsandboxed" (R12) | P |
 | Flatpak reach | `--talk-name=org.quire.Accounts1` finish arg; consent is enforced inside the daemon | P |
 | Storage | the consent store is accountd's own table, PermissionStore-shaped, so a portal can adopt it | P |
+| Voice | the caller `org.quire.Voice` with class `Voice` and an `OnDevice` route holds a shipped default grant, because the person's first-use voice consent (a sill sheet) is the grant; any other route for `Voice` needs `ai.local_only` off, a floor change and an explicit grant; an app transcribing its own files uses its own class and the normal grant | P |
 | Audit | grants, token issues, proxy opens: time, app, account, capability; never content | P |
 
 ### 4.6 Secrets
@@ -481,17 +503,20 @@ Provider verdicts for the library home:
 
 | Aspect | Rule | St |
 | --- | --- | --- |
-| One API | apps send a typed `InferRequest` (`Chat { messages, shape: Text | Json(schema), tier, class, usage }`, `Embed`, `Task`) through `Accounts::infer`; replies are `InferReply` with `ServedBy { account, model, locality }`; wire formats stay inside inferd's adapters ([A] §4); tool calls join the request with the MCP host | P |
-| Task layer | above raw chat: `Task {Summarise, Rewrite, Extract, Classify, Transcribe}` (embeddings and images are their own requests); the shell uses these, not model ids | P |
+| One API | apps send a typed `InferRequest` (`Chat { messages, shape: Text | Json(schema), tier, class, usage, tools }`, `Embed`, `Task`, `CuaBegin`, `CuaStep`, `Transcribe`, `Speak`) on a streaming session (`Accounts::session`, or `Accounts::infer` to read to the end); events stream and one `Finished(InferReply)` ends each turn, with `ServedBy { account, model, locality }`; wire formats stay inside inferd's adapters ([A] §4). Messages carry text, images (inline base64 or an attached memfd), tool calls and tool results; `Cancel` ends a turn and drops the engine stream | P |
+| Task layer | above raw chat: `Task {Summarise, Rewrite, Extract, Classify}` (embeddings, images, computer-use steps and speech are their own requests; speech to text is not a task because its input is audio); the shell uses these, not model ids | P |
+| Computer use | `CuaBegin { goal, hints, env }` then `CuaStep` requests on the same session: a window frame (raw pixels on a memfd preferred), geometry, cursor, what became of the last actions, a mask count and the accessibility tree as text; the reply is window-space `CuaAction`s plus dropped and add-only safety hints. The session needs a `ComputerUse` capability and class `Screen`; history lives in the session, so the session is pinned to one model | P |
+| Speech | `Transcribe` (streaming or batch; 16 kHz mono S16LE `Audio` frames of at most one second, in order, then `EndOfAudio`) answers `Heard` events (partial, final, language) and a `Transcribed` reply; `Speak` answers `Spoken` audio events and a `Spoke` reply. The class of a `Speak` is the class of its text. inferd keeps no audio after a turn and audits only `audio_ms` | P |
+| Model picker | settings `ai.model.<kind>.<tier>` = `<account>/<model>` for the kinds `Llm`, `ComputerUse`, `Embeddings`, `SpeechIn`, `SpeechOut`, `ImageGen`, `Rerank`; the picker is a plain list per kind (this computer first, ready before loadable before downloadable, then catalog order) with readiness, memory fit and licence beside each row and no ranking or recommended row; a non-commercial model is listed and never chosen for the person | P |
 | Routing | `route(ask, candidates, policy)`: drop cloud under local-only (nothing left: `Unavailable`), drop what the class floor forbids (nothing left: `RequiresCloud(class)`), keep granted ones (else `NeedsGrant` or `Denied`), drop stopped spend caps (else `OverBudget`); rank `OnDevice > LocalNetwork > Cloud`, then the user's per-tier choice, then price | P |
-| Data-class policy | per class, a `Floor {OnDevice, LocalNetwork, Anywhere}`: `Mail`, `Calendar`, `Photos`, `Notes`, `Files`, `Contacts`, `Screen`, `Clipboard` default to `OnDevice`; `Public` and `AppOwn` default to `Anywhere` (settings `ai.floor.<class>`, rows for 22 to add); a blocked request returns `RequiresCloud(class)`, never a silent downgrade to a cloud model | P |
+| Data-class policy | per class, a `Floor {OnDevice, LocalNetwork, Anywhere}`: `Mail`, `Calendar`, `Photos`, `Notes`, `Files`, `Contacts`, `Screen`, `Clipboard`, `Voice` default to `OnDevice`; `Public` and `AppOwn` default to `Anywhere` (settings `ai.floor.<class>`, rows for 22 to add); a blocked request returns `RequiresCloud(class)`, never a silent downgrade to a cloud model | P |
 | Local-only switch | one setting (`ai.local_only`, default on) removes every Cloud account from every answer (R14) | P |
 | Per-app permission | grant per (app, AI kind, data class); background use (indexing) is a separate grant with a cheap-tier preference | P |
 | Spend caps | `SpendCap { scope: Account | App, period: Daily | Monthly, limit: MicroUsd, warn_at: Permille }` from response usage and a price table (OpenRouter publishes prices); warn at `ai.spend.warn_permille` (proposed 800), stop when a request would reach the limit; `PlanBudget` accounts count requests (not modelled yet) | P |
 | Rate and queue | token bucket per app and account; interactive first; `Retry-After`; GPU queue (§3.3) | P |
 | Indicator | a bar item shows when a request leaves the machine, naming the provider | P |
 | Audit | app, account, model, tokens, bytes, time; content never stored by default | P |
-| Tools (MCP) | apps register MCP servers (session socket); inferd is the MCP host, mediates each tool call under the app's grants, uses elicitation for confirmations, and offers a sampling-compatible entry so an MCP server can use the user's model (spec 2025-11-25, [A] §4) | P |
+| Tools | a chat request carries the functions a model may call (`ToolDecl`, from the companion's typed actions); the model's calls come back as `ToolCall` events and parts. inferd only passes them: the router (`docket`) gates every call, and MCP is an edge binary there (`actions-mcp`), not an inferd role | P |
 
 ### 5.6 detent's Accounts page and first run
 
@@ -587,7 +612,7 @@ those keys. v3, O.
 | Kinds | Identity, Mail, Calendar, Contacts, Storage, Photos (upload/picker), Llm, Embeddings, ImageGen | P |
 | Providers | Nextcloud, Microsoft, Google (non-restricted scopes; Gmail only with a user-supplied client), generic IMAP/SMTP + DAV; AI: Ollama, llama.cpp, ComfyUI, Anthropic key, OpenAI key, OpenRouter | P |
 | syncd | Replica for WebDAV, Graph, Google Drive (AppFolder); Photos dataset only | P |
-| inferd | routing, local-only default, data-class floors, per-app grants, spend caps, audit, GPU queue; no MCP yet | P |
+| inferd | routing, local-only default, data-class floors, per-app grants, spend caps, audit, GPU queue, streaming sessions; no MCP (an edge in docket) | P |
 | UI | detent Accounts and Intelligence pages, accounts-ui sheets, first-run steps | P |
 | Photos | library on Storage, import from folders and the Google Photos Picker, optional Google Photos upload | P |
 
@@ -618,7 +643,7 @@ Service and fake servers; the real system is never touched):
 | `OpenAuthenticated` proxy for password protocols | a Flatpak test app reads an app-password IMAP account without receiving the password | P |
 | Files: Locations in the sidebar, selective sync; open/save chooser lists Storage accounts | a file saved from a sandboxed app lands in OneDrive and appears on the other machine | O |
 | Desktop-own account: settings, Spaces, dock, widgets, style CSS synced E2E over a Storage grant | changing the dock on A shows on B within one poll; the Storage account holds only ciphertext | O |
-| MCP host in inferd | Notes exposes "search notes" as a tool; a chat in the launcher calls it after an elicitation prompt | P |
+| MCP edge (`actions-mcp` in docket, not inferd) | Notes exposes "search notes" as a tool; a chat in the launcher calls it after a confirmation | P |
 
 ### 7.3 v3 (the ambitious options)
 
@@ -722,14 +747,14 @@ an edit here and a change there in step.
 
 | Section here | porter crate | Frozen as |
 | --- | --- | --- |
-| §2 vocabulary, provenance, restrictions | `porter-core` | `Capability`, `CapabilityKind`, `VocabVersion(1)`, `Need`, `matches -> Match`, `Claim`/`Offer`/`Subject`/`Provenance`, `effective`, `Restriction`/`Limit`, `Locality`/`Tier`/`Billing` |
+| §2 vocabulary, provenance, restrictions | `porter-core` (and `prov` for the companion's shared ids, labels and `Actor`) | `Capability`, `CapabilityKind`, `VocabVersion(2)`, `ComputerUse`, `Need`, `matches -> Match`, `Claim`/`Offer`/`Subject`/`Provenance`, `effective`, `Restriction`/`Limit`, `Locality`/`Tier`/`Billing` |
 | §3 providers | `porter-provider` | `ProviderSpec` (the TOML file), `parse_provider`, `ProviderSet`, `Family`, `Issuer`, `Discovery`, traits `Provider` and `ProviderSession` |
-| §4.1-4.3 core, transports | `porter-service`, `porter-client` | `AccountService` over `Provider`, `Secrets`, `Prompter`, `Clock`; `AccountsRequest`/`AccountsReply`; `Transport` with `DbusTransport`, `SocketTransport`, `InProcess` |
-| §4.4 D-Bus | `porter-dbus` | proxies and skeletons for `org.quire.Accounts1` (`Manager`, `Account`, `Grants`, `Tokens`, `Request`), `org.quire.Sync1`, `org.quire.Inference1`; `dbus/*.xml` |
-| §4.5 consent | `porter-core` `consent` | `Grant`, `GrantKey`, `decide -> Verdict`, `availability -> Availability`, `ConsentAsk`/`ConsentAnswer`, `AppId` |
+| §4.1-4.3 core, transports | `porter-service`, `porter-client` | `AccountService` over `Provider`, `Secrets`, `Prompter`, `Clock`; `AccountsRequest`/`AccountsReply`; `Transport` (`call` for accountd, `open` for an inference session) with `DbusTransport`, `SocketTransport`, `InProcess`; `InferSession` |
+| §4.4 D-Bus | `porter-dbus` | proxies and skeletons for `org.quire.Accounts1` (`Manager`, `Account`, `Grants`, `Tokens`, `Request`), `org.quire.Sync1`, `org.quire.Inference1` (`Open`, `Prepare`, `EnginesChanged`, `Gpu`); `dbus/*.xml` |
+| §4.5 consent | `porter-core` `consent` | `Grant<K = GrantKey>`, `GrantKey` (with `space`), `decide<K: Eq> -> Verdict`, `SpaceId`/`SpaceScope`, `availability -> Availability`, `ConsentAsk`/`ConsentAnswer`, `AppId` |
 | §4.6 secrets | `porter-secrets` | `Secrets` (get, put, delete, delete_account), `attributes`, `MemorySecrets`, `Oo7Secrets` (stub) |
 | §5.1 client | `porter-client` | `Accounts`, `Found`, `ConsentOffer`, `NoAccount` |
-| §5.5 AI broker | `porter-infer` | `InferRequest`/`InferReply`, `Policy`/`Floor`, `route`, `SpendCap`/`spend_verdict`/`cost`, `AuditEntry`, trait `Model`, `Broker` (stub) |
+| §5.5 AI broker | `porter-infer` | `InferRequest` (chat with tools, embeddings, tasks, computer use, speech), `ClientFrame`/`InferEvent`/`InferReply`, `Readiness`, `AiKind`/`TierMap`/`PickerRow`, `Policy`/`Floor`, `route`, `SpendCap`/`spend_verdict`/`cost`, `AuditEntry`, trait `Model`, `Broker` (stub) |
 | §6 sync | `porter-sync` | `Replica`, `Cursor`, `ChangePage`, `Conflict`, `DatasetKind`/`ConflictRule`, `MemoryReplica` |
 | §4.1 processes | `accountd`, `syncd`, `inferd` | skeletons that build their service and exit "not implemented" |
 
@@ -738,5 +763,9 @@ its section: closed sets use serde slugs rather than `Word` (§2.1); `Restrictio
 `limits` (§2.5); every capability row in a provider file writes every field (§3.1); `Usage`
 (interactive or background) is part of every grant and query (§4.4, §4.5); `Availability` adds
 `denied`; `Found::Several` is picked app-side from granted accounts; `Calendar` joins the
-on-device floor; `Replica::changes` takes a `Cursor` and writes return versions (§6.1).
+on-device floor; `Replica::changes` takes a `Cursor` and writes return versions (§6.1). The companion
+freeze (2026-10) added: `VocabVersion(2)` with `ComputerUse`, `DataClass::Voice` and the Space
+dimension of a grant (§2.3, §4.5); streaming inference sessions with tools, computer-use steps
+and speech on the `Open` fd, `Prepare`, `EnginesChanged` and `Gpu` (§4.4, §5.5); and the removal
+of inferd's MCP host role (§5.5).
 

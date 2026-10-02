@@ -17,7 +17,7 @@ Where two docs disagree, the one lower in this list is wrong until fixed (only t
 4. Token docs: `01-LAYOUT.md`, `02-TYPE.md`, `03-COLOR.md`, `29-SIZING.md`.
 5. Behaviour: `05-MOTION.md` (what survives), `06-INTERACTIONS.md`, `10`-`13`, `26-DETAILS.md`.
 6. Spaces and settings: `21-SPACES.md`, `22-SETTINGS.md`, `28-CUSTOMIZATION.md`.
-7. Per surface: `20-SURFACES.md`, `23-WIDGETS.md`, `25-EMOJI.md`, `08-ICONS.md`, `31-ACCOUNTS.md`.
+7. Per surface: `20-SURFACES.md`, `23-WIDGETS.md`, `25-EMOJI.md`, `08-ICONS.md`, `31-ACCOUNTS.md`, `32-COMPANION.md`, `33-AGENT.md`.
 8. `04-COMPONENTS.md`: reference for its KEEP entries only.
 9. Workflow docs: `CHECKLIST.md`, `README.md`, `ARCHITECTURE.md`, `DESIGN.md`, `CONSUMING.md`, `CONVENTIONS.md`, `FINDINGS.md`.
 10. `archive/`: read-only history.
@@ -74,6 +74,9 @@ Durations (`DurationToken`); every duration in CSS and Rust comes from this tabl
 | SpinStep `--t-spin-step` | 83 | 12-spoke spinner, one turn per second (conf M) | spinner spoke step | replaces PendingStep |
 | Hold tokens | | | | |
 | IdleDim | 2000 | display dim before sleep | idle overlay | kept |
+| OrbListen `--t-orb-listen` | 12000 (proposed) | none | one turn of the companion orb while it listens | ADD (proposed) |
+| OrbWork `--t-orb-work` | 8000 (proposed) | none | one turn while it works out of sight | ADD (proposed) |
+| OrbAct `--t-orb-act` | 5000 (proposed) | none | one turn while it acts in a window | ADD (proposed) |
 | Awake | 20000 | | emoji awake window | kept |
 | ToastHold | 5000 | notification banner | toast and banner hold | was 5200; absorbs SentHold |
 
@@ -414,6 +417,28 @@ primitives; 3 `Label`, `Button` (+ `IconButton` merge), `Toggle`, `Checkbox`, `R
 Table, Toolbar, SplitView, Sidebar, TabView, FieldRow, MenuBar model); 10 sill switch-over
 (L1-L16 of the component inventory); the kept ideas arrive as features (section 3.3).
 
+### 2.13 The companion (proposed)
+
+Added by the companion freeze (user, 2026-10-02: approved as "proposed"; `32-COMPANION.md` holds
+the design, `33-AGENT.md` the machinery). Every row is a frozen type with a placeholder view until
+its fill; every look is a placeholder for the user's design review. The layer is `companion`,
+above `chrome` and below `app`. Where a row says "wire", the agent's own type is converted to the
+view in the shell, because quire never names an agent crate.
+
+| Name | AppKit | Contract | Sizes | States | Public parts | Absorbs | St | Pri |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| CompanionOrb | none public | a wrapper over `VoiceOrb`: `presence: CompanionPresence {Idle, Listening, Working, Acting, Waiting}` resolves to a `VoiceOrb` activity, a period token (`OrbListen`, `OrbWork`, `OrbAct`) and a tone; Idle and Waiting are always still (zero frames); Reduced motion makes every presence still (`orb_look`, pure, table-tested) | `OrbSize {Inline 14, Bar 16, Field 20, Module 40, Hero 192}` (proposed) | presence | orb | none | ADD (proposed) | P2 |
+| ContextChips | `NSTokenField` token | the context a prompt carries, one chip per piece: `ChipKind {Query, Results, Selection, Window, App, Space, Mention, Text}`, `Removal {Removable, Fixed}`; the chips are the consent surface: what is not shown is not sent | Z3 | CTL | chip, remove | none | ADD (proposed) | P2 |
+| Prompt mode | `NSSearchField` | a field's `FieldMode {Input, Prompt}`; `PromptHost {Field, Anchored, Refused}` by `FieldKind` (a secure field never becomes a prompt); `PromptState` and the pure `prompt_step`; `TextField` and `CommandPalette` take the two props at the fill, `Input` staying byte-for-byte today's field | Z- | prompt phase | none | none | ADD (proposed) | P2 |
+| AnswerCard | none (Writing Tools card) | one card per answer: `AnswerView {Text, DraftReply, ProposedEvent, Plan, Replace, Form, Refused}`; every card carries a footer (served-by, sources, scope) and its actions, an outbound or destructive action always marked by `EffectMark` and never the unmarked primary | Z- | streaming | body, actions, footer | none | ADD (proposed) | P2 |
+| PlanList | `NSOutlineView` of steps | a plan as groups of steps by effect: `Inclusion`, `PlanStepState`, `PlanPhase {Draft, Running, Stopped, Finished, Undoing, Undone}`; pure `plan_step`; excluded steps never run, Stop keeps what is done, Undo all appears only after a run | Z- | phase | group, step | none | ADD (proposed) | P2 |
+| ReplaceBar | none (Writing Tools) | a proposed change to the text in the person's field, waiting for Apply: `ReplacePhase {Proposed, Applied, Undone, Discarded}`; pure `replace_step` | Z- | phase | change, actions | none | ADD (proposed) | P2 |
+| RunRow | `NSTableCellView` | a computer-use run: goal, app, step against budget, thought, `RunPlace`, `RunState`, served-by, controls named by the shell | row 44 | state | goal, state, controls | none | ADD (proposed) | P2 |
+| ActivityStrip | none | what the companion did, by `ActorMark`, with Undo while the journal can undo it | Z- | entry state | entry, undo | none | ADD (proposed) | P2 |
+| MemoryTimeline, ConsolidationView | none | the memory as days of rows with `MemoryVerb {Forget, Keep, Discard, OpenSource, Export}`; a pending fact (from untrusted text) awaits the person; the consolidation diff of one night | Z- | row standing | day, row, diff | none | ADD (proposed) | P2 |
+| ServedByChip | `NSPopUpButton` | the model that answers, with a menu of the others and their readiness | Z3 | model state | chip, menu | none | ADD (proposed) | P2 |
+| ConfirmCard | `NSAlert` | the content of the trusted confirmation surface (`ds-shell`): the asker, the target, a title generated by the router and never by a model, the arguments as facts, the effect, the taint line, the offer (once or always), the gesture (press or hold) and an arm delay during which the buttons take no input | alert | `ArmState` | title, facts, actions | none | ADD (proposed) | P2 |
+
 ---
 
 ## 3. The Look
@@ -502,7 +527,7 @@ Window and Space colour (user)
   Magnification stays on, capped at 72 px.
 - Kept features, quieter only: Today tabs (no header; time and close on hover), pinned tiles
   (smaller, badge only when unread), Space switch (cross-fade, no slide), edge peek (hairline edge).
-- Deferred, map only: the one-input / companion / AI work (the command pill and list search stay).
+- The one-input / companion / AI work: its types and placeholder components are frozen as "proposed" (2.13, `32-COMPANION.md`, user, 2026-10-02); the command pill and list search stay as they are until its fill.
 
 Orchestrator decisions
 - Old-direction docs are archived under `design/archive/` with "moved to" notes, never deleted.

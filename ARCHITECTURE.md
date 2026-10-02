@@ -22,6 +22,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
+| `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
 | `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
 | `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
@@ -42,7 +43,8 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-style` | `ds-core` |
 | `ds-motion` | `ds-style`, `ds-core` |
 | `ds-lint` | `ds-style`, `ds-core` |
-| `ds` | `ds-motion`, `ds-style`, `ds-core` |
+| `ds-intents` | `ds-core` |
+| `ds` | `ds-intents`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-settings-derive` |
 | `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
@@ -61,8 +63,8 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 
 | Crate | Never reaches |
 | --- | --- |
-| `ds-core`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*`, `arboard` |
-| `ds-core`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths: `::ds_core` or `::ds_style` where the caller's manifest names it, else `::ds::base` or `::ds::style`, found with `proc-macro-crate`) |
+| `ds-core`, `ds-intents`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*`, `arboard` |
+| `ds-core`, `ds-intents`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths: `::ds_core` or `::ds_style` where the caller's manifest names it, else `::ds::base` or `::ds::style`, found with `proc-macro-crate`) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |
@@ -82,8 +84,8 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
-| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (`use_machine`, `MachineRef`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
-| `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
+| `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (`use_machine`, `MachineRef`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
+| `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, requests, hover, drop, shell) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell` |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot` |
@@ -95,7 +97,7 @@ images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `ov
 popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `lists` (rows,
 settings rows, headers, animated and leaving lists, preview pane, emoji grid, appearance picker)
 < `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries) <
-`editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `app`.
+`editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `companion` (orb, chips, answer cards, plan list, replace bar, run row, activity strip, memory view, served-by chip) < `app`.
 
 ## 3. From -> to (mechanical move)
 
@@ -251,6 +253,10 @@ The single place a concept lives. Extend it; never write a second one.
 | Net policy, `data:` URLs | `blitz-kit::net`, `blitz-kit::data_url` |
 | Hover sync, pixel snap, GPU adapter choice, transform-aware hit test | `blitz-kit::{hover, snap, adapter, hit}` |
 | PDF output, printing | `ds-blitz::{pdf, print}` |
+| The companion's presence (idle, listening, working, acting, waiting) | `ds-core::vocab::CompanionPresence`; derived only by sill's `presence_of` |
+| What an app tells the companion (a thing, a chip, a summon, a field's mode) | `ds-intents`; re-exported once from `ds::components::companion` |
+| The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
+| The confirmation card and the window glow | `ds-shell::{confirm, tokens::glow}` |
 | Mail-only components | `ds::components::app` |
 
 ## 5. Traits and closed enums

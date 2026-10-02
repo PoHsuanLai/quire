@@ -3,6 +3,7 @@
 
 pub mod app;
 pub mod chrome;
+pub mod companion;
 pub mod content;
 pub mod controls;
 pub mod editor;
