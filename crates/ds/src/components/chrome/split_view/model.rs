@@ -16,6 +16,17 @@ pub enum Collapsing {
     Snaps,
 }
 
+/// What a folded pane does with what lies outside it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum Folded {
+    /// The pane clips its body: nothing of it shows, and nothing reaches the pointer.
+    #[default]
+    Clips,
+    /// The body is an `EdgePeek`: once the pane is folded away its strip at the window's edge
+    /// waits for the pointer, and the sidebar it floats out stands over the content beside it.
+    Peeks,
+}
+
 /// The widths a pane keeps.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PaneSpec {
@@ -67,6 +78,8 @@ pub struct SplitPane {
     pub body: Element,
     /// Open, or folded away.
     pub shown: Shown,
+    /// What it does with its body while folded away.
+    pub folded: Folded,
 }
 
 impl SplitPane {
@@ -76,12 +89,21 @@ impl SplitPane {
             spec,
             body,
             shown: Shown::Visible,
+            folded: Folded::Clips,
         }
     }
 
     /// The same pane, `shown`.
     pub fn shown(self, shown: Shown) -> Self {
         SplitPane { shown, ..self }
+    }
+
+    /// The same pane, its body an `EdgePeek` that stays reachable while the pane is folded.
+    pub fn peeking(self) -> Self {
+        SplitPane {
+            folded: Folded::Peeks,
+            ..self
+        }
     }
 }
 

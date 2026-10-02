@@ -5,9 +5,11 @@
 //! returns its pane to the preferred width, opening it if it was folded. A divider takes the
 //! keyboard as a separator: Left and Right move it by ten pixels, Return resets it. Whether a
 //! pane is open is the caller's (`SplitPane::shown`, reported by `on_shown`), so a toolbar
-//! button can fold a sidebar; how wide it is when open is the view's.
+//! button can fold a sidebar; how wide it is when open is the view's. A pane folds by clipping
+//! its body, unless it is `SplitPane::peeking`: its body is then an `EdgePeek`, which keeps its
+//! strip at the window's edge and floats the sidebar over the content once the pane is folded.
 //!
-//! Markup: `div.ds-split[role=group][data-dragging]` of `div.ds-split-pane` (its body inside
+//! Markup: `div.ds-split[role=group][data-dragging]` of `div.ds-split-pane[data-shown][data-folded][data-away]` (its body inside
 //! `.ds-split-pane-body`), `div.ds-split-divider[role=separator]` after each, and last
 //! `div.ds-split-rest` holding `children`.
 
@@ -155,6 +157,7 @@ pub fn SplitView(
                         index: at,
                         width: width_of(&widths, &panes, at),
                         shown: pane.shown,
+                        folded: pane.folded,
                         mover,
                         body: pane.body.clone(),
                     }

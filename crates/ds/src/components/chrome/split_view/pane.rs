@@ -1,6 +1,8 @@
 //! One pane of a split view: the box whose width is a spring while the pane opens or folds and
-//! follows the pointer 1:1 while a divider is held.
+//! follows the pointer 1:1 while a divider is held. A pane whose body is an `EdgePeek`
+//! (`Folded::Peeks`) stops clipping once it has folded away, so the peek can stand outside it.
 
+use crate::components::chrome::split_view::model::Folded;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
@@ -20,6 +22,9 @@ pub(crate) enum Mover {
     Spring,
 }
 
+/// Under this width in pixels a folding pane counts as folded away.
+const FOLDED_AWAY: f32 = 0.5;
+
 /// A pane `width` wide when open, holding `body` at that width so folding slides it away rather
 /// than squeezing it.
 #[component]
@@ -27,6 +32,7 @@ pub(crate) fn PaneBox(
     index: usize,
     width: Px,
     shown: Shown,
+    folded: Folded,
     mover: Mover,
     body: Element,
 ) -> Element {
@@ -47,12 +53,16 @@ pub(crate) fn PaneBox(
         });
     }
     let drawn = motion.frame().position().max(0.0);
+    let peeks = folded == Folded::Peeks;
+    let away = peeks && shown == Shown::Hidden && drawn < FOLDED_AWAY;
     rsx! {
         div {
             class: "ds-split-pane",
             "data-index": "{index}",
             "data-shown": shown.slug(),
-            "aria-hidden": if shown == Shown::Hidden { Some("true") } else { None },
+            "data-folded": peeks.then(|| folded.slug()),
+            "data-away": if away { Some("true") } else { None },
+            "aria-hidden": if shown == Shown::Hidden && !peeks { Some("true") } else { None },
             style: "--pane-w:{drawn}px;--pane-open:{width.0}px",
             div { class: "ds-split-pane-body", {body} }
         }

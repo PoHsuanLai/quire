@@ -25,6 +25,7 @@ pub fn StructurePage() -> Element {
         table::TableSection {}
         toolbar::ToolbarSection {}
         split_view::SplitViewSection {}
+        split_view::SplitViewPeekSection {}
         sidebar::SidebarListSection {}
         sidebar_sections::SidebarSectionsSection {}
         tab_view::TabViewSection {}
