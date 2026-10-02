@@ -157,7 +157,7 @@ fn App() -> Element {
 | --- | --- | --- | --- |
 | `appearance` | `Appearance` | required | theme, accent, motion preference — section 3 |
 | `system` | `SystemPrefs` | `SystemPrefs::default()` | the desktop's own scheme/motion/contrast, from `use_environment`'s `Environment::system` (`SystemPrefsSource::Portal`) |
-| `look` | `SpaceLook` | `SpaceLook::default()` | the frame's dots, theme override and card accent (design/21-SPACES.md §1) |
+| `look` | `SpaceLook` | `SpaceLook::default()` | the Space (design/21-SPACES.md §1): today its dots, theme override and card accent; **target (clean-up phase)**: one hue, a chroma factor, grain and theme, tinting a sidebar's ground only |
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
@@ -795,7 +795,12 @@ For a bar (FINDINGS "Bar gaps"):
       rsx! { Ds { appearance, material: Material::Bar, look, /* … */ } }
   }
   ```
-- **Chrome materials draw the Space.** A `Ds` in `Bar`, `Dock`, `Osd`, `Widget` (and a
+- **Chrome materials draw the Space (target (clean-up phase): this goes).** The design is one quiet
+  Look with a flush window: the Space tints a sidebar's ground only and shell chrome is the
+  material alone (design/30 §3.4, design/21 §3), so a consumer will pass `look` to the window
+  that has a sidebar and nothing to Bar, Dock, Osd or Widget roots; the A/B layers, `.ds-frame`,
+  `--t-scene` and `appearance.material_tint_alpha` below are the code that is being removed.
+  Until it lands, a `Ds` in `Bar`, `Dock`, `Osd`, `Widget` (and a
   `Popover` root passed `chrome: Some(RootChrome::Painted)`) draws the Space gradient, its A/B
   layers and grain as one `.ds-frame` group at the material's tint alpha
   (`--m-frame-alpha`, scaled by `appearance.material_tint_alpha`) with `data-blur=on`, and at
@@ -808,7 +813,7 @@ For a bar (FINDINGS "Bar gaps"):
   without), edge and drop (`--m-box`). A popup document keeps `Material::Popover` and its
   spare room is alpha 0 (`crates/ds-conformance/tests/bar_frame.rs` proves it over
   `Harness::render_over(Backdrop::Clear)`).
-- **The frame ground.** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
+- **The frame ground (target (clean-up phase): removed with the frame model; the `--f-*` inks go).** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
   Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
   `--surface` is `--f-pill-hover`, `--surface-2` and `--raise` are `--f-pill`, `--line*` is
   `--f-line`: `Button`, `Chip`, `Badge`, a menu's trigger and your text all draw in
@@ -1193,7 +1198,7 @@ than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in tho
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
-`spaces.default_grain` and `spaces.default_card_accent`. `store.with_look(&workspace, look)`
+`spaces.default_grain` (target (clean-up phase): default 0; was 40) and `spaces.default_card_accent` (retiring; a Space has no card accent). `store.with_look(&workspace, look)`
 records a look under the id (when there is one) and always under the position.
 
 **Settings files** (`ds_settings::{SettingsDoc, Store}`). A file is a serde type that names

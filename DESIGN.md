@@ -5,6 +5,12 @@ only says where in the code a section lives, so a reviewer can go from a paragra
 back. Paths are under `crates/ds/src/` unless another crate is named first (`ds-core/colour/srgb.rs`
 is `crates/ds-core/src/colour/srgb.rs`).
 
+The direction is one quiet Look (`design/30-CATALOGUE.md` section 3, which wins). Rows for the
+frame model (`space/frame_vars.rs`, `ground_css.rs`, `root/chrome.rs` `FrameTint`/`Ground`, the
+`.ds-frame` group, `CardAccent`, `Ds { tint_alpha }`) describe code that is **target (clean-up
+phase)** to delete or reshape; the design docs, not these rows, are the target. Moved sections
+keep a "moved to" stub in their old file, so a section number here still resolves.
+
 The design system's crates each name only the ones below them (`scripts/check-boundary.sh`
 holds the allowed edges); `ds-settings`, `ds-blitz`, `ds-harness`, `ds-conformance` and
 `ds-gallery` sit beside and above them (the last table). The layers: `ds-core` (vocabulary, geometry units, time, errors, text, colour, PNG
@@ -25,20 +31,20 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 
 | Module | Implements | Notes |
 | --- | --- | --- |
-| `ds-style/appearance/theme.rs` | 07-LOOKS §2 (Theme axis); 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
-| `ds-style/appearance/accent.rs` | 03-COLOR §5, open decision 6; 22-SETTINGS §3.1 `appearance.accent` | the eight macOS accents |
+| `ds-style/appearance/theme.rs` | 30 §3 (the one Look), 22-SETTINGS §3.1 `appearance.theme`; 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
+| `ds-style/appearance/accent.rs` | 03-COLOR §5 and §20; 22-SETTINGS §3.1 `appearance.accent` | the eight macOS accents |
 | `ds-style/appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference) and `MotionLevel` (resolved) |
 | `ds-style/appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | lenient read |
 | `ds-style/appearance/system.rs` | plan "ds-settings" portal mapping | `SystemPrefs{scheme, motion, contrast}` |
 | `ds-style/appearance/resolve.rs` | 05-MOTION §9 rule 11 (explicit `data-motion`); 03-COLOR open decision 13 | `resolve()`, `Resolved::attrs()` |
 | `ds-style/appearance/peek.rs` | 04-COMPONENTS §24 `PeekMode` | Center or Full |
-| `ds-core/colour/contrast.rs` | 03-COLOR §4.4 (WCAG ratio), §6 | `Verdict` |
-| `ds-core/colour/{srgb,oklab,fit}.rs` | 03-COLOR §4.2, §17.4, §20; 08-ICONS §1.5, §2.10 | `Srgb`, `LinearRgb`, `Oklab`, `Oklch` and their conversions, the one copy every colour computation uses; the prototype's gamut fit (`oklch_bytes`, `oklch_hex`) |
-| `ds-style/space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4.2-4.4, §5, §6, §9; 21-SPACES §2 | `Scheme`/`Capping` |
-| `ds-style/space/look.rs` | 03-COLOR §18; 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` |
-| `ds-style/space/frame_vars.rs` | 03-COLOR §4.5, §8 (opacity); 21-SPACES §2 (frame tokens not in palette.rs) | the frame's custom properties and grain opacity |
-| `ds-style/space/presets.rs` | 03-COLOR §7; 21-SPACES §4 | the eight presets as data; `default_look` |
-| `ds-style/appearance/{material,blur}.rs`, `ds-style/material/recipe.rs`, `ds-style/tokens/tint.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
+| `ds-core/colour/contrast.rs` | 03-COLOR §6 (the gates); `archive/03-COLOR-arc.md` (the WCAG ratio code) | `Verdict` |
+| `ds-core/colour/{srgb,oklab,fit}.rs` | 03-COLOR §4, §17.4, §20; 08-ICONS §1.5, §2.10 | `Srgb`, `LinearRgb`, `Oklab`, `Oklch` and their conversions, the one copy every colour computation uses; the prototype's gamut fit (`oklch_bytes`, `oklch_hex`) |
+| `ds-style/space/palette.rs` (+`card.rs`, `readout.rs`, `tests.rs`) | 03-COLOR §4, §6; 21-SPACES §2 (the flat tint; target (clean-up phase): the gradient, the field and `card.rs` go) | `Scheme`/`Capping` |
+| `ds-style/space/look.rs` | 21-SPACES §1 | `SpaceLook`, `Grain`, `CardAccent` (target (clean-up phase): `SpaceLook` is hue, chroma factor, grain, theme; `CardAccent` and the dots go) |
+| `ds-style/space/frame_vars.rs` | 03-COLOR §8 (grain opacity); 21-SPACES §2 | the frame's custom properties and grain opacity (target (clean-up phase): deleted with the frame model; the grain opacity stays) |
+| `ds-style/space/presets.rs` | 21-SPACES §4 | the eight presets as data (target (clean-up phase): one hue each, grain 0); `default_look` |
+| `ds-style/appearance/{material,blur}.rs`, `ds-style/material/recipe.rs`, `ds-style/tokens/tint.rs` | 03-COLOR §17.1-17.3; 21-SPACES §3 (no chrome tint) | `blur_region` is shell-host's (03-COLOR §17.1 "Blur region"); four tint alphas raised for legibility (§17.2) |
 | `ds-style/material/{stack,layer}.rs`, `ds-style/tokens/vibrancy.rs` | 03-COLOR §17.4 (material stack v2, the macOS polish pass) | `MaterialStack` (the highlight, hairline, shadow-strength and vibrancy keys, written inline by `Ds { stack }`); each layer written with its alpha read from its input; the vibrancy boost baked into the tint in OKLab |
 
 ## `ds`: tokens and stylesheet
@@ -46,8 +52,8 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | Module | Implements |
 | --- | --- |
 | `ds-style/tokens/colour.rs` | 03-COLOR §3, §10-12 (paper tokens, washes, `--foreign-ground`); 04-COMPONENTS O-3 (`--danger-ink`, `--mark-ground`, `--handle-ring`) |
-| `ds-style/tokens/accent_table.rs` | 03-COLOR §5 and open decision 6 (6 accents x 4 props) |
-| `ds-style/tokens/label_hue.rs` | 03-COLOR §15; 07-LOOKS §6.2 (`--c-*`) |
+| `ds-style/tokens/accent_table.rs` | 03-COLOR §5 and §20 (8 accents x 4 props) |
+| `ds-style/tokens/label_hue.rs` | `archive/03-COLOR-arc.md` §15 (Candy hues, history); `archive/07-LOOKS.md` §6.2 (`--c-*`) |
 | `ds-style/tokens/hex.rs`, `ds-style/tokens/name.rs` | the value and name types every table uses |
 | `ds-style/tokens/{token,set}.rs`, `ds-core-derive` | `Token` (`#[derive(Word, Token)]`: a family's custom properties and values from its variants' attributes), `TokenScope`, `CssValue`, `TokenSet` (a family as data, placed in the `.ds` block) |
 | `ds-style/kit/`, `ds-style/kit/style_kit.rs`, `ds-motion/kit.rs`, `assembly/kit.rs`, `ds-shell/kit.rs` | `Kit` (a layer's token families, stylesheet sections, component `Sheet`s each placed after the sheet it follows, and lint vocabulary), `KitRank`, `Kits` (`stylesheet`, `vocabulary`, `token_blocks`, `sheets`); `ds::kits()` is style, motion and the components; `ds_shell::kits()` adds the shell's, `ds_shell::stylesheet()` is the sheet a shell surface draws with (`Ds { sheet: Some(..) }`); `LintConfig::new(&ds_shell::kits())` |
@@ -57,14 +63,14 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/tokens/row_scale.rs` | 30 §1.6 (the settings row's 44 height and 34 avatar as `--row-settings-h` and `--row-avatar`, emitted on `.ds` with the ladder; `Row` and `SkeletonRow` both read them) |
 | `ds-style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
 | `ds-style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `ds-style/scale.rs`, `ds-style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_blitz::snap` |
-| `ds-style/tokens/elevation.rs` | 03-COLOR §10, §17.2 (`--shadow-pop`, `--shadow-sheet`) |
+| `ds-style/tokens/elevation.rs` | 03-COLOR §10 (the four shadows; target (clean-up phase): the code still has about twelve), §17.2 |
 | `ds-style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `ds-style/tokens/layer.rs` | 01-LAYOUT §12 |
 | `ds-style/tokens/tuned.rs`, `ds-shell/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
 | `ds-shell/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `ds-shell/kit.rs` |
 | `ds-style/css/shape_css.rs`, `ds-style/icon/{plate,family}.rs`, `ds-style/tokens/plate.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
 | `ds-style/kit/blocks.rs`, `ds-style/css/{accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
-| `ds-style/css/ground_css.rs` | 03-COLOR §4 (the frame inks); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
+| `ds-style/css/ground_css.rs` | `archive/03-COLOR-arc.md` §4 (the frame inks; target (clean-up phase): deleted with the frame model); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
 | `ds-motion/css.rs`, `ds-motion/motion.css` | 05-MOTION §4 (keyframes), §9 rule 2 (`X`/`X--b` aliases) |
 | `ds-style/emit.rs` | spike S2: every attribute selector written `[*|attr=value]` |
 | `ds-style/css/{reset,utilities}.css`, `ds-style/css/document.rs`, `assembly/stylesheet.rs`, `assembly/sheets.rs`, `ds-shell/sheets.rs` | 02-TYPE §3 (base text on `.ds`; the element rules scope through `:where(.ds)` so a lone component class outranks them); 04-COMPONENTS "Global rules" (`.ds-ic`) and "Truncation" (`.ds-truncate`) |
