@@ -3,7 +3,7 @@
 //! `tests/snapshots/structure/<component>/<state>.html`.
 
 use dioxus::prelude::*;
-use ds::components::chrome::capsule::model::CapsuleSlot;
+use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubSlot};
 use ds::components::chrome::capsule::view::Capsule;
 use ds::components::chrome::sidebar::Sidebar;
 use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
@@ -16,6 +16,7 @@ use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::chrome::window_frame::WindowTitlebar;
 use ds::components::content::text_runs::RunTone;
 use ds::components::controls::checkbox::Checkbox;
+use ds::components::controls::scrubber_model::BufferedRange;
 use ds::components::fields::fact_list::{Fact, FactList};
 use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
 use ds::components::fields::stepper::model::{Readout, StepRange};
@@ -23,6 +24,7 @@ use ds::components::fields::stepper::view::Stepper;
 use ds::components::lists::table::model::{CellAlign, Sort, SortDirection, TableColumn, TableRow};
 use ds::components::lists::table::view::Table;
 use ds::components::overlays::drag_ghost::DragCount;
+use ds::motion::spring::Millis;
 use ds::prelude::*;
 use ds_core::vocab::RowState;
 use ds_style::tokens::control_size::{ControlSize, SidebarSize};
@@ -55,6 +57,31 @@ fn capsule_slots() -> Vec<CapsuleSlot<u8>> {
         CapsuleSlot::Divider,
         CapsuleSlot::Item(ToolbarItem::new(2, "Rotate", Icon::Refresh).toggle(Check::On)),
         CapsuleSlot::Item(ToolbarItem::new(3, "Info", Icon::Info).with(Availability::Disabled)),
+    ]
+}
+
+/// A media player's capsule: play, elapsed, the progress bar, what is left, the level, a button.
+fn media_slots() -> Vec<CapsuleSlot<u8>> {
+    vec![
+        CapsuleSlot::Item(ToolbarItem::new(0, "Play", Icon::Play)),
+        CapsuleSlot::Readout("1:03".to_owned()),
+        CapsuleSlot::Scrub(ScrubSlot {
+            label: "Position".to_owned(),
+            position: Fraction(350),
+            length: Millis(180_000),
+            buffered: vec![BufferedRange {
+                from: Fraction(0),
+                to: Fraction(600),
+            }],
+            availability: Availability::Enabled,
+        }),
+        CapsuleSlot::Readout("-1:57".to_owned()),
+        CapsuleSlot::Level(LevelSlot {
+            label: "Volume".to_owned(),
+            value: Fraction(700),
+            availability: Availability::Enabled,
+        }),
+        CapsuleSlot::Item(ToolbarItem::new(1, "Info", Icon::Info)),
     ]
 }
 
@@ -161,6 +188,11 @@ pub const CASES: &[Case] = &[
         component: "capsule",
         state: "shown",
         make: || rsx! { Capsule::<u8> { label: "Controls", slots: capsule_slots(), shown: Shown::Visible, onpick: |_| {} } },
+    },
+    Case {
+        component: "capsule",
+        state: "media",
+        make: || rsx! { Capsule::<u8> { label: "Playback", slots: media_slots(), shown: Shown::Visible, onpick: |_| {} } },
     },
     Case {
         component: "capsule",
