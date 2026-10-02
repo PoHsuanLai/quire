@@ -29,6 +29,8 @@ pub(crate) enum Remote {
     },
     Redraw,
     Quit,
+    Hold,
+    Release,
 }
 
 type Wake = Arc<dyn Fn() + Send + Sync>;
@@ -94,6 +96,15 @@ impl AppHandle {
         self.push(Remote::Quit)
     }
 
+    /// Keep the event loop running with no window open, until the returned hold is dropped: a
+    /// program that plays with no window holds the loop while it does. The `LastWindowClosed`
+    /// policy applies again once the last hold is gone and no window is open (its linger starts
+    /// then). It fails once the app has ended.
+    pub fn hold(&self) -> Result<AppHold, AppEnded> {
+        self.push(Remote::Hold)?;
+        Ok(AppHold(self.clone()))
+    }
+
     /// Whether the event loop has ended.
     pub fn has_ended(&self) -> bool {
         self.lock().ended
@@ -142,6 +153,17 @@ impl AppHandle {
         state.ended = true;
         state.wake = None;
         state.pending.clear();
+    }
+}
+
+/// A claim on the event loop staying alive, made by [`AppHandle::hold`]; dropping it lets go.
+#[derive(Debug)]
+pub struct AppHold(AppHandle);
+
+impl Drop for AppHold {
+    fn drop(&mut self) {
+        // A loop that has ended has nothing left to hold.
+        let _ended = self.0.push(Remote::Release);
     }
 }
 
@@ -207,6 +229,8 @@ mod tests {
                 Remote::Open { .. } => "open",
                 Remote::Redraw => "redraw",
                 Remote::Quit => "quit",
+                Remote::Hold => "hold",
+                Remote::Release => "release",
             })
             .collect();
         assert_eq!(kinds, ["open", "redraw", "quit"]);
@@ -237,8 +261,36 @@ mod tests {
         );
         let built = handle.take().into_iter().find_map(|request| match request {
             Remote::Open { make, .. } => Some(make()),
-            Remote::Redraw | Remote::Quit => None,
+            Remote::Redraw | Remote::Quit | Remote::Hold | Remote::Release => None,
         });
         assert!(matches!(built, Some(Root::Shared(_))));
+    }
+
+    #[test]
+    fn a_hold_is_a_request_and_its_drop_is_another() {
+        let handle = AppHandle::new();
+        let _woken = counting(&handle);
+        let hold = handle.hold().expect("the loop has not ended");
+        drop(hold);
+        let kinds: Vec<&str> = handle
+            .take()
+            .iter()
+            .map(|request| match request {
+                Remote::Hold => "hold",
+                Remote::Release => "release",
+                Remote::Open { .. } | Remote::Redraw | Remote::Quit => "other",
+            })
+            .collect();
+        assert_eq!(kinds, ["hold", "release"]);
+    }
+
+    #[test]
+    fn a_hold_after_the_loop_ended_is_refused_and_dropping_one_is_harmless() {
+        let handle = AppHandle::new();
+        let _woken = counting(&handle);
+        let hold = handle.hold().expect("not ended yet");
+        handle.end();
+        drop(hold);
+        assert!(handle.hold().is_err());
     }
 }

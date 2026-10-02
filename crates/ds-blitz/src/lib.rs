@@ -74,7 +74,7 @@ mod window_place;
 mod window_requests;
 mod window_shell;
 
-pub use app_handle::{AppEnded, AppHandle, use_app_handle};
+pub use app_handle::{AppEnded, AppHandle, AppHold, use_app_handle};
 pub use app_id::AppId;
 pub use app_life::LastWindowClosed;
 pub use blitz_host::provide_host;

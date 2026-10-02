@@ -801,6 +801,11 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   privilege: closing it leaves the others up.
 - **Threads reach the loop through `AppHandle`** (a mutex-guarded queue and the winit proxy's
   wake). `open_window` needs a component's context, so a D-Bus or timer task cannot use it.
+- **A program with no window can hold the loop open.** `AppHandle::hold` returns an `AppHold`; while
+  one is held the loop does not end whatever `LastWindowClosed` says, and when the last is dropped
+  with no window open the policy applies from then (a linger starts, or `Exit` ends the loop). The
+  viewer holds it while a recording plays with no window (`Play` from the launcher), so a background
+  player outlives the windows and the loop ends one linger after it stops.
 - **A closed window's renderer is parked and kept** for the next window (Open items). The vello-hybrid
   renderer caches the winit window it drew past `suspend`, so a renderer set aside as it was kept
   the closed window mapped and frozen on screen (found 2026-10-03 with a KWin script closing a
