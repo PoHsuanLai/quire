@@ -33,17 +33,17 @@ pub struct Workspace {
 /// keys `spaces.default_grain` and `spaces.default_card_accent`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SpaceDefaults {
-    /// The grain for presets that ship none (proposed 40).
+    /// The grain every preset ships with (none, 0).
     pub grain: Grain,
     /// The card accent (proposed: the chosen accent).
     pub card_accent: CardAccent,
 }
 
 impl Default for SpaceDefaults {
-    /// design/21 section 4's proposed defaults: grain 40, the chosen accent.
+    /// design/21 section 4's defaults: grain 0 (none), the chosen accent.
     fn default() -> Self {
         SpaceDefaults {
-            grain: Grain(40),
+            grain: Grain(0),
             card_accent: CardAccent::Chosen,
         }
     }

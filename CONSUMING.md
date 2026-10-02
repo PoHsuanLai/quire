@@ -1241,7 +1241,7 @@ the button is laid out, and `anchor` moves it elsewhere.
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
-`spaces.default_grain` (target (clean-up phase): default 0; was 40) and `spaces.default_card_accent` (retiring; a Space has no card accent). `store.with_look(&workspace, look)`
+`spaces.default_grain` (default 0; was 40) and `spaces.default_card_accent` (retiring; a Space has no card accent). `store.with_look(&workspace, look)`
 records a look under the id (when there is one) and always under the position.
 
 **Settings files** (`ds_settings::{SettingsDoc, Store}`). A file is a serde type that names

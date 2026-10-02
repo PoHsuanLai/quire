@@ -237,7 +237,7 @@ mod tests {
             let preset = PRESETS[index];
             let look = SpaceLook {
                 dots: preset.dots.to_vec(),
-                grain: Grain(preset.grain.unwrap_or(40)),
+                grain: Grain(preset.grain.unwrap_or(0)),
                 theme: Theme::System,
                 card_accent: CardAccent::SpaceHue,
             };

@@ -14,9 +14,9 @@ use serde::{Deserialize, Serialize};
 pub struct Grain(pub u8);
 
 impl Default for Grain {
-    /// The first-run grain: the Work preset's 35 (design/03-COLOR.md section 7).
+    /// The first-run grain: none (design/03-COLOR.md section 8).
     fn default() -> Self {
-        Grain(35)
+        Grain(0)
     }
 }
 
