@@ -735,6 +735,11 @@ and a click on the strip pins it (`EdgePeek { onpin }`, which sets the pane's `s
 so a drag of the divider, a toolbar button and the edge click move the same state. No host element outside
 the pane is needed.
 
+A menu from a toolbar button: `Toolbar { onpick }` hears a `Picked<T> { value, anchor: Option<Anchor> }`.
+`anchor` is the button the pick came from (`Anchor::Mounted`, the chevron for an item that was behind it),
+so keep it and hang the `Menu { anchor, placement: MenuPlacement::Popup }` or `Popover` from it; no
+button of your own in the title is needed.
+
 Anchors, hover-card parts and undo:
 
 - `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element

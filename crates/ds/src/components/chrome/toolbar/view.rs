@@ -1,13 +1,14 @@
 //! Toolbar: the band across the top of a window's content (design/30 section 2.7, `NSToolbar`).
 //! Leading items, the title (or a control the caller puts in its place), trailing items, and
 //! when they do not all fit the overflow chevron, which opens the rest as a menu. Items are
-//! `Button { Toolbar }`: the glyph alone, a fill under the pointer and while pressed.
+//! `Button { Toolbar }`: the glyph alone, a fill under the pointer and while pressed. A pick
+//! reports the item's value and its button (`Picked`), so a menu or popover can hang from it.
 //!
 //! Markup: `div.ds-toolbar[role=toolbar][data-overflow]` of `span.ds-toolbar-leading`,
 //! `span.ds-toolbar-title` (`.ds-toolbar-heading`, `.ds-toolbar-subtitle`) and
 //! `span.ds-toolbar-trailing`.
 
-use crate::components::chrome::toolbar::model::{Kept, ToolbarItem, ToolbarRoom};
+use crate::components::chrome::toolbar::model::{Kept, Picked, ToolbarItem, ToolbarRoom};
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
@@ -23,11 +24,17 @@ use ds_core::press::Press;
 use ds_core::vocab::{Availability, Shown};
 use ds_style::icon::Icon;
 use ds_style::tokens::control_size::ControlSize;
+use std::collections::HashMap;
 
-/// One item as a button.
+/// The mounted buttons, by the item's place on the band (leading items first, then trailing).
+type Buttons = CopyValue<HashMap<usize, MountedRef>>;
+
+/// One item, at `place` on the band, as a button that hands its own element over when picked.
 fn button<T: Clone + PartialEq + 'static>(
     item: &ToolbarItem<T>,
-    onpick: EventHandler<T>,
+    place: usize,
+    buttons: Buttons,
+    onpick: EventHandler<Picked<T>>,
 ) -> Element {
     let value = item.value.clone();
     rsx! {
@@ -40,7 +47,17 @@ fn button<T: Clone + PartialEq + 'static>(
             icon: Some(IconSource::from(item.icon)),
             value: item.check,
             availability: item.availability,
-            onclick: move |_: Press| onpick.call(value.clone()),
+            onclick: move |_: Press| {
+                let anchor = buttons.peek().get(&place).cloned().map(Anchor::Mounted);
+                onpick.call(Picked { value: value.clone(), anchor });
+            },
+            common: Common {
+                mounted: Some(EventHandler::new(move |event: MountedEvent| {
+                    let mut buttons = buttons;
+                    buttons.write().insert(place, MountedRef(event.data()));
+                })),
+                ..Common::default()
+            },
         }
     }
 }
@@ -64,7 +81,8 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
 
 /// A toolbar. `leading` and `trailing` are the items either side of the title; `center`
 /// replaces the title's words with a control (a segmented control of views). `onpick` hears an
-/// item from the band or from the overflow menu. `room` is the width the items are laid out in.
+/// item from the band or from the overflow menu, with the button it came from, so a menu can
+/// hang from that button. `room` is the width the items are laid out in.
 #[component]
 pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] leading: Vec<ToolbarItem<T>>,
@@ -73,9 +91,10 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] subtitle: Option<TextLine>,
     #[props(default)] center: Option<Element>,
     #[props(default = ToolbarRoom::Measured)] room: ToolbarRoom,
-    onpick: EventHandler<T>,
+    onpick: EventHandler<Picked<T>>,
     #[props(default)] common: Common,
 ) -> Element {
+    let buttons: Buttons = use_hook(|| CopyValue::new(HashMap::new()));
     let probe = use_rect();
     let mut open = use_signal(|| Shown::Hidden);
     let mut chevron = use_signal(|| None::<MountedRef>);
@@ -107,8 +126,8 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
             },
             ..data,
             span { class: "ds-toolbar-leading",
-                for item in leading.iter().take(kept.leading) {
-                    {button(item, onpick)}
+                for (place , item) in leading.iter().enumerate().take(kept.leading) {
+                    {button(item, place, buttons, onpick)}
                 }
             }
             span { class: "ds-toolbar-title",
@@ -124,8 +143,8 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                 }
             }
             span { class: "ds-toolbar-trailing",
-                for item in trailing.iter().take(kept.trailing) {
-                    {button(item, onpick)}
+                for (at , item) in trailing.iter().enumerate().take(kept.trailing) {
+                    {button(item, leading.len() + at, buttons, onpick)}
                 }
                 if overflowing {
                     Button {
@@ -153,9 +172,9 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                 placement: MenuPlacement::Popup,
                 anchor,
                 items: rows,
-                onpick: move |picked: T| {
+                onpick: move |value: T| {
                     open.set(Shown::Hidden);
-                    onpick.call(picked);
+                    onpick.call(Picked { value, anchor: chevron().map(Anchor::Mounted) });
                 },
                 onclose: move |()| open.set(Shown::Hidden),
             }
