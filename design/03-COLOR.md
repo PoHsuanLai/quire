@@ -123,8 +123,8 @@ Opacity is `grain/100 × 0.10` light and `× 0.08` dark, drawn above the tint an
 content; never on a control or the content. The design system uses a pre-rendered 128x128 alpha
 noise PNG from a Park-Miller PRNG with seed 7, multiplier 16807 and modulus 2147483647 (the
 prototype's generator and overlay-blend notes are in `archive/03-COLOR-arc.md`, which Blitz cannot
-do). The `--grain` token of `C` is unused and deleted. Status: **target (clean-up phase)** for the
-default (the code still defaults to 40) and for the sidebar-only placement.
+do). The `--grain` token of `C` is unused and deleted. Status: the default is current (code default 0); the
+sidebar-only placement stays **target (clean-up phase)**.
 
 ## 9. The Space editor field
 

@@ -496,6 +496,70 @@ impl Fraction {
     }
 }
 
+/// The companion's one presence (design/32 section 3): a look of the orb and the window glow,
+/// never a panel. `data-presence`; stored as its snake-case word.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[word(case = snake)]
+pub enum CompanionPresence {
+    /// Still; zero frames anywhere.
+    #[default]
+    Idle,
+    /// Taking a prompt: a field focused in prompt mode.
+    Listening,
+    /// Thinking, or running typed actions out of sight.
+    Working,
+    /// Acting in a window: the compositor glows that window.
+    Acting,
+    /// Blocked on the person: a question, a confirmation, a taken-over run. Still (zero frames).
+    Waiting,
+}
+
+/// What a person can do with one memory row (design/32 section 6). The launcher's verb and the
+/// memory view's button are this one enum.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[word(case = snake)]
+pub enum MemoryVerb {
+    /// Delete it, and everything derived from it.
+    Forget,
+    /// Confirm a pending fact so it lasts.
+    Keep,
+    /// Refuse a pending fact.
+    Discard,
+    /// Open what it came from.
+    OpenSource,
+    /// Write the memory out as files.
+    Export,
+}
+
+/// How much a call can change the world, for drawing only: the view of the wire's effect, ordered
+/// by severity. `data-effect`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Word)]
+pub enum EffectMark {
+    /// Reads, changes nothing.
+    Read,
+    /// Writes, and can be undone.
+    UndoableWrite,
+    /// Sends something out of the machine.
+    Outbound,
+    /// Destroys something that cannot be put back.
+    Destructive,
+}
+
+/// Who did a thing, for drawing only: the view of the wire's actor. `data-actor`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+pub enum ActorMark {
+    /// The person.
+    You,
+    /// The companion.
+    Companion,
+}
+
+/// A count a view shows ("12 results", "3 steps"): the view of the wire's count.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
+pub struct Tally(pub u32);
+
 #[cfg(test)]
 mod percent_tests {
     use super::Percent;
@@ -534,8 +598,9 @@ mod fraction_tests {
 #[cfg(test)]
 mod word_tests {
     use super::{
-        Activity, Availability, Check, Dismiss, DropState, Emphasis, FocusStyle, InputModality,
-        Muting, PressPhase, Selection, Severity, Shown,
+        Activity, ActorMark, Availability, Check, CompanionPresence, Dismiss, DropState,
+        EffectMark, Emphasis, FocusStyle, InputModality, MemoryVerb, Muting, PressPhase, Selection,
+        Severity, Shown,
     };
     use crate::word::Word;
 
@@ -551,13 +616,17 @@ mod word_tests {
     #[test]
     fn every_vocabulary_word_parses_back_from_its_slug() {
         round_trips::<Activity>();
+        round_trips::<ActorMark>();
         round_trips::<Availability>();
         round_trips::<Check>();
+        round_trips::<CompanionPresence>();
         round_trips::<Dismiss>();
         round_trips::<DropState>();
+        round_trips::<EffectMark>();
         round_trips::<Emphasis>();
         round_trips::<FocusStyle>();
         round_trips::<InputModality>();
+        round_trips::<MemoryVerb>();
         round_trips::<Muting>();
         round_trips::<PressPhase>();
         round_trips::<Selection>();
@@ -614,5 +683,55 @@ mod availability_tests {
         for &(phase, want) in CASES {
             assert_eq!(phase.attr(), want, "{phase:?}");
         }
+    }
+}
+
+#[cfg(test)]
+mod companion_tests {
+    use super::{CompanionPresence, EffectMark, MemoryVerb};
+    use crate::testing::word_matches_serde;
+    use crate::word::Word;
+
+    #[test]
+    fn companion_presence_words_round_trip() {
+        word_matches_serde::<CompanionPresence>();
+        word_matches_serde::<MemoryVerb>();
+        const SLUGS: &[(CompanionPresence, &str)] = &[
+            (CompanionPresence::Idle, "idle"),
+            (CompanionPresence::Listening, "listening"),
+            (CompanionPresence::Working, "working"),
+            (CompanionPresence::Acting, "acting"),
+            (CompanionPresence::Waiting, "waiting"),
+        ];
+        assert_eq!(CompanionPresence::ALL.len(), SLUGS.len());
+        for &(presence, slug) in SLUGS {
+            assert_eq!(presence.slug(), slug, "{presence:?}");
+            assert_eq!(
+                serde_json::to_string(&presence).ok(),
+                Some(format!("\"{slug}\"")),
+                "{presence:?}"
+            );
+        }
+    }
+
+    #[test]
+    fn memory_verbs_are_stored_in_snake_case() {
+        assert_eq!(MemoryVerb::OpenSource.slug(), "open_source");
+        assert_eq!(
+            serde_json::from_str::<MemoryVerb>("\"open_source\"").ok(),
+            Some(MemoryVerb::OpenSource)
+        );
+    }
+
+    #[test]
+    fn effect_marks_order_by_severity() {
+        let ordered = [
+            EffectMark::Read,
+            EffectMark::UndoableWrite,
+            EffectMark::Outbound,
+            EffectMark::Destructive,
+        ];
+        assert_eq!(EffectMark::ALL, ordered);
+        assert!(ordered.windows(2).all(|pair| pair[0] < pair[1]));
     }
 }

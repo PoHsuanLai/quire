@@ -52,6 +52,16 @@ pub enum DurationToken {
     /// primitive itself never plays it that long — Reduced jumps straight to the level, the way
     /// `Sweep`'s own `Stand` plan does (R7, design/26 section 3.3).
     IdleDim,
+    /// `--t-orb-listen` 12 s (proposed): one turn of the companion orb while it listens, the
+    /// slowest. [`DurationKind::Hold`]: the orb is inactive under Reduced, so the period is never
+    /// shortened to a cross-fade (design/32 section 3).
+    OrbListen,
+    /// `--t-orb-work` 8 s (proposed): one turn while it works out of sight.
+    /// [`DurationKind::Hold`], as `--t-orb-listen`.
+    OrbWork,
+    /// `--t-orb-act` 5 s (proposed): one turn while it acts in a window, the quickest.
+    /// [`DurationKind::Hold`], as `--t-orb-listen`.
+    OrbAct,
 }
 
 impl DurationToken {
@@ -69,6 +79,11 @@ impl DurationToken {
             DurationToken::SendRing => DurationKind::Hold,
             // The spinner keeps turning under Reduced, as macOS's does.
             DurationToken::SpinStep => DurationKind::Hold,
+            // The orb's period is a speed, not a transition; Reduced makes the orb inactive
+            // instead of making it turn at a cross-fade's pace.
+            DurationToken::OrbListen | DurationToken::OrbWork | DurationToken::OrbAct => {
+                DurationKind::Hold
+            }
             _ => DurationKind::Motion,
         }
     }
@@ -87,6 +102,9 @@ impl DurationToken {
             (DurationToken::SendRing, _) => 5000,
             (DurationToken::Awake, _) => 20000,
             (DurationToken::IdleDim, _) => 2000,
+            (DurationToken::OrbListen, _) => 12000,
+            (DurationToken::OrbWork, _) => 8000,
+            (DurationToken::OrbAct, _) => 5000,
         }
     }
 }

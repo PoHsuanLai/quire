@@ -227,6 +227,57 @@ Not built, or limited, in quire:
 - **The gallery's own wallpaper, stage and grid layout** have no quire token or component (unsure
   whether this still matters).
 
+## Companion freeze
+
+The companion's types are frozen with placeholder views (design/32, design/33,
+30-CATALOGUE 2.13). Every behaviour behind a frozen signature is `todo!()`; each is a fill item.
+
+`todo!()` bodies (7):
+
+| Where | What it needs |
+| --- | --- |
+| `ds::components::companion::orb::step::orb_look` | the look table of design/32 section 3, table-tested over every presence and motion level |
+| `ds::components::companion::prompt::step::prompt_step` | the prompt table of design/32 section 4 |
+| `ds::components::companion::prompt::binding::use_prompt_target` | registering a field with the `CompanionPort`; needs `TextField` and `CommandPalette` to take `mode` and `chips` first |
+| `ds::components::companion::plan::step::plan_step` | `design/agent/ux.md` section 3.4: `plan_step_table`, `excluded_steps_not_run`, `stop_keeps_done_steps`, `undo_all_only_after_run` |
+| `ds::components::companion::replace::step::replace_step` | `design/agent/ux.md` section 3.4: every phase against every input |
+| `ds::components::companion::port::NoPort::answers` | a signal that never changes, made in the caller's Dioxus scope |
+| `ds_shell::tokens::glow::glow_spec` | the glow values per look and scheme; none and waiting have no period |
+
+Placeholder views (each draws one root `div.ds-<name>` and its sheet is a comment): `CompanionOrb`,
+`ContextChips`, `AnswerCard`, `PlanList`, `ReplaceBar`, `RunRow`, `ActivityStrip`,
+`MemoryTimeline`, `ConsolidationView`, `ServedByChip`, `ds_shell::confirm::view::ConfirmCard`.
+The compact form has no component of its own: `AnswerCard` draws it.
+
+Open items:
+
+- **Freeze changes to the ux types** (SPEC section 3.7 lets the freeze rename; each is one rename
+  or one move). `Span` is `MinuteSpan`, `Finish` is `PlanFinish`, `StepState` is `PlanStepState`,
+  `Undoable` is `UndoOffer`, `Count` is `Tally`, `Need` is `FieldNeed`, `Actor` is `ActorMark`,
+  `ConfirmAnswer` is `ConfirmChoice`, `TaintNote` is `TaintLine`, `GlowState` is `GlowLook`,
+  `ScopeOffer` stays. `AvatarSource` does not exist; `PersonLine` takes an `AvatarFace`.
+  `AnswerView::Refused` holds a `RefusedAnswer { why: RefusedView, actions, footer }` so a refusal
+  has the footer every card has (`footer_always_present`). The activity key is the journal's
+  `UndoToken`, as `ActivityKey` is `UndoId`.
+- **Where the seam types live.** SPEC section 3.7 puts `CompanionPort` and `use_prompt_target` in
+  `ds-intents`, but `ds-intents` depends on `ds-core` alone while they name `ContextChip`,
+  `AnswerView`, `FieldHandle`, `Callback` and `ReadSignal`. They stay in `ds`
+  (`components/companion/port.rs`, `prompt/binding.rs`). `ds-intents` holds the plain values:
+  `ThingMark`, `ContextChip`, `ChipKind`, `Removal`, `FieldMode`, `SummonSerial`,
+  `SummonAnswerMark` and the `ContextModel` trait. `ContextChip` and `FieldMode` are there, below
+  the `fields` group, because `TextField` takes both as props at the fill and a group may not name
+  one above it. `ContextModel` is two accessors; its real shape waits for the context fill
+  (design/agent/SPEC.md, Q-P7).
+- **Orb periods and sizes are proposed.** `OrbListen` 12 s, `OrbWork` 8 s, `OrbAct` 5 s (`Hold`
+  tokens), and the size ladder 14/16/20/40/192 are the freeze's proposals. CONVENTIONS section 6
+  says a proposed value is a settings key; none is added because the user's design review comes
+  first. Ends when the user sets the values or asks for keys.
+- **`TextField` and `CommandPalette` are untouched.** `prompt_host` and `FieldMode` are frozen; the
+  props pass-through is the quire fill.
+- **The gallery has no companion pages and `ds::prelude` no companion names** until the fill.
+- **The gate was run with the GPU busy:** `vello_hybrid`, `css_filter` and `texture_layer` tests
+  were skipped.
+
 ## Blitz spike results (S1-S16)
 
 Each case was rendered headlessly at 400 x 300 on anyrender_vello_cpu (S15 and S16 also on
