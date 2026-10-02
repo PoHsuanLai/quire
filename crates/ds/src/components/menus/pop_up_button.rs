@@ -70,6 +70,14 @@ fn marked<T: Clone + PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Vec
 /// chosen. `onpick` hears the value a pick asks for; the caller's `value` decides what is
 /// chosen. While the button holds the keyboard, letters choose the next item that starts with
 /// them.
+///
+/// `start` is whether the menu is open as the button mounts (closed unless asked). The menu is
+/// placed against the button's own element, which a renderer reports once it has laid the
+/// button out; `anchor` names another place instead (a point or a rect), and then the menu
+/// needs no element at all. A document with no renderer (a unit test over a `VirtualDom` and
+/// `dioxus-ssr`) never reports one, so it opens a pop-up with
+/// `start: Shown::Visible, anchor: Some(Anchor::Point(..))`, or by clicking the button once
+/// `anchor` is set.
 #[component]
 pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     items: Vec<MenuItem<T>>,
@@ -78,10 +86,12 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     #[props(default)] value: Option<T>,
     #[props(default)] title: Option<String>,
     #[props(default)] size: ControlSize,
+    #[props(default)] start: Shown,
+    #[props(default)] anchor: Option<Anchor>,
     #[props(default)] availability: Availability,
     #[props(default)] common: Common,
 ) -> Element {
-    let mut open = use_signal(|| Shown::Hidden);
+    let mut open = use_signal(move || start);
     let mut element = use_signal(|| None::<MountedRef>);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let live = availability == Availability::Enabled;
@@ -166,7 +176,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
         }
         _ => {}
     };
-    let anchor = element().map(Anchor::Mounted);
+    let anchor = anchor.or_else(|| element().map(Anchor::Mounted));
     rsx! {
         span {
             class: "ds-popup",

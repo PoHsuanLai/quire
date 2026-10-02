@@ -212,6 +212,8 @@ fn Segment<T: Clone + PartialEq + 'static>(
                 (Some(_), Selection::Unselected) => Some("-1"),
                 (Some(_), Selection::Selected) | (None, _) => None,
             },
+            // An image-only segment says nothing in words, so its name is read from here.
+            "aria-label": choice.name.clone(),
             "data-selected": selected.slug(),
             "data-thumb": under,
             "data-availability": enabled.slug(),

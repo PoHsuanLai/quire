@@ -158,10 +158,32 @@ impl Float {
             return;
         }
         asked.set(Some(element.clone()));
+        let bounds = self.bounds;
         spawn(async move {
             let mut slot = slot;
             follow_rect(&element.0, |rect| slot.set(Some(rect))).await;
+            // The bounds were read once, when the overlay mounted; the anchor has settled since,
+            // so read them again to place the surface against the same layout.
+            bounds.reread().await;
         });
+    }
+
+    /// `anchor`'s rect in the overlay's own coordinates (relative to the overlay bounds, which
+    /// are the window's unless the host insets them), for a surface that fills or hangs from an
+    /// element. `None` until the anchor has been laid out.
+    pub(crate) fn within(&self, anchor: &Anchor) -> Option<Rect> {
+        let rect = self.anchor_rect(anchor)?;
+        let bounds = self
+            .bounds
+            .rect()
+            .map_or(Point::default(), |bounds| bounds.origin);
+        Some(Rect {
+            origin: Point {
+                x: rect.origin.x - bounds.x,
+                y: rect.origin.y - bounds.y,
+            },
+            size: rect.size,
+        })
     }
 
     /// Where the surface goes, relative to the overlay bounds: `place()` against the measured

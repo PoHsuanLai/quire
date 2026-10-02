@@ -17,6 +17,8 @@
   border:var(--hair) solid var(--line); border-radius:var(--r-panel); background:var(--surface); box-shadow:var(--shadow-1);
   padding:var(--s-14); display:grid; gap:var(--s-14); color:var(--ink);
 }
+/* Frameless: a host that is a surface already (a Sheet) supplies the ground and the padding. */
+.ds-space-editor[*|data-frame=frameless]{ border:0; border-radius:0; background:none; box-shadow:none; padding:0; }
 .ds-space-editor-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-base); display:flex; align-items:center; gap:var(--s-8); }
 .ds-space-swatch{ width:14px; height:14px; border-radius:var(--r-pill); flex:none; }
 

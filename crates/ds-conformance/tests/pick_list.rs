@@ -185,6 +185,46 @@ fn a_row_that_keeps_the_list_open_yields_and_stays_until_a_row_that_closes_it() 
     assert_eq!(harness.text_of(".state").as_deref(), Some("closed"));
 }
 
+/// A list opened with a query already in its field, as a host that remembers the last one does.
+#[allow(non_snake_case)]
+fn Prefilled() -> Element {
+    let mut query = use_signal(|| "tra".to_string());
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            p { class: "query", {query()} }
+            PickList::<usize> {
+                anchor: Anchor::Point(Point { x: Px(120.0), y: Px(80.0) }),
+                label: "Labels",
+                placeholder: "Filter labels",
+                query: query(),
+                groups: groups(&query(), &[]),
+                empty: "No label matches.",
+                oninput: move |text: String| query.set(text),
+                onpick: |_| {},
+                onclose: |()| {},
+            }
+        }
+    }
+}
+
+/// The field opens with the caret after the text it holds, so the next key continues the query
+/// instead of landing in front of it.
+#[test]
+fn a_query_already_in_the_field_is_continued_not_prefixed() {
+    let mut harness = Harness::new(
+        Prefilled,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(400));
+    assert_eq!(
+        harness.focus_of(".ds-pick-list input"),
+        FocusState::Focused,
+        "the field has the keyboard"
+    );
+    type_text(&mut harness, "v");
+    assert_eq!(harness.text_of(".query").as_deref(), Some("trav"));
+}
+
 #[allow(non_snake_case)]
 fn Nothing() -> Element {
     rsx! {

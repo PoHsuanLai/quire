@@ -730,6 +730,41 @@ spinner that turns only while the `Operation` is `Running`, `Attention { why }` 
 `why` as its tooltip and accessible name. `onstatus: Option<EventHandler<K>>` hears the key of a tile whose
 warning was pressed; that press is neither a pick (`onpick`) nor the start of a drag.
 
+Window layout (design/30 §2.7, `ds::components::chrome`): a source-list sidebar is
+`Sidebar { label, sections, size, cursor, onselect, header, foot, fill }`. `sections` is a
+`Vec<SidebarSection<K>>`, top to bottom: `SidebarSection::List(items)` is a source-list `List` (its group
+headings are its own `ListItem::heading`s) and `SidebarSection::Custom(element)` is anything else the
+sidebar holds between its lists, such as `PinTiles` or `TodayTabs`, whose heading and selection you draw.
+The sections scroll; `header` stays above them and `foot` (a Space's name, dots and buttons) stays under
+them. One `cursor` runs across every list, so the app keeps one selected place. It is a plain Mac source list.
+`fill` is `SidebarFill::Material` (the default: the sidebar's own ground) or `SidebarFill::Clear`, which paints
+nothing, so the window's flat Space tint shows through behind the rows; the inks are the ordinary ones in both,
+and rows inside need no variant.
+
+A sidebar that folds away and peeks: give the `SplitView` pane a body that is an `EdgePeek` (holding the
+`Sidebar`) and mark the pane `SplitPane::new(spec, body).shown(pinned).peeking()`. A folded pane clips its
+body, so an `EdgePeek` inside one stayed out of reach; a peeking pane stops clipping once it has folded
+away, so the 10 px strip at the window's edge takes the pointer, the sidebar floats out over the content,
+and a click on the strip pins it (`EdgePeek { onpin }`, which sets the pane's `shown` again). Keep one
+`Shown` for both (`pinned` of the `EdgePeek`, `shown` of the pane, `on_shown` of the `SplitView` writing it),
+so a drag of the divider, a toolbar button and the edge click move the same state. Pinned, the `EdgePeek`
+fills its column's height, so the `Sidebar` inside keeps its foot at the bottom. No host element outside the
+pane is needed.
+
+A menu from a toolbar button: `Toolbar { onpick }` hears a `Picked<T> { value, anchor: Option<Anchor> }`.
+`anchor` is the button the pick came from (`Anchor::Mounted`, the chevron for an item that was behind it),
+so keep it and hang the `Menu { anchor, placement: MenuPlacement::Popup }` or `Popover` from it; no
+button of your own in the title is needed.
+
+A sheet from a pane, not the window: `Sheet { attach: Attach::Within(anchor) }` hangs from the top edge of
+the pane `anchor` names (`Anchor::Mounted` of the card's element, kept from its `onmounted` with
+`use_rect().anchor()`, or `Anchor::Rect` in client coordinates), centred over that pane and `min(width, 88%)`
+of it wide, clipped by the pane as it slides in, so the sidebar and the rest of the window stay clear. A
+mounted pane is measured once it has laid out and again when the overlay settles, so a Space or a layout
+that is still moving needs nothing from you; a pane that is resized while the sheet is up needs a fresh
+`Anchor::Rect`. Render the `Sheet` once the anchor exists (`if let Some(anchor) = card.anchor()`); no
+class of your own on the sheet to move its top.
+
 Anchors, hover-card parts and undo:
 
 - `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element
@@ -1225,6 +1260,14 @@ than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in tho
 `t` (thousandths). `Easing::curve()` gives the `CubicBezier` (`linear` is `(0,0,1,1)`), and
 `CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
 1000.
+
+**Opening a `PopUpButton` in a test with no renderer.** The menu is placed against the button's
+element, which a renderer reports after layout; a `VirtualDom` rendered with `dioxus-ssr` never
+does, so the menu stays shut. Give it a place and it opens: `PopUpButton { start: Shown::Visible,
+anchor: Some(Anchor::Point(Point { x: Px(40.0), y: Px(20.0) })), .. }` (or click the button once
+`anchor` is set). Let the root's overlay take the menu with a few `render_immediate` rounds, as
+`crates/ds/tests/pop_up_button_open_ssr.rs` does. On a real document `start` opens the menu once
+the button is laid out, and `anchor` moves it elsewhere.
 
 **Spaces store** (`ds::style::space::store::SpaceStore`, `crates/ds-style/src/space/store.rs`; design/21 §4, §10). Which
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks

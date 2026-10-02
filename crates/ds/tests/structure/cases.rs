@@ -6,6 +6,7 @@ use dioxus::prelude::*;
 use ds::components::chrome::capsule::model::CapsuleSlot;
 use ds::components::chrome::capsule::view::Capsule;
 use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::components::chrome::tab_view::TabView;
@@ -187,14 +188,39 @@ pub const CASES: &[Case] = &[
         make: || rsx! { SplitView { label: "Example", panes: pane(Shown::Hidden), p { "Content" } } },
     },
     Case {
+        component: "split_view",
+        state: "folded-peeking",
+        make: || rsx! { SplitView { label: "Example", panes: vec![SplitPane::new(PaneSpec::SIDEBAR, rsx! { p { "Side" } }).shown(Shown::Hidden).peeking()], p { "Content" } } },
+    },
+    Case {
         component: "sidebar",
         state: "medium",
-        make: || rsx! { Sidebar::<u8> { label: "Mail", items: places(), cursor: Some(1), onselect: |_| {}, header: rsx! { p { "Search" } } } },
+        make: || rsx! { Sidebar::<u8> { label: "Mail", sections: vec![SidebarSection::List(places())], cursor: Some(1), onselect: |_| {}, header: rsx! { p { "Search" } } } },
     },
     Case {
         component: "sidebar",
         state: "large",
-        make: || rsx! { Sidebar::<u8> { label: "Mail", items: places(), size: SidebarSize::Large, onselect: |_| {} } },
+        make: || rsx! { Sidebar::<u8> { label: "Mail", sections: vec![SidebarSection::List(places())], size: SidebarSize::Large, onselect: |_| {} } },
+    },
+    Case {
+        component: "sidebar",
+        state: "sections-and-foot-clear",
+        make: || {
+            rsx! {
+                Sidebar::<u8> {
+                    label: "Mail",
+                    fill: SidebarFill::Clear,
+                    sections: vec![
+                        SidebarSection::Custom(rsx! { p { "Pinned" } }),
+                        SidebarSection::List(places()),
+                        SidebarSection::List(places()),
+                    ],
+                    cursor: Some(1),
+                    onselect: |_| {},
+                    foot: rsx! { p { "Space" } },
+                }
+            }
+        },
     },
     Case {
         component: "tab_view",
