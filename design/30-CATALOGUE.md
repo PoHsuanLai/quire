@@ -217,7 +217,7 @@ Avatar sizes 16, 24, 32, 48, 64. Sidebar row: Small 24, Medium 28, Large 32, cho
 | Row anatomy | leading, title, detail, trailing accessory, state: one anatomy for menu, list, palette, sidebar and settings rows |
 | Callbacks | `onclick: EventHandler<Press>`, `onchange`, `onpick`, `on_hover` unified to `on<event>` |
 | Labels | `label: Text`; `aria_label` only when the visible label is absent; `tooltip` is a `Tooltip` child, not a prop |
-| Option lists | one shape: `Vec<Choice<T>> {value, label, icon, availability}` for segmented, radio, pop-up |
+| Option lists | one shape: `Vec<Choice<T>> {value, label, icon, name, availability}` for segmented, radio, pop-up; `name` is the accessible name of an option with no words (an image-only segment: `Choice::new(v, "").with_icon(i).with_name("Grid")`) |
 
 ### 1.8 Settings keys this catalogue needs
 
