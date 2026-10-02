@@ -89,7 +89,7 @@ pub const REGISTRY: [Entry; 27] = [
         page: Page::Feedback,
         title: "Overlays and feedback",
         lede: "Popover under each dismiss policy and with its arrow, Sheet hung from the window, centred and at the bottom, the alerts, SidePanel, Tooltip and DockLabel up and down, hover cards, the toast, EmptyState in its three forms, Skeleton in its three shapes and as a row, the InlineBanner shown and hidden, and Loadable cycling Loading, Ready and Failed, each with the states it can express.",
-        height: 5200,
+        height: 6600,
         body: crate::pages::overlays::catalogue::OverlaysCataloguePage,
     },
     Entry {

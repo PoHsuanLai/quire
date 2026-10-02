@@ -732,8 +732,9 @@ body, so an `EdgePeek` inside one stayed out of reach; a peeking pane stops clip
 away, so the 10 px strip at the window's edge takes the pointer, the sidebar floats out over the content,
 and a click on the strip pins it (`EdgePeek { onpin }`, which sets the pane's `shown` again). Keep one
 `Shown` for both (`pinned` of the `EdgePeek`, `shown` of the pane, `on_shown` of the `SplitView` writing it),
-so a drag of the divider, a toolbar button and the edge click move the same state. No host element outside
-the pane is needed.
+so a drag of the divider, a toolbar button and the edge click move the same state. Pinned, the `EdgePeek`
+fills its column's height, so the `Sidebar` inside keeps its foot at the bottom. No host element outside the
+pane is needed.
 
 A menu from a toolbar button: `Toolbar { onpick }` hears a `Picked<T> { value, anchor: Option<Anchor> }`.
 `anchor` is the button the pick came from (`Anchor::Mounted`, the chevron for an item that was behind it),
