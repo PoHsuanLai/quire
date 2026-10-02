@@ -5,13 +5,15 @@ use crate::focus::request::{FocusRequest, FocusTicket};
 use crate::focus::select::Landing;
 use crate::focus::soon::focus_soon_told;
 use crate::focus::targets::{FocusTarget, FocusTargets, Told};
+use crate::host::caret::InitialCaret;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
 /// When a field takes keyboard focus (design/06-INTERACTIONS.md section 17).
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub enum FieldFocus {
-    /// As soon as it is mounted: the palette's input.
+    /// As soon as it is mounted, the caret after the text it holds (a field that opens with a
+    /// query in it, so the next key continues it): the palette's input, a pick list's search.
     OnMount,
     /// Only when the user or the consumer puts it there.
     #[default]
@@ -26,7 +28,8 @@ impl FieldFocus {
     fn landing(self) -> Landing {
         match self {
             FieldFocus::Controlled(request) => request.landing(),
-            FieldFocus::OnMount | FieldFocus::Manual => Landing::Leave,
+            FieldFocus::OnMount => Landing::Place(InitialCaret::End),
+            FieldFocus::Manual => Landing::Leave,
         }
     }
 
