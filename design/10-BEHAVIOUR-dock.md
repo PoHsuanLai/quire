@@ -54,7 +54,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Value | Symbol | Number | Status | Basis |
 | --- | --- | --- | --- | --- |
 | Tile size | `T` | 48 | settled | R1, plan settled decisions |
-| Magnified tile size | `S` | 96 (so max zoom `M = S/T = 2.0`) | settled | plan settled decisions |
+| Magnified tile size | `S` | 72 (so max zoom `M = S/T = 1.5`); capped at 72 by the 2026-10-02 decision (magnification stays on); target (clean-up phase): the code and the numbers below still use 96 | settled | 30 §3.4 (was 96, plan settled decisions) |
 | Gap between tiles | `g` | 8 | settled 2026-09-24 (the macOS polish pass; was 4 proposed) | L; `--dock-gap`, `dock.tile_gap_px`; the plate fills its tile, so the visible gap is `g` |
 | Pill padding (all four sides) | `pad` | 6 | settled 2026-09-24 (the macOS polish pass; was 8) | L, the Big Sur dock's tight pill; `--dock-pad`, `dock.pill_padding_px` (proposed key) |
 | Gutter, pill bottom to screen edge | `gut` | 8 | settled | same card-inset rule |
@@ -62,7 +62,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Pill width | `W_0` | `n T + (n-1) g + 2 pad` (+ separator block, 10.3.9) | derived | |
 | Pill corner radius | `--m-radius` of `Material::Dock` | 22; the shell draws it as `Corner::Squircle(Px(dock.pill_radius_px))`, recommended 18 | squircle settled 2026-09-24, value proposed (L) | `03-COLOR.md` materials table (Dock radius 22) and §17.4; a squircle of 18 reaches 36 along each edge, capped at half the 60 px pill |
 | Pill material | `Material::Dock` | tint + edge + shadow tokens from `03-COLOR.md`; compositor blur behind | settled | plan "Design: quire", Material enum |
-| Pill tint with Spaces | Mac Look: the Space colour sits in the backdrop layer behind `Material::Dock`, which picks it up through its blur; Arc Look: `--f-*` frame tokens of the current workspace's SpaceLook (design/30 §3.3). Cross-fade `--t-big` on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
+| Pill tint with Spaces | None (superseded 2026-10-02: one Look, the Dock is the material alone and takes no Space tint, 21-SPACES §3; target (clean-up phase), the code still tints it). No cross-fade on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
 | Surface height | `H_s` | 160 = `gut + pad + S + T` (room for a magnified tile plus one bounce) | proposed | derived; transparent area outside the input region |
 | Exclusive zone | | `Reserve(gut + H_p)` = 72 when auto-hide is off; `0` when on | settled | plan: `Reserve(base+margin)`; R4 |
 | Horizontal placement | | pill centred on the output; clamped so it keeps 8 px from both output edges | proposed | L |
@@ -114,6 +114,8 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Text | desktop entry `Name` (localised), single line, truncated per `02-TYPE.md` | proposed |
 
 ### 10.3.5 Bounce
+
+The Dock uses the Mac default bounce (settled 2026-10-02): while an app launches (the Launch row) and when an app needs attention (the Informational and Critical rows). The Mac's own rules R8-R10 below stay the reference; the rows are not changed by the clean-up phase.
 
 | Kind | Trigger | Duration | Status |
 | --- | --- | --- | --- |
@@ -407,7 +409,7 @@ Settings app keys, stored in `~/.config/sill/settings.toml` under `dock` (`22-SE
 | --- | --- | --- | --- | --- |
 | `dock.magnification` | `On | Off` | `On` | | settled |
 | `dock.tile_size_px` | px | 48 | 32..80 | settled default, range proposed |
-| `dock.magnified_size_px` | px | 96 | `tile_size_px`..128 | settled default, range proposed |
+| `dock.magnified_size_px` | px | 72 (target (clean-up phase); was 96) | `tile_size_px`..72 | settled default, range proposed |
 | `dock.autohide` | `On | Off` | `Off` | | settled |
 | `dock.autohide_delay_ms` | ms | 200 | 0..1000 | settled default |
 | `dock.autohide_slide_ms` | ms | 500 | 0..1500 | settled default |
@@ -493,7 +495,7 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
 14. **Regions**: during a sweep, input region always contains every magnified tile's rect;
     blur region never extends above the pill's top edge.
 15. **Headless snapshots**: rest, magnified at 3 pointer positions, badge 7 / 1234, progress
-    0.4, label shown, dragging with Remove, in light and dark, in both Looks and two SpaceLooks.
+    0.4, label shown, dragging with Remove, in light and dark, in light and dark.
 
 ## 10.9 Open decisions
 
