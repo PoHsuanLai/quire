@@ -313,7 +313,7 @@ hover appearance. Every entry inherits `Common` (R8).
 | WindowTitlebar | `NSWindow` titlebar | traffic lights (Option = zoom, hold = tiling menu), title, subtitle, proxy icon, edited dot; drag and double-click zoom | 28 | `Activity` | title, controls | none | KEEP | P2 |
 | Toolbar | `NSToolbar` | leading, title, trailing, overflow chevron; `Button{Toolbar}` items, 52 tall region | Z- | overflow | leading, title, trailing | ad-hoc toolbars | ADD | P2 |
 | SplitView | `NSSplitView` | hairline divider, 6 px drag zone, min widths, collapse by spring, double-click resets | Z- | dragging, collapsed | divider, pane | fixed layouts | ADD | P2 |
-| Sidebar | `NSSplitViewItem` sidebar | `SplitView` pane with a `List{SourceList}`; material Sidebar | `SidebarSize` | collapsed | body, header | none | ADD | P2 |
+| Sidebar | `NSSplitViewItem` sidebar | `SplitView` pane of `SidebarSection`s, top to bottom: `List{SourceList}` (its group headings are its own) or `Custom` content (pinned tiles, Today tabs), scrolling between a `header` and a `foot` that stays at the bottom; one cursor runs across every list; `Ground {Paper, Frame}`: paper is the quiet sidebar material, `Frame` draws no ground of its own so the Space's colour shows through and takes the frame's inks (the ground rule of `ground_css`) | `SidebarSize` | collapsed | header, section, foot | none | ADD | P2 |
 | TabView | `NSTabView` | container, at most six tabs, strip is `SegmentedControl` | Z3 | selected | strip, body | `Tabs` container role | ADD | P2 |
 | PaneSwitcher | Control Center module detail | Root / Detail slide on a spring; `PaneHeader {back, title, trailing}`, `PaneFooter` | Z- | mid-slide | header, body, footer | sill `sill-cc-detail-*` (L5) | MERGE | P1 |
 
