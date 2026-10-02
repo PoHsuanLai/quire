@@ -1,5 +1,7 @@
 # 26 Details: the grammar of small state changes
 
+> **Current direction (2026-10-02).** The grammar (moments, `Cue`, `Touch`, the `Detailed` trait and its tests) stands. The flourishes the catalogue below names (seal pop, bump, gulp, spark, count-up, sweeps, nudges, springs on non-contact) are deleted by `30-CATALOGUE.md` section 1.3 (Emphasis, Number change, Progress sweep); a moment whose primitive is gone is `Rest`. One quiet Mac Look; where 30 and this file disagree, 30 wins.
+
 Status: D0 built, 2026-09-27, branch `details-d0b` (quire): `ds::detail` holds the grammar as
 types and the primitives (section 4.1 is now the sketch they grew from; the shipped API is in
 CONSUMING.md "Details"), the tokens of 3.4, `Spinner` on `use_pending`, the harness's

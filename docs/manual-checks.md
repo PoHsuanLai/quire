@@ -9,7 +9,7 @@ sill's `docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 - [ ] **mailo fcitx5 check**: mailo's native-only flip is committed on a branch and waits on it.
   Type Chewing (ㄋㄧˇㄏㄠˇ → 你好) into mailo's native build and confirm the preedit shows and
   commits; the mailo session has the exact steps.
-- [x] **Widget picks** (settled 2026-09-27: battery percent 500, track = plate darkened, one red; World Clock follows the scheme; filled device glyphs; cards tinted by the Space; the widget card becomes an interface) (progress page "Widgets matched to the reference"): percent weight, ring
+- [x] **Widget picks** (settled 2026-09-27: battery percent 500, track = plate darkened, one red; World Clock follows the scheme; filled device glyphs; cards tinted by the Space [superseded 2026-10-02: neutral plates, no Space tint, design/23 §1.0]; the widget card becomes an interface) (progress page "Widgets matched to the reference"): percent weight, ring
   track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
 - [x] **Level-control look** (settled 2026-09-27: Capsule) (progress page, OSD): Capsule (recommended) / CapsuleKnob / Segments.
 - [ ] **palmrest live steps**: section below.
