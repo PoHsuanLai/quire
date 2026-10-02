@@ -743,7 +743,15 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   privilege: closing it leaves the others up.
 - **Threads reach the loop through `AppHandle`** (a mutex-guarded queue and the winit proxy's
   wake). `open_window` needs a component's context, so a D-Bus or timer task cannot use it.
-- **A closed window's renderer is suspended and kept** for the next window (Open items).
+- **A closed window's renderer is parked and kept** for the next window (Open items). The vello-hybrid
+  renderer caches the winit window it drew past `suspend`, so a renderer set aside as it was kept
+  the closed window mapped and frozen on screen (found 2026-10-03 with a KWin script closing a
+  window of the viewer: `workspace.windowList()` still listed it, and the process was warm with
+  none left). `Windows::park` resumes the renderer on a window of the loop's own that is never
+  shown (Wayland maps a window only once a buffer is attached, and the parking surface is never
+  drawn) and suspends it again, which lets the closed window go and keeps the renderer's device:
+  the next window opens in 30 ms after the request (device and adapter reused), against 100 to
+  170 ms with a renderer dropped or a fresh one.
 
 ### File drops
 

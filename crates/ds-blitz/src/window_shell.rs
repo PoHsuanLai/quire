@@ -21,24 +21,33 @@
 //! window closes), and how every window is dropped before the loop ends (winit wants windows
 //! dropped before the loop exits).
 //!
-//! **A closed window's renderer is kept.** Each vello-hybrid renderer owns a wgpu instance of its
-//! own, and dropping one while another window is still drawing crashed the next frame of the
-//! other inside the NVIDIA Vulkan driver (`vkAcquireNextImageKHR` through a null pointer, on
-//! Wayland, 2026-09-27). So a closing window's renderer is only suspended (its surface released,
-//! as blitz-shell does on close) and set aside, and the next window opened draws with it: the app
-//! holds at most as many instances as it ever had windows open at once.
-
+//! **A closed window's renderer is kept, and parked.** Each vello-hybrid renderer owns a wgpu
+//! instance of its own, and dropping one while another window is still drawing crashed the next
+//! frame of the other inside the NVIDIA Vulkan driver (`vkAcquireNextImageKHR` through a null
+//! pointer, on Wayland, 2026-09-27). So a closing window's renderer is set aside, and the next
+//! window opened draws with it (which also keeps its device: a warm open skips the adapter probe,
+//! 33 ms against 100 to 170 ms): the app holds at most as many instances as it ever had windows
+//! open at once. But the renderer caches the window it drew past `suspend`, so the closed window
+//! stayed on screen, frozen, until the next window replaced it, and for good once the app stays
+//! warm with none. So a renderer is set aside only after it has been resumed on the parking
+//! window, a window of the loop's own that is never shown (Wayland maps a window only when it
+//! gets a buffer, and the parking surface is never drawn), which takes the closed window out of
+//! the renderer and so lets it go.
+//!
 use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
+use anyrender::WindowRenderer;
 use blitz_shell::{BlitzShellEvent, BlitzShellProxy, WindowConfig};
 use dioxus_native::winit::application::ApplicationHandler;
 use dioxus_native::winit::application::macos::ApplicationHandlerExtMacOS;
 use dioxus_native::winit::event::{StartCause, WindowEvent};
 use dioxus_native::winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoopProxy};
 use dioxus_native::winit::window::WindowId;
+use dioxus_native::winit::window::{Window, WindowAttributes};
 use dioxus_native::{DioxusNativeApplication, DioxusNativeWindowRenderer};
+use std::sync::Arc;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Instant;
 
@@ -80,8 +89,11 @@ impl Sub {
 /// Every window of the app, as winit's application.
 pub(crate) struct Windows {
     subs: Vec<(WindowKey, Sub)>,
-    /// Renderers of closed windows, for the next windows to open.
+    /// Renderers of closed windows, parked, for the next windows to open.
     spare: Vec<DioxusNativeWindowRenderer>,
+    /// The window a closed window's renderer is parked on: created at the first close, never
+    /// shown or drawn.
+    parking: Option<Arc<dyn Window>>,
     base: Base,
     life: Lifecycle,
     /// Whether the loop can create windows yet (winit's `can_create_surfaces` has come).
@@ -94,6 +106,7 @@ impl Windows {
         Windows {
             subs: Vec::new(),
             spare: Vec::new(),
+            parking: None,
             base,
             life,
             ready: false,
@@ -119,20 +132,49 @@ impl Windows {
     }
 
     /// Drop the window `key`: it leaves the screen, and its document and VirtualDom go with it.
-    fn drop_window(&mut self, key: WindowKey) {
+    fn drop_window(&mut self, event_loop: &dyn ActiveEventLoop, key: WindowKey) {
         if let Some(at) = self.subs.iter().position(|(held, _)| *held == key) {
             let (_, sub) = self.subs.remove(at);
             let renderer = sub.renderer.clone();
             drop(sub);
-            self.spare.push(renderer);
+            if self.park(event_loop, &renderer) {
+                self.spare.push(renderer);
+            }
             self.life.closed(Instant::now());
         }
         self.base.requests.set_life(key, WindowLife::Closed);
     }
 
-    fn drop_all(&mut self) {
+    fn drop_all(&mut self, event_loop: &dyn ActiveEventLoop) {
         let keys: Vec<WindowKey> = self.subs.iter().map(|(key, _)| *key).collect();
-        keys.into_iter().for_each(|key| self.drop_window(key));
+        keys.into_iter()
+            .for_each(|key| self.drop_window(event_loop, key));
+    }
+
+    /// Take the closed window out of `renderer` by resuming it on the parking window and
+    /// suspending it again, which keeps its device for the next window. `false` when that could
+    /// not be done: the renderer is then dropped with the window it caches, and the instance
+    /// goes with it.
+    fn park(
+        &mut self,
+        event_loop: &dyn ActiveEventLoop,
+        renderer: &DioxusNativeWindowRenderer,
+    ) -> bool {
+        if self.parking.is_none() {
+            let attributes = WindowAttributes::default()
+                .with_title("")
+                .with_visible(false)
+                .with_decorations(false);
+            self.parking = event_loop.create_window(attributes).ok().map(Arc::from);
+        }
+        let Some(window) = self.parking.clone() else {
+            return false;
+        };
+        let mut renderer = renderer.clone();
+        renderer.resume(Arc::new(window), 1, 1, || {});
+        let parked = renderer.complete_resume();
+        renderer.suspend();
+        parked
     }
 
     /// Answer what the app's components and threads asked since the last wake.
@@ -157,7 +199,7 @@ impl Windows {
         for request in self.base.requests.take() {
             match request {
                 Request::Open { key, spec, root } => self.open(event_loop, key, &spec, root),
-                Request::Close(key) => self.drop_window(key),
+                Request::Close(key) => self.drop_window(event_loop, key),
                 Request::Focus(key) => {
                     if let Some(window) = self.sub_mut(key).and_then(|sub| sub.slot.window()) {
                         window.focus_window();
@@ -214,14 +256,14 @@ impl Windows {
             sub.app.proxy_wake_up(event_loop);
         }
         for window_id in closes {
-            self.close(window_id);
+            self.close(event_loop, window_id);
         }
     }
 
     /// A window was asked to close, by the compositor or by its own frame: only it closes.
-    fn close(&mut self, window_id: WindowId) {
+    fn close(&mut self, event_loop: &dyn ActiveEventLoop, window_id: WindowId) {
         if let Some(key) = self.key_of(window_id) {
-            self.drop_window(key);
+            self.drop_window(event_loop, key);
         }
     }
 
@@ -232,7 +274,9 @@ impl Windows {
         }
         match self.life.verdict(Instant::now()) {
             Verdict::Exit => {
-                self.drop_all();
+                self.drop_all(event_loop);
+                self.spare.clear();
+                self.parking = None;
                 self.base.handle.end();
                 event_loop.exit();
             }
@@ -291,7 +335,7 @@ impl ApplicationHandler for Windows {
         event: WindowEvent,
     ) {
         if matches!(event, WindowEvent::CloseRequested) {
-            self.close(window_id);
+            self.close(event_loop, window_id);
             self.settle(event_loop);
             return;
         }
