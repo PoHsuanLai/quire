@@ -56,11 +56,11 @@ calloop = "0.14"
 calloop-wayland-source = "0.4"
 xkbcommon = "0.8"
 raw-window-handle = "0.6"
-keyboard-types = "0.7"
+keyboard-types = { version = "0.7", features = ["serde"] }
 cursor-icon = "1"
 
 # Common.
-tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros"] }
+tokio = { version = "1", features = ["rt-multi-thread", "sync", "time", "macros", "net", "io-util", "process"] }
 thiserror = "2"
 # Local wall-clock time with the system time zone (the bar clock); std cannot answer it.
 jiff = "0.2"
@@ -120,4 +120,35 @@ fend-core = "1.5.8"
 clap = { version = "4", features = ["derive"] }
 # latchkey lives in mailo until it is split into its own repo; cargo finds crates/latchkey itself.
 latchkey = { git = "https://github.com/PoHsuanLai/mailo", rev = "43ebf45f244a23c1e79c84b5d859b6fa1ba5bc7a" }
+# ---- Companion / agent stack (agent-spec section 1.4) ----
+# Policy point: cedar-policy's lalrpop tree passes `cargo deny check licenses` (spike S-Cedar).
+cedar-policy = "4.13"
+# actions-mcp: pin the minor.
+rmcp = { version = "3.5", default-features = false, features = ["server", "transport-io"] }
+# model-http: one HTTP stack, Unix sockets. The cloud TLS stack is rustls, never OpenSSL.
+hyper = "1"
+hyper-util = "0.1.21"
+http-body-util = "0.1"
+hyper-rustls = "0.27"
+rustls = "0.23"
+base64 = "0.22"
+fast_image_resize = "6.1.0"
+blake3 = "1"
+# almanac-seal.
+chacha20poly1305 = "0.10"
+zeroize = "1"
+getrandom = "0.3"
+# eventlog, recall: SQLCipher built from source with a vendored OpenSSL (spike S-SQL: FTS5 works
+# in an encrypted DB, a wrong key fails, licences pass the allow-list).
+rusqlite = { version = "0.40", features = ["bundled-sqlcipher-vendored-openssl"] }
+tar = "0.4"
+oo7 = "0.6"
+# recall-fastembed only; excluded from the gate.
+fastembed = "7.1"
+# The minor cosmic-comp's lock resolves.
+reis = "0.7"
+atspi = "0.30"
+# Dev-dependencies.
+proptest = "1"
+tempfile = "3"
 # ---- END PINNED BLOCK ----
