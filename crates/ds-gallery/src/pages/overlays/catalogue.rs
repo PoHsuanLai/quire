@@ -45,6 +45,7 @@ pub fn OverlaysCataloguePage() -> Element {
             }
             SheetCase { attach: Attach::Bottom, width: SheetWidth::Wide, name: "Attach::Bottom, Wide" }
         }
+        crate::pages::overlays::sheet_within::SheetWithinSection {}
         crate::pages::overlays::alert::Alerts {}
         Section { title: "SidePanel", note: "SidePanel {{ shown, width, header }} at the right edge of its root: it slides in over --t-move --e-out and out over --t-quick --e-exit, in the Popover material, with an optional header row above its body. The notification center is one (see Notifications).",
             div { class: "g-row g-row-top",
@@ -248,7 +249,7 @@ fn LoadableCase() -> Element {
 }
 
 /// The appearance the page's axes ask for, in `theme`.
-fn appearance(theme: Theme) -> Appearance {
+pub(super) fn appearance(theme: Theme) -> Appearance {
     let axes = use_context::<Signal<Axes>>();
     let axes = axes.read();
     Appearance {

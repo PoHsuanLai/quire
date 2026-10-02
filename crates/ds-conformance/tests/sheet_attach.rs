@@ -8,7 +8,7 @@ use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -18,7 +18,7 @@ const VIEW: Viewport = Viewport {
 };
 
 thread_local! {
-    static ATTACH: Cell<Attach> = const { Cell::new(Attach::Window) };
+    static ATTACH: RefCell<Attach> = const { RefCell::new(Attach::Window) };
     static WIDTH: Cell<SheetWidth> = const { Cell::new(SheetWidth::Regular) };
 }
 
@@ -29,7 +29,7 @@ fn Page() -> Element {
             Sheet {
                 label: "Sheet",
                 onclose: |_| {},
-                attach: ATTACH.with(Cell::get),
+                attach: ATTACH.with(|cell| cell.borrow().clone()),
                 width: WIDTH.with(Cell::get),
                 div { style: "height:900px", "content" }
             }
@@ -38,7 +38,7 @@ fn Page() -> Element {
 }
 
 fn start(attach: Attach, width: SheetWidth) -> Harness {
-    ATTACH.with(|cell| cell.set(attach));
+    ATTACH.with(|cell| *cell.borrow_mut() = attach);
     WIDTH.with(|cell| cell.set(width));
     let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));

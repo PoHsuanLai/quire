@@ -2,8 +2,9 @@
 //! `NSWindow` sheet): it slides down from the top, dims nothing (macOS has no scrim; a host that
 //! wants the click outside caught draws its own catcher) and takes Escape.
 //!
-//! [`Attach::Window`] hangs it from the top edge of its root; [`Attach::Centre`] centres it, as
-//! the shell's app-modal dialog stands. A host that maps and unmaps its surface passes `shown` and
+//! [`Attach::Window`] hangs it from the top edge of its root; [`Attach::Within`] from the top edge
+//! of one pane, as a document's sheet hangs from its own titlebar; [`Attach::Centre`] centres it,
+//! as the shell's app-modal dialog stands. A host that maps and unmaps its surface passes `shown` and
 //! `on_hidden`, and the sheet plays its exit before it is gone.
 
 use crate::components::overlays::popover::{Stacking, escape_closes, use_float};
@@ -31,7 +32,9 @@ use ds_style::tokens::layer::ZLayer;
 /// once and `on_hidden` does not run. Mounted hidden, it draws nothing until shown.
 ///
 /// `attach` says where it hangs: [`Attach::Window`] (the default) from the top edge,
-/// [`Attach::Centre`] centred in its root both ways, or [`Attach::Bottom`] standing above the
+/// [`Attach::Within`] from the top edge of a pane (a card, a column), centred over it and no wider
+/// than it allows, clipped by it as it slides in, [`Attach::Centre`] centred in its root both
+/// ways, or [`Attach::Bottom`] standing above the
 /// bottom edge (the widget gallery). A centred or bottom sheet needs a root that has a height: an
 /// overlay root passes `Ds { extent: RootExtent::Viewport }`.
 ///
@@ -97,6 +100,7 @@ pub fn Sheet(
             div { class: "ds-sheet-body", {children} }
         }
     };
-    float.show(attach.stage(panel), onclose);
+    let pane = attach.pane().and_then(|anchor| float.within(anchor));
+    float.show(attach.stage(panel, pane), onclose);
     rsx! {}
 }

@@ -115,6 +115,9 @@
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
 .g-modal-stage{height:300px}
 .g-cat-wide{width:1120px}
+.g-within-stage{display:flex;gap:var(--s-8);padding:var(--s-8);box-sizing:border-box}
+.g-within-side{flex:none;width:120px;border-radius:var(--r-panel);background:var(--surface-2)}
+.g-within-card{flex:1 1 0;min-width:0;border-radius:var(--r-card);background:var(--surface);color:var(--ink)}
 .g-cat-wide .g-modal-stage{height:520px}
 .g-alert-row{align-items:flex-start;gap:var(--s-22)}
 .g-alert-cc{width:var(--cc-width,320px);border-radius:var(--r-panel);overflow:hidden}

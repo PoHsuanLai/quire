@@ -99,6 +99,17 @@ impl RectProbe {
         });
     }
 
+    /// Read the element's rect again, now: layout may have moved it since its first read (a
+    /// surface placed against an anchor read later than it). Call it from a task.
+    pub(crate) async fn reread(&self) {
+        let Some(element) = (self.mounted)() else {
+            return;
+        };
+        if let Some(read) = client_rect(&element.0).await.filter(|read| laid_out(*read)) {
+            let _ = ds_style::task::try_set(self.rect, Some(read));
+        }
+    }
+
     /// The element as an anchor, once mounted.
     pub fn anchor(&self) -> Option<Anchor> {
         (self.mounted)().map(Anchor::Mounted)

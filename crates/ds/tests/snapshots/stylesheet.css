@@ -1681,7 +1681,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-send-pill[*|data-mood=fatal] .ds-send-pill-undo{ background:var(--danger-ink); color:var(--danger); }
 /* -- sheet -- */
 /* Sheet (design/30 section 2.5, `NSWindow` sheet): `min(560px, 88%)` wide, hanging from the top
-   edge of its root (`data-attach=window`) or centred (`data-attach=centre`), as tall as its
+   edge of its root (`data-attach=window`), the top edge of a pane (`data-attach=within`) or centred
+   (`data-attach=centre`), as tall as its
    content up to the root less the 36px inset. It dims nothing: macOS draws no scrim, and the
    host catches the click outside if it wants it. It slides down from past the top edge over
    `--t-big --e-out` and back up over `--t-move --e-exit` (design/30 section 1.3), holding its
@@ -1703,6 +1704,14 @@ html,body{margin:0;padding:0;background:transparent}
    rect leaves one out). The stage takes no pointer; the sheet does. */
 .ds-sheet-stage{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding:var(--s-36) 0; pointer-events:none; }
 .ds-sheet[*|data-attach=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; border-radius:var(--r-panel); }
+
+/* Within (`Attach::Within`): the stage is the pane's own box (left, top, width and height inline,
+   in the overlay's coordinates), clipping the sheet as it slides down from the pane's top edge.
+   The sheet stands in it by flex, centred across the pane, `min(560px, 88%)` of the pane wide and
+   as tall as its content up to the pane less the 36px inset, square at the top and rounded at
+   the bottom as a window's sheet is. The stage takes no pointer; the sheet does. */
+.ds-sheet-stage[*|data-attach=within]{ inset:auto; padding:0; align-items:flex-start; overflow:hidden; box-sizing:border-box; }
+.ds-sheet[*|data-attach=within]{ position:relative; top:auto; left:auto; right:auto; margin:0; }
 
 /* Narrow (`SheetWidth::Narrow`): an alert's column, as the reference desktop's password
    prompt; the rest of the sheet is as above. */
