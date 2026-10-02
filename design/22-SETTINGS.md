@@ -12,7 +12,7 @@ the gesture daemon (`palmrest`). The rule, per the user's decision of 2026-09-24
 `README.md#4-canonical-source`: **no value any design doc marks "proposed" is hard-coded**; it
 ships as the default *and* is read from a settings key listed in section 3. A **settled** value
 becomes a key only where a doc treats it as a user-facing preference — natural scrolling,
-magnification on/off, autohide, gesture-to-action mapping, theme/accent/look/motion-level — the
+magnification on/off, autohide, gesture-to-action mapping, theme/accent/motion-level — the
 same pattern the docs' own `10.6`/`11.6`/`12.6`/`13.6` Configuration tables already use (settled
 defaults sitting next to proposed ones in one table). Everything else settled — component
 markup, colour tokens, motion keyframes, layout grids — is **not** a key: it stays in `ds`'s
@@ -32,11 +32,11 @@ preferences:
    error states "not specified" with no candidate value at all (see its Open decisions O-1..
    O-29). Those are review gaps for review/build, not tunable defaults, and are excluded; see
    the "could not find a default" list in the handback report.
-3. **Per-workspace instance data is not a global default.** `21-SPACES.md#10-storage-settled-path-proposed-schema`'s
-   `$XDG_CONFIG_HOME/quire/spaces.json` stores each workspace's chosen `SpaceLook` (its dots,
-   grain, theme, accent) — that is saved *state*, like `dock.json`'s pinned items, not a
-   settings default. The *defaults* applied when a workspace has none (preset table, fallback
-   grain, fallback accent) are keys in the `spaces` domain below.
+3. **Per-workspace instance data is not a global default.** `21-SPACES.md#10-storage-settled-path-target-clean-up-phase-schema`'s
+   `$XDG_CONFIG_HOME/quire/spaces.json` stores each workspace's chosen `SpaceLook` (its hue, chroma
+   factor, grain, theme; target (clean-up phase), 21 section 1) — that is saved *state*, like
+   `dock.json`'s pinned items, not a settings default. The *defaults* applied when a workspace has
+   none (preset table, fallback grain) are keys in the `spaces` domain below.
 
 ## 2. Storage
 
@@ -98,11 +98,11 @@ control in v1.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `07-LOOKS.md#2-the-look-model` | settled (preference) |
+| `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `30-CATALOGUE.md` section 3.2 | settled (preference) |
 | `appearance.accent` | `Accent` (8 variants: `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`, `graphite`, macOS's own list in its picker order) | `Blue` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
-| `appearance.typeface` | `Typeface::{System,Editorial}` | `System` | `System`: Inter for UI and data (tabular), Inter Display for display; `Editorial`: Bricolage Grotesque, Karla and Space Mono, mail's voice, as an opt-in for an app. Written as `data-typeface` on `.ds`. Code and `Kbd` stay in Space Mono (`--font-code`) either way | `02-TYPE.md#2-the-faces` | settled (user, 2026-09-26: "make this desktop use mostly inter") |
-| `appearance.material_tint_alpha` | `Percent` | `80` | | `21-SPACES.md#3-where-the-tokens-apply` ("`--m-tint` = ... alpha .80 (proposed)") | proposed |
+| `appearance.typeface` | RETIRING | | The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | RETIRING (2026-10-02) |
+| `appearance.material_tint_alpha` | `Percent` | `80` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | RETIRING (target (clean-up phase)) |
 | `appearance.material_highlight_light` | `Percent` | `30` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `appearance.material_highlight_dark` | `Percent` | `12` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `appearance.material_hairline_light` | `Percent` | `14` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -135,7 +135,7 @@ per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICO
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `icons.style` | `IconStyle::{Colour,Muted,Monochrome}` | `Colour` (each app in the dialect its icon was designed in) | `Muted` lowers the chroma cap; `Monochrome` draws every icon in one hue, tone on tone, and desaturates and re-tints third-party icons inside our plates to the same hue | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25` | proposed (round four; implementation beyond the key waits for the user's dialect pick) |
-| `icons.monochrome_tint` | `MonochromeTint::{Space,Accent,Neutral}` | `Space` (the accent `ds::space::derive` gives the workspace's Space, so the icons follow the frame) | `Accent` = the card accent; `Neutral` = no hue; read only when `icons.style` is `Monochrome` | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25`; `03-COLOR.md#5-card-accent` | proposed |
+| `icons.monochrome_tint` | `MonochromeTint::{Space,Accent,Neutral}` | `Accent` (target (clean-up phase); the Space gives no accent any more, so the `Space` variant goes) | `Accent` = the desktop accent; `Neutral` = no hue; read only when `icons.style` is `Monochrome` | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25`; `03-COLOR.md#5-accent` | proposed |
 | `icons.plate_inset_percent` | `Percent` | `72` | | `08-ICONS.md#41-plate-mask-rule-settled-rule-proposed-numbers` | proposed |
 | `icons.symbolic_fallback_glyph_percent` | `Percent` | `56` | | `08-ICONS.md#24-object-placement-proposed`; `08-ICONS.md#43-symbolic-fallback-proposed` | proposed |
 | `icons.squircle_detect_iou` | `Fraction` | `900` (0.90) | | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
@@ -413,14 +413,14 @@ until that comparison happens (see handback report).
 ### 3.14 `spaces` (sill/settings.toml)
 
 Defaults applied when a workspace has no stored `SpaceLook` in `spaces.json` (section 1 rule
-3). Preset table itself (`21-SPACES.md#4-presets-and-defaults-per-workspace-index`) is fixed
+3). The preset table itself (`21-SPACES.md#4-presets-and-defaults-per-workspace-index`) is fixed
 data, not a key.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `spaces.default_grain` | `Count` (0..100) | `40` | presets 1/2 keep their own 35/55 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.default_card_accent` | `CardAccent::{Chosen,SpaceHue}` | `Chosen` (the accent picked in `appearance.accent`) | | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | proposed |
-| `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-proposed-schema` | RETIRING: no reader; the store lookup is not built |
+| `spaces.default_grain` | `Count` (0..100) | `0` (none) | applies to every preset; the old 40 and the per-preset 35/55 are gone. A grain value a user already set on a stored Space is kept (21 section 10 migration). Target (clean-up phase): the code default is still 40 | `21-SPACES.md#4-presets-and-defaults-per-workspace-index` | settled (user, 2026-10-02) |
+| `spaces.default_card_accent` | RETIRING | | A Space has no card accent: the accent is the desktop's, set in Settings. Remove with `CardAccent` (target (clean-up phase)) | `21-SPACES.md#1-the-model-settled` | RETIRING (2026-10-02) |
+| `spaces.lookup_order` | `SpaceLookLookup::{ByIdThenIndex}` (single variant today; kept as an enum, not a bool, for a future `ByIndexOnly` fallback) | `ByIdThenIndex` | | `21-SPACES.md#10-storage-settled-path-target-clean-up-phase-schema` | RETIRING: no reader; the store lookup is not built |
 | `spaces.wallpaper_drawer` | `WallpaperDrawer::{Cosmic,Shell}` | `Cosmic` | Advanced. `Cosmic` = COSMIC's own background service; `Shell` = the shell's wallpaper surface, which cross-fades with light and dark. Default stays `Cosmic` until shell-host paints a background layer's second frame (shell-host F40, sill F171/G21) | `21-SPACES.md#8-wallpaper-proposed`; sill FINDINGS "M2 wallpaper" | proposed (2026-09-25) |
 
 ### 3.15 `display` (sill/settings.toml)
@@ -784,7 +784,7 @@ impl Default for ScrollSettings {
 
 ### 4.3 The rest, by name
 
-`AppearanceSettings` (theme, look, accent, motion_level, material_tint_alpha),
+`AppearanceSettings` (theme, accent, motion_level; the old `look`, `typeface` and `material_tint_alpha` are retiring, target (clean-up phase)),
 `IconsSettings`, `BarSettings`, `LauncherSettings`, `GesturesSettings` (palmrest crate:
 `scroll_speed`/`lock_*`/`swipe_*`/`tap_*`/`foreign_output`/`g4_*`/`live_workspace_*`/
 `gesture_action_map`), `PalmRejectionSettings`, `MenusSettings` (carries `switcher_*` as the nested
