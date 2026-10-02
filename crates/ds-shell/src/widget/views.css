@@ -40,8 +40,8 @@
 .ds-month-widget[*|data-layout=stack]{ flex-direction:column; align-items:center; gap:var(--s-8); }
 .ds-month-widget-month{ display:flex; flex-direction:column; flex:none; width:calc(7 * 2 * var(--fs-caption)); }
 .ds-month-today{ display:flex; flex-direction:column; flex:1; min-width:0; gap:var(--s-2); padding-left:var(--s-4); }
-.ds-month-weekday{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700; text-transform:uppercase;
-  letter-spacing:var(--tracking-caps-narrow); color:var(--accent-text); }
+.ds-month-weekday{ font-family:var(--font-ui); font-size:var(--fs-small); font-weight:700;
+  letter-spacing:0; color:var(--accent-text); }
 .ds-month-date{ margin-bottom:var(--s-8); font-family:var(--font-display); font-size:var(--fs-widget-hero); font-weight:500; line-height:1; color:var(--ink); }
 .ds-month-events{ display:flex; flex-direction:column; align-self:stretch; gap:var(--s-4); padding:0 var(--s-6); }
 .ds-month-event{ display:flex; flex-direction:column; min-width:0; padding-left:var(--s-8); border-left:var(--s-3) solid var(--c-blue); }

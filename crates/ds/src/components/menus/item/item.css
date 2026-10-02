@@ -43,8 +43,8 @@
 /* Disabled (design/13 section 13.3.3): opacity .35, not selectable. */
 .ds-menu-item[*|aria-disabled=true]{ opacity:.35; }
 
-/* A group title: the data face in capitals over the rows it heads. */
-.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-data); font-weight:var(--fw-caps); font-size:var(--fs-micro); letter-spacing:var(--tracking-caps); text-transform:uppercase; font-variant-numeric:tabular-nums; color:var(--ink-faint); white-space:nowrap; }
+/* A group title: the heading type (sentence case, 11 px, secondary ink) over the rows it heads. */
+.ds-menu-header{ padding:var(--s-7) var(--s-8) var(--s-3); font-family:var(--font-ui); font-weight:600; font-size:var(--fs-eyebrow); letter-spacing:0; font-variant-numeric:tabular-nums; color:var(--ink-soft); white-space:nowrap; }
 
 /* A status line (bar gaps): an item's row and weight, no eyebrow, not a choice, so no selection
    and the arrow keys pass it. */
