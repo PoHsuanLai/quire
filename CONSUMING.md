@@ -1229,6 +1229,14 @@ than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in tho
 `CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
 1000.
 
+**Opening a `PopUpButton` in a test with no renderer.** The menu is placed against the button's
+element, which a renderer reports after layout; a `VirtualDom` rendered with `dioxus-ssr` never
+does, so the menu stays shut. Give it a place and it opens: `PopUpButton { start: Shown::Visible,
+anchor: Some(Anchor::Point(Point { x: Px(40.0), y: Px(20.0) })), .. }` (or click the button once
+`anchor` is set). Let the root's overlay take the menu with a few `render_immediate` rounds, as
+`crates/ds/tests/pop_up_button_open_ssr.rs` does. On a real document `start` opens the menu once
+the button is laid out, and `anchor` moves it elsewhere.
+
 **Spaces store** (`ds::style::space::store::SpaceStore`, `crates/ds-style/src/space/store.rs`; design/21 §4, §10). Which
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
