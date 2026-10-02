@@ -27,8 +27,12 @@ pub fn SegmentedSection() -> Element {
     let image_only = || {
         vec![
             Choice::new(0u8, "").with_icon(Icon::Grid).with_name("Grid"),
-            Choice::new(1u8, "").with_icon(Icon::Columns).with_name("Columns"),
-            Choice::new(2u8, "").with_icon(Icon::Panel).with_name("Panel"),
+            Choice::new(1u8, "")
+                .with_icon(Icon::Columns)
+                .with_name("Columns"),
+            Choice::new(2u8, "")
+                .with_icon(Icon::Panel)
+                .with_name("Panel"),
         ]
     };
     rsx! {

@@ -23,12 +23,20 @@ cd "$(dirname "$0")/../assets/fonts"
 LATIN="U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
 LATIN_EXT="U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF"
 
+# The key-cap glyphs (⌃ ⌥ ⇧ ⌘ ⌫ ↩ ↵ ⇥ ⌦ ⇞ ⇟ and the arrows ← ↑ → ↓ ↖ ↘): Google's latin range has
+# none of them, so a `KeyEquivalent` fell to whatever face the system offered, and U+2303 drew as a
+# caret (`^`). The upright Inter text face carries them (Inter 4.1 draws all of them) and every
+# stack ends with "Inter" (`--font-code`, the Editorial stacks), so no typeface depends on the
+# system for them. The italic and display cuts do not need them.
+KEYS="U+2190-2199,U+21A9,U+21B5,U+21DE-21DF,U+21E5,U+21E7,U+2303,U+2318,U+2325-2326,U+232B"
+
 files=("$@")
 if [ ${#files[@]} -eq 0 ]; then files=(*.woff2); fi
 for woff2 in "${files[@]}"; do
   stem="${woff2%.woff2}"
   case "$stem" in
     *-latin-ext) range="$LATIN_EXT" ;;
+    inter-normal-400-700-latin) range="$LATIN,$KEYS" ;;
     *-latin) range="$LATIN" ;;
     *) echo "unknown subset: $woff2" >&2; exit 1 ;;
   esac
