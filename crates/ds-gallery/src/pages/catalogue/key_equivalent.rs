@@ -18,6 +18,12 @@ pub fn KeyEquivalentSection() -> Element {
             ShortcutKey::Ctrl,
             ShortcutKey::Enter,
         ]),
+        // ⌃⌘S: the bundled Inter draws the Control glyph (a system fallback drew a caret).
+        Shortcut(vec![
+            ShortcutKey::Ctrl,
+            ShortcutKey::Super,
+            ShortcutKey::Char('s'),
+        ]),
         Shortcut(vec![
             ShortcutKey::Escape,
             ShortcutKey::Tab,

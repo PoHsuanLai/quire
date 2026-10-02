@@ -17,20 +17,20 @@ pub enum Family {
     /// names, initials, big numbers.
     #[token(
         system = "\"Inter Display\",\"Inter\",system-ui,sans-serif",
-        editorial = "\"Bricolage Grotesque\",\"Trebuchet MS\",system-ui,sans-serif"
+        editorial = "\"Bricolage Grotesque\",\"Inter\",\"Trebuchet MS\",system-ui,sans-serif"
     )]
     Display,
     /// `--font-ui`: Inter (System) or Karla (Editorial). Body text and every control.
     #[token(
         system = "\"Inter\",system-ui,sans-serif",
-        editorial = "\"Karla\",\"Segoe UI\",system-ui,sans-serif"
+        editorial = "\"Karla\",\"Inter\",\"Segoe UI\",system-ui,sans-serif"
     )]
     Ui,
     /// `--font-data`: Inter, always tabular (System), or Space Mono (Editorial). Anything
     /// machine-shaped: times, counts, chips, eyebrows, section headers.
     #[token(
         system = "\"Inter\",system-ui,sans-serif",
-        editorial = "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
+        editorial = "\"Space Mono\",\"Inter\",ui-monospace,\"SFMono-Regular\",Menlo,monospace"
     )]
     Data,
     /// `--font-serif`: Noto Serif. A message a person writes in a serif, and the control that
@@ -39,7 +39,7 @@ pub enum Family {
     Serif,
     /// `--font-code`: Space Mono in either typeface. Only where a fixed pitch carries meaning:
     /// code, `KeyEquivalent` caps, aligned logs.
-    #[token(value = "\"Space Mono\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
+    #[token(value = "\"Space Mono\",\"Inter\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
     Code,
 }
 
