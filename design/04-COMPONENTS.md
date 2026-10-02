@@ -3793,7 +3793,7 @@ a caption, and its actions with their keys. The launcher sets it beside its resu
   <div class="ds-menu" data-embed="palette">…</div>
   <div class="ds-palette-aside" style="width:360px">
     <div class="ds-preview" role="region" aria-label="Invoice.pdf preview"
-         data-content="image|text|pdf|app|facts|emoji|web" data-shown="visible"
+         data-content="image|text|pdf|app|facts|emoji|web|slot" data-shown="visible"
          data-presence="entering|present|leaving" data-pulse="a|b">
       <div class="ds-preview-media">…</div>          <!-- img.ds-preview-image, div.ds-preview-text[data-face=mono|prose],
                                                           .ds-pdf-thumb, an icon, span.ds-preview-emoji.ds-emoji-text -->
@@ -3816,7 +3816,8 @@ pub enum PaneContent {
     Image { src: ImageSource, size: ImageSize }, Text { excerpt: String, mono: Mono },
     Pdf { page: PdfPage, name: String }, App { icon: IconSource, name: String, detail: Option<String> },
     Facts { icon: IconSource, title: String, rows: Vec<(String, String)> },
-    Emoji { glyph: String, name: String }, Web { host: String, url: String } }
+    Emoji { glyph: String, name: String }, Web { host: String, url: String },
+    Slot { label: String, element: Element } }
 pub enum Mono { Monospace, Proportional }
 pub struct PaneAction { pub label: String, pub shortcut: Shortcut }
 pub const PANE_MEDIA: Size;   // 328 x 220
@@ -3826,6 +3827,14 @@ pub const PANE_MEDIA: Size;   // 328 x 220
 // ds-blitz, feature `pdf`:
 pub fn use_pdf_page(path: Option<PathBuf>, size: Size) -> Option<PdfPage>
 ```
+
+**The slot.** `PaneContent::Slot { label, element }` hosts the caller's own element in the media
+box, for content quire cannot name as data (a viewer's peek, which already draws its picture, name
+and facts). The pane keeps its frame: the slide in, the cue's cross-fade of the media, the pending
+look (which replaces the element while a load runs), and the actions. It adds no caption, the
+media box grows to fill the column above the actions (`[data-content=slot]`), and `label` words the
+region (`"{label} preview"`). The element is the caller's: its styles come from the caller's own
+layer (`AppStyle`), and a slot's markup is linted like any other.
 
 **The PDF split.** ds reads no file (section 45), so `PaneContent::Pdf` takes the page, not the
 path. A Blitz app gets the page from `ds_blitz::use_pdf_page(path, ds::components::lists::preview::content::PANE_MEDIA)`, the hook
