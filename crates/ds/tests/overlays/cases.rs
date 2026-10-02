@@ -692,6 +692,12 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "sheet",
+        state: "within-a-pane",
+        make: || rsx! { Sheet { label: "Rules", onclose: |_| {}, attach: Attach::Within(Anchor::Rect(button_rect())), p { "Rules." } } },
+        wait: SETTLED,
+    },
+    Case {
+        component: "sheet",
         state: "bottom-wide",
         make: || rsx! { Sheet { label: "Edit Widgets", onclose: |_| {}, attach: Attach::Bottom, width: SheetWidth::Wide, p { "Gallery." } } },
         wait: SETTLED,

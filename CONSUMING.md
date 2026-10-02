@@ -740,6 +740,15 @@ A menu from a toolbar button: `Toolbar { onpick }` hears a `Picked<T> { value, a
 so keep it and hang the `Menu { anchor, placement: MenuPlacement::Popup }` or `Popover` from it; no
 button of your own in the title is needed.
 
+A sheet from a pane, not the window: `Sheet { attach: Attach::Within(anchor) }` hangs from the top edge of
+the pane `anchor` names (`Anchor::Mounted` of the card's element, kept from its `onmounted` with
+`use_rect().anchor()`, or `Anchor::Rect` in client coordinates), centred over that pane and `min(width, 88%)`
+of it wide, clipped by the pane as it slides in, so the sidebar and the rest of the window stay clear. A
+mounted pane is measured once it has laid out and again when the overlay settles, so a Space or a layout
+that is still moving needs nothing from you; a pane that is resized while the sheet is up needs a fresh
+`Anchor::Rect`. Render the `Sheet` once the anchor exists (`if let Some(anchor) = card.anchor()`); no
+class of your own on the sheet to move its top.
+
 Anchors, hover-card parts and undo:
 
 - `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element
