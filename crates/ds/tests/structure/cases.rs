@@ -166,6 +166,11 @@ pub const CASES: &[Case] = &[
         make: || rsx! { SplitView { label: "Example", panes: pane(Shown::Hidden), p { "Content" } } },
     },
     Case {
+        component: "split_view",
+        state: "folded-peeking",
+        make: || rsx! { SplitView { label: "Example", panes: vec![SplitPane::new(PaneSpec::SIDEBAR, rsx! { p { "Side" } }).shown(Shown::Hidden).peeking()], p { "Content" } } },
+    },
+    Case {
         component: "sidebar",
         state: "medium",
         make: || rsx! { Sidebar::<u8> { label: "Mail", sections: vec![SidebarSection::List(places())], cursor: Some(1), onselect: |_| {}, header: rsx! { p { "Search" } } } },

@@ -2324,6 +2324,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-split{ display:flex; align-items:stretch; min-width:0; min-height:0; height:100%; }
 .ds-split-pane{ --pane-w:0px; --pane-open:0px; position:relative; flex:none; width:var(--pane-w); min-width:0; overflow:hidden; }
 .ds-split-pane[*|data-shown=hidden]{ pointer-events:none; }
+/* A pane whose body is an `EdgePeek` (`SplitPane::peeking`) stops clipping once it has folded away,
+   so the peek can stand over the content beside it; the pane still takes no pointer, only the edge
+   strip and the floating sidebar do. */
+.ds-split-pane[*|data-folded=peeks][*|data-away=true]{ overflow:visible; }
+.ds-split-pane[*|data-folded=peeks] .ds-edge,
+.ds-split-pane[*|data-folded=peeks] .ds-side{ pointer-events:auto; }
 .ds-split-pane-body{ box-sizing:border-box; width:var(--pane-open); height:100%; }
 .ds-split-rest{ flex:1 1 0; min-width:0; min-height:0; }
 

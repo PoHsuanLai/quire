@@ -726,6 +726,15 @@ them. One `cursor` runs across every list, so the app keeps one selected place. 
 ground of its own, so the Space's colour shows through, and takes the frame's inks (`--f-ink*`) for the
 text and the row fills. Rows inside it need no variant.
 
+A sidebar that folds away and peeks: give the `SplitView` pane a body that is an `EdgePeek` (holding the
+`Sidebar`) and mark the pane `SplitPane::new(spec, body).shown(pinned).peeking()`. A folded pane clips its
+body, so an `EdgePeek` inside one stayed out of reach; a peeking pane stops clipping once it has folded
+away, so the 10 px strip at the window's edge takes the pointer, the sidebar floats out over the content,
+and a click on the strip pins it (`EdgePeek { onpin }`, which sets the pane's `shown` again). Keep one
+`Shown` for both (`pinned` of the `EdgePeek`, `shown` of the pane, `on_shown` of the `SplitView` writing it),
+so a drag of the divider, a toolbar button and the edge click move the same state. No host element outside
+the pane is needed.
+
 Anchors, hover-card parts and undo:
 
 - `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element
