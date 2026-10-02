@@ -371,7 +371,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 | Battery widgets | Batteries widget | `BatteryGlyph` + `ProgressIndicator{Ring}` + `Label`, one `BatteryState`, one arc geometry | none | glyph, ring | `BatteryLevel`, `BatteryFigure`, `DeviceBattery`, `RowBattery`, `DeviceGlyph` duplicates | MERGE | P1 |
 | IdleDim | display dim | `IdleDim` token | none | overlay | none | KEEP | P2 |
 | Dock: DockTile, DockLabel, RunningDot, DockFloor | Dock | `DockTile` = plate + `Badge` + `ProgressIndicator{Bar}` + running dot; `DockLabel` uses `HoverIntent` Label; magnification and bounce in sill | hover (magnify) | tile, label, dot | sill `Tile`, `.sill-dock-label` (L14), `TooltipKind::Fly` | ADD | P1 |
-| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | target (clean-up phase): preset swatches plus one hue slider, a grain slider and the theme; no 2-D field, no gradient, no contrast readout (21-SPACES); in `ds` (`components/app/space_editor`), so an app takes them without the shell's kit; the card-accent segments and extra dots go | none | dot | none | KEEP | P2 |
+| SpaceEditor, SpaceDot | none (user-settled, 21-SPACES) | target (clean-up phase): preset swatches plus one hue slider, a grain slider and the theme; no 2-D field, no gradient, no contrast readout (21-SPACES); in `ds` (`components/app/space_editor`), so an app takes them without the shell's kit; `frame: EditorFrame::{Card (default), Frameless}` drops the editor's own card for a host that is a surface already (a Sheet); the card-accent segments and extra dots go | none | dot | none | KEEP | P2 |
 | AnimatedEmoji | Messages reactions (design/25) | the asset's own animation; no quire loop | none | image | none | KEEP | P2 |
 
 ### 2.11 App features and mail-only
