@@ -18,6 +18,7 @@ use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport}
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 use ds::file_drop::board::FileDropBoard;
+use ds::host::gesture::GestureBus;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameHover;
@@ -75,6 +76,8 @@ pub(crate) struct Headless {
     hover: (FrameHover, HoverTracker),
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
+    /// The components listening for touchpad gestures.
+    pub(crate) gestures: GestureBus,
     /// Under `FocusFallback::Ancestor`, where the keyboard goes when its element is removed.
     keeper: Keeper,
     /// The last pointer event, replayed when a resolve moves the hover by itself
@@ -153,6 +156,8 @@ impl Headless {
             clipboard: Rc::new(Memory(Arc::clone(&shell))),
             listeners: listeners.clone(),
         });
+        let gestures = GestureBus::default();
+        doc.vdom.provide_root_context(gestures.clone());
         doc.vdom.provide_root_context(provided.clipboard);
         doc.vdom
             .provide_root_context(FileDropBoard::new(Rc::clone(&provided.host)));
@@ -169,6 +174,7 @@ impl Headless {
             book,
             hover: (setup.frame_links.hover(), HoverTracker::default()),
             listeners,
+            gestures,
             keeper,
             resting: LastMove::Unknown,
             painter: Painter::Cpu,

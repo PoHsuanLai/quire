@@ -97,6 +97,14 @@ fn app() -> Element {
             style: "width:60px;height:20px",
             onpointerdown: move |_| machine.send(HoldIn::Press),
         }
+        div {
+            id: "long-press",
+            style: "width:60px;height:20px",
+            onpointerdown: move |_| {
+                machine.set_params(HoldParams { hold_ms: 2000 });
+                machine.send(HoldIn::Press);
+            },
+        }
     }
 }
 
@@ -179,4 +187,25 @@ fn a_machine_at_rest_runs_no_timer() {
     assert_eq!(word(&harness).as_deref(), Some("idle"));
     harness.advance(Duration::from_millis(5000));
     assert_eq!(outs().len(), 2, "nothing more after the release");
+}
+
+#[test]
+fn parameters_set_before_a_send_are_the_ones_that_step_reads() {
+    let mut harness = running(500);
+    let at = harness
+        .centre("#long-press")
+        .expect("the long press target");
+    harness.send(Input::click(at));
+    harness.advance(Duration::from_millis(600));
+    assert_eq!(
+        word(&harness).as_deref(),
+        Some("held"),
+        "600 ms in, with the 500 ms of the render's parameters it would be released"
+    );
+    harness.advance(Duration::from_millis(1500));
+    assert_eq!(
+        word(&harness).as_deref(),
+        Some("idle"),
+        "2100 ms in: released"
+    );
 }

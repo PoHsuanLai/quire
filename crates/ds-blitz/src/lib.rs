@@ -9,7 +9,9 @@
 //! `TokioSpawner` it hands `ds_settings::use_environment` has a runtime to run its portal and
 //! file-watch tasks on, and `enter_runtime` lends it to a test driver.
 
+mod app_handle;
 mod app_id;
+mod app_life;
 mod blitz_host;
 mod click_focus;
 pub mod clipboard;
@@ -36,6 +38,7 @@ mod frame_links;
 mod frame_tag;
 mod frame_tree;
 pub mod frames;
+mod gesture_window;
 mod host;
 mod install;
 pub mod launch;
@@ -71,7 +74,9 @@ mod window_place;
 mod window_requests;
 mod window_shell;
 
+pub use app_handle::{AppEnded, AppHandle, use_app_handle};
 pub use app_id::AppId;
+pub use app_life::LastWindowClosed;
 pub use blitz_host::provide_host;
 pub use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref};
 pub use click_focus::FocusFallback;
@@ -81,7 +86,7 @@ pub use fonts::font_context;
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_tag::FrameTag;
-pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch};
+pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch, launch_idle};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with};
 pub use origin::{FrameId, RequestOrigin};
