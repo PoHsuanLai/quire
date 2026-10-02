@@ -1,6 +1,7 @@
 //! What a `Toolbar` shows: its items as data, and the pure rule of how many of them fit before
 //! the rest go behind the overflow chevron.
 
+use crate::host::measure::Anchor;
 use ds_core::geometry::units::Px;
 use ds_core::vocab::{Availability, Check};
 use ds_style::icon::Icon;
@@ -57,6 +58,17 @@ impl<T> ToolbarItem<T> {
             ..self
         }
     }
+}
+
+/// What picking a toolbar item reports: its value, and the button it was picked from, so a menu
+/// or a popover can hang from that button.
+#[derive(Debug, Clone, PartialEq)]
+pub struct Picked<T> {
+    /// The item's value.
+    pub value: T,
+    /// The button the pick came from (the overflow chevron for an item that was behind it);
+    /// `None` until the button has mounted, which a click never precedes on a real document.
+    pub anchor: Option<Anchor>,
 }
 
 /// Where the toolbar gets the width it lays its items out in.
