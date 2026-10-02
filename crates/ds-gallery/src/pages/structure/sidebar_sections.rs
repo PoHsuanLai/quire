@@ -1,5 +1,5 @@
 //! Sidebar with several sections and a foot: pinned tiles, two source lists and a foot of
-//! Space dots, on paper and on the frame's colour.
+//! Space dots, on its own ground and clear over a Space's tint.
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
@@ -7,11 +7,10 @@ use ds::base::vocab::RowState;
 use ds::components::app::pin_tile::PinFace;
 use ds::components::app::pin_tiles::{PinItem, PinTiles};
 use ds::components::chrome::sidebar::Sidebar;
-use ds::components::chrome::sidebar_section::SidebarSection;
+use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::components::content::provider_mark::MarkProvider;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::prelude::*;
-use ds::root::chrome::Ground;
 use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::default_look;
@@ -105,14 +104,14 @@ pub fn SidebarSectionsSection() -> Element {
         .unread(3),
     ];
     rsx! {
-        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. Paper is the default; ground: Ground::Frame leaves the Space's colour showing and takes the frame's inks.",
+        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. The default fill is the sidebar's own ground; SidebarFill::Clear paints nothing, so the window's colour (a Space's flat tint) shows through, with the ordinary inks.",
             div { class: "g-row g-row-top",
-                for (name , ground) in [("Ground::Paper", Ground::Paper), ("Ground::Frame", Ground::Frame)] {
+                for (name , fill) in [("SidebarFill::Material", SidebarFill::Material), ("SidebarFill::Clear", SidebarFill::Clear)] {
                     Specimen { key: "{name}", name,
-                        div { class: if ground == Ground::Frame { "g-side-frame g-on-frame" } else { "g-side-frame" },
+                        div { class: if fill == SidebarFill::Clear { "g-side-frame g-on-tint" } else { "g-side-frame" },
                             Sidebar::<&'static str> {
                                 label: "Mail",
-                                ground,
+                                fill,
                                 cursor: Some(here()),
                                 onselect,
                                 sections: vec![

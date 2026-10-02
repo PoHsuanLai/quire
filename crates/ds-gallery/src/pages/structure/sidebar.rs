@@ -3,7 +3,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
-use ds::components::chrome::sidebar_section::SidebarSection;
+use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::control_size::SidebarSize;

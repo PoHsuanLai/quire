@@ -1,19 +1,18 @@
 //! A sidebar of several sections and a foot on a real Blitz document (design/30 section 2.7): the
 //! foot stays at the bottom while the sections scroll above it, a section of the caller's own
-//! content sits among the lists, one cursor runs across the lists, and the ground is paper by
-//! default and the Space's inks on `Ground::Frame`.
+//! content sits among the lists, one cursor runs across the lists, and the sidebar paints its own
+//! ground by default and nothing (the window's tint shows) with `SidebarFill::Clear`, in the
+//! same inks.
 
 use dioxus::prelude::*;
 use ds::base::vocab::RowState;
 use ds::components::chrome::sidebar::Sidebar;
-use ds::components::chrome::sidebar_section::SidebarSection;
+use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::prelude::*;
-use ds::root::chrome::Ground;
-use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::colour::ColourToken;
 use ds::style::tokens::hex::Hex;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -24,7 +23,7 @@ const VIEW: Viewport = Viewport {
 };
 
 thread_local! {
-    static FRAME: Cell<bool> = const { Cell::new(false) };
+    static CLEAR: Cell<bool> = const { Cell::new(false) };
     static ROWS: Cell<u8> = const { Cell::new(4) };
     static PICKED: Cell<u8> = const { Cell::new(0) };
 }
@@ -58,10 +57,10 @@ fn Page() -> Element {
         here.set(key);
     });
     let count = ROWS.with(Cell::get);
-    let ground = if FRAME.with(Cell::get) {
-        Ground::Frame
+    let fill = if CLEAR.with(Cell::get) {
+        SidebarFill::Clear
     } else {
-        Ground::Paper
+        SidebarFill::Material
     };
     let look = SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
@@ -73,7 +72,7 @@ fn Page() -> Element {
             div { style: "height:400px;width:260px",
                 Sidebar::<u8> {
                     label: "Mail",
-                    ground,
+                    fill,
                     cursor: Some(here()),
                     onselect: move |key| pick.call(key),
                     sections: vec![
@@ -88,8 +87,8 @@ fn Page() -> Element {
     }
 }
 
-fn start(frame: bool, count: u8) -> Harness {
-    FRAME.with(|cell| cell.set(frame));
+fn start(clear: bool, count: u8) -> Harness {
+    CLEAR.with(|cell| cell.set(clear));
     ROWS.with(|cell| cell.set(count));
     PICKED.with(|cell| cell.set(0));
     let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
@@ -176,6 +175,16 @@ fn a_row_in_the_second_list_moves_the_one_cursor() {
         100,
         "the first row of the second list"
     );
+    assert_eq!(
+        harness.count(".ds-row[aria-selected=true]"),
+        1,
+        "one row is selected across both lists"
+    );
+    assert_eq!(
+        harness.count(".ds-sidebar-section:nth-child(3) .ds-row[aria-selected=true]"),
+        1,
+        "and it is the one clicked"
+    );
 }
 
 fn matches(ink: ds_harness::Srgba, hex: Hex) -> bool {
@@ -187,31 +196,24 @@ fn matches(ink: ds_harness::Srgba, hex: Hex) -> bool {
 }
 
 #[test]
-fn paper_is_the_default_ground_and_the_frame_takes_the_spaces_inks() {
-    let paper = start(false, 2);
-    let paper_ink = Hex::parse(&ColourToken::Ink.value(Scheme::Light).css()).expect("hex");
-    let ink = paper.ink_of(".ds-sidebar").expect("ink");
-    assert!(matches(ink, paper_ink), "paper: {ink:?} vs {paper_ink:?}");
-    assert_eq!(paper.attr(".ds-sidebar", "data-ground"), None);
-
-    let frame = start(true, 2);
-    let look = SpaceLook {
-        dots: PRESETS[0].dots.to_vec(),
-        grain: Grain(0),
-        ..SpaceLook::default()
-    };
-    let frame_ink = Hex::parse(&FrameVars::of(&look, Scheme::Light).ink).expect("hex");
-    let ink = frame.ink_of(".ds-sidebar").expect("ink");
-    assert!(matches(ink, frame_ink), "frame: {ink:?} vs {frame_ink:?}");
+fn a_clear_sidebar_paints_nothing_and_keeps_the_ordinary_inks() {
+    let own = start(false, 2);
+    let clear = start(true, 2);
+    assert_eq!(own.attr(".ds-sidebar", "data-fill"), None);
     assert_eq!(
-        frame.attr(".ds-sidebar", "data-ground").as_deref(),
-        Some("frame")
+        clear.attr(".ds-sidebar", "data-fill").as_deref(),
+        Some("clear")
     );
-    let fill = frame
-        .fill_of(".ds-sidebar", ds_harness::Part::Element)
-        .expect("fill");
+    let ground = own.fill_of(".ds-sidebar", Part::Element).expect("fill");
+    assert!(ground.0[3] > 0.99, "its own ground is opaque: {ground:?}");
+    let none = clear.fill_of(".ds-sidebar", Part::Element).expect("fill");
     assert!(
-        fill.0[3] < 0.01,
-        "the Space's colour shows through: {fill:?}"
+        none.0[3] < 0.01,
+        "the window's tint shows through: {none:?}"
     );
+    let paper_ink = Hex::parse(&ColourToken::Ink.value(Scheme::Light).css()).expect("hex");
+    for (name, harness) in [("own", &own), ("clear", &clear)] {
+        let ink = harness.ink_of(".ds-sidebar").expect("ink");
+        assert!(matches(ink, paper_ink), "{name}: {ink:?} vs {paper_ink:?}");
+    }
 }

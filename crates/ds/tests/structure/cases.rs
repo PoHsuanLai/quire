@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
-use ds::components::chrome::sidebar_section::SidebarSection;
+use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::components::chrome::tab_view::TabView;
@@ -22,7 +22,6 @@ use ds::components::lists::table::model::{CellAlign, Sort, SortDirection, TableC
 use ds::components::lists::table::view::Table;
 use ds::components::overlays::drag_ghost::DragCount;
 use ds::prelude::*;
-use ds::root::chrome::Ground;
 use ds_core::vocab::RowState;
 use ds_style::tokens::control_size::{ControlSize, SidebarSize};
 
@@ -182,12 +181,12 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "sidebar",
-        state: "sections-and-foot-on-the-frame",
+        state: "sections-and-foot-clear",
         make: || {
             rsx! {
                 Sidebar::<u8> {
                     label: "Mail",
-                    ground: Ground::Frame,
+                    fill: SidebarFill::Clear,
                     sections: vec![
                         SidebarSection::Custom(rsx! { p { "Pinned" } }),
                         SidebarSection::List(places()),
