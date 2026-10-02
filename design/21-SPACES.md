@@ -1,267 +1,191 @@
 # 21 Spaces on the desktop
 
-> **Superseded in part by `30-CATALOGUE.md`.** 30 section 3.3 replaces where the Space colour goes: in the Mac Look it sits behind the material (backdrop), in the Arc Look it is painted on the chrome as `--f-*` frame tokens; the frame-token parts of section 1, 3 and 5 describe the Arc Look. The workspace cross-fade is `--t-big`. The palette derivation (section 2), presets, storage and the editor stand. Where this file and 30 disagree, 30 wins.
+A Space is a COSMIC workspace's colour: one flat, quiet tint on the **sidebar ground** of the
+windows that have a sidebar, plus an optional grain. It never tints the content, a control, the
+bar, the dock or any other shell chrome. This is the quiet Dia/Mac direction (`30-CATALOGUE.md`
+section 3.4, which wins over this file); the gradient, frame-token, card-accent and A/B-layer model
+is `archive/21-SPACES-arc.md`.
 
-
-"A Space colours the frame; the mail stays on paper." (S:816). On the desktop, a Space is a
-COSMIC workspace's look: its colour tints the shell chrome around the apps, never the apps.
-
-Status: **settled** = decided with the user (PLAN "UX decisions settled", 2026-09-23, second
-round) or copied from the prototypes/code; **proposed** = open until signed off.
-S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/src/palette.rs`
-(moves verbatim into `crates/ds-style/src/space/palette.rs`).
+Status: **settled** = decided with the user (PLAN "UX decisions settled", 2026-09-23; the
+2026-10-02 decisions in 30 section 3.4) or copied from code; **target (clean-up phase)** = settled
+here, not yet in the code (`ds-style/space/palette.rs`, `SpaceEditor`, `SpaceStore`).
+`palette.rs` = `crates/ds-style/src/space/palette.rs`.
 
 ## 1. The model (settled)
 
 - Each COSMIC workspace owns one `SpaceLook`.
-- Bar, dock, launcher and control-center chrome take their colour from the active workspace's
-  `SpaceLook`: in the Mac Look it sits in the backdrop layer behind each material; in the Arc Look
-  the chrome uses the `--f-*` frame tokens derived from it, drawn over compositor blur.
-- Apps stay on paper (tokens: paper, surface, surface-2, raise, ink).
-- Switching workspace cross-fades the colour over `--t-big`.
+- The Space tint is one flat colour drawn as the sidebar's ground (under the Sidebar material's
+  vibrancy). Nothing else changes colour with the Space: the content stays on paper, so every
+  contrast rule holds, and shell chrome (bar, dock, launcher, control centre, OSD) takes no tint.
+- Switching workspace cross-fades the tint over `--t-big`: no slide, no A/B layers.
+- The workspace indicator in the bar shows the Space's dot (its tint) and name.
 
 ```rust
-pub struct SpaceLook { dots: Vec<Dot>, grain: Grain(u8), theme: Theme, card_accent: CardAccent }
-pub struct Dot { hue: f32, chroma: f32 }        // palette.rs:16-23; chroma is 0..1 of the frame max
-impl FrameVars { pub fn of(look: &SpaceLook, scheme: Scheme) -> Self; pub fn style_attr(&self) -> String }
+// target (clean-up phase)
+pub struct SpaceLook { hue: f32, chroma: f32, grain: Grain(u8), theme: Theme }
 ```
 
 | Field | Meaning | Range |
 | --- | --- | --- |
-| `dots` | 1-3 colours, left to right across the gradient (S editor: up to 3 dots) | hue 0-360, chroma 0-1 |
-| `grain` | noise strength | 0-100 |
-| `theme` | this Space's appearance: System / Light / Dark (S editor "Appearance" segment) | enum |
-| `card_accent` | the chosen accent (`Chosen`), or the Space's hue (S editor "Accent" segment) | enum |
+| `hue` | the tint's hue, set by the preset swatch or the one hue slider | 0-360 |
+| `chroma` | strength factor on the quiet tint: 1 for every colour preset, .06 for the neutral preset; not shown in the editor | 0-1 |
+| `grain` | noise strength; **default 0 (none)** for new Spaces and every preset | 0-100 |
+| `theme` | this Space's appearance: System / Light / Dark | enum |
 
-**Motion is not part of a Space (settled, 2026-09-24).** A `SpaceLook` has no motion field: how
-much a surface moves is global, the `Appearance`'s `motion` resolved with the system's
-preferences into the root's `data-motion`. A consumer that wants motion per Space (mailo's
-`Space::motion`) keeps it in its own Space type and passes it into the root's
-`appearance.motion` itself.
+There are no dots list, no gradient and no `card_accent`: the accent is the desktop's, set in
+Settings (30 section 3.4), and a Space never changes it. Current code still has `dots`,
+`card_accent` and `FrameVars`; they go.
 
-An empty `dots` list reads as the neutral dot `{hue 250, chroma .06}` (palette.rs:31-35,
-121-125), the same grey as preset 8.
+**Motion is not part of a Space (settled, 2026-09-24).** How much a surface moves is global, the
+`Appearance`'s `motion` resolved with the system's preferences into the root's `data-motion`.
 
-## 2. Palette derivation (settled; quoted from Appendix A3 and palette.rs)
+## 2. The tint (settled values; the code's quiet tint)
 
-Inputs: `k = dots[0].chroma`, `h0 = dots[0].hue`, `dark` from the resolved scheme.
+Inputs: `h = hue`, `k = chroma`, `dark` from the resolved scheme. The chroma is the quiet tint
+that has been in `palette.rs` since 2026-10-01 (about 40 % of the prototype's); the gradient and
+extra stops of that derivation are dropped.
 
-**Quiet tint (settled 2026-10-01).** The frame's max chroma is about 40 % of the prototype's
-(light .052 to .022, dark .042 to .018): the Space colour behind the chrome is a quiet wash,
-because the reference moved from Arc to Dia, which is closer to the Mac. The lightness
-steps, the gradient, the card inset, the contrast loop and the grain opacity are unchanged, and
-so is the Space-mode accent derivation (03-COLOR section 4.2).
-
-| Quantity | Light | Dark | palette.rs |
-| --- | --- | --- | --- |
-| Frame L, step per stop, max C (quiet tint) | L .936, step -.012, C .022 | L .215, step +.014, C .018 | 83-94 |
-| ink (`--f-ink`) | `oklch(.22, .06k, h0)` | `oklch(.93, .018k, h0)` | 132-136 |
-| soft (`--f-ink-soft`) | `oklch(.40, .05k, h0)` | `oklch(.80, .03k, h0)` | 137-141 |
-| faint (`--f-ink-faint`) | `oklch(.52, .05k, h0)` | `oklch(.66, .035k, h0)` | 142-146 |
-| stop[i] | `oklch(L + i·step, dot.c · C, dot.h)`; while `ratio(ink, stop) < 4.5` or `ratio(faint, stop) < 3.0`: `C -= .003`, `capped = true` | same | 149-164, 105 |
-| hover (`--f-pill-hover`) | `oklch(.885, .026k + .004, h0)` | `rgba(255,255,255,.06)` | 166-170, 109 |
-| pill (`--f-pill`) | `rgba(255,255,255,.72)` | `rgba(255,255,255,.10)` | 171-175, 110-111 |
-| accent (space mode) | `oklch(aL, .045 + .035k, h0)`, aL from .45 stepping -.01 until `ratio(accent, surface) ≥ 4.5` | aL from .77 stepping +.01 | 177-184, 107 |
-| accent soft | `oklch(.935, .018, h0)` | `oklch(.29, .03, h0)` | 185-189 |
-| accent ink | `#FFFFFF` | `oklch(.2, .02, h0)` | 190-194 |
-| handle / picked swatch | `oklch(.74, c · .15, h)` | same | 96-100, 195-198 |
-| gamut fit | lower C by .002 until in sRGB | same | 103, 270-276 |
-| gradient | `linear-gradient(135deg, stops…)`, one stop repeated; positions `round(i/last·100)%` | same | 219-238 |
-
-Frame tokens that are not in palette.rs (settled in S:1188-1193; `FrameVars` adds them):
-
-| Token | Light | Dark |
+| Quantity | Light | Dark |
 | --- | --- | --- |
-| `--f-line` | `rgba(0,0,0,.08)` | `rgba(255,255,255,.09)` |
-| `--f-solid` | `stops[0]` | `stops[0]` |
-| grain opacity | `grain/100 x .10` | `grain/100 x .08` |
+| Tint (the sidebar ground) | `oklch(.936, k · .022, h)` | `oklch(.215, k · .018, h)` |
+| Contrast loop | while ink on the tint is under 4.5 or faint ink under 3.0: `C -= .003` | same |
+| Gamut fit | lower C by .002 until in sRGB | same |
+| Grain opacity | `grain/100 × .10` | `grain/100 × .08` |
+| Swatch / handle colour | `oklch(.74, k · .15, h)` | same |
 
-Port notes (settled finding, fix in quire): palette.rs:177 hard-codes the card surface as
-`#F8F9F6` / `#1D211B`; in quire it reads the `surface` token from the token table.
+Text on the tint is the neutral ink tokens (`--ink`, `--ink-soft`, `--ink-faint`), not Space-tinted
+frame inks; the `--f-*` family is deleted. Hover and selection on the sidebar use `--sel-bg-quiet`
+and the Sidebar material, as for any Mac source list.
 
-## 3. Where the tokens apply
+## 3. Where the tint applies
 
-The table is the Arc Look's. In the Mac Look the same surfaces get the Space colour behind their
-material and take their ink from the material (design/30 §3.3).
+| Surface | Tint? |
+| --- | --- |
+| A window's sidebar ground (mailo, files, settings, any `Sidebar`) | yes |
+| Workspace indicator dot in the bar, Space dots in the editor and the sidebar foot | yes (a dot) |
+| Bar, dock, launcher, control centre, OSD, notifications, power menu, lock, polkit | no |
+| Content, list, reader, controls, apps' paper | no |
 
-| Surface | Frame tokens? | Background | Text |
-| --- | --- | --- | --- |
-| Bar | yes | Space gradient at material tint alpha over blur | `--f-ink-soft`, current/hover `--f-ink` |
-| Dock pill | yes | Space gradient at material tint alpha over blur | `--f-ink` labels |
-| Launcher panel chrome (field row, group headers) | yes | Space gradient | `--f-ink*` |
-| Launcher result list | no | `--raise` | `--ink` |
-| Control center chrome | yes | Space gradient | `--f-ink*`; controls inside on `--f-pill` |
-| OSD | yes (settled 2026-09-24) | Space gradient at material tint alpha over blur | `--f-ink*` |
-| Notifications, power menu, lock, polkit | no (proposed) | their Material over paper tokens | `--ink` |
-| Apps | no (paper) | paper tokens | `--ink` |
-| Mail window frame | yes (opt-in, §9) | Space gradient + grain | `--f-ink*` |
-
-Settled: bar, dock, launcher, control center and OSD (PLAN "UX decisions settled", this doc's
-brief, and the OSD call below). The "no" row for notifications, power menu, lock and polkit
-stays proposed.
-
-Material and blur (settled mechanism, proposed alpha): `Material::{Bar,Dock,Popover}` paint
-`--m-tint` = the Space gradient at alpha .80 (proposed) when `data-blur=on`, and
-`--m-tint-solid` (alpha ≥ .94, settled) when blur is unavailable. The contrast tests in §7
-run against both.
-
-Settled implementation: a `Ds` root in Bar, Dock, Osd or Widget, or a Popover root that is itself
-a panel (`chrome: Painted`, the launcher), stamps `data-frame="tinted"` and draws §5's two layers
-and the grain as one `.ds-frame` group at the material's own tint alpha from 03-COLOR §17.2
-scaled by `appearance.material_tint_alpha` (`--m-frame-alpha`: the bar .70 light, .68 dark at the
-default) with blur, and at .94 without. The OSD is tinted like the bar (coherence across chrome
-wins), as the goldens (`crates/ds/tests/snapshots/root/chrome/osd.html`) and the Materials gallery
-sheet show. Over a pure black or white backdrop six material/scheme pairs need a further .02 tint
-alpha to reach 4.5 (03-COLOR §17.2 lists them; `crates/ds/tests/legibility.rs`'s
-`the_tinted_chrome_holds_its_ink_over_blur` holds for every pair, with and without blur).
+Status: **target (clean-up phase)**. The code still tints the bar, dock, launcher, control centre
+and OSD through `data-frame="tinted"` and the `.ds-frame` group; that goes with the frame model.
 
 ## 4. Presets and defaults per workspace index
 
-The 8 presets (settled, S; Appendix A3):
+Eight presets, each one hue (settled hues from the former first dots; settled names, mailo's
+`space/presets.rs::PRESET_NAMES`):
 
-| # | dots `[{hue, chroma}]` | Name (`Preset::name`, settled) | Sample Space in S |
+| # | Hue | Chroma | Name |
 | --- | --- | --- | --- |
-| 1 | `[{268,.72},{318,.55}]` | Dusk | Work (grain 35) |
-| 2 | `[{152,.62},{62,.55},{28,.5}]` | Orchard | Home (grain 55) |
-| 3 | `[{220,.7}]` | Harbour | |
-| 4 | `[{20,.66},{55,.6}]` | Ember | |
-| 5 | `[{190,.6},{240,.55}]` | Lagoon | |
-| 6 | `[{340,.6},{290,.5}]` | Heather | |
-| 7 | `[{95,.5}]` | Moss | |
-| 8 | `[{250,.06}]` (neutral) | Stone | |
+| 1 | 268 | 1 | Dusk |
+| 2 | 152 | 1 | Orchard |
+| 3 | 220 | 1 | Harbour |
+| 4 | 20 | 1 | Ember |
+| 5 | 190 | 1 | Lagoon |
+| 6 | 340 | 1 | Heather |
+| 7 | 95 | 1 | Moss |
+| 8 | 250 | .06 | Stone (neutral) |
 
-The names are mailo's (`space/presets.rs::PRESET_NAMES`, settled with the mailo gaps 2 wave);
-the editor's preset buttons are named by them. Work and Home are the Spaces S made from the
-first two, not the presets' names. mailo's six further presets (the retired accent hues:
-Postmark, Graphite, Pine, Indigo, Oxblood, Vermilion) are not in quire's eight.
-
-Default `SpaceLook` for a workspace with no stored look (proposed):
-- `dots = PRESETS[index % 8]`, index = the workspace's 0-based position on its output.
-- `grain`: 35 for preset 1, 55 for preset 2 (settled values), 40 for presets 3-8 (proposed).
-- `theme = System`; `card_accent = Chosen` (proposed).
+Default `SpaceLook` for a workspace with no stored look: the preset at the workspace's 0-based
+position on its output modulo 8, **grain 0**, `theme = System`. Every preset has grain 0; the old
+per-preset grains (35, 55, 40) are gone.
 
 ## 5. Workspace switch (settled model)
 
-The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
+1. The sidebar ground's colour transitions from the old tint to the new over `--t-big`
+   (`--e-in-out`); the grain opacity transitions with it.
+2. Text does not change colour (it is neutral ink), so there is nothing else to fade.
+3. No-op when the target is the current workspace.
+4. Per output: each output's workspace indicator follows that output's active workspace.
+5. Reduced motion keeps the cross-fade (30 section 1.1).
 
-1. Each tinted surface has two background layers, `.ds-layer` (front) and `.ds-layer.back`
-   (settled for every tinted root, bar gaps: on shell chrome they sit in `.ds-frame`, whose own
-   background is the current gradient, so the group is opaque inside through the fade). The
-   window's root (`data-frame=opaque`) holds them directly, with the grain, and is its own
-   stacking context so they paint over its background, which is the current gradient too
-   (settled, mailo gaps 2026-09-24; before, they painted beneath it and the switch was an
-   instant swap). Neither layer takes the pointer.
-2. On switch, the hidden layer gets the new gradient and opacity 1; the front goes to
-   opacity 0; the roles swap. Transition `opacity` over `--t-big`.
-3. Grain opacity transitions over the same `--t-big` (proposed).
-4. Text colours (`--f-ink*`) change as values on `.ds`: if spike S4 (transition on
-   var-driven values) passes, `color` transitions over `--t-big`; if not, they swap at
-   the cross-fade's midpoint (200 ms, proposed).
-5. No-op when the target is the current workspace.
-6. Per output: each output's bar follows that output's active workspace. The dock and
-   launcher follow the workspace of the output they are on (proposed).
-7. Reduced motion keeps the cross-fade (design/30 §1.1: cross-fades stay under Reduced).
+Trigger: cctk `WorkspaceState` activation events on the `cosmic_wl` thread, then `use_workspaces`,
+then each sidebar's `Ds { look }`. The shortcut is ⌃1-9 (30 section 3.4); ⌘1-9 stay free for apps.
 
-Trigger: cctk `WorkspaceState` activation events on the `cosmic_wl` thread → `use_workspaces`
-→ each surface's `Ds { look }` (PLAN "Design: `<shell>`" hooks).
+## 6. Editor (settled placement; target (clean-up phase) pieces)
 
-## 6. Editor (settled placement, pieces from 04)
-
-Lives in two places, one component (`SpaceEditor`, proposed name, in quire):
-- Settings → Spaces page: one row per workspace, full editor.
-- Bar workspace menu: right-click (or the menu button) on a workspace dot → "Edit Space…"
-  opens the editor in a `Popover` (proposed: the compact layout without provider marks).
-
-Pieces (settled, Appendix A4 "Space editor", from 04-COMPONENTS):
+Lives in two places, one component (`SpaceEditor` in quire): Settings, Spaces page (one row per
+workspace, full editor), and the bar's workspace menu ("Edit Space…" opens it in a `Popover`).
 
 | Piece | Spec |
 | --- | --- |
-| panel | pad 14, gap 14, r-panel, surface, shadow-1 |
-| title | h3 15 + 14 px gradient swatch |
-| field | h 176, r 12, crosshair; canvas 540 x 352, bg `#f3f4f1` / `#1b1d1a`, dot step 18, r 5.2, colour `oklch(dark .66 : .74, (1 - y/H)·.15, x/W·360)` |
-| handle | 22 circle, border 3 white, shadow `0 0 0 1px rgba(0,0,0,.25), 0 3px 8px rgba(0,0,0,.35)`, `role=slider`, keys left/right hue 5deg, up/down chroma .05 |
-| stops | pill chips pad `3 5 3 4`, 14 disc + degrees + x 11; up to 3 dots |
-| grain | `Slider` 0-100 |
-| segments | `SegmentedControl`s: Appearance (System/Light/Dark), Accent (Space hue vs the chosen accent) |
-| presets | 8 cols gap 6, round, border line |
-| checks | pills ok/bad at 16 % wash: the four guarantees of §7 |
-| capnote | 11.5 px, shown when `capped` |
+| presets | the eight preset swatches as round swatches, border `--line`; picking one sets hue and chroma |
+| hue slider | one `Slider` 0-360 with the hue ramp as its track; keys left/right hue 5 degrees; the swatch row follows |
+| grain | `Slider` 0-100, default 0 |
+| appearance | `SegmentedControl`: System / Light / Dark |
+| preview | the Space's dot and name |
 
-Every edit writes immediately (no Save button, proposed) and the tint updates live with the
-§5 cross-fade.
+Gone: the 2-D hue-by-chroma field and its handle, the dot chips (up to three dots), the Accent
+segment, the contrast pills and the cap note. Contrast is guaranteed by the tests of section 7,
+never shown. Every edit writes immediately (no Save button) and the tint updates live with the §5
+cross-fade.
 
-## 7. Contrast guarantees (settled floors; tests)
+## 7. Contrast guarantees (settled floors; tests only)
 
-| Pair | Floor | Test (quire `space/palette` tests, proposed names) |
+| Pair | Floor | Test (quire `space/palette` tests) |
 | --- | --- | --- |
-| sidebar/chrome text `--f-ink` on every stop | ≥ 4.5 | `ink_on_every_stop` |
-| faint `--f-ink-faint` on every stop | ≥ 3.0 | `faint_on_every_stop` |
-| accent on card surface | ≥ 3.0 (derivation aims for 4.5) | `accent_on_card` |
-| ink on accent tint (`accent_soft`) | ≥ 4.5 | `ink_on_accent_soft` |
+| `--ink` on the tint | ≥ 4.5 | `ink_on_tint` |
+| `--ink-faint` on the tint | ≥ 3.0 | `faint_on_tint` |
+| `--ink-soft` on the tint | ≥ 4.5 | `soft_on_tint` |
 
-Run over: 8 presets x {light, dark}, plus a sweep of hue 0-355 step 5 x chroma {0, .25, .5,
-.75, 1} for 1-dot Spaces (proposed). Chrome pairs are also measured with the material tint
-composited over pure black and pure white backdrops (PLAN test
-`material-legible-over-black-and-white`). The existing mailo tests in
-`palette.rs` `mod tests` move with the file.
+Run over the 8 presets x {light, dark}, plus a sweep of hue 0-355 step 5 at chroma {.06, 1}. The
+sidebar pairs are also measured with the Sidebar material composited over pure black and pure white
+backdrops. The accent contrast tests (accent on surface, ink on accent tint) belong to 03 section 20
+and no longer depend on a Space.
 
 ## 8. Wallpaper (proposed)
 
-The wallpaper is independent of the Space: it does not change on workspace switch, and the
-tint sits only on shell chrome. Reason: a per-workspace wallpaper swap is a full-screen
-repaint on every switch and would compete with the tint as the Space's colour claim.
+The wallpaper is independent of the Space: it does not change on workspace switch, and the tint
+never reaches it.
 
 ## 9. Apps opting in
 
-- Default: apps do not show the Space colour (paper only).
-- Mail's window frame does (settled design): it renders its own `.ds-layer` A/B and grain
-  from a `SpaceLook`.
-- Opt-in API (proposed): `Ds { look: Some(look) , material: Window }` on the app root; a
-  running app learns the workspace's look through `ds-settings` (`use_environment`), keyed by
-  the workspace its toplevel is on.
+- A window that has a `Sidebar` takes the Space tint on its ground; mailo does too. Nothing else
+  in an app changes with the Space.
+- API (proposed): `Ds { look: Some(look), .. }` on the app root; a running app learns the
+  workspace's look through `ds-settings` (`use_environment`), keyed by the workspace its toplevel
+  is on.
 
-## 10. Storage (settled path and schema)
+## 10. Storage (settled path; target (clean-up phase) schema)
 
 `$XDG_CONFIG_HOME/quire/spaces.json`, atomic write (the `ds-settings` writer), watched with
-`notify` (rename replaces inode; debounce 30 ms). **Settled** (2026-09-24, sill gap Q3):
-`ds::style::space::store::SpaceStore` is this schema (`crates/ds-style/src/space/store.rs`); a consumer reads, writes and
-watches it through `ds-settings`'s generic settings file API (`Settings<SpaceStore>` with
-`Format::Json`). A `null` in `by_index` means "no look stored at this
+`notify` (rename replaces inode; debounce 30 ms). `ds::style::space::store::SpaceStore` is the
+schema (`crates/ds-style/src/space/store.rs`), read and written through `ds-settings`'s
+`Settings<SpaceStore>` with `Format::Json`. A `null` in `by_index` means "no look stored at this
 position".
 
 ```json
 {
-  "version": 1,
+  "version": 2,
   "by_id": {
-    "<cosmic workspace id>": { "dots": [{"hue": 268, "chroma": 0.72}, {"hue": 318, "chroma": 0.55}],
-                               "grain": 35, "theme": "system", "card_accent": "chosen" }
+    "<cosmic workspace id>": { "hue": 268, "chroma": 1, "grain": 0, "theme": "system" }
   },
   "by_index": [ { "...": "SpaceLook for workspace 0 on its output" } ]
 }
 ```
 
-Lookup (settled; `SpaceStore::look_for_workspace`): `by_id[workspace id]` if the compositor gives a stable id
-(ext-workspace `id` event), else `by_index[position]`, else the §4 default. Writes go to
-`by_id` when an id exists and always also to `by_index`, so a restart that renumbers ids
-still finds a look.
+**Migration (version 1 to 2, settled 2026-10-02).** An existing Space keeps its **first dot's hue**
+(and that dot's chroma factor, which is 1 for every preset but Stone); the extra dots and
+`card_accent` are dropped; a `grain` value the user set is kept as it is (a stored 35 stays 35;
+only Spaces with no stored look default to 0). `theme` is kept. A version-1 file is read, converted
+and rewritten once.
+
+Lookup (`SpaceStore::look_for_workspace`): `by_id[workspace id]` if the compositor gives a stable
+id (ext-workspace `id` event), else `by_index[position]`, else the §4 default. Writes go to
+`by_id` when an id exists and always also to `by_index`.
 
 ## 11. Open decisions
 
-1. Mail has its own Spaces (Work, Home). Does mail's frame follow its own Space, the desktop
-   workspace's, or its own unless unset? Proposed: its own, falling back to the workspace's.
-2. Tint alpha over blur (.80 proposed).
-3. Grain default 40 for presets 3-8.
-4. Do notifications, OSD and power menu take the tint? Proposed no.
-5. Per-output workspaces: which look does a dock spanning one output use when the focused
-   window is on another? Proposed: the dock's own output.
-6. Whether COSMIC workspace ids are stable across sessions; decides whether `by_id` is useful.
-7. Wallpaper independence (§8).
+1. Does mailo's sidebar follow its own Space, the desktop workspace's, or its own unless unset?
+   Proposed: its own, falling back to the workspace's.
+2. Per-output workspaces: which look does a dock spanning one output use when the focused window is
+   on another? Resolved by 3: the dock takes no tint, so none.
+3. Whether COSMIC workspace ids are stable across sessions; decides whether `by_id` is useful.
+4. Migration keeps the first dot's chroma factor as well as its hue (the decision names the hue
+   only); confirm, or force chroma 1.
 
 ## 12. Sources
 
-- PLAN "UX decisions settled with the user (2026-09-23, second round)", "Spaces on the
-  desktop"; "Design: `<ds>`" (`SpaceLook`, `FrameVars`, `Ds`, `BlurState`); Appendix A3
-  (derivation, presets, grain), A4 (Space editor), A6 (Space switch).
-- `~/mailo/crates/mail-app/src/palette.rs` lines cited in §2.
-- `~/mailo-design/mailo-spaces.html` lines 816 (headline), 1180-1193 (layer swap, `--f-*`).
+- PLAN "UX decisions settled with the user (2026-09-23, second round)", "Spaces on the desktop";
+  `30-CATALOGUE.md` section 3.4.
+- `crates/ds-style/src/space/palette.rs` (the quiet tint's constants).
 - SPEC "Workspaces" (cctk, pinning, naming, reorder).
