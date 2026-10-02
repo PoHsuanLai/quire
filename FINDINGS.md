@@ -16,6 +16,13 @@ that rev.
 
 ## Open items
 
+- **`PdfPage::Ready` carries a PNG `data:` URL, not pixels.** `ds` is renderer-free and `PdfThumb` is a `ds`
+  component, while `TextureLayer` lives in `ds-blitz`, so the page type in `ds` cannot hold a texture
+  or be drawn as one; `pdf_thumb_bytes` rasterises, encodes a PNG and `PdfThumb` draws it as an `<img>`
+  (`pdf_thumb/raster.rs`). A consumer that draws pictures as textures (anyview's pane) meets one picture
+  that is not. Ends when `ds-blitz` offers the cached first page as straight RGBA (a `pdf_thumb_pixels`
+  beside `pdf_thumb_blocking`, over the same cache and the same `DeviceBox`) and the PNG is made only
+  where `PdfThumb` draws it; `PdfPage::Ready` then keeps its `ImageSource` for `ds`'s own users.
 - **Part 4 names still alive after step 4a.8.** `use_pulse`, `PulseKey` and `Pulse` stay in `ds-motion` as
   the alias machinery of the one shake (`use_shake`); they are no longer a way to flourish, and
   `use_once` is private. `PaneSlide` stays because `PaneSwitcher` draws from it.

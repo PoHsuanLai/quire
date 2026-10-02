@@ -25,6 +25,7 @@ const VIEW: Viewport = Viewport {
 enum Kind {
     Web,
     Emoji,
+    Slot,
 }
 
 /// The pane as the person sees it: sill's `PaneState`.
@@ -69,6 +70,12 @@ fn content(pane: Pane) -> PaneContent {
         Pane::Showing(Kind::Emoji) => PaneContent::Emoji {
             glyph: "🙂".to_string(),
             name: "slightly smiling face".to_string(),
+        },
+        Pane::Showing(Kind::Slot) => PaneContent::Slot {
+            label: "Photo.jpg".to_string(),
+            element: rsx! {
+                div { class: "caller-peek", "A picture the caller draws" }
+            },
         },
         Pane::Hidden | Pane::Showing(Kind::Web) | Pane::Pending | Pane::Failed => {
             PaneContent::Web {
@@ -258,4 +265,29 @@ fn reduced_snaps_the_media_and_keeps_the_ring_turning() {
         attr(&harness, ".ds-preview-pending .ds-progress", "data-pending"),
         "step"
     );
+}
+
+#[test]
+fn a_slot_keeps_the_cross_fade_the_pending_look_and_the_actions() {
+    let mut harness = Harness::new(Launcher, VIEW);
+    shown_remotely(&mut harness);
+    remote(&mut harness, Pane::Showing(Kind::Slot));
+    assert_eq!(attr(&harness, ".ds-preview", "data-content"), "slot");
+    assert_eq!(harness.count(".ds-preview-media .caller-peek"), 1);
+    assert!(
+        fading(&harness),
+        "the caller's element fades in like any media"
+    );
+    assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "present");
+    settle_until(&mut harness, |h| !fading(h));
+    remote(&mut harness, Pane::Pending);
+    assert_eq!(harness.count(".ds-preview-pending"), 1);
+    assert_eq!(
+        harness.count(".caller-peek"),
+        0,
+        "the pending look replaces the slot's element"
+    );
+    remote(&mut harness, Pane::Showing(Kind::Slot));
+    assert_eq!(harness.count(".ds-preview-media .caller-peek"), 1);
+    assert_settles_to_zero_frames(&mut harness);
 }
