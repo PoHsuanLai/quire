@@ -22,4 +22,5 @@ pub use crate::net::DsNet;
 pub use crate::node_ref::DocRef;
 pub use crate::scheme::follow_root as follow_scheme;
 pub use crate::setup::Setup;
+pub use crate::texture_layer::attached_gpu;
 pub use crate::wake::Wakeup;

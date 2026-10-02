@@ -2,16 +2,16 @@
 //! pointer and wheel events, with the clock and the quiet timer a scroll needs. The machine is
 //! pure (`swipe.rs`); this owns the time.
 
-use super::swipe::{Click, Stamp, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
+use super::swipe::{Click, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
 use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
 use ds_core::time::clock::sleep;
+use ds_core::time::stamp::{FrameClock, Stamp};
 use ds_core::vocab::PressPhase;
 use ds_style::scope::{Scope, use_scope_signal};
 use ds_style::task::{Gone, spawn_in, try_get, try_set};
 use ds_style::tokens::delay::DelayToken;
-use std::time::Instant;
 
 /// A live swipe: read its state in render, feed it from the card's listeners.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -20,7 +20,7 @@ pub struct Swiper {
     quiet: Signal<Option<Task>>,
     env: Signal<Scope>,
     scope: ScopeId,
-    origin: Instant,
+    clock: FrameClock,
     metrics: SwipeMetrics,
     on_dismiss: EventHandler<()>,
 }
@@ -56,7 +56,7 @@ impl Swiper {
 
     /// Now, as the machine's stamp.
     pub fn now(&self) -> Stamp {
-        Stamp(ds_core::time::clock::since(self.origin))
+        self.clock.now()
     }
 
     fn try_feed(&self, input: SwipeInput) -> Result<(), Gone> {
@@ -99,7 +99,7 @@ pub fn use_swipe(metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> Swiper 
         quiet: use_signal(|| None),
         env: use_scope_signal(),
         scope: use_hook(current_scope_id),
-        origin: use_hook(ds_core::time::clock::now),
+        clock: use_hook(FrameClock::started),
         metrics,
         on_dismiss,
     }

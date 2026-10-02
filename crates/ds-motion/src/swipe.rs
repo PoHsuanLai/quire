@@ -9,6 +9,7 @@
 //! The machine decides; `use_swipe` owns the clock and the timers and draws the offset.
 
 use ds_core::geometry::units::Px;
+use ds_core::time::stamp::Stamp;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 use ds_style::tokens::delay::DelayToken;
@@ -17,10 +18,6 @@ use std::time::Duration;
 /// A speed in logical pixels per second.
 #[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
 pub struct Speed(pub f32);
-
-/// When something happened, measured from any fixed origin the caller keeps.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
-pub struct Stamp(pub Duration);
 
 /// The swipe's thresholds (`notifications.swipe_dismiss_px`, `swipe_dismiss_velocity_px_s`,
 /// `swipe_damping`).
@@ -267,10 +264,10 @@ fn release_speed(last: Sample, before: Option<Sample>, at: Stamp) -> Speed {
     let Some(before) = before else {
         return Speed(0.0);
     };
-    if at.0.saturating_sub(last.at.0) > DelayToken::ReleaseWindow.delay() {
+    if Duration::from_millis(at.since(last.at)) > DelayToken::ReleaseWindow.delay() {
         return Speed(0.0);
     }
-    let seconds = last.at.0.saturating_sub(before.at.0).as_secs_f32();
+    let seconds = last.at.since(before.at) as f32 / 1000.0;
     if seconds <= 0.0 {
         return Speed(0.0);
     }

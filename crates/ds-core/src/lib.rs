@@ -10,6 +10,7 @@ pub mod base64;
 pub mod colour;
 pub mod error;
 pub mod geometry;
+pub mod machine;
 pub mod png;
 pub mod press;
 pub mod spawner;

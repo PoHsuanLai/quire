@@ -79,9 +79,15 @@ impl Harness {
         // the harness's clock.
         let time = HarnessClock::start(config.clock());
         let viewport = config.viewport();
-        let mut doc = Headless::new(app, viewport, config.setup());
+        // Opened first: a hybrid painter's device is the app's `use_gpu` from the first render.
+        let painter = crate::harness_backend::painter(&config);
+        let mut setup = config.setup().clone();
+        if let Some(gpu) = painter.gpu() {
+            setup.contexts = setup.contexts.with(gpu);
+        }
+        let mut doc = Headless::new(app, viewport, &setup);
         doc.layout = config.layout();
-        doc.painter = crate::harness_backend::painter(&config);
+        doc.painter = painter;
         let mut harness = Harness {
             viewport,
             doc,
