@@ -7,6 +7,7 @@ mod panes;
 use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::chrome::sidebar::Sidebar;
+use ds::components::chrome::sidebar_section::SidebarSection;
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
@@ -133,7 +134,7 @@ pub fn SettingsWindowPage() -> Element {
             label: "Settings",
             size: SidebarSize::Medium,
             cursor: Some(category().slug()),
-            items: sidebar_items(category(), &query(), go),
+            sections: vec![SidebarSection::List(sidebar_items(category(), &query(), go))],
             onselect: move |key: &'static str| {
                 if let Some(next) = Category::parse(key) {
                     go.call(next);

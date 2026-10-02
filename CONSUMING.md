@@ -715,6 +715,17 @@ spinner that turns only while the `Operation` is `Running`, `Attention { why }` 
 `why` as its tooltip and accessible name. `onstatus: Option<EventHandler<K>>` hears the key of a tile whose
 warning was pressed; that press is neither a pick (`onpick`) nor the start of a drag.
 
+Window layout (design/30 §2.7, `ds::components::chrome`): a source-list sidebar is
+`Sidebar { label, sections, size, cursor, onselect, header, foot, ground }`. `sections` is a
+`Vec<SidebarSection<K>>`, top to bottom: `SidebarSection::List(items)` is a source-list `List` (its group
+headings are its own `ListItem::heading`s) and `SidebarSection::Custom(element)` is anything else the
+sidebar holds between its lists, such as `PinTiles` or `TodayTabs`, whose heading and selection you draw.
+The sections scroll; `header` stays above them and `foot` (a Space's name, dots and buttons) stays under
+them. One `cursor` runs across every list, so the app keeps one selected place. `ground` is
+`Ground::Paper` (the default: the sidebar material, a quiet source list) or `Ground::Frame`, which draws no
+ground of its own, so the Space's colour shows through, and takes the frame's inks (`--f-ink*`) for the
+text and the row fills. Rows inside it need no variant.
+
 Anchors, hover-card parts and undo:
 
 - `Button` takes `common.mounted: Option<EventHandler<MountedEvent>>`: the element

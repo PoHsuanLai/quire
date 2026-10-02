@@ -6,6 +6,7 @@ mod drag_ghost;
 mod field_row;
 mod menu_bar;
 mod sidebar;
+mod sidebar_sections;
 mod split_view;
 mod stepper;
 mod tab_view;
@@ -24,7 +25,8 @@ pub fn StructurePage() -> Element {
         table::TableSection {}
         toolbar::ToolbarSection {}
         split_view::SplitViewSection {}
-        sidebar::SidebarSection {}
+        sidebar::SidebarListSection {}
+        sidebar_sections::SidebarSectionsSection {}
         tab_view::TabViewSection {}
         field_row::FieldRowSection {}
         menu_bar::MenuBarSection {}
