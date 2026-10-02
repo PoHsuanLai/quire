@@ -717,7 +717,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   `SurfaceResized` and `Focused`. `show_window_menu` is implemented for Wayland toplevels despite
   its doc.
 - Close is blitz-shell's `ShellProvider::request_window_close`, handled as `CloseRequested`: the
-  window drops and the loop exits, with no veto hook.
+  window drops, with no veto hook. Whether the loop then ends is the app's `LastWindowClosed`.
 - `with_decorations(false)` asks for no second frame; winit-wayland is built with `sctk-adwaita`,
   so server decorations on a compositor without xdg-decoration draw adwaita's frame.
 - `app_id` goes to winit as the Wayland or X11 platform attribute; Wayland is chosen when
@@ -735,10 +735,23 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   loop itself, one `DioxusNativeApplication` per window under its own `ApplicationHandler`
   (`window_shell`), with its own copies of the two private providers (the `dioxus:` asset net
   provider and the link opener).
-- **blitz-shell exits the loop when an application's last window closes**, and every second
-  window is its own application's last, so a second window's close is relayed and drops that
-  application; the first window's close drops the others first, then ends the loop.
-- **A closed window's renderer is suspended and kept** for the next window (Open items).
+- **blitz-shell exits the loop when an application's last window closes**, and every window is
+  its own application's last, so a close is relayed and drops that application only; the loop
+  ends by `crate::app_life` (`LastWindowClosed::{Exit, StayFor}`, `AppHandle::quit`), applied
+  after each close and, for a linger, by a `ControlFlow::WaitUntil` deadline. The first window
+  is a request like any other and the loop starts with none, so the first window has no
+  privilege: closing it leaves the others up.
+- **Threads reach the loop through `AppHandle`** (a mutex-guarded queue and the winit proxy's
+  wake). `open_window` needs a component's context, so a D-Bus or timer task cannot use it.
+- **A closed window's renderer is parked and kept** for the next window (Open items). The vello-hybrid
+  renderer caches the winit window it drew past `suspend`, so a renderer set aside as it was kept
+  the closed window mapped and frozen on screen (found 2026-10-03 with a KWin script closing a
+  window of the viewer: `workspace.windowList()` still listed it, and the process was warm with
+  none left). `Windows::park` resumes the renderer on a window of the loop's own that is never
+  shown (Wayland maps a window only once a buffer is attached, and the parking surface is never
+  drawn) and suspends it again, which lets the closed window go and keeps the renderer's device:
+  the next window opens in 30 ms after the request (device and adapter reused), against 100 to
+  170 ms with a renderer dropped or a fresh one.
 
 ### File drops
 
@@ -759,6 +772,42 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - dioxus-native's `clipboard` feature is on (blitz-shell over arboard 3.6), so Ctrl+C/X/V work in
   every field of a `launch` window. The app's calls answer `NoHost` outside a ds-blitz document,
   or `Unavailable`. The harness keeps an in-memory clipboard with an HTML slot.
+
+### Cold start of the first window
+
+Measured 2026-10-03 on a release build of the anyview binary showing a 1058 x 618 JPEG, Wayland
+(KWin), an AMD iGPU (RADV) and an NVIDIA dGPU over Vulkan, no session bus. Times are from
+`date +%s%N` taken before `exec` to `SystemTime` stamps printed at each step (8 runs, medians,
+on a machine other builds were also using, so about +-10 ms).
+
+| Step | Default backends | `WGPU_BACKEND=vulkan` |
+|---|---|---|
+| process start to `launch` | 3.5 ms | 3.5 ms |
+| event loop (Wayland connect) | 6 ms | 6 ms |
+| `DioxusNativeWindowRenderer::new` (a `wgpu::Instance`) | 77 ms | 58 to 68 ms |
+| fonts, VirtualDom, document | 10 ms | 10 ms |
+| window, first render, adapter, device, surface, pipelines | 92 ms | 50 to 60 ms |
+| first frame painted | 11 ms | 11 ms |
+| **process start to first frame** | **190 to 200 ms** | **127 to 150 ms** |
+
+- A window with an empty `Ds` root (a throwaway example, not kept) is within noise of the viewer's, so the
+  time is not the app's UI: it is the GPU stack's.
+- `wgpu::Instance::new` is 77 to 100 ms the first time in a process and 10 ms the second (the
+  Vulkan loader and its drivers load once), and the first `request_adapter` on all backends is
+  60 to 68 ms against 13 ms on Vulkan alone: the renderer's `WGPUContext` passes `display: None`,
+  so the GL backend can never produce an adapter on Linux (`WGPU_BACKEND=gl` panics with no
+  adapter) and its probe is the whole difference. quire cannot narrow the backends: the renderer
+  reads them from `WGPU_BACKEND` only, and `std::env::set_var` is unsafe and forbidden
+  (CONVENTIONS section 2).
+- Tried and dropped, no gain beyond noise (+-10 ms): a thread that loads the system fonts while
+  the main thread builds the document; a thread that creates a `wgpu::Instance` and an adapter at
+  the start of `launch`, kept alive (the main thread's own instance then waits on the same
+  loader and driver initialisation); building the renderer after the document instead of
+  before. The chain (instance, adapter, device) is serial inside the driver, and nothing else
+  the first frame needs is long enough to hide behind it.
+- Ends when the renderer takes its backends as an option (an `anyrender_vello_hybrid` change:
+  `VelloHybridRendererOptions::backends`) and `AppConfig` passes Vulkan on Linux; until then an
+  app sets `WGPU_BACKEND=vulkan` in the environment its launcher gives it.
 
 ## Layout, hit testing and hover
 

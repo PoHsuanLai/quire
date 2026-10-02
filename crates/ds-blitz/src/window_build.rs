@@ -5,6 +5,7 @@
 //! dioxus-native adds its window contexts (the document, the window, `use_window_event`'s
 //! registry, the shell, history, the renderer) when its application creates the window.
 
+use crate::app_handle::AppHandle;
 use crate::app_id::{AppId, with_app_id};
 use crate::fonts::font_context;
 use crate::host::{Host, HostProps};
@@ -24,13 +25,15 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
 
-/// What every window of the app shares: what the app gave `launch`, and the request queue.
+/// What every window of the app shares: what the app gave `launch`, the request queue and the
+/// app's handle.
 #[derive(Clone)]
 pub(crate) struct Base {
     pub(crate) setup: Setup,
     pub(crate) app_id: Option<AppId>,
     pub(crate) decorations: Decorations,
     pub(crate) requests: Requests,
+    pub(crate) handle: AppHandle,
 }
 
 /// How one window starts.
@@ -81,6 +84,7 @@ pub(crate) fn window_config(
     let mut vdom = VirtualDom::new_with_props(Host, HostProps::new(root, base.setup.clone()));
     base.setup.contexts.install(&mut vdom);
     vdom.provide_root_context(base.requests.clone());
+    vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());
     let net: Arc<dyn NetProvider> = Arc::new(AssetNet);
     vdom.provide_root_context(Arc::clone(&net));
