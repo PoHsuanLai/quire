@@ -2,7 +2,7 @@
 
 ## 1. What this governs
 
-This file fixes the two typefaces (System and Editorial) and the faces each maps its jobs to,
+This file fixes the one typeface (Inter, with the bundled mono for code) and the faces each job maps to,
 which job each element uses, every size, weight, line-height and tracking pair, the text colours that go with them, numerals, and the truncation
 rules. It covers the mail prototype's elements exhaustively so a shell surface can pick the
 matching role instead of inventing a size. Colour tokens are named here and defined in
@@ -13,23 +13,24 @@ every conflict with `C`.
 
 Five jobs, each with one token: display for names and headings, UI for reading and controls,
 data for anything machine-shaped, code where a fixed pitch carries meaning, serif for a message a
-person writes in a serif. Which face does each job is the root's **typeface**
-(`appearance.typeface`, `22-SETTINGS.md` section 3.1; `Ds { typeface }`, written as
-`data-typeface` on every `.ds`, like the theme).
+person writes in a serif. There is one voice: the System one. The earlier second typeface
+("Editorial": Bricolage Grotesque, Karla, Space Mono) is dropped (30 section 3.4); the typeface
+setting and `data-typeface=editorial` are history, and the Editorial values in the tables below
+are kept only as the prototype's record (marked "history").
 
 The user's decision (2026-09-26): "make this desktop use mostly inter". The reference desktop's
 system font (SF Pro) is licensed for its own platform only; Inter (SIL OFL 1.1, rsms/inter) is
 the open equivalent, and has a Display optical cut for large sizes. Inter is the system face of
 the whole desktop; the monospace face stays only where monospace carries meaning (code, `Kbd`,
-aligned logs); mail's editorial faces remain an opt-in voice for an app, not the default.
+aligned logs).
 
-| Token | System (default) | Editorial | Job |
-| --- | --- | --- | --- |
-| `--font-display` | Inter Display (`opsz` 32), `wght` 500..800 | Bricolage Grotesque | headings, names, initials in avatars, Space name, big numbers, the lock clock |
-| `--font-ui` | Inter (`opsz` 14), `wght` 400..700; italic 400 | Karla | body text and every control |
-| `--font-data` | Inter, always tabular (`font-variant-numeric:tabular-nums` on every data rule) | Space Mono | eyebrows, section headers, counts, times, chips, shortcuts, tokens, table heads |
-| `--font-code` | Space Mono | Space Mono | code, `Kbd`, aligned logs |
-| `--font-serif` | Noto Serif | Noto Serif | a message written in a serif, and the control that offers it |
+| Token | Face | Job |
+| --- | --- | --- |
+| `--font-display` | Inter Display (`opsz` 32), `wght` 500..800 | headings, names, initials in avatars, Space name, big numbers, the lock clock |
+| `--font-ui` | Inter (`opsz` 14), `wght` 400..700; italic 400 | body text and every control |
+| `--font-data` | Inter, always tabular (`font-variant-numeric:tabular-nums` on every data rule) | counts, times, chips, shortcuts, tokens, table heads |
+| `--font-code` | Space Mono | code, `Kbd`, aligned logs |
+| `--font-serif` | Noto Serif | a message written in a serif, and the control that offers it |
 
 ```css
 /* .ds (System) */
@@ -37,21 +38,11 @@ aligned logs); mail's editorial faces remain an opt-in voice for an app, not the
 --font-ui:"Inter",system-ui,sans-serif;
 --font-data:"Inter",system-ui,sans-serif;
 --font-code:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
-/* .ds[data-typeface=editorial]: exactly the prototype's (S:20-22, identical in C:44-46) */
---font-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
---font-ui:"Karla","Segoe UI",system-ui,sans-serif;
---font-data:"Space Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
 ```
 
-Editorial's faces, as the prototype loads them:
+History: the Editorial faces (Bricolage Grotesque, Karla) are not part of the design; the code that still ships or loads them goes in the clean-up phase (target).
 
-| Face | Axes and weights loaded by `S` | Loaded by `C` |
-| --- | --- | --- |
-| Bricolage Grotesque | variable, `opsz` 12..96, `wght` 500..800 | static instances at opsz 12..96: 500, 700, 800 |
-| Karla | roman `wght` 400..700; italic 400 | roman 400, 500, 600, 700; italic 400 |
-| Space Mono | 400, 700 | 400, 700 |
-
-Loading URLs: `S:4`, `C:4`. The design system ships the faces as subset TTFs (latin plus
+The design system ships the faces as subset TTFs (latin plus
 latin-ext) registered with the renderer, not as CSS `@font-face` (`P:289`, `P:306`, `P:324`).
 Inter is cut from the official Inter 4.1 release (`crates/ds-style/scripts/cut-inter.sh` records the
 zip's SHA-256): the renderer sets no optical size from the font size, so the variable font's
@@ -61,31 +52,28 @@ zip's SHA-256): the renderer sets no optical size from the font size, so the var
 
 ### 2.1 The voice tokens
 
-Sizes stay per role in both typefaces. What Inter wants differently is tracking (its own dynamic
-metrics: tight at display sizes, zero at body, far less than a monospace face in caps) and the
-weight of a caps label (a monospace label reads at 400; Inter caps at 9.5-10 px need 600 to hold
-the line). Those values are tokens, declared per typeface on `.ds`:
+Inter wants its own tracking (its dynamic metrics: tight at display sizes, zero at body). Those
+values are tokens on `.ds`:
 
-| Token | System | Editorial | Used by |
-| --- | --- | --- | --- |
-| `--tracking-heading` | -0.02em | -0.015em | `h1`-`h3` |
-| `--tracking-lock-clock` | -0.02em | -0.035em | the lock screen's time |
-| `--tracking-lock-date` | -0.01em | 0.01em | the lock screen's date |
-| `--tracking-caps` | 0.06em | 0.14em | eyebrow; section header (frame, field, menu); calendar weekday heads; checks heading |
-| `--tracking-caps-narrow` | 0.06em | 0.12em | group header; section header (group); calendar month |
-| `--fw-caps` | 600 | 400 | the same caps labels (the calendar month stays 700) |
-| `--fs-caps` | `--fs-micro` (9.5) | `--fs-eyebrow` (11) | eyebrow |
-| `--tracking-mono` | 0 | -0.02em | `.ds-mono` |
-| `--fs-mono` | .86em | .78em | `.ds-mono` |
+| Token | Value | Used by |
+| --- | --- | --- |
+| `--tracking-heading` | -0.02em | `h1`-`h3` |
+| `--tracking-lock-clock` | -0.02em | the lock screen's time |
+| `--tracking-lock-date` | -0.01em | the lock screen's date |
+| `--tracking-mono` | 0 | `.ds-mono` |
+| `--fs-mono` | .86em | `.ds-mono` |
 
-The eyebrow under System is Inter SemiBold small-caps-like: uppercase, 0.06em apart, at
-`--fs-micro`.
+Headings that group things (the old "eyebrow", section, group and weekday headers) are not caps and
+not tracked: sentence case, 11 px, secondary ink (`--ink-soft`), weight 500 or 600, tracking 0.
+The caps-tracked tokens `--tracking-caps`, `--tracking-caps-narrow`, `--fw-caps` and `--fs-caps`
+are deleted. Status: **target (clean-up phase)**; the code still emits them and the eyebrow rule
+still uppercases until the clean-up lands.
 
 ## 3. Base text
 
 Every element inherits one base: UI face, 15 px, line-height 1.55, antialiased. The block below
-is `S`'s; in the design system the tracking and the eyebrow's size and weight are the voice
-tokens of section 2.1, which under Editorial carry exactly these values.
+is `S`'s, the prototype's record (history); in the design system the tracking is the voice
+tokens of section 2.1 and the eyebrow rule is the sentence-case heading of section 2.1.
 
 ```css
 body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font-ui);
@@ -93,7 +81,7 @@ body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--fon
 h1,h2,h3{ font-family:var(--font-display); font-weight:700; margin:0; letter-spacing:-.015em; text-wrap:balance; }
 button{ font:inherit; color:inherit; }
 .mono{ font-family:var(--font-data); font-size:.78em; letter-spacing:-.02em; }
-.eyebrow{ font-family:var(--font-data); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); }
+.eyebrow{ font-family:var(--font-data); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint); } /* history: now sentence case, untracked, --ink-soft (section 2.1) */
 kbd{ font-family:var(--font-data); font-size:10.5px; border:1px solid var(--line); border-bottom-width:2px;
   border-radius:5px; padding:1px 5px; color:var(--ink-soft); background:var(--surface-2); }
 ```
@@ -124,7 +112,7 @@ Every size in 4.2 stays, role for role; the faces and the pairs move as follows.
 | 12.5-16 (UI: body, controls, rows) | Inter | as in 4.2 (400/500/600/700) | 0 | Inter's metrics give -0.004em at 13 and -0.011em at 16; the stylesheet keeps body at 0 |
 | 9-12 (UI: help, small, tooltips) | Inter | as in 4.2 | 0 | Inter's metrics give +0.005em at 11 |
 | 9.5-11.5 (data: times, counts, chips, shortcuts, cells) | Inter, tabular | 400 (700 where 4.2 says so) | 0, or as in section 5 for the non-caps rows | tabular figures everywhere the data face is used |
-| 9.5-11 (data caps: eyebrow, section headers, group heads, weekday heads, checks heading) | Inter, tabular | 600 (`--fw-caps`) | 0.06em (`--tracking-caps`, `--tracking-caps-narrow`) | the eyebrow drops from 11 to `--fs-micro` 9.5 |
+| 11 (headings: section headers, group heads, weekday heads, checks heading) | Inter, tabular | 500-600 | 0 | sentence case, `--ink-soft`; the caps rows of the old table are retired (section 2.1; target (clean-up phase)) |
 | 7.5-12.5 (display 800: initials, marks) | Inter Display | 800 | 0 | |
 | 9.5-10.5 (code: `Kbd`) | Space Mono (`--font-code`) | 400 | 0 | unchanged |
 
@@ -142,10 +130,10 @@ rounded to .5 px, so the drawn caps keep the measured heights. Settled, open dec
 | `--fs-lock-clock` | 140 | 127 | 92.39 (92.40) |
 
 Three more sizes follow the typeface: under System `--fs-nano` (9), `--fs-micro` (9.5) and
-`--fs-dial` (9, fitted to 8) are raised to the 10 px floor (section 12). Editorial keeps the
+`--fs-dial` (9, fitted to 8) are raised to the 10 px floor (section 12). The Editorial column keeps the
 prototype's values.
 
-### 4.2 Under Editorial (the prototype's pairs)
+### 4.2 The prototype's pairs (history, Editorial values)
 
 `S` uses 22 distinct sizes between 7.5 and 26 px in app surfaces. This is the full ramp with the
 role each size carries; every row cites its rules.
@@ -212,9 +200,10 @@ Above them sits `--fs-lock-clock` 140 (127 under System), the lock screen's time
 
 ## 5. Tracking
 
-Letter-spacing is fixed per role; uppercase data text is always tracked wide. The table is
-Editorial's; under System the rows that are voice tokens (section 2.1) take Inter's values, and
-the others (0.02em, 0.06em, 0.08em, 0.1em) are kept, since they are small enough to suit Inter.
+Letter-spacing is fixed per role. There is no uppercase tracked text any more: the rows below that
+say "upper" are the prototype's record (history) and now read as sentence-case headings with 0
+tracking (section 2.1); the voice-token rows take Inter's values, and the others (0.02em, 0.06em,
+0.08em) are kept, since they are small enough to suit Inter. Target (clean-up phase) for the code.
 
 | Tracking | Where | Source |
 | --- | --- | --- |
@@ -346,8 +335,7 @@ mark, which is a drawing in an 11 px mark, not text (a reviewed exception in qui
 The lint `MinFontSize` (a warning under Strict until sill and mailo are swept, design/27 section
 7) flags a `font-size` or `font` literal under 10 px (`pt` counted as 4/3 px) and a
 `var(--fs-*)` whose System value is under 10. A drawing that needs a smaller size names its
-selector in an `Exception` with the reason. Editorial (mailo's voice) keeps the prototype's
-ramp; the 13 px shell density is H5's (design/27 section 8, decision 1).
+selector in an `Exception` with the reason. The 13 px shell density is H5's (design/27 section 8, decision 1).
 
 ## 13. Writing
 
@@ -359,7 +347,7 @@ rest is a reviewer's line (CHECKLIST section 1b).
 | Element | Case | Example |
 | --- | --- | --- |
 | Button, menu item, menu title, segment label, tab label, column heading, toolbar item | Title Case | "Move to Trash", "Show All Tabs" |
-| Section header (sidebar, settings group, menu section) | Title Case, not upper-case, not tracked (H5 moves the caps headers) | "Favourites" |
+| Section header (sidebar, settings group, menu section) | Sentence case, 11 px, secondary ink; never upper-case, never tracked | "Favourites" |
 | Setting label beside a control (box, slider, pop-up) | Sentence case ending in a colon | "Show in menu bar:" |
 | Alert title | Title Case, no end punctuation, or a question | "Delete This Space?" |
 | Alert and notification body, help text, empty states, errors | Sentence case with punctuation | "Choose a password with at least 8 characters." |

@@ -2,7 +2,7 @@
 
 ## 1. What this governs
 
-This file fixes where things sit and how big they are: the window grid, the sidebar, the card
+This file fixes where things sit and how big they are: the window grid, the sidebar, the content
 with its list and reader, rows, overlays and their placement, the composer page, every radius,
 fixed control sizes, the spacing scale, z-order, responsive behaviour, and the shell surfaces
 (bar, dock, launcher and the rest). All values are CSS pixels, which the implementation treats
@@ -21,7 +21,7 @@ and margin in `S`'s app surfaces is one of these values:
 | Common steps | 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18, 22, 26, 36 |
 | Odd values | 1.5 (chip padding-y), 40 (composer scroll bottom), 46 (gutter offset), 50 (inline reply body padding-left), 56 (page wrap bottom) |
 | Floating-surface clamp margin | 8, always (`S:1724`, `S:2064`, `S:2144-2145`) |
-| Card inset inside the window | 8 (`S:81`) |
+| Content inset inside the window | 0: the window is flush (30 section 3.4) |
 
 `P:955-956`, derived from the `S` rules cited in the sections below.
 
@@ -67,42 +67,27 @@ pure translation (a motion part-way through), a glyph's diagonals and curves, an
 
 ## 3. The window
 
-The window is a coloured frame with the sidebar on the colour and a card inset 8 px on three
-sides. Verbatim:
+The window is flush, like a standard Mac window: the sidebar and the content sit side by side
+with no frame, no inset card, no padding around the content and no card shadow (settled, 30
+section 3.4). The Space tint colours the sidebar ground only (21-SPACES); the content is paper.
+The old frame model (coloured frame, 8 px inset card, `.layer` A/B, `.grain` layer) is
+`archive/01-LAYOUT-frame-model.md`.
 
-```css
-.win{
-  --f-ink:#1b1b22; --f-ink-soft:#44444f; --f-ink-faint:#5d5d6a;
-  --f-pill:rgba(255,255,255,.58); --f-pill-hover:rgba(255,255,255,.34); --f-line:rgba(0,0,0,.08);
-  position:relative; min-width:980px; height:680px; border-radius:18px; overflow:hidden;
-  display:grid; grid-template-columns:232px minmax(0,1fr); padding:8px 8px 8px 0;
-  color:var(--f-ink); isolation:isolate; box-shadow:0 18px 40px -22px rgba(0,0,0,.45);
-  transition:grid-template-columns var(--t-move) var(--e-out), padding var(--t-move) var(--e-out);
-}
-.win.no-side{ grid-template-columns:0 minmax(0,1fr); padding-left:8px; }
-.layer{ position:absolute; inset:0; z-index:-2; transition:opacity 380ms var(--e-out); }
-.grain{ position:absolute; inset:0; z-index:-1; pointer-events:none; mix-blend-mode:overlay; background-size:128px 128px; }
-```
+| Property | Value |
+| --- | --- |
+| Minimum width | 980 (mailo; apps set their own) |
+| Corner radius | window 10 (30 section 3.2) |
+| Columns | sidebar 232 (`SidebarSize` Medium, 30 section 1.6), content `minmax(0,1fr)`, no gap, no padding |
+| Divider | a 1 px hairline between sidebar and content, or the sidebar material's own edge |
+| Sidebar hidden | columns `0 minmax(0,1fr)`; the edge peek (below) brings it back |
+| Shadow | the window shadow only (30 section 3.2); none on the content |
 
-`S:77-87`
-
-| Property | Value | Source |
-| --- | --- | --- |
-| Minimum width | 980 | `S:80` |
-| Height (prototype) | 680 | `S:80` |
-| Corner radius | 18 | `S:80` |
-| Columns | sidebar 232, card `minmax(0,1fr)` | `S:81` |
-| Padding | top 8, right 8, bottom 8, left 0 (the sidebar supplies its own left padding) | `S:81` |
-| Sidebar hidden | columns `0 minmax(0,1fr)`, padding-left 8 | `S:85` |
-| Frame layers | two `.layer` elements (a and b) for the Space cross-fade, then `.grain`, then content | `S:835-838` |
-
-`C` has no frame. Its shell is one bordered panel with three columns
-`206px minmax(0,1fr) minmax(0,1.05fr)`, height `min(72vh,700px)`, min-height 560, border 1 px
-`--line`, radius `--r-panel`, background `--surface`, shadow `--shadow-2` (`C:262-268`). `S` wins.
+Status: **target (clean-up phase)** for the quire code: `.ds-frame`, the `.ds-layer` pair and the 8 px
+card inset still exist and go.
 
 ## 4. The sidebar
 
-The sidebar is a column drawn straight on the colour: command pill, a scrolling slide, a foot.
+The sidebar is a column on its own ground (the Space's flat tint, or paper-grey when a Space has none): command pill, a scrolling slide, a foot.
 
 ```css
 .side{ display:flex; flex-direction:column; min-width:0; padding:10px 10px 8px 12px; overflow:hidden; }
@@ -126,45 +111,22 @@ Order, top to bottom (`S:840-848`, `S:1259`):
 3. `.side-foot`: Space name (margin-right auto, padding-left 4), Space dots (gap 5), `+`, hide
    button (`S:145-153`, `S:843-847`).
 
-Hidden sidebar and edge peek:
-
-```css
-.edge{ position:absolute; left:0; top:0; bottom:0; width:10px; z-index:14; display:none; }
-.win.no-side .edge{ display:block; }
-.win.no-side.side-peek .side{ visibility:visible; position:absolute; left:8px; top:8px; bottom:8px; width:226px; z-index:15;
-  background:var(--f-solid); border-radius:14px; box-shadow:0 20px 40px -16px rgba(0,0,0,.45); animation:slide-r var(--t-move) var(--e-spring); }
-```
-
-`S:451-454`
+Hidden sidebar and edge peek: a 10 px strip at the window's left edge shows a hairline; the pointer
+resting on it (`HoverIntent`) slides the sidebar in over the content as a floating panel 226 wide
+(Sidebar material, window-shadow token, no frame inks), and a click pins it. The old `.edge` /
+`.side-peek` CSS used `--f-solid` and `slide-r` and is in `archive/01-LAYOUT-frame-model.md` terms
+(history).
 
 `C`'s sidebar is a `--surface-2` column with a right border, padding `12px 10px`, gap 2, items
 `.view` padding `7px 9px` radius `--r-chip` (`C:271-274`, `C:300-306`). `S` wins.
 
-## 5. The card
+## 5. The content
 
-The card is Post, inset 8 px, with a flap corner and a list and reader side by side.
-
-```css
-.card{
-  position:relative; display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.08fr); min-width:0;
-  background:var(--surface); border-radius:12px 12px 12px 4px; overflow:hidden;
-  box-shadow:0 0 0 1px rgba(0,0,0,.06), 0 10px 30px -14px rgba(0,0,0,.45);
-}
-.list-col{ display:flex; flex-direction:column; min-width:0; border-right:1px solid var(--line); min-height:0; }
-.list-bar{ display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--line-soft); }
-.list-bar .spacer{ margin-left:auto; }
-.list{ list-style:none; margin:0; padding:8px; overflow-y:auto; flex:1; min-height:0; }
-```
-
-`S:156-164`, `S:174`
-
-| Part | Rule | Source |
-| --- | --- | --- |
-| Columns | list `minmax(0,1fr)`, reader `minmax(0,1.08fr)` | `S:157` |
-| Radius | `12px 12px 12px 4px` (the flap corner is bottom-left) | `S:158` |
-| List bar | padding 11/14, gap 8, bottom border `--line-soft`; title, spacer, "Sidebar" mini (only when hidden), Compose mini | `S:162-164`, `S:852-857` |
-| List | padding 8, scrolls | `S:174` |
-| Divider | list column right border 1 px `--line` | `S:161` |
+The content column fills the window beside the sidebar: a list and a reader side by side
+(`minmax(0,1fr)` and `minmax(0,1.08fr)`, divided by a 1 px `--line`), on paper, with no inset, no
+rounded card corners and no card shadow. A list bar (padding 11/14, gap 8, bottom border
+`--line-soft`) holds the title, a spacer and the toolbar buttons; the list scrolls, padding 8. The
+old "card" markup and its flap corner are `archive/01-LAYOUT-frame-model.md`.
 
 ## 6. Rows
 
@@ -389,8 +351,7 @@ Inside a window, z-index values are fixed; overlays are children of the window.
 
 | z | Layer | Source |
 | --- | --- | --- |
-| -2 | frame `.layer` (a, b) | `S:86` |
-| -1 | `.grain` | `S:87` |
+| -1 | sidebar grain tile (when the Space's grain is above 0) | target (clean-up phase) |
 | 7 | link pill | `S:431` |
 | 8 | undo toast | `S:360` |
 | 9 | floating composer, send pill | `S:373`, `S:706` |
@@ -437,12 +398,12 @@ The shell surfaces reuse the window's geometry language; only the values below a
 | Position | bottom, centred | settled | `P:579`, `P:784` |
 | Layer | Top, anchor BOTTOM | settled | `P:579-580` |
 | Base icon size | 48 | settled | `P:784` |
-| Maximum magnified size | 96 (magnification on by default) | settled | `P:784-785` |
+| Maximum magnified size | 72 (magnification on by default; capped at 72 by the 2026-10-02 decision, was 96) | target (clean-up phase) for the code | 30 section 3.4 |
 | Magnification curve | Plank parabola: `offset = min(\|cursor - center\|, zoomIconSize); p = offset / zoomIconSize; zoom = 1 + (1 - p²)(zoomPercent × progress - 1)`; influence ±1 magnified icon width; progress 0 to 1 on enter and exit | settled curve, constants in `10-BEHAVIOUR-dock.md` | `P:785`, `P:1389-1391` |
 | Neighbours | slide apart; the dock widens; icons rise above the background, baseline fixed | settled | `P:785`, `P:1392-1393` |
-| Surface height | `base × max magnification + padding` (= 96 + padding) | settled formula, padding open | `P:580` |
+| Surface height | `base × max magnification + padding` (= 72 + padding once the cap lands) | settled formula, padding open | `P:580` |
 | Exclusive zone | `Reserve(base + margin)` | settled formula, margin open | `P:580` |
-| Gutters | 8, matching the 8 px card inset (`S:81`) and the 8 px floating clamp (`S:1724`) | settled in the orchestrator's brief for this doc | brief |
+| Gutters | 8, matching the 8 px floating clamp (`S:1724`) | settled in the orchestrator's brief for this doc | brief |
 | Auto-hide | off by default; setting: 0.2 s delay, ~0.5 s slide | settled | `P:784-786` |
 | Input region | element `dock-hit` | settled | `P:580` |
 | Blur region | element `dock-pill`, follows the pill during magnification | settled | `P:581`, `P:493-494` |
