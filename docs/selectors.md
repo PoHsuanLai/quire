@@ -45,6 +45,7 @@ re-theme every surface consistently, and every token variable
 | SidePanel | `.ds-side-panel` | `.ds-side-panel-header`, `.ds-side-panel-body` |
 | Skeleton | `.ds-skeleton` | none yet |
 | SkeletonRow | `.ds-skeleton-row` | `.ds-skeleton-row-lines` |
+| Scrubber | `.ds-scrubber` | `.ds-scrubber-track`, `.ds-scrubber-buffered`, `.ds-scrubber-fill`, `.ds-scrubber-thumb`, `.ds-scrubber-tooltip` |
 | Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb`, `.ds-slider-icon`, `.ds-slider-tick` |
 | TextField | `.ds-text-field` | `.ds-text-field-frame`, `.ds-text-field-icon`, `.ds-text-field-suffix`, `.ds-text-field-help`, `.ds-text-field-tokens` |
 | Toast | `.ds-toast` | `.ds-toast-body`, `.ds-toast-action` |

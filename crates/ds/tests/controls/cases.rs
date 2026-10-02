@@ -8,10 +8,13 @@ use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
+use ds::components::controls::scrubber_face::ScrubberFace;
+use ds::components::controls::scrubber_model::{BufferedRange, ScrubPose};
 use ds::components::controls::segmented::Tracking;
 use ds::components::lists::section_header::HeaderAction;
 use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
+use ds::motion::spring::Millis;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_core::colour::contrast::Verdict;
@@ -429,6 +432,43 @@ pub const CASES: &[Case] = &[
         component: "badge",
         state: "zero",
         make: || rsx! { Badge { content: BadgeContent::Number(0) , tone: BadgeTone::Quiet, size: ControlSize::Mini} },
+    },
+    // Scrubber: at rest, with loaded stretches, hovered, dragged and unavailable.
+    Case {
+        component: "scrubber",
+        state: "idle",
+        make: || rsx! { ScrubberFace { label: "Position", position: Fraction(350), length: Millis(180_000) } },
+    },
+    Case {
+        component: "scrubber",
+        state: "buffered",
+        make: || {
+            rsx! { ScrubberFace { label: "Position", position: Fraction(200), length: Millis(180_000), buffered: vec![
+                BufferedRange { from: Fraction(0), to: Fraction(450) },
+                BufferedRange { from: Fraction(400), to: Fraction(600) },
+                BufferedRange { from: Fraction(800), to: Fraction(900) },
+            ] } }
+        },
+    },
+    Case {
+        component: "scrubber",
+        state: "hover",
+        make: || rsx! { ScrubberFace { label: "Position", position: Fraction(350), length: Millis(180_000), pose: ScrubPose::Hover, pointer: Fraction(500) } },
+    },
+    Case {
+        component: "scrubber",
+        state: "dragging",
+        make: || rsx! { ScrubberFace { label: "Position", position: Fraction(350), length: Millis(3_723_000), pose: ScrubPose::Dragging, pointer: Fraction(750) } },
+    },
+    Case {
+        component: "scrubber",
+        state: "disabled",
+        make: || rsx! { ScrubberFace { label: "Position", position: Fraction(350), length: Millis(180_000), availability: Availability::Disabled } },
+    },
+    Case {
+        component: "scrubber",
+        state: "busy",
+        make: || rsx! { ScrubberFace { label: "Position", position: Fraction(350), length: Millis(180_000), availability: Availability::Busy } },
     },
     // Spinner.
     Case {
