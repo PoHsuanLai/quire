@@ -20,6 +20,7 @@ re-theme every surface consistently, and every token variable
 | Avatar | `.ds-avatar` | none yet |
 | Badge | `.ds-badge` | `.ds-badge-label` |
 | Button | `.ds-button` | `.ds-button-icon`, `.ds-button-label` |
+| Capsule | `.ds-capsule` | `.ds-capsule-readout`, `.ds-capsule-divider` |
 | Checkbox | `.ds-checkbox` | `.ds-checkbox-indicator`, `.ds-checkbox-label` |
 | Chip | `.ds-chip` | `.ds-chip-remove` |
 | EmptyState | `.ds-empty-state` | `.ds-empty-state-icon`, `.ds-empty-state-title`, `.ds-empty-state-body`, `.ds-empty-state-action` |

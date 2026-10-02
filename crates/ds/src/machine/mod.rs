@@ -82,6 +82,17 @@ impl<M: Machine> MachineRef<M> {
         self.state.into()
     }
 
+    /// Replace the parameters the next step reads, now. [`use_machine`] takes them at each render,
+    /// which is one render behind a machine whose parameters are derived from its own state (a
+    /// zoom step reads the scale the last step produced); a surface in that position computes
+    /// them from the state it just read and sets them here before it sends.
+    pub fn set_params(&self, params: M::Params) {
+        let mut wanted = self.params;
+        if *wanted.peek() != params {
+            wanted.set(params);
+        }
+    }
+
     fn advance(mut self, input: M::In) {
         let now = self.clock.now();
         let (next, outs) = self

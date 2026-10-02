@@ -1,0 +1,18 @@
+/* Capsule (design/30 section 2.7a): the pill of controls over content. Its scope is a transparent
+   Osd scope that fills its parent and takes no pointer; the capsule stands at the scope's bottom
+   centre, `--s-16` up from the edge, in the Osd material (the transparent-scope card rule paints
+   it) and fully rounded. Buttons are toolbar buttons at their 40 px pitch with `--s-4` between
+   them; a readout is tabular figures in the faint ink; a divider is one hairline. Hidden, nothing
+   is laid out; it fades in over `--t-quick` and out over `--t-quick` (`menu-out`), and only
+   takes the pointer while it is on screen. Attribute selectors carry `*|` (spike S2). */
+
+.ds-capsule-scope{ position:absolute; inset:0; display:flex; align-items:flex-end; justify-content:center; padding-bottom:var(--s-16); box-sizing:border-box; pointer-events:none; }
+.ds-capsule{ position:relative; z-index:var(--z-raise); display:flex; align-items:center; gap:var(--s-4); box-sizing:border-box; height:52px; padding:0 var(--s-8);
+  border-radius:var(--r-pill); box-shadow:var(--m-box); color:var(--ink); user-select:none; pointer-events:auto; }
+.ds-capsule[*|data-shown=hidden]{ display:none; }
+.ds-capsule[*|data-presence=entering],.ds-capsule[*|data-presence=present]{ animation:fade var(--t-quick) var(--e-out); }
+.ds-capsule[*|data-presence=entering][*|data-pulse=b],.ds-capsule[*|data-presence=present][*|data-pulse=b]{ animation-name:fade--b; }
+.ds-capsule[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-capsule[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
+.ds-capsule-readout{ min-width:var(--s-36); padding:0 var(--s-4); text-align:center; white-space:nowrap; font-size:var(--fs-control); font-variant-numeric:tabular-nums; color:var(--ink-soft); }
+.ds-capsule-divider{ flex:none; width:var(--hair); height:var(--s-18); margin:0 var(--s-4); background:var(--line); }

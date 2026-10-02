@@ -166,8 +166,16 @@ Not built, or limited, in quire:
   whole runs against a Latin dictionary, untested.
 - **Pane switcher**: the height snaps to the arriving pane (no measured height transition on
   Blitz); a reversal restarts both animations from their first frame.
-- **Level control and swipe have no pointer capture**: leaving the control's hit zone (the rail
-  and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there.
+- **Level control and swipe do not use `use_pointer_capture` yet**: leaving the control's hit zone (the rail
+  and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there. Ends when
+  they take the hook.
+- **No `VirtualList`, and no rotate glyphs.** `List` renders every row, and a viewer of a large text
+  file windows its own lines (it owns the wheel and the line index, so nothing scrolls natively).
+  The glyph set has no clockwise and counter-clockwise rotate marks: the viewer's capsule borrows
+  `Refresh` and `Undo`. Ends when a windowed list (fixed row height, a first row, a count) and the
+  two glyphs are added here.
+- **The media scrubber and the export `Sheet` layout are not built.** `Slider` (capsule look) and
+  `Sheet` are what a viewer composes today.
 - **`TreeItem` has no keyboard toggle of its own**; no harness test presses Enter on a summary.
 - **The virtual clock is opt-in** (`Clock::Virtual`): 24 ds-blitz tests assume the wall clock
   (they time with `Instant::now()`, sleep the thread, or click one spot twice with a long
@@ -760,7 +768,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   `SurfaceResized` and `Focused`. `show_window_menu` is implemented for Wayland toplevels despite
   its doc.
 - Close is blitz-shell's `ShellProvider::request_window_close`, handled as `CloseRequested`: the
-  window drops and the loop exits, with no veto hook.
+  window drops, with no veto hook. Whether the loop then ends is the app's `LastWindowClosed`.
 - `with_decorations(false)` asks for no second frame; winit-wayland is built with `sctk-adwaita`,
   so server decorations on a compositor without xdg-decoration draw adwaita's frame.
 - `app_id` goes to winit as the Wayland or X11 platform attribute; Wayland is chosen when
@@ -778,10 +786,23 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   loop itself, one `DioxusNativeApplication` per window under its own `ApplicationHandler`
   (`window_shell`), with its own copies of the two private providers (the `dioxus:` asset net
   provider and the link opener).
-- **blitz-shell exits the loop when an application's last window closes**, and every second
-  window is its own application's last, so a second window's close is relayed and drops that
-  application; the first window's close drops the others first, then ends the loop.
-- **A closed window's renderer is suspended and kept** for the next window (Open items).
+- **blitz-shell exits the loop when an application's last window closes**, and every window is
+  its own application's last, so a close is relayed and drops that application only; the loop
+  ends by `crate::app_life` (`LastWindowClosed::{Exit, StayFor}`, `AppHandle::quit`), applied
+  after each close and, for a linger, by a `ControlFlow::WaitUntil` deadline. The first window
+  is a request like any other and the loop starts with none, so the first window has no
+  privilege: closing it leaves the others up.
+- **Threads reach the loop through `AppHandle`** (a mutex-guarded queue and the winit proxy's
+  wake). `open_window` needs a component's context, so a D-Bus or timer task cannot use it.
+- **A closed window's renderer is parked and kept** for the next window (Open items). The vello-hybrid
+  renderer caches the winit window it drew past `suspend`, so a renderer set aside as it was kept
+  the closed window mapped and frozen on screen (found 2026-10-03 with a KWin script closing a
+  window of the viewer: `workspace.windowList()` still listed it, and the process was warm with
+  none left). `Windows::park` resumes the renderer on a window of the loop's own that is never
+  shown (Wayland maps a window only once a buffer is attached, and the parking surface is never
+  drawn) and suspends it again, which lets the closed window go and keeps the renderer's device:
+  the next window opens in 30 ms after the request (device and adapter reused), against 100 to
+  170 ms with a renderer dropped or a fresh one.
 
 ### File drops
 
@@ -802,6 +823,42 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - dioxus-native's `clipboard` feature is on (blitz-shell over arboard 3.6), so Ctrl+C/X/V work in
   every field of a `launch` window. The app's calls answer `NoHost` outside a ds-blitz document,
   or `Unavailable`. The harness keeps an in-memory clipboard with an HTML slot.
+
+### Cold start of the first window
+
+Measured 2026-10-03 on a release build of the anyview binary showing a 1058 x 618 JPEG, Wayland
+(KWin), an AMD iGPU (RADV) and an NVIDIA dGPU over Vulkan, no session bus. Times are from
+`date +%s%N` taken before `exec` to `SystemTime` stamps printed at each step (8 runs, medians,
+on a machine other builds were also using, so about +-10 ms).
+
+| Step | Default backends | `WGPU_BACKEND=vulkan` |
+|---|---|---|
+| process start to `launch` | 3.5 ms | 3.5 ms |
+| event loop (Wayland connect) | 6 ms | 6 ms |
+| `DioxusNativeWindowRenderer::new` (a `wgpu::Instance`) | 77 ms | 58 to 68 ms |
+| fonts, VirtualDom, document | 10 ms | 10 ms |
+| window, first render, adapter, device, surface, pipelines | 92 ms | 50 to 60 ms |
+| first frame painted | 11 ms | 11 ms |
+| **process start to first frame** | **190 to 200 ms** | **127 to 150 ms** |
+
+- A window with an empty `Ds` root (a throwaway example, not kept) is within noise of the viewer's, so the
+  time is not the app's UI: it is the GPU stack's.
+- `wgpu::Instance::new` is 77 to 100 ms the first time in a process and 10 ms the second (the
+  Vulkan loader and its drivers load once), and the first `request_adapter` on all backends is
+  60 to 68 ms against 13 ms on Vulkan alone: the renderer's `WGPUContext` passes `display: None`,
+  so the GL backend can never produce an adapter on Linux (`WGPU_BACKEND=gl` panics with no
+  adapter) and its probe is the whole difference. quire cannot narrow the backends: the renderer
+  reads them from `WGPU_BACKEND` only, and `std::env::set_var` is unsafe and forbidden
+  (CONVENTIONS section 2).
+- Tried and dropped, no gain beyond noise (+-10 ms): a thread that loads the system fonts while
+  the main thread builds the document; a thread that creates a `wgpu::Instance` and an adapter at
+  the start of `launch`, kept alive (the main thread's own instance then waits on the same
+  loader and driver initialisation); building the renderer after the document instead of
+  before. The chain (instance, adapter, device) is serial inside the driver, and nothing else
+  the first frame needs is long enough to hide behind it.
+- Ends when the renderer takes its backends as an option (an `anyrender_vello_hybrid` change:
+  `VelloHybridRendererOptions::backends`) and `AppConfig` passes Vulkan on Linux; until then an
+  app sets `WGPU_BACKEND=vulkan` in the environment its launcher gives it.
 
 ## Layout, hit testing and hover
 
@@ -917,7 +974,21 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   a touchpad gesture's end is a quiet spell (`DelayToken::SwipeQuiet`, 120 ms).
   `Harness::wheel` moves the pointer first.
 - **No pointer capture in Blitz**: a drag that leaves an element is noticed at the next move with
-  no button down (the edit surface captures itself).
+  no button down. The window hook hears winit's pointer events first, so `use_pointer_capture` asks
+  the host to route every move and the primary release to one element until the button comes up
+  (the edit surface's route, now general). The level control and swipe still use their own events.
+- **`use_rect` measures once, and a window resize changes what it measured.** ds-blitz bumps a
+  `WindowResized` counter (root context) on every `SurfaceResized` and `ScaleFactorChanged`, and
+  `use_rect` reads its element again a frame later, after the layout the resize caused. The
+  harness has no resize, and a shell surface's host does not bump it.
+- **`use_machine` takes its parameters at render time.** A machine whose parameters derive from
+  its own state would read them one render late; `MachineRef::set_params` sets them before a send.
+- **Phased wheel and pinch come from winit, not Blitz.** `WindowEvent::MouseWheel` carries a
+  `TouchPhase` and `WindowEvent::PinchGesture` exists on Wayland and macOS; Blitz forwards neither
+  to the document, but the window hook sees both before it, so `ds-blitz` publishes them as
+  `Gesture`s on a per-window `GestureBus` (`use_gestures`). No change to the Blitz fork. A gesture
+  is not addressed to an element; the listener checks the pointer is over it. The pointer's place
+  is the last `PointerMoved` the window saw.
 
 ### Scrolling
 

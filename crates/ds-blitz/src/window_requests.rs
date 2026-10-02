@@ -24,12 +24,6 @@ pub enum WindowLife {
     Closed,
 }
 
-/// A key for a test that needs one.
-#[cfg(test)]
-pub(crate) fn tests_key(n: u64) -> WindowKey {
-    WindowKey(n)
-}
-
 /// What a window's root renders: a plain root, or one carrying the props it was opened with.
 #[derive(Clone)]
 pub(crate) enum Root {

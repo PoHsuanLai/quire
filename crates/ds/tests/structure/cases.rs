@@ -3,6 +3,8 @@
 //! `tests/snapshots/structure/<component>/<state>.html`.
 
 use dioxus::prelude::*;
+use ds::components::chrome::capsule::model::CapsuleSlot;
+use ds::components::chrome::capsule::view::Capsule;
 use ds::components::chrome::sidebar::Sidebar;
 use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
@@ -42,6 +44,17 @@ fn items() -> Vec<ToolbarItem<u8>> {
         ToolbarItem::new(1, "Share", Icon::Upload),
         ToolbarItem::new(2, "Tag", Icon::Tag).toggle(Check::On),
         ToolbarItem::new(3, "Search", Icon::Search).with(Availability::Disabled),
+    ]
+}
+
+fn capsule_slots() -> Vec<CapsuleSlot<u8>> {
+    vec![
+        CapsuleSlot::Item(ToolbarItem::new(0, "Zoom out", Icon::Minus)),
+        CapsuleSlot::Readout("100%".to_owned()),
+        CapsuleSlot::Item(ToolbarItem::new(1, "Zoom in", Icon::Plus)),
+        CapsuleSlot::Divider,
+        CapsuleSlot::Item(ToolbarItem::new(2, "Rotate", Icon::Refresh).toggle(Check::On)),
+        CapsuleSlot::Item(ToolbarItem::new(3, "Info", Icon::Info).with(Availability::Disabled)),
     ]
 }
 
@@ -143,6 +156,16 @@ pub const CASES: &[Case] = &[
         component: "table",
         state: "descending",
         make: || rsx! { Table::<u8, u8> { label: "Files", columns: columns(), rows: table_rows(), sort: Some(Sort { column: 1, direction: SortDirection::Descending }), on_sort: |_| {}, onselect: |_| {} } },
+    },
+    Case {
+        component: "capsule",
+        state: "shown",
+        make: || rsx! { Capsule::<u8> { label: "Controls", slots: capsule_slots(), shown: Shown::Visible, onpick: |_| {} } },
+    },
+    Case {
+        component: "capsule",
+        state: "hidden",
+        make: || rsx! { Capsule::<u8> { label: "Controls", slots: capsule_slots(), shown: Shown::Hidden, onpick: |_| {} } },
     },
     Case {
         component: "toolbar",

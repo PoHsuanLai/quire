@@ -11,6 +11,7 @@
 //! answers [`Measured::Busy`] instead, and the read waits a frame.
 
 use crate::host::document::use_document_host;
+use crate::host::resized::WindowResized;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
 use ds_core::time::{FRAME_SLACK, clock::sleep};
@@ -117,11 +118,33 @@ impl RectProbe {
 }
 
 /// A probe for one element's rect.
+///
+/// The rect is read again after each change of the window's size or scale (`WindowResized`, where
+/// the host provides it), so an element that follows the window reports where it is now.
 pub fn use_rect() -> RectProbe {
-    RectProbe {
+    let probe = RectProbe {
         rect: use_signal(|| None),
         mounted: use_signal(|| None),
-    }
+    };
+    let resized = try_consume_context::<WindowResized>();
+    use_effect(move || {
+        let changes = resized.map_or(0, |resized| resized.count());
+        let Some(element) = (probe.mounted)() else {
+            return;
+        };
+        if changes == 0 {
+            return;
+        }
+        let mut rect = probe.rect;
+        spawn(async move {
+            // The window's layout follows its resize by a frame; wait it out before reading.
+            sleep(FRAME_SLACK).await;
+            if let Some(read) = read_after_layout(&element).await {
+                rect.set(Some(read));
+            }
+        });
+    });
+    probe
 }
 
 /// How many frames a read waits for layout before giving up on a zero rect.
