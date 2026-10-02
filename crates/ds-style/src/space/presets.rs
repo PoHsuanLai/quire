@@ -5,7 +5,7 @@ use super::look::SpaceLook;
 use super::palette::Dot;
 use crate::appearance::theme::Theme;
 
-/// One preset: its name, its dots, and the grain it ships with when the prototype names one.
+/// One preset: its name, its dots, and the grain it ships with when it overrides the settings default.
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Preset {
     /// What the editor calls it, its presets' accessible names: mailo's names, in
@@ -14,8 +14,8 @@ pub struct Preset {
     pub name: &'static str,
     /// One to three dots.
     pub dots: &'static [Dot],
-    /// The grain the prototype gives it (Work 35, Home 55), or `None` for the settings default
-    /// `spaces.default_grain`.
+    /// The grain it ships with, or `None` for the settings default `spaces.default_grain` (0,
+    /// none); every preset is `None`.
     pub grain: Option<u8>,
 }
 
@@ -29,12 +29,12 @@ pub const PRESETS: [Preset; 8] = [
     Preset {
         name: "Dusk",
         dots: &[dot(268.0, 0.72), dot(318.0, 0.55)],
-        grain: Some(35),
+        grain: None,
     },
     Preset {
         name: "Orchard",
         dots: &[dot(152.0, 0.62), dot(62.0, 0.55), dot(28.0, 0.5)],
-        grain: Some(55),
+        grain: None,
     },
     Preset {
         name: "Harbour",
@@ -105,15 +105,15 @@ mod tests {
     #[test]
     fn a_workspace_takes_its_preset_by_index() {
         const CASES: &[(usize, usize, u8)] = &[
-            (0, 0, 35),
-            (1, 1, 55),
-            (2, 2, 40),
-            (7, 7, 40),
-            (8, 0, 35),
-            (10, 2, 40),
+            (0, 0, 0),
+            (1, 1, 0),
+            (2, 2, 0),
+            (7, 7, 0),
+            (8, 0, 0),
+            (10, 2, 0),
         ];
         for &(index, preset, grain) in CASES {
-            let look = default_look(index, Grain(40), CardAccent::SpaceHue);
+            let look = default_look(index, Grain(0), CardAccent::SpaceHue);
             assert_eq!(look.dots, PRESETS[preset].dots, "workspace {index}");
             assert_eq!(look.grain, Grain(grain), "workspace {index}");
             assert_eq!(look.theme, Theme::System, "workspace {index}");
