@@ -166,8 +166,16 @@ Not built, or limited, in quire:
   whole runs against a Latin dictionary, untested.
 - **Pane switcher**: the height snaps to the arriving pane (no measured height transition on
   Blitz); a reversal restarts both animations from their first frame.
-- **Level control and swipe have no pointer capture**: leaving the control's hit zone (the rail
-  and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there.
+- **Level control and swipe do not use `use_pointer_capture` yet**: leaving the control's hit zone (the rail
+  and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there. Ends when
+  they take the hook.
+- **No `VirtualList`, and no rotate glyphs.** `List` renders every row, and a viewer of a large text
+  file windows its own lines (it owns the wheel and the line index, so nothing scrolls natively).
+  The glyph set has no clockwise and counter-clockwise rotate marks: the viewer's capsule borrows
+  `Refresh` and `Undo`. Ends when a windowed list (fixed row height, a first row, a count) and the
+  two glyphs are added here.
+- **The media scrubber and the export `Sheet` layout are not built.** `Slider` (capsule look) and
+  `Sheet` are what a viewer composes today.
 - **`TreeItem` has no keyboard toggle of its own**; no harness test presses Enter on a summary.
 - **The virtual clock is opt-in** (`Clock::Virtual`): 24 ds-blitz tests assume the wall clock
   (they time with `Instant::now()`, sleep the thread, or click one spot twice with a long
@@ -866,7 +874,21 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   a touchpad gesture's end is a quiet spell (`DelayToken::SwipeQuiet`, 120 ms).
   `Harness::wheel` moves the pointer first.
 - **No pointer capture in Blitz**: a drag that leaves an element is noticed at the next move with
-  no button down (the edit surface captures itself).
+  no button down. The window hook hears winit's pointer events first, so `use_pointer_capture` asks
+  the host to route every move and the primary release to one element until the button comes up
+  (the edit surface's route, now general). The level control and swipe still use their own events.
+- **`use_rect` measures once, and a window resize changes what it measured.** ds-blitz bumps a
+  `WindowResized` counter (root context) on every `SurfaceResized` and `ScaleFactorChanged`, and
+  `use_rect` reads its element again a frame later, after the layout the resize caused. The
+  harness has no resize, and a shell surface's host does not bump it.
+- **`use_machine` takes its parameters at render time.** A machine whose parameters derive from
+  its own state would read them one render late; `MachineRef::set_params` sets them before a send.
+- **Phased wheel and pinch come from winit, not Blitz.** `WindowEvent::MouseWheel` carries a
+  `TouchPhase` and `WindowEvent::PinchGesture` exists on Wayland and macOS; Blitz forwards neither
+  to the document, but the window hook sees both before it, so `ds-blitz` publishes them as
+  `Gesture`s on a per-window `GestureBus` (`use_gestures`). No change to the Blitz fork. A gesture
+  is not addressed to an element; the listener checks the pointer is over it. The pointer's place
+  is the last `PointerMoved` the window saw.
 
 ### Scrolling
 
