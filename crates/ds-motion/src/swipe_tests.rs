@@ -1,12 +1,12 @@
 use super::{
-    Click, Sample, Speed, Stamp, SwipeEffect, SwipeInput as I, SwipeLook, SwipeMetrics, SwipeState,
+    Click, Sample, Speed, SwipeEffect, SwipeInput as I, SwipeLook, SwipeMetrics, SwipeState,
     release_speed, shaped,
 };
 use ds_core::geometry::units::Px;
-use std::time::Duration;
+use ds_core::time::stamp::Stamp;
 
 fn at(ms: u64) -> Stamp {
-    Stamp(Duration::from_millis(ms))
+    Stamp(ms)
 }
 
 /// Run `inputs` from rest; the state and every effect along the way.

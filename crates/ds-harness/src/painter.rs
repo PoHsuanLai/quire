@@ -9,6 +9,7 @@ use anyrender::{PaintScene, render_to_buffer};
 use anyrender_vello_cpu::VelloCpuImageRenderer;
 use blitz_dom::BaseDocument;
 use blitz_paint::paint_scene;
+use ds_blitz::Gpu;
 use peniko::kurbo::{Affine, Rect};
 use peniko::{Color, Fill};
 use std::time::{Duration, Instant};
@@ -105,6 +106,14 @@ impl Painter {
             }
             Painter::Gpu(gpu) => gpu.time(doc, canvas),
             Painter::Unavailable(why) => Err(HarnessError::Renderer(why.clone())),
+        }
+    }
+
+    /// The GPU a hybrid painter draws on, as the app's `use_gpu` sees it.
+    pub(crate) fn gpu(&self) -> Option<Gpu> {
+        match self {
+            Painter::Gpu(gpu) => Some(gpu.gpu()),
+            Painter::Cpu | Painter::Unavailable(_) => None,
         }
     }
 

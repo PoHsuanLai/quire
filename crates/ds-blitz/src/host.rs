@@ -47,6 +47,7 @@ use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::scheme;
 use crate::setup::Setup;
+use crate::texture_layer::{Gpu, GpuProbe};
 use crate::window::WinitWindow;
 use crate::window_build::WindowSlot;
 use crate::window_drop::WindowDrop;
@@ -163,6 +164,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
     let file_drop = use_context_provider(|| FileDropBoard::new(Rc::clone(&host)));
+    use_context_provider(Gpu::empty);
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
@@ -262,6 +264,8 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 Root::Shared(root) => rsx! { Rooted { root: SharedRoot(root) } },
             }
         }
+        // Paints a widget on the first frame, which is how the window's `Gpu` gets its device.
+        GpuProbe {}
         div {
             style: "display:none",
             onmounted: move |mounted| {

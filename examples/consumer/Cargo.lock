@@ -1479,6 +1479,7 @@ dependencies = [
  "tokio",
  "webbrowser",
  "wgpu",
+ "wgpu_context",
 ]
 
 [[package]]

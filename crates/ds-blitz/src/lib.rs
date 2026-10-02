@@ -61,6 +61,7 @@ mod setup;
 pub mod snap;
 #[cfg(feature = "spell")]
 pub mod spell;
+mod texture_layer;
 mod wake;
 pub mod window;
 mod window_build;
@@ -97,6 +98,10 @@ pub use pdf_thumb::{
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
 pub use snap::snap_to_device;
+pub use texture_layer::{
+    Gpu, GpuError, Pace, PixelFormat, Pixels, PixelsError, Sampling, TexelRect, Texels, TextureFit,
+    TextureHandle, TextureLayer, use_gpu,
+};
 pub use window::{Decorations, WinitWindow};
 pub use window_requests::WindowLife;
 

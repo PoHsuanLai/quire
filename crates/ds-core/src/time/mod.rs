@@ -8,6 +8,7 @@
 //! long a test takes, never what it sees.
 
 pub mod clock;
+pub mod stamp;
 #[cfg(test)]
 mod tests;
 pub(crate) mod virtual_queue;

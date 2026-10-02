@@ -24,13 +24,17 @@ dioxus-native-dom = { workspace = true }
 dioxus-native = { workspace = true, features = ["html", "clipboard"] }
 # `open_window`: a second window on the same event loop, each with its own VirtualDom
 # (`crate::windows`), and the two providers dioxus-native keeps private (`crate::native_providers`).
-blitz-shell = { workspace = true }
+# `custom-widget`: the shell hands a texture layer's widget the renderer when it resumes and
+# unregisters a removed layer's texture from the renderer (`crate::texture_layer`).
+blitz-shell = { workspace = true, features = ["custom-widget"] }
 dioxus-asset-resolver = { workspace = true }
 webbrowser = { workspace = true }
 # `text/html` from the system clipboard for an edit surface's paste.
 arboard = { workspace = true }
 anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
+# `DeviceHandle`, the renderer's device that a texture layer's widget hands the window's `Gpu`.
+wgpu_context = { workspace = true }
 parley = { workspace = true }
 wgpu = { workspace = true }
 image = { workspace = true }
@@ -91,6 +95,9 @@ name = "second_window"
 
 [[example]]
 name = "file_drop"
+
+[[example]]
+name = "texture_layer"
 
 [[example]]
 name = "pdf"

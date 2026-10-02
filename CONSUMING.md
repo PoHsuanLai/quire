@@ -1024,6 +1024,23 @@ measured numbers.
 | Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
 | The painter alone | the `pdfrum-anyrender` crate, in the pdfrum repo | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `ds-blitz`'s `pdf` feature depends on it as a git dependency pinned to pdfrum rev 61371040, so a consumer that only prints through `ds_blitz::pdf` names nothing new; one that calls the painter directly adds the same git dependency at the same rev. Its own docs describe its page and source types. |
 
+### GPU textures
+
+A GPU texture inside the document, for decoded images, PDF page tiles and video frames: a
+`TextureLayer` fills its parent's box and draws a `TextureHandle` the app writes into from any
+thread. The device is the window renderer's own, so a texture you make on it is drawn without a
+copy. FINDINGS.md "Texture layer" has the reasons and limits.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| The window's device | `ds_blitz::use_gpu() -> Gpu`; `gpu.device()`, `queue()`, `adapter()`, `instance()` | `None` until the window's first frame; the component calling `use_gpu` re-renders when it arrives (and when `gpu.generation()` changes, after which textures made on the old device stop drawing). One `Gpu` per window. |
+| A handle to show | `gpu.handle()` (empty), `gpu.register(Texture)`, `gpu.register_view(TextureView)`, `gpu.upload(&Pixels)` | A registered texture is premultiplied, non-sRGB (`Rgba8Unorm`, `Bgra8Unorm`, `Rgba16Float`), one mip, `TEXTURE_BINDING`. |
+| CPU pixels | `Pixels::new(PixelFormat, width, height, &bytes)`; `handle.update(&pixels)` | `Rgba8Premultiplied` (pdfrum's `Pixmap`) as is, `Rgb8` made opaque, `Rgba8Straight` multiplied at upload. The same size writes in place; another size makes a new texture. Errors: `GpuError::{NotReady, TooLarge}`. |
+| The element | `TextureLayer { texture, fit, source, sampling, pace, common }` | `fit: TextureFit::{Contain, Cover, Fill, Actual, Tile}`; `source: Option<TexelRect>` in texture pixels (crop; the whole texture when `None`); `sampling: Sampling::{Nearest, Bilinear, Bicubic}`; `pace: Pace::{OnDemand, EveryFrame}`. It fills the box it is in (give the parent a size, as for any frame), and takes part in paint order, `opacity`, `filter` and `border-radius` like an image. `Actual` and `Tile` are one texel per device pixel. |
+| A new frame | `handle.replace(texture)` or `replace_view`, or write into the registered texture on `gpu.queue()`; then `handle.redraw()` | `redraw` asks each window showing the handle to repaint and is cheap to call per decoded frame (one paint per display refresh, of the latest texture); submit your GPU work first. `replace` and `update` redraw by themselves. `handle.clear()` shows nothing. |
+| In a test | `HarnessConfig::new(viewport).with_backend(Backend::Hybrid)`; `Harness::gpu()`; `harness.render_over(Backdrop::Clear)` | The harness device is the app's `use_gpu()` from the first render. The default vello_cpu backend has no device and draws nothing. |
+| Try it by hand | `cargo run -p ds-blitz --example texture_layer` | A thread uploads a moving gradient every frame. |
+
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 
 If your app has its own settings struct (not `AppearanceSettings`/`IconsSettings`, which quire
