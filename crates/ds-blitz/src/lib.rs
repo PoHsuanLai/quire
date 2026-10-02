@@ -36,6 +36,7 @@ mod frame_links;
 mod frame_tag;
 mod frame_tree;
 pub mod frames;
+mod gesture_window;
 mod host;
 mod install;
 pub mod launch;

@@ -6,6 +6,7 @@ use crate::harness::Harness;
 use crate::input::PointerAction;
 use crate::input::PointerInput;
 use blitz_traits::events::{BlitzWheelDelta, BlitzWheelEvent, PointerCoords, UiEvent};
+use ds::host::gesture::{Gesture, GesturePhase};
 use ds::prelude::*;
 use keyboard_types::Modifiers;
 
@@ -35,5 +36,18 @@ impl Harness {
             mods: Modifiers::empty(),
             element: Default::default(),
         }));
+        self.gesture(Gesture::Scroll {
+            phase: GesturePhase::Changed,
+            by: Point { x: dx, y: dy },
+            at,
+        });
+    }
+
+    /// Publish `gesture` to the components listening, as the window does for winit's pinch and
+    /// wheel events, and bring the document up to date.
+    pub(crate) fn gesture(&mut self, gesture: Gesture) {
+        let bus = self.doc.gestures.clone();
+        self.doc.doc.vdom.in_runtime(|| bus.publish(gesture));
+        self.settle_now();
     }
 }
