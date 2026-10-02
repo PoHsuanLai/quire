@@ -326,7 +326,7 @@ hover appearance. Every entry inherits `Common` (R8).
 | IconView | `NSImageView` | glyph or app-icon plate (the glyph set is Lucide on one 2 px stroke: it carries the format bar's Bold, Italic, Underline, Strike and Code, and Info, CircleCheck and TriangleAlert for severity); `IconSize` ladder; plate family by Look (abstract, embossed) | 12..128 | none | icon | `Px` sizes, plate families beyond the app plate | KEEP | P1 |
 | Avatar | contact photo / monogram | round photo or monogram; sizes 16..64; no moods | 5 | none | image | `AvatarShape` Square, `UserPortrait`, `AvatarMuting`, portrait moods | MERGE | P1 |
 | StatusItem glyphs | `NSStatusItem` images | Wi-Fi (bars animate while joining), Bluetooth, volume, battery (`BatteryGlyph`, outline) | icon | pending (Wi-Fi only) | glyph | `LayerGlyph`, Bluetooth/other pending loops | KEEP | P1 |
-| PreviewPane | Spotlight preview | app, emoji, facts, image, PDF, text, web; shell launcher only | Z- | busy | body | none | KEEP | P1 |
+| PreviewPane | Spotlight preview | app, emoji, facts, image, PDF, text, web, slot (a caller's own element); shell launcher only | Z- | busy | body | none | KEEP | P1 |
 | PdfThumb | Quick Look thumbnail | PDF first page, spinner while rendering | 3 | busy | image | `PDF_THUMB_GRACE` | KEEP | P1 |
 | EmojiGrid<T> | Character Viewer | grid with `GridMove` roving | Z- | selected | cell | none | KEEP | P1 |
 

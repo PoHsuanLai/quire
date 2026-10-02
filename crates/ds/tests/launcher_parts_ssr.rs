@@ -349,6 +349,18 @@ fn pane_web() -> Element {
     )
 }
 
+fn pane_slot() -> Element {
+    pane(
+        PaneContent::Slot {
+            label: "Invoice.pdf".to_owned(),
+            element: rsx! {
+                div { class: "ds-truncate", "The caller's own picture, name and facts" }
+            },
+        },
+        Some(0),
+    )
+}
+
 fn with_aside() -> Element {
     let aside = rsx! {
         PreviewPane {
@@ -387,6 +399,7 @@ const SPECIMENS: &[Specimen] = &[
     ("pane-facts", pane_facts),
     ("pane-emoji", pane_emoji),
     ("pane-web", pane_web),
+    ("pane-slot", pane_slot),
     ("palette-aside", with_aside),
 ];
 
@@ -487,6 +500,15 @@ fn the_markup_carries_the_states() {
     assert!(
         pdf.contains("ds-pdf-thumb") && pdf.contains("data-content=\"pdf\""),
         "{pdf}"
+    );
+    let slot = render(pane_slot);
+    assert!(
+        slot.contains("data-content=\"slot\"")
+            && slot.contains("aria-label=\"Invoice.pdf preview\"")
+            && slot.contains("The caller&#39;s own picture")
+            && !slot.contains("ds-preview-caption")
+            && slot.contains("ds-preview-actions"),
+        "the slot keeps the frame and adds no caption: {slot}"
     );
     let aside = render(with_aside);
     assert!(

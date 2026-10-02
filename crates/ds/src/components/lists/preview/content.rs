@@ -87,6 +87,15 @@ pub enum PaneContent {
         /// The whole address.
         url: String,
     },
+    /// Anything else, drawn by the caller: `element` fills the media area and draws its own
+    /// caption, so the pane keeps only its frame (the actions, the cue's cross-fade, the pending
+    /// look, the slide in). For a viewer's peek, whose pane already shows a name and facts.
+    Slot {
+        /// What a screen reader calls the pane (`"{label} preview"`): the thing's name.
+        label: String,
+        /// The caller's content, laid out in a box that fills the space above the actions.
+        element: Element,
+    },
 }
 
 impl PaneContent {
@@ -100,6 +109,7 @@ impl PaneContent {
             PaneContent::Facts { .. } => "facts",
             PaneContent::Emoji { .. } => "emoji",
             PaneContent::Web { .. } => "web",
+            PaneContent::Slot { .. } => "slot",
         }
     }
 
@@ -114,6 +124,7 @@ impl PaneContent {
             PaneContent::Facts { title, .. } => format!("{title} preview"),
             PaneContent::Emoji { name, .. } => format!("{name} preview"),
             PaneContent::Web { host, .. } => format!("{host} preview"),
+            PaneContent::Slot { label, .. } => format!("{label} preview"),
         }
     }
 }
@@ -147,6 +158,7 @@ pub(crate) fn media(content: &PaneContent) -> Element {
         PaneContent::Web { .. } => {
             icon_at(IconSource::Glyph(Icon::Globe), 64, Some(PlateFamily::Blue))
         }
+        PaneContent::Slot { element, .. } => element.clone(),
     }
 }
 
@@ -166,6 +178,7 @@ pub(crate) fn caption(content: &PaneContent) -> Element {
         PaneContent::Facts { title, .. } => (Some(title), None),
         PaneContent::Emoji { name, .. } => (Some(name), None),
         PaneContent::Web { host, url } => (Some(host), Some(url)),
+        PaneContent::Slot { .. } => (None, None),
     };
     let facts = match content {
         PaneContent::Facts { rows, .. } => rows.clone(),
