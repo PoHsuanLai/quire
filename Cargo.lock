@@ -1133,7 +1133,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 3.0.6",
+ "syn 2.0.119",
 ]
 
 [[package]]
@@ -3819,7 +3819,7 @@ dependencies = [
 [[package]]
 name = "pdfrum"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "pdfrum-common",
@@ -3840,7 +3840,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-anyrender"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "anyrender",
  "pdfrum-common",
@@ -3853,7 +3853,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-cmap"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "pdfrum-common",
  "pdfrum-object",
@@ -3863,7 +3863,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-common"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
 ]
@@ -3871,7 +3871,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-crypt"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "aes",
  "cbc",
@@ -3889,7 +3889,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-doc"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "pdfrum-common",
@@ -3905,7 +3905,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-edit"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "getrandom",
  "kurbo",
@@ -3928,7 +3928,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-filters"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "miniz_oxide 0.9.1",
  "pdfrum-common",
@@ -3940,7 +3940,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-font"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "pdfrum-cmap",
  "pdfrum-common",
@@ -3956,7 +3956,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-object"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "bytes",
  "pdfrum-common",
@@ -3967,7 +3967,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-page"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "moxcms 0.9.1",
@@ -3983,7 +3983,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-parser"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "pdfrum-common",
  "pdfrum-crypt",
@@ -3995,7 +3995,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-raster-vello-cpu"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "pdfrum-page",
@@ -4007,7 +4007,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-render"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "pdfrum-common",
@@ -4022,7 +4022,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-text"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "kurbo",
  "pdfrum-common",
@@ -4036,7 +4036,7 @@ dependencies = [
 [[package]]
 name = "pdfrum-type1"
 version = "0.4.0"
-source = "git+https://github.com/PoHsuanLai/pdfrum?rev=ec4296d5af59bca3b3e801526843e6b631cb3a86#ec4296d5af59bca3b3e801526843e6b631cb3a86"
+source = "git+https://github.com/PoHsuanLai/pdfrum?rev=8c7faadc3f858a005bbd03f564cdeb49fca63aeb#8c7faadc3f858a005bbd03f564cdeb49fca63aeb"
 dependencies = [
  "pdfrum-common",
  "read-fonts 0.44.0",
@@ -4912,8 +4912,8 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d204abcbdf8e88729306a8d0ca01a79d8a49969fe1f84696909d6dbc4321c1a"
 dependencies = [
- "foldhash 0.2.0",
- "hashbrown 0.17.1",
+ "foldhash 0.1.5",
+ "hashbrown 0.15.5",
 ]
 
 [[package]]
