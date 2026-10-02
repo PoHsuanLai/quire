@@ -2,6 +2,7 @@
 //! a wheel with its phase, and Blitz forwards neither, so the window hook turns them into the
 //! vocabulary a component listens to. The hook hears every winit event before the document.
 
+use dioxus::prelude::Modifiers;
 use dioxus_native::winit::event::{MouseScrollDelta, TouchPhase, WindowEvent};
 use ds::host::gesture::{Gesture, GesturePhase, Magnification};
 use ds::prelude::*;
@@ -10,8 +11,13 @@ use ds::prelude::*;
 const LINE_PX: f64 = 20.0;
 
 /// The gesture a winit event makes, with the pointer last seen at `at` (the window's logical
-/// pixels) and the window's display `scale`.
-pub(crate) fn gesture_of(event: &WindowEvent, scale: f64, at: Point) -> Option<Gesture> {
+/// pixels), the window's display `scale` and the modifier keys `held`.
+pub(crate) fn gesture_of(
+    event: &WindowEvent,
+    scale: f64,
+    at: Point,
+    held: Modifiers,
+) -> Option<Gesture> {
     let scale = scale.max(f64::EPSILON);
     match event {
         WindowEvent::PinchGesture { delta, phase, .. } => Some(Gesture::Pinch {
@@ -34,6 +40,7 @@ pub(crate) fn gesture_of(event: &WindowEvent, scale: f64, at: Point) -> Option<G
                     y: Px(y as f32),
                 },
                 at,
+                held,
             })
         }
         _ => None,
@@ -79,7 +86,7 @@ mod tests {
             phase: TouchPhase::Moved,
         };
         assert_eq!(
-            gesture_of(&event, 2.0, AT),
+            gesture_of(&event, 2.0, AT, Modifiers::empty()),
             Some(Gesture::Pinch {
                 phase: GesturePhase::Changed,
                 by: Magnification(50),
@@ -89,7 +96,7 @@ mod tests {
     }
 
     #[test]
-    fn a_wheel_is_logical_pixels_with_its_phase() {
+    fn a_wheel_is_logical_pixels_with_its_phase_and_the_modifiers_held() {
         // name, delta, scale, phase, expected movement
         let cases = [
             (
@@ -113,13 +120,14 @@ mod tests {
                 delta,
                 phase,
             };
-            let got = gesture_of(&event, scale, AT);
+            let got = gesture_of(&event, scale, AT, Modifiers::CONTROL);
             assert_eq!(
                 got,
                 Some(Gesture::Scroll {
                     phase: want,
                     by: Point { x: Px(x), y: Px(y) },
                     at: AT,
+                    held: Modifiers::CONTROL,
                 }),
                 "{name}"
             );
@@ -128,6 +136,9 @@ mod tests {
 
     #[test]
     fn other_events_are_not_gestures() {
-        assert_eq!(gesture_of(&WindowEvent::Destroyed, 1.0, AT), None);
+        assert_eq!(
+            gesture_of(&WindowEvent::Destroyed, 1.0, AT, Modifiers::empty()),
+            None
+        );
     }
 }

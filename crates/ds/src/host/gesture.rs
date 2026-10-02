@@ -74,6 +74,9 @@ pub enum Gesture {
         by: Point,
         /// The pointer, in the window's logical pixels.
         at: Point,
+        /// The modifier keys held while it happened: a viewer zooms with the wheel under
+        /// Control, and scrolls with it otherwise.
+        held: Modifiers,
     },
 }
 

@@ -40,6 +40,7 @@ impl Harness {
             phase: GesturePhase::Changed,
             by: Point { x: dx, y: dy },
             at,
+            held: Modifiers::empty(),
         });
     }
 

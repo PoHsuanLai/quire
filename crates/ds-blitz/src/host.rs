@@ -227,7 +227,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
         if let Some(moved) = pointer_at(event, window.scale_factor()) {
             last_pointer.set(moved);
         }
-        if let Some(gesture) = gesture_of(event, window.scale_factor(), last_pointer.get()) {
+        if let Some(gesture) =
+            gesture_of(event, window.scale_factor(), last_pointer.get(), held.get())
+        {
             gestures.publish(gesture);
         }
         if let Some(pointer) = captured_of(event, window.scale_factor(), held.get())
