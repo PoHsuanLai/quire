@@ -21,6 +21,7 @@ mod space_editor_rows;
 use css_scan::{classes, styles_class, token_violations};
 use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
+use ds::components::app::space_editor::rows::EditorFrame;
 use ds::prelude::*;
 use ds_core::colour::contrast::Verdict;
 use ds_style::space::look::CardAccent;
@@ -125,6 +126,10 @@ const CASES: &[Case] = &[
     Case {
         state: "named",
         make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), name: "Work".to_string(), onchange: |_| {}, on_active_dot: |_| {} } },
+    },
+    Case {
+        state: "frameless",
+        make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, frame: EditorFrame::Frameless } },
     },
     // SpaceDot.
     Case {

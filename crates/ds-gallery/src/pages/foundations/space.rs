@@ -5,7 +5,7 @@ use crate::axes::{Axes, PresetIndex};
 use crate::pages::{Caption, Section};
 use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
-use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
+use ds::components::app::space_editor::rows::{EditorFrame, MeasuredIn, MotionChoice};
 use ds::components::controls::chip::{Chip, ChipVariant};
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
@@ -50,6 +50,17 @@ pub fn SpacePage() -> Element {
                 on_rename: move |next: String| renamed.set(Some(next)),
                 motion: MotionChoice { level: motion, on_motion: EventHandler::new(move |next| axes.with_mut(|axes| axes.motion = next)) },
                 measured: MeasuredIn::EachScheme,
+            }
+        }
+        Section { title: "SpaceEditor, frameless", note: "frame: EditorFrame::Frameless draws no card of its own, for a host that is a surface already (a Sheet): the host here is a plain panel that sets the padding.",
+            div { style: "width:320px; padding:var(--s-16); background:var(--raise); border-radius:var(--r-menu); box-shadow:var(--shadow-sheet)",
+                SpaceEditor {
+                    look: look.clone(),
+                    scheme,
+                    active_dot: DotIndex(0),
+                    onchange: move |next| axes.with_mut(|axes| axes.look = next),
+                    frame: EditorFrame::Frameless,
+                }
             }
         }
         Section { title: "Contrast readout", note: "ds::style::space::palette::readout::readout for this Space in the current scheme: the four gates every pick is held to.",

@@ -21,7 +21,7 @@ use ds_style::space::look::{CardAccent, SpaceLook};
 use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};
-use rows::{MeasuredIn, MotionChoice};
+use rows::{EditorFrame, MeasuredIn, MotionChoice};
 
 /// Which of a Space's dots is being edited: 0, 1 or 2.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
@@ -79,6 +79,9 @@ fn dot_index(index: usize) -> DotIndex {
 /// (the Space's own motion, which the consumer feeds to its root's `appearance.motion`);
 /// `measured: MeasuredIn::EachScheme` measures the contrast in each scheme the Space's theme
 /// can show, each under its own heading, where the default measures the scheme it is drawn in.
+///
+/// `frame: EditorFrame::Frameless` draws no card of its own (no border, ground, shadow or
+/// padding) for a host that is already a surface, such as a `Sheet`; the host sets the padding.
 #[component]
 pub fn SpaceEditor(
     look: SpaceLook,
@@ -90,6 +93,7 @@ pub fn SpaceEditor(
     #[props(default)] on_rename: Option<EventHandler<String>>,
     #[props(default)] motion: Option<MotionChoice>,
     #[props(default)] measured: MeasuredIn,
+    #[props(default)] frame: EditorFrame,
     #[props(default)] common: Common,
 ) -> Element {
     let picked = use_signal(|| None::<(DotIndex, DotIndex)>);
@@ -111,6 +115,10 @@ pub fn SpaceEditor(
             class,
             id: common.id.clone(),
             "aria-label": "{label}",
+            "data-frame": match frame {
+                EditorFrame::Card => None,
+                EditorFrame::Frameless => Some(frame.slug()),
+            },
             onmounted: move |event| common.mounted(event),
             ..data,
             Title { dots: look.dots.clone(), scheme, name, on_rename }
