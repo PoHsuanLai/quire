@@ -37,6 +37,25 @@ the pattern other placeable surfaces reuse are section 9.
    screenshots** (section 1.1), and the gallery's "Widget reference" page renders ours at the
    reference crops' size for the comparison.
 
+### 1.0 The ruling of 2026-10-02 (wins over the rest of this file)
+
+Settled with the user (`30-CATALOGUE.md` section 3.4); one ruling replaces the three earlier ones
+(flat bright; not flat, tinted; neutral). Where the sections below say otherwise they describe
+code or a pass that the clean-up phase retires (**target (clean-up phase)**):
+
+- Widgets are **muted**: a neutral plate (the `Widget` material), colour only where it means
+  something (a low-battery red, a charging bolt, the clock's seconds hand, an event's colour).
+- The plate takes **no Space tint**: `CardTint::Space` and the Space gradient on the card go
+  (21-SPACES section 3); `CardTint::Material` is the one tint, and section 6 item 6 and the
+  "from Arc, the plate may take the Space's colour" clause of the fourth pass are history.
+- **Ring gauges only in the control centre**, where there is room to show them. Everywhere else a
+  battery is the plain battery glyph with a number (the user's second-pass verdict: "use a battery
+  icon and a number to show, like mac"); the Batteries widget on the desktop is that glyph row, so
+  section 4.1's ring is the control centre's.
+- The brightness of the fourth pass (a bright green ring, white day dials) applies to the control
+  centre's rings and to the clock's dials only; it is not a licence for colour elsewhere.
+- Short Mac copy on every widget (no header rows, no mono labels).
+
 ### 1.1 Measured references (2026-09-26)
 
 Sources (screenshots, reference-only, never committed): **R-bs** the Batteries widget small with
@@ -221,6 +240,8 @@ digital time 800, tabular, tracked -.02em. Labels are the UI face 700 at `--fs-s
 
 ### 4.1 Battery (`BatteryRing`)
 
+Per 1.0 this ring is the control centre's; the desktop widget shows a battery glyph and a number (target (clean-up phase)).
+
 Status (design/30 section 2.10, step 4a.7): the ring is `BatteryRing { state: BatteryState, label: Text,
 readout: Readout, children }`, a `ProgressIndicator { Ring }` (one arc geometry, notched at twelve while
 `state.power` is `Charging`) with the device's glyph as `children`; `BatteryLevel`, `BatteryFigure`,
@@ -289,14 +310,14 @@ where it knows the zone, else 06:00-18:00).
 ### 4.3 The frame (`WidgetFrame`)
 
 `WidgetFrame { size, host, tint: CardTint::{Material, Space}, title, id, kind, lift, children }`:
-`tint` defaults to `Space` (settled 2026-09-27, section 6 item 6; it was `Material`), and a
+`tint` defaults to `Space` (settled 2026-09-27, section 6 item 6; it was `Material`; target (clean-up phase): `Space` goes and `Material` is the only tint, 1.0), and a
 tile ignores it (`CardTint::on`: the center's popover already carries the Space); `kind`
 writes `data-widget`; `lift` is section 9.8's. A widget never names any of these: `WidgetCard`
 passes them (section 9.3). The desktop card is the `Widget` material's plate, corner
 `--m-radius` 20 (M3), padding 12 (M4); the tile is unchanged (12 padding, `--r-tile`).
 `CardTint::Space` writes `data-tint="space"` and lays the Space's gradient (`.ds-frame`, the
 tinted chrome's layer) over the plate at the material's frame alpha, under the content, so the
-Space's colour reaches the card (Arc's contribution). The optional title row is quiet: the glyph
+Space's colour reaches the card (history, retired by 1.0). The optional title row is quiet: the glyph
 at 12 and the name in the UI face 600 `--fs-caption` `--ink-soft`; the Batteries and Clock
 widgets pass none.
 
@@ -317,11 +338,11 @@ follows the scheme (settled, section 6 item 4).
 The band's `--accent-text` (design/03-COLOR.md section 20) is derived against the opaque card
 grounds; on the desktop card, the .48 near-white over the wallpaper, sill measured the small
 Calendar's month title at 3.7-3.9:1 over the default wallpaper's warm sand (5.3-5.7 before accent
-B). A first answer stepped the accent until it read (Postmark `#001d48`): nearly black, the
+B). A first answer stepped the accent until it read (the old navy accent, `#001d48`): nearly black, the
 accent lost, heavier than band B; withdrawn. The two options, measured on the Space-tinted card
 (the tint over seven reference wallpapers, `accent_band::WALLPAPERS`: the default wallpaper's
 sand, warm sand, coral, teal, blue and violet as sill's capture shows them, and a near-black;
-under both stops of preset 1's gradient at the frame alpha .70), Postmark, worst case:
+under both stops of preset 1's gradient at the frame alpha .70), the old navy accent, worst case (history, the Space no longer tints the card):
 
 | Option | Light | Dark |
 | --- | --- | --- |
@@ -482,7 +503,7 @@ draws it.
    night faces in either.
 5. **Filled device glyphs**: a new filled set, abstract and on the Lucide grid, not copies of the
    reference's symbols (section 4.4, `DeviceGlyph`).
-6. **Every widget card is tinted by the Space** (Arc's contribution): `CardTint::Space` is the
+6. **Every widget card is tinted by the Space** (history: retired 2026-10-02, 1.0; neutral plates now): `CardTint::Space` is the
    default, laid by quire's card and never by a widget; a notification-center tile lays no
    second gradient on the center's already tinted popover. The widget's own accent text takes a
    title colour chosen for the see-through card (section 4.3, sill Q412: two options rendered,
