@@ -6,6 +6,7 @@ members = [
   "crates/ds-motion",
   "crates/ds-lint",
   "crates/ds",
+  "crates/ds-intents",
   "crates/ds-core-derive",
   "crates/ds-settings",
   "crates/ds-shell",
@@ -33,6 +34,7 @@ ds-style           = { path = "crates/ds-style" }
 ds-motion          = { path = "crates/ds-motion" }
 ds-lint            = { path = "crates/ds-lint" }
 ds                 = { path = "crates/ds" }
+ds-intents         = { path = "crates/ds-intents" }
 ds-settings        = { path = "crates/ds-settings" }
 ds-shell           = { path = "crates/ds-shell" }
 ds-core-derive     = { path = "crates/ds-core-derive" }

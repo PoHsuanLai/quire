@@ -23,6 +23,7 @@ cd "$(dirname "$0")/.."
 # hybrid painter) name it; every other crate stays device-free.
 RULES=(
   "ds-core: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "ds-intents: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-style: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-motion: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-lint: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
@@ -69,7 +70,8 @@ EDGES=(
   "ds-style: ds-core ds-core-derive"
   "ds-motion: ds-core ds-style"
   "ds-lint: ds-core ds-style"
-  "ds: ds-core ds-motion ds-style"
+  "ds-intents: ds-core"
+  "ds: ds-core ds-intents ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-core ds-style ds-settings-derive"
   "ds-blitz: blitz-kit ds"
@@ -147,7 +149,7 @@ for rule in "${LAYERS[@]}"; do
 done
 
 # The component groups, lowest first: a group names only itself and the groups below it.
-COMPONENT_GROUPS=(content controls overlays lists fields menus editor chrome app)
+COMPONENT_GROUPS=(content controls overlays lists fields menus editor chrome companion app)
 for i in "${!COMPONENT_GROUPS[@]}"; do
   group="${COMPONENT_GROUPS[$i]}"
   above=("${COMPONENT_GROUPS[@]:$((i + 1))}")
