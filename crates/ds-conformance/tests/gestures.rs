@@ -28,8 +28,11 @@ fn Listener() -> Element {
     use_gestures(move |gesture| {
         let line = match gesture {
             Gesture::Pinch { phase, by, .. } => format!("pinch {phase:?} {}", by.0),
-            Gesture::Scroll { phase, by, .. } => {
-                format!("scroll {phase:?} {} {}", by.x.0, by.y.0)
+            Gesture::Scroll {
+                phase, by, held, ..
+            } => {
+                let control = held.contains(Modifiers::CONTROL);
+                format!("scroll {phase:?} {} {} control={control}", by.x.0, by.y.0)
             }
         };
         log.with_mut(|log| log.push(line));
@@ -81,7 +84,29 @@ fn a_wheel_is_published_as_a_scroll() {
     ));
     assert_eq!(
         harness.text_of(".log").as_deref(),
-        Some("scroll Changed 0 -24")
+        Some("scroll Changed 0 -24 control=false")
+    );
+}
+
+#[test]
+fn a_scroll_carries_the_modifiers_held_while_it_happened() {
+    let mut harness = Harness::new(Listener, VIEW);
+    harness.advance(ms(50));
+    harness.send(Input::gesture(Gesture::Scroll {
+        phase: GesturePhase::Changed,
+        by: Point {
+            x: Px(0.0),
+            y: Px(12.0),
+        },
+        at: Point {
+            x: Px(50.0),
+            y: Px(50.0),
+        },
+        held: Modifiers::CONTROL,
+    }));
+    assert_eq!(
+        harness.text_of(".log").as_deref(),
+        Some("scroll Changed 0 12 control=true")
     );
 }
 
