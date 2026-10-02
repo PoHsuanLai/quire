@@ -8,6 +8,7 @@ pub mod bar;
 pub mod battery;
 pub mod catalog;
 pub mod clock;
+pub mod confirm;
 pub mod control_center;
 pub mod date_picker;
 pub mod dock;
