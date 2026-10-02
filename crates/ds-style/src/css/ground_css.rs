@@ -1,4 +1,4 @@
-//! The frame ground (`data-ground="frame"`, `Ground::Frame`, on a scope root or on a `Sidebar`): under it the paper inks and
+//! The frame ground (`data-ground="frame"`, `Ground::Frame`): under it the paper inks and
 //! fills are the frame's, so every component (Button, Chip, Badge, a menu's
 //! trigger, plain text) draws in the `--f-*` inks without a variant of its own
 //! (design/03-COLOR.md section 4, design/04-COMPONENTS.md's sidebar item).
@@ -27,8 +27,7 @@ pub(crate) const REMAP: [(ColourToken, VarName); 8] = [
 
 /// The frame ground's redirect, then the paper values given back to overlays in each scheme.
 pub fn ground_css() -> String {
-    let on_frame = attr_selector("data-ground", "frame");
-    let ground = format!(".ds{on_frame},.ds-sidebar{on_frame}");
+    let ground = format!(".ds{}", attr_selector("data-ground", "frame"));
     let mut css = rule(
         &ground,
         &REMAP
@@ -64,7 +63,7 @@ mod tests {
     fn the_frame_redirects_the_paper_inks_and_overlays_take_them_back() {
         let css = ground_css();
         const WANT: &[&str] = &[
-            ".ds[*|data-ground=frame],.ds-sidebar[*|data-ground=frame]{--ink:var(--f-ink);--ink-soft:var(--f-ink-soft);--ink-faint:var(--f-ink-faint);--surface:var(--f-pill-hover);--surface-2:var(--f-pill);",
+            ".ds[*|data-ground=frame]{--ink:var(--f-ink);--ink-soft:var(--f-ink-soft);--ink-faint:var(--f-ink-faint);--surface:var(--f-pill-hover);--surface-2:var(--f-pill);",
             ".ds[*|data-ground=frame] .ds-overlay{--ink:#",
             ".ds[*|data-theme=dark][*|data-ground=frame] .ds-overlay{--ink:#",
         ];

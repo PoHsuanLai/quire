@@ -5,7 +5,7 @@ use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::app::edge_peek::EdgePeek;
 use ds::components::chrome::sidebar::Sidebar;
-use ds::components::chrome::sidebar_section::SidebarSection;
+use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::prelude::*;

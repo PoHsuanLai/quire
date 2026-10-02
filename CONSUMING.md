@@ -716,15 +716,15 @@ spinner that turns only while the `Operation` is `Running`, `Attention { why }` 
 warning was pressed; that press is neither a pick (`onpick`) nor the start of a drag.
 
 Window layout (design/30 §2.7, `ds::components::chrome`): a source-list sidebar is
-`Sidebar { label, sections, size, cursor, onselect, header, foot, ground }`. `sections` is a
+`Sidebar { label, sections, size, cursor, onselect, header, foot, fill }`. `sections` is a
 `Vec<SidebarSection<K>>`, top to bottom: `SidebarSection::List(items)` is a source-list `List` (its group
 headings are its own `ListItem::heading`s) and `SidebarSection::Custom(element)` is anything else the
 sidebar holds between its lists, such as `PinTiles` or `TodayTabs`, whose heading and selection you draw.
 The sections scroll; `header` stays above them and `foot` (a Space's name, dots and buttons) stays under
-them. One `cursor` runs across every list, so the app keeps one selected place. `ground` is
-`Ground::Paper` (the default: the sidebar material, a quiet source list) or `Ground::Frame`, which draws no
-ground of its own, so the Space's colour shows through, and takes the frame's inks (`--f-ink*`) for the
-text and the row fills. Rows inside it need no variant.
+them. One `cursor` runs across every list, so the app keeps one selected place. It is a plain Mac source list.
+`fill` is `SidebarFill::Material` (the default: the sidebar's own ground) or `SidebarFill::Clear`, which paints
+nothing, so the window's flat Space tint shows through behind the rows; the inks are the ordinary ones in both,
+and rows inside need no variant.
 
 A sidebar that folds away and peeks: give the `SplitView` pane a body that is an `EdgePeek` (holding the
 `Sidebar`) and mark the pane `SplitPane::new(spec, body).shown(pinned).peeking()`. A folded pane clips its
