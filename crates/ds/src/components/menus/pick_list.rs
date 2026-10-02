@@ -11,6 +11,8 @@
 
 use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
+use crate::focus::request::use_focus_request;
+use crate::host::caret::InitialCaret;
 use crate::components::fields::text_field_model::FieldKind;
 use crate::components::lists::row::size::RowSize;
 use crate::components::menus::item::item::AfterPick;
@@ -67,6 +69,8 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
         let alive = alive.clone();
         move || alive.set(Life::Gone)
     });
+    // A list opened on a query puts the caret after it, as the palette does.
+    let focus = use_focus_request().with_caret(InitialCaret::End);
     let selection = use_palette_selection(&query, None, None);
     let in_view = use_reveal();
     let revision = use_revision(&groups.key());
@@ -139,7 +143,7 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
                     value: query.clone(),
                     placeholder,
                     kind: FieldKind::Search,
-                    focus: FieldFocus::OnMount,
+                    focus: FieldFocus::Controlled(focus),
                     oninput,
                     onkey,
                 }
