@@ -19,7 +19,7 @@ pub fn SheetWithinSection() -> Element {
     rsx! {
         Section { title: "Sheet: attached to a pane", note: "Attach::Within(anchor) hangs the sheet from the top edge of one pane (a card, a column), centred over it and no wider than min(560, 88%) of it, clipped by the pane as it slides in; the sidebar and the window's other pane stay as they are. The anchor is the pane's element (Anchor::Mounted) or its rect.",
             Specimen { name: "Attach::Within, Regular".to_string(), code: Some("attach: Attach::Within(Anchor::Mounted(card))".to_string()),
-                div { class: "g-wall g-modal g-within", style: "background-image:url(\"{wallpaper::uri()}\")",
+                div { class: "g-wall g-modal", style: "background-image:url(\"{wallpaper::uri()}\")",
                     Ds { appearance, material: Material::Sheet, stylesheet: Inject::Host,
                         div { class: "g-modal-stage g-within-stage",
                             div { class: "g-within-side" }
