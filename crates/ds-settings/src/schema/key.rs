@@ -60,6 +60,9 @@ pub enum Page {
     /// `session.lock_grace_s`).
     Power,
     Apps,
+    /// The companion, its models, memory and computer use (design/22-SETTINGS.md sections 3.26 to
+    /// 3.30 `ai.*`, `agent.*`, `memory.*`, `cua.*`, `companion.*`).
+    Intelligence,
     /// A third-party program's own page, named by its app id.
     App(String),
 }
@@ -78,6 +81,7 @@ impl Page {
             Page::Accounts => "Accounts",
             Page::Power => "Power",
             Page::Apps => "Apps",
+            Page::Intelligence => "Intelligence",
             Page::App(id) => id,
         }
     }
@@ -314,6 +318,19 @@ mod tests {
     }
 
     #[test]
+    fn page_intelligence_label_and_wire_form() {
+        assert_eq!(Page::Intelligence.label(), "Intelligence");
+        assert_eq!(
+            serde_json::to_string(&Page::Intelligence).ok().as_deref(),
+            Some(r#"{"kind":"intelligence"}"#)
+        );
+        assert_eq!(
+            serde_json::from_str::<Page>(r#"{"kind":"intelligence"}"#).ok(),
+            Some(Page::Intelligence)
+        );
+    }
+
+    #[test]
     fn a_page_is_labelled_as_the_settings_app_names_it() {
         const CASES: &[(Page, &str)] = &[
             (Page::Appearance, "Appearance"),
@@ -325,6 +342,7 @@ mod tests {
             (Page::Accounts, "Accounts"),
             (Page::Power, "Power"),
             (Page::Apps, "Apps"),
+            (Page::Intelligence, "Intelligence"),
         ];
         for (page, want) in CASES {
             assert_eq!(page.label(), *want, "{page:?}");
