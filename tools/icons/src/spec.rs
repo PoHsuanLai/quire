@@ -116,7 +116,7 @@ relief = "recessed"
         assert!(parse_spec(&TEXT.replace("fill = \"symbol\"", "fill = \"ink\"")).is_err());
     }
 
-    /// The five bundled specs parse and use their subject's name.
+    /// The bundled specs parse and use their subject's name.
     #[test]
     fn bundled_specs_parse() {
         let specs = [
@@ -125,6 +125,7 @@ relief = "recessed"
             ("terminal", include_str!("../specs/terminal.toml")),
             ("notes", include_str!("../specs/notes.toml")),
             ("photos", include_str!("../specs/photos.toml")),
+            ("viewer", include_str!("../specs/viewer.toml")),
         ];
         for (name, text) in specs {
             let s = parse_spec(text).unwrap_or_else(|e| panic!("{name}: {e}"));

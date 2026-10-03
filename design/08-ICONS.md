@@ -453,8 +453,9 @@ sheets waits for the user's pick of a dialect per app.
 | Terminal | Monochrome | jade (175) | procedural |
 | Notes | Paper, clay spot | clay (40) | procedural |
 | Photos | Monochrome | rose (355) | Klein retint (round three face mode, seed 11) |
+| Viewer | Solid | teal (220) | procedural; proposed 2026-10-03, not yet picked by the user |
 
-All at chroma cap 0.07. `tools/icons/ship.toml` names each app's spec, dialect, hue and source;
+All at chroma cap 0.07 (the viewer's page with a pressed-in eye and a raised pupil is a proposal: its hue and dialect wait for the user's pick). `tools/icons/ship.toml` names each app's spec, dialect, hue and source;
 `tools/icons ship --manifest tools/icons/ship.toml --renders <round-three renders> --out
 assets/icons/apps` writes every size of every style, each drawn directly (a Klein face is
 resampled onto each size's plate; plate, grain, bevel, rim and shadow are drawn at that size):

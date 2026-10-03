@@ -163,10 +163,13 @@ mod tests {
     const MANIFEST: &str = include_str!("../ship.toml");
 
     #[test]
-    fn manifest_names_the_five_apps() {
+    fn manifest_names_the_shipped_apps() {
         let m: Manifest = toml::from_str(MANIFEST).expect("ship.toml");
         let names: Vec<_> = m.apps.iter().map(|a| a.name.as_str()).collect();
-        assert_eq!(names, ["mail", "files", "terminal", "notes", "photos"]);
+        assert_eq!(
+            names,
+            ["mail", "files", "terminal", "notes", "photos", "viewer"]
+        );
         assert!((m.chroma - 0.07).abs() < 1e-6 && (m.muted_chroma - 0.04).abs() < 1e-6);
         let klein: Vec<_> = m
             .apps

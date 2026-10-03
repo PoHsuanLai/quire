@@ -39,3 +39,14 @@ spec = "specs/photos.toml"
 dialect = "monochrome"
 hue = "rose"
 source = { kind = "klein-retint", render = "photos-s11.png" }
+
+[[app]]
+name = "viewer"
+spec = "specs/viewer.toml"
+dialect = "solid"
+hue = "teal"
+source = { kind = "procedural" }
+# Viewer: PROPOSED, NOT YET PICKED BY THE USER. The five apps above were picked by hand in rounds
+# four and five; the viewer's hue (teal, 220, unused) and dialect (solid, flat colour with a white
+# page) are the proposal. Graphite, the one dialect no app uses, has no hue, so it would make a
+# viewer plate near black rather than a colour of its own.
