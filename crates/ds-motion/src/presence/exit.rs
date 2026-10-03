@@ -1,5 +1,6 @@
 //! How an item leaves: the `data-exit` word and the animation it plays.
 
+#[cfg(feature = "dioxus")]
 use crate::anim::Anim;
 use ds_core::word::Word;
 
@@ -22,6 +23,7 @@ pub enum Exit {
 
 impl Exit {
     /// The animation this exit plays.
+    #[cfg(feature = "dioxus")]
     pub(crate) fn anim(self) -> Anim {
         match self {
             Exit::Row => Anim::RowOut,

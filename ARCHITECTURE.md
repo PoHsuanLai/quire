@@ -20,7 +20,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-core-derive` | proc macros: `#[derive(Word)]`, `#[derive(Token)]` |
 | `ds-core` | pure base: vocabulary, geometry units, colour, time, the `Spawner` trait, errors, text clip, PNG/base64, the `Word` trait |
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
-| `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar |
+| `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar; feature `dioxus` adds the hooks, timers and event conversions over Dioxus (`ds` turns it on) |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
 | `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
 | `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
@@ -65,6 +65,8 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | --- | --- |
 | `ds-core`, `ds-intents`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*`, `arboard` |
 | `ds-core`, `ds-intents`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths: `::ds_core` or `::ds_style` where the caller's manifest names it, else `::ds::base` or `::ds::style`, found with `proc-macro-crate`) |
+| `ds-style` | `dioxus` unless feature `dioxus` (appearance, tokens, palettes, icons and CSS text are plain data, so a compositor links them without it) |
+| `ds-motion` | `dioxus` unless feature `dioxus` (recipes, keyframes, springs, throws, timelines, `Touch` as data; the hooks, timers and `Touch`'s event conversions are the feature) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |

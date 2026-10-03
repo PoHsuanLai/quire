@@ -10,8 +10,8 @@ publish.workspace = true
 
 [dependencies]
 ds-core = { workspace = true }
-ds-style = { workspace = true, features = ["dioxus"] }
-dioxus = { workspace = true }
+ds-style = { workspace = true }
+dioxus = { workspace = true, optional = true }
 
 [lints]
 workspace = true
@@ -19,3 +19,9 @@ workspace = true
 [dev-dependencies]
 dioxus-ssr = { workspace = true }
 ds = { workspace = true }
+
+[features]
+# Hooks, components and event conversions over Dioxus: the `use_*` hooks, timers, pulse, presence
+# and timeline playback, gestures, rosters and the details hooks. Without it the crate is data,
+# recipes, keyframes and the pure machines, so a compositor can sample motion without linking Dioxus.
+dioxus = ["dep:dioxus", "ds-style/dioxus"]

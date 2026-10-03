@@ -78,22 +78,22 @@ pub struct Spring {
 
 impl Spring {
     /// The spring that runs `leg`.
-    pub(crate) fn new(leg: Leg, scale: PxPerUnit) -> Spring {
+    pub fn new(leg: Leg, scale: PxPerUnit) -> Spring {
         Spring { leg, scale }
     }
 
     /// A spring standing at `at`, on `tuning`.
-    pub(crate) fn still(at: f64, tuning: SpringTuning, scale: PxPerUnit) -> Spring {
+    pub fn still(at: f64, tuning: SpringTuning, scale: PxPerUnit) -> Spring {
         Spring::new(Leg::still(at, tuning), scale)
     }
 
     /// The leg it runs.
-    pub(crate) fn leg(&self) -> Leg {
+    pub fn leg(&self) -> Leg {
         self.leg
     }
 
     /// The exact state `elapsed` into the leg, between frames too.
-    pub(crate) fn state(&self, elapsed: Duration) -> State {
+    pub fn state(&self, elapsed: Duration) -> State {
         self.leg.at(elapsed)
     }
 

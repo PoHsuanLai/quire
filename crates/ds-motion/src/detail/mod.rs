@@ -8,20 +8,30 @@
 //! give; Reduced motion is inside every primitive, and every primitive's clock stops when its
 //! moment ends.
 
+#[cfg(feature = "dioxus")]
 pub mod armed;
+#[cfg(feature = "dioxus")]
 pub mod cue;
 pub mod detailed;
 pub(crate) mod grammar;
+#[cfg(feature = "dioxus")]
 pub mod level;
 pub mod moment;
 pub mod morph;
+#[cfg(feature = "dioxus")]
 pub mod morph_glyph;
+#[cfg(feature = "dioxus")]
 pub mod once;
 pub mod operation;
 pub mod pending;
 pub mod stamp;
 pub mod touch;
+#[cfg(feature = "dioxus")]
+pub mod touch_event;
 pub mod tween;
+#[cfg(feature = "dioxus")]
 pub mod use_detail;
+#[cfg(feature = "dioxus")]
 pub mod use_operation;
+#[cfg(feature = "dioxus")]
 pub mod use_pending;
