@@ -39,7 +39,6 @@ where
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_double_tap_follows_its_table() {
     let armed = |t| Tap::Armed { until: Stamp(t) };
     #[rustfmt::skip]
@@ -56,7 +55,6 @@ fn the_double_tap_follows_its_table() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_hold_follows_its_table() {
     use KeyEdge::*;
     let edge = HoldIn::Edge;
@@ -93,7 +91,6 @@ fn the_hold_follows_its_table() {
 /// The hold feeds the double tap: two short lone presses inside the window summon, and a chord
 /// between them does not count as a tap.
 #[test]
-#[ignore = "S0-QB-F"]
 fn two_lone_presses_summon_and_a_chord_does_not() {
     /// Every edge at its time, through the hold and then the double tap.
     fn summons(edges: &[(u64, KeyEdge)]) -> usize {

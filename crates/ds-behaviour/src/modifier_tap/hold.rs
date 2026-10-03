@@ -24,6 +24,8 @@ use std::time::Duration;
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
+use crate::span;
+
 /// The Command key's hold state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum HoldKey {
@@ -111,11 +113,64 @@ impl Machine for HoldKey {
     type Params = HoldParams;
 
     fn step(self, input: HoldIn, at: Stamp, params: &HoldParams) -> (HoldKey, Vec<HoldOut>) {
-        let _ = (self, input, at, params);
-        todo!("the voice 4.1 table in this module's doc")
+        match (self, input) {
+            (HoldKey::Rest, HoldIn::Edge(KeyEdge::CommandDown)) => silent(down(at, params)),
+            (HoldKey::Down { until }, HoldIn::Edge(KeyEdge::CommandUp)) if at < until => {
+                said(HoldKey::Rest, HoldOut::Tap)
+            }
+            (HoldKey::Down { .. }, HoldIn::Edge(KeyEdge::CommandUp)) => silent(HoldKey::Rest),
+            (
+                HoldKey::Down { .. },
+                HoldIn::Edge(KeyEdge::OtherKey | KeyEdge::Escape | KeyEdge::Pointer),
+            ) => silent(HoldKey::Chorded),
+            (HoldKey::Down { until }, HoldIn::Elapsed) if at >= until => {
+                said(talking(at, params), HoldOut::Start)
+            }
+            (HoldKey::Talking { .. }, HoldIn::Edge(KeyEdge::CommandUp)) => {
+                said(HoldKey::Rest, HoldOut::End)
+            }
+            (HoldKey::Talking { .. }, HoldIn::Edge(KeyEdge::Escape)) => {
+                said(HoldKey::Chorded, HoldOut::Cancel(CancelCause::Escape))
+            }
+            (HoldKey::Talking { .. }, HoldIn::Edge(KeyEdge::OtherKey | KeyEdge::Pointer)) => {
+                said(HoldKey::Chorded, HoldOut::Cancel(CancelCause::OtherInput))
+            }
+            (HoldKey::Talking { until }, HoldIn::Elapsed) if at >= until => {
+                said(HoldKey::Chorded, HoldOut::End)
+            }
+            (HoldKey::Chorded, HoldIn::Edge(KeyEdge::CommandUp)) => silent(HoldKey::Rest),
+            (state, _) => silent(state),
+        }
     }
 
     fn wake(&self) -> Option<Stamp> {
-        todo!("Down and Talking: until; Rest and Chorded: none")
+        match self {
+            HoldKey::Down { until } | HoldKey::Talking { until } => Some(*until),
+            HoldKey::Rest | HoldKey::Chorded => None,
+        }
     }
+}
+
+/// Command pressed alone at `at`: talking starts when the hold time has passed.
+fn down(at: Stamp, params: &HoldParams) -> HoldKey {
+    HoldKey::Down {
+        until: span::after(at, params.hold),
+    }
+}
+
+/// Talking from `at`: the longest hold ends it.
+fn talking(at: Stamp, params: &HoldParams) -> HoldKey {
+    HoldKey::Talking {
+        until: span::after(at, params.max),
+    }
+}
+
+/// `state`, with nothing to do.
+fn silent(state: HoldKey) -> (HoldKey, Vec<HoldOut>) {
+    (state, Vec::new())
+}
+
+/// `state`, with `out` to do.
+fn said(state: HoldKey, out: HoldOut) -> (HoldKey, Vec<HoldOut>) {
+    (state, vec![out])
 }

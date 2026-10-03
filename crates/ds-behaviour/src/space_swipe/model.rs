@@ -8,6 +8,13 @@ use ds_core::time::stamp::Stamp;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct PageMilli(pub i32);
 
+impl PageMilli {
+    /// Where Space `k` sits on the row: `k × 1000`.
+    pub fn of_space(k: u32) -> PageMilli {
+        PageMilli(i32::try_from(k).unwrap_or(i32::MAX).saturating_mul(1000))
+    }
+}
+
 /// A speed along the row of Spaces in thousandths of a page per second, positive toward later
 /// Spaces (1.5 pages/s is `1500`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
@@ -67,6 +74,16 @@ pub enum SwipeSource {
     MagicMouse,
     /// Three or four fingers horizontal on a touchpad; one page is 400 px.
     Touchpad,
+}
+
+impl SwipeSource {
+    /// How many of the device's units make one page.
+    pub fn units_per_page(self) -> i32 {
+        match self {
+            SwipeSource::MagicMouse => 1000,
+            SwipeSource::Touchpad => 400,
+        }
+    }
 }
 
 /// What moves the swipe.
