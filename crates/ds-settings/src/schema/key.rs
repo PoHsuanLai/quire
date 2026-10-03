@@ -63,6 +63,9 @@ pub enum Page {
     /// The companion, its models, memory and computer use (design/22-SETTINGS.md sections 3.26 to
     /// 3.30 `ai.*`, `agent.*`, `memory.*`, `cua.*`, `companion.*`).
     Intelligence,
+    /// The file viewer's timings, steps, history, export defaults and decoder limits
+    /// (design/22-SETTINGS.md section 3.31 `viewer.*`).
+    Viewer,
     /// A third-party program's own page, named by its app id.
     App(String),
 }
@@ -82,6 +85,7 @@ impl Page {
             Page::Power => "Power",
             Page::Apps => "Apps",
             Page::Intelligence => "Intelligence",
+            Page::Viewer => "Viewer",
             Page::App(id) => id,
         }
     }
@@ -331,6 +335,19 @@ mod tests {
     }
 
     #[test]
+    fn page_viewer_label_and_wire_form() {
+        assert_eq!(Page::Viewer.label(), "Viewer");
+        assert_eq!(
+            serde_json::to_string(&Page::Viewer).ok().as_deref(),
+            Some(r#"{"kind":"viewer"}"#)
+        );
+        assert_eq!(
+            serde_json::from_str::<Page>(r#"{"kind":"viewer"}"#).ok(),
+            Some(Page::Viewer)
+        );
+    }
+
+    #[test]
     fn a_page_is_labelled_as_the_settings_app_names_it() {
         const CASES: &[(Page, &str)] = &[
             (Page::Appearance, "Appearance"),
@@ -343,6 +360,7 @@ mod tests {
             (Page::Power, "Power"),
             (Page::Apps, "Apps"),
             (Page::Intelligence, "Intelligence"),
+            (Page::Viewer, "Viewer"),
         ];
         for (page, want) in CASES {
             assert_eq!(page.label(), *want, "{page:?}");
