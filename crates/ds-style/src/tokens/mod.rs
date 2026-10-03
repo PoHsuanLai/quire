@@ -14,6 +14,7 @@ pub mod delay;
 pub mod easing;
 pub mod elevation;
 pub mod emoji_face;
+pub mod glow;
 pub mod hex;
 pub mod label_hue;
 pub mod layer;
