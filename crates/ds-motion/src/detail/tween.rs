@@ -3,12 +3,6 @@
 //! (`CubicBezier::at`). A determinate value that changes (a battery ring's arc, a slash drawn
 //! on) moves to its new value and nothing sweeps in on first show (design/30 section 1.3).
 
-use super::level::use_level;
-use crate::timeline::glide::Glide;
-use crate::timeline::use_timeline::use_timeline;
-use dioxus::prelude::*;
-use ds_core::vocab::Fraction;
-use ds_style::appearance::motion::MotionLevel;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// How a tween moves: a duration token along an easing token.
@@ -23,7 +17,14 @@ pub struct TweenSpec {
 /// The share of a tween that follows `target`: it stands there on mount, and each time `target`
 /// changes it moves there from wherever it is now, over `spec`. Under Reduced it jumps (R7). Asks
 /// for frames only while it moves (R3).
-pub fn use_tween(target: Fraction, spec: TweenSpec) -> Fraction {
+#[cfg(feature = "dioxus")]
+pub fn use_tween(target: ds_core::vocab::Fraction, spec: TweenSpec) -> ds_core::vocab::Fraction {
+    use super::level::use_level;
+    use crate::timeline::glide::Glide;
+    use crate::timeline::use_timeline::use_timeline;
+    use dioxus::prelude::*;
+    use ds_style::appearance::motion::MotionLevel;
+
     let env = use_level();
     // The share drawn last, where a retarget starts from (R10).
     let mut drawn = use_hook(|| CopyValue::new(i64::from(target.0)));
@@ -44,5 +45,5 @@ pub fn use_tween(target: Fraction, spec: TweenSpec) -> Fraction {
     }
     let pose = use_timeline(plan.peek().1);
     drawn.set(pose.value);
-    Fraction(u16::try_from(pose.value.max(0)).unwrap_or(u16::MAX))
+    ds_core::vocab::Fraction(u16::try_from(pose.value.max(0)).unwrap_or(u16::MAX))
 }

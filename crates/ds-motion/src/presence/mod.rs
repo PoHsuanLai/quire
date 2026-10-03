@@ -4,8 +4,11 @@
 
 pub(crate) mod exit;
 pub mod spec;
+#[cfg(feature = "dioxus")]
 pub mod spring;
+#[cfg(feature = "dioxus")]
 pub(crate) mod step;
+#[cfg(feature = "dioxus")]
 pub mod use_presence;
 
 pub use exit::Exit;

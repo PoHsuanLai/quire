@@ -8,9 +8,12 @@
 
 pub(crate) mod ease;
 pub mod glide;
+#[cfg(feature = "dioxus")]
 pub(crate) mod pending;
+#[cfg(feature = "dioxus")]
 pub mod playback;
 pub mod spring;
+#[cfg(feature = "dioxus")]
 pub(crate) mod use_timeline;
 
 use std::time::Duration;

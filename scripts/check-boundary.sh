@@ -10,11 +10,12 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-# ds-core is plain data and maths, so sill's pure crates can use it: not even dioxus. ds-style names
-# dioxus only through its `dioxus` feature (scope, scale, task, busy, `Glyph`), which ds-settings
-# leaves off, so a crate that only reads settings links no Dioxus; its `dioxus` feature is for the
-# environment that provides them. ds is renderer-free and effect-free; ds-settings does I/O but
-# never renders, and takes a Spawner instead of naming a runtime.
+# ds-core is plain data and maths, so sill's pure crates can use it: not even dioxus. ds-style and
+# ds-motion name dioxus only through their `dioxus` feature (ds-style: scope, scale, task, busy,
+# `Glyph`; ds-motion: the hooks, timers and event conversions), which neither enables by default,
+# so a compositor or a crate that only reads settings links no Dioxus; ds-settings has the same
+# feature for the environment that provides them. ds is renderer-free and effect-free; ds-settings
+# does I/O but never renders, and takes a Spawner instead of naming a runtime.
 # ds-blitz reaches D-Bus only through its opt-in `print` feature, so an app that never prints
 # builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
 # (it turns on `pdf` only for its own `pdf` feature). pdfrum-anyrender (a git dependency
@@ -24,8 +25,8 @@ cd "$(dirname "$0")/.."
 RULES=(
   "ds-core: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-intents: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
-  "ds-style: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
-  "ds-motion: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "ds-style: dioxus zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "ds-motion: dioxus zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-lint: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-shell: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"

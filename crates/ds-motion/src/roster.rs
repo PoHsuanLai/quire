@@ -3,6 +3,7 @@
 //! (design/30 section 1.3: insert fades and slides down over `--t-move`, removal fades and
 //! slides up over `--t-quick`, the rows below close the gap over `--t-move`).
 
+#[cfg(feature = "dioxus")]
 use super::anim::Anim;
 use super::presence::{Exit, Presence};
 use ds_core::geometry::units::Px;
@@ -187,6 +188,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
 
     /// The animations that must settle before [`Self::rest`]: `heal` when a row heals and
     /// `row-in` when one enters. Empty when nothing is entering or healing.
+    #[cfg(feature = "dioxus")]
     pub(crate) fn running(&self) -> Vec<Anim> {
         let heal = self.entries.iter().any(|entry| entry.heal.is_some());
         let enter = self

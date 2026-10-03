@@ -1,42 +1,13 @@
 //! Who caused a moment (design/26-DETAILS.md R5): only a person's own contact may spend an
-//! overshoot. A [`Contact`] is proof of that contact, and the only public way to get one is from
-//! the event a pointer or key handler receives, so a remote change cannot claim it.
+//! overshoot. A [`Contact`] is proof of that contact. With feature `dioxus` the only public way
+//! to get one is from the event a pointer or key handler receives (`touch_event`), so a remote
+//! change cannot claim it.
 
 use crate::velocity::Velocity;
-use dioxus::prelude::{Event, KeyboardData, MouseData, PointerData};
-
-mod sealed {
-    /// Closes [`super::Handled`] to the event payloads dioxus hands a handler.
-    pub trait Sealed {}
-    impl Sealed for dioxus::prelude::MouseData {}
-    impl Sealed for dioxus::prelude::KeyboardData {}
-    impl Sealed for dioxus::prelude::PointerData {}
-}
-
-/// An event payload a person's own hand produces: a click, a pointer press, a key.
-pub trait Handled: sealed::Sealed {}
-impl Handled for MouseData {}
-impl Handled for KeyboardData {}
-impl Handled for PointerData {}
 
 /// Proof that the person touched the element in this moment. It has no public constructor but
-/// [`Contact::from_event`], which takes the event a handler was given:
-///
-/// ```
-/// use dioxus::prelude::{Event, MouseData};
-/// use ds::motion::detail::touch::{Contact, Touch};
-///
-/// fn touched(event: &Event<MouseData>) -> Touch {
-///     Touch::Contact(Contact::from_event(event))
-/// }
-/// ```
-///
-/// (Error codes in these blocks are documentation: stable rustdoc checks only that each fails.)
-///
-/// ```compile_fail,E0451
-/// // A contact cannot be written by hand: its fields are private.
-/// let forged = ds::motion::detail::touch::Contact { proof: () };
-/// ```
+/// `Contact::from_event` (feature `dioxus`), which takes the event a handler was given, so a
+/// contact cannot be written by hand: its fields are private.
 ///
 /// A contact also carries the velocity the hand had when it let go (design/27 section 3.12):
 /// zero for a click or a key, the drag's release velocity for a throw
@@ -49,10 +20,9 @@ pub struct Contact {
 }
 
 impl Contact {
-    /// The contact a handler's event is: call it inside `onclick`, `onpointerdown` or
-    /// `onkeydown` and keep it with the state change that event caused. It carries no velocity.
-    pub fn from_event<T: Handled>(event: &Event<T>) -> Contact {
-        let _ = event;
+    /// The contact an event handler proves, carrying no velocity. Visible to the details
+    /// module only, where the event conversions that may prove contact live.
+    pub(super) fn proven() -> Contact {
         Contact {
             proof: (),
             velocity: Velocity::ZERO,
@@ -76,19 +46,13 @@ impl Contact {
     /// proves contact with an event.
     pub fn pressed(press: &ds_core::press::Press) -> Contact {
         let _ = press;
-        Contact {
-            proof: (),
-            velocity: Velocity::ZERO,
-        }
+        Contact::proven()
     }
 
     /// A contact for a unit test that has no event to hand.
     #[cfg(test)]
     pub fn for_tests() -> Contact {
-        Contact {
-            proof: (),
-            velocity: Velocity::ZERO,
-        }
+        Contact::proven()
     }
 }
 
@@ -104,11 +68,6 @@ pub enum Touch {
 }
 
 impl Touch {
-    /// `Touch::Contact` from a handler's event.
-    pub fn from_event<T: Handled>(event: &Event<T>) -> Touch {
-        Touch::Contact(Contact::from_event(event))
-    }
-
     /// The release velocity a contact carries; zero for a remote change.
     pub fn velocity(self) -> Velocity {
         match self {
