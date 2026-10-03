@@ -1,20 +1,21 @@
 /* Window frame (design/04-COMPONENTS.md "Window frame"; design/13-BEHAVIOUR-menus-windows.md
-   section 13.3.11). A framed root is a column: the 28 px titlebar, then `.ds-window-body` taking
-   the rest; the resize edges lie over both. The titlebar is on the frame colour, so its inks are
-   the `--f-*` ones. The lights are 12 px discs 8 px apart, the first 13 px from the window's
-   left edge (macOS). Coloured in the active window, `--f-pill` with a hairline in an inactive
-   one; any light under the pointer colours the group and shows the marks, as on macOS. */
+   section 13.3.11). A framed root is a column: the titlebar, then `.ds-window-body` taking the
+   rest; the resize edges lie over both. The titlebar is on the frame colour, so its inks are
+   the `--f-*` ones. The lengths are the `--chrome-*` tokens (`ds_style::tokens::chrome`), the
+   lights' colouring `ds_style::tokens::chrome::light_state`: coloured in the active window,
+   `--f-pill` with a hairline in an inactive one; any light under the pointer colours the group
+   and shows the marks, as on macOS. */
 
 .ds[*|data-window-frame=titlebar]{ position:relative; display:flex; flex-direction:column; height:100vh; }
 .ds[*|data-window-frame=titlebar] > .ds-window-body{ position:relative; flex:1 1 auto; min-height:0; }
 
 .ds-titlebar{
-  position:relative; flex:0 0 auto; display:flex; align-items:center; height:28px; padding:0 var(--s-13);
+  position:relative; flex:0 0 auto; display:flex; align-items:center; height:var(--chrome-titlebar-height); padding:0 var(--chrome-light-inset);
   color:var(--f-ink-soft); cursor:default; user-select:none;
 }
 .ds-titlebar[*|data-activity=inactive]{ color:var(--f-ink-faint); }
 .ds-titlebar-title{
-  position:absolute; top:0; left:84px; right:84px; height:28px; display:flex; align-items:center; justify-content:center; gap:var(--s-6);
+  position:absolute; top:0; left:var(--chrome-title-inset); right:var(--chrome-title-inset); height:var(--chrome-titlebar-height); display:flex; align-items:center; justify-content:center; gap:var(--s-6);
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
@@ -25,9 +26,9 @@
 /* The edited dot: the document has changes not saved. */
 .ds-titlebar-edited{ flex:none; width:var(--s-6); height:var(--s-6); border-radius:var(--r-pill); background:var(--f-ink-faint); }
 
-.ds-lights{ position:relative; display:flex; align-items:center; gap:var(--s-8); }
+.ds-lights{ position:relative; display:flex; align-items:center; gap:var(--chrome-light-gap); }
 .ds-light{
-  display:grid; place-items:center; width:12px; height:12px; padding:0; border:0; border-radius:var(--r-pill);
+  display:grid; place-items:center; width:var(--chrome-light-size); height:var(--chrome-light-size); padding:0; border:0; border-radius:var(--r-pill);
   background:var(--f-pill); box-shadow:inset 0 0 0 var(--hair) var(--f-line); cursor:default;
   transition:background-color var(--t-quick) var(--e-out);
 }
@@ -49,14 +50,14 @@
 .ds-light:focus .ds-light-mark,
 .ds-light[*|aria-expanded=true] .ds-light-mark{ opacity:1; }
 
-/* The grab zones: 4 px along each side, 12 px squares at the corners, over the content and
+/* The grab zones: `--chrome-edge` along each side, `--chrome-edge-corner` squares at the corners, over the content and
    under every floating surface. */
 .ds-resize-edge{ position:absolute; z-index:var(--z-edge); }
-.ds-resize-edge[*|data-edge=top]{ top:0; left:12px; right:12px; height:4px; cursor:ns-resize; }
-.ds-resize-edge[*|data-edge=bottom]{ bottom:0; left:12px; right:12px; height:4px; cursor:ns-resize; }
-.ds-resize-edge[*|data-edge=left]{ left:0; top:12px; bottom:12px; width:4px; cursor:ew-resize; }
-.ds-resize-edge[*|data-edge=right]{ right:0; top:12px; bottom:12px; width:4px; cursor:ew-resize; }
-.ds-resize-edge[*|data-edge=top-left]{ top:0; left:0; width:12px; height:12px; cursor:nwse-resize; }
-.ds-resize-edge[*|data-edge=top-right]{ top:0; right:0; width:12px; height:12px; cursor:nesw-resize; }
-.ds-resize-edge[*|data-edge=bottom-left]{ bottom:0; left:0; width:12px; height:12px; cursor:nesw-resize; }
-.ds-resize-edge[*|data-edge=bottom-right]{ bottom:0; right:0; width:12px; height:12px; cursor:nwse-resize; }
+.ds-resize-edge[*|data-edge=top]{ top:0; left:var(--chrome-edge-corner); right:var(--chrome-edge-corner); height:var(--chrome-edge); cursor:ns-resize; }
+.ds-resize-edge[*|data-edge=bottom]{ bottom:0; left:var(--chrome-edge-corner); right:var(--chrome-edge-corner); height:var(--chrome-edge); cursor:ns-resize; }
+.ds-resize-edge[*|data-edge=left]{ left:0; top:var(--chrome-edge-corner); bottom:var(--chrome-edge-corner); width:var(--chrome-edge); cursor:ew-resize; }
+.ds-resize-edge[*|data-edge=right]{ right:0; top:var(--chrome-edge-corner); bottom:var(--chrome-edge-corner); width:var(--chrome-edge); cursor:ew-resize; }
+.ds-resize-edge[*|data-edge=top-left]{ top:0; left:0; width:var(--chrome-edge-corner); height:var(--chrome-edge-corner); cursor:nwse-resize; }
+.ds-resize-edge[*|data-edge=top-right]{ top:0; right:0; width:var(--chrome-edge-corner); height:var(--chrome-edge-corner); cursor:nesw-resize; }
+.ds-resize-edge[*|data-edge=bottom-left]{ bottom:0; left:0; width:var(--chrome-edge-corner); height:var(--chrome-edge-corner); cursor:nesw-resize; }
+.ds-resize-edge[*|data-edge=bottom-right]{ bottom:0; right:0; width:var(--chrome-edge-corner); height:var(--chrome-edge-corner); cursor:nwse-resize; }

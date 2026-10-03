@@ -6,6 +6,7 @@
 
 pub mod accent_band;
 pub mod accent_table;
+pub mod chrome;
 pub mod colour;
 pub mod control_size;
 pub(crate) mod curve;
