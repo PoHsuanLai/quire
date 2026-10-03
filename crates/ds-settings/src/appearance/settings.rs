@@ -22,14 +22,16 @@ pub struct AppearanceSettings {
     #[settings(
         label = "Theme",
         help = "Follow the desktop, or force light or dark mode.",
-        section = "Appearance"
+        section = "Appearance",
+        agent_settable
     )]
     pub theme: Theme,
     /// `appearance.accent`: one of macOS's eight.
     #[settings(
         label = "Accent",
         help = "The colour of buttons, selection, switches and focus rings across the desktop.",
-        section = "Appearance"
+        section = "Appearance",
+        agent_settable
     )]
     pub accent: Accent,
     /// `appearance.motion_level`: Standard, which the desktop's reduce-motion preference still

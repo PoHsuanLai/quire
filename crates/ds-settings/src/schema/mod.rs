@@ -6,17 +6,19 @@
 //! 9.3) — nothing here talks to a running Settings app, and nothing in the Settings app talks
 //! back to a program.
 
+mod agent;
 mod column;
 mod deep_link;
 mod key;
 mod program;
 mod traits;
 
+pub use agent::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
-    Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget, WordLabels,
-    kind_from_variants,
+    AgentSetting, Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget,
+    WordLabels, kind_from_variants,
 };
 pub use program::{
     AppId, FilePath, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,

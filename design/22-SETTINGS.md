@@ -1081,6 +1081,7 @@ pub struct KeySpec {
     pub page: Page, pub section: Section,
     pub exposure: Exposure,       // Basic | Advanced (file-only)
     pub labels: WordLabels,       // optional: a human label per enum word, by stored word
+    pub agent: AgentSetting,      // HandsOff (default) | Settable; section 9.7
 }
 pub struct Schema { pub app: AppId, pub file: FilePath, pub keys: Vec<KeySpec> }
 ```
@@ -1100,6 +1101,11 @@ Widget by kind, fixed:
 | `Shortcut` | key-capture field |
 | `List` | rows editor |
 | `Rows` | rows editor with one cell per column |
+
+`agent` is `AgentSetting::{HandsOff, Settable}`, set by the field attribute
+`#[settings(agent_settable)]` and written into the schema's `[[key]]` table as
+`agent = "settable"`; a hands-off key writes nothing, and a schema from before the mark existed
+reads every key as hands-off (section 9.7).
 
 `labels` (`[key.labels]`, word = "Label") is optional and absent from older schemas; a word
 without a label is shown as its own words (`workspace_prev` as "Workspace prev").
@@ -1243,6 +1249,40 @@ contacts register their account pages this way (`20-SURFACES.md`).
 - `widget_for_kind_is_total`: every `KeyKind` maps to exactly one component.
 - `deep_link_resolves`: "dark mode", "magnification", "natural scrolling" each resolve to one
   key through the schemas alone.
+
+### 9.7 Agent-settable keys (proposed)
+
+An agent (the companion, through detent's intents) may set a key only if the owning program's
+schema marks it. The mark is `AgentSetting::Settable`: the field attribute
+`#[settings(agent_settable)]` on the settings struct, written into the schema file as
+`agent = "settable"` in the key's `[[key]]` table and read back by the schema loader. An
+unmarked key, and every key of a schema written before the mark existed, is
+`AgentSetting::HandsOff`: an agent may read it, never set it. The derive is the only place a
+mark is written; a person never edits it, and a settings file cannot carry it.
+
+The list below is a **proposal for the user to accept or trim**, not a grant. It is conservative on
+purpose: each key is cosmetic or a convenience that one click undoes, and none touches data,
+accounts, spend or a lock. `ds_settings::schema::AGENT_SETTABLE_PROPOSED` holds the same list so
+quire's, sill's and detent's tests check their schemas against one source.
+
+| Key | Owner | Why an agent may set it | Status |
+| --- | --- | --- | --- |
+| `appearance.theme` | quire (`AppearanceSettings`) | "make it dark": a visible, instantly reversible preference | proposed (2026-10-03) |
+| `appearance.accent` | quire (`AppearanceSettings`) | the same, one of eight colours | proposed (2026-10-03) |
+| `dock.magnification` | sill (`DockSettings`) | on/off, cosmetic | proposed (2026-10-03) |
+| `dock.tile_size_px` | sill (`DockSettings`) | bounded slider, cosmetic | proposed (2026-10-03) |
+| `dock.magnified_size_px` | sill (`DockSettings`) | bounded slider, cosmetic | proposed (2026-10-03) |
+| `launcher.web_search` | sill (`LauncherSettings`) | on/off for a last "search the web" row; it sends nothing by itself | proposed (2026-10-03) |
+| `notifications.dnd` | sill (`NotificationsSettings`) | "do not disturb for the meeting": the one setting a person asks for by voice most | proposed (2026-10-03) |
+
+Never agent-settable, whatever a program writes: everything under `agent.*` (the companion's
+own strictness and budgets), `ai.*` (models, spend, local-only), `cua.*` (computer use),
+`memory.*`, `companion.*`, `session.*` and `idle.*` (the lock and its grace), and `accounts.*`.
+`AGENT_NEVER_SETTABLE` lists those prefixes and a test keeps the proposal clear of them. An
+agent that could raise its own budget or switch computer use on would be its own gatekeeper.
+
+The marks of sill's and detent's own keys live in their schemas; quire marks only what
+`quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`).
 
 ## 7. Open decisions
 

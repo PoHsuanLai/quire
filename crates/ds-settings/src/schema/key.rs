@@ -102,6 +102,31 @@ pub enum Exposure {
     Advanced,
 }
 
+/// Whether an agent (the companion, through detent's intents) may set a key. Two states, not a
+/// `bool`: `CONVENTIONS.md#4-types`. A key is hands-off unless its program marks it, so a
+/// schema written before the mark existed keeps every key hands-off.
+///
+/// Wire form: the `[[key]]` table of the schema file carries `agent = "settable"` for a
+/// settable key and nothing for a hands-off one (detent reads that spelling).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum AgentSetting {
+    /// Only the person sets the key; an agent may read it.
+    #[default]
+    HandsOff,
+    /// An agent may set the key, within its own budget and review
+    /// (`design/22-SETTINGS.md` section 9.7 lists what is proposed).
+    Settable,
+}
+
+impl AgentSetting {
+    /// Whether this is [`AgentSetting::HandsOff`]: serde's `skip_serializing_if` hook, so the
+    /// written schema names the mark only when a key is settable.
+    pub fn is_hands_off(&self) -> bool {
+        matches!(self, AgentSetting::HandsOff)
+    }
+}
+
 /// The widget table is fixed (section 9.1): one component per [`KeyKind`], never chosen by the
 /// Settings app itself.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -193,6 +218,10 @@ pub struct KeySpec {
     /// before they existed (the field is absent then).
     #[serde(default, skip_serializing_if = "WordLabels::is_empty")]
     pub labels: WordLabels,
+    /// Whether an agent may set the key. Absent from a schema written before the mark existed
+    /// and from every hands-off key, so both read as [`AgentSetting::HandsOff`].
+    #[serde(default, skip_serializing_if = "AgentSetting::is_hands_off")]
+    pub agent: AgentSetting,
 }
 
 /// Every variant count from 1 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-
@@ -393,5 +422,34 @@ mod label_tests {
         assert_eq!(spec.labels.of("other"), None);
         let again: KeySpec = toml::from_str(&toml::to_string(&spec).unwrap()).unwrap();
         assert_eq!(again.labels, WordLabels(spec.labels.0.clone()));
+    }
+}
+
+#[cfg(test)]
+mod agent_tests {
+    use super::{AgentSetting, KeySpec};
+
+    const OLD: &str = "path = \"a.b\"\ndefault = \"x\"\nlabel = \"B\"\nhelp = \"\"\nsection = \"\"\nexposure = \"basic\"\n[kind]\nkind = \"text\"\n[page]\nkind = \"appearance\"\n";
+
+    #[test]
+    fn a_key_written_before_the_mark_existed_is_hands_off_and_stays_unmarked() {
+        let spec: KeySpec = toml::from_str(OLD).expect("old schema text parses");
+        assert_eq!(spec.agent, AgentSetting::HandsOff);
+        assert!(!toml::to_string(&spec).unwrap().contains("agent"));
+    }
+
+    #[test]
+    fn a_settable_key_is_written_and_read_as_agent_settable() {
+        let spec: KeySpec = toml::from_str(&format!("agent = \"settable\"\n{OLD}")).unwrap();
+        assert_eq!(spec.agent, AgentSetting::Settable);
+        let text = toml::to_string(&spec).unwrap();
+        assert!(text.contains("agent = \"settable\""), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).unwrap(), spec);
+    }
+
+    #[test]
+    fn an_unknown_word_is_an_error_not_a_silent_hands_off() {
+        let text = format!("agent = \"always\"\n{OLD}");
+        assert!(toml::from_str::<KeySpec>(&text).is_err());
     }
 }
