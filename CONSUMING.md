@@ -751,7 +751,9 @@ so a drag of the divider, a toolbar button and the edge click move the same stat
 fills its column's height, so the `Sidebar` inside keeps its foot at the bottom. No host element outside the
 pane is needed.
 
-A menu from a toolbar button: `Toolbar { onpick }` hears a `Picked<T> { value, anchor: Option<Anchor> }`.
+A menu from a toolbar button: `Toolbar { onpick }` is an `EventHandler<Picked<T>>` (a handler is
+`move |pick: Picked<Cmd>| ...`, not `move |cmd: Cmd| ...`) and hears a `Picked<T> { value, anchor: Option<Anchor> }`;
+an app that only wants the item's value reads `pick.value`.
 `anchor` is the button the pick came from (`Anchor::Mounted`, the chevron for an item that was behind it),
 so keep it and hang the `Menu { anchor, placement: MenuPlacement::Popup }` or `Popover` from it; no
 button of your own in the title is needed.
