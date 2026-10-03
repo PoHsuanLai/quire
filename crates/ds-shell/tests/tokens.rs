@@ -327,6 +327,10 @@ const PER_ELEMENT: &[&str] = &[
     "--orb-shadow",
     "--orb-mask",
     "--orb-turn",
+    // A loaded stretch's ends and the pointer's place under a drag (`Scrubber`).
+    "--from",
+    "--to",
+    "--tip",
 ];
 
 #[test]
