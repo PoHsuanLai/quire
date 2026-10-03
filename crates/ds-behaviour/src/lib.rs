@@ -11,6 +11,7 @@ mod dir;
 pub mod hot_corner;
 pub mod modifier_tap;
 pub mod space_swipe;
+mod span;
 pub mod switcher;
 
 pub use dir::Dir;

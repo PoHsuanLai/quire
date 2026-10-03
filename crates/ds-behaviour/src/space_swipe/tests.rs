@@ -45,7 +45,6 @@ fn finishing(from: u32, to: u32, p0: i32, v0: i32, since: u64) -> Swipe {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn commit_follows_half_a_page_and_the_flick() {
     #[rustfmt::skip]
     const CASES: &[(&str, i32, i32, i32)] = &[
@@ -69,7 +68,6 @@ fn commit_follows_half_a_page_and_the_flick() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_finish_takes_the_lift_speed_within_100_to_400_ms() {
     #[rustfmt::skip]
     const CASES: &[(&str, i32, i32, u64)] = &[
@@ -93,7 +91,6 @@ fn the_finish_takes_the_lift_speed_within_100_to_400_ms() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_rubber_band_gives_a_quarter_capped_at_a_quarter_page() {
     #[rustfmt::skip]
     const CASES: &[(&str, i32, u32, u32, i32)] = &[
@@ -154,7 +151,6 @@ fn check(cases: Vec<Case>, params: &SwipeParams) {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_row_follows_the_fingers() {
     let moved = |source, p: i32, dx: i32| {
         let (state, outs, _) = run(
@@ -220,7 +216,6 @@ fn the_row_follows_the_fingers() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn a_lift_finishes_to_the_committed_space() {
     let changed = |dx| SwipeIn::Changed { dx };
     check(
@@ -330,7 +325,6 @@ fn a_lift_finishes_to_the_committed_space() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn go_slides_and_redirects() {
     check(
         vec![
@@ -400,7 +394,6 @@ fn go_slides_and_redirects() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn a_swipe_catches_a_slide_where_it_is() {
     // 0.6 to 1.0 over 400 ms; at 200 ms the ease-out-cubic has covered 0.875 of 0.4.
     let (state, outs, wake) = run(finishing(0, 1, 600, 0, 0), &[(200, MOUSE)], &FOUR);
@@ -420,7 +413,6 @@ fn a_swipe_catches_a_slide_where_it_is() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn strays_change_nothing() {
     let tracking = |dx| {
         run(
@@ -471,7 +463,6 @@ fn strays_change_nothing() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn reduced_motion_settles_at_once_with_no_live_slide() {
     check(
         vec![
@@ -516,4 +507,43 @@ fn reduced_motion_settles_at_once_with_no_live_slide() {
 fn a_new_swipe_rests_on_the_first_space() {
     assert_eq!(Swipe::default(), Swipe::Idle { at: 0 });
     assert_eq!(SwipeIn::from(Elapsed), SwipeIn::Elapsed);
+}
+
+#[test]
+fn a_touchpad_page_is_400_px_and_its_flick_commits_the_same_way() {
+    const TOUCHPAD: SwipeIn = SwipeIn::Began {
+        source: SwipeSource::Touchpad,
+    };
+    let changed = |dx| SwipeIn::Changed { dx };
+    check(
+        vec![(
+            "a quick 120 px flick is 0.3 page at 10 pages/s",
+            Swipe::Idle { at: 1 },
+            vec![
+                (0, TOUCHPAD),
+                (10, changed(-40)),
+                (20, changed(-40)),
+                (30, changed(-40)),
+                (30, SwipeIn::Ended),
+            ],
+            finishing(1, 2, 1300, 10000, 30),
+            vec![
+                offset(1100),
+                offset(1200),
+                offset(1300),
+                SwipeOut::Committed { to: 2 },
+            ],
+            Some(Stamp(240)),
+        )],
+        &FOUR,
+    );
+}
+
+#[test]
+fn a_redirect_off_the_row_leaves_the_slide_alone() {
+    let slide = finishing(0, 1, 0, 0, 0);
+    assert_eq!(
+        slide.clone().step(SwipeIn::Go { to: 4 }, Stamp(100), &FOUR),
+        (slide, vec![])
+    );
 }

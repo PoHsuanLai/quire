@@ -8,11 +8,13 @@
 //! [`SwipeOut::Offset`] and, while [`Swipe::Finishing`], samples the ease-out-cubic finish itself
 //! from the state; the machine wakes once, at the finish's end.
 
+mod finish;
 mod model;
 mod numbers;
 mod step;
 #[cfg(test)]
 mod tests;
+mod velocity;
 
 pub use model::{
     PageMilli, PagesPerSecMilli, Reduced, Samples, Swipe, SwipeIn, SwipeOut, SwipeParams,

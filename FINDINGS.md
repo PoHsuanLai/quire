@@ -226,6 +226,20 @@ Not built, or limited, in quire:
   roots that should fill the viewport; unsure whether anything else is still affected.
 - **The gallery's own wallpaper, stage and grid layout** have no quire token or component (unsure
   whether this still matters).
+- **`ds-behaviour` keeps no `ds-motion` dependency (recommended to stay that way).** The Space
+  swipe's finish is an ease-out-cubic sampled by the caller from `Swipe::Finishing`, and its
+  duration, rubber band and commit are integer maths in `space_swipe::numbers`, so the crate needs
+  only `ds-core`, which is what lets a compositor link it with no style or Dioxus. The cost is that
+  `ds-motion` also has a rubber band (`rubber::resist`, over `Px` and `MotionLevel`) and a swipe
+  with its own damping, so two rubber bands exist: the numbers here follow design/12 12.3.7 and
+  the tables in `space_swipe/tests.rs`, not shared code. Ends when the user either accepts the
+  split or asks for the gesture maths to move down into `ds-core` for both to read.
+- **A keyboard Space change takes up to 400 ms through `finish_duration`; 03 proposed 300 ms.**
+  `Swipe` runs a `Go` (a key, an intent, an overview click) through the same finish as a lift, with
+  a start speed of zero, so `clamp(|Δp| / 2 pages/s × 3, 100, 400 ms)` gives one Space 400 ms
+  (1.5 s, capped) and a catch of a slide in flight a shorter one. 03 proposed a flat 300 ms for the
+  keyboard change. Open user decision: keep 400 ms (one rule, one curve, a redirect keeps its
+  speed), or give `Go` its own 300 ms duration by adding a duration to `Finishing`.
 
 ## Companion freeze
 

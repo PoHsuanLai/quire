@@ -22,6 +22,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-style` | appearance, tokens and the `Token` trait, material, Space palettes, fonts (bytes), icons, CSS emission, the `Kit` seam |
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar; feature `dioxus` adds the hooks, timers and event conversions over Dioxus (`ds` turns it on) |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
+| `ds-behaviour` | pure input machines a shell and a compositor both run: the app switcher, hot corners, the Command key's double tap and hold, the live Space swipe; no Dioxus, no clock |
 | `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
 | `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
 | `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
@@ -44,9 +45,10 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-motion` | `ds-style`, `ds-core` |
 | `ds-lint` | `ds-style`, `ds-core` |
 | `ds-intents` | `ds-core` |
+| `ds-behaviour` | `ds-core` |
 | `ds` | `ds-intents`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
-| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-settings-derive` |
+| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-settings-derive` |
 | `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
@@ -64,6 +66,7 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | Crate | Never reaches |
 | --- | --- |
 | `ds-core`, `ds-intents`, `ds-style`, `ds-motion`, `ds-lint`, `ds`, `ds-shell` | `zbus`, `notify`, `tokio`, `winit`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*`, `arboard` |
+| `ds-behaviour` | `zbus`, `notify`, `tokio`, `winit`, `dioxus`, every `blitz*`, `stylo_taffy`, `dioxus-native*`, every `anyrender*`, `wgpu`, `wgpu_context`, `pdfrum*` (a compositor links it, so like `ds-core` it is plain data and integer maths over `Stamp`) |
 | `ds-core`, `ds-intents`, `ds-lint`, `ds-core-derive`, `ds-settings-derive` | `dioxus` (`ds-core` is plain data and maths, so sill's pure crates can use it; the linter reads strings; the derives generate paths: `::ds_core` or `::ds_style` where the caller's manifest names it, else `::ds::base` or `::ds::style`, found with `proc-macro-crate`) |
 | `ds-style` | `dioxus` unless feature `dioxus` (appearance, tokens, palettes, icons and CSS text are plain data, so a compositor links them without it) |
 | `ds-motion` | `dioxus` unless feature `dioxus` (recipes, keyframes, springs, throws, timelines, `Touch` as data; the hooks, timers and `Touch`'s event conversions are the feature) |
@@ -85,6 +88,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `command` (names, `CommandFace`, `AppCommand`, a shortcut's chord text), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
+| `ds-behaviour` | `dir` (`Dir`) < `switcher`, `hot_corner`, `modifier_tap` (`tap`, `hold`), `space_swipe` (`numbers`, `velocity`, `finish`; each concept holds `model`, `step`, `tests`) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (`use_machine`, `MachineRef`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
@@ -205,6 +209,11 @@ The single place a concept lives. Extend it; never write a second one.
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
 | A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); `ds-motion`'s gesture machines take the same `Stamp` |
+| The app switcher's transition (Command-Tab over apps, quick tap, panel, Q, H, App Exposé), generic over the app key | `ds-behaviour::switcher` |
+| A hot corner's dwell, fire and re-arm | `ds-behaviour::hot_corner` |
+| Command's double tap (summon) and hold (talk) | `ds-behaviour::modifier_tap` (`Tap`, `HoldKey`) |
+| The live Space swipe: follow, rubber band, commit, finish | `ds-behaviour::space_swipe` (`Swipe`; the numbers in `numbers`) |
+| The switcher and hot-corner settings, and their conversion into machine params | `ds-settings::schema::behaviour` (`SwitcherSettings`, `HotCornerSettings`, `params()`) |
 | A timed pure state machine and the one timer that drives it | `ds-core::machine` (`Machine`, `Elapsed`), `ds::machine` (`use_machine`, `MachineRef`) |
 | A recording's progress bar: loaded stretches, a time tooltip, a captured drag | `ds::components::controls::scrubber` (`Scrubber`; drawing in `scrubber_face`, machine in `scrubber_machine`, `BufferedRange`, `merged` and `time_text` in `scrubber_model`) |
 | A floating pill of controls, and its media slots (progress bar, level) | `ds::components::chrome::capsule` (`Capsule`, `CapsuleSlot::{Item, Readout, Divider, Scrub, Level}`, `ScrubEvent`) |
@@ -281,7 +290,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
-| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, switcher, OSD, banners, hot corners, ...; anyview) | a state that changes by input and by time | never |
+| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, OSD, banners, ...; anyview), and `ds_behaviour::{Tap, HoldKey, Swipe}` (the switcher and the hot corner are `step` functions, their timers carried in their outputs) | a state that changes by input and by time | never |
 | `AppCommand` | `ds-core` | each app's command type (what its menu items yield and its shortcuts fire) | an app with menus or shortcuts | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |

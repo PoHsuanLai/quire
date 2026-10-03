@@ -41,7 +41,6 @@ fn check(cases: Vec<Case>) {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn design_13_acceptance_8() {
     let chord = (0, SwIn::Chord(Dir::Next));
     check(vec![
@@ -147,7 +146,6 @@ fn design_13_acceptance_8() {
 /// The quick-tap rule when the release may go unseen: what arrives inside the show delay
 /// decides.
 #[test]
-#[ignore = "S0-QB-F"]
 fn quick_taps_whose_release_is_not_seen() {
     let chord = (0, SwIn::Chord(Dir::Next));
     check(vec![
@@ -225,7 +223,6 @@ fn quick_taps_whose_release_is_not_seen() {
 
 /// 03 §1.3: while an app is selected, Down (or Up) opens App Exposé for it and the panel goes.
 #[test]
-#[ignore = "S0-QB-F"]
 fn down_or_up_opens_app_expose_for_the_selection() {
     let chord = (0, SwIn::Chord(Dir::Next));
     check(vec![
@@ -273,7 +270,6 @@ fn down_or_up_opens_app_expose_for_the_selection() {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn no_apps_is_no_switcher() {
     let p = params();
     let none: &[&str] = &[];
@@ -284,5 +280,34 @@ fn no_apps_is_no_switcher() {
     assert_eq!(
         step(Switcher::Shown { sel: 2 }, SwIn::Tick, Stamp(0), none, &p),
         (Switcher::Hidden, vec![SwOut::Hide])
+    );
+}
+
+#[test]
+fn a_selection_past_a_shrunk_list_falls_back_to_the_last_app() {
+    let p = params();
+    let two = &APPS[..2];
+    assert_eq!(
+        step(
+            Switcher::Shown { sel: 3 },
+            SwIn::Key(SwKey::Q),
+            Stamp(0),
+            two,
+            &p
+        ),
+        (Switcher::Shown { sel: 1 }, vec![SwOut::Quit("firefox")])
+    );
+    assert_eq!(
+        step(
+            Switcher::Armed {
+                since: Stamp(0),
+                sel: 3
+            },
+            SwIn::ModifierReleased,
+            Stamp(50),
+            two,
+            &p
+        ),
+        (Switcher::Hidden, vec![SwOut::Activate("firefox")])
     );
 }

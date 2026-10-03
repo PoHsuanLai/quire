@@ -15,6 +15,8 @@ use std::time::Duration;
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
+use crate::span;
+
 /// The double tap's state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Tap {
@@ -63,11 +65,26 @@ impl Machine for Tap {
     type Params = TapParams;
 
     fn step(self, input: TapIn, at: Stamp, params: &TapParams) -> (Tap, Vec<TapOut>) {
-        let _ = (self, input, at, params);
-        todo!("the ux 4.2 table in this module's doc")
+        match (self, input) {
+            (Tap::Rest, TapIn::Tap) => (armed(at, params), Vec::new()),
+            (Tap::Armed { until }, TapIn::Tap) if at <= until => (Tap::Rest, vec![TapOut::Summon]),
+            (Tap::Armed { .. }, TapIn::Tap) => (armed(at, params), Vec::new()),
+            (Tap::Armed { until }, TapIn::Elapsed) if at >= until => (Tap::Rest, Vec::new()),
+            (state, _) => (state, Vec::new()),
+        }
     }
 
     fn wake(&self) -> Option<Stamp> {
-        todo!("Armed: until; Rest: none")
+        match self {
+            Tap::Armed { until } => Some(*until),
+            Tap::Rest => None,
+        }
+    }
+}
+
+/// Waiting for a second tap, the window running from `at`.
+fn armed(at: Stamp, params: &TapParams) -> Tap {
+    Tap::Armed {
+        until: span::after(at, params.window),
     }
 }

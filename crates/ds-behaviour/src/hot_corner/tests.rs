@@ -20,7 +20,6 @@ fn at(phase: Phase, next: u32) -> CornerMachine {
 }
 
 #[test]
-#[ignore = "S0-QB-F"]
 fn the_corner_follows_its_table() {
     use CornerIn::*;
     let spent = |pointer, rearm| Phase::Spent { pointer, rearm };
