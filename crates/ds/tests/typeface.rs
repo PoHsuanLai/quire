@@ -115,10 +115,7 @@ fn editorial_restores_the_values_the_rules_carried() {
         (VoiceToken::TrackingHeading, "-.015em"),
         (VoiceToken::TrackingLockClock, "-.035em"),
         (VoiceToken::TrackingLockDate, ".01em"),
-        (VoiceToken::TrackingCaps, ".14em"),
-        (VoiceToken::TrackingCapsNarrow, ".12em"),
         (VoiceToken::WeightCaps, "400"),
-        (VoiceToken::FsCaps, "var(--fs-eyebrow)"),
         (VoiceToken::TrackingMono, "-.02em"),
         (VoiceToken::FsMono, ".78em"),
     ];

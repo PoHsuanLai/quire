@@ -72,10 +72,10 @@ values are tokens on `.ds`:
 
 Headings that group things (the old "eyebrow", section, group and weekday headers) are not caps and
 not tracked: sentence case, 11 px, secondary ink (`--ink-soft`), weight 500 or 600, tracking 0.
-The caps-tracked tokens `--tracking-caps`, `--tracking-caps-narrow`, `--fw-caps` and `--fs-caps`
-are deleted. Status: the rules (eyebrow, section header, menu header, group header, month title,
-checks heading) are sentence case 11 px `--ink-soft`, weight 600, tracking 0; **target (clean-up phase)**:
-the four tokens themselves are still emitted until the last user goes.
+The caps-tracked tokens `--tracking-caps`, `--tracking-caps-narrow` and `--fs-caps` are deleted:
+the rules that carried them (eyebrow, section header, menu header, group header, checks heading) are
+sentence case 11 px `--ink-soft`, weight 600, tracking 0. `--fw-caps` stays: the calendar's month
+title reads it.
 
 ## 3. Base text
 
