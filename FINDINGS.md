@@ -23,6 +23,15 @@ that rev.
   that is not. Ends when `ds-blitz` offers the cached first page as straight RGBA (a `pdf_thumb_pixels`
   beside `pdf_thumb_blocking`, over the same cache and the same `DeviceBox`) and the PNG is made only
   where `PdfThumb` draws it; `PdfPage::Ready` then keeps its `ImageSource` for `ds`'s own users.
+- **A window that exists cannot be activated with a token.** `WindowHandle::focus` is winit's
+  `focus_window`, which on Wayland does nothing and on X11 sends `_NET_ACTIVE_WINDOW`; the one
+  Wayland call that carries an activation token to a window that exists is xdg-activation's
+  `activate(token, surface)` on the app's own connection, which winit offers only at window
+  creation (`WindowAttributesWayland::with_activation_token`, applied from the environment by
+  `startup_token`). So a running app handed a token by a second launch (D-Bus activation, a
+  notification click) cannot raise its window with it, and `focus_with_token` is not offered.
+  Ends when winit exposes the activation of an existing window, or the workspace allows one
+  module that borrows the window's `wl_surface` through `raw-window-handle` (`unsafe`).
 - **Part 4 names still alive after step 4a.8.** `use_pulse`, `PulseKey` and `Pulse` stay in `ds-motion` as
   the alias machinery of the one shake (`use_shake`); they are no longer a way to flourish, and
   `use_once` is private. `PaneSlide` stays because `PaneSwitcher` draws from it.

@@ -94,14 +94,20 @@ impl std::fmt::Debug for WindowHandle {
 }
 
 impl WindowHandle {
+    /// The handle of the window `requests` knows as `key`.
+    pub(crate) fn new(key: WindowKey, requests: Requests) -> Self {
+        WindowHandle { key, requests }
+    }
+
     /// Close the window: it leaves the screen and its VirtualDom is dropped. Closing one already
     /// closed does nothing.
     pub fn close(&self) {
         self.requests.close(self.key);
     }
 
-    /// Raise the window and give it the keyboard (the compositor may only mark it as wanting
-    /// attention; Wayland without an activation token does).
+    /// Ask the platform to raise the window and give it the keyboard: X11 does; winit's request
+    /// does nothing on Wayland, where only an activation token at window creation focuses a
+    /// window (FINDINGS "A window that exists cannot be activated with a token").
     pub fn focus(&self) {
         self.requests.focus(self.key);
     }
@@ -110,6 +116,13 @@ impl WindowHandle {
     pub fn life(&self) -> WindowLife {
         self.requests.life(self.key)
     }
+}
+
+/// The handle of the window the calling component renders in, the first window included: its
+/// owner can raise it ([`WindowHandle::focus`]) or close it. `None` outside a window `launch`
+/// runs (the harness, a snapshot), where there is no event loop to ask.
+pub fn use_window_handle() -> Option<WindowHandle> {
+    use_hook(try_consume_context::<WindowHandle>)
 }
 
 /// Open another window of this app, rendering `root` in a VirtualDom of its own. Call it from a
@@ -137,4 +150,69 @@ fn open(spec: WindowSpec, root: Root) -> Result<WindowHandle, OpenWindowError> {
     let requests = try_consume_context::<Requests>().ok_or(OpenWindowError::NoHost)?;
     let key = requests.open(spec, root);
     Ok(WindowHandle { key, requests })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::window_requests::Request;
+    use std::cell::RefCell;
+
+    /// What a probe component saw of its window.
+    #[derive(Clone)]
+    struct Seen(Rc<RefCell<Option<WindowHandle>>>);
+
+    #[allow(non_snake_case)]
+    fn Probe() -> Element {
+        let seen = use_context::<Seen>();
+        seen.0.replace(use_window_handle());
+        rsx! {}
+    }
+
+    fn nothing() -> Element {
+        rsx! {}
+    }
+
+    /// Render the probe in a document whose window is `handle`, or in none.
+    fn seen_in(handle: Option<WindowHandle>) -> Option<WindowHandle> {
+        let seen = Seen(Rc::new(RefCell::new(None)));
+        let mut vdom = VirtualDom::new(Probe);
+        vdom.provide_root_context(seen.clone());
+        if let Some(handle) = handle {
+            vdom.provide_root_context(handle);
+        }
+        vdom.rebuild_in_place();
+        seen.0.take()
+    }
+
+    #[test]
+    fn a_component_reads_the_handle_of_the_window_it_renders_in() {
+        let requests = Requests::new(|| {});
+        let first = requests.open(WindowSpec::new("First", 100, 100), Root::Plain(nothing));
+        let second = requests.open(WindowSpec::new("Second", 100, 100), Root::Plain(nothing));
+        requests.take();
+
+        let handle = seen_in(Some(WindowHandle::new(second, requests.clone())))
+            .expect("the document provided its window's handle");
+        handle.focus();
+
+        let keys: Vec<WindowKey> = requests
+            .take()
+            .into_iter()
+            .filter_map(|request| match request {
+                Request::Focus(key) => Some(key),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(
+            keys,
+            [second],
+            "the focus request names the component's window, not {first:?}"
+        );
+    }
+
+    #[test]
+    fn a_document_outside_a_launched_window_has_no_handle() {
+        assert!(seen_in(None).is_none());
+    }
 }

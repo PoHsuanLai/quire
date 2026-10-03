@@ -6,19 +6,21 @@
 //! registry, the shell, history, the renderer) when its application creates the window.
 
 use crate::app_handle::AppHandle;
-use crate::app_id::{AppId, with_app_id};
+use crate::app_id::AppId;
 use crate::fonts::font_context;
 use crate::host::{Host, HostProps};
 use crate::native_providers::{AssetNet, LinkOpener};
+use crate::open_window::WindowHandle;
 use crate::setup::Setup;
 use crate::window::Decorations;
+use crate::window_platform::with_platform;
 use crate::window_requests::{Requests, Root};
 use blitz_dom::HtmlParserProvider;
 use blitz_shell::WindowConfig;
 use blitz_traits::navigation::NavigationProvider;
 use blitz_traits::net::NetProvider;
 use dioxus::prelude::*;
-use dioxus_native::winit::window::Window;
+use dioxus_native::winit::window::{ActivationToken, Window};
 use dioxus_native::{DioxusNativeWindowRenderer, LogicalSize, WindowAttributes};
 use dioxus_native_dom::{DioxusDocument, DocumentConfig};
 use std::cell::RefCell;
@@ -37,12 +39,15 @@ pub(crate) struct Base {
 }
 
 /// How one window starts.
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub(crate) struct Shape {
     pub(crate) title: String,
     pub(crate) size: (u32, u32),
     pub(crate) app_id: Option<AppId>,
     pub(crate) decorations: Decorations,
+    /// The activation token this window asks the compositor to focus it with, if the process
+    /// was started with one that no earlier window has taken.
+    pub(crate) token: Option<ActivationToken>,
 }
 
 /// The winit window a document ended up in, filled by its `Host` on the first render (which
@@ -64,12 +69,13 @@ impl WindowSlot {
 }
 
 /// The window config for `root` shaped `shape`, drawn by `renderer`, reporting its window
-/// through `slot`.
+/// through `slot` and naming itself to its components as `handle`.
 pub(crate) fn window_config(
     root: Root,
     shape: Shape,
     base: &Base,
     slot: &WindowSlot,
+    handle: WindowHandle,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
     let (width, height) = shape.size;
@@ -77,15 +83,13 @@ pub(crate) fn window_config(
         .with_title(shape.title)
         .with_surface_size(LogicalSize::new(width, height))
         .with_decorations(shape.decorations.winit());
-    let attributes = match &shape.app_id {
-        Some(id) => with_app_id(attributes, id),
-        None => attributes,
-    };
+    let attributes = with_platform(attributes, shape.app_id.as_ref(), shape.token);
     let mut vdom = VirtualDom::new_with_props(Host, HostProps::new(root, base.setup.clone()));
     base.setup.contexts.install(&mut vdom);
     vdom.provide_root_context(base.requests.clone());
     vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());
+    vdom.provide_root_context(handle);
     let net: Arc<dyn NetProvider> = Arc::new(AssetNet);
     vdom.provide_root_context(Arc::clone(&net));
     let parser: Arc<dyn HtmlParserProvider> = Arc::new(blitz_html::HtmlProvider);
