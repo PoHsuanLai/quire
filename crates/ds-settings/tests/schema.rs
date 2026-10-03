@@ -188,3 +188,88 @@ fn icons_keys_exposure() {
         );
     }
 }
+
+// ---------------------------------------------------------------------------------------------
+// agent_settable (design/22-SETTINGS.md section 9.7)
+
+use ds_settings::quire_schema;
+use ds_settings::schema::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, AgentSetting};
+
+fn settable(schema: &Schema) -> Vec<&str> {
+    schema
+        .key
+        .iter()
+        .filter(|key| key.agent == AgentSetting::Settable)
+        .map(|key| key.path.0.as_str())
+        .collect()
+}
+
+#[test]
+fn the_derive_marks_theme_and_accent_and_nothing_else_in_the_quire_schema() {
+    assert_eq!(
+        settable(&quire_schema()),
+        ["appearance.theme", "appearance.accent"]
+    );
+}
+
+#[test]
+fn a_mark_round_trips_derive_to_toml_to_loader_in_the_wire_form_detent_reads() {
+    let schema = quire_schema();
+    let text = schema.to_toml();
+    assert_eq!(text.matches("agent = \"settable\"").count(), 2, "{text}");
+    // Detent reads the mark from the raw table; the same text must show it there.
+    let table: toml::Table = text.parse().expect("the written schema is TOML");
+    let marked: Vec<&str> = table["key"]
+        .as_array()
+        .expect("[[key]] tables")
+        .iter()
+        .filter(|key| key.get("agent").and_then(toml::Value::as_str) == Some("settable"))
+        .filter_map(|key| key.get("path")?.as_str())
+        .collect();
+    assert_eq!(marked, ["appearance.theme", "appearance.accent"]);
+    let back = Schema::from_toml(&text).unwrap_or_else(|e| panic!("{text}: {e}"));
+    assert_eq!(back, schema);
+}
+
+#[test]
+fn a_schema_file_from_before_the_mark_loads_every_key_hands_off() {
+    // Strip every `agent` line from today's output: what an older program wrote.
+    let old: String = quire_schema()
+        .to_toml()
+        .lines()
+        .filter(|line| !line.starts_with("agent = "))
+        .map(|line| format!("{line}\n"))
+        .collect();
+    let schema = Schema::from_toml(&old).unwrap_or_else(|e| panic!("{old}: {e}"));
+    assert!(!schema.key.is_empty());
+    assert!(schema.key.iter().all(|k| k.agent == AgentSetting::HandsOff));
+}
+
+#[test]
+fn quire_marks_only_proposed_keys_it_owns() {
+    for path in settable(&quire_schema()) {
+        assert!(AGENT_SETTABLE_PROPOSED.contains(&path), "{path}");
+    }
+    for key in quire_schema().key {
+        let never = AGENT_NEVER_SETTABLE
+            .iter()
+            .any(|prefix| key.path.0.starts_with(prefix));
+        assert!(
+            !never || key.agent == AgentSetting::HandsOff,
+            "{} is never agent-settable",
+            key.path.0
+        );
+    }
+}
+
+#[test]
+fn the_design_doc_lists_exactly_the_proposed_keys() {
+    let doc =
+        std::fs::read_to_string(Path::new(DOC_PATH)).unwrap_or_else(|e| panic!("{DOC_PATH}: {e}"));
+    let in_doc = keys_in_section(
+        &doc,
+        "### 9.7 Agent-settable keys (proposed)",
+        "## 7. Open decisions",
+    );
+    assert_eq!(in_doc, AGENT_SETTABLE_PROPOSED);
+}

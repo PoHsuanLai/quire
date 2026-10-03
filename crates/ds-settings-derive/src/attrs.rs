@@ -34,8 +34,17 @@ pub(crate) enum KindHint {
     Infer,
 }
 
+/// Whether a field carries `agent_settable`: two states rather than a `bool`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum AgentMark {
+    /// No mark: only the person sets the key.
+    HandsOff,
+    /// `agent_settable`: the schema lets an agent set the key.
+    Settable,
+}
+
 /// `#[settings(label = "...", help = "...", section = "...", range = "a..=b", unit = "...",
-/// advanced, text)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
+/// advanced, text, agent_settable)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
 /// `#[serde(flatten)] extra: toml::Table` catch-all is the only field this workspace's structs
 /// use it for today).
 #[derive(Debug)]
@@ -49,6 +58,8 @@ pub(crate) enum FieldAttrs {
         section: String,
         unit: Option<String>,
         advanced: bool,
+        /// `agent_settable` or nothing.
+        agent: AgentMark,
         /// `text`, `range` (with its ends) or neither.
         hint: KindHint,
     },
@@ -107,6 +118,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
     let mut unit = None;
     let mut advanced = false;
     let mut skip = false;
+    let mut agent = AgentMark::HandsOff;
     let mut text = false;
     let mut found = false;
     for attr in settings_attrs(attrs) {
@@ -125,6 +137,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
                 range = Some(parse_range(&text).map_err(|reason| meta.error(reason))?);
             } else if meta.path.is_ident("advanced") {
                 advanced = true;
+            } else if meta.path.is_ident("agent_settable") {
+                agent = AgentMark::Settable;
             } else if meta.path.is_ident("skip") {
                 skip = true;
             } else if meta.path.is_ident("text") {
@@ -132,7 +146,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a field; expected `label`, `help`, \
-                     `section`, `range`, `unit`, `advanced`, `text` or `skip`",
+                     `section`, `range`, `unit`, `advanced`, `text`, `agent_settable` or `skip`",
                 ));
             }
             Ok(())
@@ -168,6 +182,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
         section,
         unit,
         advanced,
+        agent,
         hint,
     })
 }
@@ -205,7 +220,7 @@ fn missing(span: Span, key: &str) -> syn::Error {
 
 #[cfg(test)]
 mod tests {
-    use super::{FieldAttrs, KindHint, container_attrs, field_attrs, parse_range};
+    use super::{AgentMark, FieldAttrs, KindHint, container_attrs, field_attrs, parse_range};
     use proc_macro2::Span;
     use syn::spanned::Spanned;
 
@@ -298,6 +313,26 @@ mod tests {
         assert_eq!(unit.as_deref(), Some("px"));
         assert_eq!(section, "Magnification");
         assert!(advanced);
+    }
+
+    #[test]
+    fn agent_settable_marks_a_key_and_its_absence_leaves_it_hands_off() {
+        const CASES: &[(&str, AgentMark)] = &[
+            (
+                "#[settings(label = \"L\", agent_settable)]",
+                AgentMark::Settable,
+            ),
+            ("#[settings(label = \"L\")]", AgentMark::HandsOff),
+        ];
+        for (attr, want) in CASES {
+            let source = format!("struct S {{ {attr} f: u8 }}");
+            let attrs = first_field_attrs(&source);
+            let parsed = field_attrs(attrs[0].span(), &attrs).unwrap();
+            let FieldAttrs::Key { agent, .. } = parsed else {
+                panic!("{attr}: expected FieldAttrs::Key");
+            };
+            assert_eq!(agent, *want, "{attr}");
+        }
     }
 
     #[test]

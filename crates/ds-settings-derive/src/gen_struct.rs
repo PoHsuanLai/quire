@@ -6,7 +6,7 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use syn::spanned::Spanned;
 
-use crate::attrs::{FieldAttrs, container_attrs, field_attrs};
+use crate::attrs::{AgentMark, FieldAttrs, container_attrs, field_attrs};
 use crate::shape::{Shape, shape_of};
 
 pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::Result<TokenStream> {
@@ -41,6 +41,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             section,
             unit,
             advanced,
+            agent,
             hint,
         } = attrs
         else {
@@ -52,6 +53,10 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             quote! { ::ds_settings::schema::Exposure::Advanced }
         } else {
             quote! { ::ds_settings::schema::Exposure::Basic }
+        };
+        let agent_setting = match agent {
+            AgentMark::Settable => quote! { ::ds_settings::schema::AgentSetting::Settable },
+            AgentMark::HandsOff => quote! { ::ds_settings::schema::AgentSetting::HandsOff },
         };
         let shape = shape_of(&field_ident.to_string(), &field.ty, hint)
             .map_err(|reason| syn::Error::new(field.ty.span(), reason))?;
@@ -67,6 +72,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                 section: ::ds_settings::schema::Section(#section.to_owned()),
                 exposure: #exposure,
                 labels: ::std::default::Default::default(),
+                agent: #agent_setting,
             });
         });
     }
