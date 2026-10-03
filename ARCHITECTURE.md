@@ -80,7 +80,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 
 | Crate | Modules, lowest first |
 | --- | --- |
-| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
+| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `command` (names, `CommandFace`, `AppCommand`, a shortcut's chord text), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
@@ -96,7 +96,7 @@ Component groups inside `ds` and the layer order inside the components tier: `co
 images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `overlays` (alert,
 popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `lists` (rows,
 settings rows, headers, animated and leaving lists, preview pane, emoji grid, appearance picker)
-< `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries) <
+< `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`) <
 `editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `companion` (orb, chips, answer cards, plan list, replace bar, run row, activity strip, memory view, served-by chip) < `app`.
 
 ## 3. From -> to (mechanical move)
@@ -237,6 +237,7 @@ The single place a concept lives. Extend it; never write a second one.
 | A window's handle (raise, close) and the activation token it is created with | `ds-blitz::{use_window_handle, WindowHandle}`; `ds-blitz::startup_token`, `ds-blitz::window_platform` |
 | Overlay stack, hover hub, toast hub | `ds::stack` |
 | Menu data | `ds::menus::{MenuItem, MenuPlacement, MenuImage}` |
+| What a menu item or shortcut is the face of (an action, or UI-only with a reason) and the `<AppName>.ui.toml` written from it | `ds-core::command` (`AppCommand`, `CommandFace`, `ActionName`); `ds::menus::ui_manifest` |
 | Menu pointer tracking | `ds::stack::menu_track` |
 | Popup menu view | `ds::menus::Menu` |
 | A filterable list in a popover | `ds::menus::pick_list::PickList` (its rows and keys are the palette's) |
@@ -277,6 +278,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
 | `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, switcher, OSD, banners, hot corners, ...; anyview) | a state that changes by input and by time | never |
+| `AppCommand` | `ds-core` | each app's command type (what its menu items yield and its shortcuts fire) | an app with menus or shortcuts | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |
 | `Driver`, `DocQuery` | `ds-harness` | `Harness`; later shell-host's headless surface | a new driver | never |

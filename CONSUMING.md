@@ -901,6 +901,26 @@ For a bar (FINDINGS "Bar gaps"):
   release over an enabled item after a press that began outside the menu picks it
   (press-drag-release); over a disabled item, a header or the padding it closes picking
   nothing. The owner removing the menu (a hover switch) is immediate, no fade.
+- **Commands for the conformance check.** Every menu item and shortcut is the face of an action
+  or says it is interface only. The command type your items yield and your shortcuts fire
+  implements `ds::base::command::AppCommand` (`id()`: your stable id, `face()`:
+  `CommandFace::Action(ActionName("mail.draft.create".into()))` or
+  `CommandFace::UiOnly(UiOnlyReason::new("window chrome")?)`; `ActionName` is a plain string, so
+  `ds` does not depend on the manifest that declares it). A shortcut outside any menu is a
+  `ShortcutBinding { keys, command }`. A test walks the bar, your own menus and the table into
+  `ds::components::menus::ui_manifest::{bar_rows, menu_rows, shortcut_rows}` and writes the file
+  `docket-eval --check-app` reads, beside the intents manifest:
+
+  ```rust,ignore
+  let rows = [bar_rows(&bar), menu_rows(&tray_items), shortcut_rows(&SHORTCUTS)].concat();
+  let text = UiManifest::new(IntentsApp("org.quire.Mail".into()), rows)?.to_toml()?;
+  std::fs::write("dist/intents/org.quire.Mail.ui.toml", text)?;
+  ```
+
+  A menu item in the bar and in a context menu is one row; a shortcut and a menu item for the same
+  command are a row each; one id declared with two faces is an error. The file is
+  `vocab = 1`, `app`, `[[commands]] id, source = "menu" | "shortcut", chord?, action?` and
+  `[[ui_only]] id, reason`; a chord is written `cmd+n` (`Shortcut::chord`).
 - **Status lines.** `MenuItem::Info { title, detail: Option<String> }` is a row at an item's
   weight without the header's eyebrow, never a choice: keys, hover and picks pass it by. Use it
   for a network's address or a battery's time left, instead of headers.

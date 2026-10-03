@@ -16,6 +16,8 @@ ds-style = { workspace = true, features = ["dioxus"] }
 dioxus = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
+# `ui_manifest`: the conformance file an app's menu items and shortcuts are written to.
+toml = { workspace = true }
 
 [lints]
 workspace = true
