@@ -1,5 +1,5 @@
-//! The consistency pass over the shipped set (design/08-ICONS.md 2.11): the five exported 512 px
-//! icons, three procedural and two Klein-derived, must share the plate's silhouette, the bevel
+//! The consistency pass over the shipped set (design/08-ICONS.md 2.11): the six exported 512 px
+//! icons, four procedural and two Klein-derived, must share the plate's silhouette, the bevel
 //! arc, and the drop shadow's reach, whatever drew their face.
 
 use std::path::PathBuf;
@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use icons::{PlateGrid, Template, oklab, plate_mask};
 use image::Rgba32FImage;
 
-const APPS: [&str; 5] = ["mail", "files", "terminal", "notes", "photos"];
+const APPS: [&str; 6] = ["mail", "files", "terminal", "notes", "photos", "viewer"];
 
 fn load(app: &str, style: &str) -> Rgba32FImage {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../assets/icons/apps");
@@ -80,7 +80,7 @@ fn shadow_reach(img: &Rgba32FImage, grid: PlateGrid) -> u32 {
 }
 
 #[test]
-fn the_five_share_one_plate() {
+fn the_shipped_apps_share_one_plate() {
     let t = Template::default();
     let grid = PlateGrid::for_canvas(512, &t);
     for style in ["", "muted", "monochrome"] {

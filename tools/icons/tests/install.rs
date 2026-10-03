@@ -21,7 +21,7 @@ fn install_copies_the_set_where_the_lookup_finds_it() {
         true => Presence::Present,
         false => Presence::Absent,
     };
-    for app in ["mail", "files", "terminal", "notes", "photos"] {
+    for app in ["mail", "files", "terminal", "notes", "photos", "viewer"] {
         let name = AppIconName::parse(app).expect("a name");
         for style in [IconStyle::Colour, IconStyle::Muted, IconStyle::Monochrome] {
             for px in APP_ICON_PX {
