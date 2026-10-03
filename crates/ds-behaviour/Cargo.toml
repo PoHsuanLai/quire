@@ -1,0 +1,15 @@
+[package]
+name = "ds-behaviour"
+description = "Pure input machines a shell and a compositor both run: the app switcher, hot corners, the Command key's tap and hold, and the Space swipe."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+ds-core = { workspace = true }
+
+[lints]
+workspace = true
