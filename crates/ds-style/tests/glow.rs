@@ -1,7 +1,7 @@
 //! The glow's data: its looks are words the compositor and quire agree on.
 
 use ds_core::geometry::units::Px;
-use ds_shell::tokens::glow::{GlowLook, GlowSpot};
+use ds_style::tokens::glow::{GlowLook, GlowSpot};
 
 #[test]
 fn an_acting_glow_may_name_the_spot_it_acts_at() {

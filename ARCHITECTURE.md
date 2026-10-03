@@ -263,7 +263,8 @@ The single place a concept lives. Extend it; never write a second one.
 | The companion's presence (idle, listening, working, acting, waiting) | `ds-core::vocab::CompanionPresence`; derived only by sill's `presence_of` |
 | What an app tells the companion (a thing, a chip, a summon, a field's mode) | `ds-intents`; re-exported once from `ds::components::companion` |
 | The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
-| The confirmation card and the window glow | `ds-shell::{confirm, tokens::glow}` |
+| The confirmation card | `ds-shell::confirm` |
+| The window glow's values (`GlowLook`, `GlowSpec`, `glow_spec`) | `ds-style::tokens::glow` (`ds-shell::tokens::glow` re-exports them) |
 | Mail-only components | `ds::components::app` |
 
 ## 5. Traits and closed enums

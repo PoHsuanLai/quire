@@ -166,7 +166,7 @@ and the consolidation switches are `memory.*` settings (`22-SETTINGS.md` section
 | `CompanionPresence`, `MemoryVerb`, `EffectMark`, `ActorMark`, `Tally` | `ds-core::vocab` |
 | `ThingMark`, `ContextChip`, `ChipKind`, `Removal`, `FieldMode`, `SummonSerial`, `SummonAnswerMark`, `ContextModel` | `ds-intents`, re-exported from `ds::components::companion` |
 | `CompanionOrb`, `ContextChips`, prompt mode, `AnswerCard` and the answer shapes, `PlanList`, `ReplaceBar`, `RunRow`, `ActivityStrip`, `MemoryTimeline`, `ConsolidationView`, `ServedByChip`, `CompanionPort` | `ds::components::companion` (layer `companion`, above `chrome`, below `app`) |
-| `ConfirmCard`, `glow_spec` | `ds-shell::{confirm, tokens::glow}` |
+| `ConfirmCard`, `glow_spec` | `ds-shell::confirm`, `ds-style::tokens::glow` |
 | `OrbListen`, `OrbWork`, `OrbAct` | `ds-style::tokens::timing` |
 | `Page::Intelligence` | `ds-settings::schema::key` |
 
