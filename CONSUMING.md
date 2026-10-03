@@ -109,6 +109,15 @@ ended, and a request made before the loop runs waits for it. `launch_idle(config
 with no first window, for an app that opens all of them through its handle. A window's root
 reads its app's handle with `use_app_handle()`; `open_window` still works from inside a window.
 
+**A window's own handle, and keyboard focus at launch.** A component reads the handle of the window
+it renders in with `use_window_handle()` (`Option<WindowHandle>`, `None` in the harness or a
+snapshot, where no loop runs): the first window's too, so `handle.focus()` asks for the window
+that holds the component to be raised and `handle.close()` closes it. A process started with an
+activation token (`XDG_ACTIVATION_TOKEN` on Wayland, `DESKTOP_STARTUP_ID` on X11: a launcher, a
+notification click or a D-Bus activation sets it) hands it to the first window it creates, so the
+compositor gives that window the keyboard; the variable is cleared as the window is created, so
+the token is spent once and child processes do not inherit it.
+
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
 and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
 a path dependency does not inherit your workspace's `[workspace.dependencies]`, because

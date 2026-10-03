@@ -1,10 +1,11 @@
-//! `ds_blitz::open_window` outside a window `launch` runs: the harness has no event loop to ask,
-//! so the call answers `OpenWindowError::NoHost` and opens nothing (a live run of the
+//! `ds_blitz::open_window` and `use_window_handle` outside a window `launch` runs: the harness has
+//! no event loop to ask, so the call answers `OpenWindowError::NoHost` and opens nothing, and the
+//! hook finds no handle (a live run of the
 //! `second_window` example is the proof for a real window; FINDINGS "File drops and a second
 //! window").
 
 use dioxus::prelude::*;
-use ds_blitz::{OpenWindowError, WindowSpec, open_window};
+use ds_blitz::{OpenWindowError, WindowSpec, open_window, use_window_handle};
 use ds_harness::{Harness, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
@@ -33,4 +34,16 @@ fn Asks() -> Element {
 fn the_harness_has_no_event_loop_to_open_a_window_on() {
     let harness = Harness::new(Asks, VIEW);
     assert_eq!(harness.text_of(".answer").as_deref(), Some("no host"));
+}
+
+#[allow(non_snake_case)]
+fn Reads() -> Element {
+    let found = use_window_handle().is_some();
+    rsx! { p { class: "found", "{found}" } }
+}
+
+#[test]
+fn the_harness_window_has_no_handle_to_raise() {
+    let harness = Harness::new(Reads, VIEW);
+    assert_eq!(harness.text_of(".found").as_deref(), Some("false"));
 }

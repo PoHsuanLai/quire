@@ -64,6 +64,7 @@ mod setup;
 pub mod snap;
 #[cfg(feature = "spell")]
 pub mod spell;
+mod startup_token;
 mod texture_layer;
 mod wake;
 pub mod window;
@@ -71,6 +72,7 @@ mod window_build;
 mod window_drop;
 mod window_hover;
 mod window_place;
+mod window_platform;
 mod window_requests;
 mod window_shell;
 
@@ -88,7 +90,7 @@ pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_tag::FrameTag;
 pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch, launch_idle};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
-pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with};
+pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with, use_window_handle};
 pub use origin::{FrameId, RequestOrigin};
 #[cfg(feature = "pdf")]
 pub use pdf::{

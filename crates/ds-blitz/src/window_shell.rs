@@ -36,6 +36,8 @@
 //!
 use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
+use crate::open_window::WindowHandle;
+use crate::startup_token::take_startup_token;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
 use anyrender::WindowRenderer;
@@ -227,10 +229,12 @@ impl Windows {
             size: spec.size(),
             app_id: spec.app_id_or(self.base.app_id.as_ref()),
             decorations: spec.decorations_or(self.base.decorations),
+            token: take_startup_token(event_loop),
         };
         let slot = WindowSlot::default();
+        let handle = WindowHandle::new(key, self.base.requests.clone());
         let renderer = self.spare.pop().unwrap_or_default();
-        let config = window_config(root, shape, &self.base, &slot, renderer.clone());
+        let config = window_config(root, shape, &self.base, &slot, handle, renderer.clone());
         let mut sub = Sub::new(event_loop.create_proxy(), config, slot, renderer);
         sub.app.can_create_surfaces(event_loop);
         self.subs.push((key, sub));
