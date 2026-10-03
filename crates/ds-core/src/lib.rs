@@ -8,6 +8,7 @@ extern crate self as ds_core;
 
 pub mod base64;
 pub mod colour;
+pub mod command;
 pub mod error;
 pub mod geometry;
 pub mod machine;
