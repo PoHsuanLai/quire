@@ -78,7 +78,7 @@ EDGES=(
   "ds-behaviour: ds-core"
   "ds: ds-core ds-intents ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
-  "ds-settings: ds-core ds-style ds-settings-derive"
+  "ds-settings: ds-behaviour ds-core ds-style ds-settings-derive"
   "ds-blitz: blitz-kit ds"
   "ds-harness: blitz-kit ds ds-blitz ds-core"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
