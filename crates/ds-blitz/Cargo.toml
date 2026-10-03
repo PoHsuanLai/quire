@@ -43,6 +43,8 @@ peniko = { workspace = true }
 # PDF output (the `pdf` feature): the painter, which writes through pdfrum.
 pdfrum-anyrender = { workspace = true, optional = true }
 thiserror = { workspace = true }
+# The window's display and surface handles, for the activation token (Linux: `wayland_surface`).
+raw-window-handle = { workspace = true }
 tokio = { workspace = true }
 # PDF thumbnails (part of the `pdf` feature): pdfrum's reader and CPU rasteriser.
 pdfrum = { workspace = true, optional = true }
@@ -55,6 +57,16 @@ dirs = { workspace = true, optional = true }
 # forced on the app), and a sealed memfd for the PDF's file descriptor.
 zbus = { workspace = true, optional = true }
 memfd = { workspace = true, optional = true }
+# `WindowHandle::focus_with_token`: xdg-activation on the app's own Wayland connection, with the
+# window's `wl_surface` borrowed (`wayland_surface`, the one `unsafe`).
+wayland-client = { workspace = true }
+wayland-backend = { workspace = true }
+wayland-protocols = { workspace = true }
+
+[target.'cfg(target_os = "linux")'.dev-dependencies]
+# The fake compositor `xdg_activation`'s tests talk to.
+wayland-server = { workspace = true }
+wayland-protocols = { workspace = true, features = ["server"] }
 
 [features]
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.

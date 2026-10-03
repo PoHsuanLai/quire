@@ -118,6 +118,27 @@ notification click or a D-Bus activation sets it) hands it to the first window i
 compositor gives that window the keyboard; the variable is cleared as the window is created, so
 the token is spent once and child processes do not inherit it.
 
+**Raising a window that exists: `focus_with_token`.** A running app is handed a token by a second
+launch (D-Bus `org.freedesktop.Application.Activate` or `Open`, whose `platform_data` carries it
+as `activation-token`; on X11 `desktop-startup-id`) or by a notification click. The window it
+should raise is already open, so the environment is no help: pass the token to the window's own
+handle, `handle.focus_with_token(Some(token))`. On Wayland the token goes to the compositor as
+xdg-activation's `activate(token, surface)` on the app's own connection, for that window's
+surface, which is the only way a compositor lets a window that exists take the keyboard; on X11,
+with `None`, with an empty token, or on a compositor without xdg-activation it is
+`handle.focus()`. A token is good once, so pass it to one window. In mailo's service handler:
+
+```rust,ignore
+// `platform_data: HashMap<String, OwnedValue>` is the a{sv} of the call; the token is a string.
+let token = platform_data
+    .remove("activation-token")
+    .and_then(|value| String::try_from(value).ok());
+window_handle.focus_with_token(token);
+```
+
+The request is queued and the event loop answers it, like `focus`; `WindowHandle` is
+`use_window_handle()`'s, or the handle `open_window` returned.
+
 **The pinned dependency block.** `ds`'s own manifest resolves its dependencies (`dioxus`,
 and for `ds-blitz`, the whole blitz/anyrender/wgpu stack) against *quire's own* workspace —
 a path dependency does not inherit your workspace's `[workspace.dependencies]`, because

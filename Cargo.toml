@@ -100,6 +100,7 @@ smithay-client-toolkit = { version = "0.20", default-features = false, features 
 wayland-client = "0.31"
 wayland-backend = { version = "0.3", features = ["client_system"] }
 wayland-protocols = { version = "0.32.13", features = ["client", "staging", "unstable"] }
+wayland-server = "0.31"
 calloop = "0.14"
 calloop-wayland-source = "0.4"
 xkbcommon = "0.8"

@@ -80,3 +80,11 @@ Nothing here has run on the real mouse yet; every fixture is synthesised. The Py
 2. **Switch services when ready**: `~/palmrest/install.sh` disables the Python service, enables palmrest with your current feel (`SCROLL_SPEED=32`, `SCROLL_ACCEL_MAX=1`, F6) and rolls back if palmrest does not stay up. Under KDE it sets `foreign_output = "wheel"` so scroll direction does not flip (F7).
 3. **Live acceptance** after switching: design/12 §12.8 items 8 (libinput sees finger scroll with an axis stop, no motion, no taps), 9 (calibrate the virtual touchpad's mm/px; at 0.25 it re-lands every ~120 px, F8), 10 (suppression over shell surfaces), 11 (latency on the device), 12 (timestamp calibration).
 4. **After the sensor change (palmrest 7abdae3, F25–F29)**: use the Magic Mouse on the new build for a minute (scroll, swipe, double-tap); it should feel exactly as before, since thresholds are now in mm but convert back to the same values. Optional: `[device] source = "evdev"` in gestures.toml and compare (README "Manual checks"). Other mice and the Magic Mouse 1/USB-C are marked `TODO(untested)`; no check needed.
+
+## focus_with_token on a real Wayland compositor (queued 2026-10-03)
+
+- [ ] **Activation of an existing window**: once an app (mailo's handoff) calls
+  `WindowHandle::focus_with_token` with the token of a D-Bus `Activate` or a notification click,
+  put another window in front, click the notification, and confirm the existing window comes to
+  the front and takes the keyboard. The tests drive the request against a fake compositor only;
+  whether KDE, COSMIC and GNOME honour the token is this check.

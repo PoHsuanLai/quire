@@ -106,10 +106,20 @@ impl WindowHandle {
     }
 
     /// Ask the platform to raise the window and give it the keyboard: X11 does; winit's request
-    /// does nothing on Wayland, where only an activation token at window creation focuses a
-    /// window (FINDINGS "A window that exists cannot be activated with a token").
+    /// does nothing on Wayland, where only an activation token focuses a window
+    /// ([`focus_with_token`](WindowHandle::focus_with_token)).
     pub fn focus(&self) {
-        self.requests.focus(self.key);
+        self.requests.focus(self.key, None);
+    }
+
+    /// Raise the window and give it the keyboard with an activation token: the one a launcher, a
+    /// notification click or a second launch's D-Bus `Activate` (`platform_data`'s
+    /// `activation-token`) handed the running app. On Wayland the token goes to the compositor
+    /// as xdg-activation's `activate` for this window's surface, which is the only way to raise
+    /// a window that exists; on X11, with `None`, with an empty token, or when the compositor
+    /// offers no xdg-activation, it is [`focus`](WindowHandle::focus). A token is good once.
+    pub fn focus_with_token(&self, token: Option<String>) {
+        self.requests.focus(self.key, token);
     }
 
     /// Where the window is in its life.
@@ -200,7 +210,7 @@ mod tests {
             .take()
             .into_iter()
             .filter_map(|request| match request {
-                Request::Focus(key) => Some(key),
+                Request::Focus { key, token: None } => Some(key),
                 _ => None,
             })
             .collect();
@@ -209,6 +219,27 @@ mod tests {
             [second],
             "the focus request names the component's window, not {first:?}"
         );
+    }
+
+    #[test]
+    fn a_token_travels_with_the_focus_request_of_its_window() {
+        let requests = Requests::new(|| {});
+        let key = requests.open(WindowSpec::new("Only", 100, 100), Root::Plain(nothing));
+        requests.take();
+        let handle = WindowHandle::new(key, requests.clone());
+
+        handle.focus_with_token(Some("tok".to_owned()));
+        handle.focus();
+
+        let asked: Vec<(WindowKey, Option<String>)> = requests
+            .take()
+            .into_iter()
+            .filter_map(|request| match request {
+                Request::Focus { key, token } => Some((key, token)),
+                _ => None,
+            })
+            .collect();
+        assert_eq!(asked, [(key, Some("tok".to_owned())), (key, None)]);
     }
 
     #[test]
