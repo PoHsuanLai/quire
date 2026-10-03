@@ -194,6 +194,8 @@ impl Windows {
                     }
                 }),
                 Remote::Quit => self.life.quit(),
+                Remote::Hold => self.life.hold(),
+                Remote::Release => self.life.release(Instant::now()),
             }
         }
         for request in self.base.requests.take() {

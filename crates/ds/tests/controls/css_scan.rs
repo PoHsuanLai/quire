@@ -63,6 +63,10 @@ pub const STYLES: &[(&str, &[&str])] = &[
         ],
     ),
     (
+        "scrubber",
+        &[include_str!("../../src/components/controls/scrubber.css")],
+    ),
+    (
         "text_field",
         &[
             include_str!("../../src/components/fields/text_field.css"),

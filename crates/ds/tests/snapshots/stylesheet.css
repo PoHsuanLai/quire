@@ -552,6 +552,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-capsule[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 .ds-capsule-readout{ min-width:var(--s-36); padding:0 var(--s-4); text-align:center; white-space:nowrap; font-size:var(--fs-control); font-variant-numeric:tabular-nums; color:var(--ink-soft); }
 .ds-capsule-divider{ flex:none; width:var(--hair); height:var(--s-18); margin:0 var(--s-4); background:var(--line); }
+/* The media capsule: a progress bar that takes the width the buttons leave (a capsule that holds
+   one is `data-span=wide` and spans its scope less a margin each side, up to a fixed width), and a
+   level of fixed width. The bar's tooltip rises above the capsule's row, so the capsule is not
+   clipped. */
+.ds-capsule[*|data-span=wide]{ width:calc(100% - var(--s-16) * 2); max-width:640px; }
+.ds-capsule-scrub{ flex:1 1 auto; min-width:160px; padding:0 var(--s-8); }
+.ds-capsule-level{ flex:none; width:96px; padding:0 var(--s-4); }
 /* -- checkbox -- */
 /* Checkbox (design/30 section 2.3, `NSButton` checkbox). Attribute selectors carry `*|` (spike
    S2); the focus ring is the global one, on the button (spike S12). The box is the ladder's
@@ -1894,6 +1901,40 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-slider[*|aria-disabled=true] .ds-slider-thumb{ display:none; }
 .ds-slider[*|data-look=linear][*|aria-disabled=true] .ds-slider-thumb{ display:block; }
 .ds-slider[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
+/* -- scrubber -- */
+/* Scrubber (design/30 section 2.1a): a recording's progress bar. A thin track under a round thumb,
+   the loaded stretches a lighter band behind the played fill, and a tooltip above the bar that
+   reads the time under the pointer while it hovers or drags. It stands in the OSD capsule, so
+   its inks are the capsule's (`--ink`, `--ink-soft`). Sized like the linear Slider (design/29).
+   Attribute selectors carry `*|` (spike S2); the focus ring is the global one. The played share is
+   `--f`, the tooltip's place `--tip`, a band's ends `--from` and `--to`. Under a drag the fill
+   follows the pointer with no transition; a position from outside moves it as it comes. The thumb
+   grows over `--t-quick --e-out` on hover and drag. */
+
+.ds-scrubber{ --sc-knob:var(--slider-knob-m); --sc-track:var(--slider-track-m); position:relative; display:block; width:100%; height:var(--sc-knob); cursor:default; }
+.ds-scrubber[*|data-size=mini]{ --sc-knob:var(--slider-knob-xs); --sc-track:var(--slider-track-xs); }
+.ds-scrubber[*|data-size=small]{ --sc-knob:var(--slider-knob-s); --sc-track:var(--slider-track-s); }
+.ds-scrubber[*|data-size=large]{ --sc-knob:var(--slider-knob-l); --sc-track:var(--slider-track-l); }
+
+.ds-scrubber-track{ position:absolute; left:0; right:0; top:calc((var(--sc-knob) - var(--sc-track)) / 2); height:var(--sc-track); overflow:hidden; border-radius:var(--r-pill); background:var(--line); }
+.ds-scrubber-buffered{ position:absolute; top:0; bottom:0; left:calc(var(--from) * 100%); width:calc((var(--to) - var(--from)) * 100%); background:var(--ink-faint); }
+.ds-scrubber-fill{ position:absolute; top:0; bottom:0; left:0; width:calc(var(--f) * 100%); background:var(--ink); }
+
+.ds-scrubber-thumb{ position:absolute; top:0; left:calc(var(--f) * 100%); box-sizing:border-box; width:var(--sc-knob); height:var(--sc-knob); margin-left:calc(var(--sc-knob) / -2);
+  border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-handle); transform:scale(.6); transition:transform var(--t-quick) var(--e-out); }
+.ds-scrubber[*|data-state=hover] .ds-scrubber-thumb,
+.ds-scrubber[*|data-state=dragging] .ds-scrubber-thumb{ transform:scale(1); }
+.ds-scrubber[*|data-state=dragging] .ds-scrubber-fill,
+.ds-scrubber[*|data-state=dragging] .ds-scrubber-thumb{ transition:none; }
+.ds-scrubber[*|data-state=dragging] .ds-scrubber-thumb{ left:calc(var(--tip) * 100%); }
+.ds-scrubber[*|data-state=dragging] .ds-scrubber-fill{ width:calc(var(--tip) * 100%); }
+
+.ds-scrubber-tooltip{ position:absolute; bottom:calc(100% + var(--s-6)); left:calc(var(--tip) * 100%); transform:translateX(-50%); padding:var(--s-2) var(--s-6); white-space:nowrap; pointer-events:none;
+  font-size:var(--fs-control); font-variant-numeric:tabular-nums; color:var(--ink); background:var(--raise); border-radius:var(--r-item); box-shadow:var(--shadow-pop); animation:fade var(--t-quick) var(--e-out); }
+
+.ds-scrubber[*|aria-disabled=true]{ cursor:not-allowed; opacity:.35; }
+.ds-scrubber[*|aria-disabled=true] .ds-scrubber-thumb{ display:none; }
+.ds-scrubber[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
 /* -- space_editor -- */
 /* SpaceEditor and SpaceDot (design/04-COMPONENTS.md section 32): `S:246-279`, `S:147-150`.
    Attribute selectors carry `*|` (spike S2). Every colour shown arrives inline from

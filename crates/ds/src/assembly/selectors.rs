@@ -201,6 +201,11 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
         parts: &["lines"],
     },
     ComponentSelectors {
+        component: "Scrubber",
+        root: "ds-scrubber",
+        parts: &["track", "buffered", "fill", "thumb", "tooltip"],
+    },
+    ComponentSelectors {
         component: "Slider",
         root: "ds-slider",
         parts: &["track", "fill", "thumb", "icon", "tick"],

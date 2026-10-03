@@ -33,6 +33,9 @@ pub(crate) enum Verdict {
 pub(crate) struct Lifecycle {
     policy: LastWindowClosed,
     open: usize,
+    /// How many holds are keeping the loop alive with no window: a program that plays with no
+    /// window holds the loop while it does.
+    held: usize,
     /// Since when no window has been open, if none is and the policy cares.
     idle_since: Option<Instant>,
     quitting: bool,
@@ -48,6 +51,7 @@ impl Lifecycle {
         Lifecycle {
             policy,
             open: 0,
+            held: 0,
             idle_since,
             quitting: false,
         }
@@ -59,6 +63,26 @@ impl Lifecycle {
         self.idle_since = None;
     }
 
+    /// Something other than a window wants the loop to go on: while any hold is taken the loop
+    /// does not end, whatever the policy.
+    pub(crate) fn hold(&mut self) {
+        self.held += 1;
+        self.idle_since = None;
+    }
+
+    /// A hold was let go, at `now`. With no window open and no hold left, the loop is idle from
+    /// now, so the policy's linger starts (or the loop ends, under `Exit`).
+    pub(crate) fn release(&mut self, now: Instant) {
+        if self.held == 0 {
+            // No hold to release: a release that raced one already counted.
+            return;
+        }
+        self.held -= 1;
+        if self.held == 0 && self.open == 0 {
+            self.idle_since = Some(now);
+        }
+    }
+
     /// A window closed, at `now`.
     pub(crate) fn closed(&mut self, now: Instant) {
         if self.open == 0 {
@@ -66,7 +90,7 @@ impl Lifecycle {
             return;
         }
         self.open -= 1;
-        if self.open == 0 {
+        if self.open == 0 && self.held == 0 {
             self.idle_since = Some(now);
         }
     }
@@ -206,5 +230,49 @@ mod tests {
         life.opened();
         life.closed(t0);
         assert_eq!(life.verdict(t0), Verdict::Exit);
+    }
+
+    #[test]
+    fn a_hold_keeps_a_loop_with_no_window_running_and_its_release_starts_the_linger() {
+        let t0 = Instant::now();
+        let linger = Duration::from_millis(500);
+        let mut life = Lifecycle::new(LastWindowClosed::StayFor(linger), t0);
+        life.hold();
+        assert_eq!(
+            life.verdict(at(t0, 10_000)),
+            Verdict::Run,
+            "held past the linger"
+        );
+        assert_eq!(life.wake_at(), None);
+        life.release(at(t0, 10_000));
+        assert_eq!(life.verdict(at(t0, 10_499)), Verdict::Run);
+        assert_eq!(life.wake_at(), Some(at(t0, 10_500)));
+        assert_eq!(life.verdict(at(t0, 10_500)), Verdict::Exit);
+    }
+
+    #[test]
+    fn a_hold_outlives_the_last_window_and_two_holds_need_two_releases() {
+        let t0 = Instant::now();
+        let mut life = Lifecycle::new(LastWindowClosed::Exit, t0);
+        life.opened();
+        life.hold();
+        life.hold();
+        life.closed(at(t0, 10));
+        assert_eq!(life.verdict(at(t0, 20)), Verdict::Run, "held, no window");
+        life.release(at(t0, 30));
+        assert_eq!(life.verdict(at(t0, 40)), Verdict::Run, "one hold is left");
+        life.release(at(t0, 50));
+        assert_eq!(life.verdict(at(t0, 60)), Verdict::Exit, "nothing holds it");
+    }
+
+    #[test]
+    fn a_release_with_a_window_open_leaves_the_loop_running_and_an_extra_one_changes_nothing() {
+        let t0 = Instant::now();
+        let mut life = Lifecycle::new(LastWindowClosed::Exit, t0);
+        life.release(t0);
+        life.opened();
+        life.hold();
+        life.release(at(t0, 5));
+        assert_eq!(life.verdict(at(t0, 6)), Verdict::Run, "a window is open");
     }
 }

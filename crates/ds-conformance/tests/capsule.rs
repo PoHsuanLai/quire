@@ -3,8 +3,9 @@
 //! can keep it up), and a hide fades it out, calls `on_hidden` once and takes the pointer away.
 
 use dioxus::prelude::*;
-use ds::components::chrome::capsule::model::CapsuleSlot;
+use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubSlot};
 use ds::components::chrome::capsule::view::Capsule;
+use ds::motion::spring::Millis;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -126,5 +127,90 @@ fn a_hide_fades_out_calls_on_hidden_once_and_lets_the_pointer_through() {
         harness.rect(".ds-capsule").map(|rect| rect.size.width.0),
         Some(0.0),
         "hidden, nothing is laid out"
+    );
+}
+
+/// A media capsule: a button, the progress bar and the level; `.log` lists what each reported.
+#[allow(non_snake_case)]
+fn Media() -> Element {
+    let mut log = use_signal(Vec::<String>::new);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { class: "stage", style: "position:relative; width:640px; height:400px",
+                Capsule::<u8> {
+                    label: "Playback",
+                    slots: vec![
+                        CapsuleSlot::button(1, "Play", Icon::Play),
+                        CapsuleSlot::Scrub(ScrubSlot {
+                            label: "Position".to_owned(),
+                            position: Fraction(250),
+                            length: Millis(200_000),
+                            buffered: Vec::new(),
+                            availability: Availability::Enabled,
+                        }),
+                        CapsuleSlot::Level(LevelSlot {
+                            label: "Volume".to_owned(),
+                            value: Fraction(500),
+                            availability: Availability::Enabled,
+                        }),
+                    ],
+                    shown: Shown::Visible,
+                    onpick: move |value| log.with_mut(|log| log.push(format!("pick {value}"))),
+                    onscrub: move |event| log.with_mut(|log| log.push(format!("{event:?}"))),
+                    onlevel: move |value: Fraction| log.with_mut(|log| log.push(format!("level {}", value.0))),
+                }
+            }
+            p { class: "log", {log().join(",")} }
+        }
+    }
+}
+
+#[test]
+fn a_media_capsule_gives_the_free_width_to_its_bar_and_reports_each_control() {
+    let mut harness = Harness::new(Media, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(Duration::from_millis(100));
+    let capsule = harness.rect(".ds-capsule").expect("the capsule");
+    let bar = harness.rect(".ds-capsule-scrub").expect("the bar's slot");
+    let level = harness.rect(".ds-capsule-level").expect("the level's slot");
+    assert!(
+        bar.size.width.0 >= 160.0,
+        "the bar has its minimum: {}",
+        bar.size.width.0
+    );
+    assert!(
+        bar.size.width.0 > level.size.width.0 * 2.0,
+        "the bar takes what the level and the button leave: bar {} level {}",
+        bar.size.width.0,
+        level.size.width.0
+    );
+    assert!(
+        (level.size.width.0 - 96.0).abs() < 8.0,
+        "the level is about 96 wide: {}",
+        level.size.width.0
+    );
+    assert!(
+        capsule.size.width.0 > 400.0,
+        "a media capsule is wide: {}",
+        capsule.size.width.0
+    );
+    let track = harness.rect(".ds-scrubber-track").expect("the track");
+    let at = |share: f32| Point {
+        x: Px(track.origin.x.0 + track.size.width.0 * share),
+        y: Px(track.origin.y.0 + track.size.height.0 / 2.0),
+    };
+    harness.send(Input::pointer_move(at(0.5)));
+    harness.advance(Duration::from_millis(100));
+    harness.send(Input::pointer_down(at(0.5)));
+    harness.advance(Duration::from_millis(100));
+    harness.send(Input::pointer_up(at(0.5)));
+    harness.advance(Duration::from_millis(100));
+    let log = harness.text_of(".log").unwrap_or_default();
+    assert!(
+        log.starts_with("Start(Fraction(5"),
+        "a press on the bar is a scrub start: {log}"
+    );
+    assert!(
+        log.contains("End(Fraction(5"),
+        "and the release an end: {log}"
     );
 }
