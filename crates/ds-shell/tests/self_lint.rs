@@ -15,7 +15,7 @@ use ds_lint::{Exception, LintConfig, Offence, Profile, Rule, stylesheet};
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
 /// Space dot's stops (`SpaceDot` and the Space editor's dots), and a tinted plate's
 /// stops and ink per scheme (`IconView { plate_tint }`), and the level
-/// control's rubber band and segment stagger (the capsule `Slider`).
+/// control's rubber band and segment stagger (the capsule `Slider`), and a scrubber's loaded stretches and drag point (`Scrubber`).
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
     "--av-fg",
@@ -46,6 +46,10 @@ const INLINE_VARS: &[&str] = &[
     "--turn",
     // A running loop's step: the barber pole's slide (`ProgressIndicator`).
     "--step",
+    // A loaded stretch's ends and the pointer's place under a drag (`Scrubber`).
+    "--from",
+    "--to",
+    "--tip",
 ];
 
 const EXCEPTIONS: &[Exception] = &[
