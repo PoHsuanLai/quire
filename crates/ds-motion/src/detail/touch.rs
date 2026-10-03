@@ -5,6 +5,11 @@
 
 use crate::velocity::Velocity;
 
+/// The event payloads a handler may hand to [`Contact::from_event`] and [`Touch::from_event`]; the
+/// trait lives with them in `touch_event`, and stays reachable here for callers of this path.
+#[cfg(feature = "dioxus")]
+pub use super::touch_event::Handled;
+
 /// Proof that the person touched the element in this moment. It has no public constructor but
 /// `Contact::from_event` (feature `dioxus`), which takes the event a handler was given, so a
 /// contact cannot be written by hand: its fields are private.
