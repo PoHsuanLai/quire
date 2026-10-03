@@ -52,7 +52,12 @@ pub(crate) enum Request {
         root: Root,
     },
     Close(WindowKey),
-    Focus(WindowKey),
+    /// Raise the window; `token` is the activation token a launcher, a notification click or a
+    /// D-Bus activation handed the app for it.
+    Focus {
+        key: WindowKey,
+        token: Option<String>,
+    },
 }
 
 /// The app's queue of window requests, shared by every window's document (a root context) and
@@ -94,9 +99,9 @@ impl Requests {
         self.push(Request::Close(key));
     }
 
-    /// Ask for the window `key` to be raised and focused.
-    pub(crate) fn focus(&self, key: WindowKey) {
-        self.push(Request::Focus(key));
+    /// Ask for the window `key` to be raised and focused, with `token` where it has one.
+    pub(crate) fn focus(&self, key: WindowKey, token: Option<String>) {
+        self.push(Request::Focus { key, token });
     }
 
     /// Every request since the last take, oldest first.
@@ -146,7 +151,7 @@ mod tests {
             .map(|request| match request {
                 Request::Open { key, spec, .. } => format!("open {} {}", key.0, spec.title()),
                 Request::Close(key) => format!("close {}", key.0),
-                Request::Focus(key) => format!("focus {}", key.0),
+                Request::Focus { key, token } => format!("focus {} {token:?}", key.0),
             })
             .collect()
     }
@@ -156,13 +161,18 @@ mod tests {
         let (requests, woken) = woken();
         let first = requests.open(WindowSpec::new("One", 300, 200), Root::Plain(empty));
         let second = requests.open(WindowSpec::new("Two", 300, 200), Root::Plain(empty));
-        requests.focus(first);
+        requests.focus(first, Some("abc".to_owned()));
         requests.close(second);
 
         assert_eq!(woken.get(), 4, "each request woke the loop once");
         assert_eq!(
             kinds(&requests.take()),
-            ["open 0 One", "open 1 Two", "focus 0", "close 1"]
+            [
+                "open 0 One",
+                "open 1 Two",
+                "focus 0 Some(\"abc\")",
+                "close 1"
+            ]
         );
         assert!(requests.take().is_empty(), "a take empties the queue");
     }

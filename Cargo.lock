@@ -1133,7 +1133,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d045de693cb712d0b22c6a64be5b953f67b3ce00ab5ad3dd5d8b441886ab8e1a"
 dependencies = [
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -1671,10 +1671,15 @@ dependencies = [
  "pdfrum-common",
  "pdfrum-edit",
  "peniko",
+ "raw-window-handle",
  "skrifa 0.44.0",
  "spellbook",
  "thiserror 2.0.21",
  "tokio",
+ "wayland-backend",
+ "wayland-client",
+ "wayland-protocols",
+ "wayland-server",
  "webbrowser",
  "wgpu",
  "wgpu_context",
@@ -4921,8 +4926,8 @@ version = "0.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0d204abcbdf8e88729306a8d0ca01a79d8a49969fe1f84696909d6dbc4321c1a"
 dependencies = [
- "foldhash 0.1.5",
- "hashbrown 0.15.5",
+ "foldhash 0.2.0",
+ "hashbrown 0.17.1",
 ]
 
 [[package]]
@@ -5947,6 +5952,7 @@ dependencies = [
  "wayland-backend",
  "wayland-client",
  "wayland-scanner",
+ "wayland-server",
 ]
 
 [[package]]
@@ -6010,6 +6016,19 @@ dependencies = [
  "proc-macro2",
  "quick-xml",
  "quote",
+]
+
+[[package]]
+name = "wayland-server"
+version = "0.31.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0dde9c29be0f723a573977de51ee455bf3dfa03652730a74f9dd3b337e374d75"
+dependencies = [
+ "bitflags",
+ "downcast-rs",
+ "rustix",
+ "wayland-backend",
+ "wayland-scanner",
 ]
 
 [[package]]

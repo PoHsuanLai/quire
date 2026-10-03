@@ -67,7 +67,10 @@ pub mod spell;
 mod startup_token;
 mod texture_layer;
 mod wake;
+#[cfg(target_os = "linux")]
+mod wayland_surface;
 pub mod window;
+mod window_activate;
 mod window_build;
 mod window_drop;
 mod window_hover;
@@ -75,6 +78,8 @@ mod window_place;
 mod window_platform;
 mod window_requests;
 mod window_shell;
+#[cfg(target_os = "linux")]
+mod xdg_activation;
 
 pub use app_handle::{AppEnded, AppHandle, AppHold, use_app_handle};
 pub use app_id::AppId;

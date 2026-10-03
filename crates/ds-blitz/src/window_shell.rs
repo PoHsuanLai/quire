@@ -38,6 +38,7 @@ use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::open_window::WindowHandle;
 use crate::startup_token::take_startup_token;
+use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
 use anyrender::WindowRenderer;
@@ -204,9 +205,9 @@ impl Windows {
             match request {
                 Request::Open { key, spec, root } => self.open(event_loop, key, &spec, root),
                 Request::Close(key) => self.drop_window(event_loop, key),
-                Request::Focus(key) => {
+                Request::Focus { key, token } => {
                     if let Some(window) = self.sub_mut(key).and_then(|sub| sub.slot.window()) {
-                        window.focus_window();
+                        raise(&*window, token);
                     }
                 }
             }
