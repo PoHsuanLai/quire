@@ -260,7 +260,7 @@ const CASES: &[Case] = &[
     },
     Case {
         name: "a voice token is declared",
-        css: ".label { letter-spacing: var(--tracking-caps); font-weight: var(--fw-caps); }",
+        css: ".label { letter-spacing: var(--tracking-heading); font-weight: var(--fw-caps); }",
         profile: Profile::Strict,
         rule: Rule::UndeclaredVar,
         expect: false,
