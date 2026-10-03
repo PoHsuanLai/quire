@@ -214,6 +214,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The crate error | `ds-core::error::DsError`; settings: `ds-settings::error::SettingsError` |
 | Design tokens (colour, duration, easing, spacing, shape, type, layer) | `ds-style::tokens` (one file per family, `impl Token`) |
 | Shell metric tokens (dock, OSD, notifications, control center, widgets) | `ds-shell::tokens` |
+| Window chrome geometry (titlebar, lights, resize edges) and the lights' state | `ds-style::tokens::chrome` (`ChromeToken`, `CHROME_SCALE`, `light_state`); `window_frame.css` reads the variables, `ds::components::chrome` draws |
 | What each crate adds to the stylesheet, and the lint vocabulary | `ds-style::kit::Kit`; ordered by `Kits` |
 | Appearance choice and resolution (theme, accent, motion, system prefs) | `ds-style::appearance` |
 | The enclosing scope a component reads | `ds-style::scope::Scope` |

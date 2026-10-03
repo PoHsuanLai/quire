@@ -18,6 +18,7 @@ use crate::space::{
     look::{CardAccent, SpaceLook},
 };
 use crate::tokens::{
+    chrome::ChromeToken,
     colour::ColourToken,
     easing::EasingToken,
     elevation::Shadow,
@@ -62,6 +63,7 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<ShellType>().at(Place::Metrics),
         TokenSet::of::<PersonSwatch>().at(Place::Scale),
         TokenSet::of::<SpacingToken>().at(Place::Scale),
+        TokenSet::of::<ChromeToken>().at(Place::Scale),
         TokenSet::of::<FontSize>()
             .at(Place::Scale)
             .only(Only::TypefaceFixed),
