@@ -51,6 +51,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
 | `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners`, `keyboard` |
 | `$XDG_CONFIG_HOME/<daemon>/…` | the companion's daemons: inferd (porter), intentd and companiond (docket), memoryd (almanac), cuad (cua); each repo names its file and ships its schema (section 9.2) | `ai`, `agent`, `memory`, `cua` (sections 3.26 to 3.29) |
+| `$XDG_CONFIG_HOME/anyview/settings.toml` | `anyview` (the file viewer; its settings module ships the schema, section 9.2) | `viewer` (section 3.31) |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
 Rules, all three files:
@@ -661,6 +662,37 @@ The summon and the confirmation. Page Intelligence, sections Companion and Confi
 | `companion.confirm_arm_ms` | `Ms` | `500` | `300..=1500`; the buttons of a confirmation wait this long (QUESTIONS U6) | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 
 
+### 3.31 `viewer` (anyview, `$XDG_CONFIG_HOME/anyview/settings.toml`)
+
+The file viewer's timings, steps, history and the limits of its decoders. Page Viewer: section Window (`viewer.chrome.hide_after`, `viewer.warm_for`), section Viewing (`viewer.zoom.step`, `viewer.media.seek_step`), section History (`viewer.history.cap`, `viewer.versions.keep`), section Export (`viewer.export.*`); `viewer.peek.*` and `viewer.image.*` are Advanced. A key's unit is its type, not its name: `viewer.chrome.hide_after` is `Ms` and `viewer.warm_for` is `Mins`. The reveal and hide fades are the motion token `--t-quick` and are not keys. Two rows have no constant in anyview yet and are the values proposed here: `viewer.versions.keep` (30 days) and the three `viewer.peek` budget rows (taken from the launcher pane's test budget).
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `viewer.chrome.hide_after` | `Ms` | `2000` | `500..=30000`; idle time before the viewer's toolbar and title fade out | anyview `chrome/model.rs` `ChromeParams::HIDE_AFTER`; design/20 section 2.6 | proposed (viewer join, 2026-10-03) |
+| `viewer.zoom.step` | `Fraction` | `1250` | `1001..=4000`; the factor of one zoom step in thousandths (1250 is x1.25); the stages floor it at 1001 | anyview `stage/raster/model.rs`, `stage/pdf/model.rs` `step: Permille(1250)` | proposed (viewer join, 2026-10-03) |
+| `viewer.media.seek_step` | `Secs` | `5` | `1..=300`; how far a seek key jumps in a recording | anyview `stage/media/model.rs` `MediaParams::default` | proposed (viewer join, 2026-10-03) |
+| `viewer.warm_for` | `Mins` | `10` | `0..=1440`; how long the process stays after the last window closes, so the next file opens warm; 0 quits at once | anyview `crates/anyview/src/program/start.rs` `WARM_FOR` | proposed (viewer join, 2026-10-03) |
+| `viewer.history.cap` | `Count` | `200` | `1..=10000`; how many files the recently-viewed history keeps | anyview `crates/anyview-store/src/history.rs` `HistoryCap::DEFAULT` | proposed (viewer join, 2026-10-03) |
+| `viewer.versions.keep` | `Count` | `30` | `1..=3650` days; how long the original of a file the viewer saved over is kept for Revert To | anyview PLAN.md section E (no constant yet) | proposed (viewer join, 2026-10-03) |
+| `viewer.export.jpeg_quality` | `Percent` | `90` | `1..=100`; the quality an image or frame exported as JPEG starts at | anyview `crates/anyview-core/src/export/target.rs` `default_jpeg` | proposed (viewer join, 2026-10-03) |
+| `viewer.export.avif_quality` | `Percent` | `65` | `1..=100`; the quality an image or frame exported as AVIF starts at | anyview `export/target.rs` `default_avif` | proposed (viewer join, 2026-10-03) |
+| `viewer.export.paper` | `PaperSize::{A4,A3,Letter,Legal}` | `A4` | the paper a text or document export to PDF or print is laid out on | anyview `export/layout.rs` `PaperSize` default | proposed (viewer join, 2026-10-03) |
+| `viewer.export.orientation` | `Orientation::{Portrait,Landscape}` | `Portrait` | which way up that paper is | anyview `export/layout.rs` `Orientation` default | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.bytes_mib` | `Count` | `4` | `1..=256` MiB; the most a launcher peek reads from a file | anyview-peek `tests/support/mod.rs` `pane_budget` (4,000,000 bytes; no production constant) | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.megapixels` | `Count` | `1` | `1..=64` Mpx; the most pixels a launcher peek decodes | same (1,000,000 pixels) | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.time_ms` | `Ms` | `500` | `50..=10000`; the longest a launcher peek may take before it is abandoned | same (500 ms) | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.lines` | `Count` | `40` | `5..=500`; lines of a text or code file a peek shows | anyview-text `peek/head.rs` `PEEK_LINES` | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.detect_kib` | `Count` | `1024` | `4..=65535` KiB; how much of a text file is read to guess its encoding | anyview-text `encoding.rs` `DETECT_BYTES` (1 MiB) | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.json_keys` | `Count` | `8` | `1..=64`; top-level keys a JSON peek names | anyview-text `peek/tree.rs` `KEYS_NAMED` | proposed (viewer join, 2026-10-03) |
+| `viewer.peek.highlight_line_bytes` | `Count` | `4096` | `256..=65535`; the longest line syntax highlighting is run on | anyview-text `code/state.rs` `MAX_PARSED_LINE` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.max_decode_mpx` | `Count` | `256` | `16..=4096` Mpx (2^20 pixels; 256 is 16384 by 16384); an image that declares more is refused, not decoded | anyview-image `decode/mod.rs` `MAX_DECODE_AREA` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.max_animation_mib` | `Count` | `512` | `16..=16384` MiB; the most memory the frames of one animation may take | anyview-image `decode/mod.rs` `MAX_ANIMATION_BYTES` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.svg_edge_min_px` | `Px` | `1024` | `256..=8192`; an SVG shown in full is drawn with its long edge at least this long | anyview-image `decode/mod.rs` `SVG_LONG_EDGE_MIN` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.svg_edge_max_px` | `Px` | `4096` | `1024..=16384`; and at most this long | anyview-image `decode/mod.rs` `SVG_LONG_EDGE_MAX` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.avif_speed` | `Count` | `6` | `1..=10`; the AVIF encoder's speed, 1 smallest and slowest | anyview-image `encode/avif.rs` `SPEED` | proposed (viewer join, 2026-10-03) |
+| `viewer.image.markdown_inline_mib` | `Count` | `8` | `1..=64` MiB; the largest local image a rendered Markdown file inlines | anyview-text `markdown/images.rs` `MAX_INLINE` | proposed (viewer join, 2026-10-03) |
+
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
@@ -976,6 +1008,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.times`, `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Cosmic` they still render, disabled, so the row explains itself) |
 | **Intelligence** (the companion, design/32; sill's `companion` domain and the daemons' schemas) | Companion: `companion.summon`, `companion.in_field`, `companion.notify`; Models: `ai.local_only`, `ai.floor.<class>`, `ai.model.<kind>.<tier>` (the live picker, section 9.4); Memory: `memory.files.at_rest`, `memory.consolidation.when`, `memory.consolidation.apply`, and the memory view (a live module); Computer use: `cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`; Privacy: `agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`; Confirmations: `companion.confirm_arm_ms` is Advanced |
+| **Viewer** (anyview, section 3.31) | Window: `viewer.chrome.hide_after`, `viewer.warm_for`; Viewing: `viewer.zoom.step`, `viewer.media.seek_step`; History: `viewer.history.cap`, `viewer.versions.keep`; Export: `viewer.export.jpeg_quality`, `viewer.export.avif_quality`, `viewer.export.paper`, `viewer.export.orientation`; `viewer.peek.*` and `viewer.image.*` are Advanced |
 | **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
 ## 6. Acceptance
@@ -1170,7 +1203,7 @@ as "edit in settings.toml".
 1. Discover every `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/` (and
    `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
    above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
-   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, Intelligence, plus one page per third-party app
+   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, Intelligence, Viewer, plus one page per third-party app
    id). Every "Advanced" key of a page renders under one "Advanced" disclosure at the end of the
    page, grouped by section inside it, so a section with only Advanced keys shows no empty header.
 2. Read the current value from the key's `file` through the shared lenient loader; write with
