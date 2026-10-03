@@ -1,6 +1,7 @@
 //! The structure page (design/30 sections 2.1 to 2.7, the P2 components): one section per
 //! component that builds a window's content and its forms, every state it can express, live.
 
+mod capsule;
 mod date_picker;
 mod drag_ghost;
 mod field_row;
@@ -20,6 +21,7 @@ use dioxus::prelude::*;
 #[component]
 pub fn StructurePage() -> Element {
     rsx! {
+        capsule::CapsuleSection {}
         stepper::StepperSection {}
         date_picker::DatePickerSection {}
         table::TableSection {}

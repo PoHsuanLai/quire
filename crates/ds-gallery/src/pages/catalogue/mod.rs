@@ -9,6 +9,7 @@ mod label;
 mod level_indicator;
 mod progress_indicator;
 mod radio_group;
+mod scrubber;
 mod segmented_control;
 mod slider;
 mod text_field;
@@ -27,6 +28,7 @@ pub fn CataloguePage() -> Element {
         radio_group::RadioGroupSection {}
         segmented_control::SegmentedSection {}
         slider::SliderSection {}
+        scrubber::ScrubberSection {}
         text_field::TextFieldSection {}
         progress_indicator::ProgressSection {}
         level_indicator::LevelIndicatorSection {}
