@@ -5,6 +5,7 @@
 //! processes from inheriting a token that is spent.
 
 use dioxus_native::winit::event_loop::ActiveEventLoop;
+#[cfg(target_os = "linux")]
 use dioxus_native::winit::platform::startup_notify::{
     EventLoopExtStartupNotify, reset_activation_token_env,
 };
@@ -12,6 +13,7 @@ use dioxus_native::winit::window::ActivationToken;
 
 /// The token the process was started with, taken: reading it clears the environment, so the
 /// next call answers `None`. An empty variable is no token.
+#[cfg(target_os = "linux")]
 pub(crate) fn take_startup_token(event_loop: &dyn ActiveEventLoop) -> Option<ActivationToken> {
     take(
         || event_loop.read_token_from_env(),
@@ -19,7 +21,13 @@ pub(crate) fn take_startup_token(event_loop: &dyn ActiveEventLoop) -> Option<Act
     )
 }
 
+#[cfg(not(target_os = "linux"))]
+pub(crate) fn take_startup_token(_event_loop: &dyn ActiveEventLoop) -> Option<ActivationToken> {
+    None
+}
+
 /// `read`'s token, with `reset` run once it has been read and not before.
+#[cfg(any(target_os = "linux", test))]
 fn take(
     read: impl FnOnce() -> Option<ActivationToken>,
     reset: impl FnOnce(),
