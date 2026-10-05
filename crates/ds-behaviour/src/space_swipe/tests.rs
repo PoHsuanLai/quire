@@ -126,7 +126,7 @@ fn run(
     let (state, outs) = script
         .iter()
         .fold((start, Vec::new()), |(s, mut all), &(at, input)| {
-            let (s, out) = s.step(input, Stamp(at), params);
+            let (s, out) = s.step(input, Stamp(at), params, &());
             all.extend(out);
             (s, all)
         });
@@ -430,7 +430,7 @@ fn strays_change_nothing() {
     ];
     for (name, input) in at_rest {
         assert_eq!(
-            Swipe::Idle { at: 1 }.step(*input, Stamp(50), &FOUR),
+            Swipe::Idle { at: 1 }.step(*input, Stamp(50), &FOUR, &()),
             (Swipe::Idle { at: 1 }, vec![]),
             "{name}"
         );
@@ -442,7 +442,7 @@ fn strays_change_nothing() {
     for (name, input) in while_tracking {
         let before = tracking(-300);
         assert_eq!(
-            before.clone().step(*input, Stamp(50), &FOUR),
+            before.clone().step(*input, Stamp(50), &FOUR, &()),
             (before, vec![]),
             "{name}"
         );
@@ -455,7 +455,7 @@ fn strays_change_nothing() {
         ("an early elapse", SwipeIn::Elapsed),
     ] {
         assert_eq!(
-            slide.clone().step(input, Stamp(399), &FOUR),
+            slide.clone().step(input, Stamp(399), &FOUR, &()),
             (slide.clone(), vec![]),
             "{name}"
         );
@@ -543,7 +543,9 @@ fn a_touchpad_page_is_400_px_and_its_flick_commits_the_same_way() {
 fn a_redirect_off_the_row_leaves_the_slide_alone() {
     let slide = finishing(0, 1, 0, 0, 0);
     assert_eq!(
-        slide.clone().step(SwipeIn::Go { to: 4 }, Stamp(100), &FOUR),
+        slide
+            .clone()
+            .step(SwipeIn::Go { to: 4 }, Stamp(100), &FOUR, &()),
         (slide, vec![])
     );
 }

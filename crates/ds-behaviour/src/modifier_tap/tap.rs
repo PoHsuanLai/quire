@@ -63,8 +63,9 @@ impl Machine for Tap {
     type In = TapIn;
     type Out = TapOut;
     type Params = TapParams;
+    type Ctx = ();
 
-    fn step(self, input: TapIn, at: Stamp, params: &TapParams) -> (Tap, Vec<TapOut>) {
+    fn step(self, input: TapIn, at: Stamp, params: &TapParams, _: &()) -> (Tap, Vec<TapOut>) {
         match (self, input) {
             (Tap::Rest, TapIn::Tap) => (armed(at, params), Vec::new()),
             (Tap::Armed { until }, TapIn::Tap) if at <= until => (Tap::Rest, vec![TapOut::Summon]),

@@ -1,12 +1,13 @@
-//! A timed pure state machine. A [`Machine`] decides `(state, input, time) -> (state, outputs)`
-//! and says when it wants to be stepped again with no input. It never reads a clock and never
-//! does anything: `ds::machine::use_machine` owns the state, stamps every step with a
+//! A timed pure state machine. A [`Machine`] decides `(state, input, time, settings, outside
+//! facts) -> (state, outputs)` and says when it wants to be stepped again with no input. It never
+//! reads a clock and never does anything: `ds::machine::use_machine` keeps the state (or the
+//! caller does, with `use_machine_in`), stamps every step with a
 //! [`FrameClock`](crate::time::stamp::FrameClock), sleeps until [`Machine::wake`] on
 //! `ds_core::time`'s clock (so a harness's virtual clock drives it), and hands each output to
 //! the surface's effect handler.
 //!
 //! Time is [`Stamp`], the one "when" of the design system (milliseconds from an origin the
-//! caller keeps); `ds-motion`'s gesture machines take the same type.
+//! caller keeps); every timed machine in the pure crates (`ds-behaviour`, `ds-motion`) takes it.
 
 use crate::time::stamp::Stamp;
 
@@ -15,16 +16,30 @@ use crate::time::stamp::Stamp;
 pub struct Elapsed;
 
 /// A state that changes over time or by input.
-pub trait Machine: Clone + PartialEq + Default + 'static {
+///
+/// There is no `Default` bound: the caller supplies the first state. A deadline lives in the state
+/// (`Armed { until }`), because [`Machine::wake`] reads the state alone.
+pub trait Machine: Clone + PartialEq + 'static {
     /// What moves the machine; it can be woken by the clock alone.
     type In: From<Elapsed>;
     /// What the machine wants done.
     type Out: 'static;
     /// What the surface's settings say about timing; a change applies from the next step.
     type Params: Clone + PartialEq + 'static;
+    /// Facts from outside the machine that a step reads to decide (the switcher's list of running
+    /// apps, a roster's measured row heights): read-only and the caller's, not settings. `()` for
+    /// a machine that needs none.
+    type Ctx: 'static;
 
-    /// The machine after `input` at `at`, and what it wants done.
-    fn step(self, input: Self::In, at: Stamp, params: &Self::Params) -> (Self, Vec<Self::Out>);
+    /// The machine after `input` at `at`, and what it wants done. `cx` is read at this step: the
+    /// caller provides it afresh each time, including for the step a wake causes.
+    fn step(
+        self,
+        input: Self::In,
+        at: Stamp,
+        params: &Self::Params,
+        cx: &Self::Ctx,
+    ) -> (Self, Vec<Self::Out>);
 
     /// When to step again with no input; none when the machine is at rest, so an idle machine
     /// runs no timer at all.
@@ -37,13 +52,10 @@ mod tests {
     use crate::time::stamp::Stamp;
 
     /// A toy: a lamp that turns itself off `hold` ms after the last press.
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
     enum Lamp {
-        #[default]
         Off,
-        On {
-            until: Stamp,
-        },
+        On { until: Stamp },
     }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -67,8 +79,9 @@ mod tests {
         type In = In;
         type Out = Out;
         type Params = u64;
+        type Ctx = ();
 
-        fn step(self, input: In, at: Stamp, hold: &u64) -> (Lamp, Vec<Out>) {
+        fn step(self, input: In, at: Stamp, hold: &u64, _: &()) -> (Lamp, Vec<Out>) {
             match (self, input) {
                 (_, In::Press) => (
                     Lamp::On {
@@ -118,10 +131,82 @@ mod tests {
             ("elapsed at rest is nothing", Lamp::Off, In::Elapsed, 50, Lamp::Off, &[],               None),
         ];
         for (name, from, input, at, state, outs, wake) in cases {
-            let (next, out) = from.step(*input, Stamp(*at), &500);
+            let (next, out) = from.step(*input, Stamp(*at), &500, &());
             assert_eq!(next, *state, "{name}: state");
             assert_eq!(out.as_slice(), *outs, "{name}: outputs");
             assert_eq!(next.wake(), *wake, "{name}: wake");
         }
+    }
+
+    /// A toy that reads a fact from outside: a doorbell that rings only while the house is
+    /// occupied, as the caller says at each step, and stops asking for a wake once it has rung.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    enum Bell {
+        Quiet,
+        Pressed { until: Stamp },
+    }
+
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    enum Occupancy {
+        Home,
+        Away,
+    }
+
+    impl Machine for Bell {
+        type In = In;
+        type Out = Out;
+        type Params = u64;
+        type Ctx = Occupancy;
+
+        fn step(self, input: In, at: Stamp, delay: &u64, at_home: &Occupancy) -> (Bell, Vec<Out>) {
+            match (self, input, at_home) {
+                (Bell::Quiet, In::Press, _) => (
+                    Bell::Pressed {
+                        until: at.after(*delay),
+                    },
+                    vec![],
+                ),
+                (Bell::Pressed { until }, In::Elapsed, Occupancy::Home) if at >= until => {
+                    (Bell::Quiet, vec![Out::Light(true)])
+                }
+                (Bell::Pressed { until }, In::Elapsed, Occupancy::Away) if at >= until => {
+                    (Bell::Quiet, vec![])
+                }
+                (state, _, _) => (state, vec![]),
+            }
+        }
+
+        fn wake(&self) -> Option<Stamp> {
+            match self {
+                Bell::Quiet => None,
+                Bell::Pressed { until } => Some(*until),
+            }
+        }
+    }
+
+    #[test]
+    fn a_step_reads_the_context_it_is_given() {
+        let pressed = Bell::Pressed { until: Stamp(300) };
+        #[rustfmt::skip]
+        let cases = [
+            ("home: rings",         Occupancy::Home, &[Out::Light(true)][..]),
+            ("away: stays silent",  Occupancy::Away, &[][..]),
+        ];
+        for (name, cx, outs) in cases {
+            let (next, out) = pressed.step(In::Elapsed, Stamp(300), &300, &cx);
+            assert_eq!(next, Bell::Quiet, "{name}: state");
+            assert_eq!(out.as_slice(), outs, "{name}: outputs");
+            assert_eq!(next.wake(), None, "{name}: at rest");
+        }
+    }
+
+    #[test]
+    fn a_machine_runs_to_rest_on_elapsed_alone() {
+        let (mut lamp, mut at) = (Lamp::Off.step(In::Press, Stamp(10), &500, &()).0, Stamp(10));
+        while let Some(due) = lamp.wake() {
+            at = due;
+            lamp = lamp.step(In::from(Elapsed), at, &500, &()).0;
+        }
+        assert_eq!((lamp, at), (Lamp::Off, Stamp(510)));
     }
 }
