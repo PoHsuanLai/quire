@@ -4,6 +4,7 @@
 //! here waits a frame or retries: the harness settles and the values are there.
 
 use dioxus::prelude::*;
+use ds::base::geometry::scroll::Scroll;
 use ds::host::document::{DocumentHost, use_document_host};
 use ds::host::measure::MountedRef;
 use ds::host::phase::{Observe, Observed, PhaseWrite, Queued, Watch};
@@ -131,4 +132,41 @@ fn a_queued_scroll_is_applied_in_the_frame_phase() {
         click(&mut harness, button);
         assert_eq!(offset(&harness), want, "{button}");
     }
+}
+
+/// A scroller whose scroll state is watched through the host, and a button that scrolls it by a
+/// queued write: the document dispatches no `scroll` event for that, so only the phase sees it.
+#[allow(non_snake_case)]
+fn Watched() -> Element {
+    let host = use_document_host();
+    let mut scroller = use_signal(|| None::<MountedRef>);
+    let seen = use_signal(|| None::<Scroll>);
+    let mut watch = use_signal(|| None::<Watch>);
+    let (watching, writing) = (host.clone(), host);
+    let shown = seen().map_or_else(
+        || "none".to_owned(),
+        |seen| format!("{} {} {}", seen.offset.0, seen.viewport.0, seen.content.0),
+    );
+    rsx! {
+        div { class: "scroller", style: "height:100px; overflow-y:auto; scrollbar-width:none",
+            onmounted: move |mounted: MountedEvent| {
+                let observed = watching.geometry().observe(&mounted.data(), Observe::Scroll(seen));
+                if let Observed::Watching(found) = observed {
+                    watch.set(Some(found));
+                }
+                scroller.set(Some(MountedRef(mounted.data())));
+            },
+            div { style: "height:1000px" }
+        }
+        button { class: "to-300", onclick: move |_| queue(&writing, scroller(), &[300.0]), "to 300" }
+        p { class: "seen", {shown} }
+    }
+}
+
+#[test]
+fn a_scroll_the_document_made_without_an_event_is_published() {
+    let mut harness = Harness::new(Watched, VIEW);
+    assert_eq!(harness.text_of(".seen").as_deref(), Some("0 100 1000"));
+    click(&mut harness, ".to-300");
+    assert_eq!(harness.text_of(".seen").as_deref(), Some("300 100 1000"));
 }

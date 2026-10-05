@@ -2,12 +2,14 @@
 //! and the step the loop runs.
 
 use super::book::{Book, WatchId};
-use super::read::{Moved, apply, border_box};
+use super::read::{Moved, apply, border_box, scroll_of};
 use crate::node_ref::{DocRef, NodeRef, Written};
 use dioxus::core::{Runtime, RuntimeGuard};
-use dioxus::prelude::MountedData;
+use dioxus::prelude::{MountedData, Signal};
+use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::{Observe, Observed, PhaseWrite, Queued, Watch};
 use ds::prelude::Rect;
+use ds::style::task::try_set;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -141,39 +143,88 @@ impl Phase {
     }
 
     fn publish(&self, drive: &Drive) -> usize {
-        let wanted: Vec<(WatchId, Option<Rect>)> = {
-            let book = self.shared.book.borrow();
-            let Some(read) = drive.doc.read(|doc| {
-                book.rects
-                    .iter()
-                    .map(|watch| (watch.id, border_box(doc, watch.node)))
-                    .collect()
-            }) else {
-                return 0;
-            };
-            read
+        let Some(reads) = self.read(drive) else {
+            return 0;
         };
-        let changed: Vec<_> = {
-            let mut book = self.shared.book.borrow_mut();
-            wanted
-                .into_iter()
-                .filter_map(|(id, read)| {
-                    let watch = book.rects.iter_mut().find(|watch| watch.id == id)?;
-                    (watch.last != read).then(|| {
-                        watch.last = read;
-                        (watch.sink, read)
-                    })
-                })
-                .collect()
-        };
+        let Changed { rects, scrolls } = self.changed(reads);
         let _in_runtime = RuntimeGuard::new(Rc::clone(&drive.runtime));
         // A sink whose component has gone is skipped: its watch is dropped with it.
-        changed
+        let rects = rects
             .into_iter()
-            .filter(|(sink, read)| ds::style::task::try_set(*sink, *read).is_ok())
-            .count()
+            .filter(|(sink, read)| try_set(*sink, *read).is_ok())
+            .count();
+        let scrolls = scrolls
+            .into_iter()
+            .filter(|(sink, read)| try_set(*sink, *read).is_ok())
+            .count();
+        rects + scrolls
+    }
+
+    /// Everything watched, read from the document; `None` while it is borrowed elsewhere.
+    fn read(&self, drive: &Drive) -> Option<Reads> {
+        let book = self.shared.book.borrow();
+        drive.doc.read(|doc| {
+            let rects = book
+                .rects
+                .iter()
+                .map(|watch| (watch.id, border_box(doc, watch.node)))
+                .collect();
+            let scrolls = book
+                .scrolls
+                .iter()
+                .map(|watch| (watch.id, scroll_of(doc, watch.node)))
+                .collect();
+            Reads { rects, scrolls }
+        })
+    }
+
+    /// The reads that differ from what was last published, with their sinks, remembered as
+    /// published.
+    fn changed(&self, reads: Reads) -> Changed {
+        let mut book = self.shared.book.borrow_mut();
+        let rects = reads
+            .rects
+            .into_iter()
+            .filter_map(|(id, read)| {
+                let watch = book.rects.iter_mut().find(|watch| watch.id == id)?;
+                (watch.last != read).then(|| {
+                    watch.last = read;
+                    (watch.sink, read)
+                })
+            })
+            .collect();
+        let scrolls = reads
+            .scrolls
+            .into_iter()
+            .filter_map(|(id, read)| {
+                let watch = book.scrolls.iter_mut().find(|watch| watch.id == id)?;
+                (watch.last != read).then(|| {
+                    watch.last = read;
+                    (watch.sink, read)
+                })
+            })
+            .collect();
+        Changed { rects, scrolls }
     }
 }
+
+/// What the document showed for each watch.
+struct Reads {
+    rects: Vec<Read<Rect>>,
+    scrolls: Vec<Read<Scroll>>,
+}
+
+/// What differs from what was published, with the signals to publish it to.
+struct Changed {
+    rects: Vec<Sink<Rect>>,
+    scrolls: Vec<Sink<Scroll>>,
+}
+
+/// What the document showed for one watch.
+type Read<T> = (WatchId, Option<T>);
+
+/// A signal and the value to publish to it.
+type Sink<T> = (Signal<Option<T>>, Option<T>);
 
 fn forget(shared: &Shared, id: WatchId) {
     shared.book.borrow_mut().forget(id);

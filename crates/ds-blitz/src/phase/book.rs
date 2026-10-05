@@ -3,6 +3,7 @@
 
 use blitz_dom::NodeId;
 use dioxus::prelude::Signal;
+use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::{Observe, PhaseWrite};
 use ds::prelude::Rect;
 
@@ -19,6 +20,15 @@ pub(super) struct RectWatch {
     pub(super) last: Option<Rect>,
 }
 
+/// A scroll state the phase publishes for one node.
+pub(super) struct ScrollWatch {
+    pub(super) id: WatchId,
+    pub(super) node: NodeId,
+    pub(super) sink: Signal<Option<Scroll>>,
+    /// What was last published.
+    pub(super) last: Option<Scroll>,
+}
+
 /// A write waiting for its frame.
 #[derive(Clone, Copy)]
 pub(super) struct Waiting {
@@ -30,6 +40,7 @@ pub(super) struct Waiting {
 pub(super) struct Book {
     next: u64,
     pub(super) rects: Vec<RectWatch>,
+    pub(super) scrolls: Vec<ScrollWatch>,
     pub(super) writes: Vec<Waiting>,
 }
 
@@ -45,6 +56,12 @@ impl Book {
                 sink,
                 last: None,
             }),
+            Observe::Scroll(sink) => self.scrolls.push(ScrollWatch {
+                id,
+                node,
+                sink,
+                last: None,
+            }),
         }
         id
     }
@@ -52,6 +69,7 @@ impl Book {
     /// End a registration.
     pub(super) fn forget(&mut self, id: WatchId) {
         self.rects.retain(|watch| watch.id != id);
+        self.scrolls.retain(|watch| watch.id != id);
     }
 
     /// Queue `write` for `node`, replacing one already waiting for it.

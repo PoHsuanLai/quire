@@ -5,6 +5,7 @@
 //! apply a write it queued. The write lands in that frame's document and shows on the next.
 
 use dioxus::prelude::Signal;
+use ds_core::geometry::scroll::Scroll;
 use ds_core::geometry::units::{Px, Rect};
 
 /// What the phase publishes about an element, into the signal the component owns.
@@ -12,6 +13,9 @@ use ds_core::geometry::units::{Px, Rect};
 pub enum Observe {
     /// The element's border box in logical pixels, after each layout that moved or resized it.
     Rect(Signal<Option<Rect>>),
+    /// The element's own scroll state (offset, viewport, content), after each layout or scroll
+    /// that changed it, programmatic scrolls included.
+    Scroll(Signal<Option<Scroll>>),
 }
 
 /// A registration with the phase. The phase publishes until it is dropped.

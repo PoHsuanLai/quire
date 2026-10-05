@@ -1606,6 +1606,12 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-scrim{ position:absolute; inset:0; border:0; padding:0; background:var(--scrim); cursor:default; pointer-events:auto;
   animation:fade var(--t-move) var(--e-out); }
+/* -- scroller -- */
+/* Scroller: a vertical scroll container. Its scroll state lives in a `ScrollerRef` the owner holds;
+   the host's frame phase publishes it and applies the owner's scrolls. The scrollbar is not
+   drawn (Blitz's overlay thumb is off with `scrollbar-width:none`, FINDINGS "Scrolling"). */
+
+.ds-scroller{ overflow-y:auto; overflow-x:hidden; scrollbar-width:none; min-height:0; outline:none; }
 /* -- section_header -- */
 /* SectionHeader (design/30 section 2.6): one look, the heading type (sentence case, 11 px, secondary ink, not tracked)
    over the list's ink. A header heads its group: a full-width row of its own, spanning every column when its

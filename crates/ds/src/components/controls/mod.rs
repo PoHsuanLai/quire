@@ -17,6 +17,7 @@ pub mod level_indicator;
 pub mod press;
 pub mod progress;
 pub mod radio_group;
+pub mod scroller;
 pub mod scrubber;
 pub mod scrubber_face;
 pub(crate) mod scrubber_machine;
