@@ -218,6 +218,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The live Space swipe: follow, rubber band, commit, finish | `ds-behaviour::space_swipe` (`Swipe`; the numbers in `numbers`) |
 | The switcher and hot-corner settings, and their conversion into machine params | `ds-settings::schema::behaviour` (`SwitcherSettings`, `HotCornerSettings`, `params()`) |
 | A timed pure state machine and the one timer that drives it | `ds-core::machine` (`Machine`, `Elapsed`), `ds-motion::machine` (`use_machine`, `use_machine_in`, `use_machine_state`, `MachineRef`, `MachineState`; named `ds::machine` for apps) |
+| A word or state shown for one `DelayToken` and then gone ("Copied", "Sent") | `ds::components::app::hold_for` (`HoldFor`, `use_hold_for`) |
 | A recording's progress bar: loaded stretches, a time tooltip, a captured drag | `ds::components::controls::scrubber` (`Scrubber`; drawing in `scrubber_face`, machine in `scrubber_machine`, `BufferedRange`, `merged` and `time_text` in `scrubber_model`) |
 | A floating pill of controls, and its media slots (progress bar, level) | `ds::components::chrome::capsule` (`Capsule`, `CapsuleSlot::{Item, Readout, Divider, Scrub, Level}`, `ScrubEvent`) |
 | Scope-owned tasks, spawning | `ds-style::task` (`spawn_in`); the `Spawner` trait in `ds-core::spawner` |
@@ -296,7 +297,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
-| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, OSD, banners, ...; anyview), `ds_behaviour::{Tap, HoldKey, Swipe, Switcher, Corner}`, `ds_motion::{Life (presence), RosterState, HoverIntent, SwipeState}` | a state that changes by input and by time | never |
+| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, OSD, banners, ...; anyview), `ds_behaviour::{Tap, HoldKey, Swipe, Switcher, Corner}`, `ds_motion::{Life (presence), RosterState, HoverIntent, SwipeState}`, `ds::stack::menu_track::MenuTrack` (the menu tracker), the components' own timers (the stepper's hold, the green light's hold, a pill's hold, a thread row's pointer, the voice orb's turn), `ds_shell`'s widget follower, track position and emoji frames | a state that changes by input and by time | never |
 | `AppCommand` | `ds-core` | each app's command type (what its menu items yield and its shortcuts fire) | an app with menus or shortcuts | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |
