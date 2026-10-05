@@ -10,9 +10,12 @@
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;
+use scoped::Scoped;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -26,9 +29,12 @@ impl PartialEq for HostProps {
     }
 }
 
-/// Renders a case inside a scope, so its handlers have a runtime to attach to.
+/// Renders a case inside a scope, so its handlers have a runtime to attach to and a component
+/// that reads the scope (a text field) draws instead of panicking, which dioxus-ssr renders as
+/// nothing: the four text-field goldens were once blessed as one blank line that way.
 fn host(props: HostProps) -> Element {
-    (props.make)()
+    let case = (props.make)();
+    rsx! { Scoped { {case} } }
 }
 
 fn render(make: fn() -> Element) -> String {
@@ -44,4 +50,16 @@ fn every_button_field_and_tile_state_matches_its_golden() {
         .filter_map(|case| golden::check(case.golden, &render(case.make)).err())
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// A field that failed to draw renders as nothing, and a blessed golden of nothing passes
+/// forever: every text-field golden must hold the field.
+#[test]
+fn every_text_field_golden_draws_the_field() {
+    let blank: Vec<String> = golden::all_in("controls/text_field")
+        .into_iter()
+        .filter(|(_, html)| !html.contains("class=\"ds-text-field"))
+        .map(|(name, _)| name)
+        .collect();
+    assert!(blank.is_empty(), "goldens with no text field: {blank:?}");
 }
