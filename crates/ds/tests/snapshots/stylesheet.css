@@ -1311,8 +1311,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pin-tile-status{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
 .ds-pin-tile-status[*|data-status=attention]{ color:var(--warn); cursor:default; }
 
-/* The provider's mark, bottom right (a `ProviderMark` on the tile's rung). */
-.ds-pin-tile .ds-provider{ position:absolute; right:var(--s-7); bottom:var(--s-7); box-shadow:var(--shadow-mark-tile); }
+/* The provider's mark, bottom right (a `ProviderMark` on the tile's rung), on the face's corner
+   rather than the tile's: 3 px out from the 28 px face, wherever the tile's width puts the face. A
+   fixed inset from the tile's edge drifts onto the avatar's letter as a narrow sidebar shrinks the
+   tile (7 px at the 48 px tile of a 232 px sidebar, as before; on the face's centre at 35 px). */
+.ds-pin-tile .ds-provider{ position:absolute; right:calc(50% - 17px); bottom:calc(50% - 17px); box-shadow:var(--shadow-mark-tile); }
 
 /* The drop line: the accent, in the gap before the tile a drag would take the place of. */
 .ds-pin-tile-drop{ position:absolute; top:var(--s-2); bottom:var(--s-2); left:calc(var(--s-4) * -1); width:var(--s-2); border-radius:var(--r-pill); background:var(--accent); pointer-events:none; }
@@ -2097,11 +2100,14 @@ html,body{margin:0;padding:0;background:transparent}
    row of panes: each before the last is as wide as `--pane-w` (a spring in Rust writes it while a
    pane folds, the pointer while a divider is held) and clips its body, which keeps the width the
    pane has when open (`--pane-open`), so folding slides the body away instead of squeezing it.
+   When the row is too narrow for every pane, a pane gives up width down to `--pane-least` (its
+   least, or what it is drawn at while it folds) before the last one goes under `--rest-least`, and
+   its body follows: the body is the open width less what the squeeze took (`--pane-w` - `100%`).
    The divider is a 6 px zone, the resize cursor over it, with the hairline in its middle; it
    takes the accent while held or focused. */
 
 .ds-split{ display:flex; align-items:stretch; min-width:0; min-height:0; height:100%; }
-.ds-split-pane{ --pane-w:0px; --pane-open:0px; position:relative; flex:none; width:var(--pane-w); min-width:0; overflow:hidden; }
+.ds-split-pane{ --pane-w:0px; --pane-open:0px; --pane-least:0px; position:relative; flex:0 1 var(--pane-w); width:var(--pane-w); min-width:var(--pane-least); overflow:hidden; }
 .ds-split-pane[*|data-shown=hidden]{ pointer-events:none; }
 /* A pane whose body is an `EdgePeek` (`SplitPane::peeking`) stops clipping once it has folded away,
    so the peek can stand over the content beside it; the pane still takes no pointer, only the edge
@@ -2109,8 +2115,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-split-pane[*|data-folded=peeks][*|data-away=true]{ overflow:visible; }
 .ds-split-pane[*|data-folded=peeks] .ds-edge,
 .ds-split-pane[*|data-folded=peeks] .ds-side{ pointer-events:auto; }
-.ds-split-pane-body{ box-sizing:border-box; width:var(--pane-open); height:100%; }
-.ds-split-rest{ flex:1 1 0; min-width:0; min-height:0; }
+.ds-split-pane-body{ box-sizing:border-box; width:calc(var(--pane-open) - var(--pane-w) + 100%); height:100%; }
+.ds-split-rest{ --rest-least:0px; flex:1 1 0; min-width:var(--rest-least); min-height:0; }
 
 .ds-split-divider{ position:relative; flex:none; width:6px; margin:0 calc(-1 * var(--s-3)); z-index:var(--z-raise); cursor:ew-resize; outline:none; }
 .ds-split-divider::after{
