@@ -99,6 +99,21 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
         self.machine.send(RosterIn::Leave(vec![key]));
     }
 
+    /// Start the exits of `keys` together, as one batch, from a component body: the rows to draw
+    /// change at once, so this render draws them leaving. A key that is not a row, or already
+    /// leaves, is left as it is. Send before [`Self::list_from_render`] in the same render.
+    pub fn leave_from_render(&self, keys: Vec<K>) {
+        if !keys.is_empty() {
+            self.machine.send_from_render(RosterIn::Leave(keys));
+        }
+    }
+
+    /// The consumer's keys, from a component body: new keys enter, and a key missing from the
+    /// list leaves as the spec's [`LeaveBy`] says. [`use_roster`] does this on every render.
+    pub fn list_from_render(&self, keys: Vec<K>) {
+        self.machine.send_from_render(RosterIn::List(keys));
+    }
+
     /// Take `key`'s exit back while it plays: the row is present again where it was and is not
     /// dropped when its batch settles, so nothing below it heals (an undo before the row was
     /// dropped). The consumer lists the key again in the same handler, so the next reconcile
@@ -123,6 +138,19 @@ impl<K: Clone + PartialEq + 'static> Roster<K> {
 /// happens in the render, so the rows to draw are right in the render that lists them; the
 /// settle timers are the machine's wake, started after the render.
 pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, spec: RosterSpec<K>) -> Roster<K> {
+    let roster = use_roster_from(&keys, spec);
+    roster.list_from_render(keys);
+    roster
+}
+
+/// A roster showing `seed` present, which lists nothing itself: the surface that runs it sends
+/// each render's keys with [`Roster::list_from_render`], and may start exits first with
+/// [`Roster::leave_from_render`] (a list that mounts only the rows near its viewport, where a key
+/// that is merely out of the window is dropped at once and one the caller removed plays its exit).
+pub fn use_roster_from<K: Clone + PartialEq + 'static>(
+    seed: &[K],
+    spec: RosterSpec<K>,
+) -> Roster<K> {
     let scope = use_scope_signal();
     let pitches = Pitches(use_hook(|| CopyValue::new(Vec::new())));
     let params = RosterParams {
@@ -133,7 +161,7 @@ pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, spec: RosterSpec
     };
     let on_settled = spec.on_settled;
     let machine = use_machine(
-        |_| RosterState::first_show(&keys),
+        |_| RosterState::first_show(seed),
         params,
         move || {
             Measured(
@@ -151,6 +179,5 @@ pub fn use_roster<K: Clone + PartialEq + 'static>(keys: Vec<K>, spec: RosterSpec
             }
         },
     );
-    machine.send_from_render(RosterIn::List(keys));
     Roster { machine, pitches }
 }

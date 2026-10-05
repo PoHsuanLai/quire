@@ -247,3 +247,36 @@ fn a_leaving_presence_is_the_exit_asked_for() {
     let (leaving, _) = step(abcd(), RosterIn::Leave(vec!["b"]), 0, LeaveBy::Action);
     assert_eq!(leaving.entries()[1].presence, Presence::Leaving(Exit::Row));
 }
+
+#[test]
+fn a_windowed_list_starts_the_exit_of_a_removed_row_and_drops_a_scrolled_out_one_at_once() {
+    // A list that mounts only a window of its keys: `Leave` for the key the caller removed, then
+    // `List` with the window now. The leaver stays after the row that preceded it, a key that
+    // only left the window is dropped with no exit and no heal, and the rows below the leaver
+    // heal when it settles.
+    let (state, _) = step(abcd(), RosterIn::Leave(vec!["b"]), 10, LeaveBy::Action);
+    let (state, _) = step(
+        state,
+        RosterIn::List(vec!["c", "d", "e"]),
+        10,
+        LeaveBy::Action,
+    );
+    assert_eq!(
+        rows(&state),
+        vec![
+            ("b", "leaving"),
+            ("c", "present"),
+            ("d", "present"),
+            ("e", "entering")
+        ],
+        "a (scrolled out) is gone; b plays out first, nothing above it to follow"
+    );
+    let drop_at = 10 + ms(Anim::RowOut);
+    let (dropped, outs) = step(state, RosterIn::Elapsed, drop_at, LeaveBy::Action);
+    assert_eq!(outs, vec![RosterOut::Settled("b")]);
+    assert_eq!(
+        rows(&dropped),
+        vec![("c", "healing"), ("d", "healing"), ("e", "healing")],
+        "the rows that were below b heal"
+    );
+}

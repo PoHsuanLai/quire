@@ -6,8 +6,6 @@ use crate::components::lists::virtual_list::layout::Layout;
 use crate::stack::roving::{Edge, Rove, Step};
 use dioxus::prelude::Callback;
 use ds_core::geometry::units::Px;
-use ds_motion::anim::Anim;
-use ds_motion::presence::Exit;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::ops::Range;
@@ -51,80 +49,34 @@ pub enum Change {
     Replace,
 }
 
-/// The animation `exit` plays, whose length the list waits out before it drops the rows.
-pub(crate) fn exit_anim(exit: Exit) -> Anim {
-    match exit {
-        Exit::Row => Anim::RowOut,
-        Exit::OsdOut => Anim::OsdOut,
-        Exit::PaneOut => Anim::PaneOutR,
-        Exit::Fade => Anim::MenuOut,
-        Exit::SheetOut => Anim::SheetOut,
-        Exit::PanelOut => Anim::PanelOut,
-    }
-}
-
-/// A row that left the list while it was mounted: it plays its exit where it stood.
+/// A row that left the list while it was mounted: the key it had and how tall its row was.
 #[derive(Debug, Clone, PartialEq)]
-pub(crate) struct Leaving<K> {
+pub(crate) struct Departed<K> {
     /// The key it had.
     pub(crate) key: K,
-    /// The index, in the new list, of the row it stood above: it is drawn before that row.
-    pub(crate) slot: usize,
     /// How tall its row was.
     pub(crate) height: Px,
 }
 
-/// Where each key of `keys` is.
-pub(crate) fn positions<K: Eq + Hash>(keys: &[K]) -> HashMap<&K, usize> {
-    keys.iter().enumerate().map(|(at, key)| (key, at)).collect()
-}
-
-/// The slot in `new` (whose keys sit at `index`, `new_len` of them) of a row that stood above
-/// `old[from]`: the index of the first key at or after `from` in `old` that `new` still has, or
-/// `new_len` when none.
-pub(crate) fn slot_in<K: Eq + Hash>(
-    old: &[K],
-    from: usize,
-    index: &HashMap<&K, usize>,
-    new_len: usize,
-) -> usize {
-    old.get(from..)
-        .unwrap_or_default()
-        .iter()
-        .find_map(|later| index.get(later).copied())
-        .unwrap_or(new_len)
-}
-
-/// The mounted rows `old[shown]` that `new` no longer lists, each with its slot in `new`: the
-/// index of the first key after it in `old` that `new` still has, or `new.len()` when none. A
-/// row is as tall as `before` (the layout of `old`) says.
-pub(crate) fn leaving<K: Clone + Eq + Hash>(
+/// The mounted rows `old[shown]` that `new` no longer lists, each as tall as `before` (the layout
+/// of `old`) says.
+pub(crate) fn departed<K: Clone + Eq + Hash>(
     old: &[K],
     shown: Range<usize>,
     new: &[K],
     before: &Layout,
-) -> Vec<Leaving<K>> {
-    let index = positions(new);
+) -> Vec<Departed<K>> {
+    let index: HashMap<&K, usize> = new.iter().enumerate().map(|(at, key)| (key, at)).collect();
     old.iter()
         .enumerate()
         .take(shown.end)
         .skip(shown.start)
         .filter(|(_, key)| !index.contains_key(key))
-        .map(|(at, key)| Leaving {
+        .map(|(at, key)| Departed {
             key: key.clone(),
-            slot: slot_in(old, at + 1, &index, new.len()),
             height: before.height(at),
         })
         .collect()
-}
-
-/// How far the row at `index` starts below its resting place once the rows `dropped` (each a
-/// slot and the height it had) are gone: the height of each dropped row above it. `None` for a
-/// row nothing was dropped above.
-pub(crate) fn heal_dy(dropped: &[(usize, Px)], index: usize) -> Option<Px> {
-    let above = dropped.iter().filter(|(slot, _)| *slot <= index);
-    let count = above.clone().count();
-    (count > 0).then(|| Px(above.map(|(_, height)| height.0).sum()))
 }
 
 /// Where the cursor goes from `at` for `rove` among `len` rows; `None` for an empty list. The
@@ -143,7 +95,7 @@ pub(crate) fn roved(at: Option<usize>, len: usize, rove: Rove) -> Option<usize> 
 
 #[cfg(test)]
 mod tests {
-    use super::{Leaving, heal_dy, leaving, positions, roved, slot_in};
+    use super::{Departed, departed, roved};
     use crate::components::lists::virtual_list::layout::Layout;
     use crate::stack::roving::{Edge, Rove, Step};
     use ds_core::geometry::units::Px;
@@ -154,20 +106,11 @@ mod tests {
         Vec<u32>,
         std::ops::Range<usize>,
         Vec<u32>,
-        Vec<Leaving<u32>>,
+        Vec<u32>,
     );
 
-    fn gone(key: u32, slot: usize) -> Leaving<u32> {
-        Leaving {
-            key,
-            slot,
-            height: Px(20.0),
-        }
-    }
-
     #[test]
-    fn a_removed_mounted_row_leaves_above_the_row_that_followed_it() {
-        // (name, old keys, mounted old indexes, new keys, wanted)
+    fn a_removed_mounted_row_is_a_leaver_and_a_removed_unmounted_row_is_not() {
         let cases: Vec<Case> = vec![
             (
                 "nothing removed",
@@ -181,36 +124,18 @@ mod tests {
                 vec![1, 2, 3, 4],
                 0..4,
                 vec![1, 3, 4],
-                vec![gone(2, 1)],
+                vec![2],
             ),
             (
                 "two adjacent",
                 vec![1, 2, 3, 4],
                 0..4,
                 vec![1, 4],
-                vec![gone(2, 1), gone(3, 1)],
+                vec![2, 3],
             ),
-            (
-                "two apart",
-                vec![1, 2, 3, 4],
-                0..4,
-                vec![2, 4],
-                vec![gone(1, 0), gone(3, 1)],
-            ),
-            (
-                "the last",
-                vec![1, 2, 3, 4],
-                0..4,
-                vec![1, 2, 3],
-                vec![gone(4, 3)],
-            ),
-            (
-                "all",
-                vec![1, 2],
-                0..2,
-                vec![],
-                vec![gone(1, 0), gone(2, 0)],
-            ),
+            ("two apart", vec![1, 2, 3, 4], 0..4, vec![2, 4], vec![1, 3]),
+            ("the last", vec![1, 2, 3, 4], 0..4, vec![1, 2, 3], vec![4]),
+            ("all", vec![1, 2], 0..2, vec![], vec![1, 2]),
             (
                 "not mounted: above the window",
                 vec![1, 2, 3, 4, 5],
@@ -230,7 +155,7 @@ mod tests {
                 vec![1, 2, 3, 4, 5],
                 1..4,
                 vec![1, 3, 4, 5],
-                vec![gone(2, 1)],
+                vec![2],
             ),
             (
                 "a new key is no leaver",
@@ -245,38 +170,11 @@ mod tests {
                 pitch: Px(20.0),
                 len: old.len(),
             };
-            assert_eq!(leaving(&old, shown, &new, &before), want, "{name}");
-        }
-    }
-
-    #[test]
-    fn a_leaving_row_keeps_standing_above_the_row_it_stood_above_when_the_keys_change() {
-        /// A case: name, keys it left from, its slot there, keys now, wanted slot.
-        type SlotCase = (&'static str, &'static [u32], usize, &'static [u32], usize);
-        let cases: &[SlotCase] = &[
-            ("nothing changed", &[1, 2, 5], 2, &[1, 2, 5], 2),
-            ("a key returns above it", &[1, 2, 5], 2, &[1, 2, 3, 5], 3),
-            ("a key arrives below it", &[1, 2, 5], 2, &[1, 2, 5, 9], 2),
-            (
-                "the row it stood above is gone",
-                &[1, 2, 5, 6],
-                2,
-                &[1, 2, 6],
-                2,
-            ),
-            ("everything below it is gone", &[1, 2, 5], 2, &[1, 2], 2),
-            ("it stood at the end", &[1, 2], 2, &[1, 2, 7], 3),
-            (
-                "a key arrives at the front",
-                &[1, 2, 5],
-                2,
-                &[0, 1, 2, 5],
-                3,
-            ),
-        ];
-        for &(name, old, from, new, want) in cases {
-            let index = positions(new);
-            assert_eq!(slot_in(old, from, &index, new.len()), want, "{name}");
+            let got: Vec<u32> = departed(&old, shown, &new, &before)
+                .into_iter()
+                .map(|gone| gone.key)
+                .collect();
+            assert_eq!(got, want, "{name}");
         }
     }
 
@@ -289,45 +187,14 @@ mod tests {
                 len: 0,
             },
         );
-        let got = leaving(&[1, 2, 3], 0..3, &[1, 3], &before);
+        let got = departed(&[1, 2, 3], 0..3, &[1, 3], &before);
         assert_eq!(
             got,
-            vec![Leaving {
+            vec![Departed {
                 key: 2,
-                slot: 1,
                 height: Px(24.0)
             }]
         );
-    }
-
-    #[test]
-    fn rows_below_dropped_rows_start_the_dropped_heights_lower() {
-        let dropped = |rows: &[(usize, f32)]| -> Vec<(usize, Px)> {
-            rows.iter()
-                .map(|&(slot, height)| (slot, Px(height)))
-                .collect()
-        };
-        // (dropped slots and heights, the row's index, wanted dy)
-        /// A case: dropped slots and heights, the row's index, the wanted distance.
-        type HealCase = (&'static [(usize, f32)], usize, Option<f32>);
-        let cases: &[HealCase] = &[
-            (&[], 5, None),
-            (&[(3, 20.0)], 2, None),
-            (&[(3, 20.0)], 3, Some(20.0)),
-            (&[(3, 20.0)], 9, Some(20.0)),
-            (&[(3, 20.0), (3, 20.0)], 3, Some(40.0)),
-            (&[(3, 20.0), (6, 20.0)], 5, Some(20.0)),
-            (&[(3, 20.0), (6, 20.0)], 6, Some(40.0)),
-            (&[(3, 66.0), (6, 24.0)], 5, Some(66.0)),
-            (&[(3, 66.0), (6, 24.0)], 6, Some(90.0)),
-        ];
-        for &(rows, index, want) in cases {
-            assert_eq!(
-                heal_dy(&dropped(rows), index),
-                want.map(Px),
-                "{rows:?} at {index}"
-            );
-        }
     }
 
     #[test]
