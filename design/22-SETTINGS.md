@@ -662,6 +662,7 @@ The summon and the confirmation. Page Intelligence, sections Companion and Confi
 | `companion.summon` | `SummonKey::{DoubleTapCommand,Off}` | `DoubleTapCommand` | a toggle: "Press ⌘ twice to ask" | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 | `companion.in_field` | `InField::{Prompt,Launcher}` | `Prompt` | whether a summon in a text field makes the field the prompt or opens the launcher | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 | `companion.double_tap_ms` | `Ms` | `350` | `150..=600`; conf L: tuned against a real keyboard | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.app_wait_ms` | `Ms` | `80` | `40..=500`; how long the focused app has to take a summon into its own prompt before the launcher opens instead (Advanced) | design/32 section 4.1; sill-model companion/summon.rs | proposed (agent stack, 2026-10-06) |
 | `companion.notify` | `NotifyWhen::{NeedsYou,Never}` | `NeedsYou` | a toggle: "Notify when it needs you" | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 | `companion.confirm_arm_ms` | `Ms` | `500` | `300..=1500`; the buttons of a confirmation wait this long (QUESTIONS U6) | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 
