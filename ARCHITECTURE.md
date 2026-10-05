@@ -446,16 +446,30 @@ pub trait HostWindow { fn begin_move(&self); fn begin_resize(&self, edge: Resize
     fn supports(&self, tile: WindowTile) -> Support; fn state(&self) -> WindowState; }
 
 // ds-core::machine (time is ds-core::time::stamp::Stamp: whole ms from the caller's origin)
-pub trait Machine: Clone + PartialEq + Default + 'static {
+pub trait Machine: Clone + PartialEq + 'static {      // no Default: the caller supplies the first state
     type In: From<Elapsed>;                   // what moves it; the clock alone can wake it
     type Out: 'static;                        // what it wants done
-    type Params: Clone + PartialEq + 'static; // timing settings; a change applies from the next step
-    fn step(self, input: Self::In, at: Stamp, params: &Self::Params) -> (Self, Vec<Self::Out>);
+    type Params: Clone + PartialEq + 'static; // settings (timing, thresholds); a change applies from the next step
+    type Ctx: 'static;                        // facts from outside the machine that a step reads (`()` if none)
+    fn step(self, input: Self::In, at: Stamp, params: &Self::Params, cx: &Self::Ctx)
+        -> (Self, Vec<Self::Out>);
     fn wake(&self) -> Option<Stamp>;          // when to step again with no input; none at rest
 }
-// ds::machine: runs it on ds-core::time's clock, so a harness's virtual clock drives it.
-pub fn use_machine<M: Machine>(params: M::Params, on_out: impl FnMut(M::Out) + 'static) -> MachineRef<M>;
-impl<M: Machine> MachineRef<M> { pub fn send(&self, input: M::In); pub fn state(&self) -> ReadSignal<M>; }
+// ds-motion::machine (feature dioxus; `ds::machine` re-exports it): runs it on ds-core::time's
+// clock, so a harness's virtual clock drives it.
+pub struct MachineState<M: Machine> { pub state: Signal<M>, pub clock: FrameClock }   // Copy
+pub fn use_machine_state<M: Machine>(initial: impl FnOnce(Stamp) -> M) -> MachineState<M>;
+pub fn use_machine<M: Machine>(initial: impl FnOnce(Stamp) -> M, params: M::Params,
+    ctx: impl Fn() -> M::Ctx + 'static, on_out: impl FnMut(M::Out, MachineRef<M>) + 'static) -> MachineRef<M>;
+pub fn use_machine_in<M: Machine>(held: MachineState<M>, params: M::Params,
+    ctx: impl Fn() -> M::Ctx + 'static, on_out: impl FnMut(M::Out, MachineRef<M>) + 'static) -> MachineRef<M>;
+impl<M: Machine> MachineRef<M> {
+    pub fn send(&self, input: M::In);              // from a handler, task or effect
+    pub fn send_from_render(&self, input: M::In);  // from a component body: state now, outputs after the render
+    pub fn state(&self) -> ReadSignal<M>;
+    pub fn now(&self) -> Stamp;
+    pub fn set_params(&self, params: M::Params);
+}
 
 // ds-core::spawner
 pub trait Spawner: Send + Sync {
@@ -509,6 +523,56 @@ pub enum Input {
     FileDrag(FileDragInput), Ime(ImeInput), Paste { html: String, text: String },
 }   // each part carries its `Modifiers`; the `_with` method pairs are gone
 ```
+
+### Machine: state that changes by input and by time
+
+A timed machine is one pure type that the CALLER owns. The library decides; the caller keeps the
+state, feeds the inputs and carries out the outputs. Roughly twenty timed machines had grown six
+home-made timer shapes (request-a-tick outputs, tokens, `Instant` deadlines, per-hook tasks)
+because the first `Machine` could not take a fact from outside, could not be seeded, and could not
+be reached from its own output handler. The rules that replace them:
+
+1. **`step` is pure and takes the time as a `Stamp`.** `(self, input, at, params, cx) -> (Self,
+   Vec<Out>)`. A machine never reads a clock, never spawns, never sleeps.
+2. **Deadlines live in the state.** `wake(&self)` reads the state alone, so a state that is waiting
+   keeps the `Stamp` it waits for (`Armed { until }`), never the start time plus a duration it
+   would need params to turn into a deadline. An elapsed wake is the input `Elapsed`; a step that
+   is woken early or late checks `at >= until` itself, so a stale wake changes nothing and no
+   token or serial is ever needed. An idle machine returns `None` and the hook runs no timer.
+3. **Params are settings; `Ctx` is facts.** `Params` is what a settings key says (a delay, a
+   threshold) and the surface passes it on each render; a change applies from the next step. `Ctx`
+   is what the step must READ from outside the machine to decide (the switcher's list of running
+   apps, a roster's measured row heights): read-only, owned by the caller, never settings. The hook
+   asks for it with a reader closure at EVERY step, including the step a timer wakes, because
+   between two renders the fact can change (a measurement arrives, an app quits). A machine with no
+   such fact has `type Ctx = ();`. A fact a machine would otherwise have to keep a copy of (and
+   keep in step) is `Ctx`, not state.
+4. **No `Default`.** The caller supplies the first state (`initial: impl FnOnce(Stamp) -> M`, given
+   the stamp of the moment the hook mounts, so a state seeded with a deadline counts on the hook's
+   clock). A type may still implement `Default` where a rest state is natural; the trait does not
+   ask for it.
+5. **Two hook forms, one implementation.** The OWNED form, `use_machine`, keeps the state in the
+   hook and is seeded by the caller. The CONTROLLED form, `use_machine_in`, takes a
+   `MachineState` the caller made with `use_machine_state` (the signal that holds the state, and the
+   `FrameClock` its stamps count on, both `Copy`): the caller can put it in a context, read it in a
+   sibling, persist it or replace it. A write to the signal outside `send` re-arms the timer (the
+   hook follows `wake()` of whatever the state is). The owned form is `use_machine_in` over a state
+   the hook made, so there is one timer driver.
+6. **The output handler can send.** `on_out(out, machine)` gets the `MachineRef`; an input it sends
+   runs after the outputs already queued, never inside the handler that is running. A follow-up is
+   an ordinary input, so it is stamped, stepped and tested like any other.
+7. **Render-time input.** A hook whose input comes from a prop (a surface shown or hidden by its
+   caller) sends from the component body with `send_from_render`: the state is stepped at once so
+   this render draws it, the outputs wait until after the render, and the timer follows the state
+   through the same effect. `send` is for handlers, tasks and effects.
+8. **Tests.** The pure part is a table of `(state, input, at, ctx) -> (state, outputs, wake)`;
+   `Elapsed` at each `wake()` drives a machine to rest with no clock. The hooks are tested once,
+   in `ds-conformance/tests/machine.rs`, on the virtual clock (`Clock::Virtual`): each form, a
+   context read at a timer-driven step, a follow-up send, and an idle machine that runs no timer.
+
+What this does not cover: a machine that must read the wall clock for something other than
+deadlines (none exists), and a hub that shares one machine across components (that is a
+`MachineState` in a context, owned by the root).
 
 ### Closed enums (never traits)
 
