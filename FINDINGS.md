@@ -761,8 +761,9 @@ own caret and selection. The route needs no Blitz fork.
   parses the sub-document (where its images are requested) and attaches it afterwards, with the
   parent mutably borrowed throughout. ds-blitz holds a frame's requests in a per-document
   `FrameBook` until the next walk of the document's `iframe`s reads its `data-frame-tag`, then
-  hands them to `AppNet::decide`. The lookups (`tag_of`, `frame_by_tag`) answer from a
-  thread-local list on the UI thread.
+  hands them to `AppNet::decide`. (The thread-local list of books behind `tag_of` and
+  `frame_by_tag` is deleted: nothing called them but one test; the tag arrives with the request
+  and the link.)
 - **Parser.** blitz-html pulls html5ever, markup5ever and xml5ever 0.39.0 (pinned to match
   stylo's `web_atoms`), not `markup5ever_rcdom`. No JS engine is in ds-blitz's graph. The
   security boundary for mail stays ammonia upstream; the worst case of a parser differential is

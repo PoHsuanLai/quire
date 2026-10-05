@@ -4,7 +4,6 @@
 //! way, from the id to the tag and back.
 
 use dioxus::prelude::*;
-use ds_blitz::frames::{frame_by_tag, tag_of};
 use ds_blitz::{
     AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
     RequestOrigin,
@@ -141,30 +140,4 @@ fn a_link_click_carries_its_frames_tag() {
             (tag("msg-1"), "https://example.org/one"),
         ]
     );
-}
-
-#[test]
-fn a_frame_is_found_by_its_tag_and_its_tag_by_the_frame() {
-    let (harness, _) = reader(Arc::new(Recorder::default()));
-    let first = harness.frame("iframe.first").expect("the first frame").id();
-    let second = harness
-        .frame("iframe.second")
-        .expect("the second frame")
-        .id();
-    assert_eq!(frame_by_tag(&FrameTag::new("msg-1")), Some(first));
-    assert_eq!(frame_by_tag(&FrameTag::new("msg-2")), Some(second));
-    assert_eq!(frame_by_tag(&FrameTag::new("msg-3")), None);
-    assert_eq!(tag_of(first), tag("msg-1"));
-    assert_eq!(tag_of(second), tag("msg-2"));
-    assert_ne!(first.index(), second.index(), "the keys are the frames'");
-}
-
-#[test]
-fn a_frame_is_forgotten_with_its_document() {
-    let first = {
-        let (harness, _) = reader(Arc::new(Recorder::default()));
-        harness.frame("iframe.first").expect("the first frame").id()
-    };
-    assert_eq!(tag_of(first), None);
-    assert_eq!(frame_by_tag(&FrameTag::new("msg-1")), None);
 }

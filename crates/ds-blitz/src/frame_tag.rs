@@ -13,8 +13,7 @@ pub(crate) const TAG_ATTRIBUTE: &str = "data-frame-tag";
 pub struct FrameTag(String);
 
 impl FrameTag {
-    /// The tag `text` names: what an app looks a frame up by with
-    /// [`crate::frames::frame_by_tag`].
+    /// The tag `text` names.
     pub fn new(text: impl Into<String>) -> Self {
         FrameTag(text.into())
     }

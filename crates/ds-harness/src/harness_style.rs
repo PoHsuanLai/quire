@@ -3,7 +3,7 @@
 //! time), the laid-out box of its `::before` (a thumb drawn as a pseudo-element has no
 //! selector of its own), and where that box is painted through its transforms.
 
-use crate::driver::{DocQuery, first, rect_of};
+use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
 use blitz_dom::{BaseDocument, NodeId};
 use blitz_kit::paint_rect::painted_rect as painted_bounds_of;
@@ -47,17 +47,10 @@ impl Srgba {
 }
 
 impl Harness {
-    /// The border-box rect of the first element matching `selector`, or of its `::before`, as
-    /// [`Query::rect`](crate::Query::rect) reads it (layout, transforms left out).
-    pub fn part_rect(&self, selector: &str, part: Part) -> Option<Rect> {
-        self.with_doc(|doc| rect_of(doc, part.node(doc, first(doc, selector)?)?))
-    }
-}
-
-impl Harness {
-    /// Where the part is painted: [`Harness::part_rect`] carried through the part's own
-    /// `transform` and every transformed ancestor's (`blitz_kit::paint_rect`): a box that slides
-    /// by `translateX` is read where it appears.
+    /// Where the part is painted: the border-box rect of the first element matching `selector`
+    /// (or of its `::before`) carried through the part's own `transform` and every transformed
+    /// ancestor's (`blitz_kit::paint_rect`): a box that slides by `translateX` is read where it
+    /// appears. [`Query::rect`](crate::Query::rect) reads the layout box with transforms left out.
     pub fn painted_rect(&self, selector: &str, part: Part) -> Option<Rect> {
         self.with_doc(|doc| {
             let node = part.node(doc, first(doc, selector)?)?;
