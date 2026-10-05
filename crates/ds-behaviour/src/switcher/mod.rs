@@ -5,12 +5,13 @@
 //!
 //! Generic over the app key `K`, so the compositor runs it over its own app ids and the shell
 //! over its launcher's. The caller owns the chord's grab, the release and the panel's drawing; it
-//! passes the MRU app list (the current app first) to every [`step`].
+//! provides the MRU app list (the current app first) as the machine's context at every step.
+//! The panel's show delay is a deadline in the `Armed` phase, so the machine's wake is its one
+//! timer.
 
 mod model;
 mod step;
 #[cfg(test)]
 mod tests;
 
-pub use model::{SwIn, SwKey, SwOut, Switcher, SwitcherParams};
-pub use step::step;
+pub use model::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};

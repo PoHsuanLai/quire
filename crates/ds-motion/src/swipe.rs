@@ -3,12 +3,13 @@
 //! the left; released past the distance or the speed threshold it flies out to the right from
 //! where it is, and under both it springs back. A horizontal scroll (a touchpad, a mouse's
 //! tilt wheel) is summed into the same offset and decided the same way once the deltas stop,
-//! since Blitz carries no scroll phase: the hook arms a quiet timer on each delta and feeds
-//! [`SwipeInput::Quiet`] when it runs out.
+//! since Blitz carries no scroll phase: each delta moves the quiet deadline, and the machine's wake
+//! at that deadline is the decision.
 //!
-//! The machine decides; `use_swipe` owns the clock and the timers and draws the offset.
+//! [`SwipeState`] is a `Machine`: it decides, and `use_swipe` runs it and draws the offset.
 
 use ds_core::geometry::units::Px;
+use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
@@ -63,8 +64,8 @@ enum Source {
         last: Sample,
         before: Option<Sample>,
     },
-    /// Scroll deltas, summed into `raw` (undamped).
-    Scroll { raw: Px },
+    /// Scroll deltas, summed into `raw` (undamped); no delta by `quiet_until` decides them.
+    Scroll { raw: Px, quiet_until: Stamp },
     /// Released or scrolled past a threshold: flying out from the offset it had.
     Gone,
 }
@@ -103,24 +104,28 @@ impl Default for SwipeState {
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum SwipeInput {
     /// The pointer went down at `x`.
-    Down { x: Px, at: Stamp },
+    Down { x: Px },
     /// The pointer moved to `x` with the button down.
-    Move { x: Px, at: Stamp },
+    Move { x: Px },
     /// The pointer was released (or left the card, or a move came with no button down).
-    Up { at: Stamp },
+    Up,
     /// A scroll delta: `dx` rightwards and `dy` downwards, in pixels.
     Scroll { dx: Px, dy: Px },
-    /// No scroll delta has come for the quiet spell.
-    Quiet,
+    /// A click was heard: the next one passes again.
+    Clicked,
+    /// The quiet spell after the last scroll delta has run out.
+    Elapsed,
+}
+
+impl From<Elapsed> for SwipeInput {
+    fn from(_: Elapsed) -> Self {
+        SwipeInput::Elapsed
+    }
 }
 
 /// What the hook does after a step.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SwipeEffect {
-    /// Nothing.
-    None,
-    /// (Re)start the quiet timer: a scroll delta was summed.
-    ArmQuiet,
     /// The card is dismissed: it flies out to the right from its offset.
     Dismiss,
 }
@@ -155,32 +160,38 @@ impl SwipeState {
     pub fn click(&self) -> Click {
         self.click
     }
+}
 
-    /// A click was heard: the next one passes again.
-    pub fn clicked(self) -> Self {
-        SwipeState {
-            click: Click::Passes,
-            ..self
-        }
-    }
+impl Machine for SwipeState {
+    type In = SwipeInput;
+    type Out = SwipeEffect;
+    type Params = SwipeMetrics;
+    type Ctx = ();
 
-    /// One step.
-    pub fn step(self, input: SwipeInput, metrics: SwipeMetrics) -> (Self, SwipeEffect) {
-        let none = |state| (state, SwipeEffect::None);
+    fn step(
+        self,
+        input: SwipeInput,
+        at: Stamp,
+        metrics: &SwipeMetrics,
+        _: &(),
+    ) -> (Self, Vec<SwipeEffect>) {
+        let none = |state| (state, Vec::new());
         match (self.source, input) {
+            (_, SwipeInput::Clicked) => none(SwipeState {
+                click: Click::Passes,
+                ..self
+            }),
             (Source::Gone, _) => none(self),
-            (Source::Idle | Source::Scroll { .. }, SwipeInput::Down { x, at }) => {
-                none(SwipeState {
-                    source: Source::Pointer {
-                        from: x,
-                        last: Sample { x, at },
-                        before: None,
-                    },
-                    offset: Px(0.0),
-                    click: Click::Passes,
-                })
-            }
-            (Source::Pointer { from, last, .. }, SwipeInput::Move { x, at }) => {
+            (Source::Idle | Source::Scroll { .. }, SwipeInput::Down { x }) => none(SwipeState {
+                source: Source::Pointer {
+                    from: x,
+                    last: Sample { x, at },
+                    before: None,
+                },
+                offset: Px(0.0),
+                click: Click::Passes,
+            }),
+            (Source::Pointer { from, last, .. }, SwipeInput::Move { x }) => {
                 let raw = Px(x.0 - from.0);
                 let moved = (raw.0.abs() >= TAP_SLOP) || self.click == Click::Swallowed;
                 none(SwipeState {
@@ -189,7 +200,7 @@ impl SwipeState {
                         last: Sample { x, at },
                         before: Some(last),
                     },
-                    offset: shaped(raw, metrics),
+                    offset: shaped(raw, *metrics),
                     click: if moved {
                         Click::Swallowed
                     } else {
@@ -197,40 +208,46 @@ impl SwipeState {
                     },
                 })
             }
-            (Source::Pointer { last, before, .. }, SwipeInput::Up { at }) => {
+            (Source::Pointer { last, before, .. }, SwipeInput::Up) => {
                 let speed = release_speed(last, before, at);
-                self.decide(speed, metrics)
+                self.decide(speed, *metrics)
             }
             (Source::Idle | Source::Scroll { .. }, SwipeInput::Scroll { dx, dy }) => {
                 if dx.0.abs() <= dy.0.abs() {
                     return none(self);
                 }
                 let raw = match self.source {
-                    Source::Scroll { raw } => Px(raw.0 + dx.0),
+                    Source::Scroll { raw, .. } => Px(raw.0 + dx.0),
                     _ => dx,
                 };
-                (
-                    SwipeState {
-                        source: Source::Scroll { raw },
-                        offset: shaped(raw, metrics),
-                        click: self.click,
+                none(SwipeState {
+                    source: Source::Scroll {
+                        raw,
+                        quiet_until: at.after_span(DelayToken::SwipeQuiet.delay()),
                     },
-                    SwipeEffect::ArmQuiet,
-                )
+                    offset: shaped(raw, *metrics),
+                    click: self.click,
+                })
             }
-            (Source::Scroll { .. }, SwipeInput::Quiet) => self.decide(Speed(0.0), metrics),
-            (Source::Idle, SwipeInput::Move { .. } | SwipeInput::Up { .. } | SwipeInput::Quiet)
-            | (Source::Scroll { .. }, SwipeInput::Move { .. } | SwipeInput::Up { .. })
-            | (
-                Source::Pointer { .. },
-                SwipeInput::Down { .. } | SwipeInput::Scroll { .. } | SwipeInput::Quiet,
-            ) => none(self),
+            (Source::Scroll { quiet_until, .. }, SwipeInput::Elapsed) if at >= quiet_until => {
+                self.decide(Speed(0.0), *metrics)
+            }
+            (Source::Idle | Source::Scroll { .. } | Source::Pointer { .. }, _) => none(self),
         }
     }
 
+    fn wake(&self) -> Option<Stamp> {
+        match self.source {
+            Source::Scroll { quiet_until, .. } => Some(quiet_until),
+            Source::Idle | Source::Pointer { .. } | Source::Gone => None,
+        }
+    }
+}
+
+impl SwipeState {
     /// The end of a gesture moving at `speed`: past a threshold it is dismissed from where it
     /// is; under both it springs back to its place.
-    fn decide(self, speed: Speed, metrics: SwipeMetrics) -> (Self, SwipeEffect) {
+    fn decide(self, speed: Speed, metrics: SwipeMetrics) -> (Self, Vec<SwipeEffect>) {
         let far = self.offset.0 >= metrics.dismiss.0;
         let fast = self.offset.0 > 0.0 && speed.0 >= metrics.velocity.0;
         if far || fast {
@@ -238,14 +255,14 @@ impl SwipeState {
                 source: Source::Gone,
                 ..self
             };
-            return (gone, SwipeEffect::Dismiss);
+            return (gone, vec![SwipeEffect::Dismiss]);
         }
         let back = SwipeState {
             source: Source::Idle,
             offset: Px(0.0),
             click: self.click,
         };
-        (back, SwipeEffect::None)
+        (back, Vec::new())
     }
 }
 

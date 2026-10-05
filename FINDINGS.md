@@ -32,9 +32,7 @@ that rev.
   `UndeclaredVar` and only `ds_shell::stylesheet()` lints clean (`ds-shell/tests/self_lint.rs`).
   Nothing under `ds` alone draws the OSD, the banners or the dock floor, so the reads are inert
   there. Ends when the keyframes and the floor shape move to `ds-shell`'s own sheets.
-- **Motion and interaction primitives of step 4a.3 have consumers still to move.** One
-  primitive has no caller in quire yet: `LongPress` waits for the dock and titlebar menus in
-  sill. `rubber::resist` is read by the host's scroll; `Swipe` keeps its own `swipe_damping`
+- **Motion and interaction primitives of step 4a.3 have consumers still to move.** `Swipe` keeps its own `swipe_damping`
   setting (a quarter, not `.55`) until design/22 decides the key. The tooltip is driven by
   `HoverProfile::Tip` since step 4a.6 (the CSS Fly and its `2.5 x --t-big` delay are gone). `SubmenuOpen` and `TriangleTimeout` are read by no menu tracker yet
   (`MenuTiming` carries its own). The pressed appearance (`data-pressed`) is written by `Button`,

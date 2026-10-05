@@ -211,7 +211,7 @@ The single place a concept lives. Extend it; never write a second one.
 | A list that mounts only the rows near the viewport (fixed row height, cursor kept in view, paging cue, keyed exit) | `ds::components::lists::virtual_list` (`VirtualList`, `RowHeight`; its pure steps in `model`) |
 | A scroll container and its scroll state as an owned value | `ds::components::controls::scroller` (`use_scroller` -> `ScrollerRef`, drawn by `Scroller`) |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
-| A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); `ds-motion`'s gesture machines take the same `Stamp` |
+| A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); every timed machine in `ds-behaviour` and `ds-motion` takes the same `Stamp` |
 | The app switcher's transition (Command-Tab over apps, quick tap, panel, Q, H, App Exposé), generic over the app key | `ds-behaviour::switcher` |
 | A hot corner's dwell, fire and re-arm | `ds-behaviour::hot_corner` |
 | Command's double tap (summon) and hold (talk) | `ds-behaviour::modifier_tap` (`Tap`, `HoldKey`) |
@@ -295,7 +295,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
-| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, OSD, banners, ...; anyview), and `ds_behaviour::{Tap, HoldKey, Swipe}` (the switcher and the hot corner are `step` functions, their timers carried in their outputs) | a state that changes by input and by time | never |
+| `Machine` | `ds-core` | each consumer's timed pure state (sill's dock, OSD, banners, ...; anyview), `ds_behaviour::{Tap, HoldKey, Swipe, Switcher, Corner}`, `ds_motion::{Life (presence), RosterState, HoverIntent, SwipeState}` | a state that changes by input and by time | never |
 | `AppCommand` | `ds-core` | each app's command type (what its menu items yield and its shortcuts fire) | an app with menus or shortcuts | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |

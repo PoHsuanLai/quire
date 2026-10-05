@@ -12,6 +12,7 @@ use std::collections::VecDeque;
 /// A running [`Machine`]: send it inputs, read its state. Copy: signals and cells only.
 pub struct MachineRef<M: Machine> {
     pub(super) held: MachineState<M>,
+    pub(super) read: ReadSignal<M>,
     pub(super) params: CopyValue<M::Params>,
     pub(super) ctx: CopyValue<Option<CtxReader<M>>>,
     pub(super) on_out: CopyValue<OutHandler<M>>,
@@ -57,6 +58,13 @@ impl<M: Machine> Clone for MachineRef<M> {
 
 impl<M: Machine> Copy for MachineRef<M> {}
 
+/// Two refs are equal when they are the same running machine: the same state and the same timer.
+impl<M: Machine> PartialEq for MachineRef<M> {
+    fn eq(&self, other: &Self) -> bool {
+        self.held == other.held && self.waking == other.waking
+    }
+}
+
 impl<M: Machine> std::fmt::Debug for MachineRef<M> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("MachineRef")
@@ -90,7 +98,7 @@ impl<M: Machine> MachineRef<M> {
 
     /// The machine's state, live.
     pub fn state(&self) -> ReadSignal<M> {
-        self.held.state.into()
+        self.read
     }
 
     /// Now, as the machine's stamp: what an input stamped by the caller (a seeded deadline) counts

@@ -3,16 +3,17 @@
 
 use std::time::Duration;
 
+use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
-use super::{SwIn, SwKey, SwOut, Switcher, SwitcherParams, step};
+use super::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};
 use crate::dir::Dir;
 
 /// One scripted input sequence: `(ms, input)` pairs.
 type Script = Vec<(u64, SwIn)>;
 
 /// Name, script, final state, every output in order.
-type Case = (&'static str, Script, Switcher, Vec<SwOut<&'static str>>);
+type Case = (&'static str, Script, Phase, Vec<SwOut<&'static str>>);
 
 const APPS: [&str; 4] = ["files", "firefox", "foot", "mail"];
 
@@ -22,16 +23,21 @@ fn params() -> SwitcherParams {
     }
 }
 
-fn run(inputs: &[(u64, SwIn)]) -> (Switcher, Vec<SwOut<&'static str>>) {
+fn apps() -> Vec<&'static str> {
+    APPS.to_vec()
+}
+
+fn run(inputs: &[(u64, SwIn)]) -> (Phase, Vec<SwOut<&'static str>>) {
     let p = params();
-    inputs.iter().fold(
-        (Switcher::Hidden, Vec::new()),
+    let (switcher, outs) = inputs.iter().fold(
+        (Switcher::hidden(), Vec::new()),
         |(s, mut all), &(ms, input)| {
-            let (s, out) = step(s, input, Stamp(ms), &APPS, &p);
+            let (s, out) = s.step(input, Stamp(ms), &p, &apps());
             all.extend(out);
             (s, all)
         },
-    )
+    );
+    (switcher.phase(), outs)
 }
 
 fn check(cases: Vec<Case>) {
@@ -47,31 +53,26 @@ fn design_13_acceptance_8() {
         (
             "a quick tap activates the previous app with no UI",
             vec![chord, (80, SwIn::ModifierReleased)],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("firefox")],
+            Phase::Hidden,
+            vec![SwOut::Activate("firefox")],
         ),
         (
             "held: the panel appears at 150 ms with index 1",
-            vec![chord, (149, SwIn::Tick), (150, SwIn::Tick)],
-            Switcher::Shown { sel: 1 },
-            vec![
-                SwOut::RequestTick(Stamp(150)),
-                SwOut::Show,
-                SwOut::Select(1),
-            ],
+            vec![chord, (149, SwIn::Elapsed), (150, SwIn::Elapsed)],
+            Phase::Shown { sel: 1 },
+            vec![SwOut::Show, SwOut::Select(1)],
         ),
         (
             "Tab twice then release activates index 3",
             vec![
                 chord,
-                (150, SwIn::Tick),
+                (150, SwIn::Elapsed),
                 (200, SwIn::Key(SwKey::Tab)),
                 (250, SwIn::Key(SwKey::Tab)),
                 (300, SwIn::ModifierReleased),
             ],
-            Switcher::Hidden,
+            Phase::Hidden,
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Select(2),
@@ -82,37 +83,26 @@ fn design_13_acceptance_8() {
         ),
         (
             "Escape activates nothing",
-            vec![chord, (150, SwIn::Tick), (200, SwIn::Key(SwKey::Escape))],
-            Switcher::Hidden,
-            vec![
-                SwOut::RequestTick(Stamp(150)),
-                SwOut::Show,
-                SwOut::Select(1),
-                SwOut::Hide,
-            ],
+            vec![chord, (150, SwIn::Elapsed), (200, SwIn::Key(SwKey::Escape))],
+            Phase::Hidden,
+            vec![SwOut::Show, SwOut::Select(1), SwOut::Hide],
         ),
         (
             "Q quits the selection and stays",
-            vec![chord, (150, SwIn::Tick), (200, SwIn::Key(SwKey::Q))],
-            Switcher::Shown { sel: 1 },
-            vec![
-                SwOut::RequestTick(Stamp(150)),
-                SwOut::Show,
-                SwOut::Select(1),
-                SwOut::Quit("firefox"),
-            ],
+            vec![chord, (150, SwIn::Elapsed), (200, SwIn::Key(SwKey::Q))],
+            Phase::Shown { sel: 1 },
+            vec![SwOut::Show, SwOut::Select(1), SwOut::Quit("firefox")],
         ),
         (
             "grave steps back and wraps",
             vec![
                 chord,
-                (150, SwIn::Tick),
+                (150, SwIn::Elapsed),
                 (200, SwIn::Key(SwKey::Grave)),
                 (220, SwIn::Key(SwKey::Grave)),
             ],
-            Switcher::Shown { sel: 3 },
+            Phase::Shown { sel: 3 },
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Select(0),
@@ -121,10 +111,9 @@ fn design_13_acceptance_8() {
         ),
         (
             "a click activates the clicked app",
-            vec![chord, (150, SwIn::Tick), (200, SwIn::Click(2))],
-            Switcher::Hidden,
+            vec![chord, (150, SwIn::Elapsed), (200, SwIn::Click(2))],
+            Phase::Hidden,
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Hide,
@@ -137,8 +126,8 @@ fn design_13_acceptance_8() {
                 (0, SwIn::Chord(Dir::Previous)),
                 (50, SwIn::ModifierReleased),
             ],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("mail")],
+            Phase::Hidden,
+            vec![SwOut::Activate("mail")],
         ),
     ]);
 }
@@ -152,8 +141,8 @@ fn quick_taps_whose_release_is_not_seen() {
         (
             "a second chord inside the delay switches to the previous app, no UI",
             vec![chord, (90, SwIn::Chord(Dir::Next))],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("firefox")],
+            Phase::Hidden,
+            vec![SwOut::Activate("firefox")],
         ),
         (
             "a second previous chord inside the delay switches to what the first chose",
@@ -161,18 +150,14 @@ fn quick_taps_whose_release_is_not_seen() {
                 (0, SwIn::Chord(Dir::Previous)),
                 (90, SwIn::Chord(Dir::Previous)),
             ],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("mail")],
+            Phase::Hidden,
+            vec![SwOut::Activate("mail")],
         ),
         (
             "a second chord after the delay, before its tick, steps",
-            vec![chord, (170, SwIn::Chord(Dir::Next)), (175, SwIn::Tick)],
-            Switcher::Shown { sel: 2 },
-            vec![
-                SwOut::RequestTick(Stamp(150)),
-                SwOut::Show,
-                SwOut::Select(2),
-            ],
+            vec![chord, (170, SwIn::Chord(Dir::Next)), (175, SwIn::Elapsed)],
+            Phase::Shown { sel: 2 },
+            vec![SwOut::Show, SwOut::Select(2)],
         ),
         (
             "a Tab seen while armed steps (the chord is held)",
@@ -181,37 +166,32 @@ fn quick_taps_whose_release_is_not_seen() {
                 (60, SwIn::Key(SwKey::Tab)),
                 (80, SwIn::ModifierReleased),
             ],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("foot")],
+            Phase::Hidden,
+            vec![SwOut::Activate("foot")],
         ),
         (
             "Q while armed does nothing",
-            vec![chord, (60, SwIn::Key(SwKey::Q)), (150, SwIn::Tick)],
-            Switcher::Shown { sel: 1 },
-            vec![
-                SwOut::RequestTick(Stamp(150)),
-                SwOut::Show,
-                SwOut::Select(1),
-            ],
+            vec![chord, (60, SwIn::Key(SwKey::Q)), (150, SwIn::Elapsed)],
+            Phase::Shown { sel: 1 },
+            vec![SwOut::Show, SwOut::Select(1)],
         ),
         (
             "Escape while armed cancels with nothing shown",
-            vec![chord, (60, SwIn::Key(SwKey::Escape)), (150, SwIn::Tick)],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150))],
+            vec![chord, (60, SwIn::Key(SwKey::Escape)), (150, SwIn::Elapsed)],
+            Phase::Hidden,
+            vec![],
         ),
         (
             "H hides the selection and stays; hover selects",
             vec![
                 chord,
-                (150, SwIn::Tick),
+                (150, SwIn::Elapsed),
                 (200, SwIn::Key(SwKey::H)),
                 (220, SwIn::Hover(3)),
                 (230, SwIn::Hover(9)),
             ],
-            Switcher::Shown { sel: 3 },
+            Phase::Shown { sel: 3 },
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::HideApp("firefox"),
@@ -228,10 +208,9 @@ fn down_or_up_opens_app_expose_for_the_selection() {
     check(vec![
         (
             "Down while shown hides the panel and exposes the selection",
-            vec![chord, (150, SwIn::Tick), (200, SwIn::Key(SwKey::Down))],
-            Switcher::Hidden,
+            vec![chord, (150, SwIn::Elapsed), (200, SwIn::Key(SwKey::Down))],
+            Phase::Hidden,
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Hide,
@@ -242,13 +221,12 @@ fn down_or_up_opens_app_expose_for_the_selection() {
             "Up after a Tab exposes the app the Tab selected",
             vec![
                 chord,
-                (150, SwIn::Tick),
+                (150, SwIn::Elapsed),
                 (200, SwIn::Key(SwKey::Tab)),
                 (250, SwIn::Key(SwKey::Up)),
             ],
-            Switcher::Hidden,
+            Phase::Hidden,
             vec![
-                SwOut::RequestTick(Stamp(150)),
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Select(2),
@@ -263,51 +241,58 @@ fn down_or_up_opens_app_expose_for_the_selection() {
                 (60, SwIn::Key(SwKey::Down)),
                 (80, SwIn::ModifierReleased),
             ],
-            Switcher::Hidden,
-            vec![SwOut::RequestTick(Stamp(150)), SwOut::Activate("firefox")],
+            Phase::Hidden,
+            vec![SwOut::Activate("firefox")],
         ),
     ]);
 }
 
+/// One step from `phase` over `apps`, as the phase it leaves and what it wants.
+fn once(
+    phase: Phase,
+    input: SwIn,
+    at: u64,
+    apps: &[&'static str],
+) -> (Phase, Vec<SwOut<&'static str>>) {
+    let (next, outs) = Switcher::in_phase(phase).step(input, Stamp(at), &params(), &apps.to_vec());
+    (next.phase(), outs)
+}
+
 #[test]
 fn no_apps_is_no_switcher() {
-    let p = params();
-    let none: &[&str] = &[];
     assert_eq!(
-        step(Switcher::Hidden, SwIn::Chord(Dir::Next), Stamp(0), none, &p),
-        (Switcher::Hidden, vec![])
+        once(Phase::Hidden, SwIn::Chord(Dir::Next), 0, &[]),
+        (Phase::Hidden, vec![])
     );
     assert_eq!(
-        step(Switcher::Shown { sel: 2 }, SwIn::Tick, Stamp(0), none, &p),
-        (Switcher::Hidden, vec![SwOut::Hide])
+        once(Phase::Shown { sel: 2 }, SwIn::Elapsed, 0, &[]),
+        (Phase::Hidden, vec![SwOut::Hide])
     );
 }
 
 #[test]
 fn a_selection_past_a_shrunk_list_falls_back_to_the_last_app() {
-    let p = params();
     let two = &APPS[..2];
     assert_eq!(
-        step(
-            Switcher::Shown { sel: 3 },
-            SwIn::Key(SwKey::Q),
-            Stamp(0),
-            two,
-            &p
-        ),
-        (Switcher::Shown { sel: 1 }, vec![SwOut::Quit("firefox")])
+        once(Phase::Shown { sel: 3 }, SwIn::Key(SwKey::Q), 0, two),
+        (Phase::Shown { sel: 1 }, vec![SwOut::Quit("firefox")])
     );
+    let armed = Phase::Armed {
+        until: Stamp(150),
+        sel: 3,
+    };
     assert_eq!(
-        step(
-            Switcher::Armed {
-                since: Stamp(0),
-                sel: 3
-            },
-            SwIn::ModifierReleased,
-            Stamp(50),
-            two,
-            &p
-        ),
-        (Switcher::Hidden, vec![SwOut::Activate("firefox")])
+        once(armed, SwIn::ModifierReleased, 50, two),
+        (Phase::Hidden, vec![SwOut::Activate("firefox")])
     );
+}
+
+#[test]
+fn only_an_armed_switcher_wakes_and_at_the_end_of_the_show_delay() {
+    let p = params();
+    let wake = |phase| Switcher::<&str>::in_phase(phase).wake();
+    assert_eq!(wake(Phase::Hidden), None);
+    assert_eq!(wake(Phase::Shown { sel: 1 }), None);
+    let (armed, _) = Switcher::hidden().step(SwIn::Chord(Dir::Next), Stamp(40), &p, &apps());
+    assert_eq!(armed.wake(), Some(Stamp(190)));
 }

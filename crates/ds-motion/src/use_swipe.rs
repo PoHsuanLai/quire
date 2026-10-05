@@ -1,106 +1,62 @@
-//! The swipe machine as a hook: [`SwipeState`] in a signal, fed from a card's
-//! pointer and wheel events, with the clock and the quiet timer a scroll needs. The machine is
-//! pure (`swipe.rs`); this owns the time.
+//! The swipe machine as a hook: [`SwipeState`] run by [`use_machine`], fed from a card's pointer
+//! and wheel events. The quiet spell after a scroll is the machine's own deadline, so the hook has
+//! no timer of its own.
 
+use super::machine::{MachineRef, use_machine};
 use super::swipe::{Click, SwipeEffect, SwipeInput, SwipeMetrics, SwipeState};
-use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
-use ds_core::time::clock::sleep;
-use ds_core::time::stamp::{FrameClock, Stamp};
+use ds_core::time::stamp::Stamp;
 use ds_core::vocab::PressPhase;
-use ds_style::scope::{Scope, use_scope_signal};
-use ds_style::task::{Gone, spawn_in, try_get, try_set};
-use ds_style::tokens::delay::DelayToken;
 
 /// A live swipe: read its state in render, feed it from the card's listeners.
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy)]
 pub struct Swiper {
-    state: Signal<SwipeState>,
-    quiet: Signal<Option<Task>>,
-    env: Signal<Scope>,
-    scope: ScopeId,
-    clock: FrameClock,
-    metrics: SwipeMetrics,
-    on_dismiss: EventHandler<()>,
+    machine: MachineRef<SwipeState>,
 }
 
 impl Swiper {
     /// Where the swipe is.
     pub fn state(&self) -> SwipeState {
-        *self.state.read()
+        *self.machine.state().read()
     }
 
-    /// Feed one input stamped now; a dismissal is reported to the hook's `on_dismiss`.
+    /// Feed one input, stamped now by the machine; a dismissal is reported to the hook's
+    /// `on_dismiss`.
     pub fn feed(&self, input: SwipeInput) {
-        let _ = self.try_feed(input);
+        self.machine.send(input);
     }
 
     /// The input a pointer move makes: a move while the primary button is down, or the release
     /// Blitz never delivered (the button came up outside the card; it has no pointer capture).
     pub fn pointer_moved(&self, x: Px, held: PressPhase) {
         match held {
-            PressPhase::Pressed | PressPhase::Held => {
-                self.feed(SwipeInput::Move { x, at: self.now() })
-            }
-            PressPhase::Idle => self.feed(SwipeInput::Up { at: self.now() }),
+            PressPhase::Pressed | PressPhase::Held => self.feed(SwipeInput::Move { x }),
+            PressPhase::Idle => self.feed(SwipeInput::Up),
         }
     }
 
     /// A click was heard: whether it is a press on the card (not the end of a drag).
     pub fn take_click(&self) -> Click {
-        let state = *self.state.peek();
-        let _ = try_set(self.state, state.clicked());
-        state.click()
+        let click = self.machine.state().peek().click();
+        self.feed(SwipeInput::Clicked);
+        click
     }
 
     /// Now, as the machine's stamp.
     pub fn now(&self) -> Stamp {
-        self.clock.now()
-    }
-
-    fn try_feed(&self, input: SwipeInput) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.state)?.step(input, self.metrics);
-        if next != *self.state.peek() {
-            try_set(self.state, next)?;
-        }
-        match effect {
-            SwipeEffect::None => Ok(()),
-            SwipeEffect::Dismiss => {
-                self.on_dismiss.call(());
-                Ok(())
-            }
-            SwipeEffect::ArmQuiet => self.arm_quiet(),
-        }
-    }
-
-    /// (Re)start the quiet timer: when it runs out with no new delta, the scroll is decided.
-    fn arm_quiet(&self) -> Result<(), Gone> {
-        if let Some(pending) = try_get(self.quiet)? {
-            pending.cancel();
-        }
-        try_get(self.env)?;
-        let wait = DelayToken::SwipeQuiet.delay();
-        let swiper = *self;
-        let task = spawn_in(self.scope, async move {
-            sleep(wait).await;
-            if try_set(swiper.quiet, None).is_ok() {
-                swiper.feed(SwipeInput::Quiet);
-            }
-        });
-        try_set(self.quiet, Some(task))
+        self.machine.now()
     }
 }
 
 /// A swipe with `metrics`, calling `on_dismiss` the moment a gesture ends past a threshold.
 pub fn use_swipe(metrics: SwipeMetrics, on_dismiss: EventHandler<()>) -> Swiper {
     Swiper {
-        state: use_signal(SwipeState::default),
-        quiet: use_signal(|| None),
-        env: use_scope_signal(),
-        scope: use_hook(current_scope_id),
-        clock: use_hook(FrameClock::started),
-        metrics,
-        on_dismiss,
+        machine: use_machine(
+            |_| SwipeState::default(),
+            metrics,
+            || (),
+            move |SwipeEffect::Dismiss, _| on_dismiss.call(()),
+        ),
     }
 }

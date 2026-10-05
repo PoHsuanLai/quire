@@ -1,79 +1,28 @@
-//! The list roster as a pure state machine: which keys are on screen and in what state, so a
-//! leaving row stays in the tree until its exit settles and the rows below close the gap
-//! (design/30 section 1.3: insert fades and slides down over `--t-move`, removal fades and
-//! slides up over `--t-quick`, the rows below close the gap over `--t-move`).
+//! The roster's pure operations: reconcile with the consumer's keys, start and take back exits,
+//! drop a settled batch and heal, and rest. None reads a clock: a deadline is an argument.
 
-#[cfg(feature = "dioxus")]
-use super::anim::Anim;
-use super::presence::{Exit, Presence};
+use super::super::anim::Anim;
+use super::super::presence::{Exit, Presence};
+use super::model::{Heal, RosterEntry, RosterState, RowPitch, StayError, Stayed};
 use ds_core::geometry::units::Px;
-
-/// A row's height plus the gap below it: how far the rows below move when it goes.
-#[derive(Debug, Clone, Copy, PartialEq, PartialOrd, Default)]
-pub struct RowPitch(pub Px);
-
-/// A row sliding up into the gap a removed row left: `data-presence="healing"`.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Heal {
-    /// How far it starts below its resting place.
-    pub dy: Px,
-}
-
-/// The `data-presence` word of a row: `healing` while it heals, else its presence's.
-pub fn presence_slug(presence: Presence, heal: Option<Heal>) -> &'static str {
-    match heal {
-        Some(_) => "healing",
-        None => presence.slug(),
-    }
-}
-
-/// One row the roster is drawing.
-#[derive(Debug, Clone, PartialEq)]
-pub struct RosterEntry<K> {
-    /// The consumer's key.
-    pub key: K,
-    /// Its motion state.
-    pub presence: Presence,
-    /// Its heal, while it slides into a gap; only a present row heals.
-    pub heal: Option<Heal>,
-}
-
-/// Every row on screen, in order, with its motion state.
-#[derive(Debug, Clone, PartialEq)]
-pub struct RosterState<K> {
-    entries: Vec<RosterEntry<K>>,
-}
+use ds_core::time::stamp::Stamp;
 
 impl<K: Clone + PartialEq> RosterState<K> {
-    /// A roster showing `keys` for the first time: every row simply there (nothing sweeps in on
-    /// first show).
-    pub fn first_show(keys: &[K]) -> Self {
-        let entries = keys
-            .iter()
-            .map(|key| RosterEntry {
-                key: key.clone(),
-                presence: Presence::Present,
-                heal: None,
-            })
-            .collect();
-        RosterState { entries }
-    }
-
-    /// The rows to draw, leaving ones included.
-    pub fn entries(&self) -> &[RosterEntry<K>] {
-        &self.entries
+    /// `entries` in place of the rows, everything else as it was.
+    fn with_entries(self, entries: Vec<RosterEntry<K>>) -> Self {
+        RosterState { entries, ..self }
     }
 
     /// Reconcile with the consumer's current keys: new keys enter, missing keys that are not
-    /// already leaving are dropped at once (they were removed without an exit).
+    /// already leaving are dropped at once (they were removed without an exit). `keys` become the
+    /// listed ones.
     ///
     /// Rows keep the consumer's order. A leaving row the consumer no longer lists stays
     /// right after the listed row that preceded it (or first, if none did).
     pub fn reconcile(self, keys: &[K]) -> Self {
-        let old = self.entries;
         let mut lingering: Vec<(Option<usize>, RosterEntry<K>)> = Vec::new();
         let mut anchor = None;
-        for (at, entry) in old.iter().enumerate() {
+        for (at, entry) in self.entries.iter().enumerate() {
             if keys.contains(&entry.key) {
                 anchor = Some(at);
             } else if matches!(entry.presence, Presence::Leaving(_)) {
@@ -88,30 +37,36 @@ impl<K: Clone + PartialEq> RosterState<K> {
         };
         let mut entries: Vec<RosterEntry<K>> = after(None).collect();
         for key in keys {
-            match old.iter().position(|entry| &entry.key == key) {
+            match self.entries.iter().position(|entry| &entry.key == key) {
                 Some(at) => {
-                    entries.push(old[at].clone());
+                    entries.push(self.entries[at].clone());
                     entries.extend(after(Some(at)));
                 }
                 None => entries.push(RosterEntry {
                     key: key.clone(),
                     presence: Presence::Entering,
                     heal: None,
+                    until: None,
                 }),
             }
         }
-        RosterState { entries }
+        RosterState {
+            entries,
+            listed: keys.to_vec(),
+            ..self
+        }
     }
 
     /// Start the exits of every key in `keys` together, as one batch (an archive, a Clear, a
-    /// group collapsing): each row plays `exit`. Returns the keys that started: a key the roster
-    /// does not hold, or one already leaving, is left as it is. The batch is done at the exit's
-    /// settle, and [`Self::settled_batch`] then drops them together.
-    pub fn leave_batch(self, keys: &[K], exit: Exit) -> (Self, Vec<K>) {
+    /// group collapsing): each row plays `exit` and settles at `until`. Returns the keys that
+    /// started: a key the roster does not hold, or one already leaving, is left as it is. The
+    /// batch is done at `until`, and [`Self::settled_batch`] then drops them together.
+    pub fn leave_batch(self, keys: &[K], exit: Exit, until: Stamp) -> (Self, Vec<K>) {
         let mut started = Vec::new();
         let entries = self
             .entries
-            .into_iter()
+            .iter()
+            .cloned()
             .map(|entry| {
                 if !keys.contains(&entry.key) || matches!(entry.presence, Presence::Leaving(_)) {
                     return entry;
@@ -120,11 +75,12 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 RosterEntry {
                     presence: Presence::Leaving(exit),
                     heal: None,
+                    until: Some(until),
                     ..entry
                 }
             })
             .collect();
-        (RosterState { entries }, started)
+        (self.with_entries(entries), started)
     }
 
     /// Take a leaving row's exit back: it is present again, in place, with nothing below it
@@ -138,9 +94,19 @@ impl<K: Clone + PartialEq> RosterState<K> {
         if !matches!(self.entries[at].presence, Presence::Leaving(_)) {
             return (self, Ok(Stayed::Unchanged));
         }
-        let RosterState { mut entries } = self;
+        let mut entries = self.entries.clone();
         entries[at].presence = Presence::Present;
-        (RosterState { entries }, Ok(Stayed::Restored))
+        entries[at].until = None;
+        (self.with_entries(entries), Ok(Stayed::Restored))
+    }
+
+    /// The keys whose exit has settled by `at`: leaving, with a deadline that has come.
+    pub fn due_keys(&self, at: Stamp) -> Vec<K> {
+        self.entries
+            .iter()
+            .filter(|entry| entry.until.is_some_and(|until| at >= until))
+            .map(|entry| entry.key.clone())
+            .collect()
     }
 
     /// A batch's exits have settled: drop every key in `keys` that is still leaving, at once,
@@ -151,7 +117,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
     pub fn settled_batch(self, keys: &[K], pitch: impl Fn(&K) -> RowPitch) -> Self {
         let mut gap: Option<Px> = None;
         let mut kept = Vec::with_capacity(self.entries.len());
-        for entry in self.entries {
+        for entry in self.entries.iter().cloned() {
             let leaving = matches!(entry.presence, Presence::Leaving(_));
             if leaving && keys.contains(&entry.key) {
                 gap = Some(gap.unwrap_or(Px(0.0)) + pitch(&entry.key).0);
@@ -166,14 +132,15 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 Some(_) | None => kept.push(entry),
             }
         }
-        RosterState { entries: kept }
+        self.with_entries(kept)
     }
 
     /// Every entering and healing row has settled: mark them present.
     pub fn rest(self) -> Self {
         let entries = self
             .entries
-            .into_iter()
+            .iter()
+            .cloned()
             .map(|entry| RosterEntry {
                 presence: match entry.presence {
                     Presence::Entering => Presence::Present,
@@ -183,13 +150,15 @@ impl<K: Clone + PartialEq> RosterState<K> {
                 ..entry
             })
             .collect();
-        RosterState { entries }
+        RosterState {
+            rest_due: None,
+            ..self.with_entries(entries)
+        }
     }
 
     /// The animations that must settle before [`Self::rest`]: `heal` when a row heals and
     /// `row-in` when one enters. Empty when nothing is entering or healing.
-    #[cfg(feature = "dioxus")]
-    pub(crate) fn running(&self) -> Vec<Anim> {
+    pub fn running(&self) -> Vec<Anim> {
         let heal = self.entries.iter().any(|entry| entry.heal.is_some());
         let enter = self
             .entries
@@ -200,22 +169,4 @@ impl<K: Clone + PartialEq> RosterState<K> {
             .filter_map(|(running, anim)| running.then_some(anim))
             .collect()
     }
-}
-
-/// What a [`RosterState::stay`] did.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum Stayed {
-    /// The row was leaving and is present again.
-    Restored,
-    /// The row was not leaving (entering, present or healing); nothing changed.
-    Unchanged,
-}
-
-/// Why a stay could not happen.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum StayError {
-    /// The roster holds no row with that key: never listed, or already dropped after its exit.
-    UnknownKey,
-    /// The roster's owner is gone (the list unmounted); only the hook reports this.
-    Unmounted,
 }

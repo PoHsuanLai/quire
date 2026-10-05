@@ -2,6 +2,7 @@
 //! An inserted row enters, a removed one leaves by `row-out` and is dropped when the exit settles,
 //! and the rows below heal by the heights the dropped rows measured.
 
+use ds::base::time::stamp::Stamp;
 use ds::prelude::*;
 use ds_motion::presence::{Exit, Presence};
 use ds_motion::roster::{Heal, RosterState, RowPitch, StayError, Stayed};
@@ -75,7 +76,8 @@ fn a_key_removed_without_an_exit_drops_at_once() {
 #[test]
 fn a_leaving_row_stays_where_it_was_after_a_reconcile() {
     use Life::{Leaving, Present};
-    let (state, started) = RosterState::first_show(&["a", "b", "c"]).leave_batch(&["b"], Exit::Row);
+    let (state, started) =
+        RosterState::first_show(&["a", "b", "c"]).leave_batch(&["b"], Exit::Row, Stamp(0));
     assert_eq!(started, vec!["b"]);
     let state = state.reconcile(&["a", "c"]);
     assert_eq!(
@@ -83,7 +85,7 @@ fn a_leaving_row_stays_where_it_was_after_a_reconcile() {
         vec![("a", Present), ("b", Leaving), ("c", Present)],
         "b lingers between a and c until it settles"
     );
-    let (again, started) = state.leave_batch(&["b", "zz"], Exit::Row);
+    let (again, started) = state.leave_batch(&["b", "zz"], Exit::Row, Stamp(0));
     assert!(
         started.is_empty(),
         "already leaving, or not held: nothing starts"
@@ -99,8 +101,11 @@ fn settling_a_batch_drops_it_and_heals_by_the_heights_above() {
         "c" => RowPitch(Px(55.0)),
         _ => RowPitch(Px(999.0)),
     };
-    let (state, started) =
-        RosterState::first_show(&["a", "b", "c", "d", "e"]).leave_batch(&["a", "c"], Exit::Row);
+    let (state, started) = RosterState::first_show(&["a", "b", "c", "d", "e"]).leave_batch(
+        &["a", "c"],
+        Exit::Row,
+        Stamp(0),
+    );
     assert_eq!(started, vec!["a", "c"]);
     let state = state.settled_batch(&["a", "c"], heights);
     assert_eq!(
@@ -117,7 +122,8 @@ fn settling_a_batch_drops_it_and_heals_by_the_heights_above() {
 
 #[test]
 fn a_row_taken_back_meanwhile_is_not_dropped_by_its_batch() {
-    let (state, _) = RosterState::first_show(&["a", "b"]).leave_batch(&["a", "b"], Exit::Row);
+    let (state, _) =
+        RosterState::first_show(&["a", "b"]).leave_batch(&["a", "b"], Exit::Row, Stamp(0));
     let (state, stayed) = state.stay(&"a");
     assert_eq!(stayed, Ok(Stayed::Restored));
     let state = state.settled_batch(&["a", "b"], pitch);

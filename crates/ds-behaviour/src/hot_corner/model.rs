@@ -1,17 +1,14 @@
-//! The corner's phase, timers, inputs and outputs.
+//! The corner's state, timing, inputs and outputs.
 //!
-//! - `Armed`: the pointer entering starts the dwell (`StartDwell`, a fresh token).
+//! - `Armed`: the pointer entering starts the dwell.
 //! - `Dwelling`: the dwell running out fires (`Fire`) and moves to `Spent` with the re-arm
-//!   running (`StartRearm`). Leaving first goes back to `Armed` (the dwell's timer is stale by
-//!   its token).
+//!   running. Leaving first goes back to `Armed`.
 //! - `Spent`: fires nothing; it is `Armed` again once the pointer has left **and** the re-arm
 //!   has run out, in either order.
 
 use std::time::Duration;
 
-/// A timer's identity; an elapsed timer with another token is stale.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct Token(pub u32);
+use ds_core::time::stamp::Stamp;
 
 /// Where the pointer is, for `Spent`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -25,20 +22,26 @@ pub enum Inside {
 /// Whether `Spent`'s re-arm is still running.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Rearm {
-    /// Running; its elapse comes back with this token.
-    Running(Token),
+    /// Running until this time.
+    Running {
+        /// When the re-arm runs out.
+        until: Stamp,
+    },
     /// Run out.
     Over,
 }
 
-/// The corner's phase.
+/// The corner's state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Phase {
+pub enum Corner {
     /// Ready: the pointer entering starts the dwell.
     #[default]
     Armed,
-    /// The pointer is in and the dwell with this token is running.
-    Dwelling(Token),
+    /// The pointer is in and the dwell is running.
+    Dwelling {
+        /// When the dwell runs out and the corner fires.
+        until: Stamp,
+    },
     /// Fired; waiting for the pointer to leave and the re-arm to run out.
     Spent {
         /// Where the pointer is.
@@ -46,15 +49,6 @@ pub enum Phase {
         /// Whether the re-arm still runs.
         rearm: Rearm,
     },
-}
-
-/// The machine: its phase and the next token to hand out.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub struct CornerMachine {
-    /// The phase.
-    pub phase: Phase,
-    /// The token the next timer gets.
-    pub next: Token,
 }
 
 /// The corner's timing (`hot_corners.dwell_ms`, `hot_corners.rearm_ms`).
@@ -73,19 +67,19 @@ pub enum CornerIn {
     Enter,
     /// The pointer left the corner.
     Leave,
-    /// The dwell timer with this token ran out.
-    DwellElapsed(Token),
-    /// The re-arm timer with this token ran out.
-    RearmElapsed(Token),
+    /// The deadline asked for by `wake` came due.
+    Elapsed,
+}
+
+impl From<ds_core::machine::Elapsed> for CornerIn {
+    fn from(_: ds_core::machine::Elapsed) -> CornerIn {
+        CornerIn::Elapsed
+    }
 }
 
 /// What to do.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum CornerOut {
-    /// Wait this long, then feed `DwellElapsed(token)`.
-    StartDwell(Token, Duration),
-    /// Wait this long, then feed `RearmElapsed(token)`.
-    StartRearm(Token, Duration),
     /// The corner acts.
     Fire,
 }

@@ -6,14 +6,15 @@
 //! seen while armed (Tab, Grave, the arrows) proves the chord is held and steps as it would
 //! shown. Past the delay a chord steps.
 
+use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
-use super::model::{SwIn, SwKey, SwOut, Switcher, SwitcherParams};
+use super::model::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};
 use crate::dir::Dir;
 use crate::span;
 
 /// What a step wants done, beside the phase it leaves.
-type Step<K> = (Switcher, Vec<SwOut<K>>);
+type Step<K> = (Phase, Vec<SwOut<K>>);
 
 /// The MRU app list, never empty, that selections index.
 struct Ring<'a, K>(&'a [K]);
@@ -49,10 +50,36 @@ impl<'a, K: Clone> Ring<'a, K> {
     }
 }
 
-/// `s` after `input` at `now`, over the MRU list `apps` (the current app first). An empty list
-/// is no switcher: the machine goes to [`Switcher::Hidden`], hiding the panel if it was shown.
-pub fn step<K: Clone + Eq>(
-    s: Switcher,
+impl<K: Clone + Eq + 'static> Machine for Switcher<K> {
+    type In = SwIn;
+    type Out = SwOut<K>;
+    type Params = SwitcherParams;
+    /// The MRU app list, the current app first.
+    type Ctx = Vec<K>;
+
+    /// The switcher after `input` at `at`, over the MRU list `apps`. An empty list is no
+    /// switcher: the machine goes to [`Phase::Hidden`], hiding the panel if it was shown.
+    fn step(
+        self,
+        input: SwIn,
+        at: Stamp,
+        p: &SwitcherParams,
+        apps: &Vec<K>,
+    ) -> (Self, Vec<SwOut<K>>) {
+        let (phase, outs) = phase_step(self.phase, input, at, apps, p);
+        (Switcher::in_phase(phase), outs)
+    }
+
+    fn wake(&self) -> Option<Stamp> {
+        match self.phase {
+            Phase::Armed { until, .. } => Some(until),
+            Phase::Hidden | Phase::Shown { .. } => None,
+        }
+    }
+}
+
+fn phase_step<K: Clone + Eq>(
+    s: Phase,
     input: SwIn,
     now: Stamp,
     apps: &[K],
@@ -62,17 +89,17 @@ pub fn step<K: Clone + Eq>(
         return no_apps(s);
     };
     match s {
-        Switcher::Hidden => hidden(input, now, &ring, p),
-        Switcher::Armed { since, sel } => armed(input, now, since, ring.clamp(sel), &ring, p),
-        Switcher::Shown { sel } => shown(input, ring.clamp(sel), &ring),
+        Phase::Hidden => hidden(input, now, &ring, p),
+        Phase::Armed { until, sel } => armed(input, now, until, ring.clamp(sel), &ring),
+        Phase::Shown { sel } => shown(input, ring.clamp(sel), &ring),
     }
 }
 
 /// No apps: nothing to switch, and a panel that was up goes.
-fn no_apps<K>(s: Switcher) -> Step<K> {
+fn no_apps<K>(s: Phase) -> Step<K> {
     match s {
-        Switcher::Shown { .. } => (Switcher::Hidden, vec![SwOut::Hide]),
-        Switcher::Hidden | Switcher::Armed { .. } => (Switcher::Hidden, Vec::new()),
+        Phase::Shown { .. } => (Phase::Hidden, vec![SwOut::Hide]),
+        Phase::Hidden | Phase::Armed { .. } => (Phase::Hidden, Vec::new()),
     }
 }
 
@@ -90,13 +117,13 @@ fn direction(key: SwKey) -> Option<Dir> {
 fn hidden<K: Clone>(input: SwIn, now: Stamp, ring: &Ring<'_, K>, p: &SwitcherParams) -> Step<K> {
     match input {
         SwIn::Chord(dir) => (
-            Switcher::Armed {
-                since: now,
+            Phase::Armed {
+                until: span::after(now, p.show_delay),
                 sel: ring.moved(0, dir),
             },
-            vec![SwOut::RequestTick(span::after(now, p.show_delay))],
+            Vec::new(),
         ),
-        _ => (Switcher::Hidden, Vec::new()),
+        _ => (Phase::Hidden, Vec::new()),
     }
 }
 
@@ -104,45 +131,48 @@ fn hidden<K: Clone>(input: SwIn, now: Stamp, ring: &Ring<'_, K>, p: &SwitcherPar
 fn armed<K: Clone>(
     input: SwIn,
     now: Stamp,
-    since: Stamp,
+    shows_at: Stamp,
     sel: usize,
     ring: &Ring<'_, K>,
-    p: &SwitcherParams,
 ) -> Step<K> {
-    let shows_at = span::after(since, p.show_delay);
-    let wait = |sel| (Switcher::Armed { since, sel }, Vec::new());
+    let wait = |sel| {
+        (
+            Phase::Armed {
+                until: shows_at,
+                sel,
+            },
+            Vec::new(),
+        )
+    };
     match input {
-        SwIn::ModifierReleased => (Switcher::Hidden, vec![SwOut::Activate(ring.app(sel))]),
-        SwIn::Key(SwKey::Escape) => (Switcher::Hidden, Vec::new()),
-        SwIn::Chord(_) if now < shows_at => {
-            (Switcher::Hidden, vec![SwOut::Activate(ring.app(sel))])
-        }
+        SwIn::ModifierReleased => (Phase::Hidden, vec![SwOut::Activate(ring.app(sel))]),
+        SwIn::Key(SwKey::Escape) => (Phase::Hidden, Vec::new()),
+        SwIn::Chord(_) if now < shows_at => (Phase::Hidden, vec![SwOut::Activate(ring.app(sel))]),
         SwIn::Chord(dir) => wait(ring.moved(sel, dir)),
         SwIn::Key(key) => wait(direction(key).map_or(sel, |dir| ring.moved(sel, dir))),
-        SwIn::Tick if now >= shows_at => (
-            Switcher::Shown { sel },
-            vec![SwOut::Show, SwOut::Select(sel)],
-        ),
-        SwIn::Tick | SwIn::Hover(_) | SwIn::Click(_) => wait(sel),
+        SwIn::Elapsed if now >= shows_at => {
+            (Phase::Shown { sel }, vec![SwOut::Show, SwOut::Select(sel)])
+        }
+        SwIn::Elapsed | SwIn::Hover(_) | SwIn::Click(_) => wait(sel),
     }
 }
 
 /// The panel is up on `sel`.
 fn shown<K: Clone>(input: SwIn, sel: usize, ring: &Ring<'_, K>) -> Step<K> {
-    let stay = |out| (Switcher::Shown { sel }, out);
-    let select = |sel| (Switcher::Shown { sel }, vec![SwOut::Select(sel)]);
+    let stay = |out| (Phase::Shown { sel }, out);
+    let select = |sel| (Phase::Shown { sel }, vec![SwOut::Select(sel)]);
     let activate = |index| {
         (
-            Switcher::Hidden,
+            Phase::Hidden,
             vec![SwOut::Hide, SwOut::Activate(ring.app(index))],
         )
     };
     match input {
         SwIn::Chord(dir) => select(ring.moved(sel, dir)),
         SwIn::ModifierReleased => activate(sel),
-        SwIn::Key(SwKey::Escape) => (Switcher::Hidden, vec![SwOut::Hide]),
+        SwIn::Key(SwKey::Escape) => (Phase::Hidden, vec![SwOut::Hide]),
         SwIn::Key(SwKey::Up | SwKey::Down) => (
-            Switcher::Hidden,
+            Phase::Hidden,
             vec![SwOut::Hide, SwOut::Expose(ring.app(sel))],
         ),
         SwIn::Key(SwKey::Q) => stay(vec![SwOut::Quit(ring.app(sel))]),
@@ -152,6 +182,6 @@ fn shown<K: Clone>(input: SwIn, sel: usize, ring: &Ring<'_, K>) -> Step<K> {
         }
         SwIn::Hover(index) if ring.has(index) => select(index),
         SwIn::Click(index) if ring.has(index) => activate(index),
-        SwIn::Hover(_) | SwIn::Click(_) | SwIn::Tick => stay(Vec::new()),
+        SwIn::Hover(_) | SwIn::Click(_) | SwIn::Elapsed => stay(Vec::new()),
     }
 }

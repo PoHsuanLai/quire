@@ -1,9 +1,12 @@
 //! The hover-card intent machine: wait for intent, stay warm, never mark read, never fetch
-//! (design/06-INTERACTIONS.md section 3). Pure: an event and the time in, the next state and
-//! one effect out.
+//! (design/06-INTERACTIONS.md section 3). A `Machine`: an event and the time in, the next state
+//! and the effects out; the open and close deadlines are in the state, so its wake is the one
+//! timer and a stale wake changes nothing.
 
+use ds_core::machine::{Elapsed, Machine};
+use ds_core::time::stamp::Stamp;
 use ds_style::tokens::delay::DelayToken;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// Which hover interface the pointer is resting on, and so how long it waits (design/30
 /// section 1.2): the three profiles of one machine.
@@ -57,7 +60,7 @@ pub enum IntentPhase<K> {
         /// The target under the pointer.
         key: K,
         /// When the open timer fires.
-        due: Instant,
+        due: Stamp,
     },
     /// `key`'s card is open.
     Open {
@@ -69,7 +72,7 @@ pub enum IntentPhase<K> {
         /// The closing card's key.
         key: K,
         /// When the close timer fires.
-        due: Instant,
+        due: Stamp,
     },
 }
 
@@ -87,35 +90,25 @@ pub enum HoverEvent<K> {
     EnterCard,
     /// The pointer left the open card.
     LeaveCard,
-    /// The open timer fired.
-    OpenDue,
-    /// The close timer fired.
-    CloseDue,
+    /// The deadline asked for by `wake` came due: the open or the close, whichever the phase
+    /// is waiting on.
+    Elapsed,
     /// A click landed in the list (capture phase).
     ClickInList,
     /// Space was pressed with focus outside a text field.
     SpaceKey,
 }
 
-/// What the caller must do after a step.
+impl<K> From<Elapsed> for HoverEvent<K> {
+    fn from(_: Elapsed) -> Self {
+        HoverEvent::Elapsed
+    }
+}
+
+/// What the caller must do after a step. The timers are not among them: the state's deadlines
+/// are the machine's `wake`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum IntentEffect<K> {
-    /// Nothing.
-    None,
-    /// Cancel any open timer and start one that fires after `after` (0 when warm).
-    StartOpen {
-        /// HoverOpen, or zero when warm.
-        after: Duration,
-    },
-    /// Cancel the open timer.
-    CancelOpen,
-    /// Start the close timer (HoverClose).
-    StartClose {
-        /// HoverClose.
-        after: Duration,
-    },
-    /// Cancel the close timer.
-    CancelClose,
     /// Remove any open card instantly and open `key`'s card.
     Open(K),
     /// Fade `key`'s card out (`Exit::Fade`) and unmount it once that settles; the hub is warm.
@@ -130,7 +123,7 @@ pub enum IntentEffect<K> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HoverIntent<K> {
     phase: IntentPhase<K>,
-    warm_until: Option<Instant>,
+    warm_until: Option<Stamp>,
     profile: HoverProfile,
 }
 
@@ -146,7 +139,7 @@ impl<K> Default for HoverIntent<K> {
 
 impl<K> HoverIntent<K> {
     /// A machine in `phase`, on the default profile: `step` sets the profile after.
-    fn of(phase: IntentPhase<K>, warm_until: Option<Instant>) -> Self {
+    fn of(phase: IntentPhase<K>, warm_until: Option<Stamp>) -> Self {
         HoverIntent {
             phase,
             warm_until,
@@ -155,12 +148,41 @@ impl<K> HoverIntent<K> {
     }
 }
 
-impl<K: Clone + PartialEq> HoverIntent<K> {
+impl<K: Clone + PartialEq + 'static> Machine for HoverIntent<K> {
+    type In = HoverEvent<K>;
+    type Out = IntentEffect<K>;
+    /// The delays are the profile's and the tokens': nothing to configure.
+    type Params = ();
+    type Ctx = ();
+
     /// Apply `event` at `now` (the profile's open and close, 400 ms warm).
     ///
-    /// Timer events carry no key, so a stale timer is recognised by its time: `OpenDue` and
-    /// `CloseDue` act only once `now` has reached the phase's own `due`.
-    pub fn step(self, event: HoverEvent<K>, now: Instant) -> (Self, IntentEffect<K>) {
+    /// A wake carries no key, so a stale one is recognised by its time: `Elapsed` acts only once
+    /// `now` has reached the phase's own `due`.
+    fn step(
+        self,
+        event: HoverEvent<K>,
+        now: Stamp,
+        _: &(),
+        _: &(),
+    ) -> (Self, Vec<IntentEffect<K>>) {
+        let (next, effect) = self.advance(event, now);
+        (next, effect.into_iter().collect())
+    }
+
+    fn wake(&self) -> Option<Stamp> {
+        match self.phase {
+            IntentPhase::Pending { due, .. } | IntentPhase::Closing { due, .. } => Some(due),
+            IntentPhase::Idle | IntentPhase::Open { .. } => None,
+        }
+    }
+}
+
+/// A step's effect, when it has one.
+type Effect<K> = Option<IntentEffect<K>>;
+
+impl<K: Clone + PartialEq> HoverIntent<K> {
+    fn advance(self, event: HoverEvent<K>, now: Stamp) -> (Self, Effect<K>) {
         let warm = self.warmth(now);
         let held = self.profile;
         let profile = match &event {
@@ -170,51 +192,41 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
         let HoverIntent {
             phase, warm_until, ..
         } = self;
-        let keep = |phase| (HoverIntent::of(phase, warm_until), IntentEffect::None);
+        let keep = |phase| to(phase, warm_until, None);
+        let lingers = Some(now.after_span(DelayToken::HoverWarm.delay()));
         let (next, effect) = match (phase, event) {
             (phase, HoverEvent::OverSuppressed) => keep(phase),
             (phase, HoverEvent::Over(key, profile)) => {
                 over(phase, key, profile, warm_until, warm, now)
             }
-            (IntentPhase::Pending { .. }, HoverEvent::Out) => {
-                to(IntentPhase::Idle, warm_until, IntentEffect::CancelOpen)
-            }
-            (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => {
-                let after = held.close();
-                let due = now + after;
-                to(
-                    IntentPhase::Closing { key, due },
-                    warm_until,
-                    IntentEffect::StartClose { after },
-                )
-            }
-            (IntentPhase::Closing { key, .. }, HoverEvent::EnterCard) => to(
-                IntentPhase::Open { key },
+            (IntentPhase::Pending { .. }, HoverEvent::Out) => keep(IntentPhase::Idle),
+            (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => to(
+                IntentPhase::Closing {
+                    key,
+                    due: now.after_span(held.close()),
+                },
                 warm_until,
-                IntentEffect::CancelClose,
+                None,
             ),
-            (IntentPhase::Pending { key, due }, HoverEvent::OpenDue) if now >= due => to(
+            (IntentPhase::Closing { key, .. }, HoverEvent::EnterCard) => {
+                keep(IntentPhase::Open { key })
+            }
+            (IntentPhase::Pending { key, due }, HoverEvent::Elapsed) if now >= due => to(
                 IntentPhase::Open { key: key.clone() },
                 warm_until,
-                IntentEffect::Open(key),
+                Some(IntentEffect::Open(key)),
             ),
-            (IntentPhase::Closing { key, due }, HoverEvent::CloseDue) if now >= due => to(
-                IntentPhase::Idle,
-                Some(now + DelayToken::HoverWarm.delay()),
-                IntentEffect::Close(key),
-            ),
+            (IntentPhase::Closing { key, due }, HoverEvent::Elapsed) if now >= due => {
+                to(IntentPhase::Idle, lingers, Some(IntentEffect::Close(key)))
+            }
             (
                 IntentPhase::Open { key } | IntentPhase::Closing { key, .. },
                 HoverEvent::ClickInList,
-            ) => to(IntentPhase::Idle, None, IntentEffect::Remove(key)),
-            (IntentPhase::Pending { .. }, HoverEvent::ClickInList) => {
-                to(IntentPhase::Idle, warm_until, IntentEffect::CancelOpen)
+            ) => to(IntentPhase::Idle, None, Some(IntentEffect::Remove(key))),
+            (IntentPhase::Pending { .. }, HoverEvent::ClickInList) => keep(IntentPhase::Idle),
+            (IntentPhase::Open { key }, HoverEvent::SpaceKey) => {
+                to(IntentPhase::Idle, lingers, Some(IntentEffect::Peek(key)))
             }
-            (IntentPhase::Open { key }, HoverEvent::SpaceKey) => to(
-                IntentPhase::Idle,
-                Some(now + DelayToken::HoverWarm.delay()),
-                IntentEffect::Peek(key),
-            ),
             (phase, _) => keep(phase),
         };
         (HoverIntent { profile, ..next }, effect)
@@ -226,7 +238,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
     }
 
     /// Whether cards open at once: a card is open, or one closed less than HoverWarm ago.
-    pub fn warmth(&self, now: Instant) -> HoverWarmth {
+    pub fn warmth(&self, now: Stamp) -> HoverWarmth {
         let open = matches!(
             self.phase,
             IntentPhase::Open { .. } | IntentPhase::Closing { .. }
@@ -241,52 +253,47 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
 }
 
 /// The pointer came over `key`: keep the card when it is the same key, else wait for intent
-/// (none when warm).
+/// (none when warm: the card opens at once).
 fn over<K: Clone + PartialEq>(
     phase: IntentPhase<K>,
     key: K,
     profile: HoverProfile,
-    warm_until: Option<Instant>,
+    warm_until: Option<Stamp>,
     warm: HoverWarmth,
-    now: Instant,
-) -> (HoverIntent<K>, IntentEffect<K>) {
+    now: Stamp,
+) -> (HoverIntent<K>, Effect<K>) {
     match phase {
-        IntentPhase::Open { key: open } if open == key => to(
-            IntentPhase::Open { key: open },
-            warm_until,
-            IntentEffect::None,
-        ),
-        IntentPhase::Closing { key: open, .. } if open == key => to(
-            IntentPhase::Open { key: open },
-            warm_until,
-            IntentEffect::CancelClose,
-        ),
-        IntentPhase::Pending { key: pending, due } if pending == key => to(
-            IntentPhase::Pending { key: pending, due },
-            warm_until,
-            IntentEffect::None,
-        ),
-        _ => {
-            let after = match warm {
-                HoverWarmth::Warm => Duration::ZERO,
-                HoverWarmth::Cold => profile.open(),
-            };
-            to(
+        IntentPhase::Open { key: open } if open == key => {
+            to(IntentPhase::Open { key: open }, warm_until, None)
+        }
+        IntentPhase::Closing { key: open, .. } if open == key => {
+            to(IntentPhase::Open { key: open }, warm_until, None)
+        }
+        IntentPhase::Pending { key: pending, due } if pending == key => {
+            to(IntentPhase::Pending { key: pending, due }, warm_until, None)
+        }
+        _ => match warm {
+            HoverWarmth::Warm => to(
+                IntentPhase::Open { key: key.clone() },
+                warm_until,
+                Some(IntentEffect::Open(key)),
+            ),
+            HoverWarmth::Cold => to(
                 IntentPhase::Pending {
                     key,
-                    due: now + after,
+                    due: now.after_span(profile.open()),
                 },
                 warm_until,
-                IntentEffect::StartOpen { after },
-            )
-        }
+                None,
+            ),
+        },
     }
 }
 
 fn to<K>(
     phase: IntentPhase<K>,
-    warm_until: Option<Instant>,
-    effect: IntentEffect<K>,
-) -> (HoverIntent<K>, IntentEffect<K>) {
+    warm_until: Option<Stamp>,
+    effect: Effect<K>,
+) -> (HoverIntent<K>, Effect<K>) {
     (HoverIntent::of(phase, warm_until), effect)
 }

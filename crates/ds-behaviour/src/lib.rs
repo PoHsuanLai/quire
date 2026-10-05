@@ -4,8 +4,10 @@
 //! (the companion's summon and hold-to-talk), and the live Space swipe (design/12 §12.3.7).
 //!
 //! Plain data and integer maths over `ds-core`'s [`Stamp`](ds_core::time::stamp::Stamp): no
-//! Dioxus, no renderer, no clock. Each machine takes the time as an argument and returns what it
-//! wants done; the caller owns the timers, the keyboard grab and the drawing.
+//! Dioxus, no renderer, no clock. Each machine is a `ds_core::machine::Machine`: it takes the time
+//! as an argument, keeps its deadlines in its state and says when it wants to be woken
+//! (`Machine::wake`), and returns what it wants done; the caller owns the state, the one timer
+//! (`ds::machine::use_machine` or its own driver), the keyboard grab and the drawing.
 
 mod dir;
 pub mod hot_corner;

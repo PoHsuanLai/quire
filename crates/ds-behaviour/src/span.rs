@@ -1,4 +1,4 @@
-//! Configured durations as the whole milliseconds a [`Stamp`] counts in.
+//! Configured durations as the deadlines a [`Stamp`] counts.
 
 use std::time::Duration;
 
@@ -11,5 +11,5 @@ pub(crate) fn millis(d: Duration) -> u64 {
 
 /// The time `d` after `at`.
 pub(crate) fn after(at: Stamp, d: Duration) -> Stamp {
-    at.after(millis(d))
+    at.after_span(d)
 }

@@ -90,7 +90,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-motion/presence/`, `ds-motion/{roster,use_roster}.rs` | 05-MOTION §2 principle 10, §8; 04-COMPONENTS §16 motion states. `Presence::{Hidden, Entering, Present, Leaving(Exit)}` and `use_presence` for a surface its caller shows and hides, `roster::Heal` for a row sliding into a gap, `Exit::{Row, OsdOut, PaneOut, Fade, SheetOut, PanelOut}`; `use_roster` (`LeaveBy`, `RosterSpec`) is the one hook for a list's rows |
 | `ds-motion/timeline/` | 26-DETAILS §3.2, §4.1 (Rust-driven values): `Timeline` (`total`, `at`, `settled`) with the implementors `Ease`, `Glide`, `Spring` and `Pending`; `Playback` is the one frame driver (a frame every `FRAME_TICK` while a run moves, the last at exactly its total, none at rest) and `use_timeline` follows a timeline its caller recomputes |
 | `ds-motion/hover_intent.rs` | 06-INTERACTIONS §3; 30 §1.4: `HoverProfile {Tip, Card, Label}` |
-| `ds-motion/{long_press,rubber,use_collapse}.rs` | 30 §1.3-1.4: the long-press machine over `PressPhase`, `rubber::resist`, `use_collapse` |
+| `ds-motion/{rubber,use_collapse}.rs` | 30 §1.3-1.4: `rubber::resist`, `use_collapse` |
 | `stack/{roving,typeahead}.rs` | 30 §1.4: `Roving`, `Rove`, `Wrap`, `Typeahead` |
 | `ds-motion/drag.rs` | 06-INTERACTIONS §6; 04-COMPONENTS §34 |
 | `ds-core/geometry/placement.rs` | 01-LAYOUT §8.2; 06-INTERACTIONS §4 |

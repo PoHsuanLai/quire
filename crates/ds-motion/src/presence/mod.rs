@@ -3,15 +3,17 @@
 //! roster carry one; a surface its caller shows and hides gets one from [`use_presence`].
 
 pub(crate) mod exit;
+mod model;
 pub mod spec;
 #[cfg(feature = "dioxus")]
 pub mod spring;
-#[cfg(feature = "dioxus")]
-pub(crate) mod step;
+mod step;
 #[cfg(feature = "dioxus")]
 pub mod use_presence;
 
 pub use exit::Exit;
+pub use model::{EntranceAlias, Life, PresenceIn, PresenceOut, PresenceParams};
+pub use step::change;
 
 use ds_core::vocab::Shown;
 

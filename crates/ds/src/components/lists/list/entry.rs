@@ -96,6 +96,7 @@ mod tests {
             key: 1u8,
             presence,
             heal,
+            until: None,
         };
         let healing = Heal { dy: Px(96.5) };
         let cases = [

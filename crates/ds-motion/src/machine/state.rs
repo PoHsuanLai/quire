@@ -23,6 +23,13 @@ impl<M: Machine> Clone for MachineState<M> {
 
 impl<M: Machine> Copy for MachineState<M> {}
 
+/// Two are equal when they are the same state on the same clock.
+impl<M: Machine> PartialEq for MachineState<M> {
+    fn eq(&self, other: &Self) -> bool {
+        self.state == other.state && self.clock == other.clock
+    }
+}
+
 impl<M: Machine> std::fmt::Debug for MachineState<M> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str("MachineState")

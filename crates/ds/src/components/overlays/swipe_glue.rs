@@ -137,10 +137,7 @@ impl SwipeGlue {
             let x = Px(event.client_coordinates().x as f32);
             let mut meter = self.meter;
             meter.set(VelocityMeter::default().moved(x, ds_core::time::clock::now()));
-            swiper.feed(SwipeInput::Down {
-                x,
-                at: swiper.now(),
-            });
+            swiper.feed(SwipeInput::Down { x });
         }
     }
 
@@ -163,7 +160,7 @@ impl SwipeGlue {
     /// The pointer left the element: a release it could not hear, so no contact goes with it.
     pub fn left(&self) {
         if let Some(swiper) = self.live() {
-            swiper.feed(SwipeInput::Up { at: swiper.now() });
+            swiper.feed(SwipeInput::Up);
         }
     }
 
@@ -176,7 +173,7 @@ impl SwipeGlue {
             released.set(Touch::Contact(
                 Contact::from_event(event).with_velocity(velocity),
             ));
-            swiper.feed(SwipeInput::Up { at: swiper.now() });
+            swiper.feed(SwipeInput::Up);
         }
     }
 
