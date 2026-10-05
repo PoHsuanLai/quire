@@ -755,13 +755,16 @@ motion machinery, so Reduced is automatic):
   a `ds-busy-seen` class once it has been busy).
 
 Account tiles (design/30 §2.11, `ds::components::app`): `PinTiles { label, items, selected, onpick,
-onreorder, onstatus, add }`, with `PinItem::new(key, face)` and its setters `.unread(n)`, `.mark(style)`
+onreorder, onstatus, onmenu, add }`, with `PinItem::new(key, face)` and its setters `.unread(n)`, `.mark(style)`
 and `.status(PinStatus)` (build items with these, not struct literals, so a new field does not break
 you). `PinStatus` is the account's problem mark, in the tile's top-left corner (the unread count has the
 top right, the provider mark the bottom right): `Quiet` (the default) draws none, `Busy(Operation)` a Mini
 spinner that turns only while the `Operation` is `Running`, `Attention { why }` the warning glyph with
 `why` as its tooltip and accessible name. `onstatus: Option<EventHandler<K>>` hears the key of a tile whose
 warning was pressed; that press is neither a pick (`onpick`) nor the start of a drag.
+`onmenu: Option<EventHandler<PinMenu<K>>>` hears a secondary press (a right-click) on a tile, as
+`PinMenu { key, at }` with the point to hang a menu from; the grid draws no menu itself. Only a primary
+press picks, so a right-click never changes the filter.
 
 Window layout (design/30 §2.7, `ds::components::chrome`): a source-list sidebar is
 `Sidebar { label, sections, size, cursor, onselect, header, foot, fill }`. `sections` is a

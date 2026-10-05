@@ -7,7 +7,7 @@ mod probe;
 
 use dioxus::prelude::*;
 use ds::components::app::pin_tile::{PinFace, PinStatus};
-use ds::components::app::pin_tiles::{PinAdd, PinItem, PinTiles};
+use ds::components::app::pin_tiles::{PinAdd, PinItem, PinMenu, PinTiles};
 use ds::components::content::image_source::ImageSource;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
@@ -68,6 +68,7 @@ fn Tiles() -> Element {
                     label: "Accounts",
                     items,
                     onpick: move |key: char| log.with_mut(|log| log.push(format!("pick:{key}"))),
+                    onmenu: move |menu: PinMenu<char>| log.with_mut(|log| log.push(format!("menu:{}", menu.key))),
                     onreorder: move |next: Vec<char>| {
                         log.with_mut(|log| log.push(format!("order:{}", next.iter().collect::<String>())));
                         order.set(next);
@@ -395,4 +396,24 @@ fn the_provider_mark_keeps_its_place_on_the_face_at_any_tile_width() {
         (inset - 7.0).abs() <= 1.0,
         "the mark moved at the usual width: {inset}px in from the tile"
     );
+}
+
+/// A secondary press asks for that tile's menu and is never a pick; a primary press still picks
+/// and asks for no menu.
+#[test]
+fn a_secondary_press_asks_for_the_tile_s_menu_and_picks_nothing() {
+    let mut harness = Harness::new(Tiles, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(50));
+    let second = harness
+        .centre(".ds-pin-tile:nth-child(2)")
+        .expect("the second tile");
+    harness.send(Input::press(
+        second,
+        ds::base::press::PointerButton::Secondary,
+    ));
+    harness.advance(ms(50));
+    assert_eq!(harness.text_of(".log").as_deref(), Some("menu:W"));
+    harness.send(Input::click(second));
+    harness.advance(ms(50));
+    assert_eq!(harness.text_of(".log").as_deref(), Some("menu:W,pick:W"));
 }
