@@ -12,6 +12,7 @@ pub(crate) mod menu;
 pub(crate) mod panel;
 pub(crate) mod pick;
 pub(crate) mod placement;
+pub(crate) mod placing;
 pub(crate) mod submenu;
 pub(crate) mod surface;
 pub(crate) mod tracker;

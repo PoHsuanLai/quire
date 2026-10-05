@@ -1,8 +1,10 @@
 //! The menu tracker's vocabulary: what it remembers, what it is told, what it asks for.
 
 use ds_core::geometry::units::Point;
+use ds_core::machine::Elapsed;
+use ds_core::time::stamp::Stamp;
 use ds_core::vocab::PressPhase;
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 /// An item, by its index at each nesting level: `[2, 0]` is the first item of the third
 /// item's submenu.
@@ -80,8 +82,9 @@ pub struct SafeTriangle {
     pub top: Point,
     /// The submenu's near-edge bottom corner.
     pub bottom: Point,
-    /// When the pointer last moved inside the triangle.
-    pub still_since: Instant,
+    /// When the pointer, resting inside the triangle, stops being shielded: the timeout after its
+    /// last move inside. `None` until it has moved inside since the submenu was placed.
+    pub timeout: Option<Stamp>,
 }
 
 /// The open menu's submenu, if any.
@@ -89,12 +92,12 @@ pub struct SafeTriangle {
 pub enum Submenu {
     /// None open or pending.
     None,
-    /// The pointer rests on `item`; its submenu opens once the delay has passed.
+    /// The pointer rests on `item`; its submenu opens at `until`.
     Pending {
         /// The parent item.
         item: ItemPath,
-        /// When the pointer came to rest on it.
-        since: Instant,
+        /// When the delay ends: the pointer's arrival plus the submenu delay.
+        until: Stamp,
     },
     /// `item`'s submenu is open. `guard` is `None` until the caller reports where it landed.
     Open {
@@ -118,6 +121,9 @@ pub struct Session<K> {
     pub entered: Entered,
     /// The highlighted item (always a pickable one).
     pub hot: Option<ItemPath>,
+    /// Where the keyboard cursor stands: the last item highlighted, kept while the pointer is
+    /// over something that cannot be highlighted (a rule, a disabled item).
+    pub cursor: Option<ItemPath>,
     /// The open or pending submenu.
     pub sub: Submenu,
     /// The last pointer sample.
@@ -135,8 +141,9 @@ pub enum MenuPhase<K> {
     Tracking(Session<K>),
 }
 
-/// The tracker's timings, from `menus.submenu_delay_ms` and
-/// `menus.submenu_triangle_timeout_ms` (design/22-SETTINGS.md; proposed 200 and 300 ms).
+/// The tracker's timings (its [`Machine::Params`](ds_core::machine::Machine::Params)), from
+/// `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms` (design/22-SETTINGS.md;
+/// proposed 200 and 300 ms).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct MenuTiming {
     /// How long the pointer rests on a parent item before its submenu opens.
@@ -155,11 +162,11 @@ impl Default for MenuTiming {
     }
 }
 
-/// The tracker: its timings and where it is.
+/// The tracker, a [`Machine`](ds_core::machine::Machine) over [`MenuTiming`]: where it is. Its
+/// deadlines (the submenu delay, the safe triangle's timeout) live in the state, so its wake is
+/// the one timer.
 #[derive(Debug, Clone, PartialEq)]
 pub struct MenuTrack<K> {
-    /// The submenu delay and triangle timeout.
-    pub timing: MenuTiming,
     /// Closed or tracking.
     pub phase: MenuPhase<K>,
 }
@@ -197,7 +204,8 @@ pub enum MenuTrackEvent<K> {
         /// The near-edge bottom corner.
         bottom: Point,
     },
-    /// A timer asked for with [`MenuTrackEffect::RequestTick`] fired.
+    /// A deadline in the state came due ([`Elapsed`]): the submenu delay or the triangle's
+    /// timeout.
     Tick,
     /// The keyboard moved the highlight to this item (Up or Down inside the menu): a submenu
     /// of another item closes, a pending one is dropped, nothing opens.
@@ -244,6 +252,13 @@ pub enum MenuTrackEffect<K> {
     Pick(ItemPath),
     /// Open the adjacent menu on this side (Left or Right with no submenu to act on).
     Adjacent(MenuDirection),
-    /// Deliver [`MenuTrackEvent::Tick`] at this time.
-    RequestTick(Instant),
+    /// The pointer rests on this parent item and its submenu opens after the delay: measure it
+    /// meanwhile, so the submenu can open the moment the delay ends.
+    Prepare(ItemPath),
+}
+
+impl<K> From<Elapsed> for MenuTrackEvent<K> {
+    fn from(_: Elapsed) -> Self {
+        MenuTrackEvent::Tick
+    }
 }
