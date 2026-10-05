@@ -160,10 +160,10 @@ fn the_toast_hub_hides_after_its_hold_and_not_before() {
         "hid well before the hold ends"
     );
     let hidden = settle_until(&mut harness, |h| state(h).as_deref() == Some("hidden"));
-    assert!(
-        hidden.duration_since(pushed) >= ms(5000),
-        "hid only once the full hold had run: {:?}",
-        hidden.duration_since(pushed)
+    assert_eq!(
+        hidden.duration_since(pushed),
+        ms(5000),
+        "hid only once the full hold had run"
     );
 }
 
@@ -213,10 +213,10 @@ fn the_hover_hub_opens_after_500_ms_and_not_before() {
         "open well before 500 ms"
     );
     let opened = settle_until(&mut harness, |h| state(h).as_deref() == Some("open"));
-    assert!(
-        opened.duration_since(rested) >= ms(500),
-        "opened only once the full delay had run: {:?}",
-        opened.duration_since(rested)
+    assert_eq!(
+        opened.duration_since(rested),
+        ms(500),
+        "opened only once the full delay had run"
     );
 }
 
@@ -309,10 +309,10 @@ fn a_hover_card_appears_after_500_ms_and_not_before() {
     harness.advance(ms(200));
     assert_eq!(harness.count(".ds-hovercard"), 0, "open well before 500 ms");
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
-    assert!(
-        opened.duration_since(rested) >= ms(500),
-        "appeared only once the full delay had run: {:?}",
-        opened.duration_since(rested)
+    assert_eq!(
+        opened.duration_since(rested),
+        ms(500),
+        "appeared only once the full delay had run"
     );
 }
 
@@ -360,10 +360,10 @@ fn a_toast_hides_after_its_hold() {
         "hid well before the hold ends"
     );
     let hidden = settle_until(&mut harness, |h| shown(h).as_deref() == Some("leaving"));
-    assert!(
-        hidden.duration_since(pushed) >= ms(5000),
-        "hid only once the full hold had run: {:?}",
-        hidden.duration_since(pushed)
+    assert_eq!(
+        hidden.duration_since(pushed),
+        ms(5000),
+        "hid only once the full hold had run"
     );
     // Slid out: after `--t-quick` and a frame nothing is laid out.
     harness.advance(ms(500));

@@ -84,20 +84,20 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
     let second = "ul.pins > li:nth-child(2)";
     let entered = harness.now();
     harness.send(Input::pointer_move(centre(&harness, second)));
-    // Well under half the 450 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
+    // Well under half the 500 ms open delay (fixed 2026-09-25, FINDINGS "Timing tests"): the
     // old 400 ms check flaked under load, since `advance` only guarantees *at least* the time
     // asked for, and a busy machine can stretch it past the boundary it meant to stop short of.
     harness.advance(ms(150));
     assert_eq!(
         harness.count(".ds-hovercard"),
         0,
-        "not open well before 450 ms"
+        "not open well before 500 ms"
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
-    assert!(
-        opened.duration_since(entered) >= Duration::from_millis(500),
-        "the card opened only once the intent wait had fully run: {:?}",
-        opened.duration_since(entered)
+    assert_eq!(
+        opened.duration_since(entered),
+        Duration::from_millis(500),
+        "the card opened only once the intent wait had fully run"
     );
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:1"));
     // A side card: 10 right of the item, 6 above its top (design/06 section 3).

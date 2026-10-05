@@ -308,10 +308,13 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
         "not open well before the 200 ms delay"
     );
     let opened = settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
-    assert!(
-        opened.duration_since(armed) >= Duration::from_millis(200),
-        "the submenu opened only once the full delay had run: {:?}",
-        opened.duration_since(armed)
+    // Exactly what the virtual clock gives. It is 540 ms, not the 200 ms `SubmenuOpen` token (the
+    // rest timer restarts while the pointer sits on the row; recorded in the q-r0 report as a
+    // finding for the menu-tracking rework), so a delay that grows or shrinks fails here.
+    assert_eq!(
+        opened.duration_since(armed),
+        ms(540),
+        "the submenu opened once its rest had run"
     );
     assert_eq!(
         harness.attr(PARENT, "aria-expanded").as_deref(),

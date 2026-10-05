@@ -7,7 +7,7 @@
 
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
-use ds_harness::harness::assert_settles_to_zero_frames;
+use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
 use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
@@ -54,4 +54,27 @@ fn assert_settles_to_zero_frames_drains_a_pending_900ms_sleep_on_the_virtual_clo
         Some("true"),
         "the helper must not call the document settled while the 900 ms hold is still pending"
     );
+}
+
+/// A sleep that is not a multiple of `settle_until`'s 10 ms step.
+#[allow(non_snake_case)]
+fn OddHold() -> Element {
+    let mut fired = use_signal(|| false);
+    use_hook(|| {
+        spawn(async move {
+            sleep(Duration::from_millis(905)).await;
+            fired.set(true);
+        });
+    });
+    rsx! { div { id: "hold", "data-fired": "{fired()}" } }
+}
+
+#[test]
+fn settle_until_on_the_virtual_clock_lands_exactly_on_the_timer_that_ends_the_state() {
+    let mut harness = virtual_harness(OddHold);
+    let started = harness.now();
+    let fired = settle_until(&mut harness, |h| {
+        h.attr("#hold", "data-fired").as_deref() == Some("true")
+    });
+    assert_eq!(fired.duration_since(started), Duration::from_millis(905));
 }

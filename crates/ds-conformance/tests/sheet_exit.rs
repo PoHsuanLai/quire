@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -48,7 +48,7 @@ fn exit() -> Duration {
 }
 
 fn page() -> Harness {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),
@@ -60,22 +60,26 @@ fn page() -> Harness {
 #[test]
 fn a_hidden_sheet_leaves_then_reports_at_its_settle() {
     let mut harness = page();
+    let asked = harness.now();
     set(&mut harness, Shown::Hidden);
     harness.advance(Duration::from_millis(20));
     assert_eq!(
         harness.attr(".ds-sheet", "data-presence").as_deref(),
         Some("leaving")
     );
-    harness.advance(exit() - Duration::from_millis(60));
+    // On the virtual clock a boundary is exact: one millisecond short of the settle, nothing
+    // has been reported; the settle itself is the exit's own length from the hide.
+    harness.advance(exit() - Duration::from_millis(21));
     assert_eq!(
         harness.text_of(".log").as_deref(),
         Some(""),
         "not before the settle"
     );
     assert_eq!(harness.count(".ds-sheet"), 1, "still drawn while it leaves");
-    settle_until(&mut harness, |h| {
+    let reported = settle_until(&mut harness, |h| {
         h.text_of(".log").as_deref() == Some("hidden")
     });
+    assert_eq!(reported.duration_since(asked), exit());
     assert_eq!(harness.count(".ds-sheet"), 0, "gone once settled");
 }
 

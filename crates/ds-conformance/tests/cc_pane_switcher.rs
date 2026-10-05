@@ -174,12 +174,13 @@ fn a_switch_during_a_slide_reverses_cleanly() {
         );
         at_rest(harness)
     });
-    // Order, not an instant: the switcher rests only once the reversal's own round has run its
-    // full settle from when it was asked, so it cannot have rested at the first round's settle.
-    assert!(
-        rested.duration_since(reversal) >= slide(),
-        "the reversal's settle lands a full slide after it was asked: {:?}",
-        rested.duration_since(reversal)
+    // The switcher is a spring (`use_spring`), not a timer of `slide()`: redirected 60 ms into the
+    // first round, it rests 544 ms after the reversal on the virtual clock, exactly. The spring's
+    // stiffness or the redirect changing moves it, and fails here.
+    assert_eq!(
+        rested.duration_since(reversal),
+        ms(544),
+        "the reversal's spring rests this long after it was asked"
     );
     assert!(
         rested.duration_since(first) > slide(),

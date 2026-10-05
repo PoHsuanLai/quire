@@ -132,11 +132,7 @@ fn it_rises_in_and_on_hidden_runs_only_after_the_slide_out_settles() {
         "not at half of settle(PanelOut)"
     );
     let gone = settle_until(&mut harness, |h| presence(h).is_none());
-    assert!(
-        gone.duration_since(hiding) >= out,
-        "{:?}",
-        gone.duration_since(hiding)
-    );
+    assert_eq!(gone.duration_since(hiding), out);
     assert_eq!(read(&mut harness, &HIDDEN), before + 1);
     assert_eq!(
         harness.attr(".ds-shot", "data-shown").as_deref(),
@@ -245,9 +241,10 @@ fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
         Some("gone")
     );
     let reported = swiped_by(&mut harness, released + SETTLE_BOUND);
-    assert!(
-        reported.duration_since(released) >= flight,
-        "not before its flight"
+    assert_eq!(
+        reported.duration_since(released),
+        flight,
+        "reported exactly when its flight settled"
     );
     assert_eq!(
         read(&mut harness, &DRAGS).len(),
@@ -268,15 +265,15 @@ fn beside_swipe_to_dismiss_a_drag_right_is_the_swipe_and_left_a_drag_out() {
     );
 }
 
-/// Advance in 10 ms steps until the swipe has been reported, up to `bound` on the harness's own
+/// Advance in 1 ms steps until the swipe has been reported, up to `bound` on the harness's own
 /// clock (`settle_until` reads only the document, and the report is a signal); the instant it
-/// landed.
+/// landed, exact to the millisecond.
 fn swiped_by(harness: &mut Harness, bound: Instant) -> Instant {
     while harness.now() < bound {
         if read(harness, &SWIPED) == 1 {
             return harness.now();
         }
-        harness.advance(Duration::from_millis(10));
+        harness.advance(Duration::from_millis(1));
     }
     panic!("the swipe was never reported");
 }

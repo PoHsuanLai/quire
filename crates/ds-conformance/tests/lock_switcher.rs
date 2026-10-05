@@ -172,10 +172,10 @@ fn a_wrong_password_shakes_once_and_empties_the_field_after_the_shake() {
     );
 
     let rested = settle_until(&mut harness, |h| !shaking(h));
-    assert!(
-        rested.duration_since(wrong) >= shake,
-        "the shake rested only once it had played: {:?}",
-        rested.duration_since(wrong)
+    assert_eq!(
+        rested.duration_since(wrong),
+        shake,
+        "the shake rested only once it had played"
     );
     assert_eq!(
         dots(&harness, ".ds-lock-prompt .ds-password-field"),
