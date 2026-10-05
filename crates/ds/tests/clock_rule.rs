@@ -96,10 +96,7 @@ fn test_sources() -> Vec<PathBuf> {
 }
 
 /// Files that still build a harness without naming a clock, each with the lane that owns the fix.
-const UNCHOSEN: &[(&str, &str)] = &[(
-    "ds-conformance/tests/launcher_unmount.rs",
-    "its palette render loop is being moved by the harness-GPU lane",
-)];
+const UNCHOSEN: &[(&str, &str)] = &[];
 
 /// The text with every `//` comment line blanked, so a call named in prose is not a call.
 fn code_of(text: &str) -> String {
