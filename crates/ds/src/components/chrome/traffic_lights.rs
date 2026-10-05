@@ -11,17 +11,16 @@ use crate::components::menus::item::item::{AfterPick, MenuImage, MenuItem};
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
 use crate::host::measure::{Anchor, MountedRef};
-use crate::window::hold::{Click, Hold, Opens, Waiting};
+use crate::window::hold::{Hold, HoldIn, HoldOut, HoldTiming, Wait};
 use crate::window::host::{WindowHost, use_window_host, use_window_state};
 use crate::window::timing::FrameTiming;
 use crate::window::vocab::{Maximized, Support, WindowTile, Zoom};
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
-use ds_core::time::clock::sleep;
 use ds_core::vocab::{Availability, Shown};
 use ds_core::word::Word;
+use ds_motion::machine::use_machine;
 use ds_style::icon::Icon;
-use std::time::Duration;
 
 /// Whether the tiling menu is open as the lights mount: `Open` poses it (a gallery, a picture).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -50,12 +49,26 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
         TilePose::Closed => TileMenu::Closed,
     });
     let mut anchor = use_signal(|| None::<MountedRef>);
-    let hold = use_hook(|| CopyValue::new(Hold::default()));
     let opener = Opener {
         menu,
         host: host.clone(),
     };
-    let (close, minimize, zoom, pick) = (host.clone(), host.clone(), host.clone(), host);
+    let hold = use_machine(
+        |_| Hold::default(),
+        HoldTiming {
+            press: timing.menu_press,
+            hover: timing.menu_hover,
+        },
+        || (),
+        {
+            let (opener, zoom) = (opener.clone(), host.clone());
+            move |out, _| match out {
+                HoldOut::OpenMenu => opener.open(),
+                HoldOut::ToggleZoom => with(zoom.as_ref(), |host| host.host().zoom(Zoom::Toggle)),
+            }
+        },
+    );
+    let (close, minimize, pick) = (host.clone(), host.clone(), host);
     let zoom_mark = match state.maximized {
         Maximized::On => Mark::Restore,
         Maximized::Off => Mark::Zoom,
@@ -81,25 +94,19 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
                 "aria-haspopup": "menu",
                 "aria-expanded": expanded.aria(),
                 onmounted: move |event: MountedEvent| anchor.set(Some(MountedRef(event.data()))),
-                onpointerdown: {
-                    let opener = opener.clone();
-                    move |event: PointerEvent| {
-                        event.stop_propagation();
-                        if event.trigger_button() == Some(MouseButton::Primary) && !zooms(&event) {
-                            after(hold, Waiting::Press, timing.menu_press, opener.clone());
-                        }
+                onpointerdown: move |event: PointerEvent| {
+                    event.stop_propagation();
+                    if event.trigger_button() == Some(MouseButton::Primary) && !zooms(&event) {
+                        hold.send(HoldIn::Wait(Wait::Press));
                     }
                 },
-                onpointerup: move |_| cancel(hold),
-                onpointerenter: {
-                    let opener = opener.clone();
-                    move |event: PointerEvent| {
-                        if !zooms(&event) {
-                            after(hold, Waiting::Hover, timing.menu_hover, opener.clone());
-                        }
+                onpointerup: move |_| hold.send(HoldIn::Cancel),
+                onpointerenter: move |event: PointerEvent| {
+                    if !zooms(&event) {
+                        hold.send(HoldIn::Wait(Wait::Hover));
                     }
                 },
-                onpointerleave: move |_| cancel(hold),
+                onpointerleave: move |_| hold.send(HoldIn::Cancel),
                 ondoubleclick: move |event: MouseEvent| event.stop_propagation(),
                 oncontextmenu: {
                     let opener = opener.clone();
@@ -114,14 +121,7 @@ pub(crate) fn TrafficLightGroup(timing: FrameTiming, pose: TilePose) -> Element 
                         opener.open();
                     }
                 },
-                onclick: move |_| {
-                    let mut hold = hold;
-                    let (next, click) = hold.peek().click();
-                    hold.set(next);
-                    if click == Click::Zoom {
-                        with(zoom.as_ref(), |host| host.host().zoom(Zoom::Toggle));
-                    }
-                },
+                onclick: move |_| hold.send(HoldIn::Click),
                 LightMark { mark: zoom_mark }
             }
         }
@@ -201,26 +201,6 @@ fn support(host: Option<&WindowHost>) -> [Support; 4] {
             host.host().supports(WindowTile::ALL[index])
         })
     })
-}
-
-/// Start waiting for `what`, and open the menu after `delay` unless the wait went stale.
-fn after(mut hold: CopyValue<Hold>, what: Waiting, delay: Duration, opener: Opener) {
-    let (next, ticket) = hold.peek().wait(what);
-    hold.set(next);
-    spawn(async move {
-        sleep(delay).await;
-        let (next, opens) = hold.peek().fire(ticket);
-        hold.set(next);
-        if opens == Opens::Yes {
-            opener.open();
-        }
-    });
-}
-
-/// Stop waiting.
-fn cancel(mut hold: CopyValue<Hold>) {
-    let next = hold.peek().cancel();
-    hold.set(next);
 }
 
 /// The menu's rows: a header, then each placement with its glyph, unavailable where the host
