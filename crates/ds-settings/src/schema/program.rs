@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 
 use super::agent::is_never_settable;
 use super::key::{AgentSetting, KeySpec};
+use crate::xdg;
 
 /// The directory name a schema's owning program installs under: `quire`, `sill`, `mailo`. The
 /// derive reads it off the first path segment of `#[settings(file = "...")]`
@@ -127,28 +128,22 @@ pub fn data_dirs() -> Vec<PathBuf> {
 
 /// [`data_dirs`] with the environment handed in: `xdg_data_home` (else `home`'s `.local/share`)
 /// and `xdg_data_dirs` (else `/usr/local/share:/usr/share`), so a caller that owns its
-/// directories, or a test, names them itself.
+/// directories, or a test, names them itself. The XDG rules (`crate::xdg`) apply: an empty or
+/// relative value is ignored.
 pub fn data_dirs_from(
     xdg_data_home: Option<std::ffi::OsString>,
     xdg_data_dirs: Option<std::ffi::OsString>,
     home: Option<std::ffi::OsString>,
 ) -> Vec<PathBuf> {
-    let home_dir = xdg_data_home
-        .map(PathBuf::from)
-        .or_else(|| home.map(|home| PathBuf::from(home).join(".local/share")));
-    let dirs_list = xdg_data_dirs
-        .map(|value| value.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "/usr/local/share:/usr/share".to_owned());
-    home_dir
-        .into_iter()
-        .chain(
-            dirs_list
-                .split(':')
-                .filter(|s| !s.is_empty())
-                .map(PathBuf::from),
-        )
-        .map(|base| base.join("quire").join("settings"))
-        .collect()
+    xdg::base_dir(
+        xdg_data_home.as_deref(),
+        home.as_deref(),
+        xdg::DATA_HOME_UNDER_HOME,
+    )
+    .into_iter()
+    .chain(xdg::search_dirs(xdg_data_dirs.as_deref()))
+    .map(|base| base.join("quire").join("settings"))
+    .collect()
 }
 
 /// `--write-schema <dir>` (section 9.2: "developers run `cargo run -p <app> -- --write-schema
@@ -310,6 +305,32 @@ mod tests {
         assert_eq!(
             dirs[0],
             std::path::PathBuf::from("/home/ada/.local/share/quire/settings")
+        );
+    }
+
+    #[test]
+    fn empty_or_relative_values_are_ignored_not_used_as_given() {
+        let dirs = data_dirs_from(
+            Some(OsString::from("")),
+            Some(OsString::from("")),
+            Some(OsString::from("/home/ada")),
+        );
+        assert_eq!(
+            dirs,
+            vec![
+                std::path::PathBuf::from("/home/ada/.local/share/quire/settings"),
+                std::path::PathBuf::from("/usr/local/share/quire/settings"),
+                std::path::PathBuf::from("/usr/share/quire/settings"),
+            ]
+        );
+        let relative = data_dirs_from(
+            Some(OsString::from("rel")),
+            Some(OsString::from("rel:/a")),
+            None,
+        );
+        assert_eq!(
+            relative,
+            vec![std::path::PathBuf::from("/a/quire/settings")]
         );
     }
 
