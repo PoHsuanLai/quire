@@ -1,23 +1,23 @@
 //! The one hover manager every card goes through: it owns the [`ds_motion::hover_intent::HoverIntent`] machine
-//! and its timers, and stamps `data-hover="warm|cold"` on `.ds` (design/04-COMPONENTS.md
+//! (its deadlines are its open and close timers), and stamps `data-hover="warm|cold"` on `.ds` (design/04-COMPONENTS.md
 //! O-11).
 //!
-//! Its timers are tasks of the root that provides it and drop with it; every write a timer makes
-//! is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
+//! The fade-out and warm timers are tasks of the root that provides it and drop with it; every
+//! write a timer makes is a `try_set`, so a timer that outlives the hub's signals stops instead of panicking
 //! (`ds_style::task`).
 
-use dioxus::core::{Task, current_scope_id};
+use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
 use ds_motion::anim::Anim;
 use ds_motion::hover_intent::{
     HoverEvent, HoverIntent, HoverProfile, HoverWarmth, IntentEffect, IntentPhase,
 };
+use ds_motion::machine::{MachineRef, use_machine};
 use ds_motion::settle::settle;
 use ds_style::scope::Scope;
 use ds_style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
 use ds_style::tokens::delay::DelayToken;
-use std::time::Duration;
 
 /// A card the hub is tracking: the consumer's key and the profile it waits by.
 type Card = (HoverKey, HoverProfile);
@@ -40,34 +40,33 @@ pub enum HoverKind {
     Side,
 }
 
-/// The hover manager, provided as context by `Ds`.
+/// What a card's closing leaves behind, and the scope its settle timers run in: the signals the
+/// machine's effects write. Copy.
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct HoverHub {
-    intent: Signal<HoverIntent<Card>>,
+struct Fades {
     leaving: Signal<Option<Card>>,
     peeked: Signal<Option<Card>>,
-    open_timer: Signal<Option<Task>>,
-    close_timer: Signal<Option<Task>>,
     warm_tick: Signal<u32>,
     env: Signal<Scope>,
     scope: ScopeId,
 }
 
-impl HoverHub {
-    /// Feed an event; the hub starts and cancels its own timers.
-    pub fn feed(&self, event: HoverEvent<Card>) {
-        let _ = self.try_feed(event);
-    }
+/// The hover manager, provided as context by `Ds`.
+#[derive(Debug, Clone, Copy)]
+pub struct HoverHub {
+    machine: MachineRef<HoverIntent<Card>>,
+    fades: Fades,
+}
 
-    fn try_feed(&self, event: HoverEvent<Card>) -> Result<(), Gone> {
-        let (next, effect) = try_get(self.intent)?.step(event, ds_core::time::clock::now());
-        try_set_if_changed(self.intent, next)?;
-        self.apply(effect)
+impl HoverHub {
+    /// Feed an event; the machine's own deadlines are the open and close timers.
+    pub fn feed(&self, event: HoverEvent<Card>) {
+        self.machine.send(event);
     }
 
     /// The card that is open (or closing), for the consumer to render.
     pub fn open(&self) -> Option<(HoverKey, HoverProfile)> {
-        match self.intent.read().phase() {
+        match self.machine.state().read().phase() {
             IntentPhase::Open { key } | IntentPhase::Closing { key, .. } => Some(key.clone()),
             IntentPhase::Idle | IntentPhase::Pending { .. } => None,
         }
@@ -76,38 +75,26 @@ impl HoverHub {
     /// The card fading out, until its exit settles and unmounts it; render it with
     /// `data-presence="leaving"`.
     pub fn leaving(&self) -> Option<(HoverKey, HoverProfile)> {
-        self.leaving.read().clone()
+        self.fades.leaving.read().clone()
     }
 
     /// The card Space last turned into a peek (design/06-INTERACTIONS.md section 3); the
     /// consumer opens its peek when this changes.
     pub fn peeked(&self) -> Option<(HoverKey, HoverProfile)> {
-        self.peeked.read().clone()
+        self.fades.peeked.read().clone()
     }
 
     /// Whether cards open at once right now.
     pub fn warmth(&self) -> HoverWarmth {
-        let _expiry = self.warm_tick.read();
-        self.intent.read().warmth(ds_core::time::clock::now())
+        let _expiry = self.fades.warm_tick.read();
+        self.machine.state().read().warmth(self.machine.now())
     }
+}
 
+impl Fades {
     fn apply(&self, effect: IntentEffect<Card>) -> Result<(), Gone> {
         match effect {
-            IntentEffect::None => Ok(()),
-            IntentEffect::StartOpen { after } if after.is_zero() => {
-                stop(self.open_timer)?;
-                self.try_feed(HoverEvent::OpenDue)
-            }
-            IntentEffect::StartOpen { after } => {
-                self.restart(self.open_timer, after, HoverEvent::OpenDue)
-            }
-            IntentEffect::CancelOpen => stop(self.open_timer),
-            IntentEffect::StartClose { after } => {
-                self.restart(self.close_timer, after, HoverEvent::CloseDue)
-            }
-            IntentEffect::CancelClose => stop(self.close_timer),
             IntentEffect::Open(_) | IntentEffect::Remove(_) => {
-                stop(self.close_timer)?;
                 try_set_if_changed(self.leaving, None)
             }
             IntentEffect::Close(card) => self.close(card),
@@ -120,7 +107,6 @@ impl HoverHub {
 
     /// Fade `card` out, unmount it once that settles, and end the warm window.
     fn close(&self, card: Card) -> Result<(), Gone> {
-        stop(self.close_timer)?;
         try_set_if_changed(self.leaving, Some(card.clone()))?;
         let level = try_get(self.env)?.resolved.motion;
         let out = settle(Anim::MenuOut, level);
@@ -141,48 +127,26 @@ impl HoverHub {
         });
         Ok(())
     }
-
-    /// Cancel `timer` and start it again, feeding `event` after `after`.
-    fn restart(
-        &self,
-        timer: Signal<Option<Task>>,
-        after: Duration,
-        event: HoverEvent<Card>,
-    ) -> Result<(), Gone> {
-        stop(timer)?;
-        let hub = *self;
-        let started = spawn_in(self.scope, async move {
-            sleep(after).await;
-            if try_set(timer, None).is_ok() {
-                hub.feed(event);
-            }
-        });
-        try_set(timer, Some(started))
-    }
-}
-
-/// Cancel the task in `timer`, if any.
-fn stop(timer: Signal<Option<Task>>) -> Result<(), Gone> {
-    if let Some(running) = try_get(timer)? {
-        running.cancel();
-        try_set(timer, None)?;
-    }
-    Ok(())
 }
 
 /// A new hub for `Ds` to provide, timing the fade out at the root's motion level.
 pub fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
-    let scope = use_hook(current_scope_id);
-    use_context_provider(|| HoverHub {
-        intent: Signal::new(HoverIntent::default()),
-        leaving: Signal::new(None),
-        peeked: Signal::new(None),
-        open_timer: Signal::new(None),
-        close_timer: Signal::new(None),
-        warm_tick: Signal::new(0),
+    let fades = Fades {
+        leaving: use_signal(|| None),
+        peeked: use_signal(|| None),
+        warm_tick: use_signal(|| 0),
         env,
-        scope,
-    })
+        scope: use_hook(current_scope_id),
+    };
+    let machine = use_machine(
+        |_| HoverIntent::default(),
+        (),
+        || (),
+        move |effect, _| {
+            let _ = fades.apply(effect);
+        },
+    );
+    use_context_provider(|| HoverHub { machine, fades })
 }
 
 /// The enclosing `Ds`'s hover manager.

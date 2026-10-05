@@ -3,20 +3,24 @@ use super::{
     release_speed, shaped,
 };
 use ds_core::geometry::units::Px;
+use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
 fn at(ms: u64) -> Stamp {
     Stamp(ms)
 }
 
+/// One input at a time in ms.
+type Timed = (u64, I);
+
 /// Run `inputs` from rest; the state and every effect along the way.
-fn run(inputs: &[I]) -> (SwipeState, Vec<SwipeEffect>) {
+fn run(inputs: &[Timed]) -> (SwipeState, Vec<SwipeEffect>) {
     let metrics = SwipeMetrics::default();
     inputs.iter().fold(
         (SwipeState::default(), Vec::new()),
-        |(state, mut effects), &input| {
-            let (next, effect) = state.step(input, metrics);
-            effects.push(effect);
+        |(state, mut effects), &(ms, input)| {
+            let (next, out) = state.step(input, at(ms), &metrics, &());
+            effects.extend(out);
             (next, effects)
         },
     )
@@ -33,103 +37,104 @@ fn a_drag_follows_right_and_a_quarter_left() {
         (100.5, 0.5),
     ];
     for &(to, want) in cases {
-        let (state, _) = run(&[
-            I::Down {
-                x: Px(100.0),
-                at: at(0),
-            },
-            I::Move {
-                x: Px(to),
-                at: at(200),
-            },
-        ]);
+        let (state, _) = run(&[(0, I::Down { x: Px(100.0) }), (200, I::Move { x: Px(to) })]);
         assert_eq!(state.offset(), Px(want), "to {to}");
         assert_eq!(state.look(), SwipeLook::Live, "to {to}");
     }
 }
 
+/// A release case: its name, the inputs, and the look, offset and last effect they end with.
+type ReleaseCase<'a> = (&'a str, &'a [Timed], SwipeLook, Px, Option<SwipeEffect>);
+
 #[test]
 fn a_release_springs_back_under_both_thresholds_and_flies_out_past_either() {
     #[rustfmt::skip]
-    let cases: &[(&str, &[I], SwipeLook, Px, SwipeEffect)] = &[
+    let cases: &[ReleaseCase<'_>] = &[
         // Slowly to 40 px: back to its place.
         ("slow and short", &[
-            I::Down { x: Px(0.0), at: at(0) },
-            I::Move { x: Px(20.0), at: at(100) },
-            I::Move { x: Px(40.0), at: at(200) },
-            I::Up { at: at(210) },
-        ], SwipeLook::Rest, Px(0.0), SwipeEffect::None),
+            (0, I::Down { x: Px(0.0) }),
+            (100, I::Move { x: Px(20.0) }),
+            (200, I::Move { x: Px(40.0) }),
+            (210, I::Up),
+        ], SwipeLook::Rest, Px(0.0), None),
         // Slowly past 80 px: dismissed from where it is.
         ("slow and far", &[
-            I::Down { x: Px(0.0), at: at(0) },
-            I::Move { x: Px(50.0), at: at(200) },
-            I::Move { x: Px(90.0), at: at(400) },
-            I::Up { at: at(410) },
-        ], SwipeLook::Gone, Px(90.0), SwipeEffect::Dismiss),
+            (0, I::Down { x: Px(0.0) }),
+            (200, I::Move { x: Px(50.0) }),
+            (400, I::Move { x: Px(90.0) }),
+            (410, I::Up),
+        ], SwipeLook::Gone, Px(90.0), Some(SwipeEffect::Dismiss)),
         // A flick: 30 px in 20 ms is 1500 px/s.
         ("a flick", &[
-            I::Down { x: Px(0.0), at: at(0) },
-            I::Move { x: Px(10.0), at: at(10) },
-            I::Move { x: Px(40.0), at: at(30) },
-            I::Up { at: at(35) },
-        ], SwipeLook::Gone, Px(40.0), SwipeEffect::Dismiss),
+            (0, I::Down { x: Px(0.0) }),
+            (10, I::Move { x: Px(10.0) }),
+            (30, I::Move { x: Px(40.0) }),
+            (35, I::Up),
+        ], SwipeLook::Gone, Px(40.0), Some(SwipeEffect::Dismiss)),
         // The same flick, held still for 150 ms before the release: no fling.
         ("a flick held", &[
-            I::Down { x: Px(0.0), at: at(0) },
-            I::Move { x: Px(10.0), at: at(10) },
-            I::Move { x: Px(40.0), at: at(30) },
-            I::Up { at: at(180) },
-        ], SwipeLook::Rest, Px(0.0), SwipeEffect::None),
+            (0, I::Down { x: Px(0.0) }),
+            (10, I::Move { x: Px(10.0) }),
+            (30, I::Move { x: Px(40.0) }),
+            (180, I::Up),
+        ], SwipeLook::Rest, Px(0.0), None),
         // A fast flick leftwards never dismisses.
         ("left", &[
-            I::Down { x: Px(200.0), at: at(0) },
-            I::Move { x: Px(100.0), at: at(10) },
-            I::Move { x: Px(0.0), at: at(20) },
-            I::Up { at: at(21) },
-        ], SwipeLook::Rest, Px(0.0), SwipeEffect::None),
+            (0, I::Down { x: Px(200.0) }),
+            (10, I::Move { x: Px(100.0) }),
+            (20, I::Move { x: Px(0.0) }),
+            (21, I::Up),
+        ], SwipeLook::Rest, Px(0.0), None),
     ];
     for (name, inputs, look, offset, effect) in cases {
         let (state, effects) = run(inputs);
         assert_eq!(state.look(), *look, "{name}");
         assert_eq!(state.offset(), *offset, "{name}");
-        assert_eq!(effects.last(), Some(effect), "{name}");
+        assert_eq!(effects.last(), effect.as_ref(), "{name}");
     }
 }
 
 /// A scroll case: its name, the inputs, and the look, offset and effects they end with.
-type ScrollCase<'a> = (&'a str, &'a [I], SwipeLook, Px, &'a [SwipeEffect]);
+type ScrollCase<'a> = (&'a str, &'a [Timed], SwipeLook, Px, &'a [SwipeEffect]);
 
 #[test]
 fn a_scroll_is_summed_and_decided_when_it_goes_quiet() {
+    let scroll = |dx: f32, dy: f32| I::Scroll {
+        dx: Px(dx),
+        dy: Px(dy),
+    };
     #[rustfmt::skip]
     let cases: &[ScrollCase<'_>] = &[
         ("far", &[
-            I::Scroll { dx: Px(30.0), dy: Px(0.0) },
-            I::Scroll { dx: Px(30.0), dy: Px(2.0) },
-            I::Scroll { dx: Px(30.0), dy: Px(0.0) },
-            I::Quiet,
-        ], SwipeLook::Gone, Px(90.0), &[SwipeEffect::ArmQuiet, SwipeEffect::ArmQuiet, SwipeEffect::ArmQuiet, SwipeEffect::Dismiss]),
+            (0, scroll(30.0, 0.0)),
+            (40, scroll(30.0, 2.0)),
+            (80, scroll(30.0, 0.0)),
+            (80 + QUIET, I::Elapsed),
+        ], SwipeLook::Gone, Px(90.0), &[SwipeEffect::Dismiss]),
         ("short", &[
-            I::Scroll { dx: Px(30.0), dy: Px(0.0) },
-            I::Scroll { dx: Px(20.0), dy: Px(0.0) },
-            I::Quiet,
-        ], SwipeLook::Rest, Px(0.0), &[SwipeEffect::ArmQuiet, SwipeEffect::ArmQuiet, SwipeEffect::None]),
+            (0, scroll(30.0, 0.0)),
+            (40, scroll(20.0, 0.0)),
+            (40 + QUIET, I::Elapsed),
+        ], SwipeLook::Rest, Px(0.0), &[]),
+        // A wake before the quiet spell is over decides nothing.
+        ("early", &[
+            (0, scroll(100.0, 0.0)),
+            (QUIET - 1, I::Elapsed),
+        ], SwipeLook::Live, Px(100.0), &[]),
         // Mostly vertical deltas are the list's to scroll: they move nothing.
         ("vertical", &[
-            I::Scroll { dx: Px(4.0), dy: Px(30.0) },
-            I::Scroll { dx: Px(-4.0), dy: Px(30.0) },
-        ], SwipeLook::Rest, Px(0.0), &[SwipeEffect::None, SwipeEffect::None]),
+            (0, scroll(4.0, 30.0)),
+            (10, scroll(-4.0, 30.0)),
+        ], SwipeLook::Rest, Px(0.0), &[]),
         // Leftwards, damped like a drag.
-        ("left", &[
-            I::Scroll { dx: Px(-40.0), dy: Px(0.0) },
-        ], SwipeLook::Live, Px(-10.0), &[SwipeEffect::ArmQuiet]),
+        ("left", &[(0, scroll(-40.0, 0.0))], SwipeLook::Live, Px(-10.0), &[]),
         // Gone, it takes nothing more.
         ("after", &[
-            I::Scroll { dx: Px(100.0), dy: Px(0.0) },
-            I::Quiet,
-            I::Scroll { dx: Px(10.0), dy: Px(0.0) },
-            I::Down { x: Px(0.0), at: at(0) },
-        ], SwipeLook::Gone, Px(100.0), &[SwipeEffect::ArmQuiet, SwipeEffect::Dismiss, SwipeEffect::None, SwipeEffect::None]),
+            (0, scroll(100.0, 0.0)),
+            (QUIET, I::Elapsed),
+            (QUIET + 10, scroll(10.0, 0.0)),
+            (QUIET + 20, I::Down { x: Px(0.0) }),
+        ], SwipeLook::Gone, Px(100.0), &[SwipeEffect::Dismiss]),
     ];
     for (name, inputs, look, offset, effects) in cases {
         let (state, seen) = run(inputs);
@@ -139,30 +144,53 @@ fn a_scroll_is_summed_and_decided_when_it_goes_quiet() {
     }
 }
 
+/// The quiet spell, in ms (`DelayToken::SwipeQuiet`).
+const QUIET: u64 = 120;
+
+#[test]
+fn a_scroll_wakes_the_machine_a_quiet_spell_after_the_last_delta() {
+    let metrics = SwipeMetrics::default();
+    let scrolled = |ms| {
+        SwipeState::default()
+            .step(
+                I::Scroll {
+                    dx: Px(10.0),
+                    dy: Px(0.0),
+                },
+                at(ms),
+                &metrics,
+                &(),
+            )
+            .0
+    };
+    assert_eq!(scrolled(0).wake(), Some(at(QUIET)));
+    assert_eq!(scrolled(500).wake(), Some(at(500 + QUIET)));
+    assert_eq!(SwipeState::default().wake(), None, "at rest: no timer");
+    let (decided, _) = scrolled(0).step(I::from(Elapsed), at(QUIET), &metrics, &());
+    assert_eq!(decided.wake(), None);
+}
+
 #[test]
 fn a_drag_swallows_the_click_that_ends_it_and_a_press_does_not() {
     #[rustfmt::skip]
-    let cases: &[(&str, &[I], Click)] = &[
+    let cases: &[(&str, &[Timed], Click)] = &[
         ("a press", &[
-            I::Down { x: Px(10.0), at: at(0) },
-            I::Move { x: Px(11.0), at: at(10) },
-            I::Up { at: at(20) },
+            (0, I::Down { x: Px(10.0) }),
+            (10, I::Move { x: Px(11.0) }),
+            (20, I::Up),
         ], Click::Passes),
         ("a drag back to where it began", &[
-            I::Down { x: Px(10.0), at: at(0) },
-            I::Move { x: Px(40.0), at: at(100) },
-            I::Move { x: Px(10.0), at: at(300) },
-            I::Up { at: at(400) },
+            (0, I::Down { x: Px(10.0) }),
+            (100, I::Move { x: Px(40.0) }),
+            (300, I::Move { x: Px(10.0) }),
+            (400, I::Up),
         ], Click::Swallowed),
     ];
     for (name, inputs, want) in cases {
         let (state, _) = run(inputs);
         assert_eq!(state.click(), *want, "{name}");
-        assert_eq!(
-            state.clicked().click(),
-            Click::Passes,
-            "{name}: one click only"
-        );
+        let (after, _) = state.step(I::Clicked, at(500), &SwipeMetrics::default(), &());
+        assert_eq!(after.click(), Click::Passes, "{name}: one click only");
     }
 }
 

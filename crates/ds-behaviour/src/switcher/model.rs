@@ -1,22 +1,23 @@
 //! The switcher's state, inputs, outputs and timing.
 
+use std::marker::PhantomData;
 use std::time::Duration;
 
+use ds_core::machine::Elapsed;
 use ds_core::time::stamp::Stamp;
 
 use crate::dir::Dir;
 
-/// The switcher's phase. `sel` indexes the MRU app list passed to every
-/// [`step`](super::step).
+/// The switcher's phase. `sel` indexes the MRU app list the caller provides at every step.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
-pub enum Switcher {
+pub enum Phase {
     /// Nothing held.
     #[default]
     Hidden,
     /// The chord is down and the panel is not shown yet.
     Armed {
-        /// When the chord went down; the panel shows at `since` plus the show delay.
-        since: Stamp,
+        /// When the panel shows: the chord's time plus the show delay.
+        until: Stamp,
         /// The app the release would activate.
         sel: usize,
     },
@@ -25,6 +26,60 @@ pub enum Switcher {
         /// The highlighted app.
         sel: usize,
     },
+}
+
+/// The switcher machine over the caller's app key `K`: its [`Phase`]. `K` appears only in the
+/// outputs and in the app list the caller provides as the step's context (the current app first),
+/// so the compositor runs it over its own app ids and the shell over its launcher's.
+pub struct Switcher<K> {
+    pub(crate) phase: Phase,
+    keys: PhantomData<fn() -> K>,
+}
+
+impl<K> Switcher<K> {
+    /// A switcher in `phase`.
+    pub fn in_phase(phase: Phase) -> Self {
+        Switcher {
+            phase,
+            keys: PhantomData,
+        }
+    }
+
+    /// A switcher with nothing held.
+    pub fn hidden() -> Self {
+        Switcher::in_phase(Phase::Hidden)
+    }
+
+    /// Where it is.
+    pub fn phase(&self) -> Phase {
+        self.phase
+    }
+}
+
+impl<K> Clone for Switcher<K> {
+    fn clone(&self) -> Self {
+        Switcher::in_phase(self.phase)
+    }
+}
+
+impl<K> PartialEq for Switcher<K> {
+    fn eq(&self, other: &Self) -> bool {
+        self.phase == other.phase
+    }
+}
+
+impl<K> Eq for Switcher<K> {}
+
+impl<K> std::fmt::Debug for Switcher<K> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Switcher").field(&self.phase).finish()
+    }
+}
+
+impl<K> Default for Switcher<K> {
+    fn default() -> Self {
+        Switcher::hidden()
+    }
 }
 
 /// A key pressed while the switcher is up.
@@ -65,8 +120,15 @@ pub enum SwIn {
     Hover(usize),
     /// The app at this index in the panel was clicked.
     Click(usize),
-    /// The tick the machine asked for with [`SwOut::RequestTick`] came due.
-    Tick,
+    /// The deadline asked for by `wake` came due, or the caller's app list changed and the
+    /// machine should look again (no apps hides the panel).
+    Elapsed,
+}
+
+impl From<Elapsed> for SwIn {
+    fn from(_: Elapsed) -> SwIn {
+        SwIn::Elapsed
+    }
 }
 
 /// One thing the caller must do. `K` is the caller's app key.
@@ -86,8 +148,6 @@ pub enum SwOut<K> {
     HideApp(K),
     /// Open App Exposé for the app.
     Expose(K),
-    /// Step the machine with [`SwIn::Tick`] at this time.
-    RequestTick(Stamp),
 }
 
 /// The switcher's timing (`switcher.show_delay_ms`).

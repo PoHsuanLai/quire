@@ -2,7 +2,7 @@
 //! origin the caller keeps, and the clock that makes them.
 
 use serde::{Deserialize, Serialize};
-use std::time::Instant;
+use std::time::{Duration, Instant};
 
 /// A monotonic instant in whole milliseconds since an arbitrary origin (a daemon's or a hook's
 /// start). Machines take it as an argument and never read a clock; only the code that feeds a
@@ -25,6 +25,11 @@ impl Stamp {
     /// `self` plus `ms` milliseconds.
     pub fn after(self, ms: u64) -> Stamp {
         Stamp(self.0.saturating_add(ms))
+    }
+
+    /// `self` plus `span`, in whole milliseconds, saturating: a configured delay as a deadline.
+    pub fn after_span(self, span: Duration) -> Stamp {
+        self.after(u64::try_from(span.as_millis()).unwrap_or(u64::MAX))
     }
 }
 

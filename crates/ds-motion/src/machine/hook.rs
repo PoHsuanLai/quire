@@ -43,6 +43,7 @@ pub fn use_machine_in<M: Machine>(
     handler.set(Box::new(on_out));
     let machine = MachineRef {
         held,
+        read: use_hook(|| held.state.into()),
         params: wanted,
         ctx: reader,
         on_out: handler,

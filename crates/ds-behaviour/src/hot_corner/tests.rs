@@ -2,93 +2,156 @@
 
 use std::time::Duration;
 
-use super::{CornerIn, CornerMachine, CornerOut, CornerParams, Inside, Phase, Rearm, Token, step};
+use ds_core::machine::Machine;
+use ds_core::time::stamp::Stamp;
+
+use super::{Corner, CornerIn, CornerOut, CornerParams, Inside, Rearm};
 
 const PLAIN: CornerParams = CornerParams {
     dwell: Duration::from_millis(150),
     rearm: Duration::from_millis(500),
 };
 
-const DWELL: Duration = Duration::from_millis(150);
-const REARM: Duration = Duration::from_millis(500);
-
-fn at(phase: Phase, next: u32) -> CornerMachine {
-    CornerMachine {
-        phase,
-        next: Token(next),
-    }
-}
+/// Name, state before, input, time, state after, outputs, next wake.
+type Case = (
+    &'static str,
+    Corner,
+    CornerIn,
+    u64,
+    Corner,
+    Vec<CornerOut>,
+    Option<Stamp>,
+);
 
 #[test]
 fn the_corner_follows_its_table() {
     use CornerIn::*;
-    let spent = |pointer, rearm| Phase::Spent { pointer, rearm };
-    let cases: Vec<(&str, CornerMachine, CornerIn, CornerMachine, Vec<CornerOut>)> = vec![
+    let dwelling = |t| Corner::Dwelling { until: Stamp(t) };
+    let running = |t| Rearm::Running { until: Stamp(t) };
+    let spent = |pointer, rearm| Corner::Spent { pointer, rearm };
+    let cases: Vec<Case> = vec![
         (
             "entering an armed corner starts the dwell",
-            at(Phase::Armed, 0),
+            Corner::Armed,
             Enter,
-            at(Phase::Dwelling(Token(0)), 1),
-            vec![CornerOut::StartDwell(Token(0), DWELL)],
+            1000,
+            dwelling(1150),
+            vec![],
+            Some(Stamp(1150)),
         ),
         (
-            "leaving while dwelling re-arms",
-            at(Phase::Dwelling(Token(0)), 1),
+            "leaving while dwelling re-arms and stops the timer",
+            dwelling(1150),
             Leave,
-            at(Phase::Armed, 1),
+            1100,
+            Corner::Armed,
             vec![],
+            None,
         ),
         (
-            "a stale dwell does nothing",
-            at(Phase::Armed, 1),
-            DwellElapsed(Token(0)),
-            at(Phase::Armed, 1),
+            "a wake before the dwell is due does nothing",
+            dwelling(1150),
+            Elapsed,
+            1149,
+            dwelling(1150),
             vec![],
+            Some(Stamp(1150)),
+        ),
+        (
+            "an elapsed with nothing running does nothing",
+            Corner::Armed,
+            Elapsed,
+            1200,
+            Corner::Armed,
+            vec![],
+            None,
         ),
         (
             "the dwell running out fires and starts the re-arm",
-            at(Phase::Dwelling(Token(0)), 1),
-            DwellElapsed(Token(0)),
-            at(spent(Inside::In, Rearm::Running(Token(1))), 2),
-            vec![CornerOut::Fire, CornerOut::StartRearm(Token(1), REARM)],
+            dwelling(1150),
+            Elapsed,
+            1150,
+            spent(Inside::In, running(1650)),
+            vec![CornerOut::Fire],
+            Some(Stamp(1650)),
         ),
         (
             "the re-arm running out with the pointer in only marks it over",
-            at(spent(Inside::In, Rearm::Running(Token(1))), 2),
-            RearmElapsed(Token(1)),
-            at(spent(Inside::In, Rearm::Over), 2),
+            spent(Inside::In, running(1650)),
+            Elapsed,
+            1650,
+            spent(Inside::In, Rearm::Over),
             vec![],
+            None,
         ),
         (
             "leaving after the re-arm is over arms the corner",
-            at(spent(Inside::In, Rearm::Over), 2),
+            spent(Inside::In, Rearm::Over),
             Leave,
-            at(Phase::Armed, 2),
+            1700,
+            Corner::Armed,
             vec![],
+            None,
         ),
         (
             "leaving while the re-arm runs only notes the pointer is out",
-            at(spent(Inside::In, Rearm::Running(Token(1))), 2),
+            spent(Inside::In, running(1650)),
             Leave,
-            at(spent(Inside::Out, Rearm::Running(Token(1))), 2),
+            1300,
+            spent(Inside::Out, running(1650)),
             vec![],
+            Some(Stamp(1650)),
         ),
         (
             "entering while spent only notes the pointer is in",
-            at(spent(Inside::Out, Rearm::Running(Token(1))), 2),
+            spent(Inside::Out, running(1650)),
             Enter,
-            at(spent(Inside::In, Rearm::Running(Token(1))), 2),
+            1400,
+            spent(Inside::In, running(1650)),
             vec![],
+            Some(Stamp(1650)),
         ),
         (
             "the re-arm running out with the pointer out arms the corner",
-            at(spent(Inside::Out, Rearm::Running(Token(1))), 2),
-            RearmElapsed(Token(1)),
-            at(Phase::Armed, 2),
+            spent(Inside::Out, running(1650)),
+            Elapsed,
+            1650,
+            Corner::Armed,
             vec![],
+            None,
+        ),
+        (
+            "a wake before the re-arm is due does nothing",
+            spent(Inside::Out, running(1650)),
+            Elapsed,
+            1649,
+            spent(Inside::Out, running(1650)),
+            vec![],
+            Some(Stamp(1650)),
         ),
     ];
-    for (name, from, input, want, outs) in cases {
-        assert_eq!(step(from, input, PLAIN), (want, outs), "{name}");
+    for (name, from, input, at, want, outs, wake) in cases {
+        let (next, out) = from.step(input, Stamp(at), &PLAIN, &());
+        assert_eq!((next, out), (want, outs), "{name}");
+        assert_eq!(next.wake(), wake, "{name}: wake");
     }
+}
+
+#[test]
+fn a_second_dwell_after_a_full_cycle_fires_again() {
+    let script = [
+        (0, CornerIn::Enter),
+        (150, CornerIn::Elapsed),
+        (200, CornerIn::Leave),
+        (650, CornerIn::Elapsed),
+        (700, CornerIn::Enter),
+        (850, CornerIn::Elapsed),
+    ];
+    let (_, fired) = script
+        .iter()
+        .fold((Corner::Armed, 0), |(state, fired), &(at, input)| {
+            let (next, outs) = state.step(input, Stamp(at), &PLAIN, &());
+            (next, fired + outs.len())
+        });
+    assert_eq!(fired, 2, "once per rest in the corner");
 }
