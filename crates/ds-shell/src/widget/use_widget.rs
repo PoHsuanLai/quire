@@ -1,16 +1,16 @@
 //! `use_widget`: the entry a widget shows now, from its provider's timeline (design/23-WIDGETS.md
 //! section 9.2). The hook reads the design system's clock, so on a test's virtual clock the
 //! entries change exactly when the test advances past their dates. It wakes only for what the
-//! timeline holds (the next entry's date, the refresh) and sleeps on nothing else: a widget whose
-//! provider pushes one entry at a time costs no frame between pushes (the idle-frame rule).
+//! timeline holds (the next entry's date, the refresh), as the [`Follower`] machine's wake, and
+//! sleeps on nothing else: a widget whose provider pushes one entry at a time costs no frame
+//! between pushes (the idle-frame rule).
 
 use crate::widget::contract::{Widget, fit};
+use crate::widget::follow::{FollowIn, Follower};
 use crate::widget::kind::WidgetSize;
-use crate::widget::timeline::{RefreshAsk, Timeline, Wake};
-use dioxus::core::{Task, current_scope_id};
+use crate::widget::timeline::{RefreshAsk, Timeline};
 use dioxus::prelude::*;
-use ds_style::task::{spawn_in, try_get, try_set};
-use std::time::Instant;
+use ds_motion::machine::{use_machine_in, use_machine_state};
 
 /// The entry `W` shows now from `timeline` at `size`: the timeline's current entry, or `W`'s
 /// placeholder before its first. On each entry's date the caller re-renders with the next; when
@@ -21,70 +21,25 @@ pub fn use_widget<W: Widget>(
     size: WidgetSize,
     onrefresh: Option<EventHandler<RefreshAsk>>,
 ) -> W::Entry {
-    let tick = use_signal(|| 0_u64);
-    // Read so that the task's write re-renders the caller.
-    let _ = tick();
-    let scope = use_hook(current_scope_id);
-    let mut armed = use_hook(|| CopyValue::new(None::<Armed<W::Entry>>));
-    let fresh = armed
-        .peek()
-        .as_ref()
-        .is_none_or(|was| was.timeline != *timeline);
-    if fresh {
-        if let Some(was) = armed.write().take() {
-            was.task.cancel();
-        }
-        let task = spawn_in(
-            scope,
-            follow(
-                timeline.clone(),
-                ds_core::time::clock::now(),
-                tick,
-                onrefresh,
-            ),
-        );
-        armed.set(Some(Armed {
-            timeline: timeline.clone(),
-            task,
-        }));
+    let held = use_machine_state(|_| Follower::<W::Entry>::idle());
+    let clock = held.clock;
+    let follower = use_machine_in(
+        held,
+        (),
+        move || clock,
+        move |ask, _| {
+            if let Some(handler) = onrefresh {
+                handler.call(ask);
+            }
+        },
+    );
+    if !follower.state().peek().follows(timeline) {
+        follower.send_from_render(FollowIn::Arrive(timeline.clone()));
     }
+    // Read so that each wake, which changes the state, re-renders the caller.
+    let _ = follower.state().read();
     timeline
         .current(ds_core::time::clock::now())
         .cloned()
         .unwrap_or_else(|| W::placeholder(fit::<W>(size)))
-}
-
-/// The timeline being followed, and the task following it.
-struct Armed<E> {
-    timeline: Timeline<E>,
-    task: Task,
-}
-
-/// Sleep to each wake the timeline names after `arrived`, re-rendering at each; at the refresh,
-/// ask once and stop (the answer is a new timeline, which starts a new follower).
-async fn follow<E: 'static>(
-    timeline: Timeline<E>,
-    arrived: Instant,
-    tick: Signal<u64>,
-    onrefresh: Option<EventHandler<RefreshAsk>>,
-) {
-    loop {
-        let now = ds_core::time::clock::now();
-        let Some(wake) = timeline.next_wake(now, arrived) else {
-            return;
-        };
-        ds_core::time::clock::sleep(wake.at().saturating_duration_since(now)).await;
-        let Ok(count) = try_get(tick) else {
-            return;
-        };
-        if try_set(tick, count.wrapping_add(1)).is_err() {
-            return;
-        }
-        if let Wake::Refresh(_, ask) = wake {
-            if let Some(handler) = onrefresh {
-                handler.call(ask);
-            }
-            return;
-        }
-    }
 }
