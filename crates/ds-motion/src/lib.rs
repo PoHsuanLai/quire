@@ -13,6 +13,8 @@ pub mod entrance;
 pub mod hover_intent;
 pub mod kit;
 pub mod long_press;
+#[cfg(feature = "dioxus")]
+pub mod machine;
 pub mod pane_slide;
 pub mod presence;
 pub mod projection;

@@ -111,8 +111,15 @@ impl Machine for HoldKey {
     type In = HoldIn;
     type Out = HoldOut;
     type Params = HoldParams;
+    type Ctx = ();
 
-    fn step(self, input: HoldIn, at: Stamp, params: &HoldParams) -> (HoldKey, Vec<HoldOut>) {
+    fn step(
+        self,
+        input: HoldIn,
+        at: Stamp,
+        params: &HoldParams,
+        _: &(),
+    ) -> (HoldKey, Vec<HoldOut>) {
         match (self, input) {
             (HoldKey::Rest, HoldIn::Edge(KeyEdge::CommandDown)) => silent(down(at, params)),
             (HoldKey::Down { until }, HoldIn::Edge(KeyEdge::CommandUp)) if at < until => {

@@ -39,8 +39,9 @@ impl Machine for Swipe {
     type In = SwipeIn;
     type Out = SwipeOut;
     type Params = SwipeParams;
+    type Ctx = ();
 
-    fn step(self, input: SwipeIn, at: Stamp, params: &SwipeParams) -> Step {
+    fn step(self, input: SwipeIn, at: Stamp, params: &SwipeParams, _: &()) -> Step {
         match self {
             Swipe::Idle { at: shown } => idle(shown, input, at, params),
             Swipe::Tracking {

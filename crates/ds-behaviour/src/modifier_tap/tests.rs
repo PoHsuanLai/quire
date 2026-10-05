@@ -26,12 +26,12 @@ type Case<M, I, O> = (&'static str, M, I, u64, M, &'static [O], Option<Stamp>);
 
 fn check<M>(cases: &[Case<M, M::In, M::Out>], params: &M::Params)
 where
-    M: Machine + std::fmt::Debug,
+    M: Machine<Ctx = ()> + std::fmt::Debug,
     M::In: Copy,
     M::Out: PartialEq + std::fmt::Debug,
 {
     for (name, from, input, at, state, outs, wake) in cases {
-        let (next, out) = from.clone().step(*input, Stamp(*at), params);
+        let (next, out) = from.clone().step(*input, Stamp(*at), params, &());
         assert_eq!(next, *state, "{name}: state");
         assert_eq!(out.as_slice(), *outs, "{name}: outputs");
         assert_eq!(next.wake(), *wake, "{name}: wake");
@@ -97,11 +97,11 @@ fn two_lone_presses_summon_and_a_chord_does_not() {
         let (_, _, count) = edges.iter().fold(
             (HoldKey::Rest, Tap::Rest, 0),
             |(hold, tap, count), &(at, edge)| {
-                let (hold, outs) = hold.step(HoldIn::Edge(edge), Stamp(at), &HOLD);
+                let (hold, outs) = hold.step(HoldIn::Edge(edge), Stamp(at), &HOLD, &());
                 let (tap, summoned) = outs.into_iter().filter(|o| *o == HoldOut::Tap).fold(
                     (tap, 0),
                     |(tap, n), _| {
-                        let (tap, outs) = tap.step(TapIn::Tap, Stamp(at), &TAP);
+                        let (tap, outs) = tap.step(TapIn::Tap, Stamp(at), &TAP, &());
                         (tap, n + outs.len())
                     },
                 );
