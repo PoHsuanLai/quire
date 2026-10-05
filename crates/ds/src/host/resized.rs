@@ -1,6 +1,7 @@
 //! That the window's size or scale changed: a counter the host bumps, so a hook that measured an
 //! element can measure it again. Layout follows the event by a frame, so a reader waits that
-//! frame before it reads (`measure::use_rect` does).
+//! frame before it reads (the read `layout::use_layout` falls back to when the host runs no frame
+//! phase does; with a phase, the host publishes the rect after the layout that followed).
 
 use dioxus::prelude::*;
 

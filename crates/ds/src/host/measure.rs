@@ -1,17 +1,21 @@
-//! Measuring a mounted element, the one layout read the design system does.
+//! Measuring a mounted element: the rect a component keeps ([`use_rect`], fed by the host's frame
+//! phase through [`use_layout`](crate::host::layout::use_layout)) and the one-shot async read
+//! ([`client_rect`]) that a host with no phase, and a few waits that have not moved onto the
+//! phase, use.
 //!
 //! Two phases (spike S9): `get_client_rect` inside `onmounted` returns 0 x 0, and is right only
-//! after the next resolve. So the `onmounted` handler only keeps the element; the rect is read
-//! on the following frame, never inside the handler.
+//! after the next resolve. So the `onmounted` handler only keeps the element; the rect is
+//! published after layout (or, with no phase, read on the following frame), never inside the
+//! handler.
 //!
-//! Every read goes through [`client_rect`]. On dioxus-native, `get_client_rect` borrows the
+//! Every one-shot read goes through [`client_rect`]. On dioxus-native, `get_client_rect` borrows the
 //! document mutably, and a task woken in the same turn as a dirty scope is polled inside
 //! `render_immediate` while the renderer already holds that borrow: the read would panic
 //! ("RefCell already borrowed"). The host's [`GeometryHost::measure`](crate::host::parts::GeometryHost::measure)
 //! answers [`Measured::Busy`] instead, and the read waits a frame.
 
 use crate::host::document::use_document_host;
-use crate::host::resized::WindowResized;
+use crate::host::layout::use_layout_into;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Rect};
 use ds_core::time::{FRAME_SLACK, clock::sleep};
@@ -81,23 +85,16 @@ pub struct RectProbe {
 }
 
 impl RectProbe {
-    /// The last measured rect, or `None` before the element mounted.
+    /// The last rect the host published, or `None` before the element mounted and was laid out.
     pub fn rect(&self) -> Option<Rect> {
         (self.rect)()
     }
 
-    /// Hand this the element's `onmounted` event. It keeps the element and schedules the read
-    /// for the next frame; it does not measure.
+    /// Hand this the element's `onmounted` event. It keeps the element; the host publishes its
+    /// rect from then on ([`use_layout`](crate::host::layout::use_layout)).
     pub fn on_mounted(&self, event: Event<MountedData>) {
-        let element = MountedRef(event.data());
         let mut mounted = self.mounted;
-        let mut rect = self.rect;
-        mounted.set(Some(element.clone()));
-        spawn(async move {
-            if let Some(read) = read_after_layout(&element).await {
-                rect.set(Some(read));
-            }
-        });
+        mounted.set(Some(MountedRef(event.data())));
     }
 
     /// Read the element's rect again, now: layout may have moved it since its first read (a
@@ -117,33 +114,14 @@ impl RectProbe {
     }
 }
 
-/// A probe for one element's rect.
-///
-/// The rect is read again after each change of the window's size or scale (`WindowResized`, where
-/// the host provides it), so an element that follows the window reports where it is now.
+/// A probe for one element's rect, kept by the host's frame phase: it follows the element through
+/// every layout that moves or resizes it, the window's resize included.
 pub fn use_rect() -> RectProbe {
     let probe = RectProbe {
         rect: use_signal(|| None),
         mounted: use_signal(|| None),
     };
-    let resized = try_consume_context::<WindowResized>();
-    use_effect(move || {
-        let changes = resized.map_or(0, |resized| resized.count());
-        let Some(element) = (probe.mounted)() else {
-            return;
-        };
-        if changes == 0 {
-            return;
-        }
-        let mut rect = probe.rect;
-        spawn(async move {
-            // The window's layout follows its resize by a frame; wait it out before reading.
-            sleep(FRAME_SLACK).await;
-            if let Some(read) = read_after_layout(&element).await {
-                rect.set(Some(read));
-            }
-        });
-    });
+    use_layout_into(probe.mounted.into(), probe.rect);
     probe
 }
 
@@ -152,7 +130,7 @@ const READ_ATTEMPTS: usize = 3;
 
 /// The element's rect once layout has run: wait a frame, read, and read again a frame later
 /// while the renderer still answers 0 x 0 (spike S9). `None` when the renderer cannot measure.
-async fn read_after_layout(element: &MountedRef) -> Option<Rect> {
+pub(crate) async fn read_after_layout(element: &MountedRef) -> Option<Rect> {
     let mut last = None;
     for _ in 0..READ_ATTEMPTS {
         sleep(FRAME_SLACK).await;

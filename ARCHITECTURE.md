@@ -241,6 +241,7 @@ The single place a concept lives. Extend it; never write a second one.
 | What a state change means (moments) | `ds-motion::details::Detailed` |
 | Stylesheet and markup linting | `ds-lint` |
 | The document seam (focus, caret, geometry, edit, drop) | `ds::host::DocumentHost` |
+| A mounted element's rect, kept current | `ds::host::layout::use_layout` (typed `MountedRef` in, `ReadSignal<Option<Rect>>` out); `ds::host::measure::use_rect` is the probe over it |
 | What a component asks the host to publish after layout, and the writes it queues for it | `ds::host::phase` (`Observe`, `Watch`, `PhaseWrite`) through `GeometryHost::{observe, write}`; the step is `ds-blitz::phase::Phase`, run by the window loop after each frame and by the harness after each layout |
 | Focus hooks, focus requests | `ds::focus` |
 | Text editing surface | `ds::editor::EditSurface`; host half `ds-blitz::edit` |
