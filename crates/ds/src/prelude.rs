@@ -111,6 +111,7 @@ pub use crate::components::lists::section_header::SectionHeader;
 
 // Spaces
 pub use crate::components::app::space_editor::SpaceEditor;
+pub use crate::components::app::space_editor::colour::SpaceColour;
 pub use crate::components::app::space_editor::dot::SpaceDot;
 
 // Chrome

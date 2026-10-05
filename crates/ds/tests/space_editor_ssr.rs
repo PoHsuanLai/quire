@@ -131,6 +131,11 @@ const CASES: &[Case] = &[
         state: "frameless",
         make: || rsx! { SpaceEditor { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(0), onchange: |_| {}, frame: EditorFrame::Frameless } },
     },
+    // SpaceColour: the colour half alone, unframed for a popover.
+    Case {
+        state: "colour",
+        make: || rsx! { SpaceColour { look: preset_look(0, Grain(35)), scheme: Scheme::Light, active_dot: DotIndex(1), onchange: |_| {} } },
+    },
     // SpaceDot.
     Case {
         state: "space-dot-current",
