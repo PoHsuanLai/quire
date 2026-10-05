@@ -6,6 +6,8 @@
 use std::ffi::OsString;
 use std::path::PathBuf;
 
+use crate::xdg;
+
 /// The directory name a program's files live under: `quire`, `sill`, `mailo`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct AppName(pub &'static str);
@@ -20,8 +22,9 @@ impl AppName {
 /// The tree every program's config directory sits in.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ConfigRoot {
-    /// The person's own: `$XDG_CONFIG_HOME`, else `$HOME/.config`. The one place this crate
-    /// reads the environment.
+    /// The person's own: `$XDG_CONFIG_HOME`, else `$HOME/.config`, by the XDG rules in
+    /// `crate::xdg` (an empty or relative value is ignored). The one place this crate reads
+    /// the environment for the config directory.
     Xdg,
     /// A directory standing in for `$XDG_CONFIG_HOME`: a test's scratch directory, a dev
     /// script's private home.
@@ -44,10 +47,8 @@ impl ConfigRoot {
 }
 
 fn xdg_dir(app: AppName, xdg: Option<OsString>, home: Option<OsString>) -> Option<PathBuf> {
-    let base = xdg
-        .map(PathBuf::from)
-        .or_else(|| home.map(|home| PathBuf::from(home).join(".config")))?;
-    Some(base.join(app.0))
+    xdg::base_dir(xdg.as_deref(), home.as_deref(), xdg::CONFIG_HOME_UNDER_HOME)
+        .map(|base| base.join(app.0))
 }
 
 #[cfg(test)]
@@ -77,9 +78,33 @@ mod tests {
             expect: Some("/home/ada/.config/quire"),
         },
         Case {
+            name: "home when xdg is empty",
+            xdg: Some(""),
+            home: Some("/home/ada"),
+            expect: Some("/home/ada/.config/quire"),
+        },
+        Case {
+            name: "home when xdg is relative",
+            xdg: Some("config"),
+            home: Some("/home/ada"),
+            expect: Some("/home/ada/.config/quire"),
+        },
+        Case {
             name: "neither",
             xdg: None,
             home: None,
+            expect: None,
+        },
+        Case {
+            name: "empty xdg and empty home is not the working directory",
+            xdg: Some(""),
+            home: Some(""),
+            expect: None,
+        },
+        Case {
+            name: "relative home is not a home",
+            xdg: None,
+            home: Some("ada"),
             expect: None,
         },
     ];

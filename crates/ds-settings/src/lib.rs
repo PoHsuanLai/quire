@@ -29,6 +29,7 @@ mod store;
 mod units;
 mod user_style;
 mod watch;
+mod xdg;
 
 pub use appearance::{
     AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,

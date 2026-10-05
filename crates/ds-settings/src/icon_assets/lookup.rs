@@ -3,11 +3,10 @@
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
+use crate::xdg;
+
 /// The directory under a data directory that holds the app icons.
 const SUBDIR: &str = "quire/icons/apps";
-
-/// `$XDG_DATA_DIRS` when it is unset or empty (the XDG base directory specification).
-const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
 
 /// The repository's own set, for a path-dependency consumer in development.
 const DEV_ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../assets/icons/apps");
@@ -74,23 +73,20 @@ fn set(value: &Option<OsString>) -> Option<&OsString> {
     value.as_ref().filter(|value| !value.is_empty())
 }
 
-/// `$XDG_DATA_HOME`, else `$HOME/.local/share`; a relative value is ignored, as the XDG
-/// specification says.
+/// `$XDG_DATA_HOME`, else `$HOME/.local/share` (the rules in `crate::xdg`).
 fn data_home(env: &AssetsEnv) -> Option<PathBuf> {
-    set(&env.xdg_data_home)
-        .map(PathBuf::from)
-        .filter(|path| path.is_absolute())
-        .or_else(|| set(&env.home).map(|home| PathBuf::from(home).join(".local/share")))
+    xdg::base_dir(
+        env.xdg_data_home.as_deref(),
+        env.home.as_deref(),
+        xdg::DATA_HOME_UNDER_HOME,
+    )
 }
 
 /// Every place to look, in order; none of them checked yet.
 pub fn candidates(env: &AssetsEnv) -> Vec<AssetsDir> {
     let at = |origin| move |path: PathBuf| AssetsDir { path, origin };
-    let data_dirs = set(&env.xdg_data_dirs)
-        .cloned()
-        .unwrap_or_else(|| OsString::from(DEFAULT_DATA_DIRS));
-    let shared = std::env::split_paths(&data_dirs)
-        .filter(|dir| dir.is_absolute())
+    let shared = xdg::search_dirs(env.xdg_data_dirs.as_deref())
+        .into_iter()
         .map(|dir| dir.join(SUBDIR));
     set(&env.quire_icon_assets)
         .map(PathBuf::from)
