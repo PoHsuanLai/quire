@@ -65,20 +65,13 @@ mod tests {
     use ds_core::time::clock::{install_wall, sleep};
     use std::future::Future;
     use std::pin::pin;
-    use std::sync::Arc;
-    use std::task::{Context, Wake, Waker};
+    use std::task::{Context, Waker};
     use std::time::Duration;
-
-    struct Noop;
-    impl Wake for Noop {
-        fn wake(self: Arc<Self>) {}
-    }
 
     /// A wall sleep that finishes now, counted on this thread.
     fn finish_a_sleep() {
         let _wall = install_wall();
-        let waker = Waker::from(Arc::new(Noop));
-        let mut cx = Context::from_waker(&waker);
+        let mut cx = Context::from_waker(Waker::noop());
         let mut wait = pin!(sleep(Duration::ZERO));
         while wait.as_mut().poll(&mut cx).is_pending() {
             std::thread::yield_now();
