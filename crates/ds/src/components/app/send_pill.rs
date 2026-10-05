@@ -11,12 +11,13 @@
 //! can say Cancel or be absent ([`PillAction`]), and a refusal reads as a second line under the
 //! text.
 
+use crate::components::app::hold_for::{Begin, HoldFor, HoldForIn, use_hold_for};
 use crate::components::app::send_mood::SendMood;
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::time::{FRAME_SLACK, clock::sleep};
+use ds_core::time::FRAME_SLACK;
 use ds_core::vocab::{Fraction, Shown};
 use ds_core::word::Word;
 use ds_motion::detail::operation::Operation;
@@ -98,23 +99,17 @@ pub fn SendPill(
         Sent::Not => action.word(),
         Sent::Yes => None,
     };
-    let mut shown = use_signal(|| Shown::Hidden);
-    use_hook(move || {
-        spawn(async move {
-            sleep(FRAME_SLACK).await;
-            shown.set(Shown::Visible);
-        })
-    });
-    // Sent: "Sent" stays up for ToastHold, then the pill slides away (S:2342).
-    let mut held = use_hook(|| CopyValue::new(Sent::Not));
-    if sent == Sent::Yes && *held.peek() == Sent::Not {
-        held.set(Sent::Yes);
-        let hold = DelayToken::ToastHold.delay();
-        spawn(async move {
-            sleep(hold).await;
-            shown.set(Shown::Hidden);
-        });
+    // The pill slides up on the frame after it mounts. Sent: "Sent" stays up for ToastHold, then
+    // the pill slides away (S:2342).
+    let entering = use_hold_for(FRAME_SLACK, Begin::AtMount);
+    let leaving = use_hold_for(DelayToken::ToastHold.delay(), Begin::OnStart);
+    if sent == Sent::Yes && *leaving.state().peek() == HoldFor::Rest {
+        leaving.send_from_render(HoldForIn::Start);
     }
+    let shown = match (*entering.state().read(), *leaving.state().read()) {
+        (HoldFor::Held(_), _) | (_, HoldFor::Done) => Shown::Hidden,
+        (HoldFor::Rest | HoldFor::Done, HoldFor::Rest | HoldFor::Held(_)) => Shown::Visible,
+    };
     let class = common.class("ds-send-pill");
     let data = common.data_attributes();
     let busy = (sent == Sent::Not).then_some("true");
@@ -122,7 +117,7 @@ pub fn SendPill(
         div {
             id: common.id.clone(),
             class,
-            "data-shown": shown().slug(),
+            "data-shown": shown.slug(),
             "data-mood": mood.attr(),
             role: "status",
             "aria-busy": busy,
