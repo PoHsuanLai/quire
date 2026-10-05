@@ -11,6 +11,7 @@ use crate::fonts::font_context;
 use crate::host::{Host, HostProps};
 use crate::native_providers::{AssetNet, LinkOpener};
 use crate::open_window::WindowHandle;
+use crate::phase::Phase;
 use crate::setup::Setup;
 use crate::window::Decorations;
 use crate::window_platform::with_platform;
@@ -69,12 +70,14 @@ impl WindowSlot {
 }
 
 /// The window config for `root` shaped `shape`, drawn by `renderer`, reporting its window
-/// through `slot` and naming itself to its components as `handle`.
+/// through `slot` and naming itself to its components as `handle`. The window's components are
+/// served by `phase`, which the event loop runs after each frame.
 pub(crate) fn window_config(
     root: Root,
     shape: Shape,
     base: &Base,
     slot: &WindowSlot,
+    phase: &Phase,
     handle: WindowHandle,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
@@ -89,6 +92,7 @@ pub(crate) fn window_config(
     vdom.provide_root_context(base.requests.clone());
     vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());
+    vdom.provide_root_context(phase.clone());
     vdom.provide_root_context(handle);
     let net: Arc<dyn NetProvider> = Arc::new(AssetNet);
     vdom.provide_root_context(Arc::clone(&net));

@@ -15,6 +15,7 @@ pub mod measure;
 pub mod no_host;
 pub mod parts;
 pub mod pasted;
+pub mod phase;
 pub mod pointer_capture;
 pub mod position;
 pub mod probe;

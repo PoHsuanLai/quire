@@ -37,6 +37,7 @@
 use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::open_window::WindowHandle;
+use crate::phase::{Layout, Phase};
 use crate::startup_token::take_startup_token;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
@@ -58,6 +59,8 @@ use std::time::Instant;
 struct Sub {
     app: DioxusNativeApplication,
     slot: WindowSlot,
+    /// What the window's components queue and watch, run after each frame and wake-up.
+    phase: Phase,
     /// The window's renderer, kept past the window's close (see the module documentation).
     renderer: DioxusNativeWindowRenderer,
     /// What the window's documents and shell post.
@@ -71,6 +74,7 @@ impl Sub {
         proxy: EventLoopProxy,
         config: WindowConfig<DioxusNativeWindowRenderer>,
         slot: WindowSlot,
+        phase: Phase,
         renderer: DioxusNativeWindowRenderer,
     ) -> Sub {
         let (posted, relay) = BlitzShellProxy::new(proxy);
@@ -78,6 +82,7 @@ impl Sub {
         Sub {
             app: DioxusNativeApplication::new(posted, queue, config),
             slot,
+            phase,
             renderer,
             relay,
             forward,
@@ -86,6 +91,16 @@ impl Sub {
 
     fn window_id(&self) -> Option<WindowId> {
         self.slot.window().map(|window| window.id())
+    }
+
+    /// Run the window's phase; a frame is asked for when it changed the document, so a write
+    /// shows on the next one.
+    fn run_phase(&self, layout: Layout) {
+        if self.phase.run(layout).changed()
+            && let Some(window) = self.slot.window()
+        {
+            window.request_redraw();
+        }
     }
 }
 
@@ -233,10 +248,19 @@ impl Windows {
             token: take_startup_token(event_loop),
         };
         let slot = WindowSlot::default();
+        let phase = Phase::default();
         let handle = WindowHandle::new(key, self.base.requests.clone());
         let renderer = self.spare.pop().unwrap_or_default();
-        let config = window_config(root, shape, &self.base, &slot, handle, renderer.clone());
-        let mut sub = Sub::new(event_loop.create_proxy(), config, slot, renderer);
+        let config = window_config(
+            root,
+            shape,
+            &self.base,
+            &slot,
+            &phase,
+            handle,
+            renderer.clone(),
+        );
+        let mut sub = Sub::new(event_loop.create_proxy(), config, slot, phase, renderer);
         sub.app.can_create_surfaces(event_loop);
         self.subs.push((key, sub));
         self.life.opened();
@@ -261,6 +285,7 @@ impl Windows {
                 }
             }
             sub.app.proxy_wake_up(event_loop);
+            sub.run_phase(Layout::Pending);
         }
         for window_id in closes {
             self.close(event_loop, window_id);
@@ -346,8 +371,12 @@ impl ApplicationHandler for Windows {
             self.settle(event_loop);
             return;
         }
+        let drawn = matches!(event, WindowEvent::RedrawRequested);
         if let Some(sub) = self.key_of(window_id).and_then(|key| self.sub_mut(key)) {
             sub.app.window_event(event_loop, window_id, event);
+            if drawn {
+                sub.run_phase(Layout::Resolved);
+            }
         }
     }
 

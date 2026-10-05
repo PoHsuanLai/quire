@@ -54,6 +54,7 @@ mod origin;
 mod pdf;
 #[cfg(feature = "pdf")]
 mod pdf_thumb;
+mod phase;
 #[cfg(feature = "print")]
 mod print;
 mod reveal;

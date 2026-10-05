@@ -12,6 +12,7 @@ use crate::host::hand_back::HandBack;
 use crate::host::ime::{ImeEvent, ImeListener, ImeSwitch};
 use crate::host::measure::Measured;
 use crate::host::pasted::Pasted;
+use crate::host::phase::{Observe, Observed, PhaseWrite, Queued};
 use crate::host::position::{TextPosition, TextRange};
 use crate::host::probe::Probe;
 use crate::host::reveal::Scrolled;
@@ -51,6 +52,16 @@ pub trait GeometryHost {
     fn find(&self, selector: &str) -> Found;
     /// Whether `a` and `b` are the same node.
     fn same(&self, a: &MountedData, b: &MountedData) -> SameNode;
+    /// Publish what the frame phase sees of `el` into a signal, whenever it changes, until the
+    /// returned watch is dropped. A host with no phase answers [`Observed::Unsupported`].
+    fn observe(&self, _el: &MountedData, _what: Observe) -> Observed {
+        Observed::Unsupported
+    }
+    /// Queue a write to `el` for the frame phase to apply. A host with no phase answers
+    /// [`Queued::Unsupported`].
+    fn write(&self, _el: &MountedData, _write: PhaseWrite) -> Queued {
+        Queued::Unsupported
+    }
 }
 
 /// Where the keyboard goes after a click on nothing focusable.

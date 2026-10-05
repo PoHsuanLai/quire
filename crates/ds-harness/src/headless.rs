@@ -35,6 +35,7 @@ use ds_blitz::seam::Wakeup;
 use ds_blitz::seam::follow_scheme;
 use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
 use ds_blitz::seam::{HoverTracker, link_under, live_frames, report_frame_hover};
+use ds_blitz::seam::{Layout as PhaseLayout, Phase};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
 use ds_core::vocab::{Activity, InputModality};
@@ -85,6 +86,9 @@ pub(crate) struct Headless {
     resting: LastMove,
     /// What paints it: vello_cpu unless the harness asked for vello_hybrid.
     pub(crate) painter: Painter,
+    /// The frame phase: the writes the app queued and the values it watches, run after each
+    /// layout.
+    phase: Phase,
 }
 
 /// The hovered element (a hovered text node counts as its element, which carries the listeners).
@@ -147,6 +151,8 @@ impl Headless {
         };
         let mut doc = DioxusDocument::new(vdom, config);
         let found = DocRef::Cell(Rc::clone(&doc.inner));
+        let phase = Phase::default();
+        phase.attach(found.clone(), doc.vdom.runtime());
         let provided = Provided::of(Wiring {
             keeper: match &keeper {
                 Keeper::Ancestor(shared) => Some(Rc::clone(shared)),
@@ -155,6 +161,7 @@ impl Headless {
             find: Some(focus_finder(move || Some(found.clone()))),
             clipboard: Rc::new(Memory(Arc::clone(&shell))),
             listeners: listeners.clone(),
+            phase: phase.clone(),
         });
         let gestures = GestureBus::default();
         doc.vdom.provide_root_context(gestures.clone());
@@ -178,6 +185,7 @@ impl Headless {
             keeper,
             resting: LastMove::Unknown,
             painter: Painter::Cpu,
+            phase,
         }
     }
 
@@ -230,7 +238,16 @@ impl Headless {
             let fetched = self.wakeup.fetched();
             let synced = self.resolve(at);
             let landed = self.wakeup.fetched() != fetched;
-            if !(rendered || restyled || landed || kept == Kept::Moved || synced == Repaired::Yes) {
+            // After layout, as the window runs it: a published value or an applied write is
+            // seen by the next round's renders.
+            let phased = self.phase.run(PhaseLayout::Resolved).changed();
+            if !(rendered
+                || restyled
+                || landed
+                || phased
+                || kept == Kept::Moved
+                || synced == Repaired::Yes)
+            {
                 return;
             }
         }
