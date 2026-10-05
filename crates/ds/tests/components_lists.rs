@@ -12,6 +12,8 @@ mod cases;
 #[path = "controls/css_scan.rs"]
 #[allow(dead_code)] // The controls' STYLES table is not used here.
 mod css_scan;
+#[path = "support/dom_time.rs"]
+mod dom_time;
 #[path = "support/golden.rs"]
 mod golden;
 #[path = "lists/live.rs"]

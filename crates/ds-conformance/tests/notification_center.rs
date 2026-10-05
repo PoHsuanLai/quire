@@ -44,7 +44,7 @@ fn hidden(harness: &mut Harness) -> u32 {
 
 #[test]
 fn shown_it_comes_to_rest_at_the_right_edge() {
-    let mut harness = Harness::new(Center, VIEW);
+    let mut harness = Harness::new(Center, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(presence(&harness).as_deref(), Some("entering"));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     let panel = harness
@@ -87,7 +87,7 @@ fn hidden_it_slides_out_and_on_hidden_runs_at_settle_and_not_before() {
 
 #[test]
 fn a_show_while_it_leaves_takes_the_hide_back() {
-    let mut harness = Harness::new(Center, VIEW);
+    let mut harness = Harness::new(Center, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     show(&mut harness, Shown::Hidden);
     harness.advance(Duration::from_millis(60));

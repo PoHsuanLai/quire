@@ -51,15 +51,10 @@ fn ms(n: u64) -> Duration {
 }
 
 fn start(motion: Motion) -> (Harness, Point) {
+    MOTION.with(|cell| cell.set(motion));
     // On the virtual clock: the release velocity and the wheel's quiet window both read
     // ds::time, and on the wall clock they raced under load.
-    start_on(motion, Clock::Virtual)
-}
-
-/// `start`, on `clock`.
-fn start_on(motion: Motion, clock: Clock) -> (Harness, Point) {
-    MOTION.with(|cell| cell.set(motion));
-    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(clock));
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| LOG.write().clear());
     harness.advance(ms(1));
     let at = harness
@@ -138,7 +133,7 @@ fn a_drag_released_under_the_threshold_springs_back() {
 
 #[test]
 fn a_drag_released_past_the_threshold_flies_out_and_reports_at_settle() {
-    let (mut harness, at) = start_on(Motion::Standard, Clock::Virtual);
+    let (mut harness, at) = start(Motion::Standard);
     let flight = settle(Anim::PanelOut, MotionLevel::Standard);
     let released = drag(&mut harness, at, 100.0);
     assert_eq!(swipe(&harness).as_deref(), Some("gone"));
@@ -191,7 +186,7 @@ fn a_horizontal_scroll_is_summed_and_decided_when_it_stops() {
 
 #[test]
 fn under_reduced_the_flight_settles_at_reduceds_length() {
-    let (mut harness, at) = start_on(Motion::Reduced, Clock::Virtual);
+    let (mut harness, at) = start(Motion::Reduced);
     let reduced = settle(Anim::PanelOut, MotionLevel::Reduced);
     let standard = settle(Anim::PanelOut, MotionLevel::Standard);
     let released = drag(&mut harness, at, 100.0);

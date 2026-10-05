@@ -7,7 +7,7 @@ use ds::base::press::PointerButton;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 240,
@@ -31,7 +31,7 @@ fn pressed(harness: &Harness, selector: &str) -> Option<String> {
 
 #[test]
 fn a_pointer_down_presses_a_button_until_it_comes_up() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let at = harness.centre(".ds-button").expect("the button");
     assert_eq!(pressed(&harness, ".ds-button"), None);
     harness.send(Input::pointer_move(at));
@@ -43,7 +43,7 @@ fn a_pointer_down_presses_a_button_until_it_comes_up() {
 
 #[test]
 fn a_secondary_button_does_not_press() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let at = harness.centre(".ds-button").expect("the icon button");
     harness.send(Input::pointer_move(at));
     harness.send(Input::button_down(at, PointerButton::Secondary));
@@ -52,7 +52,7 @@ fn a_secondary_button_does_not_press() {
 
 #[test]
 fn space_presses_the_focused_button() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.send(Input::key(ShortcutKey::Tab));
     harness.send(Input::key(ShortcutKey::Space));
     assert_eq!(

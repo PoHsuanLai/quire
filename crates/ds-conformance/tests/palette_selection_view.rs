@@ -9,7 +9,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
 use ds::host::caret::{Caret, InitialCaret};
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -113,7 +113,10 @@ fn inside(inner: Rect, outer: Rect) -> bool {
 /// centred, and not at all when it is in view.
 #[test]
 fn the_list_keeps_the_callers_selection_in_view() {
-    let mut harness = Harness::new(LongPalette, VIEW);
+    let mut harness = Harness::new(
+        LongPalette,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     // At rest the list is not scrolled, so its rect now is its scrollport. (Blitz moves an
     // element's own client rect by its own scroll offset, so it is read before any scroll.)
@@ -212,7 +215,7 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
             }
         }
     }
-    let mut harness = Harness::new(Own, VIEW);
+    let mut harness = Harness::new(Own, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     let view = harness
         .rect("#card .ds-palette-list")
@@ -336,7 +339,7 @@ fn SelectAllCaret() -> Element {
 
 /// The caret's place the first claimed key reports, after the palette opened on "abc".
 fn first_caret(app: fn() -> Element) -> String {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     harness.send(Input::key(ShortcutKey::Right));
     harness.advance(ms(20));
@@ -358,7 +361,10 @@ fn a_palette_opened_on_a_query_puts_the_caret_where_it_is_asked() {
         "inside",
         "a selection is not a bare caret"
     );
-    let mut harness = Harness::new(SelectAllCaret, VIEW);
+    let mut harness = Harness::new(
+        SelectAllCaret,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     harness.send(Input::key(ShortcutKey::Char('x')));
     harness.advance(ms(20));
@@ -401,7 +407,10 @@ fn KeyedRow() -> Element {
 /// A file row's time and its shortcut sit apart by `--s-6` (6 px), not run together.
 #[test]
 fn a_rows_time_and_its_shortcut_keep_their_gap() {
-    let mut harness = Harness::new(KeyedRow, VIEW);
+    let mut harness = Harness::new(
+        KeyedRow,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     let when = harness
         .rect("#card .ds-row-when")

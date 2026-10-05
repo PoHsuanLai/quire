@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::components::fields::text_field_model::FieldRows;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -54,7 +54,7 @@ fn type_text(harness: &mut Harness, text: &str) {
 
 #[test]
 fn enter_adds_a_line_and_the_caret_leaving_commits_all_of_it() {
-    let mut harness = Harness::new(Notes, VIEW);
+    let mut harness = Harness::new(Notes, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let note = harness.centre("#three textarea").expect("the note");
     harness.send(Input::click(note));
@@ -77,7 +77,7 @@ fn enter_adds_a_line_and_the_caret_leaving_commits_all_of_it() {
 
 #[test]
 fn rows_set_the_height_in_lines() {
-    let mut harness = Harness::new(Notes, VIEW);
+    let mut harness = Harness::new(Notes, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let three = harness.rect("#three textarea").expect("three").size.height;
     let six = harness.rect("#six textarea").expect("six").size.height;

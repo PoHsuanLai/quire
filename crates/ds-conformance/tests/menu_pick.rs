@@ -121,7 +121,10 @@ fn a_pick_blinks_its_item_twice_then_yields_and_closes() {
 
 #[test]
 fn a_second_pick_during_the_blink_is_ignored() {
-    let mut harness = Harness::new(Floating, VIEW);
+    let mut harness = Harness::new(
+        Floating,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(300));
     harness.send(Input::click(row(&harness, 2)));
     harness.send(Input::click(row(&harness, 3)));
@@ -131,7 +134,10 @@ fn a_second_pick_during_the_blink_is_ignored() {
 
 #[test]
 fn an_outside_press_closes_without_a_pick() {
-    let mut harness = Harness::new(Floating, VIEW);
+    let mut harness = Harness::new(
+        Floating,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(300));
     harness.send(Input::click(Point {
         x: Px(650.0),
@@ -144,7 +150,7 @@ fn an_outside_press_closes_without_a_pick() {
 
 #[test]
 fn an_inline_menu_stands_in_its_card_off_the_overlay() {
-    let mut harness = Harness::new(Inline, VIEW);
+    let mut harness = Harness::new(Inline, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(300));
     assert_eq!(harness.count(".card > .ds-menu[*|data-flow=inline]"), 1);
     assert_eq!(harness.count(".ds-overlay .ds-menu"), 0);

@@ -1061,6 +1061,15 @@ on a machine other builds were also using, so about +-10 ms).
 
 ### Timing tests
 
+- **Virtual is the default (2026-10-06).** Several sessions build on one machine, so load averages of
+  70-120 on 32 cores are normal and any wall-clock test failed on a different run each time. Every
+  test harness now names its clock and runs on `Clock::Virtual` (`ds/tests/clock_rule.rs` enforces
+  it); the bullets below describe the `Clock::Wall` exceptions. The exceptions are the tests that
+  assert real time: Blitz's wall-clock double click (`keep_focus`, `window_frame_controls`), the
+  split-clock repro (`cancelled_animation`), and the clock's own tests in `ds-harness/tests`. Tests
+  that wait on a real thread (spell worker, PDF raster) wait on the event
+  (`ds-blitz/tests/support/worker.rs`); wall-time budgets are `#[ignore = "perf: ..."]` and run by
+  `scripts/perf.sh`.
 - **The split clock.** On `Clock::Wall`, CSS resolves at the harness's own time (the sum of
   `advance`s) while ds timers and `Instant::now()` run on the wall clock, and `advance` only
   guarantees *at least* the time asked. Under load a check near a boundary lands on either side.

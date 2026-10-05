@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -38,7 +38,7 @@ fn Header() -> Element {
 
 #[test]
 fn two_actions_end_the_row_in_order_and_each_hears_its_own_press() {
-    let mut harness = Harness::new(Header, VIEW);
+    let mut harness = Harness::new(Header, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let first = harness
         .rect(".ds-section-header-action:nth-child(1)")

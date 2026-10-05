@@ -21,7 +21,7 @@ use ds::style::appearance::blur::BlurState;
 use ds::style::icon::family::PlateFamily;
 use ds::style::material::stack::MaterialStack;
 use ds::style::tokens::shape::Corner;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::prelude::*;
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
@@ -85,7 +85,7 @@ fn Corners() -> Element {
 /// where the circle leaves the white ground; well inside and well outside both agree.
 #[test]
 fn a_squircle_corner_is_fuller_than_a_circle_at_45_degrees() {
-    let mut harness = Harness::new(Corners, VIEW);
+    let mut harness = Harness::new(Corners, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "squircle-corner");
@@ -130,7 +130,7 @@ fn Card() -> Element {
 /// where 120 px away the grey is untouched.
 #[test]
 fn a_card_stacks_a_hairline_a_highlight_and_two_shadows() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "material-stack");
@@ -168,7 +168,7 @@ fn Plates() -> Element {
 /// out at 56 % of the plate.
 #[test]
 fn a_plate_is_a_gradient_superellipse_with_its_glyph_at_56_percent() {
-    let mut harness = Harness::new(Plates, VIEW);
+    let mut harness = Harness::new(Plates, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "plates");
@@ -208,7 +208,7 @@ fn Bar() -> Element {
 /// height (a Regular control, design/29-SIZING.md) and 13 px text; a closed one paints nothing.
 #[test]
 fn an_open_bar_item_draws_its_pill() {
-    let mut harness = Harness::new(Bar, VIEW);
+    let mut harness = Harness::new(Bar, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "bar-item");
@@ -274,7 +274,10 @@ fn SlimMenu() -> Element {
 /// px above and below (11 px).
 #[test]
 fn text_menu_rows_are_22_px() {
-    let mut harness = Harness::new(SlimMenu, VIEW);
+    let mut harness = Harness::new(
+        SlimMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(400));
     let rows = harness.count(".ds-menu-item");
     assert_eq!(rows, 2, "{}", harness.html());
@@ -310,7 +313,10 @@ fn DockPill() -> Element {
 /// circle's boundary is at 5.27, the squircle's at 4.66) carries paint.
 #[test]
 fn a_squircle_dock_root_masks_its_frame_and_keeps_its_shadow() {
-    let mut harness = Harness::new(DockPill, VIEW);
+    let mut harness = Harness::new(
+        DockPill,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(60));
     let frame = harness
         .render_over(ds_harness::Backdrop::Clear)
@@ -372,7 +378,10 @@ fn Launcher() -> Element {
 /// container, and as wide as it; the query is 22 px text beside a 20 px glyph.
 #[test]
 fn the_launcher_card_is_as_tall_as_its_content() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(600));
     let card = rect(&harness, ".ds-palette");
     assert_eq!(card.size.width, Px(600.0));
@@ -409,7 +418,7 @@ fn Pop() -> Element {
 /// A click outside a popover marks it leaving at once and closes it only after the `menu-out` fade.
 #[test]
 fn a_popover_fades_out_before_it_closes() {
-    let mut harness = Harness::new(Pop, VIEW);
+    let mut harness = Harness::new(Pop, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(300));
     assert_eq!(harness.count("#inside"), 1);
     harness.send(Input::pointer_down(Point {

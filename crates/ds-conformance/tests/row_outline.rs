@@ -299,7 +299,7 @@ fn renaming() -> Element {
 }
 
 fn started(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness
 }

@@ -17,7 +17,7 @@ use ds::prelude::*;
 use ds::style::icon::render::Glyph;
 use ds::style::icon::stroke::stroke_device_pixels;
 use ds::style::tokens::pixel::PixelToken;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use image::RgbaImage;
 use probe::{keep, rect};
 use std::ops::Range;
@@ -133,7 +133,10 @@ fn render(scale: u16) -> (Harness, RgbaImage) {
         height: 240,
         scale_percent: scale,
     };
-    let mut harness = Harness::new(Fixture, viewport);
+    let mut harness = Harness::new(
+        Fixture,
+        HarnessConfig::new(viewport).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(400));
     let frame = harness.render().expect("a frame");
     keep(&frame, &format!("pixel-snap-{scale}"));

@@ -110,7 +110,7 @@ fn assert_rests(harness: &mut Harness) {
 
 #[test]
 fn a_ring_stands_at_its_level_and_shows_its_figure_at_once() {
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(
         harness
             .attr(".ds-battery .ds-progress", "aria-valuenow")
@@ -161,7 +161,10 @@ fn a_new_level_moves_the_arc_linearly_and_the_figure_changes_at_once() {
 
 #[test]
 fn a_charging_bolt_is_there_from_the_first_frame() {
-    let mut harness = Harness::new(ChargingStage, VIEW);
+    let mut harness = Harness::new(
+        ChargingStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert_eq!(harness.count(".ds-battery-bolt"), 1);
     assert_eq!(harness.attr(".ds-battery-bolt", "style"), None, "fully in");
     assert_rests(&mut harness);
@@ -174,7 +177,10 @@ fn a_charging_bolt_is_there_from_the_first_frame() {
 
 #[test]
 fn under_reduced_motion_the_ring_is_at_its_level_at_once() {
-    let mut harness = Harness::new(ReducedStage, VIEW);
+    let mut harness = Harness::new(
+        ReducedStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert!((929..=931).contains(&drawn(&harness)), "{}", harness.html());
     assert_eq!(figure(&harness), "93%");
     harness.within(|| *LEVEL.write() = Fraction(400));

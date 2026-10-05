@@ -10,7 +10,9 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Layout, Query, Viewport};
+use ds_harness::{
+    Clock, Driver, FocusState, Harness, HarnessConfig, Input, Layout, Query, Viewport,
+};
 use image::RgbaImage;
 use probe::rect;
 use std::time::Duration;
@@ -96,7 +98,12 @@ fn Rows() -> Element {
 /// follows the selection, and follows the row when the results above it move it.
 #[test]
 fn a_palette_on_a_fresh_surface_reports_its_first_row_once_laid_out() {
-    let mut harness = Harness::new(Rows, HarnessConfig::new(VIEW).with_layout(Layout::Held));
+    let mut harness = Harness::new(
+        Rows,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_layout(Layout::Held),
+    );
     harness.advance(ms(150));
     assert_eq!(
         log(&harness),
@@ -191,7 +198,7 @@ fn TabPassed() -> Element {
 
 /// Press Tab in the palette's field; whether the field still has the keyboard after.
 fn tab_keeps_the_field(page: fn() -> Element) -> bool {
-    let mut harness = Harness::new(page, VIEW);
+    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     assert_eq!(
         harness.focus_of("#card .ds-input"),
@@ -300,7 +307,10 @@ const CARD: Rect = Rect {
 /// keyboard, and a hide leaves the frame as it was before the first show.
 #[test]
 fn a_kept_palette_replays_its_entrance_on_every_show() {
-    let mut harness = Harness::new(KeptFresh, VIEW);
+    let mut harness = Harness::new(
+        KeptFresh,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(100));
     let laid = harness
         .rect("#card")

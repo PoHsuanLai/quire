@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::content::status::battery_state::{BatteryPower, BatteryState, LowAt};
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -53,7 +53,7 @@ fn attr(harness: &Harness, part: &str, name: &str) -> Option<String> {
 
 #[test]
 fn the_fill_follows_a_new_step_and_ignores_a_finer_change() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let full = width(&harness);
     // 80 % is step 18 of 22: 9 of the fill's 11 units.
     assert!((full - 9.0).abs() < 0.1, "80 % drew {full} units");
@@ -73,7 +73,7 @@ fn the_fill_follows_a_new_step_and_ignores_a_finer_change() {
 
 #[test]
 fn plugging_in_grows_the_bolt_and_a_held_charge_shows_the_plug() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(
         attr(&harness, "bolt", "data-show").as_deref(),
         Some("hidden")
@@ -109,7 +109,7 @@ fn plugging_in_grows_the_bolt_and_a_held_charge_shows_the_plug() {
 
 #[test]
 fn the_fill_turns_low_at_the_threshold_but_never_while_charging() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(
         attr(&harness, "fill", "data-tone").as_deref(),
         Some("normal")
@@ -128,7 +128,7 @@ fn the_fill_turns_low_at_the_threshold_but_never_while_charging() {
 
 #[test]
 fn reduced_jumps_the_fill() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(20));
     set(&mut harness, battery(300, BatteryPower::Battery));

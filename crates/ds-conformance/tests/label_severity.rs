@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -29,7 +29,7 @@ fn Labels() -> Element {
 
 #[test]
 fn each_severity_is_its_own_colour_and_none_is_the_plain_ink() {
-    let mut harness = Harness::new(Labels, VIEW);
+    let mut harness = Harness::new(Labels, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     let plain = harness.ink_of("#plain").expect("plain ink");
     let inks: Vec<_> = Severity::ALL

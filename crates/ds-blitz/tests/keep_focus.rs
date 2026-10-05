@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_blitz::FocusFallback;
-use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -53,9 +53,15 @@ fn Shell() -> Element {
 }
 
 fn harness(fallback: FocusFallback) -> Harness {
+    harness_on(fallback, Clock::Virtual)
+}
+
+fn harness_on(fallback: FocusFallback, clock: Clock) -> Harness {
     let mut harness = Harness::new(
         Shell,
-        HarnessConfig::new(VIEW).with_focus_fallback(fallback),
+        HarnessConfig::new(VIEW)
+            .with_clock(clock)
+            .with_focus_fallback(fallback),
     );
     harness.advance(ms(50));
     harness
@@ -94,7 +100,10 @@ fn with_blitz_default_the_click_clears_the_focus() {
 
 #[test]
 fn a_second_click_keeps_the_shell_focused_without_a_blur() {
-    let mut harness = harness(FocusFallback::Ancestor);
+    // On the wall clock, on purpose: Blitz decides a double click from its own wall-clock
+    // `last_mousedown_time` (500 ms), which a virtual `advance` never lets pass. Only real time
+    // passing can end the first click's window, and a loaded machine only stretches it.
+    let mut harness = harness_on(FocusFallback::Ancestor, Clock::Wall);
     click(&mut harness, ".plain");
     harness.advance(ms(600));
     click(&mut harness, ".plain");

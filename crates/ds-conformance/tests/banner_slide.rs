@@ -10,7 +10,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::notifications::banner_stack::{Banner, BannerKey};
 use ds_shell::notifications::parts::AppMark;
 use ds_shell::notifications::swipe::NotificationSwipe;
@@ -88,7 +88,7 @@ enum Seen {
 /// Mounts one banner and polls until it rests on its place, noting whether the card was drawn
 /// past its right edge on the way.
 fn enter() -> (Harness, Probes, Seen) {
-    let mut harness = Harness::new(Stack, VIEW);
+    let mut harness = Harness::new(Stack, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *SHOWN.write() = vec![1]);
     harness.advance(Duration::from_millis(1));
     // The layout rect is the resting place: transforms never move it.

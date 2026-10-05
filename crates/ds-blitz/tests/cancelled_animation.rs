@@ -9,7 +9,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const CSS: &str = "@keyframes slide{ from{ transform:translateX(400px); } to{ transform:none; } }
@@ -43,7 +43,10 @@ fn ms(n: u64) -> Duration {
 
 /// Take the box's animation away `after` into it, then let two seconds pass.
 fn cancelled(after: u64) -> Harness {
-    let mut h = Harness::new(sliding_box, BOX_VIEW);
+    let mut h = Harness::new(
+        sliding_box,
+        HarnessConfig::new(BOX_VIEW).with_clock(Clock::Virtual),
+    );
     h.advance(ms(after));
     h.send(Input::click(at(620.0, 20.0)));
     h.advance(ms(2000));
@@ -113,7 +116,10 @@ fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
     // which Virtual's unified clock cannot produce (its `advance` only fires a timer once the
     // frame clock reaches it, so this same scenario is proven inert there in
     // virtual_clock.rs::a_stalled_first_frame_cannot_end_the_entrance_early).
-    let mut h = Harness::new(Center, PANEL_VIEW);
+    let mut h = Harness::new(
+        Center,
+        HarnessConfig::new(PANEL_VIEW).with_clock(Clock::Wall),
+    );
     assert_eq!(presence(&h).as_deref(), Some("entering"));
     std::thread::sleep(standard(Anim::PanelIn) + ms(50));
     h.advance(ms(1));
@@ -136,7 +142,10 @@ fn a_panel_present_before_its_slide_has_played_still_comes_to_rest() {
 /// the exit.
 #[test]
 fn a_hide_taken_back_midway_leaves_the_panel_at_rest() {
-    let mut h = Harness::new(Center, PANEL_VIEW);
+    let mut h = Harness::new(
+        Center,
+        HarnessConfig::new(PANEL_VIEW).with_clock(Clock::Virtual),
+    );
     settle_until(&mut h, |h| presence(h).as_deref() == Some("present"));
     h.within(|| *SHOWN.write() = Shown::Hidden);
     h.advance(standard(Anim::PanelOut) / 2);

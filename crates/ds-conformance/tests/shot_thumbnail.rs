@@ -94,7 +94,7 @@ fn read<T: Clone>(harness: &mut Harness, signal: &'static GlobalSignal<T>) -> T 
 }
 
 fn rested() -> Harness {
-    let mut harness = Harness::new(Thumb, VIEW);
+    let mut harness = Harness::new(Thumb, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("present"));
     harness
 }

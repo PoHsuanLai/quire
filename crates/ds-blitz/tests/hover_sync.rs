@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::notifications::banner_stack::{Banner, BannerKey};
 use ds_shell::notifications::parts::AppMark;
 use ds_shell::prelude::*;
@@ -92,7 +92,7 @@ const REST: Point = Point {
 
 #[test]
 fn a_block_sliding_under_a_resting_pointer_is_entered_and_the_field_left() {
-    let mut harness = Harness::new(Slider, VIEW);
+    let mut harness = Harness::new(Slider, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.send(Input::pointer_move(REST));
     assert_eq!(count("enter field"), 1);
     slide(&mut harness, Slide::Under);
@@ -114,7 +114,7 @@ fn a_block_sliding_under_a_resting_pointer_is_entered_and_the_field_left() {
 
 #[test]
 fn it_is_entered_even_before_the_pointer_moves_again() {
-    let mut harness = Harness::new(Slider, VIEW);
+    let mut harness = Harness::new(Slider, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.send(Input::pointer_move(REST));
     slide(&mut harness, Slide::Under);
     settle_until(&mut harness, |_| count("enter block") == 1);
@@ -128,7 +128,7 @@ fn it_is_entered_even_before_the_pointer_moves_again() {
 
 #[test]
 fn a_block_sliding_in_before_any_pointer_hears_nothing() {
-    let mut harness = Harness::new(Slider, VIEW);
+    let mut harness = Harness::new(Slider, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     slide(&mut harness, Slide::Under);
     harness.advance(Duration::from_millis(20));
     assert_eq!(all_heard().len(), 0);
@@ -139,7 +139,7 @@ fn a_block_sliding_in_before_any_pointer_hears_nothing() {
 /// though the field's leave is lost and the page is entered a second time.
 #[test]
 fn a_block_covering_the_whole_field_is_still_entered() {
-    let mut harness = Harness::new(Slider, VIEW);
+    let mut harness = Harness::new(Slider, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.send(Input::pointer_move(REST));
     slide(&mut harness, Slide::Cover);
     settle_until(&mut harness, |_| count("enter block") == 1);
@@ -191,7 +191,7 @@ fn at_rest(harness: &Harness) -> bool {
 
 #[test]
 fn a_banner_arriving_under_a_resting_pointer_is_hovered() {
-    let mut harness = Harness::new(Stack, VIEW);
+    let mut harness = Harness::new(Stack, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     // Where a banner comes to rest: shown once, measured, and taken away again.
     show(&mut harness, &[1]);
     settle_until(&mut harness, at_rest);

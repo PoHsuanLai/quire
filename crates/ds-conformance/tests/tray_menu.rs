@@ -108,7 +108,10 @@ fn ExternalApp() -> Element {
 
 #[test]
 fn a_symbolic_mask_takes_the_ink_and_an_image_keeps_its_colour() {
-    let mut harness = Harness::new(ExternalApp, VIEW);
+    let mut harness = Harness::new(
+        ExternalApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     // A data: image lands one resolve late (spike S7).
     harness.advance(ms(100));
     let frame = harness.render().expect("renders");
@@ -180,7 +183,10 @@ fn PressApp() -> Element {
 
 #[test]
 fn a_right_click_reports_a_secondary_press() {
-    let mut harness = Harness::new(PressApp, VIEW);
+    let mut harness = Harness::new(
+        PressApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let seen = |harness: &Harness| harness.text_of(".seen").unwrap_or_default();
     assert_eq!(harness.attr(".ds-button", "id").as_deref(), Some("tray-0"));
     let icon = centre(&harness, "#tray-0");
@@ -258,7 +264,7 @@ const PARENT: &str = ".ds-menu-item[*|aria-haspopup=true]";
 
 #[test]
 fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
-    let mut harness = Harness::new(MenuApp, VIEW);
+    let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
     assert_eq!(
         harness
@@ -341,7 +347,7 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
 
 #[test]
 fn right_opens_the_submenu_at_once_and_its_item_picks() {
-    let mut harness = Harness::new(MenuApp, VIEW);
+    let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
     for _ in 0..2 {
         harness.send(Input::key(ShortcutKey::Down));
@@ -365,7 +371,7 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
 
 #[test]
 fn escape_in_a_keyboard_submenu_closes_one_level() {
-    let mut harness = Harness::new(MenuApp, VIEW);
+    let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
     for _ in 0..2 {
         harness.send(Input::key(ShortcutKey::Down));

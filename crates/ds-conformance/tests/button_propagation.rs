@@ -8,7 +8,7 @@ use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::press::Propagation;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -80,7 +80,7 @@ fn is_open(harness: &Harness, section: &str) -> bool {
 
 #[test]
 fn a_stopped_press_leaves_its_details_closed_and_a_bubbling_one_toggles_it() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     for section in ["stop", "bubble", "glyph"] {
         assert!(!is_open(&harness, section), "{section} starts closed");

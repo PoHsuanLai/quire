@@ -11,7 +11,7 @@ mod month_sample;
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::month_grid::data::{MonthStep, WeekNumbers};
 use ds_shell::prelude::*;
 use ds_shell::tokens::widgets::WidgetMetrics;
@@ -59,7 +59,10 @@ fn within(inner: Rect, outer: Rect) -> bool {
 
 #[test]
 fn the_compact_grid_fills_a_small_widget() {
-    let mut harness = Harness::new(SmallCalendar, VIEW);
+    let mut harness = Harness::new(
+        SmallCalendar,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         harness.attr(".ds-month", "data-density").as_deref(),
@@ -151,7 +154,10 @@ fn week_pitches(harness: &Harness, count: usize) -> Vec<f32> {
 /// weeks share, each 23.6 against the six-week month's 19.67.
 #[test]
 fn a_five_week_month_spreads_its_rows_over_the_height() {
-    let mut harness = Harness::new(SmallSeptember, VIEW);
+    let mut harness = Harness::new(
+        SmallSeptember,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(50));
     assert_eq!(harness.count(".ds-month-weeks > .ds-month-row"), 5);
     let pitches = week_pitches(&harness, 5);
@@ -200,7 +206,10 @@ fn SmallSeptember() -> Element {
 /// a side, as the regular grid's 24 px disc does round its 11.5 px number.
 #[test]
 fn todays_compact_disc_is_a_circle_twice_its_number() {
-    let mut harness = Harness::new(SmallSeptember, VIEW);
+    let mut harness = Harness::new(
+        SmallSeptember,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(50));
     assert_eq!(
         harness
@@ -246,7 +255,10 @@ fn WrappedSmallCalendar() -> Element {
 
 #[test]
 fn an_unstretched_six_week_month_still_fits_the_small_widget() {
-    let harness = Harness::new(WrappedSmallCalendar, VIEW);
+    let harness = Harness::new(
+        WrappedSmallCalendar,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let body = rect(&harness, ".ds-widget-body");
     let month = rect(&harness, ".ds-month");
     assert!(

@@ -13,7 +13,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 
@@ -73,7 +73,7 @@ fn Page() -> Element {
 
 fn laid_out(frame: Frame) -> Harness {
     FRAME.set(frame);
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *PRESSES.write() = 0);
     harness.advance(Duration::from_millis(50));
     harness

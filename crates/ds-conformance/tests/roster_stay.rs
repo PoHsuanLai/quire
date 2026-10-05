@@ -84,7 +84,7 @@ fn row(n: usize) -> String {
 
 #[test]
 fn an_exit_stayed_before_it_settles_restores_the_row_and_heals_nothing() {
-    let mut harness = Harness::new(StayApp, VIEW);
+    let mut harness = Harness::new(StayApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(1500));
     assert_eq!(harness.count(".ds-list-item"), 3);
     let tops: Vec<_> = (1..=3)

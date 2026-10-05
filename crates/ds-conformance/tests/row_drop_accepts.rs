@@ -7,7 +7,7 @@ use ds::base::vocab::RowState;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName};
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -50,7 +50,7 @@ fn Page() -> Element {
 
 #[test]
 fn an_accepting_place_is_marked_and_keeps_its_box_and_label() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     assert_eq!(harness.count(".ds-row[*|data-drop=accepts]"), 1);
     assert_eq!(

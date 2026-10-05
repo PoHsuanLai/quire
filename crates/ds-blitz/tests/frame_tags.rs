@@ -8,7 +8,7 @@ use ds_blitz::{
     AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
     RequestOrigin,
 };
-use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
@@ -76,6 +76,7 @@ fn reader(requests: Arc<Recorder>) -> (Harness, Arc<Mutex<Vec<FrameLink>>>) {
             .push(link);
     });
     let config = HarnessConfig::new(VIEW)
+        .with_clock(Clock::Virtual)
         .with_net(NetPolicy::Custom(requests))
         .with_frame_links(links);
     (Harness::new(Reader, config), heard)

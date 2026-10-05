@@ -7,7 +7,7 @@ use ds::components::content::status::volume::{VolumeState, VolumeWaves};
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{ClassPresence, Driver, Harness, Query, Viewport};
+use ds_harness::{ClassPresence, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -41,7 +41,7 @@ fn dots(harness: &Harness) -> Option<String> {
 
 #[test]
 fn a_connection_shows_its_dots() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(dots(&harness).as_deref(), Some("hidden"));
     set(&mut harness, BluetoothState::Connecting(EventStamp(1)));
     harness.advance(Duration::from_millis(20));
@@ -57,7 +57,7 @@ fn a_connection_shows_its_dots() {
 
 #[test]
 fn bluetooth_off_draws_the_slash_and_a_failure_shakes_nothing() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, BluetoothState::Off);
     settle_until(&mut harness, |h| h.count("#bt [*|data-part=slash]") == 1);
     assert_eq!(
@@ -82,7 +82,7 @@ fn part_on(harness: &Harness, part: &str) -> Option<String> {
 
 #[test]
 fn the_volume_waves_cross_fade_and_mute_brings_the_slash() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(part_on(&harness, "wave-3").as_deref(), Some("on"));
     assert_eq!(part_on(&harness, "slash").as_deref(), Some("off"));
     harness.within(|| *VOLUME.write() = VolumeState::Heard(VolumeWaves::One));

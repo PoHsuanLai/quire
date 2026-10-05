@@ -10,7 +10,7 @@ mod month_sample;
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use ds_shell::month_grid::data::{DayKey, MonthKey, MonthStep};
 use ds_shell::prelude::*;
 use ds_shell::tokens::widgets::WidgetMetrics;
@@ -88,7 +88,8 @@ fn the_compact_widget_paints_at_1x_and_4x() {
                 height: SIDE,
                 scale_percent: scale * 100,
             };
-            let mut harness = Harness::new(app, view);
+            let mut harness =
+                Harness::new(app, HarnessConfig::new(view).with_clock(Clock::Virtual));
             harness.advance(Duration::from_millis(50));
             let shot = harness.render().expect("renders");
             assert_eq!(shot.width(), SIDE * u32::from(scale), "{weeks} {scheme}");

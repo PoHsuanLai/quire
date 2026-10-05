@@ -73,7 +73,10 @@ fn PressApp() -> Element {
 
 #[test]
 fn a_button_click_flips_aria_pressed() {
-    let mut harness = Harness::new(PressApp, VIEW);
+    let mut harness = Harness::new(
+        PressApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let button = centre(&harness, ".ds-button");
     let pressed = |harness: &Harness| harness.attr(".ds-button", "aria-pressed");
     assert_eq!(pressed(&harness).as_deref(), Some("false"));
@@ -85,7 +88,10 @@ fn a_button_click_flips_aria_pressed() {
 
 #[test]
 fn the_root_stamps_the_last_input_modality() {
-    let mut harness = Harness::new(PressApp, VIEW);
+    let mut harness = Harness::new(
+        PressApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let modality = |harness: &Harness| harness.attr(".ds", "data-modality");
     assert_eq!(modality(&harness).as_deref(), Some("pointer"));
     harness.send(Input::key(ShortcutKey::Tab));
@@ -106,7 +112,10 @@ fn ToggleApp() -> Element {
 
 #[test]
 fn a_toggle_switches() {
-    let mut harness = Harness::new(ToggleApp, VIEW);
+    let mut harness = Harness::new(
+        ToggleApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let checked = |harness: &Harness| harness.attr(".ds-toggle", "aria-checked");
     assert_eq!(checked(&harness).as_deref(), Some("false"));
     harness.send(Input::click(centre(&harness, ".ds-toggle")));
@@ -265,7 +274,7 @@ fn MenuDemo() -> Element {
 
 #[test]
 fn a_menu_opens_on_click_and_closes_on_escape() {
-    let mut harness = Harness::new(MenuApp, VIEW);
+    let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.count(".ds-menu"), 0);
     harness.send(Input::click(centre(&harness, ".ds-button")));
     assert_eq!(harness.count(".ds-menu"), 1, "{}", harness.html());
@@ -410,7 +419,7 @@ fn ListDemo() -> Element {
 
 #[test]
 fn a_row_leaves_and_the_rows_below_heal() {
-    let mut harness = Harness::new(ListApp, VIEW);
+    let mut harness = Harness::new(ListApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     // Let the first-show entrance settle.
     harness.advance(ms(1500));
     assert_eq!(harness.count(".ds-list-item"), 3);
@@ -488,7 +497,7 @@ fn a_field_focused_on_mount_takes_typing_without_a_click() {
     type Case = (fn() -> Element, &'static str);
     const CASES: &[Case] = &[(FocusApp, "[a]"), (ManualApp, "[]")];
     for &(app, want) in CASES {
-        let mut harness = Harness::new(app, VIEW);
+        let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
         harness.advance(ms(100));
         assert_eq!(harness.text_of(".probe-text").as_deref(), Some("[]"));
         harness.send(Input::key(ShortcutKey::Char('a')));
@@ -529,10 +538,11 @@ fn EditorApp() -> Element {
 fn the_space_editor_reports_the_dot_picked_inside_it() {
     let mut harness = Harness::new(
         EditorApp,
-        Viewport {
+        HarnessConfig::new(Viewport {
             height: 900,
             ..VIEW
-        },
+        })
+        .with_clock(Clock::Virtual),
     );
     assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
     assert!(harness.count(".ds-stop") > 1, "{}", harness.html());
@@ -570,7 +580,10 @@ fn EnvironmentApp() -> Element {
 
 #[test]
 fn use_environment_does_not_panic_under_the_harness() {
-    let mut harness = Harness::new(EnvironmentApp, VIEW);
+    let mut harness = Harness::new(
+        EnvironmentApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     // The portal round-trip and the initial file load both run async; give them a turn to
     // settle before reading the probe. Whether the portal answered or was absent, and whatever
     // theme the settings resolved to, both are fine — a value landing at all is the proof this

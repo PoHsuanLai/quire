@@ -6,6 +6,9 @@
 //! empty file and a document with no pages are a blank sheet; and on a Blitz document the page
 //! read on the worker lands and paints (the loading and pending states are `ds`'s SSR goldens).
 
+#[path = "support/worker.rs"]
+mod worker;
+
 use dioxus::prelude::*;
 use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
 use ds::components::lists::preview::content::PANE_MEDIA;
@@ -13,8 +16,7 @@ use ds::components::lists::preview::content::PaneContent;
 use ds::prelude::*;
 use ds_blitz::{DeviceBox, PdfFileThumb, ThumbRequest};
 use ds_blitz::{pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached};
-use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, Encryption, SaveOptions, blank_document, save};
 use peniko::Color;
@@ -22,6 +24,7 @@ use peniko::kurbo::{Rect, Size as Sheet};
 use std::path::PathBuf;
 use std::sync::OnceLock;
 use std::time::Duration;
+use worker::settle_on_worker;
 
 const RED: [u8; 3] = [220, 30, 30];
 const BLUE: [u8; 3] = [30, 60, 220];
@@ -293,8 +296,8 @@ fn Broken() -> Element {
 #[test]
 fn on_a_document_it_loads_then_paints_the_page() {
     SHOWN_PATH.get_or_init(|| file("shown.pdf", &letter(RED)));
-    let mut harness = Harness::new(Shown, VIEW);
-    settle_until(&mut harness, |h| {
+    let mut harness = Harness::new(Shown, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    settle_on_worker(&mut harness, |h| {
         h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("ready")
     });
     assert_eq!(
@@ -318,8 +321,8 @@ fn on_a_document_it_loads_then_paints_the_page() {
 #[test]
 fn a_broken_file_lands_on_the_plate() {
     BROKEN_PATH.get_or_init(|| file("broken.pdf", b"not a pdf at all"));
-    let mut harness = Harness::new(Broken, VIEW);
-    settle_until(&mut harness, |h| {
+    let mut harness = Harness::new(Broken, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    settle_on_worker(&mut harness, |h| {
         h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("failed")
     });
     assert_eq!(
@@ -362,11 +365,12 @@ fn the_pane_draws_a_pdf_from_its_path_through_use_pdf_page() {
     PANE_PATH.get_or_init(|| file("pane.pdf", &letter(BLUE)));
     let mut harness = Harness::new(
         PanePreview,
-        Viewport {
+        HarnessConfig::new(Viewport {
             width: 480,
             height: 480,
             scale_percent: 100,
-        },
+        })
+        .with_clock(Clock::Virtual),
     );
     harness.advance(Duration::from_millis(50));
     assert_eq!(
@@ -375,7 +379,7 @@ fn the_pane_draws_a_pdf_from_its_path_through_use_pdf_page() {
     );
     let at = harness.centre(".to-pdf").expect("the button");
     harness.send(Input::click(at));
-    settle_until(&mut harness, |h| {
+    settle_on_worker(&mut harness, |h| {
         h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("ready")
     });
     assert_eq!(

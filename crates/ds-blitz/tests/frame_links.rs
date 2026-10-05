@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, FrameLink, FrameLinks, NetDecision, NetPolicy, NetReply, NetRequest};
-use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 
 const VIEW: Viewport = Viewport {
@@ -54,6 +54,7 @@ impl Requests {
 fn click_the_link(links: FrameLinks) -> (Harness, ds_blitz::FrameId, Arc<Requests>) {
     let requests = Arc::new(Requests::default());
     let config = HarnessConfig::new(VIEW)
+        .with_clock(Clock::Virtual)
         .with_net(NetPolicy::Custom(requests.clone()))
         .with_frame_links(links);
     let mut harness = Harness::new(Reader, config);

@@ -143,7 +143,10 @@ fn shown_remotely(harness: &mut Harness) {
 
 #[test]
 fn a_showing_slides_in_whoever_caused_it() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     remote(&mut harness, Pane::Showing(Kind::Web));
     assert_eq!(attr(&harness, ".ds-preview", "data-presence"), "entering");
     assert!(
@@ -169,7 +172,10 @@ fn a_showing_slides_in_whoever_caused_it() {
 
 #[test]
 fn another_kind_cross_fades_the_media_and_never_replays_the_entrance() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     shown_remotely(&mut harness);
     let alias = attr(&harness, ".ds-preview", "data-pulse");
     remote(&mut harness, Pane::Showing(Kind::Emoji));
@@ -220,7 +226,10 @@ fn a_running_load_shows_the_pending_look_at_once_and_its_landing_cross_fades() {
 
 #[test]
 fn a_failed_load_cross_fades_to_its_still_words() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     shown_remotely(&mut harness);
     remote(&mut harness, Pane::Pending);
     settle_until(&mut harness, |h| h.count(".ds-preview-pending") == 1);
@@ -252,7 +261,10 @@ fn a_stuck_load_keeps_turning_there_is_no_cap() {
 
 #[test]
 fn reduced_snaps_the_media_and_keeps_the_ring_turning() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.within(|| *MOTION.write() = Motion::Reduced);
     shown_remotely(&mut harness);
     remote(&mut harness, Pane::Showing(Kind::Emoji));
@@ -269,7 +281,10 @@ fn reduced_snaps_the_media_and_keeps_the_ring_turning() {
 
 #[test]
 fn a_slot_keeps_the_cross_fade_the_pending_look_and_the_actions() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     shown_remotely(&mut harness);
     remote(&mut harness, Pane::Showing(Kind::Slot));
     assert_eq!(attr(&harness, ".ds-preview", "data-content"), "slot");

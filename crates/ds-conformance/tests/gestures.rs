@@ -8,7 +8,7 @@ use ds::host::captured::CapturedPointer;
 use ds::host::gesture::{Gesture, GesturePhase, Magnification, use_gestures};
 use ds::host::pointer_capture::{PointerHold, use_pointer_capture};
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -47,7 +47,10 @@ fn Listener() -> Element {
 
 #[test]
 fn a_pinch_and_a_scroll_arrive_in_order_with_their_phases() {
-    let mut harness = Harness::new(Listener, VIEW);
+    let mut harness = Harness::new(
+        Listener,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let at = Point {
         x: Px(100.0),
@@ -72,7 +75,10 @@ fn a_pinch_and_a_scroll_arrive_in_order_with_their_phases() {
 
 #[test]
 fn a_wheel_is_published_as_a_scroll() {
-    let mut harness = Harness::new(Listener, VIEW);
+    let mut harness = Harness::new(
+        Listener,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     harness.send(Input::wheel(
         Point {
@@ -90,7 +96,10 @@ fn a_wheel_is_published_as_a_scroll() {
 
 #[test]
 fn a_scroll_carries_the_modifiers_held_while_it_happened() {
-    let mut harness = Harness::new(Listener, VIEW);
+    let mut harness = Harness::new(
+        Listener,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     harness.send(Input::gesture(Gesture::Scroll {
         phase: GesturePhase::Changed,
@@ -143,7 +152,7 @@ fn Handle() -> Element {
 
 #[test]
 fn a_captured_pointer_is_followed_outside_the_element_until_the_release() {
-    let mut harness = Harness::new(Handle, VIEW);
+    let mut harness = Harness::new(Handle, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let inside = harness.centre(".handle").expect("the handle");
     harness.send(Input::pointer_down(inside));

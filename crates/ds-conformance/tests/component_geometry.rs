@@ -11,7 +11,7 @@ use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -56,7 +56,10 @@ fn FieldsApp() -> Element {
 
 #[test]
 fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
-    let harness = Harness::new(FieldsApp, VIEW);
+    let harness = Harness::new(
+        FieldsApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     // A bezeled field's frame is a Regular control, 22 (design/29-SIZING.md), and its input fills
     // it inside the two hairlines; a plain field is one line of its parent's text (13.5 px at the
     // base line height 1.55); the search row's is 16 px.
@@ -101,7 +104,10 @@ fn EmptyApp() -> Element {
 
 #[test]
 fn a_root_with_an_empty_hub_lays_out_no_toast() {
-    let mut harness = Harness::new(EmptyApp, VIEW);
+    let mut harness = Harness::new(
+        EmptyApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(100));
     assert_eq!(harness.count(".ds-toast"), 0, "{}", harness.html());
     // No pill in the picture either: the root's bottom edge is one flat ground.
@@ -143,7 +149,10 @@ fn ToastApp() -> Element {
 
 #[test]
 fn the_toast_action_shows_its_label() {
-    let mut harness = Harness::new(ToastApp, VIEW);
+    let mut harness = Harness::new(
+        ToastApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(700));
     assert_eq!(
         harness.attr(".ds-toast", "data-presence").as_deref(),
@@ -176,7 +185,7 @@ fn SendApp() -> Element {
 
 #[test]
 fn the_send_pill_undo_shows_its_label() {
-    let mut harness = Harness::new(SendApp, VIEW);
+    let mut harness = Harness::new(SendApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(700));
     assert_eq!(
         harness.text_of(".ds-send-pill-undo").as_deref(),
@@ -211,7 +220,10 @@ fn HeadersApp() -> Element {
 
 #[test]
 fn each_section_header_is_a_full_width_row_of_its_own() {
-    let harness = Harness::new(HeadersApp, VIEW);
+    let harness = Harness::new(
+        HeadersApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let mut bottom = None::<f32>;
     for n in 1..=4 {
         let header = rect(
@@ -254,7 +266,10 @@ fn ItemsApp() -> Element {
 
 #[test]
 fn a_row_without_an_accessory_keeps_its_title_left() {
-    let harness = Harness::new(ItemsApp, VIEW);
+    let harness = Harness::new(
+        ItemsApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let counted = rect(&harness, ".probe-counted .ds-row-title");
     let bare = rect(&harness, ".probe-bare .ds-row-title");
     let item = rect(&harness, ".probe-bare .ds-row");
@@ -298,7 +313,10 @@ fn the_space_editor_field_paints_and_its_presets_are_22_px() {
         height: 900,
         scale_percent: 100,
     };
-    let mut harness = Harness::new(EditorApp, view);
+    let mut harness = Harness::new(
+        EditorApp,
+        HarnessConfig::new(view).with_clock(Clock::Virtual),
+    );
     let frame = harness.render().expect("renders");
     keep(&frame, "space-editor");
     let field = rect(&harness, ".ds-field");

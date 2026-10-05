@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::components::fields::fact_list::{Fact, FactList};
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -30,7 +30,7 @@ fn Facts() -> Element {
 
 #[test]
 fn the_values_line_up_and_each_fact_is_a_row_under_the_last() {
-    let mut harness = Harness::new(Facts, VIEW);
+    let mut harness = Harness::new(Facts, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     let values: Vec<_> = (1..=3)
         .map(|n| {

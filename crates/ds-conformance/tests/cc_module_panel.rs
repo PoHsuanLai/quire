@@ -7,7 +7,7 @@ use ds::base::vocab::Muting;
 use ds::components::content::level_glyph::vocab::LevelGlyph;
 use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::prelude::*;
 use std::time::Duration;
 
@@ -59,7 +59,7 @@ fn level(harness: &mut Harness) -> u16 {
 
 #[test]
 fn a_level_inside_a_panel_on_the_grid_takes_a_press_and_a_drag() {
-    let mut harness = Harness::new(Sound, VIEW);
+    let mut harness = Harness::new(Sound, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *VALUE.write() = Fraction(200));
     harness.advance(Duration::from_millis(400));
     let panel = rect(&harness, ".ds-module-panel");

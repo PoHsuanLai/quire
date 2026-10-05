@@ -22,7 +22,7 @@ use ds::style::tokens::easing::EasingToken;
 use ds::style::tokens::hex::Hex;
 use ds::style::tokens::status::StatusMetrics;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Backdrop, Driver, Harness, Input, Viewport};
+use ds_harness::{Backdrop, Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::prelude::*;
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
@@ -116,7 +116,8 @@ fn the_bar_at_rest_is_the_first_stop_at_the_material_alpha() {
     let cases: [(App, &str, u16); 2] = [(BarOverBlur, "over blur", 700), (BarSolid, "solid", 940)];
     let stop = first_stop(0);
     for (app, name, alpha) in cases {
-        let mut harness = Harness::new(app, BAR_VIEW);
+        let mut harness =
+            Harness::new(app, HarnessConfig::new(BAR_VIEW).with_clock(Clock::Virtual));
         harness.advance(ms(50));
         let frame = harness.render().expect("renders");
         keep(&frame, &format!("bar-tint-{}", name.replace(' ', "-")));
@@ -170,7 +171,10 @@ fn half_of_the_fade() -> Duration {
 /// the corner is between the two Spaces' colours and is neither (design/21 section 5).
 #[test]
 fn a_look_change_cross_fades_the_tint() {
-    let mut harness = Harness::new(SwitchingBar, BAR_VIEW);
+    let mut harness = Harness::new(
+        SwitchingBar,
+        HarnessConfig::new(BAR_VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let before = pixel(&harness.render().expect("renders"), 1, 1);
     let button = harness
@@ -258,7 +262,10 @@ fn PaintedPopupRoot() -> Element {
 /// there, so the probe is not vacuous.
 #[test]
 fn a_popover_roots_corner_outside_its_card_is_transparent() {
-    let mut harness = Harness::new(PopupRoot, PANEL_VIEW);
+    let mut harness = Harness::new(
+        PopupRoot,
+        HarnessConfig::new(PANEL_VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(80));
     let frame = harness.render_over(Backdrop::Clear).expect("renders");
     keep(&frame, "popup-root-clear");
@@ -269,7 +276,10 @@ fn a_popover_roots_corner_outside_its_card_is_transparent() {
     let inside = modal(&pixels(&frame, card, 8.0));
     assert!(inside[3] > 200, "the card paints itself: {inside:?}");
 
-    let mut painted = Harness::new(PaintedPopupRoot, PANEL_VIEW);
+    let mut painted = Harness::new(
+        PaintedPopupRoot,
+        HarnessConfig::new(PANEL_VIEW).with_clock(Clock::Virtual),
+    );
     painted.advance(ms(80));
     let frame = painted.render_over(Backdrop::Clear).expect("renders");
     assert!(
@@ -301,7 +311,10 @@ fn GroundedBar() -> Element {
 /// On the bar `--ink` is the Space's `--f-ink`; in a popover opened from it, the paper ink again.
 #[test]
 fn the_frame_ground_draws_frame_inks_and_its_overlays_paper() {
-    let mut harness = Harness::new(GroundedBar, PANEL_VIEW);
+    let mut harness = Harness::new(
+        GroundedBar,
+        HarnessConfig::new(PANEL_VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(400));
     let frame = harness.render().expect("renders");
     keep(&frame, "frame-ground");
@@ -366,7 +379,10 @@ fn inked_width(frame: &RgbaImage, box_rect: Rect) -> u32 {
 /// the properties, the keys' defaults 22 and 16.
 #[test]
 fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
-    let mut harness = Harness::new(StatusItems, BAR_VIEW);
+    let mut harness = Harness::new(
+        StatusItems,
+        HarnessConfig::new(BAR_VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let frame = harness.render().expect("renders");
     keep(&frame, "status-items");
@@ -394,7 +410,10 @@ fn a_status_item_takes_its_box_and_glyph_from_the_properties() {
 /// Under the pointer a status item fills with `--f-pill-hover`.
 #[test]
 fn a_status_item_fills_under_the_pointer() {
-    let mut harness = Harness::new(StatusItems, BAR_VIEW);
+    let mut harness = Harness::new(
+        StatusItems,
+        HarnessConfig::new(BAR_VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let button = rect(&harness, ".plain .ds-menu-bar-item");
     let corner = |frame: &RgbaImage| {

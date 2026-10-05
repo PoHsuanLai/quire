@@ -8,7 +8,7 @@ use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::app::thread_row_hooks::PartHooks;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -121,7 +121,7 @@ const AWAY: Point = Point {
 
 #[test]
 fn a_strip_click_does_not_open_the_row() {
-    let mut harness = Harness::new(Hovered, VIEW);
+    let mut harness = Harness::new(Hovered, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     // Over the row first, so the strip is revealed by hover and takes the pointer.
     harness.send(Input::pointer_move(centre(&harness, ".ds-thread-sub")));
@@ -139,7 +139,7 @@ fn a_strip_click_does_not_open_the_row() {
 
 #[test]
 fn the_name_the_time_and_the_row_hand_the_pointer_to_the_caller() {
-    let mut harness = Harness::new(Bare, VIEW);
+    let mut harness = Harness::new(Bare, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness.send(Input::pointer_move(centre(&harness, ".ds-thread-name")));
     harness.send(Input::pointer_move(centre(&harness, ".ds-thread-sub")));
@@ -157,7 +157,10 @@ fn the_name_the_time_and_the_row_hand_the_pointer_to_the_caller() {
 
 #[test]
 fn the_caller_shows_the_strip_with_no_pointer_on_the_row() {
-    let mut harness = Harness::new(Revealed, VIEW);
+    let mut harness = Harness::new(
+        Revealed,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(400));
     assert_eq!(
         harness.attr(".ds-strip", "data-shown").as_deref(),

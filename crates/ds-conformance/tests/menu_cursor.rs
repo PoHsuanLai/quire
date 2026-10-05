@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -98,7 +98,10 @@ fn highlighted(harness: &Harness) -> Option<String> {
 
 #[test]
 fn a_field_drives_the_highlight_and_keeps_the_keyboard() {
-    let mut harness = Harness::new(FieldDriven, VIEW);
+    let mut harness = Harness::new(
+        FieldDriven,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(300));
     assert_eq!(highlighted(&harness).as_deref(), Some("Dana Okafor"));
     assert_eq!(
@@ -126,7 +129,10 @@ fn a_field_drives_the_highlight_and_keeps_the_keyboard() {
 
 #[test]
 fn the_own_cursor_is_reported_as_it_moves() {
-    let mut harness = Harness::new(OwnCursor, VIEW);
+    let mut harness = Harness::new(
+        OwnCursor,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(300));
     assert_eq!(
         harness.focus_of(".ds-menu"),

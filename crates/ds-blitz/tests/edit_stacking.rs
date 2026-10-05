@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::ExtraClass;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,
@@ -53,7 +53,7 @@ fn LayerBelow() -> Element {
 
 /// The colour at the middle of the box.
 fn middle(app: fn() -> Element) -> [u8; 3] {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let picture = harness.render().expect("a picture");
     let [r, g, b, _] = picture.get_pixel(50, 50).0;
     [r, g, b]
@@ -127,7 +127,7 @@ fn StaticSurfaceAfterLayer() -> Element {
 
 /// How many pixels of the text's box are near black.
 fn inked(app: fn() -> Element) -> usize {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let picture = harness.render().expect("a picture");
     (0..160u32)
         .flat_map(|x| (0..80u32).map(move |y| (x, y)))

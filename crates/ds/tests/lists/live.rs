@@ -3,58 +3,11 @@
 //! `block_on` until each state has settled.
 
 use super::rows::listed_thread;
+use crate::dom_time::TimedDom;
 use crate::scoped::scope;
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_core::time::clock::sleep;
-use std::future::Future;
-use std::pin::pin;
-use std::sync::Arc;
-use std::task::{Context, Poll, Wake, Waker};
-use std::thread::Thread;
-use std::time::{Duration, Instant};
-
-struct Unpark(Thread);
-
-impl Wake for Unpark {
-    fn wake(self: Arc<Self>) {
-        self.0.unpark();
-    }
-}
-
-/// Run `future` on this thread, parking between polls.
-fn block_on<F: Future>(future: F) -> F::Output {
-    let mut future = pin!(future);
-    let waker = Waker::from(Arc::new(Unpark(std::thread::current())));
-    let mut cx = Context::from_waker(&waker);
-    loop {
-        if let Poll::Ready(value) = future.as_mut().poll(&mut cx) {
-            return value;
-        }
-        std::thread::park_timeout(Duration::from_millis(5));
-    }
-}
-
-/// Poll the dom's tasks and re-render for `length`.
-fn pump(dom: &mut VirtualDom, length: Duration) {
-    let end = Instant::now() + length;
-    while Instant::now() < end {
-        let left = end.saturating_duration_since(Instant::now());
-        block_on(async {
-            let mut work = pin!(dom.wait_for_work());
-            let mut deadline = pin!(sleep(left));
-            std::future::poll_fn(|cx| {
-                if work.as_mut().poll(cx).is_ready() || deadline.as_mut().poll(cx).is_ready() {
-                    Poll::Ready(())
-                } else {
-                    Poll::Pending
-                }
-            })
-            .await;
-        });
-        dom.render_immediate_to_vec();
-    }
-}
+use std::time::Duration;
 
 fn app() -> Element {
     use_context_provider(|| Signal::new(scope()));
@@ -81,7 +34,7 @@ pub fn presences(html: &str) -> Vec<String> {
 const SETTLED: Duration = Duration::from_millis(400);
 
 /// Set the list's keys, as a consumer's state change does, and render.
-fn set_keys(dom: &mut VirtualDom, keys: &[&'static str]) -> String {
+fn set_keys(dom: &mut TimedDom, keys: &[&'static str]) -> String {
     let keys = keys.to_vec();
     dom.in_scope(ScopeId::APP, || {
         consume_context::<Signal<Vec<&'static str>>>().set(keys)
@@ -90,24 +43,16 @@ fn set_keys(dom: &mut VirtualDom, keys: &[&'static str]) -> String {
     dioxus_ssr::render(dom)
 }
 
-/// Pump until the list's presences are `want`, or the wait runs out.
-fn until(dom: &mut VirtualDom, want: &[&str]) -> Option<String> {
-    let end = Instant::now() + SETTLED;
-    while Instant::now() < end {
-        pump(dom, Duration::from_millis(10));
-        let html = dioxus_ssr::render(dom);
-        if presences(&html) == want {
-            return Some(html);
-        }
-    }
-    None
+/// Step the list's timers until its presences are `want`, or the wait runs out.
+fn until(dom: &mut TimedDom, want: &[&str]) -> Option<String> {
+    dom.run_until(SETTLED, |dom| presences(&dioxus_ssr::render(dom)) == want)?;
+    Some(dioxus_ssr::render(dom))
 }
 
 /// A list through a key arriving, a key leaving, the rows below healing and the heal resting: the
 /// markup at each moment, by name. The list plays them on its own settle timers.
 pub fn moments() -> Vec<(&'static str, String)> {
-    let mut dom = VirtualDom::new(app);
-    dom.rebuild_in_place();
+    let mut dom = TimedDom::new(|| VirtualDom::new(app));
     let first = dioxus_ssr::render(&dom);
     assert_eq!(presences(&first), ["present"; 3], "first show");
     let entering = set_keys(&mut dom, &["a", "b", "c", "d"]);

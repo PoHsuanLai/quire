@@ -6,7 +6,7 @@ mod pdf_read;
 
 use dioxus::prelude::*;
 use ds_blitz::PageSpec;
-use ds_harness::{Harness, HarnessConfig, Query, Viewport, pdf_app};
+use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport, pdf_app};
 
 fn app() -> Element {
     rsx! {
@@ -29,7 +29,7 @@ const SMALL: Viewport = Viewport {
 
 #[test]
 fn a_harness_prints_its_document_and_carries_on() {
-    let mut harness = Harness::new(app, SMALL);
+    let mut harness = Harness::new(app, HarnessConfig::new(SMALL).with_clock(Clock::Virtual));
     let before = harness.rect("h1").expect("the heading is laid out");
     let bytes = harness.pdf(PageSpec::default()).expect("the app prints");
     let doc = pdf_read::open(&bytes);
@@ -44,7 +44,12 @@ fn a_harness_prints_its_document_and_carries_on() {
 
 #[test]
 fn pdf_app_prints_at_the_page_width() {
-    let bytes = pdf_app(app, HarnessConfig::new(SMALL), PageSpec::default()).expect("prints");
+    let bytes = pdf_app(
+        app,
+        HarnessConfig::new(SMALL).with_clock(Clock::Virtual),
+        PageSpec::default(),
+    )
+    .expect("prints");
     let doc = pdf_read::open(&bytes);
     assert_eq!(doc.page_count(), 2);
     assert!(pdf_read::text(&doc, 0).contains("Bold weight falcon"));
@@ -52,7 +57,12 @@ fn pdf_app_prints_at_the_page_width() {
 
 #[test]
 fn each_weight_of_a_variable_face_embeds_its_own_instance() {
-    let bytes = pdf_app(app, HarnessConfig::new(SMALL), PageSpec::default()).expect("prints");
+    let bytes = pdf_app(
+        app,
+        HarnessConfig::new(SMALL).with_clock(Clock::Virtual),
+        PageSpec::default(),
+    )
+    .expect("prints");
     let karla: Vec<_> = pdf_read::open(&bytes)
         .embedded_fonts()
         .into_iter()
@@ -74,7 +84,7 @@ fn each_weight_of_a_variable_face_embeds_its_own_instance() {
 
 #[test]
 fn each_instance_is_named_after_its_weight() {
-    let mut harness = Harness::new(app, SMALL);
+    let mut harness = Harness::new(app, HarnessConfig::new(SMALL).with_clock(Clock::Virtual));
     let bytes = harness.pdf(PageSpec::default()).expect("the app prints");
     let mut names: Vec<String> = pdf_read::open(&bytes)
         .embedded_fonts()

@@ -7,7 +7,7 @@
 use dioxus::prelude::*;
 use ds::base::press::Press;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -64,7 +64,7 @@ fn harness(on_press: OnPress) -> Harness {
         OnPress::Leaves => leaves,
         OnPress::Stays => stays,
     };
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness
 }

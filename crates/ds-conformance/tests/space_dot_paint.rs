@@ -8,7 +8,7 @@ use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,
@@ -60,7 +60,7 @@ fn Dots() -> Element {
 
 #[test]
 fn a_space_dot_paints_what_its_inline_gradient_painted() {
-    let mut harness = Harness::new(Dots, VIEW);
+    let mut harness = Harness::new(Dots, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let picture = harness.render().expect("renders");
     for n in 0..cases().len() as u32 {
         let x0 = 40 + 60 * n;

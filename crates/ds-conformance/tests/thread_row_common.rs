@@ -7,7 +7,7 @@ use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -51,7 +51,7 @@ fn Thread() -> Element {
 
 #[test]
 fn the_common_props_reach_the_row_and_the_thread_sits_inside_it() {
-    let mut harness = Harness::new(Thread, VIEW);
+    let mut harness = Harness::new(Thread, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     assert_eq!(harness.count("#row-7.ds-row.mine"), 1, "{}", harness.html());
     assert_eq!(

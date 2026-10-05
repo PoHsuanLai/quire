@@ -17,7 +17,7 @@ use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
 use ds::style::appearance::blur::BlurState;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use ds_shell::osd::OsdLevel;
 use ds_shell::prelude::*;
 use probe::rect;
@@ -109,7 +109,10 @@ fn contrast(a: [u8; 4], b: [u8; 4]) -> f64 {
 /// The fill's and the well's painted colours and their ratio, for `ground` in `theme`.
 fn measure(ground: Ground, theme: Theme) -> ([u8; 4], [u8; 4], f64) {
     CASE.set((ground, theme));
-    let mut harness = Harness::new(Specimen, VIEW);
+    let mut harness = Harness::new(
+        Specimen,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(Duration::from_millis(600));
     let track = rect(
         &harness,

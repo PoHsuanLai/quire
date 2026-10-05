@@ -12,7 +12,7 @@ use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::style::icon::url::IconUrl;
 use ds_blitz::FocusFallback;
-use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::rect;
 use std::time::Duration;
 
@@ -174,7 +174,10 @@ fn settle_in(harness: &mut Harness) {
 /// carries the id a blur region names.
 #[test]
 fn an_embedded_palette_fills_its_container_with_no_scrim() {
-    let mut harness = Harness::new(OwnSelection, VIEW);
+    let mut harness = Harness::new(
+        OwnSelection,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     assert_eq!(harness.count(".ds-palette-wrap"), 0, "no scrim");
     assert_eq!(harness.count(".ds-overlay[*|data-layer=palette]"), 0);
@@ -199,7 +202,10 @@ fn an_embedded_palette_fills_its_container_with_no_scrim() {
 /// every move, by key or by pointer, with the rect of the row it moved to.
 #[test]
 fn the_palette_reports_its_selection_and_the_rows_rect() {
-    let mut harness = Harness::new(OwnSelection, VIEW);
+    let mut harness = Harness::new(
+        OwnSelection,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     let first = show(rect(&harness, &nth_row(1)));
     assert_eq!(log(&harness), format!("select:0,rect:{first}"));
@@ -232,7 +238,10 @@ fn the_palette_reports_its_selection_and_the_rows_rect() {
 /// Controlled, the palette shows the caller's selection and only asks to move it.
 #[test]
 fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
-    let mut followed = Harness::new(FollowedSelection, VIEW);
+    let mut followed = Harness::new(
+        FollowedSelection,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut followed);
     followed.send(Input::key(ShortcutKey::Down));
     settle_in(&mut followed);
@@ -242,7 +251,10 @@ fn a_controlled_selection_moves_only_when_the_caller_moves_it() {
         followed.attr(&nth_row(2), "aria-selected").as_deref(),
         Some("true")
     );
-    let mut pinned = Harness::new(PinnedSelection, VIEW);
+    let mut pinned = Harness::new(
+        PinnedSelection,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut pinned);
     pinned.send(Input::key(ShortcutKey::Down));
     settle_in(&mut pinned);
@@ -288,7 +300,10 @@ fn open_and_close_actions(harness: &mut Harness) {
 /// focused before it.
 #[test]
 fn a_focus_request_gives_the_field_the_keyboard_back() {
-    let mut harness = Harness::new(OwnSelection, VIEW);
+    let mut harness = Harness::new(
+        OwnSelection,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(700));
     assert_eq!(
         harness.attr("#launcher-card", "data-presence").as_deref(),
@@ -307,7 +322,9 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
     );
     let mut kept = Harness::new(
         KeptFocus,
-        HarnessConfig::new(VIEW).with_focus_fallback(FocusFallback::BlitzDefault),
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_focus_fallback(FocusFallback::BlitzDefault),
     );
     kept.advance(ms(700));
     open_and_close_actions(&mut kept);
@@ -316,7 +333,10 @@ fn a_focus_request_gives_the_field_the_keyboard_back() {
         FocusState::Unfocused,
         "without the request the field stays unfocused"
     );
-    let mut handed = Harness::new(KeptFocus, VIEW);
+    let mut handed = Harness::new(
+        KeptFocus,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     handed.advance(ms(700));
     open_and_close_actions(&mut handed);
     assert_eq!(
@@ -368,7 +388,10 @@ fn AppIconRow() -> Element {
 /// An app icon in a row fills the row's tile, drawn as it is (red), on no plate.
 #[test]
 fn an_app_icon_fills_its_rows_tile() {
-    let mut harness = Harness::new(AppIconRow, VIEW);
+    let mut harness = Harness::new(
+        AppIconRow,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(700));
     let tile = rect(&harness, ".ds-row-leading[*|data-leading=image]");
     let icon = rect(&harness, ".ds-row-leading > .ds-ext-icon");

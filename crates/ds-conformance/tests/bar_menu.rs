@@ -118,7 +118,10 @@ fn settle_in(harness: &mut Harness) {
 
 #[test]
 fn the_menu_reports_the_choice_under_the_pointer() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     harness.send(Input::pointer_move(row(&harness, "Open")));
     harness.send(Input::pointer_move(row(&harness, "Quit")));
@@ -129,7 +132,10 @@ fn the_menu_reports_the_choice_under_the_pointer() {
 
 #[test]
 fn a_status_line_is_drawn_and_never_selected() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     assert_eq!(
         harness.text_of(".ds-menu-info-title").as_deref(),
@@ -164,7 +170,10 @@ fn a_status_line_is_drawn_and_never_selected() {
 /// design/13 section 13.3.2: while the button is held, release on an enabled item picks it.
 #[test]
 fn a_press_dragged_onto_an_item_and_released_picks_it() {
-    let mut harness = Harness::new(ClosedMenu, VIEW);
+    let mut harness = Harness::new(
+        ClosedMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let opener = harness.centre(".opener").expect("the opener");
     harness.send(Input::pointer_move(opener));
     harness.send(Input::pointer_down(opener));
@@ -181,7 +190,10 @@ fn a_press_dragged_onto_an_item_and_released_picks_it() {
 /// A drag released on a disabled item picks nothing and closes, through the exit fade.
 #[test]
 fn a_drag_released_on_a_disabled_item_closes_picking_nothing() {
-    let mut harness = Harness::new(ClosedMenu, VIEW);
+    let mut harness = Harness::new(
+        ClosedMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let opener = harness.centre(".opener").expect("the opener");
     harness.send(Input::pointer_move(opener));
     harness.send(Input::pointer_down(opener));
@@ -197,7 +209,10 @@ fn a_drag_released_on_a_disabled_item_closes_picking_nothing() {
 /// inside the menu picks nothing by itself. `onpick` runs before `onclose`.
 #[test]
 fn a_click_picks_before_it_closes() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     harness.send(Input::click(row(&harness, "Open")));
     settle_until(&mut harness, |h| log(h).ends_with("close"));
@@ -243,7 +258,10 @@ fn escape_fades_the_menu_out_before_it_closes() {
 /// An outside click fades the menu out too.
 #[test]
 fn an_outside_click_fades_the_menu_out_before_it_closes() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     harness.send(Input::click(Point {
         x: Px(440.0),
@@ -261,7 +279,10 @@ fn an_outside_click_fades_the_menu_out_before_it_closes() {
 /// Every menu opens at rest, with no entrance.
 #[test]
 fn a_menu_opens_with_no_entrance() {
-    let harness = Harness::new(OpenMenu, VIEW);
+    let harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert_eq!(
         harness.attr(".ds-menu", "data-presence").as_deref(),
         Some("present")
@@ -293,7 +314,7 @@ fn PressAt() -> Element {
 /// A press carries its surface-local point, for SNI's `Activate(x, y)` and `ContextMenu(x, y)`.
 #[test]
 fn a_press_reports_where_it_happened() {
-    let mut harness = Harness::new(PressAt, VIEW);
+    let mut harness = Harness::new(PressAt, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     // (point, button)
     const CASES: &[(f32, f32, PointerButton)] = &[
         (105.0, 25.0, PointerButton::Primary),
@@ -329,7 +350,10 @@ fn MeasuredRoot() -> Element {
 /// `ds_blitz::provide_host()` gives a root the Blitz rect read `use_rect` goes through.
 #[test]
 fn the_exported_measurer_reads_a_rect() {
-    let mut harness = Harness::new(MeasuredRoot, VIEW);
+    let mut harness = Harness::new(
+        MeasuredRoot,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(80));
     assert_eq!(harness.text_of(".width").as_deref(), Some("123"));
 }
@@ -341,7 +365,10 @@ fn selected(harness: &Harness) -> Option<String> {
 
 #[test]
 fn home_and_end_go_to_the_first_and_last_enabled_choice() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     harness.send(Input::key(ShortcutKey::End));
     assert_eq!(selected(&harness).as_deref(), Some("Quit"));
@@ -351,7 +378,10 @@ fn home_and_end_go_to_the_first_and_last_enabled_choice() {
 
 #[test]
 fn typing_a_letter_selects_the_choice_that_starts_with_it() {
-    let mut harness = Harness::new(OpenMenu, VIEW);
+    let mut harness = Harness::new(
+        OpenMenu,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_in(&mut harness);
     harness.send(Input::key(ShortcutKey::Char('q')));
     assert_eq!(selected(&harness).as_deref(), Some("Quit"));

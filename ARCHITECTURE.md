@@ -818,10 +818,22 @@ implements it (the traits build with `ds-harness` default features off).
 - **Time in `ds*`** is read only through `ds_core::time::{now, since, sleep}`, never
   `Instant::now()` or `futures_timer` directly (`ds/tests/clock_rule.rs`), so the virtual
   clock reaches it. Library crates never call `tokio::spawn`; they take a `Spawner`.
-- **Timing tests** on `Clock::Wall` never assert a state at one fixed instant near a settle,
+- **Tests run on the virtual clock.** Every test harness names its clock
+  (`HarnessConfig::new(view).with_clock(Clock::Virtual)`; `ds/tests/clock_rule.rs` fails a
+  harness that does not), and a bare `VirtualDom` that needs timers uses `ds/tests/support/dom_time.rs`.
+  Several sessions build on one machine, so load averages of 70-120 are normal and a wall-clock
+  test fails on a different run each time. Virtual time asserts exact instants (`settle_until`
+  returns the instant the timer fired; `assert_eq!` it). `Clock::Wall` is for a test that asserts
+  something about real time (Blitz's wall-clock double click, the split-clock repro), and it says
+  so at the call. A test that waits on a real thread (the spell worker, a PDF raster) waits on
+  the event through `ds-blitz/tests/support/worker.rs` with a generous hang guard no passing run
+  reaches; a negative ("it must not have answered") gives the thread real time and can only let a
+  wrong answer through, never fail a right one. A wall-time budget is not a gate test: mark it
+  `#[ignore = "perf: run with --ignored on a quiet machine"]` and add it to `scripts/perf.sh`.
+- **On `Clock::Wall`** (the exceptions) never assert a state at one fixed instant near a settle,
   hover-intent, submenu or toast boundary: `Driver::advance` guarantees at least the time asked
   for. Poll with `settle_until`, assert order; a "not yet" check asserts a fixed elapsed time only
-  at or under half the window. `Clock::Virtual` tests are exempt.
+  at or under half the window.
 - **A settings key nobody reads is reported on load and not preserved.** A new settings key is a
   `design/22` row first.
 - **`Px` and the geometry built on it are `f32`**, like the renderer's layout: `PartialEq`

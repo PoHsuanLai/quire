@@ -2,6 +2,9 @@
 //! An inserted row enters, a removed one leaves by `row-out` and is dropped when the exit settles,
 //! and the rows below heal by the heights the dropped rows measured.
 
+#[path = "support/dom_time.rs"]
+mod dom_time;
+
 use ds::base::time::stamp::Stamp;
 use ds::prelude::*;
 use ds_motion::presence::{Exit, Presence};
@@ -134,6 +137,7 @@ fn a_row_taken_back_meanwhile_is_not_dropped_by_its_batch() {
 }
 
 mod hook {
+    use super::dom_time::TimedDom;
     use super::{Life, PITCH};
     use dioxus::core::{NoOpMutations, VirtualDom};
     use dioxus::prelude::*;
@@ -145,12 +149,7 @@ mod hook {
     use ds_style::appearance::resolve::Resolved;
     use ds_style::scope::Scope;
     use std::cell::Cell;
-    use std::future::Future;
-    use std::pin::pin;
-    use std::sync::Arc;
-    use std::task::{Context, Poll, Wake, Waker};
-    use std::thread::{self, Thread};
-    use std::time::{Duration, Instant};
+    use std::time::Duration;
 
     thread_local! {
         static ROSTER: Cell<Option<Roster<&'static str>>> = const { Cell::new(None) };
@@ -200,39 +199,6 @@ mod hook {
         static LIST_LEAVES: Cell<LeaveBy> = const { Cell::new(LeaveBy::Action) };
     }
 
-    struct Unpark(Thread);
-
-    impl Wake for Unpark {
-        fn wake(self: Arc<Self>) {
-            self.0.unpark();
-        }
-    }
-
-    /// Let the dom's timers run for `span`, rendering whatever they dirty.
-    fn run_for(dom: &mut VirtualDom, span: Duration) {
-        let end = Instant::now() + span;
-        let waker = Waker::from(Arc::new(Unpark(thread::current())));
-        let mut cx = Context::from_waker(&waker);
-        while Instant::now() < end {
-            let ready = {
-                let mut work = pin!(dom.wait_for_work());
-                loop {
-                    if let Poll::Ready(()) = work.as_mut().poll(&mut cx) {
-                        break true;
-                    }
-                    let now = Instant::now();
-                    if now >= end {
-                        break false;
-                    }
-                    thread::park_timeout(end - now);
-                }
-            };
-            if ready {
-                dom.render_immediate(&mut NoOpMutations);
-            }
-        }
-    }
-
     fn lives(dom: &VirtualDom, roster: Roster<&'static str>) -> Vec<(&'static str, Life)> {
         dom.in_runtime(|| {
             roster
@@ -247,8 +213,7 @@ mod hook {
     fn an_action_leave_drops_the_row_and_heals_on_settle() {
         use Life::{Healing, Leaving, Present};
         LIST_LEAVES.set(LeaveBy::Action);
-        let mut dom = VirtualDom::new(List);
-        dom.rebuild_in_place();
+        let mut dom = TimedDom::new(|| VirtualDom::new(List));
         let roster = ROSTER.get().expect("the list rendered");
         assert!(
             lives(&dom, roster).iter().all(|(_, life)| *life == Present),
@@ -256,9 +221,9 @@ mod hook {
         );
         dom.in_scope(ScopeId::APP, || roster.leave("b"));
         assert_eq!(lives(&dom, roster)[1], ("b", Leaving), "leaving at once");
-        run_for(&mut dom, ms(90));
+        dom.run_for(ms(90));
         assert_eq!(lives(&dom, roster).len(), 4, "still there mid-exit");
-        run_for(&mut dom, ms(200));
+        dom.run_for(ms(200));
         let healed = lives(&dom, roster);
         assert_eq!(
             healed.iter().map(|(k, _)| *k).collect::<Vec<_>>(),
@@ -269,7 +234,7 @@ mod hook {
             matches!(healed[1].1, Healing(_)) && matches!(healed[2].1, Healing(_)),
             "the rows below heal: {healed:?}"
         );
-        run_for(&mut dom, ms(400));
+        dom.run_for(ms(400));
         assert!(
             lives(&dom, roster).iter().all(|(_, life)| *life == Present),
             "heals settle"
@@ -280,8 +245,7 @@ mod hook {
     fn a_delisted_row_plays_its_exit_itself() {
         use Life::Leaving;
         LIST_LEAVES.set(LeaveBy::Delist);
-        let mut dom = VirtualDom::new(List);
-        dom.rebuild_in_place();
+        let mut dom = TimedDom::new(|| VirtualDom::new(List));
         let roster = ROSTER.get().expect("the list rendered");
         let mut keys = KEYS.get().expect("the list rendered");
         dom.in_runtime(|| keys.set(vec!["a", "c", "d"]));
@@ -291,7 +255,7 @@ mod hook {
             ("b", Leaving),
             "no longer listed, still drawn while it leaves"
         );
-        run_for(&mut dom, ms(300));
+        dom.run_for(ms(300));
         assert_eq!(
             lives(&dom, roster).len(),
             3,

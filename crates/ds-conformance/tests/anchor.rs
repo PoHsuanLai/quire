@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::host::measure::{Anchor, MountedRef};
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -77,7 +77,10 @@ fn rect(harness: &Harness, selector: &str) -> Rect {
 
 #[test]
 fn a_menu_anchored_to_a_buttons_mounted_handle_opens_below_it() {
-    let mut harness = Harness::new(AnchorApp, VIEW);
+    let mut harness = Harness::new(
+        AnchorApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let button = rect(&harness, ".ds-button");
     let at = harness
         .centre(".ds-button")

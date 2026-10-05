@@ -8,7 +8,7 @@ use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::host::no_host::NoHost;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -83,7 +83,7 @@ fn Unmeasured() -> Element {
 
 /// Click the strip's button once the pop-in has played, and let the measurement run.
 fn press(app: fn() -> Element) -> String {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     // The strip is centred by auto margins, so its layout rect is where it takes the pointer.
     let at = harness

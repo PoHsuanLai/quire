@@ -16,7 +16,7 @@ use ds::stack::host::OverlayId;
 use ds::stack::hover_hub::{HoverKey, HoverKind};
 use ds::style::tokens::layer::ZLayer;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -151,7 +151,7 @@ app!(OverlayApp, Card::Overlay);
 
 /// Point at the card where it covers row 3, then click its button (which covers row 1 or 2).
 fn point_and_click(app: fn() -> Element) -> (Harness, Point) {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let over_row = Point {
         x: Px(200.0),
@@ -302,7 +302,7 @@ fn MailApp() -> Element {
 
 /// The harness with row 1's sender card open, and the name's centre.
 fn sender_card_open() -> (Harness, Point) {
-    let mut harness = Harness::new(MailApp, VIEW);
+    let mut harness = Harness::new(MailApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let name = centre(&harness, ".m1 .ds-thread-name");
     harness.send(Input::pointer_move(name));
@@ -432,7 +432,10 @@ fn blitz_orders_auto_positioned_boxes_among_siblings_only() {
     // and the card goes under them for paint and hit test alike. quire never draws a floating
     // surface this way (the overlay host carries a z-index); when Blitz follows step 8, this
     // flips and the assertion goes the other way.
-    let mut harness = Harness::new(NestedAutoApp, VIEW);
+    let mut harness = Harness::new(
+        NestedAutoApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let over_row = Point {
         x: Px(200.0),

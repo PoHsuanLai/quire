@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::{FrameLink, FrameLinkHover, FrameLinks, FrameTag, HoverPhase};
-use ds_harness::{Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
@@ -77,7 +77,9 @@ fn reader() -> (Harness, Arc<Heard>) {
             .unwrap_or_else(PoisonError::into_inner)
             .push(hover);
     });
-    let config = HarnessConfig::new(VIEW).with_frame_links(links);
+    let config = HarnessConfig::new(VIEW)
+        .with_clock(Clock::Virtual)
+        .with_frame_links(links);
     (Harness::new(Reader, config), heard)
 }
 
@@ -190,7 +192,12 @@ fn inert_links_report_no_hover() {
             .unwrap_or_else(PoisonError::into_inner)
             .push(hover);
     });
-    let mut harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_frame_links(links));
+    let mut harness = Harness::new(
+        Reader,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_frame_links(links),
+    );
     let bank = at(&harness, "a.bank");
     harness.send(Input::pointer_move(bank));
     let plain = at(&harness, "p.plain");

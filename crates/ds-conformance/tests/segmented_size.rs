@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 #[allow(non_snake_case)]
@@ -48,7 +48,10 @@ fn the_well_and_its_segments_stand_on_the_ladder() {
             height: 240,
             scale_percent,
         };
-        let mut harness = Harness::new(Both, viewport);
+        let mut harness = Harness::new(
+            Both,
+            HarnessConfig::new(viewport).with_clock(Clock::Virtual),
+        );
         harness.advance(Duration::from_millis(50));
         for &(scope, well, segment) in CASES {
             let height = |selector: &str| {

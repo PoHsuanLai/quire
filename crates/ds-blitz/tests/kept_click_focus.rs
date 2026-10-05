@@ -16,7 +16,7 @@ use ds::focus::request::use_focus_request;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -75,7 +75,12 @@ fn Page() -> Element {
 }
 
 fn harness(fallback: FocusFallback) -> Harness {
-    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_focus_fallback(fallback));
+    let mut harness = Harness::new(
+        Page,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_focus_fallback(fallback),
+    );
     harness.advance(Duration::from_millis(50));
     harness
 }
@@ -208,7 +213,10 @@ fn Renaming() -> Element {
 const FIELD: &str = ".ds-row-words input";
 
 fn renaming() -> Harness {
-    let mut harness = Harness::new(Renaming, VIEW);
+    let mut harness = Harness::new(
+        Renaming,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     settle_until(&mut harness, |harness| {
         harness.focus_of(FIELD) == FocusState::Focused
     });

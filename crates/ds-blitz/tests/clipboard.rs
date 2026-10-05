@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::clipboard::{ClipboardError, read_text, write_text};
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -59,7 +59,7 @@ fn Fields() -> Element {
 
 #[test]
 fn ctrl_c_on_a_selection_then_ctrl_v_into_a_second_field() {
-    let mut harness = Harness::new(Fields, VIEW);
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let from = centre(&harness, "#from input");
     harness.send(Input::click(from));
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('a')));
@@ -79,7 +79,7 @@ fn ctrl_c_on_a_selection_then_ctrl_v_into_a_second_field() {
 
 #[test]
 fn the_apps_write_and_read_reach_the_same_clipboard() {
-    let mut harness = Harness::new(Fields, VIEW);
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let copy = centre(&harness, "#copy .ds-button");
     harness.send(Input::click(copy));
     assert_eq!(harness.clipboard_text().as_deref(), Some("ada@example.org"));

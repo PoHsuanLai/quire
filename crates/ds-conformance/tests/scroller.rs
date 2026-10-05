@@ -7,7 +7,7 @@ use ds::base::geometry::scroll::Scroll;
 use ds::components::controls::scroller::handle::use_scroller;
 use ds::components::controls::scroller::view::Scroller;
 use ds::prelude::*;
-use ds_harness::{DocQuery, Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,
@@ -59,7 +59,7 @@ fn click(harness: &mut Harness, selector: &str) {
 
 #[test]
 fn the_state_is_measured_and_follows_the_owners_scrolls_and_the_wheel() {
-    let mut harness = Harness::new(App, VIEW);
+    let mut harness = Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(
         state(&harness),
         "0 100 1000",

@@ -45,7 +45,7 @@ fn Pane() -> Element {
 
 #[test]
 fn the_banner_takes_its_place_in_the_flow_and_holds_its_width() {
-    let mut harness = Harness::new(Pane, VIEW);
+    let mut harness = Harness::new(Pane, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let banner = harness.rect(".ds-inline-banner").expect("the banner");
     let body = harness.rect(".body").expect("the message");
@@ -61,7 +61,7 @@ fn the_banner_takes_its_place_in_the_flow_and_holds_its_width() {
 
 #[test]
 fn the_action_and_the_close_button_each_report_one_press() {
-    let mut harness = Harness::new(Pane, VIEW);
+    let mut harness = Harness::new(Pane, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(harness.text_of(".log").as_deref(), Some(""));
     let load = harness
@@ -81,7 +81,7 @@ fn the_action_and_the_close_button_each_report_one_press() {
 #[test]
 fn a_severity_colours_the_mark_and_a_danger_banner_is_an_alert() {
     let harness = {
-        let mut harness = Harness::new(Pane, VIEW);
+        let mut harness = Harness::new(Pane, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
         harness.advance(ms(100));
         harness
     };
