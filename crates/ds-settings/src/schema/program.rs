@@ -6,8 +6,8 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use super::agent::is_never_settable;
-use super::key::{AgentSetting, KeySpec};
+use super::agent::never_settable_violation;
+use super::key::KeySpec;
 use crate::xdg;
 
 /// The directory name a schema's owning program installs under: `quire`, `sill`, `mailo`. The
@@ -46,11 +46,7 @@ impl Schema {
     /// the companion's own limits, computer use or a lock agent-settable.
     pub fn from_toml(text: &str) -> Result<Schema, String> {
         let schema: Schema = toml::from_str(text).map_err(|e| e.to_string())?;
-        match schema
-            .key
-            .iter()
-            .find(|key| key.agent == AgentSetting::Settable && is_never_settable(&key.path.0))
-        {
+        match never_settable_violation(&schema.key) {
             Some(key) => Err(format!(
                 "key {} is under a never-agent-settable prefix but is marked agent = \"settable\"",
                 key.path.0

@@ -21,6 +21,8 @@ mod error;
 pub mod icon_assets;
 mod latest;
 mod lenient;
+#[cfg(feature = "live")]
+pub mod live;
 mod portal;
 mod root;
 pub mod schema;

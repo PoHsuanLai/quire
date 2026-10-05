@@ -4,6 +4,7 @@
 use serde::{Deserialize, Serialize};
 
 use super::column::Column;
+use super::live_action::LiveAction;
 
 /// A dotted settings key path: `"dock.magnified_px"`. Always `<domain>.<field>`, the derive's
 /// own mechanical rule (`crates/ds-settings-derive/src/gen_struct.rs`).
@@ -142,6 +143,8 @@ pub enum Widget {
     AppearancePickerSwatch,
     ShortcutField,
     RowsEditor,
+    /// A button that runs a live module's action ([`KeyKind::Live`]).
+    ActionButton,
 }
 
 /// A key's shape: what values it can hold, and so which widget draws it.
@@ -182,6 +185,10 @@ pub enum KeyKind {
     /// A rows editor over a list of tables, one cell per column. Derived from a `Vec<T>` field
     /// whose `T` derives `SettingsRow`.
     Rows { columns: Vec<Column> },
+    /// An action of a live module (section 9.4): a button, not a value. Setting the key runs the
+    /// action in the service. Only a live module's schema carries it; a settings file has no such
+    /// key. A live module's value keys use the ordinary kinds above.
+    Live { action: LiveAction },
 }
 
 impl KeyKind {
@@ -199,6 +206,7 @@ impl KeyKind {
             KeyKind::Colour => Widget::AppearancePickerSwatch,
             KeyKind::Shortcut => Widget::ShortcutField,
             KeyKind::List(_) | KeyKind::Rows { .. } => Widget::RowsEditor,
+            KeyKind::Live { .. } => Widget::ActionButton,
         }
     }
 }
@@ -250,6 +258,7 @@ pub fn kind_from_variants(mut words: Vec<String>) -> KeyKind {
 #[cfg(test)]
 mod tests {
     use super::{KeyKind, Page, Widget, kind_from_variants};
+    use crate::schema::{ActionLabel, ActionWeight, LiveAction};
 
     #[test]
     fn two_variants_are_a_toggle() {
@@ -347,6 +356,16 @@ mod tests {
             }
             .widget(),
             Widget::RowsEditor
+        );
+        assert_eq!(
+            KeyKind::Live {
+                action: LiveAction {
+                    label: ActionLabel("Revoke".to_owned()),
+                    weight: ActionWeight::Plain,
+                }
+            }
+            .widget(),
+            Widget::ActionButton
         );
     }
 

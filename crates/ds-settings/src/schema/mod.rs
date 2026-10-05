@@ -11,10 +11,13 @@ mod behaviour;
 mod column;
 mod deep_link;
 mod key;
+mod live_action;
 mod program;
 mod traits;
 
-pub use agent::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, is_never_settable};
+pub use agent::{
+    AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, is_never_settable, never_settable_violation,
+};
 pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use deep_link::{deep_link, deep_link_path};
@@ -22,6 +25,7 @@ pub use key::{
     AgentSetting, Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section, Widget,
     WordLabels, kind_from_variants,
 };
+pub use live_action::{ActionLabel, ActionWeight, LiveAction};
 pub use program::{
     AppId, FilePath, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
 };
