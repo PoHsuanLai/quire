@@ -3,4 +3,5 @@
 
 pub mod placement;
 pub mod scale;
+pub mod scroll;
 pub mod units;

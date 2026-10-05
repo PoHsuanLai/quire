@@ -85,7 +85,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 
 | Crate | Modules, lowest first |
 | --- | --- |
-| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `command` (names, `CommandFace`, `AppCommand`, a shortcut's chord text), `press`, `standard_action`, `geometry` (units, scale, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
+| `ds-core` | `word`, `vocab` (Availability, Selection, Emphasis, Switch, Expanded, Check, Shown, Fraction, Percent, StaggerIndex, ShortcutKey, Shortcut), `command` (names, `CommandFace`, `AppCommand`, a shortcut's chord text), `press`, `standard_action`, `geometry` (units, scale, scroll, placement), `colour` (srgb, oklab, fit, contrast), `time` (clock, virtual clock, `Stamp`, `FrameClock`), `machine` (the `Machine` trait, `Elapsed`), `spawner` (the `Spawner` trait), `error`, `text` (clip), `codec` (png, base64) |
 | `ds-style` | `appearance` (theme, accent, motion, blur, material choice, peek, system prefs, resolve, typeface), `scope` (the enclosing `Scope`), `tokens` (one file per token family, `set.rs` = `TokenSet`, `tuned.rs`), `kit` (`Kit`, `Kits`, `Section`, `Vocabulary`), `material`, `space`, `icon` (glyph tables by family, plate, classify, render, url), `fonts`, `scale`, `css` (emission per cascade section, `reset.css`, `utilities.css`), `emit` |
 | `ds-motion` | `anim` (`Anim`), `recipe` (the table), `keyframes` (generated CSS + `motion.css`), `settle` (settle, timers, wake, reduced), `presence`, `timeline` (`Timeline` + `use_timeline` + one file per implementor), `roster`, `pulse`, `gesture` (drag, swipe, velocity, hover intent), `details` (grammar, `Moment`, `Detailed`, cues, one-shots, glyph morphs) |
 | `ds-behaviour` | `dir` (`Dir`) < `switcher`, `hot_corner`, `modifier_tap` (`tap`, `hold`), `space_swipe` (`numbers`, `velocity`, `finish`; each concept holds `model`, `step`, `tests`) |
@@ -207,6 +207,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Closed vocabulary (slug, label, ALL, parse) | `ds-core::word::Word` + `#[derive(Word)]` |
 | Colour maths (sRGB, linear, OKLab, OKLCH, contrast, gamut fit) | `ds-core::colour` |
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
+| Scroll state (`Scroll`: offset, viewport, content) and what follows from it: clamp, by, reveal, the rows that show, near the end | `ds-core::geometry::scroll` |
+| A scroll container and its scroll state as an owned value | `ds::components::controls::scroller` (`use_scroller` -> `ScrollerRef`, drawn by `Scroller`) |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
 | A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); `ds-motion`'s gesture machines take the same `Stamp` |
 | The app switcher's transition (Command-Tab over apps, quick tap, panel, Q, H, App Exposé), generic over the app key | `ds-behaviour::switcher` |

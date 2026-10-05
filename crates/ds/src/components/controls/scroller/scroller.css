@@ -1,0 +1,5 @@
+/* Scroller: a vertical scroll container. Its scroll state lives in a `ScrollerRef` the owner holds;
+   the host's frame phase publishes it and applies the owner's scrolls. The scrollbar is not
+   drawn (Blitz's overlay thumb is off with `scrollbar-width:none`, FINDINGS "Scrolling"). */
+
+.ds-scroller{ overflow-y:auto; overflow-x:hidden; scrollbar-width:none; min-height:0; outline:none; }

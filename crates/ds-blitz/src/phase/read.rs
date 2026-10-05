@@ -2,6 +2,7 @@
 //! document.
 
 use blitz_dom::{BaseDocument, NodeId, ScrollBehavior};
+use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::PhaseWrite;
 use ds::prelude::{Point, Px, Rect, Size};
 
@@ -17,6 +18,20 @@ pub(crate) fn border_box(doc: &BaseDocument, node: NodeId) -> Option<Rect> {
             width: Px(found.width as f32),
             height: Px(found.height as f32),
         },
+    })
+}
+
+/// `node`'s own scroll state: the offset, the height it shows (its border box less its borders) and
+/// the content's length, which is the height plus how far the content can scroll. `None` when the
+/// node is gone.
+pub(crate) fn scroll_of(doc: &BaseDocument, node: NodeId) -> Option<Scroll> {
+    let found = doc.get_node(node)?;
+    let layout = found.final_layout();
+    let viewport = layout.size.height - layout.border.top - layout.border.bottom;
+    Some(Scroll {
+        offset: Px(found.scroll_offset().y as f32),
+        viewport: Px(viewport),
+        content: Px(viewport + layout.scroll_height()),
     })
 }
 
