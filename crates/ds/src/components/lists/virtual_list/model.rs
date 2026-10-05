@@ -1,35 +1,77 @@
-//! What a `VirtualList` decides, pure: its row heights, which keys left the list and where their
-//! rows were, how far the rows below a dropped row heal, and where the keys move the cursor.
+//! What a `VirtualList` decides, pure: its row heights and what a removal means, which keys left
+//! the list and where their rows were, how far the rows below a dropped row heal, and where the
+//! keys move the cursor.
 
+use crate::components::lists::virtual_list::layout::Layout;
 use crate::stack::roving::{Edge, Rove, Step};
+use dioxus::prelude::Callback;
 use ds_core::geometry::units::Px;
+use ds_motion::anim::Anim;
+use ds_motion::presence::Exit;
 use std::collections::HashMap;
 use std::hash::Hash;
 use std::ops::Range;
 
-/// How tall a row is.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum RowHeight {
+/// How tall the rows are.
+#[derive(Debug, Clone, PartialEq)]
+pub enum RowHeight<K> {
     /// Every row is this tall, gap included: the row at index `i` starts at `i * height`.
     Fixed(Px),
+    /// Each key's row is as tall as the callback says, known up front (a mail row and a
+    /// shorter section heading in one list). A height that is negative or not a finite number
+    /// takes no room. The callback is asked for every key whenever the list renders, so it
+    /// should be a lookup, not a measurement.
+    PerKey(Callback<K, Px>),
 }
 
-impl RowHeight {
-    /// The distance from one row's top to the next one's.
-    pub fn pitch(self) -> Px {
+impl<K: Clone + 'static> RowHeight<K> {
+    /// Where the rows of `keys` lie; `previous` is kept when nothing moved.
+    pub(crate) fn layout(&self, keys: &[K], previous: &Layout) -> Layout {
         match self {
-            RowHeight::Fixed(height) => height,
+            RowHeight::Fixed(pitch) => Layout::Even {
+                pitch: *pitch,
+                len: keys.len(),
+            },
+            RowHeight::PerKey(height) => {
+                Layout::uneven(keys.iter().map(|key| height.call(key.clone())), previous)
+            }
         }
     }
 }
 
+/// What a change of the list's keys is to the rows it removes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Change {
+    /// An edit: a removed row that was mounted plays the list's exit where it stood and the rows
+    /// below heal.
+    #[default]
+    Edit,
+    /// A replacement (a new search answering a new question): removed rows are gone at once and
+    /// the new rows simply take their place, with no exit.
+    Replace,
+}
+
+/// The animation `exit` plays, whose length the list waits out before it drops the rows.
+pub(crate) fn exit_anim(exit: Exit) -> Anim {
+    match exit {
+        Exit::Row => Anim::RowOut,
+        Exit::OsdOut => Anim::OsdOut,
+        Exit::PaneOut => Anim::PaneOutR,
+        Exit::Fade => Anim::MenuOut,
+        Exit::SheetOut => Anim::SheetOut,
+        Exit::PanelOut => Anim::PanelOut,
+    }
+}
+
 /// A row that left the list while it was mounted: it plays its exit where it stood.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Leaving<K> {
     /// The key it had.
     pub(crate) key: K,
     /// The index, in the new list, of the row it stood above: it is drawn before that row.
     pub(crate) slot: usize,
+    /// How tall its row was.
+    pub(crate) height: Px,
 }
 
 /// Where each key of `keys` is.
@@ -54,11 +96,13 @@ pub(crate) fn slot_in<K: Eq + Hash>(
 }
 
 /// The mounted rows `old[shown]` that `new` no longer lists, each with its slot in `new`: the
-/// index of the first key after it in `old` that `new` still has, or `new.len()` when none.
+/// index of the first key after it in `old` that `new` still has, or `new.len()` when none. A
+/// row is as tall as `before` (the layout of `old`) says.
 pub(crate) fn leaving<K: Clone + Eq + Hash>(
     old: &[K],
     shown: Range<usize>,
     new: &[K],
+    before: &Layout,
 ) -> Vec<Leaving<K>> {
     let index = positions(new);
     old.iter()
@@ -69,15 +113,18 @@ pub(crate) fn leaving<K: Clone + Eq + Hash>(
         .map(|(at, key)| Leaving {
             key: key.clone(),
             slot: slot_in(old, at + 1, &index, new.len()),
+            height: before.height(at),
         })
         .collect()
 }
 
-/// How far the row at `index` starts below its resting place once the rows at `slots` are
-/// dropped: one pitch for each dropped row above it. `None` for a row nothing was dropped above.
-pub(crate) fn heal_dy(slots: &[usize], index: usize, pitch: Px) -> Option<Px> {
-    let above = slots.iter().filter(|slot| **slot <= index).count();
-    (above > 0).then_some(Px(pitch.0 * above as f32))
+/// How far the row at `index` starts below its resting place once the rows `dropped` (each a
+/// slot and the height it had) are gone: the height of each dropped row above it. `None` for a
+/// row nothing was dropped above.
+pub(crate) fn heal_dy(dropped: &[(usize, Px)], index: usize) -> Option<Px> {
+    let above = dropped.iter().filter(|(slot, _)| *slot <= index);
+    let count = above.clone().count();
+    (count > 0).then(|| Px(above.map(|(_, height)| height.0).sum()))
 }
 
 /// Where the cursor goes from `at` for `rove` among `len` rows; `None` for an empty list. The
@@ -97,6 +144,7 @@ pub(crate) fn roved(at: Option<usize>, len: usize, rove: Rove) -> Option<usize> 
 #[cfg(test)]
 mod tests {
     use super::{Leaving, heal_dy, leaving, positions, roved, slot_in};
+    use crate::components::lists::virtual_list::layout::Layout;
     use crate::stack::roving::{Edge, Rove, Step};
     use ds_core::geometry::units::Px;
 
@@ -110,7 +158,11 @@ mod tests {
     );
 
     fn gone(key: u32, slot: usize) -> Leaving<u32> {
-        Leaving { key, slot }
+        Leaving {
+            key,
+            slot,
+            height: Px(20.0),
+        }
     }
 
     #[test]
@@ -189,14 +241,19 @@ mod tests {
             ),
         ];
         for (name, old, shown, new, want) in cases {
-            assert_eq!(leaving(&old, shown, &new), want, "{name}");
+            let before = Layout::Even {
+                pitch: Px(20.0),
+                len: old.len(),
+            };
+            assert_eq!(leaving(&old, shown, &new, &before), want, "{name}");
         }
     }
 
     #[test]
     fn a_leaving_row_keeps_standing_above_the_row_it_stood_above_when_the_keys_change() {
-        // (name, keys it left from, its slot there, keys now, wanted slot)
-        let cases: &[(&str, &[u32], usize, &[u32], usize)] = &[
+        /// A case: name, keys it left from, its slot there, keys now, wanted slot.
+        type SlotCase = (&'static str, &'static [u32], usize, &'static [u32], usize);
+        let cases: &[SlotCase] = &[
             ("nothing changed", &[1, 2, 5], 2, &[1, 2, 5], 2),
             ("a key returns above it", &[1, 2, 5], 2, &[1, 2, 3, 5], 3),
             ("a key arrives below it", &[1, 2, 5], 2, &[1, 2, 5, 9], 2),
@@ -224,23 +281,51 @@ mod tests {
     }
 
     #[test]
-    fn rows_below_a_dropped_row_start_one_pitch_lower_for_each_row_above() {
-        let pitch = Px(20.0);
-        // (slots of the dropped rows, the row's index, wanted dy)
-        let cases: &[(&[usize], usize, Option<f32>)] = &[
+    fn a_leaving_row_remembers_how_tall_it_was() {
+        let before = Layout::uneven(
+            [Px(66.0), Px(24.0), Px(66.0)].into_iter(),
+            &Layout::Even {
+                pitch: Px(0.0),
+                len: 0,
+            },
+        );
+        let got = leaving(&[1, 2, 3], 0..3, &[1, 3], &before);
+        assert_eq!(
+            got,
+            vec![Leaving {
+                key: 2,
+                slot: 1,
+                height: Px(24.0)
+            }]
+        );
+    }
+
+    #[test]
+    fn rows_below_dropped_rows_start_the_dropped_heights_lower() {
+        let dropped = |rows: &[(usize, f32)]| -> Vec<(usize, Px)> {
+            rows.iter()
+                .map(|&(slot, height)| (slot, Px(height)))
+                .collect()
+        };
+        // (dropped slots and heights, the row's index, wanted dy)
+        /// A case: dropped slots and heights, the row's index, the wanted distance.
+        type HealCase = (&'static [(usize, f32)], usize, Option<f32>);
+        let cases: &[HealCase] = &[
             (&[], 5, None),
-            (&[3], 2, None),
-            (&[3], 3, Some(20.0)),
-            (&[3], 9, Some(20.0)),
-            (&[3, 3], 3, Some(40.0)),
-            (&[3, 6], 5, Some(20.0)),
-            (&[3, 6], 6, Some(40.0)),
+            (&[(3, 20.0)], 2, None),
+            (&[(3, 20.0)], 3, Some(20.0)),
+            (&[(3, 20.0)], 9, Some(20.0)),
+            (&[(3, 20.0), (3, 20.0)], 3, Some(40.0)),
+            (&[(3, 20.0), (6, 20.0)], 5, Some(20.0)),
+            (&[(3, 20.0), (6, 20.0)], 6, Some(40.0)),
+            (&[(3, 66.0), (6, 24.0)], 5, Some(66.0)),
+            (&[(3, 66.0), (6, 24.0)], 6, Some(90.0)),
         ];
-        for &(slots, index, want) in cases {
+        for &(rows, index, want) in cases {
             assert_eq!(
-                heal_dy(slots, index, pitch),
+                heal_dy(&dropped(rows), index),
                 want.map(Px),
-                "{slots:?} at {index}"
+                "{rows:?} at {index}"
             );
         }
     }

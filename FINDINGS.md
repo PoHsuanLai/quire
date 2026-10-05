@@ -174,13 +174,18 @@ Not built, or limited, in quire:
 - **Level control and swipe do not use `use_pointer_capture` yet**: leaving the control's hit zone (the rail
   and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there. Ends when
   they take the hook.
-- **`VirtualList` has fixed row heights only, and there are no rotate glyphs.** `RowHeight::Fixed` is
-  the one variant: a measured height needs the host to publish each row's rect and the list to
-  keep a prefix sum. `List` still renders every row, and a viewer of a large text file windows its
-  own lines (it owns the wheel and the line index). While a removed row plays its exit the
-  list's scroll mapping is off by that row's height; no type-to-select. The glyph set has no
-  clockwise and counter-clockwise rotate marks: the viewer's capsule borrows `Refresh` and
-  `Undo`. The rotate glyphs end when they are added here.
+- **`VirtualList` has no measured row heights, no type-to-select, and a leaving row skews the
+  scroll mapping; there are no rotate glyphs.** `RowHeight::Fixed` and `RowHeight::PerKey` are the
+  two variants: every height must be known up front (a measured one needs the host to publish each
+  row's rect, and ends when `RowHeight::Measured` is added). `PerKey` asks its callback for every
+  key on each render, a prefix sum of O(rows), so it must be a lookup. While a removed row plays
+  its exit the list's scroll mapping is off by that row's height. A key that returns while it
+  leaves rebases the other leaving rows' slots but not the rows already healing. `List` still
+  renders every row, and a viewer of a large text file windows its own lines (it owns the wheel
+  and the line index). The glyph set has no clockwise and counter-clockwise rotate marks: the
+  viewer's capsule borrows `Refresh` and `Undo`. The rotate glyphs end when they are added here.
+  `ds::components::lists::virtual_list::model::exit_anim` repeats `Exit::anim`, which ds-motion
+  keeps `pub(crate)`; it ends when ds-motion makes that method public.
 - **The media scrubber and the export `Sheet` layout are not built.** `Slider` (capsule look) and
   `Sheet` are what a viewer composes today.
 - **`TreeItem` has no keyboard toggle of its own**; no harness test presses Enter on a summary.
