@@ -30,6 +30,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
     let ident = &input.ident;
 
     let mut pushes = Vec::new();
+    let mut guards = Vec::new();
     for field in &fields.named {
         let Some(field_ident) = &field.ident else {
             continue;
@@ -55,7 +56,10 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             quote! { ::ds_settings::schema::Exposure::Basic }
         };
         let agent_setting = match agent {
-            AgentMark::Settable => quote! { ::ds_settings::schema::AgentSetting::Settable },
+            AgentMark::Settable => {
+                guards.push(never_settable_guard(&path));
+                quote! { ::ds_settings::schema::AgentSetting::Settable }
+            }
             AgentMark::HandsOff => quote! { ::ds_settings::schema::AgentSetting::HandsOff },
         };
         let shape = shape_of(&field_ident.to_string(), &field.ty, hint)
@@ -78,6 +82,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
     }
 
     Ok(quote! {
+        #(#guards)*
         impl ::ds_settings::schema::SettingsSchema for #ident {
             fn schema() -> ::ds_settings::schema::Schema {
                 let default = <Self as ::core::default::Default>::default();
@@ -92,6 +97,23 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             }
         }
     })
+}
+
+/// A compile-time assertion that `path` is not under a never-agent-settable prefix
+/// (`ds_settings::schema::AGENT_NEVER_SETTABLE`). The derive cannot read that list itself
+/// (`ds-settings` depends on this crate), so the check is a `const` evaluated in the
+/// consumer's build: a violation is a compile error naming the key.
+fn never_settable_guard(path: &str) -> TokenStream {
+    let message = format!(
+        "settings key `{path}` is under a never-agent-settable prefix \
+         (ds_settings::schema::AGENT_NEVER_SETTABLE): remove `agent_settable`"
+    );
+    quote! {
+        const _: () = ::core::assert!(
+            !::ds_settings::schema::is_never_settable(#path),
+            #message
+        );
+    }
 }
 
 /// The `KeyKind` expression for one field, from its shape, type and unit.
@@ -183,6 +205,37 @@ mod tests {
                 .to_string();
             assert!(text.contains(want), "{ty}: {text}");
         }
+    }
+
+    #[test]
+    fn agent_settable_emits_a_compile_time_never_settable_guard() {
+        const CASES: &[(&str, &str)] = &[("cua", "cua.f"), ("agent", "agent.f"), ("d", "d.f")];
+        for (domain, path) in CASES {
+            let source = format!(
+                "#[settings(file = \"a/s.toml\", domain = \"{domain}\", page = Page::Dock)] \
+                 struct S {{ #[settings(label = \"L\", agent_settable)] f: String }}"
+            );
+            let text = expanded(&source)
+                .unwrap_or_else(|e| panic!("{e}"))
+                .to_string();
+            assert!(
+                text.contains(&format!("is_never_settable (\"{path}\")")),
+                "{domain}: {text}"
+            );
+            assert!(
+                text.contains("const _ : () = :: core :: assert !"),
+                "{domain}: {text}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_hands_off_field_emits_no_guard() {
+        let source = format!("{HEAD} struct S {{ #[settings(label = \"L\")] f: String }}");
+        let text = expanded(&source)
+            .unwrap_or_else(|e| panic!("{e}"))
+            .to_string();
+        assert!(!text.contains("is_never_settable"), "{text}");
     }
 
     #[test]

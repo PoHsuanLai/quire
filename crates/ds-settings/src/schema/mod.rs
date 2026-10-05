@@ -14,7 +14,7 @@ mod key;
 mod program;
 mod traits;
 
-pub use agent::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED};
+pub use agent::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, is_never_settable};
 pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use deep_link::{deep_link, deep_link_path};
