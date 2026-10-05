@@ -210,18 +210,43 @@ impl Headless {
     }
 
     /// Run every render the document has queued; whether there was any.
+    ///
+    /// # Panics
+    /// When the renders never run dry: a render loop in the app, which the idle-frame rule
+    /// exists to catch, and which a test must fail on, not carry on from.
     fn flush(&mut self) -> bool {
         let waker = Waker::from(Arc::clone(&self.wakeup));
-        (0..MAX_ROUNDS)
+        let rounds = (0..=MAX_ROUNDS)
             .take_while(|_| self.doc.poll(Some(Context::from_waker(&waker))))
-            .count()
-            > 0
+            .count();
+        assert!(
+            rounds <= MAX_ROUNDS,
+            "render loop: the document was still re-rendering after {MAX_ROUNDS} rounds of \
+             renders with no input, so a component writes state on every render or an effect \
+             keeps re-running itself.\ndocument:\n{}",
+            self.html_excerpt()
+        );
+        rounds > 0
+    }
+
+    /// The start of the document's HTML, for a failure message.
+    fn html_excerpt(&self) -> String {
+        const EXCERPT: usize = 4000;
+        let html = self.doc.inner.borrow().root_element().outer_html();
+        match html.char_indices().nth(EXCERPT) {
+            Some((end, _)) => format!("{}... ({} bytes in all)", &html[..end], html.len()),
+            None => html,
+        }
     }
 
     /// Bring the document to animation time `at`: render what is queued, follow the root's
     /// scheme, style and lay out, and go round again while a round produced more work (an image
     /// that landed during styling is applied on the next resolve, spike S7).
+    ///
+    /// # Panics
+    /// After [`MAX_ROUNDS`] rounds that each produced more work, naming what kept producing it.
     pub(crate) fn frame(&mut self, at: Duration) {
+        let mut wanted = Vec::new();
         for _ in 0..MAX_ROUNDS {
             let inner = &self.doc.inner;
             self.links
@@ -241,16 +266,30 @@ impl Headless {
             // After layout, as the window runs it: a published value or an applied write is
             // seen by the next round's renders.
             let phased = self.phase.run(PhaseLayout::Resolved).changed();
-            if !(rendered
-                || restyled
-                || landed
-                || phased
-                || kept == Kept::Moved
-                || synced == Repaired::Yes)
-            {
+            wanted = [
+                (rendered, "components re-rendered"),
+                (restyled, "the colour scheme changed the root's style"),
+                (landed, "a fetched resource landed during layout"),
+                (phased, "the frame phase changed a published value"),
+                (kept == Kept::Moved, "focus moved to an ancestor"),
+                (
+                    synced == Repaired::Yes,
+                    "hover was repaired under the pointer",
+                ),
+            ]
+            .into_iter()
+            .filter_map(|(more, why)| more.then_some(why))
+            .collect();
+            if wanted.is_empty() {
                 return;
             }
         }
+        panic!(
+            "render loop: the document was still changing after {MAX_ROUNDS} rounds of one frame; \
+             the last round still had: {}.\ndocument:\n{}",
+            wanted.join(", "),
+            self.html_excerpt()
+        );
     }
 
     /// Style and lay out at `at`, then dispatch the hover change the layout made under a

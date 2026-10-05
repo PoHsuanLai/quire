@@ -3,18 +3,58 @@
 use super::virtual_queue::{VirtualQueue, VirtualSleep};
 use std::cell::RefCell;
 use std::future::Future;
+use std::marker::PhantomData;
 use std::pin::Pin;
 use std::rc::Rc;
 use std::task::{Context, Poll};
 use std::time::{Duration, Instant};
 
+/// One install on this thread: which guard made it, and the clock it chose (`None` is the
+/// wall clock, put on the stack explicitly so it shadows a virtual clock installed below it).
+#[derive(Debug)]
+struct Install {
+    id: u64,
+    queue: Option<Rc<VirtualQueue>>,
+}
+
+/// Every clock installed on this thread, oldest first, and the id the next one gets. The last
+/// entry is the clock in force; an empty stack is the wall clock. A guard removes its own entry
+/// by id, so guards may drop in any order and the clock in force is always the newest one still
+/// alive.
+#[derive(Debug)]
+struct Installs {
+    next_id: u64,
+    stack: Vec<Install>,
+}
+
 thread_local! {
-    /// The virtual queue installed on this thread; `None` is the wall clock.
-    static INSTALLED: RefCell<Option<Rc<VirtualQueue>>> = const { RefCell::new(None) };
+    static INSTALLED: RefCell<Installs> = const {
+        RefCell::new(Installs { next_id: 0, stack: Vec::new() })
+    };
 }
 
 fn installed() -> Option<Rc<VirtualQueue>> {
-    INSTALLED.with(|slot| slot.borrow().clone())
+    INSTALLED.with(|slot| slot.borrow().stack.last().and_then(|top| top.queue.clone()))
+}
+
+fn push(queue: Option<Rc<VirtualQueue>>) -> ClockGuard {
+    INSTALLED.with(|slot| {
+        let mut installs = slot.borrow_mut();
+        let id = installs.next_id;
+        installs.next_id += 1;
+        installs.stack.push(Install { id, queue });
+        ClockGuard {
+            id,
+            thread: PhantomData,
+        }
+    })
+}
+
+/// Make the wall clock the one [`now`] and [`sleep`] read on this thread until the guard drops,
+/// even while a [`VirtualClock`] installed earlier is still alive: a wall-clock test host built
+/// beside a virtual one must not read the virtual one's time.
+pub fn install_wall() -> ClockGuard {
+    push(None)
 }
 
 /// Now, on this thread's clock: `Instant::now()` on the wall clock, or the virtual clock's
@@ -76,11 +116,11 @@ impl VirtualClock {
         }
     }
 
-    /// Make this the clock [`now`] and [`sleep`] read on this thread until the guard drops,
-    /// which puts back whatever was installed before (so harnesses nest).
+    /// Make this the clock [`now`] and [`sleep`] read on this thread until the guard drops.
+    /// Guards may drop in any order: the clock in force is always the newest install still
+    /// alive, and once none is, the wall clock.
     pub fn install(&self) -> ClockGuard {
-        let previous = INSTALLED.with(|slot| slot.replace(Some(Rc::clone(&self.queue))));
-        ClockGuard { previous }
+        push(Some(Rc::clone(&self.queue)))
     }
 
     /// Now on this clock.
@@ -125,17 +165,21 @@ impl Default for VirtualClock {
     }
 }
 
-/// Keeps a [`VirtualClock`] installed on this thread; dropping it restores the clock that was
-/// installed before.
+/// Keeps a clock installed on this thread; dropping it removes that install (and only that
+/// one, whatever order guards drop in).
 #[derive(Debug)]
 #[must_use = "the clock is uninstalled as soon as the guard drops"]
 pub struct ClockGuard {
-    previous: Option<Rc<VirtualQueue>>,
+    id: u64,
+    /// The installs live in a thread-local, so the guard stays on its thread.
+    thread: PhantomData<*const ()>,
 }
 
 impl Drop for ClockGuard {
     fn drop(&mut self) {
-        let previous = self.previous.take();
-        INSTALLED.with(|slot| slot.replace(previous));
+        let id = self.id;
+        // `try_with`: a guard dropped during thread teardown finds the stack already gone.
+        let _ =
+            INSTALLED.try_with(|slot| slot.borrow_mut().stack.retain(|install| install.id != id));
     }
 }
