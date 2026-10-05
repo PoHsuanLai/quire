@@ -27,18 +27,43 @@ pub const SETTLE_BOUND: Duration = Duration::from_secs(3);
 /// than hanging the test.
 pub const VIRTUAL_DRAIN_BOUND: Duration = Duration::from_secs(30);
 
+/// The step [`settle_until`] takes.
+const STEP: Duration = Duration::from_millis(10);
+
+/// How far [`settle_until`] advances next: [`STEP`], but on the virtual clock no further than the
+/// next pending sleep's due instant, so a state a timer ends is seen at the very instant the
+/// timer fires and not at the next step boundary after it.
+fn step(harness: &Harness) -> Duration {
+    harness
+        .virtual_clock()
+        .and_then(|clock| {
+            clock
+                .next_due()
+                .map(|due| due.saturating_sub(clock.elapsed()))
+        })
+        .filter(|until| !until.is_zero())
+        .map_or(STEP, |until| until.min(STEP))
+}
+
 /// Advance `harness` in 10 ms steps until `done` holds, for at most [`SETTLE_BOUND`] on the
 /// harness's clock (wall or virtual, `Harness::now`). Returns the instant `done` first held, read
 /// on that clock so a caller can compare it against other `Instant`s it took from `Harness::now` (e.g. "settled at least one full slide after it was
 /// asked for"). Panics with the document's HTML — the last state `done` saw — if `done` never
 /// holds within the bound, so a timeout is debuggable from the failure message alone.
+///
+/// **On [`Clock::Virtual`](crate::Clock::Virtual) the instant is exact when a timer ends the
+/// state**: a step never runs past a pending sleep's due instant, so `done` is looked at the
+/// moment the timer fired, and a test asserts the delay it measures with `assert_eq!`, not a
+/// wall-clock hedge (`>=`) that a delay growing from 500 ms to 900 ms would still pass. A state
+/// that only CSS time ends (an animation sampled between timers) is seen at the next 10 ms step.
 pub fn settle_until(harness: &mut Harness, done: impl Fn(&Harness) -> bool) -> Instant {
     let started = harness.now();
     while harness.now().saturating_duration_since(started) < SETTLE_BOUND {
         if done(harness) {
             return harness.now();
         }
-        harness.advance(Duration::from_millis(10));
+        let by = step(harness);
+        harness.advance(by);
     }
     if done(harness) {
         return harness.now();

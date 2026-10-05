@@ -72,11 +72,7 @@ fn hidden_it_slides_out_and_on_hidden_runs_at_settle_and_not_before() {
     harness.advance(out / 2);
     assert_eq!(hidden(&mut harness), 0, "not well before settle(PanelOut)");
     let gone = settle_until(&mut harness, |h| presence(h).is_none());
-    assert!(
-        gone.duration_since(hiding) >= out,
-        "{:?}",
-        gone.duration_since(hiding)
-    );
+    assert_eq!(gone.duration_since(hiding), out);
     assert_eq!(hidden(&mut harness), 1);
     assert_eq!(
         harness

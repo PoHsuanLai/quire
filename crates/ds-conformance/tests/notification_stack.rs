@@ -117,11 +117,7 @@ fn one_removed_from_the_middle_leaves_and_those_after_it_heal() {
     assert_eq!(hidden(&harness), "");
 
     let gone = settle_until(&mut harness, |h| h.count(".ds-banner") == 2);
-    assert!(
-        gone.duration_since(removed) >= out,
-        "{:?}",
-        gone.duration_since(removed)
-    );
+    assert_eq!(gone.duration_since(removed), out);
     assert_eq!(presence(&harness, 1).as_deref(), Some("healing"));
     assert_eq!(
         presence(&harness, 3).as_deref(),

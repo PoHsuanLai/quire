@@ -152,10 +152,10 @@ fn a_drag_released_past_the_threshold_flies_out_and_reports_at_settle() {
         "not before the flight has run"
     );
     let heard = settle_until(&mut harness, dismissed);
-    assert!(
-        heard.duration_since(released) >= flight,
-        "on_dismiss once the flight had run: {:?}",
-        heard.duration_since(released)
+    assert_eq!(
+        heard.duration_since(released),
+        flight,
+        "on_dismiss once the flight had run"
     );
     assert!(!log(&mut harness).contains(&"open".to_owned()));
 }
@@ -197,8 +197,7 @@ fn under_reduced_the_flight_settles_at_reduceds_length() {
     let released = drag(&mut harness, at, 100.0);
     let heard = settle_until(&mut harness, dismissed);
     let took = heard.duration_since(released);
-    assert!(took >= reduced, "{took:?}");
+    // Exactly Reduced's length: the flight is a quick exit, which Reduced does not stretch.
+    assert_eq!(took, reduced);
     assert!(reduced <= standard, "{reduced:?} against {standard:?}");
-    // The flight is a quick exit: Reduced does not stretch it.
-    assert!(took < reduced + ms(200), "{took:?} against {reduced:?}");
 }

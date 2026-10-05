@@ -556,8 +556,9 @@ fn a_hidden_pane_leaves_and_says_so_when_its_exit_settles() {
         harness.count(".ds-preview") == 0
     });
     assert_eq!(harness.count(".ds-preview"), 0, "dropped at on_hidden");
-    assert!(
-        dropped.duration_since(asked) >= ms(250),
-        "not before the exit settled"
+    assert_eq!(
+        dropped.duration_since(asked),
+        settle(Anim::PaneOutR, MotionLevel::Standard),
+        "dropped exactly when the exit settled"
     );
 }

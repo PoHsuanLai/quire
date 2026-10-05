@@ -88,7 +88,11 @@ fn the_pointer_over_it_pauses_the_hold_and_leaving_starts_it_over() {
     );
     let left = harness.now();
     settle_until(&mut harness, |h| presence(h).as_deref() == Some("leaving"));
-    assert!(harness.now().duration_since(left) >= ms(2000));
+    assert_eq!(
+        harness.now().duration_since(left),
+        ms(2500),
+        "the hold that started over ran its remaining half"
+    );
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-toast"), 0);
 }

@@ -148,10 +148,12 @@ fn a_new_level_moves_the_arc_linearly_and_the_figure_changes_at_once() {
         arcs.iter().any(|&a| a > 410 && a < 920),
         "no frame between the old level and the new: {arcs:?}"
     );
-    assert!(
-        rested.duration_since(changed) >= travel(),
-        "at rest only after the whole move: {:?}",
-        rested.duration_since(changed)
+    // The arc reaches the new level `travel()` after the 1 ms step above, and `samples` calls it
+    // there once it has stood three 10 ms steps running: so a longer or shorter move fails.
+    assert_eq!(
+        rested.duration_since(changed),
+        Duration::from_millis(1) + travel() + 3 * Duration::from_millis(10),
+        "at rest only after the whole move"
     );
     assert!((399..=401).contains(&drawn(&harness)));
     assert_rests(&mut harness);

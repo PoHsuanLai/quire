@@ -154,9 +154,9 @@ fn a_row_folded_again_after_a_stay_settles_on_its_own_clock() {
     );
     let fold = settle(Anim::RowOut, MotionLevel::Standard);
     let dropped = settle_until(&mut harness, |h| h.count(".ds-list-item") == 2);
-    assert!(
-        dropped.duration_since(refolded) >= fold,
-        "the second fold dropped the row only once its own full settle had run: {:?}",
-        dropped.duration_since(refolded)
+    assert_eq!(
+        dropped.duration_since(refolded),
+        fold,
+        "the second fold dropped the row only once its own full settle had run"
     );
 }

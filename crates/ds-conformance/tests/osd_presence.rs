@@ -79,10 +79,10 @@ fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
     assert_eq!(presence(&harness).as_deref(), Some("leaving"));
 
     let gone = settle_until(&mut harness, |h| presence(h).is_none());
-    assert!(
-        gone.duration_since(hiding) >= out,
-        "the card left only once the full fade had run: {:?}",
-        gone.duration_since(hiding)
+    assert_eq!(
+        gone.duration_since(hiding),
+        out,
+        "the card left only once the full fade had run"
     );
     assert_eq!(
         hidden(&mut harness),

@@ -177,10 +177,10 @@ fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
         "not open well before 450 ms"
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
-    assert!(
-        opened.duration_since(entered) >= Duration::from_millis(500),
-        "the card opened only once the intent wait had fully run: {:?}",
-        opened.duration_since(entered)
+    assert_eq!(
+        opened.duration_since(entered),
+        Duration::from_millis(500),
+        "the card opened only once the intent wait had fully run"
     );
     assert_eq!(harness.text_of(".card-of").as_deref(), Some("pin:1"));
     harness.advance(ms(100));
@@ -232,10 +232,10 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
         "not open well before 450 ms"
     );
     let opened = settle_until(&mut harness, |h| h.count(".ds-hovercard") == 1);
-    assert!(
-        opened.duration_since(entered) >= Duration::from_millis(500),
-        "the card opened only once the intent wait had fully run: {:?}",
-        opened.duration_since(entered)
+    assert_eq!(
+        opened.duration_since(entered),
+        Duration::from_millis(500),
+        "the card opened only once the intent wait had fully run"
     );
     harness.advance(ms(50));
     assert_eq!(
@@ -262,10 +262,10 @@ fn with_no_layout_an_unplaced_card_opens_in_place_on_the_hubs_timing() {
     let leaving = settle_until(&mut harness, |h| {
         h.attr(".ds-hovercard", "data-presence").as_deref() == Some("leaving")
     });
-    assert!(
-        leaving.duration_since(left) >= Duration::from_millis(150),
-        "the close intent fired only once the full delay had run: {:?}",
-        leaving.duration_since(left)
+    assert_eq!(
+        leaving.duration_since(left),
+        Duration::from_millis(150),
+        "the close intent fired only once the full delay had run"
     );
     harness.advance(ms(250));
     assert_eq!(harness.count(".ds-hovercard"), 0, "{}", harness.html());

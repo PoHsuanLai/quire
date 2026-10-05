@@ -94,10 +94,10 @@ fn step_and_watch(harness: &mut Harness, label: &str, class: &str) {
         Some("a")
     );
     let rested = settle_until(harness, |harness| !sliding(harness, class));
-    assert!(
-        rested.duration_since(pressed) >= slide(),
-        "the class stays for the whole slide: {:?}",
-        rested.duration_since(pressed)
+    assert_eq!(
+        rested.duration_since(pressed),
+        slide(),
+        "the class stays for the whole slide"
     );
     assert_eq!(harness.attr(".ds-month-weeks", "data-pulse"), None);
 }

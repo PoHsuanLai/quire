@@ -232,10 +232,10 @@ fn escape_fades_the_menu_out_before_it_closes() {
     assert_eq!(log(&harness), "", "still fading at half the fade");
     assert_eq!(harness.count(".ds-menu"), 1);
     let closed = settle_until(&mut harness, |h| log(h) == "close");
-    assert!(
-        closed.duration_since(escaped) >= fade(),
-        "onclose landed only once the full fade had run: {:?}",
-        closed.duration_since(escaped)
+    assert_eq!(
+        closed.duration_since(escaped),
+        fade(),
+        "onclose landed only once the full fade had run"
     );
     assert_eq!(harness.count(".ds-menu"), 0);
 }
