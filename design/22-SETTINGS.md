@@ -50,7 +50,7 @@ doc is the authority on where each key actually lives, and supersedes those inli
 | --- | --- | --- |
 | `$XDG_CONFIG_HOME/quire/appearance.toml` | `ds-settings` (crate `crates/ds-settings`, PLAN "Design: `<ds>`") | `appearance`, `motion` (level selector only), `icons` |
 | `$XDG_CONFIG_HOME/sill/settings.toml` | `sill` (crate `sill-services`/`sill-surfaces`) | `bar`, `dock`, `launcher`, `scroll`, `scrollbar`, `menus`, `switcher`, `notifications`, `control_center`, `spaces`, `osd`, `power_menu`, `display`, `session`, `widgets`, `calendar`, `screenshot`, `hot_corners`, `keyboard` |
-| `$XDG_CONFIG_HOME/<daemon>/…` | the companion's daemons: inferd (porter), intentd and companiond (docket), memoryd (almanac), cuad (cua); each repo names its file and ships its schema (section 9.2) | `ai`, `agent`, `memory`, `cua` (sections 3.26 to 3.29) |
+| `$XDG_CONFIG_HOME/<daemon>/…` | the companion's daemons: inferd (porter), intentd and companiond (docket), memoryd (almanac), cuad (cua); each repo names its file and ships its schema (section 9.2). Named so far: docket `$XDG_CONFIG_HOME/docket/settings.toml` (schema `dist/settings/docket.settings.toml`); inferd's schema is porter's `dist/inferd.settings.toml` | `ai`, `agent`, `memory`, `cua` (sections 3.26 to 3.29) |
 | `$XDG_CONFIG_HOME/anyview/settings.toml` | `anyview` (the file viewer; its settings module ships the schema, section 9.2) | `viewer` (section 3.31) |
 | `$XDG_CONFIG_HOME/palmrest/gestures.toml` | `palmrest` (the gesture daemon, PLAN Appendix B); `sill`/`shell-host` read it read-only for `PointerOver` suppression and the scroll `feel` module | `gestures`, `palm_rejection` |
 
@@ -561,7 +561,7 @@ How sill treats the keyboard per app (keycap, the key-cap overlay: which keycap 
 
 ### 3.26 `ai` (inferd, through its settings module)
 
-The model layer: where data may go, which model fills each tier, how the engines are supervised. Page Intelligence, section Models (`ai.local_only`, `ai.floor.*`, `ai.model.*`) and Advanced (`ai.engine.*`, `ai.cua.*`). The owning daemon's repo names its file; the Intelligence page reads its schema (section 9.2) and the live picker rows (section 9.4).
+The model layer: where data may go, which model fills each tier, how the engines are supervised. Page Intelligence, section Models (`ai.local_only`, `ai.floor.*`, `ai.model.*`) and Advanced (`ai.engine.*`, `ai.cua.*`). The owning daemon's repo names its file (its schema ships as porter's `dist/inferd.settings.toml`); the Intelligence page reads that schema (section 9.2) and the live picker rows (section 9.4).
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -587,7 +587,7 @@ The model layer: where data may go, which model fills each tier, how the engines
 
 ### 3.27 `agent` (docket)
 
-How far the companion may act on its own and what it may spend. Page Intelligence, section Privacy (`agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`); the rest Advanced. Every value of the budget table is a key, never a constant (QUESTIONS S5); the person may lower a budget, and only the person may raise the false-negative targets of the evaluation gates, which are not keys.
+How far the companion may act on its own and what it may spend. Page Intelligence, section Privacy (`agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`); the rest Advanced. Every value of the budget table is a key, never a constant (QUESTIONS S5); the person may lower a budget, and only the person may raise the false-negative targets of the evaluation gates, which are not keys. The keys live in `$XDG_CONFIG_HOME/docket/settings.toml`; the schema ships as docket's `dist/settings/docket.settings.toml` (hands-off for agents), and actions-mcp reads `agent.mcp.expose` from the same file (`actions-mcp --write-schema <dir>` writes its part).
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
