@@ -1,5 +1,5 @@
-//! VirtualList: a list of thousands of rows, of one fixed height, that mounts only the rows near
-//! the viewport. Its scroll state is a `ScrollerRef`: the rows to mount come from `Scroll::rows`
+//! VirtualList: a list of thousands of rows, of one height or one per key, that mounts only the
+//! rows near the viewport. Its scroll state is a `ScrollerRef`: the rows to mount come from `Scroll::rows`
 //! over it, a cursor the owner moves is kept in view by revealing its row, and the end of the list
 //! coming near is reported for paging. A row the owner removes while it is mounted plays the
 //! list's exit where it stood and the rows below heal, as in `List`; a row that only scrolled out
@@ -10,16 +10,19 @@ use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::list::entry::SetPlace;
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::list::list::node_key;
+use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::model::{
-    Leaving, RowHeight, heal_dy, leaving, positions, roved, slot_in,
+    Change, Leaving, RowHeight, exit_anim, heal_dy, leaving, positions, roved, slot_in,
 };
 use crate::root::common::Common;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-use ds_core::geometry::scroll::Scroll;
+use ds_core::geometry::scroll::{Scroll, ScrollSpan};
 use ds_core::geometry::units::Px;
 use ds_core::time::clock::sleep;
+use ds_core::word::Word;
 use ds_motion::anim::Anim;
+use ds_motion::presence::Exit;
 use ds_motion::settle::settle;
 use ds_style::scope::{Scope, use_scope_signal};
 use ds_style::task::{spawn_in, try_get};
@@ -69,30 +72,37 @@ struct Memory<K> {
     leaving: Vec<Exiting<K>>,
     /// The batch the next exits belong to.
     next_batch: Batch,
-    /// The slots of rows just dropped, whose rows below are healing.
-    healing: Vec<usize>,
+    /// The slots and heights of rows just dropped, whose rows below are healing.
+    healing: Vec<(usize, Px)>,
+    /// Where the rows lay as of the last render.
+    layout: Layout,
 }
 
 /// `keys`, each drawn by `row` only while it is within the viewport (and `overscan` rows around
-/// it). `height` is every row's height. `cursor` is the key the owner's keys rest on: it is kept
+/// it). `height` is every row's height, one for all or one per key. `cursor` is the key the owner's keys rest on: it is kept
 /// in view, and the arrow keys, Home and End ask `onselect` to move it, Enter and Space ask
 /// `onpick`. `near_end` is called when fewer than `page_rows` rows lie below the viewport, and
 /// again when the list grows and it is still so. A row's content must fit its height.
+///
+/// A key the owner stops listing while its row is mounted plays `exit` where it stood and the
+/// rows below heal, unless `change` says the keys were replaced: then the row is gone at once. A
+/// key listed again before its exit settles is an ordinary row again.
 #[component]
 pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
     label: String,
     keys: Vec<K>,
     row: Callback<K, Element>,
-    height: RowHeight,
+    height: RowHeight<K>,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] cursor: Option<K>,
     #[props(default)] onselect: Option<EventHandler<K>>,
     #[props(default)] onpick: Option<EventHandler<K>>,
     #[props(default)] near_end: Option<EventHandler<()>>,
     #[props(default = PAGE_ROWS)] page_rows: usize,
+    #[props(default = Exit::Row)] exit: Exit,
+    #[props(default)] change: Change,
     #[props(default)] common: Common,
 ) -> Element {
-    let pitch = height.pitch();
     let len = keys.len();
     let scroller = use_scroller();
     let tick = use_signal(|| 0u32);
@@ -106,20 +116,18 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
             leaving: Vec::new(),
             next_batch: Batch(0),
             healing: Vec::new(),
+            layout: Layout::Even {
+                pitch: Px(0.0),
+                len: 0,
+            },
         })
     });
+    let layout = height.layout(&keys, &memory.peek().layout);
     let window = use_memo(use_reactive(
-        (&len, &pitch, &overscan),
-        move |(len, pitch, overscan)| {
-            let seen = *scroller.scroll().read();
-            let whole = Scroll {
-                content: Px(len as f32 * pitch.0),
-                ..seen
-            };
-            whole.rows(pitch, len, overscan)
-        },
+        (&layout, &overscan),
+        move |(layout, overscan)| layout.window(*scroller.scroll().read(), overscan),
     ));
-    use_paging(scroller, len, pitch, page_rows, near_end);
+    use_paging(scroller, &layout, page_rows, near_end);
     let scope = use_scope_signal();
     let task_scope = use_hook(dioxus::core::current_scope_id);
     let mut mem = memory;
@@ -137,7 +145,10 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
             exiting.gone.slot = slot_in(&state.keys, exiting.gone.slot, &index, keys.len());
         }
         let before = state.start..state.start + state.shown.len();
-        let gone = leaving(&state.keys, before, &keys);
+        let gone = match change {
+            Change::Edit => leaving(&state.keys, before, &keys, &state.layout),
+            Change::Replace => Vec::new(),
+        };
         let batch = state.next_batch;
         state.next_batch = Batch(batch.0 + 1);
         let started = !gone.is_empty();
@@ -155,18 +166,19 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
         }
         state.keys = keys.clone();
         if started {
-            queue_effect(move || drop_after_exit(memory, tick, scope, task_scope, batch));
+            queue_effect(move || drop_after_exit(memory, tick, scope, task_scope, batch, exit));
         }
     }
+    state.layout = layout.clone();
     state.cursor = cursor
         .as_ref()
         .and_then(|cursor| keys.iter().position(|key| key == cursor));
     let cursor_at = state.cursor;
     let end = window().end.min(len);
     let start = window().start.min(end);
-    let items = items(&mut state, &keys, start..end, pitch, row);
+    let items = items(&mut state, &keys, start..end, &layout, row, exit);
     drop(state);
-    use_cursor_reveal(scroller, cursor_at, pitch);
+    use_cursor_reveal(scroller, cursor_at.map(|at| layout.span(at)));
     let onkeydown = move |event: KeyboardEvent| {
         let Some(act) = list_key(&event.key(), event.modifiers()) else {
             return;
@@ -191,7 +203,7 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
         }
     };
     let data = common.data_attributes();
-    let (above, below) = (start as f32 * pitch.0, (len - end) as f32 * pitch.0);
+    let (above, below) = (layout.top(start).0, layout.below(end).0);
     rsx! {
         div {
             class: common.class("ds-virtual-list"),
@@ -233,11 +245,11 @@ struct Item {
     content: Element,
 }
 
-/// A row's inline style: its fixed height, and the distance it heals from.
-fn row_style(pitch: Px, heal: Option<Px>) -> String {
+/// A row's inline style: its height, and the distance it heals from.
+fn row_style(height: Px, heal: Option<Px>) -> String {
     match heal {
-        Some(dy) => format!("height:{}px;--dy:{}px", pitch.0, dy.0),
-        None => format!("height:{}px", pitch.0),
+        Some(dy) => format!("height:{}px;--dy:{}px", height.0, dy.0),
+        None => format!("height:{}px", height.0),
     }
 }
 
@@ -247,10 +259,11 @@ fn items<K: Clone + Eq + Hash + 'static>(
     state: &mut Memory<K>,
     keys: &[K],
     window: std::ops::Range<usize>,
-    pitch: Px,
+    layout: &Layout,
     row: Callback<K, Element>,
+    exit: Exit,
 ) -> Vec<Item> {
-    let slots: Vec<usize> = state.healing.clone();
+    let dropped = state.healing.clone();
     let mut items = Vec::new();
     let mut shown = Vec::with_capacity(window.len());
     for at in window.start..=window.end {
@@ -263,8 +276,8 @@ fn items<K: Clone + Eq + Hash + 'static>(
                 node: node_key(&exiting.gone.key),
                 place: None,
                 presence: Some("leaving"),
-                exit: Some("row"),
-                style: row_style(pitch, None),
+                exit: Some(exit.slug()),
+                style: row_style(exiting.gone.height, None),
                 content: exiting.content.clone(),
             });
         }
@@ -272,7 +285,7 @@ fn items<K: Clone + Eq + Hash + 'static>(
             continue;
         };
         let content = row.call(key.clone());
-        let heal = heal_dy(&slots, at, pitch);
+        let heal = heal_dy(&dropped, at);
         items.push(Item {
             node: node_key(key),
             place: Some(SetPlace {
@@ -281,7 +294,7 @@ fn items<K: Clone + Eq + Hash + 'static>(
             }),
             presence: heal.map(|_| "healing"),
             exit: None,
-            style: row_style(pitch, heal),
+            style: row_style(layout.height(at), heal),
             content: content.clone(),
         });
         shown.push((key.clone(), content));
@@ -298,21 +311,22 @@ fn drop_after_exit<K: Clone + Eq + 'static>(
     scope: Signal<Scope>,
     task_scope: ScopeId,
     batch: Batch,
+    exit: Exit,
 ) {
     spawn_in(task_scope, async move {
         let Ok(motion) = try_get(scope).map(|scope| scope.resolved.motion) else {
             return;
         };
-        sleep(settle(Anim::RowOut, motion)).await;
+        sleep(settle(exit_anim(exit), motion)).await;
         let mut memory = memory;
         let Ok(mut state) = memory.try_write() else {
             return;
         };
-        let dropped: Vec<usize> = state
+        let dropped: Vec<(usize, Px)> = state
             .leaving
             .iter()
             .filter(|exiting| exiting.batch == batch)
-            .map(|exiting| exiting.gone.slot)
+            .map(|exiting| (exiting.gone.slot, exiting.gone.height))
             .collect();
         state.leaving.retain(|exiting| exiting.batch != batch);
         state.healing = dropped;
@@ -326,17 +340,17 @@ fn drop_after_exit<K: Clone + Eq + 'static>(
     });
 }
 
-/// Scroll the cursor's row into view when the cursor moves, and once the scroller has been
+/// Scroll the cursor's row, at `span`, into view when it moves, and once the scroller has been
 /// measured.
-fn use_cursor_reveal(scroller: ScrollerRef, cursor: Option<usize>, pitch: Px) {
+fn use_cursor_reveal(scroller: ScrollerRef, span: Option<ScrollSpan>) {
     let measured = use_memo(move || match scroller.scroll().read().viewport.0 > 0.0 {
         true => Measured::Yes,
         false => Measured::No,
     });
-    use_effect(use_reactive((&cursor, &pitch), move |(cursor, pitch)| {
+    use_effect(use_reactive((&span,), move |(span,)| {
         let _ = measured();
-        if let Some(at) = cursor {
-            scroller.reveal_row(at, pitch);
+        if let Some(span) = span {
+            scroller.reveal(span);
         }
     }));
 }
@@ -344,20 +358,19 @@ fn use_cursor_reveal(scroller: ScrollerRef, cursor: Option<usize>, pitch: Px) {
 /// Report the end of the list coming near, and again when the list grows and it still is.
 fn use_paging(
     scroller: ScrollerRef,
-    len: usize,
-    pitch: Px,
+    layout: &Layout,
     page_rows: usize,
     near_end: Option<EventHandler<()>>,
 ) {
     let near = use_memo(use_reactive(
-        (&len, &pitch, &page_rows),
-        move |(len, pitch, page_rows)| {
+        (layout, &page_rows),
+        move |(layout, page_rows)| {
             let seen = *scroller.scroll().read();
             let whole = Scroll {
-                content: Px(len as f32 * pitch.0),
+                content: layout.total(),
                 ..seen
             };
-            match whole.near_end(Px(page_rows as f32 * pitch.0)) {
+            match whole.near_end(layout.page(page_rows)) {
                 true => Near::Yes,
                 false => Near::No,
             }
@@ -366,7 +379,7 @@ fn use_paging(
     // The newest handler, without its being a reason to report again.
     let mut handler = use_hook(|| CopyValue::new(near_end));
     handler.set(near_end);
-    use_effect(use_reactive((&len,), move |(_,)| {
+    use_effect(use_reactive((&layout.len(),), move |(_,)| {
         if let (Near::Yes, Some(near_end)) = (near(), *handler.peek()) {
             near_end.call(());
         }

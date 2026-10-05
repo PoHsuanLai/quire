@@ -208,7 +208,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Colour maths (sRGB, linear, OKLab, OKLCH, contrast, gamut fit) | `ds-core::colour` |
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
 | Scroll state (`Scroll`: offset, viewport, content) and what follows from it: clamp, by, reveal, the rows that show, near the end | `ds-core::geometry::scroll` |
-| A list that mounts only the rows near the viewport (fixed row height, cursor kept in view, paging cue, keyed exit) | `ds::components::lists::virtual_list` (`VirtualList`, `RowHeight`; its pure steps in `model`) |
+| A list that mounts only the rows near the viewport (one row height or one per key, cursor kept in view, paging cue, keyed exit or replacement) | `ds::components::lists::virtual_list` (`VirtualList`, `RowHeight`, `Change`; the prefix sum and window search in `layout`, its other pure steps in `model`) |
 | A scroll container and its scroll state as an owned value | `ds::components::controls::scroller` (`use_scroller` -> `ScrollerRef`, drawn by `Scroller`) |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
 | A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); every timed machine in `ds-behaviour` and `ds-motion` takes the same `Stamp` |
