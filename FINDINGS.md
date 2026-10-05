@@ -707,6 +707,11 @@ own caret and selection. The route needs no Blitz fork.
   answers `Observed::Unsupported` and components read through `GeometryHost::measure` as before.
   Ends when shell-host calls `Phase::run` after each of its surfaces' layouts and gives
   `provide_host` that phase.
+- **One-shot rect reads still wait on frames.** `use_rect` and `use_layout` ride the phase;
+  `client_rect`, `laid_out_rect`/`laid_out_now` (and `layout_retry` under them), `follow_rect` and
+  `RectProbe::reread` do not: they serve `ds::host::reveal`, the palette's rows and motion, the
+  menu tracker, the popover and the hover card, and they are `use_layout`'s fallback where the
+  host runs no phase. Each leaves when its caller reads a `use_layout` signal instead.
 - **Rect reads can collide with the renderer** the same way: dioxus-native-dom's
   `get_client_rect` borrows the document mutably on its first poll. Every rect read goes through
   `geometry::measure::client_rect`, which asks the host's `GeometryHost::measure` (ds-blitz's answers
