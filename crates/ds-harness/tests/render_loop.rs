@@ -69,7 +69,7 @@ fn Ticker() -> Element {
     let mut ticks = use_signal(|| 0_u32);
     use_hook(move || {
         spawn(async move {
-            while ticks.peek().clone() < 300 {
+            while *ticks.peek() < 300 {
                 sleep(Duration::from_millis(1)).await;
                 ticks += 1;
             }
