@@ -334,11 +334,13 @@ fn the_badge_times_out_on_ds_motions_own_clock() {
 /// Section 10, "Menu tracking".
 #[test]
 fn menu_track_steps() {
+    use ds::base::machine::Machine;
+    use ds::base::time::stamp::Stamp;
     use ds::stack::menu_track::types::{MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent};
-    use std::time::Instant;
 
-    let track: MenuTrack<u32> = MenuTrack::new(MenuTiming::default());
-    let (track, effects) = track.step(MenuTrackEvent::PressTitle(1), Instant::now());
+    let track: MenuTrack<u32> = MenuTrack::closed();
+    let timing = MenuTiming::default();
+    let (track, effects) = track.step(MenuTrackEvent::PressTitle(1), Stamp(0), &timing, &());
     assert!(!effects.is_empty());
 }
 
