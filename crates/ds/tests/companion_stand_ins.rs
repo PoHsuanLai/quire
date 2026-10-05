@@ -14,7 +14,7 @@ struct Seen(Rc<RefCell<Vec<(&'static str, bool)>>>);
 
 fn root() -> Element {
     let seen = consume_context::<Seen>();
-    let mut note = |what: &'static str, empty: bool| seen.0.borrow_mut().push((what, empty));
+    let note = |what: &'static str, empty: bool| seen.0.borrow_mut().push((what, empty));
     note("answers", NoPort.answers().read().is_none());
     note("heard", NoPort.heard().read().is_none());
     note("text", NoDictation.text().read().is_none());

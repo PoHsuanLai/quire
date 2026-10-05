@@ -20,6 +20,7 @@ use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
 use crate::open_window::WindowSpec;
 use crate::setup::Setup;
+use crate::startup_token::LaunchTokens;
 use crate::window::Decorations;
 use crate::window_build::Base;
 use crate::window_requests::{Requests, Root};
@@ -136,6 +137,9 @@ pub fn launch_idle(config: AppConfig) {
 }
 
 fn run(first: Option<fn() -> Element>, config: AppConfig) {
+    // First, before the runtime below or the event loop start a thread: clearing the activation
+    // token from the environment while another thread may read it is undefined behaviour.
+    let tokens = LaunchTokens::from_env();
     // Held until this call returns, which does not happen until the loop ends — i.e., for
     // the process's life. See `runtime` for why a host thread must enter Tokio at all.
     let _runtime = enter_runtime();
@@ -155,7 +159,11 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) {
     if let Some(app) = first {
         base.requests.open(config.first, Root::Plain(app));
     }
-    let windows = Windows::new(base, Lifecycle::new(config.last_window, Instant::now()));
+    let windows = Windows::new(
+        base,
+        Lifecycle::new(config.last_window, Instant::now()),
+        tokens,
+    );
     // As dioxus-native's own `launch` does: an event loop that cannot run leaves the app no
     // window to show anything in, which is a broken host, not bad input.
     let ran = event_loop.run_app(windows);

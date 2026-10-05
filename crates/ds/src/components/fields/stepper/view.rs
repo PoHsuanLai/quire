@@ -45,6 +45,8 @@ struct Holding {
     latest: CopyValue<i32>,
     range: StepRange,
     onchange: EventHandler<i32>,
+    /// The half-typed text in the field: a step replaces it with the number it lands on.
+    draft: Signal<Option<String>>,
 }
 
 impl Holding {
@@ -59,8 +61,15 @@ impl Holding {
 
     /// The change one step from the value now.
     fn step(self, direction: StepDirection) {
-        self.onchange
-            .call(self.range.step_from(*self.latest.peek(), direction));
+        self.change(self.range.step_from(*self.latest.peek(), direction));
+    }
+
+    /// Report a change that did not come from typing (a step, Home, End): the number shown is
+    /// the value now, not whatever was half typed before it.
+    fn change(self, to: i32) {
+        let mut draft = self.draft;
+        draft.set(None);
+        self.onchange.call(to);
     }
 
     /// The repeat timer of one press: it waits, then steps at the repeat pitch until the press
@@ -98,13 +107,14 @@ pub fn Stepper(
     let hold = use_hook(|| CopyValue::new(StepHold::default()));
     let mut latest = use_hook(|| CopyValue::new(value));
     latest.set(value);
+    let mut draft = use_signal(|| None::<String>);
     let holding = Holding {
         hold,
         latest,
         range,
         onchange,
+        draft,
     };
-    let mut draft = use_signal(|| None::<String>);
     let live = availability == Availability::Enabled;
     let pressed = hold().direction();
     let arrow_size = arrow_size(size);
@@ -186,8 +196,8 @@ pub fn Stepper(
                 "aria-disabled": availability.aria_disabled(),
                 onkeydown: move |event: KeyboardEvent| {
                     match event.key() {
-                        Key::Home if live => onchange.call(range.min()),
-                        Key::End if live => onchange.call(range.max()),
+                        Key::Home if live => holding.change(range.min()),
+                        Key::End if live => holding.change(range.max()),
                         _ => on_key(event),
                     }
                 },
