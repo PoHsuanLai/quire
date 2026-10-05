@@ -12,7 +12,7 @@ use ds::components::controls::button_model::Answers;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
 use ds::stack::toast_hub::use_toast_hub;
-use ds_blitz::{AppConfig, AppId, launch};
+use ds_blitz::{AppConfig, AppId, WindowSize, launch};
 use std::time::Duration;
 
 /// How long the window stays up on its own.
@@ -21,7 +21,7 @@ const LIFETIME: Duration = Duration::from_secs(3);
 fn main() {
     launch(
         App,
-        AppConfig::new("quire: ds-blitz window", 480, 320)
+        AppConfig::new("quire: ds-blitz window", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.Window".to_owned())),
     );
 }

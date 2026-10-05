@@ -85,8 +85,11 @@ from quire's root `Cargo.toml` into its own workspace root. shell-host and sill 
 local checkouts, `[patch."https://github.com/PoHsuanLai/blitz-kit"]` pointing at a sibling
 `blitz-kit` so every path-linked repo builds one copy.
 
-**Launching on Blitz.** `ds_blitz::launch(app, AppConfig::new(title, width, height))` runs `app`
-until its window closes. It enters the process-wide Tokio runtime that `ds_blitz::TokioSpawner`
+**Launching on Blitz.** `ds_blitz::launch(app, AppConfig::new(title, WindowSize::new(width, height)))`
+runs `app` until its window closes. A `WindowSize` is what the window opens at and, with
+`.with_least(width, height)`, the least a person may resize it to: give the least your layout's
+panes fit in, so no pane is squeezed past its own least (`WindowSpec::new` takes the same value
+for a later window). It enters the process-wide Tokio runtime that `ds_blitz::TokioSpawner`
 hands `use_environment`, registers quire's faces, provides the document host (`provide_host`,
 section 6, "For a bar"), and tracks the input modality. `AppConfig` also takes
 `with_app_id`, `with_decorations(Decorations::Client)` for an app whose root draws

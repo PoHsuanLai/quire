@@ -133,6 +133,7 @@ impl Requests {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::window_size::WindowSize;
     use dioxus::prelude::*;
 
     fn empty() -> Element {
@@ -159,8 +160,14 @@ mod tests {
     #[test]
     fn every_request_wakes_the_loop_and_is_answered_in_order() {
         let (requests, woken) = woken();
-        let first = requests.open(WindowSpec::new("One", 300, 200), Root::Plain(empty));
-        let second = requests.open(WindowSpec::new("Two", 300, 200), Root::Plain(empty));
+        let first = requests.open(
+            WindowSpec::new("One", WindowSize::new(300, 200)),
+            Root::Plain(empty),
+        );
+        let second = requests.open(
+            WindowSpec::new("Two", WindowSize::new(300, 200)),
+            Root::Plain(empty),
+        );
         requests.focus(first, Some("abc".to_owned()));
         requests.close(second);
 
@@ -180,7 +187,10 @@ mod tests {
     #[test]
     fn a_window_is_opening_until_the_loop_says_otherwise() {
         let (requests, _) = woken();
-        let key = requests.open(WindowSpec::new("One", 300, 200), Root::Plain(empty));
+        let key = requests.open(
+            WindowSpec::new("One", WindowSize::new(300, 200)),
+            Root::Plain(empty),
+        );
         assert_eq!(requests.life(key), WindowLife::Opening);
         requests.set_life(key, WindowLife::Open);
         assert_eq!(requests.life(key), WindowLife::Open);

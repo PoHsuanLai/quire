@@ -7,6 +7,6 @@
 fn main() {
     ds_blitz::launch(
         consumer::App,
-        ds_blitz::AppConfig::new("quire consumer example", 480, 360),
+        ds_blitz::AppConfig::new("quire consumer example", ds_blitz::WindowSize::new(480, 360)),
     );
 }

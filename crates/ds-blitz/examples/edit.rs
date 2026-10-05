@@ -14,13 +14,13 @@ use ds::host::captured::PointerPhase;
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_blitz::{AppConfig, AppId, launch};
+use ds_blitz::{AppConfig, AppId, WindowSize, launch};
 use std::time::Duration;
 
 fn main() {
     launch(
         App,
-        AppConfig::new("quire: edit surface", 520, 300)
+        AppConfig::new("quire: edit surface", WindowSize::new(520, 300))
             .with_app_id(AppId("dev.quire.Edit".to_owned())),
     );
 }

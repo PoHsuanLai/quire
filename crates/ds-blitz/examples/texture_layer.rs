@@ -7,7 +7,8 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::{
-    AppConfig, AppId, PixelFormat, Pixels, TextureFit, TextureHandle, TextureLayer, launch, use_gpu,
+    AppConfig, AppId, PixelFormat, Pixels, TextureFit, TextureHandle, TextureLayer, WindowSize,
+    launch, use_gpu,
 };
 use std::thread;
 use std::time::{Duration, Instant};
@@ -20,7 +21,7 @@ const SIDE: u32 = 256;
 fn main() {
     launch(
         App,
-        AppConfig::new("quire: ds-blitz texture layer", 480, 320)
+        AppConfig::new("quire: ds-blitz texture layer", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.TextureLayer".to_owned())),
     );
 }

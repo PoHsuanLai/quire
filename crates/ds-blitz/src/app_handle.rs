@@ -176,6 +176,7 @@ pub fn use_app_handle() -> Option<AppHandle> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::window_size::WindowSize;
     use std::sync::atomic::{AtomicUsize, Ordering};
 
     fn empty() -> Element {
@@ -192,7 +193,7 @@ mod tests {
     }
 
     fn spec() -> WindowSpec {
-        WindowSpec::new("T", 10, 10)
+        WindowSpec::new("T", WindowSize::new(10, 10))
     }
 
     #[test]

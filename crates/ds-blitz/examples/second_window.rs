@@ -21,7 +21,7 @@ use ds::components::controls::button_model::Answers;
 use ds::file_drop::board::FileDropBoard;
 use ds::host::found::Found;
 use ds::prelude::*;
-use ds_blitz::{AppConfig, AppId, WindowHandle, WindowSpec, launch, open_window_with};
+use ds_blitz::{AppConfig, AppId, WindowHandle, WindowSize, WindowSpec, launch, open_window_with};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::time::Duration;
@@ -33,7 +33,7 @@ struct Opens(Arc<AtomicUsize>);
 fn main() {
     launch(
         App,
-        AppConfig::new("quire: first window", 480, 320)
+        AppConfig::new("quire: first window", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.SecondWindow".to_owned()))
             .with_context(Opens::default()),
     );
@@ -92,7 +92,7 @@ fn open_message(subject: &str) -> Option<WindowHandle> {
     let opens = consume_context::<Opens>();
     opens.0.fetch_add(1, Ordering::SeqCst);
     open_window_with(
-        WindowSpec::new(format!("Message: {subject}"), 420, 260),
+        WindowSpec::new(format!("Message: {subject}"), WindowSize::new(420, 260)),
         Message,
         MessageProps {
             subject: subject.to_owned(),

@@ -5,7 +5,7 @@
 //! window").
 
 use dioxus::prelude::*;
-use ds_blitz::{OpenWindowError, WindowSpec, open_window, use_window_handle};
+use ds_blitz::{OpenWindowError, WindowSize, WindowSpec, open_window, use_window_handle};
 use ds_harness::{Harness, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
@@ -21,12 +21,12 @@ fn Other() -> Element {
 
 #[allow(non_snake_case)]
 fn Asks() -> Element {
-    let answer = use_hook(
-        || match open_window(WindowSpec::new("Other", 100, 100), Other) {
+    let answer = use_hook(|| {
+        match open_window(WindowSpec::new("Other", WindowSize::new(100, 100)), Other) {
             Ok(_) => "opened".to_owned(),
             Err(OpenWindowError::NoHost) => "no host".to_owned(),
-        },
-    );
+        }
+    });
     rsx! { p { class: "answer", "{answer}" } }
 }
 

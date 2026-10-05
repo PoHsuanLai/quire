@@ -13,12 +13,12 @@ use dioxus::prelude::*;
 use ds::file_drop::drag::{FileDrag, FileDrop};
 use ds::file_drop::hook::use_file_drop;
 use ds::prelude::*;
-use ds_blitz::{AppConfig, AppId, launch};
+use ds_blitz::{AppConfig, AppId, WindowSize, launch};
 
 fn main() {
     launch(
         App,
-        AppConfig::new("quire: drop files here", 520, 360)
+        AppConfig::new("quire: drop files here", WindowSize::new(520, 360))
             .with_app_id(AppId("dev.quire.FileDrop".to_owned())),
     );
 }
