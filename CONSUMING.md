@@ -1296,18 +1296,23 @@ sit on.
 **Menu tracking** (`ds::stack::menu_track::types::MenuTrack<K>`, `crates/ds/src/stack/menu_track.rs`; design/13
 §13.3.2-13.5). One machine drives bar menus and every ds `Menu`: open on press, click mode,
 press-drag-release, hover switch between open menus, the submenu delay and the safe triangle.
-`K` is your menu key (a bar title id). Feed it events with the time; perform what it returns,
-in order.
+`K` is your menu key (a bar title id). It is a `Machine`: step it with an event and a `Stamp`,
+and perform what it returns, in order; its `wake()` is the one time it wants to be stepped again
+(the submenu delay's end, the safe triangle's timeout), with `MenuTrackEvent::Tick` (from
+`Elapsed`), and none at rest.
 
 ```rust,ignore
+use ds::base::machine::Machine;
+use ds::base::time::stamp::Stamp;
 use ds::stack::menu_track::types::{MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent};
-use std::time::Instant;
 
-let track: MenuTrack<u32> = MenuTrack::new(MenuTiming::default()); // 200 ms delay, 300 ms triangle
-let (track, effects) = track.step(MenuTrackEvent::PressTitle(1), Instant::now());
+let track: MenuTrack<u32> = MenuTrack::closed();
+let timing = MenuTiming::default(); // 200 ms delay, 300 ms triangle
+let (track, effects) = track.step(MenuTrackEvent::PressTitle(1), Stamp(0), &timing, &());
 // effects == [MenuTrackEffect::Open(1, MenuAnim::Pop)]
-// RequestTick(at) asks for MenuTrackEvent::Tick at `at`; SubPlaced{top, bottom} reports a
-// submenu's near-edge corners so the safe triangle can arm.
+// Prepare(item) says the pointer rests on a parent item (measure its submenu while the delay
+// runs); SubPlaced{top, bottom} reports a submenu's near-edge corners so the safe triangle can
+// arm.
 ```
 
 Build `MenuTiming` from `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms`. Arrow
