@@ -8,6 +8,9 @@
 //! button can fold a sidebar; how wide it is when open is the view's. A pane folds by clipping
 //! its body, unless it is `SplitPane::peeking`: its body is then an `EdgePeek`, which keeps its
 //! strip at the window's edge and floats the sidebar over the content once the pane is folded.
+//! The last pane may have a least width of its own (`least_rest`): when the view is too narrow
+//! for every pane's width, the panes before it give up width, down to their own least, before
+//! it does, so a reader beside a list is never squeezed to nothing.
 //!
 //! Markup: `div.ds-split[role=group][data-dragging]` of `div.ds-split-pane[data-shown][data-folded][data-away]` (its body inside
 //! `.ds-split-pane-body`), `div.ds-split-divider[role=separator]` after each, and last
@@ -121,6 +124,9 @@ pub fn SplitView(
     #[props(into)] label: String,
     panes: Vec<SplitPane>,
     #[props(default)] on_shown: EventHandler<(usize, Shown)>,
+    /// The least the last pane is drawn at; the panes before it shrink first, to their least.
+    #[props(default)]
+    least_rest: Px,
     children: Element,
     #[props(default)] common: Common,
 ) -> Element {
@@ -156,6 +162,7 @@ pub fn SplitView(
                     PaneBox {
                         index: at,
                         width: width_of(&widths, &panes, at),
+                        least: pane.spec.min,
                         shown: pane.shown,
                         folded: pane.folded,
                         mover,
@@ -164,7 +171,7 @@ pub fn SplitView(
                     {divider(splits, &panes, at, pane.shown, shown_width(&widths, &panes, at), on_shown)}
                 }
             }
-            div { class: "ds-split-rest", {children} }
+            div { class: "ds-split-rest", style: "--rest-least:{least_rest.0}px", {children} }
         }
     }
 }

@@ -337,3 +337,62 @@ fn a_busy_mark_turns_only_while_its_operation_runs() {
         Some("idle")
     );
 }
+
+/// One account's tile in a grid `width` px wide: 160 is the content of a sidebar at its least
+/// (180), 212 that of a 232 px sidebar.
+fn one_tile(width: u32) -> Harness {
+    WIDTH.with(|cell| cell.set(width));
+    let mut harness = Harness::new(OneTile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(100));
+    harness
+}
+
+thread_local! {
+    static WIDTH: std::cell::Cell<u32> = const { std::cell::Cell::new(212) };
+}
+
+#[allow(non_snake_case)]
+fn OneTile() -> Element {
+    let width = WIDTH.with(std::cell::Cell::get);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "width:{width}px",
+                PinTiles {
+                    label: "Accounts",
+                    items: vec![account('A', MarkProvider::Fastmail)],
+                    onpick: move |_: char| {},
+                    onreorder: move |_: Vec<char>| {},
+                }
+            }
+        }
+    }
+}
+
+/// The provider's mark sits on the face's corner at any tile width: as far from the avatar's
+/// centre in a narrow tile as at the usual width, where it is where it always was (7 px in from
+/// the tile). A fixed inset from the tile instead slid it over the letter as the tile shrank.
+#[test]
+fn the_provider_mark_keeps_its_place_on_the_face_at_any_tile_width() {
+    let from_centre = |width: u32| {
+        let harness = one_tile(width);
+        let face = rect(&harness, ".ds-pin-tile .ds-avatar");
+        let mark = rect(&harness, ".ds-pin-tile .ds-provider");
+        (
+            mark.origin.x.0 - (face.origin.x.0 + face.size.width.0 / 2.0),
+            mark.origin.y.0 - (face.origin.y.0 + face.size.height.0 / 2.0),
+        )
+    };
+    let (usual, narrow) = (from_centre(212), from_centre(160));
+    assert!(
+        (usual.0 - narrow.0).abs() <= 0.5 && (usual.1 - narrow.1).abs() <= 0.5,
+        "the mark moved on the face: {usual:?} from its centre at 212 px, {narrow:?} at 160 px"
+    );
+    let harness = one_tile(212);
+    let tile = rect(&harness, ".ds-pin-tile");
+    let mark = rect(&harness, ".ds-pin-tile .ds-provider");
+    let inset = tile.origin.x.0 + tile.size.width.0 - (mark.origin.x.0 + mark.size.width.0);
+    assert!(
+        (inset - 7.0).abs() <= 1.0,
+        "the mark moved at the usual width: {inset}px in from the tile"
+    );
+}

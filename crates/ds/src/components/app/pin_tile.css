@@ -42,8 +42,11 @@
 .ds-pin-tile-status{ display:inline-flex; align-items:center; justify-content:center; line-height:0; }
 .ds-pin-tile-status[*|data-status=attention]{ color:var(--warn); cursor:default; }
 
-/* The provider's mark, bottom right (a `ProviderMark` on the tile's rung). */
-.ds-pin-tile .ds-provider{ position:absolute; right:var(--s-7); bottom:var(--s-7); box-shadow:var(--shadow-mark-tile); }
+/* The provider's mark, bottom right (a `ProviderMark` on the tile's rung), on the face's corner
+   rather than the tile's: 3 px out from the 28 px face, wherever the tile's width puts the face. A
+   fixed inset from the tile's edge drifts onto the avatar's letter as a narrow sidebar shrinks the
+   tile (7 px at the 48 px tile of a 232 px sidebar, as before; on the face's centre at 35 px). */
+.ds-pin-tile .ds-provider{ position:absolute; right:calc(50% - 17px); bottom:calc(50% - 17px); box-shadow:var(--shadow-mark-tile); }
 
 /* The drop line: the accent, in the gap before the tile a drag would take the place of. */
 .ds-pin-tile-drop{ position:absolute; top:var(--s-2); bottom:var(--s-2); left:calc(var(--s-4) * -1); width:var(--s-2); border-radius:var(--r-pill); background:var(--accent); pointer-events:none; }
