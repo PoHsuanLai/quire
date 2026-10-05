@@ -11,6 +11,7 @@
 //! Ported from sill's `bar/menu_track`, with its tests.
 
 pub(crate) mod machine;
+mod pointer;
 pub(crate) mod triangle;
 pub mod types;
 
@@ -18,3 +19,5 @@ pub mod types;
 mod keyboard_tests;
 #[cfg(test)]
 mod tests;
+#[cfg(test)]
+mod wake_tests;

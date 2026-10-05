@@ -7,23 +7,23 @@ use crate::stack::menu_track::types::{
     MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session, ShownBy, Submenu,
 };
 use ds_core::geometry::units::{Point, Px};
-use ds_core::machine::{Elapsed, Machine};
+use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 use ds_core::vocab::PressPhase;
 use std::time::Duration;
 
 /// A bar title, as the caller keys its menus.
-type Key = u32;
-type Event = MenuTrackEvent<Key>;
-type Effect = MenuTrackEffect<Key>;
-type Target = MenuTarget<Key>;
+pub(super) type Key = u32;
+pub(super) type Event = MenuTrackEvent<Key>;
+pub(super) type Effect = MenuTrackEffect<Key>;
+pub(super) type Target = MenuTarget<Key>;
 /// One scripted input sequence: `(ms, event)` pairs.
-type Script = Vec<(u64, Event)>;
+pub(super) type Script = Vec<(u64, Event)>;
 
 const A: Key = 1;
 const B: Key = 2;
 
-fn at(ms: u64) -> Stamp {
+pub(super) fn at(ms: u64) -> Stamp {
     Stamp(ms)
 }
 
@@ -32,7 +32,7 @@ fn step(track: MenuTrack<Key>, event: Event, ms: u64) -> (MenuTrack<Key>, Vec<Ef
     track.step(event, at(ms), &MenuTiming::default(), &())
 }
 
-fn path(i: u16) -> ItemPath {
+pub(super) fn path(i: u16) -> ItemPath {
     ItemPath(vec![i])
 }
 
@@ -44,24 +44,24 @@ fn target(i: u16, pick: Pickable, branch: Branch) -> Target {
     }
 }
 
-fn item(i: u16) -> Target {
+pub(super) fn item(i: u16) -> Target {
     target(i, Pickable::Enabled, Branch::Leaf)
 }
 
-fn parent(i: u16) -> Target {
+pub(super) fn parent(i: u16) -> Target {
     target(i, Pickable::Enabled, Branch::Submenu)
 }
 
-fn inert(i: u16) -> Target {
+pub(super) fn inert(i: u16) -> Target {
     target(i, Pickable::Inert, Branch::Leaf)
 }
 
-fn pt(x: f32, y: f32) -> Point {
+pub(super) fn pt(x: f32, y: f32) -> Point {
     Point { x: Px(x), y: Px(y) }
 }
 
 /// Feed `(ms, event)` pairs from closed; the final phase and every effect, in order.
-fn run(script: Script) -> (MenuPhase<Key>, Vec<Effect>) {
+pub(super) fn run(script: Script) -> (MenuPhase<Key>, Vec<Effect>) {
     let start = (MenuTrack::closed(), Vec::new());
     let (track, effects) = script
         .into_iter()
@@ -73,7 +73,7 @@ fn run(script: Script) -> (MenuPhase<Key>, Vec<Effect>) {
     (track.phase, effects)
 }
 
-fn session(phase: &MenuPhase<Key>) -> &Session<Key> {
+pub(super) fn session(phase: &MenuPhase<Key>) -> &Session<Key> {
     match phase {
         MenuPhase::Tracking(session) => session,
         MenuPhase::Closed => panic!("expected an open menu"),
@@ -81,7 +81,7 @@ fn session(phase: &MenuPhase<Key>) -> &Session<Key> {
 }
 
 /// Press A and release on its title: click mode.
-fn click_open() -> Script {
+pub(super) fn click_open() -> Script {
     vec![
         (0, Event::PressTitle(A)),
         (60, Event::Release(MenuTarget::Title(A))),
@@ -308,7 +308,7 @@ fn a_submenu_opens_after_the_delay_or_at_once_on_right_arrow() {
     let (phase, effects) = run(rest.clone());
     assert_eq!(effects.last(), Some(&Effect::Prepare(path(2))));
     assert_eq!(
-        wake_of(phase),
+        MenuTrack { phase }.wake(),
         Some(at(300)),
         "the delay's end is the machine's wake"
     );
@@ -337,96 +337,8 @@ fn the_timings_come_from_the_caller() {
     assert_eq!(track.wake(), Some(at(150)));
 }
 
-/// The machine's wake after a script.
-fn wake_of(phase: MenuPhase<Key>) -> Option<Stamp> {
-    MenuTrack { phase }.wake()
-}
-
-#[test]
-fn the_wake_is_the_submenu_delay_then_the_triangle_timeout_then_nothing() {
-    // Resting at 100 on a parent item: the delay ends at 300. Placed at 310, the triangle waits
-    // for a move inside it; a move at 320 sets the timeout 300 ms on; a move at 400 pushes it on.
-    // A tick at the wake settles each. Name, script, the wake after it.
-    let inside_at = |ms| (ms, Event::Move(pt(130.0, 130.0), item(3)));
-    let cases: Vec<(&str, Script, Option<Stamp>)> = vec![
-        ("closed", vec![], None),
-        ("open, nothing pending", click_open(), None),
-        (
-            "resting on a parent item",
-            [
-                click_open(),
-                vec![(100, Event::Move(pt(20.0, 60.0), parent(2)))],
-            ]
-            .concat(),
-            Some(at(300)),
-        ),
-        (
-            "resting on the parent item again keeps the first deadline",
-            [
-                click_open(),
-                vec![
-                    (100, Event::Move(pt(20.0, 60.0), parent(2))),
-                    (150, Event::Move(pt(21.0, 60.0), parent(2))),
-                ],
-            ]
-            .concat(),
-            Some(at(300)),
-        ),
-        (
-            "moving to a leaf drops the pending submenu",
-            [
-                click_open(),
-                vec![
-                    (100, Event::Move(pt(20.0, 60.0), parent(2))),
-                    (150, Event::Move(pt(20.0, 90.0), item(3))),
-                ],
-            ]
-            .concat(),
-            None,
-        ),
-        ("the delay ended: open", submenu_open_to(300), None),
-        (
-            "placed: no timeout until the pointer moves inside",
-            submenu_open(),
-            None,
-        ),
-        (
-            "a move inside the triangle arms the timeout",
-            [submenu_open(), vec![inside_at(320)]].concat(),
-            Some(at(620)),
-        ),
-        (
-            "a later move inside pushes it out",
-            [submenu_open(), vec![inside_at(320), inside_at(400)]].concat(),
-            Some(at(700)),
-        ),
-        (
-            "the timeout ended: the item under the pointer won",
-            [submenu_open(), vec![inside_at(320), (620, Event::Tick)]].concat(),
-            None,
-        ),
-        (
-            "a tick before the deadline changes nothing",
-            [
-                submenu_open(),
-                vec![inside_at(320), (500, Event::from(Elapsed))],
-            ]
-            .concat(),
-            Some(at(620)),
-        ),
-    ];
-    for (name, script, want) in cases {
-        let (phase, _) = if script.is_empty() {
-            (MenuPhase::Closed, Vec::new())
-        } else {
-            run(script)
-        };
-        assert_eq!(wake_of(phase), want, "{name}");
-    }
-}
-
 /// Click-open A, rest on parent item 2 until its submenu opens at `ms`.
-fn submenu_open_to(ms: u64) -> Script {
+pub(super) fn submenu_open_to(ms: u64) -> Script {
     [
         click_open(),
         vec![
@@ -438,7 +350,7 @@ fn submenu_open_to(ms: u64) -> Script {
 }
 
 /// Click-open A, rest on parent item 2 until its submenu opens, and place the submenu.
-fn submenu_open() -> Script {
+pub(super) fn submenu_open() -> Script {
     [
         submenu_open_to(300),
         vec![(
@@ -580,46 +492,4 @@ fn the_triangle_test_is_a_sign_test_either_winding() {
         "the corners are inflated 4 px"
     );
     assert!(!shielded(&guard, pt(100.0, -5.0)));
-}
-
-#[test]
-fn the_cursor_stays_on_the_last_highlighted_item_while_the_pointer_is_over_something_inert() {
-    // Name, script, the highlight after it, the cursor after it.
-    let cases: Vec<(&str, Script, Option<ItemPath>, Option<ItemPath>)> = vec![
-        ("nothing yet", click_open(), None, None),
-        (
-            "on an item",
-            [
-                click_open(),
-                vec![(100, Event::Move(pt(20.0, 60.0), item(2)))],
-            ]
-            .concat(),
-            Some(path(2)),
-            Some(path(2)),
-        ),
-        (
-            "then over a rule: the highlight goes, the cursor stays",
-            [
-                click_open(),
-                vec![
-                    (100, Event::Move(pt(20.0, 60.0), item(2))),
-                    (150, Event::Move(pt(20.0, 80.0), inert(3))),
-                ],
-            ]
-            .concat(),
-            None,
-            Some(path(2)),
-        ),
-        (
-            "the keyboard moves it",
-            [click_open(), vec![(100, Event::Select(path(4)))]].concat(),
-            Some(path(4)),
-            Some(path(4)),
-        ),
-    ];
-    for (name, script, hot, cursor) in cases {
-        let (phase, _) = run(script);
-        assert_eq!(session(&phase).hot, hot, "{name}: highlight");
-        assert_eq!(session(&phase).cursor, cursor, "{name}: cursor");
-    }
 }
