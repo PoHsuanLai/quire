@@ -1,6 +1,7 @@
 //! How a [`Harness`](crate::Harness) builds its document: the viewport, and the same providers
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
+use crate::gpu_diagnostics::GpuDiagnostics;
 use crate::harness_backend::Backend;
 use crate::harness_clock::Clock;
 use crate::headless::Layout;
@@ -21,6 +22,7 @@ pub struct HarnessConfig {
     setup: Setup,
     backend: Backend,
     adapter: AdapterPref,
+    diagnostics: GpuDiagnostics,
     clock: Clock,
     layout: Layout,
 }
@@ -33,6 +35,7 @@ impl HarnessConfig {
             setup: Setup::default(),
             backend: Backend::default(),
             adapter: AdapterPref::default(),
+            diagnostics: GpuDiagnostics::default(),
             clock: Clock::default(),
             layout: Layout::default(),
         }
@@ -85,6 +88,14 @@ impl HarnessConfig {
         self
     }
 
+    /// Whether a [`Backend::Hybrid`] harness's GPU instance names its objects and validates
+    /// (default [`GpuDiagnostics::Off`], whatever `WGPU_DEBUG` and `WGPU_VALIDATION` say). Turn
+    /// it on for one debugging session; see [`GpuDiagnostics`] for why a suite should not.
+    pub fn with_gpu_diagnostics(mut self, diagnostics: GpuDiagnostics) -> Self {
+        self.diagnostics = diagnostics;
+        self
+    }
+
     /// The clock the harness's timers run on (default [`Clock::Wall`]). [`Clock::Virtual`]
     /// makes `advance` move one clock for CSS animations and every ds timer, so a test sees the
     /// same frames however loaded the machine is.
@@ -115,6 +126,11 @@ impl HarnessConfig {
     /// The renderer the document paints with.
     pub fn backend(&self) -> Backend {
         self.backend
+    }
+
+    /// Whether a hybrid harness's GPU instance names objects and validates.
+    pub fn gpu_diagnostics(&self) -> GpuDiagnostics {
+        self.diagnostics
     }
 
     /// The GPU a hybrid harness prefers.

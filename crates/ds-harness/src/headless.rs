@@ -7,6 +7,7 @@
 
 use crate::error::HarnessError;
 use crate::painter::{Canvas, PaintTime, Painter};
+use crate::round_budget::{MAX_ROUNDS, RoundBudget, Spent};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThreading};
 use blitz_html::HtmlProvider;
@@ -45,9 +46,6 @@ use std::rc::Rc;
 use std::sync::Arc;
 use std::task::{Context, Waker};
 use std::time::Duration;
-
-/// More rounds than this without the document settling is a render loop in the app.
-const MAX_ROUNDS: usize = 64;
 
 /// Whether a document is laid out as it renders: a shell surface is not until it is mapped.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -216,17 +214,19 @@ impl Headless {
     /// exists to catch, and which a test must fail on, not carry on from.
     fn flush(&mut self) -> bool {
         let waker = Waker::from(Arc::clone(&self.wakeup));
-        let rounds = (0..=MAX_ROUNDS)
-            .take_while(|_| self.doc.poll(Some(Context::from_waker(&waker))))
-            .count();
-        assert!(
-            rounds <= MAX_ROUNDS,
-            "render loop: the document was still re-rendering after {MAX_ROUNDS} rounds of \
-             renders with no input, so a component writes state on every render or an effect \
-             keeps re-running itself.\ndocument:\n{}",
-            self.html_excerpt()
-        );
-        rounds > 0
+        let mut budget = RoundBudget::new();
+        let mut rendered = false;
+        while self.doc.poll(Some(Context::from_waker(&waker))) {
+            rendered = true;
+            assert!(
+                budget.spend() == Spent::Within,
+                "render loop: the document was still re-rendering after {MAX_ROUNDS} rounds of \
+                 renders with no input, so a component writes state on every render or an \
+                 effect keeps re-running itself.\ndocument:\n{}",
+                self.html_excerpt()
+            );
+        }
+        rendered
     }
 
     /// The start of the document's HTML, for a failure message.
@@ -246,8 +246,8 @@ impl Headless {
     /// # Panics
     /// After [`MAX_ROUNDS`] rounds that each produced more work, naming what kept producing it.
     pub(crate) fn frame(&mut self, at: Duration) {
-        let mut wanted = Vec::new();
-        for _ in 0..MAX_ROUNDS {
+        let mut budget = RoundBudget::new();
+        let wanted = loop {
             let inner = &self.doc.inner;
             self.links
                 .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
@@ -266,7 +266,7 @@ impl Headless {
             // After layout, as the window runs it: a published value or an applied write is
             // seen by the next round's renders.
             let phased = self.phase.run(PhaseLayout::Resolved).changed();
-            wanted = [
+            let wanted: Vec<&str> = [
                 (rendered, "components re-rendered"),
                 (restyled, "the colour scheme changed the root's style"),
                 (landed, "a fetched resource landed during layout"),
@@ -283,7 +283,10 @@ impl Headless {
             if wanted.is_empty() {
                 return;
             }
-        }
+            if budget.spend() == Spent::Over {
+                break wanted;
+            }
+        };
         panic!(
             "render loop: the document was still changing after {MAX_ROUNDS} rounds of one frame; \
              the last round still had: {}.\ndocument:\n{}",
