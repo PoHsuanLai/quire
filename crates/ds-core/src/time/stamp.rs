@@ -59,8 +59,47 @@ impl FrameClock {
         )
     }
 
+    /// `at` as an instant on this thread's clock: the origin plus its milliseconds. The inverse of
+    /// [`Self::stamp`] up to the whole millisecond `stamp` drops.
+    pub fn instant(&self, at: Stamp) -> Instant {
+        self.origin + Duration::from_millis(at.0)
+    }
+
     /// Now on this thread's clock, as a stamp.
     pub fn now(&self) -> Stamp {
         self.stamp(super::clock::now())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{FrameClock, Stamp};
+    use std::time::{Duration, Instant};
+
+    #[test]
+    fn a_stamp_and_its_instant_agree_to_the_millisecond() {
+        let origin = Instant::now();
+        let clock = FrameClock::new(origin);
+        let cases: &[(&str, Duration, Stamp)] = &[
+            ("the origin", Duration::ZERO, Stamp(0)),
+            ("whole ms", Duration::from_millis(1500), Stamp(1500)),
+            (
+                "a part of a ms is dropped",
+                Duration::from_micros(2700),
+                Stamp(2),
+            ),
+        ];
+        for (name, after, stamp) in cases {
+            assert_eq!(clock.stamp(origin + *after), *stamp, "{name}: stamp");
+        }
+        assert_eq!(
+            clock.instant(Stamp(1500)),
+            origin + Duration::from_millis(1500)
+        );
+        assert_eq!(
+            clock.stamp(origin - Duration::from_millis(1)),
+            Stamp(0),
+            "before the origin"
+        );
     }
 }
