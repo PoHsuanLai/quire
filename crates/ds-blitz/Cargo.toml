@@ -43,6 +43,8 @@ peniko = { workspace = true }
 # PDF output (the `pdf` feature): the painter, which writes through pdfrum.
 pdfrum-anyrender = { workspace = true, optional = true }
 thiserror = { workspace = true }
+# `menus`: the wire layout derives `Serialize`.
+serde = { workspace = true, optional = true }
 # The window's display and surface handles, for the activation token (Linux: `wayland_surface`).
 raw-window-handle = { workspace = true }
 tokio = { workspace = true }
@@ -72,6 +74,10 @@ wayland-protocols = { workspace = true, features = ["server"] }
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
 print = ["dep:zbus", "dep:memfd"]
+# `ds_blitz::menus`: the app's menu bar served as `com.canonical.dbusmenu` on its own bus
+# connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
+# default, so an app that exports no menu builds no D-Bus client for it.
+menus = ["dep:zbus", "dep:serde"]
 # PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
 # thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
 # PDF builds no PDF writer or reader.

@@ -510,6 +510,41 @@ entry; the emphasis keyframes (bump, gulp, seal-pop, pop-in, rise, fold, curl) a
 | **Verdict** | Adopt for our own apps; Adapt for foreign apps |
 | **Rule** | (a) `ds::commands::MenuModel`: the standard menus and items as data (`StandardMenu`, `StandardItem` with their reserved shortcuts, 6.2), plus app sections; ds-blitz apps export it over a session-bus interface (the `com.canonical.dbusmenu` format existing global-menu implementations read, so foreign Qt and GTK apps that export one also appear). (b) sill's bar renders the active window's model with the one menu machine (13.3.2 hover switch applies). (c) Foreign apps without a model show only the App menu (Hide, Quit, which sill performs through the toplevel protocol). (d) Status items open menus; the control center and calendar stay popovers (they are too complex for a menu, the page's exception). 13 new §13.3.13; `ds::commands`; sill bar; test: a harness app's Edit menu lists Undo with its title |
 
+**Status 2026-10-06 (rule a, the quire half).** Built. The model is `ds::components::menus::export`
+(pure: `MenuTree`, the `com.canonical.dbusmenu` layout and properties, an `Event` mapped back to a
+`CommandId`, the revision book); the server is `ds_blitz::menus::MenuExport` (feature `menus`).
+Every command item of the tree carries the `CommandId` it runs (an item without one is refused), ids
+are hashed from those `CommandId`s so they are stable, and a bar that changes (`MenuBarModel::availability`,
+a check, an added item) is announced with `LayoutUpdated` (and `ItemsPropertiesUpdated` for a
+property-only change). Test: `crates/ds-harness/tests/menu_export.rs` (a harness app's Edit menu lists
+Undo with its title and ⌘Z on a private bus; a click runs the app's Undo; disabling announces a layout).
+The `ds::commands::MenuModel` named above is `MenuBarModel` (design/30 section 2.4); no second type.
+
+**Discovery today (cosmic-comp offers no `org_kde_kwin_appmenu`).** An app serves its menu under a
+well-known name derived from its Wayland `app_id` and nothing else: bus name
+`org.quire.AppMenu.<app_id>` (each dot-separated element made legal: other characters become `_`, one
+starting with a digit gets a `_` first), object `/org/quire/AppMenu`, interface
+`com.canonical.dbusmenu`. sill reads the focused toplevel's `app_id` (ext-foreign-toplevel or
+cosmic-toplevel), calls `AppMenuAddress::for_app_id` (the same function the app used, in `ds`) and
+asks the bus (`NameHasOwner`, or `NameOwnerChanged` to follow it); if the name has an owner it fetches
+`GetLayout(0, -1, [])`, else the focused app has no menu (rule c). Why this and not a registration with
+`org.quire.Shell`: it needs no running shell at app start, nothing is lost when sill restarts (the bus
+owns the name and clears it when the app exits, which also tells sill the menu is gone), an agent
+discovers every menu with one `ListNames` filtered by `AppMenuAddress::SERVICE_PREFIX`, and the same
+address is what `org_kde_kwin_appmenu.set_address` takes later. Limits: one menu per app, not per
+window (the Mac's model); a second process with the same `app_id` is queued for the name
+(`NameOutcome::Queued`), serves on its unique name meanwhile and inherits the name when the first
+exits, which suits single-instance apps and their restarts.
+
+**Compositor path (casement P3-MN, not built here).** `ds-blitz` can reach a toplevel's `wl_surface`
+without new unsafe (`wayland_surface::adopt`), but not keep an `org_kde_kwin_appmenu` object alive:
+the compositor drops the address when that object is destroyed, `adopt` is a borrow tied to one call,
+and an object on a one-shot queue would be orphaned. The client half therefore waits for a compositor
+that offers the global (casement P3-MN, `wl/appmenu.rs`): then ds-blitz holds a persistent adopted
+connection per window, binds `org_kde_kwin_appmenu_manager` when it is advertised, and calls
+`create(surface)` and `set_address(service, path)` with the address above. Until then the
+`app_id` mapping is the only path, and it stays the fallback after.
+
 ### 5.3 Dock menus (2025-04-07)
 
 | | |

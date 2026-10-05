@@ -38,10 +38,19 @@ thiserror = { workspace = true }
 [dev-dependencies]
 # The virtual-clock ask test wakes the document from a watch channel.
 tokio = { workspace = true }
+# `menu_export`: a client of the app's exported menu, on a private bus.
+zbus = { workspace = true }
+serde = { workspace = true }
 
 [features]
 # `pdf_app` and `Harness::pdf`: a harness's document printed as it is now.
 pdf = ["ds-blitz/pdf"]
+# `menu_export`: the exported menu bar, driven over a private bus.
+menus = ["ds-blitz/menus"]
 
 [lints]
 workspace = true
+
+[[test]]
+name = "menu_export"
+required-features = ["menus"]

@@ -18,8 +18,8 @@ cd "$(dirname "$0")/.."
 # compositor runs too, so like ds-core it reaches no Dioxus and no renderer. ds is renderer-free
 # and effect-free; ds-settings does I/O but never renders, and takes a Spawner instead of naming a
 # runtime.
-# ds-blitz reaches D-Bus only through its opt-in `print` feature, so an app that never prints
-# builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
+# ds-blitz reaches D-Bus only through its opt-in `print` and `menus` features, so an app that
+# never prints or exports a menu builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
 # (it turns on `pdf` only for its own `pdf` feature). pdfrum-anyrender (a git dependency
 # from the pdfrum repo) is not an in-tree edge, so it is not listed there. wgpu is a renderer
 # dependency like anyrender: only ds-blitz (the texture layer's device) and ds-harness (the

@@ -1,6 +1,7 @@
 //! Blitz glue for quire: launching an app and opening its windows, registering the faces, the
 //! clipboard and the host seams (`provide_host`), PDF output (feature `pdf`), printing (feature
-//! `print`), spellchecking (feature `spell`), and the device-pixel layout snap (`snap`). The only
+//! `print`), spellchecking (feature `spell`), the menu bar exported over D-Bus (feature `menus`),
+//! and the device-pixel layout snap (`snap`). The only
 //! quire crate that names the blitz crates; the test driver lives in `ds-harness`, which builds
 //! its document from the parts in [`seam`].
 //!
@@ -44,6 +45,8 @@ mod install;
 pub mod launch;
 mod measure;
 mod memory_shell;
+#[cfg(all(feature = "menus", target_os = "linux"))]
+pub mod menus;
 mod native_providers;
 mod net;
 mod net_policy;

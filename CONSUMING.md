@@ -1137,6 +1137,45 @@ measured numbers.
 | Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
 | The painter alone | the `pdfrum-anyrender` crate, in the pdfrum repo | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `ds-blitz`'s `pdf` feature depends on it as a git dependency pinned to pdfrum rev 61371040, so a consumer that only prints through `ds_blitz::pdf` names nothing new; one that calls the painter directly adds the same git dependency at the same rev. Its own docs describe its page and source types. |
 
+### Exporting the menu bar
+
+A quire app's `MenuBarModel` can be served over the session bus as `com.canonical.dbusmenu`, so the
+shell's bar shows the focused app's App, File, Edit, View, Window and Help menus and an agent can
+list and run them (design/27 section 5.2 rule a). Off by default: feature `menus` of `ds-blitz`.
+
+1. Make every command type answer `AppCommand::id` (the ids your UI manifest already lists). A
+   command that wraps `BarCommand` answers with `BarCommand::id()` (`standard.undo`, `bar.about`).
+2. At startup, with the window's Wayland `app_id` (the one you give `AppConfig::with_app_id`):
+
+   ```rust
+   let tree = MenuTree::from_bar(&bar)?;                      // ds::components::menus::export
+   let export = MenuExport::start(                            // ds_blitz::menus, feature `menus`
+       &MenuExportConfig { app_id: AppId("dev.mailo.Mailo".into()), bus: Bus::Session },
+       tree,
+       move |command: CommandId| { let _ = tx.send(command); }, // runs on a bus thread
+   )?;
+   ```
+
+3. On the UI thread, turn the id back into your command and run the handler your own menu and
+   shortcuts run: `bar.command(&id)` gives `Option<&T>`. Hand the id over from the bus thread with a
+   channel and `AppHandle::redraw`, as for any other off-thread request.
+4. Whenever the bar changes (an item enables or disables, a check flips, an item appears), call
+   `export.update(&bar)`. It returns what changed and announces it (`LayoutUpdated`, and
+   `ItemsPropertiesUpdated` for a property-only change); the same bar is no change and no signal.
+
+| What | Value |
+| --- | --- |
+| Bus name | `org.quire.AppMenu.<app_id>`, each dot-separated element made a legal bus-name element (`AppMenuAddress::for_app_id`); `NameOutcome::Queued` when another process of the same `app_id` owns it (this one inherits the name when that process exits, and is served on its unique name meanwhile) |
+| Object path | `/org/quire/AppMenu` |
+| Interface | `com.canonical.dbusmenu` version 3: `GetLayout`, `GetGroupProperties`, `GetProperty`, `Event`, `EventGroup`, `AboutToShow(Group)`; signals `LayoutUpdated`, `ItemsPropertiesUpdated` |
+| Item properties | `type`, `label` (underscores doubled), `enabled`, `toggle-type`, `toggle-state`, `shortcut` (`[["Super","Z"]]`: Command is `Super`), `children-display`; plus `x-quire-command-id`, the `CommandId` the item runs |
+| Ids | an `i32` hashed from the item's `CommandId` (a menu, submenu or rule from its place), so the same bar has the same ids in every run; the bar itself is 0 |
+| Event | `Event(id, "clicked", _, _)` on an enabled command item calls your callback with its `CommandId`; a disabled or unknown item is an `InvalidArgs` error |
+
+Tests start a private `dbus-daemon` and pass `Bus::Address(..)`; never export to the real session
+bus from a test (`crates/ds-harness/tests/menu_export.rs` is the model). Under a shell that turns on
+zbus's `tokio` feature, `MenuExport::start` enters the process-wide runtime itself.
+
 ### Pointer capture, gestures and the capsule
 
 For a viewer: a drag that keeps following the pointer outside its element, a touchpad's pinch and

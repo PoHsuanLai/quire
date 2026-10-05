@@ -26,3 +26,5 @@ workspace = true
 dioxus-ssr = { workspace = true }
 ds-lint = { workspace = true }
 ds-core = { workspace = true, features = ["testing"] }
+# `menus::export`: the tree's JSON form, round-tripped.
+serde_json = { workspace = true }

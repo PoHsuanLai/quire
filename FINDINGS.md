@@ -1500,6 +1500,35 @@ the decisions and what was verified:
   already built. (9) `Anim::{MenuPop, BubblePop, PillUp, RingDrain, LinkPillIn}` and their keyframes
   are deleted.
 
+## Menu export (`ds-blitz::menus`, `ds::components::menus::export`)
+
+- **A bar is served per app, not per window.** The address is derived from the `app_id` alone, so
+  every window of an app shows the one menu (the Mac's model). A per-window menu (a document's own
+  File menu) needs the compositor to carry an address per toplevel: `org_kde_kwin_appmenu` or
+  casement's `menu_source` (compositor-scope 03 section 1.11, casement P3-MN).
+- **The client half of `org_kde_kwin_appmenu` is not built.** The object must outlive the call that
+  creates it (the compositor drops the address when it is destroyed), and
+  `wayland_surface::adopt` is a one-call borrow of winit's display and surface; a persistent
+  adopted connection per window needs a design of its own (who drops it before winit closes the
+  display). cosmic-comp offers no such global, so nothing could be tested; casement P3-MN adds the
+  server side, then ds-blitz binds `org_kde_kwin_appmenu_manager` and sets the same address.
+- **zbus's default name flags replace a running owner.** `request_name_with_flags` with the default
+  flags is `AllowReplacement | ReplaceExisting | DoNotQueue`, so a second process of the same
+  `app_id` steals the name (found in the private-bus test). `MenuExport` asks with no flags, so the
+  second process queues and inherits the name when the first exits.
+- **Ids hash the `CommandId`.** Two items that run the same command (the same command in two menus)
+  get different ids (the second is hashed again with its position); the first wins a
+  `MenuTree::id_of` lookup. Ids of items whose `CommandId` is renamed change with the rename.
+- **Not exported:** item images (`icon-name`), `hint` text, `Busy` as anything but disabled, Option
+  alternates, accelerator mnemonics (labels are escaped so no `_` is read as one), and the `visible`
+  property (every item is shown; a context menu is not exported). `Info` and `Header` rows become
+  disabled labels. `AboutToShow` answers "no update needed": the tree is always current.
+- **Activations arrive on a bus thread.** The callback must hand the `CommandId` to the UI thread
+  (a channel and `AppHandle::redraw`); `ds-blitz` has no such bridge of its own yet, so each app
+  writes the four lines (CONSUMING.md "Exporting the menu bar").
+- **Consumers to wire:** an app turns it on in its own repo (mailo, detent, anyview, sill's own
+  windows); the sill lane reads `AppMenuAddress::for_app_id` and `GetLayout`. Nothing else changes.
+
 ## Live settings modules (`ds-settings::live`, feature `live`; W1b)
 
 Open:

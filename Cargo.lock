@@ -1637,6 +1637,7 @@ dependencies = [
  "ds-motion",
  "ds-style",
  "serde",
+ "serde_json",
  "thiserror 2.0.21",
  "toml",
 ]
@@ -1679,6 +1680,7 @@ dependencies = [
  "pdfrum-edit",
  "peniko",
  "raw-window-handle",
+ "serde",
  "skrifa 0.44.0",
  "spellbook",
  "thiserror 2.0.21",
@@ -1766,12 +1768,14 @@ dependencies = [
  "keyboard-types 0.7.0",
  "peniko",
  "rustc-hash 2.1.3",
+ "serde",
  "thiserror 2.0.21",
  "tokio",
  "vello_common 0.1.0",
  "vello_hybrid",
  "wgpu",
  "wgpu_context",
+ "zbus",
 ]
 
 [[package]]

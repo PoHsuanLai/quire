@@ -9,7 +9,10 @@ use serde::{Deserialize, Serialize};
 /// Whether a control takes input (design/30 section 1.5). `Disabled` adds `aria-disabled="true"`
 /// and drops the handler; `Busy` adds `aria-busy="true"`, drops the handler as well, and is
 /// where a control's busy accessory shows.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word, serde::Serialize, serde::Deserialize,
+)]
+#[serde(rename_all = "kebab-case")]
 pub enum Availability {
     /// Takes input.
     #[default]
@@ -94,7 +97,10 @@ pub enum DropState {
 /// `aria-checked` on a toggle or a menu item; `Mixed` writes `"mixed"`.
 ///
 /// `Toggle` has no mixed look: it refuses `Mixed` and draws it as `Off`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word, serde::Serialize, serde::Deserialize,
+)]
+#[serde(rename_all = "kebab-case")]
 pub enum Check {
     /// Pressed, checked, on.
     On,

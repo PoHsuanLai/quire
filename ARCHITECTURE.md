@@ -28,7 +28,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
-| `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell` |
+| `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus` |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
 | `ds-gallery` | the visual reference binary: every component across theme, accent, motion, material |
@@ -71,7 +71,7 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | `ds-style` | `dioxus` unless feature `dioxus` (appearance, tokens, palettes, icons and CSS text are plain data, so a compositor links them without it) |
 | `ds-motion` | `dioxus` unless feature `dioxus` (recipes, keyframes, springs, throws, timelines, `Touch` as data; the hooks, timers and `Touch`'s event conversions are the feature) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
-| `ds-blitz` | `zbus`, `memfd` unless feature `print`; `pdfrum*` unless `pdf` |
+| `ds-blitz` | `zbus` unless feature `print` or `menus`; `memfd` unless `print`; `pdfrum*` unless `pdf` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |
 
 `tokio` is named only by `ds-blitz` (the `launch` entry point owns the one runtime and hands a
@@ -93,7 +93,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher` < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
-| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell` |
+| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot` |
 | `ds-conformance` | `tests/<component>.rs`, `tests/support/` |
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
@@ -102,7 +102,7 @@ Component groups inside `ds` and the layer order inside the components tier: `co
 images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `overlays` (alert,
 popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `lists` (rows,
 settings rows, headers, animated, leaving and virtual lists, preview pane, emoji grid, appearance picker)
-< `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`) <
+< `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`, `export`) <
 `editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `companion` (orb, chips, answer cards, plan list, replace bar, run row, activity strip, memory view, served-by chip) < `app`.
 
 ## 3. From -> to (mechanical move)
@@ -276,6 +276,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Net policy, `data:` URLs | `blitz-kit::net`, `blitz-kit::data_url` |
 | Hover sync, pixel snap, GPU adapter choice, transform-aware hit test | `blitz-kit::{hover, snap, adapter, hit}` |
 | PDF output, printing | `ds-blitz::{pdf, print}` |
+| An app's menu bar as data for other processes: the tree, its `com.canonical.dbusmenu` layout and properties, an event mapped back to a `CommandId`, the revision book, the bus address derived from the `app_id` | `ds::components::menus::export` (`MenuTree`, `dbusmenu`, `MenuState`, `AppMenuAddress`); pure, no zbus |
+| Serving that menu on the session bus (`com.canonical.dbusmenu`) | `ds-blitz::menus::MenuExport` (feature `menus`) |
 | The companion's presence (idle, listening, working, acting, waiting) | `ds-core::vocab::CompanionPresence`; derived only by sill's `presence_of` |
 | What an app tells the companion (a thing, a chip, a summon, a field's mode) | `ds-intents`; re-exported once from `ds::components::companion` |
 | The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
