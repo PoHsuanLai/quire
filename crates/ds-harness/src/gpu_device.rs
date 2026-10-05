@@ -4,15 +4,31 @@
 //! adapter that yields a device wins. The ranking and the device request are `blitz_kit::adapter`.
 
 use crate::error::HarnessError;
+use crate::gpu_diagnostics::GpuDiagnostics;
 use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref, block_on, ranked, request_device};
+use std::sync::{Mutex, PoisonError};
 use wgpu_context::DeviceHandle;
 
+/// Held while a harness opens its instance, enumerates adapters and requests its device. The
+/// Vulkan loader's ICD scan and device creation are not safe to run from several threads at once
+/// (a SIGSEGV in `terminator_EnumerateInstanceExtensionProperties` under parallel tests, a few
+/// runs in a thousand once debug naming was off), so harnesses open one at a time. It guards no
+/// data and no device is shared: each harness still owns its own instance and device, and which
+/// harness opens first changes nothing.
+static OPENING: Mutex<()> = Mutex::new(());
+
 /// A device on the preferred adapter, and the adapter's `name (backend)`.
-pub(crate) fn open_device(pref: &AdapterPref) -> Result<(DeviceHandle, String), HarnessError> {
+pub(crate) fn open_device(
+    pref: &AdapterPref,
+    diagnostics: GpuDiagnostics,
+) -> Result<(DeviceHandle, String), HarnessError> {
+    let _one_at_a_time = OPENING.lock().unwrap_or_else(PoisonError::into_inner);
     let pref = pref
         .clone()
         .with_env(std::env::var(ADAPTER_ENV).ok().as_deref());
     let mut desc = wgpu::InstanceDescriptor::new_without_display_handle().with_env();
+    // Not the environment's or the build's flags: a harness is headless and many run at once.
+    desc.flags = diagnostics.flags();
     if std::env::var_os("WGPU_BACKEND").is_none() {
         desc.backends = wgpu::Backends::VULKAN | wgpu::Backends::GL;
     }

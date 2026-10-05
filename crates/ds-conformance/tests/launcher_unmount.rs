@@ -11,7 +11,7 @@ use ds::base::time::clock::sleep;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -185,13 +185,19 @@ fn entrance(anim: Anim) -> Duration {
     settle(anim, MotionLevel::Standard)
 }
 
-// The harness's time is the wall clock (its module documentation says why), so a test reads
-// what the script did from the page's own count rather than catching the palette mid-way.
+/// The page on the virtual clock: the script's sleeps, the motion timers and the CSS all read
+/// one clock that `advance` moves, so nothing here depends on how loaded the machine is (on the
+/// wall clock a 16 ms tick against slow rounds made the run late and the test flaky). A test
+/// still reads what the script did from the page's own count rather than catching the palette
+/// mid-way.
+fn virtual_harness(app: fn() -> Element) -> Harness {
+    Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+}
 
 #[test]
 fn a_palette_unmounted_before_its_entrance_settles_does_not_panic() {
     assert!(entrance(Anim::PeekIn) > ms(110), "the unmount is early");
-    let mut harness = Harness::new(PaletteGoneEarly, VIEW);
+    let mut harness = virtual_harness(PaletteGoneEarly);
     run_script(
         &mut harness,
         entrance(Anim::PeekIn) + ms(400),
@@ -204,7 +210,7 @@ fn a_palette_unmounted_before_its_entrance_settles_does_not_panic() {
 
 #[test]
 fn a_menu_unmounted_before_its_fade_settles_does_not_panic() {
-    let mut harness = Harness::new(MenuGoneEarly, VIEW);
+    let mut harness = virtual_harness(MenuGoneEarly);
     run_script(
         &mut harness,
         settle(Anim::MenuOut, MotionLevel::Standard) + ms(400),
@@ -218,7 +224,7 @@ fn a_menu_unmounted_before_its_fade_settles_does_not_panic() {
 #[test]
 fn a_palette_toggled_twice_within_its_entrance_does_not_panic() {
     assert!(settle(Anim::PeekIn, MotionLevel::Standard) > ms(210));
-    let mut harness = Harness::new(PaletteToggledTwice, VIEW);
+    let mut harness = virtual_harness(PaletteToggledTwice);
     run_script(&mut harness, ms(2200), "2", ".ds-palette");
     assert_eq!(mounts(&harness), "2");
     assert_eq!(harness.count(".ds-palette"), 0);
@@ -226,7 +232,7 @@ fn a_palette_toggled_twice_within_its_entrance_does_not_panic() {
 
 #[test]
 fn a_palette_mounted_fifty_times_does_not_panic() {
-    let mut harness = Harness::new(PaletteFiftyTimes, VIEW);
+    let mut harness = virtual_harness(PaletteFiftyTimes);
     // The script's own length, and a margin for the last unmount.
     let total: u64 = (0..50u64)
         .map(|round| 7 + round % 5 + 20 + (round * 37) % 400)

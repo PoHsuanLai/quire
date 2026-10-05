@@ -1,4 +1,4 @@
-use crate::time::clock::{VirtualClock, install_wall, now, sleep};
+use crate::time::clock::{VirtualClock, install_wall, now, sleep, wall_sleeps_finished};
 use std::future::Future;
 use std::pin::pin;
 use std::sync::Arc;
@@ -156,4 +156,30 @@ fn a_wall_install_lifts_to_the_virtual_clock_below_it() {
     let _virtual = clock.install();
     drop(install_wall());
     assert!(reads(&clock));
+}
+
+#[test]
+fn only_a_finished_wall_sleep_is_counted() {
+    let _wall = install_wall();
+    let waker = Waker::from(Arc::new(Count::default()));
+    let mut cx = Context::from_waker(&waker);
+    let before = wall_sleeps_finished();
+    let mut wait = pin!(sleep(ms(5)));
+    assert_eq!(wait.as_mut().poll(&mut cx), Poll::Pending);
+    assert_eq!(wall_sleeps_finished(), before, "still waiting");
+    std::thread::sleep(ms(30));
+    assert_eq!(wait.as_mut().poll(&mut cx), Poll::Ready(()));
+    assert_eq!(wall_sleeps_finished(), before + 1);
+
+    let clock = VirtualClock::new();
+    let _guard = clock.install();
+    let mut virtual_wait = pin!(sleep(ms(5)));
+    let _ = virtual_wait.as_mut().poll(&mut cx);
+    clock.advance_to(ms(10));
+    assert_eq!(virtual_wait.as_mut().poll(&mut cx), Poll::Ready(()));
+    assert_eq!(
+        wall_sleeps_finished(),
+        before + 1,
+        "virtual time is not counted"
+    );
 }

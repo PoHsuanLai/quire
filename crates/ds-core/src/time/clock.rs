@@ -1,7 +1,7 @@
 //! Which clock this thread reads: the wall clock unless a [`VirtualClock`] is installed.
 
 use super::virtual_queue::{VirtualQueue, VirtualSleep};
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::future::Future;
 use std::marker::PhantomData;
 use std::pin::Pin;
@@ -31,6 +31,19 @@ thread_local! {
     static INSTALLED: RefCell<Installs> = const {
         RefCell::new(Installs { next_id: 0, stack: Vec::new() })
     };
+}
+
+thread_local! {
+    /// How many wall-clock sleeps have finished on this thread.
+    static WALL_FINISHED: Cell<u64> = const { Cell::new(0) };
+}
+
+/// How many wall-clock sleeps have finished on this thread, counted when the sleep's owner
+/// polls it and finds it done. A test host that bounds how many rounds of work a document may
+/// take reads it to tell a round that real time made (a timer ran out) from one the document
+/// made itself; a virtual sleep never counts, since virtual time only moves when the host says.
+pub fn wall_sleeps_finished() -> u64 {
+    WALL_FINISHED.with(Cell::get)
 }
 
 fn installed() -> Option<Rc<VirtualQueue>> {
@@ -90,7 +103,13 @@ impl Future for Wait {
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<()> {
         match self.get_mut() {
-            Wait::Wall(delay) => Pin::new(delay).poll(cx),
+            Wait::Wall(delay) => {
+                let polled = Pin::new(delay).poll(cx);
+                if polled.is_ready() {
+                    WALL_FINISHED.with(|done| done.set(done.get() + 1));
+                }
+                polled
+            }
             Wait::Virtual(sleep) => Pin::new(sleep).poll(cx),
         }
     }

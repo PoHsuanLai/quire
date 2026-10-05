@@ -6,6 +6,7 @@
 
 use crate::error::HarnessError;
 use crate::gpu_device::open_device;
+use crate::gpu_diagnostics::GpuDiagnostics;
 use crate::painter::{Canvas, PaintTime, draw};
 use anyrender::ResourceId;
 use anyrender_vello_hybrid::{ImageManager, VelloHybridScenePainter};
@@ -95,8 +96,13 @@ impl Target {
 
 impl GpuPainter {
     /// A device on the preferred adapter and a renderer for `width` x `height` device pixels.
-    pub(crate) fn open(pref: &AdapterPref, width: u32, height: u32) -> Result<Self, HarnessError> {
-        let (handle, adapter) = open_device(pref)?;
+    pub(crate) fn open(
+        pref: &AdapterPref,
+        diagnostics: GpuDiagnostics,
+        width: u32,
+        height: u32,
+    ) -> Result<Self, HarnessError> {
+        let (handle, adapter) = open_device(pref, diagnostics)?;
         let renderer = Renderer::new(
             &handle.device,
             &RenderTargetConfig {

@@ -1259,6 +1259,32 @@ What Blitz at the pinned rev paints (48 px, headless):
   under 1 ms). The rest of a frame is 1.1-1.8 ms whatever the content, and a window can overlap
   it with the next frame's CPU work. Glyph size and scale were not varied; time the real cell
   size at 125 % and 150 % before relying on these numbers there.
+- **A hybrid harness opens its instance without debug names or validation**
+  (`HarnessConfig::with_gpu_diagnostics`, `GpuDiagnostics::Off` by default, whatever
+  `WGPU_DEBUG` / `WGPU_VALIDATION` say; `On` is wgpu's debugging flags for one session). Cause:
+  wgpu's `DEBUG` flag (on in debug builds) makes the Vulkan backend load `VK_EXT_debug_utils` and
+  name every texture and buffer with `vkSetDebugUtilsObjectNameEXT`; the Vulkan loader walks its
+  device list without a lock while it does, and every harness has its own instance and device, so
+  parallel tests SIGSEGV in `loader_get_icd_and_device` (anyview#17). Measured with
+  `scripts/stress-gpu-harness.sh 30 16 32` (960 runs of the hybrid and texture-layer binaries,
+  16 processes of 32 test threads at once): 12 of 960 runs crashed before; with naming off 1 of 960, a second
+  race (concurrent `vkCreateInstance`, SIGSEGV in `terminator_EnumerateInstanceExtensionProperties`),
+  which a process-wide lock around opening a harness's device (`gpu_device::OPENING`, no data, no
+  shared device) removes; 0 of 1920 after both. The `ds-conformance` tests paint on vello_cpu and
+  never open wgpu, so the GPU-using tests are the `ds-harness` hybrid and texture-layer ones.
+  Consumers can drop `WGPU_DEBUG=0` and
+  `WGPU_VALIDATION=0` from `.cargo/config.toml`. **Not shared**: one process-wide device would
+  be a hidden global of the kind the tooling review warns about, `paint_timed` waits on the whole
+  device so its timings would include other harnesses' frames, and a lost or poisoned device
+  would fail every later test; with naming off there is no race left to remove.
+- **The render-loop cap counts only rounds the document made itself.** On the wall clock a ds
+  timer that ran out during a round makes the next round render; under load (rounds slower than
+  a 16 ms tick) that happens every round and the cap fired on a document that was only waiting.
+  `ds_core::time::clock::wall_sleeps_finished` counts the finished wall sleeps on the thread, and
+  a round in which one finished is not counted (`round_budget`); a loop finishes none, so it
+  still panics on both clocks, and a total of 16 caps even a loop hidden by a steady timer. Wakes
+  cannot tell them apart (a timer that fires mid-render wakes nobody). `launcher_unmount` ran 2 of
+  10 under a load average of 90 before, 10 of 10 after, and now runs on the virtual clock.
 
 ## Texture layer
 

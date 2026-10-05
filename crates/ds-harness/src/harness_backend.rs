@@ -29,7 +29,7 @@ pub(crate) fn painter(config: &HarnessConfig) -> Painter {
         Backend::Cpu => Painter::Cpu,
         Backend::Hybrid => {
             let (width, height) = physical(config.viewport());
-            match GpuPainter::open(config.adapter(), width, height) {
+            match GpuPainter::open(config.adapter(), config.gpu_diagnostics(), width, height) {
                 Ok(gpu) => Painter::Gpu(Box::new(gpu)),
                 Err(error) => Painter::Unavailable(error.to_string()),
             }
