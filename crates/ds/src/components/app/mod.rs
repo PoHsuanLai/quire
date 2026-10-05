@@ -3,6 +3,7 @@
 
 pub mod command_pill;
 pub mod edge_peek;
+pub(crate) mod hold_for;
 pub(crate) mod hover_open;
 pub mod hover_strip;
 pub mod link_pill;

@@ -5,17 +5,16 @@
 //! link turns the pill loud. The consumer mounts it in the reader the moment the pointer is over
 //! a link; it fades in over `--t-quick` like every floating surface.
 
+use crate::components::app::hold_for::{Begin, HoldFor, HoldForIn, use_hold_for};
 use crate::components::app::hover_open::use_hover_open;
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::time::clock::sleep;
 use ds_core::vocab::Shown;
 use ds_motion::anim::Anim;
 use ds_motion::entrance::use_entrance;
 use ds_motion::hover_intent::HoverProfile;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
-use ds_style::task::try_set;
 use ds_style::tokens::delay::DelayToken;
 
 /// Where a link goes, as mail decided it.
@@ -39,13 +38,6 @@ pub enum LinkTarget {
     },
 }
 
-/// Whether the pill has been pressed since the pointer came over it.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum Copied {
-    No,
-    Yes,
-}
-
 /// The link's destination. `href` is what a press hands to `oncopy`.
 #[component]
 pub fn LinkPill(
@@ -56,10 +48,12 @@ pub fn LinkPill(
 ) -> Element {
     let presence = use_entrance(Anim::PaletteFade).slug();
     let hover = use_hover_open(HoverProfile::Label);
-    let mut copied = use_signal(|| Copied::No);
+    // The pill shrinks to "Copied" and the pointer is no longer over it, so the word cannot
+    // wait for a leave: it stays for the toast's hold.
+    let copied = use_hold_for(DelayToken::ToastHold.delay(), Begin::OnStart);
     let expanded = hover.shown();
-    let (truth, words) = match (&target, copied()) {
-        (_, Copied::Yes) => (
+    let (truth, words) = match (&target, *copied.state().read()) {
+        (_, HoldFor::Held(_)) => (
             truth(&target),
             rsx! {
                 span { "Copied" }
@@ -71,7 +65,7 @@ pub fn LinkPill(
                 registered,
                 path,
             },
-            _,
+            HoldFor::Rest | HoldFor::Done,
         ) => (
             "honest",
             rsx! {
@@ -84,7 +78,7 @@ pub fn LinkPill(
                 }
             },
         ),
-        (LinkTarget::Lying { registered, shown }, _) => (
+        (LinkTarget::Lying { registered, shown }, HoldFor::Rest | HoldFor::Done) => (
             "lying",
             rsx! {
                 Glyph { icon: Icon::X, size: IconSize::Small }
@@ -116,14 +110,8 @@ pub fn LinkPill(
             onclick: {
                 let href = href.clone();
                 move |_| {
-                    copied.set(Copied::Yes);
+                    copied.send(HoldForIn::Start);
                     oncopy.call(href.clone());
-                    // The pill shrinks to "Copied" and the pointer is no longer over it, so the
-                    // word cannot wait for a leave: it stays for the toast's hold.
-                    spawn(async move {
-                        sleep(DelayToken::ToastHold.delay()).await;
-                        let _ = try_set(copied, Copied::No);
-                    });
                 }
             },
             ..data,
