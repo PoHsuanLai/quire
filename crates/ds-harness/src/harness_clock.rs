@@ -21,7 +21,7 @@
 //! one spot are always a double click, however far apart the test advanced them.
 
 use crate::harness::Harness;
-use ds_core::time::clock::{ClockGuard, VirtualClock};
+use ds_core::time::clock::{ClockGuard, VirtualClock, install_wall};
 use std::time::{Duration, Instant};
 
 /// The clock a harness's timers run on; pass it to
@@ -39,7 +39,9 @@ pub enum Clock {
 /// The clock a running harness holds.
 #[derive(Debug)]
 pub(crate) enum HarnessClock {
-    Wall,
+    /// The wall clock, installed explicitly so a virtual harness built earlier on this thread
+    /// and still alive does not leak its time into this one.
+    Wall { _installed: ClockGuard },
     /// The virtual clock, installed on the harness's thread until the guard drops.
     Virtual {
         clock: VirtualClock,
@@ -52,7 +54,9 @@ impl HarnessClock {
     /// render already reads the harness's clock.
     pub(crate) fn start(choice: Clock) -> Self {
         match choice {
-            Clock::Wall => HarnessClock::Wall,
+            Clock::Wall => HarnessClock::Wall {
+                _installed: install_wall(),
+            },
             Clock::Virtual => {
                 let clock = VirtualClock::new();
                 let installed = clock.install();
@@ -67,7 +71,7 @@ impl HarnessClock {
     /// Which clock this is.
     pub(crate) fn choice(&self) -> Clock {
         match self {
-            HarnessClock::Wall => Clock::Wall,
+            HarnessClock::Wall { .. } => Clock::Wall,
             HarnessClock::Virtual { .. } => Clock::Virtual,
         }
     }
@@ -75,7 +79,7 @@ impl HarnessClock {
     /// Now on this clock.
     pub(crate) fn now(&self) -> Instant {
         match self {
-            HarnessClock::Wall => Instant::now(),
+            HarnessClock::Wall { .. } => Instant::now(),
             HarnessClock::Virtual { clock, .. } => clock.now(),
         }
     }
@@ -83,7 +87,7 @@ impl HarnessClock {
     /// The virtual clock, if this is one.
     pub(crate) fn virtual_clock(&self) -> Option<VirtualClock> {
         match self {
-            HarnessClock::Wall => None,
+            HarnessClock::Wall { .. } => None,
             HarnessClock::Virtual { clock, .. } => Some(clock.clone()),
         }
     }

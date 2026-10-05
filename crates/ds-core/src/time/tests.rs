@@ -1,4 +1,4 @@
-use crate::time::clock::{VirtualClock, now, sleep};
+use crate::time::clock::{VirtualClock, install_wall, now, sleep};
 use std::future::Future;
 use std::pin::pin;
 use std::sync::Arc;
@@ -101,4 +101,59 @@ fn a_stamp_serialises_as_its_bare_number() {
     use crate::time::stamp::Stamp;
     assert_eq!(serde_json::to_string(&Stamp(42)).unwrap(), "42");
     assert_eq!(serde_json::from_str::<Stamp>("42").unwrap(), Stamp(42));
+}
+
+/// Whether `now()` reads from this clock.
+fn reads(clock: &VirtualClock) -> bool {
+    now() == clock.now()
+}
+
+#[test]
+fn guards_dropped_in_creation_order_leave_no_stale_clock() {
+    let (first, second) = (VirtualClock::new(), VirtualClock::new());
+    first.advance_to(ms(3));
+    second.advance_to(ms(7));
+    let (g1, g2) = (first.install(), second.install());
+    assert!(reads(&second));
+    // The older guard goes first: the newer clock stays in force, not the older one restored
+    // over it.
+    drop(g1);
+    assert!(reads(&second));
+    drop(g2);
+    assert!(!reads(&first) && !reads(&second), "back on the wall clock");
+}
+
+#[test]
+fn guards_dropped_newest_first_restore_the_older_clock() {
+    let (first, second) = (VirtualClock::new(), VirtualClock::new());
+    first.advance_to(ms(3));
+    second.advance_to(ms(7));
+    let (g1, g2) = (first.install(), second.install());
+    drop(g2);
+    assert!(reads(&first));
+    drop(g1);
+    assert!(!reads(&first));
+}
+
+#[test]
+fn a_wall_install_shadows_a_live_virtual_clock_and_lifts_with_its_guard() {
+    let clock = VirtualClock::new();
+    clock.advance_to(Duration::from_secs(3600));
+    let virtual_guard = clock.install();
+    let wall = install_wall();
+    assert!(!reads(&clock), "the wall install shadows the virtual clock");
+    // The virtual guard going first must not bring the virtual clock back over the wall one.
+    drop(virtual_guard);
+    assert!(!reads(&clock));
+    drop(wall);
+    assert!(!reads(&clock));
+}
+
+#[test]
+fn a_wall_install_lifts_to_the_virtual_clock_below_it() {
+    let clock = VirtualClock::new();
+    clock.advance_to(ms(5));
+    let _virtual = clock.install();
+    drop(install_wall());
+    assert!(reads(&clock));
 }
