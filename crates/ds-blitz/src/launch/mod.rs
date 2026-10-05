@@ -24,6 +24,7 @@ use crate::window::Decorations;
 use crate::window_build::Base;
 use crate::window_requests::{Requests, Root};
 use crate::window_shell::Windows;
+use crate::window_size::WindowSize;
 use dioxus::prelude::*;
 use std::time::Instant;
 
@@ -31,16 +32,9 @@ use std::time::Instant;
 /// the `with_*` methods.
 #[derive(Debug, Clone)]
 pub struct AppConfig {
-    /// The window title.
-    title: String,
-    /// The initial width in logical pixels.
-    width: u32,
-    /// The initial height in logical pixels.
-    height: u32,
-    /// The desktop application id, if the app has one.
-    app_id: Option<AppId>,
-    /// Who draws the window's frame.
-    decorations: Decorations,
+    /// The first window: its title and size, and the application id and decorations every
+    /// later window falls back to.
+    first: WindowSpec,
     /// What the document is given beyond quire's own contexts.
     setup: Setup,
     /// What the app does when its last window closes.
@@ -50,14 +44,10 @@ pub struct AppConfig {
 }
 
 impl AppConfig {
-    /// A `width` x `height` window (logical pixels) titled `title`, with no app contexts.
-    pub fn new(title: impl Into<String>, width: u32, height: u32) -> Self {
+    /// A first window of `size` titled `title`, with no app contexts.
+    pub fn new(title: impl Into<String>, size: WindowSize) -> Self {
         AppConfig {
-            title: title.into(),
-            width,
-            height,
-            app_id: None,
-            decorations: Decorations::Server,
+            first: WindowSpec::new(title, size),
             setup: Setup::default(),
             last_window: LastWindowClosed::default(),
             handle: AppHandle::new(),
@@ -82,7 +72,7 @@ impl AppConfig {
     /// The window's desktop application id (the Wayland `app_id`, the X11 `WM_CLASS`), so the
     /// desktop matches it to the app's `.desktop` file for its icon and name.
     pub fn with_app_id(mut self, id: AppId) -> Self {
-        self.app_id = Some(id);
+        self.first = self.first.with_app_id(id);
         self
     }
 
@@ -90,7 +80,7 @@ impl AppConfig {
     /// `ds::prelude::WindowFrame::Titlebar` passes [`Decorations::Client`], so the window has no second
     /// frame around it.
     pub fn with_decorations(mut self, decorations: Decorations) -> Self {
-        self.decorations = decorations;
+        self.first = self.first.with_decorations(decorations);
         self
     }
 
@@ -157,14 +147,13 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) {
     });
     let base = Base {
         setup: config.setup,
-        app_id: config.app_id.clone(),
-        decorations: config.decorations,
+        app_id: config.first.app_id_or(None),
+        decorations: config.first.decorations_or(Decorations::Server),
         requests: Requests::new(move || waker.wake_up()),
         handle: config.handle.clone(),
     };
     if let Some(app) = first {
-        let spec = WindowSpec::new(config.title, config.width, config.height);
-        base.requests.open(spec, Root::Plain(app));
+        base.requests.open(config.first, Root::Plain(app));
     }
     let windows = Windows::new(base, Lifecycle::new(config.last_window, Instant::now()));
     // As dioxus-native's own `launch` does: an event loop that cannot run leaves the app no

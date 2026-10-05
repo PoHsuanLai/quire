@@ -16,15 +16,16 @@ use crate::app_id::AppId;
 use crate::error::OpenWindowError;
 use crate::window::Decorations;
 use crate::window_requests::{Requests, Root, WindowKey, WindowLife};
+use crate::window_size::WindowSize;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
-/// How a window opened with [`open_window`] starts.
+/// How a window starts: the first one `launch` opens (inside its `AppConfig`) and any opened
+/// later with [`open_window`].
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct WindowSpec {
     title: String,
-    width: u32,
-    height: u32,
+    size: WindowSize,
     /// `None`: the first window's.
     app_id: Option<AppId>,
     /// `None`: the first window's.
@@ -32,13 +33,12 @@ pub struct WindowSpec {
 }
 
 impl WindowSpec {
-    /// A `width` x `height` window (logical pixels) titled `title`, with the first window's
-    /// application id and decorations.
-    pub fn new(title: impl Into<String>, width: u32, height: u32) -> Self {
+    /// A window of `size` titled `title`, with the first window's application id and
+    /// decorations.
+    pub fn new(title: impl Into<String>, size: WindowSize) -> Self {
         WindowSpec {
             title: title.into(),
-            width,
-            height,
+            size,
             app_id: None,
             decorations: None,
         }
@@ -61,9 +61,9 @@ impl WindowSpec {
         &self.title
     }
 
-    /// The initial size in logical pixels, width then height.
-    pub(crate) fn size(&self) -> (u32, u32) {
-        (self.width, self.height)
+    /// What it opens at, and the least it may be resized to.
+    pub fn size(&self) -> WindowSize {
+        self.size
     }
 
     /// The application id, falling back to `first`'s.
@@ -198,8 +198,14 @@ mod tests {
     #[test]
     fn a_component_reads_the_handle_of_the_window_it_renders_in() {
         let requests = Requests::new(|| {});
-        let first = requests.open(WindowSpec::new("First", 100, 100), Root::Plain(nothing));
-        let second = requests.open(WindowSpec::new("Second", 100, 100), Root::Plain(nothing));
+        let first = requests.open(
+            WindowSpec::new("First", WindowSize::new(100, 100)),
+            Root::Plain(nothing),
+        );
+        let second = requests.open(
+            WindowSpec::new("Second", WindowSize::new(100, 100)),
+            Root::Plain(nothing),
+        );
         requests.take();
 
         let handle = seen_in(Some(WindowHandle::new(second, requests.clone())))
@@ -224,7 +230,10 @@ mod tests {
     #[test]
     fn a_token_travels_with_the_focus_request_of_its_window() {
         let requests = Requests::new(|| {});
-        let key = requests.open(WindowSpec::new("Only", 100, 100), Root::Plain(nothing));
+        let key = requests.open(
+            WindowSpec::new("Only", WindowSize::new(100, 100)),
+            Root::Plain(nothing),
+        );
         requests.take();
         let handle = WindowHandle::new(key, requests.clone());
 

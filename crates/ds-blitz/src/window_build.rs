@@ -16,13 +16,14 @@ use crate::setup::Setup;
 use crate::window::Decorations;
 use crate::window_platform::with_platform;
 use crate::window_requests::{Requests, Root};
+use crate::window_size::WindowSize;
 use blitz_dom::HtmlParserProvider;
 use blitz_shell::WindowConfig;
 use blitz_traits::navigation::NavigationProvider;
 use blitz_traits::net::NetProvider;
 use dioxus::prelude::*;
 use dioxus_native::winit::window::{ActivationToken, Window};
-use dioxus_native::{DioxusNativeWindowRenderer, LogicalSize, WindowAttributes};
+use dioxus_native::{DioxusNativeWindowRenderer, WindowAttributes};
 use dioxus_native_dom::{DioxusDocument, DocumentConfig};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -43,7 +44,7 @@ pub(crate) struct Base {
 #[derive(Clone)]
 pub(crate) struct Shape {
     pub(crate) title: String,
-    pub(crate) size: (u32, u32),
+    pub(crate) size: WindowSize,
     pub(crate) app_id: Option<AppId>,
     pub(crate) decorations: Decorations,
     /// The activation token this window asks the compositor to focus it with, if the process
@@ -81,11 +82,11 @@ pub(crate) fn window_config(
     handle: WindowHandle,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
-    let (width, height) = shape.size;
-    let attributes = WindowAttributes::default()
-        .with_title(shape.title)
-        .with_surface_size(LogicalSize::new(width, height))
-        .with_decorations(shape.decorations.winit());
+    let attributes = shape.size.apply(
+        WindowAttributes::default()
+            .with_title(shape.title)
+            .with_decorations(shape.decorations.winit()),
+    );
     let attributes = with_platform(attributes, shape.app_id.as_ref(), shape.token);
     let mut vdom = VirtualDom::new_with_props(Host, HostProps::new(root, base.setup.clone()));
     base.setup.contexts.install(&mut vdom);

@@ -79,6 +79,7 @@ mod window_place;
 mod window_platform;
 mod window_requests;
 mod window_shell;
+mod window_size;
 #[cfg(target_os = "linux")]
 mod xdg_activation;
 
@@ -117,6 +118,7 @@ pub use texture_layer::{
 };
 pub use window::{Decorations, WinitWindow};
 pub use window_requests::WindowLife;
+pub use window_size::{Extent, WindowSize};
 
 // The window renderer dioxus-native runs on; named here so the pinned versions stay the ones
 // the render stack resolves.

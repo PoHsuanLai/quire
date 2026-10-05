@@ -30,7 +30,7 @@ mod wallpaper_vivid;
 mod tests;
 
 use axes::{Axes, start_with};
-use ds_blitz::{AppConfig, launch};
+use ds_blitz::{AppConfig, WindowSize, launch};
 
 fn main() {
     let args = args::parse(std::env::args().skip(1));
@@ -82,7 +82,10 @@ fn main() {
                 typeface: args.typeface.unwrap_or_default(),
                 ..Axes::default()
             });
-            launch(app::App, AppConfig::new("quire gallery", 1280, 900));
+            launch(
+                app::App,
+                AppConfig::new("quire gallery", WindowSize::new(1280, 900)),
+            );
         }
     }
 }
