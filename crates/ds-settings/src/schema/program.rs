@@ -6,7 +6,8 @@ use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 
-use super::key::KeySpec;
+use super::agent::is_never_settable;
+use super::key::{AgentSetting, KeySpec};
 
 /// The directory name a schema's owning program installs under: `quire`, `sill`, `mailo`. The
 /// derive reads it off the first path segment of `#[settings(file = "...")]`
@@ -38,9 +39,23 @@ impl Schema {
             .expect("Schema fields are all TOML-representable: strings, numbers, enums and Vec")
     }
 
-    /// The schema `text` holds, or why it does not parse.
+    /// The schema `text` holds, or why it does not parse. A key under an
+    /// [`AGENT_NEVER_SETTABLE`](super::AGENT_NEVER_SETTABLE) prefix that is marked
+    /// `agent = "settable"` is an error, so a schema file any program installs cannot make
+    /// the companion's own limits, computer use or a lock agent-settable.
     pub fn from_toml(text: &str) -> Result<Schema, String> {
-        toml::from_str(text).map_err(|e| e.to_string())
+        let schema: Schema = toml::from_str(text).map_err(|e| e.to_string())?;
+        match schema
+            .key
+            .iter()
+            .find(|key| key.agent == AgentSetting::Settable && is_never_settable(&key.path.0))
+        {
+            Some(key) => Err(format!(
+                "key {} is under a never-agent-settable prefix but is marked agent = \"settable\"",
+                key.path.0
+            )),
+            None => Ok(schema),
+        }
     }
 
     /// Writes `<app-id>.settings.toml` into `dir` (creating it if needed) by atomic
@@ -180,6 +195,49 @@ mod tests {
                 agent: Default::default(),
             }],
         }
+    }
+
+    #[test]
+    fn a_never_settable_key_marked_settable_is_rejected() {
+        const NEVER: &[&str] = &[
+            "agent.budget",
+            "ai.model",
+            "cua.enabled",
+            "memory.on",
+            "companion.mood",
+            "session.lock_grace_s",
+            "idle.dim_after_s",
+            "accounts.signed_in",
+        ];
+        for path in NEVER {
+            let mut schema = sample();
+            schema.key[0].path = KeyPath((*path).to_owned());
+            schema.key[0].agent = crate::schema::AgentSetting::Settable;
+            let err = Schema::from_toml(&schema.to_toml()).expect_err(path);
+            assert!(err.contains(path), "{err}");
+            // The same key left hands-off is fine, and so is a settable key elsewhere.
+            schema.key[0].agent = crate::schema::AgentSetting::HandsOff;
+            assert_eq!(Schema::from_toml(&schema.to_toml()), Ok(schema));
+        }
+        let mut ok = sample();
+        ok.key[0].agent = crate::schema::AgentSetting::Settable;
+        assert_eq!(Schema::from_toml(&ok.to_toml()), Ok(ok));
+    }
+
+    #[test]
+    fn discover_skips_a_schema_that_marks_a_never_key_settable() {
+        let dir = std::env::temp_dir().join(format!(
+            "ds-settings-schema-test-{}-{}",
+            std::process::id(),
+            "never-settable"
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        let mut schema = sample();
+        schema.key[0].path = KeyPath("cua.enabled".to_owned());
+        schema.key[0].agent = crate::schema::AgentSetting::Settable;
+        schema.write_to(&dir).unwrap();
+        assert_eq!(discover(std::slice::from_ref(&dir)), Vec::new());
+        std::fs::remove_dir_all(&dir).unwrap();
     }
 
     #[test]

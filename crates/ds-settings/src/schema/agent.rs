@@ -20,7 +20,11 @@ pub const AGENT_SETTABLE_PROPOSED: &[&str] = &[
 
 /// Key-path prefixes no schema may mark agent-settable: the companion's own limits, the memory
 /// and computer-use switches, model and spend choices, and anything that locks or signs in.
-/// A key under one of these is hands-off however it is annotated.
+/// A key under one of these is hands-off however it is annotated: [`Schema::from_toml`]
+/// rejects a schema that marks one settable, and `#[derive(SettingsSchema)]` fails to compile
+/// for a field that does (both through [`is_never_settable`]).
+///
+/// [`Schema::from_toml`]: super::Schema::from_toml
 pub const AGENT_NEVER_SETTABLE: &[&str] = &[
     "agent.",
     "ai.",
@@ -32,9 +36,86 @@ pub const AGENT_NEVER_SETTABLE: &[&str] = &[
     "accounts.",
 ];
 
+/// Whether `path` is under one of the [`AGENT_NEVER_SETTABLE`] prefixes. `const` so the derive
+/// can turn a violation into a compile error (`const _: () = assert!(...)`).
+///
+/// The derive refuses a never-settable key marked `agent_settable` (the doctest pins the
+/// error code, so it cannot pass for an unrelated mistake):
+///
+/// ```compile_fail,E0080
+/// use ds_settings::SettingsSchema;
+/// use ds_settings::schema::Page;
+/// #[derive(Default, serde::Serialize, SettingsSchema)]
+/// #[settings(file = "p/s.toml", domain = "cua", page = Page::Dock)]
+/// struct S {
+///     #[settings(label = "L", agent_settable)]
+///     enabled: String,
+/// }
+/// ```
+///
+/// The same struct under an ordinary domain compiles:
+///
+/// ```
+/// use ds_settings::SettingsSchema;
+/// use ds_settings::schema::Page;
+/// #[derive(Default, serde::Serialize, SettingsSchema)]
+/// #[settings(file = "p/s.toml", domain = "dock", page = Page::Dock)]
+/// struct S {
+///     #[settings(label = "L", agent_settable)]
+///     enabled: String,
+/// }
+/// ```
+pub const fn is_never_settable(path: &str) -> bool {
+    let mut at = 0;
+    while at < AGENT_NEVER_SETTABLE.len() {
+        if starts_with(path.as_bytes(), AGENT_NEVER_SETTABLE[at].as_bytes()) {
+            return true;
+        }
+        at += 1;
+    }
+    false
+}
+
+const fn starts_with(text: &[u8], prefix: &[u8]) -> bool {
+    if prefix.len() > text.len() {
+        return false;
+    }
+    let mut at = 0;
+    while at < prefix.len() {
+        if text[at] != prefix[at] {
+            return false;
+        }
+        at += 1;
+    }
+    true
+}
+
 #[cfg(test)]
 mod tests {
-    use super::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED};
+    use super::{AGENT_NEVER_SETTABLE, AGENT_SETTABLE_PROPOSED, is_never_settable};
+
+    #[test]
+    fn a_key_under_a_never_prefix_is_never_settable() {
+        const CASES: &[(&str, bool)] = &[
+            ("cua.enabled", true),
+            ("agent.budget", true),
+            ("ai.model", true),
+            ("memory.on", true),
+            ("companion.mood", true),
+            ("session.lock_grace_s", true),
+            ("idle.dim_after_s", true),
+            ("accounts.signed_in", true),
+            ("appearance.theme", false),
+            ("cuarto.x", false),
+            ("cua", false),
+            ("", false),
+        ];
+        for (path, want) in CASES {
+            assert_eq!(is_never_settable(path), *want, "{path}");
+            let by_list = AGENT_NEVER_SETTABLE.iter().any(|p| path.starts_with(p));
+            assert_eq!(is_never_settable(path), by_list, "{path}");
+        }
+    }
 
     #[test]
     fn nothing_proposed_is_security_relevant() {
