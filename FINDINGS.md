@@ -1485,3 +1485,21 @@ the decisions and what was verified:
   (8) `space_pressed` reads Ctrl+1..9; the Space colour cross-fade over `--t-big` is the frame's,
   already built. (9) `Anim::{MenuPop, BubblePop, PillUp, RingDrain, LinkPillIn}` and their keyframes
   are deleted.
+
+## Live settings modules (`ds-settings::live`, feature `live`; W1b)
+
+Open:
+
+- `KeyKind::Live { action }` and `Widget::ActionButton` are new variants. detent's
+  `Control::of` matches `KeyKind` exhaustively and needs a `Live` arm (an interface ask: a button
+  that calls `LiveClient::invoke`, destructive weight behind `Alert{Critical}`); sill and the
+  other consumers only call `KeyKind::widget()`.
+- A live module's value keys use the ordinary kinds (`Toggle`, `Text`, ...); only action rows are
+  `Live`. A toggle's value is a `Boolean` on the wire although its variants are words: the module
+  and the page agree on `on`/`off` as `true`/`false` (a file toggle stores words).
+- Values are `b`, `x`, `s` or `as` only. A float, a table or a list of numbers has no wire form
+  (`LiveError::BadValue`); add a type to `live::value` and the XML doc table when a module needs it.
+- The role hook (`LiveModule::permit`) gets the sender's unique name and the connection; resolving
+  a name to a role (accountd's `Peer` registry) is the daemon's, not this crate's.
+- `Describe` and `Get` also go through `permit(.., Access::Read)`; accountd and inferd allow reads
+  to the Settings role only, as the plan has it. A module that wants public reads returns `Allow`.

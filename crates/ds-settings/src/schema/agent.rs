@@ -5,6 +5,8 @@
 //! mark, so quire's, sill's and detent's tests can check their schemas against the same words.
 //! The list is a proposal for the person to accept or trim, not a grant.
 
+use super::key::{AgentSetting, KeySpec};
+
 /// The keys proposed as agent-settable: appearance, dock size and magnification, the
 /// launcher's web search, and Do Not Disturb. Each is cosmetic or a convenience the person undoes
 /// in one click; none reaches data, accounts, the network beyond a search link, or a lock.
@@ -74,6 +76,17 @@ pub const fn is_never_settable(path: &str) -> bool {
         at += 1;
     }
     false
+}
+
+/// The first key of `keys` that is marked [`AgentSetting::Settable`] under an
+/// [`AGENT_NEVER_SETTABLE`] prefix, if any. The one check behind [`Schema::from_toml`] and a
+/// live module's schema (`ds_settings::live::LiveSchema::check`), so a file schema and a
+/// D-Bus-served one are refused for the same reason.
+///
+/// [`Schema::from_toml`]: super::Schema::from_toml
+pub fn never_settable_violation(keys: &[KeySpec]) -> Option<&KeySpec> {
+    keys.iter()
+        .find(|key| key.agent == AgentSetting::Settable && is_never_settable(&key.path.0))
 }
 
 const fn starts_with(text: &[u8], prefix: &[u8]) -> bool {
