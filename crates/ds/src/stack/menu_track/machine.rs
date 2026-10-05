@@ -6,26 +6,25 @@ use super::types::{
     MenuTrack, MenuTrackEffect, MenuTrackEvent, Pickable, SafeTriangle, Session, ShownBy, Submenu,
 };
 use ds_core::geometry::units::Point;
+use ds_core::machine::Machine;
+use ds_core::time::stamp::Stamp;
 use ds_core::vocab::PressPhase;
-use std::time::Instant;
 
 /// The effects of one step, in order.
 type Effects<K> = Vec<MenuTrackEffect<K>>;
 
 impl<K: Clone + PartialEq> MenuTrack<K> {
-    /// A closed tracker with these timings.
-    pub fn new(timing: MenuTiming) -> Self {
+    /// A closed tracker.
+    pub fn closed() -> Self {
         MenuTrack {
-            timing,
             phase: MenuPhase::Closed,
         }
     }
 
     /// A tracker already tracking `menu` in click mode: a menu that is open by the time the
     /// tracker exists (a ds `Menu` mounts open), so the opening press is over.
-    pub fn open(timing: MenuTiming, menu: K) -> Self {
+    pub fn open(menu: K) -> Self {
         MenuTrack {
-            timing,
             phase: opened(menu, ShownBy::Press, PressPhase::Idle),
         }
     }
@@ -38,14 +37,67 @@ impl<K: Clone + PartialEq> MenuTrack<K> {
         }
     }
 
-    /// The tracker after `event` at `now`, and what the caller must do, in order.
-    pub fn step(self, event: MenuTrackEvent<K>, now: Instant) -> (Self, Effects<K>) {
-        let MenuTrack { timing, phase } = self;
-        let (phase, effects) = match phase {
+    /// The item the keyboard cursor stands on: the last one highlighted.
+    pub fn cursor(&self) -> Option<&ItemPath> {
+        match &self.phase {
+            MenuPhase::Closed => None,
+            MenuPhase::Tracking(session) => session.cursor.as_ref(),
+        }
+    }
+
+    /// Whether `item`'s submenu is open, shown or still being placed.
+    pub fn open_on(&self, item: &ItemPath) -> bool {
+        matches!(self.submenu(), Some(Submenu::Open { item: open, .. }) if open == item)
+    }
+
+    /// Whether the pointer rests on `item` and its submenu waits for the delay.
+    pub fn pending_on(&self, item: &ItemPath) -> bool {
+        matches!(self.submenu(), Some(Submenu::Pending { item: wait, .. }) if wait == item)
+    }
+
+    /// The open or pending submenu, if a menu is open and has one.
+    pub fn submenu(&self) -> Option<&Submenu> {
+        match &self.phase {
+            MenuPhase::Closed => None,
+            MenuPhase::Tracking(session) => Some(&session.sub),
+        }
+    }
+}
+
+impl<K: Clone + PartialEq + 'static> Machine for MenuTrack<K> {
+    type In = MenuTrackEvent<K>;
+    type Out = MenuTrackEffect<K>;
+    type Params = MenuTiming;
+    type Ctx = ();
+
+    /// The tracker after `event` at `at`, and what the caller must do, in order. A
+    /// [`MenuTrackEvent::Tick`] that comes before its deadline changes nothing.
+    fn step(
+        self,
+        event: MenuTrackEvent<K>,
+        at: Stamp,
+        timing: &MenuTiming,
+        _: &(),
+    ) -> (Self, Effects<K>) {
+        let (phase, effects) = match self.phase {
             MenuPhase::Closed => closed(event),
-            MenuPhase::Tracking(session) => tracking(session, event, now, timing),
+            MenuPhase::Tracking(session) => tracking(session, event, at, *timing),
         };
-        (MenuTrack { timing, phase }, effects)
+        (MenuTrack { phase }, effects)
+    }
+
+    /// The submenu delay's end, or the safe triangle's timeout; none otherwise.
+    fn wake(&self) -> Option<Stamp> {
+        let MenuPhase::Tracking(session) = &self.phase else {
+            return None;
+        };
+        match &session.sub {
+            Submenu::Pending { until, .. } => Some(*until),
+            Submenu::Open {
+                guard: Some(guard), ..
+            } => guard.timeout,
+            Submenu::Open { guard: None, .. } | Submenu::None => None,
+        }
     }
 }
 
@@ -68,6 +120,7 @@ fn opened<K>(menu: K, shown: ShownBy, held: PressPhase) -> MenuPhase<K> {
         held,
         entered: Entered::NotYet,
         hot: None,
+        cursor: None,
         sub: Submenu::None,
         pointer: Point::default(),
         under: MenuTarget::Outside,
@@ -89,7 +142,7 @@ fn keep<K>(session: Session<K>, effects: Effects<K>) -> (MenuPhase<K>, Effects<K
 fn tracking<K: Clone + PartialEq>(
     session: Session<K>,
     event: MenuTrackEvent<K>,
-    now: Instant,
+    now: Stamp,
     timing: MenuTiming,
 ) -> (MenuPhase<K>, Effects<K>) {
     match event {
@@ -117,9 +170,7 @@ fn tracking<K: Clone + PartialEq>(
             (opened(other, ShownBy::Hover, session.held), effects)
         }
         MenuTrackEvent::Move(at, target) => moved(session, at, target, now, timing),
-        MenuTrackEvent::SubPlaced { top, bottom } => {
-            keep(placed(session, top, bottom, now), vec![])
-        }
+        MenuTrackEvent::SubPlaced { top, bottom } => keep(placed(session, top, bottom), vec![]),
         MenuTrackEvent::Tick => ticked(session, now, timing),
         MenuTrackEvent::Key(key) => keyed(session, key),
         MenuTrackEvent::Select(path) => selected(session, path),
@@ -140,7 +191,8 @@ fn selected<K>(session: Session<K>, path: ItemPath) -> (MenuPhase<K>, Effects<K>
     }
     keep(
         Session {
-            hot: Some(path),
+            hot: Some(path.clone()),
+            cursor: Some(path),
             sub,
             ..session
         },
@@ -167,7 +219,8 @@ fn expanded<K>(session: Session<K>, path: ItemPath) -> (MenuPhase<K>, Effects<K>
     };
     keep(
         Session {
-            hot: Some(path),
+            hot: Some(path.clone()),
+            cursor: Some(path),
             sub,
             ..session
         },
@@ -204,7 +257,7 @@ fn released<K: PartialEq>(
 }
 
 /// The open submenu's corners are known: arm its safe triangle from the last pointer sample.
-fn placed<K>(session: Session<K>, top: Point, bottom: Point, now: Instant) -> Session<K> {
+fn placed<K>(session: Session<K>, top: Point, bottom: Point) -> Session<K> {
     let sub = match session.sub {
         Submenu::Open { item, .. } => Submenu::Open {
             item,
@@ -212,7 +265,7 @@ fn placed<K>(session: Session<K>, top: Point, bottom: Point, now: Instant) -> Se
                 from: session.pointer,
                 top,
                 bottom,
-                still_since: now,
+                timeout: None,
             }),
         },
         other => other,
@@ -225,7 +278,7 @@ fn moved<K: Clone + PartialEq>(
     session: Session<K>,
     at: Point,
     target: MenuTarget<K>,
-    now: Instant,
+    now: Stamp,
     timing: MenuTiming,
 ) -> (MenuPhase<K>, Effects<K>) {
     if let Submenu::Open {
@@ -236,14 +289,13 @@ fn moved<K: Clone + PartialEq>(
     {
         let guard = SafeTriangle {
             from: at,
-            still_since: now,
+            timeout: Some(now.after_span(timing.triangle_timeout)),
             ..*guard
         };
         let sub = Submenu::Open {
             item: item.clone(),
             guard: Some(guard),
         };
-        let effects = vec![MenuTrackEffect::RequestTick(now + timing.triangle_timeout)];
         let session = Session {
             entered: Entered::Entered,
             sub,
@@ -251,7 +303,7 @@ fn moved<K: Clone + PartialEq>(
             under: target,
             ..session
         };
-        return keep(session, effects);
+        return keep(session, Vec::new());
     }
     let (session, effects) = retarget(session, at, target, now, timing);
     keep(session, effects)
@@ -263,7 +315,7 @@ fn retarget<K: Clone>(
     session: Session<K>,
     at: Point,
     target: MenuTarget<K>,
-    now: Instant,
+    now: Stamp,
     timing: MenuTiming,
 ) -> (Session<K>, Effects<K>) {
     let mut effects = Vec::new();
@@ -291,6 +343,7 @@ fn retarget<K: Clone>(
     }
     let session = Session {
         entered,
+        cursor: hot.clone().or_else(|| session.cursor.clone()),
         hot,
         sub,
         pointer: at,
@@ -305,21 +358,21 @@ fn select<K>(
     sub: Submenu,
     path: &ItemPath,
     branch: Branch,
-    now: Instant,
+    now: Stamp,
     timing: MenuTiming,
     effects: &mut Effects<K>,
 ) -> Submenu {
     match (sub, branch) {
         (Submenu::Open { item, guard }, _) if &item == path => Submenu::Open { item, guard },
-        (Submenu::Pending { item, since }, Branch::Submenu) if &item == path => {
-            Submenu::Pending { item, since }
+        (Submenu::Pending { item, until }, Branch::Submenu) if &item == path => {
+            Submenu::Pending { item, until }
         }
         (sub, Branch::Submenu) => {
             let _ = close_sub(sub, effects);
-            effects.push(MenuTrackEffect::RequestTick(now + timing.submenu_delay));
+            effects.push(MenuTrackEffect::Prepare(path.clone()));
             Submenu::Pending {
                 item: path.clone(),
-                since: now,
+                until: now.after_span(timing.submenu_delay),
             }
         }
         (sub, Branch::Leaf) => close_sub(sub, effects),
@@ -336,11 +389,11 @@ fn close_sub<K>(sub: Submenu, effects: &mut Effects<K>) -> Submenu {
 /// A timer: the submenu delay, or the safe triangle's timeout.
 fn ticked<K: Clone>(
     session: Session<K>,
-    now: Instant,
+    now: Stamp,
     timing: MenuTiming,
 ) -> (MenuPhase<K>, Effects<K>) {
     match session.sub {
-        Submenu::Pending { item, since } if now.duration_since(since) >= timing.submenu_delay => {
+        Submenu::Pending { item, until } if now >= until => {
             let effects = vec![MenuTrackEffect::OpenSub(item.clone())];
             let sub = Submenu::Open { item, guard: None };
             keep(Session { sub, ..session }, effects)
@@ -348,7 +401,7 @@ fn ticked<K: Clone>(
         Submenu::Open {
             item,
             guard: Some(guard),
-        } if now.duration_since(guard.still_since) >= timing.triangle_timeout => {
+        } if guard.timeout.is_some_and(|timeout| now >= timeout) => {
             // The pointer stopped inside the triangle: the item under it wins.
             let sub = Submenu::Open { item, guard: None };
             let (at, under) = (session.pointer, session.under.clone());

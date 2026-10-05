@@ -14,6 +14,7 @@ use ds::prelude::*;
 use ds::root::common::Common;
 use ds::style::icon::url::IconUrl;
 use ds::style::tokens::control_size::ControlSize;
+use ds::style::tokens::delay::DelayToken;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
@@ -314,13 +315,13 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
         "not open well before the 200 ms delay"
     );
     let opened = settle_until(&mut harness, |h| h.count(SUBMENU) == 1);
-    // Exactly what the virtual clock gives. It is 540 ms, not the 200 ms `SubmenuOpen` token (the
-    // rest timer restarts while the pointer sits on the row; recorded in the q-r0 report as a
-    // finding for the menu-tracking rework), so a delay that grows or shrinks fails here.
+    // Exactly the `SubmenuOpen` token: the row and panel are measured while the rest runs, so
+    // the submenu is shown the moment the delay ends. A delay that grows (measuring after it, as
+    // it once did, made it 540 ms) or shrinks fails here.
     assert_eq!(
         opened.duration_since(armed),
-        ms(540),
-        "the submenu opened once its rest had run"
+        DelayToken::SubmenuOpen.delay(),
+        "the submenu opened as its rest ended"
     );
     assert_eq!(
         harness.attr(PARENT, "aria-expanded").as_deref(),

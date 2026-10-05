@@ -4,17 +4,19 @@
 use crate::stack::menu_track::types::{
     ItemPath, MenuKey, MenuPhase, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent, Submenu,
 };
+use ds_core::machine::Machine;
+use ds_core::time::stamp::Stamp;
 use ds_core::vocab::PressPhase;
-use std::sync::LazyLock;
-use std::time::{Duration, Instant};
 
 type Event = MenuTrackEvent<()>;
 type Effect = MenuTrackEffect<()>;
 
-static ZERO: LazyLock<Instant> = LazyLock::new(Instant::now);
+fn at(ms: u64) -> Stamp {
+    Stamp(ms)
+}
 
-fn at(ms: u64) -> Instant {
-    *ZERO + Duration::from_millis(ms)
+fn step(track: MenuTrack<()>, event: Event, ms: u64) -> (MenuTrack<()>, Vec<Effect>) {
+    track.step(event, at(ms), &MenuTiming::default(), &())
 }
 
 fn path(i: u16) -> ItemPath {
@@ -23,13 +25,13 @@ fn path(i: u16) -> ItemPath {
 
 /// Feed `events` to a tracker that starts open; the last phase and every effect, in order.
 fn run(events: Vec<Event>) -> (MenuPhase<()>, Vec<Effect>) {
-    let start = (MenuTrack::open(MenuTiming::default(), ()), Vec::new());
+    let start = (MenuTrack::open(()), Vec::new());
     let (track, effects) =
         events
             .into_iter()
             .enumerate()
             .fold(start, |(track, mut all), (ms, event)| {
-                let (track, effects) = track.step(event, at(ms as u64));
+                let (track, effects) = step(track, event, ms as u64);
                 all.extend(effects);
                 (track, all)
             });
@@ -45,7 +47,7 @@ fn sub(phase: &MenuPhase<()>) -> Submenu {
 
 #[test]
 fn an_open_tracker_is_in_click_mode() {
-    let track = MenuTrack::open(MenuTiming::default(), ());
+    let track = MenuTrack::open(());
     assert_eq!(track.open_menu(), Some(&()));
     let MenuPhase::Tracking(session) = &track.phase else {
         panic!("expected an open menu");
@@ -117,11 +119,8 @@ fn select_moves_the_highlight_and_closes_another_items_submenu() {
     for (events, want, want_sub) in cases {
         let last = events.len() - 1;
         let (earlier, _) = run(events[..last].to_vec());
-        let track = MenuTrack {
-            timing: MenuTiming::default(),
-            phase: earlier,
-        };
-        let (track, effects) = track.step(events[last].clone(), at(50));
+        let track = MenuTrack { phase: earlier };
+        let (track, effects) = step(track, events[last].clone(), 50);
         assert_eq!(effects, want, "{events:?}");
         assert_eq!(sub(&track.phase), want_sub, "{events:?}");
     }

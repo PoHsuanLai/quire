@@ -3,26 +3,31 @@
 //! Left. Every panel (the menu and each open submenu) owns one tracker for its own children, so
 //! submenus nest to any depth with one machine per level and no second state machine.
 //!
-//! The tracker performs the machine's effects: a highlight moves the panel's selection, a
-//! submenu opens once its parent row is measured (placed beside it with `place()`), a close
-//! drops it, and a tick request becomes a timer. `Close`, `Pick` and `Adjacent` are the
-//! panel's own business (a ds menu closes and picks itself), so they are ignored here.
+//! The machine is the one truth of which choice is highlighted and which submenu is open; the
+//! tracker reads both from it. What it keeps besides is what a machine cannot know: the panel's
+//! elements, and where the open submenu was measured to go ([`OpenSub`], shown only while the
+//! machine says that submenu is open). It performs the machine's effects: a rest on a parent row
+//! measures it while the delay runs, an open places the submenu beside that row, and a close
+//! forgets the placement. `Close`, `Pick` and `Adjacent` are the panel's own business (a ds menu
+//! closes and picks itself), so they are ignored here.
 
 use crate::components::menus::menu::choices::{Act, Choice};
+use crate::components::menus::menu::placing::Warm;
 use crate::host::measure::MountedRef;
-use crate::host::measure::follow_rect;
 use crate::stack::menu_track::types::{
-    Branch, ItemPath, MenuKey, MenuPhase, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect,
-    MenuTrackEvent, Pickable, Submenu,
+    Branch, ItemPath, MenuKey, MenuTarget, MenuTiming, MenuTrack, MenuTrackEffect, MenuTrackEvent,
+    Pickable, Submenu,
 };
 use crate::stack::typeahead::Typeahead;
+use dioxus::core::{ScopeId, current_scope_id};
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Point, Px, Rect, Size};
+use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::time::{
     FRAME_SLACK,
     clock::{now, sleep},
 };
 use ds_core::vocab::Availability;
+use ds_motion::machine::{MachineRef, use_machine};
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
 /// the focus where it is.
@@ -49,33 +54,46 @@ pub(crate) struct OpenSub {
     pub via: Via,
 }
 
-/// How many frames a submenu waits for its parent row to mount.
-const ROW_WAITS: usize = 4;
-
 /// One panel's tracker. Copy: every field is a handle.
 #[derive(Clone, Copy)]
 pub(crate) struct Tracker {
-    track: CopyValue<MenuTrack<()>>,
-    selected: Signal<usize>,
-    open: Signal<Option<OpenSub>>,
-    via: CopyValue<Via>,
-    rows: CopyValue<Vec<Option<MountedRef>>>,
-    panel: CopyValue<Option<MountedRef>>,
+    machine: MachineRef<MenuTrack<()>>,
+    hands: Hands,
     typeahead: CopyValue<Typeahead>,
-    pad: Px,
+}
+
+/// What the machine's effects work on: handles only, so the effect handler owns no tracker.
+#[derive(Clone, Copy)]
+pub(super) struct Hands {
+    pub(super) placed: Signal<Option<OpenSub>>,
+    pub(super) warm: CopyValue<Warm>,
+    pub(super) via: CopyValue<Via>,
+    pub(super) rows: CopyValue<Vec<Option<MountedRef>>>,
+    pub(super) panel: CopyValue<Option<MountedRef>>,
+    pub(super) scope: ScopeId,
+    pub(super) pad: Px,
 }
 
 /// A tracker for a panel whose rows sit `pad` inside its edge, open in click mode.
 pub(crate) fn use_tracker(timing: MenuTiming, pad: Px) -> Tracker {
-    Tracker {
-        track: use_hook(|| CopyValue::new(MenuTrack::open(timing, ()))),
-        selected: use_signal(|| 0usize),
-        open: use_signal(|| None),
+    let hands = Hands {
+        placed: use_signal(|| None),
+        warm: use_hook(|| CopyValue::new(Warm::Idle)),
         via: use_hook(|| CopyValue::new(Via::Pointer)),
         rows: use_hook(|| CopyValue::new(Vec::new())),
         panel: use_hook(|| CopyValue::new(None)),
-        typeahead: use_hook(|| CopyValue::new(Typeahead::default())),
+        scope: use_hook(current_scope_id),
         pad,
+    };
+    Tracker {
+        machine: use_machine(
+            |_| MenuTrack::open(()),
+            timing,
+            || (),
+            move |effect, machine| hands.apply(effect, machine),
+        ),
+        hands,
+        typeahead: use_hook(|| CopyValue::new(Typeahead::default())),
     }
 }
 
@@ -95,8 +113,13 @@ pub(crate) fn target<T>(index: usize, choice: &Choice<T>) -> MenuTarget<()> {
     }
 }
 
-fn path(index: usize) -> ItemPath {
+pub(super) fn path(index: usize) -> ItemPath {
     ItemPath(vec![u16::try_from(index).unwrap_or(u16::MAX)])
+}
+
+/// The choice an item path names at this panel's level.
+fn choice_of(path: &ItemPath) -> Option<usize> {
+    path.0.first().copied().map(usize::from)
 }
 
 impl Tracker {
@@ -112,39 +135,47 @@ impl Tracker {
         found
     }
 
-    /// The selected choice (not yet settled onto an enabled one).
+    /// The selected choice (not yet settled onto an enabled one): where the machine's cursor
+    /// stands, the first choice before anything was highlighted.
     pub(crate) fn selected(&self) -> usize {
-        (self.selected)()
+        self.machine
+            .state()
+            .read()
+            .cursor()
+            .and_then(choice_of)
+            .unwrap_or(0)
     }
 
-    /// Put the selection on `index` without telling the machine (a reset after typing).
-    pub(crate) fn reset(&self, index: usize) {
-        let mut selected = self.selected;
-        selected.set(index);
-    }
-
-    /// The submenu shown, once its parent row is measured.
+    /// The submenu shown: its placement, once its parent row is measured and for as long as the
+    /// machine has that submenu open.
     pub(crate) fn open(&self) -> Option<OpenSub> {
-        (self.open)()
+        let placed = (self.hands.placed)()?;
+        let open = self.opens(placed.choice);
+        open.then_some(placed)
+    }
+
+    /// Whether the machine has choice `index`'s submenu open (shown or still being measured).
+    fn opens(&self, index: usize) -> bool {
+        self.machine.state().read().open_on(&path(index))
     }
 
     /// Whether the machine has a submenu open (shown or still being measured).
     pub(crate) fn has_open(&self) -> bool {
         matches!(
-            &self.track.peek().phase,
-            MenuPhase::Tracking(session) if matches!(session.sub, Submenu::Open { .. })
+            self.machine.state().read().submenu(),
+            Some(Submenu::Open { .. })
         )
     }
 
     /// The panel element mounted: kept to measure it and to take the focus back.
     pub(crate) fn panel_mounted(&self, element: MountedRef) {
-        let mut panel = self.panel;
+        let mut panel = self.hands.panel;
         panel.set(Some(element));
     }
 
     /// Choice `index`'s row mounted: kept to measure it when its submenu opens.
     pub(crate) fn row_mounted(&self, index: usize, element: MountedRef) {
-        let mut rows = self.rows;
+        let mut rows = self.hands.rows;
         rows.with_mut(|rows| {
             if rows.len() <= index {
                 rows.resize(index + 1, None);
@@ -155,27 +186,26 @@ impl Tracker {
 
     /// The keyboard moved the selection to `index`.
     pub(crate) fn select(&self, index: usize) {
-        self.reset(index);
-        self.feed(MenuTrackEvent::Select(path(index)));
+        self.machine.send(MenuTrackEvent::Select(path(index)));
     }
 
     /// The pointer is at `at` over `target`.
     pub(crate) fn point(&self, at: Point, target: MenuTarget<()>) {
-        let mut via = self.via;
+        let mut via = self.hands.via;
         via.set(Via::Pointer);
-        self.feed(MenuTrackEvent::Move(at, target));
+        self.machine.send(MenuTrackEvent::Move(at, target));
     }
 
     /// Open choice `index`'s submenu now.
     pub(crate) fn expand(&self, index: usize, how: Via) {
-        let mut via = self.via;
+        let mut via = self.hands.via;
         via.set(how);
-        self.feed(MenuTrackEvent::Expand(path(index)));
+        self.machine.send(MenuTrackEvent::Expand(path(index)));
     }
 
     /// Left or Escape with a submenu open: close it, and take the focus back from it.
     pub(crate) fn close_sub(&self) {
-        self.feed(MenuTrackEvent::Key(MenuKey::Left));
+        self.machine.send(MenuTrackEvent::Key(MenuKey::Left));
         self.refocus();
     }
 
@@ -184,7 +214,7 @@ impl Tracker {
     /// closes, and after a pick that keeps the menu open
     /// (Blitz ends a click on a plain element by clearing the focus).
     pub(crate) fn refocus(&self) {
-        if let Some(panel) = self.panel.peek().clone() {
+        if let Some(panel) = self.hands.panel.peek().clone() {
             spawn(async move {
                 sleep(FRAME_SLACK).await;
                 let _ = crate::focus::soon::focus_element(&panel.0).await;
@@ -194,7 +224,7 @@ impl Tracker {
 
     /// The open submenu landed at `sub`: arm the safe triangle toward its near edge.
     pub(crate) fn placed(&self, sub: Rect) {
-        let Some(open) = *self.open.peek() else {
+        let Some(open) = *self.hands.placed.peek() else {
             return;
         };
         let centre = open.panel.left().0 + open.panel.size.width.0 / 2.0;
@@ -203,124 +233,39 @@ impl Tracker {
         } else {
             sub.right()
         };
-        self.feed(MenuTrackEvent::SubPlaced {
+        self.machine.send(MenuTrackEvent::SubPlaced {
             top: Point { x, y: sub.top() },
             bottom: Point { x, y: sub.bottom() },
         });
     }
+}
 
-    fn feed(&self, event: MenuTrackEvent<()>) {
-        let mut track = self.track;
-        let current = track.peek().clone();
-        let (next, effects) = current.step(event, ds_core::time::clock::now());
-        track.set(next);
-        for effect in effects {
-            self.apply(effect);
-        }
-    }
-
-    fn apply(&self, effect: MenuTrackEffect<()>) {
+impl Hands {
+    /// Carry out one effect of the machine.
+    fn apply(self, effect: MenuTrackEffect<()>, machine: MachineRef<MenuTrack<()>>) {
         match effect {
-            MenuTrackEffect::Highlight(Some(ItemPath(steps))) => {
-                if let Some(&index) = steps.first()
-                    && *self.selected.peek() != usize::from(index)
-                {
-                    self.reset(usize::from(index));
+            MenuTrackEffect::Highlight(highlighted) => self.forget_warm_but(highlighted.as_ref()),
+            MenuTrackEffect::Prepare(item) => {
+                if let Some(index) = choice_of(&item) {
+                    self.prepare(index, machine);
                 }
             }
-            MenuTrackEffect::OpenSub(ItemPath(steps)) => {
-                if let Some(&index) = steps.first() {
-                    self.show(usize::from(index));
+            MenuTrackEffect::OpenSub(item) => {
+                if let Some(index) = choice_of(&item) {
+                    self.open(index, machine);
                 }
             }
             MenuTrackEffect::CloseSub => {
-                let mut open = self.open;
-                if open.peek().is_some() {
-                    open.set(None);
+                let mut placed = self.placed;
+                if placed.peek().is_some() {
+                    placed.set(None);
                 }
             }
-            MenuTrackEffect::RequestTick(at) => {
-                let tracker = *self;
-                spawn(async move {
-                    sleep(at.saturating_duration_since(ds_core::time::clock::now())).await;
-                    tracker.feed(MenuTrackEvent::Tick);
-                });
-            }
-            MenuTrackEffect::Highlight(None)
-            | MenuTrackEffect::Open(..)
+            MenuTrackEffect::Open(..)
             | MenuTrackEffect::Check(_)
             | MenuTrackEffect::Close(_)
             | MenuTrackEffect::Pick(_)
             | MenuTrackEffect::Adjacent(_) => {}
         }
-    }
-
-    /// Measure choice `index`'s row and the panel, then show its submenu beside them, unless
-    /// the machine closed it meanwhile.
-    fn show(&self, index: usize) {
-        let via = *self.via.peek();
-        let tracker = *self;
-        spawn(async move {
-            let Some(row) = tracker.mounted_row(index).await else {
-                return;
-            };
-            // Follow the row and the panel until each holds still: a menu drawn in a card is
-            // measured while its surroundings are still settling (`follow_rect`, the one
-            // settle-until-stable for placement).
-            let mut row_rect = None;
-            follow_rect(&row.0, |rect| row_rect = Some(rect)).await;
-            let Some(row) = row_rect else {
-                return;
-            };
-            let panel = tracker.panel.peek().clone();
-            let panel = match panel {
-                Some(panel) => {
-                    let mut panel_rect = None;
-                    follow_rect(&panel.0, |rect| panel_rect = Some(rect)).await;
-                    panel_rect.unwrap_or(row)
-                }
-                None => row,
-            };
-            if !tracker.is_open_on(index) {
-                return;
-            }
-            let anchor = Rect {
-                origin: Point {
-                    x: panel.left(),
-                    y: row.top() - tracker.pad,
-                },
-                size: Size {
-                    width: panel.size.width,
-                    height: row.size.height,
-                },
-            };
-            let mut open = tracker.open;
-            open.set(Some(OpenSub {
-                choice: index,
-                anchor,
-                panel,
-                via,
-            }));
-        });
-    }
-
-    /// Choice `index`'s row element, waiting a few frames for it to mount (a submenu asked
-    /// for as the menu mounts, before its rows exist).
-    async fn mounted_row(&self, index: usize) -> Option<MountedRef> {
-        for _ in 0..ROW_WAITS {
-            if let Some(row) = self.rows.peek().get(index).cloned().flatten() {
-                return Some(row);
-            }
-            sleep(FRAME_SLACK).await;
-        }
-        None
-    }
-
-    fn is_open_on(&self, index: usize) -> bool {
-        matches!(
-            &self.track.peek().phase,
-            MenuPhase::Tracking(session)
-                if matches!(&session.sub, Submenu::Open { item, .. } if *item == path(index))
-        )
     }
 }

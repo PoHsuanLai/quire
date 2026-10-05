@@ -227,6 +227,39 @@ pub async fn follow_rect(element: &MountedData, mut placed: impl FnMut(Rect)) {
     }
 }
 
+/// Follow `first`'s and `second`'s client rects together, frame by frame, until both have held
+/// still for a few frames: [`follow_rect`]'s settle for a pair, in one wait rather than two
+/// (a submenu measures its parent row and its panel). The rects read last, or `None` when `first`
+/// never had an area; `second` is `None` when it is absent or never had one.
+pub async fn follow_rects(
+    first: &MountedData,
+    second: Option<&MountedData>,
+) -> Option<(Rect, Option<Rect>)> {
+    let mut last = None;
+    let mut still = 0u8;
+    for _ in 0..FOLLOW_FRAMES {
+        sleep(FRAME_SLACK).await;
+        let Some(rect) = client_rect(first).await.filter(|rect| laid_out(*rect)) else {
+            continue;
+        };
+        let other = match second {
+            Some(element) => client_rect(element).await.filter(|rect| laid_out(*rect)),
+            None => None,
+        };
+        let read = Some((rect, other));
+        if last == read {
+            still += 1;
+            if still >= STILL_FRAMES {
+                break;
+            }
+        } else {
+            still = 0;
+            last = read;
+        }
+    }
+    last
+}
+
 #[cfg(test)]
 mod tests {
     use super::{SLOW_RETRY, laid_out, layout_retry};
