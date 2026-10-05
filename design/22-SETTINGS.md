@@ -579,6 +579,10 @@ The model layer: where data may go, which model fills each tier, how the engines
 | `ai.engine.llama_server.path` | text, a path | `llama-server` | looked up on the engine unit's `PATH` when it has no slash | models.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 | `ai.cua.history_frames` | `Count` | `3` | `1..=8`; screenshots a computer-use step keeps in the prompt | models.md section 3.8 | proposed (companion freeze, 2026-10-02) |
 | `ai.cua.repair_attempts` | `Count` | `1` | `0..=3`; re-asks after an unparseable step | models.md section 3.8 | proposed (companion freeze, 2026-10-02) |
+| `ai.structured.open_text` | `Count` | `4096` | `256..=65536` characters; the longest free-text value a structured output may carry | inferd's structured-output limits (ask 143) | proposed (agent stack, 2026-10-06) |
+| `ai.structured.open_list` | `Count` | `256` | `16..=4096`; the most items an open list in a structured output may carry | inferd's structured-output limits (ask 143) | proposed (agent stack, 2026-10-06) |
+| `ai.structured.depth` | `Count` | `16` | `4..=64`; the deepest nesting a structured output may have | inferd's structured-output limits (ask 143) | proposed (agent stack, 2026-10-06) |
+| `ai.structured.repair_budget` | `Count` | `1` | `0..=3`; re-asks after a structured output fails its schema | inferd's structured-output limits (ask 143) | proposed (agent stack, 2026-10-06) |
 
 
 ### 3.27 `agent` (docket)
