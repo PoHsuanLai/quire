@@ -9,7 +9,9 @@ use crate::components::controls::scroller::handle::{ScrollerRef, use_scroller};
 use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::list::list::node_key;
-use crate::components::lists::virtual_list::model::{Leaving, RowHeight, heal_dy, leaving, roved};
+use crate::components::lists::virtual_list::model::{
+    Leaving, RowHeight, heal_dy, leaving, positions, roved, slot_in,
+};
 use crate::root::common::Common;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
@@ -41,6 +43,17 @@ enum Measured {
     No,
 }
 
+/// The exits that started together: they settle and drop together.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct Batch(u32);
+
+/// A row that left while mounted: where it stood, what it drew and the batch it plays out in.
+struct Exiting<K> {
+    gone: Leaving<K>,
+    content: Element,
+    batch: Batch,
+}
+
 /// What the list remembers between renders.
 struct Memory<K> {
     /// The keys as of the last render.
@@ -52,7 +65,9 @@ struct Memory<K> {
     /// The mounted rows, in order, as they were drawn.
     shown: Vec<(K, Element)>,
     /// Rows that left while mounted and are still playing their exit.
-    leaving: Vec<(Leaving<K>, Element)>,
+    leaving: Vec<Exiting<K>>,
+    /// The batch the next exits belong to.
+    next_batch: Batch,
     /// The slots of rows just dropped, whose rows below are healing.
     healing: Vec<usize>,
 }
@@ -88,6 +103,7 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
             start: 0,
             shown: Vec::new(),
             leaving: Vec::new(),
+            next_batch: Batch(0),
             healing: Vec::new(),
         })
     });
@@ -108,19 +124,36 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
     let mut mem = memory;
     let mut state = mem.write();
     if state.keys != keys {
+        let state = &mut *state;
+        let index = positions(&keys);
+        // A key listed again stops leaving: it is an ordinary row once more, and its batch no
+        // longer drops it or heals below it. The rows still leaving keep their place among the
+        // new keys.
+        state
+            .leaving
+            .retain(|exiting| !index.contains_key(&exiting.gone.key));
+        for exiting in &mut state.leaving {
+            exiting.gone.slot = slot_in(&state.keys, exiting.gone.slot, &index, keys.len());
+        }
         let before = state.start..state.start + state.shown.len();
         let gone = leaving(&state.keys, before, &keys);
-        let batch: Vec<K> = gone.iter().map(|gone| gone.key.clone()).collect();
+        let batch = state.next_batch;
+        state.next_batch = Batch(batch.0 + 1);
+        let started = !gone.is_empty();
         for gone in gone {
             let content = state
                 .shown
                 .iter()
                 .find(|(key, _)| *key == gone.key)
                 .map_or_else(|| rsx! {}, |(_, content)| content.clone());
-            state.leaving.push((gone, content));
+            state.leaving.push(Exiting {
+                gone,
+                content,
+                batch,
+            });
         }
         state.keys = keys.clone();
-        if !batch.is_empty() {
+        if started {
             queue_effect(move || drop_after_exit(memory, tick, scope, task_scope, batch));
         }
     }
@@ -216,13 +249,17 @@ fn items<K: Clone + Eq + Hash + 'static>(
     let mut items = Vec::new();
     let mut shown = Vec::with_capacity(window.len());
     for at in window.start..=window.end {
-        for (gone, content) in state.leaving.iter().filter(|(gone, _)| gone.slot == at) {
+        for exiting in state
+            .leaving
+            .iter()
+            .filter(|exiting| exiting.gone.slot == at)
+        {
             items.push(Item {
-                node: node_key(&gone.key),
+                node: node_key(&exiting.gone.key),
                 presence: Some("leaving"),
                 exit: Some("row"),
                 style: row_style(pitch, None),
-                content: content.clone(),
+                content: exiting.content.clone(),
             });
         }
         let Some(key) = keys.get(at).filter(|_| at < window.end) else {
@@ -250,7 +287,7 @@ fn drop_after_exit<K: Clone + Eq + 'static>(
     mut tick: Signal<u32>,
     scope: Signal<Scope>,
     task_scope: ScopeId,
-    batch: Vec<K>,
+    batch: Batch,
 ) {
     spawn_in(task_scope, async move {
         let Ok(motion) = try_get(scope).map(|scope| scope.resolved.motion) else {
@@ -264,10 +301,10 @@ fn drop_after_exit<K: Clone + Eq + 'static>(
         let dropped: Vec<usize> = state
             .leaving
             .iter()
-            .filter(|(gone, _)| batch.contains(&gone.key))
-            .map(|(gone, _)| gone.slot)
+            .filter(|exiting| exiting.batch == batch)
+            .map(|exiting| exiting.gone.slot)
             .collect();
-        state.leaving.retain(|(gone, _)| !batch.contains(&gone.key));
+        state.leaving.retain(|exiting| exiting.batch != batch);
         state.healing = dropped;
         drop(state);
         tick += 1;
