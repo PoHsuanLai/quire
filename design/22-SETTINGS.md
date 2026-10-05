@@ -1232,6 +1232,18 @@ The Settings app renders these modules in the same pages, with the same widgets;
 difference is that `Set` calls the service instead of writing a file. mailo, calendar and
 contacts register their account pages this way (`20-SURFACES.md`).
 
+The interface is frozen (quire `ds-settings`, feature `live`, 2026-10-06): `Describe() -> s`
+(JSON `{version, key: [KeySpec]}`), `Get(s) -> v`, `Set(s, v)`, signal `Changed(s, v)`; values
+are `b`, `x`, `s` or `as` only. Value keys of a live module use the ordinary kinds; only action
+rows use `kind = Live{action}` (a label plus weight `plain` or `destructive`), are run by
+`Set(key, true)` and draw as a button (`Widget::ActionButton`; a destructive one behind
+`Alert{Critical}`). A toggle's value is a boolean on the wire. The serving daemon implements
+`ds_settings::live::LiveModule` and holds all state; it decides who may `Get` or `Set` in
+`permit` (accountd and inferd allow only the Settings role), and a refusal is
+`org.quire.SettingsModule1.Error.NotPermitted`. `serve` and `LiveClient::describe` both refuse a
+schema that marks an `AGENT_NEVER_SETTABLE` key agent-settable, the same check
+`Schema::from_toml` and the derive use.
+
 ### 9.5 Rules
 
 - A settings key exists only if a `KeySpec` describes it: a struct field without the derive is
@@ -1250,7 +1262,7 @@ contacts register their account pages this way (`20-SURFACES.md`).
 - `every_key_in_catalogue_has_a_spec`: the section 3 tables parsed from this file match the
   union of all schemas emitted by the workspace, path for path.
 - `schema_round_trip`: derive -> TOML -> parse -> equals the derive output.
-- `widget_for_kind_is_total`: every `KeyKind` maps to exactly one component.
+- `widget_for_kind_is_total`: every `KeyKind` maps to exactly one component. `Live` maps to `ActionButton`.
 - `deep_link_resolves`: "dark mode", "magnification", "natural scrolling" each resolve to one
   key through the schemas alone.
 
