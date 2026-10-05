@@ -38,7 +38,7 @@ use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::open_window::WindowHandle;
 use crate::phase::{Layout, Phase};
-use crate::startup_token::take_startup_token;
+use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
@@ -114,19 +114,22 @@ pub(crate) struct Windows {
     parking: Option<Arc<dyn Window>>,
     base: Base,
     life: Lifecycle,
+    /// The activation tokens the process was started with, for the first window.
+    tokens: LaunchTokens,
     /// Whether the loop can create windows yet (winit's `can_create_surfaces` has come).
     ready: bool,
 }
 
 impl Windows {
     /// An app with no window yet; the first one is a request in `base.requests`.
-    pub(crate) fn new(base: Base, life: Lifecycle) -> Self {
+    pub(crate) fn new(base: Base, life: Lifecycle, tokens: LaunchTokens) -> Self {
         Windows {
             subs: Vec::new(),
             spare: Vec::new(),
             parking: None,
             base,
             life,
+            tokens,
             ready: false,
         }
     }
@@ -245,7 +248,7 @@ impl Windows {
             size: spec.size(),
             app_id: spec.app_id_or(self.base.app_id.as_ref()),
             decorations: spec.decorations_or(self.base.decorations),
-            token: take_startup_token(event_loop),
+            token: self.tokens.take(event_loop),
         };
         let slot = WindowSlot::default();
         let phase = Phase::default();

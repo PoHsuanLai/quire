@@ -29,6 +29,11 @@ pub enum ClipboardError {
     /// The system clipboard refused, or holds no text.
     #[error("the clipboard is unavailable or holds no text")]
     Unavailable,
+    /// The document has no window shell to reach the system clipboard through: a root
+    /// [`provide_host`](crate::provide_host) wired by itself, not one `launch` built. Nothing was
+    /// written.
+    #[error("this document has no window shell to reach the system clipboard through")]
+    NoShell,
 }
 
 /// A clipboard a document's app and its edit surfaces read and write.
@@ -38,8 +43,8 @@ pub trait Clipboard {
     /// What a paste inserts: the HTML with its plain text when the clipboard has HTML, else the
     /// text.
     fn read_html(&self) -> Option<Pasted>;
-    /// Put `text` on the clipboard.
-    fn write_text(&self, text: &str);
+    /// Put `text` on the clipboard, or say why it was not put.
+    fn write_text(&self, text: &str) -> Result<(), ClipboardError>;
 }
 
 /// The desktop's clipboard, through the window's shell: the shell is reached once the window's
@@ -81,11 +86,10 @@ impl Clipboard for System {
         pasted(html, self.read_text())
     }
 
-    fn write_text(&self, text: &str) {
-        if let Some(shell) = self.shell() {
-            let text = text.to_owned();
-            guarded(move || shell.set_clipboard_text(text).ok());
-        }
+    fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
+        let shell = self.shell().ok_or(ClipboardError::NoShell)?;
+        let text = text.to_owned();
+        guarded(move || shell.set_clipboard_text(text).ok()).ok_or(ClipboardError::Unavailable)
     }
 }
 
@@ -102,15 +106,20 @@ impl Clipboard for Memory {
         pasted(self.0.html(), self.0.text())
     }
 
-    fn write_text(&self, text: &str) {
+    fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
         self.0.put(text.to_owned());
+        Ok(())
     }
 }
 
 /// Put `text` on the clipboard. Call it from a handler inside a ds-blitz document.
+///
+/// # Errors
+/// [`ClipboardError::NoShell`] in a root [`provide_host`](crate::provide_host) wired on its own
+/// (no window shell to write through), [`ClipboardError::Unavailable`] when the system
+/// clipboard refuses.
 pub fn write_text(text: &str) -> Result<(), ClipboardError> {
-    host()?.write_text(text);
-    Ok(())
+    host()?.write_text(text)
 }
 
 /// The text on the clipboard. Call it from a handler inside a ds-blitz document.

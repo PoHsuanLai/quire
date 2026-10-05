@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds_blitz::clipboard::{ClipboardError, write_text};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -74,4 +75,24 @@ fn a_document_without_a_host_has_none_of_the_optional_parts() {
     };
     assert!(host.edit().is_none(), "NoHost has no edit part");
     assert!(host.file_drop().is_none(), "NoHost has no drop part");
+}
+
+/// What `write_text` answered inside a root, handed out through a root context.
+#[derive(Clone, Default)]
+struct Wrote(Rc<RefCell<Vec<Result<(), ClipboardError>>>>);
+
+#[test]
+fn a_bare_roots_clipboard_write_says_it_wrote_nothing_instead_of_succeeding() {
+    #[allow(non_snake_case)]
+    fn Copier() -> Element {
+        let _host = ds_blitz::provide_host();
+        let result = write_text("ada@example.org");
+        consume_context::<Wrote>().0.borrow_mut().push(result);
+        rsx! {}
+    }
+    let wrote = Wrote::default();
+    let mut dom = VirtualDom::new(Copier);
+    dom.provide_root_context(wrote.clone());
+    dom.rebuild_in_place();
+    assert_eq!(*wrote.0.borrow(), [Err(ClipboardError::NoShell)]);
 }

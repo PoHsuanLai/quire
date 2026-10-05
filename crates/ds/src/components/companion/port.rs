@@ -39,6 +39,13 @@ pub trait DictationPort: 'static {
     fn stop(&self, serial: DictateSerial);
 }
 
+/// A signal that holds nothing and never changes: what a stand-in port answers where a real one
+/// would hand out what it hears. It lives in the app's root scope, so it outlives the handler or
+/// render that asked.
+fn never<T: 'static>() -> ReadSignal<Option<T>> {
+    Signal::new_in_scope(None, ScopeId::ROOT).into()
+}
+
 /// The port of an app with no companion client: no summon is taken, and no answer ever comes.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct NoPort;
@@ -49,13 +56,13 @@ impl CompanionPort for NoPort {
     fn ask(&self, _serial: SummonSerial, _prompt: String, _chips: Vec<ContextChip>) {}
 
     fn answers(&self) -> ReadSignal<Option<(SummonSerial, AnswerView)>> {
-        todo!("NoPort::answers: a signal that never changes, made in the caller's Dioxus scope")
+        never()
     }
 
     fn cancel(&self, _serial: SummonSerial) {}
 
     fn heard(&self) -> ReadSignal<Option<(SummonSerial, HeardMark)>> {
-        todo!("NoPort::heard: a signal that never changes, made in the caller's Dioxus scope")
+        never()
     }
 }
 
@@ -67,7 +74,7 @@ impl DictationPort for NoDictation {
     fn on_dictate(&self, _handler: Callback<DictateSerial, SummonAnswerMark>) {}
 
     fn text(&self) -> ReadSignal<Option<(DictateSerial, HeardMark)>> {
-        todo!("NoDictation::text: a signal that never changes, made in the caller's Dioxus scope")
+        never()
     }
 
     fn stop(&self, _serial: DictateSerial) {}

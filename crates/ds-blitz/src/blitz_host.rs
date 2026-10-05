@@ -143,7 +143,10 @@ impl BlitzHost {
 ///
 /// The host of a root like that follows the renderer's own focus fallback, has no lookup by
 /// selector and no click-focus part, and its edit surfaces are fed no IME events: the window
-/// loop that owns those is `launch`'s and the harness's.
+/// loop that owns those is `launch`'s and the harness's. Nor does it reach a window shell, so
+/// [`clipboard::write_text`](crate::clipboard::write_text) answers
+/// [`ClipboardError::NoShell`](crate::clipboard::ClipboardError::NoShell) there, never a
+/// success that wrote nothing.
 pub fn provide_host() -> Rc<dyn DocumentHost> {
     use_hook(|| {
         try_consume_context::<Rc<dyn DocumentHost>>().unwrap_or_else(|| {
