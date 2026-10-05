@@ -8,18 +8,17 @@
 //! `span.ds-stepper-pair[role=spinbutton]` of `span.ds-stepper-up` and `span.ds-stepper-down`;
 //! a half that cannot go further is `aria-disabled`, the half held down `data-pressed`.
 
-use crate::components::fields::stepper::hold::{StepHold, Ticket};
+use crate::components::fields::stepper::hold::{HoldIn, RepeatPace, StepHold};
 use crate::components::fields::stepper::model::{Readout, StepDirection, StepRange};
 use crate::components::fields::text_field::TextField;
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::time::clock::sleep;
 use ds_core::vocab::{Availability, PressPhase};
 use ds_core::word::Word;
+use ds_motion::machine::use_machine;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconPx, IconSize};
 use ds_style::tokens::control_size::ControlSize;
-use ds_style::tokens::delay::DelayToken;
 
 /// The arrow a half draws: small enough that two of them fit in the rung's height.
 fn arrow_size(size: ControlSize) -> IconSize {
@@ -38,30 +37,20 @@ fn arrow(key: &Key) -> Option<StepDirection> {
     }
 }
 
-/// What holding a half does: the machine, the value the timer reads and where it reports.
+/// What a step does: the change one step from the value shown, and where it is reported.
 #[derive(Clone, Copy)]
-struct Holding {
-    hold: CopyValue<StepHold>,
-    latest: CopyValue<i32>,
+struct Stepping {
+    value: i32,
     range: StepRange,
     onchange: EventHandler<i32>,
     /// The half-typed text in the field: a step replaces it with the number it lands on.
     draft: Signal<Option<String>>,
 }
 
-impl Holding {
-    /// Step once now, then repeat while this press stays the held one.
-    fn begin(self, direction: StepDirection) {
-        let mut hold = self.hold;
-        let (next, ticket) = hold.peek().press(direction);
-        hold.set(next);
-        self.step(direction);
-        spawn(self.repeat(ticket));
-    }
-
+impl Stepping {
     /// The change one step from the value now.
     fn step(self, direction: StepDirection) {
-        self.change(self.range.step_from(*self.latest.peek(), direction));
+        self.change(self.range.step_from(self.value, direction));
     }
 
     /// Report a change that did not come from typing (a step, Home, End): the number shown is
@@ -70,24 +59,6 @@ impl Holding {
         let mut draft = self.draft;
         draft.set(None);
         self.onchange.call(to);
-    }
-
-    /// The repeat timer of one press: it waits, then steps at the repeat pitch until the press
-    /// is released or replaced.
-    async fn repeat(self, ticket: Ticket) {
-        sleep(DelayToken::RepeatStart.delay()).await;
-        loop {
-            let due = self.hold.peek().due(ticket);
-            let Some(direction) = due else { break };
-            self.step(direction);
-            sleep(DelayToken::RepeatEvery.delay()).await;
-        }
-    }
-
-    fn release(self) {
-        let mut hold = self.hold;
-        let next = hold.peek().release();
-        hold.set(next);
     }
 }
 
@@ -104,19 +75,21 @@ pub fn Stepper(
     onchange: EventHandler<i32>,
     #[props(default)] common: Common,
 ) -> Element {
-    let hold = use_hook(|| CopyValue::new(StepHold::default()));
-    let mut latest = use_hook(|| CopyValue::new(value));
-    latest.set(value);
     let mut draft = use_signal(|| None::<String>);
-    let holding = Holding {
-        hold,
-        latest,
+    let stepping = Stepping {
+        value,
         range,
         onchange,
         draft,
     };
+    let hold = use_machine(
+        |_| StepHold::Idle,
+        RepeatPace::default(),
+        || (),
+        move |direction, _| stepping.step(direction),
+    );
     let live = availability == Availability::Enabled;
-    let pressed = hold().direction();
+    let pressed = hold.state().read().direction();
     let arrow_size = arrow_size(size);
     let class = common.class("ds-stepper");
     let data = common.data_attributes();
@@ -126,7 +99,7 @@ pub fn Stepper(
         }
         if let Some(direction) = arrow(&event.key()) {
             event.prevent_default();
-            holding.step(direction);
+            stepping.step(direction);
         }
     };
     let field_key = on_key;
@@ -167,7 +140,7 @@ pub fn Stepper(
                 onpointerdown: move |event: PointerEvent| {
                     if live {
                         event.stop_propagation();
-                        holding.begin(direction);
+                        hold.send(HoldIn::Press(direction));
                     }
                 },
                 Glyph { icon, size: arrow_size }
@@ -196,14 +169,14 @@ pub fn Stepper(
                 "aria-disabled": availability.aria_disabled(),
                 onkeydown: move |event: KeyboardEvent| {
                     match event.key() {
-                        Key::Home if live => holding.change(range.min()),
-                        Key::End if live => holding.change(range.max()),
+                        Key::Home if live => stepping.change(range.min()),
+                        Key::End if live => stepping.change(range.max()),
                         _ => on_key(event),
                     }
                 },
-                onpointerup: move |_| holding.release(),
-                onpointerleave: move |_| holding.release(),
-                onblur: move |_| holding.release(),
+                onpointerup: move |_| hold.send(HoldIn::Release),
+                onpointerleave: move |_| hold.send(HoldIn::Release),
+                onblur: move |_| hold.send(HoldIn::Release),
                 {half(StepDirection::Up, Icon::ChevronUp)}
                 {half(StepDirection::Down, Icon::ChevronDown)}
             }
