@@ -10,9 +10,12 @@
 mod cases;
 #[path = "support/golden.rs"]
 mod golden;
+#[path = "support/scoped.rs"]
+mod scoped;
 
 use cases::CASES;
 use dioxus::prelude::*;
+use scoped::Scoped;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -26,9 +29,12 @@ impl PartialEq for HostProps {
     }
 }
 
-/// Renders a case inside a scope, so its handlers have a runtime to attach to.
+/// Renders a case inside a scope, so its handlers have a runtime to attach to and a component
+/// that reads the scope (a text field) draws instead of panicking, which dioxus-ssr renders as
+/// nothing: the four text-field goldens were once blessed as one blank line that way.
 fn host(props: HostProps) -> Element {
-    (props.make)()
+    let case = (props.make)();
+    rsx! { Scoped { {case} } }
 }
 
 fn render(make: fn() -> Element) -> String {
