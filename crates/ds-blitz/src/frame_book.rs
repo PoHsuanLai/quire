@@ -4,15 +4,11 @@
 //! requests for the app until the document it came from is found under its `iframe` (the next
 //! frame's walk, `crate::frame_tree`), then puts them to the app with the tag. `data:` never
 //! waits: it is never put to the app.
-//!
-//! The lookups (`crate::frames::{tag_of, frame_by_tag}`) reach every book on the calling thread,
-//! so they work from an app's handler in the window and in a test alike without a context.
 
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
-use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::{Arc, Mutex, MutexGuard, PoisonError, Weak};
+use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
 
 /// A frame's request for the app, run with the frame's tag once it is known.
 pub(crate) type Held = Box<dyn FnOnce(Option<FrameTag>) + Send>;
@@ -42,20 +38,10 @@ impl std::fmt::Debug for FrameBook {
     }
 }
 
-thread_local! {
-    /// Every book of a document on this thread: the window's UI thread, or a test's.
-    static BOOKS: RefCell<Vec<Weak<Mutex<Book>>>> = const { RefCell::new(Vec::new()) };
-}
-
 impl FrameBook {
-    /// An empty book, reachable from this thread's lookups for as long as it lives.
+    /// An empty book.
     pub fn new() -> Self {
-        let book = Arc::new(Mutex::new(Book::default()));
-        BOOKS.with_borrow_mut(|books| {
-            books.retain(|weak| weak.strong_count() > 0);
-            books.push(Arc::downgrade(&book));
-        });
-        FrameBook(book)
+        FrameBook(Arc::new(Mutex::new(Book::default())))
     }
 
     /// Run `request` with `frame`'s tag now if the frame has been found, or when it is.
@@ -109,34 +95,4 @@ fn release(
 
 fn lock(book: &Mutex<Book>) -> MutexGuard<'_, Book> {
     book.lock().unwrap_or_else(PoisonError::into_inner)
-}
-
-/// Every live book on this thread.
-fn books() -> Vec<Arc<Mutex<Book>>> {
-    BOOKS.with_borrow(|books| books.iter().filter_map(Weak::upgrade).collect())
-}
-
-/// The tag of `frame`'s `iframe`, if the frame is live in a document on this thread and its
-/// element has one.
-pub(crate) fn tag_of(frame: FrameId) -> Option<FrameTag> {
-    books()
-        .iter()
-        .find_map(|book| lock(book).tags.get(&frame).cloned())
-        .flatten()
-}
-
-/// The live frame whose `iframe` carries `tag`; the newest document if several do (an app gives
-/// each frame its own tag, and a reloaded frame is a new document).
-pub(crate) fn frame_by_tag(tag: &FrameTag) -> Option<FrameId> {
-    books()
-        .iter()
-        .flat_map(|book| {
-            lock(book)
-                .tags
-                .iter()
-                .filter(|(_, found)| found.as_ref() == Some(tag))
-                .map(|(frame, _)| *frame)
-                .collect::<Vec<_>>()
-        })
-        .max_by_key(|frame| frame.index())
 }

@@ -42,11 +42,6 @@ pub struct GalleryWords {
     pub center: TextLine,
     /// A surface with nothing placed.
     pub none: TextLine,
-    /// The size picker's label. Unused since the gallery offers one size per widget
-    /// (2026-09-28); kept so a host's words still build.
-    pub size: TextLine,
-    /// Each size's name: Small, Medium, Large. Unused since 2026-09-28, as `size` is.
-    pub sizes: [TextLine; 3],
 }
 
 impl Default for GalleryWords {
@@ -58,8 +53,6 @@ impl Default for GalleryWords {
             desktop: "Desktop".into(),
             center: "Notification Center".into(),
             none: "No widgets".into(),
-            size: "Size".into(),
-            sizes: ["Small".into(), "Medium".into(), "Large".into()],
         }
     }
 }

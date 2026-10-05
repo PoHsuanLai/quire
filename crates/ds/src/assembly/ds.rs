@@ -141,7 +141,7 @@ pub fn Ds(
         activity,
     });
     let hover = use_hover_hub_provider(env);
-    use_toast_hub_provider(env);
+    use_toast_hub_provider();
     use_context_provider(|| Signal::new(LayerStack::default()));
     use_overlays_provider();
     let frame = FrameVars::of(&look, resolved.scheme);

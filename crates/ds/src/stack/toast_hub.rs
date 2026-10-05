@@ -9,7 +9,6 @@ use dioxus::core::{Task, current_scope_id};
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
 use ds_style::icon::Icon;
-use ds_style::scope::Scope;
 use ds_style::task::{Gone, spawn_in, try_get, try_set};
 use ds_style::tokens::delay::DelayToken;
 
@@ -75,7 +74,6 @@ pub struct ToastHub {
     on_undo: Signal<Option<EventHandler<UndoToken>>>,
     on_action: Signal<Option<EventHandler<()>>>,
     hold: Signal<Option<Task>>,
-    env: Signal<Scope>,
     scope: ScopeId,
 }
 
@@ -224,8 +222,8 @@ enum Push {
     Action(ToastAction, EventHandler<()>),
 }
 
-/// A new hub for `Ds` to provide, timing its hold at the root's motion level.
-pub fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
+/// A new hub for `Ds` to provide.
+pub fn use_toast_hub_provider() -> ToastHub {
     let scope = use_hook(current_scope_id);
     use_context_provider(|| ToastHub {
         state: Signal::new(ToastState::Hidden),
@@ -233,7 +231,6 @@ pub fn use_toast_hub_provider(env: Signal<Scope>) -> ToastHub {
         on_undo: Signal::new(None),
         on_action: Signal::new(None),
         hold: Signal::new(None),
-        env,
         scope,
     })
 }
@@ -247,12 +244,6 @@ pub fn use_toast_hub() -> ToastHub {
 mod tests {
     use super::{ToastAction, ToastHub, UndoToken, use_toast_hub_provider};
     use dioxus::prelude::*;
-    use ds_core::vocab::{Activity, InputModality};
-    use ds_style::appearance::{
-        accent::Accent, motion::MotionLevel, resolve::Resolved, theme::Scheme,
-    };
-    use ds_style::appearance::{blur::BlurState, material::Material};
-    use ds_style::scope::Scope;
     use std::cell::RefCell;
     use std::rc::Rc;
 
@@ -274,19 +265,7 @@ mod tests {
 
     #[component]
     fn Script(log: Log) -> Element {
-        let env = use_signal(|| Scope {
-            resolved: Resolved {
-                scheme: Scheme::Light,
-                accent: Accent::Blue,
-                motion: MotionLevel::Standard,
-            },
-            scheme: Scheme::Light,
-            material: Material::Window,
-            blur: BlurState::Unavailable,
-            modality: InputModality::Pointer,
-            activity: Activity::Active,
-        });
-        let hub: ToastHub = use_toast_hub_provider(env);
+        let hub: ToastHub = use_toast_hub_provider();
         use_hook(move || {
             let heard = |log: Log| {
                 EventHandler::new(move |token: UndoToken| log.note(format!("heard {}", token.0)))
