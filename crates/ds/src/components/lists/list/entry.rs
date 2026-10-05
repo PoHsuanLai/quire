@@ -12,11 +12,34 @@ use ds_motion::use_roster::Pitches;
 use ds_style::task::spawn_in;
 use std::rc::Rc;
 
+/// Where an item stands among the `len` items of its set, for a screen reader and for a selector
+/// that addresses the nth item (`[aria-posinset="2"]`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct SetPlace {
+    /// The item's index in the set, from 0.
+    pub(crate) index: usize,
+    /// How many items the set has.
+    pub(crate) len: usize,
+}
+
+impl SetPlace {
+    /// `aria-posinset`: one-based.
+    pub(crate) fn posinset(self) -> String {
+        (self.index + 1).to_string()
+    }
+
+    /// `aria-setsize`.
+    pub(crate) fn setsize(self) -> String {
+        self.len.to_string()
+    }
+}
+
 /// One item in the list.
 #[component]
 pub(crate) fn ListEntry<K: Clone + PartialEq + 'static>(
     entry: RosterEntry<K>,
     pitches: Pitches<K>,
+    place: SetPlace,
     content: Element,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
@@ -49,6 +72,8 @@ pub(crate) fn ListEntry<K: Clone + PartialEq + 'static>(
         div {
             class: "ds-list-item",
             role: "none",
+            "aria-posinset": place.posinset(),
+            "aria-setsize": place.setsize(),
             "data-presence": presence_slug(entry.presence, entry.heal),
             "data-exit": exit_slug(entry.presence),
             style: motion_style(&entry),
@@ -85,10 +110,24 @@ fn motion_style<K>(entry: &RosterEntry<K>) -> Option<String> {
 
 #[cfg(test)]
 mod tests {
-    use super::motion_style;
+    use super::{SetPlace, motion_style};
     use ds_core::geometry::units::Px;
     use ds_motion::presence::{Exit, Presence};
     use ds_motion::roster::{Heal, RosterEntry};
+
+    #[test]
+    fn a_place_reads_one_based() {
+        let place = SetPlace { index: 0, len: 12 };
+        assert_eq!(
+            (place.posinset().as_str(), place.setsize().as_str()),
+            ("1", "12")
+        );
+        let place = SetPlace {
+            index: 4999,
+            len: 10_000,
+        };
+        assert_eq!(place.posinset(), "5000");
+    }
 
     #[test]
     fn only_a_healing_row_writes_its_distance() {
