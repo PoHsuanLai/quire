@@ -2,6 +2,7 @@
 //! that switch Spaces (design/04-COMPONENTS.md section 32, design/21-SPACES.md section 6).
 //! Every colour it shows comes from `space::palette`; it computes none.
 
+pub mod colour;
 pub mod dot;
 pub(crate) mod edit;
 pub(crate) mod field;
