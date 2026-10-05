@@ -1,0 +1,10 @@
+/* VirtualList: a list of rows of one fixed height that mounts only the rows near the viewport.
+   The rows between are two spacers' height, so the scroller's content is as long as the whole
+   list. Rows are `.ds-list-item`s and take their motion from list.css (a removed row plays
+   `row-out`, the rows below heal). The scroller fills the list's own box, which the consumer
+   sizes. */
+
+.ds-virtual-list{ display:flex; flex-direction:column; flex:1 1 0; height:100%; min-height:0; outline:none; }
+.ds-virtual-list > .ds-scroller{ flex:1 1 0; }
+.ds-virtual-list .ds-list-item{ box-sizing:border-box; }
+.ds-virtual-spacer{ flex:none; }

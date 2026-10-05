@@ -176,11 +176,13 @@ Not built, or limited, in quire:
 - **Level control and swipe do not use `use_pointer_capture` yet**: leaving the control's hit zone (the rail
   and 16 px beside it) while dragging lets go; a swipe that leaves the card releases there. Ends when
   they take the hook.
-- **No `VirtualList`, and no rotate glyphs.** `List` renders every row, and a viewer of a large text
-  file windows its own lines (it owns the wheel and the line index, so nothing scrolls natively).
-  The glyph set has no clockwise and counter-clockwise rotate marks: the viewer's capsule borrows
-  `Refresh` and `Undo`. Ends when a windowed list (fixed row height, a first row, a count) and the
-  two glyphs are added here.
+- **`VirtualList` has fixed row heights only, and there are no rotate glyphs.** `RowHeight::Fixed` is
+  the one variant: a measured height needs the host to publish each row's rect and the list to
+  keep a prefix sum. `List` still renders every row, and a viewer of a large text file windows its
+  own lines (it owns the wheel and the line index). While a removed row plays its exit the
+  list's scroll mapping is off by that row's height; no type-to-select. The glyph set has no
+  clockwise and counter-clockwise rotate marks: the viewer's capsule borrows `Refresh` and
+  `Undo`. The rotate glyphs end when they are added here.
 - **The media scrubber and the export `Sheet` layout are not built.** `Slider` (capsule look) and
   `Sheet` are what a viewer composes today.
 - **`TreeItem` has no keyboard toggle of its own**; no harness test presses Enter on a summary.

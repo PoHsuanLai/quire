@@ -54,7 +54,7 @@ pub const REGISTRY: [Entry; 27] = [
         page: Page::Lists,
         title: "Lists",
         lede: "A live List: add rows, remove them with each exit and watch the rows below heal, then undo. Row with every accessory, leading element, height and state; section headers and disclosures; a source list at each sidebar size with an outline and drop places; a List of notification groups that clear, fold and heal by measured heights; search hits with a keyboard-shown strip, tiles, the hover strip and the appearance picker.",
-        height: 3950,
+        height: 4400,
         body: crate::pages::lists::overview::ListsPage,
     },
     Entry {

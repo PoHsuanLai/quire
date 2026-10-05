@@ -132,7 +132,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
 }
 
 /// An item's node key: its key's hash, in hex.
-fn node_key<K: Hash>(key: &K) -> String {
+pub(crate) fn node_key<K: Hash>(key: &K) -> String {
     use std::hash::{BuildHasher, BuildHasherDefault, DefaultHasher};
     format!(
         "{:016x}",
