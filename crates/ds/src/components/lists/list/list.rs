@@ -4,7 +4,7 @@
 //! at the ends, letters jump to the next label that starts with them, and the list draws its
 //! selection accent while it holds the keyboard and grey when it does not.
 
-use crate::components::lists::list::entry::ListEntry;
+use crate::components::lists::list::entry::{ListEntry, SetPlace};
 use crate::components::lists::list::keys::{ListKey, labelled, list_key, moved};
 use crate::components::lists::list::model::{ListItem, ListStyle};
 use crate::root::common::Common;
@@ -65,6 +65,8 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
         },
     );
     let pitches = roster.pitches();
+    let entries = roster.entries();
+    let len = entries.len();
     let mut held = use_signal(|| Held::No);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let data = common.data_attributes();
@@ -119,12 +121,13 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             onblur: move |_| held.set(Held::No),
             onkeydown: onkey,
             ..data,
-            for entry in roster.entries() {
+            for (index, entry) in entries.into_iter().enumerate() {
                 ListEntry::<K> {
                     key: "{node_key(&entry.key)}",
-                    entry: entry.clone(),
-                    pitches,
                     content: book.of(&entry.key),
+                    entry,
+                    pitches,
+                    place: SetPlace { index, len },
                 }
             }
         }

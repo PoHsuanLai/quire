@@ -7,6 +7,7 @@
 
 use crate::components::controls::scroller::handle::{ScrollerRef, use_scroller};
 use crate::components::controls::scroller::view::Scroller;
+use crate::components::lists::list::entry::SetPlace;
 use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::list::list::node_key;
 use crate::components::lists::virtual_list::model::{
@@ -207,6 +208,8 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
                         key: "{item.node}",
                         class: "ds-list-item",
                         role: "none",
+                        "aria-posinset": item.place.map(SetPlace::posinset),
+                        "aria-setsize": item.place.map(SetPlace::setsize),
                         "data-presence": item.presence,
                         "data-exit": item.exit,
                         style: item.style,
@@ -222,6 +225,8 @@ pub fn VirtualList<K: Clone + Eq + Hash + 'static>(
 /// One row to draw: its node, its motion state, its inline style and its content.
 struct Item {
     node: String,
+    /// Where it stands among the listed keys; a leaving row is no longer one of them.
+    place: Option<SetPlace>,
     presence: Option<&'static str>,
     exit: Option<&'static str>,
     style: String,
@@ -256,6 +261,7 @@ fn items<K: Clone + Eq + Hash + 'static>(
         {
             items.push(Item {
                 node: node_key(&exiting.gone.key),
+                place: None,
                 presence: Some("leaving"),
                 exit: Some("row"),
                 style: row_style(pitch, None),
@@ -269,6 +275,10 @@ fn items<K: Clone + Eq + Hash + 'static>(
         let heal = heal_dy(&slots, at, pitch);
         items.push(Item {
             node: node_key(key),
+            place: Some(SetPlace {
+                index: at,
+                len: keys.len(),
+            }),
             presence: heal.map(|_| "healing"),
             exit: None,
             style: row_style(pitch, heal),
