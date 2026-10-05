@@ -32,6 +32,27 @@ pub(crate) struct Leaving<K> {
     pub(crate) slot: usize,
 }
 
+/// Where each key of `keys` is.
+pub(crate) fn positions<K: Eq + Hash>(keys: &[K]) -> HashMap<&K, usize> {
+    keys.iter().enumerate().map(|(at, key)| (key, at)).collect()
+}
+
+/// The slot in `new` (whose keys sit at `index`, `new_len` of them) of a row that stood above
+/// `old[from]`: the index of the first key at or after `from` in `old` that `new` still has, or
+/// `new_len` when none.
+pub(crate) fn slot_in<K: Eq + Hash>(
+    old: &[K],
+    from: usize,
+    index: &HashMap<&K, usize>,
+    new_len: usize,
+) -> usize {
+    old.get(from..)
+        .unwrap_or_default()
+        .iter()
+        .find_map(|later| index.get(later).copied())
+        .unwrap_or(new_len)
+}
+
 /// The mounted rows `old[shown]` that `new` no longer lists, each with its slot in `new`: the
 /// index of the first key after it in `old` that `new` still has, or `new.len()` when none.
 pub(crate) fn leaving<K: Clone + Eq + Hash>(
@@ -39,7 +60,7 @@ pub(crate) fn leaving<K: Clone + Eq + Hash>(
     shown: Range<usize>,
     new: &[K],
 ) -> Vec<Leaving<K>> {
-    let index: HashMap<&K, usize> = new.iter().enumerate().map(|(at, key)| (key, at)).collect();
+    let index = positions(new);
     old.iter()
         .enumerate()
         .take(shown.end)
@@ -47,10 +68,7 @@ pub(crate) fn leaving<K: Clone + Eq + Hash>(
         .filter(|(_, key)| !index.contains_key(key))
         .map(|(at, key)| Leaving {
             key: key.clone(),
-            slot: old[at + 1..]
-                .iter()
-                .find_map(|later| index.get(later).copied())
-                .unwrap_or(new.len()),
+            slot: slot_in(old, at + 1, &index, new.len()),
         })
         .collect()
 }
@@ -78,7 +96,7 @@ pub(crate) fn roved(at: Option<usize>, len: usize, rove: Rove) -> Option<usize> 
 
 #[cfg(test)]
 mod tests {
-    use super::{Leaving, heal_dy, leaving, roved};
+    use super::{Leaving, heal_dy, leaving, positions, roved, slot_in};
     use crate::stack::roving::{Edge, Rove, Step};
     use ds_core::geometry::units::Px;
 
@@ -172,6 +190,36 @@ mod tests {
         ];
         for (name, old, shown, new, want) in cases {
             assert_eq!(leaving(&old, shown, &new), want, "{name}");
+        }
+    }
+
+    #[test]
+    fn a_leaving_row_keeps_standing_above_the_row_it_stood_above_when_the_keys_change() {
+        // (name, keys it left from, its slot there, keys now, wanted slot)
+        let cases: &[(&str, &[u32], usize, &[u32], usize)] = &[
+            ("nothing changed", &[1, 2, 5], 2, &[1, 2, 5], 2),
+            ("a key returns above it", &[1, 2, 5], 2, &[1, 2, 3, 5], 3),
+            ("a key arrives below it", &[1, 2, 5], 2, &[1, 2, 5, 9], 2),
+            (
+                "the row it stood above is gone",
+                &[1, 2, 5, 6],
+                2,
+                &[1, 2, 6],
+                2,
+            ),
+            ("everything below it is gone", &[1, 2, 5], 2, &[1, 2], 2),
+            ("it stood at the end", &[1, 2], 2, &[1, 2, 7], 3),
+            (
+                "a key arrives at the front",
+                &[1, 2, 5],
+                2,
+                &[0, 1, 2, 5],
+                3,
+            ),
+        ];
+        for &(name, old, from, new, want) in cases {
+            let index = positions(new);
+            assert_eq!(slot_in(old, from, &index, new.len()), want, "{name}");
         }
     }
 
