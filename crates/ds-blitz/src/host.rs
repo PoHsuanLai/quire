@@ -46,6 +46,7 @@ use crate::frame_links::{frame_links, read_link};
 use crate::gesture_window::{gesture_of, pointer_at};
 use crate::install::install;
 use crate::node_ref::DocRef;
+use crate::phase::Phase;
 use crate::scheme;
 use crate::setup::Setup;
 use crate::texture_layer::{Gpu, GpuProbe};
@@ -56,6 +57,7 @@ use crate::window_hover::WindowHover;
 use crate::window_requests::Root;
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
+use dioxus::core::Runtime;
 use dioxus::prelude::*;
 use dioxus_native::winit::event::{ElementState, WindowEvent};
 use dioxus_native::winit::keyboard::{Key as WinitKey, NamedKey};
@@ -134,6 +136,8 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let listeners = use_hook(EditListeners::default);
     let clipboard = use_hook(|| Rc::new(System::default()));
     let document = use_hook(|| Rc::new(RefCell::new(None::<NodeHandle>)));
+    // The window loop that built this document holds the same phase and runs it after each frame.
+    let phase = use_hook(|| try_consume_context::<Phase>().unwrap_or_default());
     let host = use_hook(|| {
         let found = Rc::clone(&document);
         let provided = Provided::of(Wiring {
@@ -143,6 +147,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             })),
             clipboard: Rc::clone(&clipboard) as Rc<dyn Clipboard>,
             listeners: listeners.clone(),
+            phase: phase.clone(),
         });
         provide_context(provided.clipboard);
         provide_context(provided.host)
@@ -280,6 +285,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         }));
         nav
     });
+    let runtime = use_hook(Runtime::current);
     let mut installed = use_signal(|| Installed::Pending);
     let setup = props.setup.clone();
     let root = props.root.clone();
@@ -299,6 +305,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             onmounted: move |mounted| {
                 if let Some(handle) = mounted.data().downcast::<NodeHandle>() {
                     install(handle, &setup, &clipboard, (frame_nav.clone(), book.clone()));
+                    phase.attach(DocRef::Handle(handle.clone()), runtime.clone());
                     document.replace(Some(handle.clone()));
                     installed.set(Installed::Done);
                 }

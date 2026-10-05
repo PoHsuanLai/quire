@@ -700,6 +700,13 @@ own caret and selection. The route needs no Blitz fork.
 
 ### Bar gaps: rect reads and stacking
 
+- **The frame phase runs where a driver runs it.** `ds-blitz`'s window loop runs `Phase` after each
+  drawn frame (layout fresh: writes apply once, watched rects publish when they changed) and after
+  each wake-up (layout stale: writes apply and stay queued for the next frame). The harness runs
+  it after each layout. A document a shell-host surface drives is not run by either, so its host
+  answers `Observed::Unsupported` and components read through `GeometryHost::measure` as before.
+  Ends when shell-host calls `Phase::run` after each of its surfaces' layouts and gives
+  `provide_host` that phase.
 - **Rect reads can collide with the renderer** the same way: dioxus-native-dom's
   `get_client_rect` borrows the document mutably on its first poll. Every rect read goes through
   `geometry::measure::client_rect`, which asks the host's `GeometryHost::measure` (ds-blitz's answers

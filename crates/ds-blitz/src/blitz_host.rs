@@ -16,6 +16,7 @@ use crate::focus::{blur, caret, focus, place_caret, select_all, selection};
 use crate::focus_keep::{FocusKeeper, hand_back_seam};
 use crate::measure::measure;
 use crate::node_ref::same;
+use crate::phase::Phase;
 use crate::reveal::reveal;
 use dioxus::prelude::*;
 use ds::host::captured::CapturedPointer;
@@ -29,6 +30,7 @@ use ds::host::parts::{
     CaretHost, ClickFocusHost, EditHost, FileDropHost, FocusHost, GeometryHost, ImeHost,
 };
 use ds::host::pasted::Pasted;
+use ds::host::phase::{Observe, Observed, PhaseWrite, Queued};
 use ds::host::position::{TextPosition, TextRange};
 use ds::host::probe::Probe;
 use ds::host::reveal::Scrolled;
@@ -49,6 +51,9 @@ pub struct Wiring {
     pub clipboard: Rc<dyn Clipboard>,
     /// The edit surfaces the owner's window feeds IME events and captured pointers to.
     pub listeners: EditListeners,
+    /// The frame phase the owner runs after each layout; a phase nothing runs supports nothing,
+    /// and components read through the host's other calls.
+    pub phase: Phase,
 }
 
 impl std::fmt::Debug for Wiring {
@@ -66,6 +71,7 @@ impl Wiring {
             find: None,
             clipboard: Rc::new(System::default()),
             listeners: EditListeners::default(),
+            phase: Phase::default(),
         }
     }
 }
@@ -109,6 +115,7 @@ impl BlitzHost {
             find,
             clipboard,
             listeners,
+            phase,
         } = wiring;
         BlitzHost {
             focus: BlitzFocus {
@@ -116,7 +123,7 @@ impl BlitzHost {
                     .clone()
                     .map_or_else(HandBack::default, hand_back_seam),
             },
-            geometry: BlitzGeometry { find },
+            geometry: BlitzGeometry { find, phase },
             click_focus: keeper.map(|_| BlitzClickFocus),
             edit: BlitzEdit {
                 clipboard,
@@ -215,6 +222,7 @@ impl CaretHost for BlitzCaret {
 
 struct BlitzGeometry {
     find: Option<FindDocument>,
+    phase: Phase,
 }
 
 impl GeometryHost for BlitzGeometry {
@@ -234,6 +242,14 @@ impl GeometryHost for BlitzGeometry {
 
     fn same(&self, a: &MountedData, b: &MountedData) -> SameNode {
         same(a, b)
+    }
+
+    fn observe(&self, el: &MountedData, what: Observe) -> Observed {
+        self.phase.observe(el, what)
+    }
+
+    fn write(&self, el: &MountedData, write: PhaseWrite) -> Queued {
+        self.phase.write(el, write)
     }
 }
 

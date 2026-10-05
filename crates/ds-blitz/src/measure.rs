@@ -11,6 +11,7 @@
 //! Every Blitz host has it: `launch` and the harness wire it, and a shell's surface root gets it
 //! from [`provide_host`](crate::provide_host).
 
+use crate::phase::border_box;
 use dioxus::prelude::*;
 use dioxus_native_dom::NodeHandle;
 use ds::prelude::*;
@@ -23,17 +24,8 @@ pub(crate) fn measure(element: &MountedData) -> Measured {
     let Some(doc) = handle.try_doc() else {
         return Measured::Busy;
     };
-    match doc.get_client_bounding_rect(handle.node_id()) {
-        Some(found) => Measured::At(Rect {
-            origin: Point {
-                x: Px(found.x as f32),
-                y: Px(found.y as f32),
-            },
-            size: Size {
-                width: Px(found.width as f32),
-                height: Px(found.height as f32),
-            },
-        }),
+    match border_box(&doc, handle.node_id()) {
+        Some(rect) => Measured::At(rect),
         None => Measured::Unknown,
     }
 }
