@@ -143,7 +143,10 @@ fn a_step_slides_the_new_month_in_once() {
 
 #[test]
 fn a_pressed_day_hands_over_its_key() {
-    let mut harness = Harness::new(MonthApp, VIEW);
+    let mut harness = Harness::new(
+        MonthApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     assert_eq!(log(&harness), "");
     press(&mut harness, ".ds-month-day[*|aria-current=date]");

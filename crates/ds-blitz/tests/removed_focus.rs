@@ -13,7 +13,7 @@ use ds::prelude::*;
 use ds::root::common::Common;
 use ds_blitz::FocusFallback;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -121,7 +121,12 @@ fn FieldPage() -> Element {
 }
 
 fn harness(app: fn() -> Element, fallback: FocusFallback) -> Harness {
-    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_focus_fallback(fallback));
+    let mut harness = Harness::new(
+        app,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_focus_fallback(fallback),
+    );
     harness.advance(ms(50));
     harness
 }

@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -46,7 +46,7 @@ fn Editor() -> Element {
 
 #[test]
 fn typing_in_the_title_renames_the_space() {
-    let mut harness = Harness::new(Editor, VIEW);
+    let mut harness = Harness::new(Editor, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".name").as_deref(), Some("Work"));
     let field = ".ds-space-editor-title .ds-input";
     harness.send(Input::click(harness.centre(field).expect("the name field")));
@@ -60,7 +60,7 @@ fn typing_in_the_title_renames_the_space() {
 
 #[test]
 fn the_motion_row_reports_a_pick() {
-    let mut harness = Harness::new(Editor, VIEW);
+    let mut harness = Harness::new(Editor, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".motion").as_deref(), Some("standard"));
     let reduced = "[*|aria-label=Motion] .ds-segmented-segment:nth-child(2)";
     assert_eq!(harness.text_of(reduced).as_deref(), Some("Reduced"));
@@ -75,7 +75,7 @@ fn the_motion_row_reports_a_pick() {
 
 #[test]
 fn a_system_space_is_measured_under_both_headings() {
-    let harness = Harness::new(Editor, VIEW);
+    let harness = Harness::new(Editor, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.count(".ds-checks-heading"), 2);
     assert_eq!(
         harness
@@ -115,7 +115,10 @@ fn Accented() -> Element {
 /// press on the first borrows the Space's hue.
 #[test]
 fn the_accent_segments_read_space_colour_and_your_accent() {
-    let mut harness = Harness::new(Accented, VIEW);
+    let mut harness = Harness::new(
+        Accented,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let segments = "[*|aria-label=Accent] .ds-segmented-segment";
     assert_eq!(
         harness

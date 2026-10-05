@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::control_center::module_tile_kind::TileSpan;
 use ds_shell::prelude::*;
 use std::time::Duration;
@@ -61,7 +61,7 @@ const TICK: Duration = Duration::from_millis(50);
 
 #[test]
 fn the_chevron_opens_the_detail_and_does_not_toggle() {
-    let mut harness = Harness::new(TileApp, VIEW);
+    let mut harness = Harness::new(TileApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(TICK);
     harness.send(Input::click(centre(&harness, ".ds-module-chevron")));
     harness.advance(TICK);
@@ -80,7 +80,7 @@ fn the_chevron_opens_the_detail_and_does_not_toggle() {
 
 #[test]
 fn the_keys_toggle_on_the_tile_and_open_on_the_chevron() {
-    let mut harness = Harness::new(TileApp, VIEW);
+    let mut harness = Harness::new(TileApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(TICK);
     harness.send(Input::key(ShortcutKey::Tab));
     assert_eq!(

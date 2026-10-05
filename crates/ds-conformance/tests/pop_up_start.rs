@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use probe::{keep, rect};
 use std::time::Duration;
 
@@ -58,7 +58,7 @@ fn Placed() -> Element {
 }
 
 fn started(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(400));
     harness
 }

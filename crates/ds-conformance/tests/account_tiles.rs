@@ -88,7 +88,7 @@ fn Tiles() -> Element {
 /// other two their letter.
 #[test]
 fn each_tile_draws_the_mark_its_item_names() {
-    let mut harness = Harness::new(Tiles, VIEW);
+    let mut harness = Harness::new(Tiles, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness.count(".ds-pin-tile .ds-provider[*|data-kind=image]"),
@@ -112,7 +112,7 @@ fn each_tile_draws_the_mark_its_item_names() {
 
 #[test]
 fn the_add_tile_presses_and_is_never_pressed() {
-    let mut harness = Harness::new(Tiles, VIEW);
+    let mut harness = Harness::new(Tiles, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let add = "[*|data-face=add]";
     assert_eq!(harness.attr(add, "aria-pressed"), None);
     assert_eq!(
@@ -130,7 +130,7 @@ fn the_add_tile_presses_and_is_never_pressed() {
 /// never moves is a pick.
 #[test]
 fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
-    let mut harness = Harness::new(Tiles, VIEW);
+    let mut harness = Harness::new(Tiles, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let tiles = ".ds-pin-tile[*|data-face=account]";
     let first = harness.centre(tiles).expect("the first tile");
@@ -177,7 +177,7 @@ fn a_dragged_tile_takes_the_place_it_is_dropped_on() {
 /// window's ground: the add tile's rule outranks the Pin's ground, which comes later.
 #[test]
 fn the_add_tile_has_no_plate_at_rest() {
-    let mut harness = Harness::new(Tiles, VIEW);
+    let mut harness = Harness::new(Tiles, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.render().expect("a frame");
     probe::keep(&frame, "account_tiles");
     // `dy` down from the tile's top edge, at its middle: 3 is inside, -6 the padding above.

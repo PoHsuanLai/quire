@@ -73,12 +73,7 @@ fn show(harness: &mut Harness, keys: &[u32]) {
 
 /// A stack showing `keys`, every banner at rest (it mounts empty, and they arrive).
 fn start(keys: &[u32]) -> Harness {
-    start_on(keys, Clock::Wall)
-}
-
-/// `start`, on `clock`.
-fn start_on(keys: &[u32], clock: Clock) -> Harness {
-    let mut harness = Harness::new(Stack, HarnessConfig::new(VIEW).with_clock(clock));
+    let mut harness = Harness::new(Stack, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     show(&mut harness, keys);
     for &n in keys {
         settle_until(&mut harness, |h| {
@@ -101,7 +96,7 @@ fn a_banner_listed_slides_in_and_comes_to_rest() {
 
 #[test]
 fn one_removed_from_the_middle_leaves_and_those_after_it_heal() {
-    let mut harness = start_on(&[3, 2, 1], Clock::Virtual);
+    let mut harness = start(&[3, 2, 1]);
     let pitch = harness.rect(&row(2)).expect("row 2").size.height.0;
     let out = settle(Anim::PanelOut, MotionLevel::Standard);
     let removed = harness.now();

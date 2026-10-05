@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -74,7 +74,7 @@ fn Opaque() -> Element {
 
 #[test]
 fn a_trailing_action_fires_without_picking_or_selecting_its_row() {
-    let mut harness = Harness::new(Opaque, VIEW);
+    let mut harness = Harness::new(Opaque, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(600));
     assert_eq!(harness.text_of(".log").as_deref(), Some("select:0"));
     // The second row's remove: the pointer crosses the row to reach it.

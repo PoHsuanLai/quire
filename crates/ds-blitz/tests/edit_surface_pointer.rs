@@ -16,7 +16,8 @@ use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
 use ds_harness::{
-    ClassPresence, Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
+    ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, PointerAction,
+    PointerInput, Query, Viewport,
 };
 use std::cell::RefCell;
 use std::time::Duration;
@@ -81,7 +82,7 @@ fn fresh() -> Harness {
     drain(&INPUT);
     drain(&POINTER);
     drain(&FOCUS);
-    let mut harness = Harness::new(Editor, VIEW);
+    let mut harness = Harness::new(Editor, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness
 }
@@ -259,10 +260,11 @@ fn the_caret_is_one_device_pixel_wide_at_a_fractional_scale() {
         drain(&INPUT);
         let mut harness = Harness::new(
             Editor,
-            Viewport {
+            HarnessConfig::new(Viewport {
                 scale_percent,
                 ..VIEW
-            },
+            })
+            .with_clock(Clock::Virtual),
         );
         harness.advance(ms(50));
         let position = TextPosition::new("p0", 2);

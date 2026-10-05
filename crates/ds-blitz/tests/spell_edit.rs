@@ -6,6 +6,8 @@
 
 #[path = "support/spell_dict.rs"]
 mod spell_dict;
+#[path = "support/worker.rs"]
+mod worker;
 
 use dioxus::prelude::*;
 use ds::base::press::PointerButton;
@@ -16,11 +18,15 @@ use ds::root::common::Common;
 use ds::spell::lang::{Lang, Spell};
 use ds::spell::marks::SpellReplace;
 use ds_blitz::spell::{SpellConfig, provide_with};
-use ds_harness::harness::settle_until;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Duration;
+use worker::{give_worker_time, settle_on_worker, wait_for_reply};
+
+/// The real time the worker is given to answer when a test asserts it must not (a negative cannot
+/// be waited for on an event; this can only let a wrong answer through, never fail a right one).
+const NO_ANSWER_GRACE: Duration = Duration::from_millis(100);
 
 const VIEW: Viewport = Viewport {
     width: 420,
@@ -117,12 +123,18 @@ fn Editor() -> Element {
 fn fresh(name: &str) -> Harness {
     let dir = spell_dict::dictionary(name);
     DICT.with(|dict| *dict.borrow_mut() = Some(dir));
-    let mut harness = Harness::new(Editor, VIEW);
+    let mut harness = Harness::new(Editor, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     let editor = harness.centre("#editor").expect("the editor");
     harness.send(Input::click(editor));
     harness.advance(Duration::from_millis(50));
     harness
+}
+
+/// Let `window` of virtual time pass, then give the worker real time to answer a check it must not.
+fn quiet_for(harness: &mut Harness, window: Duration) {
+    harness.advance(window);
+    give_worker_time(harness, NO_ANSWER_GRACE);
 }
 
 fn type_text(harness: &mut Harness, text: &str) {
@@ -159,19 +171,22 @@ fn on_mark(harness: &Harness) -> Point {
 
 #[test]
 fn a_misspelling_is_marked_after_the_debounce_under_its_word() {
-    // Kept on Wall: the mark lands only once the process's spell worker (a real thread, a
-    // `tokio::sync::oneshot` reply) answers, which needs real wall time to run; `Clock::Virtual`
-    // never sleeps real time on `advance`, so the poll below could exhaust `SETTLE_BOUND`
-    // without the worker ever getting to reply.
+    // The debounce is the harness's virtual clock; the check itself runs on the process's spell
+    // worker (a real thread, a `tokio::sync::oneshot` reply), so the wait for the mark is on the
+    // reply, never on an instant.
     let mut harness = fresh("marked");
     type_text(&mut harness, "the teh ");
-    let typed = Instant::now();
+    let typed = harness.now();
     type_text(&mut harness, "cat");
-    let landed = settle_until(&mut harness, |h| marks(h) == 1);
-    assert!(
-        landed.duration_since(typed) >= DEBOUNCE,
-        "marked after {:?}, before the debounce",
-        landed.duration_since(typed)
+    harness.advance(DEBOUNCE - Duration::from_millis(1));
+    quiet_for(&mut harness, Duration::ZERO);
+    assert_eq!(marks(&harness), 0, "nothing is checked before the debounce");
+    harness.advance(Duration::from_millis(1));
+    wait_for_reply(&mut harness, |h| marks(h) == 1);
+    assert_eq!(
+        harness.now().duration_since(typed),
+        DEBOUNCE,
+        "the mark lands the moment the debounce ends"
     );
     assert_eq!(paragraph(&harness), "the teh cat");
     let mark = harness.rect(".ds-spell-mark").expect("the mark");
@@ -203,17 +218,17 @@ fn a_misspelling_is_marked_after_the_debounce_under_its_word() {
 fn the_word_being_typed_is_not_marked_until_the_caret_leaves_it() {
     let mut harness = fresh("typing");
     type_text(&mut harness, "teh");
-    harness.advance(DEBOUNCE * 2);
+    quiet_for(&mut harness, DEBOUNCE * 2);
     assert_eq!(marks(&harness), 0, "the caret is still on the word");
     type_text(&mut harness, " ");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
 }
 
 #[test]
 fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
     let mut harness = fresh("replace");
     type_text(&mut harness, "teh cat");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
     let at = on_mark(&harness);
     harness.send(Input::press(at, PointerButton::Secondary));
     menu_open(&mut harness);
@@ -224,29 +239,29 @@ fn a_picked_suggestion_replaces_the_word_and_undo_restores_it() {
     );
     let first = harness.centre(".ds-menu-item").expect("a suggestion");
     harness.send(Input::click(first));
-    settle_until(&mut harness, |h| paragraph(h) == "the cat");
-    settle_until(&mut harness, |h| {
+    settle_on_worker(&mut harness, |h| paragraph(h) == "the cat");
+    settle_on_worker(&mut harness, |h| {
         marks(h) == 0 && h.focus_of("#editor") == FocusState::Focused
     });
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('z')));
-    settle_until(&mut harness, |h| paragraph(h) == "teh cat");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| paragraph(h) == "teh cat");
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
 }
 
 #[test]
 fn ignore_spelling_unmarks_the_word() {
     let mut harness = fresh("ignore");
     type_text(&mut harness, "teh cat");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
     harness.send(Input::press(on_mark(&harness), PointerButton::Secondary));
     menu_open(&mut harness);
     let ignore = menu_row(&harness, "Ignore Spelling");
     harness.send(Input::click(ignore));
-    settle_until(&mut harness, |h| {
+    settle_on_worker(&mut harness, |h| {
         marks(h) == 0 && h.count(".ds-menu-item") == 0
     });
     type_text(&mut harness, " teh ");
-    harness.advance(DEBOUNCE * 2);
+    quiet_for(&mut harness, DEBOUNCE * 2);
     assert_eq!(marks(&harness), 0, "ignored for the session");
     assert!(!dict_dir().join("user").join("en_US.dic").exists());
 }
@@ -255,7 +270,7 @@ fn ignore_spelling_unmarks_the_word() {
 fn the_context_menu_key_on_a_marked_word_learns_it() {
     let mut harness = fresh("learn");
     type_text(&mut harness, "teh cat");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
     for _ in 0..5 {
         harness.send(Input::key(ShortcutKey::Left));
     }
@@ -263,11 +278,11 @@ fn the_context_menu_key_on_a_marked_word_learns_it() {
     menu_open(&mut harness);
     let learn = menu_row(&harness, "Learn Spelling");
     harness.send(Input::click(learn));
-    settle_until(&mut harness, |h| {
+    settle_on_worker(&mut harness, |h| {
         marks(h) == 0 && h.count(".ds-menu-item") == 0
     });
     let file = dict_dir().join("user").join("en_US.dic");
-    settle_until(&mut harness, |_| file.exists());
+    settle_on_worker(&mut harness, |_| file.exists());
     assert_eq!(
         std::fs::read_to_string(&file).ok().as_deref(),
         Some("teh\n")
@@ -278,7 +293,7 @@ fn the_context_menu_key_on_a_marked_word_learns_it() {
 fn a_right_click_off_a_marked_word_opens_nothing() {
     let mut harness = fresh("unmarked");
     type_text(&mut harness, "teh cat");
-    settle_until(&mut harness, |h| marks(h) == 1);
+    settle_on_worker(&mut harness, |h| marks(h) == 1);
     let line = harness.rect("#p0").expect("the paragraph");
     let on_cat = Point {
         x: Px(line.origin.x.0 + 44.0),
@@ -292,9 +307,9 @@ fn a_right_click_off_a_marked_word_opens_nothing() {
 /// Wait for the menu to open and finish its entrance (a row under a scaling menu is not where
 /// its rect says until the entrance ends).
 fn menu_open(harness: &mut Harness) {
-    settle_until(harness, |h| h.count(".ds-menu-item") > 0);
+    ds_harness::harness::settle_until(harness, |h| h.count(".ds-menu-item") > 0);
 
-    settle_until(harness, |h| {
+    ds_harness::harness::settle_until(harness, |h| {
         h.centre(".ds-menu-item:last-child")
             .is_some_and(|at| h.hits(at, ".ds-menu-item:last-child"))
     });

@@ -12,7 +12,8 @@ use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
 use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
 use ds_harness::{
-    Driver, FocusState, Harness, Input, PointerAction, PointerInput, Query, Viewport,
+    Clock, Driver, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput, Query,
+    Viewport,
 };
 use std::rc::Rc;
 use std::time::Duration;
@@ -106,7 +107,11 @@ fn at(x: f32, y: f32) -> Point {
 }
 
 fn start(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    start_on(app, Clock::Virtual)
+}
+
+fn start_on(app: fn() -> Element, clock: Clock) -> Harness {
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(clock));
     harness.advance(ms(50));
     harness
 }
@@ -153,7 +158,10 @@ fn a_titlebar_drag_moves_once_past_the_threshold() {
 
 #[test]
 fn a_plain_click_on_the_titlebar_does_not_move() {
-    let mut harness = start(Normal);
+    // On the wall clock, on purpose: Blitz decides a double click from its own wall-clock
+    // `last_mousedown_time` (500 ms), which a virtual `advance` never lets pass. Only real time
+    // passing can end the first click's window, and a loaded machine only stretches it.
+    let mut harness = start_on(Normal, Clock::Wall);
     harness.send(Input::click(BAR));
     harness.advance(ms(600));
     drag(&mut harness, BAR, &[at(403.0, 17.0), at(404.0, 13.0)]);

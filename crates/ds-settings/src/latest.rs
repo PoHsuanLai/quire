@@ -155,14 +155,15 @@ impl<T: Clone> Future for Changed<'_, T> {
 #[cfg(test)]
 mod tests {
     use super::{ReceiverGone, channel};
-    use std::time::Duration;
 
     #[tokio::test]
     async fn a_receiver_wakes_on_the_next_send_and_reads_the_newest() {
         let (tx, mut rx) = channel(0_u32);
         assert!(!rx.has_changed(), "the initial value is already seen");
         let waiting = tokio::spawn(async move { rx.changed().await });
-        tokio::time::sleep(Duration::from_millis(20)).await;
+        // One yield runs the spawned waiter up to its first await, so it is parked when the sends
+        // come (a current-thread runtime): no wall-clock wait.
+        tokio::task::yield_now().await;
         assert_eq!(tx.send(1), Ok(()));
         assert_eq!(tx.send(2), Ok(()));
         let got = waiting.await.unwrap_or_else(|e| panic!("{e}"));

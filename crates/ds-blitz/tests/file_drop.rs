@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer};
 use ds::file_drop::hook::use_file_drop;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::path::PathBuf;
 
 const VIEW: Viewport = Viewport {
@@ -85,7 +85,7 @@ fn files() -> Vec<PathBuf> {
 }
 
 fn harness() -> Harness {
-    Harness::new(Window, VIEW)
+    Harness::new(Window, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
 }
 
 fn at(harness: &Harness, selector: &str) -> Point {

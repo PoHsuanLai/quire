@@ -93,7 +93,10 @@ fn selected(harness: &Harness) -> String {
 /// out to the next group; Up comes back in; Enter on a cell picks it and closes.
 #[test]
 fn the_cursor_moves_through_the_grid_in_two_dimensions_and_leaves_it() {
-    let mut harness = Harness::new(GridPalette, VIEW);
+    let mut harness = Harness::new(
+        GridPalette,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     assert_eq!(
         harness.focus_of("#card .ds-input"),
@@ -181,7 +184,10 @@ fn MorePalette() -> Element {
 /// runs it and the palette stays open, the group now longer; Down goes on to the next group.
 #[test]
 fn show_more_is_a_stop_after_the_groups_last_row_and_enter_runs_it() {
-    let mut harness = Harness::new(MorePalette, VIEW);
+    let mut harness = Harness::new(
+        MorePalette,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     assert_eq!(
         harness.count(".ds-section-header-action[*|data-selected=true]"),
@@ -300,7 +306,10 @@ fn query(harness: &Harness) -> String {
 /// taken.
 #[test]
 fn a_claim_takes_space_only_while_browsing_and_right_only_at_the_end() {
-    let mut harness = Harness::new(ClaimPalette, VIEW);
+    let mut harness = Harness::new(
+        ClaimPalette,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     for key in [
         ShortcutKey::Char('a'),
@@ -407,7 +416,10 @@ fn toggle(harness: &mut Harness) {
 /// and the pane sits right of them under the field; without it the card is as it was.
 #[test]
 fn a_pane_beside_the_results_widens_the_card_by_its_width() {
-    let mut harness = Harness::new(OverlayAside, VIEW);
+    let mut harness = Harness::new(
+        OverlayAside,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     let card = width(&harness, "#card");
     let list = width(&harness, "#card > .ds-palette-list");
@@ -441,7 +453,10 @@ fn a_pane_beside_the_results_widens_the_card_by_its_width() {
 /// width.
 #[test]
 fn in_a_surface_the_results_narrow_by_the_pane() {
-    let mut harness = Harness::new(SurfaceAside, VIEW);
+    let mut harness = Harness::new(
+        SurfaceAside,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(200));
     let card = width(&harness, "#card");
     toggle(&mut harness);
@@ -478,7 +493,10 @@ fn LoneGrid() -> Element {
 /// dimensions and stop at its edges (nowhere to leave to), and Enter picks.
 #[test]
 fn a_grid_on_its_own_moves_with_the_arrows_and_stops_at_its_edges() {
-    let mut harness = Harness::new(LoneGrid, VIEW);
+    let mut harness = Harness::new(
+        LoneGrid,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(100));
     let first = harness.centre(".ds-emoji-cell").expect("a cell");
     harness.send(Input::click(first));

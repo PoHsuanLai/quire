@@ -10,7 +10,7 @@ use ds::components::app::link_pill::{LinkPill, LinkTarget};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -41,7 +41,7 @@ fn side(harness: &Harness) -> Option<String> {
 
 #[test]
 fn the_edge_peeks_the_sidebar_after_a_rest_and_hides_it_on_leaving() {
-    let mut harness = Harness::new(Edge, VIEW);
+    let mut harness = Harness::new(Edge, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(side(&harness).as_deref(), Some("hidden"));
     let edge = Point {
@@ -74,7 +74,7 @@ fn the_edge_peeks_the_sidebar_after_a_rest_and_hides_it_on_leaving() {
 
 #[test]
 fn a_click_on_the_strip_pins_the_sidebar() {
-    let mut harness = Harness::new(Edge, VIEW);
+    let mut harness = Harness::new(Edge, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness.send(Input::click(Point {
         x: Px(4.0),
@@ -124,7 +124,7 @@ fn Today() -> Element {
 /// pointer come and go for that tab alone.
 #[test]
 fn a_today_tab_carries_its_own_id_and_pointer_hooks() {
-    let mut harness = Harness::new(Today, VIEW);
+    let mut harness = Harness::new(Today, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(400));
     assert_eq!(harness.count("#tab-1.ds-row"), 1, "{}", harness.html());
     assert_eq!(harness.count("#tab-2.ds-row"), 1);
@@ -144,7 +144,7 @@ fn a_today_tab_carries_its_own_id_and_pointer_hooks() {
 
 #[test]
 fn a_today_tab_leaves_when_its_time_is_up() {
-    let mut harness = Harness::new(Today, VIEW);
+    let mut harness = Harness::new(Today, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(400));
     assert_eq!(harness.count(".ds-row"), 2);
     assert_eq!(
@@ -182,7 +182,7 @@ fn Link() -> Element {
 
 #[test]
 fn the_link_pill_expands_under_the_pointer_and_copies_on_a_click() {
-    let mut harness = Harness::new(Link, VIEW);
+    let mut harness = Harness::new(Link, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(300));
     assert_eq!(
         harness.count(".ds-link-pill-dim"),

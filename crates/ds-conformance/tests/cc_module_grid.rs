@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use ds_shell::control_center::module_grid::GridColumns;
 use ds_shell::control_center::module_tile_kind::TileSpan;
 use ds_shell::prelude::*;
@@ -42,7 +42,7 @@ fn rect(harness: &Harness, selector: &str) -> Rect {
 
 #[test]
 fn three_columns_share_the_width_and_full_spans_them_all() {
-    let mut harness = Harness::new(Three, VIEW);
+    let mut harness = Harness::new(Three, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(TICK);
     // 320 less the padding 10 each side is 300; less two gaps of 6 is 288, 96 a column.
     let first = rect(&harness, ".ds-module-tile:nth-child(1)");

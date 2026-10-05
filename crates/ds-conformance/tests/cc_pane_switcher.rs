@@ -15,12 +15,9 @@ use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
-// `Harness::advance` on `Clock::Wall` lets real time pass: quire's settle timers are
-// `futures-timer` sleeps, which such a harness cannot fake. Under a loaded parallel
-// `cargo test --workspace` an `advance(ms(170))` can stretch past a settle it meant to stop short
-// of, so a test racing an instant against a bound runs on `Clock::Virtual` instead,
-// whose `advance` fires every ds timer at its exact due instant; a test that only polls with
-// `ds_harness::harness::settle_until` up to a bound and asserts order stays on the default `Wall`.
+// Every harness here runs on `Clock::Virtual`: `advance` fires each ds timer at its exact due
+// instant, and `settle_until` returns the instant a timer ended the state, so the tests assert
+// instants and counts exactly, however loaded the machine is.
 
 const VIEW: Viewport = Viewport {
     width: 480,
@@ -99,7 +96,10 @@ fn height(harness: &Harness, selector: &str) -> f32 {
 
 #[test]
 fn a_switch_plays_both_panes_and_settles_on_the_new_one() {
-    let mut harness = Harness::new(PanesApp, VIEW);
+    let mut harness = Harness::new(
+        PanesApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     assert_eq!(harness.count(".ds-pane"), 1);
     assert_eq!(presence(&harness, "root").as_deref(), Some("present"));

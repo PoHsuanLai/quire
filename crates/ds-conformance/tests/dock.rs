@@ -63,7 +63,7 @@ fn luma(pixel: Rgba<u8>) -> u32 {
 /// the material's own 22 px leaves it to the ground.
 #[test]
 fn a_surfaces_radius_overrides_its_materials_corner() {
-    let mut harness = Harness::new(Pills, VIEW);
+    let mut harness = Harness::new(Pills, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(40));
     let frame = harness.render().expect("a frame");
     let own = luma(corner(&frame, &harness, ".own > .ds"));
@@ -92,7 +92,10 @@ fn DockIcons() -> Element {
 /// A dock icon is drawn at the dock's size, not scaled up from 22.
 #[test]
 fn icons_take_the_docks_sizes() {
-    let mut harness = Harness::new(DockIcons, VIEW);
+    let mut harness = Harness::new(
+        DockIcons,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(40));
     for (selector, side) in [
         (".large .ds-ic", 96.0),

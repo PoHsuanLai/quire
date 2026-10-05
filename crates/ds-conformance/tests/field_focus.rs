@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -58,7 +58,7 @@ fn Fields() -> Element {
 /// on `b` blurs `a` and focuses `b`.
 #[test]
 fn a_click_and_the_seam_both_report_focus_and_a_click_reports_blur() {
-    let mut harness = Harness::new(Fields, VIEW);
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(log(&harness), "focus:c", "the seam focused c on mount");
     assert_eq!(harness.focus_of("#c input"), FocusState::Focused);
@@ -79,7 +79,7 @@ fn a_click_and_the_seam_both_report_focus_and_a_click_reports_blur() {
 /// caret back to `c`, and `c` reports it through `onfocus` although the host moved it silently.
 #[test]
 fn a_controlled_request_still_focuses_and_reports_it() {
-    let mut harness = Harness::new(Fields, VIEW);
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let b = harness.centre("#b input").expect("the field");
     harness.send(Input::click(b));
@@ -108,7 +108,7 @@ fn a_controlled_request_still_focuses_and_reports_it() {
 /// the markup, and the mask holds one dot per character.
 #[test]
 fn a_secure_field_draws_dots_not_what_is_typed() {
-    let mut harness = Harness::new(Fields, VIEW);
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(
         harness.attr("#c input", "type").as_deref(),

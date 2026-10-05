@@ -9,7 +9,7 @@ use ds::base::vocab::RowState;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -117,7 +117,7 @@ fn rect(harness: &Harness, selector: &str) -> Rect {
 }
 
 fn settled(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     harness
 }

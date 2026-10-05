@@ -15,7 +15,7 @@ use ds::components::content::avatar::{
     AvatarFace, AvatarShape, AvatarSize, AvatarTone, person_hue,
 };
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::lock::vocab::LockUser;
 use ds_shell::prelude::*;
 use image::RgbaImage;
@@ -189,7 +189,7 @@ struct Dot {
 
 /// A polkit prompt with `typed` in its field and the keys `after` pressed, settled.
 fn typed_into(typed: &str, after: &[ShortcutKey]) -> Harness {
-    let mut harness = Harness::new(Polkit, VIEW);
+    let mut harness = Harness::new(Polkit, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     for c in typed.chars() {
         harness.send(Input::key(ShortcutKey::Char(c)));
@@ -305,7 +305,7 @@ fn after_left_three_times_the_caret_stands_clear_between_the_eighth_and_ninth_do
 
 #[test]
 fn a_typed_secret_draws_its_dots_from_the_leading_edge_in_a_centred_card() {
-    let mut harness = Harness::new(Polkit, VIEW);
+    let mut harness = Harness::new(Polkit, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     for c in TYPED.chars() {
         harness.send(Input::key(ShortcutKey::Char(c)));

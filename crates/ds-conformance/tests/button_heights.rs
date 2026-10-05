@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::components::controls::button_model::{Answers, ButtonRole};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -49,7 +49,7 @@ fn Page() -> Element {
 }
 
 fn page() -> Harness {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness
 }

@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::style::tokens::accent_table::accent_of;
 use ds::style::tokens::hex::Hex;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use probe::{distance, keep, modal, pixels, rect};
 
 const VIEW: Viewport = Viewport {
@@ -41,7 +41,7 @@ fn Stage() -> Element {
 
 #[test]
 fn the_selected_row_is_accent_while_active_and_grey_while_inactive() {
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.render().expect("renders");
     keep(&frame, "source-list-selection");
     let fill = |id: &str| modal(&pixels(&frame, rect(&harness, id), 2.0));

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -50,7 +50,7 @@ fn Secret() -> Element {
 
 #[test]
 fn a_secret_is_typed_and_heard_but_never_written_into_the_markup() {
-    let mut harness = Harness::new(Secret, VIEW);
+    let mut harness = Harness::new(Secret, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let field = "#secret input";
     harness.send(Input::click(harness.centre(field).expect("the field")));
     harness.advance(ms(30));
@@ -100,7 +100,7 @@ fn Titled() -> Element {
 
 #[test]
 fn a_plain_field_is_one_line_of_its_parents_text() {
-    let harness = Harness::new(Titled, VIEW);
+    let harness = Harness::new(Titled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let plain = harness.rect("#title input").expect("the plain field");
     // The title's own line, 24 x 1.25: no padding, no border, no size of its own.
     assert!((plain.size.height.0 - 30.0).abs() < 0.5, "{plain:?}");

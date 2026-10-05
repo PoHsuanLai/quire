@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::components::fields::field_row::{FieldRow, RowLayout};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -42,7 +42,7 @@ fn Narrow() -> Element {
 }
 
 fn tops(app: fn() -> Element) -> Vec<f32> {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     (1..=3)
         .map(|n| {

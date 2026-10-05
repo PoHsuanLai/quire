@@ -55,7 +55,7 @@ fn slash_offset(harness: &Harness) -> Option<f32> {
 
 #[test]
 fn at_rest_a_joined_glyph_is_whole_and_a_repeat_plays_nothing() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(lit(&harness), 4);
     assert_eq!(show(&harness, "badge").as_deref(), Some("hidden"));
     assert_eq!(harness.count("#wifi [*|data-part=slash]"), 0);
@@ -102,7 +102,7 @@ fn joining_searches_at_once_and_a_join_lands_on_the_real_bars() {
 
 #[test]
 fn bars_cross_fade_and_no_internet_grows_the_badge() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(
         &mut harness,
         WifiState::Joined {
@@ -126,7 +126,7 @@ fn bars_cross_fade_and_no_internet_grows_the_badge() {
 
 #[test]
 fn a_failed_join_leaves_the_fan_faint_and_shakes_nothing() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, WifiState::Failed(EventStamp(1)));
     harness.advance(Duration::from_millis(60));
     assert_eq!(

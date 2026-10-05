@@ -436,7 +436,10 @@ fn Switcher() -> Element {
 }
 
 fn switcher(count: usize, output: f32, selected: &str) -> Harness {
-    let mut harness = Harness::new(Switcher, VIEW);
+    let mut harness = Harness::new(
+        Switcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.within(|| {
         *COUNT.write() = count;
         *OUTPUT.write() = output;

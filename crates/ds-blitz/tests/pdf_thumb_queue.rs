@@ -4,17 +4,20 @@
 //! 20, and ends showing the last page asked for. Its own test binary, so the process-wide
 //! raster count is this test's alone.
 
+#[path = "support/worker.rs"]
+mod worker;
+
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::{PdfFileThumb, pdf_thumb_rasters};
-use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, SaveOptions, blank_document, save};
 use peniko::Color;
 use peniko::kurbo::{Rect, Size as Sheet};
 use std::path::PathBuf;
 use std::time::Duration;
+use worker::{give_worker_time, settle_on_worker};
 
 const FILES: usize = 20;
 
@@ -79,18 +82,19 @@ fn app() -> Element {
 #[test]
 fn twenty_quick_requests_run_a_few_rasters_and_show_the_last() {
     let files = files();
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let before = pdf_thumb_rasters();
     for path in &files {
         harness.within(|| *PATH.write() = path.clone());
         harness.advance(Duration::ZERO);
     }
     let last = files.last().cloned().unwrap_or_default();
-    settle_until(&mut harness, |h| {
+    settle_on_worker(&mut harness, |h| {
         h.attr(".ds-pdf-thumb", "data-state").as_deref() == Some("ready")
     });
-    // Let any raster still running for a superseded request finish, so it is counted.
-    harness.advance(Duration::from_millis(500));
+    // Let any raster still running for a superseded request finish, so it is counted: real time
+    // for the worker, which can only lower the count, never fail a right one.
+    give_worker_time(&mut harness, Duration::from_millis(500));
     let ran = pdf_thumb_rasters() - before;
     eprintln!("{ran} rasters for {FILES} requests");
     assert!(ran <= MOST_RASTERS, "{ran} rasters for {FILES} requests");

@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::host::layout::use_layout;
 use ds::host::measure::MountedRef;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,
@@ -65,7 +65,7 @@ fn laid_out(harness: &Harness) -> Option<String> {
 
 #[test]
 fn the_rect_is_published_after_layout_and_follows_the_element() {
-    let mut harness = Harness::new(App, VIEW);
+    let mut harness = Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let start = laid_out(&harness);
     assert!(
         start

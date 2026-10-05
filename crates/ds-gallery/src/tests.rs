@@ -7,7 +7,7 @@ use crate::page::Page;
 use crate::style;
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Viewport, snapshot_at};
+use ds_harness::{Clock, HarnessConfig, Viewport, snapshot_with};
 use ds_lint::{Exception, LintConfig, Profile, markup};
 use std::time::Duration;
 
@@ -109,7 +109,8 @@ fn a_page_snapshots_to_real_pixels() {
         height: 300,
         scale_percent: 100,
     };
-    let frames = snapshot_at(App, view, &[Duration::from_secs(10)]).expect("renders");
+    let config = HarnessConfig::new(view).with_clock(Clock::Virtual);
+    let frames = snapshot_with(App, config, &[Duration::from_secs(10)]).expect("renders");
     let frame = &frames[0];
     assert_eq!(frame.dimensions(), (400, 300));
     let mut colours = frame.pixels().map(|pixel| pixel.0).collect::<Vec<_>>();

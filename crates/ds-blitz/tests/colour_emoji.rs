@@ -8,7 +8,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
@@ -55,7 +55,7 @@ fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
         eprintln!("skipped: {COLRV1} is not installed");
         return;
     }
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     let shot = harness.render().expect("renders");
     let face = coloured(&harness, &shot, "#face");

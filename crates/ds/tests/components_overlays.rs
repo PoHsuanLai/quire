@@ -10,6 +10,8 @@ mod cases;
 #[path = "controls/css_scan.rs"]
 #[allow(dead_code)] // Only the token scan is used here.
 mod css_scan;
+#[path = "support/dom_time.rs"]
+mod dom_time;
 #[path = "support/golden.rs"]
 mod golden;
 #[path = "overlays/hover_card_flag.rs"]
@@ -22,6 +24,7 @@ mod palette_and_hover_targets;
 use cases::{CASES, Case};
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
+use dom_time::TimedDom;
 use ds::assembly::ds::Inject;
 use ds::components::app::peek::Peek;
 use ds::host::measure::Anchor;
@@ -31,12 +34,7 @@ use ds::stack::layer_stack::LayerId;
 use ds::stack::layer_stack::LayerStack;
 use ds_style::appearance::peek::PeekMode;
 use std::cell::Cell;
-use std::future::Future;
-use std::pin::pin;
-use std::sync::Arc;
-use std::task::{Context, Poll, Wake, Waker};
-use std::thread::{self, Thread};
-use std::time::{Duration, Instant};
+use std::time::Duration;
 
 #[derive(Props, Clone)]
 struct HostProps {
@@ -64,50 +62,15 @@ fn host(props: HostProps) -> Element {
     }
 }
 
-struct Unpark(Thread);
-
-impl Wake for Unpark {
-    fn wake(self: Arc<Self>) {
-        self.0.unpark();
-    }
-}
-
-/// Let the dom's timers run for `span`, rendering whatever they dirty.
-fn run_for(dom: &mut VirtualDom, span: Duration) {
-    let end = Instant::now() + span;
-    let waker = Waker::from(Arc::new(Unpark(thread::current())));
-    let mut cx = Context::from_waker(&waker);
-    while Instant::now() < end {
-        let ready = {
-            let mut work = pin!(dom.wait_for_work());
-            loop {
-                if let Poll::Ready(()) = work.as_mut().poll(&mut cx) {
-                    break true;
-                }
-                let now = Instant::now();
-                if now >= end {
-                    break false;
-                }
-                thread::park_timeout(end - now);
-            }
-        };
-        if ready {
-            dom.render_immediate(&mut NoOpMutations);
-        }
-    }
-}
-
-/// Build the dom, flush the effects that register overlays, and let `wait` pass.
-fn built(make: fn() -> Element, tint: Option<Alpha>, wait: Duration) -> VirtualDom {
-    let mut dom = VirtualDom::new_with_props(host, HostProps { make, tint });
-    dom.rebuild_in_place();
+/// Build the dom on a virtual clock, flush the effects that register overlays, and let `wait`
+/// of virtual time pass.
+fn built(make: fn() -> Element, tint: Option<Alpha>, wait: Duration) -> TimedDom {
+    let mut dom = TimedDom::new(|| VirtualDom::new_with_props(host, HostProps { make, tint }));
     for _ in 0..3 {
         dom.render_immediate(&mut NoOpMutations);
     }
-    if !wait.is_zero() {
-        run_for(&mut dom, wait);
-        dom.render_immediate(&mut NoOpMutations);
-    }
+    dom.run_for(wait);
+    dom.render_immediate(&mut NoOpMutations);
     dom
 }
 
@@ -263,11 +226,11 @@ fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     // It arrives sliding in from the right (`panel-in`, --t-move), and is present once that has
     // settled.
     let mut dom = built(pushed, None, Duration::ZERO);
-    run_for(&mut dom, Duration::from_millis(5));
+    dom.run_for(Duration::from_millis(5));
     dom.render_immediate(&mut NoOpMutations);
     let first = inside_root(&dom);
     assert!(first.contains("data-presence=\"entering\""), "{first}");
-    run_for(&mut dom, Duration::from_millis(400));
+    dom.run_for(Duration::from_millis(400));
     let up = inside_root(&dom);
     assert!(up.contains("data-presence=\"present\""), "{up}");
     // The hub hides it after its 5000 ms hold (ToastHold): it slides out, still drawn, then is
@@ -275,10 +238,10 @@ fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
     // (The hold, not `hide()`: `ToastHub::stop_hold` writes the hold signal while its own
     // `if let` still borrows it, which panics.)
     // The hold runs from the push: 5000 ms in, it has been leaving for a moment only.
-    run_for(&mut dom, Duration::from_millis(4650));
+    dom.run_for(Duration::from_millis(4650));
     let sinking = inside_root(&dom);
     assert!(sinking.contains("data-presence=\"leaving\""), "{sinking}");
-    run_for(&mut dom, Duration::from_millis(520));
+    dom.run_for(Duration::from_millis(520));
     let gone = inside_root(&dom);
     assert!(!gone.contains("ds-toast"), "{gone}");
 }

@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{OpenWindowError, WindowSize, WindowSpec, open_window, use_window_handle};
-use ds_harness::{Harness, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,
@@ -32,7 +32,7 @@ fn Asks() -> Element {
 
 #[test]
 fn the_harness_has_no_event_loop_to_open_a_window_on() {
-    let harness = Harness::new(Asks, VIEW);
+    let harness = Harness::new(Asks, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".answer").as_deref(), Some("no host"));
 }
 
@@ -44,6 +44,6 @@ fn Reads() -> Element {
 
 #[test]
 fn the_harness_window_has_no_handle_to_raise() {
-    let harness = Harness::new(Reads, VIEW);
+    let harness = Harness::new(Reads, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".found").as_deref(), Some("false"));
 }

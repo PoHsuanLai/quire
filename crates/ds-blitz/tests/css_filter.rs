@@ -10,7 +10,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Backend, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Backend, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use image::RgbaImage;
 
 const VIEW: Viewport = Viewport {
@@ -246,7 +246,9 @@ enum Verdict {
 
 /// The verdict for `SWATCHES[index]` on `backend`, or `None` where no GPU opens.
 fn verdict(backend: Backend, index: usize) -> Option<Verdict> {
-    let config = HarnessConfig::new(VIEW).with_backend(backend);
+    let config = HarnessConfig::new(VIEW)
+        .with_clock(Clock::Virtual)
+        .with_backend(backend);
     let mut harness = match Harness::try_new(PAGES[index], config) {
         Ok(harness) => harness,
         Err(error) => {

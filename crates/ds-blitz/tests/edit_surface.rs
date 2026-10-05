@@ -14,7 +14,7 @@ use ds::host::position::{TextPosition, TextRange};
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 
@@ -98,7 +98,7 @@ fn focused() -> Harness {
 fn focused_at(view: Viewport) -> Harness {
     INPUT.with(|log| log.borrow_mut().clear());
     FOCUS.with(|log| log.borrow_mut().clear());
-    let mut harness = Harness::new(Editor, view);
+    let mut harness = Harness::new(Editor, HarnessConfig::new(view).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let into = harness.centre("#one").expect("the first paragraph");
     harness.send(Input::click(into));
@@ -430,7 +430,7 @@ fn rect(x: f32, y: f32) -> Rect {
 
 #[test]
 fn the_ime_cursor_area_follows_what_the_app_sets() {
-    let mut harness = Harness::new(Area, VIEW);
+    let mut harness = Harness::new(Area, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness.ime_cursor_area(),

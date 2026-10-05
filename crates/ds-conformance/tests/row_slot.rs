@@ -7,7 +7,7 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::press::Propagation;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -64,7 +64,10 @@ fn log(harness: &Harness) -> String {
 
 #[test]
 fn cancel_cancels_without_opening_and_the_label_still_opens() {
-    let mut harness = Harness::new(Scheduled, VIEW);
+    let mut harness = Harness::new(
+        Scheduled,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert_eq!(log(&harness), "");
     harness.send(Input::click(
         harness
@@ -83,7 +86,10 @@ fn cancel_cancels_without_opening_and_the_label_still_opens() {
 
 #[test]
 fn the_close_button_names_its_row() {
-    let harness = Harness::new(Scheduled, VIEW);
+    let harness = Harness::new(
+        Scheduled,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     assert_eq!(
         harness
             .attr(".ds-button[*|aria-label=\"Close Q3 notes\"]", "aria-label")

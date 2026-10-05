@@ -8,7 +8,7 @@ use ds::base::vocab::RowState;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName};
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -77,7 +77,7 @@ fn item(id: &str) -> String {
 
 #[test]
 fn a_place_names_itself_and_hands_its_pointer_to_the_caller() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     assert_eq!(harness.count(".ds-row[*|data-place]"), 3);
     assert_eq!(

@@ -121,7 +121,7 @@ fn shaking(harness: &Harness) -> bool {
 
 #[test]
 fn a_failure_shakes_once_per_stamp_and_never_escalates() {
-    let mut harness = Harness::new(Item, VIEW);
+    let mut harness = Harness::new(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     set(&mut harness, Net::Failed(EventStamp(1)));
     settle_until(&mut harness, shaking);
     assert_eq!(harness.attr("#shake", "data-pulse").as_deref(), Some("a"));
@@ -143,7 +143,7 @@ fn a_failure_shakes_once_per_stamp_and_never_escalates() {
 
 #[test]
 fn reduced_plays_no_shake() {
-    let mut harness = Harness::new(Item, VIEW);
+    let mut harness = Harness::new(Item, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(20));
     set(&mut harness, Net::Failed(EventStamp(3)));

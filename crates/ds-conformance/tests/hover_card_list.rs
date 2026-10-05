@@ -120,7 +120,7 @@ fn a_hover_target_on_an_li_opens_its_card_beside_the_item() {
 
 #[test]
 fn a_time_tip_opens_small_on_one_line_below_its_time() {
-    let mut harness = Harness::new(App, VIEW);
+    let mut harness = Harness::new(App, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let time = "p .ds-hover-target";
     harness.send(Input::pointer_move(centre(&harness, time)));

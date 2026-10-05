@@ -18,7 +18,7 @@ use dioxus::prelude::*;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use image::RgbaImage;
 use probe::{distance, modal, rect};
 use std::time::Duration;
@@ -84,7 +84,7 @@ fn ink_box(harness: &Harness, frame: &RgbaImage, selector: &str) -> (u32, u32) {
 
 #[test]
 fn a_small_caps_left_and_right_arrows_have_heads() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     let frame = harness.render().expect("the page renders");
     probe::keep(&frame, "kbd-arrows");
@@ -115,7 +115,7 @@ fn a_small_caps_left_and_right_arrows_have_heads() {
 /// grows, not the rim around it.
 #[test]
 fn a_small_arrow_caps_box_is_the_same_height_as_a_plain_small_cap() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     harness.render().expect("the page renders");
     let plain_height = rect(&harness, ".plain .ds-key-equivalent-key")

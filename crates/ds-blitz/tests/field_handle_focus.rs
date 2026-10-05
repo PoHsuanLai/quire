@@ -7,7 +7,7 @@ use ds::focus::field::{FieldHandle, use_field_handle};
 use ds::focus::select::Select;
 use ds::focus::selector::{FocusError, focus_by_selector};
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -111,7 +111,7 @@ fn press(harness: &mut Harness, selector: &str) {
 }
 
 fn reached(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     press(&mut harness, "#go button");
     harness.advance(ms(150));
@@ -151,14 +151,20 @@ fn a_handle_blur_is_heard_once_and_leaves_the_field() {
 
 #[test]
 fn the_handle_hands_out_the_mounted_element() {
-    let mut harness = Harness::new(ByHandle, VIEW);
+    let mut harness = Harness::new(
+        ByHandle,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     assert_eq!(harness.text_of(".mounted").as_deref(), Some("mounted"));
 }
 
 #[test]
 fn an_unknown_selector_is_no_such_element() {
-    let mut harness = Harness::new(ByUnknown, VIEW);
+    let mut harness = Harness::new(
+        ByUnknown,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     press(&mut harness, "#go button");
     harness.advance(ms(1_000));
@@ -168,7 +174,10 @@ fn an_unknown_selector_is_no_such_element() {
 
 #[test]
 fn an_unreadable_selector_is_a_bad_selector() {
-    let mut harness = Harness::new(ByGarbage, VIEW);
+    let mut harness = Harness::new(
+        ByGarbage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     press(&mut harness, "#go button");
     harness.advance(ms(150));

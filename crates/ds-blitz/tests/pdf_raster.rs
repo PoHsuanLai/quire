@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{Margins, PageSize, PageSpec, Pt};
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use pdfrum::{Document, RenderOptions, VelloCpuBackend};
 
 /// The content box: 480 x 360 CSS px, 64 px (48 pt) of margin all round.
@@ -58,7 +58,7 @@ fn difference(a: &[u8], b: &[u8]) -> (f64, f64) {
 
 #[test]
 fn a_printed_page_looks_like_the_snapshot() {
-    let mut harness = Harness::new(app, CONTENT);
+    let mut harness = Harness::new(app, HarnessConfig::new(CONTENT).with_clock(Clock::Virtual));
     let snapshot = harness.render().expect("the snapshot renders");
     let bytes = harness.pdf(spec()).expect("the page prints");
     let doc = Document::from_bytes(bytes).expect("opens");

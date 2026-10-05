@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -62,7 +62,7 @@ fn Plain() -> Element {
 
 #[test]
 fn a_controlled_focus_with_select_all_selects_the_whole_value() {
-    let mut harness = Harness::new(Rename, VIEW);
+    let mut harness = Harness::new(Rename, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
     assert_eq!(
@@ -80,7 +80,7 @@ fn a_controlled_focus_with_select_all_selects_the_whole_value() {
 
 #[test]
 fn a_request_after_moving_away_selects_it_again() {
-    let mut harness = Harness::new(Rename, VIEW);
+    let mut harness = Harness::new(Rename, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     let other = harness.centre("#other input").expect("the other field");
     harness.send(Input::click(other));
@@ -98,7 +98,7 @@ fn a_request_after_moving_away_selects_it_again() {
 
 #[test]
 fn a_controlled_focus_without_select_all_selects_nothing() {
-    let mut harness = Harness::new(Plain, VIEW);
+    let mut harness = Harness::new(Plain, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     assert_eq!(harness.focus_of("#name input"), FocusState::Focused);
     assert_eq!(harness.selected_text("#name input"), None);
@@ -122,7 +122,7 @@ fn Shell() -> Element {
 
 #[test]
 fn an_app_focuses_its_own_element_through_focus_soon() {
-    let mut harness = Harness::new(Shell, VIEW);
+    let mut harness = Harness::new(Shell, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
     let back = harness.centre("#back .ds-button").expect("the button");
     harness.send(Input::click(back));

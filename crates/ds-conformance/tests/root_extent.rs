@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -36,7 +36,7 @@ fn Full() -> Element {
 }
 
 fn laid_out(app: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(600));
     harness
 }

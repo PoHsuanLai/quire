@@ -9,7 +9,7 @@ use ds::components::lists::row::shape::RowShape;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -81,7 +81,7 @@ fn where_the_chord_is(harness: &Harness) -> (Option<String>, Option<String>) {
 
 #[test]
 fn moving_the_selection_moves_the_chord() {
-    let mut harness = Harness::new(Files, VIEW);
+    let mut harness = Harness::new(Files, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     assert_eq!(
         harness.count("#card .ds-key-equivalent"),
@@ -154,7 +154,7 @@ fn Pane() -> Element {
 /// The chord shares the label's line: the same line box, so the same size, and no cap boxes.
 #[test]
 fn a_pane_action_draws_its_chord_as_plain_text_beside_its_label() {
-    let mut harness = Harness::new(Pane, VIEW);
+    let mut harness = Harness::new(Pane, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(400));
     assert_eq!(
         harness.count(".ds-preview-action .ds-key-equivalent-key"),

@@ -5,7 +5,7 @@ use dioxus::prelude::*;
 use ds::components::controls::segmented::Tracking;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -50,10 +50,10 @@ fn Dark() -> Element {
 
 #[test]
 fn an_image_only_segment_is_named_and_a_worded_one_is_left_to_its_words() {
-    let mut harness = Harness::new(Light, VIEW);
+    let mut harness = Harness::new(Light, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     probe::keep(&harness.render().expect("renders"), "segmented-name-light");
-    let mut dark = Harness::new(Dark, VIEW);
+    let mut dark = Harness::new(Dark, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     dark.advance(Duration::from_millis(50));
     probe::keep(&dark.render().expect("renders"), "segmented-name-dark");
     let name = |selector: &str| harness.attr(selector, "aria-label");

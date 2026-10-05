@@ -3,7 +3,7 @@
 //! through the app's document, and a `<script>` in it does nothing (Blitz runs no scripts).
 
 use dioxus::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,
@@ -27,7 +27,7 @@ fn Reader() -> Element {
 
 #[test]
 fn a_srcdoc_frame_renders_its_own_document() {
-    let harness = Harness::new(Reader, VIEW);
+    let harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness
         .frame("iframe.body")
         .unwrap_or_else(|| panic!("no frame document:\n{}", harness.html()));
@@ -41,7 +41,7 @@ fn a_srcdoc_frame_renders_its_own_document() {
 
 #[test]
 fn the_app_and_the_frame_never_see_each_others_nodes() {
-    let harness = Harness::new(Reader, VIEW);
+    let harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.frame("iframe.body").expect("a frame document");
     assert_eq!(harness.count(".inner"), 0, "the app saw into the frame");
     assert_eq!(frame.count(".outer"), 0, "the frame saw the app");
@@ -49,7 +49,7 @@ fn the_app_and_the_frame_never_see_each_others_nodes() {
 
 #[test]
 fn a_script_in_the_frame_does_nothing() {
-    let mut harness = Harness::new(Reader, VIEW);
+    let mut harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(std::time::Duration::from_millis(50));
     let frame = harness.frame("iframe.body").expect("a frame document");
     assert_eq!(frame.count(".pwned"), 0);
@@ -58,7 +58,7 @@ fn a_script_in_the_frame_does_nothing() {
 
 #[test]
 fn the_frames_text_is_painted_in_its_own_colour() {
-    let mut harness = Harness::new(Reader, VIEW);
+    let mut harness = Harness::new(Reader, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.render().expect("renders");
     let at = harness.rect("iframe.body").expect("the frame's box");
     let (x0, y0) = (at.origin.x.0 as u32, at.origin.y.0 as u32);

@@ -33,7 +33,7 @@ fn Glyphs() -> Element {
 
 #[test]
 fn a_cross_fade_stacks_two_layers_only_while_it_plays() {
-    let mut harness = Harness::new(Glyphs, VIEW);
+    let mut harness = Harness::new(Glyphs, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.count("#down .ds-morph-layer"), 1);
     // The same icon again is no morph (R2).
     harness.within(|| *ICON.write() = Icon::Volume);
@@ -82,7 +82,7 @@ fn a_slash_draws_on_and_off() {
 
 #[test]
 fn reduced_snaps_a_morph() {
-    let mut harness = Harness::new(Glyphs, VIEW);
+    let mut harness = Harness::new(Glyphs, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(20));
     harness.within(|| *ICON.write() = Icon::VolumeX);

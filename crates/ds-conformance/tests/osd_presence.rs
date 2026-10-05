@@ -101,7 +101,7 @@ fn hidden_it_fades_and_on_hidden_runs_at_settle_and_not_before() {
 
 #[test]
 fn a_show_while_it_fades_takes_the_hide_back() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(300));
     show(&mut harness, Shown::Hidden);
     harness.advance(ms(100));

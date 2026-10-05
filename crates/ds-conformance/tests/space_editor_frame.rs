@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::EditorFrame;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use probe::{keep, rect};
 use std::time::Duration;
 
@@ -64,7 +64,7 @@ fn a_frameless_editor_has_no_card_around_its_rows() {
 }
 
 fn check(page: fn() -> Element, shot: &str) {
-    let mut harness = Harness::new(page, VIEW);
+    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(50));
     let frame = harness.render().expect("the page renders");
     keep(&frame, &format!("space-editor-frame-{shot}"));

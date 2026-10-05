@@ -9,7 +9,7 @@ use ds::host::document::{DocumentHost, use_document_host};
 use ds::host::measure::MountedRef;
 use ds::host::phase::{Observe, Observed, PhaseWrite, Queued, Watch};
 use ds::prelude::*;
-use ds_harness::{DocQuery, Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -61,7 +61,7 @@ fn click(harness: &mut Harness, selector: &str) {
 
 #[test]
 fn a_watched_rect_is_published_after_layout_and_again_only_when_it_changes() {
-    let mut harness = Harness::new(Growing, VIEW);
+    let mut harness = Harness::new(Growing, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".rect").as_deref(), Some("100x40"));
     let first = harness.text_of(".publishes");
 
@@ -127,7 +127,10 @@ fn a_queued_scroll_is_applied_in_the_frame_phase() {
         (".past-end", 900.0),
     ];
     for &(button, want) in CASES {
-        let mut harness = Harness::new(Scrolling, VIEW);
+        let mut harness = Harness::new(
+            Scrolling,
+            HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+        );
         assert_eq!(offset(&harness), 0.0, "{button}: starts at the top");
         click(&mut harness, button);
         assert_eq!(offset(&harness), want, "{button}");
@@ -165,7 +168,7 @@ fn Watched() -> Element {
 
 #[test]
 fn a_scroll_the_document_made_without_an_event_is_published() {
-    let mut harness = Harness::new(Watched, VIEW);
+    let mut harness = Harness::new(Watched, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     assert_eq!(harness.text_of(".seen").as_deref(), Some("0 100 1000"));
     click(&mut harness, ".to-300");
     assert_eq!(harness.text_of(".seen").as_deref(), Some("300 100 1000"));

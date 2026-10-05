@@ -172,13 +172,24 @@ fn the_jpeg_is_embedded_once_as_it_arrived() {
 }
 
 #[test]
-fn the_fixture_is_small_and_quick() {
+fn the_fixture_is_small() {
     let size = PRINTED.bytes.len();
     assert!(size < 300_000, "{size} bytes");
+}
+
+/// A wall-time budget: it measures how long this machine took, so on a shared, loaded one it
+/// fails for reasons that are not the printer's. Not in the gate; `scripts/perf.sh` runs it.
+#[test]
+#[ignore = "perf: run with --ignored on a quiet machine"]
+fn the_fixture_prints_quickly() {
     assert!(
         PRINTED.took < Duration::from_millis(500),
         "{:?}",
         PRINTED.took
     );
-    eprintln!("fixture: {size} bytes in {:?}", PRINTED.took);
+    eprintln!(
+        "fixture: {} bytes in {:?}",
+        PRINTED.bytes.len(),
+        PRINTED.took
+    );
 }

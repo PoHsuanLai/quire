@@ -115,7 +115,7 @@ fn a_new_wake_stamp_plays_it_once_more() {
 
 #[test]
 fn under_reduced_motion_only_the_still_frame_shows() {
-    let mut harness = Harness::new(Stage, VIEW);
+    let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *MOTION.write() = Motion::Reduced);
     harness.advance(Duration::from_millis(100));
     harness.within(|| {
@@ -135,7 +135,10 @@ fn under_reduced_motion_only_the_still_frame_shows() {
 
 #[test]
 fn a_still_picture_never_leaves_its_rest_frame() {
-    let mut harness = Harness::new(StillStage, VIEW);
+    let mut harness = Harness::new(
+        StillStage,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     for _ in 0..10 {
         harness.advance(Duration::from_millis(100));
         assert_eq!(

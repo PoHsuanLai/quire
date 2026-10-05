@@ -8,7 +8,7 @@ use ds::components::content::rich_text::{Rich, RichRun};
 use ds::components::content::text_runs::RunTone;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use ds_shell::notifications::parts::{AppMark, CardAction, Hover};
 use ds_shell::prelude::*;
 
@@ -77,7 +77,7 @@ fn body_height(harness: &Harness) -> f32 {
 
 #[test]
 fn the_close_button_an_action_and_a_link_keep_their_press() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| LOG.write().clear());
     let over = centre(&harness, ".ds-notification-plate");
     harness.send(Input::pointer_move(over));
@@ -127,7 +127,7 @@ fn the_close_button_an_action_and_a_link_keep_their_press() {
 
 #[test]
 fn under_the_pointer_the_body_opens_and_it_closes_again_when_the_pointer_leaves() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     // The body measures its lines after layout, then writes the clip.
     settle_until(&mut harness, |h| {
         h.attr(".ds-notification-body", "data-clip").as_deref() == Some("always")
@@ -174,7 +174,7 @@ fn tab_to(harness: &mut Harness, selector: &str, limit: usize) -> bool {
 
 #[test]
 fn the_close_button_takes_the_keyboard_and_closes_on_enter_and_space() {
-    let mut harness = Harness::new(Card, VIEW);
+    let mut harness = Harness::new(Card, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| LOG.write().clear());
     assert!(
         tab_to(&mut harness, ".ds-notification-close", 6),

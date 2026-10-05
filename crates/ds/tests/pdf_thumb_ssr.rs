@@ -7,18 +7,12 @@
 #[path = "support/golden.rs"]
 mod golden;
 
-use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::components::content::image_source::ImageSize;
 use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
 use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
-use std::pin::pin;
-use std::sync::Arc;
-use std::task::{Context, Poll, Wake, Waker};
-use std::thread::{self, Thread};
-use std::time::{Duration, Instant};
 
 const ROOM: Size = Size {
     width: Px(160.0),
@@ -82,57 +76,21 @@ fn locked_dark() -> Element {
     )
 }
 
-/// A specimen: its golden name, how it is made, and how long its timers run first.
-type Specimen = (&'static str, fn() -> Element, Duration);
-
-const NOW: Duration = Duration::ZERO;
+/// A specimen: its golden name and how it is made.
+type Specimen = (&'static str, fn() -> Element);
 
 const SPECIMENS: &[Specimen] = &[
-    ("pending", loading, NOW),
-    ("letter", letter, NOW),
-    ("landscape-dark", landscape_dark, NOW),
-    ("empty", empty, NOW),
-    ("unreadable", unreadable, NOW),
-    ("locked-dark", locked_dark, NOW),
+    ("pending", loading),
+    ("letter", letter),
+    ("landscape-dark", landscape_dark),
+    ("empty", empty),
+    ("unreadable", unreadable),
+    ("locked-dark", locked_dark),
 ];
 
-struct Unpark(Thread);
-
-impl Wake for Unpark {
-    fn wake(self: Arc<Self>) {
-        self.0.unpark();
-    }
-}
-
-/// Let the dom's timers run for `span`, rendering whatever they dirty.
-fn run_for(dom: &mut VirtualDom, span: Duration) {
-    let end = Instant::now() + span;
-    let waker = Waker::from(Arc::new(Unpark(thread::current())));
-    let mut cx = Context::from_waker(&waker);
-    while Instant::now() < end {
-        let ready = {
-            let mut work = pin!(dom.wait_for_work());
-            loop {
-                if let Poll::Ready(()) = work.as_mut().poll(&mut cx) {
-                    break true;
-                }
-                let now = Instant::now();
-                if now >= end {
-                    break false;
-                }
-                thread::park_timeout(end - now);
-            }
-        };
-        if ready {
-            dom.render_immediate(&mut NoOpMutations);
-        }
-    }
-}
-
-fn render(make: fn() -> Element, wait: Duration) -> String {
+fn render(make: fn() -> Element) -> String {
     let mut dom = VirtualDom::new(make);
     dom.rebuild_in_place();
-    run_for(&mut dom, wait);
     dioxus_ssr::render(&dom)
 }
 
@@ -140,8 +98,8 @@ fn render(make: fn() -> Element, wait: Duration) -> String {
 fn every_specimen_matches_its_golden() {
     let failures: Vec<String> = SPECIMENS
         .iter()
-        .filter_map(|(name, make, wait)| {
-            golden::check(&format!("pdf_thumb/{name}.html"), &render(*make, *wait)).err()
+        .filter_map(|(name, make)| {
+            golden::check(&format!("pdf_thumb/{name}.html"), &render(*make)).err()
         })
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
@@ -151,8 +109,8 @@ fn every_specimen_matches_its_golden() {
 fn every_specimen_lints_clean_and_every_class_is_styled() {
     let sheet = ds::stylesheet();
     let mut failures = Vec::new();
-    for (name, make, wait) in SPECIMENS {
-        let html = render(*make, *wait);
+    for (name, make) in SPECIMENS {
+        let html = render(*make);
         for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
             failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
         }
@@ -181,17 +139,17 @@ fn every_specimen_lints_clean_and_every_class_is_styled() {
 /// and no sheet.
 #[test]
 fn the_markup_carries_the_state() {
-    let fresh = render(loading, NOW);
+    let fresh = render(loading);
     assert!(fresh.contains("data-state=\"pending\""), "{fresh}");
     assert!(fresh.contains("aria-busy=\"true\""), "{fresh}");
-    let ready = render(letter, NOW);
+    let ready = render(letter);
     assert!(ready.contains("data-state=\"ready\""), "{ready}");
     assert!(
         ready.contains("left:2.73px;top:0px;width:154.55px;height:200px"),
         "{ready}"
     );
     assert!(ready.contains("aria-label=\"Invoice.pdf\""), "{ready}");
-    let failed = render(locked_dark, NOW);
+    let failed = render(locked_dark);
     assert!(failed.contains("data-trouble=\"locked\""), "{failed}");
     assert!(!failed.contains("ds-pdf-thumb-sheet"), "{failed}");
     assert!(failed.contains("aria-label=\"Locked PDF\""), "{failed}");

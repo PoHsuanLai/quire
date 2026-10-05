@@ -9,7 +9,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::focus::request::use_focus_request;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -91,7 +91,10 @@ fn Launcher() -> Element {
 
 #[test]
 fn a_second_actions_key_closes_the_menu_and_gives_the_field_the_keyboard_back() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(300));
     assert_eq!(harness.focus_of("#card .ds-input"), FocusState::Focused);
     harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k')));

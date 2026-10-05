@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::fields::text_field_model::Invalid;
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -58,7 +58,7 @@ fn ring(harness: &Harness, id: &str) -> Option<String> {
 
 #[test]
 fn the_ring_follows_the_caret() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(ring(&harness, "name"), None);
     harness.send(Input::click(
@@ -76,7 +76,7 @@ fn the_ring_follows_the_caret() {
 
 #[test]
 fn a_search_field_clears_from_its_button_and_keeps_the_caret() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness.attr("#search input", "value").as_deref(),
@@ -102,7 +102,7 @@ fn a_search_field_clears_from_its_button_and_keeps_the_caret() {
 
 #[test]
 fn a_rejected_value_says_why_and_a_busy_field_takes_no_typing() {
-    let mut harness = Harness::new(Page, VIEW);
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     assert_eq!(
         harness

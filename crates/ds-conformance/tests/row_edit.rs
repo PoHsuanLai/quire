@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::components::lists::list::model::ListStyle;
 use ds::prelude::*;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -72,7 +72,7 @@ fn log(harness: &Harness) -> String {
 
 #[test]
 fn the_field_keeps_its_keys_and_presses_from_the_list_and_the_row() {
-    let mut harness = Harness::new(Folders, VIEW);
+    let mut harness = Harness::new(Folders, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     assert_eq!(harness.focus_of(".ds-row-edit input"), FocusState::Focused);
     harness.send(Input::key(ShortcutKey::Char('x')));
@@ -97,7 +97,7 @@ fn the_field_keeps_its_keys_and_presses_from_the_list_and_the_row() {
 
 #[test]
 fn a_row_with_no_field_still_answers_a_press_and_only_the_edited_row_says_so() {
-    let mut harness = Harness::new(Folders, VIEW);
+    let mut harness = Harness::new(Folders, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(200));
     let first = harness
         .centre(".ds-row .ds-row-title")

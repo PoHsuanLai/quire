@@ -13,7 +13,7 @@ use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
 use ds::style::tokens::easing::EasingToken;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Driver, FocusState, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;
@@ -58,7 +58,7 @@ fn ms(n: u64) -> Duration {
 
 fn start(value: u16, motion: Motion) -> Harness {
     MOTION.set(motion);
-    let mut harness = Harness::new(Level, VIEW);
+    let mut harness = Harness::new(Level, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.within(|| *VALUE.write() = Fraction(value));
     harness.advance(ms(400));
     harness

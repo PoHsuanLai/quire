@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::base::vocab::RowState;
 use ds::components::lists::row::size::RowSize;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -71,7 +71,7 @@ const SECOND: &str = ".list > .ds-row:last-child";
 
 #[test]
 fn a_toggle_rows_switch_is_its_own_and_the_row_is_the_rows() {
-    let mut harness = Harness::new(RowsApp, VIEW);
+    let mut harness = Harness::new(RowsApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(TICK);
     harness.send(Input::click(centre(
         &harness,

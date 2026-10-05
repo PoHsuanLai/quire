@@ -9,7 +9,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -144,7 +144,10 @@ fn open_quietly(harness: &mut Harness) {
 
 #[test]
 fn a_result_set_replaces_the_last_in_place() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     set(&mut harness, rows(1));
     assert_eq!(harness.count("[*|data-row-motion]"), 0);
@@ -160,7 +163,10 @@ fn a_result_set_replaces_the_last_in_place() {
 
 #[test]
 fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     open_quietly(&mut harness);
     run_action(&mut harness);
     assert_eq!(harness.count("#card .ds-row"), 7);
@@ -198,7 +204,10 @@ fn show_more_enters_the_added_rows_and_show_less_heals_by_their_height() {
 
 #[test]
 fn a_click_on_show_more_plays_the_same_expand() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     open_quietly(&mut harness);
     let at = harness
         .centre(".ds-section-header-action")
@@ -211,7 +220,10 @@ fn a_click_on_show_more_plays_the_same_expand() {
 
 #[test]
 fn a_group_growing_without_its_action_is_a_new_result_set() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     open_quietly(&mut harness);
     harness.within(|| *WIDER.write() = 3);
     harness.advance(ms(20));
@@ -222,7 +234,10 @@ fn a_group_growing_without_its_action_is_a_new_result_set() {
 
 #[test]
 fn reduced_plays_the_expand_at_its_own_tokens_and_settles() {
-    let mut harness = Harness::new(Launcher, VIEW);
+    let mut harness = Harness::new(
+        Launcher,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.within(|| *MOTION.write() = Motion::Reduced);
     set(&mut harness, rows(1));
     assert_settles_to_zero_frames(&mut harness);

@@ -14,7 +14,7 @@ use ds::prelude::*;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Input, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -61,7 +61,10 @@ fn WhereApp() -> Element {
 
 #[test]
 fn the_resets_where_scope_applies_and_a_lone_class_outranks_it() {
-    let mut harness = Harness::new(WhereApp, VIEW);
+    let mut harness = Harness::new(
+        WhereApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let frame = harness.render().expect("renders");
     keep(&frame, "where-probe");
     const BLUE: [u8; 3] = [20, 20, 230];
@@ -160,7 +163,7 @@ fn dots_are_round(app: fn() -> Element, name: &str) {
         height: 900,
         scale_percent: 200,
     };
-    let mut harness = Harness::new(app, view);
+    let mut harness = Harness::new(app, HarnessConfig::new(view).with_clock(Clock::Virtual));
     let frame = harness.render().expect("renders");
     keep(&frame, name);
     let field = rect(&harness, ".ds-field");
@@ -203,7 +206,10 @@ fn ActionHeadersApp() -> Element {
 
 #[test]
 fn a_section_headers_action_sits_at_its_right_edge_with_and_without_a_value() {
-    let harness = Harness::new(ActionHeadersApp, VIEW);
+    let harness = Harness::new(
+        ActionHeadersApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     // The inline end padding is 8 (`--s-8`).
     for (n, name) in [(1, "title"), (2, "value")] {
         let header = rect(&harness, &format!(".probe-headers > :nth-child({n})"));
@@ -243,7 +249,10 @@ fn ButtonsApp() -> Element {
 
 #[test]
 fn a_quiet_buttons_glyph_is_six_px_from_its_label() {
-    let harness = Harness::new(ButtonsApp, VIEW);
+    let harness = Harness::new(
+        ButtonsApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     let glyph = rect(&harness, ".probe-quiet .ds-ic");
     let label = rect(&harness, ".probe-quiet .ds-button-label");
     let gap = label.origin.x.0 - (glyph.origin.x.0 + glyph.size.width.0);
@@ -281,7 +290,10 @@ enum Hover {
 
 #[test]
 fn danger_is_mini_at_rest_and_red_only_on_hover() {
-    let mut harness = Harness::new(ButtonsApp, VIEW);
+    let mut harness = Harness::new(
+        ButtonsApp,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     // design/04-COMPONENTS.md section 1: "Danger (derived): at rest as Mini; red only on hover".
     let mini = fill(&mut harness, ".probe-mini", Hover::Off);
     let danger = fill(&mut harness, ".probe-danger", Hover::Off);

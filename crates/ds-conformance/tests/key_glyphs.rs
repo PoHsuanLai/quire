@@ -10,7 +10,7 @@ use dioxus::prelude::*;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 360,
@@ -84,7 +84,7 @@ fn shots_of_control_command_s() {
         ..VIEW
     };
     for (app, shot) in [(Light as fn() -> Element, "light"), (Dark, "dark")] {
-        let mut harness = Harness::new(app, big);
+        let mut harness = Harness::new(app, HarnessConfig::new(big).with_clock(Clock::Virtual));
         harness.advance(std::time::Duration::from_millis(50));
         let frame = harness.render().expect("renders");
         probe::keep(&frame, &format!("key-glyphs-2x-{shot}"));
@@ -94,7 +94,7 @@ fn shots_of_control_command_s() {
 #[test]
 fn control_command_s_is_drawn_by_the_bundled_faces() {
     for (app, shot) in [(Light as fn() -> Element, "light"), (Dark, "dark")] {
-        let mut harness = Harness::new(app, VIEW);
+        let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
         harness.advance(std::time::Duration::from_millis(50));
         let frame = harness.render().expect("renders");
         // Every row has ink; the full set of modifiers is wider than ⌃⌘S.

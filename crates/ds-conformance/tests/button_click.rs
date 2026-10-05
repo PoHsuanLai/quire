@@ -11,7 +11,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -73,7 +73,7 @@ fn FlexApp() -> Element {
 
 /// Click the Button's centre and read its label: `On` once the click reached it.
 fn label_after_click(app: fn() -> Element) -> String {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let at = harness
         .centre(".ds-button")
         .expect("the button is on screen");

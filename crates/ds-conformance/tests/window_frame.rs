@@ -13,7 +13,7 @@ use ds::prelude::*;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::easing::EasingToken;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Driver, Harness, Input, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::prelude::*;
 use image::RgbaImage;
 use probe::{distance, keep};
@@ -61,7 +61,7 @@ fn luma(pixel: [u8; 4]) -> i32 {
 }
 
 fn render(app: fn() -> Element) -> RgbaImage {
-    let mut harness = Harness::new(app, VIEW);
+    let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(60));
     harness.render().expect("renders")
 }
@@ -276,7 +276,10 @@ fn quarter_of_the_curve() -> Duration {
 /// lies between them (design/21-SPACES.md section 5).
 #[test]
 fn a_space_switch_cross_fades_the_window() {
-    let mut harness = Harness::new(Switching, VIEW);
+    let mut harness = Harness::new(
+        Switching,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
     harness.advance(ms(60));
     let before = pixel(&harness.render().expect("renders"), 2, 2);
     let button = harness

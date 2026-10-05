@@ -200,7 +200,7 @@ fn a_card_keyed_on_the_callers_hooks_opens_beside_its_measured_element() {
 
 #[test]
 fn a_card_keyed_on_a_rect_the_caller_has_opens_below_it() {
-    let mut harness = Harness::new(ByPoint, VIEW);
+    let mut harness = Harness::new(ByPoint, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let at = centre(&harness, &pin(1));
     harness.send(Input::pointer_move(at));

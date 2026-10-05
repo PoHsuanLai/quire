@@ -13,7 +13,7 @@ use ds::style::icon::plate_tint::PlateTint;
 use ds::style::icon::retint::IconStyle;
 use ds::style::icon::retint::Tint;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;
@@ -103,7 +103,7 @@ fn tolerance(scheme: Scheme) -> (f32, f32) {
 
 #[test]
 fn a_tinted_neutral_plate_takes_the_spaces_hue_in_both_schemes() {
-    let mut harness = Harness::new(Plates, VIEW);
+    let mut harness = Harness::new(Plates, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(60));
     let frame = harness.render().expect("a frame");
     keep(&frame, "plate_tint");
@@ -129,7 +129,7 @@ fn a_tinted_neutral_plate_takes_the_spaces_hue_in_both_schemes() {
 /// hue, about 125, is too near Home's 152 for a hue test to tell them apart; the stops are.)
 #[test]
 fn an_untinted_plate_is_unchanged() {
-    let mut harness = Harness::new(Plates, VIEW);
+    let mut harness = Harness::new(Plates, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(60));
     let frame = harness.render().expect("a frame");
     for (scheme, base, deep) in [
