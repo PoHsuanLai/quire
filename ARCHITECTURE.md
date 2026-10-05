@@ -101,7 +101,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 Component groups inside `ds` and the layer order inside the components tier: `content` (icons,
 images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `overlays` (alert,
 popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `lists` (rows,
-settings rows, headers, animated and leaving lists, preview pane, emoji grid, appearance picker)
+settings rows, headers, animated, leaving and virtual lists, preview pane, emoji grid, appearance picker)
 < `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`) <
 `editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `companion` (orb, chips, answer cards, plan list, replace bar, run row, activity strip, memory view, served-by chip) < `app`.
 
@@ -208,6 +208,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Colour maths (sRGB, linear, OKLab, OKLCH, contrast, gamut fit) | `ds-core::colour` |
 | Pixel units, points, rects, device scale | `ds-core::geometry` |
 | Scroll state (`Scroll`: offset, viewport, content) and what follows from it: clamp, by, reveal, the rows that show, near the end | `ds-core::geometry::scroll` |
+| A list that mounts only the rows near the viewport (fixed row height, cursor kept in view, paging cue, keyed exit) | `ds::components::lists::virtual_list` (`VirtualList`, `RowHeight`; its pure steps in `model`) |
 | A scroll container and its scroll state as an owned value | `ds::components::controls::scroller` (`use_scroller` -> `ScrollerRef`, drawn by `Scroller`) |
 | Time, sleep, virtual clock | `ds-core::time` (`now`, `since`, `sleep`) |
 | A machine's "when" (ms from an origin) and the clock that makes it | `ds-core::time::stamp` (`Stamp`, `FrameClock`); `ds-motion`'s gesture machines take the same `Stamp` |

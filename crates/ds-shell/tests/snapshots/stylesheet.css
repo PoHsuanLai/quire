@@ -2810,6 +2810,17 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-popover.ds-tooltip{ width:auto; max-width:260px; padding:var(--s-3) var(--s-8); font-size:var(--fs-shell-tip); border-radius:var(--r-item);
   animation:fade var(--t-quick) var(--e-out); }
 .ds-popover.ds-tooltip[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; }
+/* -- virtual_list -- */
+/* VirtualList: a list of rows of one fixed height that mounts only the rows near the viewport.
+   The rows between are two spacers' height, so the scroller's content is as long as the whole
+   list. Rows are `.ds-list-item`s and take their motion from list.css (a removed row plays
+   `row-out`, the rows below heal). The scroller fills the list's own box, which the consumer
+   sizes. */
+
+.ds-virtual-list{ display:flex; flex-direction:column; flex:1 1 0; height:100%; min-height:0; outline:none; }
+.ds-virtual-list > .ds-scroller{ flex:1 1 0; }
+.ds-virtual-list .ds-list-item{ box-sizing:border-box; }
+.ds-virtual-spacer{ flex:none; }
 /* -- voice_orb -- */
 /* The voice orb (design/30 section 2.9). Three glows, six conic gradients turning at different
    speeds and directions about their own centres, behind a fine dot grid. The turn `--orb-turn`
