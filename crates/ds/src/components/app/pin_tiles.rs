@@ -10,6 +10,7 @@ use crate::root::common::Common;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
+use ds_core::press::{PointerButton, Press};
 use ds_core::vocab::{DropState, Selection};
 use ds_motion::drag::{DRAG_THRESHOLD, DragPhase, use_drag};
 use std::rc::Rc;
@@ -70,6 +71,14 @@ pub struct PinAdd {
     pub onadd: EventHandler<()>,
 }
 
+/// A tile's menu was asked for (a secondary press, the context-menu key): which tile, and where,
+/// for the menu to hang from. The grid draws no menu of its own; the caller owns it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct PinMenu<K> {
+    pub key: K,
+    pub at: Point,
+}
+
 /// The Add tile's key, apart from every index.
 const ADD_KEY: &str = "add";
 
@@ -99,6 +108,8 @@ fn drop_state<K: PartialEq>(phase: &DragPhase<K>, key: &K, index: usize) -> Drop
 /// press on a tile; with `onreorder` a tile can be dragged (past 3 px) onto another's place and
 /// the new order comes back as the keys in order. A drag never also picks. `onstatus` hears the
 /// key of a tile whose `Attention` mark was pressed; that press is not a pick and starts no drag.
+/// `onmenu` hears a secondary press on a tile, with where it was; only a primary press picks, so
+/// asking for a tile's menu never also changes the filter.
 #[component]
 pub fn PinTiles<K: Clone + PartialEq + 'static>(
     label: String,
@@ -108,6 +119,7 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
     onpick: EventHandler<K>,
     #[props(default)] onreorder: Option<EventHandler<Vec<K>>>,
     #[props(default)] onstatus: Option<EventHandler<K>>,
+    #[props(default)] onmenu: Option<EventHandler<PinMenu<K>>>,
     #[props(default)] common: Common,
 ) -> Element {
     let drag = use_drag::<K>(DRAG_THRESHOLD);
@@ -181,11 +193,19 @@ pub fn PinTiles<K: Clone + PartialEq + 'static>(
                         });
                     })
                 }),
-                onclick: move |_| {
-                    if kept.replace(false) {
-                        return;
+                onclick: move |press: Press| match press.button {
+                    PointerButton::Primary => {
+                        if kept.replace(false) {
+                            return;
+                        }
+                        onpick.call(picked.clone());
                     }
-                    onpick.call(picked.clone());
+                    PointerButton::Secondary => {
+                        if let Some(onmenu) = onmenu {
+                            onmenu.call(PinMenu { key: picked.clone(), at: press.at });
+                        }
+                    }
+                    PointerButton::Middle => {}
                 },
                 common: Common { mounted: Some(hook), ..Common::default() },
             }
