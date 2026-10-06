@@ -109,7 +109,10 @@ fn a_sheet_hangs_from_its_panes_top_edge_centred_over_the_pane() {
     for naming in [Naming::Element, Naming::Rect] {
         let harness = start(400.0, naming, SheetWidth::Regular);
         let sheet = harness.rect(".ds-sheet").expect("the sheet");
-        assert!(near(sheet.origin.y.0, PANE_TOP), "{sheet:?}");
+        assert!(
+            near(sheet.origin.y.0, PANE_TOP + 12.0),
+            "12 below the pane's top: {sheet:?}"
+        );
         assert!(
             near(
                 sheet.origin.x.0 + sheet.size.width.0 / 2.0,
@@ -170,8 +173,8 @@ fn a_sheet_stays_on_its_pane_when_the_layout_moved_after_the_overlay_was_measure
         "the page moved: {pane:?}"
     );
     assert!(
-        near(sheet.origin.y.0, pane.origin.y.0),
-        "the sheet hangs from the pane where it is now: {sheet:?} {pane:?}"
+        near(sheet.origin.y.0, pane.origin.y.0 + 12.0),
+        "the sheet hangs 12 below the pane top where it is now: {sheet:?} {pane:?}"
     );
     assert!(
         near(sheet.origin.x.0, pane.origin.x.0 + 24.0),

@@ -1,6 +1,6 @@
 //! Alert: a short question or notice with one to three or more buttons, as the Mac draws an
 //! `NSAlert` before Liquid Glass (design/30 section 2.5, design/04-COMPONENTS.md section 55): a
-//! narrow panel, everything centred in one column (an optional icon at 48, a bold title, the
+//! narrow panel, everything centred in one column (an optional hero icon at 64, a bold title, the
 //! message in the soft ink), then the buttons. It stands in a [`Sheet`] and dims nothing.
 //!
 //! Buttons (`AlertButton`): the first is the default unless it is destructive, when the first
@@ -47,9 +47,15 @@ use ds_motion::presence::{
     spec::PresenceSpec,
     use_presence::{Presented, use_presence},
 };
-use ds_style::icon::render::IconSize;
+use ds_style::icon::Icon;
+use ds_style::icon::render::{IconPx, IconSize};
 use ds_style::tokens::control_size::ControlSize;
 use std::rc::Rc;
+
+/// The hero icon's side (design/34 section 3.7).
+const HERO_PX: u8 = 64;
+/// The Critical badge's side, at the hero's lower right.
+const BADGE_PX: u8 = 20;
 
 /// What an alert says and what its buttons do.
 #[derive(Debug, Clone, PartialEq)]
@@ -80,7 +86,8 @@ impl Words {
 ///
 /// `title` is the question ("Turn Bluetooth off?"), `message` what follows from it; `buttons` are
 /// its answers (see the module doc for their order and roles); `style` is `data-style`; `icon` is
-/// drawn at 48 above the title (an app's icon; none by default).
+/// drawn at 64 above the title, the caller's (an app's or provider's icon; none by default, and
+/// then nothing is reserved for it); a `Critical` alert badges it with a warning glyph.
 ///
 /// `flow: Flow::Inline` draws it where the caller renders it, over the nearest positioned
 /// ancestor, for a surface too small for a sheet's root (a 320 px control-center popover);
@@ -208,7 +215,12 @@ fn AlertBody(words: Words) -> Element {
             },
             if let Some(icon) = words.icon {
                 div { class: "ds-alert-icon",
-                    IconView { source: icon, size: IconSize::Tile48 }
+                    IconView { source: icon, size: IconSize::Px(IconPx(HERO_PX)) }
+                    if words.style == AlertStyle::Critical {
+                        span { class: "ds-alert-badge",
+                            IconView { source: IconSource::Glyph(Icon::TriangleAlert), size: IconSize::Px(IconPx(BADGE_PX)) }
+                        }
+                    }
                 }
             }
             div { class: "ds-alert-title", "{words.title}" }
@@ -294,6 +306,7 @@ fn slot(slot: Slot<'_>) -> Element {
                 })), ..Common::default() },
                 answers,
                 role,
+                size: ControlSize::Large,
                 label: button.label.clone(),
                 onclick: move |_| press.call(Some(index)),
             }

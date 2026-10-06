@@ -1,4 +1,4 @@
-//! On a real Blitz document: a sheet its host hides slides back up (`sheet-out`, --t-move) and
+//! On a real Blitz document: a sheet its host hides fades out (`sheet-out`, --t-quick) and
 //! reports `on_hidden` once the exit has settled, never before `settle(SheetOut)`; shown again
 //! while leaving, it is present at once and never reports; and a centred sheet in a viewport root
 //! stands in the middle of it.
@@ -15,6 +15,24 @@ const VIEW: Viewport = Viewport {
     height: 400,
     scale_percent: 100,
 };
+
+/// The sheet's own page, in the motion setting given.
+fn fading(motion: Motion) -> Harness {
+    thread_local! {
+        static MOTION: std::cell::Cell<Motion> = const { std::cell::Cell::new(Motion::Standard) };
+    }
+    MOTION.with(|cell| cell.set(motion));
+    #[allow(non_snake_case)]
+    fn Fading() -> Element {
+        let motion = MOTION.with(std::cell::Cell::get);
+        rsx! {
+            Ds { appearance: Appearance { motion, ..Appearance::default() }, material: Material::Sheet, extent: RootExtent::Viewport,
+                Sheet { label: "Power", onclose: move |_| {}, attach: Attach::Centre, p { "Shut down?" } }
+            }
+        }
+    }
+    Harness::new(Fading, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+}
 
 /// A power menu the page shows and hides from a context signal, logging `on_hidden`.
 #[allow(non_snake_case)]
@@ -120,4 +138,23 @@ fn a_centred_sheet_stands_in_the_middle_of_its_root() {
     );
     let across = sheet.origin.x.0 + sheet.size.width.0 / 2.0;
     assert!((across - VIEW.width as f32 / 2.0).abs() <= 1.0, "{sheet:?}");
+}
+
+#[test]
+fn a_sheet_appears_and_settles_within_its_fade_and_reduced_motion_still_does() {
+    for motion in [Motion::Standard, Motion::Reduced] {
+        let mut harness = fading(motion);
+        harness.advance(Duration::from_millis(40));
+        assert_eq!(
+            harness.attr(".ds-sheet", "data-presence").as_deref(),
+            Some("entering"),
+            "{motion:?}: still arriving"
+        );
+        harness.advance(settle(Anim::SheetIn, MotionLevel::Standard));
+        assert_eq!(
+            harness.attr(".ds-sheet", "data-presence").as_deref(),
+            Some("present"),
+            "{motion:?}: settled within the fade, not the old 400 ms slide"
+        );
+    }
 }

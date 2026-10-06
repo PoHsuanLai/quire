@@ -19,7 +19,7 @@ use ds::style::tokens::control_size::ControlSize;
 #[component]
 pub fn PowerMenu() -> Element {
     rsx! {
-        Section { title: "Sheet and power menu", note: "Sheet {{ attach }} in a Sheet root, dimming nothing (macOS draws no scrim). Attach::Centre, light and dark: centred both ways, sliding in from the top over --t-big. Attach::Window: hanging from the top edge, square at the top. Buttons at ButtonSize::Regular: Cancel (Secondary), Restart (Danger), Shut Down (Primary), and Suspend unavailable (Availability::Disabled: .35, no hover, no press). The hints are Small Kbd caps; the left and right arrows come from Space Mono like the up and down. A sheet its host hides slides back up (sheet-out, --t-move) and reports on_hidden at settle(SheetOut).",
+        Section { title: "Sheet and power menu", note: "Sheet {{ attach }} in a Sheet root, dimming nothing (macOS draws no scrim). Attach::Centre, light and dark: centred both ways, fading in with a scale over --t-quick. Attach::Window: a card hanging 12 below the top edge. Buttons at ButtonSize::Regular: Cancel (Secondary), Restart (Danger), Shut Down (Primary), and Suspend unavailable (Availability::Disabled: .35, no hover, no press). The hints are Small Kbd caps; the left and right arrows come from Space Mono like the up and down. A sheet its host hides fades out (sheet-out, --t-quick) and reports on_hidden at settle(SheetOut).",
             div { class: "g-wall g-chrome-cards", style: "background-image:url(\"{wallpaper::uri()}\")",
                 for (theme , attach) in [(Theme::Light, Attach::Centre), (Theme::Dark, Attach::Centre), (Theme::Light, Attach::Window)] {
                     Dialog { theme, attach }

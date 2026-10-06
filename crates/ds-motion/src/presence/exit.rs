@@ -14,7 +14,7 @@ pub enum Exit {
     PaneOut,
     /// A popover, tooltip or hover card fading away: `menu-out`, `--t-quick`.
     Fade,
-    /// A sheet sliding back up past the top edge: `sheet-out`.
+    /// A sheet fading and scaling out: `sheet-out`.
     SheetOut,
     /// A side panel or a toast sliding out to the right: `panel-out`.
     PanelOut,

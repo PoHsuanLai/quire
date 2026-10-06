@@ -76,11 +76,11 @@ pub enum Anim {
     /// `osd-out`: the OSD card fades out over `--t-move --e-exit` once its hold ends
     /// (design/30 section 1.3: the OSD enters with `PaletteFade`, `--t-quick`).
     OsdOut,
-    /// `sheet-in` at `--t-big --e-out`: a sheet slides down from the top edge (design/30
-    /// section 1.3: Slide(Top), the tween a sheet plays when it is not spring-driven).
+    /// `sheet-in` at `--t-quick --e-out`: a sheet or alert fades and scales in place (design/34
+    /// section 7).
     SheetIn,
-    /// `sheet-out`: a sheet slides back up past the top edge over `--t-move --e-exit` (design/30
-    /// section 1.3: exits accelerate).
+    /// `sheet-out`: a sheet or alert fades and scales out over `--t-quick --e-exit` (design/34
+    /// section 7).
     SheetOut,
     /// `panel-in`: an edge panel (the notification center) slides in from past the right edge
     /// over `--t-move --e-out`: a large surface decelerates in, since a spring's overshoot would

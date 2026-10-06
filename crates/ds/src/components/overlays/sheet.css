@@ -1,18 +1,19 @@
-/* Sheet (design/30 section 2.5, `NSWindow` sheet): `min(560px, 88%)` wide, hanging from the top
-   edge of its root (`data-attach=window`), the top edge of a pane (`data-attach=within`) or centred
-   (`data-attach=centre`), as tall as its
-   content up to the root less the 36px inset. It dims nothing: macOS draws no scrim, and the
-   host catches the click outside if it wants it. It slides down from past the top edge over
-   `--t-big --e-out` and back up over `--t-move --e-exit` (design/30 section 1.3), holding its
-   last frame until the host unmaps it; a hide taken back plays `hold`, which moves nothing.
+/* Sheet (design/34 section 3.8, `NSWindow` sheet): a floating card, all four corners `--r-panel`,
+   `min(560px, 88%)` wide, hung `--s-12` below the top edge of its root (`data-attach=window`) or
+   of a pane (`data-attach=within`), or centred (`data-attach=centre`), as tall as its content up
+   to the root less the 36px inset. It dims nothing: macOS draws no scrim, and the host catches
+   the click outside if it wants it. It fades in and scales from .97 over `--t-quick --e-out` and
+   fades back out over `--t-quick --e-exit` (design/34 section 7), holding its last frame until
+   the host unmaps it; a hide taken back plays `hold`, which moves nothing. The content brings its
+   own padding. A bottom sheet rises from below instead, in the same time.
    TODO(O-14): the size is the candidate, not signed off. TODO(O-15): focus is not moved. */
 
-.ds-sheet{ position:absolute; top:0; left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - var(--s-36)); overflow-y:auto; scrollbar-width:none;
-  background:var(--surface-2); border-radius:0 0 var(--r-panel) var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto; }
-.ds-sheet[*|data-presence=entering],.ds-sheet[*|data-presence=present]{ animation:sheet-in var(--t-big) var(--e-out); }
+.ds-sheet{ position:absolute; top:var(--s-12); left:0; right:0; margin:0 auto; width:min(560px, 88%); max-height:calc(100% - var(--s-36)); overflow-y:auto; scrollbar-width:none;
+  background:var(--surface-2); border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); display:flex; flex-direction:column; pointer-events:auto; }
+.ds-sheet[*|data-presence=entering],.ds-sheet[*|data-presence=present]{ animation:sheet-in var(--t-quick) var(--e-out); }
 .ds-sheet[*|data-presence=entering][*|data-pulse=b],.ds-sheet[*|data-presence=present][*|data-pulse=b]{ animation-name:sheet-in--b; }
 .ds-sheet[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
-.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-move) var(--e-exit) forwards; pointer-events:none; }
+.ds-sheet[*|data-presence=leaving]{ animation:sheet-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 /* The body: the caller's content, filling the sheet. */
 .ds-sheet-body{ display:flex; flex-direction:column; flex:1; min-height:0; }
@@ -24,12 +25,11 @@
 .ds-sheet[*|data-attach=centre]{ position:relative; top:auto; left:auto; right:auto; margin:0; max-height:100%; border-radius:var(--r-panel); }
 
 /* Within (`Attach::Within`): the stage is the pane's own box (left, top, width and height inline,
-   in the overlay's coordinates), clipping the sheet as it slides down from the pane's top edge.
-   The sheet stands in it by flex, centred across the pane, `min(560px, 88%)` of the pane wide and
-   as tall as its content up to the pane less the 36px inset, square at the top and rounded at
-   the bottom as a window's sheet is. The stage takes no pointer; the sheet does. */
+   in the overlay's coordinates). The sheet stands in it by flex, centred across the pane,
+   `min(560px, 88%)` of the pane wide, `--s-12` below its top edge and as tall as its content up
+   to the pane less the 36px inset, a rounded card. The stage takes no pointer; the sheet does. */
 .ds-sheet-stage[*|data-attach=within]{ inset:auto; padding:0; align-items:flex-start; overflow:hidden; box-sizing:border-box; }
-.ds-sheet[*|data-attach=within]{ position:relative; top:auto; left:auto; right:auto; margin:0; }
+.ds-sheet[*|data-attach=within]{ position:relative; top:auto; left:auto; right:auto; margin:var(--s-12) 0 0; }
 
 /* Narrow (`SheetWidth::Narrow`): an alert's column, as the reference desktop's password
    prompt; the rest of the sheet is as above. */
@@ -39,5 +39,5 @@
 .ds-sheet[*|data-width=wide]{ width:min(1040px, 92%); }
 
 /* Bottom (`Attach::Bottom`): `--s-8` above the root's bottom edge, never taller than half of it,
-   rising from below (`--sheet-dy`, the keyframes' offset). */
-.ds-sheet[*|data-attach=bottom]{ --sheet-dy:calc(100% + var(--s-36)); top:auto; bottom:var(--s-8); max-height:calc(50% - var(--s-8)); border-radius:var(--r-panel); }
+   rising from below (`--sheet-dy`, the keyframes' offset, with no scale). */
+.ds-sheet[*|data-attach=bottom]{ --sheet-dy:calc(100% + var(--s-36)); --sheet-scale:1; top:auto; bottom:var(--s-8); max-height:calc(50% - var(--s-8)); border-radius:var(--r-panel); }

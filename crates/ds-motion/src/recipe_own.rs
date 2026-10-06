@@ -73,22 +73,22 @@ pub(super) const OSD_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
-/// `sheet-in`: a sheet slides down from the top edge at `--t-big --e-out` (design/30 section
-/// 1.3: the tween a sheet plays when it is not spring-driven).
+/// `sheet-in`: a sheet or alert fades and scales in place at `--t-quick --e-out` (design/34
+/// section 7); a bottom sheet rises from below over `--t-big` (`sheet.css`).
 pub(super) const SHEET_IN: Recipe = recipe(
     "sheet-in",
-    DurationToken::Big,
+    DurationToken::Quick,
     EasingToken::Out,
     Fill::None,
     Iteration::Once,
 );
 
-/// `sheet-out`: a sheet's exit at `--t-move --e-exit`, the exit design/05
-/// section 10 gives shell chrome. It holds its last, transparent frame until the host unmaps
-/// the surface at `settle(SheetOut)`, so the sheet never flashes back between the two.
+/// `sheet-out`: a sheet's exit, a fade and scale at `--t-quick --e-exit` (design/34 section 7).
+/// It holds its last, transparent frame until the host unmaps the surface at
+/// `settle(SheetOut)`, so the sheet never flashes back between the two.
 pub(super) const SHEET_OUT: Recipe = recipe(
     "sheet-out",
-    DurationToken::Move,
+    DurationToken::Quick,
     EasingToken::Exit,
     Fill::Forwards,
     Iteration::Once,

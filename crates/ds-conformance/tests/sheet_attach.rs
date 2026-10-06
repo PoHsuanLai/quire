@@ -54,10 +54,13 @@ fn near(a: f32, b: f32) -> bool {
 }
 
 #[test]
-fn a_window_sheet_hangs_from_the_top_edge_centred_across() {
+fn a_window_sheet_hangs_12_below_the_top_edge_centred_across() {
     let harness = start(Attach::Window, SheetWidth::Regular);
     let sheet = harness.rect(".ds-sheet").expect("the sheet");
-    assert!(near(sheet.origin.y.0, 0.0), "{sheet:?}");
+    assert!(
+        near(sheet.origin.y.0, 12.0),
+        "12 below the top edge: {sheet:?}"
+    );
     assert!(near(sheet.size.width.0, 560.0), "{sheet:?}");
     assert!(
         near(sheet.origin.x.0 + sheet.size.width.0 / 2.0, 640.0),

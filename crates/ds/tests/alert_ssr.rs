@@ -62,6 +62,17 @@ fn erase() -> Element {
     )
 }
 
+fn hero() -> Element {
+    root(
+        Theme::Light,
+        rsx! {
+            Alert { title: TITLE, message: Some(TextLine::from(MESSAGE)),
+                buttons: vec![button("Turn Off", AlertRole::Normal), button("Cancel", AlertRole::Cancel)],
+                icon: Some(IconSource::Glyph(Icon::Bluetooth)) }
+        },
+    )
+}
+
 fn notice() -> Element {
     root(
         Theme::Light,
@@ -121,6 +132,7 @@ const SPECIMENS: &[Specimen] = &[
         bluetooth(AlertRole::Destructive, Flow::Floating, Theme::Light)
     }),
     ("destructive-icon", erase),
+    ("hero-icon", hero),
     ("one-button", notice),
     ("three-buttons", save),
     ("suppression-help", extras),
@@ -249,8 +261,19 @@ fn the_default_is_the_filled_first_button_unless_it_destroys() {
             b("Cancel", "return", "normal")
         ]
     );
+    assert!(
+        !plain.contains("ds-alert-icon"),
+        "no icon, no hero slot: {plain}"
+    );
+    let hero = by_name("hero-icon");
+    assert!(hero.contains("class=\"ds-alert-icon\""), "{hero}");
+    assert!(
+        hero.contains("data-size=\"64\"") && !hero.contains("ds-alert-badge"),
+        "a 64 px hero, no badge when informational: {hero}"
+    );
     let icon = by_name("destructive-icon");
     assert!(icon.contains("class=\"ds-alert-icon\""), "{icon}");
+    assert!(icon.contains("class=\"ds-alert-badge\""), "{icon}");
     assert!(icon.contains("data-style=\"critical\""), "{icon}");
 }
 

@@ -38,7 +38,7 @@ pub fn OverlaysCataloguePage() -> Element {
                 PopoverCase { dismiss: Dismiss::Manual, arrow: Arrow::None, label: "Manual" }
             }
         }
-        Section { title: "Sheet", note: "Sheet {{ attach, width }} dims nothing. Attach::Window hangs from the top edge of its root and slides down over --t-big; Attach::Centre stands in the middle (an alert's narrow column); Attach::Bottom stands 8 above the bottom edge, wide, never taller than half its root (Edit Widgets). Hidden, it slides back up over --t-move.",
+        Section { title: "Sheet", note: "Sheet {{ attach, width }} dims nothing. Attach::Window hangs a card 12 below the top edge of its root and fades in with a scale from .97 over --t-quick; Attach::Centre stands in the middle (an alert's narrow column); Attach::Bottom stands 8 above the bottom edge, wide, never taller than half its root (Edit Widgets). Hidden, it fades and scales out over --t-quick.",
             div { class: "g-row g-row-top",
                 SheetCase { attach: Attach::Window, width: SheetWidth::Regular, name: "Attach::Window, Regular" }
                 SheetCase { attach: Attach::Centre, width: SheetWidth::Narrow, name: "Attach::Centre, Narrow" }
