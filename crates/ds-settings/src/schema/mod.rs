@@ -22,8 +22,9 @@ pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
 pub use column::{Column, ColumnKind, ColumnName};
 pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
-    AgentSetting, ChoiceUnavailable, ChoiceWord, Exposure, Help, KeyKind, KeyPath, KeySpec, Label,
-    Page, Section, UnavailableReason, Widget, WordLabels, kind_from_variants,
+    AgentSetting, ChoiceGroup, ChoiceUnavailable, ChoiceWord, Exposure, GroupedChoices, Help,
+    KeyKind, KeyPath, KeySpec, Label, Page, Section, UnavailableReason, Widget, WordLabels,
+    kind_from_variants,
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
 pub use program::{

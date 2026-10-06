@@ -296,6 +296,7 @@ mod unavailable {
             labels: Default::default(),
             agent: Default::default(),
             unavailable: Default::default(),
+            groups: Default::default(),
         }
     }
 
@@ -360,5 +361,135 @@ mod unavailable {
                 .is_ok()
         );
         assert!(key.check_available(&toml::Value::Boolean(true)).is_ok());
+    }
+}
+
+mod groups {
+    use ds_settings::live::LiveSchema;
+    use ds_settings::schema::{
+        ChoiceGroup, ChoiceWord, Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section,
+    };
+
+    fn spec(words: &[&str], groups: &[(&str, &str)]) -> KeySpec {
+        KeySpec {
+            path: KeyPath("ai.model.text.fast".to_owned()),
+            kind: KeyKind::Menu {
+                variants: words.iter().map(|word| (*word).to_owned()).collect(),
+            },
+            default: toml::Value::String(String::new()),
+            label: Label("Fast".to_owned()),
+            help: Help(String::new()),
+            page: Page::Intelligence,
+            section: Section("Text".to_owned()),
+            exposure: Exposure::Basic,
+            labels: Default::default(),
+            agent: Default::default(),
+            unavailable: Default::default(),
+            groups: groups
+                .iter()
+                .map(|(word, group)| {
+                    (
+                        ChoiceWord((*word).to_owned()),
+                        ChoiceGroup((*group).to_owned()),
+                    )
+                })
+                .collect(),
+        }
+    }
+
+    /// Choices, their groups, and the sections wanted.
+    type Case<'a> = (&'a [&'a str], &'a [(&'a str, &'a str)], &'a [Want<'a>]);
+    type Want<'a> = (Option<&'a str>, &'a [&'a str]);
+
+    fn grouped() -> KeySpec {
+        spec(&["", "a1", "g1"], &[("a1", "Anthropic"), ("g1", "Google")])
+    }
+
+    #[test]
+    fn the_field_round_trips_in_json_and_is_absent_when_empty() {
+        let with = LiveSchema {
+            version: 1,
+            key: vec![grouped()],
+        };
+        let json = with.to_json();
+        assert!(
+            json.contains(r#""groups":{"a1":"Anthropic","g1":"Google"}"#),
+            "{json}"
+        );
+        assert_eq!(LiveSchema::from_json(&json).expect("parses"), with);
+        let without = LiveSchema {
+            version: 1,
+            key: vec![spec(&["a", "b"], &[])],
+        };
+        let json = without.to_json();
+        assert!(!json.contains("groups"), "{json}");
+        assert_eq!(LiveSchema::from_json(&json).expect("parses"), without);
+    }
+
+    #[test]
+    fn json_from_before_the_field_parses() {
+        let old = r#"{"version":1,"key":[{"path":"ai.model.text.fast","kind":{"kind":"menu","v":{"variants":["a","b"]}},"default":"a","label":"Fast","help":"","page":{"kind":"intelligence"},"section":"Text","exposure":"basic"}]}"#;
+        assert!(
+            LiveSchema::from_json(old).expect("parses").key[0]
+                .groups
+                .is_empty()
+        );
+    }
+
+    #[test]
+    fn the_field_round_trips_in_toml() {
+        let key = grouped();
+        let text = toml::to_string(&key).expect("serialises");
+        assert!(text.contains("[groups]"), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).expect("parses"), key);
+        assert!(
+            !toml::to_string(&spec(&["a", "b"], &[]))
+                .unwrap()
+                .contains("groups")
+        );
+    }
+
+    #[test]
+    fn grouped_choices_are_ungrouped_first_then_groups_by_first_appearance() {
+        let table: &[Case] = &[
+            (&["a", "b"], &[], &[(None, &["a", "b"])]),
+            (
+                &["", "auto", "g1", "a1", "g2", "a2", "l1"],
+                &[
+                    ("g1", "Google"),
+                    ("g2", "Google"),
+                    ("a1", "Anthropic"),
+                    ("a2", "Anthropic"),
+                ],
+                &[
+                    (None, &["", "auto", "l1"]),
+                    (Some("Google"), &["g1", "g2"]),
+                    (Some("Anthropic"), &["a1", "a2"]),
+                ],
+            ),
+            (
+                &["a1", "x"],
+                &[("a1", "Anthropic")],
+                &[(None, &["x"]), (Some("Anthropic"), &["a1"])],
+            ),
+            (
+                &["a1"],
+                &[("a1", "Anthropic")],
+                &[(Some("Anthropic"), &["a1"])],
+            ),
+        ];
+        for (words, groups, want) in table {
+            let key = spec(words, groups);
+            let got: Vec<(Option<&str>, Vec<&str>)> = key
+                .grouped_choices()
+                .into_iter()
+                .map(|section| (section.group.map(|group| group.0.as_str()), section.choices))
+                .collect();
+            let want: Vec<(Option<&str>, Vec<&str>)> = want
+                .iter()
+                .map(|(group, choices)| (*group, choices.to_vec()))
+                .collect();
+            assert_eq!(got, want, "{words:?}");
+        }
     }
 }

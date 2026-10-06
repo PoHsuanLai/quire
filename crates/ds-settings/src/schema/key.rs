@@ -63,6 +63,20 @@ pub struct ChoiceUnavailable {
     pub reason: UnavailableReason,
 }
 
+/// The display name of a group of choices in a menu ("Anthropic", "On this computer"): the value
+/// of [`KeySpec::groups`].
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct ChoiceGroup(pub String);
+
+/// A choice group's choices in order, as [`KeySpec::grouped_choices`] yields them. `group` is
+/// `None` for the ungrouped choices at the top.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GroupedChoices<'a> {
+    pub group: Option<&'a ChoiceGroup>,
+    pub choices: Vec<&'a str>,
+}
+
 /// A key's group within its page, e.g. dock's "Magnification" section.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
@@ -258,9 +272,45 @@ pub struct KeySpec {
     /// absent when empty, so a reader or writer that predates the field is unaffected.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub unavailable: BTreeMap<ChoiceWord, UnavailableReason>,
+    /// Display group of each grouped choice of a menu key: `"groups": {"<word>": "<group>"}`
+    /// (a TOML table in a file schema), absent when empty. Group order is the order of each
+    /// group's first appearance in the key's choices, so there is no order field.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub groups: BTreeMap<ChoiceWord, ChoiceGroup>,
 }
 
 impl KeySpec {
+    /// The key's choices as sections: the ungrouped ones first (`group: None`, omitted when
+    /// empty), then each group in order of first appearance in the choices, each with its
+    /// choices in their order. Empty for a key that is not a menu or segmented key.
+    pub fn grouped_choices(&self) -> Vec<GroupedChoices<'_>> {
+        let words: &[String] = match &self.kind {
+            KeyKind::Menu { variants } | KeyKind::Segmented { variants } => variants,
+            _ => return Vec::new(),
+        };
+        let group_of = |word: &String| self.groups.get(&ChoiceWord(word.clone()));
+        let mut sections = vec![GroupedChoices {
+            group: None,
+            choices: Vec::new(),
+        }];
+        for word in words {
+            let group = group_of(word);
+            let at = match sections.iter().position(|section| section.group == group) {
+                Some(at) => at,
+                None => {
+                    sections.push(GroupedChoices {
+                        group,
+                        choices: Vec::new(),
+                    });
+                    sections.len() - 1
+                }
+            };
+            sections[at].choices.push(word);
+        }
+        sections.retain(|section| !section.choices.is_empty());
+        sections
+    }
+
     /// The reason `value` cannot be picked, if it is a string naming an unavailable choice.
     pub fn unavailable_reason(&self, value: &toml::Value) -> Option<&UnavailableReason> {
         let word = value.as_str()?;

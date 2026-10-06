@@ -78,6 +78,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                 labels: ::std::default::Default::default(),
                 agent: #agent_setting,
                 unavailable: ::std::default::Default::default(),
+                groups: ::std::default::Default::default(),
             });
         });
     }

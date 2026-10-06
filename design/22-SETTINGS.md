@@ -1261,6 +1261,17 @@ not offer it. The skeleton refuses `Set(key, word)` for a listed word with the n
 call; `KeySpec::check_available` is the same check for file validation. `Describe`, `Get`,
 `Set` and `Changed` keep their signatures: the freeze above is not touched.
 
+Choice groups (additive, 2026-10-06): a menu `KeySpec` may carry `groups`, a map from a choice
+word to the display name of its group ("Anthropic", "Google", "Moonshot", "OpenAI", "On this
+computer"). JSON: `"groups":{"<word>":"<group>"}`; a file schema has an `[key.groups]` table;
+both are skipped when empty, so older schemas parse unchanged. There is no order field: the
+order of the groups is the order of each group's first appearance in `choices`, and the
+choices keep their order inside a group. `KeySpec::grouped_choices()` yields the ungrouped
+choices first (the Catalogue default `""`, `auto`), then each group with its choices; the
+Settings app draws a section header per group, and a choice that is also `unavailable` stays
+greyed inside its group. `Describe`, `Get`, `Set` and `Changed` keep their signatures: the
+freeze above is not touched.
+
 ### 9.5 Rules
 
 - A settings key exists only if a `KeySpec` describes it: a struct field without the derive is
