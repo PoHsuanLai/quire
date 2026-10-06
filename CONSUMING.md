@@ -893,6 +893,18 @@ A few props worth knowing about before you read the signatures:
 - `Row` takes `#[props(default)] drop: DropState` (`Idle`, `Target`,
   `Source`) — drag-and-drop visual state (design/04-COMPONENTS.md §34); leave it `Idle` unless
   you are wiring up drag and drop for that row.
+- `ds_shell::accounts::model::SignInForm` fields for a hand-typed server: `FormField::new(role,
+  requirement, text)` plus `.choosing(Vec<Choice>)`, `.hinted(text)` and `.in_part(FormPart)`.
+  `FieldRole` is one-to-one with porter's `FieldKind` (`Protocol`, `Port`, `Security`,
+  `OutgoingServer`, `OutgoingPort`, `OutgoingSecurity`, `SessionUrl`; `Token` stays the secret);
+  `ProblemKind::Invalid` joins `Missing` and `Refused`. A field with `choices: Some(..)` is a pop-up
+  button (the host words each `Choice { slug, label }`) and holds the chosen slug as
+  `FieldText::Plain(slug)`; a pick reaches `on_input` as `(role, FieldText::Plain(slug))`, exactly the
+  slug, like any edit, so the host maps it (porter's `FieldKind::choices()` slugs) and refits the
+  field list; quire reshapes nothing. A port is a plain entry, empty meaning the usual port, with
+  the host's number as `hint`. When any field has choices or a `part`, the form is a `Form` of
+  titled `FormSection`s (neighbouring fields of one `FormPart`: Incoming, Outgoing, SignIn), one
+  `FieldRow` each; otherwise it is the plain stack of entries as before.
 - `SpaceEditor` (and `SpaceDot`) live in `ds`, not `ds-shell`, and take two more optional props: `name: Option<String>` (the Space's own name
   field, drawn inside the editor rather than beside it) and
   `on_active_dot: Option<EventHandler<ActiveDot>>` (fires when the person's focus moves to a

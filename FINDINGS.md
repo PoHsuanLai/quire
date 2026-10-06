@@ -1590,7 +1590,8 @@ Standing facts:
 - Down and Up in the provider search move the host's cursor through the rows.
 - Copy Link and Copy Code report the text through `on_copy`; the host writes it with
   `ds_blitz::clipboard::write_text` and answers `CopyState::Copied`.
-- Every sentence is in `accounts::wording`; the host words nothing.
+- Every sentence is in `accounts::wording`; the host words nothing, except a choice's option labels
+  (`Choice { slug, label }`) and a port's hint.
 - Every use of a piece R2a made controlled is in `accounts::adapter` (`Entry`, `PickRows`,
   `Action`, `CopyAction`, `ChoiceMenu`, `Disc`).
 

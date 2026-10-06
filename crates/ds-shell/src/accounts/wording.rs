@@ -2,8 +2,8 @@
 //! providers a search keeps, whether a form may continue. Pure, so a table can test each one.
 
 use super::model::{
-    AccountChoice, ChoiceKey, FieldProblem, FieldRole, FormField, Limitation, NoAccountWhy,
-    ProblemKind, ProviderEntry, ProviderPick, Requirement, SignInFault,
+    AccountChoice, ChoiceKey, FieldProblem, FieldRole, FormField, FormPart, Limitation,
+    NoAccountWhy, ProblemKind, ProviderEntry, ProviderPick, Requirement, SignInFault,
 };
 
 /// "Mail wants to keep its library in your files": `request` finishes the sentence.
@@ -29,18 +29,42 @@ pub(crate) fn field_label(role: FieldRole) -> &'static str {
         FieldRole::Password => "Password",
         FieldRole::ApiKey => "API key",
         FieldRole::Token => "Access token",
+        FieldRole::Protocol => "Protocol",
+        FieldRole::Port => "Port",
+        FieldRole::Security => "Security",
+        FieldRole::OutgoingServer => "Outgoing server",
+        FieldRole::OutgoingPort => "Outgoing port",
+        FieldRole::OutgoingSecurity => "Outgoing security",
+        FieldRole::SessionUrl => "Session URL",
     }
 }
 
-/// The hint inside an empty form field.
-pub(crate) fn field_placeholder(role: FieldRole) -> &'static str {
+/// The hint inside an empty form field. An optional login name says what an empty one means; it
+/// never says "Required".
+pub(crate) fn field_placeholder(role: FieldRole, requirement: Requirement) -> &'static str {
     match role {
         FieldRole::Address => "name@example.org",
         FieldRole::Server => "mail.example.org",
-        FieldRole::Username => "Required",
+        FieldRole::Username => match requirement {
+            Requirement::Required => "Required",
+            Requirement::Optional => "Same as your address",
+        },
         FieldRole::Password => "Password or app password",
         FieldRole::ApiKey => "Paste your key",
         FieldRole::Token => "Paste your token",
+        FieldRole::Protocol | FieldRole::Security | FieldRole::OutgoingSecurity => "Choose",
+        FieldRole::Port | FieldRole::OutgoingPort => "Usual port",
+        FieldRole::OutgoingServer => "smtp.example.org",
+        FieldRole::SessionUrl => "https://mail.example.org/jmap/session",
+    }
+}
+
+/// The title over a group of a long form.
+pub(crate) fn part_words(part: FormPart) -> &'static str {
+    match part {
+        FormPart::Incoming => "Incoming",
+        FormPart::Outgoing => "Outgoing",
+        FormPart::SignIn => "Sign in",
     }
 }
 
@@ -50,14 +74,19 @@ pub(crate) fn problem_text(problem: FieldProblem) -> String {
     match problem.kind {
         ProblemKind::Missing => format!("Enter the {label}."),
         ProblemKind::Refused => format!("The {label} was not accepted. Check it and try again."),
+        ProblemKind::Invalid => format!("The {label} is not valid. Check it and try again."),
     }
 }
 
 /// Whether the form may continue: every required field has something in it.
-pub(crate) fn form_ready(fields: &[FormField]) -> bool {
-    fields
-        .iter()
-        .all(|field| field.requirement == Requirement::Optional || !field.text.is_blank())
+/// Whether Continue is live: every required field holds something, and no field is known to be
+/// invalid. A refusal does not hold Continue back: the person corrects the field and tries again.
+pub(crate) fn form_ready(fields: &[FormField], problem: Option<FieldProblem>) -> bool {
+    let invalid = problem.is_some_and(|problem| problem.kind == ProblemKind::Invalid);
+    !invalid
+        && fields
+            .iter()
+            .all(|field| field.requirement == Requirement::Optional || !field.text.is_blank())
 }
 
 /// The review's last button: a plain "Done", or the one-grant "Add, and allow Mail to use it"
@@ -200,11 +229,7 @@ mod tests {
     }
 
     fn field(requirement: Requirement, text: FieldText) -> FormField {
-        FormField {
-            role: FieldRole::Address,
-            requirement,
-            text,
-        }
+        FormField::new(FieldRole::Address, requirement, text)
     }
 
     fn choice(label: &str) -> AccountChoice {
@@ -259,8 +284,29 @@ mod tests {
             ),
         ];
         for (name, fields, want) in cases {
-            assert_eq!(form_ready(fields), *want, "{name}");
+            assert_eq!(form_ready(fields, None), *want, "{name}");
         }
+        // A field known to be invalid holds Continue back; a refusal does not (retry after editing).
+        let filled = vec![field(Requirement::Required, plain("ada@example.org"))];
+        let problem = |kind| FieldProblem {
+            role: FieldRole::Port,
+            kind,
+            attempt: Attempt(1),
+        };
+        assert!(!form_ready(&filled, Some(problem(ProblemKind::Invalid))));
+        assert!(form_ready(&filled, Some(problem(ProblemKind::Refused))));
+    }
+
+    #[test]
+    fn an_optional_login_name_never_says_required() {
+        assert_eq!(
+            field_placeholder(FieldRole::Username, Requirement::Optional),
+            "Same as your address"
+        );
+        assert_eq!(
+            field_placeholder(FieldRole::Username, Requirement::Required),
+            "Required"
+        );
     }
 
     #[test]
@@ -381,6 +427,11 @@ mod tests {
                 FieldRole::Address,
                 ProblemKind::Missing,
                 "Enter the email address.",
+            ),
+            (
+                FieldRole::OutgoingPort,
+                ProblemKind::Invalid,
+                "The outgoing port is not valid. Check it and try again.",
             ),
         ];
         for (role, kind, want) in cases {

@@ -11,9 +11,9 @@ use ds::assembly::ds::Inject;
 use ds::components::content::provider_mark::MarkProvider;
 use ds::prelude::*;
 use ds_shell::accounts::model::{
-    AccountChoice, Attempt, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText, FormField,
-    Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey, Requirement, ServiceKey,
-    ServiceLine, ServiceOffer, SignInFault,
+    AccountChoice, Attempt, Choice, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText,
+    FormField, FormPart, Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey,
+    Requirement, ServiceKey, ServiceLine, ServiceOffer, SignInFault,
 };
 use ds_shell::prelude::*;
 
@@ -48,10 +48,59 @@ fn providers() -> Vec<ProviderEntry> {
 }
 
 fn field(role: FieldRole, text: FieldText) -> FormField {
-    FormField {
-        role,
-        requirement: Requirement::Required,
-        text,
+    FormField::new(role, Requirement::Required, text)
+}
+
+fn manual(role: FieldRole, text: &str, part: FormPart) -> FormField {
+    field(role, FieldText::Plain(text.to_owned())).in_part(part)
+}
+
+fn chosen(role: FieldRole, slug: &str, options: &[(&str, &str)], part: FormPart) -> FormField {
+    let choices = options
+        .iter()
+        .map(|(slug, label)| Choice::new(*slug, *label));
+    manual(role, slug, part).choosing(choices.collect())
+}
+
+fn secret(role: FieldRole, part: FormPart) -> FormField {
+    field(role, FieldText::Secret(Hidden::new("not shown"))).in_part(part)
+}
+
+const PROTOCOLS: [(&str, &str); 3] = [("imap", "IMAP"), ("pop3", "POP3"), ("jmap", "JMAP")];
+const SECURITIES: [(&str, &str); 2] = [("tls", "TLS"), ("starttls", "STARTTLS")];
+
+/// The hand-typed form for `protocol`, as a host refits it: JMAP has no outgoing fields.
+fn by_hand(protocol: &str, port: &str, hint: &'static str) -> Vec<FormField> {
+    use FieldRole::*;
+    use FormPart::*;
+    let ported = |role, text: &str, hint, part| {
+        let port = manual(role, text, part).hinted(hint);
+        FormField {
+            requirement: Requirement::Optional,
+            ..port
+        }
+    };
+    match protocol {
+        "jmap" => vec![
+            chosen(Protocol, "jmap", &PROTOCOLS, Incoming),
+            manual(
+                SessionUrl,
+                "https://mail.example.org/jmap/session",
+                Incoming,
+            ),
+            secret(Token, SignIn),
+        ],
+        other => vec![
+            chosen(Protocol, other, &PROTOCOLS, Incoming),
+            manual(Server, "mail.example.org", Incoming),
+            ported(Port, port, hint, Incoming),
+            chosen(Security, "tls", &SECURITIES, Incoming),
+            manual(OutgoingServer, "smtp.example.org", Outgoing),
+            ported(OutgoingPort, "", "587", Outgoing),
+            chosen(OutgoingSecurity, "starttls", &SECURITIES, Outgoing),
+            manual(Username, "ada", SignIn),
+            secret(Password, SignIn),
+        ],
     }
 }
 
@@ -121,6 +170,15 @@ pub fn AccountsPage() -> Element {
                 ], Some(FieldProblem { role: FieldRole::Password, kind: ProblemKind::Refused, attempt: Attempt(1) })) }
             }
         }
+        Section { title: "Sign in by hand", note: "SignInForm with choices and groups: a field that carries choices is a pop-up button and reports the slug of the one picked through the same edit event, so the host can refit the list (JMAP has no outgoing fields). Fields that name a part sit in titled groups; a port is a plain entry whose hint is the host's usual number, and a refused or invalid one is marked under it.",
+            div { class: "g-row g-row-top",
+                Stage { theme: Theme::Light, height: StageHeight::Tall, body: sign_in(by_hand("imap", "", "993"), None) }
+                Stage { theme: Theme::Dark, height: StageHeight::Tall, body: sign_in(by_hand("pop3", "pop", "995"), Some(FieldProblem { role: FieldRole::Port, kind: ProblemKind::Invalid, attempt: Attempt(1) })) }
+            }
+            div { class: "g-row g-row-top",
+                Stage { theme: Theme::Light, height: StageHeight::Tall, body: sign_in(by_hand("jmap", "", ""), None) }
+            }
+        }
         Section { title: "Browser and device code", note: "BrowserWait: the page that was opened, Copy Link (the host copies; Copied once it says so), Open Again and Cancel. ShowCode: the device code large, the page to type it at, Copy Code.",
             div { class: "g-row g-row-top",
                 Stage { theme: Theme::Light, body: step(rsx! {
@@ -187,16 +245,33 @@ fn sign_in(fields: Vec<FormField>, problem: Option<FieldProblem>) -> Element {
     })
 }
 
+/// How tall a stage is: a long form needs more wallpaper around it.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+enum StageHeight {
+    #[default]
+    Regular,
+    Tall,
+}
+
+impl StageHeight {
+    fn slug(self) -> &'static str {
+        match self {
+            StageHeight::Regular => "regular",
+            StageHeight::Tall => "tall",
+        }
+    }
+}
+
 /// A sheet root of `theme` over the wallpaper holding `body`.
 #[component]
-fn Stage(theme: Theme, body: Element) -> Element {
+fn Stage(theme: Theme, body: Element, #[props(default)] height: StageHeight) -> Element {
     let axes = use_context::<Signal<Axes>>();
     let (accent, motion) = {
         let axes = axes.read();
         (axes.accent, axes.motion)
     };
     rsx! {
-        div { class: "g-modal g-accounts", style: "background-image:url(\"{wallpaper::uri()}\")",
+        div { class: "g-modal g-accounts", "data-height": height.slug(), style: "background-image:url(\"{wallpaper::uri()}\")",
             Ds {
                 appearance: Appearance { theme, accent, motion },
                 material: Material::Sheet,

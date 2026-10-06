@@ -65,6 +65,24 @@ pub enum FieldRole {
     ApiKey,
     /// An API token.
     Token,
+    /// Which protocol the server speaks (a choice: IMAP, POP3, JMAP).
+    Protocol,
+    /// The incoming server's port; empty means the usual one.
+    Port,
+    /// How the incoming connection is secured (a choice: TLS, STARTTLS).
+    Security,
+    /// The server mail is sent through.
+    #[word(slug = "outgoing-server")]
+    OutgoingServer,
+    /// The outgoing server's port; empty means the usual one.
+    #[word(slug = "outgoing-port")]
+    OutgoingPort,
+    /// How the outgoing connection is secured (a choice: TLS, STARTTLS).
+    #[word(slug = "outgoing-security")]
+    OutgoingSecurity,
+    /// The address of a JMAP session resource.
+    #[word(slug = "session-url")]
+    SessionUrl,
 }
 
 /// Whether the person may leave a field empty.
@@ -95,6 +113,37 @@ impl FieldText {
     }
 }
 
+/// One option of a choice field. The host words it; the slug is what the host's model knows it by.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Choice {
+    /// What the host calls it ("imap", "starttls"): exactly what an edit of the field reports.
+    pub slug: String,
+    /// What the person reads ("IMAP", "STARTTLS").
+    pub label: String,
+}
+
+impl Choice {
+    /// An option called `slug` and read as `label`.
+    pub fn new(slug: impl Into<String>, label: impl Into<String>) -> Self {
+        Self {
+            slug: slug.into(),
+            label: label.into(),
+        }
+    }
+}
+
+/// A titled part of a long form. Neighbouring fields of one part sit in one group.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+pub enum FormPart {
+    /// The server mail is read from.
+    Incoming,
+    /// The server mail is sent through.
+    Outgoing,
+    /// Who the person is to the server.
+    #[word(slug = "sign-in")]
+    SignIn,
+}
+
 /// One field of the sign-in form. The host owns what is typed and hands it back on every render.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FormField {
@@ -102,8 +151,52 @@ pub struct FormField {
     pub role: FieldRole,
     /// Whether it may stay empty.
     pub requirement: Requirement,
-    /// What it holds now.
+    /// What it holds now. A choice field holds the chosen slug as [`FieldText::Plain`].
     pub text: FieldText,
+    /// The options, when the field is a choice (a pop-up button); `None` for a text entry.
+    pub choices: Option<Vec<Choice>>,
+    /// The hint in an empty entry (a port's usual number); `None` keeps the role's own words.
+    pub hint: Option<String>,
+    /// The group it sits in; a form where no field names one is a single group.
+    pub part: Option<FormPart>,
+}
+
+impl FormField {
+    /// A text entry with no choices, hint or group.
+    pub fn new(role: FieldRole, requirement: Requirement, text: FieldText) -> Self {
+        Self {
+            role,
+            requirement,
+            text,
+            choices: None,
+            hint: None,
+            part: None,
+        }
+    }
+
+    /// The same field as a choice among `choices`.
+    pub fn choosing(self, choices: Vec<Choice>) -> Self {
+        Self {
+            choices: Some(choices),
+            ..self
+        }
+    }
+
+    /// The same field with `hint` in its empty entry.
+    pub fn hinted(self, hint: impl Into<String>) -> Self {
+        Self {
+            hint: Some(hint.into()),
+            ..self
+        }
+    }
+
+    /// The same field placed in `part`.
+    pub fn in_part(self, part: FormPart) -> Self {
+        Self {
+            part: Some(part),
+            ..self
+        }
+    }
 }
 
 /// What is wrong with a field.
@@ -113,6 +206,8 @@ pub enum ProblemKind {
     Missing,
     /// The server refused what was typed.
     Refused,
+    /// What was typed cannot be right (a port that is not a number).
+    Invalid,
 }
 
 /// How many times the form has been submitted: a password field shakes once for each new

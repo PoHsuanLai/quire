@@ -7,7 +7,7 @@
 //! it, so an entry wires no `onsubmit` of its own and the step's default action runs once.
 
 use super::hidden::Hidden;
-use super::model::{CopyState, FieldText, PickerChoice};
+use super::model::{Choice, CopyState, FieldText, PickerChoice};
 use dioxus::prelude::*;
 use ds::components::content::avatar::AvatarSize;
 use ds::components::content::provider_mark::MarkProvider;
@@ -110,6 +110,23 @@ pub(crate) fn Entry(
                 oninput.call(if hidden { FieldText::Secret(Hidden::new(next)) } else { FieldText::Plain(next) })
             },
         }
+    }
+}
+
+/// A pop-up button over a field's choices, the chosen slug the host's. A pick reports the slug.
+#[component]
+pub(crate) fn Pick(
+    label: String,
+    choices: Vec<Choice>,
+    chosen: Option<String>,
+    onpick: EventHandler<String>,
+) -> Element {
+    let items = choices
+        .into_iter()
+        .map(|choice| MenuItem::new(choice.slug, choice.label))
+        .collect();
+    rsx! {
+        PopUpButton { items, value: chosen, title: Some(label), onpick }
     }
 }
 

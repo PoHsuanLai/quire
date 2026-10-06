@@ -234,3 +234,4 @@
 .g-accounts-stage{height:560px}
 .g-helpers{width:588px;background-size:cover;background-position:center}
 .g-helpers-stage{height:360px}
+.g-accounts[*|data-height=tall] .g-accounts-stage{height:900px}

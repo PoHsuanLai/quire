@@ -41,11 +41,7 @@ fn log(harness: &mut Harness) -> Vec<String> {
 }
 
 fn field(role: FieldRole, text: FieldText) -> FormField {
-    FormField {
-        role,
-        requirement: Requirement::Required,
-        text,
-    }
+    FormField::new(role, Requirement::Required, text)
 }
 
 fn account(label: &str) -> AccountChoice {

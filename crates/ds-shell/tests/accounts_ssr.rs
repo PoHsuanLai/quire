@@ -14,9 +14,9 @@ use ds::components::content::provider_mark::MarkProvider;
 use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
 use ds_shell::accounts::model::{
-    AccountChoice, Attempt, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText, FormField,
-    Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey, ProviderPick, Requirement,
-    ServiceKey, ServiceLine, ServiceOffer, SignInFault,
+    AccountChoice, Attempt, Choice, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText,
+    FormField, FormPart, Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey,
+    ProviderPick, Requirement, ServiceKey, ServiceLine, ServiceOffer, SignInFault,
 };
 use ds_shell::prelude::*;
 
@@ -68,11 +68,87 @@ fn providers() -> Vec<ProviderEntry> {
 }
 
 fn field(role: FieldRole, text: FieldText) -> FormField {
+    FormField::new(role, Requirement::Required, text)
+}
+
+fn plain(text: &str) -> FieldText {
+    FieldText::Plain(text.to_owned())
+}
+
+fn choose(role: FieldRole, slug: &str, options: &[(&str, &str)], part: FormPart) -> FormField {
+    field(role, plain(slug))
+        .choosing(
+            options
+                .iter()
+                .map(|(slug, label)| Choice::new(*slug, *label))
+                .collect(),
+        )
+        .in_part(part)
+}
+
+fn entry(role: FieldRole, text: &str, part: FormPart) -> FormField {
+    field(role, plain(text)).in_part(part)
+}
+
+const PROTOCOLS: [(&str, &str); 3] = [("imap", "IMAP"), ("pop3", "POP3"), ("jmap", "JMAP")];
+const SECURITIES: [(&str, &str); 2] = [("tls", "TLS"), ("starttls", "STARTTLS")];
+
+fn optional(field: FormField) -> FormField {
     FormField {
-        role,
-        requirement: Requirement::Required,
-        text,
+        requirement: Requirement::Optional,
+        ..field
     }
+}
+
+fn imap_form() -> Vec<FormField> {
+    use FieldRole::*;
+    use FormPart::*;
+    let port = |role, text: &str, hint, part| {
+        optional(field(role, plain(text)).hinted(hint).in_part(part))
+    };
+    vec![
+        choose(Protocol, "imap", &PROTOCOLS, Incoming),
+        entry(Server, "imap.example.org", Incoming),
+        port(Port, "", "993", Incoming),
+        choose(Security, "tls", &SECURITIES, Incoming),
+        entry(OutgoingServer, "smtp.example.org", Outgoing),
+        port(OutgoingPort, "587", "587", Outgoing),
+        choose(OutgoingSecurity, "starttls", &SECURITIES, Outgoing),
+        entry(Username, "ada", SignIn),
+        field(Password, FieldText::Secret(Hidden::new(PASSWORD))).in_part(SignIn),
+    ]
+}
+
+fn jmap_form() -> Vec<FormField> {
+    use FieldRole::*;
+    use FormPart::*;
+    vec![
+        choose(Protocol, "jmap", &PROTOCOLS, Incoming),
+        entry(
+            SessionUrl,
+            "https://mail.example.org/jmap/session",
+            Incoming,
+        ),
+        field(Token, FieldText::Secret(Hidden::new(PASSWORD))).in_part(SignIn),
+    ]
+}
+
+fn pop3_form() -> Vec<FormField> {
+    use FieldRole::*;
+    use FormPart::*;
+    vec![
+        choose(Protocol, "pop3", &PROTOCOLS, Incoming),
+        entry(Server, "pop.example.org", Incoming),
+        optional(field(Port, plain("pop")).hinted("995").in_part(Incoming)),
+        choose(Security, "tls", &SECURITIES, Incoming),
+        entry(OutgoingServer, "smtp.example.org", Outgoing),
+        field(OutgoingPort, plain(""))
+            .hinted("587")
+            .in_part(Outgoing),
+        choose(OutgoingSecurity, "starttls", &SECURITIES, Outgoing),
+        entry(Username, "ada", SignIn),
+        field(Password, FieldText::Secret(Hidden::new(PASSWORD))).in_part(SignIn),
+    ]
 }
 
 fn address(text: &str) -> FormField {
@@ -221,6 +297,18 @@ const SPECIMENS: &[Specimen] = &[
                 password(PASSWORD),
             ],
             None,
+        )
+    }),
+    ("sign-in-manual-imap", || sign_in(imap_form(), None)),
+    ("sign-in-manual-jmap", || sign_in(jmap_form(), None)),
+    ("sign-in-manual-pop3-invalid", || {
+        sign_in(
+            pop3_form(),
+            Some(FieldProblem {
+                role: FieldRole::Port,
+                kind: ProblemKind::Invalid,
+                attempt: Attempt(1),
+            }),
         )
     }),
     ("browser", || {
@@ -482,4 +570,36 @@ fn the_steps_say_what_the_props_say() {
     );
     assert!(narrowed.contains("Fastmail"), "{narrowed}");
     assert!(narrowed.contains("Other"), "Other stays");
+}
+
+#[test]
+fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
+    let imap = light("sign-in-manual-imap");
+    for want in [
+        "Incoming",
+        "Outgoing",
+        "Sign in",
+        "IMAP",
+        "STARTTLS",
+        "placeholder=\"993\"",
+    ] {
+        assert!(imap.contains(want), "{want} in {imap}");
+    }
+    assert_eq!(
+        imap.matches("class=\"ds-form-section\"").count(),
+        3,
+        "{imap}"
+    );
+    assert_eq!(imap.matches("class=\"ds-popup\"").count(), 3, "{imap}");
+    let jmap = light("sign-in-manual-jmap");
+    assert!(
+        jmap.contains("Session URL") && jmap.contains("Access token"),
+        "{jmap}"
+    );
+    assert!(!jmap.contains("Outgoing"), "{jmap}");
+    let pop3 = light("sign-in-manual-pop3-invalid");
+    assert!(
+        pop3.contains("The port is not valid. Check it and try again."),
+        "{pop3}"
+    );
 }
