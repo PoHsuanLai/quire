@@ -438,3 +438,49 @@ fn a_default_button_can_take_the_keyboard_as_its_sheet_opens() {
     harness.advance(ms(600));
     assert_eq!(harness.focus_of("#default"), FocusState::Focused);
 }
+
+/// A sheet whose only stop is a toggle row, with a default button.
+#[allow(non_snake_case)]
+fn Switching() -> Element {
+    let mut on = use_signal(|| Check::Off);
+    let mut log = use_signal(Vec::<String>::new);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            Sheet {
+                label: "Options",
+                attach: Attach::Centre,
+                onclose: |()| {},
+                on_return: EventHandler::new(move |()| log.with_mut(|all| all.push("default".to_owned()))),
+                div { id: "options", style: "width:320px",
+                    Row {
+                        title: "Sync mail",
+                        accessory: Accessory::Toggle {
+                            value: on(),
+                            on_toggle: EventHandler::new(move |next: Check| on.set(next)),
+                        },
+                    }
+                }
+            }
+            p { class: "on", "{on().slug()}" }
+            p { class: "log", {log().join(",")} }
+        }
+    }
+}
+
+#[test]
+fn a_toggle_row_flips_on_space_and_leaves_return_to_the_sheets_default_button() {
+    let mut harness = harness(Switching);
+    harness.advance(ms(600));
+    click(&mut harness, "#options .ds-toggle");
+    let flipped = harness.text_of(".on");
+    harness.send(Input::key(ShortcutKey::Space));
+    harness.advance(ms(30));
+    assert_ne!(harness.text_of(".on"), flipped, "Space flips the toggle");
+    harness.send(Input::key(ShortcutKey::Enter));
+    harness.advance(ms(30));
+    assert_eq!(
+        harness.text_of(".log").as_deref(),
+        Some("default"),
+        "Return reached the sheet"
+    );
+}
