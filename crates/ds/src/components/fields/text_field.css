@@ -28,7 +28,7 @@
 .ds-text-field-frame{ display:flex; align-items:center; gap:var(--s-4); min-width:0; text-align:start; }
 .ds-text-field[*|data-variant=bezeled] .ds-text-field-frame{
   box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--tf-ground); border:0; border-radius:var(--tf-r);
-  transition:box-shadow var(--t-quick) var(--e-in-out);
+  transition:box-shadow var(--t-quick) var(--e-out);
 }
 /* A bezeled search field is NSSearchField: the same fill, the magnifier in the secondary ink.
    A plain search field keeps its own row (further down). The fill is laid over `--surface`, so

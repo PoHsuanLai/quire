@@ -18,7 +18,7 @@
 .ds-radio-group-indicator{
   display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--rg); height:var(--rg);
   border-radius:var(--r-pill); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1);
-  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+  transition:background-color var(--t-quick) var(--e-out), box-shadow var(--t-quick) var(--e-out);
 }
 .ds-radio-group-dot{ display:none; width:40%; height:40%; border-radius:var(--r-pill); background:var(--accent-ink); }
 .ds-radio-group-item[*|data-state=on] .ds-radio-group-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
@@ -35,7 +35,7 @@
    ink. The words only name the button (`.ds-radio-group-name`, visually hidden). */
 .ds-radio-group[*|data-arrangement=swatches]{ flex-direction:row; flex-wrap:wrap; align-items:center; gap:var(--s-5); }
 .ds-radio-group-swatch{ display:block; flex:none; box-sizing:border-box; width:22px; height:22px; border-radius:var(--r-pill); border:2px solid transparent;
-  transition:border-color var(--t-quick) var(--e-in-out); }
+  transition:border-color var(--t-quick) var(--e-out); }
 .ds-radio-group-item[*|data-state=on] .ds-radio-group-swatch{ border-color:var(--ink); }
 .ds-radio-group-item[*|data-pressed] .ds-radio-group-swatch{ opacity:.8; }
 .ds-radio-group-name{ position:absolute; width:var(--hair); height:var(--hair); overflow:hidden; }

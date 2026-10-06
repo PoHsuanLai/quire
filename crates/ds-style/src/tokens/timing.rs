@@ -26,12 +26,12 @@ pub enum DurationKind {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "t-", kind = fixed, css = duration_css)]
 pub enum DurationToken {
-    /// `--t-quick` 150 ms: colour and opacity, closes, cross-fades, and every moving duration
+    /// `--t-quick` 120 ms: colour and opacity, closes, cross-fades, and every moving duration
     /// under Reduced.
     Quick,
-    /// `--t-move` 250 ms: small movement.
+    /// `--t-move` 200 ms: small movement.
     Move,
-    /// `--t-big` 400 ms: entrances and exits, and the Space colour cross-fade.
+    /// `--t-big` 280 ms: entrances and exits, and the Space colour cross-fade.
     Big,
     /// `--t-spin-step` 83 ms: one of the spinner's twelve spokes, a turn a second.
     /// [`DurationKind::Hold`]: the spinner keeps turning under Reduced.
@@ -97,9 +97,9 @@ impl DurationToken {
             return DurationToken::Quick.millis(MotionLevel::Standard);
         }
         match (self, level) {
-            (DurationToken::Quick, _) => 150,
-            (DurationToken::Move, _) => 250,
-            (DurationToken::Big, _) => 400,
+            (DurationToken::Quick, _) => 120,
+            (DurationToken::Move, _) => 200,
+            (DurationToken::Big, _) => 280,
             (DurationToken::SpinStep, _) => 83,
             (DurationToken::Turn, _) => 1000,
             (DurationToken::Shake, _) => 420,

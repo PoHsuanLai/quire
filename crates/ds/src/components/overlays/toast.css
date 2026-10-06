@@ -15,4 +15,4 @@
 .ds-toast-body{ min-width:0; overflow:hidden; }
 .ds-toast .ds-toast-action{ display:flex; align-items:center; gap:var(--s-6); background:var(--paper); color:var(--ink); border:0; border-radius:var(--r-pill);
   padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; cursor:default;
-  transition:background-color var(--t-quick) var(--e-in-out); }
+  transition:background-color var(--t-quick) var(--e-out); }

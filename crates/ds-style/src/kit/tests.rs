@@ -73,7 +73,7 @@ fn the_cascade_follows_rank_not_argument_order() {
 #[test]
 fn a_family_sits_at_its_place_whichever_kit_declares_it() {
     let sheet = Kits::of(&[&LATE, &EARLY]).stylesheet();
-    let at = positions(&sheet, &["--s-1:1px;", "--t-quick:150ms;"]);
+    let at = positions(&sheet, &["--s-1:1px;", "--t-quick:120ms;"]);
     assert!(at[0] < at[1], "{sheet}");
 }
 

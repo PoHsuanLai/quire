@@ -16,9 +16,9 @@ const MOMENTUM_PX_PER_S: i32 = 50;
 /// macOS).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum SpringResponse {
-    /// `--spring-quick` 300 ms: a knob, a selection indicator.
+    /// `--spring-quick` 260 ms: a knob, a selection indicator.
     Quick,
-    /// `--spring-move` 450 ms: a panel, a sheet, a card returning.
+    /// `--spring-move` 380 ms: a panel, a sheet, a card returning.
     #[default]
     Move,
 }
@@ -27,8 +27,8 @@ impl SpringResponse {
     /// The response.
     pub fn millis(self) -> Millis {
         match self {
-            SpringResponse::Quick => Millis(300),
-            SpringResponse::Move => Millis(450),
+            SpringResponse::Quick => Millis(260),
+            SpringResponse::Move => Millis(380),
         }
     }
 
@@ -155,13 +155,13 @@ mod tests {
         let quick = SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick);
         assert_eq!(
             quick.spring(0.0, MotionLevel::Standard).response(),
-            Millis(300)
+            Millis(260)
         );
         assert_eq!(
             SpringSpec::for_touch(Touch::Remote)
                 .spring(0.0, MotionLevel::Standard)
                 .response(),
-            Millis(450)
+            Millis(380)
         );
     }
 }

@@ -94,7 +94,7 @@ mod tests {
             "exit",
             EasingToken::Exit,
             MotionLevel::Standard,
-            [0, 19, 110, 382, 1000],
+            [0, 99, 325, 630, 1000],
         ),
         (
             "shake",

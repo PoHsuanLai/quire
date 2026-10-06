@@ -47,11 +47,9 @@ impl Anim {
             Anim::RowIn
             | Anim::SlideR
             | Anim::SlideL
-            | Anim::MenuIn
             | Anim::PeekIn
             | Anim::PeekFullIn
             | Anim::SheetIn
-            | Anim::PageIn
             | Anim::PaneInR
             | Anim::PaneInL
             | Anim::PaneInROut

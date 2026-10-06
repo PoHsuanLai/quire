@@ -43,8 +43,6 @@ pub enum Anim {
     SlideR,
     /// `slide-l`: Space switch back.
     SlideL,
-    /// `menu-in`: C's trigger-anchored menus.
-    MenuIn,
     /// `menu-out`: a menu closed by Escape or an outside click fades before it goes
     /// (design/13-BEHAVIOUR-menus-windows.md section 13.3.2, "fade on close"; bar gaps).
     MenuOut,
@@ -57,8 +55,6 @@ pub enum Anim {
     /// `fade` at `--t-quick`: the command palette's backdrop, and the fade in of a popover, a
     /// tooltip and a hover card (design/30 section 1.3).
     PaletteFade,
-    /// `page-in`: composer page, inline reply.
-    PageIn,
     /// `shake-x`: the To row with no recipient.
     ShakeX,
     /// `shake`: outbox needs sign-in (C).
@@ -144,19 +140,17 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 45] = [
+    pub const ALL: [Anim; 43] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
         Anim::SlideR,
         Anim::SlideL,
-        Anim::MenuIn,
         Anim::MenuOut,
         Anim::PeekIn,
         Anim::PeekFullIn,
         Anim::Fade,
         Anim::PaletteFade,
-        Anim::PageIn,
         Anim::ShakeX,
         Anim::Shake,
         Anim::FadeIn,
@@ -200,13 +194,11 @@ impl Anim {
             Anim::Heal => "a-heal",
             Anim::SlideR => "a-slide-r",
             Anim::SlideL => "a-slide-l",
-            Anim::MenuIn => "a-menu-in",
             Anim::MenuOut => "a-menu-out",
             Anim::PeekIn => "a-peek-in",
             Anim::PeekFullIn => "a-peek-full-in",
             Anim::Fade => "a-fade",
             Anim::PaletteFade => "a-palette-fade",
-            Anim::PageIn => "a-page-in",
             Anim::ShakeX => "a-shake-x",
             Anim::Shake => "a-shake",
             Anim::FadeIn => "a-fade-in",

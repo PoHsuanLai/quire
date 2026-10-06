@@ -11,7 +11,7 @@
 .ds-pin-tile{
   position:relative; display:grid; place-items:center; box-sizing:border-box; aspect-ratio:1; padding:0; border:0; border-radius:var(--r-tile);
   background:var(--f-pill-hover); color:var(--f-ink); font:inherit; cursor:default;
-  transition:background-color var(--t-quick) var(--e-in-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-pin-tile:hover{ background:var(--f-pill); }
 .ds-pin-tile[*|data-selected=true]{ background:var(--f-pill); box-shadow:var(--shadow-current); }
@@ -27,7 +27,7 @@
 .ds-pin-tile[*|data-face=add]:hover{ background:var(--f-pill-hover); }
 .ds-pin-tile[*|data-face=add] .ds-pin-tile-face{
   box-sizing:border-box; border-radius:var(--r-pill); color:var(--f-ink-faint); border:var(--hair) dashed var(--f-ink-faint);
-  transition:color var(--t-quick) var(--e-in-out), border-color var(--t-quick) var(--e-in-out);
+  transition:color var(--t-quick) var(--e-out), border-color var(--t-quick) var(--e-out);
 }
 .ds-pin-tile[*|data-face=add]:hover .ds-pin-tile-face{ color:var(--f-ink); border-color:var(--f-ink); }
 

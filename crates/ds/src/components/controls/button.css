@@ -13,8 +13,9 @@
   height:var(--btn-h); padding:0 var(--btn-pad); border:0; border-radius:var(--btn-r);
   font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
   background:transparent; color:var(--ink-soft);
-  transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out);
+  transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
+.ds-button[*|data-pressed]{ transition:none; }
 .ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
 .ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
 .ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }

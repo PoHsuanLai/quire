@@ -6,6 +6,6 @@
 
 .ds-peek{ position:absolute; inset:36px 12% 36px 12%; background:var(--surface-2); border-radius:var(--r-panel);
   box-shadow:var(--shadow-sheet); overflow:hidden; display:flex; flex-direction:column; pointer-events:auto;
-  animation:peek-in var(--t-big) var(--e-out); }
+  animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek[*|data-mode=full]{ inset:0; animation:peek-in var(--t-move) var(--e-out); }
 .ds-peek-tools{ display:flex; justify-content:flex-end; padding:var(--s-8) var(--s-10) 0; }

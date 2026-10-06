@@ -30,7 +30,7 @@
 .ds-level-indicator[*|data-style=discrete] .ds-level-indicator-rail{ height:auto; }
 .ds-level-indicator-segments{ display:flex; gap:var(--s-2); }
 .ds-level-indicator-segment{ flex:1; aspect-ratio:1; border-radius:var(--r-micro); background:var(--m-level-well); box-shadow:var(--m-level-shade);
-  transition:background-color var(--t-quick) var(--e-in-out); }
+  transition:background-color var(--t-quick) var(--e-out); }
 .ds-level-indicator-segment[*|data-on=on]{ background:var(--m-level-fill); box-shadow:none; }
 
 /* Bands: the fill (and each lit square) takes the band's ink. */

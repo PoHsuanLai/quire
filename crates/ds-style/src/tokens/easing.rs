@@ -44,7 +44,7 @@ impl EasingToken {
         const OUT: CubicBezier = CubicBezier([220, 900, 300, 1000]);
         Easing::Cubic(match self {
             EasingToken::Out => OUT,
-            EasingToken::Exit => CubicBezier([550, 0, 750, 200]),
+            EasingToken::Exit => CubicBezier([400, 0, 1000, 1000]),
             EasingToken::Shake => CubicBezier([360, 70, 190, 970]),
             EasingToken::Linear => return Easing::Linear,
             EasingToken::InOut => CubicBezier([420, 0, 580, 1000]),

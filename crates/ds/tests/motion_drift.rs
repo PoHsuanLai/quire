@@ -212,32 +212,32 @@ fn the_settle_table() {
     // design/05-MOTION.md section 7.1's worked values, index 0.
     #[rustfmt::skip]
     const CASES: &[(Anim, MotionLevel, u64)] = &[
-        (Anim::Heal, MotionLevel::Standard, 284),
-        (Anim::MenuOut, MotionLevel::Standard, 184),
-        (Anim::RowIn, MotionLevel::Standard, 284),
+        (Anim::Heal, MotionLevel::Standard, 234),
+        (Anim::MenuOut, MotionLevel::Standard, 154),
+        (Anim::RowIn, MotionLevel::Standard, 234),
         (Anim::Shake, MotionLevel::Standard, 454),
         // Wave 2 integration: the four recipe rows the overlays needed (section 5 rows 7, 26,
         // 37 and 64).
-        (Anim::PaletteFade, MotionLevel::Standard, 184),
-        (Anim::PeekFullIn, MotionLevel::Standard, 284),
+        (Anim::PaletteFade, MotionLevel::Standard, 154),
+        (Anim::PeekFullIn, MotionLevel::Standard, 234),
         // The four keyframes the catalogue had no motion for.
-        (Anim::FadeIn, MotionLevel::Standard, 284),
+        (Anim::FadeIn, MotionLevel::Standard, 234),
         // The pane switch, both panes at `--t-move`, so one timer settles the pair.
-        (Anim::PaneInR, MotionLevel::Standard, 284),
-        (Anim::PaneInL, MotionLevel::Standard, 284),
-        (Anim::PaneOutL, MotionLevel::Standard, 284),
-        (Anim::PaneOutR, MotionLevel::Standard, 284),
+        (Anim::PaneInR, MotionLevel::Standard, 234),
+        (Anim::PaneInL, MotionLevel::Standard, 234),
+        (Anim::PaneOutL, MotionLevel::Standard, 234),
+        (Anim::PaneOutR, MotionLevel::Standard, 234),
         // The OSD's entrance at --t-quick, its exit at --t-move (neither token moves
         // with the look's level but under Reduced).
-        (Anim::OsdOut, MotionLevel::Standard, 284),
+        (Anim::OsdOut, MotionLevel::Standard, 234),
         // The sheet's exit at --t-quick.
-        (Anim::SheetOut, MotionLevel::Standard, 184),
+        (Anim::SheetOut, MotionLevel::Standard, 154),
         // The banner's exit at --t-move, which only Reduced shortens.
         // The edge panel and the toast: in at --t-move, out at --t-quick; a sheet: in and
         // out at --t-quick (an alert and a sheet fade and scale).
-        (Anim::PanelIn, MotionLevel::Standard, 284),
-        (Anim::PanelOut, MotionLevel::Standard, 184),
-        (Anim::SheetIn, MotionLevel::Standard, 184),
+        (Anim::PanelIn, MotionLevel::Standard, 234),
+        (Anim::PanelOut, MotionLevel::Standard, 154),
+        (Anim::SheetIn, MotionLevel::Standard, 154),
         // The screenshot thumbnail slides in and out at --t-move.
     ];
     for &(anim, level, ms) in CASES {
@@ -247,11 +247,11 @@ fn the_settle_table() {
             "{anim:?} {level:?}"
         );
     }
-    // Every anim settles to 184 ms (`--t-quick` and a frame's slack) under Reduced.
+    // Every anim settles to 154 ms (`--t-quick` and a frame's slack) under Reduced.
     for anim in Anim::ALL {
         assert_eq!(
             settle(anim, MotionLevel::Reduced),
-            Duration::from_millis(184),
+            Duration::from_millis(154),
             "{anim:?} Reduced"
         );
     }

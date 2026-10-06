@@ -19,7 +19,7 @@
 .ds-stepper-up,
 .ds-stepper-down{
   display:grid; place-items:center; flex:1 1 0; min-height:0; line-height:0;
-  transition:background-color var(--t-quick) var(--e-in-out);
+  transition:background-color var(--t-quick) var(--e-out);
 }
 .ds-stepper-down{ border-top:var(--hair) solid var(--line); }
 .ds-stepper-up[*|data-pressed],

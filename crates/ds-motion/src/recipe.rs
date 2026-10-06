@@ -93,19 +93,11 @@ impl Anim {
                 Fill::None,
                 Iteration::Once,
             ),
-            // `C:1007`.
-            Anim::MenuIn => recipe(
-                "menu-in",
-                DurationToken::Move,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
             Anim::MenuOut => own::MENU_OUT,
             // `S:225`.
             Anim::PeekIn => recipe(
                 "peek-in",
-                DurationToken::Big,
+                DurationToken::Move,
                 EasingToken::Out,
                 Fill::None,
                 Iteration::Once,
@@ -130,14 +122,6 @@ impl Anim {
             Anim::PaletteFade => recipe(
                 "fade",
                 DurationToken::Quick,
-                EasingToken::Out,
-                Fill::None,
-                Iteration::Once,
-            ),
-            // `S:568`.
-            Anim::PageIn => recipe(
-                "page-in",
-                DurationToken::Big,
                 EasingToken::Out,
                 Fill::None,
                 Iteration::Once,

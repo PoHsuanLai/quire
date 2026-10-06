@@ -175,11 +175,11 @@ fn a_switch_during_a_slide_reverses_cleanly() {
         at_rest(harness)
     });
     // The switcher is a spring (`use_spring`), not a timer of `slide()`: redirected 60 ms into the
-    // first round, it rests 544 ms after the reversal on the virtual clock, exactly. The spring's
+    // first round, it rests 464 ms after the reversal on the virtual clock, exactly. The spring's
     // stiffness or the redirect changing moves it, and fails here.
     assert_eq!(
         rested.duration_since(reversal),
-        ms(544),
+        ms(464),
         "the reversal's spring rests this long after it was asked"
     );
     assert!(

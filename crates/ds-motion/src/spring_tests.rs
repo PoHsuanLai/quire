@@ -101,7 +101,7 @@ fn a_retarget_at_forty_percent_keeps_position_and_velocity() {
 #[test]
 fn every_spring_rests_within_a_second_and_a_half() {
     for damping in [Ratio::CRITICAL, Ratio::MOMENTUM] {
-        for response in [Millis(300), Millis(450)] {
+        for response in [Millis(260), Millis(380)] {
             for (from, v, to) in [
                 (0.0, 0.0, 100.0),
                 (0.0, 1500.0, 100.0),
