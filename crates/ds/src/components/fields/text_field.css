@@ -1,6 +1,6 @@
 /* TextField (design/30 section 2.2, `NSTextField`, `NSSecureTextField`, `NSSearchField`).
    Attribute selectors carry `*|` (spike S2). The root holds the field and the notes under it; the
-   frame is the bezel: the hairline, the ground and the accent ring, so a prefix, a search glyph,
+   frame is the bezel: the fill and the accent ring (no hairline, design/34 section 3.2), so a prefix, a search glyph,
    a clear button or a spinner sit inside it. Blitz's `:focus-within` is always false, so the
    component writes `data-focus=ring` on the root while its input has the caret and the ring is
    drawn from that. Sized by the ladder: `--tf-*` are set once per rung and every part reads them.
@@ -13,12 +13,13 @@
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this. */
 
 .ds-text-field{
-  --tf-h:var(--ctl-h-m); --tf-r:var(--ctl-r-m); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
+  --tf-h:var(--ctl-h-m); --tf-r:var(--r-field); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
+  --tf-ground:linear-gradient(var(--fill-btn), var(--fill-btn)), var(--surface);
   display:flex; flex-direction:column; gap:var(--s-2); min-width:0; text-align:start;
 }
-.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-r:var(--ctl-r-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-r:var(--ctl-r-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-r:var(--ctl-r-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
+.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
+.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
+.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
 
 /* The frame: the bezel. A field reads from its leading edge wherever it sits: a centred container
    (the polkit card's `text-align:center`) would centre the mask and the placeholder, which span
@@ -26,17 +27,16 @@
    `text-align` says, so the dots drew mid-field with the caret before them. */
 .ds-text-field-frame{ display:flex; align-items:center; gap:var(--s-4); min-width:0; text-align:start; }
 .ds-text-field[*|data-variant=bezeled] .ds-text-field-frame{
-  box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--tf-r);
-  transition:border-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+  box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--tf-ground); border:0; border-radius:var(--tf-r);
+  transition:box-shadow var(--t-quick) var(--e-in-out);
 }
-/* A bezeled search field is NSSearchField: a rounded field filled with the quaternary wash, its
-   hairline transparent (it keeps the box the ring needs), the magnifier in the secondary ink.
-   The ring below still draws on focus. A plain search field keeps its own row (further down). */
-.ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-frame{ background:var(--fill-quaternary); border-color:transparent; }
+/* A bezeled search field is NSSearchField: the same fill, the magnifier in the secondary ink.
+   A plain search field keeps its own row (further down). The fill is laid over `--surface`, so
+   the field is opaque (the secure mask below must repeat its ground exactly). */
 .ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-icon{ color:var(--ink-soft); }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
-.ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ border-color:var(--accent-text); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
-.ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ border-color:var(--danger); }
+.ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text), 0 0 0 var(--ring) var(--accent-soft); }
+.ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ box-shadow:inset 0 0 0 calc(var(--hair) * 1.5) var(--danger); }
 .ds-text-field-icon,
 .ds-text-field-suffix{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); line-height:0; }
 .ds-text-field-help{ font-size:var(--fs-help); color:var(--ink-faint); }
@@ -50,7 +50,7 @@
 
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--tf-fs); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=bezeled]{
-  height:calc(var(--tf-h) - 2 * var(--hair)); line-height:calc(var(--tf-h) - 2 * var(--hair));
+  height:var(--tf-h); line-height:var(--tf-h);
   background:transparent; border:0; padding:0;
 }
 /* The global keyboard ring must not double the field's own focus. */
@@ -61,7 +61,7 @@
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--tf-fs); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-placeholder{ line-height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-placeholder{ line-height:var(--tf-h); }
 
 /* A secure field (`data-kind=secure`): Blitz draws a password field's characters as typed, so the
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
@@ -93,10 +93,10 @@
    reaches, stays under it and only the dots' highlight shows. A Plain field's ground is its
    container's, which the mask cannot repeat: there Blitz's highlight shows beside the dots' when
    a range is selected. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:calc(var(--tf-h) - 2 * var(--hair)); background:var(--surface); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:var(--tf-h); background:var(--tf-ground); }
 /* Bezeled, the caret spans the field's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 1.21em) / 2); height:var(--tf-h); }
 
 /* Plain: the field takes the face of the text it edits. No box, border, padding or ground; font,
    size, weight, tracking, line height and colour are inherited, so a title or a property row's

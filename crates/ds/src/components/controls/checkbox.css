@@ -14,11 +14,11 @@
 
 .ds-checkbox-indicator{
   position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--cb); height:var(--cb);
-  border-radius:var(--r-micro); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1); color:var(--accent-ink);
+  border-radius:var(--r-micro); background:var(--raise); box-shadow:var(--shadow-edge), var(--shadow-1); color:var(--accent-ink);
   transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
 }
 .ds-checkbox[*|data-state=on] .ds-checkbox-indicator,
-.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
+.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:none; }
 .ds-checkbox[*|data-pressed] .ds-checkbox-indicator{ background:var(--surface); }
 .ds-checkbox[*|data-pressed][*|data-state=on] .ds-checkbox-indicator,
 .ds-checkbox[*|data-pressed][*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent-text); }

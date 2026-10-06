@@ -8,26 +8,27 @@
    section 13.3.3; busy keeps its spinner at full strength). */
 
 .ds-button{
-  --btn-h:var(--ctl-h-m); --btn-r:var(--ctl-r-m); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
+  --btn-h:var(--ctl-h-m); --btn-r:var(--r-btn); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
   display:inline-flex; align-items:center; justify-content:center; gap:var(--s-6); box-sizing:border-box; flex:none;
-  height:var(--btn-h); padding:0 var(--btn-pad); border:var(--hair) solid transparent; border-radius:var(--btn-r);
+  height:var(--btn-h); padding:0 var(--btn-pad); border:0; border-radius:var(--btn-r);
   font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
   background:transparent; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out);
 }
-.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-r:var(--ctl-r-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
-.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-r:var(--ctl-r-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
-.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-r:var(--ctl-r-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
+.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
+.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
+.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
 
-/* Push: a raised rounded rectangle with a line; a toggle button that is on is the pressed grey. */
-.ds-button[*|data-variant=push]{ background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=push]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--surface); box-shadow:none; }
-.ds-button[*|data-variant=push][*|data-state=on]{ color:var(--ink); background:var(--surface); box-shadow:none; }
+/* Push: a borderless rounded rectangle filled with the quaternary wash (design/34 section 3.1);
+   hover lifts the ink, pressed and a toggle that is on take the stronger wash. */
+.ds-button[*|data-variant=push]{ background:var(--fill-btn); }
+.ds-button[*|data-variant=push]:hover{ color:var(--ink); }
+.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--fill); }
+.ds-button[*|data-variant=push][*|data-state=on]{ color:var(--ink); background:var(--fill); }
 /* The default button answers Return and takes the accent; a pressed one darkens. */
-.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); }
 .ds-button[*|data-variant=push][*|data-answers=return]:hover{ background:var(--accent); color:var(--accent-ink); }
-.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); }
 /* Destructive: red under the pointer; a destructive default button is red at rest. */
 .ds-button[*|data-variant=push][*|data-role=destructive]:hover{ background:var(--danger-wash); color:var(--danger); }
 .ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]{ background:var(--danger); color:var(--danger-ink); }
@@ -35,24 +36,24 @@
 
 /* Toolbar: no bezel at rest, a fill under the pointer and while pressed or open. */
 .ds-button[*|data-variant=toolbar]{ color:var(--ink-faint); }
-.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--surface); }
+.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--fill-btn); }
 .ds-button[*|data-variant=toolbar][*|data-pressed],
 .ds-button[*|data-variant=toolbar][*|data-state=on],
-.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--fill); }
 .ds-button[*|data-variant=toolbar][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 /* An image-only button is a square of the rung's height. */
 .ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; }
 
 /* Inline: words with no bezel; the quiet link-button. */
 .ds-button[*|data-variant=inline]{ color:var(--ink-faint); padding:0 var(--s-4); font-weight:var(--ctl-fw-m); }
-.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--fill-btn); }
+.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--fill); }
 .ds-button[*|data-variant=inline][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 
-/* Help: a round bezel, the question mark drawn from the label's first letter. */
-.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=help]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--surface); box-shadow:none; }
+/* Help: a round filled bezel, the question mark drawn from the label's first letter. */
+.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--fill-btn); }
+.ds-button[*|data-variant=help]:hover{ color:var(--ink); }
+.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--fill); }
 
 /* The frame draws a toolbar or inline button in its own inks (`data-ground=frame` remaps them). */
 
@@ -78,6 +79,6 @@
 .ds-button[*|data-busy=turn-icon][*|aria-busy=true] > .ds-button-icon{ opacity:1; }
 /* The busy spinner of a default button reads on the accent fill: its spokes take the ink. */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-busy=true] .ds-progress-indicator{ background:var(--accent-ink); }
-/* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
+/* A disabled default button keeps its accent edge (an inset ring, no border box): the fill at .35 is barely apart from a
    disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
-.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
+.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }

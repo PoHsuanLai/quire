@@ -536,26 +536,27 @@ html,body{margin:0;padding:0;background:transparent}
    section 13.3.3; busy keeps its spinner at full strength). */
 
 .ds-button{
-  --btn-h:var(--ctl-h-m); --btn-r:var(--ctl-r-m); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
+  --btn-h:var(--ctl-h-m); --btn-r:var(--r-btn); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
   display:inline-flex; align-items:center; justify-content:center; gap:var(--s-6); box-sizing:border-box; flex:none;
-  height:var(--btn-h); padding:0 var(--btn-pad); border:var(--hair) solid transparent; border-radius:var(--btn-r);
+  height:var(--btn-h); padding:0 var(--btn-pad); border:0; border-radius:var(--btn-r);
   font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
   background:transparent; color:var(--ink-soft);
   transition:background-color var(--t-quick) var(--e-in-out), color var(--t-quick) var(--e-in-out);
 }
-.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-r:var(--ctl-r-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
-.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-r:var(--ctl-r-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
-.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-r:var(--ctl-r-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
+.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
+.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
+.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
 
-/* Push: a raised rounded rectangle with a line; a toggle button that is on is the pressed grey. */
-.ds-button[*|data-variant=push]{ background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=push]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--surface); box-shadow:none; }
-.ds-button[*|data-variant=push][*|data-state=on]{ color:var(--ink); background:var(--surface); box-shadow:none; }
+/* Push: a borderless rounded rectangle filled with the quaternary wash (design/34 section 3.1);
+   hover lifts the ink, pressed and a toggle that is on take the stronger wash. */
+.ds-button[*|data-variant=push]{ background:var(--fill-btn); }
+.ds-button[*|data-variant=push]:hover{ color:var(--ink); }
+.ds-button[*|data-variant=push][*|data-pressed]{ background:var(--fill); }
+.ds-button[*|data-variant=push][*|data-state=on]{ color:var(--ink); background:var(--fill); }
 /* The default button answers Return and takes the accent; a pressed one darkens. */
-.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); border-color:transparent; }
+.ds-button[*|data-variant=push][*|data-answers=return]{ background:var(--accent); color:var(--accent-ink); }
 .ds-button[*|data-variant=push][*|data-answers=return]:hover{ background:var(--accent); color:var(--accent-ink); }
-.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); box-shadow:var(--shadow-1); }
+.ds-button[*|data-variant=push][*|data-answers=return][*|data-pressed]{ background:var(--accent-text); }
 /* Destructive: red under the pointer; a destructive default button is red at rest. */
 .ds-button[*|data-variant=push][*|data-role=destructive]:hover{ background:var(--danger-wash); color:var(--danger); }
 .ds-button[*|data-variant=push][*|data-role=destructive][*|data-answers=return]{ background:var(--danger); color:var(--danger-ink); }
@@ -563,24 +564,24 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Toolbar: no bezel at rest, a fill under the pointer and while pressed or open. */
 .ds-button[*|data-variant=toolbar]{ color:var(--ink-faint); }
-.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--surface); }
+.ds-button[*|data-variant=toolbar]:hover{ color:var(--ink); background:var(--fill-btn); }
 .ds-button[*|data-variant=toolbar][*|data-pressed],
 .ds-button[*|data-variant=toolbar][*|data-state=on],
-.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--fill); }
 .ds-button[*|data-variant=toolbar][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 /* An image-only button is a square of the rung's height. */
 .ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; }
 
 /* Inline: words with no bezel; the quiet link-button. */
 .ds-button[*|data-variant=inline]{ color:var(--ink-faint); padding:0 var(--s-4); font-weight:var(--ctl-fw-m); }
-.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--surface); }
-.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--surface-2); }
+.ds-button[*|data-variant=inline]:hover{ color:var(--ink); background:var(--fill-btn); }
+.ds-button[*|data-variant=inline][*|data-pressed]{ color:var(--ink); background:var(--fill); }
 .ds-button[*|data-variant=inline][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 
-/* Help: a round bezel, the question mark drawn from the label's first letter. */
-.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--surface-2); border-color:var(--line); box-shadow:var(--shadow-1); }
-.ds-button[*|data-variant=help]:hover{ color:var(--ink); background:var(--raise); }
-.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--surface); box-shadow:none; }
+/* Help: a round filled bezel, the question mark drawn from the label's first letter. */
+.ds-button[*|data-variant=help]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); background:var(--fill-btn); }
+.ds-button[*|data-variant=help]:hover{ color:var(--ink); }
+.ds-button[*|data-variant=help][*|data-pressed]{ background:var(--fill); }
 
 /* The frame draws a toolbar or inline button in its own inks (`data-ground=frame` remaps them). */
 
@@ -606,9 +607,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-button[*|data-busy=turn-icon][*|aria-busy=true] > .ds-button-icon{ opacity:1; }
 /* The busy spinner of a default button reads on the accent fill: its spokes take the ink. */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-busy=true] .ds-progress-indicator{ background:var(--accent-ink); }
-/* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a
+/* A disabled default button keeps its accent edge (an inset ring, no border box): the fill at .35 is barely apart from a
    disabled plain button (design/03-COLOR.md section 20.4: no state on the fill's colour alone). */
-.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ border-color:var(--accent-text); }
+.ds-button[*|data-variant=push][*|data-answers=return][*|aria-disabled=true]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 /* -- capsule -- */
 /* Capsule (design/30 section 2.7a): the pill of controls over content. Its scope is a transparent
    Osd scope that fills its parent and takes no pointer; the capsule stands at the scope's bottom
@@ -652,11 +653,11 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-checkbox-indicator{
   position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--cb); height:var(--cb);
-  border-radius:var(--r-micro); background:var(--raise); box-shadow:inset 0 0 0 var(--hair) var(--line), var(--shadow-1); color:var(--accent-ink);
+  border-radius:var(--r-micro); background:var(--raise); box-shadow:var(--shadow-edge), var(--shadow-1); color:var(--accent-ink);
   transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
 }
 .ds-checkbox[*|data-state=on] .ds-checkbox-indicator,
-.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
+.ds-checkbox[*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent); box-shadow:none; }
 .ds-checkbox[*|data-pressed] .ds-checkbox-indicator{ background:var(--surface); }
 .ds-checkbox[*|data-pressed][*|data-state=on] .ds-checkbox-indicator,
 .ds-checkbox[*|data-pressed][*|data-state=mixed] .ds-checkbox-indicator{ background:var(--accent-text); }
@@ -1202,7 +1203,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-menu{ width:auto; min-width:186px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
-.ds-popover.ds-menu{ border-radius:var(--r-shell-menu); box-shadow:var(--shadow-2); }
+.ds-popover.ds-menu{ border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
 
 /* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no surface (no
@@ -1224,7 +1225,7 @@ html,body{margin:0;padding:0;background:transparent}
    there is no hover rule. Attribute selectors carry `*|` (spike S2). */
 
 .ds-menu-item{
-  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
+  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-menu-item);
   font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
 }
 .ds-menu-state{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink); }
@@ -1430,7 +1431,7 @@ html,body{margin:0;padding:0;background:transparent}
    pointer through, carries the layer's `--z-*`, and is what placement measures as its bounds.
    A layer closed by an outside click lays a catcher under its surface. Radii and shadows per
    elevation: a popover is `--r-panel` with `--shadow-pop`; the menu, the hover card and the tip
-   card use the same surface (the menu's `data-elevation` is kept for it); every surface is `--raise` with a 1px `--line`. */
+   card use the same surface (the menu's `data-elevation` is kept for it); every surface is `--raise`; `--shadow-pop` draws its half-pixel edge, so there is no border. */
 
 .ds-overlay{ position:absolute; inset:0; pointer-events:none; }
 .ds-overlay[*|data-layer=toast]{ z-index:var(--z-toast); }
@@ -1449,7 +1450,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-extent=popup] .ds-overlay > .ds-popover:not([*|data-depth]){ position:static; }
 .ds[*|data-extent=popup] .ds-overlay-catch{ display:none; }
 
-.ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
+.ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:0;
   border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }
 
 /* A popover (`data-dismiss` says what closes it): `--r-panel`, fading in over `--t-quick` and,
@@ -2301,7 +2302,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- text_field -- */
 /* TextField (design/30 section 2.2, `NSTextField`, `NSSecureTextField`, `NSSearchField`).
    Attribute selectors carry `*|` (spike S2). The root holds the field and the notes under it; the
-   frame is the bezel: the hairline, the ground and the accent ring, so a prefix, a search glyph,
+   frame is the bezel: the fill and the accent ring (no hairline, design/34 section 3.2), so a prefix, a search glyph,
    a clear button or a spinner sit inside it. Blitz's `:focus-within` is always false, so the
    component writes `data-focus=ring` on the root while its input has the caret and the ring is
    drawn from that. Sized by the ladder: `--tf-*` are set once per rung and every part reads them.
@@ -2314,12 +2315,13 @@ html,body{margin:0;padding:0;background:transparent}
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this. */
 
 .ds-text-field{
-  --tf-h:var(--ctl-h-m); --tf-r:var(--ctl-r-m); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
+  --tf-h:var(--ctl-h-m); --tf-r:var(--r-field); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
+  --tf-ground:linear-gradient(var(--fill-btn), var(--fill-btn)), var(--surface);
   display:flex; flex-direction:column; gap:var(--s-2); min-width:0; text-align:start;
 }
-.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-r:var(--ctl-r-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-r:var(--ctl-r-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-r:var(--ctl-r-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
+.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
+.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
+.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
 
 /* The frame: the bezel. A field reads from its leading edge wherever it sits: a centred container
    (the polkit card's `text-align:center`) would centre the mask and the placeholder, which span
@@ -2327,17 +2329,16 @@ html,body{margin:0;padding:0;background:transparent}
    `text-align` says, so the dots drew mid-field with the caret before them. */
 .ds-text-field-frame{ display:flex; align-items:center; gap:var(--s-4); min-width:0; text-align:start; }
 .ds-text-field[*|data-variant=bezeled] .ds-text-field-frame{
-  box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--surface); border:var(--hair) solid var(--line); border-radius:var(--tf-r);
-  transition:border-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+  box-sizing:border-box; height:var(--tf-h); padding:0 var(--tf-pad); background:var(--tf-ground); border:0; border-radius:var(--tf-r);
+  transition:box-shadow var(--t-quick) var(--e-in-out);
 }
-/* A bezeled search field is NSSearchField: a rounded field filled with the quaternary wash, its
-   hairline transparent (it keeps the box the ring needs), the magnifier in the secondary ink.
-   The ring below still draws on focus. A plain search field keeps its own row (further down). */
-.ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-frame{ background:var(--fill-quaternary); border-color:transparent; }
+/* A bezeled search field is NSSearchField: the same fill, the magnifier in the secondary ink.
+   A plain search field keeps its own row (further down). The fill is laid over `--surface`, so
+   the field is opaque (the secure mask below must repeat its ground exactly). */
 .ds-text-field[*|data-kind=search][*|data-variant=bezeled] .ds-text-field-icon{ color:var(--ink-soft); }
 /* Any focus, not only keyboard focus: the plan's accent ring. */
-.ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ border-color:var(--accent-text); box-shadow:0 0 0 var(--ring) var(--accent-soft); }
-.ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ border-color:var(--danger); }
+.ds-text-field[*|data-variant=bezeled][*|data-focus=ring] .ds-text-field-frame{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text), 0 0 0 var(--ring) var(--accent-soft); }
+.ds-text-field[*|data-validity=invalid][*|data-variant=bezeled] .ds-text-field-frame{ box-shadow:inset 0 0 0 calc(var(--hair) * 1.5) var(--danger); }
 .ds-text-field-icon,
 .ds-text-field-suffix{ display:inline-flex; align-items:center; flex:none; color:var(--ink-faint); line-height:0; }
 .ds-text-field-help{ font-size:var(--fs-help); color:var(--ink-faint); }
@@ -2351,7 +2352,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-input{ width:100%; min-width:0; outline:none; font-size:var(--tf-fs); line-height:1.55; color:var(--ink); }
 .ds-input[*|data-variant=bezeled]{
-  height:calc(var(--tf-h) - 2 * var(--hair)); line-height:calc(var(--tf-h) - 2 * var(--hair));
+  height:var(--tf-h); line-height:var(--tf-h);
   background:transparent; border:0; padding:0;
 }
 /* The global keyboard ring must not double the field's own focus. */
@@ -2362,7 +2363,7 @@ html,body{margin:0;padding:0;background:transparent}
   position:absolute; left:0; top:0; pointer-events:none; white-space:nowrap;
   font:inherit; font-size:var(--tf-fs); line-height:1.55; color:var(--ink-faint);
 }
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-placeholder{ line-height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-placeholder{ line-height:var(--tf-h); }
 
 /* A secure field (`data-kind=secure`): Blitz draws a password field's characters as typed, so the
    field's own text is transparent (the caret keeps the ink) and `.ds-input-mask` lays one dot
@@ -2394,10 +2395,10 @@ html,body{margin:0;padding:0;background:transparent}
    reaches, stays under it and only the dots' highlight shows. A Plain field's ground is its
    container's, which the mask cannot repeat: there Blitz's highlight shows beside the dots' when
    a range is selected. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:calc(var(--tf-h) - 2 * var(--hair)); background:var(--surface); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:var(--tf-h); background:var(--tf-ground); }
 /* Bezeled, the caret spans the field's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 2 * var(--hair) - 1.21em) / 2); height:calc(var(--tf-h) - 2 * var(--hair)); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 1.21em) / 2); height:var(--tf-h); }
 
 /* Plain: the field takes the face of the text it edits. No box, border, padding or ground; font,
    size, weight, tracking, line height and colour are inherited, so a title or a property row's
@@ -2551,16 +2552,16 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-toggle-track{
   display:flex; align-items:center; box-sizing:border-box; width:100%; height:100%; padding:0 var(--knob-inset);
-  border-radius:var(--sw-r); background:var(--surface-2); box-shadow:inset 0 0 0 var(--hair) var(--line);
-  transition:background-color var(--t-quick) var(--e-in-out), box-shadow var(--t-quick) var(--e-in-out);
+  border-radius:var(--sw-r); background:var(--fill);
+  transition:background-color var(--t-quick) var(--e-in-out);
 }
 .ds-toggle-indicator{
   display:block; flex:none; width:var(--sw-knob); height:var(--sw-knob);
   border-radius:var(--r-pill); background:var(--knob-fill); box-shadow:var(--shadow-1);
   transform:translateX(calc(var(--knob-x) * 1px));
 }
-.ds-toggle[*|aria-checked=true] .ds-toggle-track{ background:var(--accent); box-shadow:inset 0 0 0 var(--hair) transparent; }
-.ds-toggle[*|data-pressed] .ds-toggle-track{ background:var(--surface); }
+.ds-toggle[*|aria-checked=true] .ds-toggle-track{ background:var(--accent); }
+.ds-toggle[*|data-pressed] .ds-toggle-track{ background:var(--line); }
 .ds-toggle[*|data-pressed][*|aria-checked=true] .ds-toggle-track{ background:var(--accent-text); }
 .ds-toggle[*|aria-disabled=true],
 .ds-toggle[*|aria-busy=true]{ opacity:.35; pointer-events:none; }
