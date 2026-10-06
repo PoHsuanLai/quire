@@ -6,6 +6,7 @@
 
 pub mod attrs;
 pub mod effect;
+#[cfg(feature = "dioxus")]
 pub mod pose;
 pub mod route;
 pub mod timing;

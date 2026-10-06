@@ -26,6 +26,7 @@ pub(crate) mod geometry_control;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
+#[cfg(any(test, feature = "dioxus"))]
 pub(crate) mod length;
 pub mod parts;
 pub(crate) mod plate;
