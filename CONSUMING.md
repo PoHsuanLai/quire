@@ -630,7 +630,14 @@ rsx! {
 }
 ```
 
-`ThreadRow` is the mail-only row (`ds::components::app`), built on `Row`. Everything else that lists uses `List`
+`ThreadRow` is the mail-only row (`ds::components::app`), built on `Row`. Its `more` slot holds one
+quiet trailing action in flow beside the tags, never over the time: `more: rsx! { RowMore { expanded,
+onclick: move |rect: Rect| open_menu_at(rect) } }` (`ds::components::app::row_more`; a 26 px icon-only
+`Icon::Ellipsis` button labelled "More actions", shown on row hover, focus, `shown` or while `expanded`
+is `Shown::Visible`, which the caller owns). `strip` is the older raised pill and still works. A card
+row's height is `thread_card_height(ThreadLines::Two | Three)` (`ds::components::app::thread_height`,
+the row's own box from the same tokens as its CSS, at scale 1) and the gap below it is
+`thread_card_gap()`, so a `VirtualList`'s pitch is their sum. Everything else that lists uses `List`
 of `Row`s: `Row { leading: RowLeading::Icon(..), title, detail, accessory: Accessory::Chevron,
 state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, onclick }`, where
 `Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`

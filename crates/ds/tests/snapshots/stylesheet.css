@@ -1736,6 +1736,26 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* A palette group's Show More brings the rows it added in as inserted rows come. */
 .ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
+/* -- row_more -- */
+/* RowMore: the quiet "More actions" button in a row's tail (`ThreadRow`'s `more` slot). Icon only:
+   no pill, border or shadow, the glyph faint and lifting to the full ink on its own hover. It sits
+   in flow, so it can never cover the time or the text; the negative block margins let its 26 px
+   hit box reach into the tail's gap and the row's padding without making the row taller.
+   Reveal as HoverStrip's: hidden (but laid out, so nothing reflows) until the row is hovered, the
+   button holds the focus (Blitz never matches `:focus-within`, spike S12, so the button's own
+   `:focus` stands in), the caller says `data-shown=visible`, or its menu is open. Focus ring: the
+   global `.ds[*|data-modality=keyboard] :focus` rule. */
+
+.ds-row-more{
+  display:inline-flex; align-items:center; justify-content:center; box-sizing:border-box; flex:none;
+  width:26px; height:26px; margin:calc(-1 * var(--s-5)) 0; padding:0; border:0; border-radius:var(--r-pill);
+  background:transparent; box-shadow:none; color:var(--ink-faint); cursor:default;
+  opacity:0; pointer-events:none;
+  transition:opacity var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
+}
+.ds-row-more:hover{ color:var(--ink); }
+.ds-row:hover .ds-row-more, .ds-row-more:focus, .ds-row-more[*|aria-expanded=true], .ds-row-more[*|data-shown=visible]{ opacity:1; pointer-events:auto; }
+.ds-row:hover .ds-row-more[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
 /* -- scrim -- */
 /* The peek's scrim (design/04-COMPONENTS.md section 24), verbatim `S:221-222`: it covers the
    overlay, dims with `--scrim` and fades in; a click closes. Hover is not specified; the focus

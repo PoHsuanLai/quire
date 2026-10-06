@@ -1,5 +1,6 @@
 //! ThreadRow: a mail row's content in a `Row` (design/30 section 2.11, mail content inside `Row`):
-//! a dot, the sender's name and via, subject, snippet, time, tags, star and a hover-strip slot.
+//! a dot, the sender's name and via, subject, snippet, time, tags, star, a trailing `more`
+//! action and a hover-strip slot.
 
 use crate::components::app::thread_row_hooks::{PartHooks, use_back};
 use crate::components::app::thread_row_star::star_button;
@@ -57,6 +58,11 @@ impl NameFit {
 /// while something dragged over it would land on it). Its entrance, exit and heal are the
 /// enclosing `List`'s. `onclick` receives the press, so the caller can read Shift to peek.
 ///
+/// `more` is one trailing action (a [`RowMore`](crate::components::app::row_more::RowMore)) laid
+/// out in flow beside the tags in the tail, under the time: it can never cover the time or the
+/// text. `strip` is the older raised pill, absolutely placed over the row's right edge; the two
+/// are independent. The row's height is [`thread_card_height`](crate::components::app::thread_height::thread_card_height), whichever slots it carries.
+///
 /// `subject` and `snippet` are [`TextLine`]: a string, or the runs a search hit marked.
 /// `on_sender` and `on_time` hear the pointer entering and leaving the name and the time (their
 /// own hover cards); `onpointerenter`, `onpointerleave` and `onpointerdown` hear the row itself
@@ -75,6 +81,7 @@ pub fn ThreadRow(
     tags: Element,
     star: Option<(Check, EventHandler<Check>)>,
     strip: Option<Element>,
+    more: Option<Element>,
     onclick: EventHandler<Press>,
     #[props(default)] on_sender: Option<PartHooks>,
     #[props(default)] on_time: Option<PartHooks>,
@@ -114,7 +121,12 @@ pub fn ThreadRow(
                     onpointerleave: back.part_leave(on_time),
                     "{time}"
                 }
-                span { class: "ds-thread-tags", {tags} }
+                span { class: "ds-thread-tags",
+                    {tags}
+                    if let Some(more) = more {
+                        {more}
+                    }
+                }
             }
             if let Some((state, onchange)) = star {
                 {star_button(state, onchange)}

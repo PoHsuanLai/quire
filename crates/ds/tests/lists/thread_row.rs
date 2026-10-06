@@ -6,6 +6,7 @@ use crate::cases::Case;
 use crate::rows::strip_actions;
 use dioxus::prelude::*;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, Titles};
+use ds::components::app::row_more::RowMore;
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::content::text_runs::RunTone;
 use ds::prelude::*;
@@ -24,6 +25,16 @@ fn marked_subject() -> TextLine {
 
 /// A read row carrying `strip`, its subject and snippet marked.
 fn row_with(strip: Option<Element>) -> Element {
+    row_slots(strip, None)
+}
+
+/// A row with the quiet `more` button, its menu open or not, and a tag beside it.
+fn row_more(expanded: Shown) -> Element {
+    row_slots(None, Some(rsx! { RowMore { expanded, onclick: |_| {} } }))
+}
+
+/// A read row carrying `strip` and `more`, its subject and snippet marked.
+fn row_slots(strip: Option<Element>, more: Option<Element>) -> Element {
     rsx! {
         ThreadRow {
             state: RowState { selection: Selection::Selected, emphasis: Emphasis::Plain, ..RowState::default() },
@@ -39,6 +50,7 @@ fn row_with(strip: Option<Element>) -> Element {
             tags: rsx! {},
             star: None,
             strip,
+            more,
             onclick: |_| {},
             common: Common { aria_label: Some("Open Re: UIDL stability across servers".to_string()), ..Common::default() },
         }
@@ -70,6 +82,26 @@ pub const THREAD_ROW_CASES: &[Case] = &[
         component: "thread_row",
         state: "strip-shown-by-caller",
         make: || row_with(Some(caller_strip(Shown::Visible))),
+    },
+    Case {
+        component: "thread_row",
+        state: "more-collapsed",
+        make: || row_more(Shown::Hidden),
+    },
+    Case {
+        component: "thread_row",
+        state: "more-expanded",
+        make: || row_more(Shown::Visible),
+    },
+    Case {
+        component: "row_more",
+        state: "alone",
+        make: || rsx! { RowMore { onclick: |_| {} } },
+    },
+    Case {
+        component: "row_more",
+        state: "labelled-shown",
+        make: || rsx! { RowMore { label: "Actions for this thread", shown: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         component: "hover_strip",

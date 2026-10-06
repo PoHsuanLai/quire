@@ -6,6 +6,7 @@ use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::row_more::RowMore;
 use ds::components::app::thread_row::ThreadRow;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::button_model::Bezel;
@@ -94,6 +95,7 @@ impl ThreadId {
 pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
+        crate::pages::lists::strip::MoreButton {}
         Grouped {}
         crate::pages::lists::rows::RowGallery {}
         crate::pages::lists::headers::HeaderGallery {}
@@ -228,6 +230,12 @@ fn ThreadLine(
             },
             star: (star, EventHandler::new(move |state| onstar.call((id, state)))),
             strip: rsx! { HoverStrip { actions: strip_actions() } },
+            more: rsx! {
+                RowMore {
+                    shown: (selection == Selection::Selected).then_some(Shown::Visible),
+                    onclick: |_| {},
+                }
+            },
             onclick: move |_| onselect.call(id),
         }
     }

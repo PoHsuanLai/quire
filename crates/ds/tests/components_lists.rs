@@ -86,6 +86,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
             "row",
             "list",
             "hover_strip",
+            "row_more",
             "button",
             "provider_mark",
             "chip",
@@ -122,6 +123,7 @@ fn sheets(component: &str) -> Vec<&'static str> {
         ],
         "pin_tile" => &["pin_tile", "avatar", "provider_mark", "badge"],
         "hover_strip" => &["hover_strip", "icon_button"],
+        "row_more" => &["row_more"],
         "drag" => &["drag_ghost"],
         other => return sheet(other).into_iter().collect(),
     };

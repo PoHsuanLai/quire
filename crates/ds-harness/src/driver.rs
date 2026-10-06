@@ -94,6 +94,15 @@ pub trait Query: DocQuery {
         })
     }
 
+    /// The computed `opacity` of the first element matching `selector`, itself only: an
+    /// ancestor's opacity is not folded in.
+    fn opacity_of(&self, selector: &str) -> Option<f32> {
+        self.with_doc(|doc| {
+            let styles = doc.get_node(first(doc, selector)?)?.primary_styles()?;
+            Some(styles.clone_opacity())
+        })
+    }
+
     /// The computed `background-color` of the first element matching `selector`, or of its
     /// `::before` when `part` says so.
     fn fill_of(&self, selector: &str, part: Part) -> Option<Srgba> {
