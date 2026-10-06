@@ -60,7 +60,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// the leading slot, faded in over `--t-quick`.
 ///
 /// `answers` says which window key the button answers (see [`Answers`]): a dialog that wants
-/// Return and Escape to press it routes them itself ([`Sheet`](crate::components::overlays::sheet::Sheet)'s
+/// Return and Escape to press it routes them itself (a sheet's
 /// `on_return`, an alert's own keys). `focus: ButtonFocus::OnMount` gives it the keyboard as it
 /// mounts. A caller-controlled disabled state is `availability`.
 ///
