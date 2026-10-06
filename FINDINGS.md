@@ -1017,7 +1017,11 @@ on a machine other builds were also using, so about +-10 ms).
   moving right, the opposite of the web's `deltaX`), multiplies a line by 20 px only for its own
   scrolling, targets the hover node (set only by a pointer move), and carries no scroll phase, so
   a touchpad gesture's end is a quiet spell (`DelayToken::SwipeQuiet`, 120 ms).
-  `Harness::wheel` moves the pointer first.
+  `Harness::wheel` moves the pointer first. A `ds_blitz` window does not leave its containers to
+  that scroll: its loop gives each winit event to `window_scroll` first, which takes the wheel
+  for the shared engine (`blitz_kit::scroll`, 60 px a detent, eased) and hands Blitz only a wheel
+  over a `data-wheel="capture"` element; `Harness::wheel` stays the raw one, `Input::detents`
+  the engine's.
 - **No pointer capture in Blitz**: a drag that leaves an element is noticed at the next move with
   no button down. The window hook hears winit's pointer events first, so `use_pointer_capture` asks
   the host to route every move and the primary release to one element until the button comes up
@@ -1030,10 +1034,16 @@ on a machine other builds were also using, so about +-10 ms).
   its own state would read them one render late; `MachineRef::set_params` sets them before a send.
 - **Phased wheel and pinch come from winit, not Blitz.** `WindowEvent::MouseWheel` carries a
   `TouchPhase` and `WindowEvent::PinchGesture` exists on Wayland and macOS; Blitz forwards neither
-  to the document, but the window hook sees both before it, so `ds-blitz` publishes them as
-  `Gesture`s on a per-window `GestureBus` (`use_gestures`). No change to the Blitz fork. A gesture
+  to the document, but the window sees both before it, so `ds-blitz` publishes them as
+  `Gesture`s on a per-window `GestureBus` (`use_gestures`): the wheel from `window_scroll` (which
+  also scrolls with it, and may ease its detents for listeners that ask,
+  `WheelDelivery::Eased`), the pinch from the window hook. No change to the Blitz fork. A gesture
   is not addressed to an element; the listener checks the pointer is over it. The pointer's place
-  is the last `PointerMoved` the window saw.
+  is the last `PointerMoved` the window saw. winit on Wayland ends a touchpad scroll with
+  `TouchPhase::Ended` (from `axis_stop`) and gives a wheel only `Moved`, in `LineDelta`
+  (`value120 / 120`). It delivers no momentum on Linux, so the glide after a flick is the engine's
+  (macOS's own momentum arrives as a further `Started` to `Ended` run, so a macOS window would
+  glide twice).
 
 ### Scrolling
 
@@ -1042,6 +1052,11 @@ on a machine other builds were also using, so about +-10 ms).
   Chromium-like: 10 px, 32 px minimum, 500 ms fade delay, 200 ms fade). Every ds scroll container
   sets it.
 - **A scroll does not relayout**: wheel plus style and layout is 0.03 to 0.1 ms p50.
+- **A `ds-blitz` window paints no overlay thumb** (design/11 §11.3.12): the engine writes raw
+  offsets, which Blitz's own scrollbar never reacts to, and the pinned blitz-dom builds without
+  its `scrollbars` feature anyway, so an app window has shown none before and after the shared
+  engine. Open: the thumb's paint and fade (`shell-host/src/scroll/{indicator,paint}`) would move
+  into `blitz-kit` for a `ds-blitz` window to draw it too.
 
 ## Motion and timing
 

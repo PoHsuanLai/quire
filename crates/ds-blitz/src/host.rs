@@ -38,12 +38,12 @@ use crate::blitz_host::{Provided, Wiring};
 use crate::click_focus::FocusFallback;
 use crate::clipboard::{Clipboard, System};
 use crate::edit_ime::{EditListeners, ime_of};
-use crate::edit_window::{captured_of, modifiers_of};
+use crate::edit_window::captured_of;
 use crate::focus_keep::{FocusKeeper, keep};
 use crate::frame_book::FrameBook;
 use crate::frame_hover::report;
 use crate::frame_links::{frame_links, read_link};
-use crate::gesture_window::{gesture_of, pointer_at};
+use crate::gesture_window::pinch_of;
 use crate::install::install;
 use crate::node_ref::DocRef;
 use crate::phase::Phase;
@@ -55,6 +55,7 @@ use crate::window_build::WindowSlot;
 use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
 use crate::window_requests::Root;
+use crate::window_scroll::{ScrollHandle, WindowScroll};
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
 use dioxus::core::Runtime;
@@ -66,7 +67,6 @@ use dioxus_native::{use_window, use_window_event};
 use dioxus_native_dom::NodeHandle;
 use ds::base::vocab::{Activity, InputModality};
 use ds::file_drop::board::FileDropBoard;
-use ds::host::gesture::GestureBus;
 use ds::host::resized::WindowResized;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
@@ -166,21 +166,22 @@ pub(crate) fn Host(props: HostProps) -> Element {
         use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
     };
     let seen = Rc::clone(&document);
-    let held = use_hook(|| Rc::new(std::cell::Cell::new(keyboard_types::Modifiers::empty())));
+    // The window loop gives every event to the same scrolling before the document hears it, so
+    // the pointer and the modifiers it reads are current for the event the hook hears.
+    let scroll = use_hook(consume_context::<WindowScroll>);
     let book = use_hook(FrameBook::new);
     let found = book.clone();
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
     let file_drop = use_context_provider(|| FileDropBoard::new(Rc::clone(&host)));
     use_context_provider(Gpu::empty);
-    let gestures = use_context_provider(GestureBus::default);
+    let gestures = use_context_provider(|| scroll.bus());
+    {
+        let window = Arc::clone(&window);
+        let wake: Rc<dyn Fn()> = Rc::new(move || window.request_redraw());
+        use_context_provider(|| ScrollHandle::new(scroll.clone(), wake));
+    }
     let resized = use_context_provider(WindowResized::new);
-    let last_pointer = use_hook(|| {
-        Rc::new(std::cell::Cell::new(Point {
-            x: Px(0.0),
-            y: Px(0.0),
-        }))
-    });
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
@@ -226,18 +227,11 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 current.set(next);
             }
         }
-        if let WindowEvent::ModifiersChanged(state) = event {
-            held.set(modifiers_of(state.state()));
-        }
-        if let Some(moved) = pointer_at(event, window.scale_factor()) {
-            last_pointer.set(moved);
-        }
-        if let Some(gesture) =
-            gesture_of(event, window.scale_factor(), last_pointer.get(), held.get())
-        {
+        let (pointer_at, held) = scroll.pointer();
+        if let Some(gesture) = pinch_of(event, pointer_at) {
             gestures.publish(gesture);
         }
-        if let Some(pointer) = captured_of(event, window.scale_factor(), held.get())
+        if let Some(pointer) = captured_of(event, window.scale_factor(), held)
             && let Some(sink) = listeners.captured(pointer.phase)
         {
             sink.call(pointer);

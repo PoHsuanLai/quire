@@ -81,6 +81,7 @@ mod window_hover;
 mod window_place;
 mod window_platform;
 mod window_requests;
+mod window_scroll;
 mod window_shell;
 mod window_size;
 #[cfg(target_os = "linux")]
@@ -120,6 +121,12 @@ pub use texture_layer::{
     TextureHandle, TextureLayer, use_gpu,
 };
 pub use window::{Decorations, WinitWindow};
+pub use window_scroll::{ScrollHandle, use_scroll_handle};
+// What a scroll command names: the container's element `id`, the axis, and how it moves.
+pub use blitz_kit::element_id::ElementId;
+pub use blitz_kit::scroll::cmd::ScrollCmd;
+pub use blitz_kit::scroll::engine::ScrollAnimate;
+pub use blitz_kit::scroll::geom::ScrollAxis;
 pub use window_requests::WindowLife;
 pub use window_size::{Extent, WindowSize};
 

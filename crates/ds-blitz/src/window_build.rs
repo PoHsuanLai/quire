@@ -11,11 +11,11 @@ use crate::fonts::font_context;
 use crate::host::{Host, HostProps};
 use crate::native_providers::{AssetNet, LinkOpener};
 use crate::open_window::WindowHandle;
-use crate::phase::Phase;
 use crate::setup::Setup;
 use crate::window::Decorations;
 use crate::window_platform::with_platform;
 use crate::window_requests::{Requests, Root};
+use crate::window_scroll::WindowScroll;
 use crate::window_size::WindowSize;
 use blitz_dom::HtmlParserProvider;
 use blitz_shell::WindowConfig;
@@ -78,7 +78,7 @@ pub(crate) fn window_config(
     shape: Shape,
     base: &Base,
     slot: &WindowSlot,
-    phase: &Phase,
+    scroll: &WindowScroll,
     handle: WindowHandle,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
@@ -93,7 +93,8 @@ pub(crate) fn window_config(
     vdom.provide_root_context(base.requests.clone());
     vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());
-    vdom.provide_root_context(phase.clone());
+    vdom.provide_root_context(scroll.phase());
+    vdom.provide_root_context(scroll.clone());
     vdom.provide_root_context(handle);
     let net: Arc<dyn NetProvider> = Arc::new(AssetNet);
     vdom.provide_root_context(Arc::clone(&net));

@@ -4,9 +4,12 @@
 use crate::harness::Harness;
 use crate::harness_input::{blitz_button, keyboard, pointer};
 use crate::input::{KeyInput, PointerAction, PointerInput};
+use blitz_kit::scroll::driver::KeyRepeat;
+use blitz_kit::scroll::keys::scroll_key;
 use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
 use ds::prelude::*;
 use ds_core::press::PointerButton;
+use ds_core::time::clock::now;
 use ds_core::vocab::InputModality;
 use keyboard_types::{Location, Modifiers};
 
@@ -31,6 +34,12 @@ impl Harness {
     pub(crate) fn key(&mut self, input: KeyInput) {
         self.doc.set_modality(InputModality::Keyboard);
         let (key, code) = keyboard(input.key);
+        // The window's scrolling acts on a scroll key before the document hears it, and the
+        // document hears it too.
+        if let Some(scroll) = scroll_key(&key, input.mods) {
+            self.doc.scroll.key(scroll, KeyRepeat::First, now());
+            self.doc.scroll.key_up(now());
+        }
         for state in [KeyState::Pressed, KeyState::Released] {
             let event = BlitzKeyEvent {
                 key: key.clone(),

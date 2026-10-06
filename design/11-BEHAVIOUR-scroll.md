@@ -9,7 +9,8 @@ or code, **M** reliable secondary source or imitation code, **L** observed or in
 
 ## 11.1 What this governs
 
-Every scroll in every surface and app rendered by `shell-host` (Blitz documents): which node
+Every scroll in every surface rendered by `shell-host` and every window `ds-blitz` opens (Blitz
+documents, one engine: `blitz_kit::scroll`): which node
 scrolls (latching), the phases, tracking, momentum, rubber band, axis lock, conversion from
 device units to pixels, keyboard scrolling, wheel mice, touchpads, the overlay scrollbar,
 natural scrolling and double-scroll suppression. Device decoding and gesture recognition are
@@ -47,7 +48,9 @@ clients scroll with their own toolkit physics; for them we only shape the input 
 
 ### 11.3.1 Ownership (settled)
 
-`shell-host` owns scroll physics for every Blitz document (plan B "Ownership decision"):
+The host owns scroll physics for every Blitz document (plan B "Ownership decision"); the engine
+is `blitz_kit::scroll`, which `shell-host` runs for a shell's surfaces and `ds-blitz` for an app's
+windows:
 
 1. The host does not forward wheel/axis input to Blitz's default scroll action. It runs its
    own engine (this document), writes **raw** offsets (`set_viewport_scroll` for the root,
@@ -289,7 +292,7 @@ ever re-enabled). Wayland does not identify the device, so (settled rule, plan B
 
 ## 11.4 State machine
 
-Pure, `shell-host/crates/shell-host/src/scroll/engine/`. Geometry is passed in as values; the host reads it
+Pure, `blitz-kit/crates/blitz-kit/src/scroll/engine/`. Geometry is passed in as values; the host reads it
 from Blitz before calling `step` and applies effects after.
 
 ```rust
@@ -442,7 +445,8 @@ fade 240 ms, double-scroll grace 150 ms.
 
 | Concern | Owner |
 | --- | --- |
-| Engine, latching, rubber band, keyboard, thumb painting, frame requests | `shell-host/src/scroll/{engine,latch,rubber,keys,indicator}.rs` (pure except `indicator` paint) + shell-host's input/pointer.rs (axis -> engine), shell-host's handlers (source, `axis_stop`, `axis_relative_direction`) |
+| Engine, latching, rubber band, keyboard, the document side | `blitz-kit/src/scroll/{engine,latch,rubber,keys,doc,driver}` (pure except `doc` and `driver`) |
+| Thumb painting, frame requests, device input | `shell-host/src/scroll/{indicator,paint}` + shell-host's input/scroll.rs (axis -> engine), shell-host's handlers (source, `axis_stop`, `axis_relative_direction`); `ds-blitz/src/window_scroll` (winit's `MouseWheel` and keys -> engine, the window's frame requests, the gestures `use_gestures` hears; a `ds-blitz` window paints no thumb, FINDINGS "Scrolling") |
 | palmrest client | `shell-host/src/input/palmrest.rs`: connects to the palmrest socket if present, sends `PointerOver`, feeds Gesture inputs; absent daemon = no-op |
 | Units to px, axis lock, gains | palmrest `feel` module (12 §12.3.8) |
 | Scroll notification hook | shell-host's `use_scroll` (beside `use_surface`: the host owns the engine, so the hook lives on its side, not `ds-blitz`'s) |

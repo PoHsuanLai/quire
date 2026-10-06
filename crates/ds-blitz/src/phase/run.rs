@@ -72,6 +72,23 @@ impl Phase {
         self.shared.drive.replace(Some(Drive { doc, runtime }));
     }
 
+    /// The document this phase works on, once attached.
+    pub(crate) fn document(&self) -> Option<DocRef> {
+        self.shared
+            .drive
+            .borrow()
+            .as_ref()
+            .map(|drive| drive.doc.clone())
+    }
+
+    /// Run `call` inside the runtime the phase publishes to, where a component's callback can be
+    /// called; `None` (and `call` never runs) while no document is attached.
+    pub(crate) fn in_runtime<T>(&self, call: impl FnOnce() -> T) -> Option<T> {
+        let runtime = Rc::clone(&self.shared.drive.borrow().as_ref()?.runtime);
+        let _in_runtime = RuntimeGuard::new(runtime);
+        Some(call())
+    }
+
     /// Publish what `what` names for the element `el`, until the watch is dropped.
     pub(crate) fn observe(&self, el: &MountedData, what: Observe) -> Observed {
         let (Some(_), Some(node)) = (self.shared.drive.borrow().as_ref(), NodeRef::of(el)) else {

@@ -16,7 +16,9 @@ pub enum Input {
     Pointer(PointerInput),
     /// A key press and release.
     Key(KeyInput),
-    /// A scroll delta at `at`; a positive `dx` is content moving right, a positive `dy` content
+    /// A raw scroll delta at `at`, handed to Blitz as the window hands it a wheel over a
+    /// `data-wheel="capture"` element: Blitz's own scroll, which jumps at once ([`Input::Detents`] is
+    /// the scroll engine's). A positive `dx` is content moving right, a positive `dy` content
     /// moving down (winit's sign, which Blitz forwards unchanged). The pointer is moved to `at`
     /// first, since Blitz scrolls the element under the pointer.
     Wheel {
@@ -26,6 +28,19 @@ pub enum Input {
         dx: Px,
         /// Vertical delta.
         dy: Px,
+    },
+    /// A wheel's clicks at `at`, delivered as the window delivers a mouse wheel: the scroll
+    /// engine scrolls the container under the pointer (60 px a click, eased over at most 200 ms,
+    /// so frames pass before it arrives) unless a `data-wheel="capture"` element is there, which
+    /// gets the raw wheel. In winit's sign: a click that scrolls the page down is `y: -1`. The
+    /// pointer is moved to `at` first.
+    Detents {
+        /// Where the pointer is.
+        at: Point,
+        /// Horizontal clicks.
+        x: f64,
+        /// Vertical clicks.
+        y: f64,
     },
     /// A touchpad gesture (a pinch, or a scroll with its phase), as the window publishes it to the
     /// components listening with `use_gestures`. A [`Input::Wheel`] publishes the scroll
@@ -186,6 +201,11 @@ impl Input {
     /// Scroll by `dx`, `dy` with the pointer at `at`.
     pub fn wheel(at: Point, dx: Px, dy: Px) -> Self {
         Input::Wheel { at, dx, dy }
+    }
+
+    /// `x`, `y` wheel clicks with the pointer at `at`, scrolled by the engine.
+    pub fn detents(at: Point, x: f64, y: f64) -> Self {
+        Input::Detents { at, x, y }
     }
 
     /// `gesture` published to the window's listeners.

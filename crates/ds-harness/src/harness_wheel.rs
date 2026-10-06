@@ -1,6 +1,7 @@
 //! The harness's scroll wheel: a touchpad or a mouse wheel delta delivered where the pointer
 //! is, as the window delivers winit's `MouseWheel` (a horizontal scroll swipes a
-//! notification away).
+//! notification away), and a wheel's clicks, which the scroll engine takes as it does in a
+//! window.
 
 use crate::harness::Harness;
 use crate::input::PointerAction;
@@ -8,6 +9,8 @@ use crate::input::PointerInput;
 use blitz_traits::events::{BlitzWheelDelta, BlitzWheelEvent, PointerCoords, UiEvent};
 use ds::host::gesture::{Gesture, GesturePhase};
 use ds::prelude::*;
+use ds_blitz::seam::{WheelDelta, WheelInput, WheelUse};
+use ds_core::time::clock::now;
 use keyboard_types::Modifiers;
 
 impl Harness {
@@ -42,6 +45,40 @@ impl Harness {
             at,
             held: Modifiers::empty(),
         });
+    }
+
+    /// Turn a wheel `x`, `y` clicks (winit's sign) with the pointer at `at`. The pointer is moved
+    /// there first. The engine scrolls for it and the document never sees the wheel, as in a
+    /// window; over a `data-wheel="capture"` element the raw wheel goes to the document instead.
+    pub(crate) fn detents(&mut self, at: Point, x: f64, y: f64) {
+        self.pointer(PointerInput {
+            at,
+            action: PointerAction::Move,
+            mods: Modifiers::empty(),
+        });
+        let input = WheelInput {
+            delta: WheelDelta::Lines { x, y },
+            phase: GesturePhase::Changed,
+        };
+        let (used, _) = self.doc.scroll.wheel(input, now());
+        if used == WheelUse::Passed {
+            let (px, py) = (at.x.0, at.y.0);
+            self.deliver(UiEvent::Wheel(BlitzWheelEvent {
+                delta: BlitzWheelDelta::Lines(x, y),
+                coords: PointerCoords {
+                    page_x: px,
+                    page_y: py,
+                    screen_x: px,
+                    screen_y: py,
+                    client_x: px,
+                    client_y: py,
+                },
+                buttons: self.held_buttons().blitz(),
+                mods: Modifiers::empty(),
+                element: Default::default(),
+            }));
+        }
+        self.settle_now();
     }
 
     /// Publish `gesture` to the components listening, as the window does for winit's pinch and

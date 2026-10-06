@@ -277,6 +277,7 @@ impl Driver for Harness {
             Input::Pointer(pointer) => self.pointer(pointer),
             Input::Key(key) => self.key(key),
             Input::Wheel { at, dx, dy } => self.wheel(at, dx, dy),
+            Input::Detents { at, x, y } => self.detents(at, x, y),
             Input::Gesture(gesture) => self.gesture(gesture),
             Input::FileDrag(step) => self.drop_answer = self.file_drag(step),
             Input::Ime(ime) => self.ime(ime),

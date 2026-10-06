@@ -42,6 +42,7 @@ use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
+use crate::window_scroll::{Frames, Intercept, WindowScroll};
 use anyrender::WindowRenderer;
 use blitz_shell::{BlitzShellEvent, BlitzShellProxy, WindowConfig};
 use dioxus_native::winit::application::ApplicationHandler;
@@ -51,6 +52,7 @@ use dioxus_native::winit::event_loop::{ActiveEventLoop, ControlFlow, EventLoopPr
 use dioxus_native::winit::window::WindowId;
 use dioxus_native::winit::window::{Window, WindowAttributes};
 use dioxus_native::{DioxusNativeApplication, DioxusNativeWindowRenderer};
+use ds::host::gesture::GestureBus;
 use std::sync::Arc;
 use std::sync::mpsc::{Receiver, Sender, channel};
 use std::time::Instant;
@@ -61,6 +63,8 @@ struct Sub {
     slot: WindowSlot,
     /// What the window's components queue and watch, run after each frame and wake-up.
     phase: Phase,
+    /// The window's scrolling, which hears every event before the document.
+    scroll: WindowScroll,
     /// The window's renderer, kept past the window's close (see the module documentation).
     renderer: DioxusNativeWindowRenderer,
     /// What the window's documents and shell post.
@@ -75,6 +79,7 @@ impl Sub {
         config: WindowConfig<DioxusNativeWindowRenderer>,
         slot: WindowSlot,
         phase: Phase,
+        scroll: WindowScroll,
         renderer: DioxusNativeWindowRenderer,
     ) -> Sub {
         let (posted, relay) = BlitzShellProxy::new(proxy);
@@ -83,6 +88,7 @@ impl Sub {
             app: DioxusNativeApplication::new(posted, queue, config),
             slot,
             phase,
+            scroll,
             renderer,
             relay,
             forward,
@@ -91,6 +97,22 @@ impl Sub {
 
     fn window_id(&self) -> Option<WindowId> {
         self.slot.window().map(|window| window.id())
+    }
+
+    /// Give window scrolling `event` before the document hears it. `Taken` when the document
+    /// must not see it (a wheel the engine scrolls for); a frame is asked for when scrolling
+    /// moved something or still animates.
+    fn scroll_event(&self, event: &WindowEvent) -> Intercept {
+        let Some(window) = self.slot.window() else {
+            return Intercept::Passed;
+        };
+        let handled = self
+            .scroll
+            .event(event, window.scale_factor(), Instant::now());
+        if handled.frames == Frames::Wanted {
+            window.request_redraw();
+        }
+        handled.event
     }
 
     /// Run the window's phase; a frame is asked for when it changed the document, so a write
@@ -252,6 +274,7 @@ impl Windows {
         };
         let slot = WindowSlot::default();
         let phase = Phase::default();
+        let scroll = WindowScroll::new(phase.clone(), GestureBus::default(), Instant::now());
         let handle = WindowHandle::new(key, self.base.requests.clone());
         let renderer = self.spare.pop().unwrap_or_default();
         let config = window_config(
@@ -259,11 +282,18 @@ impl Windows {
             shape,
             &self.base,
             &slot,
-            &phase,
+            &scroll,
             handle,
             renderer.clone(),
         );
-        let mut sub = Sub::new(event_loop.create_proxy(), config, slot, phase, renderer);
+        let mut sub = Sub::new(
+            event_loop.create_proxy(),
+            config,
+            slot,
+            phase,
+            scroll,
+            renderer,
+        );
         sub.app.can_create_surfaces(event_loop);
         self.subs.push((key, sub));
         self.life.opened();
@@ -376,7 +406,9 @@ impl ApplicationHandler for Windows {
         }
         let drawn = matches!(event, WindowEvent::RedrawRequested);
         if let Some(sub) = self.key_of(window_id).and_then(|key| self.sub_mut(key)) {
-            sub.app.window_event(event_loop, window_id, event);
+            if sub.scroll_event(&event) == Intercept::Passed {
+                sub.app.window_event(event_loop, window_id, event);
+            }
             if drawn {
                 sub.run_phase(Layout::Resolved);
             }

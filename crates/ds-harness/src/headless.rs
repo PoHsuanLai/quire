@@ -13,6 +13,7 @@ use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThread
 use blitz_html::HtmlProvider;
 use blitz_kit::hit::element_of;
 use blitz_kit::hover::{LastMove, Repaired, Shift, remember, repair};
+use blitz_kit::scroll::geom::ViewPoint;
 use blitz_traits::events::UiEvent;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
@@ -23,6 +24,7 @@ use ds::host::gesture::GestureBus;
 use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameHover;
+use ds_blitz::ScrollHandle;
 use ds_blitz::clipboard::Memory;
 use ds_blitz::font_context;
 use ds_blitz::seam::DocRef;
@@ -33,12 +35,14 @@ use ds_blitz::seam::FrameParser;
 use ds_blitz::seam::MemoryShell;
 use ds_blitz::seam::Setup;
 use ds_blitz::seam::Wakeup;
+use ds_blitz::seam::WindowScroll;
 use ds_blitz::seam::follow_scheme;
 use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
 use ds_blitz::seam::{HoverTracker, link_under, live_frames, report_frame_hover};
 use ds_blitz::seam::{Layout as PhaseLayout, Phase};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
+use ds_core::time::clock::now;
 use ds_core::vocab::{Activity, InputModality};
 use peniko::Color;
 use std::cell::RefCell;
@@ -87,6 +91,8 @@ pub(crate) struct Headless {
     /// The frame phase: the writes the app queued and the values it watches, run after each
     /// layout.
     phase: Phase,
+    /// The window's scrolling, run before each layout as the window loop runs it.
+    pub(crate) scroll: WindowScroll,
 }
 
 /// The hovered element (a hovered text node counts as its element, which carries the listeners).
@@ -163,6 +169,10 @@ impl Headless {
         });
         let gestures = GestureBus::default();
         doc.vdom.provide_root_context(gestures.clone());
+        let scroll = WindowScroll::new(phase.clone(), gestures.clone(), now());
+        // Every frame the harness resolves runs the scroll step, so a command needs no wake.
+        doc.vdom
+            .provide_root_context(ScrollHandle::new(scroll.clone(), Rc::new(|| {})));
         doc.vdom.provide_root_context(provided.clipboard);
         doc.vdom
             .provide_root_context(FileDropBoard::new(Rc::clone(&provided.host)));
@@ -184,11 +194,18 @@ impl Headless {
             resting: LastMove::Unknown,
             painter: Painter::Cpu,
             phase,
+            scroll,
         }
     }
 
     /// Remember where `event` leaves the pointer, if it is a pointer event.
     pub(crate) fn note_pointer(&mut self, event: &UiEvent) {
+        if let UiEvent::PointerMove(moved) = event {
+            self.scroll.track_pointer(ViewPoint {
+                x: f64::from(moved.coords.client_x),
+                y: f64::from(moved.coords.client_y),
+            });
+        }
         self.resting = remember(std::mem::take(&mut self.resting), event);
     }
 
@@ -259,6 +276,8 @@ impl Headless {
             if self.layout == Layout::Held {
                 return;
             }
+            // Before the layout, so it sees this frame's offsets, as the window loop runs it.
+            self.scroll.frame(now());
             let restyled = follow_scheme(&mut self.doc.inner.borrow_mut()).is_some();
             let fetched = self.wakeup.fetched();
             let synced = self.resolve(at);

@@ -25,3 +25,5 @@ pub use crate::scheme::follow_root as follow_scheme;
 pub use crate::setup::Setup;
 pub use crate::texture_layer::attached_gpu;
 pub use crate::wake::Wakeup;
+pub use crate::window_scroll::wheel::{WheelDelta, WheelInput};
+pub use crate::window_scroll::{Frames, WheelUse, WindowScroll};

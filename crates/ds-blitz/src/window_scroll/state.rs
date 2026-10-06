@@ -1,0 +1,284 @@
+//! A window's scroll state and what its document and listeners are told.
+
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::time::Instant;
+
+use blitz_dom::BaseDocument;
+use blitz_kit::scroll::cmd::ScrollCmd;
+use blitz_kit::scroll::doc::{self, WheelRoute};
+use blitz_kit::scroll::driver::{KeyRepeat, KeyUse, Moved, Moves, ScrollDriver};
+use blitz_kit::scroll::engine::Motion;
+use blitz_kit::scroll::geom::ViewPoint;
+use blitz_kit::scroll::keys::ScrollKey;
+use blitz_kit::scroll::time::Elapsed;
+use blitz_kit::scroll::tuning::Tuning;
+use ds::host::gesture::{Gesture, GestureBus, GesturePhase, WheelDelivery};
+use ds::prelude::*;
+use keyboard_types::Modifiers;
+
+use super::eased::Eased;
+use super::wheel::{Source, WheelInput, pointer_scrolls};
+use crate::node_ref::{DocRef, Written};
+use crate::phase::Phase;
+
+/// Whether the window needs another frame for scrolling: an offset moved, or an animation runs.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Frames {
+    Wanted,
+    Idle,
+}
+
+/// Whether a wheel went to the engine or stays with the document.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum WheelUse {
+    /// The engine scrolls for it; the document must not see the wheel.
+    Taken,
+    /// The document handles it: a `data-wheel="capture"` element, or no document or pointer yet.
+    Passed,
+}
+
+/// One window's scroll state, shared by the loop that routes its events and the host component
+/// that hands out its handle.
+#[derive(Clone)]
+pub struct WindowScroll {
+    shared: Rc<Shared>,
+}
+
+impl std::fmt::Debug for WindowScroll {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("WindowScroll").finish_non_exhaustive()
+    }
+}
+
+struct Shared {
+    /// The document, and the runtime listeners are called in.
+    phase: Phase,
+    bus: GestureBus,
+    /// Where the engine's timeline starts.
+    origin: Instant,
+    state: RefCell<State>,
+}
+
+struct State {
+    driver: ScrollDriver,
+    tuning: Tuning,
+    /// Where the pointer last was, in the window's logical pixels.
+    pointer: Option<ViewPoint>,
+    held: Modifiers,
+    eased: Eased,
+    commands: Vec<ScrollCmd>,
+}
+
+impl State {
+    /// The pointer's place as the gestures report it (the corner until it has moved).
+    fn point(&self) -> Point {
+        let at = self.pointer.unwrap_or_default();
+        Point {
+            x: Px(at.x as f32),
+            y: Px(at.y as f32),
+        }
+    }
+}
+
+impl WindowScroll {
+    /// Scrolling the document `phase` is attached to, publishing gestures to `bus`, on a
+    /// timeline that starts at `origin`.
+    pub fn new(phase: Phase, bus: GestureBus, origin: Instant) -> WindowScroll {
+        WindowScroll {
+            shared: Rc::new(Shared {
+                phase,
+                bus,
+                origin,
+                state: RefCell::new(State {
+                    driver: ScrollDriver::default(),
+                    tuning: Tuning::default(),
+                    pointer: None,
+                    held: Modifiers::empty(),
+                    eased: Eased::default(),
+                    commands: Vec::new(),
+                }),
+            }),
+        }
+    }
+
+    /// The frame phase of the document this scrolls.
+    pub(crate) fn phase(&self) -> Phase {
+        self.shared.phase.clone()
+    }
+
+    /// The window's gesture listeners.
+    pub fn bus(&self) -> GestureBus {
+        self.shared.bus.clone()
+    }
+
+    /// The pointer's place and the modifier keys down, as the gestures report them.
+    pub fn pointer(&self) -> (Point, Modifiers) {
+        let state = self.shared.state.borrow();
+        (state.point(), state.held)
+    }
+
+    /// The pointer moved to `at` (the window's logical pixels).
+    pub fn track_pointer(&self, at: ViewPoint) {
+        self.shared.state.borrow_mut().pointer = Some(at);
+    }
+
+    /// The modifier keys down are now `held`.
+    pub fn track_modifiers(&self, held: Modifiers) {
+        self.shared.state.borrow_mut().held = held;
+    }
+
+    /// Queue a programmatic scroll for the next frame.
+    pub fn queue(&self, command: ScrollCmd) {
+        self.shared.state.borrow_mut().commands.push(command);
+    }
+
+    fn elapsed(&self, now: Instant) -> Elapsed {
+        Elapsed(now.saturating_duration_since(self.shared.origin))
+    }
+
+    /// Run `act` on the document and the state, if the document is free.
+    fn with_doc<T>(&self, act: impl FnOnce(&mut BaseDocument, &mut State) -> T) -> Option<T> {
+        let doc: DocRef = self.shared.phase.document()?;
+        let mut out = None;
+        let written = doc.write(|doc| {
+            out = Some(act(doc, &mut self.shared.state.borrow_mut()));
+        });
+        match written {
+            Written::Done => out,
+            Written::Busy => None,
+        }
+    }
+
+    /// Run `call` where the window's listeners can be called; nobody hears it before the
+    /// document is attached.
+    fn publish(&self, call: impl FnOnce(&GestureBus)) {
+        let _ = self.shared.phase.in_runtime(|| call(&self.shared.bus));
+    }
+
+    /// A wheel or touchpad event: the listeners hear it, and the engine scrolls for it unless
+    /// the element under the pointer takes the wheel itself.
+    pub fn wheel(&self, input: WheelInput, now: Instant) -> (WheelUse, Frames) {
+        let el = self.elapsed(now);
+        let (gesture, pointer, held, detent_px) = {
+            let state = self.shared.state.borrow();
+            let detent_px = state.tuning.settings.wheel_detent_px.get();
+            let gesture = input.gesture(state.point(), state.held, detent_px);
+            (gesture, state.pointer, state.held, detent_px)
+        };
+        match input.source() {
+            Source::Wheel => {
+                self.ease(input, detent_px, el);
+                self.publish(|bus| bus.publish_to(WheelDelivery::AsReceived, gesture));
+            }
+            Source::Touchpad => self.publish(|bus| bus.publish(gesture)),
+        }
+        let Some(pointer) = pointer else {
+            return (WheelUse::Passed, Frames::Idle);
+        };
+        let routed = self
+            .shared
+            .phase
+            .document()
+            .and_then(|doc| doc.read(|doc| doc::wheel_route(doc, pointer)));
+        match routed {
+            Some(WheelRoute::Engine) => {
+                let moved = self.with_doc(|doc, state| {
+                    let env = state.tuning.at(el);
+                    pointer_scrolls(input, held)
+                        .into_iter()
+                        .map(|scroll| state.driver.pointer(doc, scroll, pointer, env))
+                        .fold(Moves::none(), Moves::then)
+                });
+                (WheelUse::Taken, self.frames_after(moved))
+            }
+            Some(WheelRoute::Capture) | None => (WheelUse::Passed, Frames::Idle),
+        }
+    }
+
+    /// Add a wheel's detents to what the eased listeners will be handed, if any listens.
+    fn ease(&self, input: WheelInput, detent_px: f64, el: Elapsed) {
+        if !self.shared.bus.has_listener(WheelDelivery::Eased) {
+            return;
+        }
+        let (x, y) = input.motion(detent_px);
+        let mut state = self.shared.state.borrow_mut();
+        state.eased = state.eased.push(x, y, el);
+    }
+
+    /// A scroll key went down or repeated. The key still goes on to the document: the engine
+    /// takes it only when nothing on the focus path does (`blitz_kit::scroll::doc::key_focus`).
+    pub fn key(&self, key: ScrollKey, repeat: KeyRepeat, now: Instant) -> Frames {
+        let el = self.elapsed(now);
+        let moved = self.with_doc(|doc, state| {
+            let env = state.tuning.at(el);
+            match state.driver.key(doc, key, repeat, state.pointer, env) {
+                KeyUse::Scrolled(moves) => moves,
+                KeyUse::Passed => Moves::none(),
+            }
+        });
+        self.frames_after(moved)
+    }
+
+    /// A held scroll key came up.
+    pub fn key_up(&self, now: Instant) -> Frames {
+        let el = self.elapsed(now);
+        let moved = self.with_doc(|doc, state| {
+            let env = state.tuning.at(el);
+            state.driver.key_up(doc, env)
+        });
+        self.frames_after(moved)
+    }
+
+    /// A frame is about to be drawn at `now`: run the queued commands, advance the engine, and
+    /// hand the listeners that asked for eased detents this frame's share. Called before the
+    /// document resolves, so the layout sees this frame's offsets.
+    pub fn frame(&self, now: Instant) -> Frames {
+        let el = self.elapsed(now);
+        let moved = self.with_doc(|doc, state| {
+            let env = state.tuning.at(el);
+            let commands = std::mem::take(&mut state.commands);
+            let ran = commands
+                .iter()
+                .map(|command| state.driver.command(doc, command, env))
+                .fold(Moves::none(), Moves::then);
+            ran.then(state.driver.frame(doc, env))
+        });
+        self.eased_frame(el);
+        self.frames_after(moved)
+    }
+
+    /// Hand the eased listeners what the detents' ease moves this frame.
+    fn eased_frame(&self, el: Elapsed) {
+        let gesture = {
+            let mut state = self.shared.state.borrow_mut();
+            let (next, (dx, dy)) = state.eased.advance(el);
+            state.eased = next;
+            (dx != 0.0 || dy != 0.0).then(|| Gesture::Scroll {
+                phase: GesturePhase::Changed,
+                by: Point {
+                    x: Px(dx as f32),
+                    y: Px(dy as f32),
+                },
+                at: state.point(),
+                held: state.held,
+            })
+        };
+        if let Some(gesture) = gesture {
+            self.publish(|bus| bus.publish_to(WheelDelivery::Eased, gesture));
+        }
+    }
+
+    /// Whether a frame is wanted after `moved`: an offset moved, or something still animates.
+    fn frames_after(&self, moved: Option<Moves>) -> Frames {
+        let state = self.shared.state.borrow();
+        let moved = moved.map_or(Moved::Still, |moves| moves.moved());
+        let animating = state.driver.motion() == Motion::Animating
+            || state.eased.motion() == Motion::Animating
+            || !state.commands.is_empty();
+        match (moved, animating) {
+            (Moved::Still, false) => Frames::Idle,
+            _ => Frames::Wanted,
+        }
+    }
+}

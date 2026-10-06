@@ -1337,7 +1337,7 @@ Blitz fork is needed.
 | Need | API | Notes |
 | --- | --- | --- |
 | A drag that leaves its element | `ds::host::pointer_capture::use_pointer_capture(on_pointer) -> PointerCapture`; wire `capture.on_mounted(event)` to `onmounted`, call `capture.begin() -> PointerHold` from `onpointerdown` | `on_pointer` hears every move (`PointerPhase::Drag`) and the primary release (`PointerPhase::Release`) in the window's logical pixels, wherever the pointer is, until the button comes up. `PointerHold::Local` means the host cannot (no host, not mounted yet): the element's own `onpointermove` and `onpointerup` are all there is. The edit surface uses the same route. |
-| A pinch or a phased scroll | `ds::host::gesture::use_gestures(on_gesture)`; `Gesture::Pinch { phase, by: Magnification, at }`, `Gesture::Scroll { phase, by: Point, at, held: Modifiers }`, `GesturePhase::{Began, Changed, Ended, Cancelled}` | A gesture reaches every listener with the pointer's place; the listener checks it is over its own element. `Magnification(50)` is 5% larger. A scroll's `by` is how far the content moves in logical pixels (winit's sign; a wheel detent is 20 px, and a wheel with no phases reports `Changed` only; `held` is the modifier keys down, so a wheel under Control can zoom). Pinch exists on Wayland and macOS, where winit has it. |
+| A pinch or a phased scroll | `ds::host::gesture::use_gestures(on_gesture)`; `Gesture::Pinch { phase, by: Magnification, at }`, `Gesture::Scroll { phase, by: Point, at, held: Modifiers }`, `GesturePhase::{Began, Changed, Ended, Cancelled}` | A gesture reaches every listener with the pointer's place; the listener checks it is over its own element. `Magnification(50)` is 5% larger. A scroll's `by` is how far the content moves in logical pixels (winit's sign; a wheel detent is 60 px, the distance a native container moves for it, and a wheel with no phases reports `Changed` only; `held` is the modifier keys down, so a wheel under Control can zoom). `use_gestures_with(WheelDelivery::Eased, ..)` hears the detents eased over frames instead (section 11). Pinch exists on Wayland and macOS, where winit has it. |
 | In a test | `Input::gesture(Gesture::Pinch { .. })`; `Input::wheel(..)` publishes a scroll too | `ds_blitz::launch` and `Harness` provide the `GestureBus`; with no host `use_gestures` hears nothing. |
 | A measure that follows the window | `ds::host::measure::use_rect()` | It reads again after each `ds::host::resized::WindowResized` bump, which `launch` makes on every window resize or scale change; a host with no such source (a shell surface) never bumps, and the rect stays where it was measured. |
 | A machine whose parameters come from its own state | `MachineRef::set_params(params)` before `send` | `use_machine` takes parameters at each render, one render behind a machine whose parameters are derived from its state (a zoom step reads the scale the last step made): compute them from the state just read and set them, then send. |
@@ -1560,10 +1560,40 @@ the derive cannot place at all gets an error saying what to add.
 
 ## 11. Scrolling
 
-shell-host owns scroll physics for every Blitz document (design/11-BEHAVIOUR-scroll.md section
-11.3.1): it does not forward wheel or axis input to Blitz's default scroll action, it writes raw
-offsets itself every frame, and it paints its own overlay scrollbar thumb. Everything below is
-quire's side of that split (design/11 section 11.7); the engine itself is shell-host's.
+One engine owns scroll physics for every Blitz document (design/11-BEHAVIOUR-scroll.md section
+11.3.1): `blitz_kit::scroll`, which shell-host (a shell's surfaces) and `ds-blitz` (an app's
+windows, `ds_blitz::launch`) both run. It does not let Blitz's default scroll act (Blitz jumps 20 px
+a line), it writes raw offsets itself every frame, and a wheel detent is 60 px eased over at most
+200 ms, detents accumulating; a touchpad flick glides and may stretch past an edge where a
+container opts in; arrows scroll 40 px, Page Up/Down and Space a page (`max(0.8 v, v - 40)`),
+Home/End jump to an edge. Everything below is quire's side of that split (design/11 section 11.7).
+
+**Native overflow needs nothing from you.** A container with `overflow: auto` or `scroll` scrolls
+by all of the above in a `ds_blitz` window the moment it has content to scroll, under the wheel,
+a touchpad and the keys (a scroll key acts on the focused container, else on the one under the
+pointer, else on the page; it leaves a key to the document when an element on the focus path has
+its own `onkeydown`, is a text field, or is marked `data-keys="capture"`). Do not call Blitz's own
+scroll (`MountedData::scroll_to`, `scroll-behavior: smooth`).
+
+**Programmatic scrolls go through the engine.** `ds_blitz::use_scroll_handle()` gives the window's
+`ScrollHandle` (`None` outside a window), and `handle.send(ScrollCmd::To { element, axis, offset,
+animate })`, `ScrollCmd::By { element, axis, delta, animate }` or `ScrollCmd::IntoView { element,
+animate }` runs at the next frame; `element` is a `ds_blitz::ElementId` naming the container by its
+`id` attribute, `animate` is `ScrollAnimate::Smooth` (the 200 ms ease) or `Instant`. The same
+`ScrollCmd` is shell-host's `SurfaceHandle::scroll`. `ScrollerRef::scroll_to` (the `Scroller`
+component's own offset) is a separate thing and writes at once.
+
+**A component that moves its own content from the wheel listens to gestures, and may ask for the
+ease.** `use_gestures` still hears `Gesture::Scroll { by }` as the wheel turns, but `by` is now a
+detent, 60 px, where it used to be a third of that, and it arrives whole. A viewer that moves its
+own offset (a PDF or image canvas) opts into the engine's smooth step with
+`ds::host::gesture::use_gestures_with(WheelDelivery::Eased, on_gesture)`: its wheel detents then
+arrive as one `Gesture::Scroll { phase: Changed, by, .. }` per frame, `by` that frame's share of the
+distance, summing to the detents' (60 px each, at most 200 ms, accumulating as in a native
+container). Apply `by` as the `AsReceived` listener did; clamp as you did. A touchpad's own scroll
+reaches both kinds of listener as the fingers moved, with no glide: a component that wants the
+flick to carry on keeps its own momentum. Under Control the wheel zooms in a viewer, as before: a
+listener decides what `held` means.
 
 **Every scroll container hides Blitz's own scrollbar.** Every ds component whose content scrolls
 (`Menu`, `Panel`, `Sheet`, `EditSurface`) carries `scrollbar-width: none` in its own
@@ -1575,11 +1605,13 @@ flag: an *absent* `scrollbar-width: none` is not, by itself, an offence), so thi
 to follow, not a lint you can lean on.
 
 **`data-wheel="capture"` marks a component that consumes wheel input itself.** A ds component
-that reads the wheel directly — today, only `Slider` (design/04-COMPONENTS.md section 5; a
-zoomable canvas would be the other kind design/11 names) — carries this attribute so the host
+that reads the wheel directly — today, `Slider` and the scrubber (design/04-COMPONENTS.md section 5; a
+zoomable canvas would be the other kind design/11 names) — carries this attribute so the window
 hands it the raw `BlitzWheelEvent` through `handle_ui_event` instead of scrolling whatever
-contains it; the component's own handler must call `prevent_default` once it exists (design/11
-section 11.3.1 item 2). It is a marker only: quire does not itself drive a wheel-triggered value
+contains it, and the engine does nothing for that wheel; the component's own handler must call
+`prevent_default`, or Blitz's own scroll (20 px a line, in one jump) still acts (design/11
+section 11.3.1 item 2). An element with a plain `onwheel` and no marker never hears the wheel in a
+`ds_blitz` window: the engine takes it first, so mark it, or listen with `use_gestures`. It is a marker only: quire does not itself drive a wheel-triggered value
 change on `Slider` yet, so add the same attribute to your own wheel-consuming controls even before
 you wire up the handler, and remove it from a component that turns out not to need it — an
 un-marked wheel-consumer silently gets scrolled instead of heard.
