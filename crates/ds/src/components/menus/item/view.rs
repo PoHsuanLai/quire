@@ -111,6 +111,11 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
         StateColumn::Reserved => Some(state_mark(view.check)),
         StateColumn::Absent => None,
     };
+    // Without the state column the title (or image) leads the row and takes the row's own inset.
+    let leading = match view.columns.state {
+        StateColumn::Reserved => None,
+        StateColumn::Absent => Some("absent"),
+    };
     let image = match view.columns.image {
         ImageColumn::Reserved => Some(image_mark(view.image)),
         ImageColumn::Absent => None,
@@ -133,6 +138,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             role,
             "data-selected": highlighted,
             "data-focus": FocusStyle::Highlight.slug(),
+            "data-state-column": leading,
             "aria-checked": view.check.map(Check::aria),
             "aria-disabled": view.availability.aria_disabled(),
             "aria-busy": view.availability.aria_busy(),
