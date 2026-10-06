@@ -100,7 +100,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 
 Component groups inside `ds` and the layer order inside the components tier: `content` (icons,
 images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `overlays` (alert,
-popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `forms` (`Form`, `FormSection`, `IconTile`: the grouped page and the tile a row leads with) < `lists` (rows,
+popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `forms` (`Form`, `FormSection`, `IconTile`, `PaneStack` with `PageHeader` and `PanePath`: the grouped page, the tile a row leads with and the in-pane drill-in; `PaneStack` sits here, above `controls` for its back `Button` and below `lists` since the caller's pages hold the lists, and its motion is `ds-motion::use_pane_slide`, shared with the preview switcher) < `lists` (rows,
 settings rows, headers, animated, leaving and virtual lists, preview pane, emoji grid, appearance picker)
 < `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`, `export`) <
 `editor` (`EditSurface` and its spell menu) < `chrome` (window frame, traffic lights) < `companion` (orb, chips, answer cards, plan list, replace bar, run row, activity strip, memory view, served-by chip) < `app`.

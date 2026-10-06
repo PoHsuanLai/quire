@@ -40,6 +40,8 @@ pub mod timer;
 #[cfg(feature = "dioxus")]
 pub mod use_collapse;
 #[cfg(feature = "dioxus")]
+pub mod use_pane_slide;
+#[cfg(feature = "dioxus")]
 pub mod use_roster;
 #[cfg(feature = "dioxus")]
 pub mod use_spring;

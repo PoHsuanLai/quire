@@ -1,4 +1,4 @@
-//! Form, FormSection and IconTile in every state rendered through dioxus-ssr and compared with
+//! Form, FormSection, IconTile and PaneStack in every state rendered through dioxus-ssr and compared with
 //! a golden in `tests/snapshots/forms/<component>/<state>.html`; every class in a golden is
 //! styled by the components' sheets; every golden lints clean as markup.
 //!
@@ -46,7 +46,16 @@ fn golden_name(case: &Case) -> String {
 }
 
 /// The sheets of the forms components and of what a golden draws inside them.
-const SHEETS: &[&str] = &["form", "form_section", "icon_tile", "list", "row", "avatar"];
+const SHEETS: &[&str] = &[
+    "form",
+    "form_section",
+    "icon_tile",
+    "pane_stack",
+    "button",
+    "list",
+    "row",
+    "avatar",
+];
 
 fn sheet(name: &str) -> &'static str {
     ds::component_sheets()
@@ -86,7 +95,7 @@ fn every_class_in_a_forms_golden_is_styled() {
 
 #[test]
 fn the_forms_sheets_use_tokens_only() {
-    let failures: Vec<String> = ["form", "form_section", "icon_tile"]
+    let failures: Vec<String> = ["form", "form_section", "icon_tile", "pane_stack"]
         .iter()
         .flat_map(|name| {
             token_violations(sheet(name))
@@ -134,4 +143,12 @@ fn every_forms_golden_lints_clean() {
         })
         .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// Reduced motion drops the slide and keeps the fade: the sheet's own rule, since the spring that
+/// drives `--pane-q` is the same at every level.
+#[test]
+fn the_pane_stack_does_not_slide_under_reduced_motion() {
+    let rule = ".ds[*|data-motion=reduced] .ds-pane-stack-page{ transform:none; }";
+    assert!(sheet("pane_stack").contains(rule), "missing {rule}");
 }

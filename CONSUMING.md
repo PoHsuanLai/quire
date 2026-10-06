@@ -647,6 +647,45 @@ or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its a
 actions: Vec<HeaderAction>, collapse }` heads a group (`HeaderAction::new(label, onclick)`, any
 number of them at its end).
 
+### Forms: drill-in vs sheet
+
+A settings page that lists things (accounts, networks, devices) opens the **detail of an existing
+item** by drilling in: a `PaneStack` pushes the detail page into the same pane, under a header
+whose back button names the page it came from (System Settings > Internet Accounts > an account).
+A **sheet** is for what leaves the page: creating a thing, or confirming a destructive step. One
+rule: detail of an item that exists = drill-in; create, or destructive confirm = sheet card.
+
+The caller owns the path (`PanePath<K>`, `K` names a page); the stack keeps only the transition.
+`opener` names the id of the row that opens a page, and a pop returns the keyboard to it; a push
+moves it to the new page's back button (`<id>-back-root` / `<id>-back-detail`, `id` being
+`common.id` of the stack). Escape, Command+`[` and Alt+Left call `on_back`, never at the root.
+
+```rust,ignore
+use ds::prelude::*;
+
+#[derive(Clone, PartialEq)]
+enum Page { Accounts, Account(AccountId) }
+
+let mut path = use_signal(|| PanePath::new(Page::Accounts));
+rsx! {
+    PaneStack::<Page> {
+        path: path(),
+        title: Callback::new(|page: Page| match page {
+            Page::Accounts => "Accounts".to_owned(),
+            Page::Account(id) => name_of(id),
+        }),
+        // A chevron row in the accounts Form pushes: `path.set(path.peek().pushed(Page::Account(id)))`.
+        page: Callback::new(move |page: Page| draw(page, path)),
+        opener: Callback::new(|page: Page| match page {
+            Page::Accounts => None,
+            Page::Account(id) => Some(format!("open-{id}")),   // the id on that account's `Row`
+        }),
+        on_back: move |()| path.set(path.peek().popped()),
+        common: Common { id: Some("accounts".to_owned()), ..Common::default() },
+    }
+}
+```
+
 ### Overlays
 
 ```rust,ignore

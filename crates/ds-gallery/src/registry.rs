@@ -61,7 +61,7 @@ pub const REGISTRY: [Entry; 30] = [
         page: Page::Forms,
         title: "Forms",
         lede: "A Form of FormSections as a System Settings pane draws it: a grouped list of panes led by icon tiles and a person, a chevron on every row that opens something, field rows with a toggle, the section footer, and the icon tile in five colours.",
-        height: 1300,
+        height: 1560,
         body: crate::pages::forms::FormsPage,
     },
     Entry {

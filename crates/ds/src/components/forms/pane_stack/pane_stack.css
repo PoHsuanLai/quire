@@ -1,0 +1,19 @@
+/* PaneStack and PageHeader (design/34-MODERN-LOOK.md sections 3.5 and 7). The pages slide as the
+   control center's panes do, 26 px and a fade, from one spring in Rust (design/05 section 14, H1):
+   `--pane-q` is how far the arriving page has come (0 to 1) and `--pane-way` is 1 for a push, -1
+   for a pop. The arrival is `way * (1 - q)` of 26 px from its place with opacity q; the leaving
+   page `-way * q` with opacity 1 - q, so a reversal mid-slide continues from where the pages are.
+   The leaving page is out of the flow, pinned to the top, so the stack is as tall as the page
+   arriving; what it overhangs is clipped. A page at rest plays `hold`, which moves nothing (Blitz
+   keeps a dropped animation's last value). Under Reduced the pages only cross-fade. The header is
+   the Form's margin wide (20); the back button is the quiet inline button, the title Title 2. */
+
+.ds-pane-stack{ --pane-q:1; --pane-way:1; position:relative; overflow:hidden; }
+.ds-pane-stack-page[*|data-presence=leaving]{ position:absolute; left:0; right:0; top:0; pointer-events:none; }
+.ds-pane-stack-page[*|data-presence=present]{ animation:hold var(--t-quick) var(--e-linear); }
+.ds-pane-stack-page[*|data-presence=entering]{ transform:translateX(calc(var(--pane-way) * (1 - var(--pane-q)) * var(--s-26))); opacity:var(--pane-q); }
+.ds-pane-stack-page[*|data-presence=leaving]{ transform:translateX(calc(var(--pane-way) * -1 * var(--pane-q) * var(--s-26))); opacity:calc(1 - var(--pane-q)); }
+.ds[*|data-motion=reduced] .ds-pane-stack-page{ transform:none; }
+
+.ds-page-header{ display:flex; flex-direction:column; align-items:flex-start; gap:var(--s-6); padding:var(--s-20) var(--s-20) 0; }
+.ds-page-title{ margin:0; font-family:var(--font-display); font-size:var(--fs-title-2); font-weight:700; line-height:1.25; color:var(--ink); }

@@ -2,6 +2,7 @@
 //! way System Settings draws a pane, from the grouped list, the icon tile and the field rows.
 
 pub(crate) mod grouped;
+mod pane_stack;
 
 use crate::pages::Section;
 use dioxus::prelude::*;
@@ -42,6 +43,11 @@ pub fn FormsPage() -> Element {
                 IconTile { icon: Icon::Lock, colour: Hex([0x8e, 0x8e, 0x93]) }
                 IconTile { icon: Icon::Bluetooth, colour: Hex([0x30, 0xb0, 0x50]) }
             }
+        }
+        Section {
+            title: "PaneStack",
+            note: "A settings pane that drills into a row's detail in place, as System Settings does for an account: the list's chevron row pushes the detail Form under a header with the back button (the parent's title) and the page title; the new page slides in 26 px from the right and the old leaves to the left, and back, Escape, Command+[ and Alt+Left pop it with the focus returning to the row. Sheets stay for creating things and confirmations. Left: the root; right: an account already pushed.",
+            {pane_stack::specimens()}
         }
     }
 }

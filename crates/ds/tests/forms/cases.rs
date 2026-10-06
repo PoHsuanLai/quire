@@ -1,4 +1,4 @@
-//! Form, FormSection and IconTile in every state, as data: the table the golden test walks.
+//! Form, FormSection, IconTile and PaneStack in every state, as data: the table the golden test walks.
 //! Goldens live in `tests/snapshots/forms/<component>/<state>.html`.
 
 use crate::scoped::Scoped;
@@ -14,6 +14,36 @@ pub struct Case {
     pub component: &'static str,
     pub state: &'static str,
     pub make: fn() -> Element,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Page {
+    Accounts,
+    Account,
+}
+
+fn page(page: Page) -> Element {
+    match page {
+        Page::Accounts => rsx! {
+            Form { FormSection { title: "Accounts", Row { title: "Dana", size: RowSize::Settings, accessory: Accessory::Chevron } } }
+        },
+        Page::Account => rsx! {
+            Form { FormSection { title: "Details", footer: "The account's settings.", Row { title: "Dana settings", size: RowSize::Settings } } }
+        },
+    }
+}
+
+fn stack(path: PanePath<Page>) -> Element {
+    rsx! {
+        PaneStack::<Page> {
+            path,
+            title: Callback::new(|page: Page| match page {
+                Page::Accounts => "Accounts".to_owned(),
+                Page::Account => "Dana".to_owned(),
+            }),
+            page: Callback::new(page),
+        }
+    }
 }
 
 const BLUE: Hex = Hex([0x0a, 0x84, 0xff]);
@@ -48,5 +78,20 @@ pub const CASES: &[Case] = &[
         component: "form",
         state: "two-sections",
         make: || rsx! { Form { FormSection { title: "General", div { "a" } } FormSection { title: "Privacy", footer: "Shared with no one.", div { "b" } } } },
+    },
+    Case {
+        component: "pane_stack",
+        state: "root",
+        make: || stack(PanePath::new(Page::Accounts)),
+    },
+    Case {
+        component: "pane_stack",
+        state: "pushed",
+        make: || stack(PanePath::new(Page::Accounts).pushed(Page::Account)),
+    },
+    Case {
+        component: "pane_stack",
+        state: "pushed-reduced",
+        make: || rsx! { Scoped { {stack(PanePath::new(Page::Accounts).pushed(Page::Account))} } },
     },
 ];
