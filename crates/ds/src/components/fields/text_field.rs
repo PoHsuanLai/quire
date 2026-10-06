@@ -18,7 +18,9 @@ use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::MaskCaret;
-use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows, Validity};
+use crate::components::fields::text_field_model::{
+    FieldBezel, FieldKind, FieldRows, FieldText, Validity,
+};
 use crate::components::fields::text_field_parts::{Field, Handlers, line};
 use crate::focus::field::FieldHandle;
 use crate::focus::targets::Told;
@@ -49,11 +51,59 @@ impl Holds {
     }
 }
 
-/// The text a masked or plain field shows: a secure field's own state, else the caller's `value`.
-fn held(kind: FieldKind, value: String, typed: Signal<String>) -> String {
-    match kind {
-        FieldKind::Secure => typed(),
-        FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => value,
+/// The text a field shows: a secure field's own state unless the caller holds it, else the
+/// caller's `value`.
+fn held(kind: FieldKind, text: FieldText, value: String, typed: Signal<String>) -> String {
+    match (kind, text) {
+        (FieldKind::Secure, FieldText::Own) => typed(),
+        (FieldKind::Secure, FieldText::Caller)
+        | (FieldKind::Plain | FieldKind::Search | FieldKind::Multiline, _) => value,
+    }
+}
+
+/// Which incarnation of the line the field draws. A secure field whose text the caller holds
+/// cannot be told its text was emptied (the renderer keeps its own copy), so the line is drawn
+/// again, empty, under the next generation each time the caller's text goes from some to none.
+#[derive(Clone, Copy)]
+struct Round {
+    generation: CopyValue<u32>,
+    /// Whether the caret was in the field when the current generation began.
+    caret: CopyValue<Holds>,
+}
+
+impl Round {
+    fn generation(self) -> u32 {
+        *self.generation.peek()
+    }
+
+    /// How the new generation's input takes the keyboard: the caret stays where it was.
+    fn focus(self, asked: FieldFocus) -> FieldFocus {
+        match (self.generation() > 0, *self.caret.peek()) {
+            (true, Holds::Caret) => FieldFocus::OnMount,
+            (true, Holds::Elsewhere) | (false, _) => asked,
+        }
+    }
+}
+
+/// The field's round: `caller_holds` is whether the caller holds a secret's text, `value` that text.
+fn use_round(caller_holds: bool, value: &str, holds: Holds) -> Round {
+    let mut generation = use_hook(|| CopyValue::new(0u32));
+    let mut filled = use_hook(|| CopyValue::new(false));
+    let mut caret = use_hook(|| CopyValue::new(Holds::Elsewhere));
+    let emptied = caller_holds && value.is_empty() && *filled.peek();
+    if emptied {
+        let next = *generation.peek() + 1;
+        generation.set(next);
+        caret.set(holds);
+    }
+    filled.set(caller_holds && !value.is_empty());
+    Round { generation, caret }
+}
+
+/// `line` under `generation` as its key, so a new generation mounts a new input.
+fn keyed(generation: u32, line: Element) -> Element {
+    rsx! {
+        Fragment { key: "{generation}", {line} }
     }
 }
 
@@ -85,7 +135,11 @@ fn clear_size(size: ControlSize) -> ControlSize {
 /// draws a magnifier, a clear button and `tokens` under it, and `Multiline` is a `textarea`
 /// `rows` tall (Enter adds a line; the caret leaving commits). `bezel` is its edge ([`FieldBezel`]).
 /// `onchange` hears the value committed: Enter, or the caret leaving (Blitz sends no `change`
-/// event, so the field makes its own, the same on both renderers). `prefix` and `suffix` are
+/// event, so the field makes its own, the same on both renderers). `onsubmit` hears the value on
+/// Enter alone (never on the caret leaving, never in a multi-line field, never while the field is
+/// not enabled). The controlled shape is `value` in, `oninput` out for each change, `onsubmit`
+/// for Enter; a secure field takes `value` too under `text: FieldText::Caller`, and then keeps
+/// no copy of the text (its renderer's own input aside). `prefix` and `suffix` are
 /// marks inside the frame before and after the text; `help` is a note under it, and `validity`
 /// says the value is rejected: its message replaces the help in the danger ink, and a secure
 /// field shakes once for each new rejection. `Busy` takes no input and shows a spinner after
@@ -96,6 +150,7 @@ pub fn TextField(
     value: String,
     #[props(default)] placeholder: String,
     #[props(default)] kind: FieldKind,
+    #[props(default)] text: FieldText,
     #[props(default)] bezel: FieldBezel,
     #[props(default)] rows: FieldRows,
     #[props(default)] size: ControlSize,
@@ -111,6 +166,7 @@ pub fn TextField(
     #[props(default)] onfocus: EventHandler<()>,
     #[props(default)] onblur: EventHandler<()>,
     #[props(default)] onchange: EventHandler<String>,
+    #[props(default)] onsubmit: EventHandler<String>,
     #[props(default)] handle: Option<FieldHandle>,
     #[props(default)] common: Common,
 ) -> Element {
@@ -124,9 +180,15 @@ pub fn TextField(
     if let FieldFocus::Controlled(request) = focus {
         focuser.follow(request, onfocus);
     }
-    let text = held(kind, value, typed);
-    let committed = text.clone();
-    let blurred = text.clone();
+    let round = use_round(
+        kind == FieldKind::Secure && text == FieldText::Caller,
+        &value,
+        holds(),
+    );
+    let held_text = held(kind, text, value, typed);
+    let committed = held_text.clone();
+    let submitted = held_text.clone();
+    let blurred = held_text.clone();
     let focus_in = EventHandler::new(move |()| {
         holds.set(Holds::Caret);
         onfocus.call(());
@@ -147,29 +209,33 @@ pub fn TextField(
         }),
     };
     let clearing =
-        kind == FieldKind::Search && !text.is_empty() && availability == Availability::Enabled;
+        kind == FieldKind::Search && !held_text.is_empty() && availability == Availability::Enabled;
     let note = validity.message().cloned().or(help);
     let field = Field {
         bezel,
         rows,
+        text,
         size,
         label,
         id: common.id.clone(),
         placeholder,
         availability,
         invalid: validity.attr().map(|_| "true"),
-        focus,
+        focus: round.focus(focus),
         focuser: focuser.clone(),
         caret,
         handlers: Handlers {
             oninput: EventHandler::new(move |next: String| {
-                typed.set(next.clone());
+                if kind == FieldKind::Secure && text == FieldText::Own {
+                    typed.set(next.clone());
+                }
                 oninput.call(next);
             }),
             onkey,
             onfocus: focus_in,
             onblur: focus_out,
             onchange: EventHandler::new(move |()| onchange.call(committed.clone())),
+            onsubmit: EventHandler::new(move |()| onsubmit.call(submitted.clone())),
         },
         told,
     };
@@ -207,7 +273,7 @@ pub fn TextField(
                 if let Some(mark) = leading {
                     span { class: "ds-text-field-icon", {mark} }
                 }
-                {line(field, kind, text)}
+                {keyed(round.generation(), line(field, kind, held_text))}
                 if clearing {
                     Button {
                         bezel: Bezel::Toolbar,

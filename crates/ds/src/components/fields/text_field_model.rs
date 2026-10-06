@@ -11,10 +11,11 @@ pub enum FieldKind {
     /// A line of text.
     #[default]
     Plain,
-    /// A secret that never reaches the markup: the field keeps what is typed in its own state
-    /// and hands it out only through `oninput` and `onchange`. No `value` attribute is ever
-    /// written (the `value` prop is ignored), only one dot per character over the caret. To
-    /// clear it, remount the field under a new `key`. Blitz lays a password field out as text and
+    /// A secret that never reaches the markup: no `value` attribute is ever written for the
+    /// typed text, only one dot per character over the caret. Copy and cut are refused; paste
+    /// is allowed. Who holds the text is [`FieldText`]: the field's own state (the default,
+    /// handed out only through `oninput`, `onchange` and `onsubmit`; to clear it, remount the
+    /// field under a new `key`) or the caller's `value`. Blitz lays a password field out as text and
     /// draws its characters as typed, so the field paints its text transparent and lays a row of
     /// dots over it.
     Secure,
@@ -24,6 +25,18 @@ pub enum FieldKind {
     /// Several lines: Enter adds a line, the caret leaving commits, and the field is as tall as
     /// its [`FieldRows`]. It has no mask, no clear button and no search tokens.
     Multiline,
+}
+
+/// Who holds a secure field's text. A plain, search or multi-line field always shows the
+/// caller's `value`, so this changes nothing for them.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum FieldText {
+    /// The field keeps what is typed in its own state and ignores `value`.
+    #[default]
+    Own,
+    /// The caller's `value` is the text: the field shows one dot per character of it, keeps no
+    /// copy, and a `value` the caller empties empties the field. `oninput` hears each change.
+    Caller,
 }
 
 /// How many lines a [`FieldKind::Multiline`] field shows before its text scrolls, `data-rows`.

@@ -708,6 +708,36 @@ A few props worth knowing about before you read the signatures:
   detail, actions, onclose }`). `EmptyState`'s `description` is a `TextLine`, so a `RunTone::Code` run
   can hold a command. `FactList { facts: vec![Fact::new("When", ..)] }` is a read-only list of labels
   and values; a `FieldRow` takes one control or several, which wrap.
+- **Controlled components** (CONVENTIONS section 3, "Controlled components"): the caller holds the state
+  and the component shows it. A `TextField` is `value` in, `oninput` out for each change, `onsubmit` for
+  Enter alone (`onchange` is Enter or the caret leaving; neither fires `onsubmit` in a multi-line field),
+  `validity: Validity::Invalid(Invalid { message, stamp })` for the error text under the field (it
+  replaces `help` in the danger ink) and `availability`. A secure field keeps its own text unless it is
+  given `text: FieldText::Caller`; then its `value` is the text, it keeps no copy, one dot per character
+  is all it draws, copy and cut (Ctrl or Super with C or X, Ctrl+Insert, Shift+Delete) are refused,
+  paste works, and a `value` the caller empties empties it (it needs no new `key`).
+- `List { cursor: Option<K>, onselect, onpick }` is a selection the caller holds by key: arrows, Home
+  and End and type-ahead call `onselect(key)`, Enter and Space call `onpick(key)`, and the list passes
+  over headings and disabled rows. The caller draws the selected row (`Row { state: RowState { selection,
+  .. } }`) from its own `cursor`; reordering the items moves nothing, since the cursor is a key.
+- `PopUpButton { value: Option<T>, onpick }` is controlled in its value; its open state is the button's
+  own until the caller passes `open: Some(Shown)`, after which every press, arrow key, pick or dismissal
+  reaches `on_open_change(Shown)` and the caller stores it (`start` is then ignored).
+- A button's `availability` is its controlled disabled state. `answers: Answers::Return` draws the
+  default button and `Answers::Escape` the Cancel button; the keys themselves are routed by the dialog:
+  `Alert` routes both, and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
+  control did not take it, a multi-line field's Enter included) to `on_return` and Escape to `onclose`.
+  Pass `on_return: None` while the default button is disabled. The first stop of the keyboard in a sheet
+  is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { focus:
+  ButtonFocus::OnMount }` for the default button.
+- Copying to the clipboard from an action is `ds_blitz::clipboard::write_text(&str)` (read: `read_text`),
+  reached through the document's host, so call it from a handler; a test reads it back with
+  `Harness::clipboard_text()`. ds-shell has no clipboard of its own.
+- A settings enum key's menu is built by the caller from `KeySpec::grouped_choices()`: a
+  `MenuItem::Header(group)` over each group's items, an unavailable choice as `MenuItem::new(..)
+  .with_availability(Availability::Disabled)` with `MenuItem::Info { title: reason, detail: None }` right
+  under it (detent's `menu_items` is the worked example). ds does not depend on ds-settings, so quire
+  has no converter.
 - `Row { edit: Some(field) }` puts a field where the words stood (rename in place: a `TextField` with
   `FieldBezel::Plain`); the keys and presses typed in it do not reach the `List` around it. `PinItem`
   carries its own `mark: MarkStyle`; `TodayTab` its row's `common` and `onpointerenter`/`onpointerleave`.

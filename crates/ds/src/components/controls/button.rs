@@ -11,7 +11,7 @@ use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
 use crate::components::controls::button_marks::{Leading, Trailing, spoken_label};
 use crate::components::controls::button_model::{
-    Answers, Bezel, ButtonRole, IconSwap, ImagePosition,
+    Answers, Bezel, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
 };
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
@@ -20,6 +20,7 @@ use crate::components::controls::press::{
 use crate::components::controls::progress::busy::{busy_class, use_busy, use_busy_seen};
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
+use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
@@ -58,6 +59,11 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// drops every press; `Busy` does the same for input, writes `aria-busy`, and shows a spinner in
 /// the leading slot, faded in over `--t-quick`.
 ///
+/// `answers` says which window key the button answers (see [`Answers`]): a dialog that wants
+/// Return and Escape to press it routes them itself ([`Sheet`](crate::components::overlays::sheet::Sheet)'s
+/// `on_return`, an alert's own keys). `focus: ButtonFocus::OnMount` gives it the keyboard as it
+/// mounts. A caller-controlled disabled state is `availability`.
+///
 /// `swap: IconSwap::CrossFade` fades a changed `icon` into the new one.
 ///
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear the
@@ -68,6 +74,7 @@ pub fn Button(
     #[props(default)] bezel: Bezel,
     #[props(default)] role: ButtonRole,
     #[props(default)] answers: Answers,
+    #[props(default)] focus: ButtonFocus,
     #[props(default)] size: ControlSize,
     #[props(default)] image: ImagePosition,
     #[props(default)] swap: IconSwap,
@@ -147,7 +154,12 @@ pub fn Button(
             },
             // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
             // attribute: the markup is the same with or without a handler.
-            onmounted: move |event| common.mounted(event),
+            onmounted: move |event| {
+                if focus == ButtonFocus::OnMount {
+                    focus_soon(event.data());
+                }
+                common.mounted(event);
+            },
             // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
             if availability == Availability::Busy {

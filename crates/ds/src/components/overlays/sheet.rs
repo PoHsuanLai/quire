@@ -41,6 +41,13 @@ use ds_style::tokens::layer::ZLayer;
 /// `width` is [`SheetWidth::Regular`] (560) by default, [`SheetWidth::Narrow`] (340) for an alert
 /// or a password prompt, [`SheetWidth::Wide`] (1040) for a gallery.
 ///
+/// `on_return` is what Return does anywhere in the sheet that no control took for itself: a
+/// field's Enter (not a multi-line field's, which adds a line), the sheet's own background. It
+/// is the default button's press, so a sheet with a default button passes the same handler to
+/// both, and passes `None` while that button is disabled, so Return does nothing then.
+/// Escape closes through `onclose`. The first stop of the keyboard is the caller's: a field
+/// with `FieldFocus::OnMount`, or a button with `ButtonFocus::OnMount`.
+///
 /// `common` puts the consumer's `id` (for a host that resolves its blur or input region by id),
 /// `data-*` and classes on the panel.
 #[component]
@@ -49,6 +56,7 @@ pub fn Sheet(
     onclose: EventHandler<()>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
+    #[props(default)] on_return: Option<EventHandler<()>>,
     #[props(default)] attach: Attach,
     #[props(default)] width: SheetWidth,
     #[props(default)] common: Common,
@@ -95,7 +103,16 @@ pub fn Sheet(
             role: "dialog",
             "aria-label": "{label}",
             onmounted: move |event| common.mounted(event),
-            onkeydown: move |event| escape_closes(float, &event, onclose),
+            onkeydown: move |event| {
+                escape_closes(float, &event, onclose);
+                if let Some(press) = on_return
+                    && event.key() == Key::Enter
+                {
+                    event.stop_propagation();
+                    event.prevent_default();
+                    press.call(());
+                }
+            },
             ..data,
             div { class: "ds-sheet-body", {children} }
         }

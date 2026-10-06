@@ -4,14 +4,15 @@
 use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
-use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
+use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows, FieldText};
+use crate::components::fields::text_field_secret::takes_text_out;
 use crate::focus::targets::Told;
 use dioxus::prelude::*;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 use ds_style::tokens::control_size::ControlSize;
 
-/// Where a field's events go. `onchange` takes no value: the field already knows it.
+/// Where a field's events go. `onchange` and `onsubmit` take no value: the field already knows it.
 #[derive(Clone, Copy)]
 pub(crate) struct Handlers {
     pub oninput: EventHandler<String>,
@@ -19,6 +20,8 @@ pub(crate) struct Handlers {
     pub onfocus: EventHandler<()>,
     pub onblur: EventHandler<()>,
     pub onchange: EventHandler<()>,
+    /// Enter in a one-line field.
+    pub onsubmit: EventHandler<()>,
 }
 
 /// Everything the line needs besides its value.
@@ -26,6 +29,8 @@ pub(crate) struct Field {
     pub bezel: FieldBezel,
     /// How tall a multi-line field is; a line ignores it.
     pub rows: FieldRows,
+    /// Who holds a secure field's text.
+    pub text: FieldText,
     pub size: ControlSize,
     pub label: String,
     /// The input's own `id`, from the caller's `Common`.
@@ -64,6 +69,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
     let Field {
         bezel,
         rows: _,
+        text: _,
         size,
         label,
         id,
@@ -80,7 +86,13 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
     let owner = caret.owner(count);
     let mask = (count > 0).then(|| MaskParts::cut(count, caret.selection(), owner));
     let shown = placeholder_shown(&value, &placeholder);
-    let written = (kind != FieldKind::Secure).then_some(value);
+    // A secure field writes no text, whoever holds it (a caller that empties its text remounts
+    // the line, see `TextField`).
+    let written = match kind {
+        FieldKind::Secure => None,
+        FieldKind::Plain | FieldKind::Search | FieldKind::Multiline => Some(value),
+    };
+    let secret = kind == FieldKind::Secure;
     rsx! {
         span {
             class: "ds-input-wrap",
@@ -122,10 +134,26 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                         handlers.oninput.call(event.value());
                     }
                 },
+                oncopy: move |event| {
+                    if secret {
+                        event.prevent_default();
+                    }
+                },
+                oncut: move |event| {
+                    if secret {
+                        event.prevent_default();
+                    }
+                },
                 onkeydown: move |event: KeyboardEvent| {
                     caret.refresh();
+                    if secret && takes_text_out(&event.key(), event.modifiers()) {
+                        event.prevent_default();
+                    }
                     if event.key() == Key::Enter {
                         handlers.onchange.call(());
+                        if availability == Availability::Enabled {
+                            handlers.onsubmit.call(());
+                        }
                     }
                     handlers.onkey.call(event);
                 },

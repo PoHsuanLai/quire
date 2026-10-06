@@ -69,7 +69,7 @@ pub use crate::components::fields::fact_list::{Fact, FactList};
 pub use crate::components::fields::text_field::TextField;
 pub use crate::components::fields::text_field_focus::FieldFocus;
 pub use crate::components::fields::text_field_model::FieldBezel;
-pub use crate::components::fields::text_field_model::FieldKind;
+pub use crate::components::fields::text_field_model::{FieldKind, FieldText};
 pub use crate::components::fields::text_field_model::Validity;
 
 // Overlays

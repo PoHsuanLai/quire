@@ -9,3 +9,4 @@ pub mod text_field_focus;
 pub(crate) mod text_field_mask;
 pub mod text_field_model;
 pub(crate) mod text_field_parts;
+pub(crate) mod text_field_secret;

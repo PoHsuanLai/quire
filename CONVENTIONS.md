@@ -74,6 +74,15 @@ quietly.
   dev code.
 - **An API change updates every caller in the same change.** No deprecated alias, no "kept
   for callers", no old path re-exported "for one release".
+- **Controlled components.** A component that holds a value the caller may want to own takes it
+  in an optional prop and reports each change the person asks for: `value: Option<T>` or the
+  value itself, `on_change(T)` for the change, and for a state such as open or selected the same
+  pair (`open: Option<Shown>`, `on_open_change(Shown)`). While the prop is `Some`, the
+  component's own copy is ignored and it draws what it was given; while it is `None`, it keeps its
+  own and the callback only listens. A component never holds a second copy of a value the caller
+  holds, and a selection is a key (`cursor: Option<K>`), never an index. `MenuCursor`'s shape is
+  the model. *Because:* a secure field kept its own text and ignored `value`, and a pop-up's open
+  state could only be set as it mounted.
 - **`#[non_exhaustive]` on nothing.** Nothing is published, so it buys no compatibility and
   costs exhaustive matching, which is the reason the vocabulary is enums.
 

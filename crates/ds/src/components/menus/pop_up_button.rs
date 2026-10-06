@@ -71,9 +71,15 @@ fn marked<T: Clone + PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Vec
 /// chosen. While the button holds the keyboard, letters choose the next item that starts with
 /// them.
 ///
-/// `start` is whether the menu is open as the button mounts (closed unless asked). The menu is
-/// placed against the button's own element, which a renderer reports once it has laid the
-/// button out; `anchor` names another place instead (a point or a rect), and then the menu
+/// `start` is whether the menu is open as the button mounts (closed unless asked). `open`
+/// hands the open state to the caller: `Some(shown)` is the state (the button's own is then
+/// ignored, `start` included), and every change the person asks for (a press, an arrow key, a
+/// pick, Escape or a click outside) reaches `on_open_change` as the state it wants, so the
+/// caller stores it and passes it back. With `open: None` the button keeps its own state and
+/// `on_open_change` only listens.
+///
+/// The menu is placed against the button's own element, which a renderer reports once it has
+/// laid the button out; `anchor` names another place instead (a point or a rect), and then the menu
 /// needs no element at all. A document with no renderer (a unit test over a `VirtualDom` and
 /// `dioxus-ssr`) never reports one, so it opens a pop-up with
 /// `start: Shown::Visible, anchor: Some(Anchor::Point(..))`, or by clicking the button once
@@ -87,11 +93,22 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     #[props(default)] title: Option<String>,
     #[props(default)] size: ControlSize,
     #[props(default)] start: Shown,
+    #[props(default)] open: Option<Shown>,
+    #[props(default)] on_open_change: Option<EventHandler<Shown>>,
     #[props(default)] anchor: Option<Anchor>,
     #[props(default)] availability: Availability,
     #[props(default)] common: Common,
 ) -> Element {
-    let mut open = use_signal(move || start);
+    let mut own = use_signal(move || start);
+    let shown = open.unwrap_or_else(|| own());
+    let mut set_open = move |to: Shown| {
+        if open.is_none() {
+            own.set(to);
+        }
+        if let Some(heard) = on_open_change {
+            heard.call(to);
+        }
+    };
     let mut element = use_signal(|| None::<MountedRef>);
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let live = availability == Availability::Enabled;
@@ -140,7 +157,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     let onkey = move |event: KeyboardEvent| match event.key() {
         Key::ArrowDown | Key::ArrowUp if live => {
             event.prevent_default();
-            open.set(Shown::Visible);
+            set_open(Shown::Visible);
         }
         Key::Character(text)
             if live
@@ -191,10 +208,10 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 size,
                 availability,
                 trailing,
-                shown: Some(open()),
+                shown: Some(shown),
                 onclick: move |_: Press| {
                     if live {
-                        open.set(open().flipped());
+                        set_open(shown.flipped());
                     }
                 },
                 common: Common {
@@ -210,16 +227,16 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 span { class: "ds-popup-sizer", "aria-hidden": "true", "{widest}" }
             }
         }
-        if open() == Shown::Visible && let Some(anchor) = anchor {
+        if shown == Shown::Visible && let Some(anchor) = anchor {
             Menu::<T> {
                 placement: MenuPlacement::Popup,
                 anchor,
                 items: listed,
                 onpick: move |picked: T| {
-                    open.set(Shown::Hidden);
+                    set_open(Shown::Hidden);
                     onpick.call(picked);
                 },
-                onclose: move |()| open.set(Shown::Hidden),
+                onclose: move |()| set_open(Shown::Hidden),
             }
         }
     }

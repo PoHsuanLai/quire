@@ -11,6 +11,7 @@ pub(crate) fn area(field: Field, value: String) -> Element {
     let Field {
         bezel,
         rows,
+        text: _,
         size,
         label,
         id,
@@ -59,7 +60,13 @@ pub(crate) fn area(field: Field, value: String) -> Element {
                         handlers.oninput.call(event.value());
                     }
                 },
-                onkeydown: move |event: KeyboardEvent| handlers.onkey.call(event),
+                onkeydown: move |event: KeyboardEvent| {
+                    // Enter is this field's newline: no outer default button takes it.
+                    if event.key() == Key::Enter {
+                        event.stop_propagation();
+                    }
+                    handlers.onkey.call(event);
+                },
             }
             if let Some(text) = shown {
                 span { class: "ds-input-placeholder", "aria-hidden": "true", "{text}" }
