@@ -72,4 +72,6 @@ pub enum Page {
     /// Symbol effects: every effect on a few icons, with a button for each `Once` effect and a
     /// toggle for each `While` one (design/35-SYMBOL-EFFECTS.md).
     Symbols,
+    /// The account sheets: the consent alert, the add-account steps and the parts an app shows.
+    Accounts,
 }

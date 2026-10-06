@@ -1,3 +1,4 @@
+pub mod accounts;
 pub mod app_features;
 pub mod calendar;
 pub mod chrome_targets;

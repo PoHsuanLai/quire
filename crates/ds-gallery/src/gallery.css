@@ -229,3 +229,5 @@
 .g-space-key[*|data-space="3"]{background:var(--c-violet-soft)}
 .g-space-key[*|data-space="4"]{background:var(--c-amber-soft)}
 .g-space-key[*|data-space="5"]{background:var(--c-red-soft)}
+.g-accounts{width:588px;background-size:cover;background-position:center}
+.g-accounts-stage{height:560px}

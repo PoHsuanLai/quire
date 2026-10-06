@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 28] = [
+pub const REGISTRY: [Entry; 29] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -217,6 +217,13 @@ pub const REGISTRY: [Entry; 28] = [
         lede: "Symbol effects (design/35-SYMBOL-EFFECTS.md), modelled on SF Symbols': Bounce, Pulse, Wiggle, Breathe, Rotate, Variable Color and the icon's own moving part fire once from a button; the same effects, Scale up and Scale down run while their toggle is on; Appear, Disappear, Draw On and Replace play when their state changes; and the part-aware icons (trash, bell, mail, folder, refresh, Wi-Fi, volume, battery, lock, star, heart) move the piece Apple moves. Nothing runs by itself: each settles to 0 frames except a toggle left on.",
         height: 3000,
         body: crate::pages::content::symbols::SymbolsPage,
+    },
+    Entry {
+        page: Page::Accounts,
+        title: "Accounts",
+        lede: "The account sheets: the consent alert with one account, several and none; each step of the add-account sheet (providers with a search, the sign-in form with a refused password, the browser wait, the device code, the review with limits and the add-and-allow button) in light and dark; and the parts an app shows: the account picker, the no-account states, the badge and the limited note.",
+        height: 4200,
+        body: crate::pages::shell::accounts::AccountsPage,
     },
 ];
 

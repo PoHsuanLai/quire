@@ -4,6 +4,7 @@
 //! widgets with their catalog, over `ds` (the generic components and the document seam), and the
 //! shell's own tokens and sheets, which `kits()` and `stylesheet()` add to the design system's.
 
+pub mod accounts;
 pub mod bar;
 pub mod battery;
 pub mod catalog;

@@ -1546,3 +1546,42 @@ Open:
   a name to a role (accountd's `Peer` registry) is the daemon's, not this crate's.
 - `Describe` and `Get` also go through `permit(.., Access::Read)`; accountd and inferd allow reads
   to the Settings role only, as the plan has it. A module that wants public reads returns `Allow`.
+
+## Account sheets (`ds-shell::accounts`)
+
+Standing facts:
+
+- The components take plain props and name no porter type; a host maps its sheet view to them in
+  one table-tested file (porter's `SheetView::Consent` to `ConsentAlert`, `Providers` to
+  `ProviderList`, `SignIn` to `SignInForm`, `BrowserWait` to `BrowserWait`, `ShowCode` to
+  `ShowCode`, `Review` to `ReviewServices`, `Working` to `SignInWorking`, `Failed` to
+  `SignInFailed`). `AccountSheet` is the panel a step stands in; `ConsentAlert` is its own sheet.
+- Secret text is `accounts::hidden::Hidden`: no `Display`, no serde, `Debug` prints `<hidden>`. It
+  is the one type a hidden field's keystrokes travel in (`FieldText::Secret`), and a test checks
+  the password is in no markup.
+- Escape on the consent alert answers `ConsentAnswer::Dismiss` (nothing stored); only "Don't Allow"
+  denies. A step takes Escape and Return itself, once, and each starts the keyboard on its first
+  field or its default button, so the keys reach it.
+- A row's `Accessory::Toggle` (and `Slot`) stops every key it hears, so Return pressed on a switch
+  never reached a default button. `ReviewServices` draws its switches inside the row's content
+  instead, and a conformance test presses Return after pressing a switch.
+- Every sentence is in `accounts::wording`; the host words nothing.
+- Every use of a piece R2 makes controlled is in `accounts::adapter` (`Entry`, `PickRows`,
+  `Action`, `CopyAction`, `ChoiceMenu`), so the switch is that file.
+
+Open:
+
+- A secure `TextField` keeps its own text and never reads `value`. `adapter::Entry` remounts it when
+  the host hands back an empty secret after a typed one (a refused password the host clears), but a
+  host that draws a form again with a typed password in it (Back, then forward) shows the field
+  empty. Controlled secure fields in R2a remove this; the switch is `Entry`.
+- `List` moves its cursor only while it holds the keyboard: from the provider search, Down does
+  not enter the list (Tab does). Return picks the cursor row, else the first match. Select-by-key in
+  R2a; the switch is `PickRows` and `ProviderList`.
+- `ds-shell` never touches the clipboard: Copy Link and Copy Code report the text through
+  `on_copy`, the host copies and answers `CopyState::Copied`. R2a's clipboard replaces the event in
+  `CopyAction`.
+- The account pop-up's open state is the `PopUpButton`'s own; its value is the host's. R2a's open
+  state replaces `ChoiceMenu`'s body.
+- The goldens are markup (`crates/ds-shell/tests/snapshots/accounts/*-light.html` and `-dark.html`);
+  no pixel snapshot of the Accounts gallery page is kept.
