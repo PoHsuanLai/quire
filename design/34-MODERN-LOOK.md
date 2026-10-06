@@ -388,7 +388,9 @@ Step 2 (Tahoe): same four lanes, files as above plus:
   plus `cargo test --workspace --all-features` and the sill gate.
 Step 2 starts only after step 1 is merged and the consumers are re-pinned and green.
 
-## 6. Open questions for the owner
+## 6. Owner decisions (settled 2026-10-07)
+
+The owner took every recommended default below; they are decisions, not open questions.
 
 1. **Tahoe control heights are not confirmed.** Apple publishes none in text; the 20/24/28/32/40
    ladder is my best M-low estimate. Recommended default: build step 2 on it and verify against
