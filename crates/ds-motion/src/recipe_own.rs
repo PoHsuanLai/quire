@@ -126,3 +126,12 @@ pub(super) const HOLD: Recipe = recipe(
     Fill::None,
     Iteration::Once,
 );
+
+/// `turn`: a busy button's icon, one revolution a second, forever, at a constant speed.
+pub(super) const TURN: Recipe = recipe(
+    "turn",
+    DurationToken::Turn,
+    EasingToken::Linear,
+    Fill::None,
+    Iteration::Infinite,
+);

@@ -74,6 +74,8 @@
 .ds-button[*|aria-busy=true] > .ds-button-icon,
 .ds-button[*|aria-busy=true] > .ds-button-label,
 .ds-button[*|aria-busy=true] > .ds-button-trail{ opacity:.35; }
+/* A turning icon is the busy mark itself, so it stays clear like the spinner does. */
+.ds-button[*|data-busy=turn-icon][*|aria-busy=true] > .ds-button-icon{ opacity:1; }
 /* The busy spinner of a default button reads on the accent fill: its spokes take the ink. */
 .ds-button[*|data-variant=push][*|data-answers=return][*|aria-busy=true] .ds-progress-indicator{ background:var(--accent-ink); }
 /* A disabled default button keeps its accent edge: the fill at .35 is barely apart from a

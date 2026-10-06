@@ -65,7 +65,7 @@ impl Anim {
             | Anim::PanelOut
             | Anim::MorphOut
             | Anim::RowOut => CrossFade(Out),
-            Anim::Heal | Anim::ShakeX | Anim::Shake => Still,
+            Anim::Heal | Anim::ShakeX | Anim::Shake | Anim::Turn => Still,
             Anim::MenuOut
             | Anim::Fade
             | Anim::PaletteFade

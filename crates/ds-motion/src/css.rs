@@ -181,4 +181,19 @@ mod tests {
             assert_eq!(animation(anim.recipe(), suffix), want, "{anim:?}");
         }
     }
+
+    #[test]
+    fn a_turning_icon_loops_at_a_constant_speed_and_holds_still_under_reduced() {
+        let css = motion_css();
+        let compact: String = css.split_whitespace().collect();
+        assert!(
+            compact.contains("animation:turnvar(--t-turn)var(--e-linear)infinite"),
+            "{css}"
+        );
+        assert!(
+            compact.contains("animation-name:hold"),
+            "a pulse that moves plays hold under Reduced: {css}"
+        );
+        assert_eq!(Anim::Turn.reduced().keyframes("turn"), "hold");
+    }
 }

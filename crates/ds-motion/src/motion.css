@@ -79,6 +79,8 @@
    another. Blitz at the pinned rev keeps a cancelled animation's last value on the element until
    something restyles it again; a starting animation is that restyle, in the same frame. */
 @keyframes hold{ from{ } to{ } }
+/* `turn`: a busy button's icon, one revolution (design/30 section 2.1). */
+@keyframes turn{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
 
 /* row-in, row-out and heal (design/30 section 1.3, macOS `NSTableView` `effectFade` + `slideUp`):
    an inserted row fades and slides down into place, a removed one fades and slides up, and the

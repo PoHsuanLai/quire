@@ -10,8 +10,8 @@ use ds::components::fields::text_field_model::Invalid;
 use ds::components::menus::pop_up_button::PopUpButton;
 use ds::components::overlays::sheet::Sheet;
 use ds::components::overlays::sheet_attach::Attach;
-use ds::prelude::*;
 use ds::motion::detail::stamp::EventStamp;
+use ds::prelude::*;
 use ds_harness::harness::settle_until;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
@@ -94,8 +94,16 @@ fn a_secure_field_the_caller_holds_masks_its_value_and_keeps_it_from_the_clipboa
     click(&mut harness, "#secret input");
     type_text(&mut harness, "abc");
     assert_eq!(harness.text_of(".held").as_deref(), Some("abc"));
-    assert_eq!(dots(&harness), 3, "one dot per character of the caller's value");
-    assert_eq!(harness.attr("#secret input", "value"), None, "never the text");
+    assert_eq!(
+        dots(&harness),
+        3,
+        "one dot per character of the caller's value"
+    );
+    assert_eq!(
+        harness.attr("#secret input", "value"),
+        None,
+        "never the text"
+    );
     let markup = harness.html();
     let field = markup
         .split("id=\"secret\"")
@@ -109,11 +117,19 @@ fn a_secure_field_the_caller_holds_masks_its_value_and_keeps_it_from_the_clipboa
     assert_eq!(harness.clipboard_text(), None, "copy is refused");
     chord(&mut harness, 'x');
     assert_eq!(harness.clipboard_text(), None, "cut is refused");
-    assert_eq!(harness.text_of(".held").as_deref(), Some("abc"), "and cuts nothing");
+    assert_eq!(
+        harness.text_of(".held").as_deref(),
+        Some("abc"),
+        "and cuts nothing"
+    );
 
     harness.set_clipboard_text("zz");
     chord(&mut harness, 'v');
-    assert_eq!(harness.text_of(".held").as_deref(), Some("zz"), "paste replaces");
+    assert_eq!(
+        harness.text_of(".held").as_deref(),
+        Some("zz"),
+        "paste replaces"
+    );
     assert_eq!(dots(&harness), 2);
 
     // The same chords copy out of the plain field beside it.
@@ -191,7 +207,10 @@ fn a_plain_field_submits_on_enter_alone_and_shows_its_error_under_it() {
     );
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
-    assert_eq!(harness.text_of(".log").as_deref(), Some("change:ab,submit:ab"));
+    assert_eq!(
+        harness.text_of(".log").as_deref(),
+        Some("change:ab,submit:ab")
+    );
     click(&mut harness, "#other input");
     assert_eq!(
         harness.text_of(".log").as_deref(),
@@ -250,11 +269,26 @@ fn a_list_cursor_is_a_key_the_caller_holds_and_follows_the_key_through_a_reorder
         harness.advance(ms(20));
         assert_eq!(harness.text_of(".picked").as_deref(), Some(want), "{why}");
     };
-    press(&mut harness, ShortcutKey::Down, "anthropic", "no cursor yet: the first row");
+    press(
+        &mut harness,
+        ShortcutKey::Down,
+        "anthropic",
+        "no cursor yet: the first row",
+    );
     press(&mut harness, ShortcutKey::Down, "google", "next");
-    press(&mut harness, ShortcutKey::Down, "imap", "the disabled row is passed over");
+    press(
+        &mut harness,
+        ShortcutKey::Down,
+        "imap",
+        "the disabled row is passed over",
+    );
     press(&mut harness, ShortcutKey::Home, "anthropic", "Home");
-    press(&mut harness, ShortcutKey::Char('o'), "imap", "type-ahead: the label starting with o");
+    press(
+        &mut harness,
+        ShortcutKey::Char('o'),
+        "imap",
+        "type-ahead: the label starting with o",
+    );
     press(&mut harness, ShortcutKey::Home, "anthropic", "Home again");
     press(&mut harness, ShortcutKey::Down, "google", "next");
 
@@ -262,7 +296,12 @@ fn a_list_cursor_is_a_key_the_caller_holds_and_follows_the_key_through_a_reorder
     // now first: Down reaches Anthropic.
     click(&mut harness, "#flip");
     click(&mut harness, "#p-google");
-    press(&mut harness, ShortcutKey::Down, "anthropic", "the cursor followed the key");
+    press(
+        &mut harness,
+        ShortcutKey::Down,
+        "anthropic",
+        "the cursor followed the key",
+    );
 }
 
 /// A pop-up the caller opens and closes, logging what the person asked.
@@ -293,7 +332,11 @@ fn a_pop_up_opens_when_the_caller_says_and_only_asks_when_the_person_presses() {
     assert!(harness.rect(".ds-menu").is_none());
     click(&mut harness, "#open");
     assert!(harness.rect(".ds-menu").is_some(), "the caller opened it");
-    assert_eq!(harness.text_of(".asked").as_deref(), Some(""), "and was not asked");
+    assert_eq!(
+        harness.text_of(".asked").as_deref(),
+        Some(""),
+        "and was not asked"
+    );
     let second = harness
         .centre(".ds-menu-item:nth-child(2) .ds-menu-label")
         .expect("the second item");
@@ -350,10 +393,18 @@ fn Asking() -> Element {
 fn return_in_a_sheet_presses_its_default_button_while_that_is_enabled() {
     let mut harness = harness(Asking);
     harness.advance(ms(600));
-    assert_eq!(harness.focus_of("#who input"), FocusState::Focused, "first field");
+    assert_eq!(
+        harness.focus_of("#who input"),
+        FocusState::Focused,
+        "first field"
+    );
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));
-    assert_eq!(harness.text_of(".log").as_deref(), Some(""), "disabled: Return does nothing");
+    assert_eq!(
+        harness.text_of(".log").as_deref(),
+        Some(""),
+        "disabled: Return does nothing"
+    );
     type_text(&mut harness, "ada");
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(30));

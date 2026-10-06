@@ -53,6 +53,17 @@ pub enum ButtonFocus {
     OnMount,
 }
 
+/// How a busy button shows it is working (`availability: Busy`), `data-busy`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum BusyLook {
+    /// A spinner in the leading slot (`NSProgressIndicator`).
+    #[default]
+    Spinner,
+    /// No spinner: the button's own icon keeps its glyph and turns continuously, as Mail's Get
+    /// Mail arrow does. Under Reduced motion the glyph holds still.
+    TurnIcon,
+}
+
 /// Whether the button's label is drawn beside its image (`NSButton.imagePosition`),
 /// `data-image`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]

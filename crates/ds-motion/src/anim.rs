@@ -109,11 +109,14 @@ pub enum Anim {
     /// person's own press caused (design/26 R5, play/pause, the Focus disc); `MorphIn` is the
     /// same growth at `--e-out` for a change from elsewhere.
     MorphInSpring,
+    /// `turn` at `--t-turn` linear, forever: a busy button's icon turning (a Get Mail arrow).
+    /// Under Reduced it plays `hold` once, so the glyph stays still.
+    Turn,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 31] = [
+    pub const ALL: [Anim; 32] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -145,6 +148,7 @@ impl Anim {
         Anim::Hold,
         Anim::PaneInROut,
         Anim::MorphInSpring,
+        Anim::Turn,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -181,6 +185,7 @@ impl Anim {
             Anim::Hold => "a-hold",
             Anim::PaneInROut => "a-pane-in-r-out",
             Anim::MorphInSpring => "a-morph-in-spring",
+            Anim::Turn => "a-turn",
         }
     }
 }

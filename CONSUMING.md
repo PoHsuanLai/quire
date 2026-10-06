@@ -730,6 +730,10 @@ A few props worth knowing about before you read the signatures:
   Pass `on_return: None` while the default button is disabled. The first stop of the keyboard in a sheet
   is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { focus:
   ButtonFocus::OnMount }` for the default button.
+- `Button { availability: Availability::Busy, busy: BusyLook::TurnIcon, icon, .. }` shows work in progress
+  by turning the button's own icon (Mail's Get Mail arrow) instead of the default spinner in the leading
+  slot: one linear turn a second (`turn`, `--t-turn`), no leading mark, input dropped and `aria-busy`
+  written as for any busy button. Reduced motion holds the glyph still. `BusyLook::Spinner` is the default.
 - Copying to the clipboard from an action is `ds_blitz::clipboard::write_text(&str)` (read: `read_text`),
   reached through the document's host, so call it from a handler; a test reads it back with
   `Harness::clipboard_text()`. ds-shell has no clipboard of its own.

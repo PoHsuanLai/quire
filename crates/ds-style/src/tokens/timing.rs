@@ -36,6 +36,9 @@ pub enum DurationToken {
     /// `--t-spin-step` 83 ms: one of the spinner's twelve spokes, a turn a second.
     /// [`DurationKind::Hold`]: the spinner keeps turning under Reduced.
     SpinStep,
+    /// `--t-turn` 1000 ms: one turn of a busy button's icon (`turn`), linear.
+    /// [`DurationKind::Hold`]: it is a speed, not a transition; Reduced plays the still form.
+    Turn,
     /// `--t-shake` 420 ms: `shake-x`.
     Shake,
     /// `--t-send-ring` 5 s: the undo-send countdown ring, linear. [`DurationKind::Hold`]: the
@@ -78,7 +81,7 @@ impl DurationToken {
             // The undo window is time a person has to act, not motion.
             DurationToken::SendRing => DurationKind::Hold,
             // The spinner keeps turning under Reduced, as macOS's does.
-            DurationToken::SpinStep => DurationKind::Hold,
+            DurationToken::SpinStep | DurationToken::Turn => DurationKind::Hold,
             // The orb's period is a speed, not a transition; Reduced makes the orb inactive
             // instead of making it turn at a cross-fade's pace.
             DurationToken::OrbListen | DurationToken::OrbWork | DurationToken::OrbAct => {
@@ -98,6 +101,7 @@ impl DurationToken {
             (DurationToken::Move, _) => 250,
             (DurationToken::Big, _) => 400,
             (DurationToken::SpinStep, _) => 83,
+            (DurationToken::Turn, _) => 1000,
             (DurationToken::Shake, _) => 420,
             (DurationToken::SendRing, _) => 5000,
             (DurationToken::Awake, _) => 20000,

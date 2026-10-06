@@ -11,7 +11,7 @@ use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
 use crate::components::controls::button_marks::{Leading, Trailing, spoken_label};
 use crate::components::controls::button_model::{
-    Answers, Bezel, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
+    Answers, Bezel, BusyLook, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
 };
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
@@ -64,6 +64,9 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// `on_return`, an alert's own keys). `focus: ButtonFocus::OnMount` gives it the keyboard as it
 /// mounts. A caller-controlled disabled state is `availability`.
 ///
+/// `busy: BusyLook::TurnIcon` replaces the busy spinner with the button's own `icon` turning
+/// continuously (no leading mark; input is dropped and `aria-busy` written all the same).
+///
 /// `swap: IconSwap::CrossFade` fades a changed `icon` into the new one.
 ///
 /// `propagation: Propagation::Stop` keeps the press at the button: its ancestors never hear the
@@ -82,6 +85,7 @@ pub fn Button(
     #[props(default)] value: Option<Check>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] availability: Availability,
+    #[props(default)] busy: BusyLook,
     onclick: EventHandler<Press>,
     #[props(default)] title: Option<String>,
     #[props(default)] trailing: Option<Trailing>,
@@ -105,6 +109,7 @@ pub fn Button(
         Answers::Escape => ActivationKeys::SpaceOnly,
         Answers::Nothing | Answers::Return => ActivationKeys::ReturnAndSpace,
     };
+    let turning = busy == BusyLook::TurnIcon && availability == Availability::Busy;
     let glyph = glyph_size(size);
     rsx! {
         button {
@@ -117,6 +122,7 @@ pub fn Button(
             "data-size": size.slug(),
             "data-image": image.slug(),
             "data-availability": availability.slug(),
+            "data-busy": turning.then_some(BusyLook::TurnIcon.slug()),
             "data-state": value.map(|state| state.slug()),
             title,
             "aria-label": aria_label,
@@ -162,7 +168,7 @@ pub fn Button(
             },
             // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
-            if availability == Availability::Busy {
+            if availability == Availability::Busy && !turning {
                 span { class: "ds-button-lead",
                     ProgressIndicator {
                         style: ProgressStyle::Spinner,
@@ -174,7 +180,11 @@ pub fn Button(
                 {leading_mark(mark, glyph)}
             }
             if let Some(icon) = icon {
-                span { class: "ds-button-icon", {icon_view(icon, glyph, swap)} }
+                span {
+                    class: if turning { "ds-button-icon a-turn" } else { "ds-button-icon" },
+                    "data-pulse": turning.then_some("a"),
+                    {icon_view(icon, glyph, swap)}
+                }
             }
             if bezel == Bezel::Help {
                 span { class: "ds-button-label", "aria-hidden": "true", "?" }
