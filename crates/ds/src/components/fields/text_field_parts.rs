@@ -4,7 +4,7 @@
 use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
-use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows, FieldText};
+use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::components::fields::text_field_secret::takes_text_out;
 use crate::focus::targets::Told;
 use dioxus::prelude::*;
@@ -29,8 +29,6 @@ pub(crate) struct Field {
     pub bezel: FieldBezel,
     /// How tall a multi-line field is; a line ignores it.
     pub rows: FieldRows,
-    /// Who holds a secure field's text.
-    pub text: FieldText,
     pub size: ControlSize,
     pub label: String,
     /// The input's own `id`, from the caller's `Common`.
@@ -69,7 +67,6 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
     let Field {
         bezel,
         rows: _,
-        text: _,
         size,
         label,
         id,

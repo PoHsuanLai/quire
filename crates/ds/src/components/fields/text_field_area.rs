@@ -11,7 +11,6 @@ pub(crate) fn area(field: Field, value: String) -> Element {
     let Field {
         bezel,
         rows,
-        text: _,
         size,
         label,
         id,

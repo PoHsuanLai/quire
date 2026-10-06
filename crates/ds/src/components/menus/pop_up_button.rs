@@ -100,7 +100,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     #[props(default)] common: Common,
 ) -> Element {
     let mut own = use_signal(move || start);
-    let shown = open.unwrap_or_else(|| own());
+    let shown = open.unwrap_or(own());
     let mut set_open = move |to: Shown| {
         if open.is_none() {
             own.set(to);

@@ -214,7 +214,6 @@ pub fn TextField(
     let field = Field {
         bezel,
         rows,
-        text,
         size,
         label,
         id: common.id.clone(),
