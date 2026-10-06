@@ -1147,7 +1147,7 @@ list and run them (design/27 section 5.2 rule a). Off by default: feature `menus
    command that wraps `BarCommand` answers with `BarCommand::id()` (`standard.undo`, `bar.about`).
 2. At startup, with the window's Wayland `app_id` (the one you give `AppConfig::with_app_id`):
 
-   ```rust
+   ```rust,ignore
    let tree = MenuTree::from_bar(&bar)?;                      // ds::components::menus::export
    let export = MenuExport::start(                            // ds_blitz::menus, feature `menus`
        &MenuExportConfig { app_id: AppId("dev.mailo.Mailo".into()), bus: Bus::Session },
