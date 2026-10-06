@@ -5,6 +5,7 @@
 use super::adapter::{Action, CopyAction, Intent, Landing};
 use super::frame::StepFrame;
 use super::model::CopyState;
+use super::model::StepTitle;
 use super::waiting::Waiting;
 use dioxus::prelude::*;
 
@@ -18,9 +19,11 @@ pub fn BrowserWait(
     on_open_again: EventHandler<()>,
     on_copy: EventHandler<String>,
     on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
 ) -> Element {
     rsx! {
         StepFrame {
+            shown: title,
             step: "browser",
             title: "Continue in your browser",
             onenter: EventHandler::new(move |()| on_open_again.call(())),

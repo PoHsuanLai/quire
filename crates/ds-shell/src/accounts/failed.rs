@@ -4,6 +4,7 @@
 use super::adapter::{Action, Intent, Landing};
 use super::frame::StepFrame;
 use super::model::SignInFault;
+use super::model::StepTitle;
 use super::wording::fault;
 use dioxus::prelude::*;
 
@@ -15,10 +16,12 @@ pub fn SignInFailed(
     on_retry: EventHandler<()>,
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
 ) -> Element {
     let sentence = fault(why);
     rsx! {
         StepFrame {
+            shown: title,
             step: "failed",
             title: "Could not add {provider}",
             onenter: EventHandler::new(move |()| on_retry.call(())),

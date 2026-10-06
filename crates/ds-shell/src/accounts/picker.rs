@@ -1,9 +1,10 @@
 //! AccountPicker: a pop-up button listing the accounts an app may use, with "Add Account..." under
 //! them (design/31 section 5.1). The chosen account is the host's.
 
-use super::adapter::ChoiceMenu;
+use super::adapter::{ChoiceMenu, Disc};
 use super::model::{AccountChoice, ChoiceKey, PickerChoice};
 use dioxus::prelude::*;
+use ds::components::content::avatar::AvatarSize;
 use ds::components::menus::item::item::MenuItem;
 
 /// The menu's lines: one per account, a rule, then "Add Account...".
@@ -23,7 +24,7 @@ pub(crate) fn menu_items(choices: &[AccountChoice]) -> Vec<MenuItem<PickerChoice
         .collect()
 }
 
-/// The pop-up. `chosen` is the account it shows; `on_pick` hears an account or "Add Account...".
+/// The pop-up, led by the round mark of the account it shows. `chosen` is that account; `on_pick` hears an account or "Add Account...".
 #[component]
 pub fn AccountPicker(
     accounts: Vec<AccountChoice>,
@@ -31,8 +32,17 @@ pub fn AccountPicker(
     on_pick: EventHandler<PickerChoice>,
 ) -> Element {
     let items = menu_items(&accounts);
+    let provider = chosen
+        .as_ref()
+        .and_then(|key| accounts.iter().find(|choice| &choice.key == key))
+        .map(|choice| choice.provider);
     rsx! {
-        ChoiceMenu { items, value: chosen.map(PickerChoice::Account), title: "Account", onpick: on_pick }
+        span { class: "ds-acc-badge",
+            if let Some(provider) = provider {
+                Disc { provider, size: AvatarSize::Size28 }
+            }
+            ChoiceMenu { items, value: chosen.map(PickerChoice::Account), title: "Account", onpick: on_pick }
+        }
     }
 }
 

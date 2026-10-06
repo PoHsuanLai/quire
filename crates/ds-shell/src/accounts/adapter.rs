@@ -1,37 +1,29 @@
-//! The one seam between the account sheets and the design system's components that are about to
-//! be made controlled: a text field that holds a secret, a text field the host owns, a list with
-//! a cursor the host owns, a pop-up button with a value the host owns, buttons that answer Return
-//! and Escape, a copy to the clipboard, and the keyboard's first stop. Every other file in this
-//! directory reaches those pieces through here, so changing what they are built on changes this
-//! file and no other.
+//! The one seam between the account sheets and the design system's controlled components: a text
+//! entry the host owns (a secret too), a list with a cursor the host owns, a pop-up button with a
+//! value the host owns, buttons that answer Return and Escape, a copy to the clipboard, and the
+//! keyboard's first stop. Every other file in this directory reaches those pieces through here.
 //!
-//! What today's pieces cannot do, and how this file covers it:
-//! - a secure `TextField` keeps its own text, so the host's value cannot empty it; the entry
-//!   remounts it when the host hands back an empty secret after a typed one;
-//! - the clipboard is the host's (`ds-shell` never touches the system), so a copy button reports
-//!   the text through an event and shows the host's `CopyState`.
+//! Return and Escape are the sheet's (`Sheet { on_return, onclose }`): a field's Enter bubbles to
+//! it, so an entry wires no `onsubmit` of its own and the step's default action runs once.
 
 use super::hidden::Hidden;
 use super::model::{CopyState, FieldText, PickerChoice};
 use dioxus::prelude::*;
-use ds::components::content::label::{Label, LabelStyle};
-use ds::components::content::provider_mark::{MarkProvider, ProviderMark};
+use ds::components::content::avatar::AvatarSize;
+use ds::components::content::provider_mark::MarkProvider;
 use ds::components::controls::button::Button;
-use ds::components::controls::button_model::{Answers, ButtonRole};
+use ds::components::controls::button_model::{Answers, ButtonFocus, ButtonRole};
 use ds::components::fields::text_field::TextField;
 use ds::components::fields::text_field_focus::FieldFocus;
-use ds::components::fields::text_field_model::{FieldKind, Invalid, Validity};
+use ds::components::fields::text_field_model::{FieldKind, FieldText as HeldBy, Invalid, Validity};
 use ds::components::lists::list::model::ListStyle;
-use ds::components::lists::row::row::Row;
+use ds::components::lists::row::size::RowSize;
 use ds::components::menus::item::item::MenuItem;
 use ds::components::menus::pop_up_button::PopUpButton;
-use ds::focus::soon::focus_soon;
-use ds::prelude::List;
 use ds::prelude::ListItem;
-use ds::root::common::Common;
+use ds::prelude::{List, Row, RowLeading};
 use ds_core::vocab::{Availability, Selection};
 use ds_motion::detail::stamp::EventStamp;
-use ds_style::tokens::control_size::ControlSize;
 use std::hash::Hash;
 
 /// Where the keyboard starts.
@@ -65,7 +57,8 @@ pub(crate) struct Rejection {
 }
 
 /// A text entry the host owns: `text` is what it shows, `oninput` hears each change, and the
-/// variant of `text` says whether the entry hides what is typed.
+/// variant of `text` says whether the entry hides what is typed. A secret is the caller's too
+/// (`HeldBy::Caller`): the field keeps no copy, so a host that empties or restores it is obeyed.
 #[component]
 pub(crate) fn Entry(
     label: String,
@@ -76,19 +69,22 @@ pub(crate) fn Entry(
     #[props(default)] rejection: Option<Rejection>,
     #[props(default)] availability: Availability,
     oninput: EventHandler<FieldText>,
+    #[props(default)] onkey: EventHandler<KeyboardEvent>,
 ) -> Element {
-    let mut seen = use_hook(|| CopyValue::new((0u32, 0usize)));
-    let (mut round, typed) = *seen.peek();
     let hidden = matches!(text, FieldText::Secret(_));
-    let (kind, value) = match (&text, look) {
-        (FieldText::Secret(secret), _) => (FieldKind::Secure, secret.reveal().to_owned()),
-        (FieldText::Plain(plain), EntryLook::Field) => (FieldKind::Plain, plain.clone()),
-        (FieldText::Plain(plain), EntryLook::Search) => (FieldKind::Search, plain.clone()),
+    let (kind, held, value) = match (&text, look) {
+        (FieldText::Secret(secret), _) => (
+            FieldKind::Secure,
+            HeldBy::Caller,
+            secret.reveal().to_owned(),
+        ),
+        (FieldText::Plain(plain), EntryLook::Field) => {
+            (FieldKind::Plain, HeldBy::Own, plain.clone())
+        }
+        (FieldText::Plain(plain), EntryLook::Search) => {
+            (FieldKind::Search, HeldBy::Own, plain.clone())
+        }
     };
-    if hidden && value.is_empty() && typed > 0 {
-        round += 1;
-    }
-    seen.set((round, value.len()));
     let validity = rejection.map_or(Validity::Valid, |rejection| {
         Validity::Invalid(Invalid {
             message: rejection.message.into(),
@@ -100,20 +96,19 @@ pub(crate) fn Entry(
         Landing::Anywhere => FieldFocus::Manual,
     };
     rsx! {
-        for generation in [round] {
-            TextField {
-                key: "{generation}",
-                label: label.clone(),
-                value: value.clone(),
-                placeholder: placeholder.clone(),
-                kind,
-                validity: validity.clone(),
-                availability,
-                focus,
-                oninput: move |next: String| {
-                    oninput.call(if hidden { FieldText::Secret(Hidden::new(next)) } else { FieldText::Plain(next) })
-                },
-            }
+        TextField {
+            label,
+            value,
+            placeholder,
+            kind,
+            text: held,
+            validity,
+            availability,
+            focus,
+            onkey,
+            oninput: move |next: String| {
+                oninput.call(if hidden { FieldText::Secret(Hidden::new(next)) } else { FieldText::Plain(next) })
+            },
         }
     }
 }
@@ -155,12 +150,8 @@ pub(crate) fn PickRows<K: Clone + PartialEq + Hash + 'static>(
                 rsx! {
                     Row {
                         title,
-                        content: Some(rsx! {
-                            span { class: "ds-acc-pick",
-                                ProviderMark { provider: row.mark, size: ControlSize::Regular }
-                                Label { text: row.title.clone(), style: LabelStyle::Body }
-                            }
-                        }),
+                        leading: RowLeading::Avatar(row.mark.avatar(AvatarSize::Size28)),
+                        size: RowSize::Settings,
                         state: ds_core::vocab::RowState { selection, ..Default::default() },
                         onclick: move |_| onpick.call(key.clone()),
                     }
@@ -202,27 +193,30 @@ pub(crate) fn Action(
     #[props(default)] availability: Availability,
     onclick: EventHandler<()>,
 ) -> Element {
-    let (answers, role) = match intent {
-        Intent::Default => (Answers::Return, ButtonRole::Normal),
-        Intent::Cancel => (Answers::Escape, ButtonRole::Normal),
-        Intent::Plain => (Answers::Nothing, ButtonRole::Normal),
+    let answers = match intent {
+        Intent::Default => Answers::Return,
+        Intent::Cancel => Answers::Escape,
+        Intent::Plain => Answers::Nothing,
     };
-    let common = match landing {
-        Landing::Here => Common {
-            mounted: Some(EventHandler::new(|event: MountedEvent| {
-                focus_soon(event.data())
-            })),
-            ..Common::default()
-        },
-        Landing::Anywhere => Common::default(),
+    let focus = match landing {
+        Landing::Here => ButtonFocus::OnMount,
+        Landing::Anywhere => ButtonFocus::Manual,
     };
     rsx! {
-        Button { label, answers, role, availability, common, onclick: move |_| onclick.call(()) }
+        Button {
+            label,
+            answers,
+            role: ButtonRole::Normal,
+            focus,
+            availability,
+            onclick: move |_| onclick.call(()),
+        }
     }
 }
 
-/// A button that copies `text`: the host does the copying (it hears `oncopy`), and `state` says
-/// whether it has, so the label can say "Copied".
+/// A button that copies `text`: the host does the copying (it hears `oncopy`; ds-shell may not
+/// depend on ds-blitz, so `ds_blitz::clipboard::write_text` is the host's call), and `state` is
+/// the host's word on whether it has, so the label can say "Copied".
 #[component]
 pub(crate) fn CopyAction(
     #[props(into)] label: String,
@@ -238,11 +232,17 @@ pub(crate) fn CopyAction(
         CopyState::Copied => copied,
     };
     rsx! {
-        Action { label: shown, intent, landing, onclick: move |()| oncopy.call(text.clone()) }
+        Action {
+            label: shown,
+            intent,
+            landing,
+            onclick: move |()| oncopy.call(text.clone()),
+        }
     }
 }
 
-/// A pop-up button over accounts and "Add Account...", its value the host's.
+/// A pop-up button over accounts and "Add Account...", its value the host's. Its open state is its
+/// own: no host or sheet needs to hold it.
 #[component]
 pub(crate) fn ChoiceMenu(
     items: Vec<MenuItem<PickerChoice>>,
@@ -253,4 +253,10 @@ pub(crate) fn ChoiceMenu(
     rsx! {
         PopUpButton { items, value, title: Some(title), onpick }
     }
+}
+
+/// A provider's round mark, `size` across: the leading mark of a header or a line.
+#[component]
+pub(crate) fn Disc(provider: MarkProvider, size: AvatarSize) -> Element {
+    ds::components::content::avatar::face(provider.avatar(size))
 }

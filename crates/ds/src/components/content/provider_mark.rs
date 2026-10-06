@@ -2,6 +2,7 @@
 //! or the favicon the app supplies (design/04-COMPONENTS.md section 28). A local-folders
 //! account, which has no provider, shows a neutral folder instead of a letter.
 
+use crate::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone};
 use crate::components::content::image_source::ImageSource;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -9,6 +10,7 @@ use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconPx, IconSize};
 use ds_style::tokens::control_size::ControlSize;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// A mail provider.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -62,6 +64,24 @@ impl MarkProvider {
             MarkProvider::ICloud => "#3A82F7",
             MarkProvider::Yahoo => "#6001D2",
             MarkProvider::Imap | MarkProvider::Local => "#5D6660",
+        }
+    }
+
+    /// The provider as a round avatar of `size`: its letter on its identity colour, the shape
+    /// the account screens lead their rows and headers with.
+    pub fn avatar(self, size: AvatarSize) -> AvatarFace {
+        let colour = self.colour();
+        let channel = |from: usize| {
+            colour
+                .get(from..from + 2)
+                .and_then(|pair| u8::from_str_radix(pair, 16).ok())
+                .unwrap_or_default()
+        };
+        AvatarFace {
+            initial: self.letter(),
+            size,
+            tone: AvatarTone::Account(Colour::Solid(Hex([channel(1), channel(3), channel(5)]))),
+            shape: AvatarShape::Round,
         }
     }
 
@@ -158,5 +178,23 @@ pub fn ProviderMark(
                 img { alt: "", src }
             }
         },
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::MarkProvider;
+    use crate::components::content::avatar::{AvatarShape, AvatarSize, AvatarTone};
+    use ds_style::tokens::hex::{Colour, Hex};
+
+    #[test]
+    fn a_provider_as_an_avatar_is_a_disc_of_its_letter_and_colour() {
+        let face = MarkProvider::Google.avatar(AvatarSize::Size28);
+        assert_eq!(face.initial, 'G');
+        assert_eq!(face.shape, AvatarShape::Round);
+        assert_eq!(
+            face.tone,
+            AvatarTone::Account(Colour::Solid(Hex([0x1A, 0x73, 0xE8])))
+        );
     }
 }

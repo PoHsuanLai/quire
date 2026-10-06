@@ -5,6 +5,7 @@
 use super::adapter::{Action, CopyAction, Intent, Landing};
 use super::frame::StepFrame;
 use super::model::CopyState;
+use super::model::StepTitle;
 use dioxus::prelude::*;
 
 /// The device-code step for `provider`: `code` to type at `url`. `copied` is the host's word on
@@ -17,10 +18,12 @@ pub fn ShowCode(
     #[props(default)] copied: CopyState,
     on_copy: EventHandler<String>,
     on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
 ) -> Element {
     let copy = code.clone();
     rsx! {
         StepFrame {
+            shown: title,
             step: "code",
             title: "Enter this code",
             onenter: EventHandler::new(move |()| on_copy.call(copy.clone())),

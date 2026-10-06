@@ -174,6 +174,7 @@ fn consent(choices: Vec<AccountChoice>) -> Element {
     }
 }
 
+/// A step in the standalone panel, as a host without a window of its own would show it.
 fn step(body: Element) -> Element {
     rsx! {
         AccountSheet { label: "Add Account", on_dismiss: |_| {}, {body} }
@@ -182,7 +183,7 @@ fn step(body: Element) -> Element {
 
 fn sign_in(fields: Vec<FormField>, problem: Option<FieldProblem>) -> Element {
     step(rsx! {
-        SignInForm { provider: "Fastmail", fields, problem, on_input: |_| {}, on_submit: |_| {}, on_back: |_| {}, on_cancel: |_| {} }
+        SignInForm { provider: "Fastmail", mark: MarkProvider::Fastmail, fields, problem, on_input: |_| {}, on_submit: |_| {}, on_back: |_| {}, on_cancel: |_| {} }
     })
 }
 

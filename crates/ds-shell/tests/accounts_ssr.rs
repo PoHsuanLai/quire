@@ -87,6 +87,7 @@ fn sign_in(fields: Vec<FormField>, problem: Option<FieldProblem>) -> Element {
     rsx! {
         SignInForm {
             provider: "Fastmail",
+            mark: MarkProvider::Fastmail,
             fields,
             problem,
             on_input: |_| {},

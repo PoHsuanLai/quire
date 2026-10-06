@@ -12,7 +12,7 @@ use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query
 use ds_shell::accounts::model::{
     AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, CopyState, FieldRole, FieldText,
     FormField, Limitation, ProviderEntry, ProviderKey, ProviderPick, Requirement, ServiceKey,
-    ServiceLine, ServiceOffer, SignInFault,
+    ServiceLine, ServiceOffer, SignInFault, StepTitle,
 };
 use ds_shell::prelude::*;
 use std::time::Duration;
@@ -78,9 +78,9 @@ fn Stage(body: Element) -> Element {
 #[allow(non_snake_case)]
 fn SignIn() -> Element {
     Stage(rsx! {
-        AccountSheet { label: "Add Account", on_dismiss: move |()| LOG.write().push("dismiss".to_owned()),
-            SignInForm {
-                provider: "Fastmail",
+        SignInForm {
+            provider: "Fastmail",
+            mark: MarkProvider::Fastmail,
                 fields: FIELDS(),
                 on_input: move |(role, text): (FieldRole, FieldText)| {
                     let mut fields = FIELDS.write();
@@ -91,7 +91,35 @@ fn SignIn() -> Element {
                 on_submit: move |()| LOG.write().push("submit".to_owned()),
                 on_back: move |()| LOG.write().push("back".to_owned()),
                 on_cancel: move |()| LOG.write().push("cancel".to_owned()),
-            }
+        }
+    })
+}
+
+#[allow(non_snake_case)]
+fn HostTitled() -> Element {
+    Stage(rsx! {
+        ProviderList {
+            title: StepTitle::Host,
+            providers: vec![provider("fastmail", "Fastmail")],
+            query: QUERY(),
+            cursor: CURSOR(),
+            on_query: move |query: String| *QUERY.write() = query,
+            on_cursor: move |pick: ProviderPick| *CURSOR.write() = Some(pick),
+            on_pick: move |pick: ProviderPick| LOG.write().push(format!("pick {pick:?}")),
+            on_cancel: move |()| LOG.write().push("cancel".to_owned()),
+        }
+    })
+}
+
+#[allow(non_snake_case)]
+fn ConsentInWindow() -> Element {
+    Stage(rsx! {
+        ConsentBody {
+            app: "Photos",
+            request: "keep its library in your files",
+            choices: vec![account("ada@example.org")],
+            on_choose: move |key: ChoiceKey| LOG.write().push(format!("choose {}", key.0)),
+            on_answer: move |answer: ConsentAnswer| LOG.write().push(format!("{answer:?}")),
         }
     })
 }
@@ -174,14 +202,12 @@ fn Browser() -> Element {
 #[allow(non_snake_case)]
 fn Failed() -> Element {
     Stage(rsx! {
-        AccountSheet { label: "Add Account", on_dismiss: move |()| LOG.write().push("dismiss".to_owned()),
-            SignInFailed {
-                provider: "Fastmail",
-                why: SignInFault::Unreachable,
-                on_retry: move |()| LOG.write().push("retry".to_owned()),
-                on_back: move |()| LOG.write().push("back".to_owned()),
-                on_cancel: move |()| LOG.write().push("cancel".to_owned()),
-            }
+        SignInFailed {
+            provider: "Fastmail",
+            why: SignInFault::Unreachable,
+            on_retry: move |()| LOG.write().push("retry".to_owned()),
+            on_back: move |()| LOG.write().push("back".to_owned()),
+            on_cancel: move |()| LOG.write().push("cancel".to_owned()),
         }
     })
 }
@@ -189,9 +215,7 @@ fn Failed() -> Element {
 #[allow(non_snake_case)]
 fn Working() -> Element {
     Stage(rsx! {
-        AccountSheet { label: "Add Account", on_dismiss: move |()| LOG.write().push("dismiss".to_owned()),
-            SignInWorking { provider: "Fastmail", on_cancel: move |()| LOG.write().push("cancel".to_owned()) }
-        }
+        SignInWorking { provider: "Fastmail", on_cancel: move |()| LOG.write().push("cancel".to_owned()) }
     })
 }
 
@@ -380,7 +404,7 @@ fn the_search_narrows_the_list_and_return_picks_the_first_match() {
         FocusState::Focused,
         "the search takes the keyboard"
     );
-    let rows = |harness: &Harness| harness.count(".ds-acc-pick");
+    let rows = |harness: &Harness| harness.count(".ds-acc-step .ds-avatar");
     assert_eq!(rows(&harness), 4, "three providers and Other");
     type_text(&mut harness, "fast");
     harness.advance(ms(800));
@@ -457,6 +481,41 @@ fn copy_link_reports_the_link_and_shows_the_hosts_word() {
 }
 
 #[test]
+fn a_password_the_host_hands_back_shows_in_the_field() {
+    let mut harness = start(SignIn);
+    harness.within(|| {
+        FIELDS.write()[1].text = FieldText::Secret(Hidden::new("abc".to_owned()));
+    });
+    harness.advance(ms(40));
+    assert!(
+        harness.text_of(".ds-acc-step .ds-input-mask").is_some(),
+        "a form drawn again with a typed password shows its dots: {}",
+        harness.html()
+    );
+}
+
+#[test]
+fn down_in_the_search_moves_the_cursor_through_the_rows_and_return_picks_it() {
+    let mut harness = start(Providers);
+    press(&mut harness, ShortcutKey::Down);
+    press(&mut harness, ShortcutKey::Down);
+    assert_eq!(
+        harness.focus_of(".ds-acc-step input"),
+        FocusState::Focused,
+        "the keyboard stays in the search"
+    );
+    press(&mut harness, ShortcutKey::Enter);
+    assert_eq!(
+        log(&mut harness),
+        [format!(
+            "pick {:?}",
+            ProviderPick::Provider(ProviderKey("fastmail".to_owned()))
+        )],
+        "the second row"
+    );
+}
+
+#[test]
 fn return_opens_the_browser_page_again() {
     let mut harness = start(Browser);
     press(&mut harness, ShortcutKey::Enter);
@@ -480,4 +539,44 @@ fn nothing_but_cancel_answers_while_working() {
     assert!(log(&mut harness).is_empty(), "Return answers nothing");
     press(&mut harness, ShortcutKey::Escape);
     assert_eq!(log(&mut harness), ["cancel"]);
+}
+
+#[test]
+fn a_step_in_a_host_window_draws_no_title_and_no_attached_sheet() {
+    let mut harness = start(HostTitled);
+    assert_eq!(harness.count(".ds-acc-title"), 0, "{}", harness.html());
+    assert_eq!(harness.count(".ds-sheet"), 0, "the step hangs from nothing");
+    assert_eq!(harness.count(".ds-acc-step"), 1);
+    press(&mut harness, ShortcutKey::Enter);
+    assert_eq!(
+        log(&mut harness),
+        [format!(
+            "pick {:?}",
+            ProviderPick::Provider(ProviderKey("fastmail".to_owned()))
+        )],
+        "its keys work without a sheet around it"
+    );
+}
+
+#[test]
+fn a_step_draws_its_own_title_unless_the_host_does() {
+    let harness = start(Providers);
+    assert_eq!(harness.count(".ds-acc-title"), 1, "{}", harness.html());
+}
+
+#[test]
+fn the_consent_body_stands_in_a_host_window_with_its_keys() {
+    let mut harness = start(ConsentInWindow);
+    assert_eq!(harness.count(".ds-sheet"), 0, "no sheet around the body");
+    assert_eq!(harness.count(".ds-alert"), 1);
+    press(&mut harness, ShortcutKey::Enter);
+    press(&mut harness, ShortcutKey::Escape);
+    let want = format!(
+        "{:?}",
+        ConsentAnswer::Allow {
+            account: ChoiceKey("ada@example.org".to_owned()),
+            scope: AllowScope::Once
+        }
+    );
+    assert_eq!(log(&mut harness), [want, "Dismiss".to_owned()]);
 }

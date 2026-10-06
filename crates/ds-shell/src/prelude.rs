@@ -4,7 +4,7 @@
 // Shell components
 pub use crate::accounts::badge::AccountBadge;
 pub use crate::accounts::browser_wait::BrowserWait;
-pub use crate::accounts::consent::ConsentAlert;
+pub use crate::accounts::consent::{ConsentAlert, ConsentBody};
 pub use crate::accounts::failed::SignInFailed;
 pub use crate::accounts::hidden::Hidden;
 pub use crate::accounts::limited::LimitedNote;

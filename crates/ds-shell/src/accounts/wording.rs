@@ -157,6 +157,32 @@ pub(crate) fn pick_for_enter(
     }
 }
 
+/// Which way the arrow keys move the provider cursor.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CursorStep {
+    /// Down.
+    Next,
+    /// Up.
+    Previous,
+}
+
+/// The row the cursor moves to from `cursor` among `rows`, in their order: from no cursor (or a
+/// row no longer listed) Down lands on the first and Up on the last; at either end it stays.
+pub(crate) fn step_cursor(
+    rows: &[ProviderPick],
+    cursor: Option<&ProviderPick>,
+    step: CursorStep,
+) -> Option<ProviderPick> {
+    let at = cursor.and_then(|pick| rows.iter().position(|row| row == pick));
+    let to = match (at, step) {
+        (None, CursorStep::Next) => 0,
+        (None, CursorStep::Previous) => rows.len().checked_sub(1)?,
+        (Some(at), CursorStep::Next) => (at + 1).min(rows.len().checked_sub(1)?),
+        (Some(at), CursorStep::Previous) => at.saturating_sub(1),
+    };
+    rows.get(to).cloned()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -367,5 +393,24 @@ mod tests {
                 want
             );
         }
+    }
+
+    #[test]
+    fn the_arrows_walk_the_listed_rows_and_stop_at_the_ends() {
+        let rows = [
+            ProviderPick::Provider(ProviderKey("a".to_owned())),
+            ProviderPick::Provider(ProviderKey("b".to_owned())),
+            ProviderPick::Other,
+        ];
+        let go = |from: Option<&ProviderPick>, step| step_cursor(&rows, from, step);
+        assert_eq!(go(None, CursorStep::Next).as_ref(), rows.first());
+        assert_eq!(go(None, CursorStep::Previous).as_ref(), rows.last());
+        assert_eq!(go(rows.first(), CursorStep::Next).as_ref(), rows.get(1));
+        assert_eq!(go(rows.last(), CursorStep::Next).as_ref(), rows.last());
+        assert_eq!(
+            go(rows.first(), CursorStep::Previous).as_ref(),
+            rows.first()
+        );
+        assert_eq!(step_cursor(&[], None, CursorStep::Next), None);
     }
 }

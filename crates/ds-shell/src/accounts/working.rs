@@ -3,14 +3,20 @@
 
 use super::adapter::{Action, Intent, Landing};
 use super::frame::StepFrame;
+use super::model::StepTitle;
 use super::waiting::Waiting;
 use dioxus::prelude::*;
 
 /// The waiting step for `provider`. Escape and Cancel call `on_cancel`; Return does nothing.
 #[component]
-pub fn SignInWorking(#[props(into)] provider: String, on_cancel: EventHandler<()>) -> Element {
+pub fn SignInWorking(
+    #[props(into)] provider: String,
+    on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
+) -> Element {
     rsx! {
         StepFrame {
+            shown: title,
             step: "working",
             title: "Signing in to {provider}",
             oncancel: on_cancel,

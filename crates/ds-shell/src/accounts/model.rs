@@ -269,3 +269,13 @@ pub enum SignInFault {
     #[word(slug = "store-failed")]
     StoreFailed,
 }
+
+/// Who draws a step's title.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum StepTitle {
+    /// The step, above its body.
+    #[default]
+    Own,
+    /// The host's window, in its title bar: the step draws none.
+    Host,
+}

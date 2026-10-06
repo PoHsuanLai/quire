@@ -1555,33 +1555,43 @@ Standing facts:
   one table-tested file (porter's `SheetView::Consent` to `ConsentAlert`, `Providers` to
   `ProviderList`, `SignIn` to `SignInForm`, `BrowserWait` to `BrowserWait`, `ShowCode` to
   `ShowCode`, `Review` to `ReviewServices`, `Working` to `SignInWorking`, `Failed` to
-  `SignInFailed`). `AccountSheet` is the panel a step stands in; `ConsentAlert` is its own sheet.
+  `SignInFailed`).
+- The add-account UI is a standalone window, not a sheet from a title bar. Every step is a bare
+  column (`div.ds-acc-step`) that a host puts in its own window; `title: StepTitle::Host` leaves
+  the title to the window's title bar. `ConsentBody` is the consent column, bare; `ConsentAlert`
+  and `AccountSheet` are only for a host with no window of its own: a `Sheet` with
+  `Attach::Centre` (radius, material and shadow are the sheet's tokens). The steps take Return and
+  Escape themselves (`StepFrame`), so they work with or without a sheet around them.
+- Provider marks are round: ds `Avatar` through `MarkProvider::avatar(size)` (ds, new) in the
+  provider rows (`RowLeading::Avatar`), `AccountBadge`, `AccountPicker` and the sign-in header.
 - Secret text is `accounts::hidden::Hidden`: no `Display`, no serde, `Debug` prints `<hidden>`. It
   is the one type a hidden field's keystrokes travel in (`FieldText::Secret`), and a test checks
-  the password is in no markup.
+  the password is in no markup. The secure `TextField` is the caller's (`FieldText::Caller`): a
+  form drawn again with a typed password shows it.
 - Escape on the consent alert answers `ConsentAnswer::Dismiss` (nothing stored); only "Don't Allow"
-  denies. A step takes Escape and Return itself, once, and each starts the keyboard on its first
-  field or its default button, so the keys reach it.
-- A row's `Accessory::Toggle` (and `Slot`) stops every key it hears, so Return pressed on a switch
-  never reached a default button. `ReviewServices` draws its switches inside the row's content
-  instead, and a conformance test presses Return after pressing a switch.
+  denies.
+- Return reaches a step's default button from a row's `Accessory::Toggle` (R2a), so
+  `ReviewServices` uses the real row toggle.
+- Down and Up in the provider search move the host's cursor through the rows.
+- Copy Link and Copy Code report the text through `on_copy`; the host writes it with
+  `ds_blitz::clipboard::write_text` and answers `CopyState::Copied`.
 - Every sentence is in `accounts::wording`; the host words nothing.
-- Every use of a piece R2 makes controlled is in `accounts::adapter` (`Entry`, `PickRows`,
-  `Action`, `CopyAction`, `ChoiceMenu`), so the switch is that file.
+- Every use of a piece R2a made controlled is in `accounts::adapter` (`Entry`, `PickRows`,
+  `Action`, `CopyAction`, `ChoiceMenu`, `Disc`).
 
 Open:
 
-- A secure `TextField` keeps its own text and never reads `value`. `adapter::Entry` remounts it when
-  the host hands back an empty secret after a typed one (a refused password the host clears), but a
-  host that draws a form again with a typed password in it (Back, then forward) shows the field
-  empty. Controlled secure fields in R2a remove this; the switch is `Entry`.
-- `List` moves its cursor only while it holds the keyboard: from the provider search, Down does
-  not enter the list (Tab does). Return picks the cursor row, else the first match. Select-by-key in
-  R2a; the switch is `PickRows` and `ProviderList`.
-- `ds-shell` never touches the clipboard: Copy Link and Copy Code report the text through
-  `on_copy`, the host copies and answers `CopyState::Copied`. R2a's clipboard replaces the event in
-  `CopyAction`.
-- The account pop-up's open state is the `PopUpButton`'s own; its value is the host's. R2a's open
-  state replaces `ChoiceMenu`'s body.
+- `Sheet`'s `on_return` was not used: a step in a host window has no `Sheet`, so `StepFrame` keeps
+  the Return and Escape keys, and a field's `onsubmit` is not wired (Enter bubbles to the frame;
+  both would run the default twice).
+- `PopUpButton` has no leading mark and `MenuImage` cannot hold an element, so the account pop-up
+  shows its round mark beside it, not inside it, and the menu's lines have none.
+- `ds-shell` may not depend on `ds-blitz` (check-boundary's table), so the copy buttons cannot call
+  `ds_blitz::clipboard::write_text` themselves and the host does the copy. A clipboard seam in `ds`
+  (a trait the host provides, as `provide_host` does) would let the buttons copy.
+- `Sheet` still slides in from the top even when centred; a window panel wants a fade or scale.
+- The gallery's dark Accounts snapshot hit the render loop's round limit twice under heavy machine
+  load (the document kept re-rendering); it passed on a quiet rerun and the conformance tests
+  never saw it.
 - The goldens are markup (`crates/ds-shell/tests/snapshots/accounts/*-light.html` and `-dark.html`);
   no pixel snapshot of the Accounts gallery page is kept.

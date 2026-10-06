@@ -6,24 +6,27 @@
 
 use super::adapter::{Action, Entry, Intent, Landing, Rejection};
 use super::frame::StepFrame;
-use super::model::{FieldProblem, FieldRole, FieldText, FormField};
+use super::model::{FieldProblem, FieldRole, FieldText, FormField, StepTitle};
 use super::wording::{field_label, field_placeholder, form_ready, problem_text};
 use dioxus::prelude::*;
+use ds::components::content::provider_mark::MarkProvider;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 
-/// The sign-in form for `provider`. `on_input` hears the role of the field and what it now
+/// The sign-in form for `provider`, whose round `mark` leads the header. `on_input` hears the role of the field and what it now
 /// holds; secret text arrives as [`FieldText::Secret`] and nowhere else. `on_submit` is Continue
 /// or Return, heard only while the form is ready.
 #[component]
 pub fn SignInForm(
     #[props(into)] provider: String,
+    mark: MarkProvider,
     fields: Vec<FormField>,
     #[props(default)] problem: Option<FieldProblem>,
     on_input: EventHandler<(FieldRole, FieldText)>,
     on_submit: EventHandler<()>,
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
 ) -> Element {
     let ready = form_ready(&fields);
     let availability = if ready {
@@ -34,8 +37,10 @@ pub fn SignInForm(
     let enter = ready.then(|| EventHandler::new(move |()| on_submit.call(())));
     rsx! {
         StepFrame {
+            shown: title,
             step: "sign-in",
             title: "Sign in to {provider}",
+            mark,
             onenter: enter,
             oncancel: on_cancel,
             body: rsx! {

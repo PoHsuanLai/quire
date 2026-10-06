@@ -5,17 +5,14 @@
 
 use super::adapter::{Action, Intent, Landing};
 use super::frame::StepFrame;
-use super::model::{ServiceKey, ServiceLine, ServiceOffer};
+use super::model::{ServiceKey, ServiceLine, ServiceOffer, StepTitle};
 use super::wording::{confirm_label, limitation};
 use dioxus::prelude::*;
-use ds::components::content::label::{Label, LabelRole, LabelStyle};
 use ds::components::lists::list::model::ListStyle;
-use ds::components::lists::row::row::Row;
-use ds::prelude::List;
+use ds::components::lists::row::size::RowSize;
 use ds::prelude::ListItem;
-use ds::prelude::Toggle;
+use ds::prelude::{Accessory, List, Row, TextLine};
 use ds_core::vocab::Check;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The review of `account`'s `services`. `allow` names the app to allow in the same step.
 /// `on_toggle` hears a switch flipped; `on_done` the last button or Return.
@@ -28,6 +25,7 @@ pub fn ReviewServices(
     on_done: EventHandler<()>,
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
+    #[props(default)] title: StepTitle,
 ) -> Element {
     let done = confirm_label(allow.as_deref());
     let items: Vec<ListItem<String>> = services
@@ -35,15 +33,17 @@ pub fn ReviewServices(
         .map(|line| {
             let key = line.key.clone();
             let name = line.name.clone();
-            let (toggle, detail) = match line.offer {
+            let (accessory, detail) = match line.offer {
                 ServiceOffer::Offered(value) => (
-                    Some((
+                    Accessory::Toggle {
                         value,
-                        EventHandler::new(move |next| on_toggle.call((key.clone(), next))),
-                    )),
+                        on_toggle: EventHandler::new(move |next| {
+                            on_toggle.call((key.clone(), next))
+                        }),
+                    },
                     line.limit.map(limitation),
                 ),
-                ServiceOffer::Absent(reason) => (None, Some(limitation(reason))),
+                ServiceOffer::Absent(reason) => (Accessory::None, Some(limitation(reason))),
             };
             ListItem::row(
                 line.key.0.clone(),
@@ -51,7 +51,9 @@ pub fn ReviewServices(
                 rsx! {
                     Row {
                         title: name.clone(),
-                        content: Some(service(name, detail, toggle)),
+                        detail: detail.map(TextLine::from),
+                        size: RowSize::Settings,
+                        accessory,
                     }
                 },
             )
@@ -59,6 +61,7 @@ pub fn ReviewServices(
         .collect();
     rsx! {
         StepFrame {
+            shown: title,
             step: "review",
             title: "Choose what to use",
             onenter: EventHandler::new(move |()| on_done.call(())),
@@ -72,29 +75,6 @@ pub fn ReviewServices(
                 Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_cancel.call(()) }
                 Action { label: done, intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_done.call(()) }
             },
-        }
-    }
-}
-
-/// One service's line: its name over the reason it is limited, and its switch at the end. The
-/// switch stands in the row's own content rather than its accessory, because an accessory fences
-/// every key it hears and Return must reach the sheet's default button wherever the keyboard is.
-fn service(
-    name: String,
-    detail: Option<&'static str>,
-    toggle: Option<(Check, EventHandler<Check>)>,
-) -> Element {
-    rsx! {
-        span { class: "ds-acc-service",
-            span { class: "ds-acc-service-text",
-                Label { text: name.clone(), style: LabelStyle::Body }
-                if let Some(detail) = detail {
-                    Label { text: detail, role: LabelRole::Secondary, style: LabelStyle::Footnote }
-                }
-            }
-            if let Some((value, onchange)) = toggle {
-                Toggle { label: name, value, size: ControlSize::Mini, onchange }
-            }
         }
     }
 }
