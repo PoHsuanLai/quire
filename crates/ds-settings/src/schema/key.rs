@@ -1,6 +1,8 @@
 //! One settings key, as the derive emits it and the Settings app renders it
 //! (design/22-SETTINGS.md section 9.1).
 
+use std::collections::BTreeMap;
+
 use serde::{Deserialize, Serialize};
 
 use super::column::Column;
@@ -38,6 +40,27 @@ impl WordLabels {
     pub fn of(&self, word: &str) -> Option<&str> {
         self.0.get(word).map(String::as_str)
     }
+}
+
+/// One word of an enum key, as stored (`"gpt-5"`): the key of [`KeySpec::unavailable`].
+#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct ChoiceWord(pub String);
+
+/// Why a choice cannot be picked right now, in words a person reads under the greyed choice:
+/// "Add an account to use".
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct UnavailableReason(pub String);
+
+/// A `Set` or validation named a choice the key lists as unavailable. Carries the reason so the
+/// caller can show it.
+#[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[error("{} is not available for {}: {}", .choice.0, .key.0, .reason.0)]
+pub struct ChoiceUnavailable {
+    pub key: KeyPath,
+    pub choice: ChoiceWord,
+    pub reason: UnavailableReason,
 }
 
 /// A key's group within its page, e.g. dock's "Magnification" section.
@@ -230,6 +253,31 @@ pub struct KeySpec {
     /// and from every hands-off key, so both read as [`AgentSetting::HandsOff`].
     #[serde(default, skip_serializing_if = "AgentSetting::is_hands_off")]
     pub agent: AgentSetting,
+    /// Choices of this key that cannot be picked right now, each with the reason to show under
+    /// it. Wire form: `"unavailable": {"<word>": "<reason>"}` (a TOML table in a file schema),
+    /// absent when empty, so a reader or writer that predates the field is unaffected.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub unavailable: BTreeMap<ChoiceWord, UnavailableReason>,
+}
+
+impl KeySpec {
+    /// The reason `value` cannot be picked, if it is a string naming an unavailable choice.
+    pub fn unavailable_reason(&self, value: &toml::Value) -> Option<&UnavailableReason> {
+        let word = value.as_str()?;
+        self.unavailable.get(&ChoiceWord(word.to_owned()))
+    }
+
+    /// Refuses `value` when it names an unavailable choice, with the reason.
+    pub fn check_available(&self, value: &toml::Value) -> Result<(), ChoiceUnavailable> {
+        match (self.unavailable_reason(value), value.as_str()) {
+            (Some(reason), Some(word)) => Err(ChoiceUnavailable {
+                key: self.path.clone(),
+                choice: ChoiceWord(word.to_owned()),
+                reason: reason.clone(),
+            }),
+            _ => Ok(()),
+        }
+    }
 }
 
 /// Every variant count from 1 up, mapped to the [`KeyKind`] it picks (section 9.1: "a two-

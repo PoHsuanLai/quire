@@ -46,6 +46,21 @@ impl<M: LiveModule> Skeleton<M> {
             })),
         }
     }
+
+    /// Refuses a `Set` of a key to a choice its current schema lists as unavailable, with the
+    /// reason. A key the schema does not list is left to the module (`UnknownKey` is its call).
+    async fn refuse_unavailable(
+        &self,
+        key: &KeyPath,
+        value: &toml::Value,
+    ) -> Result<(), LiveError> {
+        let schema = self.module.describe().await;
+        let spec = schema.key.iter().find(|spec| spec.path == *key);
+        match spec.map(|spec| spec.check_available(value)) {
+            Some(Err(refused)) => Err(LiveError::Unavailable(refused.reason.0)),
+            _ => Ok(()),
+        }
+    }
 }
 
 #[interface(name = "org.quire.SettingsModule1")]
@@ -90,6 +105,7 @@ impl<M: LiveModule> Skeleton<M> {
         self.authorise(&header, connection, Access::Write).await?;
         let key = KeyPath(key);
         let wire = from_wire(&value)?;
+        self.refuse_unavailable(&key, &wire).await?;
         self.module.set(&key, wire.clone()).await?;
         // An action key holds no value: its `Changed` carries what was sent.
         let now = self.module.get(&key).await.unwrap_or(wire);

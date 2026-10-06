@@ -1251,6 +1251,16 @@ rows use `kind = Live{action}` (a label plus weight `plain` or `destructive`), a
 schema that marks an `AGENT_NEVER_SETTABLE` key agent-settable, the same check
 `Schema::from_toml` and the derive use.
 
+Unavailable choices (additive, 2026-10-06): a `KeySpec` may carry `unavailable`, a map from a
+choice word to the reason it cannot be picked right now. JSON: `"unavailable":{"<word>":"<reason>"}`;
+a file schema has the same as an `[key.unavailable]` table; both are skipped when empty, so
+schemas written before the field parse unchanged and readers that predate it ignore it. The
+Settings app greys such a choice, shows the reason under it ("Add an account to use") and does
+not offer it. The skeleton refuses `Set(key, word)` for a listed word with the named error
+`org.quire.SettingsModule1.Error.Unavailable` carrying the reason, before the module sees the
+call; `KeySpec::check_available` is the same check for file validation. `Describe`, `Get`,
+`Set` and `Changed` keep their signatures: the freeze above is not touched.
+
 ### 9.5 Rules
 
 - A settings key exists only if a `KeySpec` describes it: a struct field without the derive is

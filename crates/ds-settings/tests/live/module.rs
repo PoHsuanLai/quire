@@ -26,6 +26,7 @@ pub fn spec(path: &str, kind: KeyKind, default: toml::Value) -> KeySpec {
         exposure: Exposure::Basic,
         labels: Default::default(),
         agent: AgentSetting::HandsOff,
+        unavailable: Default::default(),
     }
 }
 

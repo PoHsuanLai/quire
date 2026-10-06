@@ -273,3 +273,92 @@ fn the_design_doc_lists_exactly_the_proposed_keys() {
     );
     assert_eq!(in_doc, AGENT_SETTABLE_PROPOSED);
 }
+
+mod unavailable {
+    use ds_settings::live::LiveSchema;
+    use ds_settings::schema::{
+        ChoiceWord, Exposure, Help, KeyKind, KeyPath, KeySpec, Label, Page, Section,
+        UnavailableReason,
+    };
+
+    fn spec() -> KeySpec {
+        KeySpec {
+            path: KeyPath("ai.model.text.fast".to_owned()),
+            kind: KeyKind::Menu {
+                variants: vec!["a".to_owned(), "b".to_owned()],
+            },
+            default: toml::Value::String("a".to_owned()),
+            label: Label("Fast".to_owned()),
+            help: Help(String::new()),
+            page: Page::Intelligence,
+            section: Section("Text".to_owned()),
+            exposure: Exposure::Basic,
+            labels: Default::default(),
+            agent: Default::default(),
+            unavailable: Default::default(),
+        }
+    }
+
+    fn gated() -> KeySpec {
+        let mut key = spec();
+        key.unavailable.insert(
+            ChoiceWord("b".to_owned()),
+            UnavailableReason("Add an account to use".to_owned()),
+        );
+        key
+    }
+
+    fn live(key: KeySpec) -> LiveSchema {
+        LiveSchema {
+            version: 1,
+            key: vec![key],
+        }
+    }
+
+    #[test]
+    fn the_field_round_trips_in_json_and_is_absent_when_empty() {
+        let with = live(gated());
+        let json = with.to_json();
+        assert!(
+            json.contains(r#""unavailable":{"b":"Add an account to use"}"#),
+            "{json}"
+        );
+        assert_eq!(LiveSchema::from_json(&json).expect("parses"), with);
+
+        let without = live(spec());
+        let json = without.to_json();
+        assert!(!json.contains("unavailable"), "{json}");
+        assert_eq!(LiveSchema::from_json(&json).expect("parses"), without);
+    }
+
+    #[test]
+    fn json_from_before_the_field_parses() {
+        let old = r#"{"version":1,"key":[{"path":"ai.model.text.fast","kind":{"kind":"menu","v":{"variants":["a","b"]}},"default":"a","label":"Fast","help":"","page":{"kind":"intelligence"},"section":"Text","exposure":"basic"}]}"#;
+        let schema = LiveSchema::from_json(old).expect("old json parses");
+        assert!(schema.key[0].unavailable.is_empty());
+    }
+
+    #[test]
+    fn the_field_round_trips_in_toml() {
+        let key = gated();
+        let text = toml::to_string(&key).expect("serialises");
+        assert!(text.contains("[unavailable]"), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).expect("parses"), key);
+        assert!(!toml::to_string(&spec()).unwrap().contains("unavailable"));
+    }
+
+    #[test]
+    fn an_unavailable_choice_is_refused_with_its_reason() {
+        let key = gated();
+        let refused = key
+            .check_available(&toml::Value::String("b".to_owned()))
+            .expect_err("b is gated");
+        assert_eq!(refused.reason.0, "Add an account to use");
+        assert_eq!(refused.choice.0, "b");
+        assert!(
+            key.check_available(&toml::Value::String("a".to_owned()))
+                .is_ok()
+        );
+        assert!(key.check_available(&toml::Value::Boolean(true)).is_ok());
+    }
+}

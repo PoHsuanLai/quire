@@ -231,3 +231,50 @@ impl ds_settings::live::LiveModule for Shared {
         self.0.set(key, value).await
     }
 }
+
+#[tokio::test]
+async fn a_set_to_an_unavailable_choice_is_refused_with_its_reason() {
+    use ds_settings::schema::{ChoiceWord, UnavailableReason};
+    let bus = PrivateBus::start("unavailable");
+    let daemon = bus.connect().await;
+    let settings = bus.connect().await;
+    let role = settings.unique_name().expect("named").to_string();
+    daemon.request_name(NAME).await.expect("name");
+    let mut schema = schema();
+    let pick = schema
+        .key
+        .iter_mut()
+        .find(|spec| spec.path.0 == CLIENT)
+        .expect("the text key");
+    pick.unavailable.insert(
+        ChoiceWord("gated".to_owned()),
+        UnavailableReason("Add an account to use".to_owned()),
+    );
+    serve(&daemon, PATH, Accounts::with_schema(Some(role), schema))
+        .await
+        .expect("serves");
+    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+
+    let refused = client
+        .set(&key(CLIENT), &toml::Value::String("gated".to_owned()))
+        .await;
+    assert!(
+        matches!(&refused, Err(LiveError::Unavailable(why)) if why == "Add an account to use"),
+        "{refused:?}"
+    );
+    assert_eq!(
+        client.get(&key(CLIENT)).await.unwrap(),
+        toml::Value::String(String::new())
+    );
+    client
+        .set(&key(CLIENT), &toml::Value::String("open".to_owned()))
+        .await
+        .expect("an available choice still sets");
+    let described = client.describe().await.expect("describe");
+    assert!(
+        described
+            .key
+            .iter()
+            .any(|spec| !spec.unavailable.is_empty())
+    );
+}

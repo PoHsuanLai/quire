@@ -15,6 +15,9 @@ pub enum LiveError {
     UnknownKey(String),
     /// The value is not of the key's type, or out of its range.
     BadValue(String),
+    /// The value names a choice the key lists as `unavailable`; the text is the reason to show
+    /// ("Add an account to use"). Raised by the skeleton before the module sees the call.
+    Unavailable(String),
     /// The module could not do it (its own failure, e.g. a revoke that the provider refused).
     Failed(String),
 }
