@@ -94,6 +94,7 @@ impl ThreadId {
 pub fn ListsPage() -> Element {
     rsx! {
         LiveList {}
+        Grouped {}
         crate::pages::lists::rows::RowGallery {}
         crate::pages::lists::headers::HeaderGallery {}
         crate::pages::lists::virtual_rows::VirtualGallery {}
@@ -279,6 +280,20 @@ fn Tiles() -> Element {
             }
             if ghost() == Check::On {
                 DragGhost { title: "Re: UIDL stability across servers", sub: "Dana Okafor · 09:41", at: Point { x: Px(760.0), y: Px(140.0) } }
+            }
+        }
+    }
+}
+
+/// The grouped list (design/34-MODERN-LOOK.md section 3.5): System Settings' inset groups.
+#[component]
+fn Grouped() -> Element {
+    rsx! {
+        Section {
+            title: "List: grouped",
+            note: "ListStyle::Grouped (the old Inset, drawn the same): one rounded group on the grouped ground, no outline; rows 44 high with a 24 px icon tile or a 32 px avatar, a chevron on rows that open something, a hairline from the row's text to the edge with none above the first row or below the last, and the quiet wash for the selection.",
+            div { class: "g-stage-pad", style: "width:420px;background:var(--surface-2)",
+                crate::pages::forms::grouped::Panes {}
             }
         }
     }

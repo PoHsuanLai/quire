@@ -896,6 +896,29 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-field-group{ display:flex; flex-direction:column; min-width:0; }
 .ds-field-group-rows{ border-radius:var(--r-card); background:var(--surface); box-shadow:inset 0 0 0 var(--hair) var(--line); overflow:hidden; }
 .ds-field-group-rows > .ds-field-row + .ds-field-row{ border-top:var(--hair) solid var(--line); }
+/* -- form -- */
+/* Form (design/34-MODERN-LOOK.md section 3.5): the page margin and the gap between sections. The
+   sections draw themselves. Attribute selectors carry `*|` (spike S2). */
+
+.ds-form{ display:flex; flex-direction:column; gap:var(--s-20); box-sizing:border-box; min-width:0; padding:var(--s-20); }
+/* -- form_section -- */
+/* FormSection (design/34-MODERN-LOOK.md sections 2.3 and 3.5). The group is the `--grp` card at
+   the group radius, no outline, clipped to its corners. Its title is 13/600 secondary, 6 above
+   the card and inset to the row text; its footer 11 faint, 6 below. Rows inside lie 44 high
+   (`--row-settings-h`) with a 14 pad; each row after the first carries the hairline `--line`
+   from the row's text to the trailing edge, none above the first, none below the last. A grouped
+   `List` or `FieldRow` placed inside takes the card as its own. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-form-section{ display:flex; flex-direction:column; min-width:0; }
+.ds-form-section-title{ padding:0 var(--s-14) var(--s-6); font-size:var(--fs-control); font-weight:600; color:var(--ink-soft); line-height:1.3; }
+.ds-form-section-group{ display:flex; flex-direction:column; border-radius:var(--r-group); background:var(--grp); overflow:hidden; min-width:0; }
+.ds-form-section-footer{ margin:0; padding:var(--s-6) var(--s-14) 0; font-size:var(--fs-eyebrow); color:var(--ink-faint); line-height:1.35; }
+
+.ds-form-section-group > .ds-field-row{ position:relative; min-height:var(--row-settings-h); padding:0 var(--s-14); }
+.ds-form-section-group > .ds-field-row + .ds-field-row::before,
+.ds-form-section-group > .ds-list + .ds-field-row::before{ content:""; position:absolute; top:0; left:var(--s-14); right:0; height:var(--hair); background:var(--line); }
+.ds-form-section-group > .ds-list[*|data-style=grouped]{ background:transparent; border-radius:0; }
 /* -- hover_card -- */
 /* HoverCard (design/04-COMPONENTS.md section 22): the card `S:399-404`, its blocks `S:405-425`,
    the side card `S:428`, the live dot `S:561`. It fades in over `--t-quick` (design/30 section
@@ -983,6 +1006,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-strip[*|data-shown=visible] .ds-strip-action{ opacity:1; }
 .ds-row:hover .ds-strip[*|data-shown=hidden]{ opacity:0; pointer-events:none; }
 .ds-row:hover .ds-strip[*|data-shown=hidden] .ds-strip-action{ opacity:0; }
+/* -- icon_tile -- */
+/* IconTile (design/34-MODERN-LOOK.md sections 2.3 and 3.5): a `--row-icon-tile` square at the
+   tile radius, the caller's colour (`--tile-bg`, inline) under a gradient from a lighter step of it (`--tile-top`, inline), a white
+   glyph, no outline, no shadow. Attribute selectors carry `*|` (spike S2). */
+
+.ds-icon-tile{
+  display:grid; place-items:center; flex:none; box-sizing:border-box; width:var(--row-icon-tile); height:var(--row-icon-tile);
+  border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
+  color:var(--on-hue);
+}
 /* -- icon_view -- */
 /* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
    URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
@@ -1157,10 +1190,44 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .ds-list-item[*|data-presence=leaving]{ animation-name:menu-out; }
 .ds[*|data-motion=reduced] .ds-list-item[*|data-presence=healing]{ animation-name:hold; }
 
-/* Inset: the rows in a card, a hairline above every row after the first. */
-.ds-list[*|data-style=inset]{ padding:var(--s-4); border-radius:var(--r-card); background:var(--surface); }
-.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row{ border-top:var(--hair) solid var(--line); border-top-left-radius:0; border-top-right-radius:0; }
-.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]{ border-top-color:transparent; }
+/* Grouped (design/34-MODERN-LOOK.md sections 2.3 and 3.5, System Settings' inset grouped list;
+   `inset` is its old name, drawn as it for one release: the `List` writes `grouped` for both). The
+   rows sit in one rounded card on `--grp`: no outline, no padding, clipped to the group radius.
+   A row is `--row-settings-h` high with a 14 pad and `--row-tile-gap` between its leading tile or
+   avatar and its words. The hairline between rows (`--sep`) runs from the row's text, past the
+   leading element, to the trailing edge: none above the first row, none below the last, none
+   against a selected row. A selected row is the `--fill` wash (the selection tokens are
+   redefined here), not the accent; a pressed row takes the same wash. The first and last rows
+   take the group's corners so their wash is clipped to them. */
+.ds-list[*|data-style=grouped]{
+  --sel-bg:var(--fill); --sel-bg-quiet:var(--fill); --sel-ink:var(--ink);
+  border-radius:var(--r-group); background:var(--grp); overflow:hidden;
+}
+.ds-list[*|data-style=grouped] .ds-row{
+  --sep:var(--s-14); min-height:var(--row-settings-h); gap:var(--row-tile-gap); padding:0 var(--s-14); border-radius:0;
+}
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=icon],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=disc],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=source],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=text],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=tile]{ --sep:calc(var(--s-14) + var(--row-icon-tile) + var(--row-tile-gap)); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=avatar],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=image],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=thumb]{ --sep:calc(var(--s-14) + var(--row-avatar) + var(--row-tile-gap)); }
+.ds-list[*|data-style=grouped] .ds-row-leading{ width:var(--row-icon-tile); }
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=avatar],
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=image],
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=thumb]{ width:var(--row-avatar); height:var(--row-avatar); }
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=avatar] > .ds-avatar{ width:var(--row-avatar); height:var(--row-avatar); }
+.ds-list[*|data-style=grouped] .ds-list-item + .ds-list-item > .ds-row::before{ content:""; position:absolute; top:0; left:var(--sep); right:0; height:var(--hair); background:var(--line); }
+.ds-list[*|data-style=grouped] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]::before{ display:none; }
+.ds-list[*|data-style=grouped] .ds-list-item:first-child > .ds-row{ border-top-left-radius:var(--r-group); border-top-right-radius:var(--r-group); }
+.ds-list[*|data-style=grouped] .ds-list-item:last-child > .ds-row{ border-bottom-left-radius:var(--r-group); border-bottom-right-radius:var(--r-group); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure{ color:var(--ink-faint); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
+.ds-list[*|data-style=grouped] .ds-row:active{ background:var(--fill); }
 
 /* SourceList: a sidebar's rows at the sidebar's size (Small 24, Medium 28, Large 32). */
 .ds-list[*|data-style=source-list] .ds-row{ min-height:28px; }
@@ -1555,7 +1622,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-provider[*|data-kind=image] img{ width:100%; height:100%; display:block; object-fit:contain; }
 /* -- row -- */
 /* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
-   are 24 tall (Compact) or 44 (Settings); a row under a highlight fills with the accent and takes
+   are 24 tall (Compact; 28 in a table) or 44 (Settings); a row under a highlight fills with the accent and takes
    the accent's ink (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
    list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
    Attribute selectors carry `*|` (spike S2). */
@@ -1618,7 +1685,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:var(--row-avatar); height:var(--row-avatar); }
-.ds-row-leading[*|data-leading=text]{ border:var(--hair) solid var(--line); border-radius:var(--r-shell-highlight); background:var(--surface);
+.ds-row-leading[*|data-leading=text]{ width:var(--row-icon-tile); height:var(--row-icon-tile); border-radius:var(--r-icon-tile); background:var(--fill-quaternary);
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-row-leading[*|data-leading=avatar],
 .ds-row-leading[*|data-leading=image]{ background:transparent; }
@@ -1627,6 +1694,8 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-shell-highlight); }
 
 /* The accessory. */
+/* A chevron: the row opens a pane, sheet or popover (design/34-MODERN-LOOK.md section 2.3); the glyph is 12 px (`IconSize::Tiny`) in the faint ink. */
+.ds-row-trailing[*|data-mark=chevron]{ color:var(--ink-faint); }
 .ds-row-trailing{ display:inline-flex; align-items:center; flex:none; gap:var(--s-4); margin-left:auto; color:var(--ink-faint); font-size:var(--fs-help); }
 .ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }
@@ -2253,14 +2322,15 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- table -- */
 /* Table (design/30 section 2.6, `NSTableView`). Attribute selectors carry `*|` (spike S2). The
    header and every row lay their cells on the grid `--table-cols` the root carries, so a resize
-   moves one number and every row follows. No row is striped; the header sits on a hairline and a
+   moves one number and every row follows. No row is striped; the header is `--row-compact-h` high with no line under it (design/34-MODERN-LOOK.md section 3.5; the
+   line that appears once the content scrolls is the scroll-edge of step 2) and a
    column's title darkens under the pointer (the one hover a table shows). The edge between two
    headers is a 6 px drag zone with the resize cursor and a hairline at its middle. */
 
 .ds-table{ --table-cols:1fr; display:flex; flex-direction:column; min-width:0; }
 .ds-table-header{
-  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:24px;
-  border-bottom:var(--hair) solid var(--line); position:relative;
+  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:var(--row-compact-h);
+  position:relative;
 }
 .ds-table-column{
   display:flex; align-items:center; gap:var(--s-4); min-width:0; padding:0 var(--s-8); border:0; background:transparent;
@@ -2282,7 +2352,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-table-cells{ display:grid; grid-template-columns:var(--table-cols); align-items:center; flex:1 1 auto; min-width:0; }
 .ds-table-cell{ min-width:0; padding:0 var(--s-8); }
 .ds-table-cell[*|data-align=trailing]{ text-align:end; }
-.ds-table .ds-row{ padding:0; }
+.ds-table .ds-row{ min-height:var(--row-compact-h); padding:0; }
 .ds-table .ds-row-words{ display:flex; flex-direction:row; }
 /* -- text_field -- */
 /* TextField (design/30 section 2.2, `NSTextField`, `NSSecureTextField`, `NSSearchField`).

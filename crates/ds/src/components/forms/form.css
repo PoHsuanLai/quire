@@ -1,0 +1,4 @@
+/* Form (design/34-MODERN-LOOK.md section 3.5): the page margin and the gap between sections. The
+   sections draw themselves. Attribute selectors carry `*|` (spike S2). */
+
+.ds-form{ display:flex; flex-direction:column; gap:var(--s-20); box-sizing:border-box; min-width:0; padding:var(--s-20); }

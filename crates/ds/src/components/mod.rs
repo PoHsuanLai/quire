@@ -8,6 +8,7 @@ pub mod content;
 pub mod controls;
 pub mod editor;
 pub mod fields;
+pub mod forms;
 pub mod lists;
 pub mod menus;
 pub mod overlays;

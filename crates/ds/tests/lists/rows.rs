@@ -6,12 +6,14 @@ use crate::scoped::Scoped;
 use dioxus::prelude::*;
 use ds::components::app::hover_strip::{ActionId, HoverStrip, StripAction};
 use ds::components::app::thread_row::ThreadRow;
+use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone, PersonHue};
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::status::battery_state::BatteryState;
 use ds::components::controls::button_model::Bezel;
 use ds::components::controls::button_model::ButtonRole;
 use ds::components::controls::button_model::ImagePosition;
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::forms::icon_tile::TileFace;
 use ds::components::lists::list::model::ListStyle;
 use ds::components::lists::row::confirm::RowConfirm;
 use ds::components::lists::row::motion::RowMotion;
@@ -24,6 +26,7 @@ use ds::root::pass_through::DataName;
 use ds_core::vocab::RowState;
 use ds_style::tokens::control_size::ControlSize;
 use ds_style::tokens::control_size::SidebarSize;
+use ds_style::tokens::hex::Hex;
 
 /// The four strip actions of the Spaces prototype (`S:1286-1288`).
 pub fn strip_actions() -> Vec<StripAction> {
@@ -98,6 +101,11 @@ pub fn listed_thread(key: &'static str, emphasis: Emphasis) -> ListItem<&'static
 /// A row named `title` with `accessory`, at settings height.
 fn with_accessory(title: &'static str, accessory: Accessory) -> Element {
     rsx! { Scoped { Row { title, size: RowSize::Settings, accessory } } }
+}
+
+/// A settings row named `title` led by a blue tile of `icon`, with `accessory`.
+fn with_tile(title: &'static str, icon: Icon, accessory: Accessory) -> Element {
+    rsx! { Scoped { Row { title, size: RowSize::Settings, leading: RowLeading::Tile(TileFace::Glyph(icon, Hex([0x0a, 0x84, 0xff]))), accessory } } }
 }
 
 /// A row in `state`.
@@ -444,6 +452,26 @@ pub const ROW_CASES: &[Case] = &[
         component: "list",
         state: "inset",
         make: || rsx! { Scoped { List::<&'static str> { label: "Networks", style: ListStyle::Inset, items: vec![ListItem::row("Home", "Home", with_accessory("Home", Accessory::Check(Check::On))), ListItem::row("Café", "Café", with_accessory("Café", Accessory::Chevron))] } } },
+    },
+    Case {
+        component: "list",
+        state: "grouped",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Settings", style: ListStyle::Grouped, items: vec![ListItem::row("Wi-Fi", "Wi-Fi", with_tile("Wi-Fi", Icon::Wifi, Accessory::Chevron)), ListItem::row("Sound", "Sound", with_tile("Sound", Icon::Speaker, Accessory::Text("Studio".to_string()))), ListItem::row("Dana", "Dana", rsx! { Scoped { Row { title: "Dana", size: RowSize::Settings, leading: RowLeading::Avatar(AvatarFace { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Person(PersonHue(120)), shape: AvatarShape::Round }), accessory: Accessory::Chevron } } }), ListItem::row("About", "About", with_accessory("About", Accessory::None))] } } },
+    },
+    Case {
+        component: "list",
+        state: "grouped-selected",
+        make: || rsx! { Scoped { List::<&'static str> { label: "Settings", style: ListStyle::Grouped, cursor: Some("Sound"), items: vec![ListItem::row("Wi-Fi", "Wi-Fi", with_tile("Wi-Fi", Icon::Wifi, Accessory::Chevron)), ListItem::row("Sound", "Sound", rsx! { Scoped { Row { title: "Sound", size: RowSize::Settings, leading: RowLeading::Tile(TileFace::Glyph(Icon::Speaker, Hex([0xff, 0x3b, 0x30]))), state: RowState { selection: Selection::Selected, ..RowState::default() } } } })] } } },
+    },
+    Case {
+        component: "row",
+        state: "leading-tile",
+        make: || with_tile("Wi-Fi", Icon::Wifi, Accessory::Chevron),
+    },
+    Case {
+        component: "row",
+        state: "leading-tile-avatar",
+        make: || rsx! { Row { title: "Dana", size: RowSize::Settings, leading: RowLeading::Tile(TileFace::Avatar(AvatarFace { initial: 'D', size: AvatarSize::Size34, tone: AvatarTone::Person(PersonHue(120)), shape: AvatarShape::Round })) } },
     },
     Case {
         component: "list",

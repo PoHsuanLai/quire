@@ -11,7 +11,7 @@
 use ds_lint::{Exception, LintConfig, Offence, Profile, Rule, stylesheet};
 
 /// Custom properties a component writes inline per element, which no stylesheet block declares:
-/// the avatar's colours (`Avatar`), the slider's fraction (`Slider`), the spark angle and the
+/// the avatar's colours (`Avatar`), an icon tile's ground and top (`IconTile`), the slider's fraction (`Slider`), the spark angle and the
 /// heal distance (design/05-MOTION.md section 5), an external icon's size (`IconView`), and a
 /// Space dot's stops (`SpaceDot` and the Space editor's dots), and a tinted plate's
 /// stops and ink per scheme (`IconView { plate_tint }`), and the level
@@ -19,6 +19,8 @@ use ds_lint::{Exception, LintConfig, Offence, Profile, Rule, stylesheet};
 const INLINE_VARS: &[&str] = &[
     "--av-bg",
     "--av-fg",
+    "--tile-bg",
+    "--tile-top",
     "--f",
     "--a",
     "--dy",

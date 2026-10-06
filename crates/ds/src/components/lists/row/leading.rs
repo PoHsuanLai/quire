@@ -4,6 +4,7 @@
 use crate::components::content::avatar::{AvatarFace, face};
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
+use crate::components::forms::icon_tile::{TileFace, tile};
 use crate::components::lists::row::shape::RowShape;
 use dioxus::prelude::*;
 use ds_core::vocab::Selection;
@@ -28,6 +29,8 @@ pub enum RowLeading {
     Text(String),
     /// An avatar.
     Avatar(AvatarFace),
+    /// A grouped row's tile: a colour with a white glyph, or the circular avatar.
+    Tile(TileFace),
 }
 
 impl RowLeading {
@@ -41,8 +44,17 @@ impl RowLeading {
             RowLeading::Source(_) => Some("source"),
             RowLeading::Text(_) => Some("text"),
             RowLeading::Avatar(_) => Some("avatar"),
+            RowLeading::Tile(face) => Some(face.slug()),
         }
     }
+}
+
+/// The row's `data-leading` word: a thumbnail replaces whatever leads, as it does in `draw`.
+pub(crate) fn row_slug(leading: &RowLeading, shape: &RowShape) -> Option<&'static str> {
+    shape
+        .thumb_src()
+        .map(|_| "thumb")
+        .or_else(|| leading.slug())
 }
 
 /// The leading part drawn. A file row's thumbnail takes the place of whatever leads it.
@@ -70,6 +82,7 @@ pub(crate) fn draw(leading: &RowLeading, shape: &RowShape) -> Element {
         },
         RowLeading::Text(text) => rsx! { "{text}" },
         RowLeading::Avatar(avatar) => face(*avatar),
+        RowLeading::Tile(face) => tile(*face),
     };
     let disc = match leading {
         RowLeading::Disc(_, Selection::Selected) => Some("on"),

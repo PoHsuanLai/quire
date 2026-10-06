@@ -218,6 +218,7 @@ pub fn Row(
             "aria-disabled": availability.aria_disabled(),
             "aria-busy": availability.aria_busy(),
             "data-density": size.slug(),
+            "data-leading": leading::row_slug(&leading, &shape),
             "data-emphasis": emphasis_slug(emphasis),
             "data-focus": FocusStyle::Highlight.slug(),
             "data-drop": drop.drop_attr(),

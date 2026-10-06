@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 29] = [
+pub const REGISTRY: [Entry; 30] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -54,8 +54,15 @@ pub const REGISTRY: [Entry; 29] = [
         page: Page::Lists,
         title: "Lists",
         lede: "A live List: add rows, remove them with each exit and watch the rows below heal, then undo. Row with every accessory, leading element, height and state; section headers and disclosures; a source list at each sidebar size with an outline and drop places; a List of notification groups that clear, fold and heal by measured heights; search hits with a keyboard-shown strip, tiles, the hover strip and the appearance picker.",
-        height: 4400,
+        height: 4800,
         body: crate::pages::lists::overview::ListsPage,
+    },
+    Entry {
+        page: Page::Forms,
+        title: "Forms",
+        lede: "A Form of FormSections as a System Settings pane draws it: a grouped list of panes led by icon tiles and a person, a chevron on every row that opens something, field rows with a toggle, the section footer, and the icon tile in five colours.",
+        height: 1300,
+        body: crate::pages::forms::FormsPage,
     },
     Entry {
         page: Page::Menus,

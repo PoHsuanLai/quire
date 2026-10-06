@@ -25,10 +25,44 @@
 .ds[*|data-motion=reduced] .ds-list-item[*|data-presence=leaving]{ animation-name:menu-out; }
 .ds[*|data-motion=reduced] .ds-list-item[*|data-presence=healing]{ animation-name:hold; }
 
-/* Inset: the rows in a card, a hairline above every row after the first. */
-.ds-list[*|data-style=inset]{ padding:var(--s-4); border-radius:var(--r-card); background:var(--surface); }
-.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row{ border-top:var(--hair) solid var(--line); border-top-left-radius:0; border-top-right-radius:0; }
-.ds-list[*|data-style=inset] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]{ border-top-color:transparent; }
+/* Grouped (design/34-MODERN-LOOK.md sections 2.3 and 3.5, System Settings' inset grouped list;
+   `inset` is its old name, drawn as it for one release: the `List` writes `grouped` for both). The
+   rows sit in one rounded card on `--grp`: no outline, no padding, clipped to the group radius.
+   A row is `--row-settings-h` high with a 14 pad and `--row-tile-gap` between its leading tile or
+   avatar and its words. The hairline between rows (`--sep`) runs from the row's text, past the
+   leading element, to the trailing edge: none above the first row, none below the last, none
+   against a selected row. A selected row is the `--fill` wash (the selection tokens are
+   redefined here), not the accent; a pressed row takes the same wash. The first and last rows
+   take the group's corners so their wash is clipped to them. */
+.ds-list[*|data-style=grouped]{
+  --sel-bg:var(--fill); --sel-bg-quiet:var(--fill); --sel-ink:var(--ink);
+  border-radius:var(--r-group); background:var(--grp); overflow:hidden;
+}
+.ds-list[*|data-style=grouped] .ds-row{
+  --sep:var(--s-14); min-height:var(--row-settings-h); gap:var(--row-tile-gap); padding:0 var(--s-14); border-radius:0;
+}
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=icon],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=disc],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=source],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=text],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=tile]{ --sep:calc(var(--s-14) + var(--row-icon-tile) + var(--row-tile-gap)); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=avatar],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=image],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=thumb]{ --sep:calc(var(--s-14) + var(--row-avatar) + var(--row-tile-gap)); }
+.ds-list[*|data-style=grouped] .ds-row-leading{ width:var(--row-icon-tile); }
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=avatar],
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=image],
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=thumb]{ width:var(--row-avatar); height:var(--row-avatar); }
+.ds-list[*|data-style=grouped] .ds-row-leading[*|data-leading=avatar] > .ds-avatar{ width:var(--row-avatar); height:var(--row-avatar); }
+.ds-list[*|data-style=grouped] .ds-list-item + .ds-list-item > .ds-row::before{ content:""; position:absolute; top:0; left:var(--sep); right:0; height:var(--hair); background:var(--line); }
+.ds-list[*|data-style=grouped] .ds-list-item + .ds-list-item > .ds-row[*|aria-selected=true]::before{ display:none; }
+.ds-list[*|data-style=grouped] .ds-list-item:first-child > .ds-row{ border-top-left-radius:var(--r-group); border-top-right-radius:var(--r-group); }
+.ds-list[*|data-style=grouped] .ds-list-item:last-child > .ds-row{ border-bottom-left-radius:var(--r-group); border-bottom-right-radius:var(--r-group); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure{ color:var(--ink-faint); }
+.ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
+.ds-list[*|data-style=grouped] .ds-row:active{ background:var(--fill); }
 
 /* SourceList: a sidebar's rows at the sidebar's size (Small 24, Medium 28, Large 32). */
 .ds-list[*|data-style=source-list] .ds-row{ min-height:28px; }

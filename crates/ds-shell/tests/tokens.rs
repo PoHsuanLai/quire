@@ -298,6 +298,8 @@ const PER_ELEMENT: &[&str] = &[
     "--rb",
     "--av-bg",
     "--av-fg",
+    "--tile-bg",
+    "--tile-top",
     "--ic-size",
     "--dot-c1",
     "--dot-c2",

@@ -10,10 +10,24 @@ pub enum ListStyle {
     /// Rows on the surface, edge to edge.
     #[default]
     Plain,
-    /// Rows in an inset card, a hairline between them (a settings pane).
+    /// System Settings' inset grouped list: rows in a rounded card on the grouped ground, no
+    /// outline, a hairline between them that starts at the text (design/34 section 3.5).
+    Grouped,
+    /// Deprecated: the old name of [`ListStyle::Grouped`], drawn as it. Kept for one release
+    /// (design/34 section 6, decision 7); use `Grouped`.
     Inset,
     /// A sidebar's list: rows at the sidebar's size, headers that collapse.
     SourceList,
+}
+
+impl ListStyle {
+    /// The style as drawn: `Inset` is `Grouped` under its old name.
+    pub(crate) fn drawn(self) -> ListStyle {
+        match self {
+            ListStyle::Inset => ListStyle::Grouped,
+            other => other,
+        }
+    }
 }
 
 /// What an item is to the keyboard.

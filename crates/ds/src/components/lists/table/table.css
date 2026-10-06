@@ -1,13 +1,14 @@
 /* Table (design/30 section 2.6, `NSTableView`). Attribute selectors carry `*|` (spike S2). The
    header and every row lay their cells on the grid `--table-cols` the root carries, so a resize
-   moves one number and every row follows. No row is striped; the header sits on a hairline and a
+   moves one number and every row follows. No row is striped; the header is `--row-compact-h` high with no line under it (design/34-MODERN-LOOK.md section 3.5; the
+   line that appears once the content scrolls is the scroll-edge of step 2) and a
    column's title darkens under the pointer (the one hover a table shows). The edge between two
    headers is a 6 px drag zone with the resize cursor and a hairline at its middle. */
 
 .ds-table{ --table-cols:1fr; display:flex; flex-direction:column; min-width:0; }
 .ds-table-header{
-  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:24px;
-  border-bottom:var(--hair) solid var(--line); position:relative;
+  display:grid; grid-template-columns:var(--table-cols); align-items:stretch; flex:none; height:var(--row-compact-h);
+  position:relative;
 }
 .ds-table-column{
   display:flex; align-items:center; gap:var(--s-4); min-width:0; padding:0 var(--s-8); border:0; background:transparent;
@@ -29,5 +30,5 @@
 .ds-table-cells{ display:grid; grid-template-columns:var(--table-cols); align-items:center; flex:1 1 auto; min-width:0; }
 .ds-table-cell{ min-width:0; padding:0 var(--s-8); }
 .ds-table-cell[*|data-align=trailing]{ text-align:end; }
-.ds-table .ds-row{ padding:0; }
+.ds-table .ds-row{ min-height:var(--row-compact-h); padding:0; }
 .ds-table .ds-row-words{ display:flex; flex-direction:row; }

@@ -17,6 +17,8 @@ pub enum Page {
     Catalogue,
     /// Rows, lists, section headers, disclosures, the roster.
     Lists,
+    /// Form and FormSection over a grouped list, field rows and the icon tile (design/34).
+    Forms,
     /// Menus, menu items and pop-up buttons.
     Menus,
     /// Stepper, DatePicker, Table, Toolbar, SplitView, Sidebar, TabView, FieldRow and FieldGroup,

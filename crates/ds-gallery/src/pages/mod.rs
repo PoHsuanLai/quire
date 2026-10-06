@@ -6,6 +6,7 @@ pub mod content;
 pub mod controls;
 pub mod details;
 pub mod editor;
+pub mod forms;
 pub mod foundations;
 pub mod lists;
 pub mod menus;

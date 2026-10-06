@@ -1,5 +1,5 @@
 /* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
-   are 24 tall (Compact) or 44 (Settings); a row under a highlight fills with the accent and takes
+   are 24 tall (Compact; 28 in a table) or 44 (Settings); a row under a highlight fills with the accent and takes
    the accent's ink (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
    list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
    Attribute selectors carry `*|` (spike S2). */
@@ -62,7 +62,7 @@
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:var(--row-avatar); height:var(--row-avatar); }
-.ds-row-leading[*|data-leading=text]{ border:var(--hair) solid var(--line); border-radius:var(--r-shell-highlight); background:var(--surface);
+.ds-row-leading[*|data-leading=text]{ width:var(--row-icon-tile); height:var(--row-icon-tile); border-radius:var(--r-icon-tile); background:var(--fill-quaternary);
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-row-leading[*|data-leading=avatar],
 .ds-row-leading[*|data-leading=image]{ background:transparent; }
@@ -71,6 +71,8 @@
 .ds-row-thumb{ display:block; width:100%; height:100%; object-fit:cover; border-radius:var(--r-shell-highlight); }
 
 /* The accessory. */
+/* A chevron: the row opens a pane, sheet or popover (design/34-MODERN-LOOK.md section 2.3); the glyph is 12 px (`IconSize::Tiny`) in the faint ink. */
+.ds-row-trailing[*|data-mark=chevron]{ color:var(--ink-faint); }
 .ds-row-trailing{ display:inline-flex; align-items:center; flex:none; gap:var(--s-4); margin-left:auto; color:var(--ink-faint); font-size:var(--fs-help); }
 .ds-row-trailing[*|data-mark=check]{ width:14px; color:var(--accent-text); }
 .ds-row-trailing[*|data-mark=busy]{ width:14px; height:14px; justify-content:center; }

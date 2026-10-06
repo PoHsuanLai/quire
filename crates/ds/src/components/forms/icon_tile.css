@@ -1,0 +1,9 @@
+/* IconTile (design/34-MODERN-LOOK.md sections 2.3 and 3.5): a `--row-icon-tile` square at the
+   tile radius, the caller's colour (`--tile-bg`, inline) under a gradient from a lighter step of it (`--tile-top`, inline), a white
+   glyph, no outline, no shadow. Attribute selectors carry `*|` (spike S2). */
+
+.ds-icon-tile{
+  display:grid; place-items:center; flex:none; box-sizing:border-box; width:var(--row-icon-tile); height:var(--row-icon-tile);
+  border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
+  color:var(--on-hue);
+}

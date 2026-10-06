@@ -71,6 +71,9 @@ pub use crate::components::fields::text_field_focus::FieldFocus;
 pub use crate::components::fields::text_field_model::FieldBezel;
 pub use crate::components::fields::text_field_model::Validity;
 pub use crate::components::fields::text_field_model::{FieldKind, FieldText};
+pub use crate::components::forms::form::Form;
+pub use crate::components::forms::form_section::FormSection;
+pub use crate::components::forms::icon_tile::{IconTile, TileFace};
 
 // Overlays
 pub use crate::components::overlays::alert::Alert;

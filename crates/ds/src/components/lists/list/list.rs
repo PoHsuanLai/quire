@@ -113,7 +113,7 @@ pub fn List<K: Clone + PartialEq + Hash + 'static>(
             role: "listbox",
             tabindex: "0",
             "aria-label": common.aria_label.clone().unwrap_or(label),
-            "data-style": style.slug(),
+            "data-style": style.drawn().slug(),
             "data-sidebar-size": (style == ListStyle::SourceList).then(|| sidebar.slug()),
             "data-focus": away,
             onmounted: move |event| mounted.mounted(event),

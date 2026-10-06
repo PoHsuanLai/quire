@@ -90,7 +90,7 @@ fn Accessories() -> Element {
             div { class: "g-list g-stage-pad",
                 List::<&'static str> {
                     label: "Accessories",
-                    style: ListStyle::Inset,
+                    style: ListStyle::Grouped,
                     items: vec![
                         row("None", Accessory::None),
                         row("Check on", Accessory::Check(Check::On)),
