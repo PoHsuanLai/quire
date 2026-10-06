@@ -264,7 +264,7 @@ fn Providers() -> Element {
 fn a_list_cursor_is_a_key_the_caller_holds_and_follows_the_key_through_a_reorder() {
     let mut harness = harness(Providers);
     click(&mut harness, "#p-anthropic");
-    let mut press = |harness: &mut Harness, key: ShortcutKey, want: &str, why: &str| {
+    let press = |harness: &mut Harness, key: ShortcutKey, want: &str, why: &str| {
         harness.send(Input::key(key));
         harness.advance(ms(20));
         assert_eq!(harness.text_of(".picked").as_deref(), Some(want), "{why}");
