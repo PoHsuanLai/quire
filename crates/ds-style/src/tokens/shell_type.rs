@@ -39,12 +39,12 @@ pub enum ShellType {
     /// `--shell-menu-sep`: the margin above and below a separator (`menus.separator_margin_px`, 5).
     #[token(name = "shell-menu-sep", input = "--shell-menu-sep-m", value = "5px")]
     MenuSeparator,
-    /// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 5: the
+    /// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 6: the
     /// reference's, design/29-SIZING.md section 5.4).
     #[token(
         name = "r-shell-highlight",
         input = "--shell-highlight-radius",
-        value = "5px"
+        value = "6px"
     )]
     HighlightRadius,
     /// `--fs-shell-field`: the launcher's query (`launcher.field_font_px`, 22).
@@ -152,7 +152,7 @@ impl Default for ShellMetrics {
                 font: Px(13.0),
                 row: Px(22.0),
                 separator_margin: Px(5.0),
-                highlight_radius: Px(5.0),
+                highlight_radius: Px(6.0),
             },
             launcher: LauncherType {
                 field_font: Px(22.0),
@@ -220,5 +220,21 @@ mod tests {
         let written = metrics.style_attr();
         assert!(written.contains("--shell-menu-row-h:24px;"));
         assert!(written.contains("--shell-menu-font:13px;"));
+    }
+
+    #[test]
+    fn the_highlight_radius_key_drives_its_token() {
+        let mut metrics = ShellMetrics::default();
+        assert!(
+            metrics
+                .style_attr()
+                .contains("--shell-highlight-radius:6px;")
+        );
+        metrics.menu.highlight_radius = ds_core::geometry::units::Px(9.0);
+        assert!(
+            metrics
+                .style_attr()
+                .contains("--shell-highlight-radius:9px;")
+        );
     }
 }

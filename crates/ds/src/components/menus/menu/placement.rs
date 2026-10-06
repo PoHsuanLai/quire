@@ -1,6 +1,6 @@
 //! Where a menu is and how it differs from the others (design/30 section 2.4): the three
 //! placements, where each goes against its anchor and what each shows. One density for all
-//! (row 22, separator 9, inset 5, radius 8); every menu opens at once.
+//! (row 22, separator 9, inset 5, radius 10); every menu opens at once.
 
 use ds_core::geometry::{
     placement::{Align, Placement, Side},

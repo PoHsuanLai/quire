@@ -352,7 +352,7 @@ found elsewhere in the file that are not yet in that table.
 | `menus.submenu_triangle_timeout_ms` | `Ms` | `300` | | `13-BEHAVIOUR-menus-windows.md#13-3-4-submenus` | proposed |
 | `menus.first_mouse_window_ms` | `Ms` | `100` | activation-vs-click window on an inactive window's first click | `13-BEHAVIOUR-menus-windows.md#13-3-8-focus-and-raise-rules`; `06-INTERACTIONS.md#20-desktop-interactions-settled` (§20.4) | proposed |
 | `menus.font_px` | `Px` | `13` | `9..=24` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `menus.highlight_radius_px` | `Px` | `5` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
+| `menus.highlight_radius_px` | `Px` | `6` | `0..=12` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md`; `29-SIZING.md#13-decisions-settled-with-the-user-2026-09-28` | settled 2026-09-28 (design/29 A) |
 | `menus.tooltip_font_px` | `Px` | `12` | `9..=20` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `switcher.show_delay_ms` | `Ms` | `150` | `0..500`; a chord released within the delay switches with no UI (the quick tap) | `13-BEHAVIOUR-menus-windows.md#13-6-configuration` | proposed |
 | `switcher.icon_size_px` | `Px` | `96` | alt macOS ~128 | `13-BEHAVIOUR-menus-windows.md#13-3-5-app-switcher-cmd-tab`; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 6 | proposed |

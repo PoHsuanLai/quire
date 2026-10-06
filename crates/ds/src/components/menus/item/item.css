@@ -6,7 +6,7 @@
    there is no hover rule. Attribute selectors carry `*|` (spike S2). */
 
 .ds-menu-item{
-  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-menu-item);
+  display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
   font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
 }
 .ds-menu-state{ display:inline-flex; align-items:center; justify-content:center; flex:none; width:22px; color:var(--ink); }

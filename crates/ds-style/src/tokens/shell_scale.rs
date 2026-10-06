@@ -16,7 +16,7 @@ pub struct ShellScale {
     pub bar: WholePx,
     /// A status item's slot width, 30; its height is a Regular control's.
     pub status_width: WholePx,
-    /// A text menu's radius, 8.
+    /// A text menu's radius, 10 (design/34 step 1).
     pub menu_radius: WholePx,
     /// A text menu's inset round its rows, 5.
     pub menu_inset: WholePx,
@@ -26,7 +26,7 @@ pub struct ShellScale {
 pub const SHELL_SCALE: ShellScale = ShellScale {
     bar: WholePx(24),
     status_width: WholePx(30),
-    menu_radius: WholePx(8),
+    menu_radius: WholePx(10),
     menu_inset: WholePx(5),
 };
 
