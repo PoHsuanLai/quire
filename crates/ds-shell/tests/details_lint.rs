@@ -7,8 +7,19 @@ use ds_lint::{LintConfig, Profile, Rule, stylesheet};
 
 /// Sheets allowed to break the details rules, and why. Each is mail's (mailo pins quire by tag,
 /// so these change when mailo decides, design/05 section 12 item 4), or the keyframe table
-/// itself.
-const ALLOWED: &[(&str, Rule, &str)] = &[];
+/// itself (`a-turn`).
+const ALLOWED: &[(&str, Rule, &str)] = &[
+    (
+        "motion",
+        Rule::InfiniteLoop,
+        "`a-turn`: a busy button's icon turns at a constant speed for as long as it is busy; a stepped clock jumps 30 degrees at a time, which reads as choppy on an arrow glyph",
+    ),
+    (
+        "motion",
+        Rule::OffGrammarTiming,
+        "`a-turn`: its period is `--t-turn`, a speed rather than a transition",
+    ),
+];
 
 fn sheets() -> Vec<(&'static str, String)> {
     // The components' and the details' own sheets (the widgets' are linted with the widgets),
