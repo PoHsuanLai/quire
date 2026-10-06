@@ -112,6 +112,10 @@ pub enum FontSize {
     /// `--fs-title` 16: list title, command input.
     #[token(value = "16px")]
     Title,
+    /// `--fs-title-2` 17: macOS Title 2 (design/34-MODERN-LOOK.md section 2.5), the alert title
+    /// at 700. A new step: `--fs-title` stays 16 so no consumer moves.
+    #[token(name = "title-2", value = "17px")]
+    Title2,
     /// `--fs-heading-3` 16.5: composer `h3`.
     #[token(name = "heading-3", value = "16.5px")]
     Heading3,

@@ -379,9 +379,9 @@ fn every_var_the_stylesheet_reads_is_declared() {
 /// its own pixel value and nowhere else (it follows neither scheme nor motion).
 #[test]
 fn the_spacing_scale_is_the_layout_docs() {
-    const STEPS: [&str; 21] = [
+    const STEPS: [&str; 27] = [
         "1", "1.5", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15",
-        "16", "18", "22", "26", "36",
+        "16", "18", "20", "22", "24", "26", "28", "32", "36", "40", "48",
     ];
     let written: Vec<String> = SpacingToken::ALL
         .iter()

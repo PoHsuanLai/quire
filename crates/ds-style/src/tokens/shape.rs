@@ -9,54 +9,74 @@ use ds_core::word::Word;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "r-", kind = fixed, css = radius_css)]
 pub enum Radius {
-    /// `--r-panel` 10: peek, command menu, hover card, editor.
+    /// `--r-panel` 12: sheet, alert, peek, command menu, hover card, editor.
     Panel,
-    /// `--r-card` 10: card and rows.
+    /// `--r-card` 12: card and rows.
     Card,
-    /// `--r-btn` 5: mini, button, tool.
+    /// `--r-btn` 6: mini, button, tool.
     Btn,
     /// `--r-chip` 6.
     Chip,
     /// `--r-pill` 999.
     Pill,
-    /// `--r-field` 5: inputs, command pill, bubble.
+    /// `--r-field` 8: inputs, command pill, bubble.
     Field,
-    /// `--r-menu` 8.
+    /// `--r-menu` 10.
     Menu,
     /// `--r-item` 6: sidebar item, tooltip.
     Item,
-    /// `--r-tile` 10: account tiles, editor field.
+    /// `--r-tile` 12: account tiles, editor field.
     Tile,
     /// `--r-window` 10.
     Window,
-    /// `--r-menu-item` 8: menu item, prop row, foot button.
+    /// `--r-menu-item` 6: menu item, prop row, foot button.
     MenuItem,
     /// `--r-small` 6: fly, gutter, quiet button.
     Small,
     /// `--r-kbd` 5: key cap, favicon.
     Kbd,
-    /// `--r-tiny` 4: focus ring, provider mark.
+    /// `--r-tiny` 5: focus ring, provider mark.
     Tiny,
-    /// `--r-micro` 3: in-row provider mark.
+    /// `--r-micro` 4: in-row provider mark.
     Micro,
-    /// `--r-media` 10: images, code blocks, attachments.
+    /// `--r-media` 12: images, code blocks, attachments.
     Media,
+    /// `--r-icon-tile` 6: the 24 px icon tile leading a grouped-list row.
+    IconTile,
+    /// `--r-group` 12: an inset grouped list or form group (the card's radius under its own
+    /// name, so a group can move without moving every card).
+    Group,
 }
 
 impl Radius {
-    /// The radius as CSS. The Look (design/30-CATALOGUE.md section 3.2) has
-    /// small, uniform radii: control and field 5, menu 8, popover, card and window 10.
+    /// The radius as CSS. The Look (design/34-MODERN-LOOK.md section 2.1, step 1): control 6,
+    /// field 8, menu 10, popover, card, group and panel 12; the window stays the host's 10.
     pub fn value(self) -> &'static str {
         match self {
-            Radius::Panel | Radius::Card | Radius::Tile | Radius::Window | Radius::Media => "10px",
-            Radius::Btn | Radius::Field | Radius::Kbd => "5px",
+            Radius::Panel | Radius::Card | Radius::Tile | Radius::Media | Radius::Group => "12px",
+            Radius::Window | Radius::Menu => "10px",
+            Radius::Field => "8px",
+            Radius::Btn | Radius::MenuItem | Radius::IconTile => "6px",
             Radius::Chip | Radius::Item | Radius::Small => "6px",
+            Radius::Kbd | Radius::Tiny => "5px",
             Radius::Pill => "999px",
-            Radius::Menu | Radius::MenuItem => "8px",
-            Radius::Tiny => "4px",
-            Radius::Micro => "3px",
+            Radius::Micro => "4px",
         }
     }
+}
+
+/// The smallest radius a concentric inner shape takes (design/34-MODERN-LOOK.md section 2.1).
+pub const CONCENTRIC_FLOOR: ds_core::geometry::units::Px = ds_core::geometry::units::Px(4.0);
+
+/// The concentric rule (design/34 section 2.1, WWDC25 "concentric shapes"): the radius of a
+/// shape inset `inset` inside an outer corner of radius `outer` is the outer radius less the
+/// inset, never below [`CONCENTRIC_FLOOR`]. A capsule's radius is half its height and never goes
+/// through here.
+pub fn concentric(
+    outer: ds_core::geometry::units::Px,
+    inset: ds_core::geometry::units::Px,
+) -> ds_core::geometry::units::Px {
+    ds_core::geometry::units::Px((outer.0 - inset.0).max(CONCENTRIC_FLOOR.0))
 }
 
 /// A radius token as the stylesheet writes it.
@@ -127,5 +147,45 @@ fn round2(value: f64) -> f64 {
 impl From<Radius> for Corner {
     fn from(radius: Radius) -> Self {
         Corner::Token(radius)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{CONCENTRIC_FLOOR, Radius, concentric};
+    use ds_core::geometry::units::Px;
+
+    #[test]
+    fn the_step_one_radii_are_design_34_section_2_1() {
+        let value = Radius::value;
+        assert_eq!(value(Radius::Panel), "12px");
+        assert_eq!(value(Radius::Card), "12px");
+        assert_eq!(value(Radius::Group), "12px");
+        assert_eq!(value(Radius::Btn), "6px");
+        assert_eq!(value(Radius::Field), "8px");
+        assert_eq!(value(Radius::Menu), "10px");
+        assert_eq!(value(Radius::MenuItem), "6px");
+        assert_eq!(value(Radius::IconTile), "6px");
+        assert_eq!(value(Radius::Tiny), "5px");
+        assert_eq!(value(Radius::Micro), "4px");
+        assert_eq!(value(Radius::Window), "10px");
+    }
+
+    #[test]
+    fn a_group_follows_the_card_and_a_menu_item_sits_inside_its_menu() {
+        assert_eq!(Radius::Group.value(), Radius::Card.value());
+        let item: f32 = Radius::MenuItem
+            .value()
+            .trim_end_matches("px")
+            .parse()
+            .unwrap_or(f32::NAN);
+        assert!(item <= concentric(Px(10.0), Px(4.0)).0, "{item}");
+    }
+
+    #[test]
+    fn the_concentric_radius_is_outer_less_inset_floored() {
+        assert_eq!(concentric(Px(26.0), Px(8.0)), Px(18.0));
+        assert_eq!(concentric(Px(26.0), Px(12.0)), Px(14.0));
+        assert_eq!(concentric(Px(10.0), Px(8.0)), CONCENTRIC_FLOOR);
     }
 }

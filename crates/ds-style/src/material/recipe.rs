@@ -158,7 +158,7 @@ pub(crate) fn layers(material: Material, scheme: Scheme) -> Layers {
     let hairline_edge = inset("0 0 0 var(--hairline)", inner, inner_alpha);
     let pop = |light_alpha, dark_alpha| {
         shadow(
-            "0 12px 40px -12px",
+            "0 10px 30px -8px",
             BLACK,
             if light { light_alpha } else { dark_alpha },
         )
@@ -264,8 +264,8 @@ mod tests {
             (Material::Bar, Scheme::Light, "rgba(252,253,249,.7)", "rgba(252,253,249,.94)", "0"),
             (Material::Bar, Scheme::Dark, "rgba(20,24,19,.68)", "rgba(20,24,19,.94)", "0"),
             (Material::Dock, Scheme::Light, "rgba(252,253,249,.59)", "rgba(252,253,249,.94)", "22px"),
-            (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "10px"),
-            (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "10px"),
+            (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "12px"),
+            (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "12px"),
             (Material::Sheet, Scheme::Light, "rgba(252,253,249,.82)", "rgba(252,253,249,.94)", "18px"),
             (Material::Widget, Scheme::Dark, "rgba(20,24,19,.55)", "rgba(20,24,19,.94)", "20px"),
             (Material::Window, Scheme::Light, "var(--f-grad)", "var(--f-grad)", "0"),
@@ -329,7 +329,7 @@ mod tests {
         assert_eq!(light.hairline, "0 0 0 var(--hairline) rgba(0,0,0,.14)");
         assert_eq!(dark.hairline, "0 0 0 var(--hairline) rgba(0,0,0,.6)");
         assert_eq!(light.shadow_contact, "0 1px 2px rgba(0,0,0,.1)");
-        assert_eq!(light.shadow, "0 12px 40px -12px rgba(0,0,0,.28)");
+        assert_eq!(light.shadow, "0 10px 30px -8px rgba(0,0,0,.28)");
         for material in [
             Material::Dock,
             Material::Popover,

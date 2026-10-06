@@ -55,6 +55,17 @@ pub enum ColourToken {
     /// `--fill-quaternary`: NSColor's quaternarySystemFill, the wash a search field takes for its
     /// ground: black at .06 in light, white at .10 in dark, over whatever lies beneath.
     FillQuaternary,
+    /// `--fill-btn`: the wash a filled push button and a bezeled field take in place of a
+    /// bordered grey (design/34-MODERN-LOOK.md section 2.6): the quaternary tier, black at .06
+    /// in light, white at .10 in dark.
+    #[token(name = "fill-btn")]
+    FillBtn,
+    /// `--fill`: the stronger wash of a pressed row or button, black at .10 in light, white at
+    /// .14 in dark.
+    Fill,
+    /// `--grp`: an inset grouped list's and form group's ground: white in light, `#2C2C2E` in
+    /// dark, opaque so rows read over a translucent panel.
+    Grp,
     /// `--line-soft`: inner dividers.
     LineSoft,
     /// `--accent`: the accent's solid fill (the primary button, the today disc, a toggle on).
@@ -195,6 +206,9 @@ impl ColourToken {
             ColourToken::InkSoft => (solid(0x5C5C5C), solid(0xA3A3A3)),
             ColourToken::InkFaint => (solid(0x858585), solid(0x858585)),
             ColourToken::Line => (solid(0xD9D9D9), solid(0x444444)),
+            ColourToken::FillBtn => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
+            ColourToken::Fill => (alpha(0x000000, 100), alpha(0xFFFFFF, 140)),
+            ColourToken::Grp => (WHITE, solid(0x2C2C2E)),
             ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
             ColourToken::FillQuaternary => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
             ColourToken::Ok => (solid(0x2C7A57), solid(0x5EB489)),

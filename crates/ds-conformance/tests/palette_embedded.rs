@@ -395,7 +395,7 @@ fn an_app_icon_fills_its_rows_tile() {
     harness.advance(ms(700));
     let tile = rect(&harness, ".ds-row-leading[*|data-leading=image]");
     let icon = rect(&harness, ".ds-row-leading > .ds-ext-icon");
-    assert_eq!(tile.size.width, Px(34.0));
+    assert_eq!(tile.size.width, Px(32.0));
     assert_eq!(icon, tile, "the icon fills the tile");
     let frame = harness.render().expect("a frame");
     let centre = frame.get_pixel(

@@ -27,13 +27,23 @@ pub enum Shadow {
         dark = "0 var(--hair) 0 rgba(255,255,255,.05) inset,0 10px 22px -8px rgba(0,0,0,.7)"
     )]
     Two,
-    /// `--shadow-pop`: menus, hover cards, popovers.
-    #[token(value = "0 18px 40px -16px rgba(0,0,0,.45)")]
-    Pop,
-    /// `--shadow-sheet`: peek, sheets, the command menu.
+    /// `--shadow-edge`: the half-pixel edge that replaces a 1 px `--line` border on a filled
+    /// control, field or group (design/34-MODERN-LOOK.md section 2.6): a ring, no drop.
     #[token(
-        light = "0 24px 50px -18px rgba(0,0,0,.55)",
-        dark = "0 30px 60px -20px rgba(0,0,0,.7)"
+        light = "0 0 0 var(--hairline) rgba(0,0,0,.12)",
+        dark = "0 0 0 var(--hairline) rgba(255,255,255,.12)"
+    )]
+    Edge,
+    /// `--shadow-pop`: menus, hover cards, popovers: a hairline edge and a soft drop.
+    #[token(
+        light = "0 0 0 var(--hairline) rgba(0,0,0,.12),0 10px 30px -8px rgba(0,0,0,.28)",
+        dark = "0 0 0 var(--hairline) rgba(255,255,255,.14),0 10px 30px -8px rgba(0,0,0,.55)"
+    )]
+    Pop,
+    /// `--shadow-sheet`: peek, sheets, the command menu: a hairline edge and a long soft drop.
+    #[token(
+        light = "0 0 0 var(--hairline) rgba(0,0,0,.14),0 24px 60px -12px rgba(0,0,0,.35)",
+        dark = "0 0 0 var(--hairline) rgba(255,255,255,.14),0 24px 60px -12px rgba(0,0,0,.6)"
     )]
     Sheet,
     /// `--shadow-drag`: the drag ghost.

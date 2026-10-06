@@ -2,7 +2,7 @@
 //! app surfaces is one of these steps. The scale is dense, not a geometric ramp, so each token
 //! is named by its own pixel value: `--s-8` is 8 px, `--s-1-5` is 1.5 px.
 //!
-//! The eighteen common steps, plus the three values 04-COMPONENTS quotes exactly for a quire
+//! The eighteen common steps (design/34-MODERN-LOOK.md section 2.4 adds 20, 24, 28, 32, 40 and 48 for the larger Look's margins and group gaps), plus the three values 04-COMPONENTS quotes exactly for a quire
 //! component and the common steps miss: 1.5 (the chip's and the image provider mark's
 //! padding), 13 (the hover card's inline padding) and 15 (the toast's leading padding). The
 //! section's other odd values (40, 46, 50, 56) belong to mail surfaces quire does not draw; the
@@ -69,15 +69,33 @@ pub enum SpacingToken {
     /// `--s-18`: 18 px.
     #[token(name = "18", value = "18px")]
     S18,
+    /// `--s-20`: 20 px.
+    #[token(name = "20", value = "20px")]
+    S20,
     /// `--s-22`: 22 px.
     #[token(name = "22", value = "22px")]
     S22,
+    /// `--s-24`: 24 px.
+    #[token(name = "24", value = "24px")]
+    S24,
     /// `--s-26`: 26 px.
     #[token(name = "26", value = "26px")]
     S26,
+    /// `--s-28`: 28 px.
+    #[token(name = "28", value = "28px")]
+    S28,
+    /// `--s-32`: 32 px.
+    #[token(name = "32", value = "32px")]
+    S32,
     /// `--s-36`: 36 px.
     #[token(name = "36", value = "36px")]
     S36,
+    /// `--s-40`: 40 px.
+    #[token(name = "40", value = "40px")]
+    S40,
+    /// `--s-48`: 48 px.
+    #[token(name = "48", value = "48px")]
+    S48,
 }
 
 impl SpacingToken {
