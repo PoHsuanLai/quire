@@ -55,3 +55,13 @@ anyrender_vello_cpu = { git = "https://github.com/PoHsuanLai/anyrender", rev = "
 anyrender_vello_hybrid = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
 wgpu_context = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
 pixels_window_renderer = { git = "https://github.com/PoHsuanLai/anyrender", rev = "a0825ebfc0443f3ef0830c0e09f2d85df3da632b" }
+# dioxus-core 0.7.10 can spin forever in VirtualDom::wait_for_work: a task woken and then cancelled
+# before it is polled (a use_resource restart) leaves an empty entry in the dirty-task queue that
+# pop_task never removes. Fixed upstream in DioxusLabs/dioxus#5554 (0.8-alpha only); this fork
+# (github.com/PoHsuanLai/dioxus, branch quire-0.7) backports it onto 0.7.10. Remove when quire
+# moves to dioxus 0.8.
+dioxus-core = { git = "https://github.com/PoHsuanLai/dioxus", rev = "a615fd9f09e272c688a45e366161c576cecf0439" }
+dioxus-core-types = { git = "https://github.com/PoHsuanLai/dioxus", rev = "a615fd9f09e272c688a45e366161c576cecf0439" }
+generational-box = { git = "https://github.com/PoHsuanLai/dioxus", rev = "a615fd9f09e272c688a45e366161c576cecf0439" }
+subsecond = { git = "https://github.com/PoHsuanLai/dioxus", rev = "a615fd9f09e272c688a45e366161c576cecf0439" }
+subsecond-types = { git = "https://github.com/PoHsuanLai/dioxus", rev = "a615fd9f09e272c688a45e366161c576cecf0439" }

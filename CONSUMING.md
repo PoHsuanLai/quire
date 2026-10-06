@@ -81,7 +81,12 @@ does the rest of the pinned block. Do not add a `[patch]` for it unless you deve
 alongside: quire's own `[patch]` table (its local `blitz-kit` checkout, the vello and anyrender
 forks) applies only when quire is the workspace root, never to a consumer, so a consumer that
 needs the forks' behaviour (the CSS `filter` functions) copies the `[patch.crates-io]` block
-from quire's root `Cargo.toml` into its own workspace root. shell-host and sill add, for their
+from quire's root `Cargo.toml` into its own workspace root. The same block carries the
+`dioxus-core` fork patch (`dioxus-core`, `dioxus-core-types`, `generational-box`, `subsecond`,
+`subsecond-types`, all at one rev of github.com/PoHsuanLai/dioxus): dioxus-core 0.7.10 can spin forever
+in `wait_for_work` when a task is cancelled before it is polled (a `use_resource` restart), fixed
+upstream only in 0.8 (DioxusLabs/dioxus#5554). Every consumer that runs a `VirtualDom` copies those
+five lines too, and drops them when quire moves to dioxus 0.8. shell-host and sill add, for their
 local checkouts, `[patch."https://github.com/PoHsuanLai/blitz-kit"]` pointing at a sibling
 `blitz-kit` so every path-linked repo builds one copy.
 
