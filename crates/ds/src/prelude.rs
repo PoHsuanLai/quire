@@ -127,6 +127,10 @@ pub use ds_motion::detail::cue::Cue;
 pub use ds_motion::detail::detailed::Detailed;
 pub use ds_motion::detail::moment::Moment;
 pub use ds_motion::detail::use_detail::use_detail;
+pub use ds_motion::symbol::effect::{
+    Activity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
+};
+pub use ds_motion::symbol::view::Symbol;
 
 // Host
 pub use crate::host::document::DocumentHost;

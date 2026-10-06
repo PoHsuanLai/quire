@@ -23,6 +23,7 @@ pub mod pulse_key;
 pub mod recipe;
 pub(crate) mod recipe_detail;
 pub(crate) mod recipe_own;
+pub(crate) mod recipe_symbol;
 pub(crate) mod reduced;
 pub mod roster;
 pub mod rubber;
@@ -32,6 +33,7 @@ pub mod spring;
 pub mod spring_point;
 pub mod spring_spec;
 pub mod swipe;
+pub mod symbol;
 pub mod timeline;
 #[cfg(feature = "dioxus")]
 pub mod timer;

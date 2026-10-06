@@ -739,6 +739,18 @@ A few props worth knowing about before you read the signatures:
   by turning the button's own icon (Mail's Get Mail arrow) instead of the default spinner in the leading
   slot: one linear turn a second (`turn`, `--t-turn`), no leading mark, input dropped and `aria-busy`
   written as for any busy button. Reduced motion holds the glyph still. `BusyLook::Spinner` is the default.
+  It is the symbol effect `SymbolEffect::While(LoopEffect::Rotate, ..)` on the button's icon wrapper.
+- `Symbol { icon, size, effect }` plays a symbol effect on an icon (design/35-SYMBOL-EFFECTS.md):
+  `SymbolEffect::Once(OnceEffect::Bounce, trigger)` plays each time `trigger` (a `Trigger`, bumped
+  with `.next()`) changes and never on the first render or a re-render with the same value;
+  `SymbolEffect::While(LoopEffect::Pulse, Activity::Active)` runs until it is `Idle`;
+  `SymbolEffect::Transition(TransitionEffect::Appear, Shown::Visible)` plays when the state changes
+  (`Appear`, `Disappear`, `DrawOn`, and `Replace`, which cross-fades when `icon` changes). `Part`
+  and `VariableColor` move the piece an icon annotates (trash lid, bell, mail flap, folder, lock
+  shackle, star and heart, refresh; the bars of Wi-Fi, the waves of volume, the cells of a full
+  battery) and fall back to Bounce and Pulse on any other icon. Nothing plays by itself, and Reduced
+  motion holds or fades each. A component that wants only the wrapper's class calls
+  `use_symbol_attrs(effect)`.
 - Copying to the clipboard from an action is `ds_blitz::clipboard::write_text(&str)` (read: `read_text`),
   reached through the document's host, so call it from a handler; a test reads it back with
   `Harness::clipboard_text()`. ds-shell has no clipboard of its own.

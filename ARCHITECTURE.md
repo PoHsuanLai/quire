@@ -241,6 +241,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Tweens, springs, count-up, sweeps | `ds-motion::timeline::{Timeline, use_timeline}` |
 | List row motion (enter, exit, heal) | `ds-motion::roster` |
 | Pulse (a replayed keyframe) | `ds-motion::pulse` |
+| An icon's own motion (bounce, pulse, wiggle, breathe, rotate, draw on, a lid that lifts) | `ds-motion::symbol::{Symbol, SymbolEffect}`; part annotations `ds-style::icon::parts` |
 | Drag, swipe, hover intent | `ds-motion::gesture` |
 | What a state change means (moments) | `ds-motion::details::Detailed` |
 | Stylesheet and markup linting | `ds-lint` |
@@ -689,6 +690,9 @@ are reached as `ds::components::app::X`, not through the prelude.
 2. A Rust-driven value (level, count, glide): `impl Timeline` in
    `ds-motion/src/timeline/<name>.rs` and call `use_timeline`; never a new hook, never a `sleep`.
 3. Show/hide: `use_presence`; never a new phase enum.
+   A symbol effect is an `Anim` row in `recipe_symbol.rs` plus an arm in `symbol/route.rs`
+   (`once_anim`, `loop_anim`); a motion inside an SVG (Blitz's stylesheet does not reach there)
+   is a gesture in `symbol/pose.rs` and an annotation in `ds-style/src/icon/parts.rs`.
 4. Tests: `ds/tests/motion_drift.rs` (table against CSS), the implementor's `at` at
    `0`, `total/2`, `total` as a table test, and a conformance test with `Clock::Virtual`.
 

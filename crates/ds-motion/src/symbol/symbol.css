@@ -1,0 +1,7 @@
+/* Symbol (design/35-SYMBOL-EFFECTS.md): an icon in a wrapper the stylesheet can move. The
+   effect's keyframes play on the wrapper (`a-bounce`, `a-turn`...; motion.css); what moves a
+   part inside the SVG is written as attributes by Rust. Hidden stands invisible while nothing
+   plays (an Appear before it arrives, a Disappear that never showed). */
+
+.ds-symbol{ display:inline-block; flex:none; line-height:0; }
+.ds-symbol[*|data-visibility=hidden]{ opacity:0; }

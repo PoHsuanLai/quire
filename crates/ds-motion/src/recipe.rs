@@ -8,6 +8,7 @@
 use super::anim::Anim;
 use super::recipe_detail as detail;
 use super::recipe_own as own;
+use super::recipe_symbol as symbol;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// `animation-fill-mode`.
@@ -175,6 +176,19 @@ impl Anim {
             Anim::PaneInROut => detail::PANE_IN_R_OUT,
             Anim::MorphInSpring => detail::MORPH_IN_SPRING,
             Anim::Turn => own::TURN,
+            Anim::Bounce => symbol::BOUNCE,
+            Anim::BounceLoop => symbol::BOUNCE_LOOP,
+            Anim::Pulse => symbol::PULSE,
+            Anim::PulseLoop => symbol::PULSE_LOOP,
+            Anim::Wiggle => symbol::WIGGLE,
+            Anim::WiggleLoop => symbol::WIGGLE_LOOP,
+            Anim::Breathe => symbol::BREATHE,
+            Anim::BreatheLoop => symbol::BREATHE_LOOP,
+            Anim::RotateOnce => symbol::ROTATE_ONCE,
+            Anim::ScaleUp => symbol::SCALE_UP,
+            Anim::ScaleDown => symbol::SCALE_DOWN,
+            Anim::Appear => symbol::APPEAR,
+            Anim::Disappear => symbol::DISAPPEAR,
         }
     }
 }

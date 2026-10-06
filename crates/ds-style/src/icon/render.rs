@@ -70,7 +70,7 @@ impl IconSize {
 }
 
 #[cfg(feature = "dioxus")]
-fn child(shape: &Shape) -> Element {
+pub(super) fn shape_element(shape: &Shape) -> Element {
     match shape {
         Shape::Path(d) => rsx! { path { d: "{d}" } },
         Shape::Solid(d) => rsx! { path { d: "{d}", fill: "currentColor" } },
@@ -118,7 +118,7 @@ pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
             "stroke-linejoin": "round",
             "fill": "none",
             for shape in icon.shapes() {
-                {child(shape)}
+                {shape_element(shape)}
             }
         }
     }

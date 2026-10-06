@@ -69,4 +69,7 @@ pub enum Page {
     VoiceOrb,
     /// The shell-only components rebuilt on the survivors, each in every state (design/30 section 2.10).
     Shell,
+    /// Symbol effects: every effect on a few icons, with a button for each `Once` effect and a
+    /// toggle for each `While` one (design/35-SYMBOL-EFFECTS.md).
+    Symbols,
 }

@@ -1,6 +1,6 @@
 //! Every animation the design system plays, as data (design/05-MOTION.md section 4).
 //!
-//! 79 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
+//! 92 variants: the canonical keyframe set minus `part`, plus the three heavy exits an unread row plays 15 % slower
 //! (principle 6): `FoldHeavy`, `CrumpleHeavy` and `CurlHeavy`, each its base keyframes at a
 //! heavy duration (so `settle()` never drops a node before its
 //! CSS ends), plus `ChipFlash`, quire's own keyframe for the person chip's 1200 ms ring, plus four
@@ -23,7 +23,9 @@
 //! plays so the restyle that drops a running animation starts another, plus
 //! `PaneInROut`, the preview pane's entrance nobody touched (design/26 R5), plus
 //! `MorphInSpring`, `morph-in` on the glyph the person pressed (design/26 R5, play/pause, a
-//! Focus disc).
+//! Focus disc), plus the symbol effects' CSS-driven thirteen (design/35-SYMBOL-EFFECTS.md):
+//! `Bounce`, `Pulse`, `Wiggle` and `Breathe` once and as a loop, `RotateOnce` (its loop is
+//! `Turn`), `ScaleUp`, `ScaleDown`, `Appear` and `Disappear`.
 //!
 //! Each recipe is section 5's assignment row for the element that plays it; where S and C both
 //! assign a keyframe, S's row is the one (S wins). Keyframes S never assigns take C's row.
@@ -112,11 +114,37 @@ pub enum Anim {
     /// `turn` at `--t-turn` linear, forever: a busy button's icon turning (a Get Mail arrow).
     /// Under Reduced it plays `hold` once, so the glyph stays still.
     Turn,
+    /// `symbol-bounce` once at `--t-big`: a symbol hops and settles (design/35 section 2).
+    Bounce,
+    /// `symbol-bounce` at `--t-big`, forever: a symbol bouncing while its work goes on.
+    BounceLoop,
+    /// `symbol-pulse` once: a symbol dims and returns.
+    Pulse,
+    /// `symbol-pulse` at `--t-turn`, forever.
+    PulseLoop,
+    /// `symbol-wiggle` once: a symbol turns a few degrees each way, each smaller.
+    Wiggle,
+    /// `symbol-wiggle` at `--t-turn`, forever.
+    WiggleLoop,
+    /// `symbol-breathe` once: a symbol swells and settles.
+    Breathe,
+    /// `symbol-breathe` at `--t-turn`, forever.
+    BreatheLoop,
+    /// `turn` once at `--t-big`: one revolution of a symbol.
+    RotateOnce,
+    /// `symbol-scale-up`: a symbol held larger while its effect is active.
+    ScaleUp,
+    /// `symbol-scale-down`: a symbol held smaller while its effect is active.
+    ScaleDown,
+    /// `morph-in` at `--t-move`: a symbol arriving.
+    Appear,
+    /// `morph-out` at `--t-quick --e-exit`: a symbol leaving, holding its last frame.
+    Disappear,
 }
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 32] = [
+    pub const ALL: [Anim; 45] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -149,6 +177,19 @@ impl Anim {
         Anim::PaneInROut,
         Anim::MorphInSpring,
         Anim::Turn,
+        Anim::Bounce,
+        Anim::BounceLoop,
+        Anim::Pulse,
+        Anim::PulseLoop,
+        Anim::Wiggle,
+        Anim::WiggleLoop,
+        Anim::Breathe,
+        Anim::BreatheLoop,
+        Anim::RotateOnce,
+        Anim::ScaleUp,
+        Anim::ScaleDown,
+        Anim::Appear,
+        Anim::Disappear,
     ];
 
     /// The utility class a pulse renders: `a-gulp`.
@@ -186,6 +227,19 @@ impl Anim {
             Anim::PaneInROut => "a-pane-in-r-out",
             Anim::MorphInSpring => "a-morph-in-spring",
             Anim::Turn => "a-turn",
+            Anim::Bounce => "a-bounce",
+            Anim::BounceLoop => "a-bounce-loop",
+            Anim::Pulse => "a-pulse",
+            Anim::PulseLoop => "a-pulse-loop",
+            Anim::Wiggle => "a-wiggle",
+            Anim::WiggleLoop => "a-wiggle-loop",
+            Anim::Breathe => "a-breathe",
+            Anim::BreatheLoop => "a-breathe-loop",
+            Anim::RotateOnce => "a-rotate-once",
+            Anim::ScaleUp => "a-scale-up",
+            Anim::ScaleDown => "a-scale-down",
+            Anim::Appear => "a-appear",
+            Anim::Disappear => "a-disappear",
         }
     }
 }

@@ -132,6 +132,7 @@ mod tests {
     use super::MOTION;
     use super::{animation, keyframes, motion_css};
     use crate::anim::Anim;
+    use ds_style::emit::attr_selector;
 
     #[test]
     fn every_anim_has_its_keyframes_and_every_keyframe_an_anim() {
@@ -195,5 +196,59 @@ mod tests {
             "a pulse that moves plays hold under Reduced: {css}"
         );
         assert_eq!(Anim::Turn.reduced().keyframes("turn"), "hold");
+    }
+
+    #[test]
+    fn symbol_effects_hold_or_fade_under_reduced_and_the_loops_loop_in_the_stylesheet() {
+        let css = motion_css();
+        let compact: String = css.split_whitespace().collect();
+        // (anim, its Reduced keyframes): what moves holds or fades, what only dims plays as it is.
+        const CASES: &[(Anim, &str)] = &[
+            (Anim::Bounce, "hold"),
+            (Anim::BounceLoop, "hold"),
+            (Anim::Wiggle, "hold"),
+            (Anim::WiggleLoop, "hold"),
+            (Anim::Breathe, "hold"),
+            (Anim::BreatheLoop, "hold"),
+            (Anim::RotateOnce, "hold"),
+            (Anim::ScaleUp, "hold"),
+            (Anim::ScaleDown, "hold"),
+            (Anim::Pulse, "symbol-pulse"),
+            (Anim::PulseLoop, "symbol-pulse"),
+            (Anim::Appear, "fade"),
+            (Anim::Disappear, "menu-out"),
+        ];
+        for &(anim, still) in CASES {
+            let recipe = anim.recipe();
+            assert_eq!(
+                anim.reduced().keyframes(recipe.keyframes),
+                still,
+                "{anim:?}"
+            );
+            let reduced = format!(
+                ".ds{} .{}{}{{animation-name:{still};}}",
+                attr_selector("data-motion", "reduced"),
+                anim.class(),
+                attr_selector("data-pulse", "a"),
+            );
+            assert_eq!(
+                css.contains(&reduced),
+                still != recipe.keyframes,
+                "{anim:?}: {reduced}"
+            );
+        }
+        for anim in [
+            Anim::BounceLoop,
+            Anim::PulseLoop,
+            Anim::WiggleLoop,
+            Anim::BreatheLoop,
+        ] {
+            assert_eq!(
+                anim.recipe().iteration,
+                crate::recipe::Iteration::Infinite,
+                "{anim:?}"
+            );
+        }
+        assert!(compact.contains(".a-bounce-loop[*|data-pulse=a]{animation:symbol-bouncevar(--t-big)var(--e-out)infinite;}"), "{css}");
     }
 }

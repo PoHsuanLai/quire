@@ -57,19 +57,35 @@ impl Anim {
             | Anim::PaneInROut
             | Anim::PanelIn
             | Anim::MorphIn
-            | Anim::MorphInSpring => CrossFade(In),
+            | Anim::MorphInSpring
+            | Anim::Appear => CrossFade(In),
             Anim::PaneOutL
             | Anim::PaneOutR
             | Anim::OsdOut
             | Anim::SheetOut
             | Anim::PanelOut
             | Anim::MorphOut
-            | Anim::RowOut => CrossFade(Out),
-            Anim::Heal | Anim::ShakeX | Anim::Shake | Anim::Turn => Still,
+            | Anim::RowOut
+            | Anim::Disappear => CrossFade(Out),
+            Anim::Heal
+            | Anim::ShakeX
+            | Anim::Shake
+            | Anim::Turn
+            | Anim::Bounce
+            | Anim::BounceLoop
+            | Anim::Wiggle
+            | Anim::WiggleLoop
+            | Anim::Breathe
+            | Anim::BreatheLoop
+            | Anim::RotateOnce
+            | Anim::ScaleUp
+            | Anim::ScaleDown => Still,
             Anim::MenuOut
             | Anim::Fade
             | Anim::PaletteFade
             | Anim::FadeIn
+            | Anim::Pulse
+            | Anim::PulseLoop
             | Anim::MorphFadeIn
             | Anim::MorphFadeOut
             | Anim::Hold => Same,

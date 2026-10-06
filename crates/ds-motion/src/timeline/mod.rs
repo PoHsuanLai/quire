@@ -6,6 +6,7 @@
 //! frame clock: it asks for a frame every `FRAME_TICK` while a timeline runs and never at rest
 //! (design/26 R3).
 
+pub mod cycle;
 pub(crate) mod ease;
 pub mod glide;
 #[cfg(feature = "dioxus")]

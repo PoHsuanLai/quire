@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 27] = [
+pub const REGISTRY: [Entry; 28] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -210,6 +210,13 @@ pub const REGISTRY: [Entry; 27] = [
         lede: "The shell-only components rebuilt on the survivors, each in every state: MenuBarItem and WorkspacePills, ModuleGrid with its tiles and panels, BatteryRing, DockTile, WidgetFrame and AnimatedEmoji. The lock, notification, switcher, widget and emoji pages show the rest.",
         height: 2600,
         body: crate::pages::shell::components::ShellPage,
+    },
+    Entry {
+        page: Page::Symbols,
+        title: "Symbols",
+        lede: "Symbol effects (design/35-SYMBOL-EFFECTS.md), modelled on SF Symbols': Bounce, Pulse, Wiggle, Breathe, Rotate, Variable Color and the icon's own moving part fire once from a button; the same effects, Scale up and Scale down run while their toggle is on; Appear, Disappear, Draw On and Replace play when their state changes; and the part-aware icons (trash, bell, mail, folder, refresh, Wi-Fi, volume, battery, lock, star, heart) move the piece Apple moves. Nothing runs by itself: each settles to 0 frames except a toggle left on.",
+        height: 3000,
+        body: crate::pages::content::symbols::SymbolsPage,
     },
 ];
 

@@ -26,8 +26,12 @@ pub(crate) mod geometry_control;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
+pub(crate) mod length;
+pub mod parts;
 pub(crate) mod plate;
 pub mod plate_tint;
+#[cfg(feature = "dioxus")]
+pub mod posed;
 pub mod render;
 pub mod retint;
 pub(crate) mod sets;
@@ -280,6 +284,8 @@ pub enum Icon {
     CircleCheck,
     /// Lucide `triangle-alert`: take care.
     TriangleAlert,
+    /// Lucide `heart`: a favourite.
+    Heart,
 }
 
 impl Icon {
@@ -350,6 +356,7 @@ impl Icon {
             Icon::Info => geometry_actions::INFO,
             Icon::CircleCheck => geometry_actions::CIRCLE_CHECK,
             Icon::TriangleAlert => geometry_actions::TRIANGLE_ALERT,
+            Icon::Heart => geometry_actions::HEART,
             shell => geometry_shell::shapes(shell),
         }
     }

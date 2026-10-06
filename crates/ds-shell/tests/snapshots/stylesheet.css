@@ -204,6 +204,17 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes row-in{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 @keyframes row-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
+
+/* symbol-bounce, symbol-pulse, symbol-wiggle, symbol-breathe, symbol-scale-up, symbol-scale-down
+   (quire's symbol effects, design/35-SYMBOL-EFFECTS.md): whole-icon motion on a symbol's wrapper.
+   Each ends where it began, except the two scales, which hold while their effect is active. What
+   moves a part inside an SVG is Rust-driven (Blitz's stylesheet does not reach inside one). */
+@keyframes symbol-bounce{ 0%,100%{ transform:none; } 35%{ transform:translateY(-3px); } 65%{ transform:none; } 82%{ transform:translateY(-1px); } }
+@keyframes symbol-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+@keyframes symbol-wiggle{ 0%,100%{ transform:none; } 20%{ transform:rotate(-9deg); } 45%{ transform:rotate(7deg); } 70%{ transform:rotate(-4deg); } }
+@keyframes symbol-breathe{ 0%,100%{ transform:none; opacity:1; } 50%{ transform:scale(1.1); opacity:.7; } }
+@keyframes symbol-scale-up{ from{ transform:none; } to{ transform:scale(1.15); } }
+@keyframes symbol-scale-down{ from{ transform:none; } to{ transform:scale(.85); } }
 @keyframes peek-in--b{ 0%{ opacity:0; transform:scale(.95) translateY(12px); } 100%{ opacity:1; transform:none; } }
 @keyframes slide-r--b{ from{ transform:translateX(26px); opacity:0; } to{ transform:none; opacity:1; } }
 @keyframes slide-l--b{ from{ transform:translateX(-26px); opacity:0; } to{ transform:none; opacity:1; } }
@@ -230,6 +241,12 @@ html,body{margin:0;padding:0;background:transparent}
 @keyframes row-in--b{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 @keyframes row-out--b{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
 @keyframes heal--b{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
+@keyframes symbol-bounce--b{ 0%,100%{ transform:none; } 35%{ transform:translateY(-3px); } 65%{ transform:none; } 82%{ transform:translateY(-1px); } }
+@keyframes symbol-pulse--b{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+@keyframes symbol-wiggle--b{ 0%,100%{ transform:none; } 20%{ transform:rotate(-9deg); } 45%{ transform:rotate(7deg); } 70%{ transform:rotate(-4deg); } }
+@keyframes symbol-breathe--b{ 0%,100%{ transform:none; opacity:1; } 50%{ transform:scale(1.1); opacity:.7; } }
+@keyframes symbol-scale-up--b{ from{ transform:none; } to{ transform:scale(1.15); } }
+@keyframes symbol-scale-down--b{ from{ transform:none; } to{ transform:scale(.85); } }
 .a-row-in[*|data-pulse=a]{animation:row-in var(--t-move) var(--e-out) backwards;}
 .a-row-in[*|data-pulse=b]{animation:row-in--b var(--t-move) var(--e-out) backwards;}
 .a-row-out[*|data-pulse=a]{animation:row-out var(--t-quick) var(--e-exit) forwards;}
@@ -294,6 +311,32 @@ html,body{margin:0;padding:0;background:transparent}
 .a-morph-in-spring[*|data-pulse=b]{animation:morph-in--b var(--t-quick) var(--e-out) backwards;}
 .a-turn[*|data-pulse=a]{animation:turn var(--t-turn) var(--e-linear) infinite;}
 .a-turn[*|data-pulse=b]{animation:turn--b var(--t-turn) var(--e-linear) infinite;}
+.a-bounce[*|data-pulse=a]{animation:symbol-bounce var(--t-big) var(--e-out);}
+.a-bounce[*|data-pulse=b]{animation:symbol-bounce--b var(--t-big) var(--e-out);}
+.a-bounce-loop[*|data-pulse=a]{animation:symbol-bounce var(--t-big) var(--e-out) infinite;}
+.a-bounce-loop[*|data-pulse=b]{animation:symbol-bounce--b var(--t-big) var(--e-out) infinite;}
+.a-pulse[*|data-pulse=a]{animation:symbol-pulse var(--t-big) var(--e-in-out);}
+.a-pulse[*|data-pulse=b]{animation:symbol-pulse--b var(--t-big) var(--e-in-out);}
+.a-pulse-loop[*|data-pulse=a]{animation:symbol-pulse var(--t-turn) var(--e-in-out) infinite;}
+.a-pulse-loop[*|data-pulse=b]{animation:symbol-pulse--b var(--t-turn) var(--e-in-out) infinite;}
+.a-wiggle[*|data-pulse=a]{animation:symbol-wiggle var(--t-big) var(--e-out);}
+.a-wiggle[*|data-pulse=b]{animation:symbol-wiggle--b var(--t-big) var(--e-out);}
+.a-wiggle-loop[*|data-pulse=a]{animation:symbol-wiggle var(--t-turn) var(--e-in-out) infinite;}
+.a-wiggle-loop[*|data-pulse=b]{animation:symbol-wiggle--b var(--t-turn) var(--e-in-out) infinite;}
+.a-breathe[*|data-pulse=a]{animation:symbol-breathe var(--t-big) var(--e-in-out);}
+.a-breathe[*|data-pulse=b]{animation:symbol-breathe--b var(--t-big) var(--e-in-out);}
+.a-breathe-loop[*|data-pulse=a]{animation:symbol-breathe var(--t-turn) var(--e-in-out) infinite;}
+.a-breathe-loop[*|data-pulse=b]{animation:symbol-breathe--b var(--t-turn) var(--e-in-out) infinite;}
+.a-rotate-once[*|data-pulse=a]{animation:turn var(--t-big) var(--e-in-out);}
+.a-rotate-once[*|data-pulse=b]{animation:turn--b var(--t-big) var(--e-in-out);}
+.a-scale-up[*|data-pulse=a]{animation:symbol-scale-up var(--t-move) var(--e-out) forwards;}
+.a-scale-up[*|data-pulse=b]{animation:symbol-scale-up--b var(--t-move) var(--e-out) forwards;}
+.a-scale-down[*|data-pulse=a]{animation:symbol-scale-down var(--t-move) var(--e-out) forwards;}
+.a-scale-down[*|data-pulse=b]{animation:symbol-scale-down--b var(--t-move) var(--e-out) forwards;}
+.a-appear[*|data-pulse=a]{animation:morph-in var(--t-move) var(--e-out);}
+.a-appear[*|data-pulse=b]{animation:morph-in--b var(--t-move) var(--e-out);}
+.a-disappear[*|data-pulse=a]{animation:morph-out var(--t-quick) var(--e-exit) forwards;}
+.a-disappear[*|data-pulse=b]{animation:morph-out--b var(--t-quick) var(--e-exit) forwards;}
 .ds[*|data-motion=reduced],.ds[*|data-motion=reduced] *{animation-iteration-count:1;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=a]{animation-name:fade;}
 .ds[*|data-motion=reduced] .a-row-in[*|data-pulse=b]{animation-name:fade--b;}
@@ -345,6 +388,28 @@ html,body{margin:0;padding:0;background:transparent}
 .ds[*|data-motion=reduced] .a-morph-in-spring[*|data-pulse=b]{animation-name:fade--b;}
 .ds[*|data-motion=reduced] .a-turn[*|data-pulse=a]{animation-name:hold;}
 .ds[*|data-motion=reduced] .a-turn[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-bounce[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-bounce[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-bounce-loop[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-bounce-loop[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-wiggle[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-wiggle[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-wiggle-loop[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-wiggle-loop[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-breathe[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-breathe-loop[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-breathe-loop[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-rotate-once[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-rotate-once[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-scale-up[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-scale-up[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-scale-down[*|data-pulse=a]{animation-name:hold;}
+.ds[*|data-motion=reduced] .a-scale-down[*|data-pulse=b]{animation-name:hold--b;}
+.ds[*|data-motion=reduced] .a-appear[*|data-pulse=a]{animation-name:fade;}
+.ds[*|data-motion=reduced] .a-appear[*|data-pulse=b]{animation-name:fade--b;}
+.ds[*|data-motion=reduced] .a-disappear[*|data-pulse=a]{animation-name:menu-out;}
+.ds[*|data-motion=reduced] .a-disappear[*|data-pulse=b]{animation-name:menu-out--b;}
 /* == utilities == */
 /* utilities.css: the classes any component may add (design/02-TYPE.md sections 3 and 10,
    design/03-COLOR.md section 8). The grain tile's image is appended by ds::stylesheet, which
@@ -3136,6 +3201,14 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-widget-gallery-none{ font-family:var(--font-ui); font-size:var(--fs-small); color:var(--ink-faint); }
 .ds-widget-gallery-row{ display:flex; align-items:center; gap:var(--s-10); padding:var(--s-6) 0; border-bottom:var(--hair) solid var(--line-soft); }
 .ds-widget-gallery-row-name{ flex:1; min-width:0; font-family:var(--font-ui); font-size:var(--fs-body); }
+/* -- symbol -- */
+/* Symbol (design/35-SYMBOL-EFFECTS.md): an icon in a wrapper the stylesheet can move. The
+   effect's keyframes play on the wrapper (`a-bounce`, `a-turn`...; motion.css); what moves a
+   part inside the SVG is written as attributes by Rust. Hidden stands invisible while nothing
+   plays (an Appear before it arrives, a Disappear that never showed). */
+
+.ds-symbol{ display:inline-block; flex:none; line-height:0; }
+.ds-symbol[*|data-visibility=hidden]{ opacity:0; }
 /* -- date_picker -- */
 /* DatePicker (design/30 section 2.3, `NSDatePicker`). Attribute selectors carry `*|` (spike S2). The
    textual style is one bezel like a text field's, the segments in it side by side, the selected

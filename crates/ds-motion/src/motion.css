@@ -88,3 +88,14 @@
 @keyframes row-in{ from{ opacity:0; transform:translateY(-8px); } to{ opacity:1; transform:none; } }
 @keyframes row-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(-8px); } }
 @keyframes heal{ from{ transform:translateY(var(--dy)); } to{ transform:none; } }
+
+/* symbol-bounce, symbol-pulse, symbol-wiggle, symbol-breathe, symbol-scale-up, symbol-scale-down
+   (quire's symbol effects, design/35-SYMBOL-EFFECTS.md): whole-icon motion on a symbol's wrapper.
+   Each ends where it began, except the two scales, which hold while their effect is active. What
+   moves a part inside an SVG is Rust-driven (Blitz's stylesheet does not reach inside one). */
+@keyframes symbol-bounce{ 0%,100%{ transform:none; } 35%{ transform:translateY(-3px); } 65%{ transform:none; } 82%{ transform:translateY(-1px); } }
+@keyframes symbol-pulse{ 0%,100%{ opacity:1; } 50%{ opacity:.4; } }
+@keyframes symbol-wiggle{ 0%,100%{ transform:none; } 20%{ transform:rotate(-9deg); } 45%{ transform:rotate(7deg); } 70%{ transform:rotate(-4deg); } }
+@keyframes symbol-breathe{ 0%,100%{ transform:none; opacity:1; } 50%{ transform:scale(1.1); opacity:.7; } }
+@keyframes symbol-scale-up{ from{ transform:none; } to{ transform:scale(1.15); } }
+@keyframes symbol-scale-down{ from{ transform:none; } to{ transform:scale(.85); } }

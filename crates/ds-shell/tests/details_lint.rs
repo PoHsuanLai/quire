@@ -7,17 +7,17 @@ use ds_lint::{LintConfig, Profile, Rule, stylesheet};
 
 /// Sheets allowed to break the details rules, and why. Each is mail's (mailo pins quire by tag,
 /// so these change when mailo decides, design/05 section 12 item 4), or the keyframe table
-/// itself (`a-turn`).
+/// itself (`a-turn` and the symbol effects' loops).
 const ALLOWED: &[(&str, Rule, &str)] = &[
     (
         "motion",
         Rule::InfiniteLoop,
-        "`a-turn`: a busy button's icon turns at a constant speed for as long as it is busy; a stepped clock jumps 30 degrees at a time, which reads as choppy on an arrow glyph",
+        "`a-turn`: a busy button's icon turns at a constant speed for as long as it is busy; a stepped clock jumps 30 degrees at a time, which reads as choppy on an arrow glyph. The `a-*-loop` classes are the symbol effects' `While` run mode (design/35 section 2): the effect runs for as long as its owner says it is active, so it has no count; Reduced runs it once",
     ),
     (
         "motion",
         Rule::OffGrammarTiming,
-        "`a-turn`: its period is `--t-turn`, a speed rather than a transition",
+        "`a-turn` and the symbol loops: their period is `--t-turn`, a speed rather than a transition",
     ),
 ];
 

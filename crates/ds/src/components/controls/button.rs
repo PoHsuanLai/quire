@@ -27,6 +27,8 @@ use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Shown};
 use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
+use ds_motion::symbol::effect::{Activity, LoopEffect, SymbolEffect};
+use ds_motion::symbol::use_symbol::use_symbol_attrs;
 use ds_style::icon::render::IconSize;
 use ds_style::tokens::control_size::ControlSize;
 
@@ -65,7 +67,8 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// mounts. A caller-controlled disabled state is `availability`.
 ///
 /// `busy: BusyLook::TurnIcon` replaces the busy spinner with the button's own `icon` turning
-/// continuously (no leading mark; input is dropped and `aria-busy` written all the same).
+/// continuously (the symbol effect `Rotate` while busy; no leading mark; input is dropped and
+/// `aria-busy` written all the same).
 ///
 /// `swap: IconSwap::CrossFade` fades a changed `icon` into the new one.
 ///
@@ -111,6 +114,15 @@ pub fn Button(
     };
     let turning = busy == BusyLook::TurnIcon && availability == Availability::Busy;
     let glyph = glyph_size(size);
+    // The turn is the symbol effect `Rotate` while busy; the wrapper wears what it says.
+    let spin = use_symbol_attrs(SymbolEffect::While(
+        LoopEffect::Rotate,
+        if turning {
+            Activity::Active
+        } else {
+            Activity::Idle
+        },
+    ));
     rsx! {
         button {
             r#type: "button",
@@ -181,8 +193,11 @@ pub fn Button(
             }
             if let Some(icon) = icon {
                 span {
-                    class: if turning { "ds-button-icon a-turn" } else { "ds-button-icon" },
-                    "data-pulse": turning.then_some("a"),
+                    class: match spin.class() {
+                        Some(anim) => format!("ds-button-icon {anim}"),
+                        None => "ds-button-icon".to_owned(),
+                    },
+                    "data-pulse": spin.pulse,
                     {icon_view(icon, glyph, swap)}
                 }
             }
