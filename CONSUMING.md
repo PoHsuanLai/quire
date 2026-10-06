@@ -1234,6 +1234,59 @@ measured numbers.
 | Try it by hand | `cargo run --release -p ds-blitz --example pdf -- out.pdf`; `cargo run -p ds-blitz --features print --example print` | The first writes the fixture and prints its size and time; the second opens the real dialog. |
 | The painter alone | the `pdfrum-anyrender` crate, in the pdfrum repo | Pages recorded into anyrender's `Scene` by any anyrender renderer, written as one PDF; Blitz-free. `ds-blitz`'s `pdf` feature depends on it as a git dependency pinned to pdfrum rev 61371040, so a consumer that only prints through `ds_blitz::pdf` names nothing new; one that calls the painter directly adds the same git dependency at the same rev. Its own docs describe its page and source types. |
 
+### Missing helpers
+
+An app that runs distro tools (mpv, ffmpeg, heif-dec) can ask for one that is not installed, like
+Totem's codec prompt: a sheet says what the app needs, the person says yes, PackageKit installs it
+(and asks polkit for the password itself), and the app retries without restarting. Two parts:
+`ds-helpers` (I/O, no renderer; zbus only) and the `HelperSheet` in `ds-shell`.
+
+**The rule: ask at the moment of use.** Probe when the person tries the feature that needs the
+tool (`Helpers::available`), show the sheet then, and never at launch or in the background. A
+person who says Not Now is not asked again until they try the feature again.
+
+**The data file.** Ship `$XDG_DATA_DIRS/quire/helpers/<app>.toml`. One top-level table per
+capability (lowercase letters, digits, hyphens):
+
+```toml
+[heic-decode]
+tool = "libheif tools"          # the name the person knows
+purpose = "open HEIC photos"    # finishes "{app} needs {tool} to ..."
+probe = ["heif-dec", "heif-convert"]   # any one on PATH proves it is there
+[heic-decode.packages]          # per family, alternatives in preference order
+dnf = ["libheif-tools"]
+apt = ["libheif-examples"]
+pacman = ["libheif"]
+```
+
+Families are `dnf`, `apt`, `pacman`, `zypper`, chosen from `ID` then `ID_LIKE` in
+`/etc/os-release`. A family you leave out, or any other distro, is `Outcome::Unsupported`.
+
+**The API.**
+
+| Need | API |
+| --- | --- |
+| Load the file | `Catalog::load("anyview", &data_dirs(std::env::var_os("XDG_DATA_DIRS").as_deref()))` (or `Catalog::parse(text)`) |
+| The handle | `Helpers::new(catalog, Environment::system(), Installer::PackageKit(PackageKit::system()))`; cheap to clone |
+| Is it there? | `helpers.available(&Capability::new("heic-decode")?) -> Presence::{Present, Missing}` |
+| Words for the sheet | `helpers.entry(&capability) -> Option<&Entry>` (`tool`, `purpose`, `probe`) |
+| Install it | `helpers.provide(&capability).await -> Outcome::{Installed, Declined, NotFound, Unsupported, Failed(reason)}`; call it after the person pressed Install... |
+| Hear of changes | `let mut feed = helpers.subscribe(); feed.next().await -> Availability { capability, presence }`; `helpers.refresh(&capability)` probes again (a tool installed in a terminal) |
+| Tests and the gallery | `Installer::Fake(FakeInstaller::new(Outcome::Installed))`; `Environment { path, os_release }` takes scratch paths |
+
+`provide` returns `Installed` at once when the tool is already there, resolves the candidates
+through PackageKit (the first that exists in the repositories wins), installs it, probes again,
+and announces the change to subscribers. It never runs a package manager or sudo. A Flatpak
+sandbox cannot reach the system PackageKit: the app gets `Unsupported`.
+
+**The sheet.** `HelperSheet { app, tool, purpose, phase, icon, on_install, on_dismiss }` is
+controlled: you own the `HelperPhase` (`Ask`, `Installing`, `Failed { reason }`, `NotFound {
+package }`, `Unsupported { program }`). Show `Ask` first; on `on_install` set `Installing` and
+await `provide`; map the outcome: `Installed` closes the sheet and retries the feature, `Declined`
+returns to `Ask` or closes, `Failed` / `NotFound` / `Unsupported` show their phase (`NotFound` names
+the candidate package, `Unsupported` the probe executable). `on_dismiss` is Not Now and Close;
+Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet.
+
 ### Exporting the menu bar
 
 A quire app's `MenuBarModel` can be served over the session bus as `com.canonical.dbusmenu`, so the

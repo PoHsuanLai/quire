@@ -14,6 +14,7 @@ pub mod control_center;
 pub mod date_picker;
 pub mod dock;
 pub mod emoji;
+pub mod helpers;
 pub mod idle_dim;
 pub(crate) mod kept;
 pub(crate) mod kit;

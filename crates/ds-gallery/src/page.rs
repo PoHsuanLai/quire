@@ -76,4 +76,6 @@ pub enum Page {
     Symbols,
     /// The account sheets: the consent alert, the add-account steps and the parts an app shows.
     Accounts,
+    /// The missing-helper sheet in every phase.
+    Helpers,
 }

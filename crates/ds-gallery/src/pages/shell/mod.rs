@@ -5,6 +5,7 @@ pub mod chrome_targets;
 pub mod components;
 pub mod control_center;
 pub mod dock_tiles;
+pub mod helpers;
 pub mod level;
 pub mod level_tile;
 pub mod lock_switcher;

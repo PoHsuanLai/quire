@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 30] = [
+pub const REGISTRY: [Entry; 31] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -231,6 +231,13 @@ pub const REGISTRY: [Entry; 30] = [
         lede: "The account sheets: the consent alert with one account, several and none; each step of the add-account sheet (providers with a search, the sign-in form with a refused password, the browser wait, the device code, the review with limits and the add-and-allow button) in light and dark; and the parts an app shows: the account picker, the no-account states, the badge and the limited note.",
         height: 4200,
         body: crate::pages::shell::accounts::AccountsPage,
+    },
+    Entry {
+        page: Page::Helpers,
+        title: "Helpers",
+        lede: "The missing-helper sheet: an app that needs a distro tool this machine lacks asks, at the moment of use, to install it (the question, installing, failed, and the not-found and unsupported wordings), in light and dark. Install... goes to PackageKit, which asks for the password itself.",
+        height: 2400,
+        body: crate::pages::shell::helpers::HelpersPage,
     },
 ];
 

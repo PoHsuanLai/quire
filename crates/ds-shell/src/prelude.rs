@@ -32,6 +32,7 @@ pub use crate::dock::parts::DockLabel;
 pub use crate::dock::parts::RunningDot;
 pub use crate::dock::tile::DockTile;
 pub use crate::emoji::AnimatedEmoji;
+pub use crate::helpers::sheet::{HelperBody, HelperSheet};
 pub use crate::lock::clock::LockClock;
 pub use crate::lock::polkit_prompt::PolkitPrompt;
 pub use crate::lock::prompt::LockPrompt;

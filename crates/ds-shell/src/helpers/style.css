@@ -1,0 +1,4 @@
+/* The missing-helper sheet: an alert (`alert.css`) whose installing phase carries a spinner in
+   place of its buttons. */
+
+.ds-helper-progress{ display:flex; justify-content:center; padding:var(--s-8) 0 var(--s-4); }

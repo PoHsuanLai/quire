@@ -5,7 +5,7 @@
 use ds_style::kit::Sheet;
 
 /// The shell's sheets, in cascade order.
-pub(crate) const SHEETS: [Sheet; 32] = [
+pub(crate) const SHEETS: [Sheet; 33] = [
     Sheet {
         name: "confirm_card",
         css: include_str!("confirm/style.css"),
@@ -160,6 +160,11 @@ pub(crate) const SHEETS: [Sheet; 32] = [
         name: "widget_gallery",
         css: include_str!("widget/gallery.css"),
         after: "detail_morph",
+    },
+    Sheet {
+        name: "helper_sheet",
+        css: include_str!("helpers/style.css"),
+        after: "alert",
     },
     Sheet {
         name: "accounts",

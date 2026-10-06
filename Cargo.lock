@@ -1777,6 +1777,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-helpers"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+ "tokio",
+ "toml",
+ "zbus",
+]
+
+[[package]]
 name = "ds-intents"
 version = "0.1.0"
 dependencies = [
