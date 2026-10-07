@@ -48,7 +48,6 @@ pub fn StatusSection() -> Element {
                 BatteryCell {}
                 BluetoothCell {}
                 VolumeCell {}
-                crate::pages::details::status_items::ItemsCell {}
             }
         }
     }

@@ -164,25 +164,3 @@ fn the_cascade_is_in_the_documented_order() {
             .is_some_and(|first| *first > positions[6])
     );
 }
-
-/// The declarations of the first rule whose selector is exactly `selector`.
-fn rule_body(css: &str, selector: &str) -> Option<String> {
-    css.split('}')
-        .filter_map(|rule| rule.split_once('{'))
-        .find(|(head, _)| head.trim() == selector)
-        .map(|(_, body)| body.to_owned())
-}
-
-/// A banner slides like a toast and a side panel (design/30 section 1.3): its card enters with
-/// `panel-in`, and its row leaves with `panel-out`.
-#[test]
-fn a_banner_slides_in_and_out_with_the_panel_keyframes() {
-    let css = strip_comments(stylesheet());
-    for (selector, keyframes) in [
-        (".ds-banner-card", "animation:panel-in"),
-        (".ds-banner[*|data-presence=leaving]", "animation:panel-out"),
-    ] {
-        let body = rule_body(&css, selector).unwrap_or_else(|| panic!("no rule for {selector}"));
-        assert!(body.contains(keyframes), "{selector}: {body}");
-    }
-}

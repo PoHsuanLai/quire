@@ -102,13 +102,8 @@ pub fn OverlaysPage() -> Element {
         crate::pages::overlays::launcher_hints::SpotlightHints {}
         crate::pages::overlays::palette_and_menu::RecentPalette {}
         crate::pages::overlays::hover_card_hooks::HookKeyedCards {}
-        crate::pages::shell::control_center::ControlCenter {}
         crate::pages::overlays::sheet::PowerMenu {}
         crate::pages::overlays::alert::Alerts {}
-        crate::pages::overlays::notifications::Notifications {}
-        crate::pages::shell::calendar::Calendar {}
-        crate::pages::shell::widgets::Widgets {}
-        crate::pages::overlays::screenshot_thumb::ShotThumbnails {}
         match opened() {
             Some(Opened::Palette) => rsx! { Palette { onclose: close } },
             Some(Opened::Popover(dismiss, arrow)) => rsx! {

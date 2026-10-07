@@ -1,7 +1,6 @@
 //! The pages, grouped like the components they show, and the pieces they share.
 
 pub mod catalogue;
-pub mod chrome;
 pub mod content;
 pub mod controls;
 pub mod details;

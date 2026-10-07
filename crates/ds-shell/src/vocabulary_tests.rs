@@ -50,10 +50,8 @@ fn the_kits_reach_the_vocabulary() {
         "--s-36",
         "--ctl-h-m",
         "--switch-knob-s",
-        "--cc-panel-r",
         "--bar-status-w",
         "--shell-menu-font",
-        "--dock-tile-px",
         "--scale-hair",
         "--icons-glyph-share",
     ];

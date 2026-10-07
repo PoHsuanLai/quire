@@ -1,5 +1,5 @@
 //! The gallery's command line: `ds-gallery [--page PAGE] [--typeface system|editorial]
-//! [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR]
+//! [--snapshot DIR [--scale PERCENT]] [--detail-frames DIR]
 //! [--accent-sheet DIR] [--progress]`. A sheet is written only to its DIR; `--progress` also
 //! copies it into the progress page's tracked shots.
 
@@ -15,8 +15,6 @@ pub struct Args {
     pub page: Option<Page>,
     /// Render every page and state into this directory as a contact sheet, then exit.
     pub snapshot: Option<PathBuf>,
-    /// Render the level control's variant and motion sheets into this directory, then exit.
-    pub level_sheet: Option<PathBuf>,
     /// Render the accent candidates' contact sheets into this directory, then exit
     /// (design/03-COLOR.md section 20).
     pub accent_sheet: Option<PathBuf>,
@@ -27,7 +25,7 @@ pub struct Args {
     pub scale: Option<u16>,
     /// The typeface the root speaks in (the settings default when absent).
     pub typeface: Option<Typeface>,
-    /// Whether `--snapshot`, `--level-sheet` and `--accent-sheet` also refresh the progress
+    /// Whether `--snapshot` and `--accent-sheet` also refresh the progress
     /// page's tracked pictures (`--progress`; skipped when absent).
     pub progress: ProgressCopy,
 }
@@ -40,7 +38,7 @@ impl std::fmt::Display for ArgsError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--level-sheet DIR] [--detail-frames DIR] [--accent-sheet DIR] [--progress]",
+            "{}\nusage: ds-gallery [--page {}] [--snapshot DIR [--scale PERCENT]] [--detail-frames DIR] [--accent-sheet DIR] [--progress]",
             self.0,
             slugs()
         )
@@ -77,13 +75,6 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     return Err(ArgsError("--snapshot needs a directory".into()));
                 }
                 parsed.snapshot = once(parsed.snapshot, PathBuf::from(dir), "--snapshot")?;
-            }
-            "--level-sheet" => {
-                let dir = value("a directory")?;
-                if dir.is_empty() {
-                    return Err(ArgsError("--level-sheet needs a directory".into()));
-                }
-                parsed.level_sheet = once(parsed.level_sheet, PathBuf::from(dir), "--level-sheet")?;
             }
             "--accent-sheet" => {
                 let dir = value("a directory")?;
@@ -171,7 +162,6 @@ mod tests {
         Args {
             page,
             snapshot: snapshot.map(PathBuf::from),
-            level_sheet: None,
             accent_sheet: None,
             detail_frames: None,
             scale: None,
@@ -198,9 +188,9 @@ mod tests {
                 }),
             ),
             (
-                &["--level-sheet", "out", "--progress"],
+                &["--accent-sheet", "out", "--progress"],
                 Ok(Args {
-                    level_sheet: Some(PathBuf::from("out")),
+                    accent_sheet: Some(PathBuf::from("out")),
                     progress: ProgressCopy::Refresh,
                     ..args(None, None)
                 }),
@@ -219,15 +209,8 @@ mod tests {
                 Ok(args(Some(Page::Matrix), Some("target/gallery"))),
             ),
             (
-                &["--level-sheet", "out"],
-                Ok(Args {
-                    level_sheet: Some(PathBuf::from("out")),
-                    ..args(None, None)
-                }),
-            ),
-            (
-                &["--level-sheet", ""],
-                Err("--level-sheet needs a directory"),
+                &["--accent-sheet", ""],
+                Err("--accent-sheet needs a directory"),
             ),
             (
                 &["--detail-frames", "out"],

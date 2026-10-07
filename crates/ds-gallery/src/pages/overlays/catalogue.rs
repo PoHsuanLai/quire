@@ -1,7 +1,7 @@
 //! Overlays and feedback (design/30 sections 2.5 and 2.9): every component of the step 4a.6
 //! group in every state it can express. `Popover` under each dismiss policy and with its arrow,
 //! `Sheet` hung from the window, centred and standing at the bottom, `Alert` (the alerts
-//! section), `SidePanel`, `Tooltip` and `DockLabel` up and down, `HoverCard`, `Toast`,
+//! section), `SidePanel`, `Tooltip` up and down, `HoverCard`, `Toast`,
 //! `EmptyState` in its three forms, `Skeleton` in its three shapes and as a row, the `InlineBanner`
 //! shown and hidden, and `Loadable` cycling its phases.
 
@@ -25,7 +25,6 @@ use ds::stack::toast_hub::{UndoToken, use_toast_hub};
 use ds::style::tokens::control_size::ControlSize;
 use ds_core::geometry::placement::{Align, Side};
 use ds_core::vocab::Dismiss;
-use ds_shell::prelude::*;
 
 /// The page.
 #[component]
@@ -52,7 +51,7 @@ pub fn OverlaysCataloguePage() -> Element {
                 SideCase {}
             }
         }
-        Section { title: "Tooltip and DockLabel", note: "Tooltip {{ text, shown }}: one line below its target, opened by the Tip profile (1 s cold, at once while warm) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone. DockLabel is the same hint above a dock tile on the Label profile (100 ms).",
+        Section { title: "Tooltip", note: "Tooltip {{ text, shown }}: one line below its target, opened by the Tip profile (1 s cold, at once while warm) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Tooltip, hover it".to_string(),
                     Tooltip { text: "Archive → out of Inbox",
@@ -71,18 +70,10 @@ pub fn OverlaysCataloguePage() -> Element {
                         Button { size: ControlSize::Mini, label: "Kept down", onclick: |_| {} }
                     }
                 }
-                Specimen { name: "DockLabel, shown".to_string(), code: Some("shown: Some(Shown::Visible)".to_string()),
-                    div { class: "g-stage-pad",
-                        DockLabel { text: "Files", shown: Some(Shown::Visible),
-                            Button {  label: "Tile", onclick: |_| {} }
-                        }
-                    }
-                }
             }
         }
         crate::pages::overlays::pills::Cards {}
         ToastCase {}
-        crate::pages::shell::dock_tiles::DockTiles {}
         Section { title: "EmptyState", note: "EmptyState {{ form, title, description, icon, action, onretry }}: what a list or pane says when there is nothing to show. Empty (nothing yet, with an action), NoResults (a search found nothing) and Failure (with Retry). Static: nothing moves.",
             div { class: "g-row g-row-top",
                 Specimen { name: "EmptyForm::Empty, with an action".to_string(),

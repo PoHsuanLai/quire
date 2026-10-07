@@ -25,7 +25,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-behaviour` | pure input machines a shell and a compositor both run: the app switcher, hot corners, the Command key's double tap and hold, the live Space swipe; no Dioxus, no clock |
 | `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
 | `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
-| `ds-shell` | shell-only components, shell tokens, widget contract, registry and catalog, the widgets |
+| `ds-shell` | app-facing parts above `ds`, cross-platform: the account sheets and consent alert, the missing-helper sheet, the confirm card, with their sheets and `KIT`. The surfaces only our desktop shell draws live in sill's `sill-shell-kit` (see "Moved to sill" in section 3) |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
 | `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family, the PackageKit installer (and a fake), the availability feed |
@@ -61,7 +61,8 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 
 Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds` with feature
 `testing`; `ds`, `ds-shell` and `ds-style` may dev-depend on `ds-lint`. Consumers (sill, mailo,
-`examples/consumer`) depend on `ds` (+ `ds-shell`, `ds-settings`, `ds-blitz`, and `ds-lint`,
+anyview, `examples/consumer`) depend on `ds` (+ `ds-shell` for the account and helper sheets,
+`ds-settings`, `ds-blitz`, and `ds-lint`,
 `ds-harness` as dev-dependencies); they never name `ds-core`, `ds-style` or `ds-motion` because
 `ds` re-exports what they need (section 6).
 
@@ -97,7 +98,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-behaviour` | `dir` (`Dir`) < `switcher`, `hot_corner`, `modifier_tap` (`tap`, `hold`), `space_swipe` (`numbers`, `velocity`, `finish`; each concept holds `model`, `step`, `tests`) |
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
-| `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled) < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
+| `ds-shell` | `confirm`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled), `helpers` < `sheets` < `kit` < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, the fingers' glide for eased listeners, `ScrollHandle`), `window_fit` (the cap), `size_ledger`, `sized_window` < `window_sizer`, `screen_area` < `window_screen`, `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
@@ -139,7 +140,7 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | --- | --- |
 | `ds/style/appearance/*`, `ds/root/typeface.rs` (the `Typeface` choice) | `ds-style::appearance::*` |
 | `ds/style/env.rs` | `ds-style::scope` (`Env` -> `Scope`, `use_env` -> `use_scope`) |
-| `ds/style/tokens/*` except the files listed under `ds-shell` | `ds-style::tokens::*` (`status.rs`, `emoji_face.rs`, `person.rs`, `plate.rs`, `size_*.rs`, `control_size.rs` stay: their consumers are generic) |
+| `ds/style/tokens/*` except the files listed under `ds-shell` (now sill's `sill-shell-kit/src/tokens`, except `dock_floor.rs`, which stays in `ds-style` because the shape section draws `.ds-dock-floor`) | `ds-style::tokens::*` (`status.rs`, `emoji_face.rs`, `person.rs`, `plate.rs`, `size_*.rs`, `control_size.rs` stay: their consumers are generic) |
 | `ds/style/{material,space,icon,fonts.rs,scale.rs,css,emit.rs}` | same names in `ds-style` |
 | `ds/style/icon/geometry_shell.rs` | `ds-style::icon::glyphs::shell` (`Icon` is one closed enum owned here) |
 | `ds/assembly/stylesheet.rs` (the section list) | `ds-style::kit` (`Kits::stylesheet`); the ordered call site stays in `ds::assembly` |
@@ -183,6 +184,25 @@ A name in `{...}` is a set of files. Anything not listed keeps its file name.
 | `style/tokens/{control_center,dock,notifications,osd,shell,shell_scale,widgets,widget_paint}.rs` | `ds-shell::tokens::*`, each implementing `Token` and listed in `ds_shell::KIT` |
 | `lib.rs` root re-exports | deleted; replaced by `ds::prelude` and each crate's curated root |
 | `detail.rs`, `icon.rs`, `time.rs`, `widget.rs`, `catalog.rs` (public shim modules) | deleted; their items are reached by the owning crate's root |
+
+### Moved to sill (2026-10-07: `ds-shell` -> sill's `sill-shell-kit`)
+
+Quire's `ds-shell` kept what an app on any platform takes: `accounts`, `helpers`, `confirm`. The
+surfaces only our desktop shell draws moved, with their tokens, sheets, goldens, behaviour tests
+and emoji assets, to `crates/sill-shell-kit` in the sill workspace under the same module names:
+`bar`, `battery`, `catalog`, `clock`, `control_center`, `date_picker`, `dock`, `emoji`,
+`idle_dim`, `lock`, `month_grid`, `notifications`, `now_playing`, `osd`, `switcher`, `thumbs`,
+`user_picture`, `widget`, `tokens` (and the pieces they share: `kept`). The evidence is that
+mailo and anyview name only `ds_shell::stylesheet()`, `ds_shell::helpers::model::HelperPhase`
+and `ds_shell::prelude::HelperSheet`. `ds-style::tokens::dock_floor` stays here because the shape
+section draws `.ds-dock-floor`. The moved sheets are consumer CSS there: a `sill_shell_kit::KIT`
+of rank `Shell` (placed first among the shell-rank kits, so the cascade is byte for byte the old
+one) next to `ds_shell::KIT`. The gallery drops the pages and sections for the moved components (the shell, chrome targets, level,
+widget, lock and emoji pages, the notification and thumbnail overlays, the date picker and the
+Settings window's Date & Time pane, the control center, player and status-item details, and the
+`--level-sheet` mode); sill's
+`sill-shell-kit/tests` holds their SSR goldens and behaviour tests, and `examples/sizing_audit.rs`
+(the sizing audit's specimen sheet) lives there too.
 
 ### `ds-settings`, `ds-native`, tests
 
@@ -232,7 +252,7 @@ The single place a concept lives. Extend it; never write a second one.
 | PNG, base64 | `ds-core::codec` |
 | The crate error | `ds-core::error::DsError`; settings: `ds-settings::error::SettingsError` |
 | Design tokens (colour, duration, easing, spacing, shape, type, layer) | `ds-style::tokens` (one file per family, `impl Token`) |
-| Shell metric tokens (dock, OSD, notifications, control center, widgets) | `ds-shell::tokens` |
+| Shell metric tokens (dock, OSD, notifications, control center, widgets) | sill's `sill-shell-kit::tokens` (`--dock-floor` is `ds-style::tokens::dock_floor`) |
 | The account sheets (consent alert, add-account steps, account picker, no-account state, badge, limited note) and the secret text they carry | `ds-shell::accounts` (`model` the props, `wording` every sentence, `hidden::Hidden`; `adapter` the one file that reaches the components R2 makes controlled) |
 | Window chrome geometry (titlebar, lights, resize edges) and the lights' state | `ds-style::tokens::chrome` (`ChromeToken`, `CHROME_SCALE`, `light_state`); `window_frame.css` reads the variables, `ds::components::chrome` draws |
 | What each crate adds to the stylesheet, and the lint vocabulary | `ds-style::kit::Kit`; ordered by `Kits` |
@@ -275,9 +295,9 @@ The single place a concept lives. Extend it; never write a second one.
 | Toasts | `ds::overlays::toast` + `ds::stack::toast_hub` |
 | The root component and stylesheet assembly | `ds::assembly::{Ds, stylesheet}` |
 | A status glyph and its state (Wi-Fi, battery, Bluetooth, volume) | `ds::content::status` |
-| The battery drawing | `ds::content::status::battery::BatteryGlyph`; device models in `ds-shell::battery` |
-| Widget contract, registry, placement data | `ds-shell::widgets::{contract, registry, catalog}` |
-| Emoji: the grid / the picker sheet | `ds::lists::emoji_grid` / `ds-shell::emoji` |
+| The battery drawing | `ds::content::status::battery::BatteryGlyph`; device models in sill's `sill-shell-kit::battery` |
+| Widget contract, registry, placement data | sill's `sill-shell-kit::widget::{contract, registry}` and `catalog` |
+| Emoji: the grid / the picker sheet | `ds::lists::emoji_grid` / sill's `sill-shell-kit::emoji` |
 | Settings file I/O (lenient load, atomic save, watch) | `ds-settings::store::Store` |
 | Settings schema | `ds-settings::schema` (derived) |
 | Live (D-Bus) settings modules: schema, skeleton, proxy | `ds-settings::live` (feature `live`; the daemon owns the state) |
@@ -295,7 +315,7 @@ The single place a concept lives. Extend it; never write a second one.
 | What an app tells the companion (a thing, a chip, a summon, a field's mode) | `ds-intents`; re-exported once from `ds::components::companion` |
 | The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
 | The confirmation card | `ds-shell::confirm` |
-| The window glow's values (`GlowLook`, `GlowSpec`, `glow_spec`) | `ds-style::tokens::glow` (`ds-shell::tokens::glow` re-exports them) |
+| The window glow's values (`GlowLook`, `GlowSpec`, `glow_spec`) | `ds-style::tokens::glow` (sill's `sill-shell-kit::tokens::glow` re-exports them) |
 | Mail-only components | `ds::components::app` |
 
 ## 5. Traits and closed enums
@@ -305,10 +325,10 @@ The single place a concept lives. Extend it; never write a second one.
 | Trait | Crate | Implementors | Add an implementor when | Add a trait when |
 | --- | --- | --- | --- | --- |
 | `Word` | `ds-core` | every closed vocabulary enum (derived) | a new closed set | never |
-| `Token` | `ds-style` | each token family; shell families in `ds-shell` | a new family | never |
+| `Token` | `ds-style` | each token family; shell families in sill's `sill-shell-kit` | a new family | never |
 | `Timeline` | `ds-motion` | `Ease`, `Spring`, `Glide`, `Pending` | a Rust-driven animation | never |
 | `Detailed` | `ds-motion` | 13 component state enums | a component with moments | never |
-| `Widget` | `ds-shell` | battery, world clock, month, and each widget kind | a new widget kind | never |
+| `Widget` | sill's `sill-shell-kit` | battery, world clock, month, and each widget kind | a new widget kind | never |
 | `DocumentHost` (+ parts) | `ds` | `ds_blitz::BlitzHost`, `ds::host::NoHost` | a new renderer | a new capability of the document a component needs |
 | `SpellService`, `HostWindow` | `ds` | `ds_blitz::spell::Hunspell`, a test fake; `ds_blitz::window::WinitWindow`, sill's shell-host window, a test stub | a new platform | never |
 | `SettingsDoc` | `ds-settings` | `AppearanceFile`; each consumer's file | a new settings file | never |
@@ -358,8 +378,10 @@ pub enum KitRank { Style, Motion, Components, Shell, User }  // cascade order; f
 pub struct Kits { ... }
 impl Kits { pub fn of(kits: &[&'static Kit]) -> Kits; pub fn stylesheet(&self) -> String;
             pub fn vocabulary(&self) -> Vocabulary; }
-// Each crate exports `KIT`: ds_style::KIT, ds_motion::KIT, ds::KIT, ds_shell::KIT.
-// ds::kits() = style + motion + ds; ds_shell::kits() = ds::kits() + shell.
+// Each crate exports `KIT`: ds_style::KIT, ds_motion::KIT, ds::KIT, ds_shell::KIT (and sill's
+// sill_shell_kit::KIT, which a shell lists before ds_shell's so the sheets keep their cascade).
+// ds::kits() = style + motion + ds; ds_shell::kits() = ds::kits() + the app-facing parts;
+// sill_shell_kit::kits() = ds_shell's kits + the shell's own.
 
 // ds-motion::timeline
 pub trait Timeline: Clone + PartialEq + 'static {
@@ -631,7 +653,8 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
 | Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `EmptyState`, `Flow`, `SidePanel`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
 
-`ds_shell::prelude` (43 names) holds the shell components' names and `Widget`, `WidgetKind`,
+`ds_shell::prelude` (16 names) holds the account sheets' components and the missing-helper sheet.
+sill's `sill_shell_kit::prelude` holds the shell components' names and `Widget`, `WidgetKind`,
 `WidgetRegistry`, `WidgetSize`, `WidgetHost`, `WidgetContext`. Mail-only components (`ds::components::app`)
 are reached as `ds::components::app::X`, not through the prelude.
 
@@ -672,27 +695,25 @@ are reached as `ds::components::app::X`, not through the prelude.
 7. Gallery: `crates/ds-gallery/src/pages/<group>/<name>.rs`, one `Page` registered in
    `registry.rs`. Add the `DESIGN.md` row that names the design section.
 
-### Add a shell component or widget (`ds-shell`)
+### Add an app-facing part above `ds` (`ds-shell`)
 
 1. Component: the same as above under `crates/ds-shell/src/<part>/{model.rs, step.rs, view.rs,
-   style.css}`; its sheet goes in `ds_shell::KIT`'s sections; its tests in `crates/ds-shell/tests`.
-2. Widget: create `crates/ds-shell/src/widgets/<kind>/{mod.rs, model.rs, view.rs, style.css}`;
-   `impl Widget for <Kind>Widget` (unit type, `Default`); register it in
-   `widgets/registry.rs::builtin()`; add its `Entry` wire round-trip test in
-   `tests/widget_<kind>.rs`, its contract render (`tests/widgets_ssr.rs` row) and its gallery page
-   `pages/shell/widget_<kind>.rs`. Its paint tokens are `ds-shell::tokens::widgets` variants.
+   style.css}`; its sheet goes in `crates/ds-shell/src/sheets.rs`; its tests in `crates/ds-shell/tests`.
+2. It must work on every platform (no D-Bus, no compositor). A surface only our desktop shell draws
+   (bar, dock, widgets, lock, notifications, OSD) is not added here: it goes in sill's
+   `sill-shell-kit` (its recipe is in sill's ARCHITECTURE.md).
 3. A component the shell and another app both draw is generic: it belongs in `ds`.
 
 ### Add a token
 
 1. Family exists: add the variant to its enum in `ds-style/src/tokens/<family>.rs` (shell
-   families: `ds-shell/src/tokens/`); the `Word` derive gives its slug; add the value arm to
+   families: sill's `sill-shell-kit/src/tokens/`); the `Word` derive gives its slug; add the value arm to
    `Token::css_value` (an exhaustive `match`, one value per scope where it differs).
 2. New family: create the file, `#[derive(Word)]`, `impl Token`, and list `TokenSet::of::<T>()` in
    the crate's `KIT.tokens`. Nothing else: CSS emission and the lint vocabulary read `Kits`.
 3. A tuned token (a consumer writes its value inline) sets `KIND = Tuned` and its default is the
    settings key's default (`design/22-SETTINGS.md`).
-4. Tests: `ds-shell/tests/tokens.rs` (every name a scheme or level block sets is declared on
+4. Tests: `ds-shell/tests/tokens.rs` and sill's `sill-shell-kit/tests/tokens.rs` (every name a scheme or level block sets is declared on
    `.ds`); a new token with a raw value fails `ds-lint` by design.
 
 ### Add a motion recipe or a Rust-driven animation
@@ -773,7 +794,7 @@ are reached as `ds::components::app::X`, not through the prelude.
 | Pure function or step | table test: `const CASES: &[(Input, Expected)]`, one loop | beside the code |
 | Word, Token, Timeline, Detailed | table over `ALL` / sample instants / `moment_table` | the owning crate |
 | Component markup | SSR render, golden, `ds_lint::markup` | `crates/<crate>/tests/<component>_ssr.rs` |
-| Stylesheet | `ds_lint::assert_clean(css, &LintConfig::new(kits))` (`self_lint`) | `ds-shell/tests/self_lint.rs` |
+| Stylesheet | `ds_lint::assert_clean(css, &LintConfig::new(kits))` (`self_lint`) | `ds-shell/tests/self_lint.rs` (sill: `sill-shell-kit/tests/self_lint.rs`) |
 | Component behaviour (pointer, keys, focus, time, paint) | `Harness` through `Driver` and `Query` | `ds-conformance/tests/<component>.rs` |
 | Host behaviour (frames, clipboard, edit, drop, spell, PDF) | `Harness` on the real `BlitzHost` | `ds-blitz/tests/<topic>.rs` |
 | Settings | `Store` on `ConfigRoot::Scratch`, `SystemPrefsSource::Fixed` | `ds-settings/tests` |

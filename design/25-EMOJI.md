@@ -20,7 +20,7 @@ moods, `Mood`, `UserPortrait`, the accept beat and the accept beat's file.
 
 `ds_shell::prelude::AnimatedEmoji` (the picture), `ds_shell::emoji::id::EmojiId` (which emoji, user data), `ds_shell::emoji::disc::EmojiDisc`
 (none, or a tinted disc on a `DiscHue`), `ds_shell::emoji::disc::EmojiPlayback` (awake or still),
-`ds_shell::emoji::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/ds-shell/assets/emoji/`, and the
+`ds_shell::emoji::EMOJI_ATTRIBUTION`, the sheets and manifest under `crates/sill-shell-kit/assets/emoji/`, and the
 pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `UserPicture`,
 `UserPortrait`, `PictureChoice`, `resolve_picture`, `UserPicturePicker`, `Mood`, `WakeStamp`,
 `PictureSize` and the accept beat `Anim::PictureAccept`.
@@ -33,14 +33,14 @@ pipeline that makes them, `tools/emoji`; and the user's picture (section 7): `Us
 - **Licence: CC BY 4.0**, verified 2026-09-26 from the source site's own FAQ ("Can I use these
   animated assets commercially…?": "Animated Noto Emoji is licensed under CC BY 4.0. See the
   full license for all details.", linking https://creativecommons.org/licenses/by/4.0/legalcode).
-  The full legal code is committed as `crates/ds-shell/assets/emoji/CC-BY-4.0.txt`.
+  The full legal code is committed as `crates/sill-shell-kit/assets/emoji/CC-BY-4.0.txt`.
 - **Attribution** (required; `ds_shell::emoji::EMOJI_ATTRIBUTION` carries it, and a surface that shows these
   emoji puts it in its about box or credits):
 
   > Animated emoji: Noto Animated Emoji by Google, CC BY 4.0
   > (https://creativecommons.org/licenses/by/4.0/); frames resampled and packed.
 
-- `crates/ds-shell/assets/emoji/ATTRIBUTION.txt` states the same beside the files, with what we
+- `crates/sill-shell-kit/assets/emoji/ATTRIBUTION.txt` states the same beside the files, with what we
   changed (CC BY asks that changes be indicated). `docs/licensing-references.md` has the row.
 - **cargo deny**: `cargo deny check licenses` reads crate licences only. `ds`'s code stays
   MIT OR Apache-2.0; the sheets are data under their own licence, as the OFL fonts beside them
@@ -78,7 +78,7 @@ pre-rendered frames itself.
 `tools/emoji` (Python through uv, `pillow` only; never run by cargo):
 
 ```bash
-cd tools/emoji && uv run emojitool build --out ../../crates/ds-shell/assets/emoji
+cd tools/emoji && uv run emojitool build --out ../../crates/sill-shell-kit/assets/emoji
 ```
 
 1. **Fetch** each emoji's `512.webp` (the animation) and `512.png` (the still, used only to find
@@ -206,7 +206,7 @@ group. It reuses the grid's step rule and column style.
 
 ## 8. Built (quire)
 
-- `crates/ds-shell/src/emoji/`: `id.rs` (`EmojiId`), `sheet.rs` (sheets, manifest, the
+- `crates/sill-shell-kit/src/emoji/`: `id.rs` (`EmojiId`), `sheet.rs` (sheets, manifest, the
   frame position), `script.rs` (the wake script), `emoji/play.rs` (playing it), `disc.rs`
   (`EmojiDisc`), `mod.rs` (`AnimatedEmoji`, `EMOJI_ATTRIBUTION`); `emoji.css`.
 - Markup: `div.ds-emoji[data-size][data-mood][data-disc]` with `--em-disc` inline when tinted,
@@ -222,7 +222,7 @@ group. It reuses the grid's step rule and column style.
   mood, the sizes and the discs, and the credit line; every picture there is `Still`, so the
   snapshot shows rest frames (a snapshot lets 120 ms of timers run at mount).
 
-- The user's picture (section 7): `crates/ds-shell/src/user_picture/`: `picture.rs`
+- The user's picture (section 7): `crates/sill-shell-kit/src/user_picture/`: `picture.rs`
   (`UserPicture`), `user_picture/size.rs` (`Mood`, `PictureSize`, `WakeStamp`), `portrait.rs`
   (`UserPortrait` and the shared drawing), the accept beat's file (the accept beat), `choice.rs`
   (`PictureChoice`, `FaceFile`, `resolve_picture`), `picker.rs` (`UserPicturePicker`);

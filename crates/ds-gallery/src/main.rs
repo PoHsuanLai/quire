@@ -12,11 +12,8 @@ mod details_states;
 mod details_views;
 mod error;
 mod legibility;
-mod level_motion;
-mod level_sheet;
 mod page;
 mod pages;
-mod portrait;
 mod progress_copy;
 mod registry;
 mod sheet;
@@ -24,7 +21,6 @@ mod snapshot;
 mod style;
 mod toolbar;
 mod wallpaper;
-mod wallpaper_vivid;
 
 #[cfg(test)]
 mod inset_tests;
@@ -45,13 +41,6 @@ fn main() {
     };
     if let Some(dir) = args.accent_sheet {
         if let Err(error) = accent_sheet::run(&dir, args.progress) {
-            eprintln!("ds-gallery: {error}");
-            std::process::exit(1);
-        }
-        return;
-    }
-    if let Some(dir) = args.level_sheet {
-        if let Err(error) = level_sheet::run(&dir, args.progress) {
             eprintln!("ds-gallery: {error}");
             std::process::exit(1);
         }

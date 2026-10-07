@@ -388,7 +388,7 @@ Step 2 (Tahoe): same four lanes, files as above plus:
   row). Verify: `cargo test -p ds-style` (size_rules_tests updated to the new ladder).
 - **2B controls/menus** (capsule buttons, icons in menus, menu radius); **2C chrome**
   (window_frame.css, toolbar.css, sidebar.css, split_view, scroll-edge fade, transparent menu bar
-  in `ds-shell/bar`); **2D overlays** radii, concentric sheet/alert. Verify per lane as above
+  in `sill-shell-kit/bar`); **2D overlays** radii, concentric sheet/alert. Verify per lane as above
   plus `cargo test --workspace --all-features` and the sill gate.
 Step 2 starts only after step 1 is merged and the consumers are re-pinned and green.
 

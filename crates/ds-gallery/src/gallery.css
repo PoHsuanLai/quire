@@ -86,8 +86,6 @@
 .g-chrome-corners{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-22);align-items:start}
 .g-chrome-plate-box{width:96px;height:96px}
 .g-chrome-dock{display:flex;padding-top:var(--s-36)}
-.g-chrome-tiles{position:relative;display:flex;align-items:center;gap:var(--dock-gap);padding:var(--dock-pad)}
-.g-chrome-tile{position:relative;display:flex;width:var(--dock-tile);height:var(--dock-tile)}
 .g-chrome-windows{padding:var(--s-22) var(--s-36) var(--s-36)}
 .g-chrome-window{width:260px;height:150px;background:var(--raise);border-radius:var(--r-window)}
 .g-chrome-window-old{box-shadow:var(--shadow-pop)}
@@ -121,11 +119,9 @@
 .g-within-card{flex:1 1 0;min-width:0;border-radius:var(--r-card);background:var(--surface);color:var(--ink)}
 .g-cat-wide .g-modal-stage{height:520px}
 .g-alert-row{align-items:flex-start;gap:var(--s-22)}
-.g-alert-cc{width:var(--cc-width,320px);border-radius:var(--r-panel);overflow:hidden}
+.g-alert-cc{width:320px;border-radius:var(--r-panel);overflow:hidden}
 .g-alert-cc-body{position:relative;padding:var(--s-12);min-height:300px}
 .g-alert-stage{height:360px;padding:var(--s-14)}
-.g-cc{width:var(--cc-width,320px);border-radius:var(--r-panel);overflow:hidden}
-.g-cc-body{padding:var(--cc-pad)}
 /* The notifications specimen: per scheme, the Work tint holding the banners
    and a posed mid-drag card on the left, and the center's edge panel on the right, in a stage the
    height of a small screen (the panel is absolutely placed, so the stage gives its root a height). */

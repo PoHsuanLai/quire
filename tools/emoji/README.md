@@ -6,7 +6,7 @@ sprite sheets plus `manifest.json`. Never run by cargo; its output is committed.
 
 ```bash
 cd tools/emoji
-uv run emojitool build --out ../../crates/ds-shell/assets/emoji          # the shipped set
+uv run emojitool build --out ../../crates/sill-shell-kit/assets/emoji          # the shipped set
 uv run emojitool build --out /tmp/trial --only wink --step 66       # a trial, no manifest
 ```
 

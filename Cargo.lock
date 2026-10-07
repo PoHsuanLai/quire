@@ -1668,7 +1668,6 @@ dependencies = [
  "dirs",
  "ds",
  "ds-harness",
- "ds-shell",
  "image",
  "keyboard-types 0.7.0",
  "memfd",
@@ -1866,10 +1865,7 @@ dependencies = [
  "ds-lint",
  "ds-motion",
  "ds-style",
- "image",
  "serde",
- "serde_json",
- "thiserror 2.0.21",
 ]
 
 [[package]]

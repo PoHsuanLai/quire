@@ -2,7 +2,6 @@
 //! component that builds a window's content and its forms, every state it can express, live.
 
 mod capsule;
-mod date_picker;
 mod drag_ghost;
 mod field_row;
 mod menu_bar;
@@ -23,7 +22,6 @@ pub fn StructurePage() -> Element {
     rsx! {
         capsule::CapsuleSection {}
         stepper::StepperSection {}
-        date_picker::DatePickerSection {}
         table::TableSection {}
         toolbar::ToolbarSection {}
         split_view::SplitViewSection {}

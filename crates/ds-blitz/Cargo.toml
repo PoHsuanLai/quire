@@ -98,7 +98,6 @@ workspace = true
 [dev-dependencies]
 # The driver every host test in this crate runs through.
 ds-harness = { workspace = true, features = ["pdf"] }
-ds-shell = { workspace = true }
 # Reading printouts back: text, fonts, images, and a page rasterised for the visual check.
 pdfrum = { workspace = true }
 # Writing PDFs for the thumbnail tests (a filled page, an encrypted one).

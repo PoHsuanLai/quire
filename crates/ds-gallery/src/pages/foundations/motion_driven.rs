@@ -17,12 +17,7 @@ use ds::motion::pane_slide::Pane;
 use ds::motion::spring_point::Release;
 use ds::motion::velocity::VelocityMeter;
 use ds::prelude::*;
-use ds::style::icon::family::PlateFamily;
 use ds_core::time::clock::sleep;
-use ds_shell::notifications::parts::AppMark;
-use ds_shell::notifications::swipe::NotificationSwipe;
-use ds_shell::prelude::*;
-use ds_shell::switcher::app_switcher::{AppKey, SwitcherApp};
 
 /// The section on the Motion page.
 #[component]
@@ -33,9 +28,7 @@ pub fn DrivenSection() -> Element {
                 ToggleCell {}
                 SegmentCell {}
                 SliderCell {}
-                SwitcherCell {}
                 PaneCell {}
-                SwipeCell {}
                 SheetCell {}
                 PanelCell {}
                 DockCell {}
@@ -94,45 +87,6 @@ fn SliderCell() -> Element {
     }
 }
 
-/// Three apps for the switcher cell.
-const APPS: [(&str, &str, Icon, PlateFamily); 3] = [
-    ("mail", "Mail", Icon::Mail, PlateFamily::Blue),
-    ("clock", "Clock", Icon::Clock, PlateFamily::Neutral),
-    ("keyboard", "Keyboard", Icon::Keyboard, PlateFamily::Violet),
-];
-
-#[component]
-fn SwitcherCell() -> Element {
-    let axes = use_context::<Signal<Axes>>();
-    let (theme, accent, motion) = {
-        let axes = axes.read();
-        (axes.theme, axes.accent, axes.motion)
-    };
-    let mut at = use_signal(|| 0usize);
-    let apps: Vec<SwitcherApp> = APPS
-        .iter()
-        .map(|(key, name, icon, family)| SwitcherApp {
-            plate: Some(*family),
-            ..SwitcherApp::new(*key, *name, IconSource::Glyph(*icon))
-        })
-        .collect();
-    let chosen = AppKey(APPS[at() % APPS.len()].0.to_owned());
-    rsx! {
-        Cell { name: "Switcher ring", code: "use_spring(--switcher-at), Quick",
-            controls: rsx! { {mini("Next", move |_| at.set(at() + 1))} },
-            div { class: "g-detail g-driven-switcher",
-                Ds {
-                    appearance: Appearance { theme, accent, motion },
-                    material: Material::Osd,
-                    stylesheet: Inject::Host,
-                    chrome: Some(RootChrome::Transparent),
-                    AppSwitcher { apps, selected: chosen, output: Some(Px(360.0)), onhover: |_| {}, onactivate: |_| {} }
-                }
-            }
-        }
-    }
-}
-
 #[component]
 fn PaneCell() -> Element {
     let mut shown = use_signal(|| Pane::Root);
@@ -147,30 +101,6 @@ fn PaneCell() -> Element {
                     shown: shown(),
                     root: rsx! { p { class: "g-note", "Wi-Fi · Bluetooth · Focus" } },
                     detail: rsx! { p { class: "g-note", "Home · Office · Café" } },
-                }
-            }
-        }
-    }
-}
-
-#[component]
-fn SwipeCell() -> Element {
-    let mut round = use_signal(|| 0u32);
-    rsx! {
-        Cell { name: "Swipe return", code: "use_spring_motion(--swipe-dx), Move",
-            controls: rsx! { {mini("Replay", move |_| *round.write() += 1)} },
-            div { class: "g-detail g-detail-list",
-                for n in [round()] {
-                    NotificationCard {
-                        key: "{n}",
-                        app: AppMark { icon: IconSource::Glyph(Icon::Mail), name: "Mail".into() },
-                        age: "now",
-                        summary: "Drag me right, let go short",
-                        body: "Under 80 px it springs home at your release speed.",
-                        swipe: NotificationSwipe::Dismiss(EventHandler::new(|()| {})),
-                        on_close: |_| {},
-                        on_open: |_| {},
-                    }
                 }
             }
         }

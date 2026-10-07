@@ -12,9 +12,6 @@ use ds::components::fields::stepper::view::Stepper;
 use ds::components::menus::pop_up_button::PopUpButton;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_shell::date_picker::model::{DateValue, Elements, PickerStyle, TimeOfDay};
-use ds_shell::month_grid::data::DayKey;
-use ds_shell::prelude::*;
 
 /// The pane for `category`.
 pub(super) fn pane(category: Category) -> Element {
@@ -22,7 +19,6 @@ pub(super) fn pane(category: Category) -> Element {
         Category::WiFi => rsx! { WifiPane {} },
         Category::Appearance => rsx! { AppearancePane {} },
         Category::Displays => rsx! { DisplaysPane {} },
-        Category::DateTime => rsx! { DateTimePane {} },
     }
 }
 
@@ -139,40 +135,6 @@ fn DisplaysPane() -> Element {
             FieldRow { label: label("Night shift"), help: Some(label("Warms the display after sunset.")),
                 Toggle { label: "Night shift", value: night(), onchange: move |next| night.set(next) }
             }
-        }
-    }
-}
-
-#[component]
-fn DateTimePane() -> Element {
-    let mut when = use_signal(|| DateValue {
-        day: DayKey {
-            year: 2026,
-            month: 9,
-            day: 30,
-        },
-        time: TimeOfDay {
-            hour: 14,
-            minute: 41,
-        },
-    });
-    let mut automatic = use_signal(|| Check::Off);
-    let manual = if automatic() == Check::On {
-        Availability::Disabled
-    } else {
-        Availability::Enabled
-    };
-    rsx! {
-        FieldGroup {
-            FieldRow { label: label("Set time and date automatically"),
-                Toggle { label: "Automatic", value: automatic(), onchange: move |next| automatic.set(next) }
-            }
-            FieldRow { label: label("Date and time"), availability: manual,
-                DatePicker { label: "Date and time", value: when(), elements: Elements::DateAndTime, availability: manual, onchange: move |next| when.set(next) }
-            }
-        }
-        FieldGroup { title: "Calendar",
-            DatePicker { label: "Date", value: when(), style: PickerStyle::Graphical, availability: manual, onchange: move |next| when.set(next) }
         }
     }
 }
