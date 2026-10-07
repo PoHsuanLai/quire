@@ -1,0 +1,9 @@
+/* The search card (`present: SuggestionsPresent::Card`, Spotlight): the field and its results as
+   one surface. Floated from a `CardPlace`, the popover is the surface and this adds the width and
+   the clip; drawn where it stands (`data-surface=own`) it is the surface itself, with the
+   popover's plate, radius and shadow. The results sit under a hairline, inset as a menu's rows
+   are. */
+.ds-search-card{ width:600px; max-width:100%; overflow:hidden; border-radius:inherit; }
+.ds-search-card[*|data-surface=own]{ background:var(--raise); color:var(--ink); border-radius:var(--r-panel); box-shadow:var(--shadow-pop); }
+.ds-search-card-rows{ max-height:440px; overflow-y:auto; scrollbar-width:none; border-top:var(--hair) solid var(--line-soft); }
+.ds-search-card-rows .ds-menu[*|data-flow=inline]{ padding:var(--shell-menu-inset); }

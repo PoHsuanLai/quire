@@ -164,7 +164,9 @@ pub use crate::components::menus::menu::placement::MenuPlacement;
 pub use crate::components::menus::palette::command_palette::CommandPalette;
 pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
-pub use crate::components::menus::search::model::SuggestionSection;
+pub use crate::components::menus::search::model::{
+    CardPlace, EscapeOrder, InitialHighlight, SearchCursor, SuggestionSection, SuggestionsPresent,
+};
 pub use crate::components::menus::search::view::SearchField;
 pub use crate::components::overlays::empty_state::EmptyState;
 pub use crate::components::overlays::flow::Flow;

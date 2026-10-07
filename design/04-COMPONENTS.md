@@ -854,6 +854,17 @@ is a `ToolbarSearch` item: below its minimum width plus its items it collapses t
 button, which opens the field in place with the caret in it (`NSSearchToolbarItem`); an empty
 field folds back when the caret leaves it or on Escape.
 
+Options (Spotlight). `highlight: InitialHighlight::TopHit` lights the first pickable row whenever
+the results change, so Return picks it (default `None`). The lit row is the field's own or the
+caller's (`cursor: SearchCursor::Is(value)`, named by the row's value); `on_highlight` hears each
+move, and `onkey` hears every key the field leaves alone, so a host completes the lit row's text
+on Tab. `escape: EscapeOrder` is `ClosePanelFirst` (the panel, the text, then the window; the
+default) or `ClearFirst` (the text, with the results and so the panel, then the window): one
+Escape is one step, never a press that changes nothing. `present: SuggestionsPresent::Card` draws
+the field and its results as one surface (one radius, one shadow, the results under a hairline,
+inset as a menu's rows are); with a `CardPlace` the card floats at the window level from its
+anchor and `ondismiss` hears a press outside it, without one it is drawn where it stands.
+
 **Motion.** None. **Behaviour.** Up/Down move the selection in the list below (clamped, not
 wrapping, `S:1653-1654`); Enter runs; Esc closes. Operators `from: is:unread is:starred
 has:attachment label:` become tokens (`S:1596-1598`). 06-INTERACTIONS "command menu search".
