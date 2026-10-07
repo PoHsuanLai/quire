@@ -65,16 +65,14 @@ animation once (`css.rs`).
 
 What moves a piece of the SVG is written as attributes frame by frame, like MorphGlyph's slash:
 `PosedGlyph` (`ds-style::icon::posed`) draws each annotated part in a `g` carrying its pose
-(`transform` about the part's pivot, `opacity`, `fill`). The pose is `symbol::pose`, pure
+(`transform` about the part's pivot, `opacity`); the shapes are the solid ones of `Icon::solid_parts`, in the order of the table. The pose is `symbol::pose`, pure
 arithmetic over stops that a table pins; the clock is `timeline::cycle::Cycle` under
 `use_playback`, which asks for frames only while a cycle runs. Durations are the same tokens:
 a `Once` cycle is `--t-big`, a loop's period `--t-turn` (`symbol::timing`). A Rust-driven motion
 has no keyframes, so it has a row in `timing.rs` instead of `recipe_symbol.rs`.
 
-Draw On is `use_tween` over the strokes' dash (`stroke-dasharray`, `stroke-dashoffset`), at
-`--t-move` `--e-out`; the dash length is `ds-style::icon::length`, a bound that is never shorter
-than the stroke (control polygon of a Bezier, an arc's own radius and chord). A fully hidden
-stroke is `opacity` 0, since a round cap would leave a dot.
+Draw On is `use_tween` over a wipe: a clip rectangle that grows from the left edge over the solid glyph, at
+`--t-move` `--e-out`. Fully hidden is `opacity` 0.
 
 ## 3. Part annotations
 
@@ -82,14 +80,14 @@ stroke is `opacity` 0, since a round cap would leave a dot.
 part, and the pivot (tenths of a grid unit). The test checks every named shape exists and no shape
 is in two parts. Layers are listed in the order they step.
 
-| Icon | Gesture | Part (shape indices) | Pivot |
+| Icon | Gesture | Part (shape indices; the solid split has the same parts) | Pivot |
 | --- | --- | --- | --- |
 | Trash | Lift | lid: rule and handle (0, 2) | left end of the rule (5, 6) |
 | Bell | Ring | whole bell (0, 1), swings | top (12, 3) |
 | Mail | Flap | the V (1) flips to half open height | the top edge (12, 7) |
 | Folder | Open | outline (0) leans open | bottom-left corner (2, 20) |
 | Lock | Lift | shackle (1) | right foot (17, 11) |
-| Star, Heart | Pop | outline (0) swells and flashes its fill | centre |
+| Star, Heart | Pop | the glyph (0) swells | centre |
 | Refresh | Turn | both arrows (0-3) turn once | centre |
 | Wifi | Layers | dot, small, middle, large arc (0, 3, 2, 1) | none |
 | Volume2 | Layers | small wave, large wave (1, 2); the speaker stays | none |
@@ -114,7 +112,7 @@ timing table is copied, and the durations are the tokens above. Lucide's drawing
   (rest at both ends, the stops, layers in order), `timeline::cycle`, `css::tests` (Reduced forms and
   loops in the generated sheet), `reduced::tests` (every moving keyframe has a still form).
 - `ds-style`: `icon::parts` (every part names existing shapes), `icon::posed` (groups, pivots,
-  dashes), `icon::length`.
+  the wipe), `icon::solid_parts` (one list per part), `icon::slash`.
 - `ds/tests/motion_drift.rs`: the CSS and the recipe table agree. `ds/tests/symbol_ssr.rs`: markup
   per effect. `ds/tests/button_busy_look_ssr.rs`: the Button wrapper's markup contract.
 - `ds-conformance/tests/symbol_effects.rs`: `Clock::Virtual`; Once fires on change and not on

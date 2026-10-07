@@ -7,13 +7,19 @@
 #[cfg(feature = "dioxus")]
 use super::Icon;
 #[cfg(feature = "dioxus")]
+use super::posed::Thousandths;
+#[cfg(feature = "dioxus")]
 use super::shape::Shape;
+#[cfg(feature = "dioxus")]
+use super::slash::Cut;
 #[cfg(feature = "dioxus")]
 use super::stroke::stroke_width;
 #[cfg(feature = "dioxus")]
 use super::style::GlyphStyle;
 #[cfg(feature = "dioxus")]
 use crate::scale::use_scale;
+#[cfg(feature = "dioxus")]
+use dioxus::core::current_scope_id;
 #[cfg(feature = "dioxus")]
 use dioxus::prelude::*;
 
@@ -99,15 +105,18 @@ pub(super) fn shape_element(shape: &Shape) -> Element {
 /// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
 /// `data-size`) in `style` (solid unless a pair's off state says outline), painted in
 /// `currentColor` through attributes, never CSS (spike S6). An outline's stroke is snapped to
-/// whole device pixels at a fractional device scale (`super::stroke`).
+/// whole device pixels at a fractional device scale (`super::stroke`). `cut` is how much of a
+/// slash is drawn across it: the gap that slash leaves is cut out of the glyph (`super::slash`).
 #[cfg(feature = "dioxus")]
 #[component]
 pub fn Glyph(
     icon: Icon,
     #[props(default)] size: IconSize,
     #[props(default)] style: GlyphStyle,
+    #[props(default)] cut: Thousandths,
 ) -> Element {
     let px = size.px();
+    let mask = use_hook(|| format!("ds-cut-{}", current_scope_id().0));
     let stroke = stroke_width(size, use_scale());
     let (paint, outline) = match style {
         GlyphStyle::Solid => (("none", "currentColor"), None),
@@ -134,8 +143,10 @@ pub fn Glyph(
             "stroke-linecap": round,
             "stroke-linejoin": round,
             "fill": paint.1,
-            for shape in icon.shapes_in(style) {
-                {shape_element(shape)}
+            Cut { id: mask, drawn: cut,
+                for shape in icon.shapes_in(style) {
+                    {shape_element(shape)}
+                }
             }
         }
     }

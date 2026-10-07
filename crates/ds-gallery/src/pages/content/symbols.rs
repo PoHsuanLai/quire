@@ -151,7 +151,7 @@ fn ReplaceCell() -> Element {
 #[component]
 fn PartSection() -> Element {
     rsx! {
-        Section { title: "By part", note: "The icons Apple animates by part: the trash can's lid lifts, the bell swings from its top, the envelope's flap opens, the folder leans open, refresh turns, the Wi-Fi bars, the volume waves and the battery cells light in order (Variable Color), the lock's shackle lifts, and the star and heart swell and fill. The drawings are Lucide's; only the annotated shapes move.",
+        Section { title: "By part", note: "The icons Apple animates by part: the trash can's lid lifts, the bell swings from its top, the envelope's flap opens, the folder leans open, refresh turns, the Wi-Fi bars, the volume waves and the battery cells light in order (Variable Color), the lock's shackle lifts, and the star and heart swell. The glyphs are solid (design/08 section 1.2.1); only the annotated shapes move.",
             div { class: "g-detail-grid",
                 for (icon , effect) in PARTS {
                     PartCell { icon, effect }

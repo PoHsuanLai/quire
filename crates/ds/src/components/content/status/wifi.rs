@@ -3,7 +3,7 @@
 //! `--t-spin-step`, from the moment the join starts; a strength change cross-fades the arcs; no
 //! internet grows the badge in; turning the radio off draws the slash on.
 
-use super::part::{Paint, Part, Pen, Show, part_svg, slash_svg};
+use super::part::{Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
 use super::wifi_state::{WifiReach, WifiState};
 use dioxus::prelude::*;
@@ -17,8 +17,7 @@ use ds_motion::detail::{
 };
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
-use ds_style::icon::stroke::stroke_width;
-use ds_style::scale::use_scale;
+use ds_style::icon::solid_fan::{WIFI_DOT, WIFI_LARGE, WIFI_MID, WIFI_SMALL};
 
 /// The searching loop: the dot and the three arcs, one at a time (a step every `--t-spin-step`).
 pub(crate) const SEARCHING: PendingSpec = PendingSpec {
@@ -26,13 +25,26 @@ pub(crate) const SEARCHING: PendingSpec = PendingSpec {
     layers: PendingLayers(4),
 };
 
-/// Lucide `wifi`'s parts, from the inside out, and the badge.
-const DOT: &[Shape] = &[Shape::Path("M12 20h.01")];
-const ARC_1: &[Shape] = &[Shape::Path("M8.5 16.429a5 5 0 0 1 7 0")];
-const ARC_2: &[Shape] = &[Shape::Path("M5 12.859a10 10 0 0 1 14 0")];
-const ARC_3: &[Shape] = &[Shape::Path("M2 8.82a15 15 0 0 1 20 0")];
-/// The no-internet mark, in the fan's free lower-right corner.
-const BADGE: &[Shape] = &[Shape::Path("M21.5 14v3.5"), Shape::Path("M21.5 21h.01")];
+/// The fan's parts, from the inside out (`ds_style::icon::solid_fan`), and the badge.
+const DOT: &[Shape] = &[WIFI_DOT];
+const ARC_1: &[Shape] = &[WIFI_SMALL];
+const ARC_2: &[Shape] = &[WIFI_MID];
+const ARC_3: &[Shape] = &[WIFI_LARGE];
+/// The no-internet mark, a bar and a dot, in the fan's free lower-right corner.
+const BADGE: &[Shape] = &[
+    Shape::Rect {
+        x: "20.5",
+        y: "13.2",
+        width: "2",
+        height: "4.3",
+        rx: "1",
+    },
+    Shape::Circle {
+        cx: "21.5",
+        cy: "20.6",
+        r: "1.2",
+    },
+];
 
 /// The layers' geometry and names, from the dot out.
 const LAYERS: [(&str, &[Shape]); 4] = [
@@ -100,18 +112,15 @@ pub fn WifiGlyph(state: WifiState, #[props(default = IconSize::Bar)] size: IconS
     let detail = use_detail(state, Touch::Remote);
     let frame = use_pending(use_operation(detail.cue()), SEARCHING);
     let drawn = use_slash(slashed(state));
-    let pen = Pen {
-        px: size.px(),
-        stroke: stroke_width(size, use_scale()),
-    };
+    let pen = Pen { px: size.px() };
     let shows = layer_shows(state, frame);
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "wifi",
             "data-state": slug(state), "aria-hidden": "true",
             for (index, (name, shapes)) in LAYERS.iter().enumerate() {
-                {part_svg(Part { name, shapes, paint: Paint::Stroke, show: shows[index] }, &pen)}
+                {part_svg(Part { name, shapes, show: shows[index] }, &pen)}
             }
-            {part_svg(Part { name: "badge", shapes: BADGE, paint: Paint::Stroke, show: badge(state) }, &pen)}
+            {part_svg(Part { name: "badge", shapes: BADGE, show: badge(state) }, &pen)}
             {slash_svg(drawn, &pen)}
         }
     }

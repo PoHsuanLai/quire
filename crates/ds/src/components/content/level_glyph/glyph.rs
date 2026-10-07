@@ -4,52 +4,27 @@
 //! body with three waves shown by thirds and a slash when muted, and the sun's core with its
 //! rays, which grow with the brightness (scaled by `--f` in `level.css`).
 //!
-//! The geometry is Lucide's: the speaker body is `volume`'s, the sun `sun`'s core and eight rays,
-//! the slash `volume-off`'s. Lucide draws at most two waves; the three here are arcs on one
-//! centre (10, 12) at radii 5, 8.25 and 11.5, spaced so a 2-unit stroke leaves a gap between them.
+//! Every part is a filled shape, no stroke (design/08-ICONS.md section 1.2): the speaker body is
+//! Lucide `volume`'s path, the sun's core a disc and its eight rays capsules, the waves three
+//! annular arcs on one centre (10, 12) at radii 5, 8.25 and 11.5 with a gap between them, and the
+//! slash a solid bar. A muted speaker's body has the gap the slash leaves cut out of it.
 
+use super::solid::{CORE, KEYBOARD_BODY, KEYBOARD_CORE, KEYBOARD_RAYS, RAYS};
 use super::vocab::LevelGlyph;
+use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::vocab::Muting;
 use ds_core::word::Word;
-use ds_style::icon::Icon;
+use ds_style::icon::posed::Thousandths;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
-use ds_style::icon::stroke::stroke_width;
-use ds_style::scale::use_scale;
+use ds_style::icon::slash::{Cut, SLASH_SHAPE};
+use ds_style::icon::solid_fan::{SPEAKER, WAVE_1, WAVE_2, WAVE_3};
 
-const WAVE_1: &[Shape] = &[Shape::Path("M13.83 8.79a5 5 0 0 1 0 6.42")];
-const WAVE_2: &[Shape] = &[Shape::Path("M16.32 6.7a8.25 8.25 0 0 1 0 10.6")];
-const WAVE_3: &[Shape] = &[Shape::Path("M18.81 4.61a11.5 11.5 0 0 1 0 14.78")];
-const SLASH: &[Shape] = &[Shape::Path("M2 2l20 20")];
-
-// The keyboard-brightness glyph (design/26), on Lucide's grid: Lucide `keyboard`'s body
-// lowered and shortened to the grid's bottom half (y 12 to 22), a row of keys and the space bar,
-// and above it a sun rising from behind (a half disc of radius 3 on (12, 9)) with five rays at
-// 4.5 to 6 units out, which grow with the level as the display sun's do.
-const KEYBOARD_BODY: &[Shape] = &[
-    Shape::Rect {
-        x: "2",
-        y: "12",
-        width: "20",
-        height: "10",
-        rx: "2",
-    },
-    Shape::Path("M6 16h.01"),
-    Shape::Path("M10 16h.01"),
-    Shape::Path("M14 16h.01"),
-    Shape::Path("M18 16h.01"),
-    Shape::Path("M8 19h8"),
-];
-const KEYBOARD_CORE: &[Shape] = &[Shape::Path("M9 9a3 3 0 0 1 6 0")];
-const KEYBOARD_RAYS: &[Shape] = &[
-    Shape::Path("M12 4.5V3"),
-    Shape::Path("m15.18 5.82 1.06-1.06"),
-    Shape::Path("m8.82 5.82-1.06-1.06"),
-    Shape::Path("M16.5 9H18"),
-    Shape::Path("M7.5 9H6"),
-];
+const WAVES: [&[Shape]; 3] = [&[WAVE_1], &[WAVE_2], &[WAVE_3]];
+const BODY: &[Shape] = &[SPEAKER];
+const SLASH: &[Shape] = &[SLASH_SHAPE];
 
 /// One layer of a level glyph.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
@@ -70,26 +45,15 @@ pub(crate) enum Part {
 }
 
 impl Part {
-    /// The paint of the part's closed shape: the speaker's body and the sun's core are filled
-    /// as well as stroked, so the glyph reads solid (design/08-ICONS.md section 1.2); the open
-    /// strokes (waves, rays, slash) and the keyboard, whose keys a fill would hide, stay strokes.
-    fn fill(self) -> &'static str {
-        match self {
-            Part::Body | Part::Core | Part::KeyCore => "currentColor",
-            _ => "none",
-        }
-    }
-
     fn shapes(self) -> &'static [Shape] {
-        let sun = Icon::Sun.shapes();
         match self {
-            Part::Body => Icon::Volume.shapes(),
-            Part::Wave1 => WAVE_1,
-            Part::Wave2 => WAVE_2,
-            Part::Wave3 => WAVE_3,
+            Part::Body => BODY,
+            Part::Wave1 => WAVES[0],
+            Part::Wave2 => WAVES[1],
+            Part::Wave3 => WAVES[2],
             Part::Slash => SLASH,
-            Part::Core => &sun[..1],
-            Part::Rays => &sun[1..],
+            Part::Core => CORE,
+            Part::Rays => RAYS,
             Part::KeyBody => KEYBOARD_BODY,
             Part::KeyCore => KEYBOARD_CORE,
             Part::KeyRays => KEYBOARD_RAYS,
@@ -150,11 +114,19 @@ pub(crate) fn showing(part: Part, glyph: LevelGlyph, value: Fraction) -> Showing
     if on { Showing::On } else { Showing::Off }
 }
 
+/// How much of the slash's gap is cut out of `part`: all of it from a muted speaker's body.
+fn cut(part: Part, glyph: LevelGlyph) -> Thousandths {
+    match (part, glyph) {
+        (Part::Body, LevelGlyph::Volume(Muting::Muted)) => Thousandths(1000),
+        _ => Thousandths::default(),
+    }
+}
+
 /// `glyph` at `value`, `size`: a `span.ds-level-glyph` of stacked parts in `currentColor`.
 #[component]
 pub(crate) fn LevelGlyphView(glyph: LevelGlyph, value: Fraction, size: IconSize) -> Element {
     let px = size.px();
-    let stroke = stroke_width(size, use_scale());
+    let mask = use_hook(|| format!("ds-lcut-{}", current_scope_id().0));
     rsx! {
         span { class: "ds-level-glyph", "data-size": "{px}", "aria-hidden": "true",
             for part in parts(glyph).iter().copied() {
@@ -166,13 +138,13 @@ pub(crate) fn LevelGlyphView(glyph: LevelGlyph, value: Fraction, size: IconSize)
                     width: "{px}",
                     height: "{px}",
                     view_box: "0 0 24 24",
-                    "stroke": "currentColor",
-                    "stroke-width": stroke.clone(),
-                    "stroke-linecap": "round",
-                    "stroke-linejoin": "round",
-                    "fill": part.fill(),
-                    for shape in part.shapes() {
-                        {shape_child(shape)}
+                    "stroke": "none",
+                    "fill": "currentColor",
+                    "fill-rule": "evenodd",
+                    Cut { id: mask.clone(), drawn: cut(part, glyph),
+                        for shape in part.shapes() {
+                            {shape_child(shape)}
+                        }
                     }
                 }
             }
@@ -199,7 +171,7 @@ fn shape_child(shape: &Shape) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::{Part, Showing, showing, waves};
+    use super::{Part, Shape, Showing, showing, waves};
     use crate::components::content::level_glyph::vocab::LevelGlyph;
     use ds_core::vocab::Fraction;
     use ds_core::vocab::Muting;
@@ -237,9 +209,24 @@ mod tests {
     }
 
     #[test]
-    fn the_sun_is_lucides_core_and_eight_rays() {
+    fn the_sun_is_a_disc_and_eight_rays_and_every_part_is_filled_geometry() {
         assert_eq!(Part::Core.shapes().len(), 1);
         assert_eq!(Part::Rays.shapes().len(), 8);
         assert_eq!(Part::Body.shapes().len(), 1);
+        for part in [
+            Part::Body,
+            Part::Wave1,
+            Part::Wave2,
+            Part::Wave3,
+            Part::Slash,
+            Part::Rays,
+        ] {
+            assert!(
+                part.shapes()
+                    .iter()
+                    .all(|shape| matches!(shape, Shape::Solid(_))),
+                "{part:?}"
+            );
+        }
     }
 }

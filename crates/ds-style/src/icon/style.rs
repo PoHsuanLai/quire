@@ -55,6 +55,7 @@ impl Icon {
     /// The solid form: filled paths on the 24 grid, never empty.
     pub fn solid_shapes(self) -> &'static [Shape] {
         [
+            super::solid_fan::shapes,
             super::solid_mailo::shapes,
             super::solid_shell::shapes,
             super::solid_more::shapes,

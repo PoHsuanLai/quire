@@ -27,8 +27,6 @@ pub(crate) mod geometry_control;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
-#[cfg(any(test, feature = "dioxus"))]
-pub(crate) mod length;
 pub mod parts;
 pub(crate) mod plate;
 pub mod plate_tint;
@@ -38,8 +36,12 @@ pub mod render;
 pub mod retint;
 pub(crate) mod sets;
 pub mod shape;
+#[cfg(feature = "dioxus")]
+pub mod slash;
+pub mod solid_fan;
 pub(crate) mod solid_mailo;
 pub(crate) mod solid_more;
+pub mod solid_parts;
 pub(crate) mod solid_shell;
 pub mod stroke;
 pub mod style;

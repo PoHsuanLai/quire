@@ -55,8 +55,8 @@ fn attr(harness: &Harness, part: &str, name: &str) -> Option<String> {
 fn the_fill_follows_a_new_step_and_ignores_a_finer_change() {
     let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let full = width(&harness);
-    // 80 % is step 18 of 22: 9 of the fill's 11 units.
-    assert!((full - 9.0).abs() < 0.1, "80 % drew {full} units");
+    // 80 % is step 18 of 22: 11.86 of the fill's 14.5 units.
+    assert!((full - 11.86).abs() < 0.1, "80 % drew {full} units");
     assert_settles_to_zero_frames(&mut harness);
     // 80.0 then 79.8 % is the same step: nothing moves (R2).
     set(&mut harness, battery(798, BatteryPower::Battery));
@@ -65,9 +65,9 @@ fn the_fill_follows_a_new_step_and_ignores_a_finer_change() {
     harness.advance(Duration::from_millis(500));
     assert_eq!(harness.wakes(), wakes, "a finer change moved the fill");
     set(&mut harness, battery(300, BatteryPower::Battery));
-    // 30 % is step 7: 3.5 units, reached through the widths between.
-    settle_until(&mut harness, |h| (4.0..8.5).contains(&width(h)));
-    settle_until(&mut harness, |h| (width(h) - 3.5).abs() < 0.1);
+    // 30 % is step 7: 4.61 units, reached through the widths between.
+    settle_until(&mut harness, |h| (6.0..10.5).contains(&width(h)));
+    settle_until(&mut harness, |h| (width(h) - 4.61).abs() < 0.1);
     assert_settles_to_zero_frames(&mut harness);
 }
 
@@ -133,6 +133,6 @@ fn reduced_jumps_the_fill() {
     harness.advance(Duration::from_millis(20));
     set(&mut harness, battery(300, BatteryPower::Battery));
     harness.advance(Duration::from_millis(40));
-    assert!((width(&harness) - 3.5).abs() < 0.1, "{}", width(&harness));
+    assert!((width(&harness) - 4.61).abs() < 0.1, "{}", width(&harness));
     assert_settles_to_zero_frames(&mut harness);
 }

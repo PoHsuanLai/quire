@@ -47,10 +47,12 @@ fn lit(harness: &Harness) -> usize {
         .count()
 }
 
+/// How much of the slash is still to draw, in thousandths (0 once it is whole).
 fn slash_offset(harness: &Harness) -> Option<f32> {
     harness
-        .attr("#wifi [*|data-part=slash] path", "stroke-dashoffset")
+        .attr("#wifi [*|data-part=slash] path", "data-drawn")
         .and_then(|value| value.parse::<f32>().ok())
+        .map(|drawn| 1000.0 - drawn)
 }
 
 #[test]

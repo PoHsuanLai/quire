@@ -58,11 +58,16 @@ exception of the 2026-09 rules (Lucide's hollow outlines as the default).
    `<path stroke="none" d="M0 0h24v24H0z" fill="none"/>` bounding path.
 7. A glyph we draw is reviewed at 16 px next to its three nearest neighbours in the
    gallery before it lands.
-8. Motion that moves part of a glyph or draws it on (`PosedGlyph`, a slash morph) is built on
-   the outline's strokes and keeps drawing the outline until solid parts are annotated
-   (design/35). A cross-fade between two glyphs is solid. The level glyph (volume, brightness)
-   fills its speaker body and sun core and keeps its waves, rays and slash as strokes; the Wi-Fi,
-   Bluetooth and battery status parts stay open strokes (macOS draws them as bars and arcs).
+8. Motion is solid too. `PosedGlyph` moves the filled shapes of `Icon::solid_parts` (a part
+   effect turns, shifts, scales or dims them; a draw-on wipes the glyph in from the left through a
+   clip). A slash morph, the status glyphs' slash and the level glyph's slash are one solid bar
+   (`icon::slash`: a capsule from the top left that grows towards the bottom right as it draws
+   on), with a clear margin cut out of the glyph under it (a mask), as macOS draws it. The
+   level glyph is all filled shapes: the speaker, three annular waves, the sun's disc and
+   capsule rays, the keyboard slab with its keys cut out. The Wi-Fi fan is a dot and three
+   annular arcs, Bluetooth is the filled rune with filled dots, and the battery is an outlined
+   body (a filled path, a wall 1.5 wide, as macOS draws it) holding a solid fill level. That outlined body is the one
+   deliberate outline left in the status glyphs: a battery without a visible body reads as a bar.
 
 *Decision note, 2026-10-07.* Solid everywhere, outline only as the off half of a pair. The star
 exception (S:302-303: `.star .ic` stroke `--ink-faint`; on: stroke and fill `--warn`) is now the
@@ -76,8 +81,8 @@ passing and a raw colour on `fill` failing.
 Every `Icon` has a solid form in `crates/ds-style/src/icon/solid_*.rs`; a test walks `Icon::ALL`
 and fails on an empty one. 67 are Tabler filled (MIT, `@tabler/icons` 3.48.0, verbatim except for
 the invisible bounding path; `ChevronLeft` and `ChevronUp` are Tabler's right and down chevrons
-turned 180 degrees), 44 are Phosphor Fill (MIT, `@phosphor-icons/core` 2.1.1, scaled by 3/32 from
-its 256 grid to 24, rounded to three decimals), 3 are drawn here (`Minus`, `Search`, `Switches`).
+turned 180 degrees), 38 are Phosphor Fill (MIT, `@phosphor-icons/core` 2.1.1, scaled by 3/32 from
+its 256 grid to 24, rounded to three decimals), 3 are drawn here (`Minus`, `Search`, `Switches`) and 6 more from Lucide's speaker body and our own arcs (`Wifi`, `WifiLow`, `WifiHigh`, `Volume`, `Volume1`, `Volume2`); the parts of the animated icons (`solid_parts.rs`) are drawn here too.
 Phosphor was taken only where Tabler has no filled form and the Phosphor glyph is a heavy
 shape on the same footprint, so it sits in the same row as the Tabler ones.
 
@@ -121,9 +126,9 @@ no solid glyph carries a stroke attribute.
 | `PanelLeft` | Tabler filled `layout-sidebar` |
 | `Plus` | Tabler filled `plus` |
 | `Minus` | hand-made fill |
-| `Wifi` | Phosphor Fill `wifi-high` |
-| `WifiLow` | Phosphor Fill `wifi-low` |
-| `WifiHigh` | Phosphor Fill `wifi-medium` |
+| `Wifi` | hand-made fill (dot and three arcs, `solid_fan.rs`) |
+| `WifiLow` | hand-made fill (dot and the inner arc) |
+| `WifiHigh` | hand-made fill (dot and two arcs) |
 | `WifiOff` | Phosphor Fill `wifi-slash` |
 | `Ethernet` | Phosphor Fill `network` |
 | `Battery` | Phosphor Fill `battery-empty` |
@@ -135,9 +140,9 @@ no solid glyph carries a stroke attribute.
 | `Bluetooth` | Phosphor Fill `bluetooth` |
 | `BluetoothConnected` | Phosphor Fill `bluetooth-connected` |
 | `BluetoothOff` | Phosphor Fill `bluetooth-slash` |
-| `Volume` | Phosphor Fill `speaker-none` |
-| `Volume1` | Phosphor Fill `speaker-low` |
-| `Volume2` | Phosphor Fill `speaker-high` |
+| `Volume` | Lucide `volume` body, filled (ISC, `solid_fan.rs`) |
+| `Volume1` | the same body and one hand-made wave |
+| `Volume2` | the same body and two hand-made waves |
 | `VolumeX` | Phosphor Fill `speaker-x` |
 | `Mic` | Tabler filled `microphone` |
 | `MicOff` | Phosphor Fill `microphone-slash` |

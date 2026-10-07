@@ -10,9 +10,6 @@ use super::shape::Shape;
 /// The solid children of a glyph this file holds; empty for any other.
 pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
     match icon {
-        Icon::Wifi => WIFI,
-        Icon::WifiLow => WIFI_LOW,
-        Icon::WifiHigh => WIFI_HIGH,
         Icon::WifiOff => WIFI_OFF,
         Icon::Ethernet => ETHERNET,
         Icon::Battery => BATTERY,
@@ -24,9 +21,6 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::Bluetooth => BLUETOOTH,
         Icon::BluetoothConnected => BLUETOOTH_CONNECTED,
         Icon::BluetoothOff => BLUETOOTH_OFF,
-        Icon::Volume => VOLUME,
-        Icon::Volume1 => VOLUME1,
-        Icon::Volume2 => VOLUME2,
         Icon::VolumeX => VOLUME_X,
         Icon::Mic => MIC,
         Icon::MicOff => MIC_OFF,
@@ -58,21 +52,6 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         _ => &[],
     }
 }
-
-/// Phosphor Icons 2.1.1 Fill `wifi-high-fill` (MIT), scaled from its 256 grid to 24.
-const WIFI: &[Shape] = &[Shape::Solid(
-    "M22.908 8.7 l-9.75 11.759 A1.493 1.493 0 0 1 12 21 h0 a1.493 1.493 0 0 1 -1.154 -0.541 L1.092 8.7 A1.467 1.467 0 0 1 0.76 7.585 A1.493 1.493 0 0 1 1.339 6.572 A17.5 17.5 0 0 1 12 3 A17.5 17.5 0 0 1 22.661 6.572 a1.493 1.493 0 0 1 0.578 1.013 A1.467 1.467 0 0 1 22.908 8.7 Z",
-)];
-
-/// Phosphor Icons 2.1.1 Fill `wifi-low-fill` (MIT), scaled from its 256 grid to 24.
-const WIFI_LOW: &[Shape] = &[Shape::Solid(
-    "M23.24 7.585 a1.493 1.493 0 0 0 -0.578 -1.013 A17.5 17.5 0 0 0 12 3 A17.5 17.5 0 0 0 1.339 6.572 A1.493 1.493 0 0 0 0.76 7.585 A1.467 1.467 0 0 0 1.092 8.7 l9.75 11.759 A1.493 1.493 0 0 0 12 21 h0 a1.493 1.493 0 0 0 1.154 -0.541 h0 l9.75 -11.759 A1.467 1.467 0 0 0 23.24 7.585 Z m-7.268 7.125 a7.115 7.115 0 0 0 -7.944 0 L2.258 7.757 A16.009 16.009 0 0 1 12 4.5 A16.009 16.009 0 0 1 21.742 7.757 Z",
-)];
-
-/// Phosphor Icons 2.1.1 Fill `wifi-medium-fill` (MIT), scaled from its 256 grid to 24.
-const WIFI_HIGH: &[Shape] = &[Shape::Solid(
-    "M23.24 7.585 a1.493 1.493 0 0 0 -0.578 -1.013 A17.5 17.5 0 0 0 12 3 A17.5 17.5 0 0 0 1.339 6.572 A1.493 1.493 0 0 0 0.76 7.585 A1.467 1.467 0 0 0 1.092 8.7 l9.75 11.759 A1.493 1.493 0 0 0 12 21 h0 a1.493 1.493 0 0 0 1.154 -0.541 h0 l9.75 -11.759 A1.467 1.467 0 0 0 23.24 7.585 Z m-4.385 3.651 a11.625 11.625 0 0 0 -13.71 0 L2.258 7.757 A16.009 16.009 0 0 1 12 4.5 A16.009 16.009 0 0 1 21.742 7.757 Z",
-)];
 
 /// Phosphor Icons 2.1.1 Fill `wifi-slash-fill` (MIT), scaled from its 256 grid to 24.
 const WIFI_OFF: &[Shape] = &[Shape::Solid(
@@ -127,21 +106,6 @@ const BLUETOOTH_CONNECTED: &[Shape] = &[Shape::Solid(
 /// Phosphor Icons 2.1.1 Fill `bluetooth-slash-fill` (MIT), scaled from its 256 grid to 24.
 const BLUETOOTH_OFF: &[Shape] = &[Shape::Solid(
     "M20.754 20.805 a0.75 0.75 0 0 1 -1.059 -0.051 l-2.48 -2.728 L12.45 21.6 a0.75 0.75 0 0 1 -0.833 0.044 a0.777 0.777 0 0 1 -0.367 -0.673 V13.5 L6.45 17.1 a0.75 0.75 0 0 1 -1.046 -0.145 a0.774 0.774 0 0 1 0.17 -1.072 l5.763 -4.323 L4.695 4.254 A0.75 0.75 0 0 1 5.805 3.246 l15 16.5 A0.75 0.75 0 0 1 20.754 20.805 Z M14.531 10.614 a0.375 0.375 0 0 0 0.503 0.048 L18.45 8.1 a0.75 0.75 0 0 0 0 -1.2 l-6 -4.5 a0.75 0.75 0 0 0 -0.938 0.027 A0.773 0.773 0 0 0 11.25 3.022 V6.861 a0.375 0.375 0 0 0 0.094 0.252 Z",
-)];
-
-/// Phosphor Icons 2.1.1 Fill `speaker-none-fill` (MIT), scaled from its 256 grid to 24.
-const VOLUME: &[Shape] = &[Shape::Solid(
-    "M6 7.875 v8.25 a0.375 0.375 0 0 1 -0.375 0.375 H3 a1.5 1.5 0 0 1 -1.5 -1.5 V9 A1.5 1.5 0 0 1 3 7.5 H5.625 A0.375 0.375 0 0 1 6 7.875 Z m8.733 -5.452 a0.75 0.75 0 0 0 -0.938 -0.015 l-6.147 4.781 A0.375 0.375 0 0 0 7.5 7.485 v9.03 a0.375 0.375 0 0 0 0.145 0.295 l6.147 4.781 a0.75 0.75 0 0 0 0.844 0.053 a0.777 0.777 0 0 0 0.367 -0.673 V3.023 A0.775 0.775 0 0 0 14.73 2.423 Z",
-)];
-
-/// Phosphor Icons 2.1.1 Fill `speaker-low-fill` (MIT), scaled from its 256 grid to 24.
-const VOLUME1: &[Shape] = &[Shape::Solid(
-    "M15 3.023 V20.971 a0.777 0.777 0 0 1 -0.367 0.673 a0.75 0.75 0 0 1 -0.844 -0.053 l-6.147 -4.781 A0.375 0.375 0 0 1 7.5 16.515 V7.485 a0.375 0.375 0 0 1 0.145 -0.295 l6.147 -4.781 a0.75 0.75 0 0 1 0.938 0.015 A0.775 0.775 0 0 1 15 3.023 Z M5.625 7.5 H3 A1.5 1.5 0 0 0 1.5 9 v6 a1.5 1.5 0 0 0 1.5 1.5 H5.625 a0.375 0.375 0 0 0 0.375 -0.375 V7.875 A0.375 0.375 0 0 0 5.625 7.5 Z M18.562 9.521 a0.75 0.75 0 1 0 -1.125 0.992 a2.25 2.25 0 0 1 0 2.974 a0.75 0.75 0 1 0 1.125 0.992 a3.75 3.75 0 0 0 0 -4.958 Z",
-)];
-
-/// Phosphor Icons 2.1.1 Fill `speaker-high-fill` (MIT), scaled from its 256 grid to 24.
-const VOLUME2: &[Shape] = &[Shape::Solid(
-    "M15 3.023 V20.971 a0.777 0.777 0 0 1 -0.367 0.673 a0.75 0.75 0 0 1 -0.844 -0.053 l-6.147 -4.781 A0.375 0.375 0 0 1 7.5 16.515 V7.485 a0.375 0.375 0 0 1 0.145 -0.295 l6.147 -4.781 a0.75 0.75 0 0 1 0.938 0.015 A0.775 0.775 0 0 1 15 3.023 Z M5.625 7.5 H3 A1.5 1.5 0 0 0 1.5 9 v6 a1.5 1.5 0 0 0 1.5 1.5 H5.625 a0.375 0.375 0 0 0 0.375 -0.375 V7.875 A0.375 0.375 0 0 0 5.625 7.5 Z m11.885 1.954 a0.75 0.75 0 0 0 -0.068 1.059 a2.25 2.25 0 0 1 0 2.974 a0.75 0.75 0 1 0 1.125 0.992 a3.75 3.75 0 0 0 0 -4.958 A0.75 0.75 0 0 0 17.507 9.454 Z m3.833 -2.453 a0.75 0.75 0 1 0 -1.117 0.999 a6 6 0 0 1 0 8.001 a0.75 0.75 0 1 0 1.117 0.999 a7.5 7.5 0 0 0 0 -9.999 Z",
 )];
 
 /// Phosphor Icons 2.1.1 Fill `speaker-x-fill` (MIT), scaled from its 256 grid to 24.

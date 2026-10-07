@@ -61,7 +61,7 @@ const FLAP: &[Stop] = &[
 /// A folder: leans open about its corner and settles.
 const OPEN: &[Stop] = &[(0, REST), turned(400, -40), (1000, REST)];
 
-/// A star or a heart: swells and flashes its fill, then settles.
+/// A star or a heart: swells, then settles.
 const POP: &[Stop] = &[
     (0, REST),
     (
@@ -69,7 +69,6 @@ const POP: &[Stop] = &[
         PartPose {
             scale_x: Thousandths(1250),
             scale_y: Thousandths(1250),
-            fill: Thousandths(450),
             ..REST
         },
     ),
@@ -137,7 +136,6 @@ fn along(stops: &[Stop], at: i32) -> PartPose {
         scale_x: Thousandths(step(from.scale_x.0, to.scale_x.0)),
         scale_y: Thousandths(step(from.scale_y.0, to.scale_y.0)),
         opacity: Thousandths(step(from.opacity.0, to.opacity.0)),
-        fill: Thousandths(step(from.fill.0, to.fill.0)),
     }
 }
 
@@ -184,7 +182,7 @@ mod tests {
         assert!(at(PartGesture::Ring, 0, 1, 150).rotate > Tenths(0));
         assert!(at(PartGesture::Ring, 0, 1, 300).rotate < Tenths(0));
         assert_eq!(at(PartGesture::Flap, 0, 1, 400).scale_y, Thousandths(-500));
-        assert_eq!(at(PartGesture::Pop, 0, 1, 300).fill, Thousandths(450));
+        assert_eq!(at(PartGesture::Pop, 0, 1, 300).scale_x, Thousandths(1250));
     }
 
     #[test]

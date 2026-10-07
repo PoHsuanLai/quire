@@ -1,19 +1,19 @@
 //! A glyph drawn with its parts moved: the frame of a part effect or a draw-on, as an `svg` whose
 //! moving shapes sit in a `g` carrying the pose (design/35-SYMBOL-EFFECTS.md). Blitz's stylesheet
 //! does not reach inside an SVG, so motion that moves a piece of one is written as attributes,
-//! frame by frame, like `MorphGlyph`'s slash.
+//! frame by frame, like `MorphGlyph`'s slash. The glyph is solid: its parts are the filled
+//! shapes of [`Icon::solid_parts`], and a draw-on wipes it in from the left.
 
 use super::Icon;
-use super::length::stroke_length;
 use super::parts::{Part, Tenths};
 use super::render::{IconSize, shape_element};
 use super::shape::Shape;
-use super::stroke::stroke_width;
-use crate::scale::use_scale;
+use super::solid_parts::SolidParts;
+use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 
 /// A number in thousandths: 1000 is one (full size, full ink).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 pub struct Thousandths(pub i32);
 
 /// Where one part is in its motion: what to turn, shift, scale and tint it by.
@@ -31,8 +31,6 @@ pub struct PartPose {
     pub scale_y: Thousandths,
     /// How much of the part's ink shows.
     pub opacity: Thousandths,
-    /// How much of the part's outline is filled in.
-    pub fill: Thousandths,
 }
 
 impl PartPose {
@@ -44,7 +42,6 @@ impl PartPose {
         scale_x: Thousandths(1000),
         scale_y: Thousandths(1000),
         opacity: Thousandths(1000),
-        fill: Thousandths(0),
     };
 }
 
@@ -74,7 +71,6 @@ fn thousandths(value: Thousandths) -> String {
 fn transform(part: &Part, pose: PartPose) -> Option<String> {
     let moved = PartPose {
         opacity: PartPose::REST.opacity,
-        fill: PartPose::REST.fill,
         ..pose
     };
     if moved == PartPose::REST {
@@ -91,33 +87,8 @@ fn transform(part: &Part, pose: PartPose) -> Option<String> {
     ))
 }
 
-/// A shape's dash while `drawn` thousandths of it is drawn: the dash is as long as the stroke
-/// and shifted back by what is still to draw.
-fn dash(shape: &Shape, drawn: Thousandths) -> (String, String) {
-    let length = stroke_length(shape);
-    let left = length * (1000 - drawn.0.clamp(0, 1000)) as f32 / 1000.0;
-    (format!("{length:.2}"), format!("{left:.2}"))
-}
-
-/// `shape`, drawn `drawn` thousandths of the way when that is under 1000.
-fn drawn_shape(shape: &Shape, drawn: Thousandths) -> Element {
-    if drawn.0 >= 1000 {
-        return shape_element(shape);
-    }
-    // A round cap would leave a dot at the start of a stroke with nothing drawn.
-    if drawn.0 <= 0 {
-        return rsx! {
-            g { opacity: "0", {shape_element(shape)} }
-        };
-    }
-    let (array, offset) = dash(shape, drawn);
-    rsx! {
-        g { "stroke-dasharray": "{array}", "stroke-dashoffset": "{offset}", {shape_element(shape)} }
-    }
-}
-
 /// `icon` at `size` with each of its [`Icon::parts`] at the pose given in the same order (a part
-/// past the poses rests), and every stroke drawn `drawn` thousandths of the way. The shapes in no
+/// past the poses rests), wiped in from the left `drawn` thousandths of the way. The shapes in no
 /// part never move.
 #[component]
 pub fn PosedGlyph(
@@ -127,49 +98,60 @@ pub fn PosedGlyph(
     #[props(default = Thousandths(1000))] drawn: Thousandths,
 ) -> Element {
     let px = size.px();
-    let stroke = stroke_width(size, use_scale());
-    let shapes = icon.shapes();
+    let wipe = use_hook(|| format!("ds-wipe-{}", current_scope_id().0));
+    let solid = icon.solid_parts().unwrap_or_else(|| SolidParts {
+        still: icon.solid_shapes().to_vec(),
+        parts: Vec::new(),
+    });
     let parts = icon.parts().map_or(&[][..], |annotation| annotation.parts);
-    let moving = |index: usize| parts.iter().any(|part| part.shapes.contains(&index));
+    let width = format!("{:.2}", 0.024 * drawn.0.clamp(0, 1000) as f32);
+    let content = rsx! {
+        for shape in solid.still.iter() {
+            {shape_element(shape)}
+        }
+        for (number , part) in parts.iter().enumerate() {
+            {part_group(part, poses.get(number).copied().unwrap_or(PartPose::REST), solid.parts.get(number))}
+        }
+    };
     rsx! {
         svg {
             class: "ds-ic",
             "data-size": "{px}",
+            "data-style": "solid",
             width: "{px}",
             height: "{px}",
             view_box: "0 0 24 24",
             "aria-hidden": "true",
-            "stroke": "currentColor",
-            "stroke-width": stroke,
-            "stroke-linecap": "round",
-            "stroke-linejoin": "round",
-            "fill": "none",
-            for shape in shapes.iter().enumerate().filter(|(index, _)| !moving(*index)).map(|(_, shape)| shape) {
-                {drawn_shape(shape, drawn)}
+            "stroke": "none",
+            "fill": "currentColor",
+            if drawn.0 < 1000 {
+                defs {
+                    clipPath { id: "{wipe}",
+                        rect { x: "0", y: "0", width: "{width}", height: "24" }
+                    }
+                }
             }
-            for (number , part) in parts.iter().enumerate() {
-                {part_group(part, poses.get(number).copied().unwrap_or(PartPose::REST), shapes, drawn)}
+            if drawn.0 < 1000 {
+                g {
+                    opacity: (drawn.0 <= 0).then_some("0"),
+                    "clip-path": (drawn.0 > 0).then(|| format!("url(#{wipe})")),
+                    {content}
+                }
+            } else {
+                {content}
             }
         }
     }
 }
 
 /// One part's `g`: its shapes under its pose.
-fn part_group(
-    part: &Part,
-    pose: PartPose,
-    shapes: &'static [Shape],
-    drawn: Thousandths,
-) -> Element {
-    let fill = (pose.fill.0 > 0).then(|| thousandths(pose.fill));
+fn part_group(part: &Part, pose: PartPose, shapes: Option<&Vec<Shape>>) -> Element {
     rsx! {
         g {
             transform: transform(part, pose),
             opacity: (pose.opacity != PartPose::REST.opacity).then(|| thousandths(pose.opacity)),
-            fill: fill.as_ref().map(|_| "currentColor"),
-            "fill-opacity": fill,
-            for shape in part.shapes.iter().filter_map(|&index| shapes.get(index)) {
-                {drawn_shape(shape, drawn)}
+            for shape in shapes.into_iter().flatten() {
+                {shape_element(shape)}
             }
         }
     }
@@ -213,12 +195,12 @@ mod tests {
                 "translate(0.0 0.0) translate(5.0 6.0) rotate(-16.0) scale(1.000 1.000) translate(-5.0 -6.0)"
             )
         );
-        // Ink and fill are drawn on the group, not by the transform.
-        let flashed = PartPose {
-            fill: Thousandths(400),
+        // Ink is drawn on the group, not by the transform.
+        let dimmed = PartPose {
+            opacity: Thousandths(400),
             ..PartPose::REST
         };
-        assert_eq!(transform(&part, flashed), None);
+        assert_eq!(transform(&part, dimmed), None);
     }
 
     fn markup(icon: Icon, poses: Vec<PartPose>, drawn: Thousandths) -> String {
@@ -250,44 +232,47 @@ mod tests {
             lid.contains("rotate(-16.0)") && lid.contains("translate(5.0 6.0)"),
             "{html}"
         );
-        assert!(lid.contains("M3 6h18") && lid.contains("M8 6V4"), "{html}");
+        assert!(lid.contains("M4.5 4h15"), "{html}");
         assert!(
-            !lid.contains("M19 6v14") && before.contains("M19 6v14"),
+            !lid.contains("M5.5 8.5h13") && before.contains("M5.5 8.5h13"),
             "{html}"
         );
     }
 
     #[test]
-    fn a_part_at_rest_is_a_bare_group_and_a_layer_dims_by_opacity_and_a_pop_fills() {
+    fn the_glyph_is_solid_a_part_at_rest_is_a_bare_group_and_a_layer_dims_by_opacity() {
         let rest = markup(Icon::Trash, vec![PartPose::REST], Thousandths(1000));
         assert!(
             rest.contains("<g>") && !rest.contains("transform"),
             "{rest}"
         );
+        assert!(
+            rest.contains("fill=\"currentColor\"") && rest.contains("stroke=\"none\""),
+            "{rest}"
+        );
+        assert!(
+            !rest.contains("stroke-width") && !rest.contains("dash"),
+            "{rest}"
+        );
         let dim = PartPose {
             opacity: Thousandths(300),
-            fill: Thousandths(450),
             ..PartPose::REST
         };
         let html = markup(Icon::Wifi, vec![dim; 4], Thousandths(1000));
         assert_eq!(html.matches("opacity=\"0.300\"").count(), 4, "{html}");
-        assert!(
-            html.contains("fill=\"currentColor\"") && html.contains("fill-opacity=\"0.450\""),
-            "{html}"
-        );
     }
 
     #[test]
-    fn a_stroke_draws_on_by_its_dash_and_a_fully_hidden_one_draws_nothing() {
+    fn a_draw_on_wipes_from_the_left_and_a_fully_hidden_one_draws_nothing() {
         let half = markup(Icon::Trash, Vec::new(), Thousandths(500));
         assert!(
-            half.contains("stroke-dasharray=\"18.00\"")
-                && half.contains("stroke-dashoffset=\"9.00\""),
+            half.contains("<clipPath") && half.contains("width=\"12.00\""),
             "{half}"
         );
+        assert!(half.contains("clip-path=\"url(#ds-wipe-"), "{half}");
         let none = markup(Icon::Trash, Vec::new(), Thousandths(0));
         assert!(none.contains("opacity=\"0\""), "{none}");
         let whole = markup(Icon::Trash, Vec::new(), Thousandths(1000));
-        assert!(!whole.contains("dash"), "{whole}");
+        assert!(!whole.contains("clip"), "{whole}");
     }
 }

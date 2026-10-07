@@ -1,13 +1,16 @@
 //! The layers a status glyph is drawn from: one `svg` per part, stacked in an HTML wrapper, so the
 //! stylesheet can fade, grow or tint each part over `--t-quick` (Blitz's stylesheet does not reach
 //! inside an SVG, spike S6), and the Rust-driven parts (a slash drawn on, a battery's fill) are
-//! recomputed per frame only while they move (design/26-DETAILS.md section 3.2).
+//! recomputed per frame only while they move (design/26-DETAILS.md section 3.2). Every part is
+//! filled in the ink, no stroke (design/08-ICONS.md section 1.2).
 
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
 use ds_motion::detail::pending::Lit;
+use ds_style::icon::posed::Thousandths;
 use ds_style::icon::shape::Shape;
+use ds_style::icon::slash::slash_mark;
 
 /// How much of a part shows.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
@@ -30,15 +33,6 @@ impl Show {
     }
 }
 
-/// How a part is painted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Paint {
-    /// Stroked on the Lucide grid: 2 units, round caps and joins.
-    Stroke,
-    /// Filled in the ink, no stroke: a small mark inside an outline (a bolt, a plug).
-    Fill,
-}
-
 /// One part as drawn this frame.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct Part {
@@ -46,27 +40,19 @@ pub(crate) struct Part {
     pub(crate) name: &'static str,
     /// Its geometry on the 24 grid.
     pub(crate) shapes: &'static [Shape],
-    /// Stroked or filled.
-    pub(crate) paint: Paint,
     /// How much of it shows.
     pub(crate) show: Show,
 }
 
-/// A glyph's size and stroke, read once per render.
+/// A glyph's size, read once per render.
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct Pen {
     /// The side in logical pixels.
     pub(crate) px: u8,
-    /// The stroke width attribute (snapped at fractional scales).
-    pub(crate) stroke: String,
 }
 
 /// `part` as its own `svg.ds-ic.ds-status-part`.
 pub(crate) fn part_svg(part: Part, pen: &Pen) -> Element {
-    let (stroke, fill) = match part.paint {
-        Paint::Stroke => ("currentColor", "none"),
-        Paint::Fill => ("none", "currentColor"),
-    };
     rsx! {
         svg {
             key: "{part.name}",
@@ -76,11 +62,8 @@ pub(crate) fn part_svg(part: Part, pen: &Pen) -> Element {
             width: "{pen.px}",
             height: "{pen.px}",
             view_box: "0 0 24 24",
-            "stroke": stroke,
-            "stroke-width": pen.stroke.clone(),
-            "stroke-linecap": "round",
-            "stroke-linejoin": "round",
-            "fill": fill,
+            "stroke": "none",
+            "fill": "currentColor",
             for shape in part.shapes {
                 {shape_child(shape)}
             }
@@ -88,15 +71,11 @@ pub(crate) fn part_svg(part: Part, pen: &Pen) -> Element {
     }
 }
 
-/// The slash's length on the 24 grid (`M2 2l20 20`), for its dash.
-const SLASH_LENGTH: f32 = 28.29;
-
-/// The slash drawn as far as `drawn` (thousandths), from the top left; nothing at 0.
+/// The slash drawn as far as `drawn` (thousandths), from the top left: a solid bar; nothing at 0.
 pub(crate) fn slash_svg(drawn: Fraction, pen: &Pen) -> Element {
     if drawn.0 == 0 {
         return rsx! {};
     }
-    let offset = SLASH_LENGTH * (1.0 - f32::from(drawn.0.min(1000)) / 1000.0);
     rsx! {
         svg {
             class: "ds-ic ds-status-part",
@@ -105,15 +84,9 @@ pub(crate) fn slash_svg(drawn: Fraction, pen: &Pen) -> Element {
             width: "{pen.px}",
             height: "{pen.px}",
             view_box: "0 0 24 24",
-            "stroke": "currentColor",
-            "stroke-width": pen.stroke.clone(),
-            "stroke-linecap": "round",
-            "fill": "none",
-            path {
-                d: "M2 2l20 20",
-                "stroke-dasharray": "{SLASH_LENGTH}",
-                "stroke-dashoffset": "{offset:.2}",
-            }
+            "stroke": "none",
+            "fill": "currentColor",
+            {slash_mark(Thousandths(i32::from(drawn.0.min(1000))))}
         }
     }
 }

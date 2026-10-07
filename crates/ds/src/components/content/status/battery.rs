@@ -5,50 +5,37 @@
 //! cross-fades the fill to `--battery-low` (R15). No count, no pulse (R12).
 
 use super::battery_state::{BatteryPower, BatteryState, Tone};
-use super::part::{Paint, Part, Pen, Show, part_svg};
+use super::part::{Part, Pen, Show, part_svg};
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_motion::detail::tween::{TweenSpec, use_tween};
+use ds_style::icon::Icon;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
-use ds_style::icon::stroke::stroke_width;
-use ds_style::scale::use_scale;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
-/// Lucide `battery`'s outline: the body and the terminal.
-const OUTLINE: &[Shape] = &[
-    Shape::Rect {
-        x: "2",
-        y: "6",
-        width: "16",
-        height: "12",
-        rx: "2",
-    },
-    Shape::Path("M22 14v-4"),
-];
-
 /// A filled bolt centred in the body.
-const BOLT: &[Shape] = &[Shape::Path("M11 7.5 7.5 12.5h2.25L9 16.5l3.5-5h-2.25z")];
+const BOLT: &[Shape] = &[Shape::Path("M12 7.5 8.5 12.5h2.25L10 16.5l3.5-5h-2.25z")];
 
 /// A filled plug centred in the body: two prongs, the head, the cord.
 const PLUG: &[Shape] = &[
     Shape::Rect {
-        x: "8",
+        x: "9",
         y: "8",
         width: "1",
         height: "2",
         rx: "0",
     },
     Shape::Rect {
-        x: "11",
+        x: "12",
         y: "8",
         width: "1",
         height: "2",
         rx: "0",
     },
-    Shape::Path("M7.5 10h5v1.75a2.5 2.5 0 0 1-5 0z"),
+    Shape::Path("M8.5 10h5v1.75a2.5 2.5 0 0 1-5 0z"),
     Shape::Rect {
-        x: "9.5",
+        x: "10.5",
         y: "13.5",
         width: "1",
         height: "2.5",
@@ -62,11 +49,11 @@ const FILL: TweenSpec = TweenSpec {
     easing: EasingToken::Linear,
 };
 
-/// The fill's box inside the body, on the 24 grid: a unit of air inside the stroke.
-const FILL_X: f32 = 4.5;
-const FILL_Y: f32 = 8.5;
-const FILL_WIDTH: f32 = 11.0;
-const FILL_HEIGHT: f32 = 7.0;
+/// The fill's box inside the body, on the 24 grid: a unit of air inside the body's wall.
+const FILL_X: f32 = 3.5;
+const FILL_Y: f32 = 8.0;
+const FILL_WIDTH: f32 = 14.5;
+const FILL_HEIGHT: f32 = 8.0;
 
 /// Which mark shows, and whether the fill dims under it.
 fn marks(power: BatteryPower) -> (Show, Show, &'static str) {
@@ -94,15 +81,12 @@ pub fn BatteryGlyph(
 ) -> Element {
     let share = use_tween(state.drawn(), FILL);
     let look = state.look();
-    let pen = Pen {
-        px: size.px(),
-        stroke: stroke_width(size, use_scale()),
-    };
+    let pen = Pen { px: size.px() };
     let (bolt, plug, under) = marks(look.power);
     let width = FILL_WIDTH * f32::from(share.0.min(1000)) / 1000.0;
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "battery", "aria-hidden": "true",
-            {part_svg(Part { name: "outline", shapes: OUTLINE, paint: Paint::Stroke, show: Show::Lit }, &pen)}
+            {part_svg(Part { name: "outline", shapes: Icon::Battery.solid_shapes(), show: Show::Lit }, &pen)}
             svg {
                 class: "ds-ic ds-status-part",
                 "data-part": "fill",
@@ -118,8 +102,8 @@ pub fn BatteryGlyph(
                     rect { x: "{FILL_X}", y: "{FILL_Y}", width: "{width:.2}", height: "{FILL_HEIGHT}", rx: "1" }
                 }
             }
-            {part_svg(Part { name: "bolt", shapes: BOLT, paint: Paint::Fill, show: bolt }, &pen)}
-            {part_svg(Part { name: "plug", shapes: PLUG, paint: Paint::Fill, show: plug }, &pen)}
+            {part_svg(Part { name: "bolt", shapes: BOLT, show: bolt }, &pen)}
+            {part_svg(Part { name: "plug", shapes: PLUG, show: plug }, &pen)}
         }
     }
 }

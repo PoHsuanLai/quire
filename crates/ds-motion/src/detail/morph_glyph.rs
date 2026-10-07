@@ -15,19 +15,16 @@ use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::appearance::motion::MotionLevel;
 use ds_style::icon::Icon;
+use ds_style::icon::posed::Thousandths;
 use ds_style::icon::render::{Glyph, IconSize};
-use ds_style::icon::stroke::stroke_width;
+use ds_style::icon::slash::slash_mark;
 use ds_style::icon::style::GlyphStyle;
-use ds_style::scale::use_scale;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// The incoming glyph's fade.
 const FADE_IN: Anim = Anim::MorphFadeIn;
 /// The outgoing glyph's fade.
 const FADE_OUT: Anim = Anim::MorphFadeOut;
-
-/// The slash's length on the 24-unit grid (`M2 2l20 20`), for its dash.
-const SLASH_LENGTH: f32 = 28.29;
 
 /// What the glyph shows, compared as drawn (R2): the same icon and slash is no morph.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -87,15 +84,13 @@ pub fn MorphGlyph(
     let shown = *seen.peek();
     let playing = timer.phase() == TimerPhase::Running && shown.before.is_some();
     let px = size.px();
-    let stroke = stroke_width(size, use_scale());
-    // The slash is a stroke laid across the glyph, which a solid body would hide: a slash morph
-    // draws its glyph as an outline.
-    let look = match style {
-        MorphStyle::Slash => GlyphStyle::Outline,
-        _ => look,
+    // The slash is a solid bar across a solid glyph: the glyph gives it a clear margin, cut out
+    // as far as the slash is drawn.
+    let drawn = Thousandths(slash.frame().value.clamp(0, 1000) as i32);
+    let cut = match style {
+        MorphStyle::Slash => drawn,
+        _ => Thousandths::default(),
     };
-    let drawn = slash.frame().value.clamp(0, 1000);
-    let offset = SLASH_LENGTH * (1.0 - drawn as f32 / 1000.0);
     let alias = if shown.round.is_multiple_of(2) {
         "b"
     } else {
@@ -109,7 +104,7 @@ pub fn MorphGlyph(
                     class: "ds-morph-layer {FADE_OUT.class()}",
                     "data-morph": "out",
                     "data-pulse": alias,
-                    Glyph { icon: before, size, style: look }
+                    Glyph { icon: before, size, style: look, cut }
                 }
             }
             span {
@@ -117,23 +112,17 @@ pub fn MorphGlyph(
                 class: if playing { format!("ds-morph-layer {}", FADE_IN.class()) } else { "ds-morph-layer".to_owned() },
                 "data-morph": if playing { "in" } else { "still" },
                 "data-pulse": playing.then_some(alias),
-                Glyph { icon, size, style: look }
+                Glyph { icon, size, style: look, cut }
             }
-            if style == MorphStyle::Slash && drawn > 0 {
+            if style == MorphStyle::Slash && drawn.0 > 0 {
                 svg {
                     class: "ds-ic ds-morph-slash",
                     width: "{px}",
                     height: "{px}",
                     view_box: "0 0 24 24",
-                    "stroke": "currentColor",
-                    "stroke-width": stroke,
-                    "stroke-linecap": "round",
-                    "fill": "none",
-                    path {
-                        d: "M2 2l20 20",
-                        "stroke-dasharray": "{SLASH_LENGTH}",
-                        "stroke-dashoffset": "{offset:.2}",
-                    }
+                    "stroke": "none",
+                    "fill": "currentColor",
+                    {slash_mark(drawn)}
                 }
             }
         }
