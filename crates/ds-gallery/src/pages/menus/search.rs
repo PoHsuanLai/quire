@@ -9,6 +9,7 @@ use ds::components::content::avatar::{
 };
 use ds::host::measure::Anchor;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 
 const PEOPLE: [(&str, &str); 3] = [
     ("Dana Okafor", "dana@example.com"),

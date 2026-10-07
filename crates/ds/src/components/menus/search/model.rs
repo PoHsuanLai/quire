@@ -77,19 +77,14 @@ pub struct CardPlace {
 }
 
 /// Who says which row is highlighted.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Default)]
 pub enum SearchCursor<T> {
     /// The field's own: keys, the pointer and the initial highlight move it.
+    #[default]
     Own,
     /// The caller's: this row's value (none highlights nothing). A key or the pointer only asks
     /// for a move through `on_highlight`.
     Is(Option<T>),
-}
-
-impl<T> Default for SearchCursor<T> {
-    fn default() -> Self {
-        SearchCursor::Own
-    }
 }
 
 /// The sections as one menu: each non-empty section's header over its rows, a rule between
