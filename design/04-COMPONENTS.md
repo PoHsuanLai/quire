@@ -355,7 +355,7 @@ Mapping: `.tool` -> `[data-variant=tool]`; `.foot-btn` -> `[data-variant=foot]`;
 #[component] pub fn IconButton(
     variant: IconButtonVariant,        // Tool | Foot | Strip | Pin | Status
     #[props(into)] icon: IconSource, label: String, // Icon converts; label -> aria-label (required)
-    #[props(default)] tooltip: Option<String>,   // -> title; Strip uses Tooltip::Fly instead
+    #[props(default)] tooltip: Option<String>,   // -> Button's `title`: a Hint on the Tip profile (warm, hides on press); inside a Tooltip none
     #[props(default)] pressed: Option<Switch>,   // Pin
     #[props(default)] expanded: Option<Switch>,  // Tool that owns a Menu
     #[props(default)] availability: Availability,

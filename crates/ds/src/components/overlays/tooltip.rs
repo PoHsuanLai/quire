@@ -79,6 +79,11 @@ pub fn Tooltip(
     }
 }
 
+/// Context a hint provides to what it wraps: a control inside already has its tip, so it draws
+/// none of its own from `title` (a control wrapped in a `Tooltip` never shows two).
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Hinted;
+
 /// The hover key a hint files its target under: its own, so two hints never share a card.
 fn own_key() -> HoverKey {
     HoverKey(format!("hint:{}", current_scope_id().0))
@@ -98,6 +103,7 @@ pub fn Hint(
     #[props(default)] children: Element,
 ) -> Element {
     let own = use_hook(own_key);
+    use_context_provider(|| Hinted);
     let hooked = hover_key.is_some();
     let key = hover_key.unwrap_or(own);
     let hub = use_hover_hub();

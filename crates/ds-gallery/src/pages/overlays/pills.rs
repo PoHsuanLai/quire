@@ -10,7 +10,7 @@ use ds::components::app::send_pill::SEND_COUNTDOWN;
 use ds::components::app::send_pill::SEND_TICK;
 use ds::components::app::send_pill::SendPill;
 use ds::components::content::avatar::{AvatarSize, AvatarTone};
-use ds::components::controls::button_model::Bezel;
+use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::overlays::hover_card::target::{HoverTarget, TargetElement};
 use ds::motion::detail::operation::Operation;
@@ -69,7 +69,7 @@ pub fn Cards() -> Element {
     rsx! {
         Section {
             title: "Hover cards and tooltips",
-            note: "Rest the pointer on a target: 500 ms to open a card, 150 ms to close, then warm for 400 ms so the next opens at once; a tooltip waits 1 s cold. The pinned people below are li targets (TargetElement::Li).",
+            note: "Rest the pointer on a target: 500 ms to open a card, 150 ms to close, then warm for 400 ms so the next opens at once; a tooltip waits 1 s cold. The pinned people below are li targets (TargetElement::Li). A control's title is a tooltip too: hover the two toolbar icons (the first waits a second, the second then shows at once; a press hides it); inside a Tooltip a control shows only that one.",
             div { class: "g-row",
                 for (kind , key , text) in TARGETS {
                     HoverTarget { hover_key: HoverKey(key.to_string()), kind,
@@ -83,6 +83,10 @@ pub fn Cards() -> Element {
                         Button { bezel: Bezel::Inline, label: format!("Pinned: {name} (li target)"), onclick: |_| {} }
                     }
                 }
+            }
+            div { class: "g-row",
+                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Archive)), label: "Archive", title: Some("Archive (title)".to_owned()), onclick: |_| {} }
+                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Reply)), label: "Reply", title: Some("Reply (title)".to_owned()), onclick: |_| {} }
             }
             div { class: "g-row",
                 Tooltip { text: "Archive → out of Inbox",

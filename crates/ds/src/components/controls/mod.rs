@@ -5,6 +5,7 @@ pub mod badge;
 pub mod button;
 pub mod button_marks;
 pub mod button_model;
+mod button_tip;
 pub mod checkbox;
 pub mod chip;
 pub mod choice;

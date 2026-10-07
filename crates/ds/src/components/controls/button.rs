@@ -13,6 +13,7 @@ use crate::components::controls::button_marks::{Leading, Trailing, spoken_label}
 use crate::components::controls::button_model::{
     Answers, Bezel, BusyLook, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
 };
+use crate::components::controls::button_tip::use_tip;
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
     ActivationKeys, PressListeners, Propagation, disabled, use_pressing,
@@ -53,7 +54,9 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 ///
 /// `value` makes it a toggle button: `Check::On` draws it pressed in (`aria-pressed`). `shown`
 /// says whether the menu or panel this button opens is up (`aria-expanded`); leave it `None` on a
-/// button that opens nothing. `title` is the hover hint.
+/// button that opens nothing. `title` is the hover hint: a Mac tooltip through the hover hub
+/// (`button_tip`), drawn as a hint below the button; inside a `Tooltip` it draws nothing (the
+/// caller's tip stands), and outside a `Ds` it is the plain `title` attribute.
 ///
 /// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an
 /// element such as a `ProviderMark`).
@@ -124,7 +127,8 @@ pub fn Button(
             Activity::Idle
         },
     ));
-    rsx! {
+    let tip = use_tip(title);
+    let face = rsx! {
         button {
             r#type: "button",
             id: common.id.clone(),
@@ -137,7 +141,7 @@ pub fn Button(
             "data-availability": availability.slug(),
             "data-busy": turning.then_some(BusyLook::TurnIcon.slug()),
             "data-state": value.map(|state| state.slug()),
-            title,
+            title: tip.native(),
             "aria-label": aria_label,
             "aria-pressed": value.map(Check::aria),
             "aria-expanded": shown.map(Shown::aria),
@@ -211,7 +215,8 @@ pub fn Button(
                 {trailing_mark(mark, glyph)}
             }
         }
-    }
+    };
+    tip.wrap(face)
 }
 
 /// `icon` at `size`; a quire glyph under `IconSwap::CrossFade` fades into the next one it is

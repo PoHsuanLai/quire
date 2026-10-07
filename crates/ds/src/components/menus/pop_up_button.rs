@@ -209,6 +209,11 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 size,
                 availability,
                 trailing,
+                // An overflow draws no words, so its name is its tooltip too.
+                title: match kind {
+                    PopUpKind::Overflow => Some(label.clone()),
+                    PopUpKind::PopUp | PopUpKind::PullDown => None,
+                },
                 shown: Some(shown),
                 onclick: move |_: Press| {
                     if live {
