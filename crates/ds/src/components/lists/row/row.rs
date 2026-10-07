@@ -252,7 +252,7 @@ pub fn Row(
             },
             ..data,
             {triangle}
-            {leading::draw(&leading, &shape, selection)}
+            {leading::draw(&leading, &shape)}
             {words}
             {when}
             if !asking {

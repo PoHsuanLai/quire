@@ -59,11 +59,8 @@ pub(crate) fn row_slug(leading: &RowLeading, shape: &RowShape) -> Option<&'stati
 
 /// The leading part drawn. A file row's thumbnail takes the place of whatever leads it.
 ///
-/// The span is keyed by `selection`: a glyph's `currentColor` is baked into its box when Blitz
-/// builds it and a later `color` change does not repaint it, so a row that is selected or
-/// deselected would keep its old ink (white on the white ground, dark on the accent). A new key
-/// builds the glyph again in the colour it now has (blitz-gaps, "A colour-only restyle").
-pub(crate) fn draw(leading: &RowLeading, shape: &RowShape, selection: Selection) -> Element {
+/// A glyph's `currentColor` follows the row's ink through a selection change with no remount.
+pub(crate) fn draw(leading: &RowLeading, shape: &RowShape) -> Element {
     if let Some(thumb) = shape.thumb_src() {
         return rsx! {
             span { class: "ds-row-leading", "data-leading": "thumb",
@@ -96,7 +93,6 @@ pub(crate) fn draw(leading: &RowLeading, shape: &RowShape, selection: Selection)
     };
     rsx! {
         span {
-            key: "{selection.aria()}",
             class: "ds-row-leading",
             "data-leading": slug,
             "data-disc": disc,
