@@ -384,6 +384,18 @@ const SPECIMENS: &[Specimen] = &[
     ("working", || {
         rsx! { SignInWorking { provider: "Fastmail", on_cancel: |_| {} } }
     }),
+    ("failed-google-client-id", || {
+        rsx! {
+            SignInFailed {
+                provider: "Google",
+                why: SignInFault::NeedsClientId,
+                mark: Some(MarkProvider::Google),
+                on_retry: |_| {},
+                on_back: |_| {},
+                on_cancel: |_| {},
+            }
+        }
+    }),
     ("failed-unreachable", || failed(SignInFault::Unreachable)),
     ("failed-forbidden", || failed(SignInFault::Forbidden)),
     ("review", || review(None)),
@@ -667,5 +679,13 @@ fn the_default_provider_mark_is_the_letter() {
     assert_eq!(
         provider("x", "X", MarkProvider::Google).style,
         MarkStyle::Letter
+    );
+}
+
+#[test]
+fn the_failed_step_says_where_google_looks() {
+    assert!(
+        light("failed-google-client-id")
+            .contains("Google sign-in needs a client id: see docs/google.md")
     );
 }

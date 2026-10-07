@@ -1,6 +1,8 @@
 //! Every sentence the account sheets say, and the small decisions that read from them: which
 //! providers a search keeps, whether a form may continue. Pure, so a table can test each one.
 
+use ds::components::content::provider_mark::MarkProvider;
+
 use super::model::{
     AccountChoice, ChoiceKey, FieldProblem, FieldRole, FormField, FormPart, Limitation,
     NoAccountWhy, ProblemKind, ProviderEntry, ProviderPick, Requirement, SignInFault,
@@ -114,22 +116,27 @@ pub(crate) fn limitation(limit: Limitation) -> &'static str {
     }
 }
 
-/// What is said when a sign-in ended without an account.
-pub(crate) fn fault(fault: SignInFault) -> &'static str {
-    match fault {
+/// What is said when a sign-in ended without an account. `label` names the account being added;
+/// `provider` is its mark, when the host knows it.
+pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvider>) -> String {
+    let text = match fault {
         SignInFault::Refused => "The provider did not accept what was entered.",
         SignInFault::Unreachable => {
             "The server could not be reached. Check the address and your connection."
         }
         SignInFault::Unreadable => "The server answered in a way this desktop cannot read.",
-        SignInFault::NeedsClientId => {
-            "This build is not registered with the provider. Add a client id in Settings, under Accounts."
-        }
+        SignInFault::NeedsClientId => match provider {
+            Some(MarkProvider::Google) => "Google sign-in needs a client id: see docs/google.md",
+            _ => {
+                "This build is not registered with the provider. Add a client id in Settings, under Accounts."
+            }
+        },
         SignInFault::TimedOut => "Signing in took too long and was stopped.",
         SignInFault::Cancelled => "Signing in was cancelled.",
         SignInFault::Forbidden => "Your organisation or the provider does not allow this.",
         SignInFault::StoreFailed => "Signed in, but the account could not be saved.",
-    }
+    };
+    text.to_owned()
 }
 
 /// The title and the line of the empty state for an app with no account.
@@ -217,7 +224,6 @@ mod tests {
     use super::*;
     use crate::accounts::hidden::Hidden;
     use crate::accounts::model::{Attempt, ChoiceKey, FieldText, ProviderKey};
-    use ds::components::content::provider_mark::MarkProvider;
     use ds_core::word::Word;
 
     fn entry(key: &str, label: &str) -> ProviderEntry {
@@ -403,12 +409,38 @@ mod tests {
 
     #[test]
     fn every_fault_has_its_own_sentence() {
-        let sentences: Vec<&str> = SignInFault::ALL.iter().map(|f| fault(*f)).collect();
+        let sentences: Vec<String> = SignInFault::ALL
+            .iter()
+            .map(|f| fault(*f, "Ada", None))
+            .collect();
         let mut unique = sentences.clone();
         unique.sort_unstable();
         unique.dedup();
         assert_eq!(unique.len(), sentences.len(), "{sentences:?}");
-        assert!(sentences.iter().all(|s| s.ends_with('.')), "{sentences:?}");
+        assert!(
+            sentences
+                .iter()
+                .filter(|s| !s.contains("Ada"))
+                .all(|s| s.ends_with('.')),
+            "{sentences:?}"
+        );
+    }
+
+    #[test]
+    fn google_needs_a_client_id_says_where_to_look_and_others_keep_their_text() {
+        let google = fault(
+            SignInFault::NeedsClientId,
+            "Ada",
+            Some(MarkProvider::Google),
+        );
+        assert_eq!(
+            google,
+            "Google sign-in needs a client id: see docs/google.md"
+        );
+        for provider in [None, Some(MarkProvider::Imap)] {
+            let other = fault(SignInFault::NeedsClientId, "Ada", provider);
+            assert!(other.starts_with("This build is not registered"), "{other}");
+        }
     }
 
     #[test]

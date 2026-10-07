@@ -7,6 +7,7 @@ use super::model::SignInFault;
 use super::model::StepTitle;
 use super::wording::fault;
 use dioxus::prelude::*;
+use ds::components::content::provider_mark::MarkProvider;
 
 /// The failure step for `provider`. Return is "Try Again", Escape and Cancel call `on_cancel`.
 #[component]
@@ -17,8 +18,9 @@ pub fn SignInFailed(
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
     #[props(default)] title: StepTitle,
+    #[props(default)] mark: Option<MarkProvider>,
 ) -> Element {
-    let sentence = fault(why);
+    let sentence = fault(why, &provider, mark);
     rsx! {
         StepFrame {
             shown: title,
