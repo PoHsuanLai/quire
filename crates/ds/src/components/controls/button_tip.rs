@@ -24,7 +24,7 @@ enum Say {
     /// The plain `title` attribute: no `Ds` here provides a hub to draw a tip with.
     Native(String),
     /// A tooltip through the hover hub.
-    Tip(String, HoverDriver),
+    Tip(String, Box<HoverDriver>),
 }
 
 /// A control's title and the handles that show it. Built once per render; cloning it is cheap.
@@ -43,7 +43,7 @@ pub(crate) fn use_tip(title: Option<String>) -> Tip {
     let hinted = try_consume_context::<Hinted>().is_some();
     let say = match (title, driver, hinted) {
         (None, _, _) | (Some(_), _, true) => Say::Nothing,
-        (Some(text), Some(driver), false) => Say::Tip(text, driver),
+        (Some(text), Some(driver), false) => Say::Tip(text, Box::new(driver)),
         (Some(text), None, false) => Say::Native(text),
     };
     Tip { say, key, element }
