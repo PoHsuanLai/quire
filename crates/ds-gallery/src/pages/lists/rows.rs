@@ -86,7 +86,7 @@ fn Accessories() -> Element {
     rsx! {
         Section {
             title: "Row: accessories",
-            note: "The trailing end: Check (a dash while Mixed), a Toggle of its own (flipping it does not run the row), Chevron, Text, Glyph, Battery (the glyph and its percentage), Spinner, Badge, and a caller's Slot. A busy row shows the small spinner in place of any of them.",
+            note: "The trailing end: Check (a dash while Mixed), a Toggle of its own (flipping it does not run the row), Chevron, Text, Glyph, Battery (the glyph and its percentage), Spinner, Badge (a count as plain semibold tabular text in the secondary ink, as Mail's sidebar draws it: no capsule), and a caller's Slot. A busy row shows the small spinner in place of any of them.",
             div { class: "g-list g-stage-pad",
                 List::<&'static str> {
                     label: "Accessories",
