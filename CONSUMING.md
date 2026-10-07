@@ -1784,3 +1784,32 @@ always had, and the person's still beat both (`ds_style::css::layers` holds the 
 variables, selectors outside the public surface, `!important`, `url()` that is not a local `file:` or `data:`
 URL, parse errors with line numbers). A settings page or a `--check-style` command can print
 them; loading never waits on them. User CSS is exempt from the design-system lint rules.
+
+## 13. Portable core, desktop extras
+
+Your app is complete without our desktop; on it, the app does more (design/36-PORTABLE-CORE.md
+is the rule and the table of who is what). Three things follow for a consumer.
+
+- **Feature.** Put desktop integration in a `desktop/` module behind a `quire-desktop` feature,
+  default on for Linux (`[target.'cfg(target_os = "linux")'.dependencies]` or a `default`
+  entry your packaging sets). Core modules never import `crate::desktop` or zbus, and
+  `cargo check --workspace --no-default-features` must pass. Run
+  `quire/scripts/check-portable.sh <your-workspace-dir>` from your lane gate to check both.
+- **Probe.** `ds-desktop` (features `dbus`, `dioxus`) answers `Capability::{Intents, Accounts,
+  Memory, Companion, Appearance, Materials, Peek, Share, Helpers}` as `Presence::{Here,
+  Absent}`. `Desktop::probe().await` once, `Desktop::watch()` to follow services starting and
+  stopping, or `use_desktop()` in a component for a signal. Without `dbus` everything is `Absent`.
+- **Gate the entry point, not the behaviour.** An extra's menu item, button or settings pane is
+  rendered only under `Here`; there is no disabled twin.
+
+```text
+let desktop = use_desktop();
+rsx! {
+    Menu {
+        MenuItem { label: "Open", on_select: open }
+        if desktop.read().here(Capability::Companion) {
+            MenuItem { label: "Ask the companion", on_select: ask }
+        }
+    }
+}
+```

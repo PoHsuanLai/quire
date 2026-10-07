@@ -19,6 +19,9 @@ cd "$(dirname "$0")/.."
 # and effect-free; ds-settings does I/O but never renders, and takes a Spawner instead of naming a
 # runtime. ds-helpers (missing helpers: probe PATH, ask PackageKit) is I/O too: zbus only, no
 # renderer, no runtime, no other quire crate.
+# ds-desktop (the capability probe) names zbus only through its opt-in `dbus` feature and dioxus
+# only through `dioxus`, so a build without them links neither; the rule below checks the default
+# build. Its all-features edges are none of ours.
 # ds-blitz reaches D-Bus only through its opt-in `print` and `menus` features, so an app that
 # never prints or exports a menu builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
 # (it turns on `pdf` only for its own `pdf` feature). pdfrum-anyrender (a git dependency
@@ -36,6 +39,7 @@ RULES=(
   "ds: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-settings: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-helpers: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "ds-desktop: zbus dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-blitz: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
   "ds-harness: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
   "ds-core-derive: dioxus zbus tokio"
@@ -82,6 +86,7 @@ EDGES=(
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-behaviour ds-core ds-style ds-settings-derive"
   "ds-helpers:"
+  "ds-desktop:"
   "ds-blitz: blitz-kit ds"
   "ds-harness: blitz-kit ds ds-blitz ds-core"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"

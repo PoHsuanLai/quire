@@ -162,6 +162,14 @@ remembers.
   return futures.
 - **Timing comes from tokens and timelines**, never from ad-hoc `sleep`s. Animation state is
   driven by `Timeline`/`Presence`, never by a per-component timer.
+- **Portable core, desktop extras (the text other repos copy; design/36-PORTABLE-CORE.md).**
+  Every app and service is complete without our desktop. Desktop integration lives in a
+  `desktop/` module (or a `dbus` module of a client crate) behind the Cargo feature
+  `quire-desktop`, default on for `target_os = "linux"`; core modules never import it or zbus,
+  and the repo builds with `--no-default-features` (`scripts/check-portable.sh <dir>` checks
+  both). An extra shows only when `ds_desktop` reports its capability `Here`, probed at runtime
+  and never inferred from the OS; a missing service means the core path, with no disabled
+  control and no "requires desktop" placeholder.
 - **Proposed values are settings.** Every value the design docs mark "proposed" is read from a
   settings key (`design/22-SETTINGS.md`) with that default, never hard-coded.
 

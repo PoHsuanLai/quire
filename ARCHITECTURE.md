@@ -29,6 +29,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
 | `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family, the PackageKit installer (and a fake), the availability feed |
+| `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus` |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
@@ -51,6 +52,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-settings-derive` |
 | `ds-helpers` | nothing of ours |
+| `ds-desktop` | nothing of ours |
 | `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
@@ -74,6 +76,7 @@ Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds`
 | `ds-motion` | `dioxus` unless feature `dioxus` (recipes, keyframes, springs, throws, timelines, `Touch` as data; the hooks, timers and `Touch`'s event conversions are the feature) |
 | `ds-settings` | every `blitz*`, `dioxus-native*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (it takes a `Spawner`); `dioxus` unless feature `dioxus` |
 | `ds-helpers` | every `blitz*`, `dioxus*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (zbus brings its own executor; the tests use tokio as a dev-dependency) |
+| `ds-desktop` | every `blitz*`, `anyrender*`, `wgpu`, `wgpu_context`; `tokio` (dev-dependency only); `zbus` unless feature `dbus`; `dioxus` unless feature `dioxus` |
 | `ds-blitz` | `zbus` unless feature `print` or `menus`; `memfd` unless `print`; `pdfrum*` unless `pdf` |
 | `blitz-kit` | every `ds*` crate, `dioxus*` |
 

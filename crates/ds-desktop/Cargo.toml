@@ -1,0 +1,30 @@
+[package]
+name = "ds-desktop"
+description = "Which extras of our desktop are here: a capability probe over D-Bus name ownership, with a Dioxus hook. Everything is Absent without the dbus feature."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+dioxus = { workspace = true, optional = true }
+zbus = { workspace = true, optional = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[features]
+# `Desktop::probe` and `Desktop::watch` over the session bus (and the system bus for PackageKit).
+# Without it every capability is Absent and zbus is not in the dependency tree.
+dbus = ["dep:zbus"]
+# `use_desktop`, the signal a component gates a desktop extra on.
+dioxus = ["dep:dioxus"]
+
+[[test]]
+name = "private_bus"
+required-features = ["dbus"]

@@ -1730,6 +1730,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-desktop"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "tokio",
+ "zbus",
+]
+
+[[package]]
 name = "ds-gallery"
 version = "0.1.0"
 dependencies = [

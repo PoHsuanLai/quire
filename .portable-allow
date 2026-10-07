@@ -1,0 +1,7 @@
+# Crates whose job is D-Bus (see scripts/check-portable.sh). Each reaches zbus by design; the
+# portable gate for quire is that they stay behind their crate boundary (check-boundary.sh), and
+# that ds-desktop names zbus only under its `dbus` feature.
+^\./crates/ds-settings/src/(live/|portal\.rs)
+^\./crates/ds-helpers/src/
+^\./crates/ds-blitz/src/(menus|print)
+^\./crates/ds-desktop/src/
