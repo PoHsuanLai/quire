@@ -2,7 +2,7 @@
 //! what is typed, New Space opening its name at once, Delete asking first, and Delete missing
 //! for the last Space.
 
-use crate::support::spaces_page::{One, Three};
+use crate::support::spaces_page::{One, Three, WithAccounts};
 use dioxus::prelude::Element;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
@@ -139,4 +139,45 @@ fn delete_asks_and_only_its_button_deletes() {
     harness.advance(ms(400));
     assert_eq!(dots(&harness), 2);
     assert_eq!(harness.count(".ds-space-delete"), 0);
+}
+
+#[test]
+fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
+    let mut harness = harness(WithAccounts);
+    open_menu(&mut harness);
+    // Rows: Rename, Colour, Appearance, Accent, Accounts, rule, New Space, Delete.
+    let accounts = harness
+        .centre(".ds-menu-item:nth-child(5) .ds-menu-label")
+        .expect("the Accounts row");
+    harness.send(Input::click(accounts));
+    harness.advance(ms(400));
+    let ada = harness
+        .centre(".ds-menu[data-depth=\"1\"] .ds-menu-item:nth-child(1) .ds-menu-label")
+        .unwrap_or_else(|| panic!("no submenu:\n{}", harness.html()));
+    harness.send(Input::click(ada));
+    harness.advance(ms(100));
+    assert_eq!(
+        harness.text_of(".extra-log").as_deref(),
+        Some("Ada"),
+        "on_extra heard the item"
+    );
+    assert!(harness.count(".ds-menu") > 0, "the menu stays open");
+    let bo = harness
+        .centre(".ds-menu[data-depth=\"1\"] .ds-menu-item:nth-child(2) .ds-menu-label")
+        .expect("the second account");
+    harness.send(Input::click(bo));
+    harness.advance(ms(100));
+    assert_eq!(
+        harness.text_of(".extra-log").as_deref(),
+        Some("AdaBo"),
+        "and another can be picked"
+    );
+    // A kit row closes it: New Space is row 7 here.
+    let new = harness
+        .centre(".ds-menu-item:nth-child(7) .ds-menu-label")
+        .expect("New Space");
+    harness.send(Input::click(new));
+    harness.advance(ms(500));
+    assert_eq!(harness.count(".ds-menu"), 0, "a kit row closes the menu");
+    assert_eq!(harness.count(".ds-spaces-dot-hold"), 3, "and did its work");
 }

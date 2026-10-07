@@ -128,3 +128,44 @@ fn nowhere_to_write_keeps_the_spaces_for_the_session() {
     assert_eq!((spaces.count(), origin), (2, Origin::FirstRun));
     assert!(disk.save_spaces(&spaces).is_err());
 }
+
+#[test]
+fn a_mailo_shaped_today_keeps_its_entries_parked_drafts_and_prunes() {
+    // mailo's file: RFC 3339 `last_opened` and `parked`, and the `drafts` key.
+    let text = r#"{
+      "entries": [
+        {"space": 0, "item": 7, "last_opened": "2023-11-14T22:13:20Z"},
+        {"space": 1, "item": 8, "last_opened": "2023-11-14T01:00:00.5Z"}
+      ],
+      "drafts": [{"space": 0, "item": 3, "title": "Re: hello", "parked": "2023-11-13T09:00:00+02:00"}]
+    }"#;
+    let scratch = Scratch::new();
+    let disk = storage(&scratch);
+    let state = ConfigRoot::Scratch(scratch.root().to_path_buf())
+        .state_dir(AppName("notes"))
+        .expect("dir");
+    std::fs::create_dir_all(&state).expect("dir");
+    std::fs::write(state.join("today.json"), text).expect("write");
+    let now = Epoch(1_700_000_000 + 60);
+    let today: Today<u32, u32> = disk.boot_today(now);
+    assert_eq!(
+        today.entries.len(),
+        1,
+        "the old entry is pruned, the fresh one kept"
+    );
+    assert_eq!(today.entries[0].item, 7);
+    assert_eq!(today.entries[0].last_opened, Epoch(1_700_000_000));
+    assert_eq!(today.parked.len(), 1, "a parked draft never expires");
+    assert_eq!(today.parked[0].title, "Re: hello");
+    let stored: Today<u32, u32> = disk.load_today();
+    assert_eq!(stored, today, "written back as unix seconds");
+    assert!(
+        std::fs::read_to_string(state.join("today.json"))
+            .expect("read")
+            .contains("1700000000"),
+    );
+    // Before anything expired, the first load keeps every entry.
+    std::fs::write(state.join("today.json"), text).expect("write");
+    let early: Today<u32, u32> = disk.boot_today(Epoch(1_699_920_000));
+    assert_eq!(early.entries.len(), 2);
+}
