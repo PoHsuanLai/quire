@@ -18,6 +18,9 @@ pub(crate) fn stacking(flow: Flow) -> Stacking {
     }
 }
 
+/// The style of a menu whose anchor is not measured yet.
+const UNPLACED: &str = ";visibility:hidden;pointer-events:none";
+
 /// How the menu's element is drawn: a placed popover surface, or bare rows in the flow.
 pub(crate) struct Surface {
     pub class: &'static str,
@@ -43,11 +46,14 @@ impl Surface {
                         float.origin(Some(rect), want, gap)
                     });
                 let width = hung.width_style(field).unwrap_or_default();
+                // Until the anchor is measured the menu has no place: it is laid out (so it can
+                // be measured) but not drawn, and a press cannot land on it.
+                let waiting = field.map_or(UNPLACED, |_| "");
                 Surface {
                     class: "ds-popover ds-menu",
                     elevation: Some("pop"),
                     layer: Some("menu"),
-                    style: Some(position_style(at) + &width),
+                    style: Some(position_style(at) + &width + waiting),
                 }
             }
             Flow::Inline => Surface {

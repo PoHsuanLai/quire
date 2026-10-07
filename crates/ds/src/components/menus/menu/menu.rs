@@ -13,7 +13,7 @@ use crate::components::menus::menu::blink::Blink;
 use crate::components::menus::menu::choices::{Act, Choice, choices};
 use crate::components::menus::menu::cursor::MenuCursor;
 use crate::components::menus::menu::decide::{Decision, Level};
-use crate::components::menus::menu::hand_back::hand_back;
+use crate::components::menus::menu::hand_back::{give_back, hand_back};
 use crate::components::menus::menu::hung::Hung;
 use crate::components::menus::menu::panel::Panel;
 use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, picker};
@@ -26,6 +26,7 @@ use crate::host::measure::{Anchor, MountedRef};
 use crate::root::common::Common;
 use crate::stack::menu_track::types::MenuTiming;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
 use ds_core::press::{PointerButton, Press};
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
@@ -67,6 +68,11 @@ use ds_style::tokens::layer::ZLayer;
 /// move the keyboard, and the menu is as wide as `width` says. Pair it with a
 /// [`MenuCursor::Controlled`] cursor so the field keeps the keyboard.
 ///
+/// `measured` is `anchor`'s rect when the caller already keeps it (a button's, from
+/// [`use_rect`](crate::host::measure::use_rect)): a [`Anchor::Mounted`] menu is placed in its
+/// first frame instead of waiting a few to measure the anchor. Until a mounted anchor's rect is
+/// known the menu is laid out but hidden, and a press closes nothing and reaches nothing.
+///
 /// A floating menu that took the keyboard gives it back when it closes: to the anchor's element
 /// when `anchor` is [`Anchor::Mounted`] (or its nearest focusable ancestor), if it is still
 /// there, through the host's `FocusHost::hand_back`; anchored at a point or a rect, the host gives
@@ -86,9 +92,11 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
     #[props(default)] flow: Flow,
     #[props(default)] hung: Hung,
+    #[props(default)] measured: Option<Rect>,
     #[props(default)] common: Common,
 ) -> Element {
     let float = use_float(ZLayer::Menu, stacking(flow));
+    use_hook(|| float.known(measured));
     let fade = use_motion_timer(Anim::MenuOut);
     let mut closing = use_signal(|| Closing::No);
     let blink = use_signal(Blink::default);
@@ -119,6 +127,10 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
             fade.start(onclose);
         }
     });
+    let handed = {
+        let anchor = anchor.clone();
+        EventHandler::new(move |()| give_back(&anchor, flow, active))
+    };
     let choices = choices(&items);
     let picks = choices.clone();
     let mut panel = Panel {
@@ -136,6 +148,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
             Closer {
                 fade: fade_out,
                 now: onclose,
+                give_back: handed,
             },
         ),
         onhover: None,
@@ -162,7 +175,11 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         let panel = panel.clone();
         move |event: KeyboardEvent| {
             if panel.key(&event) == Decision::CloseMenu {
-                escape_closes(float, &event, fade_out);
+                let close = EventHandler::new(move |()| {
+                    handed.call(());
+                    fade_out.call(());
+                });
+                escape_closes(float, &event, close);
             }
         }
     };

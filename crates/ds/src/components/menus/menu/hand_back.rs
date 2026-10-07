@@ -8,9 +8,16 @@
 //! nearest focusable ancestor) when the panel is removed while it still has it. A menu anchored
 //! at a point or a rect names no element: ds-blitz then hands the keyboard to the element
 //! focused before the menu took it, or to where the pointer pressed to open it.
+//!
+//! A host with no keeper (a shell surface, `FocusFallback::BlitzDefault`) records nothing, so the
+//! menu also gives the keyboard back itself, in the turn that a pick or Escape starts closing it:
+//! [`give_back`]. The opener has it by the time the panel is removed, so the host's hand-back
+//! finds the panel without the keyboard and does nothing; and a pick's own handler, which runs
+//! after, may still move the keyboard on.
 
 use crate::components::menus::menu::cursor::MenuCursor;
 use crate::components::overlays::flow::Flow;
+use crate::focus::soon::focus_soon;
 use crate::host::document::use_document_host;
 use crate::host::measure::{Anchor, MountedRef};
 use dioxus::prelude::*;
@@ -29,4 +36,15 @@ pub(crate) fn hand_back(panel: &MountedData, anchor: &Anchor, flow: Flow, active
         .focus()
         .hand_back()
         .record(panel, Rc::as_ref(opener));
+}
+
+/// Give the keyboard to `anchor`'s element now, for a floating menu that took it: the same menus
+/// and opener as [`hand_back`].
+pub(crate) fn give_back(anchor: &Anchor, flow: Flow, active: MenuCursor) {
+    let Anchor::Mounted(MountedRef(opener)) = anchor else {
+        return;
+    };
+    if active.takes_focus() && flow == Flow::Floating {
+        focus_soon(opener.clone());
+    }
 }
