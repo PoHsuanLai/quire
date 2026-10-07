@@ -127,6 +127,8 @@ fn the_menu_opens_and_closes_under_harness() {
         harness.html()
     );
 
+    // The menu is placed once the document has measured it; the press goes where it settles.
+    harness.advance(std::time::Duration::from_millis(200));
     let item = harness
         .centre(".ds-menu-item")
         .unwrap_or_else(|| panic!("no menu item on screen:\n{}", harness.html()));
