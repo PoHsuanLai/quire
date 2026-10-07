@@ -14,3 +14,6 @@
 .ds-toolbar-title{ display:flex; flex-direction:column; align-items:center; justify-content:center; flex:1 1 0; min-width:0; line-height:1.25; }
 .ds-toolbar-heading{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-control); font-weight:600; color:var(--ink); }
 .ds-toolbar-subtitle{ max-width:100%; overflow:hidden; white-space:nowrap; font-size:var(--fs-help); color:var(--ink-faint); }
+/* The search item: the field at its minimum width, drawn where the magnifier button would be. */
+.ds-toolbar-search{ display:flex; flex:none; min-width:0; max-width:100%; }
+.ds-toolbar-search > .ds-text-field{ flex:1 1 auto; min-width:0; }

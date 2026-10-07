@@ -14,6 +14,8 @@
 .ds-overlay[*|data-layer=card]{ z-index:var(--z-card); }
 .ds-overlay[*|data-layer=menu]{ z-index:var(--z-menu); }
 .ds-overlay-catch{ position:absolute; inset:0; pointer-events:auto; }
+/* A catcher that leaves one element alone (a field a menu hangs from) is four of these around it. */
+.ds-overlay-catch-part{ position:absolute; pointer-events:auto; }
 
 /* A popup root (`RootExtent::Popup`, `root/extent.rs`): the host fits the surface to the root, so
    the overlay, the card and a nested layer lie in flow at the origin (a submenu, `data-depth`,
@@ -21,7 +23,8 @@
    compositor's grab. */
 .ds[*|data-extent=popup] .ds-overlay,
 .ds[*|data-extent=popup] .ds-overlay > .ds-popover:not([*|data-depth]){ position:static; }
-.ds[*|data-extent=popup] .ds-overlay-catch{ display:none; }
+.ds[*|data-extent=popup] .ds-overlay-catch,
+.ds[*|data-extent=popup] .ds-overlay-catch-part{ display:none; }
 
 .ds-popover{ position:absolute; pointer-events:auto; background:var(--raise); color:var(--ink); border:0;
   border-radius:var(--r-menu); box-shadow:var(--shadow-pop); }

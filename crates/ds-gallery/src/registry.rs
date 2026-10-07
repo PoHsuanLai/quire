@@ -68,14 +68,14 @@ pub const REGISTRY: [Entry; 31] = [
         page: Page::Menus,
         title: "Menus",
         lede: "Open each menu placement, the submenus and the status lines; every item state with its highlight posed; the pop-up button at each size. A pick blinks its item twice.",
-        height: 3400,
+        height: 4100,
         body: crate::pages::menus::overview::MenusPage,
     },
     Entry {
         page: Page::Structure,
         title: "Structure",
         lede: "Stepper with its field and bare, DatePicker textual and graphical, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
-        height: 5600,
+        height: 5900,
         body: pages::structure::StructurePage,
     },
     Entry {

@@ -839,6 +839,21 @@ flex wrap, gap 5, padding `0 14px 8px`.
 
 Focus is shown by the caret only (the field is inline). Hover, disabled: not specified.
 
+**Suggestions (`SearchField`, `NSSearchField`).** A search field can own a suggestions panel:
+sections of menu rows, each under an optional header, hung under the field at its width (or a
+minimum) and flipped above it when there is no room below. The panel is a Menu whose cursor the
+field drives (`MenuCursor::Controlled`), so the keyboard never leaves the field: Up and Down move
+the highlight (wrapping, skipping disabled rows; Down reopens a closed panel), Enter picks the
+highlighted row or, with none, submits the text, Escape closes the panel first and clears the
+field second, Tab is the field's own and closes the panel with the caret's leaving. A press on the
+field is inside the panel (the outside-press catcher leaves the field's rect alone, and draws
+nothing until the field is laid out, so a panel that opens mid-press does not swallow the
+release); a press anywhere else closes it. Rows may mark the characters a query matched
+(semibold), lead with an avatar and carry a second line in the faint ink. In a toolbar the field
+is a `ToolbarSearch` item: below its minimum width plus its items it collapses to a magnifier
+button, which opens the field in place with the caret in it (`NSSearchToolbarItem`); an empty
+field folds back when the caret leaves it or on Escape.
+
 **Motion.** None. **Behaviour.** Up/Down move the selection in the list below (clamped, not
 wrapping, `S:1653-1654`); Enter runs; Esc closes. Operators `from: is:unread is:starred
 has:attachment label:` become tokens (`S:1596-1598`). 06-INTERACTIONS "command menu search".

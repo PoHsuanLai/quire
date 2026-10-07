@@ -19,3 +19,7 @@
    section 13.3.3, settled 2026-09-24), inset to the rows' text. */
 .ds-menu-separator{ height:var(--hair); margin:var(--shell-menu-sep) var(--s-8); background:var(--line-soft); }
 .ds-menu-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
+
+/* An inline menu inside a popover's body gets the rows' inset the floating menu's own panel has,
+   so a consumer never pads it by hand. */
+.ds-popover-body .ds-menu[*|data-flow=inline]{ padding:var(--shell-menu-inset); }

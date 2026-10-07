@@ -36,6 +36,7 @@ pub fn MenusPage() -> Element {
         Items {}
         crate::pages::menus::pick::HintsAndPickList {}
         crate::pages::menus::field::FieldAndCard {}
+        crate::pages::menus::search::SearchSuggestions {}
         PopUps {}
     }
 }

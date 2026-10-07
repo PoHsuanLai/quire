@@ -218,6 +218,7 @@ fn entries(support: [Support; 4]) -> Vec<MenuItem<WindowTile>> {
             hint: None,
             check: None,
             after: AfterPick::Close,
+            text: Default::default(),
             availability: match support {
                 Support::Yes => Availability::Enabled,
                 Support::No => Availability::Disabled,

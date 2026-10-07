@@ -46,6 +46,7 @@ fn Anchored() -> Element {
             availability: Availability::Enabled,
             hint: None,
             after: AfterPick::Close,
+            text: Default::default(),
         })
         .collect::<Vec<_>>();
     rsx! {

@@ -2,7 +2,9 @@
 //! its image, key equivalent and check state, a parent of a submenu, a section header, a status
 //! line and a separator. `view` draws one item, `lines` the whole panel.
 
+use crate::components::content::avatar::AvatarFace;
 use crate::components::content::icon_source::IconSource;
+use crate::components::menus::item::text::{ItemText, Marks};
 use ds_core::vocab::{Availability, Check, Shortcut};
 use ds_style::icon::Icon;
 
@@ -14,6 +16,8 @@ pub enum MenuImage {
     /// Any icon source: an app's icon file (drawn as it is, with no plate under it), a symbolic
     /// icon (in the text colour) or a glyph.
     Source(IconSource),
+    /// A person or account as a coloured disc with a letter: a result row for someone.
+    Avatar(AvatarFace),
 }
 
 /// What a pick does to the menu that holds the item.
@@ -54,6 +58,8 @@ pub enum MenuItem<T> {
         availability: Availability,
         /// Whether a pick closes the menu.
         after: AfterPick,
+        /// What the row says beside its title: the characters a query matched and a second line.
+        text: ItemText,
     },
     /// An item that opens a submenu of `children` beside it (design/13 section 13.3.4): on a
     /// 200 ms rest, or at once on Right, Enter or a click. It shows a chevron where an item
@@ -94,6 +100,7 @@ impl<T> MenuItem<T> {
             check: None,
             availability: Availability::Enabled,
             after: AfterPick::Close,
+            text: ItemText::default(),
         }
     }
 
@@ -145,6 +152,23 @@ impl<T> MenuItem<T> {
     pub fn with_after(mut self, to: AfterPick) -> Self {
         if let MenuItem::Item { after, .. } = &mut self {
             *after = to;
+        }
+        self
+    }
+
+    /// The same item with the characters of its title that a query matched drawn emphasised; only
+    /// a command has a title to mark.
+    pub fn with_marks(mut self, marks: Marks) -> Self {
+        if let MenuItem::Item { text, .. } = &mut self {
+            text.marks = marks;
+        }
+        self
+    }
+
+    /// The same item with a second, fainter line under its title; only a command has one.
+    pub fn with_subtitle(mut self, subtitle: impl Into<String>) -> Self {
+        if let MenuItem::Item { text, .. } = &mut self {
+            text.subtitle = Some(subtitle.into());
         }
         self
     }

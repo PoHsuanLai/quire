@@ -8,7 +8,10 @@
 //! `span.ds-toolbar-title` (`.ds-toolbar-heading`, `.ds-toolbar-subtitle`) and
 //! `span.ds-toolbar-trailing`.
 
-use crate::components::chrome::toolbar::model::{Kept, Picked, ToolbarItem, ToolbarRoom};
+use crate::components::chrome::toolbar::model::{
+    Expansion, Kept, Picked, ToolbarItem, ToolbarRoom, search_fit, search_room,
+};
+use crate::components::chrome::toolbar::search::{ToolbarSearch, search_item};
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
@@ -75,6 +78,7 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
             check: item.check,
             availability: item.availability,
             after: AfterPick::Close,
+            text: Default::default(),
         })
         .collect()
 }
@@ -82,7 +86,9 @@ fn hidden_rows<T: Clone>(items: &[&ToolbarItem<T>]) -> Vec<MenuItem<T>> {
 /// A toolbar. `leading` and `trailing` are the items either side of the title; `center`
 /// replaces the title's words with a control (a segmented control of views). `onpick` hears an
 /// item from the band or from the overflow menu, with the button it came from, so a menu can
-/// hang from that button. `room` is the width the items are laid out in.
+/// hang from that button. `room` is the width the items are laid out in. `search` is a search
+/// field at the band's trailing end that collapses to a magnifier button when the band is too
+/// tight for it (`ToolbarSearch`); the field gives way before any item goes behind the chevron.
 #[component]
 pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] leading: Vec<ToolbarItem<T>>,
@@ -91,6 +97,7 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
     #[props(default)] subtitle: Option<TextLine>,
     #[props(default)] center: Option<Element>,
     #[props(default = ToolbarRoom::Measured)] room: ToolbarRoom,
+    #[props(default)] search: Option<ToolbarSearch>,
     onpick: EventHandler<Picked<T>>,
     #[props(default)] common: Common,
 ) -> Element {
@@ -102,7 +109,15 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
         ToolbarRoom::Fixed(width) => width,
         ToolbarRoom::Measured => probe.rect().map_or(Px(f32::MAX), |rect| rect.size.width),
     };
-    let kept = Kept::fitting(leading.len(), trailing.len(), width);
+    let expansion = use_signal(Expansion::default);
+    let fit = search
+        .as_ref()
+        .map(|search| search_fit(leading.len(), trailing.len(), width, search.min_width));
+    // The search item takes its room first, so the items overflow around it.
+    let taken = search.as_ref().zip(fit).map_or(Px(0.0), |(search, fit)| {
+        search_room(fit, expansion(), search.min_width)
+    });
+    let kept = Kept::fitting(leading.len(), trailing.len(), Px(width.0 - taken.0));
     let overflowing = !kept.all(leading.len(), trailing.len());
     let hidden: Vec<&ToolbarItem<T>> = leading
         .iter()
@@ -164,6 +179,9 @@ pub fn Toolbar<T: Clone + PartialEq + 'static>(
                             ..Common::default()
                         },
                     }
+                }
+                if let (Some(search), Some(fit)) = (search.as_ref(), fit) {
+                    {search_item(search, fit, expansion)}
                 }
             }
         }

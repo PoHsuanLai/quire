@@ -15,6 +15,9 @@ pub const TITLE_ROOM: Px = Px(140.0);
 /// The padding at each end of the band, in pixels.
 const BAND_PADDING: Px = Px(12.0);
 
+/// The gap between the band's items, in pixels.
+const ITEM_GAP: Px = Px(8.0);
+
 /// One button of a toolbar: an image and the name a tooltip, a screen reader and the overflow
 /// menu give it.
 #[derive(Debug, Clone, PartialEq)]
@@ -112,9 +115,51 @@ impl Kept {
     }
 }
 
+/// Whether the band's search field has room to stay a field.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SearchFit {
+    /// Every item and the field at its minimum width fit.
+    Inline,
+    /// They do not: the field collapses to a magnifier button.
+    Collapsed,
+}
+
+/// Whether a search field of at least `min_width` and every item fit in `room`. The field gives
+/// way before any item goes behind the chevron, so it collapses as soon as keeping it would push
+/// one off.
+pub fn search_fit(leading: usize, trailing: usize, room: Px, min_width: Px) -> SearchFit {
+    let field = Px(min_width.0 + ITEM_GAP.0);
+    if Kept::fitting(leading, trailing, Px(room.0 - field.0)).all(leading, trailing) {
+        SearchFit::Inline
+    } else {
+        SearchFit::Collapsed
+    }
+}
+
+/// Whether a collapsed search field has been opened by pressing its magnifier.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum Expansion {
+    /// The magnifier button alone.
+    #[default]
+    Folded,
+    /// The field, where the button was.
+    Open,
+}
+
+/// The room the search item takes in the band: the field and its gap, or one button while it is
+/// collapsed and folded.
+pub(crate) fn search_room(fit: SearchFit, expansion: Expansion, min_width: Px) -> Px {
+    match (fit, expansion) {
+        (SearchFit::Collapsed, Expansion::Folded) => ITEM_PITCH,
+        (SearchFit::Inline, _) | (SearchFit::Collapsed, Expansion::Open) => {
+            Px(min_width.0 + ITEM_GAP.0)
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
-    use super::Kept;
+    use super::{Expansion, Kept, SearchFit, search_fit, search_room};
     use ds_core::geometry::units::Px;
 
     #[test]
@@ -137,6 +182,58 @@ mod tests {
                     trailing: kept_trailing
                 },
                 "{name}"
+            );
+        }
+    }
+
+    #[test]
+    fn the_search_field_collapses_before_an_item_goes_behind_the_chevron() {
+        // Band padding 24, title 140, each item 40, the field its minimum plus a gap of 8.
+        /// name, room, leading items, trailing items, field minimum, fit.
+        type Case = (&'static str, f32, usize, usize, f32, SearchFit);
+        const CASES: &[Case] = &[
+            ("plenty of room", 900.0, 1, 2, 200.0, SearchFit::Inline),
+            ("exactly enough", 492.0, 1, 2, 200.0, SearchFit::Inline),
+            ("a pixel short", 491.0, 1, 2, 200.0, SearchFit::Collapsed),
+            (
+                "no items: only the field and the title",
+                372.0,
+                0,
+                0,
+                200.0,
+                SearchFit::Inline,
+            ),
+            (
+                "a wider minimum collapses sooner",
+                532.0,
+                1,
+                2,
+                260.0,
+                SearchFit::Collapsed,
+            ),
+        ];
+        for &(name, room, leading, trailing, min, want) in CASES {
+            assert_eq!(
+                search_fit(leading, trailing, Px(room), Px(min)),
+                want,
+                "{name}"
+            );
+        }
+    }
+
+    #[test]
+    fn a_folded_search_item_is_one_button_and_an_open_one_is_the_field() {
+        // (fit, expansion, room)
+        const CASES: &[(SearchFit, Expansion, f32)] = &[
+            (SearchFit::Inline, Expansion::Folded, 208.0),
+            (SearchFit::Collapsed, Expansion::Folded, 40.0),
+            (SearchFit::Collapsed, Expansion::Open, 208.0),
+        ];
+        for &(fit, expansion, room) in CASES {
+            assert_eq!(
+                search_room(fit, expansion, Px(200.0)),
+                Px(room),
+                "{fit:?} {expansion:?}"
             );
         }
     }

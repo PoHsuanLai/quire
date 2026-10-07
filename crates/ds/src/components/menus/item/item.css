@@ -54,3 +54,15 @@
 .ds-menu-info{ display:flex; flex-direction:column; padding:var(--s-6) var(--s-8); cursor:default; }
 .ds-menu-info-title{ font-size:var(--fs-shell-menu); font-weight:600; color:var(--ink); }
 .ds-menu-info-detail{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+
+/* A result row (design/04-COMPONENTS.md section 7): the characters a query matched are semibold
+   in the title's own ink, and a second line sits under the title in the faint ink. A row with a
+   second line is taller than 22 (its text decides) and keeps the same 3 px above and below. An
+   avatar fills the image column's 22 px. */
+.ds-menu-mark{ font-weight:600; }
+.ds-menu-title{ display:block; overflow:hidden; }
+.ds-menu-subtitle{ display:block; overflow:hidden; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
+.ds-menu-item[*|data-lines=two]{ padding-top:var(--s-3); padding-bottom:var(--s-3); }
+.ds-menu-image[*|data-image=avatar]{ color:inherit; }
+.ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--accent-ink); }
+.ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--ink-faint); }

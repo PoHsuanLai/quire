@@ -78,10 +78,12 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                     hint,
                     check,
                     availability,
+                    text,
                     ..
                 } => (
                     ItemView {
                         title,
+                        text: Some(text),
                         image: image.as_ref(),
                         key: key.as_ref(),
                         hint: hint.as_deref(),
@@ -102,6 +104,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                 } => (
                     ItemView {
                         title,
+                        text: None,
                         image: image.as_ref(),
                         key: None,
                         hint: None,

@@ -1,6 +1,7 @@
 //! Where a menu's element is drawn: a placed popover surface in the overlay,
 //! on the layer stack, or bare rows in its caller's flow. Split from `menu`.
 
+use crate::components::menus::menu::hung::Hung;
 use crate::components::menus::menu::placement::MenuPlacement;
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{Float, Stacking, position_style};
@@ -26,20 +27,27 @@ pub(crate) struct Surface {
 }
 
 impl Surface {
-    pub(crate) fn of(flow: Flow, float: Float, anchor: &Anchor, placement: MenuPlacement) -> Self {
+    pub(crate) fn of(
+        flow: Flow,
+        float: Float,
+        anchor: &Anchor,
+        placement: MenuPlacement,
+        hung: Hung,
+    ) -> Self {
         match flow {
             Flow::Floating => {
-                let at = float
-                    .anchor_rect(anchor)
+                let field = float.anchor_rect(anchor);
+                let at = field
                     .map(|rect| placement.placement(rect))
                     .map_or(Point::default(), |(rect, want, gap)| {
                         float.origin(Some(rect), want, gap)
                     });
+                let width = hung.width_style(field).unwrap_or_default();
                 Surface {
                     class: "ds-popover ds-menu",
                     elevation: Some("pop"),
                     layer: Some("menu"),
-                    style: Some(position_style(at)),
+                    style: Some(position_style(at) + &width),
                 }
             }
             Flow::Inline => Surface {

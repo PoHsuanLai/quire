@@ -6,6 +6,7 @@ pub(crate) mod choices;
 pub(crate) mod cursor;
 pub(crate) mod decide;
 pub(crate) mod hand_back;
+pub mod hung;
 pub(crate) mod keys;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub(crate) mod menu;

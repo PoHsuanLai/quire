@@ -2,10 +2,12 @@
 //! its end its key equivalent or the chevron of a submenu. Called by `lines` for each line of a
 //! panel.
 
+use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::press::{button_of, press_of};
 use crate::components::menus::item::item::MenuImage;
+use crate::components::menus::item::text::{Emphasis, ItemText};
 use crate::components::menus::menu::placement::Keys;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
@@ -55,6 +57,8 @@ pub(crate) struct ItemView<'a> {
     pub title: &'a str,
     /// The image.
     pub image: Option<&'a MenuImage>,
+    /// What the row says beside its title; a submenu parent says nothing.
+    pub text: Option<&'a ItemText>,
     /// The trailing hint.
     pub hint: Option<&'a str>,
     /// The key equivalent.
@@ -127,6 +131,11 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
         },
         (Branch::Leaf, Keys::Hidden, _) | (Branch::Leaf, Keys::Shown, None) => rsx! {},
     };
+    let label = label(view.title, view.text);
+    let lines = view
+        .text
+        .is_some_and(|text| text.subtitle.is_some())
+        .then_some("two");
     let hint = view.hint.map(|hint| {
         rsx! {
             span { class: "ds-menu-hint", "{hint}" }
@@ -139,6 +148,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             "data-selected": highlighted,
             "data-focus": FocusStyle::Highlight.slug(),
             "data-state-column": leading,
+            "data-lines": lines,
             "aria-checked": view.check.map(Check::aria),
             "aria-disabled": view.availability.aria_disabled(),
             "aria-busy": view.availability.aria_busy(),
@@ -164,9 +174,40 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             onmounted: move |event| onmounted.call(event),
             {state}
             {image}
-            span { class: "ds-menu-label", "{view.title}" }
+            {label}
             {hint}
             {end}
+        }
+    }
+}
+
+/// The title: plain text for a plain item, and for one with matched characters or a second line
+/// the title's runs over its subtitle.
+fn label(title: &str, text: Option<&ItemText>) -> Element {
+    let Some(text) = text.filter(|text| !text.marks.is_empty() || text.subtitle.is_some()) else {
+        return rsx! {
+            span { class: "ds-menu-label", "{title}" }
+        };
+    };
+    let runs = text.marks.runs(title);
+    let subtitle = text.subtitle.clone();
+    rsx! {
+        span { class: "ds-menu-label",
+            span { class: "ds-menu-title",
+                for (at , run) in runs.into_iter().enumerate() {
+                    match run.emphasis {
+                        Emphasis::Plain => rsx! {
+                            Fragment { key: "{at}", "{run.text}" }
+                        },
+                        Emphasis::Matched => rsx! {
+                            span { key: "{at}", class: "ds-menu-mark", "{run.text}" }
+                        },
+                    }
+                }
+            }
+            if let Some(subtitle) = subtitle {
+                span { class: "ds-menu-subtitle", "{subtitle}" }
+            }
         }
     }
 }
@@ -241,6 +282,14 @@ fn image_mark(image: Option<&MenuImage>) -> Element {
                 }
             }
         }
+        Some(MenuImage::Avatar(avatar)) => rsx! {
+            span { class: "ds-menu-image", "data-image": "avatar",
+                {face(AvatarFace {
+                    size: AvatarSize::Size22,
+                    ..*avatar
+                })}
+            }
+        },
         None => rsx! {
             span { class: "ds-menu-image", "data-image": "none" }
         },

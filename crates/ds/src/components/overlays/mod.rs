@@ -3,6 +3,7 @@
 
 pub(crate) mod alert;
 pub mod alert_model;
+pub(crate) mod catcher;
 pub mod drag_ghost;
 pub mod empty_state;
 pub(crate) mod flow;

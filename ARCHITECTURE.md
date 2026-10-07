@@ -271,6 +271,9 @@ The single place a concept lives. Extend it; never write a second one.
 | What a menu item or shortcut is the face of (an action, or UI-only with a reason) and the `<AppName>.ui.toml` written from it | `ds-core::command` (`AppCommand`, `CommandFace`, `ActionName`); `ds::menus::ui_manifest` |
 | Menu pointer tracking | `ds::stack::menu_track` |
 | Popup menu view | `ds::menus::Menu` |
+| A search field with suggestions under it: the panel it owns, its keys (Up, Down, Enter, Escape), its sections; and a menu hung from any field | `ds::menus::search` (`SearchField`, `SuggestionSection`, `step`); `ds::menus::menu::hung` (`Hung`, `PanelWidth`) |
+| A result row's marked characters, avatar and second line | `ds::menus::item::text` (`Marks`, `ItemText`); `MenuImage::Avatar` |
+| A toolbar's search item that collapses to a magnifier | `ds::chrome::toolbar::search` (`ToolbarSearch`, `SearchSeat`); the threshold is `toolbar::model::search_fit` |
 | A filterable list in a popover | `ds::menus::pick_list::PickList` (its rows and keys are the palette's) |
 | Toasts | `ds::overlays::toast` + `ds::stack::toast_hub` |
 | The root component and stylesheet assembly | `ds::assembly::{Ds, stylesheet}` |
@@ -612,7 +615,7 @@ assembly. A consumer that needs a name outside the prelude writes its home path 
 (`ds::style::tokens::shape::Radius`, `ds::base::word::Word`) and depends on `ds` alone, which is
 why consumers never name `ds-core`, `ds-style` or `ds-motion` in their manifests.
 
-`ds::prelude` (122 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
+`ds::prelude` (129 names) is what a consumer's `use ds::prelude::*` brings in; it re-exports
 from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 
 | Group | Names |
@@ -621,15 +624,15 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Vocabulary | `Availability`, `Check`, `DropState`, `Emphasis`, `Fraction`, `Percent`, `Selection`, `Shortcut`, `ShortcutKey`, `Shown`, `Word` |
 | Geometry | `Placement`, `Scale`, `Point`, `Px`, `Rect`, `Size`, `Alpha` |
 | Icons | `ExternalIcon`, `IconSource`, `IconView`, `BatteryGlyph`, `BluetoothGlyph`, `StatusState`, `VolumeGlyph`, `WifiGlyph`, `Icon`, `IconSize` |
-| Menus | `MenuCursor` |
-| Fields | `EditSurface`, `TextField`, `FieldFocus`, `FieldBezel`, `FieldKind`, `Validity` |
+| Menus | `MenuCursor`, `Hung`, `PanelWidth`, `ItemText`, `Marks` |
+| Fields | `EditSurface`, `TextField`, `SearchField`, `SuggestionSection`, `FieldFocus`, `FieldBezel`, `FieldKind`, `Validity` |
 | Overlays | `Alert`, `DragGhost`, `HoverCard`, `InlineBanner`, `Loadable`, `Phase`, `Popover`, `Sheet`, `Skeleton`, `SkeletonShape`, `SkeletonLines`, `SkeletonRow`, `use_toasts`, `Tooltip`, `use_overlays` |
 | Progress and pending work | `ProgressIndicator`, `Progress`, `ProgressStyle`, `RingGap`, `Operation`, `PendingToken` |
 | Lists and content | `Avatar`, `ImageSource`, `PdfThumb`, `ProviderMark`, `TextLine`, `TextRun`, `EmojiGrid`, `List`, `ListItem`, `PreviewPane`, `Accessory`, `RowAction`, `RowChord`, `RowLeading`, `Row`, `SectionHeader` |
 | Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |
 | Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
-| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `EmptyState`, `Flow`, `SidePanel`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
+| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `EmptyState`, `Flow`, `SidePanel`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
 
 `ds_shell::prelude` (43 names) holds the shell components' names and `Widget`, `WidgetKind`,
 `WidgetRegistry`, `WidgetSize`, `WidgetHost`, `WidgetContext`. Mail-only components (`ds::components::app`)

@@ -8,6 +8,7 @@
 //! one Escape or one outside click closes the topmost layer only (design/06-INTERACTIONS.md
 //! sections 5 and 18).
 
+use crate::components::overlays::catcher::Catcher;
 use crate::host::measure::follow_rect;
 use crate::host::measure::{Anchor, MountedRef, RectProbe};
 use crate::root::common::Common;
@@ -231,23 +232,31 @@ impl Float {
     /// wrapper that measures the bounds and, for a layer closed by an outside click, catches
     /// that click.
     pub(crate) fn show(&self, surface: Element, onclose: EventHandler<()>) {
+        self.show_around(surface, onclose, Catcher::Whole);
+    }
+
+    /// [`Float::show`] with the outside-press catcher leaving `catcher`'s element alone.
+    pub(crate) fn show_around(
+        &self,
+        surface: Element,
+        onclose: EventHandler<()>,
+        catcher: Catcher,
+    ) {
         let float = *self;
         let catches = matches!(self.stacking, Stacking::Layer(Dismiss::Transient));
         let bounds = self.bounds;
+        let outside = EventHandler::new(move |()| {
+            if float.outside_click_closes() {
+                onclose.call(());
+            }
+        });
         let content = rsx! {
             div {
                 class: "ds-overlay",
                 "data-layer": layer_slug(self.layer),
                 onmounted: move |event| bounds.on_mounted(event),
                 if catches {
-                    div {
-                        class: "ds-overlay-catch",
-                        onpointerdown: move |_| {
-                            if float.outside_click_closes() {
-                                onclose.call(());
-                            }
-                        },
-                    }
+                    {catcher.draw(outside)}
                 }
                 {surface}
             }

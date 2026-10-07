@@ -2,4 +2,5 @@
 //! chevron at the top of a window's content.
 
 pub mod model;
+pub mod search;
 pub mod view;

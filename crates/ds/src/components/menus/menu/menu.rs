@@ -14,6 +14,7 @@ use crate::components::menus::menu::choices::{Act, Choice, choices};
 use crate::components::menus::menu::cursor::MenuCursor;
 use crate::components::menus::menu::decide::{Decision, Level};
 use crate::components::menus::menu::hand_back::hand_back;
+use crate::components::menus::menu::hung::Hung;
 use crate::components::menus::menu::panel::Panel;
 use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, picker};
 use crate::components::menus::menu::placement::{MENU_INSET, MenuPlacement};
@@ -61,6 +62,11 @@ use ds_style::tokens::layer::ZLayer;
 /// [`MenuCursor::Controlled`]. The flow is fixed for the menu's life: key the menu by it to
 /// switch.
 ///
+/// `hung: Hung::FromField(width)` says `anchor` is a field the menu hangs from (the suggestions
+/// under a search field): presses on the field are inside the menu, so they neither close it nor
+/// move the keyboard, and the menu is as wide as `width` says. Pair it with a
+/// [`MenuCursor::Controlled`] cursor so the field keeps the keyboard.
+///
 /// A floating menu that took the keyboard gives it back when it closes: to the anchor's element
 /// when `anchor` is [`Anchor::Mounted`] (or its nearest focusable ancestor), if it is still
 /// there, through the host's `FocusHost::hand_back`; anchored at a point or a rect, the host gives
@@ -79,6 +85,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] active: MenuCursor,
     #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
     #[props(default)] flow: Flow,
+    #[props(default)] hung: Hung,
     #[props(default)] common: Common,
 ) -> Element {
     let float = use_float(ZLayer::Menu, stacking(flow));
@@ -169,7 +176,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         (Closing::Fading, _) => "leaving",
         (Closing::No, _) => "present",
     };
-    let surface = Surface::of(flow, float, &anchor, placement);
+    let surface = Surface::of(flow, float, &anchor, placement, hung);
     let data = common.data_attributes();
     let mounted = common.clone();
     let menu = rsx! {
@@ -218,7 +225,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     };
     match flow {
         Flow::Floating => {
-            float.show(menu, fade_out);
+            float.show_around(menu, fade_out, hung.catcher(float, &anchor));
             rsx! {
                 {child}
             }

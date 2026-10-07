@@ -45,6 +45,7 @@ fn Fixture() -> Element {
         availability: Availability::Enabled,
         hint: None,
         after: AfterPick::Close,
+        text: Default::default(),
     };
     let entries = vec![
         item(1, "New Window"),

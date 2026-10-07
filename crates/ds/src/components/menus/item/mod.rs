@@ -4,4 +4,5 @@ pub(crate) mod context;
 #[allow(clippy::module_inception)] // The layout names the file for its one concept.
 pub mod item;
 pub(crate) mod lines;
+pub mod text;
 pub(crate) mod view;
