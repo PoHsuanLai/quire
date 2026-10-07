@@ -63,6 +63,6 @@
 .ds-menu-title{ display:block; overflow:hidden; }
 .ds-menu-subtitle{ display:block; overflow:hidden; font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
 .ds-menu-item[*|data-lines=two]{ padding-top:var(--s-3); padding-bottom:var(--s-3); }
-.ds-menu-image[*|data-image=avatar]{ color:inherit; }
+.ds-menu-image[*|data-image=avatar]{ color:inherit; width:auto; min-width:22px; }
 .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--accent-ink); }
 .ds[*|data-activity=inactive] .ds-menu-item[*|data-focus=highlight][*|data-selected=true] .ds-menu-subtitle{ color:var(--ink-faint); }

@@ -75,6 +75,8 @@ pub fn SearchSuggestions() -> Element {
             div { style: "height:300px" }
             p { class: "g-note", "Last action: {picked}" }
         }
+        TopHitSearch {}
+        CardSearch {}
         if showcase == Showcase::Posed {
             Section {
                 title: "Result rows",
@@ -108,4 +110,70 @@ fn result_rows() -> Vec<MenuItem<String>> {
         .collect();
     rows.push(MenuItem::new("plain".to_owned(), "A plain row"));
     rows
+}
+
+/// A field whose first row is lit as the results change, and which completes the lit row on Tab.
+#[component]
+fn TopHitSearch() -> Element {
+    let mut query = use_signal(|| "dana".to_owned());
+    let mut lit = use_signal(|| None::<String>);
+    let mut picked = use_signal(|| "nothing yet".to_owned());
+    rsx! {
+        Section {
+            title: "SearchField, top hit",
+            note: "highlight: TopHit lights the first pickable row whenever the results change, so Return picks it. The host reads the lit row through on_highlight and sets it through cursor: Tab completes the text of the row that is lit. escape: ClearFirst makes the first Escape clear the text and the second leave.",
+            div { style: "width:300px",
+                SearchField::<String> {
+                    label: "Search",
+                    value: query(),
+                    placeholder: "Search mail, people",
+                    suggestions: sections(&query()),
+                    highlight: InitialHighlight::TopHit,
+                    escape: EscapeOrder::ClearFirst,
+                    cursor: SearchCursor::Is(lit()),
+                    on_highlight: move |value: Option<String>| lit.set(value),
+                    oninput: move |next: String| query.set(next),
+                    onpick: move |value: String| picked.set(format!("picked {value}")),
+                    onkey: move |event: KeyboardEvent| {
+                        if event.key() == Key::Tab
+                            && let Some(row) = lit()
+                        {
+                            event.prevent_default();
+                            query.set(row);
+                        }
+                    },
+                }
+            }
+            div { style: "height:300px" }
+            p { class: "g-note", "Last action: {picked}" }
+        }
+    }
+}
+
+/// Spotlight's card: the field and its results as one surface.
+#[component]
+fn CardSearch() -> Element {
+    let mut query = use_signal(|| "dana".to_owned());
+    let mut picked = use_signal(|| "nothing yet".to_owned());
+    rsx! {
+        Section {
+            title: "SearchField, card",
+            note: "present: Card draws the field and its results as one surface: one radius, one shadow, the results under a hairline. Give it a place and it floats at the window level as Spotlight does; here it is drawn where it stands.",
+            div { class: "g-row", style: "align-items:flex-start",
+                SearchField::<String> {
+                    label: "Search",
+                    value: query(),
+                    placeholder: "Spotlight Search",
+                    size: ControlSize::ExtraLarge,
+                    suggestions: sections(&query()),
+                    highlight: InitialHighlight::TopHit,
+                    escape: EscapeOrder::ClearFirst,
+                    present: SuggestionsPresent::Card,
+                    oninput: move |next: String| query.set(next),
+                    onpick: move |value: String| picked.set(format!("picked {value}")),
+                }
+            }
+            p { class: "g-note", "Last action: {picked}" }
+        }
+    }
 }

@@ -1,8 +1,10 @@
 //! What a key does to a search field's suggestions: pure, `(state, key) -> (state, act)`. The
 //! keyboard never leaves the field, so these are the field's keys: Up and Down move a cursor over
-//! the choices, Enter picks the one under it, Escape closes the panel first and clears the field
-//! second. Tab is not here: it behaves as it always does.
+//! the choices, Enter picks the one under it, Escape takes one step each press (in the order
+//! `EscapeOrder` says: the panel then the text, or the text then the window). Tab is not here: it
+//! behaves as it always does.
 
+use crate::components::menus::search::model::EscapeOrder;
 use crate::stack::roving::{Step, Wrap, moved_live};
 use ds_core::vocab::{Availability, Shown};
 
@@ -56,14 +58,6 @@ impl Suggesting {
         }
     }
 
-    /// The panel is wanted with nothing highlighted: the caret arrived, or the text changed.
-    pub(crate) fn open() -> Self {
-        Suggesting {
-            shown: Shown::Visible,
-            cursor: None,
-        }
-    }
-
     /// Whether the panel is up, given how many choices there are.
     pub(crate) fn is_open(self, choices: usize) -> bool {
         self.shown == Shown::Visible && choices > 0
@@ -79,13 +73,24 @@ fn landing(live: &[Availability], step: Step) -> Option<usize> {
     }
 }
 
+/// What Escape does: one step, never a press that changes nothing. Clearing closes the panel
+/// with the text, so the next Escape is the window's.
+fn escape(open: bool, text: Text, order: EscapeOrder) -> (Suggesting, Act) {
+    match (order, open, text) {
+        (EscapeOrder::ClosePanelFirst, true, _) => (Suggesting::closed(), Act::Swallow),
+        (_, _, Text::Filled) => (Suggesting::closed(), Act::Clear),
+        (_, _, Text::Empty) => (Suggesting::closed(), Act::Pass),
+    }
+}
+
 /// What `key` does to `state`, over choices with these `live` availabilities, in a field holding
-/// `text`.
+/// `text`, with Escape in this `order`.
 pub(crate) fn press(
     state: Suggesting,
     key: SuggestKey,
     live: &[Availability],
     text: Text,
+    order: EscapeOrder,
 ) -> (Suggesting, Act) {
     let open = state.is_open(live.len());
     match key {
@@ -111,11 +116,7 @@ pub(crate) fn press(
                 None => (state, Act::Pass),
             }
         }
-        SuggestKey::Escape => match (open, text) {
-            (true, _) => (Suggesting::closed(), Act::Swallow),
-            (false, Text::Filled) => (state, Act::Clear),
-            (false, Text::Empty) => (state, Act::Pass),
-        },
+        SuggestKey::Escape => escape(open, text, order),
         SuggestKey::Enter => match state.cursor.filter(|_| open) {
             Some(at) if live.get(at) == Some(&Availability::Enabled) => {
                 (Suggesting::closed(), Act::Pick(at))
@@ -128,6 +129,7 @@ pub(crate) fn press(
 #[cfg(test)]
 mod tests {
     use super::{Act, SuggestKey, Suggesting, Text, press};
+    use crate::components::menus::search::model::EscapeOrder;
     use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
     use ds_core::vocab::{Availability, Shown};
 
@@ -170,10 +172,44 @@ mod tests {
             ("escape closes the panel first", at(1), Escape, &[E, E], Text::Filled, (hidden, Act::Swallow)),
             ("escape then clears the text", hidden, Escape, &[E, E], Text::Filled, (hidden, Act::Clear)),
             ("escape with no panel and no text goes on", hidden, Escape, &[E, E], Text::Empty, (hidden, Act::Pass)),
-            ("escape with no choices clears at once", OPEN, Escape, &[], Text::Filled, (OPEN, Act::Clear)),
+            ("escape with no choices clears at once", OPEN, Escape, &[], Text::Filled, (Suggesting::closed(), Act::Clear)),
         ];
         for &(name, state, key, live, text, want) in cases {
-            assert_eq!(press(state, key, live, text), want, "{name}");
+            assert_eq!(
+                press(state, key, live, text, EscapeOrder::ClosePanelFirst),
+                want,
+                "{name}"
+            );
         }
+    }
+
+    #[test]
+    fn each_escape_is_one_step_in_either_order() {
+        use EscapeOrder::{ClearFirst, ClosePanelFirst};
+        let live: &[Availability] = &[E, E];
+        let mut presses = |order, start: Suggesting, text| {
+            let (mut state, mut text, mut acts) = (start, text, Vec::new());
+            while acts.last() != Some(&Act::Pass) {
+                let (next, act) = press(state, SuggestKey::Escape, live, text, order);
+                if act == Act::Clear {
+                    text = Text::Empty;
+                }
+                (state, acts) = (next, [acts, vec![act]].concat());
+            }
+            acts
+        };
+        assert_eq!(
+            presses(ClosePanelFirst, at(0), Text::Filled),
+            vec![Act::Swallow, Act::Clear, Act::Pass]
+        );
+        assert_eq!(
+            presses(ClearFirst, at(0), Text::Filled),
+            vec![Act::Clear, Act::Pass]
+        );
+        assert_eq!(presses(ClearFirst, OPEN, Text::Empty), vec![Act::Pass]);
+        assert_eq!(
+            presses(ClosePanelFirst, OPEN, Text::Empty),
+            vec![Act::Swallow, Act::Pass]
+        );
     }
 }
