@@ -5,6 +5,7 @@ use super::book::{Book, WatchId};
 use super::caret::{Early, caret_box, selection_boxes};
 use super::read::{Moved, apply, border_box, scroll_of};
 use crate::node_ref::{DocRef, NodeRef, Written};
+use crate::probe::Probe;
 use dioxus::core::{Runtime, RuntimeGuard};
 use dioxus::prelude::{MountedData, Signal};
 use ds::base::geometry::scroll::Scroll;
@@ -53,6 +54,8 @@ struct Drive {
 struct Shared {
     book: RefCell<Book>,
     drive: RefCell<Option<Drive>>,
+    /// The debug probe's file (nothing unless the feature is on and the environment asks).
+    probe: Probe,
 }
 
 /// One document's phase. Cloned freely: the host that serves components and the loop that runs it
@@ -136,6 +139,9 @@ impl Phase {
             Layout::Resolved => self.publish(&drive),
             Layout::Pending => 0,
         };
+        if layout == Layout::Resolved {
+            self.shared.probe.publish(&drive.doc);
+        }
         Ran { applied, published }
     }
 

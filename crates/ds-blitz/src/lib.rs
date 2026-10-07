@@ -62,6 +62,7 @@ mod pdf_thumb;
 mod phase;
 #[cfg(feature = "print")]
 mod print;
+mod probe;
 mod reveal;
 mod route;
 mod scheme;

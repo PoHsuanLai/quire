@@ -21,6 +21,8 @@ pub use crate::memory_shell::MemoryShell;
 pub use crate::net::DsNet;
 pub use crate::node_ref::DocRef;
 pub use crate::phase::{Early, Layout, Phase, Ran};
+#[cfg(feature = "debug-probe")]
+pub use crate::probe::snapshot as probe_snapshot;
 pub use crate::scheme::follow_root as follow_scheme;
 pub use crate::setup::Setup;
 pub use crate::sized_window::SizedWindow;

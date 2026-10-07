@@ -47,7 +47,7 @@ path, the way `examples/consumer/Cargo.toml` does:
 [dependencies]
 ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings", features = ["dioxus"] }  # `dioxus`: `use_environment`; `tokio`: zbus on tokio
-ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`
+ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`; `debug-probe` for scenario builds only
 ds-shell    = { path = "../quire/crates/ds-shell" }    # only an app that shows the account sheets, the consent alert or the missing-helper sheet
 
 [dev-dependencies]

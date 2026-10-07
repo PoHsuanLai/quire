@@ -34,6 +34,8 @@ mod pdf_app;
 mod pdf_output;
 mod pdf_raster;
 mod pixel_snap;
+#[cfg(feature = "debug-probe")]
+mod probe_snapshot;
 mod provide_host;
 mod registered_property_animation;
 mod removed_focus;

@@ -99,6 +99,12 @@ pdf = ["dep:pdfrum-anyrender", "dep:pdfrum"]
 # spelling builds no checker.
 spell = ["dep:spellbook", "dep:dirs"]
 
+# `QUIRE_DEBUG_PROBE=<dir>`: each window writes its controls, by role and name, with their boxes,
+# to a file there after every frame (`crate::probe`), so a scenario presses a control by name.
+# Off by default and never in a release build: a scenario build turns it on with
+# `--features ds-blitz/debug-probe`.
+debug-probe = []
+
 [lints]
 workspace = true
 
