@@ -2,6 +2,7 @@
 //! the person resizing it. Its answers to a request are `HarnessConfig::with_sizer_ack`.
 
 use crate::harness::Harness;
+use crate::snapshot::Viewport;
 use ds_blitz::{Extent, WindowSizer};
 
 impl Harness {
@@ -18,8 +19,16 @@ impl Harness {
     }
 
     /// The person drags the window to `size` (logical px), which reaches the app as a resize no
-    /// request asked for (`SizeOrigin::Person`).
+    /// request asked for (`SizeOrigin::Person`). The document is laid out again at the new size,
+    /// at the same device scale, so a test can check what a narrower or wider window does.
     pub fn resize_window(&mut self, size: Extent) {
+        let viewport = Viewport {
+            width: size.width,
+            height: size.height,
+            ..self.viewport
+        };
+        self.doc.resize(viewport);
+        self.viewport = viewport;
         let window = self.doc.window.clone();
         let sizer = self.doc.sizer.clone();
         self.within(|| window.resize(size, &sizer));

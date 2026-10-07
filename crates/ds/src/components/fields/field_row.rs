@@ -6,11 +6,16 @@
 //! the end, 36 px tall. `RowLayout::Form` is a grid's: a fixed label column ending at the
 //! control, so a stack of rows lines its controls up.
 //!
-//! Markup: `div.ds-field-row[data-layout]` of `span.ds-field-row-label` (`.ds-field-row-title`,
-//! `.ds-field-row-help`) and `div.ds-field-row-control`; `section.ds-field-group` of an optional
+//! A row may lead with a [`TileFace`] (System Settings' coloured tile, or an avatar). The label
+//! keeps the width its words need; the control side shrinks and wraps instead.
+//!
+//! Markup: `div.ds-field-row[data-layout]` of an optional `span.ds-field-row-leading[data-leading]`,
+//! `span.ds-field-row-label` (`.ds-field-row-title`, `.ds-field-row-help`) and
+//! `div.ds-field-row-control`; `section.ds-field-group` of an optional
 //! `SectionHeader` and `div.ds-field-group-rows`.
 
 use crate::components::content::text_runs::{TextLine, text};
+use crate::components::forms::icon_tile::{TileFace, tile};
 use crate::components::lists::section_header::SectionHeader;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -27,13 +32,14 @@ pub enum RowLayout {
     Form,
 }
 
-/// One row of a form: `label`, the `help` line under it, and the controls in `children`: one, or
+/// One row of a form: the `leading` tile or avatar, `label`, the `help` line under it, and the controls in `children`: one, or
 /// several that wrap onto further lines when the row is too narrow for them. A
 /// disabled or busy row dims its label and takes no pointer.
 #[component]
 pub fn FieldRow(
     #[props(into)] label: TextLine,
     #[props(default)] help: Option<TextLine>,
+    #[props(default)] leading: Option<TileFace>,
     #[props(default)] layout: RowLayout,
     #[props(default)] availability: Availability,
     children: Element,
@@ -52,6 +58,9 @@ pub fn FieldRow(
             "data-availability": availability.slug(),
             onmounted: move |event| common.mounted(event),
             ..data,
+            if let Some(face) = leading {
+                span { class: "ds-field-row-leading", "data-leading": face.slug(), {tile(face)} }
+            }
             span { class: "ds-field-row-label",
                 span { class: "ds-field-row-title", {text(&label)} }
                 if let Some(help) = help.as_ref() {

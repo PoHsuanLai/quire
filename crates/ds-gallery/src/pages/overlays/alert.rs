@@ -22,7 +22,7 @@ const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disc
 #[component]
 pub fn Alerts() -> Element {
     rsx! {
-        Section { title: "Alert", note: "Alert {{ title, message, buttons, style, icon, flow }}: the narrow sheet (340, or 88 % of a smaller root), dimming nothing, one centred column (optional caller-supplied hero icon at 64, title 17/700, body in the soft ink), then the buttons: one or two side by side with the default on the right, three or more stacked with the default on top. It fades in with a scale as a sheet does. The default button is filled: the first that is not destructive (a destructive one has its label red), and the keyboard starts there. Return presses the default, Escape the Cancel button, Space presses the focused button, Tab and Shift+Tab move between the buttons. Flow::Inline stands in the nearest positioned ancestor: here a 320 px control-center popover. Flow::Floating centres it in the whole root.",
+        Section { title: "Alert", note: "Alert {{ title, message, buttons, style, icon, flow }}: the narrow sheet (340, or 88 % of a smaller root), dimming nothing, one centred column (optional caller-supplied hero icon at 64, title 17/700, body in the soft ink), then the buttons: one or two side by side with the default on the right, three or more stacked with the default on top. It fades in with a scale as a sheet does. The default button is filled: the first that is not destructive (a destructive one has its label red), and the keyboard starts there. Each button may carry its own `id` (`AlertButton::with_common`), so a host or test can name the one pressed. Return presses the default, Escape the Cancel button, Space presses the focused button, Tab and Shift+Tab move between the buttons. Flow::Inline stands in the nearest positioned ancestor: here a 320 px control-center popover. Flow::Floating centres it in the whole root.",
             div { class: "g-row g-alert-row",
                 for theme in [Theme::Light, Theme::Dark] {
                     InPopover { theme }
@@ -109,7 +109,13 @@ fn Windowed(theme: Theme, case: Case) -> Element {
     let appearance = appearance(theme);
     let mut open = use_signal(|| true);
     let close = EventHandler::new(move |()| open.set(false));
-    let button = move |label: &str, role| AlertButton::new(label, role, close);
+    let button = move |label: &str, role| {
+        let id = format!("alert-{}", label.to_lowercase().replace(' ', "-"));
+        AlertButton::new(label, role, close).with_common(Common {
+            id: Some(id),
+            ..Common::default()
+        })
+    };
     let (title, message, style, icon, buttons) = match case {
         Case::Ask => (
             TITLE,

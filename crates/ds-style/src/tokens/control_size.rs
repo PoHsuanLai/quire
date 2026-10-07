@@ -44,6 +44,11 @@ impl SidebarSize {
             SidebarSize::Large => 36,
         })
     }
+
+    /// The icon tile's side in a row of this size: the row less 4 px above and below.
+    pub fn tile_size(self) -> WholePx {
+        WholePx(self.row_height().0.saturating_sub(8))
+    }
 }
 
 impl ControlSize {

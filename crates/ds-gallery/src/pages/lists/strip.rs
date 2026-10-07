@@ -106,7 +106,7 @@ pub fn MoreButton() -> Element {
     rsx! {
         Section {
             title: "Row: the quiet more button",
-            note: "ThreadRow's `more` slot: a 26 px icon-only RowMore in flow in the tail, no pill, border or shadow, hidden until the row is hovered or focused. Row 2 is shown by its caller; row 3 holds its menu open (click it to toggle).",
+            note: "ThreadRow's `more` slot: a 26 px icon-only RowMore in flow in the tail, no pill, border or shadow, hidden until the row is hovered or focused. Row 2 is shown by its caller; row 3 holds its menu open and flips it in `on_press`, which runs inside the click itself (`onclick` follows with the measured rect).",
             div { class: "g-list g-stage-pad",
                 List::<u8> {
                     label: "More",
@@ -117,7 +117,7 @@ pub fn MoreButton() -> Element {
                             2,
                             "Menu open",
                             "spec",
-                            rsx! { RowMore { expanded: open(), onclick: move |_| open.set(open().flipped()) } },
+                            rsx! { RowMore { expanded: open(), on_press: move |()| open.set(open().flipped()), onclick: |_| {} } },
                         ),
                     ],
                 }

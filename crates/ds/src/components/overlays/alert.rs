@@ -303,7 +303,7 @@ fn slot(slot: Slot<'_>) -> Element {
                     if is_default {
                         focus_soon(event.data());
                     }
-                })), ..Common::default() },
+                })), ..button.common.clone() },
                 answers,
                 role,
                 size: ControlSize::Large,

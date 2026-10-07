@@ -1,6 +1,7 @@
 //! An alert's vocabulary and the rules that decide from it (design/30 section 2.5, `NSAlert`):
 //! what its buttons are, which one Return presses and which one Escape does.
 
+use crate::root::common::Common;
 use dioxus::prelude::EventHandler;
 use ds_core::vocab::Check;
 use ds_core::word::Word;
@@ -40,6 +41,9 @@ pub struct AlertButton {
     pub role: AlertRole,
     /// Hears the button's press.
     pub onpress: EventHandler<()>,
+    /// The button's own `id`, `data-*` and class, so a host or a test can name which one it is.
+    /// Its `mounted` is the alert's, which keeps the keyboard among the buttons.
+    pub common: Common,
 }
 
 impl AlertButton {
@@ -49,7 +53,13 @@ impl AlertButton {
             label: label.into(),
             role,
             onpress,
+            common: Common::default(),
         }
+    }
+
+    /// This button with `common` (its `id`, `data-*` and class) on its element.
+    pub fn with_common(self, common: Common) -> Self {
+        AlertButton { common, ..self }
     }
 }
 

@@ -1,7 +1,7 @@
 /* FormSection (design/34-MODERN-LOOK.md sections 2.3 and 3.5). The group is the `--grp` card at
    the group radius, no outline, clipped to its corners. Its title is 13/600 secondary, 6 above
    the card and inset to the row text; its footer 11 faint, 6 below. Rows inside lie 44 high
-   (`--row-settings-h`) with a 14 pad; each row after the first carries the hairline `--line`
+   (`--row-settings-h`) with a 14 side pad and the 6 px vertical pad a row keeps, so wrapped controls stay inset; each row after the first carries the hairline `--line`
    from the row's text to the trailing edge, none above the first, none below the last. A grouped
    `List` or `FieldRow` placed inside takes the card as its own. Attribute selectors carry `*|`
    (spike S2). */
@@ -11,7 +11,7 @@
 .ds-form-section-group{ display:flex; flex-direction:column; border-radius:var(--r-group); background:var(--grp); overflow:hidden; min-width:0; }
 .ds-form-section-footer{ margin:0; padding:var(--s-6) var(--s-14) 0; font-size:var(--fs-eyebrow); color:var(--ink-faint); line-height:1.35; }
 
-.ds-form-section-group > .ds-field-row{ position:relative; min-height:var(--row-settings-h); padding:0 var(--s-14); }
+.ds-form-section-group > .ds-field-row{ position:relative; min-height:var(--row-settings-h); padding:var(--s-6) var(--s-14); }
 .ds-form-section-group > .ds-field-row + .ds-field-row::before,
 .ds-form-section-group > .ds-list + .ds-field-row::before{ content:""; position:absolute; top:0; left:var(--s-14); right:0; height:var(--hair); background:var(--line); }
 .ds-form-section-group > .ds-list[*|data-style=grouped]{ background:transparent; border-radius:0; }

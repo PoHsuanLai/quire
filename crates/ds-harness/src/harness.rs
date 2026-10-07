@@ -36,7 +36,7 @@ use std::time::{Duration, Instant};
 
 /// A headless document under test.
 pub struct Harness {
-    viewport: Viewport,
+    pub(crate) viewport: Viewport,
     pub(crate) doc: Headless,
     /// Animation time: the sum of every `advance`.
     clock: Duration,

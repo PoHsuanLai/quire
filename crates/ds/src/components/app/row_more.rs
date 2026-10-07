@@ -24,13 +24,17 @@ const LABEL: &str = "More actions";
 ///
 /// Controlled: `expanded` is whether the menu it opens is up, owned by the caller (written as
 /// `aria-expanded`, and keeping the button visible). `onclick` receives the button's own rect
-/// to anchor that menu; a click never reaches the row.
+/// to anchor that menu, as soon as the document has measured it (a later turn, since measuring is
+/// asynchronous); `on_press` is called inside the click itself, before anything is measured, so
+/// the host learns of the press in the same event and can set its own state at once. A click
+/// never reaches the row.
 #[component]
 pub fn RowMore(
     #[props(default = Icon::Ellipsis)] icon: Icon,
     #[props(into, default = LABEL.to_string())] label: String,
     #[props(default)] expanded: Shown,
     #[props(default)] shown: Option<Shown>,
+    #[props(default)] on_press: EventHandler<()>,
     onclick: EventHandler<Rect>,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
@@ -46,6 +50,7 @@ pub fn RowMore(
             onclick: move |event| {
                 // The button acts on its own; the row must not also open.
                 event.stop_propagation();
+                on_press.call(());
                 if let Some(mounted) = element() {
                     spawn(async move {
                         if let Some(measured) = client_rect(&mounted).await {

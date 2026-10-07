@@ -68,6 +68,7 @@ pub enum Layout {
 pub(crate) struct Headless {
     pub(crate) doc: DioxusDocument,
     modality: Signal<InputModality>,
+    scale: Signal<Scale>,
     wakeup: Arc<Wakeup>,
     viewport: Viewport,
     pub(crate) layout: Layout,
@@ -194,6 +195,7 @@ impl Headless {
         Headless {
             doc,
             modality: signals.modality,
+            scale: signals.scale,
             wakeup,
             viewport,
             layout: Layout::Running,
@@ -235,6 +237,23 @@ impl Headless {
         self.doc.vdom.in_runtime(|| {
             if *modality.peek() != next {
                 modality.set(next);
+            }
+        });
+    }
+
+    /// Lay the document out in `viewport` from now on, keeping its colour scheme, and tell the
+    /// app the device scale it now has. The caller resolves the document afterwards.
+    pub(crate) fn resize(&mut self, viewport: Viewport) {
+        let scheme = self.doc.inner.borrow().viewport().color_scheme;
+        let mut next = blitz_viewport(viewport);
+        next.color_scheme = scheme;
+        self.doc.inner.borrow_mut().set_viewport(next);
+        self.viewport = viewport;
+        let mut scale = self.scale;
+        let percent = Scale::from_percent(viewport.scale_percent);
+        self.doc.vdom.in_runtime(|| {
+            if *scale.peek() != percent {
+                scale.set(percent);
             }
         });
     }

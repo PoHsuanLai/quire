@@ -68,3 +68,10 @@
 .ds-list[*|data-style=source-list] .ds-row{ min-height:var(--sidebar-row-h-m); }
 .ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row{ min-height:var(--sidebar-row-h-s); }
 .ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row{ min-height:var(--sidebar-row-h-l); }
+/* A tile leading a source-list row follows the sidebar's size (`--sidebar-tile-*`). */
+.ds-list[*|data-style=source-list] .ds-row-leading[*|data-leading=tile]{ width:var(--sidebar-tile-m); }
+.ds-list[*|data-style=source-list] .ds-row-leading[*|data-leading=tile] > .ds-icon-tile{ width:var(--sidebar-tile-m); height:var(--sidebar-tile-m); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row-leading[*|data-leading=tile]{ width:var(--sidebar-tile-s); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row-leading[*|data-leading=tile] > .ds-icon-tile{ width:var(--sidebar-tile-s); height:var(--sidebar-tile-s); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row-leading[*|data-leading=tile]{ width:var(--sidebar-tile-l); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row-leading[*|data-leading=tile] > .ds-icon-tile{ width:var(--sidebar-tile-l); height:var(--sidebar-tile-l); }

@@ -92,6 +92,32 @@ fn sidebar_row_css(token: SidebarRowSize, _scope: TokenScope) -> CssValue {
     CssValue::computed(size.row_height().css())
 }
 
+/// An icon tile's side at each [`SidebarSize`], as a token: a source-list row's tile sits 4 px
+/// in from the row's top and bottom (20, 24, 28 in rows of 28, 32, 36).
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "", kind = fixed, css = sidebar_tile_css)]
+pub enum SidebarTileSize {
+    /// `--sidebar-tile-s`: the Small sidebar's tile.
+    #[token(name = "sidebar-tile-s")]
+    Small,
+    /// `--sidebar-tile-m`: the Medium sidebar's tile.
+    #[token(name = "sidebar-tile-m")]
+    Medium,
+    /// `--sidebar-tile-l`: the Large sidebar's tile.
+    #[token(name = "sidebar-tile-l")]
+    Large,
+}
+
+/// The side a sidebar tile token holds, as the stylesheet writes it.
+fn sidebar_tile_css(token: SidebarTileSize, _scope: TokenScope) -> CssValue {
+    let size = match token {
+        SidebarTileSize::Small => SidebarSize::Small,
+        SidebarTileSize::Medium => SidebarSize::Medium,
+        SidebarTileSize::Large => SidebarSize::Large,
+    };
+    CssValue::computed(size.tile_size().css())
+}
+
 #[cfg(test)]
 mod tests {
     use super::{ROW_SCALE, RowSize};
@@ -128,6 +154,15 @@ mod tests {
             css(SidebarRowSize::Large),
             SidebarSize::Large.row_height().css()
         );
+    }
+
+    #[test]
+    fn a_sidebar_tile_token_is_its_sizes_tile() {
+        use super::SidebarTileSize;
+        let css = |token: SidebarTileSize| token.css_value(TokenScope::BASE).as_str().to_owned();
+        assert_eq!(css(SidebarTileSize::Small), "20px");
+        assert_eq!(css(SidebarTileSize::Medium), "24px");
+        assert_eq!(css(SidebarTileSize::Large), "28px");
     }
 
     #[test]

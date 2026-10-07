@@ -7,7 +7,9 @@ mod pane_stack;
 use crate::pages::Section;
 use dioxus::prelude::*;
 use ds::components::fields::field_row::FieldRow;
+use ds::components::forms::icon_tile::TileFace;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::Hex;
 
 /// The Forms page.
@@ -16,7 +18,7 @@ pub fn FormsPage() -> Element {
     rsx! {
         Section {
             title: "Form",
-            note: "Form stacks FormSections 20 apart inside a 20 margin. A section is a title (13/600, secondary), one rounded group on the grouped ground with no outline, and a footer of help text. The rows' separator starts at their text, past the tile.",
+            note: "Form stacks FormSections 20 apart inside a 20 margin. A FieldRow may lead with a tile (`leading`), and its label keeps the width its words need while the control beside it wraps (\"Default\"). A section is a title (13/600, secondary), one rounded group on the grouped ground with no outline, and a footer of help text. The rows' separator starts at their text, past the tile.",
             div { class: "g-stage-pad", style: "width:460px;background:var(--surface-2)",
                 Form {
                     FormSection { title: "Connectivity", footer: "Known networks are joined automatically; the others ask first.",
@@ -24,10 +26,17 @@ pub fn FormsPage() -> Element {
                     }
                     FormSection { title: "General",
                         FieldRow { label: TextLine::from("Wi-Fi"), help: Some(TextLine::from("Join known networks automatically.")),
+                            leading: Some(TileFace::Glyph(Icon::Wifi, Hex([0x0a, 0x84, 0xff]))),
                             Toggle { label: "Wi-Fi", value: Check::On, onchange: |_| {} }
                         }
                         FieldRow { label: TextLine::from("Airplane mode"),
+                            leading: Some(TileFace::Glyph(Icon::Moon, Hex([0xff, 0x9f, 0x0a]))),
                             Toggle { label: "Airplane mode", value: Check::Off, onchange: |_| {} }
+                        }
+                        FieldRow { label: TextLine::from("Default"),
+                            help: Some(TextLine::from("Opens links and web pages.")),
+                            leading: Some(TileFace::Glyph(Icon::Globe, Hex([0x30, 0xb0, 0x50]))),
+                            Button { label: "A control wider than the space left beside the label", size: ControlSize::Regular, onclick: |_| {} }
                         }
                     }
                 }
