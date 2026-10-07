@@ -221,11 +221,7 @@ mod tests {
     use ds_core::word::Word;
 
     fn entry(key: &str, label: &str) -> ProviderEntry {
-        ProviderEntry {
-            key: ProviderKey(key.to_owned()),
-            label: label.to_owned(),
-            mark: MarkProvider::Imap,
-        }
+        ProviderEntry::new(ProviderKey(key.to_owned()), label, MarkProvider::Imap)
     }
 
     fn field(requirement: Requirement, text: FieldText) -> FormField {

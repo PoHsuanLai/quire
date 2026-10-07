@@ -8,6 +8,7 @@ use super::model::CopyState;
 use super::model::StepTitle;
 use super::waiting::Waiting;
 use dioxus::prelude::*;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 
 /// The browser step for `provider`, which opened `url`. `copied` is the host's word on whether the
 /// link has been copied; `on_copy` hears the link to copy.
@@ -20,10 +21,14 @@ pub fn BrowserWait(
     on_copy: EventHandler<String>,
     on_cancel: EventHandler<()>,
     #[props(default)] title: StepTitle,
+    #[props(default)] mark: Option<MarkProvider>,
+    #[props(default)] style: MarkStyle,
 ) -> Element {
     rsx! {
         StepFrame {
             shown: title,
+            mark,
+            style,
             step: "browser",
             title: "Continue in your browser",
             onenter: EventHandler::new(move |()| on_open_again.call(())),

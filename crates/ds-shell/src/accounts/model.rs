@@ -2,7 +2,7 @@
 //! maps its sheet view to these in one table-tested file (design/31 section 5.1).
 
 use super::hidden::Hidden;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds_core::vocab::Check;
 use ds_core::word::Word;
 
@@ -38,6 +38,25 @@ pub struct ProviderEntry {
     pub label: String,
     /// Whose mark it wears.
     pub mark: MarkProvider,
+    /// Its letter or its favicon: `MarkStyle::Letter` unless the host holds the provider's image.
+    pub style: MarkStyle,
+}
+
+impl ProviderEntry {
+    /// An entry that wears its provider's letter.
+    pub fn new(key: ProviderKey, label: impl Into<String>, mark: MarkProvider) -> Self {
+        ProviderEntry {
+            key,
+            label: label.into(),
+            mark,
+            style: MarkStyle::Letter,
+        }
+    }
+
+    /// The same entry wearing `style`.
+    pub fn styled(self, style: MarkStyle) -> Self {
+        ProviderEntry { style, ..self }
+    }
 }
 
 /// What the person picked in the provider list.

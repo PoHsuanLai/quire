@@ -39,11 +39,7 @@ fn providers() -> Vec<ProviderEntry> {
         ("google", "Google", MarkProvider::Google),
         ("microsoft", "Microsoft 365", MarkProvider::Microsoft),
     ]
-    .map(|(key, label, mark)| ProviderEntry {
-        key: ProviderKey(key.to_owned()),
-        label: label.to_owned(),
-        mark,
-    })
+    .map(|(key, label, mark)| ProviderEntry::new(ProviderKey(key.to_owned()), label, mark))
     .to_vec()
 }
 

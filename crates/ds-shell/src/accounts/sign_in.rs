@@ -9,7 +9,7 @@ use super::frame::StepFrame;
 use super::model::{FieldProblem, FieldRole, FieldText, FormField, FormPart, StepTitle};
 use super::wording::{field_label, field_placeholder, form_ready, part_words, problem_text};
 use dioxus::prelude::*;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::fields::field_row::{FieldRow, RowLayout};
 use ds::components::forms::{form::Form, form_section::FormSection};
 use ds_core::vocab::Availability;
@@ -22,6 +22,7 @@ use ds_core::word::Word;
 pub fn SignInForm(
     #[props(into)] provider: String,
     mark: MarkProvider,
+    #[props(default)] style: MarkStyle,
     fields: Vec<FormField>,
     #[props(default)] problem: Option<FieldProblem>,
     on_input: EventHandler<(FieldRole, FieldText)>,
@@ -46,6 +47,7 @@ pub fn SignInForm(
             step: "sign-in",
             title: "Sign in to {provider}",
             mark,
+            style,
             onenter: enter,
             oncancel: on_cancel,
             body: rsx! {

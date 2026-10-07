@@ -7,7 +7,7 @@ use super::frame::StepFrame;
 use super::model::{FieldText, ProviderEntry, ProviderPick, StepTitle};
 use super::wording::{CursorStep, matching, pick_for_enter, step_cursor};
 use dioxus::prelude::*;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 
 /// The provider list. `query` is what the search field holds; `cursor` the row the arrow keys
 /// rest on. `on_pick` hears a press or Return on a row (Return with no cursor picks the first
@@ -32,11 +32,13 @@ pub fn ProviderList(
             key: ProviderPick::Provider(entry.key.clone()),
             title: entry.label.clone(),
             mark: entry.mark,
+            style: entry.style.clone(),
         })
         .chain([PickRow {
             key: ProviderPick::Other,
             title: "Other\u{2026}".to_owned(),
             mark: MarkProvider::Imap,
+            style: MarkStyle::Letter,
         }])
         .collect();
     let keys: Vec<ProviderPick> = rows.iter().map(|row| row.key.clone()).collect();

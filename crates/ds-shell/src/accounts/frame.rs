@@ -6,7 +6,7 @@ use super::adapter::Disc;
 use super::model::StepTitle;
 use dioxus::prelude::*;
 use ds::components::content::avatar::AvatarSize;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 
 /// A step's column: bare, so a host puts it in a window of its own (or in `AccountSheet`). `shown`
 /// says who draws the title: `StepTitle::Host` leaves it to the window's title bar. `mark` is the
@@ -20,6 +20,7 @@ pub(crate) fn StepFrame(
     #[props(into)] title: String,
     #[props(default)] shown: StepTitle,
     #[props(default)] mark: Option<MarkProvider>,
+    #[props(default)] style: MarkStyle,
     #[props(default)] onenter: Option<EventHandler<()>>,
     oncancel: EventHandler<()>,
     body: Element,
@@ -47,7 +48,7 @@ pub(crate) fn StepFrame(
             if mark.is_some() || shown == StepTitle::Own {
                 div { class: "ds-acc-header",
                     if let Some(provider) = mark {
-                        Disc { provider, size: AvatarSize::Size48 }
+                        Disc { provider, size: AvatarSize::Size48, style: style.clone() }
                     }
                     if shown == StepTitle::Own {
                         div { class: "ds-acc-title", "{title}" }
