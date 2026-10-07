@@ -642,7 +642,7 @@ html,body{margin:0;padding:0;background:transparent}
    level of fixed width. The bar's tooltip rises above the capsule's row, so the capsule is not
    clipped. */
 .ds-capsule[*|data-span=wide]{ width:calc(100% - var(--s-16) * 2); max-width:640px; }
-.ds-capsule-scrub{ flex:1 1 auto; min-width:160px; padding:0 var(--s-8); }
+.ds-capsule-scrub{ flex:1 1 auto; min-width:120px; padding:0 var(--s-8); }
 .ds-capsule-level{ flex:none; width:96px; padding:0 var(--s-4); }
 /* -- checkbox -- */
 /* Checkbox (design/30 section 2.3, `NSButton` checkbox). Attribute selectors carry `*|` (spike
