@@ -292,3 +292,33 @@ fn a_wide_control_wraps_inside_the_row_instead_of_overflowing() {
         "the label shrank"
     );
 }
+
+#[allow(non_snake_case)]
+fn ShortLabelToggle() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            FormSection { title: "General".to_string(),
+                FieldRow { label: TextLine::from("Wi-Fi"),
+                    Toggle { label: "Wi-Fi", value: Check::On, onchange: |_| {} }
+                }
+            }
+        }
+    }
+}
+
+/// A short label does not leave the control floating mid-row: in a setting row the control sits
+/// at the trailing edge, inside the row's padding (14 px in a FormSection).
+#[test]
+fn a_setting_rows_control_sits_at_the_trailing_edge() {
+    let mut harness = on_virtual(ShortLabelToggle);
+    harness.resize_window(Extent::new(WIDE.width, WIDE.height));
+    let row = harness.rect(".ds-field-row").expect("row");
+    let control = harness.rect(".ds-field-row-control").expect("control");
+    let row_right = row.origin.x.0 + row.size.width.0;
+    let control_right = control.origin.x.0 + control.size.width.0;
+    assert!(
+        (control_right - (row_right - 14.0)).abs() < 0.5,
+        "the control ends at {control_right}, the row's padded edge is {}",
+        row_right - 14.0
+    );
+}
