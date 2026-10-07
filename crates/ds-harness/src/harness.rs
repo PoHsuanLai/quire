@@ -19,11 +19,13 @@ use crate::error::HarnessError;
 use crate::frame_view::FrameView;
 use crate::harness_clock::{Clock, HarnessClock};
 use crate::harness_config::HarnessConfig;
+use crate::harness_frames::Delivery;
 use crate::harness_input::HeldButtons;
 pub use crate::harness_settle::{
     QUIET, SETTLE_BOUND, VIRTUAL_DRAIN_BOUND, assert_settles_to_zero_frames, settle_until,
 };
 use crate::headless::{Backdrop, Headless, Layout};
+use crate::headless_step::Owed;
 use crate::input::Input;
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _};
@@ -39,7 +41,7 @@ pub struct Harness {
     pub(crate) viewport: Viewport,
     pub(crate) doc: Headless,
     /// Animation time: the sum of every `advance`.
-    clock: Duration,
+    pub(crate) clock: Duration,
     /// The mouse buttons down now.
     pub(crate) held: HeldButtons,
     /// What the window would have told the platform about the last file drag step.
@@ -219,12 +221,21 @@ impl Harness {
 
     /// Hand `event` to the document and bring it up to date.
     pub(crate) fn deliver(&mut self, event: UiEvent) {
+        self.deliver_as(event, Delivery::Settled);
+    }
+
+    /// Hand `event` to the document; bring it up to date at once, or leave that to the frames a
+    /// test steps through.
+    pub(crate) fn deliver_as(&mut self, event: UiEvent, delivery: Delivery) {
         // An edit surface holding the pointer hears a move or the release first, wherever it is
         // (`crate::edit_ime`), as the window's hook delivers it before the document.
         self.route_captured(&event);
         self.doc.note_pointer(&event);
         self.doc.doc.handle_ui_event(event);
-        self.settle();
+        match delivery {
+            Delivery::Settled => self.settle(),
+            Delivery::Pending => self.doc.owed = Owed::Frame,
+        }
     }
 
     fn settle(&mut self) {

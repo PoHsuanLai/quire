@@ -14,8 +14,10 @@ use std::rc::Rc;
 /// A handle on one `EditSurface`: pass it as the surface's `handle`, then
 /// read geometry from a handler or a task. Each read answers [`Probe::Busy`] while the renderer
 /// holds the document (ask again next frame) and [`Probe::Unknown`] before the surface mounts,
-/// with no host, or where nothing addressable is. Geometry is the last layout's: after a change
-/// to the text, read on the next frame.
+/// with no host, or where nothing addressable is. Geometry is the last laid-out frame's: after a
+/// change to the text, a read answers for the text as it was drawn, one frame late. To draw a
+/// caret in the same frame as the text it follows, use [`use_caret_rect`](crate::edit::caret::use_caret_rect)
+/// instead of reading [`caret_rect`](EditHandle::caret_rect) after the change.
 #[derive(Debug, Clone, Copy)]
 pub struct EditHandle {
     element: Signal<Option<Rc<MountedData>>>,
@@ -62,6 +64,16 @@ pub fn use_edit_handle() -> EditHandle {
 }
 
 impl EditHandle {
+    /// The surface's element as a signal, so a hook can follow its mounting.
+    pub(crate) fn element(&self) -> Signal<Option<Rc<MountedData>>> {
+        self.element
+    }
+
+    /// The document's host.
+    pub(crate) fn document(&self) -> Rc<dyn DocumentHost> {
+        self.host.0.peek().clone()
+    }
+
     /// The surface's element, once mounted; the surface sets it.
     pub(crate) fn set(&self, element: Rc<MountedData>, hooks: SurfaceHooks) {
         let mut slot = self.element;
@@ -76,7 +88,9 @@ impl EditHandle {
     }
 
     /// The caret's box at `position`: `--caret-w` wide from the insertion point, its line's
-    /// height.
+    /// height, in the **last laid-out frame**: right after the text changed it still answers for
+    /// the old text. For scroll-into-view and popovers; a drawn caret wants
+    /// [`use_caret_rect`](crate::edit::caret::use_caret_rect).
     pub fn caret_rect(&self, position: &TextPosition) -> Probe<Rect> {
         self.with(|edit, element| edit.caret_rect(element, position))
     }

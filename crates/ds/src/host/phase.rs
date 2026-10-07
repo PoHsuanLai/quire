@@ -4,7 +4,8 @@
 //! instead it asks the phase to publish what it observed into a signal when that changes, and to
 //! apply a write it queued. The write lands in that frame's document and shows on the next.
 
-use dioxus::prelude::Signal;
+use crate::host::position::TextPosition;
+use dioxus::prelude::{CopyValue, Signal};
 use ds_core::geometry::scroll::Scroll;
 use ds_core::geometry::units::{Px, Rect};
 
@@ -16,6 +17,21 @@ pub enum Observe {
     /// The element's own scroll state (offset, viewport, content), after each layout or scroll
     /// that changed it, programmatic scrolls included.
     Scroll(Signal<Option<Scroll>>),
+    /// The caret's box in an edit surface, relative to the surface's border box. Unlike the
+    /// others it is also published *before* a frame paints when `at` moved (see
+    /// [`CaretWatch`]), so the caret is drawn in the frame that draws the text it follows.
+    Caret(CaretWatch),
+}
+
+/// What the phase publishes for an edit surface's caret.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct CaretWatch {
+    /// Where the caret is, which its owner keeps up to date as it renders: the phase reads it
+    /// each step, so it never waits for a signal's own wake-up.
+    pub at: CopyValue<Option<TextPosition>>,
+    /// The caret's box (`--caret-w` wide from the insertion point, its line's height), `None`
+    /// while `at` is `None` or names nothing in the surface.
+    pub into: Signal<Option<Rect>>,
 }
 
 /// A registration with the phase. The phase publishes until it is dropped.

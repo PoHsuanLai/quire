@@ -2,6 +2,7 @@
 //! them, in the order it hands them.
 
 use crate::harness::Harness;
+use crate::harness_frames::Delivery;
 use crate::harness_input::{blitz_button, keyboard, pointer};
 use crate::input::{KeyInput, PointerAction, PointerInput};
 use blitz_kit::scroll::driver::KeyRepeat;
@@ -32,6 +33,11 @@ impl Harness {
 
     /// Press and release one key.
     pub(crate) fn key(&mut self, input: KeyInput) {
+        self.press_key(input, Delivery::Settled);
+    }
+
+    /// Press and release one key as [`Harness::key`] does, delivering each event as `delivery`.
+    pub(crate) fn press_key(&mut self, input: KeyInput, delivery: Delivery) {
         self.doc.set_modality(InputModality::Keyboard);
         let (key, code) = keyboard(input.key);
         // The window's scrolling acts on a scroll key before the document hears it, and the
@@ -51,10 +57,13 @@ impl Harness {
                 state,
                 text: None,
             };
-            self.deliver(match state {
-                KeyState::Pressed => UiEvent::KeyDown(event),
-                KeyState::Released => UiEvent::KeyUp(event),
-            });
+            self.deliver_as(
+                match state {
+                    KeyState::Pressed => UiEvent::KeyDown(event),
+                    KeyState::Released => UiEvent::KeyUp(event),
+                },
+                delivery,
+            );
         }
     }
 

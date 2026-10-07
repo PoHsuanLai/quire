@@ -37,7 +37,7 @@
 use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
 use crate::open_window::WindowHandle;
-use crate::phase::{Layout, Phase};
+use crate::phase::{Early, Layout, Phase};
 use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
@@ -66,6 +66,9 @@ struct Sub {
     phase: Phase,
     /// The window's scrolling, which hears every event before the document.
     scroll: WindowScroll,
+    /// The window's animation clock as the early step keeps it: the instant this application was
+    /// built, a hair before its renderer's own animation timer starts.
+    started: Instant,
     /// The window's renderer, kept past the window's close (see the module documentation).
     renderer: DioxusNativeWindowRenderer,
     /// What the window's documents and shell post.
@@ -90,6 +93,7 @@ impl Sub {
             slot,
             phase,
             scroll,
+            started: Instant::now(),
             renderer,
             relay,
             forward,
@@ -114,6 +118,46 @@ impl Sub {
             window.request_redraw();
         }
         handled.event
+    }
+
+    /// Before the window draws: when a caret moved, lay the document out, run the phase (which
+    /// publishes the caret's box) and hand the document the renders that followed, so the same
+    /// draw paints the text and the caret. The draw lays out again; only what the caret's box
+    /// changed is left to do. Closes the window asked for come back.
+    fn before_paint(&mut self, event_loop: &dyn ActiveEventLoop) -> Vec<WindowId> {
+        if self.phase.early() == Early::Idle {
+            return Vec::new();
+        }
+        let Some(doc) = self.phase.document() else {
+            return Vec::new();
+        };
+        let at = self.started.elapsed().as_secs_f64();
+        let _ = doc.write(|doc| doc.resolve(at));
+        match self.phase.run(Layout::Resolved).changed() {
+            true => self.hand_over(event_loop),
+            false => Vec::new(),
+        }
+    }
+
+    /// Hand the application what its documents posted, keeping back the closes: the window ids
+    /// asked to close.
+    fn hand_over(&mut self, event_loop: &dyn ActiveEventLoop) -> Vec<WindowId> {
+        let posted: Vec<BlitzShellEvent> = self.relay.try_iter().collect();
+        if posted.is_empty() {
+            return Vec::new();
+        }
+        let mut closes = Vec::new();
+        for event in posted {
+            match event {
+                BlitzShellEvent::CloseWindow { window_id } => closes.push(window_id),
+                event => {
+                    let _ = self.forward.send(event);
+                }
+            }
+        }
+        self.app.proxy_wake_up(event_loop);
+        self.run_phase(Layout::Pending);
+        closes
     }
 
     /// Run the window's phase; a frame is asked for when it changed the document, so a write
@@ -305,23 +349,10 @@ impl Windows {
     /// Hand each application what its documents posted, keeping back the closes this handler
     /// decides.
     fn relay(&mut self, event_loop: &dyn ActiveEventLoop) {
-        let mut closes = Vec::new();
-        for sub in self.all() {
-            let posted: Vec<BlitzShellEvent> = sub.relay.try_iter().collect();
-            if posted.is_empty() {
-                continue;
-            }
-            for event in posted {
-                match event {
-                    BlitzShellEvent::CloseWindow { window_id } => closes.push(window_id),
-                    event => {
-                        let _ = sub.forward.send(event);
-                    }
-                }
-            }
-            sub.app.proxy_wake_up(event_loop);
-            sub.run_phase(Layout::Pending);
-        }
+        let closes: Vec<WindowId> = self
+            .all()
+            .flat_map(|sub| sub.hand_over(event_loop))
+            .collect();
         for window_id in closes {
             self.close(event_loop, window_id);
         }
@@ -407,13 +438,20 @@ impl ApplicationHandler for Windows {
             return;
         }
         let drawn = matches!(event, WindowEvent::RedrawRequested);
+        let mut closes = Vec::new();
         if let Some(sub) = self.key_of(window_id).and_then(|key| self.sub_mut(key)) {
+            if drawn {
+                closes = sub.before_paint(event_loop);
+            }
             if sub.scroll_event(&event) == Intercept::Passed {
                 sub.app.window_event(event_loop, window_id, event);
             }
             if drawn {
                 sub.run_phase(Layout::Resolved);
             }
+        }
+        for window_id in closes {
+            self.close(event_loop, window_id);
         }
     }
 

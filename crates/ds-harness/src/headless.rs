@@ -7,6 +7,7 @@
 
 use crate::error::HarnessError;
 use crate::fake_window::{FakeWindow, WindowSpec};
+use crate::headless_step::{Owed, PhaseOrder};
 use crate::painter::{Canvas, PaintTime, Painter};
 use crate::round_budget::{MAX_ROUNDS, RoundBudget, Spent};
 use crate::snapshot::Viewport;
@@ -64,6 +65,10 @@ pub enum Layout {
     Held,
 }
 
+/// Why a round wants another: its renders ran. A window draws the frame its renders asked for and
+/// no more, so a stepped frame does not count this reason (`Headless::step`).
+pub(crate) const RE_RENDERED: &str = "components re-rendered";
+
 /// A headless document and what drives it.
 pub(crate) struct Headless {
     pub(crate) doc: DioxusDocument,
@@ -93,7 +98,13 @@ pub(crate) struct Headless {
     pub(crate) painter: Painter,
     /// The frame phase: the writes the app queued and the values it watches, run after each
     /// layout.
-    phase: Phase,
+    pub(crate) phase: Phase,
+    /// Where in a frame the phase's early step runs.
+    pub(crate) order: PhaseOrder,
+    /// Whether a frame is owed to the document: input arrived, or the last frame asked for another.
+    pub(crate) owed: Owed,
+    /// How many frames the document has laid out and painted.
+    pub(crate) frames: u64,
     /// The window's scrolling, run before each layout as the window loop runs it.
     pub(crate) scroll: WindowScroll,
     /// The window the sizer asks, and the sizer components read with `use_window_sizer`.
@@ -209,6 +220,9 @@ impl Headless {
             resting: LastMove::Unknown,
             painter: Painter::Cpu,
             phase,
+            order: PhaseOrder::default(),
+            owed: Owed::Nothing,
+            frames: 0,
             scroll,
             window,
             sizer,
@@ -263,7 +277,7 @@ impl Headless {
     /// # Panics
     /// When the renders never run dry: a render loop in the app, which the idle-frame rule
     /// exists to catch, and which a test must fail on, not carry on from.
-    fn flush(&mut self) -> bool {
+    pub(crate) fn flush(&mut self) -> bool {
         let waker = Waker::from(Arc::clone(&self.wakeup));
         let mut budget = RoundBudget::new();
         let mut rendered = false;
@@ -299,40 +313,7 @@ impl Headless {
     pub(crate) fn frame(&mut self, at: Duration) {
         let mut budget = RoundBudget::new();
         let wanted = loop {
-            let inner = &self.doc.inner;
-            self.links
-                .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
-            let rendered = self.flush();
-            // After the renders and tasks have run, so a component's own hand-back (a menu's
-            // to its anchor) goes first.
-            let kept = self.keep_focus();
-            self.find_frames();
-            if self.layout == Layout::Held {
-                return;
-            }
-            // Before the layout, so it sees this frame's offsets, as the window loop runs it.
-            self.scroll.frame(now());
-            let restyled = follow_scheme(&mut self.doc.inner.borrow_mut()).is_some();
-            let fetched = self.wakeup.fetched();
-            let synced = self.resolve(at);
-            let landed = self.wakeup.fetched() != fetched;
-            // After layout, as the window runs it: a published value or an applied write is
-            // seen by the next round's renders.
-            let phased = self.phase.run(PhaseLayout::Resolved).changed();
-            let wanted: Vec<&str> = [
-                (rendered, "components re-rendered"),
-                (restyled, "the colour scheme changed the root's style"),
-                (landed, "a fetched resource landed during layout"),
-                (phased, "the frame phase changed a published value"),
-                (kept == Kept::Moved, "focus moved to an ancestor"),
-                (
-                    synced == Repaired::Yes,
-                    "hover was repaired under the pointer",
-                ),
-            ]
-            .into_iter()
-            .filter_map(|(more, why)| more.then_some(why))
-            .collect();
+            let wanted = self.round(at);
             if wanted.is_empty() {
                 return;
             }
@@ -348,11 +329,56 @@ impl Headless {
         );
     }
 
+    /// One frame in the window's order: render what is queued, lay out, paint, then run the
+    /// phase for what the frame left; the reasons another frame is wanted, none when the document
+    /// is at rest.
+    pub(crate) fn round(&mut self, at: Duration) -> Vec<&'static str> {
+        let inner = &self.doc.inner;
+        self.links
+            .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
+        let rendered = self.flush();
+        // After the renders and tasks have run, so a component's own hand-back (a menu's
+        // to its anchor) goes first.
+        let kept = self.keep_focus();
+        self.find_frames();
+        if self.layout == Layout::Held {
+            return Vec::new();
+        }
+        // Before the layout, so it sees this frame's offsets, as the window loop runs it.
+        if self.order == PhaseOrder::BeforePaint {
+            self.early_phase(at);
+        }
+        self.scroll.frame(now());
+        let restyled = follow_scheme(&mut self.doc.inner.borrow_mut()).is_some();
+        let fetched = self.wakeup.fetched();
+        let synced = self.resolve(at);
+        self.frames += 1;
+        let landed = self.wakeup.fetched() != fetched;
+        // After layout, as the window runs it: a published value or an applied write is
+        // seen by the next round's renders.
+        let phased = self.phase.run(PhaseLayout::Resolved).changed();
+        let wanted: Vec<&'static str> = [
+            (rendered, RE_RENDERED),
+            (restyled, "the colour scheme changed the root's style"),
+            (landed, "a fetched resource landed during layout"),
+            (phased, "the frame phase changed a published value"),
+            (kept == Kept::Moved, "focus moved to an ancestor"),
+            (
+                synced == Repaired::Yes,
+                "hover was repaired under the pointer",
+            ),
+        ]
+        .into_iter()
+        .filter_map(|(more, why)| more.then_some(why))
+        .collect();
+        wanted
+    }
+
     /// Style and lay out at `at`, then dispatch the hover change the layout made under a
     /// resting pointer, which Blitz's resolve records silently (`blitz_kit::hover`). At most
     /// one replay per round: the replayed move leaves Blitz's hover where the next resolve
     /// finds it, so that one's re-hit-test changes nothing.
-    fn resolve(&mut self, at: Duration) -> Repaired {
+    pub(crate) fn resolve(&mut self, at: Duration) -> Repaired {
         let mut inner = self.doc.inner.borrow_mut();
         let before = hovered(&inner);
         inner.resolve(at.as_secs_f64());

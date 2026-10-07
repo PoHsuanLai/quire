@@ -3,8 +3,10 @@
 
 use blitz_dom::NodeId;
 use dioxus::prelude::Signal;
+use dioxus::prelude::{CopyValue, ReadableExt};
 use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::{Observe, PhaseWrite};
+use ds::host::position::TextPosition;
 use ds::prelude::Rect;
 
 /// One registration, so a component's drop can end it.
@@ -29,6 +31,30 @@ pub(super) struct ScrollWatch {
     pub(super) last: Option<Scroll>,
 }
 
+/// An edit surface's caret the phase publishes the box of.
+pub(super) struct CaretWatch {
+    pub(super) id: WatchId,
+    pub(super) node: NodeId,
+    pub(super) at: CopyValue<Option<TextPosition>>,
+    pub(super) sink: Signal<Option<Rect>>,
+    /// The position the box was last read for.
+    pub(super) last_at: Option<TextPosition>,
+    /// What was last published.
+    pub(super) last: Option<Rect>,
+}
+
+impl CaretWatch {
+    /// Where the caret is now, as its owner last said.
+    pub(super) fn now(&self) -> Option<TextPosition> {
+        self.at.try_peek().ok().and_then(|at| at.clone())
+    }
+
+    /// Whether the caret was moved since its box was read.
+    pub(super) fn moved(&self) -> bool {
+        self.now() != self.last_at
+    }
+}
+
 /// A write waiting for its frame.
 #[derive(Clone, Copy)]
 pub(super) struct Waiting {
@@ -41,6 +67,7 @@ pub(super) struct Book {
     next: u64,
     pub(super) rects: Vec<RectWatch>,
     pub(super) scrolls: Vec<ScrollWatch>,
+    pub(super) carets: Vec<CaretWatch>,
     pub(super) writes: Vec<Waiting>,
 }
 
@@ -62,6 +89,14 @@ impl Book {
                 sink,
                 last: None,
             }),
+            Observe::Caret(caret) => self.carets.push(CaretWatch {
+                id,
+                node,
+                at: caret.at,
+                sink: caret.into,
+                last_at: None,
+                last: None,
+            }),
         }
         id
     }
@@ -70,6 +105,7 @@ impl Book {
     pub(super) fn forget(&mut self, id: WatchId) {
         self.rects.retain(|watch| watch.id != id);
         self.scrolls.retain(|watch| watch.id != id);
+        self.carets.retain(|watch| watch.id != id);
     }
 
     /// Queue `write` for `node`, replacing one already waiting for it.

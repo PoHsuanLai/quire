@@ -2,12 +2,14 @@
 //! and the step the loop runs.
 
 use super::book::{Book, WatchId};
+use super::caret::{Early, caret_box};
 use super::read::{Moved, apply, border_box, scroll_of};
 use crate::node_ref::{DocRef, NodeRef, Written};
 use dioxus::core::{Runtime, RuntimeGuard};
 use dioxus::prelude::{MountedData, Signal};
 use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::{Observe, Observed, PhaseWrite, Queued, Watch};
+use ds::host::position::TextPosition;
 use ds::prelude::Rect;
 use ds::style::task::try_set;
 use std::cell::RefCell;
@@ -108,6 +110,23 @@ impl Phase {
         Queued::Yes
     }
 
+    /// Whether a caret moved since the phase last read it: the loop then lays out and runs the
+    /// phase before it paints (`Phase::run` with [`Layout::Resolved`]), so the caret is drawn in
+    /// the frame that draws the text it follows.
+    pub fn early(&self) -> Early {
+        match self
+            .shared
+            .book
+            .borrow()
+            .carets
+            .iter()
+            .any(|watch| watch.moved())
+        {
+            true => Early::Wanted,
+            false => Early::Idle,
+        }
+    }
+
     /// Run one step: apply the queued writes, then (once layout is [`Layout::Resolved`]) publish
     /// every watched value that changed. The document is borrowed only while it is read or
     /// written, and not at all while signals are set. A document that is borrowed elsewhere is
@@ -163,7 +182,11 @@ impl Phase {
         let Some(reads) = self.read(drive) else {
             return 0;
         };
-        let Changed { rects, scrolls } = self.changed(reads);
+        let Changed {
+            rects,
+            scrolls,
+            carets,
+        } = self.changed(reads);
         let _in_runtime = RuntimeGuard::new(Rc::clone(&drive.runtime));
         // A sink whose component has gone is skipped: its watch is dropped with it.
         let rects = rects
@@ -174,7 +197,11 @@ impl Phase {
             .into_iter()
             .filter(|(sink, read)| try_set(*sink, *read).is_ok())
             .count();
-        rects + scrolls
+        let carets = carets
+            .into_iter()
+            .filter(|(sink, read)| try_set(*sink, *read).is_ok())
+            .count();
+        rects + scrolls + carets
     }
 
     /// Everything watched, read from the document; `None` while it is borrowed elsewhere.
@@ -191,7 +218,20 @@ impl Phase {
                 .iter()
                 .map(|watch| (watch.id, scroll_of(doc, watch.node)))
                 .collect();
-            Reads { rects, scrolls }
+            let carets = book
+                .carets
+                .iter()
+                .map(|watch| {
+                    let at = watch.now();
+                    let found = at.as_ref().and_then(|at| caret_box(doc, watch.node, at));
+                    (watch.id, at, found)
+                })
+                .collect();
+            Reads {
+                rects,
+                scrolls,
+                carets,
+            }
         })
     }
 
@@ -221,7 +261,23 @@ impl Phase {
                 })
             })
             .collect();
-        Changed { rects, scrolls }
+        let carets = reads
+            .carets
+            .into_iter()
+            .filter_map(|(id, at, read)| {
+                let watch = book.carets.iter_mut().find(|watch| watch.id == id)?;
+                watch.last_at = at;
+                (watch.last != read).then(|| {
+                    watch.last = read;
+                    (watch.sink, read)
+                })
+            })
+            .collect();
+        Changed {
+            rects,
+            scrolls,
+            carets,
+        }
     }
 }
 
@@ -229,12 +285,17 @@ impl Phase {
 struct Reads {
     rects: Vec<Read<Rect>>,
     scrolls: Vec<Read<Scroll>>,
+    carets: Vec<CaretRead>,
 }
+
+/// A caret's position and the box the document showed for it.
+type CaretRead = (WatchId, Option<TextPosition>, Option<Rect>);
 
 /// What differs from what was published, with the signals to publish it to.
 struct Changed {
     rects: Vec<Sink<Rect>>,
     scrolls: Vec<Sink<Scroll>>,
+    carets: Vec<Sink<Rect>>,
 }
 
 /// What the document showed for one watch.

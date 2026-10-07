@@ -1,45 +1,32 @@
 //! The Edit page: an app's own two paragraphs and a chip inside `EditSurface`, with the caret an
-//! app draws placed from the host's caret rect (the surface draws none). Click in the text to
-//! move it; the last input is printed. Spelling is on: a misspelt word gets the dotted
+//! app draws placed from the caret box the host publishes with each frame (the surface draws
+//! none). Click in the text to move it; the last input is printed. Spelling is on: a misspelt word gets the dotted
 //! underline, and a right-click on it opens the suggestions (the page applies none: its text is
 //! fixed).
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::controls::chip::{Chip, ChipVariant};
-use ds::edit::handle::{EditHandle, use_edit_handle};
+use ds::edit::caret::use_caret_rect;
+use ds::edit::handle::use_edit_handle;
 use ds::edit::input::EditInput;
 use ds::edit::pointer::EditPointer;
 use ds::host::captured::PointerPhase;
 use ds::host::position::{EditKind, TextPosition};
-use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds::spell::lang::Spell;
-use ds_core::time::FRAME_SLACK;
-use ds_core::time::clock::sleep;
-
-/// How many frames the caret waits for a layout before giving up.
-const PLACE_ATTEMPTS: usize = 8;
 
 /// The edit page.
 #[component]
 pub fn EditPage() -> Element {
     let handle = use_edit_handle();
     let mut caret = use_signal(|| TextPosition::new("g1", 10));
-    let mut drawn = use_signal(|| None::<Rect>);
     let mut last = use_signal(|| "none yet".to_owned());
-    use_effect(move || {
-        let at = caret();
-        spawn(async move {
-            if let Some(rect) = place(handle, &at).await {
-                drawn.set(Some(rect));
-            }
-        });
-    });
+    let drawn = use_caret_rect(handle, Some(caret()));
     let at = caret();
     rsx! {
-        Section { title: "EditSurface", note: "An app's own paragraphs and an inline chip (an atom) in an edit surface. The accent bar is the page's own caret, drawn from the host's caret rect: the surface draws no caret or selection. Click in the text to move it.",
+        Section { title: "EditSurface", note: "An app's own paragraphs and an inline chip (an atom) in an edit surface. The accent bar is the page's own caret, drawn from the caret box the host publishes in the frame that draws the text: the surface draws no caret or selection. Click in the text to move it.",
             Specimen { name: "caret {at.node.0}:{at.offset.0}, last input {last}",
                 div { class: "g-edit",
                     EditSurface {
@@ -75,23 +62,4 @@ pub fn EditPage() -> Element {
             }
         }
     }
-}
-
-/// The caret's rect at `at`, relative to the surface, once the document has laid it out.
-async fn place(handle: EditHandle, at: &TextPosition) -> Option<Rect> {
-    for _ in 0..PLACE_ATTEMPTS {
-        sleep(FRAME_SLACK).await;
-        if let (Probe::Found(caret), Probe::Found(bounds)) =
-            (handle.caret_rect(at), handle.bounds())
-        {
-            return Some(Rect {
-                origin: Point {
-                    x: caret.origin.x - bounds.origin.x,
-                    y: caret.origin.y - bounds.origin.y,
-                },
-                size: caret.size,
-            });
-        }
-    }
-    None
 }
