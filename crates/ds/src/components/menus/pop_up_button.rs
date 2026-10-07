@@ -11,7 +11,7 @@ use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
-use crate::host::measure::{Anchor, MountedRef};
+use crate::host::measure::{Anchor, MountedRef, use_rect};
 use crate::root::common::Common;
 use crate::stack::typeahead::Typeahead;
 use dioxus::prelude::*;
@@ -110,6 +110,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
         }
     };
     let mut element = use_signal(|| None::<MountedRef>);
+    let button = use_rect();
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let live = availability == Availability::Enabled;
     let label = match kind {
@@ -217,6 +218,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 common: Common {
                     mounted: Some(EventHandler::new(move |event: MountedEvent| {
                         element.set(Some(MountedRef(event.data())));
+                        button.on_mounted(event.clone());
                         mounted.mounted(event);
                     })),
                     ..common.clone()
@@ -231,6 +233,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             Menu::<T> {
                 placement: MenuPlacement::Popup,
                 anchor,
+                measured: button.rect(),
                 items: listed,
                 onpick: move |picked: T| {
                     set_open(Shown::Hidden);

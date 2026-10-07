@@ -311,7 +311,7 @@ fn Driven() -> Element {
     let mut asked = use_signal(Vec::<String>::new);
     let mut value = use_signal(|| 1u8);
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window,
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
             PopUpButton::<u8> {
                 items: vec![MenuItem::new(1, "Work"), MenuItem::new(2, "Home")],
                 value: Some(value()),
@@ -337,6 +337,8 @@ fn a_pop_up_opens_when_the_caller_says_and_only_asks_when_the_person_presses() {
         Some(""),
         "and was not asked"
     );
+    // The menu is placed once the document has measured it; the press goes where it settles.
+    harness.advance(Duration::from_millis(200));
     let second = harness
         .centre(".ds-menu-item:nth-child(2) .ds-menu-label")
         .expect("the second item");

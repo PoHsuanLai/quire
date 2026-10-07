@@ -31,7 +31,10 @@ impl Hung {
     /// catcher waits rather than cover the field.
     pub(crate) fn catcher(self, float: Float, anchor: &Anchor) -> Catcher {
         match self {
-            Hung::Free => Catcher::Whole,
+            // Until the anchor is measured the menu is not drawn: a press then closes nothing.
+            Hung::Free => float
+                .anchor_rect(anchor)
+                .map_or(Catcher::Holding, |_| Catcher::Whole),
             Hung::FromField(_) => float
                 .within(anchor)
                 .map_or(Catcher::Pending, Catcher::Around),

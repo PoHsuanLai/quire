@@ -10,6 +10,9 @@ use ds_core::geometry::units::Rect;
 pub(crate) enum Catcher {
     /// Nothing: every press outside the surface is caught.
     Whole,
+    /// Every press is caught, and none closes the surface: it is not placed yet, so a press
+    /// is not outside anything.
+    Holding,
     /// Nothing yet: the element to leave alone is not laid out, and covering it would take the
     /// press that opened the surface (a press that opens a panel mid-press lands on whatever is
     /// over the field when it is released).
@@ -23,6 +26,9 @@ impl Catcher {
     pub(crate) fn draw(self, onpress: EventHandler<()>) -> Element {
         match self {
             Catcher::Pending => rsx! {},
+            Catcher::Holding => rsx! {
+                div { class: "ds-overlay-catch" }
+            },
             Catcher::Whole => rsx! {
                 div { class: "ds-overlay-catch", onpointerdown: move |_| onpress.call(()) }
             },

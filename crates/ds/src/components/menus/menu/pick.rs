@@ -41,8 +41,8 @@ pub(crate) struct Picked<T> {
     pub after: AfterPick,
 }
 
-/// The handler a panel calls with a pick: the first pick of an item that closes the menu blinks
-/// the item, yields the value and closes the menu, and every later one is ignored. A floating
+/// The handler a panel calls with a pick: the first pick of an item that closes the menu gives the
+/// keyboard back, blinks the item, yields the value and closes the menu, and every later one is ignored. A floating
 /// menu fades out on closing; an inline one, part of its caller's card, is closed at once. An
 /// item that keeps the menu open yields its value at once, with no blink and no closing, as
 /// often as it is picked.
@@ -68,6 +68,7 @@ pub(crate) fn picker<T: 'static>(
                 onpick.call(value);
                 return;
             }
+            close.give_back.call(());
             blink.set(Blink::Lit { depth });
             spawn_in(scope, async move {
                 for phase in phases(depth) {
@@ -93,4 +94,7 @@ pub(crate) struct Closer {
     pub fade: EventHandler<()>,
     /// Close now.
     pub now: EventHandler<()>,
+    /// Give the keyboard back to the opener: called as a pick starts, before the item's handler
+    /// runs, so a handler that moves the keyboard on has the last word.
+    pub give_back: EventHandler<()>,
 }
