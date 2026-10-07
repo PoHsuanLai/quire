@@ -5,4 +5,4 @@
 ^\./crates/ds-settings/src/live/(client|error|module|skeleton|value)\.rs$
 ^\./crates/ds-helpers/src/installer/packagekit\.rs$
 ^\./crates/ds-blitz/src/(menus\.rs|menus/(service|wire)\.rs|print/portal\.rs)$
-^\./crates/ds-desktop/src/(probe|watch)\.rs$
+^\./crates/ds-desktop/src/(probe|watch|outputs_live)\.rs$
