@@ -138,13 +138,13 @@ mod tests {
     #[test]
     fn the_physical_size_is_the_frame_times_the_scale() {
         // name, frame, scale, physical
-        const CASES: &[(&str, (u32, u32), u32, (u32, u32))] = &[
+        let cases = [
             ("1x", (1920, 1080), 120, (1920, 1080)),
             ("2x", (1920, 1080), 240, (3840, 2160)),
             ("1.5x", (2560, 1440), 180, (3840, 2160)),
             ("1.25x rounds", (2048, 1152), 150, (2560, 1440)),
         ];
-        for &(name, frame, scale, want) in CASES {
+        for (name, frame, scale, want) in cases {
             assert_eq!(area("", frame, 0, scale).physical(), want, "{name}");
         }
     }
@@ -156,13 +156,13 @@ mod tests {
             area("HDMI-1", (1920, 1080), 32, 120),
         ]);
         // name, physical, found
-        let cases: &[(&str, (u32, u32), Option<&str>)] = &[
+        let cases = [
             ("4k", (3840, 2160), Some("DP-1")),
             ("one pixel off", (3841, 2160), Some("DP-1")),
             ("1080p", (1920, 1080), Some("HDMI-1")),
             ("unknown", (800, 600), None),
         ];
-        for &(name, physical, want) in cases {
+        for (name, physical, want) in cases {
             let got = outputs.of_physical(physical).map(|a| a.name.as_str());
             assert_eq!(got, want, "{name}");
         }
