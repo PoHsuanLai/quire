@@ -382,6 +382,12 @@ pub enum SignInFault {
     /// It worked, but the account could not be kept.
     #[word(slug = "store-failed")]
     StoreFailed,
+    /// An agent login has no app set up to run it.
+    #[word(slug = "no-launcher")]
+    NoLauncher,
+    /// The agent the login runs through is not installed.
+    #[word(slug = "not-installed")]
+    NotInstalled,
 }
 
 /// Who draws a step's title.

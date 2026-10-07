@@ -135,6 +135,8 @@ pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvid
         SignInFault::Cancelled => "Signing in was cancelled.",
         SignInFault::Forbidden => "Your organisation or the provider does not allow this.",
         SignInFault::StoreFailed => "Signed in, but the account could not be saved.",
+        SignInFault::NoLauncher => return format!("No app is set up to sign {label} in"),
+        SignInFault::NotInstalled => return format!("{label} isn't installed"),
     };
     text.to_owned()
 }
@@ -441,6 +443,18 @@ mod tests {
             let other = fault(SignInFault::NeedsClientId, "Ada", provider);
             assert!(other.starts_with("This build is not registered"), "{other}");
         }
+    }
+
+    #[test]
+    fn the_agent_faults_name_the_account() {
+        assert_eq!(
+            fault(SignInFault::NoLauncher, "Claude", None),
+            "No app is set up to sign Claude in"
+        );
+        assert_eq!(
+            fault(SignInFault::NotInstalled, "Claude", None),
+            "Claude isn't installed"
+        );
     }
 
     #[test]

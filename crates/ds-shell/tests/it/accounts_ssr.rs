@@ -384,6 +384,11 @@ const SPECIMENS: &[Specimen] = &[
     ("working", || {
         rsx! { SignInWorking { provider: "Fastmail", on_cancel: |_| {} } }
     }),
+    ("working-agent", || {
+        rsx! { SignInWorking { provider: "Claude", waiting_for: WorkingFor::Agent("Claude".to_owned()), on_cancel: |_| {} } }
+    }),
+    ("failed-no-launcher", || failed(SignInFault::NoLauncher)),
+    ("failed-not-installed", || failed(SignInFault::NotInstalled)),
     ("failed-google-client-id", || {
         rsx! {
             SignInFailed {
@@ -683,7 +688,17 @@ fn the_default_provider_mark_is_the_letter() {
 }
 
 #[test]
-fn the_failed_step_says_where_google_looks() {
+fn the_working_line_names_the_agent_only_for_an_agent_login() {
+    assert!(light("working").contains("This takes a moment."));
+    let agent = light("working-agent");
+    assert!(agent.contains("Waiting for Claude\u{2026}"), "{agent}");
+    assert!(!agent.contains("This takes a moment."));
+}
+
+#[test]
+fn the_failed_step_says_the_new_faults_and_where_google_looks() {
+    assert!(light("failed-no-launcher").contains("No app is set up to sign Fastmail in"));
+    assert!(light("failed-not-installed").contains("Fastmail isn&#39;t installed"));
     assert!(
         light("failed-google-client-id")
             .contains("Google sign-in needs a client id: see docs/google.md")
