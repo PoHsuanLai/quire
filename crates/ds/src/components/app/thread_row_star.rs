@@ -5,36 +5,13 @@ use crate::focus::click::kept_click;
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
 use ds_style::icon::Icon;
-use ds_style::icon::shape::Shape;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::icon::style::GlyphStyle;
 
-/// The star's glyph: the outline, filled with its own colour once starred. `Glyph` only
-/// strokes, and a CSS `fill` never reaches SVG on Blitz (spike S6), so the fill is written as an
-/// attribute here.
+/// The star's glyph: solid once starred, outline while not (the pair rule of
+/// design/08-ICONS.md section 1.2).
 fn star_glyph(state: Check) -> Element {
-    let fill = match state {
-        Check::On => "currentColor",
-        Check::Off | Check::Mixed => "none",
-    };
-    rsx! {
-        svg {
-            class: "ds-ic",
-            "data-size": "14",
-            width: "14",
-            height: "14",
-            view_box: "0 0 24 24",
-            "aria-hidden": "true",
-            "stroke": "currentColor",
-            "stroke-width": "2",
-            "stroke-linecap": "round",
-            "stroke-linejoin": "round",
-            "fill": fill,
-            for shape in Icon::Star.shapes() {
-                if let Shape::Path(d) = shape {
-                    path { d: "{d}" }
-                }
-            }
-        }
-    }
+    rsx! { Glyph { icon: Icon::Star, size: IconSize::Compact, style: GlyphStyle::of(state) } }
 }
 
 /// The star button.

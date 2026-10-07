@@ -1,8 +1,8 @@
 # Licensing references: image-model weights and tools
 
 design/08-ICONS.md section 5 names this file as the record for model weight licences. This
-first version covers the app-icon bake-off (2026-09-24, branch `icon-bakeoff`). Glyph sets
-(Lucide ISC, Tabler MIT) get their rows when the glyphs land.
+first version covers the app-icon bake-off (2026-09-24, branch `icon-bakeoff`). The glyph sets
+are in the last section.
 
 Licences were read from each Hugging Face repo's model card metadata through the HF API
 (`/api/models/<repo>` → `cardData.license`, `gated`) on 2026-09-24. No repo is gated; no
@@ -66,3 +66,16 @@ licence and a note that the files were changed, is met by `ATTRIBUTION.txt` besi
 by the credit line in design/25; a distributor of a quire binary must carry that line in its
 credits (CONSUMING, "Animated emoji"). The still `512.png` files `tools/emoji` reads to find each
 loop's rest pose stay in its cache and are not shipped.
+
+## Glyph sets (small glyphs, `Icon`)
+
+All permissive and vendored as data (paths in `crates/ds-style/src/icon/`), with the notice kept
+beside the Lucide one in `crates/ds-style/assets/icons/` and mirrored in `assets/icons/`.
+
+| Set | Version | Licence | Notice | Used for |
+| --- | --- | --- | --- | --- |
+| Lucide | `lucide-static` 1.47.0 | ISC | `LICENSE-lucide.txt` | the outline form of every glyph |
+| Tabler Icons (filled) | `@tabler/icons` 3.48.0 | MIT | `LICENSE-tabler.txt` | the solid form, first choice; also the outline `Brightness` |
+| Phosphor Icons (Fill) | `@phosphor-icons/core` 2.1.1 | MIT | `LICENSE-phosphor.txt` | the solid form where Tabler has no filled one; scaled from 256 to the 24 grid |
+
+The per-glyph source of every solid form is the table in design/08-ICONS.md section 1.2.1.

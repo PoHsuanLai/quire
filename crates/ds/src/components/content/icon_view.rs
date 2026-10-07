@@ -10,6 +10,7 @@ use ds_core::word::Word;
 use ds_style::icon::family::PlateFamily;
 use ds_style::icon::plate_tint::{PlateTint, tint_style};
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::icon::style::GlyphStyle;
 
 /// Which way an external icon is painted: the `data-kind` word and the property its URL is
 /// written into.
@@ -44,6 +45,9 @@ impl Paint {
 /// Muted or Monochrome dock is one hue, plate included. Without one, or
 /// without a plate, it changes nothing.
 ///
+/// `look` is a glyph's style: solid, or outline for a pair's off state (design/08-ICONS.md
+/// section 1.2).
+///
 /// A status glyph (`IconSource::Status`) is drawn at `size` too.
 #[component]
 pub fn IconView(
@@ -51,6 +55,7 @@ pub fn IconView(
     #[props(default)] size: IconSize,
     #[props(default)] plate: Option<PlateFamily>,
     #[props(default)] plate_tint: Option<PlateTint>,
+    #[props(default)] look: GlyphStyle,
 ) -> Element {
     match plate {
         Some(family) => rsx! {
@@ -61,10 +66,10 @@ pub fn IconView(
                 "data-size": "{size.px()}",
                 style: plate_style(size, family, plate_tint),
                 span { class: "ds-plate-face", "aria-hidden": "true" }
-                {bare(source, size)}
+                {bare(source, size, look)}
             }
         },
-        None => bare(source, size),
+        None => bare(source, size, look),
     }
 }
 
@@ -78,10 +83,10 @@ fn plate_style(size: IconSize, family: PlateFamily, tint: Option<PlateTint>) -> 
 }
 
 /// The icon alone, as a slot draws it.
-fn bare(source: IconSource, size: IconSize) -> Element {
+fn bare(source: IconSource, size: IconSize, look: GlyphStyle) -> Element {
     match source {
         IconSource::Glyph(icon) => rsx! {
-            Glyph { icon, size }
+            Glyph { icon, size, style: look }
         },
         IconSource::Symbolic(external) => external_icon(&external, Paint::Mask),
         IconSource::Image(external) => external_icon(&external, Paint::Picture),

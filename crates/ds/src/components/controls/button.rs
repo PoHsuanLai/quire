@@ -29,7 +29,8 @@ use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_motion::symbol::effect::{Activity, LoopEffect, SymbolEffect};
 use ds_motion::symbol::use_symbol::use_symbol_attrs;
-use ds_style::icon::render::IconSize;
+use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::icon::style::GlyphStyle;
 use ds_style::tokens::control_size::ControlSize;
 
 /// The size the busy spinner takes in the leading slot: one rung under the button's own, so
@@ -198,7 +199,7 @@ pub fn Button(
                         None => "ds-button-icon".to_owned(),
                     },
                     "data-pulse": spin.pulse,
-                    {icon_view(icon, glyph, swap)}
+                    {icon_view(icon, glyph, swap, value)}
                 }
             }
             if bezel == Bezel::Help {
@@ -214,11 +215,20 @@ pub fn Button(
 }
 
 /// `icon` at `size`; a quire glyph under `IconSwap::CrossFade` fades into the next one it is
-/// given.
-fn icon_view(icon: IconSource, size: IconSize, swap: IconSwap) -> Element {
+/// given. A toggle's `value` picks the glyph's style: a star, heart, pin or bell is outline
+/// while off (`GlyphStyle::for_state`).
+fn icon_view(icon: IconSource, size: IconSize, swap: IconSwap, value: Option<Check>) -> Element {
+    let look = |icon| {
+        value.map_or(GlyphStyle::Solid, |state| {
+            GlyphStyle::for_state(icon, state)
+        })
+    };
     match (swap, icon) {
         (IconSwap::CrossFade, IconSource::Glyph(icon)) => rsx! {
-            MorphGlyph { icon, size, style: MorphStyle::CrossFade }
+            MorphGlyph { icon, size, style: MorphStyle::CrossFade, look: look(icon) }
+        },
+        (IconSwap::Instant, IconSource::Glyph(icon)) => rsx! {
+            Glyph { icon, size, style: look(icon) }
         },
         (IconSwap::Instant, source) | (IconSwap::CrossFade, source) => rsx! {
             IconView { source, size }
