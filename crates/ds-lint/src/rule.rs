@@ -11,7 +11,8 @@ pub enum Rule {
     ColourFunction,
     /// A named colour: `white`, `red`.
     NamedColour,
-    /// `currentColor` anywhere but `stroke` and `fill`.
+    /// `currentColor` anywhere but `stroke` and `fill`, the two paints of an outline glyph and a
+    /// solid one (design/08-ICONS.md section 1.2). A raw colour is refused there as anywhere.
     CurrentColourOutsideStrokeFill,
     /// A raw `ms`/`s` duration: durations are `--t-*`.
     RawDuration,

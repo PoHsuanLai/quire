@@ -1,7 +1,8 @@
-//! Drawing a glyph: `svg.ds-ic` with the stroke as attributes and `currentColor`, so the glyph
-//! takes its parent's text colour (design/08-ICONS.md sections 1.3-1.5).
+//! Drawing a glyph: `svg.ds-ic` with the paint as attributes and `currentColor`, so the glyph
+//! takes its parent's text colour (design/08-ICONS.md sections 1.3-1.5). A solid glyph is
+//! `fill="currentColor"` with no stroke; an outline one is the 2 px stroke with no fill.
 //!
-//! The stroke is written on the element, not by CSS.
+//! The paint is written on the element, not by CSS.
 
 #[cfg(feature = "dioxus")]
 use super::Icon;
@@ -9,6 +10,8 @@ use super::Icon;
 use super::shape::Shape;
 #[cfg(feature = "dioxus")]
 use super::stroke::stroke_width;
+#[cfg(feature = "dioxus")]
+use super::style::GlyphStyle;
 #[cfg(feature = "dioxus")]
 use crate::scale::use_scale;
 #[cfg(feature = "dioxus")]
@@ -94,17 +97,31 @@ pub(super) fn shape_element(shape: &Shape) -> Element {
 }
 
 /// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
-/// `data-size`), stroked in `currentColor` through attributes, never CSS (spike S6). At a
-/// fractional device scale the stroke is snapped to whole device pixels (`super::stroke`).
+/// `data-size`) in `style` (solid unless a pair's off state says outline), painted in
+/// `currentColor` through attributes, never CSS (spike S6). An outline's stroke is snapped to
+/// whole device pixels at a fractional device scale (`super::stroke`).
 #[cfg(feature = "dioxus")]
 #[component]
-pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
+pub fn Glyph(
+    icon: Icon,
+    #[props(default)] size: IconSize,
+    #[props(default)] style: GlyphStyle,
+) -> Element {
     let px = size.px();
     let stroke = stroke_width(size, use_scale());
+    let (paint, outline) = match style {
+        GlyphStyle::Solid => (("none", "currentColor"), None),
+        GlyphStyle::Outline => (("currentColor", "none"), Some(stroke)),
+    };
+    let round = outline.as_ref().map(|_| "round");
     rsx! {
         svg {
             class: "ds-ic",
             "data-size": "{px}",
+            "data-style": match style {
+                GlyphStyle::Solid => "solid",
+                GlyphStyle::Outline => "outline",
+            },
             // Presentation attributes: Blitz and browsers map an `svg`'s width and height to
             // the CSS properties, so the size needs no stylesheet rule (design/08-ICONS.md 1.4).
             width: "{px}",
@@ -112,12 +129,12 @@ pub fn Glyph(icon: Icon, #[props(default)] size: IconSize) -> Element {
             view_box: "0 0 24 24",
             // SVG elements do not carry the HTML `aria_hidden` attribute.
             "aria-hidden": "true",
-            "stroke": "currentColor",
-            "stroke-width": stroke,
-            "stroke-linecap": "round",
-            "stroke-linejoin": "round",
-            "fill": "none",
-            for shape in icon.shapes() {
+            "stroke": paint.0,
+            "stroke-width": outline,
+            "stroke-linecap": round,
+            "stroke-linejoin": round,
+            "fill": paint.1,
+            for shape in icon.shapes_in(style) {
                 {shape_element(shape)}
             }
         }

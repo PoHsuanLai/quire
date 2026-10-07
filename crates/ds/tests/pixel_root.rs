@@ -31,7 +31,7 @@ fn Root(setup: Setup) -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window, stylesheet: Inject::Host,
             scale: setup.given,
             Surface { material: Material::Popover,
-                Glyph { icon: Icon::Plus, size: IconSize::Base }
+                Glyph { icon: Icon::Plus, size: IconSize::Base, style: GlyphStyle::Outline }
             }
         }
     }

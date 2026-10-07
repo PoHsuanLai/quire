@@ -98,6 +98,27 @@ const CASES: &[Case] = &[
         rule: Rule::CurrentColourOutsideStrokeFill,
         expect: false,
     },
+    Case {
+        name: "currentColor on fill alone: passes (a solid glyph's paint)",
+        css: ".ic { fill: currentColor; }",
+        profile: Profile::Strict,
+        rule: Rule::CurrentColourOutsideStrokeFill,
+        expect: false,
+    },
+    Case {
+        name: "a raw colour on fill still fails",
+        css: ".ic { fill: #fff; }",
+        profile: Profile::Strict,
+        rule: Rule::HexColour,
+        expect: true,
+    },
+    Case {
+        name: "a named colour on fill still fails",
+        css: ".ic { fill: red; }",
+        profile: Profile::Strict,
+        rule: Rule::NamedColour,
+        expect: true,
+    },
     // RawDuration
     Case {
         name: "raw duration: 200ms fails",

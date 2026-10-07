@@ -31,7 +31,7 @@ fn tint(space: usize) -> Tint {
     Tint::space(PRESETS[space].dots)
 }
 
-/// Row `scheme`, each Space's tinted plate then an untinted one. A hollow glyph (`Square`)
+/// Row `scheme`, each Space's tinted plate then an untinted one. A hollow glyph (`Square`, outline)
 /// leaves the plate's centre to the gradient.
 #[allow(non_snake_case)]
 fn Plates() -> Element {
@@ -43,11 +43,11 @@ fn Plates() -> Element {
                         div { style: "display:flex; gap:24px; padding:8px",
                             for space in SPACES {
                                 span { class: "tinted-{space}",
-                                    IconView { source: IconSource::Glyph(Icon::Square), size: IconSize::Tile96, plate: Some(PlateFamily::Neutral), plate_tint: PlateTint::of(IconStyle::Monochrome, tint(space)) }
+                                    IconView { source: IconSource::Glyph(Icon::Square), size: IconSize::Tile96, look: GlyphStyle::Outline, plate: Some(PlateFamily::Neutral), plate_tint: PlateTint::of(IconStyle::Monochrome, tint(space)) }
                                 }
                             }
                             span { class: "plain",
-                                IconView { source: IconSource::Glyph(Icon::Square), size: IconSize::Tile96, plate: Some(PlateFamily::Neutral) }
+                                IconView { source: IconSource::Glyph(Icon::Square), size: IconSize::Tile96, look: GlyphStyle::Outline, plate: Some(PlateFamily::Neutral) }
                             }
                         }
                     }

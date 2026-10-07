@@ -3,7 +3,8 @@
 //! The geometry is Lucide (<https://lucide.dev>), ISC licence, notice in
 //! `crates/ds-style/assets/icons/LICENSE-lucide.txt`.
 //!
-//! The style is a 24 grid, 2px stroke, round caps and joins, one colour, no fills. The
+//! The outline style is a 24 grid, 2px stroke, round caps and joins, one colour; the solid
+//! style (the default, `style`, `solid_*`) is filled paths on the same grid. The
 //! stroke is written as SVG attributes by [`render::Glyph`], because usvg in Blitz
 //! may not resolve CSS on SVG (design/08-ICONS.md section 1.3, spike S6).
 //!
@@ -37,7 +38,11 @@ pub mod render;
 pub mod retint;
 pub(crate) mod sets;
 pub mod shape;
+pub(crate) mod solid_mailo;
+pub(crate) mod solid_more;
+pub(crate) mod solid_shell;
 pub mod stroke;
+pub mod style;
 #[cfg(all(test, feature = "dioxus"))]
 mod tests;
 pub(crate) mod tone_band;
@@ -290,7 +295,8 @@ pub enum Icon {
 }
 
 impl Icon {
-    /// The children of this glyph, in the design's order.
+    /// The children of this glyph's outline, in the design's order. `solid_shapes` is its
+    /// solid form and `shapes_in` picks by style.
     pub fn shapes(self) -> &'static [Shape] {
         match self {
             Icon::Inbox => INBOX,

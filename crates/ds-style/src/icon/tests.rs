@@ -1,14 +1,21 @@
 use super::Icon;
 use super::render::{Glyph, GlyphProps, IconSize};
+use super::style::GlyphStyle;
 use crate::icon::shape::Shape;
 use dioxus::prelude::*;
 
+/// An icon's outline markup: the geometry these tests pin is Lucide's.
 fn markup(icon: Icon) -> String {
+    markup_in(icon, GlyphStyle::Outline)
+}
+
+fn markup_in(icon: Icon, style: GlyphStyle) -> String {
     let mut dom = VirtualDom::new_with_props(
         Glyph,
         GlyphProps {
             icon,
             size: IconSize::Base,
+            style,
         },
     );
     dom.rebuild_in_place();
@@ -282,4 +289,33 @@ fn the_format_and_severity_glyphs_are_lucides() {
         Icon::Code.shapes().first(),
         Some(&Shape::Path("m16 18 6-6-6-6"))
     );
+}
+
+#[test]
+fn every_icon_draws_solid_by_default_as_filled_paths_with_no_stroke() {
+    let mut failures = Vec::new();
+    for &icon in Icon::ALL {
+        let page = markup_in(icon, GlyphStyle::default());
+        let names = element_names(&page);
+        let expect: Vec<&str> = std::iter::once("svg")
+            .chain(icon.solid_shapes().iter().map(shape_tag))
+            .collect();
+        if names != expect
+            || !page.contains("fill=\"currentColor\"")
+            || !page.contains("stroke=\"none\"")
+            || !page.contains("data-style=\"solid\"")
+            || page.contains("stroke-width")
+            || page.contains("fill=\"none\"")
+        {
+            failures.push(format!("{icon:?}: {page}"));
+        }
+    }
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn an_outline_is_the_stroke_and_names_its_style() {
+    let page = markup(Icon::Star);
+    assert!(page.contains("data-style=\"outline\""), "{page}");
+    assert!(page.contains("stroke-linecap=\"round\""), "{page}");
 }
