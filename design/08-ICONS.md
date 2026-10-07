@@ -18,8 +18,10 @@ SPEC = "Rust Desktop Shell — Technical Spec" (Claude Doc, rev 31).
 
 | Role | Set | Licence | Where it is used |
 | --- | --- | --- | --- |
-| Primary | Lucide (lucide.dev) | ISC | every glyph that Lucide has |
-| Gap fill | Tabler Icons (tabler.io/icons) | MIT | only when Lucide has no glyph for the concept |
+| Outline | Lucide (lucide.dev) | ISC | the outline style of every glyph that Lucide has |
+| Gap fill | Tabler Icons (tabler.io/icons) | MIT | the outline only when Lucide has no glyph for the concept |
+| Solid, primary | Tabler Icons filled | MIT | the solid style (the default) of every glyph Tabler has |
+| Solid, fallback | Phosphor Fill (phosphoricons.com) | MIT | the solid style where Tabler has no filled form |
 | Our own | drawn in-house | our licence | only when neither set has it |
 
 Why Lucide: it is the design's own spec. C:1121-1129 card 1, "One weight, one colour: Lucide
@@ -27,21 +29,178 @@ Why Lucide: it is the design's own spec. C:1121-1129 card 1, "One weight, one co
 24 grid, 2 px stroke and round caps, so its glyphs sit next to Lucide without a visible seam.
 
 Rejected (settled, PLAN "Icons"): WhiteSur, Yaru, Tela, Papirus, elementary, Colloid, Candy
-icon themes. Phosphor (named in SPEC "Visual design system") is not used: Lucide is already the
-prototypes' set.
+icon themes. Phosphor (named in SPEC "Visual design system") is not the outline set: Lucide is already the
+prototypes' set. Its Fill weight is a fallback for the solid form (1.2.1).
 
 ### 1.2 Drawing rules (settled; applies to Tabler imports and our own glyphs)
 
+Decision, owner, 2026-10-07: the desktop draws solid (filled) small glyphs, everywhere an `Icon`
+is drawn: menus, sidebars, toolbars and the bar. This replaces "no fills" and the star
+exception of the 2026-09 rules (Lucide's hollow outlines as the default).
+
 1. Canvas `viewBox="0 0 24 24"`.
-2. Stroke width 2, `stroke-linecap="round"`, `stroke-linejoin="round"`, `fill="none"`.
-3. Keep 1 px padding: no geometry outside 1..23 (Lucide's own rule).
-4. No fills. One exception: the star's on-state fills with its stroke colour
-   (S:302-303: `.star .ic` stroke `--ink-faint`; on: stroke and fill `--warn`).
+2. `GlyphStyle::{Solid, Outline}`, default `Solid` (named `GlyphStyle`, not `IconStyle`, which is the dock's Colour/Muted/Monochrome look in `retint`).
+   - Solid: filled paths, written as `fill="currentColor"` with `stroke="none"` on the `svg`
+     and no stroke attribute anywhere. The source is Tabler's filled set, then Phosphor Fill
+     where Tabler has none, then a hand-made fill (1.2.1).
+   - Outline: Lucide's glyph, `stroke-width` 2, `stroke-linecap="round"`,
+     `stroke-linejoin="round"`, `fill="none"`. It is kept only as the off state of a pair.
+3. State pairs. A control that shows on and off with a glyph whose off state is hollow draws
+   Outline for off (and mixed) and Solid for on, as macOS does: `Icon::OFF_IS_OUTLINE` (star,
+   heart, pin, bell) and `GlyphStyle::for_state(icon, state)`. A thread row's star and a
+   `Button { value }` holding one of those glyphs follow it. A pair of different glyphs
+   (`Play` and `Pause`, `Bell` and `BellOff`, `Volume` and `VolumeX`) is two solid icons, not a
+   style change.
+4. Keep 1 px padding: no geometry outside 1..23 (Lucide's own rule); Phosphor's own padding
+   already holds it.
 5. No text, no gradients, no second colour, no opacity inside the glyph.
 6. A Tabler glyph is imported unchanged except for removing Tabler's invisible
    `<path stroke="none" d="M0 0h24v24H0z" fill="none"/>` bounding path.
-7. A glyph we draw is reviewed at 16 px next to its three nearest Lucide neighbours in the
+7. A glyph we draw is reviewed at 16 px next to its three nearest neighbours in the
    gallery before it lands.
+8. Motion that moves part of a glyph or draws it on (`PosedGlyph`, a slash morph) is built on
+   the outline's strokes and keeps drawing the outline until solid parts are annotated
+   (design/35). A cross-fade between two glyphs is solid. The level glyph (volume, brightness)
+   fills its speaker body and sun core and keeps its waves, rays and slash as strokes; the Wi-Fi,
+   Bluetooth and battery status parts stay open strokes (macOS draws them as bars and arcs).
+
+*Decision note, 2026-10-07.* Solid everywhere, outline only as the off half of a pair. The star
+exception (S:302-303: `.star .ic` stroke `--ink-faint`; on: stroke and fill `--warn`) is now the
+general rule: the star's off state is the outline, its on state the solid star, in the row's
+colour (`--warn` when on). Lint: `CurrentColourOutsideStrokeFill` already allowed `fill:
+currentColor` as a whole value, so the rule is unchanged; its cases now pin `fill: currentColor`
+passing and a raw colour on `fill` failing.
+
+### 1.2.1 Solid sources (settled 2026-10-07)
+
+Every `Icon` has a solid form in `crates/ds-style/src/icon/solid_*.rs`; a test walks `Icon::ALL`
+and fails on an empty one. 67 are Tabler filled (MIT, `@tabler/icons` 3.48.0, verbatim except for
+the invisible bounding path; `ChevronLeft` and `ChevronUp` are Tabler's right and down chevrons
+turned 180 degrees), 44 are Phosphor Fill (MIT, `@phosphor-icons/core` 2.1.1, scaled by 3/32 from
+its 256 grid to 24, rounded to three decimals), 3 are drawn here (`Minus`, `Search`, `Switches`).
+Phosphor was taken only where Tabler has no filled form and the Phosphor glyph is a heavy
+shape on the same footprint, so it sits in the same row as the Tabler ones.
+
+Open strokes (a chevron, a plus, a check, an arrow) are solid in the sense that the stroke is
+already a filled outline shape in both sets (Tabler's `check` is a 2 px bar, drawn as a path);
+no solid glyph carries a stroke attribute.
+
+| Icon | Solid form from |
+| --- | --- |
+| `Inbox` | Phosphor Fill `tray` |
+| `Star` | Tabler filled `star` |
+| `Archive` | Tabler filled `archive` |
+| `Clock` | Tabler filled `clock` |
+| `Trash` | Tabler filled `trash` |
+| `Mail` | Tabler filled `mail` |
+| `MailOpen` | Tabler filled `mail-opened` |
+| `Tag` | Tabler filled `tag` |
+| `Refresh` | Phosphor Fill `arrows-clockwise` |
+| `Send` | Tabler filled `send` |
+| `Command` | Phosphor Fill `command` |
+| `Columns` | Tabler filled `columns-3` |
+| `Group` | Tabler filled `layout-board` |
+| `Panel` | Tabler filled `layout-sidebar-right` |
+| `Square` | Tabler filled `square` |
+| `Maximize` | Phosphor Fill `corners-out` |
+| `Corner` | Phosphor Fill `arrow-elbow-down-left` |
+| `Undo` | Phosphor Fill `arrow-u-up-left` |
+| `Check` | Tabler filled `check` |
+| `X` | Tabler filled `x` |
+| `Paperclip` | Phosphor Fill `paperclip` |
+| `Pen` | Tabler filled `pencil` |
+| `Key` | Tabler filled `key` |
+| `FilePen` | Tabler filled `file-pencil` |
+| `OctagonAlert` | Tabler filled `alert-octagon` |
+| `Pin` | Tabler filled `pin` |
+| `Reply` | Phosphor Fill `arrow-bend-up-left` |
+| `ReplyAll` | Phosphor Fill `arrow-bend-double-up-left` |
+| `Forward` | Phosphor Fill `arrow-bend-up-right` |
+| `Search` | hand-made fill |
+| `Settings` | Tabler filled `settings` |
+| `PanelLeft` | Tabler filled `layout-sidebar` |
+| `Plus` | Tabler filled `plus` |
+| `Minus` | hand-made fill |
+| `Wifi` | Phosphor Fill `wifi-high` |
+| `WifiLow` | Phosphor Fill `wifi-low` |
+| `WifiHigh` | Phosphor Fill `wifi-medium` |
+| `WifiOff` | Phosphor Fill `wifi-slash` |
+| `Ethernet` | Phosphor Fill `network` |
+| `Battery` | Phosphor Fill `battery-empty` |
+| `BatteryLow` | Phosphor Fill `battery-low` |
+| `BatteryMedium` | Phosphor Fill `battery-medium` |
+| `BatteryFull` | Phosphor Fill `battery-full` |
+| `BatteryCharging` | Phosphor Fill `battery-charging` |
+| `BatteryWarning` | Phosphor Fill `battery-warning` |
+| `Bluetooth` | Phosphor Fill `bluetooth` |
+| `BluetoothConnected` | Phosphor Fill `bluetooth-connected` |
+| `BluetoothOff` | Phosphor Fill `bluetooth-slash` |
+| `Volume` | Phosphor Fill `speaker-none` |
+| `Volume1` | Phosphor Fill `speaker-low` |
+| `Volume2` | Phosphor Fill `speaker-high` |
+| `VolumeX` | Phosphor Fill `speaker-x` |
+| `Mic` | Tabler filled `microphone` |
+| `MicOff` | Phosphor Fill `microphone-slash` |
+| `Sun` | Tabler filled `sun` |
+| `Moon` | Tabler filled `moon` |
+| `SunMoon` | Tabler filled `contrast` |
+| `Power` | Phosphor Fill `power` |
+| `Lock` | Tabler filled `lock` |
+| `Bell` | Tabler filled `bell` |
+| `BellOff` | Phosphor Fill `bell-slash` |
+| `Grid` | Tabler filled `layout-grid` |
+| `Window` | Tabler filled `app-window` |
+| `Monitor` | Tabler filled `device-desktop` |
+| `Keyboard` | Tabler filled `keyboard` |
+| `ChevronLeft` | Tabler filled `chevron-right`, turned 180 degrees |
+| `ChevronRight` | Tabler filled `chevron-right` |
+| `ChevronUp` | Tabler filled `chevron-down`, turned 180 degrees |
+| `ChevronDown` | Tabler filled `chevron-down` |
+| `ChevronsUpDown` | Tabler filled `caret-up-down` |
+| `Folder` | Tabler filled `folder` |
+| `File` | Tabler filled `file` |
+| `Image` | Tabler filled `photo` |
+| `Terminal` | Phosphor Fill `terminal-window` |
+| `StickyNote` | Phosphor Fill `note` |
+| `Camera` | Tabler filled `camera` |
+| `Download` | Tabler filled `download` |
+| `Upload` | Phosphor Fill `upload-simple` |
+| `Copy` | Tabler filled `copy` |
+| `Link` | Tabler filled `link` |
+| `Sparkles` | Tabler filled `sparkles` |
+| `Gauge` | Tabler filled `gauge` |
+| `Brightness` | Tabler filled `brightness` |
+| `Printer` | Phosphor Fill `printer` |
+| `FolderInput` | Phosphor Fill `tray-arrow-down` |
+| `Play` | Tabler filled `player-play` |
+| `Pause` | Tabler filled `player-pause` |
+| `SkipBack` | Tabler filled `player-skip-back` |
+| `SkipForward` | Tabler filled `player-skip-forward` |
+| `LogOut` | Phosphor Fill `sign-out` |
+| `Restart` | Phosphor Fill `arrow-counter-clockwise` |
+| `Headphones` | Tabler filled `headphones` |
+| `Speaker` | Tabler filled `device-speaker` |
+| `Mouse` | Tabler filled `mouse` |
+| `Gamepad` | Tabler filled `device-gamepad` |
+| `Phone` | Tabler filled `device-mobile` |
+| `Ellipsis` | Tabler filled `dots` |
+| `EllipsisVertical` | Tabler filled `dots-vertical` |
+| `Switches` | hand-made fill |
+| `ArrowRight` | Phosphor Fill `arrow-right` |
+| `CapsLock` | Tabler filled `arrow-big-up-line` |
+| `Clipboard` | Tabler filled `clipboard` |
+| `Smile` | Tabler filled `mood-smile` |
+| `Globe` | Tabler filled `globe` |
+| `MoonFilled` | Tabler filled `moon` |
+| `Bold` | Phosphor Fill `text-b` |
+| `Italic` | Phosphor Fill `text-italic` |
+| `Underline` | Phosphor Fill `text-underline` |
+| `Strike` | Phosphor Fill `text-strikethrough` |
+| `Code` | Phosphor Fill `code` |
+| `Info` | Tabler filled `info-circle` |
+| `CircleCheck` | Tabler filled `circle-check` |
+| `TriangleAlert` | Tabler filled `alert-triangle` |
+| `Heart` | Tabler filled `heart` |
 
 ### 1.3 Data model (settled: moves verbatim from mailo, then made `pub`)
 
@@ -77,7 +236,9 @@ Rendered markup (proposed until spike S6 reports):
      stroke-linejoin="round" fill="none"> <path d="…"/> … </svg>
 ```
 
-The stroke width stays 2 in the 24 grid at every size, so the drawn stroke scales with the
+A solid glyph is the same `svg` with `fill="currentColor" stroke="none"` and a `data-style="solid"` (`"outline"` for the stroked form); its children are `path`s of filled geometry.
+
+The outline's stroke width stays 2 in the 24 grid at every size, so the drawn stroke scales with the
 glyph (Lucide behaviour). No `absoluteStrokeWidth`.
 
 ### 1.4 Sizes
@@ -696,7 +857,8 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 | Item | Licence | What to record |
 | --- | --- | --- |
 | Lucide | ISC | notice file `crates/ds-style/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
-| Tabler Icons | MIT | notice file the Tabler notice file under `crates/ds-style/assets/icons/` (open: not added yet, though `Icon::Brightness` is Tabler's `brightness-half`), list of imported glyph names, version |
+| Tabler Icons | MIT | notice file `crates/ds-style/assets/icons/LICENSE-tabler.txt` (added 2026-10-07), imported glyph names (1.2.1), version 3.48.0 |
+| Phosphor Icons | MIT | notice file `LICENSE-phosphor.txt` beside it, glyph names (1.2.1), version 2.1.1 |
 | Our glyphs | our licence | author, date |
 | Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |
 | FLUX.2 Klein 4B weights | FLUX.2 Klein licence | exact licence text and whether outputs may be used commercially; verify before shipping |

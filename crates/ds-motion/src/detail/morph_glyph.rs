@@ -17,6 +17,7 @@ use ds_style::appearance::motion::MotionLevel;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::icon::stroke::stroke_width;
+use ds_style::icon::style::GlyphStyle;
 use ds_style::scale::use_scale;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
@@ -42,13 +43,14 @@ struct Shown {
 /// `icon` at `size`, cross-fading into each new icon it is given, and for `MorphStyle::Slash`
 /// drawing its slash on or off as `slashed` changes (over `--t-quick`). The first frame is still;
 /// a render with the same icon and slash plays nothing (R2); under Reduced every change snaps
-/// (R7). Decorative (`aria-hidden`): the words beside it carry the state.
+/// (R7). `look` is the glyph's style (solid unless a pair's off state). Decorative (`aria-hidden`): the words beside it carry the state.
 #[component]
 pub fn MorphGlyph(
     icon: Icon,
     size: IconSize,
     style: MorphStyle,
     #[props(default)] slashed: Slashed,
+    #[props(default)] look: GlyphStyle,
 ) -> Element {
     let timer = use_motion_timer(FADE_IN);
     let settled = use_hook(|| EventHandler::new(|()| {}));
@@ -86,6 +88,12 @@ pub fn MorphGlyph(
     let playing = timer.phase() == TimerPhase::Running && shown.before.is_some();
     let px = size.px();
     let stroke = stroke_width(size, use_scale());
+    // The slash is a stroke laid across the glyph, which a solid body would hide: a slash morph
+    // draws its glyph as an outline.
+    let look = match style {
+        MorphStyle::Slash => GlyphStyle::Outline,
+        _ => look,
+    };
     let drawn = slash.frame().value.clamp(0, 1000);
     let offset = SLASH_LENGTH * (1.0 - drawn as f32 / 1000.0);
     let alias = if shown.round.is_multiple_of(2) {
@@ -101,7 +109,7 @@ pub fn MorphGlyph(
                     class: "ds-morph-layer {FADE_OUT.class()}",
                     "data-morph": "out",
                     "data-pulse": alias,
-                    Glyph { icon: before, size }
+                    Glyph { icon: before, size, style: look }
                 }
             }
             span {
@@ -109,7 +117,7 @@ pub fn MorphGlyph(
                 class: if playing { format!("ds-morph-layer {}", FADE_IN.class()) } else { "ds-morph-layer".to_owned() },
                 "data-morph": if playing { "in" } else { "still" },
                 "data-pulse": playing.then_some(alias),
-                Glyph { icon, size }
+                Glyph { icon, size, style: look }
             }
             if style == MorphStyle::Slash && drawn > 0 {
                 svg {

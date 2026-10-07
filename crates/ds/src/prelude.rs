@@ -51,6 +51,7 @@ pub use crate::components::content::status::volume::VolumeGlyph;
 pub use crate::components::content::status::wifi::WifiGlyph;
 pub use ds_style::icon::Icon;
 pub use ds_style::icon::render::IconSize;
+pub use ds_style::icon::style::GlyphStyle;
 
 // Progress and pending work
 pub use crate::components::controls::progress::model::Progress;

@@ -43,7 +43,7 @@ They decide every open question about ornament. They come from `C`'s four cards.
 
 | Rule | Reading now |
 | --- | --- |
-| One weight, one colour | Glyphs are line glyphs (24 grid, 2 px stroke, round caps and joins), one colour (the ink token), no fills. App icons are the one coloured glyph family, and each app has its own colour so apps are told apart as on the Mac. |
+| One weight, one colour | Glyphs are solid (24 grid, filled paths), one colour (the ink token); a star, heart, pin or bell is outline (a 2 px stroke) while off (design/08 section 1.2). App icons are the one coloured glyph family, and each app has its own colour so apps are told apart as on the Mac. |
 | Springs only on contact | Nothing loops and nothing bounces on its own; the spinner is the one loop. A spring belongs to something a hand touched (30 section 1.3). The Dock's attention bounce is the Mac's own. |
 | Variation with a reason | Whatever differs between two items states a fact about them. |
 | Colour is a claim | Chrome is greyscale; a hue states a fact (unread, starred, destructive, status, which account, which app). The Space tint is the one decorative-but-owned colour: it says which Space you are in, on the sidebar ground only. |

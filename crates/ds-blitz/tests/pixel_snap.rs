@@ -61,7 +61,7 @@ fn Fixture() -> Element {
                 div { class: "rule" }
                 div { class: "card" }
                 div { class: "raw" }
-                span { class: "icon", Glyph { icon: Icon::Plus, size: IconSize::Base } }
+                span { class: "icon", Glyph { icon: Icon::Plus, size: IconSize::Base, style: GlyphStyle::Outline } }
             }
             Menu::<i32> {
                 placement: MenuPlacement::Popup,

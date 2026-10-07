@@ -151,7 +151,7 @@ fn a_glyph_is_stroked_and_sized_by_its_attributes() {
             size: IconSize,
         }
         fn glyph(props: At) -> Element {
-            rsx! { Glyph { icon: Icon::Wifi, size: props.size } }
+            rsx! { Glyph { icon: Icon::Wifi, size: props.size, style: GlyphStyle::Outline } }
         }
         let mut dom = VirtualDom::new_with_props(glyph, At { size: *size });
         dom.rebuild_in_place();

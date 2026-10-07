@@ -70,6 +70,16 @@ pub(crate) enum Part {
 }
 
 impl Part {
+    /// The paint of the part's closed shape: the speaker's body and the sun's core are filled
+    /// as well as stroked, so the glyph reads solid (design/08-ICONS.md section 1.2); the open
+    /// strokes (waves, rays, slash) and the keyboard, whose keys a fill would hide, stay strokes.
+    fn fill(self) -> &'static str {
+        match self {
+            Part::Body | Part::Core | Part::KeyCore => "currentColor",
+            _ => "none",
+        }
+    }
+
     fn shapes(self) -> &'static [Shape] {
         let sun = Icon::Sun.shapes();
         match self {
@@ -160,7 +170,7 @@ pub(crate) fn LevelGlyphView(glyph: LevelGlyph, value: Fraction, size: IconSize)
                     "stroke-width": stroke.clone(),
                     "stroke-linecap": "round",
                     "stroke-linejoin": "round",
-                    "fill": "none",
+                    "fill": part.fill(),
                     for shape in part.shapes() {
                         {shape_child(shape)}
                     }
