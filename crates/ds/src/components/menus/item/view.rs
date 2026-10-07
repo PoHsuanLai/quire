@@ -2,7 +2,7 @@
 //! its end its key equivalent or the chevron of a submenu. Called by `lines` for each line of a
 //! panel.
 
-use crate::components::content::avatar::{AvatarFace, AvatarSize, face};
+use crate::components::content::avatar::face;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::press::{button_of, press_of};
@@ -284,10 +284,7 @@ fn image_mark(image: Option<&MenuImage>) -> Element {
         }
         Some(MenuImage::Avatar(avatar)) => rsx! {
             span { class: "ds-menu-image", "data-image": "avatar",
-                {face(AvatarFace {
-                    size: AvatarSize::Size22,
-                    ..*avatar
-                })}
+                {face(*avatar)}
             }
         },
         None => rsx! {

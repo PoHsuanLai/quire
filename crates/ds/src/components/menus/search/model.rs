@@ -2,6 +2,8 @@
 //! optional header. Data, and the one flattening the menu draws from.
 
 use crate::components::menus::item::item::MenuItem;
+use crate::host::measure::Anchor;
+use ds_core::geometry::placement::Placement;
 
 /// A group of suggestions under a header (Spotlight's "Top hit", "Mail", "People").
 #[derive(Debug, Clone, PartialEq)]
@@ -27,6 +29,66 @@ impl<T> SuggestionSection<T> {
             header: None,
             items,
         }
+    }
+}
+
+/// Whether a new list of results highlights its first row.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum InitialHighlight {
+    /// Nothing is highlighted until a key or the pointer asks: Return submits the text.
+    #[default]
+    None,
+    /// The first pickable row is highlighted whenever the results change, so Return picks it
+    /// (Spotlight's top hit).
+    TopHit,
+}
+
+/// What Escape does first when the field holds text and the suggestions are up.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum EscapeOrder {
+    /// The first Escape closes the panel, the second clears the text, the third goes on to the
+    /// window (`NSSearchField`'s way).
+    #[default]
+    ClosePanelFirst,
+    /// The first Escape clears the text (and with it the results), the second goes on to the
+    /// window: Spotlight's way.
+    ClearFirst,
+}
+
+/// How the suggestions are presented.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum SuggestionsPresent {
+    /// A pop-up menu under the field, a second surface.
+    #[default]
+    Popup,
+    /// Spotlight's card: the field and its results are one surface, the field on top and the
+    /// results under a hairline.
+    Card,
+}
+
+/// Where a card floats: at the window level, hung from `anchor`. A card with no place is drawn
+/// where it stands, and its host places it.
+#[derive(Debug, Clone, PartialEq)]
+pub struct CardPlace {
+    /// What the card hangs from.
+    pub anchor: Anchor,
+    /// Which side of it, and how aligned.
+    pub placement: Placement,
+}
+
+/// Who says which row is highlighted.
+#[derive(Debug, Clone, PartialEq)]
+pub enum SearchCursor<T> {
+    /// The field's own: keys, the pointer and the initial highlight move it.
+    Own,
+    /// The caller's: this row's value (none highlights nothing). A key or the pointer only asks
+    /// for a move through `on_highlight`.
+    Is(Option<T>),
+}
+
+impl<T> Default for SearchCursor<T> {
+    fn default() -> Self {
+        SearchCursor::Own
     }
 }
 
