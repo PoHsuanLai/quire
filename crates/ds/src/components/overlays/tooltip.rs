@@ -16,13 +16,13 @@
 //! [`Hint`] is the one implementation: a `Tooltip` is a `Hint` below its target on the Tip
 //! profile, and the shell's `DockLabel` is a `Hint` above its target on the Label profile.
 
+use crate::components::controls::button_tip::{Hinted, own_key};
 use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
 use crate::components::overlays::hover_card::target::HoverTarget;
 use crate::components::overlays::hover_card::{Standing, use_card};
 use crate::host::measure::{MountedRef, client_rect};
 use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, use_hover_hub};
-use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Shown;
@@ -77,16 +77,6 @@ pub fn Tooltip(
             {children}
         }
     }
-}
-
-/// Context a hint provides to what it wraps: a control inside already has its tip, so it draws
-/// none of its own from `title` (a control wrapped in a `Tooltip` never shows two).
-#[derive(Debug, Clone, Copy)]
-pub(crate) struct Hinted;
-
-/// The hover key a hint files its target under: its own, so two hints never share a card.
-pub(crate) fn own_key() -> HoverKey {
-    HoverKey(format!("hint:{}", current_scope_id().0))
 }
 
 /// A hint on `children`: the shared implementation of a tooltip and a dock label. `profile` is

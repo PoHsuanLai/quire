@@ -57,6 +57,7 @@
 //! at the origin and no outside catcher covers the surface.
 
 use crate::components::chrome::window_frame::{WindowFrame, framed};
+use crate::components::overlays::title_tips::use_title_tips_provider;
 use crate::components::overlays::toast::ToastHost;
 use crate::focus::click::ClickRoot;
 use crate::host::signals::HostSignals;
@@ -141,6 +142,7 @@ pub fn Ds(
         activity,
     });
     let hover = use_hover_hub_provider(env);
+    use_title_tips_provider();
     use_toast_hub_provider();
     use_context_provider(|| Signal::new(LayerStack::default()));
     use_overlays_provider();

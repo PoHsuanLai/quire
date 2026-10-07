@@ -7,14 +7,33 @@
 //! A control already inside a hint (a `Tooltip` the caller put round it) draws nothing: never two
 //! tips. With no `Ds` to provide a hub the native `title` attribute stays.
 
-use crate::components::overlays::hover_card::intent::{
-    HoverAnchor, HoverDriver, try_use_hover_intent,
-};
-use crate::components::overlays::tooltip::{Hinted, Tooltip, own_key};
 use crate::host::measure::MountedRef;
 use crate::stack::hover_hub::HoverKey;
+use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
-use ds_motion::hover_intent::HoverProfile;
+
+/// Context a hint provides to what it wraps: a control inside already has its tip.
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Hinted;
+
+/// The hover hub key a hint files its target under: its own, so two hints never share a card.
+pub(crate) fn own_key() -> HoverKey {
+    HoverKey(format!("hint:{}", current_scope_id().0))
+}
+
+/// What `Ds` lends a control to show its title, since the overlays that draw tips sit above
+/// `controls`: the hub's three pointer verbs and the tip's surface. Provided by `overlays`.
+#[derive(Clone, Copy)]
+pub(crate) struct TipPort {
+    /// The pointer came over the control, with its element once mounted.
+    pub over: Callback<(HoverKey, Option<MountedRef>)>,
+    /// The pointer left the control.
+    pub out: Callback<()>,
+    /// The control was pressed.
+    pub press: Callback<()>,
+    /// The tip's surface for `text`, keyed by the control's key.
+    pub surface: fn(String, HoverKey) -> Element,
+}
 
 /// What a control does with its `title`.
 #[derive(Clone)]
@@ -24,9 +43,8 @@ enum Say {
     /// The plain `title` attribute: no `Ds` here provides a hub to draw a tip with.
     Native(String),
     /// A tooltip through the hover hub.
-    Tip(String, Box<HoverDriver>),
+    Tip(String, TipPort),
 }
-
 /// A control's title and the handles that show it. Built once per render; cloning it is cheap.
 #[derive(Clone)]
 pub(crate) struct Tip {
@@ -39,11 +57,11 @@ pub(crate) struct Tip {
 pub(crate) fn use_tip(title: Option<String>) -> Tip {
     let key = use_hook(own_key);
     let element = use_signal(|| None::<MountedRef>);
-    let driver = try_use_hover_intent();
+    let port = try_consume_context::<TipPort>();
     let hinted = try_consume_context::<Hinted>().is_some();
-    let say = match (title, driver, hinted) {
+    let say = match (title, port, hinted) {
         (None, _, _) | (Some(_), _, true) => Say::Nothing,
-        (Some(text), Some(driver), false) => Say::Tip(text, Box::new(driver)),
+        (Some(text), Some(port), false) => Say::Tip(text, port),
         (Some(text), None, false) => Say::Native(text),
     };
     Tip { say, key, element }
@@ -67,37 +85,31 @@ impl Tip {
     /// The pointer came over the control. The innermost control wins, as a hover target does: it
     /// handles the pointer and stops it.
     pub(crate) fn over(&self, event: &MouseEvent) {
-        if let Say::Tip(_, driver) = &self.say {
+        if let Say::Tip(_, port) = &self.say {
             event.stop_propagation();
-            let anchor = self
-                .element
-                .peek()
-                .clone()
-                .map_or(HoverAnchor::Unplaced, HoverAnchor::Element);
-            driver.over(self.key.clone(), HoverProfile::Tip, anchor);
+            port.over
+                .call((self.key.clone(), self.element.peek().clone()));
         }
     }
 
     /// The pointer left the control.
     pub(crate) fn out(&self) {
-        if let Say::Tip(_, driver) = &self.say {
-            driver.out();
+        if let Say::Tip(_, port) = &self.say {
+            port.out.call(());
         }
     }
 
     /// A press removes the tip at once, not warm.
     pub(crate) fn press(&self) {
-        if let Say::Tip(_, driver) = &self.say {
-            driver.press();
+        if let Say::Tip(_, port) = &self.say {
+            port.press.call(());
         }
     }
 
     /// The tip's surface, drawn beside the control (it takes no place in the layout).
     pub(crate) fn surface(&self) -> Element {
         match &self.say {
-            Say::Tip(text, _) => rsx! {
-                Tooltip { text: text.clone(), hover_key: Some(self.key.clone()) }
-            },
+            Say::Tip(text, port) => (port.surface)(text.clone(), self.key.clone()),
             Say::Nothing | Say::Native(_) => rsx! {},
         }
     }

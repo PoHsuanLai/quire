@@ -19,5 +19,6 @@ pub(crate) mod side_panel;
 pub mod skeleton;
 pub mod skeleton_row;
 pub mod swipe_glue;
+pub mod title_tips;
 pub mod toast;
 pub mod tooltip;
