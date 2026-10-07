@@ -18,6 +18,8 @@ use ds_motion::detail::{
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
 use ds_style::icon::solid_fan::{WIFI_DOT, WIFI_LARGE, WIFI_MID, WIFI_SMALL};
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
 
 /// The searching loop: the dot and the three arcs, one at a time (a step every `--t-spin-step`).
 pub(crate) const SEARCHING: PendingSpec = PendingSpec {
@@ -112,7 +114,10 @@ pub fn WifiGlyph(state: WifiState, #[props(default = IconSize::Bar)] size: IconS
     let detail = use_detail(state, Touch::Remote);
     let frame = use_pending(use_operation(detail.cue()), SEARCHING);
     let drawn = use_slash(slashed(state));
-    let pen = Pen { px: size.px() };
+    let pen = Pen {
+        px: size.px(),
+        stroke: stroke_width(size, use_scale()),
+    };
     let shows = layer_shows(state, frame);
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "wifi",

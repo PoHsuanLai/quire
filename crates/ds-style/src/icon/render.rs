@@ -115,6 +115,7 @@ pub fn Glyph(
     #[props(default)] style: GlyphStyle,
     #[props(default)] cut: Thousandths,
 ) -> Element {
+    let style = GlyphStyle::resolve(icon, style);
     let px = size.px();
     let mask = use_hook(|| format!("ds-cut-{}", current_scope_id().0));
     let stroke = stroke_width(size, use_scale());

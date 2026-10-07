@@ -9,6 +9,7 @@ pub mod bluetooth_state;
 pub(crate) mod family;
 pub(crate) mod part;
 pub(crate) mod slash;
+pub(crate) mod stroked;
 pub mod volume;
 pub(crate) mod wifi;
 pub mod wifi_state;

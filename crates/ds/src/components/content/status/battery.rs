@@ -12,6 +12,8 @@ use ds_motion::detail::tween::{TweenSpec, use_tween};
 use ds_style::icon::Icon;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
+use ds_style::icon::stroke::stroke_width;
+use ds_style::scale::use_scale;
 use ds_style::tokens::{easing::EasingToken, timing::DurationToken};
 
 /// A filled bolt centred in the body.
@@ -81,7 +83,10 @@ pub fn BatteryGlyph(
 ) -> Element {
     let share = use_tween(state.drawn(), FILL);
     let look = state.look();
-    let pen = Pen { px: size.px() };
+    let pen = Pen {
+        px: size.px(),
+        stroke: stroke_width(size, use_scale()),
+    };
     let (bolt, plug, under) = marks(look.power);
     let width = FILL_WIDTH * f32::from(share.0.min(1000)) / 1000.0;
     rsx! {

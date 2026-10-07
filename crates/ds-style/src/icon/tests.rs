@@ -295,7 +295,10 @@ fn the_format_and_severity_glyphs_are_lucides() {
 #[test]
 fn every_icon_draws_solid_by_default_as_filled_paths_with_no_stroke() {
     let mut failures = Vec::new();
-    for &icon in Icon::ALL {
+    for &icon in Icon::ALL
+        .iter()
+        .filter(|i| !Icon::ALWAYS_OUTLINE.contains(i))
+    {
         let page = markup_in(icon, GlyphStyle::default());
         let names = element_names(&page);
         let expect: Vec<&str> = std::iter::once("svg")
@@ -312,6 +315,17 @@ fn every_icon_draws_solid_by_default_as_filled_paths_with_no_stroke() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn an_always_outline_glyph_draws_its_stroke_even_when_asked_for_solid() {
+    for &icon in Icon::ALWAYS_OUTLINE {
+        let page = markup_in(icon, GlyphStyle::Solid);
+        assert!(
+            page.contains("data-style=\"outline\"") && page.contains("stroke-width"),
+            "{icon:?}: {page}"
+        );
+    }
 }
 
 #[test]

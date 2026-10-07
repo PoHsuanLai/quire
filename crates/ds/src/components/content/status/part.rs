@@ -49,6 +49,8 @@ pub(crate) struct Part {
 pub(crate) struct Pen {
     /// The side in logical pixels.
     pub(crate) px: u8,
+    /// The stroke width attribute (snapped at fractional scales), for the stroked Bluetooth.
+    pub(crate) stroke: String,
 }
 
 /// `part` as its own `svg.ds-ic.ds-status-part`.

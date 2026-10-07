@@ -51,6 +51,10 @@ exception of the 2026-09 rules (Lucide's hollow outlines as the default).
    `Button { value }` holding one of those glyphs follow it. A pair of different glyphs
    (`Play` and `Pause`, `Bell` and `BellOff`, `Volume` and `VolumeX`) is two solid icons, not a
    style change.
+   One per-icon exception: `Icon::ALWAYS_OUTLINE` (`Bluetooth`, `BluetoothConnected`,
+   `BluetoothOff`) draw Outline in every state, because the owner prefers the stroked rune;
+   `Glyph` applies it through `GlyphStyle::resolve`, and the Bluetooth status glyph is stroked
+   with the old dash-drawn slash.
 4. Keep 1 px padding: no geometry outside 1..23 (Lucide's own rule); Phosphor's own padding
    already holds it.
 5. No text, no gradients, no second colour, no opacity inside the glyph.
@@ -65,7 +69,7 @@ exception of the 2026-09 rules (Lucide's hollow outlines as the default).
    on), with a clear margin cut out of the glyph under it (a mask), as macOS draws it. The
    level glyph is all filled shapes: the speaker, three annular waves, the sun's disc and
    capsule rays, the keyboard slab with its keys cut out. The Wi-Fi fan is a dot and three
-   annular arcs, Bluetooth is the filled rune with filled dots, and the battery is an outlined
+   annular arcs, Bluetooth stays the stroked rune (the exception in rule 3), and the battery is an outlined
    body (a filled path, a wall 1.5 wide, as macOS draws it) holding a solid fill level. That outlined body is the one
    deliberate outline left in the status glyphs: a battery without a visible body reads as a bar.
 
@@ -79,10 +83,10 @@ passing and a raw colour on `fill` failing.
 ### 1.2.1 Solid sources (settled 2026-10-07)
 
 Every `Icon` has a solid form in `crates/ds-style/src/icon/solid_*.rs`; a test walks `Icon::ALL`
-and fails on an empty one. 67 are Tabler filled (MIT, `@tabler/icons` 3.48.0, verbatim except for
+and fails on an empty one. 63 are Tabler filled (MIT, `@tabler/icons` 3.48.0, verbatim except for
 the invisible bounding path; `ChevronLeft` and `ChevronUp` are Tabler's right and down chevrons
 turned 180 degrees), 38 are Phosphor Fill (MIT, `@phosphor-icons/core` 2.1.1, scaled by 3/32 from
-its 256 grid to 24, rounded to three decimals), 3 are drawn here (`Minus`, `Search`, `Switches`) and 6 more from Lucide's speaker body and our own arcs (`Wifi`, `WifiLow`, `WifiHigh`, `Volume`, `Volume1`, `Volume2`); the parts of the animated icons (`solid_parts.rs`) are drawn here too.
+its 256 grid to 24, rounded to three decimals), 7 are drawn here (`Minus`, `Search`, `Switches` and the rounded transport glyphs `Play`, `Pause`, `SkipBack`, `SkipForward`) and 6 more from Lucide's speaker body and our own arcs (`Wifi`, `WifiLow`, `WifiHigh`, `Volume`, `Volume1`, `Volume2`); the parts of the animated icons (`solid_parts.rs`) are drawn here too.
 Phosphor was taken only where Tabler has no filled form and the Phosphor glyph is a heavy
 shape on the same footprint, so it sits in the same row as the Tabler ones.
 
@@ -137,7 +141,7 @@ no solid glyph carries a stroke attribute.
 | `BatteryFull` | Phosphor Fill `battery-full` |
 | `BatteryCharging` | Phosphor Fill `battery-charging` |
 | `BatteryWarning` | Phosphor Fill `battery-warning` |
-| `Bluetooth` | Phosphor Fill `bluetooth` |
+| `Bluetooth` | Phosphor Fill `bluetooth`  (kept, unused: stroked, see `ALWAYS_OUTLINE`) |
 | `BluetoothConnected` | Phosphor Fill `bluetooth-connected` |
 | `BluetoothOff` | Phosphor Fill `bluetooth-slash` |
 | `Volume` | Lucide `volume` body, filled (ISC, `solid_fan.rs`) |
@@ -177,10 +181,10 @@ no solid glyph carries a stroke attribute.
 | `Brightness` | Tabler filled `brightness` |
 | `Printer` | Phosphor Fill `printer` |
 | `FolderInput` | Phosphor Fill `tray-arrow-down` |
-| `Play` | Tabler filled `player-play` |
-| `Pause` | Tabler filled `player-pause` |
-| `SkipBack` | Tabler filled `player-skip-back` |
-| `SkipForward` | Tabler filled `player-skip-forward` |
+| `Play` | hand-made from Lucide `play` (its stroke's outer edge, rounder than Tabler) |
+| `Pause` | hand-made from Lucide `pause` (its stroke's outer edge, rounder than Tabler) |
+| `SkipBack` | hand-made from Lucide `skip-back` (its stroke's outer edge, rounder than Tabler) |
+| `SkipForward` | hand-made from Lucide `skip-forward` (its stroke's outer edge, rounder than Tabler) |
 | `LogOut` | Phosphor Fill `sign-out` |
 | `Restart` | Phosphor Fill `arrow-counter-clockwise` |
 | `Headphones` | Tabler filled `headphones` |

@@ -22,15 +22,32 @@ impl Icon {
     /// heart, a pin, a bell (design/08-ICONS.md section 1.2). Every other glyph is solid in
     /// both states, its state carried by colour or by the control around it.
     pub const OFF_IS_OUTLINE: &[Icon] = &[Icon::Star, Icon::Heart, Icon::Pin, Icon::Bell];
+
+    /// The glyphs drawn as an outline in both states, a stated per-icon override: the owner
+    /// prefers the stroked rune (design/08-ICONS.md section 1.2).
+    pub const ALWAYS_OUTLINE: &[Icon] = &[
+        Icon::Bluetooth,
+        Icon::BluetoothConnected,
+        Icon::BluetoothOff,
+    ];
 }
 
 impl GlyphStyle {
+    /// The style `icon` draws in whatever it is asked for: outline for a glyph of
+    /// [`Icon::ALWAYS_OUTLINE`], else `asked`.
+    pub fn resolve(icon: Icon, asked: GlyphStyle) -> GlyphStyle {
+        match Icon::ALWAYS_OUTLINE.contains(&icon) {
+            true => GlyphStyle::Outline,
+            false => asked,
+        }
+    }
+
     /// The style `icon` draws in when the control that holds it is in `state`: for a glyph of
     /// [`Icon::OFF_IS_OUTLINE`] what [`GlyphStyle::of`] says, else solid.
     pub fn for_state(icon: Icon, state: Check) -> GlyphStyle {
         match Icon::OFF_IS_OUTLINE.contains(&icon) {
             true => GlyphStyle::of(state),
-            false => GlyphStyle::Solid,
+            false => GlyphStyle::resolve(icon, GlyphStyle::Solid),
         }
     }
 
@@ -100,6 +117,16 @@ mod tests {
         assert_eq!(
             GlyphStyle::for_state(Icon::Trash, Check::Off),
             GlyphStyle::Solid
+        );
+        for state in [Check::On, Check::Off] {
+            assert_eq!(
+                GlyphStyle::for_state(Icon::Bluetooth, state),
+                GlyphStyle::Outline
+            );
+        }
+        assert_eq!(
+            GlyphStyle::resolve(Icon::Bluetooth, GlyphStyle::Solid),
+            GlyphStyle::Outline
         );
     }
 }

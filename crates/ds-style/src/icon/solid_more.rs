@@ -95,35 +95,34 @@ const FOLDER_INPUT: &[Shape] = &[Shape::Solid(
     "M19.5 3 H4.5 A1.5 1.5 0 0 0 3 4.5 V19.5 a1.5 1.5 0 0 0 1.5 1.5 H19.5 a1.5 1.5 0 0 0 1.5 -1.5 V4.5 A1.5 1.5 0 0 0 19.5 3 Z M8.469 10.719 a0.75 0.75 0 0 1 1.061 0 L11.25 12.44 V6.75 a0.75 0.75 0 0 1 1.5 0 v5.69 l1.719 -1.72 a0.75 0.75 0 0 1 1.061 1.061 l-3 3 a0.75 0.75 0 0 1 -1.061 0 l-3 -3 A0.75 0.75 0 0 1 8.469 10.719 Z M19.5 19.5 H4.5 V15.75 H7.19 L9 17.561 A1.49 1.49 0 0 0 10.06 18 h3.879 A1.487 1.487 0 0 0 15 17.56 L16.81 15.75 H19.5 v3.75 Z",
 )];
 
-/// Tabler Icons 3.48.0 `filled/player-play` (MIT), verbatim.
+/// Hand-made from Lucide `play` (ISC): its centreline triangle, rounded at 2, stroked 2 wide,
+/// as one fill: the stroke's outer edge, corners of radius 3.
 const PLAY: &[Shape] = &[Shape::Solid(
-    "M6 4v16a1 1 0 0 0 1.524 .852l13 -8a1 1 0 0 0 0 -1.704l-13 -8a1 1 0 0 0 -1.524 .852z",
+    "M19.611 14.531L8.611 21.531A3 3 0 0 1 4 19L4 5A3 3 0 0 1 8.611 2.469L19.611 9.469A3 3 0 0 1 19.611 14.531Z",
 )];
 
-/// Tabler Icons 3.48.0 `filled/player-pause` (MIT), verbatim.
+/// Hand-made from Lucide `pause` (ISC): its two bars, `rx` 1, stroked 2 wide, as fills: the
+/// stroke's outer edge, 7 by 20 with corners of radius 2.
 const PAUSE: &[Shape] = &[
-    Shape::Solid("M9 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z"),
-    Shape::Solid("M17 4h-2a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2 -2v-12a2 2 0 0 0 -2 -2z"),
+    Shape::Solid("M6 2H9A2 2 0 0 1 11 4V20A2 2 0 0 1 9 22H6A2 2 0 0 1 4 20V4A2 2 0 0 1 6 2Z"),
+    Shape::Solid("M15 2H18A2 2 0 0 1 20 4V20A2 2 0 0 1 18 22H15A2 2 0 0 1 13 20V4A2 2 0 0 1 15 2Z"),
 ];
 
-/// Tabler Icons 3.48.0 `filled/player-skip-back` (MIT), verbatim.
+/// Hand-made from Lucide `skip-back` (ISC): the rounded triangle and the bar, each as the
+/// stroke's outer edge (corner radius 3 on the triangle, a 2 wide capsule for the bar).
 const SKIP_BACK: &[Shape] = &[
     Shape::Solid(
-        "M19.496 4.136l-12 7a1 1 0 0 0 0 1.728l12 7a1 1 0 0 0 1.504 -.864v-14a1 1 0 0 0 -1.504 -.864z",
+        "M22 6L22 18A3 3 0 0 1 17.457 20.572L7.457 14.572A3 3 0 0 1 7.457 9.428L17.457 3.428A3 3 0 0 1 22 6Z",
     ),
-    Shape::Solid(
-        "M4 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z",
-    ),
+    Shape::Solid("M3 3H3A1 1 0 0 1 4 4V20A1 1 0 0 1 3 21H3A1 1 0 0 1 2 20V4A1 1 0 0 1 3 3Z"),
 ];
 
-/// Tabler Icons 3.48.0 `filled/player-skip-forward` (MIT), verbatim.
+/// Hand-made from Lucide `skip-forward` (ISC): `SKIP_BACK` mirrored on the 24 grid.
 const SKIP_FORWARD: &[Shape] = &[
     Shape::Solid(
-        "M3 5v14a1 1 0 0 0 1.504 .864l12 -7a1 1 0 0 0 0 -1.728l-12 -7a1 1 0 0 0 -1.504 .864z",
+        "M16.543 14.572L6.543 20.572A3 3 0 0 1 2 18L2 6A3 3 0 0 1 6.543 3.428L16.543 9.428A3 3 0 0 1 16.543 14.572Z",
     ),
-    Shape::Solid(
-        "M20 4a1 1 0 0 1 .993 .883l.007 .117v14a1 1 0 0 1 -1.993 .117l-.007 -.117v-14a1 1 0 0 1 1 -1z",
-    ),
+    Shape::Solid("M21 3H21A1 1 0 0 1 22 4V20A1 1 0 0 1 21 21H21A1 1 0 0 1 20 20V4A1 1 0 0 1 21 3Z"),
 ];
 
 /// Phosphor Icons 2.1.1 Fill `sign-out-fill` (MIT), scaled from its 256 grid to 24.
