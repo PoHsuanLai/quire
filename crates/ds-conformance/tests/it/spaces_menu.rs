@@ -194,3 +194,39 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
     assert_eq!(harness.count(".ds-menu"), 0, "a kit row closes the menu");
     assert_eq!(harness.count(".ds-spaces-dot-hold"), 3, "and did its work");
 }
+
+/// The first frame the submenu is painted, its rect; then its rect once everything has settled.
+fn first_painted_and_settled(harness: &mut Harness) -> (Rect, Rect) {
+    const SUB: &str = ".ds-menu[data-depth=\"1\"]";
+    let accounts = harness
+        .centre(".ds-menu-item:nth-child(5) .ds-menu-label")
+        .expect("the Accounts row");
+    harness.send(Input::click(accounts));
+    let mut first = None;
+    for _ in 0..60 {
+        harness.advance(ms(16));
+        let hidden = harness
+            .attr(SUB, "style")
+            .is_none_or(|style| style.contains("visibility:hidden"));
+        if first.is_none() && !hidden {
+            first = harness.rect(SUB);
+        }
+    }
+    harness.advance(ms(400));
+    // A kept-open pick re-renders the page; the submenu must not move for it.
+    let ada = harness
+        .centre(&format!("{SUB} .ds-menu-item:nth-child(1) .ds-menu-label"))
+        .expect("the first account");
+    harness.send(Input::click(ada));
+    harness.advance(ms(400));
+    let settled = harness.rect(SUB).expect("the submenu");
+    (first.expect("the submenu was painted"), settled)
+}
+
+#[test]
+fn the_submenu_is_painted_where_it_settles() {
+    let mut harness = harness(WithAccounts);
+    open_menu(&mut harness);
+    let (first, settled) = first_painted_and_settled(&mut harness);
+    assert_eq!(first, settled, "the first painted frame is the settled one");
+}

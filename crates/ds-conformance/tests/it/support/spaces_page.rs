@@ -59,7 +59,7 @@ fn page_of(count: usize, with_extra: Extra) -> Element {
         }],
     };
     rsx! {
-        Ds { appearance: Appearance::default(), material: Material::Window, look: spaces.look(),
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport, look: spaces.look(),
             div {
                 class: "app",
                 tabindex: "0",
