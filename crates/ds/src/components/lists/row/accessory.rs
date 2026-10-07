@@ -4,7 +4,7 @@
 
 use crate::components::content::status::battery::BatteryGlyph;
 use crate::components::content::status::battery_state::BatteryState;
-use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
+use crate::components::controls::badge::label as count_label;
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::components::controls::toggle::Toggle;
@@ -43,7 +43,8 @@ pub enum Accessory {
     Battery(BatteryState),
     /// The small spinner, for work the row does not otherwise show (a busy row shows it itself).
     Spinner,
-    /// A count in a quiet capsule.
+    /// A count as plain text, no capsule (macOS Mail's sidebar): semibold, tabular, in the
+    /// secondary ink; more than 999 reads `999+`, zero draws nothing.
     Badge(u32),
     /// A control the caller draws (a `⋯` button, a cancel button). Presses and keys in it stay
     /// in it: the row neither runs nor takes the selection.
@@ -133,9 +134,10 @@ pub(crate) fn draw(accessory: &Accessory, label: &str, availability: Availabilit
         Accessory::Spinner => rsx! {
             span { class: "ds-row-trailing", "data-mark": "busy", Busy {} }
         },
+        Accessory::Badge(0) => rsx! {},
         Accessory::Badge(value) => rsx! {
             span { class: "ds-row-trailing", "data-mark": "badge",
-                Badge { content: BadgeContent::Number(value), tone: BadgeTone::Quiet, size: ControlSize::Small }
+                span { class: "ds-row-count", "{count_label(value)}" }
             }
         },
         Accessory::Slot(element) => rsx! {

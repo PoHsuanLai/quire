@@ -1761,6 +1761,9 @@ html,body{margin:0;padding:0;background:transparent}
    been busy wears `ds-busy-seen`, so a row's first show plays nothing. */
 .ds-busy-seen > .ds-row-trailing{ animation:fade var(--t-quick) var(--e-out); }
 .ds-row-trailing[*|data-mark=text]{ font-family:var(--font-data); font-variant-numeric:tabular-nums; }
+.ds-row-trailing[*|data-mark=badge]{ color:var(--ink-soft); }
+/* A count is plain text (macOS Mail's sidebar): semibold, tabular, secondary ink, no capsule. */
+.ds-row-count{ font-family:var(--font-data); font-size:var(--fs-help); font-weight:600; font-variant-numeric:tabular-nums; line-height:1; white-space:nowrap; }
 .ds-row-figure{ font-variant-numeric:tabular-nums; min-width:3.2ch; text-align:right; }
 .ds-row-when{ display:inline-block; flex:none; margin-left:auto; font-family:var(--font-data); font-size:var(--fs-caption); color:var(--ink-faint); font-variant-numeric:tabular-nums; }
 .ds-row-when + .ds-row-trailing, .ds-row-when + .ds-key-equivalent{ margin-left:calc(var(--s-6) - var(--s-8)); }
@@ -1787,8 +1790,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-drop=target]{ background:var(--accent-soft); color:var(--ink); transform:scale(1.045); box-shadow:var(--shadow-1); }
 .ds-row[*|data-drop=accepts]{ box-shadow:inset 0 0 0 var(--hair) var(--accent-text); }
 
-/* A Today tab: what it has left is its trailing data; one about to expire is drawn quieter. */
+/* A Today tab: what it has left is plain semibold tabular text in the secondary ink, as a count is;
+   one about to expire is drawn quieter and its time in the warn ink. No fill, border or padding. */
+.ds-row[*|data-shape=today] .ds-row-when,
+.ds-row[*|data-shape=today-soon] .ds-row-when{ font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); }
 .ds-row[*|data-shape=today-soon]{ opacity:.6; }
+.ds-row[*|data-shape=today-soon] .ds-row-when{ color:var(--warn); }
 
 /* A palette group's Show More brings the rows it added in as inserted rows come. */
 .ds-row[*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }

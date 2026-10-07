@@ -31,7 +31,7 @@ pub enum BadgeContent {
 }
 
 /// The text of a count: the number, or `999+` past the most.
-fn label(count: u32) -> String {
+pub(crate) fn label(count: u32) -> String {
     match count {
         0 => String::new(),
         n if n > MOST => format!("{MOST}+"),
