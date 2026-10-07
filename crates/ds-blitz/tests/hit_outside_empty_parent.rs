@@ -94,7 +94,6 @@ fn a_click_on_an_absolute_child_outside_a_zero_height_parent_hits_the_child() {
 }
 
 #[test]
-#[ignore = "gap(blitz): a stacking-context parent (z-index) with no height prunes its hit at node.rs `if !matches_self ...` so a child drawn outside its box is not hit (docs/blitz-gaps.md)"]
 fn a_click_on_an_absolute_child_outside_a_zero_height_stacking_parent_hits_the_child() {
     assert_hit(&[3, 4]);
 }
