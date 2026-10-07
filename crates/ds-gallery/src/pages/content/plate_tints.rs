@@ -53,7 +53,7 @@ pub fn PlateTints() -> Element {
         Section { title: "Tinted plates", note: "IconView {{ plate: Some(PlateFamily::Neutral), plate_tint: PlateTint::of(style, tint) }}: the plate's stops and ink re-coloured by retint's rule for both schemes, the root's data-theme picking one. Each tile's raster went through retint with the same pair; the glyph tile is the symbolic fallback.",
             for scheme in Scheme::ALL.iter().copied() {
                 Surface { material: Material::Popover, theme: Some(scheme),
-                    div { class: "g-row g-row-top",
+                    div { class: "g-row g-row-top g-stage-pad",
                         for column in columns() {
                             Specimen { name: format!("{} ({})", column.name, scheme.slug()),
                                 div { class: "g-row",

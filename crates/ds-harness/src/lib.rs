@@ -28,6 +28,7 @@ mod harness_style;
 mod harness_wheel;
 mod headless;
 mod input;
+pub mod inset;
 mod painter;
 mod round_budget;
 #[cfg(test)]

@@ -97,7 +97,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled) < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, `ScrollHandle`), `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
-| `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot` |
+| `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
 | `ds-conformance` | `tests/<component>.rs`, `tests/support/` |
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
 
@@ -770,6 +770,7 @@ are reached as `ds::components::app::X`, not through the prelude.
 | Host behaviour (frames, clipboard, edit, drop, spell, PDF) | `Harness` on the real `BlitzHost` | `ds-blitz/tests/<topic>.rs` |
 | Settings | `Store` on `ConfigRoot::Scratch`, `SystemPrefsSource::Fixed` | `ds-settings/tests` |
 | Pixels | `Harness::render`, golden in `tests/snapshots/`, re-blessed only with a reason in the commit message | the owning crate |
+| Content inset (text, glyphs, images 8 px off a painted box edge) | `ds_harness::inset::assert_insets(&harness, &Policy::quire())` | `ds-gallery/src/inset_tests.rs` (every page, light and dark); `ds-harness/tests/inset.rs` (the detector) |
 | A consumer | `examples/consumer/tests/coherence.rs` | `examples/consumer` |
 
 The one harness is `ds-harness`: `Harness` implements `Driver` and `DocQuery` over one headless
@@ -781,6 +782,13 @@ system: no real XDG, no portal, no D-Bus, no clipboard, no GPU unless `Backend::
 for. SSR needs no harness: a test renders a `VirtualDom` with `dioxus_ssr` (`crates/ds/tests/support/`).
 `sill` drives its surfaces through the same `Driver` trait once shell-host's headless surface
 implements it (the traits build with `ds-harness` default features off).
+
+The content inset check lives in `ds-harness`, not `ds-lint` or `ds-conformance`. It reads
+*laid-out* geometry (the glyph runs and border boxes of a Blitz document), which `ds-lint` (strings
+only, no Blitz) cannot, and `ds-conformance` is test-only (a consumer cannot depend on its
+tests), while `ds-harness` is the dev-dependency every consumer already has and the one crate whose
+`DocQuery` reads any rendered document, quire's or an app's. Its `Policy::quire()` allow table names
+the components the design holds under `--s-8`, each with its reason; an app adds its own.
 
 ## 9. Repo rules
 

@@ -586,6 +586,44 @@ design/26 R3: no CSS animation, no pending `ds` timer, nothing woke the document
 same test (a 900 ms hold begun at the top of a window shorter than 900 ms) can still be pending
 when it returns. Use `Clock::Virtual` for any test that needs the strict guarantee, not the poll.
 
+### Content inset check
+
+Text, glyphs and images keep 8 px (`--s-8`, the menu and row text inset) from the painted left and
+right edge of the box they sit in. Rule 1 cannot see this (a row with no `padding` is clean CSS),
+so one test renders your surface and measures the laid-out document. `ds-harness` is the
+dev-dependency you already have:
+
+```rust,ignore
+use ds_harness::inset::{assert_insets, Allow, Policy};
+use ds_harness::{Harness, HarnessConfig, Viewport};
+use ds::prelude::Px;
+
+#[test]
+fn every_surface_keeps_content_off_the_box_edges() {
+    let view = Viewport { width: 900, height: 700, scale_percent: 100 };
+    // quire's policy is the 8 px default plus quire's own allowances; add yours with a reason.
+    let policy = Policy::quire().allowing(&[Allow {
+        class: "unread-count",
+        min: Px(4.0),
+        reason: "a count badge: design/04 section 12, 4 px either side",
+    }]);
+    for open in [Surface::Inbox, Surface::Settings] {
+        let harness = Harness::new(open.app(), HarnessConfig::new(view));
+        assert_insets(&harness, &policy); // lists every offence: box path, side, gap, minimum
+    }
+}
+```
+
+A *visible box* is an element that paints an edge: a background that differs from what is behind it,
+a gradient, a border on a side, an outline, a shadow, or a `aria-selected`/`data-selected` state.
+`insets(&harness, &policy)` returns the `Findings` instead of panicking (`offences`, and `excused`,
+one per gap an `Allow` forgave, so a test can fail an entry that excuses nothing). Fix an offence
+with padding on the box (or the content's margin) in `--s-*` steps; widen the allow table only for a
+class the design really holds narrower, and say why. A lone icon centred in its box (an icon button)
+is never flagged. It does not see a filled child box (dot, avatar, switch thumb) as content, only
+text, glyphs and images. Set `Harness` states first (`send`, `advance`) to check a hover, a popover
+or an open menu.
+
 ## 6. The component catalogue
 
 Every component is `ds::<Name>`, one `.rs`/`.css` pair per `design/04-COMPONENTS.md` section

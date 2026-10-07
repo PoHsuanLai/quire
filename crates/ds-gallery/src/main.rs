@@ -27,6 +27,8 @@ mod wallpaper;
 mod wallpaper_vivid;
 
 #[cfg(test)]
+mod inset_tests;
+#[cfg(test)]
 mod tests;
 
 use axes::{Axes, start_with};

@@ -48,6 +48,7 @@
 .g-stage{position:relative;min-height:120px;border-radius:var(--r-panel);background:var(--surface-2);overflow:hidden}
 .g-stage-tall{min-height:200px}
 .g-stage-pad{padding:var(--s-14)}
+.g-list.g-stage-pad{padding:var(--s-14)}
 .g-leave{width:360px;border-radius:var(--r-panel);overflow:hidden}
 .g-leave-row{padding:var(--s-4) var(--s-8)}
 .g-list{position:relative;max-width:620px;border-radius:var(--r-panel);background:var(--surface);border:var(--hair) solid var(--line-soft);padding:var(--s-4) 0}
