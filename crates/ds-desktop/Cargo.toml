@@ -25,6 +25,7 @@ dbus = ["dep:zbus"]
 # `use_desktop`, the signal a component gates a desktop extra on.
 dioxus = ["dep:dioxus"]
 
+# Its own target: it starts a private D-Bus and needs the `dbus` feature.
 [[test]]
 name = "private_bus"
 required-features = ["dbus"]

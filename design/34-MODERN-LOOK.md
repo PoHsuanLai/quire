@@ -370,7 +370,7 @@ Step 1 (Sonoma):
   with `before/`).
 - **Lane 1B controls** (ds/components/controls, fields, menus/pop_up_button, menus/item,
   overlays/popover.css): button, text field, toggle/slider/checkbox, popup, menu, popover.
-  Verify: `cargo test -p ds --test stylesheet` (re-record golden: `cargo insta` / the repo's
+  Verify: `cargo test -p ds --test it stylesheet` (re-record golden: `cargo insta` / the repo's
   `UPDATE_GOLDENS=1`, see design/30 README) plus gallery Controls and Menus pages.
 - **Lane 1C lists + forms** (ds/components/lists, new `forms/`): `grouped` list style, Form,
   Section, IconTile, separator inset, chevron rule, Table header/row. Verify:

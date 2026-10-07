@@ -2,7 +2,7 @@
 //! --example pdf -- out.pdf`. The first call builds the shared font context (system fonts
 //! scanned once per process), so it is timed apart from a second, warm call.
 
-#[path = "../tests/support/print_fixture.rs"]
+#[path = "../tests/it/support/print_fixture.rs"]
 mod print_fixture;
 
 use ds_blitz::{PageSpec, pdf};

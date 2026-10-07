@@ -2,7 +2,7 @@
 //! print --example print`. On Linux the desktop portal's dialog opens (unparented); without a
 //! portal the PDF opens in the system's viewer.
 
-#[path = "../tests/support/print_fixture.rs"]
+#[path = "../tests/it/support/print_fixture.rs"]
 mod print_fixture;
 
 use ds_blitz::{PageSpec, pdf, print_dialog};

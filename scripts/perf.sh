@@ -8,7 +8,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# "<package> <test binary>": every `#[ignore = "perf: ..."]` test in that binary.
+# "<package> <test module>": every `#[ignore = "perf: ..."]` test in that module of the crate's `it` executable.
 PERF=(
   "ds-blitz pdf_output"
 )
@@ -23,5 +23,5 @@ fi
 
 for entry in "${PERF[@]}"; do
   read -r package binary <<<"$entry"
-  cargo test "${profile[@]}" -p "$package" --all-features --test "$binary" -- --ignored --nocapture
+  cargo test "${profile[@]}" -p "$package" --all-features --test it "${binary}::" -- --ignored --nocapture
 done

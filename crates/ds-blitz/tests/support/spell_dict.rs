@@ -1,5 +1,6 @@
 //! A tiny Hunspell dictionary written into a fresh temporary directory, so the spelling tests
 //! never depend on what the machine has installed.
+#![allow(dead_code, reason = "each includer uses its own part of this module")]
 
 use std::path::PathBuf;
 

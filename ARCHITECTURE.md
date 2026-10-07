@@ -307,7 +307,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Live (D-Bus) settings modules: schema, skeleton, proxy | `ds-settings::live` (feature `live`; the daemon owns the state) |
 | Desktop preferences (portal) | `ds-settings::portal::SystemPrefsSource` |
 | Test driver, document queries | `ds-harness::{Driver, DocQuery, Query}` |
-| SSR rendering and golden files in tests | `crates/ds/tests/support/` (`golden.rs`, `scoped.rs`); `dioxus_ssr` |
+| SSR rendering and golden files in tests | `crates/ds/tests/it/support/` (`golden.rs`, `scoped.rs`); `dioxus_ssr` |
 | Clipboard | `ds-blitz::clipboard::Clipboard` |
 | A GPU texture inside the document, the window's wgpu device, CPU pixels uploaded to it | `ds-blitz::texture_layer::{TextureLayer, use_gpu, Gpu, TextureHandle}`; headless device `ds-harness::Harness::gpu` |
 | Net policy, `data:` URLs | `blitz-kit::net`, `blitz-kit::data_url` |
@@ -793,11 +793,15 @@ are reached as `ds::components::app::X`, not through the prelude.
 
 ## 8. Test harness
 
+> Test paths below written `tests/<name>.rs` mean `tests/it/<name>.rs`: a crate's integration tests are
+> modules of one executable (`tests/it/main.rs`), and a separate target needs a stated reason
+> (CONVENTIONS.md section 8).
+
 | Kind of thing | Test | Where |
 | --- | --- | --- |
 | Pure function or step | table test: `const CASES: &[(Input, Expected)]`, one loop | beside the code |
 | Word, Token, Timeline, Detailed | table over `ALL` / sample instants / `moment_table` | the owning crate |
-| Component markup | SSR render, golden, `ds_lint::markup` | `crates/<crate>/tests/<component>_ssr.rs` |
+| Component markup | SSR render, golden, `ds_lint::markup` | `crates/<crate>/tests/it/<component>_ssr.rs` |
 | Stylesheet | `ds_lint::assert_clean(css, &LintConfig::new(kits))` (`self_lint`) | `ds-shell/tests/self_lint.rs` (sill: `sill-shell-kit/tests/self_lint.rs`) |
 | Component behaviour (pointer, keys, focus, time, paint) | `Harness` through `Driver` and `Query` | `ds-conformance/tests/<component>.rs` |
 | Host behaviour (frames, clipboard, edit, drop, spell, PDF) | `Harness` on the real `BlitzHost` | `ds-blitz/tests/<topic>.rs` |

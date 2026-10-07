@@ -1,0 +1,371 @@
+//! The overlay components (design/04-COMPONENTS.md sections 18, 20-25, 29-31): every component
+//! in every state rendered inside a `Ds` through dioxus-ssr and compared with a golden in
+//! `tests/snapshots/overlays/<component>/<state>.html`; the root's toast host and tint alpha;
+//! the layer stack a floating component joins; and the goldens' markup against the stylesheet.
+//!
+//! `DS_BLESS=1 cargo test -p ds --test it components_overlays` rewrites the goldens.
+
+#[path = "overlays/cases.rs"]
+mod cases;
+use crate::css_scan;
+use crate::support::dom_time;
+use crate::support::golden;
+#[path = "overlays/hover_card_flag.rs"]
+mod hover_card_flag;
+#[path = "overlays/hover_card_hooks.rs"]
+mod hover_card_hooks;
+#[path = "overlays/palette_and_hover_targets.rs"]
+mod palette_and_hover_targets;
+
+use cases::{CASES, Case};
+use dioxus::core::NoOpMutations;
+use dioxus::prelude::*;
+use dom_time::TimedDom;
+use ds::assembly::ds::Inject;
+use ds::components::app::peek::Peek;
+use ds::host::measure::Anchor;
+use ds::prelude::*;
+use ds::stack::layer_stack::Dismissal;
+use ds::stack::layer_stack::LayerId;
+use ds::stack::layer_stack::LayerStack;
+use ds_style::appearance::peek::PeekMode;
+use std::cell::Cell;
+use std::time::Duration;
+
+#[derive(Props, Clone)]
+struct HostProps {
+    make: fn() -> Element,
+    tint: Option<Alpha>,
+}
+
+/// Never equal: the host renders once, and function addresses are not comparable anyway.
+impl PartialEq for HostProps {
+    fn eq(&self, _: &Self) -> bool {
+        false
+    }
+}
+
+/// A case inside a `Ds` that inlines no stylesheet, with a host tint alpha when given.
+fn host(props: HostProps) -> Element {
+    rsx! {
+        Ds {
+            appearance: Appearance::default(),
+            material: Material::Popover,
+            stylesheet: Inject::Host,
+            tint_alpha: props.tint,
+            {(props.make)()}
+        }
+    }
+}
+
+/// Build the dom on a virtual clock, flush the effects that register overlays, and let `wait`
+/// of virtual time pass.
+fn built(make: fn() -> Element, tint: Option<Alpha>, wait: Duration) -> TimedDom {
+    let mut dom = TimedDom::new(|| VirtualDom::new_with_props(host, HostProps { make, tint }));
+    for _ in 0..3 {
+        dom.render_immediate(&mut NoOpMutations);
+    }
+    dom.run_for(wait);
+    dom.render_immediate(&mut NoOpMutations);
+    dom
+}
+
+/// What a case renders inside the root: the markup between `.ds`'s own tags, so a change to
+/// the frame variables does not rewrite every golden.
+fn inside_root(dom: &VirtualDom) -> String {
+    let html = dioxus_ssr::render(dom);
+    let open = html.find('>').map_or(0, |at| at + 1);
+    let close = html.rfind("</div>").unwrap_or(html.len());
+    html[open..close].to_string()
+}
+
+fn golden_name(case: &Case) -> String {
+    format!("overlays/{}/{}.html", case.component, case.state)
+}
+
+#[test]
+fn every_overlay_matches_its_golden() {
+    let failures: Vec<String> = CASES
+        .iter()
+        .chain(palette_and_hover_targets::PALETTE_AND_HOVER_CASES)
+        .chain(hover_card_hooks::HOVER_CARD_HOOK_CASES)
+        .chain(hover_card_flag::HOVER_CARD_FLAG_CASES)
+        .filter_map(|case| {
+            let dom = built(case.make, None, case.wait);
+            golden::check(&golden_name(case), &inside_root(&dom)).err()
+        })
+        .collect();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+#[test]
+fn floating_surfaces_render_through_the_overlay_host() {
+    // A menu drawn inside a paragraph lands after it, at the end of `.ds`, in the menu layer.
+    fn inside() -> Element {
+        rsx! {
+            p { class: "here",
+                Menu {
+                    placement: MenuPlacement::Popup,
+                    anchor: Anchor::Point(Point { x: Px(10.0), y: Px(10.0) }),
+                    items: vec![MenuItem::new(1u8, "One")],
+                    onpick: |_| {},
+                    onclose: |_| {},
+                }
+            }
+        }
+    }
+    let html = inside_root(&built(inside, None, Duration::ZERO));
+    let paragraph = html
+        .find("<p class=\"here\"></p>")
+        .expect("the paragraph is empty");
+    let layer = html
+        .find("<div class=\"ds-overlay\" data-layer=\"menu\">")
+        .expect("the menu layer");
+    assert!(paragraph < layer, "{html}");
+    assert!(html[layer..].contains("ds-menu"), "{html}");
+}
+
+thread_local! {
+    static STACK: Cell<Option<Signal<LayerStack>>> = const { Cell::new(None) };
+}
+
+#[test]
+fn the_newest_layer_takes_the_escape() {
+    // A peek, then a menu over it: one Escape names the menu, and with the menu gone the next
+    // names the peek (design/06-INTERACTIONS.md section 18).
+    #[allow(non_snake_case)]
+    fn Layered() -> Element {
+        STACK.set(Some(use_context::<Signal<LayerStack>>()));
+        rsx! {
+            Peek { mode: PeekMode::Center, label: "Thread", onclose: |_| {},
+                p { "reader" }
+            }
+            Menu {
+                placement: MenuPlacement::Popup,
+                anchor: Anchor::Point(Point::default()),
+                items: Vec::<MenuItem<u8>>::new(),
+                onpick: |_| {},
+                onclose: |_| {},
+            }
+        }
+    }
+    fn layered() -> Element {
+        rsx! { Layered {} }
+    }
+    let dom = built(layered, None, Duration::ZERO);
+    let stack = STACK.get().expect("the stack was read");
+    let (first, second) = dom.in_runtime(|| {
+        let now = stack.peek().clone();
+        let top = now.top().expect("two layers are open");
+        let first = now.escape();
+        let second = now.clone().remove(top).escape();
+        (first, second)
+    });
+    assert_eq!(first, Dismissal::Close(LayerId(stack_top(&dom, stack, 0))));
+    assert_eq!(second, Dismissal::Close(LayerId(stack_top(&dom, stack, 1))));
+    assert_ne!(first, second);
+}
+
+/// The id of the layer `down` places below the top.
+fn stack_top(dom: &VirtualDom, stack: Signal<LayerStack>, down: usize) -> u32 {
+    dom.in_runtime(|| {
+        let mut now = stack.peek().clone();
+        for _ in 0..down {
+            let top = now.top().expect("a layer");
+            now = now.remove(top);
+        }
+        now.top().expect("a layer").0
+    })
+}
+
+#[test]
+fn an_empty_hub_lays_out_no_toast() {
+    // Gallery fix A: a hidden toast was laid out in every root, and its translateY(160%) did not
+    // clear a small root, so an empty pill showed at the bottom of each.
+    fn empty() -> Element {
+        rsx! { p { "inside" } }
+    }
+    let html = inside_root(&built(empty, None, Duration::from_millis(80)));
+    assert!(html.contains("<p>inside</p>"), "{html}");
+    assert!(!html.contains("ds-toast"), "{html}");
+}
+
+#[test]
+fn the_root_renders_the_toast_host_after_the_overlay_host() {
+    #[component]
+    fn Pushed() -> Element {
+        let toasts = use_toasts();
+        use_hook(move || toasts.push("Archived".to_string(), None));
+        rsx! {}
+    }
+    fn pushed() -> Element {
+        rsx! { p { "inside" } Pushed {} }
+    }
+    let html = inside_root(&built(pushed, None, Duration::from_millis(80)));
+    let child = html.find("<p>inside</p>").expect("the children");
+    let toast = html.find("class=\"ds-toast\"").expect("the toast host");
+    assert!(child < toast, "{html}");
+    assert!(html.contains("data-presence=\"entering\""), "{html}");
+}
+
+#[test]
+fn a_toast_slides_in_and_is_dropped_after_it_slides_out() {
+    #[component]
+    fn Pushed() -> Element {
+        let toasts = use_toasts();
+        use_hook(move || toasts.push("Archived".to_string(), None));
+        rsx! {}
+    }
+    fn pushed() -> Element {
+        rsx! { Pushed {} }
+    }
+    // It arrives sliding in from the right (`panel-in`, --t-move), and is present once that has
+    // settled.
+    let mut dom = built(pushed, None, Duration::ZERO);
+    dom.run_for(Duration::from_millis(5));
+    dom.render_immediate(&mut NoOpMutations);
+    let first = inside_root(&dom);
+    assert!(first.contains("data-presence=\"entering\""), "{first}");
+    dom.run_for(Duration::from_millis(400));
+    let up = inside_root(&dom);
+    assert!(up.contains("data-presence=\"present\""), "{up}");
+    // The hub hides it after its 5000 ms hold (ToastHold): it slides out, still drawn, then is
+    // gone once `--t-quick` and a frame have passed (150 + 34 ms at Standard).
+    // (The hold, not `hide()`: `ToastHub::stop_hold` writes the hold signal while its own
+    // `if let` still borrows it, which panics.)
+    // The hold runs from the push: 5000 ms in, it has been leaving for a moment only.
+    dom.run_for(Duration::from_millis(4650));
+    let sinking = inside_root(&dom);
+    assert!(sinking.contains("data-presence=\"leaving\""), "{sinking}");
+    dom.run_for(Duration::from_millis(520));
+    let gone = inside_root(&dom);
+    assert!(!gone.contains("ds-toast"), "{gone}");
+}
+
+#[test]
+fn the_root_writes_the_tint_alpha() {
+    fn empty() -> Element {
+        rsx! {}
+    }
+    // The key's default, then a host's own value (thousandths: 640 is .64).
+    const CASES: &[(Option<Alpha>, &str)] = &[
+        (None, "--m-tint-alpha:.8;"),
+        (Some(Alpha(640)), "--m-tint-alpha:.64;"),
+        (Some(Alpha(1000)), "--m-tint-alpha:1;"),
+    ];
+    for (tint, want) in CASES {
+        let html = dioxus_ssr::render(&built(empty, *tint, Duration::ZERO));
+        let root = &html[..html.find('>').unwrap_or(html.len())];
+        assert!(root.contains(want), "{tint:?}: {root}");
+        assert_eq!(root.matches("--m-tint-alpha").count(), 1, "{root}");
+    }
+}
+
+#[test]
+fn overlay_stylesheets_use_tokens_only() {
+    const SHEETS: &[(&str, &str)] = &[
+        (
+            "command_palette",
+            include_str!("../../src/components/menus/palette/command_palette.css"),
+        ),
+        (
+            "hover_card",
+            include_str!("../../src/components/overlays/hover_card.css"),
+        ),
+        (
+            "link_pill",
+            include_str!("../../src/components/app/link_pill.css"),
+        ),
+        (
+            "menu",
+            include_str!("../../src/components/menus/menu/menu.css"),
+        ),
+        (
+            "menu_item",
+            include_str!("../../src/components/menus/item/item.css"),
+        ),
+        ("peek", include_str!("../../src/components/app/peek.css")),
+        (
+            "popover",
+            include_str!("../../src/components/overlays/popover.css"),
+        ),
+        (
+            "scrim",
+            include_str!("../../src/components/overlays/scrim.css"),
+        ),
+        (
+            "send_pill",
+            include_str!("../../src/components/app/send_pill.css"),
+        ),
+        (
+            "sheet",
+            include_str!("../../src/components/overlays/sheet.css"),
+        ),
+        (
+            "toast",
+            include_str!("../../src/components/overlays/toast.css"),
+        ),
+        (
+            "tooltip",
+            include_str!("../../src/components/overlays/tooltip.css"),
+        ),
+    ];
+    let failures: Vec<String> = SHEETS
+        .iter()
+        .flat_map(|(name, css)| {
+            css_scan::token_violations(css)
+                .into_iter()
+                .map(move |problem| format!("{name}.css: {problem}"))
+        })
+        .collect();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// Coherence rule 2 on the overlay goldens: every class is one the stylesheet styles and no
+/// element is hand-written markup, except what quire's own components must write inline.
+#[test]
+fn every_overlay_golden_lints_clean() {
+    use ds_lint::{Exception, LintConfig, Rule, markup};
+    const EXCEPTIONS: &[Exception] = &[
+        Exception {
+            rule: Rule::HexColour,
+            selector: "span.ds-avatar",
+            reason: "the person hue and account colour are computed per face (O-7); the letter is #fff (O-3)",
+        },
+        Exception {
+            rule: Rule::RawMarkup,
+            selector: "svg.ds-send-ring",
+            reason: "the send ring is two circles Rust redraws per tick, not a glyph (O-20, spike S6)",
+        },
+    ];
+    let config = LintConfig {
+        exceptions: EXCEPTIONS,
+        ..LintConfig::new(&ds::kits())
+    };
+    let goldens = golden::all_in("overlays");
+    assert!(
+        goldens.len() >= CASES.len(),
+        "only {} goldens",
+        goldens.len()
+    );
+    let failures: Vec<String> = goldens
+        .iter()
+        .flat_map(|(name, html)| {
+            markup(html, ds::stylesheet(), &config)
+                .into_iter()
+                .map(move |offence| format!("{name}: {:?} {}", offence.rule, offence.text))
+        })
+        .collect();
+    assert!(failures.is_empty(), "{}", failures.join("\n"));
+}
+
+/// A sender card composed from `HoverCardPart`s draws exactly the markup section 22 writes by
+/// hand, so a consumer loses nothing by using the parts.
+#[test]
+fn the_parts_draw_the_hand_written_card() {
+    let read = |state: &str| {
+        std::fs::read_to_string(golden::path(&format!("overlays/hover_card/{state}.html")))
+            .expect("the golden exists")
+    };
+    assert_eq!(read("sender-parts"), read("sender-open"));
+}

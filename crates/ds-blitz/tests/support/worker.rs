@@ -5,8 +5,7 @@
 //! would spend its whole bound before the thread ran. These helpers wait on the event instead,
 //! giving the thread real time between looks, and bound the wait with a hang guard that no
 //! passing run comes near.
-
-#![allow(dead_code)] // Each test binary that includes this file uses part of it.
+#![allow(dead_code, reason = "each includer uses its own part of this module")]
 
 use ds_harness::{Driver, Harness};
 use std::time::{Duration, Instant};

@@ -16,7 +16,7 @@ rounds=${1:-20}
 procs=${2:-4}
 threads=${3:-16}
 
-bins=$(cargo test -p ds-harness --test hybrid_backend --test texture_layer --no-run \
+bins=$(cargo test -p ds-harness --test it --no-run \
   --message-format=json 2>/dev/null |
   sed -n 's/.*"executable":"\([^"]*\)".*/\1/p') || exit 1
 [ -n "$bins" ] || { echo "no test binaries built" >&2; exit 1; }
@@ -28,7 +28,7 @@ one() { # one <id>: run every binary once, record each exit code
   local n=0 bin
   for bin in $bins; do
     n=$((n + 1))
-    "$bin" --test-threads="$threads" >"$work/$1.$n.log" 2>&1
+    "$bin" hybrid_backend:: texture_layer:: --test-threads="$threads" >"$work/$1.$n.log" 2>&1
     echo $? >>"$work/codes"
   done
 }

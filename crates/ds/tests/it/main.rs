@@ -1,0 +1,53 @@
+//! The crate's integration tests: one executable, one module per former test file.
+//! A separate test target needs a stated reason (CONVENTIONS.md, Tests).
+
+mod alert_ssr;
+mod button_busy_look_ssr;
+mod button_field_tile_states_ssr;
+mod button_leading_and_label_run_states_ssr;
+mod button_pass_through_and_outline_states_ssr;
+mod capsule_unmeasured_ssr;
+mod center_tables;
+mod chrome;
+mod clock_rule;
+mod companion_ssr;
+mod companion_stand_ins;
+mod companion_words;
+mod components_controls;
+mod components_lists;
+mod components_overlays;
+mod components_structure;
+mod control_goldens_lint;
+#[path = "controls/css_scan.rs"]
+mod css_scan;
+mod edit_surface_ssr;
+mod forms_ssr;
+mod hig_lint;
+mod kept_click_rule;
+mod launcher_parts_ssr;
+mod legibility;
+mod motion_drift;
+mod motion_machines;
+mod pass_through_lint;
+mod pdf_thumb_ssr;
+mod pixel_root;
+mod placement;
+mod pop_up_button_open_ssr;
+mod provider_and_button_face_states_ssr;
+mod root_ssr;
+mod roster;
+mod row_outline_editing_states_ssr;
+mod selectors;
+mod snippet_forms;
+mod space_editor_ssr;
+mod standard_action;
+mod status_tables;
+mod stylesheet;
+mod support;
+mod surface;
+mod symbol_ssr;
+mod token_derive;
+mod typeface;
+mod user_style_ssr;
+mod voice_orb_ssr;
+mod window_frame_ssr;
