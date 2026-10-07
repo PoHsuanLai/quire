@@ -187,7 +187,7 @@ mod tests {
     fn each_escape_is_one_step_in_either_order() {
         use EscapeOrder::{ClearFirst, ClosePanelFirst};
         let live: &[Availability] = &[E, E];
-        let mut presses = |order, start: Suggesting, text| {
+        let presses = |order, start: Suggesting, text| {
             let (mut state, mut text, mut acts) = (start, text, Vec::new());
             while acts.last() != Some(&Act::Pass) {
                 let (next, act) = press(state, SuggestKey::Escape, live, text, order);
