@@ -2,8 +2,9 @@
 //! `org.freedesktop.portal.Settings.ReadAll(["org.freedesktop.appearance"])` and
 //! `SettingChanged`, mapped to [`ds::prelude::SystemPrefs`]. The mappings are pure tables, tested
 //! against a fake `ReadAll`/`SettingChanged` payload with no bus involved; only
-//! [`SystemPrefsSource::Portal`] touches `zbus`, and only on Linux — a desktop without the portal, or a
-//! build for a platform that has none, simply answers [`ds::prelude::SystemPrefs::default`].
+//! [`SystemPrefsSource::Portal`] touches `zbus`, and only on Linux with feature `quire-desktop`
+//! (`portal/bus.rs`) — a desktop without the portal, or a build for a platform or feature set that
+//! has none (`portal/absent.rs`), simply answers [`ds::prelude::SystemPrefs::default`].
 
 use crate::latest::{self, Receiver};
 use ds_core::spawner::Spawner;
@@ -11,15 +12,17 @@ use ds_style::appearance::system::Contrast;
 use ds_style::appearance::system::ReducedMotion;
 use ds_style::appearance::system::SystemPrefs;
 use ds_style::appearance::theme::Scheme;
-use std::collections::HashMap;
-use zbus::zvariant::OwnedValue;
 
-/// The one namespace `ds-settings` reads; the portal groups every key by namespace, and
-/// appearance is the only one this crate resolves (design/22-SETTINGS.md section 4.4).
-const NAMESPACE: &str = "org.freedesktop.appearance";
-const KEY_COLOR_SCHEME: &str = "color-scheme";
-const KEY_CONTRAST: &str = "contrast";
-const KEY_REDUCED_MOTION: &str = "reduced-motion";
+// The half that reaches `zbus`, or its stand-in with the same two entry points.
+#[cfg_attr(
+    all(target_os = "linux", feature = "quire-desktop"),
+    path = "portal/bus.rs"
+)]
+#[cfg_attr(
+    not(all(target_os = "linux", feature = "quire-desktop")),
+    path = "portal/absent.rs"
+)]
+mod bus;
 
 /// `color-scheme`: 0 no preference, 1 prefer dark, 2 prefer light. No preference is light.
 pub fn scheme_from_portal(value: u32) -> Scheme {
@@ -45,71 +48,10 @@ pub fn contrast_from_portal(value: u32) -> Contrast {
     }
 }
 
-/// A key's raw `u32`, or `None` for a value that is missing or not a `u32` — a portal that
-/// answers something unexpected is treated the same as a missing key (section 2's leniency
-/// applies here too), never an error.
-fn as_u32(value: &OwnedValue) -> Option<u32> {
-    u32::try_from(value.clone()).ok()
-}
-
-/// [`SystemPrefs`] from one `ReadAll` namespace's key/value map. Every key is independently
-/// optional: the desktop may answer some and not others, and each missing or malformed key
-/// falls back to its own default, never the whole struct's.
-fn prefs_from_namespace(namespace: &HashMap<String, OwnedValue>) -> SystemPrefs {
-    SystemPrefs {
-        scheme: namespace
-            .get(KEY_COLOR_SCHEME)
-            .and_then(as_u32)
-            .map(scheme_from_portal)
-            .unwrap_or_default(),
-        motion: namespace
-            .get(KEY_REDUCED_MOTION)
-            .and_then(as_u32)
-            .map(reduced_motion_from_portal)
-            .unwrap_or_default(),
-        contrast: namespace
-            .get(KEY_CONTRAST)
-            .and_then(as_u32)
-            .map(contrast_from_portal)
-            .unwrap_or_default(),
-    }
-}
-
-/// Fold one `SettingChanged(namespace, key, value)` onto `prefs`; a namespace or key this crate
-/// does not read, or a value that is not a `u32`, leaves `prefs` unchanged.
-fn apply_setting_changed(
-    prefs: SystemPrefs,
-    namespace: &str,
-    key: &str,
-    value: &OwnedValue,
-) -> SystemPrefs {
-    if namespace != NAMESPACE {
-        return prefs;
-    }
-    let Some(raw) = as_u32(value) else {
-        return prefs;
-    };
-    match key {
-        KEY_COLOR_SCHEME => SystemPrefs {
-            scheme: scheme_from_portal(raw),
-            ..prefs
-        },
-        KEY_REDUCED_MOTION => SystemPrefs {
-            motion: reduced_motion_from_portal(raw),
-            ..prefs
-        },
-        KEY_CONTRAST => SystemPrefs {
-            contrast: contrast_from_portal(raw),
-            ..prefs
-        },
-        _ => prefs,
-    }
-}
-
 /// Where the desktop's preferences come from.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SystemPrefsSource {
-    /// The settings portal on the session bus. A desktop without it, or a non-Linux build, answers
+    /// The settings portal on the session bus. A desktop without it, or a build without the portal client answers
     /// the defaults and never changes.
     Portal,
     /// These preferences, forever: a test, a headless render or a pinned appearance.
@@ -122,16 +64,7 @@ impl SystemPrefsSource {
     pub async fn read(&self) -> SystemPrefs {
         match self {
             SystemPrefsSource::Fixed(prefs) => *prefs,
-            SystemPrefsSource::Portal => {
-                #[cfg(target_os = "linux")]
-                {
-                    bus::read_all().await.unwrap_or_default()
-                }
-                #[cfg(not(target_os = "linux"))]
-                {
-                    SystemPrefs::default()
-                }
-            }
+            SystemPrefsSource::Portal => bus::read_all().await.unwrap_or_default(),
         }
     }
 }
@@ -144,18 +77,13 @@ pub struct SystemPrefsWatch {
 
 impl SystemPrefsWatch {
     /// Read `source` and subscribe to it, the subscription's task running on `spawn`. A
-    /// [`SystemPrefsSource::Fixed`] watch, a desktop without the portal and a non-Linux build
+    /// [`SystemPrefsSource::Fixed`] watch, a desktop without the portal and a build without the portal client
     /// never fire after their first answer.
     pub async fn start(source: &SystemPrefsSource, spawn: &dyn Spawner) -> Self {
         let (tx, changes) = latest::channel(source.read().await);
         match source {
             SystemPrefsSource::Fixed(_) => drop(tx),
-            SystemPrefsSource::Portal => {
-                #[cfg(target_os = "linux")]
-                spawn.spawn(Box::pin(bus::follow(tx)));
-                #[cfg(not(target_os = "linux"))]
-                drop((tx, spawn));
-            }
+            SystemPrefsSource::Portal => spawn.spawn(Box::pin(bus::follow(tx))),
         }
         SystemPrefsWatch { changes }
     }
@@ -171,91 +99,15 @@ impl SystemPrefsWatch {
     }
 }
 
-/// The half of this module that actually reaches `zbus`; built only on Linux, the only platform
-/// that ships `xdg-desktop-portal`.
-#[cfg(target_os = "linux")]
-mod bus {
-    use super::{NAMESPACE, SystemPrefs, apply_setting_changed, prefs_from_namespace};
-    use crate::latest::Sender;
-    use std::collections::HashMap;
-    use zbus::export::ordered_stream::OrderedStreamExt;
-    use zbus::proxy;
-    use zbus::zvariant::OwnedValue;
-
-    #[proxy(
-        interface = "org.freedesktop.portal.Settings",
-        default_service = "org.freedesktop.portal.Desktop",
-        default_path = "/org/freedesktop/portal/desktop"
-    )]
-    trait Settings {
-        #[zbus(name = "ReadAll")]
-        fn read_all(
-            &self,
-            namespaces: &[&str],
-        ) -> zbus::Result<HashMap<String, HashMap<String, OwnedValue>>>;
-
-        #[zbus(signal, name = "SettingChanged")]
-        fn setting_changed(
-            &self,
-            namespace: String,
-            key: String,
-            value: OwnedValue,
-        ) -> zbus::Result<()>;
-    }
-
-    /// `ReadAll(["org.freedesktop.appearance"])`, or `None` when the bus, the portal or the
-    /// namespace is absent — every failure mode collapses to "use the defaults" at the caller.
-    pub(super) async fn read_all() -> Option<SystemPrefs> {
-        let connection = zbus::Connection::session().await.ok()?;
-        let proxy = SettingsProxy::new(&connection).await.ok()?;
-        let all = proxy.read_all(&[NAMESPACE]).await.ok()?;
-        Some(
-            all.get(NAMESPACE)
-                .map(prefs_from_namespace)
-                .unwrap_or_default(),
-        )
-    }
-
-    /// Subscribe to `SettingChanged` and fold every appearance-namespace change onto `tx`. A
-    /// desktop without the portal simply never sends anything: `tx` (and so the watch's
-    /// receiver) is left at its initial value when the connection or subscription cannot be made.
-    pub(super) async fn follow(tx: Sender<SystemPrefs>) {
-        let Ok(connection) = zbus::Connection::session().await else {
-            return;
-        };
-        let Ok(proxy) = SettingsProxy::new(&connection).await else {
-            return;
-        };
-        let Ok(mut changes) = proxy.receive_setting_changed().await else {
-            return;
-        };
-        while let Some(signal) = changes.next().await {
-            let Ok(args) = signal.args() else {
-                continue;
-            };
-            let next =
-                apply_setting_changed(tx.latest(), args.namespace(), args.key(), args.value());
-            if tx.send(next).is_err() {
-                return;
-            }
-        }
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::{
-        NAMESPACE, apply_setting_changed, contrast_from_portal, prefs_from_namespace,
-        reduced_motion_from_portal, scheme_from_portal,
-    };
+    use super::{contrast_from_portal, reduced_motion_from_portal, scheme_from_portal};
 
     use super::SystemPrefsSource;
     use ds_style::appearance::system::Contrast;
     use ds_style::appearance::system::ReducedMotion;
     use ds_style::appearance::system::SystemPrefs;
     use ds_style::appearance::theme::Scheme;
-    use std::collections::HashMap;
-    use zbus::zvariant::OwnedValue;
 
     #[test]
     fn the_scheme_table_matches_the_portal_spec() {
@@ -295,89 +147,6 @@ mod tests {
         ];
         for &(value, want) in CASES {
             assert_eq!(contrast_from_portal(value), want, "contrast {value}");
-        }
-    }
-
-    fn namespace(entries: &[(&str, u32)]) -> HashMap<String, OwnedValue> {
-        entries
-            .iter()
-            .map(|&(key, value)| (key.to_owned(), OwnedValue::from(value)))
-            .collect()
-    }
-
-    #[test]
-    fn prefs_from_namespace_reads_every_key_independently() {
-        let cases: &[(&str, HashMap<String, OwnedValue>, SystemPrefs)] = &[
-            (
-                "an empty answer is every default",
-                namespace(&[]),
-                SystemPrefs::default(),
-            ),
-            (
-                "every key present",
-                namespace(&[("color-scheme", 1), ("reduced-motion", 1), ("contrast", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    motion: ReducedMotion::Reduce,
-                    contrast: Contrast::High,
-                },
-            ),
-            (
-                "only the scheme, the rest missing",
-                namespace(&[("color-scheme", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    motion: ReducedMotion::NoPreference,
-                    contrast: Contrast::Normal,
-                },
-            ),
-            (
-                "a key this crate does not read is ignored",
-                namespace(&[("accent-color", 1), ("contrast", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Light,
-                    motion: ReducedMotion::NoPreference,
-                    contrast: Contrast::High,
-                },
-            ),
-        ];
-        for (name, given, want) in cases {
-            assert_eq!(&prefs_from_namespace(given), want, "{name}");
-        }
-    }
-
-    #[test]
-    fn a_setting_changed_signal_updates_only_its_own_key() {
-        let start = SystemPrefs::default();
-        let cases: &[(&str, &str, &str, u32, SystemPrefs)] = &[
-            (
-                "a matching namespace and key",
-                NAMESPACE,
-                "color-scheme",
-                1,
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    ..start
-                },
-            ),
-            (
-                "a different namespace is ignored",
-                "org.gnome.desktop",
-                "color-scheme",
-                1,
-                start,
-            ),
-            (
-                "a key this crate does not read is ignored",
-                NAMESPACE,
-                "accent-color",
-                1,
-                start,
-            ),
-        ];
-        for (name, namespace, key, raw, want) in cases {
-            let got = apply_setting_changed(start, namespace, key, &OwnedValue::from(*raw));
-            assert_eq!(&got, want, "{name}");
         }
     }
 

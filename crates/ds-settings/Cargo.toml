@@ -19,7 +19,7 @@ serde_json = { workspace = true }
 thiserror = { workspace = true }
 notify = { workspace = true }
 futures-timer = { workspace = true }
-zbus = { workspace = true }
+zbus = { workspace = true, optional = true }
 toml = { workspace = true }
 
 [lints]
@@ -31,11 +31,16 @@ ds = { workspace = true }
 tokio = { workspace = true }
 
 [features]
+default = ["quire-desktop"]
+# Our desktop's integration: the settings portal client (`portal/bus.rs`) and, with `live`, the live
+# settings modules. Without it `SystemPrefsSource::Portal` answers the defaults and the appearance
+# file, its watch and `use_environment` work as ever; no D-Bus client is built (design/36 section 1).
+quire-desktop = ["dep:zbus"]
 # `use_environment`, the signal a surface resolves its look from.
 dioxus = ["dep:dioxus", "ds-style/dioxus"]
 # Drive zbus on the tokio runtime the shell already runs (see the workspace zbus note).
-tokio = ["zbus/tokio"]
+tokio = ["quire-desktop", "zbus/tokio"]
 # `org.quire.SettingsModule1` (design/22-SETTINGS.md section 9.4): the live settings modules a
 # daemon serves (accountd, inferd) and the Settings app reads. Uses the `zbus` above under whatever
 # backend the build picked; this feature never selects an executor.
-live = []
+live = ["quire-desktop"]

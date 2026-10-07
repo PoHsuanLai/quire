@@ -1,7 +1,8 @@
-# Crates whose job is D-Bus (see scripts/check-portable.sh). Each reaches zbus by design; the
-# portable gate for quire is that they stay behind their crate boundary (check-boundary.sh), and
-# that ds-desktop names zbus only under its `dbus` feature.
-^\./crates/ds-settings/src/(live/|portal\.rs)
-^\./crates/ds-helpers/src/
-^\./crates/ds-blitz/src/(menus|print)
-^\./crates/ds-desktop/src/
+# The D-Bus clients of quire (see scripts/check-portable.sh). Each file below reaches zbus by design
+# and is compiled only under its crate's `quire-desktop` feature (or, for ds-desktop, `dbus`); the
+# rest of every crate, and every other crate, names no zbus and builds with --no-default-features.
+^\./crates/ds-settings/src/portal/bus\.rs$
+^\./crates/ds-settings/src/live/(client|error|module|skeleton|value)\.rs$
+^\./crates/ds-helpers/src/installer/packagekit\.rs$
+^\./crates/ds-blitz/src/(menus\.rs|menus/(service|wire)\.rs|print/portal\.rs)$
+^\./crates/ds-desktop/src/(probe|watch)\.rs$

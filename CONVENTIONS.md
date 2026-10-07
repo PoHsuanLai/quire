@@ -278,7 +278,7 @@ remembers.
 - **The gate passes before work is reported complete:** `cargo fmt --all --check`, `cargo
   clippy --workspace --all-targets --all-features -- -D warnings`, `cargo test --workspace`,
   `./scripts/check-boundary.sh` where the repo has one (quire also runs
-  `./scripts/check-consumer.sh`), and `cargo deny check licenses`.
+  `./scripts/check-portable.sh .` and `./scripts/check-consumer.sh`), and `cargo deny check licenses`.
   ARCHITECTURE.md gives the repo's exact commands. Check every exit code, never a piped summary.
 - **`cargo tree -i <dep>` exits 101 when the dependency is absent**, which is the state a
   boundary check wants; a boundary script checks for output, not exit status.

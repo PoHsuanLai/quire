@@ -39,7 +39,7 @@ pub(crate) fn raise(window: &dyn Window, token: Option<String>) {
     }
 }
 
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "quire-desktop"))]
 fn activate(window: &dyn Window, token: &str) -> Result<(), ActivateFailed> {
     use crate::{wayland_surface::adopt, xdg_activation};
     use raw_window_handle::HasWindowHandle;
@@ -47,8 +47,8 @@ fn activate(window: &dyn Window, token: &str) -> Result<(), ActivateFailed> {
     Ok(xdg_activation::activate(&adopted, token)?)
 }
 
-/// Elsewhere there is no Wayland to ask.
-#[cfg(not(target_os = "linux"))]
+/// Elsewhere, or without `quire-desktop`, there is no Wayland to ask.
+#[cfg(not(all(target_os = "linux", feature = "quire-desktop")))]
 fn activate(_window: &dyn Window, _token: &str) -> Result<(), ActivateFailed> {
     Err(ActivateFailed::NotLinux)
 }
@@ -58,14 +58,14 @@ fn activate(_window: &dyn Window, _token: &str) -> Result<(), ActivateFailed> {
 enum ActivateFailed {
     #[error("the window has no handle: {0}")]
     Handle(#[from] raw_window_handle::HandleError),
-    #[cfg(target_os = "linux")]
+    #[cfg(all(target_os = "linux", feature = "quire-desktop"))]
     #[error(transparent)]
     Adopt(#[from] crate::wayland_surface::AdoptError),
-    #[cfg(target_os = "linux")]
+    #[cfg(all(target_os = "linux", feature = "quire-desktop"))]
     #[error(transparent)]
     Activation(#[from] crate::xdg_activation::ActivationError),
-    #[cfg(not(target_os = "linux"))]
-    #[error("only Linux has xdg-activation")]
+    #[cfg(not(all(target_os = "linux", feature = "quire-desktop")))]
+    #[error("xdg-activation needs Linux and the `quire-desktop` feature")]
     NotLinux,
 }
 

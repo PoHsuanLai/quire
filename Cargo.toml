@@ -39,14 +39,16 @@ ds-lint            = { path = "crates/ds-lint" }
 ds                 = { path = "crates/ds" }
 ds-intents         = { path = "crates/ds-intents" }
 ds-behaviour       = { path = "crates/ds-behaviour" }
-ds-settings        = { path = "crates/ds-settings" }
-ds-helpers         = { path = "crates/ds-helpers" }
+# The three crates with desktop integration are taken without their default `quire-desktop`; each
+# member names it behind its own `quire-desktop` feature (design/36 section 4).
+ds-settings        = { path = "crates/ds-settings", default-features = false }
+ds-helpers         = { path = "crates/ds-helpers", default-features = false }
 ds-desktop         = { path = "crates/ds-desktop" }
 ds-shell           = { path = "crates/ds-shell" }
 ds-core-derive     = { path = "crates/ds-core-derive" }
 ds-settings-derive = { path = "crates/ds-settings-derive" }
-ds-blitz           = { path = "crates/ds-blitz" }
-ds-harness         = { path = "crates/ds-harness" }
+ds-blitz           = { path = "crates/ds-blitz", default-features = false }
+ds-harness         = { path = "crates/ds-harness", default-features = false }
 
 # ---- BEGIN PINNED BLOCK (source of truth: quire/docs/workspace-deps.toml) ----
 # Copied verbatim into [workspace.dependencies] of quire, shell-host and sill. Bumped only by a

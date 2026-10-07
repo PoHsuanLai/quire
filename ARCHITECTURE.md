@@ -807,9 +807,15 @@ the components the design holds under `--s-8`, each with its reason; an app adds
   cargo clippy --workspace --all-targets --all-features -- -D warnings
   cargo test --workspace --all-features
   ./scripts/check-boundary.sh
+  ./scripts/check-portable.sh .
   ./scripts/check-consumer.sh
   cargo deny check licenses
   ```
+
+  `check-portable.sh .` builds `cargo check --workspace --no-default-features` and fails when a
+  file outside `.portable-allow` names zbus: ds-settings, ds-helpers and ds-blitz keep their
+  desktop integration (portal, live modules, PackageKit, xdg-activation, print portal, menus)
+  behind `quire-desktop` (default on), and each workspace member forwards it.
 
   `check-consumer.sh` builds, clippies (`-D warnings`) and tests `examples/consumer`, its own
   cargo workspace that `--workspace` does not reach, so `CONSUMING.md`'s snippets and coherence

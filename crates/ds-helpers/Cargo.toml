@@ -12,7 +12,7 @@ publish.workspace = true
 serde = { workspace = true }
 thiserror = { workspace = true }
 toml = { workspace = true }
-zbus = { workspace = true }
+zbus = { workspace = true, optional = true }
 
 [lints]
 workspace = true
@@ -20,3 +20,14 @@ workspace = true
 [dev-dependencies]
 # The tests' runtime; the crate itself names none (zbus brings its own executor).
 tokio = { workspace = true }
+
+[features]
+default = ["quire-desktop"]
+# The PackageKit backend (`installer/packagekit.rs`), over the system bus. Without it
+# `PackageKit::system()` still exists and every install is `Outcome::Unsupported`
+# (design/36 section 2); `PackageKit::on` is absent, since it takes a zbus connection.
+quire-desktop = ["dep:zbus"]
+
+[[test]]
+name = "packagekit"
+required-features = ["quire-desktop"]

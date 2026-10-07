@@ -61,9 +61,9 @@ zbus = { workspace = true, optional = true }
 memfd = { workspace = true, optional = true }
 # `WindowHandle::focus_with_token`: xdg-activation on the app's own Wayland connection, with the
 # window's `wl_surface` borrowed (`wayland_surface`, the one `unsafe`).
-wayland-client = { workspace = true }
-wayland-backend = { workspace = true }
-wayland-protocols = { workspace = true }
+wayland-client = { workspace = true, optional = true }
+wayland-backend = { workspace = true, optional = true }
+wayland-protocols = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 # The fake compositor `xdg_activation`'s tests talk to.
@@ -71,13 +71,18 @@ wayland-server = { workspace = true }
 wayland-protocols = { workspace = true, features = ["server"] }
 
 [features]
+default = ["quire-desktop"]
+# Our desktop's integration on Linux (design/36 section 1): xdg-activation on the app's own Wayland
+# connection (`WindowHandle::focus_with_token`). Without it a token is ignored and the window is
+# raised through winit, the same call with the same result type. `print` and `menus` need it too.
+quire-desktop = ["dep:wayland-client", "dep:wayland-backend", "dep:wayland-protocols"]
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
-print = ["dep:zbus", "dep:memfd"]
+print = ["quire-desktop", "dep:zbus", "dep:memfd"]
 # `ds_blitz::menus`: the app's menu bar served as `com.canonical.dbusmenu` on its own bus
 # connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
 # default, so an app that exports no menu builds no D-Bus client for it.
-menus = ["dep:zbus", "dep:serde"]
+menus = ["quire-desktop", "dep:zbus", "dep:serde"]
 # PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
 # thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
 # PDF builds no PDF writer or reader.

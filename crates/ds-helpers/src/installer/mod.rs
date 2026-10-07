@@ -2,6 +2,9 @@
 //! tests and the gallery. An enum, not a trait object, so no async-trait is needed.
 
 mod fake;
+// The D-Bus backend, or its stand-in that reports every install `Unsupported`.
+#[cfg_attr(feature = "quire-desktop", path = "packagekit.rs")]
+#[cfg_attr(not(feature = "quire-desktop"), path = "packagekit_absent.rs")]
 mod packagekit;
 
 pub use fake::{FakeInstaller, StandIn};

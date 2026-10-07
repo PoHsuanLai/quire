@@ -77,7 +77,11 @@ impl<T> Sender<T> {
         Ok(())
     }
 
-    /// The value the receiver would read now.
+    /// The value the receiver would read now. Only the portal client folds changes onto it.
+    #[cfg_attr(
+        not(all(target_os = "linux", feature = "quire-desktop")),
+        allow(dead_code)
+    )]
     pub(crate) fn latest(&self) -> T
     where
         T: Clone,

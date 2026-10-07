@@ -71,7 +71,7 @@ pub mod spell;
 mod startup_token;
 mod texture_layer;
 mod wake;
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "quire-desktop"))]
 mod wayland_surface;
 pub mod window;
 mod window_activate;
@@ -87,7 +87,7 @@ mod window_scroll;
 mod window_shell;
 mod window_size;
 mod window_sizer;
-#[cfg(target_os = "linux")]
+#[cfg(all(target_os = "linux", feature = "quire-desktop"))]
 mod xdg_activation;
 
 pub use app_handle::{AppEnded, AppHandle, AppHold, use_app_handle};

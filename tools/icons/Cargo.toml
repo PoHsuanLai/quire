@@ -20,5 +20,10 @@ ds-style = { workspace = true }
 # Where an installed app-icon set is looked up (`icons install`, sill FINDINGS Q71).
 ds-settings = { workspace = true }
 
+[features]
+default = ["quire-desktop"]
+# Desktop integration of the quire crates this one uses (design/36 section 1).
+quire-desktop = ["ds-settings/quire-desktop"]
+
 [lints]
 workspace = true
