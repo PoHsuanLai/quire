@@ -6,7 +6,7 @@ use dioxus::prelude::Signal;
 use dioxus::prelude::{CopyValue, ReadableExt};
 use ds::base::geometry::scroll::Scroll;
 use ds::host::phase::{Observe, PhaseWrite};
-use ds::host::position::TextPosition;
+use ds::host::position::{TextPosition, TextRange};
 use ds::prelude::Rect;
 
 /// One registration, so a component's drop can end it.
@@ -55,6 +55,30 @@ impl CaretWatch {
     }
 }
 
+/// An edit surface's selection the phase publishes the boxes of.
+pub(super) struct SelectionWatch {
+    pub(super) id: WatchId,
+    pub(super) node: NodeId,
+    pub(super) range: CopyValue<Option<TextRange>>,
+    pub(super) sink: Signal<Vec<Rect>>,
+    /// The range the boxes were last read for.
+    pub(super) last_range: Option<TextRange>,
+    /// What was last published.
+    pub(super) last: Vec<Rect>,
+}
+
+impl SelectionWatch {
+    /// The selection now, as its owner last said.
+    pub(super) fn now(&self) -> Option<TextRange> {
+        self.range.try_peek().ok().and_then(|range| range.clone())
+    }
+
+    /// Whether the selection was moved since its boxes were read.
+    pub(super) fn moved(&self) -> bool {
+        self.now() != self.last_range
+    }
+}
+
 /// A write waiting for its frame.
 #[derive(Clone, Copy)]
 pub(super) struct Waiting {
@@ -68,6 +92,7 @@ pub(super) struct Book {
     pub(super) rects: Vec<RectWatch>,
     pub(super) scrolls: Vec<ScrollWatch>,
     pub(super) carets: Vec<CaretWatch>,
+    pub(super) selections: Vec<SelectionWatch>,
     pub(super) writes: Vec<Waiting>,
 }
 
@@ -97,6 +122,14 @@ impl Book {
                 last_at: None,
                 last: None,
             }),
+            Observe::Selection(selection) => self.selections.push(SelectionWatch {
+                id,
+                node,
+                range: selection.range,
+                sink: selection.into,
+                last_range: None,
+                last: Vec::new(),
+            }),
         }
         id
     }
@@ -106,6 +139,7 @@ impl Book {
         self.rects.retain(|watch| watch.id != id);
         self.scrolls.retain(|watch| watch.id != id);
         self.carets.retain(|watch| watch.id != id);
+        self.selections.retain(|watch| watch.id != id);
     }
 
     /// Queue `write` for `node`, replacing one already waiting for it.

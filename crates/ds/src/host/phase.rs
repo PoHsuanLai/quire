@@ -4,7 +4,7 @@
 //! instead it asks the phase to publish what it observed into a signal when that changes, and to
 //! apply a write it queued. The write lands in that frame's document and shows on the next.
 
-use crate::host::position::TextPosition;
+use crate::host::position::{TextPosition, TextRange};
 use dioxus::prelude::{CopyValue, Signal};
 use ds_core::geometry::scroll::Scroll;
 use ds_core::geometry::units::{Px, Rect};
@@ -21,6 +21,20 @@ pub enum Observe {
     /// others it is also published *before* a frame paints when `at` moved (see
     /// [`CaretWatch`]), so the caret is drawn in the frame that draws the text it follows.
     Caret(CaretWatch),
+    /// The boxes a selection covers in an edit surface, relative to the surface's border box;
+    /// published before a frame paints when the range moved, like [`Observe::Caret`].
+    Selection(SelectionWatch),
+}
+
+/// What the phase publishes for an edit surface's selection.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct SelectionWatch {
+    /// The selection, which its owner keeps up to date as it renders (read by the phase each
+    /// step, as [`CaretWatch::at`] is).
+    pub range: CopyValue<Option<TextRange>>,
+    /// The boxes the range covers (one per line of text, one per whole atom); empty while
+    /// `range` is `None`, collapsed, or names nothing in the surface.
+    pub into: Signal<Vec<Rect>>,
 }
 
 /// What the phase publishes for an edit surface's caret.

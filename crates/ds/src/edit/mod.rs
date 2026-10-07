@@ -15,3 +15,4 @@ pub mod handle;
 pub mod input;
 pub(crate) mod keys;
 pub mod pointer;
+pub mod selection;

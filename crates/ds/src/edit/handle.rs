@@ -95,7 +95,9 @@ impl EditHandle {
         self.with(|edit, element| edit.caret_rect(element, position))
     }
 
-    /// The boxes `range` covers: one per line of text, one per whole atom.
+    /// The boxes `range` covers: one per line of text, one per whole atom, in the **last
+    /// laid-out frame**; a drawn selection wants
+    /// [`use_selection_rects`](crate::edit::selection::use_selection_rects).
     pub fn selection_rects(&self, range: &TextRange) -> Probe<Vec<Rect>> {
         self.with(|edit, element| edit.selection_rects(element, range))
     }

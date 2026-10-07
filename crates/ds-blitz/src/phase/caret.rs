@@ -2,16 +2,17 @@
 //! the phase should read it before the frame paints.
 
 use super::read::border_box;
-use crate::edit_geometry::caret;
+use crate::edit_geometry::{caret, selection};
 use crate::edit_locate::resolve;
+use crate::edit_tree::segments;
 use blitz_dom::{BaseDocument, NodeId};
-use ds::host::position::TextPosition;
+use ds::host::position::{TextPosition, TextRange};
 use ds::prelude::{Point, Rect};
 
 /// Whether the phase has work to do before a frame paints.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Early {
-    /// A caret moved since its box was read: lay out, publish, and render what that changed, so
+    /// A caret or a selection moved since its box was read: lay out, publish, and render what that changed, so
     /// the frame draws the caret where the text it follows is.
     Wanted,
     /// Nothing moved; the frame paints as it is.
@@ -30,4 +31,29 @@ pub(super) fn caret_box(doc: &BaseDocument, surface: NodeId, at: &TextPosition) 
         },
         size: found.size,
     })
+}
+
+/// The boxes `range` covers in `surface`, relative to the surface's border box; empty when the
+/// surface or either end of the range is not in the layout.
+pub(super) fn selection_boxes(doc: &BaseDocument, surface: NodeId, range: &TextRange) -> Vec<Rect> {
+    let Some(bounds) = border_box(doc, surface).filter(|_| range.anchor != range.focus) else {
+        return Vec::new();
+    };
+    let (Some(from), Some(to)) = (
+        resolve(doc, surface, &range.anchor),
+        resolve(doc, surface, &range.focus),
+    ) else {
+        return Vec::new();
+    };
+    selection(doc, &segments(doc, surface), from, to)
+        .unwrap_or_default()
+        .into_iter()
+        .map(|found| Rect {
+            origin: Point {
+                x: found.origin.x - bounds.origin.x,
+                y: found.origin.y - bounds.origin.y,
+            },
+            size: found.size,
+        })
+        .collect()
 }

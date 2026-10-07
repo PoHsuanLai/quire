@@ -3,7 +3,7 @@
 
 use crate::harness::Harness;
 use crate::headless_step::{PhaseOrder, Stepped};
-use crate::input::KeyInput;
+use crate::input::Input;
 use ds::prelude::ShortcutKey;
 
 /// Whether the document is brought up to date as input is delivered.
@@ -19,13 +19,14 @@ impl Harness {
     /// Press and release `key` and run no frame: the next [`Harness::step_frame`] is the first
     /// that shows it.
     pub fn key_pending(&mut self, key: ShortcutKey) {
-        self.press_key(
-            KeyInput {
-                key,
-                mods: Default::default(),
-            },
-            Delivery::Pending,
-        );
+        self.chord_pending(&[], key);
+    }
+
+    /// Press and release `key` with `held` modifiers down (as [`Input::chord`]) and run no frame.
+    pub fn chord_pending(&mut self, held: &[ShortcutKey], key: ShortcutKey) {
+        if let Input::Key(input) = Input::chord(held, key) {
+            self.press_key(input, Delivery::Pending);
+        }
     }
 
     /// Run the one frame the document is owed, in the window's order (render what is queued,
