@@ -4,6 +4,7 @@
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubEvent, ScrubSlot};
+use ds::components::chrome::capsule::priority::essentials;
 use ds::components::chrome::capsule::view::Capsule;
 use ds::components::controls::scrubber_model::BufferedRange;
 use ds::motion::spring::Millis;
@@ -27,8 +28,9 @@ pub fn CapsuleSection() -> Element {
             } else {
                 Icon::Play
             },
-        )),
-        CapsuleSlot::Readout(clock(position())),
+        ))
+        .essential(),
+        CapsuleSlot::Readout(clock(position())).droppable(1),
         CapsuleSlot::Scrub(ScrubSlot {
             label: "Position".to_owned(),
             position: position(),
@@ -38,12 +40,14 @@ pub fn CapsuleSection() -> Element {
                 to: Fraction(620),
             }],
             availability: Availability::Enabled,
-        }),
+        })
+        .essential(),
         CapsuleSlot::Level(LevelSlot {
             label: "Volume".to_owned(),
             value: level(),
             availability: Availability::Enabled,
-        }),
+        })
+        .droppable(2),
     ];
     rsx! {
         Section { title: "Capsule", note: "The pill of controls over content: toolbar buttons and readouts, and for a recording a progress bar that fills the free width and a fixed-width level.",
@@ -52,21 +56,36 @@ pub fn CapsuleSection() -> Element {
                     div { style: "position:relative; width:360px; height:120px",
                         Capsule::<u8> {
                             label: "Zoom",
-                            slots: vec![
+                            slots: essentials(vec![
                                 CapsuleSlot::button(0, "Zoom out", Icon::Minus),
                                 CapsuleSlot::Readout(format!("{}%", zoom())),
                                 CapsuleSlot::button(1, "Zoom in", Icon::Plus),
-                            ],
+                            ]),
                             shown: Shown::Visible,
                             onpick: move |value| zoom.set(if value == 0 { zoom().saturating_sub(25) } else { zoom() + 25 }),
                         }
                     }
                 }
-                Specimen { name: "media".to_owned(),
+                Specimen { name: "media, wide".to_owned(),
                     div { style: "position:relative; width:480px; height:140px",
                         Capsule::<u8> {
                             label: "Playback",
-                            slots,
+                            slots: slots.clone(),
+                            shown: Shown::Visible,
+                            onpick: move |_| playing.set(if playing() == Check::On { Check::Off } else { Check::On }),
+                            onscrub: move |event| match event {
+                                ScrubEvent::Start(at) | ScrubEvent::Move(at) | ScrubEvent::End(at) | ScrubEvent::Seek(at) => position.set(at),
+                                ScrubEvent::Cancel => {}
+                            },
+                            onlevel: move |next| level.set(next),
+                        }
+                    }
+                }
+                Specimen { name: "media, narrow (the clock and level drop)".to_owned(),
+                    div { style: "position:relative; width:300px; height:140px",
+                        Capsule::<u8> {
+                            label: "Playback",
+                            slots: slots.clone(),
                             shown: Shown::Visible,
                             onpick: move |_| playing.set(if playing() == Check::On { Check::Off } else { Check::On }),
                             onscrub: move |event| match event {

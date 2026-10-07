@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubSlot};
+use ds::components::chrome::capsule::priority::essentials;
 use ds::components::chrome::capsule::view::Capsule;
 use ds::components::chrome::sidebar::Sidebar;
 use ds::components::chrome::sidebar_model::{SidebarFill, SidebarSection};
@@ -187,17 +188,17 @@ pub const CASES: &[Case] = &[
     Case {
         component: "capsule",
         state: "shown",
-        make: || rsx! { Capsule::<u8> { label: "Controls", slots: capsule_slots(), shown: Shown::Visible, onpick: |_| {} } },
+        make: || rsx! { Capsule::<u8> { label: "Controls", slots: essentials(capsule_slots()), shown: Shown::Visible, onpick: |_| {} } },
     },
     Case {
         component: "capsule",
         state: "media",
-        make: || rsx! { Capsule::<u8> { label: "Playback", slots: media_slots(), shown: Shown::Visible, onpick: |_| {} } },
+        make: || rsx! { Capsule::<u8> { label: "Playback", slots: essentials(media_slots()), shown: Shown::Visible, onpick: |_| {} } },
     },
     Case {
         component: "capsule",
         state: "hidden",
-        make: || rsx! { Capsule::<u8> { label: "Controls", slots: capsule_slots(), shown: Shown::Hidden, onpick: |_| {} } },
+        make: || rsx! { Capsule::<u8> { label: "Controls", slots: essentials(capsule_slots()), shown: Shown::Hidden, onpick: |_| {} } },
     },
     Case {
         component: "toolbar",

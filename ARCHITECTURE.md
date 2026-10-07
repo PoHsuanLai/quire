@@ -246,7 +246,7 @@ The single place a concept lives. Extend it; never write a second one.
 | A timed pure state machine and the one timer that drives it | `ds-core::machine` (`Machine`, `Elapsed`), `ds-motion::machine` (`use_machine`, `use_machine_in`, `use_machine_state`, `MachineRef`, `MachineState`; named `ds::machine` for apps) |
 | A word or state shown for one `DelayToken` and then gone ("Copied", "Sent") | `ds::components::app::hold_for` (`HoldFor`, `use_hold_for`) |
 | A recording's progress bar: loaded stretches, a time tooltip, a captured drag | `ds::components::controls::scrubber` (`Scrubber`; drawing in `scrubber_face`, machine in `scrubber_machine`, `BufferedRange`, `merged` and `time_text` in `scrubber_model`) |
-| A floating pill of controls, and its media slots (progress bar, level) | `ds::components::chrome::capsule` (`Capsule`, `CapsuleSlot::{Item, Readout, Divider, Scrub, Level}`, `ScrubEvent`) |
+| A floating pill of controls, and its media slots (progress bar, level) | `ds::components::chrome::capsule` (`Capsule`, `CapsuleSlot::{Item, Readout, Divider, Scrub, Level}`, `ScrubEvent`, `SlotPriority`, `RankedSlot`, `fit`) |
 | Scope-owned tasks, spawning | `ds-style::task` (`spawn_in`); the `Spawner` trait in `ds-core::spawner` |
 | Base vocabulary (`Availability`, `Switch`, `Shown`, `Fraction`) | `ds-core::vocab` |
 | PNG, base64 | `ds-core::codec` |

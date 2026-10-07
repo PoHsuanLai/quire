@@ -14,7 +14,9 @@
 //! Its parent is a box with a size and `position:relative`, since Blitz places an absolutely
 //! positioned scope against its parent, not its nearest positioned ancestor.
 
+use crate::components::chrome::capsule::fit::{SlotShown, fit};
 use crate::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubEvent, ScrubSlot};
+use crate::components::chrome::capsule::priority::RankedSlot;
 use crate::components::chrome::toolbar::model::ToolbarItem;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::level_glyph::vocab::LevelGlyph;
@@ -23,9 +25,11 @@ use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::controls::scrubber::Scrubber;
 use crate::components::controls::slider::Slider;
 use crate::components::controls::slider_model::SliderLook;
+use crate::host::measure::use_rect;
 use crate::root::common::Common;
 use crate::root::surface::ClassedScope;
 use dioxus::prelude::*;
+use ds_core::geometry::units::Rect;
 use ds_core::press::Press;
 use ds_core::vocab::{Fraction, Muting, Shown};
 use ds_core::word::Word;
@@ -101,14 +105,44 @@ fn level(slot: &LevelSlot, onlevel: EventHandler<Fraction>) -> Element {
 }
 
 /// `wide` for a capsule that holds a progress bar, which stretches it; no attribute otherwise.
-fn span_of<T>(slots: &[CapsuleSlot<T>]) -> Option<&'static str> {
+fn span_of<T>(slots: &[&CapsuleSlot<T>]) -> Option<&'static str> {
     slots
         .iter()
         .any(|slot| matches!(slot, CapsuleSlot::Scrub(_)))
         .then_some("wide")
 }
 
-/// A capsule of `slots`. `label` names the toolbar to a screen reader. `onpick` hears a button's
+/// The slots of `slots` that `fit` leaves showing on a stage `stage` pixels wide, by reference,
+/// in their own order. A dropped slot is not rendered at all (not `display:none`): it takes no
+/// tab stop, no accessibility node and no handler, and the capsule's width follows what is drawn.
+fn drawn<T>(slots: &[RankedSlot<T>], stage: Option<u32>) -> Vec<&CapsuleSlot<T>> {
+    slots
+        .iter()
+        .zip(fit(slots, stage))
+        .filter(|(_, state)| *state == SlotShown::Shown)
+        .map(|(one, _)| &one.slot)
+        .collect()
+}
+
+/// The whole pixels of width the capsule's stage has, once measured.
+fn stage_width(rect: Option<Rect>) -> Option<u32> {
+    rect.map(|rect| rect.size.width.0.floor().max(0.0) as u32)
+        .filter(|width| *width > 0)
+}
+
+/// Until the stage is measured the capsule cannot know what fits, so it is laid out but not seen
+/// or touched (as a popover is before it is placed); it shows once fitted, never as a wide
+/// capsule that then thins.
+fn unmeasured_style(width: Option<u32>) -> Option<&'static str> {
+    match width {
+        Some(_) => None,
+        None => Some("visibility:hidden;pointer-events:none"),
+    }
+}
+
+/// A capsule of `slots`, each with the priority at which it drops when the stage is too narrow
+/// (`CapsuleSlot::essential` / `droppable`; the progress bar never drops below its least width).
+/// `label` names the toolbar to a screen reader. `onpick` hears a button's
 /// value; `onpointerenter` and `onpointerleave` tell the owner when the pointer is over the
 /// capsule, which is when it must not hide. `onscrub` hears the progress bar of a `Scrub` slot and
 /// `onlevel` the level of a `Level` slot. `on_hidden` runs once after a hide has settled; a
@@ -116,7 +150,7 @@ fn span_of<T>(slots: &[CapsuleSlot<T>]) -> Option<&'static str> {
 #[component]
 pub fn Capsule<T: Clone + PartialEq + 'static>(
     label: String,
-    slots: Vec<CapsuleSlot<T>>,
+    slots: Vec<RankedSlot<T>>,
     shown: Shown,
     #[props(default)] on_hidden: EventHandler<()>,
     onpick: EventHandler<T>,
@@ -134,11 +168,17 @@ pub fn Capsule<T: Clone + PartialEq + 'static>(
         },
         Some(on_hidden),
     );
+    let stage = use_rect();
+    let width = stage_width(stage.rect());
+    let drawn = drawn(&slots, width);
     let class = common.class("ds-capsule");
     let data = common.data_attributes();
     let name = common.aria_label.clone().unwrap_or(label);
     rsx! {
-        ClassedScope { material: Material::Osd, class: "ds-capsule-scope",
+        ClassedScope {
+            material: Material::Osd,
+            class: "ds-capsule-scope",
+            onmounted: move |event| stage.on_mounted(event),
             div {
                 id: common.id.clone(),
                 class,
@@ -147,12 +187,13 @@ pub fn Capsule<T: Clone + PartialEq + 'static>(
                 "data-shown": presence.shown().slug(),
                 "data-presence": presence.drawn_slug(),
                 "data-pulse": alias.slug(),
-                "data-span": span_of(&slots),
+                "data-span": span_of(&drawn),
+                style: unmeasured_style(width),
                 onmounted: move |event| common.mounted(event),
                 onpointerenter: move |_| onpointerenter.call(()),
                 onpointerleave: move |_| onpointerleave.call(()),
                 ..data,
-                for slot in slots.iter() {
+                for slot in drawn.iter() {
                     match slot {
                         CapsuleSlot::Item(item) => rsx! { {button(item, onpick)} },
                         CapsuleSlot::Readout(text) => rsx! {

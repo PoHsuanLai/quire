@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::chrome::capsule::model::{CapsuleSlot, LevelSlot, ScrubSlot};
+use ds::components::chrome::capsule::priority::essentials;
 use ds::components::chrome::capsule::view::Capsule;
 use ds::motion::spring::Millis;
 use ds::prelude::*;
@@ -33,11 +34,11 @@ fn Stage() -> Element {
                 button { class: "toggle", onclick: move |_| shown.set(shown().flipped()), "toggle" }
                 Capsule::<u8> {
                     label: "Controls",
-                    slots: vec![
+                    slots: essentials(vec![
                         CapsuleSlot::button(1, "Zoom out", Icon::Minus),
                         CapsuleSlot::Readout("100%".to_owned()),
                         CapsuleSlot::button(2, "Zoom in", Icon::Plus),
-                    ],
+                    ]),
                     shown: shown(),
                     on_hidden: move |()| log.with_mut(|log| log.push("hidden".to_owned())),
                     onpick: move |value| log.with_mut(|log| log.push(format!("pick {value}"))),
@@ -139,7 +140,7 @@ fn Media() -> Element {
             div { class: "stage", style: "position:relative; width:640px; height:400px",
                 Capsule::<u8> {
                     label: "Playback",
-                    slots: vec![
+                    slots: essentials(vec![
                         CapsuleSlot::button(1, "Play", Icon::Play),
                         CapsuleSlot::Scrub(ScrubSlot {
                             label: "Position".to_owned(),
@@ -153,7 +154,7 @@ fn Media() -> Element {
                             value: Fraction(500),
                             availability: Availability::Enabled,
                         }),
-                    ],
+                    ]),
                     shown: Shown::Visible,
                     onpick: move |value| log.with_mut(|log| log.push(format!("pick {value}"))),
                     onscrub: move |event| log.with_mut(|log| log.push(format!("{event:?}"))),
@@ -173,7 +174,7 @@ fn a_media_capsule_gives_the_free_width_to_its_bar_and_reports_each_control() {
     let bar = harness.rect(".ds-capsule-scrub").expect("the bar's slot");
     let level = harness.rect(".ds-capsule-level").expect("the level's slot");
     assert!(
-        bar.size.width.0 >= 160.0,
+        bar.size.width.0 >= 120.0,
         "the bar has its minimum: {}",
         bar.size.width.0
     );
@@ -212,5 +213,102 @@ fn a_media_capsule_gives_the_free_width_to_its_bar_and_reports_each_control() {
     assert!(
         log.contains("End(Fraction(5"),
         "and the release an end: {log}"
+    );
+}
+
+/// A player's capsule on a stage `W` wide: play and the bar stay; the clock, the level and the
+/// export go in that order (clock last) as the stage narrows.
+#[allow(non_snake_case)]
+fn Thinning<const W: u32>() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { class: "stage", style: "position:relative; width:{W}px; height:200px",
+                Capsule::<u8> {
+                    label: "Playback",
+                    slots: vec![
+                        CapsuleSlot::button(1, "Play", Icon::Play).essential(),
+                        CapsuleSlot::Readout("0:25".to_owned()).droppable(1),
+                        CapsuleSlot::Scrub(ScrubSlot {
+                            label: "Position".to_owned(),
+                            position: Fraction(250),
+                            length: Millis(200_000),
+                            buffered: Vec::new(),
+                            availability: Availability::Enabled,
+                        })
+                        .essential(),
+                        CapsuleSlot::Level(LevelSlot {
+                            label: "Volume".to_owned(),
+                            value: Fraction(500),
+                            availability: Availability::Enabled,
+                        })
+                        .droppable(2),
+                        CapsuleSlot::button(2, "Export", Icon::Upload).droppable(3),
+                    ],
+                    shown: Shown::Visible,
+                    onpick: |_| {},
+                }
+            }
+        }
+    }
+}
+
+/// What shows at `W`: the buttons, the clock, the level, and the bar's width.
+fn thinned(app: fn() -> Element) -> (usize, usize, usize, f32) {
+    let viewport = Viewport {
+        width: 800,
+        height: 300,
+        scale_percent: 100,
+    };
+    let mut harness = Harness::new(app, HarnessConfig::new(viewport).with_clock(Clock::Virtual));
+    harness.advance(Duration::from_millis(200));
+    let bar = harness
+        .rect(".ds-capsule-scrub")
+        .map_or(0.0, |rect| rect.size.width.0);
+    (
+        harness.count(".ds-capsule .ds-button"),
+        harness.count(".ds-capsule-readout"),
+        harness.count(".ds-capsule-level"),
+        bar,
+    )
+}
+
+#[test]
+fn a_narrow_stage_drops_the_lower_priority_slots_and_the_bar_keeps_its_least() {
+    // (buttons, readouts, levels) at a wide, a middle and a narrow stage.
+    let (buttons, readouts, levels, bar) = thinned(Thinning::<500>);
+    assert_eq!((buttons, readouts, levels), (2, 1, 1), "wide shows all");
+    assert!(bar >= 120.0, "wide bar {bar}");
+    let (buttons, readouts, levels, bar) = thinned(Thinning::<360>);
+    assert_eq!(
+        (buttons, readouts, levels),
+        (1, 1, 1),
+        "middle drops the export"
+    );
+    assert!(bar >= 120.0, "middle bar {bar}");
+    let (buttons, readouts, levels, bar) = thinned(Thinning::<220>);
+    assert_eq!(
+        (buttons, readouts, levels),
+        (1, 0, 0),
+        "narrow keeps play and the bar"
+    );
+    assert!(bar >= 120.0, "narrow bar {bar}");
+}
+
+#[test]
+fn a_measured_capsule_shows() {
+    let viewport = Viewport {
+        width: 800,
+        height: 300,
+        scale_percent: 100,
+    };
+    let mut harness = Harness::new(
+        Thinning::<500>,
+        HarnessConfig::new(viewport).with_clock(Clock::Virtual),
+    );
+    harness.advance(Duration::from_millis(200));
+    let style = harness.attr(".ds-capsule", "style").unwrap_or_default();
+    assert!(
+        !style.contains("visibility:hidden"),
+        "measured, it shows: {style:?}"
     );
 }

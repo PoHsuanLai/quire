@@ -63,7 +63,12 @@ pub fn Surface(
 /// against its parent, not its nearest positioned ancestor, so an edge panel's scope has to fill
 /// the root for the panel inside it to (notification parts).
 #[component]
-pub(crate) fn ClassedScope(material: Material, class: &'static str, children: Element) -> Element {
+pub(crate) fn ClassedScope(
+    material: Material,
+    class: &'static str,
+    #[props(default)] onmounted: EventHandler<Event<MountedData>>,
+    children: Element,
+) -> Element {
     let env = scope(use_scope(), material, None, None, None);
     let typeface = use_typeface();
     use_scope_provider(env);
@@ -79,6 +84,7 @@ pub(crate) fn ClassedScope(material: Material, class: &'static str, children: El
             "data-ground": Ground::of(material).attribute(),
             "data-chrome": RootChrome::Transparent.attribute(),
             style: scope_style(env.material, None),
+            onmounted: move |event| onmounted.call(event),
             {children}
         }
     }
