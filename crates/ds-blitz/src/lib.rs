@@ -77,13 +77,16 @@ pub mod window;
 mod window_activate;
 mod window_build;
 mod window_drop;
+mod window_fit;
 mod window_hover;
 mod window_place;
 mod window_platform;
 mod window_requests;
+mod window_screen;
 mod window_scroll;
 mod window_shell;
 mod window_size;
+mod window_sizer;
 #[cfg(target_os = "linux")]
 mod xdg_activation;
 
@@ -127,8 +130,10 @@ pub use blitz_kit::element_id::ElementId;
 pub use blitz_kit::scroll::cmd::ScrollCmd;
 pub use blitz_kit::scroll::engine::ScrollAnimate;
 pub use blitz_kit::scroll::geom::ScrollAxis;
+pub use window_fit::SizeOrigin;
 pub use window_requests::WindowLife;
 pub use window_size::{Extent, WindowSize};
+pub use window_sizer::{WindowSizer, use_window_sizer};
 
 // The window renderer dioxus-native runs on; named here so the pinned versions stay the ones
 // the render stack resolves.

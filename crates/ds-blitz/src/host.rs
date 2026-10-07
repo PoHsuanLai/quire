@@ -56,6 +56,8 @@ use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
 use crate::window_requests::Root;
 use crate::window_scroll::{ScrollHandle, WindowScroll};
+use crate::window_size::Extent;
+use crate::window_sizer::WindowSizer;
 use blitz_traits::shell::ColorScheme;
 use blitz_traits::shell::ShellProvider;
 use dioxus::core::Runtime;
@@ -182,6 +184,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         use_context_provider(|| ScrollHandle::new(scroll.clone(), wake));
     }
     let resized = use_context_provider(WindowResized::new);
+    let sizer = use_context_provider(|| WindowSizer::new(Arc::clone(&window)));
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
@@ -207,6 +210,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
             WindowEvent::SurfaceResized(_) | WindowEvent::Focused(_)
         ) {
             framed.refresh();
+        }
+        if let WindowEvent::SurfaceResized(size) = event {
+            sizer.resized(Extent::new(size.width, size.height));
         }
         if matches!(
             event,

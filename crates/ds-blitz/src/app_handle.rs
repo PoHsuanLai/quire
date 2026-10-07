@@ -10,6 +10,7 @@
 
 use crate::open_window::WindowSpec;
 use crate::window_requests::Root;
+use crate::window_size::Extent;
 use dioxus::prelude::*;
 use std::collections::VecDeque;
 use std::rc::Rc;
@@ -41,6 +42,8 @@ struct State {
     /// Wakes the event loop; set when `launch` binds the handle.
     wake: Option<Wake>,
     ended: bool,
+    /// The screen new windows open on, set by the loop once it can read monitors.
+    screen: Option<Extent>,
 }
 
 /// A handle to the running app, cloneable and `Send + Sync`: see the module documentation.
@@ -105,6 +108,16 @@ impl AppHandle {
         Ok(AppHold(self.clone()))
     }
 
+    /// The logical-pixel extent of the monitor the next window opens on (the primary monitor, or
+    /// the first listed), for sizing a window before it opens: `Extent::fit` and
+    /// `WindowSize::fitting` cap a natural size to it. `None` until the event loop is running
+    /// (the first window's own size is therefore fixed before it is known) and where winit lists
+    /// no monitor. It is the monitor's whole size: winit has no work-area query, so panels and
+    /// docks (Wayland exclusive zones) are not subtracted.
+    pub fn screen_extent(&self) -> Option<Extent> {
+        self.lock().screen
+    }
+
     /// Whether the event loop has ended.
     pub fn has_ended(&self) -> bool {
         self.lock().ended
@@ -140,6 +153,11 @@ impl AppHandle {
         if waiting {
             wake();
         }
+    }
+
+    /// The loop read the screen.
+    pub(crate) fn set_screen(&self, screen: Option<Extent>) {
+        self.lock().screen = screen;
     }
 
     /// Every request since the last take, oldest first.

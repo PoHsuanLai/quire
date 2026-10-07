@@ -117,6 +117,49 @@ ended, and a request made before the loop runs waits for it. `launch_idle(config
 with no first window, for an app that opens all of them through its handle. A window's root
 reads its app's handle with `use_app_handle()`; `open_window` still works from inside a window.
 
+**Windows that fit their content (Preview, QuickTime).** `handle.screen_extent()`
+(`Option<Extent>`, logical pixels; also through `use_app_handle()`) is the monitor the next window
+opens on: the primary monitor, or the first listed, since winit cannot say where the compositor
+will put it. It is the monitor's whole size, not its work area: winit has no work-area query, and
+on Wayland there is none to ask, so the panel's and dock's exclusive zones are not subtracted (the
+85% cap leaves room for them); on Wayland the scale is the integer `wl_output` one, so a
+fractionally scaled output is off by the difference. It is `None` until the loop runs (the first
+window's size is fixed before then) and where winit lists no monitor. `natural.fit(screen,
+Some(least))` caps an `Extent` to 85% of the screen on each axis and never below `least` (a larger
+`least` wins), and `WindowSize::fitting(natural, screen, least)` builds the `WindowSize` (uncapped
+when `screen` is `None`). Inside the window, `use_window_sizer()` (`Option<WindowSizer>`, `None`
+in the harness) gives `sizer.request_size(Extent)` (winit's `request_surface_size`, logical
+pixels; the window never goes below its least), `sizer.size()` (logical) and `sizer.origin()`
+(`Option<SizeOrigin>`, a read subscribes the component): `None` until the window is resized,
+`SizeOrigin::Requested` when the resize is the answer to our own request, `SizeOrigin::Person` for
+any other (a drag, a tile, a zoom, the compositor's own choice). A resize is ours when it arrives
+within 500 ms of `request_size` at the requested size, to within 1 physical pixel per axis (scale
+rounding); a configure that changes nothing is no resize. On Wayland the compositor places windows;
+only the size is the app's.
+
+```rust
+// Open at the picture's natural size, then fit the real size once it is known.
+let screen = handle.screen_extent();
+let size = WindowSize::fitting(Extent::new(1200, 800), screen, Extent::new(320, 240));
+handle.open_window_with(WindowSpec::new("Photo", size), viewer, path)?;
+
+fn viewer(path: PathBuf) -> Element {
+    let sizer = use_window_sizer();
+    let app = use_app_handle();
+    let loaded = use_signal(|| None::<Extent>); // set when the decode reports its size
+    use_effect(move || {
+        let (Some(sizer), Some(natural)) = (sizer.clone(), loaded()) else { return };
+        if sizer.origin() == Some(SizeOrigin::Person) {
+            return; // the person chose a size: the content stops asking
+        }
+        let screen = app.as_ref().and_then(|app| app.screen_extent());
+        let size = screen.map_or(natural, |s| natural.fit(s, Some(Extent::new(320, 240))));
+        sizer.request_size(size);
+    });
+    rsx! { /* ... */ }
+}
+```
+
 **A window's own handle, and keyboard focus at launch.** A component reads the handle of the window
 it renders in with `use_window_handle()` (`Option<WindowHandle>`, `None` in the harness or a
 snapshot, where no loop runs): the first window's too, so `handle.focus()` asks for the window
