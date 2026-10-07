@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
@@ -107,7 +108,8 @@ fn a_plain_field_is_one_line_of_its_parents_text() {
     let bezeled = harness
         .rect("#bezeled .ds-text-field-frame")
         .expect("the bezeled field");
-    // A bezeled field keeps its own face whatever the parent's: a Regular control, 22
+    // A bezeled field keeps its own face whatever the parent's: a Regular control
     // (design/29-SIZING.md).
-    assert!((bezeled.size.height.0 - 22.0).abs() < 0.5, "{bezeled:?}");
+    let regular = f32::from(ControlSize::Regular.scale().height.0);
+    assert!((bezeled.size.height.0 - regular).abs() < 0.5, "{bezeled:?}");
 }

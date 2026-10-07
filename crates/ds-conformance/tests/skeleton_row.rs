@@ -130,7 +130,12 @@ fn it_is_as_tall_as_the_row_it_stands_for_both_reading_the_row_tokens() {
     assert!((mark.size.width.0 - circle.size.width.0).abs() < 0.5);
     assert!((mark.size.height.0 - f32::from(ROW_SCALE.avatar.0)).abs() < 0.5);
     let css = ds::stylesheet();
-    assert!(css.contains("--row-settings-h:44px") && css.contains("--row-avatar:32px"));
+    assert!(
+        css.contains(&format!(
+            "--row-settings-h:{}px",
+            ROW_SCALE.settings_height.0
+        )) && css.contains(&format!("--row-avatar:{}px", ROW_SCALE.avatar.0))
+    );
     for sheet in [
         include_str!("../../ds/src/components/lists/row/row.css"),
         include_str!("../../ds/src/components/overlays/skeleton_row.css"),

@@ -17,6 +17,7 @@
 .ds-slider[*|data-size=mini]{ --sl-knob:var(--slider-knob-xs); --sl-track:var(--slider-track-xs); --sl-h:var(--ctl-h-xs); }
 .ds-slider[*|data-size=small]{ --sl-knob:var(--slider-knob-s); --sl-track:var(--slider-track-s); --sl-h:var(--ctl-h-s); }
 .ds-slider[*|data-size=large]{ --sl-knob:var(--slider-knob-l); --sl-track:var(--slider-track-l); --sl-h:var(--ctl-h-l); }
+.ds-slider[*|data-size=extra-large]{ --sl-knob:var(--slider-knob-xl); --sl-track:var(--slider-track-xl); --sl-h:var(--ctl-h-xl); }
 
 .ds-slider[*|data-look=linear]{ width:100%; height:var(--sl-knob); }
 .ds-slider[*|data-look=linear] .ds-slider-track{

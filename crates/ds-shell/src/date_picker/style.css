@@ -9,6 +9,7 @@
 .ds-date-picker[*|data-size=mini]{ --dp-h:var(--ctl-h-xs); --dp-r:var(--ctl-r-xs); --dp-fs:var(--ctl-fs-xs); }
 .ds-date-picker[*|data-size=small]{ --dp-h:var(--ctl-h-s); --dp-r:var(--ctl-r-s); --dp-fs:var(--ctl-fs-s); }
 .ds-date-picker[*|data-size=large]{ --dp-h:var(--ctl-h-l); --dp-r:var(--ctl-r-l); --dp-fs:var(--ctl-fs-l); }
+.ds-date-picker[*|data-size=extra-large]{ --dp-h:var(--ctl-h-xl); --dp-r:var(--ctl-r-xl); --dp-fs:var(--ctl-fs-xl); }
 .ds-date-picker[*|data-style=graphical]{ flex-direction:column; align-items:stretch; gap:var(--s-8); }
 
 .ds-date-picker-field{

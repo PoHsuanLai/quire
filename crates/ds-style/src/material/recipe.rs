@@ -230,7 +230,9 @@ mod tests {
     use crate::appearance::material::Material;
     use crate::appearance::theme::Scheme;
     use crate::tokens::hex::{Alpha, Hex};
+    use crate::tokens::shape::Radius;
     use crate::tokens::tint::flat_tint;
+    use crate::tokens::token::{Token, TokenScope};
     use ds_core::word::Word;
 
     #[test]
@@ -264,13 +266,19 @@ mod tests {
             (Material::Bar, Scheme::Light, "rgba(252,253,249,.7)", "rgba(252,253,249,.94)", "0"),
             (Material::Bar, Scheme::Dark, "rgba(20,24,19,.68)", "rgba(20,24,19,.94)", "0"),
             (Material::Dock, Scheme::Light, "rgba(252,253,249,.59)", "rgba(252,253,249,.94)", "22px"),
-            (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "12px"),
-            (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "12px"),
+            (Material::Popover, Scheme::Light, "rgba(255,255,255,.78)", "rgba(255,255,255,.94)", "panel"),
+            (Material::Popover, Scheme::Dark, "rgba(41,48,38,.78)", "rgba(41,48,38,.94)", "panel"),
             (Material::Sheet, Scheme::Light, "rgba(252,253,249,.82)", "rgba(252,253,249,.94)", "18px"),
             (Material::Widget, Scheme::Dark, "rgba(20,24,19,.55)", "rgba(20,24,19,.94)", "20px"),
             (Material::Window, Scheme::Light, "var(--f-grad)", "var(--f-grad)", "0"),
         ];
+        let panel = Radius::Panel.css_value(TokenScope::BASE).to_string();
         for &(material, scheme, tint, solid, radius) in CASES {
+            let radius = if radius == "panel" {
+                panel.as_str()
+            } else {
+                radius
+            };
             let got = recipe(material, scheme, DEFAULT_TINT_ALPHA);
             assert_eq!(got.tint, tint, "{material:?} {scheme:?}");
             assert_eq!(got.tint_solid, solid, "{material:?} {scheme:?}");

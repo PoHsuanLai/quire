@@ -1,6 +1,6 @@
 //! SegmentedControl on the size ladder (design/29-SIZING.md decision 5): the well is a control's
-//! height (Mini 16, Small 19, Regular 22, Large 28), each segment fills it less the 1 px knob inset
-//! (14, 17, 20, 26), all whole pixels, at scale 1 and 2. Measured on the laid-out rects.
+//! height (Mini 20, Small 24, Regular 28, Large 32, ExtraLarge 40), each segment fills it less the 1 px knob inset
+//! (18, 22, 26, 30, 38), all whole pixels, at scale 1 and 2. Measured on the laid-out rects.
 
 use dioxus::prelude::*;
 use ds::components::controls::segmented::Tracking;
@@ -18,7 +18,7 @@ fn Both() -> Element {
     ];
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            for (class , size) in [("mini", ControlSize::Mini), ("small", ControlSize::Small), ("regular", ControlSize::Regular), ("large", ControlSize::Large)] {
+            for (class , size) in [("mini", ControlSize::Mini), ("small", ControlSize::Small), ("regular", ControlSize::Regular), ("large", ControlSize::Large), ("xl", ControlSize::ExtraLarge)] {
                 div { class,
                     SegmentedControl::<u8> {
                         label: "View",
@@ -35,13 +35,24 @@ fn Both() -> Element {
 
 #[test]
 fn the_well_and_its_segments_stand_on_the_ladder() {
-    // (scope, well, segment)
-    const CASES: &[(&str, f32, f32)] = &[
-        (".mini", 16.0, 14.0),
-        (".small", 19.0, 17.0),
-        (".regular", 22.0, 20.0),
-        (".large", 28.0, 26.0),
-    ];
+    // (scope, well, segment), both from the ladder.
+    let cases: Vec<(&str, f32, f32)> = [
+        (".mini", ControlSize::Mini),
+        (".small", ControlSize::Small),
+        (".regular", ControlSize::Regular),
+        (".large", ControlSize::Large),
+        (".xl", ControlSize::ExtraLarge),
+    ]
+    .into_iter()
+    .map(|(scope, size)| {
+        let scale = size.scale();
+        (
+            scope,
+            f32::from(scale.height.0),
+            f32::from(scale.segment().0),
+        )
+    })
+    .collect();
     for scale_percent in [100, 200] {
         let viewport = Viewport {
             width: 400,
@@ -53,7 +64,7 @@ fn the_well_and_its_segments_stand_on_the_ladder() {
             HarnessConfig::new(viewport).with_clock(Clock::Virtual),
         );
         harness.advance(Duration::from_millis(50));
-        for &(scope, well, segment) in CASES {
+        for &(scope, well, segment) in &cases {
             let height = |selector: &str| {
                 harness
                     .rect(&format!("{scope} {selector}"))

@@ -8,7 +8,7 @@
    section 13.3.3; busy keeps its spinner at full strength). */
 
 .ds-button{
-  --btn-h:var(--ctl-h-m); --btn-r:var(--r-btn); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
+  --btn-h:var(--ctl-h-m); --btn-r:var(--ctl-r-m); --btn-pad:var(--ctl-pad-m); --btn-fs:var(--ctl-fs-m); --btn-fw:var(--ctl-fw-m);
   display:inline-flex; align-items:center; justify-content:center; gap:var(--s-6); box-sizing:border-box; flex:none;
   height:var(--btn-h); padding:0 var(--btn-pad); border:0; border-radius:var(--btn-r);
   font:inherit; font-size:var(--btn-fs); font-weight:var(--btn-fw); line-height:1; white-space:nowrap; cursor:default;
@@ -16,9 +16,10 @@
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out);
 }
 .ds-button[*|data-pressed]{ transition:none; }
-.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
-.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
-.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
+.ds-button[*|data-size=mini]{ --btn-h:var(--ctl-h-xs); --btn-r:var(--ctl-r-xs); --btn-pad:var(--ctl-pad-xs); --btn-fs:var(--ctl-fs-xs); --btn-fw:var(--ctl-fw-xs); }
+.ds-button[*|data-size=small]{ --btn-h:var(--ctl-h-s); --btn-r:var(--ctl-r-s); --btn-pad:var(--ctl-pad-s); --btn-fs:var(--ctl-fs-s); --btn-fw:var(--ctl-fw-s); }
+.ds-button[*|data-size=large]{ --btn-h:var(--ctl-h-l); --btn-r:var(--ctl-r-l); --btn-pad:var(--ctl-pad-l); --btn-fs:var(--ctl-fs-l); --btn-fw:var(--ctl-fw-l); }
+.ds-button[*|data-size=extra-large]{ --btn-h:var(--ctl-h-xl); --btn-r:var(--ctl-r-xl); --btn-pad:var(--ctl-pad-xl); --btn-fs:var(--ctl-fs-xl); --btn-fw:var(--ctl-fw-xl); }
 
 /* Push: a borderless rounded rectangle filled with the quaternary wash (design/34 section 3.1);
    hover lifts the ink, pressed and a toggle that is on take the stronger wash. */
@@ -43,7 +44,7 @@
 .ds-button[*|data-variant=toolbar][*|aria-expanded=true]{ color:var(--ink); background:var(--fill); }
 .ds-button[*|data-variant=toolbar][*|data-role=destructive]:hover{ color:var(--danger); background:var(--danger-wash); }
 /* An image-only button is a square of the rung's height. */
-.ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; }
+.ds-button[*|data-image=only]{ width:var(--btn-h); padding:0; border-radius:var(--r-pill); }
 
 /* Inline: words with no bezel; the quiet link-button. */
 .ds-button[*|data-variant=inline]{ color:var(--ink-faint); padding:0 var(--s-4); font-weight:var(--ctl-fw-m); }

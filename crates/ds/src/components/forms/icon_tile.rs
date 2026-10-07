@@ -1,4 +1,4 @@
-//! IconTile: the 24 px rounded tile that leads a grouped row, a colour with a white glyph on it
+//! IconTile: the 28 px rounded tile that leads a grouped row, a colour with a white glyph on it
 //! (System Settings' General, Wi-Fi and Sound tiles; design/34-MODERN-LOOK.md sections 2.3 and
 //! 3.5). Its sibling is the circular avatar a row of people leads with: the tile's other face
 //! is an [`AvatarFace`], drawn by `Avatar` itself, so the two sit in the same leading slot.

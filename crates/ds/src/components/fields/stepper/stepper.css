@@ -9,6 +9,7 @@
 .ds-stepper[*|data-size=mini]{ --stp-h:var(--ctl-h-xs); --stp-r:var(--ctl-r-xs); }
 .ds-stepper[*|data-size=small]{ --stp-h:var(--ctl-h-s); --stp-r:var(--ctl-r-s); }
 .ds-stepper[*|data-size=large]{ --stp-h:var(--ctl-h-l); --stp-r:var(--ctl-r-l); }
+.ds-stepper[*|data-size=extra-large]{ --stp-h:var(--ctl-h-xl); --stp-r:var(--ctl-r-xl); }
 .ds-stepper .ds-text-field{ width:56px; }
 
 .ds-stepper-pair{

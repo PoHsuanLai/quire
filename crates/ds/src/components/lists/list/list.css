@@ -64,7 +64,7 @@
 .ds-list[*|data-style=grouped] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
 .ds-list[*|data-style=grouped] .ds-row:active{ background:var(--fill); }
 
-/* SourceList: a sidebar's rows at the sidebar's size (Small 24, Medium 28, Large 32). */
-.ds-list[*|data-style=source-list] .ds-row{ min-height:28px; }
-.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row{ min-height:24px; }
-.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row{ min-height:32px; }
+/* SourceList: a sidebar's rows at the sidebar's size (`--sidebar-row-h-*`, from `SidebarSize`). */
+.ds-list[*|data-style=source-list] .ds-row{ min-height:var(--sidebar-row-h-m); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=small] .ds-row{ min-height:var(--sidebar-row-h-s); }
+.ds-list[*|data-style=source-list][*|data-sidebar-size=large] .ds-row{ min-height:var(--sidebar-row-h-l); }

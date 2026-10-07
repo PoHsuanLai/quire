@@ -23,6 +23,7 @@
 .ds-segmented[*|data-size=mini]{ --sg-h:var(--ctl-h-xs); --sg-well-r:var(--seg-well-r-xs); --sg-r:var(--seg-r-xs); --sg-pad:var(--ctl-pad-xs); --sg-fs:var(--ctl-fs-xs); }
 .ds-segmented[*|data-size=small]{ --sg-h:var(--ctl-h-s); --sg-well-r:var(--seg-well-r-s); --sg-r:var(--seg-r-s); --sg-pad:var(--ctl-pad-s); --sg-fs:var(--ctl-fs-s); }
 .ds-segmented[*|data-size=large]{ --sg-h:var(--ctl-h-l); --sg-well-r:var(--seg-well-r-l); --sg-r:var(--seg-r-l); --sg-pad:var(--ctl-pad-l); --sg-fs:var(--ctl-fs-l); }
+.ds-segmented[*|data-size=extra-large]{ --sg-h:var(--ctl-h-xl); --sg-well-r:var(--seg-well-r-xl); --sg-r:var(--seg-r-xl); --sg-pad:var(--ctl-pad-xl); --sg-fs:var(--ctl-fs-xl); }
 
 /* The thumb: out of flow in the selected segment's cell, which is its containing block (both
    ends named: an abspos item's `auto` end line is the padding edge, not span 1), and one

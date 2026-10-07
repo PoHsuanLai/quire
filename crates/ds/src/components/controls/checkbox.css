@@ -11,6 +11,7 @@
 .ds-checkbox[*|data-size=mini]{ --cb:var(--check-xs); --cb-fs:var(--ctl-fs-xs); }
 .ds-checkbox[*|data-size=small]{ --cb:var(--check-s); --cb-fs:var(--ctl-fs-s); }
 .ds-checkbox[*|data-size=large]{ --cb:var(--check-l); --cb-fs:var(--ctl-fs-l); }
+.ds-checkbox[*|data-size=extra-large]{ --cb:var(--check-xl); --cb-fs:var(--ctl-fs-xl); }
 
 .ds-checkbox-indicator{
   position:relative; display:inline-flex; align-items:center; justify-content:center; flex:none; box-sizing:border-box; width:var(--cb); height:var(--cb);

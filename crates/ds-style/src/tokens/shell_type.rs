@@ -33,18 +33,18 @@ pub enum ShellType {
     /// `--fs-shell-menu`: a text menu's items (`menus.font_px`, 13).
     #[token(name = "fs-shell-menu", input = "--shell-menu-font", value = "13px")]
     MenuFont,
-    /// `--shell-menu-row`: a text menu row's height (`menus.item_height_px`, 22).
-    #[token(name = "shell-menu-row", input = "--shell-menu-row-h", value = "22px")]
+    /// `--shell-menu-row`: a text menu row's height (`menus.item_height_px`, 28).
+    #[token(name = "shell-menu-row", input = "--shell-menu-row-h", value = "28px")]
     MenuRow,
     /// `--shell-menu-sep`: the margin above and below a separator (`menus.separator_margin_px`, 5).
     #[token(name = "shell-menu-sep", input = "--shell-menu-sep-m", value = "5px")]
     MenuSeparator,
-    /// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 6: the
+    /// `--r-shell-highlight`: the selected row's inset highlight (`menus.highlight_radius_px`, 8: the
     /// reference's, design/29-SIZING.md section 5.4).
     #[token(
         name = "r-shell-highlight",
         input = "--shell-highlight-radius",
-        value = "6px"
+        value = "8px"
     )]
     HighlightRadius,
     /// `--fs-shell-field`: the launcher's query (`launcher.field_font_px`, 22).
@@ -150,9 +150,9 @@ impl Default for ShellMetrics {
             },
             menu: MenuType {
                 font: Px(13.0),
-                row: Px(22.0),
+                row: Px(28.0),
                 separator_margin: Px(5.0),
-                highlight_radius: Px(6.0),
+                highlight_radius: Px(8.0),
             },
             launcher: LauncherType {
                 field_font: Px(22.0),
@@ -225,10 +225,12 @@ mod tests {
     #[test]
     fn the_highlight_radius_key_drives_its_token() {
         let mut metrics = ShellMetrics::default();
+        let concentric = crate::tokens::shell_scale::SHELL_SCALE.menu_radius.0
+            - crate::tokens::shell_scale::SHELL_SCALE.menu_inset.0;
         assert!(
             metrics
                 .style_attr()
-                .contains("--shell-highlight-radius:6px;")
+                .contains(&format!("--shell-highlight-radius:{concentric}px;"))
         );
         metrics.menu.highlight_radius = ds_core::geometry::units::Px(9.0);
         assert!(

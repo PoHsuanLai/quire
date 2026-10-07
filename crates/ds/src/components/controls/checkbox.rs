@@ -18,7 +18,7 @@ use ds_style::tokens::control_size::ControlSize;
 fn mark_size(size: ControlSize) -> IconSize {
     match size {
         ControlSize::Mini | ControlSize::Small => IconSize::Micro,
-        ControlSize::Regular | ControlSize::Large => IconSize::Tiny,
+        ControlSize::Regular | ControlSize::Large | ControlSize::ExtraLarge => IconSize::Tiny,
     }
 }
 

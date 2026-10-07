@@ -11,6 +11,7 @@ use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
+use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
 
@@ -60,16 +61,17 @@ fn a_text_input_is_one_line_tall_and_fills_its_wrapper() {
         FieldsApp,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
     );
-    // A bezeled field's frame is a Regular control, 22 (design/29-SIZING.md), and its input fills
-    // it inside the two hairlines; a plain field is one line of its parent's text (13.5 px at the
-    // base line height 1.55); the search row's is 16 px.
-    const CASES: &[(&str, f32)] = &[
-        (".probe-boxed .ds-text-field-frame", 22.0),
-        (".probe-boxed .ds-input", 20.0),
+    // A bezeled field's frame is a Regular control (design/29-SIZING.md; its height from the
+    // ladder), and its input fills it less the frame's own padding; a plain field is one line of its
+    // parent's text (13.5 px at the base line height 1.55); the search row's is 16 px.
+    let regular = f32::from(ControlSize::Regular.scale().height.0);
+    let cases: &[(&str, f32)] = &[
+        (".probe-boxed .ds-text-field-frame", regular),
+        (".probe-boxed .ds-input", regular - 2.0),
         (".probe-inline .ds-input", 13.5 * 1.55),
         (".probe-search .ds-input", 16.0 * 1.55),
     ];
-    for &(selector, want) in CASES {
+    for &(selector, want) in cases {
         let got = rect(&harness, selector).size.height.0;
         assert!(
             (got - want).abs() <= 2.0,

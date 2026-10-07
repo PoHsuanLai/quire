@@ -8,6 +8,7 @@
 .ds-radio-group[*|data-size=mini]{ --rg:var(--check-xs); --rg-fs:var(--ctl-fs-xs); }
 .ds-radio-group[*|data-size=small]{ --rg:var(--check-s); --rg-fs:var(--ctl-fs-s); }
 .ds-radio-group[*|data-size=large]{ --rg:var(--check-l); --rg-fs:var(--ctl-fs-l); }
+.ds-radio-group[*|data-size=extra-large]{ --rg:var(--check-xl); --rg-fs:var(--ctl-fs-xl); }
 .ds-radio-group[*|data-arrangement=row]{ flex-direction:row; align-items:flex-start; gap:var(--s-16); }
 
 .ds-radio-group-item{

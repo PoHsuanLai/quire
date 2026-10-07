@@ -11,6 +11,7 @@
 .ds-scrubber[*|data-size=mini]{ --sc-knob:var(--slider-knob-xs); --sc-track:var(--slider-track-xs); }
 .ds-scrubber[*|data-size=small]{ --sc-knob:var(--slider-knob-s); --sc-track:var(--slider-track-s); }
 .ds-scrubber[*|data-size=large]{ --sc-knob:var(--slider-knob-l); --sc-track:var(--slider-track-l); }
+.ds-scrubber[*|data-size=extra-large]{ --sc-knob:var(--slider-knob-xl); --sc-track:var(--slider-track-xl); }
 
 .ds-scrubber-track{ position:absolute; left:0; right:0; top:calc((var(--sc-knob) - var(--sc-track)) / 2); height:var(--sc-track); overflow:hidden; border-radius:var(--r-pill); background:var(--line); }
 .ds-scrubber-buffered{ position:absolute; top:0; bottom:0; left:calc(var(--from) * 100%); width:calc((var(--to) - var(--from)) * 100%); background:var(--ink-faint); }

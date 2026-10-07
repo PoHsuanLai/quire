@@ -4,7 +4,6 @@
 //! concentric with the menu). The item heights, paddings and highlight a settings key can move
 //! stay [`ShellMetrics`](super::ShellMetrics) tokens; these are the fixed ones.
 
-use crate::tokens::control_size::ControlSize;
 use crate::tokens::size_scale::WholePx;
 use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
@@ -16,9 +15,9 @@ pub struct ShellScale {
     pub bar: WholePx,
     /// A status item's slot width, 30; its height is a Regular control's.
     pub status_width: WholePx,
-    /// A text menu's radius, 10 (design/34 step 1).
+    /// A text menu's radius, 14 (design/34 step 2).
     pub menu_radius: WholePx,
-    /// A text menu's inset round its rows, 5.
+    /// A text menu's inset round its rows, 6 (the highlight is the menu's radius less this: 8).
     pub menu_inset: WholePx,
 }
 
@@ -26,14 +25,15 @@ pub struct ShellScale {
 pub const SHELL_SCALE: ShellScale = ShellScale {
     bar: WholePx(24),
     status_width: WholePx(30),
-    menu_radius: WholePx(10),
-    menu_inset: WholePx(5),
+    menu_radius: WholePx(14),
+    menu_inset: WholePx(6),
 };
 
 impl ShellScale {
-    /// A bar item's height: a Regular control, 22.
+    /// A bar item's height, 22: the bar keeps its 24 (design/34 step 2 changes its transparency,
+    /// not its size), so its pill stays below the ladder's taller Regular control.
     pub fn item(self) -> WholePx {
-        ControlSize::Regular.scale().height
+        WholePx(22)
     }
 }
 

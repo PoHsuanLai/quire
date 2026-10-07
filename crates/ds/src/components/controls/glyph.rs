@@ -1,4 +1,4 @@
-//! The glyph a control of a size draws (design/30 section 1.6): 12, 14, 16 and 20 on the ladder.
+//! The glyph a control of a size draws (design/30 section 1.6): 12, 14, 16, 18 and 20 on the ladder.
 
 use ds_style::icon::render::{IconPx, IconSize};
 use ds_style::tokens::control_size::ControlSize;
@@ -25,7 +25,8 @@ mod tests {
             (ControlSize::Mini, IconSize::Tiny),
             (ControlSize::Small, IconSize::Compact),
             (ControlSize::Regular, IconSize::Base),
-            (ControlSize::Large, IconSize::Px(IconPx(20))),
+            (ControlSize::Large, IconSize::Px(IconPx(18))),
+            (ControlSize::ExtraLarge, IconSize::Px(IconPx(20))),
         ];
         for &(size, want) in CASES {
             assert_eq!(glyph_size(size), want, "{size:?}");

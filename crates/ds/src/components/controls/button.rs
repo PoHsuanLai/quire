@@ -37,7 +37,7 @@ use ds_style::tokens::control_size::ControlSize;
 fn spinner_size(size: ControlSize) -> ControlSize {
     match size {
         ControlSize::Mini | ControlSize::Small => ControlSize::Mini,
-        ControlSize::Regular | ControlSize::Large => ControlSize::Small,
+        ControlSize::Regular | ControlSize::Large | ControlSize::ExtraLarge => ControlSize::Small,
     }
 }
 

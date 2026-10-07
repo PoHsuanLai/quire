@@ -8,6 +8,7 @@
 .ds-progress[*|data-size=mini]{ --pg-h:var(--progress-xs); --pg-box:var(--spinner-xs); }
 .ds-progress[*|data-size=small]{ --pg-h:var(--progress-s); --pg-box:var(--spinner-s); }
 .ds-progress[*|data-size=large]{ --pg-h:var(--progress-l); --pg-box:var(--spinner-l); }
+.ds-progress[*|data-size=extra-large]{ --pg-h:var(--progress-xl); --pg-box:var(--spinner-xl); }
 .ds-progress[*|data-pending=idle]{ visibility:hidden; }
 
 /* Bar: a capsule track, the fill in the accent. */

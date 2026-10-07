@@ -86,31 +86,6 @@ impl Default for Policy {
 /// a regular-size control keeps 8 or more (`--ctl-pad-m` 10, `--tf-pad` 8, `--s-8`).
 pub const QUIRE_ALLOW: &[Allow] = &[
     Allow {
-        when: &["ds-button", "[data-size=mini]"],
-        min: Px(6.0),
-        reason: "a Mini control's label inset is `--ctl-pad-xs` 6 (ControlSize::Mini pad_x, design/29-SIZING.md section 3, on the 4 px grid, R7)",
-    },
-    Allow {
-        when: &["ds-segmented", "[data-size=mini]"],
-        min: Px(7.0),
-        reason: "a Mini segmented control: the track's `--knob-inset` 1 plus the segment's `--sg-pad` = `--ctl-pad-xs` 6",
-    },
-    Allow {
-        when: &["ds-segmented-segment"],
-        min: Px(6.0),
-        reason: "a segment's own label inset is its size's `--sg-pad`, 6 at Mini (the selected thumb is the box)",
-    },
-    Allow {
-        when: &["ds-text-field-frame", "^[data-size=mini]"],
-        min: Px(6.0),
-        reason: "a Mini field's `--tf-pad` is `--s-6` (text_field.css)",
-    },
-    Allow {
-        when: &["ds-text-field-frame", "^[data-size=small]"],
-        min: Px(6.0),
-        reason: "a Small field's `--tf-pad` is `--s-6` (text_field.css)",
-    },
-    Allow {
         when: &["ds-key-equivalent-key"],
         min: Px(6.0),
         reason: "a key cap is a capsule: `padding: --s-1 --s-5` plus its 1 px hairline (key_equivalent.css, 04-COMPONENTS.md section 14)",

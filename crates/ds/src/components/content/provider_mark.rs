@@ -104,7 +104,9 @@ fn folder_glyph(size: ControlSize) -> IconSize {
     match size {
         ControlSize::Mini => IconSize::Px(IconPx(8)),
         ControlSize::Small => IconSize::Px(IconPx(9)),
-        ControlSize::Regular | ControlSize::Large => IconSize::Px(IconPx(10)),
+        ControlSize::Regular | ControlSize::Large | ControlSize::ExtraLarge => {
+            IconSize::Px(IconPx(10))
+        }
     }
 }
 

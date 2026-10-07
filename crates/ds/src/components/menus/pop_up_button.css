@@ -13,3 +13,4 @@
 .ds-popup[*|data-size=mini] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-xs) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-xs); font-size:var(--ctl-fs-xs); font-weight:var(--ctl-fw-xs); }
 .ds-popup[*|data-size=small] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-s) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-s); font-size:var(--ctl-fs-s); font-weight:var(--ctl-fw-s); }
 .ds-popup[*|data-size=large] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-l) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-l); font-size:var(--ctl-fs-l); font-weight:var(--ctl-fw-l); }
+.ds-popup[*|data-size=extra-large] > .ds-popup-sizer{ padding:0 calc(var(--ctl-pad-xl) + var(--s-6) + var(--s-12)) 0 var(--ctl-pad-xl); font-size:var(--ctl-fs-xl); font-weight:var(--ctl-fw-xl); }

@@ -70,9 +70,9 @@ fn painted(harness: &mut Harness, name: &str) -> u32 {
     let track = rect(harness, ".ds-slider-track");
     let frame = harness.render().expect("renders");
     keep(&frame, name);
-    // Below the glyph's ink (the volume glyph's spans about 6 to 16 in the 22 capsule), where the
-    // round end cuts about 3 px off the run.
-    let row = (track.origin.y.0 + 18.0) as u32;
+    // Below the glyph's ink (the glyph is centred in the capsule: 16 px in the 28 Regular one),
+    // 5 px above the capsule's bottom edge, where the round end cuts a few px off the run.
+    let row = (track.origin.y.0 + track.size.height.0 - 5.0) as u32;
     run_from(&frame, track.origin.x.0 as u32, row)
 }
 

@@ -113,6 +113,7 @@ fn clear_size(size: ControlSize) -> ControlSize {
         ControlSize::Mini | ControlSize::Small => ControlSize::Mini,
         ControlSize::Regular => ControlSize::Small,
         ControlSize::Large => ControlSize::Regular,
+        ControlSize::ExtraLarge => ControlSize::Large,
     }
 }
 

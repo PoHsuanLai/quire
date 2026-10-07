@@ -1,6 +1,10 @@
 # 34 - Modern look: Sonoma/Sequoia base, then Tahoe shape
 
-Status: spec, 2026-10-07. Docs only; no CSS or Rust changed by this document. Supersedes the
+Status: spec, 2026-10-07. **Step 2 (Tahoe shape traits) implemented 2026-10-07 on branch
+`look-step2`: the token tables (control ladder 20/24/28/32/40 with `ExtraLarge`, radii, window 26/16,
+menu 14, rows, sidebar 28/32/36) and the component CSS that reads them; the structural Step 2 items
+(toolbar, scroll-edge fade, inset sidebar panel, menu icons, transparent menu bar) are not in it.**
+The spec was first written as docs only. Supersedes the
 "small, uniform radii" paragraph of design/30 section 3.2 and the Mac 10.x metrics of
 design/27 where they conflict (design/27 stays the HIG audit; this is the delta).
 
@@ -396,6 +400,8 @@ The owner took every recommended default below; they are decisions, not open que
    ladder is my best M-low estimate. Recommended default: build step 2 on it and verify against
    the Apple Design Resources macOS 26 kit once (needs a developer-account download) before the
    lane merges; the token table makes any correction one file.
+   Step 2 is built on this ladder; verification against the macOS 26 Design Resources kit is a
+   pending manual check.
 2. **Window corner radius** 26 (toolbar windows) and 16 (titlebar-only, UNKNOWN): the compositor
    draws windows, so does casement/cosmic-comp own these? Recommended: yes, expose
    `--r-window` as the token both read.

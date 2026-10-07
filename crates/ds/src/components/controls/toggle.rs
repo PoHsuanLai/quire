@@ -123,10 +123,11 @@ mod tests {
     #[test]
     fn the_knob_travels_the_track_less_the_knob_and_its_insets() {
         const CASES: &[(ControlSize, f32)] = &[
-            (ControlSize::Mini, 11.0),
-            (ControlSize::Small, 14.0),
-            (ControlSize::Regular, 16.0),
-            (ControlSize::Large, 16.0),
+            (ControlSize::Mini, 14.0),
+            (ControlSize::Small, 16.0),
+            (ControlSize::Regular, 18.0),
+            (ControlSize::Large, 18.0),
+            (ControlSize::ExtraLarge, 18.0),
         ];
         for (size, travel) in CASES {
             assert_eq!(knob_at(Check::On, *size), *travel, "{size:?}");

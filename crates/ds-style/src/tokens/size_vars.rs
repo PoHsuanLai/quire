@@ -1,7 +1,7 @@
 //! The size ladder as custom properties (design/29-SIZING.md section 10): each
 //! [`ControlSize`]'s [`SizeScale`] written as `--ctl-*`, `--knob-*`, `--switch-*`, `--slider-*`
-//! `--check-*`, `--spinner-*`, `--progress-*` and `--seg-*` tokens with an `-xs`, `-s`, `-m` or `-l`
-//! suffix (Mini, Small, Regular, Large), so the sheets read the ladder and never
+//! `--check-*`, `--spinner-*`, `--progress-*` and `--seg-*` tokens with an `-xs`, `-s`, `-m`, `-l` or `-xl`
+//! suffix (Mini, Small, Regular, Large, ExtraLarge), so the sheets read the ladder and never
 //! restate a number. The values come from `SizeScale`, so the rules hold in CSS as in Rust.
 
 use super::control_size::ControlSize;
@@ -327,6 +327,66 @@ pub enum SizeToken {
     /// `--seg-r-l`: SegmentRadius at Large.
     #[token(name = "seg-r-l")]
     LargeSegmentRadius,
+    /// `--ctl-h-xl`: Height at ExtraLarge.
+    #[token(name = "ctl-h-xl")]
+    ExtraLargeHeight,
+    /// `--ctl-r-xl`: Radius at ExtraLarge.
+    #[token(name = "ctl-r-xl")]
+    ExtraLargeRadius,
+    /// `--ctl-cap-r-xl`: CapsuleRadius at ExtraLarge.
+    #[token(name = "ctl-cap-r-xl")]
+    ExtraLargeCapsuleRadius,
+    /// `--ctl-glyph-xl`: Glyph at ExtraLarge.
+    #[token(name = "ctl-glyph-xl")]
+    ExtraLargeGlyph,
+    /// `--ctl-pad-xl`: PadX at ExtraLarge.
+    #[token(name = "ctl-pad-xl")]
+    ExtraLargePadX,
+    /// `--ctl-fs-xl`: Font at ExtraLarge.
+    #[token(name = "ctl-fs-xl")]
+    ExtraLargeFont,
+    /// `--ctl-fw-xl`: Weight at ExtraLarge.
+    #[token(name = "ctl-fw-xl")]
+    ExtraLargeWeight,
+    /// `--knob-xl`: Knob at ExtraLarge.
+    #[token(name = "knob-xl")]
+    ExtraLargeKnob,
+    /// `--switch-w-xl`: SwitchWidth at ExtraLarge.
+    #[token(name = "switch-w-xl")]
+    ExtraLargeSwitchWidth,
+    /// `--switch-h-xl`: SwitchHeight at ExtraLarge.
+    #[token(name = "switch-h-xl")]
+    ExtraLargeSwitchHeight,
+    /// `--switch-r-xl`: SwitchRadius at ExtraLarge.
+    #[token(name = "switch-r-xl")]
+    ExtraLargeSwitchRadius,
+    /// `--switch-knob-xl`: SwitchKnob at ExtraLarge.
+    #[token(name = "switch-knob-xl")]
+    ExtraLargeSwitchKnob,
+    /// `--slider-track-xl`: SliderTrack at ExtraLarge.
+    #[token(name = "slider-track-xl")]
+    ExtraLargeSliderTrack,
+    /// `--slider-knob-xl`: SliderKnob at ExtraLarge.
+    #[token(name = "slider-knob-xl")]
+    ExtraLargeSliderKnob,
+    /// `--check-xl`: CheckboxBox at ExtraLarge.
+    #[token(name = "check-xl")]
+    ExtraLargeCheckboxBox,
+    /// `--spinner-xl`: Spinner at ExtraLarge.
+    #[token(name = "spinner-xl")]
+    ExtraLargeSpinner,
+    /// `--progress-xl`: ProgressBar at ExtraLarge.
+    #[token(name = "progress-xl")]
+    ExtraLargeProgressBar,
+    /// `--seg-well-r-xl`: WellRadius at ExtraLarge.
+    #[token(name = "seg-well-r-xl")]
+    ExtraLargeWellRadius,
+    /// `--seg-h-xl`: Segment at ExtraLarge.
+    #[token(name = "seg-h-xl")]
+    ExtraLargeSegment,
+    /// `--seg-r-xl`: SegmentRadius at ExtraLarge.
+    #[token(name = "seg-r-xl")]
+    ExtraLargeSegmentRadius,
     /// `--knob-inset`: what a knob or a selected segment keeps from its track's edge.
     #[token(name = "knob-inset")]
     KnobInset,

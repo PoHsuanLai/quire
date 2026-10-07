@@ -17,6 +17,7 @@
 .ds-toggle[*|data-size=mini]{ --sw-w:var(--switch-w-xs); --sw-h:var(--switch-h-xs); --sw-r:var(--switch-r-xs); --sw-knob:var(--switch-knob-xs); }
 .ds-toggle[*|data-size=small]{ --sw-w:var(--switch-w-s); --sw-h:var(--switch-h-s); --sw-r:var(--switch-r-s); --sw-knob:var(--switch-knob-s); }
 .ds-toggle[*|data-size=large]{ --sw-w:var(--switch-w-l); --sw-h:var(--switch-h-l); --sw-r:var(--switch-r-l); --sw-knob:var(--switch-knob-l); }
+.ds-toggle[*|data-size=extra-large]{ --sw-w:var(--switch-w-xl); --sw-h:var(--switch-h-xl); --sw-r:var(--switch-r-xl); --sw-knob:var(--switch-knob-xl); }
 
 .ds-toggle-track{
   display:flex; align-items:center; box-sizing:border-box; width:100%; height:100%; padding:0 var(--knob-inset);

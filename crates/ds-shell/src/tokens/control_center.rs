@@ -20,7 +20,7 @@ pub struct ControlCenterScale {
     pub gap: WholePx,
     /// A module's radius, 8.
     pub module_radius: WholePx,
-    /// A toggle tile's height, 56.
+    /// A toggle tile's height, 64 (two Large controls).
     pub tile: WholePx,
     /// A module header's line, 16.
     pub head: WholePx,
@@ -34,7 +34,7 @@ pub const CONTROL_CENTER: ControlCenterScale = ControlCenterScale {
     padding: WholePx(10),
     gap: WholePx(10),
     module_radius: WholePx(8),
-    tile: WholePx(56),
+    tile: WholePx(64),
     head: WholePx(16),
     head_gap: WholePx(6),
 };
@@ -45,7 +45,7 @@ impl ControlCenterScale {
         WholePx(self.module_radius.0 + self.padding.0)
     }
 
-    /// A level module's height: padding, header, gap, a Regular capsule, padding; 64.
+    /// A level module's height: padding, header, gap, a Regular capsule, padding; 70.
     pub fn level_module(self) -> WholePx {
         WholePx(
             2 * self.padding.0

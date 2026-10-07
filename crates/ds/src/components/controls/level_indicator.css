@@ -9,6 +9,7 @@
 .ds-level-indicator[*|data-size=mini]{ --level-h:var(--ctl-h-xs); }
 .ds-level-indicator[*|data-size=small]{ --level-h:var(--ctl-h-s); }
 .ds-level-indicator[*|data-size=large]{ --level-h:var(--ctl-h-l); }
+.ds-level-indicator[*|data-size=extra-large]{ --level-h:var(--ctl-h-xl); }
 .ds-level-indicator-rail{ position:relative; flex:1; min-width:0; height:var(--level-h); }
 .ds-level-indicator-icon-lead{ display:flex; flex:none; color:var(--m-level-glyph); }
 

@@ -108,7 +108,7 @@ fn AppearancePane() -> Element {
                     value: sidebar(),
                     size: ControlSize::Small,
                     onchange: move |next| sidebar.set(next),
-                    p { "Rows are 24, 28 or 32 points tall." }
+                    p { "Rows are 28, 32 or 36 points tall." }
                 }
             }
         }

@@ -5,7 +5,7 @@
    Attribute selectors carry `*|` (spike S2). */
 
 .ds-row{
-  position:relative; display:flex; align-items:center; gap:var(--s-8); box-sizing:border-box; min-height:24px; padding:0 var(--s-8);
+  position:relative; display:flex; align-items:center; gap:var(--s-8); box-sizing:border-box; min-height:var(--ctl-h-s); padding:0 var(--s-8);
   border-radius:var(--r-shell-highlight); color:var(--ink); cursor:default; user-select:none; list-style:none;
   font-size:var(--fs-shell-menu);
 }

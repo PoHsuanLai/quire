@@ -13,13 +13,14 @@
    (0,0,1), so a lone class outranks them, and a container's `.ds-bubble .ds-input` outranks this. */
 
 .ds-text-field{
-  --tf-h:var(--ctl-h-m); --tf-r:var(--r-field); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--s-8);
+  --tf-h:var(--ctl-h-m); --tf-r:var(--ctl-r-m); --tf-fs:var(--ctl-fs-m); --tf-pad:var(--ctl-pad-m);
   --tf-ground:linear-gradient(var(--fill-btn), var(--fill-btn)), var(--surface);
   display:flex; flex-direction:column; gap:var(--s-2); min-width:0; text-align:start;
 }
-.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--s-6); }
-.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--s-10); }
+.ds-text-field[*|data-size=mini]{ --tf-h:var(--ctl-h-xs); --tf-r:var(--ctl-r-xs); --tf-fs:var(--ctl-fs-xs); --tf-pad:var(--ctl-pad-xs); }
+.ds-text-field[*|data-size=small]{ --tf-h:var(--ctl-h-s); --tf-r:var(--ctl-r-s); --tf-fs:var(--ctl-fs-s); --tf-pad:var(--ctl-pad-s); }
+.ds-text-field[*|data-size=large]{ --tf-h:var(--ctl-h-l); --tf-r:var(--ctl-r-l); --tf-fs:var(--ctl-fs-l); --tf-pad:var(--ctl-pad-l); }
+.ds-text-field[*|data-size=extra-large]{ --tf-h:var(--ctl-h-xl); --tf-r:var(--ctl-r-xl); --tf-fs:var(--ctl-fs-xl); --tf-pad:var(--ctl-pad-xl); }
 
 /* The frame: the bezel. A field reads from its leading edge wherever it sits: a centred container
    (the polkit card's `text-align:center`) would centre the mask and the placeholder, which span
@@ -120,7 +121,7 @@
 /* Multiline (`data-kind=multiline`): a `textarea` as tall as its `data-rows`, lines of the field's
    own 1.55 leading. The frame grows to hold it (no rung height) with a vertical pad, the caret
    and the placeholder start at the top, and the text scrolls inside the textarea past its rows. */
-.ds-text-field[*|data-kind=multiline][*|data-variant=bezeled] .ds-text-field-frame{ height:auto; align-items:flex-start; padding-top:var(--s-6); padding-bottom:var(--s-6); }
+.ds-text-field[*|data-kind=multiline][*|data-variant=bezeled] .ds-text-field-frame{ height:auto; align-items:flex-start; border-radius:var(--r-field); padding-top:var(--s-6); padding-bottom:var(--s-6); }
 .ds-input-wrap[*|data-kind=multiline]{ --tf-rows:3; }
 .ds-input-wrap[*|data-rows=two]{ --tf-rows:2; }
 .ds-input-wrap[*|data-rows=four]{ --tf-rows:4; }

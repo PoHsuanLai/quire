@@ -9,39 +9,41 @@ use ds_core::word::Word;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "r-", kind = fixed, css = radius_css)]
 pub enum Radius {
-    /// `--r-panel` 12: sheet, alert, peek, command menu, hover card, editor.
+    /// `--r-panel` 20: sheet, alert, peek, command menu, hover card, editor.
     Panel,
     /// `--r-card` 12: card and rows.
     Card,
-    /// `--r-btn` 6: mini, button, tool.
+    /// `--r-btn` 8 (Regular's): mini, button, tool.
     Btn,
-    /// `--r-chip` 6.
+    /// `--r-chip` 8.
     Chip,
     /// `--r-pill` 999.
     Pill,
-    /// `--r-field` 8: inputs, command pill, bubble.
+    /// `--r-field` 8 (Regular's): inputs, command pill, bubble.
     Field,
-    /// `--r-menu` 10.
+    /// `--r-menu` 14.
     Menu,
-    /// `--r-item` 6: sidebar item, tooltip.
+    /// `--r-item` 8: sidebar item, tooltip.
     Item,
     /// `--r-tile` 12: account tiles, editor field.
     Tile,
-    /// `--r-window` 10.
+    /// `--r-window` 26: a window with a toolbar; the compositor and the chrome both read it.
     Window,
-    /// `--r-menu-item` 6: menu item, prop row, foot button.
+    /// `--r-window-plain` 16: a titlebar-only window (design/34 section 2.1; 16 is UNKNOWN).
+    WindowPlain,
+    /// `--r-menu-item` 8 (the menu's 14 less its 6 inset): menu item, prop row, foot button.
     MenuItem,
-    /// `--r-small` 6: fly, gutter, quiet button.
+    /// `--r-small` 8: fly, gutter, quiet button.
     Small,
     /// `--r-kbd` 5: key cap, favicon.
     Kbd,
-    /// `--r-tiny` 5: focus ring, provider mark.
+    /// `--r-tiny` 6: focus ring, provider mark.
     Tiny,
-    /// `--r-micro` 4: in-row provider mark.
+    /// `--r-micro` 5: in-row provider mark.
     Micro,
     /// `--r-media` 12: images, code blocks, attachments.
     Media,
-    /// `--r-icon-tile` 6: the 24 px icon tile leading a grouped-list row.
+    /// `--r-icon-tile` 7: the 28 px icon tile leading a grouped-list row.
     IconTile,
     /// `--r-group` 12: an inset grouped list or form group (the card's radius under its own
     /// name, so a group can move without moving every card).
@@ -49,18 +51,22 @@ pub enum Radius {
 }
 
 impl Radius {
-    /// The radius as CSS. The Look (design/34-MODERN-LOOK.md section 2.1, step 1): control 6,
-    /// field 8, menu 10, popover, card, group and panel 12; the window stays the host's 10.
+    /// The radius as CSS. The Look (design/34-MODERN-LOOK.md section 2.1, step 2, Tahoe): window
+    /// 26 (16 titlebar-only), panel 20, menu 14, card and group 12, the menu item concentric
+    /// in its menu (14 less 6), chip, item and small 8, button and field a Regular control's.
     pub fn value(self) -> &'static str {
         match self {
-            Radius::Panel | Radius::Card | Radius::Tile | Radius::Media | Radius::Group => "12px",
-            Radius::Window | Radius::Menu => "10px",
-            Radius::Field => "8px",
-            Radius::Btn | Radius::MenuItem | Radius::IconTile => "6px",
-            Radius::Chip | Radius::Item | Radius::Small => "6px",
-            Radius::Kbd | Radius::Tiny => "5px",
+            Radius::Window => "26px",
+            Radius::Panel => "20px",
+            Radius::WindowPlain => "16px",
+            Radius::Menu => "14px",
+            Radius::Card | Radius::Tile | Radius::Media | Radius::Group => "12px",
+            Radius::Btn | Radius::Field | Radius::MenuItem => "8px",
+            Radius::Chip | Radius::Item | Radius::Small => "8px",
+            Radius::IconTile => "7px",
+            Radius::Tiny => "6px",
+            Radius::Kbd | Radius::Micro => "5px",
             Radius::Pill => "999px",
-            Radius::Micro => "4px",
         }
     }
 }
@@ -153,33 +159,48 @@ impl From<Radius> for Corner {
 #[cfg(test)]
 mod tests {
     use super::{CONCENTRIC_FLOOR, Radius, concentric};
+    use crate::tokens::control_size::ControlSize;
+    use crate::tokens::shell_scale::SHELL_SCALE;
     use ds_core::geometry::units::Px;
 
     #[test]
-    fn the_step_one_radii_are_design_34_section_2_1() {
+    fn the_step_two_radii_are_design_34_section_2_1() {
         let value = Radius::value;
-        assert_eq!(value(Radius::Panel), "12px");
+        assert_eq!(value(Radius::Window), "26px");
+        assert_eq!(value(Radius::WindowPlain), "16px");
+        assert_eq!(value(Radius::Panel), "20px");
         assert_eq!(value(Radius::Card), "12px");
         assert_eq!(value(Radius::Group), "12px");
-        assert_eq!(value(Radius::Btn), "6px");
-        assert_eq!(value(Radius::Field), "8px");
-        assert_eq!(value(Radius::Menu), "10px");
-        assert_eq!(value(Radius::MenuItem), "6px");
-        assert_eq!(value(Radius::IconTile), "6px");
-        assert_eq!(value(Radius::Tiny), "5px");
-        assert_eq!(value(Radius::Micro), "4px");
-        assert_eq!(value(Radius::Window), "10px");
+        assert_eq!(value(Radius::Menu), "14px");
+        assert_eq!(value(Radius::MenuItem), "8px");
+        assert_eq!(value(Radius::IconTile), "7px");
+        assert_eq!(value(Radius::Tiny), "6px");
+        assert_eq!(value(Radius::Micro), "5px");
     }
 
     #[test]
-    fn a_group_follows_the_card_and_a_menu_item_sits_inside_its_menu() {
+    fn a_button_and_a_field_are_a_regular_controls_radius() {
+        let regular = format!("{}px", ControlSize::Regular.scale().radius.0);
+        assert_eq!(Radius::Btn.value(), regular);
+        assert_eq!(Radius::Field.value(), regular);
+    }
+
+    #[test]
+    fn a_group_follows_the_card_and_a_menu_item_is_concentric_in_its_menu() {
         assert_eq!(Radius::Group.value(), Radius::Card.value());
-        let item: f32 = Radius::MenuItem
-            .value()
-            .trim_end_matches("px")
-            .parse()
-            .unwrap_or(f32::NAN);
-        assert!(item <= concentric(Px(10.0), Px(4.0)).0, "{item}");
+        let px = |radius: Radius| -> f32 {
+            radius
+                .value()
+                .trim_end_matches("px")
+                .parse()
+                .unwrap_or(f32::NAN)
+        };
+        let inset = f32::from(SHELL_SCALE.menu_inset.0);
+        assert_eq!(px(Radius::Menu), f32::from(SHELL_SCALE.menu_radius.0));
+        assert_eq!(
+            px(Radius::MenuItem),
+            concentric(Px(px(Radius::Menu)), Px(inset)).0
+        );
     }
 
     #[test]

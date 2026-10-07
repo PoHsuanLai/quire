@@ -270,10 +270,10 @@ fn SlimMenu() -> Element {
     }
 }
 
-/// A Slim menu's rows are the shell scale's 22 px and its separator row is the hairline with 5
-/// px above and below (11 px).
+/// A Slim menu's rows are the shell type scale's menu row (28 px) and its separator row is the
+/// hairline with 5 px above and below (11 px).
 #[test]
-fn text_menu_rows_are_22_px() {
+fn text_menu_rows_are_the_shell_menu_row() {
     let mut harness = Harness::new(
         SlimMenu,
         HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
@@ -282,10 +282,13 @@ fn text_menu_rows_are_22_px() {
     let rows = harness.count(".ds-menu-item");
     assert_eq!(rows, 2, "{}", harness.html());
     let first = rect(&harness, ".ds-menu-item");
-    assert_eq!(first.size.height, Px(22.0));
+    let row = ds::style::tokens::shell_type::ShellMetrics::default()
+        .menu
+        .row;
+    assert_eq!(first.size.height, row);
     let separator = rect(&harness, ".ds-menu-separator");
     assert_eq!(separator.size.height, Px(1.0));
-    assert_eq!(separator.origin.y.0 - (first.origin.y.0 + 22.0), 5.0);
+    assert_eq!(separator.origin.y.0 - (first.origin.y.0 + row.0), 5.0);
 }
 
 // ---- The dock pill as a squircle root --------------------------------------------------------

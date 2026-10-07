@@ -35,7 +35,7 @@ pub fn FormsPage() -> Element {
         }
         Section {
             title: "IconTile",
-            note: "A 24 px rounded tile: the caller's colour under a gradient from a lighter step of it, a white glyph, no outline. The other face is the circular Avatar a row of people leads with.",
+            note: "A 28 px rounded tile: the caller's colour under a gradient from a lighter step of it, a white glyph, no outline. The other face is the circular Avatar a row of people leads with.",
             div { class: "g-row",
                 IconTile { icon: Icon::Wifi, colour: Hex([0x0a, 0x84, 0xff]) }
                 IconTile { icon: Icon::Bell, colour: Hex([0xff, 0x3b, 0x30]) }

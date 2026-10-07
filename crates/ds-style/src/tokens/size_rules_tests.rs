@@ -14,24 +14,32 @@ type Row = (ControlSize, [u16; 17]);
 const CASES: &[Row] = &[
     (
         ControlSize::Mini,
-        [16, 4, 16, 14, 26, 15, 13, 3, 12, 14, 3, 12, 6, 10, 10, 4, 9],
+        [
+            20, 6, 20, 18, 32, 18, 16, 3, 14, 18, 5, 12, 8, 12, 10, 4, 10,
+        ],
     ),
     (
         ControlSize::Small,
         [
-            19, 5, 19, 17, 32, 18, 16, 4, 14, 17, 5, 14, 8, 12, 16, 6, 11,
+            24, 7, 24, 22, 38, 22, 20, 4, 16, 22, 6, 14, 10, 14, 16, 6, 11,
         ],
     ),
     (
         ControlSize::Regular,
         [
-            22, 5, 22, 20, 38, 22, 20, 4, 20, 20, 5, 16, 10, 14, 32, 6, 13,
+            28, 8, 28, 26, 44, 26, 24, 4, 22, 26, 7, 16, 12, 16, 32, 6, 13,
         ],
     ),
     (
         ControlSize::Large,
         [
-            28, 5, 28, 26, 38, 22, 20, 4, 20, 26, 5, 20, 12, 14, 32, 6, 15,
+            32, 16, 32, 30, 44, 26, 24, 4, 22, 30, 15, 18, 16, 16, 32, 6, 15,
+        ],
+    ),
+    (
+        ControlSize::ExtraLarge,
+        [
+            40, 20, 40, 38, 44, 26, 24, 4, 22, 38, 19, 20, 20, 16, 32, 6, 17,
         ],
     ),
 ];
@@ -95,8 +103,17 @@ fn every_size_obeys_the_rules() {
             ((exact / 2.0).round() * 2.0) as u16,
             "{size:?} R4"
         );
-        // R5: a rounded rectangle's radius is well short of a capsule's.
-        assert!(scale.radius.0 * 3 <= scale.height.0, "{size:?} R5");
+        // R5: a rounded rectangle's radius is well short of a capsule's; Large and
+        // ExtraLarge are capsules (design/34 section 2.2), their radius half the height (R2).
+        let capsule = matches!(size, ControlSize::Large | ControlSize::ExtraLarge);
+        assert!(
+            if capsule {
+                scale.radius.0 * 2 == scale.height.0
+            } else {
+                scale.radius.0 * 3 <= scale.height.0
+            },
+            "{size:?} R5"
+        );
         // R6: the segment is concentric in its well; an inset child loses the inset.
         assert_eq!(
             scale.segment_radius().0 + inset,
@@ -156,10 +173,12 @@ fn every_height_token_is_whole() {
             );
         }
     }
+    let mini = ControlSize::Mini.scale();
     assert_eq!(
-        SizeVar::SwitchRadius.css(ControlSize::Mini.scale()),
-        "7.5px"
+        SizeVar::SwitchRadius.css(mini),
+        HalfPx(mini.switch_height.0).css()
     );
+    assert_eq!(HalfPx(15).css(), "7.5px");
     assert_eq!(
         SizeToken::ALL.len(),
         SizeVar::ALL.len() * ControlSize::ALL.len() + 1

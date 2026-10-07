@@ -13,6 +13,7 @@ use ds::components::lists::row::size::RowSize;
 use ds::prelude::*;
 use ds::style::tokens::accent_table::accent_of;
 use ds::style::tokens::hex::Hex;
+use ds::style::tokens::row_scale::ROW_SCALE;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
@@ -128,14 +129,18 @@ fn a_grouped_row_is_settings_high_and_the_group_is_a_borderless_card() {
     let harness = harness();
     let row = rect(&harness, ".ds-list-item:nth-child(2) > .ds-row");
     let list = rect(&harness, ".ds-list");
-    assert_eq!(row.size.height.0, 44.0, "a grouped row is --row-settings-h");
+    assert_eq!(
+        row.size.height.0,
+        f32::from(ROW_SCALE.settings_height.0),
+        "a grouped row is --row-settings-h"
+    );
     assert_eq!(
         row.size.width.0, list.size.width.0,
         "rows run edge to edge: no padding, no outline box"
     );
     assert_eq!(
         list.size.height.0,
-        3.0 * 44.0,
+        3.0 * f32::from(ROW_SCALE.settings_height.0),
         "three rows and nothing else"
     );
 }
