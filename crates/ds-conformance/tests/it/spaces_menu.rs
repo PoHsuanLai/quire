@@ -162,6 +162,19 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
         "on_extra heard the item"
     );
     assert!(harness.count(".ds-menu") > 0, "the menu stays open");
+    // The same item again, past the double-click interval: add an account, then take it out.
+    harness.advance(ms(600));
+    // Where the item is now: the submenu settles to its row once the first pick re-renders it.
+    let ada_again = harness
+        .centre(".ds-menu[data-depth=\"1\"] .ds-menu-item:nth-child(1) .ds-menu-label")
+        .expect("the item is still there");
+    harness.send(Input::click(ada_again));
+    harness.advance(ms(100));
+    assert_eq!(
+        harness.text_of(".extra-log").as_deref(),
+        Some("AdaAda"),
+        "the same keep-open item can be picked twice in a row"
+    );
     let bo = harness
         .centre(".ds-menu[data-depth=\"1\"] .ds-menu-item:nth-child(2) .ds-menu-label")
         .expect("the second account");
@@ -169,7 +182,7 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
     harness.advance(ms(100));
     assert_eq!(
         harness.text_of(".extra-log").as_deref(),
-        Some("AdaBo"),
+        Some("AdaAdaBo"),
         "and another can be picked"
     );
     // A kit row closes it: New Space is row 7 here.
