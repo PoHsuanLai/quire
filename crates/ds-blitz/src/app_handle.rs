@@ -276,6 +276,7 @@ mod tests {
             .map(|request| match request {
                 Remote::Open { .. } => "open",
                 Remote::Redraw => "redraw",
+                Remote::Screen => "screen",
                 Remote::Quit => "quit",
                 Remote::Hold => "hold",
                 Remote::Release => "release",
@@ -309,7 +310,7 @@ mod tests {
         );
         let built = handle.take().into_iter().find_map(|request| match request {
             Remote::Open { make, .. } => Some(make()),
-            Remote::Redraw | Remote::Quit | Remote::Hold | Remote::Release => None,
+            Remote::Redraw | Remote::Screen | Remote::Quit | Remote::Hold | Remote::Release => None,
         });
         assert!(matches!(built, Some(Root::Shared(_))));
     }
