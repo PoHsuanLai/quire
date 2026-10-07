@@ -13,7 +13,7 @@
 .ds-field-row-label{ display:flex; flex-direction:column; flex:1 0 auto; max-width:60%; }
 .ds-field-row-title{ font-size:var(--fs-control); color:var(--ink); line-height:1.3; }
 .ds-field-row-help{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }
-.ds-field-row-control{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; flex:none; gap:var(--s-8); min-width:0; }
+.ds-field-row-control{ display:flex; flex-wrap:wrap; align-items:center; justify-content:flex-end; flex:0 1 auto; gap:var(--s-8); min-width:0; }
 .ds-field-row[*|data-layout=form]{ padding-left:0; }
 .ds-field-row[*|data-layout=form] .ds-field-row-label{ flex:none; width:120px; align-items:flex-end; text-align:end; }
 .ds-field-row[*|data-layout=form] .ds-field-row-control{ flex:1 1 0; justify-content:flex-start; }

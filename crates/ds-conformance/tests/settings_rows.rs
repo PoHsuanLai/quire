@@ -259,3 +259,36 @@ fn an_alert_button_carries_the_id_its_host_gave_it() {
     assert_eq!(harness.text_of("#turn-off").as_deref(), Some("Turn Off"));
     assert_eq!(harness.text_of("#cancel").as_deref(), Some("Cancel"));
 }
+
+#[allow(non_snake_case)]
+fn WideControl() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            FormSection { title: "Apps".to_string(),
+                FieldRow { label: TextLine::from("Apps it may use"),
+                    Button { label: "Add an app", onclick: |_| {} }
+                    Button { label: "Remove the selected app", onclick: |_| {} }
+                    Button { label: "Reset to the defaults", onclick: |_| {} }
+                }
+            }
+        }
+    }
+}
+
+/// A control wider than the room beside the label shrinks and wraps its parts inside the row
+/// (System Settings' behaviour), rather than pushing them past the window's edge.
+#[test]
+fn a_wide_control_wraps_inside_the_row_instead_of_overflowing() {
+    let mut harness = on_virtual(WideControl);
+    harness.resize_window(Extent::new(NARROW.width, NARROW.height));
+    let control = harness.rect(".ds-field-row-control").expect("control");
+    let right = control.origin.x.0 + control.size.width.0;
+    assert!(
+        right <= NARROW.width as f32,
+        "the control ends at {right}, past the window"
+    );
+    assert!(
+        width(&harness, ".ds-field-row-title") >= 44.0,
+        "the label shrank"
+    );
+}
