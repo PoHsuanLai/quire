@@ -6,7 +6,9 @@ mod bus;
 mod fake_pk;
 
 use bus::PrivateBus;
-use ds_helpers::{Family, Installer, Outcome, PackageKit, PackageName, Request};
+use ds_helpers::{
+    Capability, Executable, Family, Installer, Missing, Outcome, PackageKit, PackageName, Request,
+};
 use fake_pk::{Behaviour, Calls, serve};
 
 fn request(names: &[&str]) -> Request {
@@ -16,6 +18,18 @@ fn request(names: &[&str]) -> Request {
             .iter()
             .map(|name| PackageName::new(name).expect("a package name"))
             .collect(),
+        missing: missing(names),
+    }
+}
+
+/// What `request(names)` says it is about: a made-up capability, the first name, the program `mpv`.
+fn missing(names: &[&str]) -> Missing {
+    Missing {
+        capability: Capability::new("video-playback").expect("a capability"),
+        package: names
+            .first()
+            .map(|name| PackageName::new(name).expect("a package")),
+        program: Some(Executable::new("mpv").expect("a program")),
     }
 }
 
@@ -85,7 +99,7 @@ async fn no_candidate_in_the_repositories_is_not_found() {
     let (_bus, installer, calls) =
         setup("absent", Behaviour::default().available(&["other"])).await;
     let outcome = installer.install(&request(&["mpv", "mpv-nox"])).await;
-    assert_eq!(outcome, Outcome::NotFound);
+    assert_eq!(outcome, Outcome::NotFound(missing(&["mpv", "mpv-nox"])));
     assert!(calls.installed().is_empty());
 }
 
@@ -95,7 +109,7 @@ async fn a_package_not_found_error_counts_as_absent() {
     let (_bus, installer, _calls) = setup("notfound-err", behaviour).await;
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
-        Outcome::NotFound
+        Outcome::NotFound(missing(&["mpv"]))
     );
 }
 
@@ -144,6 +158,6 @@ async fn no_packagekit_on_the_bus_is_unsupported() {
     let installer = Installer::PackageKit(PackageKit::on(client));
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
-        Outcome::Unsupported
+        Outcome::Unsupported(missing(&["mpv"]))
     );
 }

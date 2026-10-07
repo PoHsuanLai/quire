@@ -4,7 +4,7 @@ use crate::capability::Capability;
 use crate::catalog::{Catalog, Entry};
 use crate::family::Family;
 use crate::installer::{Installer, Request};
-use crate::outcome::Outcome;
+use crate::outcome::{Missing, Outcome};
 use crate::probe::{Environment, Presence, presence};
 use crate::watch::{Log, Subscription};
 use std::sync::Arc;
@@ -74,18 +74,28 @@ impl Helpers {
     /// feature, after they have said yes to the sheet, never at launch.
     pub async fn provide(&self, capability: &Capability) -> Outcome {
         let Some(entry) = self.entry(capability) else {
-            return Outcome::Unsupported;
+            return Outcome::Unsupported(Missing {
+                capability: capability.clone(),
+                package: None,
+                program: None,
+            });
         };
         if self.refresh(capability) == Presence::Present {
             return Outcome::Installed;
         }
         let candidates = self.0.family.map(|f| (f, entry.candidates(f)));
+        let missing = Missing {
+            capability: capability.clone(),
+            package: candidates.and_then(|(_, c)| c.first().cloned()),
+            program: entry.probe.first().cloned(),
+        };
         let Some((family, candidates)) = candidates.filter(|(_, c)| !c.is_empty()) else {
-            return Outcome::Unsupported;
+            return Outcome::Unsupported(missing);
         };
         let request = Request {
             family,
             candidates: candidates.to_vec(),
+            missing,
         };
         match self.0.installer.install(&request).await {
             Outcome::Installed => match self.refresh(capability) {

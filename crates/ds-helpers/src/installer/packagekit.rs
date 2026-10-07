@@ -4,7 +4,7 @@
 //! `/usr/share/dbus-1/interfaces`). The crate docs say why this route and not `Modify2`.
 
 use super::Request;
-use crate::outcome::Outcome;
+use crate::outcome::{Missing, Outcome};
 use std::pin::Pin;
 use zbus::export::futures_core::Stream;
 use zbus::message::Type;
@@ -80,12 +80,12 @@ impl PackageKit {
             Bus::Given(connection) => connection.clone(),
             Bus::System => match Connection::system().await {
                 Ok(connection) => connection,
-                Err(_) => return Outcome::Unsupported,
+                Err(_) => return Outcome::Unsupported(request.missing.clone()),
             },
         };
         match run(&connection, request).await {
             Ok(outcome) => outcome,
-            Err(error) => classify(&error),
+            Err(error) => classify(&error, &request.missing),
         }
     }
 }
@@ -98,7 +98,7 @@ async fn run(connection: &Connection, request: &Request) -> zbus::Result<Outcome
             Found::Absent => {}
         }
     }
-    Ok(Outcome::NotFound)
+    Ok(Outcome::NotFound(request.missing.clone()))
 }
 
 async fn resolve(connection: &Connection, name: &str) -> zbus::Result<Found> {
@@ -230,7 +230,7 @@ fn apply(report: &mut Report, message: &Message) -> zbus::Result<Step> {
 
 /// A bus-level failure as an outcome: policy refusal is a decline, no PackageKit is
 /// unsupported, anything else is a failure with the daemon's words.
-fn classify(error: &zbus::Error) -> Outcome {
+fn classify(error: &zbus::Error, missing: &Missing) -> Outcome {
     use zbus::fdo::Error as Fdo;
     match error {
         zbus::Error::MethodError(name, details, _) => {
@@ -241,12 +241,16 @@ fn classify(error: &zbus::Error) -> Outcome {
                 }
                 "org.freedesktop.DBus.Error.AccessDenied" => Outcome::Declined,
                 "org.freedesktop.DBus.Error.ServiceUnknown"
-                | "org.freedesktop.DBus.Error.NameHasNoOwner" => Outcome::Unsupported,
+                | "org.freedesktop.DBus.Error.NameHasNoOwner" => {
+                    Outcome::Unsupported(missing.clone())
+                }
                 _ => Outcome::Failed(details.clone().unwrap_or_else(|| name.to_owned())),
             }
         }
         zbus::Error::FDO(fdo) => match **fdo {
-            Fdo::ServiceUnknown(_) | Fdo::NameHasNoOwner(_) => Outcome::Unsupported,
+            Fdo::ServiceUnknown(_) | Fdo::NameHasNoOwner(_) => {
+                Outcome::Unsupported(missing.clone())
+            }
             Fdo::AccessDenied(_) => Outcome::Declined,
             _ => Outcome::Failed(fdo.to_string()),
         },

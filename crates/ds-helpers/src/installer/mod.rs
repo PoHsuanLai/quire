@@ -4,12 +4,12 @@
 mod fake;
 mod packagekit;
 
-pub use fake::FakeInstaller;
+pub use fake::{FakeInstaller, StandIn};
 pub use packagekit::PackageKit;
 
 use crate::capability::PackageName;
 use crate::family::Family;
-use crate::outcome::Outcome;
+use crate::outcome::{Missing, Outcome};
 
 /// What to install: the alternatives for one tool, best first. The first that exists wins.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -18,6 +18,9 @@ pub struct Request {
     pub family: Family,
     /// The package alternatives in preference order.
     pub candidates: Vec<PackageName>,
+    /// What the request is about, handed back in [`Outcome::NotFound`] and
+    /// [`Outcome::Unsupported`].
+    pub missing: Missing,
 }
 
 /// An installer backend.

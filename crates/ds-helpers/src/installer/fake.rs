@@ -7,11 +7,20 @@ use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError};
 
+/// A stand-in tool: the executable's file name and the script text written into it.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct StandIn {
+    /// The executable's file name.
+    pub name: String,
+    /// What the file holds; start it with a `#!` line to make it runnable.
+    pub body: String,
+}
+
 /// Where, and which, executables a successful fake install leaves behind.
 #[derive(Debug, Clone)]
 struct Drop {
     dir: PathBuf,
-    names: Vec<String>,
+    tools: Vec<StandIn>,
 }
 
 /// An installer that never touches a package manager. Clones share the record of requests, so a
@@ -24,7 +33,8 @@ pub struct FakeInstaller {
 }
 
 impl FakeInstaller {
-    /// One that answers `outcome` to every request.
+    /// One that answers `outcome` to every request. The `Missing` inside a `NotFound` or
+    /// `Unsupported` is replaced by the request's own, as a real backend would give it.
     pub fn new(outcome: Outcome) -> FakeInstaller {
         FakeInstaller {
             outcome,
@@ -34,11 +44,18 @@ impl FakeInstaller {
     }
 
     /// On [`Outcome::Installed`], also create these executables in `dir`.
-    pub fn leaving(mut self, dir: PathBuf, names: &[&str]) -> FakeInstaller {
-        self.drop = Some(Drop {
-            dir,
-            names: names.iter().map(|name| (*name).to_owned()).collect(),
-        });
+    pub fn leaving(self, dir: PathBuf, names: &[&str]) -> FakeInstaller {
+        let empty = |name: &&str| StandIn {
+            name: (*name).to_owned(),
+            body: "#!/bin/sh\n".to_owned(),
+        };
+        self.leaving_with(dir, names.iter().map(empty).collect())
+    }
+
+    /// On [`Outcome::Installed`], also create these stand-in tools in `dir`, each with its own
+    /// script text.
+    pub fn leaving_with(mut self, dir: PathBuf, tools: Vec<StandIn>) -> FakeInstaller {
+        self.drop = Some(Drop { dir, tools });
         self
     }
 
@@ -60,6 +77,8 @@ impl FakeInstaller {
                 Ok(()) => Outcome::Installed,
                 Err(error) => Outcome::Failed(error.to_string()),
             },
+            (Outcome::NotFound(_), _) => Outcome::NotFound(request.missing.clone()),
+            (Outcome::Unsupported(_), _) => Outcome::Unsupported(request.missing.clone()),
             (outcome, _) => outcome.clone(),
         }
     }
@@ -67,9 +86,9 @@ impl FakeInstaller {
 
 fn leave(drop: &Drop) -> std::io::Result<()> {
     std::fs::create_dir_all(&drop.dir)?;
-    drop.names.iter().try_for_each(|name| {
-        let file = drop.dir.join(name);
-        std::fs::write(&file, "#!/bin/sh\n")?;
+    drop.tools.iter().try_for_each(|tool| {
+        let file = drop.dir.join(&tool.name);
+        std::fs::write(&file, &tool.body)?;
         std::fs::set_permissions(&file, std::fs::Permissions::from_mode(0o755))
     })
 }

@@ -1363,21 +1363,35 @@ Families are `dnf`, `apt`, `pacman`, `zypper`, chosen from `ID` then `ID_LIKE` i
 | The handle | `Helpers::new(catalog, Environment::system(), Installer::PackageKit(PackageKit::system()))`; cheap to clone |
 | Is it there? | `helpers.available(&Capability::new("heic-decode")?) -> Presence::{Present, Missing}` |
 | Words for the sheet | `helpers.entry(&capability) -> Option<&Entry>` (`tool`, `purpose`, `probe`) |
-| Install it | `helpers.provide(&capability).await -> Outcome::{Installed, Declined, NotFound, Unsupported, Failed(reason)}`; call it after the person pressed Install... |
+| Install it | `helpers.provide(&capability).await -> Outcome::{Installed, Declined, NotFound(Missing), Unsupported(Missing), Failed(reason)}`; call it after the person pressed Install... `Missing { capability, package: Option<PackageName>, program: Option<Executable> }` is the first candidate package for this distro and the first probe program |
 | Hear of changes | `let mut feed = helpers.subscribe(); feed.next().await -> Availability { capability, presence }`; `helpers.refresh(&capability)` probes again (a tool installed in a terminal) |
-| Tests and the gallery | `Installer::Fake(FakeInstaller::new(Outcome::Installed))`; `Environment { path, os_release }` takes scratch paths |
+| Tests and the gallery | `Installer::Fake(FakeInstaller::new(Outcome::Installed))`; `Environment { path, os_release }` takes scratch paths; `.leaving(dir, &["mpv"])` drops empty stand-in tools into `dir` on install, `.leaving_with(dir, vec![StandIn { name, body }])` gives each one a script |
 
 `provide` returns `Installed` at once when the tool is already there, resolves the candidates
 through PackageKit (the first that exists in the repositories wins), installs it, probes again,
 and announces the change to subscribers. It never runs a package manager or sudo. A Flatpak
 sandbox cannot reach the system PackageKit: the app gets `Unsupported`.
 
+**Availability is announced on `refresh` and `provide` only.** quire does not watch `PATH`. An
+app that wants live updates (a tool installed in a terminal while the app runs) watches `PATH`
+itself and calls `refresh` when it changes. `provide` also announces: the window that asked sees
+both its `Outcome` and an `Availability` on its feed, so handle the two as one event, not two.
+
+**The sheet's style.** The `.ds-helper-progress` rule is in the shell stylesheet, so the app's
+`Ds` root must draw with it, or the Installing phase has no progress styling:
+
+```rust
+rsx! { Ds { sheet: Some(ds_shell::stylesheet()), HelperSheet { /* ... */ } } }
+```
+
+`ds_shell::helpers::{HelperSheet, HelperBody, HelperPhase}` (also in `ds_shell::prelude`).
+
 **The sheet.** `HelperSheet { app, tool, purpose, phase, icon, on_install, on_dismiss }` is
 controlled: you own the `HelperPhase` (`Ask`, `Installing`, `Failed { reason }`, `NotFound {
 package }`, `Unsupported { program }`). Show `Ask` first; on `on_install` set `Installing` and
 await `provide`; map the outcome: `Installed` closes the sheet and retries the feature, `Declined`
 returns to `Ask` or closes, `Failed` / `NotFound` / `Unsupported` show their phase (`NotFound` names
-the candidate package, `Unsupported` the probe executable). `on_dismiss` is Not Now and Close;
+the first candidate package, `Unsupported` the first probe executable: take them from the `Missing` in the outcome). `on_dismiss` is Not Now and Close;
 Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet.
 
 ### Exporting the menu bar

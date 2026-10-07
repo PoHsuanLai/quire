@@ -9,3 +9,6 @@
 pub mod model;
 pub(crate) mod sheet;
 pub(crate) mod wording;
+
+pub use model::HelperPhase;
+pub use sheet::{HelperBody, HelperSheet};
