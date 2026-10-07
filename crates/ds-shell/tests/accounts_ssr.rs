@@ -10,7 +10,8 @@ mod golden;
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::image_source::ImageSource;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
 use ds_shell::accounts::model::{
@@ -52,11 +53,7 @@ fn account(label: &str) -> AccountChoice {
 }
 
 fn provider(key: &str, label: &str, mark: MarkProvider) -> ProviderEntry {
-    ProviderEntry {
-        key: ProviderKey(key.to_owned()),
-        label: label.to_owned(),
-        mark,
-    }
+    ProviderEntry::new(ProviderKey(key.to_owned()), label, mark)
 }
 
 fn providers() -> Vec<ProviderEntry> {
@@ -244,6 +241,44 @@ fn provider_list(query: &str, cursor: Option<ProviderPick>) -> Element {
     }
 }
 
+const FAVICON: &str = "data:image/png;base64,AAAA";
+
+fn favicon_entries() -> Vec<ProviderEntry> {
+    vec![
+        provider("fastmail", "Fastmail", MarkProvider::Fastmail)
+            .styled(MarkStyle::Image(ImageSource(FAVICON.to_owned()))),
+        provider("nextcloud", "Nextcloud", MarkProvider::Imap),
+    ]
+}
+
+fn favicon_list() -> Element {
+    rsx! {
+        ProviderList {
+            providers: favicon_entries(),
+            query: String::new(),
+            on_query: |_| {},
+            on_cursor: |_| {},
+            on_pick: |_| {},
+            on_cancel: |_| {},
+        }
+    }
+}
+
+fn favicon_sign_in() -> Element {
+    rsx! {
+        SignInForm {
+            provider: "Fastmail",
+            mark: MarkProvider::Fastmail,
+            style: MarkStyle::Image(ImageSource(FAVICON.to_owned())),
+            fields: vec![address("")],
+            on_input: |_| {},
+            on_submit: |_| {},
+            on_back: |_| {},
+            on_cancel: |_| {},
+        }
+    }
+}
+
 fn failed(why: SignInFault) -> Element {
     rsx! {
         SignInFailed { provider: "Fastmail", why, on_retry: |_| {}, on_back: |_| {}, on_cancel: |_| {} }
@@ -266,6 +301,8 @@ const SPECIMENS: &[Specimen] = &[
     }),
     ("consent-none", || consent(vec![])),
     ("providers", || provider_list("", None)),
+    ("providers-favicon", favicon_list),
+    ("sign-in-favicon", favicon_sign_in),
     ("providers-search", || provider_list("mail", None)),
     ("providers-cursor", || {
         provider_list(
@@ -601,5 +638,35 @@ fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
     assert!(
         pop3.contains("The port is not valid. Check it and try again."),
         "{pop3}"
+    );
+}
+
+#[test]
+fn an_image_provider_entry_leads_its_row_and_the_sign_in_header_with_the_favicon() {
+    let list = light("providers-favicon");
+    assert_eq!(
+        list.matches(FAVICON).count(),
+        1,
+        "one row holds the favicon"
+    );
+    assert!(list.contains(r#"data-leading="image""#));
+    assert!(
+        list.contains(r#"data-leading="avatar""#),
+        "the other rows keep letters"
+    );
+    let header = light("sign-in-favicon");
+    assert!(header.contains(FAVICON));
+    assert!(header.contains(r#"class="ds-acc-disc""#));
+    assert!(!light("sign-in-ready").contains(FAVICON));
+}
+
+#[test]
+fn the_default_provider_mark_is_the_letter() {
+    let list = light("providers");
+    assert!(!list.contains(r#"data-leading="image""#));
+    assert!(!list.contains("ds-acc-disc"));
+    assert_eq!(
+        provider("x", "X", MarkProvider::Google).style,
+        MarkStyle::Letter
     );
 }

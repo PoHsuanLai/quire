@@ -33,9 +33,10 @@ pub enum MarkProvider {
 }
 
 /// Letter or image.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 pub enum MarkStyle {
     /// The provider's letter in its colour.
+    #[default]
     Letter,
     /// The provider's own favicon.
     Image(ImageSource),

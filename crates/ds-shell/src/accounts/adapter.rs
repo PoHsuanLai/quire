@@ -10,7 +10,9 @@ use super::hidden::Hidden;
 use super::model::{Choice, CopyState, FieldText, PickerChoice};
 use dioxus::prelude::*;
 use ds::components::content::avatar::AvatarSize;
-use ds::components::content::provider_mark::MarkProvider;
+use ds::components::content::icon_source::{ExternalIcon, IconSource};
+use ds::components::content::icon_view::IconView;
+use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::button::Button;
 use ds::components::controls::button_model::{Answers, ButtonFocus, ButtonRole};
 use ds::components::fields::text_field::TextField;
@@ -24,6 +26,8 @@ use ds::prelude::ListItem;
 use ds::prelude::{List, Row, RowLeading};
 use ds_core::vocab::{Availability, Selection};
 use ds_motion::detail::stamp::EventStamp;
+use ds_style::icon::render::{IconPx, IconSize};
+use ds_style::icon::url::IconUrl;
 use std::hash::Hash;
 
 /// Where the keyboard starts.
@@ -139,6 +143,8 @@ pub(crate) struct PickRow<K> {
     pub(crate) title: String,
     /// The provider mark that leads it.
     pub(crate) mark: MarkProvider,
+    /// Its letter or its favicon.
+    pub(crate) style: MarkStyle,
 }
 
 /// A list of rows with a mark, one of them under the cursor the host owns: the arrow keys call
@@ -167,7 +173,7 @@ pub(crate) fn PickRows<K: Clone + PartialEq + Hash + 'static>(
                 rsx! {
                     Row {
                         title,
-                        leading: RowLeading::Avatar(row.mark.avatar(AvatarSize::Size28)),
+                        leading: mark_leading(row.mark, &row.style),
                         size: RowSize::Settings,
                         state: ds_core::vocab::RowState { selection, ..Default::default() },
                         onclick: move |_| onpick.call(key.clone()),
@@ -272,8 +278,48 @@ pub(crate) fn ChoiceMenu(
     }
 }
 
-/// A provider's round mark, `size` across: the leading mark of a header or a line.
+/// The favicon `style` holds, drawn `px` across, when it is one a document can load and the
+/// provider has a favicon to show (a local account never does).
+fn favicon(provider: MarkProvider, style: &MarkStyle, px: u8) -> Option<IconSource> {
+    match style {
+        MarkStyle::Image(src) if provider != MarkProvider::Local => {
+            IconUrl::parse(&src.0).ok().map(|url| {
+                IconSource::Image(ExternalIcon {
+                    url,
+                    size: IconSize::Px(IconPx(px)),
+                })
+            })
+        }
+        MarkStyle::Image(_) | MarkStyle::Letter => None,
+    }
+}
+
+/// What leads a row of providers: the favicon when `style` holds one, else the letter's disc.
+pub(crate) fn mark_leading(provider: MarkProvider, style: &MarkStyle) -> RowLeading {
+    match favicon(provider, style, 28) {
+        Some(source) => RowLeading::Source(source),
+        None => RowLeading::Avatar(provider.avatar(AvatarSize::Size28)),
+    }
+}
+
+/// A provider's round mark, `size` across: the leading mark of a header or a line. Under
+/// `MarkStyle::Image` it is the provider's favicon.
 #[component]
-pub(crate) fn Disc(provider: MarkProvider, size: AvatarSize) -> Element {
-    ds::components::content::avatar::face(provider.avatar(size))
+pub(crate) fn Disc(
+    provider: MarkProvider,
+    size: AvatarSize,
+    #[props(default)] style: MarkStyle,
+) -> Element {
+    let px = match size {
+        AvatarSize::Size28 => 28,
+        _ => 48,
+    };
+    match favicon(provider, &style, px) {
+        Some(source) => rsx! {
+            span { class: "ds-acc-disc", "data-kind": "image",
+                IconView { source }
+            }
+        },
+        None => ds::components::content::avatar::face(provider.avatar(size)),
+    }
 }
