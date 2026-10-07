@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 24] = [
+pub const REGISTRY: [Entry; 25] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -105,6 +105,13 @@ pub const REGISTRY: [Entry; 24] = [
         lede: "Pinned tiles (drag one onto another to reorder), Today tabs that expire, the edge-peek sidebar (rest the pointer on the left edge), the link pill, the launcher's commands grouped in a Space's order, and Control and a digit to switch Space.",
         height: 2600,
         body: crate::pages::shell::app_features::AppFeaturesPage,
+    },
+    Entry {
+        page: Page::Spaces,
+        title: "Spaces",
+        lede: "The Spaces kit on a toy notes app: switch with a dot or Command and a digit, right-click the Space's name or a dot for its menu, add a Space with +, and open a note to see it in Today.",
+        height: 900,
+        body: crate::pages::shell::spaces::SpacesPage,
     },
     Entry {
         page: Page::Materials,

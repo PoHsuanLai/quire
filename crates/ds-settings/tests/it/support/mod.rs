@@ -28,6 +28,11 @@ impl Scratch {
         Store::new(ConfigRoot::Scratch(self.0.clone()), APP)
     }
 
+    /// The directory standing in for `$XDG_CONFIG_HOME`.
+    pub fn root(&self) -> &std::path::Path {
+        &self.0
+    }
+
     /// The program directory itself, where the store's files land.
     pub fn app_dir(&self) -> PathBuf {
         self.0.join(APP.0)

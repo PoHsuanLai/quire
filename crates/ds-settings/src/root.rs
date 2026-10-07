@@ -46,6 +46,23 @@ impl ConfigRoot {
     }
 }
 
+impl ConfigRoot {
+    /// `app`'s state directory in this tree: what changes as the program is used and is not a
+    /// choice (`$XDG_STATE_HOME`, else `$HOME/.local/state`). A scratch root keeps it beside the
+    /// config directory, in `.state`.
+    pub fn state_dir(&self, app: AppName) -> Option<PathBuf> {
+        match self {
+            ConfigRoot::Xdg => xdg::base_dir(
+                std::env::var_os("XDG_STATE_HOME").as_deref(),
+                std::env::var_os("HOME").as_deref(),
+                xdg::STATE_HOME_UNDER_HOME,
+            )
+            .map(|base| base.join(app.0)),
+            ConfigRoot::Scratch(base) => Some(base.join(".state").join(app.0)),
+        }
+    }
+}
+
 fn xdg_dir(app: AppName, xdg: Option<OsString>, home: Option<OsString>) -> Option<PathBuf> {
     xdg::base_dir(xdg.as_deref(), home.as_deref(), xdg::CONFIG_HOME_UNDER_HOME)
         .map(|base| base.join(app.0))

@@ -22,6 +22,9 @@ pub(crate) const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
 /// The default of `$XDG_CONFIG_HOME`, under `$HOME`.
 pub(crate) const CONFIG_HOME_UNDER_HOME: &str = ".config";
 
+/// The default of `$XDG_STATE_HOME`, under `$HOME`.
+pub(crate) const STATE_HOME_UNDER_HOME: &str = ".local/state";
+
 /// The default of `$XDG_DATA_HOME`, under `$HOME`.
 pub(crate) const DATA_HOME_UNDER_HOME: &str = ".local/share";
 

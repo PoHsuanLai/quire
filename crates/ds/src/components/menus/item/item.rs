@@ -89,6 +89,48 @@ pub enum MenuItem<T> {
 }
 
 impl<T> MenuItem<T> {
+    /// The same item yielding `lift` of its value, in every submenu too: an app's rows inside a
+    /// menu of a wider pick type.
+    pub fn map<U>(self, lift: &impl Fn(T) -> U) -> MenuItem<U> {
+        match self {
+            MenuItem::Item {
+                value,
+                title,
+                image,
+                key,
+                hint,
+                check,
+                availability,
+                after,
+                text,
+            } => MenuItem::Item {
+                value: lift(value),
+                title,
+                image,
+                key,
+                hint,
+                check,
+                availability,
+                after,
+                text,
+            },
+            MenuItem::Submenu {
+                title,
+                image,
+                availability,
+                children,
+            } => MenuItem::Submenu {
+                title,
+                image,
+                availability,
+                children: children.into_iter().map(|child| child.map(lift)).collect(),
+            },
+            MenuItem::Header(title) => MenuItem::Header(title),
+            MenuItem::Info { title, detail } => MenuItem::Info { title, detail },
+            MenuItem::Separator => MenuItem::Separator,
+        }
+    }
+
     /// An enabled command yielding `value`, named `title`, with nothing else.
     pub fn new(value: T, title: impl Into<String>) -> Self {
         MenuItem::Item {

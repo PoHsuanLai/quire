@@ -16,6 +16,7 @@ pub mod send_mood;
 pub mod send_pill;
 pub mod space_editor;
 pub mod space_switch;
+pub mod spaces;
 pub mod thread_height;
 pub mod thread_row;
 pub mod thread_row_hooks;

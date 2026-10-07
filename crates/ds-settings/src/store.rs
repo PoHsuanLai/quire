@@ -77,10 +77,7 @@ impl Store {
         };
         std::fs::create_dir_all(&dir).map_err(io(&dir))?;
         let path = dir.join(D::FILE.0);
-        let tmp = path.with_extension("part");
-        let body = D::FORMAT.encode(doc)?;
-        std::fs::write(&tmp, body).map_err(io(&tmp))?;
-        std::fs::rename(&tmp, &path).map_err(io(&path))
+        write_atomic(&path, D::FORMAT.encode(doc)?.as_bytes())
     }
 
     /// Watch `D`'s file: every settled change is re-read whole. The watch runs as a task on
@@ -88,4 +85,16 @@ impl Store {
     pub fn watch<D: SettingsDoc + Send>(&self, spawn: &dyn Spawner) -> Watch<D> {
         Watch::start(self, spawn)
     }
+}
+
+/// Write `body` to `path` through a temporary file beside it and a rename, creating nothing
+/// else: the directory must exist.
+pub(crate) fn write_atomic(path: &Path, body: &[u8]) -> Result<(), SettingsError> {
+    let io = |path: &Path| {
+        let path = path.to_path_buf();
+        move |source| SettingsError::Io { path, source }
+    };
+    let tmp = path.with_extension("part");
+    std::fs::write(&tmp, body).map_err(io(&tmp))?;
+    std::fs::rename(&tmp, path).map_err(io(path))
 }

@@ -36,6 +36,9 @@ pub enum Page {
     /// App features: pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
     /// launcher commands and Space switching (design/30 section 2.11).
     App,
+    /// The Spaces kit: a toy notes app with the sidebar head and foot, the Space's menu and
+    /// Today (design/21-SPACES.md section 13).
+    Spaces,
     /// The eight materials over black, white and a wallpaper.
     Materials,
     /// Every animation at every level.

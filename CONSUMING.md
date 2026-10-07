@@ -1872,3 +1872,38 @@ rsx! {
     }
 }
 ```
+
+## 14. Spaces
+
+Arc-style tinted contexts (Work, Home...) are a kit every app shares; the app brings only its
+payload. The model is pure (`ds::components::app::spaces`: `Space<P>`, `Spaces<P, R>`, `Today<I, K>`), persistence is
+`ds_settings::SpacesStorage` (`spaces.json` in the config directory, `today.json` in the state
+directory, atomic, a corrupt file is a first run), and the views are `SpaceHead`, `SpacesFoot`,
+`SpaceMenu` and `TodaySection` (design/21 section 13). `P` is a struct (its keys sit flat beside the
+Space's own), `R` is the place the app was left at; both `Serialize + DeserializeOwned`.
+
+```text
+let storage = SpacesStorage::new(&ConfigRoot::Xdg, AppName("notes"));
+let mut place = use_signal(Place::default);
+let writer = storage.clone();
+let spaces = use_spaces(
+    move || storage.boot_spaces(|_| {}, || Spaces::first_run([Notes::default()], Notes::default), |_| Fixup::Kept).0,
+    move |all| { let _ = writer.save_spaces(all); },   // when a change is final
+    move || place.peek().clone(),                        // where the app is, for the Space being left
+    move |arrived| place.set(arrived.restore),           // show the place a switch restores
+);
+rsx! { Ds { appearance, material, look: spaces.look(),
+    onkeydown: move |e| { spaces.on_key(SwitchChord::Command, &e); },
+    Sidebar { SpaceHead { handle: spaces } /* ... */ SpacesFoot { handle: spaces, new_payload } }
+    SpaceMenu::<_, _, ()> { handle: spaces, new_payload }
+} }
+```
+
+- Hooks for an old file: `boot_spaces(raw_fix, first_run, on_load)` runs `raw_fix` on the parsed JSON
+  (a one-time import) and `on_load` on the list (a payload fix-up); either changing it writes it back.
+- Today: `use_today(|| storage.boot_today(Epoch::now()), save)` prunes on boot;
+  `today.opened(space, item)`, `TodaySection { spaces, today, row, on_pick }`. A deleted Space is
+  forgotten with `today.drop_space(id)` in `SpaceMenu`'s `on_deleted`.
+- The chord is the app's: `SwitchChord::Command` (⌘1-9) or `Control` (⌃1-9).
+- Slide content with `spaces.slide()` (`in-r` or `in-l`). `SpacesSource::Desktop` is an experiment
+  that is not built (design/21 section 13.6); pass nothing.

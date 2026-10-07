@@ -189,3 +189,74 @@ id (ext-workspace `id` event), else `by_index[position]`, else the §4 default. 
   `30-CATALOGUE.md` section 3.4.
 - `crates/ds-style/src/space/palette.rs` (the quiet tint's constants).
 - SPEC "Workspaces" (cctk, pinning, naming, reorder).
+
+## 13. Apps' Spaces: the kit
+
+Status: **settled** for 13.1-13.5 (the kit as built, 2026-10-08); **experiment, off by default**
+for 13.6.
+
+An app's Spaces (Work, Home...) are Arc-style tinted contexts that the app owns. The kit is
+generic over the app's payload `P` (what a Space holds that is the app's: mail scope, a working
+directory) and over `R`, the place the app was left at in a Space.
+
+### 13.1 Model (pure, `ds_style::space::list`)
+
+- `Space<P> { id: SpaceId, name, look: SpaceLook, payload: P }`; `Spaces<P, R> { list, current, recall }`.
+  Never empty: the last Space cannot be removed. `SpaceId` is stable: Today and Recall key on it,
+  so deleting a Space renumbers nothing.
+- Operations: `new`, `first_run`, `add` ("Space N", the next preset, the current Space's theme),
+  `rename`, `edit` (the look is held to one to three dots, finite hue and chroma), `move_to`,
+  `remove`, `select`, `switch_to(id, leaving)` and `switch_to_index` (the keys: ⌘1-9, or ⌃1-9).
+- A switch returns `Switched { from, to, slide, restore }`: the place `to` was left at, and the edge
+  its content slides in from (`in-r` for a later Space, `in-l` for an earlier one).
+- `Today<I, K>`: per Space, items opened in the last 12 hours (refreshed by opening again; closing or
+  expiring touches only Today) and an optional *parked* kind `K` that never expires (a draft waiting
+  to be reopened, sent or discarded).
+- Files: `spaces.json` in the app's config directory, `today.json` in its state directory
+  (`ds_settings::SpacesStorage`, atomic writes). Payload keys sit flat beside the Space's own.
+  A Space with no `id` (a file written before the kit) takes its position, so the position-keyed
+  `recall` and Today of such a file keep their meaning. Reading is lenient field by field (an unknown
+  theme word is the default, dots are clamped, a missing grain is the preset's own, `current` is held
+  to a real Space); a file with no Space, or that is not JSON, is a first run.
+
+### 13.2 Switching (`ds::components::app::spaces::use_spaces`)
+
+The hook owns the list as a signal and calls the app's `keep` when a change is final (a switch, a
+pick, a closed part). `handle.look()` goes to the root's `Ds { look }`, whose frame cross-fades
+over `--t-big` (380 ms) as for a workspace switch. `here` says where the app is, `arrived` receives
+the restored place and the slide direction. A switch is refused while a part of a Space's menu is
+open. The chord is the app's: `SwitchChord::Command` (⌘1-9, the default, quire's primary modifier)
+or `Control`.
+
+### 13.3 Sidebar head and foot
+
+The Space's name sits in the sidebar **head** (`SpaceHead`), quiet; its menu opens on a right
+click only. The **foot** (`SpacesFoot`), in order: the app's leading slot, the Space dots
+(`flex: 1`), New Space, the app's trailing slot (Settings, Hide sidebar). Every dot is the neutral
+dot, the Spaces not on screen are dimmed, and a right click on a dot opens that Space's menu. The
+sidebar is at least 212 px wide (`SIDEBAR_MIN_WIDTH`).
+
+### 13.4 The Space's menu (`SpaceMenu`)
+
+Rename... | Colour... | Appearance > (checked) | Accent Inside the Card > | the app's submenu slot
+(mailo: Accounts >, whose picks keep the menu open) | rule | New Space | Delete Space... (only
+while there is more than one). New Space switches to the new Space and opens its Rename at once.
+Rename, Colour and Delete are popovers at the pointer; they change the Space live and keep it on
+close; Delete asks first and only its button deletes. While a part is open a dot click does not
+switch.
+
+### 13.5 Today (`TodaySection`)
+
+A header with Clear and `TodayTabs`, drawn from `Today<I, K>` by the app's row renderer. Nothing
+shows while Today is empty.
+
+### 13.6 Desktop link (EXPERIMENT, off by default, not implemented)
+
+`SpacesSource::{Local, Desktop}` is the seam; only `Local` exists. Intended contract for a later
+lane: sill publishes each workspace's `id`, `name` and `SpaceLook` on a bus interface (and signals
+when they change); an app with `SpacesSource::Desktop` maps each of its Spaces to one workspace by
+that id (a new workspace is a new Space over the app's default payload; a deleted one drops its
+Space), and switching a workspace switches the app's Space. The look the app paints is then the
+workspace's. Open questions: whether workspace ids are stable across sessions (section 11, item 3),
+and whether an app's own Spaces and the desktop's can coexist. Do not build on this until a lane
+owns it.

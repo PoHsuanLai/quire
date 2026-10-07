@@ -27,6 +27,7 @@ mod portal;
 mod root;
 pub mod schema;
 mod spaces_file;
+mod spaces_storage;
 mod store;
 mod units;
 mod user_style;
@@ -50,6 +51,7 @@ pub use portal::{
     scheme_from_portal,
 };
 pub use root::{AppName, ConfigRoot};
+pub use spaces_storage::{Fixup, Origin, SpacesStorage};
 pub use store::Store;
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{DEBOUNCE, Watch, WatchState};

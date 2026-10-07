@@ -8,6 +8,7 @@ mod keys;
 mod rows;
 mod schema;
 mod spaces_file;
+mod spaces_storage;
 mod store;
 mod support;
 mod user_style;
