@@ -9,6 +9,7 @@
 //! Every window's root can also read its app's handle with [`use_app_handle`].
 
 use crate::open_window::WindowSpec;
+use crate::screen_area::ScreenArea;
 use crate::window_requests::Root;
 use crate::window_size::Extent;
 use dioxus::prelude::*;
@@ -43,7 +44,7 @@ struct State {
     wake: Option<Wake>,
     ended: bool,
     /// The screen new windows open on, set by the loop once it can read monitors.
-    screen: Option<Extent>,
+    screen: Option<ScreenArea>,
 }
 
 /// A handle to the running app, cloneable and `Send + Sync`: see the module documentation.
@@ -112,9 +113,17 @@ impl AppHandle {
     /// the first listed), for sizing a window before it opens: `Extent::fit` and
     /// `WindowSize::fitting` cap a natural size to it. `None` until the event loop is running
     /// (the first window's own size is therefore fixed before it is known) and where winit lists
-    /// no monitor. It is the monitor's whole size: winit has no work-area query, so panels and
-    /// docks (Wayland exclusive zones) are not subtracted.
+    /// no monitor. It is the monitor's whole size ([`ScreenArea::output`]): winit has no
+    /// work-area query, so panels and docks (Wayland exclusive zones) are not subtracted.
+    /// [`screen_area`](AppHandle::screen_area) says the same with the scale and what is known.
     pub fn screen_extent(&self) -> Option<Extent> {
+        self.screen_area().map(|area| area.output)
+    }
+
+    /// The monitor the next window opens on, with its work area and scale (see [`ScreenArea`] for
+    /// what a client can and cannot know of it). `None` where [`screen_extent`](AppHandle::screen_extent)
+    /// is.
+    pub fn screen_area(&self) -> Option<ScreenArea> {
         self.lock().screen
     }
 
@@ -156,7 +165,7 @@ impl AppHandle {
     }
 
     /// The loop read the screen.
-    pub(crate) fn set_screen(&self, screen: Option<Extent>) {
+    pub(crate) fn set_screen(&self, screen: Option<ScreenArea>) {
         self.lock().screen = screen;
     }
 

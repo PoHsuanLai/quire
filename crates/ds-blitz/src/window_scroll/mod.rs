@@ -8,6 +8,7 @@
 //! wheel the engine takes never reaches Blitz (whose own scroll jumps by 20 px a line), except
 //! over a `data-wheel="capture"` element, which gets the raw wheel (design/11 §11.3.1).
 
+mod coast;
 mod eased;
 mod events;
 mod handle;

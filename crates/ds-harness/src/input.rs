@@ -4,7 +4,7 @@
 
 use crate::harness_input::modifier;
 use ds::file_drop::drag::FileDragInput;
-use ds::host::gesture::Gesture;
+use ds::host::gesture::{Gesture, GesturePhase};
 use ds::prelude::*;
 use ds_core::press::PointerButton;
 use keyboard_types::Modifiers;
@@ -41,6 +41,24 @@ pub enum Input {
         x: f64,
         /// Vertical clicks.
         y: f64,
+        /// The modifiers held while the wheel turns: under Control the window hears a zoom
+        /// and delivers every click whole, never eased.
+        held: Modifiers,
+    },
+    /// Fingers on a touchpad moving `dx`, `dy` logical px (winit's sign, as [`Input::Wheel`]) at
+    /// `at`, in `phase` of their run: `Began` when they touch, `Changed` as they move, `Ended`
+    /// when they lift. Delivered as the window delivers a touchpad scroll: the engine scrolls the
+    /// container under the pointer (the fingers' motion, then a glide after a fast lift), and the
+    /// listeners hear the run with its phases. The pointer is moved to `at` first.
+    Fingers {
+        /// Where the pointer is.
+        at: Point,
+        /// Horizontal motion.
+        dx: Px,
+        /// Vertical motion.
+        dy: Px,
+        /// Where in their run the fingers are.
+        phase: GesturePhase,
     },
     /// A touchpad gesture (a pinch, or a scroll with its phase), as the window publishes it to the
     /// components listening with `use_gestures`. A [`Input::Wheel`] publishes the scroll
@@ -205,7 +223,18 @@ impl Input {
 
     /// `x`, `y` wheel clicks with the pointer at `at`, scrolled by the engine.
     pub fn detents(at: Point, x: f64, y: f64) -> Self {
-        Input::Detents { at, x, y }
+        Input::detents_held(at, x, y, Modifiers::empty())
+    }
+
+    /// `x`, `y` wheel clicks with the pointer at `at` and `held` modifiers down (Control is a
+    /// zoom to a viewer).
+    pub fn detents_held(at: Point, x: f64, y: f64, held: Modifiers) -> Self {
+        Input::Detents { at, x, y, held }
+    }
+
+    /// Fingers moving `dx`, `dy` with the pointer at `at`, in `phase` of their run.
+    pub fn fingers(at: Point, dx: Px, dy: Px, phase: GesturePhase) -> Self {
+        Input::Fingers { at, dx, dy, phase }
     }
 
     /// `gesture` published to the window's listeners.

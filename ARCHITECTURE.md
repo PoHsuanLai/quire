@@ -99,7 +99,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `tokens` < leaf parts `battery`, `clock`, `confirm`, `emoji`, `month_grid`, `now_playing`, `notifications`, `osd`, `idle_dim`, `dock`, `bar`, `control_center`, `switcher`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled) < `user_picture`, `thumbs` < `lock` < `widgets` (`contract`, `registry`, `catalog`, `wire`, `card`, `frame`, `gallery`, and one directory per widget kind) < `prelude` |
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
-| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, `ScrollHandle`), `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
+| `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, the fingers' glide for eased listeners, `ScrollHandle`), `window_fit` (the cap), `size_ledger`, `sized_window` < `window_sizer`, `screen_area` < `window_screen`, `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
 | `ds-conformance` | `tests/<component>.rs`, `tests/support/` |
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
@@ -255,6 +255,10 @@ The single place a concept lives. Extend it; never write a second one.
 | The document seam (focus, caret, geometry, edit, drop) | `ds::host::DocumentHost` |
 | A mounted element's rect, kept current | `ds::host::layout::use_layout` (typed `MountedRef` in, `ReadSignal<Option<Rect>>` out); `ds::host::measure::use_rect` is the probe over it |
 | Scrolling a window's containers: wheel, touchpad, keys, `ScrollCmd` | `blitz_kit::scroll` (the engine, shared with shell-host) driven by `ds-blitz::window_scroll::WindowScroll`, which the window loop runs on every winit event and the harness runs before each layout |
+| What a touchpad's run and a zoom wheel say to an eased listener (the glide after a lift, Control delivered whole) | `ds-blitz::window_scroll::{coast, state}` over `blitz_kit::scroll::{momentum, velocity}`; the vocabulary is `ds::host::gesture::{Gesture, ScrollSource}` |
+| A window's size: the cap to the screen, who resized it, whether a request was answered | `ds-blitz::window_fit` (`Fit`, `Extent::fit_with`, `WindowSize::fitting_with`), `size_ledger` (`SizeOrigin`, `SizeRequest`, the 500 ms answer window), `window_sizer` (`WindowSizer`, `use_window_sizer`) over `sized_window::SizedWindow` |
+| The output a window is on: size, work area, scale | `ds-blitz::screen_area` (`ScreenArea`, `ScreenOf`, `WorkBasis`, `Reserve`), read from winit's monitors by `window_screen` |
+| A stand-in window for a component that sizes its window | `ds-harness::fake_window` (`SizerAck`, `WindowScreen`) behind `HarnessConfig::with_sizer_ack` and the `Harness::{window_requests, window_size, resize_window, window_sizer}` methods |
 | What a component asks the host to publish after layout, and the writes it queues for it | `ds::host::phase` (`Observe`, `Watch`, `PhaseWrite`) through `GeometryHost::{observe, write}`; the step is `ds-blitz::phase::Phase`, run by the window loop after each frame and by the harness after each layout |
 | Focus hooks, focus requests | `ds::focus` |
 | Text editing surface | `ds::editor::EditSurface`; host half `ds-blitz::edit` |
@@ -313,6 +317,7 @@ The single place a concept lives. Extend it; never write a second one.
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |
 | `Driver`, `DocQuery` | `ds-harness` | `Harness`; later shell-host's headless surface | a new driver | never |
+| `SizedWindow` | `ds-blitz` | `WinitSized` (a winit window), the harness's `FakeWindow` | a host that is not winit | never |
 
 Exact signatures (bodies omitted; `...` marks provided methods):
 
@@ -780,7 +785,9 @@ The one harness is `ds-harness`: `Harness` implements `Driver` and `DocQuery` ov
 Blitz document with the same providers `launch` installs (`ds-blitz::provide_host`, `blitz-kit`
 net, fonts and hover repair), so a test runs on the code production runs. Its clock is
 `Clock::Wall` or `Clock::Virtual` (`with_clock`); a `Virtual` test asserts window boundaries
-exactly, a `Wall` test polls with `settle_until` and asserts order. Tests never touch the real
+exactly, a `Wall` test polls with `settle_until` and asserts order. Every harness has a window
+sizer over a fake window (`use_window_sizer()` is `Some`): it records the sizes asked and answers
+as `with_sizer_ack` says. Tests never touch the real
 system: no real XDG, no portal, no D-Bus, no clipboard, no GPU unless `Backend::Hybrid` is asked
 for. SSR needs no harness: a test renders a `VirtualDom` with `dioxus_ssr` (`crates/ds/tests/support/`).
 `sill` drives its surfaces through the same `Driver` trait once shell-host's headless surface

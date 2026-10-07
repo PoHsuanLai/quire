@@ -22,8 +22,18 @@
 //! wants the host's smooth step (a detent eased over at most 200 ms, detents accumulating, as
 //! design/11 §11.3.11 says) listens with [`use_gestures_with`] and [`WheelDelivery::Eased`]: its
 //! wheel detents then arrive as one `Gesture::Scroll` per frame whose `by` is that frame's share,
-//! summing to the detents' distance. A touchpad's scroll is the fingers' own motion and reaches
-//! both kinds of listener unchanged.
+//! summing to the detents' distance. Under Control a wheel is a zoom, not a scroll, and is never
+//! eased: every listener hears each detent whole, one gesture per click.
+//!
+//! **A touchpad's scroll** is the fingers' own motion, `source: ScrollSource::Finger`, with its
+//! phases: `Began` when they touch, `Changed` as they move, `Ended` when they lift. An
+//! [`WheelDelivery::AsReceived`] listener hears exactly that. An [`WheelDelivery::Eased`] listener
+//! hears the same run with the glide the engine gives a native container: the fingers' motion
+//! as it comes, then, after they lift, one `Changed` per frame for the momentum (the speed they
+//! had, decaying by the window's momentum curve), and `Ended` when the glide is over rather than
+//! when the fingers lifted; a touch during the glide ends it at once. The listener clamps to its
+//! own bounds, as it does for a wheel: the host cannot stretch content past an edge it does not
+//! know.
 
 use dioxus::prelude::*;
 use ds_core::geometry::units::Point;
@@ -41,6 +51,17 @@ pub enum GesturePhase {
     Ended,
     /// The system took the gesture away: undo nothing, forget it.
     Cancelled,
+}
+
+/// What turned a scroll: a wheel's detents, or fingers on a touchpad. winit reports a touchpad
+/// and a pointing stick alike (pixels, with phases), so a window cannot tell those two apart.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum ScrollSource {
+    /// A wheel: `by` is whole detents (60 px each) and the phase is always `Changed`.
+    Wheel,
+    /// Fingers (or any continuous source winit reports as pixels): `by` is their own motion, and
+    /// the phases say when they touched down and lifted.
+    Finger,
 }
 
 /// A change of scale in thousandths of the current scale: `Magnification(50)` is 5% larger and
@@ -75,6 +96,8 @@ pub enum Gesture {
     },
     /// A scroll: two fingers on a touchpad, or a wheel's detents.
     Scroll {
+        /// What turned it.
+        source: ScrollSource,
         /// Where the scroll is in its run; a wheel without phases reports `Changed` only.
         phase: GesturePhase,
         /// How far the content moves, in logical pixels, positive to the right and down: the

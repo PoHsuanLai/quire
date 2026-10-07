@@ -4,7 +4,7 @@
 use blitz_kit::scroll::engine::Kinetic;
 use blitz_kit::scroll::geom::ScrollAxis;
 use blitz_kit::scroll::pad::PointerScroll;
-use ds::host::gesture::{Gesture, GesturePhase};
+use ds::host::gesture::{Gesture, GesturePhase, ScrollSource};
 use ds::prelude::*;
 use keyboard_types::Modifiers;
 
@@ -62,19 +62,13 @@ fn pan(dx: f64, dy: f64, phase: GesturePhase) -> Vec<PointerScroll> {
     moved.into_iter().chain(lifted).collect()
 }
 
-/// Whether a wheel event is clicks, which listeners may want eased, or a touchpad's motion.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Source {
-    Wheel,
-    Touchpad,
-}
-
 impl WheelInput {
-    /// Which device this event is from.
-    pub fn source(&self) -> Source {
+    /// Which device this event is from: clicks are a wheel's, pixels are fingers' (winit reports
+    /// no other difference).
+    pub fn source(&self) -> ScrollSource {
         match self.delta {
-            WheelDelta::Lines { .. } => Source::Wheel,
-            WheelDelta::Pixels { .. } => Source::Touchpad,
+            WheelDelta::Lines { .. } => ScrollSource::Wheel,
+            WheelDelta::Pixels { .. } => ScrollSource::Finger,
         }
     }
 
@@ -91,6 +85,7 @@ impl WheelInput {
     pub fn gesture(&self, at: Point, held: Modifiers, detent_px: f64) -> Gesture {
         let (x, y) = self.motion(detent_px);
         Gesture::Scroll {
+            source: self.source(),
             phase: self.phase,
             by: Point {
                 x: Px(x as f32),
@@ -197,25 +192,28 @@ mod tests {
             x: Px(10.0),
             y: Px(20.0),
         };
-        // name, event, the motion `by` carries
+        // name, event, the motion `by` carries, the source a listener is told
         let cases = [
             (
-                "a click is a detent",
+                "a click is a detent of a wheel",
                 input(WheelDelta::Lines { x: 0.0, y: 3.0 }, GesturePhase::Changed),
                 (0.0, 180.0),
+                ScrollSource::Wheel,
             ),
             (
-                "pixels are their own",
+                "pixels are their own, and the fingers'",
                 input(
                     WheelDelta::Pixels { x: 20.0, y: -40.0 },
                     GesturePhase::Ended,
                 ),
                 (20.0, -40.0),
+                ScrollSource::Finger,
             ),
         ];
-        for (name, event, (x, y)) in cases {
+        for (name, event, (x, y), source) in cases {
             let got = event.gesture(AT, Modifiers::CONTROL, 60.0);
             let want = Gesture::Scroll {
+                source,
                 phase: event.phase,
                 by: Point { x: Px(x), y: Px(y) },
                 at: AT,

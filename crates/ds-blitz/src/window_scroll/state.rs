@@ -13,12 +13,13 @@ use blitz_kit::scroll::geom::ViewPoint;
 use blitz_kit::scroll::keys::ScrollKey;
 use blitz_kit::scroll::time::Elapsed;
 use blitz_kit::scroll::tuning::Tuning;
-use ds::host::gesture::{Gesture, GestureBus, GesturePhase, WheelDelivery};
+use ds::host::gesture::{Gesture, GestureBus, GesturePhase, ScrollSource, WheelDelivery};
 use ds::prelude::*;
 use keyboard_types::Modifiers;
 
+use super::coast::{Coast, Heard};
 use super::eased::Eased;
-use super::wheel::{Source, WheelInput, pointer_scrolls};
+use super::wheel::{WheelInput, pointer_scrolls};
 use crate::node_ref::{DocRef, Written};
 use crate::phase::Phase;
 
@@ -67,6 +68,7 @@ struct State {
     pointer: Option<ViewPoint>,
     held: Modifiers,
     eased: Eased,
+    coast: Coast,
     commands: Vec<ScrollCmd>,
 }
 
@@ -79,6 +81,29 @@ impl State {
             y: Px(at.y as f32),
         }
     }
+}
+
+/// The gesture an eased listener hears for `heard` from `source`, with the pointer and the
+/// modifiers as they are.
+fn scroll_gesture(state: &State, source: ScrollSource, heard: Heard) -> Gesture {
+    Gesture::Scroll {
+        source,
+        phase: heard.phase,
+        by: Point {
+            x: Px(heard.by.0 as f32),
+            y: Px(heard.by.1 as f32),
+        },
+        at: state.point(),
+        held: state.held,
+    }
+}
+
+/// What the fingers' run says to the eased listeners, as gestures.
+fn heard_as_gestures(state: &State, heard: Vec<Heard>) -> Vec<Gesture> {
+    heard
+        .into_iter()
+        .map(|heard| scroll_gesture(state, ScrollSource::Finger, heard))
+        .collect()
 }
 
 impl WindowScroll {
@@ -96,6 +121,7 @@ impl WindowScroll {
                     pointer: None,
                     held: Modifiers::empty(),
                     eased: Eased::default(),
+                    coast: Coast::default(),
                     commands: Vec::new(),
                 }),
             }),
@@ -166,12 +192,17 @@ impl WindowScroll {
             let gesture = input.gesture(state.point(), state.held, detent_px);
             (gesture, state.pointer, state.held, detent_px)
         };
-        match input.source() {
-            Source::Wheel => {
+        match (input.source(), held.contains(Modifiers::CONTROL)) {
+            // A zoom, not a scroll: every listener hears each detent whole.
+            (ScrollSource::Wheel, true) => self.publish(|bus| bus.publish(gesture)),
+            (ScrollSource::Wheel, false) => {
                 self.ease(input, detent_px, el);
                 self.publish(|bus| bus.publish_to(WheelDelivery::AsReceived, gesture));
             }
-            Source::Touchpad => self.publish(|bus| bus.publish(gesture)),
+            (ScrollSource::Finger, _) => {
+                self.publish(|bus| bus.publish_to(WheelDelivery::AsReceived, gesture));
+                self.coast(input, detent_px, el);
+            }
         }
         let Some(pointer) = pointer else {
             return (WheelUse::Passed, Frames::Idle);
@@ -204,6 +235,33 @@ impl WindowScroll {
         let (x, y) = input.motion(detent_px);
         let mut state = self.shared.state.borrow_mut();
         state.eased = state.eased.push(x, y, el);
+    }
+
+    /// The fingers' motion, for the listeners that asked for it eased: it passes through as it
+    /// came, and their lift starts the engine's glide (`coast`), if any listens.
+    fn coast(&self, input: WheelInput, detent_px: f64, el: Elapsed) {
+        if !self.shared.bus.has_listener(WheelDelivery::Eased) {
+            return;
+        }
+        let gestures = {
+            let mut state = self.shared.state.borrow_mut();
+            let (next, heard) = std::mem::take(&mut state.coast).touch(
+                input.phase,
+                input.motion(detent_px),
+                el,
+                &state.tuning.physics,
+            );
+            state.coast = next;
+            heard_as_gestures(&state, heard)
+        };
+        self.publish_eased(gestures);
+    }
+
+    /// Hand `gestures` to the eased listeners.
+    fn publish_eased(&self, gestures: Vec<Gesture>) {
+        for gesture in gestures {
+            self.publish(|bus| bus.publish_to(WheelDelivery::Eased, gesture));
+        }
     }
 
     /// A scroll key went down or repeated. The key still goes on to the document: the engine
@@ -248,25 +306,24 @@ impl WindowScroll {
         self.frames_after(moved)
     }
 
-    /// Hand the eased listeners what the detents' ease moves this frame.
+    /// Hand the eased listeners what the detents' ease and the fingers' glide move this frame.
     fn eased_frame(&self, el: Elapsed) {
-        let gesture = {
+        let gestures = {
             let mut state = self.shared.state.borrow_mut();
             let (next, (dx, dy)) = state.eased.advance(el);
             state.eased = next;
-            (dx != 0.0 || dy != 0.0).then(|| Gesture::Scroll {
+            let detents = (dx != 0.0 || dy != 0.0).then_some(Heard {
                 phase: GesturePhase::Changed,
-                by: Point {
-                    x: Px(dx as f32),
-                    y: Px(dy as f32),
-                },
-                at: state.point(),
-                held: state.held,
-            })
+                by: (dx, dy),
+            });
+            let (next, glide) = std::mem::take(&mut state.coast).advance(el, &state.tuning.physics);
+            state.coast = next;
+            let mut out = Vec::new();
+            out.extend(detents.map(|h| scroll_gesture(&state, ScrollSource::Wheel, h)));
+            out.extend(heard_as_gestures(&state, glide));
+            out
         };
-        if let Some(gesture) = gesture {
-            self.publish(|bus| bus.publish_to(WheelDelivery::Eased, gesture));
-        }
+        self.publish_eased(gestures);
     }
 
     /// Whether a frame is wanted after `moved`: an offset moved, or something still animates.
@@ -275,6 +332,7 @@ impl WindowScroll {
         let moved = moved.map_or(Moved::Still, |moves| moves.moved());
         let animating = state.driver.motion() == Motion::Animating
             || state.eased.motion() == Motion::Animating
+            || state.coast.motion() == Motion::Animating
             || !state.commands.is_empty();
         match (moved, animating) {
             (Moved::Still, false) => Frames::Idle,

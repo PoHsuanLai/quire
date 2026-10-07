@@ -7,7 +7,7 @@ use crate::harness::Harness;
 use crate::input::PointerAction;
 use crate::input::PointerInput;
 use blitz_traits::events::{BlitzWheelDelta, BlitzWheelEvent, PointerCoords, UiEvent};
-use ds::host::gesture::{Gesture, GesturePhase};
+use ds::host::gesture::{Gesture, GesturePhase, ScrollSource};
 use ds::prelude::*;
 use ds_blitz::seam::{WheelDelta, WheelInput, WheelUse};
 use ds_core::time::clock::now;
@@ -40,6 +40,7 @@ impl Harness {
             element: Default::default(),
         }));
         self.gesture(Gesture::Scroll {
+            source: ScrollSource::Finger,
             phase: GesturePhase::Changed,
             by: Point { x: dx, y: dy },
             at,
@@ -50,12 +51,13 @@ impl Harness {
     /// Turn a wheel `x`, `y` clicks (winit's sign) with the pointer at `at`. The pointer is moved
     /// there first. The engine scrolls for it and the document never sees the wheel, as in a
     /// window; over a `data-wheel="capture"` element the raw wheel goes to the document instead.
-    pub(crate) fn detents(&mut self, at: Point, x: f64, y: f64) {
+    pub(crate) fn detents(&mut self, at: Point, x: f64, y: f64, held: Modifiers) {
         self.pointer(PointerInput {
             at,
             action: PointerAction::Move,
             mods: Modifiers::empty(),
         });
+        self.doc.scroll.track_modifiers(held);
         let input = WheelInput {
             delta: WheelDelta::Lines { x, y },
             phase: GesturePhase::Changed,
@@ -78,6 +80,25 @@ impl Harness {
                 element: Default::default(),
             }));
         }
+        self.settle_now();
+    }
+
+    /// Fingers on a touchpad move `dx`, `dy` in `phase`, as the window delivers winit's
+    /// `MouseWheel` with pixels: the engine takes it, and the pointer is moved to `at` first.
+    pub(crate) fn fingers(&mut self, at: Point, dx: Px, dy: Px, phase: GesturePhase) {
+        self.pointer(PointerInput {
+            at,
+            action: PointerAction::Move,
+            mods: Modifiers::empty(),
+        });
+        let input = WheelInput {
+            delta: WheelDelta::Pixels {
+                x: f64::from(dx.0),
+                y: f64::from(dy.0),
+            },
+            phase,
+        };
+        let _ = self.doc.scroll.wheel(input, now());
         self.settle_now();
     }
 

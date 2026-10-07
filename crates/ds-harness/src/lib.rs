@@ -8,6 +8,7 @@
 
 mod driver;
 mod error;
+mod fake_window;
 mod frame_view;
 mod gpu_device;
 mod gpu_diagnostics;
@@ -26,6 +27,7 @@ mod harness_pointer;
 mod harness_settle;
 mod harness_style;
 mod harness_wheel;
+mod harness_window;
 mod headless;
 mod input;
 pub mod inset;
@@ -37,6 +39,7 @@ pub mod snapshot;
 
 pub use driver::{ClassPresence, DocQuery, Driver, FocusState, Query};
 pub use error::HarnessError;
+pub use fake_window::{SizerAck, WindowScreen};
 pub use frame_view::FrameView;
 pub use gpu_diagnostics::GpuDiagnostics;
 pub use harness::Harness;

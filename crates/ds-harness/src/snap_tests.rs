@@ -2,6 +2,7 @@
 //! redraw request or starts an animation, a second call changes nothing, and at a whole scale it
 //! changes nothing at all.
 
+use crate::fake_window::WindowSpec;
 use crate::headless::Headless;
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, NodeData};
@@ -96,7 +97,7 @@ fn snap_twice(scale_percent: u16) -> Calls {
         height: 120,
         scale_percent,
     };
-    let mut headless = Headless::new(Fixture, viewport, &Setup::default());
+    let mut headless = Headless::new(Fixture, viewport, &Setup::default(), WindowSpec::default());
     headless.frame(Duration::from_millis(400));
     let mut doc = headless.doc.inner.borrow_mut();
     doc.resolve(0.4);

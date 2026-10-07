@@ -4,7 +4,7 @@
 use dioxus_native::{LogicalSize, WindowAttributes};
 
 /// A width and a height in logical pixels.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct Extent {
     /// Across.
     pub width: u32,

@@ -23,6 +23,7 @@ pub use crate::node_ref::DocRef;
 pub use crate::phase::{Layout, Phase, Ran};
 pub use crate::scheme::follow_root as follow_scheme;
 pub use crate::setup::Setup;
+pub use crate::sized_window::SizedWindow;
 pub use crate::texture_layer::attached_gpu;
 pub use crate::wake::Wakeup;
 pub use crate::window_scroll::wheel::{WheelDelta, WheelInput};

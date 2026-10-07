@@ -6,6 +6,7 @@
 //! grid (`crate::snap`), so a picture at a fractional scale is what a snapping host shows.
 
 use crate::error::HarnessError;
+use crate::fake_window::{FakeWindow, WindowSpec};
 use crate::painter::{Canvas, PaintTime, Painter};
 use crate::round_budget::{MAX_ROUNDS, RoundBudget, Spent};
 use crate::snapshot::Viewport;
@@ -25,6 +26,7 @@ use ds::prelude::*;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameHover;
 use ds_blitz::ScrollHandle;
+use ds_blitz::WindowSizer;
 use ds_blitz::clipboard::Memory;
 use ds_blitz::font_context;
 use ds_blitz::seam::DocRef;
@@ -93,6 +95,9 @@ pub(crate) struct Headless {
     phase: Phase,
     /// The window's scrolling, run before each layout as the window loop runs it.
     pub(crate) scroll: WindowScroll,
+    /// The window the sizer asks, and the sizer components read with `use_window_sizer`.
+    pub(crate) window: FakeWindow,
+    pub(crate) sizer: WindowSizer,
 }
 
 /// The hovered element (a hovered text node counts as its element, which carries the listeners).
@@ -112,7 +117,12 @@ enum Keeper {
 impl Headless {
     /// Build `app` at `viewport` with the app's `setup` and run its first render (no layout
     /// yet).
-    pub(crate) fn new(app: fn() -> Element, viewport: Viewport, setup: &Setup) -> Self {
+    pub(crate) fn new(
+        app: fn() -> Element,
+        viewport: Viewport,
+        setup: &Setup,
+        spec: WindowSpec,
+    ) -> Self {
         let wakeup = Arc::new(Wakeup::default());
         let fetches = Arc::clone(&wakeup);
         let net_waker: Arc<dyn NetWaker> = Arc::new(move |_doc: usize| fetches.note_fetch());
@@ -147,6 +157,9 @@ impl Headless {
             activity: Signal::new_in_scope(Activity::Active, ScopeId::ROOT),
         });
         vdom.provide_root_context(signals);
+        let window = FakeWindow::new(viewport, spec);
+        let sizer = vdom.in_runtime(|| WindowSizer::over(Rc::new(window.clone())));
+        vdom.provide_root_context(sizer.clone());
         let keeper = match setup.focus_fallback {
             FocusFallback::Ancestor => {
                 Keeper::Ancestor(Rc::new(RefCell::new(FocusKeeper::default())))
@@ -195,6 +208,8 @@ impl Headless {
             painter: Painter::Cpu,
             phase,
             scroll,
+            window,
+            sizer,
         }
     }
 

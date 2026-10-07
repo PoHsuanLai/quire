@@ -1,6 +1,7 @@
 //! How a [`Harness`](crate::Harness) builds its document: the viewport, and the same providers
 //! an [`AppConfig`](crate::AppConfig) gives a window, so a test sees what the window would.
 
+use crate::fake_window::{SizerAck, WindowScreen, WindowSpec};
 use crate::gpu_diagnostics::GpuDiagnostics;
 use crate::harness_backend::Backend;
 use crate::harness_clock::Clock;
@@ -25,6 +26,7 @@ pub struct HarnessConfig {
     diagnostics: GpuDiagnostics,
     clock: Clock,
     layout: Layout,
+    window: WindowSpec,
 }
 
 impl HarnessConfig {
@@ -38,6 +40,7 @@ impl HarnessConfig {
             diagnostics: GpuDiagnostics::default(),
             clock: Clock::default(),
             layout: Layout::default(),
+            window: WindowSpec::default(),
         }
     }
 
@@ -113,6 +116,21 @@ impl HarnessConfig {
         self
     }
 
+    /// How the harness's window answers a component's `WindowSizer::request_size` (default
+    /// [`SizerAck::Now`]). Every harness has a window sizer, so `use_window_sizer()` is `Some`;
+    /// this is the one call that changes its answers.
+    pub fn with_sizer_ack(mut self, ack: SizerAck) -> Self {
+        self.window.ack = ack;
+        self
+    }
+
+    /// The output the harness's window reports through `WindowSizer::screen` (default
+    /// [`WindowScreen::Standard`]).
+    pub fn with_window_screen(mut self, screen: WindowScreen) -> Self {
+        self.window.screen = screen;
+        self
+    }
+
     /// The clock the harness's timers run on.
     pub fn clock(&self) -> Clock {
         self.clock
@@ -148,6 +166,10 @@ impl HarnessConfig {
     /// The size and scale the document renders at.
     pub fn viewport(&self) -> Viewport {
         self.viewport
+    }
+
+    pub(crate) fn window(&self) -> WindowSpec {
+        self.window
     }
 
     pub(crate) fn setup(&self) -> &Setup {

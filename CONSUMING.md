@@ -122,20 +122,51 @@ reads its app's handle with `use_app_handle()`; `open_window` still works from i
 opens on: the primary monitor, or the first listed, since winit cannot say where the compositor
 will put it. It is the monitor's whole size, not its work area: winit has no work-area query, and
 on Wayland there is none to ask, so the panel's and dock's exclusive zones are not subtracted (the
-85% cap leaves room for them); on Wayland the scale is the integer `wl_output` one, so a
-fractionally scaled output is off by the difference. It is `None` until the loop runs (the first
-window's size is fixed before then) and where winit lists no monitor. `natural.fit(screen,
-Some(least))` caps an `Extent` to 85% of the screen on each axis and never below `least` (a larger
-`least` wins), and `WindowSize::fitting(natural, screen, least)` builds the `WindowSize` (uncapped
-when `screen` is `None`). Inside the window, `use_window_sizer()` (`Option<WindowSizer>`, `None`
-in the harness) gives `sizer.request_size(Extent)` (winit's `request_surface_size`, logical
-pixels; the window never goes below its least), `sizer.size()` (logical) and `sizer.origin()`
-(`Option<SizeOrigin>`, a read subscribes the component): `None` until the window is resized,
-`SizeOrigin::Requested` when the resize is the answer to our own request, `SizeOrigin::Person` for
-any other (a drag, a tile, a zoom, the compositor's own choice). A resize is ours when it arrives
-within 500 ms of `request_size` at the requested size, to within 1 physical pixel per axis (scale
-rounding); a configure that changes nothing is no resize. On Wayland the compositor places windows;
-only the size is the app's.
+85% cap leaves room for them). It is `None` until the loop runs (the first window's size is
+fixed before then) and where winit lists no monitor. `handle.screen_area()` and
+`sizer.screen()` (below) say the same with the scale and what is known.
+`natural.fit(screen, Some(least))` caps an `Extent` to 85% of the screen on each axis and never
+below `least` (a larger `least` wins), and `WindowSize::fitting(natural, screen, least)` builds
+the `WindowSize` (uncapped when `screen` is `None`). Both cap each axis on its own, so a wide
+image squashes to the cap. For content with a shape of its own, `natural.fit_with(screen, least,
+Fit::KeepRatio)` and `WindowSize::fitting_with(natural, screen, least, Fit::KeepRatio)` shrink
+both axes by the one factor the axis that is further over its cap sets (never larger than
+`natural`; `least` then raises per axis and wins over the cap); `Fit::PerAxis` is what `fit` and
+`fitting` do.
+
+**The screen a window is on, as an app can know it.** `ScreenArea { output, work, scale, of, basis
+}` (`handle.screen_area()` before a window exists, `sizer.screen()` inside one, both
+`Option<ScreenArea>`): `output` is the whole output in logical pixels, `work` the area a window may
+use (fit to this), `scale` the output's `Scale` in 120ths (`Scale(180)` is 1.5x), `of` whose output
+it is (`ScreenOf::Window`, or `ScreenOf::Primary` before the window is open: the compositor
+chooses where a window opens and does not say), and `basis` what `work` is made from.
+`area.logical_for_pixels(Extent::new(1200, 800))` is the logical size of a window that shows
+1200 x 800 device pixels one to one on this output. What a client cannot know on Wayland: the
+panel, dock or menu bar (layer-shell exclusive zones go to the compositor, never to clients) and
+so the work area is the whole output (`WorkBasis::WholeOutput`), and an app that knows a reserve
+gives it with `area.less(Reserve { top: 32, .. })` (`WorkBasis::LessReserve`); an output's
+transform (winit reads the mode's pixels, unrotated); and, before the window is mapped, the
+fractional scale (the output's whole-number scale stands in, so the logical sizes read smaller than
+the window will see). What it does know once the window is mapped: its own output
+(`Window::current_monitor`) and the scale it draws at (`wp_fractional_scale_v1`), so `sizer.screen()` is exact
+on a fractionally scaled output where `handle.screen_area()` is not. `handle.screen_extent()` stays
+the primary output's `output`.
+
+Inside the window, `use_window_sizer()` (`Option<WindowSizer>`; `Some` in the harness too, see
+below) gives `sizer.request_size(Extent)` (winit's `request_surface_size`, logical pixels; the
+window never goes below its least), `sizer.size()` (logical), `sizer.origin()`
+(`Option<SizeOrigin>`, a read subscribes the component) and `sizer.request()` (`SizeRequest`, a
+read subscribes too). The origin is `None` until the window is resized, `SizeOrigin::Requested`
+when the resize is the answer to our own request, `SizeOrigin::Person` for any other (a drag, a
+tile, a zoom, the compositor's own choice). A resize is ours when it arrives within 500 ms of
+`request_size` at the requested size, to within 1 physical pixel per axis (scale rounding); a
+configure that changes nothing is no resize. The request has its own state: `SizeRequest::Pending(size)`
+from the call, `Idle` once a resize settles it, `Expired(size)` when nothing answered in 500 ms
+(the compositor ignored it, or took the size the window already had). Expiry leaves the origin
+as it was before the request, and the request is spent: a resize after it is the person's, however
+close to the asked size. A component that retries or gives up on a request reads `request()`; one
+that only stops fighting a person's size reads `origin()`. On Wayland the compositor places
+windows; only the size is the app's.
 
 ```rust,ignore
 // Open at the picture's natural size, then fit the real size once it is known.
@@ -597,6 +628,7 @@ for the defaults) and renders the first frame. A test sends `Input` and lets tim
 
 | Want | Call |
 | --- | --- |
+| Fingers on a touchpad, a wheel under Control | `Input::fingers(point, dx, dy, GesturePhase::Began / Changed / Ended)` (advance a frame between moves so the lift has a speed), `Input::detents_held(point, x, y, Modifiers::CONTROL)` | Fingers go through the window's scroll as winit's pixel `MouseWheel` does, with phases. |
 | Click, press or move | `Input::click(point)`, `Input::press(point, PointerButton::Secondary)`, `Input::pointer_move(point)`, `Input::drag(from, to, steps)`, `Input::wheel(point, dx, dy)` |
 | Type | `Input::key(ShortcutKey::Enter)`, `Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'))`, `Input::paste(html, text)`, `Input::ime_commit(text)` |
 | Where something is | `harness.centre(selector) -> Option<Point>`, `harness.rect(selector)`, `harness.hits(point, selector)` |
@@ -607,6 +639,7 @@ for the defaults) and renders the first frame. A test sends `Input` and lets tim
 | Want | Call | Notes |
 | --- | --- | --- |
 | Timers on the harness's clock | `HarnessConfig::with_clock(Clock::Virtual)` | Default `Clock::Wall`. `Harness::clock() -> Clock` |
+| A window a component sizes | `use_window_sizer()` is `Some` in every harness. `HarnessConfig::with_sizer_ack(SizerAck::Now / After(Duration) / Never)` (default `Now`); `with_window_screen(WindowScreen::Standard / Absent / Area(ScreenArea))`; `harness.window_requests()` (the sizes asked, logical, oldest first), `harness.window_size()`, `harness.resize_window(Extent)` (a person's drag), `harness.window_sizer()` | The answer to a request is a resize that arrives later, as in a window: `Now` is the next turn with no time passing, `After(d)` is `d` on the harness's clock, `Never` is a compositor that ignores it (the request then expires after 500 ms, see `SizeRequest`). The standard screen is 1920 x 1080 logical at the viewport's scale. Use `Clock::Virtual` for `After` and `Never`. |
 | "Now" in a test | `Harness::now() -> Instant` | The virtual clock's now (or the wall clock's); `settle_until` returns instants on the same clock, and its 3 s bound is the harness's time. On the virtual clock, time a window from `harness.now()`, never `Instant::now()` |
 | Read the time in your own component | `ds::base::time::clock::now()`, `ds::base::time::clock::since(instant)`, `ds::base::time::clock::sleep(d)` | Whatever clock the thread has installed: the wall clock in a window, the harness's in a test. A component that calls `Instant::now()` or `futures_timer` itself stays on the wall clock and drifts from the harness |
 | Install a virtual clock yourself (another harness) | `ds::base::time::clock::VirtualClock::new()`, `.install() -> ClockGuard`, `.advance_to(d)`, `.next_due()`, `.now()`, `.elapsed()`, `.waiting()`, `.due_times()` | Thread-local, restored when the guard drops. Step through `next_due` and poll your executor between steps, as `Harness::advance` does |
@@ -1444,7 +1477,7 @@ Blitz fork is needed.
 | Need | API | Notes |
 | --- | --- | --- |
 | A drag that leaves its element | `ds::host::pointer_capture::use_pointer_capture(on_pointer) -> PointerCapture`; wire `capture.on_mounted(event)` to `onmounted`, call `capture.begin() -> PointerHold` from `onpointerdown` | `on_pointer` hears every move (`PointerPhase::Drag`) and the primary release (`PointerPhase::Release`) in the window's logical pixels, wherever the pointer is, until the button comes up. `PointerHold::Local` means the host cannot (no host, not mounted yet): the element's own `onpointermove` and `onpointerup` are all there is. The edit surface uses the same route. |
-| A pinch or a phased scroll | `ds::host::gesture::use_gestures(on_gesture)`; `Gesture::Pinch { phase, by: Magnification, at }`, `Gesture::Scroll { phase, by: Point, at, held: Modifiers }`, `GesturePhase::{Began, Changed, Ended, Cancelled}` | A gesture reaches every listener with the pointer's place; the listener checks it is over its own element. `Magnification(50)` is 5% larger. A scroll's `by` is how far the content moves in logical pixels (winit's sign; a wheel detent is 60 px, the distance a native container moves for it, and a wheel with no phases reports `Changed` only; `held` is the modifier keys down, so a wheel under Control can zoom). `use_gestures_with(WheelDelivery::Eased, ..)` hears the detents eased over frames instead (section 11). Pinch exists on Wayland and macOS, where winit has it. |
+| A pinch or a phased scroll | `ds::host::gesture::use_gestures(on_gesture)`; `Gesture::Pinch { phase, by: Magnification, at }`, `Gesture::Scroll { source: ScrollSource, phase, by: Point, at, held: Modifiers }`, `ScrollSource::{Wheel, Finger}`, `GesturePhase::{Began, Changed, Ended, Cancelled}` | A gesture reaches every listener with the pointer's place; the listener checks it is over its own element. `Magnification(50)` is 5% larger. A scroll's `by` is how far the content moves in logical pixels (winit's sign; a wheel detent is 60 px, the distance a native container moves for it, and a wheel with no phases reports `Changed` only; `source` says which: `Wheel` for detents, `Finger` for a touchpad (winit reports a pointing stick as pixels too, so it reads as `Finger`); `held` is the modifier keys down, so a wheel under Control can zoom). `use_gestures_with(WheelDelivery::Eased, ..)` hears the detents eased over frames instead, and a touchpad's run with its glide (section 11). Pinch exists on Wayland and macOS, where winit has it. |
 | In a test | `Input::gesture(Gesture::Pinch { .. })`; `Input::wheel(..)` publishes a scroll too | `ds_blitz::launch` and `Harness` provide the `GestureBus`; with no host `use_gestures` hears nothing. |
 | A measure that follows the window | `ds::host::measure::use_rect()` | It reads again after each `ds::host::resized::WindowResized` bump, which `launch` makes on every window resize or scale change; a host with no such source (a shell surface) never bumps, and the rect stays where it was measured. |
 | A machine whose parameters come from its own state | `MachineRef::set_params(params)` before `send` | `use_machine` takes parameters at each render, one render behind a machine whose parameters are derived from its state (a zoom step reads the scale the last step made): compute them from the state just read and set them, then send. |
@@ -1697,10 +1730,19 @@ own offset (a PDF or image canvas) opts into the engine's smooth step with
 `ds::host::gesture::use_gestures_with(WheelDelivery::Eased, on_gesture)`: its wheel detents then
 arrive as one `Gesture::Scroll { phase: Changed, by, .. }` per frame, `by` that frame's share of the
 distance, summing to the detents' (60 px each, at most 200 ms, accumulating as in a native
-container). Apply `by` as the `AsReceived` listener did; clamp as you did. A touchpad's own scroll
-reaches both kinds of listener as the fingers moved, with no glide: a component that wants the
-flick to carry on keeps its own momentum. Under Control the wheel zooms in a viewer, as before: a
-listener decides what `held` means.
+container). Apply `by` as the `AsReceived` listener did; clamp as you did. Every gesture says
+what turned it (`source`: `Wheel` or `Finger`). **A touchpad's run** is `Began`, `Changed`,
+`Ended` as the fingers touch, move and lift: an `AsReceived` listener hears exactly that, the
+fingers' own motion. An `Eased` listener hears the same run with the glide the engine gives a
+native container: the fingers' motion as it comes, then, after a lift fast enough to glide (the
+engine's own release speed, curve and `scroll.momentum` setting), one `Changed` per frame for the
+momentum, and `Ended` when the glide is over, not at the lift; a touch during the glide ends it
+at once (an `Ended`, then the new `Began`). A slow lift is an `Ended` at the lift, with no glide.
+Stretching past an edge is the listener's: the host does not know its bounds, so clamp or stretch
+the offset yourself, and drop the rest of a glide by ignoring `Changed` once you are at an edge.
+**Under Control a wheel is a zoom, not a scroll**: every listener, eased or not, hears each click
+whole (`by` is one detent, 60 px, `phase: Changed`, `held` has Control), one gesture per
+click, with nothing eased.
 
 **Every scroll container hides Blitz's own scrollbar.** Every ds component whose content scrolls
 (`Menu`, `Panel`, `Sheet`, `EditSurface`) carries `scrollbar-width: none` in its own

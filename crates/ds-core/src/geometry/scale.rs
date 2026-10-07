@@ -36,6 +36,14 @@ impl Scale {
         Scale(u32::from(percent) * Scale::DENOMINATOR / 100)
     }
 
+    /// A scale given as the factor a platform reports (winit's `scale_factor`, 1.5 for 150 %),
+    /// rounded to the nearest 120th; `None` for a factor that is not a positive number.
+    pub fn from_factor(factor: f64) -> Option<Scale> {
+        let valid = factor.is_finite() && factor > 0.0;
+        // Bounded by the validity check and `max(1.0)`, so the cast cannot truncate or wrap.
+        valid.then(|| Scale((factor * f64::from(Scale::DENOMINATOR)).round().max(1.0) as u32))
+    }
+
     /// The numerator, never zero: a zero scale would make one device pixel infinitely wide.
     pub fn numerator(self) -> u32 {
         self.0.max(1)
@@ -79,6 +87,23 @@ mod tests {
         for &(percent, scale, grid) in PERCENT {
             assert_eq!(Scale::from_percent(percent), scale, "{percent}");
             assert_eq!(scale.grid(), grid, "{percent}");
+        }
+    }
+
+    #[test]
+    fn a_platform_factor_rounds_to_the_nearest_120th() {
+        const CASES: &[(&str, f64, Option<Scale>)] = &[
+            ("one", 1.0, Some(Scale(120))),
+            ("one and a half", 1.5, Some(Scale(180))),
+            ("a third more", 1.3333333, Some(Scale(160))),
+            ("below one", 0.5, Some(Scale(60))),
+            ("zero", 0.0, None),
+            ("negative", -2.0, None),
+            ("not a number", f64::NAN, None),
+            ("infinite", f64::INFINITY, None),
+        ];
+        for (name, factor, want) in CASES {
+            assert_eq!(Scale::from_factor(*factor), *want, "{name}");
         }
     }
 

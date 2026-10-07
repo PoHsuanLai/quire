@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::host::captured::CapturedPointer;
-use ds::host::gesture::{Gesture, GesturePhase, Magnification, use_gestures};
+use ds::host::gesture::{Gesture, GesturePhase, Magnification, ScrollSource, use_gestures};
 use ds::host::pointer_capture::{PointerHold, use_pointer_capture};
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -102,6 +102,7 @@ fn a_scroll_carries_the_modifiers_held_while_it_happened() {
     );
     harness.advance(ms(50));
     harness.send(Input::gesture(Gesture::Scroll {
+        source: ScrollSource::Finger,
         phase: GesturePhase::Changed,
         by: Point {
             x: Px(0.0),

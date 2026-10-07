@@ -42,7 +42,7 @@ use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
 use crate::window_build::{Base, Shape, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
-use crate::window_screen::screen_extent;
+use crate::window_screen::screen_area;
 use crate::window_scroll::{Frames, Intercept, WindowScroll};
 use anyrender::WindowRenderer;
 use blitz_shell::{BlitzShellEvent, BlitzShellProxy, WindowConfig};
@@ -227,7 +227,7 @@ impl Windows {
             // Windows cannot be created yet; `can_create_surfaces` serves what waits.
             return;
         }
-        self.base.handle.set_screen(screen_extent(event_loop));
+        self.base.handle.set_screen(screen_area(event_loop));
         for remote in self.base.handle.take() {
             match remote {
                 Remote::Open { spec, make } => {

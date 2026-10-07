@@ -1043,7 +1043,15 @@ on a machine other builds were also using, so about +-10 ms).
   `TouchPhase::Ended` (from `axis_stop`) and gives a wheel only `Moved`, in `LineDelta`
   (`value120 / 120`). It delivers no momentum on Linux, so the glide after a flick is the engine's
   (macOS's own momentum arrives as a further `Started` to `Ended` run, so a macOS window would
-  glide twice).
+  glide twice). winit reports a touchpad and a pointing stick alike (`PixelDelta` with phases;
+  `axis_source` is not forwarded), so `Gesture::Scroll`'s `ScrollSource` is `Wheel` or `Finger`
+  only; shell-host reads `axis_source` itself (`use_wheel`) and tells `Continuous` apart.
+- **What a window can learn of its screen on Wayland** (winit 0.31 beta): an output's size is its
+  current mode's pixels (not xdg-output's logical size, and unrotated by the output's
+  transform); a monitor's scale is the integer `wl_output` one, while `Window::scale_factor`
+  follows `wp_fractional_scale_v1`; `Window::current_monitor` is the output the surface entered;
+  there is no primary monitor; the compositor's exclusive zones are never sent to clients, so no
+  work area exists. `ds_blitz::ScreenArea` says which of these it used.
 
 ### Scrolling
 
