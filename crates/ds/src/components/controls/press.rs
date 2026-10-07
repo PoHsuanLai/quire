@@ -4,6 +4,7 @@
 //! middle one, and SNI's `ContextMenu(x, y)` and `Activate(x, y)` want the point.
 
 use crate::focus::click::kept_click;
+use crate::focus::press_focus::on_click;
 use dioxus::html::input_data::MouseButton;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
@@ -141,6 +142,7 @@ impl PressListeners {
     /// (`focus::click::kept_click`): the control has the keyboard afterwards.
     pub fn click(&self, event: &MouseEvent) {
         self.propagation.apply(event);
+        on_click(event);
         if let Some(button) = button_of(event.trigger_button()) {
             self.press.call(press_of(event, button));
         }

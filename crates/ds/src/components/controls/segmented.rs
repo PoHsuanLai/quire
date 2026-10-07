@@ -20,6 +20,7 @@ use crate::components::controls::choice::Choice;
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{ActivationKeys, activates, disabled, use_pressing};
 use crate::components::controls::segmented_thumb::{SEGMENT_PX, ThumbOver, group_style, index_of};
+use crate::focus::press_focus::on_click;
 use crate::root::common::Common;
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::*;
@@ -234,6 +235,7 @@ fn Segment<T: Clone + PartialEq + 'static>(
                 }
             },
             onclick: move |event| {
+                on_click(&event);
                 if live {
                     onpick.call(Touch::from_event(&event));
                 }

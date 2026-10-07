@@ -140,6 +140,7 @@ pub use ds_motion::symbol::effect::{
 pub use ds_motion::symbol::view::Symbol;
 
 // Host
+pub use crate::focus::press_focus::{FocusOnPress, FocusOnPressScope};
 pub use crate::host::document::DocumentHost;
 pub use crate::host::document::use_document_host;
 pub use crate::host::focused::Focused;

@@ -21,6 +21,7 @@
 //! [`ClickFocusHost::press`](crate::host::parts::ClickFocusHost::press) moves it now, inside the click, and a handler's own later focus (a
 //! `focus_soon`) still wins.
 
+use crate::focus::press_focus::{FocusOnPress, on_click};
 use crate::focus::soon::retry_busy;
 use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::fallback::Fallback;
@@ -63,6 +64,9 @@ impl ClickRoot {
 /// hear a click. Outside a `Ds` root, or with a host that has no click-focus part
 /// (`FocusFallback::BlitzDefault`, a server render, a shell's surface), it does nothing.
 pub fn kept_click(event: &MouseEvent) {
+    if on_click(event) == FocusOnPress::Refuses {
+        return;
+    }
     let Some(root) = try_consume_context::<ClickRoot>() else {
         return;
     };
