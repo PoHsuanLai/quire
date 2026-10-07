@@ -55,6 +55,16 @@ pub fn use_hover_intent() -> HoverDriver {
     }
 }
 
+/// [`use_hover_intent`] where a hub may be missing (a control drawn outside a `Ds`): `None` then.
+pub fn try_use_hover_intent() -> Option<HoverDriver> {
+    let anchors = use_anchors();
+    Some(HoverDriver {
+        hub: try_consume_context::<HoverHub>()?,
+        anchors,
+        stack: try_use_context::<Signal<LayerStack>>(),
+    })
+}
+
 impl HoverDriver {
     /// The pointer came over `key`'s target, a hover interface waiting by `profile`, placed
     /// against `anchor`. While a peek, the palette or a menu is open no card opens (`S:1790`); a

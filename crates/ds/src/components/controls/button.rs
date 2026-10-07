@@ -55,7 +55,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// `value` makes it a toggle button: `Check::On` draws it pressed in (`aria-pressed`). `shown`
 /// says whether the menu or panel this button opens is up (`aria-expanded`); leave it `None` on a
 /// button that opens nothing. `title` is the hover hint: a Mac tooltip through the hover hub
-/// (`button_tip`), drawn as a hint below the button; inside a `Tooltip` it draws nothing (the
+/// (`button_tip`), drawn below the button from the button's own pointer events, with no wrapper; inside a `Tooltip` it draws nothing (the
 /// caller's tip stands), and outside a `Ds` it is the plain `title` attribute.
 ///
 /// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an
@@ -128,7 +128,7 @@ pub fn Button(
         },
     ));
     let tip = use_tip(title);
-    let face = rsx! {
+    rsx! {
         button {
             r#type: "button",
             id: common.id.clone(),
@@ -150,7 +150,21 @@ pub fn Button(
             disabled: disabled(availability),
             "data-pressed": if live { pressing.attr() } else { None },
             onmousedown: move |event| pressing.pointer_down(&event),
-            onmouseleave: move |_| pressing.released(),
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| {
+                    tip.out();
+                    pressing.released();
+                }
+            },
             onkeydown: move |event| {
                 if live {
                     pressing.key_down(&event, keys);
@@ -177,11 +191,15 @@ pub fn Button(
             },
             // The element, for a menu or popover anchored to it (`Anchor::Mounted`). No
             // attribute: the markup is the same with or without a handler.
-            onmounted: move |event| {
-                if focus == ButtonFocus::OnMount {
-                    focus_soon(event.data());
+            onmounted: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.mounted(&event);
+                    if focus == ButtonFocus::OnMount {
+                        focus_soon(event.data());
+                    }
+                    common.mounted(event);
                 }
-                common.mounted(event);
             },
             // The consumer's own `data-*`, last: a spread follows the named attributes.
             ..data,
@@ -215,8 +233,8 @@ pub fn Button(
                 {trailing_mark(mark, glyph)}
             }
         }
-    };
-    tip.wrap(face)
+        {tip.surface()}
+    }
 }
 
 /// `icon` at `size`; a quire glyph under `IconSwap::CrossFade` fades into the next one it is

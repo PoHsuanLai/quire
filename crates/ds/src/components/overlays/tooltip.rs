@@ -85,7 +85,7 @@ pub fn Tooltip(
 pub(crate) struct Hinted;
 
 /// The hover key a hint files its target under: its own, so two hints never share a card.
-fn own_key() -> HoverKey {
+pub(crate) fn own_key() -> HoverKey {
     HoverKey(format!("hint:{}", current_scope_id().0))
 }
 
