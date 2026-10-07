@@ -28,6 +28,6 @@ pub use key::{
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
 pub use program::{
-    AppId, FilePath, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
+    AppId, FilePath, ForeignTables, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
 };
 pub use traits::{ListElement, SettingsRow, SettingsSchema, choice_of, kind_of, to_value};

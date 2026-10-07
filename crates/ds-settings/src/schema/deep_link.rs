@@ -56,6 +56,7 @@ mod tests {
             app: AppId("quire".to_owned()),
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,
+            foreign: Default::default(),
             key: keys,
         }
     }

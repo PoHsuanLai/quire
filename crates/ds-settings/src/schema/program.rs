@@ -23,12 +23,36 @@ pub struct AppId(pub String);
 #[serde(transparent)]
 pub struct FilePath(pub String);
 
+/// The top-level tables of a program's settings file that the program owns but that are not
+/// settings (an engine list, a probe table): the Settings app and detent's unknown-key check
+/// leave every key under them alone (design/22-SETTINGS.md section 9.2). Empty for most files,
+/// and then not written.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct ForeignTables(pub Vec<String>);
+
+impl ForeignTables {
+    /// Whether `path` (a dotted key path: `engines.local.cmd`) sits under one of these tables.
+    pub fn holds(&self, path: &str) -> bool {
+        let first = path.split('.').next().unwrap_or(path);
+        self.0.iter().any(|table| table == first)
+    }
+
+    fn is_empty(&self) -> bool {
+        self.0.is_empty()
+    }
+}
+
 /// One program's whole schema, as `<app-id>.settings.toml` ships it (section 9.2).
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct Schema {
     pub app: AppId,
     pub file: FilePath,
     pub version: u16,
+    /// `foreign = ["engines", "probe"]`: the file's tables that are the program's own data,
+    /// not settings. Absent in the TOML means none.
+    #[serde(default, skip_serializing_if = "ForeignTables::is_empty")]
+    pub foreign: ForeignTables,
     /// One `[[key]]` table per entry, TOML's array-of-tables (section 9.2).
     pub key: Vec<KeySpec>,
 }
@@ -171,6 +195,7 @@ mod tests {
             app: AppId("quire".to_owned()),
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,
+            foreign: Default::default(),
             key: vec![crate::schema::KeySpec {
                 path: KeyPath("appearance.theme".to_owned()),
                 kind: KeyKind::Segmented {
@@ -365,5 +390,44 @@ mod tests {
         let schema = sample();
         let args = vec!["quire".to_owned(), "--write-schema".to_owned()];
         assert!(maybe_write_schema(&schema, &args).is_err());
+    }
+}
+
+#[cfg(test)]
+mod foreign_tests {
+    use super::{ForeignTables, Schema};
+
+    #[test]
+    fn foreign_tables_round_trip_and_are_left_out_when_empty() {
+        let text = "app = \"inferd\"\nfile = \"inferd/inferd.toml\"\nversion = 1\nforeign = [\"engines\", \"probe\"]\nkey = []\n";
+        let schema = Schema::from_toml(text).expect("parses");
+        assert_eq!(
+            schema.foreign,
+            ForeignTables(vec!["engines".to_owned(), "probe".to_owned()])
+        );
+        assert!(
+            schema
+                .to_toml()
+                .contains("foreign = [\"engines\", \"probe\"]")
+        );
+        let plain = Schema {
+            foreign: ForeignTables::default(),
+            ..schema
+        };
+        assert!(!plain.to_toml().contains("foreign"));
+    }
+
+    #[test]
+    fn a_path_is_held_by_its_first_segment_only() {
+        let foreign = ForeignTables(vec!["engines".to_owned()]);
+        let cases = [
+            ("engines", true),
+            ("engines.local.cmd", true),
+            ("engine.local", false),
+            ("probe.engines", false),
+        ];
+        for (path, held) in cases {
+            assert_eq!(foreign.holds(path), held, "{path}");
+        }
     }
 }

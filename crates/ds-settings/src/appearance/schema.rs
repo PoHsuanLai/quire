@@ -1,7 +1,7 @@
 //! The schema of `quire/appearance.toml`, as quire ships it (design/22-SETTINGS.md section 9.2).
 
 use super::settings::{AppearanceSettings, IconsSettings};
-use crate::schema::{AppId, FilePath, Schema, SettingsSchema};
+use crate::schema::{AppId, FilePath, ForeignTables, Schema, SettingsSchema};
 
 /// `quire.settings.toml`: the keys of `appearance.toml`, the `appearance` and `icons` domains
 /// in one schema. quire has no program of its own, so `examples/write_schema.rs` writes it
@@ -11,6 +11,7 @@ pub fn quire_schema() -> Schema {
         app: AppId("quire".to_owned()),
         file: FilePath("quire/appearance.toml".to_owned()),
         version: 1,
+        foreign: ForeignTables::default(),
         key: [AppearanceSettings::schema(), IconsSettings::schema()]
             .into_iter()
             .flat_map(|schema| schema.key)

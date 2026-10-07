@@ -1168,6 +1168,11 @@ install. quire's own schema (`quire.settings.toml`: the `appearance` and `icons`
 `quire/appearance.toml`) has no app binary, so it is written by the `ds-settings` example
 `write_schema` (`cargo run -p ds-settings --example write_schema -- --write-schema <dir>`). A schema without a program (a stale file) is skipped with a warning.
 
+A settings file can hold tables the program owns that are not settings (inferd's `[engines]`,
+`[probe]`, `[callers]`). The schema names them in an optional top-level `foreign = ["engines",
+"probe", "callers"]` (`Schema::foreign`, `ForeignTables`): the Settings app shows no rows for
+them and an unknown-key check (detent's) leaves every key under them alone. Absent means none.
+
 A `Rows` key is one `[[key]]` table whose `kind` carries one `[[key.kind.v.columns]]` table
 per column (`kind` = `"text"` or `"choice"`; `pattern` is absent when there is none), and whose
 `default` is the list of default rows:

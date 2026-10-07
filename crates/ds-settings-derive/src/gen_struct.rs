@@ -94,6 +94,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                     app: ::ds_settings::schema::AppId(#app.to_owned()),
                     file: ::ds_settings::schema::FilePath(#file.to_owned()),
                     version: 1,
+                    foreign: ::ds_settings::schema::ForeignTables::default(),
                     key,
                 }
             }
