@@ -151,6 +151,16 @@ impl Float {
         }
     }
 
+    /// Start from an anchor rect the caller already has (a button's, kept by the frame phase), so
+    /// a mounted anchor needs no wait: the surface is placed in its first frame.
+    pub(crate) fn known(&self, rect: Option<Rect>) {
+        let mut slot = self.anchor;
+        let unset = slot.peek().is_none();
+        if let (Some(rect), true) = (rect, unset) {
+            slot.set(Some(rect));
+        }
+    }
+
     /// Read a mounted anchor once layout has run.
     fn measure(&self, element: MountedRef) {
         let slot = self.anchor;
