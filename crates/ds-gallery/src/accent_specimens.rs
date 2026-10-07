@@ -1,7 +1,6 @@
 //! What the accent sheet draws (`accent_sheet.rs`): the paint the settled band lends, and the
 //! surfaces.
 
-use crate::pages::shell::calendar::month_sample::{AUGUST, First, month as lay_out};
 use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
@@ -13,9 +12,6 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
 use ds::style::tokens::accent_table::accent_of;
 use ds::style::tokens::shape::{Corner, Radius};
-use ds_shell::month_grid::data::DayKey;
-use ds_shell::prelude::*;
-use ds_shell::tokens::widgets::WidgetMetrics;
 
 /// The colours an accent lends its surfaces, as CSS.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -95,7 +91,6 @@ fn theme_of(scheme: Scheme) -> Theme {
 #[component]
 pub fn Specimens(scheme: Scheme) -> Element {
     let paint = Paint::of(Accent::Blue, scheme);
-    let vars = paint.vars();
     let material_vars = paint.material_vars();
     let wall = format!("background-image:url(\"{}\")", wallpaper::calm_uri(scheme));
     let summary = format!(
@@ -119,19 +114,6 @@ pub fn Specimens(scheme: Scheme) -> Element {
                 }
                 Ds {
                     appearance: Appearance { theme: theme_of(scheme), ..Appearance::default() },
-                    material: Material::Widget,
-                    stylesheet: Inject::Host,
-                    chrome: Some(RootChrome::Transparent),
-                    div { style: WidgetMetrics::default().style_attr(),
-                        WidgetFrame { size: WidgetSize::Small,
-                            div { style: "{vars}",
-                                MonthGrid { data: lay_out(AUGUST, First::Monday, TODAY, &BUSY), onstep: |_| {} }
-                            }
-                        }
-                    }
-                }
-                Ds {
-                    appearance: Appearance { theme: theme_of(scheme), ..Appearance::default() },
                     material: Material::Sheet,
                     stylesheet: Inject::Host,
                     chrome: Some(RootChrome::Transparent),
@@ -147,25 +129,7 @@ pub fn Specimens(scheme: Scheme) -> Element {
     }
 }
 
-const TODAY: DayKey = DayKey {
-    year: 2026,
-    month: 8,
-    day: 14,
-};
-const BUSY: [DayKey; 2] = [
-    DayKey {
-        year: 2026,
-        month: 8,
-        day: 5,
-    },
-    DayKey {
-        year: 2026,
-        month: 8,
-        day: 27,
-    },
-];
-
-/// The controls, the menu, the rows and the tiles, on the popover panel.
+/// The controls, the menu and the rows, on the popover panel.
 #[component]
 fn Controls() -> Element {
     let views: Vec<(u8, String)> = ["Day", "Week", "Month"]
@@ -203,10 +167,6 @@ fn Controls() -> Element {
                 span { "Priya Raman" }
                 span { class: "g-acc-sub", "Re: the accent band" }
             }
-        }
-        ModuleGrid { padding: Px(0.0),
-            ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {} }
-            ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "Off", value: Check::Off, onclick: |_| {} }
         }
     }
 }

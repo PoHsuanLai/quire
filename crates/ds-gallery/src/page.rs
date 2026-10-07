@@ -21,7 +21,7 @@ pub enum Page {
     Forms,
     /// Menus, menu items and pop-up buttons.
     Menus,
-    /// Stepper, DatePicker, Table, Toolbar, SplitView, Sidebar, TabView, FieldRow and FieldGroup,
+    /// Stepper, Table, Toolbar, SplitView, Sidebar, TabView, FieldRow and FieldGroup,
     /// the MenuBar model, the drag image and the window titlebar, in every state (design/30
     /// sections 2.1 to 2.7).
     Structure,
@@ -30,7 +30,7 @@ pub enum Page {
     SettingsWindow,
     /// Popovers, hover cards, tooltips, toast, scrim, sheet, peek, palette.
     Overlays,
-    /// Popover, sheet, alert, side panel, tooltip, dock label, hover card, toast, empty state and
+    /// Popover, sheet, alert, side panel, tooltip, hover card, toast, empty state and
     /// skeleton, in every state (design/30 sections 2.5 and 2.9).
     Feedback,
     /// App features: pinned tiles, Today tabs, the edge-peek sidebar, the link pill, grouped
@@ -49,28 +49,12 @@ pub enum Page {
     Matrix,
     /// Fire each animation; the Rust `settle` beside the CSS declaration.
     MotionLab,
-    /// The shell chrome beside the macOS numbers it targets.
-    ChromeTargets,
     /// The edit surface over an app's own text, with the caret the app draws from its rect.
     Edit,
-    /// The level control's three looks and the OSD card that carries it.
-    Level,
-    /// The widgets in their flat, bright look: the battery and the world clock, with the Space
-    /// tint on the card.
-    WidgetLooks,
-    /// The widgets posed as the reference screenshots, at their size, for side-by-side proof.
-    WidgetReference,
-    /// The shell's own lock screen, polkit prompt and app switcher (M11).
-    #[word(slug = "lock")]
-    LockSwitcher,
-    /// Animated emoji: the set, sizes and discs.
-    Emoji,
     /// The small-state details: every primitive of design/26 with a replay button.
     Details,
     /// The voice orb: the three demo variants and a size ladder over every metric threshold.
     VoiceOrb,
-    /// The shell-only components rebuilt on the survivors, each in every state (design/30 section 2.10).
-    Shell,
     /// Symbol effects: every effect on a few icons, with a button for each `Once` effect and a
     /// toggle for each `While` one (design/35-SYMBOL-EFFECTS.md).
     Symbols,

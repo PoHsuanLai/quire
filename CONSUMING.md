@@ -30,8 +30,8 @@ this). A shell that runs zbus on tokio everywhere enables `ds-settings = { featu
 deliberately.
 
 **Imports.** `use ds::prelude::*;` brings in the names an app draws with (the root, the appearance
-axes, the vocabulary, geometry, icons, the overlays, lists, fields and the common controls); a shell
-program adds `use ds_shell::prelude::*;`. The crate roots hold nothing else but the stylesheet
+axes, the vocabulary, geometry, icons, the overlays, lists, fields and the common controls); an app
+that shows account sheets or the missing-helper sheet adds `use ds_shell::prelude::*;`. The crate roots hold nothing else but the stylesheet
 assembly (`ds::stylesheet()`, `ds::kits()`, `ds::component_sheets()`, `ds::KIT`, `ds::selectors`, and
 the same four in `ds_shell`) and the three facades. Every other name is reached by its home path
 (`ds::components::..`, `ds::host::..`, `ds::stack::..`, `ds::style::..`, `ds::base::..`,
@@ -48,7 +48,7 @@ path, the way `examples/consumer/Cargo.toml` does:
 ds          = { path = "../quire/crates/ds" }
 ds-settings = { path = "../quire/crates/ds-settings", features = ["dioxus"] }  # `dioxus`: `use_environment`; `tokio`: zbus on tokio
 ds-blitz    = { path = "../quire/crates/ds-blitz" }    # only if you run on Blitz; features `pdf`, `print`, `spell`
-ds-shell    = { path = "../quire/crates/ds-shell" }    # only a shell program: the bar, dock, widgets, lock screen
+ds-shell    = { path = "../quire/crates/ds-shell" }    # only an app that shows the account sheets, the consent alert or the missing-helper sheet
 
 [dev-dependencies]
 ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
@@ -56,16 +56,19 @@ ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harne
 ```
 
 The crates and what each holds: `ds` (the components, the `Ds` root, the host seams, the facades),
-`ds-shell` (shell components and widgets), `ds-settings` (settings files, the schema derive, the
+`ds-shell` (the app-facing parts above `ds`: account sheets, consent alert, missing-helper sheet; every one cross-platform), `ds-settings` (settings files, the schema derive, the
 portal, `use_environment`), `ds-blitz` (the Blitz host: `launch`, windows, PDF, print, spell),
 `ds-lint` (the linter), `ds-harness` (the test driver). `ds-core`, `ds-style` and `ds-motion` sit
 under `ds` and are reached as `ds::base`, `ds::style` and `ds::motion`. `ds-conformance` and
 `ds-gallery` are quire's own tests and contact sheet (section 9), not for consumers.
 
 The linter is its own crate, `ds-lint` (coherence rules 1 and 2, section 5 below), so a consumer
-that never lints does not pull in `cssparser`. The shell's parts are `ds-shell`, which a shell
+that never lints does not pull in `cssparser`. The app-facing parts are `ds-shell`, which an app
 depends on next to `ds` and draws with `Ds { sheet: Some(ds_shell::stylesheet()) }`; it lints
-against `ds_shell::kits()` where an app lints against `ds::kits()`.
+against `ds_shell::kits()` where an app that takes `ds` alone lints against `ds::kits()`. The
+surfaces only our desktop shell draws (bar, dock, control center, lock, switcher, OSD,
+notifications, widgets, emoji, month grid, date picker) are not quire's: they are sill's
+`sill-shell-kit`, which adds its own kit and `stylesheet()` over these.
 
 **A git dependency** is how a program outside this checkout takes quire, from a tag:
 
@@ -288,7 +291,7 @@ fn App() -> Element {
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
-| `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; a shell passes `Some(ds_shell::stylesheet())` |
+| `sheet` | `Option<&'static str>` | `None`: `ds::stylesheet()` | the text `Inject::Inline` writes; an app that takes `ds-shell` passes `Some(ds_shell::stylesheet())` |
 | `typeface` | `Option<Typeface>` | `None`: the appearance's own | overrides the appearance's typeface for this root |
 | `user_style` | `ReadSignal<UserStyle>` | empty | the person's own stylesheet, drawn after the design system's, unlayered (section 12) |
 | `surface` | `Option<&'static str>` | `None` | stamped as `data-surface`, the name a user stylesheet selects this root by |
@@ -1122,7 +1125,7 @@ For a bar (FINDINGS "Bar gaps"):
   shadow on its own box (`data-chrome="transparent"`); the `.ds-popover`/`.ds-menu` and
   `.ds-sheet` cards inside paint the material's tint (`--m-tint` over blur, `--m-tint-solid`
   without), edge and drop (`--m-box`). A popup document keeps `Material::Popover` and its
-  spare room is alpha 0 (`crates/ds-conformance/tests/bar_frame.rs` proves it over
+  spare room is alpha 0 (sill's `sill-shell-kit/tests/bar_frame.rs` proves it over
   `Harness::render_over(Backdrop::Clear)`).
 - **The frame ground (target (clean-up phase): removed with the frame model; the `--f-*` inks go).** Under `data-ground="frame"` (a Bar or Dock root, or `Surface { on:
   Some(Ground::Frame) }`) `--ink`, `--ink-soft`, `--ink-faint` are the Space's `--f-ink*`,
@@ -1130,7 +1133,7 @@ For a bar (FINDINGS "Bar gaps"):
   `--f-line`: `Button`, `Chip`, `Badge`, a menu's trigger and your text all draw in
   the frame inks with no variant of their own. Overlays opened from it (menus, popovers,
   tooltips) are paper again.
-- **Status items.** `ds_shell::prelude::MenuBarItem { image: ImagePosition::Only, icon, label, .. }` is a square of
+- **Status items.** sill's `MenuBarItem { image: ImagePosition::Only, icon, label, .. }` (`sill_shell_kit::prelude`) is a square of
   `--bar-status-box` holding its glyph (or external icon) at `--bar-status-glyph`,
   `--f-ink-soft` at rest, `--f-ink` on `--f-pill-hover` under the pointer, `--f-pill` when
   `value` is `On` or `shown` is `Visible`. Write the two properties on any element around your items

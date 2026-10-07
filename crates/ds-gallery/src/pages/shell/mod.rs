@@ -1,17 +1,3 @@
 pub mod accounts;
 pub mod app_features;
-pub mod calendar;
-pub mod chrome_targets;
-pub mod components;
-pub mod control_center;
-pub mod dock_tiles;
 pub mod helpers;
-pub mod level;
-pub mod level_tile;
-pub mod lock_switcher;
-pub mod status_items;
-pub mod widget_blur;
-pub mod widget_edit;
-pub mod widget_looks;
-pub mod widget_reference;
-pub mod widgets;

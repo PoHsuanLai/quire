@@ -254,7 +254,7 @@ low tone follows `BatteryState::is_low`; the arc follows its level with the prog
 | Part | Drawing | From |
 | --- | --- | --- |
 | Track | a full circle, stroke .093 of the ring (9.3 in the 100 box), round caps, `--battery-track`; while charging, the circle less the bolt's gap | M6, M8 |
-| Arc | clockwise from twelve as far as the level, the same stroke, round caps, `--battery-fill`; `--battery-low` at a fifth or less (`data-tone` `low` at 20 % or less, `critical` at 10 % or less, both red); charging is never low; the path is computed in Rust (`ds-shell/battery/ring.rs`), no transition (O-20) | M7, M9, M10 |
+| Arc | clockwise from twelve as far as the level, the same stroke, round caps, `--battery-fill`; `--battery-low` at a fifth or less (`data-tone` `low` at 20 % or less, `critical` at 10 % or less, both red); charging is never low; the path is computed in Rust (`sill-shell-kit/battery/ring.rs`), no transition (O-20) | M7, M9, M10 |
 | Device | the caller's glyph centred at .47 of the ring, `--ink` | M12 |
 | Bolt | while charging: a bolt .16 of the ring tall and .10 wide, `--ink`, centred on the stroke at twelve; the track and the arc leave a 29 degree gap between their ends' centres (17 between the caps) and the arc fills the rest | M11 |
 
@@ -398,7 +398,7 @@ slot), a unit of margin inside the 24 box like Lucide's own, no outline and no s
 and no traced copy of the reference's symbols (`08-ICONS.md` rules: abstract, not realistic).
 The set: `Laptop`, `Desktop`, `Phone`, `Tablet`, `Watch`, `Headphones`, `Earbuds`, `Mouse`,
 `Keyboard`, `Speaker`, `Gamepad`, `Other` (a cell with its terminal). The geometry is data
-(`ds-shell/battery/device_forms.rs`) and a test keeps every piece on the grid. In a ring the glyph is
+(`sill-shell-kit/battery/device_forms.rs`) and a test keeps every piece on the grid. In a ring the glyph is
 .47 of the ring, `--ink` (M12). Small glyphs elsewhere (16-24 px in lists) keep Lucide's stroke.
 
 ## 5. Calendar widget (research and specification only; queued)

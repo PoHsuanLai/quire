@@ -1,41 +1,18 @@
-//! Shell surfaces' parts: the lock and polkit prompts, the app switcher, the bar and dock pieces,
-//! the OSD, control-center modules, notifications, thumbnails, now playing, the idle dim, the Space
-//! editor, the user's picture, animated emoji, the month grid, clocks, batteries, and the desktop
-//! widgets with their catalog, over `ds` (the generic components and the document seam), and the
-//! shell's own tokens and sheets, which `kits()` and `stylesheet()` add to the design system's.
+//! The app-facing parts that sit above `ds`: the account sheets and the consent alert, the
+//! missing-helper sheet, the confirm card, with their sheets, which `kits()` and `stylesheet()` add
+//! to the design system's. Every part is cross-platform: an app takes this crate for them. The
+//! surfaces only our desktop shell draws (bar, dock, control center, lock, switcher, OSD,
+//! notifications, widgets and the rest) live in sill's `sill-shell-kit`.
 
 pub mod accounts;
-pub mod bar;
-pub mod battery;
-pub mod catalog;
-pub mod clock;
 pub mod confirm;
-pub mod control_center;
-pub mod date_picker;
-pub mod dock;
-pub mod emoji;
 pub mod helpers;
-pub mod idle_dim;
-pub(crate) mod kept;
 pub(crate) mod kit;
-pub mod lock;
-pub mod month_grid;
-pub mod notifications;
-pub mod now_playing;
-pub mod osd;
 pub(crate) mod sheets;
 #[cfg(test)]
-mod stored_words;
-pub mod switcher;
-pub mod thumbs;
-pub mod tokens;
-pub mod user_picture;
-#[cfg(test)]
 mod vocabulary_tests;
-pub mod widget;
 
 pub mod prelude;
 
-// The curated roots: the shell's stylesheet assembly. Every other name is in `prelude` or at its
-// home path.
+// The curated roots: the stylesheet assembly. Every other name is in `prelude` or at its home path.
 pub use crate::kit::{KIT, component_sheets, kits, stylesheet};

@@ -14,7 +14,6 @@ use ds::style::appearance::blur::BlurState;
 use ds::style::icon::render::Glyph;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::status::StatusMetrics;
-use ds_shell::prelude::*;
 
 /// Which surface wears each material (design/20-SURFACES.md section 3's table).
 fn wearer(material: Material) -> &'static str {
@@ -121,8 +120,6 @@ fn Panel(material: Material) -> Element {
                 span { class: "g-name", "Files" }
                 span { class: "g-code", "{state}" }
                 span { class: "g-spacer" }
-                MenuBarItem { image: ImagePosition::Only, icon: Icon::Wifi, label: "Wi-Fi", onclick: |_| {} }
-                MenuBarItem { image: ImagePosition::Only, icon: Icon::BatteryFull, label: "Battery", shown: Shown::Visible, onclick: |_| {} }
                 span { class: "ds-tabular", "09:41" }
             }
         },

@@ -11,6 +11,7 @@ pub mod colour;
 pub mod control_size;
 pub(crate) mod curve;
 pub mod delay;
+pub mod dock_floor;
 pub mod easing;
 pub mod elevation;
 pub mod emoji_face;

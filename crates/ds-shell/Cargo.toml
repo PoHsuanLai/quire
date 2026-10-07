@@ -1,6 +1,6 @@
 [package]
 name = "ds-shell"
-description = "The design system's shell parts: lock, switcher, bar, control center, notifications, OSD, clocks, batteries, emoji and the desktop widgets, with the shell's tokens and sheets."
+description = "The design system's app-facing parts above ds: the account sheets and consent alert, the missing-helper sheet and the confirm card, with their sheets."
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -15,9 +15,6 @@ ds-motion = { workspace = true, features = ["dioxus"] }
 ds-style = { workspace = true, features = ["dioxus"] }
 dioxus = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
-thiserror = { workspace = true }
-image = { workspace = true }
 
 [lints]
 workspace = true

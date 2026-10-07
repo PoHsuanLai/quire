@@ -13,7 +13,6 @@ use ds::prelude::*;
 use ds::root::chrome::FrameTint;
 use ds::style::space::look::CardAccent;
 use ds::style::space::presets::default_look;
-use ds_shell::prelude::*;
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";
@@ -66,13 +65,7 @@ fn InPopover(theme: Theme) -> Element {
                 chrome: Some(RootChrome::Painted),
                 frame: Some(FrameTint::Tinted),
                 div { class: "g-alert-cc-body",
-                    ModuleGrid { padding: Px(0.0),
-                        ModuleTile { glyph: Icon::Wifi, title: "Wi-Fi", status: "Home", value: Check::On, onclick: |_| {}, on_detail: |_| {} }
-                        ModuleTile { glyph: Icon::Bluetooth, title: "Bluetooth", status: "On", value: Check::On,
-                            onclick: move |_| open.set(true), on_detail: |_| {} }
-                        ModuleTile { glyph: Icon::Moon, title: "Focus", status: "Off", value: Check::Off, onclick: |_| {} }
-                        ModuleTile { glyph: Icon::Link, title: "Hotspot", status: "Off", value: Check::Off, onclick: |_| {} }
-                    }
+                    Button { label: "Bluetooth", onclick: move |_| open.set(true) }
                     if open() {
                         Alert {
                             title: TITLE,

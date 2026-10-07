@@ -25,7 +25,6 @@ pub fn DetailsPage() -> Element {
         StateSection {}
         MorphSection {}
         crate::pages::details::status::StatusSection {}
-        crate::pages::details::center::CenterSection {}
     }
 }
 

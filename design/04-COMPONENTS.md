@@ -3357,7 +3357,7 @@ and `svg.ds-clock-pin`. Every vector is on `currentColor` with `data-ds-svg`. Di
 `--font-display` 800 tabular (`09:41`, `09:41:07` with seconds), at `--fs-widget-hero` in a Small
 frame and `--fs-subject` elsewhere, bumping on each new minute; a sun (`svg.ds-clock-sun`,
 `--warn`) or moon (`svg.ds-clock-moon`, `--ink-faint`) before the city. The hand angles are pure
-(`ds-shell/clock/angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
+(`sill-shell-kit/clock/angles.rs`): hour `30 x (h mod 12) + m / 2 + s / 120` degrees, minute `6 x m + s / 10`,
 second `6 x s`.
 
 **BatteryLevel**. `BatteryLevel { level:
@@ -3366,7 +3366,7 @@ Fraction, mark: RingMark::{Plain, Charging}, label: Text, wake: WakeStamp, child
 full circle in `--battery-track`; `svg.ds-battery-arc`, clockwise from twelve as far as the level
 in `--battery-fill`, `--battery-low` at or under 20 % (`data-tone` `low`, and `critical` at or
 under 10 %, the same red); charging is never low; stroke .093 of the ring, round caps, the path
-computed in Rust (`ds-shell/battery/ring.rs`). `children` (the device glyph) sit centred in
+computed in Rust (`sill-shell-kit/battery/ring.rs`). `children` (the device glyph) sit centred in
 `span.ds-battery-device` at .47 of the ring. `Charging` (`data-mark="charging"`) cuts a gap at
 twelve in both strokes and sets `svg.ds-battery-bolt` in it once the fill has arrived. The
 percentage is the caller's (design/23 section 4.1), counted in step with the fill by
@@ -3610,7 +3610,7 @@ steadily; Wince swaps in `EmojiId::WRONG` (confounded) once through, Happy `Emoj
 still (design/25 section 5). Reduced motion, or `playback: EmojiPlayback::Still` (a picker's
 grid): still frames only.
 
-**Tests.** `ds-shell/tests/emoji_ssr.rs` (goldens, lint), `ds-shell/emoji/tests.rs` (sheets,
+**Tests.** `sill-shell-kit/tests/emoji_ssr.rs` (goldens, lint), `sill-shell-kit/emoji/tests.rs` (sheets,
 manifest, the script's idle rule, the mood mapping), `ds-conformance/tests/emoji_animation.rs` (frames
 advance, rest at 21 s, idle's rests, the wince swap, each mood as a `UserPortrait`, Reduced).
 
@@ -3654,7 +3654,7 @@ click or an arrow key (the emoji grid's `grid_step`: Left and Right wrap rows, U
 inside) calls `onpick` with the new choice; `choice` is the caller's and marks one cell (none for
 `Auto` or `Photo`). Nothing in the picker plays.
 
-**Tests.** `ds-shell/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
+**Tests.** `sill-shell-kit/tests/user_picture_ssr.rs` (goldens of the letter, the emoji at rest, the photo
 and the picker; lint; the serde round trip; the `resolve_picture` table), `ds/src/components/
 user_picture/picker.rs` (cells and marks), `ds-conformance/tests/lock_switcher.rs` (the emoji's moods
 in the lock prompt; the letter's beat).
@@ -4252,7 +4252,7 @@ frames, and so does a live settings edit that moves `level` while already dimmed
 never fades in either: it jumps straight to the level, the way `Sweep`'s own `Stand` plan does.
 Ends at 0 frames once landed (R3).
 
-**Tests.** `ds-shell/idle_dim/model.rs` (the plan table: waking and a settings edit always snap,
+**Tests.** `sill-shell-kit/idle_dim/model.rs` (the plan table: waking and a settings edit always snap,
 dimming fades except under Reduced); `ds-conformance/tests/idle_dim.rs` on `Clock::Virtual` (the fade
 lands on the level at `--t-idle-dim`, an input mid-fade snaps to zero at once, Reduced motion
 shows the level from its first frame, `assert_settles_to_zero_frames` once landed). CONSUMING.md

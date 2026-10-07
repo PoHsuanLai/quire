@@ -103,7 +103,6 @@ pub fn ListsPage() -> Element {
         crate::pages::lists::search::SearchRows {}
         crate::pages::lists::strip::StripPress {}
         crate::pages::lists::sidebar::Sidebar {}
-        crate::pages::lists::leaving::LeavingColumn {}
         Tiles {}
     }
 }

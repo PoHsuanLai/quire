@@ -19,7 +19,7 @@ pub fn App() -> Element {
     let now = axes();
     rsx! {
         Ds {
-            // The gallery shows shell parts too: the root draws with the shell's whole sheet.
+            // The root draws with ds-shell's sheet: the app-facing parts (accounts, confirm, helpers).
             sheet: Some(ds_shell::stylesheet()),
             appearance: now.appearance(),
             look: now.look.clone(),

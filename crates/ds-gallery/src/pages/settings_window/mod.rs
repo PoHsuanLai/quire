@@ -27,9 +27,6 @@ pub(crate) enum Category {
     Appearance,
     /// Brightness and the scale.
     Displays,
-    /// The date, the time and the clock's look.
-    #[word(slug = "date-time", label = "Date & Time")]
-    DateTime,
 }
 
 impl Category {
@@ -38,7 +35,6 @@ impl Category {
             Category::WiFi => Icon::Wifi,
             Category::Appearance => Icon::SunMoon,
             Category::Displays => Icon::Monitor,
-            Category::DateTime => Icon::Clock,
         }
     }
 }
@@ -73,7 +69,7 @@ fn sidebar_items(
         (
             "h-personal",
             "Personal",
-            &[Category::Appearance, Category::Displays, Category::DateTime],
+            &[Category::Appearance, Category::Displays],
         ),
     ];
     groups
@@ -146,7 +142,7 @@ pub fn SettingsWindowPage() -> Element {
         }
     };
     rsx! {
-        Section { title: "Settings window", note: "A System-Settings-like window from the catalogue's own parts: WindowTitlebar over a SplitView whose first pane is a Sidebar (search header, source list, folds on a spring from the toolbar's first button or a drag of the divider) and whose content is a Toolbar (back and forward walk the history) over FieldGroups of FieldRows with a Toggle, PopUpButton, SegmentedControl, RadioGroup, Slider, Stepper, Checkbox, TextField, DatePicker and a TabView.",
+        Section { title: "Settings window", note: "A System-Settings-like window from the catalogue's own parts: WindowTitlebar over a SplitView whose first pane is a Sidebar (search header, source list, folds on a spring from the toolbar's first button or a drag of the divider) and whose content is a Toolbar (back and forward walk the history) over FieldGroups of FieldRows with a Toggle, PopUpButton, SegmentedControl, RadioGroup, Slider, Stepper, Checkbox, TextField and a TabView.",
             div { class: "g-window",
                 div { class: "g-window-bar", WindowTitlebar { title: "System Settings" } }
                 div { class: "g-window-body",

@@ -20,6 +20,7 @@ use crate::space::{
 use crate::tokens::{
     chrome::ChromeToken,
     colour::ColourToken,
+    dock_floor::DockFloorToken,
     easing::EasingToken,
     elevation::Shadow,
     emoji_face::EmojiFace,
@@ -63,6 +64,7 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<SidebarRowSize>().at(Place::Ladder),
         TokenSet::of::<SidebarTileSize>().at(Place::Ladder),
         TokenSet::of::<ShellType>().at(Place::Metrics),
+        TokenSet::of::<DockFloorToken>().at(Place::Metrics),
         TokenSet::of::<PersonSwatch>().at(Place::Scale),
         TokenSet::of::<SpacingToken>().at(Place::Scale),
         TokenSet::of::<ChromeToken>().at(Place::Scale),

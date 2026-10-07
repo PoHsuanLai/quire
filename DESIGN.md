@@ -21,8 +21,9 @@ draws in, the tasks a scope owns; the scope, scale, task, busy and `Glyph` parts
 the keyframes, and `ds-motion/detail/`), `ds-lint` (the linter: strings in, offences out), `ds`
 (the host seams `host/`, `focus/`, `edit/`, `file_drop/`, `spell/`, `window/`, then `stack/`,
 `root/` and `components/`, and `assembly/` on top: the stylesheet's order, the one registration
-of every component sheet, and `Ds`), and `ds-shell` (the shell surfaces' parts, the widgets and
-their catalog, the shell's tokens and sheets). Inside `ds` the layers are directories named in
+of every component sheet, and `Ds`), and `ds-shell` (the app-facing parts above `ds`: the account sheets,
+the consent alert, the missing-helper sheet and their sheets; the shell surfaces' parts, the widgets
+and their catalog and the shell's tokens are sill's `sill-shell-kit`, see ARCHITECTURE.md section 3). Inside `ds` the layers are directories named in
 that order. `lib.rs` names `ds`'s public surface: `ds::prelude` and `ds_shell::prelude` hold what a
 consumer draws with, `ds::base`, `ds::style` and `ds::motion` re-export the three lower crates,
 and every other name is at its home path (the root keeps only the stylesheet assembly).
@@ -66,8 +67,8 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/tokens/elevation.rs` | 03-COLOR §10 (the four shadows; target (clean-up phase): the code still has about twelve), §17.2 |
 | `ds-style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `ds-style/tokens/layer.rs` | 01-LAYOUT §12 |
-| `ds-style/tokens/tuned.rs`, `ds-shell/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
-| `ds-shell/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `ds-shell/kit.rs` |
+| `ds-style/tokens/tuned.rs`, `sill-shell-kit/tokens/{shell_type,dock,osd,notifications,widgets}.rs` | 13-BEHAVIOUR §13.3.1, §13.3.3, §13.3.9 (the shell type scale, `ShellMetrics`); 10-BEHAVIOUR §10.3.1-10.3.2 (`DockMetrics`) | a tuned token (`kind = tuned`) is declared on `.ds` from an input a consumer writes inline, with the settings key's default behind it |
+| `sill-shell-kit/tokens/{shell_scale,control_center,widget_paint}.rs` | 29-SIZING §5, §7 (the bar's, menus' and control center's sizes on the ladder); 23-WIDGETS §2 (the widget paints) | the shell's fixed tokens, listed in `sill-shell-kit/kit.rs` |
 | `ds-style/css/shape_css.rs`, `ds-style/icon/{plate,family}.rs`, `ds-style/tokens/plate.rs` | 08-ICONS §2.1-2.5, §4.1 | `Corner::Squircle` (a six-layer mask; the shadow on the unmasked box), the plate (`PlateFamily` on `IconView`), the dock floor |
 | `ds-style/kit/blocks.rs`, `ds-style/css/{accents_css,materials_css}.rs` | the plan's token model and cascade order; `materials_css.rs` also writes `--m-box` and `--m-frame-alpha` and the root chrome rules (`data-frame=tinted`, `data-chrome=transparent` and its cards; FINDINGS "Bar gaps") |
 | `ds-style/css/ground_css.rs` | `archive/03-COLOR-arc.md` §4 (the frame inks; target (clean-up phase): deleted with the frame model); 04-COMPONENTS §19's sidebar item generalised: `data-ground=frame` redirects `--ink*`, `--surface*`, `--raise`, `--line*` to the `--f-*` inks and fills, and `.ds-overlay` under it takes the paper values back |
@@ -117,7 +118,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 `ds-core/vocab.rs` is 30-CATALOGUE 1.5, the shared state vocabulary (`Check`, `Shown`, `Availability`, `Selection`, `Emphasis`, `Muting`, `PressPhase`, `Dismiss`, `Activity`, `FocusStyle`, `InputModality`, `RowState`; with `ds-core/press.rs` and
 `ds-core/standard_action.rs`). Components sit in directories by concept: `components/{controls,
 fields,forms,menus,menus/palette,overlays,lists,content,chrome}` hold the general ones, `components/app`
-mail's own, and `ds-shell/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
+mail's own, and sill's `sill-shell-kit/` the shell surfaces' parts (`lock`, `switcher`, `bar`, `control_center`,
 `notifications`, `thumbs`, `now_playing`, `month_grid`, `clock`, `battery`, `emoji`,
 `user_picture`, `osd`, `idle_dim`, `dock`, `widget`). Every file is the
 section of 04-COMPONENTS with the same name, one `.rs` and `.css` pair each (the controls and fields of
@@ -140,7 +141,7 @@ selection, its own or the caller's, and the selected row's rect; FINDINGS "Launc
 §32, `edge_peek` (the old `edge_strip` §33), `today_tabs`, `space_switch`, `hover_open`, `drag_ghost` §34, `sync_halo` §35, and the macOS polish pass's `menu_bar_item` §36
 (13 §13.3.1, the bar's item button, title or glyph), `workspace_pills` §37 and `dock/` §38 (`DockTile`,
 `DockLabel`, `RunningDot`, `DockFloor`; 10 §10.3.2).
-The P2 components of 30-CATALOGUE 2.1 to 2.7: `fields/stepper/` (`Stepper`, `StepRange`, the hold-repeat machine), `fields/field_row` (`FieldRow`, `FieldGroup`), `fields/fact_list` (`FactList`, a read-only label and value list), `forms/` (design/34 sections 3.5 and 4: `Form` stacks `FormSection`s, a titled `--grp` group with a help footer, and `IconTile` is the 24 px tile or the circular avatar a grouped row leads with; `ListStyle::Grouped` is System Settings' inset list, `Inset` its alias for one release), `lists/table/` (`Table` over `List`, column widths), `lists/virtual_list/` (`VirtualList`, rows of one height or of a height per key windowed over a `Scroller`), `chrome/toolbar/` (`Toolbar`, the overflow rule), `chrome/capsule/` (`Capsule`, the floating pill of controls in the Osd material), `chrome/split_view/` (`SplitView`, its spring pane), `chrome/sidebar` (`Sidebar`), `chrome/tab_view` (`TabView`), `chrome/titlebar_parts` (subtitle, proxy icon, edited dot beside `WindowTitlebar`'s title), `controls/edge_grab` (the drag of a column edge or a divider), `menus/menu_bar` (`MenuBarModel`, data only), `menus/search/` (`SearchField`, a search `TextField` that owns its suggestions panel) and `overlays/drag_ghost` (`DragGhost` with its count badge); `ds-shell/date_picker/` is `DatePicker`, over the shell's `MonthGrid`.
+The P2 components of 30-CATALOGUE 2.1 to 2.7: `fields/stepper/` (`Stepper`, `StepRange`, the hold-repeat machine), `fields/field_row` (`FieldRow`, `FieldGroup`), `fields/fact_list` (`FactList`, a read-only label and value list), `forms/` (design/34 sections 3.5 and 4: `Form` stacks `FormSection`s, a titled `--grp` group with a help footer, and `IconTile` is the 24 px tile or the circular avatar a grouped row leads with; `ListStyle::Grouped` is System Settings' inset list, `Inset` its alias for one release), `lists/table/` (`Table` over `List`, column widths), `lists/virtual_list/` (`VirtualList`, rows of one height or of a height per key windowed over a `Scroller`), `chrome/toolbar/` (`Toolbar`, the overflow rule), `chrome/capsule/` (`Capsule`, the floating pill of controls in the Osd material), `chrome/split_view/` (`SplitView`, its spring pane), `chrome/sidebar` (`Sidebar`), `chrome/tab_view` (`TabView`), `chrome/titlebar_parts` (subtitle, proxy icon, edited dot beside `WindowTitlebar`'s title), `controls/edge_grab` (the drag of a column edge or a divider), `menus/menu_bar` (`MenuBarModel`, data only), `menus/search/` (`SearchField`, a search `TextField` that owns its suggestions panel) and `overlays/drag_ghost` (`DragGhost` with its count badge); `sill-shell-kit/date_picker/` is `DatePicker`, over the shell's `MonthGrid`.
 `user_picture` is a directory and 25-EMOJI section 7: `UserPicture`, `PictureSize`, the drawing the
 lock and polkit prompts share (`draw.rs`), `PictureChoice`/`resolve_picture` and `UserPicturePicker`.
 `emoji` is a directory and 25-EMOJI: `AnimatedEmoji`, `EmojiId`, `EmojiDisc`; the shipped sheets and
@@ -189,14 +190,14 @@ The shell-only settings of 22-SETTINGS (§3.4-3.14, `ShellFile`, `GesturesFile`,
 
 | Module | Implements | Notes |
 | --- | --- | --- |
-| `ds-shell/widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
-| `ds-shell/widget/timeline.rs`, `ds-shell/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::base::time::clock` (virtual in tests) |
-| `ds-shell/widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
-| `ds-shell/widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
-| `ds-shell/widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |
-| `ds-shell/widget/{battery,clock,calendar}.rs`, `ds-shell/widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
-| `ds-shell/widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
-| `ds-shell/widget/gallery.rs`, `ds-shell/widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
-| `ds-shell/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placed`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
-| `ds-shell/battery/device_glyph.rs`, `ds-shell/battery/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
-| `ds-shell/widget/slot.rs`, `ds-shell/widget/frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |
+| `sill-shell-kit/widget/contract.rs` | 23-WIDGETS §9.2 | `Widget` (one trait per kind), `WidgetKind`, `WidgetContext`, `NoIntent`, `fit` |
+| `sill-shell-kit/widget/timeline.rs`, `sill-shell-kit/widget/use_widget.rs` | 23-WIDGETS §9.2 | `Timeline`, `Dated`, `EntryDate`, `Refresh`, `RefreshAsk`, `REFRESH_FLOOR`; `use_widget` sleeps on `ds::base::time::clock` (virtual in tests) |
+| `sill-shell-kit/widget/card.rs` | 23-WIDGETS §9.3 | `WidgetCard`: the only way a widget is drawn; the card is `WidgetFrame`'s |
+| `sill-shell-kit/widget/registry.rs` | 23-WIDGETS §9.4 | `WidgetRegistry`, `WidgetInfo` (type-erased preview) |
+| `sill-shell-kit/widget/wire.rs` | 23-WIDGETS §9.5 | `WireTimeline`: the out-of-process format (the transport is not built) |
+| `sill-shell-kit/widget/{battery,clock,calendar}.rs`, `sill-shell-kit/widget/views.css` | 23-WIDGETS §4.1, §4.2, §5.2, §9.6 | quire's three widgets and their compositions |
+| `sill-shell-kit/widget/layout.rs` | 23-WIDGETS §9.7 | `WidgetLayout`, `WidgetAt`, `WidgetEdit`, `apply`, `first_free` |
+| `sill-shell-kit/widget/gallery.rs`, `sill-shell-kit/widget/gallery.css` | 23-WIDGETS §9.7 | `WidgetGallery` ("Edit Widgets"), `GalleryWords` |
+| `sill-shell-kit/catalog/placement.rs` | 23-WIDGETS §9.1 | `Placed`, `Placements`, `PlacementId`: placements as data, generic over kind, size and position |
+| `sill-shell-kit/battery/device_glyph.rs`, `sill-shell-kit/battery/device_forms.rs` | 23-WIDGETS §4.4 | `DeviceGlyph`, `Device`: the filled device set as data |
+| `sill-shell-kit/widget/slot.rs`, `sill-shell-kit/widget/frame.css` (lift) | 23-WIDGETS §9.8 | `WidgetSlotGuide`; `Lift` on the frame |

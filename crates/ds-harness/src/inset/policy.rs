@@ -106,11 +106,6 @@ pub const QUIRE_ALLOW: &[Allow] = &[
         reason: "a chip's capsule padding is `--s-7` (04-COMPONENTS.md section 10: `padding:1.5px 7px`)",
     },
     Allow {
-        when: &["ds-notification-count"],
-        min: Px(5.0),
-        reason: "the notification count capsule: `padding: 0 --s-5` (card.css)",
-    },
-    Allow {
         when: &["ds-scrubber-tooltip"],
         min: Px(6.0),
         reason: "the scrubber's time tooltip: `padding: --s-2 --s-6` (scrubber.css, 04-COMPONENTS.md section 22 tooltip)",
@@ -124,11 +119,6 @@ pub const QUIRE_ALLOW: &[Allow] = &[
         when: &["ds-send-pill"],
         min: Px(6.0),
         reason: "the send pill's trailing edge is `--s-6`: the consumer's PillAction button sits inside it (send_pill.css; 12 leading)",
-    },
-    Allow {
-        when: &["ds-module-tile"],
-        min: Px(7.0),
-        reason: "a Control Center tile ends in an 18 px chevron icon button: `padding-right: --s-4` plus the hairline, the 14 px glyph centred in the button (module_tile.css)",
     },
     Allow {
         when: &["ds-menu-item"],

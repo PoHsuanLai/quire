@@ -1059,4 +1059,4 @@ config. Positions and cells stay state (`$XDG_STATE_HOME/sill/desktop-widgets.js
   (0.2, 4.16, 5.2, 5.11, 5.12, 6.2).
 - Code (read-only): sill at `45f9af0`, re-read at master `0096872` for this revision (widget drag
   F880-F892, sill's saved-layout file, `size_of`, the tray model, `rank/sections.rs`, the keys test); quire `master` at `a2cbcb7a` and the `widget-interface`
-  worktree's uncommitted `crates/ds-shell/src/widget/`.
+  worktree's uncommitted `crates/sill-shell-kit/src/widget/`.

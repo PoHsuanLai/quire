@@ -21,7 +21,7 @@ pub struct Entry {
 }
 
 /// The pages, in the gallery's order.
-pub const REGISTRY: [Entry; 31] = [
+pub const REGISTRY: [Entry; 24] = [
     Entry {
         page: Page::Tokens,
         title: "Tokens",
@@ -53,7 +53,7 @@ pub const REGISTRY: [Entry; 31] = [
     Entry {
         page: Page::Lists,
         title: "Lists",
-        lede: "A live List: add rows, remove them with each exit and watch the rows below heal, then undo. Row with every accessory, leading element, height and state; section headers and disclosures; a source list at each sidebar size with an outline and drop places; a List of notification groups that clear, fold and heal by measured heights; search hits with a keyboard-shown strip, tiles, the hover strip and the appearance picker.",
+        lede: "A live List: add rows, remove them with each exit and watch the rows below heal, then undo. Row with every accessory, leading element, height and state; section headers and disclosures; a source list at each sidebar size with an outline and drop places; search hits with a keyboard-shown strip, tiles, the hover strip and the appearance picker.",
         height: 4800,
         body: crate::pages::lists::overview::ListsPage,
     },
@@ -74,14 +74,14 @@ pub const REGISTRY: [Entry; 31] = [
     Entry {
         page: Page::Structure,
         title: "Structure",
-        lede: "Stepper with its field and bare, DatePicker textual and graphical, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
+        lede: "Stepper with its field and bare, a sortable resizable Table, Toolbar with its overflow chevron, SplitView dragged and folded, Sidebar at each size, TabView, FieldRow and FieldGroup, the MenuBar model's menus, the drag image with its count badge and the window titlebar with its subtitle, proxy icon and edited dot.",
         height: 5900,
         body: pages::structure::StructurePage,
     },
     Entry {
         page: Page::SettingsWindow,
         title: "Settings window",
-        lede: "A System-Settings-like window from the catalogue's own parts: a titlebar over a SplitView of a Sidebar and the content, the content's Toolbar over FieldGroups of FieldRows holding a Toggle, PopUpButton, SegmentedControl, RadioGroup, Slider, Stepper, Checkbox, TextField, DatePicker and a TabView.",
+        lede: "A System-Settings-like window from the catalogue's own parts: a titlebar over a SplitView of a Sidebar and the content, the content's Toolbar over FieldGroups of FieldRows holding a Toggle, PopUpButton, SegmentedControl, RadioGroup, Slider, Stepper, Checkbox, TextField and a TabView.",
         height: 1100,
         body: pages::settings_window::SettingsWindowPage,
     },
@@ -95,7 +95,7 @@ pub const REGISTRY: [Entry; 31] = [
     Entry {
         page: Page::Feedback,
         title: "Overlays and feedback",
-        lede: "Popover under each dismiss policy and with its arrow, Sheet hung from the window, centred and at the bottom, the alerts, SidePanel, Tooltip and DockLabel up and down, hover cards, the toast, EmptyState in its three forms, Skeleton in its three shapes and as a row, the InlineBanner shown and hidden, and Loadable cycling Loading, Ready and Failed, each with the states it can express.",
+        lede: "Popover under each dismiss policy and with its arrow, Sheet hung from the window, centred and at the bottom, the alerts, SidePanel, Tooltip up and down, hover cards, the toast, EmptyState in its three forms, Skeleton in its three shapes and as a row, the InlineBanner shown and hidden, and Loadable cycling Loading, Ready and Failed, each with the states it can express.",
         height: 6600,
         body: crate::pages::overlays::catalogue::OverlaysCataloguePage,
     },
@@ -149,13 +149,6 @@ pub const REGISTRY: [Entry; 31] = [
         body: crate::pages::foundations::motion_lab::MotionLabPage,
     },
     Entry {
-        page: Page::ChromeTargets,
-        title: "Chrome targets",
-        lede: "The shell chrome beside the macOS numbers it targets: the material stack, a text menu and the menu-bar items, squircle corners, the dock pill and its plates, the launcher and the window shadow, each with the target printed under it; then the window frame with its traffic lights and the tiling menu open.",
-        height: 4250,
-        body: crate::pages::shell::chrome_targets::ChromeTargetsPage,
-    },
-    Entry {
         page: Page::Edit,
         title: "Edit",
         lede: "An EditSurface over an app's own paragraphs and a chip: the surface hands the app its input and reports geometry; the caret here is the page's own, drawn from the host's caret rect.",
@@ -163,44 +156,9 @@ pub const REGISTRY: [Entry; 31] = [
         body: crate::pages::editor::edit_surface::EditPage,
     },
     Entry {
-        page: Page::Level,
-        title: "Level",
-        lede: "The level control in its three looks for the user to choose from (capsule with the glyph inside, capsule and knob, sixteen segments), live and as a grid of states, and the OSD card at the top right that carries it.",
-        height: 2300,
-        body: crate::pages::shell::level::LevelPage,
-    },
-    Entry {
-        page: Page::WidgetLooks,
-        title: "Widget looks",
-        lede: "The widgets flat, bright and measured (design/23-WIDGETS.md section 2), every card drawn through the widget contract (WidgetCard, section 9) and tinted by the Space: the battery as bright rings with the filled device glyph inside and the percentage under each, the world clock as white day dials and dark night dials following the scheme; the calendar filling its card at every size; one card on the bare material for comparison; the filled device set; a widget picked up and the drop-slot guide; and Edit Widgets, the gallery over the registry that edits the placements the host keeps as data.",
-        height: 3560,
-        body: crate::pages::shell::widget_looks::WidgetLooksPage,
-    },
-    Entry {
-        page: Page::WidgetReference,
-        title: "Widget reference",
-        lede: "The widgets posed as the reference screenshots design/23 section 1.1 measures, at the same size, for the side-by-side comparison: the battery alone, four small rings, the medium row with a low and a charging device, the small analog clock, and the medium world clock by day and by night.",
-        height: 1650,
-        body: crate::pages::shell::widget_reference::WidgetReferencePage,
-    },
-    Entry {
-        page: Page::LockSwitcher,
-        title: "Lock and switcher",
-        lede: "The shell's own lock screen over the calm wallpaper (at rest, a wrong password mid-shake, checking in the Space's colour), the three kinds of picture the prompt takes (a face, an emoji, a photo), the polkit prompt's sheet, and the app switcher with five and fourteen apps, shrunk and scrolled.",
-        height: 3500,
-        body: crate::pages::shell::lock_switcher::LockSwitcherPage,
-    },
-    Entry {
-        page: Page::Emoji,
-        title: "Emoji",
-        lede: "Animated emoji for the user's picture (design/25-EMOJI.md): the 42 shipped Noto Animated Emoji at Large, the sizes and the discs, and the user picture's picker; each plays its own animation once and rests.",
-        height: 2500,
-        body: crate::pages::content::emoji::EmojiPage,
-    },
-    Entry {
         page: Page::Details,
         title: "Details",
-        lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again, the bar's layered status glyphs (Wi-Fi, battery, Bluetooth, volume) in every state they draw, and the control center's modules (the tile disc's fill and morph, the rows' pending, success and failure, Now Playing, the Battery module's rings, keyboard brightness). Nothing here loops: each settles to 0 frames.",
+        lede: "The grammar of small state details (design/26-DETAILS.md): Sweep with CountUp in step, Reveal, the bounded pending loop on a layered Wi-Fi glyph and on the Spinner, Settle's fill, check and seal, Shake, Nudge, every MorphGlyph style and RollDigits, each with a button that plays its moment again, and the bar's layered status glyphs (Wi-Fi, battery, Bluetooth, volume) in every state they draw. Nothing here loops: each settles to 0 frames.",
         height: 3760,
         body: crate::pages::details::overview::DetailsPage,
     },
@@ -210,13 +168,6 @@ pub const REGISTRY: [Entry; 31] = [
         lede: "The voice orb: the default at 192 px, a small one at 96 px and one with its own colours at 128 px on a 15 s period, all turning while active and at rest when not, and a ladder of sizes that crosses every threshold of its size-derived look.",
         height: 900,
         body: crate::pages::content::voice_orb::VoiceOrbPage,
-    },
-    Entry {
-        page: Page::Shell,
-        title: "Shell",
-        lede: "The shell-only components rebuilt on the survivors, each in every state: MenuBarItem and WorkspacePills, ModuleGrid with its tiles and panels, BatteryRing, DockTile, WidgetFrame and AnimatedEmoji. The lock, notification, switcher, widget and emoji pages show the rest.",
-        height: 2600,
-        body: crate::pages::shell::components::ShellPage,
     },
     Entry {
         page: Page::Symbols,

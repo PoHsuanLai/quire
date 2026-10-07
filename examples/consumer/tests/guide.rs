@@ -154,7 +154,6 @@ fn BarRoot() -> Element {
 #[component]
 fn StatusItems() -> Element {
     use ds::style::tokens::status::StatusMetrics;
-    use ds_shell::prelude::MenuBarItem;
 
     let metrics = StatusMetrics {
         box_size: Px(22.0),

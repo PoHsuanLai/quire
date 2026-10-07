@@ -3,8 +3,6 @@
 use crate::pages::content::external_icons::ExternalIcons;
 use crate::pages::content::glyphs::Glyphs;
 use crate::pages::content::plate_tints::PlateTints;
-use crate::pages::shell::dock_tiles::DockTiles;
-use crate::pages::shell::status_items::StatusItems;
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
 use ds::components::app::command_pill::CommandPill;
@@ -52,10 +50,8 @@ pub fn ControlsPage() -> Element {
         crate::pages::controls::label_runs_and_marks::LabelRunsAndMarks {}
         crate::pages::controls::pass_through::MoreGlyphs {}
         crate::pages::controls::pass_through::PassThrough {}
-        StatusItems {}
         ExternalIcons {}
         Glyphs {}
-        DockTiles {}
         PlateTints {}
         Choosers {}
         Chips {}
