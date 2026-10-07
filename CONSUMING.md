@@ -137,7 +137,7 @@ within 500 ms of `request_size` at the requested size, to within 1 physical pixe
 rounding); a configure that changes nothing is no resize. On Wayland the compositor places windows;
 only the size is the app's.
 
-```rust
+```rust,ignore
 // Open at the picture's natural size, then fit the real size once it is known.
 let screen = handle.screen_extent();
 let size = WindowSize::fitting(Extent::new(1200, 800), screen, Extent::new(320, 240));
@@ -1380,7 +1380,7 @@ both its `Outcome` and an `Availability` on its feed, so handle the two as one e
 **The sheet's style.** The `.ds-helper-progress` rule is in the shell stylesheet, so the app's
 `Ds` root must draw with it, or the Installing phase has no progress styling:
 
-```rust
+```rust,ignore
 rsx! { Ds { sheet: Some(ds_shell::stylesheet()), HelperSheet { /* ... */ } } }
 ```
 
