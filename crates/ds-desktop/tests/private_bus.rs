@@ -166,3 +166,83 @@ async fn the_system_bus_carries_packagekit() {
     let desktop = Desktop::probe_on(Some(&session), Some(&system)).await;
     assert!(desktop.here(Capability::Helpers));
 }
+
+type Row = (u32, String, (i32, i32, u32, u32), (i32, i32, u32, u32), u32);
+
+/// A stand-in for the shell's `org.quire.Outputs1`.
+struct FakeOutputs(Vec<Row>);
+
+#[zbus::interface(name = "org.quire.Outputs1")]
+impl FakeOutputs {
+    #[zbus(property)]
+    fn work_areas(&self) -> Vec<Row> {
+        self.0.clone()
+    }
+}
+
+fn row(id: u32, top: u32) -> Row {
+    (
+        id,
+        format!("DP-{id}"),
+        (0, 0, 2560, 1440),
+        (0, i32::try_from(top).unwrap_or(0), 2560, 1440 - top),
+        180,
+    )
+}
+
+#[tokio::test]
+async fn the_outputs_are_read_and_a_change_is_followed() {
+    use ds_desktop::{Outputs, OutputsWatch};
+
+    let bus = PrivateBus::start("outputs", &[]);
+    let client = bus.connect().await;
+    let shell = bus.connect().await;
+
+    // No shell: the portable fallback, an empty list.
+    assert!(Outputs::read_on(&client).await.areas().is_empty());
+    assert!(
+        !Desktop::probe_on(Some(&client), None)
+            .await
+            .here(Capability::Outputs)
+    );
+
+    shell
+        .object_server()
+        .at("/org/quire/Outputs1", FakeOutputs(vec![row(1, 32)]))
+        .await
+        .expect("exports the object");
+    shell
+        .request_name("org.quire.Outputs1")
+        .await
+        .expect("claims the name");
+    assert!(
+        Desktop::probe_on(Some(&client), None)
+            .await
+            .here(Capability::Outputs)
+    );
+
+    let read = Outputs::read_on(&client).await;
+    assert_eq!(read.areas().len(), 1);
+    assert_eq!(read.areas()[0].work.y, 32);
+    assert_eq!(read.areas()[0].physical(), (3840, 2160));
+
+    let mut watch = OutputsWatch::on(&client).await.expect("follows");
+    assert_eq!(watch.current().await.areas().len(), 1);
+    let iface = shell
+        .object_server()
+        .interface::<_, FakeOutputs>("/org/quire/Outputs1")
+        .await
+        .expect("the object");
+    iface.get_mut().await.0 = vec![row(1, 32), row(2, 0)];
+    iface
+        .get()
+        .await
+        .work_areas_changed(iface.signal_emitter())
+        .await
+        .expect("announces");
+    let after = tokio::time::timeout(WAIT, watch.changed())
+        .await
+        .expect("a change arrives")
+        .expect("the feed is live");
+    assert_eq!(after.areas().len(), 2);
+}

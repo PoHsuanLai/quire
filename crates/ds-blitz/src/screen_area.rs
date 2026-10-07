@@ -4,6 +4,7 @@
 
 use crate::window_size::Extent;
 use ds::prelude::Scale;
+use ds_desktop::OutputArea;
 
 /// Whose output the area is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -27,6 +28,10 @@ pub enum WorkBasis {
     WholeOutput,
     /// The output less a reserve the app knows of and gave (see [`ScreenArea::less`]).
     LessReserve,
+    /// The work area the shell reports on the bus (`org.quire.Outputs1`, the `Outputs` capability
+    /// of `ds-desktop`): the output less the bar's and dock's exclusive zones, exact (see
+    /// [`ScreenArea::on_desktop`]).
+    Desktop,
 }
 
 /// Logical pixels kept free along each edge of an output: a panel's height, a dock's width.
@@ -84,6 +89,25 @@ impl ScreenArea {
         }
     }
 
+    /// The same output as the shell reports it: its frame, work area and fractional scale in
+    /// place of what the window system knew (`WorkBasis::Desktop`). With no `area` (no shell,
+    /// or no output that matches) it is `self`, the portable fallback.
+    pub fn on_desktop(self, area: Option<&OutputArea>) -> ScreenArea {
+        let Some(area) = area else { return self };
+        let scale = match self.of {
+            // The window's own scale is what it draws at; the shell's is the output's.
+            ScreenOf::Window => self.scale,
+            ScreenOf::Primary => Scale(area.scale),
+        };
+        ScreenArea {
+            output: Extent::new(area.frame.width, area.frame.height),
+            work: Extent::new(area.work.width, area.work.height),
+            scale,
+            basis: WorkBasis::Desktop,
+            ..self
+        }
+    }
+
     /// The logical size of a window that shows `pixels` device pixels one to one on this
     /// output: an image of 1200 x 800 pixels on a 2x output is a 600 x 400 window.
     pub fn logical_for_pixels(&self, pixels: Extent) -> Extent {
@@ -132,6 +156,60 @@ mod tests {
             ..Reserve::default()
         });
         assert_eq!(all.work, e(0, 0));
+    }
+
+    fn desktop_area(frame: (u32, u32), work: (u32, u32), scale: u32) -> OutputArea {
+        use ds_desktop::OutputRect;
+        let rect = |(width, height)| OutputRect {
+            x: 0,
+            y: 0,
+            width,
+            height,
+        };
+        OutputArea {
+            id: 1,
+            name: "DP-1".to_owned(),
+            frame: rect(frame),
+            work: rect(work),
+            scale,
+        }
+    }
+
+    #[test]
+    fn the_shells_work_area_replaces_the_window_systems_guess() {
+        let known = |of| ScreenArea::new(e(3840, 2160), Scale(240), of).expect("scale");
+        let shell = desktop_area((2560, 1440), (2560, 1340), 180);
+        // name, of, output, work, scale
+        const CASES: &[(&str, ScreenOf, Extent, Extent, Scale)] = &[
+            (
+                "primary",
+                ScreenOf::Primary,
+                e(2560, 1440),
+                e(2560, 1340),
+                Scale(180),
+            ),
+            (
+                "window keeps its own scale",
+                ScreenOf::Window,
+                e(2560, 1440),
+                e(2560, 1340),
+                Scale(240),
+            ),
+        ];
+        for &(name, of, output, work, scale) in CASES {
+            let area = known(of).on_desktop(Some(&shell));
+            assert_eq!(
+                (area.output, area.work, area.scale, area.basis),
+                (output, work, scale, WorkBasis::Desktop),
+                "{name}"
+            );
+        }
+    }
+
+    #[test]
+    fn with_no_shell_the_area_is_the_window_systems() {
+        let area = ScreenArea::new(e(1920, 1080), Scale(120), ScreenOf::Primary).expect("scale");
+        assert_eq!(area.on_desktop(None), area);
     }
 
     #[test]

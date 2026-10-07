@@ -13,6 +13,7 @@ use crate::screen_area::ScreenArea;
 use crate::window_requests::Root;
 use crate::window_size::Extent;
 use dioxus::prelude::*;
+use ds_desktop::Outputs;
 use std::collections::VecDeque;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
@@ -30,6 +31,8 @@ pub(crate) enum Remote {
         make: Box<dyn FnOnce() -> Root + Send>,
     },
     Redraw,
+    /// The shell's outputs changed: the screen is read again.
+    Screen,
     Quit,
     Hold,
     Release,
@@ -45,6 +48,8 @@ struct State {
     ended: bool,
     /// The screen new windows open on, set by the loop once it can read monitors.
     screen: Option<ScreenArea>,
+    /// What the shell reported of its outputs; empty without it.
+    desktop: Outputs,
 }
 
 /// A handle to the running app, cloneable and `Send + Sync`: see the module documentation.
@@ -92,6 +97,16 @@ impl AppHandle {
     /// have the UI thread look again.
     pub fn redraw(&self) -> Result<(), AppEnded> {
         self.push(Remote::Redraw)
+    }
+
+    /// Tell the app what the shell reports of its outputs (`ds_desktop::Outputs::read`, or each
+    /// change of an `OutputsWatch`), and wake the loop to read the screen again. From then on
+    /// [`screen_area`](AppHandle::screen_area) answers with the shell's work area and scale
+    /// where it matches the monitor (`WorkBasis::Desktop`); empty outputs return it to the
+    /// window system's own size.
+    pub fn set_desktop_outputs(&self, outputs: Outputs) -> Result<(), AppEnded> {
+        self.lock().desktop = outputs;
+        self.push(Remote::Screen)
     }
 
     /// End the app: every window is dropped and `launch` returns, whatever the
@@ -162,6 +177,11 @@ impl AppHandle {
         if waiting {
             wake();
         }
+    }
+
+    /// What the shell last reported of its outputs.
+    pub(crate) fn desktop_outputs(&self) -> Outputs {
+        self.lock().desktop.clone()
     }
 
     /// The loop read the screen.
@@ -306,7 +326,7 @@ mod tests {
             .map(|request| match request {
                 Remote::Hold => "hold",
                 Remote::Release => "release",
-                Remote::Open { .. } | Remote::Redraw | Remote::Quit => "other",
+                Remote::Open { .. } | Remote::Redraw | Remote::Screen | Remote::Quit => "other",
             })
             .collect();
         assert_eq!(kinds, ["hold", "release"]);
@@ -320,5 +340,20 @@ mod tests {
         handle.end();
         drop(hold);
         assert!(handle.hold().is_err());
+    }
+
+    #[test]
+    fn the_shells_outputs_are_kept_and_wake_the_loop() {
+        let handle = AppHandle::new();
+        let woken = counting(&handle);
+        assert!(handle.desktop_outputs().areas().is_empty());
+        let shell = Outputs::new(vec![ds_desktop::OutputArea::default()]);
+        handle
+            .set_desktop_outputs(shell.clone())
+            .expect("not ended yet");
+        assert_eq!(handle.desktop_outputs(), shell);
+        assert_eq!(woken.load(std::sync::atomic::Ordering::SeqCst), 1);
+        handle.end();
+        assert!(handle.set_desktop_outputs(Outputs::default()).is_err());
     }
 }

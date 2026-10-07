@@ -29,7 +29,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
 | `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family, the PackageKit installer (and a fake), the availability feed |
-| `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
+| `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus` |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
@@ -53,7 +53,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-settings-derive` |
 | `ds-helpers` | nothing of ours |
 | `ds-desktop` | nothing of ours |
-| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
+| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `ds-desktop` (the shell's `Outputs` as data; feature `desktop-outputs` adds its D-Bus reading), `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
 | `ds-gallery` | `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` (snapshots) |
@@ -277,7 +277,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Scrolling a window's containers: wheel, touchpad, keys, `ScrollCmd` | `blitz_kit::scroll` (the engine, shared with shell-host) driven by `ds-blitz::window_scroll::WindowScroll`, which the window loop runs on every winit event and the harness runs before each layout |
 | What a touchpad's run and a zoom wheel say to an eased listener (the glide after a lift, Control delivered whole) | `ds-blitz::window_scroll::{coast, state}` over `blitz_kit::scroll::{momentum, velocity}`; the vocabulary is `ds::host::gesture::{Gesture, ScrollSource}` |
 | A window's size: the cap to the screen, who resized it, whether a request was answered | `ds-blitz::window_fit` (`Fit`, `Extent::fit_with`, `WindowSize::fitting_with`), `size_ledger` (`SizeOrigin`, `SizeRequest`, the 500 ms answer window), `window_sizer` (`WindowSizer`, `use_window_sizer`) over `sized_window::SizedWindow` |
-| The output a window is on: size, work area, scale | `ds-blitz::screen_area` (`ScreenArea`, `ScreenOf`, `WorkBasis`, `Reserve`), read from winit's monitors by `window_screen` |
+| The output a window is on: size, work area, scale | `ds-blitz::screen_area` (`ScreenArea`, `ScreenOf`, `WorkBasis`, `Reserve`), read from winit's monitors by `window_screen` and, under our shell, replaced by `ds-desktop::Outputs` (`ScreenArea::on_desktop`, `AppHandle::set_desktop_outputs`) |
+| A scroller's range, its clamp and its rubber-band stretch | `ds-blitz::window_scroll::ScrollBounds`, over `blitz_kit::scroll::rubber::Band` |
 | A stand-in window for a component that sizes its window | `ds-harness::fake_window` (`SizerAck`, `WindowScreen`) behind `HarnessConfig::with_sizer_ack` and the `Harness::{window_requests, window_size, resize_window, window_sizer}` methods |
 | What a component asks the host to publish after layout, and the writes it queues for it | `ds::host::phase` (`Observe`, `Watch`, `PhaseWrite`) through `GeometryHost::{observe, write}`; the step is `ds-blitz::phase::Phase`, run by the window loop after each frame and by the harness after each layout. `Observe::Caret` is also run **before** a frame paints when the caret or selection moved (`Phase::early`: lay out, publish, render, then the draw paints), so an app's caret and selection (`ds::edit::caret::use_caret_rect`, `ds::edit::selection::use_selection_rects`) is drawn in the frame of the text it follows |
 | Focus hooks, focus requests, whether a pressed control takes the keyboard (`FocusOnPressScope`) | `ds::focus` |

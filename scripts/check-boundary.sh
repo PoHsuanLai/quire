@@ -87,7 +87,7 @@ EDGES=(
   "ds-settings: ds-behaviour ds-core ds-style ds-settings-derive"
   "ds-helpers:"
   "ds-desktop:"
-  "ds-blitz: blitz-kit ds"
+  "ds-blitz: blitz-kit ds ds-desktop"
   "ds-harness: blitz-kit ds ds-blitz ds-core"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "ds-conformance:"

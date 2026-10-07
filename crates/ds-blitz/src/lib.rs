@@ -17,6 +17,8 @@ mod blitz_host;
 mod click_focus;
 pub mod clipboard;
 mod contexts;
+#[cfg(feature = "desktop-outputs")]
+mod desktop_outputs;
 mod drop_hit;
 mod edit;
 mod edit_align;
@@ -127,7 +129,7 @@ pub use texture_layer::{
     TextureHandle, TextureLayer, use_gpu,
 };
 pub use window::{Decorations, WinitWindow};
-pub use window_scroll::{ScrollHandle, use_scroll_handle};
+pub use window_scroll::{ScrollBounds, ScrollHandle, use_scroll_handle};
 // What a scroll command names: the container's element `id`, the axis, and how it moves.
 pub use blitz_kit::element_id::ElementId;
 pub use blitz_kit::scroll::cmd::ScrollCmd;

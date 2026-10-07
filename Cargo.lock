@@ -1667,6 +1667,7 @@ dependencies = [
  "dioxus-native-dom",
  "dirs",
  "ds",
+ "ds-desktop",
  "ds-harness",
  "image",
  "keyboard-types 0.7.0",

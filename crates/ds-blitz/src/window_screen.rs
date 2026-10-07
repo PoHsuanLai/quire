@@ -9,7 +9,9 @@
 //!   ([`window_area`]) is exact on a fractionally scaled output where the monitor's is not.
 //! - The panel, dock or menu bar a compositor reserves (layer-shell exclusive zones) is never
 //!   sent to clients, so the work area is the whole output (`WorkBasis::WholeOutput`), and a
-//!   fitted window is capped to 85% of it. winit has no work-area query on X11 either.
+//!   fitted window is capped to 85% of it. winit has no work-area query on X11 either. Under
+//!   our shell the app can learn it anyway: `AppHandle::set_desktop_outputs` feeds what
+//!   `ds-desktop` read from `org.quire.Outputs1` (`WorkBasis::Desktop`).
 //! - Which output a new window opens on is the compositor's choice and is not announced: before
 //!   the window exists it is the primary monitor, or the first one listed on Wayland (which has
 //!   no primary); once the window is mapped, `Window::current_monitor` is its output.
@@ -20,15 +22,25 @@ use dioxus_native::winit::event_loop::ActiveEventLoop;
 use dioxus_native::winit::monitor::MonitorHandle;
 use dioxus_native::winit::window::Window;
 use ds::prelude::Scale;
+use ds_desktop::Outputs;
 
 /// The area of the monitor a new window is likeliest to open on (the primary monitor, or the
 /// first listed), if winit lists one.
-pub(crate) fn screen_area(event_loop: &dyn ActiveEventLoop) -> Option<ScreenArea> {
+///
+/// `desktop` is what the shell reported (empty without it): the work area and scale it gives
+/// replace the guess below for the output they match.
+pub(crate) fn screen_area(
+    event_loop: &dyn ActiveEventLoop,
+    desktop: &Outputs,
+) -> Option<ScreenArea> {
     event_loop
         .primary_monitor()
         .into_iter()
         .chain(event_loop.available_monitors())
-        .find_map(|monitor| area_of(&monitor, monitor.scale_factor(), ScreenOf::Primary))
+        .find_map(|monitor| {
+            area_of(&monitor, monitor.scale_factor(), ScreenOf::Primary)
+                .map(|area| on_desktop(area, &monitor, desktop))
+        })
 }
 
 /// The area of the output `window` is on, at the scale it draws at; with no output known yet,
@@ -44,6 +56,14 @@ pub(crate) fn window_area(window: &dyn Window) -> Option<ScreenArea> {
             .chain(window.available_monitors())
             .find_map(|monitor| area_of(&monitor, monitor.scale_factor(), ScreenOf::Primary))
     })
+}
+
+/// `area` of `monitor`, as the shell reports that output when it does.
+fn on_desktop(area: ScreenArea, monitor: &MonitorHandle, desktop: &Outputs) -> ScreenArea {
+    let physical = monitor
+        .current_video_mode()
+        .map(|mode| (mode.size().width, mode.size().height));
+    area.on_desktop(physical.and_then(|size| desktop.of_physical(size)))
 }
 
 fn area_of(monitor: &MonitorHandle, factor: f64, of: ScreenOf) -> Option<ScreenArea> {

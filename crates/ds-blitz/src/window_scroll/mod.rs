@@ -8,6 +8,7 @@
 //! wheel the engine takes never reaches Blitz (whose own scroll jumps by 20 px a line), except
 //! over a `data-wheel="capture"` element, which gets the raw wheel (design/11 §11.3.1).
 
+mod bounds;
 mod coast;
 mod eased;
 mod events;
@@ -16,6 +17,7 @@ mod keys;
 mod state;
 pub mod wheel;
 
+pub use bounds::ScrollBounds;
 pub use events::Intercept;
 pub use handle::{ScrollHandle, use_scroll_handle};
 pub use state::{Frames, WheelUse, WindowScroll};

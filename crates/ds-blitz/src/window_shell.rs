@@ -271,7 +271,10 @@ impl Windows {
             // Windows cannot be created yet; `can_create_surfaces` serves what waits.
             return;
         }
-        self.base.handle.set_screen(screen_area(event_loop));
+        let desktop = self.base.handle.desktop_outputs();
+        self.base
+            .handle
+            .set_screen(screen_area(event_loop, &desktop));
         for remote in self.base.handle.take() {
             match remote {
                 Remote::Open { spec, make } => {
@@ -282,6 +285,8 @@ impl Windows {
                         window.request_redraw();
                     }
                 }),
+                // The screen was read above, with the outputs just set.
+                Remote::Screen => {}
                 Remote::Quit => self.life.quit(),
                 Remote::Hold => self.life.hold(),
                 Remote::Release => self.life.release(Instant::now()),

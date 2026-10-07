@@ -46,11 +46,15 @@ pub enum Capability {
     Share,
     /// PackageKit answers, so a missing helper can be installed on the spot.
     Helpers,
+    /// The shell's per-output work area and scale (`org.quire.Outputs1`), so a window can be
+    /// sized and placed against the usable screen. The portable fallback is the window system's
+    /// own output size ([`crate::Outputs`] is empty).
+    Outputs,
 }
 
 impl Capability {
     /// Every capability, in declaration order.
-    pub const ALL: [Capability; 9] = [
+    pub const ALL: [Capability; 10] = [
         Capability::Intents,
         Capability::Accounts,
         Capability::Memory,
@@ -60,6 +64,7 @@ impl Capability {
         Capability::Peek,
         Capability::Share,
         Capability::Helpers,
+        Capability::Outputs,
     ];
 
     /// The D-Bus name that means this capability, or `None` where no service name is settled
@@ -75,6 +80,8 @@ impl Capability {
             Capability::Memory => session("org.quire.Memory1"),
             // companiond, design/33-AGENT.md section 5 (docket repo).
             Capability::Companion => session("org.quire.Companion1"),
+            // sill's `work_areas` service (sill/crates/sill-services/src/work_areas).
+            Capability::Outputs => session("org.quire.Outputs1"),
             Capability::Helpers => Some(Service {
                 bus: Bus::System,
                 name: "org.freedesktop.PackageKit",
@@ -119,6 +126,10 @@ mod tests {
             (
                 Capability::Helpers,
                 Some((Bus::System, "org.freedesktop.PackageKit")),
+            ),
+            (
+                Capability::Outputs,
+                Some((Bus::Session, "org.quire.Outputs1")),
             ),
             (Capability::Appearance, None),
             (Capability::Materials, None),

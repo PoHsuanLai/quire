@@ -10,6 +10,9 @@ publish.workspace = true
 
 [dependencies]
 ds = { workspace = true }
+# The shell's work areas as plain data (`Outputs`); its D-Bus reading is the opt-in `desktop-outputs`
+# feature, so an app that never asks builds no D-Bus client.
+ds-desktop = { workspace = true }
 # Portable Blitz repairs shared with shell-host: `data:` decoding, the local file read, hover sync,
 # fonts, pixel snap, adapter choice. `adapter`: `AdapterPref`, the GPU ranking.
 blitz-kit = { workspace = true, features = ["adapter"] }
@@ -83,6 +86,10 @@ print = ["quire-desktop", "dep:zbus", "dep:memfd"]
 # connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
 # default, so an app that exports no menu builds no D-Bus client for it.
 menus = ["quire-desktop", "dep:zbus", "dep:serde"]
+# `AppHandle::follow_desktop_outputs`: the shell's work area and scale from `org.quire.Outputs1`
+# (ds-desktop's `Outputs`), fed to `AppHandle::screen_area`. Off by default, so an app that never asks
+# builds no D-Bus client for it.
+desktop-outputs = ["ds-desktop/dbus"]
 # PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
 # thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
 # PDF builds no PDF writer or reader.

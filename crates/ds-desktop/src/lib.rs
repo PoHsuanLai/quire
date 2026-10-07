@@ -8,6 +8,9 @@
 
 mod capability;
 mod desktop;
+mod outputs;
+#[cfg(feature = "dbus")]
+mod outputs_live;
 mod probe;
 mod watch;
 
@@ -16,6 +19,9 @@ mod hook;
 
 pub use capability::{Bus, Capability, Service};
 pub use desktop::{Desktop, Presence};
+pub use outputs::{OutputArea, OutputRect, Outputs};
+#[cfg(feature = "dbus")]
+pub use outputs_live::OutputsWatch;
 pub use watch::Watch;
 
 #[cfg(feature = "dioxus")]
