@@ -316,7 +316,7 @@ fn slot(slot: Slot<'_>) -> Element {
 
 /// How a button is drawn: the default answers Return and takes the accent, a Cancel that is not
 /// the default answers Escape, a destructive action that is not the default is a destructive
-/// button (its red label is the alert's rule).
+/// button (the alert's stylesheet fills it with `--danger` and `--danger-ink`).
 fn face(role: AlertRole, is_default: bool) -> (Answers, ButtonRole) {
     match (role, is_default) {
         (_, true) => (Answers::Return, ButtonRole::Normal),

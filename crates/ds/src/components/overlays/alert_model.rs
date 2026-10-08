@@ -24,8 +24,8 @@ pub enum AlertRole {
     /// An ordinary action.
     #[default]
     Normal,
-    /// An action that destroys something ("Delete", "Erase"): its label is drawn in the danger
-    /// red, and it is never the default, so a reflexive Return never destroys anything.
+    /// An action that destroys something ("Delete", "Erase"): it is drawn filled in the danger
+    /// red with its own ink, and it is never the default, so a reflexive Return never destroys anything.
     Destructive,
     /// Backs out: Escape presses it.
     Cancel,

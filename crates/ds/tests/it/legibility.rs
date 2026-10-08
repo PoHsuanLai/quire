@@ -111,6 +111,30 @@ fn every_ink_on_its_colour_is_legible_in_both_schemes() {
     assert!(failures.is_empty(), "{failures:#?}");
 }
 
+/// The alert's destructive action is drawn by the stylesheet as filled `--danger` with
+/// `--danger-ink` at rest, hovered and pressed, and that pair clears 4.5:1 in both schemes
+/// (`--danger` as text on the raised ground measured about 3.5:1 in dark).
+#[test]
+fn the_alert_destructive_action_is_filled_danger_and_legible() {
+    let sheet = ds::stylesheet();
+    let rules: Vec<&str> = sheet
+        .lines()
+        .filter(|line| line.starts_with(".ds-alert .ds-button") && line.contains("destructive"))
+        .collect();
+    assert_eq!(rules.len(), 3, "rest, hover and pressed: {rules:#?}");
+    for rule in rules {
+        assert!(rule.contains("background:var(--danger);"), "{rule}");
+        assert!(rule.contains("color:var(--danger-ink);"), "{rule}");
+    }
+    for scheme in Scheme::ALL.iter().copied() {
+        let got = measured(
+            &colour(ColourToken::DangerInk, scheme),
+            &colour(ColourToken::Danger, scheme),
+        );
+        assert!(got >= 4.5, "{scheme:?}: danger-ink on danger is {got:.2}");
+    }
+}
+
 /// The four gates for one Space, measured on what the root actually paints: the frame ink from
 /// [`FrameVars`], the stops the gradient is made of, and the card's accent (the Space's when it
 /// lends one, Blue otherwise).
