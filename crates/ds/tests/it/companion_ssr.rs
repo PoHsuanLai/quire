@@ -1,6 +1,7 @@
 //! The companion's placeholder components as markup: each draws one root with its own `ds-` class,
 //! lints clean under the design system's stylesheet, and that class is styled. Their looks are
-//! the fill's; this pins that the lint passes and the sheets are registered.
+//! the fill's; this pins that the lint passes and the sheets are registered, and that the
+//! unseen-outcome mark comes and goes with what the caller passes.
 
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
@@ -16,6 +17,7 @@ use ds::components::companion::memory::model::{ConsolidationDiff, MemoryDay};
 use ds::components::companion::memory::view::{ConsolidationView, MemoryTimeline};
 use ds::components::companion::orb::model::OrbSize;
 use ds::components::companion::orb::view::CompanionOrb;
+use ds::components::companion::outcome::model::Outcome;
 use ds::components::companion::plan::model::{PlanPhase, PlanView};
 use ds::components::companion::plan::view::PlanList;
 use ds::components::companion::replace::model::{ReplacePhase, ReplaceProposal};
@@ -187,4 +189,74 @@ fn the_orb_names_its_presence_and_size() {
     let html = render(SPECIMENS[0].1);
     assert!(html.contains("data-presence=\"working\""), "{html}");
     assert!(html.contains("data-size=\"bar\""), "{html}");
+}
+
+/// What carries the mark under test.
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum Carrier {
+    Orb,
+    Row,
+}
+
+#[derive(Clone, PartialEq)]
+struct Marked {
+    carrier: Carrier,
+    outcome: Option<Outcome>,
+}
+
+#[allow(non_snake_case)]
+fn MarkedStage(props: Marked) -> Element {
+    let Marked { carrier, outcome } = props;
+    match carrier {
+        Carrier::Orb => root(rsx! { CompanionOrb { presence: CompanionPresence::Idle, outcome } }),
+        Carrier::Row => {
+            let view = RunRowView {
+                goal: "Book a table".to_owned(),
+                app: app(),
+                step: Tally(3),
+                budget: None,
+                thought: None,
+                place: RunPlace::InPlace,
+                state: RunState::Done,
+                served_by: served_by(),
+                actions: Vec::new(),
+            };
+            root(rsx! { RunRow { view, outcome, on_action: |_| {} } })
+        }
+    }
+}
+
+fn render_marked(carrier: Carrier, outcome: Option<Outcome>) -> String {
+    let mut dom = VirtualDom::new_with_props(MarkedStage, Marked { carrier, outcome });
+    dom.rebuild_in_place();
+    dioxus_ssr::render(&dom)
+}
+
+/// An unseen outcome draws one still mark on the orb and on a run row, in its own tone word; the
+/// caller passing `None` clears it, and the orb's presence is not touched either way.
+#[test]
+fn an_unseen_outcome_marks_the_orb_and_a_run_row_until_the_caller_clears_it() {
+    for carrier in [Carrier::Orb, Carrier::Row] {
+        for outcome in [Outcome::Done, Outcome::Failed] {
+            let html = render_marked(carrier, Some(outcome));
+            let word = format!("data-outcome=\"{}\"", outcome.slug());
+            assert_eq!(
+                html.matches("ds-outcome-mark").count(),
+                1,
+                "{carrier:?}: {html}"
+            );
+            assert!(html.contains(&word), "{carrier:?} {outcome:?}: {html}");
+            assert!(
+                !html.contains("animation"),
+                "{carrier:?}: the mark is still"
+            );
+        }
+        let cleared = render_marked(carrier, None);
+        assert!(
+            !cleared.contains("ds-outcome-mark"),
+            "{carrier:?}: {cleared}"
+        );
+    }
+    let marked = render_marked(Carrier::Orb, Some(Outcome::Failed));
+    assert!(marked.contains("data-presence=\"idle\""), "{marked}");
 }

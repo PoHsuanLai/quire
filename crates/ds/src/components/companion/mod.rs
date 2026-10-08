@@ -15,6 +15,7 @@ pub mod form;
 pub mod mark;
 pub mod memory;
 pub mod orb;
+pub mod outcome;
 pub mod plan;
 pub mod port;
 pub mod prompt;
