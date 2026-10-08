@@ -38,8 +38,9 @@ impl Handled {
 
 impl WindowScroll {
     /// Scrolling's part in `event` at display scale `scale`: it follows the pointer and the
-    /// modifiers, takes the wheel, acts on scroll keys (which the document hears as well) and
-    /// advances before each frame is drawn.
+    /// modifiers, takes the wheel, acts on scroll keys (which the document hears as well). The
+    /// step before each frame is not here: the window runs [`WindowScroll::frame`] itself, ahead
+    /// of the frame's renders.
     pub fn event(&self, event: &WindowEvent, scale: f64, now: Instant) -> Handled {
         let scale = scale.max(f64::EPSILON);
         match event {
@@ -79,10 +80,6 @@ impl WindowScroll {
                     frames,
                 }
             }
-            WindowEvent::RedrawRequested => Handled {
-                event: Intercept::Passed,
-                frames: self.frame(now),
-            },
             _ => Handled::PASSED,
         }
     }

@@ -47,3 +47,4 @@ mod text_stack_fonts;
 mod user_style_reload;
 mod window_scroll;
 mod window_scroll_fingers;
+mod window_scroll_same_frame;

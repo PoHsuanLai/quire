@@ -336,6 +336,11 @@ impl Headless {
         let inner = &self.doc.inner;
         self.links
             .drain(&|frame, href| read_link(&inner.borrow(), frame, href));
+        // Before the renders, as the window loop runs it: a listener the scroll step hands eased
+        // detents to writes its signal now, and this frame's renders show it.
+        if self.layout != Layout::Held {
+            self.scroll.frame(now());
+        }
         let rendered = self.flush();
         // After the renders and tasks have run, so a component's own hand-back (a menu's
         // to its anchor) goes first.
@@ -348,7 +353,6 @@ impl Headless {
         if self.order == PhaseOrder::BeforePaint {
             self.early_phase(at);
         }
-        self.scroll.frame(now());
         let restyled = follow_scheme(&mut self.doc.inner.borrow_mut()).is_some();
         let fetched = self.wakeup.fetched();
         let synced = self.resolve(at);
