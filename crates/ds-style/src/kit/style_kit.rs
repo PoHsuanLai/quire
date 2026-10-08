@@ -40,7 +40,7 @@ use crate::tokens::{
     size_vars::SizeToken,
     spacing::SpacingToken,
     status::StatusMetrics,
-    terminal::TerminalColour,
+    terminal::{TerminalColour, TerminalMetric},
     timing::DurationToken,
     type_scale::{Family, FontSize},
     type_voice::VoiceToken,
@@ -80,6 +80,7 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<EmojiFace>().at(Place::Face),
         TokenSet::of::<Family>().at(Place::Typeface),
         TokenSet::of::<VoiceToken>().at(Place::Typeface),
+        TokenSet::of::<TerminalMetric>().at(Place::Scale),
         TokenSet::of::<FontSize>()
             .at(Place::Typeface)
             .only(Only::TypefaceVarying),

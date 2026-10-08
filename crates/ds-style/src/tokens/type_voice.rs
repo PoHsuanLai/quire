@@ -31,8 +31,4 @@ pub enum VoiceToken {
     /// `--fs-mono`: `.ds-mono`'s size, relative to its parent.
     #[token(system = ".86em", editorial = ".78em")]
     FsMono,
-    /// `--lh-term`: a terminal row's height as a multiple of its font size; a grid of box
-    /// drawing wants rows close enough to join.
-    #[token(name = "lh-term", system = "1.2", editorial = "1.2")]
-    LineHeightTerminal,
 }

@@ -81,6 +81,21 @@ pub enum TerminalColour {
     BrightWhite,
 }
 
+/// A measure of the terminal's cell grid that is the same in every scheme and typeface.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
+#[token(prefix = "term-", kind = fixed)]
+pub enum TerminalMetric {
+    /// `--term-font`: the system's own monospace family, for a terminal's cells. Space Mono
+    /// (`--font-code`) has no box drawing, CJK or emoji; the system's monospace covers them and
+    /// falls back per glyph. No shipped face leads this stack, on purpose.
+    #[token(name = "font", value = "monospace")]
+    Font,
+    /// `--term-lh`: a row's height as a multiple of the font size (`--term-font`); rows this close
+    /// let box drawing join from one to the next.
+    #[token(name = "lh", value = "1.2")]
+    LineHeight,
+}
+
 impl TerminalColour {
     /// The sixteen ANSI colours, in index order: 0 to 7, then their bright forms 8 to 15.
     pub const ANSI: [TerminalColour; 16] = [
@@ -156,7 +171,7 @@ fn terminal_css(token: TerminalColour, scope: TokenScope) -> CssValue {
 
 #[cfg(test)]
 mod tests {
-    use super::TerminalColour;
+    use super::{TerminalColour, TerminalMetric};
     use crate::appearance::{accent::Accent, theme::Scheme};
     use crate::tokens::hex::Hex;
     use crate::tokens::token::{Token, TokenScope};
@@ -221,6 +236,24 @@ mod tests {
             }
         }
         assert!(failures.is_empty(), "{failures:#?}");
+    }
+
+    #[test]
+    fn the_terminal_face_is_the_system_monospace_not_space_mono() {
+        let face = TerminalMetric::Font.css_value(TokenScope::BASE);
+        assert_eq!(TerminalMetric::Font.var().as_str(), "--term-font");
+        assert_eq!(face.as_str(), "monospace");
+    }
+
+    #[test]
+    fn a_terminal_row_is_one_point_two_times_its_font() {
+        assert_eq!(TerminalMetric::LineHeight.var().as_str(), "--term-lh");
+        assert_eq!(
+            TerminalMetric::LineHeight
+                .css_value(TokenScope::BASE)
+                .as_str(),
+            "1.2"
+        );
     }
 
     #[test]
