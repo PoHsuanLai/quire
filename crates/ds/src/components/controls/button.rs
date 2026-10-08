@@ -143,6 +143,7 @@ pub fn Button(
             "data-state": value.map(|state| state.slug()),
             title: tip.native(),
             "aria-label": aria_label,
+            "aria-description": tip.description(),
             "aria-pressed": value.map(Check::aria),
             "aria-expanded": shown.map(Shown::aria),
             "aria-disabled": availability.aria_disabled(),

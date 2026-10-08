@@ -76,6 +76,16 @@ impl Tip {
         }
     }
 
+    /// The value of `aria-description`: the tip's text, since a tip writes no `title` and a
+    /// screen reader would not hear it (AXHelp). The native `title` serves itself; inside a
+    /// hint the wrapper's text stands.
+    pub(crate) fn description(&self) -> Option<String> {
+        match &self.say {
+            Say::Tip(text, _) => Some(text.clone()),
+            Say::Nothing | Say::Native(_) => None,
+        }
+    }
+
     /// The control's element mounted: kept, to place the tip below it.
     pub(crate) fn mounted(&self, event: &MountedEvent) {
         let mut element = self.element;

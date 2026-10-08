@@ -3,6 +3,7 @@
 
 mod alert_ssr;
 mod button_busy_look_ssr;
+mod button_description_ssr;
 mod button_field_tile_states_ssr;
 mod button_leading_and_label_run_states_ssr;
 mod button_pass_through_and_outline_states_ssr;
