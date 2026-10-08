@@ -4,14 +4,14 @@
 
 use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
-use crate::input::{ImeInput, KeyInput};
+use crate::harness_input::paste_keys;
+use crate::input::{ImeInput, PasteChord, RawKeyInput, RawKeyPhase};
 use blitz_traits::events::{MouseEventButton, UiEvent};
 use ds::host::captured::{CapturedPointer, PointerPhase};
 use ds::host::ime::{ImeEvent, ImeSwitch};
 use ds::host::position::TextPosition;
 use ds::prelude::*;
 use ds_blitz::seam::edit_hit as hit;
-use keyboard_types::Modifiers;
 
 impl Harness {
     /// Deliver one input-method step, through the routing the window uses: to the surface that
@@ -35,13 +35,16 @@ impl Harness {
     }
 
     /// Put `html` and its plain `text` on the clipboard, as a browser's copy would, and press
-    /// Ctrl+V where the focus is.
-    pub(crate) fn paste(&mut self, html: &str, text: &str) {
+    /// `chord` where the focus is.
+    pub(crate) fn paste(&mut self, html: &str, text: &str, chord: PasteChord) {
         self.doc.shell.put_html(html.to_owned(), text.to_owned());
-        self.key(KeyInput {
-            key: ShortcutKey::Char('v'),
-            mods: Modifiers::CONTROL,
-        });
+        let (key, code, mods) = paste_keys(chord);
+        self.raw_key(RawKeyInput::down(key.clone(), code).with_mods(mods));
+        self.raw_key(
+            RawKeyInput::down(key, code)
+                .in_phase(RawKeyPhase::Up)
+                .with_mods(mods),
+        );
     }
 
     /// The text position the host resolves at `at` inside the first edit surface matching

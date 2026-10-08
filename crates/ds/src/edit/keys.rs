@@ -19,10 +19,20 @@ pub enum KeyAction {
     Key(KeyInput),
 }
 
+/// `modifiers` with Super counted as Meta: a window reports the Command key as Super, and the
+/// catalogue's chords are written with Meta, so each reads its modifiers through this.
+pub(crate) fn command_keys(modifiers: Modifiers) -> Modifiers {
+    if modifiers.contains(Modifiers::SUPER) {
+        (modifiers - Modifiers::SUPER) | Modifiers::META
+    } else {
+        modifiers
+    }
+}
+
 /// What pressing `key` with `modifiers` held means. Ctrl or Super (Cmd) makes a chord; Alt alone
 /// does not, since it types characters on some layouts (macOS Option, AltGr reported as Alt).
 pub fn classify(key: &Key, modifiers: Modifiers) -> KeyAction {
-    let command = modifiers.intersects(Modifiers::CONTROL | Modifiers::META);
+    let command = command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::META);
     let shift = modifiers.contains(Modifiers::SHIFT);
     match key {
         Key::Character(text) if command => match text.to_lowercase().as_str() {
@@ -77,6 +87,7 @@ mod tests {
             (text("å"), Modifiers::ALT, KeyAction::Text("å".to_owned())),
             (text("v"), Modifiers::CONTROL, KeyAction::Paste),
             (text("V"), Modifiers::META, KeyAction::Paste),
+            (text("v"), Modifiers::SUPER, KeyAction::Paste),
             (text("x"), Modifiers::CONTROL, KeyAction::Cut),
             (text("c"), Modifiers::CONTROL, KeyAction::Copy),
             (Key::Insert, Modifiers::SHIFT, KeyAction::Paste),

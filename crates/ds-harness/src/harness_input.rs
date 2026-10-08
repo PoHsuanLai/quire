@@ -1,6 +1,7 @@
 //! The harness's input vocabulary: quire's keys and pointer buttons as the Blitz events a window
 //! would deliver for them.
 
+use crate::input::PasteChord;
 use blitz_traits::events::{
     BlitzPointerEvent, BlitzPointerId, MouseEventButton, MouseEventButtons, PointerCoords,
 };
@@ -110,8 +111,26 @@ pub(crate) fn modifier(key: ShortcutKey) -> Modifiers {
         ShortcutKey::Ctrl => Modifiers::CONTROL,
         ShortcutKey::Shift => Modifiers::SHIFT,
         ShortcutKey::Alt => Modifiers::ALT,
-        ShortcutKey::Super => Modifiers::META,
+        ShortcutKey::Super => Modifiers::SUPER,
         _ => Modifiers::empty(),
+    }
+}
+
+/// The key, physical code and modifiers a paste chord presses.
+pub(crate) fn paste_keys(chord: PasteChord) -> (DomKey, Code, Modifiers) {
+    match chord {
+        PasteChord::CtrlV => (
+            DomKey::Character("v".into()),
+            Code::KeyV,
+            Modifiers::CONTROL,
+        ),
+        PasteChord::CtrlShiftV => (
+            DomKey::Character("V".into()),
+            Code::KeyV,
+            Modifiers::CONTROL | Modifiers::SHIFT,
+        ),
+        PasteChord::SuperV => (DomKey::Character("v".into()), Code::KeyV, Modifiers::SUPER),
+        PasteChord::ShiftInsert => (DomKey::Insert, Code::Insert, Modifiers::SHIFT),
     }
 }
 

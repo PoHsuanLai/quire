@@ -7,7 +7,7 @@ use ds::file_drop::drag::FileDragInput;
 use ds::host::gesture::{Gesture, GesturePhase};
 use ds::prelude::*;
 use ds_core::press::PointerButton;
-use keyboard_types::Modifiers;
+use keyboard_types::{Code, Key as DomKey, Location, Modifiers};
 
 /// One thing done to the document under test.
 #[derive(Debug, Clone, PartialEq)]
@@ -68,14 +68,99 @@ pub enum Input {
     FileDrag(FileDragInput),
     /// The input method.
     Ime(ImeInput),
-    /// `html` and its plain `text` put on the clipboard as a browser's copy would, then Ctrl+V
-    /// where the focus is.
+    /// One key event exactly as given: a physical code the quire keys cannot name (punctuation,
+    /// F-keys), a release alone, a repeat, a side of the keyboard, the text it types.
+    RawKey(RawKeyInput),
+    /// `html` and its plain `text` put on the clipboard as a browser's copy would, then the
+    /// `chord` pressed where the focus is.
     Paste {
         /// The rich flavour.
         html: String,
         /// The plain-text flavour.
         text: String,
+        /// The key chord that pastes.
+        chord: PasteChord,
     },
+}
+
+/// The chord a paste is pressed with: an editor takes Ctrl+V, a terminal reads it as a key and
+/// pastes on Ctrl+Shift+V.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum PasteChord {
+    /// Ctrl+V.
+    #[default]
+    CtrlV,
+    /// Ctrl+Shift+V.
+    CtrlShiftV,
+    /// Super+V.
+    SuperV,
+    /// Shift+Insert.
+    ShiftInsert,
+}
+
+/// Where in its press a raw key event is.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum RawKeyPhase {
+    /// The key goes down.
+    Down,
+    /// The key is held and repeats.
+    Repeat,
+    /// The key comes up.
+    Up,
+}
+
+/// One key event as the window would hand it to the document.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct RawKeyInput {
+    /// The logical key.
+    pub key: DomKey,
+    /// The physical key.
+    pub code: Code,
+    /// Down, repeating or up.
+    pub phase: RawKeyPhase,
+    /// Which of two like keys it is.
+    pub location: Location,
+    /// The modifiers held.
+    pub mods: Modifiers,
+    /// The text the press types, where the platform reports it.
+    pub text: Option<String>,
+}
+
+impl RawKeyInput {
+    /// `key` on the physical key `code`, going down, with nothing held.
+    pub fn down(key: DomKey, code: Code) -> Self {
+        RawKeyInput {
+            key,
+            code,
+            phase: RawKeyPhase::Down,
+            location: Location::Standard,
+            mods: Modifiers::empty(),
+            text: None,
+        }
+    }
+
+    /// The same key, in `phase`.
+    pub fn in_phase(self, phase: RawKeyPhase) -> Self {
+        RawKeyInput { phase, ..self }
+    }
+
+    /// The same key, held with `mods`.
+    pub fn with_mods(self, mods: Modifiers) -> Self {
+        RawKeyInput { mods, ..self }
+    }
+
+    /// The same key, on `location`.
+    pub fn at_location(self, location: Location) -> Self {
+        RawKeyInput { location, ..self }
+    }
+
+    /// The same key, typing `text`.
+    pub fn typing(self, text: &str) -> Self {
+        RawKeyInput {
+            text: Some(text.to_owned()),
+            ..self
+        }
+    }
 }
 
 /// A pointer action, where it happens and the modifiers held while it does.
@@ -265,12 +350,23 @@ impl Input {
         Input::Ime(ImeInput::End)
     }
 
-    /// Paste `html` with its plain `text`.
+    /// Paste `html` with its plain `text`, with Ctrl+V.
     pub fn paste(html: &str, text: &str) -> Self {
+        Input::paste_with(PasteChord::CtrlV, html, text)
+    }
+
+    /// Paste `html` with its plain `text`, pressing `chord`.
+    pub fn paste_with(chord: PasteChord, html: &str, text: &str) -> Self {
         Input::Paste {
             html: html.to_owned(),
             text: text.to_owned(),
+            chord,
         }
+    }
+
+    /// One key event as given.
+    pub fn raw_key(key: RawKeyInput) -> Self {
+        Input::RawKey(key)
     }
 
     fn pointer(at: Point, action: PointerAction) -> Self {

@@ -30,7 +30,7 @@ pub struct RawKey {
     pub modifiers: Modifiers,
     /// Which of two like keys it is, where the platform says.
     pub location: Location,
-    /// The text the press types. What the platform reports where it reports any; else the
+    /// The text the press types (none on a release). What the platform reports where it reports any; else the
     /// logical character when no Ctrl or Super is held; else none.
     pub text: Option<String>,
     /// The logical key with no modifier held, where the platform reports it (it depends on the
@@ -46,7 +46,10 @@ impl RawKey {
         (modifiers, location): (Modifiers, Location),
         extras: KeyExtras,
     ) -> Self {
-        let text = extras.text.or_else(|| typed(&key, modifiers));
+        let text = match phase {
+            KeyPhase::Press | KeyPhase::Repeat => extras.text.or_else(|| typed(&key, modifiers)),
+            KeyPhase::Release => None,
+        };
         RawKey {
             phase,
             key,
@@ -135,6 +138,20 @@ mod tests {
         for (name, key, want) in cases {
             assert_eq!(key.text.as_deref(), want, "{name}");
         }
+    }
+
+    #[test]
+    fn a_release_types_nothing() {
+        let up = RawKey::new(
+            KeyPhase::Release,
+            (character("a"), Code::KeyA),
+            (Modifiers::empty(), Location::Standard),
+            KeyExtras {
+                text: Some("a".to_owned()),
+                unshifted: None,
+            },
+        );
+        assert_eq!(up.text, None);
     }
 
     #[test]

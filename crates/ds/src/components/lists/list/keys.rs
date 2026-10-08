@@ -3,6 +3,7 @@
 //! jump to the next label that starts with them.
 
 use crate::components::lists::list::model::{ListItem, ListRole};
+use crate::edit::keys::command_keys;
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::{Key, Modifiers};
 use ds_core::vocab::Availability;
@@ -20,7 +21,8 @@ pub(crate) enum ListKey {
 
 /// The list's reading of `key`; `None` for a key it leaves alone.
 pub(crate) fn list_key(key: &Key, modifiers: Modifiers) -> Option<ListKey> {
-    let chord = modifiers.intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
+    let chord =
+        command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
     match key {
         Key::ArrowDown => Some(ListKey::Move(Rove::of(&Key::ArrowDown)?)),
         Key::ArrowUp => Some(ListKey::Move(Rove::of(&Key::ArrowUp)?)),

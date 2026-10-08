@@ -11,6 +11,7 @@ use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
+use crate::edit::keys::command_keys;
 use crate::host::measure::{Anchor, MountedRef, use_rect};
 use crate::root::common::Common;
 use crate::stack::typeahead::Typeahead;
@@ -164,8 +165,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             if live
                 && kind == PopUpKind::PopUp
                 && !text.trim().is_empty()
-                && !event
-                    .modifiers()
+                && !command_keys(event.modifiers())
                     .intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META) =>
         {
             let choices: Vec<(&T, &str)> = typed

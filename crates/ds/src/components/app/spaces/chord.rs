@@ -1,5 +1,6 @@
 //! The key that switches Space: a modifier and the digits 1 to 9.
 
+use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
 use ds_core::standard_action::SpaceNumber;
 use ds_core::vocab::{Shortcut, ShortcutKey};
@@ -26,7 +27,7 @@ impl SwitchChord {
 
     /// The Space a key press asks for: a digit 1 to 9 with this modifier held and nothing else.
     pub fn pressed(self, key: &Key, modifiers: Modifiers) -> Option<SpaceNumber> {
-        if modifiers != self.modifiers() {
+        if command_keys(modifiers) != self.modifiers() {
             return None;
         }
         let Key::Character(text) = key else {

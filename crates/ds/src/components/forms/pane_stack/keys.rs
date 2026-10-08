@@ -1,5 +1,6 @@
 //! What a key means to a pane stack, pure: the keys that go back one page.
 
+use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
 
 /// Whether `key` with `modifiers` asks to go back: Escape, the command chord `[` (the `Super` key
@@ -7,7 +8,7 @@ use dioxus::prelude::{Key, Modifiers};
 pub(crate) fn goes_back(key: &Key, modifiers: Modifiers) -> bool {
     match key {
         Key::Escape => modifiers.is_empty(),
-        Key::Character(text) if text == "[" => modifiers == Modifiers::META,
+        Key::Character(text) if text == "[" => command_keys(modifiers) == Modifiers::META,
         Key::ArrowLeft => modifiers == Modifiers::ALT,
         _ => false,
     }

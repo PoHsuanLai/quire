@@ -4,7 +4,7 @@
 use crate::harness::Harness;
 use crate::harness_frames::Delivery;
 use crate::harness_input::{blitz_button, keyboard, pointer};
-use crate::input::{KeyInput, PointerAction, PointerInput};
+use crate::input::{KeyInput, PointerAction, PointerInput, RawKeyInput, RawKeyPhase};
 use blitz_kit::scroll::driver::KeyRepeat;
 use blitz_kit::scroll::keys::scroll_key;
 use blitz_traits::events::{BlitzKeyEvent, KeyState, MouseEventButton, UiEvent};
@@ -65,6 +65,33 @@ impl Harness {
                 delivery,
             );
         }
+    }
+
+    /// Deliver one key event as given: no scroll step, no paired release, just what the window
+    /// would hand the document for it.
+    pub(crate) fn raw_key(&mut self, input: RawKeyInput) {
+        self.doc.set_modality(InputModality::Keyboard);
+        let state = match input.phase {
+            RawKeyPhase::Down | RawKeyPhase::Repeat => KeyState::Pressed,
+            RawKeyPhase::Up => KeyState::Released,
+        };
+        let event = BlitzKeyEvent {
+            key: input.key,
+            code: input.code,
+            modifiers: input.mods,
+            location: input.location,
+            is_auto_repeating: input.phase == RawKeyPhase::Repeat,
+            is_composing: false,
+            state,
+            text: input.text.map(Into::into),
+        };
+        self.deliver_as(
+            match state {
+                KeyState::Pressed => UiEvent::KeyDown(event),
+                KeyState::Released => UiEvent::KeyUp(event),
+            },
+            Delivery::Settled,
+        );
     }
 
     fn move_to(&mut self, at: Point, mods: Modifiers) {
