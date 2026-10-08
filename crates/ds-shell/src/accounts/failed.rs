@@ -1,5 +1,5 @@
-//! SignInFailed: the sign-in ended without an account, and why. The person tries again, goes
-//! back a step, or gives up.
+//! SignInFailed: the sign-in ended without an account, and why. The person tries again (when a
+//! retry could help), goes back a step, or is done. A fault may carry one more action of its own.
 
 use super::adapter::{Action, Intent, Landing};
 use super::frame::StepFrame;
@@ -9,32 +9,76 @@ use super::wording::fault;
 use dioxus::prelude::*;
 use ds::components::content::provider_mark::MarkProvider;
 
-/// The failure step for `provider`. Return is "Try Again", Escape and Cancel call `on_cancel`.
+/// Whether trying again could help, as the host knows from the fault.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Recovery {
+    /// A retry may work: "Try Again" is the default button.
+    #[default]
+    Retry,
+    /// Only a change outside the sheet helps: there is no "Try Again", and "Done" is the default.
+    NoRetry,
+}
+
+/// One more button for a fault, drawn before the default: "Open Settings", "Learn More". The
+/// host supplies its words and what it does.
+#[derive(Debug, Clone, PartialEq)]
+pub struct FailureAction {
+    /// The button's words.
+    pub label: String,
+    /// Called when the person presses it.
+    pub on_press: EventHandler<()>,
+}
+
+/// The failure step for `provider`. With `Recovery::Retry` (the default) Return is "Try Again"
+/// and Cancel calls `on_cancel`; with `Recovery::NoRetry` there is no "Try Again" (`on_retry` is
+/// never called, so a host may leave it out) and Return is "Done", which calls `on_cancel`.
+/// Escape calls `on_cancel` either way. `extra` adds one button of the host's.
 #[component]
 pub fn SignInFailed(
     #[props(into)] provider: String,
     why: SignInFault,
-    on_retry: EventHandler<()>,
+    #[props(default)] recovery: Recovery,
+    #[props(default)] on_retry: EventHandler<()>,
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
+    #[props(default)] extra: Option<FailureAction>,
     #[props(default)] title: StepTitle,
     #[props(default)] mark: Option<MarkProvider>,
 ) -> Element {
     let sentence = fault(why, &provider, mark);
+    let enter = match recovery {
+        Recovery::Retry => on_retry,
+        Recovery::NoRetry => on_cancel,
+    };
     rsx! {
         StepFrame {
             shown: title,
             step: "failed",
             title: "Could not add {provider}",
-            onenter: EventHandler::new(move |()| on_retry.call(())),
+            onenter: EventHandler::new(move |()| enter.call(())),
             oncancel: on_cancel,
             body: rsx! {
                 div { class: "ds-acc-caption", role: "alert", "{sentence}" }
             },
             actions: rsx! {
                 Action { label: "Back", onclick: move |()| on_back.call(()) }
-                Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_cancel.call(()) }
-                Action { label: "Try Again", intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_retry.call(()) }
+                match recovery {
+                    Recovery::Retry => rsx! {
+                        Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_cancel.call(()) }
+                    },
+                    Recovery::NoRetry => rsx! {},
+                }
+                if let Some(action) = extra {
+                    Action { label: action.label, onclick: move |()| action.on_press.call(()) }
+                }
+                match recovery {
+                    Recovery::Retry => rsx! {
+                        Action { label: "Try Again", intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_retry.call(()) }
+                    },
+                    Recovery::NoRetry => rsx! {
+                        Action { label: "Done", intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_cancel.call(()) }
+                    },
+                }
             },
         }
     }

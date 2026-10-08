@@ -185,13 +185,25 @@ pub fn AccountsPage() -> Element {
                 }) }
             }
         }
-        Section { title: "Working and failed", note: "SignInWorking: nothing can be pressed but Cancel. SignInFailed: why it ended without an account in a sentence, with Back, Cancel and Try Again (the default).",
+        Section { title: "Working and failed", note: "SignInWorking: nothing can be pressed but Cancel. SignInFailed: why it ended without an account in a sentence, with Back, Cancel and Try Again (the default). With Recovery::NoRetry a retry cannot help: no Try Again, Done is the default, and an optional FailureAction (Open Settings) stands before it.",
             div { class: "g-row g-row-top",
                 Stage { theme: Theme::Light, body: step(rsx! {
                     SignInWorking { provider: "Fastmail", on_cancel: |_| {} }
                 }) }
                 Stage { theme: Theme::Dark, body: step(rsx! {
                     SignInFailed { provider: "Fastmail", why: SignInFault::Unreachable, on_retry: |_| {}, on_back: |_| {}, on_cancel: |_| {} }
+                }) }
+            }
+            div { class: "g-row g-row-top",
+                Stage { theme: Theme::Light, body: step(rsx! {
+                    SignInFailed {
+                        provider: "Fastmail",
+                        why: SignInFault::Forbidden,
+                        recovery: Recovery::NoRetry,
+                        extra: Some(FailureAction { label: "Open Settings".to_owned(), on_press: EventHandler::new(|()| {}) }),
+                        on_back: |_| {},
+                        on_cancel: |_| {},
+                    }
                 }) }
             }
         }

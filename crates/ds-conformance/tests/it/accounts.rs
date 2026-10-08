@@ -219,6 +219,23 @@ fn Failed() -> Element {
 }
 
 #[allow(non_snake_case)]
+fn FailedNoRetry() -> Element {
+    Stage(rsx! {
+        SignInFailed {
+            provider: "Fastmail",
+            why: SignInFault::Forbidden,
+            recovery: Recovery::NoRetry,
+            on_back: move |()| LOG.write().push("back".to_owned()),
+            on_cancel: move |()| LOG.write().push("cancel".to_owned()),
+            extra: Some(FailureAction {
+                label: "Open Settings".to_owned(),
+                on_press: EventHandler::new(move |()| LOG.write().push("settings".to_owned())),
+            }),
+        }
+    })
+}
+
+#[allow(non_snake_case)]
 fn Working() -> Element {
     Stage(rsx! {
         SignInWorking { provider: "Fastmail", on_cancel: move |()| LOG.write().push("cancel".to_owned()) }
@@ -548,6 +565,26 @@ fn return_tries_a_failed_sign_in_again_and_escape_gives_up() {
     press(&mut harness, ShortcutKey::Enter);
     assert_eq!(log(&mut harness), ["retry"]);
     let mut harness = start(Failed);
+    press(&mut harness, ShortcutKey::Escape);
+    assert_eq!(log(&mut harness), ["cancel"]);
+}
+
+#[test]
+fn a_fault_without_a_retry_ends_on_done_and_offers_its_extra_action() {
+    let mut harness = start(FailedNoRetry);
+    assert_eq!(
+        harness.text_of(".ds-acc-actions .ds-button[data-answers=\"return\"]"),
+        Some("Done".to_owned()),
+        "{}",
+        harness.html()
+    );
+    assert!(!harness.html().contains("Try Again"));
+    press(&mut harness, ShortcutKey::Enter);
+    assert_eq!(log(&mut harness), ["cancel"], "Return is Done");
+    let mut harness = start(FailedNoRetry);
+    click(&mut harness, ".ds-acc-actions .ds-button:nth-child(2)");
+    assert_eq!(log(&mut harness), ["settings"], "the extra action");
+    let mut harness = start(FailedNoRetry);
     press(&mut harness, ShortcutKey::Escape);
     assert_eq!(log(&mut harness), ["cancel"]);
 }

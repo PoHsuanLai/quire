@@ -415,6 +415,21 @@ const SPECIMENS: &[Specimen] = &[
             }
         }
     }),
+    ("failed-no-retry", || {
+        rsx! {
+            SignInFailed {
+                provider: "Fastmail",
+                why: SignInFault::Forbidden,
+                recovery: Recovery::NoRetry,
+                extra: Some(FailureAction {
+                    label: "Open Settings".to_owned(),
+                    on_press: EventHandler::new(|()| {}),
+                }),
+                on_back: |_| {},
+                on_cancel: |_| {},
+            }
+        }
+    }),
     ("failed-unreachable", || failed(SignInFault::Unreachable)),
     ("failed-forbidden", || failed(SignInFault::Forbidden)),
     ("review", || review(None)),
@@ -741,4 +756,13 @@ fn the_failed_step_says_the_new_faults_and_where_google_looks() {
         light("failed-google-client-id")
             .contains("Google sign-in needs a client id: see docs/google.md")
     );
+}
+
+#[test]
+fn a_fault_without_a_retry_has_no_try_again_and_ends_on_done() {
+    let html = light("failed-no-retry");
+    assert!(!html.contains("Try Again"), "{html}");
+    assert!(html.contains("Done"), "{html}");
+    assert!(html.contains("Open Settings"), "{html}");
+    assert!(light("failed-unreachable").contains("Try Again"));
 }
