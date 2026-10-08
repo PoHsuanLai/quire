@@ -28,7 +28,7 @@ const SIZES: [IconSize; 5] = [
 ];
 
 /// The glyphs the viewer app and the pairs draw, each at every size in [`SIZES`].
-const AT_SIZES: [Icon; 24] = [
+const AT_SIZES: [Icon; 26] = [
     Icon::File,
     Icon::Folder,
     Icon::Image,
@@ -41,6 +41,8 @@ const AT_SIZES: [Icon; 24] = [
     Icon::ChevronRight,
     Icon::Undo,
     Icon::Refresh,
+    Icon::RotateLeft,
+    Icon::RotateRight,
     Icon::Search,
     Icon::Maximize,
     Icon::Columns,
