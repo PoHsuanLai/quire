@@ -41,6 +41,11 @@ pub enum Family {
     /// code, `KeyEquivalent` caps, aligned logs.
     #[token(value = "\"Space Mono\",\"Inter\",ui-monospace,\"SFMono-Regular\",Menlo,monospace")]
     Code,
+    /// `--font-term`: the system's own monospace family, for a terminal's cells. Space Mono has
+    /// no box drawing, CJK or emoji, so a terminal asks the system for a face that covers them
+    /// and lets the system fall back per glyph.
+    #[token(value = "monospace")]
+    Terminal,
 }
 
 impl Family {
