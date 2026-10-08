@@ -11,6 +11,7 @@ pub mod found;
 pub mod gesture;
 pub mod hand_back;
 pub mod ime;
+pub mod keys;
 pub mod layout;
 pub mod measure;
 pub mod no_host;

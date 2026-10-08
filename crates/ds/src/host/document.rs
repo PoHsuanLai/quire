@@ -1,5 +1,6 @@
 //! The one seam between the design system and the renderer it is drawn in.
 
+use crate::host::keys::KeysHost;
 use crate::host::no_host::NoHost;
 use crate::host::parts::{
     CaretHost, ClickFocusHost, EditHost, FileDropHost, FocusHost, GeometryHost,
@@ -24,6 +25,12 @@ pub trait DocumentHost {
     fn edit(&self) -> Option<&dyn EditHost>;
     /// The hit test for a file drag, where the host has one.
     fn file_drop(&self) -> Option<&dyn FileDropHost>;
+    /// What the renderer knows of a key press beyond the event (its text and its unmodified
+    /// key), where it knows any. A host that does not forward them keeps this `None` and a
+    /// raw-keys surface falls back on the event alone.
+    fn keys(&self) -> Option<&dyn KeysHost> {
+        None
+    }
 }
 
 /// The enclosing document's host: [`NoHost`] where none was provided (a server render), whose

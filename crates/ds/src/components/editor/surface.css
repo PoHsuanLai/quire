@@ -14,3 +14,7 @@
    a misspelling. */
 .ds-spell-layer{ position:absolute; width:0; height:0; margin:0; padding:0; pointer-events:none; }
 .ds-spell-mark{ position:absolute; box-sizing:border-box; border-bottom:calc(var(--hair) * 2) dotted var(--spell-mark); }
+
+/* RawKeySurface: a block the app draws a region in (a terminal grid) and takes every key for.
+   The app draws the cursor, so there is no focus ring. */
+.ds-raw-keys{ display:block; outline:none; }
