@@ -62,10 +62,17 @@ fn secret(role: FieldRole, part: FormPart) -> FormField {
     field(role, FieldText::Secret(Hidden::new("not shown"))).in_part(part)
 }
 
-const PROTOCOLS: [(&str, &str); 3] = [("imap", "IMAP"), ("pop3", "POP3"), ("jmap", "JMAP")];
-const SECURITIES: [(&str, &str); 2] = [("tls", "TLS"), ("starttls", "STARTTLS")];
+const PROTOCOLS: [(&str, &str); 3] = [
+    ("imap", "Most servers (IMAP)"),
+    ("pop3", "Older servers (POP)"),
+    ("jmap", "Newer servers (JMAP)"),
+];
+const SECURITIES: [(&str, &str); 2] = [
+    ("tls", "Secure from the start (SSL/TLS)"),
+    ("starttls", "Secure after connecting (STARTTLS)"),
+];
 
-/// The hand-typed form for `protocol`, as a host refits it: JMAP has no outgoing fields.
+/// The hand-typed form for `protocol`, as a host refits it: newer servers have no outgoing fields.
 fn by_hand(protocol: &str, port: &str, hint: &'static str) -> Vec<FormField> {
     use FieldRole::*;
     use FormPart::*;
@@ -79,11 +86,7 @@ fn by_hand(protocol: &str, port: &str, hint: &'static str) -> Vec<FormField> {
     match protocol {
         "jmap" => vec![
             chosen(Protocol, "jmap", &PROTOCOLS, Incoming),
-            manual(
-                SessionUrl,
-                "https://mail.example.org/jmap/session",
-                Incoming,
-            ),
+            manual(SessionUrl, "https://mail.example.org/session", Incoming),
             secret(Token, SignIn),
         ],
         other => vec![
@@ -166,7 +169,7 @@ pub fn AccountsPage() -> Element {
                 ], Some(FieldProblem { role: FieldRole::Password, kind: ProblemKind::Refused, attempt: Attempt(1) })) }
             }
         }
-        Section { title: "Sign in by hand", note: "SignInForm with choices and groups: a field that carries choices is a pop-up button and reports the slug of the one picked through the same edit event, so the host can refit the list (JMAP has no outgoing fields). Fields that name a part sit in titled groups; a port is a plain entry whose hint is the host's usual number, and a refused or invalid one is marked under it.",
+        Section { title: "Sign in by hand", note: "SignInForm with choices and groups: a field that carries choices is a pop-up button and reports the slug of the one picked through the same edit event, so the host can refit the list (newer servers have no outgoing fields). Fields that name a part sit in titled groups; a port is a plain entry whose hint is the host's usual number, and a refused or invalid one is marked under it.",
             div { class: "g-row g-row-top",
                 Stage { theme: Theme::Light, height: StageHeight::Tall, body: sign_in(by_hand("imap", "", "993"), None) }
                 Stage { theme: Theme::Dark, height: StageHeight::Tall, body: sign_in(by_hand("pop3", "pop", "995"), Some(FieldProblem { role: FieldRole::Port, kind: ProblemKind::Invalid, attempt: Attempt(1) })) }

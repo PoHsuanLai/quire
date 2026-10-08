@@ -95,7 +95,7 @@ impl MarkProvider {
             MarkProvider::Fastmail => "Fastmail",
             MarkProvider::ICloud => "iCloud",
             MarkProvider::Yahoo => "Yahoo",
-            MarkProvider::Imap => "IMAP",
+            MarkProvider::Imap => "Mail account",
             MarkProvider::Local => "Local folders",
         }
     }

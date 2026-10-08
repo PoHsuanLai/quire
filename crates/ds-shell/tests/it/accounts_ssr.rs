@@ -86,8 +86,15 @@ fn entry(role: FieldRole, text: &str, part: FormPart) -> FormField {
     field(role, plain(text)).in_part(part)
 }
 
-const PROTOCOLS: [(&str, &str); 3] = [("imap", "IMAP"), ("pop3", "POP3"), ("jmap", "JMAP")];
-const SECURITIES: [(&str, &str); 2] = [("tls", "TLS"), ("starttls", "STARTTLS")];
+const PROTOCOLS: [(&str, &str); 3] = [
+    ("imap", "Most servers (IMAP)"),
+    ("pop3", "Older servers (POP)"),
+    ("jmap", "Newer servers (JMAP)"),
+];
+const SECURITIES: [(&str, &str); 2] = [
+    ("tls", "Secure from the start (SSL/TLS)"),
+    ("starttls", "Secure after connecting (STARTTLS)"),
+];
 
 fn optional(field: FormField) -> FormField {
     FormField {
@@ -120,11 +127,7 @@ fn jmap_form() -> Vec<FormField> {
     use FormPart::*;
     vec![
         choose(Protocol, "jmap", &PROTOCOLS, Incoming),
-        entry(
-            SessionUrl,
-            "https://mail.example.org/jmap/session",
-            Incoming,
-        ),
+        entry(SessionUrl, "https://mail.example.org/session", Incoming),
         field(Token, FieldText::Secret(Hidden::new(PASSWORD))).in_part(SignIn),
     ]
 }
@@ -686,8 +689,8 @@ fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
         "Incoming",
         "Outgoing",
         "Sign in",
-        "IMAP",
-        "STARTTLS",
+        "Most servers (IMAP)",
+        "Secure after connecting (STARTTLS)",
         "placeholder=\"993\"",
     ] {
         assert!(imap.contains(want), "{want} in {imap}");
@@ -700,7 +703,7 @@ fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
     assert_eq!(imap.matches("class=\"ds-popup\"").count(), 3, "{imap}");
     let jmap = light("sign-in-manual-jmap");
     assert!(
-        jmap.contains("Session URL") && jmap.contains("Access token"),
+        jmap.contains("Server web address") && jmap.contains("Access token"),
         "{jmap}"
     );
     assert!(!jmap.contains("Outgoing"), "{jmap}");

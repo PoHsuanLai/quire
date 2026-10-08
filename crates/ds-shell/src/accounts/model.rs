@@ -137,7 +137,7 @@ impl FieldText {
 pub struct Choice {
     /// What the host calls it ("imap", "starttls"): exactly what an edit of the field reports.
     pub slug: String,
-    /// What the person reads ("IMAP", "STARTTLS").
+    /// What the person reads ("Most servers (IMAP)", "Secure after connecting (STARTTLS)"): the plain name first, the protocol second.
     pub label: String,
 }
 

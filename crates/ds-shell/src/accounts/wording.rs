@@ -40,13 +40,13 @@ pub(crate) fn field_label(role: FieldRole) -> &'static str {
         FieldRole::Password => "Password",
         FieldRole::ApiKey => "API key",
         FieldRole::Token => "Access token",
-        FieldRole::Protocol => "Protocol",
+        FieldRole::Protocol => "Server type",
         FieldRole::Port => "Port",
         FieldRole::Security => "Security",
         FieldRole::OutgoingServer => "Outgoing server",
         FieldRole::OutgoingPort => "Outgoing port",
         FieldRole::OutgoingSecurity => "Outgoing security",
-        FieldRole::SessionUrl => "Session URL",
+        FieldRole::SessionUrl => "Server web address",
     }
 }
 
@@ -66,7 +66,7 @@ pub(crate) fn field_placeholder(role: FieldRole, requirement: Requirement) -> &'
         FieldRole::Protocol | FieldRole::Security | FieldRole::OutgoingSecurity => "Choose",
         FieldRole::Port | FieldRole::OutgoingPort => "Usual port",
         FieldRole::OutgoingServer => "smtp.example.org",
-        FieldRole::SessionUrl => "https://mail.example.org/jmap/session",
+        FieldRole::SessionUrl => "https://mail.example.org/session",
     }
 }
 

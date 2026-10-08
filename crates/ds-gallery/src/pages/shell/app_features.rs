@@ -122,7 +122,7 @@ fn Today() -> Element {
     let mut tabs = use_signal(|| {
         let start = now();
         vec![
-            (1u8, "RFC 1939: POP3", 3 * 3600),
+            (1u8, "Older mail servers", 3 * 3600),
             (2, "UIDL stability", 20 * 60),
             (3, "Sync review notes", 90),
         ]
