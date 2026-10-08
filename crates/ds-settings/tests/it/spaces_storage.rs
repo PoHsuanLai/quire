@@ -169,3 +169,60 @@ fn a_mailo_shaped_today_keeps_its_entries_parked_drafts_and_prunes() {
     let early: Today<u32, u32> = disk.boot_today(Epoch(1_699_920_000));
     assert_eq!(early.entries.len(), 2);
 }
+
+const MAILO_TODAY: &str = r#"{"entries":[
+  {"space":1,"thread":"t-old","last_opened":"2026-10-06T12:00:00Z"},
+  {"space":1,"thread":"t-new","last_opened":"2026-10-07T12:00:00Z"}],
+ "drafts":[{"space":1,"draft":"d-1","title":"Re: lunch","parked":"2026-10-07T12:00:00Z"}]}"#;
+
+fn write_today(scratch: &Scratch, text: &str) {
+    let state = ConfigRoot::Scratch(scratch.root().to_path_buf())
+        .state_dir(AppName("notes"))
+        .expect("dir");
+    std::fs::create_dir_all(&state).expect("dir");
+    std::fs::write(state.join("today.json"), text).expect("write");
+}
+
+#[test]
+fn mailos_real_today_file_is_read_and_pruned() {
+    let scratch = Scratch::new();
+    let disk = storage(&scratch);
+    write_today(&scratch, MAILO_TODAY);
+    let loaded: Today<String, String> = disk.load_today();
+    assert_eq!(loaded.entries.len(), 2);
+    assert_eq!(loaded.entries[1].item, "t-new");
+    assert_eq!(loaded.entries[1].space, SpaceId(1));
+    assert_eq!(loaded.parked.len(), 1);
+    assert_eq!(loaded.parked[0].item, "d-1");
+    assert_eq!(loaded.parked[0].title, "Re: lunch");
+    let noon = 1791374400;
+    let booted: Today<String, String> = disk.boot_today(Epoch(noon + 3600));
+    let items: Vec<&str> = booted.entries.iter().map(|e| e.item.as_str()).collect();
+    assert_eq!(
+        items,
+        ["t-new"],
+        "the entry a day old is idle, the one an hour old is not"
+    );
+    assert_eq!(booted.parked.len(), 1, "parked things never expire");
+}
+
+#[test]
+fn one_bad_today_item_drops_only_itself() {
+    let scratch = Scratch::new();
+    let disk = storage(&scratch);
+    write_today(
+        &scratch,
+        r#"{"entries":[
+  {"space":0,"thread":"a","last_opened":"2026-10-07T12:00:00Z"},
+  {"space":0,"thread":"b","last_opened":"yesterday"},
+  {"space":0,"last_opened":"2026-10-07T12:00:00Z"},
+  {"space":0,"thread":"c","last_opened":"2026-10-07T12:00:00Z"}],
+ "drafts":[{"space":0,"draft":"x","title":"t","parked":"2026-10-07T12:00:00Z"},
+  {"space":"zero","draft":"y","title":"t","parked":"2026-10-07T12:00:00Z"}]}"#,
+    );
+    let loaded: Today<String, String> = disk.load_today();
+    let items: Vec<&str> = loaded.entries.iter().map(|e| e.item.as_str()).collect();
+    assert_eq!(items, ["a", "c"]);
+    assert_eq!(loaded.parked.len(), 1);
+    assert_eq!(loaded.parked[0].item, "x");
+}

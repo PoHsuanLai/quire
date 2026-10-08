@@ -307,3 +307,13 @@ fn today_reads_mailos_old_draft_key() {
     let today: Today<u32, u8> = serde_json::from_str(text).expect("reads");
     assert_eq!(today.parked.len(), 1);
 }
+
+#[test]
+fn edit_recall_changes_the_place_of_a_space_and_ignores_strangers() {
+    let mut spaces = set(1);
+    spaces.edit_recall(SpaceId(0), |place| place.push_str("inbox"));
+    spaces.edit_recall(SpaceId(0), |place| place.push('!'));
+    assert_eq!(spaces.recall().of(SpaceId(0)), "inbox!");
+    spaces.edit_recall(SpaceId(9), |place| place.push('x'));
+    assert_eq!(spaces.recall().len(), 1);
+}

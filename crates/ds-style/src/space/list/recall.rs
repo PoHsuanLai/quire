@@ -30,6 +30,14 @@ impl<R> Recall<R> {
         self.0.insert(id, place);
     }
 
+    /// Change the place of `id` in place, from the default when it has none.
+    pub fn edit(&mut self, id: SpaceId, change: impl FnOnce(&mut R))
+    where
+        R: Default,
+    {
+        change(self.0.entry(id).or_default());
+    }
+
     /// Forget `id`.
     pub fn forget(&mut self, id: SpaceId) {
         self.0.remove(&id);

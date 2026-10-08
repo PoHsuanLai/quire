@@ -134,6 +134,12 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
         self.spaces.write_unchecked().edit(id, edit);
     }
 
+    /// Change where `id` was left, as [`Self::change`] does a Space: nothing is written until
+    /// [`Self::commit`].
+    pub fn change_recall(&self, id: SpaceId, edit: impl FnOnce(&mut R)) {
+        self.spaces.write_unchecked().edit_recall(id, edit);
+    }
+
     /// Write the list.
     pub fn commit(&self) {
         self.keep.call(self.spaces.read().clone());

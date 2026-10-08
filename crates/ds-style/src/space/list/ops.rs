@@ -50,6 +50,17 @@ impl<P, R> Spaces<P, R> {
         }
     }
 
+    /// Change where `id` was left, from the default place when it has none. A `id` that is not
+    /// a Space is ignored.
+    pub fn edit_recall(&mut self, id: SpaceId, change: impl FnOnce(&mut R))
+    where
+        R: Default,
+    {
+        if self.index_of(id).is_some() {
+            self.recall.edit(id, change);
+        }
+    }
+
     /// Move `id` so it stands at `index` (past the end is the end). The Space on screen stays.
     pub fn move_to(&mut self, id: SpaceId, index: usize) {
         if let Some(from) = self.index_of(id) {
