@@ -27,18 +27,24 @@ pub enum RootExtent {
     /// At least the viewport: an overlay surface whose content is positioned (a sheet, an OSD,
     /// a catcher). Written `data-extent="viewport"`.
     Viewport,
+    /// Exactly the window's height and at least its width: an app's whole window, whose children
+    /// can be `height:100%` (a split view, a terminal) with no container of the app's own.
+    /// Written `data-extent="window"`. Not for a surface fitted to its content, which would
+    /// measure a root that never shrinks.
+    Window,
     /// A popup document fitted to its content: the floating card lies in flow at the origin and
     /// no outside catcher covers the surface. Written `data-extent="popup"`.
     Popup,
 }
 
 impl RootExtent {
-    /// The `data-extent` value, written only for a viewport or popup root, so a content root's
+    /// The `data-extent` value, written only for a viewport, window or popup root, so a content root's
     /// markup is what it was.
     pub fn attribute(self) -> Option<&'static str> {
         match self {
             RootExtent::Content => None,
             RootExtent::Viewport => Some("viewport"),
+            RootExtent::Window => Some("window"),
             RootExtent::Popup => Some("popup"),
         }
     }
@@ -52,6 +58,7 @@ mod tests {
     fn only_a_viewport_or_popup_root_writes_its_extent() {
         assert_eq!(RootExtent::default().attribute(), None);
         assert_eq!(RootExtent::Viewport.attribute(), Some("viewport"));
+        assert_eq!(RootExtent::Window.attribute(), Some("window"));
         assert_eq!(RootExtent::Popup.attribute(), Some("popup"));
     }
 }

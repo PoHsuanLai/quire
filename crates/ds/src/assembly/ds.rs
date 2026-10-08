@@ -55,6 +55,8 @@
 //! positioned content (a centred sheet) is otherwise 0 px tall. A popup document, whose host
 //! fits the surface to its content, passes `RootExtent::Popup`: the floating card lies in flow
 //! at the origin and no outside catcher covers the surface.
+//! An app's own window passes `RootExtent::Window`: the root is the window's height, so a
+//! `height:100%` child (a split view) needs no `100vh` container of the app's.
 
 use crate::components::chrome::window_frame::{WindowFrame, framed};
 use crate::components::overlays::title_tips::use_title_tips_provider;
