@@ -549,6 +549,9 @@ pub enum EffectMark {
     UndoableWrite,
     /// Sends something out of the machine.
     Outbound,
+    /// Runs commands on this computer: it can do anything the person's account can, so it is
+    /// marked apart from a plain write and from `Destructive`.
+    Execute,
     /// Destroys something that cannot be put back.
     Destructive,
 }
@@ -740,6 +743,7 @@ mod companion_tests {
             EffectMark::Read,
             EffectMark::UndoableWrite,
             EffectMark::Outbound,
+            EffectMark::Execute,
             EffectMark::Destructive,
         ];
         assert_eq!(EffectMark::ALL, ordered);

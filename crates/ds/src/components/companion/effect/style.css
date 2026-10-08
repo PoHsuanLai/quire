@@ -1,0 +1,7 @@
+/* The effect tag (design/32 section 4). Read and undoable writes are quiet; an outbound effect
+   is warned; running commands is a strong neutral plate; destruction is the danger wash. */
+.ds-effect-tag{ display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8); border-radius:var(--r-pill); font-size:var(--fs-caption); color:var(--ink); }
+.ds-effect-tag[*|data-effect=outbound]{ background:var(--warn-wash); }
+.ds-effect-tag[*|data-effect=execute]{ background:var(--fill); border:var(--hair) solid var(--line); }
+.ds-effect-tag[*|data-effect=destructive]{ background:var(--danger-wash); }
+.ds-effect-tag-words{ line-height:1.25; }

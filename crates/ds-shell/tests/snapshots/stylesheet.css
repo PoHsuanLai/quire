@@ -2912,6 +2912,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- context_chips -- */
 /* The context chips (design/32 section 4). Placeholder root until its fill. */
 .ds-context-chips { display:flex; flex-wrap:wrap; }
+/* -- effect_tag -- */
+/* The effect tag (design/32 section 4). Read and undoable writes are quiet; an outbound effect
+   is warned; running commands is a strong neutral plate; destruction is the danger wash. */
+.ds-effect-tag{ display:inline-flex; align-items:center; gap:var(--s-6); padding:var(--s-2) var(--s-8); border-radius:var(--r-pill); font-size:var(--fs-caption); color:var(--ink); }
+.ds-effect-tag[*|data-effect=outbound]{ background:var(--warn-wash); }
+.ds-effect-tag[*|data-effect=execute]{ background:var(--fill); border:var(--hair) solid var(--line); }
+.ds-effect-tag[*|data-effect=destructive]{ background:var(--danger-wash); }
+.ds-effect-tag-words{ line-height:1.25; }
 /* -- answer_card -- */
 /* The answer card (design/32 section 4). Placeholder root until its fill. */
 .ds-answer-card { display:block; }

@@ -3,9 +3,12 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::components::companion::effect::view::EffectTag;
 use ds::prelude::*;
 use ds::style::icon::render::{Glyph, IconPx};
 use ds::style::icon::style::GlyphStyle;
+use ds_core::vocab::EffectMark;
+use ds_core::word::Word;
 
 /// The sets in `Icon::ALL`'s order, each with its heading.
 const SETS: [(&str, &[Icon]); 4] = [
@@ -82,6 +85,12 @@ pub fn Glyphs() -> Element {
                             Glyph { icon, size: IconSize::Bar }
                         }
                     }
+                }
+            }
+            span { class: "g-name", "effect marks: what an action does to the world, in order of severity" }
+            div { class: "g-grid8",
+                for effect in EffectMark::ALL {
+                    Specimen { name: effect.slug(), EffectTag { effect: *effect } }
                 }
             }
         }

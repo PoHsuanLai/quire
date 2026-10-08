@@ -10,6 +10,7 @@ pub mod activity;
 pub mod answer;
 pub mod chips;
 pub mod draft;
+pub mod effect;
 pub mod form;
 pub mod mark;
 pub mod memory;
