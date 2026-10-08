@@ -23,6 +23,7 @@ pub use switch::{SlideIn, Switched};
 pub use time::{Epoch, IDLE};
 pub use today::{Entry, NoPark, Parked, Today};
 pub use wire::MOST_DOTS;
+pub(crate) use wire::clamp_look;
 
 #[cfg(test)]
 mod tests;

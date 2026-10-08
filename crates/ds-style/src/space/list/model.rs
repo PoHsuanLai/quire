@@ -14,14 +14,17 @@ pub struct SpaceId(pub u64);
 ///
 /// Written flat: `id`, `name`, the look's own keys, then the payload's keys, so a payload that
 /// is a struct sits beside the look in the file (and an app that kept those keys before the kit
-/// reads its old file unchanged). A payload must not have keys called `id`, `name`, `dots`,
-/// `grain`, `theme` or `card_accent`.
+/// reads its old file unchanged). A payload must not have keys called `id`, `name`, `link`,
+/// `dots`, `grain`, `theme` or `card_accent`.
 #[derive(Debug, Clone, PartialEq)]
 pub struct Space<P> {
     /// Its identity.
     pub id: SpaceId,
     /// What the switcher calls it.
     pub name: String,
+    /// The desktop Space this one follows, as the desktop names it. The kit never reads inside
+    /// it: what it means, and whether it still exists, is the app's to know.
+    pub link: Option<String>,
     /// The frame's dots, grain, theme and card accent.
     pub look: SpaceLook,
     /// The app's own.

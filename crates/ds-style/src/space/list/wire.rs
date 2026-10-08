@@ -23,7 +23,7 @@ use std::collections::{BTreeMap, BTreeSet};
 pub const MOST_DOTS: usize = 3;
 
 /// `look` held to the limits: one to three dots, each with a finite hue and chroma in range.
-pub(super) fn clamp_look(mut look: SpaceLook) -> SpaceLook {
+pub(crate) fn clamp_look(mut look: SpaceLook) -> SpaceLook {
     look.dots = look
         .dots
         .into_iter()
@@ -55,6 +55,8 @@ fn clamp_dot(dot: Dot) -> Dot {
 struct SpaceOut<'a, P> {
     id: SpaceId,
     name: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    link: &'a Option<String>,
     #[serde(flatten)]
     look: &'a SpaceLook,
     #[serde(flatten)]
@@ -78,6 +80,7 @@ impl<P: Serialize, R: Serialize> Serialize for Spaces<P, R> {
                 .map(|space| SpaceOut {
                     id: space.id,
                     name: &space.name,
+                    link: &space.link,
                     look: &space.look,
                     payload: &space.payload,
                 })
@@ -95,6 +98,8 @@ struct SpaceRaw<P> {
     id: Option<SpaceId>,
     #[serde(default)]
     name: String,
+    #[serde(default, deserialize_with = "lenient_link")]
+    link: Option<String>,
     #[serde(default, deserialize_with = "lenient_dots")]
     dots: Vec<Dot>,
     #[serde(default, deserialize_with = "lenient_grain")]
@@ -156,6 +161,7 @@ fn from_raw<P>(raw: SpaceRaw<P>, id: SpaceId, index: usize) -> Space<P> {
     Space {
         id,
         name: raw.name,
+        link: raw.link,
         look: clamp_look(SpaceLook {
             dots: raw.dots,
             grain,
@@ -196,6 +202,14 @@ fn assigned_ids(stored: impl Iterator<Item = Option<SpaceId>>) -> Vec<SpaceId> {
 
 fn lenient_id<'de, D: Deserializer<'de>>(d: D) -> Result<Option<SpaceId>, D::Error> {
     Ok(Value::deserialize(d)?.as_u64().map(SpaceId))
+}
+
+/// A link is a string; anything else, or an empty one, is no link.
+fn lenient_link<'de, D: Deserializer<'de>>(d: D) -> Result<Option<String>, D::Error> {
+    Ok(Value::deserialize(d)?
+        .as_str()
+        .filter(|link| !link.is_empty())
+        .map(str::to_owned))
 }
 
 fn lenient_dots<'de, D: Deserializer<'de>>(d: D) -> Result<Vec<Dot>, D::Error> {
