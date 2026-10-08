@@ -218,6 +218,11 @@ directory) and over `R`, the place the app was left at in a Space.
   `recall` and Today of such a file keep their meaning. Reading is lenient field by field (an unknown
   theme word is the default, dots are clamped, a missing grain is the preset's own, `current` is held
   to a real Space); a file with no Space, or that is not JSON, is a first run.
+- `link` is the Space's optional link to a desktop Space: an opaque string the kit stores and
+  never reads inside. A file with no `link`, or one that is not a non-empty string, reads as
+  unlinked; an unlinked Space writes no key. `SpaceLook::to_json` and `SpaceLook::from_json`
+  turn a look into compact JSON of at most 1024 bytes and back, for a registry that keeps one
+  look per desktop Space (the registry is the app's; quire does not depend on it).
 
 ### 13.2 Switching (`ds::components::app::spaces::use_spaces`)
 
@@ -239,11 +244,19 @@ sidebar is at least 212 px wide (`SIDEBAR_MIN_WIDTH`).
 ### 13.4 The Space's menu (`SpaceMenu`)
 
 Rename... | Colour... | Appearance > (checked) | Accent Inside the Card > | the app's submenu slot
-(mailo: Accounts >, whose picks keep the menu open) | rule | New Space | Delete Space... (only
+(mailo: Accounts >, whose picks keep the menu open) | Link to... > and Unlink (only when the app
+passes the desktop's Spaces; Unlink only while linked) | rule | New Space | Delete Space... (only
 while there is more than one). New Space switches to the new Space and opens its Rename at once.
 Rename, Colour and Delete are popovers at the pointer; they change the Space live and keep it on
 close; Delete asks first and only its button deletes. While a part is open a dot click does not
 switch.
+
+Link to... lists the desktop Spaces the app passes (`DesktopSpace { id, name }`, the linked one
+checked) and, under a rule, New Desktop Space.... A pick of a desktop Space or Unlink is stored on
+the Space (`Space::link`) and every link pick reaches `on_link` as a `LinkChange`; New Desktop
+Space... only reaches `on_link`, because the app makes the desktop Space and then links it with
+`SpacesHandle::set_link`. Clearing a link whose desktop Space is gone is the app's call too, with
+`set_link(id, None)`: the kit does not know the desktop's Spaces except when it is told.
 
 ### 13.5 Today (`TodaySection`)
 

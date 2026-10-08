@@ -260,7 +260,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The enclosing scope a component reads | `ds-style::scope::Scope` |
 | Material, blur, frame ground | `ds-style::material`; `ds::root::chrome` |
 | Space palettes and `SpaceLook` | `ds-style::space` |
-| An app's list of Spaces: `Space<P>`, `Spaces<P, R>`, switching with the place restored and the slide direction, `Today<I, K>` (items that expire after 12 h, parked things that never do), the lenient `spaces.json` reading | `ds-style::space::list` (pure, generic over the app's payload; `ds::components::app::spaces` re-exports it) |
+| An app's list of Spaces: `Space<P>` (with its optional desktop `link`), `Spaces<P, R>`, switching with the place restored and the slide direction, `Today<I, K>` (items that expire after 12 h, parked things that never do), the lenient `spaces.json` reading | `ds-style::space::list` (pure, generic over the app's payload; `ds::components::app::spaces` re-exports it) |
 | An app's `spaces.json` (config dir) and `today.json` (state dir): boot with a first run, a raw import and a payload fix-up; atomic writes | `ds-settings::SpacesStorage` (the app's data, not a `SettingsDoc`: the payload is the app's type) |
 | The Spaces controller (`use_spaces`, `use_today`), the switch chord, the sidebar head and foot, the Space's menu and its parts, the Today section | `ds::components::app::spaces` |
 | The Look (one value set, the Mac values) | `ds-style::tokens` (no Look type; design/30 section 3) |
@@ -322,6 +322,9 @@ The single place a concept lives. Extend it; never write a second one.
 | The companion's presence (idle, listening, working, acting, waiting) | `ds-core::vocab::CompanionPresence`; derived only by sill's `presence_of` |
 | What an app tells the companion (a thing, a chip, a summon, a field's mode) | `ds-intents`; re-exported once from `ds::components::companion` |
 | The companion's components: orb, chips, answer cards, plan, replace, run row, activity, memory, served-by | `ds::components::companion` |
+| The mark of a result the person has not seen yet (still, ok or danger), on the orb and on a run row; the consumer passes `Some(Outcome)` and clears it with `None` | `ds::components::companion::outcome` (`Outcome`, `OutcomeMark`) |
+| A Space's look as compact JSON of at most 1024 bytes, both ways | `ds_style::space::look_json` (`SpaceLook::to_json`, `SpaceLook::from_json`) |
+| Text cut to a width in Rust, from the end (`clip_chars`) or the middle keeping an extension (`clip_middle`) | `ds_core::text::clip` |
 | The confirmation card | `ds-shell::confirm` |
 | The window glow's values (`GlowLook`, `GlowSpec`, `glow_spec`) | `ds-style::tokens::glow` (sill's `sill-shell-kit::tokens::glow` re-exports them) |
 | Mail-only components | `ds::components::app` |

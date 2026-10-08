@@ -93,6 +93,11 @@ Working, Listening, Idle. An app derives its in-field presence from its own prom
   strength. None and Waiting have no period, so they cost no frames. Until the compositor draws it,
   the shell draws a phase A overlay around the window; the glow pulse while Working or Acting is
   allowed only while a run is live, never in Idle or Waiting (it is the one loop outside quire).
+- **An unseen outcome.** A run that finished while the person was away leaves a still dot on the
+  orb's corner and on its run row: the `ok` tone for `Outcome::Done`, the `danger` tone for
+  `Outcome::Failed`. It does not move, so it costs no frames in any presence. Whether there is an
+  unseen outcome is the consumer's: it passes `Some(outcome)` while there is one and `None` once
+  the person has looked, and nothing here remembers. `CompanionPresence` is unchanged.
 
 ## 4. The prompt and the answers
 
