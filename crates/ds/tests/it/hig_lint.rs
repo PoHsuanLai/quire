@@ -291,6 +291,11 @@ fn quires_own_sheet_warns_only_where_reviewed() {
             "the in-row provider mark's letter is a drawing in an 11 px mark, not text",
         ),
         (
+            Rule::MinFontSize,
+            ".ds-provider[*|data-kind=face][*|data-letters=\"2\"]",
+            "two letters of a provider's face are a drawing in a 14 px mark, not text",
+        ),
+        (
             Rule::FocusRingShape,
             ".ds[*|data-modality=keyboard] :focus",
             "the global ring's fixed radius is H3's to reshape (design/27 section 6.4)",

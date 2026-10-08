@@ -2,6 +2,7 @@
 
 use dioxus::prelude::*;
 use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::button_marks::Trailing;
 use ds::components::controls::button_model::Bezel;
@@ -40,6 +41,22 @@ pub const CASES: &[Case] = &[
     Case {
         golden: "lists/provider_mark/local-image-ignored.html",
         make: || rsx! { ProviderMark { provider: MarkProvider::Local, size: ControlSize::Small, style: MarkStyle::Image(ImageSource("data:image/png;base64,iVBORw0KGgo=".to_string())) } },
+    },
+    Case {
+        golden: "lists/provider_mark/face-one-letter.html",
+        make: || rsx! { ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Regular, face: Some(MarkFace::new("A", "#D97757")) } },
+    },
+    Case {
+        golden: "lists/provider_mark/face-two-letters-mini.html",
+        make: || rsx! { ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Mini, face: Some(MarkFace::new("OR", "#6467F2")) } },
+    },
+    Case {
+        golden: "lists/provider_mark/face-dark-ink.html",
+        make: || rsx! { ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Small, face: Some(MarkFace::new("Cx", "#FFE066")) } },
+    },
+    Case {
+        golden: "lists/provider_mark/face-bad-colour-neutral.html",
+        make: || rsx! { ProviderMark { provider: MarkProvider::Google, size: ControlSize::Small, face: Some(MarkFace::new("Zz", "teal")) } },
     },
     Case {
         golden: "controls/button/frame.html",

@@ -4,6 +4,7 @@
 
 use crate::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone};
 use crate::components::content::image_source::ImageSource;
+use crate::components::content::mark_face::{DrawnFace, MarkFace};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
@@ -134,15 +135,49 @@ fn local_mark(size: ControlSize, common: Common) -> Element {
     }
 }
 
+/// A face's mark: the letter in its chosen ink on the face's colour.
+fn face_mark(drawn: DrawnFace, title: &str, size: ControlSize, common: Common) -> Element {
+    let class = common.class("ds-provider");
+    let data = common.data_attributes();
+    let DrawnFace {
+        letter,
+        count,
+        colour,
+        ink,
+    } = drawn;
+    let letters = count.slug();
+    rsx! {
+        span {
+            id: common.id.clone(),
+            class,
+            "data-size": size.slug(),
+            "data-kind": "face",
+            "data-letters": letters,
+            style: "--pc:{colour};--pi:{ink}",
+            title: "{title}",
+            "aria-label": common.aria_label.clone(),
+            onmounted: move |event| common.mounted(event),
+            ..data,
+            "{letter}"
+        }
+    }
+}
+
 /// A provider mark: the provider's glyph on a tile of the control ladder (Mini 11, Small 13,
-/// Regular 14; Large repeats Regular). Static: no hover, focus or motion.
+/// Regular 14; Large repeats Regular). Static: no hover, focus or motion. A `face` (a letter
+/// and a colour supplied as data) is drawn first; without one the named `provider` stands,
+/// and the `@` of the neutral variant is the last resort.
 #[component]
 pub fn ProviderMark(
     provider: MarkProvider,
+    #[props(default)] face: Option<MarkFace>,
     #[props(default)] size: ControlSize,
     #[props(default = MarkStyle::Letter)] style: MarkStyle,
     #[props(default)] common: Common,
 ) -> Element {
+    if let (Some(drawn), MarkStyle::Letter) = (face.as_ref().and_then(MarkFace::drawn), &style) {
+        return face_mark(drawn, provider.name(), size, common);
+    }
     if provider == MarkProvider::Local {
         return local_mark(size, common);
     }

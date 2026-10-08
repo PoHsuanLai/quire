@@ -7,6 +7,7 @@ pub mod icon_view;
 pub mod image_source;
 pub mod label;
 pub mod level_glyph;
+pub mod mark_face;
 pub(crate) mod muted;
 pub mod pdf_thumb;
 pub mod picture_fit;

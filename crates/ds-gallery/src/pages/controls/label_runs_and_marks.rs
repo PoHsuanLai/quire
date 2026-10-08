@@ -3,6 +3,7 @@
 
 use crate::pages::{Section, Specimen};
 use dioxus::prelude::*;
+use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::text_runs::RunTone;
 use ds::components::controls::button_marks::{Leading, Trailing};
@@ -36,6 +37,20 @@ pub fn LabelRunsAndMarks() -> Element {
                         Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
                         Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
                         Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
+                    }
+                }
+            }
+        }
+        Section { title: "ProviderMark: a face as data", note: "face: Some(MarkFace::new(letter, \"#RRGGBB\")) draws a letter of one or two characters on the colour; quire picks white or dark ink for the contrast. Two letters are set smaller. A colour that is not #RRGGBB draws the neutral mark.",
+            div { class: "g-row g-row-top",
+                Specimen { name: "faces",
+                    div { class: "g-row",
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Regular, face: Some(MarkFace::new("A", "#D97757")) }
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Regular, face: Some(MarkFace::new("Cx", "#10A37F")) }
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Small, face: Some(MarkFace::new("OR", "#6467F2")) }
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Mini, face: Some(MarkFace::new("LM", "#4B3CC9")) }
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Regular, face: Some(MarkFace::new("K", "#16191E")) }
+                        ProviderMark { provider: MarkProvider::Imap, size: ControlSize::Regular, face: Some(MarkFace::new("Q", "teal")) }
                     }
                 }
             }
