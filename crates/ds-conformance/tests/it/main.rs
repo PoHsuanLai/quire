@@ -102,6 +102,7 @@ mod space_editor_frame;
 mod space_editor_rows;
 mod spaces_menu;
 mod spaces_switch;
+mod split_view_axis;
 mod split_view_drag;
 mod split_view_least_rest;
 mod split_view_peek;

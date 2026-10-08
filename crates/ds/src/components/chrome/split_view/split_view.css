@@ -6,7 +6,9 @@
    least, or what it is drawn at while it folds) before the last one goes under `--rest-least`, and
    its body follows: the body is the open width less what the squeeze took (`--pane-w` - `100%`).
    The divider is a 6 px zone, the resize cursor over it, with the hairline in its middle; it
-   takes the accent while held or focused. */
+   takes the accent while held or focused. A column of panes (`data-axis=column`) is the same
+   turned: the size is the height, the divider a flat zone. `data-unfocused=dim` draws the panes
+   without the focus (`data-focus=lacks`, set by the view from where a press or a key last landed) at `--pane-dim`. */
 
 .ds-split{ display:flex; align-items:stretch; min-width:0; min-height:0; height:100%; }
 .ds-split-pane{ --pane-w:0px; --pane-open:0px; --pane-least:0px; position:relative; flex:0 1 var(--pane-w); width:var(--pane-w); min-width:var(--pane-least); overflow:hidden; }
@@ -27,3 +29,13 @@
 }
 .ds-split[*|data-dragging=true] .ds-split-divider::after,
 .ds-split-divider:focus::after{ background:var(--accent); }
+
+.ds-split[*|data-axis=column]{ flex-direction:column; }
+.ds-split[*|data-axis=column] > .ds-split-pane{ flex:0 1 var(--pane-w); width:auto; height:var(--pane-w); min-width:0; min-height:var(--pane-least); }
+.ds-split[*|data-axis=column] > .ds-split-pane > .ds-split-pane-body{ width:100%; height:calc(var(--pane-open) - var(--pane-w) + 100%); }
+.ds-split[*|data-axis=column] > .ds-split-rest{ min-width:0; min-height:var(--rest-least); }
+.ds-split[*|data-axis=column] > .ds-split-divider{ width:auto; height:6px; margin:calc(-1 * var(--s-3)) 0; cursor:ns-resize; }
+.ds-split[*|data-axis=column] > .ds-split-divider::after{ top:3px; bottom:auto; left:0; right:0; width:auto; height:var(--hair); }
+
+.ds-split-pane, .ds-split-rest{ transition:opacity var(--t-quick) var(--e-out); }
+.ds-split[*|data-unfocused=dim] > [*|data-focus=lacks]{ opacity:var(--pane-dim); }
