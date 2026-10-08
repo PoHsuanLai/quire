@@ -70,14 +70,17 @@ surfaces only our desktop shell draws (bar, dock, control center, lock, switcher
 notifications, widgets, emoji, month grid, date picker) are not quire's: they are sill's
 `sill-shell-kit`, which adds its own kit and `stylesheet()` over these.
 
-**A git dependency** is how a program outside this checkout takes quire, from a tag:
+**A git dependency** is how a program outside this checkout takes quire, pinned at a full revision,
+with the release it is in a trailing comment:
 
 ```toml
-ds       = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.2.1" }
-ds-blitz = { git = "https://github.com/PoHsuanLai/quire", tag = "v0.2.1" }  # only if you run on Blitz
+ds       = { git = "https://github.com/PoHsuanLai/quire.git", rev = "<full sha>" }  # v0.2.31
+ds-blitz = { git = "https://github.com/PoHsuanLai/quire.git", rev = "<full sha>" }  # v0.2.31; only if you run on Blitz
 ```
 
-Cargo finds each crate by name in the one repository, so the crates of a tag share one revision.
+The spelling is the same in every repo: the URL ends in `.git`, the revision is the full 40-character
+sha (never a tag, never a branch), and a trailing `# vX.Y.Z` names the release it is. Cargo finds each
+crate by name in the one repository, so the crates of a revision share it.
 Nothing else is needed for quire's own dependencies: `blitz-kit` (its own public repo,
 github.com/PoHsuanLai/blitz-kit) comes transitively at the rev quire's `Cargo.toml` pins, and so
 does the rest of the pinned block. Do not add a `[patch]` for it unless you develop `blitz-kit`
