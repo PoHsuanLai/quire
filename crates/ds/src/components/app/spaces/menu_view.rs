@@ -19,7 +19,8 @@ use ds_style::space::list::SpaceId;
 /// (one submenu, say Accounts, whose picks reach `on_extra`; give them `AfterPick::KeepOpen` to
 /// keep the menu up), a rule, New Space, and Delete Space... while there is more than one.
 /// New Space opens its Rename at once. Colour, Rename and Delete are popovers at the pointer; a
-/// part changes the Space live and keeps it on close, with no Cancel. `on_deleted` hears a
+/// part changes the Space live and keeps it on close, with no Cancel (but Escape in Rename puts the
+/// old name back). Each part takes the keyboard as it opens and hands it back on close. `on_deleted` hears a
 /// deleted Space's id: the app calls `TodayHandle::drop_space` there. An app with no `extra` names
 /// `A` as `()`: `SpaceMenu::<_, _, ()>`.
 #[component]

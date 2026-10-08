@@ -5,6 +5,7 @@ use super::menu_pick::delete_words;
 use super::parts::placed;
 use crate::components::controls::button::Button;
 use crate::components::overlays::popover::{Arrow, Popover};
+use crate::focus::soon::focus_soon;
 use crate::host::measure::Anchor;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -14,8 +15,9 @@ use ds_style::icon::Icon;
 use ds_style::space::list::SpaceId;
 use ds_style::tokens::control_size::ControlSize;
 
-/// The question, naming the Space, and what stays. Only its button deletes; Escape or a click
-/// outside deletes nothing. Nothing is offered for the last Space, whose menu has no Delete row.
+/// The question, naming the Space, and what stays. Cancel, the safe default, takes the keyboard
+/// as it opens, so Return cancels. Only the Delete button deletes; Escape or a click outside
+/// deletes nothing. Nothing is offered for the last Space, whose menu has no Delete row.
 /// `kept` names what is not deleted; `on_deleted` hears the Space that went.
 #[component]
 pub(super) fn DeletePart<P, R>(
@@ -66,6 +68,12 @@ where
                     Button {
                         size: ControlSize::Large,
                         label: "Cancel",
+                        common: Common {
+                            mounted: Some(EventHandler::new(|event: MountedEvent| {
+                                focus_soon(event.data());
+                            })),
+                            ..Common::default()
+                        },
                         onclick: on_primary(|handle| handle.close_menu()),
                     }
                     Button {

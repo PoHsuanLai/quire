@@ -78,13 +78,26 @@ impl FocusKeeper {
         match focused(doc) {
             Some(held) => {
                 if self.seen.held().map(|seen| &seen.node) != Some(&held.node) {
-                    let seen = self.seen.held().map(|seen| seen.candidates.clone());
-                    self.before = seen.unwrap_or_default().then(&under_pointer(doc));
+                    self.before = self.before_next(doc);
                 }
                 self.seen = Seen::On(held);
                 None
             }
             None => self.lost(doc),
+        }
+    }
+
+    /// The candidates to fall back on once the element now focused is removed: those of the
+    /// element that had the keyboard, then the one under the pointer. When that element is
+    /// already gone (a menu replaced by the part its row opened), it was only passing the
+    /// keyboard on, so the opener it came from stays the one to return to.
+    fn before_next(&self, doc: &BaseDocument) -> Candidates {
+        match self.seen.held() {
+            Some(seen) if seen.node.presence(doc) == Presence::Here => {
+                seen.candidates.then(&under_pointer(doc))
+            }
+            Some(_) => self.before.clone(),
+            None => under_pointer(doc),
         }
     }
 

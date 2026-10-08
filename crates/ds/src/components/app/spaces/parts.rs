@@ -7,6 +7,8 @@ use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
 use crate::components::overlays::popover::{Arrow, Popover};
 use crate::focus::request::use_focus_request;
+use crate::focus::select::Select;
+use crate::focus::selector::focus_by_selector;
 use crate::host::measure::Anchor;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -16,13 +18,17 @@ use ds_style::scope::use_scope;
 use ds_style::space::list::SpaceId;
 use ds_style::space::look::SpaceLook;
 
+/// The colour part's first dot handle.
+const FIRST_HANDLE: &str = ".ds-space-colour .ds-handle";
+
 /// Where a part stands: below and after the point its menu opened at, as the menu did.
 pub(super) fn placed() -> Placement {
     Placement::new(Side::Bottom, Align::Start)
 }
 
 /// The Space's name in a field that takes the keyboard, selected so typing replaces it. Each
-/// keystroke renames the Space; Return, Escape and a click outside close it, keeping the name.
+/// keystroke renames the Space; Return and a click outside close it, keeping the name, and
+/// Escape closes it with the name it opened on put back.
 #[component]
 pub(super) fn RenamePart<P, R>(at: Point, space: SpaceId, handle: SpacesHandle<P, R>) -> Element
 where
@@ -30,6 +36,14 @@ where
     R: Clone + Default + PartialEq + 'static,
 {
     let focus = FieldFocus::Controlled(use_focus_request().with_select_all());
+    let opened_on = use_hook(|| {
+        handle
+            .spaces()
+            .peek()
+            .get(space)
+            .map(|space| space.name.clone())
+            .unwrap_or_default()
+    });
     let Some(name) = handle
         .spaces()
         .read()
@@ -53,9 +67,19 @@ where
                     focus,
                     oninput: move |typed: String| handle.change(space, |one| one.name = typed),
                     onkey: move |event: KeyboardEvent| {
-                        if event.key() == Key::Enter {
-                            event.prevent_default();
-                            handle.close_menu();
+                        match event.key() {
+                            Key::Enter => {
+                                event.prevent_default();
+                                handle.close_menu();
+                            }
+                            Key::Escape => {
+                                event.prevent_default();
+                                event.stop_propagation();
+                                let old = opened_on.clone();
+                                handle.change(space, move |one| one.name = old);
+                                handle.close_menu();
+                            }
+                            _ => {}
                         }
                     },
                 }
@@ -65,7 +89,9 @@ where
 }
 
 /// The Space's colour: the existing `SpaceColour` (field, stops, grain, presets), in the scheme
-/// the window is drawn in. The frame repaints with each change.
+/// the window is drawn in. The frame repaints with each change. The first dot's handle takes the
+/// keyboard as the part opens, so the arrow keys move it; Escape and a click outside close the
+/// part, keeping what was changed (as every part does: it has no Cancel).
 #[component]
 pub(super) fn ColourPart<P, R>(at: Point, space: SpaceId, handle: SpacesHandle<P, R>) -> Element
 where
@@ -74,6 +100,11 @@ where
 {
     let scheme = use_scope().scheme;
     let mut active = use_signal(DotIndex::default);
+    use_hook(|| {
+        spawn(async move {
+            let _ = focus_by_selector(FIRST_HANDLE, Select::None).await;
+        });
+    });
     let Some(look) = handle
         .spaces()
         .read()

@@ -6,7 +6,7 @@ use crate::support::spaces_page::{One, Three, WithAccounts};
 use dioxus::prelude::Element;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {
@@ -229,4 +229,135 @@ fn the_submenu_is_painted_where_it_settles() {
     open_menu(&mut harness);
     let (first, settled) = first_painted_and_settled(&mut harness);
     assert_eq!(first, settled, "the first painted frame is the settled one");
+}
+
+const OPENER: &str = ".app";
+
+fn key(harness: &mut Harness, key: ShortcutKey) {
+    harness.send(Input::key(key));
+    harness.advance(ms(400));
+}
+
+fn focused(harness: &Harness, selector: &str) -> bool {
+    harness.focus_of(selector) == FocusState::Focused
+}
+
+/// Open the menu, check it took the keyboard, and pick `row`.
+fn open_part(harness: &mut Harness, row: usize) {
+    open_menu(harness);
+    assert!(focused(harness, ".ds-menu"), "the menu took the keyboard");
+    pick(harness, row);
+    harness.advance(ms(300));
+}
+
+#[test]
+fn rename_takes_the_keyboard_and_escape_restores_the_name() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 1);
+    assert!(
+        focused(&harness, ".ds-space-rename input"),
+        "{}",
+        harness.html()
+    );
+    for letter in "Work".chars() {
+        harness.send(Input::key(ShortcutKey::Char(letter)));
+    }
+    harness.advance(ms(100));
+    key(&mut harness, ShortcutKey::Escape);
+    assert_eq!(harness.count(".ds-space-rename"), 0, "Escape closes it");
+    assert_eq!(
+        harness
+            .attr(".ds-space-head .ds-label", "aria-label")
+            .as_deref(),
+        Some("The Space 1 Space"),
+        "the old name is back:\n{}",
+        harness.html()
+    );
+    assert!(
+        focused(&harness, OPENER),
+        "the keyboard went back to the opener"
+    );
+}
+
+#[test]
+fn rename_return_commits_and_gives_the_keyboard_back() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 1);
+    for letter in "Work".chars() {
+        harness.send(Input::key(ShortcutKey::Char(letter)));
+    }
+    key(&mut harness, ShortcutKey::Enter);
+    assert_eq!(harness.count(".ds-space-rename"), 0);
+    assert_eq!(
+        harness
+            .attr(".ds-space-head .ds-label", "aria-label")
+            .as_deref(),
+        Some("The Work Space")
+    );
+    assert!(
+        focused(&harness, OPENER),
+        "the keyboard went back to the opener"
+    );
+}
+
+#[test]
+fn delete_focuses_cancel_and_return_cancels() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 7);
+    assert!(
+        focused(&harness, ".ds-space-part-acts .ds-button:nth-child(1)"),
+        "Cancel is the safe default:\n{}",
+        harness.html()
+    );
+    key(&mut harness, ShortcutKey::Enter);
+    assert_eq!(
+        harness.count(".ds-space-delete"),
+        0,
+        "Return pressed Cancel"
+    );
+    assert_eq!(dots(&harness), 3, "nothing was deleted");
+    assert!(
+        focused(&harness, OPENER),
+        "the keyboard went back to the opener"
+    );
+}
+
+#[test]
+fn delete_escape_cancels_and_gives_the_keyboard_back() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 7);
+    key(&mut harness, ShortcutKey::Escape);
+    assert_eq!(harness.count(".ds-space-delete"), 0, "Escape closes it");
+    assert_eq!(dots(&harness), 3, "nothing was deleted");
+    assert!(
+        focused(&harness, OPENER),
+        "the keyboard went back to the opener"
+    );
+}
+
+#[test]
+fn colour_focuses_a_handle_and_escape_keeps_the_changes() {
+    let mut harness = harness(Three);
+    open_part(&mut harness, 2);
+    assert!(
+        focused(&harness, ".ds-space-colour .ds-handle"),
+        "the first dot has the keyboard:\n{}",
+        harness.html()
+    );
+    let value = |harness: &Harness| harness.attr(".ds-space-colour .ds-handle", "aria-valuetext");
+    let was = value(&harness);
+    key(&mut harness, ShortcutKey::Right);
+    let moved = value(&harness);
+    assert_ne!(was, moved, "an arrow key moves the dot");
+    key(&mut harness, ShortcutKey::Escape);
+    assert_eq!(harness.count(".ds-space-colour"), 0, "Escape closes it");
+    assert_eq!(
+        harness.text_of(".writes").as_deref(),
+        Some("1"),
+        "the change is kept and written"
+    );
+    assert!(
+        focused(&harness, OPENER),
+        "the keyboard went back to the opener"
+    );
 }
