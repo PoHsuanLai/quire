@@ -20,7 +20,7 @@
 //! focus at `--pane-dim`: the focus is where the caller says (`focused`) or, failing that, where a
 //! press or a key last landed (renderers send no focus event up the tree to follow).
 //!
-//! Markup: `div.ds-split[role=group][data-axis][data-unfocused][data-dragging]` of `div.ds-split-pane[data-shown][data-folded][data-away]` (its body inside
+//! Markup: `div.ds-split[role=group][data-axis=column][data-unfocused=dim][data-dragging]` of `div.ds-split-pane[data-shown][data-folded][data-away]` (its body inside
 //! `.ds-split-pane-body`), `div.ds-split-divider[role=separator]` after each, and last
 //! `div.ds-split-rest` holding `children`.
 
@@ -231,8 +231,8 @@ pub fn SplitView(
             class: common.class("ds-split"),
             role: "group",
             "aria-label": common.aria_label.clone().unwrap_or(label),
-            "data-axis": axis.slug(),
-            "data-unfocused": unfocused.slug(),
+            "data-axis": (axis != SplitAxis::Row).then(|| axis.slug()),
+            "data-unfocused": (unfocused != UnfocusedPanes::Keep).then(|| unfocused.slug()),
             "data-dragging": if dragging { Some("true") } else { None },
             onmounted: move |event: MountedEvent| {
                 probe.on_mounted(event.clone());
@@ -266,7 +266,7 @@ pub fn SplitView(
             div {
                 class: "ds-split-rest",
                 style: "--rest-least:{least_rest.0}px",
-                "data-focus": PaneFocus::of(PaneAt::Rest, holding).slug(),
+                "data-focus": PaneFocus::of(PaneAt::Rest, holding).attribute(),
                 onpointerdown: move |_| hold.call(PaneAt::Rest),
                 onkeydown: move |_| hold.call(PaneAt::Rest),
                 {children}

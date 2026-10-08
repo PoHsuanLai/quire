@@ -69,6 +69,11 @@ pub enum PaneFocus {
 }
 
 impl PaneFocus {
+    /// The `data-focus` value, written once the view knows where the focus is.
+    pub(crate) fn attribute(self) -> Option<&'static str> {
+        (self != PaneFocus::Unplaced).then(|| self.slug())
+    }
+
     /// What pane `this` has when the focus is at `held`.
     pub fn of(this: PaneAt, held: Option<PaneAt>) -> Self {
         match held {

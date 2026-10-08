@@ -66,7 +66,7 @@ pub(crate) fn PaneBox(
             class: "ds-split-pane",
             "data-index": "{index}",
             "data-shown": shown.slug(),
-            "data-focus": focus.slug(),
+            "data-focus": focus.attribute(),
             onpointerdown: move |_| on_hold.call(()),
             onkeydown: move |_| on_hold.call(()),
             "data-folded": peeks.then(|| folded.slug()),
