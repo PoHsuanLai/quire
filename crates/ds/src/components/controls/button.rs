@@ -145,6 +145,7 @@ pub fn Button(
             title: tip.native(),
             "aria-label": aria_label,
             "aria-description": tip.description(&name),
+            "data-tip": tip.marker(&name),
             "aria-pressed": value.map(Check::aria),
             "aria-expanded": shown.map(Shown::aria),
             "aria-disabled": availability.aria_disabled(),

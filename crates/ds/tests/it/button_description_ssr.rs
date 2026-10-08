@@ -83,6 +83,7 @@ fn a_tip_equal_to_the_accessible_name_adds_no_description() {
     let html = button_markup(same_words);
     assert!(html.contains("aria-label=\"Zoom out\""), "{html}");
     assert!(!html.contains("aria-description"), "{html}");
+    assert!(html.contains("data-tip=\"Zoom out\""), "{html}");
 }
 
 #[test]
@@ -93,4 +94,19 @@ fn a_tip_that_differs_from_the_accessible_name_is_kept() {
         html.contains("aria-description=\"Hide the sidebar"),
         "{html}"
     );
+    assert!(!html.contains("data-tip"), "{html}");
+}
+
+fn untitled() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            Button { label: "Zoom out", bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::Refresh, onclick: |_| {} }
+        }
+    }
+}
+
+#[test]
+fn an_untitled_button_carries_no_tip_marker() {
+    let html = button_markup(untitled);
+    assert!(!html.contains("data-tip"), "{html}");
 }

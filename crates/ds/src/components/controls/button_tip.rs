@@ -87,6 +87,17 @@ impl Tip {
         }
     }
 
+    /// The value of `data-tip`: the accessible `name`, written when a tip was given and
+    /// `description` left it out for equalling that name. The name already says the tip, so a
+    /// consumer's test cannot tell a titled button from an untitled one by `aria-description`;
+    /// this marker can.
+    pub(crate) fn marker(&self, name: &str) -> Option<String> {
+        match (&self.say, self.description(name)) {
+            (Say::Tip(..), None) => Some(name.to_owned()),
+            _ => None,
+        }
+    }
+
     /// The control's element mounted: kept, to place the tip below it.
     pub(crate) fn mounted(&self, event: &MountedEvent) {
         let mut element = self.element;
