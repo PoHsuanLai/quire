@@ -38,6 +38,7 @@ pub(crate) fn field_label(role: FieldRole) -> &'static str {
         FieldRole::Server => "Server",
         FieldRole::Username => "User name",
         FieldRole::Password => "Password",
+        FieldRole::AppPassword => "App password",
         FieldRole::ApiKey => "API key",
         FieldRole::Token => "Access token",
         FieldRole::Protocol => "Server type",
@@ -61,6 +62,7 @@ pub(crate) fn field_placeholder(role: FieldRole, requirement: Requirement) -> &'
             Requirement::Optional => "Same as your address",
         },
         FieldRole::Password => "Password or app password",
+        FieldRole::AppPassword => "Paste your app password",
         FieldRole::ApiKey => "Paste your key",
         FieldRole::Token => "Paste your token",
         FieldRole::Protocol | FieldRole::Security | FieldRole::OutgoingSecurity => "Choose",
@@ -479,6 +481,11 @@ mod tests {
                 FieldRole::Address,
                 ProblemKind::Missing,
                 "Enter the email address.",
+            ),
+            (
+                FieldRole::AppPassword,
+                ProblemKind::Refused,
+                "The app password was not accepted. Check it and try again.",
             ),
             (
                 FieldRole::OutgoingPort,

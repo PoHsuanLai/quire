@@ -77,8 +77,12 @@ pub enum FieldRole {
     Server,
     /// A user name that is not the address.
     Username,
-    /// A password or an app password.
+    /// A password.
     Password,
+    /// An app password: one the provider makes for a single app, when the account's own password
+    /// is not accepted here (iCloud, Fastmail, Yahoo). The app's hint says where to make one.
+    #[word(slug = "app-password")]
+    AppPassword,
     /// An API key.
     #[word(slug = "api-key")]
     ApiKey,
