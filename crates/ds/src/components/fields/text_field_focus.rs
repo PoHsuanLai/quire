@@ -3,7 +3,7 @@
 use crate::focus::field::FieldHandle;
 use crate::focus::request::{FocusRequest, FocusTicket};
 use crate::focus::select::Landing;
-use crate::focus::soon::focus_soon_told;
+use crate::focus::soon::focus_landing_told;
 use crate::focus::targets::{FocusTarget, FocusTargets, Told};
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -84,7 +84,7 @@ impl FieldFocuser {
             served.set(request.peek());
         }
         if focus.on_mount() {
-            focus_soon_told(event.data(), focus.landing(), told.focus);
+            focus_landing_told(event.data(), focus.landing(), told.focus);
         }
     }
 
@@ -104,7 +104,7 @@ impl FieldFocuser {
         };
         if ticket != *served.peek() {
             served.set(ticket);
-            focus_soon_told(element, request.landing(), told);
+            focus_landing_told(element, request.landing(), told);
         }
     }
 }
