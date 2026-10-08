@@ -254,3 +254,35 @@ fn a_wheel_without_control_is_still_eased_over_frames() {
             .all(|h| h.source == ScrollSource::Wheel && !h.zoom)
     );
 }
+
+/// The distance a glide of `step` px a frame (8 ms) covers, as an eased listener hears it.
+fn glide_of(step: f32) -> f32 {
+    let mut harness = harness();
+    flick(&mut harness, step, 8);
+    let before = heard(&EASED).len();
+    for _ in 0..600 {
+        harness.advance(FRAME);
+    }
+    heard(&EASED)[before..].iter().map(|h| h.y).sum()
+}
+
+#[test]
+fn a_fast_lift_glides_further_than_its_own_speed_and_a_gentle_one_as_it_is() {
+    use blitz_kit::scroll::config::ScrollSettings;
+    use blitz_kit::scroll::engine::Physics;
+    let glide = Physics::from_settings(&ScrollSettings::default()).glide;
+    // name, px a frame (so px/s is 125 times it), the most the gain may add over the plain glide
+    let cases = [
+        ("gentle, 750 px/s", 6.0_f32, 1.0),
+        ("fast, 3750 px/s", 30.0, 2.0),
+    ];
+    for (name, step, times) in cases {
+        let speed = f64::from(step) * 125.0;
+        let plain = glide.travel(speed, glide.duration(speed)) as f32;
+        let got = glide_of(step);
+        assert!(
+            got >= plain * times * 0.9 && got <= plain * times * 1.1,
+            "{name}: glided {got}, the plain glide is {plain}, expected about {times}x"
+        );
+    }
+}

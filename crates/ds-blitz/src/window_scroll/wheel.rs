@@ -72,6 +72,26 @@ impl WheelInput {
         }
     }
 
+    /// How many clicks the wheel turned, whichever way (0 for a touchpad).
+    pub fn turned(&self) -> f64 {
+        match self.delta {
+            WheelDelta::Lines { x, y } => x.abs().max(y.abs()),
+            WheelDelta::Pixels { .. } => 0.0,
+        }
+    }
+
+    /// The same turn carried `gain` times as far; a touchpad's pixels are its own.
+    pub fn scaled(self, gain: f64) -> WheelInput {
+        let delta = match self.delta {
+            WheelDelta::Lines { x, y } => WheelDelta::Lines {
+                x: x * gain,
+                y: y * gain,
+            },
+            WheelDelta::Pixels { .. } => self.delta,
+        };
+        WheelInput { delta, ..self }
+    }
+
     /// How far the content moves, in winit's sign: a click is `detent_px`, a touchpad's pixels
     /// are their own.
     pub fn motion(&self, detent_px: f64) -> (f64, f64) {
@@ -184,6 +204,22 @@ mod tests {
         for (name, event, held, want) in cases {
             assert_eq!(pointer_scrolls(event, held), want, "{name}");
         }
+    }
+
+    #[test]
+    fn a_turn_scales_by_its_gain_and_a_touchpad_slide_does_not() {
+        let wheel = input(WheelDelta::Lines { x: 0.0, y: -2.0 }, GesturePhase::Changed);
+        assert_eq!(wheel.turned(), 2.0);
+        assert_eq!(
+            wheel.scaled(2.5).delta,
+            WheelDelta::Lines { x: 0.0, y: -5.0 }
+        );
+        let pad = input(
+            WheelDelta::Pixels { x: 1.0, y: -4.0 },
+            GesturePhase::Changed,
+        );
+        assert_eq!(pad.turned(), 0.0);
+        assert_eq!(pad.scaled(2.0), pad);
     }
 
     #[test]

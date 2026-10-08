@@ -5,6 +5,7 @@ use std::rc::Rc;
 use std::time::Instant;
 
 use blitz_dom::BaseDocument;
+use blitz_kit::scroll::accel::Accel;
 use blitz_kit::scroll::cmd::ScrollCmd;
 use blitz_kit::scroll::doc::{self, WheelRoute};
 use blitz_kit::scroll::driver::{KeyRepeat, KeyUse, Moved, Moves, ScrollDriver};
@@ -69,6 +70,8 @@ struct State {
     held: Modifiers,
     eased: Eased,
     coast: Coast,
+    /// How fast the wheel is being spun, for its acceleration.
+    accel: Accel,
     commands: Vec<ScrollCmd>,
 }
 
@@ -122,6 +125,7 @@ impl WindowScroll {
                     held: Modifiers::empty(),
                     eased: Eased::default(),
                     coast: Coast::default(),
+                    accel: Accel::default(),
                     commands: Vec::new(),
                 }),
             }),
@@ -186,6 +190,7 @@ impl WindowScroll {
     /// the element under the pointer takes the wheel itself.
     pub fn wheel(&self, input: WheelInput, now: Instant) -> (WheelUse, Frames) {
         let el = self.elapsed(now);
+        let input = self.accelerated(input, el);
         let (gesture, pointer, held, detent_px) = {
             let state = self.shared.state.borrow();
             let detent_px = state.tuning.settings.wheel_detent_px.get();
@@ -224,6 +229,23 @@ impl WindowScroll {
                 (WheelUse::Taken, self.frames_after(moved))
             }
             Some(WheelRoute::Capture) | None => (WheelUse::Passed, Frames::Idle),
+        }
+    }
+
+    /// `input` with a spun wheel's clicks carried further (`blitz_kit::scroll::accel`). A
+    /// Control-held wheel is a zoom and fingers are tracked 1:1 (a fast lift glides further
+    /// instead, `Physics::fling`), so neither is touched.
+    fn accelerated(&self, input: WheelInput, el: Elapsed) -> WheelInput {
+        let mut state = self.shared.state.borrow_mut();
+        let zoom = state.held.contains(Modifiers::CONTROL);
+        match (input.source(), zoom) {
+            (ScrollSource::Wheel, false) => {
+                let max = state.tuning.settings.wheel_accel_max.get();
+                let (accel, gain) = std::mem::take(&mut state.accel).feed(input.turned(), el, max);
+                state.accel = accel;
+                input.scaled(gain)
+            }
+            _ => input,
         }
     }
 
