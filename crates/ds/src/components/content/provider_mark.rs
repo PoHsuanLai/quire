@@ -5,6 +5,7 @@
 use crate::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone};
 use crate::components::content::image_source::ImageSource;
 use crate::components::content::mark_face::{DrawnFace, MarkFace};
+use crate::components::content::title_tip::{Tip, use_tip};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
@@ -114,9 +115,8 @@ fn folder_glyph(size: ControlSize) -> IconSize {
 
 /// A local account's mark: the folder in the neutral grey, whatever `style` asks for, since
 /// there is no provider whose favicon an app could hold.
-fn local_mark(size: ControlSize, common: Common) -> Element {
+fn local_mark(size: ControlSize, common: Common, tip: Tip) -> Element {
     let colour = MarkProvider::Local.colour();
-    let title = MarkProvider::Local.name();
     let class = common.class("ds-provider");
     let data = common.data_attributes();
     rsx! {
@@ -126,17 +126,20 @@ fn local_mark(size: ControlSize, common: Common) -> Element {
             "data-size": size.slug(),
             "data-kind": "local",
             style: "--pc:{colour}",
-            title: "{title}",
+            title: tip.native(),
+            onmouseover: { let tip = tip.clone(); move |event| tip.over(&event) },
+            onmouseleave: { let tip = tip.clone(); move |_| tip.out() },
             "aria-label": common.aria_label.clone(),
-            onmounted: move |event| common.mounted(event),
+            onmounted: { let tip = tip.clone(); move |event| { tip.mounted(&event); common.mounted(event) } },
             ..data,
             Glyph { icon: Icon::Folder, size: folder_glyph(size) }
         }
+        {tip.surface()}
     }
 }
 
 /// A face's mark: the letter in its chosen ink on the face's colour.
-fn face_mark(drawn: DrawnFace, title: &str, size: ControlSize, common: Common) -> Element {
+fn face_mark(drawn: DrawnFace, size: ControlSize, common: Common, tip: Tip) -> Element {
     let class = common.class("ds-provider");
     let data = common.data_attributes();
     let DrawnFace {
@@ -154,12 +157,15 @@ fn face_mark(drawn: DrawnFace, title: &str, size: ControlSize, common: Common) -
             "data-kind": "face",
             "data-letters": letters,
             style: "--pc:{colour};--pi:{ink}",
-            title: "{title}",
+            title: tip.native(),
+            onmouseover: { let tip = tip.clone(); move |event| tip.over(&event) },
+            onmouseleave: { let tip = tip.clone(); move |_| tip.out() },
             "aria-label": common.aria_label.clone(),
-            onmounted: move |event| common.mounted(event),
+            onmounted: { let tip = tip.clone(); move |event| { tip.mounted(&event); common.mounted(event) } },
             ..data,
             "{letter}"
         }
+        {tip.surface()}
     }
 }
 
@@ -175,13 +181,13 @@ pub fn ProviderMark(
     #[props(default = MarkStyle::Letter)] style: MarkStyle,
     #[props(default)] common: Common,
 ) -> Element {
+    let tip = use_tip(Some(provider.name().to_owned()));
     if let (Some(drawn), MarkStyle::Letter) = (face.as_ref().and_then(MarkFace::drawn), &style) {
-        return face_mark(drawn, provider.name(), size, common);
+        return face_mark(drawn, size, common, tip);
     }
     if provider == MarkProvider::Local {
-        return local_mark(size, common);
+        return local_mark(size, common, tip);
     }
-    let title = provider.name();
     let class = common.class("ds-provider");
     let data = common.data_attributes();
     match style {
@@ -195,12 +201,15 @@ pub fn ProviderMark(
                     "data-size": size.slug(),
                     "data-kind": "letter",
                     style: "--pc:{colour}",
-                    title: "{title}",
+                    title: tip.native(),
+            onmouseover: { let tip = tip.clone(); move |event| tip.over(&event) },
+            onmouseleave: { let tip = tip.clone(); move |_| tip.out() },
                     "aria-label": common.aria_label.clone(),
-                    onmounted: move |event| common.mounted(event),
+                    onmounted: { let tip = tip.clone(); move |event| { tip.mounted(&event); common.mounted(event) } },
                     ..data,
                     "{letter}"
                 }
+                {tip.surface()}
             }
         }
         MarkStyle::Image(ImageSource(src)) => rsx! {
@@ -209,12 +218,15 @@ pub fn ProviderMark(
                 class,
                 "data-size": size.slug(),
                 "data-kind": "image",
-                title: "{title}",
+                title: tip.native(),
+            onmouseover: { let tip = tip.clone(); move |event| tip.over(&event) },
+            onmouseleave: { let tip = tip.clone(); move |_| tip.out() },
                 "aria-label": common.aria_label.clone(),
-                onmounted: move |event| common.mounted(event),
+                onmounted: { let tip = tip.clone(); move |event| { tip.mounted(&event); common.mounted(event) } },
                 ..data,
                 img { alt: "", src }
             }
+            {tip.surface()}
         },
     }
 }

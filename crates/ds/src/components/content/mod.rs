@@ -15,4 +15,5 @@ pub mod provider_mark;
 pub mod rich_text;
 pub mod status;
 pub mod text_runs;
+pub(crate) mod title_tip;
 pub mod voice_orb;

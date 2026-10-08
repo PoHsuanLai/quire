@@ -16,7 +16,7 @@
 //! [`Hint`] is the one implementation: a `Tooltip` is a `Hint` below its target on the Tip
 //! profile, and the shell's `DockLabel` is a `Hint` above its target on the Label profile.
 
-use crate::components::controls::button_tip::{Hinted, own_key};
+use crate::components::content::title_tip::{Hinted, own_key};
 use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
 use crate::components::overlays::hover_card::target::HoverTarget;
 use crate::components::overlays::hover_card::{Standing, use_card};

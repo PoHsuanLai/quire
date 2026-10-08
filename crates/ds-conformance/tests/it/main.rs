@@ -121,6 +121,7 @@ mod text_field_multiline;
 mod text_field_secure;
 mod thread_more;
 mod thread_row_common;
+mod tips_not_titles;
 mod title_tooltip;
 mod titlebar_title_fit;
 mod toast_action;

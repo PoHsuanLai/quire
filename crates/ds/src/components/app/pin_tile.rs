@@ -12,6 +12,7 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::provider_mark::{MarkProvider, MarkStyle, ProviderMark};
+use crate::components::content::title_tip::use_tip;
 use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use crate::components::controls::press::{PressListeners, use_pressing};
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
@@ -190,6 +191,7 @@ pub fn PinTile(
         PinFace::Add { hint, .. } => hint.clone(),
         PinFace::All | PinFace::Account { .. } => None,
     };
+    let tip = use_tip(hint);
     let picture = match face {
         PinFace::All => rsx! {
             span { class: "ds-pin-tile-face", Glyph { icon: Icon::Inbox, size: IconSize::Large } }
@@ -225,21 +227,38 @@ pub fn PinTile(
             "data-pressed": pressing.attr(),
             "aria-pressed": filter.then(|| selection.aria()),
             "aria-label": name,
-            title: hint,
+            title: tip.native(),
+            onmouseover: { let tip = tip.clone(); move |event| tip.over(&event) },
             onmousedown: move |event| pressing.pointer_down(&event),
-            onmouseleave: move |_| pressing.released(),
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| {
+                    tip.out();
+                    pressing.released();
+                }
+            },
             onmouseup: move |event| {
                 pressing.released();
                 listen.mouse_up(&event);
             },
-            onpointerdown: move |event| {
-                if let Some(handler) = onpointerdown {
-                    handler.call(event);
+            onpointerdown: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.press();
+                    if let Some(handler) = onpointerdown {
+                        handler.call(event);
+                    }
                 }
             },
             onclick: move |event| listen.click(&event),
             oncontextmenu: move |event| listen.context_menu(&event),
-            onmounted: move |event| common.mounted(event),
+            onmounted: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.mounted(&event);
+                    common.mounted(event);
+                }
+            },
             ..data,
             if drop == DropState::Target {
                 span { class: "ds-pin-tile-drop", "aria-hidden": "true" }
@@ -248,6 +267,7 @@ pub fn PinTile(
             Badge { content: BadgeContent::Number(unread), tone: BadgeTone::Alert, size: ControlSize::Mini }
             {mark_of_status}
         }
+        {tip.surface()}
     }
 }
 
