@@ -19,6 +19,27 @@ pub enum Recovery {
     NoRetry,
 }
 
+impl SignInFault {
+    /// Whether a retry can help after this fault: only `AlreadyAdded` says no, since the
+    /// account stays added however often the person tries. `SignInFailed` uses it when its
+    /// `recovery` is left out.
+    pub fn recovery(self) -> Recovery {
+        match self {
+            SignInFault::AlreadyAdded => Recovery::NoRetry,
+            SignInFault::Refused
+            | SignInFault::Unreachable
+            | SignInFault::Unreadable
+            | SignInFault::NeedsClientId
+            | SignInFault::TimedOut
+            | SignInFault::Cancelled
+            | SignInFault::Forbidden
+            | SignInFault::StoreFailed
+            | SignInFault::NoLauncher
+            | SignInFault::NotInstalled => Recovery::Retry,
+        }
+    }
+}
+
 /// One more button for a fault, drawn before the default: "Open Settings", "Learn More". The
 /// host supplies its words and what it does.
 #[derive(Debug, Clone, PartialEq)]
@@ -29,15 +50,15 @@ pub struct FailureAction {
     pub on_press: EventHandler<()>,
 }
 
-/// The failure step for `provider`. With `Recovery::Retry` (the default) Return is "Try Again"
-/// and Cancel calls `on_cancel`; with `Recovery::NoRetry` there is no "Try Again" (`on_retry` is
+/// The failure step for `provider`. With `Recovery::Retry` (the default, unless the fault says otherwise) Return is "Try Again"
+/// and Cancel calls `on_cancel`; with `Recovery::NoRetry` (the default for [`SignInFault::AlreadyAdded`], see [`SignInFault::recovery`]) there is no "Try Again" (`on_retry` is
 /// never called, so a host may leave it out) and Return is "Done", which calls `on_cancel`.
 /// Escape calls `on_cancel` either way. `extra` adds one button of the host's.
 #[component]
 pub fn SignInFailed(
     #[props(into)] provider: String,
     why: SignInFault,
-    #[props(default)] recovery: Recovery,
+    #[props(default, into)] recovery: Option<Recovery>,
     #[props(default)] on_retry: EventHandler<()>,
     on_back: EventHandler<()>,
     on_cancel: EventHandler<()>,
@@ -46,6 +67,7 @@ pub fn SignInFailed(
     #[props(default)] mark: Option<MarkProvider>,
 ) -> Element {
     let sentence = fault(why, &provider, mark);
+    let recovery = recovery.unwrap_or_else(|| why.recovery());
     let enter = match recovery {
         Recovery::Retry => on_retry,
         Recovery::NoRetry => on_cancel,
@@ -80,6 +102,23 @@ pub fn SignInFailed(
                     },
                 }
             },
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use ds_core::word::Word;
+
+    #[test]
+    fn only_an_account_already_added_needs_no_retry_by_default() {
+        for fault in SignInFault::ALL {
+            let want = match fault {
+                SignInFault::AlreadyAdded => Recovery::NoRetry,
+                _ => Recovery::Retry,
+            };
+            assert_eq!(fault.recovery(), want, "{fault:?}");
         }
     }
 }

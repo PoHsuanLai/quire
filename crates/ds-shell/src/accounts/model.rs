@@ -401,6 +401,9 @@ pub enum SignInFault {
     /// The agent the login runs through is not installed.
     #[word(slug = "not-installed")]
     NotInstalled,
+    /// The account is already on this desktop: another try cannot change that.
+    #[word(slug = "already-added")]
+    AlreadyAdded,
 }
 
 /// Who draws a step's title.

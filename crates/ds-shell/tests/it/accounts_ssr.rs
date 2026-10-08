@@ -402,6 +402,7 @@ const SPECIMENS: &[Specimen] = &[
         rsx! { SignInWorking { provider: "Claude", waiting_for: WorkingFor::Agent("Claude".to_owned()), on_cancel: |_| {} } }
     }),
     ("failed-no-launcher", || failed(SignInFault::NoLauncher)),
+    ("failed-already-added", || failed(SignInFault::AlreadyAdded)),
     ("failed-not-installed", || failed(SignInFault::NotInstalled)),
     ("failed-google-client-id", || {
         rsx! {
@@ -765,4 +766,12 @@ fn a_fault_without_a_retry_has_no_try_again_and_ends_on_done() {
     assert!(html.contains("Done"), "{html}");
     assert!(html.contains("Open Settings"), "{html}");
     assert!(light("failed-unreachable").contains("Try Again"));
+}
+
+#[test]
+fn an_account_already_added_says_so_and_offers_no_try_again() {
+    let page = light("failed-already-added");
+    assert!(page.contains("This account is already added."), "{page}");
+    assert!(page.contains("Done"), "{page}");
+    assert!(!page.contains("Try Again"), "{page}");
 }

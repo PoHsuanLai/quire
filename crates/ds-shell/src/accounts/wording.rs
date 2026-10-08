@@ -144,6 +144,7 @@ pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvid
         SignInFault::Cancelled => "Signing in was cancelled.",
         SignInFault::Forbidden => "Your organisation or the provider does not allow this.",
         SignInFault::StoreFailed => "Signed in, but the account could not be saved.",
+        SignInFault::AlreadyAdded => "This account is already added.",
         SignInFault::NoLauncher => return format!("No app is set up to sign {label} in"),
         SignInFault::NotInstalled => return format!("{label} isn't installed"),
     };
