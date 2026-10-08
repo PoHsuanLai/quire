@@ -16,7 +16,7 @@ use ds_lint::{LintConfig, markup};
 use ds_shell::accounts::model::{
     AccountChoice, Attempt, Choice, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText,
     FormField, FormPart, Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey,
-    ProviderPick, Requirement, ServiceKey, ServiceLine, ServiceOffer, SignInFault,
+    ProviderPick, Requirement, ServiceKey, ServiceLine, ServiceOffer, SessionOffer, SignInFault,
 };
 use ds_shell::prelude::*;
 
@@ -226,6 +226,19 @@ fn consent(choices: Vec<AccountChoice>) -> Element {
     }
 }
 
+fn consent_session() -> Element {
+    rsx! {
+        ConsentAlert {
+            app: "Photos",
+            request: "keep its library in your files",
+            choices: vec![account("ada@example.org")],
+            session: SessionOffer::Offered,
+            on_choose: |_| {},
+            on_answer: |_| {},
+        }
+    }
+}
+
 fn provider_list(query: &str, cursor: Option<ProviderPick>) -> Element {
     rsx! {
         ProviderList {
@@ -299,6 +312,7 @@ const SPECIMENS: &[Specimen] = &[
         ])
     }),
     ("consent-none", || consent(vec![])),
+    ("consent-session", consent_session),
     ("providers", || provider_list("", None)),
     ("providers-favicon", favicon_list),
     ("sign-in-favicon", favicon_sign_in),
@@ -544,6 +558,21 @@ fn continue_waits_for_every_required_field() {
 }
 
 #[test]
+fn the_alert_without_the_offer_has_no_session_button_and_the_offer_slots_between_once_and_always() {
+    let plain = light("consent-one");
+    assert!(!plain.contains("This Session Only"));
+    let offered = light("consent-session");
+    let at = |word: &str| {
+        offered
+            .find(word)
+            .unwrap_or_else(|| panic!("{word} in {offered}"))
+    };
+    assert!(at("Allow Once") < at("This Session Only"));
+    assert!(at("This Session Only") < at("Always Allow"));
+    assert!(at("Always Allow") < at("Don&#39;t Allow"));
+}
+
+#[test]
 fn the_steps_say_what_the_props_say() {
     let cases: &[(&str, &[&str])] = &[
         (
@@ -555,6 +584,15 @@ fn the_steps_say_what_the_props_say() {
                 "Always Allow",
                 "Don&#39;t Allow",
                 "data-layout=\"stack\"",
+            ],
+        ),
+        (
+            "consent-session",
+            &[
+                "Allow Once",
+                "This Session Only",
+                "Always Allow",
+                "Don&#39;t Allow",
             ],
         ),
         (

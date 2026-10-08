@@ -4,7 +4,7 @@
 use ds::components::content::provider_mark::MarkProvider;
 
 use super::model::{
-    AccountChoice, ChoiceKey, FieldProblem, FieldRole, FormField, FormPart, Limitation,
+    AccountChoice, AllowScope, ChoiceKey, FieldProblem, FieldRole, FormField, FormPart, Limitation,
     NoAccountWhy, ProblemKind, ProviderEntry, ProviderPick, Requirement, SignInFault,
 };
 
@@ -19,6 +19,15 @@ pub(crate) fn consent_message(choices: &[AccountChoice]) -> String {
         [] => "None of your accounts can do this yet.".to_owned(),
         [only] => format!("It would use {}.", only.label),
         _ => "Choose the account it may use.".to_owned(),
+    }
+}
+
+/// The button that allows for `scope`: "Allow Once", "This Session Only" or "Always Allow".
+pub(crate) fn allow_label(scope: AllowScope) -> &'static str {
+    match scope {
+        AllowScope::Once => "Allow Once",
+        AllowScope::Session => "This Session Only",
+        AllowScope::Always => "Always Allow",
     }
 }
 

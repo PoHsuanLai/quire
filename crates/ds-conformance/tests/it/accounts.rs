@@ -12,7 +12,7 @@ use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query
 use ds_shell::accounts::model::{
     AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, CopyState, FieldRole, FieldText,
     FormField, Limitation, ProviderEntry, ProviderKey, ProviderPick, Requirement, ServiceKey,
-    ServiceLine, ServiceOffer, SignInFault, StepTitle,
+    ServiceLine, ServiceOffer, SessionOffer, SignInFault, StepTitle,
 };
 use ds_shell::prelude::*;
 use std::time::Duration;
@@ -123,6 +123,20 @@ fn Consent() -> Element {
             app: "Photos",
             request: "keep its library in your files",
             choices: vec![account("ada@example.org"), account("work@example.org")],
+            on_choose: move |key: ChoiceKey| LOG.write().push(format!("choose {}", key.0)),
+            on_answer: move |answer: ConsentAnswer| LOG.write().push(format!("{answer:?}")),
+        }
+    })
+}
+
+#[allow(non_snake_case)]
+fn ConsentSession() -> Element {
+    Stage(rsx! {
+        ConsentAlert {
+            app: "Photos",
+            request: "keep its library in your files",
+            choices: vec![account("ada@example.org")],
+            session: SessionOffer::Offered,
             on_choose: move |key: ChoiceKey| LOG.write().push(format!("choose {}", key.0)),
             on_answer: move |answer: ConsentAnswer| LOG.write().push(format!("{answer:?}")),
         }
@@ -383,6 +397,20 @@ fn dont_allow_denies_and_always_allow_is_always() {
         ConsentAnswer::Allow {
             account: ChoiceKey("ada@example.org".to_owned()),
             scope: AllowScope::Always
+        }
+    );
+    assert_eq!(log(&mut harness), [want]);
+}
+
+#[test]
+fn this_session_only_answers_the_session_scope() {
+    let mut harness = start(ConsentSession);
+    click(&mut harness, ".ds-alert-slot:nth-child(2) > .ds-button");
+    let want = format!(
+        "{:?}",
+        ConsentAnswer::Allow {
+            account: ChoiceKey("ada@example.org".to_owned()),
+            scope: AllowScope::Session
         }
     );
     assert_eq!(log(&mut harness), [want]);

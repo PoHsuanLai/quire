@@ -1,14 +1,16 @@
 //! ConsentAlert: an app asks to use an account (design/31 section 4.5). It stands in a narrow
 //! centred sheet as an alert does: the app's icon, "Photos wants to keep its library in your
 //! files", the account it would use (a pop-up when several fit), and Allow Once, Always Allow and
-//! Don't Allow stacked, the first the default. Escape closes the sheet and answers
+//! Don't Allow stacked (This Session Only between the first two when the host offers it), the first the default. Escape closes the sheet and answers
 //! [`ConsentAnswer::Dismiss`], which stores nothing; only "Don't Allow" denies. With no account
 //! that fits it offers "Add Account..." instead.
 
 use super::adapter::{Action, Intent, Landing};
-use super::model::{AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, PickerChoice};
+use super::model::{
+    AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, PickerChoice, SessionOffer,
+};
 use super::picker::AccountPicker;
-use super::wording::{consent_message, consent_title, effective_choice};
+use super::wording::{allow_label, consent_message, consent_title, effective_choice};
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
@@ -22,7 +24,7 @@ use ds_style::icon::render::IconSize;
 /// Escape answers `Dismiss`. `ConsentAlert` is this in a narrow centred sheet.
 ///  `request` finishes "{app} wants to ..."; `choices` are the accounts that
 /// fit, `chosen` the one the host has picked (the first when it has picked none, or none that
-/// fits). `on_choose` hears a pick in the pop-up; `on_answer` the person's answer.
+/// fits). `session` says whether "This Session Only" is offered. `on_choose` hears a pick in the pop-up; `on_answer` the person's answer.
 #[component]
 pub fn ConsentBody(
     #[props(into)] app: String,
@@ -30,6 +32,7 @@ pub fn ConsentBody(
     choices: Vec<AccountChoice>,
     #[props(default)] chosen: Option<ChoiceKey>,
     #[props(default)] icon: Option<IconSource>,
+    #[props(default)] session: SessionOffer,
     on_choose: EventHandler<ChoiceKey>,
     on_answer: EventHandler<ConsentAnswer>,
 ) -> Element {
@@ -45,6 +48,7 @@ pub fn ConsentBody(
         }
     };
     let once = EventHandler::new(answer(AllowScope::Once));
+    let this_session = EventHandler::new(answer(AllowScope::Session));
     let always = EventHandler::new(answer(AllowScope::Always));
     let picked = effective_choice(&choices, chosen.as_ref()).map(|choice| choice.key.clone());
     let several = choices.len() > 1;
@@ -85,10 +89,15 @@ pub fn ConsentBody(
             div { class: "ds-alert-footer", "data-layout": if fits { "stack" } else { "row" },
                 if fits {
                     span { class: "ds-alert-slot",
-                        Action { label: "Allow Once", intent: Intent::Default, landing: Landing::Here, onclick: move |()| once.call(()) }
+                        Action { label: allow_label(AllowScope::Once), intent: Intent::Default, landing: Landing::Here, onclick: move |()| once.call(()) }
+                    }
+                    if session == SessionOffer::Offered {
+                        span { class: "ds-alert-slot",
+                            Action { label: allow_label(AllowScope::Session), onclick: move |()| this_session.call(()) }
+                        }
                     }
                     span { class: "ds-alert-slot",
-                        Action { label: "Always Allow", onclick: move |()| always.call(()) }
+                        Action { label: allow_label(AllowScope::Always), onclick: move |()| always.call(()) }
                     }
                     span { class: "ds-alert-slot",
                         Action { label: "Don't Allow", onclick: move |()| on_answer.call(ConsentAnswer::Deny) }
@@ -116,6 +125,7 @@ pub fn ConsentAlert(
     choices: Vec<AccountChoice>,
     #[props(default)] chosen: Option<ChoiceKey>,
     #[props(default)] icon: Option<IconSource>,
+    #[props(default)] session: SessionOffer,
     on_choose: EventHandler<ChoiceKey>,
     on_answer: EventHandler<ConsentAnswer>,
 ) -> Element {
@@ -126,7 +136,7 @@ pub fn ConsentAlert(
             onclose: move |()| on_answer.call(ConsentAnswer::Dismiss),
             attach: Attach::Centre,
             width: SheetWidth::Narrow,
-            ConsentBody { app, request, choices, chosen, icon, on_choose, on_answer }
+            ConsentBody { app, request, choices, chosen, icon, session, on_choose, on_answer }
         }
     }
 }

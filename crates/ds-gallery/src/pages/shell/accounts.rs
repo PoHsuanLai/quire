@@ -137,7 +137,7 @@ fn services() -> Vec<ServiceLine> {
 #[component]
 pub fn AccountsPage() -> Element {
     rsx! {
-        Section { title: "Consent", note: "ConsentAlert: an app asks to use an account. The alert's own column (icon slot, title, message), the account pop-up when several fit, then Allow Once (the default, Return), Always Allow and Don't Allow stacked. Escape dismisses and stores nothing; only Don't Allow denies. With no account that fits it offers Add Account instead.",
+        Section { title: "Consent", note: "ConsentAlert: an app asks to use an account. The alert's own column (icon slot, title, message), the account pop-up when several fit, then Allow Once (the default, Return), This Session Only (only when the host offers it), Always Allow and Don't Allow stacked. Escape dismisses and stores nothing; only Don't Allow denies. With no account that fits it offers Add Account instead.",
             div { class: "g-row g-row-top",
                 Stage { theme: Theme::Light, body: consent(vec![account("ada@example.org", MarkProvider::Fastmail)]) }
                 Stage { theme: Theme::Dark, body: consent(accounts()) }
