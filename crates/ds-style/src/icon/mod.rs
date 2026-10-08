@@ -240,6 +240,11 @@ pub enum Icon {
     LogOut,
     /// Lucide `rotate-ccw`: the power menu's Restart.
     Restart,
+    /// Lucide `rotate-ccw`: turn a picture a quarter turn to the left. The same glyph as
+    /// `Restart`, named for what it does, so it pairs with `RotateRight`.
+    RotateLeft,
+    /// Lucide `rotate-cw`: turn a picture a quarter turn to the right; `RotateLeft` mirrored.
+    RotateRight,
     /// Lucide `headphones`: an audio output or a Bluetooth device.
     Headphones,
     /// Lucide `speaker`: an audio output.
@@ -343,6 +348,8 @@ impl Icon {
             | Icon::SkipForward
             | Icon::LogOut
             | Icon::Restart
+            | Icon::RotateLeft
+            | Icon::RotateRight
             | Icon::Headphones
             | Icon::Speaker
             | Icon::Mouse
