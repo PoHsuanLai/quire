@@ -127,6 +127,7 @@ fn entry(
                 .unwrap_or_else(|| field_placeholder(role, field.requirement).to_owned()),
             landing: if first { Landing::Here } else { Landing::Anywhere },
             rejection: rejection(problem, role),
+            help: field.help.clone(),
             oninput: move |text: FieldText| on_input.call((role, text)),
         }
     }
