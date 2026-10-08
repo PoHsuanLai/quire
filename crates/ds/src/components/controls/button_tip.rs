@@ -78,11 +78,12 @@ impl Tip {
 
     /// The value of `aria-description`: the tip's text, since a tip writes no `title` and a
     /// screen reader would not hear it (AXHelp). The native `title` serves itself; inside a
-    /// hint the wrapper's text stands.
-    pub(crate) fn description(&self) -> Option<String> {
+    /// hint the wrapper's text stands. Left out when it equals the accessible `name` (trimmed,
+    /// case-sensitive): a screen reader would say the same words twice.
+    pub(crate) fn description(&self, name: &str) -> Option<String> {
         match &self.say {
-            Say::Tip(text, _) => Some(text.clone()),
-            Say::Nothing | Say::Native(_) => None,
+            Say::Tip(text, _) if text.trim() != name.trim() => Some(text.clone()),
+            Say::Tip(..) | Say::Nothing | Say::Native(_) => None,
         }
     }
 

@@ -108,6 +108,7 @@ pub fn Button(
         (_, ImagePosition::Leading) => spoken_label(&label),
     };
     let aria_label = common.aria_label.clone().or(spoken);
+    let name = aria_label.clone().unwrap_or_else(|| label.plain_text());
     let listen = PressListeners::new(onclick).with_propagation(propagation);
     let pressing = use_pressing();
     let operation = use_busy(availability);
@@ -143,7 +144,7 @@ pub fn Button(
             "data-state": value.map(|state| state.slug()),
             title: tip.native(),
             "aria-label": aria_label,
-            "aria-description": tip.description(),
+            "aria-description": tip.description(&name),
             "aria-pressed": value.map(Check::aria),
             "aria-expanded": shown.map(Shown::aria),
             "aria-disabled": availability.aria_disabled(),

@@ -62,3 +62,35 @@ fn a_button_inside_a_tooltip_adds_no_description() {
     let html = button_markup(Wrapped);
     assert!(!html.contains("aria-description"), "{html}");
 }
+
+fn same_words() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            Button {
+                label: "Zoom out",
+                title: Some(" Zoom out ".to_owned()),
+                bezel: Bezel::Toolbar,
+                image: ImagePosition::Only,
+                icon: Icon::Refresh,
+                onclick: |_| {},
+            }
+        }
+    }
+}
+
+#[test]
+fn a_tip_equal_to_the_accessible_name_adds_no_description() {
+    let html = button_markup(same_words);
+    assert!(html.contains("aria-label=\"Zoom out\""), "{html}");
+    assert!(!html.contains("aria-description"), "{html}");
+}
+
+#[test]
+fn a_tip_that_differs_from_the_accessible_name_is_kept() {
+    let html = button_markup(Titled);
+    assert!(html.contains("aria-label=\"Sidebar\""), "{html}");
+    assert!(
+        html.contains("aria-description=\"Hide the sidebar"),
+        "{html}"
+    );
+}
