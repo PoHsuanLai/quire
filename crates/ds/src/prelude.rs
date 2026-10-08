@@ -18,6 +18,7 @@ pub use ds_style::scope::use_scope;
 pub use ds_style::space::look::{Grain, SpaceLook};
 
 // Vocabulary
+pub use ds_core::text::typed::TypedText;
 pub use ds_core::vocab::Availability;
 pub use ds_core::vocab::Check;
 pub use ds_core::vocab::DropState;
@@ -163,6 +164,9 @@ pub use crate::components::menus::menu::hung::{Hung, PanelWidth};
 pub use crate::components::menus::menu::menu::Menu;
 pub use crate::components::menus::menu::placement::MenuPlacement;
 pub use crate::components::menus::palette::command_palette::CommandPalette;
+pub use crate::components::menus::palette::machine::model::{
+    PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState,
+};
 pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
 pub use crate::components::menus::search::model::{

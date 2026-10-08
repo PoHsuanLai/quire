@@ -1,7 +1,8 @@
 //! The command palette: the same menu, bigger and centred, with its groups, stops, reveal and
-//! motion.
+//! motion, and `machine`, the pure query-and-selection machine a consumer runs beside it.
 
 pub(crate) mod command_palette;
+pub mod machine;
 pub(crate) mod palette_body;
 pub mod palette_claim;
 pub(crate) mod palette_expand;
