@@ -12,11 +12,12 @@
   background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
+  display:flex; flex-direction:column; max-height:calc(100vh - 11vw - var(--s-8));
   animation:peek-in var(--t-move) var(--e-out); }
 .ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
-.ds-palette-list{ padding:var(--shell-menu-inset); overflow-y:auto; scrollbar-width:none; max-height:360px; outline:none; }
+.ds-palette-list{ flex:0 1 auto; min-height:0; padding:var(--shell-menu-inset); overflow-y:auto; scrollbar-width:none; max-height:360px; outline:none; }
 .ds-palette-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 .ds-palette[*|data-host=surface] > .ds-palette-list{ flex:0 1 auto; min-height:0; max-height:none; }
 
@@ -55,3 +56,6 @@
 .ds-palette-list > *{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-palette-list > [*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 .ds-palette-list > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
+
+/* The card never stands taller than the window below its top gap (the wrap's `padding-top` is a
+   share of the width, so `11vw`) less an 8 px margin; the list scrolls inside what is left. */

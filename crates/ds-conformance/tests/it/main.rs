@@ -48,6 +48,7 @@ mod menu_keep_open;
 mod menu_pick;
 mod menu_rich_items;
 mod notification_center;
+mod overlay_fits_window;
 mod overlay_hit;
 mod palette_actions_key;
 mod palette_embedded;
