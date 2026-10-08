@@ -37,15 +37,15 @@ pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
     });
 }
 
-/// As [`focus_soon_selecting`], then `told` once the host's write has moved the focus.
+/// As [`focus_soon_selecting`], for a field whose caller listens for focus.
 ///
-/// The host's write (Blitz's `set_focus_to`) dispatches no `focus` event, so a field whose caller
-/// listens for focus would never hear that the seam put the caret in it.
+/// The host's write (Blitz's `set_focus_to`) raises the `focus` event itself since the fork's
+/// 5c526bd2, which the field's own `onfocus` hears, so `told` is no longer called here: calling
+/// it too told the caller twice. It stays in the signature until the callers drop it.
 pub(crate) fn focus_soon_told(element: Rc<MountedData>, landing: Landing, told: EventHandler<()>) {
+    let _ = told;
     spawn(async move {
-        if focus_selecting(&element, landing).await == Focused::Done {
-            told.call(());
-        }
+        let _ = focus_selecting(&element, landing).await;
     });
 }
 
