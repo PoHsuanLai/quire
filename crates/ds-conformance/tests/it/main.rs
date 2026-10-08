@@ -122,6 +122,7 @@ mod text_field_secure;
 mod thread_more;
 mod thread_row_common;
 mod title_tooltip;
+mod titlebar_title_fit;
 mod toast_action;
 mod toast_motion;
 mod toolbar_overflow;
