@@ -33,10 +33,13 @@ fn heard() -> Vec<RawKey> {
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let mut told = use_signal(|| 0u8);
+    let mut downs = use_signal(|| 0u8);
     let mut element = use_signal(|| None::<std::rc::Rc<MountedData>>);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             RawKeySurface {
+                style: "display:block;width:200px;height:80px",
+                onpointerdown: move |_| downs += 1,
                 on_key: move |key: RawKey| HEARD.with(|heard| heard.borrow_mut().push(key)),
                 common: Common {
                     mounted: Some(EventHandler::new(move |event: MountedEvent| element.set(Some(event.data())))),
@@ -54,6 +57,7 @@ fn Page() -> Element {
                 "focus"
             }
             p { class: "told", "{told}" }
+            p { class: "downs", "{downs}" }
         }
     }
 }
@@ -164,4 +168,13 @@ fn an_element_found_by_selector_can_be_measured() {
         harness.measure_found(".nothing-here"),
         Measured::Unknown
     ));
+}
+
+#[test]
+fn the_surface_passes_a_pointer_press_through_and_takes_the_style_it_is_given() {
+    let mut harness = start();
+    let at = harness.centre(".grid").expect("grid");
+    harness.send(Input::click(at));
+    assert_eq!(harness.text_of(".downs").as_deref(), Some("1"));
+    assert!(harness.html().contains("width:200px"), "{}", harness.html());
 }
