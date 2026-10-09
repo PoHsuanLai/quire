@@ -4,7 +4,7 @@
 //! is the IME's target while it has the keyboard (FINDINGS "Edit surface").
 
 use crate::components::editor::ctx::SurfaceCtx;
-use crate::components::editor::state::write_soon;
+use crate::components::editor::write_soon::write_soon;
 use crate::edit::composition::settle;
 use crate::edit::pointer::EditFocus;
 use crate::focus::select::Select;

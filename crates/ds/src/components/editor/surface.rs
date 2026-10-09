@@ -15,7 +15,8 @@ use crate::components::editor::spell::{SpellCtx, respell, touch};
 use crate::components::editor::spell_menu::{
     Asked, Opened, SpellLayer, SpellLink, at_caret, at_pointer,
 };
-use crate::components::editor::state::{SurfaceState, write_soon};
+use crate::components::editor::state::SurfaceState;
+use crate::components::editor::write_soon::write_soon;
 use crate::edit::composition::on_ime;
 use crate::edit::handle::{EditHandle, SurfaceHooks};
 use crate::edit::input::EditInput;

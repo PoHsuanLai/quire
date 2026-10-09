@@ -9,3 +9,4 @@ pub(crate) mod spell;
 pub mod spell_menu;
 pub(crate) mod state;
 pub(crate) mod surface;
+pub mod write_soon;
