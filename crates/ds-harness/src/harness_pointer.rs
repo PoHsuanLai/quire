@@ -121,6 +121,10 @@ impl Harness {
     fn button_up(&mut self, at: Point, button: PointerButton, mods: Modifiers) {
         self.held = self.held.without(button);
         let (which, _) = blitz_button(button);
+        // The app hears a menu over a frame's link before the page does, as a window does
+        if button == PointerButton::Secondary {
+            self.doc.menu_at(at);
+        }
         self.deliver(UiEvent::PointerUp(pointer(
             at,
             which,

@@ -13,6 +13,7 @@
 use crate::frame_anchor::LinkFacts;
 use crate::frame_book::FrameBook;
 use crate::frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover};
+use crate::frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
 use blitz_traits::navigation::{NavigationOptions, NavigationProvider};
@@ -50,6 +51,8 @@ pub enum FrameLinks {
         click: FrameLinkHandler,
         /// Whether the pointer crossing a link is reported too.
         hover: FrameHover,
+        /// Whether a context menu asked over a link is reported too.
+        menu: FrameMenu,
     },
 }
 
@@ -59,6 +62,7 @@ impl FrameLinks {
         FrameLinks::Intercept {
             click: FrameLinkHandler(Arc::new(handler)),
             hover: FrameHover::Ignore,
+            menu: FrameMenu::Ignore,
         }
     }
 
@@ -67,10 +71,38 @@ impl FrameLinks {
     pub fn with_hover(self, handler: impl Fn(FrameLinkHover) + Send + Sync + 'static) -> Self {
         match self {
             FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept { click, .. } => FrameLinks::Intercept {
+            FrameLinks::Intercept { click, menu, .. } => FrameLinks::Intercept {
                 click,
                 hover: FrameHover::Report(FrameHoverHandler::new(handler)),
+                menu,
             },
+        }
+    }
+
+    /// Also call `handler` when a context menu (a secondary press) is asked over a link inside
+    /// a frame (mailo's "Copy Link"): the link is the nearest enclosing `a[href]`, resolved
+    /// against the frame's base URL. It is heard just before the page's own `oncontextmenu`
+    /// for the same press, so the app can keep it for the menu that handler opens. `Inert`
+    /// stays inert.
+    pub fn with_context_menu(
+        self,
+        handler: impl Fn(FrameLinkMenu) + Send + Sync + 'static,
+    ) -> Self {
+        match self {
+            FrameLinks::Inert => FrameLinks::Inert,
+            FrameLinks::Intercept { click, hover, .. } => FrameLinks::Intercept {
+                click,
+                hover,
+                menu: FrameMenu::Report(FrameMenuHandler::new(handler)),
+            },
+        }
+    }
+
+    /// Whether a context menu asked over a link is reported.
+    pub fn menu(&self) -> FrameMenu {
+        match self {
+            FrameLinks::Inert => FrameMenu::Ignore,
+            FrameLinks::Intercept { menu, .. } => menu.clone(),
         }
     }
 
@@ -87,9 +119,10 @@ impl fmt::Debug for FrameLinks {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             FrameLinks::Inert => f.write_str("Inert"),
-            FrameLinks::Intercept { hover, .. } => f
+            FrameLinks::Intercept { hover, menu, .. } => f
                 .debug_struct("Intercept")
                 .field("hover", hover)
+                .field("menu", menu)
                 .finish_non_exhaustive(),
         }
     }

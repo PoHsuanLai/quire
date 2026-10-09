@@ -6,7 +6,7 @@
    `data-drop=target` draws the list's drop line at the tile's leading edge, in the gap between
    tiles; `data-drag=source` dims the tile being dragged. Attribute selectors carry `*|` (spike S2). */
 
-.ds-pin-tiles{ display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:var(--s-6); }
+.ds-pin-tiles{ display:grid; grid-template-columns:repeat(4, round(down, calc((100% - 3 * var(--s-6)) / 4), var(--px))); gap:var(--s-6); }
 
 .ds-pin-tile{
   position:relative; display:grid; place-items:center; box-sizing:border-box; aspect-ratio:1; padding:0; border:0; border-radius:var(--r-tile);
@@ -45,8 +45,12 @@
 /* The provider's mark, bottom right (a `ProviderMark` on the tile's rung), on the face's corner
    rather than the tile's: 3 px out from the 28 px face, wherever the tile's width puts the face. A
    fixed inset from the tile's edge drifts onto the avatar's letter as a narrow sidebar shrinks the
-   tile (7 px at the 48 px tile of a 232 px sidebar, as before; on the face's centre at 35 px). */
-.ds-pin-tile .ds-provider{ position:absolute; right:calc(50% - 17px); bottom:calc(50% - 17px); box-shadow:var(--shadow-mark-tile); }
+   tile (7 px at the 48 px tile of a 232 px sidebar, as before; on the face's centre at 35 px). The
+   offset is rounded to a whole device pixel (`--px` is one): a bare `calc(50% - 17px)` is a quarter
+   pixel where the tile's width is fractional (x 91.75 at scale 2), and Blitz paints that edge blurred;
+   the tile row's tracks are rounded down to whole device pixels for the same reason (the sliver left
+   over, under a device pixel a track, falls at the row's end). */
+.ds-pin-tile .ds-provider{ position:absolute; right:round(calc(50% - 17px), var(--px)); bottom:round(calc(50% - 17px), var(--px)); box-shadow:var(--shadow-mark-tile); }
 
 /* The drop line: the accent, in the gap before the tile a drag would take the place of. */
 .ds-pin-tile-drop{ position:absolute; top:var(--s-2); bottom:var(--s-2); left:calc(var(--s-4) * -1); width:var(--s-2); border-radius:var(--r-pill); background:var(--accent); pointer-events:none; }
