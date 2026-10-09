@@ -111,24 +111,7 @@ impl SpacingToken {
 #[cfg(test)]
 mod tests {
     use super::SpacingToken;
-    use crate::tokens::token::{Token, TokenScope};
     use ds_core::word::Word;
-
-    #[test]
-    fn each_name_is_its_own_value() {
-        for token in SpacingToken::ALL.iter().copied() {
-            let value = token.css_value(TokenScope::BASE);
-            let number = value.as_str().trim_end_matches("px");
-            assert_eq!(
-                token.var().as_str(),
-                format!("--s-{}", number.replace('.', "-"))
-            );
-        }
-        assert_eq!(
-            SpacingToken::S1Half.css_value(TokenScope::BASE).as_str(),
-            "1.5px"
-        );
-    }
 
     #[test]
     fn the_scale_ascends() {

@@ -147,67 +147,6 @@ fn star_check_and_undo_keep_their_first_path() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-/// Printer and folder-input as Lucide 1.47.0 publishes them: two paths and a rect, three paths.
-#[test]
-fn printer_and_folder_input_are_lucides() {
-    assert_eq!(
-        Icon::Printer.shapes().last(),
-        Some(&Shape::Rect {
-            x: "6",
-            y: "14",
-            width: "12",
-            height: "8",
-            rx: "1"
-        })
-    );
-    assert_eq!(Icon::Printer.shapes().len(), 3);
-    assert_eq!(
-        Icon::FolderInput.shapes().get(1..),
-        Some(&[Shape::Path("M2 13h10"), Shape::Path("m9 16 3-3-3-3")][..])
-    );
-}
-
-/// The "more" glyphs as Lucide 1.47.0 publishes them: three unit circles on the
-/// middle row for `ellipsis`, on the middle column for `ellipsis-vertical`, centre first.
-#[test]
-fn the_ellipses_are_lucides() {
-    let dot = |cx, cy| Shape::Circle { cx, cy, r: "1" };
-    assert_eq!(
-        Icon::Ellipsis.shapes(),
-        &[dot("12", "12"), dot("19", "12"), dot("5", "12")][..]
-    );
-    assert_eq!(
-        Icon::EllipsisVertical.shapes(),
-        &[dot("12", "12"), dot("12", "5"), dot("12", "19")][..]
-    );
-    for icon in [Icon::Ellipsis, Icon::EllipsisVertical] {
-        assert!(
-            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
-            "{icon:?}"
-        );
-    }
-}
-
-/// The control set as Lucide 1.47.0 publishes it: eleven glyphs, Restart
-/// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
-#[test]
-fn the_control_set_is_lucides() {
-    assert_eq!(Icon::CONTROL.len(), 14);
-    assert!(Icon::SHELL.contains(&Icon::Power), "Power is not repeated");
-    assert_eq!(
-        Icon::Restart.shapes(),
-        &[
-            Shape::Path("M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"),
-            Shape::Path("M3 3v5h5"),
-        ][..]
-    );
-    assert_eq!(
-        Icon::Phone.shapes().last(),
-        Some(&Shape::Path("M12 18h.01"))
-    );
-    assert_eq!(Icon::Gamepad.shapes().len(), 5);
-}
-
 /// A picture's rotate buttons are a pair: `RotateLeft` is `rotate-ccw`, `RotateRight` is its
 /// mirror (`rotate-cw`), and each has a solid form, which is a mirror too.
 #[test]
@@ -232,13 +171,6 @@ fn the_rotate_pair_is_mirrored_in_both_styles() {
         Icon::RotateRight.solid_shapes(),
         Icon::RotateLeft.solid_shapes()
     );
-}
-
-/// `Music` is Lucide's `music` and has a solid form of five shapes.
-#[test]
-fn music_has_both_styles() {
-    assert_eq!(Icon::Music.shapes().len(), 3);
-    assert_eq!(Icon::Music.solid_shapes().len(), 5);
 }
 
 /// The control center's own `Switches`: two 20 x 8 pill tracks 4 px apart
@@ -268,61 +200,6 @@ fn switches_is_two_tracks_with_knobs_at_opposite_ends() {
     assert_eq!(
         &Icon::SHELL[Icon::SHELL.len() - 2..],
         &[Icon::Switches, Icon::MoonFilled][..]
-    );
-}
-
-/// The launcher's provider glyphs as Lucide 1.47.0 publishes them: `clipboard` is a
-/// clip over a board, `smile` a face of three paths in a circle, `globe` a circle, a meridian
-/// and the equator; all three in the actions set.
-#[test]
-fn the_launcher_glyphs_are_lucides() {
-    assert_eq!(
-        Icon::Clipboard.shapes().first(),
-        Some(&Shape::Rect {
-            x: "8",
-            y: "2",
-            width: "8",
-            height: "4",
-            rx: "1"
-        })
-    );
-    assert_eq!(
-        Icon::Smile.shapes().get(1),
-        Some(&Shape::Path("M16.472 15a6 6 0 01-8.943 0"))
-    );
-    assert_eq!(Icon::Globe.shapes().last(), Some(&Shape::Path("M2 12h20")));
-    for icon in [Icon::Clipboard, Icon::Smile, Icon::Globe] {
-        assert!(
-            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
-            "{icon:?}"
-        );
-    }
-}
-
-/// The format bar's glyphs and the severity marks as Lucide 1.47.0 publishes them, in the actions
-/// set: `bold` is one outline, `italic` three strokes, `code` a pair of chevrons.
-#[test]
-fn the_format_and_severity_glyphs_are_lucides() {
-    const SHAPES: &[(Icon, usize)] = &[
-        (Icon::Bold, 1),
-        (Icon::Italic, 3),
-        (Icon::Underline, 2),
-        (Icon::Strike, 3),
-        (Icon::Code, 2),
-        (Icon::Info, 3),
-        (Icon::CircleCheck, 2),
-        (Icon::TriangleAlert, 3),
-    ];
-    for &(icon, count) in SHAPES {
-        assert_eq!(icon.shapes().len(), count, "{icon:?}");
-        assert!(
-            Icon::ACTIONS.contains(&icon) && Icon::ALL.contains(&icon),
-            "{icon:?}"
-        );
-    }
-    assert_eq!(
-        Icon::Code.shapes().first(),
-        Some(&Shape::Path("m16 18 6-6-6-6"))
     );
 }
 

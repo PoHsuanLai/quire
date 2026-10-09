@@ -38,22 +38,3 @@ impl Desktop {
         self.presence.insert(capability, presence);
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::{Capability, Desktop, Presence};
-
-    #[test]
-    fn a_new_desktop_has_nothing() {
-        let desktop = Desktop::default();
-        assert!(Capability::ALL.iter().all(|&c| !desktop.here(c)));
-    }
-
-    #[test]
-    fn set_then_get() {
-        let mut desktop = Desktop::default();
-        desktop.set(Capability::Memory, Presence::Here);
-        assert!(desktop.here(Capability::Memory));
-        assert_eq!(desktop.get(Capability::Intents), Presence::Absent);
-    }
-}

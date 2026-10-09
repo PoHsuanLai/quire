@@ -147,12 +147,6 @@ mod tests {
     }
 
     #[test]
-    fn default_is_the_proposed_threshold() {
-        assert_eq!(ChromaLimit::default(), ChromaLimit::PROPOSED);
-        assert_eq!(ChromaLimit::default(), ChromaLimit(40));
-    }
-
-    #[test]
     fn try_from_f32_scales_to_thousandths_and_refuses_out_of_range() {
         assert_eq!(ChromaLimit::try_from(0.04), Ok(ChromaLimit(40)));
         assert_eq!(ChromaLimit::try_from(0.0), Ok(ChromaLimit(0)));

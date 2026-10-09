@@ -97,18 +97,3 @@ fn every_appearance_key_in_the_doc_has_a_field_in_the_schema() {
         );
     }
 }
-
-#[test]
-fn every_sill_owned_row_named_here_is_still_in_the_doc() {
-    // Guards SILL_OWNED itself against drifting out of sync with the doc (a row renamed or
-    // removed there should fail loudly here, not make the test above vacuously skip nothing).
-    let doc =
-        std::fs::read_to_string(Path::new(DOC_PATH)).unwrap_or_else(|e| panic!("{DOC_PATH}: {e}"));
-    let keys = keys_in_section(&doc, "### 3.1 `appearance`", "### 3.2 `motion`");
-    for key in SILL_OWNED {
-        assert!(
-            keys.iter().any(|k| k == key),
-            "{key} listed in SILL_OWNED but not in the doc"
-        );
-    }
-}

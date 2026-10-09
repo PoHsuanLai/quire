@@ -29,25 +29,6 @@ fn schema_round_trip() {
 }
 
 // ---------------------------------------------------------------------------------------------
-// widget_for_kind_is_total
-
-#[test]
-fn widget_for_kind_is_total() {
-    // Every kind the derive actually emitted for these two domains resolves to a widget
-    // without panicking; `ds_settings::schema::key::tests::every_kind_maps_to_exactly_one_widget`
-    // (unit test, same crate) covers every `KeyKind` variant, including the ones neither
-    // domain here happens to use (`Text`, `Colour`, `Shortcut`, `List`).
-    let mut kinds = 0;
-    for schema in schemas() {
-        for key in &schema.key {
-            let _ = key.kind.widget();
-            kinds += 1;
-        }
-    }
-    assert!(kinds > 0, "no keys to check");
-}
-
-// ---------------------------------------------------------------------------------------------
 // deep_link_resolves
 
 #[test]

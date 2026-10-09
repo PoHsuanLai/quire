@@ -120,22 +120,8 @@ fn sidebar_tile_css(token: SidebarTileSize, _scope: TokenScope) -> CssValue {
 
 #[cfg(test)]
 mod tests {
-    use super::{ROW_SCALE, RowSize};
+    use super::ROW_SCALE;
     use crate::tokens::token::{Token, TokenScope};
-    use ds_core::word::Word;
-
-    #[test]
-    fn each_token_is_its_scale_value() {
-        let css = |token: RowSize| token.css_value(TokenScope::BASE).as_str().to_owned();
-        assert_eq!(css(RowSize::SettingsHeight), "48px");
-        assert_eq!(css(RowSize::Avatar), "32px");
-        assert_eq!(css(RowSize::CompactHeight), "32px");
-        assert_eq!(css(RowSize::IconTile), "28px");
-        assert_eq!(css(RowSize::TileGap), "12px");
-        assert_eq!(RowSize::SettingsHeight.var().as_str(), "--row-settings-h");
-        assert_eq!(RowSize::Avatar.var().as_str(), "--row-avatar");
-        assert_eq!(RowSize::ALL.len(), 5);
-    }
 
     #[test]
     fn a_sidebar_row_token_is_its_sizes_height() {

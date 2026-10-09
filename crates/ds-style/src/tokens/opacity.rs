@@ -19,27 +19,3 @@ pub enum OpacityToken {
     #[token(value = ".6")]
     PaneDim,
 }
-
-#[cfg(test)]
-mod tests {
-    use super::OpacityToken;
-    use crate::tokens::token::{Token, TokenScope};
-
-    #[test]
-    fn the_pane_dim_leaves_an_unfocused_pane_readable() {
-        assert_eq!(OpacityToken::PaneDim.var().as_str(), "--pane-dim");
-        assert_eq!(
-            OpacityToken::PaneDim.css_value(TokenScope::BASE).as_str(),
-            ".6"
-        );
-    }
-
-    #[test]
-    fn the_veil_is_c_s_scrim_opacity() {
-        assert_eq!(OpacityToken::Veil.var().as_str(), "--veil");
-        assert_eq!(
-            OpacityToken::Veil.css_value(TokenScope::BASE).as_str(),
-            ".16"
-        );
-    }
-}

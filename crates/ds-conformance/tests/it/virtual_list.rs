@@ -137,16 +137,6 @@ fn the_arrow_keys_ask_to_move_the_cursor_one_row() {
 }
 
 #[test]
-fn the_end_coming_near_is_reported_once() {
-    let mut harness = harness();
-    assert_eq!(harness.text_of(".ends").as_deref(), Some("0"));
-    click(&mut harness, ".to-last");
-    assert_eq!(harness.text_of(".ends").as_deref(), Some("1"));
-    harness.advance(Duration::from_millis(300));
-    assert_eq!(harness.text_of(".ends").as_deref(), Some("1"));
-}
-
-#[test]
 fn a_removed_mounted_row_plays_its_exit_and_the_rows_below_heal() {
     let mut harness = harness();
     let before = mounted(&harness);

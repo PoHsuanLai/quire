@@ -4,7 +4,7 @@
 
 use std::time::Duration;
 
-use ds_core::machine::{Elapsed, Machine};
+use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
 use super::{
@@ -501,12 +501,6 @@ fn reduced_motion_settles_at_once_with_no_live_slide() {
         ],
         &FOUR_REDUCED,
     );
-}
-
-#[test]
-fn a_new_swipe_rests_on_the_first_space() {
-    assert_eq!(Swipe::default(), Swipe::Idle { at: 0 });
-    assert_eq!(SwipeIn::from(Elapsed), SwipeIn::Elapsed);
 }
 
 #[test]

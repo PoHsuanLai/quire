@@ -259,13 +259,6 @@ mod tests {
     }
 
     #[test]
-    fn a_schema_round_trips_through_toml() {
-        let schema = sample();
-        let back = Schema::from_toml(&schema.to_toml()).unwrap();
-        assert_eq!(back, schema);
-    }
-
-    #[test]
     fn write_to_then_discover_finds_it() {
         let dir = std::env::temp_dir().join(format!(
             "ds-settings-schema-test-{}-{}",

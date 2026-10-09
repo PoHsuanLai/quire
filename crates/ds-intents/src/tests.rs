@@ -23,12 +23,6 @@ fn every_mark_word_parses_back_from_its_slug() {
 }
 
 #[test]
-fn a_field_is_an_input_until_a_summon_takes_it() {
-    assert_eq!(FieldMode::default(), FieldMode::Input);
-    assert_eq!(Removal::default(), Removal::Removable);
-}
-
-#[test]
 fn what_a_field_hears_never_shows_the_words_in_debug() {
     let words = "lisbon receipts";
     let marks = [

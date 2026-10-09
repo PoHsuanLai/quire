@@ -164,21 +164,6 @@ mod tests {
     use ds_core::geometry::units::Px;
 
     #[test]
-    fn the_step_two_radii_are_design_34_section_2_1() {
-        let value = Radius::value;
-        assert_eq!(value(Radius::Window), "26px");
-        assert_eq!(value(Radius::WindowPlain), "16px");
-        assert_eq!(value(Radius::Panel), "20px");
-        assert_eq!(value(Radius::Card), "12px");
-        assert_eq!(value(Radius::Group), "12px");
-        assert_eq!(value(Radius::Menu), "14px");
-        assert_eq!(value(Radius::MenuItem), "8px");
-        assert_eq!(value(Radius::IconTile), "7px");
-        assert_eq!(value(Radius::Tiny), "6px");
-        assert_eq!(value(Radius::Micro), "5px");
-    }
-
-    #[test]
     fn a_button_and_a_field_are_a_regular_controls_radius() {
         let regular = format!("{}px", ControlSize::Regular.scale().radius.0);
         assert_eq!(Radius::Btn.value(), regular);

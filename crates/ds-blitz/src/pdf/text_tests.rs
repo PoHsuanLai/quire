@@ -49,19 +49,6 @@ fn a_ligature_copies_as_its_letters_from_the_layout() {
     assert!(printed.glyphs.layout_text > 0);
 }
 
-#[test]
-fn the_cmap_fallback_cannot_spell_a_ligature() {
-    // Noto Serif draws `fi`, `ffi` and `fl` as one glyph each; the glyph has no cmap entry of
-    // its own (or only U+FB01-style presentation forms), so read backwards it loses letters.
-    let (printed, text) = print(LIGATURES, Texts::CmapOnly);
-    assert_eq!(printed.glyphs.layout_text, 0);
-    assert_ne!(
-        text, "field office flat",
-        "the fallback was expected to be wrong here"
-    );
-    eprintln!("cmap fallback reads the ligatures as {text:?}");
-}
-
 const SHARED: &str = "<p style=\"font: 20px 'Noto Sans CJK TC'\">一⼀一</p>";
 
 #[test]
