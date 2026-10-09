@@ -4,7 +4,7 @@
 //! in place of the words.
 
 use crate::components::content::text_runs::{TextLine, text};
-use crate::components::controls::disclosure::{Collapsing, indicator};
+use crate::components::controls::disclosure::Collapsing;
 use crate::components::controls::key_equivalent::KeyStyle;
 use crate::components::controls::press::PressListeners;
 use crate::components::controls::progress::busy::{busy_class, use_busy_seen};
@@ -13,6 +13,7 @@ use crate::components::lists::row::action::RowAction;
 use crate::components::lists::row::action::trailing as action_button;
 use crate::components::lists::row::chord::{RowChord, shown_chord};
 use crate::components::lists::row::confirm::{self, RowConfirm};
+use crate::components::lists::row::disclosure_button::RowDisclosure;
 use crate::components::lists::row::leading::{self, RowLeading};
 use crate::components::lists::row::marks::marked;
 use crate::components::lists::row::motion::RowMotion;
@@ -187,20 +188,7 @@ pub fn Row(
             span { class: "ds-row-disclosure", "data-outline": "leaf" }
         },
         Outline::Branch(shown) => rsx! {
-            span {
-                class: "ds-row-disclosure",
-                "data-outline": "branch",
-                onclick: move |event| {
-                    event.stop_propagation();
-                    event.prevent_default();
-                    if let Some(on_toggle) = on_toggle {
-                        on_toggle.call(shown.flipped());
-                    }
-                    kept_click(&event);
-                },
-                onmousedown: move |event| event.stop_propagation(),
-                {indicator(shown)}
-            }
+            RowDisclosure { shown, on_toggle }
         },
     };
     let name = title.plain_text();

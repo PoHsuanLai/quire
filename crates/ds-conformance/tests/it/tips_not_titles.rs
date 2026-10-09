@@ -4,7 +4,12 @@
 
 use dioxus::prelude::*;
 use ds::components::app::pin_tile::{PinFace, PinTile};
+use ds::components::app::row_more::RowMore;
+use ds::components::content::avatar::AvatarSize;
 use ds::components::content::provider_mark::MarkProvider;
+use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::segmented::Tracking;
+use ds::components::lists::row::row::{Outline, Row};
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -30,6 +35,22 @@ fn parts() -> Element {
             shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]),
             onclick: |_| {},
         }
+        SegmentedControl::<u8> {
+            label: "View".to_owned(),
+            choices: vec![
+                Choice { icon: Some(Icon::Music.into()), name: Some("Music".to_owned()), ..Choice::new(1, "") },
+                Choice::new(2, "Words"),
+            ],
+            tracking: Tracking::SelectOne(1),
+            onchange: |_| {},
+        }
+        RowMore { shown: Some(Shown::Visible), onclick: |_| {} }
+        Chip {
+            variant: ChipVariant::Person(MarkProvider::Imap.avatar(AvatarSize::Size28)),
+            text: "Ada".to_owned(),
+            onremove: |_| {},
+        }
+        Row { title: "Folder", outline: Outline::Branch(Shown::Hidden), on_toggle: |_| {} }
     }
 }
 
@@ -62,7 +83,7 @@ fn under_ds_no_part_writes_a_title_attribute_and_outside_it_the_title_stays() {
     let bare = started(Bare);
     assert_eq!(
         bare.html().matches(" title=").count(),
-        3,
+        7,
         "the plain title is the fallback without Ds:\n{}",
         bare.html()
     );
@@ -84,4 +105,31 @@ fn hovering_a_space_dot_draws_its_tip() {
         "{}",
         harness.html()
     );
+}
+
+/// Each named control with no words of its own, and the tip it shows: the name it carries.
+const NAMED: &[(&str, &str)] = &[
+    (".ds-segmented-segment:first-child", "Music"),
+    (".ds-row-more", "More actions"),
+    (".ds-chip-remove", "Remove Ada"),
+    (".ds-row-disclosure", "Expand"),
+];
+
+#[test]
+fn a_named_control_with_no_words_shows_its_name_as_a_tip() {
+    for &(selector, tip) in NAMED {
+        let mut harness = started(UnderDs);
+        let at = harness
+            .centre(selector)
+            .unwrap_or_else(|| panic!("{selector} is not drawn:\n{}", harness.html()));
+        harness.send(Input::pointer_move(at));
+        for _ in 0..30 {
+            harness.advance(Duration::from_millis(100));
+        }
+        assert_eq!(
+            harness.text_of(".ds-tooltip").as_deref(),
+            Some(tip),
+            "{selector}"
+        );
+    }
 }

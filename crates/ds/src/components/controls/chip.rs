@@ -1,6 +1,7 @@
 //! Chip: a small label that states a fact (design/04-COMPONENTS.md section 10).
 
 use crate::components::content::avatar::{AvatarFace, face};
+use crate::components::content::title_tip::use_tip;
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
 use ds_core::word::Word;
@@ -78,14 +79,42 @@ pub fn Chip(
             }
             "{text}"
             if let (Some(_), Some(onremove)) = (avatar, onremove) {
-                button {
-                    r#type: "button",
-                    class: "ds-chip-remove",
-                    "aria-label": "Remove {text}",
-                    onclick: move |_| onremove.call(()),
-                    Glyph { icon: Icon::X, size: IconSize::Micro }
-                }
+                ChipRemove { text: text.clone(), onremove }
             }
         }
+    }
+}
+
+/// The chip's remove button: named "Remove {text}", with the same words as its tip.
+#[component]
+fn ChipRemove(text: String, onremove: EventHandler<()>) -> Element {
+    let name = format!("Remove {text}");
+    let tip = use_tip(Some(name.clone()));
+    rsx! {
+        button {
+            r#type: "button",
+            class: "ds-chip-remove",
+            title: tip.native(),
+            "aria-label": name,
+            onclick: move |_| onremove.call(()),
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| tip.out()
+            },
+            onmounted: {
+                let tip = tip.clone();
+                move |event| tip.mounted(&event)
+            },
+            Glyph { icon: Icon::X, size: IconSize::Micro }
+        }
+        {tip.surface()}
     }
 }
