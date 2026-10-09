@@ -120,6 +120,7 @@ mod text_field_multiline;
 mod text_field_secure;
 mod thread_more;
 mod thread_row_common;
+mod tip_wall_clock;
 mod title_tooltip;
 mod toast_action;
 mod toast_motion;

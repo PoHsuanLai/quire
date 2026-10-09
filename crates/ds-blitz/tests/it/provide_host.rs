@@ -96,3 +96,19 @@ fn a_bare_roots_clipboard_write_says_it_wrote_nothing_instead_of_succeeding() {
     dom.rebuild_in_place();
     assert_eq!(*wrote.0.borrow(), [Err(ClipboardError::NoShell)]);
 }
+
+#[test]
+fn the_host_is_there_for_a_task_on_the_root_scope() {
+    #[allow(non_snake_case)]
+    fn Surface() -> Element {
+        let _host = ds_blitz::provide_host();
+        rsx! {}
+    }
+    let mut dom = VirtualDom::new(Surface);
+    dom.rebuild_in_place();
+    let from_root = dom.in_scope(ScopeId::ROOT, try_consume_context::<Rc<dyn DocumentHost>>);
+    assert!(
+        from_root.is_some_and(|host| host.edit().is_some()),
+        "a root-scope task saw no host: it cannot measure an anchor"
+    );
+}
