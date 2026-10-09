@@ -76,7 +76,9 @@ impl Harness {
         // Entered before `Headless::new`, whose `initial_build` runs `app`'s first render and
         // so is where a `use_future` calling `tokio::spawn` (e.g. `ds_settings::use_environment`)
         // would run.
-        let runtime = ds_blitz::enter_runtime();
+        // A test driver: a thread that cannot start a runtime cannot run the test.
+        let runtime =
+            ds_blitz::enter_runtime().expect("the harness's tokio runtime could not start");
         // Installed before the first render, so a hook that notes the time as it mounts reads
         // the harness's clock.
         let time = HarnessClock::start(config.clock());

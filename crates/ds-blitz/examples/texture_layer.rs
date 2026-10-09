@@ -18,12 +18,12 @@ const LIFETIME: Duration = Duration::from_secs(3);
 /// The picture's size in pixels.
 const SIDE: u32 = 256;
 
-fn main() {
+fn main() -> Result<(), ds_blitz::LaunchError> {
     launch(
         App,
         AppConfig::new("quire: ds-blitz texture layer", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.TextureLayer".to_owned())),
-    );
+    )
 }
 
 #[allow(non_snake_case)]

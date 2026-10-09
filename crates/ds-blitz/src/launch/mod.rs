@@ -9,6 +9,7 @@
 
 mod runtime;
 
+use crate::error::LaunchError;
 pub use runtime::{RuntimeGuard, TokioSpawner, enter_runtime};
 
 use crate::app_handle::AppHandle;
@@ -29,6 +30,7 @@ use crate::window_shell::Windows;
 use crate::window_size::WindowSize;
 use dioxus::prelude::*;
 use std::time::Instant;
+use tokio::runtime::Handle;
 
 /// How the window starts, and what its document is given: build it with [`AppConfig::new`] and
 /// the `with_*` methods.
@@ -45,6 +47,8 @@ pub struct AppConfig {
     handle: AppHandle,
     /// The wgpu features and limits the windows' device is created with.
     gpu: GpuRequest,
+    /// The runtime the app's tasks run on; `None` is one `launch` builds and owns.
+    runtime: Option<Handle>,
 }
 
 impl AppConfig {
@@ -56,6 +60,7 @@ impl AppConfig {
             last_window: LastWindowClosed::default(),
             handle: AppHandle::new(),
             gpu: GpuRequest::default(),
+            runtime: None,
         }
     }
 
@@ -79,6 +84,14 @@ impl AppConfig {
     /// only for what the app cannot do without.
     pub fn with_gpu(mut self, gpu: GpuRequest) -> Self {
         self.gpu = gpu;
+        self
+    }
+
+    /// Run the app's `tokio::spawn` calls on the runtime `handle` belongs to, the caller's own
+    /// (default: `launch` builds a runtime of two worker threads and drops it when the loop ends).
+    /// `launch` enters it on the calling thread for the whole run.
+    pub fn with_runtime(mut self, handle: Handle) -> Self {
+        self.runtime = Some(handle);
         self
     }
 
@@ -140,8 +153,8 @@ impl AppConfig {
 /// Run `app` in a first window until the app's [`LastWindowClosed`] policy ends the loop (by
 /// default, when the last window closes). Windows it opens with [`crate::open_window`] or an
 /// [`AppHandle`] are independent of the first: closing any one closes only it.
-pub fn launch(app: fn() -> Element, config: AppConfig) {
-    run(Some(app), config);
+pub fn launch(app: fn() -> Element, config: AppConfig) -> Result<(), LaunchError> {
+    run(Some(app), config)
 }
 
 /// Run the event loop with no window: the app opens its windows through the
@@ -149,17 +162,25 @@ pub fn launch(app: fn() -> Element, config: AppConfig) {
 /// not used; its application id, decorations and contexts are every window's defaults). It
 /// returns when the app's policy or `AppHandle::quit` ends the loop; with
 /// [`LastWindowClosed::StayFor`] the loop's linger counts from the start.
-pub fn launch_idle(config: AppConfig) {
-    run(None, config);
+pub fn launch_idle(config: AppConfig) -> Result<(), LaunchError> {
+    run(None, config)
 }
 
-fn run(first: Option<fn() -> Element>, config: AppConfig) {
+fn run(first: Option<fn() -> Element>, config: AppConfig) -> Result<(), LaunchError> {
     // First, before the runtime below or the event loop start a thread: clearing the activation
     // token from the environment while another thread may read it is undefined behaviour.
     let tokens = LaunchTokens::from_env();
     // Held until this call returns, which does not happen until the loop ends — i.e., for
     // the process's life. See `runtime` for why a host thread must enter Tokio at all.
-    let _runtime = enter_runtime();
+    let (owned, given) = match config.runtime.clone() {
+        Some(handle) => (None, handle),
+        None => {
+            let runtime = runtime::build()?;
+            let handle = runtime.handle().clone();
+            (Some(runtime), handle)
+        }
+    };
+    let entered = given.enter();
     let event_loop = blitz_shell::create_default_event_loop();
     let waker = event_loop.create_proxy();
     config.handle.bind({
@@ -182,9 +203,11 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) {
         Lifecycle::new(config.last_window, Instant::now()),
         tokens,
     );
-    // As dioxus-native's own `launch` does: an event loop that cannot run leaves the app no
-    // window to show anything in, which is a broken host, not bad input.
+    // An event loop that cannot run leaves the app no window to show anything in.
     let ran = event_loop.run_app(windows);
     config.handle.end();
-    ran.expect("the window's event loop could not run");
+    // Entered runtime first, then the owned one (dropping a runtime inside its own entry panics).
+    drop(entered);
+    drop(owned);
+    ran.map_err(|error| LaunchError::EventLoop(Box::new(error)))
 }

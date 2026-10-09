@@ -17,12 +17,12 @@ use ds::root::common::Common;
 use ds_blitz::{AppConfig, AppId, WindowSize, launch};
 use std::time::Duration;
 
-fn main() {
+fn main() -> Result<(), ds_blitz::LaunchError> {
     launch(
         App,
         AppConfig::new("quire: edit surface", WindowSize::new(520, 300))
             .with_app_id(AppId("dev.quire.Edit".to_owned())),
-    );
+    )
 }
 
 #[allow(non_snake_case)]

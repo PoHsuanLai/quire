@@ -73,10 +73,13 @@ fn main() {
                 typeface: args.typeface.unwrap_or_default(),
                 ..Axes::default()
             });
-            launch(
+            if let Err(error) = launch(
                 app::App,
                 AppConfig::new("quire gallery", WindowSize::new(1280, 900)),
-            );
+            ) {
+                eprintln!("ds-gallery: {error}");
+                std::process::exit(1);
+            }
         }
     }
 }

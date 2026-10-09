@@ -97,7 +97,7 @@ local checkouts, `[patch."https://github.com/PoHsuanLai/blitz-kit"]` pointing at
 `blitz-kit` so every path-linked repo builds one copy.
 
 **Launching on Blitz.** `ds_blitz::launch(app, AppConfig::new(title, WindowSize::new(width, height)))`
-runs `app` until its window closes. A `WindowSize` is what the window opens at and, with
+runs `app` until its window closes and returns `Result<(), LaunchError>` (no runtime, or an event loop that cannot run; `main` can return it). The app's `tokio::spawn` calls run on a runtime `launch` builds and owns, or on the caller's own via `AppConfig::with_runtime(handle)`. A `WindowSize` is what the window opens at and, with
 `.with_least(width, height)`, the least a person may resize it to: give the least your layout's
 panes fit in, so no pane is squeezed past its own least (`WindowSpec::new` takes the same value
 for a later window). It enters the process-wide Tokio runtime that `ds_blitz::TokioSpawner`

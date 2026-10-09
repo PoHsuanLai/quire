@@ -105,7 +105,7 @@ pub use blitz_host::provide_host;
 pub use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref};
 pub use click_focus::FocusFallback;
 pub use contexts::RootContexts;
-pub use error::OpenWindowError;
+pub use error::{LaunchError, OpenWindowError, RuntimeError};
 pub use fonts::font_context;
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
 pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};

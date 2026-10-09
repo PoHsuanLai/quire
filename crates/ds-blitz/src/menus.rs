@@ -71,6 +71,9 @@ pub enum MenuExportError {
     /// A value could not be written for the bus.
     #[error("a menu value could not be written for the bus: {0}")]
     Wire(String),
+    /// No runtime for zbus to run on.
+    #[error(transparent)]
+    Runtime(#[from] crate::error::RuntimeError),
 }
 
 /// A menu being served. Dropping it closes the connection, which takes the name with it.
@@ -102,7 +105,7 @@ impl MenuExport {
         let shared = Arc::new(Shared::new(MenuState::new(tree), Box::new(on_activate)));
         // zbus may run on the process-wide runtime (its `tokio` feature, when a shell turns it
         // on), which must be entered while the connection is built.
-        let _runtime = crate::enter_runtime();
+        let _runtime = crate::enter_runtime()?;
         let connection = connect(&config.bus, &address, &shared)?;
         let name = request_name(&connection, &address)?;
         Ok(MenuExport {

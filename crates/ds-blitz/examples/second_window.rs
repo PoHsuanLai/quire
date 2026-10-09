@@ -30,14 +30,15 @@ use std::time::Duration;
 #[derive(Clone, Default)]
 struct Opens(Arc<AtomicUsize>);
 
-fn main() {
+fn main() -> Result<(), ds_blitz::LaunchError> {
     launch(
         App,
         AppConfig::new("quire: first window", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.SecondWindow".to_owned()))
             .with_context(Opens::default()),
-    );
+    )?;
     println!("autopilot: launch returned");
+    Ok(())
 }
 
 fn autopilot() -> bool {

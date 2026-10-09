@@ -18,12 +18,12 @@ use std::time::Duration;
 /// How long the window stays up on its own.
 const LIFETIME: Duration = Duration::from_secs(3);
 
-fn main() {
+fn main() -> Result<(), ds_blitz::LaunchError> {
     launch(
         App,
         AppConfig::new("quire: ds-blitz window", WindowSize::new(480, 320))
             .with_app_id(AppId("dev.quire.Window".to_owned())),
-    );
+    )
 }
 
 #[allow(non_snake_case)]
