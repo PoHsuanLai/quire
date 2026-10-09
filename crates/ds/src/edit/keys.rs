@@ -20,8 +20,10 @@ pub enum KeyAction {
 }
 
 /// `modifiers` with Super counted as Meta: a window reports the Command key as Super, and the
-/// catalogue's chords are written with Meta, so each reads its modifiers through this.
-pub(crate) fn command_keys(modifiers: Modifiers) -> Modifiers {
+/// catalogue's chords are written with Meta, so each reads its modifiers through this. Apps that
+/// read modifiers off a dioxus key or wheel event go through this (or [`is_command`]) too, so a
+/// chord matches in a window as it does in the harness.
+pub fn command_keys(modifiers: Modifiers) -> Modifiers {
     if modifiers.contains(Modifiers::SUPER) {
         (modifiers - Modifiers::SUPER) | Modifiers::META
     } else {
@@ -29,10 +31,16 @@ pub(crate) fn command_keys(modifiers: Modifiers) -> Modifiers {
     }
 }
 
+/// Whether `modifiers` hold the command key: Ctrl, or Cmd (reported as Meta or Super). The test
+/// for an app's own chord or Cmd+wheel zoom read from a dioxus event.
+pub fn is_command(modifiers: Modifiers) -> bool {
+    command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::META)
+}
+
 /// What pressing `key` with `modifiers` held means. Ctrl or Super (Cmd) makes a chord; Alt alone
 /// does not, since it types characters on some layouts (macOS Option, AltGr reported as Alt).
 pub fn classify(key: &Key, modifiers: Modifiers) -> KeyAction {
-    let command = command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::META);
+    let command = is_command(modifiers);
     let shift = modifiers.contains(Modifiers::SHIFT);
     match key {
         Key::Character(text) if command => match text.to_lowercase().as_str() {
@@ -58,7 +66,7 @@ fn chord(key: &Key, modifiers: Modifiers) -> KeyAction {
 
 #[cfg(test)]
 mod tests {
-    use super::{KeyAction, classify};
+    use super::{KeyAction, classify, is_command};
     use crate::edit::input::KeyInput;
     use dioxus::prelude::{Key, Modifiers};
 
@@ -130,6 +138,22 @@ mod tests {
                 expected,
                 "{pressed:?} with {held:?}"
             );
+        }
+    }
+
+    #[test]
+    fn the_command_key_is_ctrl_meta_or_super_and_nothing_else() {
+        let cases = [
+            (Modifiers::CONTROL, true),
+            (Modifiers::META, true),
+            (Modifiers::SUPER, true),
+            (Modifiers::SUPER | Modifiers::SHIFT, true),
+            (Modifiers::ALT, false),
+            (Modifiers::SHIFT, false),
+            (Modifiers::empty(), false),
+        ];
+        for (held, command) in cases {
+            assert_eq!(is_command(held), command, "{held:?}");
         }
     }
 }

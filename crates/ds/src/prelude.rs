@@ -80,6 +80,7 @@ pub use crate::components::forms::icon_tile::{IconTile, TileFace};
 pub use crate::components::forms::pane_stack::header::PageHeader;
 pub use crate::components::forms::pane_stack::path::PanePath;
 pub use crate::components::forms::pane_stack::stack::PaneStack;
+pub use crate::edit::keys::{command_keys, is_command};
 
 // Overlays
 pub use crate::components::overlays::alert::Alert;
