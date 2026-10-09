@@ -1,0 +1,5 @@
+/* TextureLayer (the `ds-blitz` component that shows a GPU texture): an `object` that fills the box
+   its parent gives it. Blitz sets this size inline on the element too; the rule is here so the
+   class is styled by the sheet and a consumer's own rule can override it. */
+
+.ds-texture-layer{ display:block; width:100%; height:100%; }
