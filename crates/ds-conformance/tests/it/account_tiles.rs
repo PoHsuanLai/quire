@@ -341,8 +341,13 @@ fn a_busy_mark_turns_only_while_its_operation_runs() {
 /// One account's tile in a grid `width` px wide: 160 is the content of a sidebar at its least
 /// (180), 212 that of a 232 px sidebar.
 fn one_tile(width: u32) -> Harness {
+    one_tile_at(width, VIEW)
+}
+
+/// The same, in a window of `view`.
+fn one_tile_at(width: u32, view: Viewport) -> Harness {
     WIDTH.with(|cell| cell.set(width));
-    let mut harness = Harness::new(OneTile, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(OneTile, HarnessConfig::new(view).with_clock(Clock::Virtual));
     harness.advance(ms(100));
     harness
 }
@@ -395,6 +400,28 @@ fn the_provider_mark_keeps_its_place_on_the_face_at_any_tile_width() {
         (inset - 7.0).abs() <= 1.0,
         "the mark moved at the usual width: {inset}px in from the tile"
     );
+}
+
+/// At scale 2 the mark's corner is on a whole device pixel at any tile width, even where the
+/// grid gives the tile a fractional width (blurred provider icons: quarter pixels at 91.75).
+#[test]
+fn the_provider_mark_sits_on_whole_device_pixels_at_scale_two() {
+    let view = Viewport {
+        width: 320,
+        height: 160,
+        scale_percent: 200,
+    };
+    for width in [160, 171, 185, 199, 212] {
+        let harness = one_tile_at(width, view);
+        let mark = rect(&harness, ".ds-pin-tile .ds-provider");
+        for (name, edge) in [("x", mark.origin.x.0), ("y", mark.origin.y.0)] {
+            let device = edge * 2.0;
+            assert!(
+                (device - device.round()).abs() < 0.02,
+                "the mark's {name} is {edge} px ({device} device px) in a {width} px grid"
+            );
+        }
+    }
 }
 
 /// A secondary press asks for that tile's menu and is never a pick; a primary press still picks
