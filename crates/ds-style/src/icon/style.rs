@@ -21,9 +21,10 @@ pub enum GlyphStyle {
     Outline,
 }
 
-/// How the on half of a pair is drawn. Set it to `Outline` and a star, heart, pin or bell is
-/// outline in both states.
-pub const PAIR_ON: GlyphStyle = GlyphStyle::Solid;
+/// How the on half of a pair is drawn: outline, like the off half (owner, 2026-10-09), so a star,
+/// heart, pin or bell is outline in both states and only its colour marks the on state. Set it to
+/// `Solid` to fill the on half again.
+pub const PAIR_ON: GlyphStyle = GlyphStyle::Outline;
 
 impl GlyphStyle {
     /// The paint `icon` draws with when it is asked for `asked`: solid or outline, never
@@ -47,7 +48,8 @@ impl GlyphStyle {
         }
     }
 
-    /// The style of a pair's half: [`PAIR_ON`] when it is on, outline when it is off or mixed.
+    /// The style of a pair's half: [`PAIR_ON`] when it is on (outline today), outline when it is
+    /// off or mixed.
     pub fn of(state: Check) -> GlyphStyle {
         match state {
             Check::On => PAIR_ON,
@@ -125,7 +127,7 @@ mod tests {
     #[test]
     fn the_owner_picks_are_the_defaults() {
         let count = |wanted: Native| Icon::ALL.iter().filter(|i| i.native() == wanted).count();
-        assert_eq!(count(Native::Solid), 17);
+        assert_eq!(count(Native::Solid), 16);
         assert_eq!(count(Native::Pair), 4);
         assert_eq!(
             Icon::ALL

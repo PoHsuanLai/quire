@@ -1,12 +1,11 @@
-//! The Bluetooth glyph's parts, drawn as strokes: the owner prefers the stroked rune to a filled
-//! one (design/08-ICONS.md section 1.2; Bluetooth's pick is outline). Same layers and `data-*` words
+//! The Bluetooth and Wi-Fi glyphs' parts, drawn as strokes: the owner prefers the stroked glyph to a
+//! filled one (design/08-ICONS.md section 1.2; both picks are outline). Same layers and `data-*` words
 //! as `part`, with Lucide's 2 unit stroke, round caps and joins, and the slash drawn on by dash.
 
-use super::part::{Part, Pen, Show};
+use super::part::{Part, Pen, Show, shape_child};
 use dioxus::prelude::*;
 use ds_core::vocab::Fraction;
 use ds_core::word::Word;
-use ds_style::icon::shape::Shape;
 
 /// The slash's length on the 24 grid (`M2 2l20 20`), for its dash.
 const SLASH_LENGTH: f32 = 28.29;
@@ -28,9 +27,7 @@ pub(crate) fn stroked_part_svg(part: Part, pen: &Pen) -> Element {
             "stroke-linejoin": "round",
             "fill": "none",
             for shape in part.shapes {
-                if let Shape::Path(d) = shape {
-                    path { d: "{d}" }
-                }
+                {shape_child(shape)}
             }
         }
     }

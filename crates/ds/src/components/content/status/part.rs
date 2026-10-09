@@ -93,7 +93,7 @@ pub(crate) fn slash_svg(drawn: Fraction, pen: &Pen) -> Element {
     }
 }
 
-fn shape_child(shape: &Shape) -> Element {
+pub(super) fn shape_child(shape: &Shape) -> Element {
     match shape {
         Shape::Path(d) => rsx! { path { d: "{d}" } },
         Shape::Solid(d) => rsx! { path { d: "{d}", fill: "currentColor" } },

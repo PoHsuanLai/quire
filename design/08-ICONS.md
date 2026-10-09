@@ -37,8 +37,8 @@ prototypes' set. Its Fill weight is a fallback for the solid form (1.2.1).
 Decision, owner, 2026-10-09: each glyph has its own pick, made in the gallery, and the desktop
 draws that. This reverses the 2026-10-07 "solid by default" rule (which itself replaced "no
 fills"). The picks are data: `Icon::native` reads the table in `crates/ds-style/src/icon/native.rs`.
-92 glyphs are outline, 17 solid (`Battery`, `BatteryCharging`, `BatteryFull`, `BatteryLow`,
-`BatteryMedium`, `Brightness`, the four chevrons, `Key`, `Pause`, `Pen`, `Play`, `Refresh`,
+The picks are mostly outline; 16 are solid (`Battery`, `BatteryCharging`, `BatteryFull`, `BatteryLow`,
+`BatteryMedium`, the four chevrons, `Key`, `Pause`, `Pen`, `Play`, `Refresh`,
 `Restart`, `Terminal`), and 3 are replaced by a drawing the owner chose (1.2.2).
 
 1. Canvas `viewBox="0 0 24 24"`.
@@ -47,13 +47,15 @@ fills"). The picks are data: `Icon::native` reads the table in `crates/ds-style/
      and no stroke attribute anywhere. The source is Tabler's filled set, then Phosphor Fill
      where Tabler has none, then a hand-made fill (1.2.1).
    - Outline: Lucide's glyph, `stroke-width` 2, `stroke-linecap="round"`,
-     `stroke-linejoin="round"`, `fill="none"`. It is the default of 92 glyphs and the off state of a pair.
+     `stroke-linejoin="round"`, `fill="none"`. It is the default of nearly every glyph and the off state of a pair.
    Every glyph keeps both forms, so a later pick can flip back.
 3. State pairs. `Star`, `Heart`, `Pin` and `Bell` are `Native::Pair`: outline while off (and
-   mixed), `PAIR_ON` (solid) while on, as macOS draws them. `GlyphStyle::for_state(icon, state)`
+   mixed) and, since the owner's 2026-10-09 call, while on too (`PAIR_ON` is `Outline`); the colour marks
+   the on state. `GlyphStyle::for_state(icon, state)`
    gives the half; a thread row's star and a `Button { value }` holding one of them follow it.
-   `PAIR_ON` in `style.rs` is the one constant to set to `Outline` if the owner wants them
-   outline in both states. A pair of different glyphs (`Play` and `Pause`, `Bell` and `BellOff`)
+   `PAIR_ON` in `style.rs` is the one constant to set to `Solid` to fill the on half again.
+   The animated status and level glyphs (Wi-Fi, volume, brightness, keyboard light) are stroked
+   too, on the Bluetooth precedent; the battery and the slash bar stay solid. A pair of different glyphs (`Play` and `Pause`, `Bell` and `BellOff`)
    is two icons, not a style change. The old `ALWAYS_OUTLINE` list is gone: Bluetooth is
    outline because the table says so.
 4. Keep 1 px padding: no geometry outside 1..23 (Lucide's own rule); Phosphor's own padding

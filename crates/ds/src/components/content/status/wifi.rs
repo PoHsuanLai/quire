@@ -5,6 +5,7 @@
 
 use super::part::{Part, Pen, Show, part_svg, slash_svg};
 use super::slash::use_slash;
+use super::stroked::stroked_part_svg;
 use super::wifi_state::{WifiReach, WifiState};
 use dioxus::prelude::*;
 use ds_motion::detail::{
@@ -15,9 +16,9 @@ use ds_motion::detail::{
     use_operation::use_operation,
     use_pending::use_pending,
 };
+use ds_style::icon::Icon;
 use ds_style::icon::render::IconSize;
 use ds_style::icon::shape::Shape;
-use ds_style::icon::solid_fan::{WIFI_DOT, WIFI_LARGE, WIFI_MID, WIFI_SMALL};
 use ds_style::icon::stroke::stroke_width;
 use ds_style::scale::use_scale;
 
@@ -27,11 +28,7 @@ pub(crate) const SEARCHING: PendingSpec = PendingSpec {
     layers: PendingLayers(4),
 };
 
-/// The fan's parts, from the inside out (`ds_style::icon::solid_fan`), and the badge.
-const DOT: &[Shape] = &[WIFI_DOT];
-const ARC_1: &[Shape] = &[WIFI_SMALL];
-const ARC_2: &[Shape] = &[WIFI_MID];
-const ARC_3: &[Shape] = &[WIFI_LARGE];
+/// The fan's parts, from the inside out: Lucide `wifi`'s dot and three arcs, stroked, and the badge.
 /// The no-internet mark, a bar and a dot, in the fan's free lower-right corner.
 const BADGE: &[Shape] = &[
     Shape::Rect {
@@ -48,13 +45,16 @@ const BADGE: &[Shape] = &[
     },
 ];
 
-/// The layers' geometry and names, from the dot out.
-const LAYERS: [(&str, &[Shape]); 4] = [
-    ("dot", DOT),
-    ("arc-1", ARC_1),
-    ("arc-2", ARC_2),
-    ("arc-3", ARC_3),
-];
+/// The layers' geometry and names, from the dot out: Lucide `wifi`'s paths in that order.
+fn layers() -> [(&'static str, &'static [Shape]); 4] {
+    let fan = Icon::Wifi.shapes();
+    [
+        ("dot", &fan[..1]),
+        ("arc-1", &fan[3..4]),
+        ("arc-2", &fan[2..3]),
+        ("arc-3", &fan[1..2]),
+    ]
+}
 
 /// How each layer shows: the state as it is, or a pending frame over it.
 pub(crate) fn layer_shows(state: WifiState, frame: PendingFrame) -> [Show; 4] {
@@ -122,8 +122,8 @@ pub fn WifiGlyph(state: WifiState, #[props(default = IconSize::Bar)] size: IconS
     rsx! {
         span { class: "ds-status-glyph", "data-kind": "wifi",
             "data-state": slug(state), "aria-hidden": "true",
-            for (index, (name, shapes)) in LAYERS.iter().enumerate() {
-                {part_svg(Part { name, shapes, show: shows[index] }, &pen)}
+            for (index, (name, shapes)) in layers().into_iter().enumerate() {
+                {stroked_part_svg(Part { name, shapes, show: shows[index] }, &pen)}
             }
             {part_svg(Part { name: "badge", shapes: BADGE, show: badge(state) }, &pen)}
             {slash_svg(drawn, &pen)}

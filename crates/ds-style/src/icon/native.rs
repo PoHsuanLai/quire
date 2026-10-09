@@ -113,7 +113,7 @@ pub(super) const TABLE: &[(Icon, Native)] = &[
     (Icon::Link, Native::Outline),
     (Icon::Sparkles, Native::Drawn(drawn::SPARKLES)),
     (Icon::Gauge, Native::Outline),
-    (Icon::Brightness, Native::Solid),
+    (Icon::Brightness, Native::Outline),
     (Icon::Printer, Native::Outline),
     (Icon::FolderInput, Native::Outline),
     (Icon::Play, Native::Solid),
