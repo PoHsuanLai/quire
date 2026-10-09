@@ -1074,6 +1074,12 @@ on a machine other builds were also using, so about +-10 ms).
 
 ### Scrolling
 
+- **Listener-driven scrolling trailed the scroll by a frame**: eased detents and glides are
+  handed to listeners (`WheelDelivery::Eased`, the PDF and text views) by the scroll step, which
+  ran inside `RedrawRequested` after the frame's renders, so a listener's signal write was
+  rendered and painted on the next frame. The step now runs first in `RedrawRequested`
+  (`Sub::scroll_step`), followed by a hand-over so the write is rendered into the same frame; the
+  harness runs the same order (`window_scroll_same_frame`).
 - **`scrollbar-width: none` suppresses Blitz's own overlay thumb outright**:
   `Node::wants_scrollbar` reads it before asking whether the axis overflows (the thumb is
   Chromium-like: 10 px, 32 px minimum, 500 ms fade delay, 200 ms fade). Every ds scroll container

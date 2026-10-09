@@ -51,10 +51,7 @@ impl Track {
     fn release(&self, now: Elapsed, physics: &Physics) -> (f64, f64) {
         let at = SampleTime(now.0);
         let speed = |axis: &Axis| {
-            let v = axis
-                .samples
-                .velocity(at, physics.release)
-                .clamp(-physics.cap, physics.cap);
+            let v = physics.fling(axis.samples.velocity(at, physics.release));
             match (physics.momentum, v.abs() >= physics.start) {
                 (ScrollMomentum::On, true) => v,
                 _ => 0.0,

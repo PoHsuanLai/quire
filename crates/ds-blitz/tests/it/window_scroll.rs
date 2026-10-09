@@ -153,10 +153,12 @@ fn detents_in_a_burst_add_up_and_a_reversed_one_takes_back() {
         harness.advance(FRAME);
     }
     harness.advance(Duration::from_millis(300));
-    assert_eq!(offset(&harness, "list"), 180.0, "three detents");
+    // Three clicks 8 ms apart are a spun wheel, which carries each further than 60 px.
+    let three = offset(&harness, "list");
+    assert!(three >= 180.0, "three detents: {three}");
     harness.send(Input::detents(at, 0.0, 1.0));
     harness.advance(Duration::from_millis(300));
-    assert_eq!(offset(&harness, "list"), 120.0, "one back");
+    assert_eq!(offset(&harness, "list"), three - 60.0, "one back");
 }
 
 #[test]
@@ -229,4 +231,44 @@ fn a_listener_that_asks_gets_the_detents_eased_and_the_others_get_them_whole() {
         (total + 60.0).abs() < 1e-3,
         "summing to the detent: {total}"
     );
+}
+
+/// `clicks` wheel clicks `gap` apart, then the frames until everything has settled; the list's
+/// final offset.
+fn spun(clicks: u32, gap: Duration) -> f64 {
+    let mut harness = harness();
+    let at = over(&harness, "#list");
+    for _ in 0..clicks {
+        harness.send(Input::detents(at, 0.0, -1.0));
+        harness.advance(gap);
+    }
+    harness.advance(Duration::from_millis(400));
+    offset(&harness, "list")
+}
+
+#[test]
+fn a_wheel_read_at_a_slow_pace_moves_60_px_a_click() {
+    // Four clicks a second: not spun.
+    let end = spun(5, Duration::from_millis(250));
+    assert!((end - 300.0).abs() < 1.0, "{end}");
+}
+
+#[test]
+fn a_spun_wheel_carries_each_click_further_than_60_px() {
+    // Twenty clicks a second for a second: past the 1200 px unaccelerated.
+    let end = spun(20, Duration::from_millis(48));
+    assert!(end > 1800.0, "a spin of 20 clicks moved only {end}");
+    // And a pause between spins starts afresh: one click back is 60 px again.
+    let mut harness = harness();
+    let at = over(&harness, "#list");
+    for _ in 0..20 {
+        harness.send(Input::detents(at, 0.0, -1.0));
+        harness.advance(Duration::from_millis(48));
+    }
+    harness.advance(Duration::from_millis(600));
+    let before = offset(&harness, "list");
+    harness.send(Input::detents(at, 0.0, 1.0));
+    harness.advance(Duration::from_millis(300));
+    let step = before - offset(&harness, "list");
+    assert!((step - 60.0).abs() < 1.0, "{step}");
 }

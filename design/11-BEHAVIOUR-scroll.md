@@ -197,8 +197,8 @@ daemon's feel as the starting point (settled):
 | Velocity gain | `1 + min(rate / 2000, G_v - 1)`, `rate` = raw units/s of the sample, only if `0 < dt <= 50 ms`, `G_v = 2.0` | settled (Python) |
 | Repeat gain | divisor `D` starts 7; each new contact set within 0.5 s of the last output: `D = max(1, D - 1)`, else `D = 7`; gain `min(G_r, 7/D)`, `G_r = 2.3` (sequence 1.0, 1.167, 1.4, 1.75, 2.3) | settled (Python) |
 | Momentum | computed from the gained px, so it is "accelerated too" | proposed (R15) |
-| Wheel detent | 60 px, no acceleration in v1 | proposed (R15 table UNKNOWN for our mice) |
-| Touchpad | px as delivered by libinput through the compositor; no extra gain | proposed |
+| Wheel detent | 60 px at a reading pace, accelerated when spun (below) | proposed (R15 table UNKNOWN for our mice, so our own values) |
+| Touchpad | px as delivered by libinput through the compositor; no extra gain while the fingers are down (tracked 1:1); a fast lift glides further (below) | proposed |
 
 ### 11.3.9 Axis lock (predominant axis)
 
@@ -224,6 +224,21 @@ gesture in this document if still under the pointer, else the document viewport.
 | Single press | smooth: `duration = min(|delta| / 1000 px/s, 200 ms)`, curve `--e-out`; a new press during the animation adds its step to the current **target** and restarts from the current position | settled numbers (R18), curve proposed |
 | Held arrow (key repeat) | velocity ramps linearly to `25 x step` per second (1000 px/s for a line) in 0.2 s; on release a spring (m 1, k 175, c 20) runs from the current position and velocity to `target = x + v x 0.1 s`, clamped | settled numbers (R18 H), interpretation of "top 25x step in 0.2 s" and release target proposed |
 | Edges | clamp; no rubber band | proposed |
+
+**Wheel and fling acceleration (`blitz_kit::scroll::accel`, v0.2.31).** macOS accelerates wheel
+clicks and momentum (R15), but the curve is not published, so these are our own values, chosen so
+a flick of the wheel crosses a long page without a hundred turns and a reading pace is untouched.
+Proposed; tune by feel.
+
+| Value | Number | Why |
+| --- | --- | --- |
+| Wheel rate | detents per second, smoothed: each event replaces 40% of it; a gap over 250 ms ends the burst (the next click is a first one, 60 px); events under 4 ms apart count as 4 ms | a burst is one spin; a coalesced pair must not read as infinite |
+| Wheel gain | 1 up to 5 detents/s, then +0.25 per detent/s, capped at `wheel_accel_max` (5; 1 is off) | 5/s is a fast read; 20/s reaches about 4x, a spin reaches the cap |
+| Wheel scope | a source `Wheel` without Control only; Control-wheel is a zoom, touchpad pixels are the fingers' own | fingers are tracked 1:1 whatever their speed |
+| Fling gain | 1 up to 1000 px/s, then +1 per 3000 px/s, capped at `fling_accel_max` (2; 1 is off), applied to the release speed before the cap | a fast lift carries further; a gentle one glides as it is |
+
+The design/11 goldens (§11.4, §11.5) run with `fling_accel_max = 1`: they pin the unaccelerated
+engine, and the gain has its own tests.
 
 ### 11.3.11 Wheel mice and programmatic scrolls
 
@@ -435,6 +450,8 @@ process; palmrest keys in 12 §12.6):
 | `scroll.momentum` | `On | Off` | `On` | | proposed |
 | `scroll.rubber_band` | `Bounded | Linear | Off` | `Bounded` | | proposed |
 | `scroll.wheel_detent_px` | px | 60 | 20..200 | proposed |
+| `scroll.wheel_accel_max` | factor | 5 | 1..8 (1 is off) | proposed |
+| `scroll.fling_accel_max` | factor | 2 | 1..4 (1 is off) | proposed |
 | `scroll.speed` (palmrest) | int | 22 | 0..63 | settled (Python) |
 
 Gallery-only: `a` 30, `b` 0.7, stop 1 px/s, start 100 px/s, cap 12 000 px/s, velocity window
@@ -517,7 +534,7 @@ use `debug-inject` + FrameStats in nested cosmic-comp.
 2. Rubber band stretch: Bounded iOS (355 px at 1000 px of overscroll on a 1000 px view) vs
    Chromium Linear (50 px). Bounded proposed because Linear is very stiff under a finger.
 3. Keep the Python repeat gain (up to 2.3x) now that momentum exists, or reduce it.
-4. Wheel acceleration for ordinary mice (macOS accelerates; table UNKNOWN for our devices).
+4. Wheel acceleration for ordinary mice: our own curve landed in v0.2.31 (§11.3.8); the macOS table stays UNKNOWN, so tune the numbers by feel.
 5. Detent = 60 px vs the Blitz / Chromium Linux ~53 px.
 6. Whether keyboard scrolling should rubber-band at the ends (WebKit Mac does a small bounce).
 

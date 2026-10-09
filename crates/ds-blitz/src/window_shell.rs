@@ -120,6 +120,21 @@ impl Sub {
         handled.event
     }
 
+    /// Before the window draws, ahead of everything else it does for the frame: step scrolling
+    /// (the commands, the engine's frame, and the eased detents and glides handed to listeners)
+    /// and hand the application what that posted, so a listener's write is rendered into this
+    /// frame's document and painted with it, not a frame later. Closes the window asked for
+    /// come back.
+    fn scroll_step(&mut self, event_loop: &dyn ActiveEventLoop) -> Vec<WindowId> {
+        let Some(window) = self.slot.window() else {
+            return Vec::new();
+        };
+        if self.scroll.frame(Instant::now()) == Frames::Wanted {
+            window.request_redraw();
+        }
+        self.hand_over(event_loop)
+    }
+
     /// Before the window draws: when a caret moved, lay the document out, run the phase (which
     /// publishes the caret's box) and hand the document the renders that followed, so the same
     /// draw paints the text and the caret. The draw lays out again; only what the caret's box
@@ -446,7 +461,8 @@ impl ApplicationHandler for Windows {
         let mut closes = Vec::new();
         if let Some(sub) = self.key_of(window_id).and_then(|key| self.sub_mut(key)) {
             if drawn {
-                closes = sub.before_paint(event_loop);
+                closes = sub.scroll_step(event_loop);
+                closes.extend(sub.before_paint(event_loop));
             }
             if sub.scroll_event(&event) == Intercept::Passed {
                 sub.app.window_event(event_loop, window_id, event);
