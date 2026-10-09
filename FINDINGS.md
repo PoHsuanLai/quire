@@ -179,8 +179,8 @@ Not built, or limited, in quire:
   backend process can lose the fd) is not detected; COSMIC has no Print backend of its own, so a
   system without xdg-desktop-portal-gtk falls back to the viewer.
 - **pdfrum asks**: sweep (conic) gradients, gradient extend Repeat/Reflect, gradient paint on
-  strokes and text, blur and filters, compositing operators beyond source-over. pdfrum is pinned
-  by git rev until pdfrum 0.4 is on crates.io. Right-to-left runs in PDF output are untested.
+  strokes and text, blur and filters, compositing operators beyond source-over. pdfrum comes from
+  crates.io (0.5). Right-to-left runs in PDF output are untested.
 - **Pagination** is a heuristic, not CSS fragmentation ("PDF output").
 - **Spelling**: marks follow reads, not layout (a resize or font load that reflows the text
   without input leaves them until the next read); whether the surface should stay focused while
@@ -1182,7 +1182,7 @@ on a machine other builds were also using, so about +-10 ms).
 
 ## PDF output
 
-Blitz lays the document out, `pdfrum-anyrender` (a crate of the pdfrum repo, a git dependency of `ds-blitz`'s `pdf` feature pinned to pdfrum rev 61371040)
+Blitz lays the document out, `pdfrum-anyrender` (a pdfrum crate, from crates.io, behind `ds-blitz`'s `pdf` feature)
 replays anyrender's recording `Scene` onto a pdfrum canvas, and the result is a vector PDF. It
 names only anyrender, peniko, pdfrum and skrifa (no Blitz, no parley).
 
