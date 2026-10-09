@@ -228,7 +228,9 @@ impl WindowScroll {
                 });
                 (WheelUse::Taken, self.frames_after(moved))
             }
-            Some(WheelRoute::Capture) | None => (WheelUse::Passed, Frames::Idle),
+            Some(WheelRoute::Capture | WheelRoute::Nothing) | None => {
+                (WheelUse::Passed, Frames::Idle)
+            }
         }
     }
 
