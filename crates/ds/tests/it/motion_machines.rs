@@ -267,7 +267,7 @@ fn hover_intent_sequences() {
     for (name, steps) in cases {
         let mut machine = HoverIntent::default();
         for (n, (at, event, want_phase, want_effect)) in steps.into_iter().enumerate() {
-            let (next, effect) = machine.step(event.clone(), Stamp(at), &(), &());
+            let (next, effect) = machine.step(event.clone(), Stamp(at), &Default::default(), &());
             assert_eq!(
                 effect, want_effect,
                 "{name}, step {n} ({event:?} at {at} ms): effect"
@@ -292,7 +292,7 @@ fn warmth_follows_the_card_and_the_warm_window() {
         (500, HoverEvent::Out),
         (650, HoverEvent::Elapsed),
     ] {
-        machine = machine.step(event, Stamp(at), &(), &()).0;
+        machine = machine.step(event, Stamp(at), &Default::default(), &()).0;
         warmth.push(machine.warmth(Stamp(at)));
     }
     warmth.push(machine.warmth(Stamp(1049)));
@@ -303,7 +303,9 @@ fn warmth_follows_the_card_and_the_warm_window() {
 
 #[test]
 fn the_machine_wakes_for_the_open_and_the_close_and_rests_otherwise() {
-    let step = |machine: HoverIntent<u8>, event, at| machine.step(event, Stamp(at), &(), &()).0;
+    let step = |machine: HoverIntent<u8>, event, at| {
+        machine.step(event, Stamp(at), &Default::default(), &()).0
+    };
     let idle = HoverIntent::default();
     assert_eq!(idle.wake(), None);
     let pending = step(idle, HoverEvent::Over(1, HoverProfile::Card), 0);
@@ -445,7 +447,7 @@ fn slider_fraction_along_the_track() {
 }
 
 #[test]
-fn each_hover_profile_waits_by_its_own_open_and_close() {
+fn each_hover_profile_waits_by_its_own_open_and_close_under_the_standard_tip_delay() {
     // (profile, open delay, close delay)
     const CASES: &[(HoverProfile, u64, u64)] = &[
         (HoverProfile::Tip, 1000, 0),
@@ -454,18 +456,47 @@ fn each_hover_profile_waits_by_its_own_open_and_close() {
     ];
     for &(profile, open, close) in CASES {
         let machine = HoverIntent::default();
-        let (machine, _) = machine.step(HoverEvent::Over(1u8, profile), Stamp(0), &(), &());
+        let (machine, _) = machine.step(
+            HoverEvent::Over(1u8, profile),
+            Stamp(0),
+            &TipDelay::Standard,
+            &(),
+        );
         assert_eq!(
             machine.wake(),
             Some(Stamp(open)),
             "{profile:?} opens after {open} ms"
         );
-        let (machine, _) = machine.step(HoverEvent::Elapsed, Stamp(open), &(), &());
-        let (machine, _) = machine.step(HoverEvent::Out, Stamp(open + 10), &(), &());
+        let (machine, _) = machine.step(HoverEvent::Elapsed, Stamp(open), &TipDelay::Standard, &());
+        let (machine, _) =
+            machine.step(HoverEvent::Out, Stamp(open + 10), &TipDelay::Standard, &());
         assert_eq!(
             machine.wake(),
             Some(Stamp(open + 10 + close)),
             "{profile:?} closes after {close} ms"
         );
+    }
+}
+
+#[test]
+fn an_immediate_tip_opens_at_once_and_the_other_profiles_are_unchanged() {
+    let machine = HoverIntent::default();
+    let (machine, effects) = machine.step(
+        HoverEvent::Over(1u8, HoverProfile::Tip),
+        Stamp(0),
+        &TipDelay::Immediate,
+        &(),
+    );
+    assert_eq!(effects, vec![IntentEffect::Open(1)]);
+    assert_eq!(machine.phase(), &IntentPhase::Open { key: 1 });
+    assert_eq!(TipDelay::default(), TipDelay::Immediate);
+    for (profile, open) in [(HoverProfile::Card, 500), (HoverProfile::Label, 100)] {
+        let (machine, _) = HoverIntent::default().step(
+            HoverEvent::Over(1u8, profile),
+            Stamp(0),
+            &TipDelay::Immediate,
+            &(),
+        );
+        assert_eq!(machine.wake(), Some(Stamp(open)), "{profile:?}");
     }
 }

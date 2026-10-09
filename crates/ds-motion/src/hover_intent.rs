@@ -5,14 +5,15 @@
 
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
-use ds_style::tokens::delay::DelayToken;
+use ds_style::tokens::delay::{DelayToken, TipDelay};
 use std::time::Duration;
 
 /// Which hover interface the pointer is resting on, and so how long it waits (design/30
 /// section 1.2): the three profiles of one machine.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum HoverProfile {
-    /// A tooltip: opens after 1 s, closes at once.
+    /// A tooltip: opens at once by default ([`TipDelay::Immediate`]) or after 1 s under
+    /// [`TipDelay::Standard`]; closes at once.
     Tip,
     /// A hover card: opens after 500 ms, closes after 150 ms.
     #[default]
@@ -22,10 +23,10 @@ pub enum HoverProfile {
 }
 
 impl HoverProfile {
-    /// How long the pointer rests before it opens, cold.
-    pub fn open(self) -> Duration {
+    /// How long the pointer rests before it opens, cold; a tip waits as `tip` says.
+    pub fn open(self, tip: TipDelay) -> Duration {
         match self {
-            HoverProfile::Tip => DelayToken::TipOpen.delay(),
+            HoverProfile::Tip => tip.open(),
             HoverProfile::Card => DelayToken::CardOpen.delay(),
             HoverProfile::Label => DelayToken::LabelOpen.delay(),
         }
@@ -151,8 +152,8 @@ impl<K> HoverIntent<K> {
 impl<K: Clone + PartialEq + 'static> Machine for HoverIntent<K> {
     type In = HoverEvent<K>;
     type Out = IntentEffect<K>;
-    /// The delays are the profile's and the tokens': nothing to configure.
-    type Params = ();
+    /// The delays are the profile's and the tokens'; the app chooses how long a tip waits.
+    type Params = TipDelay;
     type Ctx = ();
 
     /// Apply `event` at `now` (the profile's open and close, 400 ms warm).
@@ -163,10 +164,10 @@ impl<K: Clone + PartialEq + 'static> Machine for HoverIntent<K> {
         self,
         event: HoverEvent<K>,
         now: Stamp,
-        _: &(),
+        tip: &TipDelay,
         _: &(),
     ) -> (Self, Vec<IntentEffect<K>>) {
-        let (next, effect) = self.advance(event, now);
+        let (next, effect) = self.advance(event, now, *tip);
         (next, effect.into_iter().collect())
     }
 
@@ -182,7 +183,7 @@ impl<K: Clone + PartialEq + 'static> Machine for HoverIntent<K> {
 type Effect<K> = Option<IntentEffect<K>>;
 
 impl<K: Clone + PartialEq> HoverIntent<K> {
-    fn advance(self, event: HoverEvent<K>, now: Stamp) -> (Self, Effect<K>) {
+    fn advance(self, event: HoverEvent<K>, now: Stamp, tip: TipDelay) -> (Self, Effect<K>) {
         let warm = self.warmth(now);
         let held = self.profile;
         let profile = match &event {
@@ -197,7 +198,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
         let (next, effect) = match (phase, event) {
             (phase, HoverEvent::OverSuppressed) => keep(phase),
             (phase, HoverEvent::Over(key, profile)) => {
-                over(phase, key, profile, warm_until, warm, now)
+                over(phase, key, profile.open(tip), warm_until, warm, now)
             }
             (IntentPhase::Pending { .. }, HoverEvent::Out) => keep(IntentPhase::Idle),
             (IntentPhase::Open { key }, HoverEvent::Out | HoverEvent::LeaveCard) => to(
@@ -257,7 +258,7 @@ impl<K: Clone + PartialEq> HoverIntent<K> {
 fn over<K: Clone + PartialEq>(
     phase: IntentPhase<K>,
     key: K,
-    profile: HoverProfile,
+    wait: Duration,
     warm_until: Option<Stamp>,
     warm: HoverWarmth,
     now: Stamp,
@@ -272,16 +273,16 @@ fn over<K: Clone + PartialEq>(
         IntentPhase::Pending { key: pending, due } if pending == key => {
             to(IntentPhase::Pending { key: pending, due }, warm_until, None)
         }
-        _ => match warm {
-            HoverWarmth::Warm => to(
+        _ => match (warm, wait.is_zero()) {
+            (HoverWarmth::Warm, _) | (HoverWarmth::Cold, true) => to(
                 IntentPhase::Open { key: key.clone() },
                 warm_until,
                 Some(IntentEffect::Open(key)),
             ),
-            HoverWarmth::Cold => to(
+            (HoverWarmth::Cold, false) => to(
                 IntentPhase::Pending {
                     key,
-                    due: now.after_span(profile.open()),
+                    due: now.after_span(wait),
                 },
                 warm_until,
                 None,

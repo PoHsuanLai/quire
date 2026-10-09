@@ -51,7 +51,7 @@ pub fn OverlaysCataloguePage() -> Element {
                 SideCase {}
             }
         }
-        Section { title: "Tooltip", note: "Tooltip {{ text, shown }}: one line below its target, opened by the Tip profile (1 s cold, at once while warm) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
+        Section { title: "Tooltip", note: "Tooltip {{ text, shown }}: one line below its target, opened by the Tip profile (at once by default, 1 s cold under `TipDelay::Standard`) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Tooltip, hover it".to_string(),
                     Tooltip { text: "Archive → out of Inbox",

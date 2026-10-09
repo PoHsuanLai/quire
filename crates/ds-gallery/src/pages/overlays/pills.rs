@@ -69,7 +69,7 @@ pub fn Cards() -> Element {
     rsx! {
         Section {
             title: "Hover cards and tooltips",
-            note: "Rest the pointer on a target: 500 ms to open a card, 150 ms to close, then warm for 400 ms so the next opens at once; a tooltip waits 1 s cold. The pinned people below are li targets (TargetElement::Li). A control's title is a tooltip too: hover the two toolbar icons (the first waits a second, the second then shows at once; a press hides it); inside a Tooltip a control shows only that one.",
+            note: "Rest the pointer on a target: 500 ms to open a card, 150 ms to close, then warm for 400 ms so the next opens at once; a tooltip opens at once (an app can ask for a 1 s wait). The pinned people below are li targets (TargetElement::Li). A control's title is a tooltip too: hover the two toolbar icons (each shows at once; a press hides it); inside a Tooltip a control shows only that one.",
             div { class: "g-row",
                 for (kind , key , text) in TARGETS {
                     HoverTarget { hover_key: HoverKey(key.to_string()), kind,

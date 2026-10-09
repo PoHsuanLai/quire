@@ -7,6 +7,7 @@ use dioxus::prelude::*;
 use ds_core::vocab::Shown;
 use ds_motion::hover_intent::{HoverEvent, HoverIntent, HoverProfile, IntentPhase};
 use ds_motion::machine::{MachineRef, use_machine};
+use ds_style::tokens::delay::TipDelay;
 
 /// There is one thing to hover, so the machine's key is nothing.
 type Part = ();
@@ -21,7 +22,12 @@ pub struct HoverOpen {
 /// A [`HoverOpen`] for this component, waiting by `profile`.
 pub fn use_hover_open(profile: HoverProfile) -> HoverOpen {
     HoverOpen {
-        machine: use_machine(|_| HoverIntent::default(), (), || (), |_, _| {}),
+        machine: use_machine(
+            |_| HoverIntent::default(),
+            TipDelay::default(),
+            || (),
+            |_, _| {},
+        ),
         profile,
     }
 }

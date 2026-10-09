@@ -1,7 +1,7 @@
 //! A tooltip keyed by the caller's own pointer hooks (design/30 section 2.5), on a real Blitz
 //! document: a thread row's time feeds the hover hub from its own events through
-//! `use_hover_intent` and draws `Tooltip { hover_key }` wrapping nothing. The tip opens after
-//! the Tip profile's second, stands below the element it was anchored to, and goes when the
+//! `use_hover_intent` and draws `Tooltip { hover_key }` wrapping nothing. The tip opens at once,
+//! stands below the element it was anchored to, and goes when the
 //! pointer leaves.
 
 use dioxus::prelude::*;
@@ -79,7 +79,7 @@ fn started() -> Harness {
 }
 
 #[test]
-fn the_tip_opens_after_the_tip_delay_below_its_anchor_and_goes_with_the_pointer() {
+fn the_tip_opens_at_once_below_its_anchor_and_goes_with_the_pointer() {
     let mut harness = started();
     assert_eq!(
         harness.count(".ds-tooltip"),
@@ -93,14 +93,8 @@ fn the_tip_opens_after_the_tip_delay_below_its_anchor_and_goes_with_the_pointer(
     );
     let over = harness.centre("#time").expect("the time");
     harness.send(Input::pointer_move(over));
-    harness.advance(ms(700));
-    assert_eq!(
-        harness.count(".ds-tooltip"),
-        0,
-        "not before the second is up"
-    );
-    harness.advance(ms(600));
-    assert_eq!(harness.count(".ds-tooltip"), 1, "after it");
+    harness.advance(ms(50));
+    assert_eq!(harness.count(".ds-tooltip"), 1, "no wait by default");
     let tip = harness.rect(".ds-tooltip").expect("the tip");
     let time = harness.rect("#time").expect("the time");
     assert!(

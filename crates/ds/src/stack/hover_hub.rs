@@ -17,7 +17,7 @@ use ds_motion::machine::{MachineRef, use_machine};
 use ds_motion::settle::settle;
 use ds_style::scope::Scope;
 use ds_style::task::{Gone, spawn_in, try_get, try_set, try_set_if_changed};
-use ds_style::tokens::delay::DelayToken;
+use ds_style::tokens::delay::{DelayToken, TipDelay};
 
 /// A card the hub is tracking: the consumer's key and the profile it waits by.
 type Card = (HoverKey, HoverProfile);
@@ -130,7 +130,7 @@ impl Fades {
 }
 
 /// A new hub for `Ds` to provide, timing the fade out at the root's motion level.
-pub fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
+pub fn use_hover_hub_provider(env: Signal<Scope>, tip: TipDelay) -> HoverHub {
     let fades = Fades {
         leaving: use_signal(|| None),
         peeked: use_signal(|| None),
@@ -140,7 +140,7 @@ pub fn use_hover_hub_provider(env: Signal<Scope>) -> HoverHub {
     };
     let machine = use_machine(
         |_| HoverIntent::default(),
-        (),
+        tip,
         || (),
         move |effect, _| {
             let _ = fades.apply(effect);

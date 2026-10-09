@@ -436,7 +436,7 @@ entry; the emphasis keyframes (bump, gulp, seal-pop, pop-in, rise, fold, curl) a
 | | |
 | --- | --- |
 | **Apple** | Tips for simple features only (≤ 3 steps), one or two sentences; macOS help tags describe only the control under the pointer, start with a verb, 60-75 characters, do not repeat the label |
-| **quire today** | `Tooltip` and `HoverCard` over `HoverIntent` (Tip 1000 ms, Card 500 ms; design/30 §1.2) |
+| **quire today** | `Tooltip` and `HoverCard` over `HoverIntent` (Tip 0 ms by default, 1000 ms under `TipDelay::Standard`; Card 500 ms; design/30 §1.2) |
 | **Verdict** | Adopt the text rules (3.17) |
 
 ### 4.14 Playing audio, and UI sounds (2024-01-18)

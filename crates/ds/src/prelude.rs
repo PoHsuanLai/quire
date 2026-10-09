@@ -184,3 +184,4 @@ pub use crate::root::extent::RootExtent;
 pub use ds_motion::settle::settle;
 pub use ds_motion::timer::use_motion_timer;
 pub use ds_style::appearance::resolve::resolve;
+pub use ds_style::tokens::delay::TipDelay;

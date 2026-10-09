@@ -1,7 +1,7 @@
 //! Tooltip: one line that names what a control does or what a value means (design/30 section
 //! 2.5, `NSToolTip`).
 //!
-//! The tip waits by the Tip profile through the hover hub (1 s cold, at once while the hub is
+//! The tip waits by the Tip profile through the hover hub (at once by default, 1 s cold under `TipDelay::Standard`, at once while the hub is
 //! warm, gone the moment the pointer leaves), stands below its target and fades in and out over
 //! `--t-quick`. A caller that runs its own machine passes `shown`: the tip then shows or hides
 //! on that say alone, at once, with no hover and no delay of its own.

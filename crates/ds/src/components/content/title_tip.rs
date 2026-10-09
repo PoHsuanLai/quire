@@ -1,7 +1,7 @@
 //! A control's `title` as a Mac tooltip (`NSView.toolTip`, design/30 section 2.5): the control
 //! feeds the hover hub from its own pointer events and a hooked [`Tooltip`] draws the tip, so
 //! nothing wraps the control and its box, its siblings and its selectors are what they were.
-//! The tip waits by the Tip profile (1 s cold, at once while the hub is warm), never takes focus,
+//! The tip waits by the Tip profile (at once by default, 1 s cold under `TipDelay::Standard`, at once while the hub is warm), never takes focus,
 //! never blocks a click and goes on a press.
 //!
 //! A control already inside a hint (a `Tooltip` the caller put round it) draws nothing: never two

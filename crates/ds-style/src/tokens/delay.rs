@@ -4,12 +4,36 @@
 use ds_core::word::Word;
 use std::time::Duration;
 
+/// How long a tooltip waits before it opens cold (design/30-CATALOGUE.md section 1.2): an app-wide
+/// choice made on the `Ds` root; tips are instant unless the app asks for `Standard`. Warm hover (another hover UI open or closed within
+/// [`DelayToken::HoverWarm`]) opens a tip at once either way.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum TipDelay {
+    /// The pointer rests for [`DelayToken::TipOpen`] (1000 ms) first; an app opts in.
+    Standard,
+    /// The tip opens the moment the pointer arrives, with no wait (the default: tips are
+    /// instant everywhere).
+    #[default]
+    Immediate,
+}
+
+impl TipDelay {
+    /// How long the pointer rests before a cold tip opens.
+    pub fn open(self) -> Duration {
+        match self {
+            TipDelay::Standard => DelayToken::TipOpen.delay(),
+            TipDelay::Immediate => Duration::ZERO,
+        }
+    }
+}
+
 /// A timer length only Rust reads: intent and reading time, never scaled by the level
 /// (design/30-CATALOGUE.md section 1.2). Each is the default of a settings key of the same
 /// name where one exists; the settings override it, this table is where the default lives.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 pub enum DelayToken {
-    /// 1000 ms: a tooltip opens after the pointer rests (the `Tip` hover profile).
+    /// 1000 ms: a tooltip opens after the pointer rests, when the app opts in with
+    /// `TipDelay::Standard` (the default `TipDelay::Immediate` opens at once).
     TipOpen,
     /// 500 ms: a hover card opens after the pointer rests (the `Card` profile).
     CardOpen,

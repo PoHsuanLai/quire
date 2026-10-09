@@ -123,11 +123,8 @@ fn a_time_tip_opens_small_on_one_line_below_its_time() {
     harness.advance(ms(50));
     let time = "p .ds-hover-target";
     harness.send(Input::pointer_move(centre(&harness, time)));
-    // Well under the Tip profile's second: nothing yet.
-    harness.advance(ms(400));
-    assert_eq!(harness.count(".ds-tooltip"), 0, "{}", harness.html());
-    // The Tip profile waits a second.
-    harness.advance(ms(800));
+    // The Tip profile is immediate by default: no wait.
+    harness.advance(ms(50));
     assert_eq!(harness.count(".ds-tooltip"), 1, "{}", harness.html());
     let target = rect(&harness, time);
     let tip = rect(&harness, ".ds-tooltip");

@@ -1,5 +1,5 @@
 //! A control's `title` is a Mac tooltip (design/30 section 2.5): through the hover hub, after
-//! the Tip delay cold, at once while warm, gone on a press; one tip at most; and the wrapper it
+//! the Tip delay cold (none by default, 1 s under `TipDelay::Standard`), at once while warm, gone on a press; one tip at most; and the wrapper it
 //! needs changes nothing about the control's size or its neighbours' places.
 
 use dioxus::prelude::*;
@@ -38,6 +38,18 @@ fn icon(id: &'static str, title: Option<&str>, icon: Icon) -> Element {
 fn Titled() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
+            div { style: "position:absolute;left:100px;top:100px;display:flex;gap:8px",
+                {icon("first", Some("Archive"), Icon::Archive)}
+                {icon("second", Some("Reply"), Icon::Reply)}
+            }
+        }
+    }
+}
+
+#[allow(non_snake_case)]
+fn Slow() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport, tip_delay: TipDelay::Standard,
             div { style: "position:absolute;left:100px;top:100px;display:flex;gap:8px",
                 {icon("first", Some("Archive"), Icon::Archive)}
                 {icon("second", Some("Reply"), Icon::Reply)}
@@ -86,8 +98,8 @@ fn tip_text(harness: &Harness) -> Option<String> {
 }
 
 #[test]
-fn a_title_waits_the_tip_delay_cold_shows_at_once_warm_and_hides_on_a_press() {
-    let mut harness = started(Titled);
+fn a_title_under_the_standard_tip_delay_waits_cold_shows_at_once_warm_and_hides_on_a_press() {
+    let mut harness = started(Slow);
     assert_eq!(harness.count(".ds-tooltip"), 0);
     let first = harness.centre("#first").expect("first");
     harness.send(Input::pointer_move(first));
@@ -115,6 +127,18 @@ fn a_title_waits_the_tip_delay_cold_shows_at_once_warm_and_hides_on_a_press() {
         0,
         "not again until the pointer moves on"
     );
+}
+
+#[test]
+fn a_title_shows_at_once_by_default_and_hides_on_a_press() {
+    let mut harness = started(Titled);
+    let first = harness.centre("#first").expect("first");
+    harness.send(Input::pointer_move(first));
+    harness.advance(ms(50));
+    assert_eq!(tip_text(&harness).as_deref(), Some("Archive"), "no wait");
+    harness.send(Input::pointer_down(first));
+    harness.advance(ms(300));
+    assert_eq!(harness.count(".ds-tooltip"), 0, "hidden on press");
 }
 
 #[test]

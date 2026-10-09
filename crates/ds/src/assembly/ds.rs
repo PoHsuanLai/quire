@@ -85,6 +85,7 @@ use ds_style::material::stack::MaterialStack;
 use ds_style::scale::use_root_scale;
 use ds_style::scope::{Scope, use_scope_provider};
 use ds_style::space::{frame_vars::FrameVars, look::SpaceLook};
+use ds_style::tokens::delay::TipDelay;
 use ds_style::tokens::hex::Alpha;
 use ds_style::tokens::{pixel::PixelToken, shape::Corner};
 use std::rc::Rc;
@@ -121,6 +122,7 @@ pub fn Ds(
     #[props(default)] typeface: Option<Typeface>,
     #[props(default)] user_style: ReadSignal<UserStyle>,
     #[props(default)] surface: Option<&'static str>,
+    #[props(default)] tip_delay: TipDelay,
     children: Element,
 ) -> Element {
     let typeface = typeface.unwrap_or(use_typeface());
@@ -143,7 +145,7 @@ pub fn Ds(
         modality,
         activity,
     });
-    let hover = use_hover_hub_provider(env);
+    let hover = use_hover_hub_provider(env, tip_delay);
     use_title_tips_provider();
     use_toast_hub_provider();
     use_context_provider(|| Signal::new(LayerStack::default()));
