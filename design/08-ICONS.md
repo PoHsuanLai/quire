@@ -190,6 +190,7 @@ no solid glyph carries a stroke attribute.
 | `RotateLeft` | the same glyph as `Restart` (Lucide `rotate-ccw` outline), named for turning a picture left |
 | `RotateRight` | `Restart` mirrored: Lucide `rotate-cw` outline, hand-mirrored Phosphor Fill solid |
 | `Headphones` | Tabler filled `headphones` |
+| `Music` | hand-made from Lucide `music` (five filled shapes: two heads, two stems, a beam) |
 | `Speaker` | Tabler filled `device-speaker` |
 | `Mouse` | Tabler filled `mouse` |
 | `Gamepad` | Tabler filled `device-gamepad` |

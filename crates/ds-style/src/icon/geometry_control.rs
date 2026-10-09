@@ -19,6 +19,7 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::Restart | Icon::RotateLeft => RESTART,
         Icon::RotateRight => ROTATE_RIGHT,
         Icon::Headphones => HEADPHONES,
+        Icon::Music => MUSIC,
         Icon::Speaker => SPEAKER,
         Icon::Mouse => MOUSE,
         Icon::Gamepad => GAMEPAD,
@@ -83,6 +84,13 @@ const RESTART: &[Shape] = &[
 const ROTATE_RIGHT: &[Shape] = &[
     Shape::Path("M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"),
     Shape::Path("M21 3v5h-5"),
+];
+
+/// Lucide `music`.
+const MUSIC: &[Shape] = &[
+    Shape::Path("M9 18V5l12-2v13"),
+    Shape::Path("M3 18a3 3 0 1 0 6 0 3 3 0 1 0-6 0"),
+    Shape::Path("M15 16a3 3 0 1 0 6 0 3 3 0 1 0-6 0"),
 ];
 
 /// Lucide `headphones`.

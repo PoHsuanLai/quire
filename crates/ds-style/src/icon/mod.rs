@@ -247,6 +247,8 @@ pub enum Icon {
     RotateRight,
     /// Lucide `headphones`: an audio output or a Bluetooth device.
     Headphones,
+    /// Lucide `music`: a recording with no cover, or a music library.
+    Music,
     /// Lucide `speaker`: an audio output.
     Speaker,
     /// Lucide `mouse`: a Bluetooth device.
@@ -351,6 +353,7 @@ impl Icon {
             | Icon::RotateLeft
             | Icon::RotateRight
             | Icon::Headphones
+            | Icon::Music
             | Icon::Speaker
             | Icon::Mouse
             | Icon::Gamepad

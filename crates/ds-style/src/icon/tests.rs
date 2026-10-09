@@ -191,7 +191,7 @@ fn the_ellipses_are_lucides() {
 /// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
 #[test]
 fn the_control_set_is_lucides() {
-    assert_eq!(Icon::CONTROL.len(), 13);
+    assert_eq!(Icon::CONTROL.len(), 14);
     assert!(Icon::SHELL.contains(&Icon::Power), "Power is not repeated");
     assert_eq!(
         Icon::Restart.shapes(),
@@ -231,6 +231,13 @@ fn the_rotate_pair_is_mirrored_in_both_styles() {
         Icon::RotateRight.solid_shapes(),
         Icon::RotateLeft.solid_shapes()
     );
+}
+
+/// `Music` is Lucide's `music` and has a solid form of five shapes.
+#[test]
+fn music_has_both_styles() {
+    assert_eq!(Icon::Music.shapes().len(), 3);
+    assert_eq!(Icon::Music.solid_shapes().len(), 5);
 }
 
 /// The control center's own `Switches`: two 20 x 8 pill tracks 4 px apart
