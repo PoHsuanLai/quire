@@ -336,6 +336,7 @@ impl Windows {
             size: spec.size(),
             app_id: spec.app_id_or(self.base.app_id.as_ref()),
             decorations: spec.decorations_or(self.base.decorations),
+            icon: spec.icon_or(self.base.icon.as_ref()),
             token: self.tokens.take(event_loop),
         };
         let slot = WindowSlot::default();

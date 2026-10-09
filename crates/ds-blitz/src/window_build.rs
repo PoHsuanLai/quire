@@ -13,7 +13,7 @@ use crate::host::{Host, HostProps};
 use crate::native_providers::{AssetNet, LinkOpener};
 use crate::open_window::WindowHandle;
 use crate::setup::Setup;
-use crate::window::Decorations;
+use crate::window::{Decorations, winit_icon};
 use crate::window_platform::with_platform;
 use crate::window_requests::{Requests, Root};
 use crate::window_scroll::WindowScroll;
@@ -26,6 +26,7 @@ use dioxus::prelude::*;
 use dioxus_native::winit::window::{ActivationToken, Window};
 use dioxus_native::{DioxusNativeWindowRenderer, WindowAttributes};
 use dioxus_native_dom::{DioxusDocument, DocumentConfig};
+use ds::window::icon::WindowIcon;
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -37,6 +38,8 @@ pub(crate) struct Base {
     pub(crate) setup: Setup,
     pub(crate) app_id: Option<AppId>,
     pub(crate) decorations: Decorations,
+    /// The icon a window without its own shows.
+    pub(crate) icon: Option<WindowIcon>,
     pub(crate) requests: Requests,
     pub(crate) handle: AppHandle,
     /// What the windows' devices are requested with.
@@ -50,6 +53,7 @@ pub(crate) struct Shape {
     pub(crate) size: WindowSize,
     pub(crate) app_id: Option<AppId>,
     pub(crate) decorations: Decorations,
+    pub(crate) icon: Option<WindowIcon>,
     /// The activation token this window asks the compositor to focus it with, if the process
     /// was started with one that no earlier window has taken.
     pub(crate) token: Option<ActivationToken>,
@@ -88,7 +92,8 @@ pub(crate) fn window_config(
     let attributes = shape.size.apply(
         WindowAttributes::default()
             .with_title(shape.title)
-            .with_decorations(shape.decorations.winit()),
+            .with_decorations(shape.decorations.winit())
+            .with_window_icon(shape.icon.and_then(|icon| winit_icon(&icon))),
     );
     let attributes = with_platform(attributes, shape.app_id.as_ref(), shape.token);
     let mut vdom = VirtualDom::new_with_props(Host, HostProps::new(root, base.setup.clone()));

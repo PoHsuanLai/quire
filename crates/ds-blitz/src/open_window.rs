@@ -18,6 +18,7 @@ use crate::window::Decorations;
 use crate::window_requests::{Requests, Root, WindowKey, WindowLife};
 use crate::window_size::WindowSize;
 use dioxus::prelude::*;
+use ds::window::icon::WindowIcon;
 use std::rc::Rc;
 
 /// How a window starts: the first one `launch` opens (inside its `AppConfig`) and any opened
@@ -30,6 +31,8 @@ pub struct WindowSpec {
     app_id: Option<AppId>,
     /// `None`: the first window's.
     decorations: Option<Decorations>,
+    /// `None`: the first window's.
+    icon: Option<WindowIcon>,
 }
 
 impl WindowSpec {
@@ -41,6 +44,7 @@ impl WindowSpec {
             size,
             app_id: None,
             decorations: None,
+            icon: None,
         }
     }
 
@@ -53,6 +57,13 @@ impl WindowSpec {
     /// Who draws its frame, instead of the first window's choice.
     pub fn with_decorations(mut self, decorations: Decorations) -> Self {
         self.decorations = Some(decorations);
+        self
+    }
+
+    /// An icon of its own, instead of the first window's. X11, Windows and macOS show it; Wayland
+    /// takes the icon from the app's `.desktop` file, matched by the application id.
+    pub fn with_icon(mut self, icon: WindowIcon) -> Self {
+        self.icon = Some(icon);
         self
     }
 
@@ -69,6 +80,11 @@ impl WindowSpec {
     /// The application id, falling back to `first`'s.
     pub(crate) fn app_id_or(&self, first: Option<&AppId>) -> Option<AppId> {
         self.app_id.clone().or_else(|| first.cloned())
+    }
+
+    /// The icon, falling back to `first`'s.
+    pub(crate) fn icon_or(&self, first: Option<&WindowIcon>) -> Option<WindowIcon> {
+        self.icon.clone().or_else(|| first.cloned())
     }
 
     /// The decorations, falling back to `first`.

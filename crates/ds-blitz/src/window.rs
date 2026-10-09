@@ -13,8 +13,10 @@
 use crate::window_place::{Area, placement};
 use blitz_traits::shell::ShellProvider;
 use dioxus_native::winit::dpi::{PhysicalPosition, PhysicalSize};
+use dioxus_native::winit::icon::{Icon, RgbaIcon};
 use dioxus_native::winit::window::{ResizeDirection, Window};
 use ds::prelude::*;
+use ds::window::icon::WindowIcon;
 use ds::window::vocab::{Activation, Fullscreen, Maximized, Support, TileError, WindowTile, Zoom};
 use std::sync::Arc;
 
@@ -140,6 +142,17 @@ impl HostWindow for WinitWindow {
     fn set_title(&self, title: &str) {
         self.window.set_title(title);
     }
+
+    fn set_icon(&self, icon: &WindowIcon) {
+        self.window.set_window_icon(winit_icon(icon));
+    }
+}
+
+/// winit's icon for `icon`; none if winit refuses the pixels.
+pub(crate) fn winit_icon(icon: &WindowIcon) -> Option<Icon> {
+    RgbaIcon::new(icon.rgba().to_vec(), icon.width(), icon.height())
+        .ok()
+        .map(Icon::from)
 }
 
 /// winit's name for an edge.

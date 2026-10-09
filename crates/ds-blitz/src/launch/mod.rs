@@ -29,6 +29,7 @@ use crate::window_requests::{Requests, Root};
 use crate::window_shell::Windows;
 use crate::window_size::WindowSize;
 use dioxus::prelude::*;
+use ds::window::icon::WindowIcon;
 use std::time::Instant;
 use tokio::runtime::Handle;
 
@@ -104,6 +105,16 @@ impl AppConfig {
     /// desktop matches it to the app's `.desktop` file for its icon and name.
     pub fn with_app_id(mut self, id: AppId) -> Self {
         self.first = self.first.with_app_id(id);
+        self
+    }
+
+    /// The icon every window shows, where the platform takes one from the window (X11, Windows,
+    /// macOS). Wayland takes the icon from the app's `.desktop` file, matched by
+    /// [`with_app_id`](AppConfig::with_app_id), so set that too. A window opened with its own
+    /// [`WindowSpec::with_icon`] shows that one. The running window's icon changes with
+    /// `ds::prelude::WindowHost::set_icon`.
+    pub fn with_icon(mut self, icon: WindowIcon) -> Self {
+        self.first = self.first.with_icon(icon);
         self
     }
 
@@ -190,6 +201,7 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) -> Result<(), LaunchEr
     let base = Base {
         setup: config.setup,
         app_id: config.first.app_id_or(None),
+        icon: config.first.icon_or(None),
         decorations: config.first.decorations_or(Decorations::Server),
         requests: Requests::new(move || waker.wake_up()),
         handle: config.handle.clone(),
