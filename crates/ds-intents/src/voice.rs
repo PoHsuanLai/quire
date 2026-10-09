@@ -9,6 +9,7 @@ use std::fmt;
 /// How a summon was started (the view of the agent's summon origin).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum SummonOriginMark {
     /// A key or a click.
     Keyboard,
@@ -24,6 +25,7 @@ pub struct DictateSerial(pub u64);
 
 /// What a field hears. The words are the person's: `Debug` shows their shape only.
 #[derive(Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HeardMark {
     /// The input level (drives the orb only while listening).
     Level(InputLevel),
@@ -37,6 +39,7 @@ pub enum HeardMark {
 
 /// How an utterance ended, for a field. `Debug` shows the shape only.
 #[derive(Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum HeardEndMark {
     /// Send these words.
     Send(String),

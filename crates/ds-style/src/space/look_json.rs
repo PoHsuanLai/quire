@@ -10,6 +10,7 @@ pub const LOOK_JSON_MOST: usize = 1024;
 
 /// Why a text is not a look.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum LookJsonError {
     /// The text is longer than [`LOOK_JSON_MOST`] bytes.
     TooLong,

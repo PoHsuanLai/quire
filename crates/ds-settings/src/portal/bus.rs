@@ -26,23 +26,28 @@ fn as_u32(value: &OwnedValue) -> Option<u32> {
 /// optional: the desktop may answer some and not others, and each missing or malformed key
 /// falls back to its own default, never the whole struct's.
 fn prefs_from_namespace(namespace: &HashMap<String, OwnedValue>) -> SystemPrefs {
-    SystemPrefs {
-        scheme: namespace
-            .get(KEY_COLOR_SCHEME)
-            .and_then(as_u32)
-            .map(scheme_from_portal)
-            .unwrap_or_default(),
-        motion: namespace
-            .get(KEY_REDUCED_MOTION)
-            .and_then(as_u32)
-            .map(reduced_motion_from_portal)
-            .unwrap_or_default(),
-        contrast: namespace
-            .get(KEY_CONTRAST)
-            .and_then(as_u32)
-            .map(contrast_from_portal)
-            .unwrap_or_default(),
-    }
+    SystemPrefs::default()
+        .with_scheme(
+            namespace
+                .get(KEY_COLOR_SCHEME)
+                .and_then(as_u32)
+                .map(scheme_from_portal)
+                .unwrap_or_default(),
+        )
+        .with_motion(
+            namespace
+                .get(KEY_REDUCED_MOTION)
+                .and_then(as_u32)
+                .map(reduced_motion_from_portal)
+                .unwrap_or_default(),
+        )
+        .with_contrast(
+            namespace
+                .get(KEY_CONTRAST)
+                .and_then(as_u32)
+                .map(contrast_from_portal)
+                .unwrap_or_default(),
+        )
 }
 
 /// Fold one `SettingChanged(namespace, key, value)` onto `prefs`; a namespace or key this crate
@@ -60,18 +65,9 @@ fn apply_setting_changed(
         return prefs;
     };
     match key {
-        KEY_COLOR_SCHEME => SystemPrefs {
-            scheme: scheme_from_portal(raw),
-            ..prefs
-        },
-        KEY_REDUCED_MOTION => SystemPrefs {
-            motion: reduced_motion_from_portal(raw),
-            ..prefs
-        },
-        KEY_CONTRAST => SystemPrefs {
-            contrast: contrast_from_portal(raw),
-            ..prefs
-        },
+        KEY_COLOR_SCHEME => prefs.with_scheme(scheme_from_portal(raw)),
+        KEY_REDUCED_MOTION => prefs.with_motion(reduced_motion_from_portal(raw)),
+        KEY_CONTRAST => prefs.with_contrast(contrast_from_portal(raw)),
         _ => prefs,
     }
 }
@@ -158,29 +154,26 @@ mod tests {
             (
                 "every key present",
                 namespace(&[("color-scheme", 1), ("reduced-motion", 1), ("contrast", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    motion: ReducedMotion::Reduce,
-                    contrast: Contrast::High,
-                },
+                SystemPrefs::default()
+                    .with_scheme(Scheme::Dark)
+                    .with_motion(ReducedMotion::Reduce)
+                    .with_contrast(Contrast::High),
             ),
             (
                 "only the scheme, the rest missing",
                 namespace(&[("color-scheme", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    motion: ReducedMotion::NoPreference,
-                    contrast: Contrast::Normal,
-                },
+                SystemPrefs::default()
+                    .with_scheme(Scheme::Dark)
+                    .with_motion(ReducedMotion::NoPreference)
+                    .with_contrast(Contrast::Normal),
             ),
             (
                 "a key this crate does not read is ignored",
                 namespace(&[("accent-color", 1), ("contrast", 1)]),
-                SystemPrefs {
-                    scheme: Scheme::Light,
-                    motion: ReducedMotion::NoPreference,
-                    contrast: Contrast::High,
-                },
+                SystemPrefs::default()
+                    .with_scheme(Scheme::Light)
+                    .with_motion(ReducedMotion::NoPreference)
+                    .with_contrast(Contrast::High),
             ),
         ];
         for (name, given, want) in cases {
@@ -197,10 +190,7 @@ mod tests {
                 NAMESPACE,
                 "color-scheme",
                 1,
-                SystemPrefs {
-                    scheme: Scheme::Dark,
-                    ..start
-                },
+                start.with_scheme(Scheme::Dark),
             ),
             (
                 "a different namespace is ignored",

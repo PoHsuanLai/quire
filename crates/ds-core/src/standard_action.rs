@@ -10,6 +10,7 @@ use crate::vocab::{Shortcut, ShortcutKey};
 
 /// A standard action and its reserved keys.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StandardAction {
     /// ⌘Space: the launcher (Spotlight's key).
     Launcher,

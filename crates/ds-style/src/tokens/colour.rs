@@ -34,6 +34,7 @@ const fn rgb_hex(rgb: u32) -> Hex {
 /// One card colour token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = fixed, css = colour_css)]
+#[non_exhaustive]
 pub enum ColourToken {
     /// `--paper`: page ground; inverse text on ink pills.
     Paper,

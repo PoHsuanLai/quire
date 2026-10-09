@@ -148,6 +148,7 @@ pub enum Exposure {
 /// settable key and nothing for a hands-off one (detent reads that spelling).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum AgentSetting {
     /// Only the person sets the key; an agent may read it.
     #[default]

@@ -79,6 +79,7 @@ pub enum IntentPhase<K> {
 
 /// Something that happened to the hover machine.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum HoverEvent<K> {
     /// The pointer came over the innermost target `key`, whose interface is `profile`.
     Over(K, HoverProfile),
@@ -109,6 +110,7 @@ impl<K> From<Elapsed> for HoverEvent<K> {
 /// What the caller must do after a step. The timers are not among them: the state's deadlines
 /// are the machine's `wake`.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum IntentEffect<K> {
     /// Remove any open card instantly and open `key`'s card.
     Open(K),

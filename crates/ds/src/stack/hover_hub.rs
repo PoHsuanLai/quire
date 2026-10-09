@@ -102,6 +102,8 @@ impl Fades {
                 self.close(card.clone())?;
                 try_set_if_changed(self.peeked, Some(card))
             }
+            // An effect this hub does not know yet (the enum is non_exhaustive): leave it.
+            _ => Ok(()),
         }
     }
 

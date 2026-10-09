@@ -86,6 +86,7 @@ impl SizeVar {
 /// large), then the knob inset every size shares.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = fixed, css = size_css)]
+#[non_exhaustive]
 pub enum SizeToken {
     /// `--ctl-h-xs`: Height at Mini.
     #[token(name = "ctl-h-xs")]

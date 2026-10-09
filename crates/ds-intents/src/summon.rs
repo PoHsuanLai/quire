@@ -9,6 +9,7 @@ pub struct SummonSerial(pub u64);
 /// How an app answered a summon: the view of the agent's summon answer.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum SummonAnswerMark {
     /// The focused field became the prompt.
     TookField,

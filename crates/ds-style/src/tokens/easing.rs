@@ -22,6 +22,7 @@ pub enum Easing {
 /// One easing token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "e-", kind = fixed, css = easing_css)]
+#[non_exhaustive]
 pub enum EasingToken {
     /// `--e-out`: entrances that decelerate.
     Out,

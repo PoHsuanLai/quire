@@ -106,11 +106,9 @@ fn expected(pairs: &[(&str, String)]) -> BTreeMap<String, String> {
 
 #[test]
 fn the_root_stamps_exactly_its_attributes() {
-    let dark_reduced = SystemPrefs {
-        scheme: Scheme::Dark,
-        motion: ReducedMotion::Reduce,
-        ..SystemPrefs::default()
-    };
+    let dark_reduced = SystemPrefs::default()
+        .with_scheme(Scheme::Dark)
+        .with_motion(ReducedMotion::Reduce);
     struct Case {
         name: &'static str,
         setup: Setup,

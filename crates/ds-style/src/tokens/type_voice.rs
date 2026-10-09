@@ -12,6 +12,7 @@ use ds_core::word::Word;
 /// One typeface-dependent value.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = fixed)]
+#[non_exhaustive]
 pub enum VoiceToken {
     /// `--tracking-heading`: `h1`-`h3` (and any heading in the display face).
     #[token(system = "-.02em", editorial = "-.015em")]

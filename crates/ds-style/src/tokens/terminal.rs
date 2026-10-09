@@ -22,6 +22,7 @@ const fn rgb(value: u32) -> Colour {
 /// One colour of the terminal palette.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "term-", kind = fixed, css = terminal_css)]
+#[non_exhaustive]
 pub enum TerminalColour {
     /// `--term-fg`: the default foreground.
     Fg,
@@ -84,6 +85,7 @@ pub enum TerminalColour {
 /// A measure of the terminal's cell grid that is the same in every scheme and typeface.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "term-", kind = fixed)]
+#[non_exhaustive]
 pub enum TerminalMetric {
     /// `--term-font`: the system's own monospace family, for a terminal's cells. Space Mono
     /// (`--font-code`) has no box drawing, CJK or emoji; the system's monospace covers them and

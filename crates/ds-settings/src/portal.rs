@@ -152,11 +152,10 @@ mod tests {
 
     #[tokio::test]
     async fn a_fixed_source_answers_its_own_preferences_and_never_touches_the_bus() {
-        let fixed = SystemPrefs {
-            scheme: Scheme::Dark,
-            motion: ReducedMotion::Reduce,
-            contrast: Contrast::High,
-        };
+        let fixed = SystemPrefs::default()
+            .with_scheme(Scheme::Dark)
+            .with_motion(ReducedMotion::Reduce)
+            .with_contrast(Contrast::High);
         assert_eq!(SystemPrefsSource::Fixed(fixed).read().await, fixed);
     }
 }

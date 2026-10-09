@@ -8,6 +8,7 @@ use ds_core::word::Word;
 /// One length of the window chrome.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "chrome-", kind = fixed, css = chrome_css)]
+#[non_exhaustive]
 pub enum ChromeToken {
     /// `--chrome-titlebar-height` 28.
     TitlebarHeight,

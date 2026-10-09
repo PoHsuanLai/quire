@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 /// The card's accent, one of eight.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
+#[non_exhaustive]
 pub enum Accent {
     /// systemBlue, the default.
     #[default]

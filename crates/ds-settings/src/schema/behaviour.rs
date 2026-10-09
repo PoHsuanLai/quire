@@ -17,6 +17,7 @@ use crate::units::{Ms, Px};
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "sill/settings.toml", domain = "switcher", page = Page::KeyboardAndShortcuts)]
+#[non_exhaustive]
 pub struct SwitcherSettings {
     #[settings(
         label = "Show delay",
@@ -90,6 +91,7 @@ impl SwitcherSettings {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum CornerAction {
     /// Nothing; the corner is inactive.
     #[default]
@@ -114,6 +116,7 @@ pub enum CornerAction {
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "sill/settings.toml", domain = "hot_corners", page = Page::Dock)]
+#[non_exhaustive]
 pub struct HotCornerSettings {
     #[settings(
         label = "Top left",

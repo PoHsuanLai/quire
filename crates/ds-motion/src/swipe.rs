@@ -102,6 +102,7 @@ impl Default for SwipeState {
 
 /// What happened to a card.
 #[derive(Debug, Clone, Copy, PartialEq)]
+#[non_exhaustive]
 pub enum SwipeInput {
     /// The pointer went down at `x`.
     Down { x: Px },
@@ -125,6 +126,7 @@ impl From<Elapsed> for SwipeInput {
 
 /// What the hook does after a step.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum SwipeEffect {
     /// The card is dismissed: it flies out to the right from its offset.
     Dismiss,

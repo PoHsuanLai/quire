@@ -14,6 +14,7 @@ use ds_core::word::Word;
 /// One step of the spacing scale.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Word, Token)]
 #[token(prefix = "s-", kind = fixed)]
+#[non_exhaustive]
 pub enum SpacingToken {
     /// `--s-1`: 1 px.
     #[token(name = "1", value = "1px")]

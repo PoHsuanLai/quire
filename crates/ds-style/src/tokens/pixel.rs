@@ -18,6 +18,7 @@ use ds_core::word::Word;
 /// One pixel token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "", kind = tuned)]
+#[non_exhaustive]
 pub enum PixelToken {
     /// `--dpr`: the scale itself, unitless (`1.5`), for a `calc()` that needs it.
     #[token(name = "dpr", input = "--scale-dpr", value = "1")]

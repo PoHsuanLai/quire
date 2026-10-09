@@ -5,6 +5,7 @@ use std::path::PathBuf;
 
 /// A settings write that did not happen.
 #[derive(Debug, thiserror::Error)]
+#[non_exhaustive]
 pub enum SettingsError {
     /// A file or directory could not be read, written or renamed.
     #[error("{path}: {source}")]

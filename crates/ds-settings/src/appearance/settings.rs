@@ -17,6 +17,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "quire/appearance.toml", domain = "appearance", page = Page::Appearance)]
+#[non_exhaustive]
 pub struct AppearanceSettings {
     /// `appearance.theme`: System, Light or Dark.
     #[settings(
@@ -161,6 +162,7 @@ impl AppearanceSettings {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum PlateGlyphPolicy {
     /// macOS rule per accent: white ink where it reads at 3:1 on the fill, the deep ink of the hue otherwise (yellow, orange, green).
     #[default]
@@ -175,6 +177,7 @@ pub enum PlateGlyphPolicy {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum IconDarkVariant {
     /// The freedesktop convention: the same icon in both schemes.
     #[default]
@@ -201,6 +204,7 @@ pub enum IconStyle {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default, Serialize, Deserialize, Word)]
 #[serde(rename_all = "snake_case")]
 #[word(case = snake)]
+#[non_exhaustive]
 pub enum MonochromeTint {
     /// The current workspace's Space: the accent `ds` derives from its first dot.
     #[default]
@@ -221,6 +225,7 @@ pub enum MonochromeTint {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize, crate::SettingsSchema)]
 #[serde(default)]
 #[settings(file = "quire/appearance.toml", domain = "icons", page = Page::Appearance)]
+#[non_exhaustive]
 pub struct IconsSettings {
     /// `icons.style` (proposed Colour).
     #[settings(
@@ -314,6 +319,7 @@ impl Default for IconsSettings {
 /// `quire/appearance.toml`, whole.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
+#[non_exhaustive]
 pub struct AppearanceFile {
     /// The schema version, 1. Nothing reads it yet but its absence.
     pub version: u16,

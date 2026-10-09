@@ -16,6 +16,7 @@ pub struct LiveSchema {
 
 /// Why a [`LiveSchema`] is refused.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
+#[non_exhaustive]
 pub enum LiveSchemaError {
     #[error("the schema is not valid JSON of the live schema shape: {0}")]
     Parse(String),

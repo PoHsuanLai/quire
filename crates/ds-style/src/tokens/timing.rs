@@ -25,6 +25,7 @@ pub enum DurationKind {
 /// One duration token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "t-", kind = fixed, css = duration_css)]
+#[non_exhaustive]
 pub enum DurationToken {
     /// `--t-quick` 120 ms: colour and opacity, closes, cross-fades, and every moving duration
     /// under Reduced.

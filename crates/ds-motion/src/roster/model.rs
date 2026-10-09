@@ -84,6 +84,7 @@ pub enum Stayed {
 
 /// Why a stay could not happen.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum StayError {
     /// The roster holds no row with that key: never listed, or already dropped after its exit.
     UnknownKey,
@@ -103,6 +104,7 @@ pub enum LeaveBy {
 
 /// What moves the roster.
 #[derive(Debug, Clone, PartialEq)]
+#[non_exhaustive]
 pub enum RosterIn<K> {
     /// The consumer's keys, passed on every render. New keys enter; a key listed again while it
     /// leaves stays where it is; a key that goes missing leaves as [`RosterParams::leave`] says
@@ -125,6 +127,7 @@ impl<K> From<Elapsed> for RosterIn<K> {
 
 /// What the roster's owner does after a step.
 #[derive(Debug, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum RosterOut<K> {
     /// This key's exit has settled and the row is dropped (its batch's keys come out together).
     Settled(K),

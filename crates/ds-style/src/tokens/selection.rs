@@ -12,6 +12,7 @@ use ds_core::word::Word;
 /// One selection paint.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
 #[token(prefix = "sel-", kind = fixed, css = selection_css)]
+#[non_exhaustive]
 pub enum SelectionToken {
     /// `--sel-bg`: the selected row's fill while its window is active.
     Bg,

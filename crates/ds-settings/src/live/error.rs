@@ -6,6 +6,7 @@ use zbus::DBusError;
 /// `org.quire.SettingsModule1.Error.` so a client matches on the name, not on text.
 #[derive(Debug, DBusError)]
 #[zbus(prefix = "org.quire.SettingsModule1.Error")]
+#[non_exhaustive]
 pub enum LiveError {
     #[zbus(error)]
     ZBus(zbus::Error),

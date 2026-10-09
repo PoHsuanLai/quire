@@ -11,6 +11,7 @@ pub struct FileName(pub &'static str);
 
 /// How a settings file is written.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum Format {
     /// TOML: every hand-edited settings file.
     Toml,
