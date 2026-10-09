@@ -57,7 +57,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
 | `ds-gallery` | `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` (snapshots) |
-| `tools/icons` | `ds-style`, `ds-core`, `ds-settings` |
+| `tools/icons` | `ds`, `ds-style`, `ds-settings` (`ds` for the Space palette derivation) |
 
 Dev-dependencies follow the same table, plus: every crate may dev-depend on `ds` with feature
 `testing`; `ds`, `ds-shell` and `ds-style` may dev-depend on `ds-lint`. Consumers (sill, mailo,

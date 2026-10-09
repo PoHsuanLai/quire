@@ -83,8 +83,33 @@ quietly.
   holds, and a selection is a key (`cursor: Option<K>`), never an index. `MenuCursor`'s shape is
   the model. *Because:* a secure field kept its own text and ignored `value`, and a pop-up's open
   state could only be set as it mounted.
-- **`#[non_exhaustive]` on nothing.** Nothing is published, so it buys no compatibility and
-  costs exhaustive matching, which is the reason the vocabulary is enums.
+- **`#[non_exhaustive]` on public types that will grow.** Reversed 2026-10-09 by the owner
+  (layering rule: every crate is usable as a library by other crates). Errors, events, token and
+  word sets, settings and config structs carry it, so adding a variant or field is not a
+  breaking change for a consumer that pins a new rev. Pure value types whose fields are the
+  point (`Rect`, `Point`) and enums that must stay closed for exhaustive matching do not. Inside
+  the defining crate matching stays exhaustive; a consumer adds a `_ =>` arm or uses the type's
+  constructor. *Because:* consumers now take quire as a library, and every new variant broke
+  their build.
+
+## Library layering
+
+Every crate is usable by other crates as a library, in idiomatic Rust (owner rule, 2026-10-09).
+The audit rubric (`~/rs-wt/layering-audit/RUBRIC.md`) holds the full list; the rules that bite:
+
+- **Pure core.** `*-core` crates and token crates do no I/O and link no runtime, D-Bus or UI crate.
+- **Injected I/O.** Files, buses, processes, clocks and the environment arrive as values or
+  traits, so a consumer can supply its own or a fake.
+- **Typed errors.** `thiserror` enums in library APIs; no `String`, `Box<dyn Error>` or `anyhow`.
+  No `unwrap`, `expect` or `panic!` on a path a caller can reach.
+- **No globals, no env reads in libraries.** Read the environment once, in the binary or a
+  `from_env()` constructor over an injectable struct.
+- **Test support behind a `testing` feature**, off by default, never plain `pub`.
+- **Dependencies between repos are git revs.** No sibling overrides inside a repo at all. Cargo
+  finds `.cargo/config.toml` in parent directories, so a `[patch]` block pointing at sibling
+  checkouts lives in the work dir above the siblings (e.g. `~/rs-wt/<lane>/.cargo/config.toml`).
+  A repo's own tracked `.cargo/config.toml` holds build settings only. The fork `[patch]` block
+  is `docs/fork-patches.toml`; `scripts/fork-patches.sh check <Cargo.toml>` verifies a copy.
 
 ## 4. Types
 
