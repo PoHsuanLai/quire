@@ -39,7 +39,7 @@ fn Page() -> Element {
         Ds { appearance: Appearance::default(), material: Material::Window,
             RawKeySurface {
                 style: "display:block;width:200px;height:80px",
-                onpointerdown: move |_| downs += 1,
+                onpointerdown: move |_: PointerEvent| downs += 1,
                 on_key: move |key: RawKey| HEARD.with(|heard| heard.borrow_mut().push(key)),
                 common: Common {
                     mounted: Some(EventHandler::new(move |event: MountedEvent| element.set(Some(event.data())))),
