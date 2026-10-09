@@ -2,7 +2,7 @@
 //! follows the pointer 1:1 while a divider is held. A pane whose body is an `EdgePeek`
 //! (`Folded::Peeks`) stops clipping once it has folded away, so the peek can stand outside it.
 
-use crate::components::chrome::split_view::model::Folded;
+use crate::components::chrome::split_view::model::{Folded, PaneFocus};
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
@@ -36,6 +36,8 @@ pub(crate) fn PaneBox(
     shown: Shown,
     folded: Folded,
     mover: Mover,
+    focus: PaneFocus,
+    on_hold: EventHandler<()>,
     body: Element,
 ) -> Element {
     let target = match shown {
@@ -64,6 +66,9 @@ pub(crate) fn PaneBox(
             class: "ds-split-pane",
             "data-index": "{index}",
             "data-shown": shown.slug(),
+            "data-focus": focus.attribute(),
+            onpointerdown: move |_| on_hold.call(()),
+            onkeydown: move |_| on_hold.call(()),
             "data-folded": peeks.then(|| folded.slug()),
             "data-away": if away { Some("true") } else { None },
             "aria-hidden": if shown == Shown::Hidden && !peeks { Some("true") } else { None },

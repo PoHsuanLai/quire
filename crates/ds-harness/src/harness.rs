@@ -293,7 +293,8 @@ impl Driver for Harness {
             Input::Gesture(gesture) => self.gesture(gesture),
             Input::FileDrag(step) => self.drop_answer = self.file_drag(step),
             Input::Ime(ime) => self.ime(ime),
-            Input::Paste { html, text } => self.paste(&html, &text),
+            Input::RawKey(key) => self.raw_key(key),
+            Input::Paste { html, text, chord } => self.paste(&html, &text, chord),
         }
     }
 

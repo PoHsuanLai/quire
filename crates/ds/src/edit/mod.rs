@@ -10,9 +10,10 @@
 
 pub mod caret;
 pub mod clicks;
-pub(crate) mod composition;
+pub mod composition;
 pub mod handle;
 pub mod input;
 pub(crate) mod keys;
 pub mod pointer;
+pub mod raw_key;
 pub mod selection;

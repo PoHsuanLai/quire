@@ -8,6 +8,7 @@
 use crate::app_handle::AppHandle;
 use crate::app_id::AppId;
 use crate::fonts::font_context;
+use crate::gpu_request::GpuRequest;
 use crate::host::{Host, HostProps};
 use crate::native_providers::{AssetNet, LinkOpener};
 use crate::open_window::WindowHandle;
@@ -38,6 +39,8 @@ pub(crate) struct Base {
     pub(crate) decorations: Decorations,
     pub(crate) requests: Requests,
     pub(crate) handle: AppHandle,
+    /// What the windows' devices are requested with.
+    pub(crate) gpu: GpuRequest,
 }
 
 /// How one window starts.

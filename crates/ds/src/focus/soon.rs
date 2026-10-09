@@ -39,9 +39,23 @@ pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
 
 /// As [`focus_soon_selecting`], then `told` once the host's write has moved the focus.
 ///
-/// The host's write (Blitz's `set_focus_to`) dispatches no `focus` event, so a field whose caller
-/// listens for focus would never hear that the seam put the caret in it.
-pub(crate) fn focus_soon_told(element: Rc<MountedData>, landing: Landing, told: EventHandler<()>) {
+/// The host's write (Blitz's `set_focus_to`) dispatches no `focus` event, so a surface whose
+/// caller listens for focus would never hear that the seam put the keyboard in it: `told` is
+/// that event. It is not called when the write did not land (no host, an element the host does
+/// not own, a document that stayed busy).
+///
+/// Public so an app that draws its own region (a terminal) focuses it, and runs its focus-in,
+/// exactly as `EditSurface` does.
+pub fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHandler<()>) {
+    focus_landing_told(element, select.into(), told);
+}
+
+/// As [`focus_soon_told`], landing the caret at any [`Landing`] (a field's start or end too).
+pub(crate) fn focus_landing_told(
+    element: Rc<MountedData>,
+    landing: Landing,
+    told: EventHandler<()>,
+) {
     spawn(async move {
         if focus_selecting(&element, landing).await == Focused::Done {
             told.call(());

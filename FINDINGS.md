@@ -16,6 +16,25 @@ that rev.
 
 ## Open items
 
+- **`WindowSizer::request_size` never takes effect on Wayland (found reading winit-wayland
+  0.31.0-beta.3; seen on KWin as `SizeRequest::Expired`).** It is not KWin and not a background
+  window. winit's `request_surface_size` returns `Some(size)` when the platform applied the size
+  at once, and then emits no `SurfaceResized`; it returns `None` only when the event will follow.
+  winit-wayland always returns `Some`: it stores the new size, sets the window geometry and asks
+  for a redraw (`window/state.rs` `request_surface_size`), and the only `SurfaceResized` it sends
+  comes from a compositor `configure` or a scale change (`event_loop/mod.rs`). A client-initiated
+  resize draws no configure. `WinitSized::request_surface_size` (`sized_window.rs`) drops the
+  return (`let _applied`) on the belief that the event follows either way, so Blitz's viewport and
+  renderer are never told the new size (the box does not change) and the `SizeLedger` never sees
+  the resize (`Expired`, origin `None`). Two more ways to get nothing: winit-wayland ignores the
+  request outright while the last configure is maximized, fullscreen or tiled (`is_stateless`),
+  still returning the old size as `Some`; and the harness's fake window answers through
+  `answer_to`, so no test sees either. The fix is to act on the return: for `Some(applied)` that
+  differs from the surface size, deliver the resize as the event would (call `resized(applied)`
+  and hand `SurfaceResized(applied)` to the window's Blitz application), and treat `Some` equal
+  to the old size as refused (`Expired` at once, not after 500 ms). Not changed in v0.2.31. A
+  fake that returns `Some` and sends no event would reproduce it in the harness; the live check
+  (a focused, floating window on KWin) was not run.
 - **`PdfPage::Ready` carries a PNG `data:` URL, not pixels.** `ds` is renderer-free and `PdfThumb` is a `ds`
   component, while `TextureLayer` lives in `ds-blitz`, so the page type in `ds` cannot hold a texture
   or be drawn as one; `pdf_thumb_bytes` rasterises, encodes a PNG and `PdfThumb` draws it as an `<img>`

@@ -13,12 +13,25 @@ pub enum OpacityToken {
     /// full opacity and faded by `fade`.
     #[token(value = ".16")]
     Veil,
+    /// `--pane-dim` .6: a pane of a split view that does not hold the focus, when the view dims
+    /// them (`UnfocusedPanes::Dim`), so the one being typed into stands out.
+    #[token(value = ".6")]
+    PaneDim,
 }
 
 #[cfg(test)]
 mod tests {
     use super::OpacityToken;
     use crate::tokens::token::{Token, TokenScope};
+
+    #[test]
+    fn the_pane_dim_leaves_an_unfocused_pane_readable() {
+        assert_eq!(OpacityToken::PaneDim.var().as_str(), "--pane-dim");
+        assert_eq!(
+            OpacityToken::PaneDim.css_value(TokenScope::BASE).as_str(),
+            ".6"
+        );
+    }
 
     #[test]
     fn the_veil_is_c_s_scrim_opacity() {

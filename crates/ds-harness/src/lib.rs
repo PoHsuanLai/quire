@@ -19,6 +19,7 @@ mod harness_clock;
 mod harness_config;
 mod harness_drop;
 mod harness_edit;
+mod harness_found;
 mod harness_frames;
 mod harness_hit;
 mod harness_input;
@@ -54,6 +55,8 @@ pub use harness_pdf::pdf_app;
 pub use harness_style::{Part, Srgba};
 pub use headless::{Backdrop, Layout};
 pub use headless_step::{PhaseOrder, Stepped};
-pub use input::{ImeInput, Input, KeyInput, PointerAction, PointerInput};
+pub use input::{
+    ImeInput, Input, KeyInput, PasteChord, PointerAction, PointerInput, RawKeyInput, RawKeyPhase,
+};
 pub use painter::PaintTime;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};

@@ -3,6 +3,7 @@
 //! ends, Enter picks, Right opens a submenu, Left and Escape close one level, letters jump to
 //! the next item that starts with them.
 
+use crate::edit::keys::command_keys;
 use crate::stack::roving::{Edge, Step};
 use dioxus::prelude::*;
 
@@ -28,7 +29,8 @@ pub(crate) enum KeyAct {
 /// A panel's reading of `key`; `None` for a key it leaves alone. Letters only count with no
 /// Ctrl, Alt or Super.
 pub(crate) fn key_act(key: &Key, modifiers: Modifiers) -> Option<KeyAct> {
-    let chord = modifiers.intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
+    let chord =
+        command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
     match key {
         Key::ArrowDown => Some(KeyAct::Move(Step::Down)),
         Key::ArrowUp => Some(KeyAct::Move(Step::Up)),

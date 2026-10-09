@@ -4,6 +4,7 @@ pub(crate) mod ctx;
 pub(crate) mod focus;
 pub(crate) mod keys;
 pub(crate) mod pointer;
+pub(crate) mod raw_keys;
 pub(crate) mod spell;
 pub mod spell_menu;
 pub(crate) mod state;

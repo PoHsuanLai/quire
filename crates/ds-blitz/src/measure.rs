@@ -11,21 +11,20 @@
 //! Every Blitz host has it: `launch` and the harness wire it, and a shell's surface root gets it
 //! from [`provide_host`](crate::provide_host).
 
+use crate::node_ref::NodeRef;
 use crate::phase::border_box;
 use dioxus::prelude::*;
-use dioxus_native_dom::NodeHandle;
 use ds::prelude::*;
 
-/// `element`'s border box, if the document is free and the element is a Blitz node.
-pub(crate) fn measure(element: &MountedData) -> Measured {
-    let Some(handle) = element.downcast::<NodeHandle>() else {
+/// `element`'s border box, if the document is free and the element is a Blitz node: a component's
+/// own mounted handle, or an element found by selector (`GeometryHost::find`).
+pub fn measure(element: &MountedData) -> Measured {
+    let Some(node) = NodeRef::of(element) else {
         return Measured::Unknown;
     };
-    let Some(doc) = handle.try_doc() else {
-        return Measured::Busy;
-    };
-    match border_box(&doc, handle.node_id()) {
-        Some(rect) => Measured::At(rect),
-        None => Measured::Unknown,
+    match node.read(|doc| border_box(doc, node.node)) {
+        None => Measured::Busy,
+        Some(Some(rect)) => Measured::At(rect),
+        Some(None) => Measured::Unknown,
     }
 }

@@ -4,7 +4,11 @@
 //! to make a `NodeHandle` for. The focus writes (`crate::focus`) take either.
 
 use blitz_dom::{BaseDocument, NodeId};
-use dioxus::html::RenderedElementBacking;
+use dioxus::html::geometry::{
+    PixelsRect,
+    euclid::{Point2D, Size2D},
+};
+use dioxus::html::{MountedError, MountedResult, RenderedElementBacking};
 use dioxus::prelude::MountedData;
 use dioxus_native_dom::NodeHandle;
 use ds::host::found::SameNode;
@@ -102,14 +106,33 @@ impl NodeRef {
     }
 }
 
-/// An element found by selector, as a mounted handle the focus writes accept. It answers no
-/// other mounted-element call (rects, scrolling): those need a component's own `onmounted`.
+/// An element found by selector, as a mounted handle the focus writes and the host's rect read
+/// accept, and the element's `get_client_rect`. It answers no other mounted-element call
+/// (scrolling): those need a component's own `onmounted`.
 #[derive(Clone)]
 pub(crate) struct FoundNode(pub(crate) NodeRef);
 
 impl RenderedElementBacking for FoundNode {
     fn as_any(&self) -> &dyn std::any::Any {
         self
+    }
+
+    fn get_client_rect(
+        &self,
+    ) -> std::pin::Pin<Box<dyn std::future::Future<Output = MountedResult<PixelsRect>>>> {
+        let read = self
+            .0
+            .read(|doc| doc.get_client_bounding_rect(self.0.node))
+            .flatten();
+        Box::pin(async move {
+            read.map(|found| {
+                PixelsRect::new(
+                    Point2D::new(found.x, found.y),
+                    Size2D::new(found.width, found.height),
+                )
+            })
+            .ok_or(MountedError::NotSupported)
+        })
     }
 }
 

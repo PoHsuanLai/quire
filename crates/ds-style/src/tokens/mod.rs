@@ -37,6 +37,7 @@ pub mod size_scale;
 pub(crate) mod size_vars;
 pub mod spacing;
 pub mod status;
+pub mod terminal;
 pub mod timing;
 pub(crate) mod tint;
 pub mod token;

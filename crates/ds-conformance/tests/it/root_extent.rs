@@ -3,6 +3,7 @@
 //! document, and the sheet it hosts has that area to be placed in.
 
 use dioxus::prelude::*;
+use ds::components::chrome::split_view::view::SplitView;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
@@ -71,4 +72,23 @@ fn a_viewport_root_is_the_viewports_size_and_its_sheet_is_placed_in_it() {
         sheet.origin.y.0 + sheet.size.height.0 <= VIEW.height as f32,
         "the sheet is inside the viewport: {sheet:?}"
     );
+}
+
+#[allow(non_snake_case)]
+fn Window() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Window,
+            SplitView { label: "Panes", panes: Vec::new(), p { "Only a short line" } }
+        }
+    }
+}
+
+#[test]
+fn a_window_root_fills_the_window_so_a_full_height_child_needs_no_container() {
+    let harness = laid_out(Window);
+    let root = harness.rect(".ds").expect("the root is laid out");
+    assert_eq!(root.size.height.0, VIEW.height as f32, "{root:?}");
+    assert_eq!(root.size.width.0, VIEW.width as f32, "{root:?}");
+    let split = harness.rect(".ds-split").expect("the split is laid out");
+    assert_eq!(split.size.height.0, VIEW.height as f32, "{split:?}");
 }

@@ -1,11 +1,12 @@
 //! What a secure field refuses: the keys that would copy or cut its text out. Paste stays.
 
+use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
 
 /// Whether `key` with `modifiers` copies or cuts text out of a field: the action key with C or X
 /// (Control, or Super where it is the action key), Control+Insert (copy) and Shift+Delete (cut).
 pub(crate) fn takes_text_out(key: &Key, modifiers: Modifiers) -> bool {
-    let action = modifiers.intersects(Modifiers::CONTROL | Modifiers::META);
+    let action = command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::META);
     match key {
         Key::Character(text) => action && matches!(text.to_lowercase().as_str(), "c" | "x"),
         Key::Insert => modifiers.contains(Modifiers::CONTROL),

@@ -17,6 +17,7 @@ use crate::app_life::{LastWindowClosed, Lifecycle};
 use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
+use crate::gpu_request::GpuRequest;
 use crate::net_policy::NetPolicy;
 use crate::open_window::WindowSpec;
 use crate::setup::Setup;
@@ -42,6 +43,8 @@ pub struct AppConfig {
     last_window: LastWindowClosed,
     /// The handle the app's own threads reach the loop through.
     handle: AppHandle,
+    /// The wgpu features and limits the windows' device is created with.
+    gpu: GpuRequest,
 }
 
 impl AppConfig {
@@ -52,6 +55,7 @@ impl AppConfig {
             setup: Setup::default(),
             last_window: LastWindowClosed::default(),
             handle: AppHandle::new(),
+            gpu: GpuRequest::default(),
         }
     }
 
@@ -68,6 +72,19 @@ impl AppConfig {
     pub fn with_handle(mut self, handle: AppHandle) -> Self {
         self.handle = handle;
         self
+    }
+
+    /// The wgpu features and limits every window's device is requested with (default: the
+    /// renderer's own, no extra features). A GPU that lacks one cannot make the device, so ask
+    /// only for what the app cannot do without.
+    pub fn with_gpu(mut self, gpu: GpuRequest) -> Self {
+        self.gpu = gpu;
+        self
+    }
+
+    /// The GPU request windows are opened with.
+    pub fn gpu(&self) -> &GpuRequest {
+        &self.gpu
     }
 
     /// The window's desktop application id (the Wayland `app_id`, the X11 `WM_CLASS`), so the
@@ -155,6 +172,7 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) {
         decorations: config.first.decorations_or(Decorations::Server),
         requests: Requests::new(move || waker.wake_up()),
         handle: config.handle.clone(),
+        gpu: config.gpu.clone(),
     };
     if let Some(app) = first {
         base.requests.open(config.first, Root::Plain(app));
