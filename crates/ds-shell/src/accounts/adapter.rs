@@ -284,6 +284,10 @@ pub(crate) fn ChoiceMenu(
     }
 }
 
+/// The favicon size a settings row draws: `--row-avatar` (row.css), so the image is supplied at
+/// the size it is painted at.
+const ROW_AVATAR_PX: u8 = 32;
+
 /// The favicon `style` holds, drawn `px` across, when it is one a document can load and the
 /// provider has a favicon to show (a local account never does).
 fn favicon(provider: MarkProvider, style: &MarkStyle, px: u8) -> Option<IconSource> {
@@ -311,7 +315,7 @@ pub(crate) fn mark_leading(
         face.and_then(|face| face.avatar(AvatarSize::Size28))
             .unwrap_or_else(|| provider.avatar(AvatarSize::Size28))
     };
-    match favicon(provider, style, 28) {
+    match favicon(provider, style, ROW_AVATAR_PX) {
         Some(source) => RowLeading::Source(source),
         None => RowLeading::Avatar(lettered()),
     }

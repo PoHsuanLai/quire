@@ -333,6 +333,11 @@ rim and highlight are `--hair`.
   opaque pixels take `--ink`, the transparent ones show the ground) and an RGB PNG (keeps its
   red), `crates/ds-conformance/tests/tray_menu.rs`. Step 3 (`--warn` for `NeedsAttention`) stays
   the caller's: it sets the colour of the icon's parent.
+- Image filtering (2026-10-09): Blitz paints `<img>` (and an `Image` icon's `background-image`)
+  with bilinear filtering, and `object-fit` is honoured (blitz-paint `render.rs`), so an image
+  shows soft at any size but its own. Supply every raster at device size: logical size times the
+  scale (a 32 px row avatar at scale 2 is a 64 px image). The element's box must land on whole
+  device pixels too, or the edges blur whatever the source size.
 - Settled (bar gaps): step 2's test is `ds::icon::classify(png_bytes) -> Result<IconKind::{Symbolic,
   Image}, DsError>`: symbolic when every pixel with alpha >= 128 has OKLCH chroma below the
   threshold (0.04, still proposed; `classify_with(png, ChromaLimit(thousandths))` takes another).

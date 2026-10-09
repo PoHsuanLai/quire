@@ -3,8 +3,7 @@
    a `PinTile` is that tile's rule. The white chip is
    `--mark-ground` and the provider's identity colour arrives inline as `--pc` (O-3); the rings
    are `--shadow-mark` and `--shadow-mark-tile`. Attribute selectors carry `*|` (spike S2).
-   `object-fit:contain` on the favicon is unverified on Blitz; the app pre-sizes the image if it
-   is not honoured. Static: no hover, focus or motion. */
+   Static: no hover, focus or motion. */
 
 .ds-provider{
   --pc:var(--ink); --pi:var(--surface);
