@@ -3,9 +3,9 @@
 //! ends, Enter picks, Right opens a submenu, Left and Escape close one level, letters jump to
 //! the next item that starts with them.
 
-use crate::edit::keys::command_keys;
 use crate::stack::roving::{Edge, Step};
 use dioxus::prelude::*;
+use ds_core::command::command_keys;
 
 /// What a key does in a menu panel.
 #[derive(Debug, Clone, PartialEq, Eq)]

@@ -1,7 +1,7 @@
 //! What a secure field refuses: the keys that would copy or cut its text out. Paste stays.
 
-use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::command::command_keys;
 
 /// Whether `key` with `modifiers` copies or cuts text out of a field: the action key with C or X
 /// (Control, or Super where it is the action key), Control+Insert (copy) and Shift+Delete (cut).

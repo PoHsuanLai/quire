@@ -1,7 +1,7 @@
 //! The key that switches Space: a modifier and the digits 1 to 9.
 
-use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::command::command_keys;
 use ds_core::standard_action::SpaceNumber;
 use ds_core::vocab::{Shortcut, ShortcutKey};
 

@@ -1,7 +1,7 @@
 //! What a key means to a pane stack, pure: the keys that go back one page.
 
-use crate::edit::keys::command_keys;
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::command::command_keys;
 
 /// Whether `key` with `modifiers` asks to go back: Escape, the command chord `[` (the `Super` key
 /// is the host's command key, as everywhere in the catalogue) and Alt+Left.

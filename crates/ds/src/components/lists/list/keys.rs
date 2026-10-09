@@ -3,9 +3,9 @@
 //! jump to the next label that starts with them.
 
 use crate::components::lists::list::model::{ListItem, ListRole};
-use crate::edit::keys::command_keys;
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::command::command_keys;
 use ds_core::vocab::Availability;
 
 /// What a key asks of a list.

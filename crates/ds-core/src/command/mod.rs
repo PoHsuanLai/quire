@@ -6,7 +6,9 @@
 
 mod chord;
 mod face;
+mod keys;
 mod names;
 
 pub use face::{AppCommand, CommandFace, ShortcutBinding};
+pub use keys::{command_keys, is_command};
 pub use names::{ActionName, CommandId, EmptyReason, IntentsApp, UiOnlyReason};
