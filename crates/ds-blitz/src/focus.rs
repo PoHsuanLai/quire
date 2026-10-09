@@ -40,18 +40,36 @@ fn lookup(doc: DocRef, selector: &str) -> Found {
     }
 }
 
-/// Give `element` the keyboard, if the document is free and the element is a Blitz node.
+/// Give `element` the keyboard, if the document is free and the element is a Blitz node. An
+/// element that already has it is left alone: `set_focus_to` on a focused field puts its caret
+/// back at the start (a field focused again by selector typed "nvoicei" for "Invoice").
 pub(crate) fn focus(element: &MountedData) -> Focused {
     let Some(node) = NodeRef::of(element) else {
         return Focused::Unknown;
     };
-    match node.read(|doc| doc.get_node(node.node).is_some()) {
+    let state = node.read(|doc| match doc.get_node(node.node) {
+        None => Held::Gone,
+        Some(_) if doc.get_focussed_node_id() == Some(node.node) => Held::Already,
+        Some(_) => Held::Not,
+    });
+    match state {
         None => Focused::Busy,
-        Some(false) => Focused::Unknown,
-        Some(true) => done(node.write(|doc| {
+        Some(Held::Gone) => Focused::Unknown,
+        Some(Held::Already) => Focused::Done,
+        Some(Held::Not) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
         })),
     }
+}
+
+/// Whether a node has the keyboard already.
+enum Held {
+    /// The node is not in the document.
+    Gone,
+    /// It has the focus.
+    Already,
+    /// It is there and does not.
+    Not,
 }
 
 /// Take the keyboard from `element` if it has it: Blitz clears the focus, as a click on nothing

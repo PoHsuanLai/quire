@@ -4,6 +4,7 @@
 //! a handle's blur is heard once too (Blitz clears the focus silently, so the handle tells it); an unknown or unreadable selector is a typed error.
 
 use dioxus::prelude::*;
+use ds::base::time::clock::sleep;
 use ds::focus::field::{FieldHandle, use_field_handle};
 use ds::focus::select::Select;
 use ds::focus::selector::{FocusError, focus_by_selector};
@@ -183,4 +184,51 @@ fn an_unreadable_selector_is_a_bad_selector() {
     press(&mut harness, "#go button");
     harness.advance(ms(150));
     assert_eq!(log(&harness), "bad-selector");
+}
+
+/// A field asked for twice by selector, 300 ms apart, as a palette's does on each open; its text
+/// echoed below.
+#[allow(non_snake_case)]
+fn Refocused() -> Element {
+    let mut text = use_signal(|| "Invoice".to_owned());
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Sheet,
+            div { class: "rename", style: "display:flex; width:300px; padding:12px",
+                TextField { label: "Name", value: text(), oninput: move |next| text.set(next) }
+            }
+            div { id: "go", style: "display:flex",
+                Button { label: "Go",
+                    onclick: move |_| {
+                        spawn(async move {
+                            for _ in 0..2 {
+                                let _ = focus_by_selector(".rename input", Select::None).await;
+                                sleep(ms(300)).await;
+                            }
+                        });
+                    }
+                }
+            }
+            p { class: "text", {text()} }
+        }
+    }
+}
+
+#[test]
+fn asking_again_for_a_focused_field_leaves_its_caret_where_it_is() {
+    let mut harness = Harness::new(
+        Refocused,
+        HarnessConfig::new(VIEW).with_clock(Clock::Virtual),
+    );
+    harness.advance(ms(50));
+    press(&mut harness, "#go button");
+    harness.advance(ms(150));
+    harness.send(Input::key(ShortcutKey::Char('X')));
+    harness.advance(ms(300));
+    harness.send(Input::key(ShortcutKey::Char('Y')));
+    harness.advance(ms(50));
+    let text = harness.text_of(".text").unwrap_or_default();
+    assert!(
+        text.contains("XY"),
+        "the second ask moved the caret: {text}"
+    );
 }
