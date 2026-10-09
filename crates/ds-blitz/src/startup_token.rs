@@ -134,20 +134,24 @@ mod tests {
     }
 
     #[test]
-    fn a_token_for_the_other_session_is_no_token() {
-        let (mut tokens, _) = read(&[(X11_VAR, "x")]);
-        assert_eq!(raw(tokens.take_for(Session::Wayland)), None);
-    }
-
-    #[test]
-    fn no_variable_is_no_token_and_leaves_the_environment_alone() {
-        let (mut tokens, resets) = read(&[]);
-        assert_eq!((raw(tokens.take_for(Session::Wayland)), resets), (None, 0));
-    }
-
-    #[test]
-    fn an_empty_variable_is_no_token_and_leaves_the_environment_alone() {
-        let (mut tokens, resets) = read(&[(WAYLAND_VAR, "")]);
-        assert_eq!((raw(tokens.take_for(Session::Wayland)), resets), (None, 0));
+    fn a_missing_token_is_no_token_and_resets_the_environment_only_for_a_token_that_was_there() {
+        let cases: [(&str, &[(&str, &str)], Session, u32); 3] = [
+            ("another session's", &[(X11_VAR, "x")], Session::Wayland, 1),
+            ("no variable", &[], Session::Wayland, 0),
+            (
+                "an empty variable",
+                &[(WAYLAND_VAR, "")],
+                Session::Wayland,
+                0,
+            ),
+        ];
+        for (name, vars, session, want_resets) in cases {
+            let (mut tokens, resets) = read(vars);
+            assert_eq!(
+                (raw(tokens.take_for(session)), resets),
+                (None, want_resets),
+                "{name}"
+            );
+        }
     }
 }

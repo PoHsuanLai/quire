@@ -90,31 +90,41 @@ mod tests {
     }
 
     #[test]
-    fn a_token_on_wayland_is_handed_to_the_compositor() {
-        assert_eq!(
-            route(token("abc"), wayland()),
-            Route::Token("abc".to_owned())
-        );
-    }
-
-    #[test]
-    fn no_token_is_a_plain_focus() {
-        assert_eq!(route(None, wayland()), Route::Focus);
-        assert_eq!(route(None, x11()), Route::Focus);
-    }
-
-    #[test]
-    fn an_empty_token_is_no_token() {
-        assert_eq!(route(token(""), wayland()), Route::Focus);
-    }
-
-    #[test]
-    fn x11_focuses_through_winit_whatever_the_token() {
-        assert_eq!(route(token("abc"), x11()), Route::Focus);
-    }
-
-    #[test]
-    fn a_window_with_no_display_handle_is_focused_through_winit() {
-        assert_eq!(route(token("abc"), None), Route::Focus);
+    fn a_token_routes_by_session() {
+        let cases = [
+            (
+                "a token on wayland is handed to the compositor",
+                route(token("abc"), wayland()),
+                Route::Token("abc".to_owned()),
+            ),
+            (
+                "no token on wayland is a plain focus",
+                route(None, wayland()),
+                Route::Focus,
+            ),
+            (
+                "no token on x11 is a plain focus",
+                route(None, x11()),
+                Route::Focus,
+            ),
+            (
+                "an empty token is no token",
+                route(token(""), wayland()),
+                Route::Focus,
+            ),
+            (
+                "x11 focuses through winit whatever the token",
+                route(token("abc"), x11()),
+                Route::Focus,
+            ),
+            (
+                "a window with no display handle is focused through winit",
+                route(token("abc"), None),
+                Route::Focus,
+            ),
+        ];
+        for (name, got, want) in cases {
+            assert_eq!(got, want, "{name}");
+        }
     }
 }
