@@ -18,16 +18,16 @@ use ds_harness::{
 use std::rc::Rc;
 use std::time::Duration;
 
-const VIEW: Viewport = Viewport {
+pub(crate) const VIEW: Viewport = Viewport {
     width: 480,
     height: 240,
     scale_percent: 100,
 };
 
 /// A host that logs every request and can only maximize.
-struct Stub {
-    log: Signal<Vec<String>>,
-    maximized: Maximized,
+pub(crate) struct Stub {
+    pub(crate) log: Signal<Vec<String>>,
+    pub(crate) maximized: Maximized,
 }
 
 impl Stub {
@@ -98,15 +98,15 @@ fn Zoomed() -> Element {
     framed(Maximized::On)
 }
 
-fn ms(n: u64) -> Duration {
+pub(crate) fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn at(x: f32, y: f32) -> Point {
+pub(crate) fn at(x: f32, y: f32) -> Point {
     Point { x: Px(x), y: Px(y) }
 }
 
-fn start(app: fn() -> Element) -> Harness {
+pub(crate) fn start(app: fn() -> Element) -> Harness {
     start_on(app, Clock::Virtual)
 }
 
@@ -116,24 +116,24 @@ fn start_on(app: fn() -> Element, clock: Clock) -> Harness {
     harness
 }
 
-fn log(harness: &Harness) -> String {
+pub(crate) fn log(harness: &Harness) -> String {
     harness.text_of(".log").unwrap_or_default()
 }
 
-fn centre(harness: &Harness, selector: &str) -> Point {
+pub(crate) fn centre(harness: &Harness, selector: &str) -> Point {
     harness
         .centre(selector)
         .unwrap_or_else(|| panic!("{selector} is not in the document:\n{}", harness.html()))
 }
 
 /// The titlebar's empty middle, clear of the lights, the title and the top edge.
-const BAR: Point = Point {
+pub(crate) const BAR: Point = Point {
     x: Px(400.0),
     y: Px(16.0),
 };
 
 /// Press at `from`, move through `path`, release at the last point.
-fn drag(harness: &mut Harness, from: Point, path: &[Point]) {
+pub(crate) fn drag(harness: &mut Harness, from: Point, path: &[Point]) {
     harness.send(Input::pointer_move(from));
     harness.send(Input::pointer_down(from));
     for &point in path {

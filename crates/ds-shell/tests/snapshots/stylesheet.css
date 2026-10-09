@@ -2901,6 +2901,7 @@ html,body{margin:0;padding:0;background:transparent}
   font-size:var(--fs-control); font-weight:600; white-space:nowrap; overflow:hidden;
   pointer-events:none;
 }
+.ds-titlebar-trailing{ position:relative; flex:none; display:flex; align-items:center; margin-left:auto; }
 .ds-titlebar-name{ min-width:0; overflow:hidden; }
 .ds-titlebar-subtitle{ min-width:0; overflow:hidden; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
 .ds-titlebar-ruler{ position:absolute; visibility:hidden; display:flex; gap:var(--s-6); white-space:nowrap; pointer-events:none; }

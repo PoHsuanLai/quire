@@ -49,6 +49,9 @@ pub enum WindowFrame {
         lights: TrafficLights,
         /// The move threshold and the tiling menu's delays, from the settings.
         timing: FrameTiming,
+        /// What sits at the bar's trailing end (a mode switch, a share button). A press on it
+        /// never starts a window move or zooms the window.
+        trailing: Option<Element>,
     },
 }
 
@@ -60,6 +63,27 @@ impl WindowFrame {
             parts: TitleParts::default(),
             lights,
             timing: FrameTiming::default(),
+            trailing: None,
+        }
+    }
+
+    /// The same frame with `trailing` at the end of its bar; no frame has no bar.
+    pub fn with_trailing(self, trailing: Element) -> Self {
+        match self {
+            WindowFrame::None => WindowFrame::None,
+            WindowFrame::Titlebar {
+                title,
+                parts,
+                lights,
+                timing,
+                ..
+            } => WindowFrame::Titlebar {
+                title,
+                parts,
+                lights,
+                timing,
+                trailing: Some(trailing),
+            },
         }
     }
 
@@ -71,12 +95,14 @@ impl WindowFrame {
                 title,
                 lights,
                 timing,
+                trailing,
                 ..
             } => WindowFrame::Titlebar {
                 title,
                 parts,
                 lights,
                 timing,
+                trailing,
             },
         }
     }
@@ -100,8 +126,9 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
             parts,
             lights,
             timing,
+            trailing,
         } => rsx! {
-            WindowTitlebar { title, parts, lights, timing }
+            WindowTitlebar { title, parts, lights, timing, trailing }
             div { class: "ds-window-body", {children} }
             ResizeEdges {}
         },
@@ -114,7 +141,8 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 /// double-click zooms. Neither happens on a light, nor while the window is maximized or
 /// fullscreen. `data-first-mouse` lets the first click of an inactive window through
 /// (design/13 section 13.3.8). `parts` are what goes with the title; `data-activity` says
-/// whether the window is the one the person works in.
+/// whether the window is the one the person works in. `trailing` is drawn after the title area at
+/// the bar's end; a press or double-click on it is its own and neither moves nor zooms the window.
 #[component]
 pub fn WindowTitlebar(
     title: String,
@@ -122,6 +150,7 @@ pub fn WindowTitlebar(
     #[props(default)] lights: TrafficLights,
     #[props(default)] timing: FrameTiming,
     #[props(default)] pose: TilePose,
+    #[props(default)] trailing: Option<Element>,
     #[props(default)] common: Common,
 ) -> Element {
     let host = use_window_host();
@@ -166,6 +195,14 @@ pub fn WindowTitlebar(
                 TrafficLightGroup { timing, pose }
             }
             TitleArea { title, parts }
+            if let Some(trailing) = trailing {
+                div {
+                    class: "ds-titlebar-trailing",
+                    onpointerdown: move |event: PointerEvent| event.stop_propagation(),
+                    ondoubleclick: move |event: MouseEvent| event.stop_propagation(),
+                    {trailing}
+                }
+            }
         }
     }
 }

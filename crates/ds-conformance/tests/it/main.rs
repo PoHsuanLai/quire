@@ -129,6 +129,7 @@ mod tip_wall_clock;
 mod tips_not_titles;
 mod title_tooltip;
 mod titlebar_title_fit;
+mod titlebar_trailing;
 mod toast_action;
 mod toast_motion;
 mod toolbar_overflow;
