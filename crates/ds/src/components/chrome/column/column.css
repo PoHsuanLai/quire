@@ -1,0 +1,7 @@
+/* Column: children stacked with a token gap (`--column-gap`, set by the component from a spacing
+   step) and aligned across the width. Attribute selectors carry `*|` (spike S2). */
+
+.ds-column{ display:flex; flex-direction:column; gap:var(--column-gap, var(--s-8)); min-width:0; }
+.ds-column[*|data-align=start]{ align-items:flex-start; }
+.ds-column[*|data-align=center]{ align-items:center; }
+.ds-column[*|data-align=end]{ align-items:flex-end; }

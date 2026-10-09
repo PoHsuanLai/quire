@@ -29,6 +29,7 @@ use ds::motion::spring::Millis;
 use ds::prelude::*;
 use ds_core::vocab::RowState;
 use ds_style::tokens::control_size::{ControlSize, SidebarSize};
+use ds_style::tokens::spacing::SpacingToken;
 
 /// One component in one state.
 pub struct Case {
@@ -209,6 +210,16 @@ pub const CASES: &[Case] = &[
         component: "toolbar",
         state: "overflow",
         make: || rsx! { Toolbar::<u8> { leading: items()[..1].to_vec(), trailing: items()[1..].to_vec(), title: Some(TextLine::from("Downloads")), room: ToolbarRoom::Fixed(Px(250.0)), onpick: |_| {} } },
+    },
+    Case {
+        component: "column",
+        state: "default",
+        make: || rsx! { Column { p { "First" } p { "Second" } } },
+    },
+    Case {
+        component: "column",
+        state: "gap-and-align",
+        make: || rsx! { Column { gap: SpacingToken::S20, align: ColumnAlign::Center, p { "First" } p { "Second" } } },
     },
     Case {
         component: "split_view",

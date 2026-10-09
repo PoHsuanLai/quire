@@ -63,6 +63,11 @@ const OWN_SHEETS: &[(&str, &str, &str)] = &[
         include_str!("../../src/components/chrome/toolbar/toolbar.css"),
     ),
     (
+        "column",
+        "ds-column",
+        include_str!("../../src/components/chrome/column/column.css"),
+    ),
+    (
         "split_view",
         "ds-split",
         include_str!("../../src/components/chrome/split_view/split_view.css"),
