@@ -6,6 +6,7 @@
 //! section 13.3.4): `panel` holds what the menu and its submenus share.
 
 use crate::components::controls::press::{button_of, press_of};
+use crate::components::menus::alive::use_alive;
 use crate::components::menus::item::context::available;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::active::{asks, follow_active};
@@ -100,6 +101,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let fade = use_motion_timer(Anim::MenuOut);
     let mut closing = use_signal(|| Closing::No);
     let blink = use_signal(Blink::default);
+    let alive = use_alive();
     let tracker = use_tracker(timing, MENU_INSET);
     let mut gesture = use_hook(|| CopyValue::new(Gesture::Outside));
     let mut hovered = use_hook(|| CopyValue::new(None::<usize>));
@@ -168,21 +170,25 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         onrelease: None,
         cursor: active,
         on_active,
+        alive: alive.clone(),
     };
     follow_active(active, panel.current(), reported, on_active);
     panel.onrelease = Some(released(picks, panel.onpick, fade_out, gesture, on_release));
     let onkey = {
-        let panel = panel.clone();
+        let (panel, alive) = (panel.clone(), alive.clone());
         move |event: KeyboardEvent| {
-            if panel.key(&event) == Decision::CloseMenu {
-                let close = EventHandler::new(move |()| {
-                    handed.call(());
-                    fade_out.call(());
-                });
-                escape_closes(float, &event, close);
-            }
+            alive.run(|| {
+                if panel.key(&event) == Decision::CloseMenu {
+                    let close = EventHandler::new(move |()| {
+                        handed.call(());
+                        fade_out.call(());
+                    });
+                    escape_closes(float, &event, close);
+                }
+            });
         }
     };
+    let (opened, pressed, released_on) = (alive.clone(), alive.clone(), alive.clone());
     let body = panel.body(&items);
     let child = panel.submenu(timing);
     let probe = float.surface();
@@ -210,30 +216,37 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
             tabindex: "-1",
             style: surface.style,
             onmounted: move |event| {
-                let element = event.data();
-                tracker.panel_mounted(MountedRef(element.clone()));
-                probe.on_mounted(event.clone());
-                mounted.mounted(event);
-                // A field beside the menu that drives its cursor keeps the keyboard, and an
-                // inline menu leaves it with its caller.
-                if active.takes_focus() && flow == Flow::Floating {
-                    hand_back(&element, &opener, flow, active);
-                    crate::focus::soon::focus_soon(element);
-                }
+                opened.run(|| {
+                    let element = event.data();
+                    tracker.panel_mounted(MountedRef(element.clone()));
+                    probe.on_mounted(event.clone());
+                    mounted.mounted(event);
+                    // A field beside the menu that drives its cursor keeps the keyboard, and an
+                    // inline menu leaves it with its caller.
+                    if active.takes_focus() && flow == Flow::Floating {
+                        hand_back(&element, &opener, flow, active);
+                        crate::focus::soon::focus_soon(element);
+                    }
+                });
             },
             onmousemove: move |event| hover.hovered(&event),
             onmouseleave: move |_| leave.left_items(),
-            onmousedown: move |_| gesture.set(Gesture::Pressed),
+            onmousedown: move |_| {
+                pressed.run(|| gesture.set(Gesture::Pressed));
+            },
             onmouseup: move |event| {
-                if let Some(on_release) = on_release {
-                    let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
-                    on_release.call(press_of(&event, button));
-                }
-                // A drag that came in and let go over no choice closes, picking nothing
-                // (design/13 section 13.3.2).
-                if *gesture.peek() == Gesture::Entered {
-                    fade_out.call(());
-                }
+                released_on.run(|| {
+                    if let Some(on_release) = on_release {
+                        let button =
+                            button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
+                        on_release.call(press_of(&event, button));
+                    }
+                    // A drag that came in and let go over no choice closes, picking nothing
+                    // (design/13 section 13.3.2).
+                    if *gesture.peek() == Gesture::Entered {
+                        fade_out.call(());
+                    }
+                });
             },
             onkeydown: onkey,
             ..data,

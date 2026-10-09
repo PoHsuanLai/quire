@@ -3,6 +3,7 @@
 //! 13.3.4). It floats on the menu layer without joining the layer stack: its menu's layer takes
 //! Escape and the outside click, and it closes with its parent.
 
+use crate::components::menus::alive::use_alive;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::blink::Blink;
 use crate::components::menus::menu::choices::choices;
@@ -42,6 +43,8 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
 ) -> Element {
     let float = use_float(ZLayer::Menu, Stacking::Passive);
     let tracker = use_tracker(timing, MENU_INSET);
+    let alive = use_alive();
+    let (keyed, opened) = (alive.clone(), alive.clone());
     let panel = Panel {
         tracker,
         choices: choices(&items),
@@ -55,6 +58,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
         onrelease: None,
         cursor: MenuCursor::Auto,
         on_active: None,
+        alive,
     };
     let want = Placement::new(Side::Right, Align::Start);
     let at = float.origin(Some(anchor), want, SUB_GAP);
@@ -89,18 +93,22 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
                     format!("{};visibility:hidden", position_style(at))
                 },
                 onmounted: move |event| {
-                    let element = event.data();
-                    tracker.panel_mounted(MountedRef(element.clone()));
-                    probe.on_mounted(event);
-                    if via == Via::Keyboard {
-                        crate::focus::soon::focus_soon(element);
-                    }
+                    opened.run(|| {
+                        let element = event.data();
+                        tracker.panel_mounted(MountedRef(element.clone()));
+                        probe.on_mounted(event);
+                        if via == Via::Keyboard {
+                            crate::focus::soon::focus_soon(element);
+                        }
+                    });
                 },
                 onmousemove: move |event| hover.hovered(&event),
                 onkeydown: move |event| {
-                    if key_panel.key(&event) == Decision::Back {
-                        onback.call(());
-                    }
+                    keyed.run(|| {
+                        if key_panel.key(&event) == Decision::Back {
+                            onback.call(());
+                        }
+                    });
                 },
                 {body}
             }

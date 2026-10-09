@@ -13,8 +13,9 @@ use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_focus::FieldFocus;
 use crate::components::fields::text_field_model::FieldKind;
 use crate::components::lists::row::size::RowSize;
+use crate::components::menus::alive::use_alive;
 use crate::components::menus::item::item::AfterPick;
-use crate::components::menus::palette::palette_body::{Life, StopEvents, draw_groups};
+use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
 use crate::components::menus::palette::palette_group::PaletteGroups;
 use crate::components::menus::palette::palette_lines::{PaletteKey, palette_key};
 use crate::components::menus::palette::palette_motion::ListMotion;
@@ -35,8 +36,6 @@ use ds_core::geometry::{
     units::Px,
 };
 use ds_core::vocab::Availability;
-use std::cell::Cell;
-use std::rc::Rc;
 
 /// Below the control, its start edge level with the control's.
 fn below() -> Placement {
@@ -64,11 +63,7 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
     #[props(default)] arrow: Arrow,
     #[props(default)] common: Common,
 ) -> Element {
-    let alive = use_hook(|| Rc::new(Cell::new(Life::Up)));
-    use_drop({
-        let alive = alive.clone();
-        move || alive.set(Life::Gone)
-    });
+    let alive = use_alive();
     // A list opened on a query puts the caret after it, as the palette does.
     let focus = use_focus_request().with_caret(InitialCaret::End);
     let selection = use_palette_selection(&query, None, None);

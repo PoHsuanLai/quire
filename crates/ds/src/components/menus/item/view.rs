@@ -6,6 +6,7 @@ use crate::components::content::avatar::face;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::controls::press::{button_of, press_of};
+use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuImage;
 use crate::components::menus::item::text::{Emphasis, ItemText};
 use crate::components::menus::menu::placement::Keys;
@@ -81,7 +82,7 @@ pub(crate) struct ItemView<'a> {
 /// pointer's client position when it moves over any item, disabled ones too, so the highlight
 /// follows the pointer and the menu tracker sees where it is (`point`), its mount, and, where the
 /// menu listens for it, a button released over it (`release`).
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub(crate) struct RowEvents {
     /// A click of a live item.
     pub pick: EventHandler<()>,
@@ -91,6 +92,9 @@ pub(crate) struct RowEvents {
     pub mounted: EventHandler<MountedEvent>,
     /// A button was released over the item.
     pub release: Option<EventHandler<Press>>,
+    /// Whether the menu that owns these handlers is still mounted; every listener asks before
+    /// it calls one, since the row can outlive its owner by a frame.
+    pub alive: Alive,
 }
 
 /// An item, reporting through `events`.
@@ -100,7 +104,9 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
         point: onpoint,
         mounted: onmounted,
         release: onrelease,
+        alive,
     } = events;
+    let (moved, clicked, released, mounted) = (alive.clone(), alive.clone(), alive.clone(), alive);
     let (popup, expanded) = match view.branch {
         Branch::Leaf => (None, None),
         Branch::Parent(open) => (Some("true"), Some(open.aria())),
@@ -157,21 +163,23 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             onmousedown: move |event| event.prevent_default(),
             onmousemove: move |event| {
                 event.stop_propagation();
-                onpoint.call(client_point(&event));
+                moved.run(|| onpoint.call(client_point(&event)));
             },
             onclick: move |_| {
                 if live {
-                    onpick.call(());
+                    clicked.run(|| onpick.call(()));
                 }
             },
             onmouseup: move |event| {
                 if let Some(onrelease) = onrelease {
                     event.stop_propagation();
                     let button = button_of(event.trigger_button()).unwrap_or(PointerButton::Primary);
-                    onrelease.call(press_of(&event, button));
+                    released.run(|| onrelease.call(press_of(&event, button)));
                 }
             },
-            onmounted: move |event| onmounted.call(event),
+            onmounted: move |event| {
+                mounted.run(|| onmounted.call(event));
+            },
             {state}
             {image}
             {label}

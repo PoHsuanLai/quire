@@ -18,7 +18,8 @@
 //! panel), where it draws no scrim and its card fills its container. A
 //! caller may keep it mounted and say whether it is `shown` (`palette_shown`).
 
-use crate::components::menus::palette::palette_body::{Life, StopEvents, draw_groups};
+use crate::components::menus::alive::use_alive;
+use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
 use crate::components::menus::palette::palette_claim::{Claim, FieldKey};
 use crate::components::menus::palette::palette_group::PaletteGroups;
 use crate::components::menus::palette::palette_lines::{PaletteKey, palette_key};
@@ -54,8 +55,6 @@ use ds_core::geometry::units::{Px, Rect};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
 use ds_style::tokens::{layer::ZLayer, shape::Corner};
-use std::cell::Cell;
-use std::rc::Rc;
 
 /// The launcher's preview pane width (design/13 section 13.3.9, proposed): what `aside_width`
 /// is when not given.
@@ -145,11 +144,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     #[props(default)] handle: Option<PaletteHandle>,
 ) -> Element {
     let float = use_float(ZLayer::Palette, Stacking::Layer(Dismiss::Semitransient));
-    let alive = use_hook(|| Rc::new(Cell::new(Life::Up)));
-    use_drop({
-        let alive = alive.clone();
-        move || alive.set(Life::Gone)
-    });
+    let alive = use_alive();
     let showing = use_showing(shown, Anim::PeekIn);
     let selection = use_palette_selection(&query, selected, on_select);
     let rects = use_row_rects(on_select_rect);

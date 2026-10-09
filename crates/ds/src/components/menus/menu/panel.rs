@@ -2,6 +2,7 @@
 //! pointer and key handling, and the submenu it opens (design/13-BEHAVIOUR-menus-windows.md
 //! section 13.3.4). `Menu` is the root panel; `SubMenu` is every panel below it.
 
+use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::lines::{Drawn, render_lines};
 use crate::components::menus::item::view::client_point;
@@ -51,6 +52,9 @@ pub(crate) struct Panel<T: 'static> {
     pub cursor: MenuCursor,
     /// Under a caller's cursor, where a key asked the highlight to go.
     pub on_active: Option<EventHandler<Option<usize>>>,
+    /// Whether the component that built this panel is still mounted: its rows are drawn by the
+    /// overlay host and can outlive it by a frame.
+    pub alive: Alive,
 }
 
 impl<T: Clone + PartialEq + 'static> Panel<T> {
@@ -115,24 +119,29 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                 }),
                 onrelease: self.onrelease,
             },
+            &self.alive,
         )
     }
 
     /// The pointer moved over the panel but not a row (its padding, a header, a rule).
     pub(crate) fn hovered(&self, event: &MouseEvent) {
-        let at = client_point(event);
-        self.tracker.point(at, MenuTarget::Menu);
-        if let Some(onhover) = self.onhover {
-            onhover.call(at);
-        }
-        self.left_items();
+        self.alive.run(|| {
+            let at = client_point(event);
+            self.tracker.point(at, MenuTarget::Menu);
+            if let Some(onhover) = self.onhover {
+                onhover.call(at);
+            }
+            self.left_items();
+        });
     }
 
     /// The pointer is over no choice of this panel.
     pub(crate) fn left_items(&self) {
-        if let Some(onitem) = self.onitem {
-            onitem.call(None);
-        }
+        self.alive.run(|| {
+            if let Some(onitem) = self.onitem {
+                onitem.call(None);
+            }
+        });
     }
 
     /// What `event` means here; the caller acts on `Query`, `CloseMenu` and `Back`, which

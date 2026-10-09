@@ -2,6 +2,7 @@
 //! owns a menu of suggestions, the command palette and pick list built on the same rows, and the conformance file an app's menu items and
 //! shortcuts are written to.
 
+pub(crate) mod alive;
 pub mod export;
 pub mod item;
 pub(crate) mod menu;

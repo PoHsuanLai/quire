@@ -1,6 +1,7 @@
 //! Drawing a panel's lines: headers, status lines, rules and items, each item wired to report a
 //! click, a pointer move and its mount by its choice number (`choices`).
 
+use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::view::{
     Branch, Columns, ImageColumn, ItemView, RowEvents, StateColumn, header, info, item,
@@ -57,7 +58,7 @@ pub(crate) fn columns<T>(items: &[MenuItem<T>]) -> Columns {
 }
 
 /// Draw `items`.
-pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
+pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive) -> Element {
     let columns = columns(items);
     let mut index = 0usize;
     let rendered: Vec<Element> = items
@@ -133,6 +134,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn) -> Element {
                     point: EventHandler::new(move |point| drawn.onpoint.call((at, point))),
                     mounted: EventHandler::new(move |event| drawn.onmounted.call((at, event))),
                     release,
+                    alive: alive.clone(),
                 },
             )
         })

@@ -6,25 +6,17 @@ use crate::components::lists::emoji_grid::grid::{CellEvents, draw_cells, grid_st
 use crate::components::lists::row::row::{Row, RowMounted};
 use crate::components::lists::row::size::RowSize;
 use crate::components::lists::section_header::{HeaderAction, SectionHeader};
+use crate::components::menus::alive::Alive;
 use crate::components::menus::palette::palette_motion::ListMotion;
 use crate::components::menus::palette::palette_stops::{Body, ShownGroup};
 use dioxus::prelude::*;
 use ds_core::vocab::{RowState, Selection};
-use std::cell::Cell;
-use std::rc::Rc;
-
-/// Whether the palette that draws the rows is still mounted.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Life {
-    Up,
-    Gone,
-}
 
 /// What the drawn stops report, by stop number.
 #[derive(Clone)]
 pub(crate) struct StopEvents {
     /// Whether the palette is still up: a row mounts after it may be gone.
-    pub alive: Rc<Cell<Life>>,
+    pub alive: Alive,
     /// A click on a row or a cell.
     pub pick: EventHandler<usize>,
     /// The pointer moved over a row or a cell.
@@ -76,6 +68,11 @@ fn draw_group<T>(
                 .enumerate()
                 .map(|(at, marked)| {
                     let row = marked.row;
+                    let (clicked, pointed, mounted) = (
+                        events.alive.clone(),
+                        events.alive.clone(),
+                        events.alive.clone(),
+                    );
                     let state = RowState {
                         selection: Selection::of(&Some(at), &local),
                         availability: row.availability,
@@ -95,14 +92,15 @@ fn draw_group<T>(
                             state,
                             size: events.size,
                             motion: motion.of(at),
-                            onclick: move |_| events.pick.call(first + at),
-                            onpointermove: move |_| events.point.call(first + at),
+                            onclick: move |_| {
+                                clicked.run(|| events.pick.call(first + at));
+                            },
+                            onpointermove: move |_| {
+                                pointed.run(|| events.point.call(first + at));
+                            },
                             onmounted: {
-                                let alive = events.alive.clone();
                                 RowMounted::new(move |event: MountedEvent| {
-                                    if alive.get() == Life::Up {
-                                        events.mounted.call((first + at, event));
-                                    }
+                                    mounted.run(|| events.mounted.call((first + at, event)));
                                 })
                             },
                         }
@@ -112,15 +110,24 @@ fn draw_group<T>(
             (rsx! { {drawn.into_iter()} }, size)
         }
         Body::Grid(grid) => {
+            let (picked, pointed, mounted) = (
+                events.alive.clone(),
+                events.alive.clone(),
+                events.alive.clone(),
+            );
             let cells = draw_cells(
                 &grid.cells,
                 local,
                 CellEvents {
-                    pick: EventHandler::new(move |at: usize| events.pick.call(first + at)),
-                    point: EventHandler::new(move |at: usize| events.point.call(first + at)),
+                    pick: EventHandler::new(move |at: usize| {
+                        picked.run(|| events.pick.call(first + at));
+                    }),
+                    point: EventHandler::new(move |at: usize| {
+                        pointed.run(|| events.point.call(first + at));
+                    }),
                     mounted: Some(EventHandler::new(
                         move |(at, event): (usize, MountedEvent)| {
-                            events.mounted.call((first + at, event))
+                            mounted.run(|| events.mounted.call((first + at, event)));
                         },
                     )),
                 },
@@ -144,14 +151,17 @@ fn draw_group<T>(
         SectionHeader {
             title: shown.group.title.clone(),
             actions: shown.group.action.clone().into_iter().map(|(label, run)| {
+                let (ran, action_mounted) = (events.alive.clone(), events.alive.clone());
                 let booked = EventHandler::new(move |()| {
-                    events.action_ran.call(());
-                    run.call(());
+                    ran.run(|| {
+                        events.action_ran.call(());
+                        run.call(());
+                    });
                 });
                 HeaderAction {
                     selection: action_selection,
                     onmounted: Some(EventHandler::new(move |event: MountedEvent| {
-                        events.action_mounted.call((first + size, event))
+                        action_mounted.run(|| events.action_mounted.call((first + size, event)));
                     })),
                     ..HeaderAction::new(label, booked)
                 }
