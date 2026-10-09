@@ -35,6 +35,7 @@ mod headless_step;
 mod input;
 pub mod inset;
 mod painter;
+mod recorded_window;
 mod round_budget;
 #[cfg(test)]
 mod snap_tests;
@@ -59,4 +60,5 @@ pub use input::{
     ImeInput, Input, KeyInput, PasteChord, PointerAction, PointerInput, RawKeyInput, RawKeyPhase,
 };
 pub use painter::PaintTime;
+pub use recorded_window::WindowHosting;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};

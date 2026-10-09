@@ -9,6 +9,7 @@ use crate::error::HarnessError;
 use crate::fake_window::{FakeWindow, WindowSpec};
 use crate::headless_step::{Owed, PhaseOrder};
 use crate::painter::{Canvas, PaintTime, Painter};
+use crate::recorded_window::{WindowHosting, WindowLog};
 use crate::round_budget::{MAX_ROUNDS, RoundBudget, Spent};
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _, DocumentConfig, NodeId, StyleThreading};
@@ -114,6 +115,8 @@ pub(crate) struct Headless {
     /// The window the sizer asks, and the sizer components read with `use_window_sizer`.
     pub(crate) window: FakeWindow,
     pub(crate) sizer: WindowSizer,
+    /// What the app set through its window host, when it has one.
+    pub(crate) window_log: WindowLog,
 }
 
 /// The hovered element (a hovered text node counts as its element, which carries the listeners).
@@ -176,6 +179,16 @@ impl Headless {
         let window = FakeWindow::new(viewport, spec);
         let sizer = vdom.in_runtime(|| WindowSizer::over(Rc::new(window.clone())));
         vdom.provide_root_context(sizer.clone());
+        let window_log = WindowLog::default();
+        match spec.hosting {
+            WindowHosting::Absent => {}
+            WindowHosting::Recorded => {
+                let host = vdom.in_scope(ScopeId::ROOT, || {
+                    WindowHost::new(Rc::new(window_log.clone()))
+                });
+                vdom.provide_root_context(host);
+            }
+        }
         let keeper = match setup.focus_fallback {
             FocusFallback::Ancestor => {
                 Keeper::Ancestor(Rc::new(RefCell::new(FocusKeeper::default())))
@@ -231,6 +244,7 @@ impl Headless {
             scroll,
             window,
             sizer,
+            window_log,
         }
     }
 

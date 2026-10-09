@@ -35,6 +35,23 @@ impl Harness {
         self.settle_now();
     }
 
+    /// Every title the app set through its window host, oldest first. Empty unless the harness
+    /// was built with [`WindowHosting::Recorded`](crate::WindowHosting::Recorded).
+    pub fn window_titles(&self) -> Vec<String> {
+        self.doc.window_log.titles()
+    }
+
+    /// The title the app set last, if it set one (see [`Harness::window_titles`]).
+    pub fn window_title(&self) -> Option<String> {
+        self.window_titles().pop()
+    }
+
+    /// The icon the app set last through its window host, if any (see
+    /// [`Harness::window_titles`] for when there is a host).
+    pub fn window_icon(&self) -> Option<ds::window::icon::WindowIcon> {
+        self.doc.window_log.icon()
+    }
+
     /// The sizer components read with `use_window_sizer`, for a test that reads its state
     /// without a component.
     pub fn window_sizer(&self) -> WindowSizer {

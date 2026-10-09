@@ -2,6 +2,7 @@
 //! as the test chose ([`SizerAck`]), so a component that sizes its window runs in a test the way
 //! it runs in a window: the answer is a resize that arrives later, never inside the request.
 
+use crate::recorded_window::WindowHosting;
 use crate::snapshot::Viewport;
 use dioxus::core::spawn_forever;
 use ds::prelude::Scale;
@@ -59,6 +60,7 @@ impl WindowScreen {
 pub(crate) struct WindowSpec {
     pub ack: SizerAck,
     pub screen: WindowScreen,
+    pub hosting: WindowHosting,
 }
 
 struct State {

@@ -6,6 +6,7 @@ use crate::gpu_diagnostics::GpuDiagnostics;
 use crate::harness_backend::Backend;
 use crate::harness_clock::Clock;
 use crate::headless::Layout;
+use crate::recorded_window::WindowHosting;
 use crate::snapshot::Viewport;
 use ds_blitz::AdapterPref;
 use ds_blitz::FocusFallback;
@@ -121,6 +122,15 @@ impl HarnessConfig {
     /// this is the one call that changes its answers.
     pub fn with_sizer_ack(mut self, ack: SizerAck) -> Self {
         self.window.ack = ack;
+        self
+    }
+
+    /// Whether the app has a window host at the root (default [`WindowHosting::Absent`]).
+    /// [`WindowHosting::Recorded`] gives it one that keeps every title and icon set through it,
+    /// read with [`Harness::window_titles`](crate::Harness::window_titles) and
+    /// [`Harness::window_icon`](crate::Harness::window_icon).
+    pub fn with_window_hosting(mut self, hosting: WindowHosting) -> Self {
+        self.window.hosting = hosting;
         self
     }
 
