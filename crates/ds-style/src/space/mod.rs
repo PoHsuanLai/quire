@@ -9,4 +9,6 @@ pub mod look;
 pub mod look_json;
 pub mod palette;
 pub mod presets;
+#[cfg(feature = "dioxus")]
+pub mod provided;
 pub mod store;

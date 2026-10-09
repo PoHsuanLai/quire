@@ -103,6 +103,7 @@ mod source_list_selection;
 mod space_dot_paint;
 mod space_editor_frame;
 mod space_editor_rows;
+mod space_look_signal;
 mod spaces_menu;
 mod spaces_switch;
 mod split_view_axis;

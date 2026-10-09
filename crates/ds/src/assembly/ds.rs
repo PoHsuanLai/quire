@@ -84,7 +84,7 @@ use ds_style::material::recipe::DEFAULT_TINT_ALPHA;
 use ds_style::material::stack::MaterialStack;
 use ds_style::scale::use_root_scale;
 use ds_style::scope::{Scope, use_scope_provider};
-use ds_style::space::{frame_vars::FrameVars, look::SpaceLook};
+use ds_style::space::{frame_vars::FrameVars, look::SpaceLook, provided::use_space_look_provider};
 use ds_style::tokens::delay::TipDelay;
 use ds_style::tokens::hex::Alpha;
 use ds_style::tokens::{pixel::PixelToken, shape::Corner};
@@ -145,6 +145,7 @@ pub fn Ds(
         modality,
         activity,
     });
+    use_space_look_provider(&look);
     let hover = use_hover_hub_provider(env, tip_delay);
     use_title_tips_provider();
     use_toast_hub_provider();
