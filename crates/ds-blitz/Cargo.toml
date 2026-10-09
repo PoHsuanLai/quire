@@ -104,6 +104,9 @@ spell = ["dep:spellbook", "dep:dirs"]
 # Off by default and never in a release build: a scenario build turns it on with
 # `--features ds-blitz/debug-probe`.
 debug-probe = []
+# `ds_blitz::seam`: the parts a headless host wires a document from. For `ds-harness` and tests
+# only; an app has no use for them, so they are off by default and carry no stability promise.
+testing = []
 
 [lints]
 workspace = true

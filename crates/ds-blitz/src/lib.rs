@@ -3,7 +3,7 @@
 //! `print`), spellchecking (feature `spell`), the menu bar exported over D-Bus (feature `menus`),
 //! and the device-pixel layout snap (`snap`). The only
 //! quire crate that names the blitz crates; the test driver lives in `ds-harness`, which builds
-//! its document from the parts in [`seam`].
+//! its document from the parts in `seam` (feature `testing`).
 //!
 //! It is also the only quire crate that may depend on `tokio` (`scripts/check-boundary.sh`
 //! forbids it to `ds`): `launch` owns the process-wide runtime (`launch::runtime`), so the
@@ -68,6 +68,7 @@ mod reveal;
 mod route;
 mod scheme;
 mod screen_area;
+#[cfg(feature = "testing")]
 pub mod seam;
 mod setup;
 mod size_ledger;
