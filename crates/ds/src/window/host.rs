@@ -40,8 +40,8 @@ pub trait HostWindow {
     /// Change the window's title, the name the compositor shows in its switcher and task list.
     /// A host with no such name keeps the default and ignores it.
     fn set_title(&self, _title: &str) {}
-    /// Change the window's icon, where the platform takes one from the window (X11, Windows,
-    /// macOS). A host with no such icon (Wayland reads it from the app's desktop entry) keeps the
+    /// Change the window's icon, where the platform takes one from the window (X11 and Windows; macOS
+    /// takes the dock icon from the app bundle). A host with no such icon (Wayland reads it from the app's desktop entry) keeps the
     /// default and ignores it.
     fn set_icon(&self, _icon: &WindowIcon) {}
     /// The edges the compositor has tiled; a host that cannot tell keeps the default, none.

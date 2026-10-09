@@ -1,6 +1,6 @@
 //! A window's icon as pixels: the small picture a window shows in its titlebar, task switcher
-//! or dock, where the platform takes one from the app. X11, Windows and macOS read it from the
-//! window; Wayland takes the icon from the app's desktop entry (matched by its application id),
+//! or dock, where the platform takes one from the app. X11 and Windows read it from the window
+//! (winit has none on macOS, where the app bundle gives the dock icon); Wayland takes the icon from the app's desktop entry (matched by its application id),
 //! and a compositor that implements `xdg_toplevel_icon` may also use this one.
 
 /// Bytes in one pixel: red, green, blue, alpha.

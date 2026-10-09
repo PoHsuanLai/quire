@@ -861,7 +861,7 @@ Full catalogue (design doc section in parentheses):
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure, search and multi-line), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
 | Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow), `Skeleton`/`SkeletonRow` (static placeholders), `Loadable` (placeholder, content or failure by phase) |
-| Frame | `Capsule` (design/30 §2.7a), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
+| Frame | `Column` (a vertical stack: `gap: SpacingToken`, `align: ColumnAlign`), `Capsule` (design/30 §2.7a), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
 `crates/ds/src/components/<family>/<name>.rs` — read that, not this table, before wiring one up; this doc
@@ -1506,6 +1506,24 @@ copy. FINDINGS.md "Texture layer" has the reasons and limits.
 | A new frame | `handle.replace(texture)` or `replace_view`, or write into the registered texture on `gpu.queue()`; then `handle.redraw()` | `redraw` asks each window showing the handle to repaint and is cheap to call per decoded frame (one paint per display refresh, of the latest texture); submit your GPU work first. `replace` and `update` redraw by themselves. `handle.clear()` shows nothing. |
 | In a test | `HarnessConfig::new(viewport).with_backend(Backend::Hybrid)`; `Harness::gpu()`; `harness.render_over(Backdrop::Clear)` | The harness device is the app's `use_gpu()` from the first render. The default vello_cpu backend has no device and draws nothing. |
 | Try it by hand | `cargo run -p ds-blitz --example texture_layer` | A thread uploads a moving gradient every frame. |
+
+### The window, custom surfaces and their tests
+
+What a quire app can do about its own window and its own text regions, and how to test it. Each
+row replaces something apps used to work around.
+
+| Need | API | Notes |
+| --- | --- | --- |
+| A vertical stack with a gap | `Column { gap: SpacingToken::S12, align: ColumnAlign::Center, .. }` | Replaces a local flex class. `gap` is a spacing step (default `S8`), `align` is `Stretch` (default), `Start`, `Center` or `End`. It draws nothing of its own. |
+| The window's title | `ds::window::host::use_window_title(title)` | Set when the window first draws and again whenever `title` changes. |
+| The window's icon | `AppConfig::with_icon(WindowIcon)` for every window, `WindowSpec::with_icon` for one, `WindowHost::set_icon(&WindowIcon)` while running | `WindowIcon::new(rgba, width, height)` checks the bytes. X11 and Windows show it (winit has no window icon on macOS: the app bundle gives the dock icon). Wayland takes the icon from the app's `.desktop` file, matched by `AppConfig::with_app_id`, so set that too (a compositor with `xdg_toplevel_icon` may also use the pixels). |
+| Focus a field you hold no handle for | `ds::focus::selector::focus_by_selector(selector, Select::All)` | Asking again for a field that already has the keyboard leaves its caret where it is (it used to put it back at the start); `Select::All` on a focused field selects at once. |
+| Land the caret at the start, the end or everything | `ds::focus::soon::focus_landing_told(element, Landing::Place(InitialCaret::End), told)` | Public now (`Landing` is `ds::focus::select::Landing`). `focus_soon`, `focus_soon_selecting` and `focus_soon_told` cover the common cases. |
+| Place the IME window of your own surface | `ds::components::editor::write_soon::write_soon(host, element, \|edit, element\| edit.ime().cursor_area(element, area))` | The retry `EditSurface` makes while the document is busy, so a `TextureLayer` pane with its own text input places the candidate window the same way. |
+| A grid that reads the keys and the mouse | `RawKeySurface { on_key, style, onpointerdown, onpointermove, onpointerup, onwheel, .. }` | `style` is the element's inline style (the size a renderer sets inline); the pointer and wheel handlers are passed through as they arrive. |
+| A `TextureLayer` in a styled page | nothing to do | `.ds-texture-layer` has a rule in the stylesheet (fills its parent), so the coherence tests need no exemption. |
+| Test the window title and icon | `HarnessConfig::with_window_hosting(WindowHosting::Recorded)`; `harness.window_titles()`, `window_title()`, `window_icon()` | The harness window host records what `use_window_title` and `WindowHost::set_icon` send. With the default (`Absent`) there is no host, as before. |
+| Test IME placement | `harness.ime_switch()` and `harness.ime_cursor_area()` | The harness shell records the IME requests an edit surface or a `write_soon` makes. |
 
 ## 7. Settings schema: `#[derive(SettingsSchema)]`
 

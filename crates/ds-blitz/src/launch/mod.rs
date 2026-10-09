@@ -108,8 +108,8 @@ impl AppConfig {
         self
     }
 
-    /// The icon every window shows, where the platform takes one from the window (X11, Windows,
-    /// macOS). Wayland takes the icon from the app's `.desktop` file, matched by
+    /// The icon every window shows, where the platform takes one from the window (X11 and Windows;
+    /// winit has no window icon on macOS, where the bundle gives the dock icon). Wayland takes the icon from the app's `.desktop` file, matched by
     /// [`with_app_id`](AppConfig::with_app_id), so set that too. A window opened with its own
     /// [`WindowSpec::with_icon`] shows that one. The running window's icon changes with
     /// `ds::prelude::WindowHost::set_icon`.

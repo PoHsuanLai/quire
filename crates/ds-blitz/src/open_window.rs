@@ -60,7 +60,7 @@ impl WindowSpec {
         self
     }
 
-    /// An icon of its own, instead of the first window's. X11, Windows and macOS show it; Wayland
+    /// An icon of its own, instead of the first window's. X11 and Windows show it; Wayland
     /// takes the icon from the app's `.desktop` file, matched by the application id.
     pub fn with_icon(mut self, icon: WindowIcon) -> Self {
         self.icon = Some(icon);

@@ -1644,3 +1644,30 @@ Open:
   never saw it.
 - The goldens are markup (`crates/ds-shell/tests/snapshots/accounts/*-light.html` and `-dark.html`);
   no pixel snapshot of the Accounts gallery page is kept.
+
+## Window host, icon and re-focus (v0.3.3 queue)
+
+- A field that already has the keyboard is not focused again. Blitz's `set_focus_to` on the focused
+  field put its caret back at the start; a palette asking `focus_by_selector(.., Select::All)` on
+  each open, and a `Select::None` ask made again, typed "nvoicei" for "Invoice". `ds-blitz`'s
+  `focus` now answers `Focused::Done` with no write for the focused node, so the caret stays and
+  a following select-all applies in the same frame. Regression: `field_handle_focus.rs`.
+- The window icon is `HostWindow::set_icon(&WindowIcon)` (default: ignored). `WinitWindow` sends it
+  to winit's `set_window_icon`, and `AppConfig::with_icon` / `WindowSpec::with_icon` give it at
+  creation. winit supports it on X11 and Windows; macOS has none (the bundle gives the dock icon) and
+  Wayland needs the compositor's `xdg_toplevel_icon`, so a Wayland app sets its application id and ships a
+  `.desktop` file with an `Icon=`.
+- The harness has no window host by default: a component's `use_window_host()` is `None`, as in a
+  document no window holds. `WindowHosting::Recorded` provides one that records titles and icons
+  (move, resize, zoom and tile requests are ignored and nothing can be tiled). The IME needed no
+  new host: the harness shell already records `set_ime_enabled` and `set_ime_cursor_area`, read
+  with `Harness::ime_switch` and `ime_cursor_area`.
+- `EditSurface`'s busy retry is public as `components::editor::write_soon::write_soon`, and
+  `focus::soon::focus_landing_told` with `focus::select::Landing` are public, because custom
+  surfaces (a terminal grid, a `TextureLayer` pane) need the same waits.
+- `.ds-texture-layer` is a rule of the `texture_layer` sheet in `ds` (the class is written by
+  `ds-blitz`'s `TextureLayer`; the sheet is a ds sheet because the stylesheet is assembled there).
+  Blitz still sets the size inline.
+- Needs blessing by the orchestrator: `ds-shell`'s `stylesheet.css` golden (the `column` and
+  `texture_layer` sheets; the `ds` copy is gone), and the new `structure/column/*.html` goldens.
+
