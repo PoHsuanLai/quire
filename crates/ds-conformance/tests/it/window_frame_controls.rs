@@ -72,6 +72,9 @@ impl HostWindow for Stub {
             ..WindowState::default()
         }
     }
+    fn set_title(&self, title: &str) {
+        self.note(format!("title:{title}"));
+    }
 }
 
 /// A framed window whose host is the stub, in `maximized`.

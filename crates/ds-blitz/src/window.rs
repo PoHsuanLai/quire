@@ -136,6 +136,10 @@ impl HostWindow for WinitWindow {
             },
         }
     }
+
+    fn set_title(&self, title: &str) {
+        self.window.set_title(title);
+    }
 }
 
 /// winit's name for an edge.

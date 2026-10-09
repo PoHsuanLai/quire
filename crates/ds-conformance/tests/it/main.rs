@@ -146,3 +146,4 @@ mod virtual_list_set;
 mod voice_orb;
 mod window_frame_controls;
 mod window_layout_shots;
+mod window_title;

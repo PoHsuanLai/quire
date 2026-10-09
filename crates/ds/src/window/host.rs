@@ -35,6 +35,9 @@ pub trait HostWindow {
     fn supports(&self, tile: WindowTile) -> Support;
     /// The window's state now.
     fn state(&self) -> WindowState;
+    /// Change the window's title, the name the compositor shows in its switcher and task list.
+    /// A host with no such name keeps the default and ignores it.
+    fn set_title(&self, _title: &str) {}
 }
 
 /// The host's window, as root context: the seam and its last reported state.
@@ -70,6 +73,11 @@ impl WindowHost {
         (self.state)()
     }
 
+    /// Retitle the window, as the app asks after launch.
+    pub fn set_title(&self, title: &str) {
+        self.host.set_title(title);
+    }
+
     /// Re-read the host's own state, after a window event that may have changed it (a resize, a
     /// focus change).
     pub fn refresh(&self) {
@@ -101,4 +109,16 @@ pub fn use_window_host() -> Option<WindowHost> {
 /// not fullscreen, active) with no host.
 pub fn use_window_state() -> WindowState {
     use_window_host().map_or(WindowState::default(), |host| host.state())
+}
+
+/// Keep the window's title at `title`: set when the window first draws and again each time
+/// `title` changes. Does nothing with no host.
+pub fn use_window_title(title: impl Into<String>) {
+    let title = title.into();
+    let host = use_window_host();
+    use_effect(use_reactive!(|title| {
+        if let Some(host) = host.as_ref() {
+            host.set_title(&title);
+        }
+    }));
 }
