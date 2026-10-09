@@ -18,7 +18,8 @@ pub enum Select {
 /// What a focus write does with the field's text once the caret is in it: nothing, or the caret
 /// put at an [`InitialCaret`] place (a [`Select::All`] is [`InitialCaret::SelectAll`]).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Landing {
+#[non_exhaustive]
+pub enum Landing {
     /// Left where the renderer puts it.
     Leave,
     /// Put there.

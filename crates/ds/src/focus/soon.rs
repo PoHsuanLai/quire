@@ -59,11 +59,9 @@ pub fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHand
 /// too), for a surface whose own `onfocus` hears the focus event the host's write raises: `told`
 /// is no longer called here (calling it too told the caller twice) and stays in the signature
 /// until the callers drop it.
-pub(crate) fn focus_landing_told(
-    element: Rc<MountedData>,
-    landing: Landing,
-    told: EventHandler<()>,
-) {
+///
+/// Public so an app's own field surface lands the caret the way `TextField` does.
+pub fn focus_landing_told(element: Rc<MountedData>, landing: Landing, told: EventHandler<()>) {
     let _ = told;
     spawn(async move {
         let _ = focus_selecting(&element, landing).await;
