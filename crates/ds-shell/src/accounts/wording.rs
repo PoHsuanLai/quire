@@ -147,6 +147,11 @@ pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvid
         SignInFault::Forbidden => "Your organisation or the provider does not allow this.",
         SignInFault::StoreFailed => "Signed in, but the account could not be saved.",
         SignInFault::AlreadyAdded => "This account is already added.",
+        SignInFault::NotRunning => "Tailscale isn't running on this computer.",
+        SignInFault::SignedOut => "Tailscale is signed out.",
+        SignInFault::NotAllowed => {
+            "This computer's Tailscale doesn't let your accounts ask it yet."
+        }
         SignInFault::NoLauncher => return format!("No app is set up to sign {label} in"),
         SignInFault::NotInstalled => return format!("{label} isn't installed"),
     };
@@ -438,6 +443,24 @@ mod tests {
                 .all(|s| s.ends_with('.')),
             "{sentences:?}"
         );
+    }
+
+    #[test]
+    fn the_tailscale_faults_say_what_is_wrong_with_it() {
+        let cases = [
+            (
+                SignInFault::NotRunning,
+                "Tailscale isn't running on this computer.",
+            ),
+            (SignInFault::SignedOut, "Tailscale is signed out."),
+            (
+                SignInFault::NotAllowed,
+                "This computer's Tailscale doesn't let your accounts ask it yet.",
+            ),
+        ];
+        for (kind, want) in cases {
+            assert_eq!(fault(kind, "Ada", None), want, "{kind:?}");
+        }
     }
 
     #[test]

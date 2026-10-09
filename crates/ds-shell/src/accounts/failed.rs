@@ -35,7 +35,10 @@ impl SignInFault {
             | SignInFault::Forbidden
             | SignInFault::StoreFailed
             | SignInFault::NoLauncher
-            | SignInFault::NotInstalled => Recovery::Retry,
+            | SignInFault::NotInstalled
+            | SignInFault::NotRunning
+            | SignInFault::SignedOut
+            | SignInFault::NotAllowed => Recovery::Retry,
         }
     }
 }

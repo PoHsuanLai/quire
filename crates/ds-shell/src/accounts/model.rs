@@ -404,6 +404,7 @@ pub enum CopyState {
 
 /// Why a sign-in ended without an account.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+#[non_exhaustive]
 pub enum SignInFault {
     /// The provider refused what was typed.
     Refused,
@@ -433,6 +434,15 @@ pub enum SignInFault {
     /// The account is already on this desktop: another try cannot change that.
     #[word(slug = "already-added")]
     AlreadyAdded,
+    /// The computer's Tailscale is not running.
+    #[word(slug = "not-running")]
+    NotRunning,
+    /// The computer's Tailscale is running but nobody is signed in to it.
+    #[word(slug = "signed-out")]
+    SignedOut,
+    /// The computer's Tailscale does not yet let this person's accounts ask it who they are.
+    #[word(slug = "not-allowed")]
+    NotAllowed,
 }
 
 /// Who draws a step's title.
