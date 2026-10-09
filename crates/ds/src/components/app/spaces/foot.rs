@@ -8,7 +8,7 @@ use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
-use ds_core::vocab::Selection;
+use ds_core::vocab::{Selection, Shortcut};
 use ds_style::icon::Icon;
 use ds_style::scope::use_scope;
 use ds_style::space::frame_vars::FrameVars;
@@ -26,6 +26,7 @@ pub fn SpacesFoot<P, R>(
     handle: SpacesHandle<P, R>,
     new_payload: Callback<(), P>,
     #[props(default)] chord: SwitchChord,
+    #[props(default)] new_shortcut: Option<Shortcut>,
     #[props(default)] leading: Option<Element>,
     #[props(default)] trailing: Option<Element>,
 ) -> Element
@@ -78,6 +79,7 @@ where
                 icon: Icon::Plus,
                 label: "New Space",
                 title: "New Space".to_owned(),
+                title_shortcut: new_shortcut,
                 onclick: move |press: ds_core::press::Press| {
                     if handle.editing().is_none() {
                         let made = handle.add(new_payload.call(()));

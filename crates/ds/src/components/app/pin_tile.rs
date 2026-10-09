@@ -12,6 +12,7 @@
 
 use crate::components::content::avatar::{Avatar, AvatarSize, AvatarTone};
 use crate::components::content::provider_mark::{MarkProvider, MarkStyle, ProviderMark};
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use crate::components::controls::press::{PressListeners, use_pressing};
@@ -51,7 +52,7 @@ pub enum PinFace {
     Add {
         /// What names it to assistive technology ("Add account").
         label: String,
-        /// The hover hint ("Add account…"), when the app wants one.
+        /// The hover hint ("Add Account"), when the app wants one.
         hint: Option<String>,
     },
 }
@@ -191,7 +192,7 @@ pub fn PinTile(
         PinFace::Add { hint, .. } => hint.clone(),
         PinFace::All | PinFace::Account { .. } => None,
     };
-    let tip = use_tip(hint);
+    let tip = use_tip(hint.map(TipText::new));
     let picture = match face {
         PinFace::All => rsx! {
             span { class: "ds-pin-tile-face", Glyph { icon: Icon::Inbox, size: IconSize::Large } }

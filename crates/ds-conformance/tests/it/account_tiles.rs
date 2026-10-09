@@ -74,7 +74,7 @@ fn Tiles() -> Element {
                     },
                     add: PinAdd {
                         label: "Add account".to_string(),
-                        hint: Some("Add account…".to_string()),
+                        hint: Some("Add Account".to_string()),
                         onadd: EventHandler::new(move |()| log.with_mut(|log| log.push("add".to_string()))),
                     },
                 }

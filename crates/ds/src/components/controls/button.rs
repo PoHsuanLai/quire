@@ -7,6 +7,7 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
@@ -25,7 +26,7 @@ use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
-use ds_core::vocab::{Availability, Check, Shown};
+use ds_core::vocab::{Availability, Check, Shortcut, Shown};
 use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_motion::symbol::effect::{Activity, LoopEffect, SymbolEffect};
@@ -95,6 +96,7 @@ pub fn Button(
     #[props(default)] busy: BusyLook,
     onclick: EventHandler<Press>,
     #[props(default)] title: Option<String>,
+    #[props(default)] title_shortcut: Option<Shortcut>,
     #[props(default)] trailing: Option<Trailing>,
     #[props(default)] leading: Option<Leading>,
     #[props(default)] propagation: Propagation,
@@ -128,7 +130,7 @@ pub fn Button(
             Activity::Idle
         },
     ));
-    let tip = use_tip(title);
+    let tip = use_tip(title.map(|title| TipText::new(title).with_shortcut_opt(title_shortcut)));
     rsx! {
         button {
             r#type: "button",

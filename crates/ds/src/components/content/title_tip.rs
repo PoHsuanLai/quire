@@ -7,6 +7,7 @@
 //! A control already inside a hint (a `Tooltip` the caller put round it) draws nothing: never two
 //! tips. With no `Ds` to provide a hub the native `title` attribute stays.
 
+use crate::components::content::tip_text::TipText;
 use crate::host::measure::MountedRef;
 use crate::stack::hover_hub::HoverKey;
 use dioxus::core::current_scope_id;
@@ -54,11 +55,12 @@ pub(crate) struct Tip {
 }
 
 /// How `title` is shown here. Called unconditionally, every render, as it holds hooks.
-pub(crate) fn use_tip(title: Option<String>) -> Tip {
+pub(crate) fn use_tip(title: Option<TipText>) -> Tip {
     let key = use_hook(own_key);
     let element = use_signal(|| None::<MountedRef>);
     let port = try_consume_context::<TipPort>();
     let hinted = try_consume_context::<Hinted>().is_some();
+    let title = title.map(|tip| tip.render());
     let say = match (title, port, hinted) {
         (None, _, _) | (Some(_), _, true) => Say::Nothing,
         (Some(text), Some(port), false) => Say::Tip(text, port),

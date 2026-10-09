@@ -11,7 +11,7 @@ use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::Press;
 use ds_core::text::clip::clip_chars;
-use ds_core::vocab::{Check, RowState};
+use ds_core::vocab::{Check, RowState, Shortcut};
 
 /// How many characters of a name the name column holds before it must fade: the column at
 /// the narrowest window S draws (980 px, design/01-LAYOUT.md section 1), which leaves the list
@@ -80,6 +80,7 @@ pub fn ThreadRow(
     time: String,
     tags: Element,
     star: Option<(Check, EventHandler<Check>)>,
+    #[props(default)] star_shortcut: Option<Shortcut>,
     strip: Option<Element>,
     more: Option<Element>,
     onclick: EventHandler<Press>,
@@ -129,7 +130,7 @@ pub fn ThreadRow(
                 }
             }
             if let Some((state, onchange)) = star {
-                StarButton { state, onchange }
+                StarButton { state, onchange, shortcut: star_shortcut }
             }
             if let Some(strip) = strip {
                 {strip}

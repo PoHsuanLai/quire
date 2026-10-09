@@ -85,14 +85,14 @@ pub fn Cards() -> Element {
                 }
             }
             div { class: "g-row",
-                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Archive)), label: "Archive", title: Some("Archive (title)".to_owned()), onclick: |_| {} }
-                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Reply)), label: "Reply", title: Some("Reply (title)".to_owned()), onclick: |_| {} }
+                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Archive)), label: "Archive", title: Some("Archive".to_owned()), title_shortcut: Some(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('e')])), onclick: |_| {} }
+                Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Some(IconSource::from(Icon::Reply)), label: "Reply", title: Some("Reply".to_owned()), title_shortcut: Some(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('r')])), onclick: |_| {} }
             }
             div { class: "g-row",
-                Tooltip { text: "Archive → out of Inbox",
+                Tooltip { text: "Archive", shortcut: Some(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('e')])),
                     Button { size: ControlSize::Mini, label: "Tooltip", onclick: |_| {} }
                 }
-                Tooltip { text: "Until tomorrow 08:00",
+                Tooltip { text: "Snooze",
                     Button { size: ControlSize::Mini, label: "Another tooltip", onclick: |_| {} }
                 }
             }

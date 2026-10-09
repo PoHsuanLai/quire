@@ -65,7 +65,7 @@ impl<K> PinItem<K> {
 pub struct PinAdd {
     /// What names it to assistive technology ("Add account").
     pub label: String,
-    /// The hover hint ("Add account…").
+    /// The hover hint ("Add Account").
     pub hint: Option<String>,
     /// It was pressed.
     pub onadd: EventHandler<()>,

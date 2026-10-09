@@ -25,7 +25,7 @@ fn parts() -> Element {
     rsx! {
         ProviderMark { provider: MarkProvider::Imap }
         PinTile {
-            face: PinFace::Add { label: "Add account".to_owned(), hint: Some("Add account\u{2026}".to_owned()) },
+            face: PinFace::Add { label: "Add account".to_owned(), hint: Some("Add Account".to_owned()) },
             onclick: |_| {},
         }
         SpaceDot {
@@ -110,8 +110,8 @@ fn hovering_a_space_dot_draws_its_tip() {
 /// Each named control with no words of its own, and the tip it shows: the name it carries.
 const NAMED: &[(&str, &str)] = &[
     (".ds-segmented-segment:first-child", "Music"),
-    (".ds-row-more", "More actions"),
-    (".ds-chip-remove", "Remove Ada"),
+    (".ds-row-more", "More"),
+    (".ds-chip-remove", "Remove"),
     (".ds-row-disclosure", "Expand"),
 ];
 

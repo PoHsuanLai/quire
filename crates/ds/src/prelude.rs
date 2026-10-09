@@ -83,6 +83,7 @@ pub use crate::components::forms::pane_stack::stack::PaneStack;
 pub use crate::edit::keys::{command_keys, is_command};
 
 // Overlays
+pub use crate::components::content::tip_text::TipText;
 pub use crate::components::overlays::alert::Alert;
 pub use crate::components::overlays::drag_ghost::DragGhost;
 pub use crate::components::overlays::hover_card::HoverCard;

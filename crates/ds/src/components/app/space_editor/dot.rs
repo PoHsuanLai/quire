@@ -1,6 +1,7 @@
 //! One Space's dot in the sidebar foot, the switch between Spaces (design/04-COMPONENTS.md
 //! section 32, `S:147-150`).
 
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -23,11 +24,10 @@ pub fn SpaceDot(
         Selection::Selected => Check::On,
         Selection::Unselected => Check::Off,
     };
-    let keys = shortcut.glyphs();
     let paint = DotPaint::gradient(&frame.stops);
     let class = common.class("ds-space-dot");
     let data = common.data_attributes();
-    let tip = use_tip(Some(format!("{name} ({keys})")));
+    let tip = use_tip(Some(TipText::new(name.clone()).with_shortcut(shortcut)));
     rsx! {
         button {
             r#type: "button",

@@ -51,22 +51,22 @@ pub fn OverlaysCataloguePage() -> Element {
                 SideCase {}
             }
         }
-        Section { title: "Tooltip", note: "Tooltip {{ text, shown }}: one line below its target, opened by the Tip profile (at once by default, 1 s cold under `TipDelay::Standard`) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
+        Section { title: "Tooltip", note: "Tooltip {{ text, shortcut, shown }}: one line, written `Name  ⌘K` (a noun, two spaces, the key), below its target, opened by the Tip profile (at once by default, 1 s cold under `TipDelay::Standard`) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Tooltip, hover it".to_string(),
-                    Tooltip { text: "Archive → out of Inbox",
+                    Tooltip { text: "Archive", shortcut: Some(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('e')])),
                         Button { size: ControlSize::Mini, label: "Archive", onclick: |_| {} }
                     }
                 }
                 Specimen { name: "Tooltip, shown".to_string(), code: Some("shown: Some(Shown::Visible)".to_string()),
                     div { class: "g-stage-pad",
-                        Tooltip { text: "Snooze until tomorrow", shown: Some(Shown::Visible),
+                        Tooltip { text: "Snooze", shortcut: Some(Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('h')])), shown: Some(Shown::Visible),
                             Button { size: ControlSize::Mini, label: "Snooze", onclick: |_| {} }
                         }
                     }
                 }
                 Specimen { name: "Tooltip, hidden".to_string(), code: Some("shown: Some(Shown::Hidden)".to_string()),
-                    Tooltip { text: "Never shown", shown: Some(Shown::Hidden),
+                    Tooltip { text: "Hidden", shown: Some(Shown::Hidden),
                         Button { size: ControlSize::Mini, label: "Kept down", onclick: |_| {} }
                     }
                 }

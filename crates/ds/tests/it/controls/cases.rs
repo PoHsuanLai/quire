@@ -147,7 +147,7 @@ pub const CASES: &[Case] = &[
     Case {
         component: "button",
         state: "toolbar-foot",
-        make: || rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::PanelLeft, label: "Hide the sidebar", title: "Hide the sidebar (Ctrl S)".to_string(), onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Toolbar, image: ImagePosition::Only, icon: Icon::PanelLeft, label: "Hide the sidebar", title: "Hide Sidebar".to_string(), title_shortcut: Some(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('s')])), onclick: |_| {} } },
     },
     Case {
         component: "button",

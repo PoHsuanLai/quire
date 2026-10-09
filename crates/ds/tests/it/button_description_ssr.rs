@@ -22,7 +22,8 @@ fn icon_only() -> Element {
     rsx! {
         Button {
             label: "Sidebar",
-            title: Some("Hide the sidebar (\u{2303}\u{2318}S)".to_owned()),
+            title: Some("Hide Sidebar".to_owned()),
+            title_shortcut: Some(Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Super, ShortcutKey::Char('s')])),
             bezel: Bezel::Toolbar,
             image: ImagePosition::Only,
             icon: Icon::Refresh,
@@ -42,7 +43,7 @@ fn Titled() -> Element {
 fn Wrapped() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            Tooltip { text: "Hide the sidebar", {icon_only()} }
+            Tooltip { text: "Hide Sidebar", {icon_only()} }
         }
     }
 }
@@ -51,7 +52,7 @@ fn Wrapped() -> Element {
 fn a_titled_icon_button_describes_itself() {
     let html = button_markup(Titled);
     assert!(
-        html.contains("aria-description=\"Hide the sidebar (\u{2303}\u{2318}S)\""),
+        html.contains("aria-description=\"Hide Sidebar  \u{2303}\u{2318}S\""),
         "{html}"
     );
     assert!(!html.contains(" title="), "{html}");
@@ -90,10 +91,7 @@ fn a_tip_equal_to_the_accessible_name_adds_no_description() {
 fn a_tip_that_differs_from_the_accessible_name_is_kept() {
     let html = button_markup(Titled);
     assert!(html.contains("aria-label=\"Sidebar\""), "{html}");
-    assert!(
-        html.contains("aria-description=\"Hide the sidebar"),
-        "{html}"
-    );
+    assert!(html.contains("aria-description=\"Hide Sidebar"), "{html}");
     assert!(!html.contains("data-tip"), "{html}");
 }
 

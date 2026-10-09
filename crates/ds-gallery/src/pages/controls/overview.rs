@@ -239,7 +239,7 @@ fn Marks() -> Element {
                 PinTile { face: one('W', MarkProvider::Microsoft), unread: 0, onclick: |_| {} }
                 PinTile { face: one('G', MarkProvider::Google), selection: Selection::Selected, unread: 5, mark: MarkStyle::Image(favicon()), onclick: |_| {} }
                 PinTile { face: one('L', MarkProvider::Local), selection: Selection::Selected, unread: 1, onclick: |_| {} }
-                PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} }
+                PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add Account".to_string()) }, onclick: |_| {} }
             }
         }
     }

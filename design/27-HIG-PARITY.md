@@ -326,6 +326,8 @@ entry; the emphasis keyframes (bump, gulp, seal-pop, pop-in, rise, fold, curl) a
 | **Verdict** | Adopt |
 | **Rule** | A writing section in 02 (new §13): the case table per element, the ellipsis rule, the alert button vocabulary, the tooltip limit, "you" not "the user". Enforced where text is data: markup lint `ThreeDots` ("..." in any label), `TitleCaseLabel` warns on a lower-case second word in `Button`, `MenuEntry` and segment labels (an allowlist for articles and short prepositions), a test that `Tooltip` text is ≤ 75 characters. `ds::lint::markup`; doc + lint + test |
 
+**Owner override, tooltips (2026-10-09).** Apple's help tag rule above (start with a verb, 60-75 characters, do not repeat the control's name) is not followed. A quire tooltip is "just a noun with keybinds", written `Name  ⌘K`: a short title-case noun phrase, two spaces, then the key in Kbd glyphs; no parentheses, no sentence, no full stop. The sentence form moves to the accessible name (`aria-label`), which keeps its full wording. Built by `TipText` and held by the `tip_style` conformance test (design/30 section 2.5).
+
 ## 4. Patterns
 
 ### 4.1 Drag and drop (2023-10-05)

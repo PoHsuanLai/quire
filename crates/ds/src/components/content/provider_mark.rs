@@ -5,6 +5,7 @@
 use crate::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone};
 use crate::components::content::image_source::ImageSource;
 use crate::components::content::mark_face::{DrawnFace, MarkFace};
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::{Tip, use_tip};
 use crate::root::common::Common;
 use dioxus::prelude::*;
@@ -181,7 +182,7 @@ pub fn ProviderMark(
     #[props(default = MarkStyle::Letter)] style: MarkStyle,
     #[props(default)] common: Common,
 ) -> Element {
-    let tip = use_tip(Some(provider.name().to_owned()));
+    let tip = use_tip(Some(TipText::new(provider.name())));
     if let (Some(drawn), MarkStyle::Letter) = (face.as_ref().and_then(MarkFace::drawn), &style) {
         return face_mark(drawn, size, common, tip);
     }

@@ -16,6 +16,7 @@
 
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::text;
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::components::controls::choice::Choice;
 use crate::components::controls::glyph::glyph_size;
@@ -192,7 +193,7 @@ fn Segment<T: Clone + PartialEq + 'static>(
 ) -> Element {
     let pressing = use_pressing();
     let image_only = choice.label.plain_text().is_empty();
-    let tip = use_tip(choice.name.clone().filter(|_| image_only));
+    let tip = use_tip(choice.name.clone().filter(|_| image_only).map(TipText::new));
     let live = enabled == Availability::Enabled && group == Availability::Enabled;
     let checked = match selected {
         Selection::Selected => Check::On,

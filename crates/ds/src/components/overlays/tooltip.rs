@@ -16,6 +16,7 @@
 //! [`Hint`] is the one implementation: a `Tooltip` is a `Hint` below its target on the Tip
 //! profile, and the shell's `DockLabel` is a `Hint` above its target on the Label profile.
 
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::{Hinted, own_key};
 use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
 use crate::components::overlays::hover_card::target::HoverTarget;
@@ -25,7 +26,7 @@ use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, use_hover_hub};
 use dioxus::prelude::*;
 use ds_core::time::{FRAME_SLACK, clock::sleep};
-use ds_core::vocab::Shown;
+use ds_core::vocab::{Shortcut, Shown};
 use ds_core::word::Word;
 use ds_motion::hover_intent::HoverProfile;
 
@@ -55,16 +56,21 @@ impl HintSide {
 /// stands while the caller's own hooks hold that key open (see above). `shown` wins when both
 /// are given.
 ///
+/// `text` is the tip's name and `shortcut` its key, drawn through [`TipText`] as `Name  ⌘K`
+/// (the house style, design/30 section 2.5).
+///
 /// `common` goes on the tip's surface (`role="tooltip"`); its `aria_label` names it in place of
 /// its text.
 #[component]
 pub fn Tooltip(
     text: String,
+    #[props(default)] shortcut: Option<Shortcut>,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] hover_key: Option<HoverKey>,
     #[props(default)] common: Common,
     #[props(default)] children: Element,
 ) -> Element {
+    let text = TipText::new(text).with_shortcut_opt(shortcut).render();
     rsx! {
         Hint {
             text,

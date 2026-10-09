@@ -61,7 +61,7 @@ pub const CASES: &[Case] = &[
     // Button: a hint, a name for assistive technology, and the open state of what it opens.
     Case {
         golden: "controls/button/mini-titled-open.html",
-        make: || rsx! { Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "+", title: "Add account…", shown: Shown::Visible, onclick: |_| {} } },
+        make: || rsx! { Button { common: Common { aria_label: Some("Add account".to_string()), ..Common::default() }, size: ControlSize::Mini, label: "+", title: "Add Account", shown: Shown::Visible, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/quiet-closed.html",
@@ -83,7 +83,7 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "lists/pin_tile/add.html",
-        make: || rsx! { PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} } },
+        make: || rsx! { PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add Account".to_string()) }, onclick: |_| {} } },
     },
     Case {
         golden: "lists/pin_tile/add-named.html",

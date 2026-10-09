@@ -1,6 +1,7 @@
 //! A branch row's disclosure triangle as a control: it has a name ("Expand" or "Collapse"), a
 //! tip with it, and Return or Space press it.
 
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::components::controls::disclosure::indicator;
 use crate::components::controls::press::{ActivationKeys, activates};
@@ -21,7 +22,7 @@ fn name(shown: Shown) -> &'static str {
 #[component]
 pub(crate) fn RowDisclosure(shown: Shown, on_toggle: Option<EventHandler<Shown>>) -> Element {
     let label = name(shown);
-    let tip = use_tip(Some(label.to_owned()));
+    let tip = use_tip(Some(TipText::new(label)));
     let toggle = move || {
         if let Some(on_toggle) = on_toggle {
             on_toggle.call(shown.flipped());

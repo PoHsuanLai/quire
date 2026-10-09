@@ -95,7 +95,7 @@ fn PinnedTiles() -> Element {
                 PinTile { face: account('L', MarkProvider::Local), drop: DropState::Source, onclick: |_| {} }
                 PinTile { face: account('W', MarkProvider::Microsoft), unread: 2, status: PinStatus::Attention { why: "Password rejected".to_owned() }, onstatus: |()| {}, onclick: |_| {} }
                 PinTile { face: account('G', MarkProvider::Fastmail), status: PinStatus::Busy(working), onclick: |_| {} }
-                PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add account…".to_string()) }, onclick: |_| {} }
+                PinTile { face: PinFace::Add { label: "Add account".to_string(), hint: Some("Add Account".to_string()) }, onclick: |_| {} }
             }
             div { style: "width:260px",
                 PinTiles {

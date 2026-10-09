@@ -1,12 +1,13 @@
 //! RowMore: the one quiet "More actions" button a row carries in its tail: an icon-only
 //! button with no pill, border or shadow that opens the row's menu (design/34-MODERN-LOOK.md).
 
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Rect;
-use ds_core::vocab::Shown;
+use ds_core::vocab::{Shortcut, Shown};
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
@@ -14,6 +15,9 @@ use std::rc::Rc;
 
 /// The default `aria-label`.
 const LABEL: &str = "More actions";
+
+/// The default tip: the terse noun, apart from the accessible name.
+const TIP: &str = "More";
 
 /// A row's trailing action button, for `ThreadRow`'s `more` slot.
 ///
@@ -33,13 +37,15 @@ const LABEL: &str = "More actions";
 pub fn RowMore(
     #[props(default = Icon::Ellipsis)] icon: Icon,
     #[props(into, default = LABEL.to_string())] label: String,
+    #[props(into, default = TIP.to_string())] tip: String,
+    #[props(default)] shortcut: Option<Shortcut>,
     #[props(default)] expanded: Shown,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_press: EventHandler<()>,
     onclick: EventHandler<Rect>,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
-    let tip = use_tip(Some(label.clone()));
+    let tip = use_tip(Some(TipText::new(tip).with_shortcut_opt(shortcut)));
     rsx! {
         button {
             r#type: "button",

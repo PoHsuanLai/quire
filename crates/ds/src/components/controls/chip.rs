@@ -1,6 +1,7 @@
 //! Chip: a small label that states a fact (design/04-COMPONENTS.md section 10).
 
 use crate::components::content::avatar::{AvatarFace, face};
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
@@ -85,11 +86,11 @@ pub fn Chip(
     }
 }
 
-/// The chip's remove button: named "Remove {text}", with the same words as its tip.
+/// The chip's remove button: named "Remove {text}", its tip just "Remove".
 #[component]
 fn ChipRemove(text: String, onremove: EventHandler<()>) -> Element {
     let name = format!("Remove {text}");
-    let tip = use_tip(Some(name.clone()));
+    let tip = use_tip(Some(TipText::new("Remove")));
     rsx! {
         button {
             r#type: "button",

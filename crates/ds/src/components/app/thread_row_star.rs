@@ -1,10 +1,11 @@
 //! A thread row's star (design/04-COMPONENTS.md section 16): the button that toggles it. Split
 //! from `list_row` so the row's own file holds the row.
 
+use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::focus::click::kept_click;
 use dioxus::prelude::*;
-use ds_core::vocab::Check;
+use ds_core::vocab::{Check, Shortcut};
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::icon::style::GlyphStyle;
@@ -15,14 +16,23 @@ fn star_glyph(state: Check) -> Element {
     rsx! { Glyph { icon: Icon::Star, size: IconSize::Compact, style: GlyphStyle::of(state) } }
 }
 
-/// The star button.
+/// The star button. Its accessible name is the full wording; its tip is the terse noun, with
+/// `shortcut` when the host binds a key.
 #[component]
-pub(crate) fn StarButton(state: Check, onchange: EventHandler<Check>) -> Element {
+pub(crate) fn StarButton(
+    state: Check,
+    onchange: EventHandler<Check>,
+    #[props(default)] shortcut: Option<Shortcut>,
+) -> Element {
     let label = match state {
         Check::On => "Unstar this thread",
         Check::Off | Check::Mixed => "Star this thread",
     };
-    let tip = use_tip(Some(label.to_owned()));
+    let noun = match state {
+        Check::On => "Unstar",
+        Check::Off | Check::Mixed => "Star",
+    };
+    let tip = use_tip(Some(TipText::new(noun).with_shortcut_opt(shortcut)));
     rsx! {
         button {
             r#type: "button",
