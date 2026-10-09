@@ -77,5 +77,7 @@ beside the Lucide one in `crates/ds-style/assets/icons/` and mirrored in `assets
 | Lucide | `lucide-static` 1.47.0 | ISC | `LICENSE-lucide.txt` | the outline form of every glyph |
 | Tabler Icons (filled) | `@tabler/icons` 3.48.0 | MIT | `LICENSE-tabler.txt` | the solid form, first choice; also the outline `Brightness` |
 | Phosphor Icons (Fill) | `@phosphor-icons/core` 2.1.1 | MIT | `LICENSE-phosphor.txt` | the solid form where Tabler has no filled one; scaled from 256 to the 24 grid |
+| Bootstrap Icons | `bootstrap-icons` 1.13.2 | MIT | `LICENSE-bootstrap.txt` | `Download`, `Upload` (design/08 section 1.2.2) |
+| Remix Icon | `remixicon` 4.6.0 | Apache-2.0 | `LICENSE-remixicon.txt` | `Sparkles`; later releases changed licence, do not update |
 
 The per-glyph source of every solid form is the table in design/08-ICONS.md section 1.2.1.

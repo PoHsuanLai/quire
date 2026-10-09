@@ -103,7 +103,7 @@ pub(super) fn shape_element(shape: &Shape) -> Element {
 }
 
 /// `icon`, drawn as an `svg` of class `ds-ic` at `size` (its `width`, `height` and
-/// `data-size`) in `style` (solid unless a pair's off state says outline), painted in
+/// `data-size`) in `style` (the icon's own pick unless a caller asks, `Icon::native`), painted in
 /// `currentColor` through attributes, never CSS (spike S6). An outline's stroke is snapped to
 /// whole device pixels at a fractional device scale (`super::stroke`). `cut` is how much of a
 /// slash is drawn across it: the gap that slash leaves is cut out of the glyph (`super::slash`).
@@ -115,13 +115,14 @@ pub fn Glyph(
     #[props(default)] style: GlyphStyle,
     #[props(default)] cut: Thousandths,
 ) -> Element {
-    let style = GlyphStyle::resolve(icon, style);
+    let asked = style;
+    let style = GlyphStyle::resolve(icon, asked);
     let px = size.px();
     let mask = use_hook(|| format!("ds-cut-{}", current_scope_id().0));
     let stroke = stroke_width(size, use_scale());
     let (paint, outline) = match style {
-        GlyphStyle::Solid => (("none", "currentColor"), None),
         GlyphStyle::Outline => (("currentColor", "none"), Some(stroke)),
+        GlyphStyle::Solid | GlyphStyle::Native => (("none", "currentColor"), None),
     };
     let round = outline.as_ref().map(|_| "round");
     rsx! {
@@ -129,8 +130,8 @@ pub fn Glyph(
             class: "ds-ic",
             "data-size": "{px}",
             "data-style": match style {
-                GlyphStyle::Solid => "solid",
                 GlyphStyle::Outline => "outline",
+                GlyphStyle::Solid | GlyphStyle::Native => "solid",
             },
             // Presentation attributes: Blitz and browsers map an `svg`'s width and height to
             // the CSS properties, so the size needs no stylesheet rule (design/08-ICONS.md 1.4).
@@ -145,7 +146,7 @@ pub fn Glyph(
             "stroke-linejoin": round,
             "fill": paint.1,
             Cut { id: mask, drawn: cut,
-                for shape in icon.shapes_in(style) {
+                for shape in icon.shapes_in(asked) {
                     {shape_element(shape)}
                 }
             }

@@ -45,8 +45,8 @@ impl Paint {
 /// Muted or Monochrome dock is one hue, plate included. Without one, or
 /// without a plate, it changes nothing.
 ///
-/// `look` is a glyph's style: solid, or outline for a pair's off state (design/08-ICONS.md
-/// section 1.2).
+/// `look` is a glyph's style: its own pick (`Icon::native`) unless asked for solid or outline
+/// (design/08-ICONS.md section 1.2).
 ///
 /// A status glyph (`IconSource::Status`) is drawn at `size` too.
 #[component]

@@ -40,7 +40,7 @@ struct Shown {
 /// `icon` at `size`, cross-fading into each new icon it is given, and for `MorphStyle::Slash`
 /// drawing its slash on or off as `slashed` changes (over `--t-quick`). The first frame is still;
 /// a render with the same icon and slash plays nothing (R2); under Reduced every change snaps
-/// (R7). `look` is the glyph's style (solid unless a pair's off state). Decorative (`aria-hidden`): the words beside it carry the state.
+/// (R7). `look` is the glyph's style (its own pick unless asked). Decorative (`aria-hidden`): the words beside it carry the state.
 #[component]
 pub fn MorphGlyph(
     icon: Icon,

@@ -1,4 +1,5 @@
 use super::Icon;
+use super::native::Native;
 use super::render::{Glyph, GlyphProps, IconSize};
 use super::style::GlyphStyle;
 use crate::icon::shape::Shape;
@@ -326,38 +327,53 @@ fn the_format_and_severity_glyphs_are_lucides() {
 }
 
 #[test]
-fn every_icon_draws_solid_by_default_as_filled_paths_with_no_stroke() {
+fn every_icon_draws_its_native_pick_by_default() {
     let mut failures = Vec::new();
-    for &icon in Icon::ALL
-        .iter()
-        .filter(|i| !Icon::ALWAYS_OUTLINE.contains(i))
-    {
+    for &icon in Icon::ALL {
         let page = markup_in(icon, GlyphStyle::default());
-        let names = element_names(&page);
+        let (shapes, style) = match icon.native() {
+            Native::Solid => (icon.solid_shapes(), "solid"),
+            Native::Drawn(shapes) => (shapes, "solid"),
+            Native::Outline | Native::Pair => (icon.shapes(), "outline"),
+        };
         let expect: Vec<&str> = std::iter::once("svg")
-            .chain(icon.solid_shapes().iter().map(shape_tag))
+            .chain(shapes.iter().map(shape_tag))
             .collect();
-        if names != expect
-            || !page.contains("fill=\"currentColor\"")
-            || !page.contains("stroke=\"none\"")
-            || !page.contains("data-style=\"solid\"")
-            || page.contains("stroke-width")
-            || page.contains("fill=\"none\"")
-        {
+        if element_names(&page) != expect || !page.contains(&format!("data-style=\"{style}\"")) {
             failures.push(format!("{icon:?}: {page}"));
+        }
+        let filled = style == "solid";
+        if filled != (page.contains("stroke=\"none\"") && !page.contains("stroke-width")) {
+            failures.push(format!("{icon:?} paint: {page}"));
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
 #[test]
-fn an_always_outline_glyph_draws_its_stroke_even_when_asked_for_solid() {
-    for &icon in Icon::ALWAYS_OUTLINE {
-        let page = markup_in(icon, GlyphStyle::Solid);
-        assert!(
-            page.contains("data-style=\"outline\"") && page.contains("stroke-width"),
-            "{icon:?}: {page}"
-        );
+fn an_explicit_style_beats_the_pick() {
+    let page = markup_in(Icon::Bluetooth, GlyphStyle::Solid);
+    assert!(page.contains("data-style=\"solid\""), "{page}");
+    let page = markup_in(Icon::Play, GlyphStyle::Outline);
+    assert!(page.contains("data-style=\"outline\"") && page.contains("stroke-width"));
+}
+
+#[test]
+fn a_replacement_is_filled_paths_on_the_24_grid() {
+    for icon in [Icon::Download, Icon::Upload, Icon::Sparkles] {
+        let Native::Drawn(shapes) = icon.native() else {
+            panic!("{icon:?}: not drawn");
+        };
+        for shape in shapes {
+            let Shape::Solid(d) = shape else {
+                panic!("{icon:?}: {shape:?}");
+            };
+            for number in d.split(|c: char| c.is_ascii_alphabetic() || c.is_whitespace()) {
+                if let Ok(value) = number.parse::<f32>() {
+                    assert!(value.abs() <= 24.0, "{icon:?}: {value} in {d}");
+                }
+            }
+        }
     }
 }
 

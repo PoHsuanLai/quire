@@ -4,7 +4,7 @@
 //! `crates/ds-style/assets/icons/LICENSE-lucide.txt`.
 //!
 //! The outline style is a 24 grid, 2px stroke, round caps and joins, one colour; the solid
-//! style (the default, `style`, `solid_*`) is filled paths on the same grid. The
+//! style (`style`, `solid_*`; each icon's default is its `native` pick) is filled paths on the same grid. The
 //! stroke is written as SVG attributes by [`render::Glyph`], because usvg in Blitz
 //! may not resolve CSS on SVG (design/08-ICONS.md section 1.3, spike S6).
 //!
@@ -20,6 +20,7 @@
 use shape::Shape;
 
 pub mod classify;
+pub(crate) mod drawn;
 pub mod family;
 pub(crate) mod geometry;
 pub(crate) mod geometry_actions;
@@ -27,6 +28,7 @@ pub(crate) mod geometry_control;
 pub(crate) mod geometry_format;
 pub(crate) mod geometry_own;
 pub(crate) mod geometry_shell;
+pub mod native;
 pub mod parts;
 pub(crate) mod plate;
 pub mod plate_tint;

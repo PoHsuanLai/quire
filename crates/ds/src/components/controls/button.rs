@@ -242,10 +242,10 @@ pub fn Button(
 
 /// `icon` at `size`; a quire glyph under `IconSwap::CrossFade` fades into the next one it is
 /// given. A toggle's `value` picks the glyph's style: a star, heart, pin or bell is outline
-/// while off (`GlyphStyle::for_state`).
+/// while off (`GlyphStyle::for_state`); any other glyph draws its own pick (`Icon::native`).
 fn icon_view(icon: IconSource, size: IconSize, swap: IconSwap, value: Option<Check>) -> Element {
     let look = |icon| {
-        value.map_or(GlyphStyle::Solid, |state| {
+        value.map_or(GlyphStyle::Native, |state| {
             GlyphStyle::for_state(icon, state)
         })
     };
