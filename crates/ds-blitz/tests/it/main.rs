@@ -27,6 +27,7 @@ mod frame_tags;
 mod frames;
 mod hit_absolute_in_padded_parent;
 mod hit_outside_empty_parent;
+mod ime_texture_layer;
 mod keep_focus;
 mod kept_click_focus;
 mod net_policy;
