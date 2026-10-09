@@ -24,21 +24,10 @@ impl Harness {
             action: PointerAction::Move,
             mods: Modifiers::empty(),
         });
-        let (x, y) = (at.x.0, at.y.0);
-        self.deliver(UiEvent::Wheel(BlitzWheelEvent {
-            delta: BlitzWheelDelta::Pixels(f64::from(dx.0), f64::from(dy.0)),
-            coords: PointerCoords {
-                page_x: x,
-                page_y: y,
-                screen_x: x,
-                screen_y: y,
-                client_x: x,
-                client_y: y,
-            },
-            buttons: self.held_buttons().blitz(),
-            mods: Modifiers::empty(),
-            element: Default::default(),
-        }));
+        self.deliver_wheel(
+            at,
+            BlitzWheelDelta::Pixels(f64::from(dx.0), f64::from(dy.0)),
+        );
         self.gesture(Gesture::Scroll {
             source: ScrollSource::Finger,
             phase: GesturePhase::Changed,
@@ -64,27 +53,14 @@ impl Harness {
         };
         let (used, _) = self.doc.scroll.wheel(input, now());
         if used == WheelUse::Passed {
-            let (px, py) = (at.x.0, at.y.0);
-            self.deliver(UiEvent::Wheel(BlitzWheelEvent {
-                delta: BlitzWheelDelta::Lines(x, y),
-                coords: PointerCoords {
-                    page_x: px,
-                    page_y: py,
-                    screen_x: px,
-                    screen_y: py,
-                    client_x: px,
-                    client_y: py,
-                },
-                buttons: self.held_buttons().blitz(),
-                mods: Modifiers::empty(),
-                element: Default::default(),
-            }));
+            self.deliver_wheel(at, BlitzWheelDelta::Lines(x, y));
         }
         self.settle_now();
     }
 
     /// Fingers on a touchpad move `dx`, `dy` in `phase`, as the window delivers winit's
-    /// `MouseWheel` with pixels: the engine takes it, and the pointer is moved to `at` first.
+    /// `MouseWheel` with pixels: the engine takes it (or, with nothing to scroll under the pointer,
+    /// the document gets the wheel), and the pointer is moved to `at` first.
     pub(crate) fn fingers(&mut self, at: Point, dx: Px, dy: Px, phase: GesturePhase) {
         self.pointer(PointerInput {
             at,
@@ -98,8 +74,33 @@ impl Harness {
             },
             phase,
         };
-        let _ = self.doc.scroll.wheel(input, now());
+        let (used, _) = self.doc.scroll.wheel(input, now());
+        if used == WheelUse::Passed {
+            self.deliver_wheel(
+                at,
+                BlitzWheelDelta::Pixels(f64::from(dx.0), f64::from(dy.0)),
+            );
+        }
         self.settle_now();
+    }
+
+    /// Hand the document a wheel of `delta` at `at`, as Blitz receives one from the window.
+    fn deliver_wheel(&mut self, at: Point, delta: BlitzWheelDelta) {
+        let (x, y) = (at.x.0, at.y.0);
+        self.deliver(UiEvent::Wheel(BlitzWheelEvent {
+            delta,
+            coords: PointerCoords {
+                page_x: x,
+                page_y: y,
+                screen_x: x,
+                screen_y: y,
+                client_x: x,
+                client_y: y,
+            },
+            buttons: self.held_buttons().blitz(),
+            mods: Modifiers::empty(),
+            element: Default::default(),
+        }));
     }
 
     /// Publish `gesture` to the components listening, as the window does for winit's pinch and
