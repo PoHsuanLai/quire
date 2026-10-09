@@ -5,5 +5,6 @@
 pub(crate) mod grab;
 pub(crate) mod hold;
 pub mod host;
+pub mod tiled;
 pub(crate) mod timing;
 pub mod vocab;

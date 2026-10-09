@@ -52,3 +52,4 @@ mod typeface;
 mod user_style_ssr;
 mod voice_orb_ssr;
 mod window_frame_ssr;
+mod window_tiled;

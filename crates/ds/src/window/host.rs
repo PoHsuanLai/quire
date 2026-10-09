@@ -9,6 +9,7 @@
 //! pushes a change with [`WindowHost::refresh`] (re-read its own `state`) or
 //! [`WindowHost::publish`] (a state it was told, as an xdg configure).
 
+use super::tiled::Tiled;
 use super::vocab::{ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
 use dioxus::prelude::*;
 use std::rc::Rc;
@@ -38,6 +39,10 @@ pub trait HostWindow {
     /// Change the window's title, the name the compositor shows in its switcher and task list.
     /// A host with no such name keeps the default and ignores it.
     fn set_title(&self, _title: &str) {}
+    /// The edges the compositor has tiled; a host that cannot tell keeps the default, none.
+    fn tiled(&self) -> Tiled {
+        Tiled::NONE
+    }
 }
 
 /// The host's window, as root context: the seam and its last reported state.
@@ -45,6 +50,7 @@ pub trait HostWindow {
 pub struct WindowHost {
     host: Rc<dyn HostWindow>,
     state: Signal<WindowState>,
+    tiled: Signal<Tiled>,
 }
 
 impl std::fmt::Debug for WindowHost {
@@ -60,7 +66,8 @@ impl WindowHost {
     /// the calling scope owns); [`use_window_host_provider`] does and provides it.
     pub fn new(host: Rc<dyn HostWindow>) -> Self {
         let state = Signal::new(host.state());
-        WindowHost { host, state }
+        let tiled = Signal::new(host.tiled());
+        WindowHost { host, state, tiled }
     }
 
     /// The seam.
@@ -73,6 +80,19 @@ impl WindowHost {
         (self.state)()
     }
 
+    /// The last reported tiled edges; a component that reads it redraws when they change.
+    pub fn tiled(&self) -> Tiled {
+        (self.tiled)()
+    }
+
+    /// Report the tiled edges a compositor configure named. Writes only a change.
+    pub fn publish_tiled(&self, tiled: Tiled) {
+        let mut signal = self.tiled;
+        if *signal.peek() != tiled {
+            signal.set(tiled);
+        }
+    }
+
     /// Retitle the window, as the app asks after launch.
     pub fn set_title(&self, title: &str) {
         self.host.set_title(title);
@@ -82,6 +102,7 @@ impl WindowHost {
     /// focus change).
     pub fn refresh(&self) {
         self.publish(self.host.state());
+        self.publish_tiled(self.host.tiled());
     }
 
     /// Report `state`, as a host told it by its compositor does. Writes only a change.
@@ -121,4 +142,10 @@ pub fn use_window_title(title: impl Into<String>) {
             host.set_title(&title);
         }
     }));
+}
+
+/// The edges the window is tiled on, redrawn on every change the host reports; none with no
+/// host.
+pub fn use_window_tiled() -> Tiled {
+    use_window_host().map_or(Tiled::NONE, |host| host.tiled())
 }
