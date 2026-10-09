@@ -191,7 +191,7 @@ fn the_ellipses_are_lucides() {
 /// is `rotate-ccw`, Phone is `smartphone`, and `Power` stays in the shell set.
 #[test]
 fn the_control_set_is_lucides() {
-    assert_eq!(Icon::CONTROL.len(), 11);
+    assert_eq!(Icon::CONTROL.len(), 14);
     assert!(Icon::SHELL.contains(&Icon::Power), "Power is not repeated");
     assert_eq!(
         Icon::Restart.shapes(),
@@ -205,6 +205,39 @@ fn the_control_set_is_lucides() {
         Some(&Shape::Path("M12 18h.01"))
     );
     assert_eq!(Icon::Gamepad.shapes().len(), 5);
+}
+
+/// A picture's rotate buttons are a pair: `RotateLeft` is `rotate-ccw`, `RotateRight` is its
+/// mirror (`rotate-cw`), and each has a solid form, which is a mirror too.
+#[test]
+fn the_rotate_pair_is_mirrored_in_both_styles() {
+    assert_eq!(Icon::RotateLeft.shapes(), Icon::Restart.shapes());
+    assert_eq!(
+        Icon::RotateRight.shapes(),
+        &[
+            Shape::Path("M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"),
+            Shape::Path("M21 3v5h-5"),
+        ][..]
+    );
+    assert_eq!(
+        Icon::RotateLeft.solid_shapes(),
+        Icon::Restart.solid_shapes()
+    );
+    assert_eq!(
+        Icon::RotateRight.solid_shapes().len(),
+        Icon::RotateLeft.solid_shapes().len()
+    );
+    assert_ne!(
+        Icon::RotateRight.solid_shapes(),
+        Icon::RotateLeft.solid_shapes()
+    );
+}
+
+/// `Music` is Lucide's `music` and has a solid form of five shapes.
+#[test]
+fn music_has_both_styles() {
+    assert_eq!(Icon::Music.shapes().len(), 3);
+    assert_eq!(Icon::Music.solid_shapes().len(), 5);
 }
 
 /// The control center's own `Switches`: two 20 x 8 pill tracks 4 px apart

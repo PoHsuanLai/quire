@@ -1,6 +1,7 @@
 //! One Space's dot in the sidebar foot, the switch between Spaces (design/04-COMPONENTS.md
 //! section 32, `S:147-150`).
 
+use crate::components::content::title_tip::use_tip;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::{Check, Selection, Shortcut};
@@ -26,6 +27,7 @@ pub fn SpaceDot(
     let paint = DotPaint::gradient(&frame.stops);
     let class = common.class("ds-space-dot");
     let data = common.data_attributes();
+    let tip = use_tip(Some(format!("{name} ({keys})")));
     rsx! {
         button {
             r#type: "button",
@@ -33,13 +35,32 @@ pub fn SpaceDot(
             id: common.id.clone(),
             "aria-pressed": pressed.aria(),
             "aria-label": common.aria_label.clone().unwrap_or_else(|| format!("{name} Space")),
-            title: "{name} ({keys})",
+            title: tip.native(),
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| tip.out()
+            },
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
             "data-stops": paint.count(),
             "data-selected": selection.slug(),
             style: paint.style_attr(),
             onclick: move |_| onclick.call(()),
-            onmounted: move |event| common.mounted(event),
+            onmounted: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.mounted(&event);
+                    common.mounted(event);
+                }
+            },
             ..data,
         }
+        {tip.surface()}
     }
 }

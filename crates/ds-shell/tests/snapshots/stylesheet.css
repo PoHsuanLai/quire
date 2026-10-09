@@ -735,11 +735,12 @@ html,body{margin:0;padding:0;background:transparent}
   background:var(--scrim); pointer-events:auto; animation:fade var(--t-quick) var(--e-out); }
 .ds-palette{ width:min(540px, 88%); background:var(--raise); color:var(--ink); border:var(--hair) solid var(--line);
   border-radius:var(--r-panel); box-shadow:var(--shadow-sheet); overflow:hidden;
+  display:flex; flex-direction:column; max-height:calc(100vh - 11vw - var(--s-8));
   animation:peek-in var(--t-move) var(--e-out); }
 .ds-palette[*|data-host=surface]{ width:100%; height:auto; max-height:100%; box-sizing:border-box; display:flex; flex-direction:column;
   background:var(--m-tint-solid); border-color:transparent; box-shadow:var(--m-box); }
 .ds[*|data-blur=on] .ds-palette[*|data-host=surface]{ background:var(--m-tint); }
-.ds-palette-list{ padding:var(--shell-menu-inset); overflow-y:auto; scrollbar-width:none; max-height:360px; outline:none; }
+.ds-palette-list{ flex:0 1 auto; min-height:0; padding:var(--shell-menu-inset); overflow-y:auto; scrollbar-width:none; max-height:360px; outline:none; }
 .ds-palette-empty{ padding:var(--s-10); font-size:var(--fs-meta); color:var(--ink-faint); }
 .ds-palette[*|data-host=surface] > .ds-palette-list{ flex:0 1 auto; min-height:0; max-height:none; }
 
@@ -778,6 +779,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-palette-list > *{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-palette-list > [*|data-row-motion=in]{ animation:row-in var(--t-move) var(--e-out) backwards; }
 .ds-palette-list > [*|data-row-motion=heal-from] ~ *{ animation:heal var(--t-move) var(--e-in-out) backwards; }
+
+/* The card never stands taller than the window below its top gap (the wrap's `padding-top` is a
+   share of the width, so `11vw`) less an 8 px margin; the list scrolls inside what is left. */
 /* -- command_pill -- */
 /* CommandPill (design/04-COMPONENTS.md section 8): `S:92-100`. The inset highlight is
    `--shadow-pill-inset` (O-3); the label truncates with `.ds-truncate` (no ellipsis on Blitz).
@@ -1298,7 +1302,7 @@ html,body{margin:0;padding:0;background:transparent}
    once; one closed by Escape, an outside click or a pick fades out before it goes (`menu-out`,
    `--t-quick --e-exit`), taking no pointer while it does. */
 
-.ds-menu{ width:auto; min-width:186px; max-height:320px; overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; }
+.ds-menu{ width:auto; min-width:186px; max-height:min(320px, calc(100vh - 2 * var(--s-8))); overflow-y:auto; scrollbar-width:none; padding:var(--shell-menu-inset); outline:none; }
 .ds[*|data-modality=keyboard] .ds-menu:focus{ outline:none; }
 .ds-popover.ds-menu{ border-radius:var(--r-shell-menu); box-shadow:var(--shadow-pop); }
 .ds-popover.ds-menu[*|data-presence=leaving]{ animation:menu-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
@@ -1306,6 +1310,9 @@ html,body{margin:0;padding:0;background:transparent}
 /* Drawn inline in its caller's card (`flow: Flow::Inline`): the same rows, with no surface (no
    `.ds-popover`) and no padding of its own; the card's box sizes it. */
 .ds-menu[*|data-flow=inline]{ width:auto; min-width:0; max-height:none; overflow:visible; padding:0; }
+
+/* A menu never stands taller than the window less its 8 px margins; past that it scrolls inside,
+   as an `NSMenu` does. */
 
 /* A submenu (design/13 section 13.3.4) is a menu beside its parent row. */
 
@@ -2875,6 +2882,9 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-titlebar-name{ min-width:0; overflow:hidden; }
 .ds-titlebar-subtitle{ min-width:0; overflow:hidden; font-weight:400; font-size:var(--fs-help); color:var(--f-ink-faint); }
+.ds-titlebar-ruler{ position:absolute; visibility:hidden; display:flex; gap:var(--s-6); white-space:nowrap; pointer-events:none; }
+.ds-ruler-name{ flex:none; }
+.ds-ruler-subtitle{ font-weight:400; font-size:var(--fs-help); }
 .ds-titlebar-proxy{ display:inline-flex; flex:none; line-height:0; color:var(--f-ink-soft); }
 .ds-titlebar[*|data-activity=inactive] .ds-titlebar-proxy{ opacity:.5; }
 /* The edited dot: the document has changes not saved. */
@@ -2918,7 +2928,13 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- companion_orb -- */
 /* The companion orb (design/32 section 3): the voice orb in the companion's presence. Placeholder
    root until its fill; the look follows `data-presence`, `data-size` and `data-tone`. */
-.ds-companion-orb { display:block; flex:none; }
+.ds-companion-orb { position:relative; display:block; flex:none; }
+/* -- outcome_mark -- */
+/* The unseen-outcome mark (design/32 section 3): a still dot, `--ok` for done and `--danger` for
+   failed. It sits on the corner of the thing it marks and never moves. */
+.ds-outcome-mark{ position:absolute; top:0; right:0; width:var(--s-6); height:var(--s-6); border-radius:var(--r-pill); box-shadow:0 0 0 var(--hair) var(--raise); }
+.ds-outcome-mark[*|data-outcome=done]{ background:var(--ok); }
+.ds-outcome-mark[*|data-outcome=failed]{ background:var(--danger); }
 /* -- context_chips -- */
 /* The context chips (design/32 section 4). Placeholder root until its fill. */
 .ds-context-chips { display:flex; flex-wrap:wrap; }
@@ -2941,7 +2957,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-replace-bar { display:block; }
 /* -- run_row -- */
 /* The run row (design/32 section 5). Placeholder root until its fill. */
-.ds-run-row { display:block; }
+.ds-run-row { position:relative; display:block; }
 /* -- activity_strip -- */
 /* The activity strip (design/32 section 5). Placeholder root until its fill. */
 .ds-activity-strip { display:block; }

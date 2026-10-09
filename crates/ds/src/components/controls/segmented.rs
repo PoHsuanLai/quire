@@ -16,6 +16,7 @@
 
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::text;
+use crate::components::content::title_tip::use_tip;
 use crate::components::controls::choice::Choice;
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{ActivationKeys, activates, disabled, use_pressing};
@@ -190,6 +191,8 @@ fn Segment<T: Clone + PartialEq + 'static>(
     onpick: EventHandler<Touch>,
 ) -> Element {
     let pressing = use_pressing();
+    let image_only = choice.label.plain_text().is_empty();
+    let tip = use_tip(choice.name.clone().filter(|_| image_only));
     let live = enabled == Availability::Enabled && group == Availability::Enabled;
     let checked = match selected {
         Selection::Selected => Check::On,
@@ -215,6 +218,19 @@ fn Segment<T: Clone + PartialEq + 'static>(
             },
             // An image-only segment says nothing in words, so its name is read from here.
             "aria-label": choice.name.clone(),
+            title: tip.native(),
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmounted: {
+                let tip = tip.clone();
+                move |event| tip.mounted(&event)
+            },
             "data-selected": selected.slug(),
             "data-thumb": under,
             "data-availability": enabled.slug(),
@@ -222,7 +238,13 @@ fn Segment<T: Clone + PartialEq + 'static>(
             "aria-disabled": enabled.aria_disabled(),
             disabled: disabled(if group == Availability::Enabled { enabled } else { group }),
             onmousedown: move |event| pressing.pointer_down(&event),
-            onmouseleave: move |_| pressing.released(),
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| {
+                    tip.out();
+                    pressing.released();
+                }
+            },
             onmouseup: move |_| pressing.released(),
             onblur: move |_| pressing.released(),
             onkeyup: move |_| pressing.released(),
@@ -247,6 +269,7 @@ fn Segment<T: Clone + PartialEq + 'static>(
             }
             span { class: "ds-segmented-label", {text(&choice.label)} }
         }
+        {tip.surface()}
     }
 }
 

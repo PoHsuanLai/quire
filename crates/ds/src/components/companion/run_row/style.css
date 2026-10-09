@@ -1,2 +1,2 @@
 /* The run row (design/32 section 5). Placeholder root until its fill. */
-.ds-run-row { display:block; }
+.ds-run-row { position:relative; display:block; }

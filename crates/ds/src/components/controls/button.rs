@@ -7,13 +7,13 @@
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
 use crate::components::content::text_runs::{TextLine, text};
+use crate::components::content::title_tip::use_tip;
 use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
 use crate::components::controls::button_marks::{Leading, Trailing, spoken_label};
 use crate::components::controls::button_model::{
     Answers, Bezel, BusyLook, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
 };
-use crate::components::controls::button_tip::use_tip;
 use crate::components::controls::glyph::glyph_size;
 use crate::components::controls::press::{
     ActivationKeys, PressListeners, Propagation, disabled, use_pressing,
@@ -55,7 +55,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// `value` makes it a toggle button: `Check::On` draws it pressed in (`aria-pressed`). `shown`
 /// says whether the menu or panel this button opens is up (`aria-expanded`); leave it `None` on a
 /// button that opens nothing. `title` is the hover hint: a Mac tooltip through the hover hub
-/// (`button_tip`), drawn below the button from the button's own pointer events, with no wrapper; inside a `Tooltip` it draws nothing (the
+/// (`title_tip`), drawn below the button from the button's own pointer events, with no wrapper; inside a `Tooltip` it draws nothing (the
 /// caller's tip stands), and outside a `Ds` it is the plain `title` attribute.
 ///
 /// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an

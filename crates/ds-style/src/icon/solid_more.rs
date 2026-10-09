@@ -21,8 +21,10 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::SkipBack => SKIP_BACK,
         Icon::SkipForward => SKIP_FORWARD,
         Icon::LogOut => LOG_OUT,
-        Icon::Restart => RESTART,
+        Icon::Restart | Icon::RotateLeft => RESTART,
+        Icon::RotateRight => ROTATE_RIGHT,
         Icon::Headphones => HEADPHONES,
+        Icon::Music => MUSIC,
         Icon::Speaker => SPEAKER,
         Icon::Mouse => MOUSE,
         Icon::Gamepad => GAMEPAD,
@@ -134,6 +136,23 @@ const LOG_OUT: &[Shape] = &[Shape::Solid(
 const RESTART: &[Shape] = &[Shape::Solid(
     "M21 12 a9 9 0 0 1 -8.879 9 H12 A8.942 8.942 0 0 1 5.822 18.544 a0.75 0.75 0 0 1 1.031 -1.09 A7.5 7.5 0 1 0 6.697 6.693 a0.288 0.288 0 0 1 -0.024 0.023 L5.684 7.621 l1.594 1.594 A0.75 0.75 0 0 1 6.75 10.5 H2.25 a0.75 0.75 0 0 1 -0.75 -0.75 V5.25 A0.75 0.75 0 0 1 2.781 4.716 L4.623 6.562 L5.648 5.625 A9 9 0 0 1 21 12 Z",
 )];
+
+/// Hand-made from Phosphor `arrow-counter-clockwise-fill` (MIT): `RESTART` mirrored on the 24
+/// grid (every x is 24 - x, each arc's sweep flipped), the pair of `RESTART` for a picture's
+/// rotate buttons.
+const ROTATE_RIGHT: &[Shape] = &[Shape::Solid(
+    "M 3 12 a 9 9 0 0 0 8.879 9 H 12 A 8.942 8.942 0 0 0 18.178 18.544 a 0.75 0.75 0 0 0 -1.031 -1.09 A 7.5 7.5 0 1 1 17.303 6.693 a 0.288 0.288 0 0 0 0.024 0.023 L 18.316 7.621 l -1.594 1.594 A 0.75 0.75 0 0 0 17.25 10.5 H 21.75 a 0.75 0.75 0 0 0 0.75 -0.75 V 5.25 A 0.75 0.75 0 0 0 21.219 4.716 L 19.377 6.562 L 18.352 5.625 A 9 9 0 0 0 3 12 Z",
+)];
+
+/// Hand-made from Lucide `music` (ISC) on the 24 grid: two note heads, two stems and a beam, each
+/// its own shape so overlaps never cancel under the non-zero rule.
+const MUSIC: &[Shape] = &[
+    Shape::Solid("M 2.5 18 a 3.5 3.5 0 1 0 7 0 a 3.5 3.5 0 1 0 -7 0 Z"),
+    Shape::Solid("M 14.5 16 a 3.5 3.5 0 1 0 7 0 a 3.5 3.5 0 1 0 -7 0 Z"),
+    Shape::Solid("M 8 5 h 2 v 13 h -2 Z"),
+    Shape::Solid("M 20 3 h 2 v 13 h -2 Z"),
+    Shape::Solid("M 8 5 L 22 2 V 6 L 8 9 Z"),
+];
 
 /// Tabler Icons 3.48.0 `filled/headphones` (MIT), verbatim.
 const HEADPHONES: &[Shape] = &[Shape::Solid(

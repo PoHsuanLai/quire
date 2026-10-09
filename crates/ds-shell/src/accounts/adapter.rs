@@ -12,7 +12,9 @@ use dioxus::prelude::*;
 use ds::components::content::avatar::AvatarSize;
 use ds::components::content::icon_source::{ExternalIcon, IconSource};
 use ds::components::content::icon_view::IconView;
+use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::content::text_runs::TextLine;
 use ds::components::controls::button::Button;
 use ds::components::controls::button_model::{Answers, ButtonFocus, ButtonRole};
 use ds::components::fields::text_field::TextField;
@@ -71,6 +73,7 @@ pub(crate) fn Entry(
     #[props(default)] look: EntryLook,
     #[props(default)] landing: Landing,
     #[props(default)] rejection: Option<Rejection>,
+    #[props(default)] help: Option<String>,
     #[props(default)] availability: Availability,
     oninput: EventHandler<FieldText>,
     #[props(default)] onkey: EventHandler<KeyboardEvent>,
@@ -107,6 +110,7 @@ pub(crate) fn Entry(
             kind,
             text: held,
             validity,
+            help: help.map(TextLine::Plain),
             availability,
             focus,
             onkey,
@@ -145,6 +149,8 @@ pub(crate) struct PickRow<K> {
     pub(crate) mark: MarkProvider,
     /// Its letter or its favicon.
     pub(crate) style: MarkStyle,
+    /// Its letter and colour as data, drawn instead of the provider's own letter.
+    pub(crate) face: Option<MarkFace>,
 }
 
 /// A list of rows with a mark, one of them under the cursor the host owns: the arrow keys call
@@ -173,7 +179,7 @@ pub(crate) fn PickRows<K: Clone + PartialEq + Hash + 'static>(
                 rsx! {
                     Row {
                         title,
-                        leading: mark_leading(row.mark, &row.style),
+                        leading: mark_leading(row.mark, &row.style, row.face.as_ref()),
                         size: RowSize::Settings,
                         state: ds_core::vocab::RowState { selection, ..Default::default() },
                         onclick: move |_| onpick.call(key.clone()),
@@ -294,11 +300,20 @@ fn favicon(provider: MarkProvider, style: &MarkStyle, px: u8) -> Option<IconSour
     }
 }
 
-/// What leads a row of providers: the favicon when `style` holds one, else the letter's disc.
-pub(crate) fn mark_leading(provider: MarkProvider, style: &MarkStyle) -> RowLeading {
+/// What leads a row of providers: the favicon when `style` holds one, else the data `face`'s
+/// disc, else the provider's own letter's.
+pub(crate) fn mark_leading(
+    provider: MarkProvider,
+    style: &MarkStyle,
+    face: Option<&MarkFace>,
+) -> RowLeading {
+    let lettered = || {
+        face.and_then(|face| face.avatar(AvatarSize::Size28))
+            .unwrap_or_else(|| provider.avatar(AvatarSize::Size28))
+    };
     match favicon(provider, style, 28) {
         Some(source) => RowLeading::Source(source),
-        None => RowLeading::Avatar(provider.avatar(AvatarSize::Size28)),
+        None => RowLeading::Avatar(lettered()),
     }
 }
 

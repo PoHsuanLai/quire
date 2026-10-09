@@ -5,6 +5,7 @@ pub(crate) mod accessory;
 pub(crate) mod action;
 pub mod chord;
 pub mod confirm;
+pub(crate) mod disclosure_button;
 pub(crate) mod leading;
 pub(crate) mod marks;
 pub mod motion;

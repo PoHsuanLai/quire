@@ -10,6 +10,7 @@ use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::components::content::image_source::ImageSource;
+use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
 use ds_lint::{LintConfig, markup};
@@ -279,6 +280,32 @@ fn favicon_list() -> Element {
     }
 }
 
+const HELP: &str = "Make one under Security, then App passwords.";
+
+fn faced_list() -> Element {
+    rsx! {
+        ProviderList {
+            providers: vec![
+                provider("nextcloud", "Nextcloud", MarkProvider::Imap)
+                    .faced(MarkFace::new("Nx", "#0082C9")),
+                provider("fastmail", "Fastmail", MarkProvider::Fastmail),
+            ],
+            query: String::new(),
+            on_query: |_| {},
+            on_cursor: |_| {},
+            on_pick: |_| {},
+            on_cancel: |_| {},
+        }
+    }
+}
+
+fn helped_sign_in() -> Element {
+    sign_in(
+        vec![address("ada@example.org"), password("").helped(HELP)],
+        None,
+    )
+}
+
 fn favicon_sign_in() -> Element {
     rsx! {
         SignInForm {
@@ -319,6 +346,18 @@ const SPECIMENS: &[Specimen] = &[
     ("providers", || provider_list("", None)),
     ("providers-favicon", favicon_list),
     ("sign-in-favicon", favicon_sign_in),
+    ("providers-faced", faced_list),
+    ("sign-in-help", helped_sign_in),
+    ("sign-in-help-refused", || {
+        sign_in(
+            vec![address("ada@example.org"), password(PASSWORD).helped(HELP)],
+            Some(FieldProblem {
+                role: FieldRole::Password,
+                kind: ProblemKind::Refused,
+                attempt: Attempt(1),
+            }),
+        )
+    }),
     ("providers-search", || provider_list("mail", None)),
     ("providers-cursor", || {
         provider_list(
@@ -731,6 +770,40 @@ fn an_image_provider_entry_leads_its_row_and_the_sign_in_header_with_the_favicon
     assert!(header.contains(FAVICON));
     assert!(header.contains(r#"class="ds-acc-disc""#));
     assert!(!light("sign-in-ready").contains(FAVICON));
+}
+
+#[test]
+fn a_provider_entry_with_a_face_leads_its_row_with_the_face() {
+    let faced = light("providers-faced").to_lowercase();
+    let plain = light("providers").to_lowercase();
+    assert!(
+        faced.contains("0082c9"),
+        "the face's colour leads its row: {faced}"
+    );
+    assert!(
+        !plain.contains("0082c9"),
+        "without a face the colour is not there"
+    );
+    assert_eq!(
+        provider("x", "X", MarkProvider::Google)
+            .faced(MarkFace::new("X", "#112233"))
+            .face,
+        Some(MarkFace::new("X", "#112233"))
+    );
+}
+
+#[test]
+fn a_field_help_line_shows_under_its_entry_and_a_refusal_takes_its_place() {
+    let helped = light("sign-in-help");
+    assert!(helped.contains(HELP), "{helped}");
+    assert!(helped.contains("ds-text-field-help"), "{helped}");
+    assert!(!light("sign-in-ready").contains(HELP));
+    let refused = light("sign-in-help-refused");
+    assert!(
+        !refused.contains(HELP),
+        "the refusal replaces the help: {refused}"
+    );
+    assert!(refused.contains("ds-text-field-help"));
 }
 
 #[test]

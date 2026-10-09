@@ -1,0 +1,5 @@
+/* The unseen-outcome mark (design/32 section 3): a still dot, `--ok` for done and `--danger` for
+   failed. It sits on the corner of the thing it marks and never moves. */
+.ds-outcome-mark{ position:absolute; top:0; right:0; width:var(--s-6); height:var(--s-6); border-radius:var(--r-pill); box-shadow:0 0 0 var(--hair) var(--raise); }
+.ds-outcome-mark[*|data-outcome=done]{ background:var(--ok); }
+.ds-outcome-mark[*|data-outcome=failed]{ background:var(--danger); }

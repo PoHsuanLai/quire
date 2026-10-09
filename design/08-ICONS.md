@@ -187,7 +187,10 @@ no solid glyph carries a stroke attribute.
 | `SkipForward` | hand-made from Lucide `skip-forward` (its stroke's outer edge, rounder than Tabler) |
 | `LogOut` | Phosphor Fill `sign-out` |
 | `Restart` | Phosphor Fill `arrow-counter-clockwise` |
+| `RotateLeft` | the same glyph as `Restart` (Lucide `rotate-ccw` outline), named for turning a picture left |
+| `RotateRight` | `Restart` mirrored: Lucide `rotate-cw` outline, hand-mirrored Phosphor Fill solid |
 | `Headphones` | Tabler filled `headphones` |
+| `Music` | hand-made from Lucide `music` (five filled shapes: two heads, two stems, a beam) |
 | `Speaker` | Tabler filled `device-speaker` |
 | `Mouse` | Tabler filled `mouse` |
 | `Gamepad` | Tabler filled `device-gamepad` |

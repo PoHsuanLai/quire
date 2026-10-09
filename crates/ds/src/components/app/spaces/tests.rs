@@ -1,4 +1,5 @@
 use super::chord::SwitchChord;
+use super::menu_link::{DesktopSpace, LinkChange, Linking};
 use super::menu_pick::{SpacePick, Then, apply, delete_words, rows};
 use super::open_menu::Showing;
 use crate::components::menus::item::item::MenuItem;
@@ -69,7 +70,7 @@ fn titles(items: &[MenuItem<SpacePick<u8>>]) -> Vec<String> {
 fn the_menu_lists_the_rows_in_the_agreed_order_and_delete_only_beside_another_space() {
     let slot = vec![MenuItem::new(7u8, "Mine")];
     let look = SpaceLook::default();
-    let many = titles(&rows(&look, 2, slot.clone()));
+    let many = titles(&rows(&look, 2, slot.clone(), Linking::Off));
     assert_eq!(
         many,
         [
@@ -83,7 +84,7 @@ fn the_menu_lists_the_rows_in_the_agreed_order_and_delete_only_beside_another_sp
             "Delete Space\u{2026}"
         ]
     );
-    let one = titles(&rows(&look, 1, slot));
+    let one = titles(&rows(&look, 1, slot, Linking::Off));
     assert_eq!(one.last().map(String::as_str), Some("New Space"));
     assert!(!one.iter().any(|title| title.starts_with("Delete")));
 }
@@ -96,7 +97,7 @@ fn the_app_slot_keeps_its_own_values() {
         availability: ds_core::vocab::Availability::Enabled,
         children: vec![MenuItem::new(3u8, "Ada")],
     }];
-    let items = rows(&SpaceLook::default(), 2, slot);
+    let items = rows(&SpaceLook::default(), 2, slot, Linking::Off);
     let MenuItem::Submenu { children, .. } = &items[4] else {
         panic!("the slot is the fifth row");
     };
@@ -146,5 +147,112 @@ fn the_delete_question_names_the_space_and_what_is_kept() {
         let (said, body) = delete_words(name, "Your mail");
         assert_eq!(said, title);
         assert!(body.starts_with("Your mail is not affected"), "{body}");
+    }
+}
+
+fn desktop() -> Vec<DesktopSpace> {
+    vec![
+        DesktopSpace {
+            id: "work".into(),
+            name: "Work".into(),
+        },
+        DesktopSpace {
+            id: "home".into(),
+            name: "Home".into(),
+        },
+    ]
+}
+
+#[test]
+fn link_rows_list_the_desktop_spaces_and_unlink_shows_only_while_linked() {
+    let desktop = desktop();
+    let unlinked = rows::<u8>(
+        &SpaceLook::default(),
+        2,
+        Vec::new(),
+        Linking::Offered {
+            current: None,
+            desktop: &desktop,
+        },
+    );
+    assert_eq!(
+        titles(&unlinked),
+        [
+            "Rename\u{2026}",
+            "Colour\u{2026}",
+            "Appearance",
+            "Accent Inside the Card",
+            "Link to\u{2026}",
+            "-",
+            "New Space",
+            "Delete Space\u{2026}"
+        ]
+    );
+    let MenuItem::Submenu { children, .. } = &unlinked[4] else {
+        panic!("Link to... is a submenu");
+    };
+    assert_eq!(
+        titles(children),
+        ["Work", "Home", "-", "New Desktop Space\u{2026}"]
+    );
+    let linked = rows::<u8>(
+        &SpaceLook::default(),
+        2,
+        Vec::new(),
+        Linking::Offered {
+            current: Some("home"),
+            desktop: &desktop,
+        },
+    );
+    assert_eq!(titles(&linked)[5], "Unlink");
+    let MenuItem::Submenu { children, .. } = &linked[4] else {
+        panic!("Link to... is a submenu");
+    };
+    let checks: Vec<ds_core::vocab::Check> = children
+        .iter()
+        .filter_map(|item| match item {
+            MenuItem::Item { check, .. } => Some(check.unwrap_or(ds_core::vocab::Check::Off)),
+            _ => None,
+        })
+        .collect();
+    use ds_core::vocab::Check::{Off, On};
+    assert_eq!(
+        checks,
+        [Off, On, Off],
+        "the linked Space is the one checked"
+    );
+}
+
+#[test]
+fn a_menu_with_no_desktop_has_no_link_rows() {
+    let off = titles(&rows::<u8>(
+        &SpaceLook::default(),
+        2,
+        Vec::new(),
+        Linking::Off,
+    ));
+    assert!(
+        !off.iter()
+            .any(|title| title.contains("Link") || title == "Unlink"),
+        "{off:?}"
+    );
+}
+
+#[test]
+fn link_picks_become_link_changes() {
+    let look = SpaceLook::default();
+    let table: [(SpacePick<u8>, Then<u8>); 3] = [
+        (
+            SpacePick::Link("work".into()),
+            Then::Link(LinkChange::Linked("work".into())),
+        ),
+        (SpacePick::Unlink, Then::Link(LinkChange::Unlinked)),
+        (
+            SpacePick::NewDesktopSpace,
+            Then::Link(LinkChange::NewDesktopSpace),
+        ),
+    ];
+    for (pick, want) in table {
+        assert_eq!(apply(pick.clone(), &look), want, "{pick:?}");
     }
 }

@@ -2,8 +2,9 @@
 //! (`#RRGGBB`), as a host that ships its providers as data supplies it. Quire never names the
 //! host; it validates the pair and picks the letter's ink itself.
 
+use crate::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, AvatarTone};
 use ds_core::colour::contrast::ratio;
-use ds_style::tokens::hex::Hex;
+use ds_style::tokens::hex::{Colour, Hex};
 
 /// The neutral colour a face falls back to when its own is not `#RRGGBB`: the IMAP grey.
 pub(crate) const NEUTRAL: &str = "#5D6660";
@@ -68,6 +69,20 @@ impl MarkFace {
         } else {
             DARK_INK
         }
+    }
+
+    /// The face as a round avatar of `size`, for a row that leads with an avatar: the letter's
+    /// first character on the face's colour. `None` when the letter is blank; a bad colour
+    /// draws the neutral mark's, as [`MarkFace::drawn`] does.
+    pub fn avatar(&self, size: AvatarSize) -> Option<AvatarFace> {
+        let drawn = self.drawn()?;
+        let colour = Hex::parse(&drawn.colour)?;
+        Some(AvatarFace {
+            initial: drawn.letter.chars().next()?,
+            size,
+            tone: AvatarTone::Account(Colour::Solid(colour)),
+            shape: AvatarShape::Round,
+        })
     }
 
     /// What to draw: `None` when the letter is blank (the named variant stands in); a bad

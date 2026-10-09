@@ -129,6 +129,13 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
         id
     }
 
+    /// Link `id` to the desktop Space `link` (its id as the desktop names it), or unlink it, and
+    /// write the list. The app calls this with `None` when the desktop Space is gone.
+    pub fn set_link(&self, id: SpaceId, link: Option<String>) {
+        self.spaces.write_unchecked().set_link(id, link);
+        self.commit();
+    }
+
     /// Change `id` as it is edited: the frame follows, nothing is written until [`Self::commit`].
     pub fn change(&self, id: SpaceId, edit: impl FnOnce(&mut ds_style::space::list::Space<P>)) {
         self.spaces.write_unchecked().edit(id, edit);

@@ -16,8 +16,10 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::SkipBack => SKIP_BACK,
         Icon::SkipForward => SKIP_FORWARD,
         Icon::LogOut => LOG_OUT,
-        Icon::Restart => RESTART,
+        Icon::Restart | Icon::RotateLeft => RESTART,
+        Icon::RotateRight => ROTATE_RIGHT,
         Icon::Headphones => HEADPHONES,
+        Icon::Music => MUSIC,
         Icon::Speaker => SPEAKER,
         Icon::Mouse => MOUSE,
         Icon::Gamepad => GAMEPAD,
@@ -76,6 +78,19 @@ const LOG_OUT: &[Shape] = &[
 const RESTART: &[Shape] = &[
     Shape::Path("M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"),
     Shape::Path("M3 3v5h5"),
+];
+
+/// Lucide `rotate-cw`: `RESTART` mirrored, the pair of a picture's rotate buttons.
+const ROTATE_RIGHT: &[Shape] = &[
+    Shape::Path("M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"),
+    Shape::Path("M21 3v5h-5"),
+];
+
+/// Lucide `music`.
+const MUSIC: &[Shape] = &[
+    Shape::Path("M9 18V5l12-2v13"),
+    Shape::Path("M3 18a3 3 0 1 0 6 0 3 3 0 1 0-6 0"),
+    Shape::Path("M15 16a3 3 0 1 0 6 0 3 3 0 1 0-6 0"),
 ];
 
 /// Lucide `headphones`.

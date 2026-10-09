@@ -1,6 +1,7 @@
 //! RowMore: the one quiet "More actions" button a row carries in its tail: an icon-only
 //! button with no pill, border or shadow that opens the row's menu (design/34-MODERN-LOOK.md).
 
+use crate::components::content::title_tip::use_tip;
 use crate::focus::click::kept_click;
 use crate::host::measure::client_rect;
 use dioxus::prelude::*;
@@ -38,15 +39,35 @@ pub fn RowMore(
     onclick: EventHandler<Rect>,
 ) -> Element {
     let mut element = use_signal(|| None::<Rc<MountedData>>);
+    let tip = use_tip(Some(label.clone()));
     rsx! {
         button {
             r#type: "button",
             class: "ds-row-more",
             "data-shown": shown.map(Shown::slug),
+            title: tip.native(),
             "aria-label": "{label}",
+            onpointerdown: {
+                let tip = tip.clone();
+                move |_| tip.press()
+            },
+            onmouseover: {
+                let tip = tip.clone();
+                move |event| tip.over(&event)
+            },
+            onmouseleave: {
+                let tip = tip.clone();
+                move |_| tip.out()
+            },
             "aria-haspopup": "menu",
             "aria-expanded": expanded.aria(),
-            onmounted: move |event| element.set(Some(event.data())),
+            onmounted: {
+                let tip = tip.clone();
+                move |event| {
+                    tip.mounted(&event);
+                    element.set(Some(event.data()));
+                }
+            },
             onclick: move |event| {
                 // The button acts on its own; the row must not also open.
                 event.stop_propagation();
@@ -62,5 +83,6 @@ pub fn RowMore(
             },
             Glyph { icon, size: IconSize::Compact }
         }
+        {tip.surface()}
     }
 }

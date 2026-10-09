@@ -6,6 +6,7 @@ pub mod dot_paint;
 pub mod frame_vars;
 pub mod list;
 pub mod look;
+pub mod look_json;
 pub mod palette;
 pub mod presets;
 pub mod store;

@@ -1,8 +1,8 @@
 //! The port `Ds` lends every control so its `title` shows as a tooltip (design/30 section 2.5):
 //! the hub's pointer verbs and the tooltip's surface, which sit above `controls` and so are
-//! handed down as context (see `controls::button_tip`).
+//! handed down as context (see `content::title_tip`).
 
-use crate::components::controls::button_tip::TipPort;
+use crate::components::content::title_tip::TipPort;
 use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_intent};
 use crate::components::overlays::tooltip::Tooltip;
 use crate::stack::hover_hub::HoverKey;

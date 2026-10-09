@@ -1,5 +1,6 @@
 //! The Space's menu as data: what it lists, and what a pick does. Pure.
 
+use super::menu_link::{LinkChange, Linking, link_rows};
 use super::open_menu::Showing;
 use crate::components::menus::item::item::MenuItem;
 use ds_core::vocab::{Availability, Check};
@@ -22,6 +23,12 @@ pub enum SpacePick<A> {
     New,
     /// Delete Space...: a question at the pointer.
     Delete,
+    /// Link to... one desktop Space, by its id.
+    Link(String),
+    /// Link to... New Desktop Space...: the app makes one.
+    NewDesktopSpace,
+    /// Unlink: follow no desktop Space.
+    Unlink,
     /// A pick from the app's own submenu.
     App(A),
 }
@@ -35,6 +42,8 @@ pub enum Then<A> {
     Kept(SpaceLook),
     /// Make a new Space, switch to it and open its name.
     NewSpace,
+    /// A link row: store it, and tell the app.
+    Link(LinkChange),
     /// The app's own row.
     App(A),
 }
@@ -61,11 +70,12 @@ fn checked(on: bool) -> Check {
 
 /// The menu for a Space looking like `look`, one of `count`: Rename, Colour, Appearance, Accent
 /// Inside the Card, the app's `extra` rows (usually one submenu whose picks keep the menu open),
-/// a rule, New Space, and Delete only while there is another Space to show.
+/// the `linking` rows, a rule, New Space, and Delete only while there is another Space to show.
 pub fn rows<A: Clone>(
     look: &SpaceLook,
     count: usize,
     extra: Vec<MenuItem<A>>,
+    linking: Linking<'_>,
 ) -> Vec<MenuItem<SpacePick<A>>> {
     let themes = Theme::ALL
         .iter()
@@ -88,6 +98,7 @@ pub fn rows<A: Clone>(
         submenu("Accent Inside the Card", accents),
     ];
     out.extend(extra.into_iter().map(|item| item.map(&SpacePick::App)));
+    out.extend(link_rows(linking));
     out.push(MenuItem::Separator);
     out.push(MenuItem::new(SpacePick::New, "New Space"));
     if count > 1 {
@@ -111,6 +122,9 @@ pub fn apply<A>(pick: SpacePick<A>, look: &SpaceLook) -> Then<A> {
             card_accent,
             ..look.clone()
         }),
+        SpacePick::Link(id) => Then::Link(LinkChange::Linked(id)),
+        SpacePick::NewDesktopSpace => Then::Link(LinkChange::NewDesktopSpace),
+        SpacePick::Unlink => Then::Link(LinkChange::Unlinked),
         SpacePick::App(app) => Then::App(app),
     }
 }

@@ -3,7 +3,7 @@
 //! action and a hover-strip slot.
 
 use crate::components::app::thread_row_hooks::{PartHooks, use_back};
-use crate::components::app::thread_row_star::star_button;
+use crate::components::app::thread_row_star::StarButton;
 use crate::components::content::text_runs::{TextLine, text};
 use crate::components::lists::row::row::{Row, relay};
 use crate::components::lists::row::size::RowSize;
@@ -129,7 +129,7 @@ pub fn ThreadRow(
                 }
             }
             if let Some((state, onchange)) = star {
-                {star_button(state, onchange)}
+                StarButton { state, onchange }
             }
             if let Some(strip) = strip {
                 {strip}

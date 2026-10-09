@@ -11,6 +11,7 @@ pub(crate) mod controller;
 pub(crate) mod delete;
 pub(crate) mod foot;
 pub(crate) mod head;
+pub(crate) mod menu_link;
 pub(crate) mod menu_pick;
 pub(crate) mod menu_view;
 pub(crate) mod open_menu;
@@ -27,6 +28,7 @@ pub use ds_style::space::list::{
 };
 pub use foot::SpacesFoot;
 pub use head::SpaceHead;
+pub use menu_link::{DesktopSpace, LinkChange, Linking};
 pub use menu_pick::SpacePick;
 pub use menu_view::SpaceMenu;
 pub use open_menu::{OpenMenu, Showing};

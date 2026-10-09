@@ -33,12 +33,14 @@ pub fn ProviderList(
             title: entry.label.clone(),
             mark: entry.mark,
             style: entry.style.clone(),
+            face: entry.face.clone(),
         })
         .chain([PickRow {
             key: ProviderPick::Other,
             title: "Other\u{2026}".to_owned(),
             mark: MarkProvider::Imap,
             style: MarkStyle::Letter,
+            face: None,
         }])
         .collect();
     let keys: Vec<ProviderPick> = rows.iter().map(|row| row.key.clone()).collect();

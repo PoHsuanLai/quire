@@ -171,6 +171,37 @@ fn a_stored_file_round_trips() {
 }
 
 #[test]
+fn a_link_is_stored_and_a_file_without_one_reads_as_unlinked() {
+    let mut spaces = set(2);
+    spaces.set_link(SpaceId(1), Some("desk-7".to_owned()));
+    let json = serde_json::to_string(&spaces).expect("serialises");
+    assert!(json.contains(r#""link":"desk-7""#), "{json}");
+    assert_eq!(
+        json.matches("\"link\"").count(),
+        1,
+        "an unlinked Space writes no key"
+    );
+    assert_eq!(read(&json), Some(spaces.clone()));
+    let before = r#"{"spaces":[{"id":0,"name":"A","folder":"x"},{"id":1,"name":"B","link":4},{"id":2,"name":"C","link":""}]}"#;
+    let links: Vec<Option<String>> = read(before)
+        .expect("reads")
+        .list()
+        .iter()
+        .map(|space| space.link.clone())
+        .collect();
+    assert_eq!(
+        links,
+        [None, None, None],
+        "missing, not a string, and empty all mean no link"
+    );
+    spaces.set_link(SpaceId(1), None);
+    assert_eq!(
+        spaces.get(SpaceId(1)).map(|space| space.link.clone()),
+        Some(None)
+    );
+}
+
+#[test]
 fn an_old_or_damaged_file_is_read_leniently() {
     // mailo's file from before the kit: no ids, positions in `recall`, a retired accent word.
     let old = r#"{"spaces":[

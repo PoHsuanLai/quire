@@ -2,6 +2,7 @@
 //! maps its sheet view to these in one table-tested file (design/31 section 5.1).
 
 use super::hidden::Hidden;
+use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds_core::vocab::Check;
 use ds_core::word::Word;
@@ -40,6 +41,9 @@ pub struct ProviderEntry {
     pub mark: MarkProvider,
     /// Its letter or its favicon: `MarkStyle::Letter` unless the host holds the provider's image.
     pub style: MarkStyle,
+    /// Its letter and colour as data, when the host ships its providers that way; drawn in
+    /// place of `mark`'s own letter while `style` is `MarkStyle::Letter`.
+    pub face: Option<MarkFace>,
 }
 
 impl ProviderEntry {
@@ -50,6 +54,15 @@ impl ProviderEntry {
             label: label.into(),
             mark,
             style: MarkStyle::Letter,
+            face: None,
+        }
+    }
+
+    /// The same entry wearing `face`.
+    pub fn faced(self, face: MarkFace) -> Self {
+        ProviderEntry {
+            face: Some(face),
+            ..self
         }
     }
 
@@ -182,6 +195,9 @@ pub struct FormField {
     pub hint: Option<String>,
     /// The group it sits in; a form where no field names one is a single group.
     pub part: Option<FormPart>,
+    /// A line of help under the entry (where to make an app password); `None` for none. A
+    /// refusal of the field takes the line's place while it stands.
+    pub help: Option<String>,
 }
 
 impl FormField {
@@ -194,6 +210,7 @@ impl FormField {
             choices: None,
             hint: None,
             part: None,
+            help: None,
         }
     }
 
@@ -209,6 +226,14 @@ impl FormField {
     pub fn hinted(self, hint: impl Into<String>) -> Self {
         Self {
             hint: Some(hint.into()),
+            ..self
+        }
+    }
+
+    /// The same field with `help` under its entry.
+    pub fn helped(self, help: impl Into<String>) -> Self {
+        Self {
+            help: Some(help.into()),
             ..self
         }
     }

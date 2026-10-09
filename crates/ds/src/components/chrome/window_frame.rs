@@ -10,7 +10,7 @@
 //! default, [`WindowFrame::None`], leaves the root's markup exactly as it was.
 
 use crate::components::chrome::resize_edges::ResizeEdges;
-use crate::components::chrome::titlebar_parts::TitleParts;
+use crate::components::chrome::titlebar_parts::{TitleArea, TitleParts};
 use crate::components::chrome::traffic_lights::{TilePose, TrafficLightGroup};
 use crate::root::common::Common;
 use crate::window::grab::{Grab, GrabEffect};
@@ -165,7 +165,7 @@ pub fn WindowTitlebar(
             if lights == TrafficLights::Shown {
                 TrafficLightGroup { timing, pose }
             }
-            {parts.view(&title)}
+            TitleArea { title, parts }
         }
     }
 }

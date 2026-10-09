@@ -29,6 +29,7 @@ impl<P, R> Spaces<P, R> {
         self.list.push(Space {
             id,
             name: format!("Space {}", count + 1),
+            link: None,
             look,
             payload,
         });
@@ -38,6 +39,12 @@ impl<P, R> Spaces<P, R> {
     /// Give `id` a name. Any text, including none.
     pub fn rename(&mut self, id: SpaceId, name: impl Into<String>) {
         self.edit(id, |space| space.name = name.into());
+    }
+
+    /// Link `id` to the desktop Space named `link`, or unlink it with `None`. The kit only
+    /// stores the name; a consumer whose desktop Space is gone unlinks it itself.
+    pub fn set_link(&mut self, id: SpaceId, link: Option<String>) {
+        self.edit(id, |space| space.link = link);
     }
 
     /// Change `id` in place. Its look is brought back to the dot limits afterwards (one to three
