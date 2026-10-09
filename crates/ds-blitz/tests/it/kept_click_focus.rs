@@ -130,8 +130,8 @@ fn a_strip_button_click_focuses_the_button() {
 }
 
 #[test]
-fn a_disclosure_triangle_click_leaves_the_keyboard_on_the_app() {
-    pressed_focuses(TRIANGLE, "toggle:projects", ".app");
+fn a_disclosure_triangle_click_focuses_the_triangle() {
+    pressed_focuses(TRIANGLE, "toggle:projects", TRIANGLE);
 }
 
 #[test]
