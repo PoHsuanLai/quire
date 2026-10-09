@@ -15,6 +15,7 @@ pub use crate::frame_book::FrameBook;
 pub use crate::frame_hit::{LinkUnder, link_under};
 pub use crate::frame_hover::{HoverTracker, report as report_frame_hover};
 pub use crate::frame_links::{LinkInbox, frame_links, read_link};
+pub use crate::frame_menu::{ask as ask_frame_menu, report as report_frame_menu};
 pub use crate::frame_tree::live_frames;
 pub use crate::frames::FrameParser;
 pub use crate::measure::measure as measure_element;

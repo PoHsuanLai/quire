@@ -6,7 +6,8 @@
 use crate::frame_book::FrameBook;
 use crate::frame_hit::link_under;
 use crate::frame_hover::{FrameLinkHover, HoverTracker};
-use dioxus_native::winit::event::WindowEvent;
+use crate::frame_menu::{FrameLinkMenu, ask};
+use dioxus_native::winit::event::{ElementState, MouseButton, WindowEvent};
 use dioxus_native_dom::NodeHandle;
 use ds::prelude::*;
 
@@ -60,5 +61,35 @@ impl WindowHover {
             }
             _ => Vec::new(),
         }
+    }
+
+    /// The context menu `event` asks over a link in a frame, if it is the release of the
+    /// secondary button (the press Blitz makes a `contextmenu` of) on one.
+    pub(crate) fn menu(
+        &self,
+        event: &WindowEvent,
+        scale: f64,
+        document: Option<&NodeHandle>,
+    ) -> Option<FrameLinkMenu> {
+        let WindowEvent::PointerButton {
+            state: ElementState::Released,
+            position,
+            button,
+            ..
+        } = event
+        else {
+            return None;
+        };
+        if button.clone().mouse_button() != Some(MouseButton::Right) {
+            return None;
+        }
+        let at = Point {
+            x: Px((position.x / scale) as f32),
+            y: Px((position.y / scale) as f32),
+        };
+        let doc = document.and_then(NodeHandle::try_doc)?;
+        let under = link_under(&doc, at);
+        drop(doc);
+        ask(under, at, &self.book)
     }
 }

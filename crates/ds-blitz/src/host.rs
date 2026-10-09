@@ -174,6 +174,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let found = book.clone();
     let hovering = use_hook(|| Rc::new(RefCell::new(WindowHover::new(book.clone()))));
     let hover = props.setup.frame_links.hover();
+    let menu = props.setup.frame_links.menu();
     let file_drop = use_context_provider(|| FileDropBoard::new(Rc::clone(&host)));
     use_context_provider(Gpu::empty);
     let gestures = use_context_provider(|| scroll.bus());
@@ -196,6 +197,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 seen.borrow().as_ref(),
             );
             report(&hover, crossings);
+        }
+        if let crate::frame_menu::FrameMenu::Report(_) = menu {
+            let asked =
+                hovering
+                    .borrow()
+                    .menu(event, window.scale_factor(), seen.borrow().as_ref());
+            crate::frame_menu::report(&menu, asked);
         }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             let mut current = signals.scale;
