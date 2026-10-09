@@ -132,6 +132,7 @@ pub use crate::components::app::space_editor::dot::SpaceDot;
 pub use crate::components::chrome::window_frame::TrafficLights;
 pub use crate::components::chrome::window_frame::WindowFrame;
 pub use crate::window::host::WindowHost;
+pub use crate::window::icon::WindowIcon;
 pub use crate::window::vocab::ResizeEdge;
 pub use crate::window::vocab::WindowState;
 

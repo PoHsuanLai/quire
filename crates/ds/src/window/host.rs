@@ -9,6 +9,7 @@
 //! pushes a change with [`WindowHost::refresh`] (re-read its own `state`) or
 //! [`WindowHost::publish`] (a state it was told, as an xdg configure).
 
+use super::icon::WindowIcon;
 use super::tiled::Tiled;
 use super::vocab::{ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
 use dioxus::prelude::*;
@@ -39,6 +40,10 @@ pub trait HostWindow {
     /// Change the window's title, the name the compositor shows in its switcher and task list.
     /// A host with no such name keeps the default and ignores it.
     fn set_title(&self, _title: &str) {}
+    /// Change the window's icon, where the platform takes one from the window (X11, Windows,
+    /// macOS). A host with no such icon (Wayland reads it from the app's desktop entry) keeps the
+    /// default and ignores it.
+    fn set_icon(&self, _icon: &WindowIcon) {}
     /// The edges the compositor has tiled; a host that cannot tell keeps the default, none.
     fn tiled(&self) -> Tiled {
         Tiled::NONE
@@ -96,6 +101,11 @@ impl WindowHost {
     /// Retitle the window, as the app asks after launch.
     pub fn set_title(&self, title: &str) {
         self.host.set_title(title);
+    }
+
+    /// Change the window's icon, as the app asks after launch.
+    pub fn set_icon(&self, icon: &WindowIcon) {
+        self.host.set_icon(icon);
     }
 
     /// Re-read the host's own state, after a window event that may have changed it (a resize, a
