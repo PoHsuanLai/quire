@@ -1,14 +1,11 @@
 //! The fields a focus from outside can reach, and what each one says when it gets or loses the
 //! caret that way.
 //!
-//! A host's focus write dispatches no `focus` or `blur` event (Blitz's `set_focus_to`), so a field
-//! focused by a [`FieldHandle`](crate::focus::field::FieldHandle) or by
-//! [`focus_by_selector`](crate::focus::selector::focus_by_selector) would never hear it. Each mounted
-//! `TextField` enters itself here with its own handlers; a focus that lands on it through a host
-//! calls them, the same told-path its `Focus::OnMount` takes.
+//! A host's focus write raises `focus` (Blitz's `set_focus_to`, since the fork's 5c526bd2) but
+//! clears the focus silently, so a field blurred by a
+//! [`FieldHandle`](crate::focus::field::FieldHandle) would never hear it. Each mounted
+//! `TextField` enters itself here with its own handlers; a blur through a host calls them.
 
-use crate::host::found::SameNode;
-use crate::host::parts::GeometryHost;
 use dioxus::prelude::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -51,15 +48,5 @@ impl FocusTargets {
     /// The field in `owner` has unmounted.
     pub(crate) fn leave(&self, owner: ScopeId) {
         self.0.borrow_mut().retain(|held| held.owner != owner);
-    }
-
-    /// What the field at `element` says, if `element` is one: the host's node identity decides,
-    /// since an element found by selector is a different handle on the same node.
-    pub(crate) fn told_at(&self, element: &MountedData, host: &dyn GeometryHost) -> Option<Told> {
-        self.0
-            .borrow()
-            .iter()
-            .find(|held| host.same(&held.element, element) == SameNode::Same)
-            .map(|held| held.told)
     }
 }

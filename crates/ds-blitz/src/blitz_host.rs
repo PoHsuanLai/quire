@@ -97,6 +97,18 @@ impl Provided {
             clipboard,
         }
     }
+
+    /// Provide both to the calling component's subtree and to the root scope, and answer the
+    /// host. A task spawned on the root (an anchor's rect follow, which outlives the component
+    /// that started it) reads its contexts from the root scope; with the host provided only
+    /// below it, that task got no host, measured nothing, and a tooltip stayed hidden for want
+    /// of its anchor in every real window (the harness wires its host on the root).
+    pub fn provide(self) -> Rc<dyn DocumentHost> {
+        dioxus::core::provide_root_context(Rc::clone(&self.clipboard));
+        dioxus::core::provide_root_context(Rc::clone(&self.host));
+        provide_context(self.clipboard);
+        provide_context(self.host)
+    }
 }
 
 /// The Blitz document host: every part, the optional ones present where the owner wired them.
@@ -149,11 +161,8 @@ impl BlitzHost {
 /// success that wrote nothing.
 pub fn provide_host() -> Rc<dyn DocumentHost> {
     use_hook(|| {
-        try_consume_context::<Rc<dyn DocumentHost>>().unwrap_or_else(|| {
-            let provided = Provided::of(Wiring::standalone());
-            provide_context(provided.clipboard);
-            provide_context(provided.host)
-        })
+        try_consume_context::<Rc<dyn DocumentHost>>()
+            .unwrap_or_else(|| Provided::of(Wiring::standalone()).provide())
     })
 }
 

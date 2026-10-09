@@ -151,8 +151,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             listeners: listeners.clone(),
             phase: phase.clone(),
         });
-        provide_context(provided.clipboard);
-        provide_context(provided.host)
+        provided.provide()
     });
     // An `EditSurface { spell: Spell::On {..} }` checks through the system's dictionaries.
     #[cfg(feature = "spell")]

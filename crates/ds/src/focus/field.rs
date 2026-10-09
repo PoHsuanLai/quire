@@ -70,9 +70,9 @@ impl FieldHandle {
             return;
         };
         self.run(async move {
-            if focus_selecting(&target.element, select.into()).await == Focused::Done {
-                target.told.focus.call(());
-            }
+            // Blitz raises the `focus` event for a focus set from code, which the field's own
+            // `onfocus` hears: telling it here too told the caller twice.
+            let _ = focus_selecting(&target.element, select.into()).await;
         });
     }
 

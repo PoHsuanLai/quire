@@ -1,6 +1,7 @@
 //! A field reached by its `FieldHandle` or by selector takes the keyboard,
-//! selects its value, and hears `onfocus` once, though Blitz's focus write dispatches no event;
-//! a handle's blur is heard once too; an unknown or unreadable selector is a typed error.
+//! selects its value, and hears `onfocus` once (Blitz raises the event for a focus set from code,
+//! after the ask's own task has run, so a selector's "found" comes first);
+//! a handle's blur is heard once too (Blitz clears the focus silently, so the handle tells it); an unknown or unreadable selector is a typed error.
 
 use dioxus::prelude::*;
 use ds::focus::field::{FieldHandle, use_field_handle};
@@ -133,7 +134,7 @@ fn a_field_focused_by_its_handle_hears_it_once_with_its_value_selected() {
 fn a_field_focused_by_selector_hears_it_once_with_its_value_selected() {
     let harness = reached(BySelector);
     assert_eq!(harness.focus_of(".rename input"), FocusState::Focused);
-    assert_eq!(log(&harness), "focus,found");
+    assert_eq!(log(&harness), "found,focus");
     assert_eq!(
         harness.selected_text(".rename input").as_deref(),
         Some("Inbox")

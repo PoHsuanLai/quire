@@ -49,6 +49,7 @@ impl Harness {
         for state in [KeyState::Pressed, KeyState::Released] {
             let event = BlitzKeyEvent {
                 key: key.clone(),
+                key_without_modifiers: key.clone(),
                 code,
                 modifiers: input.mods,
                 location: Location::Standard,
@@ -76,7 +77,8 @@ impl Harness {
             RawKeyPhase::Up => KeyState::Released,
         };
         let event = BlitzKeyEvent {
-            key: input.key,
+            key: input.key.clone(),
+            key_without_modifiers: input.key,
             code: input.code,
             modifiers: input.mods,
             location: input.location,

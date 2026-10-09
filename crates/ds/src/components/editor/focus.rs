@@ -8,7 +8,7 @@ use crate::components::editor::state::write_soon;
 use crate::edit::composition::settle;
 use crate::edit::pointer::EditFocus;
 use crate::focus::select::Select;
-use crate::focus::soon::{blur_element, focus_soon_told};
+use crate::focus::soon::{blur_element, focus_landing_told};
 use crate::host::document::DocumentHost;
 use crate::host::ime::{ImeEvent, ImeSwitch};
 use crate::host::measure::BUSY_ATTEMPTS;
@@ -52,7 +52,7 @@ pub(crate) fn focused_out(ctx: &SurfaceCtx) {
 /// it lands (`told`).
 pub(crate) fn focus_surface(ctx: &SurfaceCtx, told: EventHandler<()>) {
     if let Some(element) = ctx.state.element() {
-        focus_soon_told(element, Select::None, told);
+        focus_landing_told(element, Select::None.into(), told);
     }
 }
 

@@ -123,6 +123,7 @@ mod text_field_multiline;
 mod text_field_secure;
 mod thread_more;
 mod thread_row_common;
+mod tip_wall_clock;
 mod tips_not_titles;
 mod title_tooltip;
 mod titlebar_title_fit;

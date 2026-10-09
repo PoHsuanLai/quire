@@ -7,7 +7,6 @@
 
 use crate::focus::select::Select;
 use crate::focus::soon::focus_selecting;
-use crate::focus::targets::FocusTargets;
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::found::Found;
@@ -63,15 +62,10 @@ pub async fn focus_by_selector(
     let selector = selector.into();
     let host = use_document_host();
     let element = find(host.geometry(), &selector).await?;
-    let told = try_consume_context::<FocusTargets>()
-        .and_then(|targets| targets.told_at(&element, host.geometry()));
     match focus_selecting(&element, select.into()).await {
-        Focused::Done => {
-            if let Some(told) = told {
-                told.focus.call(());
-            }
-            Ok(())
-        }
+        // Blitz raises the `focus` event for a focus set from code: the field's own `onfocus`
+        // hears it, so nothing tells the field again here.
+        Focused::Done => Ok(()),
         Focused::Busy => Err(FocusError::Busy),
         Focused::Unknown => Err(FocusError::Refused { selector }),
     }

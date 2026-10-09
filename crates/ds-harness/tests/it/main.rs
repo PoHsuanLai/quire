@@ -3,6 +3,7 @@
 //! Separate target: `menu_export` (feature `menus`) starts a private D-Bus and owns the names on it.
 
 mod centre_padded;
+mod forwarded_context_menu;
 mod guards;
 mod hybrid_backend;
 mod inset;

@@ -37,29 +37,36 @@ pub fn focus_soon_selecting(element: Rc<MountedData>, select: Select) {
     });
 }
 
-/// As [`focus_soon_selecting`], then `told` once the host's write has moved the focus.
+/// As [`focus_soon_selecting`], for a field whose caller listens for focus.
 ///
-/// The host's write (Blitz's `set_focus_to`) dispatches no `focus` event, so a surface whose
-/// caller listens for focus would never hear that the seam put the keyboard in it: `told` is
-/// that event. It is not called when the write did not land (no host, an element the host does
-/// not own, a document that stayed busy).
+/// The host's write (Blitz's `set_focus_to`) dispatched no `focus` event until the fork's
+/// 5c526bd2; now it does, and a surface's own `onfocus` hears it. `told` is for the caller that
+/// has no `onfocus` of its own to hear it with: it is called once the host's write has moved the
+/// focus. It is not called when the write did not land (no host, an element the host does not
+/// own, a document that stayed busy).
 ///
 /// Public so an app that draws its own region (a terminal) focuses it, and runs its focus-in,
 /// exactly as `EditSurface` does.
 pub fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHandler<()>) {
-    focus_landing_told(element, select.into(), told);
+    spawn(async move {
+        if focus_selecting(&element, select.into()).await == Focused::Done {
+            told.call(());
+        }
+    });
 }
 
-/// As [`focus_soon_told`], landing the caret at any [`Landing`] (a field's start or end too).
+/// As [`focus_soon_selecting`], landing the caret at any [`Landing`] (a field's start or end
+/// too), for a surface whose own `onfocus` hears the focus event the host's write raises: `told`
+/// is no longer called here (calling it too told the caller twice) and stays in the signature
+/// until the callers drop it.
 pub(crate) fn focus_landing_told(
     element: Rc<MountedData>,
     landing: Landing,
     told: EventHandler<()>,
 ) {
+    let _ = told;
     spawn(async move {
-        if focus_selecting(&element, landing).await == Focused::Done {
-            told.call(());
-        }
+        let _ = focus_selecting(&element, landing).await;
     });
 }
 
