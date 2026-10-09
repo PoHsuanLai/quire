@@ -23,6 +23,7 @@ mod control_goldens_lint;
 mod css_scan;
 mod edit_surface_ssr;
 mod forms_ssr;
+mod golden_hygiene;
 mod hig_lint;
 mod kept_click_rule;
 mod launcher_parts_ssr;
@@ -39,11 +40,11 @@ mod root_ssr;
 mod roster;
 mod row_outline_editing_states_ssr;
 mod selectors;
+mod sheet_hygiene;
 mod snippet_forms;
 mod space_editor_ssr;
 mod standard_action;
 mod status_tables;
-mod stylesheet;
 mod support;
 mod surface;
 mod symbol_ssr;
@@ -53,3 +54,16 @@ mod user_style_ssr;
 mod voice_orb_ssr;
 mod window_frame_ssr;
 mod window_tiled;
+
+#[path = "support/module_guard.rs"]
+mod module_guard;
+
+#[test]
+fn every_test_file_is_a_module() {
+    let dir = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/it");
+    let left_out = module_guard::undeclared(&dir);
+    assert!(
+        left_out.is_empty(),
+        "not a module of main.rs, so never run: {left_out:?}"
+    );
+}

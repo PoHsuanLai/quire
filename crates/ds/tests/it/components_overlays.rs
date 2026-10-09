@@ -7,7 +7,6 @@
 
 #[path = "overlays/cases.rs"]
 mod cases;
-use crate::css_scan;
 use crate::support::dom_time;
 use crate::support::golden;
 #[path = "overlays/hover_card_flag.rs"]
@@ -259,66 +258,6 @@ fn the_root_writes_the_tint_alpha() {
         assert!(root.contains(want), "{tint:?}: {root}");
         assert_eq!(root.matches("--m-tint-alpha").count(), 1, "{root}");
     }
-}
-
-#[test]
-fn overlay_stylesheets_use_tokens_only() {
-    const SHEETS: &[(&str, &str)] = &[
-        (
-            "command_palette",
-            include_str!("../../src/components/menus/palette/command_palette.css"),
-        ),
-        (
-            "hover_card",
-            include_str!("../../src/components/overlays/hover_card.css"),
-        ),
-        (
-            "link_pill",
-            include_str!("../../src/components/app/link_pill.css"),
-        ),
-        (
-            "menu",
-            include_str!("../../src/components/menus/menu/menu.css"),
-        ),
-        (
-            "menu_item",
-            include_str!("../../src/components/menus/item/item.css"),
-        ),
-        ("peek", include_str!("../../src/components/app/peek.css")),
-        (
-            "popover",
-            include_str!("../../src/components/overlays/popover.css"),
-        ),
-        (
-            "scrim",
-            include_str!("../../src/components/overlays/scrim.css"),
-        ),
-        (
-            "send_pill",
-            include_str!("../../src/components/app/send_pill.css"),
-        ),
-        (
-            "sheet",
-            include_str!("../../src/components/overlays/sheet.css"),
-        ),
-        (
-            "toast",
-            include_str!("../../src/components/overlays/toast.css"),
-        ),
-        (
-            "tooltip",
-            include_str!("../../src/components/overlays/tooltip.css"),
-        ),
-    ];
-    let failures: Vec<String> = SHEETS
-        .iter()
-        .flat_map(|(name, css)| {
-            css_scan::token_violations(css)
-                .into_iter()
-                .map(move |problem| format!("{name}.css: {problem}"))
-        })
-        .collect();
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
 /// Coherence rule 2 on the overlay goldens: every class is one the stylesheet styles and no

@@ -15,7 +15,7 @@ mod png;
 #[path = "lists/space_editor_rows.rs"]
 mod space_editor_rows;
 
-use css_scan::{classes, styles_class, token_violations};
+use css_scan::{classes, styles_class};
 use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::EditorFrame;
@@ -209,20 +209,6 @@ fn every_class_in_a_golden_is_styled_by_the_editors_sheets() {
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-#[test]
-fn the_space_editor_stylesheet_uses_tokens_only() {
-    let all = ds::component_sheets();
-    let (_, css) = all
-        .iter()
-        .find(|(name, _)| *name == "space_editor")
-        .expect("the space_editor sheet is registered");
-    let problems: Vec<String> = token_violations(css)
-        .into_iter()
-        .map(|problem| format!("space_editor.css: {problem}"))
-        .collect();
-    assert!(problems.is_empty(), "{}", problems.join("\n"));
 }
 
 /// What the editor writes inline that a consumer may not: colours computed per Space. Each is

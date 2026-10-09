@@ -5,6 +5,7 @@
 //! `DS_BLESS=1 cargo test -p ds-shell --test it accounts_ssr` rewrites the goldens.
 
 use crate::golden;
+use crate::hygiene;
 
 use dioxus::core::NoOpMutations;
 use dioxus::prelude::*;
@@ -13,7 +14,7 @@ use ds::components::content::image_source::ImageSource;
 use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
-use ds_lint::{LintConfig, markup};
+use ds_lint::LintConfig;
 use ds_shell::accounts::model::{
     AccountChoice, Attempt, Choice, ChoiceKey, CopyState, FieldProblem, FieldRole, FieldText,
     FormField, FormPart, Limitation, NoAccountWhy, ProblemKind, ProviderEntry, ProviderKey,
@@ -541,34 +542,17 @@ fn every_specimen_matches_its_golden_in_light_and_dark() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-#[test]
-fn every_specimen_lints_clean_and_every_class_is_styled() {
+/// Lint offences and unstyled classes of every specimen, swept by `golden_hygiene`.
+pub(crate) fn hygiene_failures() -> Vec<String> {
     let sheet = ds_shell::stylesheet();
-    let mut failures = Vec::new();
-    for (at, (name, _)) in SPECIMENS.iter().enumerate() {
-        let html = render(Theme::Light, at);
-        for offence in markup(&html, sheet, &LintConfig::new(&ds_shell::kits())) {
-            failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
-        }
-        for class in html
-            .split("class=\"")
-            .skip(1)
-            .filter_map(|rest| rest.split('"').next())
-            .flat_map(str::split_whitespace)
-            .filter(|class| class.starts_with("ds-"))
-        {
-            let needle = format!(".{class}");
-            let styled = sheet.match_indices(&needle).any(|(at, _)| {
-                !sheet[at + needle.len()..]
-                    .starts_with(|c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-            });
-            if !styled {
-                failures.push(format!("{name}: .{class} is not styled"));
-            }
-        }
-    }
-    failures.dedup();
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    let config = LintConfig::new(&ds_shell::kits());
+    SPECIMENS
+        .iter()
+        .enumerate()
+        .flat_map(|(at, (name, _))| {
+            hygiene::failures(name, &render(Theme::Light, at), sheet, &config)
+        })
+        .collect()
 }
 
 /// A password never reaches the markup, whatever the step: not as a value, not as text.

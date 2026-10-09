@@ -104,17 +104,6 @@ fn every_class_in_a_golden_is_styled_by_its_component() {
 }
 
 #[test]
-fn control_stylesheets_use_tokens_only() {
-    let mut failures = Vec::new();
-    for (component, sheets) in STYLES {
-        for problem in token_violations(sheets[0]) {
-            failures.push(format!("{component}.css: {problem}"));
-        }
-    }
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-#[test]
 fn the_token_scan_catches_what_it_bans() {
     const BAD: &[&str] = &[
         ".x{ color:#fff; }",

@@ -5,13 +5,14 @@
 //! `DS_BLESS=1 cargo test -p ds --features lint --test it pdf_thumb_ssr` rewrites the goldens.
 
 use crate::support::golden;
+use crate::support::hygiene;
 
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::components::content::image_source::ImageSize;
 use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
 use ds::prelude::*;
-use ds_lint::{LintConfig, markup};
+use ds_lint::LintConfig;
 
 const ROOM: Size = Size {
     width: Px(160.0),
@@ -104,34 +105,14 @@ fn every_specimen_matches_its_golden() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-#[test]
-fn every_specimen_lints_clean_and_every_class_is_styled() {
+/// Lint offences and unstyled classes of every specimen, swept by `golden_hygiene`.
+pub(crate) fn hygiene_failures() -> Vec<String> {
     let sheet = ds::stylesheet();
-    let mut failures = Vec::new();
-    for (name, make) in SPECIMENS {
-        let html = render(*make);
-        for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
-            failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
-        }
-        for class in html
-            .split("class=\"")
-            .skip(1)
-            .filter_map(|rest| rest.split('"').next())
-            .flat_map(str::split_whitespace)
-            .filter(|class| class.starts_with("ds-"))
-        {
-            let needle = format!(".{class}");
-            let styled = sheet.match_indices(&needle).any(|(at, _)| {
-                !sheet[at + needle.len()..]
-                    .starts_with(|c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-            });
-            if !styled {
-                failures.push(format!("{name}: .{class} is not styled"));
-            }
-        }
-    }
-    failures.dedup();
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    let config = LintConfig::new(&ds::kits());
+    SPECIMENS
+        .iter()
+        .flat_map(|(name, make)| hygiene::failures(name, &render(*make), sheet, &config))
+        .collect()
 }
 
 /// Each state stamps its word, the sheet sits at the page's aspect, and a failure draws a plate

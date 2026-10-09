@@ -11,7 +11,7 @@ use crate::support::golden;
 use crate::support::scoped;
 
 use cases::{CASES, Case};
-use css_scan::{classes, styles_class, token_violations};
+use css_scan::{classes, styles_class};
 use dioxus::prelude::*;
 
 #[derive(Props, Clone)]
@@ -86,19 +86,6 @@ fn every_class_in_a_forms_golden_is_styled() {
             }
         }
     }
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-#[test]
-fn the_forms_sheets_use_tokens_only() {
-    let failures: Vec<String> = ["form", "form_section", "icon_tile", "pane_stack"]
-        .iter()
-        .flat_map(|name| {
-            token_violations(sheet(name))
-                .into_iter()
-                .map(move |problem| format!("{name}.css: {problem}"))
-        })
-        .collect();
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 

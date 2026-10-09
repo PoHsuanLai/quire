@@ -25,7 +25,7 @@ mod strip_press;
 mod thread_row;
 
 use cases::{CASES, Case};
-use css_scan::{classes, styles_class, token_violations};
+use css_scan::{classes, styles_class};
 use dioxus::prelude::*;
 use ds_motion::drag::{DragPhase, DragTracker, use_drag};
 use ds_motion::presence::Exit;
@@ -168,40 +168,6 @@ fn every_class_in_a_golden_is_styled_by_its_component() {
                     "{name}: .{class} is in no stylesheet of {component}"
                 ));
             }
-        }
-    }
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
-}
-
-/// The stylesheets of the components listed here.
-const OWN: &[&str] = &[
-    "thread_row",
-    "row",
-    "list",
-    "disclosure",
-    "hover_strip",
-    "command_pill",
-    "pin_tile",
-    "provider_mark",
-    "drag_ghost",
-    "edge_peek",
-    "text_runs",
-];
-
-#[test]
-fn list_stylesheets_use_tokens_only() {
-    let mut failures = Vec::new();
-    let all = ds::component_sheets();
-    for name in OWN {
-        let Some((_, css)) = all.iter().find(|(n, _)| n == name) else {
-            failures.push(format!("{name}: not in the component list"));
-            continue;
-        };
-        if css.trim().starts_with("/*") && css.lines().count() < 3 {
-            failures.push(format!("{name}.css is still the stub"));
-        }
-        for problem in token_violations(css) {
-            failures.push(format!("{name}.css: {problem}"));
         }
     }
     assert!(failures.is_empty(), "{}", failures.join("\n"));

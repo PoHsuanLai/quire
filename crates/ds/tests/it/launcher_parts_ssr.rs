@@ -7,6 +7,7 @@
 //! `DS_BLESS=1 cargo test -p ds --features lint --test it launcher_parts_ssr` rewrites the goldens.
 
 use crate::support::golden;
+use crate::support::hygiene;
 
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
@@ -18,7 +19,7 @@ use ds::components::lists::preview::pane::PaneAction;
 use ds::components::lists::row::shape::{ClipBody, RowShape};
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
 use ds::prelude::*;
-use ds_lint::{LintConfig, markup};
+use ds_lint::LintConfig;
 
 fn root(body: Element) -> Element {
     rsx! {
@@ -419,34 +420,14 @@ fn every_specimen_matches_its_golden() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-#[test]
-fn every_specimen_lints_clean_and_every_class_is_styled() {
+/// Lint offences and unstyled classes of every specimen, swept by `golden_hygiene`.
+pub(crate) fn hygiene_failures() -> Vec<String> {
     let sheet = ds::stylesheet();
-    let mut failures = Vec::new();
-    for (name, make) in SPECIMENS {
-        let html = render(*make);
-        for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
-            failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
-        }
-        for class in html
-            .split("class=\"")
-            .skip(1)
-            .filter_map(|rest| rest.split('"').next())
-            .flat_map(str::split_whitespace)
-            .filter(|class| class.starts_with("ds-"))
-        {
-            let needle = format!(".{class}");
-            let styled = sheet.match_indices(&needle).any(|(at, _)| {
-                !sheet[at + needle.len()..]
-                    .starts_with(|c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-            });
-            if !styled {
-                failures.push(format!("{name}: .{class} is not styled"));
-            }
-        }
-    }
-    failures.dedup();
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    let config = LintConfig::new(&ds::kits());
+    SPECIMENS
+        .iter()
+        .flat_map(|(name, make)| hygiene::failures(name, &render(*make), sheet, &config))
+        .collect()
 }
 
 /// What each part stamps, read from the markup: the shapes, the action under the cursor, the

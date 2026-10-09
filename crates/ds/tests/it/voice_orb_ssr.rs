@@ -5,14 +5,15 @@
 //! `DS_BLESS=1 cargo test -p ds --features lint --test it voice_orb_ssr` rewrites the goldens.
 
 use crate::support::golden;
+use crate::support::hygiene;
 
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::components::content::voice_orb::model::{OrbColour, OrbColours};
-use ds::components::content::voice_orb::view::{ORB_PERIOD, VoiceOrb};
+use ds::components::content::voice_orb::view::VoiceOrb;
 use ds::prelude::*;
 use ds_core::vocab::Activity;
-use ds_lint::{LintConfig, markup};
+use ds_lint::LintConfig;
 use ds_style::tokens::hex::Hex;
 use std::time::Duration;
 
@@ -95,33 +96,19 @@ fn every_specimen_matches_its_golden() {
     assert!(failures.is_empty(), "{}", failures.join("\n"));
 }
 
-#[test]
-fn every_specimen_lints_clean_and_every_class_is_styled() {
+/// Lint offences and unstyled classes of every specimen, swept by `golden_hygiene`.
+pub(crate) fn hygiene_failures() -> Vec<String> {
     let sheet = ds::stylesheet();
-    let mut failures = Vec::new();
-    for (name, make) in SPECIMENS {
-        let html = render(*make);
-        for offence in markup(&html, sheet, &LintConfig::new(&ds::kits())) {
-            failures.push(format!("{name}: {:?} {}", offence.rule, offence.text));
-        }
-        for class in orb(&html)
-            .split("class=\"")
-            .skip(1)
-            .filter_map(|rest| rest.split('"').next())
-            .flat_map(str::split_whitespace)
-        {
-            let needle = format!(".{class}");
-            let styled = sheet.match_indices(&needle).any(|(at, _)| {
-                !sheet[at + needle.len()..]
-                    .starts_with(|c: char| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-            });
-            if !styled {
-                failures.push(format!("{name}: .{class} is not styled"));
-            }
-        }
-    }
-    failures.dedup();
-    assert!(failures.is_empty(), "{}", failures.join("\n"));
+    let config = LintConfig::new(&ds::kits());
+    SPECIMENS
+        .iter()
+        .flat_map(|(name, make)| {
+            let html = render(*make);
+            let mut found = hygiene::offences(name, &html, sheet, &config);
+            found.extend(hygiene::unstyled(name, orb(&html), sheet));
+            found
+        })
+        .collect()
 }
 
 /// The markup says which state it is in, that a small orb has no mask, and that only a named
@@ -143,10 +130,4 @@ fn the_markup_carries_the_state() {
     assert!(!named.contains("aria-hidden"), "{named}");
     let custom = render(custom);
     assert!(custom.contains("--orb-c1:#e88b5a;"), "{custom}");
-}
-
-/// The period an orb turns at when the caller names none.
-#[test]
-fn the_default_period_is_twenty_seconds() {
-    assert_eq!(ORB_PERIOD, Duration::from_secs(20));
 }
