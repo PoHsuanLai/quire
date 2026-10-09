@@ -1,5 +1,5 @@
 //! The Bluetooth glyph's parts, drawn as strokes: the owner prefers the stroked rune to a filled
-//! one (design/08-ICONS.md section 1.2, `Icon::ALWAYS_OUTLINE`). Same layers and `data-*` words
+//! one (design/08-ICONS.md section 1.2; Bluetooth's pick is outline). Same layers and `data-*` words
 //! as `part`, with Lucide's 2 unit stroke, round caps and joins, and the slash drawn on by dash.
 
 use super::part::{Part, Pen, Show};

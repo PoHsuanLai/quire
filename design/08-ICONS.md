@@ -34,27 +34,28 @@ prototypes' set. Its Fill weight is a fallback for the solid form (1.2.1).
 
 ### 1.2 Drawing rules (settled; applies to Tabler imports and our own glyphs)
 
-Decision, owner, 2026-10-07: the desktop draws solid (filled) small glyphs, everywhere an `Icon`
-is drawn: menus, sidebars, toolbars and the bar. This replaces "no fills" and the star
-exception of the 2026-09 rules (Lucide's hollow outlines as the default).
+Decision, owner, 2026-10-09: each glyph has its own pick, made in the gallery, and the desktop
+draws that. This reverses the 2026-10-07 "solid by default" rule (which itself replaced "no
+fills"). The picks are data: `Icon::native` reads the table in `crates/ds-style/src/icon/native.rs`.
+92 glyphs are outline, 17 solid (`Battery`, `BatteryCharging`, `BatteryFull`, `BatteryLow`,
+`BatteryMedium`, `Brightness`, the four chevrons, `Key`, `Pause`, `Pen`, `Play`, `Refresh`,
+`Restart`, `Terminal`), and 3 are replaced by a drawing the owner chose (1.2.2).
 
 1. Canvas `viewBox="0 0 24 24"`.
-2. `GlyphStyle::{Solid, Outline}`, default `Solid` (named `GlyphStyle`, not `IconStyle`, which is the dock's Colour/Muted/Monochrome look in `retint`).
+2. `GlyphStyle::{Native, Solid, Outline}`, default `Native`: the icon's own pick. Asking for `Solid` or `Outline` always gets that form (named `GlyphStyle`, not `IconStyle`, which is the dock's Colour/Muted/Monochrome look in `retint`).
    - Solid: filled paths, written as `fill="currentColor"` with `stroke="none"` on the `svg`
      and no stroke attribute anywhere. The source is Tabler's filled set, then Phosphor Fill
      where Tabler has none, then a hand-made fill (1.2.1).
    - Outline: Lucide's glyph, `stroke-width` 2, `stroke-linecap="round"`,
-     `stroke-linejoin="round"`, `fill="none"`. It is kept only as the off state of a pair.
-3. State pairs. A control that shows on and off with a glyph whose off state is hollow draws
-   Outline for off (and mixed) and Solid for on, as macOS does: `Icon::OFF_IS_OUTLINE` (star,
-   heart, pin, bell) and `GlyphStyle::for_state(icon, state)`. A thread row's star and a
-   `Button { value }` holding one of those glyphs follow it. A pair of different glyphs
-   (`Play` and `Pause`, `Bell` and `BellOff`, `Volume` and `VolumeX`) is two solid icons, not a
-   style change.
-   One per-icon exception: `Icon::ALWAYS_OUTLINE` (`Bluetooth`, `BluetoothConnected`,
-   `BluetoothOff`) draw Outline in every state, because the owner prefers the stroked rune;
-   `Glyph` applies it through `GlyphStyle::resolve`, and the Bluetooth status glyph is stroked
-   with the old dash-drawn slash.
+     `stroke-linejoin="round"`, `fill="none"`. It is the default of 92 glyphs and the off state of a pair.
+   Every glyph keeps both forms, so a later pick can flip back.
+3. State pairs. `Star`, `Heart`, `Pin` and `Bell` are `Native::Pair`: outline while off (and
+   mixed), `PAIR_ON` (solid) while on, as macOS draws them. `GlyphStyle::for_state(icon, state)`
+   gives the half; a thread row's star and a `Button { value }` holding one of them follow it.
+   `PAIR_ON` in `style.rs` is the one constant to set to `Outline` if the owner wants them
+   outline in both states. A pair of different glyphs (`Play` and `Pause`, `Bell` and `BellOff`)
+   is two icons, not a style change. The old `ALWAYS_OUTLINE` list is gone: Bluetooth is
+   outline because the table says so.
 4. Keep 1 px padding: no geometry outside 1..23 (Lucide's own rule); Phosphor's own padding
    already holds it.
 5. No text, no gradients, no second colour, no opacity inside the glyph.
@@ -69,7 +70,7 @@ exception of the 2026-09 rules (Lucide's hollow outlines as the default).
    on), with a clear margin cut out of the glyph under it (a mask), as macOS draws it. The
    level glyph is all filled shapes: the speaker, three annular waves, the sun's disc and
    capsule rays, the keyboard slab with its keys cut out. The Wi-Fi fan is a dot and three
-   annular arcs, Bluetooth stays the stroked rune (the exception in rule 3), and the battery is an outlined
+   annular arcs, Bluetooth is the stroked rune (its pick is outline), and the battery is an outlined
    body (a filled path, a wall 1.5 wide, as macOS draws it) holding a solid fill level. That outlined body is the one
    deliberate outline left in the status glyphs: a battery without a visible body reads as a bar.
 
@@ -79,6 +80,22 @@ general rule: the star's off state is the outline, its on state the solid star, 
 colour (`--warn` when on). Lint: `CurrentColourOutsideStrokeFill` already allowed `fill:
 currentColor` as a whole value, so the rule is unchanged; its cases now pin `fill: currentColor`
 passing and a raw colour on `fill` failing.
+
+### 1.2.2 Replaced glyphs (owner picks, 2026-10-09)
+
+`Native::Drawn` holds the paths (`drawn.rs`): filled shapes on the 24 grid, drawn the same in
+either style, with no stroke. Only permissively licensed sources ship.
+
+| Icon | Source | Licence | State |
+| --- | --- | --- | --- |
+| `Download` | Bootstrap Icons 1.13.2 `cloud-download`, scaled by 22/16 from its 16 grid and moved 1 unit so the 1 px padding holds | MIT, `LICENSE-bootstrap.txt` | shipped |
+| `Upload` | Bootstrap Icons 1.13.2 `cloud-upload`, converted the same way; its `evenodd` is dropped, each path being one simple contour | MIT, `LICENSE-bootstrap.txt` | shipped |
+| `Sparkles` | Remix Icon 4.6.0 `sparkling-line`, verbatim (the Apache-2.0 release; later releases carry a restrictive licence, so the version is pinned) | Apache-2.0, `LICENSE-remixicon.txt` | shipped |
+| `LogOut` | SVG Repo download `logout-svgrepo-com.svg`, SVG Repo Mixer Tools, no author or licence in the file; its page could not be reached | unconfirmed | not shipped: the Lucide outline stays |
+| `Phone` | SVG Repo download `mobile-svgrepo-com.svg`, same family | unconfirmed | not shipped: the Lucide outline stays |
+
+Animated parts (`solid_parts`, `PosedGlyph`) and the bespoke status and level glyphs are built
+from filled shapes that move, so they stay solid whatever the table says.
 
 ### 1.2.1 Solid sources (settled 2026-10-07)
 
@@ -141,7 +158,7 @@ no solid glyph carries a stroke attribute.
 | `BatteryFull` | Phosphor Fill `battery-full` |
 | `BatteryCharging` | Phosphor Fill `battery-charging` |
 | `BatteryWarning` | Phosphor Fill `battery-warning` |
-| `Bluetooth` | Phosphor Fill `bluetooth`  (kept, unused: stroked, see `ALWAYS_OUTLINE`) |
+| `Bluetooth` | Phosphor Fill `bluetooth`  (kept, unused: stroked, its pick is outline) |
 | `BluetoothConnected` | Phosphor Fill `bluetooth-connected` |
 | `BluetoothOff` | Phosphor Fill `bluetooth-slash` |
 | `Volume` | Lucide `volume` body, filled (ISC, `solid_fan.rs`) |
@@ -868,6 +885,8 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 | Lucide | ISC | notice file `crates/ds-style/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
 | Tabler Icons | MIT | notice file `crates/ds-style/assets/icons/LICENSE-tabler.txt` (added 2026-10-07), imported glyph names (1.2.1), version 3.48.0 |
 | Phosphor Icons | MIT | notice file `LICENSE-phosphor.txt` beside it, glyph names (1.2.1), version 2.1.1 |
+| Bootstrap Icons | MIT | notice file `LICENSE-bootstrap.txt` beside it, `Download` and `Upload` (1.2.2), version 1.13.2 |
+| Remix Icon | Apache-2.0 | notice file `LICENSE-remixicon.txt` beside it, `Sparkles` (1.2.2), version 4.6.0 only |
 | Our glyphs | our licence | author, date |
 | Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |
 | FLUX.2 Klein 4B weights | FLUX.2 Klein licence | exact licence text and whether outputs may be used commercially; verify before shipping |
