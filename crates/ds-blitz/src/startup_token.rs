@@ -133,9 +133,17 @@ mod tests {
         assert_eq!(raw(tokens.take_for(Session::Wayland)), None, "both spent");
     }
 
+    /// name, the environment, the session asked for, how many variables are reset.
+    type Case = (
+        &'static str,
+        &'static [(&'static str, &'static str)],
+        Session,
+        u32,
+    );
+
     #[test]
     fn a_missing_token_is_no_token_and_resets_the_environment_only_for_a_token_that_was_there() {
-        let cases: [(&str, &[(&str, &str)], Session, u32); 3] = [
+        let cases: [Case; 3] = [
             ("another session's", &[(X11_VAR, "x")], Session::Wayland, 1),
             ("no variable", &[], Session::Wayland, 0),
             (

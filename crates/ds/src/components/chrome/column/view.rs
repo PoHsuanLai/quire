@@ -9,7 +9,6 @@ use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::tokens::spacing::SpacingToken;
-use ds_style::tokens::token::Token;
 
 /// A vertical stack: `gap` between children (8 px unless given), `align` across the width
 /// (stretched unless given).
