@@ -188,7 +188,7 @@ pub use crate::components::menus::palette::machine::model::{
 };
 pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
-pub use crate::components::menus::pull_down_button::PullDownButton;
+pub use crate::components::menus::pull_down_button::{PullDownButton, PullDownFace};
 pub use crate::components::menus::search::model::{
     CardPlace, Ends, EscapeOrder, InitialHighlight, Panel, SearchCursor, SuggestionSection,
     SuggestionsPresent,

@@ -20,9 +20,20 @@ use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::tokens::control_size::ControlSize;
 
+/// Which face a pull-down button wears.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum PullDownFace {
+    /// `icon` and `title` (either or both), and the chevron after them.
+    #[default]
+    Labelled,
+    /// The chevron alone, Dia's foot control; `icon` and `title` are not drawn, and
+    /// `common.aria_label`, else "Menu", is its name and its tooltip.
+    Chevron,
+}
+
 /// A pull-down button over `items`: `icon` and `title` are its face (either or both; with no
 /// `title` the icon stands alone and `common.aria_label`, else "Menu", names it), and a chevron
-/// follows. `onpick` hears the value a pick asks for; the face never changes with it.
+/// follows; `face: PullDownFace::Chevron` draws the chevron alone. `onpick` hears the value a pick asks for; the face never changes with it.
 ///
 /// Return, Space and a click open the menu; Down and Up do too. Escape or a pick closes it and
 /// the menu hands the keyboard back to the button.
@@ -35,6 +46,7 @@ use ds_style::tokens::control_size::ControlSize;
 pub fn PullDownButton<T: Clone + PartialEq + 'static>(
     items: Vec<MenuItem<T>>,
     onpick: EventHandler<T>,
+    #[props(default)] face: PullDownFace,
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] title: Option<String>,
     #[props(default = Bezel::Toolbar)] bezel: Bezel,
@@ -59,9 +71,17 @@ pub fn PullDownButton<T: Clone + PartialEq + 'static>(
     let mut element = use_signal(|| None::<MountedRef>);
     let button = use_rect();
     let live = availability == Availability::Enabled;
-    let image = match (&title, &icon) {
-        (None, Some(_)) => ImagePosition::Only,
-        (Some(_), _) | (None, None) => ImagePosition::Leading,
+    let (icon, title) = match face {
+        PullDownFace::Labelled => (icon, title),
+        PullDownFace::Chevron => (None, common.aria_label.clone()),
+    };
+    let image = match (face, &title, &icon) {
+        (PullDownFace::Chevron, ..) | (PullDownFace::Labelled, None, Some(_)) => {
+            ImagePosition::Only
+        }
+        (PullDownFace::Labelled, Some(_), _) | (PullDownFace::Labelled, None, None) => {
+            ImagePosition::Leading
+        }
     };
     let label = title.unwrap_or_else(|| "Menu".to_owned());
     let mounted = common.clone();

@@ -380,6 +380,14 @@ fn PopUps() -> Element {
                         onpick: move |value| pulled.set(format!("item {value}")),
                     }
                 }
+                Specimen { name: "PullDownButton, chevron only",
+                    PullDownButton::<u8> {
+                        items: options(),
+                        face: PullDownFace::Chevron,
+                        common: Common { aria_label: Some("Space actions".to_owned()), ..Common::default() },
+                        onpick: move |value| pulled.set(format!("item {value}")),
+                    }
+                }
                 Specimen { name: "Disabled",
                     PopUpButton::<u8> { items: options(), value: Some(0), availability: Availability::Disabled, onpick: |_| {} }
                 }
