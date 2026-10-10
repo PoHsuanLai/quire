@@ -167,6 +167,7 @@ pub use crate::spell::service::SpellService;
 pub use crate::window::host::HostWindow;
 
 // Controls, menus and root pieces a consumer draws that the groups above omit
+pub use crate::components::app::spaces::{NewSpace, Showing, SpacesHandle};
 pub use crate::components::content::label::Label;
 pub use crate::components::controls::button::Button;
 pub use crate::components::controls::choice::Choice;
@@ -185,6 +186,7 @@ pub use crate::components::menus::palette::machine::model::{
 };
 pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
+pub use crate::components::menus::pull_down_button::PullDownButton;
 pub use crate::components::menus::search::model::{
     CardPlace, Ends, EscapeOrder, InitialHighlight, Panel, SearchCursor, SuggestionSection,
     SuggestionsPresent,

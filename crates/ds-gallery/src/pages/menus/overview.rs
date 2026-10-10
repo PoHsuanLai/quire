@@ -365,6 +365,21 @@ fn PopUps() -> Element {
                         onpick: move |value| pulled.set(format!("item {value}")),
                     }
                 }
+                Specimen { name: "PullDownButton", code: "PullDownButton".to_string(),
+                    PullDownButton::<u8> {
+                        items: options(),
+                        icon: Some(IconSource::Glyph(Icon::Plus)),
+                        title: Some("Actions".to_string()),
+                        onpick: move |value| pulled.set(format!("item {value}")),
+                    }
+                }
+                Specimen { name: "PullDownButton, icon",
+                    PullDownButton::<u8> {
+                        items: options(),
+                        icon: Some(IconSource::Glyph(Icon::Ellipsis)),
+                        onpick: move |value| pulled.set(format!("item {value}")),
+                    }
+                }
                 Specimen { name: "Disabled",
                     PopUpButton::<u8> { items: options(), value: Some(0), availability: Availability::Disabled, onpick: |_| {} }
                 }

@@ -900,7 +900,7 @@ Full catalogue (design doc section in parentheses):
 | --- | --- |
 | Controls | `Label`, `Button` (push, toolbar, inline and help bezels; an image-only button is a toolbar `Button`), `Toggle`, `Checkbox`, `RadioGroup<T>`, `SegmentedControl<T>` (also the tab strip), `Slider` (linear and capsule looks), `TextField` (plain, secure, search and multi-line), `ProgressIndicator` (bar, spinner, ring), `LevelIndicator`, `Badge`, `KeyEquivalent`, `CommandPill`, `Chip`, `Avatar`, `SectionHeader` |
 | Lists | `List`, `Row`, `SectionHeader`, `Disclosure` (design/30 §2), `ThreadRow` (`ds::components::app`), `HoverStrip` (§17) |
-| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow), `Skeleton`/`SkeletonRow` (static placeholders), `Loadable` (placeholder, content or failure by phase) |
+| Overlays | `Tooltip`/`HoverTarget`/`HoverCard` (§18, §22), `Menu`/`MenuItem`/`PopUpButton`/`PullDownButton` (design/30 §2.4), `Popover` (§21), `Toast`/`use_toasts` (§23), `Sheet`/`Alert`/`SidePanel`/`Peek` (§24), `CommandPalette<T>` (§25), `EmptyState`, `InlineBanner` (a message in a pane's own flow), `Skeleton`/`SkeletonRow` (static placeholders), `Loadable` (placeholder, content or failure by phase) |
 | Frame | `Column` (a vertical stack: `gap: SpacingToken`, `align: ColumnAlign`), `Capsule` (design/30 §2.7a), `PinTile`/`PinTiles` (design/30 §2.11), `ProviderMark` (§28), `LinkPill` (§29), `SendPill` (§31), `SpaceEditor` and `SpaceDot` (§32), `EdgePeek`, `TodayTabs`, `space_pressed` (§2.11), `DragGhost` (§34) |
 
 Every component's exact props are its own `#[component] pub fn` signature in
@@ -934,6 +934,11 @@ A few props worth knowing about before you read the signatures:
 - `PopUpButton { value: Option<T>, onpick }` is controlled in its value; its open state is the button's
   own until the caller passes `open: Some(Shown)`, after which every press, arrow key, pick or dismissal
   reaches `on_open_change(Shown)` and the caller stores it (`start` is then ignored).
+- `PullDownButton { items, onpick, icon, title }` is `NSPopUpButton`'s pull-down style: an icon and/or a
+  label with a chevron down, opening a menu of actions under it. A pick calls `onpick(T)` and the face
+  never changes (with an `icon` and no `title` it is the icon alone, named "Menu" unless
+  `common.aria_label` says otherwise). Return, Space, Down and a click open it; Escape closes it and
+  the button has the keyboard again. `start`, `open`, `on_open_change` and `anchor` are `PopUpButton`'s.
 - A button's `availability` is its controlled disabled state. `answers: Answers::Return` draws the
   default button and `Answers::Escape` the Cancel button; the keys themselves are routed by the dialog:
   `Alert` routes both, and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
@@ -1960,6 +1965,10 @@ rsx! { Ds { appearance, material, look: spaces.look(),
 } }
 ```
 
+- `SpacesFoot { new_space: NewSpace::Hidden }` leaves the `+` out, for a foot whose one menu holds New
+  Space (Dia: leading icon, the dots, one chevron). Put a `PullDownButton` in `trailing` and make the
+  Space from its pick: `let made = spaces.add(payload); spaces.show(made, at, Showing::Rename);`
+  (`SpacesHandle`, `Showing` and `NewSpace` are in the prelude). `new_payload` is still required.
 - Hooks for an old file: `boot_spaces(raw_fix, first_run, on_load)` runs `raw_fix` on the parsed JSON
   (a one-time import) and `on_load` on the list (a payload fix-up); either changing it writes it back.
 - Today: `use_today(|| storage.boot_today(Epoch::now()), save)` prunes on boot;
