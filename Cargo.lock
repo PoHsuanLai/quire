@@ -1727,6 +1727,7 @@ dependencies = [
 name = "ds-conformance"
 version = "0.1.0"
 dependencies = [
+ "chordkit",
  "dioxus",
  "ds",
  "ds-blitz",
@@ -1772,6 +1773,7 @@ dependencies = [
 name = "ds-gallery"
 version = "0.1.0"
 dependencies = [
+ "chordkit",
  "dioxus",
  "dioxus-ssr",
  "ds",

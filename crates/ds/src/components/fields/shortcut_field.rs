@@ -106,7 +106,7 @@ pub fn ShortcutField(
                 onmounted: move |event| common.mounted(event),
                 "{text}"
             }
-            if let Some(used_by) = used_by {
+            if let Some(used_by) = &used_by {
                 span { class: "ds-shortcut-field-clash", role: "status", "{used_by}" }
             }
         }
