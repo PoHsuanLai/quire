@@ -52,6 +52,7 @@ fn button<T: Clone + PartialEq + 'static>(
         Button {
             label: item.label.clone(),
             title: Some(item.label.clone()),
+            title_shortcut: item.shortcut.clone(),
             bezel: Bezel::Toolbar,
             size: ControlSize::Large,
             image: ImagePosition::Only,

@@ -3,7 +3,7 @@
 
 use crate::host::measure::Anchor;
 use ds_core::geometry::units::Px;
-use ds_core::vocab::{Availability, Check};
+use ds_core::vocab::{Availability, Check, Shortcut};
 use ds_style::icon::Icon;
 
 /// How wide one toolbar button and its gap are, in pixels (`--btn-h` Large plus the gap).
@@ -32,6 +32,9 @@ pub struct ToolbarItem<T> {
     pub check: Option<Check>,
     /// Whether it can be picked.
     pub availability: Availability,
+    /// The key that does what the button does, drawn after its name in the tooltip
+    /// (`Zoom In  +`); none for a button with no key.
+    pub shortcut: Option<Shortcut>,
 }
 
 impl<T> ToolbarItem<T> {
@@ -43,6 +46,15 @@ impl<T> ToolbarItem<T> {
             icon,
             check: None,
             availability: Availability::Enabled,
+            shortcut: None,
+        }
+    }
+
+    /// The same item with the key that does what it does.
+    pub fn with_shortcut(self, shortcut: Shortcut) -> Self {
+        ToolbarItem {
+            shortcut: Some(shortcut),
+            ..self
         }
     }
 
