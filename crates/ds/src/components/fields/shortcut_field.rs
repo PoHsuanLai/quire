@@ -22,6 +22,7 @@ use crate::root::common::Common;
 use chordkit::Chord;
 use dioxus::prelude::*;
 use ds_core::command::chord_text;
+use ds_core::time::{FRAME_SLACK, clock::sleep};
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
 
@@ -53,6 +54,9 @@ pub fn ShortcutField(
     let mut capture = use_signal(Capture::default);
     // The well itself: a click hands it the keyboard, so the next combination reaches it.
     let mut well = use_signal(|| None::<std::rc::Rc<MountedData>>);
+    // Whether the well has the keyboard, so a blur that the click's own focus undoes is not a
+    // cancel.
+    let mut held = use_signal(|| Held::Elsewhere);
     let live = availability == Availability::Enabled;
     let mut finish = move |recorded: ShortcutRecorded| {
         capture.set(Capture::Idle);
@@ -96,10 +100,18 @@ pub fn ShortcutField(
                         }
                     }
                 },
+                onfocus: move |_| held.set(Held::Here),
                 onblur: move |_| {
-                    if capture() == Capture::Listening {
-                        finish(ShortcutRecorded::Cancelled);
-                    }
+                    held.set(Held::Elsewhere);
+                    // Blitz can blur the well around the click that starts listening (it moves
+                    // focus off a focused button whose child was hit) and the click focuses it
+                    // again; only a blur that still stands a frame later gives up.
+                    spawn(async move {
+                        sleep(FRAME_SLACK).await;
+                        if held() == Held::Elsewhere && capture() == Capture::Listening {
+                            finish(ShortcutRecorded::Cancelled);
+                        }
+                    });
                 },
                 onkeydown: move |event: KeyboardEvent| match capture() {
                     Capture::Idle => {
@@ -144,4 +156,13 @@ pub fn ShortcutField(
             }
         }
     }
+}
+
+/// Whether the well has the keyboard.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Held {
+    /// The well is focused.
+    Here,
+    /// Focus is elsewhere.
+    Elsewhere,
 }

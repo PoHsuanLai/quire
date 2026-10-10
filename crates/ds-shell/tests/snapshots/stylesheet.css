@@ -2761,9 +2761,11 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-shortcut-field-clash{ font-size:var(--fs-help); color:var(--warn); }
 .ds-shortcut-field[*|data-availability=disabled] .ds-shortcut-field-well{ opacity:.35; }
-/* With extra keys the well holds key caps (KeyEquivalent's `cap` style: `.ds-key-equivalent-key`):
+/* The caps take no pointer: Blitz moves focus off a focused button when its non-focusable child
+   is clicked, which would cancel the recording the click starts; the well hears the click.
+   With extra keys the well holds key caps (KeyEquivalent's `cap` style: `.ds-key-equivalent-key`):
    the value's and each further key's. */
-.ds-shortcut-field-caps{ display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
+.ds-shortcut-field-caps{ pointer-events:none; display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
 /* -- text_runs -- */
 /* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
