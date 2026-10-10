@@ -294,6 +294,77 @@ fn app_overrides_lie_on_the_source_and_survive_a_reload() {
 }
 
 #[test]
+fn set_overrides_rebinds_and_an_empty_set_restores_the_default() {
+    let mut state = ours_state();
+    let compose = row("mail.compose", "Primary+Shift+N");
+    let tab = row("mail.tab", "Primary+T");
+    let tabs = Registration::new(&mail())
+        .forgo(StandardAction::ShowFonts)
+        .action(compose.0, compose.1)
+        .action(tab.0, tab.1);
+    assert_eq!(state.register(&mail(), &tabs), Ok(()));
+    let rebound = press(&[Modifier::Super, Modifier::Alt], 'n');
+    let default = press(&[Modifier::Super, Modifier::Shift], 'n');
+    let command_t = press(&[Modifier::Super], 't');
+    let (overrides, parsed) = Overrides::parse("mail.compose = Primary+Alt+N\n");
+    assert!(parsed.is_empty(), "{parsed:?}");
+    state.set_overrides(overrides);
+    assert_eq!(
+        state.keymap.resolve(&rebound, Context::Normal),
+        app_action("mail.compose")
+    );
+    assert_eq!(state.keymap.resolve(&default, Context::Normal), None);
+    // The registrations and the forgo survive the reapply.
+    assert_eq!(
+        state.keymap.resolve(&command_t, Context::Normal),
+        app_action("mail.tab")
+    );
+    state.set_overrides(Overrides::default());
+    assert_eq!(state.keymap.resolve(&rebound, Context::Normal), None);
+    assert_eq!(
+        state.keymap.resolve(&default, Context::Normal),
+        app_action("mail.compose")
+    );
+    assert_eq!(
+        state.keymap.resolve(&command_t, Context::Normal),
+        app_action("mail.tab")
+    );
+    assert!(state.problems().is_empty(), "{:?}", state.problems());
+}
+
+#[test]
+fn the_handle_sets_overrides_in_a_running_app() {
+    thread_local! {
+        static SEEN: RefCell<Vec<Option<Action>>> = const { RefCell::new(Vec::new()) };
+    }
+    fn running() -> Element {
+        let keys = use_keys_provider();
+        use_hook(|| {
+            let (compose, chord) = row("mail.compose", "Primary+Shift+N");
+            let registration = Registration::new(&mail()).action(compose, chord);
+            assert_eq!(keys.register(&mail(), &registration), Ok(()));
+            let rebound = |keys: &super::Keys| {
+                keys.resolve(
+                    &Key::Character("n".into()),
+                    Modifiers::META | Modifiers::ALT,
+                    Context::Normal,
+                )
+            };
+            let (overrides, _) = Overrides::parse("mail.compose = Primary+Alt+N\n");
+            keys.set_overrides(overrides);
+            SEEN.with(|seen| seen.borrow_mut().push(rebound(&keys)));
+            keys.set_overrides(Overrides::default());
+            SEEN.with(|seen| seen.borrow_mut().push(rebound(&keys)));
+        });
+        rsx! {}
+    }
+    let mut dom = VirtualDom::new(running);
+    dom.rebuild_in_place();
+    let seen = SEEN.with(|seen| seen.borrow().clone());
+    assert_eq!(seen, vec![app_action("mail.compose"), None]);
+}
+
+#[test]
 fn a_probe_registers_with_forgo_through_the_handle() {
     thread_local! {
         static TAKEN: RefCell<Option<Option<Action>>> = const { RefCell::new(None) };

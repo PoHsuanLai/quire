@@ -3,7 +3,7 @@
 use super::source::KeySource;
 use super::state::KeyState;
 use chordkit::{
-    Action, AppAction, AppId, Chord, Conflict, Context, DefaultChord, Keymap, Platform,
+    Action, AppAction, AppId, Chord, Conflict, Context, DefaultChord, Keymap, Overrides, Platform,
     Registration,
 };
 use dioxus::prelude::*;
@@ -77,6 +77,17 @@ impl Keys {
             self.touch();
         }
         registered
+    }
+
+    /// Replaces the person's overrides in a running app, as `AppConfig::with_keymap_overrides`
+    /// gave them at launch: they lie again over the conventions, the system's layer and the
+    /// app's, every [`register`](Keys::register) is made again (so app actions and forgone
+    /// standard actions hold), and every shortcut hint redraws. Empty overrides give the
+    /// defaults back, so a reset undoes an earlier change. What the new overrides cannot apply
+    /// is kept in [`problems`](Keys::problems).
+    pub fn set_overrides(&self, overrides: Overrides) {
+        self.state.write_unchecked().set_overrides(overrides);
+        self.touch();
     }
 
     /// The chords that trigger `action` in ordinary window content, best first.

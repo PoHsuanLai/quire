@@ -1,4 +1,4 @@
-use chordkit::{AppId, Conflict, Keymap, Registration, Watch};
+use chordkit::{AppId, Conflict, Keymap, Overrides, Registration, Watch};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 
@@ -86,6 +86,13 @@ impl KeyState {
         self.base = base;
         self.keymap = keymap;
         self.problems = problems;
+    }
+
+    /// Replaces the person's overrides with `overrides` (empty ones give the defaults back), then
+    /// reads the source again and makes every registration again over it.
+    pub(super) fn set_overrides(&mut self, overrides: Overrides) {
+        self.source = self.source.clone().with_overrides(overrides);
+        self.reload();
     }
 
     /// Whether the source said its settings changed since the last call.

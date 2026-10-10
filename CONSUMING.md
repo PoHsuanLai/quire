@@ -1989,6 +1989,11 @@ fn Editor() -> Element {
   source stays) or `KeySource::with_overrides(overrides)` (harness: `with_keymap_source`). They are
   applied before registrations, again after every reload, and the lines the platform refuses are
   in `Keys::problems()`.
+- **Changing overrides while running.** `use_keys().set_overrides(overrides)` replaces the person's
+  overrides in a running app (a settings screen saving a rebind): they lie again over the
+  conventions and the system's layer, every `register` is made again (app actions and forgone
+  standard actions hold), and shortcut hints redraw. Empty `Overrides::default()` gives the
+  defaults back.
 - **Below App, above Ds.** A component that sits between the launcher and `Ds` and needs the
   launcher's `KeySource` calls `ds::prelude::use_keys_provider()` (it makes the root keymap, or
   joins the enclosing one); `use_keys` there would build a keymap of our conventions. Under `Ds`
