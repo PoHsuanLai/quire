@@ -20,7 +20,7 @@ fn page() -> Element {
     let mut picked = use_signal(|| 0_u8);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
-            div { style: "padding:24px",
+            div {
                 PullDownButton::<u8> {
                     items: vec![MenuItem::new(1, "New Space"), MenuItem::new(2, "Settings")],
                     onpick: move |value| picked.set(value),
@@ -49,7 +49,7 @@ fn click_button(harness: &mut Harness) {
     let at = harness.centre(BUTTON).expect("laid out"); // test-only
     harness.send(Input::pointer_move(at));
     harness.send(Input::click(at));
-    settle(harness);
+    harness.advance(Duration::from_millis(16));
 }
 
 #[test]
@@ -76,7 +76,6 @@ fn a_pick_fires_onpick_and_the_label_stays() {
     let mut harness = started();
     let before = harness.text_of(BUTTON);
     click_button(&mut harness);
-    harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Enter));
     settle(&mut harness);
