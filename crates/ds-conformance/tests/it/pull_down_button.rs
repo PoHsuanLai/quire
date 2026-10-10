@@ -20,7 +20,7 @@ fn page() -> Element {
     let mut picked = use_signal(|| 0_u8);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
-            div {
+            div { style: "padding:24px",
                 PullDownButton::<u8> {
                     items: vec![MenuItem::new(1, "New Space"), MenuItem::new(2, "Settings")],
                     onpick: move |value| picked.set(value),

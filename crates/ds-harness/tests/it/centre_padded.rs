@@ -104,7 +104,6 @@ fn Inline() -> Element {
 }
 
 #[test]
-#[ignore = "Blitz hit test removes an inline root's padding and border before testing its atomic inline boxes, whose locations already include them; fixed in the blitz fork at the next toolchain bump"]
 fn an_inline_box_under_a_padded_block_is_read_where_it_is_drawn() {
     let mut harness = Harness::new(Inline, VIEW);
     let inner = harness.rect("#btn").expect("the button");
