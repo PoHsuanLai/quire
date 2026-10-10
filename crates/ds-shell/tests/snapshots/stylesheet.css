@@ -540,6 +540,14 @@ html,body{margin:0;padding:0;background:transparent}
 /* The dot has no number: a circle of the badge's height, less the label's inset. */
 .ds-badge[*|data-content=dot]{ min-width:0; width:calc(var(--bd-h) / 2); height:calc(var(--bd-h) / 2); padding:0; }
 .ds-badge-label{ line-height:1; white-space:nowrap; }
+/* -- banner_action_row -- */
+/* BannerActionRow (a banner's text field and its buttons in one line). The field takes the width
+   left and may shrink to nothing; the buttons keep their size, and the row wraps them under the
+   field when the pane is too narrow for both. */
+
+.ds-banner-action-row{ display:flex; align-items:center; flex-wrap:wrap; gap:var(--s-6) var(--s-8); box-sizing:border-box; width:100%; min-width:0; }
+.ds-banner-action-row-field{ display:flex; flex:1 1 12em; min-width:0; }
+.ds-banner-action-row-buttons{ display:flex; flex:none; align-items:center; gap:var(--s-6); }
 /* -- button -- */
 /* Button (design/30 section 2.1, `NSButton`). Attribute selectors carry `*|` (spike S2). The
    focus ring is the global `.ds[*|data-modality=keyboard] :focus` rule (spike S12).
@@ -730,6 +738,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-column[*|data-align=start]{ align-items:flex-start; }
 .ds-column[*|data-align=center]{ align-items:center; }
 .ds-column[*|data-align=end]{ align-items:flex-end; }
+.ds-column[*|data-gap=none]{ gap:0; }
+.ds-column[*|data-extent=fill]{ width:100%; height:100%; box-sizing:border-box; }
+.ds-column[*|data-extent=fixed]{ --column-extent:var(--ctl-h-m); height:var(--column-extent); flex:none; }
+.ds-column[*|data-extent=fixed][*|data-size=mini]{ --column-extent:var(--ctl-h-xs); }
+.ds-column[*|data-extent=fixed][*|data-size=small]{ --column-extent:var(--ctl-h-s); }
+.ds-column[*|data-extent=fixed][*|data-size=large]{ --column-extent:var(--ctl-h-l); }
+.ds-column[*|data-extent=fixed][*|data-size=extra-large]{ --column-extent:var(--ctl-h-xl); }
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
@@ -1071,6 +1086,16 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
   color:var(--on-hue);
 }
+/* -- icon_button_group -- */
+/* IconButtonGroup: small icon buttons on one rounded plate. The plate's radius follows the control
+   size's ladder (`--ctl-r-*`); the quiet fill is the banner's. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-icon-button-group{ --group-r:var(--ctl-r-s); display:inline-flex; align-items:center; gap:var(--s-1); padding:var(--s-2); box-sizing:border-box; border-radius:var(--group-r); background:var(--fill-quaternary); }
+.ds-icon-button-group[*|data-size=mini]{ --group-r:var(--ctl-r-xs); }
+.ds-icon-button-group[*|data-size=regular]{ --group-r:var(--ctl-r-m); }
+.ds-icon-button-group[*|data-size=large]{ --group-r:var(--ctl-r-l); }
+.ds-icon-button-group[*|data-size=extra-large]{ --group-r:var(--ctl-r-xl); }
 /* -- icon_view -- */
 /* IconView (design/08-ICONS.md section 1.5): an external icon in any icon slot. The size and the
    URL arrive inline (`--ic-size`, and `mask-image` or `background-image`), so this sheet only
@@ -1348,8 +1373,11 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-menu-item{
   display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
-  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
+  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap; position:relative;
 }
+/* A row's tooltip zone: transparent, over the whole row, so a disabled row still has a pointer
+   target; the row's own handlers hear the events that bubble from it. */
+.ds-menu-tip{ position:absolute; top:0; right:0; bottom:0; left:0; }
 /* A menu with no state column: the title starts as far from the highlight's edge as the key
    equivalent ends, rather than 2 px in (the 2 px assumes the 22 px check column beside it). */
 .ds-menu-item[*|data-state-column=absent]{ padding-left:var(--s-8); }
@@ -1596,6 +1624,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-pdf-thumb[*|data-state=pending] .ds-pdf-thumb-sheet{ opacity:.5; }
 .ds-pdf-thumb-page{ position:absolute; left:0; top:0; display:block; width:100%; height:100%; pointer-events:none; user-select:none; }
 .ds-pdf-thumb-plate{ position:absolute; left:0; top:0; right:0; bottom:0; display:flex; align-items:center; justify-content:center; }
+/* -- pinned_bar -- */
+/* PinnedBar: a bar laid over the top or bottom edge of a scroll container. Blitz has no
+   `position: sticky`, so the container is positioned and the bar is absolute within it, outside
+   the scroller. The bar is a raised card inset from the edge. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-pinned{ position:relative; display:flex; flex-direction:column; min-width:0; min-height:0; }
+.ds-pinned-bar{
+  position:absolute; top:var(--s-8); left:var(--s-8); right:var(--s-8); z-index:var(--z-raise); box-sizing:border-box;
+  padding:var(--s-6) var(--s-10); border-radius:var(--r-menu); background:var(--raise); box-shadow:var(--shadow-pop); color:var(--ink);
+}
+.ds-pinned[*|data-edge=bottom] .ds-pinned-bar{ top:auto; bottom:var(--s-8); }
 /* -- popover -- */
 /* Popover (design/04-COMPONENTS.md section 21): the surface under menus, hover cards, the tip
    card, and the overlay wrapper every floating component renders into at the end
@@ -2721,6 +2761,13 @@ html,body{margin:0;padding:0;background:transparent}
 }
 .ds-shortcut-field-clash{ font-size:var(--fs-help); color:var(--warn); }
 .ds-shortcut-field[*|data-availability=disabled] .ds-shortcut-field-well{ opacity:.35; }
+/* With extra keys the well holds key caps: the value's and each further key's, in the key
+   equivalent's cap style. */
+.ds-shortcut-field-caps{ display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
+.ds-shortcut-field-cap{
+  display:inline-block; font-family:var(--font-code); font-size:var(--fs-note); border:var(--hair) solid var(--line); border-bottom-width:2px;
+  border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
+}
 /* -- text_runs -- */
 /* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with
