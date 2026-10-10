@@ -80,7 +80,7 @@ mod tests {
             (&[], None),
         ];
         for (vars, want) in cases {
-            let found = config_dir(&lookup(*vars));
+            let found = config_dir(&lookup(vars));
             assert_eq!(found, want.map(PathBuf::from), "{vars:?}");
         }
     }
@@ -102,7 +102,7 @@ mod tests {
             (&[("CHORDKIT_PLATFORM", "windows")], Platform::Windows),
         ];
         for (vars, want) in cases {
-            assert_eq!(detected(&lookup(*vars)).platform(), *want, "{vars:?}");
+            assert_eq!(detected(&lookup(vars)).platform(), *want, "{vars:?}");
         }
     }
 
