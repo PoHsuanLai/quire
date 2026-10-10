@@ -130,6 +130,7 @@ pub use crate::components::lists::row::leading::RowLeading;
 pub use crate::components::lists::row::row::Row;
 pub use crate::components::lists::section_header::HeaderAction;
 pub use crate::components::lists::section_header::SectionHeader;
+pub use crate::components::lists::table::rules::{ColumnRules, HeaderRule};
 
 // Spaces
 pub use crate::components::app::space_editor::SpaceEditor;

@@ -8,7 +8,8 @@
 //! Markup: `div.ds-table[role=group]` (the grid template as `--table-cols`) of
 //! `div.ds-table-header` (`button.ds-table-column` with `.ds-table-title`, `.ds-table-sort`, and
 //! a `span.ds-table-resize` after each but the last) and the `List`, whose rows hold
-//! `div.ds-table-cells` of `span.ds-table-cell`.
+//! `div.ds-table-cells` of `span.ds-table-cell`. `data-rules=hairline` on the root draws the
+//! lines between columns.
 
 use crate::components::lists::list::list::List;
 use crate::components::lists::list::model::{ListItem, ListStyle};
@@ -16,6 +17,7 @@ use crate::components::lists::row::row::Row;
 use crate::components::lists::row::size::RowSize;
 use crate::components::lists::table::head::{cells, use_resize};
 use crate::components::lists::table::model::{Sort, TableColumn, TableRow};
+use crate::components::lists::table::rules::ColumnRules;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::{RowState, Selection};
@@ -25,7 +27,7 @@ use std::hash::Hash;
 /// A table of `rows` in `columns`. `sort` is the sorted column; `on_sort` hears what a header
 /// press asks for. `selection` are the selected rows and `cursor` the one the keys rest on;
 /// `onselect` hears a click, an arrow or a typed letter reaching a row. `size` is the rows'
-/// height (24 by default).
+/// height (24 by default). `rules` draws a hairline between the columns.
 #[component]
 pub fn Table<K: Clone + PartialEq + Hash + 'static, C: Clone + PartialEq + 'static>(
     label: String,
@@ -37,6 +39,7 @@ pub fn Table<K: Clone + PartialEq + Hash + 'static, C: Clone + PartialEq + 'stat
     #[props(default)] cursor: Option<K>,
     onselect: EventHandler<K>,
     #[props(default)] size: RowSize,
+    #[props(default)] rules: ColumnRules,
     #[props(default)] common: Common,
 ) -> Element {
     let resize = use_resize();
@@ -76,6 +79,7 @@ pub fn Table<K: Clone + PartialEq + Hash + 'static, C: Clone + PartialEq + 'stat
             role: "group",
             "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "data-density": size.slug(),
+            "data-rules": rules.attribute(),
             style: "--table-cols:{template}",
             onmounted: move |event| common.mounted(event),
             onpointermove: move |event: PointerEvent| resize.drag(&move_columns, &event),

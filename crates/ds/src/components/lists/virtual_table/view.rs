@@ -14,13 +14,15 @@
 //! Markup: `div.ds-table.ds-vtable.ds-list[role=group]` (the grid template as `--table-cols`) of
 //! `div.ds-vtable-body` of the `Table`'s `div.ds-table-header` and a `Scroller` of a spacer,
 //! `div.ds-vtable-rows[role=listbox]` of `div.ds-vtable-item` (one `Row` each, `data-row` its
-//! index) and a spacer. A table wider than its box scrolls sideways, header and rows together.
+//! index) and a spacer. `data-rules=hairline` draws the lines between columns and
+//! `data-scrolled=yes|no` (unless the header rule is `Never`) keys the line under the header. A table wider than its box scrolls sideways, header and rows together.
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{cells, use_resize};
 use crate::components::lists::table::model::{Sort, TableColumn};
+use crate::components::lists::table::rules::{ColumnRules, HeaderRule};
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
 use crate::components::lists::virtual_table::model::{TableKey, page_rows, table_key, target};
@@ -53,7 +55,8 @@ pub const fn row_pitch() -> Px {
 /// to a row. `sort` is the sorted column and `on_sort` hears what a header press asks for.
 /// `cursor` is the selected row, kept in view; `onselect` hears a click, an arrow, Home, End,
 /// Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the cursor.
-/// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default).
+/// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default). `rules` draws a hairline between the columns; `header_rule` draws one under the
+/// header once the rows are scrolled (`HeaderRule::WhenScrolled`, the default).
 ///
 /// The row index and the pixel offset are `f32`s in the end: past about 500,000 rows (16 million
 /// pixels) a row's top is no longer exact, so a table of more rows than that should be paged by
@@ -71,6 +74,8 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] onselect: Option<EventHandler<usize>>,
     #[props(default)] onpick: Option<EventHandler<usize>>,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
+    #[props(default)] rules: ColumnRules,
+    #[props(default)] header_rule: HeaderRule,
     #[props(default)] common: Common,
 ) -> Element {
     let pitch = row_pitch();
@@ -140,6 +145,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     let data = common.data_attributes();
     let mounted = common.clone();
     let away = (held() == Held::No).then_some("away");
+    let scrolled = header_rule.attribute(scroller.scroll().read().offset);
     let (above, below) = (layout.top(start).0, layout.below(end).0);
     let (height, wide) = (pitch.0, total.0);
     rsx! {
@@ -150,6 +156,8 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             tabindex: "0",
             "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "data-focus": away,
+            "data-rules": rules.attribute(),
+            "data-scrolled": scrolled,
             style: "--table-cols:{template}",
             onmounted: move |event| mounted.mounted(event),
             onfocus: move |_| held.set(Held::Yes),

@@ -787,6 +787,8 @@ or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its a
 `List { label, items: Vec<ListItem<K>>, style: ListStyle }` roves with the arrows and Home/End.
 `Table { label, columns, rows, sort, on_sort, selection, cursor, onselect }` (`TableColumn::new(id, title, width)`, `TableRow::new(key, label, cells)`) is a header of sortable, resizable columns over a `List`.
 
+`Table` and `VirtualTable` take `rules: ColumnRules::{None, Hairline}` (prelude; default `None`): `Hairline` draws a hairline between the columns, header and cells, like Numbers; apps never style `.ds-table-*` themselves (ds-lint's DsInternals rule).
+
 **A table of many rows: `VirtualTable`.** `ds::components::lists::virtual_table::{VirtualTable, row_pitch}`
 shows a file of a million lines without building them. `VirtualTable::<C> { label, columns:
 Vec<TableColumn<C>>, rows: usize, cell: Callback<(usize, usize), Element>, scroller: ScrollerRef, sort,
@@ -796,7 +798,7 @@ the data stays where you keep it; `cell` is called on every render for every mou
 lookup. Rows are `row_pitch()` tall (`--row-compact-h`), the header stays above the scroller, column
 widths are the `TableColumn`s' and a drag on a header edge resizes them (a table wider than its box scrolls
 sideways). The row index is the row's identity: `cursor` is the selected row (kept in view), and the
-arrows, Home, End, Page Up and Page Down ask `onselect` for another row; Enter and Space ask `onpick`.
+arrows, Home, End, Page Up and Page Down ask `onselect` for another row; Enter and Space ask `onpick`. `header_rule: HeaderRule::{WhenScrolled (default), Never}` (prelude) draws a hairline under the header once the rows are scrolled, like Finder's list view; ds writes `data-scrolled=yes|no` from the scroller, no JS.
 To scroll to a row, make the scroller yourself, `let scroller = use_scroller();`, pass it in, and call
 `scroller.reveal_row(row, row_pitch())` (the least scroll that shows it) or `scroller.scroll_to(Px(row as
 f32 * row_pitch().0))` (the row at the top). Rows are `f32` pixels: beyond about 500,000 rows a row's top is

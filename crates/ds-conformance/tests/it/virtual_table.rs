@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use ds::components::controls::scroller::handle::use_scroller;
 use ds::components::lists::table::model::TableColumn;
+use ds::components::lists::table::rules::{ColumnRules, HeaderRule};
 use ds::components::lists::virtual_table::{VirtualTable, row_pitch};
 use ds::prelude::*;
 use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -56,6 +57,7 @@ fn Page() -> Element {
                     on_sort: |_| {},
                     cursor: cursor(),
                     onselect: move |row| cursor.set(Some(row)),
+                    rules: ColumnRules::Hairline,
                 }
             }
             button { class: "to-5000", onclick: move |_| scroller.reveal_row(5000, row_pitch()), "5000" }
@@ -157,4 +159,48 @@ fn the_keys_ask_to_move_the_cursor_by_a_row_and_by_a_page_and_the_cursor_row_is_
         mounted(&harness).contains(&(ROWS - 1)),
         "the cursor is in view"
     );
+}
+
+#[allow(non_snake_case)]
+fn Bare() -> Element {
+    let scroller = use_scroller();
+    let columns = vec![TableColumn::new(0u8, "Row", Px(80.0))];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "height:200px; width:300px; display:flex; flex-direction:column",
+                VirtualTable::<u8> {
+                    label: "Bare",
+                    columns,
+                    rows: ROWS,
+                    cell: Callback::new(|(row, _): (usize, usize)| rsx! { "{row}" }),
+                    scroller,
+                    on_sort: |_| {},
+                    header_rule: HeaderRule::Never,
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn hairline_rules_are_marked_and_none_leaves_the_table_unmarked() {
+    let ruled = harness().html();
+    assert!(ruled.contains("data-rules=\"hairline\""), "{ruled}");
+    let bare = Harness::new(Bare, HarnessConfig::new(VIEW).with_clock(Clock::Virtual)).html();
+    assert!(!bare.contains("data-rules"), "no rules attribute");
+    assert!(
+        !bare.contains("data-scrolled"),
+        "HeaderRule::Never marks nothing"
+    );
+}
+
+#[test]
+fn the_header_rule_shows_once_the_rows_are_scrolled() {
+    let mut harness = harness();
+    assert!(harness.html().contains("data-scrolled=\"no\""));
+    let at = harness.centre(".ds-scroller").expect("the scroller");
+    harness.send(Input::wheel(at, Px(0.0), Px(-3.0 * row_pitch().0)));
+    assert!(harness.html().contains("data-scrolled=\"yes\""));
+    harness.send(Input::wheel(at, Px(0.0), Px(3.0 * row_pitch().0)));
+    assert!(harness.html().contains("data-scrolled=\"no\""));
 }

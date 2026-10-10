@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use ds::components::lists::table::model::{Sort, SortDirection, TableColumn, TableRow};
+use ds::components::lists::table::rules::ColumnRules;
 use ds::components::lists::table::view::Table;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -93,4 +94,22 @@ fn dragging_a_header_edge_resizes_the_column_and_stops_at_its_least() {
         6,
     ));
     assert_eq!(head(&harness), 48.0, "held at the least");
+}
+
+#[allow(non_snake_case)]
+fn Ruled() -> Element {
+    let columns = vec![TableColumn::new(0u8, "Name", Px(150.0))];
+    let rows = vec![TableRow::new(1u8, "A", vec![rsx! { "A" }])];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            Table::<u8, u8> { label: "Files", columns, rows, rules: ColumnRules::Hairline, on_sort: |_| {}, onselect: |_| {} }
+        }
+    }
+}
+
+#[test]
+fn hairline_rules_mark_the_table_and_the_default_does_not() {
+    let ruled = Harness::new(Ruled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    assert!(ruled.html().contains("data-rules=\"hairline\""));
+    assert!(!harness().html().contains("data-rules"));
 }

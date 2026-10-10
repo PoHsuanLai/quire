@@ -3,5 +3,6 @@
 
 pub(crate) mod head;
 pub mod model;
+pub mod rules;
 pub mod view;
 pub(crate) mod widths;
