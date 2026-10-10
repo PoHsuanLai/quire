@@ -86,3 +86,40 @@ fn a_scrolled_container_keeps_its_own_rect() {
         "scrolling its content does not move the box itself"
     );
 }
+
+/// A button inside an inline-block inside a padded, bordered block: Blitz places each atomic inline
+/// box in its inline root's content box, so the padding of both roots lies between them and the
+/// window.
+#[allow(non_snake_case)]
+fn Inline() -> Element {
+    let mut hits = use_signal(|| 0u32);
+    rsx! {
+        div { id: "root", style: "padding:24px 30px; border:2px solid black",
+            span { id: "box", style: "display:inline-block; padding:4px 6px",
+                button { id: "btn", style: "padding:2px 8px", onclick: move |_| hits += 1, "go" }
+            }
+        }
+        div { id: "hits", "{hits}" }
+    }
+}
+
+#[test]
+fn an_inline_box_under_a_padded_block_is_read_where_it_is_drawn() {
+    let mut harness = Harness::new(Inline, VIEW);
+    let inner = harness.rect("#btn").expect("the button");
+    // 8 body margin + 2 border + 30 padding of the block, then the inline-block's 6 padding.
+    assert_eq!(inner.origin.x.0, 8.0 + 2.0 + 30.0 + 6.0);
+    let outer = harness.rect("#box").expect("the inline-block");
+    assert_eq!(outer.origin.x.0, 8.0 + 2.0 + 30.0);
+    assert!(
+        outer.origin.y.0 >= 8.0 + 2.0 + 24.0,
+        "below the block's top padding: {outer:?}"
+    );
+    let at = harness.centre("#btn").expect("the button's centre");
+    assert!(
+        harness.hits(at, "#btn"),
+        "a press at {at:?} targets the button"
+    );
+    harness.send(Input::click(at));
+    assert_eq!(harness.text_of("#hits").as_deref(), Some("1"));
+}

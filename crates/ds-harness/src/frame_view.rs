@@ -2,7 +2,7 @@
 //! document, so the harness's own queries never see into it (the isolation mailo's reader relies
 //! on) and a test that wants its contents asks the frame.
 
-use crate::driver::{DocQuery, first};
+use crate::driver::{DocQuery, first, rect_of};
 use crate::harness::Harness;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
 use ds::prelude::*;
@@ -87,13 +87,12 @@ impl<'h> FrameView<'h> {
     /// coordinates: where a test clicks it with [`Input::click`](crate::Input::click).
     pub fn centre(&self, selector: &str) -> Option<Point> {
         self.harness.with_doc(|doc| {
-            let node = doc.get_node(self.iframe)?;
-            let offset = node.absolute_position(0.0, 0.0);
-            let sub = node.subdoc()?.inner();
-            let rect = sub.get_client_bounding_rect(first(&sub, selector)?)?;
+            let offset = rect_of(doc, self.iframe)?.origin;
+            let sub = doc.get_node(self.iframe)?.subdoc()?.inner();
+            let rect = rect_of(&sub, first(&sub, selector)?)?;
             Some(Point {
-                x: Px(offset.x + (rect.x + rect.width / 2.0) as f32),
-                y: Px(offset.y + (rect.y + rect.height / 2.0) as f32),
+                x: Px(offset.x.0 + rect.origin.x.0 + rect.size.width.0 / 2.0),
+                y: Px(offset.y.0 + rect.origin.y.0 + rect.size.height.0 / 2.0),
             })
         })
     }

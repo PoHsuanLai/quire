@@ -137,17 +137,43 @@ pub(crate) fn first(doc: &BaseDocument, selector: &str) -> Option<NodeId> {
     doc.query_selector(selector).ok().flatten()
 }
 
-/// The border-box rect of `node`.
+/// The border-box rect of `node` in the window's coordinates.
+///
+/// Blitz places a box inside an inline root (a block holding inline content) relative to that
+/// root's content box, and its own `get_client_bounding_rect` sums the layout locations without the
+/// roots' padding and border, so an atomic inline box (a button, an inline-grid) under a padded
+/// block reads that much too far up and left. The paint and the hit test both add the content
+/// offset; so does this. Non-atomic inline elements already carry it (`inline_fragment_rects`).
 pub(crate) fn rect_of(doc: &BaseDocument, node: NodeId) -> Option<Rect> {
     let found = doc.get_client_bounding_rect(node)?;
+    let (dx, dy) = match doc.inline_fragment_rects(node) {
+        Some(_) => (0.0, 0.0),
+        None => inline_content_offset(doc, node),
+    };
     Some(Rect {
         origin: Point {
-            x: Px(found.x as f32),
-            y: Px(found.y as f32),
+            x: Px(found.x as f32 + dx),
+            y: Px(found.y as f32 + dy),
         },
         size: Size {
             width: Px(found.width as f32),
             height: Px(found.height as f32),
         },
     })
+}
+
+/// The padding and border `node`'s layout ancestors that are inline roots put between their
+/// border box and the content box their inline children are placed in: (left, top) summed.
+fn inline_content_offset(doc: &BaseDocument, node: NodeId) -> (f32, f32) {
+    let mut offset = (0.0, 0.0);
+    let mut at = doc.get_node(node).and_then(|n| n.layout_parent.get());
+    while let Some(parent) = at.and_then(|id| doc.get_node(id)) {
+        if parent.flags.is_inline_root() {
+            let layout = parent.unrounded_layout();
+            offset.0 += layout.padding.left + layout.border.left;
+            offset.1 += layout.padding.top + layout.border.top;
+        }
+        at = parent.layout_parent.get();
+    }
+    offset
 }
