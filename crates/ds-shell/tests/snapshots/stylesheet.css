@@ -2549,11 +2549,13 @@ html,body{margin:0;padding:0;background:transparent}
 
 /* Column rules (`ColumnRules::Hairline`, Numbers): a hairline between each cell and the next, the
    full row high, and the header's drag-edge line drawn the header's whole height. */
+.ds-table[*|data-rules=hairline] .ds-row{ align-items:stretch; }
+.ds-table[*|data-rules=hairline] .ds-row-words{ align-self:stretch; }
 .ds-table[*|data-rules=hairline] .ds-table-cells{ align-items:stretch; }
 .ds-table[*|data-rules=hairline] .ds-table-cell{ display:flex; align-items:center; }
 .ds-table[*|data-rules=hairline] .ds-table-cell > *{ min-width:0; overflow:hidden; white-space:nowrap; }
 .ds-table[*|data-rules=hairline] .ds-table-cell[*|data-align=trailing]{ justify-content:flex-end; }
-.ds-table[*|data-rules=hairline] .ds-table-cell + .ds-table-cell{ box-shadow:inset var(--hair) 0 0 var(--line); }
+.ds-table[*|data-rules=hairline] .ds-table-cell + .ds-table-cell{ border-left:var(--hair) solid var(--line); }
 .ds-table[*|data-rules=hairline] .ds-table-resize::after{ top:0; bottom:0; }
 
 /* Header rule (`HeaderRule::WhenScrolled`, Finder): a hairline under the header once the rows have
