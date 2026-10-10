@@ -785,6 +785,22 @@ state: RowState { selection, ..RowState::default() }, size: RowSize::Settings, o
 `Accessory` is `None`, `Check`, `Toggle`, `Chevron`, `Text`, `Glyph`, `Battery`, `Spinner`, `Badge`
 or `Slot`; a busy row (`Availability::Busy`) shows the spinner in place of its accessory.
 `List { label, items: Vec<ListItem<K>>, style: ListStyle }` roves with the arrows and Home/End.
+`Table { label, columns, rows, sort, on_sort, selection, cursor, onselect }` (`TableColumn::new(id, title, width)`, `TableRow::new(key, label, cells)`) is a header of sortable, resizable columns over a `List`.
+
+**A table of many rows: `VirtualTable`.** `ds::components::lists::virtual_table::{VirtualTable, row_pitch}`
+shows a file of a million lines without building them. `VirtualTable::<C> { label, columns:
+Vec<TableColumn<C>>, rows: usize, cell: Callback<(usize, usize), Element>, scroller: ScrollerRef, sort,
+on_sort, cursor: Option<usize>, onselect, onpick, overscan }`: you give the row count and answer
+`cell((row, column))` for the rows that show (the viewport and `overscan`, 4 by default, on each side), so
+the data stays where you keep it; `cell` is called on every render for every mounted row, so make it a
+lookup. Rows are `row_pitch()` tall (`--row-compact-h`), the header stays above the scroller, column
+widths are the `TableColumn`s' and a drag on a header edge resizes them (a table wider than its box scrolls
+sideways). The row index is the row's identity: `cursor` is the selected row (kept in view), and the
+arrows, Home, End, Page Up and Page Down ask `onselect` for another row; Enter and Space ask `onpick`.
+To scroll to a row, make the scroller yourself, `let scroller = use_scroller();`, pass it in, and call
+`scroller.reveal_row(row, row_pitch())` (the least scroll that shows it) or `scroller.scroll_to(Px(row as
+f32 * row_pitch().0))` (the row at the top). Rows are `f32` pixels: beyond about 500,000 rows a row's top is
+no longer exact, so page such a file in the owner.
 `Disclosure { title, shown, ontoggle, children }` collapses a body; `SectionHeader { title, value,
 actions: Vec<HeaderAction>, collapse }` heads a group (`HeaderAction::new(label, onclick)`, any
 number of them at its end).

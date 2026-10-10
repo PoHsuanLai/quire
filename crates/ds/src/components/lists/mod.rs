@@ -8,3 +8,4 @@ pub mod row;
 pub mod section_header;
 pub mod table;
 pub mod virtual_list;
+pub mod virtual_table;

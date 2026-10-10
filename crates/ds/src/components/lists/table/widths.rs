@@ -31,6 +31,11 @@ impl Widths {
             .unwrap_or(Px(0.0))
     }
 
+    /// How wide all the columns are together, the last at its own width.
+    pub(crate) fn total<C>(&self, columns: &[TableColumn<C>]) -> Px {
+        Px((0..columns.len()).map(|at| self.of(columns, at).0).sum())
+    }
+
     /// `grid-template-columns`: every column its width, the last taking what is left (never
     /// under its own least).
     pub(crate) fn template<C>(&self, columns: &[TableColumn<C>]) -> String {
@@ -75,6 +80,13 @@ mod tests {
         );
         let narrow = widths.dragged(&columns, 1, Px(10.0));
         assert_eq!(narrow.of(&columns, 1), Px(48.0), "held at the least");
+    }
+
+    #[test]
+    fn the_columns_together_are_as_wide_as_their_widths_sum() {
+        let columns = columns();
+        let widths = Widths::default().dragged(&columns, 1, Px(100.0));
+        assert_eq!(widths.total(&columns), Px(330.0));
     }
 
     #[test]

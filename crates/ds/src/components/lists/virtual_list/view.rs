@@ -284,7 +284,7 @@ fn items<K: Clone + Eq + Hash + 'static>(
 
 /// Scroll the cursor's row, at `span`, into view when it moves, and once the scroller has been
 /// measured.
-fn use_cursor_reveal(scroller: ScrollerRef, span: Option<ScrollSpan>) {
+pub(crate) fn use_cursor_reveal(scroller: ScrollerRef, span: Option<ScrollSpan>) {
     let measured = use_memo(move || match scroller.scroll().read().viewport.0 > 0.0 {
         true => Measured::Yes,
         false => Measured::No,
