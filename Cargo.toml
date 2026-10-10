@@ -62,10 +62,10 @@ blitz-kit = { git = "https://github.com/PoHsuanLai/blitz-kit", rev = "25b509987f
 
 # The portable keymap core (own repo, public): actions, chords, the resolver and per-platform
 # sources. quire is the one toolkit integration (`ds::keys`); apps declare their actions with it.
-chordkit = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "6bc8b634a057bb28591ee6fd6241e07d0beca03e" }
+chordkit = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "ba094c62006c280ac53c4c5df5c0e639c1226c07" }
 # I/O sources for it: only crates that may read files (ds-blitz) take them, never ds-core.
-chordkit-kde = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "6bc8b634a057bb28591ee6fd6241e07d0beca03e" }
-chordkit-gnome = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "6bc8b634a057bb28591ee6fd6241e07d0beca03e" }
+chordkit-kde = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "ba094c62006c280ac53c4c5df5c0e639c1226c07" }
+chordkit-gnome = { git = "https://github.com/PoHsuanLai/chordkit.git", rev = "ba094c62006c280ac53c4c5df5c0e639c1226c07" }
 
 # Blitz: git main, pinned by rev (crates.io dioxus-native 0.8 alpha does not build with
 # blitz 0.3.0-beta.2). The in-tree dioxus-native-dom targets dioxus 0.7.x.

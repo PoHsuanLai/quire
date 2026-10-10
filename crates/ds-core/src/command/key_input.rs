@@ -2,7 +2,7 @@
 //! [`chordkit::KeyInput`]. Everything that resolves a key to an action goes through it, so no
 //! other file decides what Ctrl, Super or Meta mean.
 
-use chordkit::{Key as ChordKey, KeyInput, Modifier, Modifiers as ChordModifiers, NamedKey};
+use chordkit::{AltGr, Key as ChordKey, KeyInput, Modifier, Modifiers as ChordModifiers, NamedKey};
 use keyboard_types::{Key, Modifiers};
 
 /// Each toolkit modifier flag and the physical modifier it reports. Super and Meta stay apart
@@ -62,7 +62,13 @@ pub fn chord_key_of(key: &Key) -> Option<ChordKey> {
 /// reports it: a shifted symbol (`!` for Shift+1) is not unshifted here, so an app chord that
 /// holds Shift with a symbol key needs the host's unshifted key.
 pub fn key_input(key: &Key, modifiers: Modifiers) -> Option<KeyInput> {
-    Some(KeyInput::new(modifiers_of(modifiers), chord_key_of(key)?))
+    let input = KeyInput::new(modifiers_of(modifiers), chord_key_of(key)?);
+    // AltGraph types a character (AltGr+Q is @ on many layouts, and arrives with Ctrl and Alt on
+    // Windows): chordkit then reads no chord from the press.
+    Some(match modifiers.contains(Modifiers::ALT_GRAPH) {
+        true => input.with_alt_gr(AltGr::Held),
+        false => input,
+    })
 }
 
 fn character(text: &str) -> Option<ChordKey> {
@@ -196,5 +202,18 @@ mod tests {
         for (key, want) in cases {
             assert_eq!(chord_key_of(&key), want, "{key:?}");
         }
+    }
+
+    #[test]
+    fn alt_graph_types_text_and_reads_no_chord() {
+        let held = Modifiers::CONTROL | Modifiers::ALT | Modifiers::ALT_GRAPH;
+        let input = key_input(&Key::Character("@".into()), held).expect("a chord key");
+        assert!(input.types_text());
+        let plain = key_input(
+            &Key::Character("t".into()),
+            Modifiers::CONTROL | Modifiers::ALT,
+        )
+        .expect("a chord key");
+        assert!(!plain.types_text());
     }
 }
