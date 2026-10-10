@@ -31,6 +31,9 @@ fn only_the_chords_modifier_and_a_digit_from_one_to_nine_switches() {
         (SwitchChord::Command, Key::Enter, Modifiers::META, None),
         (SwitchChord::Control, key("3"), Modifiers::CONTROL, Some(3)),
         (SwitchChord::Control, key("3"), Modifiers::META, None),
+        (SwitchChord::Unbound, key("3"), Modifiers::META, None),
+        (SwitchChord::Unbound, key("3"), Modifiers::CONTROL, None),
+        (SwitchChord::Unbound, key("3"), Modifiers::empty(), None),
     ];
     for (chord, pressed, modifiers, want) in cases {
         let got = chord
@@ -48,6 +51,7 @@ fn the_hint_beside_a_dot_is_the_chord_and_its_place() {
         (SwitchChord::Command, 8, "\u{2318}9"),
         (SwitchChord::Command, 9, ""),
         (SwitchChord::Control, 2, "\u{2303}3"),
+        (SwitchChord::Unbound, 0, ""),
     ];
     for &(chord, index, glyphs) in CASES {
         assert_eq!(chord.shortcut(index).glyphs(), glyphs, "{chord:?} {index}");

@@ -15,19 +15,23 @@ pub enum SwitchChord {
     Command,
     /// ⌃1 to ⌃9.
     Control,
+    /// No chord: the app reaches its Spaces through its menu and command palette, and the
+    /// controller reads no keys (a terminal, whose ⌘1 to ⌘9 are its tabs).
+    Unbound,
 }
 
 impl SwitchChord {
-    fn modifiers(self) -> Modifiers {
+    fn modifiers(self) -> Option<Modifiers> {
         match self {
-            SwitchChord::Command => Modifiers::META,
-            SwitchChord::Control => Modifiers::CONTROL,
+            SwitchChord::Command => Some(Modifiers::META),
+            SwitchChord::Control => Some(Modifiers::CONTROL),
+            SwitchChord::Unbound => None,
         }
     }
 
     /// The Space a key press asks for: a digit 1 to 9 with this modifier held and nothing else.
     pub fn pressed(self, key: &Key, modifiers: Modifiers) -> Option<SpaceNumber> {
-        if command_keys(modifiers) != self.modifiers() {
+        if Some(command_keys(modifiers)) != self.modifiers() {
             return None;
         }
         let Key::Character(text) = key else {
@@ -45,9 +49,13 @@ impl SwitchChord {
             .and_then(|n| char::from_digit(n, 10))
             .filter(|_| index < 9);
         let modifier = match self {
-            SwitchChord::Command => ShortcutKey::Super,
-            SwitchChord::Control => ShortcutKey::Ctrl,
+            SwitchChord::Command => Some(ShortcutKey::Super),
+            SwitchChord::Control => Some(ShortcutKey::Ctrl),
+            SwitchChord::Unbound => None,
         };
-        Shortcut(digit.map_or_else(Vec::new, |digit| vec![modifier, ShortcutKey::Char(digit)]))
+        Shortcut(match (modifier, digit) {
+            (Some(modifier), Some(digit)) => vec![modifier, ShortcutKey::Char(digit)],
+            _ => Vec::new(),
+        })
     }
 }
