@@ -2,12 +2,17 @@
 
 use super::handle::Keys;
 use super::source::KeySource;
-use chordkit::{AppAction, AppId, Conflict, DefaultChord, Platform};
+use chordkit::{AppAction, AppId, Conflict, DefaultChord, Platform, Registration};
 use dioxus::prelude::*;
 
 /// The root's keymap: the enclosing root's when there is one, else a new one from the
 /// [`KeySource`] the launcher provided (our desktop's conventions without one). Reloads it when
-/// the source said its settings changed. `Ds` calls this; an app does not.
+/// the source said its settings changed.
+///
+/// `Ds` calls this; an app does not. Use it instead of [`use_keys`] only in a component that sits
+/// below the app's `App` yet above `Ds` (a host or shell that draws `Ds` itself), where
+/// `use_keys` would build a keymap of our conventions the launcher's [`KeySource`] never reaches.
+/// Everywhere under `Ds`, `use_keys` is the one to call.
 pub fn use_keys_provider() -> Keys {
     let keys = use_hook(|| {
         if let Some(enclosing) = try_consume_context::<Keys>() {
@@ -45,4 +50,11 @@ pub fn use_register_actions(
 ) -> Result<(), Conflict> {
     let keys = use_keys();
     use_hook(|| keys.register_actions(app, actions))
+}
+
+/// [`use_register_actions`] for an app that forgoes standard actions or gives fallbacks: declares
+/// `registration` (built for `app`) once, at its first render. See `Keys::register`.
+pub fn use_register(app: &AppId, registration: &Registration) -> Result<(), Conflict> {
+    let keys = use_keys();
+    use_hook(|| keys.register(app, registration))
 }

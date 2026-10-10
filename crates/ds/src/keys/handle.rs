@@ -4,6 +4,7 @@ use super::source::KeySource;
 use super::state::KeyState;
 use chordkit::{
     Action, AppAction, AppId, Chord, Conflict, Context, DefaultChord, Keymap, Platform,
+    Registration,
 };
 use dioxus::prelude::*;
 use ds_core::command::{KeyCap, shortcut_caps, shortcut_text};
@@ -48,15 +49,30 @@ impl Keys {
         self.resolve(&event.key(), event.modifiers(), context)
     }
 
-    /// Declares `app`'s actions with their portable default chords. All or nothing; the
-    /// `Conflict` says in plain words why a chord was refused. Safe to call again with the same
-    /// rows. The registration is made again after every reload.
+    /// Declares `app`'s actions with their portable default chords. A thin wrapper over
+    /// [`register`](Keys::register) for an app that forgoes nothing and has no fallbacks.
     pub fn register_actions(
         &self,
         app: &AppId,
         actions: &[(AppAction, DefaultChord)],
     ) -> Result<(), Conflict> {
-        let registered = self.state.write_unchecked().register(app, actions);
+        let registration = actions
+            .iter()
+            .fold(Registration::new(app), |registration, (action, chord)| {
+                registration.action(action.clone(), *chord)
+            });
+        self.register(app, &registration)
+    }
+
+    /// Declares what `registration` (built for `app`; chordkit offers no way to read the app
+    /// back, so it is named again) holds: the app's actions with their defaults and fallbacks,
+    /// and the standard actions it does not offer (`Registration::forgo`, `IfOffered` ones only).
+    /// All or nothing; the `Conflict` says in plain words why it was refused.
+    ///
+    /// A registration replaces the app's earlier one, so an app may register changed defaults
+    /// (and the same rows again is a no-op). It is made again after every reload.
+    pub fn register(&self, app: &AppId, registration: &Registration) -> Result<(), Conflict> {
+        let registered = self.state.write_unchecked().register(app, registration);
         if registered.is_ok() {
             self.touch();
         }

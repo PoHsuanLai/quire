@@ -89,7 +89,8 @@ pub use ds_core::command::{command_keys, is_command};
 
 // Keys as actions
 pub use crate::keys::{
-    ActionTaken, KeySource, Keys, on_action, use_keys, use_platform, use_register_actions,
+    ActionTaken, KeySource, Keys, on_action, use_keys, use_keys_provider, use_platform,
+    use_register, use_register_actions,
 };
 
 // Overlays

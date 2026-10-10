@@ -1687,6 +1687,22 @@ Open:
   `dyn KeymapSource`, because the source is shared with every window and its watch callback comes
   from another thread. keycap's source must be `Send + Sync`.
 
+## Keys: registration with forgo, overrides, pure drawing (wh-keys7)
+
+- `Keys::register(&AppId, &Registration)` and `ds::keys::use_register` carry chordkit's `forgo` and
+  fallbacks; `register_actions` is a wrapper over it. The app is passed again because chordkit's
+  `Registration::app()` is `pub(crate)`: ask chordkit for a public accessor and the argument goes.
+- A registration replaces its app's earlier one (the replay too), built from a kept base keymap
+  (source plus overrides); a refused replacement leaves the earlier one standing. An identical one
+  is a no-op.
+- `KeySource::with_overrides(Overrides)` and `AppConfig::with_keymap_overrides(Overrides)` lay an
+  app's own changes over the loaded keymap, before registrations, again after each reload; refused
+  lines are in `Keys::problems`. A second call replaces the first (no merge).
+- `use_keys_provider` is in `ds::prelude`, documented as the hook for a component between `App`
+  and `Ds`.
+- `ds_core::command::{chord_text, chord_caps, shortcut_text_for, shortcut_caps_for}` draw a chord
+  or a keymap's action for a platform with no runtime. `shortcut_text` (a `Shortcut`) is unchanged.
+
 ## Window host, icon and re-focus (v0.3.3 queue)
 
 - A field that already has the keyboard is not focused again. Blitz's `set_focus_to` on the focused

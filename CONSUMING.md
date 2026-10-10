@@ -1977,6 +1977,26 @@ fn Editor() -> Element {
   makes every registration again after a reload, so register once, at first render. A person's own
   change to an action (`mail.compose = Primary+Alt+N` in their overrides) wins over the default.
   Two apps never share an action id, and an app never registers a standard action's chord.
+- **Forgo and fallbacks.** An app that does not offer an `IfOffered` standard action gives its chord
+  away: `Keys::register(&app, &Registration::new(&app).forgo(StandardAction::ShowFonts)
+  .action(strike, "Primary+Shift+S".parse()?))` (or `use_register` at first render). Forgoing a
+  universal action (Copy) is refused. `action_with_fallback` gives a second chord for contexts where
+  the default has no live form. Registering an app again **replaces** its earlier registration (the
+  same rows again do nothing), so changed defaults never clash with the app's own old ones; a
+  refused one leaves the earlier registration standing.
+- **App overrides.** An app with its own rebinding file reads it into chordkit `Overrides` and lays
+  them over the shared keymap: `AppConfig::with_keymap_overrides(overrides)` (the detected or given
+  source stays) or `KeySource::with_overrides(overrides)` (harness: `with_keymap_source`). They are
+  applied before registrations, again after every reload, and the lines the platform refuses are
+  in `Keys::problems()`.
+- **Below App, above Ds.** A component that sits between the launcher and `Ds` and needs the
+  launcher's `KeySource` calls `ds::prelude::use_keys_provider()` (it makes the root keymap, or
+  joins the enclosing one); `use_keys` there would build a keymap of our conventions. Under `Ds`
+  always use `use_keys`.
+- **Drawing without a runtime.** `ds_core::command::shortcut_text_for(&keymap, &action)`,
+  `chord_text(platform, &chord)` and the `*_caps` forms draw an action's best chord or a chord for
+  a platform: `⌘C` on a Mac or our desktop, `Ctrl+C` on Windows and KDE. For pure code (a command
+  panel's hints) that holds a `Keymap` (`Keys::with_keymap`) or only a `Platform`.
 - **Drawing.** `KeyEquivalent`, a menu item's key, `CommandPill`, a `Tooltip` and a `TitleTip` draw a
   `Shortcut` through `Keys::text_of`: `⇧⌘Z` on a Mac-style platform, `Ctrl+Shift+Z` (that platform's
   order and words) elsewhere. A `Shortcut` is written in Mac terms; Command in it is Primary, and a

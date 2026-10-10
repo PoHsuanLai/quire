@@ -3,7 +3,8 @@
 //! document takes our desktop's conventions, so a test reads no real system.
 
 use chordkit::{
-    ChangeCallback, ConventionSource, Desktop, Keymap, KeymapSource, Platform, SourceError, Watch,
+    ChangeCallback, ConventionSource, Desktop, Keymap, KeymapSource, Overrides, Platform,
+    SourceError, Watch,
 };
 use std::fmt;
 use std::sync::Arc;
@@ -14,6 +15,7 @@ use std::sync::Arc;
 pub struct KeySource {
     platform: Platform,
     source: Arc<dyn KeymapSource + Send + Sync>,
+    overrides: Option<Arc<Overrides>>,
 }
 
 impl KeySource {
@@ -22,7 +24,17 @@ impl KeySource {
         KeySource {
             platform,
             source: Arc::from(source),
+            overrides: None,
         }
+    }
+
+    /// This source with an app's own changes laid on top of whatever it loads (system detection,
+    /// keycap), so an app with its own rebinding file folds into the shared keymap without
+    /// reimplementing detection. Applied again after every reload; a change it cannot apply is
+    /// kept in `Keys::problems`. A second call replaces the first.
+    pub fn with_overrides(mut self, overrides: Overrides) -> Self {
+        self.overrides = Some(Arc::new(overrides));
+        self
     }
 
     /// `platform`'s conventions and nothing else: the fixed-platform source tests use.
@@ -35,7 +47,11 @@ impl KeySource {
         self.platform
     }
 
-    /// The keymap the source gives for its platform.
+    pub(super) fn overrides(&self) -> Option<&Overrides> {
+        self.overrides.as_deref()
+    }
+
+    /// The keymap the source gives for its platform, before the app's overrides.
     pub fn load(&self) -> Result<Keymap, SourceError> {
         self.source.load(self.platform)
     }

@@ -29,7 +29,7 @@ use crate::window_build::Base;
 use crate::window_requests::{Requests, Root};
 use crate::window_shell::Windows;
 use crate::window_size::WindowSize;
-use chordkit::{KeymapSource, Platform};
+use chordkit::{KeymapSource, Overrides, Platform};
 use dioxus::prelude::*;
 use ds::window::icon::WindowIcon;
 use std::sync::Arc;
@@ -55,6 +55,8 @@ pub struct AppConfig {
     runtime: Option<Handle>,
     /// Where the keymap comes from; the environment's own unless the app names a source.
     keymap: KeymapChoice,
+    /// The app's own keymap changes, laid over whatever source the keymap comes from.
+    keymap_overrides: Option<Overrides>,
 }
 
 impl AppConfig {
@@ -68,6 +70,7 @@ impl AppConfig {
             gpu: GpuRequest::default(),
             runtime: None,
             keymap: KeymapChoice::default(),
+            keymap_overrides: None,
         }
     }
 
@@ -120,6 +123,15 @@ impl AppConfig {
         source: Box<dyn KeymapSource + Send + Sync>,
     ) -> Self {
         self.keymap = KeymapChoice::GivenFor(platform, Arc::from(source));
+        self
+    }
+
+    /// The app's own keymap changes (an app with its own rebinding file reads it into chordkit
+    /// `Overrides`), laid on top of the keymap source, detected or given, so the shared keymap
+    /// holds them and the detection stays. Kept across a reload; those it cannot apply are in
+    /// `Keys::problems`. A second call replaces the first.
+    pub fn with_keymap_overrides(mut self, overrides: Overrides) -> Self {
+        self.keymap_overrides = Some(overrides);
         self
     }
 
@@ -188,6 +200,14 @@ impl AppConfig {
     }
 }
 
+/// `keys` with the app's own changes on top, when it has any.
+fn layered(keys: ds::keys::KeySource, overrides: Option<Overrides>) -> ds::keys::KeySource {
+    match overrides {
+        Some(overrides) => keys.with_overrides(overrides),
+        None => keys,
+    }
+}
+
 /// Run `app` in a first window until the app's [`LastWindowClosed`] policy ends the loop (by
 /// default, when the last window closes). Windows it opens with [`crate::open_window`] or an
 /// [`AppHandle`] are independent of the first: closing any one closes only it.
@@ -227,7 +247,10 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) -> Result<(), LaunchEr
     });
     // The one read of the environment for the keymap: the platform and, for it, the settings file.
     let setup = Setup {
-        keys: config.keymap.resolve(&|name| std::env::var(name).ok()),
+        keys: layered(
+            config.keymap.resolve(&|name| std::env::var(name).ok()),
+            config.keymap_overrides,
+        ),
         ..config.setup
     };
     let base = Base {

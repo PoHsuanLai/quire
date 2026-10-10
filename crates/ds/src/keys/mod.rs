@@ -14,7 +14,7 @@ mod state;
 
 pub use handle::Keys;
 pub use on_action::{ActionTaken, on_action};
-pub use provider::{use_keys, use_keys_provider, use_platform, use_register_actions};
+pub use provider::{use_keys, use_keys_provider, use_platform, use_register, use_register_actions};
 pub(crate) use quire_actions::{pane_back as pane_back_action, register_quire_actions};
 pub use source::KeySource;
 
