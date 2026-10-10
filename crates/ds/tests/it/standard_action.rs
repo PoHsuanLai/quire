@@ -1,49 +1,48 @@
-//! The standard shortcut table (design/27-HIG-PARITY.md section 6.2): every combination is
-//! reserved once, drawn in the Mac's order, and refused to `Shortcut::custom`.
+//! The standard shortcut table (design/27-HIG-PARITY.md section 6.2): chordkit's conventions on
+//! this desktop, drawn in the Mac's order, and the refusals `Shortcut::custom` gets from
+//! chordkit's registration. chordkit's own tests cover that no two actions share a chord.
 
 use ds::prelude::*;
-use ds_core::standard_action::{Reserved, SpaceNumber, StandardAction};
+use ds_core::standard_action::{Conflict, SpaceNumber, StandardAction};
 
 #[test]
-fn no_two_actions_share_a_combination() {
-    let mut seen: Vec<(Vec<ShortcutKey>, StandardAction)> = Vec::new();
-    for action in StandardAction::ALL {
-        let keys = Shortcut::standard(action).keys();
-        if let Some((_, owner)) = seen.iter().find(|(other, _)| *other == keys) {
-            panic!("{action:?} and {owner:?} share {keys:?}");
-        }
-        seen.push((keys, action));
-    }
-}
-
-#[test]
-fn every_action_is_written_in_the_macs_order_and_owns_its_keys() {
-    for action in StandardAction::ALL {
+fn every_action_has_keys_on_this_desktop_in_the_macs_order() {
+    for action in StandardAction::all() {
         let shortcut = Shortcut::standard(action);
+        assert!(!shortcut.0.is_empty(), "{action:?} has keys");
         assert_eq!(
             shortcut.keys(),
             shortcut.0,
             "{action:?} is written in order"
         );
-        assert_eq!(
-            StandardAction::owning(&shortcut.0),
-            Some(action),
-            "{action:?}"
-        );
-        assert_eq!(
-            Shortcut::custom(shortcut.0.clone()),
-            Err(Reserved(action)),
-            "{action:?} is refused to custom"
-        );
+        assert!(shortcut.default_chord().is_some(), "{action:?} is a chord");
+    }
+}
+
+/// What `Shortcut::custom` says about a combination.
+#[derive(Debug, PartialEq)]
+enum Verdict {
+    Free,
+    /// A standard action has it in every app.
+    Standard(StandardAction),
+    /// The desktop keeps it for itself.
+    Kept,
+}
+
+fn verdict(keys: Vec<ShortcutKey>) -> Verdict {
+    match Shortcut::custom(keys) {
+        Ok(_) => Verdict::Free,
+        Err(Conflict::Standard { action, .. }) => Verdict::Standard(action),
+        Err(_) => Verdict::Kept,
     }
 }
 
 #[test]
-fn custom_refuses_a_reserved_combination_in_any_order_or_case() {
-    let cases: Vec<(Vec<ShortcutKey>, Option<StandardAction>)> = vec![
+fn custom_refuses_a_taken_combination_in_any_order_or_case() {
+    let cases: Vec<(Vec<ShortcutKey>, Verdict)> = vec![
         (
             vec![ShortcutKey::Super, ShortcutKey::Char('S')],
-            Some(StandardAction::Save),
+            Verdict::Standard(StandardAction::Save),
         ),
         (
             vec![
@@ -51,7 +50,7 @@ fn custom_refuses_a_reserved_combination_in_any_order_or_case() {
                 ShortcutKey::Super,
                 ShortcutKey::Shift,
             ],
-            Some(StandardAction::Redo),
+            Verdict::Standard(StandardAction::Redo),
         ),
         (
             vec![
@@ -59,32 +58,35 @@ fn custom_refuses_a_reserved_combination_in_any_order_or_case() {
                 ShortcutKey::Ctrl,
                 ShortcutKey::Char('s'),
             ],
-            Some(StandardAction::ToggleSidebar),
+            Verdict::Standard(StandardAction::ToggleSidebar),
         ),
         (
             vec![ShortcutKey::Super, ShortcutKey::Char('t')],
-            Some(StandardAction::ShowFonts),
+            Verdict::Standard(StandardAction::ShowFonts),
         ),
-        (
-            vec![ShortcutKey::Super, ShortcutKey::Space],
-            Some(StandardAction::Launcher),
-        ),
+        // The desktop's own keys are kept whoever asks.
+        (vec![ShortcutKey::Super, ShortcutKey::Space], Verdict::Kept),
         (
             vec![ShortcutKey::Ctrl, ShortcutKey::Char('3')],
-            SpaceNumber::new(3).map(StandardAction::SwitchToSpace),
+            Verdict::Kept,
         ),
         // The command menu's key, the launcher's actions menu and an app's own: free.
-        (vec![ShortcutKey::Super, ShortcutKey::Char('k')], None),
-        (vec![ShortcutKey::Super, ShortcutKey::Char('1')], None),
-        (vec![ShortcutKey::Enter], None),
-        (vec![ShortcutKey::Super, ShortcutKey::Backspace], None),
+        (
+            vec![ShortcutKey::Super, ShortcutKey::Char('k')],
+            Verdict::Free,
+        ),
+        (
+            vec![ShortcutKey::Super, ShortcutKey::Char('1')],
+            Verdict::Free,
+        ),
+        (vec![ShortcutKey::Enter], Verdict::Free),
+        (
+            vec![ShortcutKey::Super, ShortcutKey::Backspace],
+            Verdict::Free,
+        ),
     ];
-    for (keys, owner) in cases {
-        let got = Shortcut::custom(keys.clone());
-        match owner {
-            Some(action) => assert_eq!(got, Err(Reserved(action)), "{keys:?}"),
-            None => assert!(got.is_ok(), "{keys:?}: {got:?}"),
-        }
+    for (keys, want) in cases {
+        assert_eq!(verdict(keys.clone()), want, "{keys:?}");
     }
 }
 
@@ -109,6 +111,7 @@ fn modifiers_draw_control_option_shift_command() {
         (StandardAction::ToggleSidebar, "⌃⌘S"),
         (StandardAction::ForceQuit, "⌥⌘Esc"),
         (StandardAction::Help, "⌘?"),
+        (StandardAction::SwitchToSpace(three()), "⌃3"),
     ];
     for (action, glyphs) in cases {
         assert_eq!(Shortcut::standard(action).glyphs(), glyphs, "{action:?}");
@@ -128,13 +131,13 @@ fn modifiers_draw_control_option_shift_command() {
     );
 }
 
+fn three() -> SpaceNumber {
+    SpaceNumber::new(3).expect("3 is a space")
+}
+
 #[test]
 fn a_space_number_is_one_to_nine() {
     assert_eq!(SpaceNumber::new(0), None);
     assert_eq!(SpaceNumber::new(10), None);
     assert_eq!(SpaceNumber::new(9).map(SpaceNumber::get), Some(9));
-    assert_eq!(
-        Reserved(StandardAction::Save).to_string(),
-        "⌘S is reserved for Save"
-    );
 }

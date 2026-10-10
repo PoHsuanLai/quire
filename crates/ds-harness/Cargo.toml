@@ -34,6 +34,8 @@ wgpu_context = { workspace = true }
 rustc-hash = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
+# `HarnessConfig::with_platform`: the fixed-platform keymap tests run under.
+chordkit = { workspace = true }
 peniko = { workspace = true }
 thiserror = { workspace = true }
 

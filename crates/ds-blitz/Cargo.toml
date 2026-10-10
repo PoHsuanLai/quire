@@ -42,6 +42,11 @@ parley = { workspace = true }
 wgpu = { workspace = true }
 image = { workspace = true }
 keyboard-types = { workspace = true }
+# The keymap (`AppConfig::with_keymap_source`) and the sources the detected default reads:
+# kdeglobals and a GNOME dconf dump. Only this I/O crate links the source crates.
+chordkit = { workspace = true }
+chordkit-kde = { workspace = true }
+chordkit-gnome = { workspace = true }
 peniko = { workspace = true }
 # PDF output (the `pdf` feature): the painter, which writes through pdfrum.
 pdfrum-anyrender = { workspace = true, optional = true }

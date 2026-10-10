@@ -14,6 +14,8 @@ ds-intents = { workspace = true }
 ds-motion = { workspace = true, features = ["dioxus"] }
 ds-style = { workspace = true, features = ["dioxus"] }
 dioxus = { workspace = true }
+# `ds::keys`: the toolkit side of the keymap; sources are injected, none is linked here.
+chordkit = { workspace = true }
 serde = { workspace = true }
 thiserror = { workspace = true }
 # `ui_manifest`: the conformance file an app's menu items and shortcuts are written to.
