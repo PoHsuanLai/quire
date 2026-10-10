@@ -1,10 +1,10 @@
 //! The palette machine, over a row type that is not `Copy`.
 
 use super::model::{PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState};
-use ds_core::machine::Machine;
-use ds_core::text::typed::TypedText;
-use ds_core::time::stamp::Stamp;
-use ds_core::vocab::ShortcutKey;
+use crate::machine::Machine;
+use crate::text::typed::TypedText;
+use crate::time::stamp::Stamp;
+use crate::vocab::ShortcutKey;
 
 /// A row type that is not `Copy`, as a launcher's or a new-tab bar's rows are not.
 #[derive(Debug, Clone, PartialEq, Eq)]

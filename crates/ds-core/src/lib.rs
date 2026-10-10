@@ -12,6 +12,7 @@ pub mod command;
 pub mod error;
 pub mod geometry;
 pub mod machine;
+pub mod palette;
 pub mod png;
 pub mod press;
 pub mod spawner;

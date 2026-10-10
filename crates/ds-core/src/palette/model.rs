@@ -1,7 +1,7 @@
 //! The palette machine's states, inputs, outputs and params.
 
-use ds_core::text::typed::TypedText;
-use ds_core::vocab::ShortcutKey;
+use crate::text::typed::TypedText;
+use crate::vocab::ShortcutKey;
 use std::marker::PhantomData;
 
 /// A position in the ranked rows, from 0.
@@ -80,8 +80,8 @@ pub enum PaletteIn {
     Elapsed,
 }
 
-impl From<ds_core::machine::Elapsed> for PaletteIn {
-    fn from(_: ds_core::machine::Elapsed) -> Self {
+impl From<crate::machine::Elapsed> for PaletteIn {
+    fn from(_: crate::machine::Elapsed) -> Self {
         PaletteIn::Elapsed
     }
 }

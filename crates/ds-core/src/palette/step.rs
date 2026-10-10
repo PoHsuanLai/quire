@@ -1,9 +1,9 @@
 //! The palette machine's transitions.
 
 use super::model::{PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState};
-use ds_core::machine::Machine;
-use ds_core::text::typed::TypedText;
-use ds_core::time::stamp::Stamp;
+use crate::machine::Machine;
+use crate::text::typed::TypedText;
+use crate::time::stamp::Stamp;
 
 type Step<T> = (PaletteState<T>, Vec<PaletteOut<T>>);
 

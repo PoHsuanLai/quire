@@ -1,8 +1,9 @@
-//! The palette's pure machine: a query, a selection over rows someone else ranked, and what
-//! Enter runs. Generic over the row type, so a launcher, a command palette and a new-tab bar
-//! share one. [`CommandPalette`](super::command_palette::CommandPalette) draws; this decides.
+//! The palette's pure machine now lives in `ds_core::palette`, with no renderer; this keeps the
+//! old paths. [`CommandPalette`](super::command_palette::CommandPalette) draws; the machine decides.
 
-pub mod model;
-mod step;
-#[cfg(test)]
-mod tests;
+pub mod model {
+    //! The machine's states, inputs, outputs and params, from `ds_core::palette::model`.
+    pub use ds_core::palette::model::{
+        PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState,
+    };
+}
