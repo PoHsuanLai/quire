@@ -12,6 +12,7 @@ use crate::components::controls::press::{ActivationKeys, activates, disabled};
 use crate::components::fields::shortcut_field_model::{
     Capture, Heard, ShortcutClash, ShortcutRecorded, hear,
 };
+use crate::focus::soon::focus_soon;
 use crate::keys::use_platform;
 use crate::root::common::Common;
 use chordkit::Chord;
@@ -39,6 +40,8 @@ pub fn ShortcutField(
 ) -> Element {
     let platform = use_platform();
     let mut capture = use_signal(Capture::default);
+    // The well itself: a click hands it the keyboard, so the next combination reaches it.
+    let mut well = use_signal(|| None::<std::rc::Rc<MountedData>>);
     let live = availability == Availability::Enabled;
     let mut finish = move |recorded: ShortcutRecorded| {
         capture.set(Capture::Idle);
@@ -73,6 +76,9 @@ pub fn ShortcutField(
                 onclick: move |_| {
                     if live {
                         capture.set(Capture::Listening);
+                        if let Some(element) = well() {
+                            focus_soon(element);
+                        }
                     }
                 },
                 onblur: move |_| {
@@ -103,7 +109,10 @@ pub fn ShortcutField(
                         }
                     }
                 },
-                onmounted: move |event| common.mounted(event),
+                onmounted: move |event| {
+                    well.set(Some(event.data()));
+                    common.mounted(event);
+                },
                 "{text}"
             }
             if let Some(used_by) = &used_by {

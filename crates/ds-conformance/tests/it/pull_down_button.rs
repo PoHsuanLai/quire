@@ -98,16 +98,20 @@ fn escape_closes_the_menu_and_the_button_has_the_keyboard() {
 fn chevron_page() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport,
-            PullDownButton::<u8> {
-                items: vec![MenuItem::new(1, "New Space")],
-                face: PullDownFace::Chevron,
-                common: Common { aria_label: Some("Space actions".to_owned()), ..Common::default() },
-                onpick: |_| {},
+            div { id: "named",
+                PullDownButton::<u8> {
+                    items: vec![MenuItem::new(1, "New Space")],
+                    face: PullDownFace::Chevron,
+                    common: Common { aria_label: Some("Space actions".to_owned()), ..Common::default() },
+                    onpick: |_| {},
+                }
             }
-            PullDownButton::<u8> {
-                items: vec![MenuItem::new(1, "New Space")],
-                face: PullDownFace::Chevron,
-                onpick: |_| {},
+            div { id: "plain",
+                PullDownButton::<u8> {
+                    items: vec![MenuItem::new(1, "New Space")],
+                    face: PullDownFace::Chevron,
+                    onpick: |_| {},
+                }
             }
         }
     }
@@ -127,15 +131,11 @@ fn the_chevron_face_draws_one_glyph_no_text_and_its_name() {
     );
     assert_eq!(harness.count(".ds-popup .ds-button-label"), 0, "no text");
     assert_eq!(
-        harness
-            .attr(".ds-popup:nth-child(1) .ds-button", "aria-label")
-            .as_deref(),
+        harness.attr("#named .ds-button", "aria-label").as_deref(),
         Some("Space actions")
     );
     assert_eq!(
-        harness
-            .attr(".ds-popup:nth-child(2) .ds-button", "aria-label")
-            .as_deref(),
+        harness.attr("#plain .ds-button", "aria-label").as_deref(),
         Some("Menu")
     );
 }
