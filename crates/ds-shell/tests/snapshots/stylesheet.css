@@ -2710,7 +2710,7 @@ html,body{margin:0;padding:0;background:transparent}
 
 .ds-shortcut-field{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:var(--s-2); min-width:0; }
 .ds-shortcut-field-well{
-  box-sizing:border-box; min-width:var(--s-96); height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border:0; border-radius:var(--ctl-r-m);
+  box-sizing:border-box; min-width:calc(var(--s-48) * 2); height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border:0; border-radius:var(--ctl-r-m);
   background:linear-gradient(var(--fill-btn), var(--fill-btn)), var(--surface); color:var(--ink);
   font-size:var(--ctl-fs-m); text-align:center; cursor:default;
   transition:box-shadow var(--t-quick) var(--e-out);
