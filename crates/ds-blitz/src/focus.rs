@@ -65,9 +65,9 @@ pub(crate) fn focus(element: &MountedData) -> Focused {
 /// Give `element` the keyboard and put its caret at `caret` in one write to the document, so the
 /// field cannot be typed into between the two (a deferred select-all selected the empty length it
 /// had seen and put the caret at 0, and "invoice" became "nvoicei"). A field that has the
-/// keyboard already is left alone, caret included. A field not laid out yet is `Busy` before
-/// anything is written, so the retry repeats the whole write; an element that is no text field
-/// is only focused.
+/// keyboard already is left alone, caret included. A field not laid out yet has no editor to
+/// type into or place a caret in, so it takes the keyboard now and its first layout puts the caret
+/// at the start; an element that is no text field is only focused.
 pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focused {
     let Some(node) = NodeRef::of(element) else {
         return Focused::Unknown;
@@ -95,8 +95,7 @@ pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focus
             });
             doc.shell_provider.request_redraw();
         })),
-        Some(Some((Held::Not, Field::NotLaidOut))) => Focused::Busy,
-        Some(Some((Held::Not, Field::Absent))) => focus(element),
+        Some(Some((Held::Not, Field::NotLaidOut | Field::Absent))) => focus(element),
     }
 }
 
