@@ -3,7 +3,7 @@
 //! panicking when the renderer holds the document or the element is not its own.
 
 use crate::host::captured::CapturedPointer;
-use crate::host::caret::{Caret, FieldSelection, InitialCaret};
+use crate::host::caret::{Caret, CaretOwed, FieldSelection, InitialCaret};
 use crate::host::drop_hit::DropHit;
 use crate::host::fallback::Fallback;
 use crate::host::focused::Focused;
@@ -51,6 +51,12 @@ pub trait CaretHost {
     fn place_caret(&self, el: &MountedData, at: InitialCaret) -> Focused;
     /// The field's selection, in characters.
     fn selection(&self, el: &MountedData) -> FieldSelection;
+    /// Whether the focused field `el`, not laid out yet, still owes its caret. A host that cannot
+    /// tell owes nothing.
+    fn caret_owed(&self, el: &MountedData) -> CaretOwed {
+        let _ = el;
+        CaretOwed::No
+    }
 }
 
 /// Where things are in the document.

@@ -14,8 +14,9 @@
 use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
 use blitz_dom::Node;
+use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
-use ds::host::caret::{Caret, Collapsed, FieldSelection, InitialCaret, caret_at};
+use ds::host::caret::{Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at};
 use ds::host::found::Found;
 use ds::prelude::*;
 use std::rc::Rc;
@@ -207,6 +208,28 @@ pub(crate) fn selection(element: &MountedData) -> FieldSelection {
     })
     .flatten()
     .unwrap_or(FieldSelection::Unknown)
+}
+
+/// Whether `element` is a field with text whose editor is not built yet, so a caret asked for when
+/// it was focused is still owed. A document busy rendering owes nothing: the caller then leaves
+/// the caret where Blitz puts it rather than risk moving a key already typed.
+pub(crate) fn caret_owed(element: &MountedData) -> CaretOwed {
+    let Some(node) = NodeRef::of(element) else {
+        return CaretOwed::No;
+    };
+    node.read(|doc| {
+        let found = doc.get_node(node.node)?;
+        let element = found.element_data()?;
+        let empty = element
+            .attr(LocalName::from("value"))
+            .is_none_or(str::is_empty);
+        match (field_of(found), empty) {
+            (Field::NotLaidOut, false) => Some(CaretOwed::AfterLayout),
+            _ => Some(CaretOwed::No),
+        }
+    })
+    .flatten()
+    .unwrap_or(CaretOwed::No)
 }
 
 fn done(written: Written) -> Focused {

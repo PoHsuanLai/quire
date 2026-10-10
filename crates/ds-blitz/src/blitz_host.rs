@@ -12,7 +12,9 @@ use crate::drop_hit::drop_hit;
 use crate::edit::set_ime_cursor_area;
 use crate::edit::{capture, caret_rect, forget, hit_test, listen, selection_rects, set_ime};
 use crate::edit_ime::EditListeners;
-use crate::focus::{blur, caret, focus, focus_placing, place_caret, select_all, selection};
+use crate::focus::{
+    blur, caret, caret_owed, focus, focus_placing, place_caret, select_all, selection,
+};
 use crate::focus_keep::{FocusKeeper, hand_back_seam};
 use crate::measure::measure;
 use crate::node_ref::same;
@@ -20,7 +22,7 @@ use crate::phase::Phase;
 use crate::reveal::reveal;
 use dioxus::prelude::*;
 use ds::host::captured::CapturedPointer;
-use ds::host::caret::{Caret, FieldSelection, InitialCaret};
+use ds::host::caret::{Caret, CaretOwed, FieldSelection, InitialCaret};
 use ds::host::drop_hit::DropHit;
 use ds::host::fallback::Fallback;
 use ds::host::found::{Found, SameNode};
@@ -233,6 +235,10 @@ impl CaretHost for BlitzCaret {
 
     fn selection(&self, el: &MountedData) -> FieldSelection {
         selection(el)
+    }
+
+    fn caret_owed(&self, el: &MountedData) -> CaretOwed {
+        caret_owed(el)
     }
 }
 

@@ -27,6 +27,18 @@ pub enum InitialCaret {
     SelectAll,
 }
 
+/// Whether a field focused before its first layout still owes the caret its landing asked for.
+/// An empty field owes nothing: its caret sits at the start, which is its end too, so nothing is
+/// placed after the editor is built and a key typed the moment it is (a summoned search field
+/// typed into at once) is never moved away from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum CaretOwed {
+    /// Nothing to place: the field is laid out, empty, or not a field.
+    No,
+    /// A field with text and no editor yet: its caret lands once the editor is built.
+    AfterLayout,
+}
+
 /// A field's caret and selection as the host reads them: a masked field draws its
 /// own caret over its dots, since Blitz measures the hidden text in another face than the dots.
 /// Offsets count characters (`char`s) of the field's text, as the mask draws one dot for each.
