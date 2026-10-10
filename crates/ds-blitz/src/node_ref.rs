@@ -122,7 +122,11 @@ impl RenderedElementBacking for FoundNode {
     ) -> std::pin::Pin<Box<dyn std::future::Future<Output = MountedResult<PixelsRect>>>> {
         let read = self
             .0
-            .read(|doc| doc.get_client_bounding_rect(self.0.node))
+            .read(|doc| {
+                crate::layout_chain::placeable(doc, self.0.node)
+                    .then(|| doc.get_client_bounding_rect(self.0.node))
+                    .flatten()
+            })
             .flatten();
         Box::pin(async move {
             read.map(|found| {

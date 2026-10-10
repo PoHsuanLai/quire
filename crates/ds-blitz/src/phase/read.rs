@@ -8,6 +8,9 @@ use ds::prelude::{Point, Px, Rect, Size};
 
 /// `node`'s border box in logical pixels; `None` when the node is gone.
 pub(crate) fn border_box(doc: &BaseDocument, node: NodeId) -> Option<Rect> {
+    if !crate::layout_chain::placeable(doc, node) {
+        return None;
+    }
     let found = doc.get_client_bounding_rect(node)?;
     Some(Rect {
         origin: Point {

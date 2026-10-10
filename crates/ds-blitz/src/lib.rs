@@ -47,6 +47,7 @@ mod gpu_request;
 mod host;
 mod install;
 pub mod launch;
+mod layout_chain;
 mod measure;
 mod memory_shell;
 #[cfg(all(feature = "menus", target_os = "linux"))]

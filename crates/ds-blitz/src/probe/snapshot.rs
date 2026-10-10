@@ -27,6 +27,9 @@ fn walk(doc: &BaseDocument, node: &Node, out: &mut String) {
 
 fn line(doc: &BaseDocument, node: &Node, element: &ElementData, out: &mut String) {
     let Some(role) = role_of(element) else { return };
+    if !crate::layout_chain::placeable(doc, node.id) {
+        return;
+    }
     let Some(rect) = doc.get_client_bounding_rect(node.id) else {
         return;
     };

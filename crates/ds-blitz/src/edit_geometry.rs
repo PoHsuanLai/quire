@@ -154,6 +154,10 @@ fn line_at(x: Px, y: Px, height: Px) -> Rect {
 /// `get_client_bounding_rect` (and so `ds::host::parts::GeometryHost::measure`) reads it, from the unrounded layout, so
 /// a caret rect and a measured container agree to the 64th of a pixel.
 fn border_origin(doc: &BaseDocument, node: &Node) -> (f32, f32) {
+    // A node whose layout chain lost a box cannot be placed: the window origin, not a panic.
+    if !crate::layout_chain::placeable(doc, node.id) {
+        return (0.0, 0.0);
+    }
     let at = node.unrounded_absolute_position(0.0, 0.0);
     let scroll = doc.viewport_scroll();
     (

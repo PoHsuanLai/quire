@@ -33,7 +33,7 @@ fn descend(doc: &BaseDocument, (x, y): (f32, f32), frame: Option<FrameId>) -> Op
     let hit = doc.hit(x, y)?;
     let node = doc.get_node(hit.node_id)?;
     match node.subdoc() {
-        Some(sub) => {
+        Some(sub) if crate::layout_chain::placeable(doc, node.id) => {
             let offset = node.absolute_position(0.0, 0.0);
             let inner = sub.inner();
             let scroll = inner.viewport_scroll();
@@ -43,6 +43,8 @@ fn descend(doc: &BaseDocument, (x, y): (f32, f32), frame: Option<FrameId>) -> Op
             );
             descend(&inner, inside, Some(FrameId::of(sub.id())))
         }
+        // A frame whose layout chain lost a box cannot be placed (`layout_chain`): no link.
+        Some(_) => None,
         None => {
             let (anchor, facts) = anchor_at(doc, hit.node_id)?;
             Some(LinkUnder {
