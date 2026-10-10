@@ -9,7 +9,7 @@
 //! `value`.
 //!
 //! Markup: `span.ds-shortcut-field[data-recording][data-clash]` holding
-//! `button.ds-shortcut-field-well` (with `more`, a `span.ds-shortcut-field-caps` of a `kbd.ds-shortcut-field-cap` per key) and, when another action uses the chord, a
+//! `button.ds-shortcut-field-well` (with `more`, a `span.ds-shortcut-field-caps` of a `kbd.ds-key-equivalent-key` cap per key, KeyEquivalent's cap style) and, when another action uses the chord, a
 //! `span.ds-shortcut-field-clash`.
 
 use crate::components::controls::press::{ActivationKeys, activates, disabled};
@@ -131,10 +131,10 @@ pub fn ShortcutField(
                 if more.is_empty() {
                     "{text}"
                 } else {
-                    span { class: "ds-shortcut-field-caps",
-                        kbd { class: "ds-shortcut-field-cap", "{text}" }
+                    span { class: "ds-shortcut-field-caps ds-key-equivalent", "data-style": "cap",
+                        kbd { class: "ds-key-equivalent-key", "{text}" }
                         for extra in &extras {
-                            kbd { class: "ds-shortcut-field-cap", "{extra}" }
+                            kbd { class: "ds-key-equivalent-key", "{extra}" }
                         }
                     }
                 }

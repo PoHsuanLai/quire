@@ -72,7 +72,7 @@ fn the_value_and_each_extra_key_are_caps_in_the_well() {
     let mut idle = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     idle.advance(Duration::from_millis(100));
     assert_eq!(
-        idle.count(".ds-shortcut-field-cap"),
+        idle.count(".ds-shortcut-field-caps .ds-key-equivalent-key"),
         2,
         "the value and one extra key"
     );
