@@ -4,7 +4,7 @@ use crate::pages::content::external_icons::ExternalIcons;
 use crate::pages::content::glyphs::Glyphs;
 use crate::pages::content::plate_tints::PlateTints;
 use crate::pages::{Section, Specimen};
-use chordkit::{Chord, Key as ChordKey, Modifier, Modifiers as ChordModifiers};
+use chordkit::{Chord, Key as ChordKey, Modifier, Modifiers as ChordModifiers, NamedKey};
 use dioxus::prelude::*;
 use ds::components::app::command_pill::CommandPill;
 use ds::components::app::pin_tile::{PinFace, PinTile};
@@ -116,7 +116,7 @@ fn Choosers() -> Element {
             }
             SegmentedControl::<u8> { label: "Mailbox", choices: Choice::pairs(tabs), tracking: Tracking::SelectOne(tab()), onchange: move |next| tab.set(next) }
         }
-        Section { title: "ShortcutField", note: "Live: click it (or Return or Space with the keyboard on it), then type a combination with a modifier or a function key; Escape gives up, Backspace or Delete clears. The second names the action that already uses its shortcut.",
+        Section { title: "ShortcutField", note: "Live: click it (or Return or Space with the keyboard on it), then type a combination with a modifier or a function key; Escape gives up, Backspace or Delete clears. The single-key fields take a bare key or Shift with a character (Delete is a key there), and the last shows an extra key as a second cap. Another names the action that already uses its shortcut.",
             div { class: "g-row",
                 Specimen { name: "live",
                     ShortcutField { label: "Live shortcut", value: shortcut(), onrecord: move |recorded| match recorded {
@@ -130,6 +130,12 @@ fn Choosers() -> Element {
                 }
                 Specimen { name: "clash",
                     ShortcutField { label: "Clashing shortcut", value: Some(sample_chord()), clash: ShortcutClash::With("New Space".to_owned()), onrecord: |_| {} }
+                }
+                Specimen { name: "single keys",
+                    ShortcutField { label: "Single key", value: Some(Chord::new(ChordModifiers::default(), ChordKey::Char('j'))), accepts: ShortcutKinds::SingleKeys, onrecord: |_| {} }
+                }
+                Specimen { name: "extra keys",
+                    ShortcutField { label: "Two keys", value: Some(Chord::new(ChordModifiers::default(), ChordKey::Char('j'))), more: vec![Chord::new(ChordModifiers::default(), ChordKey::Named(NamedKey::Down))], accepts: ShortcutKinds::SingleKeys, onrecord: |_| {} }
                 }
                 Specimen { name: "disabled",
                     ShortcutField { label: "Disabled shortcut", value: Some(sample_chord()), availability: Availability::Disabled, onrecord: |_| {} }

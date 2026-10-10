@@ -4,13 +4,17 @@
 //! gives up, Backspace or Delete clears. While it listens it keeps every key it hears from the
 //! window's actions.
 //!
+//! `accepts` chooses what counts: combinations, or single keys (a bare key, or Shift with a
+//! character; Delete is then a key). `more` lists the action's further keys, drawn as caps beside
+//! `value`.
+//!
 //! Markup: `span.ds-shortcut-field[data-recording][data-clash]` holding
-//! `button.ds-shortcut-field-well` and, when another action uses the chord, a
+//! `button.ds-shortcut-field-well` (with `more`, a `span.ds-shortcut-field-caps` of a `kbd.ds-shortcut-field-cap` per key) and, when another action uses the chord, a
 //! `span.ds-shortcut-field-clash`.
 
 use crate::components::controls::press::{ActivationKeys, activates, disabled};
 use crate::components::fields::shortcut_field_model::{
-    Capture, Heard, ShortcutClash, ShortcutRecorded, hear,
+    Capture, Heard, ShortcutClash, ShortcutKinds, ShortcutRecorded, hear,
 };
 use crate::focus::soon::focus_soon;
 use crate::keys::use_platform;
@@ -34,6 +38,13 @@ pub fn ShortcutField(
     label: String,
     #[props(default)] value: Option<Chord>,
     onrecord: EventHandler<ShortcutRecorded>,
+    /// What the field accepts: combinations (the default) or single keys.
+    #[props(default)]
+    accepts: ShortcutKinds,
+    /// Further keys the action also has, drawn as key caps after `value`. The caller manages
+    /// them; recording replaces only `value`.
+    #[props(default)]
+    more: Vec<Chord>,
     #[props(default)] clash: ShortcutClash,
     #[props(default)] availability: Availability,
     #[props(default)] common: Common,
@@ -52,6 +63,10 @@ pub fn ShortcutField(
         (Capture::Idle, Some(chord)) => chord_text(platform, &chord),
         (Capture::Idle, None) => EMPTY.to_owned(),
     };
+    let extras: Vec<String> = more
+        .iter()
+        .map(|chord| chord_text(platform, chord))
+        .collect();
     let class = common.class("ds-shortcut-field");
     let data = common.data_attributes();
     let name = common.aria_label.clone().unwrap_or(label);
@@ -95,7 +110,7 @@ pub fn ShortcutField(
                         }
                     }
                     Capture::Listening => {
-                        let heard = hear(platform, &event.key(), event.modifiers());
+                        let heard = hear(platform, accepts, &event.key(), event.modifiers());
                         if heard == Heard::Leave {
                             return;
                         }
@@ -113,7 +128,16 @@ pub fn ShortcutField(
                     well.set(Some(event.data()));
                     common.mounted(event);
                 },
-                "{text}"
+                if more.is_empty() {
+                    "{text}"
+                } else {
+                    span { class: "ds-shortcut-field-caps",
+                        kbd { class: "ds-shortcut-field-cap", "{text}" }
+                        for extra in &extras {
+                            kbd { class: "ds-shortcut-field-cap", "{extra}" }
+                        }
+                    }
+                }
             }
             if let Some(used_by) = &used_by {
                 span { class: "ds-shortcut-field-clash", role: "status", "{used_by}" }

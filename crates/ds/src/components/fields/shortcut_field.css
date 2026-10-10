@@ -16,3 +16,10 @@
 }
 .ds-shortcut-field-clash{ font-size:var(--fs-help); color:var(--warn); }
 .ds-shortcut-field[*|data-availability=disabled] .ds-shortcut-field-well{ opacity:.35; }
+/* With extra keys the well holds key caps: the value's and each further key's, in the key
+   equivalent's cap style. */
+.ds-shortcut-field-caps{ display:inline-flex; align-items:center; justify-content:center; gap:var(--s-4); }
+.ds-shortcut-field-cap{
+  display:inline-block; font-family:var(--font-code); font-size:var(--fs-note); border:var(--hair) solid var(--line); border-bottom-width:2px;
+  border-radius:var(--r-kbd); padding:var(--s-1) var(--s-5); color:var(--ink-soft); background:var(--surface-2);
+}

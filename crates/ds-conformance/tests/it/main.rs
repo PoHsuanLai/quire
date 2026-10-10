@@ -100,6 +100,7 @@ mod sheet_buttons;
 mod sheet_exit;
 mod sheet_within;
 mod shortcut_field;
+mod shortcut_field_single_keys;
 mod sidebar_sections;
 mod skeleton_row;
 mod slider_ticks;

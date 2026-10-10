@@ -73,7 +73,9 @@ pub use crate::components::editor::raw_keys::RawKeySurface;
 pub use crate::components::editor::surface::EditSurface;
 pub use crate::components::fields::fact_list::{Fact, FactList};
 pub use crate::components::fields::shortcut_field::ShortcutField;
-pub use crate::components::fields::shortcut_field_model::{ShortcutClash, ShortcutRecorded};
+pub use crate::components::fields::shortcut_field_model::{
+    ShortcutClash, ShortcutKinds, ShortcutRecorded,
+};
 pub use crate::components::fields::text_field::TextField;
 pub use crate::components::fields::text_field_focus::FieldFocus;
 pub use crate::components::fields::text_field_model::FieldBezel;

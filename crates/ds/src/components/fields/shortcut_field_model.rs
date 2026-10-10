@@ -38,6 +38,18 @@ pub(crate) enum Capture {
     Listening,
 }
 
+/// What the field accepts as a shortcut.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+#[non_exhaustive]
+pub enum ShortcutKinds {
+    /// A combination with a modifier, or a function key; the system-settings recorder.
+    #[default]
+    Combinations,
+    /// A bare key, or Shift with a character, for an app whose commands are single keys. Delete
+    /// is a key to bind here, not a clear; Backspace still clears.
+    SingleKeys,
+}
+
 /// What a key means to a field that is listening.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Heard {
@@ -54,25 +66,38 @@ pub(crate) enum Heard {
     Leave,
 }
 
-/// What `key` with `modifiers` held means to a field listening on `platform`. Escape, Backspace,
-/// Delete and Tab are meant bare; with a modifier they are combinations like any other.
-pub(crate) fn hear(platform: Platform, key: &Key, modifiers: Modifiers) -> Heard {
+/// What `key` with `modifiers` held means to a field listening on `platform` for `kinds`. Escape,
+/// Backspace, Delete and Tab are meant bare; with a modifier they are combinations like any
+/// other. For `SingleKeys` Delete is offered as a key.
+pub(crate) fn hear(
+    platform: Platform,
+    kinds: ShortcutKinds,
+    key: &Key,
+    modifiers: Modifiers,
+) -> Heard {
     let bare = modifiers_of(modifiers).is_empty();
-    match (key, bare) {
-        (Key::Escape, true) => Heard::Cancel,
-        (Key::Backspace | Key::Delete, true) => Heard::Clear,
-        (Key::Tab, true) => Heard::Leave,
-        _ => match chord_of(platform, key, modifiers).filter(is_shortcut) {
+    match (key, bare, kinds) {
+        (Key::Escape, true, _) => Heard::Cancel,
+        (Key::Backspace, true, _) => Heard::Clear,
+        (Key::Delete, true, ShortcutKinds::Combinations) => Heard::Clear,
+        (Key::Tab, true, _) => Heard::Leave,
+        _ => match chord_of(platform, key, modifiers).filter(|chord| is_shortcut(kinds, chord)) {
             Some(chord) => Heard::Offer(chord),
             None => Heard::Wait,
         },
     }
 }
 
-/// Whether `chord` is something to bind: it holds a modifier (Shift alone with a character is
-/// typing), or it is a function key.
-fn is_shortcut(chord: &Chord) -> bool {
+/// Whether `chord` is something to bind for `kinds`. Combinations: it holds a modifier (Shift
+/// alone with a character is typing), or it is a function key. Single keys: it is bare, or Shift
+/// with a character.
+fn is_shortcut(kinds: ShortcutKinds, chord: &Chord) -> bool {
     let modifiers = chord.modifiers();
+    if kinds == ShortcutKinds::SingleKeys {
+        let shifted = modifiers == ChordModifiers::of(Modifier::Shift)
+            && matches!(chord.key(), ChordKey::Char(_));
+        return modifiers.is_empty() || shifted;
+    }
     let typing = modifiers == ChordModifiers::of(Modifier::Shift)
         && matches!(chord.key(), ChordKey::Char(_));
     let function = matches!(chord.key(), ChordKey::Named(NamedKey::F(_)));
@@ -81,7 +106,7 @@ fn is_shortcut(chord: &Chord) -> bool {
 
 #[cfg(test)]
 mod tests {
-    use super::{Heard, hear};
+    use super::{Heard, ShortcutKinds, hear};
     use chordkit::{
         Chord, Desktop, Key as ChordKey, Modifier, Modifiers as ChordModifiers, NamedKey, Platform,
     };
@@ -185,7 +210,74 @@ mod tests {
             ),
         ];
         for (name, key, modifiers, want) in cases {
-            assert_eq!(hear(ours(), &key, modifiers), want, "{name}");
+            assert_eq!(
+                hear(ours(), ShortcutKinds::Combinations, &key, modifiers),
+                want,
+                "{name}"
+            );
+        }
+    }
+
+    #[test]
+    fn single_keys_take_a_bare_key_or_shift_and_a_character() {
+        let letter = |c: &str| Key::Character(c.to_owned());
+        let cases: Vec<(&str, Key, Modifiers, Heard)> = vec![
+            (
+                "a bare letter is offered",
+                letter("j"),
+                Modifiers::empty(),
+                chord(&[], ChordKey::Char('j')),
+            ),
+            (
+                "shift and a letter is offered",
+                letter("J"),
+                Modifiers::SHIFT,
+                chord(&[Modifier::Shift], ChordKey::Char('j')),
+            ),
+            (
+                "delete is a key",
+                Key::Delete,
+                Modifiers::empty(),
+                chord(&[], ChordKey::Named(NamedKey::Delete)),
+            ),
+            (
+                "backspace clears",
+                Key::Backspace,
+                Modifiers::empty(),
+                Heard::Clear,
+            ),
+            (
+                "escape cancels",
+                Key::Escape,
+                Modifiers::empty(),
+                Heard::Cancel,
+            ),
+            ("tab leaves", Key::Tab, Modifiers::empty(), Heard::Leave),
+            (
+                "a bare arrow is offered",
+                Key::ArrowUp,
+                Modifiers::empty(),
+                chord(&[], ChordKey::Named(NamedKey::Up)),
+            ),
+            (
+                "control and a letter waits",
+                letter("j"),
+                Modifiers::CONTROL,
+                Heard::Wait,
+            ),
+            (
+                "a lone modifier waits",
+                Key::Shift,
+                Modifiers::SHIFT,
+                Heard::Wait,
+            ),
+        ];
+        for (name, key, modifiers, want) in cases {
+            assert_eq!(
+                hear(ours(), ShortcutKinds::SingleKeys, &key, modifiers),
+                want,
+                "{name}"
+            );
         }
     }
 }
