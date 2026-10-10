@@ -84,7 +84,7 @@ pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focus
     });
     match probed {
         None => Focused::Busy,
-        Some(None) => Focused::Unknown,
+        Some(None | Some((Held::Gone, _))) => Focused::Unknown,
         Some(Some((Held::Already, _))) => Focused::Done,
         Some(Some((Held::Not, Field::Editable))) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
