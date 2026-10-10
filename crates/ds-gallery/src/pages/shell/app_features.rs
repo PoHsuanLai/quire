@@ -295,6 +295,7 @@ fn Grouped() -> Element {
 #[component]
 fn Spaces() -> Element {
     let mut space = use_signal(|| 1u8);
+    let keys = use_keys();
     rsx! {
         Section { title: "Space switching", note: "Control and 1 to 9 switch to that Space (Command and a digit are left to the apps). The frame's colour cross-fades over --t-big.",
             div { class: "g-row",
@@ -303,7 +304,9 @@ fn Spaces() -> Element {
                     tabindex: "0",
                     "data-space": "{space}",
                     onkeydown: move |event| {
-                        if let Some(next) = space_pressed(&event.key(), event.modifiers()) {
+                        let pressed = keys
+                            .with_keymap(|keymap| space_pressed(keymap, &event.key(), event.modifiers()));
+                        if let Some(next) = pressed {
                             event.prevent_default();
                             space.set(next.get());
                         }

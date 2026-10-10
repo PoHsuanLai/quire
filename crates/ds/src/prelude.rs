@@ -83,7 +83,14 @@ pub use crate::components::forms::icon_tile::{IconTile, TileFace};
 pub use crate::components::forms::pane_stack::header::PageHeader;
 pub use crate::components::forms::pane_stack::path::PanePath;
 pub use crate::components::forms::pane_stack::stack::PaneStack;
+// Deprecated: ask the keymap (`use_keys`) instead of which modifier is held.
+#[allow(deprecated)]
 pub use ds_core::command::{command_keys, is_command};
+
+// Keys as actions
+pub use crate::keys::{
+    ActionTaken, KeySource, Keys, on_action, use_keys, use_platform, use_register_actions,
+};
 
 // Overlays
 pub use crate::components::content::tip_text::TipText;

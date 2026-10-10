@@ -65,7 +65,7 @@ fn page_of(count: usize, with_extra: Extra) -> Element {
                 tabindex: "0",
                 style: "padding:24px; width:260px",
                 onkeydown: move |event: KeyboardEvent| {
-                    spaces.on_key(SwitchChord::Command, &event);
+                    spaces.on_key(SwitchChord::Primary, &event);
                 },
                 SpaceHead { handle: spaces }
                 p { class: "place", {place()} }

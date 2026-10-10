@@ -7,6 +7,7 @@ use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::components::fields::text_field_secret::takes_text_out;
 use crate::focus::targets::Told;
+use crate::keys::use_keys;
 use dioxus::prelude::*;
 use ds_core::vocab::Availability;
 use ds_core::word::Word;
@@ -61,6 +62,7 @@ pub(crate) fn aria_placeholder(placeholder: &str) -> Option<String> {
 /// The field's text as it draws: a line (text, a search or a secret; a secure field writes no
 /// `value`) or, for a multi-line field, a `textarea`.
 pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
+    let keys = use_keys();
     if kind == FieldKind::Multiline {
         return area(field, value);
     }
@@ -143,7 +145,11 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                 },
                 onkeydown: move |event: KeyboardEvent| {
                     caret.refresh();
-                    if secret && takes_text_out(&event.key(), event.modifiers()) {
+                    if secret
+                        && keys.with_keymap(|keymap| {
+                            takes_text_out(keymap, &event.key(), event.modifiers())
+                        })
+                    {
                         event.prevent_default();
                     }
                     if event.key() == Key::Enter {

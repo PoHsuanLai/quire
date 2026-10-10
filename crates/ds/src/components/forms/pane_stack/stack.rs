@@ -24,6 +24,7 @@ use super::path::PanePath;
 use super::track::PaneTrack;
 use crate::focus::select::Select;
 use crate::focus::selector::focus_by_selector;
+use crate::keys::{register_quire_actions, use_keys};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
@@ -46,6 +47,8 @@ pub fn PaneStack<K: Clone + PartialEq + 'static>(
     #[props(default)] common: Common,
 ) -> Element {
     let id = common.id.clone().unwrap_or_else(|| "ds-pane-stack".into());
+    let keys = use_keys();
+    use_hook(|| register_quire_actions(&keys));
     let track = use_track(&path, &id, opener);
     let (slide, frame) = use_pane_slide(track.slot, None);
     let arrival = arrival(track.slot, frame.position());
@@ -66,7 +69,9 @@ pub fn PaneStack<K: Clone + PartialEq + 'static>(
             style: "--pane-q:{arrival:.4};--pane-way:{sign(&track)}",
             onmounted: move |event| common.mounted(event),
             onkeydown: move |event| {
-                if !at_root && goes_back(&event.key(), event.modifiers()) {
+                if !at_root
+                    && keys.with_keymap(|keymap| goes_back(keymap, &event.key(), event.modifiers()))
+                {
                     event.prevent_default();
                     event.stop_propagation();
                     on_back.call(());

@@ -4,6 +4,7 @@
 
 use crate::host::keys::KeyExtras;
 use dioxus::prelude::{Code, Key, Location, Modifiers};
+use ds_core::command::types_text;
 
 /// Where in its press a key is.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -62,13 +63,11 @@ impl RawKey {
     }
 }
 
-/// What a character key types when the platform said nothing: itself, unless Ctrl or Super makes
-/// it a chord.
+/// What a character key types when the platform said nothing: itself, unless a command key (Ctrl,
+/// Super or Meta) makes it a chord. Alt alone still types (macOS Option, AltGr reported as Alt).
 fn typed(key: &Key, modifiers: Modifiers) -> Option<String> {
     match key {
-        Key::Character(text) if !modifiers.intersects(Modifiers::CONTROL | Modifiers::SUPER) => {
-            Some(text.clone())
-        }
+        Key::Character(text) if types_text(key, modifiers - Modifiers::ALT) => Some(text.clone()),
         _ => None,
     }
 }
@@ -117,6 +116,11 @@ mod tests {
             (
                 "no extras, Super types nothing",
                 made(character("t"), Modifiers::SUPER, KeyExtras::default()),
+                None,
+            ),
+            (
+                "no extras, Meta types nothing",
+                made(character("t"), Modifiers::META, KeyExtras::default()),
                 None,
             ),
             (

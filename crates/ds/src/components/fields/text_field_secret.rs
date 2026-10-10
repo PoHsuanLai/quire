@@ -1,43 +1,74 @@
 //! What a secure field refuses: the keys that would copy or cut its text out. Paste stays.
 
+use crate::edit::keys::{KeyAction, classify};
+use chordkit::Keymap;
 use dioxus::prelude::{Key, Modifiers};
-use ds_core::command::command_keys;
 
-/// Whether `key` with `modifiers` copies or cuts text out of a field: the action key with C or X
-/// (Control, or Super where it is the action key), Control+Insert (copy) and Shift+Delete (cut).
-pub(crate) fn takes_text_out(key: &Key, modifiers: Modifiers) -> bool {
-    let action = command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::META);
-    match key {
-        Key::Character(text) => action && matches!(text.to_lowercase().as_str(), "c" | "x"),
-        Key::Insert => modifiers.contains(Modifiers::CONTROL),
-        Key::Delete => modifiers.contains(Modifiers::SHIFT),
-        _ => false,
-    }
+/// Whether `key` with `modifiers` copies or cuts text out of a field under `keymap`: the
+/// platform's copy and cut chords, Ctrl+Insert (copy) and Shift+Delete (cut).
+pub(crate) fn takes_text_out(keymap: &Keymap, key: &Key, modifiers: Modifiers) -> bool {
+    matches!(
+        classify(keymap, key, modifiers),
+        KeyAction::Copy | KeyAction::Cut
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use super::takes_text_out;
+    use chordkit::{Desktop, Keymap, Platform};
     use dioxus::prelude::{Key, Modifiers};
+
+    type Case = (&'static str, Platform, Key, Modifiers, bool);
+
+    fn ours() -> Platform {
+        Platform::Linux {
+            desktop: Desktop::Ours,
+        }
+    }
 
     #[test]
     fn copy_and_cut_chords_are_refused_and_paste_and_typing_are_not() {
         let none = Modifiers::empty();
         let ctrl = Modifiers::CONTROL;
-        let cases: Vec<(&str, Key, Modifiers, bool)> = vec![
-            ("ctrl c", Key::Character("c".into()), ctrl, true),
-            ("ctrl X", Key::Character("X".into()), ctrl, true),
-            ("super c", Key::Character("c".into()), Modifiers::META, true),
-            ("ctrl insert", Key::Insert, ctrl, true),
-            ("shift delete", Key::Delete, Modifiers::SHIFT, true),
-            ("ctrl v", Key::Character("v".into()), ctrl, false),
-            ("shift insert", Key::Insert, Modifiers::SHIFT, false),
-            ("plain c", Key::Character("c".into()), none, false),
-            ("plain delete", Key::Delete, none, false),
-            ("ctrl a", Key::Character("a".into()), ctrl, false),
+        let kde = Platform::Linux {
+            desktop: Desktop::Kde,
+        };
+        let cases: Vec<Case> = vec![
+            ("kde ctrl c", kde, Key::Character("c".into()), ctrl, true),
+            ("kde ctrl X", kde, Key::Character("X".into()), ctrl, true),
+            (
+                "ours cmd c",
+                ours(),
+                Key::Character("c".into()),
+                Modifiers::SUPER,
+                true,
+            ),
+            (
+                "ours meta x",
+                ours(),
+                Key::Character("x".into()),
+                Modifiers::META,
+                true,
+            ),
+            (
+                "ours ctrl c is not copy",
+                ours(),
+                Key::Character("c".into()),
+                ctrl,
+                false,
+            ),
+            ("ctrl insert", kde, Key::Insert, ctrl, true),
+            ("shift delete", kde, Key::Delete, Modifiers::SHIFT, true),
+            ("kde ctrl v", kde, Key::Character("v".into()), ctrl, false),
+            ("shift insert", kde, Key::Insert, Modifiers::SHIFT, false),
+            ("plain c", kde, Key::Character("c".into()), none, false),
+            ("plain delete", kde, Key::Delete, none, false),
+            ("kde ctrl a", kde, Key::Character("a".into()), ctrl, false),
         ];
-        for (name, key, modifiers, want) in cases {
-            assert_eq!(takes_text_out(&key, modifiers), want, "{name}");
+        for (name, platform, key, modifiers, want) in cases {
+            let keymap = Keymap::conventional(platform);
+            assert_eq!(takes_text_out(&keymap, &key, modifiers), want, "{name}");
         }
     }
 }

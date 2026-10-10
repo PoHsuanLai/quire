@@ -63,6 +63,7 @@ use crate::components::overlays::title_tips::use_title_tips_provider;
 use crate::components::overlays::toast::ToastHost;
 use crate::focus::click::ClickRoot;
 use crate::host::signals::HostSignals;
+use crate::keys::use_keys_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
 use crate::root::typeface::{use_typeface, use_typeface_provider};
@@ -126,6 +127,7 @@ pub fn Ds(
     children: Element,
 ) -> Element {
     let typeface = typeface.unwrap_or(use_typeface());
+    use_keys_provider();
     use_typeface_provider(typeface);
     let signals = use_hook(try_consume_context::<HostSignals>);
     let scale = use_root_scale(scale, signals.map(|signals| (signals.scale)()));

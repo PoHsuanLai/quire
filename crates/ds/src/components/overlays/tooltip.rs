@@ -22,6 +22,7 @@ use crate::components::overlays::hover_card::intent::{HoverAnchor, use_hover_int
 use crate::components::overlays::hover_card::target::HoverTarget;
 use crate::components::overlays::hover_card::{Standing, use_card};
 use crate::host::measure::{MountedRef, client_rect};
+use crate::keys::use_keys;
 use crate::root::common::Common;
 use crate::stack::hover_hub::{HoverKey, use_hover_hub};
 use dioxus::prelude::*;
@@ -70,7 +71,10 @@ pub fn Tooltip(
     #[props(default)] common: Common,
     #[props(default)] children: Element,
 ) -> Element {
-    let text = TipText::new(text).with_shortcut_opt(shortcut).render();
+    let keys = use_keys();
+    let text = TipText::new(text)
+        .with_shortcut_opt(shortcut)
+        .render_in(&keys);
     rsx! {
         Hint {
             text,

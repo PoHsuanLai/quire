@@ -6,6 +6,7 @@
 //! accessible name: a control's `aria-label` keeps its full wording ("Star this thread") while
 //! its tip is terse ("Star  S").
 
+use crate::keys::Keys;
 use ds_core::vocab::Shortcut;
 use std::fmt;
 
@@ -47,10 +48,20 @@ impl TipText {
         &self.name
     }
 
-    /// The tip as drawn: `Name  ⌘K`, or `Name` with no key.
+    /// The tip as drawn on our desktop: `Name  ⌘K`, or `Name` with no key.
     pub fn render(&self) -> String {
+        self.render_with(Shortcut::glyphs)
+    }
+
+    /// The tip as `keys` draws its key for the platform: `Name  ⌘K` on a Mac-style one,
+    /// `Name  Ctrl+K` elsewhere.
+    pub fn render_in(&self, keys: &Keys) -> String {
+        self.render_with(|shortcut| keys.text_of(shortcut))
+    }
+
+    fn render_with(&self, draw: impl Fn(&Shortcut) -> String) -> String {
         match &self.shortcut {
-            Some(shortcut) => format!("{}{TIP_SEPARATOR}{}", self.name, shortcut.glyphs()),
+            Some(shortcut) => format!("{}{TIP_SEPARATOR}{}", self.name, draw(shortcut)),
             None => self.name.clone(),
         }
     }

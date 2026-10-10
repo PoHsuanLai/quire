@@ -25,6 +25,7 @@ use crate::host::captured::CapturedPointer;
 use crate::host::document::use_document_host;
 use crate::host::ime::ImeEvent;
 use crate::host::position::TextPosition;
+use crate::keys::use_keys;
 use crate::root::common::Common;
 use crate::spell::lang::Spell;
 use crate::spell::marks::SpellReplace;
@@ -80,6 +81,7 @@ pub fn EditSurface(
         on_input,
         on_pointer,
         on_focus,
+        keys: use_keys(),
     };
     let heard = {
         let ctx = ctx.clone();

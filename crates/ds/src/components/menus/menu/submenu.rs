@@ -15,6 +15,7 @@ use crate::components::menus::menu::placement::{Keys, MENU_INSET};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
 use crate::components::overlays::popover::{Stacking, layer_slug, position_style, use_float};
 use crate::host::measure::MountedRef;
+use crate::keys::use_keys;
 use crate::stack::menu_track::types::MenuTiming;
 use dioxus::prelude::*;
 use ds_core::geometry::{
@@ -52,6 +53,7 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
         depth,
         blink,
         keys,
+        keymap: use_keys(),
         onpick,
         onhover: Some(onhover),
         onitem: None,

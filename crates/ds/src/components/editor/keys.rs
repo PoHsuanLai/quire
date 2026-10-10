@@ -14,7 +14,10 @@ pub(crate) fn key_down(ctx: &SurfaceCtx, event: &KeyboardEvent) {
     let (idle, ended) = settle(ctx.state.composing.get());
     ctx.state.composing.set(idle);
     ctx.tell(ended);
-    let input = match classify(&event.key(), event.modifiers()) {
+    let gesture = ctx
+        .keys
+        .with_keymap(|keymap| classify(keymap, &event.key(), event.modifiers()));
+    let input = match gesture {
         KeyAction::Text(text) => EditInput::Text(text),
         KeyAction::Key(key) => EditInput::Key(key),
         KeyAction::Cut => EditInput::Cut,

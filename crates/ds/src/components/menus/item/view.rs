@@ -13,7 +13,7 @@ use crate::components::menus::menu::placement::Keys;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
 use ds_core::press::{PointerButton, Press};
-use ds_core::vocab::{Availability, Check, FocusStyle, Selection, Shortcut, Shown};
+use ds_core::vocab::{Availability, Check, FocusStyle, Selection, Shown};
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
@@ -63,7 +63,7 @@ pub(crate) struct ItemView<'a> {
     /// The trailing hint.
     pub hint: Option<&'a str>,
     /// The key equivalent.
-    pub key: Option<&'a Shortcut>,
+    pub key: Option<String>,
     /// The state mark.
     pub check: Option<Check>,
     /// Whether this is the highlighted item.
@@ -133,7 +133,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
     let end = match (view.branch, view.keys, view.key) {
         (Branch::Parent(_), _, _) => chevron(),
         (Branch::Leaf, Keys::Shown, Some(key)) => rsx! {
-            span { class: "ds-menu-trailing", "data-mark": "keys", "{key.glyphs()}" }
+            span { class: "ds-menu-trailing", "data-mark": "keys", "{key}" }
         },
         (Branch::Leaf, Keys::Hidden, _) | (Branch::Leaf, Keys::Shown, None) => rsx! {},
     };

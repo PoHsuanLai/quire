@@ -5,7 +5,7 @@
 use crate::components::lists::list::model::{ListItem, ListRole};
 use crate::stack::roving::{Rove, Roving, Wrap};
 use dioxus::prelude::{Key, Modifiers};
-use ds_core::command::command_keys;
+use ds_core::command::types_text;
 use ds_core::vocab::Availability;
 
 /// What a key asks of a list.
@@ -21,8 +21,7 @@ pub(crate) enum ListKey {
 
 /// The list's reading of `key`; `None` for a key it leaves alone.
 pub(crate) fn list_key(key: &Key, modifiers: Modifiers) -> Option<ListKey> {
-    let chord =
-        command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
+    let chord = !types_text(key, modifiers);
     match key {
         Key::ArrowDown => Some(ListKey::Move(Rove::of(&Key::ArrowDown)?)),
         Key::ArrowUp => Some(ListKey::Move(Rove::of(&Key::ArrowUp)?)),

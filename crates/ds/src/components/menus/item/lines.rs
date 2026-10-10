@@ -23,6 +23,8 @@ pub(crate) struct Drawn {
     pub open: Option<usize>,
     /// Whether key equivalents show.
     pub keys: Keys,
+    /// The window's keymap, which draws each key equivalent for the platform.
+    pub keymap: crate::keys::Keys,
     /// A click on a live choice.
     pub onpick: EventHandler<usize>,
     /// The pointer moved over a choice, at this client point.
@@ -86,7 +88,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                         title,
                         text: Some(text),
                         image: image.as_ref(),
-                        key: key.as_ref(),
+                        key: key.as_ref().map(|shortcut| drawn.keymap.text_of(shortcut)),
                         hint: hint.as_deref(),
                         check: *check,
                         highlight: Selection::of(&Some(index), &drawn.selected),

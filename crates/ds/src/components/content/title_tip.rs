@@ -9,6 +9,7 @@
 
 use crate::components::content::tip_text::TipText;
 use crate::host::measure::MountedRef;
+use crate::keys::use_keys;
 use crate::stack::hover_hub::HoverKey;
 use dioxus::core::current_scope_id;
 use dioxus::prelude::*;
@@ -60,7 +61,8 @@ pub(crate) fn use_tip(title: Option<TipText>) -> Tip {
     let element = use_signal(|| None::<MountedRef>);
     let port = try_consume_context::<TipPort>();
     let hinted = try_consume_context::<Hinted>().is_some();
-    let title = title.map(|tip| tip.render());
+    let keys = use_keys();
+    let title = title.map(|tip| tip.render_in(&keys));
     let say = match (title, port, hinted) {
         (None, _, _) | (Some(_), _, true) => Say::Nothing,
         (Some(text), Some(port), false) => Say::Tip(text, port),

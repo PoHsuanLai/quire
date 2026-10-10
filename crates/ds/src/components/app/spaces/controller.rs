@@ -2,6 +2,7 @@
 
 use super::chord::SwitchChord;
 use super::open_menu::OpenMenu;
+use crate::keys::{Keys, use_keys};
 use dioxus::prelude::*;
 use ds_style::space::list::{Refused, Removed, SlideIn, SpaceId, Spaces, Switched};
 use ds_style::space::look::SpaceLook;
@@ -18,6 +19,8 @@ pub struct SpacesHandle<P: 'static, R: 'static> {
     pub(super) keep: Callback<Spaces<P, R>>,
     pub(super) here: Callback<(), R>,
     pub(super) arrived: Callback<Switched<R>>,
+    /// The window's keymap, for the platform whose primary modifier the chord is.
+    pub(super) keys: Keys,
 }
 
 impl<P, R> Clone for SpacesHandle<P, R> {
@@ -66,6 +69,7 @@ where
         keep: use_callback(move |spaces: Spaces<P, R>| keep(&spaces)),
         here: use_callback(move |()| here()),
         arrived: use_callback(arrived),
+        keys: use_keys(),
     }
 }
 
@@ -116,7 +120,7 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
 
     /// A key press on the window: switch when it is `chord` and a digit.
     pub fn on_key(&self, chord: SwitchChord, event: &KeyboardEvent) -> Option<Switched<R>> {
-        let number = chord.pressed(&event.key(), event.modifiers())?;
+        let number = chord.pressed(self.keys.platform(), &event.key(), event.modifiers())?;
         self.switch_index(usize::from(number.get()) - 1)
     }
 

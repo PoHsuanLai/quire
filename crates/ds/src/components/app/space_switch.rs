@@ -1,23 +1,21 @@
-//! Space switching by key (design/30 section 2.11, design/27 section 8 decision 5): Ctrl+1 to
-//! Ctrl+9 switch to that Space, and Command+1 to 9 are left to the apps. The Space's colour then
-//! cross-fades over `--t-big` (the frame's own transition, not this file's).
+//! Space switching by key (design/30 section 2.11, design/27 section 8 decision 5): the
+//! platform's Switch-to-Space-n action (Ctrl+1 to Ctrl+9 on our desktop, where Command+1 to 9 are
+//! left to the apps), as the keymap binds it. The Space's colour then cross-fades over `--t-big`
+//! (the frame's own transition, not this file's).
 
+use chordkit::{Action, Context, Keymap, StandardAction};
 use dioxus::prelude::{Key, Modifiers};
-use ds_core::standard_action::{SpaceNumber, StandardAction};
+use ds_core::command::resolve;
+use ds_core::standard_action::SpaceNumber;
 use ds_core::vocab::Shortcut;
 
-/// The Space a key press asks for: a digit 1 to 9 with Control held and nothing else.
-pub fn space_pressed(key: &Key, modifiers: Modifiers) -> Option<SpaceNumber> {
-    if modifiers != Modifiers::CONTROL {
-        return None;
+/// The Space a key press asks for under `keymap`: the one its Switch-to-Space action names, or
+/// `None` for any other key (and for a platform with no key for a numbered desktop).
+pub fn space_pressed(keymap: &Keymap, key: &Key, modifiers: Modifiers) -> Option<SpaceNumber> {
+    match resolve(keymap, key, modifiers, Context::Normal)? {
+        Action::Standard(StandardAction::SwitchToSpace(space)) => Some(space),
+        _ => None,
     }
-    let Key::Character(text) = key else {
-        return None;
-    };
-    let mut chars = text.chars();
-    let digit = chars.next().filter(|_| chars.next().is_none())?;
-    let n = u8::try_from(digit.to_digit(10)?).ok()?;
-    SpaceNumber::new(n)
 }
 
 /// The shortcut that switches to `space`, for a hint beside its dot.
@@ -28,6 +26,7 @@ pub fn space_shortcut(space: SpaceNumber) -> Shortcut {
 #[cfg(test)]
 mod tests {
     use super::{space_pressed, space_shortcut};
+    use chordkit::{Desktop, Keymap, Platform};
     use dioxus::prelude::{Key, Modifiers};
     use ds_core::standard_action::SpaceNumber;
 
@@ -35,21 +34,46 @@ mod tests {
         Key::Character(text.to_string())
     }
 
+    fn ours() -> Platform {
+        Platform::Linux {
+            desktop: Desktop::Ours,
+        }
+    }
+
+    type Case = (Platform, Key, Modifiers, Option<SpaceNumber>);
+
     #[test]
-    fn only_control_and_a_digit_from_one_to_nine_switches() {
-        let cases = [
-            (key("1"), Modifiers::CONTROL, SpaceNumber::new(1)),
-            (key("9"), Modifiers::CONTROL, SpaceNumber::new(9)),
-            (key("0"), Modifiers::CONTROL, None),
-            (key("1"), Modifiers::empty(), None),
-            (key("1"), Modifiers::META, None),
-            (key("1"), Modifiers::CONTROL | Modifiers::SHIFT, None),
-            (key("a"), Modifiers::CONTROL, None),
-            (key("12"), Modifiers::CONTROL, None),
-            (Key::Enter, Modifiers::CONTROL, None),
+    fn only_the_platforms_space_chord_switches() {
+        let kde = Platform::Linux {
+            desktop: Desktop::Kde,
+        };
+        let cases: Vec<Case> = vec![
+            (ours(), key("1"), Modifiers::CONTROL, SpaceNumber::new(1)),
+            (ours(), key("9"), Modifiers::CONTROL, SpaceNumber::new(9)),
+            (ours(), key("0"), Modifiers::CONTROL, None),
+            (ours(), key("1"), Modifiers::empty(), None),
+            (ours(), key("1"), Modifiers::META, None),
+            (ours(), key("1"), Modifiers::SUPER, None),
+            (
+                ours(),
+                key("1"),
+                Modifiers::CONTROL | Modifiers::SHIFT,
+                None,
+            ),
+            (ours(), key("a"), Modifiers::CONTROL, None),
+            (ours(), key("12"), Modifiers::CONTROL, None),
+            (ours(), Key::Enter, Modifiers::CONTROL, None),
+            (kde, Key::F3, Modifiers::CONTROL, SpaceNumber::new(3)),
+            (kde, key("3"), Modifiers::CONTROL, None),
+            (Platform::Windows, key("3"), Modifiers::CONTROL, None),
         ];
-        for (pressed, modifiers, want) in cases {
-            assert_eq!(space_pressed(&pressed, modifiers), want, "{pressed:?}");
+        for (platform, pressed, modifiers, want) in cases {
+            let keymap = Keymap::conventional(platform);
+            assert_eq!(
+                space_pressed(&keymap, &pressed, modifiers),
+                want,
+                "{platform:?} {pressed:?} {modifiers:?}"
+            );
         }
     }
 

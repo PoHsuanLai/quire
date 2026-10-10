@@ -24,6 +24,7 @@ use crate::components::menus::menu::tracker::{Via, use_tracker};
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
 use crate::host::measure::{Anchor, MountedRef};
+use crate::keys::use_keys;
 use crate::root::common::Common;
 use crate::stack::menu_track::types::MenuTiming;
 use dioxus::prelude::*;
@@ -142,6 +143,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         depth: 0,
         blink: blink(),
         keys: placement.keys(),
+        keymap: use_keys(),
         onpick: picker(
             blink,
             closing,

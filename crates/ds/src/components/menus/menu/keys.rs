@@ -5,7 +5,7 @@
 
 use crate::stack::roving::{Edge, Step};
 use dioxus::prelude::*;
-use ds_core::command::command_keys;
+use ds_core::command::types_text;
 
 /// What a key does in a menu panel.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -29,8 +29,7 @@ pub(crate) enum KeyAct {
 /// A panel's reading of `key`; `None` for a key it leaves alone. Letters only count with no
 /// Ctrl, Alt or Super.
 pub(crate) fn key_act(key: &Key, modifiers: Modifiers) -> Option<KeyAct> {
-    let chord =
-        command_keys(modifiers).intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META);
+    let chord = !types_text(key, modifiers);
     match key {
         Key::ArrowDown => Some(KeyAct::Move(Step::Down)),
         Key::ArrowUp => Some(KeyAct::Move(Step::Up)),

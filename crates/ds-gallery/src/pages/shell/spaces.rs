@@ -66,7 +66,7 @@ pub fn SpacesPage() -> Element {
                 div { class: "g-spaces",
                     tabindex: "0",
                     onkeydown: move |event: KeyboardEvent| {
-                        spaces.on_key(SwitchChord::Command, &event);
+                        spaces.on_key(SwitchChord::Primary, &event);
                     },
                     div { class: "g-spaces-side",
                         SpaceHead { handle: spaces }

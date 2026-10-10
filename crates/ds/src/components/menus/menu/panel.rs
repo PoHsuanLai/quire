@@ -17,6 +17,7 @@ use crate::components::menus::menu::placement::Keys;
 use crate::components::menus::menu::submenu::SubMenu;
 use crate::components::menus::menu::tracker::{Tracker, Via, target};
 use crate::host::measure::MountedRef;
+use crate::keys::Keys as WindowKeys;
 use crate::stack::menu_track::types::{MenuTarget, MenuTiming};
 use dioxus::prelude::*;
 use ds_core::geometry::units::Point;
@@ -38,6 +39,8 @@ pub(crate) struct Panel<T: 'static> {
     pub blink: Blink,
     /// Whether key equivalents show.
     pub keys: Keys,
+    /// The window's keymap, which draws each key equivalent for the platform.
+    pub keymap: WindowKeys,
     /// A pick of a choice of the panel at this depth: the menu blinks, yields the value, then
     /// closes; an item that keeps the menu open yields at once and nothing else happens.
     pub onpick: EventHandler<Picked<T>>,
@@ -89,6 +92,7 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                 selected: self.current().filter(|_| lit(self.blink, self.depth)),
                 open: tracker.open().map(|open| open.choice),
                 keys: self.keys,
+                keymap: self.keymap,
                 onpick: EventHandler::new(move |index: usize| match choices.get(index) {
                     Some(Choice {
                         act: Act::Pick(value, after),

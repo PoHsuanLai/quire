@@ -15,7 +15,7 @@ use crate::host::measure::{Anchor, MountedRef, use_rect};
 use crate::root::common::Common;
 use crate::stack::typeahead::Typeahead;
 use dioxus::prelude::*;
-use ds_core::command::command_keys;
+use ds_core::command::types_text;
 use ds_core::press::Press;
 use ds_core::time::clock::now;
 use ds_core::vocab::{Availability, Check, Shown};
@@ -165,8 +165,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             if live
                 && kind == PopUpKind::PopUp
                 && !text.trim().is_empty()
-                && !command_keys(event.modifiers())
-                    .intersects(Modifiers::CONTROL | Modifiers::ALT | Modifiers::META) =>
+                && types_text(&event.key(), event.modifiers()) =>
         {
             let choices: Vec<(&T, &str)> = typed
                 .iter()

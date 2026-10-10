@@ -5,6 +5,7 @@ use crate::components::editor::state::SurfaceState;
 use crate::edit::input::EditInput;
 use crate::edit::pointer::{EditFocus, EditPointer};
 use crate::host::document::DocumentHost;
+use crate::keys::Keys;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -16,6 +17,8 @@ pub(crate) struct SurfaceCtx {
     pub(crate) on_input: EventHandler<EditInput>,
     pub(crate) on_pointer: Option<EventHandler<EditPointer>>,
     pub(crate) on_focus: Option<EventHandler<EditFocus>>,
+    /// The window's keymap: which keys are clipboard gestures on this platform.
+    pub(crate) keys: Keys,
 }
 
 impl SurfaceCtx {

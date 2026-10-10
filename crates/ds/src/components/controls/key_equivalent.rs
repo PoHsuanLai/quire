@@ -5,6 +5,7 @@
 //! no hover, no press. Markup: `span.ds-key-equivalent[data-style][data-size]`, in `Cap` holding
 //! one `kbd.ds-key-equivalent-key` per key.
 
+use crate::keys::use_keys;
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::vocab::{GlyphKind, Shortcut};
@@ -31,10 +32,12 @@ pub fn KeyEquivalent(
     #[props(default)] size: ControlSize,
     #[props(default)] common: Common,
 ) -> Element {
-    let keys = shortcut.keys();
-    if keys.is_empty() {
+    let keys = use_keys();
+    let caps = keys.caps_of(&shortcut);
+    if caps.is_empty() {
         return rsx! {};
     }
+    let text = keys.text_of(&shortcut);
     let class = common.class("ds-key-equivalent");
     let data = common.data_attributes();
     rsx! {
@@ -47,13 +50,13 @@ pub fn KeyEquivalent(
             onmounted: move |event| common.mounted(event),
             ..data,
             match style {
-                KeyStyle::Text => rsx! { "{shortcut.glyphs()}" },
+                KeyStyle::Text => rsx! { "{text}" },
                 KeyStyle::Cap => rsx! {
-                    for key in keys {
+                    for cap in caps {
                         kbd {
                             class: "ds-key-equivalent-key",
-                            "data-glyph": key.glyph_kind().map(GlyphKind::slug),
-                            "{key.glyph()}"
+                            "data-glyph": cap.kind.map(GlyphKind::slug),
+                            "{cap.text}"
                         }
                     }
                 },

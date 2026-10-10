@@ -134,8 +134,8 @@ done
 # by cargo itself: a `pub(crate)` item cannot be named across a crate boundary.
 DS=crates/ds/src
 LAYERS=(
-  "host: focus edit file_drop machine spell window stack root components assembly"
-  "focus edit file_drop machine spell window: stack root components assembly"
+  "host: focus edit file_drop keys machine spell window stack root components assembly"
+  "focus edit file_drop keys machine spell window: stack root components assembly"
   "stack: root components assembly"
   "root: components assembly"
   "components: assembly components::app"

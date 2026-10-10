@@ -3,6 +3,7 @@ use super::menu_link::{DesktopSpace, LinkChange, Linking};
 use super::menu_pick::{SpacePick, Then, apply, delete_words, rows};
 use super::open_menu::Showing;
 use crate::components::menus::item::item::MenuItem;
+use chordkit::{Desktop, Platform};
 use dioxus::prelude::{Key, Modifiers};
 use ds_style::appearance::theme::Theme;
 use ds_style::space::look::{CardAccent, SpaceLook};
@@ -12,34 +13,99 @@ fn key(text: &str) -> Key {
 }
 
 #[test]
-fn only_the_chords_modifier_and_a_digit_from_one_to_nine_switches() {
-    // (chord, key, modifiers, the number asked for)
+fn only_the_platforms_primary_modifier_and_a_digit_from_one_to_nine_switches() {
+    let kde = Platform::Linux {
+        desktop: Desktop::Kde,
+    };
+    let ours = Platform::Linux {
+        desktop: Desktop::Ours,
+    };
+    // (chord, platform, key, modifiers, the number asked for)
     let cases = [
-        (SwitchChord::Command, key("1"), Modifiers::META, Some(1)),
-        (SwitchChord::Command, key("9"), Modifiers::META, Some(9)),
-        (SwitchChord::Command, key("0"), Modifiers::META, None),
-        (SwitchChord::Command, key("1"), Modifiers::CONTROL, None),
         (
-            SwitchChord::Command,
+            SwitchChord::Primary,
+            ours,
+            key("1"),
+            Modifiers::SUPER,
+            Some(1),
+        ),
+        (
+            SwitchChord::Primary,
+            ours,
+            key("9"),
+            Modifiers::META,
+            Some(9),
+        ),
+        (SwitchChord::Primary, ours, key("0"), Modifiers::META, None),
+        (
+            SwitchChord::Primary,
+            ours,
+            key("1"),
+            Modifiers::CONTROL,
+            None,
+        ),
+        (
+            SwitchChord::Primary,
+            ours,
             key("1"),
             Modifiers::META | Modifiers::SHIFT,
             None,
         ),
-        (SwitchChord::Command, key("1"), Modifiers::empty(), None),
-        (SwitchChord::Command, key("a"), Modifiers::META, None),
-        (SwitchChord::Command, key("12"), Modifiers::META, None),
-        (SwitchChord::Command, Key::Enter, Modifiers::META, None),
-        (SwitchChord::Control, key("3"), Modifiers::CONTROL, Some(3)),
-        (SwitchChord::Control, key("3"), Modifiers::META, None),
-        (SwitchChord::Unbound, key("3"), Modifiers::META, None),
-        (SwitchChord::Unbound, key("3"), Modifiers::CONTROL, None),
-        (SwitchChord::Unbound, key("3"), Modifiers::empty(), None),
+        (
+            SwitchChord::Primary,
+            ours,
+            key("1"),
+            Modifiers::empty(),
+            None,
+        ),
+        (SwitchChord::Primary, ours, key("a"), Modifiers::META, None),
+        (SwitchChord::Primary, ours, key("12"), Modifiers::META, None),
+        (
+            SwitchChord::Primary,
+            ours,
+            Key::Enter,
+            Modifiers::META,
+            None,
+        ),
+        (
+            SwitchChord::Primary,
+            kde,
+            key("3"),
+            Modifiers::CONTROL,
+            Some(3),
+        ),
+        (SwitchChord::Primary, kde, key("3"), Modifiers::META, None),
+        (
+            SwitchChord::Primary,
+            Platform::Windows,
+            key("5"),
+            Modifiers::CONTROL,
+            Some(5),
+        ),
+        (SwitchChord::Unbound, ours, key("3"), Modifiers::META, None),
+        (
+            SwitchChord::Unbound,
+            kde,
+            key("3"),
+            Modifiers::CONTROL,
+            None,
+        ),
+        (
+            SwitchChord::Unbound,
+            ours,
+            key("3"),
+            Modifiers::empty(),
+            None,
+        ),
     ];
-    for (chord, pressed, modifiers, want) in cases {
+    for (chord, platform, pressed, modifiers, want) in cases {
         let got = chord
-            .pressed(&pressed, modifiers)
+            .pressed(platform, &pressed, modifiers)
             .map(|number| number.get());
-        assert_eq!(got, want, "{chord:?} {pressed:?} {modifiers:?}");
+        assert_eq!(
+            got, want,
+            "{chord:?} {platform:?} {pressed:?} {modifiers:?}"
+        );
     }
 }
 
@@ -47,10 +113,9 @@ fn only_the_chords_modifier_and_a_digit_from_one_to_nine_switches() {
 fn the_hint_beside_a_dot_is_the_chord_and_its_place() {
     // (chord, index, glyphs)
     const CASES: &[(SwitchChord, usize, &str)] = &[
-        (SwitchChord::Command, 0, "\u{2318}1"),
-        (SwitchChord::Command, 8, "\u{2318}9"),
-        (SwitchChord::Command, 9, ""),
-        (SwitchChord::Control, 2, "\u{2303}3"),
+        (SwitchChord::Primary, 0, "\u{2318}1"),
+        (SwitchChord::Primary, 8, "\u{2318}9"),
+        (SwitchChord::Primary, 9, ""),
         (SwitchChord::Unbound, 0, ""),
     ];
     for &(chord, index, glyphs) in CASES {
