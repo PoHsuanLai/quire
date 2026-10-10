@@ -83,12 +83,15 @@ pub enum Input {
     },
 }
 
-/// The chord a paste is pressed with: an editor takes Ctrl+V, a terminal reads it as a key and
-/// pastes on Ctrl+Shift+V.
+/// The chord a paste is pressed with: an editor takes the platform's paste chord, a terminal reads
+/// a key and pastes on Ctrl+Shift+V.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum PasteChord {
-    /// Ctrl+V.
+    /// The harness platform's own paste: Command+V (arriving as Super) on a Mac-style one, Ctrl+V
+    /// elsewhere.
     #[default]
+    Primary,
+    /// Ctrl+V.
     CtrlV,
     /// Ctrl+Shift+V.
     CtrlShiftV,
@@ -350,9 +353,9 @@ impl Input {
         Input::Ime(ImeInput::End)
     }
 
-    /// Paste `html` with its plain `text`, with Ctrl+V.
+    /// Paste `html` with its plain `text`, with the platform's paste chord.
     pub fn paste(html: &str, text: &str) -> Self {
-        Input::paste_with(PasteChord::CtrlV, html, text)
+        Input::paste_with(PasteChord::Primary, html, text)
     }
 
     /// Paste `html` with its plain `text`, pressing `chord`.

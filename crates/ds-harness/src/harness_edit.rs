@@ -38,7 +38,7 @@ impl Harness {
     /// `chord` where the focus is.
     pub(crate) fn paste(&mut self, html: &str, text: &str, chord: PasteChord) {
         self.doc.shell.put_html(html.to_owned(), text.to_owned());
-        let (key, code, mods) = paste_keys(chord);
+        let (key, code, mods) = paste_keys(chord, self.doc.platform);
         self.raw_key(RawKeyInput::down(key.clone(), code).with_mods(mods));
         self.raw_key(
             RawKeyInput::down(key, code)

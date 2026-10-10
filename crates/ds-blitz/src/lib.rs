@@ -46,6 +46,8 @@ mod gesture_window;
 mod gpu_request;
 mod host;
 mod install;
+mod keymap_choice;
+mod keymap_detect;
 pub mod launch;
 mod layout_chain;
 mod measure;

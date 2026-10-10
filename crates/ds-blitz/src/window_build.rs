@@ -97,7 +97,7 @@ pub(crate) fn window_config(
     );
     let attributes = with_platform(attributes, shape.app_id.as_ref(), shape.token);
     let mut vdom = VirtualDom::new_with_props(Host, HostProps::new(root, base.setup.clone()));
-    base.setup.contexts.install(&mut vdom);
+    base.setup.install(&mut vdom);
     vdom.provide_root_context(base.requests.clone());
     vdom.provide_root_context(base.handle.clone());
     vdom.provide_root_context(slot.clone());

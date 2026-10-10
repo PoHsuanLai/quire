@@ -8,6 +8,8 @@ use crate::harness_clock::Clock;
 use crate::headless::Layout;
 use crate::recorded_window::WindowHosting;
 use crate::snapshot::Viewport;
+use chordkit::Platform;
+use ds::keys::KeySource;
 use ds_blitz::AdapterPref;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameLinks;
@@ -75,6 +77,21 @@ impl HarnessConfig {
     /// Provide every value in `contexts` at the root, after any already given.
     pub fn with_contexts(mut self, contexts: RootContexts) -> Self {
         self.setup.contexts = self.setup.contexts.and(contexts);
+        self
+    }
+
+    /// Fix the document's keymap to `platform`'s conventions, so a test reads no real system
+    /// (default: our desktop's, where Command is the primary modifier and arrives as Super). A
+    /// key the platform does not bind does nothing, as on that platform.
+    pub fn with_platform(mut self, platform: Platform) -> Self {
+        self.setup.keys = KeySource::conventions(platform);
+        self
+    }
+
+    /// Give the document `source` instead of a platform's conventions: a fake of the desktop's
+    /// own keymap source, for a test of how the document follows a reload.
+    pub fn with_keymap_source(mut self, source: KeySource) -> Self {
+        self.setup.keys = source;
         self
     }
 

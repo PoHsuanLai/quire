@@ -19,6 +19,7 @@ use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::gpu_request::GpuRequest;
+use crate::keymap_choice::KeymapChoice;
 use crate::net_policy::NetPolicy;
 use crate::open_window::WindowSpec;
 use crate::setup::Setup;
@@ -28,8 +29,10 @@ use crate::window_build::Base;
 use crate::window_requests::{Requests, Root};
 use crate::window_shell::Windows;
 use crate::window_size::WindowSize;
+use chordkit::{KeymapSource, Platform};
 use dioxus::prelude::*;
 use ds::window::icon::WindowIcon;
+use std::sync::Arc;
 use std::time::Instant;
 use tokio::runtime::Handle;
 
@@ -50,6 +53,8 @@ pub struct AppConfig {
     gpu: GpuRequest,
     /// The runtime the app's tasks run on; `None` is one `launch` builds and owns.
     runtime: Option<Handle>,
+    /// Where the keymap comes from; the environment's own unless the app names a source.
+    keymap: KeymapChoice,
 }
 
 impl AppConfig {
@@ -62,6 +67,7 @@ impl AppConfig {
             handle: AppHandle::new(),
             gpu: GpuRequest::default(),
             runtime: None,
+            keymap: KeymapChoice::default(),
         }
     }
 
@@ -93,6 +99,27 @@ impl AppConfig {
     /// `launch` enters it on the calling thread for the whole run.
     pub fn with_runtime(mut self, handle: Handle) -> Self {
         self.runtime = Some(handle);
+        self
+    }
+
+    /// Where the app's keymap comes from, loaded for the platform `chordkit::detect_process`
+    /// finds (default: chordkit's own source for that platform: kdeglobals on KDE, a saved
+    /// dconf dump on GNOME, else the platform's conventions). Our desktop's launcher passes
+    /// keycap's source here. The source is called from any thread when its settings change
+    /// (`KeymapSource::watch`), so it is `Send + Sync`.
+    pub fn with_keymap_source(mut self, source: Box<dyn KeymapSource + Send + Sync>) -> Self {
+        self.keymap = KeymapChoice::Given(Arc::from(source));
+        self
+    }
+
+    /// [`with_keymap_source`](AppConfig::with_keymap_source) for a platform the app names itself
+    /// instead of the one detected.
+    pub fn with_keymap(
+        mut self,
+        platform: Platform,
+        source: Box<dyn KeymapSource + Send + Sync>,
+    ) -> Self {
+        self.keymap = KeymapChoice::GivenFor(platform, Arc::from(source));
         self
     }
 
@@ -198,8 +225,13 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) -> Result<(), LaunchEr
         let waker = event_loop.create_proxy();
         move || waker.wake_up()
     });
+    // The one read of the environment for the keymap: the platform and, for it, the settings file.
+    let setup = Setup {
+        keys: config.keymap.resolve(&|name| std::env::var(name).ok()),
+        ..config.setup
+    };
     let base = Base {
-        setup: config.setup,
+        setup,
         app_id: config.first.app_id_or(None),
         icon: config.first.icon_or(None),
         decorations: config.first.decorations_or(Decorations::Server),

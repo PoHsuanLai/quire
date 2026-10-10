@@ -5,7 +5,9 @@ use crate::input::PasteChord;
 use blitz_traits::events::{
     BlitzPointerEvent, BlitzPointerId, MouseEventButton, MouseEventButtons, PointerCoords,
 };
+use chordkit::{Context as KeyContext, Platform};
 use ds::prelude::*;
+use ds_core::command::modifiers_held;
 use ds_core::press::PointerButton;
 use keyboard_types::{Code, Key as DomKey, Modifiers};
 
@@ -117,8 +119,13 @@ pub(crate) fn modifier(key: ShortcutKey) -> Modifiers {
 }
 
 /// The key, physical code and modifiers a paste chord presses.
-pub(crate) fn paste_keys(chord: PasteChord) -> (DomKey, Code, Modifiers) {
+pub(crate) fn paste_keys(chord: PasteChord, platform: Platform) -> (DomKey, Code, Modifiers) {
     match chord {
+        PasteChord::Primary => (
+            DomKey::Character("v".into()),
+            Code::KeyV,
+            modifiers_held(platform.primary(KeyContext::Normal)),
+        ),
         PasteChord::CtrlV => (
             DomKey::Character("v".into()),
             Code::KeyV,

@@ -20,6 +20,7 @@ use blitz_kit::scroll::geom::ViewPoint;
 use blitz_traits::events::UiEvent;
 use blitz_traits::net::NetWaker;
 use blitz_traits::shell::{ColorScheme, ShellProvider, Viewport as BlitzViewport};
+use chordkit::Platform;
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 use ds::file_drop::board::FileDropBoard;
@@ -117,6 +118,8 @@ pub(crate) struct Headless {
     pub(crate) sizer: WindowSizer,
     /// What the app set through its window host, when it has one.
     pub(crate) window_log: WindowLog,
+    /// The platform the document's keymap is fixed to.
+    pub(crate) platform: Platform,
 }
 
 /// The hovered element (a hovered text node counts as its element, which carries the listeners).
@@ -169,7 +172,7 @@ impl Headless {
         let listeners = EditListeners::default();
         let mut vdom = VirtualDom::new(app);
         // The app's own first, so a quire context of the same type (none today) would win.
-        setup.contexts.install(&mut vdom);
+        setup.install(&mut vdom);
         let signals = vdom.in_runtime(|| HostSignals {
             modality: Signal::new_in_scope(InputModality::default(), ScopeId::ROOT),
             scale: Signal::new_in_scope(Scale::from_percent(viewport.scale_percent), ScopeId::ROOT),
@@ -211,7 +214,12 @@ impl Headless {
         });
         let gestures = GestureBus::default();
         doc.vdom.provide_root_context(gestures.clone());
-        let scroll = WindowScroll::new(phase.clone(), gestures.clone(), now());
+        let scroll = WindowScroll::new(
+            phase.clone(),
+            gestures.clone(),
+            now(),
+            setup.keys.platform(),
+        );
         // Every frame the harness resolves runs the scroll step, so a command needs no wake.
         doc.vdom
             .provide_root_context(ScrollHandle::new(scroll.clone(), Rc::new(|| {})));
@@ -245,6 +253,7 @@ impl Headless {
             window,
             sizer,
             window_log,
+            platform: setup.keys.platform(),
         }
     }
 

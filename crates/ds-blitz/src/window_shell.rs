@@ -341,7 +341,12 @@ impl Windows {
         };
         let slot = WindowSlot::default();
         let phase = Phase::default();
-        let scroll = WindowScroll::new(phase.clone(), GestureBus::default(), Instant::now());
+        let scroll = WindowScroll::new(
+            phase.clone(),
+            GestureBus::default(),
+            Instant::now(),
+            self.base.setup.keys.platform(),
+        );
         let handle = WindowHandle::new(key, self.base.requests.clone());
         let renderer = self.spare.pop().unwrap_or_else(|| self.base.gpu.renderer());
         let config = window_config(

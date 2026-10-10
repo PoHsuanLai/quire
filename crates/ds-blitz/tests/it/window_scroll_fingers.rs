@@ -1,8 +1,9 @@
 //! What a component that moves its own content hears of fingers on a touchpad and of a wheel
-//! under Control (`ds::host::gesture`): the fingers' run with its source and phases, the glide
+//! under the primary modifier (`ds::host::gesture`): the fingers' run with its source and phases, the glide
 //! after a fast lift for a listener that asked for the ease, and a zoom wheel delivered whole.
 //! The harness runs the window's scroll step on its virtual clock, as the window loop does.
 
+use chordkit::Platform;
 use dioxus::prelude::*;
 use ds::host::gesture::{
     Gesture, GesturePhase, ScrollSource, WheelDelivery, use_gestures, use_gestures_with,
@@ -43,7 +44,7 @@ fn hear(log: &'static std::thread::LocalKey<RefCell<Vec<Heard>>>, gesture: Gestu
         ..
     } = gesture
     {
-        let zoom = held.contains(Modifiers::CONTROL);
+        let zoom = !held.is_empty();
         let heard = Heard {
             source,
             phase,
@@ -62,9 +63,13 @@ fn Page() -> Element {
 }
 
 fn harness() -> Harness {
+    harness_on(HarnessConfig::new(VIEW))
+}
+
+fn harness_on(config: HarnessConfig) -> Harness {
     AS_RECEIVED.with(|log| log.borrow_mut().clear());
     EASED.with(|log| log.borrow_mut().clear());
-    Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+    Harness::new(Page, config.with_clock(Clock::Virtual))
 }
 
 fn heard(log: &'static std::thread::LocalKey<RefCell<Vec<Heard>>>) -> Vec<Heard> {
@@ -203,10 +208,10 @@ fn a_touch_during_the_glide_ends_it_before_the_next_run_begins() {
 }
 
 #[test]
-fn a_wheel_under_control_is_a_zoom_delivered_whole_never_eased() {
+fn a_wheel_under_the_primary_modifier_is_a_zoom_delivered_whole_never_eased() {
     let mut harness = harness();
     let zoom = |harness: &mut Harness| {
-        harness.send(Input::detents_held(AT, 0.0, -1.0, Modifiers::CONTROL));
+        harness.send(Input::detents_held(AT, 0.0, -1.0, Modifiers::SUPER));
     };
     zoom(&mut harness);
     zoom(&mut harness);
@@ -284,5 +289,20 @@ fn a_fast_lift_glides_further_than_its_own_speed_and_a_gentle_one_as_it_is() {
             got >= plain * times * 0.9 && got <= plain * times * 1.1,
             "{name}: glided {got}, the plain glide is {plain}, expected about {times}x"
         );
+    }
+}
+
+#[test]
+fn the_zoom_modifier_is_the_platforms_primary() {
+    // (platform, modifier held, a zoom delivered whole to the eased listener)
+    let cases = [
+        (Platform::Windows, Modifiers::CONTROL, true),
+        (Platform::Windows, Modifiers::SUPER, false),
+    ];
+    for (platform, held, whole) in cases {
+        let mut harness = harness_on(HarnessConfig::new(VIEW).with_platform(platform));
+        harness.send(Input::detents_held(AT, 0.0, -1.0, held));
+        let at_once = heard(&EASED).len();
+        assert_eq!(at_once == 1, whole, "{platform:?} {held:?}");
     }
 }

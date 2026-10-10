@@ -14,6 +14,7 @@ use blitz_kit::scroll::geom::ViewPoint;
 use blitz_kit::scroll::keys::ScrollKey;
 use blitz_kit::scroll::time::Elapsed;
 use blitz_kit::scroll::tuning::Tuning;
+use chordkit::Platform;
 use ds::host::gesture::{Gesture, GestureBus, GesturePhase, ScrollSource, WheelDelivery};
 use ds::prelude::*;
 use keyboard_types::Modifiers;
@@ -68,6 +69,8 @@ struct State {
     /// Where the pointer last was, in the window's logical pixels.
     pointer: Option<ViewPoint>,
     held: Modifiers,
+    /// The platform whose primary modifier makes a wheel a zoom.
+    platform: Platform,
     eased: Eased,
     coast: Coast,
     /// How fast the wheel is being spun, for its acceleration.
@@ -76,6 +79,12 @@ struct State {
 }
 
 impl State {
+    /// Whether the wheel is a zoom: the platform's primary modifier is down (Command on a Mac
+    /// and our desktop, Ctrl elsewhere).
+    fn zooming(&self) -> bool {
+        ds::base::command::holds_primary(self.platform, self.held)
+    }
+
     /// The pointer's place as the gestures report it (the corner until it has moved).
     fn point(&self) -> Point {
         let at = self.pointer.unwrap_or_default();
@@ -111,8 +120,8 @@ fn heard_as_gestures(state: &State, heard: Vec<Heard>) -> Vec<Gesture> {
 
 impl WindowScroll {
     /// Scrolling the document `phase` is attached to, publishing gestures to `bus`, on a
-    /// timeline that starts at `origin`.
-    pub fn new(phase: Phase, bus: GestureBus, origin: Instant) -> WindowScroll {
+    /// timeline that starts at `origin`, on `platform` (whose primary modifier zooms the wheel).
+    pub fn new(phase: Phase, bus: GestureBus, origin: Instant, platform: Platform) -> WindowScroll {
         WindowScroll {
             shared: Rc::new(Shared {
                 phase,
@@ -123,6 +132,7 @@ impl WindowScroll {
                     tuning: Tuning::default(),
                     pointer: None,
                     held: Modifiers::empty(),
+                    platform,
                     eased: Eased::default(),
                     coast: Coast::default(),
                     accel: Accel::default(),
@@ -191,13 +201,19 @@ impl WindowScroll {
     pub fn wheel(&self, input: WheelInput, now: Instant) -> (WheelUse, Frames) {
         let el = self.elapsed(now);
         let input = self.accelerated(input, el);
-        let (gesture, pointer, held, detent_px) = {
+        let (gesture, pointer, held, detent_px, zoom) = {
             let state = self.shared.state.borrow();
             let detent_px = state.tuning.settings.wheel_detent_px.get();
             let gesture = input.gesture(state.point(), state.held, detent_px);
-            (gesture, state.pointer, state.held, detent_px)
+            (
+                gesture,
+                state.pointer,
+                state.held,
+                detent_px,
+                state.zooming(),
+            )
         };
-        match (input.source(), held.contains(Modifiers::CONTROL)) {
+        match (input.source(), zoom) {
             // A zoom, not a scroll: every listener hears each detent whole.
             (ScrollSource::Wheel, true) => self.publish(|bus| bus.publish(gesture)),
             (ScrollSource::Wheel, false) => {
@@ -235,11 +251,11 @@ impl WindowScroll {
     }
 
     /// `input` with a spun wheel's clicks carried further (`blitz_kit::scroll::accel`). A
-    /// Control-held wheel is a zoom and fingers are tracked 1:1 (a fast lift glides further
+    /// primary-modifier wheel is a zoom and fingers are tracked 1:1 (a fast lift glides further
     /// instead, `Physics::fling`), so neither is touched.
     fn accelerated(&self, input: WheelInput, el: Elapsed) -> WheelInput {
         let mut state = self.shared.state.borrow_mut();
-        let zoom = state.held.contains(Modifiers::CONTROL);
+        let zoom = state.zooming();
         match (input.source(), zoom) {
             (ScrollSource::Wheel, false) => {
                 let max = state.tuning.settings.wheel_accel_max.get();

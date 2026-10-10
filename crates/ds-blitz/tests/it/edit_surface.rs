@@ -2,6 +2,7 @@
 //! a paste with HTML, and the geometry an app draws its own caret and selection from, all
 //! through a real Blitz document.
 
+use chordkit::Platform;
 use dioxus::prelude::*;
 use ds::edit::handle::{EditHandle, use_edit_handle};
 use ds::edit::input::PreeditCursor;
@@ -96,9 +97,14 @@ fn focused() -> Harness {
 
 /// As [`focused`], at `view`.
 fn focused_at(view: Viewport) -> Harness {
+    focused_with(HarnessConfig::new(view))
+}
+
+/// As [`focused`], with the document built from `config` (a platform other than our desktop's).
+fn focused_with(config: HarnessConfig) -> Harness {
     INPUT.with(|log| log.borrow_mut().clear());
     FOCUS.with(|log| log.borrow_mut().clear());
-    let mut harness = Harness::new(Editor, HarnessConfig::new(view).with_clock(Clock::Virtual));
+    let mut harness = Harness::new(Editor, config.with_clock(Clock::Virtual));
     harness.advance(ms(50));
     let into = harness.centre("#one").expect("the first paragraph");
     harness.send(Input::click(into));
@@ -209,14 +215,33 @@ fn a_paste_carries_the_clipboards_html_and_its_text() {
         })]
     );
     harness.set_clipboard_text("plain");
-    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('v')));
+    harness.send(Input::chord(&[ShortcutKey::Super], ShortcutKey::Char('v')));
     assert_eq!(
         heard(),
         vec![EditInput::Paste(Pasted::Text("plain".to_owned()))]
     );
-    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('c')));
-    harness.send(Input::chord(&[ShortcutKey::Ctrl], ShortcutKey::Char('x')));
+    harness.send(Input::chord(&[ShortcutKey::Super], ShortcutKey::Char('c')));
+    harness.send(Input::chord(&[ShortcutKey::Super], ShortcutKey::Char('x')));
     assert_eq!(heard(), vec![EditInput::Copy, EditInput::Cut]);
+}
+
+#[test]
+fn the_clipboard_chords_are_the_platforms_own() {
+    // (platform, modifier held, what the chord does)
+    let cases = [
+        (Platform::Windows, ShortcutKey::Ctrl, vec![EditInput::Copy]),
+        (Platform::Windows, ShortcutKey::Super, Vec::new()),
+    ];
+    for (platform, held, want) in cases {
+        let mut harness = focused_with(HarnessConfig::new(VIEW).with_platform(platform));
+        heard();
+        harness.send(Input::chord(&[held], ShortcutKey::Char('c')));
+        let got: Vec<EditInput> = heard()
+            .into_iter()
+            .filter(|input| matches!(input, EditInput::Copy))
+            .collect();
+        assert_eq!(got, want, "{platform:?} {held:?}");
+    }
 }
 
 #[test]
