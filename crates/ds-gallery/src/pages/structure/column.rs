@@ -12,24 +12,24 @@ pub fn ColumnSection() -> Element {
     rsx! {
         Section { title: "Column", note: "A vertical stack. The gap is a spacing step or none; the extent is the content's height, the parent's whole box, or a control's height.",
             div { class: "g-row",
-                div { class: "g-stage",
+                div { class: "g-stage g-stage-pad",
                     Column { gap: SpacingToken::S16,
                         span { "Stepped" }
                         span { "gap" }
                     }
                 }
-                div { class: "g-stage",
+                div { class: "g-stage g-stage-pad",
                     Column { gap: ColumnGap::None,
                         span { "No" }
                         span { "gap" }
                     }
                 }
-                div { class: "g-stage", style: "height:120px",
+                div { class: "g-stage g-stage-pad", style: "height:120px",
                     Column { extent: ColumnExtent::Fill, gap: ColumnGap::None,
                         span { "Fills the stage" }
                     }
                 }
-                div { class: "g-stage",
+                div { class: "g-stage g-stage-pad",
                     Column { extent: ColumnExtent::Fixed(ControlSize::Large),
                         span { "One large control tall" }
                     }
