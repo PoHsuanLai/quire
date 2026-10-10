@@ -105,6 +105,21 @@ fn apply(
     }
 }
 
+/// Every pane's size now, as the caller saves it: what the person left it, else its preferred.
+fn sizes_now(splits: Splits, panes: &[SplitPane]) -> Vec<PaneSize> {
+    let kept = splits.sizes.peek().clone();
+    panes
+        .iter()
+        .enumerate()
+        .map(|(at, pane)| {
+            kept.get(at)
+                .copied()
+                .flatten()
+                .unwrap_or(pane.spec.preferred)
+        })
+        .collect()
+}
+
 /// The two arrow keys that move a divider along `axis`: the one that shrinks the pane before it,
 /// and the one that grows it.
 fn arrows(axis: SplitAxis) -> (Key, Key) {
@@ -120,6 +135,7 @@ fn divider(
     panes: &[SplitPane],
     at: usize,
     on_shown: EventHandler<(usize, Shown)>,
+    on_resized: EventHandler<Vec<PaneSize>>,
 ) -> Element {
     let mut grab = splits.grab;
     let shown = panes.get(at).map_or(Shown::Hidden, |pane| pane.shown);
@@ -145,6 +161,7 @@ fn divider(
             ondoubleclick: move |_| {
                 let preferred = double.get(at).map_or(Px(0.0), |pane| pane.spec.preferred_px(splits.extent));
                 apply(splits, &double, at, preferred, on_shown);
+                on_resized.call(sizes_now(splits, &double));
             },
             onkeydown: move |event: KeyboardEvent| {
                 let now = shown_size.0;
@@ -160,12 +177,14 @@ fn divider(
                 };
                 event.prevent_default();
                 apply(splits, &keys, at, Px(raw), on_shown);
+                on_resized.call(sizes_now(splits, &keys));
             },
         }
     }
 }
 
-/// A split view of `panes` and then `children`. `on_shown` hears a pane a drag folded or opened.
+/// A split view of `panes` and then `children`. `on_shown` hears a pane a drag folded or opened;
+/// `on_resized` hears the sizes once a drag or key adjustment has settled.
 #[component]
 pub fn SplitView(
     #[props(into)] label: String,
@@ -185,6 +204,12 @@ pub fn SplitView(
     #[props(default)]
     on_focus_pane: EventHandler<PaneAt>,
     #[props(default)] on_shown: EventHandler<(usize, Shown)>,
+    /// Every pane's size once a divider drag has ended (pointer released, or left the view), a
+    /// key has moved a divider, or a double-click has reset one: once per gesture, never per
+    /// frame, so an app saves the split once. Apart from `on_shown`, which is about whether a
+    /// pane is open.
+    #[props(default)]
+    on_resized: EventHandler<Vec<PaneSize>>,
     /// The least the last pane is drawn at; the panes before it shrink first, to their least.
     #[props(default)]
     least_rest: Px,
@@ -225,6 +250,13 @@ pub fn SplitView(
     };
     let data = common.data_attributes();
     let held = panes.clone();
+    let settled = panes.clone();
+    let settle = use_callback(move |()| {
+        if grab.peek().is_some() {
+            on_resized.call(sizes_now(splits, &settled));
+            grab.set(None);
+        }
+    });
     rsx! {
         div {
             id: common.id.clone(),
@@ -244,8 +276,8 @@ pub fn SplitView(
                     apply(splits, &held, at, raw, on_shown);
                 }
             },
-            onpointerup: move |_| grab.set(None),
-            onpointerleave: move |_| grab.set(None),
+            onpointerup: move |_| settle.call(()),
+            onpointerleave: move |_| settle.call(()),
             ..data,
             for (at , pane) in panes.iter().enumerate() {
                 Fragment { key: "{at}",
@@ -260,7 +292,7 @@ pub fn SplitView(
                         on_hold: move |()| hold.call(PaneAt::Pane(at)),
                         body: pane.body.clone(),
                     }
-                    {divider(splits, &panes, at, on_shown)}
+                    {divider(splits, &panes, at, on_shown, on_resized)}
                 }
             }
             div {

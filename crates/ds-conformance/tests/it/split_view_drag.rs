@@ -3,7 +3,7 @@
 //! double-click returns it to its preferred width.
 
 use dioxus::prelude::*;
-use ds::components::chrome::split_view::model::{PaneSpec, SplitPane};
+use ds::components::chrome::split_view::model::{PaneSize, PaneSpec, SplitPane};
 use ds::components::chrome::split_view::view::SplitView;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
@@ -18,6 +18,8 @@ const VIEW: Viewport = Viewport {
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let mut shown = use_signal(|| Shown::Visible);
+    let mut saved = use_signal(Vec::<PaneSize>::new);
+    let mut saves = use_signal(|| 0usize);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "height:180px",
@@ -25,10 +27,16 @@ fn Page() -> Element {
                     label: "Example",
                     panes: vec![SplitPane::new(PaneSpec::SIDEBAR, rsx! { p { "Side" } }).shown(shown())],
                     on_shown: move |(_, next)| shown.set(next),
+                    on_resized: move |sizes| {
+                        saved.set(sizes);
+                        saves += 1;
+                    },
                     p { "Content" }
                 }
             }
             p { class: "shown", "{Word::slug(shown())}" }
+            p { class: "saves", "{saves()}" }
+            p { class: "saved", "{saved():?}" }
         }
     }
 }
@@ -64,6 +72,15 @@ fn dragging_the_divider_sizes_the_pane_within_its_widths() {
     ));
     harness.advance(Duration::from_millis(600));
     assert_eq!(width(&harness), 280.0);
+    assert_eq!(
+        harness.text_of(".saves").as_deref(),
+        Some("1"),
+        "one report for the whole drag, not one per frame"
+    );
+    assert_eq!(
+        harness.text_of(".saved").as_deref(),
+        Some("[Fixed(Px(280.0))]")
+    );
     let from = divider(&harness);
     harness.send(Input::drag(
         from,

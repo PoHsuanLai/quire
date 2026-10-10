@@ -17,9 +17,11 @@ use ds_core::vocab::RowState;
 #[component]
 pub fn SplitViewSection() -> Element {
     let mut sidebar = use_signal(|| Shown::Visible);
+    let mut saves = use_signal(|| 0usize);
     rsx! {
-        Section { title: "SplitView", note: "NSSplitView: drag the divider (a 6 px zone with the hairline in it) to size the sidebar between 180 and 320; past half its least it folds away and a drag back opens it; double-click the divider to return to 240. The button folds it on a spring. The divider takes the arrow keys.",
+        Section { title: "SplitView", note: "NSSplitView: drag the divider (a 6 px zone with the hairline in it) to size the sidebar between 180 and 320; past half its least it folds away and a drag back opens it; double-click the divider to return to 240. The button folds it on a spring. The divider takes the arrow keys. The count below goes up once per finished drag or key adjustment, not per frame.",
             div { class: "g-row",
+                span { class: "g-note", "Sizes saved: {saves()}" }
                 Button {
                     label: "Sidebar",
                     size: ControlSize::Small,
@@ -34,6 +36,7 @@ pub fn SplitViewSection() -> Element {
                         div { class: "g-split-side", "Sidebar" }
                     }).shown(sidebar())],
                     on_shown: move |(_, shown)| sidebar.set(shown),
+                    on_resized: move |_| saves += 1,
                     div { class: "g-split-main", "Content" }
                 }
             }
