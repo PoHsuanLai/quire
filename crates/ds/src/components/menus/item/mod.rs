@@ -5,4 +5,5 @@ pub(crate) mod context;
 pub mod item;
 pub(crate) mod lines;
 pub mod text;
+pub(crate) mod tip;
 pub(crate) mod view;

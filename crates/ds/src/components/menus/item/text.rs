@@ -105,6 +105,10 @@ pub struct ItemText {
     pub marks: Marks,
     /// A second, fainter line under the title: an address, a folder, a snippet.
     pub subtitle: Option<String>,
+    /// A tooltip for the row, shown at once on hover, also while the row is disabled: why it
+    /// cannot be picked ("Wait for the agent to finish"). The row's key equivalent, when it
+    /// has one, follows it as `Name  ⌘K`.
+    pub tip: Option<String>,
 }
 
 #[cfg(test)]

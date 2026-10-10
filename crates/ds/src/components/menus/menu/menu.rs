@@ -21,6 +21,7 @@ use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, pic
 use crate::components::menus::menu::placement::{MENU_INSET, MenuPlacement};
 use crate::components::menus::menu::surface::{Surface, stacking};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
+use crate::components::menus::menu::unavailable::ContextUnavailable;
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::popover::{escape_closes, use_float};
 use crate::host::measure::{Anchor, MountedRef};
@@ -43,7 +44,8 @@ use ds_style::tokens::layer::ZLayer;
 /// numbered over items and submenu parents, headers, status lines and rules not counted.
 ///
 /// `placement` says where the menu belongs. A `Bar` menu and a `Popup` menu draw their items'
-/// key equivalents; a `Context` menu leaves out what cannot be picked and shows none. Every menu
+/// key equivalents; a `Context` menu leaves out what cannot be picked (unless `unavailable` is `Dim`) and shows
+/// no key equivalents. Every menu
 /// opens at once. A pick blinks the item twice, then calls `onpick`, fades the menu out over
 /// `--t-quick` and calls `onclose`; Escape and an outside click play the fade and call `onclose`.
 /// An item with `AfterPick::KeepOpen` (a toggle in a set of toggles) yields its value at once and
@@ -94,6 +96,10 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     #[props(default)] on_active: Option<EventHandler<Option<usize>>>,
     #[props(default)] flow: Flow,
     #[props(default)] hung: Hung,
+    /// Whether a `Context` menu leaves out the items that cannot be picked (the default) or
+    /// keeps them dimmed. The other placements ignore it.
+    #[props(default)]
+    unavailable: ContextUnavailable,
     #[props(default)] measured: Option<Rect>,
     #[props(default)] common: Common,
 ) -> Element {
@@ -113,8 +119,8 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         }
     });
     let items = match placement {
-        MenuPlacement::Context => available(&items),
-        MenuPlacement::Bar | MenuPlacement::Popup => items,
+        MenuPlacement::Context if unavailable == ContextUnavailable::Hide => available(&items),
+        MenuPlacement::Context | MenuPlacement::Bar | MenuPlacement::Popup => items,
     };
     let label = items.iter().find_map(|item| match item {
         MenuItem::Header(text) => Some(text.clone()),

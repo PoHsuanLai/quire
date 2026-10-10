@@ -7,8 +7,11 @@
 
 .ds-menu-item{
   display:flex; align-items:center; gap:var(--s-4); min-height:var(--shell-menu-row); padding:0 var(--s-8) 0 var(--s-2); border-radius:var(--r-shell-highlight);
-  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap;
+  font-size:var(--fs-shell-menu); font-weight:400; color:var(--ink); cursor:default; white-space:nowrap; position:relative;
 }
+/* A row's tooltip zone: transparent, over the whole row, so a disabled row still has a pointer
+   target; the row's own handlers hear the events that bubble from it. */
+.ds-menu-tip{ position:absolute; top:0; right:0; bottom:0; left:0; }
 /* A menu with no state column: the title starts as far from the highlight's edge as the key
    equivalent ends, rather than 2 px in (the 2 px assumes the 22 px check column beside it). */
 .ds-menu-item[*|data-state-column=absent]{ padding-left:var(--s-8); }

@@ -16,6 +16,7 @@ mod collapse;
 mod column_layout;
 mod component_faces;
 mod component_geometry;
+mod context_menu_unavailable;
 mod controlled_inputs;
 mod details_glyphs;
 mod details_state;

@@ -53,8 +53,8 @@ pub enum MenuItem<T> {
         /// Its state mark, for an item that is on, off or mixed: a check, a dash for `Mixed`.
         check: Option<Check>,
         /// Whether it can be picked. A disabled item is drawn at .35 opacity, skipped by the
-        /// arrow keys and ignores the pointer; a context menu leaves it out (design/13 section
-        /// 13.3.3).
+        /// arrow keys and ignores the pointer; a context menu leaves it out unless it is asked
+        /// to dim it (`ContextUnavailable`; design/13 section 13.3.3).
         availability: Availability,
         /// Whether a pick closes the menu.
         after: AfterPick,
@@ -203,6 +203,15 @@ impl<T> MenuItem<T> {
     pub fn with_marks(mut self, marks: Marks) -> Self {
         if let MenuItem::Item { text, .. } = &mut self {
             text.marks = marks;
+        }
+        self
+    }
+
+    /// The same item with a tooltip `tip`, shown on hover even while the item is disabled (the
+    /// reason it is); only a command has one.
+    pub fn with_tip(mut self, tip: impl Into<String>) -> Self {
+        if let MenuItem::Item { text, .. } = &mut self {
+            text.tip = Some(tip.into());
         }
         self
     }

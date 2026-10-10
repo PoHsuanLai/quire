@@ -17,3 +17,4 @@ pub(crate) mod placing;
 pub(crate) mod submenu;
 pub(crate) mod surface;
 pub(crate) mod tracker;
+pub mod unavailable;

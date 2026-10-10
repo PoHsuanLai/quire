@@ -5,10 +5,12 @@
 use crate::components::content::avatar::face;
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
+use crate::components::content::tip_text::TipText;
 use crate::components::controls::press::{button_of, press_of};
 use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuImage;
 use crate::components::menus::item::text::{Emphasis, ItemText};
+use crate::components::menus::item::tip::RowTip;
 use crate::components::menus::menu::placement::Keys;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
@@ -60,6 +62,8 @@ pub(crate) struct ItemView<'a> {
     pub image: Option<&'a MenuImage>,
     /// What the row says beside its title; a submenu parent says nothing.
     pub text: Option<&'a ItemText>,
+    /// The tooltip, with the row's key equivalent as its key.
+    pub tip: Option<TipText>,
     /// The trailing hint.
     pub hint: Option<&'a str>,
     /// The key equivalent.
@@ -158,6 +162,7 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             "aria-checked": view.check.map(Check::aria),
             "aria-disabled": view.availability.aria_disabled(),
             "aria-busy": view.availability.aria_busy(),
+            "aria-description": view.tip.as_ref().map(|tip| tip.name().to_owned()),
             "aria-haspopup": popup,
             "aria-expanded": expanded,
             onmousedown: move |event| event.prevent_default(),
@@ -185,6 +190,9 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
             {label}
             {hint}
             {end}
+            if let Some(tip) = view.tip.clone() {
+                RowTip { tip }
+            }
         }
     }
 }

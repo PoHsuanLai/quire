@@ -1,6 +1,7 @@
 //! Drawing a panel's lines: headers, status lines, rules and items, each item wired to report a
 //! click, a pointer move and its mount by its choice number (`choices`).
 
+use crate::components::content::tip_text::TipText;
 use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::view::{
@@ -87,6 +88,10 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                     ItemView {
                         title,
                         text: Some(text),
+                        tip: text
+                            .tip
+                            .as_ref()
+                            .map(|name| TipText::new(name.clone()).with_shortcut_opt(key.clone())),
                         image: image.as_ref(),
                         key: key.as_ref().map(|shortcut| drawn.keymap.text_of(shortcut)),
                         hint: hint.as_deref(),
@@ -108,6 +113,7 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                     ItemView {
                         title,
                         text: None,
+                        tip: None,
                         image: image.as_ref(),
                         key: None,
                         hint: None,
