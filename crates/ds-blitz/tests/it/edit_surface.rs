@@ -97,14 +97,24 @@ fn focused() -> Harness {
 
 /// As [`focused`], at `view`.
 fn focused_at(view: Viewport) -> Harness {
-    focused_with(HarnessConfig::new(view))
+    focused_with(view, OURS)
 }
 
-/// As [`focused`], with the document built from `config` (a platform other than our desktop's).
-fn focused_with(config: HarnessConfig) -> Harness {
+/// Our desktop's platform, the harness's default keymap.
+const OURS: Platform = chordkit::Platform::Linux {
+    desktop: chordkit::Desktop::Ours,
+};
+
+/// As [`focused`], at `view` on `platform`'s keymap.
+fn focused_with(view: Viewport, platform: Platform) -> Harness {
     INPUT.with(|log| log.borrow_mut().clear());
     FOCUS.with(|log| log.borrow_mut().clear());
-    let mut harness = Harness::new(Editor, config.with_clock(Clock::Virtual));
+    let mut harness = Harness::new(
+        Editor,
+        HarnessConfig::new(view)
+            .with_platform(platform)
+            .with_clock(Clock::Virtual),
+    );
     harness.advance(ms(50));
     let into = harness.centre("#one").expect("the first paragraph");
     harness.send(Input::click(into));
@@ -233,7 +243,7 @@ fn the_clipboard_chords_are_the_platforms_own() {
         (Platform::Windows, ShortcutKey::Super, Vec::new()),
     ];
     for (platform, held, want) in cases {
-        let mut harness = focused_with(HarnessConfig::new(VIEW).with_platform(platform));
+        let mut harness = focused_with(VIEW, platform);
         heard();
         harness.send(Input::chord(&[held], ShortcutKey::Char('c')));
         let got: Vec<EditInput> = heard()

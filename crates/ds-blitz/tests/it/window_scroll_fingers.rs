@@ -63,13 +63,20 @@ fn Page() -> Element {
 }
 
 fn harness() -> Harness {
-    harness_on(HarnessConfig::new(VIEW))
+    harness_on(chordkit::Platform::Linux {
+        desktop: chordkit::Desktop::Ours,
+    })
 }
 
-fn harness_on(config: HarnessConfig) -> Harness {
+fn harness_on(platform: Platform) -> Harness {
     AS_RECEIVED.with(|log| log.borrow_mut().clear());
     EASED.with(|log| log.borrow_mut().clear());
-    Harness::new(Page, config.with_clock(Clock::Virtual))
+    Harness::new(
+        Page,
+        HarnessConfig::new(VIEW)
+            .with_platform(platform)
+            .with_clock(Clock::Virtual),
+    )
 }
 
 fn heard(log: &'static std::thread::LocalKey<RefCell<Vec<Heard>>>) -> Vec<Heard> {
@@ -300,7 +307,7 @@ fn the_zoom_modifier_is_the_platforms_primary() {
         (Platform::Windows, Modifiers::SUPER, false),
     ];
     for (platform, held, whole) in cases {
-        let mut harness = harness_on(HarnessConfig::new(VIEW).with_platform(platform));
+        let mut harness = harness_on(platform);
         harness.send(Input::detents_held(AT, 0.0, -1.0, held));
         let at_once = heard(&EASED).len();
         assert_eq!(at_once == 1, whole, "{platform:?} {held:?}");
