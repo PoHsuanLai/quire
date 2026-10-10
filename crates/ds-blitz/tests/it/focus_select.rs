@@ -80,9 +80,17 @@ fn a_controlled_focus_with_select_all_selects_the_whole_value() {
     );
 }
 
+/// A laid-out field asked for again is focused and selected in one write: no frame sees it
+/// focused with its caret not yet placed, so a key typed then is never moved away from.
 #[test]
 fn the_value_is_selected_in_the_frame_the_focus_lands() {
     let mut harness = Harness::new(Rename, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(100));
+    let other = harness.centre("#other input").expect("the other field");
+    harness.send(Input::click(other));
+    harness.advance(ms(50));
+    let again = harness.centre("#again .ds-button").expect("the button");
+    harness.send(Input::click(again));
     let mut frames = 0;
     while harness.focus_of("#name input") != FocusState::Focused {
         if harness.step_frame() == Stepped::Idle {
