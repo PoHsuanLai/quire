@@ -4,7 +4,7 @@ use super::chord::SwitchChord;
 use super::controller::SpacesHandle;
 use super::new_space::NewSpace;
 use super::open_menu::Showing;
-use crate::components::app::space_editor::dot::SpaceDot;
+use crate::components::app::space_editor::dot::{DotFace, SpaceDot};
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use dioxus::prelude::*;
@@ -18,9 +18,9 @@ use ds_style::space::look::SpaceLook;
 /// The foot of a sidebar that has Spaces.
 ///
 /// `leading` is the app's own (mailo puts Downloads there); `trailing` the app's (Settings, Hide
-/// sidebar). The dots take the free width between. Every dot is the quiet neutral one and the
-/// others are dimmed, as Dia draws them: a Space's own colours are its frame's, not the
-/// picker's. A right click on a dot is that Space's menu; a click switches, unless a part of a
+/// sidebar). The dots take the free width between. Each Space is a small dot, as Dia draws
+/// them (`DotFace::Foot`): the current one larger and in ink, the others faint ink; a Space's own
+/// colours are its frame's, not the picker's. A right click on a dot is that Space's menu; a click switches, unless a part of a
 /// Space's menu is open. `+` adds a Space over `new_payload` and opens its name.
 ///
 /// `new_space: NewSpace::Hidden` leaves the `+` out, for a foot whose one menu holds New Space
@@ -70,6 +70,7 @@ where
                         },
                         SpaceDot {
                             name,
+                            face: DotFace::Foot,
                             frame: FrameVars::of(&SpaceLook::default(), scheme),
                             selection: Selection::of(&id, &current),
                             shortcut: chord.shortcut(index),

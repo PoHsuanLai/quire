@@ -8,10 +8,9 @@
 .ds-spaces-foot > *{ flex:none; }
 /* The dots take the foot's free width, so the buttons sit at its end. */
 .ds-spaces-foot > .ds-spaces-dots{ display:flex; gap:var(--s-5); align-items:center; flex:1 1 auto; min-width:0; }
-/* The hold a dot's right click is caught on: it lays out as the dot. The Spaces not on screen are
-   drawn quieter. */
+/* The hold a dot's right click is caught on: it lays out as the dot. Which Space is current is
+   the dot's own brightness and size (space_editor.css), not the hold's. */
 .ds-spaces-dot-hold{ display:flex; }
-.ds-spaces-dot-hold[*|data-current=false]{ opacity:.62; }
 
 .ds-space-part{ display:grid; gap:var(--s-10); padding:var(--s-12); }
 .ds-space-rename{ width:240px; }

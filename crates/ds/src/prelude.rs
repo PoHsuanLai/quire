@@ -142,7 +142,7 @@ pub use crate::components::lists::table::rules::{ColumnRules, HeaderRule};
 // Spaces
 pub use crate::components::app::space_editor::SpaceEditor;
 pub use crate::components::app::space_editor::colour::SpaceColour;
-pub use crate::components::app::space_editor::dot::SpaceDot;
+pub use crate::components::app::space_editor::dot::{DotFace, SpaceDot};
 
 // Chrome
 pub use crate::components::chrome::window_frame::TrafficLights;

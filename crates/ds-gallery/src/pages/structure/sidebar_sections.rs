@@ -65,6 +65,7 @@ fn foot(scheme: Scheme) -> Element {
             SpaceDot {
                 key: "{index}",
                 name,
+                face: DotFace::Foot,
                 frame: FrameVars::of(&look, scheme),
                 selection,
                 shortcut: Shortcut(vec![]),

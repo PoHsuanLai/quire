@@ -142,6 +142,14 @@ const CASES: &[Case] = &[
         state: "space-dot-elsewhere",
         make: || rsx! { SpaceDot { name: "Home", frame: ds_style::space::frame_vars::FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
     },
+    Case {
+        state: "space-dot-foot-current",
+        make: || rsx! { SpaceDot { name: "Work", face: DotFace::Foot, frame: ds_style::space::frame_vars::FrameVars::of(&preset_look(0, Grain(35)), Scheme::Light), selection: Selection::Selected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('1')]), onclick: |_| {} } },
+    },
+    Case {
+        state: "space-dot-foot-elsewhere",
+        make: || rsx! { SpaceDot { name: "Home", face: DotFace::Foot, frame: ds_style::space::frame_vars::FrameVars::of(&preset_look(1, Grain(55)), Scheme::Dark), selection: Selection::Unselected, shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char('2')]), onclick: |_| {} } },
+    },
 ];
 
 #[test]

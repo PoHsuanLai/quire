@@ -26,11 +26,24 @@ pub fn SpacePage() -> Element {
     let motion = axes.read().motion;
     let checks = readout(&look, scheme);
     rsx! {
-        Section { title: "Presets", note: "The eight presets as the sidebar foot draws them. Picking one resets the Space; the toolbar's Space menu does the same.",
+        Section { title: "Presets", note: "The eight presets as colour swatches (the editor's face), then as the sidebar foot draws them: small dots, the current one larger and in ink. Picking one resets the Space; the toolbar's Space menu does the same.",
             div { class: "g-row",
                 for (index , candidate) in PresetIndex::all().enumerate() {
                     SpaceDot {
                         key: "{index}",
+                        name: candidate.label(),
+                        frame: FrameVars::of(&candidate.look(), scheme),
+                        selection: if candidate == preset { Selection::Selected } else { Selection::Unselected },
+                        shortcut: Shortcut(vec![ShortcutKey::Ctrl, ShortcutKey::Char(char::from(b'1' + candidate.0))]),
+                        onclick: move |_| axes.with_mut(|axes| *axes = axes.clone().with_preset(candidate)),
+                    }
+                }
+            }
+            div { class: "g-row",
+                for (index , candidate) in PresetIndex::all().enumerate() {
+                    SpaceDot {
+                        key: "{index}",
+                        face: DotFace::Foot,
                         name: candidate.label(),
                         frame: FrameVars::of(&candidate.look(), scheme),
                         selection: if candidate == preset { Selection::Selected } else { Selection::Unselected },

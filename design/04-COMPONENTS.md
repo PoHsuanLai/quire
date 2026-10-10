@@ -2885,8 +2885,13 @@ window (`S:866-904`). Shell: Settings > Spaces and the bar's workspace menu (pla
 #[component] pub fn SpaceEditor(look: SpaceLook, scheme: Scheme, active_dot: DotIndex,
     onchange: EventHandler<SpaceLook>, #[props(default)] name: Option<String> /* "{name} Space" */,
     #[props(default)] on_active_dot: Option<EventHandler<ActiveDot /* = DotIndex */>>) -> Element
-#[component] pub fn SpaceDot(name: String, frame: FrameVars, here: Here, shortcut: Shortcut, onclick: EventHandler<()>) -> Element
+#[component] pub fn SpaceDot(name: String, frame: FrameVars, here: Here, shortcut: Shortcut, onclick: EventHandler<()>, #[props(default)] face: DotFace /* Swatch | Foot */) -> Element
 ```
+
+`DotFace::Swatch` (default) is the editor's colour swatch. `DotFace::Foot` is the sidebar foot's dot,
+which `SpacesFoot` uses: a 22px target (quiet `--f-pill-hover` wash) around a 5px pip in
+`--f-ink-faint`, 7px and `--f-ink` for the current Space; no fill, ring or scale, and the change
+fades on `--t-quick`.
 
 Derivation of every colour shown (stops, picked colours, checks) is `space/palette.rs`
 (03-COLOR); the editor only renders.
