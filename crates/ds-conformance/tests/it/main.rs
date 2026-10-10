@@ -87,6 +87,7 @@ mod scroller;
 mod scrubber;
 mod search_field;
 mod search_field_modes;
+mod search_summon_typing;
 mod section_header_actions;
 mod segmented_keys;
 mod segmented_name;
