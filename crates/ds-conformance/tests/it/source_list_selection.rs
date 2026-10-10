@@ -1,6 +1,6 @@
-//! A source list's selected row is the accent under white ink while its window is active, even
-//! when the list does not hold the keyboard, and the quiet grey while the window is inactive
-//! (macOS's sidebar).
+//! A source list's selected row is a neutral grey wash (`--sel-neutral`), never the accent, while
+//! its window is active (even when the list does not hold the keyboard) and while it is inactive
+//! (macOS's sidebar: the accent stays on the focus ring, the cursor and the symbol).
 
 use crate::support::probe;
 
@@ -39,21 +39,21 @@ fn Stage() -> Element {
 }
 
 #[test]
-fn the_selected_row_is_accent_while_active_and_grey_while_inactive() {
+fn the_selected_row_is_neutral_grey_active_or_inactive() {
     let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.render().expect("renders");
     keep(&frame, "source-list-selection");
     let fill = |id: &str| modal(&pixels(&frame, rect(&harness, id), 2.0));
-    let blue = accent_of(Accent::Blue, Scheme::Light).fill;
-    let Hex([r, g, b]) = blue;
-    assert!(
-        distance(fill("#active"), [r, g, b, 255]) <= 2,
-        "active row {:?}, want the accent {blue:?}",
-        fill("#active")
-    );
-    let quiet = fill("#inactive");
-    assert!(
-        quiet[0].abs_diff(quiet[2]) < 24,
-        "inactive row {quiet:?} is not a grey"
-    );
+    let Hex([r, g, b]) = accent_of(Accent::Blue, Scheme::Light).fill;
+    for id in ["#active", "#inactive"] {
+        let got = fill(id);
+        assert!(
+            got[0].abs_diff(got[2]) < 24,
+            "{id} row {got:?} is not a grey"
+        );
+        assert!(
+            distance(got, [r, g, b, 255]) > 60,
+            "{id} row {got:?} is the accent"
+        );
+    }
 }

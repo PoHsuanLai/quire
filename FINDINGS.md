@@ -1729,3 +1729,46 @@ Open:
 - Needs blessing by the orchestrator: `ds-shell`'s `stylesheet.css` golden (the `column` and
   `texture_layer` sheets; the `ds` copy is gone), and the new `structure/column/*.html` goldens.
 
+
+## q20 (temor design audit, measured at v0.3.16)
+
+1. **Flat shell ground: `SidebarFill::Flat`.** `components::chrome::sidebar_model::SidebarFill`
+   (`Material` default, `Clear`) gains `Flat`: the sidebar paints `--surface-2` (data-fill=flat),
+   one tone, no gradient, no Space hue. It extends the existing sidebar fill rather than adding a
+   look or a raw colour. `--surface-2` is the first rung above `--paper` on the lightness ladder
+   (dark #1E1E1E to #242424, light #ECECEC to #F5F5F5), so an app whose content sits on `--paper`
+   (a terminal, an editor) gets a sidebar exactly one step off its content. Legibility is the
+   existing `every_text_ink_holds_its_floor_on_every_ground` (Surface2 is in its grounds) and the
+   new selected-row test below. When to use it: content-first apps; leave `Material` for apps
+   whose frame is the Space (mail) and `Clear` where the window's tint should show.
+2. **Neutral sidebar selection, the default for source lists.** New token `--sel-neutral`
+   (`ColourToken::SelectionNeutral`): black at .08 in light, white at .08 in dark. design/27
+   section 5.12 asks for a "rounded selection highlight" and macOS (Big Sur on) paints source
+   lists with a neutral wash, the accent on the symbol; no HIG page asks for an accent fill. So
+   the neutral wash is the default for every `ListStyle::SourceList` row, not a variant:
+   `--ink` on it measures well over 10:1 (dark on #242424 about 11:1), against 2.98:1 for
+   `--sel-ink` on the accent. The fill is the same active, away or inactive; the selected row's
+   leading symbol takes `--accent-text` (`--ink-soft` when the window is inactive), the detail and
+   trailing take `--ink-soft`. Focus ring and cursor are untouched (accent). Plain `List` rows
+   still select with `--sel-bg`. The test `a_selected_sidebar_row_keeps_its_ink_on_the_neutral_wash`
+   gates `--ink` at 4.5:1 and `--ink-soft` at 3:1 in both schemes over Paper, Surface, Surface2
+   and Raise. A consumer that wanted the old accent fill in a sidebar has none now; ask if one does.
+3. **Concentric palette rows.** The palette card is `--r-panel` 20 with a 6 inset and 8 rows, so
+   the rows were 6 short of concentric. Chosen: keep the rows at 8 (the menu's, the 28 px row
+   would be a capsule at 14) and take the inset to 12: new `ShellScale.palette_radius` 20 and
+   `palette_inset` 12, token `--shell-palette-inset` (`ShellSize::PaletteInset`), used by
+   `.ds-palette-list`. New test `a_menu_row_and_a_palette_row_are_concentric_in_their_containers`
+   (`tokens/shape.rs`) checks container radius less inset equals the highlight radius for the menu
+   (14, 6) and the palette (20, 12). The rule was only a test for the menu item before.
+4. **Goldens that change (orchestrator: `DS_BLESS=1`).** `ds-shell/tests/snapshots/stylesheet.css`:
+   new `--sel-neutral` in both scheme blocks, new `--shell-palette-inset`, `.ds-palette-list`
+   padding, the source-list selection rules in the row sheet, `.ds-sidebar[data-fill=flat]`.
+   Any stylesheet golden of `ds` that embeds the same sheets. SSR/structure goldens: unchanged
+   unless one renders a sidebar with `SidebarFill::Flat` (none does today). Pixel captures
+   (`keep` shots) of a selected source-list row and of the palette (rows now 12 in from the card
+   edge) differ; the gallery structure/sidebar page gains a third specimen.
+5. **Likeliest compile issues.** `shape.rs` test imports `shell_type::ShellMetrics` and reads
+   `ShellMetrics::default().menu.highlight_radius` (a `Px`); `ShellScale` gained two fields (a
+   struct literal elsewhere would break, none known); `ColourToken` gained a variant (an
+   exhaustive match elsewhere would break); the legibility test reuses `rgb`, `over` and `colour`
+   from the same file. `source_list_selection.rs` was rewritten to the neutral expectation.

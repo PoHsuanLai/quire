@@ -64,6 +64,11 @@ pub enum ColourToken {
     /// `--fill`: the stronger wash of a pressed row or button, black at .10 in light, white at
     /// .14 in dark.
     Fill,
+    /// `--sel-neutral`: a source list's selected-row fill, the neutral raised wash macOS sidebars
+    /// use (design/27 section 5.12): the foreground at 8 %, black in light and white in dark, over
+    /// whatever lies beneath. The accent stays on the focus ring, the cursor and the symbol.
+    #[token(name = "sel-neutral")]
+    SelectionNeutral,
     /// `--grp`: an inset grouped list's and form group's ground: white in light, `#2C2C2E` in
     /// dark, opaque so rows read over a translucent panel.
     Grp,
@@ -209,6 +214,7 @@ impl ColourToken {
             ColourToken::Line => (solid(0xD9D9D9), solid(0x444444)),
             ColourToken::FillBtn => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
             ColourToken::Fill => (alpha(0x000000, 100), alpha(0xFFFFFF, 140)),
+            ColourToken::SelectionNeutral => (alpha(0x000000, 80), alpha(0xFFFFFF, 80)),
             ColourToken::Grp => (WHITE, solid(0x2C2C2E)),
             ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
             ColourToken::FillQuaternary => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),

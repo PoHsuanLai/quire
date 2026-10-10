@@ -19,6 +19,11 @@ pub struct ShellScale {
     pub menu_radius: WholePx,
     /// A text menu's inset round its rows, 6 (the highlight is the menu's radius less this: 8).
     pub menu_inset: WholePx,
+    /// The command palette's radius, 20 (the panel's).
+    pub palette_radius: WholePx,
+    /// The palette list's inset round its rows, 12: the panel's radius less the row's 8, so the
+    /// rows stay the menu's 8 and the rule (outer less inset) holds.
+    pub palette_inset: WholePx,
 }
 
 /// The settled numbers (design/29 section 13 decision 2; the reference's menu).
@@ -27,6 +32,8 @@ pub const SHELL_SCALE: ShellScale = ShellScale {
     status_width: WholePx(30),
     menu_radius: WholePx(14),
     menu_inset: WholePx(6),
+    palette_radius: WholePx(20),
+    palette_inset: WholePx(12),
 };
 
 impl ShellScale {
@@ -53,6 +60,9 @@ pub enum ShellSize {
     /// `--shell-menu-inset`: how far a menu row is inset from the menu's edge.
     #[token(name = "shell-menu-inset")]
     MenuInset,
+    /// `--shell-palette-inset`: how far a command-palette row is inset from the card's edge.
+    #[token(name = "shell-palette-inset")]
+    PaletteInset,
 }
 
 /// The size a shell token holds, as the stylesheet writes it.
@@ -62,6 +72,7 @@ fn shell_size_css(token: ShellSize, _scope: TokenScope) -> CssValue {
         ShellSize::StatusWidth => SHELL_SCALE.status_width,
         ShellSize::MenuRadius => SHELL_SCALE.menu_radius,
         ShellSize::MenuInset => SHELL_SCALE.menu_inset,
+        ShellSize::PaletteInset => SHELL_SCALE.palette_inset,
     };
     CssValue::computed(size.css())
 }

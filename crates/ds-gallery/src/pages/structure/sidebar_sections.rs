@@ -105,9 +105,9 @@ pub fn SidebarSectionsSection() -> Element {
         .unread(3),
     ];
     rsx! {
-        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. The default fill is the sidebar's own ground; SidebarFill::Clear paints nothing, so the window's colour (a Space's flat tint) shows through, with the ordinary inks.",
+        Section { title: "Sidebar: sections and a foot", note: "Sections of source-list Lists (their headings are ListItem::heading) and Custom content (pinned tiles) scroll between the header and the foot, which stays at the bottom; one cursor runs across every list. The default fill is the sidebar's own ground; SidebarFill::Clear paints nothing, so the window's colour (a Space's flat tint) shows through, with the ordinary inks; SidebarFill::Flat paints --surface-2, one lightness step above the paper a content-first app (terminal, editor) draws its content on: one tone, no gradient, no Space hue. A selected sidebar row is the neutral --sel-neutral wash with the accent on its symbol.",
             div { class: "g-row g-row-top",
-                for (name , fill) in [("SidebarFill::Material", SidebarFill::Material), ("SidebarFill::Clear", SidebarFill::Clear)] {
+                for (name , fill) in [("SidebarFill::Material", SidebarFill::Material), ("SidebarFill::Clear", SidebarFill::Clear), ("SidebarFill::Flat", SidebarFill::Flat)] {
                     Specimen { key: "{name}", name,
                         div { class: if fill == SidebarFill::Clear { "g-side-frame g-on-tint" } else { "g-side-frame" },
                             Sidebar::<&'static str> {

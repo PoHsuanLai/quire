@@ -754,3 +754,33 @@ fn a_selected_row_keeps_its_ink() {
     }
     assert!(failures.is_empty(), "{failures:#?}");
 }
+
+/// A selected sidebar row's text reads on the neutral wash (`--sel-neutral`, the foreground at
+/// 8 %): `--ink` at 4.5:1 (13 px text) and the detail's `--ink-soft` at 3:1, in both schemes, over
+/// every ground a sidebar sits on (the flat `--surface-2` among them).
+#[test]
+fn a_selected_sidebar_row_keeps_its_ink_on_the_neutral_wash() {
+    let mut failures = Vec::new();
+    for scheme in Scheme::ALL.iter().copied() {
+        let wash = colour(ColourToken::SelectionNeutral, scheme);
+        for ground in [
+            ColourToken::Paper,
+            ColourToken::Surface,
+            ColourToken::Surface2,
+            ColourToken::Raise,
+        ] {
+            let under = rgb(&colour(ground, scheme));
+            let back = over(&wash, under);
+            for (ink, needs) in [(ColourToken::Ink, 4.5), (ColourToken::InkSoft, 3.0)] {
+                let fore = colour(ink, scheme);
+                let got = measured(&fore, &back);
+                if got < needs {
+                    failures.push(format!(
+                        "{scheme:?} on {ground:?}: {ink:?} {fore} on {back} is {got:.2}, needs {needs}"
+                    ));
+                }
+            }
+        }
+    }
+    assert!(failures.is_empty(), "{failures:#?}");
+}

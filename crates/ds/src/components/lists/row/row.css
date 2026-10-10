@@ -1,6 +1,6 @@
 /* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
    are 24 tall (Compact; 28 in a table) or 44 (Settings); a row under a highlight fills with the accent and takes
-   the accent's ink (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
+   the accent's ink (a source list's row fills neutral instead, below) (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
    list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
    Attribute selectors carry `*|` (spike S2). */
 
@@ -29,15 +29,23 @@
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
-/* A source list is a sidebar: its selection stays the accent while the window is active, whether
-   or not the list holds the keyboard, and goes grey only with the window (macOS). */
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg); color:var(--sel-ink); }
+/* A source list is a sidebar, and a Mac sidebar's selection is a neutral rounded wash, not the
+   accent (design/27 section 5.12): the row keeps its ink, the accent stays on the focus ring and
+   the cursor, and the selected row's symbol takes it. Active, away or inactive, the fill is the
+   same; only the symbol goes quiet with an inactive window. */
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-neutral); color:var(--ink); }
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic,
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--sel-ink); }
-.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-bg-quiet); color:var(--ink); }
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
-.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing{ color:var(--ink-soft); }
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--accent-text); }
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
 
 /* The words: the title over its detail. Emphasis Strong is an unread row. */

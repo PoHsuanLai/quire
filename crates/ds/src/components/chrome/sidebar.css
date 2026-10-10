@@ -5,6 +5,9 @@
 
 .ds-sidebar{ display:flex; flex-direction:column; box-sizing:border-box; height:100%; min-height:0; background:var(--surface); color:var(--ink); }
 .ds-sidebar[*|data-fill=clear]{ background:transparent; }
+/* A flat sidebar (`data-fill=flat`) is one tone, `--surface-2`: the first lightness rung above
+   `--paper`, where a content-first app's content sits. No gradient, no Space hue. */
+.ds-sidebar[*|data-fill=flat]{ background:var(--surface-2); }
 .ds-sidebar-header{ flex:none; padding:var(--s-12) var(--s-10) var(--s-8); }
 .ds-sidebar-body{ flex:1 1 0; min-height:0; overflow-y:auto; scrollbar-width:none; display:flex; flex-direction:column; gap:var(--s-4); padding:0 var(--s-10) var(--s-10); }
 .ds-sidebar-header + .ds-sidebar-body{ padding-top:0; }

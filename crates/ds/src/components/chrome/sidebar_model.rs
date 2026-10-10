@@ -24,4 +24,9 @@ pub enum SidebarFill {
     /// Nothing: whatever the window draws behind the sidebar shows, such as a Space's flat tint.
     /// The inks are the ordinary ones.
     Clear,
+    /// A flat ground: `--surface-2`, the first rung above `--paper` on the lightness ladder, in
+    /// one tone (no gradient, no Space hue). For content-first apps (a terminal, an editor) whose
+    /// content sits on `--paper`: the sidebar reads as the same product, one step lifted. The
+    /// inks are the ordinary ones.
+    Flat,
 }

@@ -19,8 +19,9 @@ use std::hash::Hash;
 /// A sidebar of `sections`, with `header` above them and `foot` below. `cursor` is the place the
 /// keys rest on and the caller draws selected, across every list; `onselect` hears where a click,
 /// an arrow or a typed letter reached. `size` is the rows' height, `appearance.sidebar_size`'s
-/// value. `fill` is what it paints behind its rows: its own ground (the default) or nothing
-/// (`SidebarFill::Clear`), so the window's colour shows through.
+/// value. `fill` is what it paints behind its rows: its own ground (the default), nothing
+/// (`SidebarFill::Clear`, so the window's colour shows through) or a flat step above the paper
+/// (`SidebarFill::Flat`).
 #[component]
 pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
     #[props(into)] label: String,
@@ -40,7 +41,7 @@ pub fn Sidebar<K: Clone + PartialEq + Hash + 'static>(
             class: common.class("ds-sidebar"),
             "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "data-size": size.slug(),
-            "data-fill": (fill == SidebarFill::Clear).then(|| fill.slug()),
+            "data-fill": (fill != SidebarFill::Material).then(|| fill.slug()),
             onmounted: move |event| common.mounted(event),
             ..data,
             if let Some(header) = header {

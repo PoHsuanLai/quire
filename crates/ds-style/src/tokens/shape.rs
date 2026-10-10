@@ -161,6 +161,7 @@ mod tests {
     use super::{CONCENTRIC_FLOOR, Radius, concentric};
     use crate::tokens::control_size::ControlSize;
     use crate::tokens::shell_scale::SHELL_SCALE;
+    use crate::tokens::shell_type::ShellMetrics;
     use ds_core::geometry::units::Px;
 
     #[test]
@@ -186,6 +187,30 @@ mod tests {
             px(Radius::MenuItem),
             concentric(Px(px(Radius::Menu)), Px(inset)).0
         );
+    }
+
+    /// Design/34 section 2.1: a row's radius is its container's less the inset between them,
+    /// for the menu and the command palette alike (the palette's card is `--r-panel`, its list
+    /// inset `--shell-palette-inset`, its rows the highlight radius `--r-shell-highlight`).
+    #[test]
+    fn a_menu_row_and_a_palette_row_are_concentric_in_their_containers() {
+        let px = |radius: Radius| -> f32 {
+            radius
+                .value()
+                .trim_end_matches("px")
+                .parse()
+                .unwrap_or(f32::NAN)
+        };
+        let row = f32::from(ShellMetrics::default().menu.highlight_radius.0);
+        let menu = (SHELL_SCALE.menu_radius, SHELL_SCALE.menu_inset);
+        let palette = (SHELL_SCALE.palette_radius, SHELL_SCALE.palette_inset);
+        assert_eq!(px(Radius::Panel), f32::from(palette.0.0));
+        for (outer, inset) in [menu, palette] {
+            assert_eq!(
+                concentric(Px(f32::from(outer.0)), Px(f32::from(inset.0))).0,
+                row
+            );
+        }
     }
 
     #[test]

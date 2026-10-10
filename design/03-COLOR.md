@@ -208,7 +208,7 @@ Which token paints which element. The sidebar's rows are 14.1; everything else i
 
 ### 14.1 Sidebar
 
-Moved to `archive/03-COLOR-arc.md` (the frame usage map). The sidebar is a Mac source list: its rows read `--ink`, `--ink-soft`, `--ink-faint`, selection `--sel-bg` or `--sel-bg-quiet` (30 section 3.2), on the Space tint.
+Moved to `archive/03-COLOR-arc.md` (the frame usage map). The sidebar is a Mac source list: its rows read `--ink`, `--ink-soft`, `--ink-faint`, and the selected row is the neutral wash `--sel-neutral` (the foreground at 8 %, 4.5:1 for `--ink` over every ground; q20 in FINDINGS), on the Space tint. A content-first app (terminal, editor) gives the sidebar the flat ground instead: `SidebarFill::Flat` paints `--surface-2`, one lightness rung above `--paper` where its content sits, with no gradient and no Space hue.
 
 ### 14.2 Card
 
