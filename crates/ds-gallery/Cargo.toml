@@ -9,6 +9,7 @@ repository.workspace = true
 publish.workspace = true
 
 [dependencies]
+chordkit = { workspace = true }
 ds-core = { workspace = true }
 ds = { workspace = true }
 ds-shell = { workspace = true }

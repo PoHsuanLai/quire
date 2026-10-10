@@ -98,6 +98,7 @@ mod sheet_attach;
 mod sheet_buttons;
 mod sheet_exit;
 mod sheet_within;
+mod shortcut_field;
 mod sidebar_sections;
 mod skeleton_row;
 mod slider_ticks;

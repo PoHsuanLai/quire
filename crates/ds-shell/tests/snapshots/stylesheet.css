@@ -2702,6 +2702,25 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-text-field-frame{ padding:var(--s-12) var(--s-14); gap:var(--s-9); border-bottom:var(--hair) solid var(--line-soft); color:var(--ink-faint); }
 .ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input{ font-size:var(--fs-title); color:var(--ink); }
 .ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-title); }
+/* -- shortcut_field -- */
+/* ShortcutField (System Settings' shortcut recorder). Attribute selectors carry `*|` (spike S2).
+   The well is a bezeled field's fill; while it listens it takes the accent ring (Blitz's
+   `:focus-within` is always false, so the component writes `data-recording`). A clash is told
+   under the well in the warning ink. */
+
+.ds-shortcut-field{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:var(--s-2); min-width:0; }
+.ds-shortcut-field-well{
+  box-sizing:border-box; min-width:var(--s-96); height:var(--ctl-h-m); padding:0 var(--ctl-pad-m); border:0; border-radius:var(--ctl-r-m);
+  background:linear-gradient(var(--fill-btn), var(--fill-btn)), var(--surface); color:var(--ink);
+  font-size:var(--ctl-fs-m); text-align:center; cursor:default;
+  transition:box-shadow var(--t-quick) var(--e-out);
+}
+.ds-shortcut-field[*|data-recording=idle] .ds-shortcut-field-well{ font-variant-numeric:tabular-nums; }
+.ds-shortcut-field[*|data-recording=listening] .ds-shortcut-field-well{
+  color:var(--ink-soft); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), 0 0 0 var(--ring) var(--accent-soft);
+}
+.ds-shortcut-field-clash{ font-size:var(--fs-help); color:var(--warn); }
+.ds-shortcut-field[*|data-availability=disabled] .ds-shortcut-field-well{ opacity:.35; }
 /* -- text_runs -- */
 /* Text runs: a caller's search hit is `mark.ds-mark`, a soft accent ground under
    the line's own ink (mailo's `.row mark.hit`); a stronger or quieter run is `span.ds-run` with

@@ -4,6 +4,7 @@ use crate::pages::content::external_icons::ExternalIcons;
 use crate::pages::content::glyphs::Glyphs;
 use crate::pages::content::plate_tints::PlateTints;
 use crate::pages::{Section, Specimen};
+use chordkit::{Chord, Key as ChordKey, Modifier, Modifiers as ChordModifiers};
 use dioxus::prelude::*;
 use ds::components::app::command_pill::CommandPill;
 use ds::components::app::pin_tile::{PinFace, PinTile};
@@ -20,6 +21,14 @@ use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
 use ds::style::tokens::label_hue::LabelHue;
 use ds_core::colour::contrast::Verdict;
+
+/// The chord the specimens start with: Shift and Command and K.
+fn sample_chord() -> Chord {
+    Chord::new(
+        ChordModifiers::of(Modifier::Super).with(Modifier::Shift),
+        ChordKey::Char('k'),
+    )
+}
 
 const PROVIDERS: [MarkProvider; 7] = [
     MarkProvider::Google,
@@ -78,6 +87,7 @@ fn Buttons() -> Element {
 fn Choosers() -> Element {
     let mut view = use_signal(|| 1u8);
     let mut on = use_signal(|| Check::On);
+    let mut shortcut = use_signal(|| Some(sample_chord()));
     let mut level = use_signal(|| Fraction(350));
     let mut tab = use_signal(|| 0u8);
     let mut count = use_signal(|| 3u32);
@@ -105,6 +115,26 @@ fn Choosers() -> Element {
                 SegmentedControl::<u8> { label: "View", choices: Choice::pairs(views), tracking: Tracking::SelectOne(view()), size: ControlSize::Mini, onchange: move |next| view.set(next) }
             }
             SegmentedControl::<u8> { label: "Mailbox", choices: Choice::pairs(tabs), tracking: Tracking::SelectOne(tab()), onchange: move |next| tab.set(next) }
+        }
+        Section { title: "ShortcutField", note: "Live: click it (or Return or Space with the keyboard on it), then type a combination with a modifier or a function key; Escape gives up, Backspace or Delete clears. The second names the action that already uses its shortcut.",
+            div { class: "g-row",
+                Specimen { name: "live",
+                    ShortcutField { label: "Live shortcut", value: shortcut(), onrecord: move |recorded| match recorded {
+                        ShortcutRecorded::Chord(chord) => shortcut.set(Some(chord)),
+                        ShortcutRecorded::Cleared => shortcut.set(None),
+                        _ => {}
+                    } }
+                }
+                Specimen { name: "empty",
+                    ShortcutField { label: "Empty shortcut", onrecord: |_| {} }
+                }
+                Specimen { name: "clash",
+                    ShortcutField { label: "Clashing shortcut", value: Some(sample_chord()), clash: ShortcutClash::With("New Space".to_owned()), onrecord: |_| {} }
+                }
+                Specimen { name: "disabled",
+                    ShortcutField { label: "Disabled shortcut", value: Some(sample_chord()), availability: Availability::Disabled, onrecord: |_| {} }
+                }
+            }
         }
         Section { title: "Toggle and Slider",
             div { class: "g-row",
