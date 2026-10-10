@@ -301,7 +301,8 @@ fn a_fast_lift_glides_further_than_its_own_speed_and_a_gentle_one_as_it_is() {
 
 #[test]
 fn the_zoom_modifier_is_the_platforms_primary() {
-    // (platform, modifier held, a zoom delivered whole to the eased listener)
+    // (platform, modifier held, a zoom delivered whole to the eased listener). A plain detent
+    // also lands one event in its first frame, then keeps easing; a zoom is that one event alone.
     let cases = [
         (Platform::Windows, Modifiers::CONTROL, true),
         (Platform::Windows, Modifiers::SUPER, false),
@@ -309,7 +310,12 @@ fn the_zoom_modifier_is_the_platforms_primary() {
     for (platform, held, whole) in cases {
         let mut harness = harness_on(platform);
         harness.send(Input::detents_held(AT, 0.0, -1.0, held));
-        let at_once = heard(&EASED).len();
-        assert_eq!(at_once == 1, whole, "{platform:?} {held:?}");
+        harness.advance(Duration::from_millis(300));
+        let eased = heard(&EASED).len();
+        assert_eq!(
+            eased == 1,
+            whole,
+            "{platform:?} {held:?}: {eased} eased events"
+        );
     }
 }
