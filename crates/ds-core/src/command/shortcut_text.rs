@@ -83,7 +83,7 @@ fn owner_of(shortcut: &Shortcut) -> Option<StandardAction> {
 const MODIFIER_GLYPHS: [char; 4] = ['⌃', '⌥', '⇧', '⌘'];
 
 /// A drawn chord's caps: one per leading modifier glyph then the rest, or one per `+` part.
-fn split_caps(text: &str) -> Vec<String> {
+pub(super) fn split_caps(text: &str) -> Vec<String> {
     if text.is_empty() {
         return Vec::new();
     }
@@ -112,7 +112,7 @@ fn split_caps(text: &str) -> Vec<String> {
         .collect()
 }
 
-fn arrow(cap: &str) -> Option<GlyphKind> {
+pub(super) fn arrow(cap: &str) -> Option<GlyphKind> {
     matches!(cap, "↑" | "↓" | "←" | "→").then_some(GlyphKind::Arrow)
 }
 
