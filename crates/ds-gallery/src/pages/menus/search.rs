@@ -78,6 +78,7 @@ pub fn SearchSuggestions() -> Element {
         }
         TopHitSearch {}
         CardSearch {}
+        HostShownSearch {}
         if showcase == Showcase::Posed {
             Section {
                 title: "Result rows",
@@ -174,6 +175,33 @@ fn CardSearch() -> Element {
                     onpick: move |value: String| picked.set(format!("picked {value}")),
                 }
             }
+            p { class: "g-note", "Last action: {picked}" }
+        }
+    }
+}
+
+/// A panel the host keeps up, with arrows that stop at the ends.
+#[component]
+fn HostShownSearch() -> Element {
+    let mut query = use_signal(String::new);
+    let mut picked = use_signal(|| "nothing yet".to_owned());
+    rsx! {
+        Section {
+            title: "SearchField, host-shown rows",
+            note: "open: Shown puts the rows up whenever there are any, before any focus or typing, and an Escape on an empty field leaves them up. ends: Stop keeps the highlight on the first or last row instead of wrapping.",
+            div { style: "width:300px",
+                SearchField::<String> {
+                    label: "Search",
+                    value: query(),
+                    placeholder: "Search mail, people",
+                    suggestions: sections(&query()),
+                    open: Panel::Shown,
+                    ends: Ends::Stop,
+                    oninput: move |next: String| query.set(next),
+                    onpick: move |value: String| picked.set(format!("picked {value}")),
+                }
+            }
+            div { style: "height:300px" }
             p { class: "g-note", "Last action: {picked}" }
         }
     }

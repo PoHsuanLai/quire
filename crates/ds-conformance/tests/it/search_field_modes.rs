@@ -21,6 +21,8 @@ const VIEW: Viewport = Viewport {
 struct Setup {
     highlight: InitialHighlight,
     escape: EscapeOrder,
+    open: Panel,
+    ends: Ends,
     present: SuggestionsPresent,
     floated: bool,
 }
@@ -29,6 +31,8 @@ thread_local! {
     static SETUP: Cell<Setup> = const { Cell::new(Setup {
         highlight: InitialHighlight::None,
         escape: EscapeOrder::ClosePanelFirst,
+        open: Panel::Owned,
+        ends: Ends::Wrap,
         present: SuggestionsPresent::Popup,
         floated: false,
     }) };
@@ -74,6 +78,8 @@ fn Page() -> Element {
                     suggestions: sections(),
                     highlight: setup.highlight,
                     escape: setup.escape,
+                    open: setup.open,
+                    ends: setup.ends,
                     present: setup.present,
                     place,
                     cursor: SearchCursor::Is(lit()),
@@ -215,6 +221,36 @@ fn escape_clears_first_then_reaches_the_window() {
     assert_eq!(text(&harness, "#log"), "");
     press(&mut harness, ShortcutKey::Escape);
     assert_eq!(text(&harness, "#log"), "window-escape");
+}
+
+#[test]
+fn rows_the_host_shows_are_up_before_any_focus_and_survive_escape_on_an_empty_field() {
+    SETUP.with(|cell| {
+        cell.set(Setup {
+            open: Panel::Shown,
+            ..popup()
+        })
+    });
+    let mut harness = Harness::new(Page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(300));
+    assert_eq!(harness.focus_of(".ds-input"), FocusState::Unfocused);
+    assert_eq!(harness.count(".ds-menu-item"), 3, "rows on summon");
+    let at = harness.centre(".ds-input").expect("the field");
+    harness.send(Input::click(at));
+    harness.advance(ms(300));
+    press(&mut harness, ShortcutKey::Escape);
+    assert_eq!(text(&harness, "#log"), "window-escape");
+    assert_eq!(harness.count(".ds-menu-item"), 3, "the rows stay");
+}
+
+#[test]
+fn the_arrows_stop_at_the_last_row_when_asked() {
+    let mut harness = start(Setup {
+        ends: Ends::Stop,
+        ..popup()
+    });
+    (0..5).for_each(|_| press(&mut harness, ShortcutKey::Down));
+    assert_eq!(lit(&harness).as_deref(), Some("Sam Lindqvist"));
 }
 
 fn card() -> Setup {

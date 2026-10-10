@@ -17,8 +17,8 @@ use crate::components::menus::menu::placement::MenuPlacement;
 use crate::components::menus::search::card::card;
 use crate::components::menus::search::highlight::{initial, shown_at, value_at};
 use crate::components::menus::search::model::{
-    CardPlace, EscapeOrder, InitialHighlight, SearchCursor, SuggestionSection, SuggestionsPresent,
-    flatten,
+    CardPlace, Ends, EscapeOrder, InitialHighlight, Manner, Panel, SearchCursor, SuggestionSection,
+    SuggestionsPresent, flatten,
 };
 use crate::components::menus::search::step::{Act, SuggestKey, Suggesting, Text, press};
 use crate::components::overlays::flow::Flow;
@@ -91,6 +91,12 @@ impl<T: Clone + 'static> Moves<T> {
 /// `highlight` ask for, so a caller can complete the text of the row that is lit on Tab (read in
 /// `onkey`, which hears every key the field leaves alone).
 ///
+/// `open` says who decides whether the panel is up: `Owned` (the default) is the field, which
+/// opens it after focus or typing; `Shown` is the host, whose rows are up whenever there are any,
+/// before any focus or typing, and an Escape on an empty field goes on to the window with the
+/// rows still up. `ends` says what the arrows do past the first and last row: `Wrap` (the
+/// default) or `Stop`.
+///
 /// `present` is `Popup` (a menu under the field) or `Card` (the field and its results as one
 /// surface, with `place` floating it at the window level and `ondismiss` hearing a press outside
 /// it or an Escape that nothing else took; with no `place` it is drawn where it stands).
@@ -110,6 +116,8 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
     #[props(default)] cursor: SearchCursor<T>,
     #[props(default)] on_highlight: EventHandler<Option<T>>,
     #[props(default)] escape: EscapeOrder,
+    #[props(default)] open: Panel,
+    #[props(default)] ends: Ends,
     #[props(default)] present: SuggestionsPresent,
     #[props(default)] place: Option<CardPlace>,
     #[props(default)] ondismiss: EventHandler<()>,
@@ -141,7 +149,12 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
         shown: state().shown,
         cursor: lit,
     };
-    let open = now.is_open(live.len());
+    let manner = Manner {
+        escape,
+        panel: open,
+        ends,
+    };
+    let open = now.is_open(live.len(), manner.panel);
     let moves = Moves {
         picks: picks.clone(),
         from: lit,
@@ -191,7 +204,7 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
                 let Some(key) = suggest_key(&event) else {
                     return onkey.call(event);
                 };
-                let (next, act) = press(now, key, &keys_live, text_of(&typed), escape);
+                let (next, act) = press(now, key, &keys_live, text_of(&typed), manner);
                 key_moves.to(next);
                 match act {
                     Act::Pass => onkey.call(event),
@@ -207,7 +220,7 @@ pub fn SearchField<T: Clone + PartialEq + 'static>(
                 }
             },
             onsubmit: move |_| {
-                let (next, act) = press(now, SuggestKey::Enter, &enter_live, text_of(&enter_value), escape);
+                let (next, act) = press(now, SuggestKey::Enter, &enter_live, text_of(&enter_value), manner);
                 enter_moves.to(next);
                 match act {
                     Act::Pick(at) => {

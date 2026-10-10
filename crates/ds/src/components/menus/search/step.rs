@@ -4,7 +4,7 @@
 //! `EscapeOrder` says: the panel then the text, or the text then the window). Tab is not here: it
 //! behaves as it always does.
 
-use crate::components::menus::search::model::EscapeOrder;
+use crate::components::menus::search::model::{Ends, EscapeOrder, Manner, Panel};
 use crate::stack::roving::{Step, Wrap, moved_live};
 use ds_core::vocab::{Availability, Shown};
 
@@ -58,9 +58,11 @@ impl Suggesting {
         }
     }
 
-    /// Whether the panel is up, given how many choices there are.
-    pub(crate) fn is_open(self, choices: usize) -> bool {
-        self.shown == Shown::Visible && choices > 0
+    /// Whether the panel is up, given how many choices there are: when the field owns the panel
+    /// it also needs to be wanted; a host that shows it wants it always.
+    pub(crate) fn is_open(self, choices: usize, panel: Panel) -> bool {
+        let wanted = panel == Panel::Shown || self.shown == Shown::Visible;
+        wanted && choices > 0
     }
 }
 
@@ -75,24 +77,32 @@ fn landing(live: &[Availability], step: Step) -> Option<usize> {
 
 /// What Escape does: one step, never a press that changes nothing. Clearing closes the panel
 /// with the text, so the next Escape is the window's.
-fn escape(open: bool, text: Text, order: EscapeOrder) -> (Suggesting, Act) {
-    match (order, open, text) {
-        (EscapeOrder::ClosePanelFirst, true, _) => (Suggesting::closed(), Act::Swallow),
+/// A panel the host shows stays up: Escape clears the text, or goes on to the window.
+fn escape(state: Suggesting, open: bool, text: Text, manner: Manner) -> (Suggesting, Act) {
+    match (manner.escape, open, text) {
+        (_, _, Text::Empty) if manner.panel == Panel::Shown => (state, Act::Pass),
+        (EscapeOrder::ClosePanelFirst, true, _) if manner.panel == Panel::Owned => {
+            (Suggesting::closed(), Act::Swallow)
+        }
         (_, _, Text::Filled) => (Suggesting::closed(), Act::Clear),
         (_, _, Text::Empty) => (Suggesting::closed(), Act::Pass),
     }
 }
 
 /// What `key` does to `state`, over choices with these `live` availabilities, in a field holding
-/// `text`, with Escape in this `order`.
+/// `text`, behaving as `manner` says.
 pub(crate) fn press(
     state: Suggesting,
     key: SuggestKey,
     live: &[Availability],
     text: Text,
-    order: EscapeOrder,
+    manner: Manner,
 ) -> (Suggesting, Act) {
-    let open = state.is_open(live.len());
+    let open = state.is_open(live.len(), manner.panel);
+    let wrap = match manner.ends {
+        Ends::Wrap => Wrap::Wraps,
+        Ends::Stop => Wrap::Stops,
+    };
     match key {
         SuggestKey::Up | SuggestKey::Down => {
             let step = if key == SuggestKey::Up {
@@ -102,7 +112,7 @@ pub(crate) fn press(
             };
             let from = state.cursor.filter(|_| open);
             let to = match from {
-                Some(at) => Some(moved_live(Wrap::Wraps, at, live, step)),
+                Some(at) => Some(moved_live(wrap, at, live, step)),
                 None => landing(live, step),
             };
             match to {
@@ -116,7 +126,7 @@ pub(crate) fn press(
                 None => (state, Act::Pass),
             }
         }
-        SuggestKey::Escape => escape(open, text, order),
+        SuggestKey::Escape => escape(state, open, text, manner),
         SuggestKey::Enter => match state.cursor.filter(|_| open) {
             Some(at) if live.get(at) == Some(&Availability::Enabled) => {
                 (Suggesting::closed(), Act::Pick(at))
@@ -129,7 +139,7 @@ pub(crate) fn press(
 #[cfg(test)]
 mod tests {
     use super::{Act, SuggestKey, Suggesting, Text, press};
-    use crate::components::menus::search::model::EscapeOrder;
+    use crate::components::menus::search::model::{Ends, EscapeOrder, Manner, Panel};
     use ds_core::vocab::Availability::{Disabled as D, Enabled as E};
     use ds_core::vocab::{Availability, Shown};
 
@@ -176,7 +186,7 @@ mod tests {
         ];
         for &(name, state, key, live, text, want) in cases {
             assert_eq!(
-                press(state, key, live, text, EscapeOrder::ClosePanelFirst),
+                press(state, key, live, text, Manner::default()),
                 want,
                 "{name}"
             );
@@ -190,7 +200,11 @@ mod tests {
         let presses = |order, start: Suggesting, text| {
             let (mut state, mut text, mut acts) = (start, text, Vec::new());
             while acts.last() != Some(&Act::Pass) {
-                let (next, act) = press(state, SuggestKey::Escape, live, text, order);
+                let manner = Manner {
+                    escape: order,
+                    ..Manner::default()
+                };
+                let (next, act) = press(state, SuggestKey::Escape, live, text, manner);
                 if act == Act::Clear {
                     text = Text::Empty;
                 }
@@ -211,5 +225,43 @@ mod tests {
             presses(ClosePanelFirst, OPEN, Text::Empty),
             vec![Act::Swallow, Act::Pass]
         );
+    }
+
+    #[test]
+    fn a_panel_the_host_shows_keeps_its_rows_on_escape_with_no_text() {
+        let live: &[Availability] = &[E, E];
+        let shown = Manner {
+            panel: Panel::Shown,
+            ..Manner::default()
+        };
+        let closed = Suggesting::closed();
+        assert!(closed.is_open(2, Panel::Shown));
+        assert!(!closed.is_open(2, Panel::Owned));
+        assert_eq!(
+            press(at(1), SuggestKey::Escape, live, Text::Empty, shown),
+            (at(1), Act::Pass)
+        );
+        assert_eq!(
+            press(closed, SuggestKey::Down, live, Text::Empty, shown).1,
+            Act::Swallow
+        );
+        assert_eq!(
+            press(at(1), SuggestKey::Escape, live, Text::Filled, shown).1,
+            Act::Clear
+        );
+    }
+
+    #[test]
+    fn the_arrows_stop_at_the_ends_when_asked() {
+        let live: &[Availability] = &[E, E, E];
+        let stop = Manner {
+            ends: Ends::Stop,
+            ..Manner::default()
+        };
+        let moved = |from, key, manner| press(at(from), key, live, Text::Filled, manner).0;
+        assert_eq!(moved(2, SuggestKey::Down, stop), at(2));
+        assert_eq!(moved(0, SuggestKey::Up, stop), at(0));
+        assert_eq!(moved(1, SuggestKey::Down, stop), at(2));
+        assert_eq!(moved(2, SuggestKey::Down, Manner::default()), at(0));
     }
 }

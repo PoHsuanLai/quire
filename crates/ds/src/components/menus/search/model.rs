@@ -55,6 +55,35 @@ pub enum EscapeOrder {
     ClearFirst,
 }
 
+/// Who decides whether the suggestions panel is up.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Panel {
+    /// The field: the panel opens as the caret arrives or the text changes, and Escape closes it.
+    #[default]
+    Owned,
+    /// The host: the rows are up whenever there are any, on summon before any focus or typing.
+    /// Escape on an empty field goes on to the window with the rows still up.
+    Shown,
+}
+
+/// What the arrow keys do at the first and last row.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub enum Ends {
+    /// Down from the last row lands on the first, Up from the first on the last.
+    #[default]
+    Wrap,
+    /// The highlight stays on the last row (or the first).
+    Stop,
+}
+
+/// How a search field's panel and keys behave, gathered for the pure key step.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+pub(crate) struct Manner {
+    pub(crate) escape: EscapeOrder,
+    pub(crate) panel: Panel,
+    pub(crate) ends: Ends,
+}
+
 /// How the suggestions are presented.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
 pub enum SuggestionsPresent {
