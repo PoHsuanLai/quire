@@ -9,6 +9,7 @@
 //! once that render has ended (`ds_style::busy`), then a frame later.
 
 use crate::focus::select::{Landing, Select};
+use crate::host::caret::FieldSelection;
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::measure::BUSY_ATTEMPTS;
@@ -75,7 +76,15 @@ pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> 
     match landing {
         Landing::Place(caret) => {
             let host = use_document_host();
-            retry_busy(|| host.focus().focus_placing(element, caret)).await
+            let focused = retry_busy(|| host.focus().focus_placing(element, caret)).await;
+            // A field focused before its first layout has no editor yet, so nothing can have been
+            // typed into it: its caret lands as soon as the editor is built.
+            if focused == Focused::Done
+                && host.caret().selection(element) == FieldSelection::Unknown
+            {
+                let _ = retry_busy(|| host.caret().place_caret(element, caret)).await;
+            }
+            focused
         }
         Landing::Leave => focus_element(element).await,
     }
