@@ -14,6 +14,14 @@ fn mail() -> AppId {
     AppId::new("mail").expect("an app name")
 }
 
+/// `rows` as mail's registration: plain actions with their defaults, nothing forgone.
+fn rows(rows: &[(AppAction, DefaultChord)]) -> Registration {
+    rows.iter().cloned().fold(
+        Registration::new(&mail()),
+        |registration, (action, chord)| registration.action(action, chord),
+    )
+}
+
 fn row(id: &str, chord: &str) -> (AppAction, DefaultChord) {
     (
         AppAction::new(id).expect("an action id"),
@@ -72,7 +80,7 @@ fn a_reload_applies_the_sources_change_and_registers_again_over_it() {
     let mut state = windows_state(remap.clone());
     let compose = row("mail.compose", "Primary+Shift+N");
     assert_eq!(
-        state.register(&mail(), std::slice::from_ref(&compose)),
+        state.register(&mail(), &rows(std::slice::from_ref(&compose))),
         Ok(())
     );
     let ctrl_shift_n = press(&[Modifier::Ctrl, Modifier::Shift], 'n');
@@ -98,7 +106,7 @@ fn a_refused_registration_is_not_remembered() {
     remap.set_copy("Ctrl+C");
     let mut state = windows_state(remap);
     let taken = row("mail.copy", "Primary+C");
-    let refused = state.register(&mail(), &[taken]);
+    let refused = state.register(&mail(), &rows(&[taken]));
     assert!(
         matches!(refused, Err(Conflict::Standard { .. })),
         "{refused:?}"
@@ -205,7 +213,7 @@ fn an_app_forgoes_what_it_does_not_offer_and_never_what_every_app_honours() {
     let mut state = ours_state();
     let command_t = press(&[Modifier::Super], 't');
     let tab = row("mail.tab", "Primary+T");
-    let refused = state.register(&mail(), std::slice::from_ref(&tab));
+    let refused = state.register(&mail(), &rows(std::slice::from_ref(&tab)));
     assert!(
         matches!(refused, Err(Conflict::Standard { .. })),
         "{refused:?}"
@@ -237,9 +245,12 @@ fn registering_an_app_again_replaces_its_earlier_registration() {
     let command_shift_n = press(&[Modifier::Super, Modifier::Shift], 'n');
     let old = row("mail.compose", "Primary+Shift+N");
     let new = row("mail.write", "Primary+Shift+N");
-    assert_eq!(state.register(&mail(), &[old]), Ok(()));
+    assert_eq!(state.register(&mail(), &rows(&[old])), Ok(()));
     // The changed defaults give the chord to another action: no clash with the app's own old one.
-    assert_eq!(state.register(&mail(), std::slice::from_ref(&new)), Ok(()));
+    assert_eq!(
+        state.register(&mail(), &rows(std::slice::from_ref(&new))),
+        Ok(())
+    );
     assert_eq!(
         state.keymap.resolve(&command_shift_n, Context::Normal),
         app_action("mail.write")
@@ -251,7 +262,7 @@ fn registering_an_app_again_replaces_its_earlier_registration() {
         app_action("mail.write")
     );
     // A refused replacement leaves the earlier registration standing.
-    let refused = state.register(&mail(), &[row("mail.copy", "Primary+C")]);
+    let refused = state.register(&mail(), &rows(&[row("mail.copy", "Primary+C")]));
     assert!(refused.is_err());
     assert_eq!(
         state.keymap.resolve(&command_shift_n, Context::Normal),
@@ -267,7 +278,7 @@ fn app_overrides_lie_on_the_source_and_survive_a_reload() {
     let source = KeySource::conventions(ours()).with_overrides(overrides);
     let mut state = KeyState::load(source);
     let compose = row("mail.compose", "Primary+Shift+N");
-    assert_eq!(state.register(&mail(), &[compose]), Ok(()));
+    assert_eq!(state.register(&mail(), &rows(&[compose])), Ok(()));
     let rebound = press(&[Modifier::Super, Modifier::Alt], 'n');
     let default = press(&[Modifier::Super, Modifier::Shift], 'n');
     for _ in 0..2 {
