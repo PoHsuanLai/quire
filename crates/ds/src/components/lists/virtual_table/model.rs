@@ -66,7 +66,8 @@ mod tests {
         let page_down = TableKey::Page(Step::Down);
         let page_up = TableKey::Page(Step::Up);
         // (cursor, rows, key, page, wanted)
-        let cases: &[(Option<usize>, usize, TableKey, usize, Option<usize>)] = &[
+        type Case = (Option<usize>, usize, TableKey, usize, Option<usize>);
+        let cases: &[Case] = &[
             (None, 100, down, 10, Some(0)),
             (Some(5), 100, down, 10, Some(6)),
             (Some(99), 100, down, 10, Some(99)),

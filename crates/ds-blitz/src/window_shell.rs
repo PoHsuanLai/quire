@@ -41,7 +41,7 @@ use crate::open_window::WindowHandle;
 use crate::phase::{Early, Layout, Phase};
 use crate::startup_token::LaunchTokens;
 use crate::window_activate::raise;
-use crate::window_build::{Base, Shape, WindowSlot, window_config};
+use crate::window_build::{Base, Shape, WindowParts, WindowSlot, window_config};
 use crate::window_requests::{Request, WindowKey, WindowLife};
 use crate::window_screen::screen_area;
 use crate::window_scroll::{Frames, Intercept, WindowScroll};
@@ -359,10 +359,12 @@ impl Windows {
             root,
             shape,
             &self.base,
-            &slot,
-            &scroll,
-            handle,
-            &close,
+            WindowParts {
+                slot: &slot,
+                scroll: &scroll,
+                handle,
+                close: &close,
+            },
             renderer.clone(),
         );
         let mut sub = Sub::new(

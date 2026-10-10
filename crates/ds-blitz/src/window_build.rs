@@ -78,20 +78,34 @@ impl WindowSlot {
     }
 }
 
-/// The window config for `root` shaped `shape`, drawn by `renderer`, reporting its window
-/// through `slot` and naming itself to its components as `handle`, and asking `close` what to do
-/// with a request to close it. The window's components are
-/// served by `phase`, which the event loop runs after each frame.
+/// What a window's components reach it through: the slot that reports its window, its scroll
+/// phase, the handle that names it, and the guard asked what to do with a request to close it.
+pub(crate) struct WindowParts<'a> {
+    /// Reports the window once it is created.
+    pub(crate) slot: &'a WindowSlot,
+    /// The window's scrolling, served by the event loop after each frame.
+    pub(crate) scroll: &'a WindowScroll,
+    /// The window as its components name it.
+    pub(crate) handle: WindowHandle,
+    /// Asked first when the frame's close button or the compositor asks to close the window.
+    pub(crate) close: &'a CloseGuard,
+}
+
+/// The window config for `root` shaped `shape`, drawn by `renderer`, its components reaching the
+/// window through `parts`.
 pub(crate) fn window_config(
     root: Root,
     shape: Shape,
     base: &Base,
-    slot: &WindowSlot,
-    scroll: &WindowScroll,
-    handle: WindowHandle,
-    close: &CloseGuard,
+    parts: WindowParts<'_>,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
+    let WindowParts {
+        slot,
+        scroll,
+        handle,
+        close,
+    } = parts;
     let attributes = shape.size.apply(
         WindowAttributes::default()
             .with_title(shape.title)
