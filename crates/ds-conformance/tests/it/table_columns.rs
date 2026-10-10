@@ -110,6 +110,9 @@ fn Ruled() -> Element {
 #[test]
 fn hairline_rules_mark_the_table_and_the_default_does_not() {
     let ruled = Harness::new(Ruled, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-    assert!(ruled.html().contains("data-rules=\"hairline\""));
-    assert!(!harness().html().contains("data-rules"));
+    assert_eq!(
+        ruled.attr(".ds-table", "data-rules").as_deref(),
+        Some("hairline")
+    );
+    assert_eq!(harness().attr(".ds-table", "data-rules"), None);
 }

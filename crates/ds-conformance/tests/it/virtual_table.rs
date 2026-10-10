@@ -184,12 +184,21 @@ fn Bare() -> Element {
 
 #[test]
 fn hairline_rules_are_marked_and_none_leaves_the_table_unmarked() {
-    let ruled = harness().html();
-    assert!(ruled.contains("data-rules=\"hairline\""), "{ruled}");
-    let bare = Harness::new(Bare, HarnessConfig::new(VIEW).with_clock(Clock::Virtual)).html();
-    assert!(!bare.contains("data-rules"), "no rules attribute");
-    assert!(
-        !bare.contains("data-scrolled"),
+    // Read off the table itself: the page's stylesheet names both attributes too.
+    let ruled = harness();
+    assert_eq!(
+        ruled.attr(".ds-vtable", "data-rules").as_deref(),
+        Some("hairline")
+    );
+    let bare = Harness::new(Bare, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    assert_eq!(
+        bare.attr(".ds-vtable", "data-rules"),
+        None,
+        "no rules attribute"
+    );
+    assert_eq!(
+        bare.attr(".ds-vtable", "data-scrolled"),
+        None,
         "HeaderRule::Never marks nothing"
     );
 }
