@@ -18,6 +18,9 @@ pub struct KeyCap {
 
 /// `shortcut` as `keymap`'s platform shows it.
 pub fn shortcut_text(keymap: &Keymap, shortcut: &Shortcut) -> String {
+    if !is_chord(shortcut) {
+        return shortcut.glyphs();
+    }
     let platform = keymap.platform();
     let own = shortcut
         .default_chord()
@@ -35,6 +38,16 @@ pub fn shortcut_text(keymap: &Keymap, shortcut: &Shortcut) -> String {
 
 /// The caps `shortcut` is drawn on: the modifiers, then the key.
 pub fn shortcut_caps(keymap: &Keymap, shortcut: &Shortcut) -> Vec<KeyCap> {
+    if !is_chord(shortcut) {
+        return shortcut
+            .keys()
+            .into_iter()
+            .map(|key| KeyCap {
+                text: key.glyph(),
+                kind: key.glyph_kind(),
+            })
+            .collect();
+    }
     split_caps(&shortcut_text(keymap, shortcut))
         .into_iter()
         .map(|text| KeyCap {
@@ -42,6 +55,14 @@ pub fn shortcut_caps(keymap: &Keymap, shortcut: &Shortcut) -> Vec<KeyCap> {
             text,
         })
         .collect()
+}
+
+/// Whether `shortcut` is a chord: modifiers and exactly one key. A lone modifier, a key sequence
+/// or no key at all has no chord to ask the platform about, so it is drawn as written.
+fn is_chord(shortcut: &Shortcut) -> bool {
+    let keys = shortcut.keys();
+    let plain = keys.iter().filter(|key| key.is_plain()).count();
+    plain == 1
 }
 
 /// The standard action whose design chord (the Mac's, on our desktop) this shortcut is.
@@ -160,6 +181,26 @@ mod tests {
         ];
         for (text, want) in cases {
             assert_eq!(split_caps(text), want, "{text:?}");
+        }
+    }
+
+    #[test]
+    fn what_is_no_chord_is_drawn_as_written_on_every_platform() {
+        let sequence = Shortcut(vec![
+            ShortcutKey::Super,
+            ShortcutKey::Backspace,
+            ShortcutKey::Enter,
+        ]);
+        let lone = Shortcut(vec![ShortcutKey::Super]);
+        for platform in [ours(), Platform::Windows] {
+            let keymap = keymap(platform);
+            assert_eq!(shortcut_text(&keymap, &sequence), "⌘⌫↵");
+            assert_eq!(shortcut_text(&keymap, &lone), "⌘");
+            let caps: Vec<String> = shortcut_caps(&keymap, &sequence)
+                .into_iter()
+                .map(|cap| cap.text)
+                .collect();
+            assert_eq!(caps, ["⌘", "⌫", "↵"]);
         }
     }
 

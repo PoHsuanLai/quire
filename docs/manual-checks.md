@@ -4,6 +4,19 @@ Things only a person at the machine can verify. While the user is away they are 
 work; each is ticked off with the date and what was seen. sill keeps its own queue at
 sill's `docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 
+## Keys as actions (queued 2026-10-10)
+
+- [ ] **Clipboard and Space chords per session**: in a quire app's edit surface and secure field,
+  copy, cut and paste with the platform's own chord (Ctrl on KDE and GNOME, Command arriving as
+  Super on our desktop) and confirm Ctrl+C does nothing on our desktop; on KDE change Copy in
+  System Settings (kdeglobals `[Shortcuts]` `Copy=`) and confirm a restart picks it up. The
+  harness checks the mapping, not a real session.
+- [ ] **Wheel zoom**: hold the platform's primary modifier (Command on our desktop, Ctrl on KDE)
+  over a zoomable view and scroll; a plain wheel scrolls.
+- [ ] **A keycap source**: when the desktop's launcher passes keycap's `KeymapSource`, change a
+  standard chord in keycap and watch an open app's menu text follow without a restart (the
+  reload runs inside `Ds`'s render and has not been run live).
+
 ## Waiting on you (picks and checks, queued 2026-09-26)
 
 - [ ] **mailo fcitx5 check**: mailo's native-only flip is committed on a branch and waits on it.

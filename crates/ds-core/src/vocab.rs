@@ -340,6 +340,11 @@ impl ShortcutKey {
         }
     }
 
+    /// Whether this is a key and no modifier.
+    pub(crate) fn is_plain(self) -> bool {
+        self.modifier_rank().is_none()
+    }
+
     /// The text one key cap shows. Only `⌃ ⇧ ⌥ ⌘`, upper-case characters and `↵` are the
     /// doc's; the rest are not specified in design/04-COMPONENTS.md (O-2 names only the
     /// modifiers). TODO(O-2): Space, Escape, Tab, Backspace, the arrows and Home, End, Delete, PageUp,
