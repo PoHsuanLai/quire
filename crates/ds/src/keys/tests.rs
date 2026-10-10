@@ -92,7 +92,10 @@ fn a_reload_applies_the_sources_change_and_registers_again_over_it() {
 
 #[test]
 fn a_refused_registration_is_not_remembered() {
-    let mut state = windows_state(Remap::default());
+    // A Remap with no chords unbinds Copy; keep it on Ctrl+C so the app's chord clashes.
+    let remap = Remap::default();
+    remap.set_copy("Ctrl+C");
+    let mut state = windows_state(remap);
     let taken = row("mail.copy", "Primary+C");
     let refused = state.register(&mail(), &[taken]);
     assert!(
