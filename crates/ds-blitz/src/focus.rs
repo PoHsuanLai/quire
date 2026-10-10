@@ -13,8 +13,7 @@
 
 use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
-use blitz_dom::Node;
-use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
+use blitz_dom::{LocalName, Node};
 use dioxus::prelude::*;
 use ds::host::caret::{Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at};
 use ds::host::found::Found;
