@@ -1645,6 +1645,48 @@ Open:
 - The goldens are markup (`crates/ds-shell/tests/snapshots/accounts/*-light.html` and `-dark.html`);
   no pixel snapshot of the Accounts gallery page is kept.
 
+## Keys as actions (chordkit)
+
+- Standing: a key press resolves to an action through one chain. `ds_core::command::key_input` is
+  the only place a dioxus key and its modifiers become a chordkit `KeyInput` (Ctrl, Alt, Shift, Super
+  and Meta are kept apart; chordkit's normaliser folds Meta into Super on every platform; lock and
+  AltGraph flags are not chord modifiers). `Keys::action_of` / `Keys::resolve` read the active keymap,
+  `Context` decides what a text field or a terminal keeps. Nothing else in quire reads
+  `Modifiers::CONTROL`, `SUPER` or `META` to decide a chord.
+- Standing: on our desktop (and macOS) Command arrives as Super and Ctrl+V is not a paste;
+  on KDE, GNOME, Windows and other Linux Ctrl+V is. A document under no `KeySource` takes our
+  desktop's conventions, and so does the harness unless `HarnessConfig::with_platform` says
+  otherwise. Tests that pressed Ctrl for a clipboard chord or a wheel zoom now press the platform's
+  primary (`edit_surface`, `window_scroll_fingers`).
+- Standing: the design glyphs (`ShortcutKey::glyph`: Enter `↵`, Escape `Esc`) draw every shortcut on a
+  Mac-style platform that is what its `Shortcut` says, so the SSR goldens are unchanged; chordkit
+  draws a chord the keymap changed, and every chord on a word-style platform (`Ctrl+Shift+Z`, KDE's
+  `Meta+...` order). chordkit's own Mac glyphs differ for Enter (`↩`) and Escape (`⎋`); align them when
+  design/04 O-2 signs off the glyph set.
+- Standing: `ShortcutKey::Super` in a `Shortcut` is Command, which is `Primary`: on Windows
+  `Shortcut(vec![Super, Char('k')])` is Ctrl+K. A literal Windows-key chord is not expressible as a
+  `Shortcut` (it is a `DefaultChord` with `Super`). A desktop-owned chord (`Shortcut::standard`) is
+  drawn from the live keymap, so a remapped Copy shows its new chord.
+- Standing: `SwitchChord` is `Primary` or `Unbound`; the `Control` variant is gone because Ctrl+1..9 is the
+  desktop's Space switch on our desktop (chordkit reserves it).
+- Standing: `PaneStack` registers `quire.pane-back` (Primary+`[`) on first render; an app that already
+  holds that chord leaves the pane stack's Command+`[` unbound (the conflict is in `Keys::problems`),
+  while Escape and Alt+Left still go back.
+- Open: a chord that holds Shift with a symbol key reaches the resolver as the shifted symbol
+  (`!` for Shift+1); only `RawKey::unshifted` knows the base key. Letters and digits without Shift,
+  the whole conventions table, and Primary+`[` are unaffected.
+- Open: the Blitz fork's text actions (`ACTION_MODS` in the fork's `util.rs`) still accept Ctrl and
+  Super on every platform and ignore Meta; the later fork lane feeds them from the keymap. Until then
+  Ctrl+A/Z/C/V work in a text field on our desktop through Blitz, not through the keymap.
+- Open: the GNOME source reads a saved `dconf dump /` at `$XDG_CONFIG_HOME/chordkit/dconf-dump`; nothing
+  writes that file yet (chordkit FINDINGS "Sources").
+- Open: `Keys` reloads inside `Ds`'s render (the watch callback sets a flag and schedules the render),
+  and registering writes a signal during a render. Neither has been run; check for a dioxus
+  "write during render" warning with a live source.
+- Open: `AppConfig::with_keymap_source` takes `Box<dyn KeymapSource + Send + Sync>`, not the bare
+  `dyn KeymapSource`, because the source is shared with every window and its watch callback comes
+  from another thread. keycap's source must be `Send + Sync`.
+
 ## Window host, icon and re-focus (v0.3.3 queue)
 
 - A field that already has the keyboard is not focused again. Blitz's `set_focus_to` on the focused

@@ -1914,7 +1914,7 @@ let spaces = use_spaces(
     move |arrived| place.set(arrived.restore),           // show the place a switch restores
 );
 rsx! { Ds { appearance, material, look: spaces.look(),
-    onkeydown: move |e| { spaces.on_key(SwitchChord::Command, &e); },
+    onkeydown: move |e| { spaces.on_key(SwitchChord::Primary, &e); },
     Sidebar { SpaceHead { handle: spaces } /* ... */ SpacesFoot { handle: spaces, new_payload } }
     SpaceMenu::<_, _, ()> { handle: spaces, new_payload }
 } }
@@ -1925,6 +1925,130 @@ rsx! { Ds { appearance, material, look: spaces.look(),
 - Today: `use_today(|| storage.boot_today(Epoch::now()), save)` prunes on boot;
   `today.opened(space, item)`, `TodaySection { spaces, today, row, on_pick }`. A deleted Space is
   forgotten with `today.drop_space(id)` in `SpaceMenu`'s `on_deleted`.
-- The chord is the app's: `SwitchChord::Command` (⌘1-9) or `Control` (⌃1-9).
+- The chord is the app's: `SwitchChord::Primary` (Primary+1..9: ⌘1-9 on a Mac and our desktop, Ctrl+1..9
+  elsewhere) or `Unbound`. Ctrl+1..9 on our desktop is the desktop's own Space switch (a standard
+  action chordkit reserves), so there is no `Control` variant.
 - Slide content with `spaces.slide()` (`in-r` or `in-l`). `SpacesSource::Desktop` is an experiment
   that is not built (design/21 section 13.6); pass nothing.
+
+## 15. Keyboard: actions, not modifiers
+
+An app never reads which modifier is held and never decides Command versus Ctrl. quire is the one
+toolkit integration of chordkit (github.com/PoHsuanLai/chordkit, the keymap core): a key event
+becomes a chordkit key press in one place (`ds_core::command::key_input`), resolves to an `Action`
+in the right `Context`, and every shortcut is drawn through chordkit's display. On each OS the
+keymap follows that OS's own shortcut settings when it has any (kdeglobals on KDE, a dconf dump on
+GNOME, our desktop's keycap), and its conventions otherwise (Command on a Mac and our desktop, Ctrl
+on Windows and other Linux). The nouns (`StandardAction`, `AppAction`, `DefaultChord`, `Primary`,
+`Keymap`, `Context`, `Platform`) are chordkit's; quire keeps no copy. Add chordkit to your
+workspace by the same git rev as quire's (`docs/workspace-deps.toml`).
+
+```text
+use chordkit::{Action, AppAction, AppId, Context, DefaultChord, StandardAction};
+use ds::prelude::*;   // Keys, on_action, ActionTaken, use_keys, use_register_actions
+
+fn Editor() -> Element {
+    // 1. Declare the app's own actions once, with a portable default chord. `Primary` is Command or
+    //    Ctrl, whichever the platform means; never write "Cmd" or "Ctrl" in a default.
+    let mail = AppId::new("mail").unwrap();
+    let compose = AppAction::new("mail.compose").unwrap();
+    let rows = [(compose.clone(), "Primary+Shift+N".parse::<DefaultChord>().unwrap())];
+    let registered = use_register_actions(&mail, &rows);   // Err(Conflict) says why, in words
+
+    // 2. Handle actions. Standard ones (Save, Copy, Find) are handled, never registered.
+    let keys = use_keys();
+    rsx! { div {
+        onkeydown: on_action(keys, Context::Normal, move |action| match action {
+            Action::Standard(StandardAction::Save) => { save(); ActionTaken::Yes }
+            Action::App(a) if a == compose => { compose_mail(); ActionTaken::Yes }
+            _ => ActionTaken::No,   // the key goes on to the focused widget
+        }),
+        /* ... */
+    } }
+}
+```
+
+- **Context.** `Context::Normal` for window content, `Context::TextEntry` in a text field (typing
+  keys belong to the field), `Context::Terminal` in a terminal (plain Ctrl belongs to the program,
+  and Primary is Ctrl+Shift where it is Ctrl elsewhere). `Keys::action_of(&event, context)` is
+  `on_action` without the consuming; `Keys::resolve(&key, modifiers, context)` takes a key and
+  modifiers from any source.
+- **Registering.** `Keys::register_actions(app, rows)` is all or nothing and idempotent. The keymap
+  makes every registration again after a reload, so register once, at first render. A person's own
+  change to an action (`mail.compose = Primary+Alt+N` in their overrides) wins over the default.
+  Two apps never share an action id, and an app never registers a standard action's chord.
+- **Drawing.** `KeyEquivalent`, a menu item's key, `CommandPill`, a `Tooltip` and a `TitleTip` draw a
+  `Shortcut` through `Keys::text_of`: `⇧⌘Z` on a Mac-style platform, `Ctrl+Shift+Z` (that platform's
+  order and words) elsewhere. A `Shortcut` is written in Mac terms; Command in it is Primary, and a
+  shortcut that is a standard action's shows the chord the keymap really binds it to (Windows Redo is
+  Ctrl+Y). `Shortcut::standard(action)` is the action's chord on our desktop; `Shortcut::custom(keys)`
+  is refused with chordkit's `Conflict` when a standard action has the chord or the desktop keeps it.
+- **What quire resolves itself.** Clipboard chords on `EditSurface` and the secure field, the
+  desktop's Space switch (`space_switch::space_pressed(&keymap, ..)` reads the platform's
+  Switch-to-Space action), an app's own Spaces (`SwitchChord::Primary`), the pane stack's back chord
+  (the action `quire.pane-back`, Primary+`[`, registered by `PaneStack`), raw-key typed text, a
+  list's, menu's and pop-up's type-ahead, and the window's wheel zoom (Primary+wheel). None reads a
+  modifier.
+- **Where the keymap comes from.** `Ds` loads it from the `KeySource` in the root context. A launch
+  provides one: `AppConfig::with_keymap_source(Box<dyn KeymapSource + Send + Sync>)` (the platform
+  is detected, `CHORDKIT_PLATFORM` overrides) or `with_keymap(platform, source)`. Without either,
+  `launch` uses `chordkit::detect_process` and chordkit's own source for that platform (the KDE
+  file, a GNOME dump saved at `$XDG_CONFIG_HOME/chordkit/dconf-dump`, else the conventions).
+  quire does not depend on keycap: our desktop's launcher plugs its source in,
+
+  ```text
+  let config = AppConfig::new("Mail", size).with_keymap_source(Box::new(keycap_client::Source::connect()));
+  ```
+
+  and keycap implements `chordkit::KeymapSource` (`load`, and `watch` for a live reload; the
+  callback may run on any thread and `Ds` re-renders itself to pick it up).
+- **Tests.** `HarnessConfig::with_platform(Platform)` fixes the keymap to a platform's conventions
+  and reads no real system; the default is our desktop's (Command arrives as Super).
+  `Input::paste` presses the platform's paste chord (`PasteChord::Primary`); name another with
+  `Input::paste_with`. `with_keymap_source(KeySource)` plugs a fake source, which is how a reload is
+  driven.
+- **Deprecated.** `is_command` and `command_keys` stay, `#[deprecated]`, over chordkit's normaliser.
+  They treat Ctrl and Command alike on every platform, which is the thing this section ends.
+- **Limits.** The key is as the window reports it, so a chord that holds Shift with a symbol key
+  (`Primary+Shift+1`) needs the host's unshifted key (`RawKey::unshifted`); letters and digits are
+  fine. `Shortcut` text for a menu shows the shortcut as declared unless it is a standard
+  action's, whose live chord is drawn. The Blitz fork's text-editing hook (word moves, line deletes,
+  `blitz-dom` `ACTION_MODS`) still accepts Ctrl and Super itself; quire will feed it the keymap's
+  text actions in the fork lane.
+
+### Migrating a consumer
+
+<!-- paths: skip -->
+Line numbers are `~/rs-wt/keymap/SURVEY.md` at the 2026-10-10 tips.
+
+- **mailo.** Replace `mail-app/src/ui/chord.rs:44-77` (`command()`, exactly one of Ctrl/Meta) and
+  `view.rs:1244` `command_shortcut` with `AppAction`s and `DefaultChord`s (`Primary+Shift+N`) registered
+  through `use_register_actions`, handled in `on_action`. `keymap.rs:26-40` single-key `DEFAULTS` and
+  the user's `keyboard.json` stay the app's (single keys are `DefaultChord`s with no Primary); read the
+  file into chordkit `Overrides` if a person's change should win everywhere. `window/root.rs:117-124`
+  tests `.ctrl()` only, which is the Cmd+P bug in thread windows: resolve `StandardAction::Print`
+  instead. The composer's `is_command` calls resolve `Context::TextEntry`. `SwitchChord::Command`
+  becomes `Primary`.
+- **anyview.** `views/keys.rs` (the normaliser) goes: `on_action` replaces it. `keys/route.rs:67-76`
+  (Cmd+K/I/W/O) become `AppAction`s, or `StandardAction::Close`/`Open` where they are those.
+  `command.rs:94-129` (zoom, find, page edit) map to `StandardAction::{Bigger, Smaller, Find, ...}`;
+  `action/spec.rs` `Binding::Own` rows are `AppAction`s. Cmd+1/9 as zoom conflicts with the app's
+  Primary+1..9 Space chord: chordkit's registration refuses it, so pick one (the zoom is `Bigger` and
+  `Smaller`; set the Space chord `Unbound` if the app has no Spaces).
+- **sill.** `sill-launcher/src/chord.rs:55-95` (`reveal`, `copy`, `search_web`, `quick_look`, `forget`)
+  and `launcher/chord_keys.rs:41-61` are `StandardAction::{Reveal, Copy, QuickLook}` plus `AppAction`s;
+  `sill-dock/src/dock/pointer.rs:98` (own `SUPER|CONTROL|META`) uses `ds::base::command::holds_primary`
+  or the action. The switcher's `command_keys` (Alt/Meta release) is a modifier *release*, which is
+  not a chord: keep it, on `ds::base::command::modifiers_of`. `dist/keycap/keycap.toml` remap rules
+  and `dist/cosmic` bindings stay keycap's. The desktop launcher passes keycap's `KeymapSource` to
+  `AppConfig::with_keymap_source`.
+- **temor.** `temor-pane/src/keys/{keymap,chord}.rs` (own `Keymap`/`Chord`/`Mods`) and
+  `input/route.rs` `is_command_form` go: resolve with `Context::Terminal`, where Primary is Super on
+  our desktop and Ctrl+Shift elsewhere and plain Ctrl never matches, so everything unresolved goes to
+  the pty. A terminal keeps `SwitchChord::Unbound`.
+- **detent.** No key handling today. Settings › Keyboard needs a shortcut-capture control: it will
+  show `Keys::with_keymap(|k| k.bindings(Context::Normal))` and read a new chord with
+  `ds_core::command::key_input`; `KeyKind::Shortcut` stays file-only until that lands.
+- **casement** (compositor) reads shell bindings from the same keymap with `Keymap::resolve` and
+  `ds_core::command::{key_input, resolve}`, which need no dioxus.
+<!-- paths: end -->
