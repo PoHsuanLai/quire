@@ -28,6 +28,17 @@ pub trait FocusHost {
     fn blur(&self, el: &MountedData) -> Focused;
     /// Select all of `el`'s text, once the caret is in it.
     fn select(&self, el: &MountedData) -> Focused;
+    /// Give `el` the keyboard and put its caret at `at` in the same write, so a key typed the
+    /// moment the focus lands never meets a caret placed afterwards from a stale view of the
+    /// text. A host that cannot place a caret from here selects all for
+    /// [`InitialCaret::SelectAll`] and only focuses for the rest; a field that already has the
+    /// keyboard keeps its caret.
+    fn focus_placing(&self, el: &MountedData, at: InitialCaret) -> Focused {
+        match (self.focus(el), at) {
+            (Focused::Done, InitialCaret::SelectAll) => self.select(el),
+            (focused, _) => focused,
+        }
+    }
     /// Where the keyboard goes when a surface that took it is removed.
     fn hand_back(&self) -> &HandBack;
 }

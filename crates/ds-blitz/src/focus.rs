@@ -62,6 +62,44 @@ pub(crate) fn focus(element: &MountedData) -> Focused {
     }
 }
 
+/// Give `element` the keyboard and put its caret at `caret` in one write to the document, so the
+/// field cannot be typed into between the two (a deferred select-all selected the empty length it
+/// had seen and put the caret at 0, and "invoice" became "nvoicei"). A field that has the
+/// keyboard already is left alone, caret included. A field not laid out yet is `Busy` before
+/// anything is written, so the retry repeats the whole write; an element that is no text field
+/// is only focused.
+pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focused {
+    let Some(node) = NodeRef::of(element) else {
+        return Focused::Unknown;
+    };
+    let probed = node.read(|doc| {
+        doc.get_node(node.node).map(|found| {
+            let held = if doc.get_focussed_node_id() == Some(node.node) {
+                Held::Already
+            } else {
+                Held::Not
+            };
+            (held, field_of(found))
+        })
+    });
+    match probed {
+        None => Focused::Busy,
+        Some(None) => Focused::Unknown,
+        Some(Some((Held::Already, _))) => Focused::Done,
+        Some(Some((Held::Not, Field::Editable))) => done(node.write(|doc| {
+            doc.set_focus_to(node.node);
+            doc.with_text_input(node.node, |mut driver| match caret {
+                InitialCaret::SelectAll => driver.select_all(),
+                InitialCaret::End => driver.move_to_text_end(),
+                InitialCaret::Start => driver.move_to_text_start(),
+            });
+            doc.shell_provider.request_redraw();
+        })),
+        Some(Some((Held::Not, Field::NotLaidOut))) => Focused::Busy,
+        Some(Some((Held::Not, Field::Absent))) => focus(element),
+    }
+}
+
 /// Whether a node has the keyboard already.
 enum Held {
     /// The node is not in the document.

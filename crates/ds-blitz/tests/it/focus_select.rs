@@ -6,7 +6,9 @@ use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{
+    Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Stepped, Viewport,
+};
 use std::rc::Rc;
 use std::time::Duration;
 
@@ -75,6 +77,24 @@ fn a_controlled_focus_with_select_all_selects_the_whole_value() {
         harness.text_of(".name").as_deref(),
         Some("X"),
         "typing replaced it"
+    );
+}
+
+#[test]
+fn the_value_is_selected_in_the_frame_the_focus_lands() {
+    let mut harness = Harness::new(Rename, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let mut frames = 0;
+    while harness.focus_of("#name input") != FocusState::Focused {
+        if harness.step_frame() == Stepped::Idle {
+            harness.advance(ms(1));
+        }
+        frames += 1;
+        assert!(frames < 60, "never focused");
+    }
+    assert_eq!(
+        harness.selected_text("#name input").as_deref(),
+        Some("Archive"),
+        "the caret was placed in a later write than the focus"
     );
 }
 

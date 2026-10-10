@@ -12,7 +12,7 @@ use crate::drop_hit::drop_hit;
 use crate::edit::set_ime_cursor_area;
 use crate::edit::{capture, caret_rect, forget, hit_test, listen, selection_rects, set_ime};
 use crate::edit_ime::EditListeners;
-use crate::focus::{blur, caret, focus, place_caret, select_all, selection};
+use crate::focus::{blur, caret, focus, focus_placing, place_caret, select_all, selection};
 use crate::focus_keep::{FocusKeeper, hand_back_seam};
 use crate::measure::measure;
 use crate::node_ref::same;
@@ -209,6 +209,10 @@ impl FocusHost for BlitzFocus {
 
     fn select(&self, el: &MountedData) -> Focused {
         select_all(el)
+    }
+
+    fn focus_placing(&self, el: &MountedData, at: InitialCaret) -> Focused {
+        focus_placing(el, at)
     }
 
     fn hand_back(&self) -> &HandBack {

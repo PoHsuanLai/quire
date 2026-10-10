@@ -9,7 +9,6 @@
 //! once that render has ended (`ds_style::busy`), then a frame later.
 
 use crate::focus::select::{Landing, Select};
-use crate::host::caret::InitialCaret;
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::measure::BUSY_ATTEMPTS;
@@ -68,27 +67,17 @@ pub fn focus_landing_told(element: Rc<MountedData>, landing: Landing, told: Even
     });
 }
 
-/// Move the focus to `element`, then do `landing` with its text; the focus's outcome.
+/// Move the focus to `element` and do `landing` with its text, in one host write: the caret
+/// lands with the focus, so nothing typed between the two can be selected away or overwritten.
+/// A busy document or a field not laid out yet retries the whole write; the outcome is the
+/// focus's.
 pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> Focused {
-    let focused = focus_element(element).await;
-    if focused == Focused::Done
-        && let Landing::Place(caret) = landing
-    {
-        let _ = place_caret(element, caret).await;
-    }
-    focused
-}
-
-/// Put the caret of the focused field `element` at `caret`, through the host: a whole-value
-/// selection through [`FocusHost::select`](crate::host::parts::FocusHost::select), an end through
-/// [`CaretHost::place_caret`](crate::host::parts::CaretHost::place_caret).
-async fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused {
-    let host = use_document_host();
-    match caret {
-        InitialCaret::SelectAll => retry_busy(|| host.focus().select(element)).await,
-        InitialCaret::End | InitialCaret::Start => {
-            retry_busy(|| host.caret().place_caret(element, caret)).await
+    match landing {
+        Landing::Place(caret) => {
+            let host = use_document_host();
+            retry_busy(|| host.focus().focus_placing(element, caret)).await
         }
+        Landing::Leave => focus_element(element).await,
     }
 }
 
