@@ -5,3 +5,10 @@
 .ds-column[*|data-align=start]{ align-items:flex-start; }
 .ds-column[*|data-align=center]{ align-items:center; }
 .ds-column[*|data-align=end]{ align-items:flex-end; }
+.ds-column[*|data-gap=none]{ gap:0; }
+.ds-column[*|data-extent=fill]{ width:100%; height:100%; box-sizing:border-box; }
+.ds-column[*|data-extent=fixed]{ --column-extent:var(--ctl-h-m); height:var(--column-extent); flex:none; }
+.ds-column[*|data-extent=fixed][*|data-size=mini]{ --column-extent:var(--ctl-h-xs); }
+.ds-column[*|data-extent=fixed][*|data-size=small]{ --column-extent:var(--ctl-h-s); }
+.ds-column[*|data-extent=fixed][*|data-size=large]{ --column-extent:var(--ctl-h-l); }
+.ds-column[*|data-extent=fixed][*|data-size=extra-large]{ --column-extent:var(--ctl-h-xl); }

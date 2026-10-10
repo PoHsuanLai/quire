@@ -2,6 +2,7 @@
 //! component that builds a window's content and its forms, every state it can express, live.
 
 mod capsule;
+mod column;
 mod drag_ghost;
 mod field_row;
 mod menu_bar;
@@ -24,6 +25,7 @@ pub fn StructurePage() -> Element {
         stepper::StepperSection {}
         table::TableSection {}
         toolbar::ToolbarSection {}
+        column::ColumnSection {}
         split_view::SplitViewSection {}
         split_view::SplitViewPeekSection {}
         sidebar::SidebarListSection {}

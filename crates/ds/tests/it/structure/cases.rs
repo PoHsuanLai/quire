@@ -222,6 +222,16 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Column { gap: SpacingToken::S20, align: ColumnAlign::Center, p { "First" } p { "Second" } } },
     },
     Case {
+        component: "column",
+        state: "gapless-fill",
+        make: || rsx! { Column { gap: ColumnGap::None, extent: ColumnExtent::Fill, p { "First" } p { "Second" } } },
+    },
+    Case {
+        component: "column",
+        state: "fixed",
+        make: || rsx! { Column { extent: ColumnExtent::Fixed(ControlSize::Large), p { "First" } } },
+    },
+    Case {
         component: "split_view",
         state: "open",
         make: || rsx! { SplitView { label: "Example", panes: pane(Shown::Visible), p { "Content" } } },

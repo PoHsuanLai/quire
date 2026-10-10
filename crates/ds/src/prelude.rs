@@ -67,7 +67,7 @@ pub use ds_motion::detail::operation::PendingToken;
 pub use crate::components::menus::menu::cursor::MenuCursor;
 
 // Fields
-pub use crate::components::chrome::column::model::ColumnAlign;
+pub use crate::components::chrome::column::model::{ColumnAlign, ColumnExtent, ColumnGap};
 pub use crate::components::chrome::column::view::Column;
 pub use crate::components::editor::raw_keys::RawKeySurface;
 pub use crate::components::editor::surface::EditSurface;

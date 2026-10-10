@@ -13,6 +13,7 @@ mod button_propagation;
 mod capsule;
 mod cc_pane_switcher;
 mod collapse;
+mod column_layout;
 mod component_faces;
 mod component_geometry;
 mod controlled_inputs;
