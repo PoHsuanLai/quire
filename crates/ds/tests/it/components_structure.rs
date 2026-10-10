@@ -43,6 +43,21 @@ fn name(case: &Case) -> String {
 /// The classes each component's own sheet styles, by the prefix its markup carries.
 const OWN_SHEETS: &[(&str, &str, &str)] = &[
     (
+        "banner_action_row",
+        "ds-banner-action-row",
+        include_str!("../../src/components/overlays/banner_action_row.css"),
+    ),
+    (
+        "icon_button_group",
+        "ds-icon-button-group",
+        include_str!("../../src/components/controls/icon_button_group.css"),
+    ),
+    (
+        "pinned_bar",
+        "ds-pinned",
+        include_str!("../../src/components/overlays/pinned_bar.css"),
+    ),
+    (
         "capsule",
         "ds-capsule",
         include_str!("../../src/components/chrome/capsule/capsule.css"),

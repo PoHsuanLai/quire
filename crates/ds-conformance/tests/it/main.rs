@@ -63,6 +63,7 @@ mod palette_surface_layout;
 mod palette_trailing_action;
 mod pane_stack;
 mod pick_list;
+mod pinned_bar_layout;
 mod plate_tint;
 mod pop_up_menu_focus;
 mod pop_up_start;

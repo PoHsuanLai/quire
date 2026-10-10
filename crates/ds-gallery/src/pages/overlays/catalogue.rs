@@ -156,6 +156,7 @@ pub fn OverlaysCataloguePage() -> Element {
         }
         SkeletonCase {}
         BannerShownCase {}
+        crate::pages::overlays::banner_pinned::BannerAndPinned {}
         LoadableCase {}
     }
 }

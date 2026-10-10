@@ -1,0 +1,9 @@
+/* IconButtonGroup: small icon buttons on one rounded plate. The plate's radius follows the control
+   size's ladder (`--ctl-r-*`); the quiet fill is the banner's. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-icon-button-group{ --group-r:var(--ctl-r-s); display:inline-flex; align-items:center; gap:var(--s-1); padding:var(--s-2); box-sizing:border-box; border-radius:var(--group-r); background:var(--fill-quaternary); }
+.ds-icon-button-group[*|data-size=mini]{ --group-r:var(--ctl-r-xs); }
+.ds-icon-button-group[*|data-size=regular]{ --group-r:var(--ctl-r-m); }
+.ds-icon-button-group[*|data-size=large]{ --group-r:var(--ctl-r-l); }
+.ds-icon-button-group[*|data-size=extra-large]{ --group-r:var(--ctl-r-xl); }

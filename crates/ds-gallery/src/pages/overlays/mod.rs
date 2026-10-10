@@ -1,4 +1,5 @@
 pub mod alert;
+pub mod banner_pinned;
 pub mod catalogue;
 pub mod hover_card_hooks;
 pub mod launcher;

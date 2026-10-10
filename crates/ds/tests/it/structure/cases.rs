@@ -16,6 +16,7 @@ use ds::components::chrome::toolbar::model::{ToolbarItem, ToolbarRoom};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::chrome::window_frame::WindowTitlebar;
 use ds::components::content::text_runs::RunTone;
+use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::checkbox::Checkbox;
 use ds::components::controls::scrubber_model::BufferedRange;
 use ds::components::fields::fact_list::{Fact, FactList};
@@ -230,6 +231,26 @@ pub const CASES: &[Case] = &[
         component: "column",
         state: "fixed",
         make: || rsx! { Column { extent: ColumnExtent::Fixed(ControlSize::Large), p { "First" } } },
+    },
+    Case {
+        component: "icon_button_group",
+        state: "small",
+        make: || rsx! { IconButtonGroup { label: "Formatting", Button { bezel: Bezel::Toolbar, size: ControlSize::Small, image: ImagePosition::Only, icon: Icon::Bold, label: "Bold", onclick: |_| {} } Button { bezel: Bezel::Toolbar, size: ControlSize::Small, image: ImagePosition::Only, icon: Icon::Italic, label: "Italic", onclick: |_| {} } } },
+    },
+    Case {
+        component: "banner_action_row",
+        state: "field-and-buttons",
+        make: || rsx! { BannerActionRow { label: "Name", field: rsx! { p { "Field" } }, p { "Save" } p { "Cancel" } } },
+    },
+    Case {
+        component: "pinned_bar",
+        state: "top",
+        make: || rsx! { PinnedBar { label: "Suggestion", bar: rsx! { p { "Offer" } }, p { "Content" } } },
+    },
+    Case {
+        component: "pinned_bar",
+        state: "bottom",
+        make: || rsx! { PinnedBar { label: "Suggestion", edge: PinEdge::Bottom, bar: rsx! { p { "Offer" } }, p { "Content" } } },
     },
     Case {
         component: "split_view",

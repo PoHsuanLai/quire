@@ -1,0 +1,7 @@
+/* BannerActionRow (a banner's text field and its buttons in one line). The field takes the width
+   left and may shrink to nothing; the buttons keep their size, and the row wraps them under the
+   field when the pane is too narrow for both. */
+
+.ds-banner-action-row{ display:flex; align-items:center; flex-wrap:wrap; gap:var(--s-6) var(--s-8); box-sizing:border-box; width:100%; min-width:0; }
+.ds-banner-action-row-field{ display:flex; flex:1 1 12em; min-width:0; }
+.ds-banner-action-row-buttons{ display:flex; flex:none; align-items:center; gap:var(--s-6); }

@@ -99,12 +99,15 @@ pub use crate::keys::{
 
 // Overlays
 pub use crate::components::content::tip_text::TipText;
+pub use crate::components::controls::icon_button_group::IconButtonGroup;
 pub use crate::components::overlays::alert::Alert;
+pub use crate::components::overlays::banner_action_row::BannerActionRow;
 pub use crate::components::overlays::drag_ghost::DragGhost;
 pub use crate::components::overlays::hover_card::HoverCard;
 pub use crate::components::overlays::inline_banner::InlineBanner;
 pub use crate::components::overlays::loadable::Loadable;
 pub use crate::components::overlays::loadable::Phase;
+pub use crate::components::overlays::pinned_bar::{PinEdge, PinnedBar};
 pub use crate::components::overlays::popover::Popover;
 pub use crate::components::overlays::sheet::Sheet;
 pub use crate::components::overlays::skeleton::Skeleton;

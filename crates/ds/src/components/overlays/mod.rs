@@ -3,6 +3,7 @@
 
 pub(crate) mod alert;
 pub mod alert_model;
+pub mod banner_action_row;
 pub(crate) mod catcher;
 pub mod drag_ghost;
 pub mod empty_state;
@@ -10,6 +11,7 @@ pub(crate) mod flow;
 pub mod hover_card;
 pub mod inline_banner;
 pub mod loadable;
+pub mod pinned_bar;
 pub mod popover;
 pub(crate) mod scrim;
 pub mod sheet;

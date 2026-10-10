@@ -11,6 +11,7 @@ pub mod choice;
 pub mod disclosure;
 pub(crate) mod edge_grab;
 pub(crate) mod glyph;
+pub mod icon_button_group;
 pub mod key_equivalent;
 pub(crate) mod level_draw;
 pub mod level_indicator;

@@ -57,6 +57,7 @@ pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
         crate::pages::controls::label_runs_and_marks::LabelRunsAndMarks {}
+        crate::pages::controls::icon_groups::IconGroups {}
         crate::pages::controls::pass_through::MoreGlyphs {}
         crate::pages::controls::pass_through::PassThrough {}
         ExternalIcons {}

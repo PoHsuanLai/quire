@@ -1,0 +1,11 @@
+/* PinnedBar: a bar laid over the top or bottom edge of a scroll container. Blitz has no
+   `position: sticky`, so the container is positioned and the bar is absolute within it, outside
+   the scroller. The bar is a raised card inset from the edge. Attribute selectors carry `*|`
+   (spike S2). */
+
+.ds-pinned{ position:relative; display:flex; flex-direction:column; min-width:0; min-height:0; }
+.ds-pinned-bar{
+  position:absolute; top:var(--s-8); left:var(--s-8); right:var(--s-8); z-index:var(--z-raise); box-sizing:border-box;
+  padding:var(--s-6) var(--s-10); border-radius:var(--r-menu); background:var(--raise); box-shadow:var(--shadow-pop); color:var(--ink);
+}
+.ds-pinned[*|data-edge=bottom] .ds-pinned-bar{ top:auto; bottom:var(--s-8); }
