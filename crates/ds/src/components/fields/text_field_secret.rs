@@ -4,13 +4,23 @@ use crate::edit::keys::{KeyAction, classify};
 use chordkit::Keymap;
 use dioxus::prelude::{Key, Modifiers};
 
-/// Whether `key` with `modifiers` copies or cuts text out of a field under `keymap`: the
-/// platform's copy and cut chords, Ctrl+Insert (copy) and Shift+Delete (cut).
+/// Whether `key` with `modifiers` could copy or cut text out of a field: the platform's copy and
+/// cut chords under `keymap`, Ctrl+Insert (copy) and Shift+Delete (cut), and, whatever the
+/// keymap says, C or X under Control, Command or Meta. A secure field refuses every chord any
+/// layer below might still read as copy or cut: Blitz's own text actions take Control and Command
+/// until they resolve through the keymap (FINDINGS "Keys as actions"), and a leak is not undone.
 pub(crate) fn takes_text_out(keymap: &Keymap, key: &Key, modifiers: Modifiers) -> bool {
     matches!(
         classify(keymap, key, modifiers),
         KeyAction::Copy | KeyAction::Cut
-    )
+    ) || any_layers_copy(key, modifiers)
+}
+
+/// C or X held with Control, Command (Super) or Meta: a copy or cut to some layer on some platform.
+fn any_layers_copy(key: &Key, modifiers: Modifiers) -> bool {
+    let commanding = modifiers.intersects(Modifiers::CONTROL | Modifiers::SUPER | Modifiers::META);
+    let letter = matches!(key, Key::Character(text) if text.eq_ignore_ascii_case("c") || text.eq_ignore_ascii_case("x"));
+    commanding && letter
 }
 
 #[cfg(test)]
@@ -52,11 +62,11 @@ mod tests {
                 true,
             ),
             (
-                "ours ctrl c is not copy",
+                "ours ctrl c is refused too (Blitz still copies on it)",
                 ours(),
                 Key::Character("c".into()),
                 ctrl,
-                false,
+                true,
             ),
             ("ctrl insert", kde, Key::Insert, ctrl, true),
             ("shift delete", kde, Key::Delete, Modifiers::SHIFT, true),
