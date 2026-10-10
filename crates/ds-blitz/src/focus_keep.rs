@@ -177,6 +177,7 @@ pub fn keep(keeper: &mut FocusKeeper, doc: &DocRef) -> Kept {
     };
     match doc.write(|write| {
         write.set_focus_to(next);
+        crate::focus::caret_after_text(write, next);
         write.shell_provider.request_redraw();
     }) {
         Written::Done => Kept::Moved,

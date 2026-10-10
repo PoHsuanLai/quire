@@ -13,7 +13,7 @@
 
 use crate::blitz_host::FindDocument;
 use crate::node_ref::{DocRef, FoundNode, NodeRef, Written};
-use blitz_dom::{LocalName, Node};
+use blitz_dom::{BaseDocument, LocalName, Node, NodeId};
 use dioxus::prelude::*;
 use ds::host::caret::{Caret, CaretOwed, Collapsed, FieldSelection, InitialCaret, caret_at};
 use ds::host::found::Found;
@@ -40,9 +40,10 @@ fn lookup(doc: DocRef, selector: &str) -> Found {
     }
 }
 
-/// Give `element` the keyboard, if the document is free and the element is a Blitz node. An
-/// element that already has it is left alone: `set_focus_to` on a focused field puts its caret
-/// back at the start (a field focused again by selector typed "nvoicei" for "Invoice").
+/// Give `element` the keyboard, if the document is free and the element is a Blitz node, a text
+/// field with its caret after its text. An element that already has it is left alone:
+/// `set_focus_to` on a focused field puts its caret back at the start (a field focused again by
+/// selector typed "nvoicei" for "Invoice").
 pub(crate) fn focus(element: &MountedData) -> Focused {
     let Some(node) = NodeRef::of(element) else {
         return Focused::Unknown;
@@ -58,6 +59,7 @@ pub(crate) fn focus(element: &MountedData) -> Focused {
         Some(Held::Already) => Focused::Done,
         Some(Held::Not) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
+            caret_after_text(doc, node.node);
         })),
     }
 }
@@ -229,6 +231,19 @@ pub(crate) fn caret_owed(element: &MountedData) -> CaretOwed {
     })
     .flatten()
     .unwrap_or(CaretOwed::No)
+}
+
+/// Put the caret of `node`, if it is a laid-out text field, after its text. Blitz builds a field's
+/// editor with the caret at the start, so a field mounted anew and given the keyboard from code (a
+/// remounted field the focus is handed back to) would take the next key before its text: the
+/// caret goes after it instead, as on macOS.
+pub(crate) fn caret_after_text(doc: &mut BaseDocument, node: NodeId) {
+    if doc
+        .get_node(node)
+        .is_some_and(|found| matches!(field_of(found), Field::Editable))
+    {
+        doc.with_text_input(node, |mut driver| driver.move_to_text_end());
+    }
 }
 
 fn done(written: Written) -> Focused {
