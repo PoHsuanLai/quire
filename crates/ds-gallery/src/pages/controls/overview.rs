@@ -116,7 +116,7 @@ fn Choosers() -> Element {
             }
             SegmentedControl::<u8> { label: "Mailbox", choices: Choice::pairs(tabs), tracking: Tracking::SelectOne(tab()), onchange: move |next| tab.set(next) }
         }
-        Section { title: "ShortcutField", note: "Live: click it (or Return or Space with the keyboard on it), then type a combination with a modifier or a function key; Escape gives up, Backspace or Delete clears. The single-key fields take a bare key or Shift with a character (Delete is a key there), and the last shows an extra key as a second cap. Another names the action that already uses its shortcut.",
+        Section { title: "ShortcutField", note: "Live: click it (or Return or Space with the keyboard on it), then type a combination with a modifier or a function key; Escape gives up, Backspace or Delete clears. The single-key fields take a bare key or Shift with a character (Delete is a key there), and the last shows an extra key as a second cap. The clashing one names the action that already uses its shortcut.",
             div { class: "g-row",
                 Specimen { name: "live",
                     ShortcutField { label: "Live shortcut", value: shortcut(), onrecord: move |recorded| match recorded {

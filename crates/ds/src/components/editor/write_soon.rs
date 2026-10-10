@@ -19,15 +19,30 @@ pub fn write_soon(
     element: Rc<MountedData>,
     write: impl Fn(&dyn EditHost, &MountedData) -> Probe<()> + 'static,
 ) {
+    write_soon_then(host, element, write, |_| {});
+}
+
+/// [`write_soon`] for a write that answers with a value: `write` returns [`Probe::Found`] of it
+/// and `then` hears it once, as `Some(value)`. `then` hears `None` when the write ended without
+/// one (the host has no edit part, does not own the element, or stayed busy through every try),
+/// so a caller waiting on the answer is never left waiting.
+pub fn write_soon_then<T: 'static>(
+    host: Rc<dyn DocumentHost>,
+    element: Rc<MountedData>,
+    write: impl Fn(&dyn EditHost, &MountedData) -> Probe<T> + 'static,
+    then: impl FnOnce(Option<T>) + 'static,
+) {
     spawn(async move {
         for _ in 0..BUSY_ATTEMPTS {
             let Some(edit) = host.edit() else {
-                return;
+                return then(None);
             };
             match write(edit, &element) {
                 Probe::Busy => sleep(FRAME_SLACK).await,
-                Probe::Found(()) | Probe::Unknown => return,
+                Probe::Found(value) => return then(Some(value)),
+                Probe::Unknown => return then(None),
             }
         }
+        then(None);
     });
 }
