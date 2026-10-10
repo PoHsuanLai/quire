@@ -25,11 +25,19 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn sections() -> Vec<SuggestionSection<String>> {
-    vec![SuggestionSection::titled(
-        "Recents",
-        vec![MenuItem::new("Compose".to_owned(), "Compose")],
-    )]
+/// The rows mail shows: its recents before the first key, then results for the query, which
+/// arrive a moment later and change in number as they do.
+fn sections(query: &str, drawn: u32) -> Vec<SuggestionSection<String>> {
+    if query.is_empty() {
+        return vec![SuggestionSection::titled(
+            "Recents",
+            vec![MenuItem::new("Compose".to_owned(), "Compose")],
+        )];
+    }
+    let rows = (0..=drawn)
+        .map(|n| MenuItem::new(format!("{query} {n}"), format!("{query} {n}")))
+        .collect();
+    vec![SuggestionSection::titled("Mail", rows)]
 }
 
 /// A button that summons the card as mail's ⌘K does: the query cleared, the card shown, and the
@@ -39,6 +47,16 @@ fn Page() -> Element {
     let mut query = use_signal(String::new);
     let mut shown = use_signal(|| false);
     let mut in_a_field = use_signal(|| false);
+    let mut drawn = use_signal(|| 0u32);
+    // Results land a few milliseconds after each key, as a search does: another render of the
+    // card while keys are still coming.
+    use_effect(move || {
+        let _ = query();
+        spawn(async move {
+            ds::base::time::clock::sleep(Duration::from_millis(3)).await;
+            drawn.with_mut(|n| *n += 1);
+        });
+    });
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
             div { style: "position:relative; height:520px",
@@ -56,7 +74,7 @@ fn Page() -> Element {
                         SearchField::<String> {
                             label: "Search",
                             value: query(),
-                            suggestions: sections(),
+                            suggestions: sections(&query(), drawn()),
                             open: Panel::Shown,
                             ends: Ends::Stop,
                             present: SuggestionsPresent::Card,
@@ -122,4 +140,19 @@ fn keys_typed_a_few_milliseconds_apart_land_in_order() {
         harness.advance(ms(4));
     });
     assert_eq!(typed(&mut harness), "invoice");
+}
+
+#[test]
+fn the_field_is_the_same_node_after_the_first_key_and_the_results() {
+    let mut harness = summoned();
+    let before = harness.attr(FIELD, "data-dioxus-id");
+    assert!(before.is_some(), "the field carries its node id");
+    harness.send(Input::key(ShortcutKey::Char('i')));
+    harness.advance(ms(40));
+    assert_eq!(
+        harness.attr(FIELD, "data-dioxus-id"),
+        before,
+        "{}",
+        harness.html()
+    );
 }
