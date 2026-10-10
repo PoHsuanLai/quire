@@ -32,6 +32,7 @@ pub fn PinnedBar(
     #[props(default)] common: Common,
 ) -> Element {
     let data = common.data_attributes();
+    let bar_label = common.aria_label.clone().unwrap_or(label);
     rsx! {
         div {
             id: common.id.clone(),
@@ -43,7 +44,7 @@ pub fn PinnedBar(
             div {
                 class: "ds-pinned-bar",
                 role: "region",
-                "aria-label": common.aria_label.clone().unwrap_or(label),
+                "aria-label": bar_label,
                 {bar}
             }
         }
