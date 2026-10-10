@@ -36,6 +36,7 @@
 //!
 use crate::app_handle::Remote;
 use crate::app_life::{Lifecycle, Verdict};
+use crate::close_request::{CloseAnswer, CloseGuard};
 use crate::open_window::WindowHandle;
 use crate::phase::{Early, Layout, Phase};
 use crate::startup_token::LaunchTokens;
@@ -66,6 +67,8 @@ struct Sub {
     phase: Phase,
     /// The window's scrolling, which hears every event before the document.
     scroll: WindowScroll,
+    /// What the window's components decide about a request to close it.
+    close: CloseGuard,
     /// The window's animation clock as the early step keeps it: the instant this application was
     /// built, a hair before its renderer's own animation timer starts.
     started: Instant,
@@ -84,6 +87,7 @@ impl Sub {
         slot: WindowSlot,
         phase: Phase,
         scroll: WindowScroll,
+        close: CloseGuard,
         renderer: DioxusNativeWindowRenderer,
     ) -> Sub {
         let (posted, relay) = BlitzShellProxy::new(proxy);
@@ -93,6 +97,7 @@ impl Sub {
             slot,
             phase,
             scroll,
+            close,
             started: Instant::now(),
             renderer,
             relay,
@@ -348,6 +353,7 @@ impl Windows {
             self.base.setup.keys.platform(),
         );
         let handle = WindowHandle::new(key, self.base.requests.clone());
+        let close = CloseGuard::default();
         let renderer = self.spare.pop().unwrap_or_else(|| self.base.gpu.renderer());
         let config = window_config(
             root,
@@ -356,6 +362,7 @@ impl Windows {
             &slot,
             &scroll,
             handle,
+            &close,
             renderer.clone(),
         );
         let mut sub = Sub::new(
@@ -364,6 +371,7 @@ impl Windows {
             slot,
             phase,
             scroll,
+            close,
             renderer,
         );
         sub.app.can_create_surfaces(event_loop);
@@ -384,10 +392,23 @@ impl Windows {
         }
     }
 
-    /// A window was asked to close, by the compositor or by its own frame: only it closes.
+    /// A window was asked to close, by the compositor or by its own frame: only it closes, and
+    /// only if its app does not keep it (`crate::close_request`).
     fn close(&mut self, event_loop: &dyn ActiveEventLoop, window_id: WindowId) {
-        if let Some(key) = self.key_of(window_id) {
-            self.drop_window(event_loop, key);
+        let Some(key) = self.key_of(window_id) else {
+            return;
+        };
+        let Some(sub) = self.sub_mut(key) else {
+            return;
+        };
+        match sub.close.ask() {
+            CloseAnswer::Close => self.drop_window(event_loop, key),
+            CloseAnswer::Keep => {
+                // The handler wrote what it needs to show; the next frame draws it.
+                if let Some(window) = sub.slot.window() {
+                    window.request_redraw();
+                }
+            }
         }
     }
 

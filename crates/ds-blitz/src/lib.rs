@@ -16,6 +16,7 @@ mod app_life;
 mod blitz_host;
 mod click_focus;
 pub mod clipboard;
+mod close_request;
 mod contexts;
 #[cfg(feature = "desktop-outputs")]
 mod desktop_outputs;
@@ -108,6 +109,7 @@ pub use app_life::LastWindowClosed;
 pub use blitz_host::provide_host;
 pub use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref};
 pub use click_focus::FocusFallback;
+pub use close_request::{CloseAnswer, use_close_request};
 pub use contexts::RootContexts;
 pub use error::{LaunchError, OpenWindowError, RuntimeError};
 pub use fonts::font_context;

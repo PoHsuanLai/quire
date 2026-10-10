@@ -206,6 +206,28 @@ notification click or a D-Bus activation sets it) hands it to the first window i
 compositor gives that window the keyboard; the variable is cleared as the window is created, so
 the token is spent once and child processes do not inherit it.
 
+**Refusing a close (unsaved work).** The person's close (the frame's close button, the
+compositor's) drops the window at once unless the app answers first:
+`use_close_request(|| CloseAnswer::Keep)` in any component of the window registers its handler
+(`ds_blitz::{use_close_request, CloseAnswer}`; GTK's `close-request`, AppKit's `windowShouldClose:`).
+The event loop calls it for each such request and closes on `CloseAnswer::Close`; with no handler
+the window closes as before. A handler that answers `Keep` shows its own question (a `Sheet` or
+`Alert`: "Do you want to save the changes made to ...") and, when the person decides, closes the
+window with `use_window_handle()`'s `handle.close()`, which is never put to the handler, nor are
+`AppHandle::quit` and the `LastWindowClosed` policy. The handler runs on the UI thread from the
+event loop, not from a render: it may write signals and must not block. One handler per window
+(the last component to register, until it unmounts); the harness has none, so a test drives the
+decision through the app's own state.
+
+```rust,ignore
+let dirty = use_signal(|| false);
+let mut asking = use_signal(|| false);
+use_close_request(move || match dirty() {
+    true => { asking.set(true); CloseAnswer::Keep }
+    false => CloseAnswer::Close,
+});
+```
+
 **Raising a window that exists: `focus_with_token`.** A running app is handed a token by a second
 launch (D-Bus `org.freedesktop.Application.Activate` or `Open`, whose `platform_data` carries it
 as `activation-token`; on X11 `desktop-startup-id`) or by a notification click. The window it

@@ -7,6 +7,7 @@
 
 use crate::app_handle::AppHandle;
 use crate::app_id::AppId;
+use crate::close_request::CloseGuard;
 use crate::fonts::font_context;
 use crate::gpu_request::GpuRequest;
 use crate::host::{Host, HostProps};
@@ -78,7 +79,8 @@ impl WindowSlot {
 }
 
 /// The window config for `root` shaped `shape`, drawn by `renderer`, reporting its window
-/// through `slot` and naming itself to its components as `handle`. The window's components are
+/// through `slot` and naming itself to its components as `handle`, and asking `close` what to do
+/// with a request to close it. The window's components are
 /// served by `phase`, which the event loop runs after each frame.
 pub(crate) fn window_config(
     root: Root,
@@ -87,6 +89,7 @@ pub(crate) fn window_config(
     slot: &WindowSlot,
     scroll: &WindowScroll,
     handle: WindowHandle,
+    close: &CloseGuard,
     renderer: DioxusNativeWindowRenderer,
 ) -> WindowConfig<DioxusNativeWindowRenderer> {
     let attributes = shape.size.apply(
@@ -104,6 +107,7 @@ pub(crate) fn window_config(
     vdom.provide_root_context(scroll.phase());
     vdom.provide_root_context(scroll.clone());
     vdom.provide_root_context(handle);
+    vdom.provide_root_context(close.clone());
     let net: Arc<dyn NetProvider> = Arc::new(AssetNet);
     vdom.provide_root_context(Arc::clone(&net));
     let parser: Arc<dyn HtmlParserProvider> = Arc::new(blitz_html::HtmlProvider);
