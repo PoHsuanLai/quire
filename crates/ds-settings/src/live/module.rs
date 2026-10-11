@@ -3,7 +3,7 @@
 
 use std::future::Future;
 
-use super::{LiveError, LiveSchema};
+use super::{LiveError, LiveSchema, Snapshot};
 use crate::schema::KeyPath;
 
 /// The unique bus name of the peer that made a call (`:1.42`).
@@ -22,7 +22,7 @@ pub struct Caller {
 /// What a call does to the module's state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Access {
-    /// `Get`.
+    /// `Get` and `Snapshot`.
     Read,
     /// `Set`, including running an action key.
     Write,
@@ -51,6 +51,22 @@ pub trait LiveModule: Send + Sync + 'static {
 
     /// A key's current value, or [`LiveError::UnknownKey`].
     fn get(&self, key: &KeyPath) -> impl Future<Output = Result<toml::Value, LiveError>> + Send;
+
+    /// The schema and every value, consistent with each other (`Snapshot` on the bus; one call
+    /// where `describe` then a `get` per key could see the module change in between). The default
+    /// reads `describe` then each key and drops a key that answers `UnknownKey` from schema and
+    /// values alike; a module that can read its state once overrides it, and asks no permission
+    /// here (the skeleton asked `Access::Read` already).
+    fn snapshot(&self) -> impl Future<Output = Result<Snapshot, LiveError>> + Send {
+        async move {
+            let schema = self.describe().await;
+            let mut reads = Vec::with_capacity(schema.key.len());
+            for spec in &schema.key {
+                reads.push((spec.path.clone(), self.get(&spec.path).await));
+            }
+            Snapshot::from_reads(schema, reads)
+        }
+    }
 
     /// Sets a key, or runs it when it is an action key (then `value` is `true` by convention and
     /// carries nothing). The skeleton broadcasts `Changed` with the value a following `get`

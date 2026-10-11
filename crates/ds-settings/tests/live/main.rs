@@ -6,3 +6,4 @@ mod bus;
 mod module;
 mod round_trip;
 mod schema;
+mod snapshot;

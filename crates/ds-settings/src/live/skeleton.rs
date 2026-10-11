@@ -1,5 +1,7 @@
 //! The serving side: exports a [`LiveModule`] as `org.quire.SettingsModule1` on a connection.
 
+use std::collections::HashMap;
+
 use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::zvariant::{ObjectPath, Value};
@@ -91,6 +93,27 @@ impl<M: LiveModule> Skeleton<M> {
         self.authorise(&header, connection, Access::Read).await?;
         let value = self.module.get(&KeyPath(key)).await?;
         to_wire(&value)
+    }
+
+    /// The schema (as `Describe`) and every key's value (as `Get`), read once.
+    #[zbus(out_args("schema", "values"))]
+    async fn snapshot(
+        &self,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &Connection,
+    ) -> Result<(String, HashMap<String, Value<'static>>), LiveError> {
+        self.authorise(&header, connection, Access::Read).await?;
+        let snapshot = self.module.snapshot().await?;
+        snapshot
+            .schema
+            .check()
+            .map_err(|why| LiveError::Failed(why.to_string()))?;
+        let values = snapshot
+            .values
+            .iter()
+            .map(|(key, value)| Ok((key.0.clone(), to_wire(value)?)))
+            .collect::<Result<_, LiveError>>()?;
+        Ok((snapshot.schema.to_json(), values))
     }
 
     /// Sets a key (or runs an action key), then broadcasts `Changed`.

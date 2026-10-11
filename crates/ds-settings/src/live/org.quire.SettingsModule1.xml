@@ -13,6 +13,13 @@
     <arg name="value" type="v" direction="out"/>
   </method>
   <!--
+   The schema (as `Describe`) and every key's value (as `Get`), read once.
+   -->
+  <method name="Snapshot">
+    <arg name="schema" type="s" direction="out"/>
+    <arg name="values" type="a{sv}" direction="out"/>
+  </method>
+  <!--
    Sets a key (or runs an action key), then broadcasts `Changed`.
    -->
   <method name="Set">

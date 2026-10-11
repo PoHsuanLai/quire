@@ -14,6 +14,7 @@
 //! | --- | --- | --- |
 //! | `Describe` | `() -> s` | the module's [`LiveSchema`] as JSON |
 //! | `Get` | `(s) -> v` | a key's current value |
+//! | `Snapshot` | `() -> (s, a{sv})` | the schema (as `Describe`) and every key's value (as `Get`), read once |
 //! | `Set` | `(s, v) -> ()` | set a value, or run an action key (any value; the client sends `true`) |
 //! | `Changed` | `(s, v)` signal | a key's new value, broadcast |
 //!
@@ -30,6 +31,7 @@ mod error;
 mod module;
 mod schema;
 mod skeleton;
+mod snapshot;
 pub mod value;
 
 pub use client::{Change, Changes, LiveClient, SettingsModule1Proxy};
@@ -37,6 +39,7 @@ pub use error::LiveError;
 pub use module::{Access, Caller, LiveModule, SenderName, Verdict};
 pub use schema::{LiveSchema, LiveSchemaError};
 pub use skeleton::{Served, serve};
+pub use snapshot::Snapshot;
 
 /// The D-Bus interface name.
 pub const INTERFACE: &str = "org.quire.SettingsModule1";

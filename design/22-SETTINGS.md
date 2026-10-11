@@ -1266,6 +1266,16 @@ not offer it. The skeleton refuses `Set(key, word)` for a listed word with the n
 call; `KeySpec::check_available` is the same check for file validation. `Describe`, `Get`,
 `Set` and `Changed` keep their signatures: the freeze above is not touched.
 
+Snapshot (additive, 2026-10-12): `Snapshot() -> (s schema, a{sv} values)` answers `Describe` and
+a `Get` per key in one call: `schema` is the `Describe` JSON, `values` maps each key to its value
+encoded as `Get` encodes it (`b`, `x`, `s` or `as`, in a variant). Every key in `values` is in the
+schema and the reverse, so a reader never sees a module half-changed between calls (an account
+removed after `Describe` made `Get` answer `UnknownKey`). It asks `permit(Access::Read)` once and
+a refusal is `NotPermitted`. `LiveModule::snapshot` has a default (describe, then each `get`,
+dropping a key that answers `UnknownKey` from schema and values); a module that can read its state
+once overrides it. `LiveClient::snapshot` falls back to that same client-side read when the peer
+answers `UnknownMethod`, so new clients work with old modules.
+
 Choice groups (additive, 2026-10-06): a menu `KeySpec` may carry `groups`, a map from a choice
 word to the display name of its group ("Anthropic", "Google", "Moonshot", "OpenAI", "On this
 computer"). JSON: `"groups":{"<word>":"<group>"}`; a file schema has an `[key.groups]` table;
