@@ -79,9 +79,11 @@ fn the_field_keeps_its_keys_and_presses_from_the_list_and_the_row() {
     harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(50));
+    // The caret sits after the name it was built with, as a browser's input does (Blitz fork
+    // ca79f436; it used to start at 0, which is what mailo #28's "nvoicei" was).
     assert_eq!(
         harness.text_of(".name").as_deref(),
-        Some("xReceipts"),
+        Some("Receiptsx"),
         "the letter went to the field"
     );
     assert_eq!(log(&harness), "", "the list heard nothing");
