@@ -138,6 +138,9 @@ const COPIED_TEXT: &[&str] = &[".ds-row-clip{", ".ds-preview-text[*|data-face=mo
 /// A code run is code: the text run tone for a command or an address the person copies.
 const CODE_RUN: &str = ".ds-run[*|data-tone=code]{";
 
+/// A mono run is shell data in a line (a folder, a branch name): the code face with no chip (q21).
+const MONO_RUN: &str = ".ds-run[*|data-tone=mono]{";
+
 #[test]
 fn only_code_and_key_caps_ask_for_the_code_face() {
     let css = stylesheet();
@@ -145,7 +148,7 @@ fn only_code_and_key_caps_ask_for_the_code_face() {
         .lines()
         .filter(|line| line.contains("font-family:var(--font-code)"))
         .filter(|line| !COPIED_TEXT.iter().any(|rule| line.starts_with(rule)))
-        .filter(|line| !line.starts_with(CODE_RUN))
+        .filter(|line| !line.starts_with(CODE_RUN) && !line.starts_with(MONO_RUN))
         .collect();
     assert_eq!(code_rules.len(), 1, "{code_rules:#?}");
     for rule in COPIED_TEXT {
