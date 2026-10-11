@@ -214,4 +214,17 @@ else
   fail=1
 fi
 
+# The pinned block consumers copy (docs/workspace-deps.toml) names the same Blitz and blitz-kit
+# revisions as the root manifest (it once lagged a toolchain bump and a consumer noticed).
+for crate in blitz-dom blitz-kit; do
+  root=$(grep -E "^$crate *=" Cargo.toml | grep -oE 'rev = "[0-9a-f]+"' | head -1)
+  doc=$(grep -E "^$crate *=" docs/workspace-deps.toml | grep -oE 'rev = "[0-9a-f]+"' | head -1)
+  if [ -n "$root" ] && [ "$root" = "$doc" ]; then
+    echo "pins hold: docs/workspace-deps.toml names $crate at the root manifest's $root"
+  else
+    echo "PINS DRIFT: docs/workspace-deps.toml has $crate ${doc:-missing}, Cargo.toml has ${root:-missing}"
+    fail=1
+  fi
+done
+
 exit "$fail"
