@@ -201,7 +201,7 @@ mod tests {
                 .parse()
                 .unwrap_or(f32::NAN)
         };
-        let row = f32::from(ShellMetrics::default().menu.highlight_radius.0);
+        let row = ShellMetrics::default().menu.highlight_radius.0;
         let menu = (SHELL_SCALE.menu_radius, SHELL_SCALE.menu_inset);
         let palette = (SHELL_SCALE.palette_radius, SHELL_SCALE.palette_inset);
         assert_eq!(px(Radius::Panel), f32::from(palette.0.0));
