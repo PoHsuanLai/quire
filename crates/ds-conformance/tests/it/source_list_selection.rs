@@ -1,6 +1,7 @@
-//! A source list's selected row is a neutral grey wash (`--sel-neutral`), never the accent, while
-//! its window is active (even when the list does not hold the keyboard) and while it is inactive
-//! (macOS's sidebar: the accent stays on the focus ring, the cursor and the symbol).
+//! A source list's selected row, when the list does not hold the keyboard, is a neutral grey wash
+//! (`--sel-neutral`), not the accent, in an active window and an inactive one (macOS's
+//! unemphasized sidebar selection; a focused list's emphasized accent selection is
+//! `settings_rows.rs`'s case).
 
 use crate::support::probe;
 

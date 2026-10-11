@@ -1817,22 +1817,18 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
-/* A source list is a sidebar, and a Mac sidebar's selection is a neutral rounded wash, not the
-   accent (design/27 section 5.12): the row keeps its ink, the accent stays on the focus ring and
-   the cursor, and the selected row's symbol takes it. Active, away or inactive, the fill is the
-   same; only the symbol goes quiet with an inactive window. */
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true],
+/* A source list is a sidebar, selected the Mac way (design/27 section 5.12): while the list holds
+   the keyboard its selection is emphasized (the accent with white ink, the plain row rule above);
+   when focus is elsewhere, or the window is inactive, it is a neutral rounded wash that keeps the
+   row's ink, and the selected symbol takes the accent (grey with an inactive window). */
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true],
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-neutral); color:var(--ink); }
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic,
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
+.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic,
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing{ color:var(--ink-soft); }
-.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading,
 .ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--accent-text); }
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
 

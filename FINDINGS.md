@@ -1741,18 +1741,19 @@ Open:
    existing `every_text_ink_holds_its_floor_on_every_ground` (Surface2 is in its grounds) and the
    new selected-row test below. When to use it: content-first apps; leave `Material` for apps
    whose frame is the Space (mail) and `Clear` where the window's tint should show.
-2. **Neutral sidebar selection, the default for source lists.** New token `--sel-neutral`
-   (`ColourToken::SelectionNeutral`): black at .08 in light, white at .08 in dark. design/27
-   section 5.12 asks for a "rounded selection highlight" and macOS (Big Sur on) paints source
-   lists with a neutral wash, the accent on the symbol; no HIG page asks for an accent fill. So
-   the neutral wash is the default for every `ListStyle::SourceList` row, not a variant:
-   `--ink` on it measures well over 10:1 (dark on #242424 about 11:1), against 2.98:1 for
-   `--sel-ink` on the accent. The fill is the same active, away or inactive; the selected row's
-   leading symbol takes `--accent-text` (`--ink-soft` when the window is inactive), the detail and
-   trailing take `--ink-soft`. Focus ring and cursor are untouched (accent). Plain `List` rows
-   still select with `--sel-bg`. The test `a_selected_sidebar_row_keeps_its_ink_on_the_neutral_wash`
-   gates `--ink` at 4.5:1 and `--ink-soft` at 3:1 in both schemes over Paper, Surface, Surface2
-   and Raise. A consumer that wanted the old accent fill in a sidebar has none now; ask if one does.
+2. **Neutral sidebar selection when the list does not hold the keyboard.** New token
+   `--sel-neutral` (`ColourToken::SelectionNeutral`): black at .08 in light, white at .08 in dark.
+   macOS selects a source list two ways (NSTableView's emphasized and unemphasized selection):
+   while the list is the keyboard's, the accent with white ink; when focus is elsewhere or the
+   window is inactive, a neutral rounded wash that keeps the row's ink, the symbol taking the
+   accent (grey when inactive). The lane first made the wash the only style; at merge it was
+   narrowed to the unemphasized case, so a focused sidebar keeps the accent (the conformance test
+   `a_source_list_glyph_takes_the_ink_of_a_selection_that_moves` pins it). For temor, whose
+   sidebar is rarely the keyboard's (the terminal is), the row is the neutral wash: `--ink` on it
+   measures over 10:1 (dark on #242424 about 11:1) against 2.98:1 for #E8E8E8 on the accent.
+   The emphasized state draws `--sel-ink` (white) on the accent. The test
+   `a_selected_sidebar_row_keeps_its_ink_on_the_neutral_wash` gates `--ink` at 4.5:1 and
+   `--ink-soft` at 3:1 in both schemes over Paper, Surface, Surface2 and Raise.
 3. **Concentric palette rows.** The palette card is `--r-panel` 20 with a 6 inset and 8 rows, so
    the rows were 6 short of concentric. Chosen: keep the rows at 8 (the menu's, the 28 px row
    would be a capsule at 14) and take the inset to 12: new `ShellScale.palette_radius` 20 and
