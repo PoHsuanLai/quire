@@ -1818,3 +1818,13 @@ Tests (`crates/ds-conformance/tests/it/search_summon_prefilled.rs`, Ctrl+K summo
 Expectation on Blitz 6069a906 alone, without fix B: the prefilled and replaced cases fail with "nvoicei" (editor built with text, caret at 0; `set_text` keeps the old index), when the field is focused before its first layout. `prefilled_selector_all*` fails with "nvoicei" when the selection was not made. Cases where focus lands after layout already pass (the `Place` path already places the caret).
 - Blitz fix (ca79f436, caret to text end when the editor is built or its text replaced): closes `prefilled_*` (None/Own) and `replaced_*`. Does not make Select::All select "i" if the selection is dropped.
 - Fix B (quire): `focus_selecting`'s `Leave` arm now owes the caret at End like `Place`; a Busy `caret_owed` read counts as owed; the owed caret waits up to 40 frames for the layout (was 8). Closes `prefilled_selector_none*` and `prefilled_selector_all*` on old Blitz; cannot close `replaced_*` (text replaced after focus; only the Blitz fix). `prefilled_own_focus*` goes through `focus_placing` (Place arm) and was already covered by the old owed check, so it is the control.
+
+### q22 results (run at merge, 2026-10-11)
+
+`search_summon_prefilled` reproduces mailo #28 deterministically: on Blitz 6069a906 with fix B, 7 of the
+12 cases read "nvoicei" (every `FieldFocus::OnMount` case and every `replaced_*` case); the
+`focus_by_selector` cases pass (fix B, or the selector's wait for a drawn element). On the Blitz fork's
+ca79f436 (the caret goes to the end of text written from outside, in `TextInputData::set_text` and when
+an editor is built with its value) all 12 pass. So the cause is Blitz's caret, not the scheduling: extra
+parked tasks only decided whether the editor was built, or its text set, after focus. Fix B stays as a
+second line (a focus that lands before layout owes the caret).

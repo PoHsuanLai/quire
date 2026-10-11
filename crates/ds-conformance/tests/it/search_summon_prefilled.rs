@@ -48,7 +48,7 @@ fn Idle() -> Element {
     rsx! { span { style: "display:none", "{ticks}" } }
 }
 
-/// Ctrl+K summons the field; Ctrl+J then sets its text from outside.
+/// The Summon button shows the field (as mail's ⌘K does); Ctrl+J then sets its text from outside.
 #[allow(non_snake_case)]
 fn Case<const HOW: u8, const SIBLINGS: usize, const MOUNT: u8>() -> Element {
     let mut query = use_signal(String::new);
@@ -65,21 +65,24 @@ fn Case<const HOW: u8, const SIBLINGS: usize, const MOUNT: u8>() -> Element {
                     if !event.modifiers().ctrl() {
                         return;
                     }
-                    match event.key() {
-                        Key::Character(c) if c == "k" => {
-                            query.set(if MOUNT == PREFILLED { "i".to_owned() } else { String::new() });
-                            shown.set(true);
-                            if HOW != OWN {
-                                let select = if HOW == ALL { Select::All } else { Select::None };
-                                spawn(async move {
-                                    let _ = focus_by_selector(FIELD, select).await;
-                                });
-                            }
-                        }
-                        Key::Character(c) if c == "j" => query.set("i".to_owned()),
-                        _ => {}
+                    if let Key::Character(c) = event.key()
+                        && c == "j"
+                    {
+                        query.set("i".to_owned());
                     }
                 },
+                Button { label: "Summon",
+                    onclick: move |_| {
+                        query.set(if MOUNT == PREFILLED { "i".to_owned() } else { String::new() });
+                        shown.set(true);
+                        if HOW != OWN {
+                            let select = if HOW == ALL { Select::All } else { Select::None };
+                            spawn(async move {
+                                let _ = focus_by_selector(FIELD, select).await;
+                            });
+                        }
+                    }
+                }
                 for n in 0..SIBLINGS {
                     Idle { key: "{n}" }
                 }
@@ -99,11 +102,12 @@ fn Case<const HOW: u8, const SIBLINGS: usize, const MOUNT: u8>() -> Element {
     }
 }
 
-/// Summon with Ctrl+K without settling, then step frame by frame until the field reads focused.
+/// Click Summon without settling, then step frame by frame until the field reads focused.
 fn summoned(page: fn() -> Element) -> Harness {
     let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(100));
-    harness.chord_pending(&[ShortcutKey::Ctrl], ShortcutKey::Char('k'));
+    let at = harness.centre(".ds-button").expect("the summon button");
+    harness.send(Input::click(at));
     let mut frames = 0;
     while harness.focus_of(FIELD) != FocusState::Focused {
         if harness.step_frame() == Stepped::Idle {
