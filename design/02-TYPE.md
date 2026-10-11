@@ -70,6 +70,12 @@ values are tokens on `.ds`:
 | `--tracking-mono` | 0 | `.ds-mono` |
 | `--fs-mono` | .86em | `.ds-mono` |
 
+**Code or Mono in a text run.** Both draw the fixed-pitch face (`--font-code`) at `--fs-mono`
+relative to the line. `RunTone::Code` is a chip (quiet ground, small padding): a command or an
+address the person copies. `RunTone::Mono` is the face alone, on the line's own ground and ink with
+no padding: data that is merely fixed-pitch (a folder or branch name in a sidebar row, a path in a
+list). Use `Mono` in rows, `Code` in prose and empty states.
+
 Headings that group things (the old "eyebrow", section, group and weekday headers) are not caps and
 not tracked: sentence case, 11 px, secondary ink (`--ink-soft`), weight 500 or 600, tracking 0.
 The caps-tracked tokens `--tracking-caps`, `--tracking-caps-narrow` and `--fs-caps` are deleted:

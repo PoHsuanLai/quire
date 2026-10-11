@@ -45,6 +45,7 @@
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=disc],
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=source],
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=text],
+.ds-list[*|data-style=grouped] .ds-row[*|data-leading=element],
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=tile]{ --sep:calc(var(--s-14) + var(--row-icon-tile) + var(--row-tile-gap)); }
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=avatar],
 .ds-list[*|data-style=grouped] .ds-row[*|data-leading=image],

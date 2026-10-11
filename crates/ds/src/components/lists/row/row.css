@@ -58,6 +58,7 @@
 
 /* The leading element. */
 .ds-row-leading{ display:grid; place-items:center; flex:none; width:22px; color:var(--ink-soft); }
+.ds-row-leading[*|data-leading=element]{ pointer-events:none; }
 .ds-row-leading[*|data-leading=disc]{ width:26px; height:26px; border-radius:var(--r-pill); background:var(--paper); color:var(--ink); box-shadow:var(--shadow-1);
   transition:background-color var(--t-quick) var(--e-out), color var(--t-quick) var(--e-out); }
 .ds-row-leading[*|data-disc=on]{ background:var(--accent); color:var(--accent-ink); box-shadow:inset 0 0 0 var(--hair) var(--accent-text), var(--shadow-1); }

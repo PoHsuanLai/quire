@@ -19,3 +19,6 @@
 /* A code run: the fixed-pitch face (`--font-code`) at `--fs-mono`, relative to the line, on a quiet ground, so
    a command or an address reads as something to copy. */
 .ds-run[*|data-tone=code]{ font-family:var(--font-code); font-size:var(--fs-mono); background:var(--fill-quaternary); border-radius:var(--r-micro); padding:0 var(--s-3); }
+/* A mono run: the same face and step as a code run, with no chip: the line's own ground and ink,
+   no padding, the line's line-height. Shell data in a row (a folder, a branch name). */
+.ds-run[*|data-tone=mono]{ font-family:var(--font-code); font-size:var(--fs-mono); }

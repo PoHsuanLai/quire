@@ -1773,3 +1773,34 @@ Open:
    struct literal elsewhere would break, none known); `ColourToken` gained a variant (an
    exhaustive match elsewhere would break); the legibility test reuses `rgb`, `over` and `colour`
    from the same file. `source_list_selection.rs` was rewritten to the neutral expectation.
+
+## q21
+
+Two requests from temor (a terminal).
+
+1. **`RunTone::Mono`.** `span.ds-run[data-tone="mono"]`: `--font-code` at `--fs-mono` (the
+   ladder's one mono step, .86em of the line), the line's own ground, ink and line-height, no
+   chip, no padding. `RunTone::Code` stays the chip for text to copy. The only exhaustive match on
+   `RunTone` is `text_runs::run` (handled); `data-tone` comes from the `Word` slug. Guide:
+   design/02 "Code or Mono in a text run".
+2. **`RowLeading::Element(Element)`.** Named like its siblings (`RowLeading::Icon/Disc/Source/
+   Text/Avatar/Tile`). Drawn in `span.ds-row-leading[data-leading="element"][aria-hidden=true]`,
+   the glyph's 22 px box centred (grouped lists give it the icon-tile separator inset), with
+   `pointer-events:none` and no handler: a click on it is a click on the row, one hit target. It
+   is decorative (hidden from assistive technology); a control belongs in `Accessory::Slot`.
+   Example: `Row { title: "main", leading: RowLeading::Element(rsx! { span { class: "orb" } }) }`.
+3. **`Accessory::Slot` swallowing the click is not a bug.** The slot stops the click and
+   mousedown (and calls `kept_click`) by design: it hosts controls (a `PopUpButton`, a cancel
+   button) whose press must not open the row; `row_slot` and `row_action_menu` pin that. A
+   decorative orb or dot should use `RowLeading::Element` instead; Slot's behaviour is unchanged.
+4. **Public names for temor.** `ds::prelude::RunTone::Mono`, `ds::prelude::RowLeading::Element`.
+5. **Goldens that change (orchestrator: `DS_BLESS=1`).** Stylesheet goldens that embed the sheets
+   (`ds-shell/tests/snapshots/stylesheet.css`, any `ds` stylesheet golden): new `.ds-run[...mono]`
+   rule, new `.ds-row-leading[...element]` rule, one added grouped-list selector. No SSR golden
+   renders either new case, so markup goldens are unchanged. Tests added:
+   `crates/ds/tests/it/row_leading_element_ssr.rs` (structure) and
+   `crates/ds-conformance/tests/it/row_leading_element.rs` (click on the leading element fires the
+   row's onclick).
+6. **Likeliest compile issues.** `leading.rs` `draw` (the `hidden` `Option<&str>` attribute and
+   `element.clone()` as an `Element`); the new tests' imports (`ds_harness` API as in
+   `row_slot.rs`; `dioxus_ssr` in the ds test as in `row_outline_editing_states_ssr.rs`).

@@ -34,6 +34,10 @@ pub enum RunTone {
     /// Fixed pitch: `code.ds-run[data-tone="code"]`, a command or an address the person copies
     /// (an empty state's "run `x`").
     Code,
+    /// Fixed pitch with no chip: `span.ds-run[data-tone="mono"]`, the code face at the mono step
+    /// on the line's own ground and ink, no padding. Shell data in a row (a folder, a branch)
+    /// where [`RunTone::Code`]'s chip would shout; `Code` is for text to copy.
+    Mono,
 }
 
 impl RunTone {
@@ -159,7 +163,10 @@ pub(crate) fn run(run: &TextRun) -> Element {
         (RunTone::Code, tone) => rsx! {
             code { class: "ds-run", "data-tone": tone, "{core}" }
         },
-        (RunTone::Strong | RunTone::Faint | RunTone::Italic | RunTone::Underline, tone) => rsx! {
+        (
+            RunTone::Strong | RunTone::Faint | RunTone::Italic | RunTone::Underline | RunTone::Mono,
+            tone,
+        ) => rsx! {
             span { class: "ds-run", "data-tone": tone, "{core}" }
         },
     };

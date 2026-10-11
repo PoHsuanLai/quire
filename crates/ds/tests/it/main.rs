@@ -38,6 +38,7 @@ mod pop_up_button_open_ssr;
 mod provider_and_button_face_states_ssr;
 mod root_ssr;
 mod roster;
+mod row_leading_element_ssr;
 mod row_outline_editing_states_ssr;
 mod selectors;
 mod sheet_hygiene;

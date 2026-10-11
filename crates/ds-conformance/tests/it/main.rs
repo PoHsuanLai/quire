@@ -84,6 +84,7 @@ mod row_drop_accepts;
 mod row_drop_places;
 mod row_edit;
 mod row_glyph_colour;
+mod row_leading_element;
 mod row_outline;
 mod row_slot;
 mod row_toggle;

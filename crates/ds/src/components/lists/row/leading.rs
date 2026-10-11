@@ -31,6 +31,12 @@ pub enum RowLeading {
     Avatar(AvatarFace),
     /// A grouped row's tile: a colour with a white glyph, or the circular avatar.
     Tile(TileFace),
+    /// Anything the caller draws (a status orb, a dot, a small badge), in the glyph's box and
+    /// centred like it. It is decorative: hidden from assistive technology and transparent to the
+    /// pointer, so a click on it is a click on the row (the row stays one hit target). A control
+    /// belongs in [`Accessory::Slot`](crate::components::lists::row::accessory::Accessory::Slot)
+    /// instead, which keeps its own presses.
+    Element(Element),
 }
 
 impl RowLeading {
@@ -45,6 +51,7 @@ impl RowLeading {
             RowLeading::Text(_) => Some("text"),
             RowLeading::Avatar(_) => Some("avatar"),
             RowLeading::Tile(face) => Some(face.slug()),
+            RowLeading::Element(_) => Some("element"),
         }
     }
 }
@@ -85,7 +92,9 @@ pub(crate) fn draw(leading: &RowLeading, shape: &RowShape) -> Element {
         RowLeading::Text(text) => rsx! { "{text}" },
         RowLeading::Avatar(avatar) => face(*avatar),
         RowLeading::Tile(face) => tile(*face),
+        RowLeading::Element(element) => element.clone(),
     };
+    let hidden = matches!(leading, RowLeading::Element(_)).then_some("true");
     let disc = match leading {
         RowLeading::Disc(_, Selection::Selected) => Some("on"),
         RowLeading::Disc(_, Selection::Unselected) => Some("off"),
@@ -96,6 +105,7 @@ pub(crate) fn draw(leading: &RowLeading, shape: &RowShape) -> Element {
             class: "ds-row-leading",
             "data-leading": slug,
             "data-disc": disc,
+            "aria-hidden": hidden,
             {inner}
         }
     }
