@@ -9,13 +9,16 @@
 //! once that render has ended (`ds_style::busy`), then a frame later.
 
 use crate::focus::select::{Landing, Select};
-use crate::host::caret::CaretOwed;
+use crate::host::caret::{CaretOwed, InitialCaret};
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
 use crate::host::measure::BUSY_ATTEMPTS;
 use dioxus::prelude::*;
 use ds_style::busy::wait_out_busy;
 use std::rc::Rc;
+
+/// How many tries an owed caret waits for the field's first layout: a few frames, not forever.
+const LAYOUT_ATTEMPTS: usize = 40;
 
 /// Give `element` the keyboard from a task of the calling scope, a frame later whenever the
 /// document is busy. Best-effort: a renderer without focus still shows the element, and the
@@ -73,21 +76,33 @@ pub fn focus_landing_told(element: Rc<MountedData>, landing: Landing, told: Even
 /// A busy document or a field not laid out yet retries the whole write; the outcome is the
 /// focus's.
 pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> Focused {
+    let host = use_document_host();
     match landing {
         Landing::Place(caret) => {
-            let host = use_document_host();
             let focused = retry_busy(|| host.focus().focus_placing(element, caret)).await;
-            // A field with text focused before its first layout has no editor yet, so nothing can
-            // have been typed into it: its caret lands as soon as the editor is built. An empty
-            // one owes nothing, so a key typed once its editor is built stays where it went.
-            if focused == Focused::Done
-                && host.caret().caret_owed(element) == CaretOwed::AfterLayout
-            {
-                let _ = retry_busy(|| host.caret().place_caret(element, caret)).await;
-            }
+            land_owed_caret(element, focused, caret).await;
             focused
         }
-        Landing::Leave => focus_element(element).await,
+        Landing::Leave => {
+            let focused = focus_element(element).await;
+            // Focusing without a caret still leaves a field with text and no editor yet with its
+            // caret at the start once the editor is built, so the next key would land before the
+            // text: it owes the caret after the text, as a placed `End` does.
+            land_owed_caret(element, focused, InitialCaret::End).await;
+            focused
+        }
+    }
+}
+
+/// A field with text focused before its first layout has no editor yet, so nothing can have been
+/// typed into it: its caret lands as soon as the editor is built, however many frames the layout
+/// takes (`LAYOUT_ATTEMPTS`; a select-all that gave up after `BUSY_ATTEMPTS` left the caret at the
+/// start). An empty one owes nothing, so a key typed once its editor is built stays where it went.
+/// A document too busy to read counts as owing (the placing retries).
+async fn land_owed_caret(element: &MountedData, focused: Focused, caret: InitialCaret) {
+    let host = use_document_host();
+    if focused == Focused::Done && host.caret().caret_owed(element) == CaretOwed::AfterLayout {
+        let _ = retry_for(LAYOUT_ATTEMPTS, || host.caret().place_caret(element, caret)).await;
     }
 }
 
@@ -107,8 +122,13 @@ pub(crate) async fn blur_element(element: &MountedData) -> Focused {
 /// Try a host write until the document is free, for up to `BUSY_ATTEMPTS` tries: the first few
 /// as soon as the render that holds it ends, so the write lands in the frame it was asked in
 /// (`ds_style::busy`), the rest a frame apart.
-pub(crate) async fn retry_busy(mut write: impl FnMut() -> Focused) -> Focused {
-    for attempt in 0..BUSY_ATTEMPTS {
+pub(crate) async fn retry_busy(write: impl FnMut() -> Focused) -> Focused {
+    retry_for(BUSY_ATTEMPTS, write).await
+}
+
+/// As [`retry_busy`], for up to `attempts` tries.
+async fn retry_for(attempts: usize, mut write: impl FnMut() -> Focused) -> Focused {
+    for attempt in 0..attempts {
         match write() {
             Focused::Busy => wait_out_busy(attempt).await,
             tried => return tried,

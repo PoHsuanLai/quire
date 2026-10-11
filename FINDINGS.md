@@ -1804,3 +1804,17 @@ Two requests from temor (a terminal).
 6. **Likeliest compile issues.** `leading.rs` `draw` (the `hidden` `Option<&str>` attribute and
    `element.clone()` as an `Element`); the new tests' imports (`ds_harness` API as in
    `row_slot.rs`; `dioxus_ssr` in the ds test as in `row_outline_editing_states_ssr.rs`).
+
+## q22
+
+Mailo #28 ("nvoicei"): a key typed right after a text field gains focus lands before its text.
+Written by reading only; the orchestrator runs these (expectations, not results).
+
+Tests (`crates/ds-conformance/tests/it/search_summon_prefilled.rs`, Ctrl+K summons a `TextField`, frames stepped until it reads focused, then "nvoice" is typed, the field's signal read from `#value`):
+- `prefilled_own_focus*`, `prefilled_selector_none*` (0/1/2 idle siblings with a timer `use_future`): the field mounts with value "i" so Blitz builds its editor WITH text; focused by `FieldFocus::OnMount` or `focus_by_selector(.., Select::None)`. Assert "invoice".
+- `prefilled_selector_all*`: same with `Select::All`; the selection of "i" must survive, so the first key replaces it. Assert "nvoice".
+- `replaced_*`: the field mounts empty and focused, then the signal is set to "i" from outside (Ctrl+J); the next keys go after it. Assert "invoice".
+
+Expectation on Blitz 6069a906 alone, without fix B: the prefilled and replaced cases fail with "nvoicei" (editor built with text, caret at 0; `set_text` keeps the old index), when the field is focused before its first layout. `prefilled_selector_all*` fails with "nvoicei" when the selection was not made. Cases where focus lands after layout already pass (the `Place` path already places the caret).
+- Blitz fix (ca79f436, caret to text end when the editor is built or its text replaced): closes `prefilled_*` (None/Own) and `replaced_*`. Does not make Select::All select "i" if the selection is dropped.
+- Fix B (quire): `focus_selecting`'s `Leave` arm now owes the caret at End like `Place`; a Busy `caret_owed` read counts as owed; the owed caret waits up to 40 frames for the layout (was 8). Closes `prefilled_selector_none*` and `prefilled_selector_all*` on old Blitz; cannot close `replaced_*` (text replaced after focus; only the Blitz fix). `prefilled_own_focus*` goes through `focus_placing` (Place arm) and was already covered by the old owed check, so it is the control.

@@ -212,13 +212,14 @@ pub(crate) fn selection(element: &MountedData) -> FieldSelection {
 }
 
 /// Whether `element` is a field with text whose editor is not built yet, so a caret asked for when
-/// it was focused is still owed. A document busy rendering owes nothing: the caller then leaves
-/// the caret where Blitz puts it rather than risk moving a key already typed.
+/// it was focused is still owed. A document busy rendering is read as owing: the caller then
+/// places the caret with a retry, which waits for the editor, rather than leaving a field that is
+/// not laid out yet with its caret at the start.
 pub(crate) fn caret_owed(element: &MountedData) -> CaretOwed {
     let Some(node) = NodeRef::of(element) else {
         return CaretOwed::No;
     };
-    node.read(|doc| {
+    let read = node.read(|doc| {
         let found = doc.get_node(node.node)?;
         let element = found.element_data()?;
         let empty = element
@@ -228,9 +229,11 @@ pub(crate) fn caret_owed(element: &MountedData) -> CaretOwed {
             (Field::NotLaidOut, false) => Some(CaretOwed::AfterLayout),
             _ => Some(CaretOwed::No),
         }
-    })
-    .flatten()
-    .unwrap_or(CaretOwed::No)
+    });
+    match read {
+        None => CaretOwed::AfterLayout,
+        Some(owed) => owed.unwrap_or(CaretOwed::No),
+    }
 }
 
 /// Put the caret of `node`, if it is a laid-out text field, after its text. Blitz builds a field's
