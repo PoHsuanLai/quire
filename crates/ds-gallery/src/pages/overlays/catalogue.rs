@@ -110,7 +110,6 @@ pub fn OverlaysCataloguePage() -> Element {
                     div { class: "g-stage g-stage-tall",
                         EmptyState {
                             form: EmptyForm::Failure,
-                            icon: Some(Icon::OctagonAlert),
                             title: "Couldn’t load your mail",
                             description: "The server didn’t answer.",
                             onretry: |_| {},

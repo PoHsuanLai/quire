@@ -6,7 +6,6 @@ use super::model::NoAccountWhy;
 use super::wording::no_account;
 use dioxus::prelude::*;
 use ds::components::overlays::empty_state::EmptyState;
-use ds_style::icon::Icon;
 
 /// The empty state for `why`. "Add Account..." (`on_add`) for a missing account or a provider
 /// that cannot do it; "Open Settings" (`on_settings`) for an app the person turned away.
@@ -26,6 +25,6 @@ pub fn NoAccount(
         },
     };
     rsx! {
-        EmptyState { title, description: Some(line.into()), icon: Some(Icon::Inbox), action: Some(action) }
+        EmptyState { title, description: Some(line.into()), action: Some(action) }
     }
 }

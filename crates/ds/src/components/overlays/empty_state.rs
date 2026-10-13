@@ -1,6 +1,9 @@
 //! EmptyState: what a list, a pane or a page says when there is nothing to show (design/30
-//! section 2.9, SwiftUI `ContentUnavailableView`): a glyph, a title, an optional description and
-//! an optional action, centred.
+//! section 2.9, SwiftUI `ContentUnavailableView`): a title, an optional description and an
+//! optional action, centred, and a glyph above them only when the caller brings one. No form draws
+//! a glyph of its own: the title already says what the glyph would (an empty inbox, a search, a
+//! failure whose Retry sits right below), and a 48 px picture of it is the loudest thing in the
+//! pane for the least news, so Mail's empty and failed lists are words alone.
 //!
 //! Three forms (`EmptyForm`): `Empty` (nothing here yet), `NoResults` (a search or filter found
 //! nothing) and `Failure` (it could not be loaded, with a Retry when the caller can). It is static
@@ -27,16 +30,7 @@ pub enum EmptyForm {
     Failure,
 }
 
-/// The glyph a form draws when the caller brings none.
-fn glyph_of(form: EmptyForm) -> Icon {
-    match form {
-        EmptyForm::Empty => Icon::Inbox,
-        EmptyForm::NoResults => Icon::Search,
-        EmptyForm::Failure => Icon::Refresh,
-    }
-}
-
-/// A placeholder for nothing to show. `icon` overrides the form's glyph; `description` is the
+/// A placeholder for nothing to show. `icon` is a glyph above the title, drawn only when given; `description` is the
 /// line under the title, whole or as runs (a `RunTone::Code` run is a command to copy); `action` is an element of the caller's (a button that adds the first
 /// item); a `Failure` with `onretry` draws a Retry button, after the action. `common` puts the
 /// consumer's `id`, `data-*` and classes on the root, and `aria_label` names it in place of its
@@ -53,7 +47,6 @@ pub fn EmptyState(
 ) -> Element {
     let class = common.class("ds-empty-state");
     let data = common.data_attributes();
-    let icon = icon.unwrap_or_else(|| glyph_of(form));
     let retry = onretry.filter(|_| form == EmptyForm::Failure);
     rsx! {
         div {
@@ -64,8 +57,10 @@ pub fn EmptyState(
             "data-form": form.slug(),
             onmounted: move |event| common.mounted(event),
             ..data,
-            div { class: "ds-empty-state-icon",
-                IconView { source: icon.into(), size: IconSize::Tile48 }
+            if let Some(icon) = icon {
+                div { class: "ds-empty-state-icon",
+                    IconView { source: icon.into(), size: IconSize::Tile48 }
+                }
             }
             div { class: "ds-empty-state-title", "{title}" }
             if let Some(description) = description {
