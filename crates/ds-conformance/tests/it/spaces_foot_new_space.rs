@@ -55,9 +55,10 @@ fn the_foot_draws_its_plus_unless_asked_not_to() {
     assert_eq!(hidden.count(".ds-spaces-dot-hold"), 3, "the dots stay");
 }
 
-/// The foot draws each Space as the foot face: a 22px target around a small pip, the current
-/// one a larger ink pip and the others a smaller, fainter one; the labels and pressed states
-/// an app reads stay as they were.
+/// The foot draws each Space as the foot face: a 16px target around a small pip, the current
+/// one a larger ink pip and the others a smaller, fainter one, the targets 2px apart and
+/// together at the centre of the dots' width; the labels and pressed states an app reads stay
+/// as they were.
 #[test]
 fn the_foot_dots_are_small_pips_and_the_current_one_is_larger_ink() {
     let mut harness = started(WithPlus);
@@ -72,7 +73,7 @@ fn the_foot_dots_are_small_pips_and_the_current_one_is_larger_ink() {
         assert!(label.ends_with(" Space"), "label {label}");
         let target = harness.rect(&dot(n)).expect("target");
         assert!(
-            (target.size.width.0 - 22.0).abs() < 1.0,
+            (target.size.width.0 - 16.0).abs() < 1.0,
             "target {}",
             target.size.width.0
         );
@@ -87,8 +88,20 @@ fn the_foot_dots_are_small_pips_and_the_current_one_is_larger_ink() {
     );
     let current = harness.rect(&pip(1)).expect("current pip").size.width.0;
     let other = harness.rect(&pip(2)).expect("other pip").size.width.0;
-    assert!((current - 7.0).abs() < 0.5, "current pip {current}");
-    assert!((other - 5.0).abs() < 0.5, "other pip {other}");
+    assert!((current - 6.0).abs() < 0.5, "current pip {current}");
+    assert!((other - 4.0).abs() < 0.5, "other pip {other}");
+    let first = harness.rect(&dot(1)).expect("first");
+    let second = harness.rect(&dot(2)).expect("second");
+    let last = harness.rect(&dot(3)).expect("last");
+    let apart = second.origin.x.0 - (first.origin.x.0 + first.size.width.0);
+    assert!((apart - 2.0).abs() < 0.5, "dots {apart}px apart");
+    let group = harness.rect(".ds-spaces-dots").expect("dots");
+    let middle = (first.origin.x.0 + last.origin.x.0 + last.size.width.0) / 2.0;
+    let centre = group.origin.x.0 + group.size.width.0 / 2.0;
+    assert!(
+        (middle - centre).abs() < 1.0,
+        "dots at {middle}, their width's centre {centre}"
+    );
     let ink = harness.fill_of(&pip(1), Part::Element).expect("fill");
     let faint = harness.fill_of(&pip(2), Part::Element).expect("fill");
     assert!(ink != faint, "brightness marks the current one");

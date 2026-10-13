@@ -237,7 +237,7 @@ or `Control`.
 
 The Space's name sits in the sidebar **head** (`SpaceHead`), quiet; its menu opens on a right
 click only. The **foot** (`SpacesFoot`), in order: the app's leading slot, the Space dots
-(`flex: 1`), New Space, the app's trailing slot (Settings, Hide sidebar). Every dot is the neutral
+(`flex: 1`, centred in that width, 16 px targets 2 px apart around a 4 px pip, the current one 6 px), New Space, the app's trailing slot (Settings, Hide sidebar). Every dot is the neutral
 dot, the Spaces not on screen are dimmed, and a right click on a dot opens that Space's menu. The
 sidebar is at least 212 px wide (`SIDEBAR_MIN_WIDTH`).
 
