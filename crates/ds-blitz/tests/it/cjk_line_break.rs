@@ -12,7 +12,7 @@ use dioxus_native_dom::DioxusDocument;
 const LINE_PX: f64 = 20.0;
 
 #[component]
-fn Box(break_rule: String) -> Element {
+fn Sentence(break_rule: String) -> Element {
     rsx! {
         div { id: "box", style: "width:64px; font-size:16px; line-height:20px; word-break:{break_rule};",
             "我們今天去公園玩耍然後回家吃飯"
@@ -23,8 +23,8 @@ fn Box(break_rule: String) -> Element {
 /// How many lines the sentence takes in a 64 px box under `word-break: break_rule`.
 fn lines(break_rule: &str) -> u32 {
     let vdom = VirtualDom::new_with_props(
-        Box,
-        BoxProps {
+        Sentence,
+        SentenceProps {
             break_rule: break_rule.to_string(),
         },
     );
