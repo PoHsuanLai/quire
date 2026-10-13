@@ -258,7 +258,7 @@ fn a_placement_the_host_cannot_make_is_unavailable() {
     // The header is the menu's first child; the rows follow it.
     let rows: Vec<(String, Option<String>)> = (2..=5)
         .map(|n| {
-            let row = format!(".ds-menu > :nth-child({n})");
+            let row = format!(".ds-menu-list > :nth-child({n})");
             let title = harness
                 .text_of(&format!("{row} .ds-menu-label"))
                 .unwrap_or_default();
@@ -276,7 +276,7 @@ fn a_placement_the_host_cannot_make_is_unavailable() {
         "{}",
         harness.html()
     );
-    let left = centre(&harness, ".ds-menu > :nth-child(3)");
+    let left = centre(&harness, ".ds-menu-list > :nth-child(3)");
     harness.send(Input::click(left));
     harness.advance(ms(300));
     assert_eq!(log(&harness), "", "an unavailable row places nothing");

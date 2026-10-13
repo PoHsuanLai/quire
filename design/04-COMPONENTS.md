@@ -1921,7 +1921,7 @@ pub enum Trail { None, Shortcut(Shortcut), Note(String) }
 | Part | Rich | Slim | Dropdown (C) | Context (derived) |
 | --- | --- | --- | --- | --- |
 | Width | 280 | 220 | min 186, auto | = Slim |
-| Max height | 320 (360 in palette), scroll | 320 | not specified | = Slim |
+| Max height | the room to the window edge it opens toward, less 8 (see below); palette 360 | same | same | = Slim |
 | Padding | 5 | 5 | 6 | 5 |
 | Radius | 12 (`--r-menu`) | 12 | `--r-panel` 14 | 12 |
 | Surface | `--raise`, 1px `--line`, `0 18px 40px -16px rgba(0,0,0,.45)` | same | `--raise`, 1px `--line`, `--shadow-2` | = Slim |
@@ -1931,6 +1931,15 @@ pub enum Trail { None, Shortcut(Shortcut), Note(String) }
 | Detail | ui 11.5 / 1.3 `--ink-faint` | same | n/a | same |
 | Trail | data 10 `--ink-faint`; check icon 14 `--accent` | same | data 10 `--ink-faint` (`.tail`) | same |
 | Empty | padding 10, ui 12.5 `--ink-faint` | same | not specified | same |
+
+**Height and scrolling (2026-10-13, `NSMenu`).** A floating `Menu` has no fixed cap: it grows to its
+rows until it meets the window edge it opens toward, less `--s-8`. Rust sets that as an inline
+`max-height` from the side `place()` chose (`Float::room`); the stylesheet's window-high cap holds
+until the place is known. Rows scroll in `.ds-menu-list` (the panel holds the strips and the
+list). Where rows lie past an end, a full-width strip one row high (`.ds-menu-scroll[data-end=start|end]`,
+a chevron) shows there; resting the pointer on it scrolls the list `ScrollArrowStep` (16 ms) by 6 px
+a tick, and the strip goes at that end. The wheel and a trackpad still scroll; a key that moves the
+highlight brings its row into view. A menu that fits shows no strip. An inline menu has none of this.
 
 **States.** Rich and Slim (verbatim, `S:665-680`, `S:787-791`):
 

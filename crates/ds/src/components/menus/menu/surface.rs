@@ -2,11 +2,12 @@
 //! on the layer stack, or bare rows in its caller's flow. Split from `menu`.
 
 use crate::components::menus::menu::hung::Hung;
+use crate::components::menus::menu::placement::MIN_ROOM;
 use crate::components::menus::menu::placement::MenuPlacement;
 use crate::components::overlays::flow::Flow;
-use crate::components::overlays::popover::{Float, Stacking, position_style};
+use crate::components::overlays::popover::{Float, Stacking, max_height_style, position_style};
 use crate::host::measure::Anchor;
-use ds_core::geometry::units::Point;
+use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Dismiss;
 
 /// A floating menu is a layer that Escape and an outside press close; an inline one is part of
@@ -40,11 +41,16 @@ impl Surface {
         match flow {
             Flow::Floating => {
                 let field = float.anchor_rect(anchor);
-                let at = field
-                    .map(|rect| placement.placement(rect))
-                    .map_or(Point::default(), |(rect, want, gap)| {
-                        float.origin(Some(rect), want, gap)
-                    });
+                let wanted = field.map(|rect| placement.placement(rect));
+                let at = wanted.map_or(Point::default(), |(rect, want, gap)| {
+                    float.origin(Some(rect), want, gap)
+                });
+                // The menu grows to its rows until it meets the edge it opens toward, less the
+                // margin; the stylesheet's window-high cap holds until that is known.
+                let room = wanted
+                    .and_then(|(rect, want, gap)| float.room(Some(rect), want, gap))
+                    .map(|room| max_height_style(Px(room.0.max(MIN_ROOM.0))))
+                    .unwrap_or_default();
                 let width = hung.width_style(field).unwrap_or_default();
                 // Until the anchor is measured the menu has no place: it is laid out (so it can
                 // be measured) but not drawn, and a press cannot land on it.
@@ -53,7 +59,7 @@ impl Surface {
                     class: "ds-popover ds-menu",
                     elevation: Some("pop"),
                     layer: Some("menu"),
-                    style: Some(position_style(at) + &width + waiting),
+                    style: Some(position_style(at) + &width + &room + waiting),
                 }
             }
             Flow::Inline => Surface {

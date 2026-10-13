@@ -78,6 +78,9 @@ pub enum DelayToken {
     RepeatStart,
     /// 70 ms: a held stepper button repeats at this pitch.
     RepeatEvery,
+    /// 16 ms: a menu's scroll arrow scrolls the list one step each time this has passed while the
+    /// pointer rests on it (about a frame at 60 Hz).
+    ScrollArrowStep,
 }
 
 impl DelayToken {
@@ -104,6 +107,7 @@ impl DelayToken {
             DelayToken::SpellDebounce => 300,
             DelayToken::RepeatStart => 500,
             DelayToken::RepeatEvery => 70,
+            DelayToken::ScrollArrowStep => 16,
         })
     }
 }

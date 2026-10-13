@@ -19,6 +19,7 @@ use crate::components::menus::menu::hung::Hung;
 use crate::components::menus::menu::panel::Panel;
 use crate::components::menus::menu::pick::{Closer, Closing, Gesture, Picked, picker};
 use crate::components::menus::menu::placement::{MENU_INSET, MenuPlacement};
+use crate::components::menus::menu::scrolling::{use_in_view, use_scrolling};
 use crate::components::menus::menu::surface::{Surface, stacking};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
 use crate::components::menus::menu::unavailable::ContextUnavailable;
@@ -37,7 +38,10 @@ use ds_motion::anim::Anim;
 use ds_motion::timer::use_motion_timer;
 use ds_style::tokens::layer::ZLayer;
 
-/// A floating list of commands. `timing` is the submenu delay and safe-triangle timeout, read
+/// A floating list of commands. A floating menu grows to its rows until it meets the window edge
+/// it opens toward, less 8 px; past that it scrolls inside, with an arrow strip at each end that
+/// has rows past it (resting the pointer on a strip scrolls the list), and a key that moves the
+/// highlight brings its row into view. `timing` is the submenu delay and safe-triangle timeout, read
 /// by the caller from `menus.submenu_delay_ms` and `menus.submenu_triangle_timeout_ms`
 /// (design/22-SETTINGS.md; the defaults are the proposed 200 and 300 ms). `expanded` opens
 /// that choice's submenu as the menu mounts (a restored menu, a posed picture); choices are
@@ -110,6 +114,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let blink = use_signal(Blink::default);
     let alive = use_alive();
     let tracker = use_tracker(timing, MENU_INSET);
+    let scrolling = use_scrolling();
     let mut gesture = use_hook(|| CopyValue::new(Gesture::Outside));
     let mut hovered = use_hook(|| CopyValue::new(None::<usize>));
     let reported = use_hook(|| CopyValue::new(None::<Option<usize>>));
@@ -181,6 +186,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         alive: alive.clone(),
     };
     follow_active(active, panel.current(), reported, on_active);
+    use_in_view(tracker, panel.current(), hovered);
     panel.onrelease = Some(released(picks, panel.onpick, fade_out, gesture, on_release));
     let onkey = {
         let (panel, alive) = (panel.clone(), alive.clone());
@@ -197,7 +203,10 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         }
     };
     let (opened, pressed, released_on) = (alive.clone(), alive.clone(), alive.clone());
-    let body = panel.body(&items);
+    let body = match flow {
+        Flow::Floating => scrolling.frame(tracker, panel.body(&items)),
+        Flow::Inline => panel.body(&items),
+    };
     let child = panel.submenu(timing);
     let probe = float.surface();
     let opener = anchor.clone();

@@ -50,6 +50,7 @@ mod menu_in_card;
 mod menu_keep_open;
 mod menu_pick;
 mod menu_rich_items;
+mod menu_scroll;
 mod menu_stale_handlers;
 mod notification_center;
 mod overlay_fits_window;

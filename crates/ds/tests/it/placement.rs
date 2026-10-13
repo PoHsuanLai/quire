@@ -2,7 +2,7 @@
 //! never flip (design/01-LAYOUT.md section 8.2, design/06-INTERACTIONS.md sections 3 and 4).
 
 use ds::prelude::*;
-use ds_core::geometry::placement::{Align, Placed, Side, place};
+use ds_core::geometry::placement::{Align, Placed, Side, place, room_on_side};
 
 fn rect(x: f32, y: f32, w: f32, h: f32) -> Rect {
     Rect {
@@ -194,4 +194,29 @@ fn placement_flips_and_clamps() {
         );
         assert_eq!(got, case.expect, "{}", case.name);
     }
+}
+
+#[test]
+fn the_room_is_the_space_toward_the_edge_less_the_margin() {
+    let anchor = rect(100.0, 100.0, 80.0, 20.0);
+    // (side, gap, want): the window is 700 high.
+    #[rustfmt::skip]
+    let cases = [
+        (Side::Bottom, 2.0, 700.0 - 120.0 - 2.0 - 8.0),
+        (Side::Top, 2.0, 100.0 - 2.0 - 8.0),
+        (Side::Right, 0.0, 700.0 - 16.0),
+    ];
+    for (side, gap, want) in cases {
+        assert_eq!(
+            room_on_side(anchor, WINDOW, side, Px(gap)),
+            Px(want),
+            "{side:?}"
+        );
+    }
+    let low = rect(100.0, 690.0, 80.0, 20.0);
+    assert_eq!(
+        room_on_side(low, WINDOW, Side::Bottom, Px(0.0)),
+        Px(0.0),
+        "never negative"
+    );
 }

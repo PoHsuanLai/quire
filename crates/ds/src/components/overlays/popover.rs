@@ -17,7 +17,7 @@ use crate::stack::layer_stack::{Dismissal, LayerId, LayerStack};
 use dioxus::core::{current_scope_id, queue_effect};
 use dioxus::prelude::*;
 use ds_core::geometry::{
-    placement::{Placed, Placement, Side, place},
+    placement::{Placed, Placement, Side, place, room_on_side},
     units::{Point, Px, Rect, Size},
 };
 use ds_core::vocab::{Dismiss, Shown};
@@ -217,6 +217,16 @@ impl Float {
         Some(place(anchor, content, bounds, want, gap))
     }
 
+    /// How tall the surface may be on the side it landed on: the room between `anchor` and the
+    /// bounds' edge it opens toward, less the margin. `None` until the bounds are measured, so a
+    /// surface not yet placed keeps its stylesheet's cap.
+    pub(crate) fn room(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Option<Px> {
+        let anchor = anchor?;
+        let bounds = self.bounds.rect()?;
+        let placed = self.placing(Some(anchor), want, gap)?;
+        Some(room_on_side(anchor, bounds, placed.side, gap))
+    }
+
     /// Where the surface sits in client coordinates, once the bounds and its own size are
     /// measured: `origin`'s placement offset by the bounds' corner. `None` before that.
     pub(crate) fn placed(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Option<Rect> {
@@ -314,6 +324,11 @@ impl Float {
 /// `left` and `top` for a placed surface.
 pub(crate) fn position_style(at: Point) -> String {
     format!("left:{}px;top:{}px", px(at.x), px(at.y))
+}
+
+/// `max-height` for a surface that may stand `room` tall.
+pub(crate) fn max_height_style(room: Px) -> String {
+    format!(";max-height:{}px", px(room))
 }
 
 /// A length as CSS writes it, to a tenth of a pixel: `12`, `12.5`.

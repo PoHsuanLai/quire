@@ -28,6 +28,7 @@ use ds_core::time::{
 };
 use ds_core::vocab::Availability;
 use ds_motion::machine::{MachineRef, use_machine};
+use ds_style::task::spawn_in;
 
 /// How a submenu was asked for: by the keyboard it takes the focus, by the pointer it leaves
 /// the focus where it is.
@@ -70,6 +71,7 @@ pub(super) struct Hands {
     pub(super) via: CopyValue<Via>,
     pub(super) rows: CopyValue<Vec<Option<MountedRef>>>,
     pub(super) panel: CopyValue<Option<MountedRef>>,
+    pub(super) list: CopyValue<Option<MountedRef>>,
     pub(super) scope: ScopeId,
     pub(super) pad: Px,
 }
@@ -82,6 +84,7 @@ pub(crate) fn use_tracker(timing: MenuTiming, pad: Px) -> Tracker {
         via: use_hook(|| CopyValue::new(Via::Pointer)),
         rows: use_hook(|| CopyValue::new(Vec::new())),
         panel: use_hook(|| CopyValue::new(None)),
+        list: use_hook(|| CopyValue::new(None)),
         scope: use_hook(current_scope_id),
         pad,
     };
@@ -171,6 +174,24 @@ impl Tracker {
     pub(crate) fn panel_mounted(&self, element: MountedRef) {
         let mut panel = self.hands.panel;
         panel.set(Some(element));
+    }
+
+    /// The scrolling list of rows mounted: the rows are brought into view in it.
+    pub(crate) fn list_mounted(&self, element: MountedRef) {
+        let mut list = self.hands.list;
+        list.set(Some(element));
+    }
+
+    /// Scroll the least that shows choice `index`'s row, once it is laid out.
+    pub(crate) fn show_row(&self, index: usize) {
+        let hands = self.hands;
+        spawn_in(hands.scope, async move {
+            let list = hands.list.peek().clone();
+            let row = hands.rows.peek().get(index).cloned().flatten();
+            if let (Some(list), Some(row)) = (list, row) {
+                let _ = crate::host::reveal::reveal(&list.0, &row.0).await;
+            }
+        });
     }
 
     /// Choice `index`'s row mounted: kept to measure it when its submenu opens.

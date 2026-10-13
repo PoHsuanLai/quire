@@ -12,6 +12,10 @@ use ds_core::word::Word;
 /// above its parent row.
 pub(crate) const MENU_INSET: Px = Px(5.0);
 
+/// The least height a menu keeps when its anchor leaves little room on either side: about three
+/// rows, so it never shrinks to a sliver.
+pub(crate) const MIN_ROOM: Px = Px(84.0);
+
 /// Where a menu belongs (`NSMenu`'s three roles).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum MenuPlacement {

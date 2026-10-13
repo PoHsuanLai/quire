@@ -12,6 +12,7 @@ use crate::components::menus::menu::decide::{Decision, Level};
 use crate::components::menus::menu::panel::Panel;
 use crate::components::menus::menu::pick::Picked;
 use crate::components::menus::menu::placement::{Keys, MENU_INSET};
+use crate::components::menus::menu::scrolling::{use_in_view, use_scrolling};
 use crate::components::menus::menu::tracker::{Via, use_tracker};
 use crate::components::overlays::popover::{Stacking, layer_slug, position_style, use_float};
 use crate::host::measure::MountedRef;
@@ -44,6 +45,8 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
 ) -> Element {
     let float = use_float(ZLayer::Menu, Stacking::Passive);
     let tracker = use_tracker(timing, MENU_INSET);
+    let scrolling = use_scrolling();
+    let pointed = use_hook(|| CopyValue::new(None::<usize>));
     let alive = use_alive();
     let (keyed, opened) = (alive.clone(), alive.clone());
     let panel = Panel {
@@ -74,7 +77,8 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
             }
         }
     }));
-    let body = panel.body(&items);
+    use_in_view(tracker, panel.current(), pointed);
+    let body = scrolling.frame(tracker, panel.body(&items));
     let child = panel.submenu(timing);
     let probe = float.surface();
     let key_panel = panel.clone();
