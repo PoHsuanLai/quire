@@ -35,6 +35,8 @@ fn Page() -> Element {
                     common: Common { id: Some("first".to_owned()), ..Common::default() },
                     span { "control" }
                 }
+                // Far enough below that the first row's card does not cover this row's button.
+                div { style: "height:160px" }
                 FieldRow {
                     label: "Bluetooth",
                     help: Some(TextLine::from("Connect accessories.")),
@@ -59,8 +61,9 @@ fn press(harness: &mut Harness, selector: &str) {
     harness.advance(ms(400));
 }
 
+/// The help popovers open: the card, since the button's own "About" tip is a popover too.
 fn popovers(harness: &Harness) -> usize {
-    harness.count(".ds-popover")
+    harness.count(".ds-field-help-card")
 }
 
 #[test]
