@@ -118,6 +118,18 @@
    its tracking is its parent's, usually none: the bar is centred on the point. */
 .ds-input-wrap[*|data-variant=plain] .ds-input-caret::before{ left:-.75px; top:-.969em; height:1.21em; background:var(--accent-text); }
 
+/* The caret blinks while its field has the keyboard: Blitz paints the caret solid for as long as the
+   field is focused and has no blink of its own, so the field's `caret-color` is what flashes. One
+   second a cycle, half of it visible (the platforms' own rate is about that), as a step and not a
+   fade. Two keyframes because a keyframe cannot say "the inherited colour": the ink the field's
+   caret takes by default, and the accent a plain field's takes. */
+@keyframes ds-caret-blink-ink{ 0%{ caret-color:var(--ink); } 50%{ caret-color:transparent; } 100%{ caret-color:transparent; } }
+@keyframes ds-caret-blink-accent{ 0%{ caret-color:var(--accent-text); } 50%{ caret-color:transparent; } 100%{ caret-color:transparent; } }
+.ds-input:focus{ animation:ds-caret-blink-ink 1s steps(1,end) infinite; }
+.ds-input[*|data-variant=plain]:focus{ animation-name:ds-caret-blink-accent; }
+/* A field that draws its own caret (`data-caret=drawn`) keeps Blitz's transparent. */
+.ds-input[*|data-caret=drawn]:focus{ animation:none; }
+
 /* Multiline (`data-kind=multiline`): a `textarea` as tall as its `data-rows`, lines of the field's
    own 1.55 leading. The frame grows to hold it (no rung height) with a vertical pad, the caret
    and the placeholder start at the top, and the text scrolls inside the textarea past its rows. */
