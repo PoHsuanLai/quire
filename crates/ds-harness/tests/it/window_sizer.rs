@@ -119,12 +119,13 @@ fn an_ack_now_answers_on_the_next_turn_not_inside_the_request() {
 fn a_size_applied_at_once_with_no_resize_event_still_reaches_the_layout() {
     let mut harness = harness(SizerAck::Applied);
     let fill = |harness: &Harness| harness.rect("#fill").map(|rect| rect.size.width.0);
-    assert_eq!(fill(&harness), Some(800.0));
+    // The fill spans the body, inside its margin: it grows by what the window grew by.
+    let before = fill(&harness).expect("the fill is laid out");
     click(&mut harness, "#ask");
     assert_eq!(harness.window_size(), ASKED);
     assert_eq!(
         fill(&harness),
-        Some(900.0),
+        Some(before + 100.0),
         "the document is laid out at the size the window took"
     );
     assert_eq!(shown(&harness), state("idle", "requested"));
