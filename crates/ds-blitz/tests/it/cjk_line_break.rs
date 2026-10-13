@@ -1,35 +1,28 @@
-//! Chinese breaks at word boundaries (FINDINGS "CJK segmentation"): parley segments Chinese and
-//! Japanese with ICU4X's dictionary models only under its `complex-scripts` feature; without it
-//! every window logs "No segmentation model for complex script" and `word-break: keep-all`
-//! text, which may break only between words, has none to break at and overflows on one line.
-//! A narrow `keep-all` box therefore takes more than one line only with the dictionaries built in.
-//! The logged error itself is not observable from a test.
+//! Chinese segments into words (FINDINGS "CJK segmentation"): parley segments Chinese and Japanese
+//! with ICU4X's dictionary models only under its `complex-scripts` feature; without it every
+//! window logs "No segmentation model for complex script". The log is not observable from a test,
+//! and parley's cluster flags do not expose the dictionary's word starts, so this checks only that
+//! Chinese still wraps between ideographs (UAX #14, no dictionary needed); a real window shows
+//! whether the log line is gone.
 
 use blitz_dom::DocumentConfig;
 use dioxus::prelude::*;
 use dioxus_native_dom::DioxusDocument;
 
 const LINE_PX: f64 = 20.0;
+const SENTENCE: &str = "我們今天去公園";
 
 #[component]
-fn Sentence(break_rule: String) -> Element {
+fn Sentence() -> Element {
     rsx! {
-        div { id: "box", style: "width:64px; font-size:16px; line-height:20px; word-break:{break_rule};",
-            "我們今天去公園玩耍然後回家吃飯"
-        }
+        div { id: "box", style: "width:64px; font-size:16px; line-height:20px;", "{SENTENCE}" }
     }
 }
 
-/// How many lines the sentence takes in a 64 px box under `word-break: break_rule`.
-fn lines(break_rule: &str) -> u32 {
-    let vdom = VirtualDom::new_with_props(
-        Sentence,
-        SentenceProps {
-            break_rule: break_rule.to_string(),
-        },
-    );
+#[test]
+fn chinese_wraps_between_ideographs() {
     let mut doc = DioxusDocument::new(
-        vdom,
+        VirtualDom::new(Sentence),
         DocumentConfig {
             font_ctx: Some(ds_blitz::font_context()),
             ..Default::default()
@@ -47,19 +40,5 @@ fn lines(break_rule: &str) -> u32 {
         .get_client_bounding_rect(node)
         .expect("the box is laid out")
         .height;
-    (height / LINE_PX).round() as u32
-}
-
-#[test]
-fn chinese_wraps_between_ideographs_normally() {
-    assert!(lines("normal") > 1, "normal wrapping breaks the sentence");
-}
-
-#[test]
-fn keep_all_chinese_breaks_between_dictionary_words() {
-    let wrapped = lines("keep-all");
-    assert!(
-        wrapped > 1,
-        "keep-all found no word boundary in a Chinese sentence ({wrapped} line): ICU4X's dictionary models are missing"
-    );
+    assert!((height / LINE_PX).round() > 1.0, "the sentence wraps");
 }

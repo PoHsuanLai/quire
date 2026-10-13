@@ -26,7 +26,7 @@ fn app() -> Element {
             div { style: "position:absolute; left:0; top:0; width:300px; height:80px; background:#fff; display:flex; font-family:'Inter', 'Noto Color Emoji', sans-serif; font-size:48px; line-height:72px;",
                 span { id: "face", style: "display:block; width:88px;", "😀" }
                 span { id: "flag", style: "display:block; width:88px;", "🇹🇼" }
-                span { id: "plain", style: "display:block; width:88px; font-family:'Inter',system-ui,sans-serif;", "👩‍👩‍👧‍👦" }
+                span { id: "plain", style: "display:block; width:88px; font-family:'Inter',system-ui,sans-serif;", "🇹🇼" }
             }
             div { style: "position:absolute; left:0; top:80px; width:400px; height:80px; background:#fff; display:flex; font-size:48px; line-height:72px; color:#000;",
                 span { id: "token", class: "ds-emoji-text", style: "display:block; width:88px;", "🎉" }
@@ -71,11 +71,12 @@ fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
         token > 1000,
         "🎉 under .ds-emoji-text coloured pixels: {token}"
     );
-    // A stack naming no emoji family paints a ZWJ family in colour, not as monochrome faces,
+    // A stack naming no emoji family paints a flag in colour, one glyph, not two letter boxes
+    // (a ZWJ family takes the same path, but Noto draws it mostly grey, which this count misses),
     let plain = coloured(&harness, &shot, "#plain");
     assert!(
         plain > 1000,
-        "👩‍👩‍👧‍👦 under a plain stack coloured pixels: {plain}"
+        "🇹🇼 under a plain stack coloured pixels: {plain}"
     );
     // and its letters, digits and `#` fall through to Inter: the same pixels as Inter alone.
     let crop = |selector: &str| {
