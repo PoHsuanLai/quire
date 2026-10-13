@@ -123,13 +123,24 @@ fn a_key_brings_the_highlighted_row_into_view() {
         harness.advance(ms(50));
     }
     harness.advance(ms(200));
-    let list = harness.rect(".ds-menu-list").expect("the list");
+    // The rect of a scroller comes back moved by its own scroll offset, so the visible list is
+    // measured from what does not scroll: the panel and the strips that show.
+    let panel = harness.rect(".ds-menu").expect("the menu");
+    let top = harness
+        .rect(".ds-menu-scroll[*|data-end=start]")
+        .map_or(panel.origin.y.0, |strip| {
+            strip.origin.y.0 + strip.size.height.0
+        });
+    let bottom = harness
+        .rect(".ds-menu-scroll[*|data-end=end]")
+        .map_or(panel.origin.y.0 + panel.size.height.0, |strip| {
+            strip.origin.y.0
+        });
     let row = harness
         .rect(".ds-menu-item[*|data-selected=true]")
         .expect("a row is highlighted");
     assert!(
-        row.origin.y.0 >= list.origin.y.0 - 0.5
-            && row.origin.y.0 + row.size.height.0 <= list.origin.y.0 + list.size.height.0 + 0.5,
-        "the highlighted row {row:?} is inside the list {list:?}"
+        row.origin.y.0 >= top - 0.5 && row.origin.y.0 + row.size.height.0 <= bottom + 0.5,
+        "the highlighted row {row:?} shows between {top} and {bottom}"
     );
 }
