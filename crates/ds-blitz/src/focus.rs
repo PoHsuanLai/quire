@@ -59,6 +59,7 @@ pub(crate) fn focus(element: &MountedData) -> Focused {
         Some(Held::Already) => Focused::Done,
         Some(Held::Not) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
+            enable_ime_for_unbuilt_field(doc, node.node);
             caret_after_text(doc, node.node);
         })),
     }
@@ -253,6 +254,23 @@ fn done(written: Written) -> Focused {
     match written {
         Written::Done => Focused::Done,
         Written::Busy => Focused::Busy,
+    }
+}
+
+/// Turn the input method on for a text field that took the keyboard before its first layout.
+///
+/// Blitz switches the input method on when a node with an editor takes the keyboard
+/// (`Node::focus`), and builds the editor with the first layout, so a field focused on mount
+/// found none and left it off. On macOS that is not only about composing text: with the input
+/// method off winit does not run `interpretKeyEvents`, the standard key bindings (Backspace among
+/// them, which Blitz leaves to them on macOS) never arrive, and the field takes typing but
+/// cannot delete until the keyboard has moved away and back.
+fn enable_ime_for_unbuilt_field(doc: &mut BaseDocument, node: NodeId) {
+    if doc
+        .get_node(node)
+        .is_some_and(|found| matches!(field_of(found), Field::NotLaidOut))
+    {
+        doc.shell_provider.set_ime_enabled(true);
     }
 }
 
