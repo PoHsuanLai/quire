@@ -9,14 +9,13 @@ use crate::gpu_device::open_device;
 use crate::gpu_diagnostics::GpuDiagnostics;
 use crate::painter::{Canvas, PaintTime, draw};
 use anyrender::ResourceId;
-use anyrender_vello_hybrid::{ImageManager, VelloHybridScenePainter};
+use anyrender_vello_hybrid::{ImageManager, ImageUploads, VelloHybridScenePainter};
 use blitz_dom::BaseDocument;
 use blitz_kit::adapter::AdapterPref;
 use ds_blitz::Gpu;
 use ds_blitz::seam::attached_gpu;
 use rustc_hash::FxHashMap;
 use std::time::{Duration, Instant};
-use vello_common::paint::ImageId;
 use vello_hybrid::{RenderSize, RenderTargetConfig, Renderer, Resources, Scene, TextureBindings};
 use wgpu_context::DeviceHandle;
 
@@ -33,7 +32,7 @@ pub(crate) struct GpuPainter {
     resources: Resources,
     scene: Scene,
     /// Uploaded images by content hash, kept across frames as shell-host keeps them.
-    images: FxHashMap<u64, ImageId>,
+    images: ImageUploads,
     /// Textures the document registered (a canvas), by anyrender resource.
     bindings: FxHashMap<ResourceId, wgpu::TextureView>,
     target: Target,
