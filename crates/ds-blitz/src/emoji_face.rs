@@ -85,11 +85,14 @@ fn insert_before_first(list: &[FamilyId], covers: &[bool], face: FamilyId) -> Ve
         Some(_) if face_first => list.to_vec(),
         _ => {
             let at = at.unwrap_or(list.len());
-            let rest = |range: &[FamilyId]| range.iter().copied().filter(|id| *id != face);
             let (before, after) = list.split_at(at);
-            rest(before)
+            let others = |id: &FamilyId| *id != face;
+            before
+                .iter()
+                .copied()
+                .filter(others)
                 .chain(std::iter::once(face))
-                .chain(rest(after))
+                .chain(after.iter().copied().filter(others))
                 .collect()
         }
     }
