@@ -114,7 +114,7 @@ wgpu_context = "0.9"
 # Per-device image cache for the shared hybrid renderer (SPIKE.md S1 finding 5).
 rustc-hash = "2"
 vello_common = "0.1"
-parley = { version = "0.11.1", default-features = false, features = ["std"] }
+parley = { version = "0.11.1", default-features = false, features = ["std", "complex-scripts"] }
 image = { version = "0.25.6", default-features = false, features = ["png", "jpeg"] }
 
 # Wayland client (shell-host and sill share one sctk major: cosmic-client-toolkit uses 0.20).

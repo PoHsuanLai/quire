@@ -8,6 +8,7 @@
 mod cancelled_animation;
 mod caret_same_frame;
 mod cascade_layer;
+mod cjk_line_break;
 mod click_focus_restore;
 mod clipboard;
 mod colour_emoji;
