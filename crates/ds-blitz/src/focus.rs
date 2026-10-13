@@ -278,7 +278,7 @@ fn enable_ime_for_unbuilt_field(doc: &mut BaseDocument, node: NodeId) {
 enum Field {
     /// A field with its editor.
     Editable,
-    /// An `input` or `textarea` not laid out yet: no editor until the first layout.
+    /// A text field not laid out yet: no editor until the first layout.
     NotLaidOut,
     /// Not a text field, or gone.
     Absent,
@@ -292,7 +292,48 @@ fn field_of(node: &Node) -> Field {
         return Field::Editable;
     }
     match element.name.local.as_ref() {
-        "input" | "textarea" => Field::NotLaidOut,
+        "textarea" => Field::NotLaidOut,
+        "input" if takes_text(element.attr(LocalName::from("type"))) => Field::NotLaidOut,
         _ => Field::Absent,
+    }
+}
+
+/// Whether an `input` of `kind` is one Blitz gives an editor (`blitz-dom`'s layout, the types it
+/// builds a `TextInputData` for). A checkbox, a button, a range or a file input never has one, so
+/// it is never a field waiting for its editor: turning the input method on for it would leave it
+/// on, as Blitz turns it off on blur only for a node with an editor.
+fn takes_text(kind: Option<&str>) -> bool {
+    matches!(
+        kind.map(str::to_ascii_lowercase).as_deref(),
+        None | Some("text" | "password" | "email" | "number" | "search" | "tel" | "url")
+    )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::takes_text;
+
+    #[test]
+    fn only_an_input_blitz_gives_an_editor_waits_for_one() {
+        let cases = [
+            (None, true),
+            (Some("text"), true),
+            (Some("PASSWORD"), true),
+            (Some("email"), true),
+            (Some("number"), true),
+            (Some("search"), true),
+            (Some("tel"), true),
+            (Some("url"), true),
+            (Some("checkbox"), false),
+            (Some("radio"), false),
+            (Some("range"), false),
+            (Some("button"), false),
+            (Some("submit"), false),
+            (Some("file"), false),
+            (Some("color"), false),
+        ];
+        for (kind, text) in cases {
+            assert_eq!(takes_text(kind), text, "{kind:?}");
+        }
     }
 }
