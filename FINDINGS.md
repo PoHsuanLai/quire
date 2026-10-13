@@ -1298,15 +1298,18 @@ What Blitz at the pinned rev paints (48 px, headless):
 Parley 0.11.1 segments words and lines with ICU4X's dictionary models only under its
 `complex-scripts` feature; without it `WordSegmenter::new_for_non_complex_scripts` logs "ICU4X
 data error: No segmentation model for complex script: Chinese/Japanese" for every window with
-that text, and `word-break: keep-all` has no word boundary to break at. The workspace turns the
-feature on (`parley = { features = ["std", "complex-scripts"] }`); Blitz (checked at the pinned
-rev) builds no segmenter of its own, so nothing else logs it.
-`ds-blitz/tests/it/cjk_line_break.rs` lays a Chinese sentence out in a 64 px `keep-all` box and
-wants more than one line (the logged error is not observable from a test).
+that text, and Chinese and Japanese get no dictionary word boundaries (word selection and moving
+by word fall back). Line wrapping between ideographs is UAX #14 and works either way. The
+workspace turns the feature on (`parley = { features = ["std", "complex-scripts"] }`); Blitz
+(checked at the pinned rev) builds no segmenter of its own, so nothing else logs it.
+`ds-blitz/tests/it/cjk_line_break.rs` checks only that Chinese wraps: the log is not observable
+from a test, `word-break: keep-all` does not use the dictionary for Chinese (it keeps ideograph
+runs whole either way), and parley's cluster flags do not expose the dictionary's word starts.
 
-- **Known trade-off: binary size.** The dictionaries (`icu_segmenter_data` Chinese/Japanese
-  models and word lists) are compiled into every binary that links parley, a few hundred KB to
-  about 1 MB in release builds. Not measured here; measure it on the first build and record it.
+- **Known trade-off: binary size.** Measured 2026-10-14 on a stripped release binary that only
+  lays text out with parley 0.11.1: 1.54 MB without the feature, 5.34 MB with it, so about
+  +3.8 MB per binary that links parley (ICU4X's baked dictionaries and LSTM models for Chinese,
+  Japanese and the South-East Asian scripts).
 
 ## Hybrid harness backend
 
