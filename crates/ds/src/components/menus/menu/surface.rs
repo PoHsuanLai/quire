@@ -46,11 +46,17 @@ impl Surface {
                     float.origin(Some(rect), want, gap)
                 });
                 // The menu grows to its rows until it meets the edge it opens toward, less the
-                // margin; the stylesheet's window-high cap holds until that is known.
-                let room = wanted
-                    .and_then(|(rect, want, gap)| float.room(Some(rect), want, gap))
-                    .map(|room| max_height_style(Px(room.0.max(MIN_ROOM.0))))
-                    .unwrap_or_default();
+                // margin; the stylesheet's window-high cap holds until that is known. A context
+                // menu is not held to the edge it opens toward: placement shifts it back inside
+                // the window (as every desktop's does), so it scrolls only when the window itself
+                // is too short for its rows, and the window-high cap is its limit.
+                let room = match placement {
+                    MenuPlacement::Context => String::new(),
+                    MenuPlacement::Bar | MenuPlacement::Popup => wanted
+                        .and_then(|(rect, want, gap)| float.room(Some(rect), want, gap))
+                        .map(|room| max_height_style(Px(room.0.max(MIN_ROOM.0))))
+                        .unwrap_or_default(),
+                };
                 let width = hung.width_style(field).unwrap_or_default();
                 // Until the anchor is measured the menu has no place: it is laid out (so it can
                 // be measured) but not drawn, and a press cannot land on it.

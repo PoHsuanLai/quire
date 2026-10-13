@@ -180,31 +180,35 @@ pub fn Capsule<T: Clone + PartialEq + 'static>(
             material: Material::Osd,
             class: "ds-capsule-scope",
             onmounted: move |event| stage.on_mounted(event),
-            div {
-                id: common.id.clone(),
-                class,
-                role: "toolbar",
-                "aria-label": "{name}",
-                "data-shown": presence.shown().slug(),
-                "data-presence": presence.drawn_slug(),
-                "data-pulse": alias.slug(),
-                "data-span": span_of(&drawn),
-                style: unmeasured_style(width),
-                onmounted: move |event| common.mounted(event),
-                onpointerenter: move |_| onpointerenter.call(()),
-                onpointerleave: move |_| onpointerleave.call(()),
-                ..data,
-                for slot in drawn.iter() {
-                    match slot {
-                        CapsuleSlot::Item(item) => rsx! { {button(item, onpick)} },
-                        CapsuleSlot::Readout(text) => rsx! {
-                            span { class: "ds-capsule-readout", "{text}" }
-                        },
-                        CapsuleSlot::Divider => rsx! {
-                            span { class: "ds-capsule-divider", role: "separator" }
-                        },
-                        CapsuleSlot::Scrub(slot) => scrub(slot, onscrub),
-                        CapsuleSlot::Level(slot) => level(slot, onlevel),
+            // A stage too narrow for even the slots that never drop leaves nothing to draw: the
+            // scope stays (it measures the stage), but no pill, not an empty one.
+            if !drawn.is_empty() {
+                div {
+                    id: common.id.clone(),
+                    class,
+                    role: "toolbar",
+                    "aria-label": "{name}",
+                    "data-shown": presence.shown().slug(),
+                    "data-presence": presence.drawn_slug(),
+                    "data-pulse": alias.slug(),
+                    "data-span": span_of(&drawn),
+                    style: unmeasured_style(width),
+                    onmounted: move |event| common.mounted(event),
+                    onpointerenter: move |_| onpointerenter.call(()),
+                    onpointerleave: move |_| onpointerleave.call(()),
+                    ..data,
+                    for slot in drawn.iter() {
+                        match slot {
+                            CapsuleSlot::Item(item) => rsx! { {button(item, onpick)} },
+                            CapsuleSlot::Readout(text) => rsx! {
+                                span { class: "ds-capsule-readout", "{text}" }
+                            },
+                            CapsuleSlot::Divider => rsx! {
+                                span { class: "ds-capsule-divider", role: "separator" }
+                            },
+                            CapsuleSlot::Scrub(slot) => scrub(slot, onscrub),
+                            CapsuleSlot::Level(slot) => level(slot, onlevel),
+                        }
                     }
                 }
             }
