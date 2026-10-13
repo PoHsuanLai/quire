@@ -24,3 +24,13 @@
 .ds-field-group{ display:flex; flex-direction:column; min-width:0; }
 .ds-field-group-rows{ border-radius:var(--r-card); background:var(--surface); box-shadow:inset 0 0 0 var(--hair) var(--line); overflow:hidden; }
 .ds-field-group-rows > .ds-field-row + .ds-field-row{ border-top:var(--hair) solid var(--line); }
+
+/* Help on request (`HelpShown::OnRequest`): the label is the title with a small ⓘ button at its
+   trailing end, and the help text stays in the tree, visually hidden, for `aria-describedby`.
+   The popover's card holds the label as a bold title above the help. */
+.ds-field-row[*|data-help=on-request] .ds-field-row-label{ flex-direction:row; align-items:center; gap:var(--s-4); }
+.ds-field-row[*|data-help=on-request] .ds-field-row-help{ position:absolute; width:var(--hair); height:var(--hair); overflow:hidden; white-space:nowrap; }
+.ds-field-row-about{ display:inline-flex; flex:none; align-items:center; }
+.ds-field-help-card{ display:flex; flex-direction:column; gap:var(--s-4); box-sizing:border-box; max-width:260px; padding:var(--s-12); }
+.ds-field-help-title{ font-size:var(--fs-control); font-weight:600; color:var(--ink); line-height:1.3; }
+.ds-field-help-text{ font-size:var(--fs-help); color:var(--ink-faint); line-height:1.3; }

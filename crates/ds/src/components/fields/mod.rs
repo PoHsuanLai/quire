@@ -1,6 +1,7 @@
 //! Fields: the one text field.
 
 pub mod fact_list;
+pub mod field_help;
 pub mod field_row;
 pub mod shortcut_field;
 pub mod shortcut_field_model;

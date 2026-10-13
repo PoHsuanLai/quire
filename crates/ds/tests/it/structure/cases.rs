@@ -20,6 +20,7 @@ use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::components::controls::checkbox::Checkbox;
 use ds::components::controls::scrubber_model::BufferedRange;
 use ds::components::fields::fact_list::{Fact, FactList};
+use ds::components::fields::field_help::HelpShown;
 use ds::components::fields::field_row::{FieldGroup, FieldRow, RowLayout};
 use ds::components::fields::stepper::model::{Readout, StepRange};
 use ds::components::fields::stepper::view::Stepper;
@@ -311,6 +312,11 @@ pub const CASES: &[Case] = &[
         component: "field_row",
         state: "setting",
         make: || rsx! { FieldRow { label: TextLine::from("Wi-Fi"), help: Some(TextLine::from("Join known networks.")), span { "control" } } },
+    },
+    Case {
+        component: "field_row",
+        state: "on-request",
+        make: || rsx! { FieldRow { label: TextLine::from("Wi-Fi"), help: Some(TextLine::from("Join known networks.")), help_shown: HelpShown::OnRequest, span { "control" } } },
     },
     Case {
         component: "field_row",

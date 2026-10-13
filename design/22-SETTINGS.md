@@ -1022,6 +1022,10 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Viewer** (anyview, section 3.31) | Window: `viewer.chrome.hide_after`, `viewer.warm_for`; Viewing: `viewer.zoom.step`, `viewer.media.seek_step`; History: `viewer.history.cap`, `viewer.versions.keep`; Export: `viewer.export.jpeg_quality`, `viewer.export.avif_quality`, `viewer.export.paper`, `viewer.export.orientation`; `viewer.peek.*` and `viewer.image.*` are Advanced |
 | **Advanced** (file only) | everything else in section 3: `bar.*`, `menus.*`, `switcher.*`, `control_center.*`, `icons.*` (except `style` and `monochrome_tint`), `scrollbar.*`, `scroll.momentum_*`/`rubber_band_*`/`wheel_detent_px`, `dock.*` geometry beyond the Dock page's list above, `palm_rejection.*`, `gestures.g4_*`/`live_workspace_*`, `spaces.default_grain`/`default_card_accent`, `session.*` other than `lock_grace_s` (Accounts page, all Advanced) |
 
+**Row help (2026-10-13).** Settings is for normal people: a row's label is a short noun and its details
+come on request. Settings rows use `FieldRow { help_shown: HelpShown::OnRequest }` (04-COMPONENTS.md
+section 56): the help sits behind the row's ⓘ. It is one or two sentences and never repeats the label.
+
 ## 6. Acceptance
 
 1. **Round-trip test per domain**: `Domain::default()` -> `toml::to_string` -> `toml::from_str`

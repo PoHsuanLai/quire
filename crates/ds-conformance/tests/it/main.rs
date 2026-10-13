@@ -24,6 +24,7 @@ mod driven_components;
 mod driven_motion;
 mod fact_list;
 mod field_focus;
+mod field_help;
 mod field_row_controls;
 mod gestures;
 mod grouped_list;

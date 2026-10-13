@@ -4395,6 +4395,17 @@ default wherever the focus is; Escape and the scrim cancel in both flows; Space 
 focused button; Tab stays inside; inline it fits inside a 320 px popover, floating it is centred in
 the window).
 
+### 56. FieldRow help (2026-10-13)
+
+`FieldRow { help, help_shown }` (design/30 section 2.2). `HelpShown::Inline` (the default) draws the help
+under the label. `HelpShown::OnRequest` hides it behind a borderless ⓘ (`Icon::Info`, `Bezel::Toolbar`,
+`ControlSize::Small`) at the label's trailing end, named "About <label>" with the tip "About". A press
+toggles a `Popover` (`Dismiss::Transient`, with its arrow) anchored to the button: the label as a bold
+title, then the help. Escape, an outside press and a second press close it, with the Popover's own
+fade; the layer stack keeps one open, since a press on another row's ⓘ is an outside press that closes
+the first. In both modes the help is one element, `id` the row's `id` plus `-help` (else a slug of the
+label), and the row carries `aria-describedby` to it; on request it is visually hidden, not removed.
+
 ## Open decisions
 
 Each needs a yes/no or a number before the owning wave starts. "Proposal" marks this document's
