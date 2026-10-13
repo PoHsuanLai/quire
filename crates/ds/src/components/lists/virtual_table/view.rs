@@ -56,7 +56,9 @@ pub const fn row_pitch() -> Px {
 /// `cursor` is the selected row, kept in view; `onselect` hears a click, an arrow, Home, End,
 /// Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the cursor.
 /// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default). `rules` draws a hairline between the columns; `header_rule` draws one under the
-/// header once the rows are scrolled (`HeaderRule::WhenScrolled`, the default).
+/// header once the rows are scrolled (`HeaderRule::WhenScrolled`, the default). `pitch` is how
+/// tall every row is ([`row_pitch`], the compact row, by default): a table that zooms its rows
+/// gives the zoomed height, and a row may be shorter than the compact row.
 ///
 /// The row index and the pixel offset are `f32`s in the end: past about 500,000 rows (16 million
 /// pixels) a row's top is no longer exact, so a table of more rows than that should be paged by
@@ -76,9 +78,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] rules: ColumnRules,
     #[props(default)] header_rule: HeaderRule,
+    #[props(default = row_pitch())] pitch: Px,
     #[props(default)] common: Common,
 ) -> Element {
-    let pitch = row_pitch();
     let layout = Layout::Even { pitch, len: rows };
     let window = use_memo(use_reactive(
         (&layout, &overscan),
