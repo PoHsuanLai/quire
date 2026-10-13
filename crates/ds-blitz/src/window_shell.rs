@@ -436,11 +436,29 @@ impl Windows {
     }
 }
 
+/// AppKit's standard key bindings (Backspace, ⌥⌫, ⌃A …), which Blitz's text input leaves to the
+/// platform on macOS. Each reaches the window it was typed in: every window is its own
+/// application, and one handed another window's binding finds no such window and drops it, which
+/// is how the first window's handler alone left every later window unable to delete.
+impl ApplicationHandlerExtMacOS for Windows {
+    fn standard_key_binding(
+        &mut self,
+        event_loop: &dyn ActiveEventLoop,
+        window_id: WindowId,
+        action: &str,
+    ) {
+        let Some(key) = self.key_of(window_id) else {
+            return;
+        };
+        if let Some(handler) = self.sub_mut(key).and_then(|sub| sub.app.macos_handler()) {
+            handler.standard_key_binding(event_loop, window_id, action);
+        }
+    }
+}
+
 impl ApplicationHandler for Windows {
     fn macos_handler(&mut self) -> Option<&mut dyn ApplicationHandlerExtMacOS> {
-        self.subs
-            .first_mut()
-            .and_then(|(_, sub)| sub.app.macos_handler())
+        Some(self)
     }
 
     fn resumed(&mut self, event_loop: &dyn ActiveEventLoop) {
