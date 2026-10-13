@@ -2,6 +2,7 @@
 //! stand-in (the harness's fake), which answers as a test says.
 
 use crate::screen_area::ScreenArea;
+use crate::window_requests::Requests;
 use crate::window_screen::window_area;
 use crate::window_size::Extent;
 use crate::window_sizer::WindowSizer;
@@ -26,27 +27,35 @@ pub trait SizedWindow {
     fn screen(&self) -> Option<ScreenArea>;
 }
 
-/// A winit window, whose resizes arrive as `WindowEvent::SurfaceResized`.
-pub(crate) struct WinitSized(pub(crate) Arc<dyn Window>);
+/// A winit window, whose resizes arrive as `WindowEvent::SurfaceResized`, except one the
+/// platform applies at once and answers only in `request_surface_size`'s return (Wayland): that
+/// is handed to the event loop (`requests`), which delivers the event the platform did not send.
+pub(crate) struct WinitSized {
+    pub(crate) window: Arc<dyn Window>,
+    pub(crate) requests: Option<Requests>,
+}
 
 impl SizedWindow for WinitSized {
     fn surface_size(&self) -> Extent {
-        let size = self.0.surface_size();
+        let size = self.window.surface_size();
         Extent::new(size.width, size.height)
     }
 
     fn scale_factor(&self) -> f64 {
-        self.0.scale_factor()
+        self.window.scale_factor()
     }
 
     fn request_surface_size(&self, logical: Extent, _answer_to: &WindowSizer) {
-        // Where the platform applies it at once it says so; the resize event follows either way.
-        let _applied = self
-            .0
+        // Where the platform applies it at once it says so and may send no resize event.
+        let applied = self
+            .window
             .request_surface_size(LogicalSize::new(logical.width, logical.height).into());
+        if let Some(requests) = &self.requests {
+            requests.applied(self.window.id(), applied);
+        }
     }
 
     fn screen(&self) -> Option<ScreenArea> {
-        window_area(self.0.as_ref())
+        window_area(self.window.as_ref())
     }
 }

@@ -283,6 +283,21 @@ impl Headless {
         });
     }
 
+    /// Deliver the resizes the window applied at once (`SizerAck::Applied`) as the window loop
+    /// delivers winit's `Some(size)`: the document is laid out at the new size and the sizer
+    /// hears it, as for a `SurfaceResized`.
+    pub(crate) fn deliver_applied(&mut self) {
+        for applied in self.window.take_applied() {
+            self.resize(Viewport {
+                width: applied.logical.width,
+                height: applied.logical.height,
+                ..self.viewport
+            });
+            let sizer = self.sizer.clone();
+            self.doc.vdom.in_runtime(|| sizer.resized(applied.physical));
+        }
+    }
+
     /// Lay the document out in `viewport` from now on, keeping its colour scheme, and tell the
     /// app the device scale it now has. The caller resolves the document afterwards.
     pub(crate) fn resize(&mut self, viewport: Viewport) {
@@ -361,6 +376,7 @@ impl Headless {
     /// phase for what the frame left; the reasons another frame is wanted, none when the document
     /// is at rest.
     pub(crate) fn round(&mut self, at: Duration) -> Vec<&'static str> {
+        self.deliver_applied();
         let inner = &self.doc.inner;
         self.links
             .drain(&|frame, href| read_link(&inner.borrow(), frame, href));

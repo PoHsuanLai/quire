@@ -48,6 +48,7 @@ fn Sizing() -> Element {
         p { id: "sizer", "present" }
         p { id: "request", "{request}" }
         p { id: "origin", "{origin}" }
+        div { id: "fill", style: "width:100%; height:10px" }
         button {
             id: "ask",
             style: "position:absolute; left:0; top:0; width:80px; height:30px",
@@ -112,6 +113,27 @@ fn an_ack_now_answers_on_the_next_turn_not_inside_the_request() {
     assert_eq!(sizer.origin(), Some(SizeOrigin::Requested));
     assert_eq!(harness.window_size(), ASKED);
     assert_eq!(harness.window_requests(), vec![ASKED]);
+}
+
+#[test]
+fn a_size_applied_at_once_with_no_resize_event_still_reaches_the_layout() {
+    let mut harness = harness(SizerAck::Applied);
+    let fill = |harness: &Harness| harness.rect("#fill").map(|rect| rect.size.width.0);
+    assert_eq!(fill(&harness), Some(800.0));
+    click(&mut harness, "#ask");
+    assert_eq!(harness.window_size(), ASKED);
+    assert_eq!(
+        fill(&harness),
+        Some(900.0),
+        "the document is laid out at the size the window took"
+    );
+    assert_eq!(shown(&harness), state("idle", "requested"));
+    harness.resize_window(ASKED);
+    assert_eq!(
+        shown(&harness),
+        state("idle", "requested"),
+        "a repeat of the same size changes nothing"
+    );
 }
 
 #[test]

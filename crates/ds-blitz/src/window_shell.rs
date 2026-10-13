@@ -316,6 +316,9 @@ impl Windows {
             match request {
                 Request::Open { key, spec, root } => self.open(event_loop, key, &spec, root),
                 Request::Close(key) => self.drop_window(event_loop, key),
+                Request::Resized { window, size } => {
+                    self.window_event(event_loop, window, WindowEvent::SurfaceResized(size));
+                }
                 Request::Focus { key, token } => {
                     if let Some(window) = self.sub_mut(key).and_then(|sub| sub.slot.window()) {
                         raise(&*window, token);

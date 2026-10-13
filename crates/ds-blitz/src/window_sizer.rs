@@ -5,6 +5,7 @@
 use crate::screen_area::ScreenArea;
 use crate::size_ledger::{ANSWER_WINDOW, Expiry, Serial, SizeLedger, SizeOrigin, SizeRequest};
 use crate::sized_window::{SizedWindow, WinitSized};
+use crate::window_requests::Requests;
 use crate::window_size::Extent;
 use dioxus::core::spawn_forever;
 use dioxus::prelude::*;
@@ -35,8 +36,8 @@ impl std::fmt::Debug for WindowSizer {
 
 impl WindowSizer {
     /// The sizer of the winit `window`.
-    pub(crate) fn new(window: Arc<dyn Window>) -> WindowSizer {
-        WindowSizer::over(Rc::new(WinitSized(window)))
+    pub(crate) fn new(window: Arc<dyn Window>, requests: Option<Requests>) -> WindowSizer {
+        WindowSizer::over(Rc::new(WinitSized { window, requests }))
     }
 
     /// The sizer of `window`, for a host that is not a winit window (the headless harness). The

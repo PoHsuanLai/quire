@@ -4,6 +4,8 @@
 
 use crate::open_window::WindowSpec;
 use dioxus::prelude::Element;
+use dioxus_native::winit::dpi::PhysicalSize;
+use dioxus_native::winit::window::WindowId;
 use std::cell::{Cell, RefCell};
 use std::collections::{HashMap, VecDeque};
 use std::rc::Rc;
@@ -58,6 +60,12 @@ pub(crate) enum Request {
         key: WindowKey,
         token: Option<String>,
     },
+    /// The platform applied a size the window asked for and sent no resize event (Wayland):
+    /// the loop gives the window the `SurfaceResized` that never came.
+    Resized {
+        window: WindowId,
+        size: PhysicalSize<u32>,
+    },
 }
 
 /// The app's queue of window requests, shared by every window's document (a root context) and
@@ -102,6 +110,14 @@ impl Requests {
     /// Ask for the window `key` to be raised and focused, with `token` where it has one.
     pub(crate) fn focus(&self, key: WindowKey, token: Option<String>) {
         self.push(Request::Focus { key, token });
+    }
+
+    /// Winit's answer to a request to resize `window`: `Some(size)` is a resize the platform
+    /// applied at once and may report no event for, so the loop is asked to deliver it.
+    pub(crate) fn applied(&self, window: WindowId, answer: Option<PhysicalSize<u32>>) {
+        if let Some(size) = answer {
+            self.push(Request::Resized { window, size });
+        }
     }
 
     /// Every request since the last take, oldest first.
@@ -153,6 +169,7 @@ mod tests {
                 Request::Open { key, spec, .. } => format!("open {} {}", key.0, spec.title()),
                 Request::Close(key) => format!("close {}", key.0),
                 Request::Focus { key, token } => format!("focus {} {token:?}", key.0),
+                Request::Resized { size, .. } => format!("resized {}x{}", size.width, size.height),
             })
             .collect()
     }

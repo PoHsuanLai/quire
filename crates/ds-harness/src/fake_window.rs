@@ -23,6 +23,10 @@ pub enum SizerAck {
     After(Duration),
     /// Never: the compositor ignores the request.
     Never,
+    /// At once, as Wayland does: the window has the size when the request returns, and nothing
+    /// is sent but the return value. The host delivers the resize
+    /// (`Headless::deliver_applied`), as the event loop does for winit's `Some(size)`.
+    Applied,
 }
 
 /// The output the harness's window reports through `WindowSizer::screen`.
@@ -63,12 +67,22 @@ pub(crate) struct WindowSpec {
     pub hosting: WindowHosting,
 }
 
+/// A size the window took at once (`SizerAck::Applied`).
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct Applied {
+    pub logical: Extent,
+    /// What the sizer hears as the resize.
+    pub physical: Extent,
+}
+
 struct State {
     /// The window's content size, physical px.
     size: Extent,
     scale: Scale,
     ack: SizerAck,
     requests: Vec<Extent>,
+    /// Sizes applied at once, for the host to deliver as resizes.
+    applied: Vec<Applied>,
     screen: Option<ScreenArea>,
 }
 
@@ -84,6 +98,7 @@ impl FakeWindow {
             scale,
             ack: spec.ack,
             requests: Vec::new(),
+            applied: Vec::new(),
             screen: spec.screen.area(viewport),
         })))
     }
@@ -91,6 +106,11 @@ impl FakeWindow {
     /// The sizes asked for so far, logical px, oldest first.
     pub(crate) fn requests(&self) -> Vec<Extent> {
         self.0.borrow().requests.clone()
+    }
+
+    /// The sizes applied at once since the last take, oldest first.
+    pub(crate) fn take_applied(&self) -> Vec<Applied> {
+        std::mem::take(&mut self.0.borrow_mut().applied)
     }
 
     /// The window is now `logical` px, as a person's drag leaves it: the size changes and the
@@ -125,6 +145,15 @@ impl SizedWindow for FakeWindow {
         };
         let delay = match ack {
             SizerAck::Never => return,
+            SizerAck::Applied => {
+                let mut state = self.0.borrow_mut();
+                state.size = answer;
+                state.applied.push(Applied {
+                    logical,
+                    physical: answer,
+                });
+                return;
+            }
             SizerAck::Now => Duration::ZERO,
             SizerAck::After(delay) => delay,
         };

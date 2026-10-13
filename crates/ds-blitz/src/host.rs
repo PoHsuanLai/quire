@@ -54,7 +54,7 @@ use crate::window::WinitWindow;
 use crate::window_build::WindowSlot;
 use crate::window_drop::WindowDrop;
 use crate::window_hover::WindowHover;
-use crate::window_requests::Root;
+use crate::window_requests::{Requests, Root};
 use crate::window_scroll::{ScrollHandle, WindowScroll};
 use crate::window_size::Extent;
 use crate::window_sizer::WindowSizer;
@@ -162,9 +162,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
         }
     });
     let shell = use_hook(consume_context::<Arc<dyn ShellProvider>>);
+    let requests = use_hook(try_consume_context::<Requests>);
     let framed = {
         let window = Arc::clone(&window);
-        use_window_host_provider(move || Rc::new(WinitWindow::new(window, shell)))
+        let requests = requests.clone();
+        use_window_host_provider(move || {
+            Rc::new(WinitWindow::new(window, shell).reporting(requests))
+        })
     };
     let seen = Rc::clone(&document);
     // The window loop gives every event to the same scrolling before the document hears it, so
@@ -184,7 +188,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         use_context_provider(|| ScrollHandle::new(scroll.clone(), wake));
     }
     let resized = use_context_provider(WindowResized::new);
-    let sizer = use_context_provider(|| WindowSizer::new(Arc::clone(&window)));
+    let sizer = use_context_provider(|| WindowSizer::new(Arc::clone(&window), requests.clone()));
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
