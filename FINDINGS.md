@@ -1258,7 +1258,7 @@ What Blitz at the pinned rev paints (48 px, headless):
 | Noto Color Emoji COLRv1 (Fedora's default), named in the stack | colour, including skin tones, flags and ZWJ sequences shaped to single glyphs (Noto draws the family in greys) | colour, the same to within anti-aliasing |
 | Noto Color Emoji CBDT | nothing (0 inked) | nothing |
 | CBDT with glifo's `png` feature on | colour | **panics** (`pixmap image sources are not supported by Vello Hybrid`) |
-| no emoji family named | monochrome from Symbola, with tofu for modifiers and flags | |
+| no emoji family named, before `ds_blitz::EmojiChoice` | monochrome from Symbola, with tofu for modifiers and flags | |
 | Noto Emoji (monochrome), named | monochrome outlines | |
 
 - **COLRv1 needs no change in quire**: glifo interprets the paint graphs (layers, gradients,
@@ -1276,9 +1276,37 @@ What Blitz at the pinned rev paints (48 px, headless):
   stacks name no emoji face while shell-host lacks quire's faces (Open items).
   `ds-blitz/tests/text_stack_fonts.rs` lays the stack out under both font contexts: under shell-host's,
   "00:22" is 84 px against 45 for Inter and 41 for system-ui.
+- **Unnamed-stack emoji (anyview report, 2026-10-14).** A ZWJ family drew as four monochrome
+  faces and a flag as two boxes in a window whose stack names no emoji family. Cause: fallback,
+  not the renderer. glifo paints COLRv1 (`glifo/src/colr.rs`, `vello_tests/tests/emoji.rs`
+  `big_colr`) and the named-family rows above prove it. Parley (`shape/mod.rs`, `select_font`)
+  asks the element's stack, then the `emoji` generic, and `system-ui`/`sans-serif` expand to the
+  whole fontconfig match list (`fc-match -s`), which reaches Symbola before the `emoji` generic
+  is consulted. Fix: `ds_blitz::font_context` (`emoji_face.rs`) detects the first COLR family of
+  the `emoji` generic (CBDT is skipped: it draws nothing) and inserts it into each generic list
+  just before the first family mapping U+1F600, so text fonts earlier in the list keep digits and
+  spaces. `QUIRE_EMOJI_FAMILY=<name>` (`EmojiChoice::Named`) overrides the detection. Not
+  covered: contexts not built by quire (shell-host's `SharedFonts::system`) still need the
+  emoji face named, or the same call; the fix would belong in `blitz_kit::fonts::SharedFonts`.
+
 - **For an emoji grid**: COLRv1 by name for the whole set; AnimatedEmoji's still first frames
   (`EmojiPlayback::Still`) where a cell must match the picture it becomes; pre-rendered sprite
   sheets only if scrolling were too slow (it is not, "Hybrid harness backend"); never CBDT.
+
+## CJK segmentation
+
+Parley 0.11.1 segments words and lines with ICU4X's dictionary models only under its
+`complex-scripts` feature; without it `WordSegmenter::new_for_non_complex_scripts` logs "ICU4X
+data error: No segmentation model for complex script: Chinese/Japanese" for every window with
+that text, and `word-break: keep-all` has no word boundary to break at. The workspace turns the
+feature on (`parley = { features = ["std", "complex-scripts"] }`); Blitz (checked at the pinned
+rev) builds no segmenter of its own, so nothing else logs it.
+`ds-blitz/tests/it/cjk_line_break.rs` lays a Chinese sentence out in a 64 px `keep-all` box and
+wants more than one line (the logged error is not observable from a test).
+
+- **Known trade-off: binary size.** The dictionaries (`icu_segmenter_data` Chinese/Japanese
+  models and word lists) are compiled into every binary that links parley, a few hundred KB to
+  about 1 MB in release builds. Not measured here; measure it on the first build and record it.
 
 ## Hybrid harness backend
 

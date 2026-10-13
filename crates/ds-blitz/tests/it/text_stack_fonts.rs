@@ -21,6 +21,9 @@ use std::sync::Arc;
 const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
 const STACK: &str = "\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif";
 /// sill's broken strings: a file name and the bar clock.
+/// A face, a thumbs-up with a skin tone, a flag and a ZWJ family.
+const EMOJI: &str = "\u{1F600}\u{1F44D}\u{1F3FD}\u{1F1F9}\u{1F1FC}\u{1F469}\u{200D}\u{1F469}\u{200D}\u{1F467}\u{200D}\u{1F466}";
+const LAST: &str = "\"Inter\",system-ui,sans-serif,\"Noto Color Emoji\"";
 const TEXTS: &[&str] = &["m9-extra-1.pdf", "00:22", "a b c"];
 
 /// shell-host's context, as `SharedFonts::system()` builds it.
@@ -156,31 +159,59 @@ fn the_stack_is_inter_under_quire_and_takes_the_emoji_faces_digits_under_shell_h
     }
 }
 
-/// Why the emoji face cannot simply go last: `system-ui` already maps emoji (fontconfig lists
-/// Symbola under it here), so a face named after it is never reached. Under either context the
-/// emoji of `"Inter",system-ui,sans-serif,"Noto Color Emoji"` lay out as system-ui's, not as the
-/// colour face's.
+/// Why the emoji face cannot simply go last under shell-host's context: `system-ui` already maps
+/// emoji (fontconfig lists Symbola under it here), so a face named after it is never reached.
+/// The emoji of `"Inter",system-ui,sans-serif,"Noto Color Emoji"` lay out as system-ui's, not as
+/// the colour face's.
 #[test]
-fn an_emoji_face_after_system_ui_is_never_reached() {
+fn an_emoji_face_after_system_ui_is_never_reached_under_shell_host() {
     if !applies() {
         return;
     }
-    let emoji = "\u{1F600}\u{1F44D}\u{1F3FD}\u{1F1F9}\u{1F1FC}";
-    let last = "\"Inter\",system-ui,sans-serif,\"Noto Color Emoji\"";
-    for fonts in [
-        shell_host_fonts as fn() -> FontContext,
-        ds_blitz::font_context,
-    ] {
-        let colour = width(fonts(), "\"Noto Color Emoji\"", emoji);
-        let system = width(fonts(), "system-ui,sans-serif", emoji);
-        assert!(
-            (colour - system).abs() > 1.0,
-            "the faces differ here ({colour} vs {system})"
+    let colour = width(shell_host_fonts(), "\"Noto Color Emoji\"", EMOJI);
+    let system = width(shell_host_fonts(), "system-ui,sans-serif", EMOJI);
+    assert!(
+        (colour - system).abs() > 1.0,
+        "the faces differ here ({colour} vs {system})"
+    );
+    let got = width(shell_host_fonts(), LAST, EMOJI);
+    assert!(
+        (got - system).abs() < 0.01,
+        "emoji last is system-ui's ({got} vs {system})"
+    );
+}
+
+/// Under quire's context the colour face sits ahead of the monochrome one in `system-ui` and
+/// `sans-serif` (`ds_blitz::EmojiChoice`), so emoji in a stack that names no emoji family lay
+/// out as the colour face's (a ZWJ family and a flag shape to single glyphs) and ordinary text
+/// is still Inter's.
+#[test]
+fn quire_s_context_reaches_the_colour_face_through_system_ui() {
+    if !applies() {
+        return;
+    }
+    let colour = width(ds_blitz::font_context(), "\"Noto Color Emoji\"", EMOJI);
+    let plain = width(
+        ds_blitz::font_context(),
+        "\"Inter\",system-ui,sans-serif",
+        EMOJI,
+    );
+    assert!(
+        (plain - colour).abs() < 0.01,
+        "a stack naming no emoji family lays emoji out as the colour face ({plain} vs {colour})"
+    );
+    let last = width(ds_blitz::font_context(), LAST, EMOJI);
+    assert!(
+        (last - colour).abs() < 0.01,
+        "emoji last ({last} vs {colour})"
+    );
+    for text in TEXTS {
+        let stack = width(
+            ds_blitz::font_context(),
+            "\"Inter\",system-ui,sans-serif",
+            text,
         );
-        let got = width(fonts(), last, emoji);
-        assert!(
-            (got - system).abs() < 0.01,
-            "emoji last is system-ui's ({got} vs {system})"
-        );
+        let inter = width(ds_blitz::font_context(), "\"Inter\"", text);
+        assert!((stack - inter).abs() < 0.01, "{text}: {stack} vs {inter}");
     }
 }

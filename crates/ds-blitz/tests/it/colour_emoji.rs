@@ -4,7 +4,8 @@
 //! own fallback does not reach it on this machine (it picks Symbola, monochrome), which is why
 //! an emoji grid names the family. `.ds-emoji-text` (the `--font-emoji` stack, emoji face first)
 //! paints colour too, while its letters, digits and `#` stay Inter's pixel for pixel. Skipped,
-//! with a note, where the font is not installed.
+//! with a note, where the font is not installed. A stack naming no emoji family (`Inter`,
+//! `system-ui`, `sans-serif`) reaches the colour face too (`ds_blitz::EmojiChoice`).
 
 use dioxus::prelude::*;
 use ds::prelude::*;
@@ -22,9 +23,10 @@ const VIEW: Viewport = Viewport {
 fn app() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window,
-            div { style: "position:absolute; left:0; top:0; width:200px; height:80px; background:#fff; display:flex; font-family:'Inter', 'Noto Color Emoji', sans-serif; font-size:48px; line-height:72px;",
+            div { style: "position:absolute; left:0; top:0; width:300px; height:80px; background:#fff; display:flex; font-family:'Inter', 'Noto Color Emoji', sans-serif; font-size:48px; line-height:72px;",
                 span { id: "face", style: "display:block; width:88px;", "😀" }
                 span { id: "flag", style: "display:block; width:88px;", "🇹🇼" }
+                span { id: "plain", style: "display:block; width:88px; font-family:'Inter',system-ui,sans-serif;", "👩‍👩‍👧‍👦" }
             }
             div { style: "position:absolute; left:0; top:80px; width:400px; height:80px; background:#fff; display:flex; font-size:48px; line-height:72px; color:#000;",
                 span { id: "token", class: "ds-emoji-text", style: "display:block; width:88px;", "🎉" }
@@ -68,6 +70,12 @@ fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
     assert!(
         token > 1000,
         "🎉 under .ds-emoji-text coloured pixels: {token}"
+    );
+    // A stack naming no emoji family paints a ZWJ family in colour, not as monochrome faces,
+    let plain = coloured(&harness, &shot, "#plain");
+    assert!(
+        plain > 1000,
+        "👩‍👩‍👧‍👦 under a plain stack coloured pixels: {plain}"
     );
     // and its letters, digits and `#` fall through to Inter: the same pixels as Inter alone.
     let crop = |selector: &str| {
