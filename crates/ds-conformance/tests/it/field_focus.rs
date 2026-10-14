@@ -124,3 +124,43 @@ fn a_secure_field_draws_dots_not_what_is_typed() {
         Some("••••••")
     );
 }
+
+/// A field with a select-all request and the text it holds; Escape in the field asks again.
+#[allow(non_snake_case)]
+fn Asked() -> Element {
+    let request = use_focus_request().with_select_all();
+    let mut text = use_signal(String::new);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Sheet,
+            div { style: "display:flex; width:300px; padding:12px",
+                TextField { label: "Q", value: text(), focus: FieldFocus::Controlled(request),
+                    oninput: move |next: String| text.set(next),
+                    onkey: move |event: KeyboardEvent| {
+                        if event.key() == dioxus::prelude::Key::Escape {
+                            request.request();
+                        }
+                    },
+                }
+            }
+            p { class: "held", {text()} }
+        }
+    }
+}
+
+/// Asking again for a field that already has the keyboard selects its text anew (a second Find
+/// over a typed query), so the next key replaces the query instead of extending it.
+#[test]
+fn a_repeated_select_all_request_on_a_focused_field_selects_its_text() {
+    let mut harness = Harness::new(Asked, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    harness.advance(ms(100));
+    for c in "abc".chars() {
+        harness.send(Input::key(ShortcutKey::Char(c)));
+        harness.advance(ms(20));
+    }
+    assert_eq!(harness.text_of(".held").as_deref(), Some("abc"));
+    harness.send(Input::key(ShortcutKey::Escape));
+    harness.advance(ms(100));
+    harness.send(Input::key(ShortcutKey::Char('x')));
+    harness.advance(ms(50));
+    assert_eq!(harness.text_of(".held").as_deref(), Some("x"));
+}

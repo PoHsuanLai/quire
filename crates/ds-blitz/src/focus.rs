@@ -68,7 +68,9 @@ pub(crate) fn focus(element: &MountedData) -> Focused {
 /// Give `element` the keyboard and put its caret at `caret` in one write to the document, so the
 /// field cannot be typed into between the two (a deferred select-all selected the empty length it
 /// had seen and put the caret at 0, and "invoice" became "nvoicei"). A field that has the
-/// keyboard already is left alone, caret included. A field not laid out yet has no editor to
+/// keyboard already keeps it but takes the caret again (a second request on a focused field selects
+/// its text anew; `set_focus_to` is not called, it would put the caret back at the start). A field
+/// not laid out yet has no editor to
 /// type into or place a caret in, so it takes the keyboard now and its first layout puts the caret
 /// at the start; an element that is no text field is only focused.
 pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focused {
@@ -88,7 +90,8 @@ pub(crate) fn focus_placing(element: &MountedData, caret: InitialCaret) -> Focus
     match probed {
         None => Focused::Busy,
         Some(None | Some((Held::Gone, _))) => Focused::Unknown,
-        Some(Some((Held::Already, _))) => Focused::Done,
+        Some(Some((Held::Already, Field::Editable))) => place_caret(element, caret),
+        Some(Some((Held::Already, Field::NotLaidOut | Field::Absent))) => Focused::Done,
         Some(Some((Held::Not, Field::Editable))) => done(node.write(|doc| {
             doc.set_focus_to(node.node);
             doc.with_text_input(node.node, |mut driver| match caret {
