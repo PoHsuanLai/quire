@@ -169,8 +169,13 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let framed = {
         let window = Arc::clone(&window);
         let requests = requests.clone();
+        let zoomed = Rc::clone(&document);
         use_window_host_provider(move || {
-            Rc::new(WinitWindow::new(window, shell).reporting(requests))
+            Rc::new(
+                WinitWindow::new(window, shell)
+                    .reporting(requests)
+                    .zooming(Rc::clone(&zoomed)),
+            )
         })
     };
     let seen = Rc::clone(&document);

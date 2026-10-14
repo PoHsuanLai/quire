@@ -16,9 +16,14 @@ use blitz_traits::shell::ShellProvider;
 use dioxus_native::winit::dpi::{PhysicalPosition, PhysicalSize};
 use dioxus_native::winit::icon::{Icon, RgbaIcon};
 use dioxus_native::winit::window::{ResizeDirection, Window};
+use dioxus_native_dom::NodeHandle;
 use ds::prelude::*;
 use ds::window::icon::WindowIcon;
-use ds::window::vocab::{Activation, Fullscreen, Maximized, Support, TileError, WindowTile, Zoom};
+use ds::window::vocab::{
+    Activation, Fullscreen, Maximized, PageZoom, Support, TileError, WindowTile, Zoom,
+};
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::sync::Arc;
 
 /// The winit window, as the frame's host.
@@ -27,6 +32,8 @@ pub struct WinitWindow {
     shell: Arc<dyn ShellProvider>,
     /// Where a resize the platform applied without an event is reported (`Requests::applied`).
     requests: Option<Requests>,
+    /// The document, once it is mounted, whose viewport a page zoom changes.
+    document: Option<Rc<RefCell<Option<NodeHandle>>>>,
 }
 
 impl std::fmt::Debug for WinitWindow {
@@ -44,7 +51,14 @@ impl WinitWindow {
             window,
             shell,
             requests: None,
+            document: None,
         }
+    }
+
+    /// The same seam, zooming `document` on a page zoom.
+    pub(crate) fn zooming(mut self, document: Rc<RefCell<Option<NodeHandle>>>) -> Self {
+        self.document = Some(document);
+        self
     }
 
     /// The same seam, reporting the resizes the platform applies without an event to `requests`.
@@ -161,6 +175,24 @@ impl HostWindow for WinitWindow {
 
     fn set_icon(&self, icon: &WindowIcon) {
         self.window.set_window_icon(winit_icon(icon));
+    }
+
+    fn page_zoom(&self, step: PageZoom) {
+        let Some(handle) = self
+            .document
+            .as_ref()
+            .and_then(|slot| slot.borrow().clone())
+        else {
+            return;
+        };
+        {
+            let mut doc = handle.doc_mut();
+            let mut viewport = doc.viewport_mut();
+            let next = crate::shell_keys::zoomed(viewport.zoom(), step);
+            viewport.set_zoom(next);
+        }
+        // The next frame lays the page out at its new size, and the host's scale follows it.
+        self.window.request_redraw();
     }
 }
 

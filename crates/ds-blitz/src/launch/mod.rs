@@ -23,6 +23,7 @@ use crate::keymap_choice::KeymapChoice;
 use crate::net_policy::NetPolicy;
 use crate::open_window::WindowSpec;
 use crate::setup::Setup;
+use crate::shell_keys::ShellKeys;
 use crate::startup_token::LaunchTokens;
 use crate::window::Decorations;
 use crate::window_build::Base;
@@ -190,6 +191,14 @@ impl AppConfig {
     /// [`FocusFallback::Ancestor`]: the nearest focusable ancestor, as in a browser).
     pub fn with_focus_fallback(mut self, fallback: FocusFallback) -> Self {
         self.setup.focus_fallback = fallback;
+        self
+    }
+
+    /// Who answers the keys blitz-shell has its own meaning for (default [`ShellKeys::Blitz`]):
+    /// with [`ShellKeys::App`] every key is the document's, and the app zooms the page through
+    /// `WindowHost::page_zoom`.
+    pub fn with_shell_keys(mut self, keys: ShellKeys) -> Self {
+        self.setup.shell_keys = keys;
         self
     }
 

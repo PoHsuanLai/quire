@@ -138,4 +138,5 @@ pub(crate) fn window_config(
         },
     );
     WindowConfig::with_attributes(Box::new(doc) as _, renderer, attributes)
+        .with_builtin_keys(base.setup.shell_keys.builtin())
 }

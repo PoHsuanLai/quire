@@ -6,6 +6,7 @@ use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::net_policy::NetPolicy;
+use crate::shell_keys::ShellKeys;
 use dioxus::prelude::VirtualDom;
 use ds::keys::KeySource;
 
@@ -23,6 +24,8 @@ pub struct Setup {
     /// Where the keymap comes from, provided at the root for `Ds` to load. Our desktop's
     /// conventions until the launch names another.
     pub keys: KeySource,
+    /// Who answers the keys blitz-shell has its own meaning for (its page zoom and overlays).
+    pub shell_keys: ShellKeys,
 }
 
 impl Setup {

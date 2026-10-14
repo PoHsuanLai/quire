@@ -11,7 +11,7 @@
 
 use super::icon::WindowIcon;
 use super::tiled::Tiled;
-use super::vocab::{ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
+use super::vocab::{PageZoom, ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -48,6 +48,8 @@ pub trait HostWindow {
     fn tiled(&self) -> Tiled {
         Tiled::NONE
     }
+    /// Zoom the page one step, or back to its own size. A host that draws at one size ignores it.
+    fn page_zoom(&self, _step: PageZoom) {}
 }
 
 /// The host's window, as root context: the seam and its last reported state.
@@ -106,6 +108,12 @@ impl WindowHost {
     /// Change the window's icon, as the app asks after launch.
     pub fn set_icon(&self, icon: &WindowIcon) {
         self.host.set_icon(icon);
+    }
+
+    /// Zoom the page one step, or back to its own size, as the app's Bigger, Smaller and Actual
+    /// Size ask.
+    pub fn page_zoom(&self, step: PageZoom) {
+        self.host.page_zoom(step);
     }
 
     /// Re-read the host's own state, after a window event that may have changed it (a resize, a

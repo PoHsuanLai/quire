@@ -39,6 +39,19 @@ pub enum Zoom {
     Restore,
 }
 
+/// A step of the page's zoom, as the standard Bigger, Smaller and Actual Size ask for it
+/// (Primary with `+`, `-` and `0`): everything in the window drawn larger or smaller, laid out
+/// again at its new size.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+pub enum PageZoom {
+    /// One step larger.
+    Bigger,
+    /// One step smaller.
+    Smaller,
+    /// Back to the page's own size.
+    ActualSize,
+}
+
 /// A placement the tiling menu offers (macOS Sequoia's Window > Move & Resize). Named
 /// `WindowTile` because `ds::MenuTile` is a menu row's leading tile.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]

@@ -1,11 +1,12 @@
 //! The window host the harness gives an app that asks for one ([`WindowHosting::Recorded`]): a
 //! `HostWindow` that keeps every title and icon the app set, so a test reads what
-//! `use_window_title` and `WindowHost::set_icon` sent. It draws nothing and places nothing:
+//! `use_window_title` and `WindowHost::set_icon` sent, and every page zoom asked
+//! (`WindowHost::page_zoom`). It draws nothing and places nothing:
 //! the frame's requests (move, resize, zoom, tile) are ignored and the state is the default.
 
 use ds::window::host::HostWindow;
 use ds::window::icon::WindowIcon;
-use ds::window::vocab::{ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
+use ds::window::vocab::{PageZoom, ResizeEdge, Support, TileError, WindowState, WindowTile, Zoom};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -23,6 +24,7 @@ pub enum WindowHosting {
 struct Calls {
     titles: Vec<String>,
     icons: Vec<WindowIcon>,
+    zooms: Vec<PageZoom>,
 }
 
 /// What the app asked of its window, shared between the host the app holds and the harness.
@@ -33,6 +35,11 @@ impl WindowLog {
     /// Every title set, oldest first.
     pub(crate) fn titles(&self) -> Vec<String> {
         self.0.borrow().titles.clone()
+    }
+
+    /// Every page zoom asked, oldest first.
+    pub(crate) fn page_zooms(&self) -> Vec<PageZoom> {
+        self.0.borrow().zooms.clone()
     }
 
     /// The icon set last, if any.
@@ -70,5 +77,9 @@ impl HostWindow for WindowLog {
 
     fn set_icon(&self, icon: &WindowIcon) {
         self.0.borrow_mut().icons.push(icon.clone());
+    }
+
+    fn page_zoom(&self, step: PageZoom) {
+        self.0.borrow_mut().zooms.push(step);
     }
 }

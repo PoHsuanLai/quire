@@ -41,6 +41,13 @@ impl Harness {
         self.doc.window_log.titles()
     }
 
+    /// Every page zoom the app asked of its window host, oldest first (Bigger, Smaller, Actual
+    /// Size). Empty unless the harness was built with
+    /// [`WindowHosting::Recorded`](crate::WindowHosting::Recorded).
+    pub fn page_zooms(&self) -> Vec<ds::window::vocab::PageZoom> {
+        self.doc.window_log.page_zooms()
+    }
+
     /// The title the app set last, if it set one (see [`Harness::window_titles`]).
     pub fn window_title(&self) -> Option<String> {
         self.window_titles().pop()

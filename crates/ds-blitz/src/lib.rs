@@ -77,6 +77,7 @@ mod screen_area;
 #[cfg(feature = "testing")]
 pub mod seam;
 mod setup;
+mod shell_keys;
 mod size_ledger;
 mod sized_window;
 pub mod snap;
@@ -136,6 +137,7 @@ pub use pdf_thumb::{
 };
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
+pub use shell_keys::ShellKeys;
 pub use snap::snap_to_device;
 pub use texture_layer::{
     Gpu, GpuError, Pace, PixelFormat, Pixels, PixelsError, Sampling, TexelRect, Texels, TextureFit,
