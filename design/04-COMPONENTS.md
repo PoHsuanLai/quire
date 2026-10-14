@@ -3585,7 +3585,7 @@ per app `div.ds-switcher-cell[role=option][aria-selected][aria-label]` (`a-fold`
 | Part | Value | Basis |
 | --- | --- | --- |
 | Panel | `Material::Osd` in a transparent root, painted as the OSD card: the Space gradient at the frame alpha (the solid floor without blur), `--m-box`, `--m-radius` (18); padding 16, 10 below the name line | design/13 13.3.5 (Osd, radius 18, padding 16); design/20 1.7 |
-| Cells | `--switcher-cell` 112 with icons `--switcher-icon` 96, `--switcher-gap` 8 | `switcher.cell_size_px`, `icon_size_px`, `cell_gap_px` |
+| Cells | `--switcher-cell` 80 with icons `--switcher-icon` 64 (design/20 section 1.11: the plate at 64), `--switcher-gap` 8 | `switcher.cell_size_px`, `icon_size_px`, `cell_gap_px` |
 | Selection | one `--f-pill` square of the cell's size, `--r-tile` (12), behind the row, moved to the selected cell by `transform` with `--t-quick --e-spring` | design/13 13.3.5; design/20 1.11 |
 | Name | the selected cell's Fly, moved under the tile (14 below the icon) and set in the UI face 13/600 in `--f-ink`, no label box; the others' Flys are `Shown::Hidden` | design/13 13.3.5 ("ui 13/600 centred"); design/20 1.11 (`Tooltip{Fly}`); the user's no-monospace rule |
 | Overflow | the panel fits `output - 64`: past that the cells shrink (icon + 16), down to icons of `switcher.overflow_min_icon_px` (48); past that the view is the room left and the row is scrolled (`margin-left`) with the selection centred, clamped to the row's ends | design/13 13.3.5 |

@@ -70,8 +70,8 @@ impl Default for SwitcherSettings {
     fn default() -> Self {
         SwitcherSettings {
             show_delay_ms: Ms(150),
-            icon_size_px: Px(96),
-            cell_size_px: Px(112),
+            icon_size_px: Px(64),
+            cell_size_px: Px(80),
             cell_gap_px: Px(8),
             overflow_min_icon_px: Px(48),
         }
