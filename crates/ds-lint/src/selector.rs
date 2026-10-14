@@ -16,13 +16,14 @@ use super::tokenize::Located;
 /// `DsInternals`.
 pub(crate) const CONSUMER_SEAMS: &[&str] = &["data-slot"];
 
-/// The twelve attributes a `.ds` root carries that a consumer must never select on
+/// The thirteen attributes a `.ds` root carries that a consumer must never select on
 /// (design/22-SETTINGS.md, ARCHITECTURE.md "Repo rules", design/04-COMPONENTS.md "Shared
 /// vocabulary"): the scope's, the root chrome's `data-chrome`, `data-frame` and `data-ground` (bar
 /// gaps), and its `data-extent` (sheet and modal parts), and its `data-typeface`.
 const INTERNAL_ATTRS: &[&str] = &[
     "data-theme",
     "data-accent",
+    "data-contrast",
     "data-motion",
     "data-material",
     "data-blur",

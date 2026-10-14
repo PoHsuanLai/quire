@@ -5,7 +5,10 @@
 //! Foreground and background are the card's ink and surface in the scheme, so a terminal sits
 //! in a Space's card like any other content (design/21-SPACES.md: the card follows the
 //! scheme, the Space paints the frame around it). The cursor and the selection follow the
-//! accent, as a text caret and a selected row do. Every ANSI colour reads on the background at
+//! accent, as a text caret and a selected row do. The hues are Apple's system colours at
+//! increased contrast (`system_hue`): on the dark ground those are Apple's own; on white the
+//! normals are the increased-contrast values and each bright is one step (0.07 of OKLCH
+//! lightness) darker, in the same hue. Every ANSI colour reads on the background at
 //! 4.5:1 or better, so the "black" of a dark scheme and the "white" of a light one are lifted
 //! or deepened from the usual: `ansi_colours_read_on_the_background` gates all sixteen in both.
 
@@ -140,22 +143,22 @@ impl TerminalColour {
             // the window paper's, which a terminal sits deepest in.
             TerminalColour::Fg => (rgb(0x202020), rgb(0xE8E8E8)),
             TerminalColour::Bg => (rgb(0xFFFFFF), rgb(0x1E1E1E)),
-            TerminalColour::Black => (rgb(0x303030), rgb(0x8A8A8A)),
-            TerminalColour::Red => (rgb(0xB3261E), rgb(0xF0786C)),
-            TerminalColour::Green => (rgb(0x1B7A3E), rgb(0x5EC27F)),
-            TerminalColour::Yellow => (rgb(0x8A6100), rgb(0xD9B04A)),
-            TerminalColour::Blue => (rgb(0x1F5FBF), rgb(0x6EA3F2)),
-            TerminalColour::Magenta => (rgb(0xA23B9C), rgb(0xD98BD3)),
-            TerminalColour::Cyan => (rgb(0x0B7A85), rgb(0x4FC3CF)),
-            TerminalColour::White => (rgb(0x5C5C5C), rgb(0xC8C8C8)),
-            TerminalColour::BrightBlack => (rgb(0x6B6B6B), rgb(0x9A9A9A)),
-            TerminalColour::BrightRed => (rgb(0xC7382D), rgb(0xFF8F84)),
-            TerminalColour::BrightGreen => (rgb(0x187A3F), rgb(0x7ADB98)),
-            TerminalColour::BrightYellow => (rgb(0x946A00), rgb(0xEBC866)),
-            TerminalColour::BrightBlue => (rgb(0x2F6FD1), rgb(0x8DB8F8)),
-            TerminalColour::BrightMagenta => (rgb(0xB14AAA), rgb(0xE8A3E2)),
-            TerminalColour::BrightCyan => (rgb(0x0A7983), rgb(0x6FD6E0)),
-            TerminalColour::BrightWhite => (rgb(0x4A4A4A), rgb(0xF5F5F5)),
+            TerminalColour::Black => (rgb(0x303030), rgb(0x8E8E93)),
+            TerminalColour::Red => (rgb(0xE9152D), rgb(0xFF6165)),
+            TerminalColour::Green => (rgb(0x008932), rgb(0x4AD968)),
+            TerminalColour::Yellow => (rgb(0xA16A00), rgb(0xFEDF43)),
+            TerminalColour::Blue => (rgb(0x1E6EF4), rgb(0x5CB8FF)),
+            TerminalColour::Magenta => (rgb(0xB02FC2), rgb(0xEA8DFF)),
+            TerminalColour::Cyan => (rgb(0x008198), rgb(0x3BDDEC)),
+            TerminalColour::White => (rgb(0x5C5C5C), rgb(0xD1D1D6)),
+            TerminalColour::BrightBlack => (rgb(0x6B6B6B), rgb(0xAEAEB2)),
+            TerminalColour::BrightRed => (rgb(0xC70322), rgb(0xFF9093)),
+            TerminalColour::BrightGreen => (rgb(0x007128), rgb(0x80E495)),
+            TerminalColour::BrightYellow => (rgb(0x865803), rgb(0xFEE97B)),
+            TerminalColour::BrightBlue => (rgb(0x0057DA), rgb(0x8DCDFF)),
+            TerminalColour::BrightMagenta => (rgb(0x9908AB), rgb(0xF0AFFF)),
+            TerminalColour::BrightCyan => (rgb(0x066B7E), rgb(0x76E7F2)),
+            TerminalColour::BrightWhite => (rgb(0x4A4A4A), rgb(0xF5F5F7)),
             TerminalColour::Cursor | TerminalColour::Selection => (rgb(0x000000), rgb(0x000000)),
         }
     }

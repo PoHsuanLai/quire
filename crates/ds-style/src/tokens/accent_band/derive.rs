@@ -42,14 +42,16 @@ pub fn accent_roles(band: &AccentBand, pick: AccentPick, scheme: Scheme) -> Acce
         hue: pick.hue.degrees(),
     };
     let (fill, ink) = solid_fill(bounds, tone);
-    roles_around(bounds, tone, scheme, fill, ink)
+    roles_around(bounds, tone, scheme, (fill, ink), None)
 }
 
 /// The roles of the Mac Look's accent: `fill` is the system colour itself, its ink white when
 /// white reads on it at [`floors::INK_ON_SYSTEM_FILL`] (Apple's own blue button is 4.0:1) and the
 /// deep ink of the hue otherwise (macOS's rule for yellow); the text accent, wash and ring are
-/// derived around it in the fill's own hue and chroma.
-pub fn system_roles(band: &AccentBand, scheme: Scheme, fill: Hex) -> AccentRoles {
+/// derived around it. The text accents lead from `text_lead` (the hue's increased-contrast
+/// value) and are it exactly wherever it reads on every ground; where it does not, they step
+/// from its lightness, in its own hue and chroma, until they do.
+pub fn system_roles(band: &AccentBand, scheme: Scheme, fill: Hex, text_lead: Hex) -> AccentRoles {
     let bounds = band.scheme(scheme);
     let own = Oklch::from(Oklab::from(Srgb::from(fill)));
     let tone = Tone {
@@ -62,20 +64,27 @@ pub fn system_roles(band: &AccentBand, scheme: Scheme, fill: Hex) -> AccentRoles
     } else {
         tone_ink(tone)
     };
-    roles_around(bounds, tone, scheme, fill, ink)
+    roles_around(bounds, tone, scheme, (fill, ink), Some(text_lead))
 }
 
-/// The text accent, wash and ring around a chosen fill and ink.
+/// The text accent, wash and ring around a chosen fill and ink, the text leading from `lead`
+/// when there is one.
 fn roles_around(
     bounds: &SchemeBand,
     tone: Tone,
     scheme: Scheme,
-    fill: Hex,
-    ink: Hex,
+    (fill, ink): (Hex, Hex),
+    lead: Option<Hex>,
 ) -> AccentRoles {
     let grounds = card_grounds(scheme);
     let wash = wash_alpha(bounds.wash, fill, &grounds);
-    let text_on = |on| text_accent(bounds, tone, scheme, &text_grounds(on, scheme, fill, wash));
+    let text_on = |on| {
+        let grounds = text_grounds(on, scheme, fill, wash);
+        match lead {
+            Some(lead) => text_from(lead, scheme, &grounds),
+            None => text_accent(bounds, tone, scheme, &grounds),
+        }
+    };
     let text = text_on(TextOn::Card);
     AccentRoles {
         fill,
@@ -101,6 +110,29 @@ fn solid_fill(bounds: &SchemeBand, tone: Tone) -> (Hex, Hex) {
 /// The near-black of the accent's hue that [`InkRule::Deep`] writes.
 fn tone_ink(tone: Tone) -> Hex {
     Hex(oklch_bytes(0.22, 0.03, tone.hue))
+}
+
+/// The text accent that leads from `lead`: `lead` itself where it reads on every one of
+/// `grounds`, else its own hue and chroma stepped away from the card from its lightness.
+fn text_from(lead: Hex, scheme: Scheme, grounds: &[TextGround]) -> Hex {
+    let reads = |text: Hex| {
+        grounds
+            .iter()
+            .all(|ground| contrast(text, ground.hex) >= floors::TEXT)
+    };
+    if reads(lead) {
+        return lead;
+    }
+    let own = Oklch::from(Oklab::from(Srgb::from(lead)));
+    let tone = Tone {
+        chroma: own.c,
+        hue: own.h.to_degrees().rem_euclid(360.0),
+    };
+    let step = match scheme {
+        Scheme::Light => -floors::LIGHTNESS_STEP,
+        Scheme::Dark => floors::LIGHTNESS_STEP,
+    };
+    tone.at(walk(own.l, step, |lightness| reads(tone.at(lightness))))
 }
 
 /// The text accent: darker than the band's start in light, lighter in dark, until it reads on

@@ -1,4 +1,6 @@
-//! One `.ds[data-accent=…]` block per accent and scheme.
+//! One `.ds[data-accent=…]` block per accent and scheme, and one more of each under
+//! `data-contrast=high` (the desktop asks for increased contrast), which sets the same seven
+//! properties from the increased-contrast shade of the hue.
 //!
 //! The dark blocks carry `data-theme=dark` as well, one attribute more specific than both the
 //! light accent blocks and the dark token block, so a dark root takes its accent's dark quad
@@ -9,10 +11,12 @@
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected
 //! hue on every button.
 
-use crate::appearance::{accent::Accent, theme::Scheme};
+use crate::appearance::{accent::Accent, system::Contrast, theme::Scheme};
 use crate::emit::{attr_selector, declaration, rule};
 use crate::tokens::{
-    accent_band::roles::AccentRoles, accent_table::accent_of, colour::ColourToken,
+    accent_band::roles::AccentRoles,
+    accent_table::{accent_in, accent_of},
+    colour::ColourToken,
 };
 use ds_core::word::Word;
 
@@ -25,8 +29,16 @@ pub fn accents_css() -> String {
     for scheme in Scheme::ALL.iter().copied() {
         for accent in Accent::ALL.iter().copied() {
             css.push_str(&rule(
-                &selector(accent, scheme),
+                &selector(accent, scheme, Contrast::Normal),
                 &seven(accent_of(accent, scheme)),
+            ));
+        }
+    }
+    for scheme in Scheme::ALL.iter().copied() {
+        for accent in Accent::ALL.iter().copied() {
+            css.push_str(&rule(
+                &selector(accent, scheme, Contrast::High),
+                &seven(accent_in(accent, scheme, Contrast::High)),
             ));
         }
     }
@@ -59,12 +71,19 @@ pub fn swatch_var(accent: Accent) -> String {
     format!("--swatch-{}", accent.slug())
 }
 
-fn selector(accent: Accent, scheme: Scheme) -> String {
+fn selector(accent: Accent, scheme: Scheme, contrast: Contrast) -> String {
     let theme = match scheme {
         Scheme::Light => String::new(),
         Scheme::Dark => attr_selector("data-theme", scheme.slug()),
     };
-    format!(".ds{theme}{}", attr_selector("data-accent", accent.slug()))
+    let contrast = match contrast {
+        Contrast::Normal => String::new(),
+        Contrast::High => attr_selector("data-contrast", "high"),
+    };
+    format!(
+        ".ds{theme}{contrast}{}",
+        attr_selector("data-accent", accent.slug())
+    )
 }
 
 fn seven(roles: AccentRoles) -> Vec<String> {

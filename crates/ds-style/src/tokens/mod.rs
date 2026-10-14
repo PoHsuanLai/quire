@@ -31,12 +31,15 @@ pub mod set;
 pub mod shape;
 pub mod shell_scale;
 pub mod shell_type;
+pub mod signal_colour;
 #[cfg(test)]
 pub mod size_rules_tests;
 pub mod size_scale;
 pub(crate) mod size_vars;
 pub mod spacing;
 pub mod status;
+pub mod system_hue;
+pub mod tag_colour;
 pub mod terminal;
 pub mod timing;
 pub(crate) mod tint;

@@ -5,8 +5,9 @@
 
 use ds::prelude::*;
 use ds_shell::stylesheet;
+use ds_style::appearance::system::Contrast;
 use ds_style::space::frame_vars::FrameVars;
-use ds_style::tokens::accent_table::accent_of;
+use ds_style::tokens::accent_table::accent_in;
 use ds_style::tokens::colour::ColourToken;
 use ds_style::tokens::easing::EasingToken;
 use ds_style::tokens::elevation::Shadow;
@@ -136,7 +137,8 @@ fn each_accent_block_sets_exactly_the_seven() {
         .into_iter()
         .filter(|(sel, _)| sel.contains("data-accent="))
         .collect();
-    assert_eq!(blocks.len(), Accent::ALL.len() * Scheme::ALL.len());
+    // One block per accent and scheme at ordinary contrast, and one more of each at increased.
+    assert_eq!(blocks.len(), Accent::ALL.len() * Scheme::ALL.len() * 2);
     for (selector, decls) in blocks {
         let names: BTreeSet<&str> = decls.iter().map(|(name, _)| name.as_str()).collect();
         assert_eq!(names, seven, "{selector}");
@@ -151,20 +153,25 @@ fn each_accent_block_is_the_bands_roles() {
             Scheme::Light => "",
             Scheme::Dark => "[*|data-theme=dark]",
         };
-        for accent in Accent::ALL.iter().copied() {
-            let selector = format!(".ds{theme}[*|data-accent={}]", accent.slug());
-            let decls = block(&selector);
-            let want = accent_of(accent, scheme);
-            for (name, value) in [
-                ("--accent", want.fill.css()),
-                ("--accent-ink", want.ink.css()),
-                ("--accent-soft", want.wash_colour().css()),
-                ("--accent-text", want.text.css()),
-                ("--accent-text-material", want.text_material.css()),
-                ("--accent-ring", want.ring_colour().css()),
-                ("--seal", want.fill.css()),
-            ] {
-                assert_eq!(decls.get(name), Some(&value), "{selector} {name}");
+        for (contrast, attr) in [
+            (Contrast::Normal, ""),
+            (Contrast::High, "[*|data-contrast=high]"),
+        ] {
+            for accent in Accent::ALL.iter().copied() {
+                let selector = format!(".ds{theme}{attr}[*|data-accent={}]", accent.slug());
+                let decls = block(&selector);
+                let want = accent_in(accent, scheme, contrast);
+                for (name, value) in [
+                    ("--accent", want.fill.css()),
+                    ("--accent-ink", want.ink.css()),
+                    ("--accent-soft", want.wash_colour().css()),
+                    ("--accent-text", want.text.css()),
+                    ("--accent-text-material", want.text_material.css()),
+                    ("--accent-ring", want.ring_colour().css()),
+                    ("--seal", want.fill.css()),
+                ] {
+                    assert_eq!(decls.get(name), Some(&value), "{selector} {name}");
+                }
             }
         }
     }

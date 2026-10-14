@@ -113,8 +113,9 @@ fn the_ink_is_deep() {
     }
 }
 
-/// The eight swatches in the picker are eight colours: every pair of built-in fills stands at least
-/// 0.04 apart in OKLab in both schemes (the narrowest gap is Apple's own, Red to Pink in light, 0.045).
+/// The swatches in the picker are all different colours: every pair of built-in fills stands at
+/// least 0.03 apart in OKLab in both schemes (the narrowest gap is Apple's own 2025 pair, Red to
+/// Pink in light, 0.033; Teal to Cyan is 0.039).
 #[test]
 fn every_built_in_swatch_is_distinct() {
     for scheme in Scheme::ALL.iter().copied() {
@@ -128,7 +129,7 @@ fn every_built_in_swatch_is_distinct() {
                 let apart =
                     Oklab::from(Srgb::from(first)).distance(Oklab::from(Srgb::from(second)));
                 assert!(
-                    apart >= 0.04,
+                    apart >= 0.03,
                     "{scheme:?}: {one:?} {} and {other:?} {} are {apart:.3} apart",
                     first.css(),
                     second.css()
@@ -138,8 +139,8 @@ fn every_built_in_swatch_is_distinct() {
     }
 }
 
-/// The Mac Look's default accent is systemBlue with white ink, light then dark; the text accent,
-/// wash and ring are derived around it.
+/// The default accent is Apple's 2025 systemBlue with white ink, light then dark; the text
+/// accent, wash and ring are derived around it.
 #[test]
 fn blue_is_system_blue() {
     let light = accent_of(Accent::Blue, Scheme::Light);
@@ -152,7 +153,7 @@ fn blue_is_system_blue() {
     ];
     assert_eq!(
         got,
-        ["#007aff", "#ffffff", "#0a84ff", "#ffffff"].map(str::to_owned)
+        ["#0088ff", "#ffffff", "#0091ff", "#ffffff"].map(str::to_owned)
     );
 }
 
