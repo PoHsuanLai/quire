@@ -2407,8 +2407,9 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-spaces-foot{ display:flex; align-items:center; gap:var(--s-6); padding-top:var(--s-6); min-width:0; }
 .ds-spaces-foot > *{ flex:none; }
 /* The dots take the foot's free width, so the buttons sit at its end, and stand close together at
-   its centre. */
+   its centre. With one Space there are no dots, and the empty gap takes that width instead. */
 .ds-spaces-foot > .ds-spaces-dots{ display:flex; gap:var(--s-2); align-items:center; justify-content:center; flex:1 1 auto; min-width:0; }
+.ds-spaces-foot > .ds-spaces-gap{ flex:1 1 auto; min-width:0; }
 /* The hold a dot's right click is caught on: it lays out as the dot. Which Space is current is
    the dot's own brightness and size (space_editor.css), not the hold's. */
 .ds-spaces-dot-hold{ display:flex; }
