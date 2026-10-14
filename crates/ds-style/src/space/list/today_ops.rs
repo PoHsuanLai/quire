@@ -75,6 +75,17 @@ impl<I, K> Today<I, K> {
             .collect()
     }
 
+    /// Every entry of `space`, newest first, however long it has been idle: the list of an app
+    /// whose Today keeps an entry until it is closed or cleared. Such an app reads this in place
+    /// of [`Today::live`] and never calls [`Today::prune`] (it loads with
+    /// `SpacesStorage::load_today`, not `boot_today`).
+    pub fn all(&self, space: SpaceId) -> Vec<&Entry<I>> {
+        self.entries
+            .iter()
+            .filter(|entry| entry.space == space)
+            .collect()
+    }
+
     /// What `space` parked, newest first.
     pub fn parked_in(&self, space: SpaceId) -> Vec<&Parked<K>> {
         self.parked
