@@ -21,15 +21,16 @@ pub enum MenuCursor {
 }
 
 /// The highlighted choice among `live`: the menu's own `selection` settled onto an enabled
-/// choice, or the caller's, clamped to the last choice. `None` when nothing is highlighted.
+/// choice, or the caller's, clamped to the last choice. `None` when nothing is highlighted: the
+/// menu's own before the pointer or a key has moved it.
 pub(crate) fn highlighted(
     cursor: MenuCursor,
-    selection: usize,
+    selection: Option<usize>,
     live: &[Availability],
 ) -> Option<usize> {
     let last = live.len().checked_sub(1)?;
     match cursor {
-        MenuCursor::Auto => Some(settled(selection, live)),
+        MenuCursor::Auto => selection.map(|selection| settled(selection, live)),
         MenuCursor::Controlled(index) => index.map(|index| index.min(last)),
     }
 }
@@ -63,22 +64,24 @@ mod tests {
     fn the_highlight_is_the_menus_own_or_the_callers() {
         // (cursor, own selection, live, want)
         #[rustfmt::skip]
-        let cases: &[(MenuCursor, usize, &[_], Option<usize>)] = &[
-            (MenuCursor::Auto, 0, &[D, E], Some(1)),
-            (MenuCursor::Auto, 1, &[E, E], Some(1)),
-            (MenuCursor::Controlled(Some(0)), 1, &[E, E], Some(0)),
+        let cases: &[(MenuCursor, Option<usize>, &[_], Option<usize>)] = &[
+            // The menu's own: nothing until something moved it, then settled onto an enabled one.
+            (MenuCursor::Auto, None, &[E, E], None),
+            (MenuCursor::Auto, Some(0), &[D, E], Some(1)),
+            (MenuCursor::Auto, Some(1), &[E, E], Some(1)),
+            (MenuCursor::Controlled(Some(0)), Some(1), &[E, E], Some(0)),
             // The caller's is shown as asked, disabled or not, clamped to the list.
-            (MenuCursor::Controlled(Some(0)), 1, &[D, E], Some(0)),
-            (MenuCursor::Controlled(Some(9)), 0, &[E, E, E], Some(2)),
-            (MenuCursor::Controlled(None), 1, &[E, E], None),
-            (MenuCursor::Auto, 0, &[], None),
-            (MenuCursor::Controlled(Some(0)), 0, &[], None),
+            (MenuCursor::Controlled(Some(0)), Some(1), &[D, E], Some(0)),
+            (MenuCursor::Controlled(Some(9)), None, &[E, E, E], Some(2)),
+            (MenuCursor::Controlled(None), Some(1), &[E, E], None),
+            (MenuCursor::Auto, Some(0), &[], None),
+            (MenuCursor::Controlled(Some(0)), None, &[], None),
         ];
         for &(cursor, selection, live, want) in cases {
             assert_eq!(
                 highlighted(cursor, selection, live),
                 want,
-                "{cursor:?} {selection} {live:?}"
+                "{cursor:?} {selection:?} {live:?}"
             );
         }
     }

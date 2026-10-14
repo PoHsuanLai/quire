@@ -46,6 +46,9 @@ use ds_style::tokens::layer::ZLayer;
 /// (design/22-SETTINGS.md; the defaults are the proposed 200 and 300 ms). `expanded` opens
 /// that choice's submenu as the menu mounts (a restored menu, a posed picture); choices are
 /// numbered over items and submenu parents, headers, status lines and rules not counted.
+/// A menu opens with nothing highlighted until the pointer or a key moves onto a choice
+/// (design/13 section 13.3.2); `start` is the choice highlighted as it opens instead (a pop-up's
+/// chosen value), numbered as `expanded` numbers them.
 ///
 /// `placement` says where the menu belongs. A `Bar` menu and a `Popup` menu draw their items'
 /// key equivalents; a `Context` menu leaves out what cannot be picked (unless `unavailable` is `Dim`) and shows
@@ -94,6 +97,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     onclose: EventHandler<()>,
     #[props(default)] timing: MenuTiming,
     #[props(default)] expanded: Option<usize>,
+    #[props(default)] start: Option<usize>,
     #[props(default)] on_hover: Option<EventHandler<Option<usize>>>,
     #[props(default)] on_release: Option<EventHandler<Press>>,
     #[props(default)] active: MenuCursor,
@@ -121,6 +125,11 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     use_effect(move || {
         if let Some(index) = expanded {
             tracker.expand(index, Via::Pointer);
+        }
+    });
+    use_hook(|| {
+        if let Some(index) = start {
+            tracker.select(index);
         }
     });
     let items = match placement {

@@ -76,6 +76,8 @@ fn a_pick_fires_onpick_and_the_label_stays() {
     let mut harness = started();
     let before = harness.text_of(BUTTON);
     click_button(&mut harness);
+    // The menu opens with nothing highlighted: Down lands on the first item, the next on Settings.
+    harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Down));
     harness.send(Input::key(ShortcutKey::Enter));
     settle(&mut harness);

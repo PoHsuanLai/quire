@@ -45,6 +45,13 @@ pub(crate) fn SubMenu<T: Clone + PartialEq + 'static>(
 ) -> Element {
     let float = use_float(ZLayer::Menu, Stacking::Passive);
     let tracker = use_tracker(timing, MENU_INSET);
+    // Opened by the keyboard (Right, Enter), it opens on its first choice, as a key moves into it;
+    // opened by the pointer, on nothing.
+    use_hook(|| {
+        if via == Via::Keyboard {
+            tracker.select(0);
+        }
+    });
     let scrolling = use_scrolling();
     let pointed = use_hook(|| CopyValue::new(None::<usize>));
     let alive = use_alive();
