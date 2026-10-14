@@ -219,9 +219,9 @@ pub(crate) fn Host(props: HostProps) -> Element {
             crate::frame_menu::report(&menu, asked);
         }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
-            // The document hears the new factor after this hook: carry the zoom over now.
-            let zoom = factor / window.scale_factor().max(f64::EPSILON);
-            let next = scale_of(*scale_factor * zoom);
+            // The document hears the new factor after this hook: carry its zoom over now. The
+            // zoom is read on its own, as winit may already report the new factor here.
+            let next = scale_of(*scale_factor * document_zoom(&seen.borrow()));
             let mut current = signals.scale;
             if *current.peek() != next {
                 current.set(next);
@@ -363,6 +363,14 @@ fn document_scale(document: &Option<NodeHandle>, factor: f64) -> f64 {
         .as_ref()
         .and_then(NodeHandle::try_doc)
         .map_or(factor, |doc| f64::from(doc.viewport().scale()))
+}
+
+/// The page zoom blitz-shell keeps, or none (1) before the document is there.
+fn document_zoom(document: &Option<NodeHandle>) -> f64 {
+    document
+        .as_ref()
+        .and_then(NodeHandle::try_doc)
+        .map_or(1.0, |doc| f64::from(doc.viewport().zoom()))
 }
 
 /// A winit scale factor in 120ths, the unit `ds::prelude::Scale` shares with the Wayland protocol.
