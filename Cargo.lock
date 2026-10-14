@@ -855,7 +855,7 @@ checksum = "f079e83a288787bcd14a6aea84cee5c87a67c5a3e660c30f557a3d24761b3527"
 [[package]]
 name = "chordkit"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=7ba392a65bb5cae7144a23b364c60d200d35efb3#7ba392a65bb5cae7144a23b364c60d200d35efb3"
+source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=2fcdce262606d47efccfcac9ab96d4dd5af5196b#2fcdce262606d47efccfcac9ab96d4dd5af5196b"
 dependencies = [
  "thiserror 2.0.21",
 ]
@@ -863,7 +863,7 @@ dependencies = [
 [[package]]
 name = "chordkit-gnome"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=7ba392a65bb5cae7144a23b364c60d200d35efb3#7ba392a65bb5cae7144a23b364c60d200d35efb3"
+source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=2fcdce262606d47efccfcac9ab96d4dd5af5196b#2fcdce262606d47efccfcac9ab96d4dd5af5196b"
 dependencies = [
  "chordkit",
 ]
@@ -871,7 +871,7 @@ dependencies = [
 [[package]]
 name = "chordkit-kde"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=7ba392a65bb5cae7144a23b364c60d200d35efb3#7ba392a65bb5cae7144a23b364c60d200d35efb3"
+source = "git+https://github.com/PoHsuanLai/chordkit.git?rev=2fcdce262606d47efccfcac9ab96d4dd5af5196b#2fcdce262606d47efccfcac9ab96d4dd5af5196b"
 dependencies = [
  "chordkit",
 ]

@@ -75,7 +75,7 @@ mod tests {
             ("a bare key", Shortcut(vec![ShortcutKey::Char('e')]), "e"),
             (
                 "the plus key",
-                Shortcut::standard(StandardAction::Bigger),
+                Shortcut(vec![ShortcutKey::Super, ShortcutKey::Char('+')]),
                 "cmd+plus",
             ),
             ("escape", Shortcut(vec![ShortcutKey::Escape]), "escape"),
