@@ -6,7 +6,7 @@ use crate::components::menus::item::item::MenuItem;
 use chordkit::{Desktop, Platform};
 use dioxus::prelude::{Key, Modifiers};
 use ds_style::appearance::theme::Theme;
-use ds_style::space::look::{CardAccent, SpaceLook};
+use ds_style::space::look::SpaceLook;
 
 fn key(text: &str) -> Key {
     Key::Character(text.to_string())
@@ -146,7 +146,6 @@ fn the_menu_lists_the_rows_in_the_agreed_order_and_delete_only_beside_another_sp
             "Rename\u{2026}",
             "Colour\u{2026}",
             "Appearance",
-            "Accent Inside the Card",
             "Mine",
             "-",
             "New Space",
@@ -167,8 +166,8 @@ fn the_app_slot_keeps_its_own_values() {
         children: vec![MenuItem::new(3u8, "Ada")],
     }];
     let items = rows(&SpaceLook::default(), 2, slot, Linking::Off);
-    let MenuItem::Submenu { children, .. } = &items[4] else {
-        panic!("the slot is the fifth row");
+    let MenuItem::Submenu { children, .. } = &items[3] else {
+        panic!("the slot is the fourth row");
     };
     assert_eq!(
         children[0],
@@ -184,10 +183,6 @@ fn a_pick_opens_a_part_changes_the_look_or_is_the_apps() {
         theme: Theme::Dark,
         ..look.clone()
     });
-    let hue = Then::<u8>::Kept(SpaceLook {
-        card_accent: CardAccent::SpaceHue,
-        ..look.clone()
-    });
     // (pick, what it asks)
     let cases: Vec<(SpacePick<u8>, Then<u8>)> = vec![
         (SpacePick::Rename, Then::Open(Showing::Rename)),
@@ -195,7 +190,6 @@ fn a_pick_opens_a_part_changes_the_look_or_is_the_apps() {
         (SpacePick::Delete, Then::Open(Showing::Delete)),
         (SpacePick::New, Then::NewSpace),
         (SpacePick::Theme(Theme::Dark), dark),
-        (SpacePick::Accent(CardAccent::SpaceHue), hue),
         (SpacePick::App(4), Then::App(4)),
     ];
     for (pick, want) in cases {
@@ -250,14 +244,13 @@ fn link_rows_list_the_desktop_spaces_and_unlink_shows_only_while_linked() {
             "Rename\u{2026}",
             "Colour\u{2026}",
             "Appearance",
-            "Accent Inside the Card",
             "Link to\u{2026}",
             "-",
             "New Space",
             "Delete Space\u{2026}"
         ]
     );
-    let MenuItem::Submenu { children, .. } = &unlinked[4] else {
+    let MenuItem::Submenu { children, .. } = &unlinked[3] else {
         panic!("Link to... is a submenu");
     };
     assert_eq!(
@@ -273,8 +266,8 @@ fn link_rows_list_the_desktop_spaces_and_unlink_shows_only_while_linked() {
             desktop: &desktop,
         },
     );
-    assert_eq!(titles(&linked)[5], "Unlink");
-    let MenuItem::Submenu { children, .. } = &linked[4] else {
+    assert_eq!(titles(&linked)[4], "Unlink");
+    let MenuItem::Submenu { children, .. } = &linked[3] else {
         panic!("Link to... is a submenu");
     };
     let checks: Vec<ds_core::vocab::Check> = children

@@ -12,7 +12,6 @@ use ds::components::content::provider_mark::MarkProvider;
 use ds::components::controls::button_model::{Bezel, ImagePosition};
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
-use ds::style::space::look::CardAccent;
 use ds::style::space::presets::default_look;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::hex::{Colour, Hex};
@@ -60,7 +59,7 @@ const LABELS: &[(&str, &str, Icon)] =
 /// The Space dots, a plus and the hide button.
 fn foot(scheme: Scheme) -> Element {
     let dot = |index: usize, name: &'static str, selection: Selection| {
-        let look = default_look(index, Grain(0), CardAccent::SpaceHue);
+        let look = default_look(index, Grain(0));
         rsx! {
             SpaceDot {
                 key: "{index}",

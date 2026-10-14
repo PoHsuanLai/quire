@@ -8,7 +8,6 @@ use ds::root::chrome::Ground;
 use ds_core::colour::contrast::ratio;
 use ds_style::material::recipe::recipe;
 use ds_style::space::frame_vars::FrameVars;
-use ds_style::space::look::CardAccent;
 use ds_style::space::palette::{Dot, derive};
 use ds_style::space::presets::PRESETS;
 use ds_style::tokens::accent_table::accent_of;
@@ -136,16 +135,14 @@ fn the_alert_destructive_action_is_filled_danger_and_legible() {
 }
 
 /// The four gates for one Space, measured on what the root actually paints: the frame ink from
-/// [`FrameVars`], the stops the gradient is made of, and the card's accent (the Space's when it
-/// lends one, Blue otherwise).
+/// [`FrameVars`], the stops the gradient is made of, and the card's accent, which is the
+/// desktop's whatever the Space (Blue here).
 fn gates(look: &SpaceLook, scheme: Scheme) -> Vec<String> {
     let vars = FrameVars::of(look, scheme);
     let stops = derive(&look.dots, scheme).stops;
     let surface = colour(ColourToken::Surface, scheme);
     let ink = colour(ColourToken::Ink, scheme);
-    let roles = vars
-        .accent
-        .unwrap_or_else(|| accent_of(Accent::Blue, scheme));
+    let roles = accent_of(Accent::Blue, scheme);
     let accent = roles.text.css();
     // The wash is translucent: laid over the card before the card's ink is measured on it.
     let ground = Hex::parse(&surface).unwrap_or(Hex([0, 0, 0]));
@@ -198,18 +195,13 @@ fn every_preset_frame_is_legible() {
     let mut failures = Vec::new();
     for (index, preset) in PRESETS.iter().enumerate() {
         for scheme in Scheme::ALL.iter().copied() {
-            for card_accent in [CardAccent::Chosen, CardAccent::SpaceHue] {
-                let look = SpaceLook {
-                    dots: preset.dots.to_vec(),
-                    grain: Grain(40),
-                    theme: Theme::System,
-                    card_accent,
-                };
-                for failure in gates(&look, scheme) {
-                    failures.push(format!(
-                        "preset {index} {scheme:?} {card_accent:?}: {failure}"
-                    ));
-                }
+            let look = SpaceLook {
+                dots: preset.dots.to_vec(),
+                grain: Grain(40),
+                theme: Theme::System,
+            };
+            for failure in gates(&look, scheme) {
+                failures.push(format!("preset {index} {scheme:?}: {failure}"));
             }
         }
     }
@@ -225,7 +217,6 @@ fn every_one_dot_space_on_the_sweep_is_legible() {
             let hue = f32::from(step * 5);
             let look = SpaceLook {
                 dots: vec![Dot { hue, chroma }],
-                card_accent: CardAccent::SpaceHue,
                 ..SpaceLook::default()
             };
             for scheme in Scheme::ALL.iter().copied() {

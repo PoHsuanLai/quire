@@ -6,7 +6,7 @@ use crate::components::menus::item::item::MenuItem;
 use ds_core::vocab::{Availability, Check};
 use ds_core::word::Word;
 use ds_style::appearance::theme::Theme;
-use ds_style::space::look::{CardAccent, SpaceLook};
+use ds_style::space::look::SpaceLook;
 
 /// A row of the Space's menu, or a row the app added.
 #[derive(Debug, Clone, PartialEq)]
@@ -17,8 +17,6 @@ pub enum SpacePick<A> {
     Colour,
     /// Appearance, one of the themes.
     Theme(Theme),
-    /// Accent Inside the Card: the Space's colour, or the person's accent.
-    Accent(CardAccent),
     /// New Space; it opens its name at once.
     New,
     /// Delete Space...: a question at the pointer.
@@ -48,13 +46,6 @@ pub enum Then<A> {
     App(A),
 }
 
-fn accent_name(accent: CardAccent) -> &'static str {
-    match accent {
-        CardAccent::SpaceHue => "Space Colour",
-        CardAccent::Chosen => "Your Accent",
-    }
-}
-
 fn submenu<A>(title: &str, children: Vec<MenuItem<SpacePick<A>>>) -> MenuItem<SpacePick<A>> {
     MenuItem::Submenu {
         title: title.to_owned(),
@@ -68,9 +59,9 @@ fn checked(on: bool) -> Check {
     if on { Check::On } else { Check::Off }
 }
 
-/// The menu for a Space looking like `look`, one of `count`: Rename, Colour, Appearance, Accent
-/// Inside the Card, the app's `extra` rows (usually one submenu whose picks keep the menu open),
-/// the `linking` rows, a rule, New Space, and Delete only while there is another Space to show.
+/// The menu for a Space looking like `look`, one of `count`: Rename, Colour, Appearance, the
+/// app's `extra` rows (usually one submenu whose picks keep the menu open), the `linking` rows,
+/// a rule, New Space, and Delete only while there is another Space to show.
 pub fn rows<A: Clone>(
     look: &SpaceLook,
     count: usize,
@@ -84,18 +75,10 @@ pub fn rows<A: Clone>(
                 .with_check(checked(look.theme == *theme))
         })
         .collect();
-    let accents = [CardAccent::SpaceHue, CardAccent::Chosen]
-        .into_iter()
-        .map(|accent| {
-            MenuItem::new(SpacePick::Accent(accent), accent_name(accent))
-                .with_check(checked(look.card_accent == accent))
-        })
-        .collect();
     let mut out = vec![
         MenuItem::new(SpacePick::Rename, "Rename\u{2026}"),
         MenuItem::new(SpacePick::Colour, "Colour\u{2026}"),
         submenu("Appearance", themes),
-        submenu("Accent Inside the Card", accents),
     ];
     out.extend(extra.into_iter().map(|item| item.map(&SpacePick::App)));
     out.extend(link_rows(linking));
@@ -116,10 +99,6 @@ pub fn apply<A>(pick: SpacePick<A>, look: &SpaceLook) -> Then<A> {
         SpacePick::New => Then::NewSpace,
         SpacePick::Theme(theme) => Then::Kept(SpaceLook {
             theme,
-            ..look.clone()
-        }),
-        SpacePick::Accent(card_accent) => Then::Kept(SpaceLook {
-            card_accent,
             ..look.clone()
         }),
         SpacePick::Link(id) => Then::Link(LinkChange::Linked(id)),

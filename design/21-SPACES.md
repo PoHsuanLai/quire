@@ -33,8 +33,8 @@ pub struct SpaceLook { hue: f32, chroma: f32, grain: Grain(u8), theme: Theme }
 | `theme` | this Space's appearance: System / Light / Dark | enum |
 
 There are no dots list, no gradient and no `card_accent`: the accent is the desktop's, set in
-Settings (30 section 3.4), and a Space never changes it. Current code still has `dots`,
-`card_accent` and `FrameVars`; they go.
+Settings (30 section 3.4), and a Space never changes it. Current code still has `dots` and
+`FrameVars`; they go.
 
 **Motion is not part of a Space (settled, 2026-09-24).** How much a surface moves is global, the
 `Appearance`'s `motion` resolved with the system's preferences into the root's `data-motion`.
@@ -245,7 +245,7 @@ sidebar is at least 212 px wide (`SIDEBAR_MIN_WIDTH`).
 
 ### 13.4 The Space's menu (`SpaceMenu`)
 
-Rename... | Colour... | Appearance > (checked) | Accent Inside the Card > | the app's submenu slot
+Rename... | Colour... | Appearance > (checked) | the app's submenu slot
 (mailo: Accounts >, whose picks keep the menu open) | Link to... > and Unlink (only when the app
 passes the desktop's Spaces; Unlink only while linked) | rule | New Space | Delete Space... (only
 while there is more than one). New Space switches to the new Space and opens its Rename at once.

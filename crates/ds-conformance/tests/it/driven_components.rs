@@ -17,7 +17,6 @@ use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds::stack::toast_hub::ToastState;
 use ds::stack::toast_hub::use_toast_hub;
-use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds_blitz::TokioSpawner;
 use ds_harness::harness::settle_until;
@@ -518,7 +517,6 @@ fn EditorApp() -> Element {
         dots: PRESETS[0].dots.to_vec(),
         grain: Grain(35),
         theme: Theme::System,
-        card_accent: CardAccent::SpaceHue,
     });
     rsx! {
         Root {

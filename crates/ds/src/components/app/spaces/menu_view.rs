@@ -16,7 +16,7 @@ use ds_style::space::list::SpaceId;
 
 /// The menu of whichever Space the handle has open; nothing while none is.
 ///
-/// Rows, in order: Rename..., Colour..., Appearance, Accent Inside the Card, the app's `extra`
+/// Rows, in order: Rename..., Colour..., Appearance, the app's `extra`
 /// (one submenu, say Accounts, whose picks reach `on_extra`; give them `AfterPick::KeepOpen` to
 /// keep the menu up), "Link to..." and "Unlink" when `desktop` lists the desktop's Spaces, a
 /// rule, New Space, and Delete Space... while there is more than one.

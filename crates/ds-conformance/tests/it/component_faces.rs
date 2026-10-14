@@ -10,7 +10,6 @@ use ds::components::app::space_editor::DotIndex;
 use ds::components::controls::button_model::{Bezel, ButtonRole};
 use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
-use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
@@ -101,7 +100,6 @@ fn look() -> SpaceLook {
         dots: PRESETS[0].dots.to_vec(),
         grain: Grain(35),
         theme: Theme::System,
-        card_accent: CardAccent::SpaceHue,
     }
 }
 

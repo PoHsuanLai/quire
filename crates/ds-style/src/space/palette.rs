@@ -73,7 +73,7 @@ pub struct Palette {
     pub hover: String,
     /// A selected pill. Dark is `rgba(255,255,255,.10)`; light is white at .72.
     pub pill: String,
-    /// The accent inside the card: the settled band's fill at the Space's hue, the first dot's
+    /// The Space's own accent: the settled band's fill at the Space's hue, the first dot's
     /// chroma as its weight (design/03-COLOR.md section 20).
     pub accent: String,
     /// The accent's translucent wash, behind a selected row: `rgba(...)`, never a hex.
@@ -225,7 +225,7 @@ pub fn derive(dots: &[Dot], scheme: Scheme) -> Palette {
     }
 }
 
-/// The card accent a Space lends: the settled band at its first dot's hue, weighted by that
+/// The Space's own accent: the settled band at its first dot's hue, weighted by that
 /// dot's chroma, so a grey Space lends a grey-blue (design/03-COLOR.md section 20). The one
 /// derivation every accent shares; it replaced mailo's `oklch(aL, .045 + .035k, h0)`.
 fn space_accent(hue: f64, chroma: f64, scheme: Scheme) -> AccentRoles {

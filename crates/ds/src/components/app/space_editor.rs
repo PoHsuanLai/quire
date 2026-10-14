@@ -18,7 +18,7 @@ use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::word::Word;
 use ds_style::appearance::theme::{Scheme, Theme};
-use ds_style::space::look::{CardAccent, SpaceLook};
+use ds_style::space::look::SpaceLook;
 use handles::Field;
 use parts::{Checks, GrainRow, Presets, Stops};
 use rows::{EachScheme, MotionRow, Title};
@@ -143,21 +143,6 @@ pub fn SpaceEditor(
             }
             if let Some(choice) = motion {
                 MotionRow { choice }
-            }
-            div {
-                SectionHeader { title: "Accent inside the card" }
-                SegmentedControl::<CardAccent> {
-                    label: "Accent",
-                    choices: Choice::pairs(vec![
-                        (CardAccent::SpaceHue, "Space colour".to_string()),
-                        (CardAccent::Chosen, "Your accent".to_string()),
-                    ]),
-                    tracking: Tracking::SelectOne(look.card_accent),
-                    onchange: {
-                        let look = look.clone();
-                        move |card_accent| onchange.call(SpaceLook { card_accent, ..look.clone() })
-                    },
-                }
             }
             Presets { look: look.clone(), scheme, picker, onchange }
             match measured {

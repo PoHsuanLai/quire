@@ -312,7 +312,7 @@ fn App() -> Element {
 | --- | --- | --- | --- |
 | `appearance` | `Appearance` | required | theme, accent, motion preference — section 3 |
 | `system` | `SystemPrefs` | `SystemPrefs::default()` | the desktop's own scheme/motion/contrast, from `use_environment`'s `Environment::system` (`SystemPrefsSource::Portal`) |
-| `look` | `SpaceLook` | `SpaceLook::default()` | the Space (design/21-SPACES.md §1): today its dots, theme override and card accent; **target (clean-up phase)**: one hue, a chroma factor, grain and theme, tinting a sidebar's ground only |
+| `look` | `SpaceLook` | `SpaceLook::default()` | the Space (design/21-SPACES.md §1): today its dots, grain and theme override; **target (clean-up phase)**: one hue, a chroma factor, grain and theme, tinting a sidebar's ground only |
 | `material` | `Material` | required | which of the eight materials this root paints (design/03-COLOR.md §17.1) |
 | `blur` | `BlurState` | `BlurState::default()` | whether the compositor blurs behind this surface |
 | `stylesheet` | `Inject` | `Inject::Inline` | `Inline` puts a `<style>` inside `.ds` (spike S1); `Host` lets you inject `ds::stylesheet()` yourself |
@@ -1735,7 +1735,7 @@ the button is laid out, and `anchor` moves it elsewhere.
 look each workspace wears. `store.look_for_workspace(&Workspace { id, index }, defaults)` looks
 up by compositor id, then by position, then falls back to `PRESETS[index % 8]`;
 `store.look_for(WorkspaceIndex(i), defaults)` skips the id. `SpaceDefaults` carries
-`spaces.default_grain` (default 0; was 40) and `spaces.default_card_accent` (retiring; a Space has no card accent). `store.with_look(&workspace, look)`
+`spaces.default_grain` (default 0; was 40); a Space has no card accent, since the card wears the desktop's. `store.with_look(&workspace, look)`
 records a look under the id (when there is one) and always under the position.
 
 **Settings files** (`ds_settings::{SettingsDoc, Store}`). A file is a serde type that names

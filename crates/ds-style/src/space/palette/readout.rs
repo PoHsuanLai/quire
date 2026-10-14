@@ -7,7 +7,7 @@
 
 use super::derive;
 use crate::appearance::{accent::Accent, theme::Scheme};
-use crate::space::look::{CardAccent, SpaceLook};
+use crate::space::look::SpaceLook;
 use crate::space::palette::card::card;
 use crate::tokens::{accent_table::accent_of, hex::Hex};
 use ds_core::colour::contrast::{Verdict, ratio};
@@ -38,8 +38,8 @@ impl ContrastCheck {
 ///
 /// Sidebar ink and faint text on every stop of the frame, the card's accent text on the card,
 /// and the card's ink on the accent's wash laid over the card (the wash is translucent, so it
-/// is composited before it is measured). With [`CardAccent::Chosen`] the last two measure
-/// the chosen accent, since that is what the card then wears. A colour that is not a hex pair
+/// is composited before it is measured). The last two measure the chosen accent, since a Space
+/// never changes the accent the card wears. A colour that is not a hex pair
 /// measures 0, which fails, rather than being left out.
 pub fn readout(space: &SpaceLook, scheme: Scheme) -> Vec<ContrastCheck> {
     let palette = derive(&space.dots, scheme);
@@ -51,10 +51,7 @@ pub fn readout(space: &SpaceLook, scheme: Scheme) -> Vec<ContrastCheck> {
             .map(|stop| ratio(fore, stop).unwrap_or(0.0))
             .fold(f64::INFINITY, f64::min)
     };
-    let roles = match space.card_accent {
-        CardAccent::SpaceHue => palette.accent_roles,
-        CardAccent::Chosen => accent_of(Accent::Blue, scheme),
-    };
+    let roles = accent_of(Accent::Blue, scheme);
     let wash = Hex::parse(post.surface)
         .map(|surface| roles.fill.over(roles.wash, surface).css())
         .unwrap_or_default();

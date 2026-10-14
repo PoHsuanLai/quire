@@ -4,14 +4,16 @@
 //! Replaces mailo's `ui/paint.rs` `push_palette` and `grain_opacity`; the `-l`/`-d` copies
 //! and `SYSTEM_ACCENT` are deleted.
 //!
-//! The arithmetic is mailo's `push_palette`, `push_accent` and `grain_opacity` for an explicit
-//! theme: the palette `derive` makes, the first stop as `--f-solid`, the gradient, the scheme's
-//! `--f-line`, and the grain as an opacity. mailo's `--f-hover` is written `--f-pill-hover`.
+//! The arithmetic is mailo's `push_palette` and `grain_opacity` for an explicit theme: the
+//! palette `derive` makes, the first stop as `--f-solid`, the gradient, the scheme's `--f-line`,
+//! and the grain as an opacity. mailo's `--f-hover` is written `--f-pill-hover`.
+//!
+//! The frame writes no accent: the card keeps the desktop's, set in Settings
+//! (design/21-SPACES.md section 1).
 
-use super::look::{CardAccent, Grain, SpaceLook};
+use super::look::{Grain, SpaceLook};
 use super::palette::{derive, gradient};
 use crate::appearance::theme::Scheme;
-use crate::tokens::accent_band::roles::AccentRoles;
 
 /// Every frame variable one Space paints in one scheme, as CSS values.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,10 +39,6 @@ pub struct FrameVars {
     pub stops: Vec<String>,
     /// `--f-grain`: the grain tile's opacity, `grain / 100 x .10` light, `x .08` dark.
     pub grain_opacity: String,
-    /// The accent roles when the card borrows the Space's hue; written as `--accent`,
-    /// `--accent-ink`, `--accent-soft`, `--accent-text`, `--accent-text-material`,
-    /// `--accent-ring` and `--seal`.
-    pub accent: Option<AccentRoles>,
 }
 
 impl FrameVars {
@@ -53,10 +51,6 @@ impl FrameVars {
             Scheme::Light => "rgba(0,0,0,.08)",
             Scheme::Dark => "rgba(255,255,255,.09)",
         };
-        let accent = match look.card_accent {
-            CardAccent::Chosen => None,
-            CardAccent::SpaceHue => Some(palette.accent_roles),
-        };
         FrameVars {
             ink: palette.ink,
             ink_soft: palette.soft,
@@ -68,7 +62,6 @@ impl FrameVars {
             gradient,
             stops: palette.stops.clone(),
             grain_opacity: grain_opacity(look.grain, scheme),
-            accent,
         }
     }
 
@@ -87,7 +80,7 @@ impl FrameVars {
 
     /// Every variable with its value, in the order the attribute writes them.
     fn pairs(&self) -> Vec<(&'static str, String)> {
-        let mut pairs = vec![
+        vec![
             ("--f-ink", self.ink.clone()),
             ("--f-ink-soft", self.ink_soft.clone()),
             ("--f-ink-faint", self.ink_faint.clone()),
@@ -97,19 +90,7 @@ impl FrameVars {
             ("--f-solid", self.solid.clone()),
             ("--f-grad", self.gradient.clone()),
             ("--f-grain", self.grain_opacity.clone()),
-        ];
-        if let Some(roles) = &self.accent {
-            pairs.extend([
-                ("--accent", roles.fill.css()),
-                ("--accent-ink", roles.ink.css()),
-                ("--accent-soft", roles.wash_colour().css()),
-                ("--accent-text", roles.text.css()),
-                ("--accent-text-material", roles.text_material.css()),
-                ("--accent-ring", roles.ring_colour().css()),
-                ("--seal", roles.fill.css()),
-            ]);
-        }
-        pairs
+        ]
     }
 }
 
@@ -141,7 +122,7 @@ fn grain_opacity(grain: Grain, scheme: Scheme) -> String {
 mod tests {
     use super::{FrameVars, grain_opacity};
     use crate::appearance::theme::{Scheme, Theme};
-    use crate::space::look::{CardAccent, Grain, SpaceLook};
+    use crate::space::look::{Grain, SpaceLook};
     use crate::space::palette::NEUTRAL_DOT;
     use crate::space::presets::PRESETS;
 
@@ -171,7 +152,6 @@ mod tests {
             dots: vec![NEUTRAL_DOT],
             grain: Grain(35),
             theme: crate::appearance::theme::Theme::System,
-            card_accent: CardAccent::SpaceHue,
         };
         let vars = FrameVars::of(&look, Scheme::Light);
         let style = vars.style_attr();
@@ -191,14 +171,7 @@ mod tests {
                 "--f-line",
                 "--f-solid",
                 "--f-grad",
-                "--f-grain",
-                "--accent",
-                "--accent-ink",
-                "--accent-soft",
-                "--accent-text",
-                "--accent-text-material",
-                "--accent-ring",
-                "--seal"
+                "--f-grain"
             ]
         );
         assert!(
@@ -209,8 +182,8 @@ mod tests {
     /// Each preset in each scheme, computed by the mockup's own JavaScript arithmetic
     /// (design/03-COLOR.md sections 4.3-4.4, ported line for line outside this crate), with the
     /// gradient at the quiet tint's chroma (design/03-COLOR.md section 4.2):
-    /// `[ink, soft, faint, hover, gradient]`. The Space accent is no longer the mockup's: it is
-    /// the settled band's (design/03-COLOR.md section 20), checked against `derive` below.
+    /// `[ink, soft, faint, hover, gradient]`. The mockup's Space accent is not painted: the frame
+    /// leaves the desktop's accent alone.
     #[rustfmt::skip]
     const MOCKUP: &[(usize, Scheme, [&str; 5])] = &[
         (0, Scheme::Light, ["#12192f", "#3f475c", "#60697e", "#d3d9e9", "linear-gradient(135deg,#e5eaf5 0%,#e9e3eb 100%)"]),
@@ -239,7 +212,6 @@ mod tests {
                 dots: preset.dots.to_vec(),
                 grain: Grain(preset.grain.unwrap_or(0)),
                 theme: Theme::System,
-                card_accent: CardAccent::SpaceHue,
             };
             let vars = FrameVars::of(&look, scheme);
             let case = format!("preset {index} {scheme:?}");
@@ -263,18 +235,9 @@ mod tests {
                 Scheme::Dark => ("rgba(255,255,255,.10)", "rgba(255,255,255,.09)"),
             };
             assert_eq!([vars.pill.as_str(), &vars.line], [pill, line], "{case}");
-            let lent = crate::space::palette::derive(&look.dots, scheme).accent_roles;
-            assert_eq!(vars.accent, Some(lent), "{case}");
-            let chosen = FrameVars::of(
-                &SpaceLook {
-                    card_accent: CardAccent::Chosen,
-                    ..look
-                },
-                scheme,
-            );
-            assert_eq!(
-                chosen.accent, None,
-                "{case}: the chosen accent writes no accent"
+            assert!(
+                !vars.style_attr().contains("--accent"),
+                "{case}: the frame leaves the desktop's accent alone"
             );
         }
         assert_eq!(MOCKUP.len(), PRESETS.len() * 2);

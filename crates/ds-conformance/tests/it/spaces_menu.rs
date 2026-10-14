@@ -60,7 +60,6 @@ fn the_menu_lists_its_rows_in_order() {
             "Rename\u{2026}",
             "Colour\u{2026}",
             "Appearance",
-            "Accent Inside the Card",
             "New Space",
             "Delete Space\u{2026}"
         ]
@@ -115,7 +114,7 @@ fn rename_opens_a_field_that_keeps_the_name_when_it_closes() {
 fn new_space_makes_one_and_opens_its_name() {
     let mut harness = harness(Three);
     open_menu(&mut harness);
-    pick(&mut harness, 6);
+    pick(&mut harness, 5);
     assert_eq!(dots(&harness), 4);
     assert_eq!(
         harness.text_of(".current").as_deref(),
@@ -129,7 +128,7 @@ fn new_space_makes_one_and_opens_its_name() {
 fn delete_asks_and_only_its_button_deletes() {
     let mut harness = harness(Three);
     open_menu(&mut harness);
-    pick(&mut harness, 7);
+    pick(&mut harness, 6);
     assert_eq!(harness.count(".ds-space-delete"), 1);
     assert_eq!(dots(&harness), 3, "asking deletes nothing");
     let confirm = harness
@@ -145,9 +144,9 @@ fn delete_asks_and_only_its_button_deletes() {
 fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
     let mut harness = harness(WithAccounts);
     open_menu(&mut harness);
-    // Rows: Rename, Colour, Appearance, Accent, Accounts, rule, New Space, Delete.
+    // Rows: Rename, Colour, Appearance, Accounts, rule, New Space, Delete.
     let accounts = harness
-        .centre(".ds-menu-item:nth-child(5) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(4) .ds-menu-label")
         .expect("the Accounts row");
     harness.send(Input::click(accounts));
     harness.advance(ms(400));
@@ -185,9 +184,9 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
         Some("AdaAdaBo"),
         "and another can be picked"
     );
-    // A kit row closes it: New Space is row 7 here.
+    // A kit row closes it: New Space is row 6 here.
     let new = harness
-        .centre(".ds-menu-item:nth-child(7) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(6) .ds-menu-label")
         .expect("New Space");
     harness.send(Input::click(new));
     harness.advance(ms(500));
@@ -199,7 +198,7 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
 fn first_painted_and_settled(harness: &mut Harness) -> (Rect, Rect) {
     const SUB: &str = ".ds-menu[data-depth=\"1\"]";
     let accounts = harness
-        .centre(".ds-menu-item:nth-child(5) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(4) .ds-menu-label")
         .expect("the Accounts row");
     harness.send(Input::click(accounts));
     let mut first = None;
@@ -303,7 +302,7 @@ fn rename_return_commits_and_gives_the_keyboard_back() {
 #[test]
 fn delete_focuses_cancel_and_return_cancels() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 7);
+    open_part(&mut harness, 6);
     assert!(
         focused(&harness, ".ds-space-part-acts .ds-button:nth-child(1)"),
         "Cancel is the safe default:\n{}",
@@ -325,7 +324,7 @@ fn delete_focuses_cancel_and_return_cancels() {
 #[test]
 fn delete_escape_cancels_and_gives_the_keyboard_back() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 7);
+    open_part(&mut harness, 6);
     key(&mut harness, ShortcutKey::Escape);
     assert_eq!(harness.count(".ds-space-delete"), 0, "Escape closes it");
     assert_eq!(dots(&harness), 3, "nothing was deleted");

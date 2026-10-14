@@ -4,7 +4,7 @@
 //! Data and a pure lookup only; a consumer reads, writes and watches the file through
 //! `ds_settings`'s generic settings file API (ds stays effect-free).
 
-use super::look::{CardAccent, Grain, SpaceLook};
+use super::look::{Grain, SpaceLook};
 use super::presets::default_look;
 use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::BTreeMap;
@@ -30,22 +30,17 @@ pub struct Workspace {
 }
 
 /// What a workspace with no stored look falls back to beyond its preset's dots: the settings
-/// keys `spaces.default_grain` and `spaces.default_card_accent`.
+/// key `spaces.default_grain`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct SpaceDefaults {
     /// The grain every preset ships with (none, 0).
     pub grain: Grain,
-    /// The card accent (proposed: the chosen accent).
-    pub card_accent: CardAccent,
 }
 
 impl Default for SpaceDefaults {
-    /// design/21 section 4's defaults: grain 0 (none), the chosen accent.
+    /// design/21 section 4's default: grain 0 (none).
     fn default() -> Self {
-        SpaceDefaults {
-            grain: Grain(0),
-            card_accent: CardAccent::Chosen,
-        }
+        SpaceDefaults { grain: Grain(0) }
     }
 }
 
@@ -53,7 +48,8 @@ impl Default for SpaceDefaults {
 ///
 /// `by_index` holds `None` for a position with no stored look, so a look stored for workspace
 /// 3 does not invent looks for 0 to 2. A malformed entry there costs that position only; the
-/// lenient reader in ds-settings handles every other key.
+/// lenient reader in ds-settings handles every other key. The `card_accent` key older files
+/// carry in each look is a key the look does not know, so reading drops it and keeps the rest.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct SpaceStore {
@@ -120,7 +116,7 @@ impl SpaceStore {
 
 /// The preset look for `index` (design/21 section 4).
 fn preset_look(index: WorkspaceIndex, defaults: SpaceDefaults) -> SpaceLook {
-    default_look(index.0, defaults.grain, defaults.card_accent)
+    default_look(index.0, defaults.grain)
 }
 
 /// `by_index`, one entry at a time: an entry that is not a look is `None`, and anything that
@@ -135,25 +131,19 @@ fn each_or_none<'de, D: Deserializer<'de>>(
     Ok(entries.into_iter().map(look_or_none).collect())
 }
 
-/// One entry as a look. A value the look does not accept costs only that key: the entry is
-/// read again without `card_accent` (its old `postmark` is no longer a word), which then
-/// takes the default. An entry that is still not a look is `None`.
+/// One entry as a look. An entry that is not a look is `None`; a key the look does not know,
+/// such as an old file's `card_accent`, is ignored.
 fn look_or_none(entry: serde_json::Value) -> Option<SpaceLook> {
-    if let Ok(look) = serde_json::from_value::<Option<SpaceLook>>(entry.clone()) {
-        return look;
-    }
-    let serde_json::Value::Object(mut fields) = entry else {
-        return None;
-    };
-    fields.remove("card_accent")?;
-    serde_json::from_value(serde_json::Value::Object(fields)).ok()
+    serde_json::from_value::<Option<SpaceLook>>(entry)
+        .ok()
+        .flatten()
 }
 
 #[cfg(test)]
 mod tests {
     use super::{SpaceDefaults, SpaceStore, Workspace, WorkspaceId, WorkspaceIndex};
     use crate::appearance::theme::Theme;
-    use crate::space::look::{CardAccent, Grain, SpaceLook};
+    use crate::space::look::{Grain, SpaceLook};
     use crate::space::palette::Dot;
     use crate::space::presets::PRESETS;
 
@@ -162,7 +152,6 @@ mod tests {
             dots: vec![Dot { hue, chroma: 0.5 }],
             grain: Grain(70),
             theme: Theme::Dark,
-            card_accent: CardAccent::SpaceHue,
         }
     }
 
@@ -179,7 +168,6 @@ mod tests {
         for index in [0, 1, 2, 7, 8, 13] {
             let got = store.look_for(WorkspaceIndex(index), SpaceDefaults::default());
             assert_eq!(got.dots, PRESETS[index % 8].dots, "workspace {index}");
-            assert_eq!(got.card_accent, CardAccent::Chosen, "workspace {index}");
         }
     }
 
@@ -234,15 +222,11 @@ mod tests {
             {"grain": 60, "card_accent": "space_hue"}]}"#;
         let store: SpaceStore = serde_json::from_str(text).unwrap_or_else(|e| panic!("{e}"));
         let first = store.by_index[0].as_ref().unwrap_or_else(|| panic!("lost"));
-        assert_eq!(
-            (first.grain, first.theme, first.card_accent),
-            (Grain(20), Theme::Dark, CardAccent::Chosen)
-        );
+        assert_eq!((first.grain, first.theme), (Grain(20), Theme::Dark));
         let second = store.by_index[1].as_ref().unwrap_or_else(|| panic!("lost"));
-        assert_eq!(
-            (second.grain, second.card_accent),
-            (Grain(60), CardAccent::SpaceHue)
-        );
+        assert_eq!(second.grain, Grain(60));
+        let written = serde_json::to_string(&store).unwrap_or_else(|e| panic!("{e}"));
+        assert!(!written.contains("card_accent"), "{written}");
     }
 
     #[test]

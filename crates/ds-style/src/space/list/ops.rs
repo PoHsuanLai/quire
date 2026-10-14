@@ -23,7 +23,7 @@ impl<P, R> Spaces<P, R> {
         let id = SpaceId(self.next);
         self.next += 1;
         let count = self.list.len();
-        let mut look = default_look(count, Grain::default(), self.current().look.card_accent);
+        let mut look = default_look(count, Grain::default());
         look.dots = PRESETS[count % PRESETS.len()].dots.to_vec();
         look.theme = self.current().look.theme;
         self.list.push(Space {
