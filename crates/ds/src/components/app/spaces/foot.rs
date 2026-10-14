@@ -18,7 +18,8 @@ use ds_style::space::look::SpaceLook;
 /// The foot of a sidebar that has Spaces.
 ///
 /// `leading` is the app's own (mailo puts Downloads there); `trailing` the app's (Settings, Hide
-/// sidebar). The dots take the free width between. Each Space is a small dot, as Dia draws
+/// sidebar). The dots take the free width between; with one Space there is nothing to switch to,
+/// so no dot and no dots group is drawn, and an empty gap keeps that width. Each Space is a small dot, as Dia draws
 /// them (`DotFace::Foot`): the current one larger and in ink, the others faint ink; a Space's own
 /// colours are its frame's, not the picker's. A right click on a dot is that Space's menu; a click switches, unless a part of a
 /// Space's menu is open. `+` adds a Space over `new_payload` and opens its name.
@@ -56,27 +57,31 @@ where
             if let Some(leading) = leading {
                 {leading}
             }
-            div { class: "ds-spaces-dots", role: "group", "aria-label": "Spaces",
-                for (index, id, name) in dots {
-                    span {
-                        key: "{id.0}",
-                        class: "ds-spaces-dot-hold",
-                        "data-current": if id == current { "true" } else { "false" },
-                        oncontextmenu: move |event: MouseEvent| {
-                            event.prevent_default();
-                            event.stop_propagation();
-                            let at = event.client_coordinates();
-                            handle.open_menu(id, Point { x: Px(at.x as f32), y: Px(at.y as f32) });
-                        },
-                        SpaceDot {
-                            name,
-                            face: DotFace::Foot,
-                            frame: FrameVars::of(&SpaceLook::default(), scheme),
-                            selection: Selection::of(&id, &current),
-                            shortcut: chord.shortcut(index),
-                            onclick: move |()| {
-                                handle.switch(id);
+            if dots.len() < 2 {
+                div { class: "ds-spaces-gap" }
+            } else {
+                div { class: "ds-spaces-dots", role: "group", "aria-label": "Spaces",
+                    for (index, id, name) in dots {
+                        span {
+                            key: "{id.0}",
+                            class: "ds-spaces-dot-hold",
+                            "data-current": if id == current { "true" } else { "false" },
+                            oncontextmenu: move |event: MouseEvent| {
+                                event.prevent_default();
+                                event.stop_propagation();
+                                let at = event.client_coordinates();
+                                handle.open_menu(id, Point { x: Px(at.x as f32), y: Px(at.y as f32) });
                             },
+                            SpaceDot {
+                                name,
+                                face: DotFace::Foot,
+                                frame: FrameVars::of(&SpaceLook::default(), scheme),
+                                selection: Selection::of(&id, &current),
+                                shortcut: chord.shortcut(index),
+                                onclick: move |()| {
+                                    handle.switch(id);
+                                },
+                            }
                         }
                     }
                 }

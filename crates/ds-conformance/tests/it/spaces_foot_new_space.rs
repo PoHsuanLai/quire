@@ -1,5 +1,5 @@
-//! The Space foot's New Space button on a real Blitz document: it is drawn by default and left
-//! out by `NewSpace::Hidden`, which keeps the dots.
+//! The Space foot on a real Blitz document: its New Space button is drawn by default and left
+//! out by `NewSpace::Hidden`, which keeps the dots; with one Space it draws no dots at all.
 
 use dioxus::prelude::*;
 use ds::components::app::spaces::{Spaces, SpacesFoot, Switched, use_spaces};
@@ -13,9 +13,9 @@ const VIEW: Viewport = Viewport {
     scale_percent: 100,
 };
 
-fn foot(new_space: NewSpace) -> Element {
+fn foot(new_space: NewSpace, count: usize) -> Element {
     let spaces = use_spaces(
-        || Spaces::first_run((0..3).map(|_| ()), || ()),
+        move || Spaces::first_run((0..count).map(|_| ()), || ()),
         |_| {},
         String::new,
         |_: Switched<String>| {},
@@ -32,12 +32,17 @@ fn foot(new_space: NewSpace) -> Element {
 
 #[allow(non_snake_case)]
 fn WithPlus() -> Element {
-    foot(NewSpace::Shown)
+    foot(NewSpace::Shown, 3)
 }
 
 #[allow(non_snake_case)]
 fn WithoutPlus() -> Element {
-    foot(NewSpace::Hidden)
+    foot(NewSpace::Hidden, 3)
+}
+
+#[allow(non_snake_case)]
+fn OneSpace() -> Element {
+    foot(NewSpace::Shown, 1)
 }
 
 fn started(app: fn() -> Element) -> Harness {
@@ -53,6 +58,27 @@ fn the_foot_draws_its_plus_unless_asked_not_to() {
     let hidden = started(WithoutPlus);
     assert_eq!(hidden.count(".ds-spaces-foot > .ds-button"), 0);
     assert_eq!(hidden.count(".ds-spaces-dot-hold"), 3, "the dots stay");
+}
+
+/// One Space has nothing to switch to: the foot draws no dot and no dots group, and the New
+/// Space button still sits at the foot's end.
+#[test]
+fn one_space_draws_no_dots_and_no_dots_group() {
+    let many = started(WithPlus);
+    assert_eq!(many.count(".ds-spaces-dots"), 1);
+    assert_eq!(many.count(".ds-space-dot"), 3);
+    let one = started(OneSpace);
+    assert_eq!(one.count(".ds-spaces-dots"), 0, "no dots group");
+    assert_eq!(one.count(".ds-space-dot"), 0, "no dot");
+    assert_eq!(one.count(".ds-spaces-foot [role=group]"), 0);
+    let foot = one.rect(".ds-spaces-foot").expect("foot");
+    let plus = one.rect(".ds-spaces-foot > .ds-button").expect("plus");
+    let foot_end = foot.origin.x.0 + foot.size.width.0;
+    let plus_end = plus.origin.x.0 + plus.size.width.0;
+    assert!(
+        (foot_end - plus_end).abs() < 1.0,
+        "New Space ends at {plus_end}, the foot at {foot_end}"
+    );
 }
 
 /// The foot draws each Space as the foot face: a 16px target around a small pip, the current
