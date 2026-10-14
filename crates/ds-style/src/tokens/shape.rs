@@ -27,9 +27,10 @@ pub enum Radius {
     Item,
     /// `--r-tile` 12: account tiles, editor field.
     Tile,
-    /// `--r-window` 26: a window with a toolbar; the compositor and the chrome both read it.
+    /// `--r-window` 10: a window (Sonoma and Sequoia's radius, design/34 section 2.1 "Old"); the
+    /// compositor and the chrome both read it.
     Window,
-    /// `--r-window-plain` 16: a titlebar-only window (design/34 section 2.1; 16 is UNKNOWN).
+    /// `--r-window-plain` 10: a titlebar-only window; the same 10 until a look gives it its own.
     WindowPlain,
     /// `--r-menu-item` 8 (the menu's 14 less its 6 inset): menu item, prop row, foot button.
     MenuItem,
@@ -51,14 +52,14 @@ pub enum Radius {
 }
 
 impl Radius {
-    /// The radius as CSS. The Look (design/34-MODERN-LOOK.md section 2.1, step 2, Tahoe): window
-    /// 26 (16 titlebar-only), panel 20, menu 14, card and group 12, the menu item concentric
+    /// The radius as CSS. The pre-Liquid-Glass look (design/34-MODERN-LOOK.md section 2.1, window from
+    /// the "Old" column, the rest step 2): window 10 (titlebar-only too), panel 20, menu 14, card and group 12, the menu item concentric
     /// in its menu (14 less 6), chip, item and small 8, button and field a Regular control's.
     pub fn value(self) -> &'static str {
         match self {
-            Radius::Window => "26px",
+            Radius::Window => "10px",
             Radius::Panel => "20px",
-            Radius::WindowPlain => "16px",
+            Radius::WindowPlain => "10px",
             Radius::Menu => "14px",
             Radius::Card | Radius::Tile | Radius::Media | Radius::Group => "12px",
             Radius::Btn | Radius::Field | Radius::MenuItem => "8px",
