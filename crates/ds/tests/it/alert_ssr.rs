@@ -223,7 +223,7 @@ fn the_default_is_the_filled_first_button_unless_it_destroys() {
     );
     for want in [
         "data-attach=\"centre\"",
-        "data-width=\"narrow\"",
+        "data-width=\"alert\"",
         "data-style=\"informational\"",
         "data-layout=\"row\"",
     ] {
