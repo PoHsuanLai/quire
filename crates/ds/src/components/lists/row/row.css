@@ -10,6 +10,7 @@
   font-size:var(--fs-shell-menu);
 }
 .ds-row[*|data-density=settings]{ min-height:var(--row-settings-h); }
+.ds-row[*|data-density=palette]{ min-height:var(--row-palette-h); }
 .ds-row[*|aria-disabled=true]{ opacity:.35; }
 .ds-row[*|aria-busy=true]{ cursor:default; }
 

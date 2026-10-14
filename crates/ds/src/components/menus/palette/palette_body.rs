@@ -27,7 +27,7 @@ pub(crate) struct StopEvents {
     pub action_mounted: EventHandler<(usize, MountedEvent)>,
     /// A header action was clicked (before it runs).
     pub action_ran: EventHandler<()>,
-    /// The rows' height: the palette's are `Settings`, a popover's list `Compact`.
+    /// The rows' height: the palette's are `Palette`, a popover's list `Compact`.
     pub size: RowSize,
 }
 

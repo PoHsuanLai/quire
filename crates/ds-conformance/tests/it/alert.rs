@@ -206,6 +206,6 @@ fn floating_it_is_centred_in_the_window() {
     let centre_y = panel.origin.y.0 + panel.size.height.0 / 2.0;
     assert!((centre_x - 400.0).abs() < 1.0, "{panel:?}");
     assert!((centre_y - 300.0).abs() < 1.0, "{panel:?}");
-    assert!((panel.size.width.0 - 340.0).abs() < 0.5, "the narrow sheet");
+    assert!((panel.size.width.0 - 260.0).abs() < 0.5, "the alert sheet");
     assert_eq!(harness.count(".popover .ds-alert"), 0);
 }

@@ -269,7 +269,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     in_view.stop_mounted(index, MountedRef(event.data()));
                 }),
                 action_ran: EventHandler::new(move |()| actions.ran()),
-                size: RowSize::Settings,
+                size: RowSize::Palette,
             },
             &motion,
         )

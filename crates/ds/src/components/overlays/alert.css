@@ -1,11 +1,11 @@
 /* Alert (design/34 section 3.7, design/04-COMPONENTS.md section 55): the Mac's alert in the narrow
-   sheet (`SheetWidth::Narrow`, 340, or 88 % of a smaller root), centred: one centred column as
+   sheet (`SheetWidth::Alert`, `--sheet-alert-w` 260, or 88 % of a smaller root), centred: one centred column as
    the polkit prompt's, the optional caller-supplied hero icon at 64 (a Critical alert badges it
    with a 20 px warning glyph at the lower right), the title in the display face at
    `--fs-title-2` 17/700, the body in `--fs-control` in the soft ink, then the footer: one or two
    buttons side by side at equal width 8 apart, 18 below, the default on the right (the first
-   button is last on screen), or three or more stacked, the default on top, all at the Large
-   size. The default button is the accent one; another is the plain one, or, for a destructive
+   button is last on screen), or three or more stacked, the default on top, all at the Regular
+   size (the ladder's 28). The default button is the accent one; another is the plain one, or, for a destructive
    action, a Danger whose label is red at rest as well as on hover. The panel's entrance and exit
    are the sheet's. Nothing behind it is dimmed.
    Inline (`data-flow=inline`): a stage over the nearest positioned ancestor, on the peek layer,

@@ -38,7 +38,7 @@ use ds_style::tokens::layer::ZLayer;
 /// bottom edge (the widget gallery). A centred or bottom sheet needs a root that has a height: an
 /// overlay root passes `Ds { extent: RootExtent::Viewport }`.
 ///
-/// `width` is [`SheetWidth::Regular`] (560) by default, [`SheetWidth::Narrow`] (340) for an alert
+/// `width` is [`SheetWidth::Regular`] (560) by default, [`SheetWidth::Narrow`] (340) for a password prompt, [`SheetWidth::Alert`] (260) for an alert
 /// or a password prompt, [`SheetWidth::Wide`] (1040) for a gallery.
 ///
 /// `on_return` is what Return does anywhere in the sheet that no control took for itself: a

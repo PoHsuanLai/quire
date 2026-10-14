@@ -129,7 +129,7 @@ pub fn Alert(
                     shown,
                     on_hidden,
                     attach: Attach::Centre,
-                    width: SheetWidth::Narrow,
+                    width: SheetWidth::Alert,
                     common,
                     AlertBody { words }
                 }
@@ -172,7 +172,7 @@ fn InlineAlert(
                     "data-presence": drawn,
                     "data-pulse": alias.slug(),
                     "data-attach": Attach::Centre.slug(),
-                    "data-width": SheetWidth::Narrow.attribute(),
+                    "data-width": SheetWidth::Alert.attribute(),
                     role: "alertdialog",
                     "aria-label": "{words.title}",
                     onmounted: move |event| common.mounted(event),
@@ -306,7 +306,7 @@ fn slot(slot: Slot<'_>) -> Element {
                 })), ..button.common.clone() },
                 answers,
                 role,
-                size: ControlSize::Large,
+                size: ControlSize::Regular,
                 label: button.label.clone(),
                 onclick: move |_| press.call(Some(index)),
             }

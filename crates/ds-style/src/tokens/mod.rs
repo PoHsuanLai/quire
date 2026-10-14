@@ -29,6 +29,7 @@ pub mod row_scale;
 pub mod selection;
 pub mod set;
 pub mod shape;
+pub mod sheet_scale;
 pub mod shell_scale;
 pub mod shell_type;
 pub mod signal_colour;

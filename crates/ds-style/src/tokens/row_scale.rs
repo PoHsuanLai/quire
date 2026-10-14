@@ -22,6 +22,9 @@ pub struct RowScale {
     pub icon_tile: WholePx,
     /// The gap between a row's leading tile or avatar and its label, 12.
     pub tile_gap: WholePx,
+    /// A command-palette result row's height, 38: tighter than a settings row, so a palette
+    /// shows more results (the reference palette's rows are about 38 pt).
+    pub palette_height: WholePx,
 }
 
 /// The settled numbers.
@@ -31,6 +34,7 @@ pub const ROW_SCALE: RowScale = RowScale {
     compact_height: WholePx(32),
     icon_tile: WholePx(28),
     tile_gap: WholePx(12),
+    palette_height: WholePx(38),
 };
 
 /// One of the row's sizes, as a token.
@@ -52,6 +56,9 @@ pub enum RowSize {
     /// `--row-tile-gap`: the gap from the leading element to the label.
     #[token(name = "row-tile-gap")]
     TileGap,
+    /// `--row-palette-h`: a command-palette result row's height.
+    #[token(name = "row-palette-h")]
+    PaletteHeight,
 }
 
 /// The size a row token holds, as the stylesheet writes it.
@@ -62,6 +69,7 @@ fn row_size_css(token: RowSize, _scope: TokenScope) -> CssValue {
         RowSize::CompactHeight => ROW_SCALE.compact_height,
         RowSize::IconTile => ROW_SCALE.icon_tile,
         RowSize::TileGap => ROW_SCALE.tile_gap,
+        RowSize::PaletteHeight => ROW_SCALE.palette_height,
     };
     CssValue::computed(size.css())
 }

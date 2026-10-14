@@ -11,6 +11,8 @@ pub enum RowSize {
     Compact,
     /// 44: a settings row, with room for a detail line.
     Settings,
+    /// 38: a command-palette result (`--row-palette-h`).
+    Palette,
     /// A card: a row that lays its own `content` out, edge to edge (a mail thread).
     Card,
 }
