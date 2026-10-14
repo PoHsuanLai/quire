@@ -32,6 +32,18 @@ pub enum TrafficLights {
     Hidden,
 }
 
+/// Where a titlebar's title sits when the bar also carries a trailing control.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum TitleRoom {
+    /// Centred in the bar between the title insets, as `NSWindow` centres a title: the trailing
+    /// control may lie under it in a bar too narrow for both.
+    #[default]
+    Centred,
+    /// In the room between the lights and the trailing control, centred there: a title too long
+    /// for it is cut (in the middle) before the control, as Preview's is before its toolbar.
+    Beside,
+}
+
 /// Whether a root draws a window frame, and what it holds.
 #[derive(Debug, Clone, PartialEq, Default)]
 pub enum WindowFrame {
@@ -143,6 +155,8 @@ pub fn framed(frame: WindowFrame, children: Element) -> Element {
 /// (design/13 section 13.3.8). `parts` are what goes with the title; `data-activity` says
 /// whether the window is the one the person works in. `trailing` is drawn after the title area at
 /// the bar's end; a press or double-click on it is its own and neither moves nor zooms the window.
+/// `title_room` says whether the title keeps to the middle of the bar or to the room beside the
+/// lights and `trailing`.
 #[component]
 pub fn WindowTitlebar(
     title: String,
@@ -151,6 +165,7 @@ pub fn WindowTitlebar(
     #[props(default)] timing: FrameTiming,
     #[props(default)] pose: TilePose,
     #[props(default)] trailing: Option<Element>,
+    #[props(default)] title_room: TitleRoom,
     #[props(default)] common: Common,
 ) -> Element {
     let host = use_window_host();
@@ -166,6 +181,10 @@ pub fn WindowTitlebar(
             "aria-label": common.aria_label.clone(),
             "data-window": state.slug(),
             "data-activity": state.activity().slug(),
+            "data-title-room": match title_room {
+                TitleRoom::Centred => None,
+                TitleRoom::Beside => Some(title_room.slug()),
+            },
             "data-first-mouse": "",
             onmounted: move |event| common.mounted(event),
             onpointerdown: move |event: PointerEvent| {
