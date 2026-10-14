@@ -673,6 +673,7 @@ connection per window, binds `org_kde_kwin_appmenu_manager` when it is advertise
 | --- | --- |
 | **Apple** | Minimum leading, maximum trailing; optional end icons; macOS: tick marks (directional thumb when present, round otherwise), circular sliders, live feedback, a label in sentence case with a colon; pair with a text field and stepper for exact values |
 | **quire today** | 04 §5 `Slider`; drag with no tween, rubber band, press swell, `LevelTick` (26 §5.10.3) |
+| **Mac Control Center** | Not on the HIG page. Observed (M): Display and Sound sliders are a pill well with a round white knob that holds the glyph, fill neutral, title above; see design/29 section 16. Scroll-wheel adjust and a value tooltip are open |
 | **Verdict** | Adapt: add `ticks: Ticks::{None, Every(step)}` with snapping; the knob's release uses the spring (3.12) |
 
 ### 5.18 Steppers (not retrieved)

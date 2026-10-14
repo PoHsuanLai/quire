@@ -201,7 +201,7 @@ Same as push button: filled, no border, chevron.up.chevron.down 10 px trailing g
 
 Toggle: track loses the inset hairline (L24 `box-shadow:inset 0 0 0 var(--hair) var(--line)`)
 and takes the fill wash off, on = accent; knob white with `--shadow-1` kept. Step 2 size per
-2.2 (26 high). Slider: track 4 -> 6 px, capsule; knob white with shadow, no ring. Checkbox: 14 -> 16
+2.2 (26 high). Slider: track 4 -> 6 px, capsule; knob white with shadow, no ring. The control center's level slider is the `Mac` look (design/29 section 16): the glyph inside the knob, neutral fill. Checkbox: 14 -> 16
 in step 2, radius 4 -> 5, no border when checked. All values M-low. Toggle's spring stays
 (motion section).
 

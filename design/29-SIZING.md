@@ -379,7 +379,7 @@ lint (`Rule::RawControlHeight`).
 | 4 | Toggle in settings rows | S (26 x 15) |
 | 5 | Segmented shape | rounded rectangle (well r6, segment r5) |
 | 6 | Control center radius | panel 18 = module 8 + padding 10 (R6) |
-| 7 | Control center level look | capsule with a knob |
+| 7 | Control center level look | capsule with a knob (2026-10-15: refined to the `Mac` look, the glyph inside the knob, section 16) |
 | 8 | Dark plate fix | F3 tone band (user) |
 | 9 | Does mailo move with the shell | not yet: one density step larger until audited |
 
@@ -423,3 +423,69 @@ lint (`Rule::RawControlHeight`).
   the progress page's copy.
 - Still open: R7's sweep of the off-grid spacing steps (section 12 step 6), the
   `Rule::RawControlHeight` lint, sill reading these sizes (R9), mailo's own density step.
+
+## 16. Mac level sliders (2026-10-15)
+
+The owner's remark: the control center shipped the iOS level pill (a fat fill with the glyph
+inside it, or a capsule with a separate knob and the glyph beside the rail), which is awkward
+with a pointer. This section is what macOS draws, what is measured and what is not, and what
+changed. Confidence: H read from Apple's templates or pages, M observed on screenshots of
+Sonoma/Sequoia from memory of Apple's own support pages and press images, L inferred. **No
+number below is a measurement of a running Mac**; the 2024-2025 Wayback snapshots of
+support.apple.com could not be fetched from this lane (the host was blocked), so the M rows
+are not re-verified against a dated capture and are marked UNKNOWN where nothing else backs them.
+
+### 16.1 What macOS Sonoma / Sequoia draws
+
+| Surface | What it is | Conf. |
+| --- | --- | --- |
+| Control Center, Display and Sound modules | A full-width module (2 columns wide, one row) with the **title above the slider** ("Display", "Sound"; semibold 13, no glyph and no percentage in the header). The slider is a pill-shaped well; the part left of the knob is filled in a light neutral (not the accent colour), the rest is a translucent darker well. The **knob is a round white disc, nearly the track's height, with a soft shadow and the glyph inside it** (the sun for Display, the speaker with waves for Sound, whose waves follow the level). Nothing stands before the track, so the whole module width is track | M (shape and glyph in the knob); UNKNOWN (exact track and knob heights) |
+| Track and knob size | Our earlier read: a track about 22 tall with a white knob of about 21 filling it (section 5.2 above, L-M). Kept: **track 22 (Regular), knob 20, inset 1** | L-M, UNKNOWN to the pixel |
+| Fill colour | Neutral light (a near-white on the dark tint, white over the light one), never the accent: the Control Center sliders do not take the accent colour. The standard `NSSlider` in a window does (accent fill, key window only) | M |
+| Sound menu-bar extra | Option-clicking or the Sound item opens a popover with a "Sound" title, a volume slider and the Output list. UNKNOWN whether the slider is the Control Center one or a plain `NSSlider` with speaker end icons; treated as the Control Center one (same module, same code in AppKit's menu-extra host) | UNKNOWN |
+| Brightness and volume keys (OSD) | Big Sur through Sonoma: a square bezel (about 200 x 200, radius about 18) in the dark HUD material, bottom centre about 140 above the screen edge, a large glyph and **sixteen chiclet squares** that fill one by one; the volume keys step by a sixteenth, with Option+Shift a quarter of that (sixty-fourths). It is not a slider and nothing in it can be grabbed. UNKNOWN whether Sequoia changed the placement or size | H (sixteen steps, quarter steps); M (size, position); UNKNOWN (Sequoia) |
+| iOS, for contrast | A thick vertical (Control Center, 1x2 module) or horizontal (volume HUD) pill with **no knob**, fill white, glyph at the bottom or left inside the fill, set by a vertical or horizontal drag from anywhere in it; made for a finger | H |
+
+### 16.2 What a pointer does on the Mac sliders
+
+| Gesture | Mac | Conf. |
+| --- | --- | --- |
+| Click on the well | The knob **jumps** to the click and the drag continues from there | M |
+| Drag the knob | 1:1, the fill follows, no tween; a drag past the end keeps the end | H |
+| Scroll wheel / two-finger scroll over it | Adjusts the value. Our `Slider` does **not** do this yet (open item, section 16.5) | M |
+| Arrow keys (focused) | Step the value; Full Keyboard Access is what makes a slider focusable (design/27 section 5.x focus) | H |
+| Hover | No change; the HIG recommends a tooltip with the exact value | H (HIG Sliders) |
+| Pressed | No swell on the knob (design/30 section 2.1) | H |
+
+Source for the HIG rows: Apple HIG Sliders (2023-06-21 snapshot in the apple-design references:
+"In a linear slider ... the thumb is a narrow lozenge shape", tick marks, live feedback, tooltip
+with the thumb's value, label in sentence case with a colon, text field and stepper for exact
+values). The HIG says nothing about Control Center; the module rows are observation.
+
+### 16.3 What changed
+
+| Was | Is |
+| --- | --- |
+| `Slider` looks: `Linear`, `Capsule` (iOS pill, no knob, glyph inside the fill, drawn twice), `CapsuleKnob` (glyph beside the rail) | `Mac` added: knob carries the glyph (14 px, once), no lead glyph, the rail is the whole width. `Linear` stays the default (it is `NSSlider`: 4 px track, accent fill, 20 px knob, for settings rows). `Capsule` and `CapsuleKnob` stay only for the media `Capsule` bar's volume and for consumers not yet re-pinned; no Mac surface should draw them |
+| Control center level module: header glyph + title + percentage over a capsule 22 with the glyph beside it | Title and percentage over the Mac slider, no header glyph (the knob has it); height unchanged at 64 |
+| Volume/brightness OSD: the continuous capsule | The sixteen-square style (`LevelStyle::Discrete`), as the bezel draws it |
+
+### 16.4 Values
+
+| Token / value | Old | New |
+| --- | --- | --- |
+| `Slider` look default | `Linear` | `Linear` (unchanged) |
+| Control center level slider look | `CapsuleKnob` | `Mac` |
+| Level glyph size | 22 (lead, outside the rail) or 16 (inside) | 14 (inside the knob) |
+| Rail height | 22 | 22 |
+| Knob | 20, empty | 20, holds the glyph in `--m-level-glyph-fill` |
+| Rail width in a 300 module | 300 less 22 less 10 gap = 268 | 300 (less module padding) |
+| `--cc-level-h` | 64 | 64 |
+
+### 16.5 Left open
+
+- Scroll wheel and trackpad scroll adjusting a `Slider` (Mac behaviour, not built).
+- A tooltip with the exact value on hover (HIG).
+- Whether the track should be thinner than 22 (the owner's remark mentions a "thin" slider; the
+  thin one is `Linear`, which a Sound or Display menu may use instead of the module slider).
+- Confirm the Sequoia OSD against a dated capture.
