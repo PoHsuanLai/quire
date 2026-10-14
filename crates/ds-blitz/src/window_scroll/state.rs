@@ -22,8 +22,60 @@ use keyboard_types::Modifiers;
 use super::coast::{Coast, Heard};
 use super::eased::Eased;
 use super::wheel::{WheelInput, pointer_scrolls};
+use crate::frame_tag::FrameTag;
 use crate::node_ref::{DocRef, Written};
 use crate::phase::Phase;
+
+/// How many frames a frame view waits for its frame's element to be laid out before it gives up.
+const FRAME_VIEW_FRAMES: u8 = 30;
+
+/// A request to scroll the document of the `iframe` tagged `tag` the least that shows its
+/// first element matching `selector`.
+struct FrameView {
+    tag: FrameTag,
+    selector: String,
+    /// How many more frames to wait for the element to exist and be laid out.
+    patience: u8,
+}
+
+impl FrameView {
+    /// Try the scroll in `doc`; true when it is done (it scrolled, or there is nothing to
+    /// scroll to), false when the frame or its element is not laid out yet.
+    fn run(&self, doc: &mut BaseDocument) -> bool {
+        let hosts = doc.query_selector_all("iframe").unwrap_or_default();
+        for host in hosts {
+            let tagged = doc.get_node(host).is_some_and(|node| {
+                FrameTag::read(
+                    node.attr(blitz_dom::LocalName::from(crate::frame_tag::TAG_ATTRIBUTE)),
+                ) == Some(self.tag.clone())
+            });
+            if !tagged {
+                continue;
+            }
+            let Some(sub) = doc.get_node_mut(host).and_then(|node| node.subdoc_mut()) else {
+                return false;
+            };
+            let mut inner = sub.inner_mut();
+            let Ok(Some(target)) = inner.query_selector(&self.selector) else {
+                return false;
+            };
+            let laid_out = inner
+                .get_node(target)
+                .is_some_and(|node| node.final_layout().size.height > 0.0);
+            if !laid_out {
+                return false;
+            }
+            inner.scroll_into_view(
+                target,
+                blitz_dom::ScrollBehavior::Instant,
+                blitz_dom::ScrollLogicalPosition::Nearest,
+                blitz_dom::ScrollLogicalPosition::Nearest,
+            );
+            return true;
+        }
+        false
+    }
+}
 
 /// Whether the window needs another frame for scrolling: an offset moved, or an animation runs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -76,6 +128,8 @@ struct State {
     /// How fast the wheel is being spun, for its acceleration.
     accel: Accel,
     commands: Vec<ScrollCmd>,
+    /// Scrolls of a frame's own document, kept until the frame has laid the element out.
+    frame_views: Vec<FrameView>,
 }
 
 impl State {
@@ -137,6 +191,7 @@ impl WindowScroll {
                     coast: Coast::default(),
                     accel: Accel::default(),
                     commands: Vec::new(),
+                    frame_views: Vec::new(),
                 }),
             }),
         }
@@ -171,6 +226,19 @@ impl WindowScroll {
     /// Queue a programmatic scroll for the next frame.
     pub fn queue(&self, command: ScrollCmd) {
         self.shared.state.borrow_mut().commands.push(command);
+    }
+
+    /// Queue a scroll of the document of the frame tagged `tag` to its first element matching
+    /// `selector`, the least that shows it. A newer request for the same frame replaces the
+    /// older one. It runs at the first frame where the element is laid out.
+    pub fn queue_frame_view(&self, tag: FrameTag, selector: impl Into<String>) {
+        let mut state = self.shared.state.borrow_mut();
+        state.frame_views.retain(|view| view.tag != tag);
+        state.frame_views.push(FrameView {
+            tag,
+            selector: selector.into(),
+            patience: FRAME_VIEW_FRAMES,
+        });
     }
 
     fn elapsed(&self, now: Instant) -> Elapsed {
@@ -340,6 +408,17 @@ impl WindowScroll {
                 .iter()
                 .map(|command| state.driver.command(doc, command, env))
                 .fold(Moves::none(), Moves::then);
+            let views = std::mem::take(&mut state.frame_views);
+            state.frame_views = views
+                .into_iter()
+                .filter_map(|view| {
+                    let waiting = !view.run(doc) && view.patience > 1;
+                    waiting.then(|| FrameView {
+                        patience: view.patience - 1,
+                        ..view
+                    })
+                })
+                .collect();
             ran.then(state.driver.frame(doc, env))
         });
         self.eased_frame(el);
@@ -373,7 +452,8 @@ impl WindowScroll {
         let animating = state.driver.motion() == Motion::Animating
             || state.eased.motion() == Motion::Animating
             || state.coast.motion() == Motion::Animating
-            || !state.commands.is_empty();
+            || !state.commands.is_empty()
+            || !state.frame_views.is_empty();
         match (moved, animating) {
             (Moved::Still, false) => Frames::Idle,
             _ => Frames::Wanted,

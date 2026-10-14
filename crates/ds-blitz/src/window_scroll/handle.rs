@@ -6,6 +6,7 @@ use blitz_kit::scroll::cmd::ScrollCmd;
 use dioxus::prelude::*;
 
 use super::state::WindowScroll;
+use crate::frame_tag::FrameTag;
 
 /// Scrolls the containers of the window the calling component renders in: `ScrollCmd::To`,
 /// `By` and `IntoView` run through the same engine as the wheel and the keys (smooth by the
@@ -33,6 +34,15 @@ impl ScrollHandle {
     /// Run `command` at the window's next frame.
     pub fn send(&self, command: ScrollCmd) {
         self.scroll.queue(command);
+        (self.wake)();
+    }
+
+    /// Scroll the document of the `iframe` tagged `tag` (`data-frame-tag`) the least that shows
+    /// its first element matching `selector`, at the first frame where the element is laid
+    /// out (a frame whose `srcdoc` just changed is laid out a frame later). A command cannot
+    /// name an element inside a frame by `id`, so a frame's document is scrolled through here.
+    pub fn frame_into_view(&self, tag: FrameTag, selector: impl Into<String>) {
+        self.scroll.queue_frame_view(tag, selector);
         (self.wake)();
     }
 }
