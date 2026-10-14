@@ -1304,6 +1304,7 @@ freeze above is not touched.
   ```rust,ignore
   SettingsPage {
       schemas: vec![Schema],            // a titled FormSection per section, a FieldRow per key
+      page: Option<Page>,               // only the keys of this page id; None draws all
       values: toml::Value,              // the file's content; a missing key reads its default
       onedit: |edit: SettingEdit| ..,   // { path: KeyPath, value }; edit.applied_to(values)
       extras: vec![SectionRows::new("Section title", rows).footer("note")],

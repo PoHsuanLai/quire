@@ -6,13 +6,17 @@ use crate::section::{SchemaSection, SectionRows};
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_settings::schema::Schema;
+use ds_settings::schema::{Page, Schema};
 
 /// A settings page: a `Form` with one titled `FormSection` per section of each schema, in the
 /// order each section's first key comes, and one `FieldRow` per key. The control follows the key's
 /// kind: a two-word key is a switch when the words are an on/off pair and segments otherwise;
 /// three or more choices are a pop-up button; a kind not drawn yet is shown read-only. Nothing
 /// here knows a key by name.
+///
+/// `page` names one page of the schemas (a key's `page`, the schema's own page id): only that
+/// page's keys are drawn, so one list of schemas serves several pages and an app opens a
+/// sub-page by id. `None`, the default, draws every key.
 ///
 /// `values` is the file's current content as TOML (a key not in it reads as its schema default).
 /// The page holds no copy: a change reaches `onedit` as a [`SettingEdit`], the app applies it
@@ -24,13 +28,17 @@ use ds_settings::schema::Schema;
 #[component]
 pub fn SettingsPage(
     #[props(default)] schemas: Vec<Schema>,
+    #[props(default)] page: Option<Page>,
     #[props(default = toml::Value::Table(toml::Table::new()))] values: toml::Value,
     #[props(default)] onedit: EventHandler<SettingEdit>,
     #[props(default)] extras: Vec<SectionRows>,
     #[props(default)] children: Element,
     #[props(default)] common: Common,
 ) -> Element {
-    let groups: Vec<KeyGroup> = schemas.iter().flat_map(sections).collect();
+    let groups: Vec<KeyGroup> = schemas
+        .iter()
+        .flat_map(|schema| sections(schema, page.as_ref()))
+        .collect();
     let beside = |title: &str| -> Vec<SectionRows> {
         extras
             .iter()
