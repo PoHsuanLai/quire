@@ -2868,7 +2868,7 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-emphasis=plain] .ds-thread-name{ font-weight:500; color:var(--ink-soft); }
 .ds-thread-via{ display:inline-flex; align-items:center; flex:none; font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-micro); color:var(--ink-faint); }
 .ds-thread-sub{ font-size:var(--fs-body); line-height:1.35; color:var(--ink); }
-.ds-row[*|data-emphasis=strong] .ds-thread-sub{ font-weight:600; }
+/* Unread is said once, by the dot and the sender's weight: the subject keeps its own. */
 .ds-thread-snip{ font-size:var(--fs-meta); color:var(--ink-faint); }
 /* The tail (time, tags, ⋯) ends the name's line, so the subject and the snippet run to the row's
    right inset under it. */
