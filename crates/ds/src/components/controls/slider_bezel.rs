@@ -1,5 +1,5 @@
-//! The capsule sliders (`SliderLook::Capsule` and `SliderLook::CapsuleKnob`): a level with a
-//! glyph that follows it, the control center's volume and brightness (the user's brief of
+//! The level sliders (`SliderLook::Mac`, `Capsule` and `CapsuleKnob`): a level with a glyph that
+//! follows it (in the knob, for `Mac`), the control center's volume and brightness (the user's brief of
 //! 2026-09-25; design/30 section 2.1).
 //!
 //! Motion: while the pointer holds it, the fill follows the pointer with no easing; a level set
@@ -24,6 +24,7 @@ fn shape_of(look: SliderLook) -> Shape {
     match look {
         SliderLook::Linear | SliderLook::Capsule => Shape::Capsule,
         SliderLook::CapsuleKnob => Shape::CapsuleKnob,
+        SliderLook::Mac => Shape::Mac,
     }
 }
 
@@ -145,7 +146,7 @@ pub(crate) fn BezelSlider(
 fn travel(rail: Rect, shape: Shape) -> Rect {
     match shape {
         Shape::Capsule | Shape::Segments => rail,
-        Shape::CapsuleKnob => {
+        Shape::CapsuleKnob | Shape::Mac => {
             let inset = rail.size.height.0 / 2.0;
             Rect {
                 origin: Point {

@@ -42,7 +42,7 @@ pub fn SliderSection() -> Element {
                 }
             }
             div { class: "g-grid2",
-                for look in [SliderLook::Capsule, SliderLook::CapsuleKnob] {
+                for look in [SliderLook::Mac, SliderLook::Capsule, SliderLook::CapsuleKnob] {
                     Specimen { name: look.slug().to_owned(),
                         div { style: "width:260px; display:flex; flex-direction:column; gap:12px",
                             Slider { label: "Volume", value: volume(), look, glyph: LevelGlyph::Volume(Muting::Audible), onchange: move |next| volume.set(next) }

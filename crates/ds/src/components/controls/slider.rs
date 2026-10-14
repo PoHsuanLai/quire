@@ -16,11 +16,13 @@ use ds_style::tokens::control_size::ControlSize;
 
 /// A value in a range, `value` in thousandths.
 ///
-/// `look: Linear` is the thin track under a round knob; `ticks` puts marks on it and snaps the
-/// value to them, and `step` is a key's step without them (zero is a twentieth). The capsule
-/// looks carry `glyph`, a `LevelGlyph` that follows `value` or a `VolumeState` (both convert):
-/// the speaker then draws that state's waves and slash, as the bar's volume item does; they step
-/// a sixteenth a key, a sixty-fourth with Shift, and take neither `ticks` nor `step`.
+/// `look: Linear` is the thin track under a round knob (`NSSlider`, the default); `ticks` puts
+/// marks on it and snaps the value to them, and `step` is a key's step without them (zero is a
+/// twentieth). `look: Mac` is the Control Center's level slider: a 22 high capsule under a round
+/// knob that carries the glyph. The level looks (`Mac`, `Capsule`, `CapsuleKnob`) carry `glyph`,
+/// a `LevelGlyph` that follows `value` or a `VolumeState` (both convert): the speaker then draws
+/// that state's waves and slash, as the bar's volume item does; they step a sixteenth a key, a
+/// sixty-fourth with Shift, and take neither `ticks` nor `step`.
 /// `Disabled` and `Busy` take no press, drag or key, and `Disabled` leaves the tab order.
 #[component]
 pub fn Slider(
@@ -39,7 +41,7 @@ pub fn Slider(
         SliderLook::Linear => rsx! {
             LinearSlider { label, value, step, ticks, size, availability, onchange, common }
         },
-        SliderLook::Capsule | SliderLook::CapsuleKnob => rsx! {
+        SliderLook::Mac | SliderLook::Capsule | SliderLook::CapsuleKnob => rsx! {
             BezelSlider { label, value, look, glyph, size, availability, onchange, common }
         },
     }

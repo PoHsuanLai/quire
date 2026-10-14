@@ -389,6 +389,16 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "slider",
+        state: "mac-volume",
+        make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Mac, glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} } },
+    },
+    Case {
+        component: "slider",
+        state: "mac-brightness-disabled",
+        make: || rsx! { Slider { label: "Brightness", value: Fraction(0), look: SliderLook::Mac, glyph: LevelGlyph::Brightness, availability: Availability::Disabled } },
+    },
+    Case {
+        component: "slider",
         state: "capsule-volume",
         make: || rsx! { Slider { label: "Volume", value: Fraction(400), look: SliderLook::Capsule, glyph: LevelGlyph::Volume(Muting::Audible), onchange: |_| {} } },
     },
