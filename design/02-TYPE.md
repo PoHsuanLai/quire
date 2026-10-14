@@ -172,7 +172,7 @@ role each size carries; every row cites its rules.
 | 14 | UI, lh 1.65 | reader body | `S:212` |
 | 13.5 | display 700 | Space name | `S:146` |
 | 13.5 | UI 700 / 500 | sender name, unread / read | `S:190-191` |
-| 13.5 | UI 600 / 400, lh 1.35 | subject, unread / read | `S:193-194` |
+| 13.5 | UI 400, lh 1.35 | subject, unread or read (unread is the dot and the sender's 700) | `S:193-194` |
 | 13.5 | UI 600 (label `.t` 500) | sidebar item | `S:128`, `S:137` |
 | 13.5 | UI | command menu item; input `.inp` | `S:239`, `S:781` |
 | 13 | UI | command pill; hover card; menu item name (600); bubble button; composer inputs; prop values | `S:95`, `S:400`, `S:674`, `S:685`, `S:381`, `S:603` |
@@ -240,9 +240,9 @@ UI text uses four weights and each one means something.
 
 | Weight | Meaning | Examples | Source |
 | --- | --- | --- | --- |
-| 400 | read, resting | read subject, body, snippet | `S:51`, `S:193` |
+| 400 | read, resting | subject, body, snippet | `S:51`, `S:193` |
 | 500 | read name; sidebar label text | read sender, `.item .t`, pinned item | `S:191`, `S:137`, `S:558` |
-| 600 | control label; unread subject | sidebar item, mini, segmented, toast, menu item name | `S:128`, `S:168`, `S:194`, `S:266`, `S:362`, `S:674` |
+| 600 | control label | sidebar item, mini, segmented, toast, menu item name | `S:128`, `S:168`, `S:266`, `S:362`, `S:674` |
 | 700 | unread name; primary action; heading | unread sender, `.btn`, toast tab, reader sender, headings | `S:190`, `S:387`, `S:367`, `S:211`, `S:52` |
 | 800 (display) | initials and marks in small coloured shapes; matched characters | avatars, favicons, provider marks, `mark` in menus | `S:116`, `S:139`, `S:553`, `S:791` |
 
