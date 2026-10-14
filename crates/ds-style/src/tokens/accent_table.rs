@@ -1,7 +1,7 @@
 //! The accents' colours, light and dark, at ordinary and increased contrast (design/03-COLOR.md
 //! sections 5 and 20).
 //!
-//! Every accent is one of Apple's 2025 system hues (`system_hue`), except graphite, the Mac's
+//! Every accent is one of Apple's 2025 system hues (`system_hue`) that the macOS picker offers, except graphite, the Mac's
 //! neutral grey. The fill is the hue's own value, so a selected tab, a button and the focus
 //! ring's colour keep Apple's blue; the text accent (`--accent-text`: a link, the caret, a
 //! chip's words) leads from the hue's increased-contrast value and steps further only where a
@@ -38,17 +38,12 @@ pub fn accent_in(accent: Accent, scheme: Scheme, contrast: Contrast) -> AccentRo
 fn shades_of(accent: Accent) -> HueShades {
     let hue = match accent {
         Accent::Blue => SystemHue::Blue,
-        Accent::Indigo => SystemHue::Indigo,
         Accent::Purple => SystemHue::Purple,
         Accent::Pink => SystemHue::Pink,
         Accent::Red => SystemHue::Red,
         Accent::Orange => SystemHue::Orange,
         Accent::Yellow => SystemHue::Yellow,
         Accent::Green => SystemHue::Green,
-        Accent::Mint => SystemHue::Mint,
-        Accent::Teal => SystemHue::Teal,
-        Accent::Cyan => SystemHue::Cyan,
-        Accent::Brown => SystemHue::Brown,
         Accent::Graphite => return GRAPHITE,
     };
     hue.shades()

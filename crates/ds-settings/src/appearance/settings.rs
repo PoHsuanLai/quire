@@ -27,7 +27,7 @@ pub struct AppearanceSettings {
         agent_settable
     )]
     pub theme: Theme,
-    /// `appearance.accent`: one of Apple's twelve system hues or the Mac's graphite.
+    /// `appearance.accent`: one of macOS's eight.
     #[settings(
         label = "Accent",
         help = "The colour of buttons, selection, switches and focus rings across the desktop.",

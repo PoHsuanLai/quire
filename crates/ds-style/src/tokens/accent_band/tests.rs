@@ -115,7 +115,7 @@ fn the_ink_is_deep() {
 
 /// The swatches in the picker are all different colours: every pair of built-in fills stands at
 /// least 0.03 apart in OKLab in both schemes (the narrowest gap is Apple's own 2025 pair, Red to
-/// Pink in light, 0.033; Teal to Cyan is 0.039).
+/// Pink in light, 0.033).
 #[test]
 fn every_built_in_swatch_is_distinct() {
     for scheme in Scheme::ALL.iter().copied() {

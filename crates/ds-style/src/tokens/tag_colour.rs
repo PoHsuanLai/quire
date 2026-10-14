@@ -56,7 +56,6 @@ fn tag_css(token: TagColour, scope: TokenScope) -> CssValue {
 #[cfg(test)]
 mod tests {
     use super::TagColour;
-    use crate::tokens::token::Token;
     use ds_core::word::Word;
 
     #[test]

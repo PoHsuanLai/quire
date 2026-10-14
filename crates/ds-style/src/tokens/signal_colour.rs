@@ -54,6 +54,7 @@ fn signal_css(token: SignalColour, scope: TokenScope) -> CssValue {
 mod tests {
     use super::SignalColour;
     use crate::tokens::token::{Token, TokenScope};
+    use ds_core::word::Word;
 
     #[test]
     fn the_folder_follows_the_secondary_label_and_no_two_signals_share_a_hue() {

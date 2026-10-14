@@ -7,6 +7,7 @@ use ds_core::vocab::Activity;
 use ds_core::vocab::InputModality;
 use ds_style::appearance::blur::BlurState;
 use ds_style::appearance::resolve::Resolved;
+use ds_style::appearance::system::Contrast;
 use ds_style::scope::Scope;
 
 /// The scope a component reads when nothing above it is a `Ds`: light, Postmark, Reduced motion
@@ -17,6 +18,7 @@ pub fn scope() -> Scope {
             scheme: Scheme::Light,
             accent: Accent::Blue,
             motion: MotionLevel::Reduced,
+            contrast: Contrast::Normal,
         },
         scheme: Scheme::Light,
         material: Material::Window,

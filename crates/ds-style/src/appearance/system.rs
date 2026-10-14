@@ -26,6 +26,17 @@ pub enum Contrast {
     High,
 }
 
+impl Contrast {
+    /// The `data-contrast` value a root carries: only increased contrast writes one, so a
+    /// root at ordinary contrast is marked as it always was.
+    pub const fn attribute(self) -> Option<&'static str> {
+        match self {
+            Contrast::Normal => None,
+            Contrast::High => Some("high"),
+        }
+    }
+}
+
 /// Everything the desktop contributes to resolving an [`crate::Appearance`].
 ///
 /// The default is what a desktop with no portal answers: light, no motion preference, normal

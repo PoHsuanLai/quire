@@ -1,17 +1,16 @@
 //! The accent a person picks for the card (design/03-COLOR.md section 5 and open decision 6;
 //! design/22-SETTINGS.md section 3.1 `appearance.accent`).
 //!
-//! Apple's twelve system hues and the Mac's graphite: Blue (the default), Indigo, Purple, Pink,
-//! Red, Orange, Yellow, Green, Mint, Teal, Cyan, Brown, Graphite. The macOS picker's nine come
-//! first in its own order; the four more are the 2025 system colours it does not offer. The
-//! token values live in `tokens::accent_table`.
-//! No older names are read (`postmark`, `amber`, `violet`): they fall to the default like any
-//! other unknown word.
+//! macOS's own list of eight, in the order its picker shows them: Blue (the default), Purple,
+//! Pink, Red, Orange, Yellow, Green, Graphite. The token values live in `tokens::accent_table`.
+//! The other system hues (indigo, mint, teal, cyan, brown) are not accents; they are tag and
+//! signal colours (`tokens::system_hue`). No older names are read (`postmark`, `amber`,
+//! `violet`): they fall to the default like any other unknown word.
 
 use ds_core::word::Word;
 use serde::{Deserialize, Serialize};
 
-/// The card's accent, one of thirteen.
+/// The card's accent, one of eight.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Copy, Hash, Default, Word)]
 #[serde(rename_all = "snake_case")]
 #[non_exhaustive]
@@ -19,8 +18,6 @@ pub enum Accent {
     /// systemBlue, the default.
     #[default]
     Blue,
-    /// systemIndigo.
-    Indigo,
     /// systemPurple.
     Purple,
     /// systemPink.
@@ -33,14 +30,6 @@ pub enum Accent {
     Yellow,
     /// systemGreen.
     Green,
-    /// systemMint.
-    Mint,
-    /// systemTeal.
-    Teal,
-    /// systemCyan.
-    Cyan,
-    /// systemBrown.
-    Brown,
     /// The Mac graphite accent, a neutral grey.
     Graphite,
 }

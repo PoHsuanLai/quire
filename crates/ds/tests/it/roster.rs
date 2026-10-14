@@ -146,6 +146,7 @@ mod hook {
     use ds_motion::use_roster::{LeaveBy, Roster, RosterSpec, use_roster};
     use ds_style::appearance::blur::BlurState;
     use ds_style::appearance::resolve::Resolved;
+    use ds_style::appearance::system::Contrast;
     use ds_style::scope::Scope;
     use std::cell::Cell;
     use std::time::Duration;
@@ -166,6 +167,7 @@ mod hook {
                 scheme: Scheme::Light,
                 accent: Accent::Blue,
                 motion: MotionLevel::Standard,
+                contrast: Contrast::Normal,
             };
             Signal::new(Scope {
                 resolved,

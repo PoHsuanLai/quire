@@ -37,7 +37,7 @@ where
         .unwrap_or_default())
 }
 
-/// A stored accent. Anything that is not one of the thirteen is [`Accent::default`].
+/// A stored accent. Anything that is not one of the eight is [`Accent::default`].
 fn de_accent<'de, D>(deserializer: D) -> Result<Accent, D::Error>
 where
     D: Deserializer<'de>,

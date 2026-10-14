@@ -6,7 +6,7 @@ use crate::appearance::{
     accent::Accent,
     appearance::Appearance,
     motion::{Motion, MotionLevel},
-    system::{ReducedMotion, SystemPrefs},
+    system::{Contrast, ReducedMotion, SystemPrefs},
     theme::{Scheme, Theme},
 };
 use ds_core::word::Word;
@@ -20,6 +20,8 @@ pub struct Resolved {
     pub accent: Accent,
     /// The motion level.
     pub motion: MotionLevel,
+    /// The desktop's contrast preference; a root writes `data-contrast` only for `High`.
+    pub contrast: Contrast,
 }
 
 impl Resolved {
@@ -54,6 +56,7 @@ pub fn resolve(app: Appearance, look_theme: Theme, system: SystemPrefs) -> Resol
         scheme,
         accent: app.accent,
         motion,
+        contrast: system.contrast,
     }
 }
 
@@ -109,6 +112,7 @@ mod tests {
                 scheme,
                 accent: Accent::Green,
                 motion: level,
+                contrast: Contrast::Normal,
             };
             assert_eq!(got, want, "{name}");
         }
@@ -120,6 +124,7 @@ mod tests {
             scheme: Scheme::Dark,
             accent: Accent::Purple,
             motion: MotionLevel::Reduced,
+            contrast: Contrast::Normal,
         };
         assert_eq!(
             resolved.attrs(),
