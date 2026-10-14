@@ -160,7 +160,7 @@ Not built, or limited, in quire:
   without an event), so a rename field is not told it lost the keyboard in that case.
 - **The window frame**: no veto hook for close (an app with unsaved work cannot intercept the red
   light); Left half, Right half and Centre are unavailable on Wayland (a compositor gap on
-  cosmic-comp and KWin, "Window frame"; KWin's scripting D-Bus interface was not examined); the
+  KWin and others, "Window frame"; KWin's scripting D-Bus interface was not examined); the
   X11 placement path has not been run on a live X server; there is no un-minimize.
 - **Second windows**: a second window's `use_window_event` never hears its own
   `CloseRequested` (apps act in `use_drop`); a `Signal` cannot cross windows (data goes by props
@@ -171,7 +171,7 @@ Not built, or limited, in quire:
 - **Frame link hover and click text in a window** are compiled but not driven by any test.
 - **The print dialog** is unparented on Wayland (neither winit nor `launch` exports an
   xdg-foreign handle); xdg-desktop-portal-gtk issue #562 (a second PreparePrint + Print in one
-  backend process can lose the fd) is not detected; COSMIC has no Print backend of its own, so a
+  backend process can lose the fd) is not detected; a
   system without xdg-desktop-portal-gtk falls back to the viewer.
 - **pdfrum asks**: sweep (conic) gradients, gradient extend Repeat/Reflect, gradient paint on
   strokes and text, blur and filters, compositing operators beyond source-over. pdfrum comes from
@@ -815,8 +815,7 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   size; winit reports no work area, so a half covers the output's panels too.
 - No client protocol offers a placement. xdg-shell's `xdg_toplevel` requests (wayland-protocols
   0.32.13) include `set_maximized` (Fill) but no position, and none of the staging xdg protocols
-  vendored there sets one; cosmic-comp's `zcosmic_toplevel_manager_v1` and KWin's
-  `org_kde_plasma_window` (both privileged) have no geometry request.
+  vendored there sets one; KWin's `org_kde_plasma_window` (privileged) has no geometry request.
 - `set_minimized(false)` is ignored on Wayland and `is_minimized` is always `None`.
   `is_maximized`/`fullscreen` read the last configure, so `launch` refreshes the state on every
   `SurfaceResized` and `Focused`. `show_window_menu` is implemented for Wayland toplevels despite
@@ -1584,7 +1583,7 @@ the decisions and what was verified:
   creates it (the compositor drops the address when it is destroyed), and
   `wayland_surface::adopt` is a one-call borrow of winit's display and surface; a persistent
   adopted connection per window needs a design of its own (who drops it before winit closes the
-  display). cosmic-comp offers no such global, so nothing could be tested; casement P3-MN adds the
+  display). No compositor offered such a global, so nothing could be tested; casement P3-MN adds the
   server side, then ds-blitz binds `org_kde_kwin_appmenu_manager` and sets the same address.
 - **zbus's default name flags replace a running owner.** `request_name_with_flags` with the default
   flags is `AllowReplacement | ReplaceExisting | DoNotQueue`, so a second process of the same

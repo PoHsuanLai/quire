@@ -55,7 +55,7 @@ Dependency direction (unchanged rules): `ds-core < ds-style < ds-motion < ds < d
 | Confirmation surface, phase A (no fork) | sill `sill-overlays::confirm/` | new surface | not unforgeable; see §7 Q7 |
 | Glow, phase A (no fork) | sill `sill-overlays::glow/` | new input-transparent layer surface | phase B: the compositor draws it |
 | `companion` settings domain | sill `sill-settings::companion.rs` | new domain | `Page::Intelligence` |
-| COSMIC binding + Toshy snippet | sill `dist/cosmic/.../custom`, `dist/toshy/companion_tap.py` | new rows/files | |
+| compositor binding + Toshy snippet | sill `dist/casement/.../custom`, `dist/toshy/companion_tap.py` | new rows/files | |
 
 Adopted crates: nothing new. Existing pins only: dioxus, serde, `ds-core::word::Word` derive, zbus (sill-services only).
 
@@ -675,7 +675,7 @@ Fakes and fixtures:
   - `sill-settings/src/{companion.rs, control_center.rs (variant), lib.rs}`;
   - `sill-ui-kit/src/companion/**` (signatures);
   - `sill-launcher-ui/src/launcher/{mode.rs, companion_keys.rs}` (types only);
-  - `dist/cosmic/.../custom` (one row: unique chord to `sill companion tap`);
+  - `dist/casement/.../custom` (one row: unique chord to `sill companion tap`);
   - `dist/toshy/companion_tap.py`;
   - design/22 §3 rows (doc edit in quire, coordinated).
 

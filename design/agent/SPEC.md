@@ -18,7 +18,7 @@ How to read this file:
 | "context" | docket (`docket-core::context`, `IntentProvider1.Context/Summon`), quire `ds-intents` (view shapes, seams), docket `docket-ds` (the adapter) |
 | "agent", "planner", "agent-loop", "companion daemon" | docket: `agent-loop`, `companion-wire`, `companiond`, `readerd` (§3.6, §4) |
 | "security" | labels: porter `prov`; policy, review, breaker, budgets: docket; sandbox units: each daemon's `dist/` in its own repo; egress proxy and `secret-cell`: deferred until a cloud backend is turned on (stoker `model-http` already takes a proxy `HttpTarget`) |
-| "compositor" | the cosmic-comp fork (cua repo owns the protocol crate; the fork branch is shared with double-tap ⌘ later) and sill (`sill-overlays` phase A) |
+| "compositor" | the casement (cua repo owns the protocol crate; the casement branch is shared with double-tap ⌘ later) and sill (`sill-overlays` phase A) |
 | "launcher", "presence", "settings" | ux (sill, quire ds, detent; design/22 rows by the quire agent) |
 | "intents" | docket |
 
@@ -40,7 +40,7 @@ Four new library repos plus one GPL fork. Every new repo copies porter's shape: 
 | `~/almanac` | new | memory: eventlog, memfiles, recall, memoryd | yes (memoryd Linux) |
 | `~/docket` | new | typed actions, router, policy, review, eval, MCP edge, **and the companion agent** (agent-loop, companiond, readerd), the ds adapter | core yes; daemons Linux |
 | `~/cua` | new (name: Q-P1) | computer-use runtime: a11y tree, agent seat, masked capture, desktop leases, run machine, cuad, `quire-agent-v1` protocol | core yes; cuad Linux |
-| `~/cosmic-comp` | new fork, GPL-3.0-only | `src/quire/**` only (agent seat, masked source, trusted surface, glow, kill chord, later double-tap) | no; nothing of ours depends on it |
+| `~/casement` | new fork, GPL-3.0-only | `src/quire/**` only (agent seat, masked source, trusted surface, glow, kill chord, later double-tap) | no; nothing of ours depends on it |
 | `~/quire` | existing | + `ds-intents` crate; companion components and vocab; design docs | yes |
 | `~/sill` | existing | launcher companion mode, companion service, providers, overlays (confirm and glow phase A), settings domain | no |
 | `~/detent` | existing | `Page::Intelligence` row and icon | no |
@@ -61,7 +61,7 @@ the pure, portable foundation that owns `AppName`, `DataClass` and now `SpaceId`
 stoker  ←  porter  ←  almanac  ←  docket  ←  cua  ←  sill
    ↑          ↑          ↑          ↑   ↖quire(ds-intents only)
    └──────────┴──────────┴──────────┴── mailo, detent (clients only)
-quire depends on none of them.  cosmic-comp fork → cua's quire-agent-protocol only.
+quire depends on none of them.  casement → cua's quire-agent-protocol only.
 ```
 
 ### 1.3 Every crate (final names)
@@ -111,7 +111,7 @@ quire depends on none of them.  cosmic-comp fork → cua's quire-agent-protocol 
 | 40 | `a11y-tree` | cua | pure; `atspi` feature | **cua-action, prov** |
 | 41 | `seat-input` | cua | pure; `ei` feature | **cua-action** |
 | 42 | `maskcap` | cua | pure; `wayland` feature | **cua-action** |
-| 43 | `cua-desktop` | cua | pure; `cosmic` feature | **cua-action, docket-core** (`RunMode`, `WindowTrust`), quire-agent-protocol (feature) |
+| 43 | `cua-desktop` | cua | pure; `wayland` feature | **cua-action, docket-core** (`RunMode`, `WindowTrust`), quire-agent-protocol (feature) |
 | 44 | `quire-agent-protocol` | cua | wayland-scanner | — |
 | 45 | `cua-bus` (new split) | cua | pure, serde-only (`Cua1` bodies, `CuaRecord`) | **prov, docket-core, porter-infer** |
 | 46 | `cua-run` | cua | pure run machine | 40-43, 45, **docket-core, prov, porter-core, porter-infer** |
@@ -146,13 +146,13 @@ rusqlite notify cedar-policy rmcp` except where the table says so (`policy-point
 | tar | 0.4 | almanac-service export | |
 | oo7 | 0.6 | almanac-seal `Oo7Keys`, porter secrets | |
 | fastembed | 7.1 (ort 2.0.0-rc.13) | recall-fastembed only | excluded from gate |
-| reis | 0.7 (the minor cosmic-comp's lock resolves) | seat-input `ei`, cua-fake | |
+| reis | 0.7 (the minor the compositor lock resolves) | seat-input `ei`, cua-fake | |
 | atspi | 0.30 | a11y-tree `atspi` | |
 | proptest | 1 (dev) | cua-parse, vision-prep, model-http | |
 | tempfile | 3 (dev) | almanac | |
 | keyboard-types | 0.7 + **`serde` feature** | cua-action `Chord` | pinned line changes |
 | tokio | 1 + **`net`, `io-util`, `process`** | io crates and daemons | pinned line changes |
-| already pinned, unchanged | serde, serde_json, thiserror 2, toml 1, zbus 5.19, image 0.25.6, jiff 0.2, notify 8.2, wayland-* 0.31/0.3/0.32.13, cosmic-client-toolkit, xkbcommon 0.8, memfd 0.6, rustix 1.1 | | |
+| already pinned, unchanged | serde, serde_json, thiserror 2, toml 1, zbus 5.19, image 0.25.6, jiff 0.2, notify 8.2, wayland-* 0.31/0.3/0.32.13, the Wayland client toolkit, xkbcommon 0.8, memfd 0.6, rustix 1.1 | | |
 | later | ashpd 0.13, pipewire, nix 0.30 (fanotify), sqlite-vec | | |
 
 Not adopted: async-openai, genai, rig (reqwest cannot reach Unix-socket engines; our trait is
@@ -621,7 +621,7 @@ pub enum RunControl { Watch, TakeOver, HandBack, Pause, Resume, Stop, UndoAll } 
 | **companiond** | docket | ux's "agent daemon", actions' "companion", cua's "planner/router that calls Start", memory's "agent-loop" | `org.quire.Companion1` `/org/quire/Companion1` | §4.2 | `Intents1` (role companion), inferd (planner) |
 | **readerd** | docket | actions' quarantined reader | `org.quire.Reader1` `/org/quire/Reader1` | `Extract(session s, ask s) -> s` (caller must be intentd) | `Intents1.Session.Resolve`, inferd (reader: `Need::Llm{StructuredOutput}`, no tools) |
 | **memoryd** | almanac | ux's "memory daemon" | `org.quire.Memory1` `/org/quire/Memory1` (memory.md §3.10; ux's names mapped C27) | Record / Recall / Control | inferd (embed, consolidation) |
-| **cuad** | cua | cua-integration's cuad | `org.quire.Cua1` `/org/quire/Cua1` (+ `/run/<id>`); `IntentProvider1` as `org.quire.Cua` | cua.md §3.8 | `Intents1.Gate`, inferd (ComputerUse, class Screen), `Memory1.Record`, `com.system76.CosmicComp.Ei.GetSenderSocket` (stock) or `quire-agent-v1` (fork) |
+| **cuad** | cua | cua-integration's cuad | `org.quire.Cua1` `/org/quire/Cua1` (+ `/run/<id>`); `IntentProvider1` as `org.quire.Cua` | cua.md §3.8 | `Intents1.Gate`, inferd (ComputerUse, class Screen), `Memory1.Record`, `the compositor's input service` (stock) or `quire-agent-v1` (fork) |
 | sill daemon (existing) | sill | ux's confirm phase A and glow phase A | serves **`org.quire.Confirm1`** `/org/quire/Confirm1` and `IntentProvider1` as `org.quire.Shell` | `Confirm(request s)->o`, `Cancel(id s)` | all of the above as a client |
 | actions-mcp | docket | — | not on the bus (stdio/unix socket), off by default | MCP tools generated from the registry | `Intents1` as role mcp |
 
@@ -672,7 +672,7 @@ it, the agent seat cannot focus it), receipts `HardwareSeat`.
 **`org.quire.Reader1`**: `Extract(session s, ask s) -> s`.
 **Wayland** (cua repo `quire-agent-protocol`): `quire-agent-v1` (manager, lease: `set_glow(state, rect)`
 replaces ux's `quire_agent_glow_v1`), later `quire_trusted_surface_v1` (sill client) and
-`quire_sensitive_v1` (shell-host client). Stock: `com.system76.CosmicComp.Ei.GetSenderSocket`.
+`quire_sensitive_v1` (shell-host client). Stock: `the compositor's input service`.
 
 Name rule: every interface we own is `org.quire.<Name>1`; objects at `/org/quire/<Name>1`; errors
 `org.quire.<Name>1.Error.<Variant>` mapped 1:1 from the refusal enum.
@@ -760,7 +760,7 @@ JSON, step tables of the pure parts) pass.
 | **S0 Holo-3.1-4B chat template** (read `chat_template.jinja`, `preprocessor_config.json`, `config.json` via WebFetch; read-only) | stoker agent, step 0 | `ToolDialect` variants, `GridMax`/`PatchFactor` values, `catalog/holo-3.1-4b.toml`, cua-parse fixtures (W1b) | geometry and every other stoker type |
 | **S-SQL** SQLCipher bundled build with FTS5 + `cargo deny` | scratch crate `~/rs-wt/spikes/sqlcipher` | wave 0's rusqlite line → almanac freeze (eventlog/recall hold rusqlite types) | — |
 | **S-Cedar** `cargo deny` for cedar-policy 4.13 | wave 0 agent | wave 0 line → docket freeze | — |
-| **Spike A** stock cosmic-comp 1.8 nested: capture + EI inject (cua.md §6) | `~/rs-wt/spikes/cua-a/`, then moved to `~/cua/spike/` | cua fill 2 (seat-input `ei`, maskcap `wayland`, cua-desktop `cosmic`), stock `mode_support` values, Q-P2 | the cua freeze |
+| **Spike A** a stock compositor nested: capture + EI inject (cua.md §6) | `~/rs-wt/spikes/cua-a/`, then moved to `~/cua/spike/` | cua fill 2 (seat-input `ei`, maskcap `wayland`, cua-desktop `desktop`), stock `mode_support` values, Q-P2 | the cua freeze |
 | **Spike T** Toshy double-tap route (does a tap-vs-hold remap on ⌘ disturb ⌘-click/⌘-drag?) | manual check queued in `sill/docs/manual-checks.md` (needs the real keyboard) | sill W4 wiring of `Tap` vs `Summon`, `dist/toshy/companion_tap.py`; default route A until it runs | the sill freeze (both variants frozen) |
 | models S1 (engines on Unix sockets under `PrivateNetwork`) | dev script, scratch user unit | stoker W2b, inferd W3 | freeze |
 | memory S1 (embedding throughput), S3 (fscrypt), S4 (fanotify), S5 (sqlite-vec), S6 (xattr) | dev scripts | memoryd embedder default, Q-Me1, Q-P4, Q-P5 | freeze |
@@ -777,7 +777,7 @@ JSON, step tables of the pure parts) pass.
 | 3 | **almanac** (new) | everything in `~/almanac` | porter-style gate, `--exclude recall-fastembed` |
 | 3 | **docket** (new) | everything in `~/docket` (including companion crates, `docket-ds`, `manifests/org.quire.Memory.toml`, `default.cedar` stubs with ids `rule-of-two`, `untrusted-sink`, the XML for Intents1, IntentProvider1, Confirm1, Companion1, Reader1) | porter-style gate + `cargo test -p policy-point -p docket-eval` |
 | 4 | **cua** (new) | everything in `~/cua` (incl. `cua-bus`, both XML/protocol files); joins nothing to quire (reis/atspi landed in stage 0) | porter-style gate |
-| 4 | **fork-setup** | `~/cosmic-comp` at the 1.8 tag, branch `quire`, `src/quire/mod.rs` hook, stub globals | `cargo build --release && cargo test`; runs nested |
+| 4 | **fork-setup** | `~/casement` at the 1.8 tag, branch `quire`, `src/quire/mod.rs` hook, stub globals | `cargo build --release && cargo test`; runs nested |
 | 5 | **sill** | ux.md §6 F2 file list with §3.8 here; design/22 is the quire agent's | sill gate |
 | 5 | **detent** | `detent-model/src/page.rs`, `detent-ui/src/icons.rs`, fixtures | detent gate + `scripts/gen-fixtures.sh` |
 
@@ -804,7 +804,7 @@ pinned git revs replace them in fill wave 1, stage by stage, once each upstream 
 | Wave | Parallel agents (repo: owned paths) | Source |
 |---|---|---|
 | F1 pure | stoker: vision-prep; cua-parse (+fuzz/); model-catalog + supervisor `step/budget`; model-replay + ScriptedProvider. porter: matching arm, `picker_rows`, `tier_choice`, session step, FakeModel streaming, `prov` lattice. almanac: eventlog; memfiles; recall (+fastembed); seal + watch. docket: policy-point (Cedar, grid); action-review (cascade, breaker); docket-router (call step, covers/compare, SessionSaw, journal, Previewing; owns docket-fake); docket-dbus + docket-client; docket-eval; agent-loop. cua: cua-run; a11y-tree; seat-input; maskcap. quire W1: orb, chips, prompt, TextField/CommandPalette prop pass-through. | models §6, memory §6, actions §6 + addendum, cua §6, ux §6 |
-| F2 io/backends | stoker: model-http + openai-compat (fixtures by dev script); supervisor io (after models S1); cua-session. almanac: almanac-service + almanac-fake. docket: intentd (private bus, seams wired to almanac-client); actions-mcp; readerd; companiond. cua (after Spike A/E): seat-input `ei`; maskcap `wayland`; a11y-tree `atspi`; cua-desktop `cosmic`. quire W2/W3: cards, plan, replace, form, rows, ds-shell views; ds-intents ContextModel (after Q-P7). | same |
+| F2 io/backends | stoker: model-http + openai-compat (fixtures by dev script); supervisor io (after models S1); cua-session. almanac: almanac-service + almanac-fake. docket: intentd (private bus, seams wired to almanac-client); actions-mcp; readerd; companiond. cua (after Spike A/E): seat-input `ei`; maskcap `wayland`; a11y-tree `atspi`; cua-desktop `desktop`. quire W2/W3: cards, plan, replace, form, rows, ds-shell views; ds-intents ContextModel (after Q-P7). | same |
 | F3 daemons | porter: inferd bridge, engines, fd session server with memfds, Prepare, `cua_run`; client `DbusTransport::open`. almanac: almanac-dbus, almanac-client, memoryd + unit. cua: cuad, cua-dbus codec, cua-fake harness, `dist/`. docket: docket-ds against quire. sill W4/W5 (on fakes): companion service, providers, launcher mode, bar/control centre, overlays (confirm, glow phase A). | same |
 | F4 integration | mailo session (manifest, provider, actor on UndoStack, undo-send window); sill W6 (replace fakes; nested compositor, private bus, scratch HOME); fork fill F1-F7 with acceptance scripts; acceptance `dev/cua-step-holo.sh` (GPU, by hand) | — |
 | Later | cloud backends + cua-vendors bodies, mistral.rs spike, weight downloader, procedures, KWin backend, `quire_sensitive_v1`, recall-sqlite-vec, egress, secret-cell | — |

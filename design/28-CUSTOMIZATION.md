@@ -102,7 +102,7 @@ add items. "Before/during" = before the app pass or during it (section 6).
 | 4.8 | Quick Look and preview-pane previewers, Quick Actions | which extensions are on; per type, which preview fields | Extensions settings (Quick Look, Finder); View › Show Preview Options; Customize Quick Actions | yes (Quick Look and Finder extensions) | launcher preview pane with a closed `Preview` enum | nice | during |
 | 4.9 | Hot corners | an action per corner (the reference's modifier waits on the compositor fork, G121) | Settings › Desktop & Dock › Hot Corners: a pop-up per corner | no | `hot_corners.*` keys, closed `CornerAction` | must (exists) | before (fold into actions) |
 | 4.10 | Gestures | an action per gesture | Settings › Trackpad / Mouse pop-ups | no | `gestures.gesture_action_map` | must (exists) | before (fold into actions) |
-| 4.11 | Keyboard shortcuts | on/off and a chord per system shortcut; per-app menu shortcuts | Settings › Keyboard › Keyboard Shortcuts: list, checkboxes, capture; App Shortcuts "+" | apps add their own menu commands | sill writes COSMIC's `custom` and `system_actions` files; no page | must (system list), nice (app shortcuts) | before (system), during (app) |
+| 4.11 | Keyboard shortcuts | on/off and a chord per system shortcut; per-app menu shortcuts | Settings › Keyboard › Keyboard Shortcuts: list, checkboxes, capture; App Shortcuts "+" | apps add their own menu commands | sill writes the compositor's `custom` and `system_actions` files; no page | must (system list), nice (app shortcuts) | before (system), during (app) |
 | 4.12 | Sidebars in our apps | which built-in items show, favourites and their order | Finder Settings › Sidebar checklist; drag into Favorites, out to remove | apps add locations (file providers) | none (apps not built) | must for Files, nice elsewhere | during |
 | 4.13 | Lock screen | large clock, message, user list (no widgets on the Mac) | Settings › Lock Screen | no | `session.lock_clock`, `session.user_picture` | nice (scalar keys only) | before, small |
 | 4.14 | Notifications per app | allow, style, lock screen, center, badge, sound, previews, grouping | Settings › Notifications: app list, one page per app | every app is a row | one global `banner_style`; per-app deferred (F270) | must | before |
@@ -501,14 +501,14 @@ Quick Note, Start Screen Saver, Disable Screen Saver, Put Display to Sleep, Lock
 (22 §3.23); design/13 §13.3.12. The modifier key was retired on 2026-09-26 (sill FINDINGS
 "hot_corners.modifier retired"): a keyboard-less layer surface is never sent
 `wl_keyboard.modifiers`, so a corner cannot know what is held (shell-host F61, sill G121); the
-wish is a fork item in `docs/cosmic-gaps.md` in sill.
+wish is a fork item in `docs/compositor-gaps.md` in sill.
 
 **Mapping.** Owner: sill (actions are shell actions). It is the pattern with one slot per corner
 and a registry of **actions**; the action registry is shared with 4.10 and 4.11 (one
 `ShellAction` registry: `id`, `name`, `glyph`, `run`), so an app's action (Quick Note from Notes,
 a Mail "New Message") can be a corner, a gesture or a shortcut without three lists. Picker: a
 pop-up per slot (`KeyKind::Menu`, 22 §9.1). No settings row changes. **The modifier waits on the
-compositor fork** (cosmic-gaps, G121): when the compositor can report held modifiers to a
+compositor fork** (compositor-gaps, G121): when the compositor can report held modifiers to a
 keyboard-less surface, a per-corner modifier returns as a key; until then none is proposed.
 
 `CornerAction` stays the closed set until the action registry exists; then its variants become
@@ -542,29 +542,29 @@ with a checkbox and a captured chord. App Shortcuts: "+", pick an app, type the 
 create keyboard shortcuts only for existing menu commands" (mchlp2271). HIG keyboards: respect
 standard shortcuts, custom ones only for frequent commands.
 
-**Today.** Global keys belong to cosmic-comp. sill ships and writes COSMIC's shortcut files,
-`com.system76.CosmicSettings.Shortcuts/v1/custom` and `.../system_actions` (under `dist/cosmic`;
+**Today.** Global keys belong to the compositor. sill ships and writes the compositor's shortcut files,
+`the shortcut file` and `.../system_actions` (under `dist/casement`;
 sill FINDINGS: the launcher, screenshots, the switcher, brightness and lock are bound there).
 quire has `StandardAction` and `Shortcut::custom` refusing reserved chords (27 §6.2, H0).
 
-**Mapping.** Owner: sill (system shortcuts are `ShellAction` bindings, written to COSMIC's two
+**Mapping.** Owner: sill (system shortcuts are `ShellAction` bindings, written to the compositor's two
 files), quire (`MenuModel` commands for App Shortcuts, `KeyKind::Shortcut` capture field). The
 registry is the action registry of 4.9 plus every app's `MenuModel` commands. Picker: the
 Settings app's Keyboard Shortcuts page, a `SettingsRow` list per group with a toggle and a
 capture field; App Shortcuts as a `List` of `{app, menu_path, chord}` rows.
 
-**Who wins a conflict (proposed, open decision 10).** COSMIC's files are the live truth for
-global keys, and the person or COSMIC Settings may edit them behind sill's back. So: **the chord
-COSMIC holds wins**. sill writes a binding only to a chord COSMIC does not already hold for
-another action; when `shortcuts.bindings` asks for a chord COSMIC holds (a clash), sill leaves
-COSMIC's binding, keeps its own row, and the Settings app shows the clash on that row (a
-warning glyph and "Used by <action> in COSMIC") until the person picks another chord or frees it.
+**Who wins a conflict (proposed, open decision 10).** the compositor's files are the live truth for
+global keys, and the person or the desktop settings app may edit them behind sill's back. So: **the chord
+the desktop holds wins**. sill writes a binding only to a chord the desktop does not already hold for
+another action; when `shortcuts.bindings` asks for a chord the desktop holds (a clash), sill leaves
+the compositor's binding, keeps its own row, and the Settings app shows the clash on that row (a
+warning glyph and "Used by <action> in the compositor") until the person picks another chord or frees it.
 sill rereads both files on change (directory watch, 22 §2) so the page never shows a stale
 chord.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `shortcuts.bindings` | `Vec<Binding { action: KindId, chord: Shortcut, shown: Shown }>` | the reference's bindings for the actions we have | `Shortcut::custom` rules apply; a clash with COSMIC is shown, not written | mchlp2271; 27 §6.2 | proposed (design/28) |
+| `shortcuts.bindings` | `Vec<Binding { action: KindId, chord: Shortcut, shown: Shown }>` | the reference's bindings for the actions we have | `Shortcut::custom` rules apply; a clash with the compositor is shown, not written | mchlp2271; 27 §6.2 | proposed (design/28) |
 | `shortcuts.app_shortcuts` | `Vec<AppShortcut { app: AppId, menu_path: Text, chord: Shortcut }>` | `[]` | the menu path in `File->Export as PDF…` form | mchlp2271 | proposed (design/28), nice |
 
 Both are behaviour, not placement: they are `sill/settings.toml` keys (a new §3 domain in design/22,
@@ -962,8 +962,8 @@ Shell; each a quire lane plus a sill lane where named.
    scalar kinds); sill adds `notifications.apps` and `notifications.previews`,
    the `notifying-apps.json` state file written by the notifications task, and the Settings page.
 7. **P6 Actions** (sill, palmrest): the `ShellAction` registry; hot corners, gestures and the
-   system shortcuts list read ids; `shortcuts.bindings` written to COSMIC's `custom` and
-   `system_actions` with COSMIC winning a clash (4.11); design/22 §5's Keyboard / Shortcuts line
+   system shortcuts list read ids; `shortcuts.bindings` written to the compositor's `custom` and
+   `system_actions` with the compositor winning a clash (4.11); design/22 §5's Keyboard / Shortcuts line
    now points here.
 8. **P7 Dock on the shared shape** (sill): `layout.dock`, migration of `dock.json`, `pins::run`
    as its writer task; stacks stay deferred.
@@ -1023,11 +1023,11 @@ compositor fork reports held modifiers (4.9).
 9. **Bar order key when the person never reorders.** Keep `layout.bar_items` empty (default
    order computed) or write the full order on first run. **Recommend empty until the first
    Command-drag**, so a new default order can still ship to people who never touched it.
-10. **Shortcut clashes with COSMIC** (new in the revision, 4.11). (A) the chord COSMIC holds
-    wins: sill writes only chords COSMIC does not hold for another action, and the Settings app
-    shows the clash on the row; (B) sill's `shortcuts.bindings` wins and overwrites COSMIC's
-    binding; (C) refuse to save a clashing chord. **Recommend A**: COSMIC's files are the live
-    truth for global keys and may be edited outside sill (COSMIC Settings, by hand); overwriting
+10. **Shortcut clashes with the compositor** (new in the revision, 4.11). (A) the chord the desktop holds
+    wins: sill writes only chords the desktop does not hold for another action, and the Settings app
+    shows the clash on the row; (B) sill's `shortcuts.bindings` wins and overwrites the compositor's
+    binding; (C) refuse to save a clashing chord. **Recommend A**: the compositor's files are the live
+    truth for global keys and may be edited outside sill (the desktop settings app, by hand); overwriting
     silently breaks a binding the person made there, and refusing hides why.
 
 Note on decision 1 (revision): `layout.toml` holds only membership, order and per-instance

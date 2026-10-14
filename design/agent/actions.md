@@ -161,7 +161,7 @@ pub fn declassify<T>(v: Labelled<T>, to: Confidentiality, w: &Witness) -> Labell
 ### 3.2 `porter-core` additions (freeze now; a porter change)
 
 ```rust
-/// A Space's stable id, minted by quire when the Space is made (not the COSMIC workspace id,
+/// A Space's stable id, minted by quire when the Space is made (not the workspace id,
 /// which may not survive a session: 21-SPACES §11.3).
 pub struct SpaceId(String);                      // id grammar like AccountId; Hash, Ord
 pub enum SpaceScope { Any, Only(SpaceId) }
@@ -981,7 +981,7 @@ All tests are hermetic. Bus tests use a private `dbus-daemon --session` with scr
 - **C4. MCP.** 31 §5.5 makes inferd the MCP host. The build map makes `actions-mcp` edge-only. Resolution: MCP in both directions lives in `actions-mcp`. Imported tools become router actions of a pseudo-app `mcp.<server>`, default `Outbound`, each in bubblewrap. inferd drops the role (an edit to 31).
 - **C5. Provider kinds.** models.md has `ProviderKind::App(AppName)`, which breaks sill's `Copy` + `ALL` Tab order. Resolution: one `ProviderKind::Things`, with per-kind scoping later (`Scope::Kind`).
 - **C6. Companion work is deferred.** 30 §3.4 says "Deferred, map only: one-input/companion/AI work". Resolution: freeze types only; `ds` is untouched until U6.
-- **C7. Space identity.** 21-SPACES §11.3 says COSMIC workspace ids may be unstable, yet Spaces are hard walls with their own key. Resolution: a quire-minted `SpaceId`, mapped to workspaces by `SpaceStore`.
+- **C7. Space identity.** 21-SPACES §11.3 says workspace ids may be unstable, yet Spaces are hard walls with their own key. Resolution: a quire-minted `SpaceId`, mapped to workspaces by `SpaceStore`.
 - **C8. P1 inline replace.** agent-ux P1 ("nothing applies without the Apply keypress") differs from item 9 (`text.replace` is an UndoableWrite and runs). This is a UX call (U8).
 
 ### 7.3 Questions only the user can answer

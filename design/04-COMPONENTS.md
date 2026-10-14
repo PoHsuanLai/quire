@@ -2221,7 +2221,7 @@ y = target bottom + 6; clamp to [8, window - 8]; no flip. 06-INTERACTIONS "hover
 - `color-mix` flag background -> `--danger-wash`.
 - JS timers and `.out` removal -> `HoverHub` + `HoverIntent` state machine + `settle(HcOut)`.
 - Position from `getBoundingClientRect` -> `onmounted` rects + `place()`.
-- Plan: host synthesises a PointerMove before pointer down (cosmic-comp #2230) so intent arms.
+- Plan: host synthesises a PointerMove before pointer down so intent arms.
 
 ### 23. Toast
 

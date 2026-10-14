@@ -578,7 +578,7 @@ fn widget_card_over(wallpaper: Hex, scheme: Scheme, stop: Option<&str>) -> Hex {
 }
 
 /// The wallpaper backdrops a desktop widget is gated over: the default wallpaper's colours as
-/// sill's desktop capture shows them (2026-09-27, `widgets-desktop-cosmic.png`: a light warm
+/// sill's desktop capture shows them (2026-09-27, `widgets-desktop.png`: a light warm
 /// sand, a warm coral, a deep teal, a blue, a dark violet) and a near-black night wallpaper.
 /// Pure black and white are the material gates', where the relaxed 3:1 large-text floor
 /// applies to the widget's own text.

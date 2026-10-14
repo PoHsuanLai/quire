@@ -172,7 +172,7 @@ the 40-unit lock. Status: proposed (R5 H, R8 H).
 | Commit | at lift: if `|p| >= 0.5`: commit unless `v * sign(p) <= -1.5 pages/s` (reverse flick); if `|p| < 0.5`: commit iff `v * sign(p) >= 1.5 pages/s` | proposed (R10/R11: libadwaita 0.6 px/ms over 400 px = 1.5 pages/s) |
 | Finish duration | `clamp(|p_target - p| / max(|v|, 2 pages/s) * 3, 100 ms, 400 ms)`, ease-out-cubic | proposed (R10: base 0.002/ms = 2 pages/s) |
 | One page per gesture | yes (live mode never fires twice per contact) | proposed (R8) |
-| Output on COSMIC | no client protocol for a live workspace offset (ext-workspace has none; "no live workspace tracking yet"); route: synthetic 4-contact horizontal swipe on the palmrest virtual touchpad so the compositor runs its own live gesture | proposed (L: compositor finger count to verify) |
+| Output on the compositor | no client protocol for a live workspace offset (ext-workspace has none; "no live workspace tracking yet"); route: synthetic 4-contact horizontal swipe on the palmrest virtual touchpad so the compositor runs its own live gesture | proposed (L: compositor finger count to verify) |
 | Default today | Trigger mode (G5), live mode behind `workspace_swipe = Live` | settled ("trigger now, live tracking later") |
 
 ### 12.3.8 Units to px (the `feel` module)
@@ -341,13 +341,13 @@ pub enum Action {
 }
 ```
 
-| Gesture | Default (Apple) | COSMIC backend | KWin backend (today) | Status |
+| Gesture | Default (Apple) | compositor backend | KWin backend (today) | Status |
 | --- | --- | --- | --- | --- |
 | One-finger swipe right | Back | Alt+Left on O3 | Alt+Left on O3 | settled |
 | One-finger swipe left | Forward | Alt+Right | Alt+Right | settled |
-| Two-finger swipe right (fingers move right) | WorkspacePrev | `sill workspace prev` IPC (cctk `WorkspaceState::activate`); without sill: the COSMIC shortcut keys from the user's shortcuts file | kglobalaccel `Switch One Desktop to the Left` (Python, H) | settled |
+| Two-finger swipe right (fingers move right) | WorkspacePrev | `sill workspace prev` IPC (the toplevel client); without sill: the compositor shortcut keys from the user's shortcuts file | kglobalaccel `Switch One Desktop to the Left` (Python, H) | settled |
 | Two-finger swipe left | WorkspaceNext | `sill workspace next` | `Switch One Desktop to the Right` | settled |
-| Two-finger double-tap | WorkspaceOverview | COSMIC `WorkspaceOverview` system action (sill IPC or its shortcut) | kglobalaccel `Overview` | settled mapping, backends L |
+| Two-finger double-tap | WorkspaceOverview | the desktop `WorkspaceOverview` system action (sill IPC or its shortcut) | kglobalaccel `Overview` | settled mapping, backends L |
 | One-finger double-tap | SmartZoom | our surfaces: focused ds root; others: none | same | settled ("where supported") |
 
 ## 12.7 Integration
@@ -356,12 +356,12 @@ pub enum Action {
 | --- | --- |
 | Decoder, tracker, feel, gestures, outputs, service | `magic-gestures` repo, `palmrest` binary |
 | Host client, double-scroll rule, swipe decision on our surfaces | `shell-host/src/input/palmrest.rs` + `scroll/**` (11) |
-| Workspace / overview actions on COSMIC | `sill-ipc` gains `Workspace{Prev, Next, Overview}` (proposed addition); `sill-services` `cosmic_wl` performs them |
+| Workspace / overview actions on the compositor | `sill-ipc` gains `Workspace{Prev, Next, Overview}` (proposed addition); `sill-services` `toplevel_wl` performs them |
 | Settings page | Settings app, writes `config.toml` and the compositor's natural-scroll value for "palmrest touchpad" |
 
 Platform limits:
 
-- No live workspace tracking through a client protocol on cosmic-comp; live mode depends on
+- No live workspace tracking through a client protocol on the compositor; live mode depends on
   the compositor's own touchpad gesture (finger count to verify).
 - Wayland cannot identify the device behind an axis event; hence the suppression rules.
 - libinput: tap-to-click, disable-while-typing and palm detection may act on the virtual

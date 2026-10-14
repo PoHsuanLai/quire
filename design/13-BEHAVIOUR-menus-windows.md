@@ -102,7 +102,7 @@ behaviour and numbers.
 
 ### 13.3.5 App switcher (Cmd+Tab)
 
-Bound through COSMIC's shortcuts (`system_actions` `WindowSwitcher` / `WindowSwitcherPrevious`
+Bound through the compositor's shortcuts (`system_actions` `WindowSwitcher` / `WindowSwitcherPrevious`
 -> `sill switcher next|prev`; Toshy turns physical Cmd+Tab into the switcher chord). The surface
 is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pattern).
 
@@ -126,7 +126,7 @@ is an Overlay layer with `KeyboardMode::Exclusive`, kept warm (plan launcher pat
 
 ### 13.3.6 Notifications
 
-`sill` owns `org.freedesktop.Notifications` (cosmic-notifications absent, plan COSMIC findings).
+`sill` owns `org.freedesktop.Notifications` (the desktop notification daemon absent, plan compositor findings).
 
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
@@ -174,8 +174,8 @@ Whether a swiped banner stays in the center is `notifications.swipe`, the caller
 | First click (our apps) | a pointer press that activates an inactive ds-blitz toplevel is consumed (not delivered to Blitz) unless the element under it or an ancestor carries `data-first-mouse` (ds opts in: window drag areas, scrollbar thumbs, the traffic-light buttons). "Activating" = the surface's `xdg_toplevel` `activated` state or `wl_keyboard.enter` arrived within 100 ms before the press | R10 (H), detection proposed |
 | Hover and scroll | work in inactive windows without activating them (Wayland default); our scroll engine latches normally | proposed |
 | Foreign apps | toolkit and compositor behaviour; not controlled | limit |
-| Cmd-drag a background window | compositor feature; cosmic-comp moves windows with Super+drag (activation behaviour is cosmic-comp's) | R11 (M); limit |
-| Raise | activating an app raises one toplevel (cctk `activate`); macOS raises all of the app's windows; not reproducible | limit |
+| Cmd-drag a background window | compositor feature; the compositor moves windows with Super+drag (activation behaviour is the compositor) | R11 (M); limit |
+| Raise | activating an app raises one toplevel (the toplevel client); macOS raises all of the app's windows; not reproducible | limit |
 | Layer surfaces | bar and dock never take keyboard focus; their popups switch the layer to `OnDemand` until closed (plan shell-host rule); launcher and switcher use `Exclusive` | settled (plan) |
 
 ### 13.3.9 Launcher appearance (Spotlight-like)
@@ -276,7 +276,7 @@ Acceptance (sill `dev/accept/hot-corners.sh`, nested compositor, debug-inject or
 (6) `Launcher` twice from the same corner opens then closes it. There is no modifier option: a
 keyboard-less surface cannot learn a held key portably (shell-host F61), so the reference
 desktop's modifier gating was retired on 2026-09-26; it is a compositor-fork item in sill's
-cosmic-gaps list (send modifier state to the surface under the pointer).
+compositor-gaps list (send modifier state to the surface under the pointer).
 
 ## 13.4 State machines
 
@@ -387,9 +387,9 @@ Banner duration is not a setting (R8: not user-changeable since Big Sur).
 | Menu tracking machine, safe triangle, `Menu` component | quire `ds/stack/menu_track/machine.rs` (settled, shipped), `ds/components/menus/menu/menu.rs` |
 | Popup surfaces, reposition, grabs | shell-host `popup` (`PopupConfig`, `xdg_positioner`, `xdg_popup.reposition`) |
 | Bar, switcher, notifications, control center, launcher surfaces | sill `surfaces/{bar,switcher,notifications,control_center,launcher}` |
-| Notification server | sill-services (pattern: cosmic-notifications subscriptions/notifications.rs) |
-| Toplevel activation / close / minimize | sill-services `cosmic_wl` (cctk) |
-| Shortcuts | `dist/cosmic/.../system_actions` (Launcher, WindowSwitcher) |
+| Notification server | sill-services (pattern: the desktop notification daemon subscriptions/notifications.rs) |
+| Toplevel activation / close / minimize | sill-services `toplevel_wl` (the toplevel client) |
+| Shortcuts | `dist/casement/.../system_actions` (Launcher, WindowSwitcher) |
 | Sounds | sill-services `sound` (libpulse-binding) |
 | First-mouse filter | shell-host shell-host's input/pointer.rs (activation-time tracking) + ds `data-first-mouse` |
 
@@ -399,21 +399,21 @@ Platform limits:
   popup with `reposition` (xdg_wm_base v3+). If a compositor lacks reposition, the fallback
   is close + reopen with the last button serial, which the compositor may refuse (then the
   menu closes and the next press opens the other one).
-- Nested cosmic-comp does not grab the keyboard (cosmic-comp#9): KDE eats Super and Cmd+Tab
+- the nested compositor does not grab the keyboard: KDE eats Super and Cmd+Tab
   chords; switcher and launcher are tested through `sill` CLI/IPC in the nested session.
-- cosmic-comp #2230: a popup or layer under a still pointer gets no enter; menus open by press
+- a popup or layer under a still pointer gets no enter; menus open by press
   so this affects only the first hover highlight.
 - No foreign-toplevel protocol on KWin: switcher and window lists are empty there.
 - No client placement on Wayland: `xdg_toplevel` has no position request, so our windows'
-  Left half, Right half and Centre are unavailable there (neither cosmic-comp's
-  `zcosmic_toplevel_manager_v1` nor KWin's `org_kde_plasma_window` sets a geometry either;
+  Left half, Right half and Centre are unavailable there (neither the compositor
+  `the compositor's toplevel manager` nor KWin's `org_kde_plasma_window` sets a geometry either;
   FINDINGS "Window frame").
 - Toshy's Cmd mapping on app_id-less layer surfaces is unverified (plan shell risks); the
   switcher accepts both Alt+Tab and Super+Tab chords.
 
 ## 13.8 Acceptance tests
 
-Driven by `ds_harness::Harness` (pure menus) and `sill debug` in nested cosmic-comp.
+Driven by `ds_harness::Harness` (pure menus) and `sill debug` in the nested compositor.
 
 1. **Open on press**: a press on a bar title shows its menu on the next frame; release on the
    title leaves it open; a second press on the title closes it.
@@ -468,8 +468,8 @@ Driven by `ds_harness::Harness` (pure menus) and `sill debug` in nested cosmic-c
 ## 13.10 Sources
 
 - Plan Appendix C-D (all R rows), "Design: sill" (Bar, Launcher, notifications server,
-  shortcuts), "Design: shell-host" (popups, keyboard modes), "Findings: COSMIC" (shortcuts,
-  cosmic-notifications, cosmic-comp #2230, #9), M0 spike item a.
+  shortcuts), "Design: shell-host" (popups, keyboard modes), "Findings: compositors" (shortcuts,
+  the desktop notification daemon, ), M0 spike item a.
 - Sibling docs: `03-COLOR.md` materials, `05-MOTION.md`, `30-CATALOGUE.md` §1 and §2.4-2.5,
   `20-SURFACES.md` §1.1, `01-LAYOUT.md` §13.1 (bar height open decision).
 - Plan Appendix A: A0 (principles, S:792), A2 (type sizes), A3 (colour usage), A4 (`.fmenu`,

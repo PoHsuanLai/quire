@@ -354,7 +354,7 @@ port should close it on edge leave unless the pointer entered the sidebar).
 Undo across Spaces: the undo entry records its Space; undo is ignored in another Space
 (S:1555), and the toast is not hidden on a switch. Proposed: hide the toast on switch.
 
-On the desktop, the same machine runs per workspace (plan "UX decisions": each COSMIC
+On the desktop, the same machine runs per workspace (plan "UX decisions": each the desktop
 workspace has a SpaceLook; bar, dock and launcher chrome cross-fade the tint over 380 ms);
 details in `21-SPACES.md`.
 
@@ -580,7 +580,7 @@ outbox pill (C:2118-2186).
 | editor handle moved by keys | the handle keeps focus | S:1457 |
 | hover card, link pill, toast | never take focus | |
 | focus ring | `:focus-visible` 2.5 px accent outline, offset 2, radius 4 | S:55 |
-| desktop launcher | keyboard-first: never depends on hover for its initial state (cosmic-comp #2230) | plan, shell risks |
+| desktop launcher | keyboard-first: never depends on hover for its initial state | plan, shell risks |
 | an alert opens (`Alert`, sill Q490) | the default button takes focus: the action, or Cancel when the action is destructive (the HIG: never give the primary role to a destructive button); Tab and Shift+Tab move between its two buttons and never leave it (it is modal); Return presses the default wherever the focus is, Space the focused button | design/04 section 55 |
 
 ## 18. Escape by context
@@ -651,7 +651,7 @@ observed) is kept.
 
 | Behaviour | Rule | Status | Source |
 | --- | --- | --- | --- |
-| Open / toggle | `sill launcher toggle` (COSMIC shortcut); `open --query` | settled (plan) | plan sill |
+| Open / toggle | `sill launcher toggle` (compositor shortcut); `open --query` | settled (plan) | plan sill |
 | Close | Escape, focus lost, click on the catcher (the transparent full-screen surface), or toggle | settled (plan) | plan sill |
 | Navigate | Up / Down move the selection; Enter runs it | settled (plan) | plan sill |
 | Providers | Tab cycles providers (apps, calculator, settings, windows, system) | settled (plan) | plan sill |
@@ -691,7 +691,7 @@ observed) is kept.
 
 ### 20.6 Magic Mouse gestures
 
-Apple's full set, mapped to COSMIC; every row is an entry in the gesture daemon's
+Apple's full set, mapped to the compositor; every row is an entry in the gesture daemon's
 gesture -> action table, and this mapping is the shipped default (plan "UX decisions").
 
 | Gesture (Apple name) | Action here | Status | Source |

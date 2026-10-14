@@ -88,7 +88,7 @@ One quiet Look (design/30 §3). Shell chrome is the Mac material alone and takes
 | --- | --- | --- |
 | Layer / role | toasts: `Overlay`, anchor `TOP\|RIGHT` under the bar; center: `Overlay` panel anchored right, or xdg popup from the clock | P |
 | Material | toasts `Toast`; center `Popover` | P |
-| Server | `org.freedesktop.Notifications` (cosmic-notifications absent) | S |
+| Server | `org.freedesktop.Notifications` (the desktop notification daemon absent) | S |
 | Components | toast card (`HoverTarget` for actions, `Button` at `ControlSize::Mini` actions, app icon 08 plate at 20 P), `ToastHost` stack; center: `Row` groups by app in a `List`, `SectionHeader`, `Button` (Inline bezel) Clear | S / P |
 | Motion | toast in Slide(Right) `--t-move` `--e-out`; out Slide(Right) `--t-quick` `--e-exit`, a swipe dismiss continuing with the release velocity; the stack closes the gap by `Roster`; center rows enter and leave by `Roster` | S |
 | Timers | hold 5000 ms (`ToastHold`), paused while hovered | S |
@@ -146,7 +146,7 @@ and `ds_shell::tokens::osd::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSU
 | Motion | password error `use_shake` (`--t-shake`, `--e-shake`) once; unlock Fade `--t-move` `--e-exit` | S / P |
 | Behaviours | lock before sleep on logind `PrepareForSleep` (SPEC); 06 (Escape clears field) | S |
 | Keyboard | lock surfaces always receive keyboard | S |
-| Milestone | borrowed at M7 (`session.locker`, design/22 §3.19: cosmic-greeter, else swaylock, else hyprlock); own at M11, and sill's own lock is the default since the user's pick of 2026-09-27 (`auto` keeps the borrowed order) | S |
+| Milestone | borrowed at M7 (`session.locker`, design/22 §3.19: the desktop greeter, else swaylock, else hyprlock); own at M11, and sill's own lock is the default since the user's pick of 2026-09-27 (`auto` keeps the borrowed order) | S |
 
 ### 1.10 Polkit prompt (SPEC Tier 1)
 
@@ -158,13 +158,13 @@ and `ds_shell::tokens::osd::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSU
 | Motion | the sheet's enter and exit (design/30 §1.3); wrong password `use_shake` once | P |
 | Keyboard | `Exclusive` | P |
 | Blur / input | blur `Element("panel")`; input `Whole` | P |
-| Milestone | borrowed at M7 (`session.polkit_agent`, design/22 §3.19: polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, else cosmic-osd); own at M11 | S |
+| Milestone | borrowed at M7 (`session.polkit_agent`, design/22 §3.19: polkit-kde, polkit-gnome, lxqt-policykit, polkit-mate, else the desktop OSD); own at M11 | S |
 
 ### 1.11 App switcher (SPEC Tier 2)
 
 | Field | Value | St |
 | --- | --- | --- |
-| Layer / role | `Overlay`, centred; check what cosmic-comp provides first (SPEC) | S |
+| Layer / role | `Overlay`, centred; check what the compositor provides first (SPEC) | S |
 | Material | `Osd` | P |
 | Components | app tiles (08 plate at 64 P), the selected app's name as a `Label` under the selection | P |
 | Motion | show after 150 ms hold P, Fade `--t-quick`; the selection square slides by a `Spring` | P |
@@ -319,7 +319,7 @@ paper (`--paper`), flush with their sidebar (no inset card, 30 §3.4). A window'
 
 ### 2.5 Terminal
 
-Open decision (2026-09-24): the terminal core is undecided until the app-suite milestone; candidates `alacritty_terminal`, `wezterm-term` (Rust), libghostty (Zig, C ABI). ghostty is the daily terminal until then; cosmic-term is not part of this program.
+Open decision (2026-09-24): the terminal core is undecided until the app-suite milestone; candidates `alacritty_terminal`, `wezterm-term` (Rust), libghostty (Zig, C ABI). ghostty is the daily terminal until then; a terminal is not part of this program.
 
 | Field | Value | St |
 | --- | --- | --- |
@@ -408,7 +408,7 @@ recorder. The M10 screenshot thumbnail (1.13) becomes the shared after-capture s
 5. Calendar popup milestone (M10 proposed) and a new `MonthGrid` component in 04.
 6. Quick note milestone (M12 with Notes, proposed) and its shortcut (SPEC: key to be chosen).
 7. Hot corner surface size 2 x 2 px and dwell (13).
-8. App switcher: build ours or use cosmic-comp's (SPEC says check first).
+8. App switcher: build ours or use the compositor (SPEC says check first).
 
 ## 4. Sources
 

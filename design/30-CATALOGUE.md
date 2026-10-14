@@ -364,7 +364,7 @@ section 1.3; sizes follow 1.6; rows and controls are the survivors above.
 | Name | AppKit or macOS surface | Contract | States | Public parts | Absorbs | St | Pri |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | MenuBarItem | `NSStatusItem` button / menu title | title or glyph; open highlight; `Shown` | CTL | title, icon | `open: Switch` | KEEP | P1 |
-| WorkspacePills | Mission Control Spaces bar | one pill per COSMIC workspace; `Selection` | selected | pill | `Here` | KEEP | P1 |
+| WorkspacePills | Mission Control Spaces bar | one pill per workspace; `Selection` | selected | pill | `Here` | KEEP | P1 |
 | ModuleGrid, ModuleTile, ModulePanel, ModuleDisc | Control Center modules | 1x1, 2x1, 2x2, full-width; tile is a `Row`-like tile with `Availability` | CTL, on/off (`Check`) | tile, disc, panel | `ModuleState`, `DiscMotion`, `Chevron` | MERGE | P1 |
 | Osd | volume / brightness HUD | `LevelIndicator` in a HUD material, `Shown` | `Shown` | body | `OsdPhase` | KEEP | P1 |
 | NotificationCard, GroupHeader, BannerStack | banner, Notification Center | swipe to dismiss, action buttons, inline reply field (P2) | swiped | card, header | `banner-*` keyframes | KEEP | P1 |
@@ -601,7 +601,7 @@ Each row is a DROP: name, then the reason.
 | # | Item | Why it waits |
 | --- | --- | --- |
 | 1 | App layout: sidebar-plus-content window versus toolbar window, per app (both flush) | decided as each app is built; not designed here |
-| 2 | Menu-bar transport for quire apps (push the `MenuBar` model to the shell over IPC, or draw in-window) | COSMIC has no global-menu protocol; 27 §8.6 covers foreign apps only |
+| 2 | Menu-bar transport for quire apps (push the `MenuBar` model to the shell over IPC, or draw in-window) | the desktop has no global-menu protocol; 27 §8.6 covers foreign apps only |
 | 3 | mailo's move onto a Look and the density step it keeps (29 decision 9) | mailo keeps its current look for now |
 | 4 | HUD / inspector panel (`NSPanel`) | no app needs one yet |
 | 5 | The measured-values pass: every "conf L" value (spring responses 300/450, Big 400, switch small/regular, mini progress, Look colours) tuned against a real Mac | needs hardware; the defaults ship meanwhile |

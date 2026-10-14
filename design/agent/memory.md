@@ -90,7 +90,7 @@ Why a separate repo: memory is not accounts. The three owned crates (`eventlog`,
 ### 3.1 Shared identity (home: `prov` if the actions area agrees, else `almanac-core`) [freeze now]
 
 ```rust
-/// One Space: a hard wall for memory. Stable across sessions (unlike COSMIC workspace ids,
+/// One Space: a hard wall for memory. Stable across sessions (unlike workspace ids,
 /// design/21 §11.3); minted once, slug grammar of porter-core::id.
 pub struct SpaceId(String);                 // "work", "home", "s-01j9zk..."; reserved: "desktop" [Q2]
 

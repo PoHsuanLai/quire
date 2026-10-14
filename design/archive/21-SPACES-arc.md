@@ -6,7 +6,7 @@
 
 
 "A Space colours the frame; the mail stays on paper." (S:816). On the desktop, a Space is a
-COSMIC workspace's look: its colour tints the shell chrome around the apps, never the apps.
+workspace's look: its colour tints the shell chrome around the apps, never the apps.
 
 Status: **settled** = decided with the user (PLAN "UX decisions settled", 2026-09-23, second
 round) or copied from the prototypes/code; **proposed** = open until signed off.
@@ -15,7 +15,7 @@ S = `~/mailo-design/mailo-spaces.html`; palette.rs = `~/mailo/crates/mail-app/sr
 
 ## 1. The model (settled)
 
-- Each COSMIC workspace owns one `SpaceLook`.
+- Each workspace owns one `SpaceLook`.
 - Bar, dock, launcher and control-center chrome take their colour from the active workspace's
   `SpaceLook`: in the Mac Look it sits in the backdrop layer behind each material; in the Arc Look
   the chrome uses the `--f-*` frame tokens derived from it, drawn over compositor blur.
@@ -164,7 +164,7 @@ The layer A/B model from S (Appendix A6 "Space switch"; S:1180-1187):
    launcher follow the workspace of the output they are on (proposed).
 7. Reduced motion keeps the cross-fade (design/30 §1.1: cross-fades stay under Reduced).
 
-Trigger: cctk `WorkspaceState` activation events on the `cosmic_wl` thread → `use_workspaces`
+Trigger: the toplevel client `WorkspaceState` activation events on the `toplevel_wl` thread → `use_workspaces`
 → each surface's `Ds { look }` (PLAN "Design: `<shell>`" hooks).
 
 ## 6. Editor (settled placement, pieces from 04)
@@ -235,7 +235,7 @@ position".
 {
   "version": 1,
   "by_id": {
-    "<cosmic workspace id>": { "dots": [{"hue": 268, "chroma": 0.72}, {"hue": 318, "chroma": 0.55}],
+    "<workspace id>": { "dots": [{"hue": 268, "chroma": 0.72}, {"hue": 318, "chroma": 0.55}],
                                "grain": 35, "theme": "system", "card_accent": "chosen" }
   },
   "by_index": [ { "...": "SpaceLook for workspace 0 on its output" } ]
@@ -256,7 +256,7 @@ still finds a look.
 4. Do notifications, OSD and power menu take the tint? Proposed no.
 5. Per-output workspaces: which look does a dock spanning one output use when the focused
    window is on another? Proposed: the dock's own output.
-6. Whether COSMIC workspace ids are stable across sessions; decides whether `by_id` is useful.
+6. Whether workspace ids are stable across sessions; decides whether `by_id` is useful.
 7. Wallpaper independence (§8).
 
 ## 12. Sources
@@ -266,4 +266,4 @@ still finds a look.
   (derivation, presets, grain), A4 (Space editor), A6 (Space switch).
 - `~/mailo/crates/mail-app/src/palette.rs` lines cited in §2.
 - `~/mailo-design/mailo-spaces.html` lines 816 (headline), 1180-1193 (layer swap, `--f-*`).
-- SPEC "Workspaces" (cctk, pinning, naming, reorder).
+- SPEC "Workspaces" (the toplevel client, pinning, naming, reorder).

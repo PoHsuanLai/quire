@@ -277,7 +277,7 @@ latched node's rect and scroll metrics.
 
 Default **ON** (R16 H). One Settings value `scroll.natural`; the Settings app writes it to our
 config (applied by the host to palmrest events) and to the compositor's per-device settings for
-mice and touchpads including the palmrest virtual touchpad (COSMIC `com.system76.CosmicComp`
+mice and touchpads including the palmrest virtual touchpad (the desktop `the desktop settings`
 input config; KWin `kcminputrc`), so our surfaces and foreign clients agree. Status: settled
 default, mechanism proposed.
 
@@ -482,13 +482,13 @@ Platform limits:
   touchpad's finger source + `axis_stop` (GTK needs `gdk_scroll_event_is_stop`); their curves
   differ from ours (R8, R9). Accepted.
 - Magic Mouse on stock libinput has no `axis_stop` (R20); this is why palmrest exists.
-- KWin and cosmic-comp both deliver `axis_source` and `axis_stop` (wl_pointer v5+); the
+- KWin and the compositor both deliver `axis_source` and `axis_stop` (wl_pointer v5+); the
   suppression rule depends on it.
 
 ## 11.8 Acceptance tests
 
 Pure tests drive `step` with synthetic streams at 120 Hz and `now` advanced by hand; host tests
-use `debug-inject` + FrameStats in nested cosmic-comp.
+use `debug-inject` + FrameStats in the nested compositor.
 
 1. **Flick model**: Changed deltas forming a steady 2000 px/s for 100 ms, then Ended:
    momentum travel 501.5 px +- 5 % (476..527), MomentumEnded at 976 ms +- 1 frame after Ended.

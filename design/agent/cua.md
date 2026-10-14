@@ -4,12 +4,12 @@
 
 Status: plan for the freeze. Sources read: BRIEF.md, COMPANION.md, cua-integration.md, research-ecosystem-{agents,infra}.md, research-cua-models.md, research-agent-memory §3, intents-research/{models,agent-ux}.md, quire design/31-ACCOUNTS.md (§2.3-2.4, §4, §5.5, §11), quire CONVENTIONS.md and ARCHITECTURE.md (`Machine`), porter (ARCHITECTURE, CONVENTIONS, FINDINGS, check-boundary.sh, dbus XML), sill-launcher (`Provider`, `Activation`), and shell-host's nested-compositor harness (`scripts/dev/`).
 
-I also checked the installed binaries on this machine (Fedora 44: cosmic-comp 1.8.0, kwin 6.7.5) and the nested cosmic-comp globals the harness recorded (`~/shell-host/scripts/dev/out/globals.txt`):
+I also checked the installed binaries on this machine (Fedora 44: the compositor, kwin 6.7.5) and the the nested compositor globals the harness recorded (`~/shell-host/scripts/dev/out/globals.txt`):
 
-- **Window capture on stock cosmic-comp 1.8.** It advertises `ext_image_copy_capture_manager_v1`, `ext_foreign_toplevel_image_capture_source_manager_v1`, `ext_foreign_toplevel_list_v1`, `zcosmic_toplevel_info_v1` (its `geometry` event exists since v2), `zcosmic_toplevel_manager_v1` (`move_to_ext_workspace` since v4), `ext_workspace_manager_v1`, `zwp_virtual_keyboard_manager_v1`, `zwp_text_input_manager_v3`, `cosmic_a11y_manager_v1` and `wp_security_context_manager_v1`. It has **no** `zwlr_virtual_pointer` and **no** `ext_transient_seat`.
-- **Input on stock cosmic-comp 1.8.** The EIS server is reached over D-Bus as `com.system76.CosmicComp.Ei` at `/com/system76/CosmicComp/Ei`, method `GetSenderSocket(device_types)`. reis is vendored in the binary. The exact argument types and who may call it (`COSMIC_ENFORCE_DBUS_OWNERS`) are [unverified]; Spike A settles them.
+- **Window capture on a stock compositor.** It advertises `ext_image_copy_capture_manager_v1`, `ext_foreign_toplevel_image_capture_source_manager_v1`, `ext_foreign_toplevel_list_v1`, a private toplevel-info global (its `geometry` event exists since v2), a private toplevel manager (`move_to_ext_workspace` since v4), `ext_workspace_manager_v1`, `zwp_virtual_keyboard_manager_v1`, `zwp_text_input_manager_v3`, a private accessibility manager and `wp_security_context_manager_v1`. It has **no** `zwlr_virtual_pointer` and **no** `ext_transient_seat`.
+- **Input on a stock compositor.** The EIS server is reached over D-Bus as a private D-Bus input service, method `GetSenderSocket(device_types)`. reis is vendored in the binary. The exact argument types and who may call it are [unverified]; Spike A settles them.
 - **KWin 6.7.5.** The plugins `eis.so` (`org.kde.KWin.EIS.RemoteDesktop`), `screencast.so` (`zkde_screencast` stream_window over PipeWire, with off-screen rendering of windows) and `screenshot.so` are installed. `libkwin` has no ext-image-copy-capture.
-- **Licences.** cosmic-comp is GPL-3.0-only, and our deny.toml keeps GPL out. So the fork is a separate GPL repo, and no crate of ours may depend on it. The private protocol crate it uses is ours, under MIT OR Apache-2.0.
+- **Licences.** the compositor is GPL-3.0-only, and our deny.toml keeps GPL out. So the fork is a separate GPL repo, and no crate of ours may depend on it. The private protocol crate it uses is ours, under MIT OR Apache-2.0.
 - **Protocol bindings.** wayland-protocols 0.32.13 (already pinned) contains ext-image-copy-capture, ext-image-capture-source, ext-foreign-toplevel-list, ext-transient-seat and ext-workspace.
 
 ---
@@ -24,7 +24,7 @@ I also checked the installed binaries on this machine (Fedora 44: cosmic-comp 1.
 - **`maskcap`**: masked per-window capture over ext-image-copy-capture (stock) or the fork's masked source, plus damage-based settling and stall digests.
 - **`cua-desktop`**: windows, geometry, leases, workspaces, glow, the kill chord, and the stock consent guard.
 - **Run modes**: in place, agent workspace, nested session; which backend supports which.
-- **The cosmic-comp fork**: what must change, against what works on stock protocols.
+- **The casement**: what must change, against what works on stock protocols.
 - **Event-log records and procedures**: the run → event-log record types (written through the memory area's `eventlog`), and the learned-procedure file format (later).
 - **Spikes first**, each with acceptance criteria.
 
@@ -58,7 +58,7 @@ Workspace conventions are copied from porter: `rust-toolchain.toml` at 1.98.1, q
 | `a11y-tree` | snapshot model (`A11ySnapshot`, `A11yNode`, `Role`), prune, render to model text, diff, `NodeSelector`; trait `A11ySource`; feature `atspi` = AT-SPI backend | none by default; zbus behind `atspi` | core yes |
 | `seat-input` | `InputOp`, `plan(action) -> Vec<InputOp>`, chord/keymap mapping, `InputReceipt`; trait `AgentSeat`; feature `ei` = reis client backend | none by default; reis behind `ei` | core yes |
 | `maskcap` | `Frame`, `PixelBuf`, `MaskRegion`, `MaskReport`, `apply_masks`, `FrameDigest`, settle logic; traits `WindowCapture` and `CaptureSession`; feature `wayland` = ext-image-copy-capture plus the quire masked source | none by default | core yes |
-| `cua-desktop` | `ToplevelInfo`, `LeaseRequest`/`LeaseGrant`, `BackendCaps`, `GlowState`, `DesktopEvent`; traits `Desktop` and `LeaseControl`; feature `cosmic` = cosmic-client-toolkit, ext-workspace and the quire-agent protocol | none by default | core yes |
+| `cua-desktop` | `ToplevelInfo`, `LeaseRequest`/`LeaseGrant`, `BackendCaps`, `GlowState`, `DesktopEvent`; traits `Desktop` and `LeaseControl`; feature `wayland` = the Wayland client toolkit, ext-workspace and the quire-agent protocol | none by default | core yes |
 | `quire-agent-protocol` | `protocols/quire-agent-v1.xml` plus wayland-scanner bindings; features `client` and `server` (the fork uses `server`) | none | yes |
 | `cua-run` | pure core: ids, `CuaTask`, `CuaResult`, `RunMode`, `Budget`, `Observation`, `ActionOutcome`, `classify_effect`, `LeaseBook`, the run machine (`Run::step`), stall detection, `CuaRecord` (event-log payloads), `Procedure` types, the `Cua1` wire bodies, `mode_support` | none | yes |
 | `cua-dbus` | `org.quire.Cua1` zbus proxies and skeletons, `dbus/org.quire.Cua1.xml`, codec, introspection test | zbus | Linux |
@@ -72,7 +72,7 @@ Workspace conventions are copied from porter: `rust-toolchain.toml` at 1.98.1, q
 | `a11y-tree` | `cua-action` (models), `prov` (actions) |
 | `seat-input` | `cua-action` |
 | `maskcap` | `cua-action` |
-| `cua-desktop` | `cua-action`; `quire-agent-protocol` (feature `cosmic`) |
+| `cua-desktop` | `cua-action`; `quire-agent-protocol` (feature `wayland`) |
 | `cua-run` | `cua-action`, `a11y-tree`, `seat-input`, `maskcap`, `cua-desktop` (all default features), `prov`, `quire-intents` (types), `porter-core` (`DataClass`, `AppId`, `Locality`) |
 | `cua-dbus` | `cua-run` |
 | `cua-fake` | everything above with default features, plus `reis` (for `FakeEis`), plus models' `model-provider` (replay) |
@@ -80,14 +80,14 @@ Workspace conventions are copied from porter: `rust-toolchain.toml` at 1.98.1, q
 
 **External boundary.** Every crate except `cua-dbus`, `cuad` and the backend features never reaches `zbus`, `zvariant`, `tokio`, `wayland-client`, `wayland-backend`, `reis`, `atspi`, `reqwest` or `hyper` (default features). `cua-run` additionally never reaches `cedar-policy` or `rusqlite`: verdicts and records cross as data.
 
-### Fork repo `~/cosmic-comp` (GPL-3.0-only, branch `quire`, rebased on upstream release tags)
+### Fork repo `~/casement` (GPL-3.0-only, branch `quire`, rebased on upstream release tags)
 
 All quire code goes in `src/quire/` (agent seat, masked source, lease and glow globals, input-origin gate, kill chord), with small hook calls into upstream files. The fork depends on `quire-agent-protocol` (feature `server`) by git rev. The double-tap ⌘ detection (COMPANION item 7) also lands here later; whoever owns it shares the branch. Ownership: Q11.
 
 ### Adopted crates (from quire's pinned block unless marked "joins the block")
 
-- **Already pinned:** `wayland-client 0.31`, `wayland-backend 0.3`, `wayland-protocols 0.32.13` (staging), `cosmic-client-toolkit` (pinned rev), `xkbcommon 0.8` (text → keysym → keycode on the EIS keymap), `zbus 5.19` (tokio), `tokio 1`, `serde`/`serde_json`, `thiserror 2`, `image 0.25.6` (PNG for thumbnails only), `memfd 0.6` (shm buffers for capture), `rustix 1.1`.
-- **Joins the block:** `reis 0.7` (MIT; pin the minor that the fork's cosmic-comp `Cargo.lock` resolves; the README says its API may change) and `atspi 0.30` (Apache-2.0 OR MIT).
+- **Already pinned:** `wayland-client 0.31`, `wayland-backend 0.3`, `wayland-protocols 0.32.13` (staging), `the Wayland client toolkit` (pinned rev), `xkbcommon 0.8` (text → keysym → keycode on the EIS keymap), `zbus 5.19` (tokio), `tokio 1`, `serde`/`serde_json`, `thiserror 2`, `image 0.25.6` (PNG for thumbnails only), `memfd 0.6` (shm buffers for capture), `rustix 1.1`.
+- **Joins the block:** `reis 0.7` (MIT; pin the minor that the fork's the compositor `Cargo.lock` resolves; the README says its API may change) and `atspi 0.30` (Apache-2.0 OR MIT).
 - **Later, joins the block:** `ashpd 0.13` (RemoteDesktop/ScreenCast portal fallback if `GetSenderSocket` is owner-restricted) and `pipewire` (KWin window capture; [unverified] version and licence).
 - **From other areas:** `cua-action`, `model-provider` (models); `prov`, `policy-point`, `quire-intents` (actions); `eventlog`, `memfiles` (memory); `porter-core` (`DataClass::Screen`, `AppId`, `Locality`).
 
@@ -306,7 +306,7 @@ pub enum RevokeReason { KillChord, WindowClosed, SpaceChanged, Compositor }
 
 pub struct BackendCaps { pub kind: BackendKind, pub seat: SeatIsolation, pub masking: MaskWhere,
     pub consent: ConsentGuard, pub hidden: HiddenCapture, pub glow: GlowDraw }
-pub enum BackendKind { CosmicFork, CosmicStock, KwinStock }
+pub enum BackendKind { Casement, StockCompositor, KwinStock }
 pub enum ConsentGuard { CompositorOrigin, CuadSuspendsInput }
 pub enum HiddenCapture { Renders, Withheld }
 pub enum GlowDraw { Compositor, ShellOnly }
@@ -490,7 +490,7 @@ Bodies are JSON in `s` with the envelope `{ "vocab": 1, "body": … }`. This is 
   <method name="Start"><arg name="task" type="s" direction="in"/><arg name="run" type="o" direction="out"/></method>
   <method name="Runs"><arg type="ao" direction="out"/></method>
   <method name="StopAll"/>                              <!-- control-centre kill switch -->
-  <property name="Backend" type="s" access="read"/>     <!-- cosmic_fork | cosmic_stock | kwin_stock | none -->
+  <property name="Backend" type="s" access="read"/>     <!-- casement | stock_compositor | kwin_stock | none -->
   <property name="Modes" type="a{ss}" access="read"/>   <!-- mode -> full | hands_off | unsupported:<gap> -->
   <signal name="RunAdded"><arg type="o"/></signal>
   <signal name="RunRemoved"><arg type="o"/></signal>
@@ -677,13 +677,13 @@ Pure tests use `const CASES` tables, named by behaviour; the I/O feature tests r
 
 Spikes run on throwaway compositors only, with a private runtime dir and a private D-Bus bus (shell-host's `accept-lock.sh` pattern). The person's `wayland-0` is never touched. Spike code lives in `cua/spike/` and `scripts/dev/spike-*.sh` and writes `scripts/dev/out/spike-*.json`. The scripts reuse `~/shell-host/scripts/dev/{nested.sh,kwin-virtual.sh}` through `SHELL_HOST_DIR`.
 
-**Spike A: stock cosmic-comp 1.8, nested (3 days)**
+**Spike A: a stock compositor, nested (3 days)**
 1. **Capture.** Capture one toplevel through `ext_foreign_toplevel_image_capture_source` plus ext-image-copy-capture, at scale 1.0 and 1.5. Pass if:
    - frame size equals `round(logical × scale)`;
    - p95 capture latency is under 50 ms at 1920×1080 shm;
    - damage-quiet settling detects the end of a GTK animation within quiet + 50 ms.
    Record whether frames arrive for an occluded window, a minimized window, and a window on another workspace (this decides `HiddenCapture` for stock).
-2. **Inject.** Introspect `com.system76.CosmicComp.Ei.GetSenderSocket` (record its signature and whether a non-portal caller is allowed; if not, measure the `RemoteDesktop.ConnectToEIS` portal path). Then a reis client clicks at window-local points read by a probe client that prints `wl_pointer` coordinates. Pass if:
+2. **Inject.** Introspect `the compositor's input service` (record its signature and whether a non-portal caller is allowed; if not, measure the `RemoteDesktop.ConnectToEIS` portal path). Then a reis client clicks at window-local points read by a probe client that prints `wl_pointer` coordinates. Pass if:
    - the click lands within ±1 lpx after the geometry transform;
    - `ctrl+s` arrives as the chord;
    - one scroll detent arrives as one detent.
@@ -691,7 +691,7 @@ Spikes run on throwaway compositors only, with a private runtime dir and a priva
 3. **Matrix.** GTK4 (gtk4-demo), Qt6, Firefox, Chromium, foot and a Blitz app: open a menu and select, combo box, slider drag, drag-and-drop, text entry, scroll. Record the pass rate.
 4. **Interference.** Show whether EI moves the user's cursor and steals focus. Expected yes, which confirms fork F1.
 5. **Coordinate frames.** Record the offsets between the capture frame, xdg window geometry (CSD shadows), AT-SPI window extents and the EI region.
-**Go:** items 1 and 2 pass → `CosmicStock` is a backend (AgentWorkspace only if hidden windows render; InPlace = HandsOff).
+**Go:** items 1 and 2 pass → `StockCompositor` is a backend (AgentWorkspace only if hidden windows render; InPlace = HandsOff).
 
 **Spike B: KWin `--virtual` (2 days).** Capture through `org.kde.KWin.ScreenShot2.CaptureWindow` or `zkde_screencast` stream_window (PipeWire). Inject through `org.kde.KWin.EIS.RemoteDesktop`. Run the Spike A matrix subset. **Go:** KWin becomes the nested-session host and the portability reference (`KwinStock`).
 
@@ -720,7 +720,7 @@ Prerequisite: models' `cua-action`, actions' `prov` and `quire-intents` types, a
   - all shape tests in §5 that need no behaviour: wire round-trips, slugs, introspection, fixtures load;
   - `scripts/check-boundary.sh`;
   - joining reis and atspi into quire's `docs/workspace-deps.toml` first (a quire edit, coordinated).
-- **Agent `fork-setup`** owns `~/cosmic-comp`: fork at the upstream 1.8 tag, branch `quire`, an empty `src/quire/mod.rs` hooked in, `quire-agent-protocol` (server) advertising stub globals. It builds and runs nested.
+- **Agent `fork-setup`** owns `~/casement`: fork at the upstream 1.8 tag, branch `quire`, an empty `src/quire/mod.rs` hooked in, `quire-agent-protocol` (server) advertising stub globals. It builds and runs nested.
 
 ### Fill waves (disjoint file ownership)
 
@@ -733,12 +733,12 @@ Prerequisite: models' `cua-action`, actions' `prov` and `quire-intents` types, a
   1. `crates/seat-input/src/ei/**` plus `crates/cua-fake/src/eis.rs`
   2. `crates/maskcap/src/wayland/**`
   3. `crates/a11y-tree/src/atspi/**`
-  4. `crates/cua-desktop/src/cosmic/**`
+  4. `crates/cua-desktop/src/wayland/**`
 - **Fill 3 (1 agent):** `crates/cuad/**`, `crates/cua-dbus/src/codec.rs`, `crates/cua-fake/src/{harness.rs, model.rs, policy.rs, events.rs, desktop.rs, capture.rs}`, and `dist/`.
-- **Fill 4 (1 agent, `~/cosmic-comp` `src/quire/**` only):** fork changes F1-F7 below, then Spikes C and D become acceptance scripts in `~/cua/scripts/dev/accept-{agent-seat,masking}.sh` (with `COSMIC_COMP=~/cosmic-comp/target/release/cosmic-comp`).
+- **Fill 4 (1 agent, `~/casement` `src/quire/**` only):** fork changes F1-F7 below, then Spikes C and D become acceptance scripts in `~/cua/scripts/dev/accept-{agent-seat,masking}.sh` (with `COMPOSITOR_BIN=~/casement/target/release/the compositor`).
 - **Fill 5 (later):** procedures (`cua-run/src/procedure.rs`, plus replay in cuad), NestedSession mode (KWin host), the KWin backend, the `quire_sensitive_v1` client in shell-host.
 
-### Fork changes (cosmic-comp) against stock
+### Fork changes (the compositor) against stock
 
 | # | Change | On stock, instead |
 |---|---|---|
@@ -748,7 +748,7 @@ Prerequisite: models' `cua-action`, actions' `prov` and `quire-intents` types, a
 | F4 | Lease and glow: the compositor draws the glow and the agent cursor from lease state | the shell's orb only (`GlowDraw::ShellOnly`) |
 | F5 | Kill chord: a hardware chord handled in the compositor revokes every lease | control-centre `StopAll` only |
 | F6 | Settling from capture-session damage | already stock (ext-image-copy-capture frames wait for damage) |
-| F7 | Hidden agent-workspace windows keep rendering and receiving frame callbacks (cosmic-comp #2777 withholds them) | depends on Spike A1; if not, AgentWorkspace is Unsupported on stock |
+| F7 | Hidden agent-workspace windows keep rendering and receiving frame callbacks (withholds them) | depends on Spike A1; if not, AgentWorkspace is Unsupported on stock |
 
 ### Verify commands
 
@@ -764,7 +764,7 @@ cargo deny check licenses
 
 Spikes and acceptance (dev only, never in CI): `scripts/dev/spike-{a,b,e}.sh`, `scripts/dev/accept-{agent-seat,masking}.sh`.
 
-Fork: `cargo build --release && cargo test` in `~/cosmic-comp`, then the `~/cua` acceptance scripts against it.
+Fork: `cargo build --release && cargo test` in `~/casement`, then the `~/cua` acceptance scripts against it.
 
 ---
 
@@ -822,7 +822,7 @@ Fork: `cargo build --release && cargo test` in `~/cosmic-comp`, then the `~/cua`
 
 **Questions only the user can answer**
 1. Confirm replacing COMPANION item 4 with: "typed actions and hooks first; a CUA tier, off by default per app, inside the lease and consent stack."
-2. Ship v1 on stock cosmic-comp (shared seat, HandsOff in place, masking inside cuad, consent guard by suspending input), with the fork as phase 2? Or require the fork before any release? My recommendation is stock first; the fork is required before "keep working while it acts".
+2. Ship v1 on a stock compositor (shared seat, HandsOff in place, masking inside cuad, consent guard by suspending input), with the fork as phase 2? Or require the fork before any release? My recommendation is stock first; the fork is required before "keep working while it acts".
 3. The repo name (`cua` is a placeholder), and confirmation that `cuad` is its own daemon rather than part of shell-host.
 4. Should actions target a11y nodes (`ActionTarget::Node`) when a tree exists? My recommendation is yes, and to freeze both forms now.
 5. Default run mode: agent workspace (out of sight, glow plus peek) or in place?
@@ -831,14 +831,14 @@ Fork: `cargo build --release && cargo test` in `~/cosmic-comp`, then the `~/cua`
 8. Browser grants: Once/per-session only, or is "Always" allowed?
 9. CJK and Unicode typing: may the agent use the virtual-keyboard keymap trick on stock (it targets the user's focus), or only the fork's agent text-input?
 10. Procedures: auto-propose promotion to a typed action, or only on an explicit "save as routine"?
-11. Is KWin a product target (portable CUA) or only the nested-session host and spike reference? And who owns the cosmic-comp fork overall (cua, or a compositor area shared with the double-tap ⌘ work)?
+11. Is KWin a product target (portable CUA) or only the nested-session host and spike reference? And who owns the casement overall (cua, or a compositor area shared with the double-tap ⌘ work)?
 12. Keep screenshots off by default with no thumbnails? Recommended: yes.
 
 ### Critical files for implementation
 - /home/pohsuanlai/rs-wt/companion/cua-integration.md
 - /home/pohsuanlai/porter/ARCHITECTURE.md (the repo shape, boundary script and frozen-trait conventions to copy)
 - /home/pohsuanlai/quire/design/31-ACCOUNTS.md (§4.4 Inference1, §4.5 consent, §5.5 data-class floors)
-- /home/pohsuanlai/shell-host/scripts/dev/README.md (the nested cosmic-comp and headless KWin harness the spikes reuse)
+- /home/pohsuanlai/shell-host/scripts/dev/README.md (the the nested compositor and headless KWin harness the spikes reuse)
 - /home/pohsuanlai/sill/crates/sill-launcher/src/activation.rs and provider.rs (where the run strip plugs in)
 
 <!-- paths: end -->

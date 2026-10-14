@@ -491,7 +491,7 @@ Each rule names its source in the plan's Blitz findings or risk table.
     `.ds` (plan, components).
 11. **Reduced is explicit.** Never rely on `@media (prefers-reduced-motion)`; the portal value is
     resolved in Rust and written as `data-motion="reduced"` (plan, "Must be rewritten").
-12. **Fullscreen surfaces never animate** (plan, shell risks, cosmic-comp #2777).
+12. **Fullscreen surfaces never animate** (plan, shell risks, ).
 
 ## 10. Shell motion
 

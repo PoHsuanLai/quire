@@ -1,6 +1,6 @@
 //! Handing a PDF to the system to print (the `print` feature). On Linux that is the desktop
 //! portal's print dialog (`org.freedesktop.portal.Print`, implemented by the GTK and KDE portal
-//! backends; COSMIC's falls back to GTK's): the dialog chooses the printer and settings, and
+//! backends): the dialog chooses the printer and settings, and
 //! the portal prints the PDF from a sealed in-memory file. Where there is no portal or no print
 //! backend, and on every other system, the PDF is written to a temporary file and opened in the
 //! system's viewer, which prints it.

@@ -378,10 +378,10 @@ Popover material), never on the desktop card.
 
 **Compositor blur, recommended (for sill and the compositor).** Blur behind a desktop widget
 with a Gaussian of **sigma 22 logical pixels** (M26): 44 device pixels at 2x. On a compositor that
-blurs by a dual-Kawase pass count or a "strength" (COSMIC's `frosted` theme value), pick the
+blurs by a dual-Kawase pass count or a "strength" (the compositor's `frosted` theme value), pick the
 setting whose blur of a sharp edge spreads 10-90 % over about 56 logical pixels (2.56 sigma). The
 reference also raises the saturation of what shows through by about 1.8 (M29, low confidence);
-the tint cannot do that (it only mixes), so it is a compositor gap: `docs/cosmic-gaps.md` in sill
+the tint cannot do that (it only mixes), so it is a compositor gap: `docs/compositor-gaps.md` in sill
 should carry "saturation x1.8 inside the widget's blur region". Blur on the desktop widget is a
 choice the shell may skip: the reference's desktop card in its editing mode shows no blur at all
 (M30), and the gallery's "Compositor blur" wall (the Widget reference page) shows the tint over
@@ -420,7 +420,7 @@ data face's caps (the current `--accent` caps title reads as a form label). Moti
 
 ### 5.1 The compact month's spacing (2026-09-27)
 
-The user's report on sill's capture (`widgets-desktop-cosmic.png`, the small calendar tile):
+The user's report on sill's capture (`widgets-desktop-desktop.png`, the small calendar tile):
 "looks weird". The compact grid was packed into the top of the 140 x 140 content box (a
 five-week month left 21 of it empty, the ink's bottom inset 38.8 against 15.2 at the top), the
 title and weekday heads sat tight on each other and on the first row, and the rows (19) ran
@@ -450,7 +450,7 @@ and 4x: `tools/progress/shots/gallery/calendar-compact-*.png`.
 
 ### 5.2 The month at each size: the reference's layouts (2026-09-27)
 
-sill's notification-center capture (`notification-center-open-cosmic.png`, the right-hand
+sill's notification-center capture (`notification-center-open-desktop.png`, the right-hand
 column): the Large tile drew the regular month at the top and left about 40 % of it empty under
 the last week, the fault section 5.1 fixed for the Small card. A first answer stretched the grid
 over the Medium and Large cards; reviewed, it read sparse (wide gaps between the days), the same

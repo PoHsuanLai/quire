@@ -76,7 +76,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Reflective floor | a light band rising from the pill's floor under the tiles (white .26 to 0 over 40 % of the pill), off by default; ds `DockFloor`, `--dock-floor` | settled 2026-09-24 as an option, off (`dock.floor`, proposed key; macOS dropped its 3D floor after 10.9) |
 | Placeholder tile | until the generated icons arrive, an app with no icon is `IconView { plate: Some(family) }`: the 08-ICONS plate in one of the six families with the glyph at 56 % | settled 2026-09-24 |
 | Badge capsule | anchored to the tile's top-right: right edge at tile right + 2, top edge at tile top - 2; height 18, min width 18, horizontal padding 5, radius 9; fill `--danger`, text `--accent-ink`-equivalent white token, ui font 11/700 tabular; text = count; `> 999` renders `999+`; scales with the tile (it is part of the tile's transform); appears and disappears with the tile (no pop, no bump; a count change swaps the text at once, design/30 §1.3) | proposed (R21 H for meaning, geometry L) |
-| Badge source | `com.canonical.Unity.LauncherEntry.Update`: `count` + `count-visible` | settled (plan COSMIC findings) |
+| Badge source | `com.canonical.Unity.LauncherEntry.Update`: `count` + `count-visible` | settled (plan compositor findings) |
 | Progress | a `ProgressIndicator{Bar}` under the icon, as macOS draws it (design/30 §2.9; the ring and `dock.progress_style` are removed); `progress` 0..1 from LauncherEntry `progress` + `progress-visible`; a changed value tweens linearly over `--t-move` | settled (design/30); bar geometry not yet specified |
 | Urgent | LauncherEntry `urgent = true` starts a Critical bounce (10.3.5) | proposed (M) |
 | Separator | 1 px wide, 36 px tall (0.75 T), `--line`, 6 px margin each side; present only when the Trash tile is present (10.3.9) | proposed (R26 L) |
@@ -142,7 +142,7 @@ an app_id the arriving modifier is unverified (plan shell risks), so the dock ac
 | Primary click (press and release on the same tile, no drag) | app not running | launch (activation token, DBusActivatable, `systemd-run` scope; plan "Launch") + Launch bounce | settled (R15) |
 | | running, no toplevel on any workspace but process alive (DBusActivatable) | `org.freedesktop.Application.Activate` | proposed (R23 L) |
 | | running, all toplevels minimized | unminimize and activate the most recently active toplevel | proposed (R23 L) |
-| | running, not the active app | activate the most recently active toplevel of the app (COSMIC activates one toplevel; others are not raised) | proposed (R15 H; limit) |
+| | running, not the active app | activate the most recently active toplevel of the app (the compositor activates one toplevel; others are not raised) | proposed (R15 H; limit) |
 | | running and active | cycle: activate the next toplevel of the app in MRU order on the current workspace; with one toplevel, nothing | settled (plan "click launch/activate/cycle") |
 | Cmd-click | any | Show in Files: `org.freedesktop.FileManager1.ShowItems([desktop file uri])` | proposed (R16 H meaning) |
 | Option-click | any | activate as primary click, then minimize every toplevel of the previously active app | proposed (R17 H) |
@@ -167,13 +167,13 @@ Opens on secondary **press** (press-drag-release selects, §13.3.2). ds `Menu` (
 3. `Options >` submenu: `Keep in Dock` (check), `Open at Login` (check; writes or removes
    `~/.config/autostart/<id>.desktop`), `Show in Files`. (R22 M)
 4. `Hide` (minimize every toplevel of the app), shown when running. (R22; macOS Hide is not
-   minimize, this is the nearest COSMIC operation, proposed)
+   minimize, this is the nearest compositor operation, proposed)
 5. `Quit` (close every toplevel via `ToplevelManager::close`), shown when running. With Option
    held while the menu is open the item reads `Force Quit` and sends SIGKILL to the app's
    `app-sill-*` scope; hidden for apps we did not launch (no pid from the toplevel protocol).
    (R22 M)
 
-`Show All Windows` is omitted in v1 (no per-app window overview in COSMIC). Recent documents
+`Show All Windows` is omitted in v1 (no per-app window overview in the compositor). Recent documents
 are omitted in v1. While the menu is open the dock is Frozen (10.3.3).
 
 ### 10.3.8 Drag inside, drag out, drops
@@ -202,12 +202,12 @@ Trash tile are **proposed** (R26); stacks are **deferred** (R25 UNKNOWN).
 
 ### 10.3.10 Minimize target
 
-The dock calls `set_rectangle(toplevel, dock_surface, rect)` (cctk `ToplevelManager`) for every
+The dock calls `set_rectangle(toplevel, dock_surface, rect)` (the toplevel client) for every
 toplevel of every tile with the tile's **rest** rect (not magnified), after each layout change,
 debounced 100 ms. The compositor draws the minimize animation into that rect; its style and
-duration are cosmic-comp's (R14 not reproducible from a client). Minimized windows do not get
-their own tiles (`minimize-to-application` = ON, the only mode in v1). Status: proposed (M, cctk
-API as used by cosmic-applets app-list).
+duration are the compositor's (R14 not reproducible from a client). Minimized windows do not get
+their own tiles (`minimize-to-application` = ON, the only mode in v1). Status: proposed (M, the toplevel client
+API as used by the desktop applets).
 
 ### 10.3.11 Auto-hide
 
@@ -302,7 +302,7 @@ Hover transitions (P = progress):
 
 | From | Event | To | Effects |
 | --- | --- | --- | --- |
-| Rest | PointerEnter / first PointerMove (cosmic-comp #2230: a still pointer gets no enter) | Entering{from: 0, since: now} | RequestFrames |
+| Rest | PointerEnter / first PointerMove (a still pointer gets no enter) | Entering{from: 0, since: now} | RequestFrames |
 | Entering | Frame, `now - since >= (1-from) x 120 ms` | Tracking | Redraw |
 | Entering / Tracking | PointerMove | same, x updated | Redraw on next Frame |
 | Tracking | PointerMove with no change in x | Tracking | none (no frame) |
@@ -429,7 +429,7 @@ leave 200 ms, bounce `P` 500 ms, hold-to-menu (the `LongPress` delay), remove th
 | --- | --- | --- |
 | Dock surface, machine, `magnify` | `sill-surfaces/src/surfaces/dock/**`, pure helpers table-tested (plan names `magnify(centers, pointer_x, Params)`) | Top layer, anchor BOTTOM, `KeyboardMode::None` (OnDemand while a menu is open, shell-host rule) |
 | Layer surface, regions, blur, popups, frame pacing | `shell-host` (`layer`, `region::rounded_strips`, `blur`, `popup`, `frame`) | input and blur regions via `RegionSpec::Element` resolved after layout each frame |
-| Toplevels, activation, minimize rects, workspaces | `sill-services` `cosmic_wl` thread (cctk `ToplevelInfoState`, `ToplevelManagerState`) | second Wayland connection (plan: orphan rule) |
+| Toplevels, activation, minimize rects, workspaces | `sill-services` `toplevel_wl` thread (the toplevel client) | second Wayland connection (plan: orphan rule) |
 | Items, `match_app`, launch | `sill-services` apps + launch services | plan "Design: sill" |
 | Badges, progress, urgent | `use_launcher_entry` (zbus match on LauncherEntry) | |
 | Menu component | ds `Menu` (`Placement::Context`) | §13.3.2-13.3.4 behaviour |
@@ -439,22 +439,22 @@ leave 200 ms, bounce `P` 500 ms, hold-to-menu (the `LongPress` delay), remove th
 
 Platform limits:
 
-- cosmic-comp #2230: a layer surface under a still pointer gets no enter; magnification and
+- a layer surface under a still pointer gets no enter; magnification and
   the label start on the first motion (the host synthesises PointerMove before a press).
-- cosmic-comp #2777: delayed frame callbacks for fullscreen layer surfaces; the dock is never
+- delayed frame callbacks for fullscreen layer surfaces; the dock is never
   fullscreen, but the watchdog applies (plan frame machine).
-- No urgency on toplevels in cctk: attention comes only from LauncherEntry `urgent` and our IPC.
+- No urgency on toplevels in the toplevel client: attention comes only from LauncherEntry `urgent` and our IPC.
 - KWin (development host): no foreign-toplevel or workspace protocol, so no running dots,
   no window list, click = launch or D-Bus activate only, no minimize target; badges work.
   "Dock degrades quietly on KWin" (plan).
 - Fullscreen windows cover the Top layer; the dock is not revealed over fullscreen in v1.
 - Toshy modifier mapping on app_id-less layer surfaces is unverified; hence Super or Ctrl =
   Cmd in 10.3.6.
-- Blur cost (cosmic-comp #2613/#2795): one blur region, only while the dock is visible.
+- Blur cost: one blur region, only while the dock is visible.
 
 ## 10.8 Acceptance tests
 
-Automatable through `sill debug {pointer,leave,stats,capture}` in nested cosmic-comp, the
+Automatable through `sill debug {pointer,leave,stats,capture}` in the nested compositor, the
 headless renderer and pure table tests. Frame times refer to the output refresh `f`.
 
 1. **Curve table** (pure): `magnify` for `P = 1`, pointer on tile 3 of 7: sizes
@@ -514,7 +514,7 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
 
 - Plan Appendix C-A (all R rows), "UX decisions settled with the user", "Design: sill" (Dock,
   Launch), "Design: shell-host" (`RegionSpec::Element`, `rounded_strips`, frame machine),
-  "Findings: COSMIC" (cctk APIs, LauncherEntry, cosmic-comp #2230, #2777, #2613, #2795),
+  "Findings: compositors" (the toplevel client),
   M0 spike item c.
 - Plan Appendix A: A1 (card inset 8), A4 (fly), A5 (tokens), A6 (hover warm, drag threshold),
   A7. Sibling docs: `03-COLOR.md` materials table (Dock tint, edge, shadow, radius 22),

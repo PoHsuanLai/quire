@@ -1,6 +1,6 @@
 # 21 Spaces on the desktop
 
-A Space is a COSMIC workspace's colour: one flat, quiet tint on the **sidebar ground** of the
+A Space is a workspace's colour: one flat, quiet tint on the **sidebar ground** of the
 windows that have a sidebar, plus an optional grain. It never tints the content, a control, the
 bar, the dock or any other shell chrome. This is the quiet Dia/Mac direction (`30-CATALOGUE.md`
 section 3.4, which wins over this file); the gradient, frame-token, card-accent and A/B-layer model
@@ -13,7 +13,7 @@ here, not yet in the code (`ds-style/space/palette.rs`, `SpaceEditor`, `SpaceSto
 
 ## 1. The model (settled)
 
-- Each COSMIC workspace owns one `SpaceLook`.
+- Each workspace owns one `SpaceLook`.
 - The Space tint is one flat colour drawn as the sidebar's ground (under the Sidebar material's
   vibrancy). Nothing else changes colour with the Space: the content stays on paper, so every
   contrast rule holds, and shell chrome (bar, dock, launcher, control centre, OSD) takes no tint.
@@ -98,7 +98,7 @@ per-preset grains (35, 55, 40) are gone.
 4. Per output: each output's workspace indicator follows that output's active workspace.
 5. Reduced motion keeps the cross-fade (30 section 1.1).
 
-Trigger: cctk `WorkspaceState` activation events on the `cosmic_wl` thread, then `use_workspaces`,
+Trigger: the toplevel client `WorkspaceState` activation events on the `toplevel_wl` thread, then `use_workspaces`,
 then each sidebar's `Ds { look }`. The shortcut is ⌃1-9 (30 section 3.4); ⌘1-9 stay free for apps.
 
 ## 6. Editor (settled placement; target (clean-up phase) pieces)
@@ -157,7 +157,7 @@ position".
 {
   "version": 2,
   "by_id": {
-    "<cosmic workspace id>": { "hue": 268, "chroma": 1, "grain": 0, "theme": "system" }
+    "<workspace id>": { "hue": 268, "chroma": 1, "grain": 0, "theme": "system" }
   },
   "by_index": [ { "...": "SpaceLook for workspace 0 on its output" } ]
 }
@@ -179,7 +179,7 @@ id (ext-workspace `id` event), else `by_index[position]`, else the §4 default. 
    Proposed: its own, falling back to the workspace's.
 2. Per-output workspaces: which look does a dock spanning one output use when the focused window is
    on another? Resolved by 3: the dock takes no tint, so none.
-3. Whether COSMIC workspace ids are stable across sessions; decides whether `by_id` is useful.
+3. Whether workspace ids are stable across sessions; decides whether `by_id` is useful.
 4. Migration keeps the first dot's chroma factor as well as its hue (the decision names the hue
    only); confirm, or force chroma 1.
 
@@ -188,7 +188,7 @@ id (ext-workspace `id` event), else `by_index[position]`, else the §4 default. 
 - PLAN "UX decisions settled with the user (2026-09-23, second round)", "Spaces on the desktop";
   `30-CATALOGUE.md` section 3.4.
 - `crates/ds-style/src/space/palette.rs` (the quiet tint's constants).
-- SPEC "Workspaces" (cctk, pinning, naming, reorder).
+- SPEC "Workspaces" (the toplevel client, pinning, naming, reorder).
 
 ## 13. Apps' Spaces: the kit
 

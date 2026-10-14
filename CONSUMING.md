@@ -2114,7 +2114,7 @@ Line numbers are `~/rs-wt/keymap/SURVEY.md` at the 2026-10-10 tips.
   `sill-dock/src/dock/pointer.rs:98` (own `SUPER|CONTROL|META`) uses `ds::base::command::holds_primary`
   or the action. The switcher's `command_keys` (Alt/Meta release) is a modifier *release*, which is
   not a chord: keep it, on `ds::base::command::modifiers_of`. `dist/keycap/keycap.toml` remap rules
-  and `dist/cosmic` bindings stay keycap's. The desktop launcher passes keycap's `KeymapSource` to
+  stay keycap's. The desktop launcher passes keycap's `KeymapSource` to
   `AppConfig::with_keymap_source`.
 - **temor.** `temor-pane/src/keys/{keymap,chord}.rs` (own `Keymap`/`Chord`/`Mods`) and
   `input/route.rs` `is_command_form` go: resolve with `Context::Terminal`, where Primary is Super on

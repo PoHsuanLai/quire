@@ -201,7 +201,7 @@ above onto the shell surfaces and onto the decisions the plan records as settled
 | Decision | Verbatim or near-verbatim | Source |
 | --- | --- | --- |
 | Mac UX, Arc UI | "UX is Mac-vibed; UI may be more aggressive, Arc-browser style." | `P:11` |
-| Spaces on the desktop | "each COSMIC workspace has a SpaceLook; bar, dock and launcher chrome use its `--f-*` frame tokens over compositor blur; apps stay on paper; workspace switch cross-fades the tint (380 ms)." | `P:792-794` |
+| Spaces on the desktop | "each workspace has a SpaceLook; bar, dock and launcher chrome use its `--f-*` frame tokens over compositor blur; apps stay on paper; workspace switch cross-fades the tint (380 ms)." | `P:792-794` |
 | Space store and editor | "workspace <-> SpaceLook store, default presets per workspace index, editor lives in Settings and in the bar's workspace menu" | `P:794-796` |
 | Dock | "magnification ON by default, bottom, no auto-hide. Plank parabola curve, icon 48 -> up to 96, neighbours slide apart, no easing while tracking, ~200 ms shrink on leave; toggle + sizes + auto-hide (0.2 s delay, ~0.5 s slide) available in Settings." | `P:784-786` |
 | Small glyphs | Lucide (ISC) primary, Tabler (MIT) for gaps, 24 grid, 2 px stroke, round caps, through the `Icon` enum; tray and third-party symbolic icons recoloured to the ink token. | `P:806-809` |

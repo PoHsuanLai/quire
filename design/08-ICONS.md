@@ -849,8 +849,7 @@ section 5 before any output ships.
 ### 4.1 Plate-mask rule (settled rule, proposed numbers)
 
 Every dock tile and launcher row has the same silhouette. A third-party app's own icon
-(resolved from its `.desktop` `Icon=` through the icon theme: COSMIC icon theme, else
-Cosmic, else hicolor, PLAN "use_apps") is drawn inside our plate:
+(resolved from its `.desktop` `Icon=` through the icon theme: the desktop icon theme, else hicolor, PLAN "use_apps") is drawn inside our plate:
 
 - Plate: the neutral "paper" plate of 2.3 (proposed). Dark: `#2A2E28` → `#1D211B`
   (proposed, from the dark surface token `#1D211B` in palette.rs:177).

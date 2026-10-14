@@ -522,12 +522,12 @@ property-only change). Test: `crates/ds-harness/tests/menu_export.rs` (a harness
 Undo with its title and ⌘Z on a private bus; a click runs the app's Undo; disabling announces a layout).
 The `ds::commands::MenuModel` named above is `MenuBarModel` (design/30 section 2.4); no second type.
 
-**Discovery today (cosmic-comp offers no `org_kde_kwin_appmenu`).** An app serves its menu under a
+**Discovery today (the compositor offers no `org_kde_kwin_appmenu`).** An app serves its menu under a
 well-known name derived from its Wayland `app_id` and nothing else: bus name
 `org.quire.AppMenu.<app_id>` (each dot-separated element made legal: other characters become `_`, one
 starting with a digit gets a `_` first), object `/org/quire/AppMenu`, interface
 `com.canonical.dbusmenu`. sill reads the focused toplevel's `app_id` (ext-foreign-toplevel or
-cosmic-toplevel), calls `AppMenuAddress::for_app_id` (the same function the app used, in `ds`) and
+toplevel), calls `AppMenuAddress::for_app_id` (the same function the app used, in `ds`) and
 asks the bus (`NameHasOwner`, or `NameOwnerChanged` to follow it); if the name has an owner it fetches
 `GetLayout(0, -1, [])`, else the focused app has no menu (rule c). Why this and not a registration with
 `org.quire.Shell`: it needs no running shell at app start, nothing is lost when sill restarts (the bus

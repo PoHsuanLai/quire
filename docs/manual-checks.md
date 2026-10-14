@@ -100,4 +100,4 @@ Nothing here has run on the real mouse yet; every fixture is synthesised. The Py
   `WindowHandle::focus_with_token` with the token of a D-Bus `Activate` or a notification click,
   put another window in front, click the notification, and confirm the existing window comes to
   the front and takes the keyboard. The tests drive the request against a fake compositor only;
-  whether KDE, COSMIC and GNOME honour the token is this check.
+  whether KDE and GNOME honour the token is this check.

@@ -421,7 +421,7 @@ Settled rules:
 
 | Rule | Source |
 | --- | --- |
-| Each COSMIC workspace has a SpaceLook | `P:792` |
+| Each workspace has a SpaceLook | `P:792` |
 | Bar, dock and launcher chrome use that SpaceLook's `--f-*` over compositor blur | `P:792-793` |
 | Apps stay on paper | `P:793` |
 | Switching workspace cross-fades the tint over 380 ms | `P:793-794` |

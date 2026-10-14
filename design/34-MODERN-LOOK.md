@@ -293,14 +293,14 @@ Sonoma lights: 12 px, 8 gap, 20 from the left edge; quire has 13, small drift), 
 centred; toolbar below with a hairline; `--r-window` 10.
 
 Step 1: `titlebar_height` 28 -> 28; window content margin 20; no behaviour change besides the
-radius being the host's (cosmic-comp/casement draw the window shape).
+radius being the host's (the compositor/casement draw the window shape).
 Step 2: lights 12 -> 14 px, gap 8 -> 10, inset 13 -> 20 (M-low: Tahoe lights are larger and
 sit lower in a 52 px toolbar); toolbar 52 high (with 32 buttons centred, 10 vertical pad;
 M-low) and the titlebar-only window 28; **no toolbar bottom line**; content scrolls under
 the toolbar with a hard scroll-edge fade 20 px (H qualitative; 20 px UNKNOWN); window radius
 26/16 per 2.1. The chrome tokens are shared with a compositor ("so the two cannot drift"), so
 `CHROME_SCALE` changes need the compositor lane informed: breaking for casement and the
-cosmic-comp fork - flag in 4.
+casement - flag in 4.
 
 ### 3.10 Sidebar (`chrome/sidebar.css`, `chrome/split_view`)
 
@@ -348,7 +348,7 @@ API: additive unless noted.
   mitigate by `#[non_exhaustive]`-free grep in sill/detent/mailo/anyview first).
 - `RowScale` gains `icon_tile`, `compact_height`; `ROW_SCALE` const fields are public:
   adding fields breaks struct-literal users (only quire constructs it).
-- `CHROME_SCALE` values change in step 2 (compositor-visible; **breaking for casement/cosmic-comp
+- `CHROME_SCALE` values change in step 2 (compositor-visible; **breaking for casement/the compositor
   lane**: coordinate).
 - `SpacingToken` gains S20..S48 (additive).
 - `FontSize::Title` retune is value-breaking for every consumer: use new `Title2` instead.
@@ -403,7 +403,7 @@ The owner took every recommended default below; they are decisions, not open que
    Step 2 is built on this ladder; verification against the macOS 26 Design Resources kit is a
    pending manual check.
 2. **Window corner radius** 26 (toolbar windows) and 16 (titlebar-only, UNKNOWN): the compositor
-   draws windows, so does casement/cosmic-comp own these? Recommended: yes, expose
+   draws windows, so does casement/the compositor own these? Recommended: yes, expose
    `--r-window` as the token both read.
 3. **Alert title size**: Sonoma's own alert title is 13 bold; the owner asked for bigger. Default
    17/700.

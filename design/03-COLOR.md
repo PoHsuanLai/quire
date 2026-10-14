@@ -278,7 +278,7 @@ pub enum BlurState { Available, Unavailable }  // data-blur=on|off -> --m-tint v
 | Nested scope | `Surface(material, theme)` sets a material for a subtree without a stylesheet | `P:323` |
 | Blur on | the surface paints `--m-tint` (translucent) and the compositor blurs behind it | `P:316` |
 | Blur off | the surface paints `--m-tint-solid`, alpha at least 0.94 | `P:316` |
-| Blur source | `ext-background-effect-v1` (cosmic-comp since 1.3.0; KWin 6.7.5 advertises it); needs an alpha buffer and a non-empty region; strength is the COSMIC theme's `frosted` setting | `P:152-155` |
+| Blur source | `ext-background-effect-v1` (the compositor since 1.3.0; KWin 6.7.5 advertises it); needs an alpha buffer and a non-empty region; strength is the theme's `frosted` setting | `P:152-155` |
 | Blur region | owned by the host: rounded 1 px strips per corner row, capped at the radius; the design system exposes only `Material::blur()` intent | `P:514-516` |
 | Fallback | opaque tinted material behind a flag if blur fails the spike | `P:527` |
 | Test | `material-legible-over-black-and-white` | `P:369` |
@@ -665,7 +665,7 @@ Still open:
   `C:87-170`; seal `C:315-319`; Candy look and warmth `C:776-966`; scrim and command wrap
   `C:1054-1060`.
 - `P` `~/.claude/plans/vast-toasting-peach.md`: context `P:18-19`; mailo accents `P:59`; filter
-  `P:75`; COSMIC blur `P:152-155`; gallery `P:269`; grain PNG `P:288`; token families
+  `P:75`; the desktop blur `P:152-155`; gallery `P:269`; grain PNG `P:288`; token families
   `P:291-304`; SpaceLook and Material `P:313-323`; legibility tests `P:366-369`; Blitz risks
   `P:418-426`; blur regions `P:514-516`; spike blur `P:527`; desktop Spaces `P:792-796`; app
   icons `P:810-825`; Appendix A3 `P:984-1026`; A8 `P:1486-1491`.
