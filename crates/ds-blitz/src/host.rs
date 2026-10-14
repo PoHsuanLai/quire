@@ -26,8 +26,11 @@
 //! - Files dragged in from outside (winit's data-transfer events, which blitz-shell ignores), as
 //!   `ds::file_drop::board::FileDropBoard`: the drag is hit-tested through the document and the target under a
 //!   release hears its `ondrop` (`crate::window_drop`, `crate::drop_hit`).
-//! - The window's scale factor, in `ds::prelude::HostSignals`, so `Ds` writes the pixel tokens for it and a
-//!   hairline is one device pixel wide. The window path cannot snap positions (blitz-shell
+//! - The document's scale, in `ds::prelude::HostSignals`: the window's scale factor times the
+//!   page zoom blitz-shell keeps (Ctrl or Super with `=`, `-` and `0`), so `Ds` writes the pixel
+//!   tokens for it and a hairline is one device pixel wide, and a surface that draws its own
+//!   pixels (a texture) draws them at the size the page is laid out at. The window's pointer
+//!   positions become CSS pixels by the same scale. The window path cannot snap positions (blitz-shell
 //!   resolves and paints in one call, with nothing between; FINDINGS "Pixel snapping"), so at a
 //!   fractional scale a line may still start half-way through a device pixel here.
 //!
@@ -191,27 +194,35 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let sizer = use_context_provider(|| WindowSizer::new(Arc::clone(&window), requests.clone()));
     let dragged = use_hook(|| Rc::new(RefCell::new(WindowDrop::default())));
     use_window_event(move |event, event_loop| {
+        // The document's scale as it stood before this event: blitz-shell changes the zoom only
+        // after the hook has heard the key, so a zoom shows here from the next event on.
+        let factor = document_scale(&seen.borrow(), window.scale_factor());
+        let next = scale_of(factor);
+        if *signals.scale.peek() != next {
+            let mut current = signals.scale;
+            current.set(next);
+            resized.bump();
+        }
         if let (Some(keeper), Some(handle)) = (&keeper, seen.borrow().as_ref()) {
             keep(&mut keeper.borrow_mut(), &DocRef::Handle(handle.clone()));
         }
         if let crate::frame_hover::FrameHover::Report(_) = hover {
-            let crossings = hovering.borrow_mut().crossings(
-                event,
-                window.scale_factor(),
-                seen.borrow().as_ref(),
-            );
+            let crossings = hovering
+                .borrow_mut()
+                .crossings(event, factor, seen.borrow().as_ref());
             report(&hover, crossings);
         }
         if let crate::frame_menu::FrameMenu::Report(_) = menu {
-            let asked =
-                hovering
-                    .borrow()
-                    .menu(event, window.scale_factor(), seen.borrow().as_ref());
+            let asked = hovering
+                .borrow()
+                .menu(event, factor, seen.borrow().as_ref());
             crate::frame_menu::report(&menu, asked);
         }
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
+            // The document hears the new factor after this hook: carry the zoom over now.
+            let zoom = factor / window.scale_factor().max(f64::EPSILON);
+            let next = scale_of(*scale_factor * zoom);
             let mut current = signals.scale;
-            let next = scale_of(*scale_factor);
             if *current.peek() != next {
                 current.set(next);
             }
@@ -248,7 +259,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         if let Some(gesture) = pinch_of(event, pointer_at) {
             gestures.publish(gesture);
         }
-        if let Some(pointer) = captured_of(event, window.scale_factor(), held)
+        if let Some(pointer) = captured_of(event, factor, held)
             && let Some(sink) = listeners.captured(pointer.phase)
         {
             sink.call(pointer);
@@ -264,9 +275,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
                 sink.call(ime);
             }
         }
-        let inputs = dragged
-            .borrow_mut()
-            .inputs(event, event_loop, window.scale_factor());
+        let inputs = dragged.borrow_mut().inputs(event, event_loop, factor);
         for input in inputs {
             let answer = file_drop.feed(input);
             dragged.borrow_mut().answer(event_loop, answer);
@@ -345,6 +354,15 @@ fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
     if let Some(live) = live {
         book.bind(live);
     }
+}
+
+/// The document's scale: the window's `factor` times the page zoom, or `factor` alone before
+/// the document is there.
+fn document_scale(document: &Option<NodeHandle>, factor: f64) -> f64 {
+    document
+        .as_ref()
+        .and_then(NodeHandle::try_doc)
+        .map_or(factor, |doc| f64::from(doc.viewport().scale()))
 }
 
 /// A winit scale factor in 120ths, the unit `ds::prelude::Scale` shares with the Wayland protocol.
