@@ -20,7 +20,7 @@ sill's `docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 ## Waiting on you (picks and checks, queued 2026-09-26)
 
 - [ ] **mailo fcitx5 check**: mailo's native-only flip is committed on a branch and waits on it.
-  Type Chewing (ㄋㄧˇㄏㄠˇ → 你好) into mailo's native build and confirm the preedit shows and
+  Type Bopomofo with McBopomofo (ㄋㄧˇㄏㄠˇ → 你好) into mailo's native build and confirm the preedit shows and
   commits; the mailo session has the exact steps.
 - [x] **Widget picks** (settled 2026-09-27: battery percent 500, track = plate darkened, one red; World Clock follows the scheme; filled device glyphs; cards tinted by the Space [superseded 2026-10-02: neutral plates, no Space tint, design/23 §1.0]; the widget card becomes an interface) (progress page "Widgets matched to the reference"): percent weight, ring
   track, low-battery colour, dark World Clock card, filled device glyphs, Space tint default.
@@ -44,7 +44,7 @@ sill's `docs/manual-checks.md`; shell-host's item f at 1.5 is listed there.
 ## quire
 
 - [ ] **EditSurface IME in a real window** (v0.1.7, FINDINGS "Edit surface"): with fcitx5 on
-  Chewing, run `cargo run -p ds-blitz --example edit`, click into the surface, type ㄋㄧˇㄏㄠˇ
+  McBopomofo, run `cargo run -p ds-blitz --example edit`, click into the surface, type ㄋㄧˇㄏㄠˇ
   and press Enter. Expect the printed inputs `Composition(Start)`, `Update("ㄋ")` …,
   `Update("")`, `End("你好")`, in that order, and no `Key`/`Text` while the preedit shows.
   No automated test drives winit's IME; re-check after every toolchain bump.
