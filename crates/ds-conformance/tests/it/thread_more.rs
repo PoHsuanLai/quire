@@ -144,18 +144,48 @@ fn an_open_menu_keeps_it_visible_with_the_pointer_away() {
     assert_eq!(harness.attr(MORE, "aria-expanded").as_deref(), Some("true"));
 }
 
+/// The button ends the name's line, after the time. Its hit box never covers the time; it may
+/// reach into the gap above the subject (its negative block margins, so the row is no taller),
+/// but the glyph it draws never covers the name, the subject or the snippet.
 #[test]
 fn it_never_overlaps_the_time_or_the_text() {
     let harness = settled(Three);
+    let apart = |a: Rect, b: Rect| {
+        a.right().0 <= b.left().0
+            || b.right().0 <= a.left().0
+            || a.bottom().0 <= b.top().0
+            || b.bottom().0 <= a.top().0
+    };
     let more = rect(&harness, MORE);
-    for other in [".ds-thread-time", ".ds-thread-main"] {
-        let other = rect(&harness, other);
-        let apart = more.right().0 <= other.left().0
-            || other.right().0 <= more.left().0
-            || more.bottom().0 <= other.top().0
-            || other.bottom().0 <= more.top().0;
-        assert!(apart, "{more:?} overlaps {other:?}");
+    let time = rect(&harness, ".ds-thread-time");
+    assert!(apart(more, time), "{more:?} overlaps the time {time:?}");
+    let glyph = rect(&harness, &format!("{MORE} .ds-ic"));
+    for part in [".ds-thread-name", ".ds-thread-sub", ".ds-thread-snip"] {
+        let other = rect(&harness, part);
+        assert!(apart(glyph, other), "{glyph:?} overlaps {part} {other:?}");
     }
+}
+
+/// The time and the tail end the first line only, so the subject and the snippet run to the
+/// row's right inset (`--s-11`) and no column runs down the row's right side.
+#[test]
+fn the_subject_and_the_snippet_run_to_the_right_inset() {
+    let harness = settled(Three);
+    let thread = rect(&harness, ".ds-thread");
+    let inset = thread.right().0 - 11.0;
+    for part in [".ds-thread-sub", ".ds-thread-snip", ".ds-thread-tail"] {
+        let right = rect(&harness, part).right().0;
+        assert!(
+            (right - inset).abs() < 0.5,
+            "{part} ends at {right}, the inset at {inset}"
+        );
+    }
+    let name = rect(&harness, ".ds-thread-name");
+    let time = rect(&harness, ".ds-thread-time");
+    assert!(
+        time.top().0 >= name.top().0 && time.bottom().0 <= name.bottom().0,
+        "the time {time:?} is not within the name's line {name:?}"
+    );
 }
 
 #[test]

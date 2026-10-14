@@ -59,8 +59,8 @@ impl NameFit {
 /// enclosing `List`'s. `onclick` receives the press, so the caller can read Shift to peek.
 ///
 /// `more` is one trailing action (a [`RowMore`](crate::components::app::row_more::RowMore)) laid
-/// out in flow beside the tags in the tail, under the time: it can never cover the time or the
-/// text. `strip` is the older raised pill, absolutely placed over the row's right edge; the two
+/// out in flow beside the tags in the tail, which ends the first line after the time: it can
+/// never cover the time or the text, and the subject and snippet run under it. `strip` is the older raised pill, absolutely placed over the row's right edge; the two
 /// are independent. The row's height is [`thread_card_height`](crate::components::app::thread_height::thread_card_height), whichever slots it carries.
 ///
 /// `subject` and `snippet` are [`TextLine`]: a string, or the runs a search hit marked.
@@ -109,24 +109,24 @@ pub fn ThreadRow(
                     if let Some(via) = via {
                         span { class: "ds-thread-via", {via} }
                     }
+                    span { class: "ds-thread-tail",
+                        span {
+                            class: "ds-thread-time",
+                            onpointerenter: back.part_enter(on_time),
+                            onpointerleave: back.part_leave(on_time),
+                            "{time}"
+                        }
+                        span { class: "ds-thread-tags",
+                            {tags}
+                            if let Some(more) = more {
+                                {more}
+                            }
+                        }
+                    }
                 }
                 div { class: "ds-thread-sub ds-truncate", {text(&subject)} }
                 if let Some(snippet) = snippet {
                     div { class: "ds-thread-snip ds-truncate", {text(&snippet)} }
-                }
-            }
-            div { class: "ds-thread-tail",
-                span {
-                    class: "ds-thread-time",
-                    onpointerenter: back.part_enter(on_time),
-                    onpointerleave: back.part_leave(on_time),
-                    "{time}"
-                }
-                span { class: "ds-thread-tags",
-                    {tags}
-                    if let Some(more) = more {
-                        {more}
-                    }
                 }
             }
             if let Some((state, onchange)) = star {
