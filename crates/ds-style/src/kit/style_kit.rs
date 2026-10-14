@@ -13,10 +13,7 @@ use crate::css::{
 use crate::icon::family::PlateShare;
 use crate::kit::Kits;
 use crate::material::{level::LEVEL_VARS, stack::STACK_INPUTS};
-use crate::space::{
-    frame_vars::FrameVars,
-    look::{CardAccent, SpaceLook},
-};
+use crate::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::tokens::{
     chrome::ChromeToken,
     colour::ColourToken,
@@ -159,13 +156,8 @@ fn inline_vars() -> Vec<String> {
         .map(VarName::as_str)
         .map(str::to_owned);
     let swatches = Accent::ALL.iter().copied().map(swatch_var);
-    // Ask the frame for its names rather than restating them; a Space that lends its hue
-    // writes the most.
-    let look = SpaceLook {
-        card_accent: CardAccent::SpaceHue,
-        ..SpaceLook::default()
-    };
-    let frame = FrameVars::of(&look, Scheme::Light)
+    // Ask the frame for its names rather than restating them.
+    let frame = FrameVars::of(&SpaceLook::default(), Scheme::Light)
         .names()
         .into_iter()
         .map(str::to_owned);

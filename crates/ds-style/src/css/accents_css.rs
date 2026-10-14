@@ -3,8 +3,7 @@
 //! The dark blocks carry `data-theme=dark` as well, one attribute more specific than both the
 //! light accent blocks and the dark token block, so a dark root takes its accent's dark quad
 //! whatever the source order. Each block sets exactly the seven accent properties (design/03-COLOR.md
-//! section 20). A Space that lends the card its hue writes the same seven inline on the root,
-//! which beats all of these.
+//! section 20). A Space never overrides them: the card wears the desktop's accent.
 //!
 //! The `--swatch-<accent>` properties on `.ds` are every accent's own `--accent`, for a picker
 //! that has to paint all six at once: a swatch written `var(--accent)` would show the selected

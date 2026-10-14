@@ -6,7 +6,6 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
-use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
 
@@ -21,7 +20,6 @@ fn frame(index: usize) -> FrameVars {
         dots: PRESETS[index].dots.to_vec(),
         grain: Grain(0),
         theme: Theme::Light,
-        card_accent: CardAccent::Chosen,
     };
     FrameVars::of(&look, Scheme::Light)
 }

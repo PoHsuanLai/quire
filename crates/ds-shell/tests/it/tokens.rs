@@ -6,7 +6,6 @@
 use ds::prelude::*;
 use ds_shell::stylesheet;
 use ds_style::space::frame_vars::FrameVars;
-use ds_style::space::look::CardAccent;
 use ds_style::tokens::accent_table::accent_of;
 use ds_style::tokens::colour::ColourToken;
 use ds_style::tokens::easing::EasingToken;
@@ -345,11 +344,7 @@ fn every_var_the_stylesheet_reads_is_declared() {
         .filter(|name| name.starts_with("--"))
         .collect();
     // What the root writes inline: ask the program, not a copy of its list.
-    let look = SpaceLook {
-        card_accent: CardAccent::SpaceHue,
-        ..SpaceLook::default()
-    };
-    let inline: BTreeSet<String> = FrameVars::of(&look, Scheme::Light)
+    let inline: BTreeSet<String> = FrameVars::of(&SpaceLook::default(), Scheme::Light)
         .style_attr()
         .split(';')
         .filter_map(|pair| pair.split_once(':'))

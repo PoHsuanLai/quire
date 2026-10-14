@@ -69,19 +69,14 @@ pub const PRESETS: [Preset; 8] = [
 ];
 
 /// The look a workspace with no stored one takes: `PRESETS[index % 8]`, the preset's own grain
-/// or `default_grain`, theme System, and `default_accent` (design/21-SPACES.md section 4,
-/// keys `spaces.default_grain` and `spaces.default_card_accent`).
-pub fn default_look(
-    index: usize,
-    default_grain: super::look::Grain,
-    default_accent: super::look::CardAccent,
-) -> SpaceLook {
+/// or `default_grain`, and theme System (design/21-SPACES.md section 4, key
+/// `spaces.default_grain`).
+pub fn default_look(index: usize, default_grain: super::look::Grain) -> SpaceLook {
     let preset = PRESETS[index % PRESETS.len()];
     SpaceLook {
         dots: preset.dots.to_vec(),
         grain: preset.grain.map_or(default_grain, super::look::Grain),
         theme: Theme::System,
-        card_accent: default_accent,
     }
 }
 
@@ -89,7 +84,7 @@ pub fn default_look(
 mod tests {
     use super::{PRESETS, default_look};
     use crate::appearance::theme::Theme;
-    use crate::space::look::{CardAccent, Grain};
+    use crate::space::look::Grain;
 
     #[test]
     fn the_presets_are_named_in_the_design_order() {
@@ -113,11 +108,10 @@ mod tests {
             (10, 2, 0),
         ];
         for &(index, preset, grain) in CASES {
-            let look = default_look(index, Grain(0), CardAccent::SpaceHue);
+            let look = default_look(index, Grain(0));
             assert_eq!(look.dots, PRESETS[preset].dots, "workspace {index}");
             assert_eq!(look.grain, Grain(grain), "workspace {index}");
             assert_eq!(look.theme, Theme::System, "workspace {index}");
-            assert_eq!(look.card_accent, CardAccent::SpaceHue, "workspace {index}");
         }
     }
 }

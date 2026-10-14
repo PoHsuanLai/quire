@@ -1,7 +1,7 @@
 //! The Spaces a first run starts with.
 
 use super::model::{Space, SpaceId, Spaces};
-use crate::space::look::{CardAccent, Grain};
+use crate::space::look::Grain;
 use crate::space::presets::{PRESETS, default_look};
 
 impl<P, R> Spaces<P, R> {
@@ -15,14 +15,14 @@ impl<P, R> Spaces<P, R> {
                 id: SpaceId(index as u64),
                 name: format!("Space {}", index + 1),
                 link: None,
-                look: default_look(index, Grain::default(), CardAccent::default()),
+                look: default_look(index, Grain::default()),
                 payload,
             });
         let first = made.next().unwrap_or_else(|| Space {
             id: SpaceId(0),
             name: "Space 1".to_owned(),
             link: None,
-            look: default_look(0, Grain::default(), CardAccent::default()),
+            look: default_look(0, Grain::default()),
             payload: fallback(),
         });
         let mut spaces = Spaces::new(first);

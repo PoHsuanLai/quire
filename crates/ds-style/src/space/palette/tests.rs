@@ -315,7 +315,7 @@ fn half_rounds_the_way_javascript_does() {
 fn the_readout_is_the_ratio_of_the_derived_tokens() {
     // A fixed pick, measured here the long way from `derive` and `ratio`. The readout must say
     // exactly these numbers: the editor shows nothing it computed on its own.
-    use crate::space::look::{CardAccent, Grain, SpaceLook};
+    use crate::space::look::{Grain, SpaceLook};
     use crate::space::palette::{
         card::{POST_DARK, POST_LIGHT},
         readout::readout,
@@ -323,45 +323,37 @@ fn the_readout_is_the_ratio_of_the_derived_tokens() {
     use ds_core::colour::contrast::{Verdict, ratio};
     for scheme in [Scheme::Light, Scheme::Dark] {
         let dark = scheme == Scheme::Dark;
-        for accent in [CardAccent::SpaceHue, CardAccent::Chosen] {
-            let space = SpaceLook {
-                dots: HOME.to_vec(),
-                grain: Grain(35),
-                theme: crate::appearance::theme::Theme::System,
-                card_accent: accent,
-            };
-            let palette = derive(HOME, scheme);
-            let post = if dark { POST_DARK } else { POST_LIGHT };
-            let worst = |fore: &str| {
-                palette
-                    .stops
-                    .iter()
-                    .map(|stop| ratio(fore, stop).expect("hex"))
-                    .fold(f64::INFINITY, f64::min)
-            };
-            let roles = match accent {
-                CardAccent::SpaceHue => palette.accent_roles,
-                CardAccent::Chosen => crate::tokens::accent_table::accent_of(
-                    crate::appearance::accent::Accent::Blue,
-                    scheme,
-                ),
-            };
-            let ground = Hex::parse(post.surface).expect("hex");
-            let tint = roles.fill.over(roles.wash, ground).css();
-            let want = [
-                worst(&palette.ink),
-                worst(&palette.faint),
-                ratio(&roles.text.css(), post.surface).expect("hex"),
-                ratio(post.ink, &tint).expect("hex"),
-            ];
-            let checks = readout(&space, scheme);
-            let got: Vec<f64> = checks.iter().map(|check| check.measured).collect();
-            assert_eq!(got, want, "dark={dark} {accent:?}");
-            assert!(
-                checks.iter().all(|check| check.verdict() == Verdict::Pass),
-                "dark={dark} {accent:?}: {checks:?}"
-            );
-        }
+        let space = SpaceLook {
+            dots: HOME.to_vec(),
+            grain: Grain(35),
+            theme: crate::appearance::theme::Theme::System,
+        };
+        let palette = derive(HOME, scheme);
+        let post = if dark { POST_DARK } else { POST_LIGHT };
+        let worst = |fore: &str| {
+            palette
+                .stops
+                .iter()
+                .map(|stop| ratio(fore, stop).expect("hex"))
+                .fold(f64::INFINITY, f64::min)
+        };
+        let roles =
+            crate::tokens::accent_table::accent_of(crate::appearance::accent::Accent::Blue, scheme);
+        let ground = Hex::parse(post.surface).expect("hex");
+        let tint = roles.fill.over(roles.wash, ground).css();
+        let want = [
+            worst(&palette.ink),
+            worst(&palette.faint),
+            ratio(&roles.text.css(), post.surface).expect("hex"),
+            ratio(post.ink, &tint).expect("hex"),
+        ];
+        let checks = readout(&space, scheme);
+        let got: Vec<f64> = checks.iter().map(|check| check.measured).collect();
+        assert_eq!(got, want, "dark={dark}");
+        assert!(
+            checks.iter().all(|check| check.verdict() == Verdict::Pass),
+            "dark={dark}: {checks:?}"
+        );
     }
 }
 

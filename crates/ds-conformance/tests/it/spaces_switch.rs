@@ -66,11 +66,7 @@ fn command_two_switches_and_the_frame_takes_that_spaces_look() {
     );
     let second = frame_style(&harness);
     assert_ne!(first, second, "the root's frame variables follow the Space");
-    let look = ds::style::space::presets::default_look(
-        1,
-        ds::style::space::look::Grain(0),
-        ds::style::space::look::CardAccent::default(),
-    );
+    let look = ds::style::space::presets::default_look(1, ds::style::space::look::Grain(0));
     let solid = |scheme| ds::style::space::frame_vars::FrameVars::of(&look, scheme).solid;
     let (light, dark) = (solid(Scheme::Light), solid(Scheme::Dark));
     assert!(

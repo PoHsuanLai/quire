@@ -1,6 +1,6 @@
 use super::*;
 use crate::appearance::theme::Theme;
-use crate::space::look::{CardAccent, Grain};
+use crate::space::look::Grain;
 use crate::space::palette::Dot;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
@@ -202,6 +202,25 @@ fn a_link_is_stored_and_a_file_without_one_reads_as_unlinked() {
 }
 
 #[test]
+fn a_retired_card_accent_is_dropped_and_never_reaches_the_payload() {
+    // A payload that keeps every key it is given would keep the old accent word for ever.
+    type Open = Spaces<serde_json::Map<String, serde_json::Value>, String>;
+    let old = r#"{"spaces":[
+        {"name":"Work","grain":20,"theme":"dark","card_accent":"hint","folder":"a"}
+      ]}"#;
+    let spaces: Open = serde_json::from_str(old).expect("reads");
+    let work = &spaces.list()[0];
+    assert_eq!((work.look.grain, work.look.theme), (Grain(20), Theme::Dark));
+    assert_eq!(
+        work.payload.keys().collect::<Vec<_>>(),
+        ["folder"],
+        "only the app's own key"
+    );
+    let written = serde_json::to_string(&spaces).expect("serialises");
+    assert!(!written.contains("card_accent"), "{written}");
+}
+
+#[test]
 fn an_old_or_damaged_file_is_read_leniently() {
     // mailo's file from before the kit: no ids, positions in `recall`, a retired accent word.
     let old = r#"{"spaces":[
@@ -217,7 +236,6 @@ fn an_old_or_damaged_file_is_read_leniently() {
         "current is held to a real Space"
     );
     assert_eq!(spaces.list()[0].look.theme, Theme::Dark);
-    assert_eq!(spaces.list()[0].look.card_accent, CardAccent::SpaceHue);
     assert_eq!(spaces.list()[0].payload.folder, "a");
     assert_eq!(spaces.list()[1].look.theme, Theme::System);
     assert_eq!(

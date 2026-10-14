@@ -9,7 +9,6 @@ use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
-use ds::style::space::look::CardAccent;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
@@ -296,7 +295,6 @@ fn EditorApp() -> Element {
         dots: PRESETS[0].dots.to_vec(),
         grain: Grain(35),
         theme: Theme::System,
-        card_accent: CardAccent::SpaceHue,
     };
     rsx! {
         Root {

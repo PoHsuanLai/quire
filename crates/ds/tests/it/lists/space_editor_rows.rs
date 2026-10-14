@@ -6,7 +6,6 @@ use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::{MeasuredIn, MotionChoice};
 use ds::prelude::*;
-use ds_style::space::look::CardAccent;
 use ds_style::space::presets::PRESETS;
 
 /// Preset `index` as a Space's look, in `theme`.
@@ -15,7 +14,6 @@ fn look(index: usize, theme: Theme) -> SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
         grain: ds::prelude::Grain(35),
         theme,
-        card_accent: CardAccent::SpaceHue,
     }
 }
 

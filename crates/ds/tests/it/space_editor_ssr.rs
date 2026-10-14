@@ -21,7 +21,6 @@ use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::EditorFrame;
 use ds::prelude::*;
 use ds_core::colour::contrast::Verdict;
-use ds_style::space::look::CardAccent;
 use ds_style::space::palette::readout::readout;
 use ds_style::space::palette::{Capping, Dot, derive, swatch};
 use ds_style::space::presets::PRESETS;
@@ -73,13 +72,12 @@ fn scrub(html: &str) -> String {
     out
 }
 
-/// Preset `index` as a Space that lends its hue to the card.
+/// Preset `index` as a Space's look.
 fn preset_look(index: usize, grain: Grain) -> SpaceLook {
     SpaceLook {
         dots: PRESETS[index].dots.to_vec(),
         grain,
         theme: Theme::System,
-        card_accent: CardAccent::SpaceHue,
     }
 }
 
@@ -94,7 +92,7 @@ struct Case {
 }
 
 const CASES: &[Case] = &[
-    // SpaceEditor: the two sample Spaces in each scheme and a one-dot Space on the chosen accent.
+    // SpaceEditor: the two sample Spaces in each scheme and a one-dot Space.
     Case {
         state: "work-light",
         make: || editor(preset_look(0, Grain(35)), Scheme::Light, 0),
@@ -108,17 +106,8 @@ const CASES: &[Case] = &[
         make: || editor(preset_look(1, Grain(55)), Scheme::Light, 2),
     },
     Case {
-        state: "one-dot-chosen",
-        make: || {
-            editor(
-                SpaceLook {
-                    card_accent: CardAccent::Chosen,
-                    ..preset_look(2, Grain(40))
-                },
-                Scheme::Light,
-                0,
-            )
-        },
+        state: "one-dot",
+        make: || editor(preset_look(2, Grain(40)), Scheme::Light, 0),
     },
     Case {
         state: "named",

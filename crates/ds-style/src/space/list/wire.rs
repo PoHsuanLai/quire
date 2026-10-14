@@ -6,15 +6,16 @@
 //! `recall` map costs only itself. A file with no Space at all is not a `Spaces` (the caller
 //! falls back to a first run). A Space with no `id`, as mailo wrote before the kit, takes its
 //! position, so keys that were positions (`recall`, Today's `space`) keep meaning the same Space.
+//! The `card_accent` key older files carry is read and dropped, so it never reaches the payload.
 
 use super::model::{Space, SpaceId, Spaces};
 use super::recall::Recall;
 use crate::appearance::theme::Theme;
-use crate::space::look::{CardAccent, Grain, SpaceLook};
+use crate::space::look::{Grain, SpaceLook};
 use crate::space::palette::{Dot, NEUTRAL_DOT};
 use crate::space::presets::default_look;
 use ds_core::word::Word;
-use serde::de::{DeserializeOwned, Error};
+use serde::de::{DeserializeOwned, Error, IgnoredAny};
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 use std::collections::{BTreeMap, BTreeSet};
@@ -106,8 +107,10 @@ struct SpaceRaw<P> {
     grain: Option<u8>,
     #[serde(default, deserialize_with = "lenient_theme")]
     theme: Theme,
-    #[serde(default, deserialize_with = "lenient_accent")]
-    card_accent: CardAccent,
+    /// The retired card accent: read so that an old file's key does not land in a flattened
+    /// payload, and never kept.
+    #[serde(default, rename = "card_accent")]
+    _card_accent: IgnoredAny,
     #[serde(flatten)]
     payload: P,
 }
@@ -154,10 +157,9 @@ impl<'de, P: DeserializeOwned, R: DeserializeOwned> Deserialize<'de> for Spaces<
 }
 
 fn from_raw<P>(raw: SpaceRaw<P>, id: SpaceId, index: usize) -> Space<P> {
-    let grain = raw.grain.map_or_else(
-        || default_look(index, Grain::default(), CardAccent::default()).grain,
-        Grain,
-    );
+    let grain = raw
+        .grain
+        .map_or_else(|| default_look(index, Grain::default()).grain, Grain);
     Space {
         id,
         name: raw.name,
@@ -166,7 +168,6 @@ fn from_raw<P>(raw: SpaceRaw<P>, id: SpaceId, index: usize) -> Space<P> {
             dots: raw.dots,
             grain,
             theme: raw.theme,
-            card_accent: raw.card_accent,
         }),
         payload: raw.payload,
     }
@@ -235,13 +236,4 @@ fn lenient_theme<'de, D: Deserializer<'de>>(d: D) -> Result<Theme, D::Error> {
         .as_str()
         .and_then(Theme::parse)
         .unwrap_or_default())
-}
-
-/// `hint` is what mailo wrote before the look was quire's and `space_hue` is quire's word for
-/// the same choice; every other word is the chosen accent.
-fn lenient_accent<'de, D: Deserializer<'de>>(d: D) -> Result<CardAccent, D::Error> {
-    Ok(match Value::deserialize(d)?.as_str() {
-        Some("hint" | "space_hue") => CardAccent::SpaceHue,
-        _ => CardAccent::Chosen,
-    })
 }
