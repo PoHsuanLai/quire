@@ -211,7 +211,8 @@ directory) and over `R`, the place the app was left at in a Space.
   its content slides in from (`in-r` for a later Space, `in-l` for an earlier one).
 - `Today<I, K>`: per Space, items opened in the last 12 hours (refreshed by opening again; closing or
   expiring touches only Today) and an optional *parked* kind `K` that never expires (a draft waiting
-  to be reopened, sent or discarded).
+  to be reopened, sent or discarded). `live` lists what has time left; an app whose entries stay
+  until they are closed or cleared lists `all` and loads with `load_today`, which does not prune.
 - Files: `spaces.json` in the app's config directory, `today.json` in its state directory
   (`ds_settings::SpacesStorage`, atomic writes). Payload keys sit flat beside the Space's own.
   A Space with no `id` (a file written before the kit) takes its position, so the position-keyed

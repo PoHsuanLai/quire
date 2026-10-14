@@ -315,6 +315,30 @@ fn entries_expire_twelve_hours_after_they_were_opened_and_parked_things_never_do
 }
 
 #[test]
+fn all_keeps_an_entry_that_live_has_expired() {
+    let mut today = Recent::default();
+    today.opened(SpaceId(0), 1, at(0));
+    today.opened(SpaceId(1), 2, at(0));
+    let later = at(48 * 3600);
+    let all: Vec<u32> = today
+        .all(SpaceId(0))
+        .iter()
+        .map(|entry| entry.item)
+        .collect();
+    assert_eq!(all, [1], "listed until closed or cleared");
+    assert!(
+        live(&today, 0, later).is_empty(),
+        "the default still expires"
+    );
+    today.clear(SpaceId(0));
+    assert!(
+        today.all(SpaceId(0)).is_empty(),
+        "clearing still removes it"
+    );
+    assert_eq!(today.all(SpaceId(1)).len(), 1);
+}
+
+#[test]
 fn deleting_a_space_forgets_only_its_entries() {
     let mut today: Today<u32, u8> = Today::default();
     today.opened(SpaceId(0), 1, at(0));

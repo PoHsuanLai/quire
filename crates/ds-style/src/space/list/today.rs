@@ -39,7 +39,9 @@ pub enum NoPark {}
 
 /// The items currently in Today, most recently opened first, and what is parked.
 ///
-/// Entries expire [`super::IDLE`] after they were last opened; parked things never expire.
+/// Entries expire [`super::IDLE`] after they were last opened, as [`Today::live`] and
+/// [`Today::prune`] read them; an app whose entries stay until they are closed or cleared reads
+/// [`Today::all`] instead. Parked things never expire.
 /// Closing or expiring an entry never touches the app's data. Written to `today.json` in the
 /// state directory.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
