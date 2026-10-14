@@ -1889,6 +1889,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-settings-page"
+version = "0.1.0"
+dependencies = [
+ "dioxus",
+ "dioxus-ssr",
+ "ds",
+ "ds-lint",
+ "ds-settings",
+ "toml",
+]
+
+[[package]]
 name = "ds-shell"
 version = "0.1.0"
 dependencies = [

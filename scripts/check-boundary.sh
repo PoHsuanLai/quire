@@ -24,6 +24,8 @@ cd "$(dirname "$0")/.."
 # ds-desktop (the capability probe) names zbus only through its opt-in `dbus` feature and dioxus
 # only through `dioxus`, so a build without them links neither; the rule below checks the default
 # build. Its all-features edges are none of ours.
+# ds-settings-page draws a schema (ds-settings' types) with ds's rows and controls; neither of those
+# may name the other, so the page is a crate of its own, and no D-Bus client or runtime comes with it.
 # ds-blitz reaches D-Bus only through its opt-in `print` and `menus` features, so an app that
 # never prints or exports a menu builds no D-Bus client for it, and pdfrum only through `pdf`; ds-harness inherits both rules
 # (it turns on `pdf` only for its own `pdf` feature). pdfrum-anyrender (a git dependency
@@ -40,6 +42,7 @@ RULES=(
   "ds-shell: zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds: chordkit-kde chordkit-gnome zbus notify tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-settings: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
+  "ds-settings-page: zbus tokio winit blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-helpers: dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-desktop: zbus dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-blitz: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
@@ -87,6 +90,7 @@ EDGES=(
   "ds: ds-core ds-intents ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
   "ds-settings: ds-behaviour ds-core ds-style ds-settings-derive"
+  "ds-settings-page: ds ds-settings"
   "ds-helpers:"
   "ds-desktop:"
   "ds-blitz: blitz-kit ds ds-desktop"

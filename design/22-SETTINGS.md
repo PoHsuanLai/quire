@@ -1297,7 +1297,23 @@ freeze above is not touched.
 - No program renders its own settings UI for keys the schema covers (mailo's appearance
   picker becomes the appearance picker component bound to `quire/appearance.toml`); an app
   may still embed the Settings app's rendering of its own schema in-app via the shared
-  `SettingsPage` component (04, proposed).
+  `SettingsPage` component (built: crate `ds-settings-page`, moved whole from mailo's
+  `settings_window/keys.rs`). It is a crate of its own because it needs `ds` and `ds-settings`,
+  which may not name each other. API:
+
+  ```rust,ignore
+  SettingsPage {
+      schemas: vec![Schema],            // a titled FormSection per section, a FieldRow per key
+      values: toml::Value,              // the file's content; a missing key reads its default
+      onedit: |edit: SettingEdit| ..,   // { path: KeyPath, value }; edit.applied_to(values)
+      extras: vec![SectionRows::new("Section title", rows).footer("note")],
+      children,                         // whole sections the app draws itself, last
+  }
+  ```
+
+  The page saves nothing; the app applies the edit and writes through its own `Store`. `extras`
+  rows join the section of that title, or stand as a section of their own after the schema's, so
+  a page of only app rows (a shortcut list) uses the same `Form` look with no schema.
 - Every "proposed" value in this doc is Basic or Advanced per section 5; nothing is file-only
   without also being in the schema.
 

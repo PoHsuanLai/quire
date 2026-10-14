@@ -1,0 +1,48 @@
+//! The control a key kind gets.
+
+use crate::pair::Pair;
+use ds_settings::schema::KeyKind;
+
+/// The control a key gets.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum Control {
+    Switch(Pair),
+    /// Two short choices, side by side.
+    Segments(Vec<String>),
+    /// Three or more choices, or a menu: a pop-up button showing the chosen one, as the Mac
+    /// draws any choice whose segments would squeeze the row's label.
+    PopUp(Vec<String>),
+    /// A kind this page does not draw yet: the value, read-only.
+    Shown,
+}
+
+/// What draws `kind`.
+pub(crate) fn control_of(kind: &KeyKind) -> Control {
+    match kind {
+        KeyKind::Toggle { variants } => Pair::of(variants)
+            .map(Control::Switch)
+            .unwrap_or_else(|| choice(variants.to_vec())),
+        KeyKind::Segmented { variants } => choice(variants.clone()),
+        KeyKind::Menu { variants } => Control::PopUp(variants.clone()),
+        KeyKind::Fixed { .. }
+        | KeyKind::Bounded { .. }
+        | KeyKind::Text
+        | KeyKind::Colour
+        | KeyKind::Shortcut
+        | KeyKind::List(_)
+        | KeyKind::Rows { .. }
+        | KeyKind::Live { .. } => Control::Shown,
+    }
+}
+
+/// The control for a choice between `words`: segments for two, a pop-up for more.
+fn choice(words: Vec<String>) -> Control {
+    match words.len() {
+        0..=2 => Control::Segments(words),
+        _ => Control::PopUp(words),
+    }
+}
+
+#[cfg(test)]
+#[path = "control_tests.rs"]
+mod tests;
