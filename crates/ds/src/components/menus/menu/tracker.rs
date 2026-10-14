@@ -139,14 +139,10 @@ impl Tracker {
     }
 
     /// The selected choice (not yet settled onto an enabled one): where the machine's cursor
-    /// stands, the first choice before anything was highlighted.
-    pub(crate) fn selected(&self) -> usize {
-        self.machine
-            .state()
-            .read()
-            .cursor()
-            .and_then(choice_of)
-            .unwrap_or(0)
+    /// stands, or `None` until the pointer or a key has put it somewhere. A menu opens with
+    /// nothing highlighted (design/13 section 13.3.2).
+    pub(crate) fn selected(&self) -> Option<usize> {
+        self.machine.state().read().cursor().and_then(choice_of)
     }
 
     /// The submenu shown: its placement, once its parent row is measured and for as long as the

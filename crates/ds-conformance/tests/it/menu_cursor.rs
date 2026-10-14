@@ -145,6 +145,6 @@ fn the_own_cursor_is_reported_as_it_moves() {
     harness.advance(ms(50));
     assert_eq!(
         log(&harness),
-        "active:Some(0),active:Some(1),active:Some(2),active:Some(1)"
+        "active:None,active:Some(0),active:Some(1),active:Some(0)"
     );
 }

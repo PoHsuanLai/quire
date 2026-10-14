@@ -272,7 +272,17 @@ fn a_disabled_item_is_skipped_by_down_and_ignores_a_click() {
             .as_deref(),
         Some("true")
     );
-    assert_eq!(selected(&harness), "Open");
+    assert_eq!(
+        selected(&harness),
+        "",
+        "the menu opens with nothing highlighted"
+    );
+    harness.send(Input::key(ShortcutKey::Down));
+    assert_eq!(
+        selected(&harness),
+        "Open",
+        "Down from nothing lands on the first"
+    );
     harness.send(Input::key(ShortcutKey::Down));
     assert_eq!(
         selected(&harness),
@@ -349,7 +359,7 @@ fn a_rest_opens_the_submenu_after_the_delay_and_left_closes_it() {
 fn right_opens_the_submenu_at_once_and_its_item_picks() {
     let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
-    for _ in 0..2 {
+    for _ in 0..3 {
         harness.send(Input::key(ShortcutKey::Down));
     }
     assert_eq!(selected(&harness), "More");
@@ -373,7 +383,7 @@ fn right_opens_the_submenu_at_once_and_its_item_picks() {
 fn escape_in_a_keyboard_submenu_closes_one_level() {
     let mut harness = Harness::new(MenuApp, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(ms(80));
-    for _ in 0..2 {
+    for _ in 0..3 {
         harness.send(Input::key(ShortcutKey::Down));
     }
     harness.send(Input::key(ShortcutKey::Enter));

@@ -66,6 +66,16 @@ fn marked<T: Clone + PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Vec
         .collect()
 }
 
+/// Where the item `value` names stands among the menu's choices (its items and submenu parents),
+/// for the menu to open with it highlighted.
+fn chosen_choice<T: PartialEq>(items: &[MenuItem<T>], value: Option<&T>) -> Option<usize> {
+    let value = value?;
+    items
+        .iter()
+        .filter(|item| matches!(item, MenuItem::Item { .. } | MenuItem::Submenu { .. }))
+        .position(|item| matches!(item, MenuItem::Item { value: own, .. } if own == value))
+}
+
 /// A pop-up button over `items`. `value` is the chosen item's value for a pop-up (its title
 /// is the button's); `title` is a pull-down's fixed label and a pop-up's while nothing is
 /// chosen. `onpick` hears the value a pick asks for; the caller's `value` decides what is
@@ -133,6 +143,11 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     let listed = match kind {
         PopUpKind::PopUp => marked(&items, value.as_ref()),
         PopUpKind::PullDown | PopUpKind::Overflow => items.clone(),
+    };
+    // A pop-up's menu opens on its chosen item; a pull-down's on nothing.
+    let start = match kind {
+        PopUpKind::PopUp => chosen_choice(&items, value.as_ref()),
+        PopUpKind::PullDown | PopUpKind::Overflow => None,
     };
     let (bezel, image, icon, trailing) = match kind {
         PopUpKind::PopUp => (
@@ -238,6 +253,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
                 placement: MenuPlacement::Popup,
                 anchor,
                 measured: button.rect(),
+                start,
                 items: listed,
                 onpick: move |picked: T| {
                     set_open(Shown::Hidden);
@@ -251,7 +267,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
 
 #[cfg(test)]
 mod tests {
-    use super::{chosen_title, marked};
+    use super::{chosen_choice, chosen_title, marked};
     use crate::components::menus::item::item::MenuItem;
     use ds_core::vocab::Check;
 
@@ -261,6 +277,14 @@ mod tests {
             MenuItem::Separator,
             MenuItem::new(2, "Move"),
         ]
+    }
+
+    #[test]
+    fn a_pop_up_opens_on_its_chosen_item_counted_among_the_choices() {
+        assert_eq!(chosen_choice(&items(), Some(&2)), Some(1));
+        assert_eq!(chosen_choice(&items(), Some(&1)), Some(0));
+        assert_eq!(chosen_choice(&items(), Some(&9)), None);
+        assert_eq!(chosen_choice(&items(), None), None);
     }
 
     #[test]
