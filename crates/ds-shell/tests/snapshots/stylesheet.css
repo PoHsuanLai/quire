@@ -1890,6 +1890,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=avatar],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=thumb],
 .ds-row[*|data-density=settings] .ds-row-leading[*|data-leading=image]{ width:var(--row-avatar); height:var(--row-avatar); }
+/* A palette result (38 high, as Spotlight's) carries its app icon or tile at 28. */
+.ds-row[*|data-density=palette] .ds-row-leading[*|data-leading=source],
+.ds-row[*|data-density=palette] .ds-row-leading[*|data-leading=avatar],
+.ds-row[*|data-density=palette] .ds-row-leading[*|data-leading=thumb],
+.ds-row[*|data-density=palette] .ds-row-leading[*|data-leading=image]{ width:var(--row-icon-tile); height:var(--row-icon-tile); }
 .ds-row-leading[*|data-leading=text]{ width:var(--row-icon-tile); height:var(--row-icon-tile); border-radius:var(--r-icon-tile); background:var(--fill-quaternary);
   font-family:var(--font-display); font-weight:800; font-size:var(--fs-control); color:var(--ink-soft); }
 .ds-row-leading[*|data-leading=avatar],

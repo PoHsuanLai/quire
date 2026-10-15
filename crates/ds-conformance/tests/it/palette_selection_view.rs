@@ -189,7 +189,8 @@ fn rows_24() -> PaletteGroups<u8> {
 
 /// The same under the palette's own keys (sill's real-input run): Down pressed eleven times in a
 /// 24-row group, with no caller holding the selection, brings row 11 (below the fold at rest)
-/// into view against the bottom edge; Up back to row 3 brings it in against the top edge. The
+/// into view against the bottom edge; Up back to row 2 (above the fold with 38 px palette rows)
+/// brings it in against the top edge. The
 /// palette is on a surface 420 px tall, as sill's launcher panel bounds it.
 #[test]
 fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
@@ -241,13 +242,13 @@ fn the_palettes_own_down_and_up_scroll_the_selection_into_view() {
         (bottom(shown) - bottom(view)).abs() < 1.0,
         "against the bottom edge: {shown:?} in {view:?}"
     );
-    for _ in 0..8 {
+    for _ in 0..9 {
         harness.send(Input::key(ShortcutKey::Up));
         harness.advance(ms(20));
     }
     harness.advance(ms(100));
     let up = selected_rect(&harness);
-    assert!(inside(up, view), "row 3 in view: {up:?} in {view:?}");
+    assert!(inside(up, view), "row 2 in view: {up:?} in {view:?}");
     assert!(
         (top(up) - top(view)).abs() < 1.0,
         "against the top edge: {up:?} in {view:?}"
