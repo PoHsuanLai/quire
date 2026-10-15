@@ -2,9 +2,11 @@
 //! and the state the lights are in.
 
 pub mod light;
+pub mod light_hue;
 pub mod scale;
 pub mod token;
 
 pub use light::{GroupHover, LightFill, LightState, light_state};
+pub use light_hue::{Light, light_hue};
 pub use scale::{CHROME_SCALE, ChromeScale};
 pub use token::ChromeToken;
