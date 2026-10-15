@@ -152,6 +152,20 @@ fn pop3_form() -> Vec<FormField> {
     ]
 }
 
+/// The IMAP form with its ports and security choices under the Advanced disclosure.
+fn advanced_imap_form() -> Vec<FormField> {
+    imap_form()
+        .into_iter()
+        .map(|field| match field.role {
+            FieldRole::Port
+            | FieldRole::Security
+            | FieldRole::OutgoingPort
+            | FieldRole::OutgoingSecurity => field.advanced(),
+            _ => field,
+        })
+        .collect()
+}
+
 fn address(text: &str) -> FormField {
     field(FieldRole::Address, FieldText::Plain(text.to_owned()))
 }
@@ -394,6 +408,19 @@ const SPECIMENS: &[Specimen] = &[
     }),
     ("sign-in-manual-imap", || sign_in(imap_form(), None)),
     ("sign-in-manual-jmap", || sign_in(jmap_form(), None)),
+    ("sign-in-manual-advanced", || {
+        sign_in(advanced_imap_form(), None)
+    }),
+    ("sign-in-manual-advanced-invalid", || {
+        sign_in(
+            advanced_imap_form(),
+            Some(FieldProblem {
+                role: FieldRole::OutgoingPort,
+                kind: ProblemKind::Invalid,
+                attempt: Attempt(1),
+            }),
+        )
+    }),
     ("sign-in-manual-pop3-invalid", || {
         sign_in(
             pop3_form(),
@@ -734,6 +761,65 @@ fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
     assert!(
         pop3.contains("The port is not valid. Check it and try again."),
         "{pop3}"
+    );
+}
+
+/// The `data-shown` the form's disclosure writes on its root.
+fn disclosure_shown(html: &str) -> String {
+    let (_, after) = html
+        .split_once("class=\"ds-disclosure\"")
+        .expect("a disclosure");
+    let tag = after.split('>').next().unwrap_or_default();
+    let (_, value) = tag.split_once("data-shown=\"").expect("its data-shown");
+    value.split('"').next().unwrap_or_default().to_owned()
+}
+
+#[test]
+fn advanced_fields_sit_under_one_closed_disclosure_in_their_own_parts() {
+    let plain = light("sign-in-manual-imap");
+    assert!(!plain.contains("ds-disclosure"), "{plain}");
+    let advanced = light("sign-in-manual-advanced");
+    assert_eq!(
+        advanced.matches("class=\"ds-disclosure\"").count(),
+        1,
+        "{advanced}"
+    );
+    assert!(
+        advanced.contains("<span class=\"ds-disclosure-label\">Advanced</span>"),
+        "{advanced}"
+    );
+    let (shown, tucked) = advanced
+        .split_once("class=\"ds-acc-advanced\"")
+        .expect("the disclosure's sections");
+    assert_eq!(
+        shown.matches("class=\"ds-form-section\"").count(),
+        3,
+        "Incoming, Outgoing and Sign in stay in the form"
+    );
+    assert_eq!(
+        tucked.matches("class=\"ds-form-section\"").count(),
+        2,
+        "Incoming and Outgoing again, under Advanced"
+    );
+    assert!(
+        tucked.contains("placeholder=\"993\""),
+        "the port is under it"
+    );
+    assert!(!shown.contains("placeholder=\"993\""), "and not above it");
+    assert_eq!(
+        disclosure_shown(&advanced),
+        "hidden",
+        "closed until opened: {advanced}"
+    );
+    let marked = light("sign-in-manual-advanced-invalid");
+    assert_eq!(
+        disclosure_shown(&marked),
+        "visible",
+        "a marked advanced field opens it: {marked}"
+    );
+    assert!(
+        marked.contains("The outgoing port is not valid. Check it and try again."),
+        "{marked}"
     );
 }
 

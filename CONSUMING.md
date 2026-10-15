@@ -1001,7 +1001,10 @@ A few props worth knowing about before you read the signatures:
   field list; quire reshapes nothing. A port is a plain entry, empty meaning the usual port, with
   the host's number as `hint`. When any field has choices or a `part`, the form is a `Form` of
   titled `FormSection`s (neighbouring fields of one `FormPart`: Incoming, Outgoing, SignIn), one
-  `FieldRow` each; otherwise it is the plain stack of entries as before.
+  `FieldRow` each; otherwise it is the plain stack of entries as before. `.advanced()` puts a field
+  (`fold: FieldFold::Advanced`) under one "Advanced" `Disclosure` after the shown fields, grouped
+  there by its own part (mailo: the ports and security choices); the disclosure starts closed and
+  is open while a `problem` marks one of its fields.
 - `SpaceEditor` (and `SpaceDot`) live in `ds`, not `ds-shell`, and take two more optional props: `name: Option<String>` (the Space's own name
   field, drawn inside the editor rather than beside it) and
   `on_active_dot: Option<EventHandler<ActiveDot>>` (fires when the person's focus moves to a

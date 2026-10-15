@@ -2,17 +2,21 @@
 //! password, an app password or an API key, a server when the lookup missed it. The host owns
 //! every value and hears each keystroke; Continue stays disabled until every required field has
 //! text, and Return does the same as Continue. A refusal marks its field with a sentence under it
-//! (a password shakes once for each new refused attempt).
+//! (a password shakes once for each new refused attempt). Fields the host marks advanced (a port,
+//! a security choice) sit under one "Advanced" disclosure after the rest, in their own parts.
 
 use super::adapter::{Action, Entry, Intent, Landing, Pick, Rejection};
 use super::frame::StepFrame;
-use super::model::{FieldProblem, FieldRole, FieldText, FormField, FormPart, StepTitle};
-use super::wording::{field_label, field_placeholder, form_ready, part_words, problem_text};
+use super::model::{FieldFold, FieldProblem, FieldRole, FieldText, FormField, FormPart, StepTitle};
+use super::wording::{
+    ADVANCED_WORDS, field_label, field_placeholder, form_ready, part_words, problem_text,
+};
 use dioxus::prelude::*;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
+use ds::components::controls::disclosure::Disclosure;
 use ds::components::fields::field_row::{FieldRow, RowLayout};
 use ds::components::forms::{form::Form, form_section::FormSection};
-use ds_core::vocab::Availability;
+use ds_core::vocab::{Availability, Shown};
 use ds_core::word::Word;
 
 /// The sign-in form for `provider`, whose round `mark` leads the header. `on_input` hears the role of the field and what it now
@@ -31,10 +35,17 @@ pub fn SignInForm(
     on_cancel: EventHandler<()>,
     #[props(default)] title: StepTitle,
 ) -> Element {
+    let mut opened = use_signal(|| Shown::Hidden);
     let ready = form_ready(&fields, problem);
-    let grouped = fields
-        .iter()
-        .any(|field| field.choices.is_some() || field.part.is_some());
+    let grouped = fields.iter().any(|field| {
+        field.choices.is_some() || field.part.is_some() || field.fold == FieldFold::Advanced
+    });
+    let advanced = runs(&fields, FieldFold::Advanced);
+    let advanced_shown = if marks_advanced(&fields, problem) {
+        Shown::Visible
+    } else {
+        opened()
+    };
     let availability = if ready {
         Availability::Enabled
     } else {
@@ -53,10 +64,14 @@ pub fn SignInForm(
             body: rsx! {
                 if grouped {
                     Form {
-                        for (part , run) in runs(&fields) {
-                            FormSection { key: "{part.map_or(\"form\", |part| part.slug())}", title: part.map(part_title),
-                                for (index , field) in run {
-                                    {row(field, index == 0, problem, on_input)}
+                        {sections(runs(&fields, FieldFold::Shown), FieldFold::Shown, problem, on_input)}
+                        if !advanced.is_empty() {
+                            Disclosure {
+                                shown: advanced_shown,
+                                on_toggle: move |next: Shown| opened.set(next),
+                                label: ADVANCED_WORDS.to_owned(),
+                                div { class: "ds-acc-advanced",
+                                    {sections(advanced, FieldFold::Advanced, problem, on_input)}
                                 }
                             }
                         }
@@ -79,11 +94,13 @@ pub fn SignInForm(
 /// The part a run of fields sits in, and the fields of the run with their place in the form.
 type Run<'a> = (Option<FormPart>, Vec<(usize, &'a FormField)>);
 
-/// The fields cut into runs of neighbours that share a part, in the order given.
-fn runs(fields: &[FormField]) -> Vec<Run<'_>> {
+/// The fields that stand where `fold` says, cut into runs of neighbours that share a part, in
+/// the order given; each keeps its place in the whole form.
+fn runs(fields: &[FormField], fold: FieldFold) -> Vec<Run<'_>> {
     fields
         .iter()
         .enumerate()
+        .filter(|(_, field)| field.fold == fold)
         .fold(Vec::<Run>::new(), |mut runs, (index, field)| {
             match runs.last_mut() {
                 Some((part, run)) if *part == field.part => run.push((index, field)),
@@ -91,6 +108,33 @@ fn runs(fields: &[FormField]) -> Vec<Run<'_>> {
             }
             runs
         })
+}
+
+/// One section per run, each titled with its part.
+fn sections(
+    runs: Vec<Run<'_>>,
+    fold: FieldFold,
+    problem: Option<FieldProblem>,
+    on_input: EventHandler<(FieldRole, FieldText)>,
+) -> Element {
+    rsx! {
+        for (part , run) in runs {
+            FormSection { key: "{fold.slug()}-{part.map_or(\"form\", |part| part.slug())}", title: part.map(part_title),
+                for (index , field) in run {
+                    {row(field, index == 0, problem, on_input)}
+                }
+            }
+        }
+    }
+}
+
+/// Whether `problem` marks a field under the Advanced disclosure, which must then be open.
+fn marks_advanced(fields: &[FormField], problem: Option<FieldProblem>) -> bool {
+    problem.is_some_and(|problem| {
+        fields
+            .iter()
+            .any(|field| field.fold == FieldFold::Advanced && field.role == problem.role)
+    })
 }
 
 /// What the person's eye must not need to guess: the words over a group.
