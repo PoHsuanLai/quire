@@ -69,6 +69,8 @@ pub enum CellAlign {
     Leading,
     /// At the end: numbers.
     Trailing,
+    /// In the middle: a mark that stands for a value, such as a yes or no's tick.
+    Center,
 }
 
 /// One column.

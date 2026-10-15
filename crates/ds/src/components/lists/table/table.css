@@ -15,6 +15,7 @@
   justify-content:flex-start; font:inherit; font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); text-align:start; cursor:default;
 }
 .ds-table-column[*|data-align=trailing]{ justify-content:flex-end; }
+.ds-table-column[*|data-align=center]{ justify-content:center; }
 .ds-table-column:hover{ color:var(--ink); }
 .ds-table-column[*|aria-disabled=true]:hover{ color:var(--ink-soft); }
 .ds-table-column[*|aria-sort=ascending],
@@ -32,6 +33,7 @@
 /* A trailing cell (numbers, sizes, dates) does not fade: `.ds-truncate`'s fade covers its last 1.5em
    even when the text fits, and end-aligned text always ends there. Overflow still clips. */
 .ds-table-cell[*|data-align=trailing]{ text-align:end; mask-image:none; }
+.ds-table-cell[*|data-align=center]{ text-align:center; mask-image:none; }
 .ds-table .ds-row{ min-height:var(--row-compact-h); padding:0; }
 .ds-table .ds-row-words{ display:flex; flex-direction:row; }
 
@@ -43,6 +45,7 @@
 .ds-table[*|data-rules=hairline] .ds-table-cell{ display:flex; align-items:center; }
 .ds-table[*|data-rules=hairline] .ds-table-cell > *{ min-width:0; overflow:hidden; white-space:nowrap; }
 .ds-table[*|data-rules=hairline] .ds-table-cell[*|data-align=trailing]{ justify-content:flex-end; }
+.ds-table[*|data-rules=hairline] .ds-table-cell[*|data-align=center]{ justify-content:center; }
 .ds-table[*|data-rules=hairline] .ds-table-cell + .ds-table-cell{ border-left:var(--hair) solid var(--line); }
 .ds-table[*|data-rules=hairline] .ds-table-resize::after{ top:0; bottom:0; }
 
