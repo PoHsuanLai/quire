@@ -14,8 +14,11 @@ use ds::prelude::*;
 pub fn SpacesBars() -> Element {
     rsx! {
         Section { title: "SpacesBar", note: "SpacesBar {{ spaces, shown, expansion, on_pick, on_add }}: collapsed it is a row of names with the current one on the pill; the pointer over it expands it to a thumbnail for each Space with its name under it, the current one ringed in the accent. The plus at the right edge adds a Space. A Space a drag is over is lit (DropState::Target), one that could take the drop is outlined (Accepts). It drops in from the top edge and lifts away over --t-overview.",
+            // One bar to a row on a wide wall: expanded, three thumbnails are wider than a modal.
             div { class: "g-row g-row-top",
                 Bar { name: "SpacesBar, hover it".to_string(), held: None, over: DropState::Idle }
+            }
+            div { class: "g-row g-row-top",
                 Bar { name: "SpacesBar, held expanded, a drag over Desktop 3".to_string(), held: Some(BarExpansion::Expanded), over: DropState::Target }
             }
         }
@@ -47,7 +50,7 @@ fn Bar(name: String, held: Option<BarExpansion>, over: DropState) -> Element {
         .collect();
     rsx! {
         Specimen { name, code: Some("spaces, shown, expansion".to_string()),
-            div { class: "g-wall g-modal", style: "background-image:url(\"{wallpaper::uri()}\")",
+            div { class: "g-wall g-modal g-modal-wide", style: "background-image:url(\"{wallpaper::uri()}\")",
                 Ds { appearance, material: Material::Popover, stylesheet: Inject::Host,
                     div { class: "g-modal-stage",
                         div { class: "g-stage-pad",

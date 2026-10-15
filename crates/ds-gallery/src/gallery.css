@@ -112,6 +112,7 @@
 .g-level-label{width:150px}
 /* The control center specimen: the panel is 320 wide, 12 inside (design/13 section 13.3.7). */
 .g-modal{position:relative;width:560px;border-radius:var(--r-panel);overflow:hidden}
+.g-modal.g-modal-wide{width:760px}
 .g-modal-stage{height:300px}
 .g-cat-wide{width:1120px}
 .g-within-stage{display:flex;gap:var(--s-8);padding:var(--s-8);box-sizing:border-box}
