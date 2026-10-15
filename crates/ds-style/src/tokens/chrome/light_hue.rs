@@ -63,7 +63,6 @@ pub fn light_hue(light: Light, scheme: Scheme) -> (Hex, Hex) {
 mod tests {
     use super::{Light, light_hue};
     use crate::appearance::theme::Scheme;
-    use crate::tokens::token::Token;
     use ds_core::word::Word;
 
     const CSS: &str = include_str!("../../../../ds/src/components/chrome/window_frame.css");
