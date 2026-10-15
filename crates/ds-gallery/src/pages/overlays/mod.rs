@@ -10,4 +10,5 @@ pub mod palette_and_menu;
 pub mod pills;
 pub mod sheet;
 pub mod sheet_within;
+pub mod spaces_bar;
 pub mod tip_hooks;

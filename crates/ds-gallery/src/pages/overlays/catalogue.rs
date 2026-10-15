@@ -51,6 +51,7 @@ pub fn OverlaysCataloguePage() -> Element {
                 SideCase {}
             }
         }
+        crate::pages::overlays::spaces_bar::SpacesBars {}
         Section { title: "Tooltip", note: "Tooltip {{ text, shortcut, shown }}: one line, written `Name  ⌘K` (a noun, two spaces, the key), below its target, opened by the Tip profile (at once by default, 1 s cold under `TipDelay::Standard`) and gone when the pointer leaves. Under a caller's shown it is up or down on that say alone.",
             div { class: "g-row g-row-top",
                 Specimen { name: "Tooltip, hover it".to_string(),

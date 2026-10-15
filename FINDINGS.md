@@ -1898,3 +1898,40 @@ ISC; outline by default, with hand-filled solid forms because every icon needs o
 `Terminal` already existed (`Terminal` is Lucide `square-terminal`, solid by the owner's pick).
 Goldens to bless: `tests/snapshots/lists/pin_tile/glyph-pressed.html` and `glyph-unpressed.html`
 (new); the gallery's Glyphs page gains two specimens.
+
+## q-spacesbar
+
+Lane `q-spacesbar`, written without a build: nothing here has been compiled or run, so the gate decides.
+
+- **Motion.** `Anim::DropIn` / `Exit::LiftOut` (`a-drop-in` / `a-lift-out`, keyframes `drop-in` / `lift-out`): a
+  surface hung from the top edge slides down from `--drop-dy` above (default `--s-48`) with a fade, and leaves by the
+  reverse holding its last frame. New duration token `--t-overview` (`DurationToken::Overview`), 350 ms, Reduced
+  `--t-quick` like every motion token. design/13 R7 records that the system's overview duration is not published;
+  350 ms is the windows' flight as sill's `spacesbar` lane reports it (and equals design/05's `--d-fly`, a
+  different thing: a hover delay). Easing `--e-out` in, `--e-exit` out (arriving is not contact, so no spring). Reduced: `fade`
+  / `menu-out`.
+- **`SpacesBar`** (`ds::components::overlays::spaces_bar`, design/04 section 57). Props are typed:
+  `spaces: Vec<SpaceTile>`, `shown: Shown`, `on_pick(BarSpaceKey)`, `on_add: Option<..>`, `expansion:
+  Option<BarExpansion>` with `on_expansion_change` (controlled-component rule: `None` follows the pointer). It runs
+  its own `use_presence` with `DropIn` / `LiftOut`, so a host gets `on_hidden` at `settle(LiftOut)` and draws nothing
+  once hidden. The drag highlight reuses `DropState` (`Target` lit, `Accepts` outlined, `Source` dimmed).
+- **Departures.**
+  1. WorkspacePills lives in sill's `sill-shell-kit`, not in quire, so `SpacesBar` draws its own Space buttons (the
+     same look: the frame's `--f-pill` with `--shadow-current` for the current one) instead of reusing it.
+  2. Hover is `onpointerenter` / `onpointerleave` on the bar with no intent delay; Sonoma expands as the pointer
+     reaches the top edge, which only the host's layer-surface input region can decide.
+  3. The plus is always drawn when `on_add` is given (Sonoma shows it on hover).
+  4. No drag-and-drop logic: the host sets each tile's `DropState`.
+  5. The thumbnail card is 160 x 100 with no wallpaper stand-in; a Space with no `ImageSource` draws a quiet blank
+     card. When expanded the bar is taller than the collapsed row, so the host's surface must be at least
+     `padding + 100 + gap + name` (about 150 px) high, or the thumbnails are cut.
+- **Hand-written, to confirm at the gate (no build in this lane).** `ds-shell/tests/snapshots/stylesheet.css` (token
+  `--t-overview` in `.ds` and the Reduced block, the `drop-in` / `lift-out` keyframes and `--b` aliases, four pulse
+  classes and four Reduced rules, the `spaces_bar` sheet before `slider`), `ds/tests/snapshots/overlays/spaces_bar/
+  {collapsed,expanded}.html`, `docs/selectors.md`. If any differs, read the diff against the generated text before
+  blessing: the cause may be a mistake in the hand-written golden or in the component.
+- **Tests added.** `ds-motion` (reduced-form and keyframe tables cover the two new `Anim`s by `Anim::ALL`);
+  `ds/tests/it/motion_drift.rs` settle rows (384 ms); `ds-conformance/tests/it/drop_in_lift_out.rs` (presence on a
+  virtual clock, exact settle, Reduced); `ds-conformance/tests/it/spaces_bar.rs` (hover expands and collapses, press and
+  right-click, the plus, held expansion, the drop highlight, the lift); `SpaceTile` and `BarExpansion` unit tests; two
+  goldens.

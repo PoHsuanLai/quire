@@ -204,6 +204,9 @@ pub use crate::components::menus::search::view::SearchField;
 pub use crate::components::overlays::empty_state::EmptyState;
 pub use crate::components::overlays::flow::Flow;
 pub use crate::components::overlays::side_panel::SidePanel;
+pub use crate::components::overlays::spaces_bar::{
+    BarExpansion, BarSpaceKey, SpaceTile, SpacesBar,
+};
 pub use crate::root::chrome::RootChrome;
 pub use crate::root::common::Common;
 pub use crate::root::extent::RootExtent;

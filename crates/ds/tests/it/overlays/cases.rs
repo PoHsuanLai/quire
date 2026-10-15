@@ -38,6 +38,7 @@ use ds_style::icon::render::Glyph;
 use ds_style::icon::url::IconUrl;
 use ds_style::tokens::control_size::ControlSize;
 
+use ds::components::content::image_source::ImageSource;
 use ds::components::controls::button_model::Answers;
 use ds::components::overlays::empty_state::EmptyForm;
 use ds::components::overlays::inline_banner::InlineBanner;
@@ -935,4 +936,37 @@ pub const CASES: &[Case] = &[
         make: || rsx! { SidePanel { label: "Notification Center", shown: Shown::Hidden, p { "Nothing new." } } },
         wait: NOW,
     },
+    // SpacesBar: collapsed, a row of names with the current one marked and one that could take a
+    // drop; expanded, thumbnails with one picture, the current one and the one a drag is over.
+    Case {
+        component: "spaces_bar",
+        state: "collapsed",
+        make: || rsx! { SpacesBar { label: "Spaces", spaces: bar_spaces(), shown: Shown::Visible, on_pick: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "spaces_bar",
+        state: "expanded",
+        make: || rsx! { SpacesBar { label: "Spaces", spaces: bar_thumbnails(), shown: Shown::Visible, expansion: Some(BarExpansion::Expanded), on_pick: |_| {} } },
+        wait: NOW,
+    },
 ];
+
+/// Three Spaces, the second on show and the third able to take a drop.
+fn bar_spaces() -> Vec<SpaceTile> {
+    vec![
+        SpaceTile::new(BarSpaceKey("1".to_owned()), "Desktop 1"),
+        SpaceTile::new(BarSpaceKey("2".to_owned()), "Desktop 2").current(Selection::Selected),
+        SpaceTile::new(BarSpaceKey("3".to_owned()), "Desktop 3").in_drag(DropState::Accepts),
+    ]
+}
+
+/// Two Spaces: the one on show has a picture, the other has a drag over it and none.
+fn bar_thumbnails() -> Vec<SpaceTile> {
+    vec![
+        SpaceTile::new(BarSpaceKey("1".to_owned()), "Desktop 1")
+            .current(Selection::Selected)
+            .thumbnail(ImageSource("data:image/png;base64,AAAA".to_owned())),
+        SpaceTile::new(BarSpaceKey("2".to_owned()), "Desktop 2").in_drag(DropState::Target),
+    ]
+}

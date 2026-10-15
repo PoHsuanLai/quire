@@ -272,6 +272,7 @@ The single place a concept lives. Extend it; never write a second one.
 | An app's list of Spaces: `Space<P>` (with its optional desktop `link`), `Spaces<P, R>`, switching with the place restored and the slide direction, `Today<I, K>` (items that expire after 12 h, parked things that never do), the lenient `spaces.json` reading | `ds-style::space::list` (pure, generic over the app's payload; `ds::components::app::spaces` re-exports it) |
 | An app's `spaces.json` (config dir) and `today.json` (state dir): boot with a first run, a raw import and a payload fix-up; atomic writes | `ds-settings::SpacesStorage` (the app's data, not a `SettingsDoc`: the payload is the app's type) |
 | The Spaces controller (`use_spaces`, `use_today`), the switch chord, the sidebar head and foot, the Space's menu and its parts, the Today section | `ds::components::app::spaces` |
+| Mission Control's Spaces bar: names that expand to thumbnails, the plus, the drag highlight, the drop-in and lift-out | `ds::components::overlays::spaces_bar` (`SpacesBar`, `SpaceTile`; motion `Anim::DropIn`, `Exit::LiftOut`, `--t-overview`) |
 | The Look (one value set, the Mac values) | `ds-style::tokens` (no Look type; design/30 section 3) |
 | Glyphs (the `Icon` enum), plate, retint, classify | `ds-style::icon` |
 | Font faces as bytes | `ds-style::fonts`; registration with the renderer: `blitz-kit::fonts` |
@@ -671,7 +672,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |
 | Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
-| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `PaletteState`, `PaletteIn`, `PaletteOut`, `PaletteParams`, `PaletteIndex`, `PaletteMove`, `EmptyState`, `Flow`, `SidePanel`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
+| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `PaletteState`, `PaletteIn`, `PaletteOut`, `PaletteParams`, `PaletteIndex`, `PaletteMove`, `EmptyState`, `Flow`, `SidePanel`, `SpacesBar`, `SpaceTile`, `BarSpaceKey`, `BarExpansion`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
 
 `ds_shell::prelude` (16 names) holds the account sheets' components and the missing-helper sheet.
 sill's `sill_shell_kit::prelude` holds the shell components' names and `Widget`, `WidgetKind`,

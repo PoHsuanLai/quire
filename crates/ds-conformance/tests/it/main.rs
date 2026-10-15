@@ -116,6 +116,7 @@ mod space_dot_paint;
 mod space_editor_frame;
 mod space_editor_rows;
 mod space_look_signal;
+mod spaces_bar;
 mod spaces_foot_new_space;
 mod spaces_menu;
 mod spaces_switch;

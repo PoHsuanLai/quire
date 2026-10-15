@@ -191,6 +191,10 @@ pub(crate) const SHEETS: [(&str, &str); 97] = [
         "skeleton_row",
         include_str!("../components/overlays/skeleton_row.css"),
     ),
+    (
+        "spaces_bar",
+        include_str!("../components/overlays/spaces_bar/spaces_bar.css"),
+    ),
     ("slider", include_str!("../components/controls/slider.css")),
     (
         "scrubber",

@@ -4415,6 +4415,36 @@ fade; the layer stack keeps one open, since a press on another row's ⓘ is an o
 the first. In both modes the help is one element, `id` the row's `id` plus `-help` (else a slug of the
 label), and the row carries `aria-describedby` to it; on request it is visually hidden, not removed.
 
+### 57. SpacesBar (2026-10-15)
+
+**Purpose.** Mission Control's strip of Spaces along the top edge, as Sonoma and Sequoia draw it
+(design/27 pre-Liquid-Glass). Collapsed it is a centred row of the Spaces' names with the current one
+on the frame's pill; the pointer over the bar expands it to a thumbnail for each Space with its name
+under it, the current thumbnail ringed in the accent; a plus at the right edge adds a Space; a Space a
+drag is over is lit.
+**Markup.** `div.ds-spaces-bar[role=group][data-expansion][data-presence][data-pulse]` holding
+`div.ds-spaces-bar-side`, `div.ds-spaces-bar-row` (a `button.ds-spaces-bar-space[data-selected]
+[aria-current][data-drop][data-drag]` per Space, holding `span.ds-spaces-bar-thumb` (with
+`img.ds-spaces-bar-picture` when it has a picture; only while expanded) and `span.ds-spaces-bar-name`)
+and a second side holding `span.ds-spaces-bar-add` around a toolbar `Button`.
+**Props.** `SpacesBar { label, spaces: Vec<SpaceTile>, shown: Shown, on_pick: EventHandler<BarSpaceKey>,
+on_add: Option<EventHandler<()>>, add_label, on_hidden, expansion: Option<BarExpansion>,
+on_expansion_change: Option<EventHandler<BarExpansion>>, common }`. `SpaceTile::new(key, name)` with
+`.current(Selection)`, `.thumbnail(ImageSource)`, `.in_drag(DropState)`. `BarSpaceKey` is the host's own
+id, quoted back by `on_pick` and never read. `expansion` follows the controlled-component rule: `None`
+follows the pointer, `Some` is drawn whatever the pointer does and `on_expansion_change` hears each ask.
+A primary press only picks; a secondary one does nothing.
+**Values.** Bar padding `--s-8` by `--s-20`; Spaces `--s-16` apart; a Space `--r-small`, name 12.5 / 500
+(`--fs-meta`); collapsed current on `--f-pill` with `--shadow-current`; thumbnail 160 x 100, `--r-tiny`,
+`--f-pill-hover` ground, `--shadow-mark`; current and `DropState::Target` ring `--s-2` `--accent`;
+`Accepts` a `--hair` accent outline; `Source` dimmed to .35; thumbnails fade in over `--t-quick`.
+**Motion.** `drop-in` (`--t-overview --e-out`, 350 ms) in and `lift-out` (`--t-overview --e-exit`) out,
+by `use_presence`; `on_hidden` runs at `settle(LiftOut)`, when the host unmaps the surface. `--drop-dy`
+sets how far above it starts (`--s-48`). Reduced: a cross-fade over `--t-quick`.
+**Tests.** `ds/tests/it/components_overlays.rs` goldens (`spaces_bar/collapsed`, `expanded`);
+`ds-conformance/tests/it/spaces_bar.rs` (hover, press, plus, held expansion, drop lit, lift) and
+`drop_in_lift_out.rs` (the motion on a virtual clock).
+
 ## Open decisions
 
 Each needs a yes/no or a number before the owning wave starts. "Proposal" marks this document's

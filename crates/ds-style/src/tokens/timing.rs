@@ -43,7 +43,7 @@ pub enum DurationToken {
     /// `--t-shake` 420 ms: `shake-x`.
     Shake,
     /// `--t-overview` 350 ms: the flight of Mission Control's scene, windows and the Spaces
-    /// bar alike (design/05 section 3.3; the system's own value is not published, design/13 R7,
+    /// bar alike (design/05 section 3; the system's own value is not published, design/13 R7,
     /// so this is the flight the shell measures).
     Overview,
     /// `--t-send-ring` 5 s: the undo-send countdown ring, linear. [`DurationKind::Hold`]: the
