@@ -3,7 +3,6 @@
 use crate::capability::Executable;
 use crate::catalog::Entry;
 use std::ffi::OsString;
-use std::os::unix::fs::PermissionsExt;
 use std::path::Path;
 
 /// Whether a tool can be run.
@@ -36,8 +35,20 @@ impl Environment {
 
 fn is_executable(path: &Path) -> bool {
     std::fs::metadata(path)
-        .map(|meta| meta.is_file() && meta.permissions().mode() & 0o111 != 0)
+        .map(|meta| meta.is_file() && can_execute(&meta))
         .unwrap_or(false)
+}
+
+#[cfg(unix)]
+fn can_execute(meta: &std::fs::Metadata) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    meta.permissions().mode() & 0o111 != 0
+}
+
+/// A platform with no execute bit (Windows) runs a file by its name: any file found is a tool.
+#[cfg(not(unix))]
+fn can_execute(_meta: &std::fs::Metadata) -> bool {
+    true
 }
 
 fn on_path(path: &OsString, executable: &Executable) -> bool {
@@ -59,10 +70,11 @@ mod tests {
     use super::{Presence, presence};
     use crate::capability::Capability;
     use crate::catalog::Catalog;
-    use std::os::unix::fs::PermissionsExt;
 
     #[test]
+    #[cfg(unix)]
     fn probing_walks_path_for_an_executable_file() {
+        use std::os::unix::fs::PermissionsExt;
         let root = std::env::temp_dir().join(format!("ds-helpers-probe-{}", std::process::id()));
         let (bin, other) = (root.join("bin"), root.join("other"));
         std::fs::create_dir_all(&bin).expect("scratch");

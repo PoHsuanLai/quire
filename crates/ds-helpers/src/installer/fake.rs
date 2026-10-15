@@ -3,7 +3,6 @@
 
 use super::Request;
 use crate::outcome::Outcome;
-use std::os::unix::fs::PermissionsExt;
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, PoisonError};
 
@@ -89,6 +88,18 @@ fn leave(drop: &Drop) -> std::io::Result<()> {
     drop.tools.iter().try_for_each(|tool| {
         let file = drop.dir.join(&tool.name);
         std::fs::write(&file, &tool.body)?;
-        std::fs::set_permissions(&file, std::fs::Permissions::from_mode(0o755))
+        make_executable(&file)
     })
+}
+
+#[cfg(unix)]
+fn make_executable(file: &std::path::Path) -> std::io::Result<()> {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::set_permissions(file, std::fs::Permissions::from_mode(0o755))
+}
+
+/// A platform with no execute bit (Windows) needs none.
+#[cfg(not(unix))]
+fn make_executable(_file: &std::path::Path) -> std::io::Result<()> {
+    Ok(())
 }
