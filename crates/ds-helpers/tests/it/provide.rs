@@ -174,16 +174,19 @@ async fn outcomes_pass_through() {
     }
 }
 
+/// name, os-release, capability, the package, the program, the install lines.
+type UnsupportedCase = (
+    &'static str,
+    &'static str,
+    &'static str,
+    Option<&'static str>,
+    Option<&'static str>,
+    &'static [(Family, &'static str)],
+);
+
 #[tokio::test]
 async fn unknown_distro_or_family_gap_or_capability_is_unsupported() {
-    let table: [(
-        &str,
-        &str,
-        &str,
-        Option<&str>,
-        Option<&str>,
-        &[(Family, &str)],
-    ); 4] = [
+    let table: [UnsupportedCase; 4] = [
         (
             "unknown distro lists every family",
             "ID=nixos\n",
