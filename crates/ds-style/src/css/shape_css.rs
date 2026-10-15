@@ -1,6 +1,7 @@
 //! Shapes the stylesheet draws itself (the macOS polish pass, 2026-09-24): the squircle corner
 //! (`data-corner="squircle"`, [`crate::Corner::Squircle`]), the app-icon plate
-//! ([`crate::PlateFamily`] on an `IconView`) and the dock's reflective floor.
+//! ([`crate::PlateFamily`] on an `IconView`, whose paint a family icon tile shares) and the
+//! dock's reflective floor.
 //!
 //! A squircle is a `mask-image` of six layers (four corner quadrants and the cross between
 //! them, `icon/plate.rs`), and a mask clips the element's own `box-shadow` too, so the mask never
@@ -168,6 +169,10 @@ fn squircle_css() -> String {
     .concat()
 }
 
+/// What a plate family paints: the app-icon plate, and a grouped row's icon tile drawn in a
+/// family (`TileFace::Plate`), which reads the same three properties.
+const PAINTED: [&str; 2] = [".ds-plate", ".ds-icon-tile"];
+
 /// Section 2.5 at a 48 px tile: the inner top highlight (white .35), the inner rim (black .08)
 /// and a drop from `--shadow-2`'s outer part under a 1 px contact shadow.
 fn plate_css() -> String {
@@ -231,18 +236,19 @@ fn plate_css() -> String {
     ));
     for family in PlateFamily::ALL.iter().copied() {
         let (base, deep) = family.stops();
+        let named = attr_selector("data-family", family.slug());
         css.push_str(&rule(
-            &format!("{plate}{}", attr_selector("data-family", family.slug())),
+            &PAINTED.map(|painted| format!("{painted}{named}")).join(","),
             &stops(base, deep, family.glyph()),
         ));
     }
     let (base, deep, ink) = NEUTRAL_DARK;
+    let dark = attr_selector("data-theme", Scheme::Dark.slug());
+    let neutral = attr_selector("data-family", PlateFamily::Neutral.slug());
     css.push_str(&rule(
-        &format!(
-            ".ds{} {plate}{}",
-            attr_selector("data-theme", Scheme::Dark.slug()),
-            attr_selector("data-family", PlateFamily::Neutral.slug())
-        ),
+        &PAINTED
+            .map(|painted| format!(".ds{dark} {painted}{neutral}"))
+            .join(","),
         &stops(base, deep, ink),
     ));
     css.push_str(&tinted_plate_css(plate));
@@ -319,8 +325,8 @@ mod tests {
             "mask-size:min(var(--sq-k,28px),50%) min(var(--sq-k,28px),50%),",
             "100% calc(100% - 2*min(var(--sq-k,28px),50%)),calc(100% - 2*min(var(--sq-k,28px),50%)) 100%;mask-repeat:no-repeat;}",
             ".ds[*|data-frame=tinted][*|data-corner=squircle]::before,.ds[*|data-frame=tinted][*|data-corner=squircle]::after{content:none;}",
-            ".ds-plate[*|data-family=amber]{--plate-base:#f0a81e;--plate-deep:#8e5a05;--plate-ink:#16171a;}",
-            ".ds[*|data-theme=dark] .ds-plate[*|data-family=neutral]{--plate-base:#2a2e28;",
+            ".ds-plate[*|data-family=amber],.ds-icon-tile[*|data-family=amber]{--plate-base:#f0a81e;--plate-deep:#8e5a05;--plate-ink:#16171a;}",
+            ".ds[*|data-theme=dark] .ds-plate[*|data-family=neutral],.ds[*|data-theme=dark] .ds-icon-tile[*|data-family=neutral]{--plate-base:#2a2e28;",
             ".ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-l);--plate-deep:var(--plate-deep-l);--plate-ink:var(--plate-ink-l);}",
             ".ds[*|data-theme=dark] .ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-d);",
             ".ds-dock-floor{--dock-floor-fill:",

@@ -2,7 +2,8 @@
 //! keeps its words' width when the window narrows, and a row inside a FormSection keeps its
 //! height and vertical padding; a source list's tiles follow the sidebar's size; a source list's
 //! glyphs take the ink of a selection that moves; RowMore's press reaches the host first; a
-//! grouped list after a FieldRow in one FormSection has the hairline between them.
+//! grouped list after a FieldRow in one FormSection has the hairline between them; a neutral
+//! family tile turns dark with the scheme and its glyph shows on it.
 
 use dioxus::prelude::*;
 use ds::base::geometry::units::{Point, Px};
@@ -17,6 +18,7 @@ use ds::components::lists::row::size::RowSize;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole};
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::style::icon::family::PlateFamily;
 use ds::style::tokens::control_size::{ControlSize, SidebarSize};
 use ds::style::tokens::hex::Hex;
 use ds_blitz::Extent;
@@ -364,5 +366,47 @@ fn a_grouped_list_after_a_field_row_has_the_hairline_between_them() {
     assert!(
         ground - edge >= 40 * 20,
         "no hairline where the list meets the row: ground {ground}, edge {edge}"
+    );
+}
+
+/// A FormSection in the dark scheme whose row leads with the neutral family's tile.
+#[allow(non_snake_case)]
+fn NeutralTileInDark() -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme: Theme::Dark, ..Appearance::default() }, material: Material::Window,
+            FormSection { title: "General".to_string(),
+                FieldRow { label: TextLine::from("Other"), leading: Some(TileFace::Plate(Icon::Globe, PlateFamily::Neutral)),
+                    span { "On" }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_neutral_tile_is_dark_paper_in_the_dark_and_its_glyph_shows() {
+    let mut harness = on_virtual(NeutralTileInDark);
+    let tile = harness.rect(".ds-icon-tile").expect("the tile");
+    let picture = harness.render_over(Backdrop::Scheme).expect("a picture");
+    let (left, top) = (tile.origin.x.0.ceil() as u32, tile.origin.y.0.ceil() as u32);
+    let side = tile.size.width.0.floor() as u32;
+    // The inner square, clear of the corners and the rim.
+    let greens: Vec<u32> = (top + 3..top + side - 3)
+        .flat_map(|y| (left + 3..left + side - 3).map(move |x| (x, y)))
+        .map(|(x, y)| u32::from(picture.get_pixel(x, y)[1]))
+        .collect();
+    let count = u32::try_from(greens.len()).expect("a small tile");
+    let mean = greens.iter().sum::<u32>() / count.max(1);
+    let (darkest, brightest) = (
+        greens.iter().copied().min().unwrap_or(0),
+        greens.iter().copied().max().unwrap_or(0),
+    );
+    assert!(
+        mean < 128,
+        "the tile is dark paper in the dark, not white: mean {mean}"
+    );
+    assert!(
+        brightest - darkest > 120,
+        "the glyph stands off the paper: {darkest}..{brightest}"
     );
 }

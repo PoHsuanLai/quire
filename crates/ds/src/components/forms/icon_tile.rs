@@ -5,11 +5,18 @@
 //!
 //! The ground is the caller's colour under a soft vertical gradient from a lighter step of the
 //! same hue (design/08: matte, per-app gradient, no outline); the glyph is the on-hue ink.
-//! Markup: `span.ds-icon-tile` (`style="--tile-bg;--tile-top"`) of a `Glyph`, or an `Avatar`.
+//! A tile may instead be drawn in one of design/08's plate families ([`TileFace::Plate`]): the
+//! family's stops and glyph ink, as its app-icon plate has them, so the neutral paper turns dark
+//! with the scheme and its glyph stays legible on it, where a white glyph on the paper's light
+//! stop would vanish.
+//! Markup: `span.ds-icon-tile` (`style="--tile-bg;--tile-top"`, or `data-family`) of a `Glyph`, or
+//! an `Avatar`.
 
 use crate::components::content::avatar::{AvatarFace, face};
 use dioxus::prelude::*;
+use ds_core::word::Word;
 use ds_style::icon::Icon;
+use ds_style::icon::family::PlateFamily;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::tokens::hex::Hex;
 
@@ -18,6 +25,9 @@ use ds_style::tokens::hex::Hex;
 pub enum TileFace {
     /// A rounded tile: `icon` in white on `colour`.
     Glyph(Icon, Hex),
+    /// A rounded tile in a plate family: `icon` in the family's glyph ink on its stops, the
+    /// neutral paper's dark paint in the dark scheme (design/08 sections 2.3 and 4.1).
+    Plate(Icon, PlateFamily),
     /// A person or account: the circular avatar.
     Avatar(AvatarFace),
 }
@@ -26,7 +36,7 @@ impl TileFace {
     /// The row's `data-leading` word: a tile is its own shape, an avatar the avatar's.
     pub(crate) fn slug(self) -> &'static str {
         match self {
-            TileFace::Glyph(..) => "tile",
+            TileFace::Glyph(..) | TileFace::Plate(..) => "tile",
             TileFace::Avatar(_) => "avatar",
         }
     }
@@ -37,6 +47,11 @@ pub fn tile(tile: TileFace) -> Element {
     match tile {
         TileFace::Glyph(icon, colour) => rsx! {
             IconTile { icon, colour }
+        },
+        TileFace::Plate(icon, family) => rsx! {
+            span { class: "ds-icon-tile", "data-family": family.slug(),
+                Glyph { icon, size: IconSize::Compact }
+            }
         },
         TileFace::Avatar(avatar) => face(avatar),
     }

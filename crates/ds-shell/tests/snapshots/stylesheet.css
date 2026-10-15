@@ -116,13 +116,13 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-plate-face{position:absolute;inset:0;border-radius:var(--r-plate);background:linear-gradient(135deg,var(--plate-base),var(--plate-deep));box-shadow:var(--plate-inner);mask-image:url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cpath%20d='M100.00%2050.00L99.99%2062.73L99.96%2066.80L99.90%2069.75L99.83%2072.14L99.73%2074.20L99.61%2076.01L99.47%2077.63L99.31%2079.12L99.13%2080.49L98.92%2081.75L98.69%2082.94L98.44%2084.05L98.17%2085.09L97.87%2086.08L97.55%2087.01L97.20%2087.89L96.84%2088.73L96.44%2089.52L96.02%2090.28L95.58%2091.00L95.11%2091.68L94.61%2092.33L94.08%2092.94L93.53%2093.53L92.94%2094.08L92.33%2094.61L91.68%2095.11L91.00%2095.58L90.28%2096.02L89.52%2096.44L88.73%2096.84L87.89%2097.20L87.01%2097.55L86.08%2097.87L85.09%2098.17L84.05%2098.44L82.94%2098.69L81.75%2098.92L80.49%2099.13L79.12%2099.31L77.63%2099.47L76.01%2099.61L74.20%2099.73L72.14%2099.83L69.75%2099.90L66.80%2099.96L62.73%2099.99L50.00%20100.00L37.27%2099.99L33.20%2099.96L30.25%2099.90L27.86%2099.83L25.80%2099.73L23.99%2099.61L22.37%2099.47L20.88%2099.31L19.51%2099.13L18.25%2098.92L17.06%2098.69L15.95%2098.44L14.91%2098.17L13.92%2097.87L12.99%2097.55L12.11%2097.20L11.27%2096.84L10.48%2096.44L9.72%2096.02L9.00%2095.58L8.32%2095.11L7.67%2094.61L7.06%2094.08L6.47%2093.53L5.92%2092.94L5.39%2092.33L4.89%2091.68L4.42%2091.00L3.98%2090.28L3.56%2089.52L3.16%2088.73L2.80%2087.89L2.45%2087.01L2.13%2086.08L1.83%2085.09L1.56%2084.05L1.31%2082.94L1.08%2081.75L0.87%2080.49L0.69%2079.12L0.53%2077.63L0.39%2076.01L0.27%2074.20L0.17%2072.14L0.10%2069.75L0.04%2066.80L0.01%2062.73L0.00%2050.00L0.01%2037.27L0.04%2033.20L0.10%2030.25L0.17%2027.86L0.27%2025.80L0.39%2023.99L0.53%2022.37L0.69%2020.88L0.87%2019.51L1.08%2018.25L1.31%2017.06L1.56%2015.95L1.83%2014.91L2.13%2013.92L2.45%2012.99L2.80%2012.11L3.16%2011.27L3.56%2010.48L3.98%209.72L4.42%209.00L4.89%208.32L5.39%207.67L5.92%207.06L6.47%206.47L7.06%205.92L7.67%205.39L8.32%204.89L9.00%204.42L9.72%203.98L10.48%203.56L11.27%203.16L12.11%202.80L12.99%202.45L13.92%202.13L14.91%201.83L15.95%201.56L17.06%201.31L18.25%201.08L19.51%200.87L20.88%200.69L22.37%200.53L23.99%200.39L25.80%200.27L27.86%200.17L30.25%200.10L33.20%200.04L37.27%200.01L50.00%200.00L62.73%200.01L66.80%200.04L69.75%200.10L72.14%200.17L74.20%200.27L76.01%200.39L77.63%200.53L79.12%200.69L80.49%200.87L81.75%201.08L82.94%201.31L84.05%201.56L85.09%201.83L86.08%202.13L87.01%202.45L87.89%202.80L88.73%203.16L89.52%203.56L90.28%203.98L91.00%204.42L91.68%204.89L92.33%205.39L92.94%205.92L93.53%206.47L94.08%207.06L94.61%207.67L95.11%208.32L95.58%209.00L96.02%209.72L96.44%2010.48L96.84%2011.27L97.20%2012.11L97.55%2012.99L97.87%2013.92L98.17%2014.91L98.44%2015.95L98.69%2017.06L98.92%2018.25L99.13%2019.51L99.31%2020.88L99.47%2022.37L99.61%2023.99L99.73%2025.80L99.83%2027.86L99.90%2030.25L99.96%2033.20L99.99%2037.27Z'/%3E%3C/svg%3E");mask-size:100% 100%;mask-repeat:no-repeat;}
 .ds-plate > .ds-ic,.ds-plate > .ds-ext-icon[*|data-kind=symbolic]{position:relative;width:var(--plate-glyph);height:var(--plate-glyph);}
 .ds-plate > .ds-ext-icon[*|data-kind=image]{position:relative;width:var(--plate-inset);height:var(--plate-inset);}
-.ds-plate[*|data-family=red]{--plate-base:#e8483c;--plate-deep:#b7352b;--plate-ink:#ffffff;}
-.ds-plate[*|data-family=amber]{--plate-base:#f0a81e;--plate-deep:#8e5a05;--plate-ink:#16171a;}
-.ds-plate[*|data-family=green]{--plate-base:#28b24a;--plate-deep:#1a7a33;--plate-ink:#16171a;}
-.ds-plate[*|data-family=blue]{--plate-base:#2b7cff;--plate-deep:#0b5fe0;--plate-ink:#ffffff;}
-.ds-plate[*|data-family=violet]{--plate-base:#8b5cf0;--plate-deep:#6b3fcc;--plate-ink:#ffffff;}
-.ds-plate[*|data-family=neutral]{--plate-base:#ffffff;--plate-deep:#f1f3ee;--plate-ink:#1a1e1a;}
-.ds[*|data-theme=dark] .ds-plate[*|data-family=neutral]{--plate-base:#2a2e28;--plate-deep:#1d211b;--plate-ink:#e8eae4;}
+.ds-plate[*|data-family=red],.ds-icon-tile[*|data-family=red]{--plate-base:#e8483c;--plate-deep:#b7352b;--plate-ink:#ffffff;}
+.ds-plate[*|data-family=amber],.ds-icon-tile[*|data-family=amber]{--plate-base:#f0a81e;--plate-deep:#8e5a05;--plate-ink:#16171a;}
+.ds-plate[*|data-family=green],.ds-icon-tile[*|data-family=green]{--plate-base:#28b24a;--plate-deep:#1a7a33;--plate-ink:#16171a;}
+.ds-plate[*|data-family=blue],.ds-icon-tile[*|data-family=blue]{--plate-base:#2b7cff;--plate-deep:#0b5fe0;--plate-ink:#ffffff;}
+.ds-plate[*|data-family=violet],.ds-icon-tile[*|data-family=violet]{--plate-base:#8b5cf0;--plate-deep:#6b3fcc;--plate-ink:#ffffff;}
+.ds-plate[*|data-family=neutral],.ds-icon-tile[*|data-family=neutral]{--plate-base:#ffffff;--plate-deep:#f1f3ee;--plate-ink:#1a1e1a;}
+.ds[*|data-theme=dark] .ds-plate[*|data-family=neutral],.ds[*|data-theme=dark] .ds-icon-tile[*|data-family=neutral]{--plate-base:#2a2e28;--plate-deep:#1d211b;--plate-ink:#e8eae4;}
 .ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-l);--plate-deep:var(--plate-deep-l);--plate-ink:var(--plate-ink-l);}
 .ds[*|data-theme=dark] .ds-plate[*|data-icon-style]{--plate-base:var(--plate-base-d);--plate-deep:var(--plate-deep-d);--plate-ink:var(--plate-ink-d);}
 .ds-dock-floor{--dock-floor-fill:linear-gradient(to top,rgba(255,255,255,.26),rgba(255,255,255,.08) 38%,rgba(255,255,255,0) 40%);position:absolute;inset:0;border-radius:inherit;background:var(--dock-floor-fill);opacity:var(--dock-floor);pointer-events:none;}
@@ -1124,6 +1124,12 @@ html,body{margin:0;padding:0;background:transparent}
   border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
   color:var(--on-hue);
 }
+/* A family tile (`data-family`, `TileFace::Plate`): the plate family's paint (`--plate-base`,
+   `--plate-deep`, `--plate-ink`, declared with the plate's rules, the neutral one dark paper in the
+   dark scheme), top to bottom as the tile's own gradient runs. The neutral paper is the group's
+   ground in either scheme, so it keeps a hairline rim, as the plate keeps its inner rim. */
+.ds-icon-tile[*|data-family]{ background-color:var(--plate-deep); background-image:linear-gradient(180deg, var(--plate-base), var(--plate-deep)); color:var(--plate-ink); }
+.ds-icon-tile[*|data-family=neutral]{ box-shadow:inset 0 0 0 var(--hair) var(--line); }
 /* -- icon_button_group -- */
 /* IconButtonGroup: small icon buttons on one rounded plate. The plate's radius follows the control
    size's ladder (`--ctl-r-*`); the quiet fill is the banner's. Attribute selectors carry `*|`
