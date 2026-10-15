@@ -134,7 +134,7 @@ fn a_dot_click_switches_but_not_while_a_part_is_open() {
     harness.send(Input::click(third));
     harness.advance(ms(50));
     assert_eq!(text(&harness, ".current"), "2");
-    // Right-click the first dot and choose Rename: a part is open for the first Space.
+    // Right-click the first dot and choose Edit Space: its sheet is open for the first Space.
     let first = harness
         .centre(".ds-spaces-dot-hold:nth-child(1) .ds-space-dot")
         .expect("first dot");
@@ -143,15 +143,15 @@ fn a_dot_click_switches_but_not_while_a_part_is_open() {
         ds::base::press::PointerButton::Secondary,
     ));
     harness.advance(ms(100));
-    let rename = harness
+    let edit = harness
         .centre(".ds-menu-item:nth-child(1) .ds-menu-label")
         .expect("the menu's first row");
-    harness.send(Input::click(rename));
+    harness.send(Input::click(edit));
     harness.advance(ms(400));
     assert_eq!(
-        harness.count(".ds-space-rename"),
+        harness.count(".ds-space-edit"),
         1,
-        "the name field is open"
+        "the Edit Space sheet is open"
     );
     let second = harness
         .centre(".ds-spaces-dot-hold:nth-child(2) .ds-space-dot")

@@ -180,6 +180,18 @@ pub enum FormPart {
     SignIn,
 }
 
+/// Whether a field stands in the form or under its Advanced disclosure.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
+pub enum FieldFold {
+    /// In the form, where the person sees it.
+    #[default]
+    Shown,
+    /// Under the form's one "Advanced" disclosure, after every shown field and grouped by its own
+    /// part there (a port, a security choice the usual value covers). The disclosure is closed
+    /// until the person opens it, and open while a problem marks one of its fields.
+    Advanced,
+}
+
 /// One field of the sign-in form. The host owns what is typed and hands it back on every render.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FormField {
@@ -198,10 +210,12 @@ pub struct FormField {
     /// A line of help under the entry (where to make an app password); `None` for none. A
     /// refusal of the field takes the line's place while it stands.
     pub help: Option<String>,
+    /// Whether it stands in the form or under the Advanced disclosure.
+    pub fold: FieldFold,
 }
 
 impl FormField {
-    /// A text entry with no choices, hint or group.
+    /// A text entry with no choices, hint or group, shown in the form.
     pub fn new(role: FieldRole, requirement: Requirement, text: FieldText) -> Self {
         Self {
             role,
@@ -211,6 +225,7 @@ impl FormField {
             hint: None,
             part: None,
             help: None,
+            fold: FieldFold::Shown,
         }
     }
 
@@ -242,6 +257,14 @@ impl FormField {
     pub fn in_part(self, part: FormPart) -> Self {
         Self {
             part: Some(part),
+            ..self
+        }
+    }
+
+    /// The same field under the form's Advanced disclosure, still in its own part there.
+    pub fn advanced(self) -> Self {
+        Self {
+            fold: FieldFold::Advanced,
             ..self
         }
     }

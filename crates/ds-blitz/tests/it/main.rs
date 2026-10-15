@@ -20,6 +20,7 @@ mod edit_surface_pointer;
 mod field_handle_focus;
 mod file_drop;
 mod focus_select;
+mod frame_image_click;
 mod frame_link_menu;
 mod frame_link_text;
 mod frame_links;

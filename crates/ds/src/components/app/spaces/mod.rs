@@ -3,12 +3,13 @@
 //! The model is pure (`ds_style::space::list`, re-exported here); persistence is
 //! `ds_settings::SpacesStorage`. This module is what sits between: the controller hooks
 //! ([`use_spaces`], [`use_today`]), the switch chord, and the views that draw a Space (the
-//! sidebar head and foot, the Space's menu, the Today section). The app supplies its payload,
+//! sidebar head and foot, the Space's menu and its Edit Space sheet, the Today section). The app supplies its payload,
 //! where it is (`here`), and how to show a place again (`arrived`).
 
 pub(crate) mod chord;
 pub(crate) mod controller;
 pub(crate) mod delete;
+pub(crate) mod edit;
 pub(crate) mod foot;
 pub(crate) mod head;
 pub(crate) mod menu_link;
@@ -27,6 +28,7 @@ pub use ds_style::space::list::{
     Entry, Epoch, IDLE, NoPark, Parked, Recall, Refused, Removed, SlideIn, Space, SpaceId, Spaces,
     Switched, Today,
 };
+pub use edit::EditSpaceSheet;
 pub use foot::SpacesFoot;
 pub use head::SpaceHead;
 pub use menu_link::{DesktopSpace, LinkChange, Linking};

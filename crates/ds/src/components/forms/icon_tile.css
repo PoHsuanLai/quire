@@ -7,3 +7,9 @@
   border-radius:var(--r-icon-tile); background-color:var(--tile-bg); background-image:linear-gradient(180deg, var(--tile-top), var(--tile-bg));
   color:var(--on-hue);
 }
+/* A family tile (`data-family`, `TileFace::Plate`): the plate family's paint (`--plate-base`,
+   `--plate-deep`, `--plate-ink`, declared with the plate's rules, the neutral one dark paper in the
+   dark scheme), top to bottom as the tile's own gradient runs. The neutral paper is the group's
+   ground in either scheme, so it keeps a hairline rim, as the plate keeps its inner rim. */
+.ds-icon-tile[*|data-family]{ background-color:var(--plate-deep); background-image:linear-gradient(180deg, var(--plate-base), var(--plate-deep)); color:var(--plate-ink); }
+.ds-icon-tile[*|data-family=neutral]{ box-shadow:inset 0 0 0 var(--hair) var(--line); }

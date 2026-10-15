@@ -3,16 +3,18 @@
    `panel-in` (`--t-move --e-out`) and out with `panel-out` (`--t-quick --e-exit`), holding its
    last frame until the host drops it; a swipe to the right carries it along (`--swipe-dx`, its
    exit starts there). Nothing is laid out while the hub is empty. The action is a quiet button
-   inside the pill, in the accent's ink on the pill. A hide taken back plays `hold`. */
+   inside the pill, in the accent's ink on the pill. A hide taken back plays `hold`. A short notice
+   stays on one line; a long one wraps inside a column of about 28em (never wider than the window
+   less its margins), and the action keeps its one line beside it. */
 
 .ds-toast{ position:absolute; right:var(--s-14); bottom:var(--s-14); transform:translateX(var(--swipe-dx,0px));
   display:flex; align-items:center; gap:var(--s-8); background:var(--ink); color:var(--paper); border-radius:var(--r-pill);
-  padding:var(--s-6) var(--s-6) var(--s-6) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; white-space:nowrap; pointer-events:auto; touch-action:none; }
+  padding:var(--s-6) var(--s-6) var(--s-6) var(--s-15); box-shadow:var(--shadow-2); font-size:var(--fs-meta); font-weight:600; box-sizing:border-box; max-width:min(28em, calc(100% - var(--s-14) * 2)); pointer-events:auto; touch-action:none; }
 .ds-toast[*|data-presence=entering],.ds-toast[*|data-presence=present]{ animation:panel-in var(--t-move) var(--e-out); }
 .ds-toast[*|data-presence=entering][*|data-pulse=b],.ds-toast[*|data-presence=present][*|data-pulse=b]{ animation-name:panel-in--b; }
 .ds-toast[*|data-presence=present][*|data-pulse=held]{ animation:hold var(--t-quick) var(--e-linear); }
 .ds-toast[*|data-presence=leaving]{ animation:panel-out var(--t-quick) var(--e-exit) forwards; pointer-events:none; }
-.ds-toast-body{ min-width:0; overflow:hidden; }
+.ds-toast-body{ min-width:0; overflow:hidden; white-space:normal; overflow-wrap:anywhere; line-height:1.35; }
 .ds-toast .ds-toast-action{ display:flex; align-items:center; gap:var(--s-6); background:var(--paper); color:var(--ink); border:0; border-radius:var(--r-pill);
-  padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; cursor:default;
+  flex:none; white-space:nowrap; padding:var(--s-5) var(--s-12) var(--s-5) var(--s-9); font-size:var(--fs-small); font-weight:700; cursor:default;
   transition:background-color var(--t-quick) var(--e-out); }

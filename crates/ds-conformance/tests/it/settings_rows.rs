@@ -1,7 +1,9 @@
 //! The rows of a settings pane on a real Blitz document: a FieldRow leads with a tile, its label
 //! keeps its words' width when the window narrows, and a row inside a FormSection keeps its
 //! height and vertical padding; a source list's tiles follow the sidebar's size; a source list's
-//! glyphs take the ink of a selection that moves; RowMore's press reaches the host first.
+//! glyphs take the ink of a selection that moves; RowMore's press reaches the host first; a
+//! grouped list after a FieldRow in one FormSection has the hairline between them; a neutral
+//! family tile turns dark with the scheme and its glyph shows on it.
 
 use dioxus::prelude::*;
 use ds::base::geometry::units::{Point, Px};
@@ -11,9 +13,12 @@ use ds::components::chrome::sidebar::Sidebar;
 use ds::components::chrome::sidebar_model::SidebarSection;
 use ds::components::fields::field_row::FieldRow;
 use ds::components::forms::icon_tile::TileFace;
+use ds::components::lists::list::model::ListStyle;
+use ds::components::lists::row::size::RowSize;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole};
 use ds::prelude::*;
 use ds::root::common::Common;
+use ds::style::icon::family::PlateFamily;
 use ds::style::tokens::control_size::{ControlSize, SidebarSize};
 use ds::style::tokens::hex::Hex;
 use ds_blitz::Extent;
@@ -42,6 +47,22 @@ fn Pane() -> Element {
                 FieldRow { label: TextLine::from("Quiet"),
                     span { "On" }
                 }
+            }
+        }
+    }
+}
+
+/// A FormSection holding a FieldRow and then a grouped List of one row.
+#[allow(non_snake_case)]
+fn RowThenList() -> Element {
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            FormSection { title: "General".to_string(),
+                FieldRow { label: TextLine::from("Quiet"),
+                    span { "On" }
+                }
+                List::<&'static str> { label: "Accounts", style: ListStyle::Grouped,
+                    items: vec![ListItem::row("a", "Ada", rsx! { Row { title: TextLine::from("Ada"), size: RowSize::Settings } })] }
             }
         }
     }
@@ -320,5 +341,72 @@ fn a_setting_rows_control_sits_at_the_trailing_edge() {
         (control_right - (row_right - 14.0)).abs() < 0.5,
         "the control ends at {control_right}, the row's padded edge is {}",
         row_right - 14.0
+    );
+}
+
+#[test]
+fn a_grouped_list_after_a_field_row_has_the_hairline_between_them() {
+    let mut harness = on_virtual(RowThenList);
+    let list = harness
+        .rect(".ds-form-section-group > .ds-list")
+        .expect("the list in the group");
+    let picture = harness.render_over(Backdrop::Scheme).expect("a picture");
+    // Across the row's width, right of its words: the group's ground, and the line on its top edge.
+    let top = list.origin.y.0.round() as u32;
+    let columns = || {
+        let start = (list.origin.x.0 + list.size.width.0 * 0.5) as u32;
+        start..start + 40
+    };
+    let green = |x: u32, y: u32| i64::from(picture.get_pixel(x, y)[1]);
+    let ground: i64 = columns().map(|x| green(x, top + 6)).sum();
+    let edge: i64 = (top.saturating_sub(1)..=top + 1)
+        .map(|y| columns().map(|x| green(x, y)).sum::<i64>())
+        .min()
+        .expect("three lines");
+    assert!(
+        ground - edge >= 40 * 20,
+        "no hairline where the list meets the row: ground {ground}, edge {edge}"
+    );
+}
+
+/// A FormSection in the dark scheme whose row leads with the neutral family's tile.
+#[allow(non_snake_case)]
+fn NeutralTileInDark() -> Element {
+    rsx! {
+        Ds { appearance: Appearance { theme: Theme::Dark, ..Appearance::default() }, material: Material::Window,
+            FormSection { title: "General".to_string(),
+                FieldRow { label: TextLine::from("Other"), leading: Some(TileFace::Plate(Icon::Globe, PlateFamily::Neutral)),
+                    span { "On" }
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_neutral_tile_is_dark_paper_in_the_dark_and_its_glyph_shows() {
+    let mut harness = on_virtual(NeutralTileInDark);
+    let tile = harness.rect(".ds-icon-tile").expect("the tile");
+    let picture = harness.render_over(Backdrop::Scheme).expect("a picture");
+    let (left, top) = (tile.origin.x.0.ceil() as u32, tile.origin.y.0.ceil() as u32);
+    let side = tile.size.width.0.floor() as u32;
+    // The inner square, clear of the corners and the rim.
+    let greens: Vec<u32> = (top + 3..top + side - 3)
+        .flat_map(|y| (left + 3..left + side - 3).map(move |x| (x, y)))
+        .map(|(x, y)| u32::from(picture.get_pixel(x, y)[1]))
+        .collect();
+    let count = u32::try_from(greens.len()).expect("a small tile");
+    let mean = greens.iter().sum::<u32>() / count.max(1);
+    let (darkest, brightest) = (
+        greens.iter().copied().min().unwrap_or(0),
+        greens.iter().copied().max().unwrap_or(0),
+    );
+    assert!(
+        mean < 128,
+        "the tile is dark paper in the dark, not white: mean {mean}"
+    );
+    assert!(
+        brightest - darkest > 120,
+        "the glyph stands off the paper: {darkest}..{brightest}"
     );
 }

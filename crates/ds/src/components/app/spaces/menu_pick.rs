@@ -11,10 +11,8 @@ use ds_style::space::look::SpaceLook;
 /// A row of the Space's menu, or a row the app added.
 #[derive(Debug, Clone, PartialEq)]
 pub enum SpacePick<A> {
-    /// Rename...: a field at the pointer.
-    Rename,
-    /// Colour...: the colour field, stops, grain and presets at the pointer.
-    Colour,
+    /// Edit Space...: the name and colour sheet (`EditSpaceSheet`).
+    Edit,
     /// Appearance, one of the themes.
     Theme(Theme),
     /// New Space; it opens its name at once.
@@ -59,8 +57,7 @@ fn checked(on: bool) -> Check {
     if on { Check::On } else { Check::Off }
 }
 
-/// The menu for a Space looking like `look`, one of `count`: Rename, Colour, Appearance, the
-/// app's `extra` rows (usually one submenu whose picks keep the menu open), the `linking` rows,
+/// The menu for a Space looking like `look`, one of `count`: Edit Space, Appearance, the app's `extra` rows (usually one submenu whose picks keep the menu open), the `linking` rows,
 /// a rule, New Space, and Delete only while there is another Space to show.
 pub fn rows<A: Clone>(
     look: &SpaceLook,
@@ -76,8 +73,7 @@ pub fn rows<A: Clone>(
         })
         .collect();
     let mut out = vec![
-        MenuItem::new(SpacePick::Rename, "Rename\u{2026}"),
-        MenuItem::new(SpacePick::Colour, "Colour\u{2026}"),
+        MenuItem::new(SpacePick::Edit, "Edit Space\u{2026}"),
         submenu("Appearance", themes),
     ];
     out.extend(extra.into_iter().map(|item| item.map(&SpacePick::App)));
@@ -93,8 +89,7 @@ pub fn rows<A: Clone>(
 /// Do `pick` to a Space looking like `look`.
 pub fn apply<A>(pick: SpacePick<A>, look: &SpaceLook) -> Then<A> {
     match pick {
-        SpacePick::Rename => Then::Open(Showing::Rename),
-        SpacePick::Colour => Then::Open(Showing::Colour),
+        SpacePick::Edit => Then::Open(Showing::Edit),
         SpacePick::Delete => Then::Open(Showing::Delete),
         SpacePick::New => Then::NewSpace,
         SpacePick::Theme(theme) => Then::Kept(SpaceLook {

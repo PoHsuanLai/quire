@@ -13,6 +13,7 @@
 use crate::frame_anchor::LinkFacts;
 use crate::frame_book::FrameBook;
 use crate::frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover};
+use crate::frame_image::{FrameImageClick, FrameImageHandler, FrameImages};
 use crate::frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
 use crate::frame_tag::FrameTag;
 use crate::origin::FrameId;
@@ -53,6 +54,8 @@ pub enum FrameLinks {
         hover: FrameHover,
         /// Whether a context menu asked over a link is reported too.
         menu: FrameMenu,
+        /// Whether a click on an image (outside any link) is reported too.
+        image: FrameImages,
     },
 }
 
@@ -63,6 +66,7 @@ impl FrameLinks {
             click: FrameLinkHandler(Arc::new(handler)),
             hover: FrameHover::Ignore,
             menu: FrameMenu::Ignore,
+            image: FrameImages::Ignore,
         }
     }
 
@@ -71,10 +75,13 @@ impl FrameLinks {
     pub fn with_hover(self, handler: impl Fn(FrameLinkHover) + Send + Sync + 'static) -> Self {
         match self {
             FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept { click, menu, .. } => FrameLinks::Intercept {
+            FrameLinks::Intercept {
+                click, menu, image, ..
+            } => FrameLinks::Intercept {
                 click,
                 hover: FrameHover::Report(FrameHoverHandler::new(handler)),
                 menu,
+                image,
             },
         }
     }
@@ -90,11 +97,46 @@ impl FrameLinks {
     ) -> Self {
         match self {
             FrameLinks::Inert => FrameLinks::Inert,
-            FrameLinks::Intercept { click, hover, .. } => FrameLinks::Intercept {
+            FrameLinks::Intercept {
+                click,
+                hover,
+                image,
+                ..
+            } => FrameLinks::Intercept {
                 click,
                 hover,
                 menu: FrameMenu::Report(FrameMenuHandler::new(handler)),
+                image,
             },
+        }
+    }
+
+    /// Also call `handler` when a primary click is released on an image inside a frame
+    /// (mailo opens an inline image in Peek): an `img` with a `src`, resolved against the frame's
+    /// base URL (a `cid:` reference stays `cid:`), and no link above it, since a click on a linked
+    /// image is the link's. `Inert` stays inert.
+    pub fn with_image_click(
+        self,
+        handler: impl Fn(FrameImageClick) + Send + Sync + 'static,
+    ) -> Self {
+        match self {
+            FrameLinks::Inert => FrameLinks::Inert,
+            FrameLinks::Intercept {
+                click, hover, menu, ..
+            } => FrameLinks::Intercept {
+                click,
+                hover,
+                menu,
+                image: FrameImages::Report(FrameImageHandler::new(handler)),
+            },
+        }
+    }
+
+    /// Whether a click on an image is reported.
+    pub fn images(&self) -> FrameImages {
+        match self {
+            FrameLinks::Inert => FrameImages::Ignore,
+            FrameLinks::Intercept { image, .. } => image.clone(),
         }
     }
 
@@ -119,10 +161,13 @@ impl fmt::Debug for FrameLinks {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             FrameLinks::Inert => f.write_str("Inert"),
-            FrameLinks::Intercept { hover, menu, .. } => f
+            FrameLinks::Intercept {
+                hover, menu, image, ..
+            } => f
                 .debug_struct("Intercept")
                 .field("hover", hover)
                 .field("menu", menu)
+                .field("image", image)
                 .finish_non_exhaustive(),
         }
     }

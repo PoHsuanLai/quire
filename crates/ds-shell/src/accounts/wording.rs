@@ -72,6 +72,9 @@ pub(crate) fn field_placeholder(role: FieldRole, requirement: Requirement) -> &'
     }
 }
 
+/// The disclosure the advanced fields of a form sit under.
+pub(crate) const ADVANCED_WORDS: &str = "Advanced";
+
 /// The title over a group of a long form.
 pub(crate) fn part_words(part: FormPart) -> &'static str {
     match part {
