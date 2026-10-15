@@ -2,6 +2,7 @@
 //! resizable columns over a `List` of rows.
 
 pub(crate) mod head;
+pub mod look;
 pub mod model;
 pub mod rules;
 pub mod view;

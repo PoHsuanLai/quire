@@ -12,7 +12,7 @@
 }
 .ds-table-column{
   display:flex; align-items:center; gap:var(--s-4); min-width:0; padding:0 var(--s-8); border:0; background:transparent;
-  font:inherit; font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); text-align:start; cursor:default;
+  justify-content:flex-start; font:inherit; font-size:var(--fs-help); font-weight:600; color:var(--ink-soft); text-align:start; cursor:default;
 }
 .ds-table-column[*|data-align=trailing]{ justify-content:flex-end; }
 .ds-table-column:hover{ color:var(--ink); }

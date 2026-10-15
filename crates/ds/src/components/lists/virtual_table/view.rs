@@ -14,13 +14,17 @@
 //! Markup: `div.ds-table.ds-vtable.ds-list[role=group]` (the grid template as `--table-cols`) of
 //! `div.ds-vtable-body` of the `Table`'s `div.ds-table-header` and a `Scroller` of a spacer,
 //! `div.ds-vtable-rows[role=listbox]` of `div.ds-vtable-item` (one `Row` each, `data-row` its
-//! index) and a spacer. `data-rules=hairline` draws the lines between columns and
-//! `data-scrolled=yes|no` (unless the header rule is `Never`) keys the line under the header. A table wider than its box scrolls sideways, header and rows together.
+//! index; `data-selected=yes` on the cursor's, `data-stripe=odd` on a striped one) and a spacer.
+//! `data-look=striped|unstriped` is a list look (absent for the plain grid), `data-rules=hairline`
+//! draws the lines between columns and `data-scrolled=yes|no` (unless the header rule is `Never`)
+//! keys the line under the header. A table wider than its box scrolls sideways, header and rows
+//! together.
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
 use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{cells, use_resize};
+use crate::components::lists::table::look::TableLook;
 use crate::components::lists::table::model::{Sort, TableColumn};
 use crate::components::lists::table::rules::{ColumnRules, HeaderRule};
 use crate::components::lists::virtual_list::layout::Layout;
@@ -55,7 +59,9 @@ pub const fn row_pitch() -> Px {
 /// to a row. `sort` is the sorted column and `on_sort` hears what a header press asks for.
 /// `cursor` is the selected row, kept in view; `onselect` hears a click, an arrow, Home, End,
 /// Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the cursor.
-/// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default). `rules` draws a hairline between the columns; `header_rule` draws one under the
+/// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default).
+/// `look` dresses the table (`TableLook::Plain`, the grid, by default; `Striped` and `Unstriped`
+/// are Finder's list view). `rules` draws a hairline between the columns; `header_rule` draws one under the
 /// header once the rows are scrolled (`HeaderRule::WhenScrolled`, the default). `pitch` is how
 /// tall every row is ([`row_pitch`], the compact row, by default): a table that zooms its rows
 /// gives the zoomed height, and a row may be shorter than the compact row.
@@ -76,6 +82,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] onselect: Option<EventHandler<usize>>,
     #[props(default)] onpick: Option<EventHandler<usize>>,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
+    #[props(default)] look: TableLook,
     #[props(default)] rules: ColumnRules,
     #[props(default)] header_rule: HeaderRule,
     #[props(default = row_pitch())] pitch: Px,
@@ -158,6 +165,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             tabindex: "0",
             "aria-label": common.aria_label.clone().unwrap_or_else(|| label.clone()),
             "data-focus": away,
+            "data-look": look.attribute(),
             "data-rules": rules.attribute(),
             "data-scrolled": scrolled,
             style: "--table-cols:{template}",
@@ -185,6 +193,8 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
                                 "aria-posinset": (row + 1).to_string(),
                                 "aria-setsize": rows.to_string(),
                                 "data-row": row.to_string(),
+                                "data-selected": (cursor == Some(row)).then_some("yes"),
+                                "data-stripe": look.striped(row).then_some("odd"),
                                 style: "height:{height}px",
                                 {content}
                             }

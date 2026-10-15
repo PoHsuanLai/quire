@@ -1,15 +1,17 @@
 //! `VirtualTable` over 100,000 rows asks for the cells of the rows in the viewport and a few
 //! around it only, keeps its header where it is while the rows scroll, scrolls to a row the owner
-//! asks for, and moves its cursor by row and by page.
+//! asks for, and moves its cursor by row and by page. Its list looks mark the table, stripe every
+//! other row by its index and mark the cursor's row; the plain grid is left unmarked.
 
 use dioxus::prelude::*;
 use ds::components::controls::scroller::handle::use_scroller;
+use ds::components::lists::table::look::TableLook;
 use ds::components::lists::table::model::TableColumn;
 use ds::components::lists::table::rules::{ColumnRules, HeaderRule};
 use ds::components::lists::virtual_table::{VirtualTable, row_pitch};
 use ds::prelude::*;
 use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
 
 const VIEW: Viewport = Viewport {
@@ -24,6 +26,8 @@ const OVERSCAN: usize = 4;
 thread_local! {
     /// The rows `cell` was called for, on this test's thread.
     static BUILT: RefCell<HashSet<usize>> = RefCell::new(HashSet::new());
+    /// The look `Looked` is drawn in, on this test's thread.
+    static LOOK: Cell<TableLook> = const { Cell::new(TableLook::Plain) };
 }
 
 fn built() -> usize {
@@ -212,4 +216,68 @@ fn the_header_rule_shows_once_the_rows_are_scrolled() {
     assert!(harness.html().contains("data-scrolled=\"yes\""));
     harness.send(Input::wheel(at, Px(0.0), Px(3.0 * row_pitch().0)));
     assert!(harness.html().contains("data-scrolled=\"no\""));
+}
+
+#[allow(non_snake_case)]
+fn Looked() -> Element {
+    let scroller = use_scroller();
+    let columns = vec![TableColumn::new(0u8, "Row", Px(80.0))];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "height:200px; width:300px; display:flex; flex-direction:column",
+                VirtualTable::<u8> {
+                    label: "Looked",
+                    columns,
+                    rows: ROWS,
+                    cell: Callback::new(|(row, _): (usize, usize)| rsx! { "{row}" }),
+                    scroller,
+                    on_sort: |_| {},
+                    cursor: Some(1),
+                    look: LOOK.get(),
+                }
+            }
+        }
+    }
+}
+
+#[test]
+fn a_list_look_is_marked_and_stripes_every_other_row_by_index_and_marks_the_cursor_row() {
+    // (look, data-look, stripes)
+    let cases = [
+        (TableLook::Plain, None, false),
+        (TableLook::Striped, Some("striped"), true),
+        (TableLook::Unstriped, Some("unstriped"), false),
+    ];
+    for (look, marked, striped) in cases {
+        LOOK.set(look);
+        let mut harness = Harness::new(Looked, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+        assert_eq!(harness.attr(".ds-vtable", "data-look").as_deref(), marked, "{look:?}");
+        assert_eq!(
+            harness.count(".ds-vtable-item[data-stripe=odd]") > 0,
+            striped,
+            "{look:?} stripes"
+        );
+        assert_eq!(harness.count(".ds-vtable-item[data-selected=yes]"), 1, "{look:?}");
+        assert_eq!(
+            harness.attr(".ds-vtable-item[data-row=\"1\"]", "data-selected").as_deref(),
+            Some("yes"),
+            "{look:?} the cursor row"
+        );
+        if striped {
+            // The stripe follows the row, not its place among those mounted.
+            assert!(harness.attr(".ds-vtable-item[data-row=\"1\"]", "data-stripe").is_some());
+            assert!(harness.attr(".ds-vtable-item[data-row=\"2\"]", "data-stripe").is_none());
+            let at = harness.centre(".ds-scroller").expect("the scroller");
+            harness.send(Input::wheel(at, Px(0.0), Px(-5.0 * row_pitch().0)));
+            let rows = mounted(&harness);
+            for row in rows {
+                let selector = format!(".ds-vtable-item[data-row=\"{row}\"]");
+                assert_eq!(
+                    harness.attr(&selector, "data-stripe").is_some(),
+                    row % 2 == 1,
+                    "row {row} after scrolling"
+                );
+            }
+        }
+    }
 }

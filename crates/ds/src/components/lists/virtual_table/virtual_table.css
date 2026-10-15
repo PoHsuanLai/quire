@@ -12,3 +12,30 @@
 /* A table zoomed out has rows shorter than the compact row: the row is the item's height. */
 .ds-vtable .ds-vtable-item > .ds-row{ min-height:0; }
 .ds-vtable-spacer{ flex:none; }
+
+/* The list looks (`TableLook::Striped` and `Unstriped`, Finder's list view and the SwiftUI Table;
+   `data-look`). The header stays above the scroller, so no row passes under it and it needs no
+   fill of its own; its hairline is the header rule's. Its titles are regular-weight, smaller than
+   the cells and in the secondary ink; the sort indicator is drawn on the sorted column only. A row
+   is inset by `--s-6` each side, so the selected row is a rounded block (`--r-shell-highlight`)
+   away from the table's edges, in the accent while the table holds the keyboard and in the grey
+   wash when it does not (row.css). Under the selected row's accent the secondary inks are the
+   selected ink. The stripes (`data-stripe=odd`, by the row's index so they stay put as the window
+   slides) and the tint under the pointer are on the item, the full width, and give way to the
+   selection. The table's ground is the content surface, and `--stripe` is a 3 % wash. No rule is
+   drawn between rows. */
+.ds-vtable[*|data-look]{ background:var(--surface); }
+.ds-vtable[*|data-look] .ds-table-header{ box-sizing:border-box; padding:0 var(--s-6); }
+.ds-vtable[*|data-look] .ds-table-column{ font-size:var(--fs-small); font-weight:500; color:var(--ink-soft); }
+.ds-vtable[*|data-look] .ds-table-column:hover,
+.ds-vtable[*|data-look] .ds-table-column[*|aria-sort=ascending],
+.ds-vtable[*|data-look] .ds-table-column[*|aria-sort=descending]{ color:var(--ink); }
+.ds-vtable[*|data-look] .ds-table-column[*|aria-disabled=true]:hover{ color:var(--ink-soft); }
+.ds-vtable[*|data-look] .ds-vtable-item > .ds-row{ margin:0 var(--s-6); }
+.ds-vtable[*|data-look=striped] .ds-vtable-item[*|data-stripe=odd]{ background:var(--stripe); }
+.ds-vtable[*|data-look] .ds-vtable-item[*|data-row]:hover{ background:var(--sel-neutral); }
+.ds-vtable[*|data-look] .ds-vtable-item[*|data-selected=yes],
+.ds-vtable[*|data-look] .ds-vtable-item[*|data-selected=yes]:hover{ background:transparent; }
+.ds:not([*|data-activity=inactive]) .ds-vtable[*|data-look]:not([*|data-focus=away]) .ds-row[*|data-focus=highlight][*|aria-selected=true]{
+  --ink-soft:var(--sel-ink); --ink-faint:var(--sel-ink);
+}
