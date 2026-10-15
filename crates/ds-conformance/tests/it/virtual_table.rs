@@ -1,16 +1,23 @@
 //! `VirtualTable` over 100,000 rows asks for the cells of the rows in the viewport and a few
 //! around it only, keeps its header where it is while the rows scroll, scrolls to a row the owner
 //! asks for, and moves its cursor by row and by page. Its list looks mark the table, stripe every
-//! other row by its index and mark the cursor's row; the plain grid is left unmarked.
+//! other row by its index and mark the cursor's row; the plain grid is left unmarked. A table that
+//! holds a leading column draws two panes of the same rows, and a click, Shift-click, Command-click
+//! or Shift-arrow reaches rows the way Finder's list does.
 
 use dioxus::prelude::*;
+use ds::base::press::PointerButton;
+use ds::base::selection::RowSelection;
 use ds::components::controls::scroller::handle::use_scroller;
 use ds::components::lists::table::look::TableLook;
 use ds::components::lists::table::model::TableColumn;
 use ds::components::lists::table::rules::{ColumnRules, HeaderRule};
 use ds::components::lists::virtual_table::{VirtualTable, row_pitch};
 use ds::prelude::*;
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{
+    Clock, DocQuery, Driver, Harness, HarnessConfig, Input, PointerAction, PointerInput, Query,
+    Viewport,
+};
 use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
 
@@ -298,4 +305,163 @@ fn a_list_look_is_marked_and_stripes_every_other_row_by_index_and_marks_the_curs
             }
         }
     }
+}
+
+#[allow(non_snake_case)]
+fn Picking() -> Element {
+    let scroller = use_scroller();
+    let mut chosen = use_signal(RowSelection::none);
+    let columns = vec![
+        TableColumn::new(0u8, "Row", Px(80.0)),
+        TableColumn::new(1u8, "Square", Px(120.0)),
+        TableColumn::new(2u8, "Cube", Px(120.0)),
+    ];
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { style: "height:200px; width:300px; display:flex; flex-direction:column",
+                VirtualTable::<u8> {
+                    label: "Picking",
+                    columns,
+                    rows: ROWS,
+                    cell: Callback::new(|(row, _): (usize, usize)| rsx! { "{row}" }),
+                    scroller,
+                    on_sort: |_| {},
+                    cursor: chosen().cursor(),
+                    selection: Some(chosen()),
+                    onreach: move |pick| {
+                        let next = chosen.peek().clone().picked(pick);
+                        chosen.set(next);
+                    },
+                    pinned: 1,
+                    look: TableLook::Striped,
+                }
+            }
+            p { class: "count", "{chosen().count()}" }
+            p { class: "cursor", "{chosen().cursor().map_or(-1, |row| row as i64)}" }
+        }
+    }
+}
+
+fn picking() -> Harness {
+    Harness::new(Picking, HarnessConfig::new(VIEW).with_clock(Clock::Virtual))
+}
+
+/// The row of one pane, by index.
+fn row_in(pane: &str, row: usize) -> String {
+    format!("{pane} .ds-vtable-item[data-row=\"{row}\"]")
+}
+
+/// Click the middle of `selector` with `held` down.
+fn click_holding(harness: &mut Harness, selector: &str, held: Modifiers) {
+    let at = harness.centre(selector).expect("laid out");
+    let click = PointerInput::new(at, PointerAction::Click(PointerButton::Primary));
+    harness.send(Input::Pointer(click.with_mods(held)));
+}
+
+fn picked(harness: &Harness) -> (String, String) {
+    (
+        harness.text_of(".count").unwrap_or_default(),
+        harness.text_of(".cursor").unwrap_or_default(),
+    )
+}
+
+#[test]
+fn a_table_that_holds_a_column_is_two_panes_of_the_same_rows_aligned_to_the_pixel() {
+    let mut harness = picking();
+    assert_eq!(
+        harness.attr(".ds-vtable", "data-pinned").as_deref(),
+        Some("yes")
+    );
+    assert_eq!(
+        harness.count(".ds-table-column"),
+        3,
+        "a title for each column, across the two headers"
+    );
+    let held = harness.count(".ds-vtable-held .ds-vtable-item");
+    assert!(held > 0, "the held pane has rows");
+    assert_eq!(harness.count(".ds-vtable-columns .ds-vtable-item"), held);
+    assert_eq!(
+        harness.attr(".ds-vtable", "data-across").as_deref(),
+        Some("no"),
+        "the seam shows once the columns are scrolled"
+    );
+    assert_eq!(
+        harness.centre(&row_in(".ds-vtable-held", 3)).map(|at| at.y),
+        harness
+            .centre(&row_in(".ds-vtable-columns", 3))
+            .map(|at| at.y),
+        "a row is at one height in both panes"
+    );
+    let at = harness.centre(".ds-scroller").expect("the scroller");
+    harness.send(Input::wheel(at, Px(0.0), Px(-5.0 * row_pitch().0)));
+    assert_eq!(
+        harness.centre(&row_in(".ds-vtable-held", 7)).map(|at| at.y),
+        harness
+            .centre(&row_in(".ds-vtable-columns", 7))
+            .map(|at| at.y),
+        "and still after the rows scroll"
+    );
+    assert_eq!(
+        harness.count(".ds-vtable-held .ds-vtable-item"),
+        harness.count(".ds-vtable-columns .ds-vtable-item"),
+        "the same window of rows in both"
+    );
+}
+
+#[test]
+fn a_click_replaces_a_command_click_toggles_and_a_shift_click_extends_in_either_pane() {
+    let mut harness = picking();
+    let held = |row| row_in(".ds-vtable-held", row);
+    let side = |row| row_in(".ds-vtable-columns", row);
+    // (row to click, modifiers held, rows selected after, cursor after). The primary modifier is
+    // Command, which the window reports as Super.
+    let steps: Vec<(String, Modifiers, &str, &str)> = vec![
+        (held(3), Modifiers::empty(), "1", "3"),
+        (side(6), Modifiers::SHIFT, "4", "6"),
+        (held(9), Modifiers::SUPER, "5", "9"),
+        (side(4), Modifiers::SUPER, "4", "4"),
+        (side(5), Modifiers::empty(), "1", "5"),
+    ];
+    for (selector, held_keys, count, cursor) in steps {
+        click_holding(&mut harness, &selector, held_keys);
+        assert_eq!(
+            picked(&harness),
+            (count.to_owned(), cursor.to_owned()),
+            "{selector} with {held_keys:?}"
+        );
+    }
+    // Row 5 is the one selected now, and it is drawn selected in both panes.
+    assert_eq!(harness.count(".ds-vtable-item[data-selected=yes]"), 2);
+    assert_eq!(
+        harness.attr(&held(5), "data-selected").as_deref(),
+        Some("yes")
+    );
+    assert_eq!(
+        harness.attr(&side(5), "data-selected").as_deref(),
+        Some("yes")
+    );
+}
+
+#[test]
+fn shift_with_an_arrow_extends_the_selection_from_the_anchor() {
+    let mut harness = picking();
+    click_holding(
+        &mut harness,
+        &row_in(".ds-vtable-columns", 3),
+        Modifiers::empty(),
+    );
+    // The keys go to the focused element, as in the table above: a header takes the focus.
+    click(&mut harness, ".ds-table-column");
+    let shift_down = Input::chord(&[ShortcutKey::Shift], ShortcutKey::Down);
+    harness.send(shift_down.clone());
+    harness.send(shift_down);
+    assert_eq!(picked(&harness), ("3".to_owned(), "5".to_owned()));
+    harness.send(Input::chord(&[ShortcutKey::Shift], ShortcutKey::Up));
+    assert_eq!(picked(&harness), ("2".to_owned(), "4".to_owned()));
+    harness.send(Input::key(ShortcutKey::Down));
+    assert_eq!(
+        picked(&harness),
+        ("1".to_owned(), "5".to_owned()),
+        "a plain arrow narrows to one row"
+    );
 }

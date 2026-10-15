@@ -4,6 +4,7 @@ use crate::components::lists::list::keys::{ListKey, list_key};
 use crate::components::lists::virtual_list::model::roved;
 use crate::stack::roving::{Rove, Step};
 use dioxus::prelude::{Key, Modifiers};
+use ds_core::selection::PickHow;
 
 /// What a key asks of a virtual table.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -44,6 +45,21 @@ pub(crate) fn target(at: Option<usize>, len: usize, key: TableKey, page: usize) 
     }
 }
 
+/// How many of `total` columns are really held in place when `asked` are: at least one column
+/// is left to scroll, so a table of one column holds none.
+pub(crate) fn held_columns(asked: usize, total: usize) -> usize {
+    asked.min(total.saturating_sub(1))
+}
+
+/// How an arrow, Home, End, Page Up or Page Down reaches its row: with Shift it extends the
+/// selection from its anchor, otherwise it replaces the selection.
+pub(crate) fn key_how(modifiers: Modifiers) -> PickHow {
+    match modifiers.contains(Modifiers::SHIFT) {
+        true => PickHow::Extend,
+        false => PickHow::Replace,
+    }
+}
+
 /// How many whole rows of `pitch` the viewport `height` shows, at least one.
 pub(crate) fn page_rows(height: f32, pitch: f32) -> usize {
     match pitch > 0.0 && height.is_finite() {
@@ -54,9 +70,10 @@ pub(crate) fn page_rows(height: f32, pitch: f32) -> usize {
 
 #[cfg(test)]
 mod tests {
-    use super::{TableKey, page_rows, table_key, target};
+    use super::{TableKey, held_columns, key_how, page_rows, table_key, target};
     use crate::stack::roving::{Edge, Rove, Step};
     use dioxus::prelude::{Key, Modifiers};
+    use ds_core::selection::PickHow;
 
     #[test]
     fn the_cursor_moves_by_a_row_an_end_or_a_page_and_stops_at_the_ends() {
@@ -119,5 +136,25 @@ mod tests {
         for (height, pitch, want) in cases {
             assert_eq!(page_rows(height, pitch), want, "{height} over {pitch}");
         }
+    }
+
+    #[test]
+    fn at_least_one_column_is_left_to_scroll_and_shift_extends() {
+        // (asked, columns, held)
+        let cases = [
+            (0, 5, 0),
+            (2, 5, 2),
+            (5, 5, 4),
+            (9, 5, 4),
+            (2, 1, 0),
+            (2, 0, 0),
+        ];
+        for (asked, total, held) in cases {
+            assert_eq!(held_columns(asked, total), held, "{asked} of {total}");
+        }
+        assert_eq!(key_how(Modifiers::SHIFT), PickHow::Extend);
+        assert_eq!(key_how(Modifiers::SHIFT | Modifiers::ALT), PickHow::Extend);
+        assert_eq!(key_how(Modifiers::empty()), PickHow::Replace);
+        assert_eq!(key_how(Modifiers::CONTROL), PickHow::Replace);
     }
 }

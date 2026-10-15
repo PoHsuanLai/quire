@@ -804,6 +804,18 @@ To scroll to a row, make the scroller yourself, `let scroller = use_scroller();`
 `scroller.reveal_row(row, row_pitch())` (the least scroll that shows it) or `scroller.scroll_to(Px(row as
 f32 * row_pitch().0))` (the row at the top). Rows are `f32` pixels: beyond about 500,000 rows a row's top is
 no longer exact, so page such a file in the owner.
+**Several rows, and columns that stay put.** Give `VirtualTable` a `selection: Option<RowSelection>`
+(`ds::base::selection::RowSelection`: ranges, never a key per row, `contains(row)` is a binary search) and an
+`onreach: EventHandler<Pick>` and it behaves as Finder's list does: `Pick { row, how }` says a plain click or
+arrow `Replace`s the selection, the primary modifier (Command, or Ctrl) with a click `Toggle`s the row, and
+Shift with a click or an arrow `Extend`s from the anchor. Keep a `RowSelection` in a signal and fold each pick
+in with `selection.picked(pick)`; `.all(rows)` is Select All, `.narrowed()` is what Esc does to several rows,
+`.rows()` walks the selected rows (for Copy). Select All and Copy are the keymap's chords, not the table's.
+Without `selection` and `onreach` nothing changes: `cursor` is the selected row and `onselect` hears usizes.
+`pinned: usize` holds that many leading columns in place, header and cells, while the rest scroll sideways
+under them (at least one column always scrolls); a faint line marks the seam once they are scrolled. To
+scroll such a table sideways yourself, name the box `ds::components::lists::virtual_table::columns_id(id)`
+(`id` being the `common.id` you gave) instead of the root.
 `Disclosure { title, shown, ontoggle, children }` collapses a body; `SectionHeader { title, value,
 actions: Vec<HeaderAction>, collapse }` heads a group (`HeaderAction::new(label, onclick)`, any
 number of them at its end).

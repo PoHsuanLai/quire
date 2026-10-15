@@ -33,9 +33,37 @@
 .ds-vtable[*|data-look] .ds-table-column[*|aria-disabled=true]:hover{ color:var(--ink-soft); }
 .ds-vtable[*|data-look] .ds-vtable-item > .ds-row{ margin:0 var(--s-6); }
 .ds-vtable[*|data-look=striped] .ds-vtable-item[*|data-stripe=odd]{ background:var(--stripe); }
-.ds-vtable[*|data-look] .ds-vtable-item[*|data-row]:hover{ background:var(--sel-neutral); }
+.ds-vtable[*|data-look] .ds-vtable-item[*|data-row]:hover,
+.ds-vtable[*|data-look] .ds-vtable-item[*|data-hover=yes]{ background:var(--sel-neutral); }
 .ds-vtable[*|data-look] .ds-vtable-item[*|data-selected=yes],
 .ds-vtable[*|data-look] .ds-vtable-item[*|data-selected=yes]:hover{ background:transparent; }
 .ds:not([*|data-activity=inactive]) .ds-vtable[*|data-look]:not([*|data-focus=away]) .ds-row[*|data-focus=highlight][*|aria-selected=true]{
   --ink-soft:var(--sel-ink); --ink-faint:var(--sel-ink);
 }
+
+/* Pinned columns (`pinned` > 0, `data-pinned=yes`; split.rs): two panes side by side under the
+   header, both in the table's one scroller so the rows of each move together. The held pane is as
+   wide as its columns; the other pane scrolls sideways itself (its offset moves the scrolling
+   header, which sits in a clip). `--pin-inset` is the list looks' row inset, so a pane's width
+   counts the inset its rows keep on the table's edge and not on the seam. A row is one block
+   across the seam: rounded on the left in the held pane and on the right in the scrolling one.
+   Once the columns are scrolled (`data-across=yes`) a hairline marks the seam. */
+.ds-vtable[*|data-pinned]{ overflow:hidden; }
+.ds-vtable[*|data-look]{ --pin-inset:var(--s-6); }
+.ds-vtable-heads{ display:flex; flex:none; }
+.ds-vtable-held-head{ flex:none; position:relative; }
+.ds-vtable-head-clip{ flex:1 1 0; min-width:0; overflow:hidden; }
+.ds-vtable-split{ display:flex; flex-direction:row; }
+.ds-vtable-held{ flex:none; position:relative; overflow:hidden; }
+.ds-vtable-columns{ flex:1 1 0; min-width:0; overflow-x:auto; overflow-y:hidden; scrollbar-width:none; }
+.ds-vtable[*|data-pinned] .ds-vtable-held .ds-row{ border-radius:var(--r-shell-highlight) 0 0 var(--r-shell-highlight); }
+.ds-vtable[*|data-pinned] .ds-vtable-columns .ds-row{ border-radius:0 var(--r-shell-highlight) var(--r-shell-highlight) 0; }
+.ds-vtable[*|data-pinned][*|data-look] .ds-vtable-held-head .ds-table-header{ padding:0 0 0 var(--s-6); }
+.ds-vtable[*|data-pinned][*|data-look] .ds-vtable-head-track .ds-table-header{ padding:0 var(--s-6) 0 0; }
+.ds-vtable[*|data-pinned][*|data-look] .ds-vtable-held .ds-vtable-item > .ds-row{ margin:0 0 0 var(--s-6); }
+.ds-vtable[*|data-pinned][*|data-look] .ds-vtable-columns .ds-vtable-item > .ds-row{ margin:0 var(--s-6) 0 0; }
+.ds-vtable[*|data-pinned][*|data-rules=hairline] .ds-vtable-columns .ds-table-cell:first-child{ border-left:var(--hair) solid var(--line); }
+.ds-vtable-held::after,
+.ds-vtable-held-head::after{ content:""; position:absolute; top:0; bottom:0; right:0; width:var(--hair); background:var(--line); opacity:0; pointer-events:none; }
+.ds-vtable[*|data-across=yes] .ds-vtable-held::after,
+.ds-vtable[*|data-across=yes] .ds-vtable-held-head::after{ opacity:1; }

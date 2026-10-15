@@ -12,6 +12,7 @@ use ds_core::geometry::units::Px;
 use ds_core::word::Word;
 use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
+use std::ops::Range;
 
 /// The widths a table's columns have been dragged to, and the drag in progress. `Copy`, so the
 /// table's handlers and the header's edges share it.
@@ -40,6 +41,17 @@ impl Resize {
         self.widths.read().total(columns)
     }
 
+    /// `grid-template-columns` for the columns `span` of `columns` (one pane of a table that
+    /// holds its leading columns apart).
+    pub(crate) fn template_in<C>(&self, columns: &[TableColumn<C>], span: Range<usize>) -> String {
+        self.widths.read().template_in(columns, span)
+    }
+
+    /// How wide the columns `span` of `columns` are together.
+    pub(crate) fn total_in<C>(&self, columns: &[TableColumn<C>], span: Range<usize>) -> Px {
+        self.widths.read().total_in(columns, span)
+    }
+
     /// The pointer moved: a column edge being dragged follows it.
     pub(crate) fn drag<C>(&self, columns: &[TableColumn<C>], event: &PointerEvent) {
         if let Some((at, held)) = (self.grab)() {
@@ -63,9 +75,24 @@ impl Resize {
         sort: Option<&Sort<C>>,
         on_sort: EventHandler<Sort<C>>,
     ) -> Element {
+        self.header_in(columns, 0..columns.len(), sort, on_sort)
+    }
+
+    /// The header row of the columns `span` of `columns`: a title for each, and a resize edge
+    /// after each but the last column of the whole table, so the last column of a pane that
+    /// stops short of it still resizes. A drag names the column by its place in `columns`.
+    pub(crate) fn header_in<C: Clone + PartialEq + 'static>(
+        &self,
+        columns: &[TableColumn<C>],
+        span: Range<usize>,
+        sort: Option<&Sort<C>>,
+        on_sort: EventHandler<Sort<C>>,
+    ) -> Element {
         let heads: Vec<(Element, usize, Px, bool)> = columns
             .iter()
             .enumerate()
+            .skip(span.start)
+            .take(span.len())
             .map(|(at, column)| {
                 let sorted = sort.is_some_and(|sort| sort.column == column.id);
                 let width = self.widths.read().of(columns, at);

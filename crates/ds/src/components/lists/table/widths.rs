@@ -3,6 +3,7 @@
 
 use crate::components::lists::table::model::TableColumn;
 use ds_core::geometry::units::Px;
+use std::ops::Range;
 
 /// The width of each column: a dragged one wins over the column's own.
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -33,24 +34,35 @@ impl Widths {
 
     /// How wide all the columns are together, the last at its own width.
     pub(crate) fn total<C>(&self, columns: &[TableColumn<C>]) -> Px {
-        Px((0..columns.len()).map(|at| self.of(columns, at).0).sum())
+        self.total_in(columns, 0..columns.len())
+    }
+
+    /// How wide the columns `span` are together.
+    pub(crate) fn total_in<C>(&self, columns: &[TableColumn<C>], span: Range<usize>) -> Px {
+        Px(span.map(|at| self.of(columns, at).0).sum())
     }
 
     /// `grid-template-columns`: every column its width, the last taking what is left (never
     /// under its own least).
     pub(crate) fn template<C>(&self, columns: &[TableColumn<C>]) -> String {
+        self.template_in(columns, 0..columns.len())
+    }
+
+    /// `grid-template-columns` for the columns `span` of `columns`: every one its width, except
+    /// the last column of the whole table, which takes what is left (never under its own
+    /// least). A span that stops short of it is all fixed widths.
+    pub(crate) fn template_in<C>(&self, columns: &[TableColumn<C>], span: Range<usize>) -> String {
         let last = columns.len().saturating_sub(1);
-        (0..columns.len())
-            .map(|at| {
-                if at == last {
-                    let least = columns.get(at).map_or(0.0, |column| column.min_width.0);
-                    format!("minmax({least}px, 1fr)")
-                } else {
-                    format!("{}px", self.of(columns, at).0)
-                }
-            })
-            .collect::<Vec<_>>()
-            .join(" ")
+        span.map(|at| {
+            if at == last {
+                let least = columns.get(at).map_or(0.0, |column| column.min_width.0);
+                format!("minmax({least}px, 1fr)")
+            } else {
+                format!("{}px", self.of(columns, at).0)
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ")
     }
 }
 
@@ -94,5 +106,31 @@ mod tests {
         let columns = columns();
         let widths = Widths::default().dragged(&columns, 0, Px(200.0));
         assert_eq!(widths.template(&columns), "200px 90px minmax(48px, 1fr)");
+    }
+
+    #[test]
+    fn a_span_of_columns_has_its_own_template_and_total() {
+        let columns = columns();
+        let widths = Widths::default().dragged(&columns, 0, Px(200.0));
+        // (span, template, total)
+        let cases = [
+            (0..1, "200px", 200.0),
+            (0..2, "200px 90px", 290.0),
+            (1..3, "90px minmax(48px, 1fr)", 160.0),
+            (2..3, "minmax(48px, 1fr)", 70.0),
+            (0..0, "", 0.0),
+        ];
+        for (span, template, total) in cases {
+            assert_eq!(
+                widths.template_in(&columns, span.clone()),
+                template,
+                "{span:?}"
+            );
+            assert_eq!(
+                widths.total_in(&columns, span.clone()),
+                Px(total),
+                "{span:?}"
+            );
+        }
     }
 }

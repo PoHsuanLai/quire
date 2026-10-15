@@ -15,6 +15,7 @@ pub mod machine;
 pub mod palette;
 pub mod png;
 pub mod press;
+pub mod selection;
 pub mod spawner;
 pub mod standard_action;
 pub mod text;

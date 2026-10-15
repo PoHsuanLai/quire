@@ -6,10 +6,26 @@
 //! it. The header sits above the scroller, so it stays while the rows scroll.
 //!
 //! A row's identity is its index: the cursor, the selection and `onselect` are row indexes. The
-//! cursor is the selected row; the owner moves it (a controlled component, as `VirtualList`'s), and
-//! it is kept in view. Scrolling to a row from outside is the owner's `ScrollerRef`:
-//! `scroller.reveal_row(row, row_pitch())`. The arrows, Home, End, Page Up and Page Down ask
-//! `onselect` to move the cursor and stop at the ends; Enter and Space ask `onpick`.
+//! cursor is the row the keys rest on; the owner moves it (a controlled component, as
+//! `VirtualList`'s), and it is kept in view. Scrolling to a row from outside is the owner's
+//! `ScrollerRef`: `scroller.reveal_row(row, row_pitch())`. The arrows, Home, End, Page Up and
+//! Page Down ask `onselect` to move the cursor and stop at the ends; Enter and Space ask
+//! `onpick`.
+//!
+//! Which rows are selected is the cursor's row alone, unless the owner gives a `selection` (a
+//! `RowSelection`, ranges and never a key per row, so a million selected rows cost the same as
+//! one). Then a row is selected when `selection.contains(row)`. The owner who wants several rows
+//! listens to `onreach` instead of `onselect`: it hears a `Pick`, the row and how it was reached,
+//! that the owner folds into its `RowSelection` with `RowSelection::picked`. A plain click or
+//! arrow replaces the selection, the primary modifier (Command, or Ctrl) toggles the row, and
+//! Shift (with a click or an arrow) extends from the anchor. Select all (Command A) and Copy are
+//! the keymap's, not the table's: the owner answers them with `RowSelection::all`.
+//!
+//! `pinned` holds that many leading columns in place, header and cells, while the other columns
+//! scroll sideways under them (Numbers' frozen columns, Finder's pinned Name). It cannot be
+//! `position: sticky`, which Blitz does not lay out, so the table is two panes, built in
+//! `split.rs`, whose doc comment says how they stay one table. A table that holds no column is
+//! one pane whose root scrolls sideways, as before.
 //!
 //! Markup: `div.ds-table.ds-vtable.ds-list[role=group]` (the grid template as `--table-cols`) of
 //! `div.ds-vtable-body` of the `Table`'s `div.ds-table-header` and a `Scroller` of a spacer,
@@ -18,7 +34,9 @@
 //! `data-look=striped|unstriped` is a list look (absent for the plain grid), `data-rules=hairline`
 //! draws the lines between columns and `data-scrolled=yes|no` (unless the header rule is `Never`)
 //! keys the line under the header. A table wider than its box scrolls sideways, header and rows
-//! together.
+//! together. With `pinned` columns the root carries `data-pinned=yes` and `data-across=yes|no`
+//! (the other columns are scrolled sideways or not), and the body is `split::body`'s: see there.
+//! `columns_id(id)` names the box that scrolls sideways then.
 
 use crate::components::controls::scroller::handle::ScrollerRef;
 use crate::components::controls::scroller::view::Scroller;
@@ -26,14 +44,22 @@ use crate::components::lists::row::row::Row;
 use crate::components::lists::table::head::{cells, use_resize};
 use crate::components::lists::table::look::TableLook;
 use crate::components::lists::table::model::{Sort, TableColumn};
-use crate::components::lists::table::rules::{ColumnRules, HeaderRule};
+use crate::components::lists::table::rules::{ColumnRules, HeaderRule, Scrolled};
 use crate::components::lists::virtual_list::layout::Layout;
 use crate::components::lists::virtual_list::view::use_cursor_reveal;
-use crate::components::lists::virtual_table::model::{TableKey, page_rows, table_key, target};
+use crate::components::lists::virtual_table::model::{
+    TableKey, held_columns, key_how, page_rows, table_key, target,
+};
+use crate::components::lists::virtual_table::split::{self, Line, Pane, Panes};
+use crate::keys::use_platform;
 use crate::root::common::Common;
+use chordkit::Platform;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
+use ds_core::press::Press;
+use ds_core::selection::{Pick, PickHow, RowSelection};
 use ds_core::vocab::{RowState, Selection};
+use ds_core::word::Word;
 use ds_style::tokens::row_scale::ROW_SCALE;
 
 /// How many rows around the viewport are mounted besides the visible ones.
@@ -53,12 +79,68 @@ pub const fn row_pitch() -> Px {
     Px(ROW_SCALE.compact_height.0 as f32)
 }
 
+/// How the owner hears a row being reached: by a click or a key.
+#[derive(Clone, Copy)]
+struct Reach {
+    platform: Platform,
+    onreach: Option<EventHandler<Pick>>,
+    onselect: Option<EventHandler<usize>>,
+}
+
+impl Reach {
+    /// Whether anyone listens.
+    fn heard(self) -> bool {
+        self.onreach.is_some() || self.onselect.is_some()
+    }
+
+    /// Tell the owner `pick`: `onreach` hears the row and how, else `onselect` hears the row.
+    fn tell(self, pick: Pick) {
+        match (self.onreach, self.onselect) {
+            (Some(onreach), _) => onreach.call(pick),
+            (None, Some(onselect)) => onselect.call(pick.row),
+            (None, None) => {}
+        }
+    }
+
+    /// A click on `row`, with the modifiers it carried.
+    fn clicked(self, row: usize, press: Press) {
+        let how = PickHow::of_press(self.platform, press.modifiers);
+        self.tell(Pick { row, how });
+    }
+}
+
+/// One row's content: its cells on the grid of `columns`, selected or not.
+fn row_content<C>(
+    columns: &[TableColumn<C>],
+    drawn: &[Element],
+    row: usize,
+    selection: Selection,
+    reach: Reach,
+) -> Element {
+    rsx! {
+        Row {
+            state: RowState {
+                selection,
+                ..RowState::default()
+            },
+            content: Some(cells(columns, drawn)),
+            title: format!("Row {}", row + 1),
+            onclick: move |press: Press| reach.clicked(row, press),
+        }
+    }
+}
+
 /// A table of `rows` rows in `columns`. `cell` is asked for `(row, column)` of each row that
 /// shows, and must be cheap: it is called on every render of the table for every mounted row.
 /// `scroller` is the table's scroll state, made by the owner with `use_scroller()` so it can scroll
 /// to a row. `sort` is the sorted column and `on_sort` hears what a header press asks for.
-/// `cursor` is the selected row, kept in view; `onselect` hears a click, an arrow, Home, End,
-/// Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the cursor.
+/// `cursor` is the row the keys rest on, kept in view; `onselect` hears a click, an arrow, Home,
+/// End, Page Up or Page Down asking for another row, and `onpick` hears Enter or Space on the
+/// cursor. `selection`, when given, says which rows are selected (the cursor's row alone
+/// otherwise), and `onreach` hears the same asks with how the row was reached (`Pick`) in place
+/// of `onselect`: Shift with a click or an arrow extends, the primary modifier with a click
+/// toggles. `pinned` is how many leading columns are held in place while the others scroll
+/// sideways under them (none by default; at least one column always scrolls).
 /// `overscan` is how many rows are mounted beyond the visible ones on each side (4 by default).
 /// `look` dresses the table (`TableLook::Plain`, the grid, by default; `Striped` and `Unstriped`
 /// are Finder's list view). `rules` draws a hairline between the columns; `header_rule` draws one under the
@@ -79,8 +161,11 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     #[props(default)] sort: Option<Sort<C>>,
     on_sort: EventHandler<Sort<C>>,
     #[props(default)] cursor: Option<usize>,
+    #[props(default)] selection: Option<RowSelection>,
     #[props(default)] onselect: Option<EventHandler<usize>>,
+    #[props(default)] onreach: Option<EventHandler<Pick>>,
     #[props(default)] onpick: Option<EventHandler<usize>>,
+    #[props(default)] pinned: usize,
     #[props(default = OVERSCAN_ROWS)] overscan: usize,
     #[props(default)] look: TableLook,
     #[props(default)] rules: ColumnRules,
@@ -102,31 +187,30 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     );
     let resize = use_resize();
     let mut held = use_signal(|| Held::No);
-    let template = resize.template(&columns);
-    let total = resize.total(&columns);
-    let header = resize.header(&columns, sort.as_ref(), on_sort);
-    let items: Vec<(usize, Element)> = (start..end)
+    let hovered = use_signal(|| None::<usize>);
+    let across = use_signal(|| Px(0.0));
+    let reach = Reach {
+        platform: use_platform(),
+        onreach,
+        onselect,
+    };
+    let kept = held_columns(pinned, columns.len());
+    let selected = |row: usize| {
+        let on = match &selection {
+            Some(chosen) => chosen.contains(row),
+            None => cursor == Some(row),
+        };
+        match on {
+            true => Selection::Selected,
+            false => Selection::Unselected,
+        }
+    };
+    let drawn_rows: Vec<(usize, Vec<Element>)> = (start..end)
         .map(|row| {
-            let drawn: Vec<Element> = (0..columns.len())
+            let drawn = (0..columns.len())
                 .map(|column| cell.call((row, column)))
                 .collect();
-            let selected = cursor == Some(row);
-            let content = rsx! {
-                Row {
-                    state: RowState {
-                        selection: if selected { Selection::Selected } else { Selection::Unselected },
-                        ..RowState::default()
-                    },
-                    content: Some(cells(&columns, &drawn)),
-                    title: format!("Row {}", row + 1),
-                    onclick: move |_| {
-                        if let Some(onselect) = onselect {
-                            onselect.call(row);
-                        }
-                    },
-                }
-            };
-            (row, content)
+            (row, drawn)
         })
         .collect();
     let onkeydown = move |event: KeyboardEvent| {
@@ -143,9 +227,12 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             TableKey::Move(_) | TableKey::Page(_) => {
                 let shown = scroller.scroll().read().viewport.0;
                 let page = page_rows(shown, pitch.0);
-                if let (Some(to), Some(onselect)) = (target(cursor, rows, act, page), onselect) {
+                if let (Some(row), true) = (target(cursor, rows, act, page), reach.heard()) {
                     event.prevent_default();
-                    onselect.call(to);
+                    reach.tell(Pick {
+                        row,
+                        how: key_how(event.modifiers()),
+                    });
                 }
             }
         }
@@ -156,7 +243,96 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
     let away = (held() == Held::No).then_some("away");
     let scrolled = header_rule.attribute(scroller.scroll().read().offset);
     let (above, below) = (layout.top(start).0, layout.below(end).0);
-    let (height, wide) = (pitch.0, total.0);
+    let height = pitch.0;
+    let frame = match kept {
+        0 => {
+            let header = resize.header(&columns, sort.as_ref(), on_sort);
+            let template = resize.template(&columns);
+            let wide = resize.total(&columns).0;
+            let items: Vec<(usize, Element)> = drawn_rows
+                .iter()
+                .map(|(row, drawn)| {
+                    let content = row_content(&columns, drawn, *row, selected(*row), reach);
+                    (*row, content)
+                })
+                .collect();
+            let body = rsx! {
+                div { class: "ds-vtable-body", style: "min-width:{wide}px",
+                    {header}
+                    Scroller { scroller,
+                        div { class: "ds-vtable-spacer", style: "height:{above}px" }
+                        div {
+                            class: "ds-vtable-rows",
+                            role: "listbox",
+                            "aria-label": label.clone(),
+                            for (row , content) in items {
+                                div {
+                                    key: "{row}",
+                                    class: "ds-vtable-item",
+                                    role: "none",
+                                    "aria-posinset": (row + 1).to_string(),
+                                    "aria-setsize": rows.to_string(),
+                                    "data-row": row.to_string(),
+                                    "data-selected": (selected(row) == Selection::Selected).then_some("yes"),
+                                    "data-stripe": look.striped(row).then_some("odd"),
+                                    style: "height:{height}px",
+                                    {content}
+                                }
+                            }
+                        }
+                        div { class: "ds-vtable-spacer", style: "height:{below}px" }
+                    }
+                }
+            };
+            (body, Some(format!("--table-cols:{template}")), None, None)
+        }
+        kept => {
+            let all = columns.len();
+            let lines = |span: std::ops::Range<usize>| -> Vec<Line> {
+                drawn_rows
+                    .iter()
+                    .map(|(row, drawn)| Line {
+                        row: *row,
+                        selection: selected(*row),
+                        stripe: look.striped(*row).then_some("odd"),
+                        content: row_content(
+                            &columns[span.clone()],
+                            &drawn[span.clone()],
+                            *row,
+                            selected(*row),
+                            reach,
+                        ),
+                    })
+                    .collect()
+            };
+            let body = split::body(Panes {
+                held: Pane {
+                    head: resize.header_in(&columns, 0..kept, sort.as_ref(), on_sort),
+                    lines: lines(0..kept),
+                    template: resize.template_in(&columns, 0..kept),
+                    width: resize.total_in(&columns, 0..kept),
+                },
+                scrolling: Pane {
+                    head: resize.header_in(&columns, kept..all, sort.as_ref(), on_sort),
+                    lines: lines(kept..all),
+                    template: resize.template_in(&columns, kept..all),
+                    width: resize.total_in(&columns, kept..all),
+                },
+                scroller,
+                label: label.clone(),
+                id: common.id.clone(),
+                rows,
+                above,
+                below,
+                height,
+                across,
+                hovered,
+            });
+            let ahead = Some(Scrolled::at(across()).slug());
+            (body, None, Some("yes"), ahead)
+        }
+    };
+    let (body, inline, pin, across_mark) = frame;
     rsx! {
         div {
             id: common.id.clone(),
@@ -168,7 +344,9 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             "data-look": look.attribute(),
             "data-rules": rules.attribute(),
             "data-scrolled": scrolled,
-            style: "--table-cols:{template}",
+            "data-pinned": pin,
+            "data-across": across_mark,
+            style: inline,
             onmounted: move |event| mounted.mounted(event),
             onfocus: move |_| held.set(Held::Yes),
             onblur: move |_| held.set(Held::No),
@@ -177,32 +355,7 @@ pub fn VirtualTable<C: Clone + PartialEq + 'static>(
             onpointerup: move |_| resize.release(),
             onpointerleave: move |_| resize.release(),
             ..data,
-            div { class: "ds-vtable-body", style: "min-width:{wide}px",
-                {header}
-                Scroller { scroller,
-                    div { class: "ds-vtable-spacer", style: "height:{above}px" }
-                    div {
-                        class: "ds-vtable-rows",
-                        role: "listbox",
-                        "aria-label": label.clone(),
-                        for (row , content) in items {
-                            div {
-                                key: "{row}",
-                                class: "ds-vtable-item",
-                                role: "none",
-                                "aria-posinset": (row + 1).to_string(),
-                                "aria-setsize": rows.to_string(),
-                                "data-row": row.to_string(),
-                                "data-selected": (cursor == Some(row)).then_some("yes"),
-                                "data-stripe": look.striped(row).then_some("odd"),
-                                style: "height:{height}px",
-                                {content}
-                            }
-                        }
-                    }
-                    div { class: "ds-vtable-spacer", style: "height:{below}px" }
-                }
-            }
+            {body}
         }
     }
 }
