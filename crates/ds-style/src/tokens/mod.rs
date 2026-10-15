@@ -14,6 +14,7 @@ pub mod delay;
 pub mod dock_floor;
 pub mod easing;
 pub mod elevation;
+pub mod elevation_layers;
 pub mod emoji_face;
 pub mod glow;
 pub mod hex;
