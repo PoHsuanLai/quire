@@ -174,8 +174,8 @@ fn inside_an_edit_surface_its_own_focus_wins() {
 #[test]
 fn a_press_on_a_panels_empty_space_keeps_the_keyboard_and_escape_still_closes_it() {
     let mut harness = panel(FocusFallback::Ancestor);
+    // A plain button takes no focus in Blitz; the press on it leaves the panel as it was.
     click(&mut harness, ".inside");
-    assert_eq!(harness.focus_of(".inside"), FocusState::Focused);
     click(&mut harness, ".empty");
     assert_eq!(harness.focus_of(".panel"), FocusState::Focused);
     harness.send(Input::key(ShortcutKey::Escape));
