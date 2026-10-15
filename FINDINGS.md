@@ -1853,3 +1853,25 @@ ca79f436 (the caret goes to the end of text written from outside, in `TextInputD
 an editor is built with its value) all 12 pass. So the cause is Blitz's caret, not the scheduling: extra
 parked tasks only decided whether the editor was built, or its text set, after focus. Fix B stays as a
 second line (a focus that lands before layout owes the caret).
+
+## chrome numbers for casement (2026-10-15)
+
+casement draws window chrome itself and reaches quire only through the pure crates, so the numbers
+the chrome stylesheet writes are now public as numbers, each from the table the CSS is written from:
+
+- `Radius::px() -> u16` (`--r-window` is 10). `Radius::value()` now returns a `String` formatted
+  from `px()` (it was `&'static str`; nothing in this workspace called it outside `shape.rs`).
+- `Shadow::layers(scheme) -> &'static [ShadowLayer]` for `Window` and `Drag`. A layer holds
+  `dx, dy, blur, spread`, an `rgb: Hex` and an `alpha: Alpha` in thousandths (a byte cannot hold
+  `.12` or `.66` and write them back); `rgba()` rounds to bytes for a renderer. The CSS for those two
+  is written from the layers. The other eleven shadows read `var(--hair)`, `--hairline` or
+  `--f-pill`, so they stay CSS-only and `layers` returns an empty slice for them.
+- `chrome::light_hue(Light, Scheme) -> (Hex, Hex)`: disc and mark ink. quire already had the colours:
+  `window_frame.css` paints the disc `--c-red|amber|green` and the mark `-deep` (light) or `-soft`
+  (dark), from `label_hue.rs`. `light_hue` names that choice; a test checks the CSS reads the same
+  tokens.
+- `chrome::title_font(Typeface) -> TitleFont { family, size_px, weight }`: Inter, 13 (`--fs-control`),
+  600.
+
+Nothing in the stylesheet changed. Tests pin the generated strings to the old literals and to
+`crates/ds-shell/tests/snapshots/stylesheet.css`.
