@@ -56,7 +56,7 @@ pub fn SpacesBar(
         Some(on_hidden),
     );
     let mut own = use_signal(BarExpansion::default);
-    let now = expansion.unwrap_or_else(|| own());
+    let now = expansion.unwrap_or_else(|| *own.read());
     let mut ask = move |over: PointerOver| {
         let next = BarExpansion::under_pointer(over);
         if expansion.is_none() {
