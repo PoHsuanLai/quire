@@ -1,7 +1,7 @@
 //! Whether a hybrid harness's wgpu instance names its objects and validates calls.
 //!
-//! Every hybrid harness opens its own instance and device. With wgpu's `DEBUG` flag (on by
-//! default in debug builds) the Vulkan backend loads `VK_EXT_debug_utils` and names every
+//! A process opens one instance and device per adapter preference (`gpu_device`). With wgpu's
+//! `DEBUG` flag (on by default in debug builds) the Vulkan backend loads `VK_EXT_debug_utils` and names every
 //! texture, buffer and view through `vkSetDebugUtilsObjectNameEXT`; the Vulkan loader walks its
 //! device list without a lock while it does, so naming from many harnesses in one test process
 //! can crash in `loader_get_icd_and_device` (a SIGSEGV seen with parallel tests, anyview#17).
