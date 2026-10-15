@@ -10,7 +10,7 @@
    a quiet dashed hairline, `data-drag=source` dims the one being dragged. Attribute selectors carry
    `*|` (spike S2). */
 
-.ds-spaces-bar{ box-sizing:border-box; width:100%; display:flex; align-items:flex-start; justify-content:center; gap:var(--s-12); padding:var(--s-8) var(--s-20);
+.ds-spaces-bar{ --drop-dy:calc(var(--s-48) * -1); box-sizing:border-box; width:100%; display:flex; align-items:flex-start; justify-content:center; gap:var(--s-12); padding:var(--s-8) var(--s-20);
   color:var(--f-ink); font:inherit; font-size:var(--fs-meta); font-weight:500; }
 .ds-spaces-bar[*|data-presence=entering],.ds-spaces-bar[*|data-presence=present]{ animation:drop-in var(--t-overview) var(--e-out); }
 .ds-spaces-bar[*|data-presence=entering][*|data-pulse=b],.ds-spaces-bar[*|data-presence=present][*|data-pulse=b]{ animation-name:drop-in--b; }

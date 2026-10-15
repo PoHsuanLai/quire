@@ -198,6 +198,7 @@ Existing tokens are used wherever they fit; five are new.
 | `PendingCap` | 10 s | 10 s | 10 s | 0 (still at once) | delay (Rust-only) | after this, a pending loop holds its still frame | proposed |
 | `SettleHold` | 900 ms | 900 ms | 900 ms | 900 ms | hold (Reduced keeps it: it is reading time, as `--t-send-ring`) | how long a Check stays before the element rests or leaves | proposed |
 | `--t-quick`, `--t-move`, `--t-big`, `--t-shake`, `--t-nudge`, `--stagger` | as design/05 §3 | | | | | Change, Select, Preview, Reveal, Shake, Nudge | settled |
+| `--t-overview` | 350 ms | 350 ms | 350 ms | 120 ms (`--t-quick`) | duration | Mission Control's Spaces bar drops in and lifts out with the compositor's windows, which fly over this length (q-spacesbar) | proposed |
 
 None of these is a setting: durations are token-table data, not keys (design/22 §3.2). The
 operation timeouts are the services' (sill), not motion tokens.
