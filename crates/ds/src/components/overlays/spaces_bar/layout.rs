@@ -99,7 +99,8 @@ fn use_part(part: Part) -> RectProbe {
         }
     });
     use_drop(move || {
-        if let Ok(mut map) = book.0.try_write() {
+        let mut map = book.0;
+        if let Ok(mut map) = map.try_write() {
             map.remove(&part);
         }
     });
