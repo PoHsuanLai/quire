@@ -146,6 +146,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     let host = use_hook(|| {
         let found = Rc::clone(&document);
         let provided = Provided::of(Wiring {
+            focus_fallback: fallback,
             keeper: keeper.clone(),
             find: Some(crate::focus::finder(move || {
                 found.borrow().clone().map(DocRef::Handle)

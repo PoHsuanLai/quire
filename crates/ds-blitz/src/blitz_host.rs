@@ -1,12 +1,12 @@
 //! `ds::prelude::DocumentHost` on Blitz, and [`provide_host`], the one call that gives a root all of it.
 //!
-//! The host is built from what a document's owner knows: whether the keyboard falls back to a
-//! focusable ancestor (and the keeper that watches removals for it), how to find an element by
-//! selector, which clipboard it has, and the listeners its window feeds the IME and pointer
-//! capture to. A window and the harness own all of it; a shell's surface root has none of it,
+//! The host is built from what a document's owner knows: where the keyboard goes after a click on
+//! nothing focusable, the keeper that watches removals, how to find an element by selector, which
+//! clipboard it has, and the listeners its window feeds the IME and pointer capture to. A window
+//! and the harness own all of it; a shell's surface root has the click-focus part and no more,
 //! and its host answers what a document alone can.
 
-use crate::click_focus::{fallback, restore, take};
+use crate::click_focus::{FocusFallback, fallback, restore, take};
 use crate::clipboard::{Clipboard, System};
 use crate::drop_hit::drop_hit;
 use crate::edit::set_ime_cursor_area;
@@ -45,7 +45,11 @@ pub(crate) type FindDocument = Rc<dyn Fn(&str) -> Found>;
 
 /// What a document's owner knows, and the host is made of.
 pub struct Wiring {
-    /// Under `FocusFallback::Ancestor`, the keeper that hands a removed element's keyboard on.
+    /// Where the keyboard goes after a click on nothing focusable; under `Ancestor` the host has
+    /// the click-focus part, which needs nothing from the owner.
+    pub focus_fallback: FocusFallback,
+    /// Under `FocusFallback::Ancestor`, the keeper that hands a removed element's keyboard on;
+    /// absent where the owner has no event loop to look at the focus from.
     pub keeper: Option<Rc<RefCell<FocusKeeper>>>,
     /// Selector lookup in the owner's document; absent where the owner cannot reach it.
     pub find: Option<FindDocument>,
@@ -65,10 +69,12 @@ impl std::fmt::Debug for Wiring {
 }
 
 impl Wiring {
-    /// What a document alone has: the renderer's focus fallback, no selector lookup, the
-    /// desktop's clipboard once a shell reaches it, and listeners nothing feeds.
+    /// What a document alone has: the click-focus part (a click on nothing focusable keeps the
+    /// keyboard on the nearest focusable ancestor, as a window's does), no keeper, no selector
+    /// lookup, the desktop's clipboard once a shell reaches it, and listeners nothing feeds.
     fn standalone() -> Self {
         Wiring {
+            focus_fallback: FocusFallback::Ancestor,
             keeper: None,
             find: None,
             clipboard: Rc::new(System::default()),
@@ -125,6 +131,7 @@ struct BlitzHost {
 impl BlitzHost {
     fn new(wiring: Wiring) -> Self {
         let Wiring {
+            focus_fallback,
             keeper,
             find,
             clipboard,
@@ -138,7 +145,10 @@ impl BlitzHost {
                     .map_or_else(HandBack::default, hand_back_seam),
             },
             geometry: BlitzGeometry { find, phase },
-            click_focus: keeper.map(|_| BlitzClickFocus),
+            click_focus: match focus_fallback {
+                FocusFallback::Ancestor => Some(BlitzClickFocus),
+                FocusFallback::BlitzDefault => None,
+            },
             edit: BlitzEdit {
                 clipboard,
                 ime: BlitzIme(listeners.clone()),
@@ -155,8 +165,9 @@ impl BlitzHost {
 /// any quire component reads the document. A root that already has a host (a window's, the
 /// harness's) keeps it, so a component calling this under one takes what the window wired.
 ///
-/// The host of a root like that follows the renderer's own focus fallback, has no lookup by
-/// selector and no click-focus part, and its edit surfaces are fed no IME events: the window
+/// The host of a root like that has the window's click-focus part (a press on nothing focusable
+/// leaves the keyboard on the nearest focusable ancestor, so Escape still reaches the surface),
+/// has no lookup by selector and no keeper for removed elements, and its edit surfaces are fed no IME events: the window
 /// loop that owns those is `launch`'s and the harness's. Nor does it reach a window shell, so
 /// [`clipboard::write_text`](crate::clipboard::write_text) answers
 /// [`ClipboardError::NoShell`](crate::clipboard::ClipboardError::NoShell) there, never a

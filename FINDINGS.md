@@ -123,9 +123,10 @@ Not built, or limited, in quire:
 
 - **Other Blitz hosts get less than `launch` and the harness.** shell-host and sill call
   `ds_blitz::provide_host()`, which installs every part of the document host, but do not
-  forward IME events or pointer capture to an `EditSurface`, have no click-focus fallback or
-  hand-back, find no element by selector, and provide no spell checker
-  (`ds_blitz::spell::provide()`) or resting-pointer hover replay; they must call
+  forward IME events or pointer capture to an `EditSurface`, have no hand-back of a removed
+  element's keyboard (no `FocusKeeper`; the click-focus part they do have), find no element by
+  selector, and provide no spell checker (`ds_blitz::spell::provide()`) or resting-pointer hover
+  replay; they must call
   `ds_blitz::snap_to_device` after each resolve themselves. Each needs a ds-blitz entry point
   the host calls.
 - **shell-host does not register quire's faces.** `SharedFonts::system()` never calls
@@ -678,6 +679,11 @@ own caret and selection. The route needs no Blitz fork.
   after the click if the click left it nowhere. The default is not prevented; when the ancestor
   already has the focus it is cleared first without events and refocused by a task, so a handler
   that moved the focus during the click wins. `BlitzDefault` switches the fallback off.
+  `provide_host()` (shell surfaces) has the same part, with no keeper. Blitz counts `tabindex="-1"`
+  as not focusable (`flush_is_focussable`: `index >= 0`), so a panel that is the keyboard's home
+  must carry `tabindex="0"` to be the ancestor a press on empty space lands on; a browser would
+  take `-1` too, and quire does not yet (departure from the browser, kept to leave menus' and
+  radios' roving `-1` items out of the click chain).
 - **The kept-click rule.** dioxus 0.7 has no capture phase and Blitz dispatches bottom-up only
   (blitz-dom's events/driver.rs), so a control that stops a click keeps it from the root. Every quire click
   handler that stops a click or prevents its default calls `focus::click::kept_click` last: with

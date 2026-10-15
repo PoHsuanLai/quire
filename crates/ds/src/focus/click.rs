@@ -62,7 +62,7 @@ impl ClickRoot {
 /// prevented its default): the control hands it to the host itself, as the root would have.
 /// Call it last in the click handler, after the control's own work, as the root is the last to
 /// hear a click. Outside a `Ds` root, or with a host that has no click-focus part
-/// (`FocusFallback::BlitzDefault`, a server render, a shell's surface), it does nothing.
+/// (`FocusFallback::BlitzDefault`, a server render), it does nothing.
 pub fn kept_click(event: &MouseEvent) {
     if on_click(event) == FocusOnPress::Refuses {
         return;

@@ -206,6 +206,7 @@ impl Headless {
         let phase = Phase::default();
         phase.attach(found.clone(), doc.vdom.runtime());
         let provided = Provided::of(Wiring {
+            focus_fallback: setup.focus_fallback,
             keeper: match &keeper {
                 Keeper::Ancestor(shared) => Some(Rc::clone(shared)),
                 Keeper::Off => None,

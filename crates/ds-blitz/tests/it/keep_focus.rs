@@ -2,7 +2,8 @@
 //! focusable ancestor (mailo's `.app[tabindex]`), as a browser does, where Blitz would clear it;
 //! `FocusFallback::BlitzDefault` keeps Blitz's behaviour. A field the click leaves still hears
 //! its blur, the ancestor hears no spurious one, a double click still arrives, and an edit
-//! surface's own focus wins inside it.
+//! surface's own focus wins inside it. A shell surface's panel is the same: a press on its empty
+//! space keeps the keyboard on the panel, so Escape still reaches the panel's handler.
 
 use dioxus::prelude::*;
 use ds::prelude::*;
@@ -50,6 +51,37 @@ fn Shell() -> Element {
             p { class: "log", {log().join(",")} }
         }
     }
+}
+
+/// A shell surface's shape: a panel that closes on Escape, with a button inside and room around it.
+#[allow(non_snake_case)]
+fn Panel() -> Element {
+    let mut log = use_signal(Vec::<String>::new);
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window,
+            div { class: "panel", tabindex: "0", style: "padding:20px; width:300px; height:200px",
+                onkeydown: move |event: KeyboardEvent| {
+                    if event.key() == Key::Escape {
+                        log.with_mut(|log| log.push("closed".to_owned()));
+                    }
+                },
+                button { class: "inside", style: "height:30px", "Inside" }
+                div { class: "empty", style: "height:100px" }
+            }
+            p { class: "log", {log().join(",")} }
+        }
+    }
+}
+
+fn panel(fallback: FocusFallback) -> Harness {
+    let mut harness = Harness::new(
+        Panel,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_focus_fallback(fallback),
+    );
+    harness.advance(ms(50));
+    harness
 }
 
 fn harness(fallback: FocusFallback) -> Harness {
@@ -137,4 +169,15 @@ fn inside_an_edit_surface_its_own_focus_wins() {
     click(&mut harness, ".inside");
     assert_eq!(harness.focus_of("#editor"), FocusState::Focused);
     assert_eq!(harness.focus_of(".app"), FocusState::Unfocused);
+}
+
+#[test]
+fn a_press_on_a_panels_empty_space_keeps_the_keyboard_and_escape_still_closes_it() {
+    let mut harness = panel(FocusFallback::Ancestor);
+    click(&mut harness, ".inside");
+    assert_eq!(harness.focus_of(".inside"), FocusState::Focused);
+    click(&mut harness, ".empty");
+    assert_eq!(harness.focus_of(".panel"), FocusState::Focused);
+    harness.send(Input::key(ShortcutKey::Escape));
+    assert_eq!(log(&harness), "closed");
 }

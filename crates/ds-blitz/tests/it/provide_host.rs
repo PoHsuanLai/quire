@@ -42,14 +42,17 @@ fn Inner() -> Element {
 }
 
 #[test]
-fn a_bare_root_gets_the_edit_and_drop_parts_but_no_click_focus() {
+fn a_bare_root_gets_the_edit_drop_and_click_focus_parts() {
     let hosts = render(Bare);
     let [host] = hosts.as_slice() else {
         panic!("one root rendered, {} hosts seen", hosts.len());
     };
     assert!(host.edit().is_some(), "edit part");
     assert!(host.file_drop().is_some(), "file drop part");
-    assert!(host.click_focus().is_none(), "click focus is a window's");
+    assert!(
+        host.click_focus().is_some(),
+        "a press on nothing focusable would clear the surface's keyboard"
+    );
 }
 
 #[test]
