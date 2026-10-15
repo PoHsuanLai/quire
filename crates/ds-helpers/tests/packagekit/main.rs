@@ -30,6 +30,7 @@ fn missing(names: &[&str]) -> Missing {
             .first()
             .map(|name| PackageName::new(name).expect("a package")),
         program: Some(Executable::new("mpv").expect("a program")),
+        install_lines: Vec::new(),
     }
 }
 

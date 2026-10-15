@@ -3,6 +3,7 @@
 use crate::capability::Capability;
 use crate::catalog::{Catalog, Entry};
 use crate::family::Family;
+use crate::install_line::install_lines;
 use crate::installer::{Installer, Request};
 use crate::outcome::{Missing, Outcome};
 use crate::probe::{Environment, Presence, presence};
@@ -78,6 +79,7 @@ impl Helpers {
                 capability: capability.clone(),
                 package: None,
                 program: None,
+                install_lines: Vec::new(),
             });
         };
         if self.refresh(capability) == Presence::Present {
@@ -88,6 +90,7 @@ impl Helpers {
             capability: capability.clone(),
             package: candidates.and_then(|(_, c)| c.first().cloned()),
             program: entry.probe.first().cloned(),
+            install_lines: install_lines(entry, self.0.family),
         };
         let Some((family, candidates)) = candidates.filter(|(_, c)| !c.is_empty()) else {
             return Outcome::Unsupported(missing);

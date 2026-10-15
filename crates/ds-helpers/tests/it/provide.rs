@@ -2,8 +2,8 @@
 //! The example data file is anyview's four capabilities (names are fixtures, not claims).
 
 use ds_helpers::{
-    Capability, Catalog, Environment, Executable, FakeInstaller, Family, Helpers, Installer,
-    Missing, Outcome, PackageName, Presence, StandIn,
+    Capability, Catalog, Environment, Executable, FakeInstaller, Family, Helpers, InstallLine,
+    Installer, Missing, Outcome, PackageName, Presence, StandIn,
 };
 use std::path::{Path, PathBuf};
 
@@ -82,11 +82,23 @@ fn cap(name: &str) -> Capability {
     Capability::new(name).expect("capability")
 }
 
-fn missing(capability: &str, package: Option<&str>, program: Option<&str>) -> Missing {
+fn missing(
+    capability: &str,
+    package: Option<&str>,
+    program: Option<&str>,
+    lines: &[(Family, &str)],
+) -> Missing {
     Missing {
         capability: cap(capability),
         package: package.map(|name| PackageName::new(name).expect("package")),
         program: program.map(|name| Executable::new(name).expect("program")),
+        install_lines: lines
+            .iter()
+            .map(|(family, name)| InstallLine {
+                family: *family,
+                package: PackageName::new(name).expect("package"),
+            })
+            .collect(),
     }
 }
 
@@ -125,11 +137,16 @@ async fn provide_installs_then_reprobes_and_announces() {
 #[tokio::test]
 async fn the_request_carries_this_distros_alternatives() {
     let scratch = Scratch::new("request", "ID=fedora\nID_LIKE=\"rhel\"\n");
-    let fake = FakeInstaller::new(Outcome::NotFound(missing("x", None, None)));
+    let fake = FakeInstaller::new(Outcome::NotFound(missing("x", None, None, &[])));
     let helpers = helpers(&scratch, fake.clone());
     assert_eq!(
         helpers.provide(&cap("media-probe")).await,
-        Outcome::NotFound(missing("media-probe", Some("ffmpeg"), Some("ffprobe")))
+        Outcome::NotFound(missing(
+            "media-probe",
+            Some("ffmpeg"),
+            Some("ffprobe"),
+            &[(Family::Dnf, "ffmpeg")]
+        ))
     );
     let asked = fake.asked();
     assert_eq!(asked.len(), 1);
@@ -143,7 +160,12 @@ async fn the_request_carries_this_distros_alternatives() {
 async fn outcomes_pass_through() {
     for outcome in [
         Outcome::Declined,
-        Outcome::NotFound(missing("video-playback", Some("mpv"), Some("mpv"))),
+        Outcome::NotFound(missing(
+            "video-playback",
+            Some("mpv"),
+            Some("mpv"),
+            &[(Family::Apt, "mpv")],
+        )),
         Outcome::Failed("disk full".to_owned()),
     ] {
         let scratch = Scratch::new("pass", "ID=ubuntu\n");
@@ -154,13 +176,26 @@ async fn outcomes_pass_through() {
 
 #[tokio::test]
 async fn unknown_distro_or_family_gap_or_capability_is_unsupported() {
-    let table = [
+    let table: [(
+        &str,
+        &str,
+        &str,
+        Option<&str>,
+        Option<&str>,
+        &[(Family, &str)],
+    ); 4] = [
         (
-            "unknown distro",
+            "unknown distro lists every family",
             "ID=nixos\n",
             "video-playback",
             None,
             Some("mpv"),
+            &[
+                (Family::Dnf, "mpv"),
+                (Family::Apt, "mpv"),
+                (Family::Pacman, "mpv"),
+                (Family::Zypper, "mpv"),
+            ],
         ),
         (
             "no zypper entry",
@@ -168,15 +203,25 @@ async fn unknown_distro_or_family_gap_or_capability_is_unsupported() {
             "heic-decode",
             None,
             Some("heif-dec"),
+            &[],
         ),
-        ("undeclared", "ID=fedora\n", "teleport", None, None),
+        ("undeclared", "ID=fedora\n", "teleport", None, None, &[]),
+        (
+            "arch without a way to install",
+            "ID=arch\n",
+            "video-playback",
+            Some("mpv"),
+            Some("mpv"),
+            &[(Family::Pacman, "mpv")],
+        ),
     ];
-    for (name, os_release, capability, package, program) in table {
+    for (name, os_release, capability, package, program, lines) in table {
         let scratch = Scratch::new("unsupported", os_release);
-        let helpers = helpers(&scratch, FakeInstaller::new(Outcome::Installed));
+        let installer = FakeInstaller::new(Outcome::Unsupported(missing("x", None, None, &[])));
+        let helpers = helpers(&scratch, installer);
         assert_eq!(
             helpers.provide(&cap(capability)).await,
-            Outcome::Unsupported(missing(capability, package, program)),
+            Outcome::Unsupported(missing(capability, package, program, lines)),
             "{name}"
         );
     }

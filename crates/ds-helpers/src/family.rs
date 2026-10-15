@@ -14,6 +14,9 @@ pub enum Family {
 }
 
 impl Family {
+    /// Every family, in the order a list of them reads.
+    pub const ALL: [Family; 4] = [Family::Dnf, Family::Apt, Family::Pacman, Family::Zypper];
+
     /// The key the helpers file uses for this family.
     pub const fn key(self) -> &'static str {
         match self {
@@ -21,6 +24,17 @@ impl Family {
             Family::Apt => "apt",
             Family::Pacman => "pacman",
             Family::Zypper => "zypper",
+        }
+    }
+
+    /// The command that installs packages on this family, up to the package names, as typed in a
+    /// terminal.
+    pub const fn install_command(self) -> &'static str {
+        match self {
+            Family::Dnf => "sudo dnf install",
+            Family::Apt => "sudo apt install",
+            Family::Pacman => "sudo pacman -S",
+            Family::Zypper => "sudo zypper install",
         }
     }
 
