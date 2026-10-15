@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use super::column::Column;
 use super::live_action::LiveAction;
+use super::place::ChoicePlace;
 
 /// A dotted settings key path: `"dock.magnified_px"`. Always `<domain>.<field>`, the derive's
 /// own mechanical rule (`crates/ds-settings-derive/src/gen_struct.rs`).
@@ -23,6 +24,12 @@ pub struct Label(pub String);
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Help(pub String);
+
+/// A short line a picker shows inline under the key, separate from [`Help`] (which stays behind
+/// the info button): the value of [`KeySpec::note`].
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(transparent)]
+pub struct Note(pub String);
 
 /// What a picker calls each word of an enum key, by the stored word: `workspace_prev` is
 /// "Previous workspace". Optional: a word without an entry is shown as its own words.
@@ -278,6 +285,15 @@ pub struct KeySpec {
     /// group's first appearance in the key's choices, so there is no order field.
     #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
     pub groups: BTreeMap<ChoiceWord, ChoiceGroup>,
+    /// Where each choice's model runs: `"places": {"<word>": {"kind": "cloud", "company":
+    /// "Anthropic"}}` (a TOML table in a file schema), absent when empty. A picker draws a mark
+    /// per place; a choice without an entry has none.
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    pub places: BTreeMap<ChoiceWord, ChoicePlace>,
+    /// A short line a picker shows inline under the key, apart from `help`, which stays behind
+    /// the info button. Absent when `None`, so older schemas parse and write unchanged.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub note: Option<Note>,
 }
 
 impl KeySpec {
@@ -310,6 +326,11 @@ impl KeySpec {
         }
         sections.retain(|section| !section.choices.is_empty());
         sections
+    }
+
+    /// Where the model behind `word` runs, if the schema says.
+    pub fn place_of(&self, word: &str) -> Option<&ChoicePlace> {
+        self.places.get(&ChoiceWord(word.to_owned()))
     }
 
     /// The reason `value` cannot be picked, if it is a string naming an unavailable choice.

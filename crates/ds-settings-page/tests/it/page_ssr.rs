@@ -33,6 +33,8 @@ fn key(path: &str, label: &str, section: &str, kind: KeyKind, default: &str) -> 
         agent: AgentSetting::HandsOff,
         unavailable: Default::default(),
         groups: Default::default(),
+        places: Default::default(),
+        note: None,
     }
 }
 

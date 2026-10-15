@@ -211,6 +211,8 @@ mod tests {
                 agent: Default::default(),
                 unavailable: Default::default(),
                 groups: Default::default(),
+                places: Default::default(),
+                note: None,
             }],
         }
     }

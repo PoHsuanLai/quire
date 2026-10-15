@@ -982,7 +982,9 @@ A few props worth knowing about before you read the signatures:
   `MenuItem::Header(group)` over each group's items, an unavailable choice as `MenuItem::new(..)
   .with_availability(Availability::Disabled)` with `MenuItem::Info { title: reason, detail: None }` right
   under it (detent's `menu_items` is the worked example). ds does not depend on ds-settings, so quire
-  has no converter.
+  has no converter. `KeySpec::place_of(word)` says where a choice's model runs (`ChoicePlace`: this
+  computer, your computer, cloud, assistant) for the mark beside it, and `KeySpec::note` is the short
+  line to show under the key (`help` stays behind the info button).
 - `Row { edit: Some(field) }` puts a field where the words stood (rename in place: a `TextField` with
   `FieldBezel::Plain`); the keys and presses typed in it do not reach the `List` around it. `PinItem`
   carries its own `mark: MarkStyle`; `TodayTab` its row's `common` and `onpointerenter`/`onpointerleave`.

@@ -28,6 +28,8 @@ pub fn spec(path: &str, kind: KeyKind, default: toml::Value) -> KeySpec {
         agent: AgentSetting::HandsOff,
         unavailable: Default::default(),
         groups: Default::default(),
+        places: Default::default(),
+        note: None,
     }
 }
 

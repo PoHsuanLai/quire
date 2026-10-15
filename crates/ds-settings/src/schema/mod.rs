@@ -12,6 +12,7 @@ mod column;
 mod deep_link;
 mod key;
 mod live_action;
+mod place;
 mod program;
 mod traits;
 
@@ -23,10 +24,11 @@ pub use column::{Column, ColumnKind, ColumnName};
 pub use deep_link::{deep_link, deep_link_path};
 pub use key::{
     AgentSetting, ChoiceGroup, ChoiceUnavailable, ChoiceWord, Exposure, GroupedChoices, Help,
-    KeyKind, KeyPath, KeySpec, Label, Page, Section, UnavailableReason, Widget, WordLabels,
+    KeyKind, KeyPath, KeySpec, Label, Note, Page, Section, UnavailableReason, Widget, WordLabels,
     kind_from_variants,
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
+pub use place::{ChoicePlace, CompanyName, EngineName, HostName};
 pub use program::{
     AppId, FilePath, ForeignTables, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,
 };

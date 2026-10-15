@@ -278,6 +278,8 @@ mod unavailable {
             agent: Default::default(),
             unavailable: Default::default(),
             groups: Default::default(),
+            places: Default::default(),
+            note: None,
         }
     }
 
@@ -375,6 +377,8 @@ mod groups {
                     )
                 })
                 .collect(),
+            places: Default::default(),
+            note: None,
         }
     }
 
@@ -472,5 +476,148 @@ mod groups {
                 .collect();
             assert_eq!(got, want, "{words:?}");
         }
+    }
+}
+
+mod places {
+    use ds_settings::live::LiveSchema;
+    use ds_settings::schema::{
+        ChoicePlace, ChoiceWord, CompanyName, EngineName, Exposure, Help, HostName, KeyKind,
+        KeyPath, KeySpec, Label, Note, Page, Section,
+    };
+
+    fn word(text: &str) -> ChoiceWord {
+        ChoiceWord(text.to_owned())
+    }
+
+    fn spec() -> KeySpec {
+        KeySpec {
+            path: KeyPath("ai.model.text.fast".to_owned()),
+            kind: KeyKind::Menu {
+                variants: vec!["a".to_owned(), "b".to_owned()],
+            },
+            default: toml::Value::String("a".to_owned()),
+            label: Label("Fast".to_owned()),
+            help: Help(String::new()),
+            page: Page::Intelligence,
+            section: Section("Text".to_owned()),
+            exposure: Exposure::Basic,
+            labels: Default::default(),
+            agent: Default::default(),
+            unavailable: Default::default(),
+            groups: Default::default(),
+            places: Default::default(),
+            note: None,
+        }
+    }
+
+    fn placed() -> KeySpec {
+        let mut key = spec();
+        key.places.insert(
+            word("a"),
+            ChoicePlace::ThisComputer {
+                engine: Some(EngineName("llama.cpp".to_owned())),
+            },
+        );
+        key.places.insert(
+            word("b"),
+            ChoicePlace::Cloud {
+                company: CompanyName("Anthropic".to_owned()),
+            },
+        );
+        key.note = Some(Note("Runs where you pick.".to_owned()));
+        key
+    }
+
+    #[test]
+    fn each_place_has_its_wire_form() {
+        let table: &[(ChoicePlace, &str)] = &[
+            (
+                ChoicePlace::ThisComputer {
+                    engine: Some(EngineName("llama.cpp".to_owned())),
+                },
+                r#"{"kind":"this_computer","engine":"llama.cpp"}"#,
+            ),
+            (
+                ChoicePlace::ThisComputer { engine: None },
+                r#"{"kind":"this_computer"}"#,
+            ),
+            (
+                ChoicePlace::YourComputer {
+                    host: HostName("frieren".to_owned()),
+                },
+                r#"{"kind":"your_computer","host":"frieren"}"#,
+            ),
+            (
+                ChoicePlace::Cloud {
+                    company: CompanyName("Anthropic".to_owned()),
+                },
+                r#"{"kind":"cloud","company":"Anthropic"}"#,
+            ),
+            (ChoicePlace::Assistant, r#"{"kind":"assistant"}"#),
+        ];
+        for (place, wire) in table {
+            assert_eq!(&serde_json::to_string(place).expect("serialises"), wire);
+            assert_eq!(
+                &serde_json::from_str::<ChoicePlace>(wire).expect("parses"),
+                place
+            );
+        }
+    }
+
+    #[test]
+    fn places_and_note_round_trip_in_json() {
+        let with = LiveSchema {
+            version: 1,
+            key: vec![placed()],
+        };
+        let json = with.to_json();
+        assert!(
+            json.contains(r#""places":{"a":{"kind":"this_computer","engine":"llama.cpp"},"b":{"kind":"cloud","company":"Anthropic"}}"#),
+            "{json}"
+        );
+        assert!(json.contains(r#""note":"Runs where you pick.""#), "{json}");
+        assert_eq!(LiveSchema::from_json(&json).expect("parses"), with);
+    }
+
+    #[test]
+    fn places_and_note_round_trip_in_toml() {
+        let key = placed();
+        let text = toml::to_string(&key).expect("serialises");
+        assert!(text.contains("[places.a]"), "{text}");
+        assert!(text.contains("note = "), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).expect("parses"), key);
+    }
+
+    #[test]
+    fn a_key_without_them_writes_neither_field() {
+        let json = LiveSchema {
+            version: 1,
+            key: vec![spec()],
+        }
+        .to_json();
+        assert!(!json.contains("places") && !json.contains("note"), "{json}");
+        let text = toml::to_string(&spec()).expect("serialises");
+        assert!(!text.contains("places") && !text.contains("note"), "{text}");
+    }
+
+    #[test]
+    fn json_from_before_the_fields_parses() {
+        let old = r#"{"version":1,"key":[{"path":"ai.model.text.fast","kind":{"kind":"menu","v":{"variants":["a","b"]}},"default":"a","label":"Fast","help":"","page":{"kind":"intelligence"},"section":"Text","exposure":"basic"}]}"#;
+        let key = &LiveSchema::from_json(old).expect("parses").key[0];
+        assert!(key.places.is_empty());
+        assert_eq!(key.note, None);
+    }
+
+    #[test]
+    fn place_of_reads_the_entry_for_a_word() {
+        let key = placed();
+        assert_eq!(
+            key.place_of("b"),
+            Some(&ChoicePlace::Cloud {
+                company: CompanyName("Anthropic".to_owned())
+            })
+        );
+        assert_eq!(key.place_of("zzz"), None);
     }
 }

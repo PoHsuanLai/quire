@@ -1288,6 +1288,16 @@ Settings app draws a section header per group, and a choice that is also `unavai
 greyed inside its group. `Describe`, `Get`, `Set` and `Changed` keep their signatures: the
 freeze above is not touched.
 
+Choice places and note (additive, 2026-10-16): a menu `KeySpec` may carry `places`, a map from a
+choice word to where its model runs, and `note`, a short line a picker shows inline under the
+key (apart from `help`, which stays behind the info button). A place is an internally tagged
+value: `{"kind":"this_computer","engine":"llama.cpp"}` (`engine` optional),
+`{"kind":"your_computer","host":"frieren"}`, `{"kind":"cloud","company":"Anthropic"}` or
+`{"kind":"assistant"}`; a file schema has `[key.places.<word>]` tables. A word without an entry
+has no place. `places` is skipped when empty and `note` when absent, so older schemas parse
+unchanged and a key without them serialises byte for byte as before. `KeySpec::place_of(word)`
+reads one entry. `Describe`, `Get`, `Set` and `Changed` keep their signatures.
+
 ### 9.5 Rules
 
 - A settings key exists only if a `KeySpec` describes it: a struct field without the derive is

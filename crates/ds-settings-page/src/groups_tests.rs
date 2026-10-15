@@ -18,6 +18,8 @@ fn key(path: &str, section: &str) -> KeySpec {
         agent: AgentSetting::HandsOff,
         unavailable: Default::default(),
         groups: Default::default(),
+        places: Default::default(),
+        note: None,
     }
 }
 
