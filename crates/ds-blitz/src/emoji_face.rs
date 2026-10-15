@@ -7,11 +7,14 @@
 //! sequences) before the `emoji` generic is ever consulted. So the colour face is inserted into
 //! each generic list just before its first family that maps an emoji: text fonts earlier in the
 //! list still map the letters, digits and spaces (Noto Color Emoji maps digits to empty glyphs).
-//! The face is detected, not named: the first family of the `emoji` generic that carries a COLR
-//! table (CBDT draws nothing on our renderers), or the one `QUIRE_EMOJI_FAMILY` names.
+//! The face is detected, not named: the one `QUIRE_EMOJI_FAMILY` names, else the first family of
+//! the `emoji` generic that carries a COLR table (CBDT draws nothing on our renderers), else the
+//! COLRv1 file the installer or a distro package left on disk (`emoji_file`), registered here.
 
+use crate::emoji_file::colrv1_emoji_file;
 use blitz_dom::FontContext;
 use parley::fontique::{FamilyId, GenericFamily, QueryFamily, QueryFont, QueryStatus};
+use std::sync::Arc;
 
 /// The environment variable naming the colour emoji family to use instead of the detected one.
 pub const EMOJI_FAMILY_ENV: &str = "QUIRE_EMOJI_FAMILY";
@@ -36,7 +39,7 @@ const GENERICS: [GenericFamily; 10] = [
 /// Which family paints colour emoji.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum EmojiChoice {
-    /// The first COLR family the system lists for `emoji`.
+    /// The first COLR family the system lists for `emoji`, else a COLRv1 font file on disk.
     #[default]
     Detect,
     /// This family, trusted without a table check.
@@ -98,19 +101,33 @@ fn insert_before_first(list: &[FamilyId], covers: &[bool], face: FamilyId) -> Ve
     }
 }
 
+/// The family to paint colour emoji with: the one `choice` names, else the first COLR family of
+/// the `emoji` generic, else the COLRv1 file [`colrv1_emoji_file`] finds, registered.
 fn colour_face(ctx: &mut FontContext, choice: &EmojiChoice) -> Option<FamilyId> {
     match choice {
         EmojiChoice::Named(name) => ctx.collection.family_id(name),
-        EmojiChoice::Detect => {
-            let emoji: Vec<FamilyId> = ctx
-                .collection
-                .generic_families(GenericFamily::Emoji)
-                .collect();
-            emoji
-                .into_iter()
-                .find(|id| first_font(ctx, *id, |font| has_table(font, *b"COLR")))
-        }
+        EmojiChoice::Detect => system_colour_face(ctx).or_else(|| register_colrv1_file(ctx)),
     }
+}
+
+fn system_colour_face(ctx: &mut FontContext) -> Option<FamilyId> {
+    let emoji: Vec<FamilyId> = ctx
+        .collection
+        .generic_families(GenericFamily::Emoji)
+        .collect();
+    emoji
+        .into_iter()
+        .find(|id| first_font(ctx, *id, |font| has_table(font, *b"COLR")))
+}
+
+/// The family of the COLRv1 file on this machine, registered with the collection. The
+/// registered family shadows a system family of the same name (the bitmap build's), so a stack
+/// that names `Noto Color Emoji` reaches the colour face too.
+fn register_colrv1_file(ctx: &mut FontContext) -> Option<FamilyId> {
+    let bytes = std::fs::read(colrv1_emoji_file()?).ok()?;
+    let blob = parley::fontique::Blob::new(Arc::new(bytes) as _);
+    let families = ctx.collection.register_fonts(blob, None);
+    families.into_iter().next().map(|(id, _)| id)
 }
 
 fn maps_emoji(ctx: &mut FontContext, id: FamilyId) -> bool {
@@ -134,57 +151,13 @@ fn first_font(ctx: &mut FontContext, id: FamilyId, read: impl Fn(&QueryFont) -> 
 }
 
 fn has_table(font: &QueryFont, tag: [u8; 4]) -> bool {
-    table_listed(font.blob.data(), font.index, tag)
-}
-
-/// Whether the sfnt (or collection member `index`) lists a table `tag`.
-fn table_listed(data: &[u8], index: u32, tag: [u8; 4]) -> bool {
-    let be32 = |at: usize| -> Option<usize> {
-        let bytes = data.get(at..at + 4)?;
-        Some(u32::from_be_bytes(bytes.try_into().ok()?) as usize)
-    };
-    let start = if data.starts_with(b"ttcf") {
-        be32(12 + 4 * index as usize)
-    } else {
-        Some(0)
-    };
-    let Some(start) = start else { return false };
-    let Some(count) = data
-        .get(start + 4..start + 6)
-        .map(|bytes| u16::from_be_bytes([bytes[0], bytes[1]]) as usize)
-    else {
-        return false;
-    };
-    (0..count).any(|n| {
-        let at = start + 12 + 16 * n;
-        data.get(at..at + 4) == Some(&tag[..])
-    })
+    crate::sfnt::table_listed(font.blob.data(), font.index, tag)
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{insert_before_first, table_listed};
+    use super::insert_before_first;
     use parley::fontique::FamilyId;
-
-    /// An sfnt header listing `tags` and nothing else.
-    fn sfnt(tags: &[&[u8; 4]]) -> Vec<u8> {
-        let mut data = vec![0, 1, 0, 0];
-        data.extend((tags.len() as u16).to_be_bytes());
-        data.extend([0; 6]);
-        for tag in tags {
-            data.extend(tag.iter());
-            data.extend([0; 12]);
-        }
-        data
-    }
-
-    #[test]
-    fn a_table_directory_is_searched_for_colr() {
-        let colour = sfnt(&[b"cmap", b"COLR", b"glyf"]);
-        assert!(table_listed(&colour, 0, *b"COLR"));
-        assert!(!table_listed(&sfnt(&[b"cmap", b"CBDT"]), 0, *b"COLR"));
-        assert!(!table_listed(&[0, 1], 0, *b"COLR"));
-    }
 
     #[test]
     fn the_colour_face_goes_before_the_first_family_that_maps_emoji() {
