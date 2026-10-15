@@ -251,22 +251,40 @@ fn a_list_look_is_marked_and_stripes_every_other_row_by_index_and_marks_the_curs
     for (look, marked, striped) in cases {
         LOOK.set(look);
         let mut harness = Harness::new(Looked, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
-        assert_eq!(harness.attr(".ds-vtable", "data-look").as_deref(), marked, "{look:?}");
+        assert_eq!(
+            harness.attr(".ds-vtable", "data-look").as_deref(),
+            marked,
+            "{look:?}"
+        );
         assert_eq!(
             harness.count(".ds-vtable-item[data-stripe=odd]") > 0,
             striped,
             "{look:?} stripes"
         );
-        assert_eq!(harness.count(".ds-vtable-item[data-selected=yes]"), 1, "{look:?}");
         assert_eq!(
-            harness.attr(".ds-vtable-item[data-row=\"1\"]", "data-selected").as_deref(),
+            harness.count(".ds-vtable-item[data-selected=yes]"),
+            1,
+            "{look:?}"
+        );
+        assert_eq!(
+            harness
+                .attr(".ds-vtable-item[data-row=\"1\"]", "data-selected")
+                .as_deref(),
             Some("yes"),
             "{look:?} the cursor row"
         );
         if striped {
             // The stripe follows the row, not its place among those mounted.
-            assert!(harness.attr(".ds-vtable-item[data-row=\"1\"]", "data-stripe").is_some());
-            assert!(harness.attr(".ds-vtable-item[data-row=\"2\"]", "data-stripe").is_none());
+            assert!(
+                harness
+                    .attr(".ds-vtable-item[data-row=\"1\"]", "data-stripe")
+                    .is_some()
+            );
+            assert!(
+                harness
+                    .attr(".ds-vtable-item[data-row=\"2\"]", "data-stripe")
+                    .is_none()
+            );
             let at = harness.centre(".ds-scroller").expect("the scroller");
             harness.send(Input::wheel(at, Px(0.0), Px(-5.0 * row_pitch().0)));
             let rows = mounted(&harness);
