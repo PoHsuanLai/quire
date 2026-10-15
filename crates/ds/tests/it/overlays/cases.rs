@@ -950,6 +950,19 @@ pub const CASES: &[Case] = &[
         make: || rsx! { SpacesBar { label: "Spaces", spaces: bar_thumbnails(), shown: Shown::Visible, expansion: Some(BarExpansion::Expanded), on_pick: |_| {} } },
         wait: NOW,
     },
+    // The plus lit by a drag, and the Spaces over their backdrops (one with a picture on it).
+    Case {
+        component: "spaces_bar",
+        state: "plus-lit",
+        make: || rsx! { SpacesBar { label: "Spaces", spaces: bar_backdrops(), shown: Shown::Visible, expansion: Some(BarExpansion::Expanded), add_drop: DropState::Target, on_add: |_| {}, on_pick: |_| {} } },
+        wait: NOW,
+    },
+    Case {
+        component: "spaces_bar",
+        state: "backdrops",
+        make: || rsx! { SpacesBar { label: "Spaces", spaces: bar_backdrops(), shown: Shown::Visible, expansion: Some(BarExpansion::Expanded), on_pick: |_| {} } },
+        wait: NOW,
+    },
 ];
 
 /// Three Spaces, the second on show and the third able to take a drop.
@@ -968,5 +981,17 @@ fn bar_thumbnails() -> Vec<SpaceTile> {
             .current(Selection::Selected)
             .thumbnail(ImageSource("data:image/png;base64,AAAA".to_owned())),
         SpaceTile::new(BarSpaceKey("2".to_owned()), "Desktop 2").in_drag(DropState::Target),
+    ]
+}
+
+/// Two Spaces over a backdrop: the first with a picture on it, the second the backdrop alone.
+fn bar_backdrops() -> Vec<SpaceTile> {
+    let wall = ImageSource("data:image/png;base64,BBBB".to_owned());
+    vec![
+        SpaceTile::new(BarSpaceKey("1".to_owned()), "Desktop 1")
+            .current(Selection::Selected)
+            .backdrop(wall.clone())
+            .thumbnail(ImageSource("data:image/png;base64,AAAA".to_owned())),
+        SpaceTile::new(BarSpaceKey("2".to_owned()), "Desktop 2").backdrop(wall),
     ]
 }

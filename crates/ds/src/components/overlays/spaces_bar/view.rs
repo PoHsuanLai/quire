@@ -7,15 +7,17 @@
 //! unmaps its surface. The pointer over the bar expands it to thumbnails, and off it collapses it
 //! again, unless the caller holds `expansion` itself.
 
+use super::layout::{BarLayout, Book, Reporter, use_add_rect, use_card_rect, use_tile_rect};
 use super::model::{BarExpansion, BarSpaceKey, PointerOver, SpaceTile};
 use crate::components::content::icon_source::IconSource;
+use crate::components::content::image_source::ImageSource;
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::controls::press::{ActivationKeys, PressListeners};
 use crate::root::common::Common;
 use dioxus::prelude::*;
 use ds_core::press::{PointerButton, Press};
-use ds_core::vocab::Shown;
+use ds_core::vocab::{DropState, Shown};
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
 use ds_motion::presence::{
@@ -33,7 +35,10 @@ const ADD_LABEL: &str = "Add Space";
 /// `add_label`) reports through `on_add`. `shown` is whether the bar is up: it drops in and lifts
 /// away, and `on_hidden` runs at the end of the lift. `expansion` is how much shows: `None`
 /// follows the pointer, `Some` is what the caller says, and `on_expansion_change` hears each
-/// change the pointer asks for. `common.aria_label` names the group in place of `label`.
+/// change the pointer asks for. `add_drop` is the plus's part in a drag, as `SpaceTile::in_drag`
+/// is a Space's: `Target` lights it with the wash and ring a lit Space gets. `on_layout`, when
+/// given, hears where the Spaces and the plus are drawn (measured) each time any of them moves or
+/// resizes. `common.aria_label` names the group in place of `label`.
 #[component]
 pub fn SpacesBar(
     label: String,
@@ -42,6 +47,8 @@ pub fn SpacesBar(
     on_pick: EventHandler<BarSpaceKey>,
     #[props(default)] on_add: Option<EventHandler<()>>,
     #[props(default = ADD_LABEL.to_owned())] add_label: String,
+    #[props(default)] add_drop: DropState,
+    #[props(default)] on_layout: Option<EventHandler<BarLayout>>,
     #[props(default)] on_hidden: EventHandler<()>,
     #[props(default)] expansion: Option<BarExpansion>,
     #[props(default)] on_expansion_change: Option<EventHandler<BarExpansion>>,
@@ -55,6 +62,7 @@ pub fn SpacesBar(
         },
         Some(on_hidden),
     );
+    Book::provide();
     let mut own = use_signal(BarExpansion::default);
     let now = expansion.unwrap_or_else(|| *own.read());
     let mut ask = move |over: PointerOver| {
@@ -74,6 +82,7 @@ pub fn SpacesBar(
     let class = common.class("ds-spaces-bar");
     let data = common.data_attributes();
     let name = common.aria_label.clone().unwrap_or(label);
+    let keys: Vec<BarSpaceKey> = spaces.iter().map(|tile| tile.key.clone()).collect();
     rsx! {
         div {
             id: common.id.clone(),
@@ -95,20 +104,35 @@ pub fn SpacesBar(
             }
             div { class: "ds-spaces-bar-side",
                 if let Some(on_add) = on_add {
-                    span { class: "ds-spaces-bar-add",
-                        Button {
-                            label: add_label,
-                            bezel: Bezel::Toolbar,
-                            image: ImagePosition::Only,
-                            icon: Some(IconSource::from(Icon::Plus)),
-                            onclick: move |press: Press| {
-                                if press.button == PointerButton::Primary {
-                                    on_add.call(());
-                                }
-                            },
-                        }
-                    }
+                    Plus { label: add_label, drop: add_drop, on_add }
                 }
+            }
+            if let Some(on_layout) = on_layout {
+                Reporter { keys, on_layout }
+            }
+        }
+    }
+}
+
+/// The plus at the right edge, lit while a drag is over it.
+#[component]
+fn Plus(label: String, drop: DropState, on_add: EventHandler<()>) -> Element {
+    let probe = use_add_rect();
+    rsx! {
+        span {
+            class: "ds-spaces-bar-add",
+            "data-drop": drop.drop_attr(),
+            onmounted: move |event| probe.on_mounted(event),
+            Button {
+                label,
+                bezel: Bezel::Toolbar,
+                image: ImagePosition::Only,
+                icon: Some(IconSource::from(Icon::Plus)),
+                onclick: move |press: Press| {
+                    if press.button == PointerButton::Primary {
+                        on_add.call(());
+                    }
+                },
             }
         }
     }
@@ -122,8 +146,11 @@ fn Tile(tile: SpaceTile, expansion: BarExpansion, on_pick: EventHandler<BarSpace
         name,
         current,
         thumbnail,
+        backdrop,
         drop,
     } = tile;
+    let probe = use_tile_rect(&key);
+    let card = key.clone();
     let listen = PressListeners::new(EventHandler::new(move |press: Press| {
         if press.button == PointerButton::Primary {
             on_pick.call(key.clone());
@@ -137,17 +164,35 @@ fn Tile(tile: SpaceTile, expansion: BarExpansion, on_pick: EventHandler<BarSpace
             "data-drop": drop.drop_attr(),
             "data-drag": drop.drag_attr(),
             "aria-current": current.aria_current(),
+            onmounted: move |event| probe.on_mounted(event),
             onclick: move |event| listen.click(&event),
             onkeydown: move |event| listen.key_down(&event, ActivationKeys::ReturnAndSpace),
             oncontextmenu: move |event| listen.context_menu(&event),
             if expansion == BarExpansion::Expanded {
-                span { class: "ds-spaces-bar-thumb",
-                    if let Some(picture) = thumbnail {
-                        img { class: "ds-spaces-bar-picture", alt: "", src: picture.0, draggable: "false" }
-                    }
-                }
+                Card { space: card, backdrop, picture: thumbnail }
             }
             span { class: "ds-spaces-bar-name", "{name}" }
+        }
+    }
+}
+
+/// A Space's thumbnail card: its backdrop under its picture, both cover-fit and clipped by the
+/// card's corners.
+#[component]
+fn Card(
+    space: BarSpaceKey,
+    backdrop: Option<ImageSource>,
+    picture: Option<ImageSource>,
+) -> Element {
+    let probe = use_card_rect(&space);
+    rsx! {
+        span { class: "ds-spaces-bar-thumb", onmounted: move |event| probe.on_mounted(event),
+            if let Some(backdrop) = backdrop {
+                img { class: "ds-spaces-bar-backdrop", alt: "", src: backdrop.0, draggable: "false" }
+            }
+            if let Some(picture) = picture {
+                img { class: "ds-spaces-bar-picture", alt: "", src: picture.0, draggable: "false" }
+            }
         }
     }
 }

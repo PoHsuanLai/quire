@@ -213,7 +213,7 @@ pub const COMPONENTS: &[ComponentSelectors] = &[
     ComponentSelectors {
         component: "SpacesBar",
         root: "ds-spaces-bar",
-        parts: &["space", "thumb", "name", "add"],
+        parts: &["space", "thumb", "backdrop", "name", "add"],
     },
     ComponentSelectors {
         component: "TextField",

@@ -2,7 +2,9 @@
 //! it collapses it again, unless the caller holds the expansion (which then hears the ask); a
 //! primary press on a Space reports its key and a secondary one does not; the plus reports an
 //! add; the Space a drag is over is lit; and a bar its host hides lifts away, reporting
-//! `on_hidden` at `settle(LiftOut)` and drawing nothing after.
+//! `on_hidden` at `settle(LiftOut)` and drawing nothing after; `on_layout` reports the rectangles
+//! the Spaces, their cards and the plus are drawn at; the plus a drag is over is lit; and a
+//! Space's backdrop lies under its picture.
 
 use dioxus::prelude::*;
 use ds::base::press::PointerButton;
@@ -31,7 +33,9 @@ fn tiles() -> Vec<SpaceTile> {
     vec![
         SpaceTile::new(BarSpaceKey("a".to_owned()), "Desktop 1"),
         SpaceTile::new(BarSpaceKey("b".to_owned()), "Desktop 2").current(Selection::Selected),
-        SpaceTile::new(BarSpaceKey("c".to_owned()), "Desktop 3").in_drag(DropState::Target),
+        SpaceTile::new(BarSpaceKey("c".to_owned()), "Desktop 3")
+            .backdrop(ImageSource("data:image/png;base64,BBBB".to_owned()))
+            .in_drag(DropState::Target),
     ]
 }
 
@@ -41,8 +45,11 @@ fn tiles() -> Vec<SpaceTile> {
 fn Hung(held: Option<BarExpansion>) -> Element {
     let shown = use_context::<Signal<Shown>>();
     let mut log = use_signal(Vec::<String>::new);
+    let mut layout = use_signal(BarLayout::default);
     rsx! {
         SpacesBar {
+            add_drop: DropState::Target,
+            on_layout: move |to: BarLayout| layout.set(to),
             label: "Spaces",
             spaces: tiles(),
             shown: shown(),
@@ -53,6 +60,11 @@ fn Hung(held: Option<BarExpansion>) -> Element {
             on_hidden: move |()| log.with_mut(|log| log.push("hidden".to_owned())),
         }
         p { class: "log", {log().join(",")} }
+        p { class: "reported-add", {layout().add.map(whole).unwrap_or_default()} }
+        for rects in layout().spaces {
+            p { class: "reported-tile", {whole(rects.tile)} }
+            p { class: "reported-card", {rects.card.map(whole).unwrap_or_default()} }
+        }
     }
 }
 
@@ -70,6 +82,27 @@ fn Held() -> Element {
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport, Hung { held: Some(BarExpansion::Collapsed) } }
     }
+}
+
+#[allow(non_snake_case)]
+fn Open() -> Element {
+    use_context_provider(|| Signal::new(Shown::Visible));
+    rsx! {
+        Ds { appearance: Appearance::default(), material: Material::Window, extent: RootExtent::Viewport, Hung { held: Some(BarExpansion::Expanded) } }
+    }
+}
+
+/// A rect as whole pixels, `x,y,width,height`: how the page writes what `on_layout` reported and
+/// how the test reads what is drawn, so rounding in either reading is not a difference.
+fn whole(rect: Rect) -> String {
+    let n = |px: Px| px.0.round() as i32;
+    format!(
+        "{},{},{},{}",
+        n(rect.origin.x),
+        n(rect.origin.y),
+        n(rect.size.width),
+        n(rect.size.height)
+    )
 }
 
 fn harness(page: fn() -> Element) -> Harness {
@@ -189,4 +222,49 @@ fn a_hidden_bar_lifts_away_reports_at_its_settle_and_draws_nothing_after() {
     let reported = ds_harness::harness::settle_until(&mut harness, |h| log(h) == "hidden");
     assert_eq!(reported.duration_since(asked), exit);
     assert_eq!(harness.count(".ds-spaces-bar"), 0, "gone once settled");
+}
+
+#[test]
+fn on_layout_reports_the_rectangles_the_parts_are_drawn_at() {
+    let mut harness = harness(Open);
+    harness.advance(ms(120));
+    for (reported, drawn) in [
+        (".reported-add", ".ds-spaces-bar-add"),
+        (".reported-tile", ".ds-spaces-bar-space"),
+        (".reported-card", ".ds-spaces-bar-thumb"),
+    ] {
+        let at = harness.rect(drawn).map(whole);
+        assert!(at.is_some(), "{drawn} is drawn");
+        assert_eq!(harness.text_of(reported), at, "{reported} matches {drawn}");
+    }
+    assert_eq!(harness.count(".reported-tile"), 3, "a rectangle per Space");
+    assert_eq!(harness.count(".reported-card"), 3);
+}
+
+#[test]
+fn a_collapsed_bar_reports_tiles_and_no_cards() {
+    let mut harness = harness(Page);
+    harness.advance(ms(120));
+    assert_eq!(harness.count(".reported-tile"), 3);
+    assert_eq!(harness.text_of(".reported-card").as_deref(), Some(""));
+}
+
+#[test]
+fn the_plus_a_drag_is_over_is_lit() {
+    let harness = harness(Page);
+    assert_eq!(harness.count(".ds-spaces-bar-add[*|data-drop=target]"), 1);
+}
+
+#[test]
+fn a_backdrop_lies_under_the_picture_inside_the_card() {
+    let mut harness = harness(Open);
+    harness.advance(ms(60));
+    assert_eq!(
+        harness.count(".ds-spaces-bar-backdrop"),
+        1,
+        "one Space has one"
+    );
+    let card = harness.rect(".ds-spaces-bar-space[*|data-drop=target] .ds-spaces-bar-thumb");
+    let backdrop = harness.rect(".ds-spaces-bar-backdrop");
+    assert_eq!(card, backdrop, "it fills the card it is clipped by");
 }

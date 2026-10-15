@@ -47,7 +47,7 @@ re-theme every surface consistently, and every token variable
 | SkeletonRow | `.ds-skeleton-row` | `.ds-skeleton-row-lines` |
 | Scrubber | `.ds-scrubber` | `.ds-scrubber-track`, `.ds-scrubber-buffered`, `.ds-scrubber-fill`, `.ds-scrubber-thumb`, `.ds-scrubber-tooltip` |
 | Slider | `.ds-slider` | `.ds-slider-track`, `.ds-slider-fill`, `.ds-slider-thumb`, `.ds-slider-icon`, `.ds-slider-tick` |
-| SpacesBar | `.ds-spaces-bar` | `.ds-spaces-bar-space`, `.ds-spaces-bar-thumb`, `.ds-spaces-bar-name`, `.ds-spaces-bar-add` |
+| SpacesBar | `.ds-spaces-bar` | `.ds-spaces-bar-space`, `.ds-spaces-bar-thumb`, `.ds-spaces-bar-backdrop`, `.ds-spaces-bar-name`, `.ds-spaces-bar-add` |
 | TextField | `.ds-text-field` | `.ds-text-field-frame`, `.ds-text-field-icon`, `.ds-text-field-suffix`, `.ds-text-field-help`, `.ds-text-field-tokens` |
 | Toast | `.ds-toast` | `.ds-toast-body`, `.ds-toast-action` |
 | Toggle | `.ds-toggle` | `.ds-toggle-track`, `.ds-toggle-indicator` |

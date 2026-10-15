@@ -4421,16 +4421,24 @@ label), and the row carries `aria-describedby` to it; on request it is visually 
 (design/27 pre-Liquid-Glass). Collapsed it is a centred row of the Spaces' names with the current one
 on the frame's pill; the pointer over the bar expands it to a thumbnail for each Space with its name
 under it, the current thumbnail ringed in the accent; a plus at the right edge adds a Space; a Space a
-drag is over is lit.
+drag is over is lit, and so is the plus when a drag is over it. A Space may lie over its desktop's own
+picture, and the host can ask where everything is drawn.
 **Markup.** `div.ds-spaces-bar[role=group][data-expansion][data-presence][data-pulse]` holding
 `div.ds-spaces-bar-side`, `div.ds-spaces-bar-row` (a `button.ds-spaces-bar-space[data-selected]
 [aria-current][data-drop][data-drag]` per Space, holding `span.ds-spaces-bar-thumb` (with
-`img.ds-spaces-bar-picture` when it has a picture; only while expanded) and `span.ds-spaces-bar-name`)
-and a second side holding `span.ds-spaces-bar-add` around a toolbar `Button`.
+`img.ds-spaces-bar-backdrop` when it has a backdrop, then `img.ds-spaces-bar-picture` when it has a
+picture; only while expanded) and `span.ds-spaces-bar-name`)
+and a second side holding `span.ds-spaces-bar-add[data-drop]` around a toolbar `Button`.
 **Props.** `SpacesBar { label, spaces: Vec<SpaceTile>, shown: Shown, on_pick: EventHandler<BarSpaceKey>,
 on_add: Option<EventHandler<()>>, add_label, on_hidden, expansion: Option<BarExpansion>,
-on_expansion_change: Option<EventHandler<BarExpansion>>, common }`. `SpaceTile::new(key, name)` with
-`.current(Selection)`, `.thumbnail(ImageSource)`, `.in_drag(DropState)`. `BarSpaceKey` is the host's own
+on_expansion_change: Option<EventHandler<BarExpansion>>, add_drop: DropState, on_layout:
+Option<EventHandler<BarLayout>>, common }`. `SpaceTile::new(key, name)` with
+`.current(Selection)`, `.thumbnail(ImageSource)`, `.backdrop(ImageSource)`, `.in_drag(DropState)`.
+`add_drop` is the plus's part in a drag (`Target` wash and `--s-2` accent ring as a lit Space; `Accepts` a
+`--hair` outline). `backdrop` is drawn as an `img` under the thumbnail's picture, cover-fit and clipped by the
+card's `--r-tiny`; alone, it is what the card shows. `on_layout` hears a `BarLayout { spaces: Vec<SpaceRects
+{ key, tile, card: Option<Rect> }>, add: Option<Rect> }` (window coordinates, logical pixels) after each
+layout that moves or resizes a part (measured with `use_rect`, as the toolbar and titlebar do). `BarSpaceKey` is the host's own
 id, quoted back by `on_pick` and never read. `expansion` follows the controlled-component rule: `None`
 follows the pointer, `Some` is drawn whatever the pointer does and `on_expansion_change` hears each ask.
 A primary press only picks; a secondary one does nothing.
@@ -4442,7 +4450,8 @@ A primary press only picks; a secondary one does nothing.
 by `use_presence`; `on_hidden` runs at `settle(LiftOut)`, when the host unmaps the surface. `--drop-dy`
 sets how far above it starts (`--s-48`). Reduced: a cross-fade over `--t-quick`.
 **Tests.** `ds/tests/it/components_overlays.rs` goldens (`spaces_bar/collapsed`, `expanded`);
-`ds-conformance/tests/it/spaces_bar.rs` (hover, press, plus, held expansion, drop lit, lift) and
+`ds-conformance/tests/it/spaces_bar.rs` (hover, press, plus, held expansion, drop lit, lift, the lit plus,
+the backdrop under the picture, `on_layout` against the drawn elements) and
 `drop_in_lift_out.rs` (the motion on a virtual clock).
 
 ## Open decisions

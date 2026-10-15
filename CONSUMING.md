@@ -2030,6 +2030,19 @@ rsx! { Ds { appearance, material, look: spaces.look(),
 - Slide content with `spaces.slide()` (`in-r` or `in-l`). `SpacesSource::Desktop` is an experiment
   that is not built (design/21 section 13.6); pass nothing.
 
+### The Spaces bar: lit plus, backdrops, measured rectangles
+
+`SpacesBar` (Mission Control's strip) takes three optional things beyond its Spaces; a caller that gives none draws what it always did.
+
+```text
+SpacesBar { label, spaces, shown, on_pick, on_add,
+            add_drop: DropState::Target,          // the plus lit, as SpaceTile::in_drag lights a Space
+            on_layout: move |l: BarLayout| ... }  // where the parts are drawn
+SpaceTile::new(key, name).backdrop(ImageSource::file(&wallpaper)?).thumbnail(picture)
+```
+
+The backdrop is the desktop's own picture (the output's wallpaper), drawn under the thumbnail's picture, cover-fit and clipped to the card; a thumbnail with transparent areas shows it through, and without a thumbnail it is all the card shows. `on_layout` delivers real rectangles (window coordinates, logical pixels): `layout.spaces[i].tile` is the Space's button, `.card` its thumbnail card (`None` while the bar is collapsed), `layout.add` the plus. Do not compute them from quire's padding numbers.
+
 ## 15. Keyboard: actions, not modifiers
 
 An app never reads which modifier is held and never decides Command versus Ctrl. quire is the one

@@ -1935,3 +1935,40 @@ Lane `q-spacesbar`, written without a build: nothing here has been compiled or r
   virtual clock, exact settle, Reduced); `ds-conformance/tests/it/spaces_bar.rs` (hover expands and collapses, press and
   right-click, the plus, held expansion, the drop highlight, the lift); `SpaceTile` and `BarExpansion` unit tests; two
   goldens.
+
+## q-barasks
+
+Lane `q-barasks`, written without a build: nothing here has been compiled or run, so the gate decides. Answers sill's FINDINGS `mc2` /
+`mc4` asks for `SpacesBar`. All additive: existing callers compile unchanged.
+
+- **Added.** `SpacesBar::add_drop: DropState` (default `Idle`; written as `data-drop` on `.ds-spaces-bar-add`, CSS lights the button inside it
+  with `--accent-soft` and a `--s-2` accent ring for `Target`, a `--hair` ring for `Accepts`); `SpaceTile::backdrop(ImageSource)` (an
+  `img.ds-spaces-bar-backdrop` under the picture inside `.ds-spaces-bar-thumb`); `SpacesBar::on_layout: Option<EventHandler<BarLayout>>` with
+  `BarLayout { spaces: Vec<SpaceRects { key, tile, card: Option<Rect> }>, add: Option<Rect> }` (re-exported from `ds::prelude`).
+- **Why an `img` for the backdrop.** The thumbnail picture is already an `img` with `object-fit: cover` clipped by the card's `overflow:hidden`
+  and radius, which Blitz draws (and an `img` takes `file:` and `data:` through the net provider). A CSS `background-image` through a custom
+  property is what sill called unproven; S8 (above) proves only `data:` backgrounds with a `data:` NetProvider.
+- **Why `on_layout` and not per-tile hooks.** Every quire component that exposes geometry does it with `use_rect` (the host's frame phase) and a
+  callback or anchor (palette `on_rect`, menus' `Anchor::Mounted`), not ids for the caller to measure. One event with all rects lets the host
+  send one update per change. Each part (`Tile`, `Card`, `Plus`) owns a probe and publishes into a book the bar shares by context; a `Reporter`
+  child reads the book in the bar's order and calls `on_layout` when the layout differs; nothing is reported until a part is laid out. The card
+  probe lives in its own component so its rect is withdrawn when the bar collapses.
+- **Departures.** The tile rect is the button (it includes the name and padding), the card is the thumbnail; both are reported so a host picks.
+  The plus rect is the `span.ds-spaces-bar-add` around the button (the same box).
+- **Goldens that will change.** None of the existing: `spaces_bar/collapsed` and `expanded` gain no attribute (an `Idle` plus has no
+  `data-drop`; probes add no markup). New, to be created on bless: `ds/tests/snapshots/overlays/spaces_bar/plus-lit.html` and `backdrops.html`.
+  Hand-edited, to confirm: `ds-shell/tests/snapshots/stylesheet.css` (the three added rules after the `spaces_bar` sheet's last rule) and
+  `docs/selectors.md`.
+- **Likeliest first-compile faults.** `use_reactive!(|layout| ..)` capturing `on_layout` (an `EventHandler`, `Copy`); `use_drop` / `try_write`
+  on the book signal (needs the `Writable` trait in scope via the dioxus prelude); the `Plus` prop named `drop` next to `core::mem::drop` used in
+  `layout.rs` (they are different scopes, but a lint may object); `.ds-button` specificity against the Button's own hover rule if the lit plus
+  looks unlit; the conformance test's `harness.rect` (the `Query` trait must be imported there; it already is for `centre`) and its coordinates
+  matching the phase-published rects to the whole pixel; `SpaceTile` is `#[non_exhaustive]`, so the destructure in `view.rs` is only legal
+  inside the crate.
+- **How sill switches over** (`crates/sill-overlays/src/spaces_bar/`). Delete `style.css`'s `data-add-drop` rule and its `--sill-bar-wallpaper`
+  / `data-backdrop` rule (the file goes if nothing else is in it), the wrapper's `data-add-drop` and `data-backdrop` attributes and the
+  `css_url` / custom-property code in `view.rs`, and the arithmetic in `bar_layout.rs` (`BAR_SIDE`, `ADD_PX`, the card computation).
+  Call instead: `SpacesBar { add_drop: bar.add_drop(), on_layout: move |l| publish(l), .. }` and
+  `SpaceTile::new(..).backdrop(ImageSource::file(&wallpaper_path)?)` (or `ImageSource(url)` for the URL it has now); build the
+  `BarLayout` sill publishes from `l.spaces[i].card` (the cards) and `l.add` (the plus), adding the output's origin, in place of the
+  computed rectangles. The `use_rect` on the bar element in `io.rs` is still needed for the bar's own box if the host wants it.

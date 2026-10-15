@@ -22,6 +22,9 @@ pub struct SpaceTile {
     /// What the Space looks like, shown in the expanded bar. Without one the thumbnail is a
     /// quiet blank card.
     pub thumbnail: Option<ImageSource>,
+    /// The desktop's own picture (typically the output's wallpaper), drawn under the thumbnail,
+    /// cover-fit and clipped to the card's corners. Without a thumbnail it shows alone.
+    pub backdrop: Option<ImageSource>,
     /// Its part in a drag: `Target` while the dragged thing is over it, `Accepts` while it could
     /// take the drop but the pointer is elsewhere.
     pub drop: DropState,
@@ -35,6 +38,7 @@ impl SpaceTile {
             name: name.into(),
             current: Selection::Unselected,
             thumbnail: None,
+            backdrop: None,
             drop: DropState::Idle,
         }
     }
@@ -48,6 +52,15 @@ impl SpaceTile {
     pub fn thumbnail(self, thumbnail: ImageSource) -> Self {
         SpaceTile {
             thumbnail: Some(thumbnail),
+            ..self
+        }
+    }
+
+    /// The same Space with `backdrop` under its thumbnail, as the Mac shows each desktop's
+    /// wallpaper with its windows on top.
+    pub fn backdrop(self, backdrop: ImageSource) -> Self {
+        SpaceTile {
+            backdrop: Some(backdrop),
             ..self
         }
     }
@@ -90,6 +103,7 @@ pub(crate) enum PointerOver {
 #[cfg(test)]
 mod tests {
     use super::{BarExpansion, BarSpaceKey, PointerOver, SpaceTile};
+    use crate::components::content::image_source::ImageSource;
     use ds_core::vocab::{DropState, Selection};
 
     #[test]
@@ -110,8 +124,17 @@ mod tests {
         assert_eq!(tile.current, Selection::Unselected);
         assert_eq!(tile.drop, DropState::Idle);
         assert_eq!(tile.thumbnail, None);
+        assert_eq!(tile.backdrop, None);
         let marked = tile.current(Selection::Selected).in_drag(DropState::Target);
         assert_eq!(marked.current, Selection::Selected);
         assert_eq!(marked.drop, DropState::Target);
+    }
+
+    #[test]
+    fn a_backdrop_is_kept_beside_the_thumbnail() {
+        let wall = ImageSource("file:///wall.png".to_owned());
+        let tile = SpaceTile::new(BarSpaceKey("a".to_owned()), "Desktop 1").backdrop(wall.clone());
+        assert_eq!(tile.backdrop, Some(wall));
+        assert_eq!(tile.thumbnail, None);
     }
 }
