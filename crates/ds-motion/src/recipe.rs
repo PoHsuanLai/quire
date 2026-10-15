@@ -152,6 +152,8 @@ impl Anim {
             Anim::SheetOut => own::SHEET_OUT,
             Anim::PanelIn => own::PANEL_IN,
             Anim::PanelOut => own::PANEL_OUT,
+            Anim::DropIn => own::DROP_IN,
+            Anim::LiftOut => own::LIFT_OUT,
             Anim::MorphIn => detail::MORPH_IN,
             Anim::MorphOut => detail::MORPH_OUT,
             Anim::MorphFadeIn => detail::MORPH_FADE_IN,

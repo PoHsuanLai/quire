@@ -42,6 +42,10 @@ pub enum DurationToken {
     Turn,
     /// `--t-shake` 420 ms: `shake-x`.
     Shake,
+    /// `--t-overview` 350 ms: the flight of Mission Control's scene, windows and the Spaces
+    /// bar alike (design/05 section 3.3; the system's own value is not published, design/13 R7,
+    /// so this is the flight the shell measures).
+    Overview,
     /// `--t-send-ring` 5 s: the undo-send countdown ring, linear. [`DurationKind::Hold`]: the
     /// ring shows how long a send can still be taken back, which Reduced must not shorten.
     SendRing,
@@ -104,6 +108,7 @@ impl DurationToken {
             (DurationToken::SpinStep, _) => 83,
             (DurationToken::Turn, _) => 1000,
             (DurationToken::Shake, _) => 420,
+            (DurationToken::Overview, _) => 350,
             (DurationToken::SendRing, _) => 5000,
             (DurationToken::Awake, _) => 20000,
             (DurationToken::IdleDim, _) => 2000,

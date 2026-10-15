@@ -58,6 +58,13 @@
 @keyframes panel-in{ from{ transform:translateX(calc(100% + var(--s-16))); } to{ transform:none; } }
 @keyframes panel-out{ from{ transform:translateX(var(--swipe-dx,0px)); } to{ transform:translateX(calc(100% + var(--s-16))); } }
 
+/* drop-in and lift-out (quire's): a surface hung from the top edge, Mission Control's Spaces bar,
+   slides down from `--drop-dy` above its place (`--s-48` by default) with a fade at
+   `--t-overview --e-out`, the pace the overview's windows fly at, and leaves by the reverse at
+   `--t-overview --e-exit`, holding its last frame until the host unmaps it. */
+@keyframes drop-in{ from{ opacity:0; transform:translateY(var(--drop-dy,calc(var(--s-48) * -1))); } to{ opacity:1; transform:none; } }
+@keyframes lift-out{ from{ opacity:1; transform:none; } to{ opacity:0; transform:translateY(var(--drop-dy,calc(var(--s-48) * -1))); } }
+
 
 /* morph-in, morph-out: a glyph that changes state grows in from .9 as the old one shrinks to .9
    and fades (MorphStyle::DownUp; OffUp plays only morph-in). */

@@ -22,6 +22,7 @@ mod details_glyphs;
 mod details_state;
 mod driven_components;
 mod driven_motion;
+mod drop_in_lift_out;
 mod fact_list;
 mod field_focus;
 mod field_help;

@@ -16,7 +16,8 @@
 //! and `PaneOutL` and `PaneOutR` carry the outgoing pane away the other way, plus the OSD's exit:
 //! `OsdOut`, and `LevelTick`, the level control's quiet mark when its fill crosses a
 //! step, plus `SheetOut`, the sheet's exit, plus `PanelIn` and `PanelOut`, the slide in and out
-//! of an edge panel, a notification banner, a toast and a screenshot thumbnail, plus
+//! of an edge panel, a notification banner, a toast and a screenshot thumbnail, plus `DropIn`
+//! and `LiftOut`, a top-edge bar arriving from above and leaving upward, plus
 //! the small-state details' eight (design/26-DETAILS.md
 //! section 3.2): `MorphIn`, `MorphOut`, `MorphFadeIn`, `MorphFadeOut`,
 //! `SealOut` and `NudgeUp`, plus `Hold`, a keyframe that moves nothing, which a resting state
@@ -86,6 +87,13 @@ pub enum Anim {
     /// `--t-quick --e-exit` (design/30 section 1.3), holding its last frame until the host
     /// unmaps it at `settle(PanelOut)`.
     PanelOut,
+    /// `drop-in`: a surface hung from the top edge (Mission Control's Spaces bar) slides down from
+    /// above with a fade over `--t-overview --e-out`, as the overview's windows fly. `--drop-dy`
+    /// sets how far above it starts (`--s-48` by default).
+    DropIn,
+    /// `lift-out`: the reverse of `drop-in`, sliding up and fading over `--t-overview --e-exit`,
+    /// holding its last frame until the host unmaps it at `settle(LiftOut)`.
+    LiftOut,
     /// `morph-in`: a glyph growing into a new state (design/26 `MorphGlyph`).
     MorphIn,
     /// `morph-out`: the glyph it replaces shrinking away.
@@ -140,7 +148,7 @@ pub enum Anim {
 
 impl Anim {
     /// Every animation, in the catalogue's order.
-    pub const ALL: [Anim; 43] = [
+    pub const ALL: [Anim; 45] = [
         Anim::RowIn,
         Anim::RowOut,
         Anim::Heal,
@@ -163,6 +171,8 @@ impl Anim {
         Anim::SheetOut,
         Anim::PanelIn,
         Anim::PanelOut,
+        Anim::DropIn,
+        Anim::LiftOut,
         Anim::MorphIn,
         Anim::MorphOut,
         Anim::MorphFadeIn,
@@ -211,6 +221,8 @@ impl Anim {
             Anim::SheetOut => "a-sheet-out",
             Anim::PanelIn => "a-panel-in",
             Anim::PanelOut => "a-panel-out",
+            Anim::DropIn => "a-drop-in",
+            Anim::LiftOut => "a-lift-out",
             Anim::MorphIn => "a-morph-in",
             Anim::MorphOut => "a-morph-out",
             Anim::MorphFadeIn => "a-morph-fade-in",

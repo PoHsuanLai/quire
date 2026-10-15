@@ -54,6 +54,7 @@ impl Anim {
             | Anim::PaneInL
             | Anim::PaneInROut
             | Anim::PanelIn
+            | Anim::DropIn
             | Anim::MorphIn
             | Anim::MorphInSpring
             | Anim::Appear => CrossFade(In),
@@ -62,6 +63,7 @@ impl Anim {
             | Anim::OsdOut
             | Anim::SheetOut
             | Anim::PanelOut
+            | Anim::LiftOut
             | Anim::MorphOut
             | Anim::RowOut
             | Anim::Disappear => CrossFade(Out),

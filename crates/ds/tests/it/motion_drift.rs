@@ -238,6 +238,9 @@ fn the_settle_table() {
         (Anim::PanelIn, MotionLevel::Standard, 234),
         (Anim::PanelOut, MotionLevel::Standard, 154),
         (Anim::SheetIn, MotionLevel::Standard, 154),
+        // A top-edge bar flies at --t-overview (350 ms), in and out.
+        (Anim::DropIn, MotionLevel::Standard, 384),
+        (Anim::LiftOut, MotionLevel::Standard, 384),
         // The screenshot thumbnail slides in and out at --t-move.
     ];
     for &(anim, level, ms) in CASES {

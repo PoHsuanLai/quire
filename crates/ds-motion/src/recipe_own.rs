@@ -116,6 +116,27 @@ pub(super) const PANEL_OUT: Recipe = recipe(
     Iteration::Once,
 );
 
+/// `drop-in`: a top-edge bar (Mission Control's Spaces bar) slides down from above with a fade at
+/// `--t-overview --e-out`, the pace the overview's windows fly at. Arriving is not contact, so it
+/// decelerates rather than springs. An entrance; it holds nothing.
+pub(super) const DROP_IN: Recipe = recipe(
+    "drop-in",
+    DurationToken::Overview,
+    EasingToken::Out,
+    Fill::None,
+    Iteration::Once,
+);
+
+/// `lift-out`: the bar leaves upward at `--t-overview --e-exit`, holding its last, transparent
+/// frame until the host unmaps it at `settle(LiftOut)`.
+pub(super) const LIFT_OUT: Recipe = recipe(
+    "lift-out",
+    DurationToken::Overview,
+    EasingToken::Exit,
+    Fill::Forwards,
+    Iteration::Once,
+);
+
 /// `hold`: moves nothing, at `--t-quick --e-linear`. A resting state that follows an
 /// animated one plays it, so the restyle that drops the running animation starts another and
 /// the element is restyled from its resting style, not left at the dropped animation's value.

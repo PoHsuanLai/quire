@@ -18,6 +18,8 @@ pub enum Exit {
     SheetOut,
     /// A side panel or a toast sliding out to the right: `panel-out`.
     PanelOut,
+    /// A bar hung from the top edge lifting away: `lift-out`.
+    LiftOut,
 }
 
 impl Exit {
@@ -30,6 +32,7 @@ impl Exit {
             Exit::Fade => Anim::MenuOut,
             Exit::SheetOut => Anim::SheetOut,
             Exit::PanelOut => Anim::PanelOut,
+            Exit::LiftOut => Anim::LiftOut,
         }
     }
 }

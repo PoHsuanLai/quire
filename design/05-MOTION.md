@@ -176,6 +176,7 @@ The prototypes write these as literal milliseconds, so they do not change with l
 | `--t-scene` | 380ms | CSS | Space layer cross-fade | S:86 |
 | `--t-shake` | 420ms | CSS | `shake-x` (S). C's `shake` is 560ms (C:546) | S:590 |
 | `--d-fly` | 350ms | CSS delay | strip preview label | S:445 |
+| `--t-overview` | 350ms (Reduced: `--t-quick`) | CSS | `drop-in` / `lift-out`: Mission Control's Spaces bar, at the pace the overview's windows fly (the system's value is not published, design/13 R7) | quire |
 | (park) | 420ms | CSS | `park` | S:570 |
 | (nudge) | 520ms | CSS, C only | outbox retry | C:545 |
 | (C shake) | 560ms | CSS, C only | outbox needs-sign-in | C:546 |
@@ -673,6 +674,7 @@ Reduced rule.
 | Pane switcher | `--pane-p` 0..1, Move | remote (1.0) | `slide-r`/`slide-l`, `pane-out-*`, restarted on reversal |
 | Sheet hide, show again | `--present-p` 0..1, Quick out, Move in | remote (1.0) | `sheet-out`; a re-show restarted `peek-in` |
 | Edge panel hide, show again | `--present-p` 0..1, Quick out, Move in | remote (1.0) | `panel-out`, `hold` on a taken-back hide |
+| Top-edge bar hide, show again | the same machine, `--t-overview` both ways | remote (1.0) | `lift-out`, `hold` on a taken-back hide |
 | Dock tile drag return (`DragReturnFrame`, sill wires the drag) | `--drag-dx`/`--drag-dy` px, Move | the release, per axis | none (sill had no return) |
 
 Not converted: the launcher's open and close (27 section 3.12 lists it last; it keeps its

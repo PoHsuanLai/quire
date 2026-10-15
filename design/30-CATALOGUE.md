@@ -71,6 +71,7 @@ Durations (`DurationToken`); every duration in CSS and Rust comes from this tabl
 | Move `--t-move` | 250 | `NSAnimationContext` default | collapse, list insert/remove, pane slide, banner in, progress value change | kept |
 | Big `--t-big` | 400 | window / sheet class (conf L) | sheet and side-panel in when not spring-driven, Space tint cross-fade | was 420; absorbs Scene 380 |
 | Shake `--t-shake` | 420 | login shake (conf M) | the one shake | kept; absorbs ShakeLong |
+| Overview `--t-overview` | 350 | Mission Control's window flight (the system value is not published, design/13 R7) | `drop-in` / `lift-out`, a bar hung from the top edge (the Spaces bar) | ADD |
 | SpinStep `--t-spin-step` | 83 | 12-spoke spinner, one turn per second (conf M) | spinner spoke step | replaces PendingStep |
 | Hold tokens | | | | |
 | IdleDim | 2000 | display dim before sleep | idle overlay | kept |
@@ -149,6 +150,7 @@ Motion of the macOS surfaces, all built from the rows above:
 | Tooltip, hover card | Fade `--t-quick` | Fade `--t-quick` |
 | Sheet, alert | Slide(Top) with `Spring` response Move | Slide(Top) `--t-move` `--e-exit` |
 | Side panel, notification banner, toast | Slide(Right) `--t-move` `--e-out` | Slide(Right) `--t-quick` `--e-exit`; swipe right dismisses with the release velocity |
+| Top-edge bar (the Spaces bar of Mission Control) | `drop-in`: Slide(Down) from `--drop-dy` (`--s-48`) with a fade, `--t-overview` `--e-out` | `lift-out`: the reverse, `--t-overview` `--e-exit`, last frame held until unmapped. Reduced: cross-fade |
 | OSD | Fade `--t-quick` | Fade `--t-move` after its hold |
 | Pane switch | Spring on `--pane-p` | reverses mid-slide |
 | Space switch | tint cross-fade `--t-big`, no slide | |
