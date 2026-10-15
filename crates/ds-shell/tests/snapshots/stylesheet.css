@@ -502,9 +502,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-alert-help{ position:absolute; left:var(--s-24); bottom:var(--s-20); }
 /* -- helper_sheet -- */
 /* The missing-helper sheet: an alert (`alert.css`) whose installing phase carries a spinner in
-   place of its buttons. */
+   place of its buttons; the unsupported phase may carry an install command to copy. */
 
 .ds-helper-progress{ display:flex; justify-content:center; padding:var(--s-8) 0 var(--s-4); }
+/* The install command: one selectable line in the data face, the Copy button beside it. */
+.ds-helper-command{ display:flex; align-items:center; align-self:stretch; gap:var(--s-8); margin-top:var(--s-12); }
+.ds-helper-command-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }
 /* -- accounts -- */
 /* The account sheets (design/31 sections 4.5 and 5.6). A step is one column in a regular sheet:
    a bold title, the body in the soft ink, and a row of buttons at the end with the default last.

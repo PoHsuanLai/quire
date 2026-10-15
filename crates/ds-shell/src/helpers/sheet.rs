@@ -1,9 +1,11 @@
 //! HelperBody and HelperSheet: the missing-helper question and what follows it, in the alert
 //! layout the consent alert uses.
 
+use super::command::CommandLine;
 use super::model::HelperPhase;
 use super::wording::words;
 use crate::accounts::adapter::{Action, Intent, Landing};
+use crate::accounts::model::CopyState;
 use crate::accounts::waiting::Waiting;
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
@@ -16,7 +18,10 @@ use ds_style::icon::render::IconSize;
 /// The helper column, bare, so a host puts it in a window of its own. In `Ask`, Return installs
 /// and Escape is "Not Now"; in the end phases Return and Escape both close; while `Installing`
 /// there is nothing to press and neither key does anything. `purpose` finishes "{app} needs
-/// {tool} to ...". `on_install` hears Install..., `on_dismiss` Not Now and Close.
+/// {tool} to ...". `on_install` hears Install..., `on_dismiss` Not Now and Close. An
+/// `Unsupported` phase with a `command` shows it as a line with a Copy button: `on_copy` hears
+/// the command to copy (the host writes the clipboard) and `copy` is the host's word on whether
+/// it has.
 #[component]
 pub fn HelperBody(
     #[props(into)] app: String,
@@ -26,6 +31,8 @@ pub fn HelperBody(
     #[props(default)] icon: Option<IconSource>,
     on_install: EventHandler<()>,
     on_dismiss: EventHandler<()>,
+    #[props(default)] on_copy: EventHandler<String>,
+    #[props(default)] copy: CopyState,
 ) -> Element {
     let said = words(&app, &tool, &purpose, &phase);
     let (title, body) = (said.title, said.body);
@@ -38,6 +45,10 @@ pub fn HelperBody(
     };
     let ask = phase == HelperPhase::Ask;
     let busy = phase == HelperPhase::Installing;
+    let command = match &phase {
+        HelperPhase::Unsupported { command, .. } => command.clone(),
+        _ => None,
+    };
     rsx! {
         div {
             class: "ds-alert",
@@ -59,6 +70,9 @@ pub fn HelperBody(
             }
             div { class: "ds-alert-title", "{title}" }
             div { class: "ds-alert-body", role: if ask || busy { "" } else { "alert" }, "{body}" }
+            if let Some(text) = command {
+                CommandLine { text, copy, on_copy }
+            }
             if busy {
                 div { class: "ds-helper-progress", Waiting {} }
             }
@@ -84,7 +98,8 @@ pub fn HelperBody(
 }
 
 /// The helper alert in a narrow centred sheet: [`HelperBody`] for a host with no window of its
-/// own. Escape closes the sheet as `on_dismiss` (never while installing).
+/// own. Escape closes the sheet as `on_dismiss` (never while installing). `on_copy` and `copy`
+/// are [`HelperBody`]'s.
 #[component]
 pub fn HelperSheet(
     #[props(into)] app: String,
@@ -94,6 +109,8 @@ pub fn HelperSheet(
     #[props(default)] icon: Option<IconSource>,
     on_install: EventHandler<()>,
     on_dismiss: EventHandler<()>,
+    #[props(default)] on_copy: EventHandler<String>,
+    #[props(default)] copy: CopyState,
 ) -> Element {
     let label = words(&app, &tool, &purpose, &phase).title;
     let busy = phase == HelperPhase::Installing;
@@ -107,7 +124,7 @@ pub fn HelperSheet(
             },
             attach: Attach::Centre,
             width: SheetWidth::Narrow,
-            HelperBody { app, tool, purpose, phase, icon, on_install, on_dismiss }
+            HelperBody { app, tool, purpose, phase, icon, on_install, on_dismiss, on_copy, copy }
         }
     }
 }

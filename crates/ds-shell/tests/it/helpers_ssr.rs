@@ -65,6 +65,13 @@ const SPECIMENS: &[Specimen] = &[
     ("unsupported", || {
         sheet(HelperPhase::Unsupported {
             program: "mpv".into(),
+            command: None,
+        })
+    }),
+    ("unsupported-command", || {
+        sheet(HelperPhase::Unsupported {
+            program: "mpv".into(),
+            command: Some("sudo apt install wl-clipboard".into()),
         })
     }),
 ];
@@ -150,4 +157,38 @@ fn the_end_phases_close_and_say_what_to_look_for() {
         );
         assert!(!html.contains("Install\u{2026}"), "{name}");
     }
+}
+
+#[test]
+fn an_unsupported_system_with_a_command_shows_it_selectable_with_a_copy_button() {
+    let html = light("unsupported-command");
+    assert!(html.contains("for example with this command:"), "{html}");
+    assert!(
+        html.contains(
+            "<span class=\"ds-helper-command-text\">sudo apt install wl-clipboard</span>"
+        ),
+        "{html}"
+    );
+    assert!(
+        html.contains("<span class=\"ds-button-label\">Copy</span>"),
+        "{html}"
+    );
+    assert!(
+        html.contains("Close") && !html.contains("Install\u{2026}"),
+        "{html}"
+    );
+    let styled = ds_shell::stylesheet().lines().any(|rule| {
+        rule.starts_with(".ds-helper-command-text{") && rule.contains("user-select:text")
+    });
+    assert!(styled, "the command line must be selectable");
+}
+
+#[test]
+fn an_unsupported_system_without_a_command_has_no_command_line() {
+    let html = light("unsupported");
+    assert!(html.contains("then try again."), "{html}");
+    assert!(
+        !html.contains("ds-helper-command") && !html.contains("Copy"),
+        "{html}"
+    );
 }

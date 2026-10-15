@@ -33,11 +33,17 @@ pub(crate) fn words(app: &str, tool: &str, purpose: &str, phase: &HelperPhase) -
                  manager, then try again."
             ),
         },
-        HelperPhase::Unsupported { program } => Words {
+        HelperPhase::Unsupported { program, command } => Words {
             title: format!("{app} cannot install {tool} here"),
-            body: format!(
-                "Install a package that provides \u{201c}{program}\u{201d}, then try again."
-            ),
+            body: match command {
+                Some(_) => format!(
+                    "Install a package that provides \u{201c}{program}\u{201d}, for example \
+                     with this command:"
+                ),
+                None => format!(
+                    "Install a package that provides \u{201c}{program}\u{201d}, then try again."
+                ),
+            },
         },
     }
 }
@@ -72,9 +78,18 @@ mod tests {
             (
                 HelperPhase::Unsupported {
                     program: "mpv".into(),
+                    command: None,
                 },
                 "Photos cannot install mpv here",
-                "provides \u{201c}mpv\u{201d}",
+                "provides \u{201c}mpv\u{201d}, then try again.",
+            ),
+            (
+                HelperPhase::Unsupported {
+                    program: "mpv".into(),
+                    command: Some("sudo apt install mpv".into()),
+                },
+                "Photos cannot install mpv here",
+                "for example with this command:",
             ),
         ];
         for (phase, title, body) in table {

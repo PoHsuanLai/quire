@@ -22,5 +22,10 @@ pub enum HelperPhase {
     Unsupported {
         /// The program a package must provide.
         program: String,
+        /// The one install line for the person's distro family, which the host picks (from
+        /// `InstallLine::text()` of the `Missing`). `Some`: the sheet shows it as a selectable line
+        /// with a Copy button, and the host does the copying. `None`: the sheet only names the
+        /// program.
+        command: Option<String>,
     },
 }
