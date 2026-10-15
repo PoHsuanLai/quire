@@ -79,7 +79,7 @@ fn every_accent_is_legible_in_both_schemes() {
 
 /// Every `X` / `X-ink` pair: text on the accent, on `--ok`, on `--warn` and on `--danger`, in
 /// both schemes (the accent here is Blue; `every_accent_is_legible_in_both_schemes` covers
-/// the other five). Dark `--danger-ink` was white on `#E0705A`, 3.17:1.
+/// the other five). Dark `--danger-ink` is dark on `#FF4245`: white there is 3.43:1.
 #[test]
 fn every_ink_on_its_colour_is_legible_in_both_schemes() {
     const PAIRS: [(ColourToken, ColourToken); 4] = [

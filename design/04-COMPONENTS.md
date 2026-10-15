@@ -4087,7 +4087,7 @@ pub struct SpellConfig { pub dictionaries: Vec<PathBuf>, pub user: PathBuf }
 | Part | Value | Basis |
 | --- | --- | --- |
 | Mark | a dotted bottom border, round dots `calc(var(--hair) * 2)` across (2 px at 1x, whole device pixels at any scale), in `--spell-mark` | the reference's red dotted underline; Blitz draws `dotted` as round dots |
-| `--spell-mark` | the danger hue at full strength: `#B03A2A` light, `#E0705A` dark | proposed: a dot a few pixels across needs all its chroma to read as red |
+| `--spell-mark` | the danger hue at full strength: `#E9152D` light, `#FF4245` dark | proposed: a dot a few pixels across needs all its chroma to read as red |
 | Mark height | half the line box plus .62 em, so the dots sit just under the descenders whatever the line height | proposed |
 | Debounce | `DelayToken::SpellDebounce`, 300 ms after the last input or caret move | proposed |
 | Menu | quire's context `Menu` at the pointer (or under the caret for the key): up to 5 suggestions (`No Guesses Found` when none), a rule, `Ignore Spelling`, `Learn Spelling` | the reference's spelling items |

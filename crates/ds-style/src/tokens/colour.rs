@@ -218,11 +218,11 @@ impl ColourToken {
             ColourToken::Grp => (WHITE, solid(0x2C2C2E)),
             ColourToken::LineSoft => (solid(0xE6E6E6), solid(0x383838)),
             ColourToken::FillQuaternary => (alpha(0x000000, 60), alpha(0xFFFFFF, 100)),
-            ColourToken::Ok => (solid(0x2C7A57), solid(0x5EB489)),
-            ColourToken::Warn => (solid(0xA5761A), solid(0xD2A249)),
-            ColourToken::Danger => (solid(0xB03A2A), solid(0xE0705A)),
+            ColourToken::Ok => (solid(0x008932), solid(0x30D158)),
+            ColourToken::Warn => (solid(0xC55300), solid(0xFF9230)),
+            ColourToken::Danger => (solid(0xE9152D), solid(0xFF4245)),
             // The danger hue, as `--danger` (proposed, design/04-COMPONENTS.md section 50).
-            ColourToken::SpellMark => (solid(0xB03A2A), solid(0xE0705A)),
+            ColourToken::SpellMark => (solid(0xE9152D), solid(0xFF4245)),
             // Not redefined in dark (section 3).
             ColourToken::Scrim => (alpha(0x000000, 220), alpha(0x000000, 220)),
             // Opaque black in either scheme: `IdleDim` sets the overlay's own opacity from
@@ -239,17 +239,17 @@ impl ColourToken {
             ColourToken::OrbC3 => (solid(0xA9AFFE), solid(0x8D92F9)),
             // The sender's page stays white in a dark window (section 12).
             ColourToken::ForeignGround => (WHITE, WHITE),
-            ColourToken::OkWash => (alpha(0x2C7A57, 160), alpha(0x5EB489, 160)),
-            ColourToken::WarnWash => (solid(0xF2EBE1), solid(0x3F3930)),
-            ColourToken::DangerWash => (alpha(0xB03A2A, 160), alpha(0xE0705A, 160)),
-            // `#fff` on the lying link pill in light (`S:436`); in dark `--danger` is lifted to
-            // `#E0705A`, where white measures 3.17:1, so the ink turns dark (mailo's `#1A0B08`,
-            // 6.06:1). The legibility test gates every status pair in both schemes.
+            ColourToken::OkWash => (alpha(0x008932, 160), alpha(0x30D158, 160)),
+            ColourToken::WarnWash => (solid(0xFAE7DF), solid(0x45382F)),
+            ColourToken::DangerWash => (alpha(0xE9152D, 160), alpha(0xFF4245, 160)),
+            // `#fff` on the lying link pill in light (4.56:1 on `#E9152D`); in dark `--danger` is
+            // lifted to `#FF4245`, where white measures 3.43:1, so the ink turns dark (mailo's
+            // `#1A0B08`, 5.58:1). The legibility test gates every status pair in both schemes.
             ColourToken::DangerInk => (WHITE, solid(0x1A0B08)),
-            // White on `--ok` in light (5.21:1); a dark green-black on the lifted dark `--ok`.
+            // White on `--ok` in light (4.54:1); a dark green-black on the lifted dark `--ok`.
             ColourToken::OkInk => (WHITE, solid(0x0B1A12)),
-            // White on light `--warn` is 4.03:1, under the gate, so both schemes take a dark ink.
-            ColourToken::WarnInk => (solid(0x140D03), solid(0x140D03)),
+            // White on light `--warn` `#C55300` is 4.55:1; the lifted dark `--warn` takes a dark ink.
+            ColourToken::WarnInk => (WHITE, solid(0x140D03)),
             // A modal's dimming: stronger in dark, where the paper is already near black and the
             // sheet stands out by its hairline and shadow; the legibility test gates both.
             ColourToken::ScrimModal => (alpha(0x000000, 400), alpha(0x000000, 550)),

@@ -46,16 +46,19 @@ The Mac values (30 section 3.2), as the code has them (`crates/ds-style/src/toke
 The prototype's greenish Post palette (`#E9ECE6` and friends) is history. `--seal` is deleted
 (unused). Status colours:
 
-| Token | Target (Mac system colour), light / dark | Code today |
-| --- | --- | --- |
-| `--ok` | green `#34C759` / `#30D158` | `#2C7A57` / `#5EB489` |
-| `--warn` | orange `#FF9500` / `#FF9F0A` | `#A5761A` / `#D2A249` |
-| `--danger` | red `#FF3B30` / `#FF453A` | `#B03A2A` / `#E0705A` |
+| Token | Light | Dark | Wash (`X-wash`) |
+| --- | --- | --- | --- |
+| `--ok` | `#008932` | `#30D158` | `--ok` at .16 over transparent |
+| `--warn` | `#C55300` | `#FF9230` | `--warn` 14% over `--surface`, OKLab: `#FAE7DF` / `#45382F` |
+| `--danger` | `#E9152D` | `#FF4245` | `--danger` at .16 over transparent |
 
-The target column is **target (clean-up phase)** (settled 2026-10-02: status colours are the Mac
-system green, orange and red). Each status colour keeps its `X-ink` (`--ok-ink`, `--warn-ink`,
+Apple system green/orange/red, 2025 (the system hue table's increased-contrast form in light,
+the normal form in dark; `crates/ds-style/src/tokens/system_hue.rs`). `--spell-mark` is the
+`--danger` value. Each status colour keeps its `X-ink` (`--ok-ink`, `--warn-ink`,
 `--danger-ink`) for text on it, chosen so every `X` / `X-ink` pair clears 4.5:1 in both schemes
-(`crates/ds/tests/legibility.rs::every_ink_on_its_colour_is_legible_in_both_schemes`); the inks
+(`crates/ds/tests/it/legibility.rs::every_ink_on_its_colour_is_legible_in_both_schemes`): light
+ok/danger take white (4.54, 4.56), light warn takes white (4.55; the old dark ink measured 4.24),
+dark ok `#0B1A12` (8.87), dark warn `#140D03` (8.64), dark danger `#1A0B08` (5.58). The inks
 are re-derived when the colours change. Where a system colour is too light for text on paper, the
 text variant is a deeper step of the same hue, not a new hue.
 
