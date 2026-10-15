@@ -52,23 +52,36 @@ pub enum Radius {
 }
 
 impl Radius {
-    /// The radius as CSS. The pre-Liquid-Glass look (design/34-MODERN-LOOK.md section 2.1, window from
-    /// the "Old" column, the rest step 2): window 10 (titlebar-only too), panel 20, menu 14, card and group 12, the menu item concentric
-    /// in its menu (14 less 6), chip, item and small 8, button and field a Regular control's.
-    pub fn value(self) -> &'static str {
+    /// The radius in logical pixels: the one number the stylesheet's `--r-*` is written from
+    /// ([`Radius::value`]), so a compositor drawing a corner reads what the CSS says. The
+    /// pre-Liquid-Glass look (design/34-MODERN-LOOK.md section 2.1, window from the "Old"
+    /// column, the rest step 2): window 10 (titlebar-only too), panel 20, menu 14, card and
+    /// group 12, the menu item concentric in its menu (14 less 6), chip, item and small 8,
+    /// button and field a Regular control's.
+    ///
+    /// ```
+    /// use ds_style::tokens::shape::Radius;
+    /// assert_eq!(Radius::Window.px(), 10);
+    /// assert_eq!(Radius::Window.value(), "10px");
+    /// ```
+    pub fn px(self) -> u16 {
         match self {
-            Radius::Window => "10px",
-            Radius::Panel => "20px",
-            Radius::WindowPlain => "10px",
-            Radius::Menu => "14px",
-            Radius::Card | Radius::Tile | Radius::Media | Radius::Group => "12px",
-            Radius::Btn | Radius::Field | Radius::MenuItem => "8px",
-            Radius::Chip | Radius::Item | Radius::Small => "8px",
-            Radius::IconTile => "7px",
-            Radius::Tiny => "6px",
-            Radius::Kbd | Radius::Micro => "5px",
-            Radius::Pill => "999px",
+            Radius::Window | Radius::WindowPlain => 10,
+            Radius::Panel => 20,
+            Radius::Menu => 14,
+            Radius::Card | Radius::Tile | Radius::Media | Radius::Group => 12,
+            Radius::Btn | Radius::Field | Radius::MenuItem => 8,
+            Radius::Chip | Radius::Item | Radius::Small => 8,
+            Radius::IconTile => 7,
+            Radius::Tiny => 6,
+            Radius::Kbd | Radius::Micro => 5,
+            Radius::Pill => 999,
         }
+    }
+
+    /// The radius as CSS: [`Radius::px`] and `px`.
+    pub fn value(self) -> String {
+        format!("{}px", self.px())
     }
 }
 
@@ -88,7 +101,7 @@ pub fn concentric(
 
 /// A radius token as the stylesheet writes it.
 fn radius_css(token: Radius, _: TokenScope) -> CssValue {
-    CssValue::fixed(token.value())
+    CssValue::computed(token.value())
 }
 
 /// A material's corner, overriding the radius its recipe gives it (`--m-radius`): a radius
@@ -163,13 +176,26 @@ mod tests {
     use crate::tokens::control_size::ControlSize;
     use crate::tokens::shell_scale::SHELL_SCALE;
     use crate::tokens::shell_type::ShellMetrics;
+    use crate::tokens::token::{Token, TokenScope};
     use ds_core::geometry::units::Px;
+    use ds_core::word::Word;
 
     #[test]
     fn a_button_and_a_field_are_a_regular_controls_radius() {
         let regular = format!("{}px", ControlSize::Regular.scale().radius.0);
         assert_eq!(Radius::Btn.value(), regular);
         assert_eq!(Radius::Field.value(), regular);
+    }
+
+    /// Every variant: the number a compositor reads is the number the stylesheet declares.
+    #[test]
+    fn px_is_the_number_the_generated_css_writes_for_every_variant() {
+        for radius in Radius::ALL.iter().copied() {
+            let declared = radius.css_value(TokenScope::BASE).to_string();
+            assert_eq!(declared, format!("{}px", radius.px()), "{radius:?}");
+            assert_eq!(radius.value(), declared, "{radius:?}");
+        }
+        assert_eq!(Radius::Window.px(), 10);
     }
 
     #[test]
