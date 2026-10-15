@@ -76,6 +76,7 @@ use ds_core::geometry::scale::Scale;
 use ds_core::vocab::{Activity, InputModality};
 use ds_core::word::Word;
 use ds_motion::hover_intent::HoverWarmth;
+use ds_style::appearance::transparency::Transparency;
 use ds_style::appearance::{
     appearance::Appearance, resolve::resolve, system::SystemPrefs, typeface::Typeface,
 };
@@ -159,7 +160,17 @@ pub fn Ds(
     let corner = radius
         .map(crate::root::surface::radius_style)
         .unwrap_or_default();
-    let stack = stack.map(|stack| stack.style_attr()).unwrap_or_default();
+    // Reduce transparency drops the vibrancy boost everywhere, the person's own share included.
+    let stack = stack
+        .map(|stack| match resolved.transparency {
+            Transparency::System => stack,
+            Transparency::Reduced => MaterialStack {
+                vibrancy: Alpha(0),
+                ..stack
+            },
+        })
+        .map(|stack| stack.style_attr())
+        .unwrap_or_default();
     let pixels = PixelToken::style_attr(scale);
     let style = format!(
         "{}{}--m-tint-alpha:{};{corner}{stack}{pixels}",

@@ -10,6 +10,7 @@ use ds_core::vocab::{Activity, InputModality};
 use ds_lint::{LintConfig, Rule, markup};
 use ds_style::appearance::blur::BlurState;
 use ds_style::appearance::system::ReducedMotion;
+use ds_style::material::stack::MaterialStack;
 use ds_style::space::frame_vars::FrameVars;
 use std::collections::BTreeMap;
 
@@ -24,6 +25,7 @@ struct Setup {
     modality: Option<InputModality>,
     activity: Option<Activity>,
     surface: Option<(Material, Option<Scheme>)>,
+    stack: Option<MaterialStack>,
 }
 
 impl Default for Setup {
@@ -38,6 +40,7 @@ impl Default for Setup {
             modality: None,
             activity: None,
             surface: None,
+            stack: None,
         }
     }
 }
@@ -58,6 +61,7 @@ fn Root(setup: Setup) -> Element {
             look: setup.look.clone(),
             material: setup.material,
             blur: setup.blur,
+            stack: setup.stack,
             stylesheet: setup.stylesheet,
             if let Some((material, theme)) = setup.surface {
                 Surface { material, theme,
@@ -398,5 +402,28 @@ fn only_reduced_transparency_is_stamped_and_a_surface_keeps_it() {
                 "{transparency:?} root {nth}: {markup}"
             );
         }
+    }
+}
+
+#[test]
+fn reduced_transparency_zeroes_the_stacks_vibrancy_share() {
+    for (transparency, vibrancy) in [
+        (Transparency::System, "--m-vibrancy:1;"),
+        (Transparency::Reduced, "--m-vibrancy:0;"),
+    ] {
+        let markup = render(Setup {
+            appearance: Appearance {
+                transparency,
+                ..Appearance::default()
+            },
+            material: Material::Window,
+            stack: Some(MaterialStack::default()),
+            ..Setup::default()
+        });
+        let style = attributes_of(&markup, 0)
+            .remove("style")
+            .unwrap_or_default();
+        assert!(style.contains(vibrancy), "{transparency:?}: {style}");
+        assert_eq!(style.matches("--m-vibrancy").count(), 1, "{style}");
     }
 }
