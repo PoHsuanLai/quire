@@ -245,13 +245,15 @@ sidebar is at least 212 px wide (`SIDEBAR_MIN_WIDTH`).
 
 ### 13.4 The Space's menu (`SpaceMenu`)
 
-Rename... | Colour... | Appearance > (checked) | the app's submenu slot
+Edit Space... | Appearance > (checked) | the app's submenu slot
 (mailo: Accounts >, whose picks keep the menu open) | Link to... > and Unlink (only when the app
 passes the desktop's Spaces; Unlink only while linked) | rule | New Space | Delete Space... (only
-while there is more than one). New Space switches to the new Space and opens its Rename at once.
-Rename, Colour and Delete are popovers at the pointer; they change the Space live and keep it on
-close; Delete asks first and only its button deletes. While a part is open a dot click does not
-switch.
+while there is more than one). Edit Space... opens a sheet (`EditSpaceSheet`): a title, a grouped
+form with the name and the colour (field, stops, grain, presets), and Cancel and Save. It changes
+the Space live; Save and Return keep it, Cancel and Escape put back what it opened on. New Space
+switches to the new Space and opens its name at once, a field at the pointer that renames live
+(Return keeps, Escape puts the old name back). Delete is a question at the pointer; only its
+button deletes. While a part or the sheet is open a dot click does not switch.
 
 Link to... lists the desktop Spaces the app passes (`DesktopSpace { id, name }`, the linked one
 checked) and, under a rule, New Desktop Space.... A pick of a desktop Space or Unlink is stored on

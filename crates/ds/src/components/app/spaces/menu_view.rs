@@ -2,10 +2,11 @@
 
 use super::controller::SpacesHandle;
 use super::delete::DeletePart;
+use super::edit::EditSpaceSheet;
 use super::menu_link::{DesktopSpace, LinkChange, Linking};
 use super::menu_pick::{SpacePick, Then, apply, rows};
 use super::open_menu::{OpenMenu, Showing};
-use super::parts::{ColourPart, RenamePart};
+use super::parts::RenamePart;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
 use crate::components::menus::menu::placement::MenuPlacement;
@@ -16,13 +17,14 @@ use ds_style::space::list::SpaceId;
 
 /// The menu of whichever Space the handle has open; nothing while none is.
 ///
-/// Rows, in order: Rename..., Colour..., Appearance, the app's `extra`
+/// Rows, in order: Edit Space..., Appearance, the app's `extra`
 /// (one submenu, say Accounts, whose picks reach `on_extra`; give them `AfterPick::KeepOpen` to
 /// keep the menu up), "Link to..." and "Unlink" when `desktop` lists the desktop's Spaces, a
 /// rule, New Space, and Delete Space... while there is more than one.
-/// New Space opens its Rename at once. Colour, Rename and Delete are popovers at the pointer; a
-/// part changes the Space live and keeps it on close, with no Cancel (but Escape in Rename puts the
-/// old name back). Each part takes the keyboard as it opens and hands it back on close. `on_deleted` hears a
+/// Edit Space... opens [`EditSpaceSheet`]: the name and colour, changed live, with Cancel and Save.
+/// New Space opens its name at once, a field at the pointer that renames live (Escape puts the old
+/// name back). Delete is a question at the pointer. Each part takes the keyboard as it opens and
+/// hands it back on close. `on_deleted` hears a
 /// deleted Space's id: the app calls `TodayHandle::drop_space` there. `desktop` is the desktop's
 /// Spaces (`None` for an app with no desktop to follow: no link rows); a Link or Unlink pick is
 /// stored on the Space, and every link pick reaches `on_link`, New Desktop Space... included,
@@ -108,7 +110,7 @@ where
             }
         }
         Showing::Rename => rsx! { RenamePart { at, space: id, handle } },
-        Showing::Colour => rsx! { ColourPart { at, space: id, handle } },
+        Showing::Edit => rsx! { EditSpaceSheet { space: id, handle } },
         Showing::Delete => rsx! {
             DeletePart {
                 at,

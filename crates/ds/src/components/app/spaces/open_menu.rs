@@ -10,10 +10,10 @@ use ds_style::space::list::SpaceId;
 pub enum Showing {
     /// The menu.
     Menu,
-    /// The name field.
+    /// The name field at the pointer (a new Space's, opened as it is made).
     Rename,
-    /// The colour field, stops, grain and presets.
-    Colour,
+    /// The Edit Space sheet: the name, and the colour field, stops, grain and presets.
+    Edit,
     /// The delete question.
     Delete,
 }
@@ -40,13 +40,13 @@ impl<P: Clone + PartialEq + 'static, R: Clone + Default + PartialEq + 'static> S
         self.show(space, at, Showing::Menu);
     }
 
-    /// Open one of `space`'s parts at `at`. Colour, Rename and Delete hold the Space as being
+    /// Open one of `space`'s parts at `at`. Rename, Edit and Delete hold the Space as being
     /// edited, so a dot click does not switch away and a reload waits, until [`Self::close_menu`].
     pub fn show(&self, space: SpaceId, at: Point, showing: Showing) {
         let (mut menu, mut editing) = (self.menu, self.editing);
         match showing {
             Showing::Menu => editing.set(None),
-            Showing::Rename | Showing::Colour | Showing::Delete => editing.set(Some(space)),
+            Showing::Rename | Showing::Edit | Showing::Delete => editing.set(Some(space)),
         }
         menu.set(Some(OpenMenu { space, at, showing }));
     }

@@ -1,6 +1,6 @@
-//! The Space's menu through the kit on a real Blitz document: the rows in order, Rename keeping
-//! what is typed, New Space opening its name at once, Delete asking first, and Delete missing
-//! for the last Space.
+//! The Space's menu through the kit on a real Blitz document: the rows in order, Edit Space's
+//! sheet keeping what Save keeps and putting back what Cancel drops, New Space opening its name
+//! at once, Delete asking first, and Delete missing for the last Space.
 
 use crate::support::spaces_page::{One, Three, WithAccounts};
 use dioxus::prelude::Element;
@@ -19,10 +19,22 @@ fn ms(n: u64) -> Duration {
     Duration::from_millis(n)
 }
 
-fn harness(page: fn() -> Element) -> Harness {
-    let mut harness = Harness::new(page, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+/// Tall enough for the whole Edit Space sheet (name, colour field, stops, grain, presets and its
+/// buttons) to stand on screen without scrolling.
+const TALL: Viewport = Viewport {
+    width: 480,
+    height: 900,
+    scale_percent: 100,
+};
+
+fn harness_in(page: fn() -> Element, view: Viewport) -> Harness {
+    let mut harness = Harness::new(page, HarnessConfig::new(view).with_clock(Clock::Virtual));
     harness.advance(ms(50));
     harness
+}
+
+fn harness(page: fn() -> Element) -> Harness {
+    harness_in(page, VIEW)
 }
 
 /// Right click on the head: the Space's menu opens at the pointer.
@@ -57,8 +69,7 @@ fn the_menu_lists_its_rows_in_order() {
     assert_eq!(
         labels(&three),
         [
-            "Rename\u{2026}",
-            "Colour\u{2026}",
+            "Edit Space\u{2026}",
             "Appearance",
             "New Space",
             "Delete Space\u{2026}"
@@ -79,21 +90,28 @@ fn the_last_space_cannot_be_deleted() {
 }
 
 #[test]
-fn rename_opens_a_field_that_keeps_the_name_when_it_closes() {
-    let mut harness = harness(Three);
+fn edit_opens_a_sheet_whose_save_keeps_the_name() {
+    let mut harness = harness_in(Three, TALL);
     open_menu(&mut harness);
     pick(&mut harness, 1);
-    assert_eq!(harness.count(".ds-space-rename"), 1);
+    assert_eq!(harness.count(".ds-space-edit"), 1, "{}", harness.html());
     for letter in "Work".chars() {
         harness.send(Input::key(ShortcutKey::Char(letter)));
     }
     harness.advance(ms(100));
+    assert_eq!(
+        harness
+            .attr(".ds-space-head .ds-label", "aria-label")
+            .as_deref(),
+        Some("The Work Space"),
+        "the name changes as it is typed"
+    );
     harness.send(Input::key(ShortcutKey::Enter));
     harness.advance(ms(400));
     assert_eq!(
-        harness.count(".ds-space-rename"),
+        harness.count(".ds-space-edit"),
         0,
-        "Return closes the field"
+        "Return saves and closes"
     );
     assert_eq!(
         harness
@@ -114,7 +132,7 @@ fn rename_opens_a_field_that_keeps_the_name_when_it_closes() {
 fn new_space_makes_one_and_opens_its_name() {
     let mut harness = harness(Three);
     open_menu(&mut harness);
-    pick(&mut harness, 5);
+    pick(&mut harness, 4);
     assert_eq!(dots(&harness), 4);
     assert_eq!(
         harness.text_of(".current").as_deref(),
@@ -128,7 +146,7 @@ fn new_space_makes_one_and_opens_its_name() {
 fn delete_asks_and_only_its_button_deletes() {
     let mut harness = harness(Three);
     open_menu(&mut harness);
-    pick(&mut harness, 6);
+    pick(&mut harness, 5);
     assert_eq!(harness.count(".ds-space-delete"), 1);
     assert_eq!(dots(&harness), 3, "asking deletes nothing");
     let confirm = harness
@@ -144,9 +162,9 @@ fn delete_asks_and_only_its_button_deletes() {
 fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
     let mut harness = harness(WithAccounts);
     open_menu(&mut harness);
-    // Rows: Rename, Colour, Appearance, Accounts, rule, New Space, Delete.
+    // Rows: Edit Space, Appearance, Accounts, rule, New Space, Delete.
     let accounts = harness
-        .centre(".ds-menu-item:nth-child(4) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(3) .ds-menu-label")
         .expect("the Accounts row");
     harness.send(Input::click(accounts));
     harness.advance(ms(400));
@@ -184,9 +202,9 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
         Some("AdaAdaBo"),
         "and another can be picked"
     );
-    // A kit row closes it: New Space is row 6 here.
+    // A kit row closes it: New Space is row 5 here.
     let new = harness
-        .centre(".ds-menu-item:nth-child(6) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(5) .ds-menu-label")
         .expect("New Space");
     harness.send(Input::click(new));
     harness.advance(ms(500));
@@ -198,7 +216,7 @@ fn the_app_submenu_keeps_the_menu_open_and_a_kit_row_still_closes_it() {
 fn first_painted_and_settled(harness: &mut Harness) -> (Rect, Rect) {
     const SUB: &str = ".ds-menu[data-depth=\"1\"]";
     let accounts = harness
-        .centre(".ds-menu-item:nth-child(4) .ds-menu-label")
+        .centre(".ds-menu-item:nth-child(3) .ds-menu-label")
         .expect("the Accounts row");
     harness.send(Input::click(accounts));
     let mut first = None;
@@ -249,26 +267,30 @@ fn open_part(harness: &mut Harness, row: usize) {
     harness.advance(ms(300));
 }
 
+fn head_label(harness: &Harness) -> Option<String> {
+    harness.attr(".ds-space-head .ds-label", "aria-label")
+}
+
 #[test]
 fn rename_takes_the_keyboard_and_escape_restores_the_name() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 1);
+    open_part(&mut harness, 4);
     assert!(
         focused(&harness, ".ds-space-rename input"),
         "{}",
         harness.html()
     );
+    let opened_on = head_label(&harness);
     for letter in "Work".chars() {
         harness.send(Input::key(ShortcutKey::Char(letter)));
     }
     harness.advance(ms(100));
     key(&mut harness, ShortcutKey::Escape);
     assert_eq!(harness.count(".ds-space-rename"), 0, "Escape closes it");
+    assert_ne!(opened_on.as_deref(), Some("The Work Space"));
     assert_eq!(
-        harness
-            .attr(".ds-space-head .ds-label", "aria-label")
-            .as_deref(),
-        Some("The Space 1 Space"),
+        head_label(&harness),
+        opened_on,
         "the old name is back:\n{}",
         harness.html()
     );
@@ -281,7 +303,7 @@ fn rename_takes_the_keyboard_and_escape_restores_the_name() {
 #[test]
 fn rename_return_commits_and_gives_the_keyboard_back() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 1);
+    open_part(&mut harness, 4);
     for letter in "Work".chars() {
         harness.send(Input::key(ShortcutKey::Char(letter)));
     }
@@ -302,7 +324,7 @@ fn rename_return_commits_and_gives_the_keyboard_back() {
 #[test]
 fn delete_focuses_cancel_and_return_cancels() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 6);
+    open_part(&mut harness, 5);
     assert!(
         focused(&harness, ".ds-space-part-acts .ds-button:nth-child(1)"),
         "Cancel is the safe default:\n{}",
@@ -324,7 +346,7 @@ fn delete_focuses_cancel_and_return_cancels() {
 #[test]
 fn delete_escape_cancels_and_gives_the_keyboard_back() {
     let mut harness = harness(Three);
-    open_part(&mut harness, 6);
+    open_part(&mut harness, 5);
     key(&mut harness, ShortcutKey::Escape);
     assert_eq!(harness.count(".ds-space-delete"), 0, "Escape closes it");
     assert_eq!(dots(&harness), 3, "nothing was deleted");
@@ -334,29 +356,86 @@ fn delete_escape_cancels_and_gives_the_keyboard_back() {
     );
 }
 
+/// The frame's look: the root's style, which the Space's colour writes.
+fn frame_style(harness: &Harness) -> String {
+    harness.attr(".ds", "style").unwrap_or_default()
+}
+
+/// A preset in the open Edit Space sheet that is not the Space's look: the fourth.
+fn click_a_preset(harness: &mut Harness) {
+    let preset = harness
+        .centre(".ds-space-edit .ds-preset:nth-child(4)")
+        .unwrap_or_else(|| panic!("no preset:\n{}", harness.html()));
+    harness.send(Input::click(preset));
+    harness.advance(ms(300));
+}
+
 #[test]
-fn colour_focuses_a_handle_and_escape_keeps_the_changes() {
-    let mut harness = harness(Three);
-    open_part(&mut harness, 2);
+fn edit_takes_the_keyboard_and_escape_puts_the_name_back() {
+    let mut harness = harness_in(Three, TALL);
+    let name = head_label(&harness);
+    open_part(&mut harness, 1);
     assert!(
-        focused(&harness, ".ds-space-colour .ds-handle"),
-        "the first dot has the keyboard:\n{}",
+        focused(&harness, ".ds-space-edit input"),
+        "the name has the keyboard:\n{}",
         harness.html()
     );
-    let value = |harness: &Harness| harness.attr(".ds-space-colour .ds-handle", "aria-valuetext");
-    let was = value(&harness);
-    key(&mut harness, ShortcutKey::Right);
-    let moved = value(&harness);
-    assert_ne!(was, moved, "an arrow key moves the dot");
+    for letter in "Work".chars() {
+        harness.send(Input::key(ShortcutKey::Char(letter)));
+    }
+    harness.advance(ms(100));
+    assert_eq!(head_label(&harness).as_deref(), Some("The Work Space"));
     key(&mut harness, ShortcutKey::Escape);
-    assert_eq!(harness.count(".ds-space-colour"), 0, "Escape closes it");
+    assert_eq!(harness.count(".ds-space-edit"), 0, "Escape closes it");
+    assert_eq!(head_label(&harness), name, "the name it opened on is back");
+}
+
+#[test]
+fn edit_cancel_puts_the_colour_back() {
+    let mut harness = harness_in(Three, TALL);
+    let frame = frame_style(&harness);
+    open_part(&mut harness, 1);
+    click_a_preset(&mut harness);
+    assert_ne!(
+        frame_style(&harness),
+        frame,
+        "the frame repaints as the colour changes"
+    );
+    let cancel = harness
+        .centre(".ds-space-edit-acts .ds-button:nth-child(1)")
+        .expect("the Cancel button");
+    harness.send(Input::click(cancel));
+    harness.advance(ms(400));
+    assert_eq!(harness.count(".ds-space-edit"), 0, "Cancel closes it");
+    assert_eq!(
+        frame_style(&harness),
+        frame,
+        "the look it opened on is back"
+    );
+}
+
+#[test]
+fn edit_save_keeps_the_name_and_colour() {
+    let mut harness = harness_in(Three, TALL);
+    let frame = frame_style(&harness);
+    open_part(&mut harness, 1);
+    for letter in "Work".chars() {
+        harness.send(Input::key(ShortcutKey::Char(letter)));
+    }
+    click_a_preset(&mut harness);
+    let painted = frame_style(&harness);
+    let save = harness
+        .centre(".ds-space-edit-acts .ds-button:nth-child(2)")
+        .expect("the Save button");
+    harness.send(Input::click(save));
+    harness.advance(ms(400));
+    assert_eq!(harness.count(".ds-space-edit"), 0, "Save closes it");
+    assert_eq!(head_label(&harness).as_deref(), Some("The Work Space"));
+    assert_ne!(painted, frame);
+    assert_eq!(frame_style(&harness), painted, "the new look is kept");
     assert_eq!(
         harness.text_of(".writes").as_deref(),
         Some("1"),
-        "the change is kept and written"
-    );
-    assert!(
-        focused(&harness, OPENER),
-        "the keyboard went back to the opener"
+        "written once, when it closed"
     );
 }

@@ -2012,6 +2012,10 @@ rsx! { Ds { appearance, material, look: spaces.look(),
   Space (Dia: leading icon, the dots, one chevron). Put a `PullDownButton` in `trailing` and make the
   Space from its pick: `let made = spaces.add(payload); spaces.show(made, at, Showing::Rename);`
   (`SpacesHandle`, `Showing` and `NewSpace` are in the prelude). `new_payload` is still required.
+- The menu's Edit Space... opens `EditSpaceSheet` (the name and colour, live, with Cancel and Save);
+  `SpaceMenu` draws it. To offer it from elsewhere (a settings pane's Edit button), call
+  `spaces.show(id, at, Showing::Edit)` with `SpaceMenu` mounted. An app's own Escape handling that
+  closes a part with `close_menu` leaves `Showing::Edit` to the sheet, whose Escape is Cancel.
 - Hooks for an old file: `boot_spaces(raw_fix, first_run, on_load)` runs `raw_fix` on the parsed JSON
   (a one-time import) and `on_load` on the list (a payload fix-up); either changing it writes it back.
 - Today: `use_today(|| storage.boot_today(Epoch::now()), save)` prunes on boot;
