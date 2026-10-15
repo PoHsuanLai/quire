@@ -4,6 +4,7 @@
    `--f`). Attribute selectors carry `*|` (spike S2). */
 
 .ds-level-glyph{ position:relative; display:block; flex:none; }
+.ds-level-glyph[*|data-size="14"]{ width:14px; height:14px; }
 .ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
 .ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
 .ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }

@@ -1205,6 +1205,7 @@ html,body{margin:0;padding:0;background:transparent}
    `--f`). Attribute selectors carry `*|` (spike S2). */
 
 .ds-level-glyph{ position:relative; display:block; flex:none; }
+.ds-level-glyph[*|data-size="14"]{ width:14px; height:14px; }
 .ds-level-glyph[*|data-size="16"]{ width:16px; height:16px; }
 .ds-level-glyph[*|data-size="22"]{ width:22px; height:22px; }
 .ds-level-part{ position:absolute; left:0; top:0; transition:opacity var(--t-quick) var(--e-out), transform var(--t-quick) var(--e-out); }
@@ -2282,6 +2283,9 @@ html,body{margin:0;padding:0;background:transparent}
   transition:left var(--t-quick) var(--e-out);
 }
 .ds-slider[*|data-pressed] .ds-slider-thumb{ transition:none; }
+
+/* The Mac well is 22 at every size and its knob 20 (design/29 section 16), thinner than the capsule's rung. */
+.ds-slider[*|data-look=mac]{ --level-h:var(--s-22); }
 
 /* The Mac knob holds the glyph, centred, in the dark ink the glyph has where the fill covers it. */
 .ds-slider[*|data-look=mac] .ds-slider-thumb{ display:flex; align-items:center; justify-content:center; box-sizing:border-box; color:var(--m-level-glyph-fill); }
