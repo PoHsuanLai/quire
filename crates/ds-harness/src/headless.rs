@@ -43,12 +43,13 @@ use ds_blitz::seam::WindowScroll;
 use ds_blitz::seam::follow_scheme;
 use ds_blitz::seam::{FocusKeeper, Kept, focus_finder, keep};
 use ds_blitz::seam::{
-    HoverTracker, ask_frame_menu, link_under, live_frames, report_frame_hover, report_frame_menu,
+    HoverTracker, ask_frame_image, ask_frame_menu, image_under, link_under, live_frames,
+    report_frame_hover, report_frame_image, report_frame_menu,
 };
 use ds_blitz::seam::{Layout as PhaseLayout, Phase};
 use ds_blitz::seam::{LinkInbox, frame_links, read_link};
 use ds_blitz::seam::{Provided, Wiring};
-use ds_blitz::{FrameHover, FrameMenu};
+use ds_blitz::{FrameHover, FrameImages, FrameMenu};
 use ds_core::time::clock::now;
 use ds_core::vocab::{Activity, InputModality};
 use peniko::Color;
@@ -91,6 +92,8 @@ pub(crate) struct Headless {
     hover: (FrameHover, HoverTracker),
     /// Whether the app hears a context menu asked over a link in a frame.
     menu: FrameMenu,
+    /// Whether the app hears a click on an image in a frame.
+    images: FrameImages,
     /// The edit surfaces listening for IME events.
     pub(crate) listeners: EditListeners,
     /// The components listening for touchpad gestures.
@@ -240,6 +243,7 @@ impl Headless {
             book,
             hover: (setup.frame_links.hover(), HoverTracker::default()),
             menu: setup.frame_links.menu(),
+            images: setup.frame_links.images(),
             listeners,
             gestures,
             keeper,
@@ -472,6 +476,15 @@ impl Headless {
         }
         let under = link_under(&self.doc.inner.borrow(), at);
         report_frame_menu(&self.menu, ask_frame_menu(under, at, &self.book));
+    }
+
+    /// The primary button was released at `at`: tell the app if it was on an image in a frame.
+    pub(crate) fn image_at(&mut self, at: Point) {
+        if let FrameImages::Ignore = self.images {
+            return;
+        }
+        let under = image_under(&self.doc.inner.borrow(), at);
+        report_frame_image(&self.images, ask_frame_image(under, at, &self.book));
     }
 
     /// Paint the document as it was last resolved, over `backdrop`.

@@ -1,11 +1,12 @@
-//! The window's side of frame link hover: winit's pointer moves, in physical pixels, become the
-//! document's logical points and are hit-tested against the frames (`crate::frame_hit`). The
-//! host's event hook hears a move before the document does, so the hit uses the layout the user
-//! is looking at.
+//! The window's side of frame link hover, link menus and image clicks: winit's pointer moves and
+//! releases, in physical pixels, become the document's logical points and are hit-tested against
+//! the frames (`crate::frame_hit`). The host's event hook hears an event before the document
+//! does, so the hit uses the layout the user is looking at.
 
 use crate::frame_book::FrameBook;
-use crate::frame_hit::link_under;
+use crate::frame_hit::{image_under, link_under};
 use crate::frame_hover::{FrameLinkHover, HoverTracker};
+use crate::frame_image::{FrameImageClick, ask as ask_image};
 use crate::frame_menu::{FrameLinkMenu, ask};
 use dioxus_native::winit::event::{ElementState, MouseButton, WindowEvent};
 use dioxus_native_dom::NodeHandle;
@@ -71,25 +72,44 @@ impl WindowHover {
         scale: f64,
         document: Option<&NodeHandle>,
     ) -> Option<FrameLinkMenu> {
-        let WindowEvent::PointerButton {
-            state: ElementState::Released,
-            position,
-            button,
-            ..
-        } = event
-        else {
-            return None;
-        };
-        if button.clone().mouse_button() != Some(MouseButton::Right) {
-            return None;
-        }
-        let at = Point {
-            x: Px((position.x / scale) as f32),
-            y: Px((position.y / scale) as f32),
-        };
+        let at = released(event, scale, MouseButton::Right)?;
         let doc = document.and_then(NodeHandle::try_doc)?;
         let under = link_under(&doc, at);
         drop(doc);
         ask(under, at, &self.book)
     }
+
+    /// The image `event` clicks in a frame, if it is the release of the primary button on one.
+    pub(crate) fn image(
+        &self,
+        event: &WindowEvent,
+        scale: f64,
+        document: Option<&NodeHandle>,
+    ) -> Option<FrameImageClick> {
+        let at = released(event, scale, MouseButton::Left)?;
+        let doc = document.and_then(NodeHandle::try_doc)?;
+        let under = image_under(&doc, at);
+        drop(doc);
+        ask_image(under, at, &self.book)
+    }
+}
+
+/// Where `event` releases `which`, in logical points at `scale` device pixels per point.
+fn released(event: &WindowEvent, scale: f64, which: MouseButton) -> Option<Point> {
+    let WindowEvent::PointerButton {
+        state: ElementState::Released,
+        position,
+        button,
+        ..
+    } = event
+    else {
+        return None;
+    };
+    if button.clone().mouse_button() != Some(which) {
+        return None;
+    }
+    Some(Point {
+        x: Px((position.x / scale) as f32),
+        y: Px((position.y / scale) as f32),
+    })
 }
