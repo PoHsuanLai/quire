@@ -15,7 +15,7 @@ use crate::kit::Kits;
 use crate::material::{level::LEVEL_VARS, stack::STACK_INPUTS};
 use crate::space::{frame_vars::FrameVars, look::SpaceLook};
 use crate::tokens::{
-    chrome::ChromeToken,
+    chrome::{ChromeToken, LightPaint},
     colour::ColourToken,
     dock_floor::DockFloorToken,
     easing::EasingToken,
@@ -73,6 +73,7 @@ pub static KIT: Kit = Kit {
         TokenSet::of::<PersonSwatch>().at(Place::Scale),
         TokenSet::of::<SpacingToken>().at(Place::Scale),
         TokenSet::of::<ChromeToken>().at(Place::Scale),
+        TokenSet::of::<LightPaint>().at(Place::Scheme),
         TokenSet::of::<FontSize>()
             .at(Place::Scale)
             .only(Only::TypefaceFixed),

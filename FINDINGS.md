@@ -1875,3 +1875,15 @@ the chrome stylesheet writes are now public as numbers, each from the table the 
 
 Nothing in the stylesheet changed. Tests pin the generated strings to the old literals and to
 `crates/ds-shell/tests/snapshots/stylesheet.css`.
+
+## Traffic lights use macOS's own colours (lane mac-lights)
+
+The window lights no longer borrow the candy label hues (`--c-red|amber|green` and their
+`-deep`/`-soft`). `ds-style/tokens/chrome/light_paint.rs` holds a table per light: disc, hairline
+rim and mark ink, written as `--light-close`, `--light-close-rim`, `--light-close-mark` (and
+`minimize`, `zoom`). Values are observed from the macOS Sonoma traffic lights: close #FF5F57 / rim
+#E2463F / mark #4D0000, minimise #FEBC2E / #E1A116 / #995700, zoom #28C840 / #12AC28 / #006500.
+The mark inks are opaque (macOS draws them at about 60% alpha). The dark scheme keeps the same
+numbers (rims not separately observed). The inactive look (`light_state`'s neutral fill with a
+hairline) is unchanged. `light_hue` keeps `(disc, mark)`; `light_rim` and `light_colours` are new;
+`Light::hue()` and `Light::tokens()` are gone. `stylesheet.css` golden needs blessing.

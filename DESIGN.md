@@ -66,7 +66,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/tokens/spacing.rs` | 01-LAYOUT §2 (the 18 common steps plus the 1.5, 13 and 15 04-COMPONENTS quotes, as `--s-1`, `--s-1-5` … `--s-36`, emitted on `.ds`; every component sheet reads them) |
 | `ds-style/tokens/pixel.rs`, `ds-core/geometry/scale.rs`, `ds-style/scale.rs`, `ds-style/icon/stroke.rs` | 01-LAYOUT §2.1 (pixel snapping): `Scale` in 120ths, `PixelToken` (`--hair`, `--hairline`, `--px`, `--ring`, `--focus-ring`, `--dpr`, tuned tokens the root writes for its scale), `Ds { scale }` / `HostSignals`, a glyph's stroke snapped to an even number of device pixels (08-ICONS §1.4.1); the layout snap itself is `ds_blitz::snap` |
 | `ds-style/tokens/elevation_layers.rs` | `ShadowLayer`, `Shadow::layers`: `--shadow-window` and `--shadow-drag` as numbers, their CSS written from them (the other shadows read `var()` and stay CSS-only) |
-| `ds-style/tokens/chrome/{light_hue,title_font}.rs` | the traffic lights' disc and ink (`light_hue`, over `label_hue.rs`) and the title's font (`title_font`, 13 at 600) as numbers for a compositor |
+| `ds-style/tokens/chrome/{light_hue,light_paint,title_font}.rs` | the traffic lights' disc, rim and mark ink (`light_hue`, `light_rim`, `light_colours`, from `light_paint.rs`, macOS's own colours, written as `--light-*`) and the title's font (`title_font`, 13 at 600) as numbers for a compositor |
 | `ds-style/tokens/elevation.rs` | 03-COLOR §10 (the four shadows; target (clean-up phase): the code still has about twelve), §17.2 |
 | `ds-style/tokens/type_scale.rs` | 02-TYPE §2, §4 |
 | `ds-style/tokens/layer.rs` | 01-LAYOUT §12 |
