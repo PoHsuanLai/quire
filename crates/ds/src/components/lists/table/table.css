@@ -29,7 +29,9 @@
 
 .ds-table-cells{ display:grid; grid-template-columns:var(--table-cols); align-items:center; flex:1 1 auto; min-width:0; }
 .ds-table-cell{ min-width:0; padding:0 var(--s-8); }
-.ds-table-cell[*|data-align=trailing]{ text-align:end; }
+/* A trailing cell (numbers, sizes, dates) does not fade: `.ds-truncate`'s fade covers its last 1.5em
+   even when the text fits, and end-aligned text always ends there. Overflow still clips. */
+.ds-table-cell[*|data-align=trailing]{ text-align:end; mask-image:none; }
 .ds-table .ds-row{ min-height:var(--row-compact-h); padding:0; }
 .ds-table .ds-row-words{ display:flex; flex-direction:row; }
 
