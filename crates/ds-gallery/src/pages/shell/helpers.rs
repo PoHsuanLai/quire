@@ -64,7 +64,7 @@ fn Stage(theme: Theme, body: Element) -> Element {
     rsx! {
         div { class: "g-modal g-helpers", style: "background-image:url(\"{wallpaper::uri()}\")",
             Ds {
-                appearance: Appearance { theme, accent, motion },
+                appearance: Appearance { theme, accent, motion, ..Appearance::default() },
                 material: Material::Sheet,
                 stylesheet: Inject::Host,
                 div { class: "g-helpers-stage" }

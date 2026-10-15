@@ -5,7 +5,11 @@
 const OFF_WORDS: [&str; 5] = ["off", "hide", "never", "none", "nothing"];
 
 /// Pairs that are a switch though neither word is off: (on, off).
-const ON_OFF_PAIRS: [(&str, &str); 2] = [("natural", "traditional"), ("reduced", "standard")];
+const ON_OFF_PAIRS: [(&str, &str); 3] = [
+    ("natural", "traditional"),
+    ("reduced", "standard"),
+    ("reduced", "system"),
+];
 
 /// A two-word key that is a switch: which word is on and which off.
 #[derive(Debug, Clone, PartialEq, Eq)]

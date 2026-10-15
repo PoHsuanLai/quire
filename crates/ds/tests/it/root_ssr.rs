@@ -132,6 +132,7 @@ fn the_root_stamps_exactly_its_attributes() {
                     theme: Theme::System,
                     accent: Accent::Purple,
                     motion: Motion::Standard,
+                    ..Appearance::default()
                 },
                 system: dark_reduced,
                 blur: BlurState::Available,
@@ -154,6 +155,7 @@ fn the_root_stamps_exactly_its_attributes() {
                     theme: Theme::Light,
                     accent: Accent::Blue,
                     motion: Motion::Standard,
+                    ..Appearance::default()
                 },
                 system: dark_reduced,
                 material: Material::Bar,
@@ -371,4 +373,30 @@ fn a_surface_nests_a_scope_without_a_stylesheet() {
     assert_eq!(nested, want);
     assert_eq!(markup.matches("<style").count(), 1, "the root's only");
     assert!(markup.contains("inside"), "children render");
+}
+
+#[test]
+fn only_reduced_transparency_is_stamped_and_a_surface_keeps_it() {
+    for (transparency, want) in [
+        (Transparency::System, None),
+        (Transparency::Reduced, Some("reduced")),
+    ] {
+        let markup = render(Setup {
+            appearance: Appearance {
+                transparency,
+                ..Appearance::default()
+            },
+            material: Material::Window,
+            surface: Some((Material::Popover, None)),
+            ..Setup::default()
+        });
+        for nth in 0..2 {
+            let attributes = attributes_of(&markup, nth);
+            assert_eq!(
+                attributes.get("data-transparency").map(String::as_str),
+                want,
+                "{transparency:?} root {nth}: {markup}"
+            );
+        }
+    }
 }

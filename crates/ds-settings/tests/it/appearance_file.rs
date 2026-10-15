@@ -9,6 +9,7 @@ use ds_style::appearance::motion::Motion;
 
 use ds_settings::{AppearanceFile, IconDarkVariant, Loaded, Percent, PlateGlyphPolicy};
 use ds_style::appearance::theme::Theme;
+use ds_style::appearance::transparency::Transparency;
 use std::path::Path;
 use support::Scratch;
 
@@ -58,6 +59,7 @@ fn a_file_round_trips() {
             f.appearance.theme = Theme::Dark;
             f.appearance.accent = Accent::Purple;
             f.appearance.motion_level = Motion::Reduced;
+            f.appearance.transparency = Transparency::Reduced;
         }),
         with(|f| {
             f.appearance.material_tint_alpha = Percent(64);
@@ -151,6 +153,27 @@ fn a_bad_value_costs_only_its_own_field() {
             text: "[appearance]\naccent = \"violet\"\n",
             want: AppearanceFile::default(),
             invalid: &["appearance.accent"],
+        },
+        Case {
+            name: "a file from before the field reads transparency as System",
+            text: "[appearance]\ntheme = \"dark\"\nmotion_level = \"reduced\"\n",
+            want: with(|f| {
+                f.appearance.theme = Theme::Dark;
+                f.appearance.motion_level = Motion::Reduced;
+            }),
+            invalid: &[],
+        },
+        Case {
+            name: "reduced transparency is read",
+            text: "[appearance]\ntransparency = \"reduced\"\n",
+            want: with(|f| f.appearance.transparency = Transparency::Reduced),
+            invalid: &[],
+        },
+        Case {
+            name: "an unknown transparency costs only itself",
+            text: "[appearance]\ntransparency = \"clear\"\ntheme = \"dark\"\n",
+            want: with(|f| f.appearance.theme = Theme::Dark),
+            invalid: &["appearance.transparency"],
         },
         Case {
             name: "an out-of-range percent is clamped, not refused",

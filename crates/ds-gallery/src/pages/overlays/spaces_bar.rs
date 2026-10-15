@@ -39,6 +39,7 @@ fn Bar(name: String, held: Option<BarExpansion>, over: DropState, add_over: Drop
             theme: Theme::Light,
             accent: axes.accent,
             motion: axes.motion,
+            ..Appearance::default()
         }
     };
     let mut shown = use_signal(|| Shown::Visible);

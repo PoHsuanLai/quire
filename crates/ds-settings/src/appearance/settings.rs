@@ -10,6 +10,7 @@ use ds_style::appearance::accent::Accent;
 use ds_style::appearance::appearance::Appearance;
 use ds_style::appearance::motion::Motion;
 use ds_style::appearance::theme::Theme;
+use ds_style::appearance::transparency::Transparency;
 use ds_style::appearance::typeface::Typeface;
 use serde::{Deserialize, Serialize};
 
@@ -44,6 +45,16 @@ pub struct AppearanceSettings {
         section = "Appearance"
     )]
     pub motion_level: Motion,
+    /// `appearance.transparency`: System keeps translucent materials, Reduced paints every
+    /// material solid. Read as macOS's "Reduce transparency": a switch that is on for Reduced.
+    /// The compositor reads it from this file, as it reads `theme`.
+    #[settings(
+        label = "Reduce transparency",
+        help = "Make blurred and translucent areas solid. Windows, menus and panels stop \
+                showing what is behind them.",
+        section = "Appearance"
+    )]
+    pub transparency: Transparency,
     /// `appearance.typeface`: System (Inter) unless the person picks mail's editorial faces.
     #[settings(
         label = "Typeface",
@@ -130,6 +141,7 @@ impl Default for AppearanceSettings {
             theme: Theme::System,
             accent: Accent::Blue,
             motion_level: Motion::Standard,
+            transparency: Transparency::System,
             typeface: Typeface::System,
             material_tint_alpha: Percent(80),
             material_highlight_light: Percent(30),
@@ -148,12 +160,13 @@ impl AppearanceSettings {
         self.typeface
     }
 
-    /// The three choices a `ds::prelude::Ds` root resolves.
+    /// The choices a `ds::prelude::Ds` root resolves.
     pub fn appearance(&self) -> Appearance {
         Appearance {
             theme: self.theme,
             accent: self.accent,
             motion: self.motion_level,
+            transparency: self.transparency,
         }
     }
 }

@@ -1,10 +1,10 @@
-//! How a surface looks, as data: the three choices a `.ds` root resolves (design/04-COMPONENTS.md
-//! section 26, O-16: Theme, Accent, Motion).
+//! How a surface looks, as data: the choices a `.ds` root resolves (design/04-COMPONENTS.md
+//! section 26, O-16: Theme, Accent, Motion; and `appearance.transparency`).
 //!
 //! Loading is lenient: a missing field is the first-run value and an unknown word for one field
 //! is that field's default, never a failure of the whole value.
 
-use crate::appearance::{accent::Accent, motion::Motion, theme::Theme};
+use crate::appearance::{accent::Accent, motion::Motion, theme::Theme, transparency::Transparency};
 use ds_core::word::Word;
 use serde::de::Deserializer;
 use serde::{Deserialize, Serialize};
@@ -25,6 +25,17 @@ pub struct Appearance {
     /// How much the window moves.
     #[serde(deserialize_with = "de_motion")]
     pub motion: Motion,
+    /// Whether materials may be translucent (`appearance.transparency`); written only when it
+    /// is `Reduced`, so a file from before the field reads and writes as it did.
+    #[serde(
+        deserialize_with = "de_transparency",
+        skip_serializing_if = "is_system"
+    )]
+    pub transparency: Transparency,
+}
+
+fn is_system(transparency: &Transparency) -> bool {
+    *transparency == Transparency::System
 }
 
 /// A stored theme. Anything that is not `system`, `light` or `dark` is [`Theme::default`].
@@ -57,6 +68,17 @@ where
         .unwrap_or_default())
 }
 
+/// A stored transparency. Anything that is not `system` or `reduced` is
+/// [`Transparency::default`].
+fn de_transparency<'de, D>(deserializer: D) -> Result<Transparency, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    Ok(word(deserializer)?
+        .and_then(|word| Transparency::parse(&word))
+        .unwrap_or_default())
+}
+
 /// The stored value as a word, or `None` when it is some other shape (a number, a table), so
 /// `"accent": 7` costs only the accent.
 fn word<'de, D>(deserializer: D) -> Result<Option<String>, D::Error>
@@ -78,7 +100,9 @@ where
 #[cfg(test)]
 mod tests {
     use super::Appearance;
-    use crate::appearance::{accent::Accent, motion::Motion, theme::Theme};
+    use crate::appearance::{
+        accent::Accent, motion::Motion, theme::Theme, transparency::Transparency,
+    };
 
     #[test]
     fn a_partial_value_keeps_the_fields_it_has() {
@@ -122,6 +146,41 @@ mod tests {
                     theme: Theme::Dark,
                     accent: Accent::Purple,
                     motion: Motion::Reduced,
+                    ..Appearance::default()
+                },
+            ),
+            (
+                "an old file without the field is System",
+                r#"{"theme":"dark","accent":"purple","motion":"reduced"}"#,
+                Appearance {
+                    theme: Theme::Dark,
+                    accent: Accent::Purple,
+                    motion: Motion::Reduced,
+                    transparency: Transparency::System,
+                },
+            ),
+            (
+                "reduced transparency",
+                r#"{"transparency":"reduced"}"#,
+                Appearance {
+                    transparency: Transparency::Reduced,
+                    ..Appearance::default()
+                },
+            ),
+            (
+                "an unknown transparency keeps the theme",
+                r#"{"theme":"dark","transparency":"clear"}"#,
+                Appearance {
+                    theme: Theme::Dark,
+                    ..Appearance::default()
+                },
+            ),
+            (
+                "a transparency that is not a word keeps the motion",
+                r#"{"transparency":1,"motion":"reduced"}"#,
+                Appearance {
+                    motion: Motion::Reduced,
+                    ..Appearance::default()
                 },
             ),
         ];
@@ -129,6 +188,27 @@ mod tests {
             let got: Appearance =
                 serde_json::from_str(json).unwrap_or_else(|e| panic!("{name}: {e}"));
             assert_eq!(got, want, "{name}: {json}");
+        }
+    }
+
+    #[test]
+    fn only_reduced_transparency_is_written() {
+        let reduced = Appearance {
+            transparency: Transparency::Reduced,
+            ..Appearance::default()
+        };
+        let cases = [
+            (
+                Appearance::default(),
+                r#"{"theme":"system","accent":"blue","motion":"standard"}"#,
+            ),
+            (
+                reduced,
+                r#"{"theme":"system","accent":"blue","motion":"standard","transparency":"reduced"}"#,
+            ),
+        ];
+        for (value, want) in cases {
+            assert_eq!(serde_json::to_string(&value).unwrap_or_default(), want);
         }
     }
 }

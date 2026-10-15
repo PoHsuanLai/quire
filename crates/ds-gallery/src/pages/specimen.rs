@@ -79,7 +79,7 @@ pub fn Scope(
     };
     rsx! {
         Ds {
-            appearance: Appearance { theme, accent, motion },
+            appearance: Appearance { theme, accent, motion, ..Appearance::default() },
             look: SpaceLook { theme, ..look },
             material,
             blur,

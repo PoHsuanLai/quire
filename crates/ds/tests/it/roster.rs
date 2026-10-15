@@ -147,6 +147,7 @@ mod hook {
     use ds_style::appearance::blur::BlurState;
     use ds_style::appearance::resolve::Resolved;
     use ds_style::appearance::system::Contrast;
+    use ds_style::appearance::transparency::Transparency;
     use ds_style::scope::Scope;
     use std::cell::Cell;
     use std::time::Duration;
@@ -168,6 +169,7 @@ mod hook {
                 accent: Accent::Blue,
                 motion: MotionLevel::Standard,
                 contrast: Contrast::Normal,
+                transparency: Transparency::System,
             };
             Signal::new(Scope {
                 resolved,

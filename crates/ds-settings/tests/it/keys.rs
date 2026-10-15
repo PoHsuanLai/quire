@@ -23,6 +23,7 @@ const APPEARANCE_SETTINGS_FIELDS: &[&str] = &[
     "theme",
     "accent",
     "motion_level",
+    "transparency",
     "typeface",
     "material_tint_alpha",
     "material_highlight_light",

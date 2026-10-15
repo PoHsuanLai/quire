@@ -179,6 +179,7 @@ pub fn Ds(
             "data-typeface": typeface.slug(),
             "data-accent": resolved.accent.slug(),
             "data-contrast": resolved.contrast.attribute(),
+            "data-transparency": resolved.transparency.attribute(),
             "data-motion": resolved.motion.slug(),
             "data-material": material.slug(),
             "data-blur": blur.slug(),

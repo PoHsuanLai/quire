@@ -35,6 +35,7 @@ and every other name is at its home path (the root keeps only the stylesheet ass
 | `ds-style/appearance/theme.rs` | 30 §3 (the one Look), 22-SETTINGS §3.1 `appearance.theme`; 03-COLOR §3 (two schemes) | `Theme` (the choice); `Scheme` is the resolved light/dark |
 | `ds-style/appearance/accent.rs` | 03-COLOR §5 and §20; 22-SETTINGS §3.1 `appearance.accent` | the eight macOS accents |
 | `ds-style/appearance/motion.rs` | 05-MOTION §3.2; 22-SETTINGS §3.1-3.2 `motion_level` | `Motion` (the preference) and `MotionLevel` (resolved) |
+| `ds-style/appearance/transparency.rs` | 27-HIG-PARITY §3.1 Reduce Transparency; 22-SETTINGS §3.1 `appearance.transparency` | `Transparency` (`System`, `Reduced`); `Resolved` carries it and a root writes `data-transparency=reduced` only for `Reduced` |
 | `ds-style/appearance/appearance.rs` | 04-COMPONENTS §26 (O-16: Theme, Accent, Motion) | lenient read |
 | `ds-style/appearance/system.rs` | plan "ds-settings" portal mapping | `SystemPrefs{scheme, motion, contrast}` |
 | `ds-style/appearance/resolve.rs` | 05-MOTION §9 rule 11 (explicit `data-motion`); 03-COLOR open decision 13 | `resolve()`, `Resolved::attrs()` |

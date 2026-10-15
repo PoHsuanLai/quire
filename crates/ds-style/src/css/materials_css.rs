@@ -1,5 +1,6 @@
 //! One `.ds[data-material=…]` block per material and scheme, and the `data-blur` switch
-//! between `--m-tint` and `--m-tint-solid`.
+//! between `--m-tint` and `--m-tint-solid`, and the `data-transparency=reduced` override that
+//! points `--m-tint` at the solid one.
 //!
 //! The paint rules come last: a root or `Surface` with a material paints the solid tint
 //! unless it says `data-blur=on`, which is the safe default of [`crate::BlurState`]. The
@@ -62,6 +63,7 @@ pub fn materials_css() -> String {
             ));
         }
     }
+    css.push_str(&reduced_css());
     let material = format!(".ds{}", presence_selector("data-material"));
     let solid = [property("background", "var(--m-tint-solid)")];
     css.push_str(&rule(&material, &solid));
@@ -77,6 +79,28 @@ pub fn materials_css() -> String {
     css.push_str(&osd_card_css());
     css.push_str(&level_css());
     css
+}
+
+/// Reduced transparency (`data-transparency=reduced`, design/27-HIG-PARITY.md section 3.1): the
+/// translucent tint becomes the solid one, so every rule that paints `--m-tint` (a root, a card of
+/// a transparent root, the squircle and palette layers, an app's own) paints it solid without a
+/// rule of its own; the vibrancy boost is off so the solid tint is the flat colour; and the tinted
+/// frame sits at the solid floor. It follows every material block and matches them in
+/// specificity, so it wins over the dark ones.
+fn reduced_css() -> String {
+    let [tint_var, _, _, _, _, _, frame_alpha_var, ..] = MATERIAL_VARS;
+    rule(
+        &format!(
+            ".ds{}{}",
+            presence_selector("data-material"),
+            attr_selector("data-transparency", "reduced")
+        ),
+        &[
+            declaration(VIBRANCY, "0"),
+            declaration(tint_var, "var(--m-tint-solid)"),
+            declaration(frame_alpha_var, &SOLID_ALPHA.css()),
+        ],
+    )
 }
 
 /// The OSD card (`Osd`): a card inside a transparent Osd root that
@@ -302,7 +326,45 @@ fn vibrant(boosted: Hex, flat: Hex, alpha: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::materials_css;
+    use super::{materials_css, selector};
+    use crate::appearance::{material::Material, theme::Scheme};
+    use crate::material::recipe::{DEFAULT_TINT_ALPHA, recipe};
+    use ds_core::word::Word;
+
+    /// Every alpha an `rgba(r,g,b,a)` in `value` names.
+    fn alphas(value: &str) -> Vec<f32> {
+        value
+            .split("rgba(")
+            .skip(1)
+            .filter_map(|tail| tail.split(')').next()?.rsplit(',').next()?.parse().ok())
+            .collect()
+    }
+
+    #[test]
+    fn reduced_transparency_paints_every_material_solid() {
+        const RULE: &str = ".ds[*|data-material][*|data-transparency=reduced]{--m-vibrancy:0;--m-tint:var(--m-tint-solid);--m-frame-alpha:.94;}\n";
+        let css = materials_css();
+        let reduced = css.find(RULE).unwrap_or_else(|| panic!("missing {RULE}"));
+        for scheme in Scheme::ALL.iter().copied() {
+            for material in Material::ALL.iter().copied() {
+                let name = format!("{} {}", scheme.slug(), material.slug());
+                let block = css
+                    .find(&format!("{}{{", selector(material, scheme)))
+                    .unwrap_or_else(|| panic!("{name}: no block"));
+                assert!(
+                    block < reduced,
+                    "{name}: the override comes after the block"
+                );
+                // What `--m-tint` points at is the solid tint: the Space gradient (window), or
+                // colours at alpha .94 or more.
+                let solid = recipe(material, scheme, DEFAULT_TINT_ALPHA).tint_solid;
+                assert!(
+                    solid == "var(--f-grad)" || alphas(&solid).iter().all(|alpha| *alpha >= 0.94),
+                    "{name}: {solid}"
+                );
+            }
+        }
+    }
 
     #[test]
     fn every_tint_scales_its_own_alpha_by_the_key() {

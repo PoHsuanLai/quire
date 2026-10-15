@@ -434,6 +434,12 @@ fn App() -> Element {
 }
 ```
 
+**Reduce transparency.** `appearance.transparency` (`System` or `Reduced`, "Reduce transparency" in
+Settings) rides in the same `Appearance`: consumers get it through `Ds`, which stamps
+`data-transparency=reduced` and nothing at all for `System`, and every material then paints its solid
+tint with the vibrancy boost off. The compositor reads `Appearance.transparency` from the same file
+it reads `theme` from.
+
 **Nothing here names a runtime.** The file watch and the portal watch are tasks handed to the
 `ds::base::spawner::Spawner` you pass (`ds-settings` may not depend on `tokio`, `scripts/check-boundary.sh`).
 On Blitz, `ds_blitz::TokioSpawner::current()` is the implementor: `ds_blitz::launch` enters a

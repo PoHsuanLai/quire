@@ -101,6 +101,11 @@ mod tests {
                 &["standard", "reduced"],
             ),
             (
+                "transparency",
+                stored_words::<ds_style::appearance::transparency::Transparency>(),
+                &["system", "reduced"],
+            ),
+            (
                 "typeface",
                 stored_words::<ds_style::appearance::typeface::Typeface>(),
                 &["system", "editorial"],

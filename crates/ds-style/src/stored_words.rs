@@ -7,6 +7,7 @@ use crate::appearance::{
     motion::{Motion, MotionLevel},
     peek::PeekMode,
     theme::{Scheme, Theme},
+    transparency::Transparency,
     typeface::Typeface,
 };
 use crate::tokens::label_hue::LabelHue;
@@ -22,5 +23,6 @@ fn stored_vocabularies_serialise_as_their_slugs() {
     word_matches_serde::<PeekMode>();
     word_matches_serde::<Scheme>();
     word_matches_serde::<Theme>();
+    word_matches_serde::<Transparency>();
     word_matches_serde::<Typeface>();
 }

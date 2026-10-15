@@ -117,7 +117,7 @@ fn Stage(material: Material, children: Element) -> Element {
     };
     rsx! {
         div { class: "g-driven-stage",
-            Ds { appearance: Appearance { theme, accent, motion }, material, stylesheet: Inject::Host,
+            Ds { appearance: Appearance { theme, accent, motion, ..Appearance::default() }, material, stylesheet: Inject::Host,
                 div { class: "g-driven-stage-fill" }
                 {children}
             }

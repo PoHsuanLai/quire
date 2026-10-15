@@ -103,6 +103,7 @@ control in v1.
 | `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `30-CATALOGUE.md` section 3.2 | settled (preference) |
 | `appearance.accent` | `Accent` (8 variants: `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`, `graphite`, macOS's own list in its picker order) | `Blue` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
 | `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
+| `appearance.transparency` | `Transparency::{System,Reduced}` | `System` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
 | `appearance.typeface` | RETIRING | | The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
 | `appearance.material_tint_alpha` | `Percent` | `80` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | settled; to retire in the clean-up phase |
 | `appearance.material_highlight_light` | `Percent` | `30` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
@@ -1008,7 +1009,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 
 | Settings app page | Keys shown |
 | --- | --- |
-| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
+| **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
 | **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
@@ -1125,8 +1126,8 @@ without a label is shown as its own words (`workspace_prev` as "Workspace prev")
 The schema's `kind` for a two-variant enum stays `toggle`; the Settings app decides between
 switch and segments from the words, so a program writes nothing extra. Two words are an on/off
 pair when either is `off`, `hide`, `never`, `none` or `nothing` (the other is the on side), or
-when they are one of `natural`/`traditional` (natural on) or `reduced`/`standard` (reduced on: a
-switch labelled like macOS's "Reduce motion", on for the reduced value). Everything else is a
+when they are one of `natural`/`traditional` (natural on) or `reduced`/`standard` or `reduced`/`system` (reduced on: a
+switch labelled like macOS's "Reduce motion" or "Reduce transparency", on for the reduced value). Everything else is a
 choice between two things, not a switch. The rule and its table test live in detent's
 `detent-model` (`control.rs`). All widgets are from `04-COMPONENTS.md`; the Settings app has no
 widgets of its own.

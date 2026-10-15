@@ -1,4 +1,4 @@
-//! The appearance vocabulary: what a person picks (theme, accent, motion), what the
+//! The appearance vocabulary: what a person picks (theme, accent, motion, transparency), what the
 //! desktop says (system preferences), and what the two resolve to on a `.ds` root; and which
 //! typeface the root's type speaks in.
 
@@ -12,4 +12,5 @@ pub mod peek;
 pub mod resolve;
 pub mod system;
 pub mod theme;
+pub mod transparency;
 pub mod typeface;

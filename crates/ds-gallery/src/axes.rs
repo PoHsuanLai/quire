@@ -104,6 +104,7 @@ impl Axes {
             theme: self.theme,
             accent: self.accent,
             motion: self.motion,
+            ..Appearance::default()
         }
     }
 

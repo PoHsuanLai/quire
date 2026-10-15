@@ -40,7 +40,7 @@ fn Dialog(theme: Theme, attach: Attach) -> Element {
     rsx! {
         div { class: "g-modal",
             Ds {
-                appearance: Appearance { theme, accent, motion },
+                appearance: Appearance { theme, accent, motion, ..Appearance::default() },
                 material: Material::Sheet,
                 stylesheet: Inject::Host,
                 div { class: "g-modal-stage" }

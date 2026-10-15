@@ -8,6 +8,7 @@ use crate::appearance::{
     motion::{Motion, MotionLevel},
     system::{Contrast, ReducedMotion, SystemPrefs},
     theme::{Scheme, Theme},
+    transparency::Transparency,
 };
 use ds_core::word::Word;
 
@@ -22,6 +23,8 @@ pub struct Resolved {
     pub motion: MotionLevel,
     /// The desktop's contrast preference; a root writes `data-contrast` only for `High`.
     pub contrast: Contrast,
+    /// `appearance.transparency`; a root writes `data-transparency` only for `Reduced`.
+    pub transparency: Transparency,
 }
 
 impl Resolved {
@@ -57,6 +60,7 @@ pub fn resolve(app: Appearance, look_theme: Theme, system: SystemPrefs) -> Resol
         accent: app.accent,
         motion,
         contrast: system.contrast,
+        transparency: app.transparency,
     }
 }
 
@@ -78,6 +82,7 @@ mod tests {
         motion::{Motion, MotionLevel},
         system::{Contrast, ReducedMotion, SystemPrefs},
         theme::{Scheme, Theme},
+        transparency::Transparency,
     };
 
     const fn prefs(scheme: Scheme, motion: ReducedMotion) -> SystemPrefs {
@@ -106,6 +111,7 @@ mod tests {
                 theme,
                 accent: Accent::Green,
                 motion,
+                ..Appearance::default()
             };
             let got = resolve(app, look, system);
             let want = Resolved {
@@ -113,6 +119,7 @@ mod tests {
                 accent: Accent::Green,
                 motion: level,
                 contrast: Contrast::Normal,
+                transparency: Transparency::System,
             };
             assert_eq!(got, want, "{name}");
         }
@@ -125,6 +132,7 @@ mod tests {
             accent: Accent::Purple,
             motion: MotionLevel::Reduced,
             contrast: Contrast::Normal,
+            transparency: Transparency::System,
         };
         assert_eq!(
             resolved.attrs(),
@@ -134,5 +142,21 @@ mod tests {
                 ("data-motion", "reduced")
             ]
         );
+    }
+
+    #[test]
+    fn transparency_is_the_apps_choice_and_marks_a_root_only_when_reduced() {
+        for (transparency, attribute) in [
+            (Transparency::System, None),
+            (Transparency::Reduced, Some("reduced")),
+        ] {
+            let app = Appearance {
+                transparency,
+                ..Appearance::default()
+            };
+            let got = resolve(app, Theme::System, SystemPrefs::default());
+            assert_eq!(got.transparency, transparency);
+            assert_eq!(got.transparency.attribute(), attribute);
+        }
     }
 }

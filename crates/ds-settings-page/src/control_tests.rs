@@ -30,6 +30,7 @@ fn each_kind_gets_the_control_detent_gives_it() {
             switch("natural", "traditional"),
         ),
         (toggle("standard", "reduced"), switch("reduced", "standard")),
+        (toggle("system", "reduced"), switch("reduced", "system")),
         // A choice between two things is not a switch.
         (
             toggle("icons", "letters"),

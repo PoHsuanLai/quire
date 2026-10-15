@@ -46,6 +46,7 @@ fn appearance(theme: Theme) -> Appearance {
         theme,
         accent: axes.accent,
         motion: axes.motion,
+        ..Appearance::default()
     }
 }
 
