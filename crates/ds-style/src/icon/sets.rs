@@ -125,6 +125,8 @@ impl Icon {
         Icon::CircleCheck,
         Icon::TriangleAlert,
         Icon::Heart,
+        Icon::GitBranch,
+        Icon::Diff,
     ];
 
     /// The control center's, the power menu's and Now Playing's glyphs (Lucide,
@@ -251,6 +253,8 @@ impl Icon {
         Icon::CircleCheck,
         Icon::TriangleAlert,
         Icon::Heart,
+        Icon::GitBranch,
+        Icon::Diff,
         Icon::Play,
         Icon::Pause,
         Icon::SkipBack,

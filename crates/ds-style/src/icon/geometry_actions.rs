@@ -151,3 +151,26 @@ pub(super) const TRIANGLE_ALERT: &[Shape] = &[
 pub(super) const HEART: &[Shape] = &[Shape::Path(
     "M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5",
 )];
+
+/// Lucide `git-branch`.
+pub(super) const GIT_BRANCH: &[Shape] = &[
+    Shape::Path("M6 3v12"),
+    Shape::Circle {
+        cx: "18",
+        cy: "6",
+        r: "3",
+    },
+    Shape::Circle {
+        cx: "6",
+        cy: "18",
+        r: "3",
+    },
+    Shape::Path("M18 9a9 9 0 0 1-9 9"),
+];
+
+/// Lucide `diff`: a plus over a minus.
+pub(super) const DIFF: &[Shape] = &[
+    Shape::Path("M12 3v14"),
+    Shape::Path("M5 10h14"),
+    Shape::Path("M5 21h14"),
+];

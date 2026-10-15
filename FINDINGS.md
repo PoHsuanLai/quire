@@ -1887,3 +1887,14 @@ The mark inks are opaque (macOS draws them at about 60% alpha). The dark scheme 
 numbers (rims not separately observed). The inactive look (`light_state`'s neutral fill with a
 hairline) is unchanged. `light_hue` keeps `(disc, mark)`; `light_rim` and `light_colours` are new;
 `Light::hue()` and `Light::tokens()` are gone. `stylesheet.css` golden needs blessing.
+
+## Glyph pin tiles and git glyphs (lane temor-asks)
+
+`PinFace::Glyph { icon, label }` shows an `Icon` on a pinned tile, drawn as `All`'s inbox glyph is
+(`ds-pin-tile-face`, `IconSize::Large`), so the stylesheet is unchanged; `label` is the
+`aria-label`, as an account's address is, and `data-face="glyph"`. `PinFace` is now
+`#[non_exhaustive]`. `Icon::GitBranch` and `Icon::Diff` are new (Lucide `git-branch` and `diff`,
+ISC; outline by default, with hand-filled solid forms because every icon needs one). `Folder` and
+`Terminal` already existed (`Terminal` is Lucide `square-terminal`, solid by the owner's pick).
+Goldens to bless: `tests/snapshots/lists/pin_tile/glyph-pressed.html` and `glyph-unpressed.html`
+(new); the gallery's Glyphs page gains two specimens.

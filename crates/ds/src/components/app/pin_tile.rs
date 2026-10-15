@@ -32,6 +32,7 @@ use ds_style::tokens::hex::Colour;
 
 /// What a tile shows.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum PinFace {
     /// Every account: the inbox glyph.
     All,
@@ -46,6 +47,14 @@ pub enum PinFace {
         /// Its address, which names the tile to assistive technology (`S:1236`); without one
         /// the tile is named by its letter and provider.
         address: Option<String>,
+    },
+    /// A symbolic glyph in place of a letter or the inbox glyph (a terminal tab, say). It is
+    /// drawn as `All`'s inbox glyph is: the same size, ink and pressed look.
+    Glyph {
+        /// The glyph.
+        icon: Icon,
+        /// What names the tile to assistive technology, as an account's address does ("Terminal").
+        label: String,
     },
     /// The tile after the accounts that adds one: a plus in a dashed ring, quiet until hovered.
     /// It is an action, not a filter: never selected, no count.
@@ -91,6 +100,7 @@ impl PinFace {
         match self {
             PinFace::All => "all",
             PinFace::Account { .. } => "account",
+            PinFace::Glyph { .. } => "glyph",
             PinFace::Add { .. } => "add",
         }
     }
@@ -101,7 +111,7 @@ impl PinFace {
 fn label(face: &PinFace) -> String {
     match face {
         PinFace::All => "All accounts".to_string(),
-        PinFace::Add { label, .. } => label.clone(),
+        PinFace::Add { label, .. } | PinFace::Glyph { label, .. } => label.clone(),
         PinFace::Account {
             address: Some(address),
             ..
@@ -190,12 +200,15 @@ pub fn PinTile(
     };
     let hint = match &face {
         PinFace::Add { hint, .. } => hint.clone(),
-        PinFace::All | PinFace::Account { .. } => None,
+        PinFace::All | PinFace::Account { .. } | PinFace::Glyph { .. } => None,
     };
     let tip = use_tip(hint.map(TipText::new));
     let picture = match face {
         PinFace::All => rsx! {
             span { class: "ds-pin-tile-face", Glyph { icon: Icon::Inbox, size: IconSize::Large } }
+        },
+        PinFace::Glyph { icon, .. } => rsx! {
+            span { class: "ds-pin-tile-face", Glyph { icon, size: IconSize::Large } }
         },
         PinFace::Account {
             initial,
@@ -278,6 +291,7 @@ mod tests {
     use crate::components::content::provider_mark::MarkProvider;
     use ds_core::vocab::{Muting, Selection};
     use ds_motion::detail::operation::Operation;
+    use ds_style::icon::Icon;
     use ds_style::tokens::hex::{Colour, Hex};
 
     #[test]
@@ -296,6 +310,15 @@ mod tests {
     }
 
     #[test]
+    fn a_glyph_tile_has_its_own_face_word() {
+        let glyph = PinFace::Glyph {
+            icon: Icon::GitBranch,
+            label: "Branches".to_string(),
+        };
+        assert_eq!(glyph.slug(), "glyph");
+    }
+
+    #[test]
     fn a_tile_is_named_by_its_address_else_its_letter_and_provider() {
         let colour = Colour::Solid(Hex([0x5b, 0x4f, 0xc4]));
         let account = |address: Option<&str>| PinFace::Account {
@@ -308,6 +331,13 @@ mod tests {
             (PinFace::All, "All accounts"),
             (account(Some("poh@acme.example")), "poh@acme.example"),
             (account(None), "P, Fastmail account"),
+            (
+                PinFace::Glyph {
+                    icon: Icon::Terminal,
+                    label: "Terminal".to_string(),
+                },
+                "Terminal",
+            ),
             (
                 PinFace::Add {
                     label: "Add account".to_string(),

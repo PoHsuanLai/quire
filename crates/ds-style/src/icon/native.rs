@@ -148,4 +148,6 @@ pub(super) const TABLE: &[(Icon, Native)] = &[
     (Icon::CircleCheck, Native::Outline),
     (Icon::TriangleAlert, Native::Outline),
     (Icon::Heart, Native::Pair),
+    (Icon::GitBranch, Native::Outline),
+    (Icon::Diff, Native::Outline),
 ];

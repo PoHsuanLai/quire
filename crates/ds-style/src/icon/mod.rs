@@ -303,6 +303,10 @@ pub enum Icon {
     TriangleAlert,
     /// Lucide `heart`: a favourite.
     Heart,
+    /// Lucide `git-branch`: a version-control branch.
+    GitBranch,
+    /// Lucide `diff`: lines added and removed (a plus over a minus).
+    Diff,
 }
 
 impl Icon {
@@ -378,6 +382,8 @@ impl Icon {
             Icon::CircleCheck => geometry_actions::CIRCLE_CHECK,
             Icon::TriangleAlert => geometry_actions::TRIANGLE_ALERT,
             Icon::Heart => geometry_actions::HEART,
+            Icon::GitBranch => geometry_actions::GIT_BRANCH,
+            Icon::Diff => geometry_actions::DIFF,
             shell => geometry_shell::shapes(shell),
         }
     }

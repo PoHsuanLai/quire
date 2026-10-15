@@ -47,6 +47,8 @@ pub(super) fn shapes(icon: Icon) -> &'static [Shape] {
         Icon::CircleCheck => CIRCLE_CHECK,
         Icon::TriangleAlert => TRIANGLE_ALERT,
         Icon::Heart => HEART,
+        Icon::GitBranch => GIT_BRANCH,
+        Icon::Diff => DIFF,
         _ => &[],
     }
 }
@@ -295,3 +297,19 @@ const TRIANGLE_ALERT: &[Shape] = &[Shape::Solid(
 const HEART: &[Shape] = &[Shape::Solid(
     "M6.979 3.074a6 6 0 0 1 4.988 1.425l.037 .033l.034 -.03a6 6 0 0 1 4.733 -1.44l.246 .036a6 6 0 0 1 3.364 10.008l-.18 .185l-.048 .041l-7.45 7.379a1 1 0 0 1 -1.313 .082l-.094 -.082l-7.493 -7.422a6 6 0 0 1 3.176 -10.215z",
 )];
+
+/// Lucide `git-branch` as fills: the stem as a rounded bar, the two nodes as discs, the join as
+/// an arc band.
+const GIT_BRANCH: &[Shape] = &[
+    Shape::Solid("M6 2a1 1 0 0 1 1 1v12a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1z"),
+    Shape::Solid("M18 3a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"),
+    Shape::Solid("M6 15a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"),
+    Shape::Solid("M19 9A10 10 0 0 1 9 19v-2A8 8 0 0 0 17 9z"),
+];
+
+/// Lucide `diff` as fills: three rounded bars, the plus's two and the minus.
+const DIFF: &[Shape] = &[
+    Shape::Solid("M12 2a1 1 0 0 1 1 1v14a1 1 0 0 1-2 0V3a1 1 0 0 1 1-1z"),
+    Shape::Solid("M5 9h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"),
+    Shape::Solid("M5 20h14a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2z"),
+];

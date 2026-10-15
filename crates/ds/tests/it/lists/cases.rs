@@ -88,6 +88,16 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "pin_tile",
+        state: "glyph-pressed",
+        make: || rsx! { PinTile { face: PinFace::Glyph { icon: Icon::Terminal, label: "Terminal".to_string() }, selection: Selection::Selected, onclick: |_| {} } },
+    },
+    Case {
+        component: "pin_tile",
+        state: "glyph-unpressed",
+        make: || rsx! { PinTile { face: PinFace::Glyph { icon: Icon::Terminal, label: "Terminal".to_string() }, selection: Selection::Unselected, onclick: |_| {} } },
+    },
+    Case {
+        component: "pin_tile",
         state: "none-unread",
         make: || rsx! { PinTile { face: PinFace::All, unread: 0, onclick: |_| {} } },
     },
