@@ -413,14 +413,14 @@ fn a_click_replaces_a_command_click_toggles_and_a_shift_click_extends_in_either_
     let mut harness = picking();
     let held = |row| row_in(".ds-vtable-held", row);
     let side = |row| row_in(".ds-vtable-columns", row);
-    // (row to click, modifiers held, rows selected after, cursor after). The primary modifier is
-    // Command, which the window reports as Super.
+    // (row to click, modifiers held, rows selected after, cursor after), all rows on screen. The
+    // primary modifier is Command, which the window reports as Super.
     let steps: Vec<(String, Modifiers, &str, &str)> = vec![
-        (held(3), Modifiers::empty(), "1", "3"),
-        (side(6), Modifiers::SHIFT, "4", "6"),
-        (held(9), Modifiers::SUPER, "5", "9"),
-        (side(4), Modifiers::SUPER, "4", "4"),
-        (side(5), Modifiers::empty(), "1", "5"),
+        (held(1), Modifiers::empty(), "1", "1"),
+        (side(3), Modifiers::SHIFT, "3", "3"),
+        (held(4), Modifiers::SUPER, "4", "4"),
+        (side(2), Modifiers::SUPER, "3", "2"),
+        (side(3), Modifiers::empty(), "1", "3"),
     ];
     for (selector, held_keys, count, cursor) in steps {
         click_holding(&mut harness, &selector, held_keys);
@@ -430,14 +430,14 @@ fn a_click_replaces_a_command_click_toggles_and_a_shift_click_extends_in_either_
             "{selector} with {held_keys:?}"
         );
     }
-    // Row 5 is the one selected now, and it is drawn selected in both panes.
+    // Row 3 is the one selected now, and it is drawn selected in both panes.
     assert_eq!(harness.count(".ds-vtable-item[data-selected=yes]"), 2);
     assert_eq!(
-        harness.attr(&held(5), "data-selected").as_deref(),
+        harness.attr(&held(3), "data-selected").as_deref(),
         Some("yes")
     );
     assert_eq!(
-        harness.attr(&side(5), "data-selected").as_deref(),
+        harness.attr(&side(3), "data-selected").as_deref(),
         Some("yes")
     );
 }
