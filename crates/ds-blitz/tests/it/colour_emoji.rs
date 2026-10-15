@@ -4,15 +4,13 @@
 //! own fallback does not reach it on this machine (it picks Symbola, monochrome), which is why
 //! an emoji grid names the family. `.ds-emoji-text` (the `--font-emoji` stack, emoji face first)
 //! paints colour too, while its letters, digits and `#` stay Inter's pixel for pixel. Skipped,
-//! with a note, where the font is not installed. A stack naming no emoji family (`Inter`,
+//! with a note, where no COLRv1 emoji font is installed (`ds_blitz::colrv1_emoji_file`). A stack naming no emoji family (`Inter`,
 //! `system-ui`, `sans-serif`) reaches the colour face too (`ds_blitz::EmojiChoice`).
 
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
 use std::time::Duration;
-
-const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
 
 const VIEW: Viewport = Viewport {
     width: 400,
@@ -53,8 +51,8 @@ fn coloured(harness: &Harness, shot: &image::RgbaImage, selector: &str) -> u32 {
 
 #[test]
 fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
-    if !std::path::Path::new(COLRV1).exists() {
-        eprintln!("skipped: {COLRV1} is not installed");
+    if ds_blitz::colrv1_emoji_file().is_none() {
+        eprintln!("skipped: no COLRv1 colour emoji font (Noto-COLRv1.ttf) is installed");
         return;
     }
     let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));

@@ -11,8 +11,6 @@ use ds_blitz::AdapterPref;
 use ds_harness::{Backend, Driver, Harness, HarnessConfig, Input, Viewport};
 use std::time::{Duration, Instant};
 
-const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
-
 const SMALL: Viewport = Viewport {
     width: 240,
     height: 120,
@@ -191,8 +189,8 @@ fn scroll(label: &str, mut harness: Harness) {
 #[test]
 #[ignore = "a benchmark: run with --ignored --nocapture, in release"]
 fn emoji_grid_scrolls_on_both_backends() {
-    if !std::path::Path::new(COLRV1).exists() {
-        eprintln!("skipped: {COLRV1} is not installed");
+    if ds_blitz::colrv1_emoji_file().is_none() {
+        eprintln!("skipped: no COLRv1 colour emoji font (Noto-COLRv1.ttf) is installed");
         return;
     }
     println!(

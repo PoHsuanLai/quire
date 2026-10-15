@@ -18,7 +18,6 @@ use parley::fontique::{Blob, Collection, CollectionOptions};
 use skrifa::MetadataProvider;
 use std::sync::Arc;
 
-const COLRV1: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
 const STACK: &str = "\"Inter\",\"Noto Color Emoji\",system-ui,sans-serif";
 /// sill's broken strings: a file name and the bar clock.
 /// A face, a thumbs-up with a skin tone, a flag and a ZWJ family.
@@ -84,14 +83,21 @@ fn width(fonts: FontContext, stack: &str, text: &str) -> f64 {
 
 /// Whether the COLRv1 emoji face maps `c` in its cmap.
 fn emoji_maps(c: char) -> bool {
-    let bytes = std::fs::read(COLRV1).expect("the emoji font reads");
+    let path = ds_blitz::colrv1_emoji_file().expect("the emoji font is installed");
+    let bytes = std::fs::read(path).expect("the emoji font reads");
     let font = skrifa::FontRef::new(&bytes).expect("the emoji font parses");
     font.charmap().map(c).is_some()
 }
 
 fn applies() -> bool {
-    if !std::path::Path::new(COLRV1).exists() {
-        eprintln!("skipped: {COLRV1} is not installed");
+    if ds_blitz::colrv1_emoji_file().is_none() {
+        eprintln!("skipped: no COLRv1 colour emoji font (Noto-COLRv1.ttf) is installed");
+        return false;
+    }
+    if system_only().family_by_name("Noto Color Emoji").is_none() {
+        eprintln!(
+            "skipped: the system does not list the emoji font, so shell-host cannot reach it"
+        );
         return false;
     }
     if system_only().family_by_name("Inter").is_some() {
