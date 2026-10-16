@@ -14,6 +14,8 @@ use std::path::Path;
 use support::Scratch;
 
 const FILE: &str = "appearance.toml";
+/// The file a save locks, beside the settings file.
+const LOCK: &str = ".appearance.toml.lock";
 
 fn entries(dir: &Path) -> Vec<String> {
     let mut names = std::fs::read_dir(dir)
@@ -77,8 +79,8 @@ fn a_file_round_trips() {
             "{file:?}"
         );
         // The rename is the whole of the write: a temp file left beside the real one is a crash
-        // that did not finish, and this directory had no other files.
-        assert_eq!(entries(&scratch.app_dir()), [FILE], "{file:?}");
+        // that did not finish. The lock's sidecar is the only other file.
+        assert_eq!(entries(&scratch.app_dir()), [LOCK, FILE], "{file:?}");
     }
 }
 
@@ -216,41 +218,71 @@ fn a_bad_value_costs_only_its_own_field() {
 }
 
 #[test]
-fn a_key_nobody_reads_is_reported_and_gone_after_the_next_save() {
+fn a_key_nobody_reads_and_a_comment_survive_the_next_save() {
+    const TEXT: &str = "# mine, not the program's\nversion = 1\nfuture = \"kept\"\n\
+        [appearance]\ntheme = \"dark\"   # night owl\npuppy = true\nlook = \"arc\"\n\
+        [icons]\nsparkle = 3\n[later]\nanswer = 42\n";
     let scratch = Scratch::new();
     let store = scratch.store();
-    write(
-        &scratch,
-        b"version = 1\nfuture = \"dropped\"\n[appearance]\ntheme = \"dark\"\npuppy = true\nlook = \"arc\"\n\
-          [icons]\nsparkle = 3\n[later]\nanswer = 42\n",
-    );
+    write(&scratch, TEXT.as_bytes());
     let read = store.load::<AppearanceFile>();
     assert_eq!(read.value.appearance.theme, Theme::Dark);
-    assert_eq!(
-        unknown(&read),
-        [
-            "appearance.look",
-            "appearance.puppy",
-            "future",
-            "icons.sparkle",
-            "later"
-        ]
-    );
+    let reported = [
+        "appearance.look",
+        "appearance.puppy",
+        "future",
+        "icons.sparkle",
+        "later",
+    ];
+    assert_eq!(unknown(&read), reported);
     assert!(read.invalid.is_empty(), "{:?}", read.invalid);
 
-    store.save(&read.value).unwrap_or_else(|e| panic!("{e}"));
+    // A known key changes; everything else in the file stays as the person left it.
+    let changed = with(|f| {
+        f.appearance = read.value.appearance.clone();
+        f.appearance.theme = Theme::Light;
+    });
+    let saved = store.save(&changed).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(saved.kept_at, None);
     let written =
         std::fs::read_to_string(scratch.app_dir().join(FILE)).unwrap_or_else(|e| panic!("{e}"));
-    for gone in ["puppy", "look", "future", "sparkle", "later", "answer"] {
-        assert!(
-            !written.contains(gone),
-            "{gone} survived the save:\n{written}"
-        );
+    for kept in [
+        "# mine, not the program's",
+        "future = \"kept\"",
+        "# night owl",
+        "puppy = true",
+        "look = \"arc\"",
+        "sparkle = 3",
+        "[later]",
+        "answer = 42",
+    ] {
+        assert!(written.contains(kept), "{kept} was lost:\n{written}");
     }
+    assert!(written.contains("theme = \"light\""), "{written}");
     let again = store.load::<AppearanceFile>();
+    assert_eq!(again.value, changed);
     assert_eq!(
-        again,
-        Loaded::clean(read.value),
-        "a saved file has nothing left to report"
+        unknown(&again),
+        reported,
+        "the unknown keys are still reported"
+    );
+}
+
+#[test]
+fn a_save_of_a_fresh_file_is_what_the_encoder_writes() {
+    let scratch = Scratch::new();
+    let file = with(|f| {
+        f.appearance.theme = Theme::Dark;
+        f.icons.dark_mode_variant = IconDarkVariant::Adaptive;
+    });
+    scratch
+        .store()
+        .save(&file)
+        .unwrap_or_else(|e| panic!("{e}"));
+    let written =
+        std::fs::read_to_string(scratch.app_dir().join(FILE)).unwrap_or_else(|e| panic!("{e}"));
+    assert_eq!(
+        written,
+        toml::to_string(&file).unwrap_or_else(|e| panic!("{e}"))
     );
 }

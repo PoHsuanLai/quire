@@ -6,7 +6,8 @@
 //! 80. So the fallback is the *struct's* default for that key: start from `D::default()` as a
 //! key tree, lay each key the file sets over it one at a time, and keep a key only if `D` still
 //! deserializes with it. A key `D` accepts but does not store back is one nobody reads: it is
-//! reported in [`Loaded::unknown`] and gone on the next save.
+//! reported in [`Loaded::unknown`]. A TOML file's save leaves it in the file with the comments
+//! around it (`Store::save`); other formats write only the type's own keys.
 
 mod text;
 mod wire;
@@ -48,7 +49,7 @@ pub struct InvalidKey {
 
 impl fmt::Display for UnknownKey {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "unknown key `{}` is not read and not kept", self.0)
+        write!(f, "unknown key `{}` is not read", self.0)
     }
 }
 

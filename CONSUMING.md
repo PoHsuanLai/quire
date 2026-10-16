@@ -1850,7 +1850,7 @@ impl SettingsDoc for YourFile {
 }
 let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
 let loaded = store.load::<YourFile>();   // lenient: a bad key costs only itself; never fails
-store.save(&loaded.value)?;              // durable atomic write; drops unknown keys; a damaged old file is kept as .bad
+store.save(&loaded.value)?;              // durable atomic write; keeps keys the type does not read and the file's comments (TOML); a damaged old file is kept as .bad
 let mut watch = store.watch::<YourFile>(&spawner);   // 30 ms debounce, a task on `spawner`
 ```
 
@@ -1862,7 +1862,7 @@ big, refused by the system); only a deleted file returns the defaults. A file th
 cannot be used is never taken for a missing one and never overwritten: `load` gives the defaults for
 this run and reports the file in `invalid`, and `save` first moves it aside to `<name>.bad-<seconds>`
 (`Saved::kept_at` says where, so tell the person). Core crates that read or write the person's own
-files use `ds_helpers::{read_capped, read_text_capped, write_atomic, move_aside}` (std only, no UI).
+files use `ds_helpers::{read_capped, read_text_capped, write_atomic, update_atomic, move_aside}` (no UI; `update_atomic` is the read-modify-write for a file another program may also change).
 Tests use
 `ConfigRoot::Scratch(dir)`, never real XDG.
 

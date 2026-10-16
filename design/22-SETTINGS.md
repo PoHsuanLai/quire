@@ -1039,14 +1039,14 @@ section 56): the help sits behind the row's ⓘ. It is one or two sentences and 
    | out-of-range `Percent` (`255`) | `icons.plate_inset_percent` | clamped to `100` at construction (the newtype's constructor, not serde) |
    | negative where `Px` (`u16`) expected | any `Px` field | parse error on that field only -> default |
    | missing table entirely (`[dock]` absent) | whole `DockSettings` | `#[serde(default)]` on the struct produces `DockSettings::default()` |
-   | unknown key (`[dock].puppy = true`) | n/a | listed in `Loaded::unknown` as `dock.puppy`, absent from the next write; every other key is read as usual |
+   | unknown key (`[dock].puppy = true`) | n/a | listed in `Loaded::unknown` as `dock.puppy`, and left in the file by the next save (a TOML file is saved by merging into the parsed text, so unknown keys and comments stay); every other key is read as usual |
 3. **Watch-fires-on-rename**: a tempdir test writes `settings.toml`, starts `SettingsWatch`,
    then does the same atomic temp+rename the real writer does (not an in-place write), and
    asserts exactly one `ShellFile` is yielded within the 30 ms debounce + a slack margin — same
    pattern PLAN "Design: `<ds>`" already names for `ds-settings`: "round-trip, watch-fires-on-rename
    tempdir, portal mapping tables".
 4. **Unknown-key report**: a file with a key no struct reads loads every other key as usual,
-   lists the key in `Loaded::unknown`, and a save of the loaded value leaves it out.
+   lists the key in `Loaded::unknown`, and a save of the loaded value leaves it (and the file's comments) in place.
 5. **Every key in this doc appears in the Rust schema**: a test that parses this file's section
    3 tables (the dotted key column) and asserts, for each one, that the corresponding
    `Domain::default()` struct has a field of that name reachable by splitting on `.` and

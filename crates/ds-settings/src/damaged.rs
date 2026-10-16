@@ -34,6 +34,12 @@ pub struct Saved {
     pub kept_at: Option<PathBuf>,
 }
 
+/// What an edit of a file's text says when the text it was given is damaged: the caller then keeps
+/// the file under a `.bad` name and writes a new one, instead of merging into it.
+#[derive(Debug, thiserror::Error)]
+#[error("a file that cannot be used is in the way")]
+pub(crate) struct InTheWay;
+
 /// Why the file at `path` cannot be used, `None` when it is missing or `understood` accepts its
 /// text.
 pub(crate) fn damage(

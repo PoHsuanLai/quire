@@ -1,5 +1,7 @@
 //! The XDG Base Directory rules, written once: every place this crate turns `XDG_*` and `HOME`
-//! into a directory goes through here (the config root, the schema directories, the icon assets).
+//! into a directory goes through here (the config root, the schema directories, the icon assets),
+//! and a consumer that needs the same directories calls [`base_dir`] instead of keeping its own
+//! copy.
 //!
 //! The specification's rules, as functions of values handed in (never read from the process
 //! environment here, so a table test can pass any value):
@@ -20,13 +22,13 @@ use std::path::PathBuf;
 pub(crate) const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
 
 /// The default of `$XDG_CONFIG_HOME`, under `$HOME`.
-pub(crate) const CONFIG_HOME_UNDER_HOME: &str = ".config";
+pub const CONFIG_HOME_UNDER_HOME: &str = ".config";
 
 /// The default of `$XDG_STATE_HOME`, under `$HOME`.
-pub(crate) const STATE_HOME_UNDER_HOME: &str = ".local/state";
+pub const STATE_HOME_UNDER_HOME: &str = ".local/state";
 
 /// The default of `$XDG_DATA_HOME`, under `$HOME`.
-pub(crate) const DATA_HOME_UNDER_HOME: &str = ".local/share";
+pub const DATA_HOME_UNDER_HOME: &str = ".local/share";
 
 /// `value` as an absolute path: `None` when it is unset, empty or relative.
 fn absolute(value: Option<&OsStr>) -> Option<PathBuf> {
@@ -37,12 +39,10 @@ fn absolute(value: Option<&OsStr>) -> Option<PathBuf> {
 }
 
 /// A `$XDG_*_HOME` directory: `xdg` when it is a usable absolute path, else `$HOME/<under_home>`
-/// when `home` is one, else `None`.
-pub(crate) fn base_dir(
-    xdg: Option<&OsStr>,
-    home: Option<&OsStr>,
-    under_home: &str,
-) -> Option<PathBuf> {
+/// when `home` is one, else `None`. Pass one of [`CONFIG_HOME_UNDER_HOME`],
+/// [`STATE_HOME_UNDER_HOME`] and [`DATA_HOME_UNDER_HOME`] as `under_home`, and the two variables'
+/// values as the caller read them (this function reads no environment).
+pub fn base_dir(xdg: Option<&OsStr>, home: Option<&OsStr>, under_home: &str) -> Option<PathBuf> {
     absolute(xdg).or_else(|| absolute(home).map(|home| home.join(under_home)))
 }
 

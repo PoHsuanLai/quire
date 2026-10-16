@@ -319,7 +319,8 @@ fn a_broken_settings_file_is_kept_when_a_save_replaces_it() {
     let saved = scratch.store().save(&themed(20)).expect("saves");
     let aside = saved.kept_at.expect("the old file was kept");
     assert_eq!(std::fs::read(aside).expect("kept"), b"not toml [[[ = =");
-    assert_eq!(names(&scratch.app_dir()).len(), 2);
+    // The kept file, the new one and the lock's sidecar.
+    assert_eq!(names(&scratch.app_dir()).len(), 3);
     // A readable file with a bad value is not damaged: the save replaces it in place.
     std::fs::write(
         scratch.app_dir().join(FILE),
@@ -400,5 +401,5 @@ fn writers_racing_for_a_settings_file_never_tear_it() {
         "{:?}",
         loaded.value
     );
-    assert_eq!(names(&scratch.app_dir()), [FILE]);
+    assert_eq!(names(&scratch.app_dir()), [".appearance.toml.lock", FILE]);
 }

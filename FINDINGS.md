@@ -16,12 +16,6 @@ that rev.
 
 ## Open items
 
-- **Settings files keep no unknown keys or comments across a save (QUIRE-10).** `Store::save`
-  writes the typed document, so a key a newer quire rev added, and every TOML comment, is gone
-  after an older rev saves. Writers in one process queue behind a path lock, and a torn file is
-  impossible, but a read-modify-write across processes is still last-writer-wins. Needs an owner
-  decision: merge into the parsed tree (`toml_edit`) or accept the loss; a `flock` sidecar was
-  not added because `ds-helpers` takes no dependency beyond `std`.
 - **Agent-settable is not yet an allow-list (QUIRE-13).** Discovery now binds a schema to its app
   and location, but a program's own schema may still mark `privacy.*`, `network.*` or `security.*`
   keys settable: `AGENT_NEVER_SETTABLE` does not list them, and adding prefixes breaks a consumer
@@ -1497,8 +1491,8 @@ the decisions and what was verified:
   per-field `deserialize_with` would turn a bad key into the type's zero, not the key's default).
   A number that does not fit its type falls back to the field's default. A malformed `by_index`
   entry in the Spaces store costs only its own position. A key the file sets and the struct does
-  not store back is reported in `Loaded::unknown` (cut at the first unknown table) and is gone
-  after the next save; a value the struct refuses is in `Loaded::invalid`, and text that is not
+  not store back is reported in `Loaded::unknown` (cut at the first unknown table) and stays in
+  a TOML file across a save (see the next entry; JSON stores write only the type's keys); a value the struct refuses is in `Loaded::invalid`, and text that is not
   the format at all is one invalid key with an empty path. A watch keeps the last good value
   when the file is there and cannot be used (not text, over the 1 MiB settings cap, not a regular
   file, refused by the system); only a deleted file returns the defaults, and a refused read is
@@ -1513,6 +1507,19 @@ the decisions and what was verified:
   it keeps the target's mode, writes through a symlink, and queues writers of one path in a
   process behind a lock. Caps: settings 1 MiB and 4 000 keys, Spaces and Today 16 MiB, a schema
   file 256 KiB. `spaces.json` and `today.json` are created 0600.
+- **A TOML settings save merges into the file** (QUIRE-10, QUIRE-02; owner decision 2026-10-16,
+  preserve). `Store::save` runs under `ds_helpers::update_atomic`: it takes the in-process path
+  lock and an `flock` on the sidecar `.<name>.lock` (0600, left in place, waited for at most five
+  seconds), reads the file through the capped reader, and publishes through the same writer as
+  `write_atomic`. For TOML the typed document is laid over the parsed file with `toml_edit`
+  (`ds-settings/src/preserve.rs`): a value that means the same is untouched, a changed one keeps
+  its spacing and trailing comment, a new key is added, a key the type owns and no longer writes
+  (a `None`, a removed map entry) is taken out, and every key `Loaded::unknown` reported, with all
+  comments, stays. An inline table the type writes as a table is opened so its unknown keys
+  stay. A file that is damaged keeps the old behaviour (moved aside, `Saved::kept_at`). Not
+  covered: JSON and CSS stores (they write the type's own keys only), and a damaged file's move
+  aside, which runs after the lock is released (a second writer could in theory move the same
+  file first; the damaged file is kept either way).
 - **Schema discovery trusts only what its location says** (QUIRE-13). A `<app>.settings.toml`
   must declare that `app` and a `file` inside `<app>/`; the first schema found for an app wins and
   `data_dirs()` lists the system directories before `$XDG_DATA_HOME`, so a user-dir schema can add

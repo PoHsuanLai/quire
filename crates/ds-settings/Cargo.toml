@@ -24,6 +24,8 @@ notify = { workspace = true }
 futures-timer = { workspace = true }
 zbus = { workspace = true, optional = true }
 toml = { workspace = true }
+# Save merges into the parsed file, keeping unknown keys and comments.
+toml_edit = { workspace = true }
 
 [lints]
 workspace = true

@@ -4,14 +4,15 @@
 //! A [`Store`] is one program's config directory. Every file in it is a [`SettingsDoc`]; there
 //! is no other load or save path.
 
-use crate::damaged::{Saved, keep_damaged};
-use crate::doc::SettingsDoc;
+use crate::damaged::{InTheWay, Saved, keep_damaged};
+use crate::doc::{Format, SettingsDoc};
 use crate::error::SettingsError;
 use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read};
+use crate::preserve;
 use crate::root::{AppName, ConfigRoot};
 use crate::watch::Watch;
 use ds_core::spawner::Spawner;
-use ds_helpers::{NewFileMode, write_atomic};
+use ds_helpers::{NewFileMode, UpdateError, update_atomic, write_atomic};
 use std::path::PathBuf;
 
 /// One program's settings directory.
@@ -71,10 +72,17 @@ impl Store {
 
     /// Write `doc` as its file, creating the directory if needed.
     ///
-    /// The bytes land in a uniquely named temporary file beside it, are flushed, and are renamed
-    /// into place (see [`ds_helpers::write_atomic`]), so a crash mid-write cannot leave a
-    /// half-written file, two writers cannot tear one another's, and a directory watch sees one
-    /// rename rather than a truncated file. A symlinked settings file is written through.
+    /// A TOML file already there is not replaced but changed: `doc`'s values are laid over the
+    /// parsed file, so a key `D` does not read (a newer rev's, a hand-added one), every comment and
+    /// the person's formatting stay as they were, and a changed value keeps its spacing and its
+    /// trailing comment. A key `D` owns and no longer writes (a `None`, a removed map entry) is
+    /// taken out. Other formats, and a file that is not there, get `doc` as encoded.
+    ///
+    /// The read, the merge and the write happen under the file's lock ([`ds_helpers::update_atomic`]):
+    /// writers in this process and in other programs take turns, and the bytes land in a uniquely
+    /// named temporary file beside it, are flushed and renamed into place, so a crash mid-write
+    /// cannot leave a half-written file and a directory watch sees one rename. A symlinked
+    /// settings file is written through.
     ///
     /// A file already there that cannot be used (see [`Store::load`]) or is not this document at
     /// all is first moved aside to `<name>.bad-<seconds>`; [`Saved::kept_at`] says where.
@@ -86,19 +94,47 @@ impl Store {
         })?;
         let path = dir.join(D::FILE.0);
         let body = D::FORMAT.encode(doc)?;
-        let saved = keep_damaged(&path, SETTINGS_CAP, |text| {
-            match read::<D>(text, D::FORMAT) {
-                Read::Garbled { reason } => Err(reason),
-                Read::Loaded(_) => Ok(()),
+        let update = update_atomic(&path, SETTINGS_CAP, NewFileMode::Umask, |existing| {
+            merged::<D>(existing, &body)
+        });
+        match update {
+            Ok(()) => Ok(Saved::default()),
+            Err(UpdateError::Write(error)) => Err(error.into()),
+            // A file that could not be read, or whose text is not this document, is in the way.
+            Err(_) => {
+                let saved = keep_damaged(&path, SETTINGS_CAP, understood::<D>)?;
+                write_atomic(&path, body.as_bytes(), NewFileMode::Umask)?;
+                Ok(saved)
             }
-        })?;
-        write_atomic(&path, body.as_bytes(), NewFileMode::Umask)?;
-        Ok(saved)
+        }
     }
 
     /// Watch `D`'s file: every settled change is re-read whole. The watch runs as a task on
     /// `spawn`.
     pub fn watch<D: SettingsDoc + Send>(&self, spawn: &dyn Spawner) -> Watch<D> {
         Watch::start(self, spawn)
+    }
+}
+
+/// `Ok` when `text` is a `D`'s file (a bad value costs its own key, so it still is), else why not.
+fn understood<D: SettingsDoc>(text: &str) -> Result<(), String> {
+    match read::<D>(text, D::FORMAT) {
+        Read::Garbled { reason } => Err(reason),
+        Read::Loaded(_) => Ok(()),
+    }
+}
+
+/// The text a save writes: `body` laid over the `existing` TOML file, or `body` itself when there
+/// is no file or the format has no comments to keep. [`InTheWay`] when the file is not a `D`.
+fn merged<D: SettingsDoc>(existing: Option<String>, body: &str) -> Result<String, InTheWay> {
+    let Some(text) = existing else {
+        return Ok(body.to_owned());
+    };
+    match read::<D>(&text, D::FORMAT) {
+        Read::Garbled { .. } => Err(InTheWay),
+        Read::Loaded(loaded) => match D::FORMAT {
+            Format::Toml => preserve::merge(&text, body, &loaded.unknown),
+            _ => Ok(body.to_owned()),
+        },
     }
 }
