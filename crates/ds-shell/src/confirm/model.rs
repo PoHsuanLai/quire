@@ -70,7 +70,7 @@ pub enum ConfirmChoice {
 /// generated from the action, and the facts are the arguments the action will run with.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ConfirmView {
-    /// Who asks: "Companion".
+    /// Who asks: "Assistant".
     pub asker: AppMark,
     /// The app and window it acts in.
     pub target: AppMark,

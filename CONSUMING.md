@@ -2046,7 +2046,7 @@ rsx! {
     Menu {
         MenuItem { label: "Open", on_select: open }
         if desktop.read().here(Capability::Companion) {
-            MenuItem { label: "Ask the companion", on_select: ask }
+            MenuItem { label: "Ask the assistant", on_select: ask }
         }
     }
 }

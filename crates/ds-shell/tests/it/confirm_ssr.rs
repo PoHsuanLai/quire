@@ -19,7 +19,7 @@ fn mark(name: &str) -> AppMark {
 
 fn view(arm: ArmState) -> ConfirmView {
     ConfirmView {
-        asker: mark("Companion"),
+        asker: mark("Assistant"),
         target: mark("Mail"),
         title: "Send this email?".to_owned(),
         facts: Vec::new(),

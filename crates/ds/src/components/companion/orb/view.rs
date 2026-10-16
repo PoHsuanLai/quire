@@ -9,7 +9,7 @@ use ds_core::vocab::CompanionPresence;
 use ds_core::word::Word;
 
 /// The companion's presence as an orb: a wrapper over the voice orb whose look follows the
-/// presence. `common.aria_label` defaults to the presence's words ("Companion is working").
+/// presence. `common.aria_label` defaults to the presence's words ("Assistant is working").
 /// `outcome` is a result the person has not seen: a still dot on the orb's corner while it is
 /// `Some`, gone when the caller passes `None`. It does not change the presence.
 #[component]
