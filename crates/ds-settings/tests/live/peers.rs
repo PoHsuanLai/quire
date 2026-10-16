@@ -92,10 +92,8 @@ impl LiveModule for Hanging {
         Verdict::Allow
     }
     async fn describe(&self) -> LiveSchema {
-        LiveSchema {
-            version: 1,
-            key: Vec::new(),
-        }
+        // One key, so a snapshot has a value to wait for.
+        crate::module::schema()
     }
     async fn get(&self, _: &KeyPath) -> Result<toml::Value, LiveError> {
         std::future::pending().await

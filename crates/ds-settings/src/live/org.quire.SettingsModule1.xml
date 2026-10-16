@@ -20,14 +20,14 @@
     <arg name="values" type="a{sv}" direction="out"/>
   </method>
   <!--
-   Sets a key (or runs an action key), then broadcasts `Changed`.
+   Sets a key (or runs an action key), then sends `Changed` to the peers that may read.
    -->
   <method name="Set">
     <arg name="key" type="s" direction="in"/>
     <arg name="value" type="v" direction="in"/>
   </method>
   <!--
-   A key's new value.
+   A key's new value, sent to the peers that may read (never broadcast).
    -->
   <signal name="Changed">
     <arg name="key" type="s"/>
