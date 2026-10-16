@@ -1699,6 +1699,7 @@ dependencies = [
  "ds-desktop",
  "ds-harness",
  "ds-helpers",
+ "ds-peer",
  "image",
  "keyboard-types 0.7.0",
  "memfd",
@@ -1766,6 +1767,7 @@ name = "ds-desktop"
 version = "0.1.0"
 dependencies = [
  "dioxus",
+ "ds-peer",
  "tokio",
  "zbus",
 ]
@@ -1825,6 +1827,7 @@ dependencies = [
 name = "ds-helpers"
 version = "0.1.0"
 dependencies = [
+ "ds-peer",
  "serde",
  "thiserror 2.0.21",
  "tokio",
@@ -1861,6 +1864,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-peer"
+version = "0.1.0"
+dependencies = [
+ "futures-timer",
+ "thiserror 2.0.21",
+ "tokio",
+]
+
+[[package]]
 name = "ds-settings"
 version = "0.1.0"
 dependencies = [
@@ -1869,6 +1881,7 @@ dependencies = [
  "ds-behaviour",
  "ds-core",
  "ds-helpers",
+ "ds-peer",
  "ds-settings-derive",
  "ds-style",
  "futures-timer",

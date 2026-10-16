@@ -1548,6 +1548,9 @@ dependencies = [
 [[package]]
 name = "ds-desktop"
 version = "0.1.0"
+dependencies = [
+ "ds-peer",
+]
 
 [[package]]
 name = "ds-harness"
@@ -1580,6 +1583,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-helpers"
+version = "0.1.0"
+dependencies = [
+ "ds-peer",
+ "serde",
+ "thiserror 2.0.20",
+ "toml",
+]
+
+[[package]]
 name = "ds-intents"
 version = "0.1.0"
 dependencies = [
@@ -1605,12 +1618,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "ds-peer"
+version = "0.1.0"
+dependencies = [
+ "futures-timer",
+ "thiserror 2.0.20",
+]
+
+[[package]]
 name = "ds-settings"
 version = "0.1.0"
 dependencies = [
  "dioxus",
  "ds-behaviour",
  "ds-core",
+ "ds-helpers",
+ "ds-peer",
  "ds-settings-derive",
  "ds-style",
  "futures-timer",
