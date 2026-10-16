@@ -3,9 +3,10 @@
 //! writers racing for one path.
 
 use ds_helpers::{
-    NewFileMode, ReadCap, ReadError, UnixSeconds, move_aside, read_capped, read_text_capped,
-    write_atomic,
+    NewFileMode, ReadCap, ReadError, UnixSeconds, UpdateError, move_aside, read_capped,
+    read_text_capped, update_atomic, write_atomic,
 };
+use std::convert::Infallible;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU32, Ordering};
@@ -290,4 +291,111 @@ fn a_damaged_file_is_moved_aside_under_a_timestamped_name_and_never_overwritten(
     let second = move_aside(&path, UnixSeconds(1_700_000_000)).expect("aside");
     assert_eq!(second, scratch.file("spaces.json.bad-1700000000-1"));
     assert_eq!(fs::read(&first).expect("read"), b"{ half");
+}
+
+/// `update_atomic` with an edit that cannot fail: `text` is appended as a line.
+fn append_line(path: &Path, cap: ReadCap, line: &str) -> Result<(), UpdateError<Infallible>> {
+    update_atomic(path, cap, NewFileMode::OwnerOnly, |current| {
+        Ok(current.unwrap_or_default() + line + "\n")
+    })
+}
+
+#[test]
+fn writers_that_each_add_a_key_all_keep_their_key() {
+    const WRITERS: usize = 8;
+    const ROUNDS: usize = 25;
+    let scratch = Scratch::new("update-race");
+    let path = Arc::new(scratch.file("doc.toml"));
+    let start = Arc::new(Barrier::new(WRITERS));
+    let writers: Vec<_> = (0..WRITERS)
+        .map(|writer| {
+            let (path, start) = (Arc::clone(&path), Arc::clone(&start));
+            std::thread::spawn(move || {
+                start.wait();
+                for round in 0..ROUNDS {
+                    append_line(&path, ReadCap::mib(1), &format!("key_{writer}_{round} = 1"))
+                        .expect("update");
+                }
+            })
+        })
+        .collect();
+    for writer in writers {
+        writer.join().expect("writer");
+    }
+    let text = read_text_capped(&path, ReadCap::mib(1)).expect("read");
+    assert_eq!(text.lines().count(), WRITERS * ROUNDS, "an update was lost");
+    for writer in 0..WRITERS {
+        for round in 0..ROUNDS {
+            assert!(
+                text.contains(&format!("key_{writer}_{round} = 1\n")),
+                "{writer} {round}"
+            );
+        }
+    }
+    // The only things beside the file are the lock sidecar, 0600, and nothing half written.
+    assert_eq!(scratch.names(), [".doc.toml.lock", "doc.toml"]);
+}
+
+#[test]
+fn an_update_of_a_missing_file_sees_none_and_creates_it_privately() {
+    use std::os::unix::fs::PermissionsExt;
+    let scratch = Scratch::new("update-missing");
+    let path = scratch.file("new.toml");
+    let mut seen = Vec::new();
+    update_atomic(&path, SMALL, NewFileMode::OwnerOnly, |current| {
+        seen.push(current);
+        Ok::<_, Infallible>("a = 1\n".to_owned())
+    })
+    .expect("update");
+    assert_eq!(seen, [None]);
+    assert_eq!(fs::read_to_string(&path).expect("read"), "a = 1\n");
+    let mode = |name: &str| {
+        fs::metadata(scratch.file(name))
+            .expect("meta")
+            .permissions()
+            .mode()
+            & 0o777
+    };
+    assert_eq!(mode("new.toml"), 0o600);
+    assert_eq!(mode(".new.toml.lock"), 0o600);
+
+    // An existing file's text is what the edit sees.
+    update_atomic(&path, SMALL, NewFileMode::OwnerOnly, |current| {
+        seen.push(current);
+        Ok::<_, Infallible>("a = 2\n".to_owned())
+    })
+    .expect("update");
+    assert_eq!(seen, [None, Some("a = 1\n".to_owned())]);
+}
+
+#[test]
+fn an_update_refuses_a_file_over_the_cap_and_never_calls_the_edit() {
+    let scratch = Scratch::new("update-cap");
+    let path = scratch.file("big");
+    fs::write(&path, "123456789").expect("file");
+    let error = update_atomic(
+        &path,
+        SMALL,
+        NewFileMode::Umask,
+        |_| -> Result<String, Infallible> {
+            panic!("the edit ran on a file that is over the cap");
+        },
+    )
+    .expect_err("over the cap");
+    assert!(
+        matches!(error, UpdateError::Read(ReadError::TooBig { .. })),
+        "{error}"
+    );
+    assert_eq!(fs::read(&path).expect("read"), b"123456789");
+}
+
+#[test]
+fn an_edit_that_refuses_leaves_the_file_alone() {
+    let scratch = Scratch::new("update-refuse");
+    let path = scratch.file("doc");
+    fs::write(&path, "kept").expect("file");
+    let error = update_atomic(&path, SMALL, NewFileMode::Umask, |_| Err::<String, _>("no"))
+        .expect_err("refused");
+    assert!(matches!(error, UpdateError::Edit("no")), "{error}");
+    assert_eq!(fs::read(&path).expect("read"), b"kept");
 }

@@ -153,6 +153,12 @@ notify = "8.2"
 zbus = { version = "5.19" }
 dirs = "6"
 toml = "1"
+# Settings files are saved by merging into the parsed file so unknown keys and comments stay
+# (ds-settings `Store::save`).
+toml_edit = "0.25"
+# The `flock` between programs that write one file (ds-helpers `update_atomic`), Unix only; no
+# `unsafe` on our side.
+rustix = { version = "1", default-features = false, features = ["std", "fs"] }
 # SSR renders for component goldens and markup lint (dev-dependency in consumers).
 dioxus-ssr = "0.7"
 # Named directly for image paints in custom widgets (blitz re-exports nothing).

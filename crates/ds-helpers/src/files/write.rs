@@ -62,7 +62,8 @@ pub fn write_atomic(path: &Path, body: &[u8], new_file: NewFileMode) -> Result<(
         .map_err(|source| WriteError::at(&target, source))
 }
 
-fn publish(target: &Path, body: &[u8], new_file: NewFileMode) -> io::Result<()> {
+/// The temporary file, rename and directory sync, for a caller that already holds the path's lock.
+pub(super) fn publish(target: &Path, body: &[u8], new_file: NewFileMode) -> io::Result<()> {
     let dir = match target.parent() {
         Some(parent) if !parent.as_os_str().is_empty() => parent,
         _ => Path::new("."),

@@ -1,8 +1,9 @@
 //! Missing helpers, and the safe file reader and writer every quire crate shares.
 //!
-//! The file half ([`read_capped`], [`write_atomic`], [`move_aside`]) is UI-free: it needs only
-//! `std`, so a core crate with no window, bus or runtime can read and write a person's files with
-//! the same guarantees as quire's settings code.
+//! The file half ([`read_capped`], [`write_atomic`], [`update_atomic`], [`move_aside`]) is UI-free:
+//! it needs only `std` (and `rustix` for the file lock on Unix), so a core crate with no window,
+//! bus or runtime can read and write a person's files with the same guarantees as quire's
+//! settings code.
 //!
 //! Missing helpers (design/27 permission-prompt rules; `quire/CONSUMING.md`, "Missing helpers").
 //!
@@ -79,8 +80,8 @@ pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
 pub use ds_peer::Deadline;
 pub use family::Family;
 pub use files::{
-    NewFileMode, ReadCap, ReadError, UnixSeconds, WriteError, move_aside, read_capped,
-    read_text_capped, write_atomic,
+    NewFileMode, ReadCap, ReadError, UnixSeconds, UpdateError, WriteError, move_aside, read_capped,
+    read_text_capped, update_atomic, write_atomic,
 };
 pub use helpers::Helpers;
 pub use install_line::InstallLine;
