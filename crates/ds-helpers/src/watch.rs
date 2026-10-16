@@ -100,14 +100,23 @@ mod tests {
     use super::Log;
     use std::future::Future;
     use std::pin::pin;
-    use std::task::{Context, Waker};
+    use std::sync::Arc;
+    use std::task::{Context, Wake, Waker};
+
+    /// A waker with one address (`Waker::noop` may not compare equal to itself).
+    struct Quiet;
+
+    impl Wake for Quiet {
+        fn wake(self: Arc<Self>) {}
+    }
 
     #[test]
     fn polling_again_with_the_same_waker_keeps_one_waker() {
         let log = Log::default();
         let mut feed = log.subscribe();
         let mut next = pin!(feed.next());
-        let mut cx = Context::from_waker(Waker::noop());
+        let waker = Waker::from(Arc::new(Quiet));
+        let mut cx = Context::from_waker(&waker);
         for _ in 0..50 {
             assert!(next.as_mut().poll(&mut cx).is_pending());
         }
