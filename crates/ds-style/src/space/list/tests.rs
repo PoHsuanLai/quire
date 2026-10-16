@@ -275,6 +275,25 @@ fn a_file_with_no_space_or_no_json_is_not_a_list() {
     }
 }
 
+#[test]
+fn an_id_too_large_to_count_past_is_read_as_no_id_and_never_repeats() {
+    let json = r#"{"spaces":[{"id":18446744073709551615,"name":"a"},{"id":4,"name":"b"}]}"#;
+    let mut spaces = read(json).expect("a list");
+    let ids_read = ids(&spaces);
+    assert_eq!(ids_read.len(), 2);
+    assert!(
+        ids_read.iter().all(|&id| id <= u64::from(u32::MAX)),
+        "{ids_read:?}"
+    );
+    let added = spaces.add(Note::default());
+    let all = ids(&spaces);
+    assert_eq!(
+        all.iter().filter(|&&id| id == added.0).count(),
+        1,
+        "{all:?}"
+    );
+}
+
 fn at(secs: i64) -> Epoch {
     Epoch(1_700_000_000 + secs)
 }

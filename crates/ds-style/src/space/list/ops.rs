@@ -10,7 +10,7 @@ impl<P, R> Spaces<P, R> {
     pub fn new(first: Space<P>) -> Self {
         Spaces {
             current: first.id,
-            next: first.id.0 + 1,
+            next: first.id.0.saturating_add(1),
             list: vec![first],
             recall: super::recall::Recall::default(),
         }
@@ -21,7 +21,7 @@ impl<P, R> Spaces<P, R> {
     /// not switched to.
     pub fn add(&mut self, payload: P) -> SpaceId {
         let id = SpaceId(self.next);
-        self.next += 1;
+        self.next = self.next.saturating_add(1);
         let count = self.list.len();
         let mut look = default_look(count, Grain::default());
         look.dots = PRESETS[count % PRESETS.len()].dots.to_vec();

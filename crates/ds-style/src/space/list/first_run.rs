@@ -27,7 +27,7 @@ impl<P, R> Spaces<P, R> {
         });
         let mut spaces = Spaces::new(first);
         for space in made {
-            spaces.next = space.id.0 + 1;
+            spaces.next = space.id.0.saturating_add(1);
             spaces.list.push(space);
         }
         spaces

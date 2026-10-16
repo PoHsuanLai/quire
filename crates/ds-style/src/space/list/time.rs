@@ -47,11 +47,20 @@ fn rfc3339(text: &str) -> Option<i64> {
         b'Z' | b'z' => 0,
         sign => {
             let (h, m) = offset[1..].split_once(':')?;
-            let minutes = h.parse::<i64>().ok()? * 60 + m.parse::<i64>().ok()?;
+            let (h, m) = (h.parse::<u8>().ok()?, m.parse::<u8>().ok()?);
+            let minutes = i64::from(h) * 60 + i64::from(m);
             if *sign == b'-' { -minutes } else { minutes }
         }
     };
-    if !(1..=12).contains(&month) || !(1..=31).contains(&day) {
+    // Every field is bounded before any arithmetic, so a file cannot overflow the sums below.
+    let in_range = (0..=9999).contains(&year)
+        && (1..=12).contains(&month)
+        && (1..=31).contains(&day)
+        && (0..24).contains(&hour)
+        && (0..60).contains(&minute)
+        && (0..=60).contains(&second)
+        && (-24 * 60..=24 * 60).contains(&shift);
+    if !in_range {
         return None;
     }
     Some(
@@ -116,6 +125,9 @@ mod tests {
             (r#""yesterday""#, None),
             (r#""2023-13-14T22:13:20Z""#, None),
             ("null", None),
+            (r#""9000000000000000000-01-01T00:00:00Z""#, None),
+            (r#""2023-11-14T99:13:20Z""#, None),
+            (r#""2023-11-14T22:13:20+99999999999999999:00""#, None),
         ];
         for &(json, want) in CASES {
             let got = serde_json::from_str::<Epoch>(json)

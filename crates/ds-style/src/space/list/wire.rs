@@ -146,7 +146,11 @@ impl<'de, P: DeserializeOwned, R: DeserializeOwned> Deserialize<'de> for Spaces<
             .into_iter()
             .filter(|(id, _)| known.contains(id))
             .collect();
-        let next = list.iter().map(|space| space.id.0 + 1).max().unwrap_or(0);
+        let next = list
+            .iter()
+            .map(|space| space.id.0.saturating_add(1))
+            .max()
+            .unwrap_or(0);
         Ok(Spaces {
             list,
             current,
@@ -173,16 +177,23 @@ fn from_raw<P>(raw: SpaceRaw<P>, id: SpaceId, index: usize) -> Space<P> {
     }
 }
 
-/// One id per Space: the stored one when it is the first to use it, else the Space's position,
-/// else the next number nobody has.
+/// The largest id a file may give a Space. A larger one is read as no id, so the counter that
+/// hands out the next id can never wrap onto a Space that exists.
+const MAX_STORED_ID: u64 = u32::MAX as u64;
+
+/// One id per Space: the stored one when it is in range and the first to use it, else the Space's
+/// position, else the next number nobody has.
 fn assigned_ids(stored: impl Iterator<Item = Option<SpaceId>>) -> Vec<SpaceId> {
     let stored: Vec<Option<SpaceId>> = stored.collect();
     let mut taken: BTreeSet<u64> = BTreeSet::new();
     let mut kept: Vec<Option<SpaceId>> = Vec::new();
     for id in &stored {
-        kept.push(id.filter(|id| taken.insert(id.0)));
+        kept.push(id.filter(|id| id.0 <= MAX_STORED_ID && taken.insert(id.0)));
     }
-    let mut spare = taken.iter().next_back().map_or(0, |top| top + 1);
+    let mut spare = taken
+        .iter()
+        .next_back()
+        .map_or(0, |top| top.saturating_add(1));
     kept.into_iter()
         .enumerate()
         .map(|(index, id)| {
