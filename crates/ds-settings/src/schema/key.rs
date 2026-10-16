@@ -101,6 +101,9 @@ pub enum Page {
     Notifications,
     Spaces,
     Accounts,
+    /// What programs may reach: the per-app permission rows the compositor publishes
+    /// (design/22-SETTINGS.md section 5), as macOS's "Privacy & Security" does.
+    Privacy,
     /// sill's idle service (design/22-SETTINGS.md section 3.24 `idle.*`, section 3.19
     /// `session.lock_grace_s`).
     Power,
@@ -127,6 +130,7 @@ impl Page {
             Page::Notifications => "Notifications",
             Page::Spaces => "Spaces",
             Page::Accounts => "Accounts",
+            Page::Privacy => "Privacy & Security",
             Page::Power => "Power",
             Page::Apps => "Apps",
             Page::Intelligence => "Intelligence",
@@ -490,48 +494,47 @@ mod tests {
     }
 
     #[test]
-    fn page_intelligence_label_and_wire_form() {
-        assert_eq!(Page::Intelligence.label(), "Intelligence");
-        assert_eq!(
-            serde_json::to_string(&Page::Intelligence).ok().as_deref(),
-            Some(r#"{"kind":"intelligence"}"#)
-        );
-        assert_eq!(
-            serde_json::from_str::<Page>(r#"{"kind":"intelligence"}"#).ok(),
-            Some(Page::Intelligence)
-        );
-    }
-
-    #[test]
-    fn page_viewer_label_and_wire_form() {
-        assert_eq!(Page::Viewer.label(), "Viewer");
-        assert_eq!(
-            serde_json::to_string(&Page::Viewer).ok().as_deref(),
-            Some(r#"{"kind":"viewer"}"#)
-        );
-        assert_eq!(
-            serde_json::from_str::<Page>(r#"{"kind":"viewer"}"#).ok(),
-            Some(Page::Viewer)
-        );
-    }
-
-    #[test]
-    fn a_page_is_labelled_as_the_settings_app_names_it() {
-        const CASES: &[(Page, &str)] = &[
-            (Page::Appearance, "Appearance"),
-            (Page::Dock, "Dock"),
-            (Page::MouseAndGestures, "Mouse & Gestures"),
-            (Page::KeyboardAndShortcuts, "Keyboard & Shortcuts"),
-            (Page::Notifications, "Notifications"),
-            (Page::Spaces, "Spaces"),
-            (Page::Accounts, "Accounts"),
-            (Page::Power, "Power"),
-            (Page::Apps, "Apps"),
-            (Page::Intelligence, "Intelligence"),
-            (Page::Viewer, "Viewer"),
+    fn a_page_is_labelled_as_the_settings_app_names_it_and_keeps_its_wire_form() {
+        const CASES: &[(Page, &str, &str)] = &[
+            (Page::Appearance, "Appearance", "appearance"),
+            (Page::Dock, "Dock", "dock"),
+            (
+                Page::MouseAndGestures,
+                "Mouse & Gestures",
+                "mouse_and_gestures",
+            ),
+            (
+                Page::KeyboardAndShortcuts,
+                "Keyboard & Shortcuts",
+                "keyboard_and_shortcuts",
+            ),
+            (Page::Notifications, "Notifications", "notifications"),
+            (Page::Spaces, "Spaces", "spaces"),
+            (Page::Accounts, "Accounts", "accounts"),
+            (Page::Privacy, "Privacy & Security", "privacy"),
+            (Page::Power, "Power", "power"),
+            (Page::Apps, "Apps", "apps"),
+            (Page::Intelligence, "Intelligence", "intelligence"),
+            (Page::Viewer, "Viewer", "viewer"),
         ];
-        for (page, want) in CASES {
-            assert_eq!(page.label(), *want, "{page:?}");
+        for (page, label, kind) in CASES {
+            assert_eq!(page.label(), *label, "{page:?}");
+            let wire = format!(r#"{{"kind":"{kind}"}}"#);
+            assert_eq!(
+                serde_json::to_string(page).ok(),
+                Some(wire.clone()),
+                "{page:?}"
+            );
+            assert_eq!(
+                serde_json::from_str::<Page>(&wire).ok().as_ref(),
+                Some(page)
+            );
+            let toml = format!("kind = \"{kind}\"\n");
+            assert_eq!(
+                toml::from_str::<Page>(&toml).ok().as_ref(),
+                Some(page),
+                "{kind}"
+            );
         }
         assert_eq!(
             Page::App("com.example.App".to_owned()).label(),

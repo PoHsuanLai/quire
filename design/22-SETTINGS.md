@@ -1015,6 +1015,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
 | **Spotlight** (sill M9, Q303) | `launcher.clipboard_history` (a privacy choice people should find), `launcher.web_search`, `launcher.emoji_skin_tone`; the rest of `launcher.*` stays Advanced |
+| **Privacy & Security** (the compositor's per-app permission rows; `Page::Privacy`, wire `privacy`) | the rows casement publishes through its settings module (one per app and permission); no keys of quire's own | 
 | **Power** (added Q445; sill's own idle service, section 3.24) | `idle.screen_off_ac_min`, `idle.screen_off_battery_min`, `idle.suspend_ac_min`, `idle.suspend_battery_min`, `idle.dim_s`, `idle.dim_level_pct`, `idle.lock`, `idle.locked_screen_off_s`, `session.lock_grace_s` (`Sill` under `idle.times` is what makes the `idle.screen_off_*`/`idle.suspend_*` sliders apply; under `Desktop` they still render, disabled, so the row explains itself) |
 | **Intelligence** (the companion, design/32; sill's `companion` domain and the daemons' schemas) | Companion: `companion.summon`, `companion.in_field`, `companion.notify`; Models: `ai.local_only`, `ai.floor.<class>`, `ai.model.<kind>.<tier>` (the live picker, section 9.4); Memory: `memory.files.at_rest`, `memory.consolidation.when`, `memory.consolidation.apply`, and the memory view (a live module); Computer use: `cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`; Privacy: `agent.strictness`, `agent.mcp.expose`, `agent.undo.keep_h`; Confirmations: `companion.confirm_arm_ms` is Advanced |
 | **Viewer** (anyview, section 3.31) | Window: `viewer.chrome.hide_after`, `viewer.warm_for`; Viewing: `viewer.zoom.step`, `viewer.media.seek_step`; History: `viewer.history.cap`, `viewer.versions.keep`; Export: `viewer.export.jpeg_quality`, `viewer.export.avif_quality`, `viewer.export.paper`, `viewer.export.orientation`; `viewer.peek.*` and `viewer.image.*` are Advanced |
@@ -1227,7 +1228,7 @@ as "edit in settings.toml".
 1. Discover every `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/` (and
    `$XDG_DATA_HOME`), parse, group keys by `page` then `section`, render with the widget table
    above; pages come from a fixed `Page` enum (Appearance, Dock, Mouse and Gestures, Keyboard
-   and Shortcuts, Notifications, Spaces, Accounts, Power, Apps, Intelligence, Viewer, plus one page per third-party app
+   and Shortcuts, Notifications, Spaces, Accounts, Privacy, Power, Apps, Intelligence, Viewer, plus one page per third-party app
    id). Every "Advanced" key of a page renders under one "Advanced" disclosure at the end of the
    page, grouped by section inside it, so a section with only Advanced keys shows no empty header.
 2. Read the current value from the key's `file` through the shared lenient loader; write with
