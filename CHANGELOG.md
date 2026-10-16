@@ -3,7 +3,7 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## Unreleased
+## v0.3.30
 
 Two additions for the permission prompts the compositor publishes. Nothing changes for a consumer
 that does not opt in, except one thing: `ds_settings::Page` gains a variant, so a consumer's
