@@ -1,20 +1,23 @@
 //! Secret text on its way from a field to the host.
 
 use std::fmt;
+use zeroize::Zeroizing;
 
 /// Text the person typed into a hidden field (a password, an app password, an API key).
 ///
 /// It lives in props and in the one event that reports a keystroke, and goes nowhere else: no
 /// `Display`, no serde, and a `Debug` that prints `<hidden>`, so a log line, a panic message or
 /// an error chain never carries it. The host reads it with [`Hidden::reveal`], at the point it
-/// hands the answer to the sign-in.
+/// hands the answer to the sign-in. Its memory is overwritten when the last owner drops it, so a
+/// password does not outlive its sheet in freed heap, swap or a core dump (each clone is
+/// wiped on its own drop).
 #[derive(Clone, PartialEq, Eq, Default)]
-pub struct Hidden(String);
+pub struct Hidden(Zeroizing<String>);
 
 impl Hidden {
     /// Secret text holding `text`.
     pub fn new(text: impl Into<String>) -> Self {
-        Hidden(text.into())
+        Hidden(Zeroizing::new(text.into()))
     }
 
     /// The text itself, for the host to hand to the sign-in.

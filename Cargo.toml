@@ -193,6 +193,8 @@ fend-core = "1.5.8"
 clap = { version = "4", features = ["derive"] }
 # latchkey is its own repo (PoHsuanLai/latchkey).
 latchkey = { git = "https://github.com/PoHsuanLai/latchkey", rev = "335d7a7c65bc7d196d5f19dfb305896ff3a55958" }
+# ds-shell: `Hidden` wipes a typed secret on drop. (In docs/workspace-deps.toml already.)
+zeroize = "1"
 # ---- END PINNED BLOCK ----
 
 
