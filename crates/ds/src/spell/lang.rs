@@ -6,8 +6,20 @@ use serde::{Deserialize, Serialize};
 /// A dictionary's language, as Hunspell names its files: `en_US` for `en_US.aff`/`en_US.dic`,
 /// `de` for `de.aff`. A language code of two or three lower-case letters, then optionally `_`
 /// and a two-letter upper-case region.
+///
+/// Read from a stored file through [`Lang::parse`], so a name that is not a language code (one
+/// with a path in it, say) is refused instead of reaching a file path.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
+#[serde(try_from = "String")]
 pub struct Lang(String);
+
+impl TryFrom<String> for Lang {
+    type Error = DsError;
+
+    fn try_from(value: String) -> Result<Lang, DsError> {
+        Lang::parse(&value)
+    }
+}
 
 impl Lang {
     /// A language from a dictionary name or a locale: `en_US`, `en-US`, `en_US.UTF-8`,
@@ -71,7 +83,23 @@ pub enum Spell {
 
 #[cfg(test)]
 mod tests {
-    use super::Lang;
+    use super::{Lang, Spell};
+
+    #[test]
+    fn a_stored_language_goes_through_the_parser() {
+        const CASES: &[(&str, Option<&str>)] = &[
+            (r#""en_US""#, Some("en_US")),
+            (r#""../../.config/x""#, None),
+            (r#""en_US/../x""#, None),
+            (r#""""#, None),
+        ];
+        for &(json, want) in CASES {
+            let got = serde_json::from_str::<Lang>(json).ok();
+            assert_eq!(got.as_ref().map(Lang::name), want, "{json}");
+        }
+        let stored = r#"{"kind":"on","v":{"lang":"../../x"}}"#;
+        assert!(serde_json::from_str::<Spell>(stored).is_err());
+    }
 
     const CASES: &[(&str, Option<&str>)] = &[
         ("en_US", Some("en_US")),
