@@ -15,6 +15,16 @@ first, with what a consumer has to change.
   left to the caller. A text over the cap is `DesktopFileError::TooBig`; `DESKTOP_ENTRY_CAP` is 256 KiB.
   Additive; no existing item changes.
 
+**blitz** (our fork, rev 4ca21b12, from 5c755366)
+- Tab and Shift-Tab move through a sub-document's (an iframe's) focusable nodes and then on to the
+  next one after the host, instead of being forwarded into the sub-document; a sub-document with none
+  is skipped.
+- A wheel, touch pan or fling over a sub-document scrolls it first and passes what it cannot scroll,
+  per axis, to the host element's scroll ancestors, so a reader frame that fits its content no longer
+  swallows the wheel.
+- A consumer that pins blitz by rev moves to 4ca21b12 with this release (the whole `[workspace.dependencies]`
+  blitz block, as before).
+
 ## v0.3.30
 
 Two additions for the permission prompts the compositor publishes. Nothing changes for a consumer
