@@ -2,7 +2,7 @@
 # and is compiled only under its crate's `quire-desktop` feature (or, for ds-desktop, `dbus`); the
 # rest of every crate, and every other crate, names no zbus and builds with --no-default-features.
 ^\./crates/ds-settings/src/portal/bus\.rs$
-^\./crates/ds-settings/src/live/(client|error|module|skeleton|value)\.rs$
-^\./crates/ds-helpers/src/installer/packagekit\.rs$
+^\./crates/ds-settings/src/live/(client|error|module|readers|skeleton|value)\.rs$
+^\./crates/ds-helpers/src/installer/(packagekit|transaction)\.rs$
 ^\./crates/ds-blitz/src/(menus\.rs|menus/(service|wire)\.rs|print/portal\.rs)$
 ^\./crates/ds-desktop/src/(probe|watch|outputs_live)\.rs$
