@@ -11,6 +11,7 @@ use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::prelude::*;
 use ds_lint::LintConfig;
+use ds_shell::accounts::model::CopyState;
 use ds_shell::helpers::model::HelperPhase;
 use ds_shell::prelude::*;
 
@@ -71,8 +72,24 @@ const SPECIMENS: &[Specimen] = &[
     ("unsupported-command", || {
         sheet(HelperPhase::Unsupported {
             program: "mpv".into(),
-            command: Some("sudo apt install wl-clipboard".into()),
+            command: Some("sudo pacman -S mpv".into()),
         })
+    }),
+    ("unsupported-copied", || {
+        rsx! {
+            HelperSheet {
+                app: "Anyview",
+                tool: "mpv",
+                purpose: "play videos",
+                phase: HelperPhase::Unsupported {
+                    program: "mpv".into(),
+                    command: Some("sudo pacman -S mpv".into()),
+                },
+                on_install: |_| {},
+                on_dismiss: |_| {},
+                copy: CopyState::Copied,
+            }
+        }
     }),
 ];
 
@@ -162,11 +179,12 @@ fn the_end_phases_close_and_say_what_to_look_for() {
 #[test]
 fn an_unsupported_system_with_a_command_shows_it_selectable_with_a_copy_button() {
     let html = light("unsupported-command");
-    assert!(html.contains("for example with this command:"), "{html}");
     assert!(
-        html.contains(
-            "<span class=\"ds-helper-command-text\">sudo apt install wl-clipboard</span>"
-        ),
+        html.contains("Run this in Terminal to install it yourself, then try again:"),
+        "{html}"
+    );
+    assert!(
+        html.contains("<span class=\"ds-helper-command-text\">sudo pacman -S mpv</span>"),
         "{html}"
     );
     assert!(
@@ -176,6 +194,12 @@ fn an_unsupported_system_with_a_command_shows_it_selectable_with_a_copy_button()
     assert!(
         html.contains("Close") && !html.contains("Install\u{2026}"),
         "{html}"
+    );
+    let copied = light("unsupported-copied");
+    assert!(
+        copied.contains("<span class=\"ds-button-label\">Copied</span>")
+            && !copied.contains(">Copy<"),
+        "the host's word that it copied turns the label to Copied: {copied}"
     );
     let styled = ds_shell::stylesheet().lines().any(|rule| {
         rule.starts_with(".ds-helper-command-text{") && rule.contains("user-select:text")
