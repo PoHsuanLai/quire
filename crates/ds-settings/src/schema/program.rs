@@ -4,6 +4,7 @@
 use std::io;
 use std::path::{Path, PathBuf};
 
+use ds_helpers::{NewFileMode, ReadCap, read_text_capped, write_atomic};
 use serde::{Deserialize, Serialize};
 
 use super::agent::never_settable_violation;
@@ -79,18 +80,23 @@ impl Schema {
         }
     }
 
-    /// Writes `<app-id>.settings.toml` into `dir` (creating it if needed) by atomic
-    /// temp-file-plus-rename, the same mechanism every settings file in this workspace uses
-    /// (design/22-SETTINGS.md section 2).
+    /// Writes `<app-id>.settings.toml` into `dir` (creating it if needed) through
+    /// [`ds_helpers::write_atomic`], the same mechanism every settings file in this workspace
+    /// uses (design/22-SETTINGS.md section 2).
     pub fn write_to(&self, dir: &Path) -> io::Result<PathBuf> {
         std::fs::create_dir_all(dir)?;
         let target = dir.join(format!("{}.settings.toml", self.app.0));
-        let temp = dir.join(format!(".{}.settings.toml.tmp", self.app.0));
-        std::fs::write(&temp, self.to_toml())?;
-        std::fs::rename(&temp, &target)?;
+        write_atomic(&target, self.to_toml().as_bytes(), NewFileMode::Umask)
+            .map_err(|error| error.source)?;
         Ok(target)
     }
 }
+
+/// The most a schema file may hold: a few KiB for a program with a hundred keys.
+const SCHEMA_CAP: ReadCap = ReadCap::kib(256);
+
+/// The suffix of a schema file's name; what precedes it is the program it describes.
+const SCHEMA_SUFFIX: &str = ".settings.toml";
 
 /// Every valid schema found directly under each of `dirs` (section 9.3: "discover every
 /// `*.settings.toml` under `$XDG_DATA_DIRS/quire/settings/`..."), in directory order and then
@@ -98,8 +104,21 @@ impl Schema {
 /// normal `$XDG_DATA_DIRS` entry with nothing installed yet); a file that exists but will not
 /// parse is skipped with a warning on stderr (section 9.2, "a schema without a program... is
 /// skipped with a warning").
+///
+/// A schema is admitted only for what its location says it is:
+///
+/// - its file is named `<app>.settings.toml` for the `app` it declares, and the settings file it
+///   names (`file`) is inside that app's own directory, so a schema cannot describe another
+///   program's file;
+/// - the first schema found for an app wins, so the order of `dirs` is the order of trust:
+///   [`data_dirs`] lists the system directories before the user's own, and a schema in the
+///   user's directory can add a program but never replace an installed one's;
+/// - it is no larger than 256 KiB and a regular file.
+///
+/// The `agent = "settable"` marks of the keys it returns are therefore those of a schema this
+/// function admitted, read through [`KeySpec::agent`].
 pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
-    let mut found = Vec::new();
+    let mut found: Vec<Schema> = Vec::new();
     for dir in dirs {
         let Ok(mut entries) = std::fs::read_dir(dir).map(|entries| {
             entries
@@ -110,7 +129,7 @@ pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
                         && path
                             .file_name()
                             .and_then(|name| name.to_str())
-                            .is_some_and(|name| name.ends_with(".settings.toml"))
+                            .is_some_and(|name| name.ends_with(SCHEMA_SUFFIX))
                 })
                 .collect::<Vec<_>>()
         }) else {
@@ -118,10 +137,7 @@ pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
         };
         entries.sort();
         for path in entries {
-            let parsed = std::fs::read_to_string(&path)
-                .map_err(|e| e.to_string())
-                .and_then(|text| Schema::from_toml(&text));
-            match parsed {
+            match admit(&path, &found) {
                 Ok(schema) => found.push(schema),
                 Err(why) => eprintln!(
                     "quire settings: skipping stale schema {}: {why}",
@@ -133,9 +149,37 @@ pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
     found
 }
 
-/// `$XDG_DATA_HOME/quire/settings` then every `$XDG_DATA_DIRS`-listed `<dir>/quire/settings`,
-/// in that order (`$XDG_DATA_HOME` first so a user's own install shadows a system one), the
-/// directories [`discover`] scans (section 9.2). Falls back to the XDG defaults
+/// The schema at `path`, if it may join `found`.
+fn admit(path: &Path, found: &[Schema]) -> Result<Schema, String> {
+    let text = read_text_capped(path, SCHEMA_CAP).map_err(|error| error.to_string())?;
+    let schema = Schema::from_toml(&text)?;
+    let app = schema.app.0.as_str();
+    let named_for = path
+        .file_name()
+        .and_then(|name| name.to_str())
+        .and_then(|name| name.strip_suffix(SCHEMA_SUFFIX));
+    if named_for != Some(app) {
+        return Err(format!("the file is not named for its program, {app}"));
+    }
+    if schema.file.0.split('/').next() != Some(app) {
+        return Err(format!(
+            "it names {}, which is not inside {app}'s own directory",
+            schema.file.0
+        ));
+    }
+    if found.iter().any(|earlier| earlier.app == schema.app) {
+        return Err(format!(
+            "{app} already has a schema in an earlier directory"
+        ));
+    }
+    Ok(schema)
+}
+
+/// Every `$XDG_DATA_DIRS`-listed `<dir>/quire/settings`, then `$XDG_DATA_HOME/quire/settings`
+/// last, the directories [`discover`] scans (section 9.2). The user's directory comes last
+/// because [`discover`] keeps the first schema it finds for a program: a user's own install can
+/// add a program but never shadow an installed one (and so never change which of its keys an
+/// agent may set). Falls back to the XDG defaults
 /// (`~/.local/share`, `/usr/local/share:/usr/share`) when the variable is unset, per the XDG
 /// base directory specification.
 pub fn data_dirs() -> Vec<PathBuf> {
@@ -155,15 +199,15 @@ pub fn data_dirs_from(
     xdg_data_dirs: Option<std::ffi::OsString>,
     home: Option<std::ffi::OsString>,
 ) -> Vec<PathBuf> {
-    xdg::base_dir(
-        xdg_data_home.as_deref(),
-        home.as_deref(),
-        xdg::DATA_HOME_UNDER_HOME,
-    )
-    .into_iter()
-    .chain(xdg::search_dirs(xdg_data_dirs.as_deref()))
-    .map(|base| base.join("quire").join("settings"))
-    .collect()
+    xdg::search_dirs(xdg_data_dirs.as_deref())
+        .into_iter()
+        .chain(xdg::base_dir(
+            xdg_data_home.as_deref(),
+            home.as_deref(),
+            xdg::DATA_HOME_UNDER_HOME,
+        ))
+        .map(|base| base.join("quire").join("settings"))
+        .collect()
 }
 
 /// `--write-schema <dir>` (section 9.2: "developers run `cargo run -p <app> -- --write-schema
@@ -275,6 +319,63 @@ mod tests {
         std::fs::remove_dir_all(&dir).unwrap();
     }
 
+    fn scratch(tag: &str) -> std::path::PathBuf {
+        let dir = std::env::temp_dir().join(format!(
+            "ds-settings-schema-test-{}-{tag}",
+            std::process::id()
+        ));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        dir
+    }
+
+    #[test]
+    fn a_user_schema_never_shadows_an_installed_one_of_the_same_program() {
+        let system = scratch("shadow-system");
+        let user = scratch("shadow-user");
+        let mut installed = sample();
+        installed.key[0].agent = crate::schema::AgentSetting::HandsOff;
+        installed.write_to(&system).unwrap();
+        let mut planted = sample();
+        planted.key[0].agent = crate::schema::AgentSetting::Settable;
+        planted.write_to(&user).unwrap();
+        // The system directory is listed first, as `data_dirs` lists it.
+        let found = discover(&[system.clone(), user.clone()]);
+        assert_eq!(found, vec![installed]);
+        // A user schema for a program nobody installed is still found.
+        let mut own = sample();
+        own.app = AppId("mine".to_owned());
+        own.file = FilePath("mine/settings.toml".to_owned());
+        own.write_to(&user).unwrap();
+        assert_eq!(discover(&[system.clone(), user.clone()]).len(), 2);
+        std::fs::remove_dir_all(&system).unwrap();
+        std::fs::remove_dir_all(&user).unwrap();
+    }
+
+    #[test]
+    fn a_schema_that_names_another_programs_file_or_name_is_not_admitted() {
+        let dir = scratch("binding");
+        let mut other_file = sample();
+        other_file.file = FilePath("sill/settings.toml".to_owned());
+        other_file.write_to(&dir).unwrap();
+        assert_eq!(discover(std::slice::from_ref(&dir)), Vec::new());
+
+        // Named for one program, declaring another.
+        std::fs::remove_file(dir.join("quire.settings.toml")).unwrap();
+        std::fs::write(dir.join("sill.settings.toml"), sample().to_toml()).unwrap();
+        assert_eq!(discover(std::slice::from_ref(&dir)), Vec::new());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
+    #[test]
+    fn a_huge_schema_file_is_not_read() {
+        let dir = scratch("huge");
+        let text = format!("{}\n# {}", sample().to_toml(), "x".repeat(300 * 1024));
+        std::fs::write(dir.join("quire.settings.toml"), text).unwrap();
+        assert_eq!(discover(std::slice::from_ref(&dir)), Vec::new());
+        std::fs::remove_dir_all(&dir).unwrap();
+    }
+
     #[test]
     fn a_nonexistent_directory_is_skipped_silently() {
         let dir = std::env::temp_dir().join("ds-settings-schema-test-does-not-exist");
@@ -297,7 +398,7 @@ mod tests {
     }
 
     #[test]
-    fn xdg_data_home_comes_before_xdg_data_dirs() {
+    fn xdg_data_home_comes_after_xdg_data_dirs_so_it_never_shadows_them() {
         let dirs = data_dirs_from(
             Some(OsString::from("/xdg-data-home")),
             Some(OsString::from("/a:/b")),
@@ -306,9 +407,9 @@ mod tests {
         assert_eq!(
             dirs,
             vec![
-                std::path::PathBuf::from("/xdg-data-home/quire/settings"),
                 std::path::PathBuf::from("/a/quire/settings"),
                 std::path::PathBuf::from("/b/quire/settings"),
+                std::path::PathBuf::from("/xdg-data-home/quire/settings"),
             ]
         );
     }
@@ -321,8 +422,10 @@ mod tests {
             Some(OsString::from("/home/ada")),
         );
         assert_eq!(
-            dirs[0],
-            std::path::PathBuf::from("/home/ada/.local/share/quire/settings")
+            dirs.last(),
+            Some(&std::path::PathBuf::from(
+                "/home/ada/.local/share/quire/settings"
+            ))
         );
     }
 
@@ -336,9 +439,9 @@ mod tests {
         assert_eq!(
             dirs,
             vec![
-                std::path::PathBuf::from("/home/ada/.local/share/quire/settings"),
                 std::path::PathBuf::from("/usr/local/share/quire/settings"),
                 std::path::PathBuf::from("/usr/share/quire/settings"),
+                std::path::PathBuf::from("/home/ada/.local/share/quire/settings"),
             ]
         );
         let relative = data_dirs_from(
