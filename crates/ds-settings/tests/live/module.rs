@@ -65,6 +65,8 @@ pub struct Accounts {
     pub schema: LiveSchema,
     values: Mutex<BTreeMap<String, toml::Value>>,
     pub removed: Mutex<u32>,
+    /// A peer (by unique name) `permit` refuses to let read.
+    reads_refused: Option<String>,
 }
 
 impl Accounts {
@@ -83,13 +85,23 @@ impl Accounts {
             schema,
             values: Mutex::new(values),
             removed: Mutex::new(0),
+            reads_refused: None,
         }
+    }
+
+    /// This module, refusing reads from the peer named `name`.
+    pub fn refusing_reads_from(mut self, name: String) -> Accounts {
+        self.reads_refused = Some(name);
+        self
     }
 }
 
 impl LiveModule for Accounts {
     async fn permit(&self, caller: &Caller, access: Access) -> Verdict {
         match (access, &self.settings_role) {
+            (Access::Read, _) if self.reads_refused.as_deref() == Some(&caller.sender.0) => {
+                Verdict::Refuse
+            }
             (Access::Read, _) => Verdict::Allow,
             (Access::Write, Some(name)) if *name == caller.sender.0 => Verdict::Allow,
             (Access::Write, _) => Verdict::Refuse,

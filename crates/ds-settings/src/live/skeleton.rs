@@ -7,6 +7,7 @@ use zbus::object_server::SignalEmitter;
 use zbus::zvariant::{ObjectPath, Value};
 use zbus::{Connection, interface};
 
+use super::readers::{Readers, addressed};
 use super::value::{from_wire, to_wire};
 use super::{Access, Caller, INTERFACE, LiveError, LiveModule, SenderName, Verdict};
 use crate::schema::KeyPath;
@@ -15,6 +16,8 @@ use crate::schema::KeyPath;
 /// daemon keeps its state behind the module).
 struct Skeleton<M> {
     module: M,
+    /// The peers `permit` let read: the only ones `Changed` is sent to.
+    readers: Readers,
 }
 
 impl<M: LiveModule> Skeleton<M> {
@@ -26,12 +29,12 @@ impl<M: LiveModule> Skeleton<M> {
         access: Access,
     ) -> Result<(), LiveError> {
         let sender = header.sender().map(|name| SenderName(name.to_string()));
-        let verdict = match sender {
+        let verdict = match &sender {
             Some(sender) => {
                 self.module
                     .permit(
                         &Caller {
-                            sender,
+                            sender: sender.clone(),
                             connection: connection.clone(),
                         },
                         access,
@@ -40,9 +43,13 @@ impl<M: LiveModule> Skeleton<M> {
             }
             None => Verdict::Refuse,
         };
-        match verdict {
-            Verdict::Allow => Ok(()),
-            Verdict::Refuse => Err(LiveError::NotPermitted(match access {
+        match (verdict, sender) {
+            (Verdict::Allow, Some(reader)) if access == Access::Read => {
+                self.readers.add(connection, &reader).await;
+                Ok(())
+            }
+            (Verdict::Allow, _) => Ok(()),
+            (Verdict::Refuse, _) => Err(LiveError::NotPermitted(match access {
                 Access::Read => "this caller may not read the settings module".to_owned(),
                 Access::Write => "this caller may not change the settings module".to_owned(),
             })),
@@ -116,7 +123,7 @@ impl<M: LiveModule> Skeleton<M> {
         Ok((snapshot.schema.to_json(), values))
     }
 
-    /// Sets a key (or runs an action key), then broadcasts `Changed`.
+    /// Sets a key (or runs an action key), then sends `Changed` to the peers that may read.
     async fn set(
         &self,
         key: String,
@@ -132,11 +139,16 @@ impl<M: LiveModule> Skeleton<M> {
         self.module.set(&key, wire.clone()).await?;
         // An action key holds no value: its `Changed` carries what was sent.
         let now = self.module.get(&key).await.unwrap_or(wire);
-        Self::changed(&emitter, &key.0, to_wire(&now)?).await?;
+        for reader in self.readers.present(connection).await {
+            if let Some(to_reader) = addressed(&emitter, reader) {
+                // A reader that left a moment ago loses its signal and no one else does.
+                let _ = Self::changed(&to_reader, &key.0, to_wire(&now)?).await;
+            }
+        }
         Ok(())
     }
 
-    /// A key's new value.
+    /// A key's new value, sent to the peers that may read (never broadcast).
     #[zbus(signal)]
     async fn changed(emitter: &SignalEmitter<'_>, key: &str, value: Value<'_>) -> zbus::Result<()>;
 }
@@ -147,15 +159,21 @@ impl<M: LiveModule> Skeleton<M> {
 pub struct Served {
     connection: Connection,
     path: ObjectPath<'static>,
+    readers: Readers,
 }
 
 impl Served {
-    /// Broadcasts `Changed(key, value)` from the module's object path.
+    /// Sends `Changed(key, value)` from the module's object path to the peers `permit` let read,
+    /// and to no one else.
     pub async fn changed(&self, key: &KeyPath, value: &toml::Value) -> Result<(), LiveError> {
         let emitter = SignalEmitter::new(&self.connection, self.path.clone())?;
-        emitter
-            .emit(INTERFACE, "Changed", &(key.0.as_str(), to_wire(value)?))
-            .await?;
+        for reader in self.readers.present(&self.connection).await {
+            if let Some(to_reader) = addressed(&emitter, reader) {
+                let body = (key.0.as_str(), to_wire(value)?);
+                // A reader that left a moment ago loses its signal and no one else does.
+                let _ = to_reader.emit(INTERFACE, "Changed", &body).await;
+            }
+        }
         Ok(())
     }
 
@@ -182,19 +200,27 @@ pub async fn serve<M: LiveModule>(
         .map_err(|why| LiveError::Failed(why.to_string()))?;
     let path = ObjectPath::try_from(path.to_owned())
         .map_err(|why| LiveError::Failed(format!("bad object path {path}: {why}")))?;
+    let readers = Readers::default();
     connection
         .object_server()
-        .at(path.clone(), Skeleton { module })
+        .at(
+            path.clone(),
+            Skeleton {
+                module,
+                readers: readers.clone(),
+            },
+        )
         .await?;
     Ok(Served {
         connection: connection.clone(),
         path,
+        readers,
     })
 }
 
 #[cfg(test)]
 mod tests {
-    use super::Skeleton;
+    use super::{Readers, Skeleton};
     use crate::live::{
         Access, Caller, INTROSPECTION_XML, LiveError, LiveModule, LiveSchema, Verdict,
     };
@@ -223,7 +249,11 @@ mod tests {
     #[test]
     fn the_skeleton_matches_the_checked_in_introspection_xml() {
         let mut xml = String::new();
-        Skeleton { module: Nothing }.introspect_to_writer(&mut xml, 0);
+        Skeleton {
+            module: Nothing,
+            readers: Readers::default(),
+        }
+        .introspect_to_writer(&mut xml, 0);
         assert_eq!(xml.trim(), INTROSPECTION_XML.trim());
     }
 }

@@ -16,7 +16,14 @@
 //! | `Get` | `(s) -> v` | a key's current value |
 //! | `Snapshot` | `() -> (s, a{sv})` | the schema (as `Describe`) and every key's value (as `Get`), read once |
 //! | `Set` | `(s, v) -> ()` | set a value, or run an action key (any value; the client sends `true`) |
-//! | `Changed` | `(s, v)` signal | a key's new value, broadcast |
+//! | `Changed` | `(s, v)` signal | a key's new value, sent to each peer the module let read, and to no one else |
+//!
+//! `Changed` is never a broadcast: a signal with no destination reaches everyone who added a match
+//! rule, and `permit` cannot refuse a match rule. The skeleton sends it to the peers it let read
+//! (a peer that called `Describe`, `Get` or `Snapshot`, or [`LiveClient::changes`]), by unique
+//! name; a peer it refused hears nothing. A client takes a signal only from the module it asked
+//! (the proxy filters on the module's unique name), and every call a client makes has a
+//! deadline ([`Timeouts`], [`LiveError::Timeout`]).
 //!
 //! Values travel as `b` (bool), `x` (integer), `s` (string) or `as` (list of strings); see
 //! [`value`].
@@ -29,17 +36,21 @@
 mod client;
 mod error;
 mod module;
+mod readers;
 mod schema;
 mod skeleton;
 mod snapshot;
+mod timeouts;
 pub mod value;
 
 pub use client::{Change, Changes, LiveClient, SettingsModule1Proxy};
+pub use ds_peer::Deadline;
 pub use error::LiveError;
 pub use module::{Access, Caller, LiveModule, SenderName, Verdict};
 pub use schema::{LiveSchema, LiveSchemaError};
 pub use skeleton::{Served, serve};
 pub use snapshot::Snapshot;
+pub use timeouts::Timeouts;
 
 /// The D-Bus interface name.
 pub const INTERFACE: &str = "org.quire.SettingsModule1";

@@ -13,6 +13,7 @@ ds-core = { workspace = true }
 ds-behaviour = { workspace = true }
 # The capped reader and the durable atomic writer every file here goes through (UI-free).
 ds-helpers = { workspace = true }
+ds-peer = { workspace = true }
 ds-style = { workspace = true }
 ds-settings-derive = { workspace = true }
 dioxus = { workspace = true, optional = true }

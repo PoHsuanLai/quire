@@ -42,8 +42,9 @@ pub enum Verdict {
 /// `/org/quire/Inference1/settings`; both `Refuse` every `Write` unless the caller holds the
 /// Settings role.
 pub trait LiveModule: Send + Sync + 'static {
-    /// The caller-role hook, asked before every `Get` (`Access::Read`) and `Set`
-    /// (`Access::Write`). No default: a module states its policy.
+    /// The caller-role hook, asked before every `Describe`, `Get` and `Snapshot` (`Access::Read`) and
+    /// every `Set` (`Access::Write`). A peer it lets read is also the peer `Changed` is sent to, so
+    /// it is the one place that decides who hears a value. No default: a module states its policy.
     fn permit(&self, caller: &Caller, access: Access) -> impl Future<Output = Verdict> + Send;
 
     /// The keys right now (accounts come and go, so this is asked on every `Describe`).
@@ -69,8 +70,8 @@ pub trait LiveModule: Send + Sync + 'static {
     }
 
     /// Sets a key, or runs it when it is an action key (then `value` is `true` by convention and
-    /// carries nothing). The skeleton broadcasts `Changed` with the value a following `get`
-    /// reports, so an implementation does not signal its own `Set`.
+    /// carries nothing). The skeleton sends `Changed` with the value a following `get`
+    /// reports to the peers that may read, so an implementation does not signal its own `Set`.
     fn set(
         &self,
         key: &KeyPath,

@@ -79,7 +79,7 @@ async fn set_get_describe_and_changed_round_trip() {
 }
 
 #[tokio::test]
-async fn a_daemon_originated_change_is_broadcast() {
+async fn a_daemon_originated_change_reaches_the_reader() {
     let bus = PrivateBus::start("served");
     let daemon = bus.connect().await;
     let settings = bus.connect().await;

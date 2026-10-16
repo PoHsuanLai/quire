@@ -1258,6 +1258,15 @@ rows use `kind = Live{action}` (a label plus weight `plain` or `destructive`), a
 schema that marks an `AGENT_NEVER_SETTABLE` key agent-settable, the same check
 `Schema::from_toml` and the derive use.
 
+Who hears `Changed` (2026-10-16, production audit QUIRE-04; the signature is not touched): the signal is
+never a broadcast, because a signal with no destination goes to every peer that adds a match rule and
+`permit` cannot refuse a match rule. The skeleton remembers the peers `permit` let read (a call to
+`Describe`, `Get` or `Snapshot`; `LiveClient::changes` makes one) and sends `Changed` to each of
+them by unique name, and `Served::changed` the same. A peer `permit` refuses hears nothing, and
+`LiveClient::changes` tells it `NotPermitted`. Every client call has a deadline
+(`Timeouts`, 10 s for reads and 30 s for a `Set`) and a module that is silent is
+`LiveError::Timeout`; a client takes `Changed` only from the module's own unique name.
+
 Unavailable choices (additive, 2026-10-06): a `KeySpec` may carry `unavailable`, a map from a
 choice word to the reason it cannot be picked right now. JSON: `"unavailable":{"<word>":"<reason>"}`;
 a file schema has the same as an `[key.unavailable]` table; both are skipped when empty, so
