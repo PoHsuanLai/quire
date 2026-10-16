@@ -2,6 +2,7 @@
 //! A separate test target needs a stated reason (CONVENTIONS.md, Tests).
 //! Separate target: `packagekit` (feature `quire-desktop`) runs a fake PackageKit on a private D-Bus.
 
+mod desktop_file;
 mod files;
 mod provide;
 

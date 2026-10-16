@@ -3,7 +3,8 @@
 //! The file half ([`read_capped`], [`write_atomic`], [`update_atomic`], [`move_aside`]) is UI-free:
 //! it needs only `std` (and `rustix` for the file lock on Unix), so a core crate with no window,
 //! bus or runtime can read and write a person's files with the same guarantees as quire's
-//! settings code.
+//! settings code. [`DesktopFile`] is the matching reader for the text of a freedesktop `.desktop`
+//! file (pure: the text comes in, capped, from [`read_text_capped`] or anywhere else).
 //!
 //! Missing helpers (design/27 permission-prompt rules; `quire/CONSUMING.md`, "Missing helpers").
 //!
@@ -65,6 +66,7 @@
 
 mod capability;
 mod catalog;
+mod desktop_file;
 mod family;
 mod files;
 mod helpers;
@@ -77,6 +79,9 @@ mod watch;
 
 pub use capability::{Capability, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
+pub use desktop_file::{
+    DESKTOP_ENTRY_CAP, DesktopFile, DesktopFileError, DesktopGroup, EntryLocale,
+};
 pub use ds_peer::Deadline;
 pub use family::Family;
 pub use files::{

@@ -3,6 +3,18 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+**ds-helpers**
+- New `DesktopFile`, a pure reader for the text of a freedesktop `.desktop` file (and any key file in
+  that format): `DesktopFile::parse(text, ReadCap)` / `from_bytes`, `entry()` for `[Desktop Entry]`,
+  `group(name)`, `groups()`, `skipped_lines()`; on a group (`DesktopGroup`) `string`, `localized`, `list`,
+  `localized_list`, `boolean`, `is_true`, `key_names`. A localized key (`Name[de_AT]`) is picked by
+  `EntryLocale::parse("de_AT.UTF-8")` and its `variants()`; value escapes (`\s \n \t \r \\`, `\;` in a
+  list) are taken; a repeated group merges and a repeated key keeps its last value; `Exec` field codes are
+  left to the caller. A text over the cap is `DesktopFileError::TooBig`; `DESKTOP_ENTRY_CAP` is 256 KiB.
+  Additive; no existing item changes.
+
 ## v0.3.30
 
 Two additions for the permission prompts the compositor publishes. Nothing changes for a consumer

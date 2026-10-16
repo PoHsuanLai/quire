@@ -2165,3 +2165,23 @@ apps (first detent's Settings, "install llama.cpp" with a copyable command) reus
   `RequestName` in `ds-blitz::menus` is a call to the bus daemon itself and has no deadline. The frame-link channel (QUIRE-21) is still
   unbounded. detent's half of DETENT-07 (feeding `Failed` on `LiveError::Timeout`, awaiting `invoke` off the effect loop) and the same
   convention in porter-dbus are theirs.
+
+## One reader for desktop files (ds-helpers `DesktopFile`)
+
+- **What landed.** `ds_helpers::DesktopFile` reads the text of a `.desktop` file (or any key file in that format) into groups and
+  keys: `Name[de_DE@euro]` picked by `EntryLocale` variants (`lang_COUNTRY@MODIFIER`, `lang_COUNTRY`, `lang@MODIFIER`, `lang`, then the
+  default), the value escapes (`\s \n \t \r \\`, and `\;` inside a list), `;` lists with empty items dropped, `true`/`false`
+  booleans, comments, a byte order mark, CRLF. A group named twice is one group and a key given twice keeps its last value (GLib's key
+  file; the specification leaves both undefined; the `freedesktop-desktop-entry` crate sill and detent use also keeps the last key but
+  refuses a repeated group). A malformed line or a pair before any group is skipped and counted
+  (`skipped_lines`), never an error. The text is refused whole over the caller's `ReadCap` (`DESKTOP_ENTRY_CAP` is 256 KiB).
+  `Exec` and `TryExec` come back after the value escapes only; field codes and command-line quoting stay the caller's.
+- **Not a merge of two copies.** Sill and detent do not keep readers of their own: sill's
+  `sill-services::apps::backend::scan` and detent's `detent-files::programs` both call the third-party `freedesktop-desktop-entry` 0.8.3
+  (`DesktopEntry::from_str`, `Iter`), and anyview's mpris code uses it too; each reads the file with an uncapped
+  `std::fs::read_to_string`. So `DesktopFile` is a new, second reader, not a merge of two copies. What moving onto it would buy: no
+  `gettext-rs` (a C library) behind a pure parse, a size cap on every read, one tolerance for malformed lines (the crate fails the whole
+  entry on a repeated group or a localized key with no default), and the same locale rule in every app. What it costs: sill reads
+  more accessors than `DesktopFile` has (`only_show_in`, `not_show_in`, `flatpak`, `startup_wm_class`, `dbus_activatable`, `Iter`'s
+  directory walk and app ids), which stay with the caller as plain `string`/`list`/`is_true` reads. Whether to move is the owner's call;
+  the reader is additive and nothing in quire uses it yet.
