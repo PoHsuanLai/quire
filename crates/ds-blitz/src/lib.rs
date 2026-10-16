@@ -55,6 +55,7 @@ mod keymap_choice;
 mod keymap_detect;
 pub mod launch;
 mod layout_chain;
+mod link_open;
 mod measure;
 mod memory_shell;
 #[cfg(all(feature = "menus", target_os = "linux"))]
@@ -128,6 +129,7 @@ pub use frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
 pub use frame_tag::FrameTag;
 pub use gpu_request::GpuRequest;
 pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch, launch_idle};
+pub use link_open::{LinkFailureHandler, LinkOpenError};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};
 pub use open_window::{WindowHandle, WindowSpec, open_window, open_window_with, use_window_handle};
 pub use origin::{FrameId, RequestOrigin};

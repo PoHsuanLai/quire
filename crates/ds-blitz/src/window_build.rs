@@ -11,7 +11,8 @@ use crate::close_request::CloseGuard;
 use crate::fonts::font_context;
 use crate::gpu_request::GpuRequest;
 use crate::host::{Host, HostProps};
-use crate::native_providers::{AssetNet, LinkOpener};
+use crate::link_open::LinkOpener;
+use crate::native_providers::AssetNet;
 use crate::open_window::WindowHandle;
 use crate::setup::Setup;
 use crate::window::{Decorations, winit_icon};
@@ -126,7 +127,8 @@ pub(crate) fn window_config(
     vdom.provide_root_context(Arc::clone(&net));
     let parser: Arc<dyn HtmlParserProvider> = Arc::new(blitz_html::HtmlProvider);
     vdom.provide_root_context(Arc::clone(&parser));
-    let navigation: Arc<dyn NavigationProvider> = Arc::new(LinkOpener);
+    let navigation: Arc<dyn NavigationProvider> =
+        Arc::new(LinkOpener::new(base.setup.link_failed.clone()));
     let doc = DioxusDocument::new(
         vdom,
         DocumentConfig {

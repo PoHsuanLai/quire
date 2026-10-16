@@ -5,6 +5,7 @@
 use crate::click_focus::FocusFallback;
 use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
+use crate::link_open::LinkFailureHandler;
 use crate::net_policy::NetPolicy;
 use crate::shell_keys::ShellKeys;
 use dioxus::prelude::VirtualDom;
@@ -19,6 +20,8 @@ pub struct Setup {
     pub net: NetPolicy,
     /// What a link clicked in a frame does.
     pub frame_links: FrameLinks,
+    /// What happens when a clicked link cannot be opened in the desktop's browser or mail client.
+    pub link_failed: LinkFailureHandler,
     /// Where the keyboard goes after a click on nothing focusable.
     pub focus_fallback: FocusFallback,
     /// Where the keymap comes from, provided at the root for `Ds` to load. Our desktop's

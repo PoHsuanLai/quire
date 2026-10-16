@@ -20,6 +20,7 @@ use crate::contexts::RootContexts;
 use crate::frame_links::FrameLinks;
 use crate::gpu_request::GpuRequest;
 use crate::keymap_choice::KeymapChoice;
+use crate::link_open::LinkFailureHandler;
 use crate::net_policy::NetPolicy;
 use crate::open_window::WindowSpec;
 use crate::setup::Setup;
@@ -184,6 +185,13 @@ impl AppConfig {
     /// navigates, so the app opens the link itself or nothing happens.
     pub fn with_frame_links(mut self, links: FrameLinks) -> Self {
         self.setup.frame_links = links;
+        self
+    }
+
+    /// What happens when a clicked `http`, `https` or `mailto` link cannot be opened (default: a
+    /// line on stderr). The handler runs on a worker thread, not the UI thread.
+    pub fn with_link_failure(mut self, handler: LinkFailureHandler) -> Self {
+        self.setup.link_failed = handler;
         self
     }
 
