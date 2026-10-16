@@ -127,7 +127,8 @@ pub enum PixelsError {
     Empty,
     /// The bytes are not `width * height * bytes_per_pixel` long.
     Length {
-        /// The length the size and format need.
+        /// The length the size and format need; `usize::MAX` when that is more than a machine can
+        /// address.
         want: usize,
         /// The length given.
         got: usize,
@@ -168,7 +169,11 @@ impl<'a> Pixels<'a> {
         if width == 0 || height == 0 {
             return Err(PixelsError::Empty);
         }
-        let want = width as usize * height as usize * format.bytes_per_pixel();
+        // A size no memory can hold is a wrong length too, reported as the largest `want` there is.
+        let want = (width as usize)
+            .checked_mul(height as usize)
+            .and_then(|pixels| pixels.checked_mul(format.bytes_per_pixel()))
+            .unwrap_or(usize::MAX);
         if bytes.len() != want {
             return Err(PixelsError::Length {
                 want,
@@ -201,5 +206,24 @@ impl<'a> Pixels<'a> {
     /// The bytes as given.
     pub fn bytes(&self) -> &'a [u8] {
         self.bytes
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{PixelFormat, Pixels, PixelsError};
+
+    #[test]
+    fn a_size_no_memory_can_hold_is_a_wrong_length_not_an_overflow() {
+        let huge = Pixels::new(PixelFormat::Rgba8Premultiplied, u32::MAX, u32::MAX, &[]);
+        assert_eq!(
+            huge,
+            Err(PixelsError::Length {
+                want: usize::MAX,
+                got: 0
+            })
+        );
+        let exact = Pixels::new(PixelFormat::Rgba8Premultiplied, 1, 1, &[0; 4]);
+        assert!(exact.is_ok());
     }
 }
