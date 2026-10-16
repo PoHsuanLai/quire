@@ -53,16 +53,21 @@ impl fmt::Display for Capability {
     }
 }
 
-/// A package name as the distro spells it (`libheif-tools`). PackageKit reads `@name` as a group
-/// and `name;version;arch;repo` as an exact id, so neither, nor whitespace, is a plain name.
+/// A package name as the distro spells it (`libheif-tools`): ASCII letters and digits with `+`, `.`,
+/// `_` and `-` inside, starting with a letter or digit. That is every name the four package
+/// managers use, and it is also what keeps a name from being anything else: PackageKit reads
+/// `@name` as a group and `name;version;arch;repo` as an exact id, and the install line shown to
+/// copy (`sudo dnf install <name>`) is pasted into a shell, where `$(`, a backtick, `|` or `&`
+/// would run.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PackageName(String);
 
 impl PackageName {
     /// `name` as a package name.
     pub fn new(name: &str) -> Result<PackageName, NameError> {
-        let bad = |c: char| c.is_whitespace() || c == ';' || c == '/' || c.is_control();
-        if name.is_empty() || name.starts_with('@') || name.chars().any(bad) {
+        let plain = |c: char| c.is_ascii_alphanumeric() || matches!(c, '+' | '.' | '_' | '-');
+        let starts_plain = name.starts_with(|c: char| c.is_ascii_alphanumeric());
+        if !starts_plain || !name.chars().all(plain) {
             return Err(NameError::new(
                 "package name",
                 name,
@@ -144,6 +149,19 @@ mod tests {
             ("mpv;1.0;x86_64;fedora", false),
             ("two words", false),
             ("", false),
+            ("python3.12", true),
+            ("lib32-mesa_x", true),
+            ("x$(curl evil)", false),
+            ("x`id`", false),
+            ("a|b", false),
+            ("a&b", false),
+            ("a>b", false),
+            ("a'b", false),
+            ("a\"b", false),
+            ("-y", false),
+            ("a/b", false),
+            ("a\nb", false),
+            ("café", false),
         ];
         for (name, ok) in table {
             assert_eq!(PackageName::new(name).is_ok(), *ok, "{name}");

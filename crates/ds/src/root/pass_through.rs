@@ -59,8 +59,9 @@ const DS_PREFIX: &str = "ds-";
 ///
 /// Names are a small closed vocabulary of the consumer's own (`folder`, `thread`), so each
 /// distinct one is interned once, for the life of the program, as the `&'static str` the
-/// renderer's attribute takes. The value is where the data goes; build names from constants,
-/// never from data, or the set grows with it.
+/// renderer's attribute takes. [`DataName::parse`] takes a `&'static str` for that reason: a name
+/// can only come from the program's text, so the set of interned names is as small as the
+/// program, and data (a title, a path) cannot grow it. The value is where the data goes.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct DataName {
     /// The whole attribute name, `data-` included.
@@ -70,7 +71,7 @@ pub struct DataName {
 impl DataName {
     /// The name, checked: lowercase ASCII letters, digits and `-`, starting with a letter; not
     /// `ds-…`, and not a name quire uses itself.
-    pub fn parse(name: &str) -> Result<Self, PassThroughError> {
+    pub fn parse(name: &'static str) -> Result<Self, PassThroughError> {
         let shaped = name.starts_with(|c: char| c.is_ascii_lowercase())
             && name
                 .chars()
@@ -222,7 +223,7 @@ mod tests {
             ("slot", Err(())),
         ];
         for (given, want) in cases {
-            let got = DataName::parse(given)
+            let got = DataName::parse(*given)
                 .map(DataName::attribute)
                 .map_err(|_| ());
             assert_eq!(got, *want, "{given:?}");

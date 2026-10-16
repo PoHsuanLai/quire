@@ -83,11 +83,34 @@ impl Subscription {
                     Poll::Ready(change)
                 }
                 None => {
-                    state.wakers.push(cx.waker().clone());
+                    // A select loop polls again and again with the same waker: keep one.
+                    if !state.wakers.iter().any(|w| w.will_wake(cx.waker())) {
+                        state.wakers.push(cx.waker().clone());
+                    }
                     Poll::Pending
                 }
             }
         })
         .await
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::Log;
+    use std::future::Future;
+    use std::pin::pin;
+    use std::task::{Context, Waker};
+
+    #[test]
+    fn polling_again_with_the_same_waker_keeps_one_waker() {
+        let log = Log::default();
+        let mut feed = log.subscribe();
+        let mut next = pin!(feed.next());
+        let mut cx = Context::from_waker(Waker::noop());
+        for _ in 0..50 {
+            assert!(next.as_mut().poll(&mut cx).is_pending());
+        }
+        assert_eq!(log.state().wakers.len(), 1);
     }
 }
