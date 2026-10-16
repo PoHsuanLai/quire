@@ -272,6 +272,9 @@ mod tests {
             "session.lock_grace_s",
             "idle.dim_after_s",
             "accounts.signed_in",
+            "privacy.share_usage",
+            "network.proxy",
+            "security.require_password",
         ];
         for path in NEVER {
             let mut schema = sample();

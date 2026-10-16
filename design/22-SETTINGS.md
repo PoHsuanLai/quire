@@ -1374,7 +1374,10 @@ quire's, sill's and detent's tests check their schemas against one source.
 
 Never agent-settable, whatever a program writes: everything under `agent.*` (the companion's
 own strictness and budgets), `ai.*` (models, spend, local-only), `cua.*` (computer use),
-`memory.*`, `companion.*`, `session.*` and `idle.*` (the lock and its grace), and `accounts.*`.
+`memory.*`, `companion.*`, `session.*` and `idle.*` (the lock and its grace), `accounts.*`, and
+`privacy.*`, `network.*` and `security.*` (owner decision 2026-10-16: what is shared, what is
+reachable and what is checked are the person's to change). There is no allow-list at read time:
+a program's own schema still decides which other keys it marks settable.
 `AGENT_NEVER_SETTABLE` lists those prefixes and a test keeps the proposal clear of them. An
 agent that could raise its own budget or switch computer use on would be its own gatekeeper.
 

@@ -21,7 +21,8 @@ pub const AGENT_SETTABLE_PROPOSED: &[&str] = &[
 ];
 
 /// Key-path prefixes no schema may mark agent-settable: the companion's own limits, the memory
-/// and computer-use switches, model and spend choices, and anything that locks or signs in.
+/// and computer-use switches, model and spend choices, anything that locks or signs in, and the
+/// privacy, network and security switches (what is shared, what is reachable, what is checked).
 /// A key under one of these is hands-off however it is annotated: [`Schema::from_toml`]
 /// rejects a schema that marks one settable, and `#[derive(SettingsSchema)]` fails to compile
 /// for a field that does (both through [`is_never_settable`]).
@@ -36,6 +37,9 @@ pub const AGENT_NEVER_SETTABLE: &[&str] = &[
     "session.",
     "idle.",
     "accounts.",
+    "privacy.",
+    "network.",
+    "security.",
 ];
 
 /// Whether `path` is under one of the [`AGENT_NEVER_SETTABLE`] prefixes. `const` so the derive
@@ -118,6 +122,12 @@ mod tests {
             ("session.lock_grace_s", true),
             ("idle.dim_after_s", true),
             ("accounts.signed_in", true),
+            ("privacy.share_usage", true),
+            ("network.proxy", true),
+            ("security.require_password", true),
+            ("privacy", false),
+            ("networking.wifi", false),
+            ("securityx.level", false),
             ("appearance.theme", false),
             ("cuarto.x", false),
             ("cua", false),

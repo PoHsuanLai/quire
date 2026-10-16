@@ -34,6 +34,9 @@ fn a_live_schema_with_a_never_settable_key_marked_settable_is_rejected() {
         "companion.mood",
         "session.lock_grace_s",
         "idle.dim_after_s",
+        "privacy.share_usage",
+        "network.proxy",
+        "security.require_password",
     ] {
         assert!(is_never_settable(path), "{path}");
         let mut bad = schema();

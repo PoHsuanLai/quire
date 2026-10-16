@@ -28,7 +28,7 @@
 //! Values travel as `b` (bool), `x` (integer), `s` (string) or `as` (list of strings); see
 //! [`value`].
 //!
-//! Agent-never-settable (section 9.7): a schema that marks an `accounts.` or `ai.` key (or any
+//! Agent-never-settable (section 9.7): a schema that marks an `accounts.`, `ai.`, `privacy.`, `network.` or `security.` key (or any
 //! [`AGENT_NEVER_SETTABLE`](crate::schema::AGENT_NEVER_SETTABLE) prefix) agent-settable is
 //! refused by [`LiveSchema::check`], which [`serve`] runs before it exports anything and
 //! `Describe` runs on every call.

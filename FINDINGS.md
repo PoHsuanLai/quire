@@ -16,11 +16,12 @@ that rev.
 
 ## Open items
 
-- **Agent-settable is not yet an allow-list (QUIRE-13).** Discovery now binds a schema to its app
-  and location, but a program's own schema may still mark `privacy.*`, `network.*` or `security.*`
-  keys settable: `AGENT_NEVER_SETTABLE` does not list them, and adding prefixes breaks a consumer
-  whose derive marks one. Needs an owner decision (enforce `AGENT_SETTABLE_PROPOSED` at read time,
-  or extend the deny prefixes) and a warning to sill and detent first.
+- **Agent-settable is a deny-list, not an allow-list (QUIRE-13).** Owner decision 2026-10-16:
+  `AGENT_NEVER_SETTABLE` now also lists `privacy.`, `network.` and `security.`, and no allow-list
+  is enforced at read time (a program's own schema still decides which other keys it marks
+  settable; `AGENT_SETTABLE_PROPOSED` stays a proposal that tests check). A consumer whose schema
+  marks a key under one of the three new prefixes agent-settable now fails to compile (derive) or
+  to load (`Schema::from_toml`, `LiveSchema::check`); sill and detent must be told before they re-pin.
 - **Watched directory deleted and recreated (QUIRE-18).** `Watch` starts its watcher before the
   first read and re-reads on every event, but the inotify watch dies with a deleted directory
   while `state()` stays `Live`. The portal and output watches still end silently on a bus error
