@@ -61,6 +61,8 @@ pdfrum = { workspace = true, optional = true }
 # Spellchecking (the `spell` feature): the checker, and XDG data for the user dictionary.
 spellbook = { workspace = true, optional = true }
 dirs = { workspace = true, optional = true }
+# The user's learned words are read through the capped reader (`ds_helpers::read_text_capped`).
+ds-helpers = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
 # The print portal (the `print` feature): zbus with quire's async-io default (no executor is
@@ -102,7 +104,7 @@ pdf = ["dep:pdfrum-anyrender", "dep:pdfrum"]
 # `ds_blitz::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
 # dictionaries checked on one worker thread. Off by default, so an app that never checks
 # spelling builds no checker.
-spell = ["dep:spellbook", "dep:dirs"]
+spell = ["dep:spellbook", "dep:dirs", "dep:ds-helpers"]
 
 # `QUIRE_DEBUG_PROBE=<dir>`: each window writes its controls, by role and name, with their boxes,
 # to a file there after every frame (`crate::probe`), so a scenario presses a control by name.

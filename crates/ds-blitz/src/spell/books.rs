@@ -6,11 +6,16 @@ use super::choose::pick;
 use super::config::SpellConfig;
 use ds::spell::lang::Lang;
 use ds::spell::service::Learned;
+use ds_helpers::{ReadCap, read_text_capped};
 use spellbook::Dictionary;
 use std::collections::{HashMap, HashSet};
 use std::fs::{self, OpenOptions};
 use std::io::Write;
 use std::path::PathBuf;
+
+/// The most a person's learned-words file may hold: a word a line, a few KiB in practice, and a
+/// file past a megabyte is not a word list.
+const USER_WORDS_CAP: ReadCap = ReadCap::mib(1);
 
 /// What the worker holds.
 pub(crate) struct Books {
@@ -130,7 +135,7 @@ impl Books {
 
     /// The user's learned words for the installed dictionary `lang`, one per line.
     fn user_words(&self, lang: &Lang) -> Vec<String> {
-        fs::read_to_string(self.user_file(lang))
+        read_text_capped(&self.user_file(lang), USER_WORDS_CAP)
             .map(|text| {
                 text.lines()
                     .map(str::trim)
