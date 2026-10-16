@@ -62,7 +62,7 @@ ds-harness         = { path = "crates/ds-harness", default-features = false }
 
 # The portable Blitz repairs (own repo, public). Local checkouts redirect it to a sibling path through
 # each workspace root's [patch] (quire/CONSUMING.md section 1); git consumers get this rev.
-blitz-kit = { git = "https://github.com/PoHsuanLai/blitz-kit", rev = "0ba642e76f3c7edca77b228f05e0399af46e2ec3" }
+blitz-kit = { git = "https://github.com/PoHsuanLai/blitz-kit", rev = "5db6e15f45145d5239a2047079b7d4d1cd8b5553" }
 
 # The portable keymap core (own repo, public): actions, chords, the resolver and per-platform
 # sources. quire is the one toolkit integration (`ds::keys`); apps declare their actions with it.

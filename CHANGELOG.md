@@ -26,7 +26,7 @@ block to 4ca21b12 with this release.
 - A wheel, touch pan or fling over a sub-document scrolls it first and passes what it cannot scroll,
   per axis, to the host element's scroll ancestors, so a reader frame that fits its content no longer
   swallows the wheel.
-- A consumer that pins blitz by rev moves to 4ca21b12 with this release (the whole `[workspace.dependencies]`
+- blitz-kit moves to 5db6e15 (the same blitz rev). A consumer that pins blitz by rev moves to 4ca21b12 with this release (the whole `[workspace.dependencies]`
   blitz block, as before).
 
 ## v0.3.30
