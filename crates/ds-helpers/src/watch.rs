@@ -101,13 +101,17 @@ mod tests {
     use std::future::Future;
     use std::pin::pin;
     use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
     use std::task::{Context, Wake, Waker};
 
-    /// A waker with one address (`Waker::noop` may not compare equal to itself).
-    struct Quiet;
+    /// A waker with one address (`Waker::noop` may not compare equal to itself) that counts its wakes.
+    #[derive(Default)]
+    struct Counted(AtomicUsize);
 
-    impl Wake for Quiet {
-        fn wake(self: Arc<Self>) {}
+    impl Wake for Counted {
+        fn wake(self: Arc<Self>) {
+            self.0.fetch_add(1, Ordering::Relaxed);
+        }
     }
 
     #[test]
@@ -115,11 +119,17 @@ mod tests {
         let log = Log::default();
         let mut feed = log.subscribe();
         let mut next = pin!(feed.next());
-        let waker = Waker::from(Arc::new(Quiet));
+        let counted = Arc::new(Counted::default());
+        let waker = Waker::from(Arc::clone(&counted));
         let mut cx = Context::from_waker(&waker);
         for _ in 0..50 {
             assert!(next.as_mut().poll(&mut cx).is_pending());
         }
         assert_eq!(log.state().wakers.len(), 1);
+        assert_eq!(
+            counted.0.load(Ordering::Relaxed),
+            0,
+            "nothing changed, so nothing woke"
+        );
     }
 }
