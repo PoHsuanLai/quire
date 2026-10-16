@@ -3,6 +3,31 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+Two additions for the permission prompts the compositor publishes. Nothing changes for a consumer
+that does not opt in, except one thing: `ds_settings::Page` gains a variant, so a consumer's
+exhaustive `match` on `Page` needs an arm for `Page::Privacy` (or a wildcard).
+
+**ds-settings**
+- New `Page::Privacy`, the page for "Privacy & Security" settings (what programs may reach; casement
+  publishes its per-app permission rows here). `Page::Privacy.label()` is `"Privacy & Security"`; its
+  wire form is `{"kind":"privacy"}` in JSON and `kind = "privacy"` under `[key.page]` in a schema
+  TOML. It sits after `Accounts` in the page list (design/22 sections 5 and 9.3). A schema written
+  before it reads as it did; a Settings app that predates it fails to parse a key on this page.
+
+**ds** (`Alert`)
+- New prop `arm_after: Option<Duration>` (default `None`). With a delay the alert answers nothing
+  for that long after it mounts, so a keypress or click already in flight cannot answer a permission
+  question: the buttons are disabled (`aria-disabled`, the Button's disabled look, no hover or
+  press) and Return, Escape, Space and clicks do nothing. Escape neither dismisses the sheet nor
+  calls `on_dismiss` while unarmed. The keyboard moves to the default button when it arms. Unset is
+  today's behaviour exactly. The wait is a `Machine`, so a harness's virtual clock drives it.
+- New module `ds::components::overlays::alert_arming`: `Arming` (a `Machine`: `Armed`, or `Waiting {
+  until }`), `ArmingIn`, and the pure rule `route(Arming, AlertInput, &[AlertRole], Hearing) ->
+  Route` (`AlertInput`, `Hearing`, `Route`) that decides what an input does, which the alert now
+  uses for Return, Escape, Space and clicks alike.
+
 ## v0.3.29
 
 Consumers re-pin once; the lock gains `toml_edit` for ds-settings

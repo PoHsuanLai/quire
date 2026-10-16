@@ -2,7 +2,9 @@
 //! tooltips, hover cards, toasts, the empty state, the skeleton and its row, the loadable pane, and the drag ghost.
 
 pub(crate) mod alert;
+pub mod alert_arming;
 pub mod alert_model;
+mod alert_words;
 pub mod banner_action_row;
 pub(crate) mod catcher;
 pub mod drag_ghost;

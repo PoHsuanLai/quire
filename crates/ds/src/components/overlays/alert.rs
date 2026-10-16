@@ -21,6 +21,13 @@
 //! covering the nearest positioned ancestor (a control-center popover) and catching the pointer
 //! for the popover under it, with no layer of its own on the stack.
 //!
+//! Arming (`arm_after`): an alert may hold its answers off for a moment after it appears, so a
+//! keypress or click already in flight (the person typing in the window under a permission
+//! question) cannot answer it. Until it arms the buttons are disabled and Return, Escape, Space
+//! and clicks do nothing, Escape included: it dismisses nothing and reports nothing. The wait is
+//! an `Arming` machine on quire's clock; it starts when the alert mounts. Unset, an alert is
+//! armed at once and nothing here is drawn or done.
+//!
 //! An alert may carry a suppression `Checkbox` under its message ("Do not show this again") and a
 //! help button (the `Help` bezel) at the foot's leading corner.
 
@@ -30,10 +37,11 @@ use crate::components::content::text_runs::{TextLine, text};
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::{Answers, Bezel, ButtonRole};
 use crate::components::controls::checkbox::Checkbox;
+use crate::components::overlays::alert_arming::{AlertInput, Arming};
 use crate::components::overlays::alert_model::{
-    AlertButton, AlertRole, AlertStyle, FooterLayout, Suppression, default_button, escape_button,
-    tab_target,
+    AlertButton, AlertRole, AlertStyle, FooterLayout, Suppression, default_button, tab_target,
 };
+use crate::components::overlays::alert_words::Words;
 use crate::components::overlays::flow::Flow;
 use crate::components::overlays::sheet::Sheet;
 use crate::components::overlays::sheet_attach::Attach;
@@ -41,9 +49,10 @@ use crate::components::overlays::sheet_width::SheetWidth;
 use crate::focus::soon::focus_soon;
 use crate::root::common::Common;
 use dioxus::prelude::*;
-use ds_core::vocab::Shown;
+use ds_core::vocab::{Availability, Shown};
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
+use ds_motion::machine::use_machine;
 use ds_motion::presence::{
     Exit,
     spec::PresenceSpec,
@@ -53,46 +62,12 @@ use ds_style::icon::Icon;
 use ds_style::icon::render::{IconPx, IconSize};
 use ds_style::tokens::control_size::ControlSize;
 use std::rc::Rc;
+use std::time::Duration;
 
 /// The hero icon's side (design/34 section 3.7).
 const HERO_PX: u8 = 64;
 /// The Critical badge's side, at the hero's lower right.
 const BADGE_PX: u8 = 20;
-
-/// What an alert says and what its buttons do.
-#[derive(Debug, Clone, PartialEq)]
-struct Words {
-    title: String,
-    message: Option<TextLine>,
-    style: AlertStyle,
-    buttons: Vec<AlertButton>,
-    icon: Option<IconSource>,
-    suppression: Option<Suppression>,
-    help: Option<EventHandler<()>>,
-    dismiss: Option<EventHandler<()>>,
-}
-
-impl Words {
-    fn roles(&self) -> Vec<AlertRole> {
-        self.buttons.iter().map(|button| button.role).collect()
-    }
-
-    /// Escape, or the sheet closing another way: the caller's dismissal when it asked to hear
-    /// one, else the Cancel button's press (none when the alert has no Cancel).
-    fn escape(&self) {
-        match self.dismiss {
-            Some(dismissed) => dismissed.call(()),
-            None => self.press(escape_button(&self.roles())),
-        }
-    }
-
-    /// Press button `index`, if there is one.
-    fn press(&self, index: Option<usize>) {
-        if let Some(button) = index.and_then(|index| self.buttons.get(index)) {
-            button.onpress.call(());
-        }
-    }
-}
 
 /// A question or notice with buttons.
 ///
@@ -112,6 +87,11 @@ impl Words {
 /// button is pressed (not even Cancel), so a caller can tell "dismissed" from the person pressing
 /// "Don't Allow". Unset, a dismissal presses the Cancel button, as before.
 ///
+/// `arm_after` holds the answers off for that long after the alert appears (see the module doc):
+/// its buttons are disabled and every key and click is ignored until then, so an answer already
+/// in flight cannot land on a question the person has not seen. Read when the alert mounts.
+/// `None` (the default) arms it at once.
+///
 /// `common` goes on the panel (the sheet), so a host whose blur region resolves an id finds it.
 #[component]
 pub fn Alert(
@@ -123,11 +103,18 @@ pub fn Alert(
     #[props(default)] suppression: Option<Suppression>,
     #[props(default)] help: Option<EventHandler<()>>,
     #[props(default)] on_dismiss: Option<EventHandler<()>>,
+    #[props(default)] arm_after: Option<Duration>,
     #[props(default)] flow: Flow,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
     #[props(default)] common: Common,
 ) -> Element {
+    let arming = use_machine(
+        move |at| Arming::after(at, arm_after),
+        (),
+        || (),
+        |(), _| {},
+    );
     let words = Words {
         title: title.clone(),
         message,
@@ -137,6 +124,7 @@ pub fn Alert(
         suppression,
         help,
         dismiss: on_dismiss,
+        arming,
     };
     match flow {
         Flow::Floating => {
@@ -144,7 +132,7 @@ pub fn Alert(
             rsx! {
                 Sheet {
                     label: title,
-                    onclose: move |()| escape.escape(),
+                    onclose: move |()| escape.answer(AlertInput::Escape),
                     shown,
                     on_hidden,
                     attach: Attach::Centre,
@@ -210,14 +198,22 @@ fn AlertBody(words: Words) -> Element {
     let default = default_button(&roles);
     let count = words.buttons.len();
     let elements = use_hook(|| CopyValue::new(Vec::<Option<Rc<MountedData>>>::new()));
-    let press = {
+    let answer = {
         let words = words.clone();
-        EventHandler::new(move |index: Option<usize>| words.press(index))
+        EventHandler::new(move |input: AlertInput| words.answer(input))
     };
-    let leave = {
-        let words = words.clone();
-        EventHandler::new(move |()| words.escape())
-    };
+    let arming = words.arming;
+    let availability = arming.state().read().availability();
+    // An alert that waits has its default button disabled, which cannot hold the keyboard: when
+    // it arms, the keyboard goes there, as it would have at mount.
+    let started = use_hook(|| *arming.state().peek());
+    use_effect(move || {
+        let now = *arming.state().read();
+        let target = default.and_then(|index| elements.peek().get(index).cloned().flatten());
+        if let (Arming::Armed, Arming::Waiting { .. }, Some(target)) = (now, started, target) {
+            focus_soon(target);
+        }
+    });
     rsx! {
         div {
             class: "ds-alert",
@@ -226,12 +222,12 @@ fn AlertBody(words: Words) -> Element {
                 Key::Escape => {
                     event.stop_propagation();
                     event.prevent_default();
-                    leave.call(());
+                    answer.call(AlertInput::Escape);
                 }
                 Key::Enter => {
                     event.stop_propagation();
                     event.prevent_default();
-                    press.call(default);
+                    answer.call(AlertInput::Return);
                 }
                 _ => {}
             },
@@ -266,7 +262,7 @@ fn AlertBody(words: Words) -> Element {
             }
             div { class: "ds-alert-footer", "data-layout": FooterLayout::of(count).slug(),
                 for (index , button) in words.buttons.iter().enumerate() {
-                    {slot(Slot { index, count, button, default, press, elements })}
+                    {slot(Slot { index, count, button, default, availability, answer, elements })}
                 }
             }
         }
@@ -279,7 +275,8 @@ struct Slot<'a> {
     count: usize,
     button: &'a AlertButton,
     default: Option<usize>,
-    press: EventHandler<Option<usize>>,
+    availability: Availability,
+    answer: EventHandler<AlertInput>,
     elements: CopyValue<Vec<Option<Rc<MountedData>>>>,
 }
 
@@ -291,7 +288,8 @@ fn slot(slot: Slot<'_>) -> Element {
         count,
         button,
         default,
-        press,
+        availability,
+        answer,
         mut elements,
     } = slot;
     let is_default = default == Some(index);
@@ -305,7 +303,7 @@ fn slot(slot: Slot<'_>) -> Element {
                 if is_space(&key) {
                     event.stop_propagation();
                     event.prevent_default();
-                    press.call(Some(index));
+                    answer.call(AlertInput::Press(index));
                 } else if key == Key::Tab {
                     event.stop_propagation();
                     event.prevent_default();
@@ -329,8 +327,9 @@ fn slot(slot: Slot<'_>) -> Element {
                 answers,
                 role,
                 size: ControlSize::Regular,
+                availability,
                 label: button.label.clone(),
-                onclick: move |_| press.call(Some(index)),
+                onclick: move |_| answer.call(AlertInput::Press(index)),
             }
         }
     }

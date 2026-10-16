@@ -14,6 +14,7 @@ use ds::assembly::ds::Inject;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyle, Suppression};
 use ds::prelude::*;
 use ds_lint::LintConfig;
+use std::time::Duration;
 
 const TITLE: &str = "Turn Bluetooth off?";
 const MESSAGE: &str = "Bluetooth devices such as keyboards and mice will be disconnected.";
@@ -314,4 +315,29 @@ fn inline_it_stands_in_its_container_and_catches_the_pointer() {
         let html = by_name(name);
         assert!(!html.contains("ds-alert"), "{name}: {html}");
     }
+}
+
+#[test]
+fn an_alert_that_has_not_armed_draws_its_buttons_disabled() {
+    fn waiting() -> Element {
+        root(
+            Theme::Light,
+            rsx! {
+                Alert { title: TITLE, buttons: vec![button("Turn Off", AlertRole::Normal), button("Cancel", AlertRole::Cancel)],
+                    arm_after: Some(Duration::from_millis(800)) }
+            },
+        )
+    }
+    let html = render(waiting);
+    assert_eq!(
+        html.matches("data-availability=\"disabled\"").count(),
+        2,
+        "{html}"
+    );
+    assert_eq!(html.matches("aria-disabled=\"true\"").count(), 2, "{html}");
+    let plain = by_name("floating-light");
+    assert!(
+        !plain.contains("aria-disabled"),
+        "no delay, no disabled button: {plain}"
+    );
 }

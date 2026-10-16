@@ -4,7 +4,8 @@
 //! reports that and presses nothing) and a press outside does nothing (a sheet
 //! dims nothing and closes by its buttons); Space presses the button that has the keyboard, and
 //! Tab moves it; inline it stands inside a 320 px popover and fits, and floating it is centred in
-//! the whole window.
+//! the whole window. With `arm_after` it answers nothing (no key, no click, not even Escape) until
+//! the delay has run, then everything as above.
 
 use dioxus::prelude::*;
 use ds::components::overlays::alert_model::{AlertButton, AlertRole};
@@ -32,6 +33,7 @@ thread_local! {
     static ACTION_ROLE: Cell<AlertRole> = const { Cell::new(AlertRole::Normal) };
     static FLOW: Cell<Flow> = const { Cell::new(Flow::Floating) };
     static LISTENING: Cell<Listening> = const { Cell::new(Listening::ToButtonsOnly) };
+    static ARM_AFTER: Cell<Option<Duration>> = const { Cell::new(None) };
 }
 
 #[allow(non_snake_case)]
@@ -52,6 +54,7 @@ fn Page() -> Element {
                 AlertButton::new("Cancel", AlertRole::Cancel, EventHandler::new(|()| LOG.write().push("cancel".to_owned()))),
             ],
             on_dismiss,
+            arm_after: ARM_AFTER.with(Cell::get),
             flow,
         }
     };
@@ -77,6 +80,21 @@ fn start(action: AlertRole, flow: Flow) -> Harness {
 }
 
 fn start_listening(action: AlertRole, flow: Flow, listening: Listening) -> Harness {
+    start_with(action, flow, listening, None)
+}
+
+/// The alert with `arm_after` set, listening for a dismissal.
+fn start_armed_after(flow: Flow, delay: Duration) -> Harness {
+    start_with(AlertRole::Normal, flow, Listening::ToDismissal, Some(delay))
+}
+
+fn start_with(
+    action: AlertRole,
+    flow: Flow,
+    listening: Listening,
+    arm_after: Option<Duration>,
+) -> Harness {
+    ARM_AFTER.with(|cell| cell.set(arm_after));
     ACTION_ROLE.with(|cell| cell.set(action));
     FLOW.with(|cell| cell.set(flow));
     LISTENING.with(|cell| cell.set(listening));
@@ -244,4 +262,45 @@ fn floating_it_is_centred_in_the_window() {
     assert!((centre_y - 300.0).abs() < 1.0, "{panel:?}");
     assert!((panel.size.width.0 - 260.0).abs() < 0.5, "the alert sheet");
     assert_eq!(harness.count(".popover .ds-alert"), 0);
+}
+
+#[test]
+fn an_alert_with_an_arming_delay_answers_nothing_until_it_arms() {
+    for flow in [Flow::Floating, Flow::Inline] {
+        let mut harness = start_armed_after(flow, Duration::from_millis(2000));
+        for key in [ShortcutKey::Enter, ShortcutKey::Escape, ShortcutKey::Space] {
+            press(&mut harness, key);
+        }
+        let at = harness.centre(ACTION).expect("the action");
+        harness.send(Input::click(at));
+        harness.advance(Duration::from_millis(20));
+        assert_eq!(
+            log(&harness),
+            "",
+            "{flow:?}: nothing answers before it arms"
+        );
+        assert_eq!(
+            harness.count("[*|data-availability=disabled]"),
+            2,
+            "{flow:?}"
+        );
+
+        harness.advance(Duration::from_millis(2000));
+        assert_eq!(
+            harness.count("[*|data-availability=disabled]"),
+            0,
+            "{flow:?}"
+        );
+        assert_eq!(
+            harness.focus_of(ACTION),
+            FocusState::Focused,
+            "{flow:?}: the keyboard arrives"
+        );
+        press(&mut harness, ShortcutKey::Enter);
+        assert_eq!(
+            log(&harness),
+            "action",
+            "{flow:?}: armed, it answers as ever"
+        );
+    }
 }

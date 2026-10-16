@@ -4391,6 +4391,14 @@ there, so neither the sheet's own Escape nor a browser's synthesised click press
 Inline it has no layer on the stack: its keys are its own, and it covers exactly the nearest
 positioned ancestor, so render it last in that container.
 
+**Arming (`arm_after: Option<Duration>`, 2026-10-17).** A question that grants something (a
+permission) must not be answered by a keypress or click already in flight when it appeared. With a
+delay the alert is unarmed until it passes: the buttons are `Availability::Disabled` (dimmed, no
+hover or press), and Return, Escape, Space and clicks do nothing, Escape included (it neither
+dismisses nor reports a dismissal). The delay is an `Arming` state machine on quire's clock
+(`alert_model`), started when the alert mounts, and the keyboard moves to the default button when
+it arms. Unset, the alert is armed at once and is as above.
+
 **Motion.** The sheet's: `peek-in --t-big --e-spring` as it mounts (scrim `fade --t-move
 --e-out`); with `shown`, hidden, the driven spring fades and lowers it, the scrim plays `menu-out
 --t-quick --e-exit`, and `on_hidden` runs once the spring rests. Reduced: it only fades.
