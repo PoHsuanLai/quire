@@ -247,8 +247,6 @@ async fn the_outputs_are_read_and_a_change_is_followed() {
     assert_eq!(after.areas().len(), 2);
 }
 
-type Row = (u32, String, (i32, i32, u32, u32), (i32, i32, u32, u32), u32);
-
 /// What a process holding `org.quire.Outputs1` says when asked for the work areas.
 #[derive(Clone)]
 enum Answer {
@@ -285,7 +283,7 @@ async fn hold_outputs(bus: &PrivateBus, answer: Answer) -> zbus::Connection {
     holder
 }
 
-fn row(id: u32, work: (i32, i32, u32, u32), scale: u32) -> Row {
+fn row_at(id: u32, work: (i32, i32, u32, u32), scale: u32) -> Row {
     (id, format!("DP-{id}"), (0, 0, 1920, 1080), work, scale)
 }
 
@@ -293,9 +291,9 @@ fn row(id: u32, work: (i32, i32, u32, u32), scale: u32) -> Row {
 async fn rows_that_cannot_hold_a_window_read_as_no_outputs() {
     let bus = PrivateBus::start("squatter", &[]);
     let rows = vec![
-        row(1, (0, 0, 1920, 0), 120),
-        row(2, (0, 32, 1920, 1048), 0),
-        row(3, (0, 32, 1920, 1048), 120),
+        row_at(1, (0, 0, 1920, 0), 120),
+        row_at(2, (0, 32, 1920, 1048), 0),
+        row_at(3, (0, 32, 1920, 1048), 120),
     ];
     let _holder = hold_outputs(&bus, Answer::Rows(rows)).await;
     let client = bus.connect().await;
