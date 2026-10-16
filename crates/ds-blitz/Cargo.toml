@@ -25,6 +25,8 @@ dioxus-native-dom = { workspace = true }
 # `html`: an `<iframe srcdoc>` in the window parses into a real sub-document (G4). `clipboard`:
 # copy and paste in every text field, and `ds_blitz::clipboard` (G5).
 dioxus-native = { workspace = true, features = ["html", "clipboard"] }
+# A deadline for each call to the print portal (the `print` feature).
+ds-peer = { workspace = true, optional = true }
 # `open_window`: a second window on the same event loop, each with its own VirtualDom
 # (`crate::windows`), and the two providers dioxus-native keeps private (`crate::native_providers`).
 # `custom-widget`: the shell hands a texture layer's widget the renderer when it resumes and
@@ -88,7 +90,7 @@ default = ["quire-desktop"]
 quire-desktop = ["dep:wayland-client", "dep:wayland-backend", "dep:wayland-protocols"]
 # `print_dialog`: the system print dialog (the desktop portal on Linux), else the viewer.
 # Off by default, so an app that never prints builds no D-Bus client for it.
-print = ["quire-desktop", "dep:zbus", "dep:memfd"]
+print = ["quire-desktop", "dep:zbus", "dep:memfd", "dep:ds-peer"]
 # `ds_blitz::menus`: the app's menu bar served as `com.canonical.dbusmenu` on its own bus
 # connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
 # default, so an app that exports no menu builds no D-Bus client for it.

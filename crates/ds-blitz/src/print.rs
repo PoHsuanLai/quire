@@ -6,7 +6,11 @@
 //! system's viewer, which prints it.
 //!
 //! The call blocks until the person has answered the dialog; call it off the UI thread (a
-//! `spawn_blocking`, a worker thread). The dialog is not parented to the app's window: the
+//! `spawn_blocking`, a worker thread). It does not block for ever: every call to the portal has a
+//! deadline, the dialog itself waits ten minutes for the person, and a portal that goes away
+//! while the dialog is up ends the wait at once ([`PrintError::Portal`], in words that say the
+//! print service did not answer). A portal that does not answer before the dialog is shown is
+//! treated as no portal, and the PDF opens in the viewer. The dialog is not parented to the app's window: the
 //! portal wants `wayland:<xdg-foreign handle>` for that, and neither winit nor `launch` exports
 //! one yet, so it opens as its own window. A GTK portal backend has been seen to lose the file
 //! on a second PreparePrint + Print in one backend process (xdg-desktop-portal-gtk issue #562);
