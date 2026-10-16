@@ -3,7 +3,11 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## Unreleased
+## v0.3.31
+
+Two additions: `ds_helpers::DesktopFile`, a pure reader for `.desktop` files, and the blitz fork at
+4ca21b12 (iframe Tab order and wheel chaining). A consumer that pins blitz by rev moves its whole blitz
+block to 4ca21b12 with this release.
 
 **ds-helpers**
 - New `DesktopFile`, a pure reader for the text of a freedesktop `.desktop` file (and any key file in
