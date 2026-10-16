@@ -8,7 +8,9 @@
 //! at equal width with the default on the right, three or more stack with the default on top
 //! (`FooterLayout`).
 //!
-//! Keys (design/06-INTERACTIONS.md sections 17 and 18): Escape presses the Cancel button; Return
+//! Keys (design/06-INTERACTIONS.md sections 17 and 18): Escape presses the Cancel button, unless
+//! the caller asked to hear a dismissal (`on_dismiss`), when Escape reports that instead and
+//! presses nothing, so "dismissed" and "Don't Allow" are different answers; Return
 //! presses the default button, whichever button has the keyboard; Space presses the button that
 //! has it; Tab and Shift+Tab move between the buttons, wrapping, since the alert is modal. The
 //! keyboard starts on the default button. Blitz synthesises no click from a key, and each key
@@ -67,11 +69,21 @@ struct Words {
     icon: Option<IconSource>,
     suppression: Option<Suppression>,
     help: Option<EventHandler<()>>,
+    dismiss: Option<EventHandler<()>>,
 }
 
 impl Words {
     fn roles(&self) -> Vec<AlertRole> {
         self.buttons.iter().map(|button| button.role).collect()
+    }
+
+    /// Escape, or the sheet closing another way: the caller's dismissal when it asked to hear
+    /// one, else the Cancel button's press (none when the alert has no Cancel).
+    fn escape(&self) {
+        match self.dismiss {
+            Some(dismissed) => dismissed.call(()),
+            None => self.press(escape_button(&self.roles())),
+        }
     }
 
     /// Press button `index`, if there is one.
@@ -95,6 +107,11 @@ impl Words {
 /// overlay, which needs a root with a height (`RootExtent::Viewport`). `shown` and `on_hidden`
 /// are the sheet's, for a host that hides it with its exit rather than unmounting it.
 ///
+/// `on_dismiss` is how the alert hears that it was dismissed rather than answered: Escape, or the
+/// sheet closing by any other way than a button. While it is set, that is reported there and no
+/// button is pressed (not even Cancel), so a caller can tell "dismissed" from the person pressing
+/// "Don't Allow". Unset, a dismissal presses the Cancel button, as before.
+///
 /// `common` goes on the panel (the sheet), so a host whose blur region resolves an id finds it.
 #[component]
 pub fn Alert(
@@ -105,6 +122,7 @@ pub fn Alert(
     #[props(default)] icon: Option<IconSource>,
     #[props(default)] suppression: Option<Suppression>,
     #[props(default)] help: Option<EventHandler<()>>,
+    #[props(default)] on_dismiss: Option<EventHandler<()>>,
     #[props(default)] flow: Flow,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
@@ -118,6 +136,7 @@ pub fn Alert(
         icon,
         suppression,
         help,
+        dismiss: on_dismiss,
     };
     match flow {
         Flow::Floating => {
@@ -125,7 +144,7 @@ pub fn Alert(
             rsx! {
                 Sheet {
                     label: title,
-                    onclose: move |()| escape.press(escape_button(&escape.roles())),
+                    onclose: move |()| escape.escape(),
                     shown,
                     on_hidden,
                     attach: Attach::Centre,
@@ -189,12 +208,15 @@ fn InlineAlert(
 fn AlertBody(words: Words) -> Element {
     let roles = words.roles();
     let default = default_button(&roles);
-    let escape = escape_button(&roles);
     let count = words.buttons.len();
     let elements = use_hook(|| CopyValue::new(Vec::<Option<Rc<MountedData>>>::new()));
     let press = {
         let words = words.clone();
         EventHandler::new(move |index: Option<usize>| words.press(index))
+    };
+    let leave = {
+        let words = words.clone();
+        EventHandler::new(move |()| words.escape())
     };
     rsx! {
         div {
@@ -204,7 +226,7 @@ fn AlertBody(words: Words) -> Element {
                 Key::Escape => {
                     event.stop_propagation();
                     event.prevent_default();
-                    press.call(escape);
+                    leave.call(());
                 }
                 Key::Enter => {
                     event.stop_propagation();

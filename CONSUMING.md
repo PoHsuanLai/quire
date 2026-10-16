@@ -962,7 +962,8 @@ A few props worth knowing about before you read the signatures:
   the button has the keyboard again. `start`, `open`, `on_open_change` and `anchor` are `PopUpButton`'s.
 - A button's `availability` is its controlled disabled state. `answers: Answers::Return` draws the
   default button and `Answers::Escape` the Cancel button; the keys themselves are routed by the dialog:
-  `Alert` routes both, and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
+  `Alert` routes both (Escape presses the Cancel button; with `on_dismiss: Some(handler)` it reports a
+  dismissal there instead and presses nothing, so "dismissed" is not "Don't Allow"), and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
   control did not take it, a multi-line field's Enter included) to `on_return` and Escape to `onclose`.
   Pass `on_return: None` while the default button is disabled. The first stop of the keyboard in a sheet
   is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { focus:

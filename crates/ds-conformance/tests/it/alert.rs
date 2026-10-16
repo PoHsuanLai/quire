@@ -1,6 +1,7 @@
 //! The alert on a real Blitz document: it opens with the keyboard on the default
 //! button (the first, or the first that is not destructive); Return presses the default
-//! wherever the keyboard is; Escape presses Cancel and a press outside does nothing (a sheet
+//! wherever the keyboard is; Escape presses Cancel (or, when the caller listens for a dismissal,
+//! reports that and presses nothing) and a press outside does nothing (a sheet
 //! dims nothing and closes by its buttons); Space presses the button that has the keyboard, and
 //! Tab moves it; inline it stands inside a 320 px popover and fits, and floating it is centred in
 //! the whole window.
@@ -19,14 +20,29 @@ const VIEW: Viewport = Viewport {
 };
 
 static LOG: GlobalSignal<Vec<String>> = Signal::global(Vec::new);
+
+/// Whether the page asks the alert to report a dismissal.
+#[derive(Clone, Copy, PartialEq)]
+enum Listening {
+    ToButtonsOnly,
+    ToDismissal,
+}
+
 thread_local! {
     static ACTION_ROLE: Cell<AlertRole> = const { Cell::new(AlertRole::Normal) };
     static FLOW: Cell<Flow> = const { Cell::new(Flow::Floating) };
+    static LISTENING: Cell<Listening> = const { Cell::new(Listening::ToButtonsOnly) };
 }
 
 #[allow(non_snake_case)]
 fn Page() -> Element {
     let flow = FLOW.with(Cell::get);
+    let on_dismiss = match LISTENING.with(Cell::get) {
+        Listening::ToDismissal => Some(EventHandler::new(|()| {
+            LOG.write().push("dismissed".to_owned());
+        })),
+        Listening::ToButtonsOnly => None,
+    };
     let alert = rsx! {
         Alert {
             title: "Turn Bluetooth off?",
@@ -35,6 +51,7 @@ fn Page() -> Element {
                 AlertButton::new("Turn Off", ACTION_ROLE.with(Cell::get), EventHandler::new(|()| LOG.write().push("action".to_owned()))),
                 AlertButton::new("Cancel", AlertRole::Cancel, EventHandler::new(|()| LOG.write().push("cancel".to_owned()))),
             ],
+            on_dismiss,
             flow,
         }
     };
@@ -56,8 +73,13 @@ fn Page() -> Element {
 }
 
 fn start(action: AlertRole, flow: Flow) -> Harness {
+    start_listening(action, flow, Listening::ToButtonsOnly)
+}
+
+fn start_listening(action: AlertRole, flow: Flow, listening: Listening) -> Harness {
     ACTION_ROLE.with(|cell| cell.set(action));
     FLOW.with(|cell| cell.set(flow));
+    LISTENING.with(|cell| cell.set(listening));
     let config = HarnessConfig::new(VIEW).with_clock(Clock::Virtual);
     let mut harness = Harness::new(Page, config);
     harness.within(|| LOG.write().clear());
@@ -126,6 +148,20 @@ fn return_presses_the_default_wherever_the_keyboard_is() {
     let mut harness = start(AlertRole::Destructive, Flow::Floating);
     press(&mut harness, ShortcutKey::Enter);
     assert_eq!(log(&harness), "cancel", "a reflexive Return never destroys");
+}
+
+#[test]
+fn escape_reports_a_dismissal_and_does_not_press_cancel_when_the_caller_listens() {
+    for flow in [Flow::Floating, Flow::Inline] {
+        let mut harness = start_listening(AlertRole::Normal, flow, Listening::ToDismissal);
+        press(&mut harness, ShortcutKey::Escape);
+        assert_eq!(log(&harness), "dismissed", "{flow:?}");
+
+        // A button press is still an answer, not a dismissal.
+        let mut harness = start_listening(AlertRole::Normal, flow, Listening::ToDismissal);
+        press(&mut harness, ShortcutKey::Enter);
+        assert_eq!(log(&harness), "action", "{flow:?}");
+    }
 }
 
 #[test]
