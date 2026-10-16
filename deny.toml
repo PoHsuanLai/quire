@@ -68,6 +68,7 @@ allow-git = [
     "https://github.com/PoHsuanLai/blitz",
     "https://github.com/PoHsuanLai/chordkit.git",
     "https://github.com/PoHsuanLai/dioxus",
+    "https://github.com/PoHsuanLai/peephole",
     "https://github.com/PoHsuanLai/vello",
     "https://github.com/DioxusLabs/taffy",
 ]

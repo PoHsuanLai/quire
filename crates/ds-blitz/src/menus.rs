@@ -10,10 +10,30 @@
 //! [`AppHandle`](crate::AppHandle) redraw), look the value up with
 //! `MenuBarModel::command` and run the handler the app's own menu runs.
 //!
+//! Who may press an item is the app's [`MenuPermit`], a required argument of [`MenuExport::start`]:
+//! there is no default, so a menu anyone on the bus may press cannot be exported by leaving it out.
+//! Our desktop's is `ShellOnly` (feature `peephole`, Linux): only the shell. A press from a
+//! message that names no sender, or from a caller the permit refuses, fails with `AccessDenied`;
+//! reading the menu stays open, because it is what the window already shows. An `EventGroup`
+//! carries at most 64 events, and one sender may make at most 8 such calls a second.
+//!
+//! The well-known name is requested with `DoNotQueue`: a second process of the same `app_id`
+//! cannot take the menu over, and its export fails with [`MenuExportError::NameTaken`].
+//!
 //! Off by default, so an app that exports nothing builds no D-Bus client for it.
 
+mod pace;
+mod permit;
 mod service;
+#[cfg(feature = "peephole")]
+mod shell_only;
 mod wire;
+
+#[cfg(feature = "testing")]
+pub use permit::AllowAnyCaller;
+pub use permit::{Caller, MenuPermit, SenderName, Verdict};
+#[cfg(feature = "peephole")]
+pub use shell_only::ShellOnly;
 
 use crate::app_id::AppId;
 use ds::base::command::{AppCommand, CommandId};
@@ -34,17 +54,6 @@ pub enum Bus {
     Session,
     /// A bus at this address: a test's private daemon, never the real session.
     Address(String),
-}
-
-/// Whether the app has the well-known name for its menu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum NameOutcome {
-    /// The app owns [`AppMenuAddress::service`]: the shell finds its menu from the `app_id`.
-    Owned,
-    /// Another process of the same `app_id` owns it. This one is queued for it and takes it
-    /// over, with no action, when that process exits; until then its menu is reachable on this
-    /// connection's unique name only, which nothing derives from an `app_id`.
-    Queued,
 }
 
 /// What the export needs: whose menu it is and where to serve it.
@@ -68,6 +77,10 @@ pub enum MenuExportError {
     /// The bus refused the export.
     #[error("the bus refused the menu export: {0}")]
     Bus(#[from] zbus::Error),
+    /// Another process already owns the name this app's menu is served under (a second copy of
+    /// the same app, or a program squatting on it). The export is not started.
+    #[error("the menu name {0} is already in use")]
+    NameTaken(String),
     /// A value could not be written for the bus.
     #[error("a menu value could not be written for the bus: {0}")]
     Wire(String),
@@ -81,49 +94,43 @@ pub struct MenuExport {
     connection: zbus::blocking::Connection,
     shared: Arc<Shared>,
     address: AppMenuAddress,
-    name: NameOutcome,
 }
 
 impl std::fmt::Debug for MenuExport {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MenuExport")
             .field("address", &self.address)
-            .field("name", &self.name)
             .finish_non_exhaustive()
     }
 }
 
 impl MenuExport {
     /// Serve `tree` for `config.app_id`. `on_activate` runs, on a bus thread, with the command
-    /// of every enabled item a client clicks.
+    /// of every enabled item a client, which `permit` let press items, clicks. Fails with
+    /// [`MenuExportError::NameTaken`] when another process owns the menu's name.
     pub fn start(
         config: &MenuExportConfig,
         tree: MenuTree,
         on_activate: impl Fn(CommandId) + Send + Sync + 'static,
+        permit: impl MenuPermit,
     ) -> Result<MenuExport, MenuExportError> {
         let address = AppMenuAddress::for_app_id(&config.app_id.0)?;
         let shared = Arc::new(Shared::new(MenuState::new(tree), Box::new(on_activate)));
         // zbus may run on the process-wide runtime (its `tokio` feature, when a shell turns it
         // on), which must be entered while the connection is built.
         let _runtime = crate::enter_runtime()?;
-        let connection = connect(&config.bus, &address, &shared)?;
-        let name = request_name(&connection, &address)?;
+        let connection = connect(&config.bus, &address, &shared, permit)?;
+        request_name(&connection, &address)?;
         Ok(MenuExport {
             connection,
             shared,
             address,
-            name,
         })
     }
 
     /// Where the menu is served: the bus name (when owned) and the object path.
     pub fn address(&self) -> &AppMenuAddress {
         &self.address
-    }
-
-    /// Whether the well-known name is the app's yet.
-    pub fn name(&self) -> NameOutcome {
-        self.name
     }
 
     /// The connection's unique name, which always reaches the menu.
@@ -161,31 +168,35 @@ fn connect(
     bus: &Bus,
     address: &AppMenuAddress,
     shared: &Arc<Shared>,
+    permit: impl MenuPermit,
 ) -> Result<zbus::blocking::Connection, zbus::Error> {
     let builder = match bus {
         Bus::Session => Builder::session()?,
         Bus::Address(text) => Builder::address(text.as_str())?,
     };
     builder
-        .serve_at(address.path.as_str(), DbusMenu::new(Arc::clone(shared)))?
+        .serve_at(
+            address.path.as_str(),
+            DbusMenu::new(Arc::clone(shared), permit),
+        )?
         .build()
 }
 
 /// Ask for the well-known name once the object is served (so no call can arrive before it is).
+/// `DoNotQueue`, and neither replacing nor replaceable: a name that is taken stays with its owner,
+/// and a process that wanted it is told, not queued behind it.
 fn request_name(
     connection: &zbus::blocking::Connection,
     address: &AppMenuAddress,
-) -> Result<NameOutcome, zbus::Error> {
-    // No flags at all: zbus's default would let a second process replace the first, and
-    // `DoNotQueue` would refuse it; neither is wanted (a second process waits its turn).
-    let no_flags = std::iter::empty::<RequestNameFlags>().collect();
-    let reply = zbus::block_on(
-        connection
-            .inner()
-            .request_name_with_flags(address.service.as_str(), no_flags),
-    )?;
-    Ok(match reply {
-        RequestNameReply::InQueue => NameOutcome::Queued,
-        _ => NameOutcome::Owned,
-    })
+) -> Result<(), MenuExportError> {
+    let reply = zbus::block_on(connection.inner().request_name_with_flags(
+        address.service.as_str(),
+        RequestNameFlags::DoNotQueue.into(),
+    ))?;
+    match reply {
+        RequestNameReply::PrimaryOwner | RequestNameReply::AlreadyOwner => Ok(()),
+        RequestNameReply::InQueue | RequestNameReply::Exists => {
+            Err(MenuExportError::NameTaken(address.service.clone()))
+        }
+    }
 }

@@ -11,7 +11,9 @@ use ds::components::menus::export::{AppMenuAddress, Change, MenuTree};
 use ds::components::menus::item::item::MenuItem;
 use ds::components::menus::menu_bar::{BarCommand, BarSection, MenuBarModel};
 use ds_blitz::AppId;
-use ds_blitz::menus::{Bus, MenuExport, MenuExportConfig, NameOutcome};
+use ds_blitz::menus::{
+    AllowAnyCaller, Bus, Caller, MenuExport, MenuExportConfig, MenuExportError, MenuPermit, Verdict,
+};
 use ds_core::command::{AppCommand, CommandFace, CommandId, UiOnlyReason};
 use ds_core::standard_action::StandardAction;
 use ds_core::vocab::Availability;
@@ -148,13 +150,22 @@ struct Client {
     proxy: Proxy<'static>,
 }
 
+/// A new client connection to the private bus, and its unique name (what a permit sees).
+fn connect(bus: &PrivateBus) -> (Connection, String) {
+    let connection = zbus::blocking::connection::Builder::address(bus.address.as_str())
+        .expect("a unix address")
+        .build()
+        .expect("the client connects to the private bus");
+    let unique = connection
+        .unique_name()
+        .map(ToString::to_string)
+        .unwrap_or_default();
+    (connection, unique)
+}
+
 impl Client {
     fn new(bus: &PrivateBus, service: &str) -> Client {
-        let connection = zbus::blocking::connection::Builder::address(bus.address.as_str())
-            .expect("a unix address")
-            .build()
-            .expect("the client connects to the private bus");
-        Client::on(&connection, service)
+        Client::on(&connect(bus).0, service)
     }
 
     fn on(connection: &Connection, service: &str) -> Client {
@@ -178,6 +189,56 @@ impl Client {
         self.proxy
             .call("Event", &(id, "clicked", Value::from(0_i32), 0_u32))
     }
+
+    /// One `EventGroup` call that clicks item `id` `times` times; the ids it refused.
+    fn click_group(&self, id: i32, times: usize) -> zbus::Result<Vec<i32>> {
+        let events: Vec<(i32, &str, Value<'_>, u32)> = (0..times)
+            .map(|_| (id, "clicked", Value::from(0_i32), 0_u32))
+            .collect();
+        self.proxy.call("EventGroup", &(events,))
+    }
+}
+
+/// What a method error says, whichever form zbus hands it over in.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Refusal {
+    AccessDenied,
+    LimitsExceeded,
+    InvalidArgs,
+    Other,
+}
+
+fn refusal(error: &zbus::Error) -> Refusal {
+    const DENIED: &str = "org.freedesktop.DBus.Error.AccessDenied";
+    const LIMITS: &str = "org.freedesktop.DBus.Error.LimitsExceeded";
+    const ARGS: &str = "org.freedesktop.DBus.Error.InvalidArgs";
+    match error {
+        zbus::Error::FDO(inner) => match **inner {
+            zbus::fdo::Error::AccessDenied(_) => Refusal::AccessDenied,
+            zbus::fdo::Error::LimitsExceeded(_) => Refusal::LimitsExceeded,
+            zbus::fdo::Error::InvalidArgs(_) => Refusal::InvalidArgs,
+            _ => Refusal::Other,
+        },
+        zbus::Error::MethodError(name, ..) => match name.as_str() {
+            DENIED => Refusal::AccessDenied,
+            LIMITS => Refusal::LimitsExceeded,
+            ARGS => Refusal::InvalidArgs,
+            _ => Refusal::Other,
+        },
+        _ => Refusal::Other,
+    }
+}
+
+/// A permit that lets one connection (by unique name) press items.
+struct OnlyFrom(String);
+
+impl MenuPermit for OnlyFrom {
+    async fn permit(&self, caller: &Caller) -> Verdict {
+        match caller.sender.0 == self.0 {
+            true => Verdict::Allow,
+            false => Verdict::Refuse,
+        }
+    }
 }
 
 /// Run `harness` until `done`, in short real-time steps: the bus delivers on its own thread.
@@ -190,14 +251,27 @@ fn settle(harness: &mut Harness, done: impl Fn(&Harness) -> bool, within: Durati
 }
 
 fn start(bus: &PrivateBus, tx: tokio::sync::mpsc::UnboundedSender<CommandId>) -> MenuExport {
+    start_with(bus, tx, AllowAnyCaller)
+}
+
+fn start_with(
+    bus: &PrivateBus,
+    tx: tokio::sync::mpsc::UnboundedSender<CommandId>,
+    permit: impl MenuPermit,
+) -> MenuExport {
     let config = MenuExportConfig {
         app_id: AppId(APP_ID.to_owned()),
         bus: Bus::Address(bus.address.clone()),
     };
     let tree = MenuTree::from_bar(&bar(Availability::Enabled)).expect("a tree");
-    MenuExport::start(&config, tree, move |command| {
-        let _ = tx.send(command);
-    })
+    MenuExport::start(
+        &config,
+        tree,
+        move |command| {
+            let _ = tx.send(command);
+        },
+        permit,
+    )
     .expect("the export starts on the private bus")
 }
 
@@ -211,7 +285,6 @@ fn the_edit_menu_is_served_and_a_click_on_undo_runs_the_apps_undo() {
     let service = AppMenuAddress::for_app_id(APP_ID)
         .expect("an address")
         .service;
-    assert_eq!(export.name(), NameOutcome::Owned);
 
     let client = Client::new(&bus, &service);
     let (revision, root) = client.layout();
@@ -301,38 +374,86 @@ fn disabling_an_item_announces_a_new_layout_and_refuses_its_click() {
 }
 
 #[test]
-fn a_second_process_of_the_same_app_id_is_queued_and_inherits_the_name() {
+fn a_second_process_of_the_same_app_id_is_refused_the_name() {
     let bus = PrivateBus::start("second");
     let (tx, _rx) = unbounded_channel();
     let first = start(&bus, tx.clone());
-    let second = start(&bus, tx);
-    assert_eq!(first.name(), NameOutcome::Owned);
-    assert_eq!(second.name(), NameOutcome::Queued);
-    let client = Client::new(&bus, &second.unique_name());
-    assert_eq!(
-        client.layout().0,
-        1,
-        "its menu is reachable by the unique name"
-    );
-
     let service = AppMenuAddress::for_app_id(APP_ID)
         .expect("an address")
         .service;
-    let by_name = Client::new(&bus, &service);
-    assert_eq!(by_name.layout().0, 1, "the first owns the name");
-    drop(first);
-    let until = Instant::now() + Duration::from_secs(10);
-    let mut inherited = by_name
-        .proxy
-        .call::<_, _, (u32, Layout)>("GetLayout", &(0_i32, 0_i32, Vec::<String>::new()));
-    while inherited.is_err() && Instant::now() < until {
-        std::thread::sleep(Duration::from_millis(50));
-        inherited = by_name
-            .proxy
-            .call("GetLayout", &(0_i32, 0_i32, Vec::<String>::new()));
-    }
+
+    let config = MenuExportConfig {
+        app_id: AppId(APP_ID.to_owned()),
+        bus: Bus::Address(bus.address.clone()),
+    };
+    let tree = MenuTree::from_bar(&bar(Availability::Enabled)).expect("a tree");
+    let second = MenuExport::start(&config, tree, |_| {}, AllowAnyCaller);
     assert!(
-        inherited.is_ok(),
-        "the queued process owns the name once the first is gone"
+        matches!(&second, Err(MenuExportError::NameTaken(name)) if *name == service),
+        "the name stays with its owner and the second is told"
     );
+
+    let by_name = Client::new(&bus, &service);
+    assert_eq!(by_name.layout().0, 1, "the first still owns the name");
+    drop(first);
+}
+
+#[test]
+fn only_a_caller_the_permit_lets_may_press_an_item_but_anyone_may_read() {
+    let bus = PrivateBus::start("permit");
+    let (tx, mut activations) = unbounded_channel();
+    let service = AppMenuAddress::for_app_id(APP_ID)
+        .expect("an address")
+        .service;
+    let ((shell_bus, shell_name), (intruder_bus, _)) = (connect(&bus), connect(&bus));
+    let export = start_with(&bus, tx, OnlyFrom(shell_name));
+    let (shell, intruder) = (
+        Client::on(&shell_bus, &service),
+        Client::on(&intruder_bus, &service),
+    );
+    let undo = shell.layout().1.child("Edit").child("Undo").id;
+
+    assert_eq!(intruder.layout().0, 1, "reading the menu is open");
+    let refused = intruder.click(undo).expect_err("refused");
+    assert_eq!(refusal(&refused), Refusal::AccessDenied);
+    let refused = intruder.click_group(undo, 1).expect_err("refused");
+    assert_eq!(refusal(&refused), Refusal::AccessDenied);
+    assert!(activations.try_recv().is_err(), "nothing ran");
+
+    shell.click(undo).expect("the permitted caller presses");
+    assert!(activations.try_recv().is_ok(), "the press ran the command");
+    drop(export);
+}
+
+#[test]
+fn an_event_group_is_limited_in_size_and_in_calls_per_second() {
+    let bus = PrivateBus::start("group");
+    let (tx, mut activations) = unbounded_channel();
+    let export = start(&bus, tx);
+    let service = AppMenuAddress::for_app_id(APP_ID)
+        .expect("an address")
+        .service;
+    let client = Client::new(&bus, &service);
+    let undo = client.layout().1.child("Edit").child("Undo").id;
+
+    let too_many = client.click_group(undo, 65).expect_err("over the size cap");
+    assert_eq!(refusal(&too_many), Refusal::InvalidArgs);
+    assert!(activations.try_recv().is_err(), "none of the 65 ran");
+    assert_eq!(client.click_group(undo, 64), Ok(Vec::new()));
+    assert_eq!(
+        std::iter::from_fn(|| activations.try_recv().ok()).count(),
+        64,
+        "all 64 ran"
+    );
+
+    // A burst beyond eight calls in a second is told to wait.
+    let waited = (0..30)
+        .filter_map(|_| client.click_group(undo, 1).err())
+        .map(|error| refusal(&error))
+        .collect::<Vec<_>>();
+    assert!(
+        waited.contains(&Refusal::LimitsExceeded),
+        "a burst of 30 calls was not paced: {waited:?}"
+    );
+    drop(export);
 }

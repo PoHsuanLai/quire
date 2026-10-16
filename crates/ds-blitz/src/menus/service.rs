@@ -1,12 +1,18 @@
 //! The `com.canonical.dbusmenu` object: the methods a client calls, the signals it listens for.
 
+use super::pace::{EVENTS_PER_CALL_MAX, Pace, Pass};
+use super::permit::{self, Caller, MenuPermit, SenderName, Verdict};
 use super::wire::{self, Layout, Props, WireError};
 use ds::base::command::CommandId;
 use ds::components::menus::export::{
     Change, Depth, Dispatch, MenuState, MenuTree, NodeId, PropNames, Revision,
 };
+use std::future::Future;
+use std::pin::Pin;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
+use std::time::Instant;
 use zbus::fdo;
+use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::zvariant::Value;
 
@@ -43,14 +49,55 @@ impl Shared {
     }
 }
 
-/// The served object.
+/// A [`MenuPermit`] with its future boxed, so the served object names no type parameter.
+trait AskPermit: Send + Sync {
+    fn ask<'a>(&'a self, caller: &'a Caller) -> Pin<Box<dyn Future<Output = Verdict> + Send + 'a>>;
+}
+
+impl<P: MenuPermit> AskPermit for P {
+    fn ask<'a>(&'a self, caller: &'a Caller) -> Pin<Box<dyn Future<Output = Verdict> + Send + 'a>> {
+        Box::pin(self.permit(caller))
+    }
+}
+
+/// The served object. `permit` decides who may press an item; reads (`GetLayout` and the rest)
+/// answer anyone, because the menu is what the window already shows.
 pub(super) struct DbusMenu {
     shared: Arc<Shared>,
+    permit: Box<dyn AskPermit>,
+    pace: Mutex<Pace>,
 }
 
 impl DbusMenu {
-    pub(super) fn new(shared: Arc<Shared>) -> DbusMenu {
-        DbusMenu { shared }
+    pub(super) fn new(shared: Arc<Shared>, permit: impl MenuPermit) -> DbusMenu {
+        DbusMenu {
+            shared,
+            permit: Box::new(permit),
+            pace: Mutex::new(Pace::default()),
+        }
+    }
+
+    /// The sender of an item press, once the permit lets it: a message that names no sender, or
+    /// one the permit refuses, is `AccessDenied`.
+    async fn admit(
+        &self,
+        header: &Header<'_>,
+        connection: &zbus::Connection,
+    ) -> fdo::Result<SenderName> {
+        let sender = permit::named(header)?;
+        let caller = Caller {
+            sender: sender.clone(),
+            connection: connection.clone(),
+        };
+        match self.permit.ask(&caller).await {
+            Verdict::Allow => Ok(sender),
+            Verdict::Refuse => Err(permit::denied()),
+        }
+    }
+
+    fn pace(&self) -> MutexGuard<'_, Pace> {
+        // A poisoned lock still holds a whole table: the only writer inserts and prunes.
+        self.pace.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
     fn click(&self, id: i32, event_id: &str) -> fdo::Result<()> {
@@ -120,18 +167,39 @@ impl DbusMenu {
             })
     }
 
-    fn event(
+    async fn event(
         &self,
         id: i32,
         event_id: String,
         _data: Value<'_>,
         _timestamp: u32,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &zbus::Connection,
     ) -> fdo::Result<()> {
+        self.admit(&header, connection).await?;
         self.click(id, &event_id)
     }
 
-    /// The ids whose event was refused.
-    fn event_group(&self, events: Vec<(i32, String, Value<'_>, u32)>) -> fdo::Result<Vec<i32>> {
+    /// The ids whose event was refused. At most [`EVENTS_PER_CALL_MAX`] events a call and
+    /// `CALLS_PER_SECOND_MAX` calls a second from one sender.
+    async fn event_group(
+        &self,
+        events: Vec<(i32, String, Value<'_>, u32)>,
+        #[zbus(header)] header: Header<'_>,
+        #[zbus(connection)] connection: &zbus::Connection,
+    ) -> fdo::Result<Vec<i32>> {
+        let sender = self.admit(&header, connection).await?;
+        let pass = self.pace().admit(&sender, Instant::now());
+        if pass == Pass::Wait {
+            return Err(fdo::Error::LimitsExceeded(
+                "too many event groups a second".to_owned(),
+            ));
+        }
+        if events.len() > EVENTS_PER_CALL_MAX {
+            return Err(fdo::Error::InvalidArgs(format!(
+                "an event group carries at most {EVENTS_PER_CALL_MAX} events"
+            )));
+        }
         let refused: Vec<i32> = events
             .iter()
             .filter(|(id, event_id, _, _)| self.click(*id, event_id).is_err())

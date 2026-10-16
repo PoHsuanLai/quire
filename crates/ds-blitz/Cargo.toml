@@ -77,6 +77,10 @@ memfd = { workspace = true, optional = true }
 wayland-client = { workspace = true, optional = true }
 wayland-backend = { workspace = true, optional = true }
 wayland-protocols = { workspace = true, optional = true }
+# `menus::ShellOnly` (the `peephole` feature): which program is calling, by its pidfd and the unit
+# manager's facts. Its own repo, taken by tag; Linux only, because it reads `/proc` and the system
+# manager's bus. `desktop` adds the desktop's role names.
+peephole-bus = { git = "https://github.com/PoHsuanLai/peephole", tag = "v0.1.0", features = ["desktop"], optional = true }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 # The fake compositor `xdg_activation`'s tests talk to.
@@ -96,6 +100,10 @@ print = ["quire-desktop", "dep:zbus", "dep:memfd", "dep:ds-peer"]
 # connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
 # default, so an app that exports no menu builds no D-Bus client for it.
 menus = ["quire-desktop", "dep:zbus", "dep:serde"]
+# `menus::ShellOnly`: the menu permit for our desktop, which lets only the shell press an item
+# (peephole's `shell` role at the full proof). Linux only. Off by default; without it an app passes
+# its own `MenuPermit` to `MenuExport::start`, because there is no default permit.
+peephole = ["menus", "dep:peephole-bus"]
 # `AppHandle::follow_desktop_outputs`: the shell's work area and scale from `org.quire.Outputs1`
 # (ds-desktop's `Outputs`), fed to `AppHandle::screen_area`. Off by default, so an app that never asks
 # builds no D-Bus client for it.

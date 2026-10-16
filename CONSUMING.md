@@ -1564,8 +1564,14 @@ list and run them (design/27 section 5.2 rule a). Off by default: feature `menus
        &MenuExportConfig { app_id: AppId("dev.mailo.Mailo".into()), bus: Bus::Session },
        tree,
        move |command: CommandId| { let _ = tx.send(command); }, // runs on a bus thread
+       permit,                                                  // who may press an item
    )?;
    ```
+
+   `permit` is a `MenuPermit` and has no default. Our desktop's is `ShellOnly::new(peers)` (feature
+   `peephole`, Linux): only the shell may press an item, as peephole's caller table judges it; build
+   the `BusPeers` once for the process. Another desktop passes its own permit. Reading the menu stays
+   open to everyone.
 
 3. On the UI thread, turn the id back into your command and run the handler your own menu and
    shortcuts run: `bar.command(&id)` gives `Option<&T>`. Hand the id over from the bus thread with a
@@ -1576,12 +1582,13 @@ list and run them (design/27 section 5.2 rule a). Off by default: feature `menus
 
 | What | Value |
 | --- | --- |
-| Bus name | `org.quire.AppMenu.<app_id>`, each dot-separated element made a legal bus-name element (`AppMenuAddress::for_app_id`); `NameOutcome::Queued` when another process of the same `app_id` owns it (this one inherits the name when that process exits, and is served on its unique name meanwhile) |
+| Bus name | `org.quire.AppMenu.<app_id>`, each dot-separated element made a legal bus-name element (`AppMenuAddress::for_app_id`); requested with `DoNotQueue`: when another process owns it, `start` fails with `MenuExportError::NameTaken` and exports nothing |
 | Object path | `/org/quire/AppMenu` |
 | Interface | `com.canonical.dbusmenu` version 3: `GetLayout`, `GetGroupProperties`, `GetProperty`, `Event`, `EventGroup`, `AboutToShow(Group)`; signals `LayoutUpdated`, `ItemsPropertiesUpdated` |
 | Item properties | `type`, `label` (underscores doubled), `enabled`, `toggle-type`, `toggle-state`, `shortcut` (`[["Super","Z"]]`: Command is `Super`), `children-display`; plus `x-quire-command-id`, the `CommandId` the item runs |
 | Ids | an `i32` hashed from the item's `CommandId` (a menu, submenu or rule from its place), so the same bar has the same ids in every run; the bar itself is 0 |
-| Event | `Event(id, "clicked", _, _)` on an enabled command item calls your callback with its `CommandId`; a disabled or unknown item is an `InvalidArgs` error |
+| Event | `Event(id, "clicked", _, _)` from a caller the permit lets, on an enabled command item, calls your callback with its `CommandId`; a disabled or unknown item is an `InvalidArgs` error; a message with no sender or a caller the permit refuses is `AccessDenied` |
+| EventGroup | the same per event, at most 64 events a call (`InvalidArgs` beyond) and 8 calls a second per sender (`LimitsExceeded` beyond) |
 
 Tests start a private `dbus-daemon` and pass `Bus::Address(..)`; never export to the real session
 bus from a test (`crates/ds-harness/tests/menu_export.rs` is the model). Under a shell that turns on
