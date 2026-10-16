@@ -8,7 +8,9 @@ use crate::xdg;
 /// The directory under a data directory that holds the app icons.
 const SUBDIR: &str = "quire/icons/apps";
 
-/// The repository's own set, for a path-dependency consumer in development.
+/// The repository's own set, for a path-dependency consumer in development. Debug builds only: a
+/// release build must not carry the builder's source path, nor trust a directory there.
+#[cfg(debug_assertions)]
 const DEV_ASSETS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/../../assets/icons/apps");
 
 /// Which step of the lookup a directory came from.
@@ -21,7 +23,7 @@ pub enum AssetsOrigin {
     /// One `$XDG_DATA_DIRS` entry's `quire/icons/apps`.
     DataDir,
     /// The repository's `assets/icons/apps`, from `CARGO_MANIFEST_DIR` at compile time:
-    /// development only; an installed program never has it.
+    /// debug builds only; a release build never lists it.
     DevAssets,
 }
 
@@ -98,8 +100,20 @@ pub fn candidates(env: &AssetsEnv) -> Vec<AssetsDir> {
                 .map(at(AssetsOrigin::DataHome)),
         )
         .chain(shared.map(at(AssetsOrigin::DataDir)))
-        .chain([at(AssetsOrigin::DevAssets)(PathBuf::from(DEV_ASSETS))])
+        .chain(dev_assets().map(at(AssetsOrigin::DevAssets)))
         .collect()
+}
+
+/// The repository's own set; only a debug build has it.
+#[cfg(debug_assertions)]
+fn dev_assets() -> Option<PathBuf> {
+    Some(PathBuf::from(DEV_ASSETS))
+}
+
+/// The repository's own set; only a debug build has it.
+#[cfg(not(debug_assertions))]
+fn dev_assets() -> Option<PathBuf> {
+    None
 }
 
 /// The first candidate `probe` finds.
@@ -137,9 +151,7 @@ pub fn install_dir(env: &AssetsEnv) -> Option<PathBuf> {
 
 #[cfg(test)]
 mod tests {
-    use super::{
-        AssetsEnv, AssetsOrigin, DEV_ASSETS, Presence, candidates, find_apps_dir, install_dir,
-    };
+    use super::{AssetsEnv, AssetsOrigin, Presence, candidates, find_apps_dir, install_dir};
     use std::ffi::OsString;
     use std::path::{Path, PathBuf};
 
@@ -162,10 +174,21 @@ mod tests {
             .collect()
     }
 
+    /// The development step a debug build ends its list with, and a release build leaves out.
+    fn dev_steps() -> Vec<(AssetsOrigin, String)> {
+        #[cfg(debug_assertions)]
+        {
+            vec![(AssetsOrigin::DevAssets, super::DEV_ASSETS.to_owned())]
+        }
+        #[cfg(not(debug_assertions))]
+        {
+            Vec::new()
+        }
+    }
+
     #[test]
     fn the_order_is_override_data_home_data_dirs_then_the_repository() {
-        use AssetsOrigin::{DataDir, DataHome, DevAssets, Override};
-        let dev = DEV_ASSETS.to_owned();
+        use AssetsOrigin::{DataDir, DataHome, Override};
         let cases: &[(&str, AssetsEnv, Vec<Step>)] = &[
             (
                 "everything set",
@@ -175,7 +198,6 @@ mod tests {
                     (DataHome, "/data/quire/icons/apps"),
                     (DataDir, "/a/quire/icons/apps"),
                     (DataDir, "/b/quire/icons/apps"),
-                    (DevAssets, &dev),
                 ],
             ),
             (
@@ -185,7 +207,6 @@ mod tests {
                     (DataHome, "/home/ada/.local/share/quire/icons/apps"),
                     (DataDir, "/usr/local/share/quire/icons/apps"),
                     (DataDir, "/usr/share/quire/icons/apps"),
-                    (DevAssets, &dev),
                 ],
             ),
             (
@@ -194,7 +215,6 @@ mod tests {
                 vec![
                     (DataHome, "/home/ada/.local/share/quire/icons/apps"),
                     (DataDir, "/c/quire/icons/apps"),
-                    (DevAssets, &dev),
                 ],
             ),
         ];
@@ -202,6 +222,7 @@ mod tests {
             let want: Vec<(AssetsOrigin, String)> = want
                 .iter()
                 .map(|(origin, path)| (*origin, (*path).to_owned()))
+                .chain(dev_steps())
                 .collect();
             assert_eq!(listed(env), want, "{name}");
         }
@@ -240,6 +261,26 @@ mod tests {
     }
 
     #[test]
+    fn a_release_build_has_no_development_step() {
+        let steps = listed(&AssetsEnv::default());
+        assert_eq!(
+            steps
+                .iter()
+                .any(|(origin, _)| *origin == AssetsOrigin::DevAssets),
+            cfg!(debug_assertions)
+        );
+    }
+
+    #[test]
+    fn the_install_dir_is_under_the_data_home() {
+        assert_eq!(
+            install_dir(&env(None, Some("/data"), None)),
+            Some(PathBuf::from("/data/quire/icons/apps"))
+        );
+    }
+
+    #[cfg(debug_assertions)]
+    #[test]
     fn the_development_fallback_is_this_repositorys_set() {
         let dev = candidates(&AssetsEnv::default())
             .pop()
@@ -249,10 +290,6 @@ mod tests {
             dev.path.join("mail/48.png").is_file(),
             "{}",
             dev.path.display()
-        );
-        assert_eq!(
-            install_dir(&env(None, Some("/data"), None)),
-            Some(PathBuf::from("/data/quire/icons/apps"))
         );
     }
 }
