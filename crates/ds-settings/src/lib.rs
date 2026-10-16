@@ -14,6 +14,7 @@
 extern crate self as ds_settings;
 
 mod appearance;
+mod damaged;
 mod doc;
 #[cfg(feature = "dioxus")]
 mod environment;
@@ -38,6 +39,7 @@ pub use appearance::{
     AppearanceFile, AppearanceSettings, IconDarkVariant, IconStyle, IconsSettings, MonochromeTint,
     PlateGlyphPolicy, quire_schema,
 };
+pub use damaged::{DamagedFile, Saved};
 pub use doc::{FileName, Format, SettingsDoc};
 pub use ds_settings_derive::{SettingsRow, SettingsSchema};
 pub use ds_style::kit::UserStyle;
@@ -51,7 +53,7 @@ pub use portal::{
     scheme_from_portal,
 };
 pub use root::{AppName, ConfigRoot};
-pub use spaces_storage::{Fixup, Origin, SpacesStorage};
+pub use spaces_storage::{Fixup, Origin, SpacesLoad, SpacesStorage};
 pub use store::Store;
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{DEBOUNCE, Watch, WatchState};

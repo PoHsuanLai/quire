@@ -3,6 +3,7 @@
 //! Separate target: `live` (feature `live`) runs the settings service on a private D-Bus.
 
 mod appearance_file;
+mod damaged_files;
 mod derive;
 mod keys;
 mod rows;

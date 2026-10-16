@@ -1,9 +1,9 @@
-//! The kit's two files through `SpacesStorage` on a scratch tree: a round trip, a corrupt file
-//! falling back to the first run, the one-time import, the payload fix-up, and Today's prune.
+//! The kit's two files through `SpacesStorage` on a scratch tree: a round trip, the one-time
+//! import, the payload fix-up, and Today's prune. A damaged file is in `damaged_files.rs`.
 
 use crate::support::Scratch;
 
-use ds_settings::{AppName, ConfigRoot, Fixup, Origin, SpacesStorage};
+use ds_settings::{AppName, ConfigRoot, Fixup, Origin, SpacesLoad, SpacesStorage};
 use ds_style::space::list::{Epoch, IDLE, SpaceId, Spaces, Today};
 use serde::{Deserialize, Serialize};
 
@@ -44,20 +44,6 @@ fn a_first_run_is_written_and_read_back() {
     assert_eq!(again, spaces);
 }
 
-#[test]
-fn a_corrupt_or_empty_file_is_a_first_run_not_a_crash() {
-    for text in ["{ nope", "", "[]", r#"{"spaces":[]}"#, "\u{0}"] {
-        let scratch = Scratch::new();
-        let disk = storage(&scratch);
-        let dir = disk_dir(&scratch);
-        std::fs::create_dir_all(&dir).expect("dir");
-        std::fs::write(dir.join("spaces.json"), text).expect("write");
-        let (spaces, origin) = disk.boot_spaces(|_| {}, first, untouched);
-        assert_eq!(origin, Origin::FirstRun, "{text:?}");
-        assert_eq!(spaces.count(), 2);
-    }
-}
-
 fn disk_dir(scratch: &Scratch) -> std::path::PathBuf {
     ConfigRoot::Scratch(scratch.root().to_path_buf())
         .dir(AppName("notes"))
@@ -91,7 +77,9 @@ fn the_raw_import_and_the_payload_fixup_run_and_a_change_is_saved() {
         spaces.current().look.theme,
         ds_style::appearance::theme::Theme::Dark
     );
-    let saved: Set = disk.load_spaces(|_| {}).expect("written");
+    let SpacesLoad::Stored(saved) = disk.load_spaces::<Note, String>(|_| {}) else {
+        panic!("the fix-up was written back");
+    };
     assert_eq!(saved, spaces, "the fix-up was written back");
 }
 

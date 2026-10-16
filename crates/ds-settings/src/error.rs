@@ -31,3 +31,12 @@ pub enum SettingsError {
         app: &'static str,
     },
 }
+
+impl From<ds_helpers::WriteError> for SettingsError {
+    fn from(error: ds_helpers::WriteError) -> Self {
+        SettingsError::Io {
+            path: error.path,
+            source: error.source,
+        }
+    }
+}

@@ -5,7 +5,7 @@
 use crate::doc::{FileName, SettingsDoc};
 use crate::error::SettingsError;
 use crate::latest::{self, Receiver, Sender};
-use crate::lenient::{FileText, Loaded, Read, file_text, read};
+use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read};
 use crate::store::Store;
 use ds_core::spawner::Spawner;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
@@ -15,6 +15,14 @@ use std::time::Duration;
 
 /// How long the watch waits for a burst of events to settle before re-reading.
 pub const DEBOUNCE: Duration = Duration::from_millis(30);
+
+/// How long the watch waits before reading again a file the system would not give it (too many
+/// open files, permissions mid-change). No file event follows such a failure, so the watch asks
+/// again itself; the wait doubles each time.
+const RETRY_FIRST: Duration = Duration::from_millis(250);
+
+/// How many times a refused read is asked again before the watch waits for the next file event.
+const RETRIES: u32 = 6;
 
 /// Whether a [`Watch`] is looking at the disk.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -57,14 +65,21 @@ impl<D: SettingsDoc> Watch<D> {
 
 impl<D: SettingsDoc + Send> Watch<D> {
     pub(crate) fn start(store: &Store, spawn: &dyn Spawner) -> Watch<D> {
+        // The watcher starts before the first read, so a write that lands in between is seen as
+        // an event and re-read, not missed until the next edit.
+        let armed = arm::<D>(store);
         let initial = store.load::<D>();
         let (out, changes) = latest::channel(initial.clone());
-        match begin::<D>(store, spawn, initial, out) {
-            Ok(watcher) => Watch {
-                changes,
-                state: WatchState::Live,
-                _watcher: Some(watcher),
-            },
+        match armed {
+            Ok((watcher, signals)) => {
+                let path = store.path::<D>().unwrap_or_default();
+                spawn.spawn(Box::pin(settle(path, initial.value, signals, out)));
+                Watch {
+                    changes,
+                    state: WatchState::Live,
+                    _watcher: Some(watcher),
+                }
+            }
             Err(error) => Watch {
                 changes,
                 state: WatchState::Blind {
@@ -90,14 +105,11 @@ fn touches_the_file(event: &notify::Event, name: FileName) -> bool {
             .any(|path| path.file_name() == Some(OsStr::new(name.0)))
 }
 
-/// Start the directory watch and the task that settles its events; the watcher is the caller's
-/// to keep alive.
-fn begin<D: SettingsDoc + Send>(
+/// Start the directory watch; its events arrive on the returned receiver. The watcher is the
+/// caller's to keep alive.
+fn arm<D: SettingsDoc + Send>(
     store: &Store,
-    spawn: &dyn Spawner,
-    initial: Loaded<D>,
-    out: Sender<Loaded<D>>,
-) -> Result<RecommendedWatcher, SettingsError> {
+) -> Result<(RecommendedWatcher, Receiver<()>), SettingsError> {
     let dir = store.require_dir()?;
     std::fs::create_dir_all(&dir).map_err(|source| SettingsError::Io {
         path: dir.clone(),
@@ -113,9 +125,7 @@ fn begin<D: SettingsDoc + Send>(
         }
     })?;
     watcher.watch(&dir, RecursiveMode::NonRecursive)?;
-    let path = dir.join(D::FILE.0);
-    spawn.spawn(Box::pin(settle(path, initial.value, signals, out)));
-    Ok(watcher)
+    Ok((watcher, signals))
 }
 
 /// Re-read `path` after every settled burst of events and publish it, until the watcher or the
@@ -139,22 +149,55 @@ async fn settle<D: SettingsDoc + Send>(
             }
             signals.catch_up();
         }
-        let loaded = match file_text(&path) {
-            FileText::Text(text) => match read::<D>(&text, D::FORMAT) {
-                Read::Garbled { reason } => Loaded::garbled(good.clone(), reason),
-                Read::Loaded(loaded) => {
-                    good = loaded.value.clone();
-                    loaded
-                }
-            },
-            FileText::NotText(reason) => Loaded::garbled(good.clone(), reason),
-            FileText::Missing => {
-                good = D::default();
-                Loaded::default()
-            }
-        };
+        let (loaded, mut retry) = reread(&path, &mut good);
         if out.send(loaded).is_err() {
             return;
+        }
+        // A refused read raises no file event, so ask again with a growing wait, unless the
+        // file changes meanwhile (then the outer loop reads it). Only the answer that ends the
+        // refusal is published; the same refusal again tells nobody anything new.
+        let mut wait = RETRY_FIRST;
+        for _ in 0..RETRIES {
+            if retry == Retry::Done {
+                break;
+            }
+            futures_timer::Delay::new(wait).await;
+            if signals.has_changed() {
+                break;
+            }
+            wait = wait.saturating_mul(2);
+            let (again, next) = reread(&path, &mut good);
+            retry = next;
+            if retry == Retry::Done && out.send(again).is_err() {
+                return;
+            }
+        }
+    }
+}
+
+/// Whether a read should be asked again.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Retry {
+    /// The system refused the file: nothing will announce when it stops.
+    Later,
+    /// The file was read, or is gone, or is wrongly written (an edit will announce its fix).
+    Done,
+}
+
+/// The file at `path` as the watch publishes it, updating `good` when it read cleanly or is gone.
+fn reread<D: SettingsDoc + Send>(path: &std::path::Path, good: &mut D) -> (Loaded<D>, Retry) {
+    match file_text(path, SETTINGS_CAP) {
+        FileText::Text(text) => match read::<D>(&text, D::FORMAT) {
+            Read::Garbled { reason } => (Loaded::garbled(good.clone(), reason), Retry::Done),
+            Read::Loaded(loaded) => {
+                *good = loaded.value.clone();
+                (loaded, Retry::Done)
+            }
+        },
+        FileText::Unusable(reason) => (Loaded::garbled(good.clone(), reason), Retry::Later),
+        FileText::Missing => {
+            *good = D::default();
+            (Loaded::default(), Retry::Done)
         }
     }
 }

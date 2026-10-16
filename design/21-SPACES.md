@@ -218,7 +218,7 @@ directory) and over `R`, the place the app was left at in a Space.
   A Space with no `id` (a file written before the kit) takes its position, so the position-keyed
   `recall` and Today of such a file keep their meaning. Reading is lenient field by field (an unknown
   theme word is the default, dots are clamped, a missing grain is the preset's own, `current` is held
-  to a real Space); a file with no Space, or that is not JSON, is a first run.
+  to a real Space); a file with no Space, or that is not JSON, is a damaged file (`Origin::Damaged`): the app runs on a first run in memory, the file is left exactly as it was, and the first save moves it to `spaces.json.bad-<seconds>` before writing. Only a missing file is a first run that is written at once.
 - `link` is the Space's optional link to a desktop Space: an opaque string the kit stores and
   never reads inside. A file with no `link`, or one that is not a non-empty string, reads as
   unlinked; an unlinked Space writes no key. `SpaceLook::to_json` and `SpaceLook::from_json`

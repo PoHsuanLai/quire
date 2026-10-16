@@ -4,13 +4,15 @@
 //! A [`Store`] is one program's config directory. Every file in it is a [`SettingsDoc`]; there
 //! is no other load or save path.
 
+use crate::damaged::{Saved, keep_damaged};
 use crate::doc::SettingsDoc;
 use crate::error::SettingsError;
-use crate::lenient::{FileText, Loaded, Read, file_text, read};
+use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read};
 use crate::root::{AppName, ConfigRoot};
 use crate::watch::Watch;
 use ds_core::spawner::Spawner;
-use std::path::{Path, PathBuf};
+use ds_helpers::{NewFileMode, write_atomic};
+use std::path::PathBuf;
 
 /// One program's settings directory.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -41,17 +43,20 @@ impl Store {
         self.dir().map(|dir| dir.join(D::FILE.0))
     }
 
-    /// `D` as stored, or its defaults when there is no file or it cannot be read: a missing or
-    /// damaged file means the program looks as it did on first run, and a bad value costs only
-    /// its own key. What was refused or dropped is in the result, for the caller to report.
+    /// `D` as stored, or its defaults when there is no file or it cannot be used: a missing file
+    /// means the program looks as it did on first run, and a bad value costs only its own key.
+    /// A file that is there and cannot be used (not text, too big, not a regular file, refused
+    /// by the system) is left alone on disk: the defaults are for this run only, and the file is
+    /// reported in [`Loaded::invalid`] as wholly invalid. What was refused or dropped is in the
+    /// result, for the caller to report.
     pub fn load<D: SettingsDoc>(&self) -> Loaded<D> {
         let Some(path) = self.path::<D>() else {
             return Loaded::default();
         };
-        match file_text(&path) {
+        match file_text(&path, SETTINGS_CAP) {
             FileText::Text(text) => Self::decode(&text),
             FileText::Missing => Loaded::default(),
-            FileText::NotText(reason) => Loaded::garbled(D::default(), reason),
+            FileText::Unusable(reason) => Loaded::garbled(D::default(), reason),
         }
     }
 
@@ -66,18 +71,29 @@ impl Store {
 
     /// Write `doc` as its file, creating the directory if needed.
     ///
-    /// The bytes land in a temporary file beside it and are renamed into place, so a crash
-    /// mid-write cannot leave a half-written file, and a directory watch sees one rename rather
-    /// than a truncated one.
-    pub fn save<D: SettingsDoc>(&self, doc: &D) -> Result<(), SettingsError> {
+    /// The bytes land in a uniquely named temporary file beside it, are flushed, and are renamed
+    /// into place (see [`ds_helpers::write_atomic`]), so a crash mid-write cannot leave a
+    /// half-written file, two writers cannot tear one another's, and a directory watch sees one
+    /// rename rather than a truncated file. A symlinked settings file is written through.
+    ///
+    /// A file already there that cannot be used (see [`Store::load`]) or is not this document at
+    /// all is first moved aside to `<name>.bad-<seconds>`; [`Saved::kept_at`] says where.
+    pub fn save<D: SettingsDoc>(&self, doc: &D) -> Result<Saved, SettingsError> {
         let dir = self.require_dir()?;
-        let io = |path: &Path| {
-            let path = path.to_path_buf();
-            move |source| SettingsError::Io { path, source }
-        };
-        std::fs::create_dir_all(&dir).map_err(io(&dir))?;
+        std::fs::create_dir_all(&dir).map_err(|source| SettingsError::Io {
+            path: dir.clone(),
+            source,
+        })?;
         let path = dir.join(D::FILE.0);
-        write_atomic(&path, D::FORMAT.encode(doc)?.as_bytes())
+        let body = D::FORMAT.encode(doc)?;
+        let saved = keep_damaged(&path, SETTINGS_CAP, |text| {
+            match read::<D>(text, D::FORMAT) {
+                Read::Garbled { reason } => Err(reason),
+                Read::Loaded(_) => Ok(()),
+            }
+        })?;
+        write_atomic(&path, body.as_bytes(), NewFileMode::Umask)?;
+        Ok(saved)
     }
 
     /// Watch `D`'s file: every settled change is re-read whole. The watch runs as a task on
@@ -85,16 +101,4 @@ impl Store {
     pub fn watch<D: SettingsDoc + Send>(&self, spawn: &dyn Spawner) -> Watch<D> {
         Watch::start(self, spawn)
     }
-}
-
-/// Write `body` to `path` through a temporary file beside it and a rename, creating nothing
-/// else: the directory must exist.
-pub(crate) fn write_atomic(path: &Path, body: &[u8]) -> Result<(), SettingsError> {
-    let io = |path: &Path| {
-        let path = path.to_path_buf();
-        move |source| SettingsError::Io { path, source }
-    };
-    let tmp = path.with_extension("part");
-    std::fs::write(&tmp, body).map_err(io(&tmp))?;
-    std::fs::rename(&tmp, path).map_err(io(path))
 }

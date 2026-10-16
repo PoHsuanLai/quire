@@ -97,3 +97,33 @@ async fn a_file_that_is_not_toml_keeps_the_last_good_value_and_says_so() {
     assert_eq!(got.invalid.len(), 1, "{:?}", got.invalid);
     assert_eq!(got.invalid[0].path, "", "the whole file is the invalid key");
 }
+
+#[tokio::test]
+async fn a_file_the_system_refuses_keeps_the_last_good_value_and_comes_back() {
+    let scratch = Scratch::new();
+    let store = scratch.store();
+    store.save(&dark()).unwrap_or_else(|e| panic!("{e}"));
+    let mut watch = store.watch::<AppearanceFile>(&TestSpawner::current());
+    let path = scratch.app_dir().join("appearance.toml");
+    if !support::make_unreadable(&path) {
+        return;
+    }
+
+    // Taking the permissions away is an event: the file is re-read, refused, and the program
+    // keeps looking as it did instead of reverting to the defaults.
+    let refused = tokio::time::timeout(MARGIN, watch.changed())
+        .await
+        .unwrap_or_else(|_| panic!("the refusal was never reported"))
+        .unwrap_or_else(|| panic!("the watch stopped"));
+    assert_eq!(refused.value, dark());
+    assert_eq!(refused.invalid.len(), 1, "{:?}", refused.invalid);
+    assert_eq!(watch.current(), dark());
+
+    support::make_readable(&path);
+    let back = tokio::time::timeout(MARGIN, watch.changed())
+        .await
+        .unwrap_or_else(|_| panic!("the readable file was never re-read"))
+        .unwrap_or_else(|| panic!("the watch stopped"));
+    assert_eq!(back.value, dark());
+    assert!(back.invalid.is_empty(), "{:?}", back.invalid);
+}

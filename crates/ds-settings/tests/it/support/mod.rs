@@ -44,3 +44,40 @@ impl Drop for Scratch {
         let _ = std::fs::remove_dir_all(&self.0);
     }
 }
+
+/// Make a FIFO at `path`; `false` when the system has no `mkfifo` (the test then proves nothing
+/// and returns).
+pub fn make_fifo(path: &std::path::Path) -> bool {
+    std::process::Command::new("mkfifo")
+        .arg(path)
+        .status()
+        .is_ok_and(|status| status.success())
+}
+
+/// Take every permission from the file at `path`. `false` when that does not stop this process
+/// from reading it (it runs as root), so the test has nothing to prove.
+pub fn make_unreadable(path: &std::path::Path) -> bool {
+    use std::os::unix::fs::PermissionsExt;
+    std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o000)).is_ok()
+        && std::fs::File::open(path).is_err()
+}
+
+/// Give the file at `path` its ordinary permissions back.
+pub fn make_readable(path: &std::path::Path) {
+    use std::os::unix::fs::PermissionsExt;
+    let _ = std::fs::set_permissions(path, std::fs::Permissions::from_mode(0o644));
+}
+
+/// The names in `dir`, sorted.
+pub fn names(dir: &std::path::Path) -> Vec<String> {
+    let mut names: Vec<String> = std::fs::read_dir(dir)
+        .map(|entries| {
+            entries
+                .filter_map(Result::ok)
+                .map(|entry| entry.file_name().to_string_lossy().into_owned())
+                .collect()
+        })
+        .unwrap_or_default();
+    names.sort();
+    names
+}

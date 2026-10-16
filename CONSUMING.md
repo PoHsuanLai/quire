@@ -1845,14 +1845,20 @@ impl SettingsDoc for YourFile {
 }
 let store = Store::new(ConfigRoot::Xdg, AppName("your-app-id"));
 let loaded = store.load::<YourFile>();   // lenient: a bad key costs only itself; never fails
-store.save(&loaded.value)?;              // atomic temp-and-rename; drops unknown keys
+store.save(&loaded.value)?;              // durable atomic write; drops unknown keys; a damaged old file is kept as .bad
 let mut watch = store.watch::<YourFile>(&spawner);   // 30 ms debounce, a task on `spawner`
 ```
 
 `Loaded { value, unknown, invalid }` carries what the file held that did not become part of the
 value; `loaded.diagnostics(YourFile::FILE)` is one printable line per entry. A key nobody reads
 is reported and not preserved. `watch.changed().await` yields the whole re-read file as a
-`Loaded`, and keeps the last good value when the file is not valid text. Tests use
+`Loaded`, and keeps the last good value when the file is there and cannot be used (not text, too
+big, refused by the system); only a deleted file returns the defaults. A file that is there and
+cannot be used is never taken for a missing one and never overwritten: `load` gives the defaults for
+this run and reports the file in `invalid`, and `save` first moves it aside to `<name>.bad-<seconds>`
+(`Saved::kept_at` says where, so tell the person). Core crates that read or write the person's own
+files use `ds_helpers::{read_capped, read_text_capped, write_atomic, move_aside}` (std only, no UI).
+Tests use
 `ConfigRoot::Scratch(dir)`, never real XDG.
 
 **Settings derive, three more shapes.** Text is recognised by type (`String`, `PathBuf`,
@@ -2038,7 +2044,9 @@ rsx! {
 Arc-style tinted contexts (Work, Home...) are a kit every app shares; the app brings only its
 payload. The model is pure (`ds::components::app::spaces`: `Space<P>`, `Spaces<P, R>`, `Today<I, K>`), persistence is
 `ds_settings::SpacesStorage` (`spaces.json` in the config directory, `today.json` in the state
-directory, atomic, a corrupt file is a first run), and the views are `SpaceHead`, `SpacesFoot`,
+directory, atomic, readable by the person only; a missing file is a first run, a file that is there
+and cannot be used is `Origin::Damaged(..)`: the app runs on first-run Spaces in memory, nothing is
+written, and the first `save_spaces` keeps the old file as `spaces.json.bad-<seconds>`), and the views are `SpaceHead`, `SpacesFoot`,
 `SpaceMenu` and `TodaySection` (design/21 section 13). `P` is a struct (its keys sit flat beside the
 Space's own), `R` is the place the app was left at; both `Serialize + DeserializeOwned`.
 
@@ -2069,6 +2077,8 @@ rsx! { Ds { appearance, material, look: spaces.look(),
   closes a part with `close_menu` leaves `Showing::Edit` to the sheet, whose Escape is Cancel.
 - Hooks for an old file: `boot_spaces(raw_fix, first_run, on_load)` runs `raw_fix` on the parsed JSON
   (a one-time import) and `on_load` on the list (a payload fix-up); either changing it writes it back.
+  `load_spaces` answers `SpacesLoad::{Stored, Missing, Damaged}`. Tell the person about
+  `Origin::Damaged` (and `Saved::kept_at` from a save): their Spaces are in a file the app could not read.
 - Today: `use_today(|| storage.boot_today(Epoch::now()), save)` prunes on boot;
   `today.opened(space, item)`, `TodaySection { spaces, today, row, on_pick }`. A deleted Space is
   forgotten with `today.drop_space(id)` in `SpaceMenu`'s `on_deleted`.

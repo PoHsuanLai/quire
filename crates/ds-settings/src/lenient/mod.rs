@@ -14,8 +14,9 @@ mod wire;
 use crate::doc::{FileName, Format};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
+use std::collections::HashSet;
 use std::fmt;
-pub(crate) use text::{FileText, file_text};
+pub(crate) use text::{FileText, SETTINGS_CAP, file_text};
 use wire::{JsonWire, TomlWire, Wire};
 
 /// A settings file as read: the value, and everything in the file that did not become part of
@@ -121,6 +122,11 @@ pub(crate) enum Read<D> {
     },
 }
 
+/// The most keys one file may set. The reader lays them over the defaults one at a time, each
+/// time re-reading the whole tree, so its cost grows with the square of this; the largest real
+/// file is a few hundred keys.
+const MAX_LEAVES: usize = 4_000;
+
 /// `text` as a `D` in `format`, keeping every key that is valid and the default for every key
 /// that is not.
 pub(crate) fn read<D>(text: &str, format: Format) -> Read<D>
@@ -156,9 +162,16 @@ where
     let Some(mut tree) = W::encode(&D::default()) else {
         return Read::Loaded(Loaded::clean(D::default()));
     };
+    let leaves = W::leaves(&given);
+    if leaves.len() > MAX_LEAVES {
+        return Read::Garbled {
+            reason: format!("sets more than {MAX_LEAVES} keys"),
+        };
+    }
     let mut unknown: Vec<UnknownKey> = Vec::new();
+    let mut seen_unknown: HashSet<String> = HashSet::new();
     let mut invalid = Vec::new();
-    for (path, value) in W::leaves(&given) {
+    for (path, value) in leaves {
         let mut candidate = tree.clone();
         W::set(&mut candidate, &path, value);
         match W::decode::<D>(&candidate) {
@@ -168,9 +181,9 @@ where
             }),
             Ok(decoded) => match W::encode(&decoded) {
                 Some(stored) if !W::has(&stored, &path) => {
-                    let key = UnknownKey(unread_prefix::<W>(&stored, &path));
-                    if !unknown.contains(&key) {
-                        unknown.push(key);
+                    let prefix = unread_prefix::<W>(&stored, &path);
+                    if seen_unknown.insert(prefix.clone()) {
+                        unknown.push(UnknownKey(prefix));
                     }
                 }
                 _ => tree = candidate,

@@ -16,6 +16,31 @@ that rev.
 
 ## Open items
 
+- **Settings files keep no unknown keys or comments across a save (QUIRE-10).** `Store::save`
+  writes the typed document, so a key a newer quire rev added, and every TOML comment, is gone
+  after an older rev saves. Writers in one process queue behind a path lock, and a torn file is
+  impossible, but a read-modify-write across processes is still last-writer-wins. Needs an owner
+  decision: merge into the parsed tree (`toml_edit`) or accept the loss; a `flock` sidecar was
+  not added because `ds-helpers` takes no dependency beyond `std`.
+- **Agent-settable is not yet an allow-list (QUIRE-13).** Discovery now binds a schema to its app
+  and location, but a program's own schema may still mark `privacy.*`, `network.*` or `security.*`
+  keys settable: `AGENT_NEVER_SETTABLE` does not list them, and adding prefixes breaks a consumer
+  whose derive marks one. Needs an owner decision (enforce `AGENT_SETTABLE_PROPOSED` at read time,
+  or extend the deny prefixes) and a warning to sill and detent first.
+- **Watched directory deleted and recreated (QUIRE-18).** `Watch` starts its watcher before the
+  first read and re-reads on every event, but the inotify watch dies with a deleted directory
+  while `state()` stays `Live`. The portal and output watches still end silently on a bus error
+  (bus lane). Ends when `Watch` re-arms on a vanished directory and reports `Blind`.
+- **The password in a field is copied into the DOM value (QUIRE-22).** `Hidden` now wipes its
+  own memory on drop, but `ds-shell`'s `Entry` hands the secret to `TextField` as a `String`
+  prop. Ends when the secure field holds a wiping secret type instead of a `String`.
+- **The print fallback's PDF is not deleted when the viewer exits (QUIRE-11).** It is written
+  0600 in `$XDG_RUNTIME_DIR/quire-print` (else the temp directory), and the next print sweeps
+  files older than a day; `xdg-open` returns before the viewer has read it, so no earlier
+  delete is safe.
+- **Sibling `[patch]` for blitz-kit still in the root `Cargo.toml` (QUIRE-24).** CONVENTIONS wants
+  it in the work dir above the siblings; moving it needs a `.cargo/config.toml` outside this repo
+  and a `Cargo.lock` refresh against the pinned git rev.
 - **`WindowSizer::request_size` on Wayland (fixed on `lane/wayland-resize`, live check not run).**
   winit's `request_surface_size` returns `Some(size)` when the platform applied the size at once,
   and then emits no `SurfaceResized`; winit-wayland always returns `Some` (`window/state.rs`) and
@@ -1455,7 +1480,24 @@ the decisions and what was verified:
   not store back is reported in `Loaded::unknown` (cut at the first unknown table) and is gone
   after the next save; a value the struct refuses is in `Loaded::invalid`, and text that is not
   the format at all is one invalid key with an empty path. A watch keeps the last good value
-  when the file is not valid text.
+  when the file is there and cannot be used (not text, over the 1 MiB settings cap, not a regular
+  file, refused by the system); only a deleted file returns the defaults, and a refused read is
+  asked again after 250 ms and then at doubling waits, six times.
+- **A file that is there and cannot be used is never a missing file** (`ds-helpers::files`,
+  `ds-settings::damaged`). `read_capped` opens without blocking (`O_NONBLOCK` where its value is
+  known, plus a regular-file check before and after the open), refuses a file over the caller's
+  cap, and reports only `NotFound` as missing. `Store::load` and `SpacesStorage` give defaults for
+  that run and leave the file; `Store::save`, `save_spaces` and `save_today` move an unusable
+  file to `<name>.bad-<seconds>` (`-1`, `-2` when taken) before writing. `write_atomic` writes
+  a `.<name>.<pid>.<n>.tmp` beside the target, `sync_all`s it, renames, and syncs the directory;
+  it keeps the target's mode, writes through a symlink, and queues writers of one path in a
+  process behind a lock. Caps: settings 1 MiB and 4 000 keys, Spaces and Today 16 MiB, a schema
+  file 256 KiB. `spaces.json` and `today.json` are created 0600.
+- **Schema discovery trusts only what its location says** (QUIRE-13). A `<app>.settings.toml`
+  must declare that `app` and a `file` inside `<app>/`; the first schema found for an app wins and
+  `data_dirs()` lists the system directories before `$XDG_DATA_HOME`, so a user-dir schema can add
+  a program but not replace an installed one. The `agent = "settable"` mark is read only from the
+  admitted schema's `KeySpec::agent`.
 - **The portal's colour scheme** has three values (0 no preference, 1 dark, 2 light); no
   preference maps to Light.
 - **Types.** `Motion` is the preference (Standard or Reduced, default Standard, with a `label()`; the

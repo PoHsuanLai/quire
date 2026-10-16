@@ -28,8 +28,8 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-shell` | app-facing parts above `ds`, cross-platform: the account sheets and consent alert, the missing-helper sheet (its `Unsupported` phase shows the install command for the person's distro as a selectable line with a Copy button), the confirm card, with their sheets and `KIT`. The surfaces only our desktop shell draws live in sill's `sill-shell-kit` (see "Moved to sill" in section 3) |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings-page` | `SettingsPage`: a settings schema drawn as grouped rows with the control each key kind gets, and room for an app's own rows; its own crate because it needs `ds` and `ds-settings`, which may not name each other |
-| `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
-| `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family and its install command, `OsRelease` (the `ID`, `ID_LIKE` and `VERSION_ID` of an os-release text, which `Family::detect` is built on), the PackageKit installer (and a fake), the availability feed, and for a request nothing can install (no PackageKit, as on a stock Arch) the `Missing::install_lines` to copy |
+| `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save (a damaged file kept under a `.bad` name, never overwritten), watch, schema, appearance file, portal, icon-theme lookup |
+| `ds-helpers` | the safe file reader and writer every quire crate shares (`files`: `read_capped`, `read_text_capped`, `write_atomic`, `move_aside`; std only, no UI), and missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family and its install command, `OsRelease` (the `ID`, `ID_LIKE` and `VERSION_ID` of an os-release text, which `Family::detect` is built on), the PackageKit installer (and a fake), the availability feed, and for a request nothing can install (no PackageKit, as on a stock Arch) the `Missing::install_lines` to copy |
 | `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus`, `debug-probe` (a test build only: `QUIRE_DEBUG_PROBE=<dir>` makes each window write its controls by role and name with their boxes, `ds-blitz::probe`) |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
@@ -52,10 +52,10 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds` | `ds-intents`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-shell` | `ds`, `ds-motion`, `ds-style`, `ds-core` |
 | `ds-settings-page` | `ds` (the rows and controls), `ds-settings` (the schema types) |
-| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-settings-derive` |
+| `ds-settings` | `ds-style` (system prefs, appearance enums), `ds-core`, `ds-behaviour` (the switcher and hot-corner settings convert into its machine params), `ds-helpers` (the capped reader and durable writer, `files`), `ds-settings-derive` |
 | `ds-helpers` | nothing of ours |
 | `ds-desktop` | nothing of ours |
-| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `ds-desktop` (the shell's `Outputs` as data; feature `desktop-outputs` adds its D-Bus reading), `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
+| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `ds-helpers` (feature `spell`: the capped file reader), `ds-desktop` (the shell's `Outputs` as data; feature `desktop-outputs` adds its D-Bus reading), `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
 | `ds-gallery` | `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` (snapshots) |
@@ -101,7 +101,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-lint` | `rule` (`Rule`, `Severity`, `Profile`, `Exception`), `tokenize`, `walk`, `stylesheet` rules, `markup` rules, `hig`, `details`, `assert` |
 | `ds` | `host` (the seam traits: `DocumentHost`, `FocusHost`, `CaretHost`, `GeometryHost`, `ClickFocusHost`, `EditHost`, `ImeHost`, `FileDropHost`, `NoHost`, `HostSignals`) < `focus`, `edit`, `file_drop`, `keys` (the window's chordkit keymap), `machine` (re-exports `ds_motion::machine`), `spell`, `window` (hooks and pure logic over the seams) < `stack` (overlay stack, hover hub, toast hub, menu tracker, pull tab) < `root` (`Surface`, chrome, extent, typeface) < components `content` < `controls` < `overlays` < `forms` < `lists` < `fields` < `menus` < `editor` < `chrome` < `companion` < `app` (mail-only, named by nothing but `assembly`) < `assembly` (`Ds`, stylesheet, sheet registration) < `prelude`, `testing` |
 | `ds-shell` | `confirm`, `accounts` (`adapter` is the one file that reaches the components R2 makes controlled), `helpers` < `sheets` < `kit` < `prelude` |
-| `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `spaces_storage` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
+| `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `damaged` (`DamagedFile`, `Saved`: a file that is there and unusable is kept) < `doc` (`SettingsDoc`, `Format`, `FileName`) < `store` < `spaces_storage` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-settings-page` | `pair` (on/off words) < `control` (the control a kind gets), `words`, `edit` (`SettingEdit`, the value lookup), `groups` < `key_row`, `section` (`SectionRows`, `SchemaSection`) < `page` (`SettingsPage`) |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard`, `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, the fingers' glide for eased listeners, `ScrollHandle`), `window_fit` (the cap), `size_ledger`, `sized_window` < `window_sizer`, `screen_area` < `window_screen`, `startup_token`, `window_activate` (raising a window, with or without a token) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
 | `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
@@ -316,6 +316,7 @@ The single place a concept lives. Extend it; never write a second one.
 | The battery drawing | `ds::content::status::battery::BatteryGlyph`; device models in sill's `sill-shell-kit::battery` |
 | Widget contract, registry, placement data | sill's `sill-shell-kit::widget::{contract, registry}` and `catalog` |
 | Emoji: the grid / the picker sheet | `ds::lists::emoji_grid` / sill's `sill-shell-kit::emoji` |
+| Reading a person's file with a size cap and writing it durably (unique temp, `sync_all`, rename, directory fsync, mode kept, symlink followed, per-path lock), and keeping a damaged file under `<name>.bad-<seconds>` | `ds-helpers::files` (UI-free; `ds-settings` and `SpacesStorage` call it, and so should every core crate) |
 | Settings file I/O (lenient load, atomic save, watch) | `ds-settings::store::Store` |
 | Settings schema | `ds-settings::schema` (derived) |
 | Live (D-Bus) settings modules: schema, skeleton, proxy | `ds-settings::live` (feature `live`; the daemon owns the state) |
@@ -862,7 +863,8 @@ the components the design holds under `--s-8`, each with its reason; an app adds
   ./scripts/check-boundary.sh
   ./scripts/check-portable.sh .
   ./scripts/check-consumer.sh
-  cargo deny check licenses
+  ./scripts/check-release-features.sh
+  cargo deny check licenses bans sources
   ```
 
   `check-portable.sh .` builds `cargo check --workspace --no-default-features` and fails when a
@@ -873,6 +875,11 @@ the components the design holds under `--s-8`, each with its reason; an app adds
   `check-consumer.sh` builds, clippies (`-D warnings`) and tests `examples/consumer`, its own
   cargo workspace that `--workspace` does not reach, so `CONSUMING.md`'s snippets and coherence
   rules stay true to the public API.
+
+  `check-release-features.sh` fails when `ds-blitz/debug-probe` or `testing` is on in a normal
+  build of that consumer (features unify across a build, so one dependent that turns them on
+  ships them in every release binary). `cargo deny check advisories` runs wherever the advisory
+  database is reachable (a RUSTSEC entry or a yanked crate in the tree fails it).
 
 - **One module allowed `unsafe`:** `crates/ds-blitz/src/wayland_surface.rs` (`#![allow(unsafe_code)]`;
   Linux only), everywhere else `unsafe_code = "deny"` at the workspace. It holds two blocks, in
