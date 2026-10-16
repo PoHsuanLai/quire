@@ -104,8 +104,9 @@ blitz-shell = { git = "https://github.com/PoHsuanLai/blitz", rev = "5c7553665295
 dioxus-asset-resolver = { version = "0.7", features = ["native"] }
 webbrowser = "1.0"
 # The system clipboard's text/html, for an edit surface's paste (ds-blitz): blitz-shell's own
-# arboard (its `clipboard` feature, same features), read directly since ShellProvider has text only.
-arboard = { version = "3.6", default-features = false, features = ["wayland-data-control"] }
+# arboard (its `clipboard` feature), read directly since ShellProvider has text only. No
+# `wayland-data-control` here: quire does not use the privileged clipboard protocol (FINDINGS "Clipboard").
+arboard = { version = "3.6", default-features = false }
 
 # Dioxus 0.7.x (renderer-free core; mailo is on 0.7.10).
 dioxus = { version = "0.7", default-features = false, features = ["macro", "html", "hooks", "signals"] }

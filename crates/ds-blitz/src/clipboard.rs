@@ -9,7 +9,16 @@
 //!
 //! `text/html` (an edit surface's paste) is not in blitz's `ShellProvider`, so the window reads it
 //! from `arboard` itself and the harness from its memory clipboard's HTML slot.
+//!
+//! The system clipboard is another program's, asked at the moment of the paste, so a read does
+//! not run on the UI thread: it runs on a worker with a short wait and a size cap (`read`), and
+//! an owner that is slow, silent or enormous is read as an empty clipboard. quire asks for the
+//! selection with the window's own connection and does not use the privileged data-control
+//! protocol (FINDINGS "Clipboard"), which would let a client read the clipboard unfocused.
 
+mod read;
+
+use self::read::Reader;
 use crate::memory_shell::MemoryShell;
 use blitz_traits::shell::ShellProvider;
 use dioxus::prelude::*;
@@ -52,6 +61,8 @@ pub trait Clipboard {
 #[derive(Default)]
 pub struct System {
     shell: RefCell<Option<Arc<dyn ShellProvider>>>,
+    /// Runs each read off the UI thread, under a time and a size limit.
+    reader: Reader,
 }
 
 impl std::fmt::Debug for System {
@@ -74,11 +85,11 @@ impl System {
 impl Clipboard for System {
     fn read_text(&self) -> Option<String> {
         let shell = self.shell()?;
-        guarded(|| shell.get_clipboard_text().ok())
+        self.reader.text(move || shell.get_clipboard_text().ok())
     }
 
     fn read_html(&self) -> Option<Pasted> {
-        let html = guarded(|| {
+        let html = self.reader.text(|| {
             arboard::Clipboard::new()
                 .and_then(|mut clipboard| clipboard.get().html())
                 .ok()
@@ -155,8 +166,9 @@ fn host() -> Result<Rc<dyn Clipboard>, ClipboardError> {
         .ok_or(ClipboardError::NoHost)
 }
 
-/// Run a clipboard call, reading a panic as no answer: blitz-shell unwraps
-/// `arboard::Clipboard::new()`, which fails on a session with no clipboard at all.
+/// Run a clipboard write, reading a panic as no answer: blitz-shell unwraps
+/// `arboard::Clipboard::new()`, which fails on a session with no clipboard at all. (Reads go
+/// through [`Reader`], which runs them on a worker thread, where a panic ends only that thread.)
 fn guarded<T>(call: impl FnOnce() -> Option<T>) -> Option<T> {
     catch_unwind(AssertUnwindSafe(call)).ok().flatten()
 }

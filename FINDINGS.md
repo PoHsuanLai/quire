@@ -675,7 +675,10 @@ own caret and selection. The route needs no Blitz fork.
   factor); while captured the surface ignores its own `pointermove`/`pointerup`.
 - **Clipboard HTML.** `ShellProvider` has text only; the window reads `text/html` through arboard
   directly (`ds_blitz::clipboard::read_html()`). On Wayland arboard goes through XWayland, as
-  blitz-shell's text clipboard does (`wayland-data-control` is off in both).
+  blitz-shell's text clipboard does: quire does not use `wayland-data-control` (decided 2026-10-16,
+  production audit QUIRE-08; the workspace `arboard` asks for no features). The blitz fork's own
+  workspace still enables the feature for blitz-shell's arboard, so the lock keeps `wl-clipboard-rs`
+  until the fork drops it (an ask to the blitz fork, see "Clipboard" below).
 - **Stacking with an app's layers follows CSS 2.1 Appendix E** here: a positioned (z-index auto)
   block paints over an earlier absolute layer, a static block under it, and a `z-index: -1` layer
   goes under its container's background when the container makes no stacking context. For a
@@ -912,6 +915,21 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
 - dioxus-native's `clipboard` feature is on (blitz-shell over arboard 3.6), so Ctrl+C/X/V work in
   every field of a `launch` window. The app's calls answer `NoHost` outside a ds-blitz document,
   or `Unavailable`. The harness keeps an in-memory clipboard with an HTML slot.
+- **No data-control (2026-10-16, QUIRE-08).** quire reads and writes the clipboard as a client with
+  a window, never through `zwlr`/`ext` data-control, which would let a background client read it:
+  so casement need not offer that protocol to every app for quire apps to paste. The cost is that
+  arboard reaches the Wayland selection through XWayland. The workspace `arboard` has no features;
+  blitz-shell's arboard (in the blitz fork's workspace, `features = ["wayland-data-control"]`)
+  still turns it on in the build, so **ask to the blitz fork:** drop `wayland-data-control` from
+  `arboard` in the fork's root `Cargo.toml` (the fork commit 15ead74d added it), after which the
+  lock loses `wl-clipboard-rs`. Until then the build contains the backend but quire's own reads do
+  not depend on it.
+- **Reads are bounded (QUIRE-08).** `ds_blitz::clipboard` reads on a worker thread (`clipboard/read.rs`):
+  the UI waits at most 500 ms, takes at most 16 MiB, and starts no second read while one is stuck.
+  An owner that is slow, silent or huge reads as an empty clipboard. Still open: the `EditHost::paste`
+  seam is synchronous, so a paste still holds the UI for up to those 500 ms, and blitz-shell's own
+  Ctrl+V inside a text field reads on the UI thread with no bound (the same fork, same ask: read
+  on a worker with a deadline). An async paste seam is the full fix and is not done.
 
 ### Cold start of the first window
 
