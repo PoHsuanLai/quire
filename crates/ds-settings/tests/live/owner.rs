@@ -87,7 +87,7 @@ fn not_the_service<T>(answer: Result<T, LiveError>) -> bool {
 
 #[tokio::test]
 async fn a_refused_owner_is_sent_nothing_and_no_secret() {
-    let bus = PrivateBus::start("refused");
+    let bus = PrivateBus::start("owner-refused");
     let daemon = bus.connect().await;
     let settings = bus.connect().await;
     daemon.request_name(NAME).await.expect("name");

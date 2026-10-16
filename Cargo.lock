@@ -1708,6 +1708,7 @@ dependencies = [
  "pdfrum-anyrender",
  "pdfrum-common",
  "pdfrum-edit",
+ "peephole-bus",
  "peniko",
  "raw-window-handle",
  "serde",
@@ -4181,6 +4182,38 @@ dependencies = [
  "pdfrum-common",
  "read-fonts 0.44.0",
  "thiserror 2.0.21",
+]
+
+[[package]]
+name = "peephole"
+version = "0.1.1"
+source = "git+https://github.com/PoHsuanLai/peephole?tag=v0.1.1#e1b1b6adaff180516f198cf5435e85e4dc36e971"
+dependencies = [
+ "peephole-core",
+ "rustix",
+ "thiserror 2.0.21",
+]
+
+[[package]]
+name = "peephole-bus"
+version = "0.1.1"
+source = "git+https://github.com/PoHsuanLai/peephole?tag=v0.1.1#e1b1b6adaff180516f198cf5435e85e4dc36e971"
+dependencies = [
+ "futures-timer",
+ "peephole",
+ "peephole-core",
+ "thiserror 2.0.21",
+ "zbus",
+]
+
+[[package]]
+name = "peephole-core"
+version = "0.1.1"
+source = "git+https://github.com/PoHsuanLai/peephole?tag=v0.1.1#e1b1b6adaff180516f198cf5435e85e4dc36e971"
+dependencies = [
+ "serde",
+ "thiserror 2.0.21",
+ "toml",
 ]
 
 [[package]]

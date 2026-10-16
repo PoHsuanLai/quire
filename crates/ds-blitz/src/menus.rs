@@ -192,7 +192,14 @@ fn request_name(
     let reply = zbus::block_on(connection.inner().request_name_with_flags(
         address.service.as_str(),
         RequestNameFlags::DoNotQueue.into(),
-    ))?;
+    ));
+    // zbus reports a taken name as its own error, not as an `Exists` reply.
+    let reply = match reply {
+        Err(zbus::Error::NameTaken) => {
+            return Err(MenuExportError::NameTaken(address.service.clone()));
+        }
+        other => other?,
+    };
     match reply {
         RequestNameReply::PrimaryOwner | RequestNameReply::AlreadyOwner => Ok(()),
         RequestNameReply::InQueue | RequestNameReply::Exists => {

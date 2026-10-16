@@ -80,7 +80,7 @@ wayland-protocols = { workspace = true, optional = true }
 # `menus::ShellOnly` (the `peephole` feature): which program is calling, by its pidfd and the unit
 # manager's facts. Its own repo, taken by tag; Linux only, because it reads `/proc` and the system
 # manager's bus. `desktop` adds the desktop's role names.
-peephole-bus = { git = "https://github.com/PoHsuanLai/peephole", tag = "v0.1.0", features = ["desktop"], optional = true }
+peephole-bus = { git = "https://github.com/PoHsuanLai/peephole", tag = "v0.1.1", features = ["desktop"], optional = true }
 
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 # The fake compositor `xdg_activation`'s tests talk to.
