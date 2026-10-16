@@ -1502,7 +1502,7 @@ returns to `Ask` or closes, `Failed` / `NotFound` / `Unsupported` show their pha
 the first candidate package, `Unsupported` the first probe executable: take them from the `Missing` in the outcome).
 `Unsupported.command` is `Option<String>`: pick the one `install_lines` entry for the person's distro
 family and pass its `.text()` (`None` when the list is empty, or when you cannot tell which family
-is theirs). With `Some`, the sheet shows it as a selectable line with a Copy button: give
+is theirs). With `Some`, the sheet says to run it in Terminal (the person's computer cannot install it for them, as on a stock Arch with no PackageKit) and shows it as a selectable line with a Copy button: give
 `HelperSheet` / `HelperBody` an `on_copy: EventHandler<String>` (default: nothing) that writes the
 clipboard (`ds_blitz::clipboard::write_text`; ds-shell does not depend on ds-blitz) and a
 `copy: CopyState` (`ds_shell::accounts::model::CopyState`, default `Idle`; set `Copied` after you copied, as `BrowserWait` does) so the

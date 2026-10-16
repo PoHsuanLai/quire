@@ -1978,3 +1978,32 @@ Lane `q-barasks`, written without a build: nothing here has been compiled or run
   `SpaceTile::new(..).backdrop(ImageSource::file(&wallpaper_path)?)` (or `ImageSource(url)` for the URL it has now); build the
   `BarLayout` sill publishes from `l.spaces[i].card` (the cards) and `l.add` (the plus), adding the output's origin, in place of the
   computed rectangles. The `use_rect` on the bar element in `io.rs` is still needed for the bar's own box if the host wants it.
+
+## q-d25
+
+Lane `q-d25`, written without a build: nothing here has been compiled or run, so the gate decides. Answers distro audit row D25
+(`~/rs-wt/distro-audit/REPORT.md`): on Arch there is no PackageKit, `packagekit_absent.rs` answers `Outcome::Unsupported`, and the person had no
+way forward.
+
+- **Found already landed.** Commit `a781b8b2` (before this lane) had added the whole mechanism: `Missing::install_lines` (`InstallLine`, built
+  from `Family::install_command()` and the first candidate of the helpers file, so no distro is hardcoded and an unknown distro lists every
+  family), `HelperPhase::Unsupported { program, command: Option<String> }`, the `CommandLine` part (selectable data-face line plus the existing
+  `CopyAction`, the one copy path ds-shell has: the host writes the clipboard and says `CopyState::Copied`), and an `ds-helpers` test row
+  "arch without a way to install". This lane found that and changed no type.
+- **What this lane changed.** The words, the fixtures and the docs. With a command the body now reads "Run this in Terminal to install it
+  yourself, then try again:" (before: "Install a package that provides ... for example with this command:", which did not say the computer could
+  not do it and did not say where to run it). No PackageKit, D-Bus or protocol name is shown; the title is still "{app} cannot install {tool}
+  here". The command fixtures were `sudo apt install wl-clipboard` for a tool called mpv; they are now `sudo pacman -S mpv`, the Arch case.
+  The gallery's "Unsupported with a command" section shows the Idle sheet (light) and the Copied sheet (dark).
+- **Unchanged on purpose.** `HelperPhase::Unsupported` without a command (a family the file has no package for) keeps "Install a package that
+  provides ..., then try again."; `NotFound` never shows a command (the package manager said no candidate exists, so the command would fail);
+  rpm-ostree images keep their own `Failed` answer from the PackageKit backend.
+- **Public API.** No public item changed shape in this lane. The shape anyview must already match (from `a781b8b2`): `HelperPhase::Unsupported`
+  has the extra field `command: Option<String>`; `HelperBody` / `HelperSheet` gained props `on_copy: EventHandler<String>` and `copy: CopyState`
+  (both default).
+- **Goldens, hand-edited, to confirm on bless.** `ds-shell/tests/snapshots/helpers/unsupported-command-{light,dark}.html` (new body text and
+  command); new `unsupported-copied-{light,dark}.html` (the same with the label `Copied`), written by hand from the first pair.
+- **Test cut.** The Copied label is asserted inside the existing `an_unsupported_system_with_a_command_...` test through one new specimen, not as
+  a new test function. No test became redundant.
+- **Open.** A host with an unknown distro (several `install_lines`) passes `command: None`; showing every family's line is possible but was not
+  asked for. `Missing` does not carry the `Family`, so a host picking one line out of several needs `Helpers::family()`.

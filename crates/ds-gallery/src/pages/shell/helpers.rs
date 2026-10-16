@@ -7,12 +7,19 @@ use crate::wallpaper;
 use dioxus::prelude::*;
 use ds::assembly::ds::Inject;
 use ds::prelude::*;
+use ds_shell::accounts::model::CopyState;
 use ds_shell::helpers::model::HelperPhase;
 use ds_shell::prelude::*;
 
 fn sheet(phase: HelperPhase) -> Element {
     rsx! {
         HelperSheet { app: "Anyview", tool: "mpv", purpose: "play videos", phase, on_install: |_| {}, on_dismiss: |_| {} }
+    }
+}
+
+fn copied(phase: HelperPhase) -> Element {
+    rsx! {
+        HelperSheet { app: "Anyview", tool: "mpv", purpose: "play videos", phase, on_install: |_| {}, on_dismiss: |_| {}, copy: CopyState::Copied }
     }
 }
 
@@ -38,16 +45,16 @@ pub fn HelpersPage() -> Element {
                 Stage { theme: Theme::Dark, body: sheet(HelperPhase::Failed { reason: "The network is unreachable, so the package could not be downloaded.".to_owned() }) }
             }
         }
-        Section { title: "Not found and unsupported", note: "NotFound: no software source has the package; the sheet names the package to look for. Unsupported: this system cannot install from here (an unknown distro, or no PackageKit); it names the program a package must provide, and without a command that is all it says.",
+        Section { title: "Not found and unsupported", note: "NotFound: no software source has the package; the sheet names the package to look for. Unsupported: this system cannot install from here (an unknown distro, or no installer service); it names the program a package must provide, and without a command that is all it says.",
             div { class: "g-row g-row-top",
                 Stage { theme: Theme::Light, body: sheet(HelperPhase::NotFound { package: "mpv".to_owned() }) }
                 Stage { theme: Theme::Dark, body: sheet(HelperPhase::Unsupported { program: "mpv".to_owned(), command: None }) }
             }
         }
-        Section { title: "Unsupported with a command", note: "Unsupported with a command: the host picks the one install line for the person's distro family; the sheet shows it as a selectable line in the data face with a Copy button beside it (the host writes the clipboard, and tells the sheet when it has, so the button says Copied).",
+        Section { title: "Unsupported with a command", note: "Unsupported with a command (a stock Arch, which has no one-click installer): the host picks the one install line for the person's distro family from the package names the app's helpers file gives; the sheet says the computer cannot install it, shows the line selectable in the data face, and a Copy button beside it. The host writes the clipboard and tells the sheet when it has, so the button then says Copied (right).",
             div { class: "g-row g-row-top",
-                Stage { theme: Theme::Light, body: sheet(HelperPhase::Unsupported { program: "mpv".to_owned(), command: Some("sudo apt install wl-clipboard".to_owned()) }) }
-                Stage { theme: Theme::Dark, body: sheet(HelperPhase::Unsupported { program: "mpv".to_owned(), command: Some("sudo apt install wl-clipboard".to_owned()) }) }
+                Stage { theme: Theme::Light, body: sheet(HelperPhase::Unsupported { program: "mpv".to_owned(), command: Some("sudo pacman -S mpv".to_owned()) }) }
+                Stage { theme: Theme::Dark, body: copied(HelperPhase::Unsupported { program: "mpv".to_owned(), command: Some("sudo pacman -S mpv".to_owned()) }) }
             }
         }
     }
