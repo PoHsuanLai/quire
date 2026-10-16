@@ -12,6 +12,7 @@ members = [
   "crates/ds-settings",
   "crates/ds-helpers",
   "crates/ds-desktop",
+  "crates/ds-peer",
   "crates/ds-shell",
   "crates/ds-settings-page",
   "crates/ds-settings-derive",
@@ -45,6 +46,7 @@ ds-behaviour       = { path = "crates/ds-behaviour" }
 ds-settings        = { path = "crates/ds-settings", default-features = false }
 ds-helpers         = { path = "crates/ds-helpers", default-features = false }
 ds-desktop         = { path = "crates/ds-desktop" }
+ds-peer            = { path = "crates/ds-peer" }
 ds-shell           = { path = "crates/ds-shell" }
 ds-settings-page   = { path = "crates/ds-settings-page" }
 ds-core-derive     = { path = "crates/ds-core-derive" }

@@ -1,0 +1,22 @@
+[package]
+name = "ds-peer"
+description = "A deadline for a call to another process, and the typed error for a peer that did not answer in time."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+# A wall-clock delay on its own timer thread, so the deadline works under any executor (zbus's
+# own, tokio, a test's block_on).
+futures-timer = { workspace = true }
+
+[lints]
+workspace = true
+
+[dev-dependencies]
+# The tests' runtime; the crate itself names none.
+tokio = { workspace = true }

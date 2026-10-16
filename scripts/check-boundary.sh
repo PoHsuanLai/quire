@@ -18,7 +18,7 @@ cd "$(dirname "$0")/.."
 # compositor runs too, so like ds-core it reaches no Dioxus and no renderer. ds is renderer-free
 # and effect-free; ds-settings does I/O but never renders, and takes a Spawner instead of naming a
 # runtime. ds-helpers (missing helpers: probe PATH, ask PackageKit) is I/O too: zbus only, no
-# renderer, no runtime, no other quire crate.
+# renderer, no runtime, and no quire crate but ds-peer (the deadline on each call to a peer).
 # chordkit (the keymap core) is pure and ds-core and ds take it; its I/O sources (chordkit-kde, chordkit-gnome
 # read a settings file) are named by ds-blitz alone, which injects them as the launch's default KeySource.
 # ds-desktop (the capability probe) names zbus only through its opt-in `dbus` feature and dioxus
@@ -47,6 +47,7 @@ RULES=(
   "ds-desktop: zbus dioxus tokio blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-blitz: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
   "ds-harness: zbus memfd pdfrum-anyrender pdfrum pdfrum-edit"
+  "ds-peer: zbus notify tokio winit dioxus blitz blitz-dom blitz-paint blitz-traits blitz-html blitz-net blitz-shell stylo_taffy dioxus-native dioxus-native-dom anyrender anyrender_vello anyrender_vello_cpu anyrender_vello_hybrid anyrender_skia anyrender_svg pdfrum-anyrender pdfrum-edit wgpu wgpu_context"
   "ds-core-derive: dioxus zbus tokio"
   "ds-settings-derive: dioxus zbus tokio"
 )
@@ -89,11 +90,12 @@ EDGES=(
   "ds-behaviour: ds-core"
   "ds: ds-core ds-intents ds-motion ds-style"
   "ds-shell: ds ds-core ds-motion ds-style"
-  "ds-settings: ds-behaviour ds-core ds-helpers ds-style ds-settings-derive"
+  "ds-settings: ds-behaviour ds-core ds-helpers ds-peer ds-style ds-settings-derive"
   "ds-settings-page: ds ds-settings"
-  "ds-helpers:"
-  "ds-desktop:"
-  "ds-blitz: blitz-kit ds ds-desktop ds-helpers"
+  "ds-peer:"
+  "ds-helpers: ds-peer"
+  "ds-desktop: ds-peer"
+  "ds-blitz: blitz-kit ds ds-desktop ds-helpers ds-peer"
   "ds-harness: blitz-kit ds ds-blitz ds-core"
   "ds-gallery: ds ds-core ds-harness ds-lint ds-blitz ds-settings ds-shell"
   "ds-conformance:"
