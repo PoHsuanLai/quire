@@ -3,6 +3,37 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## Unreleased
+
+Not tagged. Consumers pick this up with the next re-pin; the lock gains `toml_edit` for ds-settings
+and `rustix` (Unix) for ds-helpers, both already resolved in the tree.
+
+**ds-helpers**
+- `update_atomic(path, cap, new_file, edit)` and `UpdateError<E>` (`Read`, `Edit`, `Write`; non-exhaustive)
+  are new: read the file as text under a cap, let `edit(Option<String>) -> Result<String, E>` produce
+  the new text, publish it as `write_atomic` does. Writers in the process queue on the path and
+  writers in other programs on an `flock` of the sidecar `.<name>.lock` beside the file (0600, left in
+  place; a holder that does not let go in five seconds makes the update fail with `TimedOut`).
+  Do not call `write_atomic` or `update_atomic` for the same path from inside `edit`.
+
+**ds-settings**
+- `Store::save` of a TOML file now merges into the file already there (format preserving): keys the
+  type does not read and every comment stay, a changed value keeps its spacing and trailing comment,
+  and a key the type owns and no longer writes is removed. A new file and the JSON and CSS stores
+  are written as before; a damaged file is still moved aside (`Saved::kept_at`). A save leaves a
+  `.<name>.lock` file beside the settings file.
+- `ds_settings::xdg` is public: `base_dir(xdg, home, under_home)` and the `CONFIG_HOME_UNDER_HOME`,
+  `STATE_HOME_UNDER_HOME` and `DATA_HOME_UNDER_HOME` constants.
+- `AGENT_NEVER_SETTABLE` gains `privacy.`, `network.` and `security.`. A schema that marks a key under
+  one of them agent-settable is refused (`Schema::from_toml`, `LiveSchema::check`) or fails to
+  compile (the derive). Programs whose schemas do must drop the mark.
+- `Loaded::unknown`'s `Display` no longer says the key is "not kept".
+
+**ds**
+- `Alert { on_dismiss: Option<EventHandler<()>> }`: while set, Escape (and the sheet closing by any
+  way but a button) calls it and presses no button, so a dismissal is told apart from the Cancel
+  button. Unset, Escape presses the Cancel button as before.
+
 ## v0.3.28
 
 Consumers re-pin once. Cargo.lock files are refreshed by whoever bumps the pin.
