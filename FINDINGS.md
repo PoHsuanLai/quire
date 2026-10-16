@@ -2110,3 +2110,31 @@ apps (first detent's Settings, "install llama.cpp" with a copyable command) reus
   the `ds` type (same path, same variants). Removed: nothing public.
 - **Open.** `Helpers` does not hand out its os-release text or `OsRelease`; detent reads the file itself or `Helpers` grows an accessor
   (not asked for here).
+
+## Peers: deadlines, who is believed, who hears (production audit, lane pa-qbus, 2026-10-16)
+
+- **One deadline helper: `ds-peer`.** `Deadline` (`READ` 10 s, `START` 3 s, `ACTION` 30 s, `PROMPT` 10 min), `within(deadline,
+  peer, work)` and the typed `NotAnswering` ("The package manager is not answering"). Used by ds-helpers (PackageKit), ds-settings (the
+  live client, the portal read), ds-desktop (probe, `Outputs`) and ds-blitz (print portal). The values are the audit's (10 s reads,
+  30 s actions); the owner has not confirmed them. A new peer call takes one of the four, never a bare `Duration`.
+- **PackageKit (QUIRE-05, 06).** The match rule names PackageKit's unique name (from the `CreateTransaction` reply) and `apply` checks the
+  sender again; a `NameOwnerChanged` watch ends the wait if PackageKit disconnects; a quiet transaction is cancelled. `Resolve` ignores any
+  id whose name is not the one asked for. Not answering is `Outcome::Failed("The package manager is not answering")`, **not a new variant**:
+  `Outcome` is matched exhaustively by anyview, so a `NotAnswering` variant waits for a wave that updates it.
+- **`Changed` (QUIRE-04): unicast, not key-only.** The signature stays `(s, v)` (design/22 section 9.4, frozen) and accountd's
+  `Served::changed(key, value)` keeps working: the skeleton sends the signal by unique name to the peers `permit(Read)` let read (a
+  `Describe`, `Get` or `Snapshot`; `LiveClient::changes` makes one), never as a broadcast. `permit` is not asked again at emission, so a
+  peer whose role is withdrawn mid-session keeps hearing until it leaves. On a session bus that allows eavesdropping (the stock
+  `dbus-daemon` policy; `dbus-broker` has none) a process can still watch unicast traffic: the session bus is one trust domain, and this
+  closes the match-rule route, not a hostile monitor. A raw `SettingsModule1Proxy` user must read once before it listens.
+- **Clients take signals from the owner only.** zbus's proxy signal streams filter on the destination's current unique name, so
+  `LiveClient::changes`, the portal's `SettingChanged` and the print portal's `Response` are sender-checked; PackageKit used a raw match
+  rule and now checks by hand.
+- **`use_environment` (QUIRE-07).** The file is published and watched first; `SystemPrefsWatch::start` subscribes to `SettingChanged`
+  before it reads, on one connection, and a portal that does not answer within `START` is the defaults. `start` still awaits its first
+  read (casement and anyview call it), so only `use_environment` stopped waiting.
+- **Not done.** QUIRE-03 and QUIRE-12 (caller identity for menus) wait for the shared identity design. QUIRE-25's owner check (is the holder
+  of `org.quire.Outputs1` sill?) belongs with sill; quire now drops rows with no size or no scale and caps the list at 16. The dbusmenu
+  `RequestName` in `ds-blitz::menus` is a call to the bus daemon itself and has no deadline. The frame-link channel (QUIRE-21) is still
+  unbounded. detent's half of DETENT-07 (feeding `Failed` on `LiveError::Timeout`, awaiting `invoke` off the effect loop) and the same
+  convention in porter-dbus are theirs.
