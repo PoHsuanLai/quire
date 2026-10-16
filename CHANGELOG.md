@@ -3,9 +3,9 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
-## Unreleased
+## v0.3.29
 
-Not tagged. Consumers pick this up with the next re-pin; the lock gains `toml_edit` for ds-settings
+Consumers re-pin once; the lock gains `toml_edit` for ds-settings
 and `rustix` (Unix) for ds-helpers, both already resolved in the tree.
 
 Production audit, wave 2 (QUIRE-03, QUIRE-12 library side, DETENT-05). Two signatures change, so
@@ -35,7 +35,7 @@ optional `peephole` feature only.
   a name that is taken is `MenuExportError::NameTaken(name)` and nothing is exported.
 - `EventGroup` carries at most 64 events a call (`InvalidArgs`) and a sender may make 8 calls a
   second (`LimitsExceeded`).
-- New optional dependency `peephole-bus` (git tag v0.1.0, Linux only) behind feature `peephole`.
+- New optional dependency `peephole-bus` (git tag v0.1.1, Linux only) behind feature `peephole`.
 
 **ds-helpers**
 - `update_atomic(path, cap, new_file, edit)` and `UpdateError<E>` (`Read`, `Edit`, `Write`; non-exhaustive)
