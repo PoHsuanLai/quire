@@ -8,6 +8,35 @@ first, with what a consumer has to change.
 Not tagged. Consumers pick this up with the next re-pin; the lock gains `toml_edit` for ds-settings
 and `rustix` (Unix) for ds-helpers, both already resolved in the tree.
 
+Production audit, wave 2 (QUIRE-03, QUIRE-12 library side, DETENT-05). Two signatures change, so
+consumers adapt once on re-pinning; the lock gains `peephole-bus` (and its deps) for `ds-blitz`'s new
+optional `peephole` feature only.
+
+**ds-settings**
+- `LiveClient::new(connection, destination, path, check: impl OwnerCheck)` is now synchronous (it
+  touches the bus on first use) and takes the check as a required argument. Before the first read or
+  `Set`, and again whenever the name's owner is a different connection, the client asks
+  `OwnerCheck::holds_role(name, owner)`; a refused owner is the new `LiveError::NotTheService` and
+  nothing is sent to it (a typed secret never reaches a squatter). Calls then go to the owner that
+  passed by its unique name. `OwnerCheck`, `OwnerAnswer` and (feature `testing`) `AnyOwner` are new.
+- The client refuses replies over `ds_settings::live::limits`: a schema over `SCHEMA_JSON_MAX`
+  (1 MiB), `KEYS_MAX` (1024) keys, `TEXT_MAX` (2048 bytes) per path, label, help, note or section,
+  `CHOICES_MAX` (512) choices; a value over `VALUE_TEXT_MAX` (8 KiB) or `VALUE_ITEMS_MAX` (512) items.
+  The refusal is `LiveError::Failed("The service sent more than a settings page can show.")`.
+- New feature `testing` (implies `live`); the `live` test binary needs it.
+
+**ds-blitz** (feature `menus`)
+- `MenuExport::start(config, tree, on_activate, permit: impl MenuPermit)`: the permit is required.
+  `MenuPermit::permit(&Caller) -> Verdict` is asked before every `Event` and `EventGroup`; a message
+  with no sender or a refused caller gets `AccessDenied`. Reads stay open. New: `Caller`,
+  `SenderName`, `Verdict`, `MenuPermit`; with feature `peephole` (Linux) `ShellOnly::new(Arc<BusPeers>)`
+  (role `shell` at the full proof); with `testing` `AllowAnyCaller`.
+- The menu's name is requested with `DoNotQueue`. `NameOutcome` and `MenuExport::name()` are gone;
+  a name that is taken is `MenuExportError::NameTaken(name)` and nothing is exported.
+- `EventGroup` carries at most 64 events a call (`InvalidArgs`) and a sender may make 8 calls a
+  second (`LimitsExceeded`).
+- New optional dependency `peephole-bus` (git tag v0.1.0, Linux only) behind feature `peephole`.
+
 **ds-helpers**
 - `update_atomic(path, cap, new_file, edit)` and `UpdateError<E>` (`Read`, `Edit`, `Write`; non-exhaustive)
   are new: read the file as text under a cap, let `edit(Option<String>) -> Result<String, E>` produce

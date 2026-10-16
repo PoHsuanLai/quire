@@ -22,6 +22,23 @@ that rev.
   settable; `AGENT_SETTABLE_PROPOSED` stays a proposal that tests check). A consumer whose schema
   marks a key under one of the three new prefixes agent-settable now fails to compile (derive) or
   to load (`Schema::from_toml`, `LiveSchema::check`); sill and detent must be told before they re-pin.
+- **Menu export and owner check: what is not covered (QUIRE-03, QUIRE-12, DETENT-05; production audit
+  wave 2, 2026-10-16).** `MenuExport::start` takes a required `MenuPermit` and `LiveClient::new` a required
+  `OwnerCheck`; both policies belong to the consumer (the desktop's are peephole roles: `ShellOnly`
+  for menus, detent's `BusPeers` check for the live modules). Deferred or decided here:
+  (1) reads of the menu (`GetLayout`, `GetGroupProperties`, `GetProperty`, `AboutToShow`) are not
+  gated: the layout is what the window already shows, and the shell's bar reads it; (2) a single
+  `Event` is gated but not paced (the permit is what bounds it; only `EventGroup` has the 8-a-second
+  limit the audit asked for); (3) the focused-app check (the menu's owner is the focused window's
+  app, QUIRE-12 sill side) is sill's; (4) a second copy of an app no longer queues for the menu name
+  and shows no menu in the bar: its `start` fails with `NameTaken` and the app decides (run without a
+  menu, or exit); (5) `LiveClient` caps `Describe`/`Snapshot`/`Get`/`Changed` replies
+  (`ds_settings::live::limits`), but detent's own `Holds`/`NeedsConfirmation` parsing (Sync1) is
+  detent's to cap; (6) the first check after a name changes hands costs one `GetNameOwner` on every
+  call (the owner is looked up each time so a name that moved is never trusted for one call), and a
+  refused owner is asked again on every call, not cached; (7) `ShellOnly` has no test of its own in
+  quire (peephole's `fake` seam would need a second feature); its logic is one `require` call. The
+  values of the caps (64, 8, 1024 and the rest) are ours; the owner has not confirmed them.
 - **Watched directory deleted and recreated (QUIRE-18).** `Watch` starts its watcher before the
   first read and re-reads on every event, but the inotify watch dies with a deleted directory
   while `state()` stays `Live`. The portal and output watches still end silently on a bus error
@@ -2143,7 +2160,7 @@ apps (first detent's Settings, "install llama.cpp" with a copyable command) reus
 - **`use_environment` (QUIRE-07).** The file is published and watched first; `SystemPrefsWatch::start` subscribes to `SettingChanged`
   before it reads, on one connection, and a portal that does not answer within `START` is the defaults. `start` still awaits its first
   read (casement and anyview call it), so only `use_environment` stopped waiting.
-- **Not done.** QUIRE-03 and QUIRE-12 (caller identity for menus) wait for the shared identity design. QUIRE-25's owner check (is the holder
+- **Not done.** (QUIRE-03 and QUIRE-12's library side landed in wave 2: see Open items.) QUIRE-25's owner check (is the holder
   of `org.quire.Outputs1` sill?) belongs with sill; quire now drops rows with no size or no scale and caps the list at 16. The dbusmenu
   `RequestName` in `ds-blitz::menus` is a call to the bus daemon itself and has no deadline. The frame-link channel (QUIRE-21) is still
   unbounded. detent's half of DETENT-07 (feeding `Failed` on `LiveError::Timeout`, awaiting `invoke` off the effect loop) and the same
