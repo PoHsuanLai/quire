@@ -70,7 +70,7 @@ pub(crate) struct LinkOpener {
 
 impl LinkOpener {
     pub(crate) fn new(failed: LinkFailureHandler) -> LinkOpener {
-        LinkOpener::with(failed, |href| webbrowser::open(href))
+        LinkOpener::with(failed, webbrowser::open)
     }
 
     fn with(failed: LinkFailureHandler, open: Open) -> LinkOpener {
