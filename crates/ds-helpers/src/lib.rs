@@ -1,3 +1,9 @@
+//! Missing helpers, and the safe file reader and writer every quire crate shares.
+//!
+//! The file half ([`read_capped`], [`write_atomic`], [`move_aside`]) is UI-free: it needs only
+//! `std`, so a core crate with no window, bus or runtime can read and write a person's files with
+//! the same guarantees as quire's settings code.
+//!
 //! Missing helpers (design/27 permission-prompt rules; `quire/CONSUMING.md`, "Missing helpers").
 //!
 //! An app runs distro tools (mpv, ffmpeg, heif-dec) that may not be installed. This crate lets
@@ -53,6 +59,7 @@
 mod capability;
 mod catalog;
 mod family;
+mod files;
 mod helpers;
 mod install_line;
 mod installer;
@@ -64,6 +71,10 @@ mod watch;
 pub use capability::{Capability, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
 pub use family::Family;
+pub use files::{
+    NewFileMode, ReadCap, ReadError, UnixSeconds, WriteError, move_aside, read_capped,
+    read_text_capped, write_atomic,
+};
 pub use helpers::Helpers;
 pub use install_line::InstallLine;
 pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn};
