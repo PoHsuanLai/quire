@@ -789,7 +789,7 @@ html,body{margin:0;padding:0;background:transparent}
    Copy button beside it. Placement (margins) is the parent's. */
 
 .ds-command-line{ display:flex; align-items:center; align-self:stretch; gap:var(--s-8); }
-.ds-command-line-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }
+.ds-command-line-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with
