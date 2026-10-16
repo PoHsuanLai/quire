@@ -228,7 +228,8 @@ async fn a_package_manager_that_vanishes_ends_the_wait_at_once() {
         }
         drop(daemon);
     };
-    let (outcome, ()) = tokio::join!(installer.install(&request(&["mpv"])), vanish);
+    let wanted = request(&["mpv"]);
+    let (outcome, ()) = tokio::join!(installer.install(&wanted), vanish);
     assert_eq!(
         outcome,
         Outcome::Failed("The package manager stopped before it finished.".to_owned())

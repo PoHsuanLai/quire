@@ -223,7 +223,7 @@ mod tests {
             ("slot", Err(())),
         ];
         for (given, want) in cases {
-            let got = DataName::parse(*given)
+            let got = DataName::parse(given)
                 .map(DataName::attribute)
                 .map_err(|_| ());
             assert_eq!(got, *want, "{given:?}");
