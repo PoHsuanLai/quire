@@ -24,11 +24,10 @@ const DEFAULT_DATA_DIRS: &str = "/usr/local/share:/usr/share";
 /// Where Fedora's `google-noto-color-emoji-fonts` puts it.
 const FEDORA_PATH: &str = "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf";
 
-/// Where AUR COLRv1 emoji packages put it. Unverified: the package names and paths are a guess.
-const AUR_PATHS: [&str; 2] = [
-    "/usr/share/fonts/noto-emoji-colrv1/Noto-COLRv1.ttf",
-    "/usr/share/fonts/noto/Noto-COLRv1.ttf",
-];
+/// Where the AUR's `noto-fonts-emoji-colrv1` puts it (its PKGBUILD installs `fonts/Noto-COLRv1.ttf`
+/// into `/usr/share/fonts/noto`, read 2026-10-16). Arch's own `noto-fonts-emoji` ships only the
+/// bitmap `NotoColorEmoji.ttf`.
+const AUR_PATHS: [&str; 1] = ["/usr/share/fonts/noto/Noto-COLRv1.ttf"];
 
 /// How deep the file-name search goes below a font directory.
 const SCAN_DEPTH: usize = 4;
@@ -238,7 +237,6 @@ mod tests {
                 "/opt/b/fonts/quire/Noto-COLRv1.ttf",
                 "/home/u/.local/share/fonts/quire/Noto-COLRv1.ttf",
                 "/usr/share/fonts/google-noto-color-emoji-fonts/Noto-COLRv1.ttf",
-                "/usr/share/fonts/noto-emoji-colrv1/Noto-COLRv1.ttf",
                 "/usr/share/fonts/noto/Noto-COLRv1.ttf",
             ]
         );
@@ -258,7 +256,7 @@ mod tests {
             );
         }
         let no_home = strs(dirs(None, None, None).candidates());
-        assert_eq!(no_home.len(), 5, "no home, no user dir: {no_home:?}");
+        assert_eq!(no_home.len(), 4, "no home, no user dir: {no_home:?}");
     }
 
     #[test]
