@@ -1,7 +1,9 @@
 //! The net provider every quire document gets, one per kind of document: the app's own and its
 //! frames' (`crate::frames` gives each frame document the frame one as it is parsed). Where a
 //! request goes is `crate::route`'s table; this file only carries it out. `data:` and `file:`
-//! are answered on the calling thread. The waker fires after each answer so the host paints the
+//! are answered on the calling thread; a `file:` is read only from inside the `FileRoots` the app
+//! names (an app that names none reads no file), and only when it is a regular file of at most
+//! `blitz_kit::net::MAX_RESOURCE_BYTES`. The waker fires after each answer so the host paints the
 //! frame the resource landed in: blitz applies a loaded image on the next resolve, one frame late
 //! (spike S7).
 //!
@@ -13,7 +15,7 @@ use crate::frame_tag::FrameTag;
 use crate::net_policy::{NetDecision, NetPolicy, NetReply, NetRequest};
 use crate::origin::{FrameId, RequestOrigin};
 use crate::route::{Document, Policy, Route, route};
-use blitz_kit::net::LocalSource;
+use blitz_kit::net::{FileRoots, LocalSource};
 use blitz_traits::net::{Bytes, NetHandler, NetProvider, NetWaker, Request};
 use std::sync::Arc;
 
@@ -27,6 +29,8 @@ pub struct DsNet {
     fallback: Option<Arc<dyn NetProvider>>,
     /// Told when a resource has been handed to the document.
     waker: Option<Arc<dyn NetWaker>>,
+    /// The only directories a `file:` request reads from. Empty serves no file.
+    roots: FileRoots,
 }
 
 impl std::fmt::Debug for DsNet {
@@ -36,17 +40,20 @@ impl std::fmt::Debug for DsNet {
 }
 
 impl DsNet {
-    /// The app document's provider: under `Local`, other schemes go to `fallback`.
+    /// The app document's provider: under `Local`, other schemes go to `fallback`. Its `file:`
+    /// requests read only from inside `roots`; empty roots read no file at all.
     pub fn top(
         policy: NetPolicy,
         fallback: Option<Arc<dyn NetProvider>>,
         waker: Option<Arc<dyn NetWaker>>,
+        roots: FileRoots,
     ) -> Arc<dyn NetProvider> {
         Arc::new(DsNet {
             served: Served::Top,
             policy,
             fallback,
             waker,
+            roots,
         })
     }
 
@@ -61,6 +68,8 @@ impl DsNet {
             policy,
             fallback: None,
             waker,
+            // A frame is never served `file:` (`crate::route`), so it holds no roots.
+            roots: FileRoots::default(),
         })
     }
 
@@ -154,9 +163,10 @@ impl NetProvider for DsNet {
             request.url.scheme(),
             Policy::of(&self.policy),
         ) {
-            // The same reads the kit's `LocalNet` makes, answered on this thread.
+            // The same reads the kit's `LocalNet` makes, answered on this thread: a file only
+            // from inside the app's roots.
             Route::Data | Route::File => {
-                let bytes = LocalSource::of(&request.url).read();
+                let bytes = LocalSource::of(&request.url).read_within(&self.roots);
                 self.answer(doc_id, request.url.to_string(), bytes, handler);
             }
             Route::Fallback => {

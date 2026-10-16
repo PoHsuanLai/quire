@@ -162,7 +162,12 @@ impl Headless {
         let config = DocumentConfig {
             viewport: Some(blitz_viewport(viewport)),
             font_ctx: Some(font_context()),
-            net_provider: Some(DsNet::top(setup.net.clone(), None, Some(net_waker))),
+            net_provider: Some(DsNet::top(
+                setup.net.clone(),
+                None,
+                Some(net_waker),
+                setup.file_roots.clone(),
+            )),
             html_parser_provider: Some(FrameParser::shared(
                 Arc::new(HtmlProvider),
                 frame_net,

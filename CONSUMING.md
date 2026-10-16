@@ -106,7 +106,9 @@ hands `use_environment`, registers quire's faces, provides the document host (`p
 section 6, "For a bar"), and tracks the input modality. `AppConfig` also takes
 `with_app_id`, `with_decorations(Decorations::Client)` for an app whose root draws
 `WindowFrame::Titlebar`, `with_context(value)` (read with `use_context` anywhere in the app),
-`with_net`, `with_frame_links` and `with_focus_fallback`. `examples/consumer/src/main.rs` is the
+`with_net`, `with_file_roots`, `with_frame_links` and `with_focus_fallback`. An app that reads local
+files through `file:` URLs (an icon directory, a wallpaper cache) names those directories with
+`with_file_roots(FileRoots::new([dir, ..]))`; with no roots set, no `file:` URL loads. `examples/consumer/src/main.rs` is the
 whole call.
 
 **Windows and when the app ends.** Windows are independent: closing any window, the first
@@ -1128,7 +1130,10 @@ External icons and a caller-driven tooltip (FINDINGS "Pointer events"):
   takes an `IconSource`, and an `Icon` (or `Option<Icon>` for `Button`)
   still converts, so existing call sites are unchanged. `ds::prelude::IconView { source, size }` draws one
   anywhere else. The URL loads through the document's net provider (ds-blitz and shell-host's
-  `LocalNet` answer `data:` and `file:`), one frame late.
+  `LocalNet` answer `data:` and `file:`), one frame late. A `file:` URL loads only when the app
+  named its directory with `AppConfig::with_file_roots` (and `HarnessConfig::with_file_roots` in
+  tests), and only for a regular file of at most 32 MiB; a path outside the roots, through a
+  symlink out of them, or with `..` is refused.
 
   ```rust,ignore
   let icon = ds::prelude::IconSource::Symbolic(ds::prelude::ExternalIcon {

@@ -8,6 +8,7 @@ use crate::frame_links::FrameLinks;
 use crate::link_open::LinkFailureHandler;
 use crate::net_policy::NetPolicy;
 use crate::shell_keys::ShellKeys;
+use blitz_kit::net::FileRoots;
 use dioxus::prelude::VirtualDom;
 use ds::keys::KeySource;
 
@@ -18,6 +19,9 @@ pub struct Setup {
     pub contexts: RootContexts,
     /// Who answers the document's requests, and its frames'.
     pub net: NetPolicy,
+    /// The directories the app document may read `file:` URLs from (a wallpaper cache, an icon
+    /// directory). Empty until the app names some, so an app that names none reads no file.
+    pub file_roots: FileRoots,
     /// What a link clicked in a frame does.
     pub frame_links: FrameLinks,
     /// What happens when a clicked link cannot be opened in the desktop's browser or mail client.

@@ -804,7 +804,9 @@ own caret and selection. The route needs no Blitz fork.
   navigation providers. The app renders one frame after the host installs its providers, so no
   frame is parsed with dioxus-native's.
 - **Network policy.** `data:` is always served; `about:` never fetches. The app's document gets
-  `file:` under `NetPolicy::Local` and `Custom`; a frame never gets `file:` from ds-blitz (under
+  `file:` under `NetPolicy::Local` and `Custom`, only from inside the `FileRoots` the app names
+  (`AppConfig::with_file_roots`; none named, none read; HOST-09) and only a regular file of at
+  most 32 MiB; a frame never gets `file:` from ds-blitz (under
   `Local` and `Sealed` a frame gets `data:` only; under `Custom` everything else is put to
   `AppNet::decide`). An `<iframe src>` in the app's own markup is fetched by the app's document
   (`start_iframe_load` uses the parent's id and provider).

@@ -11,8 +11,11 @@ use ds::motion::detail::operation::PendingToken;
 use ds::motion::pulse_key::PulseKey;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
+use ds_blitz::FileRoots;
 use ds_harness::harness::settle_until;
-use ds_harness::{Driver, Harness, Query, Viewport, snapshot, snapshot_at};
+use ds_harness::{
+    Driver, Harness, HarnessConfig, Query, Viewport, snapshot, snapshot_at, snapshot_with,
+};
 use image::RgbaImage;
 use std::time::Duration;
 
@@ -154,7 +157,13 @@ fn data_and_file_images_land_before_the_snapshot() {
         height: 100,
         scale_percent: 100,
     };
-    let frame = snapshot(ImageApp, view).expect("renders");
+    // The app names the directory its file lives in, or the document would read no file.
+    let roots = FileRoots::new([std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR"))]);
+    let config = HarnessConfig::new(view).with_file_roots(roots);
+    let frame = snapshot_with(ImageApp, config, &[Duration::from_secs(10)])
+        .expect("renders")
+        .pop()
+        .expect("one frame per moment");
     keep(&frame, "images");
     // Inside the first tile of each 40 px box, stacked below the body's 8 px margin. (Blitz
     // paints an SVG background once at its intrinsic 10 px rather than tiling it; PNGs tile,

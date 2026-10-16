@@ -1,10 +1,10 @@
-//! The app's network policy. The app's document gets `file:` under `Local`
-//! and nothing but `data:` under `Sealed`; under `Custom` every other request is put to the
+//! The app's network policy. The app's document gets `file:` under `Local`, from inside the roots
+//! the app names and nowhere else, and nothing but `data:` under `Sealed`; under `Custom` every other request is put to the
 //! app's handler, which sees where it came from and decides. A frame is never served `file:` by
 //! ds-blitz, whatever the policy.
 
 use dioxus::prelude::*;
-use ds_blitz::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
+use ds_blitz::{AppNet, FileRoots, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
 use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
@@ -28,6 +28,11 @@ fn swatch() -> PathBuf {
             path
         })
         .clone()
+}
+
+/// The one directory the swatch is in, as the roots an app that shows it names.
+fn roots() -> FileRoots {
+    FileRoots::new([swatch().parent().map(PathBuf::from).unwrap_or_default()])
 }
 
 /// The same PNG's bytes, for a handler to answer with.
@@ -92,15 +97,41 @@ fn width(harness: &Harness, selector: &str) -> f32 {
 }
 
 #[test]
-fn the_app_document_gets_file_under_local_and_not_under_sealed() {
-    let cases = [(NetPolicy::Local, 7.0), (NetPolicy::Sealed, 0.0)];
-    for (policy, want) in cases {
-        let name = format!("{policy:?}");
+fn the_app_document_reads_a_file_only_under_local_and_only_inside_its_roots() {
+    let elsewhere = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let cases = [
+        (
+            "local, swatch's directory is a root",
+            NetPolicy::Local,
+            roots(),
+            7.0,
+        ),
+        (
+            "local, no roots named",
+            NetPolicy::Local,
+            FileRoots::default(),
+            0.0,
+        ),
+        (
+            "local, another directory is the root",
+            NetPolicy::Local,
+            FileRoots::new([elsewhere]),
+            0.0,
+        ),
+        (
+            "sealed, even with the root",
+            NetPolicy::Sealed,
+            roots(),
+            0.0,
+        ),
+    ];
+    for (name, policy, file_roots, want) in cases {
         let harness = Harness::new(
             LocalImage,
             HarnessConfig::new(VIEW)
                 .with_clock(Clock::Virtual)
-                .with_net(policy),
+                .with_net(policy)
+                .with_file_roots(file_roots),
         );
         assert_eq!(width(&harness, ".local"), want, "{name}");
     }
@@ -132,6 +163,7 @@ fn a_custom_policy_still_serves_the_app_its_own_files_without_asking() {
     let recorder = Recorder::new(NetDecision::Deny);
     let config = HarnessConfig::new(VIEW)
         .with_clock(Clock::Virtual)
+        .with_file_roots(roots())
         .with_net(NetPolicy::Custom(recorder.clone()));
     let harness = Harness::new(LocalImage, config);
     assert_eq!(width(&harness, ".local"), 7.0);
@@ -163,7 +195,12 @@ fn frame_width(harness: &Harness, selector: &str) -> f32 {
 
 #[test]
 fn a_frames_file_request_is_denied_while_the_app_documents_succeeds() {
-    let harness = Harness::new(Framed, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let harness = Harness::new(
+        Framed,
+        HarnessConfig::new(VIEW)
+            .with_clock(Clock::Virtual)
+            .with_file_roots(roots()),
+    );
     assert_eq!(width(&harness, ".local"), 7.0, "the app's own file");
     assert_eq!(frame_width(&harness, ".local"), 0.0, "the frame's file");
     assert_eq!(
@@ -178,6 +215,7 @@ fn a_custom_handler_sees_the_frames_requests_with_the_frame_as_origin() {
     let recorder = Recorder::new(NetDecision::Allow);
     let config = HarnessConfig::new(VIEW)
         .with_clock(Clock::Virtual)
+        .with_file_roots(roots())
         .with_net(NetPolicy::Custom(recorder.clone()));
     let harness = Harness::new(Framed, config);
     let frame = harness.frame("iframe.body").expect("a frame document").id();
@@ -205,6 +243,7 @@ fn a_denied_frame_request_never_reaches_the_frame() {
     let recorder = Recorder::new(NetDecision::Deny);
     let config = HarnessConfig::new(VIEW)
         .with_clock(Clock::Virtual)
+        .with_file_roots(roots())
         .with_net(NetPolicy::Custom(recorder.clone()));
     let harness = Harness::new(Framed, config);
     assert_eq!(recorder.seen().len(), 2);

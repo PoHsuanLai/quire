@@ -31,6 +31,7 @@ use crate::window_build::Base;
 use crate::window_requests::{Requests, Root};
 use crate::window_shell::Windows;
 use crate::window_size::WindowSize;
+use blitz_kit::net::FileRoots;
 use chordkit::{KeymapSource, Overrides, Platform};
 use dioxus::prelude::*;
 use ds::window::icon::WindowIcon;
@@ -178,6 +179,16 @@ impl AppConfig {
     /// [`NetPolicy::Local`]).
     pub fn with_net(mut self, policy: NetPolicy) -> Self {
         self.setup.net = policy;
+        self
+    }
+
+    /// The directories the app document may read `file:` URLs from (default none). The app names
+    /// every place it shows local files from (a wallpaper cache, an icon directory); a `file:`
+    /// request anywhere else, one that only reaches a root through a symlink or `..`, and one for
+    /// anything but a regular file of at most 32 MiB is refused. An app that sets no roots reads
+    /// no `file:` URLs at all; `data:` is not affected, and a frame is never served `file:`.
+    pub fn with_file_roots(mut self, roots: FileRoots) -> Self {
+        self.setup.file_roots = roots;
         self
     }
 

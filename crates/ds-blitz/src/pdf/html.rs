@@ -9,6 +9,7 @@ use crate::pdf::spec::ContentBox;
 use crate::wake::Wakeup;
 use blitz_dom::{DocumentConfig, MediaType, StyleThreading};
 use blitz_html::{HtmlDocument, HtmlProvider};
+use blitz_kit::net::FileRoots;
 use blitz_traits::net::NetWaker;
 use std::sync::Arc;
 
@@ -23,7 +24,12 @@ pub(crate) fn document(html: &str, content: ContentBox) -> HtmlDocument {
     let config = DocumentConfig {
         viewport: Some(content.viewport()),
         font_ctx: Some(font_context()),
-        net_provider: Some(DsNet::top(NetPolicy::Sealed, None, Some(waker))),
+        net_provider: Some(DsNet::top(
+            NetPolicy::Sealed,
+            None,
+            Some(waker),
+            FileRoots::default(),
+        )),
         html_parser_provider: Some(Arc::new(HtmlProvider)),
         media_type: Some(MediaType::print()),
         style_threading: StyleThreading::Sequential,

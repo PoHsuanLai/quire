@@ -115,6 +115,7 @@ pub use app_id::AppId;
 pub use app_life::LastWindowClosed;
 pub use blitz_host::provide_host;
 pub use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref};
+pub use blitz_kit::net::FileRoots;
 pub use click_focus::FocusFallback;
 pub use close_request::{CloseAnswer, use_close_request};
 pub use contexts::RootContexts;

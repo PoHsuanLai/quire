@@ -11,6 +11,7 @@ use crate::snapshot::Viewport;
 use chordkit::Platform;
 use ds::keys::KeySource;
 use ds_blitz::AdapterPref;
+use ds_blitz::FileRoots;
 use ds_blitz::FocusFallback;
 use ds_blitz::FrameLinks;
 use ds_blitz::NetPolicy;
@@ -57,6 +58,16 @@ impl HarnessConfig {
     /// [`NetPolicy::Local`]).
     pub fn with_net(mut self, policy: NetPolicy) -> Self {
         self.setup.net = policy;
+        self
+    }
+
+    /// The directories the app document may read `file:` URLs from (default none). The app names
+    /// every place it shows local files from (a wallpaper cache, an icon directory); a `file:`
+    /// request anywhere else, one that only reaches a root through a symlink or `..`, and one for
+    /// anything but a regular file of at most 32 MiB is refused. An app that sets no roots reads
+    /// no `file:` URLs at all; `data:` is not affected, and a frame is never served `file:`.
+    pub fn with_file_roots(mut self, roots: FileRoots) -> Self {
+        self.setup.file_roots = roots;
         self
     }
 

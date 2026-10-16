@@ -28,7 +28,8 @@ mod inset_tests;
 mod tests;
 
 use axes::{Axes, start_with};
-use ds_blitz::{AppConfig, WindowSize, launch};
+use ds_blitz::{AppConfig, FileRoots, WindowSize, launch};
+use std::path::Path;
 
 fn main() {
     let args = args::parse(std::env::args().skip(1));
@@ -75,7 +76,9 @@ fn main() {
             });
             if let Err(error) = launch(
                 app::App,
-                AppConfig::new("quire gallery", WindowSize::new(1280, 900)),
+                AppConfig::new("quire gallery", WindowSize::new(1280, 900)).with_file_roots(
+                    FileRoots::new([Path::new(env!("CARGO_MANIFEST_DIR")).join("assets")]),
+                ),
             ) {
                 eprintln!("ds-gallery: {error}");
                 std::process::exit(1);

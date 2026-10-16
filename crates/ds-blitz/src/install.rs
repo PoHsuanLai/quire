@@ -13,7 +13,7 @@ use blitz_traits::net::NetWaker;
 use dioxus_native_dom::NodeHandle;
 use std::sync::Arc;
 
-/// Put `setup`'s net policy on the document and on every frame it will build, waking the
+/// Put `setup`'s net policy and file roots on the document and on every frame it will build, waking the
 /// window's shell to paint when a resource lands; give every frame `frame_nav` and hold its
 /// requests in `book` until it is found; and reach the clipboard through the shell.
 pub(crate) fn install(
@@ -30,6 +30,11 @@ pub(crate) fn install(
     let fallback = Arc::clone(&doc.net_provider);
     let parser = Arc::clone(&doc.html_parser_provider);
     let frame_net = DsNet::frame(setup.net.clone(), Some(Arc::clone(&waker)), book);
-    doc.set_net_provider(DsNet::top(setup.net.clone(), Some(fallback), Some(waker)));
+    doc.set_net_provider(DsNet::top(
+        setup.net.clone(),
+        Some(fallback),
+        Some(waker),
+        setup.file_roots.clone(),
+    ));
     doc.set_html_parser_provider(FrameParser::shared(parser, frame_net, frame_nav));
 }
