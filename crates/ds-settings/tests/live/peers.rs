@@ -4,8 +4,8 @@ use std::pin::Pin;
 use std::time::{Duration, Instant};
 
 use ds_settings::live::{
-    Access, Caller, Deadline, INTERFACE, LiveClient, LiveError, LiveModule, LiveSchema, Timeouts,
-    Verdict, serve,
+    Access, AnyOwner, Caller, Deadline, INTERFACE, LiveClient, LiveError, LiveModule, LiveSchema,
+    Timeouts, Verdict, serve,
 };
 use ds_settings::schema::KeyPath;
 use zbus::export::futures_core::Stream;
@@ -54,13 +54,13 @@ async fn changed_reaches_the_peers_that_may_read_and_not_one_that_was_refused() 
     let mut heard = MessageStream::for_match_rule(rule, &spy, None)
         .await
         .expect("subscribed");
-    let spy_client = LiveClient::new(&spy, NAME, PATH).await.expect("proxy");
+    let spy_client = LiveClient::new(&spy, NAME, PATH, AnyOwner).expect("proxy");
     assert!(matches!(
         spy_client.changes().await,
         Err(LiveError::NotPermitted(_))
     ));
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     let mut changes = client.changes().await.expect("subscribed");
     client
         .set(&key(TOGGLE), &toml::Value::Boolean(false))
@@ -111,8 +111,7 @@ async fn a_module_that_does_not_answer_ends_every_call_as_a_timeout() {
     daemon.request_name(NAME).await.expect("name");
     serve(&daemon, PATH, Hanging).await.expect("serves");
     let wait = Deadline::of(Duration::from_millis(150));
-    let client = LiveClient::new(&settings, NAME, PATH)
-        .await
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner)
         .expect("proxy")
         .with_timeouts(Timeouts::new(wait, wait));
 

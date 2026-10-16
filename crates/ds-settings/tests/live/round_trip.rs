@@ -2,7 +2,7 @@
 
 use std::pin::Pin;
 
-use ds_settings::live::{Change, INTERFACE, LiveClient, LiveError, serve};
+use ds_settings::live::{AnyOwner, Change, INTERFACE, LiveClient, LiveError, serve};
 use ds_settings::schema::{AgentSetting, KeyKind, KeyPath};
 use zbus::export::futures_core::Stream;
 
@@ -32,7 +32,7 @@ async fn set_get_describe_and_changed_round_trip() {
         .await
         .expect("serves");
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     assert_eq!(client.describe().await.expect("describe"), schema());
     assert_eq!(
         client.get(&key(TOGGLE)).await.unwrap(),
@@ -87,7 +87,7 @@ async fn a_daemon_originated_change_reaches_the_reader() {
     let served = serve(&daemon, PATH, Accounts::new(None))
         .await
         .expect("serves");
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     let mut changes = client.changes().await.expect("subscribed");
     served
         .changed(&key(TOGGLE), &toml::Value::Boolean(false))
@@ -117,7 +117,7 @@ async fn an_action_key_runs_through_set() {
     serve(&daemon, PATH, Shared(module.clone()))
         .await
         .expect("serves");
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     client.invoke(&key(REMOVE)).await.expect("allowed");
     assert_eq!(*module.removed.lock().unwrap(), 1);
 }
@@ -133,7 +133,7 @@ async fn set_from_a_caller_without_the_role_is_refused_by_name() {
         .await
         .expect("serves");
 
-    let client = LiveClient::new(&agent, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&agent, NAME, PATH, AnyOwner).expect("proxy");
     // Reading is allowed to anyone; writing is not.
     assert!(client.describe().await.is_ok());
     for refused in [
@@ -179,7 +179,7 @@ async fn unknown_keys_and_bad_values_have_their_own_names() {
     serve(&daemon, PATH, Accounts::new(Some(role)))
         .await
         .expect("serves");
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     assert!(matches!(
         client.get(&key("accounts.nope")).await,
         Err(LiveError::UnknownKey(_))
@@ -253,7 +253,7 @@ async fn a_set_to_an_unavailable_choice_is_refused_with_its_reason() {
     serve(&daemon, PATH, Accounts::with_schema(Some(role), schema))
         .await
         .expect("serves");
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
 
     let refused = client
         .set(&key(CLIENT), &toml::Value::String("gated".to_owned()))

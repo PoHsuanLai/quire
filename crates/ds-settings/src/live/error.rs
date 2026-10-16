@@ -21,6 +21,10 @@ pub enum LiveError {
     Unavailable(String),
     /// The module could not do it (its own failure, e.g. a revoke that the provider refused).
     Failed(String),
+    /// The program that owns the module's bus name is not the program the module belongs to (or
+    /// could not be told apart from one). Raised by the client, never by a skeleton, before
+    /// anything is sent; the text is for a person.
+    NotTheService(String),
     /// The module did not answer in time. Raised by the client, never by a skeleton; the text is
     /// for a person ("The service is not answering").
     Timeout(String),

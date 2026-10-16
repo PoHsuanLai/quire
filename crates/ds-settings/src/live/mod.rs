@@ -25,6 +25,12 @@
 //! (the proxy filters on the module's unique name), and every call a client makes has a
 //! deadline ([`Timeouts`], [`LiveError::Timeout`]).
 //!
+//! Who owns the name: a well-known name goes to whoever asks first, so [`LiveClient`] takes an
+//! [`OwnerCheck`] and asks it about the name's owner before the first read or `Set`, and again
+//! whenever the owner is another connection. A refused owner is [`LiveError::NotTheService`] and
+//! nothing is sent to it, so a typed secret never reaches a squatter; the client then speaks to the
+//! owner that passed by its unique name. What a module's replies may carry is capped ([`limits`]).
+//!
 //! Values travel as `b` (bool), `x` (integer), `s` (string) or `as` (list of strings); see
 //! [`value`].
 //!
@@ -35,7 +41,10 @@
 
 mod client;
 mod error;
+pub mod limits;
+mod link;
 mod module;
+mod owner;
 mod readers;
 mod schema;
 mod skeleton;
@@ -47,6 +56,9 @@ pub use client::{Change, Changes, LiveClient, SettingsModule1Proxy};
 pub use ds_peer::Deadline;
 pub use error::LiveError;
 pub use module::{Access, Caller, LiveModule, SenderName, Verdict};
+#[cfg(feature = "testing")]
+pub use owner::AnyOwner;
+pub use owner::{OwnerAnswer, OwnerCheck};
 pub use schema::{LiveSchema, LiveSchemaError};
 pub use skeleton::{Served, serve};
 pub use snapshot::Snapshot;

@@ -4,8 +4,8 @@
 use std::collections::BTreeMap;
 
 use ds_settings::live::{
-    Access, Caller, INTERFACE, LiveClient, LiveError, LiveModule, LiveSchema, Snapshot, Verdict,
-    serve,
+    Access, AnyOwner, Caller, INTERFACE, LiveClient, LiveError, LiveModule, LiveSchema, Snapshot,
+    Verdict, serve,
 };
 use ds_settings::schema::KeyPath;
 use zbus::interface;
@@ -132,7 +132,7 @@ async fn snapshot_over_the_bus_equals_describe_and_get() {
         .await
         .expect("serves");
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     let snapshot = client.snapshot().await.expect("snapshot");
     assert_eq!(snapshot.schema, client.describe().await.unwrap());
     assert_eq!(snapshot, client.snapshot_by_parts().await.unwrap());
@@ -155,7 +155,7 @@ async fn a_vanished_key_is_absent_from_the_bus_snapshot_too() {
     };
     serve(&daemon, PATH, module).await.expect("serves");
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     let snapshot = client.snapshot().await.expect("snapshot");
     assert!(snapshot.schema.key.iter().all(|spec| spec.path.0 != CLIENT));
     assert!(!snapshot.values.contains_key(&key(CLIENT)));
@@ -172,7 +172,7 @@ async fn a_refused_reader_gets_not_permitted() {
         .await
         .expect("serves");
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     match client.snapshot().await {
         Err(LiveError::NotPermitted(_)) => {}
         other => panic!("expected NotPermitted, got {other:?}"),
@@ -197,7 +197,7 @@ async fn a_module_without_snapshot_is_read_by_the_client() {
         .unwrap();
     assert!(raw.call_method("Snapshot", &()).await.is_err());
 
-    let client = LiveClient::new(&settings, NAME, PATH).await.expect("proxy");
+    let client = LiveClient::new(&settings, NAME, PATH, AnyOwner).expect("proxy");
     let snapshot = client.snapshot().await.expect("falls back");
     assert_eq!(snapshot.schema, schema());
     assert_eq!(snapshot.values.len(), schema().key.len());

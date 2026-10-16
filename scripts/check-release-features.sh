@@ -9,7 +9,7 @@ cd "$(dirname "$0")/.."
 
 manifest=examples/consumer/Cargo.toml
 fail=0
-for crate in ds-blitz ds-core; do
+for crate in ds-blitz ds-core ds-settings; do
   # `-i` inverts the tree to the crate, `-e features` lists the feature nodes that are on.
   on=$(cargo tree --manifest-path "$manifest" -e normal,build,features -i "$crate" --prefix none 2>/dev/null || true)
   for feature in debug-probe testing; do

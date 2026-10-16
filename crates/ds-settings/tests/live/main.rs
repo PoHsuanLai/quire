@@ -4,6 +4,7 @@
 
 mod bus;
 mod module;
+mod owner;
 mod peers;
 mod round_trip;
 mod schema;

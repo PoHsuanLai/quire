@@ -1267,6 +1267,14 @@ them by unique name, and `Served::changed` the same. A peer `permit` refuses hea
 (`Timeouts`, 10 s for reads and 30 s for a `Set`) and a module that is silent is
 `LiveError::Timeout`; a client takes `Changed` only from the module's own unique name.
 
+Who owns the name (2026-10-16, production audit DETENT-05): a well-known name goes to whoever asks
+first, so `LiveClient::new` takes an `OwnerCheck` that the consumer supplies (ds-settings knows no
+caller table). Before the first call, and whenever the name's owner is another connection, the
+client asks it whether that owner holds the module's role; a refusal is `LiveError::NotTheService`,
+nothing is sent (no secret), and calls that pass go to the owner's unique name, so the name cannot
+change hands between check and call. Replies are capped (`live::limits`): 1 MiB of schema, 1024 keys,
+2 KiB per label, 8 KiB per value.
+
 Unavailable choices (additive, 2026-10-06): a `KeySpec` may carry `unavailable`, a map from a
 choice word to the reason it cannot be picked right now. JSON: `"unavailable":{"<word>":"<reason>"}`;
 a file schema has the same as an `[key.unavailable]` table; both are skipped when empty, so

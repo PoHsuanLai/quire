@@ -49,3 +49,12 @@ tokio = ["quire-desktop", "zbus/tokio"]
 # daemon serves (accountd, inferd) and the Settings app reads. Uses the `zbus` above under whatever
 # backend the build picked; this feature never selects an executor.
 live = ["quire-desktop"]
+# `live::AnyOwner`, an owner check that passes every owner. For tests and scenarios only: a shipped
+# program supplies a real check, so this stays off in a normal build.
+testing = ["live"]
+
+# The live-module tests need `testing` (`AnyOwner`) beside `live`; the gate runs --all-features.
+[[test]]
+name = "live"
+path = "tests/live/main.rs"
+required-features = ["live", "testing"]
