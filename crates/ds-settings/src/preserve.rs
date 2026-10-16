@@ -45,7 +45,14 @@ fn lay(table: &mut Table, fresh: &Table, unknown: &HashSet<&str>, path: &str) {
     drop_owned_but_absent(table, fresh, unknown, path);
     for (key, item) in fresh.iter() {
         match table.get_mut(key) {
-            Some(old) => settle(old, item, unknown, &dotted(path, key)),
+            Some(old) => {
+                let opens = old.is_inline_table() && item.is_table();
+                settle(old, item, unknown, &dotted(path, key));
+                // `dock = { .. }` keeps the space before its `=`; a `[dock]` header must not.
+                if opens && let Some(mut header) = table.key_mut(key) {
+                    header.leaf_decor_mut().clear();
+                }
+            }
             None => {
                 table.insert(key, unplaced(item.clone()));
             }
