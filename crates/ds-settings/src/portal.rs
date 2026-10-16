@@ -76,15 +76,17 @@ pub struct SystemPrefsWatch {
 }
 
 impl SystemPrefsWatch {
-    /// Read `source` and subscribe to it, the subscription's task running on `spawn`. A
-    /// [`SystemPrefsSource::Fixed`] watch, a desktop without the portal and a build without the portal client
-    /// never fire after their first answer.
+    /// Subscribe to `source` and then read it, the subscription's task running on `spawn`. A
+    /// [`SystemPrefsSource::Fixed`] watch, a desktop without the portal and a build without the
+    /// portal client never fire after their first answer. A portal that does not answer within
+    /// [`Deadline::START`](ds_peer::Deadline::START) is the defaults, so this returns in a few
+    /// seconds at worst; a caller that must not wait at all starts it beside its other work
+    /// (`use_environment` does).
     pub async fn start(source: &SystemPrefsSource, spawn: &dyn Spawner) -> Self {
-        let (tx, changes) = latest::channel(source.read().await);
-        match source {
-            SystemPrefsSource::Fixed(_) => drop(tx),
-            SystemPrefsSource::Portal => spawn.spawn(Box::pin(bus::follow(tx))),
-        }
+        let changes = match source {
+            SystemPrefsSource::Fixed(prefs) => latest::channel(*prefs).1,
+            SystemPrefsSource::Portal => bus::start(spawn).await,
+        };
         SystemPrefsWatch { changes }
     }
 

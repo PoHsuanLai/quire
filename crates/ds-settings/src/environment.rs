@@ -84,6 +84,11 @@ fn report(loaded: &Loaded<AppearanceFile>) {
 /// Load the settings `store` holds, read the desktop's preferences from `system`, and keep both
 /// live, their watches running on `spawner`. Unknown and invalid keys in the file are printed to
 /// stderr as they are read.
+///
+/// The person's own file comes first: it is published at once and watched before the desktop is
+/// asked anything, so a portal that is slow, wedged or absent never delays the appearance the
+/// person chose or hides an edit to it. The desktop's preferences fold in when the portal has
+/// answered (or, if it does not answer in time, never, and the defaults stand).
 pub fn use_environment(
     store: Store,
     system: SystemPrefsSource,
@@ -96,13 +101,11 @@ pub fn use_environment(
         async move {
             let loaded = store.load::<AppearanceFile>();
             report(&loaded);
-            let prefs = SystemPrefsWatch::start(&system, &*spawner).await;
-            env.set(Environment {
-                settings: loaded.value,
-                system: prefs.current(),
-            });
+            env.with_mut(|e| e.settings = loaded.value);
             let files = store.watch::<AppearanceFile>(&*spawner);
             spawn(follow_files(env, files));
+            let prefs = SystemPrefsWatch::start(&system, &*spawner).await;
+            env.with_mut(|e| e.system = prefs.current());
             follow_prefs(env, prefs).await;
         }
     });

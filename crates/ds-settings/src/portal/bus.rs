@@ -2,11 +2,16 @@
 //! `quire-desktop`; `portal/absent.rs` answers the same two entry points elsewhere.
 
 use super::{SystemPrefs, contrast_from_portal, reduced_motion_from_portal, scheme_from_portal};
-use crate::latest::Sender;
+use crate::latest::{self, Receiver, Sender};
+use ds_core::spawner::Spawner;
+use ds_peer::{Deadline, within};
 use std::collections::HashMap;
 use zbus::export::ordered_stream::OrderedStreamExt;
 use zbus::proxy;
 use zbus::zvariant::OwnedValue;
+
+/// Who a screen says is not answering when the portal runs out of time.
+const PEER: &str = "The desktop's appearance service";
 
 /// The one namespace `ds-settings` reads; the portal groups every key by namespace, and
 /// appearance is the only one this crate resolves (design/22-SETTINGS.md section 4.4).
@@ -93,41 +98,79 @@ trait Settings {
     ) -> zbus::Result<()>;
 }
 
-/// `ReadAll(["org.freedesktop.appearance"])`, or `None` when the bus, the portal or the
-/// namespace is absent — every failure mode collapses to "use the defaults" at the caller.
-pub(super) async fn read_all() -> Option<SystemPrefs> {
-    let connection = zbus::Connection::session().await.ok()?;
-    let proxy = SettingsProxy::new(&connection).await.ok()?;
-    let all = proxy.read_all(&[NAMESPACE]).await.ok()?;
-    Some(
-        all.get(NAMESPACE)
-            .map(prefs_from_namespace)
-            .unwrap_or_default(),
-    )
+/// A connection to the portal that is already subscribed to `SettingChanged`: the subscription is
+/// made before the first read, on the same connection, so a change between the two is not lost.
+pub(super) struct Opened {
+    proxy: SettingsProxy<'static>,
+    changes: SettingChangedStream,
 }
 
-/// Subscribe to `SettingChanged` and fold every appearance-namespace change onto `tx`. A
-/// desktop without the portal simply never sends anything: `tx` (and so the watch's
-/// receiver) is left at its initial value when the connection or subscription cannot be made.
-pub(super) async fn follow(tx: Sender<SystemPrefs>) {
-    let Ok(connection) = zbus::Connection::session().await else {
-        return;
-    };
-    let Ok(proxy) = SettingsProxy::new(&connection).await else {
-        return;
-    };
-    let Ok(mut changes) = proxy.receive_setting_changed().await else {
-        return;
-    };
-    while let Some(signal) = changes.next().await {
-        let Ok(args) = signal.args() else {
-            continue;
-        };
-        let next = apply_setting_changed(tx.latest(), args.namespace(), args.key(), args.value());
-        if tx.send(next).is_err() {
-            return;
+/// Connect, and subscribe to `SettingChanged`; `None` when there is no bus or portal, or the
+/// portal does not answer in time (a desktop whose portal is wedged shows the defaults, and does
+/// not stall whoever is waiting).
+pub(super) async fn open() -> Option<Opened> {
+    within(Deadline::START, PEER, async {
+        let connection = zbus::Connection::session().await.ok()?;
+        let proxy = SettingsProxy::new(&connection).await.ok()?;
+        let changes = proxy.receive_setting_changed().await.ok()?;
+        Some(Opened { proxy, changes })
+    })
+    .await
+    .ok()?
+}
+
+impl Opened {
+    /// `ReadAll(["org.freedesktop.appearance"])`, or `None` when the portal does not answer in time
+    /// or has no such namespace: every failure mode collapses to "use the defaults" at the caller.
+    pub(super) async fn read(&self) -> Option<SystemPrefs> {
+        let all = within(Deadline::START, PEER, self.proxy.read_all(&[NAMESPACE]))
+            .await
+            .ok()?
+            .ok()?;
+        Some(
+            all.get(NAMESPACE)
+                .map(prefs_from_namespace)
+                .unwrap_or_default(),
+        )
+    }
+
+    /// Fold every appearance-namespace `SettingChanged` onto `tx` until the receiver is gone or
+    /// the bus connection ends. The portal's own signals only: the proxy takes a signal from the
+    /// portal's unique name and no one else's.
+    pub(super) async fn follow(mut self, tx: Sender<SystemPrefs>) {
+        while let Some(signal) = self.changes.next().await {
+            let Ok(args) = signal.args() else {
+                continue;
+            };
+            let next =
+                apply_setting_changed(tx.latest(), args.namespace(), args.key(), args.value());
+            if tx.send(next).is_err() {
+                return;
+            }
         }
     }
+}
+
+/// `ReadAll`, once, on a connection of its own.
+pub(super) async fn read_all() -> Option<SystemPrefs> {
+    open().await?.read().await
+}
+
+/// The preferences now and every change after: read after subscribing, the following task on
+/// `spawn`. A desktop without the portal, or one that does not answer in time, is the defaults
+/// and never changes.
+pub(super) async fn start(spawn: &dyn Spawner) -> Receiver<SystemPrefs> {
+    let opened = open().await;
+    let first = match &opened {
+        Some(opened) => opened.read().await,
+        None => None,
+    };
+    let (tx, changes) = latest::channel(first.unwrap_or_default());
+    match opened {
+        Some(opened) => spawn.spawn(Box::pin(opened.follow(tx))),
+        None => drop(tx),
+    }
+    changes
 }
 
 #[cfg(test)]
