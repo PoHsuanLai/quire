@@ -1587,6 +1587,7 @@ name = "ds-helpers"
 version = "0.1.0"
 dependencies = [
  "ds-peer",
+ "rustix",
  "serde",
  "thiserror 2.0.20",
  "toml",
@@ -1642,6 +1643,7 @@ dependencies = [
  "serde_json",
  "thiserror 2.0.20",
  "toml",
+ "toml_edit",
  "zbus",
 ]
 
@@ -4891,6 +4893,7 @@ dependencies = [
  "indexmap",
  "toml_datetime",
  "toml_parser",
+ "toml_writer",
  "winnow",
 ]
 
