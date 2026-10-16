@@ -63,7 +63,8 @@ pdfrum = { workspace = true, optional = true }
 # Spellchecking (the `spell` feature): the checker, and XDG data for the user dictionary.
 spellbook = { workspace = true, optional = true }
 dirs = { workspace = true, optional = true }
-# The user's learned words are read through the capped reader (`ds_helpers::read_text_capped`).
+# The user's learned words and a thumbnail's PDF are read through the capped reader
+# (`ds_helpers::read_text_capped`, `read_capped`).
 ds-helpers = { workspace = true, optional = true }
 
 [target.'cfg(target_os = "linux")'.dependencies]
@@ -102,7 +103,7 @@ desktop-outputs = ["ds-desktop/dbus"]
 # PDF output (`pdf`, `PageSpec`) and `PdfFileThumb`: a PDF's first page rasterised off the UI
 # thread and cached, drawn by `ds::PdfThumb`. Off by default, so an app that writes and shows no
 # PDF builds no PDF writer or reader.
-pdf = ["dep:pdfrum-anyrender", "dep:pdfrum"]
+pdf = ["dep:pdfrum-anyrender", "dep:pdfrum", "dep:ds-helpers"]
 # `ds_blitz::spell`: an `EditSurface`'s spellchecker (`ds::HostSpell`), system Hunspell
 # dictionaries checked on one worker thread. Off by default, so an app that never checks
 # spelling builds no checker.

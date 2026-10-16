@@ -4,13 +4,19 @@ use super::cache;
 use super::raster::rasterise;
 use ds::components::content::pdf_thumb::{PdfPage, PdfTrouble};
 use ds::prelude::*;
-use std::path::PathBuf;
+use ds_helpers::{ReadCap, ReadError, read_capped};
+use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::SystemTime;
 
 /// The largest side a thumbnail is rasterised at, in device pixels: a preview pane at 3x, and a
 /// cap so a huge `size` cannot ask vello_cpu for a poster.
 const LARGEST_SIDE: u32 = 2048;
+
+/// The largest PDF a thumbnail reads whole into memory: a scanned book is a few hundred MiB, and a
+/// preview of one is not worth that much memory per cached page. A bigger file is shown as a
+/// PDF with no preview.
+const LARGEST_PDF: ReadCap = ReadCap::mib(128);
 
 /// A thumbnail wanted: the file, the room it is fitted into (logical pixels), and the device
 /// scale it is drawn at.
@@ -86,12 +92,17 @@ pub fn pdf_thumb_blocking(request: &ThumbRequest) -> PdfPage {
         return hit;
     }
     RASTERS.fetch_add(1, Ordering::Relaxed);
-    let page = match std::fs::read(&key.path) {
+    let page = match read_pdf(&key.path, LARGEST_PDF) {
         Ok(bytes) => rasterise(bytes, key.fit),
         Err(_) => PdfPage::Failed(PdfTrouble::Unreadable),
     };
     cache::insert(key, page.clone());
     page
+}
+
+/// The bytes of the regular file at `path`, refused when it is anything else or over `cap`.
+fn read_pdf(path: &Path, cap: ReadCap) -> Result<Vec<u8>, ReadError> {
+    read_capped(path, cap)
 }
 
 /// Files read and rasterised (cache misses) so far in this process.
@@ -101,4 +112,29 @@ static RASTERS: AtomicU64 = AtomicU64::new(0);
 /// and how a test proves superseded requests never ran.
 pub fn pdf_thumb_rasters() -> u64 {
     RASTERS.load(Ordering::Relaxed)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_file_over_the_cap_or_not_a_file_is_not_read() {
+        let dir = std::env::temp_dir().join(format!("ds-blitz-pdf-read-{}", std::process::id()));
+        std::fs::create_dir_all(&dir).expect("scratch dir");
+        let small = dir.join("small.pdf");
+        let big = dir.join("big.pdf");
+        std::fs::write(&small, [1u8; 16]).expect("written");
+        std::fs::write(&big, [1u8; 17]).expect("written");
+        let cap = ReadCap::bytes(16);
+        let cases = [
+            ("at the cap", small, true),
+            ("one byte over", big, false),
+            ("a directory", dir.clone(), false),
+        ];
+        for (name, path, readable) in cases {
+            assert_eq!(read_pdf(&path, cap).is_ok(), readable, "{name}");
+        }
+        let _ = std::fs::remove_dir_all(&dir);
+    }
 }
