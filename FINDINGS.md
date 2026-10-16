@@ -2007,3 +2007,46 @@ way forward.
   a new test function. No test became redundant.
 - **Open.** A host with an unknown distro (several `install_lines`) passes `command: None`; showing every family's line is possible but was not
   asked for. `Missing` does not carry the `Family`, so a host picking one line out of several needs `Helpers::family()`.
+
+## q-cmdline
+
+Lane `q-cmdline`, written without a build: nothing here has been compiled or run, so the gate decides. Two small additive changes so other
+apps (first detent's Settings, "install llama.cpp" with a copyable command) reuse what ds-shell's helper sheet had.
+
+- **`ds::components::controls::command_line::CommandLine`** (`command_line.rs` + `command_line.css`, sheet `command_line` registered in
+  `assembly/sheets.rs`, 98 -> 99): props `text: String`, `copy: CopyState` (default `Idle`), `on_copy: EventHandler<String>`. The host writes
+  the clipboard (`ds` reaches no renderer; `scripts/check-boundary.sh` is unaffected: the component names `dioxus` and `Button` only). Classes
+  `.ds-command-line` and `.ds-command-line-text` (the old `.ds-helper-command{,-text}`), tokens only. The old rule's `margin-top:var(--s-12)`
+  is the parent's business and moved to the helper sheet as `.ds-alert .ds-command-line`, so the component sets no margin. It keeps the Return
+  rule (Return on Copy does not reach the sheet's own Return).
+- **`ds::components::controls::copy_state::CopyState`** (`Idle`, `Copied`, default `Idle`, `Word`) moved from ds-shell. The path
+  `ds_shell::accounts::model::CopyState` still resolves: it is now `pub use` of the `ds` type, same variants and derives, so no public
+  ds-shell path changed. The type is the same one for `CopyAction`, `ShowCode`, `BrowserWait` and `HelperSheet`.
+- **Deleted in ds-shell:** `helpers/command.rs` (`pub(crate) CommandLine`) and its CSS in `helpers/style.css`. `CopyAction` stays: it is the
+  accounts sheets' Copy Link / Copy Code button, not the command line's. `CommandLine` does not use it (it draws `ds`'s `Button` with the same
+  props `Action` passed, so the button markup is byte for byte the old one).
+- **`ds_helpers::OsRelease`** (`os_release.rs`): `parse(&str)` gives `id` (lower case), `id_like` (words, lower case) and `version_id`
+  (`None` when absent or empty); `Family::detect` is built on it and `Family` is unchanged. Two small differences from the old inline reader:
+  `#` lines are skipped and the last assignment of a key wins (as when the shell sources the file); neither changes a real file's result. The
+  table test uses full os-release texts for Fedora 44, Ubuntu 24.04, Ubuntu 26.04, Debian 13, Debian 14 (forky, still testing, so no
+  `VERSION_ID`), Arch and openSUSE Tumbleweed (with its commented `# VERSION=` line). The Fedora, Ubuntu and Tumbleweed texts are written
+  from memory of the real files for those releases (the 26.04 and 44 files were not fetched), so the gate cannot catch a wrong detail in
+  an unused field; the fields the test reads (`ID`, `ID_LIKE`, `VERSION_ID`) are the ones those distros are known to carry.
+- **Goldens hand-edited (class rename only), to confirm on bless:** `ds-shell/tests/snapshots/helpers/unsupported-command-{light,dark}.html`,
+  `unsupported-copied-{light,dark}.html` (`ds-helper-command` -> `ds-command-line`, `-text` likewise);
+  `ds-shell/tests/snapshots/stylesheet.css` (the `helper_sheet` section lost the two rules and gained the `.ds-alert .ds-command-line`
+  rule; a new `command_line` section sits before `command_palette`). New by hand: `ds/tests/snapshots/controls/command_line/{idle,copied}.html`
+  (the same markup as the helper goldens' command line). No other SSR golden under `crates/*/tests/snapshots/` contains the line or the
+  stylesheet (searched for the class names and for the section markers).
+- **Tests.** Two `command_line` cases in `ds/tests/it/controls/cases.rs` (goldens above), the sheet in `css_scan::STYLES` (every class in a
+  golden is styled) and in `sheet_hygiene::SHEETS` (tokens only). `ds-shell`'s `helpers_ssr` assertions only changed class names; the
+  selectable-text check there stays (it is the one place `user-select:text` is asserted). `ds-helpers`: `os_release.rs` has the table over the
+  seven texts and a table of the file shapes (empty, single quotes with CRLF, empty `VERSION_ID`, repeated key, a key that only ends in
+  `VERSION_ID`). The existing `Family::detect` table stays: it tests the mapping, the new one tests the reading.
+- **Gallery.** The controls page has a "CommandLine" section (a live one that turns to Copied, a Copied one, a long wrapping command); the
+  shell Helpers page already shows it inside the sheet.
+- **Public items.** Added: `ds::components::controls::command_line::CommandLine`, `ds::components::controls::copy_state::CopyState`,
+  `ds_helpers::OsRelease` (fields `id`, `id_like`, `version_id`; `parse`). Changed: `ds_shell::accounts::model::CopyState` is a re-export of
+  the `ds` type (same path, same variants). Removed: nothing public.
+- **Open.** `Helpers` does not hand out its os-release text or `OsRelease`; detent reads the file itself or `Helpers` grows an accessor
+  (not asked for here).

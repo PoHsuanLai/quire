@@ -17,6 +17,7 @@ const SHEETS: &[&str] = &[
     "disclosure",
     "hover_strip",
     "command_pill",
+    "command_line",
     "pin_tile",
     "provider_mark",
     "drag_ghost",

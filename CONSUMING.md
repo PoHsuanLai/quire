@@ -1462,6 +1462,9 @@ pacman = ["libheif"]
 
 Families are `dnf`, `apt`, `pacman`, `zypper`, chosen from `ID` then `ID_LIKE` in
 `/etc/os-release`. A family you leave out, or any other distro, is `Outcome::Unsupported`.
+To know the release too (an app that shows a different command for Ubuntu 24.04 and 26.04), read the same text
+with `ds_helpers::OsRelease::parse(&text)`: `id`, `id_like` and `version_id` (`None` on Arch and Debian testing,
+which carry none); `Family::detect` is built on it.
 
 **The API.**
 
@@ -1505,9 +1508,39 @@ family and pass its `.text()` (`None` when the list is empty, or when you cannot
 is theirs). With `Some`, the sheet says to run it in Terminal (the person's computer cannot install it for them, as on a stock Arch with no PackageKit) and shows it as a selectable line with a Copy button: give
 `HelperSheet` / `HelperBody` an `on_copy: EventHandler<String>` (default: nothing) that writes the
 clipboard (`ds_blitz::clipboard::write_text`; ds-shell does not depend on ds-blitz) and a
-`copy: CopyState` (`ds_shell::accounts::model::CopyState`, default `Idle`; set `Copied` after you copied, as `BrowserWait` does) so the
-button says "Copied". `on_dismiss` is Not Now and Close;
+`copy: CopyState` (`ds::components::controls::copy_state::CopyState`, also at `ds_shell::accounts::model::CopyState`; default `Idle`; set `Copied` after you copied, as `BrowserWait` does) so the
+button says "Copied". The line itself is `ds`'s `CommandLine` (next section). `on_dismiss` is Not Now and Close;
 Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet.
+
+### Showing a command to copy
+
+`ds::components::controls::command_line::CommandLine { text, copy, on_copy }` draws a command as one
+selectable line in the data face with a Copy button beside it: use it wherever the person has to run
+something in a terminal (Settings that say how to install a tool, an error that names the fix).
+`ds` is renderer-free and cannot write the clipboard, so the host does: `on_copy` hears the `text`
+when Copy is pressed, you write it (`ds_blitz::clipboard::write_text(&text)`), and you hold a
+`CopyState` (`ds::components::controls::copy_state::CopyState`, `Idle` or `Copied`, default `Idle`)
+that you pass as `copy`, set to `Copied` after the write, so the label reads "Copied"; set it back to
+`Idle` when the text changes or after a moment. The component sets no margin; space it from its
+parent. Return on the button presses it and goes no further, so a sheet around it keeps its own
+Return.
+
+```rust,ignore
+use ds::components::controls::command_line::CommandLine;
+use ds::components::controls::copy_state::CopyState;
+
+let mut copy = use_signal(CopyState::default);
+rsx! {
+    CommandLine {
+        text: "sudo dnf install llama-cpp".to_owned(),
+        copy: copy(),
+        on_copy: move |text: String| {
+            let _ = ds_blitz::clipboard::write_text(&text);
+            copy.set(CopyState::Copied);
+        },
+    }
+}
+```
 
 ### Exporting the menu bar
 

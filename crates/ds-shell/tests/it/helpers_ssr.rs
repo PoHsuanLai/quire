@@ -184,7 +184,7 @@ fn an_unsupported_system_with_a_command_shows_it_selectable_with_a_copy_button()
         "{html}"
     );
     assert!(
-        html.contains("<span class=\"ds-helper-command-text\">sudo pacman -S mpv</span>"),
+        html.contains("<span class=\"ds-command-line-text\">sudo pacman -S mpv</span>"),
         "{html}"
     );
     assert!(
@@ -202,7 +202,7 @@ fn an_unsupported_system_with_a_command_shows_it_selectable_with_a_copy_button()
         "the host's word that it copied turns the label to Copied: {copied}"
     );
     let styled = ds_shell::stylesheet().lines().any(|rule| {
-        rule.starts_with(".ds-helper-command-text{") && rule.contains("user-select:text")
+        rule.starts_with(".ds-command-line-text{") && rule.contains("user-select:text")
     });
     assert!(styled, "the command line must be selectable");
 }
@@ -212,7 +212,7 @@ fn an_unsupported_system_without_a_command_has_no_command_line() {
     let html = light("unsupported");
     assert!(html.contains("then try again."), "{html}");
     assert!(
-        !html.contains("ds-helper-command") && !html.contains("Copy"),
+        !html.contains("ds-command-line") && !html.contains("Copy"),
         "{html}"
     );
 }

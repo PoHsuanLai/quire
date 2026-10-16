@@ -1,0 +1,5 @@
+/* CommandLine: a command to copy. One selectable line in the data face on a quiet fill, the
+   Copy button beside it. Placement (margins) is the parent's. */
+
+.ds-command-line{ display:flex; align-items:center; align-self:stretch; gap:var(--s-8); }
+.ds-command-line-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }

@@ -506,9 +506,8 @@ html,body{margin:0;padding:0;background:transparent}
    place of its buttons; the unsupported phase may carry an install command to copy. */
 
 .ds-helper-progress{ display:flex; justify-content:center; padding:var(--s-8) 0 var(--s-4); }
-/* The install command: one selectable line in the data face, the Copy button beside it. */
-.ds-helper-command{ display:flex; align-items:center; align-self:stretch; gap:var(--s-8); margin-top:var(--s-12); }
-.ds-helper-command-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }
+/* The install command (`CommandLine`, `command_line.css`): set below the alert's words. */
+.ds-alert .ds-command-line{ margin-top:var(--s-12); }
 /* -- accounts -- */
 /* The account sheets (design/31 sections 4.5 and 5.6). A step is one column in a regular sheet:
    a bold title, the body in the soft ink, and a row of buttons at the end with the default last.
@@ -785,6 +784,12 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-column[*|data-extent=fixed][*|data-size=small]{ --column-extent:var(--ctl-h-s); }
 .ds-column[*|data-extent=fixed][*|data-size=large]{ --column-extent:var(--ctl-h-l); }
 .ds-column[*|data-extent=fixed][*|data-size=extra-large]{ --column-extent:var(--ctl-h-xl); }
+/* -- command_line -- */
+/* CommandLine: a command to copy. One selectable line in the data face on a quiet fill, the
+   Copy button beside it. Placement (margins) is the parent's. */
+
+.ds-command-line{ display:flex; align-items:center; align-self:stretch; gap:var(--s-8); }
+.ds-command-line-text{ flex:1; min-width:0; padding:var(--s-6) var(--s-10); border-radius:var(--r-small); background:var(--fill-quaternary); font-family:var(--font-data); font-size:var(--fs-small); line-height:1.45; color:var(--ink); text-align:left; word-break:break-all; user-select:text; }
 /* -- command_palette -- */
 /* CommandPalette (design/04-COMPONENTS.md section 25), `S:230-234` with the overrides
    `S:793-799`: a scrim that centres the panel near the top, the panel entering with

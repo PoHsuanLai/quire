@@ -24,12 +24,12 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
 | `ds-behaviour` | pure input machines a shell and a compositor both run: the app switcher, hot corners, the Command key's double tap and hold, the live Space swipe; no Dioxus, no clock |
 | `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
-| `ds` | generic components, the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
+| `ds` | generic components (among them `CommandLine`, a copyable command; the host writes the clipboard), the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
 | `ds-shell` | app-facing parts above `ds`, cross-platform: the account sheets and consent alert, the missing-helper sheet (its `Unsupported` phase shows the install command for the person's distro as a selectable line with a Copy button), the confirm card, with their sheets and `KIT`. The surfaces only our desktop shell draws live in sill's `sill-shell-kit` (see "Moved to sill" in section 3) |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
 | `ds-settings-page` | `SettingsPage`: a settings schema drawn as grouped rows with the control each key kind gets, and room for an app's own rows; its own crate because it needs `ds` and `ds-settings`, which may not name each other |
 | `ds-settings` | `SettingsDoc` + `Store`: lenient load, atomic save, watch, schema, appearance file, portal, icon-theme lookup |
-| `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family and its install command, the PackageKit installer (and a fake), the availability feed, and for a request nothing can install (no PackageKit, as on a stock Arch) the `Missing::install_lines` to copy |
+| `ds-helpers` | missing helpers: the helpers file (capability, probe, per-distro package alternatives), the PATH probe, the distro family and its install command, `OsRelease` (the `ID`, `ID_LIKE` and `VERSION_ID` of an os-release text, which `Family::detect` is built on), the PackageKit installer (and a fake), the availability feed, and for a request nothing can install (no PackageKit, as on a stock Arch) the `Missing::install_lines` to copy |
 | `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus`, `debug-probe` (a test build only: `QUIRE_DEBUG_PROBE=<dir>` makes each window write its controls by role and name with their boxes, `ds-blitz::probe`) |
 | `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
@@ -109,7 +109,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
 
 Component groups inside `ds` and the layer order inside the components tier: `content` (icons,
-images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` < `overlays` (alert,
+images, avatars, status glyphs, rich text, marks, PDF thumbs) < `controls` (buttons, toggles, sliders, chips, `CommandLine` with its `CopyState`, ...) < `overlays` (alert,
 popover, sheet, tooltip, toast, scrim, hover card, drag ghost, panel, flow) < `forms` (`Form`, `FormSection`, `IconTile`, `PaneStack` with `PageHeader` and `PanePath`: the grouped page, the tile a row leads with and the in-pane drill-in; `PaneStack` sits here, above `controls` for its back `Button` and below `lists` since the caller's pages hold the lists, and its motion is `ds-motion::use_pane_slide`, shared with the preview switcher) < `lists` (rows,
 settings rows, headers, animated, leaving and virtual lists, preview pane, emoji grid, appearance picker)
 < `fields` (text input, search field, selection bubble) < `menus` (menu, palette, entries, `ui_manifest`, `export`) <

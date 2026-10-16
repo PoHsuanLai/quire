@@ -6,7 +6,6 @@
 //! (Ask, then Installing while `Helpers::provide` runs, then nothing on success or one of the
 //! end phases). No `ds-helpers` type is named here; a host maps its outcome to a phase.
 
-pub(crate) mod command;
 pub mod model;
 pub(crate) mod sheet;
 pub(crate) mod wording;

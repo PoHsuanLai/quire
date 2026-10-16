@@ -5,6 +5,8 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use ds::components::controls::button_model::{Answers, Bezel, ButtonRole, ImagePosition};
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::command_line::CommandLine;
+use ds::components::controls::copy_state::CopyState;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
@@ -432,6 +434,17 @@ pub const CASES: &[Case] = &[
         component: "badge",
         state: "zero",
         make: || rsx! { Badge { content: BadgeContent::Number(0) , tone: BadgeTone::Quiet, size: ControlSize::Mini} },
+    },
+    // CommandLine: the line and its Copy button; the host's word that it copied turns the label.
+    Case {
+        component: "command_line",
+        state: "idle",
+        make: || rsx! { CommandLine { text: "sudo pacman -S mpv".to_string(), on_copy: |_| {} } },
+    },
+    Case {
+        component: "command_line",
+        state: "copied",
+        make: || rsx! { CommandLine { text: "sudo pacman -S mpv".to_string(), copy: CopyState::Copied, on_copy: |_| {} } },
     },
     // Scrubber: at rest, with loaded stretches, hovered, dragged and unavailable.
     Case {

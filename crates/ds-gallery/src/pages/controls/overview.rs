@@ -12,6 +12,8 @@ use ds::components::content::avatar::{AvatarFace, AvatarShape, AvatarSize, Avata
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::controls::badge::{Badge, BadgeContent, BadgeTone};
 use ds::components::controls::chip::{Chip, ChipVariant};
+use ds::components::controls::command_line::CommandLine;
+use ds::components::controls::copy_state::CopyState;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::components::controls::progress::model::{Progress, ProgressStyle};
 use ds::components::controls::progress::view::ProgressIndicator;
@@ -56,6 +58,7 @@ const AVATAR_SIZES: [AvatarSize; 8] = [
 pub fn ControlsPage() -> Element {
     rsx! {
         Buttons {}
+        CommandLines {}
         crate::pages::controls::label_runs_and_marks::LabelRunsAndMarks {}
         crate::pages::controls::icon_groups::IconGroups {}
         crate::pages::controls::pass_through::MoreGlyphs {}
@@ -79,6 +82,20 @@ fn Buttons() -> Element {
                 KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Shift, ShortcutKey::Super, ShortcutKey::Char('p')]) , style: KeyStyle::Cap}
                 KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Super, ShortcutKey::Enter]), style: KeyStyle::Cap, size: ControlSize::Mini}
                 KeyEquivalent { shortcut: Shortcut(vec![ShortcutKey::Escape, ShortcutKey::Tab, ShortcutKey::Backspace, ShortcutKey::Up, ShortcutKey::Down, ShortcutKey::Left, ShortcutKey::Right, ShortcutKey::Space]), style: KeyStyle::Cap, size: ControlSize::Mini}
+            }
+        }
+    }
+}
+
+#[component]
+fn CommandLines() -> Element {
+    let mut copy = use_signal(CopyState::default);
+    rsx! {
+        Section { title: "CommandLine", note: "Live: Copy tells the host (here the page itself, which writes no clipboard) and the label reads Copied until the host says Idle again. The second line is the Copied state as a host that has copied shows it. A long command wraps at any character; the text is selectable.",
+            div { class: "g-column",
+                CommandLine { text: "sudo dnf install llama-cpp".to_string(), copy: copy(), on_copy: move |_| copy.set(CopyState::Copied) }
+                CommandLine { text: "sudo pacman -S mpv".to_string(), copy: CopyState::Copied, on_copy: |_| {} }
+                CommandLine { text: "sudo apt install --no-install-recommends ffmpeg libheif-examples wl-clipboard mpv".to_string(), on_copy: |_| {} }
             }
         }
     }

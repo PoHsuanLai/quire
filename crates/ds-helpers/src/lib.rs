@@ -32,7 +32,8 @@
 //! ```
 //!
 //! The distro family comes from `ID`, then each `ID_LIKE` entry, of `/etc/os-release`
-//! ([`Family::detect`]; read through [`Environment::os_release`], never written).
+//! ([`Family::detect`], on the fields [`OsRelease::parse`] reads, which also give the release's
+//! `VERSION_ID`; read through [`Environment::os_release`], never written).
 //!
 //! # Why PackageKit's system transaction API, not `Modify2`
 //!
@@ -55,6 +56,7 @@ mod family;
 mod helpers;
 mod install_line;
 mod installer;
+mod os_release;
 mod outcome;
 mod probe;
 mod watch;
@@ -65,6 +67,7 @@ pub use family::Family;
 pub use helpers::Helpers;
 pub use install_line::InstallLine;
 pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn};
+pub use os_release::OsRelease;
 pub use outcome::{Missing, Outcome};
 pub use probe::{Environment, Presence};
 pub use watch::{Availability, Subscription};

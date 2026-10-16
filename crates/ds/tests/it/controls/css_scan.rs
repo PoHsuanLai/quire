@@ -86,6 +86,13 @@ pub const STYLES: &[(&str, &[&str])] = &[
         ],
     ),
     (
+        "command_line",
+        &[
+            include_str!("../../../src/components/controls/command_line.css"),
+            include_str!("../../../src/components/controls/button.css"),
+        ],
+    ),
+    (
         "key_equivalent",
         &[include_str!(
             "../../../src/components/controls/key_equivalent.css"

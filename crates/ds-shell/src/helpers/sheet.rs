@@ -1,7 +1,6 @@
 //! HelperBody and HelperSheet: the missing-helper question and what follows it, in the alert
 //! layout the consent alert uses.
 
-use super::command::CommandLine;
 use super::model::HelperPhase;
 use super::wording::words;
 use crate::accounts::adapter::{Action, Intent, Landing};
@@ -10,6 +9,7 @@ use crate::accounts::waiting::Waiting;
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
 use ds::components::content::icon_view::IconView;
+use ds::components::controls::command_line::CommandLine;
 use ds::components::overlays::sheet::Sheet;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;

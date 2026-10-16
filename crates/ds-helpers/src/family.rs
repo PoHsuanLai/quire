@@ -1,5 +1,7 @@
 //! The distro family, which decides whose package names to try.
 
+use crate::os_release::OsRelease;
+
 /// A package-name family: the distros that share one set of package names.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Family {
@@ -56,19 +58,12 @@ impl Family {
     }
 
     /// The family of the distro an `os-release` file describes: `ID` first, then each `ID_LIKE`
-    /// entry in order. `None` when none of them is known.
+    /// entry in order (see [`OsRelease`]). `None` when none of them is known.
     pub fn detect(os_release: &str) -> Option<Family> {
-        let value = |key: &str| {
-            os_release
-                .lines()
-                .filter_map(|line| line.trim().split_once('='))
-                .find(|(name, _)| *name == key)
-                .map(|(_, value)| value.trim().trim_matches(|c| c == '"' || c == '\''))
-                .unwrap_or_default()
-        };
-        std::iter::once(value("ID"))
-            .chain(value("ID_LIKE").split_whitespace())
-            .find_map(|id| Family::of_id(&id.to_ascii_lowercase()))
+        let release = OsRelease::parse(os_release);
+        std::iter::once(release.id.as_str())
+            .chain(release.id_like.iter().map(String::as_str))
+            .find_map(Family::of_id)
     }
 }
 

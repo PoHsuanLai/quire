@@ -8,6 +8,8 @@ pub mod button_model;
 pub mod checkbox;
 pub mod chip;
 pub mod choice;
+pub mod command_line;
+pub mod copy_state;
 pub mod disclosure;
 pub(crate) mod edge_grab;
 pub(crate) mod glyph;
