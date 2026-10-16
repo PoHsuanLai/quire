@@ -1698,6 +1698,7 @@ dependencies = [
  "ds",
  "ds-desktop",
  "ds-harness",
+ "ds-helpers",
  "image",
  "keyboard-types 0.7.0",
  "memfd",
@@ -1867,6 +1868,7 @@ dependencies = [
  "ds",
  "ds-behaviour",
  "ds-core",
+ "ds-helpers",
  "ds-settings-derive",
  "ds-style",
  "futures-timer",
@@ -1912,6 +1914,7 @@ dependencies = [
  "ds-motion",
  "ds-style",
  "serde",
+ "zeroize",
 ]
 
 [[package]]
