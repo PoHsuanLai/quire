@@ -66,7 +66,8 @@ impl Watch {
 mod live {
     use crate::Desktop;
     use crate::capability::Bus;
-    use crate::probe::bus::{Side, capabilities_named, fill};
+    use crate::probe::bus::{PEER, Side, capabilities_named, fill};
+    use ds_peer::{Deadline, within};
     use std::future::{Future, poll_fn};
     use std::pin::pin;
     use std::task::Poll;
@@ -112,15 +113,22 @@ mod live {
             session: Option<&zbus::Connection>,
             system: Option<&zbus::Connection>,
         ) -> Live {
-            let session = Followed::open(session).await;
-            let system = Followed::open(system).await;
             let mut desktop = Desktop::default();
-            fill(
-                &mut desktop,
-                session.as_ref().map(|f| &f.side),
-                system.as_ref().map(|f| &f.side),
-            )
+            let (mut followed_session, mut followed_system) = (None, None);
+            // A bus that stops answering costs a start `Deadline::START` and no more; what it
+            // said before then stands and the rest is `Absent` until it speaks.
+            let _ = within(Deadline::START, PEER, async {
+                followed_session = Followed::open(session).await;
+                followed_system = Followed::open(system).await;
+                fill(
+                    &mut desktop,
+                    followed_session.as_ref().map(|f| &f.side),
+                    followed_system.as_ref().map(|f| &f.side),
+                )
+                .await;
+            })
             .await;
+            let (session, system) = (followed_session, followed_system);
             Live {
                 desktop,
                 session,

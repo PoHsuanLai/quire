@@ -30,6 +30,10 @@ pub struct OutputArea {
     pub scale: u32,
 }
 
+/// The most rows read from the wire. A desk has a handful of outputs; a longer list is not one,
+/// and a process squatting the shell's name cannot make us hold or draw an unbounded one.
+const MAX_ROWS: usize = 16;
+
 /// The wire row, `(us(iiuu)(iiuu)u)`.
 pub(crate) type Wire = (u32, String, (i32, i32, u32, u32), (i32, i32, u32, u32), u32);
 
@@ -42,7 +46,18 @@ fn rect((x, y, width, height): (i32, i32, u32, u32)) -> OutputRect {
     }
 }
 
+impl OutputRect {
+    fn has_size(&self) -> bool {
+        self.width > 0 && self.height > 0
+    }
+}
+
 impl OutputArea {
+    /// Whether the frame and the work area have a size and the scale is not zero.
+    fn has_size(&self) -> bool {
+        self.frame.has_size() && self.work.has_size() && self.scale > 0
+    }
+
     /// The output's size in device pixels: the frame times the scale, rounded.
     pub fn physical(&self) -> (u32, u32) {
         let device = |logical: u32| {
@@ -65,12 +80,15 @@ impl Outputs {
         Outputs { areas }
     }
 
-    /// Outputs from the property's wire rows.
+    /// Outputs from the property's wire rows: at most [`MAX_ROWS`] of them, and a row with a
+    /// frame or work area of no size, or a scale of zero, is dropped (windows fitted into
+    /// nothing are worse than no answer: the caller then keeps the window system's own size).
     #[cfg_attr(not(feature = "dbus"), allow(dead_code))]
     pub(crate) fn of_wire(rows: Vec<Wire>) -> Outputs {
         Outputs {
             areas: rows
                 .into_iter()
+                .take(MAX_ROWS)
                 .map(|(id, name, frame, work, scale)| OutputArea {
                     id,
                     name,
@@ -78,6 +96,7 @@ impl Outputs {
                     work: rect(work),
                     scale,
                 })
+                .filter(OutputArea::has_size)
                 .collect(),
         }
     }
@@ -204,6 +223,41 @@ mod tests {
         )];
         let outputs = Outputs::of_wire(rows);
         assert_eq!(outputs.areas(), &[area_with(3, "DP-2", 32, 1340)]);
+    }
+
+    #[test]
+    fn wire_rows_that_cannot_hold_a_window_are_dropped_and_the_list_is_capped() {
+        let row = |id: u32, frame: (i32, i32, u32, u32), work: (i32, i32, u32, u32), scale: u32| {
+            (id, format!("DP-{id}"), frame, work, scale)
+        };
+        let good = (0, 0, 1920, 1080);
+        let table = [
+            ("a good row stays", vec![row(1, good, good, 120)], 1),
+            (
+                "a zero-height work area",
+                vec![row(1, good, (0, 0, 1920, 0), 120)],
+                0,
+            ),
+            (
+                "a zero-width frame",
+                vec![row(1, (0, 0, 0, 1080), good, 120)],
+                0,
+            ),
+            ("a zero scale", vec![row(1, good, good, 0)], 0),
+            (
+                "only the bad row goes",
+                vec![row(1, good, (0, 0, 0, 0), 120), row(2, good, good, 120)],
+                1,
+            ),
+            (
+                "a long list is cut",
+                (0..1000).map(|id| row(id, good, good, 120)).collect(),
+                MAX_ROWS,
+            ),
+        ];
+        for (name, rows, want) in table {
+            assert_eq!(Outputs::of_wire(rows).areas().len(), want, "{name}");
+        }
     }
 
     fn area_with(id: u32, name: &str, top: i32, height: u32) -> OutputArea {

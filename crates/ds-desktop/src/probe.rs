@@ -22,15 +22,27 @@ impl Desktop {
 pub(crate) mod bus {
     use crate::capability::{Bus, Capability};
     use crate::{Desktop, Presence};
+    use ds_peer::{Deadline, within};
     use std::collections::HashSet;
+    use std::future::Future;
     use zbus::Connection;
     use zbus::fdo::DBusProxy;
 
-    /// The session and system connections; either may be missing (a headless box, a sandbox).
+    /// Who a screen says is not answering when a bus runs out of time.
+    pub(crate) const PEER: &str = "The message bus";
+
+    /// `work`'s answer, or `None` when it failed or did not come within [`Deadline::START`]: a
+    /// probe never waits on a wedged bus, it reports what it knows.
+    pub(crate) async fn answered<T>(work: impl Future<Output = zbus::Result<T>>) -> Option<T> {
+        within(Deadline::START, PEER, work).await.ok()?.ok()
+    }
+
+    /// The session and system connections; either may be missing (a headless box, a sandbox) or
+    /// silent.
     pub(crate) async fn connect() -> (Option<Connection>, Option<Connection>) {
         (
-            Connection::session().await.ok(),
-            Connection::system().await.ok(),
+            answered(Connection::session()).await,
+            answered(Connection::system()).await,
         )
     }
 
@@ -76,6 +88,8 @@ pub(crate) mod bus {
             .filter(move |c| c.service().is_some_and(|s| s.bus == bus && s.name == name))
     }
 
+    /// Fill `desktop` from the buses, one capability at a time; a caller that cuts it short keeps
+    /// the capabilities filled so far.
     pub(crate) async fn fill(desktop: &mut Desktop, session: Option<&Side>, system: Option<&Side>) {
         for capability in Capability::ALL {
             let Some(service) = capability.service() else {
@@ -95,21 +109,25 @@ pub(crate) mod bus {
 
     impl Desktop {
         /// Probe over the given connections (a private bus in tests); a missing bus leaves its
-        /// capabilities `Absent`.
+        /// capabilities `Absent`, and so does a bus that does not finish answering within
+        /// [`Deadline::START`]: what it said before then stands.
         pub async fn probe_on(
             session: Option<&Connection>,
             system: Option<&Connection>,
         ) -> Desktop {
-            let session = match session {
-                Some(c) => Side::open(c).await,
-                None => None,
-            };
-            let system = match system {
-                Some(c) => Side::open(c).await,
-                None => None,
-            };
             let mut desktop = Desktop::default();
-            fill(&mut desktop, session.as_ref(), system.as_ref()).await;
+            let _ = within(Deadline::START, PEER, async {
+                let session = match session {
+                    Some(c) => Side::open(c).await,
+                    None => None,
+                };
+                let system = match system {
+                    Some(c) => Side::open(c).await,
+                    None => None,
+                };
+                fill(&mut desktop, session.as_ref(), system.as_ref()).await;
+            })
+            .await;
             desktop
         }
     }

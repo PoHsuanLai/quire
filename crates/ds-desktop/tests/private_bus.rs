@@ -1,7 +1,7 @@
 //! The probe against a private `dbus-daemon`: a fake service claims a name and releases it.
 //! Nothing here reaches the real session or system bus; the guard kills the daemon by PID.
 
-use ds_desktop::{Capability, Desktop};
+use ds_desktop::{Capability, Desktop, Outputs};
 use std::io::{BufRead, BufReader};
 use std::path::PathBuf;
 use std::process::{Child, Command, Stdio};
@@ -245,4 +245,74 @@ async fn the_outputs_are_read_and_a_change_is_followed() {
         .expect("a change arrives")
         .expect("the feed is live");
     assert_eq!(after.areas().len(), 2);
+}
+
+type Row = (u32, String, (i32, i32, u32, u32), (i32, i32, u32, u32), u32);
+
+/// What a process holding `org.quire.Outputs1` says when asked for the work areas.
+#[derive(Clone)]
+enum Answer {
+    Rows(Vec<Row>),
+    /// It holds the name and never replies.
+    Never,
+}
+
+struct Shell(Answer);
+
+#[zbus::interface(name = "org.quire.Outputs1")]
+impl Shell {
+    #[zbus(property)]
+    async fn work_areas(&self) -> Vec<Row> {
+        match &self.0 {
+            Answer::Rows(rows) => rows.clone(),
+            Answer::Never => std::future::pending().await,
+        }
+    }
+}
+
+/// A connection on `bus` that holds `org.quire.Outputs1` and answers as `answer` says.
+async fn hold_outputs(bus: &PrivateBus, answer: Answer) -> zbus::Connection {
+    let holder = bus.connect().await;
+    holder
+        .object_server()
+        .at("/org/quire/Outputs1", Shell(answer))
+        .await
+        .expect("served");
+    holder
+        .request_name("org.quire.Outputs1")
+        .await
+        .expect("claims the name");
+    holder
+}
+
+fn row(id: u32, work: (i32, i32, u32, u32), scale: u32) -> Row {
+    (id, format!("DP-{id}"), (0, 0, 1920, 1080), work, scale)
+}
+
+#[tokio::test]
+async fn rows_that_cannot_hold_a_window_read_as_no_outputs() {
+    let bus = PrivateBus::start("squatter", &[]);
+    let rows = vec![
+        row(1, (0, 0, 1920, 0), 120),
+        row(2, (0, 32, 1920, 1048), 0),
+        row(3, (0, 32, 1920, 1048), 120),
+    ];
+    let _holder = hold_outputs(&bus, Answer::Rows(rows)).await;
+    let client = bus.connect().await;
+    let outputs = Outputs::read_on(&client).await;
+    let ids: Vec<u32> = outputs.areas().iter().map(|area| area.id).collect();
+    assert_eq!(ids, [3]);
+}
+
+#[tokio::test]
+async fn a_shell_that_holds_the_name_and_never_answers_reads_as_no_outputs() {
+    let bus = PrivateBus::start("silent", &[]);
+    let _holder = hold_outputs(&bus, Answer::Never).await;
+    let client = bus.connect().await;
+    let started = std::time::Instant::now();
+    let outputs = tokio::time::timeout(Duration::from_secs(15), Outputs::read_on(&client))
+        .await
+        .expect("the read ends by its own deadline");
+    assert!(outputs.areas().is_empty());
+    assert!(started.elapsed() < Duration::from_secs(10));
 }
