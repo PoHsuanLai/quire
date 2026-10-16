@@ -16,7 +16,10 @@ const LOCK_POLL: Duration = Duration::from_millis(10);
 /// The exclusive lock on one sidecar file, held for as long as this value lives (closing the file
 /// releases it, also when the process dies).
 #[derive(Debug)]
-pub(super) struct Flock(File);
+pub(super) struct Flock {
+    /// Never read: it is held so the lock lasts.
+    _file: File,
+}
 
 impl Flock {
     /// Create the sidecar at `path` if it is not there and take its exclusive lock, waiting up to
@@ -25,7 +28,7 @@ impl Flock {
     pub(super) fn exclusive(path: &Path) -> io::Result<Flock> {
         let file = open(path)?;
         wait(&file)?;
-        Ok(Flock(file))
+        Ok(Flock { _file: file })
     }
 }
 
