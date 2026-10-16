@@ -3,18 +3,11 @@
 //! `Package`, `ErrorCode` and `Finished` signals (the interface XML PackageKit ships in
 //! `/usr/share/dbus-1/interfaces`). The crate docs say why this route and not `Modify2`.
 
-use super::Request;
+use super::transaction::{Budget, Fault, PEER, Report, transact};
+use super::{Request, Timeouts};
 use crate::outcome::{Missing, Outcome};
-use std::pin::Pin;
-use zbus::export::futures_core::Stream;
-use zbus::message::Type;
-use zbus::zvariant::OwnedObjectPath;
-use zbus::{Connection, MatchRule, Message, MessageStream};
-
-const SERVICE: &str = "org.freedesktop.PackageKit";
-const ROOT_PATH: &str = "/org/freedesktop/PackageKit";
-const ROOT_INTERFACE: &str = "org.freedesktop.PackageKit";
-const TRANSACTION_INTERFACE: &str = "org.freedesktop.PackageKit.Transaction";
+use ds_peer::within;
+use zbus::Connection;
 
 /// `PK_FILTER_ENUM_NONE` as a bitfield value (`1 << 1`; `UNKNOWN` is bit 0).
 const FILTER_NONE: u64 = 1 << 1;
@@ -44,14 +37,7 @@ enum Bus {
 #[derive(Debug)]
 pub struct PackageKit {
     bus: Bus,
-}
-
-/// What a transaction reported before it finished.
-#[derive(Debug, Default)]
-struct Report {
-    packages: Vec<String>,
-    error: Option<(u32, String)>,
-    exit: u32,
+    timeouts: Timeouts,
 }
 
 /// What resolving one candidate name found.
@@ -65,72 +51,109 @@ enum Found {
 impl PackageKit {
     /// The system's PackageKit, over the system bus.
     pub fn system() -> PackageKit {
-        PackageKit { bus: Bus::System }
+        PackageKit {
+            bus: Bus::System,
+            timeouts: Timeouts::default(),
+        }
     }
 
     /// A PackageKit (or a stand-in) reached over `connection`.
     pub fn on(connection: Connection) -> PackageKit {
         PackageKit {
             bus: Bus::Given(connection),
+            timeouts: Timeouts::default(),
         }
+    }
+
+    /// This backend with `timeouts` for each wait on PackageKit.
+    pub fn with_timeouts(mut self, timeouts: Timeouts) -> PackageKit {
+        self.timeouts = timeouts;
+        self
     }
 
     pub(super) async fn install(&self, request: &Request) -> Outcome {
         let connection = match &self.bus {
             Bus::Given(connection) => connection.clone(),
-            Bus::System => match Connection::system().await {
-                Ok(connection) => connection,
-                Err(_) => return Outcome::Unsupported(request.missing.clone()),
+            Bus::System => match within(self.timeouts.step, PEER, Connection::system()).await {
+                Ok(Ok(connection)) => connection,
+                Ok(Err(_)) => return Outcome::Unsupported(request.missing.clone()),
+                Err(silent) => return Outcome::Failed(silent.to_string()),
             },
         };
-        match run(&connection, request).await {
+        match run(&connection, request, self.timeouts).await {
             Ok(outcome) => outcome,
-            Err(error) => classify(&error, &request.missing),
+            Err(fault) => classify(&fault, &request.missing),
         }
     }
 }
 
-async fn run(connection: &Connection, request: &Request) -> zbus::Result<Outcome> {
+async fn run(
+    connection: &Connection,
+    request: &Request,
+    timeouts: Timeouts,
+) -> Result<Outcome, Fault> {
     for name in &request.candidates {
-        match resolve(connection, name.as_str()).await? {
+        match resolve(connection, name.as_str(), timeouts).await? {
             Found::Installed => return Ok(Outcome::Installed),
-            Found::Available(id) => return install_id(connection, id).await,
+            Found::Available(id) => return install_id(connection, id, timeouts).await,
             Found::Absent => {}
         }
     }
     Ok(Outcome::NotFound(request.missing.clone()))
 }
 
-async fn resolve(connection: &Connection, name: &str) -> zbus::Result<Found> {
-    let report = transact(connection, "Resolve", &(FILTER_NONE, vec![name])).await?;
-    resolve_report(&report).map_err(zbus::Error::Failure)
+async fn resolve(connection: &Connection, name: &str, timeouts: Timeouts) -> Result<Found, Fault> {
+    let budget = Budget {
+        quick: timeouts.step,
+        method: timeouts.step,
+    };
+    let report = transact(connection, "Resolve", &(FILTER_NONE, vec![name]), budget).await?;
+    resolve_report(&report, name).map_err(|details| zbus::Error::Failure(details).into())
 }
 
-/// What a `Resolve` report says. The package id is `name;version;arch;data`; an installed
-/// package's data starts with `installed`. Read that, not the `info` enum.
-fn resolve_report(report: &Report) -> Result<Found, String> {
+/// What a `Resolve` report says about `name`. The package id is `name;version;arch;data`; an
+/// installed package's data starts with `installed`. Read that, not the `info` enum. An id for any
+/// other name is not an answer to this request and is ignored, so only a package that was asked
+/// for can reach `InstallPackages`.
+fn resolve_report(report: &Report, name: &str) -> Result<Found, String> {
     match &report.error {
         Some((code, _)) if *code == ERROR_PACKAGE_NOT_FOUND => return Ok(Found::Absent),
         Some((_, details)) => return Err(details.clone()),
         None => {}
     }
-    let installed = |id: &String| {
-        id.rsplit(';')
-            .next()
-            .is_some_and(|d| d.starts_with("installed"))
-    };
-    Ok(match report.packages.iter().find(|id| !installed(id)) {
-        _ if report.packages.iter().any(installed) => Found::Installed,
-        Some(id) => Found::Available(id.clone()),
-        None => Found::Absent,
+    let (installed, available): (Vec<&String>, Vec<&String>) = report
+        .packages
+        .iter()
+        .filter(|id| id.split(';').next() == Some(name))
+        .partition(|id| is_installed(id));
+    Ok(match (installed.first(), available.first()) {
+        (Some(_), _) => Found::Installed,
+        (None, Some(id)) => Found::Available((*id).clone()),
+        (None, None) => Found::Absent,
     })
 }
 
-async fn install_id(connection: &Connection, id: String) -> zbus::Result<Outcome> {
+/// Whether a package id's data field says the package is installed.
+fn is_installed(id: &str) -> bool {
+    id.rsplit(';')
+        .next()
+        .is_some_and(|data| data.starts_with("installed"))
+}
+
+async fn install_id(
+    connection: &Connection,
+    id: String,
+    timeouts: Timeouts,
+) -> Result<Outcome, Fault> {
+    let budget = Budget {
+        quick: timeouts.step,
+        method: timeouts.install,
+    };
     let report = transact(
         connection,
         "InstallPackages",
         &(FLAG_ONLY_TRUSTED, vec![id]),
+        budget,
     )
     .await?;
     Ok(match (report.exit, report.error) {
@@ -142,95 +165,18 @@ async fn install_id(connection: &Connection, id: String) -> zbus::Result<Outcome
     })
 }
 
-/// One transaction: create it, subscribe to its signals before calling `method` (so none is
-/// missed), then read until `Finished`. Polkit is asked inside the method call, because the
-/// transaction is told the caller is interactive.
-async fn transact<B>(connection: &Connection, method: &str, body: &B) -> zbus::Result<Report>
-where
-    B: serde::Serialize + zbus::zvariant::DynamicType,
-{
-    let created = connection
-        .call_method(
-            Some(SERVICE),
-            ROOT_PATH,
-            Some(ROOT_INTERFACE),
-            "CreateTransaction",
-            &(),
-        )
-        .await?;
-    let path: OwnedObjectPath = created.body().deserialize()?;
-    let rule = MatchRule::builder()
-        .msg_type(Type::Signal)
-        .path(path.as_str())?
-        .interface(TRANSACTION_INTERFACE)?
-        .build();
-    let mut signals = MessageStream::for_match_rule(rule, connection, None).await?;
-    let path = path.as_str();
-    let hints = (vec!["interactive=true"],);
-    connection
-        .call_method(
-            Some(SERVICE),
-            path,
-            Some(TRANSACTION_INTERFACE),
-            "SetHints",
-            &hints,
-        )
-        .await?;
-    connection
-        .call_method(
-            Some(SERVICE),
-            path,
-            Some(TRANSACTION_INTERFACE),
-            method,
-            body,
-        )
-        .await?;
-    read_until_finished(&mut signals).await
-}
-
-async fn read_until_finished(signals: &mut MessageStream) -> zbus::Result<Report> {
-    let mut report = Report::default();
-    loop {
-        let next = std::future::poll_fn(|cx| Pin::new(&mut *signals).poll_next(cx)).await;
-        let message = next.ok_or_else(|| zbus::Error::Failure("the bus closed".to_owned()))??;
-        if apply(&mut report, &message)? == Step::Done {
-            return Ok(report);
-        }
+/// A failed transaction as an outcome: a PackageKit that did not answer or went away is a failure
+/// in plain words, a bus-level failure is [`classify_bus`].
+fn classify(fault: &Fault, missing: &Missing) -> Outcome {
+    match fault {
+        Fault::Bus(error) => classify_bus(error, missing),
+        Fault::Silent(_) | Fault::Gone => Outcome::Failed(fault.to_string()),
     }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-enum Step {
-    More,
-    Done,
-}
-
-fn apply(report: &mut Report, message: &Message) -> zbus::Result<Step> {
-    let header = message.header();
-    let member = header
-        .member()
-        .map(|m| m.as_str().to_owned())
-        .unwrap_or_default();
-    let body = message.body();
-    match member.as_str() {
-        "Package" => {
-            let (_info, id, _summary): (u32, String, String) = body.deserialize()?;
-            report.packages.push(id);
-        }
-        "ErrorCode" => report.error = Some(body.deserialize()?),
-        "Finished" => {
-            let (exit, _runtime): (u32, u32) = body.deserialize()?;
-            report.exit = exit;
-            return Ok(Step::Done);
-        }
-        _ => {}
-    }
-    Ok(Step::More)
 }
 
 /// A bus-level failure as an outcome: policy refusal is a decline, no PackageKit is
 /// unsupported, anything else is a failure with the daemon's words.
-fn classify(error: &zbus::Error, missing: &Missing) -> Outcome {
+fn classify_bus(error: &zbus::Error, missing: &Missing) -> Outcome {
     use zbus::fdo::Error as Fdo;
     match error {
         zbus::Error::MethodError(name, details, _) => {
@@ -301,7 +247,40 @@ mod tests {
             ),
         ];
         for (name, input, want) in table {
-            assert_eq!(resolve_report(&input), want, "{name}");
+            assert_eq!(resolve_report(&input, "mpv"), want, "{name}");
+        }
+    }
+
+    #[test]
+    fn a_package_that_was_not_asked_for_is_never_chosen() {
+        let table = [
+            (
+                "only another name",
+                vec!["evil;1;x86_64;repo"],
+                Found::Absent,
+            ),
+            (
+                "another name beside the asked one",
+                vec!["evil;1;x86_64;repo", "mpv;2;x86_64;repo"],
+                Found::Available("mpv;2;x86_64;repo".into()),
+            ),
+            (
+                "a longer name that starts the same",
+                vec!["mpv-evil;1;x86_64;repo"],
+                Found::Absent,
+            ),
+            (
+                "another name that is installed",
+                vec!["other;1;x86_64;installed"],
+                Found::Absent,
+            ),
+        ];
+        for (name, ids, want) in table {
+            assert_eq!(
+                resolve_report(&report(&ids, None), "mpv"),
+                Ok(want),
+                "{name}"
+            );
         }
     }
 }

@@ -7,12 +7,16 @@ mod fake;
 #[cfg_attr(not(feature = "quire-desktop"), path = "packagekit_absent.rs")]
 mod packagekit;
 
+#[cfg(feature = "quire-desktop")]
+mod transaction;
+
 pub use fake::{FakeInstaller, StandIn};
 pub use packagekit::PackageKit;
 
 use crate::capability::PackageName;
 use crate::family::Family;
 use crate::outcome::{Missing, Outcome};
+use ds_peer::Deadline;
 
 /// What to install: the alternatives for one tool, best first. The first that exists wins.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,6 +46,34 @@ impl Installer {
         match self {
             Installer::PackageKit(backend) => backend.install(request).await,
             Installer::Fake(backend) => backend.install(request),
+        }
+    }
+}
+
+/// How long each wait on the package manager may take before it counts as not answering.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub struct Timeouts {
+    /// The quick calls, and a lookup of a package's name with its answer.
+    pub step: Deadline,
+    /// An installation: the password prompt, the download and the install. Long, because the
+    /// person may be typing and a download may be slow; a package manager that vanishes ends
+    /// the wait at once, whatever this says.
+    pub install: Deadline,
+}
+
+impl Timeouts {
+    /// Timeouts of `step` for the quick calls and `install` for an installation.
+    pub const fn new(step: Deadline, install: Deadline) -> Timeouts {
+        Timeouts { step, install }
+    }
+}
+
+impl Default for Timeouts {
+    fn default() -> Timeouts {
+        Timeouts {
+            step: Deadline::ACTION,
+            install: Deadline::PROMPT,
         }
     }
 }

@@ -70,6 +70,7 @@ mod watch;
 
 pub use capability::{Capability, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
+pub use ds_peer::Deadline;
 pub use family::Family;
 pub use files::{
     NewFileMode, ReadCap, ReadError, UnixSeconds, WriteError, move_aside, read_capped,
@@ -77,7 +78,7 @@ pub use files::{
 };
 pub use helpers::Helpers;
 pub use install_line::InstallLine;
-pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn};
+pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn, Timeouts};
 pub use os_release::OsRelease;
 pub use outcome::{Missing, Outcome};
 pub use probe::{Environment, Presence};

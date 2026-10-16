@@ -7,9 +7,11 @@ mod fake_pk;
 
 use bus::PrivateBus;
 use ds_helpers::{
-    Capability, Executable, Family, Installer, Missing, Outcome, PackageKit, PackageName, Request,
+    Capability, Deadline, Executable, Family, Installer, Missing, Outcome, PackageKit, PackageName,
+    Request, Timeouts,
 };
 use fake_pk::{Behaviour, Calls, serve};
+use std::time::Duration;
 
 fn request(names: &[&str]) -> Request {
     Request {
@@ -160,5 +162,75 @@ async fn no_packagekit_on_the_bus_is_unsupported() {
     assert_eq!(
         installer.install(&request(&["mpv"])).await,
         Outcome::Unsupported(missing(&["mpv"]))
+    );
+}
+
+/// Timeouts a test can wait out: a step is generous, an installation is `install`.
+fn timeouts(install: Duration) -> Timeouts {
+    Timeouts::new(Deadline::of(Duration::from_secs(5)), Deadline::of(install))
+}
+
+#[tokio::test]
+async fn signals_from_another_process_are_not_believed() {
+    let bus = PrivateBus::start("forged");
+    let forger = bus.connect().await;
+    let daemon = bus.connect().await;
+    let calls = serve(
+        &daemon,
+        Behaviour::default().available(&["mpv"]).forged_by(forger),
+    )
+    .await;
+    let client = bus.connect().await;
+    let installer = Installer::PackageKit(PackageKit::on(client));
+    assert_eq!(
+        installer.install(&request(&["mpv"])).await,
+        Outcome::Installed
+    );
+    assert_eq!(calls.installed(), ["mpv;1.0;x86_64;fedora"]);
+}
+
+#[tokio::test]
+async fn a_transaction_that_goes_quiet_is_cancelled_and_reported_as_not_answering() {
+    let bus = PrivateBus::start("quiet");
+    let daemon = bus.connect().await;
+    let calls = serve(
+        &daemon,
+        Behaviour::default().available(&["mpv"]).never_finish(),
+    )
+    .await;
+    let client = bus.connect().await;
+    let installer = Installer::PackageKit(
+        PackageKit::on(client).with_timeouts(timeouts(Duration::from_millis(300))),
+    );
+    assert_eq!(
+        installer.install(&request(&["mpv"])).await,
+        Outcome::Failed("The package manager is not answering".to_owned())
+    );
+    assert_eq!(calls.cancelled(), 1);
+}
+
+#[tokio::test]
+async fn a_package_manager_that_vanishes_ends_the_wait_at_once() {
+    let bus = PrivateBus::start("vanish");
+    let daemon = bus.connect().await;
+    let calls = serve(
+        &daemon,
+        Behaviour::default().available(&["mpv"]).never_finish(),
+    )
+    .await;
+    let client = bus.connect().await;
+    let installer = Installer::PackageKit(
+        PackageKit::on(client).with_timeouts(timeouts(Duration::from_secs(120))),
+    );
+    let vanish = async {
+        while calls.installed().is_empty() {
+            tokio::time::sleep(Duration::from_millis(20)).await;
+        }
+        drop(daemon);
+    };
+    let (outcome, ()) = tokio::join!(installer.install(&request(&["mpv"])), vanish);
+    assert_eq!(
+        outcome,
+        Outcome::Failed("The package manager stopped before it finished.".to_owned())
     );
 }

@@ -1,11 +1,22 @@
 //! A stand-in for PackageKit's system service, claimed on the private bus under the real name.
 
 use std::sync::{Arc, Mutex};
+use zbus::message::Header;
 use zbus::object_server::SignalEmitter;
 use zbus::zvariant::OwnedObjectPath;
 use zbus::{Connection, ObjectServer, interface};
 
 const NAME: &str = "org.freedesktop.PackageKit";
+const TRANSACTION: &str = "org.freedesktop.PackageKit.Transaction";
+
+/// Whether an installation ever finishes.
+#[derive(Debug, Clone, Copy, Default)]
+enum Ending {
+    #[default]
+    Finishes,
+    /// `InstallPackages` returns and then nothing more is said: no `Finished`.
+    Never,
+}
 
 /// What the fake does.
 #[derive(Debug, Clone, Default)]
@@ -16,6 +27,10 @@ pub struct Behaviour {
     cancel_transaction: bool,
     resolve_error: Option<(u32, String)>,
     install_error: Option<(u32, String)>,
+    ending: Ending,
+    /// Another process on the bus that forges a `Package` and a `Finished` on the transaction
+    /// before the real answers.
+    forger: Option<Connection>,
 }
 
 impl Behaviour {
@@ -41,6 +56,17 @@ impl Behaviour {
         self.resolve_error = Some((code, text.to_owned()));
         self
     }
+    /// `InstallPackages` is accepted and the transaction then goes quiet.
+    pub fn never_finish(mut self) -> Self {
+        self.ending = Ending::Never;
+        self
+    }
+    /// A second connection forges `Package("evil;1;x86_64;repo")` and `Finished(success)` on the
+    /// transaction ahead of the real signals.
+    pub fn forged_by(mut self, forger: Connection) -> Self {
+        self.forger = Some(forger);
+        self
+    }
     pub fn fail_install(self, text: &str) -> Self {
         self.install_errors(2, text)
     }
@@ -58,6 +84,7 @@ struct Record {
     hints: Vec<String>,
     flags: Vec<u64>,
     transactions: u32,
+    cancelled: u32,
 }
 
 /// What the fake was asked.
@@ -79,6 +106,10 @@ impl Calls {
     }
     pub fn flags(&self) -> Vec<u64> {
         self.with(|r| r.flags.clone())
+    }
+    /// How many transactions were told to cancel.
+    pub fn cancelled(&self) -> u32 {
+        self.with(|r| r.cancelled)
     }
 }
 
@@ -126,13 +157,21 @@ impl Transaction {
         self.calls.with(|r| r.hints.extend(hints));
     }
 
+    fn cancel(&self) {
+        self.calls.with(|r| r.cancelled += 1);
+    }
+
     async fn resolve(
         &self,
         _filter: u64,
         packages: Vec<String>,
+        #[zbus(header)] header: Header<'_>,
         #[zbus(signal_emitter)] emitter: SignalEmitter<'_>,
     ) -> zbus::fdo::Result<()> {
         self.calls.with(|r| r.resolved.extend(packages.clone()));
+        if let (Some(forger), Some(path)) = (&self.behaviour.forger, header.path()) {
+            forge(forger, path.clone()).await?;
+        }
         if let Some((code, text)) = &self.behaviour.resolve_error {
             Self::error_code(&emitter, *code, text).await?;
             Self::finished(&emitter, 2, 1).await?;
@@ -167,6 +206,9 @@ impl Transaction {
             r.installed.extend(package_ids);
         });
         let to_zbus = |e: zbus::Error| TransactionError::ZBus(e);
+        if matches!(self.behaviour.ending, Ending::Never) {
+            return Ok(());
+        }
         match (
             &self.behaviour.install_error,
             self.behaviour.cancel_transaction,
@@ -196,6 +238,18 @@ impl Transaction {
 
     #[zbus(signal)]
     async fn finished(emitter: &SignalEmitter<'_>, exit: u32, runtime: u32) -> zbus::Result<()>;
+}
+
+/// `forger` says, on a transaction it does not own, that `evil` is the answer and that it is done.
+async fn forge(forger: &Connection, path: zbus::zvariant::ObjectPath<'_>) -> zbus::Result<()> {
+    let emitter = SignalEmitter::new(forger, path)?;
+    emitter
+        .emit(TRANSACTION, "Package", &(2u32, "evil;1;x86_64;repo", ""))
+        .await?;
+    emitter.emit(TRANSACTION, "Finished", &(1u32, 1u32)).await?;
+    // Let the bus deliver them before the real answers are sent.
+    tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+    Ok(())
 }
 
 /// Claim PackageKit's name on `connection` and serve `behaviour`.
