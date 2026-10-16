@@ -52,6 +52,12 @@
 //! `InstallPackages` asks polkit (`SetHints interactive=true` lets it prompt), and
 //! `Finished`/`ErrorCode` say how it ended. The backend runs no package manager and uses no sudo.
 //!
+//! Every wait on PackageKit has a deadline ([`Timeouts`]: 30 s for a lookup, ten minutes for an
+//! installation, which includes the password prompt and the download). PackageKit going away ends
+//! the wait at once, and one that goes quiet is asked to cancel; either is
+//! `Outcome::Failed("The package manager is not answering")`. Signals are believed only from the
+//! PackageKit that created the transaction, and only a package that was asked for is installed.
+//!
 //! Limits: a Flatpak-sandboxed app cannot reach the system bus's PackageKit, so it gets
 //! [`Outcome::Unsupported`]; an image-based distro (rpm-ostree) installs nothing through
 //! PackageKit this way and reports its own failure.
