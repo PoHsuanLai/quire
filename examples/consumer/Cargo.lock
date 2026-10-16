@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "blitz-kit"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/blitz-kit?rev=009232ce6eabe768dc9dfc2b46a464acfa865c48#009232ce6eabe768dc9dfc2b46a464acfa865c48"
+source = "git+https://github.com/PoHsuanLai/blitz-kit?rev=0ba642e76f3c7edca77b228f05e0399af46e2ec3#0ba642e76f3c7edca77b228f05e0399af46e2ec3"
 dependencies = [
  "blitz-dom",
  "blitz-traits",
