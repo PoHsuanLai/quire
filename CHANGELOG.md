@@ -3,6 +3,24 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.32
+
+The blitz fork at 4b236792: an input method can delete the text around the caret and read it. A
+consumer that pins blitz by rev moves its whole blitz block to 4b236792 with this release.
+
+**blitz** (our fork, rev 4b236792, from 4ca21b12)
+- An input method's DeleteSurrounding deletes the bytes before and after the caret (or the selection)
+  in a text input: a pre-edit is cleared first, the counts are clamped to the text and rounded inward to
+  char boundaries, and the input raises Input as a typed deletion does.
+- New `TextInputData::surrounding_text()` and `BaseDocument::focused_surrounding_text()` return a
+  `SurroundingText { text, cursor, anchor }`: the text around the caret, at most
+  `SURROUNDING_TEXT_MAX_BYTES` (4000) bytes cut on char boundaries, with the pre-edit left out. A host
+  sends it to the input method (shell-host's text-input-v3 surrounding text). Additive.
+- blitz-kit moves to 8570d0f (the same blitz rev).
+
+**ds, ds-shell**
+- Text a person sees or hears says "assistant" for the companion (the orb's label, the confirm sheet).
+
 ## v0.3.31
 
 Two additions: `ds_helpers::DesktopFile`, a pure reader for `.desktop` files, and the blitz fork at
