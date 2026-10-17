@@ -147,7 +147,7 @@ fn Menus() -> Element {
     rsx! {
         Section {
             title: "Menu",
-            note: "One menu, three placements. Arrow keys wrap and skip disabled items, Home and End jump to the ends, letters jump to the next item that starts with them, Enter or Tab picks, Escape or an outside click closes. A menu opens at once; a pick blinks its item twice, then the menu fades out over --t-quick. A submenu opens on a 200 ms rest, or at once on Right, Enter or a click; Left or Escape closes it. A context menu leaves out what is unavailable and shows no key equivalents.",
+            note: "One menu, three placements. Arrow keys wrap and skip disabled items, Home and End jump to the ends, letters jump to the next item that starts with them, Enter or Tab picks, Escape or an outside click closes. A menu opens at once; a pick blinks its item twice, then the menu fades out over --t-quick. A submenu opens on a 200 ms rest, or at once on Right, Enter or a click; Left or Escape closes it. A context menu leaves out what is unavailable; every menu shows its key equivalents.",
             div {
                 class: "g-row",
                 onmounted: move |event| anchor.set(Some(MountedRef(event.data()))),

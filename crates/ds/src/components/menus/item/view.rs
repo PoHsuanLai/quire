@@ -11,7 +11,6 @@ use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuImage;
 use crate::components::menus::item::text::{Emphasis, ItemText};
 use crate::components::menus::item::tip::RowTip;
-use crate::components::menus::menu::placement::Keys;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
 use ds_core::press::{PointerButton, Press};
@@ -78,8 +77,6 @@ pub(crate) struct ItemView<'a> {
     pub branch: Branch,
     /// The panel's leading columns.
     pub columns: Columns,
-    /// Whether key equivalents show.
-    pub keys: Keys,
 }
 
 /// What an item reports: a click of a live item (`pick`; a parent opens its submenu), the
@@ -134,12 +131,12 @@ pub(crate) fn item(view: ItemView<'_>, events: RowEvents) -> Element {
         ImageColumn::Reserved => Some(image_mark(view.image)),
         ImageColumn::Absent => None,
     };
-    let end = match (view.branch, view.keys, view.key) {
-        (Branch::Parent(_), _, _) => chevron(),
-        (Branch::Leaf, Keys::Shown, Some(key)) => rsx! {
+    let end = match (view.branch, view.key) {
+        (Branch::Parent(_), _) => chevron(),
+        (Branch::Leaf, Some(key)) => rsx! {
             span { class: "ds-menu-trailing", "data-mark": "keys", "{key}" }
         },
-        (Branch::Leaf, Keys::Hidden, _) | (Branch::Leaf, Keys::Shown, None) => rsx! {},
+        (Branch::Leaf, None) => rsx! {},
     };
     let label = label(view.title, view.text);
     let lines = view

@@ -50,9 +50,8 @@ use ds_style::tokens::layer::ZLayer;
 /// (design/13 section 13.3.2); `start` is the choice highlighted as it opens instead (a pop-up's
 /// chosen value), numbered as `expanded` numbers them.
 ///
-/// `placement` says where the menu belongs. A `Bar` menu and a `Popup` menu draw their items'
-/// key equivalents; a `Context` menu leaves out what cannot be picked (unless `unavailable` is `Dim`) and shows
-/// no key equivalents. Every menu
+/// `placement` says where the menu belongs. Every menu draws its items' key equivalents; a
+/// `Context` menu also leaves out what cannot be picked (unless `unavailable` is `Dim`). Every menu
 /// opens at once. A pick blinks the item twice, then calls `onpick`, fades the menu out over
 /// `--t-quick` and calls `onclose`; Escape and an outside click play the fade and call `onclose`.
 /// An item with `AfterPick::KeepOpen` (a toggle in a set of toggles) yields its value at once and
@@ -162,7 +161,6 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
         level: Level::Root,
         depth: 0,
         blink: blink(),
-        keys: placement.keys(),
         keymap: use_keys(),
         onpick: picker(
             blink,

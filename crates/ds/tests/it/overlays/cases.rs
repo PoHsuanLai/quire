@@ -445,6 +445,13 @@ pub const CASES: &[Case] = &[
         make: || rsx! { Menu { placement: MenuPlacement::Context, anchor: Anchor::Point(Point { x: Px(420.0), y: Px(310.0) }), items: vec![item(1, "Archive"), item(2, "Snooze…")], onpick: |_| {}, onclose: |_| {} } },
         wait: NOW,
     },
+    // A context menu draws its items' key equivalents, as a pop-up's do.
+    Case {
+        component: "menu",
+        state: "context-keys",
+        make: || rsx! { Menu { placement: MenuPlacement::Context, anchor: Anchor::Point(Point { x: Px(420.0), y: Px(310.0) }), items: snooze(), onpick: |_| {}, onclose: |_| {} } },
+        wait: NOW,
+    },
     Case {
         component: "menu",
         state: "context-hides-the-unavailable",
@@ -581,7 +588,7 @@ pub const CASES: &[Case] = &[
         make: || rsx! { PartsCard { parts: vec![person(), stats(), flag(FlagTone::Danger), foot(), actions()] } },
         wait: INTENT,
     },
-    // Menu hints: a trailing word before the key equivalent; a hint also shows in a context menu.
+    // Menu hints: a trailing word before the key equivalent; a hint shows in a context menu too.
     Case {
         component: "menu",
         state: "hints",

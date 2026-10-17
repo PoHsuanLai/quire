@@ -19,21 +19,14 @@ pub(crate) const MIN_ROOM: Px = Px(84.0);
 /// Where a menu belongs (`NSMenu`'s three roles).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
 pub enum MenuPlacement {
-    /// A menu bar menu, hung under its title. Its key equivalents show.
+    /// A menu bar menu, hung under its title.
     Bar,
     /// A pop-up or pull-down button's menu, a Dock or status-item menu: below its anchor.
     #[default]
     Popup,
-    /// A context menu, at the pointer: it hides what is unavailable and shows no key
-    /// equivalents (design/27).
+    /// A context menu, at the pointer: it hides what is unavailable. Its key equivalents show,
+    /// as every menu's do (the owner's call, 2026-10-17, over design/27's HIG row).
     Context,
-}
-
-/// Whether a menu draws its items' key equivalents.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Keys {
-    Shown,
-    Hidden,
 }
 
 impl MenuPlacement {
@@ -45,13 +38,5 @@ impl MenuPlacement {
             MenuPlacement::Popup => Px(2.0),
         };
         (anchor, Placement::new(Side::Bottom, Align::Start), gap)
-    }
-
-    /// Whether key equivalents are drawn.
-    pub(crate) fn keys(self) -> Keys {
-        match self {
-            MenuPlacement::Bar | MenuPlacement::Popup => Keys::Shown,
-            MenuPlacement::Context => Keys::Hidden,
-        }
     }
 }

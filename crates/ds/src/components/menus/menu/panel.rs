@@ -13,7 +13,6 @@ use crate::components::menus::menu::cursor::{MenuCursor, highlighted, seed};
 use crate::components::menus::menu::decide::{Child, Decision, Level, decide};
 use crate::components::menus::menu::keys::{KeyAct, key_act};
 use crate::components::menus::menu::pick::Picked;
-use crate::components::menus::menu::placement::Keys;
 use crate::components::menus::menu::submenu::SubMenu;
 use crate::components::menus::menu::tracker::{Tracker, Via, target};
 use crate::host::measure::MountedRef;
@@ -37,8 +36,6 @@ pub(crate) struct Panel<T: 'static> {
     pub depth: u8,
     /// The pick in flight: while a picked item blinks, its highlight goes out and comes back.
     pub blink: Blink,
-    /// Whether key equivalents show.
-    pub keys: Keys,
     /// The window's keymap, which draws each key equivalent for the platform.
     pub keymap: WindowKeys,
     /// A pick of a choice of the panel at this depth: the menu blinks, yields the value, then
@@ -91,7 +88,6 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
             Drawn {
                 selected: self.current().filter(|_| lit(self.blink, self.depth)),
                 open: tracker.open().map(|open| open.choice),
-                keys: self.keys,
                 keymap: self.keymap,
                 onpick: EventHandler::new(move |index: usize| match choices.get(index) {
                     Some(Choice {
@@ -245,7 +241,6 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                 timing,
                 depth: self.depth + 1,
                 blink: self.blink,
-                keys: self.keys,
                 onpick: self.onpick,
                 onback: move |()| tracker.close_sub(),
                 onhover: move |at| tracker.point(at, MenuTarget::Menu),

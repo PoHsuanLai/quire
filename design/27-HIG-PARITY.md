@@ -122,7 +122,7 @@ data test), **Doc** (a reviewer's CHECKLIST line).
 | 10 | Undo and redo exist only as mail's undo toast; no Cmd+Z / Shift+Cmd+Z in fields and lists, no Edit menu | every edit | Type + Test | 4.18 |
 | 11 | No written style: title case for buttons and menus, the ellipsis rule, "Cancel" always, tooltip length | every label | Lint + Doc | 3.17 |
 | 12 | Label hierarchy stops at three inks; text on a material uses card or frame inks instead of per-material vibrant inks | menus, bar, control center | Type (tokens) + Test | 3.11 |
-| 13 | Menus: text menus must open with no animation; context menus must hide unavailable items and show no shortcuts; no titles or help lines in text menus | every menu | Type + Test | 5.1, 5.4 |
+| 13 | Menus: text menus must open with no animation; context menus must hide unavailable items (they show their shortcuts: owner override, section 5.4); no titles or help lines in text menus | every menu | Type + Test | 5.1, 5.4 |
 | 14 | No state restoration: windows, panes, sidebar expansion, the last settings pane | every relaunch | Type + Test | 4.6 |
 | 15 | Sidebar metrics and icon colour: no Small/Medium/Large; icons in ink, not accent | every app sidebar | Type | 5.12 |
 | 16 | Glyph weight does not follow the adjacent text's weight; no symbol scales | every icon beside text | Type | 3.15 |
@@ -143,7 +143,7 @@ Most of this audit's motion and state rules fit that machinery without a second 
 | Contact carries the release velocity; springs retarget from position and velocity | `Touch::Contact(Velocity)` (extends 26 §4.1's `Touch`); `use_spring` next to 26's `use_tween` | `ds::detail`, `ds::motion` |
 | Damping 1.0 unless the driving gesture had momentum; 0.8 then | `SpringSpec::for_touch(Touch)`; no public constructor takes a raw damping | `ds::motion` |
 | Reduced motion swaps movement for a cross-fade | every motion primitive declares its Reduced form (design/30 §1.3); a data test fails a primitive without one | `ds::motion`, design/30 §1.1 |
-| A context menu never shows shortcuts and hides unavailable items | `Menu` with `Placement::Context` takes items without `shortcut` and filters `Availability::Disabled` at the type level | `ds::components::menu` |
+| A context menu hides unavailable items and shows its shortcuts (owner override, section 5.4) | `Menu` with `Placement::Context` filters `Availability::Disabled` when built; every placement draws key equivalents | `ds::components::menu` |
 | A default button is never destructive | `AlertButtons { default: Action<Safe>, cancel, other }`; `Action<Destructive>` cannot be the default | `ds::components::alert` |
 | Reserved shortcuts | `Shortcut::custom(..)` returns an error for a combination in the standard table; `Shortcut::standard(StandardAction)` is the only way to bind one | `ds::components::vocab`, test |
 | Inner radius follows outer radius | `Radius::inner(outer, inset)`; the CSS lint rejects a raw radius on an element the markup marks as nested | `ds::geometry`, `ds::lint` |
@@ -561,8 +561,10 @@ connection per window, binds `org_kde_kwin_appmenu_manager` when it is advertise
 | --- | --- |
 | **Apple** | Relevant items only, few, at most about three groups; available elsewhere too; **hide** unavailable items (not dim); **no keyboard shortcuts** in context menus; rarely a title; one submenu level |
 | **quire today** | `Menu` with `Placement::Context` shares the text menu metrics; 09 H5 "every menu item shows its shortcut" |
-| **Verdict** | Adopt; this overrides H5 for context menus only |
-| **Rule** | `Placement::Context` takes items without a `shortcut` field and filters `Availability::Disabled` out when built. 04 §20; 09 H5 note; type |
+| **Verdict** | Adopt, except the shortcuts (owner override below); H5 holds for context menus too |
+| **Rule** | `Placement::Context` filters `Availability::Disabled` out when built and draws key equivalents like every menu. 04 §20; 09 H5 note; golden `menu/context-keys` |
+
+**Owner override, context menu shortcuts (2026-10-17).** Apple's "no keyboard shortcuts in context menus" is not followed: a context menu draws its items' key equivalents, as bar and pop-up menus do, so a right-click teaches the key (temor's tab and block menus, mailo's row menu). Hiding unavailable items still holds.
 
 ### 5.5 Edit menus (2024-04-01)
 
@@ -838,7 +840,7 @@ banner).
 **H3: Focus, selection, pointer, menus (quire).** The shape-following translucent ring,
 `FocusStyle::{Ring, Highlight}`, emphasized and unemphasized selection colours, menus highlight
 in accent with accent ink, text menus open without animation and blink on pick, context menus
-drop shortcuts and hide unavailable items, the one-popover rule, the arrow cursor everywhere
+hide unavailable items (and show shortcuts, owner override 5.4), the one-popover rule, the arrow cursor everywhere
 but links. Gallery contact sheet reviewed beside macOS screenshots.
 
 **H4: Commands, undo, modality (quire + sill).** `MenuModel` with the standard menus and items;

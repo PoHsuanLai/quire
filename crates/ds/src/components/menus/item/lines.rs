@@ -7,7 +7,6 @@ use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::view::{
     Branch, Columns, ImageColumn, ItemView, RowEvents, StateColumn, header, info, item,
 };
-use crate::components::menus::menu::placement::Keys;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Point;
 use ds_core::press::Press;
@@ -22,8 +21,6 @@ pub(crate) struct Drawn {
     pub selected: Option<usize>,
     /// The choice whose submenu is open.
     pub open: Option<usize>,
-    /// Whether key equivalents show.
-    pub keys: Keys,
     /// The window's keymap, which draws each key equivalent for the platform.
     pub keymap: crate::keys::Keys,
     /// A click on a live choice.
@@ -100,7 +97,6 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                         availability: *availability,
                         branch: Branch::Leaf,
                         columns,
-                        keys: drawn.keys,
                     },
                     index,
                 ),
@@ -126,7 +122,6 @@ pub(crate) fn render_lines<T>(items: &[MenuItem<T>], drawn: Drawn, alive: &Alive
                             Shown::Hidden
                         }),
                         columns,
-                        keys: drawn.keys,
                     },
                     index,
                 ),
