@@ -10,7 +10,7 @@ use super::wifi_state::{WifiReach, WifiState};
 use dioxus::prelude::*;
 use ds_motion::detail::{
     morph::Slashed,
-    pending::{PendingFrame, PendingLayers, PendingSpec, PendingStyle},
+    pending::{PendingFrame, PendingLayers, PendingSpec},
     touch::Touch,
     use_detail::use_detail,
     use_operation::use_operation,
@@ -23,8 +23,7 @@ use ds_style::icon::stroke::stroke_width;
 use ds_style::scale::use_scale;
 
 /// The searching loop: the dot and the three arcs, one at a time (a step every `--t-spin-step`).
-pub(crate) const SEARCHING: PendingSpec = PendingSpec {
-    style: PendingStyle::Iterate,
+pub(crate) const SEARCHING: PendingSpec = PendingSpec::Iterate {
     layers: PendingLayers(4),
 };
 

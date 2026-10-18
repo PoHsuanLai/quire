@@ -1,15 +1,10 @@
 //! The spoke spinner's arithmetic (design/30 section 1.3, Pending loop): twelve spokes, the lit
 //! one going round one step every `--t-spin-step`, the ones behind it fading.
 
-use ds_motion::detail::pending::{
-    PendingFrame, PendingLayers, PendingSpec, PendingStyle, SPIN_STEPS,
-};
+use ds_motion::detail::pending::{PendingFrame, PendingSpec, SPIN_STEPS};
 
 /// The loop an indicator plays: one ring, a twelfth of a turn a step.
-pub(crate) const SPIN: PendingSpec = PendingSpec {
-    style: PendingStyle::Spin,
-    layers: PendingLayers(1),
-};
+pub(crate) const SPIN: PendingSpec = PendingSpec::Spin;
 
 /// How many spokes behind the head `spoke` stands in `frame`: 0 is the lit head, 11 the faintest.
 /// An idle loop has no head; every spoke is then at its resting age.

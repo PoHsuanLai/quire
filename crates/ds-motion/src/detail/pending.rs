@@ -2,26 +2,20 @@
 //! how it moves and what it draws in a frame. The frame at a time is
 //! [`crate::timeline::pending::Pending`].
 
-/// How a pending loop moves.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub enum PendingStyle {
-    /// One layer at a time: the Wi-Fi bars searching.
-    Iterate,
-    /// A ring turns a twelfth per step: the spinner.
-    Spin,
-}
-
-/// How many layers a style steps through (the Wi-Fi glyph: the dot and three arcs = 4).
+/// How many layers an iterating loop steps through (the Wi-Fi glyph: the dot and three arcs = 4).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct PendingLayers(pub u8);
 
-/// A pending loop's look.
+/// A pending loop's look: how it moves, with what only that movement needs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct PendingSpec {
-    /// How it moves.
-    pub style: PendingStyle,
-    /// Over how many layers (1 for a ring).
-    pub layers: PendingLayers,
+pub enum PendingSpec {
+    /// One layer at a time: the Wi-Fi bars searching.
+    Iterate {
+        /// Over how many layers.
+        layers: PendingLayers,
+    },
+    /// A ring turns a twelfth per step: the spinner.
+    Spin,
 }
 
 /// The steps of one turn of the spinner: twelve spokes.
@@ -30,9 +24,9 @@ pub const SPIN_STEPS: u8 = 12;
 impl PendingSpec {
     /// Steps in one cycle: a layer each for Iterate, twelve twelfths for Spin.
     pub fn cycle(self) -> u8 {
-        match self.style {
-            PendingStyle::Iterate => self.layers.0.max(1),
-            PendingStyle::Spin => SPIN_STEPS,
+        match self {
+            PendingSpec::Iterate { layers } => layers.0.max(1),
+            PendingSpec::Spin => SPIN_STEPS,
         }
     }
 }
@@ -71,9 +65,9 @@ impl PendingFrame {
         let PendingFrame::Step(n) = self else {
             return Lit::On;
         };
-        let on = match spec.style {
-            PendingStyle::Iterate => layer == n % spec.cycle(),
-            PendingStyle::Spin => true,
+        let on = match spec {
+            PendingSpec::Iterate { .. } => layer == n % spec.cycle(),
+            PendingSpec::Spin => true,
         };
         if on { Lit::On } else { Lit::Off }
     }
@@ -81,12 +75,11 @@ impl PendingFrame {
 
 #[cfg(test)]
 mod tests {
-    use super::{Lit, PendingFrame, PendingLayers, PendingSpec, PendingStyle};
+    use super::{Lit, PendingFrame, PendingLayers, PendingSpec};
 
     #[test]
     fn each_style_lights_its_own_layers() {
-        let wifi = PendingSpec {
-            style: PendingStyle::Iterate,
+        let wifi = PendingSpec::Iterate {
             layers: PendingLayers(4),
         };
         let lit =
@@ -95,10 +88,6 @@ mod tests {
         assert_eq!(lit(PendingFrame::Step(2), wifi), [Off, Off, On, Off]);
         assert_eq!(lit(PendingFrame::Step(5), wifi), [Off, On, Off, Off]);
         assert_eq!(lit(PendingFrame::Idle, wifi), [On, On, On, On]);
-        let ring = PendingSpec {
-            style: PendingStyle::Spin,
-            layers: PendingLayers(1),
-        };
-        assert_eq!(PendingFrame::Step(7).lit(ring, 0), On);
+        assert_eq!(PendingFrame::Step(7).lit(PendingSpec::Spin, 0), On);
     }
 }

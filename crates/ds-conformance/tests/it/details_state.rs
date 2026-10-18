@@ -9,7 +9,6 @@ use ds::motion::detail::operation::Operation;
 use ds::motion::detail::operation::PendingToken;
 use ds::motion::detail::pending::PendingLayers;
 use ds::motion::detail::pending::PendingSpec;
-use ds::motion::detail::pending::PendingStyle;
 use ds::motion::detail::stamp::EventStamp;
 use ds::motion::detail::touch::Touch;
 use ds::motion::detail::use_pending::use_pending;
@@ -49,8 +48,7 @@ static NET: GlobalSignal<Net> = Signal::global(|| Net::Off);
 static OP: GlobalSignal<Operation> = Signal::global(|| Operation::Idle);
 static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
-const WIFI: PendingSpec = PendingSpec {
-    style: PendingStyle::Iterate,
+const WIFI: PendingSpec = PendingSpec::Iterate {
     layers: PendingLayers(4),
 };
 
