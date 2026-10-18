@@ -170,7 +170,7 @@ fn the_edit_menu_lists_undo_with_its_title_and_command_z() {
     let layout = full(&tree_of(&bar()));
     assert_eq!(
         prop_of(&layout, "children-display"),
-        Some(Prop::ChildrenDisplay(ChildrenDisplay::Submenu))
+        Some(Prop::ChildrenSubmenu)
     );
     let titles: Vec<Option<Prop>> = layout
         .children
@@ -202,10 +202,7 @@ fn properties_follow_what_the_item_is() {
     let wrap = find_child(find_child(&layout, "View"), "Wrap Lines");
     let paste = find_child(find_child(&layout, "Edit"), "Paste");
     let rule = &find_child(&layout, "Notes").children[1];
-    assert_eq!(
-        prop_of(wrap, "toggle-type"),
-        Some(Prop::ToggleType(ToggleType::Checkmark))
-    );
+    assert_eq!(prop_of(wrap, "toggle-type"), Some(Prop::ToggleCheckmark));
     assert_eq!(
         prop_of(wrap, "toggle-state"),
         Some(Prop::ToggleState(ToggleState::On))

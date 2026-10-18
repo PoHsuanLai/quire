@@ -21,13 +21,6 @@ pub enum ItemType {
     Separator,
 }
 
-/// `toggle-type`: the mark an item can carry.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ToggleType {
-    /// A check mark.
-    Checkmark,
-}
-
 /// `toggle-state`: whether the mark is shown.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ToggleState {
@@ -50,13 +43,6 @@ impl ToggleState {
     }
 }
 
-/// `children-display`: that an item opens a submenu.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ChildrenDisplay {
-    /// It opens one.
-    Submenu,
-}
-
 /// One property of an item, with its value.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Prop {
@@ -66,14 +52,14 @@ pub enum Prop {
     Label(String),
     /// `enabled`: only [`Availability::Enabled`] is true.
     Enabled(Availability),
-    /// `toggle-type`.
-    ToggleType(ToggleType),
+    /// `toggle-type` = `checkmark`: the item carries a check mark.
+    ToggleCheckmark,
     /// `toggle-state`.
     ToggleState(ToggleState),
     /// `shortcut`: one chord.
     Shortcut(Chord),
-    /// `children-display`.
-    ChildrenDisplay(ChildrenDisplay),
+    /// `children-display` = `submenu`: the item opens a submenu.
+    ChildrenSubmenu,
     /// `x-quire-command-id`.
     CommandId(CommandId),
 }
@@ -85,10 +71,10 @@ impl Prop {
             Prop::Type(_) => "type",
             Prop::Label(_) => "label",
             Prop::Enabled(_) => "enabled",
-            Prop::ToggleType(_) => "toggle-type",
+            Prop::ToggleCheckmark => "toggle-type",
             Prop::ToggleState(_) => "toggle-state",
             Prop::Shortcut(_) => "shortcut",
-            Prop::ChildrenDisplay(_) => "children-display",
+            Prop::ChildrenSubmenu => "children-display",
             Prop::CommandId(_) => "x-quire-command-id",
         }
     }
@@ -197,7 +183,7 @@ fn escape(label: &str) -> String {
 }
 
 fn root_props() -> Vec<Prop> {
-    vec![Prop::ChildrenDisplay(ChildrenDisplay::Submenu)]
+    vec![Prop::ChildrenSubmenu]
 }
 
 fn toggle(check: Check) -> ToggleState {
@@ -219,7 +205,7 @@ fn props_of(node: &MenuNode) -> Vec<Prop> {
         } => [
             Some(Prop::Label(escape(&node.label))),
             Some(Prop::Enabled(*availability)),
-            check.map(|_| Prop::ToggleType(ToggleType::Checkmark)),
+            check.map(|_| Prop::ToggleCheckmark),
             check.map(|check| Prop::ToggleState(toggle(check))),
             shortcut.clone().map(Prop::Shortcut),
             Some(Prop::CommandId(command.clone())),
@@ -230,7 +216,7 @@ fn props_of(node: &MenuNode) -> Vec<Prop> {
         NodeKind::Submenu { availability, .. } => vec![
             Prop::Label(escape(&node.label)),
             Prop::Enabled(*availability),
-            Prop::ChildrenDisplay(ChildrenDisplay::Submenu),
+            Prop::ChildrenSubmenu,
         ],
         NodeKind::Separator => vec![Prop::Type(ItemType::Separator)],
         NodeKind::Label => vec![

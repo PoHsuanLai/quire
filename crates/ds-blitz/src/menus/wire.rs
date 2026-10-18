@@ -33,16 +33,16 @@ fn owned<'a>(value: impl Into<Value<'a>>) -> Result<OwnedValue, WireError> {
 /// The wire value of one property.
 fn value(prop: &Prop) -> Result<OwnedValue, WireError> {
     use ds::base::vocab::Availability;
-    use ds::components::menus::export::{ChildrenDisplay, ItemType, ToggleType};
+    use ds::components::menus::export::ItemType;
     match prop {
         Prop::Type(ItemType::Standard) => owned("standard"),
         Prop::Type(ItemType::Separator) => owned("separator"),
         Prop::Label(label) => owned(label.as_str()),
         Prop::Enabled(availability) => owned(*availability == Availability::Enabled),
-        Prop::ToggleType(ToggleType::Checkmark) => owned("checkmark"),
+        Prop::ToggleCheckmark => owned("checkmark"),
         Prop::ToggleState(state) => owned(state.wire()),
         Prop::Shortcut(chord) => owned(vec![chord.0.clone()]),
-        Prop::ChildrenDisplay(ChildrenDisplay::Submenu) => owned("submenu"),
+        Prop::ChildrenSubmenu => owned("submenu"),
         Prop::CommandId(command) => owned(command.0.as_str()),
     }
 }

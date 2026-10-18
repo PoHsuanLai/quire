@@ -15,8 +15,8 @@ mod tree;
 pub use address::{AddressError, AppMenuAddress};
 pub use chord::{Chord, ChordError};
 pub use dbusmenu::{
-    ChildrenDisplay, DbusItem, DbusLayout, Depth, Dispatch, EventError, EventKind, ItemType, Prop,
-    PropNames, ToggleState, ToggleType,
+    DbusItem, DbusLayout, Depth, Dispatch, EventError, EventKind, ItemType, Prop, PropNames,
+    ToggleState,
 };
 pub use ids::NodeId;
 pub use state::{Change, MenuState, Revision};
