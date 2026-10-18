@@ -31,10 +31,11 @@ use crate::focus::request::use_focus_request;
 use crate::host::caret::InitialCaret;
 use crate::host::measure::{Anchor, MountedRef};
 use crate::root::common::Common;
+use crate::root::pointer_trail::{Movement, movement_of, use_pointer_trail};
 use dioxus::prelude::*;
 use ds_core::geometry::{
     placement::{Align, Placement, Side},
-    units::Px,
+    units::{Point, Px},
 };
 use ds_core::vocab::Availability;
 
@@ -68,6 +69,8 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
     // A list opened on a query puts the caret after it, as the palette does.
     let focus = use_focus_request().with_caret(InitialCaret::End);
     let selection = use_palette_selection(&query, None, None);
+    // Only a move that went somewhere selects (`PointerTrail`).
+    let trail = use_pointer_trail();
     let in_view = use_reveal();
     let revision = use_revision(&groups.key());
     let shown = shown_groups(&groups.0, &query);
@@ -108,9 +111,10 @@ pub fn PickList<T: Clone + PartialEq + 'static>(
     } else {
         let point = {
             let (live, selection) = (live.clone(), selection.clone());
-            move |index: usize| {
+            move |(index, to): (usize, Point)| {
+                let moved = movement_of(trail, to) == Movement::Moved;
                 let enabled = live.get(index) == Some(&Availability::Enabled);
-                if enabled && index != current {
+                if moved && enabled && index != current {
                     in_view.pointed(index, revision);
                     selection.select(index);
                 }

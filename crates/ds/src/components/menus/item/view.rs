@@ -254,6 +254,15 @@ pub(crate) fn client_point(event: &MouseEvent) -> Point {
     }
 }
 
+/// Where a pointer event happened, in the same client coordinates.
+pub(crate) fn pointer_point(event: &PointerEvent) -> Point {
+    let at = event.client_coordinates();
+    Point {
+        x: Px(at.x as f32),
+        y: Px(at.y as f32),
+    }
+}
+
 /// A parent row's trailing mark: the 12 px chevron (design/13 section 13.3.3).
 fn chevron() -> Element {
     rsx! {

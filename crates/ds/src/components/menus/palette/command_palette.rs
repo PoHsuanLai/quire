@@ -31,6 +31,7 @@ use crate::components::menus::palette::palette_shown::{Change, Seen, Showing, us
 use crate::components::menus::palette::palette_stops::{
     Run, Travel, grid_spans, run_of, shown_groups, stops, travel,
 };
+use crate::root::pointer_trail::{Movement, movement_of, use_pointer_trail};
 use ds_core::vocab::Dismiss;
 use ds_core::word::Word;
 use ds_motion::anim::Anim;
@@ -51,7 +52,7 @@ use crate::host::document::{DocumentHost, use_document_host};
 use crate::host::measure::MountedRef;
 use dioxus::core::queue_effect;
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Px, Rect};
+use ds_core::geometry::units::{Point, Px, Rect};
 use ds_core::vocab::Availability;
 use ds_core::vocab::Shown;
 use ds_style::tokens::{layer::ZLayer, shape::Corner};
@@ -147,6 +148,9 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let alive = use_alive();
     let showing = use_showing(shown, Anim::PeekIn);
     let selection = use_palette_selection(&query, selected, on_select);
+    // A move that reaches a row without the pointer moving (the layout changed under a still
+    // pointer, as when a menu over the rows closes) selects nothing (`PointerTrail`).
+    let trail = use_pointer_trail();
     let rects = use_row_rects(on_select_rect);
     let in_view = use_reveal();
     let own_actions = use_action_book();
@@ -256,9 +260,10 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                 point: EventHandler::new({
                     let live = live.clone();
                     let selection = selection.clone();
-                    move |index: usize| {
+                    move |(index, to): (usize, Point)| {
+                        let moved = movement_of(trail, to) == Movement::Moved;
                         let enabled = live.get(index) == Some(&Availability::Enabled);
-                        if enabled && index != current {
+                        if moved && enabled && index != current {
                             in_view.pointed(index, revision);
                             selection.select(index);
                         }

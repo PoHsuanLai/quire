@@ -7,9 +7,10 @@
 //! is its accessible label and its Fly tooltip, never a caption under the cell.
 
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
+use crate::components::menus::item::view::client_point;
 use crate::components::overlays::tooltip::Tooltip;
 use dioxus::prelude::*;
-use ds_core::geometry::units::Px;
+use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Selection;
 
 /// One emoji: what picking it yields, the characters drawn, and its name.
@@ -45,8 +46,8 @@ pub const EMOJI_COLUMNS: u8 = 8;
 pub(crate) struct CellEvents {
     /// A click on a cell.
     pub pick: EventHandler<usize>,
-    /// The pointer moved over a cell.
-    pub point: EventHandler<usize>,
+    /// The pointer moved over a cell, to this point in client coordinates.
+    pub point: EventHandler<(usize, Point)>,
     /// A cell's element mounted.
     pub mounted: Option<EventHandler<(usize, MountedEvent)>>,
 }
@@ -74,7 +75,7 @@ pub(crate) fn draw_cells<T>(
                 role: "gridcell",
                 "aria-selected": Selection::of(&Some(index), &selected).aria(),
                 "aria-label": "{cell.name}",
-                onmousemove: move |_| events.point.call(index),
+                onmousemove: move |event| events.point.call((index, client_point(&event))),
                 onclick: move |_| events.pick.call(index),
                 onmounted: move |event| {
                     if let Some(mounted) = events.mounted {
@@ -160,7 +161,7 @@ pub fn EmojiGrid<T: Clone + PartialEq + 'static>(
         selected,
         CellEvents {
             pick: EventHandler::new(pick),
-            point: EventHandler::new(ask),
+            point: EventHandler::new(move |(index, _): (usize, Point)| ask(index)),
             mounted: None,
         },
     );

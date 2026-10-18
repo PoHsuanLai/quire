@@ -7,9 +7,11 @@ use crate::components::lists::row::row::{Row, RowMounted};
 use crate::components::lists::row::size::RowSize;
 use crate::components::lists::section_header::{HeaderAction, SectionHeader};
 use crate::components::menus::alive::Alive;
+use crate::components::menus::item::view::pointer_point;
 use crate::components::menus::palette::palette_motion::ListMotion;
 use crate::components::menus::palette::palette_stops::{Body, ShownGroup};
 use dioxus::prelude::*;
+use ds_core::geometry::units::Point;
 use ds_core::vocab::{RowState, Selection};
 
 /// What the drawn stops report, by stop number.
@@ -19,8 +21,8 @@ pub(crate) struct StopEvents {
     pub alive: Alive,
     /// A click on a row or a cell.
     pub pick: EventHandler<usize>,
-    /// The pointer moved over a row or a cell.
-    pub point: EventHandler<usize>,
+    /// The pointer moved over a row or a cell, to this point in client coordinates.
+    pub point: EventHandler<(usize, Point)>,
     /// A row's or a cell's element mounted.
     pub mounted: EventHandler<(usize, MountedEvent)>,
     /// A header action's element mounted (it reports no rect, but is kept in view).
@@ -95,8 +97,9 @@ fn draw_group<T>(
                             onclick: move |_| {
                                 clicked.run(|| events.pick.call(first + at));
                             },
-                            onpointermove: move |_| {
-                                pointed.run(|| events.point.call(first + at));
+                            onpointermove: move |event: PointerEvent| {
+                                let to = pointer_point(&event);
+                                pointed.run(|| events.point.call((first + at, to)));
                             },
                             onmounted: {
                                 RowMounted::new(move |event: MountedEvent| {
@@ -122,8 +125,8 @@ fn draw_group<T>(
                     pick: EventHandler::new(move |at: usize| {
                         picked.run(|| events.pick.call(first + at));
                     }),
-                    point: EventHandler::new(move |at: usize| {
-                        pointed.run(|| events.point.call(first + at));
+                    point: EventHandler::new(move |(at, to): (usize, Point)| {
+                        pointed.run(|| events.point.call((first + at, to)));
                     }),
                     mounted: Some(EventHandler::new(
                         move |(at, event): (usize, MountedEvent)| {

@@ -56,6 +56,7 @@ mod menu_stale_handlers;
 mod notification_center;
 mod overlay_fits_window;
 mod overlay_hit;
+mod palette_actions_click;
 mod palette_actions_key;
 mod palette_embedded;
 mod palette_grid_pane;

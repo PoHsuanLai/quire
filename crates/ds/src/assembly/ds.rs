@@ -66,6 +66,7 @@ use crate::host::signals::HostSignals;
 use crate::keys::use_keys_provider;
 use crate::root::chrome::{FrameTint, Ground, RootChrome};
 use crate::root::extent::RootExtent;
+use crate::root::pointer_trail::PointerTrail;
 use crate::root::typeface::{use_typeface, use_typeface_provider};
 use crate::stack::host::{OverlayHost, use_overlays_provider};
 use crate::stack::hover_hub::use_hover_hub_provider;
@@ -138,6 +139,7 @@ pub fn Ds(
     let resolved = resolve(appearance, look.theme, system);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
+    let trail = PointerTrail::provide();
     let modality = signals.map_or(InputModality::default(), |signals| (signals.modality)());
     let activity = signals.map_or(Activity::Active, |signals| (signals.activity)());
     let env = use_scope_provider(Scope {
@@ -208,6 +210,8 @@ pub fn Ds(
             onmounted: move |event: MountedEvent| element.set(Some(event.data())),
             // Last to hear a click: where the keyboard goes when it landed on nothing focusable.
             onclick: move |event: MouseEvent| click_root.clicked(&event),
+            // Last to hear a move: where the pointer is, for a list asking whether it moved.
+            onpointermove: move |event: PointerEvent| trail.heard(&event),
             if stylesheet == Inject::Inline {
                 style { {sheet.unwrap_or_else(crate::assembly::stylesheet::stylesheet)} }
             }
