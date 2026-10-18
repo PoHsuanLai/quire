@@ -125,7 +125,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
     let typeahead = use_hook(|| CopyValue::new(Typeahead::default()));
     let live = availability == Availability::Enabled;
     let label = match kind {
-        PopUpKind::PopUp => chosen_title(&items, value.as_ref()).or(title.clone()),
+        PopUpKind::PopUp => chosen_title(&items, value.as_ref()).or_else(|| title.clone()),
         PopUpKind::PullDown => title.clone(),
         PopUpKind::Overflow => title.clone().or_else(|| Some("More".to_string())),
     }
@@ -198,7 +198,7 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             let from = choices
                 .iter()
                 .position(|(own, _)| Some(*own) == value.as_ref())
-                .unwrap_or(choices.len().saturating_sub(1));
+                .unwrap_or_else(|| choices.len().saturating_sub(1));
             let mut buffer = typeahead;
             let (next, found) = buffer.peek().clone().typed(&text, now(), &labels, from);
             buffer.set(next);

@@ -102,13 +102,15 @@ impl MenuTree {
         fn visit<'a>(node: &'a MenuNode, depth: usize, out: &mut Vec<(&'a MenuNode, usize)>) {
             out.push((node, depth));
             if let NodeKind::Submenu { children, .. } = &node.kind {
-                children
-                    .iter()
-                    .for_each(|child| visit(child, depth + 1, out));
+                for child in children {
+                    visit(child, depth + 1, out);
+                }
             }
         }
         let mut out = Vec::new();
-        self.menus.iter().for_each(|menu| visit(menu, 0, &mut out));
+        for menu in &self.menus {
+            visit(menu, 0, &mut out);
+        }
         out
     }
 

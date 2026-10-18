@@ -119,8 +119,7 @@ impl Detailed for Validity {
             {
                 Moment::Failure
             }
-            (Validity::Invalid(_), Validity::Invalid(_))
-            | (Validity::Invalid(_), Validity::Valid)
+            (Validity::Invalid(_), Validity::Invalid(_) | Validity::Valid)
             | (Validity::Valid, Validity::Valid) => Moment::Rest,
         }
     }

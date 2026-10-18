@@ -35,21 +35,20 @@ pub enum HelpShown {
 
 /// The id of the row's help element: the row's own `id` and `-help`, else a slug of its label.
 pub(crate) fn help_id(row_id: Option<&str>, label: &str) -> String {
-    match row_id {
-        Some(id) => format!("{id}-help"),
-        None => {
-            let slug: String = label
-                .chars()
-                .map(|c| {
-                    if c.is_alphanumeric() {
-                        c.to_ascii_lowercase()
-                    } else {
-                        '-'
-                    }
-                })
-                .collect();
-            format!("ds-field-help-{}", slug.trim_matches('-'))
-        }
+    if let Some(id) = row_id {
+        format!("{id}-help")
+    } else {
+        let slug: String = label
+            .chars()
+            .map(|c| {
+                if c.is_alphanumeric() {
+                    c.to_ascii_lowercase()
+                } else {
+                    '-'
+                }
+            })
+            .collect();
+        format!("ds-field-help-{}", slug.trim_matches('-'))
     }
 }
 

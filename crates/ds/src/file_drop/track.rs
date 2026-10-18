@@ -105,8 +105,10 @@ pub(crate) fn step(track: DragTrack, input: FileDragInput) -> Step {
                 _ => Step::to(DragTrack::Idle),
             }
         }
-        (track, FileDragInput::Offered(_) | FileDragInput::Moved { .. })
-        | (track, FileDragInput::Dropped) => Step::to(track),
+        (
+            track,
+            FileDragInput::Offered(_) | FileDragInput::Moved { .. } | FileDragInput::Dropped,
+        ) => Step::to(track),
     }
 }
 

@@ -24,8 +24,8 @@ pub(crate) struct SurfaceCtx {
 impl SurfaceCtx {
     /// Hand each input to the app, in order.
     pub(crate) fn tell(&self, inputs: Vec<EditInput>) {
-        inputs
-            .into_iter()
-            .for_each(|input| self.on_input.call(input));
+        for input in inputs {
+            self.on_input.call(input);
+        }
     }
 }

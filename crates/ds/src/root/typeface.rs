@@ -22,5 +22,5 @@ pub fn use_typeface_provider(typeface: Typeface) {
 /// The enclosing root's typeface; [`Typeface::System`] outside a `Ds`.
 pub fn use_typeface() -> Typeface {
     use_hook(try_consume_context::<RootTypeface>)
-        .map_or(Typeface::default(), |RootTypeface(typeface)| typeface())
+        .map_or_else(Typeface::default, |RootTypeface(typeface)| typeface())
 }

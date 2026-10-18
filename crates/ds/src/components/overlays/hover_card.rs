@@ -177,7 +177,7 @@ pub(crate) fn use_card(
                 .surface()
                 .rect()
                 .is_none_or(|rect| rect.size.width.0 <= 0.0));
-    let at = target.map_or(Point::default(), |(rect, want, gap)| {
+    let at = target.map_or_else(Point::default, |(rect, want, gap)| {
         float.origin(Some(rect), want, gap)
     });
     let style = if unplaced {

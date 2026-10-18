@@ -87,7 +87,7 @@ pub(crate) fn labelled<K: Clone + PartialEq>(
         .collect();
     let from = cursor
         .and_then(|key| rows.iter().position(|item| item.key == *key))
-        .unwrap_or(labels.len().saturating_sub(1));
+        .unwrap_or_else(|| labels.len().saturating_sub(1));
     find(&labels, from)
         .and_then(|at| rows.get(at))
         .map(|item| item.key.clone())

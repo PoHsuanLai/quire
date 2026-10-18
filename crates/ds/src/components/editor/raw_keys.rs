@@ -45,8 +45,7 @@ pub fn RawKeySurface(
         event.prevent_default();
         let extras = host
             .keys()
-            .map(|keys| keys.extras(&event.data()))
-            .unwrap_or_else(KeyExtras::default);
+            .map_or_else(KeyExtras::default, |keys| keys.extras(&event.data()));
         let phase = match phase {
             KeyPhase::Press if event.is_auto_repeating() => KeyPhase::Repeat,
             other => other,

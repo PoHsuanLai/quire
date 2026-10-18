@@ -57,7 +57,7 @@ pub(super) fn place(dot: Dot) -> (f64, f64) {
 
 /// The colour at fractions `(x, y)` of the field, from the palette.
 fn colour_at(x: f64, y: f64, scheme: Scheme) -> [u8; 3] {
-    Hex::parse(&swatch(dot_at(x, y), scheme)).map_or(ground(scheme), |Hex(rgb)| rgb)
+    Hex::parse(&swatch(dot_at(x, y), scheme)).map_or_else(|| ground(scheme), |Hex(rgb)| rgb)
 }
 
 /// How much of pixel `(x, y)` the circle at `(cx, cy)` covers, 0 to 1.

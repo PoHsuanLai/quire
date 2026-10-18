@@ -111,7 +111,7 @@ fn intern(attribute: &str) -> &'static str {
     // A poisoned lock still holds a valid set: the only writer inserts a finished string.
     let mut names = NAMES
         .lock()
-        .unwrap_or_else(|poisoned| poisoned.into_inner());
+        .unwrap_or_else(std::sync::PoisonError::into_inner);
     if let Some(known) = names.get(attribute) {
         return known;
     }

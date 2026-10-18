@@ -147,7 +147,7 @@ pub fn use_window_host() -> Option<WindowHost> {
 /// The window's state, redrawn on every change the host reports; the default (its own size,
 /// not fullscreen, active) with no host.
 pub fn use_window_state() -> WindowState {
-    use_window_host().map_or(WindowState::default(), |host| host.state())
+    use_window_host().map_or_else(WindowState::default, |host| host.state())
 }
 
 /// Keep the window's title at `title`: set when the window first draws and again each time

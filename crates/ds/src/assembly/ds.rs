@@ -133,14 +133,14 @@ pub fn Ds(
     use_typeface_provider(typeface);
     let signals = use_hook(try_consume_context::<HostSignals>);
     let scale = use_root_scale(scale, signals.map(|signals| (signals.scale)()));
-    let chrome = chrome.unwrap_or(RootChrome::of(material));
-    let frame_tint = frame.unwrap_or(FrameTint::of(material, chrome));
-    let ground = ground.unwrap_or(Ground::of(material));
+    let chrome = chrome.unwrap_or_else(|| RootChrome::of(material));
+    let frame_tint = frame.unwrap_or_else(|| FrameTint::of(material, chrome));
+    let ground = ground.unwrap_or_else(|| Ground::of(material));
     let resolved = resolve(appearance, look.theme, system);
     let mut element = use_hook(|| CopyValue::new(None::<Rc<MountedData>>));
     let click_root = use_context_provider(|| ClickRoot::of(element));
     let trail = PointerTrail::provide();
-    let modality = signals.map_or(InputModality::default(), |signals| (signals.modality)());
+    let modality = signals.map_or_else(InputModality::default, |signals| (signals.modality)());
     let activity = signals.map_or(Activity::Active, |signals| (signals.activity)());
     let env = use_scope_provider(Scope {
         resolved,

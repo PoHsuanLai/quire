@@ -42,7 +42,7 @@ impl Surface {
             Flow::Floating => {
                 let field = float.anchor_rect(anchor);
                 let wanted = field.map(|rect| placement.placement(rect));
-                let at = wanted.map_or(Point::default(), |(rect, want, gap)| {
+                let at = wanted.map_or_else(Point::default, |(rect, want, gap)| {
                     float.origin(Some(rect), want, gap)
                 });
                 // The menu grows to its rows until it meets the edge it opens toward, less the

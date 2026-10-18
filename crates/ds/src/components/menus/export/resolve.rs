@@ -13,13 +13,13 @@ impl BarCommand {
         CommandId(match self {
             BarCommand::About => "bar.about".to_owned(),
             BarCommand::HelpSearch => "bar.help_search".to_owned(),
-            BarCommand::Standard(action) => format!("standard.{}", snake(action)),
+            BarCommand::Standard(action) => format!("standard.{}", snake(*action)),
         })
     }
 }
 
 /// `PasteAndMatchStyle` as `paste_and_match_style`.
-fn snake(action: &StandardAction) -> String {
+fn snake(action: StandardAction) -> String {
     format!("{action:?}")
         .chars()
         .enumerate()

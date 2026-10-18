@@ -74,7 +74,7 @@ pub fn arc_path(span: RingSpan) -> Option<String> {
             mid = point(half),
         ));
     }
-    let large = if span.sweep > 180.0 { 1 } else { 0 };
+    let large = i32::from(span.sweep > 180.0);
     Some(format!(
         "M{}A{RADIUS} {RADIUS} 0 {large} 1 {}",
         point(span.from),

@@ -37,7 +37,7 @@ pub fn Surface(
     children: Element,
 ) -> Element {
     let env = scope(use_scope(), material, theme, accent, blur);
-    let ground = on.unwrap_or(Ground::of(material));
+    let ground = on.unwrap_or_else(|| Ground::of(material));
     let typeface = use_typeface();
     use_scope_provider(env);
     rsx! {

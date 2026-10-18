@@ -65,7 +65,7 @@ where
                 Menu::<SpacePick<A>> {
                     placement: MenuPlacement::Context,
                     anchor: Anchor::Point(at),
-                    items: rows(&space.look, count, extra, linking(&space.link, desktop.as_deref())),
+                    items: rows(&space.look, count, extra, linking(space.link.as_deref(), desktop.as_deref())),
                     common: Common {
                         aria_label: Some(format!("{} Space", space.name)),
                         ..Common::default()
@@ -124,9 +124,9 @@ where
 }
 
 /// What the menu offers: the link rows when the app gave the desktop's Spaces.
-fn linking<'a>(link: &'a Option<String>, desktop: Option<&'a [DesktopSpace]>) -> Linking<'a> {
+fn linking<'a>(link: Option<&'a str>, desktop: Option<&'a [DesktopSpace]>) -> Linking<'a> {
     desktop.map_or(Linking::Off, |desktop| Linking::Offered {
-        current: link.as_deref(),
+        current: link,
         desktop,
     })
 }

@@ -187,7 +187,7 @@ impl Float {
         let bounds = self
             .bounds
             .rect()
-            .map_or(Point::default(), |bounds| bounds.origin);
+            .map_or_else(Point::default, |bounds| bounds.origin);
         Some(Rect {
             origin: Point {
                 x: rect.origin.x - bounds.x,
@@ -201,7 +201,7 @@ impl Float {
     /// bounds and the surface's own size, or against the anchor alone before either is known.
     pub(crate) fn origin(&self, anchor: Option<Rect>, want: Placement, gap: Px) -> Point {
         self.placing(anchor, want, gap)
-            .map_or(Point::default(), |placed| placed.origin)
+            .map_or_else(Point::default, |placed| placed.origin)
     }
 
     /// [`Float::origin`] with the side the surface landed on, for a surface that draws an arrow
@@ -416,7 +416,7 @@ pub fn Popover(
     };
     let anchor_rect = float.anchor_rect(&anchor);
     let placed = float.placing(anchor_rect, placement, gap);
-    let at = placed.map_or(Point::default(), |placed| placed.origin);
+    let at = placed.map_or_else(Point::default, |placed| placed.origin);
     let probe = float.surface();
     // Escape and an outside click fade the popover out, then close it (`Exit::Fade`,
     // `--t-quick`).

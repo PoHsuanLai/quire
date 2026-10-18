@@ -187,7 +187,9 @@ impl<T: Clone + PartialEq + 'static> Panel<T> {
                 Availability::Disabled | Availability::Busy => "",
             })
             .collect();
-        let from = self.current().unwrap_or(labels.len().saturating_sub(1));
+        let from = self
+            .current()
+            .unwrap_or_else(|| labels.len().saturating_sub(1));
         self.tracker
             .typed(text, &labels, from)
             .map_or(Decision::Nothing, Decision::Select)

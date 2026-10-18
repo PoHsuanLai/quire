@@ -258,7 +258,7 @@ fn icon_view(icon: IconSource, size: IconSize, swap: IconSwap, value: Option<Che
         (IconSwap::Instant, IconSource::Glyph(icon)) => rsx! {
             Glyph { icon, size, style: look(icon) }
         },
-        (IconSwap::Instant, source) | (IconSwap::CrossFade, source) => rsx! {
+        (IconSwap::Instant | IconSwap::CrossFade, source) => rsx! {
             IconView { source, size }
         },
     }

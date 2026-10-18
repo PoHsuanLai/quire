@@ -7,7 +7,7 @@ use ds_core::vocab::Availability;
 use ds_core::word::Word;
 
 /// Several lines of text, as tall as the field's `rows`.
-pub(crate) fn area(field: Field, value: String) -> Element {
+pub(crate) fn area(field: Field, value: &str) -> Element {
     let Field {
         bezel,
         rows,

@@ -64,7 +64,7 @@ pub(crate) fn aria_placeholder(placeholder: &str) -> Option<String> {
 pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
     let keys = use_keys();
     if kind == FieldKind::Multiline {
-        return area(field, value);
+        return area(field, &value);
     }
     let Field {
         bezel,

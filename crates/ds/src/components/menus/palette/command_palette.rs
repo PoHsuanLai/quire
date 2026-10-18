@@ -154,7 +154,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     let rects = use_row_rects(on_select_rect);
     let in_view = use_reveal();
     let own_actions = use_action_book();
-    let actions = handle.map(PaletteHandle::book).unwrap_or(own_actions);
+    let actions = handle.map_or(own_actions, PaletteHandle::book);
     let key = groups.key();
     let revision = use_revision(&(tokens.clone(), key.clone()));
     let own_focus = use_focus_request();
