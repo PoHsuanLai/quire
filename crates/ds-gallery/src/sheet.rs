@@ -9,7 +9,7 @@ use std::path::Path;
 /// The sheet for `shots`, read back from `dir`.
 pub fn html(dir: &Path, shots: &[Shot]) -> std::io::Result<String> {
     let mut body = String::new();
-    for entry in registry::REGISTRY {
+    for entry in registry::all() {
         let figures = shots
             .iter()
             .filter(|shot| shot.page == entry.page)
@@ -22,8 +22,7 @@ pub fn html(dir: &Path, shots: &[Shot]) -> std::io::Result<String> {
             lede = escape(entry.lede),
         ));
     }
-    let nav = registry::REGISTRY
-        .iter()
+    let nav = registry::all()
         .map(|entry| {
             format!(
                 "<a href=\"#{}\">{}</a>",

@@ -17,8 +17,7 @@ use ds::style::tokens::control_size::ControlSize;
 pub fn Toolbar() -> Element {
     let mut axes = use_context::<Signal<Axes>>();
     let now = axes();
-    let pages = registry::REGISTRY
-        .iter()
+    let pages = registry::all()
         .map(|entry| (entry.page, entry.title.to_string()))
         .collect::<Vec<_>>();
     let themes = Theme::ALL
