@@ -3,7 +3,7 @@
 //! a table pins when an effect fires: on a change of its trigger, activity or visibility, never
 //! on a render that changes nothing (design/35-SYMBOL-EFFECTS.md section 2).
 
-use super::effect::{Activity, SymbolEffect, TransitionEffect};
+use super::effect::{EffectActivity, SymbolEffect, TransitionEffect};
 use super::route::{loop_anim, once_anim};
 use crate::anim::Anim;
 use ds_core::vocab::Shown;
@@ -41,8 +41,8 @@ pub struct Memory {
 fn key(effect: SymbolEffect) -> u32 {
     match effect {
         SymbolEffect::Once(_, trigger) => trigger.0,
-        SymbolEffect::While(_, Activity::Idle) => 0,
-        SymbolEffect::While(_, Activity::Active) => 1,
+        SymbolEffect::While(_, EffectActivity::Idle) => 0,
+        SymbolEffect::While(_, EffectActivity::Active) => 1,
         SymbolEffect::Transition(_, Shown::Hidden) => 0,
         SymbolEffect::Transition(_, Shown::Visible) => 1,
     }
@@ -53,7 +53,7 @@ pub fn advance(memory: Memory, effect: SymbolEffect) -> (Memory, SymbolAttrs) {
     let now = key(effect);
     let changed = memory.seen.is_some_and(|seen| seen != now);
     let round = memory.round + u32::from(changed);
-    let running = matches!(effect, SymbolEffect::While(_, Activity::Active));
+    let running = matches!(effect, SymbolEffect::While(_, EffectActivity::Active));
     let next = Memory {
         seen: Some(now),
         round,
@@ -64,8 +64,8 @@ pub fn advance(memory: Memory, effect: SymbolEffect) -> (Memory, SymbolAttrs) {
     let attrs = match effect {
         SymbolEffect::Once(once, _) if fired => play(once_anim(once), alias),
         SymbolEffect::Once(..) => SymbolAttrs::default(),
-        SymbolEffect::While(looped, Activity::Active) => play(loop_anim(looped), Some("a")),
-        SymbolEffect::While(_, Activity::Idle) if memory.ran => play(Anim::Hold, Some("a")),
+        SymbolEffect::While(looped, EffectActivity::Active) => play(loop_anim(looped), Some("a")),
+        SymbolEffect::While(_, EffectActivity::Idle) if memory.ran => play(Anim::Hold, Some("a")),
         SymbolEffect::While(..) => SymbolAttrs::default(),
         SymbolEffect::Transition(TransitionEffect::Appear, Shown::Visible) if fired => {
             play(Anim::Appear, alias)
@@ -102,7 +102,7 @@ mod tests {
     use super::{Memory, SymbolAttrs, advance};
     use crate::anim::Anim;
     use crate::symbol::effect::{
-        Activity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
+        EffectActivity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
     };
     use ds_core::vocab::Shown;
 
@@ -136,7 +136,7 @@ mod tests {
     #[test]
     fn a_while_effect_runs_while_active_and_holds_when_it_stops() {
         let turn = |activity| SymbolEffect::While(LoopEffect::Rotate, activity);
-        use Activity::{Active, Idle};
+        use EffectActivity::{Active, Idle};
         let got = wear(&[
             turn(Idle),
             turn(Active),
@@ -167,7 +167,7 @@ mod tests {
             (LoopEffect::Breathe, Anim::BreatheLoop),
             (LoopEffect::Rotate, Anim::Turn),
         ] {
-            let got = wear(&[SymbolEffect::While(effect, Activity::Active)]);
+            let got = wear(&[SymbolEffect::While(effect, EffectActivity::Active)]);
             assert_eq!(got[0].0, Some(anim), "{effect:?}");
         }
     }

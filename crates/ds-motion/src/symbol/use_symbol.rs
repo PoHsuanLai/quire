@@ -1,7 +1,7 @@
 //! The hooks under `Symbol`: the wrapper's attributes, and the part driver's progress.
 
 use super::attrs::{Memory, SymbolAttrs, advance};
-use super::effect::{Activity, SymbolEffect};
+use super::effect::{EffectActivity, SymbolEffect};
 use super::route::{PartRun, Route};
 use super::timing::cycle;
 use crate::detail::level::use_level;
@@ -35,8 +35,8 @@ fn plan(was: Option<PartRun>, run: PartRun, gesture: PlanFor, level: MotionLevel
         (None, PartRun::Once(_)) => None,
         (Some(PartRun::Once(before)), PartRun::Once(now)) if before == now => None,
         (_, PartRun::Once(_)) => Some(cycle(gesture.0, run, level)),
-        (_, PartRun::While(Activity::Active)) => Some(cycle(gesture.0, run, level)),
-        (_, PartRun::While(Activity::Idle)) => rest,
+        (_, PartRun::While(EffectActivity::Active)) => Some(cycle(gesture.0, run, level)),
+        (_, PartRun::While(EffectActivity::Idle)) => rest,
     }
 }
 

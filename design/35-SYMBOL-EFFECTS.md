@@ -25,7 +25,7 @@ ours.
 
 ```rust
 Symbol { icon, size, effect: SymbolEffect::Once(OnceEffect::Bounce, trigger) }
-Symbol { icon, size, effect: SymbolEffect::While(LoopEffect::Rotate, Activity::Active) }
+Symbol { icon, size, effect: SymbolEffect::While(LoopEffect::Rotate, EffectActivity::Active) }
 Symbol { icon, size, effect: SymbolEffect::Transition(TransitionEffect::Appear, Shown::Visible) }
 ```
 
@@ -34,7 +34,7 @@ A run mode is part of the value, so an effect cannot be given a mode it does not
 | Mode | Fires | Effects |
 | --- | --- | --- |
 | `Once(effect, Trigger)` | each time the trigger value changes; never on the first render, never on a re-render with the same value | Bounce, Pulse, Wiggle, Breathe, Rotate, VariableColor, Part |
-| `While(effect, Activity)` | for as long as the activity is `Active`; stopping plays `hold` so the engine drops the last frame | Bounce, Pulse, ScaleUp, ScaleDown, Wiggle, Breathe, Rotate, VariableColor, Part |
+| `While(effect, EffectActivity)` | for as long as the activity is `Active`; stopping plays `hold` so the engine drops the last frame | Bounce, Pulse, ScaleUp, ScaleDown, Wiggle, Breathe, Rotate, VariableColor, Part |
 | `Transition(effect, Shown)` | when the visibility (or, for Replace, the icon) changes; the first render stands at the given state | Appear, Disappear, DrawOn (and Draw Off, its `Hidden`), Replace |
 
 `Part` plays the icon's own annotated gesture and `VariableColor` lights its layers in order; on an

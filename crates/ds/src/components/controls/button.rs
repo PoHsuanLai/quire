@@ -29,7 +29,7 @@ use ds_core::press::Press;
 use ds_core::vocab::{Availability, Check, Shortcut, Shown};
 use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
-use ds_motion::symbol::effect::{Activity, LoopEffect, SymbolEffect};
+use ds_motion::symbol::effect::{EffectActivity, LoopEffect, SymbolEffect};
 use ds_motion::symbol::use_symbol::use_symbol_attrs;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::icon::style::GlyphStyle;
@@ -125,9 +125,9 @@ pub fn Button(
     let spin = use_symbol_attrs(SymbolEffect::While(
         LoopEffect::Rotate,
         if turning {
-            Activity::Active
+            EffectActivity::Active
         } else {
-            Activity::Idle
+            EffectActivity::Idle
         },
     ));
     let tip = use_tip(title.map(|title| TipText::new(title).with_shortcut_opt(title_shortcut)));

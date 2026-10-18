@@ -1,7 +1,9 @@
 //! Which of a symbol's three drivers plays an effect on an icon: the stylesheet on the wrapper,
 //! Rust on the parts inside the SVG, or the draw-on tween (design/35-SYMBOL-EFFECTS.md section 3).
 
-use super::effect::{Activity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger};
+use super::effect::{
+    EffectActivity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
+};
 use crate::anim::Anim;
 use ds_core::vocab::Shown;
 use ds_style::icon::Icon;
@@ -13,7 +15,7 @@ pub enum PartRun {
     /// One play per change of the trigger.
     Once(Trigger),
     /// Plays again and again while active.
-    While(Activity),
+    While(EffectActivity),
 }
 
 /// The driver an effect has on an icon.
@@ -92,7 +94,7 @@ pub fn loop_anim(effect: LoopEffect) -> Anim {
 mod tests {
     use super::{PartRun, Route, route};
     use crate::symbol::effect::{
-        Activity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
+        EffectActivity, LoopEffect, OnceEffect, SymbolEffect, TransitionEffect, Trigger,
     };
     use ds_core::vocab::Shown;
     use ds_style::icon::Icon;
@@ -101,7 +103,7 @@ mod tests {
     #[test]
     fn a_part_effect_moves_the_part_where_there_is_one_and_falls_back_where_there_is_not() {
         let once = |effect| SymbolEffect::Once(effect, Trigger(1));
-        let looped = |effect| SymbolEffect::While(effect, Activity::Active);
+        let looped = |effect| SymbolEffect::While(effect, EffectActivity::Active);
         // (effect, icon, driver).
         let cases = [
             (
@@ -127,7 +129,7 @@ mod tests {
             (
                 looped(LoopEffect::VariableColor),
                 Icon::Volume2,
-                Route::Parts(PartGesture::Layers, PartRun::While(Activity::Active)),
+                Route::Parts(PartGesture::Layers, PartRun::While(EffectActivity::Active)),
             ),
             (
                 looped(LoopEffect::Part),

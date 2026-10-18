@@ -976,7 +976,7 @@ A few props worth knowing about before you read the signatures:
 - `Symbol { icon, size, effect }` plays a symbol effect on an icon (design/35-SYMBOL-EFFECTS.md):
   `SymbolEffect::Once(OnceEffect::Bounce, trigger)` plays each time `trigger` (a `Trigger`, bumped
   with `.next()`) changes and never on the first render or a re-render with the same value;
-  `SymbolEffect::While(LoopEffect::Pulse, Activity::Active)` runs until it is `Idle`;
+  `SymbolEffect::While(LoopEffect::Pulse, EffectActivity::Active)` runs until it is `Idle`;
   `SymbolEffect::Transition(TransitionEffect::Appear, Shown::Visible)` plays when the state changes
   (`Appear`, `Disappear`, `DrawOn`, and `Replace`, which cross-fades when `icon` changes). `Part`
   and `VariableColor` move the piece an icon annotates (trash lid, bell, mail flap, folder, lock

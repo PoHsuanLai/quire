@@ -35,7 +35,7 @@ pub enum FaceStyle {
 
 /// The weights a face covers: one for a static instance, a range for a variable face.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct FontWeight {
+pub struct WeightRange {
     /// The lightest weight.
     pub min: u16,
     /// The heaviest weight.
@@ -62,7 +62,7 @@ pub struct Face {
     /// Upright or italic.
     pub style: FaceStyle,
     /// The weights it covers.
-    pub weight: FontWeight,
+    pub weight: WeightRange,
     /// The subset it carries.
     pub subset: Subset,
     /// The file.
@@ -75,7 +75,7 @@ macro_rules! face {
             name: $name,
             family: $family,
             style: $style,
-            weight: FontWeight {
+            weight: WeightRange {
                 min: $min,
                 max: $max,
             },

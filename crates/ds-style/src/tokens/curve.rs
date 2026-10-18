@@ -83,31 +83,11 @@ mod tests {
     /// Each token's value at 0, .25, .5, .75 and 1, computed by exact rational bisection
     /// (Python `fractions`, 80 steps) and rounded to the thousandth.
     const CASES: &[(&str, EasingToken, [u16; 5])] = &[
-        (
-            "out",
-            EasingToken::Out,
-            [0, 748, 949, 993, 1000],
-        ),
-        (
-            "exit",
-            EasingToken::Exit,
-            [0, 99, 325, 630, 1000],
-        ),
-        (
-            "shake",
-            EasingToken::Shake,
-            [0, 311, 790, 955, 1000],
-        ),
-        (
-            "linear",
-            EasingToken::Linear,
-            [0, 250, 500, 750, 1000],
-        ),
-        (
-            "in-out",
-            EasingToken::InOut,
-            [0, 129, 500, 871, 1000],
-        ),
+        ("out", EasingToken::Out, [0, 748, 949, 993, 1000]),
+        ("exit", EasingToken::Exit, [0, 99, 325, 630, 1000]),
+        ("shake", EasingToken::Shake, [0, 311, 790, 955, 1000]),
+        ("linear", EasingToken::Linear, [0, 250, 500, 750, 1000]),
+        ("in-out", EasingToken::InOut, [0, 129, 500, 871, 1000]),
     ];
 
     #[test]
@@ -138,10 +118,7 @@ mod tests {
 
     #[test]
     fn time_past_the_end_clamps_and_linear_is_the_identity() {
-        assert_eq!(
-            EasingToken::Out.easing().at(Fraction(4000)),
-            Fraction(1000)
-        );
+        assert_eq!(EasingToken::Out.easing().at(Fraction(4000)), Fraction(1000));
         for t in 0..=1000 {
             assert_eq!(Easing::Linear.at(Fraction(t)), Fraction(t), "{t}");
         }

@@ -2,7 +2,7 @@
 //! when it runs, as one enum a caller writes and a table the stylesheet and the part driver read.
 //!
 //! Each effect has one run mode, and the type says which: a `Once` effect plays when its
-//! [`Trigger`] changes, a `While` effect plays for as long as it is [`Activity::Active`], and a
+//! [`Trigger`] changes, a `While` effect plays for as long as it is [`EffectActivity::Active`], and a
 //! `Transition` effect plays when its icon arrives, leaves, draws or is replaced.
 
 use ds_core::vocab::Shown;
@@ -21,7 +21,7 @@ impl Trigger {
 
 /// Whether a `While` effect is running.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-pub enum Activity {
+pub enum EffectActivity {
     /// Not running: the symbol is at rest.
     #[default]
     Idle,
@@ -96,8 +96,8 @@ pub enum TransitionEffect {
 pub enum SymbolEffect {
     /// Plays once each time the trigger changes; the first render plays nothing.
     Once(OnceEffect, Trigger),
-    /// Plays for as long as the activity is [`Activity::Active`].
-    While(LoopEffect, Activity),
+    /// Plays for as long as the activity is [`EffectActivity::Active`].
+    While(LoopEffect, EffectActivity),
     /// Plays when the visibility, or for `Replace` the icon, changes; the first render stands at
     /// the given state.
     Transition(TransitionEffect, Shown),

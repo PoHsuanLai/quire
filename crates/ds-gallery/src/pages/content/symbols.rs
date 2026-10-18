@@ -89,10 +89,10 @@ fn WhileSection() -> Element {
 
 #[component]
 fn WhileCell(effect: LoopEffect) -> Element {
-    let mut activity = use_signal(Activity::default);
+    let mut activity = use_signal(EffectActivity::default);
     let (label, next) = match activity() {
-        Activity::Idle => ("Start", Activity::Active),
-        Activity::Active => ("Stop", Activity::Idle),
+        EffectActivity::Idle => ("Start", EffectActivity::Active),
+        EffectActivity::Active => ("Stop", EffectActivity::Idle),
     };
     rsx! {
         Cell { name: effect.label(), code: "SymbolEffect::While({effect:?}, activity)",
@@ -164,14 +164,14 @@ fn PartSection() -> Element {
 #[component]
 fn PartCell(icon: Icon, effect: OnceEffect) -> Element {
     let mut trigger = use_signal(Trigger::default);
-    let mut activity = use_signal(Activity::default);
+    let mut activity = use_signal(EffectActivity::default);
     let loop_effect = match effect {
         OnceEffect::VariableColor => LoopEffect::VariableColor,
         _ => LoopEffect::Part,
     };
     let (label, next) = match activity() {
-        Activity::Idle => ("Loop", Activity::Active),
-        Activity::Active => ("Stop", Activity::Idle),
+        EffectActivity::Idle => ("Loop", EffectActivity::Active),
+        EffectActivity::Active => ("Stop", EffectActivity::Idle),
     };
     rsx! {
         Cell { name: format!("{icon:?}"), code: "SymbolEffect::Once({effect:?}, trigger)",

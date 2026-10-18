@@ -92,12 +92,7 @@ mod tests {
 
     #[test]
     fn a_glide_down_and_a_still_glide() {
-        let down = Glide::between(
-            800,
-            200,
-            MS(100),
-            EasingToken::Out.easing(),
-        );
+        let down = Glide::between(800, 200, MS(100), EasingToken::Out.easing());
         let mid = down.at(MS(50)).value;
         assert!((200..800).contains(&mid), "{mid}");
         assert_eq!(down.at(MS(100)).value, 200);

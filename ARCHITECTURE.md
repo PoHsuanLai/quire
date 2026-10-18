@@ -693,7 +693,7 @@ are reached as `ds::components::app::X`, not through the prelude.
 | `Layers` (`motion/detail/pending`) / (`shell/notifications/parts`) | `PendingLayers` / `StackLayers` |
 | `Placement` (`core/geometry`) / (`shell/catalog`, generic over kind, size, anchor) | `Placement` / `Placed` |
 | `Ground` (`root/chrome`) / (`style/tokens/accent_band`) | `Ground` / `TextGround` |
-| `Weight` (`style/fonts`) / (`style/tokens/accent_band`) | `FontWeight` / `BandWeight` |
+| `Weight` (`style/fonts`) / (`style/tokens/accent_band`) | `WeightRange` / `BandWeight` |
 | `Held` (`overlay/menu_track`) / (`motion/use_swipe`) | `MenuHold` / `SwipeHold` |
 | `Span` (`shell/battery/ring`) / (`spell/words`) | `RingSpan` / `WordSpan` |
 | `Level` (`shell/osd`), `Swipe` (`shell/notifications`) | `OsdLevel`, `NotificationSwipe` |
