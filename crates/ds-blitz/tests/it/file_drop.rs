@@ -72,8 +72,8 @@ fn names(paths: &[PathBuf]) -> String {
 fn describe(drag: &FileDrag) -> String {
     match drag {
         FileDrag::Idle => "idle".to_owned(),
-        FileDrag::Over { paths, .. } => format!("over:{}", names(paths)),
-        FileDrag::Dropped { paths, .. } => format!("dropped:{}", names(paths)),
+        FileDrag::Over(FileDrop { paths, .. }) => format!("over:{}", names(paths)),
+        FileDrag::Dropped(FileDrop { paths, .. }) => format!("dropped:{}", names(paths)),
     }
 }
 

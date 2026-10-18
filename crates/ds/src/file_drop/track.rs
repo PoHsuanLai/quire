@@ -133,10 +133,10 @@ pub(crate) fn target_view(track: &DragTrack, over: Over) -> TargetView {
             },
             Over::Yes,
         ) => TargetView {
-            drag: FileDrag::Over {
+            drag: FileDrag::Over(FileDrop {
                 paths: paths.clone(),
                 point: *point,
-            },
+            }),
             place: DropState::Target,
         },
         (
@@ -327,10 +327,10 @@ mod tests {
             (
                 &over_files,
                 Over::Yes,
-                FileDrag::Over {
+                FileDrag::Over(FileDrop {
                     paths: files(),
                     point: at(3.0, 4.0),
-                },
+                }),
                 DropState::Target,
                 DropAcceptance::Copy,
             ),

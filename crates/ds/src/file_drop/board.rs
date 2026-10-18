@@ -147,10 +147,7 @@ fn show(board: &Board, track: &DragTrack, turn: Turn, landed: Option<&(DropTarge
     for (at, target) in board.targets.iter().enumerate() {
         let next = match landed {
             Some((on, files)) if on.owner == target.owner => TargetView {
-                drag: FileDrag::Dropped {
-                    paths: files.paths.clone(),
-                    point: files.point,
-                },
+                drag: FileDrag::Dropped(files.clone()),
                 place: DropState::Idle,
             },
             _ => target_view(track, over_at(board.under, at)),
@@ -159,7 +156,7 @@ fn show(board: &Board, track: &DragTrack, turn: Turn, landed: Option<&(DropTarge
         let kept = turn == Turn::SameDrag
             && landed.is_none()
             && next == TargetView::default()
-            && matches!(view.peek().drag, FileDrag::Dropped { .. });
+            && matches!(view.peek().drag, FileDrag::Dropped(_));
         if !kept && *view.peek() != next {
             view.set(next);
         }

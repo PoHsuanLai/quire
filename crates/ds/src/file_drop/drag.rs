@@ -11,29 +11,20 @@ pub enum FileDrag {
     /// window, or it carries no files.
     #[default]
     Idle,
-    /// Files are over this target, the pointer at `point` (the window's logical pixels).
-    Over {
-        /// The dragged files.
-        paths: Vec<PathBuf>,
-        /// Where the pointer is.
-        point: Point,
-    },
-    /// Files were let go on this target, at `point`. Stays until the next drag enters the
+    /// Files are over this target, the pointer at the files' `point` (the window's logical
+    /// pixels).
+    Over(FileDrop),
+    /// Files were let go on this target, at their `point`. Stays until the next drag enters the
     /// window.
-    Dropped {
-        /// The dropped files.
-        paths: Vec<PathBuf>,
-        /// Where they were let go.
-        point: Point,
-    },
+    Dropped(FileDrop),
 }
 
-/// Files let go on a target: what its `ondrop` hears.
+/// Files over a target, or let go on it (what its `ondrop` hears), with where the pointer is.
 #[derive(Debug, Clone, PartialEq)]
 pub struct FileDrop {
-    /// The dropped files, in the order the source listed them.
+    /// The files, in the order the source listed them.
     pub paths: Vec<PathBuf>,
-    /// Where they were let go (the window's logical pixels).
+    /// Where the pointer is, or where they were let go (the window's logical pixels).
     pub point: Point,
 }
 

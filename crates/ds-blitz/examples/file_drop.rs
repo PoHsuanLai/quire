@@ -44,8 +44,10 @@ fn Composer() -> Element {
     });
     let status = match drop.drag() {
         FileDrag::Idle => "Drag files here".to_owned(),
-        FileDrag::Over { paths, .. } => format!("Let go to attach {} file(s)", paths.len()),
-        FileDrag::Dropped { paths, .. } => format!("Attached {} file(s)", paths.len()),
+        FileDrag::Over(FileDrop { paths, .. }) => {
+            format!("Let go to attach {} file(s)", paths.len())
+        }
+        FileDrag::Dropped(FileDrop { paths, .. }) => format!("Attached {} file(s)", paths.len()),
     };
     let border = match drop.drop_attr() {
         Some("target") => "2px solid var(--accent-text)",
