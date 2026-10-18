@@ -8,7 +8,7 @@ use blitz_dom::BaseDocument;
 use blitz_kit::scroll::accel::Accel;
 use blitz_kit::scroll::cmd::ScrollCmd;
 use blitz_kit::scroll::doc::{self, WheelRoute};
-use blitz_kit::scroll::driver::{KeyRepeat, KeyUse, Moved, Moves, ScrollDriver};
+use blitz_kit::scroll::driver::{KeyRepeat, Moved, Moves, ScrollDriver};
 use blitz_kit::scroll::engine::Motion;
 use blitz_kit::scroll::geom::ViewPoint;
 use blitz_kit::scroll::keys::ScrollKey;
@@ -378,10 +378,7 @@ impl WindowScroll {
         let el = self.elapsed(now);
         let moved = self.with_doc(|doc, state| {
             let env = state.tuning.at(el);
-            match state.driver.key(doc, key, repeat, state.pointer, env) {
-                KeyUse::Scrolled(moves) => moves,
-                KeyUse::Passed => Moves::none(),
-            }
+            state.driver.key(doc, key, repeat, state.pointer, env)
         });
         self.frames_after(moved)
     }
