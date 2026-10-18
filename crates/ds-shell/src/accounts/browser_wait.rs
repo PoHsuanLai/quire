@@ -41,7 +41,7 @@ pub fn BrowserWait(
                 div { class: "ds-acc-url", "{url}" }
             },
             actions: rsx! {
-                CopyAction { label: "Copy Link", copied: "Copied", text: url.clone(), state: copied, oncopy: on_copy }
+                CopyAction { label: "Copy Link", copied: "Copied", text: url, state: copied, oncopy: on_copy }
                 Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_cancel.call(()) }
                 Action { label: "Open Again", intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_open_again.call(()) }
             },

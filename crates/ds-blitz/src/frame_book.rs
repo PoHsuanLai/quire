@@ -75,9 +75,9 @@ impl FrameBook {
         };
         // Unlocked: the app's `decide` may look a tag up.
         for (tag, requests) in released {
-            requests
-                .into_iter()
-                .for_each(|request| request(tag.clone()));
+            for request in requests {
+                request(tag.clone());
+            }
         }
     }
 }

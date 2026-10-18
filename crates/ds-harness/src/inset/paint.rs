@@ -136,9 +136,8 @@ pub(crate) fn painted(node: &Node, ground: &Ground) -> Option<Painted> {
 
 /// Whether the element says it is highlighted, selected or hovered.
 fn is_marked(node: &Node) -> bool {
-    let element = match node.element_data() {
-        Some(element) => element,
-        None => return false,
+    let Some(element) = node.element_data() else {
+        return false;
     };
     element.attrs().iter().any(|attribute| {
         let name = attribute.name.local.as_ref();

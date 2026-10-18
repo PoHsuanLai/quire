@@ -123,9 +123,8 @@ impl HostWindow for WinitWindow {
             self.window.set_maximized(true);
             return Ok(());
         }
-        let output = match (self.placeable(), self.output()) {
-            (Support::Yes, Some(output)) => output,
-            _ => return Err(TileError::Unsupported),
+        let (Support::Yes, Some(output)) = (self.placeable(), self.output()) else {
+            return Err(TileError::Unsupported);
         };
         let size = self.window.outer_size();
         let Some(area) = placement(output, (size.width, size.height), tile) else {

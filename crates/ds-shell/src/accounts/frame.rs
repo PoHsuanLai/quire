@@ -48,7 +48,7 @@ pub(crate) fn StepFrame(
             if mark.is_some() || shown == StepTitle::Own {
                 div { class: "ds-acc-header",
                     if let Some(provider) = mark {
-                        Disc { provider, size: AvatarSize::Size48, style: style.clone() }
+                        Disc { provider, size: AvatarSize::Size48, style }
                     }
                     if shown == StepTitle::Own {
                         div { class: "ds-acc-title", "{title}" }

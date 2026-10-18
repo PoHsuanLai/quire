@@ -111,7 +111,7 @@ pub(crate) fn fallback(root: &MountedData) -> Fallback {
         let _ = root.write(BaseDocument::clear_focus);
     }
     Fallback::Ancestor(Rc::new(MountedData::new(ChainNode {
-        doc: root.doc.clone(),
+        doc: root.doc,
         candidates,
     })))
 }

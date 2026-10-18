@@ -50,7 +50,7 @@ pub fn ReviewServices(
                 name.clone(),
                 rsx! {
                     Row {
-                        title: name.clone(),
+                        title: name,
                         detail: detail.map(TextLine::from),
                         size: RowSize::Settings,
                         accessory,

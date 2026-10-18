@@ -127,26 +127,24 @@ fn assert_settles_wall(harness: &mut Harness) {
 fn assert_settles_virtual(harness: &mut Harness, clock: &VirtualClock) {
     let started = clock.elapsed();
     while let Some(due) = clock.next_due() {
-        if due.saturating_sub(started) > VIRTUAL_DRAIN_BOUND {
-            panic!(
-                "assert_settles_to_zero_frames: {} timer(s) still pending after \
-                 {VIRTUAL_DRAIN_BOUND:?} of virtual time (due at {:?}, started at {started:?}) \
-                 — a component may be rescheduling itself forever:\n{}",
-                clock.waiting(),
-                clock.due_times(),
-                harness.html()
-            );
-        }
+        assert!(
+            due.saturating_sub(started) <= VIRTUAL_DRAIN_BOUND,
+            "assert_settles_to_zero_frames: {} timer(s) still pending after \
+             {VIRTUAL_DRAIN_BOUND:?} of virtual time (due at {:?}, started at {started:?}) \
+             — a component may be rescheduling itself forever:\n{}",
+            clock.waiting(),
+            clock.due_times(),
+            harness.html()
+        );
         harness.advance(due.saturating_sub(clock.elapsed()));
     }
     let wakes = harness.wakes();
     harness.advance(QUIET);
-    if harness.wakes() != wakes || harness.is_animating() {
-        panic!(
-            "assert_settles_to_zero_frames: a timer or animation started during the {QUIET:?} \
-             quiet window right after every pending sleep drained (animating: {}):\n{}",
-            harness.is_animating(),
-            harness.html()
-        );
-    }
+    assert!(
+        harness.wakes() == wakes && !harness.is_animating(),
+        "assert_settles_to_zero_frames: a timer or animation started during the {QUIET:?} \
+         quiet window right after every pending sleep drained (animating: {}):\n{}",
+        harness.is_animating(),
+        harness.html()
+    );
 }

@@ -50,9 +50,9 @@ pub(crate) fn route(document: Document, scheme: &str, policy: Policy) -> Route {
     match (scheme, document, policy) {
         ("data", _, _) => Route::Data,
         // `about:blank` names an empty document: there is nothing to fetch.
-        ("about", _, _) => Route::Drop,
-        (_, _, Policy::Sealed) => Route::Drop,
-        (_, Document::Frame, Policy::Local) => Route::Drop,
+        ("about", _, _) | (_, _, Policy::Sealed) | (_, Document::Frame, Policy::Local) => {
+            Route::Drop
+        }
         (_, Document::Frame, Policy::Custom) => Route::App,
         ("file", Document::Top, _) => Route::File,
         (_, Document::Top, Policy::Local) => Route::Fallback,

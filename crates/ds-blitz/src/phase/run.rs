@@ -118,8 +118,11 @@ impl Phase {
     /// the frame that draws the text it follows.
     pub fn early(&self) -> Early {
         let book = self.shared.book.borrow();
-        let moved = book.carets.iter().any(|watch| watch.moved())
-            || book.selections.iter().any(|watch| watch.moved());
+        let moved = book.carets.iter().any(super::book::CaretWatch::moved)
+            || book
+                .selections
+                .iter()
+                .any(super::book::SelectionWatch::moved);
         match moved {
             true => Early::Wanted,
             false => Early::Idle,

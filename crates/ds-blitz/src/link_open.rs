@@ -177,15 +177,12 @@ fn decoded(text: &str) -> String {
             (b'%', Some(high), Some(low)) => u8::try_from(high * 16 + low).ok(),
             _ => None,
         };
-        match escaped {
-            Some(byte) => {
-                out.push(byte);
-                at += 3;
-            }
-            None => {
-                out.push(bytes[at]);
-                at += 1;
-            }
+        if let Some(byte) = escaped {
+            out.push(byte);
+            at += 3;
+        } else {
+            out.push(bytes[at]);
+            at += 1;
         }
     }
     String::from_utf8_lossy(&out).into_owned()

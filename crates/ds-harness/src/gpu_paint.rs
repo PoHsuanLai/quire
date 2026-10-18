@@ -252,7 +252,7 @@ impl GpuPainter {
     }
 
     /// Submit `encoder` and wait until the GPU has run it.
-    fn finish(&mut self, encoder: wgpu::CommandEncoder) -> Result<(), HarnessError> {
+    fn finish(&self, encoder: wgpu::CommandEncoder) -> Result<(), HarnessError> {
         self.handle.queue.submit([encoder.finish()]);
         self.wait()
     }

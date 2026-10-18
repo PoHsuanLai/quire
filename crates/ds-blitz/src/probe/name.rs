@@ -12,13 +12,12 @@ pub(super) fn name_of(doc: &BaseDocument, node: &Node) -> String {
             .flatten()
             .find(|text| !text.trim().is_empty())
     });
-    match labelled {
-        Some(text) => squash(text),
-        None => {
-            let mut text = String::new();
-            visible_text(doc, node, &mut text);
-            squash(&text)
-        }
+    if let Some(text) = labelled {
+        squash(text)
+    } else {
+        let mut text = String::new();
+        visible_text(doc, node, &mut text);
+        squash(&text)
     }
 }
 

@@ -258,13 +258,12 @@ fn run(first: Option<fn() -> Element>, config: AppConfig) -> Result<(), LaunchEr
     let tokens = LaunchTokens::from_env();
     // Held until this call returns, which does not happen until the loop ends — i.e., for
     // the process's life. See `runtime` for why a host thread must enter Tokio at all.
-    let (owned, given) = match config.runtime.clone() {
-        Some(handle) => (None, handle),
-        None => {
-            let runtime = runtime::build()?;
-            let handle = runtime.handle().clone();
-            (Some(runtime), handle)
-        }
+    let (owned, given) = if let Some(handle) = config.runtime.clone() {
+        (None, handle)
+    } else {
+        let runtime = runtime::build()?;
+        let handle = runtime.handle().clone();
+        (Some(runtime), handle)
     };
     let entered = given.enter();
     let event_loop = blitz_shell::create_default_event_loop();

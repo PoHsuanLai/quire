@@ -65,7 +65,7 @@ impl Harness {
 
     /// Hand a pointer move or primary release to the edit surface holding the pointer, if one
     /// does.
-    pub(crate) fn route_captured(&mut self, event: &UiEvent) {
+    pub(crate) fn route_captured(&self, event: &UiEvent) {
         let (phase, pointer) = match event {
             UiEvent::PointerMove(pointer) => (PointerPhase::Drag, pointer),
             UiEvent::PointerUp(pointer) if pointer.button == MouseEventButton::Main => {

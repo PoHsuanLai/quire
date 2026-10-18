@@ -131,6 +131,8 @@ fn crossing(
 /// Hand each of `crossings` to the app, if it listens.
 pub fn report(hover: &FrameHover, crossings: Vec<FrameLinkHover>) {
     if let FrameHover::Report(FrameHoverHandler(handler)) = hover {
-        crossings.into_iter().for_each(|crossing| handler(crossing));
+        for crossing in crossings {
+            handler(crossing);
+        }
     }
 }

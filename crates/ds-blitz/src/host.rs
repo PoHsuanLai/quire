@@ -203,7 +203,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
     use_window_event(move |event, event_loop| {
         // The document's scale as it stood before this event: blitz-shell changes the zoom only
         // after the hook has heard the key, so a zoom shows here from the next event on.
-        let factor = document_scale(&seen.borrow(), window.scale_factor());
+        let factor = document_scale(seen.borrow().as_ref(), window.scale_factor());
         let next = scale_of(factor);
         if *signals.scale.peek() != next {
             let mut current = signals.scale;
@@ -234,7 +234,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
         if let WindowEvent::ScaleFactorChanged { scale_factor, .. } = event {
             // The document hears the new factor after this hook: carry its zoom over now. The
             // zoom is read on its own, as winit may already report the new factor here.
-            let next = scale_of(*scale_factor * document_zoom(&seen.borrow()));
+            let next = scale_of(*scale_factor * document_zoom(seen.borrow().as_ref()));
             let mut current = signals.scale;
             if *current.peek() != next {
                 current.set(next);
@@ -294,7 +294,7 @@ pub(crate) fn Host(props: HostProps) -> Element {
             dragged.borrow_mut().answer(event_loop, answer);
         }
         if matches!(event, WindowEvent::RedrawRequested) {
-            find_frames(&seen.borrow(), &found);
+            find_frames(seen.borrow().as_ref(), &found);
         }
         if matches!(event, WindowEvent::RedrawRequested)
             && let Some(handle) = seen.borrow().as_ref()
@@ -359,10 +359,9 @@ enum Installed {
 /// Find the frames attached under the document's `iframe`s since the last frame (each asked
 /// for a redraw as it attached), so their requests reach the app tagged. The document is
 /// released before any request is put to the app.
-fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
+fn find_frames(document: Option<&NodeHandle>, book: &FrameBook) {
     let live = document
-        .as_ref()
-        .and_then(|handle| handle.try_doc())
+        .and_then(NodeHandle::try_doc)
         .map(|doc| crate::frame_tree::live_frames(&doc));
     if let Some(live) = live {
         book.bind(live);
@@ -371,17 +370,15 @@ fn find_frames(document: &Option<NodeHandle>, book: &FrameBook) {
 
 /// The document's scale: the window's `factor` times the page zoom, or `factor` alone before
 /// the document is there.
-fn document_scale(document: &Option<NodeHandle>, factor: f64) -> f64 {
+fn document_scale(document: Option<&NodeHandle>, factor: f64) -> f64 {
     document
-        .as_ref()
         .and_then(NodeHandle::try_doc)
         .map_or(factor, |doc| f64::from(doc.viewport().scale()))
 }
 
 /// The page zoom blitz-shell keeps, or none (1) before the document is there.
-fn document_zoom(document: &Option<NodeHandle>) -> f64 {
+fn document_zoom(document: Option<&NodeHandle>) -> f64 {
     document
-        .as_ref()
         .and_then(NodeHandle::try_doc)
         .map_or(1.0, |doc| f64::from(doc.viewport().zoom()))
 }

@@ -25,7 +25,7 @@ pub(super) fn open(pdf: &[u8], title: &str) -> Result<PrintOutcome, PrintError> 
     let dir = staging_dir();
     private_dir(&dir)?;
     sweep(&dir, SystemTime::now());
-    let path = dir.join(file_name(title, unique()));
+    let path = dir.join(file_name(title, &unique()));
     create_private(&path, pdf)?;
     let status = opener(&path)
         .status()
@@ -126,7 +126,7 @@ fn unique() -> String {
 
 /// `title` made safe as a file name (letters, digits, `-` and `_` kept; everything else a
 /// `-`; at most 60 characters), then `unique` and `.pdf`.
-fn file_name(title: &str, unique: String) -> PathBuf {
+fn file_name(title: &str, unique: &str) -> PathBuf {
     let stem: String = title
         .chars()
         .map(|c| {
@@ -212,11 +212,7 @@ mod tests {
     #[test]
     fn titles_become_safe_file_names() {
         for &(title, want) in CASES {
-            assert_eq!(
-                file_name(title, "7".to_owned()),
-                PathBuf::from(want),
-                "{title:?}"
-            );
+            assert_eq!(file_name(title, "7"), PathBuf::from(want), "{title:?}");
         }
     }
 }

@@ -255,8 +255,9 @@ impl Windows {
 
     fn drop_all(&mut self, event_loop: &dyn ActiveEventLoop) {
         let keys: Vec<WindowKey> = self.subs.iter().map(|(key, _)| *key).collect();
-        keys.into_iter()
-            .for_each(|key| self.drop_window(event_loop, key));
+        for key in keys {
+            self.drop_window(event_loop, key);
+        }
     }
 
     /// Take the closed window out of `renderer` by resuming it on the parking window and

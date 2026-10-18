@@ -54,17 +54,16 @@ pub fn use_pdf_page(path: Option<PathBuf>, size: Size) -> Option<PdfPage> {
         .as_ref()
         .filter(|arrived| arrived.request == request)
         .map(|arrived| arrived.page.clone());
-    let page = match landed.or_else(|| pdf_thumb_cached(&request)) {
-        Some(page) => page,
-        None => {
-            if fresh {
-                if let Some(previous) = running.take() {
-                    previous.cancel();
-                }
-                running.set(Some(spawn(read(slot, request, arrived))));
+    let page = if let Some(page) = landed.or_else(|| pdf_thumb_cached(&request)) {
+        page
+    } else {
+        if fresh {
+            if let Some(previous) = running.take() {
+                previous.cancel();
             }
-            PdfPage::Loading
+            running.set(Some(spawn(read(slot, request, arrived))));
         }
+        PdfPage::Loading
     };
     Some(page)
 }

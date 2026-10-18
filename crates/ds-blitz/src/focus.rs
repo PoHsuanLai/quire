@@ -143,9 +143,9 @@ pub(crate) fn place_caret(element: &MountedData, caret: InitialCaret) -> Focused
     let Some(node) = NodeRef::of(element) else {
         return Focused::Unknown;
     };
-    let field = match node.read(|doc| doc.get_node(node.node).map_or(Field::Absent, field_of)) {
-        None => return Focused::Busy,
-        Some(field) => field,
+    let Some(field) = node.read(|doc| doc.get_node(node.node).map_or(Field::Absent, field_of))
+    else {
+        return Focused::Busy;
     };
     match field {
         Field::Editable => done(node.write(|doc| {
@@ -203,7 +203,7 @@ pub(crate) fn selection(element: &MountedData) -> FieldSelection {
         let text = editor.raw_text();
         let chars = |byte: usize| {
             text.get(..byte)
-                .map_or(text.chars().count(), |s| s.chars().count())
+                .map_or_else(|| text.chars().count(), |s| s.chars().count())
         };
         let selection = editor.raw_selection();
         Some(FieldSelection::Focused {
@@ -268,7 +268,7 @@ fn done(written: Written) -> Focused {
 /// method off winit does not run `interpretKeyEvents`, the standard key bindings (Backspace among
 /// them, which Blitz leaves to them on macOS) never arrive, and the field takes typing but
 /// cannot delete until the keyboard has moved away and back.
-fn enable_ime_for_unbuilt_field(doc: &mut BaseDocument, node: NodeId) {
+fn enable_ime_for_unbuilt_field(doc: &BaseDocument, node: NodeId) {
     if doc
         .get_node(node)
         .is_some_and(|found| matches!(field_of(found), Field::NotLaidOut))

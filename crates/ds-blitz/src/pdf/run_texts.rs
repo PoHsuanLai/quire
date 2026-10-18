@@ -85,13 +85,16 @@ fn glyph_clusters(run: &Run<'_, TextBrush>) -> Vec<Range<usize>> {
             // Visual order: after its ligature's glyph left to right, before it right to left.
             match clusters.last_mut() {
                 Some((held, _)) if !cluster.is_rtl() => *held = union(held, &range),
-                _ => swallowed = Some(swallowed.map_or(range.clone(), |held| union(&held, &range))),
+                _ => {
+                    swallowed =
+                        Some(swallowed.map_or_else(|| range.clone(), |held| union(&held, &range)))
+                }
             }
             continue;
         }
         let range = swallowed
             .take()
-            .map_or(range.clone(), |held| union(&held, &range));
+            .map_or_else(|| range.clone(), |held| union(&held, &range));
         clusters.push((range, glyphs));
     }
     clusters

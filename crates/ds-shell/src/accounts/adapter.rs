@@ -193,7 +193,7 @@ pub(crate) fn PickRows<K: Clone + PartialEq + Hash + 'static>(
             label,
             items,
             style: ListStyle::Inset,
-            cursor: cursor.clone(),
+            cursor,
             onselect: move |key| oncursor.call(key),
             onpick: move |key| onpick.call(key),
         }

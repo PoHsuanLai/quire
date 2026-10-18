@@ -18,11 +18,11 @@ pub struct Service {
     pub name: &'static str,
 }
 
-const fn session(name: &'static str) -> Option<Service> {
-    Some(Service {
+const fn session(name: &'static str) -> Service {
+    Service {
         bus: Bus::Session,
         name,
-    })
+    }
 }
 
 /// One extra the desktop adds to an app's portable core.
@@ -72,16 +72,16 @@ impl Capability {
     pub const fn service(self) -> Option<Service> {
         match self {
             // design/33-AGENT.md section 5 (intentd, docket repo).
-            Capability::Intents => session("org.quire.Intents1"),
+            Capability::Intents => Some(session("org.quire.Intents1")),
             // accountd, porter repo (porter/crates/accountd/src/lib.rs:2); also named by
             // ds-settings' live client docs.
-            Capability::Accounts => session("org.quire.Accounts1"),
+            Capability::Accounts => Some(session("org.quire.Accounts1")),
             // memoryd, design/33-AGENT.md section 5 (almanac repo).
-            Capability::Memory => session("org.quire.Memory1"),
+            Capability::Memory => Some(session("org.quire.Memory1")),
             // companiond, design/33-AGENT.md section 5 (docket repo).
-            Capability::Companion => session("org.quire.Companion1"),
+            Capability::Companion => Some(session("org.quire.Companion1")),
             // sill's `work_areas` service (sill/crates/sill-services/src/work_areas).
-            Capability::Outputs => session("org.quire.Outputs1"),
+            Capability::Outputs => Some(session("org.quire.Outputs1")),
             Capability::Helpers => Some(Service {
                 bus: Bus::System,
                 name: "org.freedesktop.PackageKit",

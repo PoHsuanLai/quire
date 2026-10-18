@@ -77,7 +77,7 @@ pub fn ConsentBody(
             if several {
                 div { class: "ds-acc-choice",
                     AccountPicker {
-                        accounts: choices.clone(),
+                        accounts: choices,
                         chosen: picked,
                         on_pick: move |choice: PickerChoice| match choice {
                             PickerChoice::Account(key) => on_choose.call(key),

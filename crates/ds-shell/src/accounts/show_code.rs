@@ -35,7 +35,7 @@ pub fn ShowCode(
             },
             actions: rsx! {
                 Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_cancel.call(()) }
-                CopyAction { label: "Copy Code", copied: "Copied", text: code.clone(), state: copied, intent: Intent::Default, landing: Landing::Here, oncopy: on_copy }
+                CopyAction { label: "Copy Code", copied: "Copied", text: code, state: copied, intent: Intent::Default, landing: Landing::Here, oncopy: on_copy }
             },
         }
     }

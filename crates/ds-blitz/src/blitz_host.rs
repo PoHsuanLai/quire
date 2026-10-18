@@ -140,9 +140,7 @@ impl BlitzHost {
         } = wiring;
         BlitzHost {
             focus: BlitzFocus {
-                hand_back: keeper
-                    .clone()
-                    .map_or_else(HandBack::default, hand_back_seam),
+                hand_back: keeper.map_or_else(HandBack::default, hand_back_seam),
             },
             geometry: BlitzGeometry { find, phase },
             click_focus: match focus_fallback {

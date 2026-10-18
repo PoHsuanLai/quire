@@ -137,7 +137,7 @@ impl MenuExport {
     pub fn unique_name(&self) -> String {
         self.connection
             .unique_name()
-            .map(|name| name.to_string())
+            .map(ToString::to_string)
             .unwrap_or_default()
     }
 

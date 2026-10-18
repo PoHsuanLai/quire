@@ -76,7 +76,7 @@ fn open_new(
         match request_device(&adapter, "ds-harness") {
             Ok((device, queue)) => {
                 let handle = DeviceHandle {
-                    instance: instance.clone(),
+                    instance,
                     adapter,
                     device,
                     queue,

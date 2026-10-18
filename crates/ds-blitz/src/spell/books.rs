@@ -81,12 +81,11 @@ impl Books {
                 let _ = dictionary.add(word);
             }
         }
-        match saved {
-            Ok(()) => Learned::Saved,
-            Err(_) => {
-                self.ignored.insert(word.to_owned());
-                Learned::SessionOnly
-            }
+        if let Ok(()) = saved {
+            Learned::Saved
+        } else {
+            self.ignored.insert(word.to_owned());
+            Learned::SessionOnly
         }
     }
 

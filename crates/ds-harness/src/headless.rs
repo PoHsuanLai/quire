@@ -284,7 +284,7 @@ impl Headless {
     }
 
     /// Record the kind of input that arrived last, so `Ds` stamps `data-modality`.
-    pub(crate) fn set_modality(&mut self, next: InputModality) {
+    pub(crate) fn set_modality(&self, next: InputModality) {
         let mut modality = self.modality;
         self.doc.vdom.in_runtime(|| {
             if *modality.peek() != next {
@@ -459,7 +459,7 @@ impl Headless {
 
     /// Find the frames the renders attached under their `iframe`s, so their requests reach the
     /// app tagged. The document is free by then: the app's `decide` may touch it.
-    fn find_frames(&mut self) {
+    fn find_frames(&self) {
         let live = live_frames(&self.doc.inner.borrow());
         self.book.bind(live);
     }
@@ -467,7 +467,7 @@ impl Headless {
     /// The pointer moved to `at`: tell the app if it came onto or left a link in a frame.
     pub(crate) fn hover_at(&mut self, at: Point) {
         let (hover, tracker) = &mut self.hover;
-        if let FrameHover::Ignore = hover {
+        if matches!(hover, FrameHover::Ignore) {
             return;
         }
         let under = link_under(&self.doc.inner.borrow(), at);
@@ -476,8 +476,8 @@ impl Headless {
     }
 
     /// The secondary button was released at `at`: tell the app if it was over a link in a frame.
-    pub(crate) fn menu_at(&mut self, at: Point) {
-        if let FrameMenu::Ignore = self.menu {
+    pub(crate) fn menu_at(&self, at: Point) {
+        if matches!(self.menu, FrameMenu::Ignore) {
             return;
         }
         let under = link_under(&self.doc.inner.borrow(), at);
@@ -485,8 +485,8 @@ impl Headless {
     }
 
     /// The primary button was released at `at`: tell the app if it was on an image in a frame.
-    pub(crate) fn image_at(&mut self, at: Point) {
-        if let FrameImages::Ignore = self.images {
+    pub(crate) fn image_at(&self, at: Point) {
+        if matches!(self.images, FrameImages::Ignore) {
             return;
         }
         let under = image_under(&self.doc.inner.borrow(), at);
