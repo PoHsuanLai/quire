@@ -336,9 +336,9 @@ Open items:
   `AnswerView`, `FieldHandle`, `Callback` and `ReadSignal`. They stay in `ds`
   (`components/companion/port.rs`, `prompt/binding.rs`). `ds-intents` holds the plain values:
   `ThingMark`, `ContextChip`, `ChipKind`, `Removal`, `FieldMode`, `SummonSerial`,
-  `SummonAnswerMark` and the `ContextModel` trait. `ContextChip` and `FieldMode` are there, below
+  `SummonAnswerMark` and the `ContextModel` struct. `ContextChip` and `FieldMode` are there, below
   the `fields` group, because `TextField` takes both as props at the fill and a group may not name
-  one above it. `ContextModel` is two accessors; its real shape waits for the context fill
+  one above it. `ContextModel` is two fields; its real shape waits for the context fill
   (design/agent/SPEC.md, Q-P7).
 - **Orb periods and sizes are proposed.** `OrbListen` 12 s, `OrbWork` 8 s, `OrbAct` 5 s (`Hold`
   tokens), and the size ladder 14/16/20/40/192 are the freeze's proposals. CONVENTIONS section 6

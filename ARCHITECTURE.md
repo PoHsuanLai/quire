@@ -23,7 +23,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-motion` | `Anim` and recipes, keyframes, `Presence`, `Timeline`, rosters, gestures, pulse, the details grammar; feature `dioxus` adds the hooks, timers and event conversions over Dioxus (`ds` turns it on) |
 | `ds-lint` | stylesheet and markup linter; reads its vocabulary from `Kits` |
 | `ds-behaviour` | pure input machines a shell and a compositor both run: the app switcher, hot corners, the Command key's double tap and hold, the live Space swipe; no Dioxus, no clock |
-| `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` seam; no agent type |
+| `ds-intents` | pure presentational context for the companion: the marks an app reports (`ThingMark`, `ContextChip`, `FieldMode`, the summon values) and the `ContextModel` values; no agent type |
 | `ds` | generic components (among them `CommandLine`, a copyable command; the host writes the clipboard), the `DocumentHost` seam and its hooks, overlay stack, root, `Ds`, stylesheet assembly, `ds::prelude` |
 | `ds-shell` | app-facing parts above `ds`, cross-platform: the account sheets and consent alert, the missing-helper sheet (its `Unsupported` phase shows the install command for the person's distro as a selectable line with a Copy button), the confirm card, with their sheets and `KIT`. The surfaces only our desktop shell draws live in sill's `sill-shell-kit` (see "Moved to sill" in section 3) |
 | `ds-settings-derive` | proc macro: `#[derive(SettingsSchema)]` |
