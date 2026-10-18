@@ -9,8 +9,10 @@
 //! [`Deadline::ACTION`], [`Deadline::PROMPT`]); a caller picks one and never writes a bare
 //! duration. The crate names no runtime and no bus: it is a wall-clock delay and a future.
 
+mod answer;
 mod deadline;
 mod within;
 
+pub use answer::{SenderName, Verdict};
 pub use deadline::Deadline;
 pub use within::{NotAnswering, within};

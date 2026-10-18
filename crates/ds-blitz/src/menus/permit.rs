@@ -15,9 +15,7 @@ use zbus::message::Header;
 /// about which check it failed.
 const DENIED: &str = "this caller may not use the menu";
 
-/// The unique bus name of the peer that made a call (`:1.42`).
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SenderName(pub String);
+pub use ds_peer::{SenderName, Verdict};
 
 /// Who is calling: the sender's unique bus name and the connection that received the call, so the
 /// permit can resolve the peer its own way.
@@ -25,14 +23,6 @@ pub struct SenderName(pub String);
 pub struct Caller {
     pub sender: SenderName,
     pub connection: zbus::Connection,
-}
-
-/// The answer to [`MenuPermit::permit`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Verdict {
-    Allow,
-    /// The caller may not press items. The call fails with `AccessDenied`.
-    Refuse,
 }
 
 /// The policy for who may press the exported menu's items. Asked before every `Event` and

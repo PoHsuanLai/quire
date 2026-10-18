@@ -99,7 +99,7 @@ print = ["quire-desktop", "dep:zbus", "dep:memfd", "dep:ds-peer"]
 # `ds_blitz::menus`: the app's menu bar served as `com.canonical.dbusmenu` on its own bus
 # connection, so the shell's bar shows the focused app's menus (design/27 section 5.2). Off by
 # default, so an app that exports no menu builds no D-Bus client for it.
-menus = ["quire-desktop", "dep:zbus", "dep:serde"]
+menus = ["quire-desktop", "dep:zbus", "dep:serde", "dep:ds-peer"]
 # `menus::ShellOnly`: the menu permit for our desktop, which lets only the shell press an item
 # (peephole's `shell` role at the full proof). Linux only. Off by default; without it an app passes
 # its own `MenuPermit` to `MenuExport::start`, because there is no default permit.

@@ -6,9 +6,7 @@ use std::future::Future;
 use super::{LiveError, LiveSchema, Snapshot};
 use crate::schema::KeyPath;
 
-/// The unique bus name of the peer that made a call (`:1.42`).
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SenderName(pub String);
+pub use ds_peer::{SenderName, Verdict};
 
 /// Who is calling: the sender's bus name and the connection that received the call, so the
 /// implementer can resolve the peer's role its own way (accountd's `Peer` registry, or the bus's
@@ -26,14 +24,6 @@ pub enum Access {
     Read,
     /// `Set`, including running an action key.
     Write,
-}
-
-/// The answer to [`LiveModule::permit`].
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Verdict {
-    Allow,
-    /// The caller's role may not do this. The call fails with `NotPermitted`.
-    Refuse,
 }
 
 /// One live module: its schema, its values, and who may change them.
