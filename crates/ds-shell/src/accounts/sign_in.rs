@@ -78,7 +78,7 @@ pub fn SignInForm(
                     }
                 } else {
                     for (index , field) in fields.iter().enumerate() {
-                        {entry(field, index == 0, problem, on_input)}
+                        {entry(field, landing_of(index), problem, on_input)}
                     }
                 }
             },
@@ -121,7 +121,7 @@ fn sections(
         for (part , run) in runs {
             FormSection { key: "{fold.slug()}-{part.map_or(\"form\", |part| part.slug())}", title: part.map(part_title),
                 for (index , field) in run {
-                    {row(field, index == 0, problem, on_input)}
+                    {row(field, landing_of(index), problem, on_input)}
                 }
             }
         }
@@ -148,14 +148,22 @@ fn rejection(problem: Option<FieldProblem>, role: FieldRole) -> Option<Rejection
         .filter(|problem| problem.role == role)
         .map(|problem| Rejection {
             message: problem_text(problem),
-            attempt: problem.attempt.0,
+            attempt: problem.attempt,
         })
+}
+
+/// Where the keyboard starts: in the form's first field, anywhere for the rest.
+fn landing_of(index: usize) -> Landing {
+    match index {
+        0 => Landing::Here,
+        _ => Landing::Anywhere,
+    }
 }
 
 /// A text entry for `field`: its hint when the host gave one, else the role's.
 fn entry(
     field: &FormField,
-    first: bool,
+    landing: Landing,
     problem: Option<FieldProblem>,
     on_input: EventHandler<(FieldRole, FieldText)>,
 ) -> Element {
@@ -169,7 +177,7 @@ fn entry(
                 .hint
                 .clone()
                 .unwrap_or_else(|| field_placeholder(role, field.requirement).to_owned()),
-            landing: if first { Landing::Here } else { Landing::Anywhere },
+            landing,
             rejection: rejection(problem, role),
             help: field.help.clone(),
             oninput: move |text: FieldText| on_input.call((role, text)),
@@ -180,7 +188,7 @@ fn entry(
 /// One row of a grouped form: the label, and a pop-up (a choice) or an entry beside it.
 fn row(
     field: &FormField,
-    first: bool,
+    landing: Landing,
     problem: Option<FieldProblem>,
     on_input: EventHandler<(FieldRole, FieldText)>,
 ) -> Element {
@@ -200,7 +208,7 @@ fn row(
                 }
             }
         }
-        None => entry(field, first, problem, on_input),
+        None => entry(field, landing, problem, on_input),
     };
     rsx! {
         FieldRow { key: "{role.slug()}", label: field_label(role), layout: RowLayout::Form, {control} }

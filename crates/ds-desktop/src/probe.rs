@@ -46,6 +46,13 @@ pub(crate) mod bus {
         )
     }
 
+    /// Whether a bus name has an owner right now.
+    #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+    pub(crate) enum NameOwner {
+        Owned,
+        Unowned,
+    }
+
     /// One bus: its daemon proxy and the names it can activate.
     pub(crate) struct Side {
         pub(crate) proxy: DBusProxy<'static>,
@@ -64,19 +71,22 @@ pub(crate) mod bus {
         }
 
         /// A name with an owner, or one the bus would start, is here.
-        pub(crate) fn presence(&self, name: &str, owned: bool) -> Presence {
-            if owned || self.activatable.contains(name) {
-                Presence::Here
-            } else {
-                Presence::Absent
+        pub(crate) fn presence(&self, name: &str, owner: NameOwner) -> Presence {
+            match owner {
+                NameOwner::Owned => Presence::Here,
+                NameOwner::Unowned if self.activatable.contains(name) => Presence::Here,
+                NameOwner::Unowned => Presence::Absent,
             }
         }
 
-        async fn owned(&self, name: &str) -> bool {
+        async fn owner(&self, name: &str) -> NameOwner {
             let Ok(name) = zbus::names::BusName::try_from(name) else {
-                return false;
+                return NameOwner::Unowned;
             };
-            self.proxy.name_has_owner(name).await.unwrap_or(false)
+            match self.proxy.name_has_owner(name).await {
+                Ok(true) => NameOwner::Owned,
+                Ok(false) | Err(_) => NameOwner::Unowned,
+            }
         }
     }
 
@@ -100,7 +110,7 @@ pub(crate) mod bus {
                 Bus::System => system,
             };
             let presence = match side {
-                Some(side) => side.presence(service.name, side.owned(service.name).await),
+                Some(side) => side.presence(service.name, side.owner(service.name).await),
                 None => Presence::Absent,
             };
             desktop.set(capability, presence);
