@@ -5,7 +5,6 @@
 use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::item::lines::{Drawn, render_lines};
-use crate::components::menus::item::view::client_point;
 use crate::components::menus::menu::blink::Blink;
 use crate::components::menus::menu::blink::highlighted as lit;
 use crate::components::menus::menu::choices::{Act, Choice, liveness};
@@ -15,6 +14,7 @@ use crate::components::menus::menu::keys::{KeyAct, key_act};
 use crate::components::menus::menu::pick::Picked;
 use crate::components::menus::menu::submenu::SubMenu;
 use crate::components::menus::menu::tracker::{Tracker, Via, target};
+use crate::host::event_point::client_point;
 use crate::host::measure::MountedRef;
 use crate::keys::Keys as WindowKeys;
 use crate::stack::menu_track::types::{MenuTarget, MenuTiming};

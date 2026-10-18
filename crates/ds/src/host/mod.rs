@@ -5,6 +5,7 @@ pub mod captured;
 pub mod caret;
 pub mod document;
 pub mod drop_hit;
+pub mod event_point;
 pub mod fallback;
 pub mod focused;
 pub mod found;

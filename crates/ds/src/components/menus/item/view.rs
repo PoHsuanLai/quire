@@ -11,8 +11,9 @@ use crate::components::menus::alive::Alive;
 use crate::components::menus::item::item::MenuImage;
 use crate::components::menus::item::text::{Emphasis, ItemText};
 use crate::components::menus::item::tip::RowTip;
+use crate::host::event_point::client_point;
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Point, Px};
+use ds_core::geometry::units::Point;
 use ds_core::press::{PointerButton, Press};
 use ds_core::vocab::{Availability, Check, FocusStyle, Selection, Shown};
 use ds_core::word::Word;
@@ -242,24 +243,6 @@ pub(crate) fn info(title: &str, detail: Option<&str>) -> Element {
 pub(crate) fn header(title: &str) -> Element {
     rsx! {
         div { class: "ds-menu-header", role: "presentation", "{title}" }
-    }
-}
-
-/// Where a mouse event happened, in the client coordinates every quire rect is read in.
-pub(crate) fn client_point(event: &MouseEvent) -> Point {
-    let at = event.client_coordinates();
-    Point {
-        x: Px(at.x as f32),
-        y: Px(at.y as f32),
-    }
-}
-
-/// Where a pointer event happened, in the same client coordinates.
-pub(crate) fn pointer_point(event: &PointerEvent) -> Point {
-    let at = event.client_coordinates();
-    Point {
-        x: Px(at.x as f32),
-        y: Px(at.y as f32),
     }
 }
 

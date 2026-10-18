@@ -7,8 +7,8 @@
 //! is its accessible label and its Fly tooltip, never a caption under the cell.
 
 use crate::components::lists::emoji_grid::nav::{GridMove, GridStep, grid_step};
-use crate::components::menus::item::view::client_point;
 use crate::components::overlays::tooltip::Tooltip;
+use crate::host::event_point::client_point;
 use dioxus::prelude::*;
 use ds_core::geometry::units::{Point, Px};
 use ds_core::vocab::Selection;

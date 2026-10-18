@@ -5,7 +5,7 @@
 //! (`blitz_kit::hover`): a browser sends no move then, and a list that follows the pointer must
 //! not follow it, or a menu closing over a list selects the row under the still pointer.
 
-use crate::components::menus::item::view::pointer_point;
+use crate::host::event_point::pointer_point;
 use dioxus::prelude::*;
 use ds_core::geometry::units::Point;
 
