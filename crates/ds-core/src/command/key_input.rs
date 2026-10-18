@@ -6,7 +6,7 @@ use chordkit::{AltGr, Key as ChordKey, KeyInput, Modifier, Modifiers as ChordMod
 use keyboard_types::{Key, Modifiers};
 
 /// Each toolkit modifier flag and the physical modifier it reports. Super and Meta stay apart
-/// here; the platform's normaliser folds them (`chordkit::Platform::meta_as`).
+/// here; the platform's normaliser folds them (`chordkit::KeyInput::normalise`).
 const FLAGS: [(Modifiers, Modifier); 5] = [
     (Modifiers::CONTROL, Modifier::Ctrl),
     (Modifiers::ALT, Modifier::Alt),

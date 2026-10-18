@@ -2215,8 +2215,8 @@ fn Editor() -> Element {
   `Input::paste` presses the platform's paste chord (`PasteChord::Primary`); name another with
   `Input::paste_with`. `with_keymap_source(KeySource)` plugs a fake source, which is how a reload is
   driven.
-- **Deprecated.** `is_command` and `command_keys` stay, `#[deprecated]`, over chordkit's normaliser.
-  They treat Ctrl and Command alike on every platform, which is the thing this section ends.
+- **Removed.** `is_command` and `command_keys` are gone; they treated Ctrl and Command alike on
+  every platform, which is the thing this section ends. Ask the keymap.
 - **Limits.** The key is as the window reports it, so a chord that holds Shift with a symbol key
   (`Primary+Shift+1`) needs the host's unshifted key (`RawKey::unshifted`); letters and digits are
   fine. `Shortcut` text for a menu shows the shortcut as declared unless it is a standard
