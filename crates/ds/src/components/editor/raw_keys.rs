@@ -48,7 +48,7 @@ pub fn RawKeySurface(
             (event.modifiers(), event.location()),
         ));
     };
-    let read_up = read.clone();
+    let read_up = read;
     let class = common.class("ds-raw-keys");
     let data = common.data_attributes();
     let label = common.aria_label.clone();

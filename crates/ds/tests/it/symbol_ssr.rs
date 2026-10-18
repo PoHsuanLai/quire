@@ -47,7 +47,7 @@ fn once(effect: OnceEffect, trigger: u32) -> SymbolEffect {
     SymbolEffect::Once(effect, Trigger(trigger))
 }
 
-fn looped(effect: LoopEffect, activity: Activity) -> SymbolEffect {
+fn looped(effect: LoopEffect, activity: EffectActivity) -> SymbolEffect {
     SymbolEffect::While(effect, activity)
 }
 
@@ -128,10 +128,10 @@ fn a_while_effect_plays_while_active_and_holds_once_it_stops() {
     for &(effect, class, icon) in CASES {
         let got = renders(
             icon,
-            looped(effect, Activity::Idle),
+            looped(effect, EffectActivity::Idle),
             &[
-                looped(effect, Activity::Active),
-                looped(effect, Activity::Idle),
+                looped(effect, EffectActivity::Active),
+                looped(effect, EffectActivity::Idle),
             ],
         );
         assert!(
@@ -227,7 +227,7 @@ fn a_part_effect_puts_the_parts_in_groups_inside_the_svg_and_the_rest_outside() 
 
 #[test]
 fn reduced_motion_writes_the_same_markup_for_the_stylesheet_to_hold() {
-    let effect = looped(LoopEffect::Wiggle, Activity::Active);
+    let effect = looped(LoopEffect::Wiggle, EffectActivity::Active);
     let standard = renders(Icon::Bell, effect, &[]);
     let mut dom = VirtualDom::new(Page);
     dom.in_runtime(|| {

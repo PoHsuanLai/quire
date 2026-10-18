@@ -16,7 +16,7 @@ const VIEW: Viewport = Viewport {
 };
 
 static TRIGGER: GlobalSignal<Trigger> = Signal::global(Trigger::default);
-static ACTIVITY: GlobalSignal<Activity> = Signal::global(Activity::default);
+static ACTIVITY: GlobalSignal<EffectActivity> = Signal::global(EffectActivity::default);
 static BUMP: GlobalSignal<u32> = Signal::global(|| 0);
 static MOTION: GlobalSignal<Motion> = Signal::global(|| Motion::Standard);
 
@@ -101,7 +101,7 @@ fn a_once_effect_fires_on_a_new_trigger_and_not_on_a_re_render() {
 #[test]
 fn a_while_effect_runs_while_active_and_stops_asking_for_frames_when_idle() {
     let mut harness = harness();
-    harness.within(|| *ACTIVITY.write() = Activity::Active);
+    harness.within(|| *ACTIVITY.write() = EffectActivity::Active);
     settle_until(&mut harness, |h| pose(h, "#bell").is_some());
     assert_eq!(
         harness.has_class("#spin .ds-symbol", "a-turn"),
@@ -110,7 +110,7 @@ fn a_while_effect_runs_while_active_and_stops_asking_for_frames_when_idle() {
     // Still going well past one cycle: it does not run out.
     harness.advance(Duration::from_secs(5));
     assert!(harness.is_animating(), "the loop keeps asking for frames");
-    harness.within(|| *ACTIVITY.write() = Activity::Idle);
+    harness.within(|| *ACTIVITY.write() = EffectActivity::Idle);
     settle_until(&mut harness, |h| {
         h.has_class("#spin .ds-symbol", "a-hold") == ClassPresence::Present
     });
