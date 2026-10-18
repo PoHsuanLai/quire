@@ -58,11 +58,11 @@ fn row_id(stack: &str, account: Account) -> String {
 }
 
 /// The accounts, each a chevron row that `open`s it.
-fn accounts(stack: String, open: EventHandler<Account>) -> Element {
+fn accounts(stack: &str, open: EventHandler<Account>) -> Element {
     let items = ACCOUNTS
         .into_iter()
         .map(|account| {
-            let id = row_id(&stack, account);
+            let id = row_id(stack, account);
             ListItem::row(
                 account.name,
                 account.name,
@@ -131,7 +131,7 @@ pub fn AccountsStack(id: String, start: Option<Account>) -> Element {
     let stack = id.clone();
     let page = Callback::new(move |page: Page| match page {
         Page::Accounts => accounts(
-            stack.clone(),
+            &stack,
             EventHandler::new(move |account| {
                 let next = path.peek().pushed(Page::Account(account));
                 path.set(next);

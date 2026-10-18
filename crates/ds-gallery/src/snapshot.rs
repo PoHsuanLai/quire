@@ -46,7 +46,7 @@ pub struct Shot {
 impl Shot {
     /// Its file name: `tokens-light-blue.png`, with `-editorial` before the extension under
     /// the Editorial typeface.
-    pub fn file(&self) -> String {
+    pub fn file(self) -> String {
         let typeface = match self.typeface {
             Typeface::System => "",
             Typeface::Editorial => "-editorial",
@@ -60,7 +60,7 @@ impl Shot {
     }
 
     /// The axes it is drawn with: overlays posed, standard motion, the default Space.
-    pub fn axes(&self) -> Axes {
+    pub fn axes(self) -> Axes {
         let theme = match self.scheme {
             Scheme::Light => Theme::Light,
             Scheme::Dark => Theme::Dark,
@@ -77,7 +77,7 @@ impl Shot {
     }
 
     /// The viewport: the gallery's width, the page's own height, at the shot's scale.
-    pub fn viewport(&self) -> Viewport {
+    pub fn viewport(self) -> Viewport {
         Viewport {
             width: WIDTH,
             height: registry::entry(self.page).height,
@@ -111,7 +111,7 @@ pub fn shots_of(pages: &[Page]) -> Vec<Shot> {
 }
 
 /// Render `shot` to pixels.
-pub fn render(shot: &Shot) -> Result<image::RgbaImage, GalleryError> {
+pub fn render(shot: Shot) -> Result<image::RgbaImage, GalleryError> {
     start_with(shot.axes());
     let mut frames =
         snapshot_placed(App, shot.viewport(), &[AT]).map_err(|source| GalleryError::Render {
@@ -159,7 +159,7 @@ pub fn run(
     })
     .collect::<Vec<_>>();
     for (done, shot) in shots.iter().enumerate() {
-        let picture = render(shot)?;
+        let picture = render(*shot)?;
         let path = dir.join(shot.file());
         picture.save(&path).map_err(|source| GalleryError::Encode {
             path: path.clone(),

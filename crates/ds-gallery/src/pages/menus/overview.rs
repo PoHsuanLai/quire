@@ -191,7 +191,7 @@ fn Menus() -> Element {
                 Menu::<u8> {
                     key: "{placement:?}",
                     placement,
-                    anchor: at.clone(),
+                    anchor: at,
                     items: file_menu(),
                     onpick: move |value: u8| picked.set(format!("item {value}")),
                     onclose: close,
@@ -200,7 +200,7 @@ fn Menus() -> Element {
             Some(Opened::Nested) => rsx! {
                 Menu::<u8> {
                     placement: MenuPlacement::Popup,
-                    anchor: at.clone(),
+                    anchor: at,
                     items: nested(),
                     onpick: move |value: u8| picked.set(format!("item {value}")),
                     onclose: close,
@@ -209,7 +209,7 @@ fn Menus() -> Element {
             Some(Opened::Status) => rsx! {
                 Menu::<u8> {
                     placement: MenuPlacement::Bar,
-                    anchor: at.clone(),
+                    anchor: at,
                     items: status(),
                     onpick: move |value: u8| picked.set(format!("item {value}")),
                     onclose: close,

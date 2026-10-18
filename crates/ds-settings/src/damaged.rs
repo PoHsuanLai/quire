@@ -65,13 +65,12 @@ pub(crate) fn keep_damaged(
     cap: ReadCap,
     understood: impl FnOnce(&str) -> Result<(), String>,
 ) -> Result<Saved, SettingsError> {
-    match damage(path, cap, understood) {
-        None => Ok(Saved::default()),
-        Some(_) => {
-            let at = UnixSeconds(u64::try_from(Epoch::now().0).unwrap_or(0));
-            Ok(Saved {
-                kept_at: Some(move_aside(path, at)?),
-            })
-        }
+    if damage(path, cap, understood).is_none() {
+        Ok(Saved::default())
+    } else {
+        let at = UnixSeconds(u64::try_from(Epoch::now().0).unwrap_or(0));
+        Ok(Saved {
+            kept_at: Some(move_aside(path, at)?),
+        })
     }
 }

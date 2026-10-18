@@ -36,9 +36,10 @@ pub(crate) fn expand(input: &syn::DeriveInput) -> syn::Result<TokenStream> {
         let name = ident.to_string();
         let label = &attrs.label;
         let kind = if is_text_type(&field.ty) {
-            let pattern = match &attrs.pattern {
-                Some(pattern) => quote! { ::std::option::Option::Some(#pattern.to_owned()) },
-                None => quote! { ::std::option::Option::None },
+            let pattern = if let Some(pattern) = &attrs.pattern {
+                quote! { ::std::option::Option::Some(#pattern.to_owned()) }
+            } else {
+                quote! { ::std::option::Option::None }
             };
             quote! { ::ds_settings::schema::ColumnKind::Text { pattern: #pattern } }
         } else if attrs.pattern.is_some() {

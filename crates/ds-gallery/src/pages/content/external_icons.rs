@@ -78,7 +78,7 @@ pub fn ExternalIcons() -> Element {
                 Specimen { name: "IconView at Bar: glyph, symbolic, image",
                     div { class: "g-row",
                         IconView { source: Icon::Bell.into(), size: IconSize::Bar }
-                        IconView { source: symbolic(bell.clone(), IconSize::Bar) }
+                        IconView { source: symbolic(bell, IconSize::Bar) }
                         IconView { source: symbolic(keyboard, IconSize::Bar) }
                         IconView { source: image(IconSize::Bar) }
                     }

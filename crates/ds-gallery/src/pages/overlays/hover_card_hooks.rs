@@ -70,7 +70,7 @@ pub fn HookKeyedCards() -> Element {
     let hub = use_hover_intent().hub();
     let open = hub
         .open()
-        .or(hub.leaving())
+        .or_else(|| hub.leaving())
         .filter(|(key, _)| key.0.starts_with(HOOK_KEYED));
     let floating = open
         .as_ref()

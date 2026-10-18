@@ -52,10 +52,7 @@ const POSED_AT: Point = Point {
 #[component]
 pub fn OverlaysPage() -> Element {
     let showcase = use_context::<Signal<Axes>>().peek().showcase;
-    let mut opened = use_signal(|| match showcase {
-        Showcase::Posed => None,
-        Showcase::Live => None,
-    });
+    let mut opened = use_signal(|| None);
     let mut anchor = use_signal(|| None::<MountedRef>);
     let toasts = use_toast_hub();
     use_hook(move || {
@@ -109,7 +106,7 @@ pub fn OverlaysPage() -> Element {
             Some(Opened::Popover(dismiss, arrow)) => rsx! {
                 Popover {
                     key: "{dismiss:?}",
-                    anchor: at.clone(),
+                    anchor: at,
                     placement: Placement::new(Side::Bottom, Align::Start),
                     gap: Px(8.0),
                     arrow,

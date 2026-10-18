@@ -3,7 +3,7 @@
 //!
 //! Config, not data: a cosmetic choice is never a write to the file that holds someone's mail.
 
-use std::ffi::OsString;
+use std::ffi::OsStr;
 use std::path::PathBuf;
 
 use crate::xdg;
@@ -38,8 +38,8 @@ impl ConfigRoot {
         match self {
             ConfigRoot::Xdg => xdg_dir(
                 app,
-                std::env::var_os("XDG_CONFIG_HOME"),
-                std::env::var_os("HOME"),
+                std::env::var_os("XDG_CONFIG_HOME").as_deref(),
+                std::env::var_os("HOME").as_deref(),
             ),
             ConfigRoot::Scratch(base) => Some(base.join(app.0)),
         }
@@ -63,15 +63,14 @@ impl ConfigRoot {
     }
 }
 
-fn xdg_dir(app: AppName, xdg: Option<OsString>, home: Option<OsString>) -> Option<PathBuf> {
-    xdg::base_dir(xdg.as_deref(), home.as_deref(), xdg::CONFIG_HOME_UNDER_HOME)
-        .map(|base| base.join(app.0))
+fn xdg_dir(app: AppName, xdg: Option<&OsStr>, home: Option<&OsStr>) -> Option<PathBuf> {
+    xdg::base_dir(xdg, home, xdg::CONFIG_HOME_UNDER_HOME).map(|base| base.join(app.0))
 }
 
 #[cfg(test)]
 mod tests {
     use super::{AppName, ConfigRoot, xdg_dir};
-    use std::ffi::OsString;
+    use std::ffi::OsStr;
     use std::path::PathBuf;
 
     struct Case {
@@ -132,8 +131,8 @@ mod tests {
             assert_eq!(
                 xdg_dir(
                     AppName::QUIRE,
-                    case.xdg.map(OsString::from),
-                    case.home.map(OsString::from)
+                    case.xdg.map(OsStr::new),
+                    case.home.map(OsStr::new)
                 ),
                 case.expect.map(PathBuf::from),
                 "{}",
@@ -145,7 +144,7 @@ mod tests {
     #[test]
     fn the_app_name_is_the_last_component() {
         assert_eq!(
-            xdg_dir(AppName::MAILO, Some(OsString::from("/xdg")), None),
+            xdg_dir(AppName::MAILO, Some(OsStr::new("/xdg")), None),
             Some(PathBuf::from("/xdg/mailo"))
         );
     }

@@ -77,18 +77,15 @@ impl Subscription {
     pub async fn next(&mut self) -> Availability {
         poll_fn(|cx| {
             let mut state = self.log.state();
-            match state.log.get(self.seen).cloned() {
-                Some(change) => {
-                    self.seen += 1;
-                    Poll::Ready(change)
+            if let Some(change) = state.log.get(self.seen).cloned() {
+                self.seen += 1;
+                Poll::Ready(change)
+            } else {
+                // A select loop polls again and again with the same waker: keep one.
+                if !state.wakers.iter().any(|w| w.will_wake(cx.waker())) {
+                    state.wakers.push(cx.waker().clone());
                 }
-                None => {
-                    // A select loop polls again and again with the same waker: keep one.
-                    if !state.wakers.iter().any(|w| w.will_wake(cx.waker())) {
-                        state.wakers.push(cx.waker().clone());
-                    }
-                    Poll::Pending
-                }
+                Poll::Pending
             }
         })
         .await

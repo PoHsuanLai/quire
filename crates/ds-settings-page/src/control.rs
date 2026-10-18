@@ -19,9 +19,9 @@ pub(crate) enum Control {
 /// What draws `kind`.
 pub(crate) fn control_of(kind: &KeyKind) -> Control {
     match kind {
-        KeyKind::Toggle { variants } => Pair::of(variants)
-            .map(Control::Switch)
-            .unwrap_or_else(|| choice(variants.to_vec())),
+        KeyKind::Toggle { variants } => {
+            Pair::of(variants).map_or_else(|| choice(variants.to_vec()), Control::Switch)
+        }
         KeyKind::Segmented { variants } => choice(variants.clone()),
         KeyKind::Menu { variants } => Control::PopUp(variants.clone()),
         KeyKind::Fixed { .. }

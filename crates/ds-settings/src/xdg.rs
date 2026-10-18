@@ -51,7 +51,7 @@ pub fn base_dir(xdg: Option<&OsStr>, home: Option<&OsStr>, under_home: &str) -> 
 pub(crate) fn search_dirs(value: Option<&OsStr>) -> Vec<PathBuf> {
     let list = value
         .filter(|value| !value.is_empty())
-        .unwrap_or(OsStr::new(DEFAULT_DATA_DIRS));
+        .unwrap_or_else(|| OsStr::new(DEFAULT_DATA_DIRS));
     std::env::split_paths(list)
         .filter(|dir| dir.is_absolute())
         .collect()

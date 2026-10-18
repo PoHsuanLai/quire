@@ -67,30 +67,36 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                 let word = value("a page")?;
                 let page = page_named(&word)
                     .ok_or_else(|| ArgsError(format!("no page is called {word:?}")))?;
-                parsed.page = once(parsed.page, page, "--page")?;
+                parsed.page = once(parsed.page.as_ref(), page, "--page")?;
             }
             "--snapshot" => {
                 let dir = value("a directory")?;
                 if dir.is_empty() {
                     return Err(ArgsError("--snapshot needs a directory".into()));
                 }
-                parsed.snapshot = once(parsed.snapshot, PathBuf::from(dir), "--snapshot")?;
+                parsed.snapshot = once(parsed.snapshot.as_ref(), PathBuf::from(dir), "--snapshot")?;
             }
             "--accent-sheet" => {
                 let dir = value("a directory")?;
                 if dir.is_empty() {
                     return Err(ArgsError("--accent-sheet needs a directory".into()));
                 }
-                parsed.accent_sheet =
-                    once(parsed.accent_sheet, PathBuf::from(dir), "--accent-sheet")?;
+                parsed.accent_sheet = once(
+                    parsed.accent_sheet.as_ref(),
+                    PathBuf::from(dir),
+                    "--accent-sheet",
+                )?;
             }
             "--detail-frames" => {
                 let dir = value("a directory")?;
                 if dir.is_empty() {
                     return Err(ArgsError("--detail-frames needs a directory".into()));
                 }
-                parsed.detail_frames =
-                    once(parsed.detail_frames, PathBuf::from(dir), "--detail-frames")?;
+                parsed.detail_frames = once(
+                    parsed.detail_frames.as_ref(),
+                    PathBuf::from(dir),
+                    "--detail-frames",
+                )?;
             }
             "--scale" => {
                 let word = value("a percentage")?;
@@ -99,7 +105,7 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                     .ok()
                     .filter(|scale| (100..=300).contains(scale))
                     .ok_or_else(|| ArgsError(format!("--scale takes 100 to 300, not {word:?}")))?;
-                parsed.scale = once(parsed.scale, scale, "--scale")?;
+                parsed.scale = once(parsed.scale.as_ref(), scale, "--scale")?;
             }
             "--typeface" => {
                 let word = value("a typeface")?;
@@ -108,7 +114,7 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
                         "--typeface takes system or editorial, not {word:?}"
                     ))
                 })?;
-                parsed.typeface = once(parsed.typeface, typeface, "--typeface")?;
+                parsed.typeface = once(parsed.typeface.as_ref(), typeface, "--typeface")?;
             }
             "--progress" => {
                 if inline.is_some() {
@@ -126,7 +132,7 @@ pub fn parse(args: impl Iterator<Item = String>) -> Result<Args, ArgsError> {
 }
 
 /// `Some(value)` the first time a flag is given; an error the second.
-fn once<T>(seen: Option<T>, value: T, flag: &str) -> Result<Option<T>, ArgsError> {
+fn once<T>(seen: Option<&T>, value: T, flag: &str) -> Result<Option<T>, ArgsError> {
     match seen {
         Some(_) => Err(ArgsError(format!("{flag} given twice"))),
         None => Ok(Some(value)),

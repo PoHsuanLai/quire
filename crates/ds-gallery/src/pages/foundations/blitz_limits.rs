@@ -249,12 +249,15 @@ fn Live() -> Element {
         InputModality::Pointer => "pointer: no focus rings",
         InputModality::Keyboard => "keyboard: focus rings show",
     };
-    let rect = probe.rect().map_or("not measured yet".to_string(), |rect| {
-        format!(
-            "{} x {} at ({}, {})",
-            rect.size.width.0, rect.size.height.0, rect.origin.x.0, rect.origin.y.0
-        )
-    });
+    let rect = probe.rect().map_or_else(
+        || "not measured yet".to_string(),
+        |rect| {
+            format!(
+                "{} x {} at ({}, {})",
+                rect.size.width.0, rect.size.height.0, rect.origin.x.0, rect.origin.y.0
+            )
+        },
+    );
     rsx! {
         Section { title: "S9, S10, S12: measured, timed, driven",
             div { class: "g-grid3",

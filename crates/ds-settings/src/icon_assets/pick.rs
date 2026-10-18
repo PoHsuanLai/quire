@@ -57,7 +57,7 @@ pub fn find_app_icon(
     probe: impl Fn(&Path) -> Presence,
 ) -> Option<PathBuf> {
     let base = dir.join(app.as_str());
-    let base = style_dir(style).map_or(base.clone(), |sub| base.join(sub));
+    let base = style_dir(style).map_or_else(|| base.clone(), |sub| base.join(sub));
     sizes_to_try(size)
         .into_iter()
         .map(|px| base.join(format!("{px}.png")))

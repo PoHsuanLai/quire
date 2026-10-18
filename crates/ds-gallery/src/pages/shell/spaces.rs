@@ -54,7 +54,9 @@ pub fn SpacesPage() -> Element {
         use_today(Default::default, |_| {});
     let new_payload = use_callback(|()| Folder::default());
     let scheme = use_scope().scheme;
-    let slide = spaces.slide().map(|slide| slide.attribute());
+    let slide = spaces
+        .slide()
+        .map(ds::components::app::spaces::SlideIn::attribute);
     rsx! {
         Section { title: "Notes", note: "A toy notes app. The sidebar head names the Space (right-click for its menu); the foot has a dot per Space (right-click one for its menu), + makes a Space and opens its name, and Command and 1 to 9 switch. A note you open lands in Today for 12 hours, per Space; each Space reopens the note it was left on, and the page slides in from the side the Space is on.",
             Ds {

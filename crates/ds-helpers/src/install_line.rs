@@ -32,7 +32,7 @@ impl fmt::Display for InstallLine {
 /// family is not known, the first candidate of every family the file names one for. The first
 /// candidate only, since the alternatives are exclusive: the first that exists wins.
 pub(crate) fn install_lines(entry: &Entry, family: Option<Family>) -> Vec<InstallLine> {
-    let families = family.map_or(Family::ALL.to_vec(), |family| vec![family]);
+    let families = family.map_or_else(|| Family::ALL.to_vec(), |family| vec![family]);
     families
         .into_iter()
         .filter_map(|family| {

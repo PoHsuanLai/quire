@@ -71,8 +71,8 @@ impl AssetsEnv {
 }
 
 /// A variable's value, with an empty one read as unset (the XDG specification's rule).
-fn set(value: &Option<OsString>) -> Option<&OsString> {
-    value.as_ref().filter(|value| !value.is_empty())
+fn set(value: Option<&OsString>) -> Option<&OsString> {
+    value.filter(|value| !value.is_empty())
 }
 
 /// `$XDG_DATA_HOME`, else `$HOME/.local/share` (the rules in `crate::xdg`).
@@ -90,7 +90,7 @@ pub fn candidates(env: &AssetsEnv) -> Vec<AssetsDir> {
     let shared = xdg::search_dirs(env.xdg_data_dirs.as_deref())
         .into_iter()
         .map(|dir| dir.join(SUBDIR));
-    set(&env.quire_icon_assets)
+    set(env.quire_icon_assets.as_ref())
         .map(PathBuf::from)
         .map(at(AssetsOrigin::Override))
         .into_iter()

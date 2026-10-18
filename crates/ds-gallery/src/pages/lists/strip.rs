@@ -36,7 +36,7 @@ fn actions() -> Vec<StripAction> {
 #[component]
 pub fn StripPress() -> Element {
     let mut pressed = use_signal(|| None::<ActionId>);
-    let said = pressed().map_or("nothing yet".to_string(), |id| id.0);
+    let said = pressed().map_or_else(|| "nothing yet".to_string(), |id| id.0);
     rsx! {
         Section {
             title: "A strip that acts before it measures",

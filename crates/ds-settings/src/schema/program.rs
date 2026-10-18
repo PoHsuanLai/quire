@@ -122,7 +122,7 @@ pub fn discover(dirs: &[PathBuf]) -> Vec<Schema> {
     for dir in dirs {
         let Ok(mut entries) = std::fs::read_dir(dir).map(|entries| {
             entries
-                .filter_map(|entry| entry.ok())
+                .filter_map(Result::ok)
                 .map(|entry| entry.path())
                 .filter(|path| {
                     path.is_file()

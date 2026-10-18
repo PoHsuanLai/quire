@@ -34,9 +34,7 @@ impl Environment {
 }
 
 fn is_executable(path: &Path) -> bool {
-    std::fs::metadata(path)
-        .map(|meta| meta.is_file() && can_execute(&meta))
-        .unwrap_or(false)
+    std::fs::metadata(path).is_ok_and(|meta| meta.is_file() && can_execute(&meta))
 }
 
 #[cfg(unix)]

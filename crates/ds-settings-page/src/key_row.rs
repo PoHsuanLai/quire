@@ -56,7 +56,7 @@ pub(crate) fn KeyRow(
                 SegmentedControl::<String> {
                     label: label.clone(),
                     choices,
-                    tracking: Tracking::SelectOne(current.clone()),
+                    tracking: Tracking::SelectOne(current),
                     onchange: move |word: String| say(word),
                 }
             }
@@ -69,7 +69,7 @@ pub(crate) fn KeyRow(
             rsx! {
                 PopUpButton::<String> {
                     items,
-                    value: Some(current.clone()),
+                    value: Some(current),
                     common: Common { aria_label: Some(label.clone()), ..Common::default() },
                     onpick: move |word: String| say(word),
                 }
@@ -78,7 +78,7 @@ pub(crate) fn KeyRow(
         Control::Shown => rsx! { Label { text: shown(&value) } },
     };
     rsx! {
-        FieldRow { label: TextLine::from(label.clone()), help, {control} }
+        FieldRow { label: TextLine::from(label), help, {control} }
     }
 }
 

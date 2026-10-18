@@ -85,7 +85,7 @@ pub fn CapsuleSection() -> Element {
                     div { style: "position:relative; width:300px; height:140px",
                         Capsule::<u8> {
                             label: "Playback",
-                            slots: slots.clone(),
+                            slots,
                             shown: Shown::Visible,
                             onpick: move |_| playing.set(if playing() == Check::On { Check::Off } else { Check::On }),
                             onscrub: move |event| match event {

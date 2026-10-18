@@ -198,7 +198,7 @@ impl Catalog {
 pub fn data_dirs(value: Option<&std::ffi::OsStr>) -> Vec<PathBuf> {
     let list = value
         .filter(|value| !value.is_empty())
-        .unwrap_or(std::ffi::OsStr::new("/usr/local/share:/usr/share"));
+        .unwrap_or_else(|| std::ffi::OsStr::new("/usr/local/share:/usr/share"));
     std::env::split_paths(list)
         .filter(|dir| dir.is_absolute())
         .collect()

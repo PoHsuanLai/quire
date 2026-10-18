@@ -13,7 +13,7 @@ pub fn html(dir: &Path, shots: &[Shot]) -> std::io::Result<String> {
         let figures = shots
             .iter()
             .filter(|shot| shot.page == entry.page)
-            .map(|shot| figure(dir, shot))
+            .map(|shot| figure(dir, *shot))
             .collect::<std::io::Result<String>>()?;
         body.push_str(&format!(
             "<section id=\"{slug}\"><h2>{title}</h2><p>{lede}</p><div class=\"row\">{figures}</div></section>\n",
@@ -42,7 +42,7 @@ pub fn html(dir: &Path, shots: &[Shot]) -> std::io::Result<String> {
 const STYLE: &str = "body{margin:24px;font:14px system-ui,sans-serif;background:#f4f4f1;color:#1b1d1a}h2{margin:28px 0 4px}p{margin:0 0 10px;max-width:900px}.row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}figure{margin:0}img{width:100%;height:auto;border:1px solid #ccc;display:block}figcaption{font:12px ui-monospace,monospace;margin-top:4px}nav a{color:inherit}";
 
 /// One picture with its caption.
-fn figure(dir: &Path, shot: &Shot) -> std::io::Result<String> {
+fn figure(dir: &Path, shot: Shot) -> std::io::Result<String> {
     let bytes = std::fs::read(dir.join(shot.file()))?;
     Ok(format!(
         "<figure><a href=\"{file}\"><img alt=\"{file}\" src=\"{uri}\"></a><figcaption>{file}</figcaption></figure>",

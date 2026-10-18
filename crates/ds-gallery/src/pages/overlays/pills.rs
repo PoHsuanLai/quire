@@ -62,7 +62,7 @@ const PINNED: [(&str, &str); 2] = [("side:4", "Sam Lindqvist"), ("side:5", "Priy
 pub fn Cards() -> Element {
     let hub = use_hover_hub();
     // A hook-keyed card is drawn by its own section (`overlays::hover_card_hooks`).
-    let open = hub.open().or(hub.leaving()).filter(|(key, _)| {
+    let open = hub.open().or_else(|| hub.leaving()).filter(|(key, _)| {
         !key.0
             .starts_with(crate::pages::overlays::hover_card_hooks::HOOK_KEYED)
     });

@@ -125,9 +125,10 @@ fn never_settable_guard(path: &str) -> TokenStream {
 fn kind_expr(shape: Shape, ty: &syn::Type, unit: Option<&str>) -> TokenStream {
     match shape {
         Shape::Bounded { min, max } => {
-            let unit = match unit {
-                Some(unit) => quote! { ::std::option::Option::Some(#unit.to_owned()) },
-                None => quote! { ::std::option::Option::None },
+            let unit = if let Some(unit) = unit {
+                quote! { ::std::option::Option::Some(#unit.to_owned()) }
+            } else {
+                quote! { ::std::option::Option::None }
             };
             quote! { ::ds_settings::schema::KeyKind::Bounded { min: #min, max: #max, unit: #unit } }
         }

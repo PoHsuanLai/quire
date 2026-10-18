@@ -20,7 +20,7 @@ fn row(
     accessory: Accessory,
 ) -> PaletteRow<u8> {
     PaletteRow {
-        detail: detail.map(|detail| detail.into()),
+        detail: detail.map(Into::into),
         leading,
         accessory,
         ..PaletteRow::new(value, title)

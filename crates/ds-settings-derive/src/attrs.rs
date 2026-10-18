@@ -94,7 +94,7 @@ pub(crate) fn container_attrs(
             Ok(())
         })?;
     }
-    let span = attrs.first().map(|attr| attr.span()).unwrap_or(fallback);
+    let span = attrs.first().map_or(fallback, Spanned::span);
     if !found {
         return Err(syn::Error::new(
             span,
@@ -152,7 +152,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
             Ok(())
         })?;
     }
-    let span = attrs.first().map(|attr| attr.span()).unwrap_or(fallback);
+    let span = attrs.first().map_or(fallback, Spanned::span);
     if skip {
         return Ok(FieldAttrs::Skip);
     }

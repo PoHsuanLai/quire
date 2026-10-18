@@ -68,7 +68,7 @@ pub fn SpacePage() -> Element {
         Section { title: "SpaceEditor, frameless", note: "frame: EditorFrame::Frameless draws no card of its own, for a host that is a surface already (a Sheet): the host here is a plain panel that sets the padding.",
             div { style: "width:320px; padding:var(--s-16); background:var(--raise); border-radius:var(--r-menu); box-shadow:var(--shadow-sheet)",
                 SpaceEditor {
-                    look: look.clone(),
+                    look,
                     scheme,
                     active_dot: DotIndex(0),
                     onchange: move |next| axes.with_mut(|axes| axes.look = next),
@@ -97,7 +97,7 @@ pub fn SpacePage() -> Element {
                 Caption { name: "--f-solid", code: frame.solid.clone() }
                 Caption { name: "--f-grain", code: frame.grain_opacity.clone() }
             }
-            Caption { name: "--f-grad", code: frame.gradient.clone() }
+            Caption { name: "--f-grad", code: frame.gradient }
             div { class: "g-row",
                 for (name , var) in [("ink", "--f-ink"), ("soft", "--f-ink-soft"), ("faint", "--f-ink-faint"), ("pill", "--f-pill"), ("hover", "--f-pill-hover"), ("solid", "--f-solid")] {
                     div { class: "g-col",

@@ -316,15 +316,14 @@ impl KeySpec {
         }];
         for word in words {
             let group = group_of(word);
-            let at = match sections.iter().position(|section| section.group == group) {
-                Some(at) => at,
-                None => {
-                    sections.push(GroupedChoices {
-                        group,
-                        choices: Vec::new(),
-                    });
-                    sections.len() - 1
-                }
+            let at = if let Some(at) = sections.iter().position(|section| section.group == group) {
+                at
+            } else {
+                sections.push(GroupedChoices {
+                    group,
+                    choices: Vec::new(),
+                });
+                sections.len() - 1
             };
             sections[at].choices.push(word);
         }

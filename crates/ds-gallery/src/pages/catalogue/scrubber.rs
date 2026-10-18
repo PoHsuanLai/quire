@@ -34,7 +34,7 @@ pub fn ScrubberSection() -> Element {
                             label: "Position",
                             position: position(),
                             length: LENGTH,
-                            buffered: loaded.clone(),
+                            buffered: loaded,
                             onscrubstart: move |at| position.set(at),
                             onscrub: move |at| position.set(at),
                             onseek: move |at| position.set(at),

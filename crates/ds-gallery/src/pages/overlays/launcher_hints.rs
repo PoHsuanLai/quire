@@ -90,7 +90,7 @@ pub fn SpotlightHints() -> Element {
                             CommandPalette::<u8> {
                                 label: "Launch",
                                 placeholder: "Search",
-                                query: "".to_string(),
+                                query: String::new(),
                                 tokens: Vec::new(),
                                 groups: groups(),
                                 empty: "Nothing matches.",
