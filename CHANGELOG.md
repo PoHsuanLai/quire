@@ -3,6 +3,19 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.33
+
+Two menu fixes; no public API change and no pin moves (blitz stays at 4b236792). Consumers move their
+quire tag and relock.
+
+**ds**
+- A context menu draws its items' key equivalents, as every menu does (the owner's override of the
+  HIG row in design/27, 2026-10-17; golden menu/context-keys).
+- A row in the command palette or a pick list follows the pointer only when the pointer moves: a menu
+  closing over the rows no longer selects the row under a still pointer (blitz-kit's hover repair
+  replays the last move after a layout change). The `Ds` root keeps where the last move reached; new
+  conformance test palette_actions_click.
+
 ## v0.3.32
 
 The blitz fork at 4b236792: an input method can delete the text around the caret and read it. A
