@@ -95,7 +95,7 @@ fn width(harness: &Harness, selector: &str) -> f32 {
 /// The fill's width `share` thousandths into `--t-quick` on the `--e-out` curve, from 20 % to
 /// 80 % of 200 px.
 fn on_the_curve(share: u16) -> f32 {
-    let curve = EasingToken::Out.easing(MotionLevel::Standard);
+    let curve = EasingToken::Out.easing();
     let done = f32::from(curve.at(Fraction(share)).0) / 1000.0;
     200.0 * (0.2 + 0.6 * done)
 }

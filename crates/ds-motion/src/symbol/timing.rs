@@ -37,7 +37,7 @@ pub fn cycle(gesture: PartGesture, run: PartRun, level: MotionLevel) -> Cycle {
     };
     Cycle {
         period: token.duration(level),
-        easing: easing(gesture, run).easing(level),
+        easing: easing(gesture, run).easing(),
         repeat,
     }
 }

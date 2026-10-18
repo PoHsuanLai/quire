@@ -201,7 +201,7 @@ fn every_level_resolves_to_the_rust_table() {
             expect(token.var().as_str(), format!("{ms}ms"));
         }
         for token in EasingToken::ALL {
-            expect(token.var().as_str(), token.easing(level).css());
+            expect(token.var().as_str(), token.easing().css());
         }
     }
     assert!(failures.is_empty(), "{failures:#?}");

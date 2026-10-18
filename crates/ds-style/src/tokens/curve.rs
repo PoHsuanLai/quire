@@ -74,7 +74,6 @@ fn solve_x(x1: i128, x2: i128, t: i128) -> i128 {
 
 #[cfg(test)]
 mod tests {
-    use crate::appearance::motion::MotionLevel;
     use crate::tokens::easing::{CubicBezier, Easing, EasingToken};
     use ds_core::vocab::Fraction;
     use ds_core::word::Word;
@@ -83,43 +82,38 @@ mod tests {
 
     /// Each token's value at 0, .25, .5, .75 and 1, computed by exact rational bisection
     /// (Python `fractions`, 80 steps) and rounded to the thousandth.
-    const CASES: &[(&str, EasingToken, MotionLevel, [u16; 5])] = &[
+    const CASES: &[(&str, EasingToken, [u16; 5])] = &[
         (
             "out",
             EasingToken::Out,
-            MotionLevel::Standard,
             [0, 748, 949, 993, 1000],
         ),
         (
             "exit",
             EasingToken::Exit,
-            MotionLevel::Standard,
             [0, 99, 325, 630, 1000],
         ),
         (
             "shake",
             EasingToken::Shake,
-            MotionLevel::Standard,
             [0, 311, 790, 955, 1000],
         ),
         (
             "linear",
             EasingToken::Linear,
-            MotionLevel::Standard,
             [0, 250, 500, 750, 1000],
         ),
         (
             "in-out",
             EasingToken::InOut,
-            MotionLevel::Standard,
             [0, 129, 500, 871, 1000],
         ),
     ];
 
     #[test]
     fn every_token_reads_its_known_values_at_the_quarters() {
-        for &(name, token, level, want) in CASES {
-            let easing = token.easing(level);
+        for &(name, token, want) in CASES {
+            let easing = token.easing();
             let got = QUARTERS.map(|t| easing.at(Fraction(t)).0);
             assert_eq!(got, want, "{name}");
         }
@@ -128,18 +122,16 @@ mod tests {
     #[test]
     fn a_curve_whose_y_stays_in_range_never_goes_back() {
         for token in EasingToken::ALL.iter().copied() {
-            for level in [MotionLevel::Standard, MotionLevel::Reduced] {
-                let curve = token.easing(level).curve();
-                let [_, y1, _, y2] = curve.0;
-                if !(0..=1000).contains(&y1) || !(0..=1000).contains(&y2) {
-                    continue;
-                }
-                let mut last = 0;
-                for t in 0..=1000 {
-                    let now = curve.at(Fraction(t)).0;
-                    assert!(now >= last, "{token:?} {level:?} at {t}: {now} < {last}");
-                    last = now;
-                }
+            let curve = token.easing().curve();
+            let [_, y1, _, y2] = curve.0;
+            if !(0..=1000).contains(&y1) || !(0..=1000).contains(&y2) {
+                continue;
+            }
+            let mut last = 0;
+            for t in 0..=1000 {
+                let now = curve.at(Fraction(t)).0;
+                assert!(now >= last, "{token:?} at {t}: {now} < {last}");
+                last = now;
             }
         }
     }
@@ -147,9 +139,7 @@ mod tests {
     #[test]
     fn time_past_the_end_clamps_and_linear_is_the_identity() {
         assert_eq!(
-            EasingToken::Out
-                .easing(MotionLevel::Standard)
-                .at(Fraction(4000)),
+            EasingToken::Out.easing().at(Fraction(4000)),
             Fraction(1000)
         );
         for t in 0..=1000 {

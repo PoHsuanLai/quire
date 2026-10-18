@@ -40,7 +40,7 @@ pub fn MotionPage() -> Element {
         Section { title: "Easings", note: "No easing follows the level.",
             LevelTable {
                 rows: EasingToken::ALL.iter().map(|token| {
-                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().copied().map(|level| token.easing(level).css()).collect::<Vec<_>>())
+                    (token.var().as_str().to_string(), MotionLevel::ALL.iter().map(|_| token.easing().css()).collect::<Vec<_>>())
                 }).collect::<Vec<_>>(),
             }
         }

@@ -348,8 +348,7 @@ fn menu_track_steps() {
 fn easing_at() {
     use ds::style::tokens::easing::EasingToken;
 
-    let level = MotionLevel::Standard;
-    let progress = EasingToken::Out.easing(level).at(Fraction(500));
+    let progress = EasingToken::Out.easing().at(Fraction(500));
     assert!(progress.0 > 500);
 }
 

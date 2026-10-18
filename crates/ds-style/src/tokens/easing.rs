@@ -1,7 +1,6 @@
 //! Easing curves per motion level (design/05-MOTION.md sections 3.1-3.4).
 
 use super::hex::thousandths;
-use crate::appearance::motion::MotionLevel;
 use crate::tokens::token::{CssValue, Token, TokenScope};
 use ds_core::word::Word;
 
@@ -37,11 +36,11 @@ pub enum EasingToken {
 }
 
 impl EasingToken {
-    /// The curve at `level`.
+    /// The curve.
     ///
-    /// No easing follows the level: Reduced changes durations, never curves. A spring is a
+    /// No easing follows the motion level: Reduced changes durations, never curves. A spring is a
     /// Rust `Spring`, not an easing.
-    pub fn easing(self, _level: MotionLevel) -> Easing {
+    pub fn easing(self) -> Easing {
         const OUT: CubicBezier = CubicBezier([220, 900, 300, 1000]);
         Easing::Cubic(match self {
             EasingToken::Out => OUT,
@@ -53,9 +52,9 @@ impl EasingToken {
     }
 }
 
-/// An easing as the stylesheet writes it, at the scope's motion level.
-fn easing_css(token: EasingToken, scope: TokenScope) -> CssValue {
-    CssValue::computed(token.easing(scope.motion).css())
+/// An easing as the stylesheet writes it; the same at every motion level.
+fn easing_css(token: EasingToken, _scope: TokenScope) -> CssValue {
+    CssValue::computed(token.easing().css())
 }
 
 impl Easing {

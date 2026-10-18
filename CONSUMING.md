@@ -1825,7 +1825,7 @@ keys inside a menu, wrap, disabled skipping and filtering stay with the `Menu` c
 machine takes `MenuKey::{Escape, Left, Right, Enter}` (map Space and Tab to `Enter`).
 
 **Curves** (`crates/ds-style/src/tokens/curve.rs`). For motion you drive from a frame clock rather
-than CSS: `EasingToken::Out.easing(level).at(Fraction(t))` gives progress in thousandths at time
+than CSS: `EasingToken::Out.easing().at(Fraction(t))` gives progress in thousandths at time
 `t` (thousandths). `Easing::curve()` gives the `CubicBezier` (`linear` is `(0,0,1,1)`), and
 `CubicBezier::at` evaluates it. Integer arithmetic throughout; a spring's overshoot reads above
 1000.

@@ -73,7 +73,6 @@ impl Timeline for Glide {
 #[cfg(test)]
 mod tests {
     use super::{Glide, Timeline};
-    use ds_style::appearance::motion::MotionLevel;
     use ds_style::tokens::easing::{Easing, EasingToken};
     use std::time::Duration;
 
@@ -97,7 +96,7 @@ mod tests {
             800,
             200,
             MS(100),
-            EasingToken::Out.easing(MotionLevel::Standard),
+            EasingToken::Out.easing(),
         );
         let mid = down.at(MS(50)).value;
         assert!((200..800).contains(&mid), "{mid}");

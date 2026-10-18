@@ -147,6 +147,6 @@ fn slide_slash(slash: Playback<Glide>, slashed: Slashed, reduced: bool) {
         slash.peek().map_or(to, |pose| pose.value),
         to,
         DurationToken::Quick.duration(MotionLevel::Standard),
-        EasingToken::Out.easing(MotionLevel::Standard),
+        EasingToken::Out.easing(),
     ));
 }

@@ -38,7 +38,7 @@ pub fn use_tween(target: ds_core::vocab::Fraction, spec: TweenSpec) -> ds_core::
                 *drawn.peek(),
                 to,
                 spec.duration.duration(level),
-                spec.easing.easing(level),
+                spec.easing.easing(),
             ),
         };
         plan.set((target, glide));
