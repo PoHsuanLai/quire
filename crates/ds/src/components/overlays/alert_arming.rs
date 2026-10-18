@@ -91,29 +91,16 @@ pub fn route(arming: Arming, input: AlertInput, roles: &[AlertRole], hearing: He
     }
 }
 
-/// What moves an alert's arming: only the clock.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum ArmingIn {
-    /// The wait's end came.
-    Elapsed,
-}
-
-impl From<Elapsed> for ArmingIn {
-    fn from(_: Elapsed) -> Self {
-        ArmingIn::Elapsed
-    }
-}
-
 impl Machine for Arming {
-    type In = ArmingIn;
+    type In = Elapsed;
     type Out = ();
     type Params = ();
     type Ctx = ();
 
-    fn step(self, input: ArmingIn, at: Stamp, _: &(), _: &()) -> (Arming, Vec<()>) {
+    fn step(self, input: Elapsed, at: Stamp, _: &(), _: &()) -> (Arming, Vec<()>) {
         let next = match (self, input) {
-            (Arming::Waiting { until }, ArmingIn::Elapsed) if at >= until => Arming::Armed,
-            (state, ArmingIn::Elapsed) => state,
+            (Arming::Waiting { until }, Elapsed) if at >= until => Arming::Armed,
+            (state, Elapsed) => state,
         };
         (next, Vec::new())
     }
@@ -128,9 +115,9 @@ impl Machine for Arming {
 
 #[cfg(test)]
 mod tests {
-    use super::{AlertInput, Arming, ArmingIn, Hearing, Route, route};
+    use super::{AlertInput, Arming, Hearing, Route, route};
     use crate::components::overlays::alert_model::AlertRole::{Cancel, Normal};
-    use ds_core::machine::Machine;
+    use ds_core::machine::{Elapsed, Machine};
     use ds_core::time::stamp::Stamp;
     use ds_core::vocab::Availability;
     use std::time::Duration;
@@ -182,7 +169,7 @@ mod tests {
             ),
         ];
         for (name, state, at, next, wake, buttons) in cases {
-            let (after, outs) = state.step(ArmingIn::Elapsed, Stamp(at), &(), &());
+            let (after, outs) = state.step(Elapsed, Stamp(at), &(), &());
             assert_eq!(
                 (after, after.wake(), after.availability()),
                 (next, wake, buttons),
