@@ -23,7 +23,7 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
         handlers,
         told,
     } = field;
-    let shown = placeholder_shown(&value, &placeholder);
+    let shown = placeholder_shown(value, &placeholder);
     rsx! {
         span {
             class: "ds-input-wrap",
