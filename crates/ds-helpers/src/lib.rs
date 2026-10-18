@@ -77,7 +77,7 @@ mod outcome;
 mod probe;
 mod watch;
 
-pub use capability::{Capability, Executable, NameError, PackageName};
+pub use capability::{CapabilityName, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
 pub use desktop_file::{
     DESKTOP_ENTRY_CAP, DesktopFile, DesktopFileError, DesktopGroup, EntryLocale,
@@ -93,5 +93,5 @@ pub use install_line::InstallLine;
 pub use installer::{FakeInstaller, Installer, PackageKit, Request, StandIn, Timeouts};
 pub use os_release::OsRelease;
 pub use outcome::{Missing, Outcome};
-pub use probe::{Environment, Presence};
+pub use probe::{Environment, ToolPresence};
 pub use watch::{Availability, Subscription};

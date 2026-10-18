@@ -1478,7 +1478,7 @@ which carry none); `Family::detect` is built on it.
 | --- | --- |
 | Load the file | `Catalog::load("anyview", &data_dirs(std::env::var_os("XDG_DATA_DIRS").as_deref()))` (or `Catalog::parse(text)`) |
 | The handle | `Helpers::new(catalog, Environment::system(), Installer::PackageKit(PackageKit::system()))`; cheap to clone |
-| Is it there? | `helpers.available(&Capability::new("heic-decode")?) -> Presence::{Present, Missing}` |
+| Is it there? | `helpers.available(&CapabilityName::new("heic-decode")?) -> ToolPresence::{Present, Missing}` |
 | Words for the sheet | `helpers.entry(&capability) -> Option<&Entry>` (`tool`, `purpose`, `probe`) |
 | Install it | `helpers.provide(&capability).await -> Outcome::{Installed, Declined, NotFound(Missing), Unsupported(Missing), Failed(reason)}`; call it after the person pressed Install... `Missing { capability, package: Option<PackageName>, program: Option<Executable>, install_lines: Vec<InstallLine> }` is the first candidate package for this distro and the first probe program; `install_lines` is the same package as a command to copy (`sudo pacman -S mpv`, `.text()`), for the `Unsupported` answer where no PackageKit runs (stock Arch): one line for this distro's family, or one per family the file names when the distro is unknown |
 | Hear of changes | `let mut feed = helpers.subscribe(); feed.next().await -> Availability { capability, presence }`; `helpers.refresh(&capability)` probes again (a tool installed in a terminal) |

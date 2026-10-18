@@ -1,12 +1,12 @@
 //! The app-facing handle: probe, ask, and hear about changes.
 
-use crate::capability::Capability;
+use crate::capability::CapabilityName;
 use crate::catalog::{Catalog, Entry};
 use crate::family::Family;
 use crate::install_line::install_lines;
 use crate::installer::{Installer, Request};
 use crate::outcome::{Missing, Outcome};
-use crate::probe::{Environment, Presence, presence};
+use crate::probe::{Environment, ToolPresence, presence};
 use crate::watch::{Log, Subscription};
 use std::sync::Arc;
 
@@ -40,7 +40,7 @@ impl Helpers {
     }
 
     /// What the file says about `capability`: the tool's name and purpose, for the sheet.
-    pub fn entry(&self, capability: &Capability) -> Option<&Entry> {
+    pub fn entry(&self, capability: &CapabilityName) -> Option<&Entry> {
         self.0.catalog.get(capability)
     }
 
@@ -49,16 +49,17 @@ impl Helpers {
         self.0.family
     }
 
-    /// Is the tool there now? An undeclared capability is [`Presence::Missing`].
-    pub fn available(&self, capability: &Capability) -> Presence {
-        self.entry(capability).map_or(Presence::Missing, |entry| {
-            presence(&self.0.environment.path, entry)
-        })
+    /// Is the tool there now? An undeclared capability is [`ToolPresence::Missing`].
+    pub fn available(&self, capability: &CapabilityName) -> ToolPresence {
+        self.entry(capability)
+            .map_or(ToolPresence::Missing, |entry| {
+                presence(&self.0.environment.path, entry)
+            })
     }
 
     /// Probe again and announce the result to subscribers if it changed (a tool the person
     /// installed some other way, or removed).
-    pub fn refresh(&self, capability: &Capability) -> Presence {
+    pub fn refresh(&self, capability: &CapabilityName) -> ToolPresence {
         let now = self.available(capability);
         self.0.log.record(capability, now);
         now
@@ -73,7 +74,7 @@ impl Helpers {
     /// is asked for the first candidate package that exists. After an install the tool is
     /// probed again, and subscribers hear of it. Call it when the person tries to use the
     /// feature, after they have said yes to the sheet, never at launch.
-    pub async fn provide(&self, capability: &Capability) -> Outcome {
+    pub async fn provide(&self, capability: &CapabilityName) -> Outcome {
         let Some(entry) = self.entry(capability) else {
             return Outcome::Unsupported(Missing {
                 capability: capability.clone(),
@@ -82,7 +83,7 @@ impl Helpers {
                 install_lines: Vec::new(),
             });
         };
-        if self.refresh(capability) == Presence::Present {
+        if self.refresh(capability) == ToolPresence::Present {
             return Outcome::Installed;
         }
         let candidates = self.0.family.map(|f| (f, entry.candidates(f)));
@@ -102,8 +103,8 @@ impl Helpers {
         };
         match self.0.installer.install(&request).await {
             Outcome::Installed => match self.refresh(capability) {
-                Presence::Present => Outcome::Installed,
-                Presence::Missing => Outcome::Failed(format!(
+                ToolPresence::Present => Outcome::Installed,
+                ToolPresence::Missing => Outcome::Failed(format!(
                     "{} was installed, but it is still not on your PATH.",
                     entry.tool
                 )),

@@ -1,6 +1,6 @@
 //! What asking for a helper came to.
 
-use crate::capability::{Capability, Executable, PackageName};
+use crate::capability::{CapabilityName, Executable, PackageName};
 use crate::install_line::InstallLine;
 
 /// What a request that found nothing was about, for the sheet's words: the capability asked for,
@@ -10,7 +10,7 @@ use crate::install_line::InstallLine;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Missing {
     /// The capability that was asked for.
-    pub capability: Capability,
+    pub capability: CapabilityName,
     /// The first candidate package for this distro.
     pub package: Option<PackageName>,
     /// The first program that proves the tool is there.

@@ -45,7 +45,7 @@ pub(crate) fn install_lines(entry: &Entry, family: Option<Family>) -> Vec<Instal
 #[cfg(test)]
 mod tests {
     use super::install_lines;
-    use crate::capability::Capability;
+    use crate::capability::CapabilityName;
     use crate::catalog::Catalog;
     use crate::family::Family;
 
@@ -72,7 +72,7 @@ pacman = ["libheif"]
     fn texts(capability: &str, family: Option<Family>) -> Vec<String> {
         let catalog = Catalog::parse(FILE).expect("parses");
         let entry = catalog
-            .get(&Capability::new(capability).expect("capability"))
+            .get(&CapabilityName::new(capability).expect("capability"))
             .expect("declared");
         install_lines(entry, family)
             .iter()

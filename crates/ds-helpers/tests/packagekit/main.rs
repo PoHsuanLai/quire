@@ -7,8 +7,8 @@ mod fake_pk;
 
 use bus::PrivateBus;
 use ds_helpers::{
-    Capability, Deadline, Executable, Family, Installer, Missing, Outcome, PackageKit, PackageName,
-    Request, Timeouts,
+    CapabilityName, Deadline, Executable, Family, Installer, Missing, Outcome, PackageKit,
+    PackageName, Request, Timeouts,
 };
 use fake_pk::{Behaviour, Calls, serve};
 use std::time::Duration;
@@ -27,7 +27,7 @@ fn request(names: &[&str]) -> Request {
 /// What `request(names)` says it is about: a made-up capability, the first name, the program `mpv`.
 fn missing(names: &[&str]) -> Missing {
     Missing {
-        capability: Capability::new("video-playback").expect("a capability"),
+        capability: CapabilityName::new("video-playback").expect("a capability"),
         package: names
             .first()
             .map(|name| PackageName::new(name).expect("a package")),

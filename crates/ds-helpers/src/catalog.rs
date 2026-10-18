@@ -1,7 +1,7 @@
 //! The helpers file an app ships and the entries it parses into. Parsing is pure: text in, a
 //! [`Catalog`] or the first thing wrong with it out.
 
-use crate::capability::{Capability, Executable, NameError, PackageName};
+use crate::capability::{CapabilityName, Executable, NameError, PackageName};
 use crate::family::Family;
 use serde::Deserialize;
 use std::collections::BTreeMap;
@@ -43,7 +43,7 @@ impl Entry {
 /// Every capability one helpers file declares.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct Catalog {
-    entries: BTreeMap<Capability, Entry>,
+    entries: BTreeMap<CapabilityName, Entry>,
 }
 
 /// Why a helpers file could not be used.
@@ -156,10 +156,11 @@ impl Catalog {
         let entries = raw
             .into_iter()
             .map(|(key, raw)| {
-                let capability = Capability::new(&key).map_err(|source| CatalogError::Name {
-                    capability: key.clone(),
-                    source,
-                })?;
+                let capability =
+                    CapabilityName::new(&key).map_err(|source| CatalogError::Name {
+                        capability: key.clone(),
+                        source,
+                    })?;
                 Ok((capability, entry(&key, raw)?))
             })
             .collect::<Result<_, CatalogError>>()?;
@@ -183,12 +184,12 @@ impl Catalog {
     }
 
     /// What `capability` needs, if the file declares it.
-    pub fn get(&self, capability: &Capability) -> Option<&Entry> {
+    pub fn get(&self, capability: &CapabilityName) -> Option<&Entry> {
         self.entries.get(capability)
     }
 
     /// Every capability the file declares, in name order.
-    pub fn capabilities(&self) -> impl Iterator<Item = &Capability> {
+    pub fn capabilities(&self) -> impl Iterator<Item = &CapabilityName> {
         self.entries.keys()
     }
 }
@@ -207,7 +208,7 @@ pub fn data_dirs(value: Option<&std::ffi::OsStr>) -> Vec<PathBuf> {
 #[cfg(test)]
 mod tests {
     use super::{Catalog, CatalogError, data_dirs};
-    use crate::capability::Capability;
+    use crate::capability::CapabilityName;
     use crate::family::Family;
     use std::ffi::OsStr;
     use std::path::PathBuf;
@@ -230,8 +231,8 @@ mod tests {
         dnf = ["ffmpeg", "ffmpeg-free"]
     "#;
 
-    fn cap(name: &str) -> Capability {
-        Capability::new(name).expect("a capability")
+    fn cap(name: &str) -> CapabilityName {
+        CapabilityName::new(name).expect("a capability")
     }
 
     #[test]

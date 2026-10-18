@@ -5,7 +5,7 @@ use std::fmt;
 /// What an app needs to do, in the app's own words: `video-playback`, `heic-decode`. Lowercase
 /// ASCII letters, digits and hyphens, so it is a legal bare TOML key and never needs quoting.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Capability(String);
+pub struct CapabilityName(String);
 
 /// A name that is not valid for the type it was offered as.
 #[derive(Debug, Clone, PartialEq, Eq, thiserror::Error)]
@@ -26,9 +26,9 @@ impl NameError {
     }
 }
 
-impl Capability {
+impl CapabilityName {
     /// `name` as a capability.
-    pub fn new(name: &str) -> Result<Capability, NameError> {
+    pub fn new(name: &str) -> Result<CapabilityName, NameError> {
         let legal = |c: char| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-';
         match (name.is_empty(), name.chars().all(legal)) {
             (true, _) => Err(NameError::new("capability", name, "it is empty")),
@@ -37,7 +37,7 @@ impl Capability {
                 name,
                 "use lowercase letters, digits and hyphens",
             )),
-            _ => Ok(Capability(name.to_owned())),
+            _ => Ok(CapabilityName(name.to_owned())),
         }
     }
 
@@ -47,7 +47,7 @@ impl Capability {
     }
 }
 
-impl fmt::Display for Capability {
+impl fmt::Display for CapabilityName {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(&self.0)
     }
@@ -120,7 +120,7 @@ impl fmt::Display for Executable {
 
 #[cfg(test)]
 mod tests {
-    use super::{Capability, Executable, PackageName};
+    use super::{CapabilityName, Executable, PackageName};
 
     #[test]
     fn capabilities_are_bare_keys() {
@@ -134,7 +134,7 @@ mod tests {
             ("a.b", false),
         ];
         for (name, ok) in table {
-            assert_eq!(Capability::new(name).is_ok(), *ok, "{name}");
+            assert_eq!(CapabilityName::new(name).is_ok(), *ok, "{name}");
         }
     }
 

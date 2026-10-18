@@ -7,7 +7,7 @@ use std::path::Path;
 
 /// Whether a tool can be run.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Presence {
+pub enum ToolPresence {
     /// An executable for it is on `PATH`.
     Present,
     /// None is.
@@ -56,17 +56,17 @@ fn on_path(path: &OsString, executable: &Executable) -> bool {
 }
 
 /// Whether any of the entry's probe executables is on `path`.
-pub fn presence(path: &OsString, entry: &Entry) -> Presence {
+pub fn presence(path: &OsString, entry: &Entry) -> ToolPresence {
     match entry.probe.iter().any(|exe| on_path(path, exe)) {
-        true => Presence::Present,
-        false => Presence::Missing,
+        true => ToolPresence::Present,
+        false => ToolPresence::Missing,
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{Presence, presence};
-    use crate::capability::Capability;
+    use super::{ToolPresence, presence};
+    use crate::capability::CapabilityName;
     use crate::catalog::Catalog;
 
     #[test]
@@ -93,16 +93,26 @@ mod tests {
         .expect("parses");
         let entry = |name: &str| {
             catalog
-                .get(&Capability::new(name).expect("cap"))
+                .get(&CapabilityName::new(name).expect("cap"))
                 .expect("entry")
         };
         let path = std::env::join_paths([&other, &bin]).expect("path");
         let none = std::env::join_paths([&other]).expect("path");
         let table = [
-            ("any one probe is enough", "heic", &path, Presence::Present),
-            ("not on this path", "heic", &none, Presence::Missing),
-            ("not executable", "data", &path, Presence::Missing),
-            ("a directory is not a tool", "dir", &path, Presence::Missing),
+            (
+                "any one probe is enough",
+                "heic",
+                &path,
+                ToolPresence::Present,
+            ),
+            ("not on this path", "heic", &none, ToolPresence::Missing),
+            ("not executable", "data", &path, ToolPresence::Missing),
+            (
+                "a directory is not a tool",
+                "dir",
+                &path,
+                ToolPresence::Missing,
+            ),
         ];
         for (name, cap, path, want) in table {
             assert_eq!(presence(path, entry(cap)), want, "{name}");

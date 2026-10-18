@@ -1,8 +1,8 @@
 //! Availability changes: a log every subscriber reads at its own pace, woken by a `Waker`. No
 //! runtime behind it, so any executor drives it.
 
-use crate::capability::Capability;
-use crate::probe::Presence;
+use crate::capability::CapabilityName;
+use crate::probe::ToolPresence;
 use std::collections::HashMap;
 use std::future::poll_fn;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
@@ -12,14 +12,14 @@ use std::task::{Poll, Waker};
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Availability {
     /// The capability whose tool changed.
-    pub capability: Capability,
+    pub capability: CapabilityName,
     /// How it is now.
-    pub presence: Presence,
+    pub presence: ToolPresence,
 }
 
 #[derive(Debug, Default)]
 struct State {
-    known: HashMap<Capability, Presence>,
+    known: HashMap<CapabilityName, ToolPresence>,
     log: Vec<Availability>,
     wakers: Vec<Waker>,
 }
@@ -35,13 +35,13 @@ impl Log {
 
     /// Record `presence`; announce it when it differs from the last one recorded (the first
     /// sighting of a capability is announced only when the tool is present).
-    pub(crate) fn record(&self, capability: &Capability, presence: Presence) {
+    pub(crate) fn record(&self, capability: &CapabilityName, presence: ToolPresence) {
         let wakers = {
             let mut state = self.state();
             let before = state.known.insert(capability.clone(), presence);
             let changed = match before {
                 Some(before) => before != presence,
-                None => presence == Presence::Present,
+                None => presence == ToolPresence::Present,
             };
             if !changed {
                 return;
