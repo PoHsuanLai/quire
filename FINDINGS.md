@@ -1791,7 +1791,7 @@ Open:
   holds that chord leaves the pane stack's Command+`[` unbound (the conflict is in `Keys::problems`),
   while Escape and Alt+Left still go back.
 - Open: a chord that holds Shift with a symbol key reaches the resolver as the shifted symbol
-  (`!` for Shift+1); only `RawKey::unshifted` knows the base key. Letters and digits without Shift,
+  (`!` for Shift+1); a `RawKey` carries the physical `code` for the base key. Letters and digits without Shift,
   the whole conventions table, and Primary+`[` are unaffected.
 - Open: the Blitz fork's text actions (`ACTION_MODS` in the fork's `util.rs`) still accept Ctrl and
   Super on every platform and ignore Meta; the later fork lane feeds them from the keymap. Until then

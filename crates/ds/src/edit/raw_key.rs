@@ -1,8 +1,7 @@
 //! A key press as an app that draws its own region (a terminal) needs it: which physical key,
-//! down or up or repeating, what it types, and what it would be unmodified. Pure: the surface
-//! reads the event and the host's extras, and this is the rule that puts them together.
+//! down or up or repeating, and what it types. Pure: the surface reads the event, and this is the
+//! rule that reads the text off it.
 
-use crate::host::keys::KeyExtras;
 use dioxus::prelude::{Code, Key, Location, Modifiers};
 use ds_core::command::types_text;
 
@@ -31,24 +30,20 @@ pub struct RawKey {
     pub modifiers: Modifiers,
     /// Which of two like keys it is, where the platform says.
     pub location: Location,
-    /// The text the press types (none on a release). What the platform reports where it reports any; else the
-    /// logical character when no Ctrl or Super is held; else none.
+    /// The text the press types (none on a release): the logical character when no Ctrl or Super
+    /// is held, else none.
     pub text: Option<String>,
-    /// The logical key with no modifier held, where the platform reports it (it depends on the
-    /// layout, which the physical code does not). `None` where it does not.
-    pub unshifted: Option<Key>,
 }
 
 impl RawKey {
-    /// The event `phase` of the key `key` (physical `code`), made with `extras` from the host.
+    /// The event `phase` of the key `key` (physical `code`).
     pub fn new(
         phase: KeyPhase,
         (key, code): (Key, Code),
         (modifiers, location): (Modifiers, Location),
-        extras: KeyExtras,
     ) -> Self {
         let text = match phase {
-            KeyPhase::Press | KeyPhase::Repeat => extras.text.or_else(|| typed(&key, modifiers)),
+            KeyPhase::Press | KeyPhase::Repeat => typed(&key, modifiers),
             KeyPhase::Release => None,
         };
         RawKey {
@@ -58,12 +53,11 @@ impl RawKey {
             modifiers,
             location,
             text,
-            unshifted: extras.unshifted,
         }
     }
 }
 
-/// What a character key types when the platform said nothing: itself, unless a command key (Ctrl,
+/// What a character key types: itself, unless a command key (Ctrl,
 /// Super or Meta) makes it a chord. Alt alone still types (macOS Option, AltGr reported as Alt).
 fn typed(key: &Key, modifiers: Modifiers) -> Option<String> {
     match key {
@@ -75,68 +69,52 @@ fn typed(key: &Key, modifiers: Modifiers) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::{KeyPhase, RawKey};
-    use crate::host::keys::KeyExtras;
     use dioxus::prelude::{Code, Key, Location, Modifiers};
 
     fn character(text: &str) -> Key {
         Key::Character(text.to_owned())
     }
 
-    fn made(key: Key, modifiers: Modifiers, extras: KeyExtras) -> RawKey {
+    fn made(key: Key, modifiers: Modifiers) -> RawKey {
         RawKey::new(
             KeyPhase::Press,
             (key, Code::KeyA),
             (modifiers, Location::Standard),
-            extras,
         )
     }
 
     #[test]
-    fn text_is_the_platforms_when_given_else_the_character_unless_a_chord() {
-        let said = |text: &str| KeyExtras {
-            text: Some(text.to_owned()),
-            unshifted: None,
-        };
+    fn text_is_the_character_unless_a_chord() {
         let cases: Vec<(&str, RawKey, Option<&str>)> = vec![
             (
-                "no extras: the character",
-                made(character("A"), Modifiers::SHIFT, KeyExtras::default()),
+                "the character",
+                made(character("A"), Modifiers::SHIFT),
                 Some("A"),
             ),
             (
-                "no extras, Alt keeps its character",
-                made(character("b"), Modifiers::ALT, KeyExtras::default()),
+                "Alt keeps its character",
+                made(character("b"), Modifiers::ALT),
                 Some("b"),
             ),
             (
-                "no extras, Ctrl types nothing",
-                made(character("c"), Modifiers::CONTROL, KeyExtras::default()),
+                "Ctrl types nothing",
+                made(character("c"), Modifiers::CONTROL),
                 None,
             ),
             (
-                "no extras, Super types nothing",
-                made(character("t"), Modifiers::SUPER, KeyExtras::default()),
+                "Super types nothing",
+                made(character("t"), Modifiers::SUPER),
                 None,
             ),
             (
-                "no extras, Meta types nothing",
-                made(character("t"), Modifiers::META, KeyExtras::default()),
+                "Meta types nothing",
+                made(character("t"), Modifiers::META),
                 None,
             ),
             (
-                "no extras, a named key types nothing",
-                made(Key::Enter, Modifiers::empty(), KeyExtras::default()),
+                "a named key types nothing",
+                made(Key::Enter, Modifiers::empty()),
                 None,
-            ),
-            (
-                "the platform's text wins (a dead key)",
-                made(character("e"), Modifiers::empty(), said("é")),
-                Some("é"),
-            ),
-            (
-                "the platform's text wins over a chord's silence",
-                made(character("a"), Modifiers::CONTROL, said("\u{1}")),
-                Some("\u{1}"),
             ),
         ];
         for (name, key, want) in cases {
@@ -150,27 +128,7 @@ mod tests {
             KeyPhase::Release,
             (character("a"), Code::KeyA),
             (Modifiers::empty(), Location::Standard),
-            KeyExtras {
-                text: Some("a".to_owned()),
-                unshifted: None,
-            },
         );
         assert_eq!(up.text, None);
-    }
-
-    #[test]
-    fn the_unshifted_key_is_only_what_the_platform_reported() {
-        let none = made(character("!"), Modifiers::SHIFT, KeyExtras::default());
-        assert_eq!(none.unshifted, None);
-        let given = made(
-            character("!"),
-            Modifiers::SHIFT,
-            KeyExtras {
-                text: None,
-                unshifted: Some(character("1")),
-            },
-        );
-        assert_eq!(given.unshifted, Some(character("1")));
-        assert_eq!(given.text.as_deref(), Some("!"));
     }
 }

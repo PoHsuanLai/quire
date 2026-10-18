@@ -60,7 +60,7 @@ pub fn chord_key_of(key: &Key) -> Option<ChordKey> {
 
 /// The key press `key` with `modifiers` held, as chordkit takes it. The key is as the toolkit
 /// reports it: a shifted symbol (`!` for Shift+1) is not unshifted here, so an app chord that
-/// holds Shift with a symbol key needs the host's unshifted key.
+/// holds Shift with a symbol key reads the base key from the physical code.
 pub fn key_input(key: &Key, modifiers: Modifiers) -> Option<KeyInput> {
     let input = KeyInput::new(modifiers_of(modifiers), chord_key_of(key)?);
     // AltGraph types a character (AltGr+Q is @ on many layouts, and arrives with Ctrl and Alt on
