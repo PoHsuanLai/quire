@@ -22,7 +22,7 @@ use ds::style::icon::family::PlateFamily;
 use ds::style::tokens::control_size::{ControlSize, SidebarSize};
 use ds::style::tokens::hex::Hex;
 use ds_blitz::Extent;
-use ds_harness::{Backdrop, Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Backdrop, Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const WIDE: Viewport = Viewport {

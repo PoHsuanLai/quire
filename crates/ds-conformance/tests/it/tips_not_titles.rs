@@ -12,7 +12,7 @@ use ds::components::controls::segmented::Tracking;
 use ds::components::lists::row::row::{Outline, Row};
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

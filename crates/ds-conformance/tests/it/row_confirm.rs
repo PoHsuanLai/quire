@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::controls::button_model::ButtonRole;
 use ds::components::lists::row::confirm::RowConfirm;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -9,7 +9,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::{assert_settles_to_zero_frames, settle_until};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

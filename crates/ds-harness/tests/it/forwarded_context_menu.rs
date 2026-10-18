@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::base::press::PointerButton;
 use ds::prelude::{Point, Px};
 use ds_blitz::TextureLayer;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

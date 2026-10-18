@@ -145,7 +145,6 @@ fn an_allowance_lowers_the_minimum_for_its_class_and_is_counted() {
 }
 
 fn read_scene(harness: &Harness) -> ds_harness::inset::Scene {
-    use ds_harness::DocQuery;
     harness.with_doc(read)
 }
 

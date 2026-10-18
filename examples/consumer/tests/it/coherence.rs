@@ -12,7 +12,7 @@
 
 use consumer::{App, STYLE};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use ds_lint::{LintConfig, Profile, Rule, assert_clean, markup};
 
 const VIEW: Viewport = Viewport {

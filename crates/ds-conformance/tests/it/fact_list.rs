@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::components::fields::fact_list::{Fact, FactList};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

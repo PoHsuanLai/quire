@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::base::word::Word;
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query};
+use ds_harness::{Clock, Harness, HarnessConfig, Input};
 
 fn look_of(theme: Theme) -> SpaceLook {
     SpaceLook {

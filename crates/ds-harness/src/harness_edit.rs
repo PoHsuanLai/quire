@@ -2,10 +2,10 @@
 //! host's hit test and IME requests read back. The IME events go through the same routing the
 //! window uses (`crate::edit_ime`): to the surface that has the keyboard.
 
-use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
 use crate::harness_input::paste_keys;
 use crate::input::{ImeInput, PasteChord, RawKeyInput, RawKeyPhase};
+use crate::query::first;
 use blitz_traits::events::{MouseEventButton, UiEvent};
 use ds::host::captured::{CapturedPointer, PointerPhase};
 use ds::host::ime::{ImeEvent, ImeSwitch};

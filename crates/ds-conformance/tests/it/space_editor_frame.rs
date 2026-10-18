@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::components::app::space_editor::DotIndex;
 use ds::components::app::space_editor::rows::EditorFrame;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use probe::{keep, rect};
 use std::time::Duration;
 

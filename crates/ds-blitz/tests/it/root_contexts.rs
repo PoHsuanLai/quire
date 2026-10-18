@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::RootContexts;
-use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport, snapshot_with};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport, snapshot_with};
 use std::sync::Arc;
 use std::time::Duration;
 

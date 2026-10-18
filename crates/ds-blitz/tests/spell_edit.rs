@@ -18,7 +18,7 @@ use ds::root::common::Common;
 use ds::spell::lang::{Lang, Spell};
 use ds::spell::marks::SpellReplace;
 use ds_blitz::spell::{SpellConfig, provide_with};
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::path::PathBuf;
 use std::time::Duration;

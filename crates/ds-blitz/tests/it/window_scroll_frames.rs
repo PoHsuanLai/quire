@@ -8,7 +8,7 @@ use blitz_kit::scroll::geom::ScrollAxis;
 use dioxus::prelude::*;
 use ds::host::gesture::GesturePhase;
 use ds::prelude::*;
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

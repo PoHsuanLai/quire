@@ -16,7 +16,7 @@ use ds::components::lists::preview::content::PaneContent;
 use ds::prelude::*;
 use ds_blitz::{DeviceBox, PdfFileThumb, ThumbRequest};
 use ds_blitz::{pdf_thumb_blocking, pdf_thumb_bytes, pdf_thumb_cached};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, Encryption, SaveOptions, blank_document, save};
 use peniko::Color;

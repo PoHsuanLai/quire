@@ -10,7 +10,7 @@ use ds::components::app::link_pill::{LinkPill, LinkTarget};
 use ds::components::app::today_tabs::{TodayTab, TodayTabs};
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

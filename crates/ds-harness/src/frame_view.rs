@@ -2,8 +2,8 @@
 //! document, so the harness's own queries never see into it (the isolation mailo's reader relies
 //! on) and a test that wants its contents asks the frame.
 
-use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
+use crate::query::first;
 use blitz_dom::{BaseDocument, LocalName, NodeId};
 use ds::prelude::*;
 use ds_blitz::FrameId;

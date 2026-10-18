@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::components::content::provider_mark::MarkProvider;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::accounts::model::{
     AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, CopyState, FieldRole, FieldText,
     FormField, Limitation, ProviderEntry, ProviderKey, ProviderPick, Requirement, ServiceKey,

@@ -5,7 +5,6 @@
 //! A snapshot sees CSS time only: the document is resolved at each moment, but no wall-clock
 //! timer runs. Drive timers with [`crate::Harness`].
 
-use crate::driver::Driver;
 use crate::error::HarnessError;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;

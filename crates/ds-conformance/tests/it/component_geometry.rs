@@ -11,7 +11,7 @@ use ds::prelude::*;
 use ds::stack::toast_hub::UndoToken;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

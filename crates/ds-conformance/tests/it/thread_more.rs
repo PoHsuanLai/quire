@@ -9,7 +9,7 @@ use ds::components::app::row_more::RowMore;
 use ds::components::app::thread_height::{ThreadLines, thread_card_gap, thread_card_height};
 use ds::components::app::thread_row::ThreadRow;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

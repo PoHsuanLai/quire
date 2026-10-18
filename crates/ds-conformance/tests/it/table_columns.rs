@@ -7,7 +7,7 @@ use ds::components::lists::table::model::{Sort, SortDirection, TableColumn, Tabl
 use ds::components::lists::table::rules::ColumnRules;
 use ds::components::lists::table::view::Table;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

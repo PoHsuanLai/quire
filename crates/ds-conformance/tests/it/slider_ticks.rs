@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::components::controls::slider_model::Ticks;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 static VALUE: GlobalSignal<Fraction> = Signal::global(|| Fraction(0));

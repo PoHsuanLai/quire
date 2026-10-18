@@ -12,8 +12,7 @@ use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
 use ds::window::vocab::{Maximized, Support, TileError, WindowTile, Zoom};
 use ds_harness::{
-    Clock, Driver, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput, Query,
-    Viewport,
+    Clock, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput, Viewport,
 };
 use std::rc::Rc;
 use std::time::Duration;

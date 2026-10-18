@@ -9,7 +9,7 @@ use ds::components::overlays::hover_card::target::HoverTarget;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::hash::{DefaultHasher, Hash, Hasher};
 use std::sync::mpsc::{self, TryRecvError};
 use std::thread::JoinHandle;

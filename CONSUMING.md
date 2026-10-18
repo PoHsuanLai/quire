@@ -53,7 +53,7 @@ ds-shell    = { path = "../quire/crates/ds-shell" }    # only an app that shows 
 
 [dev-dependencies]
 ds-lint     = { path = "../quire/crates/ds-lint" }     # your own tests call it (section 5 below)
-ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harness`, `Input`, `Query`, `snapshot` (feature `pdf`: `pdf_app`)
+ds-harness  = { path = "../quire/crates/ds-harness" }  # the test driver: `Harness`, `Input`, `snapshot` (feature `pdf`: `pdf_app`)
 ```
 
 The crates and what each holds: `ds` (the components, the `Ds` root, the host seams, the facades),
@@ -627,7 +627,7 @@ shortened:
 
 ```rust,ignore
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 let resolved = resolve(Appearance::default(), SpaceLook::default().theme, SystemPrefs::default());
@@ -659,9 +659,8 @@ once. The two assertions above then hold exactly, every run.
 
 **Driving and reading.** `Harness::new(app, config)` takes a `HarnessConfig` (or a bare `Viewport`
 for the defaults) and renders the first frame. A test sends `Input` and lets time pass through the
-`Driver` trait (`send`, `advance`, `render`) and reads the document through the `Query` trait
-(both are in `ds_harness`; a second driver, such as a shell surface's headless host, gets
-`Query` by implementing `DocQuery`):
+`Harness` methods (`send`, `advance`, `render`) and reads the document through its query methods
+(`rect`, `text_of`, `attr`, `count`, `has_class`, `ink_of`, `fill_of`, `focus_of`):
 
 | Want | Call |
 | --- | --- |

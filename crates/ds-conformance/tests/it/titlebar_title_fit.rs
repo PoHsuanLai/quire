@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const LONG: &str = "a-very-long-holiday-picture-name-that-keeps-on-going-and-going-2026.png";

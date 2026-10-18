@@ -13,7 +13,7 @@ use dioxus::prelude::*;
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

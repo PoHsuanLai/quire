@@ -8,7 +8,7 @@ use ds::components::controls::scrubber::Scrubber;
 use ds::components::controls::scrubber_model::BufferedRange;
 use ds::motion::spring::Millis;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

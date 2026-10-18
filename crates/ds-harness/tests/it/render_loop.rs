@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_core::time::clock::sleep;
-use ds_harness::{Driver, Harness, Viewport};
+use ds_harness::{Harness, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

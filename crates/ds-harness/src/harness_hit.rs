@@ -1,9 +1,9 @@
 //! What a press would land on: the harness's hit test, the one Blitz runs for the pointer, with
-//! CSS transforms and `pointer-events` applied (the layout rects [`Query::rect`](crate::Query::rect) reads leave
+//! CSS transforms and `pointer-events` applied (the layout rects [`Harness::rect`](crate::Harness::rect) reads leave
 //! transforms out, FINDINGS "Native focus").
 
-use crate::driver::{DocQuery, first};
 use crate::harness::Harness;
+use crate::query::first;
 use blitz_dom::{BaseDocument, NodeId};
 use ds::prelude::*;
 

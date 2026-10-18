@@ -7,9 +7,7 @@ use ds_blitz::{
     Extent, Reserve, ScreenArea, ScreenOf, SizeOrigin, SizeRequest, WindowSizer, WorkBasis,
     use_window_sizer,
 };
-use ds_harness::{
-    Clock, Driver, Harness, HarnessConfig, Input, Query, SizerAck, Viewport, WindowScreen,
-};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, SizerAck, Viewport, WindowScreen};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

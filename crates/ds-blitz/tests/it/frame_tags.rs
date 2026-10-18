@@ -8,7 +8,7 @@ use ds_blitz::{
     AppNet, FrameLink, FrameLinks, FrameTag, NetDecision, NetPolicy, NetReply, NetRequest,
     RequestOrigin,
 };
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 

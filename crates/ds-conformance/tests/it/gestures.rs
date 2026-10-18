@@ -8,7 +8,7 @@ use ds::host::captured::CapturedPointer;
 use ds::host::gesture::{Gesture, GesturePhase, Magnification, ScrollSource, use_gestures};
 use ds::host::pointer_capture::{PointerHold, use_pointer_capture};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

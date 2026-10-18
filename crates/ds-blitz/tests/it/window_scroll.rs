@@ -12,7 +12,7 @@ use dioxus::prelude::*;
 use ds::host::gesture::{Gesture, WheelDelivery, use_gestures, use_gestures_with};
 use ds::prelude::*;
 use ds_blitz::{ScrollAnimate, ScrollCmd, use_scroll_handle};
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

@@ -9,9 +9,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::PaletteGroup;
 use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::prelude::*;
-use ds_harness::{
-    Clock, Driver, FocusState, Harness, HarnessConfig, Input, Layout, Query, Viewport,
-};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Layout, Viewport};
 use image::RgbaImage;
 use probe::rect;
 use std::time::Duration;

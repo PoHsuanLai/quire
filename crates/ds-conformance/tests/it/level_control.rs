@@ -12,7 +12,7 @@ use ds::components::controls::slider_model::SliderLook;
 use ds::prelude::*;
 use ds::style::tokens::easing::EasingToken;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, rect};
 use std::cell::Cell;

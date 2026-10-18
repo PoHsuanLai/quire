@@ -9,7 +9,6 @@ use std::time::Duration;
 use dioxus::prelude::*;
 use ds::base::time::stamp::Ms;
 use ds::machine::{use_machine, use_machine_in, use_machine_state};
-use ds_harness::Driver;
 use hold::{
     Hold, HoldIn, HoldOut, HoldParams, Lock, lock, outs, press, record, running, set_lock, word,
     word_of,

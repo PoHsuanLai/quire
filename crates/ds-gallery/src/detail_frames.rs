@@ -12,7 +12,7 @@ use ds::assembly::ds::Inject;
 use ds::motion::detail::morph::Slashed;
 use ds::motion::detail::stamp::EventStamp;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::{RgbaImage, imageops};
 use std::path::Path;
 use std::time::Duration;

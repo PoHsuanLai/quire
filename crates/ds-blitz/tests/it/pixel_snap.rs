@@ -17,7 +17,7 @@ use ds::prelude::*;
 use ds::style::icon::render::Glyph;
 use ds::style::icon::stroke::stroke_device_pixels;
 use ds::style::tokens::pixel::PixelToken;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use image::RgbaImage;
 use probe::{keep, rect};
 use std::ops::Range;

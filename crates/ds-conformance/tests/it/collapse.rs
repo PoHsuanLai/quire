@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::motion::use_collapse::use_collapse;
 use ds::prelude::*;
 use ds::style::tokens::timing::DurationToken;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

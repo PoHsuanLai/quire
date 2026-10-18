@@ -8,7 +8,7 @@ use std::time::Duration;
 
 use dioxus::prelude::*;
 use ds::machine::use_machine;
-use ds_harness::{Driver, Input};
+use ds_harness::Input;
 use hold::{Hold, HoldIn, HoldOut, HoldParams, lock, outs, press, record, running, word, word_of};
 
 fn app() -> Element {

@@ -17,7 +17,7 @@ use dioxus::prelude::*;
 use ds::components::controls::key_equivalent::{KeyEquivalent, KeyStyle};
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use image::RgbaImage;
 use probe::{distance, modal, rect};
 use std::time::Duration;

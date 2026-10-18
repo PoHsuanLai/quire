@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::file_drop::drag::{DropAcceptance, FileDrag, FileDragInput, FileDrop, Offer};
 use ds::file_drop::hook::use_file_drop;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::path::PathBuf;
 
 const VIEW: Viewport = Viewport {

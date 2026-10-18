@@ -17,7 +17,7 @@ use ds_blitz::menus::{
 use ds_core::command::{AppCommand, CommandFace, CommandId, UiOnlyReason};
 use ds_core::standard_action::StandardAction;
 use ds_core::vocab::Availability;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::mpsc;

@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Srgba, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Part, Srgba, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

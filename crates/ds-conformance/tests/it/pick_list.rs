@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

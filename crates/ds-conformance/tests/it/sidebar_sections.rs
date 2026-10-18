@@ -12,7 +12,7 @@ use ds::prelude::*;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::colour::ColourToken;
 use ds::style::tokens::hex::Hex;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Part, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Part, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

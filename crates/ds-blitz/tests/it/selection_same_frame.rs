@@ -11,9 +11,7 @@ use ds::host::position::{TextPosition, TextRange};
 use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
-use ds_harness::{
-    Clock, Driver, Harness, HarnessConfig, Input, PhaseOrder, Query, Stepped, Viewport,
-};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PhaseOrder, Stepped, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

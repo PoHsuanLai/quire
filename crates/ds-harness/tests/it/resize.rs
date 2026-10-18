@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::Extent;
-use ds_harness::{Harness, Query, Viewport};
+use ds_harness::{Harness, Viewport};
 
 const NARROW: Viewport = Viewport {
     width: 320,

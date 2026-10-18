@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::seam::probe_snapshot;
-use ds_harness::{Clock, DocQuery, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,

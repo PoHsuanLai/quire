@@ -11,7 +11,7 @@ use ds::components::content::status::battery_state::BatteryState;
 use ds::components::lists::row::size::RowSize;
 use ds::prelude::*;
 use ds_harness::harness::assert_settles_to_zero_frames;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

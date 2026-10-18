@@ -303,7 +303,7 @@ mod rule_two {
 /// Section 5, rule 4.
 #[test]
 fn the_badge_times_out_on_ds_motions_own_clock() {
-    use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+    use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
     use std::time::Duration;
 
     let resolved = resolve(

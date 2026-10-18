@@ -1,7 +1,6 @@
 //! Printing a harness's document as it is now, for [`pdf_app`] and for tests that assert on a
 //! printout's text rather than its pixels.
 
-use crate::driver::Driver;
 use crate::harness::Harness;
 use crate::harness_config::HarnessConfig;
 use crate::snapshot::{MOUNT_SETTLE, Viewport};

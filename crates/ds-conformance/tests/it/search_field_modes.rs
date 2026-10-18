@@ -7,7 +7,7 @@ use ds::base::geometry::placement::{Align, Side};
 use ds::components::menus::search::view::SearchField;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

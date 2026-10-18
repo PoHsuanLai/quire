@@ -11,7 +11,7 @@ use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
 use ds_core::time::clock::sleep;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::{Duration, Instant};
 use tokio::sync::watch;

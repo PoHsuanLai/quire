@@ -3,7 +3,7 @@
 
 use dioxus::prelude::*;
 use ds_core::geometry::units::Px;
-use ds_harness::{Driver, Harness, Input, Query, Viewport};
+use ds_harness::{Harness, Input, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,

@@ -11,7 +11,7 @@ use crate::page::Page;
 use crate::registry;
 use ds::prelude::*;
 use ds_harness::inset::{Findings, Policy, insets};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 /// The width every page is laid out at, as the snapshots are.

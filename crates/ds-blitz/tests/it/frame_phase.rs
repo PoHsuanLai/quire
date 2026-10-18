@@ -9,7 +9,7 @@ use ds::host::document::{DocumentHost, use_document_host};
 use ds::host::measure::MountedRef;
 use ds::host::phase::{Observe, Observed, PhaseWrite, Queued, Watch};
 use ds::prelude::*;
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 

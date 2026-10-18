@@ -9,7 +9,7 @@ use ds::host::gesture::{
     Gesture, GesturePhase, ScrollSource, WheelDelivery, use_gestures, use_gestures_with,
 };
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use keyboard_types::Modifiers;
 use std::cell::RefCell;
 use std::time::Duration;

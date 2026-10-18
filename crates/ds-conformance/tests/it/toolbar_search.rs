@@ -8,7 +8,7 @@ use ds::components::chrome::toolbar::search::{SearchSeat, ToolbarSearch};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::components::menus::search::view::SearchField;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

@@ -3,7 +3,7 @@
 //! `position:absolute; bottom:0` with a real size, in a footer behind it.
 
 use dioxus::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

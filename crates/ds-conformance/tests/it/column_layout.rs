@@ -7,7 +7,7 @@ use ds::components::chrome::column::view::Column;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::spacing::SpacingToken;
-use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::Cell;
 
 const VIEW: Viewport = Viewport {

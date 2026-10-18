@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Clock, Harness, HarnessConfig, Part, Query, Srgba, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
 use ds_settings::UserStyle;
 use std::cell::Cell;
 

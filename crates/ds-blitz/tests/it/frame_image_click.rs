@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
 use ds_blitz::{FrameImageClick, FrameLink, FrameLinks, FrameTag};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 

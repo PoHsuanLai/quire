@@ -32,16 +32,16 @@ pub use policy::{Allow, Policy, text_inset};
 pub use read::read;
 pub use scene::{Content, ContentKind, Edges, Paint, Scene, VisibleBox};
 
-use crate::driver::DocQuery;
+use crate::harness::Harness;
 
 /// Check every visible box of the document against `policy`.
-pub fn insets(doc: &impl DocQuery, policy: &Policy) -> Findings {
-    doc.with_doc(|doc| measure(&read(doc), policy))
+pub fn insets(harness: &Harness, policy: &Policy) -> Findings {
+    harness.with_doc(|doc| measure(&read(doc), policy))
 }
 
 /// Fail with the offences listed when any box has content closer to a painted edge than
 /// `policy` allows.
-pub fn assert_insets(doc: &impl DocQuery, policy: &Policy) {
-    let findings = insets(doc, policy);
+pub fn assert_insets(harness: &Harness, policy: &Policy) {
+    let findings = insets(harness, policy);
     assert!(findings.offences.is_empty(), "{}", findings.text());
 }

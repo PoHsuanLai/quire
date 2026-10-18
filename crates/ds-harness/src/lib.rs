@@ -6,7 +6,6 @@
 //! the code production runs. Its clock is [`Clock::Wall`] or [`Clock::Virtual`]
 //! ([`HarnessConfig::with_clock`]). Feature `pdf` adds [`pdf_app`] and [`Harness::pdf`].
 
-mod driver;
 mod error;
 mod fake_window;
 mod frame_view;
@@ -35,13 +34,13 @@ mod headless_step;
 mod input;
 pub mod inset;
 mod painter;
+mod query;
 mod recorded_window;
 mod round_budget;
 #[cfg(test)]
 mod snap_tests;
 pub mod snapshot;
 
-pub use driver::{ClassPresence, DocQuery, Driver, FocusState, Query};
 pub use error::HarnessError;
 pub use fake_window::{SizerAck, WindowScreen};
 pub use frame_view::FrameView;
@@ -60,5 +59,6 @@ pub use input::{
     ImeInput, Input, KeyInput, PasteChord, PointerAction, PointerInput, RawKeyInput, RawKeyPhase,
 };
 pub use painter::PaintTime;
+pub use query::{ClassPresence, FocusState};
 pub use recorded_window::WindowHosting;
 pub use snapshot::{Viewport, snapshot, snapshot_at, snapshot_placed, snapshot_with};

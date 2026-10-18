@@ -9,8 +9,7 @@ use ds::focus::soon::focus_soon_told;
 use ds::host::measure::Measured;
 use ds::prelude::*;
 use ds_harness::{
-    Clock, Driver, Harness, HarnessConfig, Input, PasteChord, Query, RawKeyInput, RawKeyPhase,
-    Viewport,
+    Clock, Harness, HarnessConfig, Input, PasteChord, RawKeyInput, RawKeyPhase, Viewport,
 };
 use keyboard_types::{Code, Key, Location, Modifiers};
 use std::cell::RefCell;

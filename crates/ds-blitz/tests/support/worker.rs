@@ -7,7 +7,7 @@
 //! passing run comes near.
 #![allow(dead_code, reason = "each includer uses its own part of this module")]
 
-use ds_harness::{Driver, Harness};
+use ds_harness::Harness;
 use std::time::{Duration, Instant};
 
 /// How long a test waits on a worker before it calls the worker hung. A passing run returns the

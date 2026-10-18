@@ -13,9 +13,7 @@ use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
 use ds_blitz::FileRoots;
 use ds_harness::harness::settle_until;
-use ds_harness::{
-    Driver, Harness, HarnessConfig, Query, Viewport, snapshot, snapshot_at, snapshot_with,
-};
+use ds_harness::{Harness, HarnessConfig, Viewport, snapshot, snapshot_at, snapshot_with};
 use image::RgbaImage;
 use std::time::Duration;
 

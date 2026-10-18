@@ -6,7 +6,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::{FrameLink, FrameLinkHover, FrameLinks, FrameTag, HoverPhase};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 

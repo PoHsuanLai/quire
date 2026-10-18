@@ -16,8 +16,8 @@ use ds::prelude::*;
 use ds::root::common::Common;
 use ds::root::pass_through::{DataAttr, DataName, ExtraClass};
 use ds_harness::{
-    ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, PointerAction,
-    PointerInput, Query, Viewport,
+    ClassPresence, Clock, FocusState, Harness, HarnessConfig, Input, PointerAction, PointerInput,
+    Viewport,
 };
 use std::cell::RefCell;
 use std::time::Duration;

@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::lists::list::model::ListItem;
 use ds::components::lists::virtual_list::{RowHeight, VirtualList};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

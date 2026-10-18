@@ -5,7 +5,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, FileRoots, NetDecision, NetPolicy, NetReply, NetRequest, RequestOrigin};
-use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex, OnceLock, PoisonError};
 

@@ -2,7 +2,7 @@
 //! specificity, and a later layer beats an earlier one (ARCHITECTURE.md section 10).
 
 use dioxus::prelude::*;
-use ds_harness::{Clock, Harness, HarnessConfig, Part, Query, Srgba, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Part, Srgba, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 100,

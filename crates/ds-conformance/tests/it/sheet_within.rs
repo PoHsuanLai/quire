@@ -9,7 +9,7 @@ use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
 use ds::host::measure::{Anchor, use_rect};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::{Cell, RefCell};
 use std::time::Duration;
 

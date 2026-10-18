@@ -15,7 +15,7 @@ use ds::style::icon::url::IconUrl;
 use ds::style::tokens::control_size::ControlSize;
 use ds::style::tokens::delay::DelayToken;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use image::{ImageFormat, Rgba, RgbaImage};
 use probe::{distance, keep, modal, pixels, rect};
 use std::io::Cursor;

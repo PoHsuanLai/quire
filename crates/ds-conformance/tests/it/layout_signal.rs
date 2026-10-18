@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::host::layout::use_layout;
 use ds::host::measure::MountedRef;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,

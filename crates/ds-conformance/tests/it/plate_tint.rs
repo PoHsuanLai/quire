@@ -12,7 +12,7 @@ use ds::style::icon::plate_tint::PlateTint;
 use ds::style::icon::retint::IconStyle;
 use ds::style::icon::retint::Tint;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use image::{Rgba, RgbaImage};
 use probe::{keep, rect};
 use std::time::Duration;

@@ -2,7 +2,7 @@
 //! padding reaches the button: its client rect is right, and so must be its hit.
 
 use dioxus::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

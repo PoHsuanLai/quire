@@ -7,7 +7,7 @@ use ds::components::chrome::toolbar::model::{Picked, ToolbarItem, ToolbarRoom};
 use ds::components::chrome::toolbar::view::Toolbar;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

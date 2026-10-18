@@ -9,7 +9,7 @@ use dioxus::prelude::*;
 use ds::base::vocab::RowState;
 use ds::components::lists::row::size::RowSize;
 use ds::prelude::*;
-use ds_harness::{Backdrop, Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Backdrop, Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

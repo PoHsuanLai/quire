@@ -12,7 +12,7 @@ use ds::components::lists::section_header::HeaderAction;
 use ds::prelude::*;
 use ds::style::space::presets::PRESETS;
 use ds::style::tokens::control_size::ControlSize;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use image::RgbaImage;
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;

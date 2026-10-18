@@ -20,7 +20,7 @@ use ds::stack::toast_hub::use_toast_hub;
 use ds::style::space::presets::PRESETS;
 use ds_blitz::TokioSpawner;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use ds_settings::{AppName, ConfigRoot, Store, SystemPrefsSource, use_environment};
 use std::sync::Arc;
 use std::time::Duration;

@@ -14,7 +14,7 @@ use ds::motion::hover_intent::HoverProfile;
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use probe::rect;
 use std::rc::Rc;
 use std::time::Duration;

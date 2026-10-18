@@ -3,7 +3,7 @@
 //! sees the hover card open, not before.
 //!
 //! Time. quire's timers are `futures-timer` sleeps and its hover intent reads `Instant::now()`,
-//! both on the wall clock, so a harness cannot fake time: [`Driver::advance`] really lets it
+//! both on the wall clock, so a harness cannot fake time: [`Harness::advance`] really lets it
 //! pass. It does not spin: it sleeps on a condition variable that the document's waker signals,
 //! so it wakes exactly when a timer fires (or a resource lands), runs the renders that queued,
 //! resolves the document at the matching animation time, and sleeps again until the deadline.
@@ -14,7 +14,6 @@
 //! `HarnessConfig::with_clock(Clock::Virtual)` runs quire's timers on the same clock as its CSS
 //! instead, and `advance` takes no wall-clock time at all (`crate::harness_clock`).
 
-use crate::driver::{DocQuery, Driver, Query, first};
 use crate::error::HarnessError;
 use crate::frame_view::FrameView;
 use crate::harness_clock::{Clock, HarnessClock};
@@ -27,6 +26,7 @@ pub use crate::harness_settle::{
 use crate::headless::{Backdrop, Headless, Layout};
 use crate::headless_step::Owed;
 use crate::input::Input;
+use crate::query::first;
 use crate::snapshot::Viewport;
 use blitz_dom::{BaseDocument, Document as _};
 use blitz_traits::events::UiEvent;
@@ -278,14 +278,9 @@ impl Harness {
     }
 }
 
-impl DocQuery for Harness {
-    fn with_doc<T>(&self, read: impl FnOnce(&BaseDocument) -> T) -> T {
-        read(&self.doc.doc.inner())
-    }
-}
-
-impl Driver for Harness {
-    fn send(&mut self, input: Input) {
+impl Harness {
+    /// Deliver `input` and bring the document up to date.
+    pub fn send(&mut self, input: Input) {
         match input {
             Input::Pointer(pointer) => self.pointer(pointer),
             Input::Key(key) => self.key(key),
@@ -300,11 +295,13 @@ impl Driver for Harness {
         }
     }
 
-    fn advance(&mut self, by: Duration) {
+    /// Let `by` pass: fire due timers and render. At least `by` passes.
+    pub fn advance(&mut self, by: Duration) {
         self.pass(by);
     }
 
-    fn render(&mut self) -> Result<image::RgbaImage, HarnessError> {
+    /// Paint the document as it is now.
+    pub fn render(&mut self) -> Result<image::RgbaImage, HarnessError> {
         self.doc.paint(Backdrop::Scheme)
     }
 }

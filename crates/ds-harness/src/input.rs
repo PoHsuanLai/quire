@@ -1,4 +1,4 @@
-//! What a test hands a [`Driver`](crate::Driver): one [`Input`] value per thing a person or the
+//! What a test hands a [`Harness`](crate::Harness): one [`Input`] value per thing a person or the
 //! platform does, so a test reads as a list of inputs and the driver is the only place that
 //! knows how each reaches the document.
 

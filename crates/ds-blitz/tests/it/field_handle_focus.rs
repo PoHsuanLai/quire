@@ -9,7 +9,7 @@ use ds::focus::field::{FieldHandle, use_field_handle};
 use ds::focus::select::Select;
 use ds::focus::selector::{FocusError, focus_by_selector};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{AppNet, FrameLink, FrameLinks, NetDecision, NetPolicy, NetReply, NetRequest};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::sync::{Arc, Mutex, PoisonError};
 
 const VIEW: Viewport = Viewport {

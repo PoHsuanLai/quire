@@ -10,7 +10,7 @@ mod worker;
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::{PdfFileThumb, pdf_thumb_rasters};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use pdfrum_common::Limits;
 use pdfrum_edit::{EditDoc, SaveOptions, blank_document, save};
 use peniko::Color;

@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::fields::stepper::model::{Readout, StepRange};
 use ds::components::fields::stepper::view::Stepper;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

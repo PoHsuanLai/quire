@@ -12,7 +12,7 @@ use crate::progress_copy::ProgressCopy;
 use crate::style;
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_harness::{Driver, Harness, Query, Viewport};
+use ds_harness::{Harness, Viewport};
 use image::{RgbaImage, imageops};
 use std::cell::Cell;
 use std::path::{Path, PathBuf};

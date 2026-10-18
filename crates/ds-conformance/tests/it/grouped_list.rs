@@ -13,7 +13,7 @@ use ds::prelude::*;
 use ds::style::tokens::accent_table::accent_of;
 use ds::style::tokens::hex::Hex;
 use ds::style::tokens::row_scale::ROW_SCALE;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use probe::{distance, keep, modal, pixels, rect};
 use std::time::Duration;
 

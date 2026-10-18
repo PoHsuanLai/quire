@@ -8,7 +8,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::focus::request::use_focus_request;
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

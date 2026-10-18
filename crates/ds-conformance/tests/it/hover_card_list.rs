@@ -9,7 +9,7 @@ use ds::components::overlays::hover_card::target::{HoverTarget, TargetElement};
 use ds::prelude::*;
 use ds::stack::hover_hub::{HoverKey, HoverKind, use_hover_hub};
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use probe::rect;
 use std::time::Duration;
 

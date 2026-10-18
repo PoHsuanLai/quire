@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::style::space::frame_vars::FrameVars;
 use ds::style::space::presets::PRESETS;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,

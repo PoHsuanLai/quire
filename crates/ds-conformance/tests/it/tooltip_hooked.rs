@@ -10,7 +10,7 @@ use ds::host::measure::MountedRef;
 use ds::motion::hover_intent::HoverProfile;
 use ds::prelude::*;
 use ds::stack::hover_hub::HoverKey;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

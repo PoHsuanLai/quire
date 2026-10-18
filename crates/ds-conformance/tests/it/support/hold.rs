@@ -7,7 +7,7 @@ use std::time::Duration;
 
 use ds::base::machine::{Elapsed, Machine};
 use ds::base::time::stamp::{Ms, Stamp};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Hold {

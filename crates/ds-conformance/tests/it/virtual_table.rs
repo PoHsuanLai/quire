@@ -14,10 +14,7 @@ use ds::components::lists::table::model::TableColumn;
 use ds::components::lists::table::rules::{ColumnRules, HeaderRule};
 use ds::components::lists::virtual_table::{VirtualTable, row_pitch};
 use ds::prelude::*;
-use ds_harness::{
-    Clock, DocQuery, Driver, Harness, HarnessConfig, Input, PointerAction, PointerInput, Query,
-    Viewport,
-};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, PointerAction, PointerInput, Viewport};
 use std::cell::{Cell, RefCell};
 use std::collections::HashSet;
 

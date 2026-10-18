@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteRow};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::time::Duration;
 
 const WIDTH: u32 = 480;

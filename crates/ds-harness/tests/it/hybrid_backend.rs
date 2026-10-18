@@ -8,7 +8,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_blitz::AdapterPref;
-use ds_harness::{Backend, Driver, Harness, HarnessConfig, Input, Viewport};
+use ds_harness::{Backend, Harness, HarnessConfig, Input, Viewport};
 use std::time::{Duration, Instant};
 
 const SMALL: Viewport = Viewport {

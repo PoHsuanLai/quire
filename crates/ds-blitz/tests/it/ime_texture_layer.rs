@@ -10,7 +10,7 @@ use ds::host::probe::Probe;
 use ds::prelude::*;
 use ds::root::common::Common;
 use ds_blitz::TextureLayer;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use std::cell::RefCell;
 use std::rc::Rc;
 use std::time::Duration;

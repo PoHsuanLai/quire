@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds::host::gesture::{Gesture, WheelDelivery, use_gestures_with};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::RefCell;
 use std::time::Duration;
 

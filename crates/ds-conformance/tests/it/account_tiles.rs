@@ -11,7 +11,7 @@ use ds::components::content::image_source::ImageSource;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::prelude::*;
 use ds::style::tokens::hex::{Colour, Hex};
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use probe::rect;
 use std::time::Duration;
 

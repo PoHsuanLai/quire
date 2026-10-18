@@ -6,9 +6,7 @@ use dioxus::prelude::*;
 use ds::focus::request::use_focus_request;
 use ds::focus::soon::focus_soon;
 use ds::prelude::*;
-use ds_harness::{
-    Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Stepped, Viewport,
-};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Stepped, Viewport};
 use std::rc::Rc;
 use std::time::Duration;
 

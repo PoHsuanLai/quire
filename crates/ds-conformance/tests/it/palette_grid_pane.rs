@@ -11,9 +11,7 @@ use ds::components::menus::palette::palette_group::PaletteRow;
 use ds::components::menus::palette::palette_group::{PaletteGroup, PaletteGroups};
 use ds::host::caret::Caret;
 use ds::prelude::*;
-use ds_harness::{
-    ClassPresence, Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Viewport,
-};
+use ds_harness::{ClassPresence, Clock, FocusState, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

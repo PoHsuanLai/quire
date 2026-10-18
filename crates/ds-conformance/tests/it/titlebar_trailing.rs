@@ -7,7 +7,7 @@ use dioxus::prelude::*;
 use ds::prelude::*;
 use ds::window::host::use_window_host_provider;
 use ds::window::vocab::Maximized;
-use ds_harness::{Driver, Input, Query};
+use ds_harness::Input;
 use std::rc::Rc;
 
 #[allow(non_snake_case)]

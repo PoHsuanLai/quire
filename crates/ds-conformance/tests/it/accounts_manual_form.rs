@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use ds::prelude::*;
 use ds_harness::harness::settle_until;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use ds_shell::accounts::model::{Choice, FieldRole, FieldText, FormField, FormPart, Requirement};
 use ds_shell::prelude::*;
 use std::time::Duration;

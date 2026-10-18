@@ -33,7 +33,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-peer` | a deadline for every call to another process: `Deadline` (named waits: read, start, action, prompt), `within`, and the typed `NotAnswering` a screen shows as "X is not answering"; no runtime, no bus |
 | `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus`, `debug-probe` (a test build only: `QUIRE_DEBUG_PROBE=<dir>` makes each window write its controls by role and name with their boxes, `ds-blitz::probe`) |
-| `ds-harness` | dev-only test driver: `Driver`, `DocQuery`, `Harness`, snapshots, painters |
+| `ds-harness` | dev-only test driver: `Harness` with its `send` and query methods, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
 | `ds-gallery` | the visual reference binary: every component across theme, accent, motion, material |
 | `tools/icons` | app-icon post-process (binary) |
@@ -107,7 +107,7 @@ declarations and re-exports. Directories group a concept; role files follow `CON
 | `ds-settings` | `error` < `root` (`ConfigRoot`, `AppName`) < `lenient` < `damaged` (`DamagedFile`, `Saved`: a file that is there and unusable is kept) < `doc` (`SettingsDoc`, `Format`, `FileName`) < `preserve` (a TOML save merged into the parsed file) < `store` < `spaces_storage` < `watch` < `schema` < `appearance` (file, settings structs) < `portal` < `live` (feature `live`: `org.quire.SettingsModule1`) < `environment` (feature `dioxus`) < `icon_assets` < `units` |
 | `ds-settings-page` | `pair` (on/off words) < `control` (the control a kind gets), `words`, `edit` (`SettingEdit`, the value lookup), `groups` < `key_row`, `section` (`SectionRows`, `SchemaSection`) < `page` (`SettingsPage`) |
 | `ds-blitz` | `error`, `contexts`, `setup`, `document` (node ref, origin, wake) < `focus`, `measure`, `reveal`, `phase` (the frame phase: `Phase`, its book of watches and queued writes, the reads), `edit` (+ ime, tree, geometry), `file_drop`, `clipboard` (+ `read`: reads on a worker, with a wait and a size cap), `frames` < `host` (`BlitzHost`, `provide_host`) < `window` (build, place, platform, requests, hover, drop, shell), `window_scroll` (`WindowScroll`: winit's wheel and keys as `blitz_kit::scroll` inputs and as gestures, the fingers' glide for eased listeners, `ScrollHandle`), `window_fit` (the cap), `size_ledger`, `sized_window` < `window_sizer`, `screen_area` < `window_screen`, `startup_token`, `window_activate` (raising a window, with or without a token), `link_open` (a clicked link opened on a worker, failures reported, `mailto` without `attach`) < `xdg_activation` over `wayland_surface` (Linux; the one `unsafe`) < `app_life` (`LastWindowClosed`, the pure `Lifecycle`), `app_handle` (`AppHandle`, `AppHold`) < `launch`, `open_window` < `texture_layer` (model, fit, convert, gpu, widget, view) < features `pdf`, `print`, `spell`, `menus` (`service` over `wire`, over the pure `ds::menus::export`) |
-| `ds-harness` | `input` (`Input` and its parts) < `driver` (`Driver`, `DocQuery`, `Query`) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
+| `ds-harness` | `input` (`Input` and its parts) < `query` (the `Harness` read methods) < `headless` (document, painter, backend, gpu paint, clock, settle) < `harness` (`Harness`) < `snapshot`; `inset` (the content inset check: `scene` < `read`, `measure`, `policy`, `offence`) |
 | `ds-conformance` | `tests/<component>.rs`, `tests/support/` |
 | `ds-gallery` | `axes`, `args`, `page`, `registry`, `pages/<group>/<component>.rs`, `sheet`, `snapshot`, `app` |
 
@@ -325,7 +325,7 @@ The single place a concept lives. Extend it; never write a second one.
 | Settings schema | `ds-settings::schema` (derived) |
 | Live (D-Bus) settings modules: schema, skeleton, proxy | `ds-settings::live` (feature `live`; the daemon owns the state) |
 | Desktop preferences (portal) | `ds-settings::portal::SystemPrefsSource` |
-| Test driver, document queries | `ds-harness::{Driver, DocQuery, Query}` |
+| Test driver, document queries | `ds-harness::Harness` |
 | SSR rendering and golden files in tests | `crates/ds/tests/it/support/` (`golden.rs`, `scoped.rs`); `dioxus_ssr` |
 | Clipboard | `ds-blitz::clipboard::Clipboard` |
 | A GPU texture inside the document, the window's wgpu device, CPU pixels uploaded to it | `ds-blitz::texture_layer::{TextureLayer, use_gpu, Gpu, TextureHandle}`; headless device `ds-harness::Harness::gpu` |
@@ -364,7 +364,6 @@ The single place a concept lives. Extend it; never write a second one.
 | `AppCommand` | `ds-core` | each app's command type (what its menu items yield and its shortcuts fire) | an app with menus or shortcuts | never |
 | `Spawner` | `ds-core` | `ds_blitz::TokioSpawner`, a test's inline spawner | a new runtime | never |
 | `Clipboard` | `ds-blitz` | `System`, `Memory` | never | never |
-| `Driver`, `DocQuery` | `ds-harness` | `Harness`; later shell-host's headless surface | a new driver | never |
 | `SizedWindow` | `ds-blitz` | `WinitSized` (a winit window), the harness's `FakeWindow` | a host that is not winit | never |
 
 Exact signatures (bodies omitted; `...` marks provided methods):
@@ -568,23 +567,19 @@ pub trait Clipboard {
 }
 
 // ds-harness
-pub trait Driver {
-    fn send(&mut self, input: Input);
-    fn advance(&mut self, by: std::time::Duration);
-    fn render(&mut self) -> Result<image::RgbaImage, HarnessError>;
-}
-pub trait DocQuery {
-    fn with_doc<T>(&self, read: impl FnOnce(&blitz_dom::BaseDocument) -> T) -> T;
-}
-pub trait Query: DocQuery {   // blanket-implemented extension trait
-    fn rect(&self, selector: &str) -> Option<Rect>;
-    fn text_of(&self, selector: &str) -> Option<String>;
-    fn attr(&self, selector: &str, name: &str) -> Option<String>;
-    fn count(&self, selector: &str) -> usize;
-    fn has_class(&self, selector: &str, class: &str) -> ClassPresence;
-    fn ink_of(&self, selector: &str) -> Option<Srgba>;
-    fn fill_of(&self, selector: &str, part: Part) -> Option<Srgba>;
-    fn focus_of(&self, selector: &str) -> FocusState;
+impl Harness {
+    pub fn send(&mut self, input: Input);
+    pub fn advance(&mut self, by: std::time::Duration);
+    pub fn render(&mut self) -> Result<image::RgbaImage, HarnessError>;
+    pub fn with_doc<T>(&self, read: impl FnOnce(&blitz_dom::BaseDocument) -> T) -> T;
+    pub fn rect(&self, selector: &str) -> Option<Rect>;
+    pub fn text_of(&self, selector: &str) -> Option<String>;
+    pub fn attr(&self, selector: &str, name: &str) -> Option<String>;
+    pub fn count(&self, selector: &str) -> usize;
+    pub fn has_class(&self, selector: &str, class: &str) -> ClassPresence;
+    pub fn ink_of(&self, selector: &str) -> Option<Srgba>;
+    pub fn fill_of(&self, selector: &str, part: Part) -> Option<Srgba>;
+    pub fn focus_of(&self, selector: &str) -> FocusState;
 }
 pub enum Input {
     Pointer(PointerInput), Key(KeyInput), Wheel { at: Point, dx: Px, dy: Px },
@@ -800,14 +795,14 @@ are reached as `ds::components::app::X`, not through the prelude.
 ### Add a host input (harness)
 
 1. A variant or field in `ds-harness/src/input.rs`; the delivery in `headless/`; the assertion
-   helper as a `Query` method with a bool-free return.
+   helper as a `Harness` query method with a bool-free return.
 2. A test in `ds-harness/tests/<input>.rs` that shows the input reaches the document.
 
 ### Add a conformance test
 
 1. `crates/ds-conformance/tests/<component>.rs`, named for the component (never a work item).
-2. Build `Harness::new(app, viewport_or_config)`, drive with `Driver::send`, read with
-   `Query`; the assertion names the difference the action makes (`CONVENTIONS.md` §8).
+2. Build `Harness::new(app, viewport_or_config)`, drive with `Harness::send`, read with
+   its query methods; the assertion names the difference the action makes (`CONVENTIONS.md` §8).
 3. Timing on the wall clock uses `settle_until`; virtual-clock tests assert the boundary exactly.
 
 ### Add a gallery page

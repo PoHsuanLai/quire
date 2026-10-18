@@ -6,7 +6,7 @@
 
 use dioxus::prelude::*;
 use ds_blitz::{OpenWindowError, WindowSize, WindowSpec, open_window, use_window_handle};
-use ds_harness::{Clock, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 200,

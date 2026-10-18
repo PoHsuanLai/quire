@@ -7,7 +7,7 @@ use ds::base::geometry::scroll::Scroll;
 use ds::components::controls::scroller::handle::use_scroller;
 use ds::components::controls::scroller::view::Scroller;
 use ds::prelude::*;
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 
 const VIEW: Viewport = Viewport {
     width: 400,

@@ -8,7 +8,7 @@ use dioxus::prelude::*;
 use ds::components::menus::pop_up_button::{PopUpButton, PopUpKind};
 use ds::host::measure::Anchor;
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Viewport};
 use probe::{keep, rect};
 use std::time::Duration;
 

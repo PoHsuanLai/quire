@@ -9,9 +9,7 @@ use dioxus::prelude::*;
 use ds::focus::select::Select;
 use ds::focus::selector::focus_by_selector;
 use ds::prelude::*;
-use ds_harness::{
-    Clock, Driver, FocusState, Harness, HarnessConfig, Input, Query, Stepped, Viewport,
-};
+use ds_harness::{Clock, FocusState, Harness, HarnessConfig, Input, Stepped, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

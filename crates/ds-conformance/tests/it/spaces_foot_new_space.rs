@@ -4,7 +4,7 @@
 use dioxus::prelude::*;
 use ds::components::app::spaces::{Spaces, SpacesFoot, Switched, use_spaces};
 use ds::prelude::*;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Part, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Part, Viewport};
 use std::time::Duration;
 
 const VIEW: Viewport = Viewport {

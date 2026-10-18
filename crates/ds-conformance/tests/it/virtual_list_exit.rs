@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::lists::virtual_list::{Change, RowHeight, VirtualList};
 use ds::motion::presence::Exit;
 use ds::prelude::*;
-use ds_harness::{Clock, DocQuery, Driver, Harness, HarnessConfig, Input, Query, Viewport};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::cell::Cell;
 use std::time::Duration;
 

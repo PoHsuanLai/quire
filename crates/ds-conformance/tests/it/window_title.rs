@@ -7,7 +7,7 @@ use ds::prelude::*;
 use ds::window::host::{use_window_host, use_window_host_provider, use_window_title};
 use ds::window::icon::WindowIcon;
 use ds::window::vocab::Maximized;
-use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, WindowHosting};
+use ds_harness::{Clock, Harness, HarnessConfig, Input, WindowHosting};
 use std::rc::Rc;
 
 #[allow(non_snake_case)]
