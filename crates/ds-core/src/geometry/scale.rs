@@ -7,8 +7,10 @@
 /// Device pixels per logical pixel, in 120ths: `Scale(120)` is 1x, `Scale(180)` is 1.5x.
 ///
 /// 120ths because that is the wire unit of `wp_fractional_scale_v1.preferred_scale`, and the
-/// `Scale(u32)` shell-host already names: a host passes its value through unchanged, and every
-/// scale a compositor can announce is exact here.
+/// `blitz_kit::units::Scale120(u32)` that shell-host and the kit's pixel snap share: a host
+/// passes its value through unchanged, and every scale a compositor can announce is exact here.
+/// It is a second type on purpose: this crate is the pure base and must not depend on Blitz, and
+/// the kit sits below quire, so neither can name the other's.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub struct Scale(pub u32);
 
