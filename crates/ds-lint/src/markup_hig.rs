@@ -108,7 +108,7 @@ impl Scan<'_> {
             cursor = self.markup_at(start);
         }
         while let Some(element) = self.open.pop() {
-            self.judge(element);
+            self.judge(&element);
         }
     }
 
@@ -172,7 +172,7 @@ impl Scan<'_> {
             named,
         };
         if VOID.contains(&element.name.as_str()) || tag.trim_end_matches('>').ends_with('/') {
-            self.judge(element);
+            self.judge(&element);
         } else {
             self.open.push(element);
         }
