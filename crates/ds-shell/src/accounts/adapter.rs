@@ -7,7 +7,7 @@
 //! it, so an entry wires no `onsubmit` of its own and the step's default action runs once.
 
 use super::hidden::Hidden;
-use super::model::{Choice, CopyState, FieldText, PickerChoice};
+use super::model::{Attempt, Choice, CopyState, FieldText, PickerChoice};
 use dioxus::prelude::*;
 use ds::components::content::avatar::AvatarSize;
 use ds::components::content::icon_source::{ExternalIcon, IconSource};
@@ -59,7 +59,7 @@ pub(crate) struct Rejection {
     /// What is wrong.
     pub(crate) message: String,
     /// The submit it answers.
-    pub(crate) attempt: u32,
+    pub(crate) attempt: Attempt,
 }
 
 /// A text entry the host owns: `text` is what it shows, `oninput` hears each change, and the
@@ -95,7 +95,7 @@ pub(crate) fn Entry(
     let validity = rejection.map_or(Validity::Valid, |rejection| {
         Validity::Invalid(Invalid {
             message: rejection.message.into(),
-            stamp: EventStamp(rejection.attempt),
+            stamp: EventStamp(rejection.attempt.0),
         })
     });
     let focus = match landing {
