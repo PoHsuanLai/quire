@@ -1,4 +1,4 @@
-//! The palette machine, over a row type that is not `Copy`.
+//! The palette machine, over a list of rows it only counts.
 
 use super::model::{PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState};
 use crate::machine::Machine;
@@ -6,21 +6,10 @@ use crate::text::typed::TypedText;
 use crate::time::stamp::Stamp;
 use crate::vocab::ShortcutKey;
 
-/// A row type that is not `Copy`, as a launcher's or a new-tab bar's rows are not.
-#[derive(Debug, Clone, PartialEq, Eq)]
-enum Row {
-    Export,
-    Rotate,
-    Find,
-    Typed(String),
-}
+type Palette = PaletteState;
 
-type Palette = PaletteState<Row>;
-
-const EXPORT: Row = Row::Export;
-const ROTATE: Row = Row::Rotate;
-const FIND: Row = Row::Find;
-const ROWS: &[Row] = &[EXPORT, ROTATE, FIND];
+/// A list of three rows.
+const ROWS: usize = 3;
 
 const fn open(query: &'static str, row: usize) -> Palette {
     Palette::open(TypedText::from_static(query), PaletteIndex(row))
@@ -29,11 +18,11 @@ const fn open(query: &'static str, row: usize) -> Palette {
 /// Name, ranked rows, state before, input, state after, outputs.
 type Case = (
     &'static str,
-    &'static [Row],
+    usize,
     Palette,
     PaletteIn,
     Palette,
-    &'static [PaletteOut<Row>],
+    &'static [PaletteOut],
 );
 
 const CASES: &[Case] = &[
@@ -95,7 +84,7 @@ const CASES: &[Case] = &[
     ),
     (
         "moving over no rows stays on row zero",
-        &[],
+        0,
         open("zzz", 0),
         PaletteIn::Move(PaletteMove::Down),
         open("zzz", 0),
@@ -103,7 +92,7 @@ const CASES: &[Case] = &[
     ),
     (
         "a shorter list pulls a stale selection back in range",
-        &[EXPORT],
+        1,
         open("e", 2),
         PaletteIn::Move(PaletteMove::Up),
         open("e", 0),
@@ -115,11 +104,11 @@ const CASES: &[Case] = &[
         open("", 1),
         PaletteIn::Enter,
         Palette::Closed,
-        &[PaletteOut::Run(Row::Rotate), PaletteOut::Closed],
+        &[PaletteOut::Run(PaletteIndex(1)), PaletteOut::Closed],
     ),
     (
         "enter with no rows stays open",
-        &[],
+        0,
         open("zzz", 0),
         PaletteIn::Enter,
         open("zzz", 0),
@@ -131,7 +120,7 @@ const CASES: &[Case] = &[
         open("", 0),
         PaletteIn::Pick(PaletteIndex(2)),
         Palette::Closed,
-        &[PaletteOut::Run(Row::Find), PaletteOut::Closed],
+        &[PaletteOut::Run(PaletteIndex(2)), PaletteOut::Closed],
     ),
     (
         "a click past the rows is nothing",
@@ -170,9 +159,7 @@ const CASES: &[Case] = &[
 #[test]
 fn every_row_of_the_table_steps_as_written() {
     for (name, rows, from, input, state, outs) in CASES {
-        let params = PaletteParams {
-            rows: rows.to_vec(),
-        };
+        let params = PaletteParams { rows: *rows };
         let (next, out) = from.clone().step(input.clone(), Stamp(0), &params, &());
         assert_eq!(next, *state, "{name}: state");
         assert_eq!(out.as_slice(), *outs, "{name}: outputs");
@@ -215,32 +202,15 @@ fn keys_mean_moves_enter_and_escape() {
 #[test]
 fn a_refresh_pulls_a_stale_selection_into_range_and_leaves_a_good_one() {
     // name, rows now, state before, state after
-    let cases: &[(&str, &[Row], Palette, Palette)] = &[
-        ("past the end", &[EXPORT], open("e", 2), open("e", 0)),
-        (
-            "onto the last row",
-            &[EXPORT, ROTATE],
-            open("e", 5),
-            open("e", 1),
-        ),
-        (
-            "in range stays",
-            &[EXPORT, ROTATE, FIND],
-            open("e", 1),
-            open("e", 1),
-        ),
-        ("no rows", &[], open("e", 3), open("e", 0)),
-        (
-            "closed stays closed",
-            &[EXPORT],
-            Palette::Closed,
-            Palette::Closed,
-        ),
+    let cases: &[(&str, usize, Palette, Palette)] = &[
+        ("past the end", 1, open("e", 2), open("e", 0)),
+        ("onto the last row", 2, open("e", 5), open("e", 1)),
+        ("in range stays", 3, open("e", 1), open("e", 1)),
+        ("no rows", 0, open("e", 3), open("e", 0)),
+        ("closed stays closed", 1, Palette::Closed, Palette::Closed),
     ];
     for (name, rows, from, want) in cases {
-        let params = PaletteParams {
-            rows: rows.to_vec(),
-        };
+        let params = PaletteParams { rows: *rows };
         let (next, out) = from
             .clone()
             .step(PaletteIn::Refreshed, Stamp(0), &params, &());
@@ -251,12 +221,8 @@ fn a_refresh_pulls_a_stale_selection_into_range_and_leaves_a_good_one() {
 
 #[test]
 fn rows_that_change_while_open_apply_from_the_next_step() {
-    let first = PaletteParams {
-        rows: vec![Row::Typed("a".to_owned())],
-    };
-    let later = PaletteParams {
-        rows: vec![Row::Typed("a".to_owned()), Row::Typed("b".to_owned())],
-    };
+    let first = PaletteParams { rows: 1 };
+    let later = PaletteParams { rows: 2 };
     let state = open("q", 0);
     let (state, _) = state.step(PaletteIn::Move(PaletteMove::Down), Stamp(0), &first, &());
     assert_eq!(state, open("q", 0), "one row: down stays put");
@@ -270,25 +236,19 @@ fn rows_that_change_while_open_apply_from_the_next_step() {
     assert_eq!(state, Palette::Closed);
     assert_eq!(
         out,
-        vec![
-            PaletteOut::Run(Row::Typed("b".to_owned())),
-            PaletteOut::Closed
-        ]
+        vec![PaletteOut::Run(PaletteIndex(1)), PaletteOut::Closed]
     );
 }
 
 #[test]
-fn rows_keep_the_order_they_are_given() {
-    // Fixed ranking: the highlight walks the rows as listed, whatever they are.
-    let params = PaletteParams {
-        rows: vec![FIND, EXPORT, ROTATE],
-    };
+fn the_highlight_walks_the_rows_in_order() {
+    let params = PaletteParams { rows: ROWS };
     let mut state = open("", 0);
     let mut seen = vec![];
     for step in 0..3 {
         let (picked, out) = state.clone().step(PaletteIn::Enter, Stamp(0), &params, &());
         assert_eq!(picked, Palette::Closed);
-        seen.push(out[0].clone());
+        seen.push(out[0]);
         let (next, _) = state.step(
             PaletteIn::Move(PaletteMove::Down),
             Stamp(step),
@@ -300,9 +260,9 @@ fn rows_keep_the_order_they_are_given() {
     assert_eq!(
         seen,
         vec![
-            PaletteOut::Run(FIND),
-            PaletteOut::Run(EXPORT),
-            PaletteOut::Run(ROTATE)
+            PaletteOut::Run(PaletteIndex(0)),
+            PaletteOut::Run(PaletteIndex(1)),
+            PaletteOut::Run(PaletteIndex(2))
         ]
     );
 }

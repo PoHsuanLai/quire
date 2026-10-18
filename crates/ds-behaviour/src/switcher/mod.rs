@@ -3,9 +3,10 @@
 //! panel appears; Tab, Grave and the arrows move the selection; Q quits and H hides the selected
 //! app; Down or Up opens App Exposé for it; Escape cancels; the chord's release activates.
 //!
-//! Generic over the app key `K`, so the compositor runs it over its own app ids and the shell
-//! over its launcher's. The caller owns the chord's grab, the release and the panel's drawing; it
-//! provides the MRU app list (the current app first) as the machine's context at every step.
+//! The machine is the [`Phase`]. It names apps by index into the MRU list (the current app first),
+//! so the compositor runs it over its own app ids and the shell over its launcher's. The caller
+//! owns the chord's grab, the release and the panel's drawing; it provides the list's length as
+//! the machine's context at every step and maps the indexes in the outputs back through its list.
 //! The panel's show delay is a deadline in the `Armed` phase, so the machine's wake is its one
 //! timer.
 
@@ -14,4 +15,4 @@ mod step;
 #[cfg(test)]
 mod tests;
 
-pub use model::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};
+pub use model::{Phase, SwIn, SwKey, SwOut, SwitcherParams};

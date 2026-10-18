@@ -1,6 +1,5 @@
 //! The switcher's state, inputs, outputs and timing.
 
-use std::marker::PhantomData;
 use std::time::Duration;
 
 use ds_core::machine::Elapsed;
@@ -8,7 +7,10 @@ use ds_core::time::stamp::Stamp;
 
 use crate::dir::Dir;
 
-/// The switcher's phase. `sel` indexes the MRU app list the caller provides at every step.
+/// The switcher machine: its phase. `sel` indexes the MRU app list the caller keeps; the machine
+/// sees only how many apps it holds (the step's context, the current app first) and answers with
+/// indexes into it, so the compositor runs it over its own app ids and the shell over its
+/// launcher's.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Phase {
     /// Nothing held.
@@ -26,60 +28,6 @@ pub enum Phase {
         /// The highlighted app.
         sel: usize,
     },
-}
-
-/// The switcher machine over the caller's app key `K`: its [`Phase`]. `K` appears only in the
-/// outputs and in the app list the caller provides as the step's context (the current app first),
-/// so the compositor runs it over its own app ids and the shell over its launcher's.
-pub struct Switcher<K> {
-    pub(crate) phase: Phase,
-    keys: PhantomData<fn() -> K>,
-}
-
-impl<K> Switcher<K> {
-    /// A switcher in `phase`.
-    pub fn in_phase(phase: Phase) -> Self {
-        Switcher {
-            phase,
-            keys: PhantomData,
-        }
-    }
-
-    /// A switcher with nothing held.
-    pub fn hidden() -> Self {
-        Switcher::in_phase(Phase::Hidden)
-    }
-
-    /// Where it is.
-    pub fn phase(&self) -> Phase {
-        self.phase
-    }
-}
-
-impl<K> Clone for Switcher<K> {
-    fn clone(&self) -> Self {
-        Switcher::in_phase(self.phase)
-    }
-}
-
-impl<K> PartialEq for Switcher<K> {
-    fn eq(&self, other: &Self) -> bool {
-        self.phase == other.phase
-    }
-}
-
-impl<K> Eq for Switcher<K> {}
-
-impl<K> std::fmt::Debug for Switcher<K> {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Switcher").field(&self.phase).finish()
-    }
-}
-
-impl<K> Default for Switcher<K> {
-    fn default() -> Self {
-        Switcher::hidden()
-    }
 }
 
 /// A key pressed while the switcher is up.
@@ -131,9 +79,9 @@ impl From<Elapsed> for SwIn {
     }
 }
 
-/// One thing the caller must do. `K` is the caller's app key.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub enum SwOut<K> {
+/// One thing the caller must do. An app is named by its index in the MRU list the step ran over.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SwOut {
     /// Show the panel.
     Show,
     /// Hide the panel.
@@ -141,13 +89,13 @@ pub enum SwOut<K> {
     /// Highlight the app at this index.
     Select(usize),
     /// Activate the app (unhide it, or ask a windowless app to reopen).
-    Activate(K),
+    Activate(usize),
     /// Quit the app.
-    Quit(K),
+    Quit(usize),
     /// Hide the app.
-    HideApp(K),
+    HideApp(usize),
     /// Open App Exposé for the app.
-    Expose(K),
+    Expose(usize),
 }
 
 /// The switcher's timing (`switcher.show_delay_ms`).

@@ -5,15 +5,15 @@ use crate::machine::Machine;
 use crate::text::typed::TypedText;
 use crate::time::stamp::Stamp;
 
-type Step<T> = (PaletteState<T>, Vec<PaletteOut<T>>);
+type Step = (PaletteState, Vec<PaletteOut>);
 
-impl<T: Clone + PartialEq + 'static> Machine for PaletteState<T> {
+impl Machine for PaletteState {
     type In = PaletteIn;
-    type Out = PaletteOut<T>;
-    type Params = PaletteParams<T>;
+    type Out = PaletteOut;
+    type Params = PaletteParams;
     type Ctx = ();
 
-    fn step(self, input: PaletteIn, _at: Stamp, params: &PaletteParams<T>, _cx: &()) -> Step<T> {
+    fn step(self, input: PaletteIn, _at: Stamp, params: &PaletteParams, _cx: &()) -> Step {
         match self {
             PaletteState::Closed => closed(&input),
             PaletteState::Open {
@@ -27,7 +27,7 @@ impl<T: Clone + PartialEq + 'static> Machine for PaletteState<T> {
     }
 }
 
-fn closed<T>(input: &PaletteIn) -> Step<T> {
+fn closed(input: &PaletteIn) -> Step {
     match input {
         PaletteIn::Open => {
             let state = PaletteState::open(TypedText::EMPTY, PaletteIndex(0));
@@ -43,21 +43,21 @@ fn closed<T>(input: &PaletteIn) -> Step<T> {
     }
 }
 
-fn open<T: Clone>(
+fn open(
     query: TypedText,
     selection: PaletteIndex,
     input: PaletteIn,
-    params: &PaletteParams<T>,
-) -> Step<T> {
+    params: &PaletteParams,
+) -> Step {
     let this = PaletteState::open(query.clone(), selection);
     match input {
         PaletteIn::Typed(text) => (PaletteState::open(text, PaletteIndex(0)), vec![]),
         PaletteIn::Move(movement) => {
-            let selection = moved(selection, movement, params.rows.len());
+            let selection = moved(selection, movement, params.rows);
             (PaletteState::open(query, selection), vec![])
         }
         PaletteIn::Refreshed => {
-            let selection = in_range(selection, params.rows.len());
+            let selection = in_range(selection, params.rows);
             (PaletteState::open(query, selection), vec![])
         }
         PaletteIn::Enter => run(this, selection, params),
@@ -67,14 +67,15 @@ fn open<T: Clone>(
     }
 }
 
-/// `row`'s value, with the palette closed after it; nothing when there is no such row.
-fn run<T: Clone>(this: PaletteState<T>, row: PaletteIndex, params: &PaletteParams<T>) -> Step<T> {
-    match params.rows.get(row.0) {
-        Some(value) => (
+/// `row` run, with the palette closed after it; nothing when there is no such row.
+fn run(this: PaletteState, row: PaletteIndex, params: &PaletteParams) -> Step {
+    if row.0 < params.rows {
+        (
             PaletteState::Closed,
-            vec![PaletteOut::Run(value.clone()), PaletteOut::Closed],
-        ),
-        None => (this, vec![]),
+            vec![PaletteOut::Run(row), PaletteOut::Closed],
+        )
+    } else {
+        (this, vec![])
     }
 }
 

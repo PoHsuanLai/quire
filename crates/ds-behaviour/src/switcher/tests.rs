@@ -1,21 +1,22 @@
 //! The switcher's tables (design/13 §13.4 acceptance 8, the quick-tap rule, App Exposé from 03
-//! §1.3). The app key is a plain string here; the machine never looks inside it.
+//! §1.3). The machine sees four apps by index: files 0, firefox 1, foot 2, mail 3.
 
 use std::time::Duration;
 
 use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
-use super::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};
+use super::{Phase, SwIn, SwKey, SwOut, SwitcherParams};
 use crate::dir::Dir;
 
 /// One scripted input sequence: `(ms, input)` pairs.
 type Script = Vec<(u64, SwIn)>;
 
 /// Name, script, final state, every output in order.
-type Case = (&'static str, Script, Phase, Vec<SwOut<&'static str>>);
+type Case = (&'static str, Script, Phase, Vec<SwOut>);
 
-const APPS: [&str; 4] = ["files", "firefox", "foot", "mail"];
+/// How many apps the MRU list holds.
+const APPS: usize = 4;
 
 fn params() -> SwitcherParams {
     SwitcherParams {
@@ -23,21 +24,17 @@ fn params() -> SwitcherParams {
     }
 }
 
-fn apps() -> Vec<&'static str> {
-    APPS.to_vec()
-}
-
-fn run(inputs: &[(u64, SwIn)]) -> (Phase, Vec<SwOut<&'static str>>) {
+fn run(inputs: &[(u64, SwIn)]) -> (Phase, Vec<SwOut>) {
     let p = params();
-    let (switcher, outs) = inputs.iter().fold(
-        (Switcher::hidden(), Vec::new()),
-        |(s, mut all), &(ms, input)| {
-            let (s, out) = s.step(input, Stamp(ms), &p, &apps());
-            all.extend(out);
-            (s, all)
-        },
-    );
-    (switcher.phase(), outs)
+    let (switcher, outs) =
+        inputs
+            .iter()
+            .fold((Phase::Hidden, Vec::new()), |(s, mut all), &(ms, input)| {
+                let (s, out) = s.step(input, Stamp(ms), &p, &APPS);
+                all.extend(out);
+                (s, all)
+            });
+    (switcher, outs)
 }
 
 fn check(cases: Vec<Case>) {
@@ -54,7 +51,7 @@ fn design_13_acceptance_8() {
             "a quick tap activates the previous app with no UI",
             vec![chord, (80, SwIn::ModifierReleased)],
             Phase::Hidden,
-            vec![SwOut::Activate("firefox")],
+            vec![SwOut::Activate(1)],
         ),
         (
             "held: the panel appears at 150 ms with index 1",
@@ -78,7 +75,7 @@ fn design_13_acceptance_8() {
                 SwOut::Select(2),
                 SwOut::Select(3),
                 SwOut::Hide,
-                SwOut::Activate("mail"),
+                SwOut::Activate(3),
             ],
         ),
         (
@@ -91,7 +88,7 @@ fn design_13_acceptance_8() {
             "Q quits the selection and stays",
             vec![chord, (150, SwIn::Elapsed), (200, SwIn::Key(SwKey::Q))],
             Phase::Shown { sel: 1 },
-            vec![SwOut::Show, SwOut::Select(1), SwOut::Quit("firefox")],
+            vec![SwOut::Show, SwOut::Select(1), SwOut::Quit(1)],
         ),
         (
             "grave steps back and wraps",
@@ -117,7 +114,7 @@ fn design_13_acceptance_8() {
                 SwOut::Show,
                 SwOut::Select(1),
                 SwOut::Hide,
-                SwOut::Activate("foot"),
+                SwOut::Activate(2),
             ],
         ),
         (
@@ -127,7 +124,7 @@ fn design_13_acceptance_8() {
                 (50, SwIn::ModifierReleased),
             ],
             Phase::Hidden,
-            vec![SwOut::Activate("mail")],
+            vec![SwOut::Activate(3)],
         ),
     ]);
 }
@@ -142,7 +139,7 @@ fn quick_taps_whose_release_is_not_seen() {
             "a second chord inside the delay switches to the previous app, no UI",
             vec![chord, (90, SwIn::Chord(Dir::Next))],
             Phase::Hidden,
-            vec![SwOut::Activate("firefox")],
+            vec![SwOut::Activate(1)],
         ),
         (
             "a second previous chord inside the delay switches to what the first chose",
@@ -151,7 +148,7 @@ fn quick_taps_whose_release_is_not_seen() {
                 (90, SwIn::Chord(Dir::Previous)),
             ],
             Phase::Hidden,
-            vec![SwOut::Activate("mail")],
+            vec![SwOut::Activate(3)],
         ),
         (
             "a second chord after the delay, before its tick, steps",
@@ -167,7 +164,7 @@ fn quick_taps_whose_release_is_not_seen() {
                 (80, SwIn::ModifierReleased),
             ],
             Phase::Hidden,
-            vec![SwOut::Activate("foot")],
+            vec![SwOut::Activate(2)],
         ),
         (
             "Q while armed does nothing",
@@ -194,7 +191,7 @@ fn quick_taps_whose_release_is_not_seen() {
             vec![
                 SwOut::Show,
                 SwOut::Select(1),
-                SwOut::HideApp("firefox"),
+                SwOut::HideApp(1),
                 SwOut::Select(3),
             ],
         ),
@@ -210,12 +207,7 @@ fn down_or_up_opens_app_expose_for_the_selection() {
             "Down while shown hides the panel and exposes the selection",
             vec![chord, (150, SwIn::Elapsed), (200, SwIn::Key(SwKey::Down))],
             Phase::Hidden,
-            vec![
-                SwOut::Show,
-                SwOut::Select(1),
-                SwOut::Hide,
-                SwOut::Expose("firefox"),
-            ],
+            vec![SwOut::Show, SwOut::Select(1), SwOut::Hide, SwOut::Expose(1)],
         ),
         (
             "Up after a Tab exposes the app the Tab selected",
@@ -231,7 +223,7 @@ fn down_or_up_opens_app_expose_for_the_selection() {
                 SwOut::Select(1),
                 SwOut::Select(2),
                 SwOut::Hide,
-                SwOut::Expose("foot"),
+                SwOut::Expose(2),
             ],
         ),
         (
@@ -242,40 +234,34 @@ fn down_or_up_opens_app_expose_for_the_selection() {
                 (80, SwIn::ModifierReleased),
             ],
             Phase::Hidden,
-            vec![SwOut::Activate("firefox")],
+            vec![SwOut::Activate(1)],
         ),
     ]);
 }
 
-/// One step from `phase` over `apps`, as the phase it leaves and what it wants.
-fn once(
-    phase: Phase,
-    input: SwIn,
-    at: u64,
-    apps: &[&'static str],
-) -> (Phase, Vec<SwOut<&'static str>>) {
-    let (next, outs) = Switcher::in_phase(phase).step(input, Stamp(at), &params(), &apps.to_vec());
-    (next.phase(), outs)
+/// One step from `phase` over `apps` apps, as the phase it leaves and what it wants.
+fn once(phase: Phase, input: SwIn, at: u64, apps: usize) -> (Phase, Vec<SwOut>) {
+    phase.step(input, Stamp(at), &params(), &apps)
 }
 
 #[test]
 fn no_apps_is_no_switcher() {
     assert_eq!(
-        once(Phase::Hidden, SwIn::Chord(Dir::Next), 0, &[]),
+        once(Phase::Hidden, SwIn::Chord(Dir::Next), 0, 0),
         (Phase::Hidden, vec![])
     );
     assert_eq!(
-        once(Phase::Shown { sel: 2 }, SwIn::Elapsed, 0, &[]),
+        once(Phase::Shown { sel: 2 }, SwIn::Elapsed, 0, 0),
         (Phase::Hidden, vec![SwOut::Hide])
     );
 }
 
 #[test]
 fn a_selection_past_a_shrunk_list_falls_back_to_the_last_app() {
-    let two = &APPS[..2];
+    let two = 2;
     assert_eq!(
         once(Phase::Shown { sel: 3 }, SwIn::Key(SwKey::Q), 0, two),
-        (Phase::Shown { sel: 1 }, vec![SwOut::Quit("firefox")])
+        (Phase::Shown { sel: 1 }, vec![SwOut::Quit(1)])
     );
     let armed = Phase::Armed {
         until: Stamp(150),
@@ -283,16 +269,16 @@ fn a_selection_past_a_shrunk_list_falls_back_to_the_last_app() {
     };
     assert_eq!(
         once(armed, SwIn::ModifierReleased, 50, two),
-        (Phase::Hidden, vec![SwOut::Activate("firefox")])
+        (Phase::Hidden, vec![SwOut::Activate(1)])
     );
 }
 
 #[test]
 fn only_an_armed_switcher_wakes_and_at_the_end_of_the_show_delay() {
     let p = params();
-    let wake = |phase| Switcher::<&str>::in_phase(phase).wake();
+    let wake = |phase: Phase| phase.wake();
     assert_eq!(wake(Phase::Hidden), None);
     assert_eq!(wake(Phase::Shown { sel: 1 }), None);
-    let (armed, _) = Switcher::hidden().step(SwIn::Chord(Dir::Next), Stamp(40), &p, &apps());
+    let (armed, _) = Phase::Hidden.step(SwIn::Chord(Dir::Next), Stamp(40), &p, &APPS);
     assert_eq!(armed.wake(), Some(Stamp(190)));
 }
