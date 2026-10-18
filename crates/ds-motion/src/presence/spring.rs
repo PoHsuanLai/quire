@@ -30,12 +30,16 @@ const SHOWING_PX: f32 = 40.0;
 /// Where a surface is in its life.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Stage {
-    /// Shown: entering until its entrance settles, then at rest.
+    /// Shown on mount: its entrance keyframe plays, then it is at rest.
+    Arrival,
+    /// Shown, driven by the spring: entering until the spring settles, then at rest.
     Up,
     /// Hidden, on its way out.
     Leaving,
-    /// Hidden, and its exit has come to rest (or it mounted hidden): nothing drawn.
+    /// Hidden, and its exit has come to rest: nothing drawn.
     Gone,
+    /// Mounted hidden, no hand has touched it yet: nothing drawn, no spring drive.
+    Unmounted,
 }
 
 /// What one render's `shown` does to a surface at `stage`.
@@ -49,21 +53,13 @@ pub enum Step {
     Leave,
 }
 
-/// What moves the surface now.
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Drive {
-    /// Its first entrance, the keyframe in its stylesheet.
-    Keyframe,
-    /// The spring, from its first hide on.
-    Spring,
-}
-
 /// The step from `stage` given the caller's `shown`.
 pub(crate) fn step(stage: Stage, shown: Shown) -> Step {
     match (stage, shown) {
-        (Stage::Leaving | Stage::Gone, Shown::Visible) => Step::Enter,
-        (Stage::Up, Shown::Hidden) => Step::Leave,
-        (Stage::Up, Shown::Visible) | (Stage::Leaving | Stage::Gone, Shown::Hidden) => Step::Stay,
+        (Stage::Leaving | Stage::Gone | Stage::Unmounted, Shown::Visible) => Step::Enter,
+        (Stage::Arrival | Stage::Up, Shown::Hidden) => Step::Leave,
+        (Stage::Arrival | Stage::Up, Shown::Visible)
+        | (Stage::Leaving | Stage::Gone | Stage::Unmounted, Shown::Hidden) => Step::Stay,
     }
 }
 
@@ -79,7 +75,6 @@ fn place(shown: Shown) -> f32 {
 #[derive(Clone, Copy, Debug)]
 pub struct SpringPresence {
     stage: CopyValue<Stage>,
-    drive: CopyValue<Drive>,
     entrance: MotionTimer,
     spring: SpringMotion,
     /// What this render's `shown` changed, for the caller to act on the layer stack.
@@ -89,24 +84,24 @@ pub struct SpringPresence {
 impl SpringPresence {
     /// Whether the surface is drawn at all: not once gone.
     pub fn drawn(&self) -> bool {
-        *self.stage.peek() != Stage::Gone
+        !matches!(*self.stage.peek(), Stage::Gone | Stage::Unmounted)
     }
 
     /// `data-presence`: entering, present, or leaving.
     pub fn slug(&self) -> &'static str {
-        match (*self.stage.peek(), *self.drive.peek()) {
-            (Stage::Up, Drive::Keyframe) => match self.entrance.phase() {
+        match *self.stage.peek() {
+            Stage::Arrival => match self.entrance.phase() {
                 TimerPhase::Settled => "present",
                 TimerPhase::Idle | TimerPhase::Running => "entering",
             },
-            (Stage::Up, Drive::Spring) => {
+            Stage::Up => {
                 let frame = self.spring.peek();
                 match (frame.phase(), frame.position() == 1.0) {
                     (SpringPhase::Rest, true) => "present",
                     (SpringPhase::Rest, false) | (SpringPhase::Moving, _) => "entering",
                 }
             }
-            (Stage::Leaving | Stage::Gone, _) => "leaving",
+            Stage::Leaving | Stage::Gone | Stage::Unmounted => "leaving",
         }
     }
 
@@ -117,9 +112,9 @@ impl SpringPresence {
 
     /// `data-drive`: `spring` once the spring draws it, nothing while its first entrance plays.
     pub fn drive(&self) -> Option<&'static str> {
-        match *self.drive.peek() {
-            Drive::Keyframe => None,
-            Drive::Spring => Some("spring"),
+        match *self.stage.peek() {
+            Stage::Arrival | Stage::Unmounted => None,
+            Stage::Up | Stage::Leaving | Stage::Gone => Some("spring"),
         }
     }
 
@@ -143,11 +138,10 @@ pub fn use_spring_presence(
     let frame = spring.frame();
     let mut stage = use_hook(|| {
         CopyValue::new(match now {
-            Shown::Visible => Stage::Up,
-            Shown::Hidden => Stage::Gone,
+            Shown::Visible => Stage::Arrival,
+            Shown::Hidden => Stage::Unmounted,
         })
     });
-    let mut drive = use_hook(|| CopyValue::new(Drive::Keyframe));
     use_hook(|| {
         if now == Shown::Visible {
             timer.start(EventHandler::new(|()| {}));
@@ -158,13 +152,11 @@ pub fn use_spring_presence(
         Step::Stay => {}
         Step::Enter => {
             stage.set(Stage::Up);
-            drive.set(Drive::Spring);
             let spec = SpringSpec::for_touch(Touch::Remote);
             queue_effect(move || spring.go(1.0, spec));
         }
         Step::Leave => {
             stage.set(Stage::Leaving);
-            drive.set(Drive::Spring);
             let spec = SpringSpec::for_touch(Touch::Remote).response(SpringResponse::Quick);
             queue_effect(move || spring.go(0.0, spec));
         }
@@ -178,7 +170,6 @@ pub fn use_spring_presence(
     }
     SpringPresence {
         stage,
-        drive,
         entrance: timer,
         spring,
         step,
