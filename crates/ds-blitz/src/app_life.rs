@@ -38,7 +38,14 @@ pub(crate) struct Lifecycle {
     held: usize,
     /// Since when no window has been open, if none is and the policy cares.
     idle_since: Option<Instant>,
-    quitting: bool,
+    run: Run,
+}
+
+/// Whether the app has asked to end the loop.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Run {
+    Going,
+    Quitting,
 }
 
 impl Lifecycle {
@@ -53,7 +60,7 @@ impl Lifecycle {
             open: 0,
             held: 0,
             idle_since,
-            quitting: false,
+            run: Run::Going,
         }
     }
 
@@ -97,12 +104,12 @@ impl Lifecycle {
 
     /// The app asked to end the loop.
     pub(crate) fn quit(&mut self) {
-        self.quitting = true;
+        self.run = Run::Quitting;
     }
 
     /// Whether the loop runs on at `now`.
     pub(crate) fn verdict(&self, now: Instant) -> Verdict {
-        if self.quitting {
+        if self.run == Run::Quitting {
             return Verdict::Exit;
         }
         match (self.policy, self.idle_since) {
@@ -119,7 +126,7 @@ impl Lifecycle {
     /// When the loop must look again with nothing else happening: the end of a linger.
     pub(crate) fn wake_at(&self) -> Option<Instant> {
         match (self.policy, self.idle_since) {
-            (LastWindowClosed::StayFor(linger), Some(since)) if !self.quitting => {
+            (LastWindowClosed::StayFor(linger), Some(since)) if self.run == Run::Going => {
                 since.checked_add(linger)
             }
             _ => None,

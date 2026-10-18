@@ -204,7 +204,14 @@ pub(crate) struct Windows {
     /// The activation tokens the process was started with, for the first window.
     tokens: LaunchTokens,
     /// Whether the loop can create windows yet (winit's `can_create_surfaces` has come).
-    ready: bool,
+    surfaces: Surfaces,
+}
+
+/// Whether winit's `can_create_surfaces` has come.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum Surfaces {
+    NotYet,
+    Ready,
 }
 
 impl Windows {
@@ -217,7 +224,7 @@ impl Windows {
             base,
             life,
             tokens,
-            ready: false,
+            surfaces: Surfaces::NotYet,
         }
     }
 
@@ -288,7 +295,7 @@ impl Windows {
 
     /// Answer what the app's components and threads asked since the last wake.
     fn serve(&mut self, event_loop: &dyn ActiveEventLoop) {
-        if !self.ready {
+        if self.surfaces == Surfaces::NotYet {
             // Windows cannot be created yet; `can_create_surfaces` serves what waits.
             return;
         }
@@ -420,7 +427,7 @@ impl Windows {
 
     /// Apply the app's policy: end the loop, or tell it when to look again.
     fn settle(&mut self, event_loop: &dyn ActiveEventLoop) {
-        if !self.ready {
+        if self.surfaces == Surfaces::NotYet {
             return;
         }
         match self.life.verdict(Instant::now()) {
@@ -486,7 +493,7 @@ impl ApplicationHandler for Windows {
     fn can_create_surfaces(&mut self, event_loop: &dyn ActiveEventLoop) {
         self.all()
             .for_each(|sub| sub.app.can_create_surfaces(event_loop));
-        self.ready = true;
+        self.surfaces = Surfaces::Ready;
         self.serve(event_loop);
         self.settle(event_loop);
     }

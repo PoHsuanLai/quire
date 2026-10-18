@@ -40,12 +40,22 @@ pub(crate) enum Remote {
 
 type Wake = Arc<dyn Fn() + Send + Sync>;
 
+/// Where the handle stands with the event loop.
+#[derive(Default)]
+enum Binding {
+    /// No loop yet: requests wait.
+    #[default]
+    Unbound,
+    /// `launch` bound the handle to a loop; the waker wakes it.
+    Bound(Wake),
+    /// The loop ended: requests are refused.
+    Ended,
+}
+
 #[derive(Default)]
 struct State {
     pending: VecDeque<Remote>,
-    /// Wakes the event loop; set when `launch` binds the handle.
-    wake: Option<Wake>,
-    ended: bool,
+    binding: Binding,
     /// The screen new windows open on, set by the loop once it can read monitors.
     screen: Option<ScreenArea>,
     /// What the shell reported of its outputs; empty without it.
@@ -144,7 +154,7 @@ impl AppHandle {
 
     /// Whether the event loop has ended.
     pub fn has_ended(&self) -> bool {
-        self.lock().ended
+        matches!(self.lock().binding, Binding::Ended)
     }
 
     fn lock(&self) -> MutexGuard<'_, State> {
@@ -154,11 +164,13 @@ impl AppHandle {
     fn push(&self, request: Remote) -> Result<(), AppEnded> {
         let wake = {
             let mut state = self.lock();
-            if state.ended {
-                return Err(AppEnded);
-            }
+            let wake = match &state.binding {
+                Binding::Ended => return Err(AppEnded),
+                Binding::Unbound => None,
+                Binding::Bound(wake) => Some(Arc::clone(wake)),
+            };
             state.pending.push_back(request);
-            state.wake.clone()
+            wake
         };
         if let Some(wake) = wake {
             wake();
@@ -171,7 +183,9 @@ impl AppHandle {
         let wake: Wake = Arc::new(wake);
         let waiting = {
             let mut state = self.lock();
-            state.wake = Some(Arc::clone(&wake));
+            if !matches!(state.binding, Binding::Ended) {
+                state.binding = Binding::Bound(Arc::clone(&wake));
+            }
             !state.pending.is_empty()
         };
         if waiting {
@@ -197,8 +211,7 @@ impl AppHandle {
     /// The loop ended: refuse what comes, drop what waits.
     pub(crate) fn end(&self) {
         let mut state = self.lock();
-        state.ended = true;
-        state.wake = None;
+        state.binding = Binding::Ended;
         state.pending.clear();
     }
 }
