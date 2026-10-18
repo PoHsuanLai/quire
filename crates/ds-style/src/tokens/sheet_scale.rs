@@ -1,44 +1,19 @@
 //! The widths of the sheets that are not the settings sheet's 560: an alert's column and the
 //! password prompt's, as tokens so the sheet's stylesheet reads them and a look can move them.
 
-use crate::tokens::size_scale::WholePx;
-use crate::tokens::token::{CssValue, Token, TokenScope};
+use crate::tokens::token::Token;
 use ds_core::word::Word;
-
-/// The narrow sheets' widths.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct SheetScale {
-    /// A password prompt's column, 340.
-    pub narrow: WholePx,
-    /// An alert's column, 260: the width of a Sonoma `NSAlert`.
-    pub alert: WholePx,
-}
-
-/// The settled numbers.
-pub const SHEET_SCALE: SheetScale = SheetScale {
-    narrow: WholePx(340),
-    alert: WholePx(260),
-};
 
 /// One of the narrow sheets' widths, as a token.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word, Token)]
-#[token(prefix = "sheet-", kind = fixed, css = sheet_size_css)]
+#[token(prefix = "sheet-", kind = fixed)]
 pub enum SheetSize {
-    /// `--sheet-narrow-w`: a password prompt's column.
-    #[token(name = "narrow-w")]
+    /// `--sheet-narrow-w`: a password prompt's column, 340.
+    #[token(name = "narrow-w", value = "340px")]
     Narrow,
-    /// `--sheet-alert-w`: an alert's column.
-    #[token(name = "alert-w")]
+    /// `--sheet-alert-w`: an alert's column, 260: the width of a Sonoma `NSAlert`.
+    #[token(name = "alert-w", value = "260px")]
     Alert,
-}
-
-/// The width a sheet token holds, as the stylesheet writes it.
-fn sheet_size_css(token: SheetSize, _scope: TokenScope) -> CssValue {
-    let width = match token {
-        SheetSize::Narrow => SHEET_SCALE.narrow,
-        SheetSize::Alert => SHEET_SCALE.alert,
-    };
-    CssValue::computed(width.css())
 }
 
 #[cfg(test)]
