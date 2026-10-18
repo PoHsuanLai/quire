@@ -2,7 +2,7 @@
 //! and the palette's field should have it back without being remounted (which replays the
 //! palette's entrance).
 
-use crate::focus::select::{Landing, Select};
+use crate::focus::select::Select;
 use crate::host::caret::InitialCaret;
 use dioxus::prelude::*;
 use ds_style::task::{try_get, try_set};
@@ -18,7 +18,7 @@ pub struct FocusTicket(pub u32);
 pub struct FocusRequest {
     asked: Signal<FocusTicket>,
     /// What the field does with its text each time the request lands.
-    landing: Landing,
+    landing: Option<InitialCaret>,
 }
 
 impl FocusRequest {
@@ -26,7 +26,7 @@ impl FocusRequest {
     /// mounts), so the first key typed replaces it: a rename field opened on the old name.
     pub fn with_select_all(self) -> Self {
         FocusRequest {
-            landing: Landing::Place(InitialCaret::SelectAll),
+            landing: Some(InitialCaret::SelectAll),
             ..self
         }
     }
@@ -37,7 +37,7 @@ impl FocusRequest {
     /// host without one leaves the caret where the renderer put it.
     pub fn with_caret(self, caret: InitialCaret) -> Self {
         FocusRequest {
-            landing: Landing::Place(caret),
+            landing: Some(caret),
             ..self
         }
     }
@@ -46,23 +46,18 @@ impl FocusRequest {
     /// that selects the whole value, [`Select::None`] otherwise (a caret placed at an end too).
     pub fn select(&self) -> Select {
         match self.landing {
-            Landing::Place(InitialCaret::SelectAll) => Select::All,
-            Landing::Leave | Landing::Place(InitialCaret::End | InitialCaret::Start) => {
-                Select::None
-            }
+            Some(InitialCaret::SelectAll) => Select::All,
+            None | Some(InitialCaret::End | InitialCaret::Start) => Select::None,
         }
     }
 
     /// Where the field's caret goes when the focus lands, if anywhere.
     pub fn caret(&self) -> Option<InitialCaret> {
-        match self.landing {
-            Landing::Leave => None,
-            Landing::Place(caret) => Some(caret),
-        }
+        self.landing
     }
 
     /// What the focus write does with the field's text.
-    pub(crate) fn landing(&self) -> Landing {
+    pub(crate) fn landing(&self) -> Option<InitialCaret> {
         self.landing
     }
 
@@ -91,6 +86,6 @@ impl FocusRequest {
 pub fn use_focus_request() -> FocusRequest {
     FocusRequest {
         asked: use_signal(FocusTicket::default),
-        landing: Landing::Leave,
+        landing: None,
     }
 }

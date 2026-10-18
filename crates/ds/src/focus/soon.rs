@@ -8,7 +8,7 @@
 //! [`FocusHost`](crate::host::parts::FocusHost) answers [`Focused::Busy`] instead, and the change is tried again
 //! once that render has ended (`ds_style::busy`), then a frame later.
 
-use crate::focus::select::{Landing, Select};
+use crate::focus::select::Select;
 use crate::host::caret::{CaretOwed, InitialCaret};
 use crate::host::document::use_document_host;
 use crate::host::focused::Focused;
@@ -58,13 +58,17 @@ pub fn focus_soon_told(element: Rc<MountedData>, select: Select, told: EventHand
     });
 }
 
-/// As [`focus_soon_selecting`], landing the caret at any [`Landing`] (a field's start or end
+/// As [`focus_soon_selecting`], landing the caret at any [`InitialCaret`], or nowhere (a field's start or end
 /// too), for a surface whose own `onfocus` hears the focus event the host's write raises: `told`
 /// is no longer called here (calling it too told the caller twice) and stays in the signature
 /// until the callers drop it.
 ///
 /// Public so an app's own field surface lands the caret the way `TextField` does.
-pub fn focus_landing_told(element: Rc<MountedData>, landing: Landing, told: EventHandler<()>) {
+pub fn focus_landing_told(
+    element: Rc<MountedData>,
+    landing: Option<InitialCaret>,
+    told: EventHandler<()>,
+) {
     let _ = told;
     spawn(async move {
         let _ = focus_selecting(&element, landing).await;
@@ -75,15 +79,18 @@ pub fn focus_landing_told(element: Rc<MountedData>, landing: Landing, told: Even
 /// lands with the focus, so nothing typed between the two can be selected away or overwritten.
 /// A busy document or a field not laid out yet retries the whole write; the outcome is the
 /// focus's.
-pub(crate) async fn focus_selecting(element: &MountedData, landing: Landing) -> Focused {
+pub(crate) async fn focus_selecting(
+    element: &MountedData,
+    landing: Option<InitialCaret>,
+) -> Focused {
     let host = use_document_host();
     match landing {
-        Landing::Place(caret) => {
+        Some(caret) => {
             let focused = retry_busy(|| host.focus().focus_placing(element, caret)).await;
             land_owed_caret(element, focused, caret).await;
             focused
         }
-        Landing::Leave => {
+        None => {
             let focused = focus_element(element).await;
             // Focusing without a caret still leaves a field with text and no editor yet with its
             // caret at the start once the editor is built, so the next key would land before the

@@ -15,22 +15,13 @@ pub enum Select {
     All,
 }
 
-/// What a focus write does with the field's text once the caret is in it: nothing, or the caret
-/// put at an [`InitialCaret`] place (a [`Select::All`] is [`InitialCaret::SelectAll`]).
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[non_exhaustive]
-pub enum Landing {
-    /// Left where the renderer puts it.
-    Leave,
-    /// Put there.
-    Place(InitialCaret),
-}
-
-impl From<Select> for Landing {
+impl From<Select> for Option<InitialCaret> {
+    /// The caret a focus write puts: [`Select::All`] is [`InitialCaret::SelectAll`], and
+    /// [`Select::None`] leaves the caret where the renderer puts it.
     fn from(select: Select) -> Self {
         match select {
-            Select::None => Landing::Leave,
-            Select::All => Landing::Place(InitialCaret::SelectAll),
+            Select::None => None,
+            Select::All => Some(InitialCaret::SelectAll),
         }
     }
 }

@@ -1839,7 +1839,7 @@ Open:
   new host: the harness shell already records `set_ime_enabled` and `set_ime_cursor_area`, read
   with `Harness::ime_switch` and `ime_cursor_area`.
 - `EditSurface`'s busy retry is public as `components::editor::write_soon::write_soon` (and `write_soon_then`, which hands back the write's value), and
-  `focus::soon::focus_landing_told` with `focus::select::Landing` are public, because custom
+  `focus::soon::focus_landing_told` is public, because custom
   surfaces (a terminal grid, a `TextureLayer` pane) need the same waits.
 - `.ds-texture-layer` is a rule of the `texture_layer` sheet in `ds` (the class is written by
   `ds-blitz`'s `TextureLayer`; the sheet is a ds sheet because the stylesheet is assembled there).

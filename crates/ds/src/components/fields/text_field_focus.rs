@@ -2,9 +2,9 @@
 
 use crate::focus::field::FieldHandle;
 use crate::focus::request::{FocusRequest, FocusTicket};
-use crate::focus::select::Landing;
 use crate::focus::soon::focus_landing_told;
 use crate::focus::targets::{FocusTarget, FocusTargets, Told};
+use crate::host::caret::InitialCaret;
 use dioxus::prelude::*;
 use std::rc::Rc;
 
@@ -23,10 +23,10 @@ pub enum FieldFocus {
 
 impl FieldFocus {
     /// What the field does with its text when the focus lands: a controlled request's choice.
-    fn landing(self) -> Landing {
+    fn landing(self) -> Option<InitialCaret> {
         match self {
             FieldFocus::Controlled(request) => request.landing(),
-            FieldFocus::OnMount | FieldFocus::Manual => Landing::Leave,
+            FieldFocus::OnMount | FieldFocus::Manual => None,
         }
     }
 
