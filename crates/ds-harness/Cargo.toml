@@ -26,10 +26,9 @@ anyrender = { workspace = true }
 anyrender_vello_hybrid = { workspace = true }
 anyrender_vello_cpu = { workspace = true }
 wgpu = { workspace = true }
-# The hybrid backend (`gpu_paint`): vello_hybrid driven directly on an offscreen device, its image
-# ids, and the device handle anyrender_vello_hybrid paints with.
+# The hybrid backend (`gpu_paint`): vello_hybrid driven directly on an offscreen device, and the
+# device handle anyrender_vello_hybrid paints with.
 vello_hybrid = { workspace = true }
-vello_common = { workspace = true }
 wgpu_context = { workspace = true }
 rustc-hash = { workspace = true }
 image = { workspace = true }

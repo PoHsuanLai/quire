@@ -1817,7 +1817,6 @@ dependencies = [
  "serde",
  "thiserror 2.0.21",
  "tokio",
- "vello_common 0.1.0",
  "vello_hybrid",
  "wgpu",
  "wgpu_context",
@@ -1929,7 +1928,6 @@ dependencies = [
  "ds-lint",
  "ds-motion",
  "ds-style",
- "serde",
  "zeroize",
 ]
 
