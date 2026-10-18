@@ -6,7 +6,6 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::controls::button::Button;
-use crate::components::controls::button_marks::Trailing;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
@@ -106,7 +105,7 @@ pub fn PullDownButton<T: Clone + PartialEq + 'static>(
                 icon,
                 size,
                 availability,
-                trailing: Some(Trailing::Glyph(Icon::ChevronDown)),
+                trailing: Some(Icon::ChevronDown),
                 title: match image {
                     ImagePosition::Only => Some(label.clone()),
                     ImagePosition::Leading => None,

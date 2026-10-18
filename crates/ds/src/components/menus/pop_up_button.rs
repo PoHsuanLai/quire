@@ -6,7 +6,6 @@
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::controls::button::Button;
-use crate::components::controls::button_marks::Trailing;
 use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::menus::item::item::MenuItem;
 use crate::components::menus::menu::menu::Menu;
@@ -154,13 +153,13 @@ pub fn PopUpButton<T: Clone + PartialEq + 'static>(
             Bezel::Push,
             ImagePosition::Leading,
             None,
-            Some(Trailing::Glyph(Icon::ChevronsUpDown)),
+            Some(Icon::ChevronsUpDown),
         ),
         PopUpKind::PullDown => (
             Bezel::Push,
             ImagePosition::Leading,
             None,
-            Some(Trailing::Glyph(Icon::ChevronDown)),
+            Some(Icon::ChevronDown),
         ),
         PopUpKind::Overflow => (
             Bezel::Toolbar,

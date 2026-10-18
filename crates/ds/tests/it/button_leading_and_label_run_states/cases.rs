@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::text_runs::RunTone;
-use ds::components::controls::button_marks::{Leading, Trailing};
+use ds::components::controls::button_marks::Leading;
 use ds::components::controls::button_model::Bezel;
 use ds::prelude::*;
 use ds::root::common::Common;
@@ -50,7 +50,7 @@ fn google() -> Leading {
 pub const CASES: &[Case] = &[
     Case {
         golden: "controls/button/leading-mark.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: google(), trailing: Trailing::Glyph(Icon::ChevronDown), shown: Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: google(), trailing: Icon::ChevronDown, shown: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/leading-glyph.html",

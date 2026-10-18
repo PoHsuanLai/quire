@@ -11,7 +11,7 @@ use crate::components::content::tip_text::TipText;
 use crate::components::content::title_tip::use_tip;
 use crate::components::controls::button_marks::leading as leading_mark;
 use crate::components::controls::button_marks::trailing as trailing_mark;
-use crate::components::controls::button_marks::{Leading, Trailing, spoken_label};
+use crate::components::controls::button_marks::{Leading, spoken_label};
 use crate::components::controls::button_model::{
     Answers, Bezel, BusyLook, ButtonFocus, ButtonRole, IconSwap, ImagePosition,
 };
@@ -31,6 +31,7 @@ use ds_core::word::Word;
 use ds_motion::detail::{morph::MorphStyle, morph_glyph::MorphGlyph};
 use ds_motion::symbol::effect::{EffectActivity, LoopEffect, SymbolEffect};
 use ds_motion::symbol::use_symbol::use_symbol_attrs;
+use ds_style::icon::Icon;
 use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::icon::style::GlyphStyle;
 use ds_style::tokens::control_size::ControlSize;
@@ -59,7 +60,7 @@ fn spinner_size(size: ControlSize) -> ControlSize {
 /// (`title_tip`), drawn below the button from the button's own pointer events, with no wrapper; inside a `Tooltip` it draws nothing (the
 /// caller's tip stands), and outside a `Ds` it is the plain `title` attribute.
 ///
-/// `trailing` puts a mark after the label, `leading` one before it (`Leading::Mark` holds an
+/// `trailing` puts a glyph after the label, `leading` one before it (`Leading::Mark` holds an
 /// element such as a `ProviderMark`).
 ///
 /// `availability`: `Disabled` writes `aria-disabled` and `disabled`, draws the button at .35 and
@@ -97,7 +98,7 @@ pub fn Button(
     onclick: EventHandler<Press>,
     #[props(default)] title: Option<String>,
     #[props(default)] title_shortcut: Option<Shortcut>,
-    #[props(default)] trailing: Option<Trailing>,
+    #[props(default)] trailing: Option<Icon>,
     #[props(default)] leading: Option<Leading>,
     #[props(default)] propagation: Propagation,
     #[props(default)] common: Common,
@@ -234,8 +235,8 @@ pub fn Button(
             } else if image == ImagePosition::Leading {
                 span { class: "ds-button-label", {text(&label)} }
             }
-            if let Some(mark) = trailing {
-                {trailing_mark(mark, glyph)}
+            if let Some(icon) = trailing {
+                {trailing_mark(icon, glyph)}
             }
         }
         {tip.surface()}

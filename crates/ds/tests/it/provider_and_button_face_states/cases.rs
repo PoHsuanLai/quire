@@ -4,7 +4,6 @@ use dioxus::prelude::*;
 use ds::components::app::pin_tile::{PinFace, PinTile};
 use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
-use ds::components::controls::button_marks::Trailing;
 use ds::components::controls::button_model::Bezel;
 use ds::prelude::*;
 use ds_style::tokens::control_size::ControlSize;
@@ -68,11 +67,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         golden: "controls/button/quiet-caret.html",
-        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Trailing::Glyph(Icon::ChevronDown), shown: Shown::Hidden, onclick: |_| {} } },
+        make: || rsx! { Button { bezel: Bezel::Inline, label: "poh@acme.example", trailing: Icon::ChevronDown, shown: Shown::Hidden, onclick: |_| {} } },
     },
     Case {
         golden: "controls/button/mini-trailing-glyph.html",
-        make: || rsx! { Button { size: ControlSize::Mini, label: "Open", trailing: Trailing::Glyph(Icon::Link), onclick: |_| {} } },
+        make: || rsx! { Button { size: ControlSize::Mini, label: "Open", trailing: Icon::Link, onclick: |_| {} } },
     },
     Case {
         golden: "controls/text_field/secret-value-unwritten.html",

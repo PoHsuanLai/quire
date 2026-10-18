@@ -6,7 +6,7 @@ use dioxus::prelude::*;
 use ds::components::content::mark_face::MarkFace;
 use ds::components::content::provider_mark::{MarkProvider, MarkStyle};
 use ds::components::content::text_runs::RunTone;
-use ds::components::controls::button_marks::{Leading, Trailing};
+use ds::components::controls::button_marks::Leading;
 use ds::components::controls::button_model::Bezel;
 use ds::prelude::*;
 use ds::style::tokens::control_size::ControlSize;
@@ -34,8 +34,8 @@ pub fn LabelRunsAndMarks() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "mark",
                     div { class: "g-row",
-                        Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
-                        Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Trailing::Glyph(Icon::ChevronDown), onclick: |_| {} }
+                        Button { bezel: Bezel::Inline, label: "poh@acme.example", leading: mark(MarkProvider::Google), trailing: Icon::ChevronDown, onclick: |_| {} }
+                        Button { bezel: Bezel::Toolbar, label: "Local folders", leading: mark(MarkProvider::Local), trailing: Icon::ChevronDown, onclick: |_| {} }
                         Button { size: ControlSize::Mini, label: "Pinned", leading: Leading::Glyph(Icon::Pin), onclick: |_| {} }
                     }
                 }
@@ -59,7 +59,7 @@ pub fn LabelRunsAndMarks() -> Element {
             div { class: "g-row g-row-top",
                 Specimen { name: "runs",
                     div { class: "g-row",
-                        Button { bezel: Bezel::Inline, label: quoted_head(), trailing: Trailing::Glyph(Icon::ChevronDown), shown: open(),
+                        Button { bezel: Bezel::Inline, label: quoted_head(), trailing: Icon::ChevronDown, shown: open(),
                             onclick: move |_| open.set(match open() { Shown::Visible => Shown::Hidden, Shown::Hidden => Shown::Visible }) }
                         Button { size: ControlSize::Mini, label: quoted_head(), onclick: |_| {} }
                     }
