@@ -183,7 +183,7 @@ mod live {
                         return Poll::Ready(Some(Moved {
                             bus,
                             name: args.name().to_string(),
-                            owner: match args.new_owner() {
+                            owner: match args.new_owner().as_ref() {
                                 Some(_) => NameOwner::Owned,
                                 None => NameOwner::Unowned,
                             },
