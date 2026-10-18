@@ -9,7 +9,7 @@ use crate::components::controls::press::{button_of, press_of};
 use crate::components::menus::alive::use_alive;
 use crate::components::menus::item::context::available;
 use crate::components::menus::item::item::MenuItem;
-use crate::components::menus::menu::active::{asks, follow_active};
+use crate::components::menus::menu::active::{Reported, asks, follow_active};
 use crate::components::menus::menu::blink::Blink;
 use crate::components::menus::menu::choices::{Act, Choice, choices};
 use crate::components::menus::menu::cursor::MenuCursor;
@@ -120,7 +120,7 @@ pub fn Menu<T: Clone + PartialEq + 'static>(
     let scrolling = use_scrolling();
     let mut gesture = use_hook(|| CopyValue::new(Gesture::Outside));
     let mut hovered = use_hook(|| CopyValue::new(None::<usize>));
-    let reported = use_hook(|| CopyValue::new(None::<Option<usize>>));
+    let reported = use_hook(|| CopyValue::new(Reported::Never));
     use_effect(move || {
         if let Some(index) = expanded {
             tracker.expand(index, Via::Pointer);

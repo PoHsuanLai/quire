@@ -20,20 +20,38 @@ pub(crate) fn asks(
     }
 }
 
+/// What `follow_active` last told the caller.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub(crate) enum Reported {
+    /// Nothing yet.
+    #[default]
+    Never,
+    /// That no choice is highlighted.
+    Cleared,
+    /// That this choice is.
+    At(usize),
+}
+
+impl From<Option<usize>> for Reported {
+    fn from(current: Option<usize>) -> Self {
+        current.map_or(Reported::Cleared, Reported::At)
+    }
+}
+
 /// Under the menu's own cursor, tell the caller after this render when the highlight moved.
 pub(crate) fn follow_active(
     active: MenuCursor,
     current: Option<usize>,
-    reported: CopyValue<Option<Option<usize>>>,
+    reported: CopyValue<Reported>,
     on_active: Option<EventHandler<Option<usize>>>,
 ) {
     let (MenuCursor::Auto, Some(on_active)) = (active, on_active) else {
         return;
     };
     let mut reported = reported;
-    if *reported.peek() == Some(current) {
+    if *reported.peek() == Reported::from(current) {
         return;
     }
-    reported.set(Some(current));
+    reported.set(Reported::from(current));
     queue_effect(move || on_active.call(current));
 }
