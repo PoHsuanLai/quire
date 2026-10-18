@@ -6,7 +6,7 @@ use std::cell::{Cell, RefCell};
 use std::time::Duration;
 
 use ds::base::machine::{Elapsed, Machine};
-use ds::base::time::stamp::Stamp;
+use ds::base::time::stamp::{Ms, Stamp};
 use ds_harness::{Clock, Driver, Harness, HarnessConfig, Input, Query, Viewport};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -65,7 +65,7 @@ impl Machine for Hold {
         lock: &Lock,
     ) -> (Hold, Vec<HoldOut>) {
         let held = Hold::Held {
-            until: at.after(params.hold_ms),
+            until: at.after(Ms(params.hold_ms)),
         };
         match (self, input, lock) {
             (_, HoldIn::Press, _) => (held, vec![HoldOut::Pressed]),

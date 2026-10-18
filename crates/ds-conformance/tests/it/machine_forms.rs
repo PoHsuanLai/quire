@@ -7,6 +7,7 @@ use crate::support::hold;
 use std::time::Duration;
 
 use dioxus::prelude::*;
+use ds::base::time::stamp::Ms;
 use ds::machine::{use_machine, use_machine_in, use_machine_state};
 use ds_harness::Driver;
 use hold::{
@@ -29,7 +30,7 @@ fn label(state: Hold) -> Element {
 fn seeded() -> Element {
     let machine = use_machine::<Hold>(
         |now| Hold::Held {
-            until: now.after(300),
+            until: now.after(Ms(300)),
         },
         params(),
         lock,
@@ -65,7 +66,7 @@ fn controlled() -> Element {
             style: "width:60px;height:20px",
             onpointerdown: move |_| {
                 let mut state = held.state;
-                state.set(Hold::Held { until: held.clock.now().after(200) });
+                state.set(Hold::Held { until: held.clock.now().after(Ms(200)) });
             },
         }
     }

@@ -49,7 +49,7 @@ pub trait Machine: Clone + PartialEq + 'static {
 #[cfg(test)]
 mod tests {
     use super::{Elapsed, Machine};
-    use crate::time::stamp::Stamp;
+    use crate::time::stamp::{Ms, Stamp};
 
     /// A toy: a lamp that turns itself off `hold` ms after the last press.
     #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -85,7 +85,7 @@ mod tests {
             match (self, input) {
                 (_, In::Press) => (
                     Lamp::On {
-                        until: at.after(*hold),
+                        until: at.after(Ms(*hold)),
                     },
                     if self == Lamp::Off {
                         vec![Out::Light(true)]
@@ -162,7 +162,7 @@ mod tests {
             match (self, input, at_home) {
                 (Bell::Quiet, In::Press, _) => (
                     Bell::Pressed {
-                        until: at.after(*delay),
+                        until: at.after(Ms(*delay)),
                     },
                     vec![],
                 ),

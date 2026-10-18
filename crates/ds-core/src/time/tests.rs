@@ -78,11 +78,11 @@ fn stamps_count_milliseconds_from_the_origin() {
 
 #[test]
 fn stamp_arithmetic_saturates() {
-    use crate::time::stamp::Stamp;
+    use crate::time::stamp::{Ms, Stamp};
     assert_eq!(Stamp(900).since(Stamp(400)), 500);
     assert_eq!(Stamp(400).since(Stamp(900)), 0);
-    assert_eq!(Stamp(10).after(5), Stamp(15));
-    assert_eq!(Stamp(u64::MAX).after(1), Stamp(u64::MAX));
+    assert_eq!(Stamp(10).after(Ms(5)), Stamp(15));
+    assert_eq!(Stamp(u64::MAX).after(Ms(1)), Stamp(u64::MAX));
 }
 
 #[test]

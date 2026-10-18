@@ -16,20 +16,40 @@ use std::time::{Duration, Instant};
 #[serde(transparent)]
 pub struct Stamp(pub u64);
 
+/// Whole milliseconds: a length of time, as the machines' timers are specified. Added to a
+/// [`Stamp`] with [`Stamp::after`].
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord, Default, Serialize, Deserialize,
+)]
+#[serde(transparent)]
+pub struct Ms(pub u64);
+
+impl From<u16> for Ms {
+    fn from(value: u16) -> Ms {
+        Ms(u64::from(value))
+    }
+}
+
+impl From<u32> for Ms {
+    fn from(value: u32) -> Ms {
+        Ms(u64::from(value))
+    }
+}
+
 impl Stamp {
     /// Milliseconds from `earlier` to `self`, zero if `earlier` is later.
     pub fn since(self, earlier: Stamp) -> u64 {
         self.0.saturating_sub(earlier.0)
     }
 
-    /// `self` plus `ms` milliseconds.
-    pub fn after(self, ms: u64) -> Stamp {
-        Stamp(self.0.saturating_add(ms))
+    /// `self` plus `span`.
+    pub fn after(self, span: Ms) -> Stamp {
+        Stamp(self.0.saturating_add(span.0))
     }
 
     /// `self` plus `span`, in whole milliseconds, saturating: a configured delay as a deadline.
     pub fn after_span(self, span: Duration) -> Stamp {
-        self.after(u64::try_from(span.as_millis()).unwrap_or(u64::MAX))
+        self.after(Ms(u64::try_from(span.as_millis()).unwrap_or(u64::MAX)))
     }
 }
 
