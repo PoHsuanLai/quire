@@ -317,7 +317,7 @@ impl Shortcut {
     /// The glyph text, modifiers in the Mac's order whatever order they were given in: `⌃⌥⇧⌘`,
     /// then the key (`⇧⌘Z`).
     pub fn glyphs(&self) -> String {
-        self.keys().into_iter().map(|key| key.glyph()).collect()
+        self.keys().into_iter().map(ShortcutKey::glyph).collect()
     }
 
     /// The keys in the order they are drawn: modifiers first in the Mac's order (⌃⌥⇧⌘),

@@ -262,7 +262,7 @@ pub fn swatch(dot: Dot, scheme: Scheme) -> String {
 pub fn gradient(palette: &Palette) -> String {
     let stops = &palette.stops;
     if stops.len() <= 1 {
-        let colour = stops.first().map(String::as_str).unwrap_or("");
+        let colour = stops.first().map_or("", String::as_str);
         return format!("linear-gradient(135deg,{colour},{colour})");
     }
     let last = stops.len() - 1;

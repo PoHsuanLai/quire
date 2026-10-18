@@ -70,7 +70,7 @@ pub(super) fn begin(
     p0: PageMilli,
     v0: PagesPerSecMilli,
     now: Stamp,
-    params: &SwipeParams,
+    params: SwipeParams,
 ) -> Step {
     match params.reduced {
         Reduced::Yes => (

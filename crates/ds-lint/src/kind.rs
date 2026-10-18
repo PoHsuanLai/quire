@@ -52,9 +52,8 @@ pub fn function_name(text: &str) -> Option<&str> {
 
 /// A `Hash`/`IDHash` token's text (`#fff`, `#112233`), unchanged (it already carries the `#`).
 pub fn is_hash(text: &str) -> bool {
-    let rest = match text.strip_prefix('#') {
-        Some(rest) => rest,
-        None => return false,
+    let Some(rest) = text.strip_prefix('#') else {
+        return false;
     };
     matches!(rest.len(), 3 | 4 | 6 | 8) && rest.chars().all(|c| c.is_ascii_hexdigit())
 }

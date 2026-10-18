@@ -185,11 +185,11 @@ impl Scan<'_> {
         };
         let closed: Vec<Open> = self.open.drain(at..).collect();
         for element in closed.into_iter().rev() {
-            self.judge(element);
+            self.judge(&element);
         }
     }
 
-    fn judge(&mut self, element: Open) {
+    fn judge(&mut self, element: &Open) {
         if element.named == Naming::Unnamed {
             self.out.push(Offence {
                 rule: Rule::UnnamedControl,

@@ -158,7 +158,7 @@ impl RowSelection {
 
     /// The selected rows in ascending order, one at a time.
     pub fn rows(&self) -> impl Iterator<Item = usize> + '_ {
-        self.ranges.iter().flat_map(|range| range.clone())
+        self.ranges.iter().flat_map(Clone::clone)
     }
 
     /// The selected ranges, ascending, disjoint, and never touching.

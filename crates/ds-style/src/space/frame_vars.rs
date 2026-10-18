@@ -60,7 +60,7 @@ impl FrameVars {
             line: line.to_owned(),
             solid,
             gradient,
-            stops: palette.stops.clone(),
+            stops: palette.stops,
             grain_opacity: grain_opacity(look.grain, scheme),
         }
     }

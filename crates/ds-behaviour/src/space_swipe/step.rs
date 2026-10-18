@@ -43,20 +43,20 @@ impl Machine for Swipe {
 
     fn step(self, input: SwipeIn, at: Stamp, params: &SwipeParams, _: &()) -> Step {
         match self {
-            Swipe::Idle { at: shown } => idle(shown, input, at, params),
+            Swipe::Idle { at: shown } => idle(shown, input, at, *params),
             Swipe::Tracking {
                 from,
                 source,
                 p,
                 samples,
-            } => tracking(from, source, p, samples, input, at, params),
+            } => tracking(from, source, p, samples, input, at, *params),
             Swipe::Finishing {
                 from,
                 to,
                 p0,
                 v0,
                 since,
-            } => finishing(from, Slide { to, p0, v0, since }, input, at, params),
+            } => finishing(from, Slide { to, p0, v0, since }, input, at, *params),
         }
     }
 
@@ -86,17 +86,17 @@ fn track(from: u32, source: SwipeSource, p: PageMilli) -> Step {
 }
 
 /// Whether Space `to` is on the row.
-fn on_row(to: u32, params: &SwipeParams) -> bool {
+fn on_row(to: u32, params: SwipeParams) -> bool {
     to < params.spaces
 }
 
 /// The last Space on the row.
-fn last_space(params: &SwipeParams) -> u32 {
+fn last_space(params: SwipeParams) -> u32 {
     params.spaces.saturating_sub(1)
 }
 
 /// At rest on Space `shown`.
-fn idle(shown: u32, input: SwipeIn, at: Stamp, params: &SwipeParams) -> Step {
+fn idle(shown: u32, input: SwipeIn, at: Stamp, params: SwipeParams) -> Step {
     match input {
         SwipeIn::Began { source } => track(shown, source, PageMilli::of_space(shown)),
         SwipeIn::Go { to } if to != shown && on_row(to, params) => begin(
@@ -119,7 +119,7 @@ fn tracking(
     samples: Samples,
     input: SwipeIn,
     at: Stamp,
-    params: &SwipeParams,
+    params: SwipeParams,
 ) -> Step {
     let drawn = rubber(p, 0, last_space(params));
     match input {
@@ -149,7 +149,7 @@ fn follow(
     samples: Samples,
     dx: i32,
     at: Stamp,
-    params: &SwipeParams,
+    params: SwipeParams,
 ) -> Step {
     let moved = div_nearest(i64::from(dx) * 1000, i64::from(source.units_per_page()));
     let p = PageMilli(saturate(i64::from(p.0) - moved));
@@ -170,7 +170,7 @@ fn follow(
 
 /// The Space a lift at `p` with velocity `v` commits to: one from `from` at most, and `from`
 /// itself when that would leave the row.
-fn committed_space(from: u32, p: PageMilli, v: PagesPerSecMilli, params: &SwipeParams) -> u32 {
+fn committed_space(from: u32, p: PageMilli, v: PagesPerSecMilli, params: SwipeParams) -> u32 {
     let travelled = PageMilli(saturate(
         i64::from(p.0) - i64::from(PageMilli::of_space(from).0),
     ));
@@ -183,7 +183,7 @@ fn committed_space(from: u32, p: PageMilli, v: PagesPerSecMilli, params: &SwipeP
 
 /// Sliding to `slide.to`: its end settles it, the fingers catch it where it is, a `Go`
 /// redirects it from where it is at the speed it has.
-fn finishing(from: u32, slide: Slide, input: SwipeIn, at: Stamp, params: &SwipeParams) -> Step {
+fn finishing(from: u32, slide: Slide, input: SwipeIn, at: Stamp, params: SwipeParams) -> Step {
     let state = Swipe::Finishing {
         from,
         to: slide.to,

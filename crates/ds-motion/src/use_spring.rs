@@ -36,9 +36,11 @@ impl SpringMotion {
 
     /// Where the spring is this instant on the frame clock, exactly (between frames too).
     pub fn state(self) -> State {
-        self.playback.timeline().map_or(State::default(), |spring| {
-            spring.state(self.playback.elapsed())
-        })
+        self.playback
+            .timeline()
+            .map_or_else(State::default, |spring| {
+                spring.state(self.playback.elapsed())
+            })
     }
 
     /// Move toward `target` on the spring `spec` chooses: from where it is at the speed it has,

@@ -32,10 +32,10 @@ impl<K: Clone + PartialEq + 'static> Machine for RosterState<K> {
         measured: &Measured<K>,
     ) -> (Self, Vec<RosterOut<K>>) {
         match input {
-            RosterIn::List(keys) => (self.listed(keys, at, params), Vec::new()),
-            RosterIn::Leave(keys) => (self.leaving(&keys, at, params), Vec::new()),
+            RosterIn::List(keys) => (self.listed(&keys, at, *params), Vec::new()),
+            RosterIn::Leave(keys) => (self.leaving(&keys, at, *params), Vec::new()),
             RosterIn::Stay(key) => (self.stay(&key).0, Vec::new()),
-            RosterIn::Elapsed => self.elapsed(at, params, measured),
+            RosterIn::Elapsed => self.elapsed(at, *params, measured),
         }
     }
 
@@ -50,7 +50,7 @@ impl<K: Clone + PartialEq + 'static> Machine for RosterState<K> {
 
 impl<K: Clone + PartialEq> RosterState<K> {
     /// The consumer's keys again.
-    fn listed(self, keys: Vec<K>, at: Stamp, params: &RosterParams) -> Self {
+    fn listed(self, keys: &[K], at: Stamp, params: RosterParams) -> Self {
         if self.listed == keys {
             return self;
         }
@@ -71,18 +71,18 @@ impl<K: Clone + PartialEq> RosterState<K> {
             LeaveBy::Delist => stayed.leaving(&gone, at, params),
             LeaveBy::Action => stayed,
         };
-        started.reconcile(&keys).resting(at, params)
+        started.reconcile(keys).resting(at, params)
     }
 
     /// Start `keys`' exits as one batch.
-    fn leaving(self, keys: &[K], at: Stamp, params: &RosterParams) -> Self {
+    fn leaving(self, keys: &[K], at: Stamp, params: RosterParams) -> Self {
         let until = at.after_span(settle(params.exit.anim(), params.motion));
         self.leave_batch(keys, params.exit, until).0
     }
 
     /// The rest deadline moved out to cover the entering and healing rows, if there are any: a
     /// deadline already later is kept.
-    fn resting(self, at: Stamp, params: &RosterParams) -> Self {
+    fn resting(self, at: Stamp, params: RosterParams) -> Self {
         let Some(length) = self
             .running()
             .into_iter()
@@ -102,7 +102,7 @@ impl<K: Clone + PartialEq> RosterState<K> {
     fn elapsed(
         self,
         at: Stamp,
-        params: &RosterParams,
+        params: RosterParams,
         measured: &Measured<K>,
     ) -> (Self, Vec<RosterOut<K>>) {
         let rested = match self.rest_due {

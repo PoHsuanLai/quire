@@ -70,19 +70,15 @@ impl PlateStops {
     /// The family as the stylesheet draws it in `scheme`: only the neutral plate changes in the
     /// dark (design/08 section 4.1).
     pub fn of(family: PlateFamily, scheme: Scheme) -> PlateStops {
-        match (family, scheme) {
-            (PlateFamily::Neutral, Scheme::Dark) => {
-                let (base, deep, ink) = NEUTRAL_DARK;
-                PlateStops { base, deep, ink }
-            }
-            _ => {
-                let (base, deep) = family.stops();
-                PlateStops {
-                    base,
-                    deep,
-                    ink: family.glyph(),
-                }
-            }
+        if let (PlateFamily::Neutral, Scheme::Dark) = (family, scheme) {
+            let (base, deep, ink) = NEUTRAL_DARK;
+            return PlateStops { base, deep, ink };
+        }
+        let (base, deep) = family.stops();
+        PlateStops {
+            base,
+            deep,
+            ink: family.glyph(),
         }
     }
 

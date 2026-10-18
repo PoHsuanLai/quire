@@ -15,7 +15,7 @@ impl<T: Clone + PartialEq + 'static> Machine for PaletteState<T> {
 
     fn step(self, input: PaletteIn, _at: Stamp, params: &PaletteParams<T>, _cx: &()) -> Step<T> {
         match self {
-            PaletteState::Closed => closed(input),
+            PaletteState::Closed => closed(&input),
             PaletteState::Open {
                 query, selection, ..
             } => open(query, selection, input, params),
@@ -27,7 +27,7 @@ impl<T: Clone + PartialEq + 'static> Machine for PaletteState<T> {
     }
 }
 
-fn closed<T>(input: PaletteIn) -> Step<T> {
+fn closed<T>(input: &PaletteIn) -> Step<T> {
     match input {
         PaletteIn::Open => {
             let state = PaletteState::open(TypedText::EMPTY, PaletteIndex(0));

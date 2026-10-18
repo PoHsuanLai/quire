@@ -83,7 +83,7 @@ pub fn recipe(material: Material, scheme: Scheme, tint_alpha: Alpha) -> Material
         tint_solid,
         edge: joined(&stack.edge, Layer::css),
         shadow: one(stack.ambient),
-        radius: radius(material).to_owned(),
+        radius: radius(material),
         highlight: one(stack.highlight),
         hairline: one(stack.hairline),
         shadow_contact: one(stack.contact),
