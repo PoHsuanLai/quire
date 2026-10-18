@@ -17,7 +17,6 @@ use ds_core::machine::Machine;
 use ds_core::time::stamp::Stamp;
 
 use super::model::{Corner, CornerIn, CornerOut, CornerParams, Inside, Rearm};
-use crate::span;
 
 /// What a step wants done, beside the state it leaves.
 type Step = (Corner, Vec<CornerOut>);
@@ -31,14 +30,14 @@ impl Machine for Corner {
     fn step(self, input: CornerIn, at: Stamp, params: &CornerParams, _: &()) -> Step {
         match (self, input) {
             (Corner::Armed, CornerIn::Enter) => quiet(Corner::Dwelling {
-                until: span::after(at, params.dwell),
+                until: at.after_span(params.dwell),
             }),
             (Corner::Dwelling { .. }, CornerIn::Leave) => quiet(Corner::Armed),
             (Corner::Dwelling { until }, CornerIn::Elapsed) if at >= until => (
                 Corner::Spent {
                     pointer: Inside::In,
                     rearm: Rearm::Running {
-                        until: span::after(at, params.rearm),
+                        until: at.after_span(params.rearm),
                     },
                 },
                 vec![CornerOut::Fire],

@@ -15,8 +15,6 @@ use std::time::Duration;
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
-use crate::span;
-
 /// The double tap's state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum Tap {
@@ -86,6 +84,6 @@ impl Machine for Tap {
 /// Waiting for a second tap, the window running from `at`.
 fn armed(at: Stamp, params: &TapParams) -> Tap {
     Tap::Armed {
-        until: span::after(at, params.window),
+        until: at.after_span(params.window),
     }
 }

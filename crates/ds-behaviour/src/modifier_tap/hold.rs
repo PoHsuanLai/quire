@@ -24,8 +24,6 @@ use std::time::Duration;
 use ds_core::machine::{Elapsed, Machine};
 use ds_core::time::stamp::Stamp;
 
-use crate::span;
-
 /// The Command key's hold state.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
 pub enum HoldKey {
@@ -161,14 +159,14 @@ impl Machine for HoldKey {
 /// Command pressed alone at `at`: talking starts when the hold time has passed.
 fn down(at: Stamp, params: &HoldParams) -> HoldKey {
     HoldKey::Down {
-        until: span::after(at, params.hold),
+        until: at.after_span(params.hold),
     }
 }
 
 /// Talking from `at`: the longest hold ends it.
 fn talking(at: Stamp, params: &HoldParams) -> HoldKey {
     HoldKey::Talking {
-        until: span::after(at, params.max),
+        until: at.after_span(params.max),
     }
 }
 

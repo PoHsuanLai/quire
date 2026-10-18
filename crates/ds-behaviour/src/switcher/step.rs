@@ -11,7 +11,6 @@ use ds_core::time::stamp::Stamp;
 
 use super::model::{Phase, SwIn, SwKey, SwOut, Switcher, SwitcherParams};
 use crate::dir::Dir;
-use crate::span;
 
 /// What a step wants done, beside the phase it leaves.
 type Step<K> = (Phase, Vec<SwOut<K>>);
@@ -118,7 +117,7 @@ fn hidden<K: Clone>(input: SwIn, now: Stamp, ring: &Ring<'_, K>, p: &SwitcherPar
     match input {
         SwIn::Chord(dir) => (
             Phase::Armed {
-                until: span::after(now, p.show_delay),
+                until: now.after_span(p.show_delay),
                 sel: ring.moved(0, dir),
             },
             Vec::new(),

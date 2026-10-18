@@ -7,7 +7,6 @@ use ds_core::time::stamp::Stamp;
 
 use super::model::{PageMilli, PagesPerSecMilli, Reduced, Swipe, SwipeOut, SwipeParams};
 use super::numbers::{div_nearest, finish_duration, saturate};
-use crate::span;
 
 /// What a step wants done, beside the state it leaves.
 type Step = (Swipe, Vec<SwipeOut>);
@@ -34,12 +33,13 @@ impl Slide {
 
     /// When the slide reaches its Space.
     pub(super) fn ends(&self) -> Stamp {
-        span::after(self.since, self.duration())
+        self.since.after_span(self.duration())
     }
 
     /// The slide's length and the time left in it at `now`, both in milliseconds.
     fn remaining(&self, now: Stamp) -> (i64, i64) {
-        let total = i64::try_from(span::millis(self.duration())).unwrap_or(i64::MAX);
+        let total =
+            i64::try_from(Stamp::default().after_span(self.duration()).0).unwrap_or(i64::MAX);
         let spent = i64::try_from(now.since(self.since))
             .unwrap_or(i64::MAX)
             .min(total);
