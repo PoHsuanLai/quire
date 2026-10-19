@@ -2396,7 +2396,7 @@ dependencies = [
 [[package]]
 name = "glifo"
 version = "0.2.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
+source = "git+https://github.com/PoHsuanLai/vello?rev=84b2c9f7debed7d15f48d0ec9ea8575c16a56938#84b2c9f7debed7d15f48d0ec9ea8575c16a56938"
 dependencies = [
  "bytemuck",
  "foldhash 0.2.0",
@@ -5914,7 +5914,7 @@ dependencies = [
 [[package]]
 name = "vello_common"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
+source = "git+https://github.com/PoHsuanLai/vello?rev=84b2c9f7debed7d15f48d0ec9ea8575c16a56938#84b2c9f7debed7d15f48d0ec9ea8575c16a56938"
 dependencies = [
  "bytemuck",
  "fearless_simd",
@@ -5944,7 +5944,7 @@ dependencies = [
 [[package]]
 name = "vello_cpu"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
+source = "git+https://github.com/PoHsuanLai/vello?rev=84b2c9f7debed7d15f48d0ec9ea8575c16a56938#84b2c9f7debed7d15f48d0ec9ea8575c16a56938"
 dependencies = [
  "bytemuck",
  "crossbeam-channel",
@@ -5971,7 +5971,7 @@ dependencies = [
 [[package]]
 name = "vello_hybrid"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
+source = "git+https://github.com/PoHsuanLai/vello?rev=84b2c9f7debed7d15f48d0ec9ea8575c16a56938#84b2c9f7debed7d15f48d0ec9ea8575c16a56938"
 dependencies = [
  "bytemuck",
  "glifo 0.2.0",
@@ -5986,7 +5986,7 @@ dependencies = [
 [[package]]
 name = "vello_sparse_shaders"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
+source = "git+https://github.com/PoHsuanLai/vello?rev=84b2c9f7debed7d15f48d0ec9ea8575c16a56938#84b2c9f7debed7d15f48d0ec9ea8575c16a56938"
 dependencies = [
  "wesl",
  "wesl-macros",
