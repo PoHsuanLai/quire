@@ -3,6 +3,7 @@
 
 use crate::components::fields::text_field_area::area;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
+use crate::components::fields::text_field_ime::{Composition, FieldIme};
 use crate::components::fields::text_field_mask::{CaretMark, MaskCaret, MaskParts};
 use crate::components::fields::text_field_model::{FieldBezel, FieldKind, FieldRows};
 use crate::components::fields::text_field_secret::takes_text_out;
@@ -45,13 +46,21 @@ pub(crate) struct Field {
     pub handlers: Handlers,
     /// What a host's focus write tells the field, which no renderer event will.
     pub told: Told,
+    /// An input method's composition in progress, which hides the placeholder.
+    pub ime: FieldIme,
 }
 
-/// The placeholder as a span over the field, shown while the value is empty: Blitz draws no
+/// The placeholder as a span over the field, shown while the value is empty and no input method
+/// is composing (its preedit is not the value yet, but it is drawn): Blitz draws no
 /// `placeholder` attribute and has no `::placeholder` (O-23's fallback). The input carries the
 /// text as `aria-placeholder` instead, so a browser does not draw it twice.
-pub(crate) fn placeholder_shown(value: &str, placeholder: &str) -> Option<String> {
-    (value.is_empty() && !placeholder.is_empty()).then(|| placeholder.to_string())
+pub(crate) fn placeholder_shown(
+    value: &str,
+    placeholder: &str,
+    composing: Composition,
+) -> Option<String> {
+    (value.is_empty() && !placeholder.is_empty() && composing == Composition::Idle)
+        .then(|| placeholder.to_string())
 }
 
 /// `aria-placeholder`, when there is a placeholder at all.
@@ -80,11 +89,12 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
         caret,
         handlers,
         told,
+        ime,
     } = field;
     let count = kind.mask(&value).map_or(0, |dots| dots.chars().count());
     let owner = caret.owner(count);
     let mask = (count > 0).then(|| MaskParts::cut(count, caret.selection(), owner));
-    let shown = placeholder_shown(&value, &placeholder);
+    let shown = placeholder_shown(&value, &placeholder, ime.composition());
     // A secure field writes no text, whoever holds it (a caller that empties its text remounts
     // the line, see `TextField`).
     let written = match kind {
@@ -114,6 +124,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                 value: written,
                 onmounted: move |event| {
                     caret.mounted(&event);
+                    ime.mounted(&event);
                     focuser.mounted(focus, &event, told);
                 },
                 onfocus: move |_| {
@@ -122,6 +133,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                 },
                 onblur: move |_| {
                     caret.refresh();
+                    ime.left();
                     handlers.onchange.call(());
                     handlers.onblur.call(());
                 },
@@ -182,17 +194,22 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::{aria_placeholder, placeholder_shown};
+    use super::{Composition, aria_placeholder, placeholder_shown};
 
     #[test]
-    fn the_placeholder_shows_only_over_an_empty_value() {
-        const CASES: &[(&str, &str, Option<&str>)] = &[
-            ("", "Add a person", Some("Add a person")),
-            ("Dana", "Add a person", None),
-            ("", "", None),
+    fn the_placeholder_shows_only_over_an_empty_value_with_nothing_composing() {
+        const CASES: &[(&str, &str, Composition, Option<&str>)] = &[
+            ("", "Add a person", Composition::Idle, Some("Add a person")),
+            ("Dana", "Add a person", Composition::Idle, None),
+            ("", "", Composition::Idle, None),
+            // Pinyin being composed: drawn in the field, not yet its value.
+            ("", "Add a person", Composition::Composing, None),
         ];
-        for &(value, placeholder, want) in CASES {
-            assert_eq!(placeholder_shown(value, placeholder).as_deref(), want);
+        for &(value, placeholder, composing, want) in CASES {
+            assert_eq!(
+                placeholder_shown(value, placeholder, composing).as_deref(),
+                want
+            );
         }
         assert_eq!(aria_placeholder("").as_deref(), None);
         assert_eq!(aria_placeholder("x").as_deref(), Some("x"));

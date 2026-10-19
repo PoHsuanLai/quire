@@ -22,8 +22,9 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
         caret,
         handlers,
         told,
+        ime,
     } = field;
-    let shown = placeholder_shown(value, &placeholder);
+    let shown = placeholder_shown(value, &placeholder, ime.composition());
     rsx! {
         span {
             class: "ds-input-wrap",
@@ -47,10 +48,12 @@ pub(crate) fn area(field: Field, value: &str) -> Element {
                 value: "{value}",
                 onmounted: move |event| {
                     caret.mounted(&event);
+                    ime.mounted(&event);
                     focuser.mounted(focus, &event, told);
                 },
                 onfocus: move |_| handlers.onfocus.call(()),
                 onblur: move |_| {
+                    ime.left();
                     handlers.onchange.call(());
                     handlers.onblur.call(());
                 },

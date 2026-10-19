@@ -17,6 +17,7 @@ use crate::components::controls::progress::busy::use_busy;
 use crate::components::controls::progress::model::{Progress, ProgressStyle};
 use crate::components::controls::progress::view::ProgressIndicator;
 use crate::components::fields::text_field_focus::{FieldFocus, FieldFocuser};
+use crate::components::fields::text_field_ime::FieldIme;
 use crate::components::fields::text_field_mask::MaskCaret;
 use crate::components::fields::text_field_model::{
     FieldBezel, FieldKind, FieldRows, FieldText, Validity,
@@ -173,6 +174,7 @@ pub fn TextField(
 ) -> Element {
     let focuser = FieldFocuser::use_new(handle);
     let caret = MaskCaret::use_new();
+    let ime = FieldIme::use_new();
     let mut typed = use_signal(String::new);
     let mut holds = use_signal(|| Holds::Elsewhere);
     let operation = use_busy(availability);
@@ -238,6 +240,7 @@ pub fn TextField(
             onsubmit: EventHandler::new(move |()| onsubmit.call(submitted.clone())),
         },
         told,
+        ime,
     };
     let leading = match (prefix, kind) {
         (Some(mark), _) => Some(mark),
