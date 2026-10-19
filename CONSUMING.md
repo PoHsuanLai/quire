@@ -2199,8 +2199,14 @@ fn Editor() -> Element {
 - **Where the keymap comes from.** `Ds` loads it from the `KeySource` in the root context. A launch
   provides one: `AppConfig::with_keymap_source(Box<dyn KeymapSource + Send + Sync>)` (the platform
   is detected, `CHORDKIT_PLATFORM` overrides) or `with_keymap(platform, source)`. Without either,
-  `launch` uses `chordkit::detect_process` and chordkit's own source for that platform (the KDE
-  file, a GNOME dump saved at `$XDG_CONFIG_HOME/chordkit/dconf-dump`, else the conventions).
+  `launch` uses the platform `chordkit::detect` finds and the desktop's own shortcut settings for
+  it: `kdeglobals` on Plasma; on GNOME the dconf database through `dconf dump /`, read when the
+  source is made and again on the watch's thread when the database changes (a failed `dconf` keeps
+  the last dump; with no `dconf` program, the dump saved at `$XDG_CONFIG_HOME/chordkit/dconf-dump`
+  is read); elsewhere the conventions. Both stores are watched, so a change in the desktop's
+  settings reloads the keymap. An app that builds a keymap of its own on the system's, outside any
+  window, takes `ds_blitz::system_key_source(platform, lookup)` (the config directory read through
+  its lookup) and loads and watches the `KeySource` it returns (`source()`, `watch`).
   quire does not depend on keycap: our desktop's launcher plugs its source in,
 
   ```text

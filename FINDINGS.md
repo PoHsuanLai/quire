@@ -1796,8 +1796,12 @@ Open:
 - Open: the Blitz fork's text actions (`ACTION_MODS` in the fork's `util.rs`) still accept Ctrl and
   Super on every platform and ignore Meta; the later fork lane feeds them from the keymap. Until then
   Ctrl+A/Z/C/V work in a text field on our desktop through Blitz, not through the keymap.
-- Open: the GNOME source reads a saved `dconf dump /` at `$XDG_CONFIG_HOME/chordkit/dconf-dump`; nothing
-  writes that file yet (chordkit FINDINGS "Sources").
+- Closed 2026-10-19: the GNOME source runs `dconf dump /` itself, when the source is made and on the
+  watch's thread when `$XDG_CONFIG_HOME/dconf/user` changes, and holds the dump in memory, so a load
+  (which `Keys` may do during a render) only parses. A failed `dconf` keeps the last dump; the dump
+  saved at `$XDG_CONFIG_HOME/chordkit/dconf-dump` is read only when there is no `dconf` program, and
+  that file is not watched. The `dconf` call is injected, so tests never read the real database.
+  Moved from temor's own keymap source, which now takes quire's.
 - Open: `Keys` reloads inside `Ds`'s render (the watch callback sets a flag and schedules the render),
   and registering writes a signal during a render. Neither has been run; check for a dioxus
   "write during render" warning with a live source.

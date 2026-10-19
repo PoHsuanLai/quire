@@ -129,6 +129,7 @@ pub use frame_links::{FrameLink, FrameLinkHandler, FrameLinks};
 pub use frame_menu::{FrameLinkMenu, FrameMenu, FrameMenuHandler};
 pub use frame_tag::FrameTag;
 pub use gpu_request::GpuRequest;
+pub use keymap_detect::system_key_source;
 pub use launch::{AppConfig, RuntimeGuard, TokioSpawner, enter_runtime, launch, launch_idle};
 pub use link_open::{LinkFailureHandler, LinkOpenError};
 pub use net_policy::{AppNet, NetDecision, NetPolicy, NetReply, NetRequest};

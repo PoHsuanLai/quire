@@ -1,6 +1,6 @@
 //! Which keymap source a launch uses: the one the environment names, or the one the app gave.
 
-use crate::keymap_detect::{detected, platform_of};
+use crate::keymap_detect::{detected_key_source, platform_of};
 use chordkit::{ChangeCallback, Keymap, KeymapSource, Platform, SourceError, Watch};
 use ds::keys::KeySource;
 use std::fmt;
@@ -24,7 +24,7 @@ impl KeymapChoice {
     /// The source to launch with, reading the environment through `var`.
     pub(crate) fn resolve(self, var: &impl Fn(&str) -> Option<String>) -> KeySource {
         match self {
-            KeymapChoice::Detected => detected(var),
+            KeymapChoice::Detected => detected_key_source(var),
             KeymapChoice::Given(source) => {
                 KeySource::new(platform_of(var), Box::new(Shared(source)))
             }

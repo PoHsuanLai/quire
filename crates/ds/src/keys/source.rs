@@ -56,8 +56,17 @@ impl KeySource {
         self.source.load(self.platform)
     }
 
-    pub(super) fn watch(&self, on_change: ChangeCallback) -> Result<Watch, SourceError> {
+    /// Calls `on_change` whenever the source's settings change, until the `Watch` is dropped, so an
+    /// app that builds a keymap of its own from this source can load it again.
+    pub fn watch(&self, on_change: ChangeCallback) -> Result<Watch, SourceError> {
         self.source.watch(on_change)
+    }
+
+    /// The source itself, for an app that builds a keymap of its own on it. Loading it gives the
+    /// system's keymap alone: the overrides from [`with_overrides`](KeySource::with_overrides) are
+    /// not applied.
+    pub fn source(&self) -> &(dyn KeymapSource + Send + Sync) {
+        &*self.source
     }
 }
 
