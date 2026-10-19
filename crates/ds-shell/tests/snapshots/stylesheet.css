@@ -2488,6 +2488,10 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-stop .ds-stop-remove{ border:0; background:none; padding:0; cursor:default; color:var(--ink-faint); line-height:0; }
 
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
+/* PresetSwatches: the presets as a settings row's control, the checked one ringed. */
+.ds-preset-swatches{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:var(--s-8); }
+.ds-preset-swatches .ds-preset{ width:24px; height:24px; }
+.ds-preset-swatches .ds-preset[*|aria-checked=true]{ box-shadow:0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
 }
