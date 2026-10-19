@@ -9,6 +9,7 @@ pub(crate) mod field;
 pub(crate) mod handles;
 pub(crate) mod parts;
 pub mod rows;
+pub mod swatches;
 
 use crate::components::controls::choice::Choice;
 use crate::components::controls::segmented::SegmentedControl;
