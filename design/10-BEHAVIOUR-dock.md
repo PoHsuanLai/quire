@@ -120,7 +120,7 @@ The Dock uses the Mac default bounce (settled 2026-10-02): while an app launches
 | Kind | Trigger | Duration | Status |
 | --- | --- | --- | --- |
 | Launch | primary click on a tile whose app has no toplevel and was launched by us | repeats until `match_app` sees the app's first toplevel, the launched scope exits, or 10 s pass | settled (R8 H), 10 s cap proposed |
-| Informational | `sill` IPC `Dock{Attention{app, Informational}}` (proposed IPC addition) | 1 s = 2 periods | R8 (H) |
+| Informational | `sill` IPC `Dock{Attention{app, Informational}}` (proposed IPC addition) | 2 periods (1.2 s; the Mac's is about 1 s) | R8 (H) |
 | Critical | LauncherEntry `urgent = true`, or IPC `Dock{Attention{app, Critical}}` | repeats until the app has an activated toplevel or `urgent` clears | R8 (H) |
 
 | Value | Number | Status | Basis |
@@ -476,9 +476,9 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
    move to the neighbour: its label appears within 1 frame; leave for 300 ms and return: 0 ms
    delay; leave for 500 ms and return: the open delay again.
 8. **Bounce**: Informational: the tile's lift follows 10.5.3 within 1 px per frame and ends at
-   1000 ms +- 1 frame; Critical: continues until a toplevel of that app is activated, then
-   finishes the current period; Launch with a test app that maps a window at 1.3 s: stops at
-   the end of the period containing 1.3 s (1.5 s).
+   1200 ms +- 1 frame (two periods); Critical: continues until a toplevel of that app is
+   activated, then finishes the current period; Launch with a test app that maps a window at
+   1.3 s: stops at the end of the period containing 1.3 s (1.8 s).
 9. **Exclusive zone**: a maximised foot window has height `output_h - bar_h - 72`
    (auto-hide Off) and `output_h - bar_h` (auto-hide On).
 10. **Clicks** (scripted with a test app): launch; activate; cycle with two windows alternates
