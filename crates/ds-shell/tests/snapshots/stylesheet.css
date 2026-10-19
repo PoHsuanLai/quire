@@ -1884,7 +1884,7 @@ html,body{margin:0;padding:0;background:transparent}
 /* -- row -- */
 /* Row (design/30 section 2.6, `NSTableCellView`): a leading element, the words, an accessory. Rows
    are 24 tall (Compact; 28 in a table) or 44 (Settings); a row under a highlight fills with the accent and takes
-   the accent's ink (a source list's row fills neutral instead, below) (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
+   the accent's ink (a source list's row fills neutral instead, always, below) (`FocusStyle::Highlight`, section 1.4), grey when its window is inactive or its
    list has lost the keyboard. No hover: a pointer over a row changes nothing (section 1.4).
    Attribute selectors carry `*|` (spike S2). */
 
@@ -1914,19 +1914,16 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
 .ds-list[*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
-/* A source list is a sidebar, selected the Mac way (design/27 section 5.12): while the list holds
-   the keyboard its selection is emphasized (the accent with white ink, the plain row rule above);
-   when focus is elsewhere, or the window is inactive, it is a neutral rounded wash that keeps the
-   row's ink, and the selected symbol takes the accent (grey with an inactive window). */
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true],
-.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-neutral); color:var(--ink); }
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic,
-.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
-.ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing{ color:var(--ink-soft); }
-.ds-list[*|data-style=source-list][*|data-focus=away] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--accent-text); }
+/* A source list is a sidebar, and its selection says where you are, not what to act on
+   (design/27 section 5.12): a neutral rounded wash that keeps the row's ink, focused or not,
+   active window or inactive, so the accent is left to the content beside it. The symbol is ink
+   too; an inactive window softens it with the words around it. */
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true]{ background:var(--sel-neutral); color:var(--ink); }
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-detail,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-disclosure,
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-trailing .ds-ic{ color:var(--ink-soft); }
+.ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink); }
 .ds[*|data-activity=inactive] .ds-list[*|data-style=source-list] .ds-row[*|data-focus=highlight][*|aria-selected=true] .ds-row-leading{ color:var(--ink-soft); }
 
 /* The words: the title over its detail. Emphasis Strong is an unread row. */
