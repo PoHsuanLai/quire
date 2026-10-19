@@ -2907,11 +2907,19 @@ html,body{margin:0;padding:0;background:transparent}
    so Blitz's own selection, which it paints over the hidden text in a fixed colour no style
    reaches, stays under it and only the dots' highlight shows. A Plain field's ground is its
    container's, which the mask cannot repeat: there Blitz's highlight shows beside the dots' when
-   a range is selected. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{ line-height:var(--tf-h); background:var(--tf-ground); }
-/* Bezeled, the caret spans the field's line, hung from its top: the ascent plus the line's
+   a range is selected. The frame's rings are inset shadows, painted under its children, so the
+   mask stops short of the frame's top and bottom by the widest of them (the invalid ring, 1.5
+   hairlines) and its line is that much shorter, centred where the field's is: an opaque mask of
+   the field's full height hid the ring's long edges as soon as one dot was typed. */
+.ds-input-wrap[*|data-variant=bezeled]{ --tf-mask-inset:calc(var(--hair) * 1.5); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-mask{
+  top:var(--tf-mask-inset); line-height:calc(var(--tf-h) - 2 * var(--tf-mask-inset)); background:var(--tf-ground);
+}
+/* Bezeled, the caret spans the mask's line, hung from its top: the ascent plus the line's
    half-leading over Inter's 1.21em. */
-.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{ top:calc(-.969em - (var(--tf-h) - 1.21em) / 2); height:var(--tf-h); }
+.ds-input-wrap[*|data-variant=bezeled] .ds-input-caret::before{
+  top:calc(-.969em - (var(--tf-h) - 2 * var(--tf-mask-inset) - 1.21em) / 2); height:calc(var(--tf-h) - 2 * var(--tf-mask-inset));
+}
 
 /* Plain: the field takes the face of the text it edits. No box, border, padding or ground; font,
    size, weight, tracking, line height and colour are inherited, so a title or a property row's
