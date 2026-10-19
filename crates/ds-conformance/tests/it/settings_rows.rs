@@ -1,9 +1,9 @@
 //! The rows of a settings pane on a real Blitz document: a FieldRow leads with a tile, its label
 //! keeps its words' width when the window narrows, and a row inside a FormSection keeps its
 //! height and vertical padding; a source list's tiles follow the sidebar's size; a source list's
-//! glyphs take the ink of a selection that moves; RowMore's press reaches the host first; a
-//! grouped list after a FieldRow in one FormSection has the hairline between them; a neutral
-//! family tile turns dark with the scheme and its glyph shows on it.
+//! glyphs take the ink of a selection that moves, dark on its neutral wash; RowMore's press
+//! reaches the host first; a grouped list after a FieldRow in one FormSection has the hairline
+//! between them; a neutral family tile turns dark with the scheme and its glyph shows on it.
 
 use dioxus::prelude::*;
 use ds::base::geometry::units::{Point, Px};
@@ -207,7 +207,8 @@ fn a_source_list_glyph_takes_the_ink_of_a_selection_that_moves() {
     harness.send(Input::click(at));
     harness.advance(Duration::from_millis(400));
     // The row that lost the selection draws its glyph dark on the white ground, where a baked
-    // white would leave nothing but its words; the row that won draws it white on the accent.
+    // white would leave nothing but its words; the row that won draws it dark too, on the neutral
+    // wash a sidebar's selection is (design/27 section 5.12), not white on the accent.
     let (lost, won) = (ink_at(&mut harness, 12), ink_at(&mut harness, 44));
     assert!(
         lost > 5_000,
@@ -223,10 +224,9 @@ fn a_source_list_glyph_takes_the_ink_of_a_selection_that_moves() {
         .flat_map(|y| (20..38).map(move |x| (x, y)))
         .map(|(x, y)| glyph(x, y))
         .max();
-    assert_eq!(
-        brightest,
-        Some(255),
-        "the selected glyph stays dark on the accent"
+    assert!(
+        brightest.is_some_and(|brightest| brightest < 250),
+        "the selected glyph is white, as on the accent: {brightest:?}"
     );
 }
 

@@ -1,7 +1,6 @@
-//! A source list's selected row, when the list does not hold the keyboard, is a neutral grey wash
-//! (`--sel-neutral`), not the accent, in an active window and an inactive one (macOS's
-//! unemphasized sidebar selection; a focused list's emphasized accent selection is
-//! `settings_rows.rs`'s case).
+//! A source list's selected row is a neutral grey wash (`--sel-neutral`), not the accent, whether
+//! or not the list holds the keyboard, in an active window and an inactive one: a sidebar's
+//! selection says where you are, and the accent is left to the content (design/27 section 5.12).
 
 use crate::support::probe;
 
@@ -14,14 +13,15 @@ use probe::{distance, keep, modal, pixels, rect};
 
 const VIEW: Viewport = Viewport {
     width: 300,
-    height: 140,
+    height: 180,
     scale_percent: 100,
 };
 
-/// A source list whose one row is selected and whose list is not the keyboard's.
-fn list(id: &'static str) -> Element {
+/// A source list whose one row is selected, its list the keyboard's (no `data-focus`) or not
+/// (`away`).
+fn list(id: &'static str, focus: Option<&'static str>) -> Element {
     rsx! {
-        div { class: "ds-list", "data-style": "source-list", "data-focus": "away",
+        div { class: "ds-list", "data-style": "source-list", "data-focus": focus,
             div { id, class: "ds-row", "data-focus": "highlight", "aria-selected": "true", style: "height:28px", "Inbox" }
         }
     }
@@ -33,20 +33,21 @@ fn Stage() -> Element {
         Ds {
             appearance: Appearance { theme: Theme::Light, ..Appearance::default() },
             material: Material::Window,
-            div { style: "padding:8px", {list("active")} }
-            div { class: "ds", "data-theme": "light", "data-activity": "inactive", style: "padding:8px", {list("inactive")} }
+            div { style: "padding:8px", {list("focused", None)} }
+            div { style: "padding:8px", {list("active", Some("away"))} }
+            div { class: "ds", "data-theme": "light", "data-activity": "inactive", style: "padding:8px", {list("inactive", Some("away"))} }
         }
     }
 }
 
 #[test]
-fn the_selected_row_is_neutral_grey_active_or_inactive() {
+fn the_selected_row_is_neutral_grey_focused_or_not_active_or_inactive() {
     let mut harness = Harness::new(Stage, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     let frame = harness.render().expect("renders");
     keep(&frame, "source-list-selection");
     let fill = |id: &str| modal(&pixels(&frame, rect(&harness, id), 2.0));
     let Hex([r, g, b]) = accent_of(Accent::Blue, Scheme::Light).fill;
-    for id in ["#active", "#inactive"] {
+    for id in ["#focused", "#active", "#inactive"] {
         let got = fill(id);
         assert!(
             got[0].abs_diff(got[2]) < 24,
