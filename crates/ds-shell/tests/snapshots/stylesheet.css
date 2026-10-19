@@ -1523,7 +1523,19 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-search-card{ width:600px; max-width:100%; overflow:hidden; border-radius:inherit; }
 .ds-search-card[*|data-surface=own]{ background:var(--raise); color:var(--ink); border-radius:var(--r-panel); box-shadow:var(--shadow-pop); }
 .ds-search-card-rows{ max-height:440px; overflow-y:auto; scrollbar-width:none; border-top:var(--hair) solid var(--line-soft); }
-.ds-search-card-rows .ds-menu[*|data-flow=inline]{ padding:var(--shell-menu-inset); }
+/* The card is Spotlight's panel, so it keeps the command palette's launcher scale (the macOS
+   polish pass, design/13 section 13.3.9), not a text menu's: the query row at 12 by 16 with the
+   22/500 query beside the 20 px glyph, the rows 38 high (`--row-palette-h`) at the row title's
+   14, inset 12 from the card's edge (`--shell-palette-inset`). */
+/* Each selector outweighs the plain search field's own (`text_field.css`), which comes later. */
+.ds-search-card .ds-text-field[*|data-kind=search][*|data-variant=plain] .ds-text-field-frame{ padding:var(--s-12) var(--s-16); gap:var(--s-11); }
+.ds-search-card .ds-text-field[*|data-kind=search] .ds-text-field-icon .ds-ic{ width:var(--shell-field-glyph); height:var(--shell-field-glyph); }
+.ds-search-card .ds-text-field[*|data-kind=search] .ds-input[*|data-variant=plain],
+.ds-search-card .ds-text-field[*|data-kind=search] .ds-input-wrap[*|data-variant=plain] .ds-input-placeholder{ font-size:var(--fs-shell-field); font-weight:var(--fw-shell-field); }
+/* The syntax chips start where the glyph does. */
+.ds-search-card .ds-text-field[*|data-kind=search] .ds-text-field-tokens{ padding:var(--s-4) var(--s-16) var(--s-8); }
+.ds-search-card-rows .ds-menu[*|data-flow=inline]{ padding:var(--shell-palette-inset); }
+.ds-search-card-rows .ds-menu-item{ min-height:var(--row-palette-h); font-size:var(--fs-shell-row); }
 /* -- pane_stack -- */
 /* PaneStack and PageHeader (design/34-MODERN-LOOK.md sections 3.5 and 7). The pages slide as the
    control center's panes do, 26 px and a fade, from one spring in Rust (design/05 section 14, H1):
