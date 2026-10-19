@@ -3,8 +3,9 @@
 //! `SettingChanged`, mapped to [`ds::prelude::SystemPrefs`]. The mappings are pure tables, tested
 //! against a fake `ReadAll`/`SettingChanged` payload with no bus involved; only
 //! [`SystemPrefsSource::Portal`] touches `zbus`, and only on Linux with feature `quire-desktop`
-//! (`portal/bus.rs`) — a desktop without the portal, or a build for a platform or feature set that
-//! has none (`portal/absent.rs`), simply answers [`ds::prelude::SystemPrefs::default`].
+//! (`portal/bus.rs`). On macOS the same answers come from the user's defaults (`portal/macos.rs`).
+//! A desktop without the portal, or a build for a platform or feature set that has neither
+//! (`portal/absent.rs`), simply answers [`ds::prelude::SystemPrefs::default`].
 
 use crate::latest::{self, Receiver};
 use ds_core::spawner::Spawner;
@@ -13,13 +14,17 @@ use ds_style::appearance::system::ReducedMotion;
 use ds_style::appearance::system::SystemPrefs;
 use ds_style::appearance::theme::Scheme;
 
-// The half that reaches `zbus`, or its stand-in with the same two entry points.
+// The half that reaches `zbus`, the Mac's defaults, or a stand-in, with the same two entry points.
 #[cfg_attr(
     all(target_os = "linux", feature = "quire-desktop"),
     path = "portal/bus.rs"
 )]
+#[cfg_attr(target_os = "macos", path = "portal/macos.rs")]
 #[cfg_attr(
-    not(all(target_os = "linux", feature = "quire-desktop")),
+    not(any(
+        all(target_os = "linux", feature = "quire-desktop"),
+        target_os = "macos"
+    )),
     path = "portal/absent.rs"
 )]
 mod bus;

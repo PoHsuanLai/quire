@@ -27,6 +27,11 @@ toml = { workspace = true }
 # Save merges into the parsed file, keeping unknown keys and comments.
 toml_edit = { workspace = true }
 
+[target.'cfg(target_os = "macos")'.dependencies]
+# The system's appearance and accessibility preferences (`portal/macos.rs`), read from the user's
+# defaults through safe bindings.
+objc2-core-foundation = { workspace = true }
+
 [lints]
 workspace = true
 

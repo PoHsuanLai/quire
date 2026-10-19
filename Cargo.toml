@@ -162,6 +162,9 @@ toml = "1"
 toml_edit = "0.25"
 # The `flock` between programs that write one file (ds-helpers `update_atomic`), Unix only; no
 # `unsafe` on our side.
+# macOS preferences (ds-settings `portal/macos.rs`): CFPreferences through safe bindings, the
+# version winit already brings.
+objc2-core-foundation = { version = "0.3.2", default-features = false, features = ["std", "CFBase", "CFString", "CFNumber", "CFPreferences", "CFPropertyList"] }
 rustix = { version = "1", default-features = false, features = ["std", "fs"] }
 # SSR renders for component goldens and markup lint (dev-dependency in consumers).
 dioxus-ssr = "0.7"
