@@ -2395,13 +2395,14 @@ dependencies = [
 [[package]]
 name = "glifo"
 version = "0.2.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=3e43d4af1f1955f2efc2cd52e50350811a1386ca#3e43d4af1f1955f2efc2cd52e50350811a1386ca"
+source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
 dependencies = [
  "bytemuck",
  "foldhash 0.2.0",
  "hashbrown 0.17.1",
  "log",
  "peniko",
+ "png",
  "skrifa 0.44.0",
  "smallvec",
  "vello_common 0.1.0",
@@ -5912,7 +5913,7 @@ dependencies = [
 [[package]]
 name = "vello_common"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=3e43d4af1f1955f2efc2cd52e50350811a1386ca#3e43d4af1f1955f2efc2cd52e50350811a1386ca"
+source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
 dependencies = [
  "bytemuck",
  "fearless_simd",
@@ -5942,7 +5943,7 @@ dependencies = [
 [[package]]
 name = "vello_cpu"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=3e43d4af1f1955f2efc2cd52e50350811a1386ca#3e43d4af1f1955f2efc2cd52e50350811a1386ca"
+source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
 dependencies = [
  "bytemuck",
  "crossbeam-channel",
@@ -5969,7 +5970,7 @@ dependencies = [
 [[package]]
 name = "vello_hybrid"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=3e43d4af1f1955f2efc2cd52e50350811a1386ca#3e43d4af1f1955f2efc2cd52e50350811a1386ca"
+source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
 dependencies = [
  "bytemuck",
  "glifo 0.2.0",
@@ -5984,7 +5985,7 @@ dependencies = [
 [[package]]
 name = "vello_sparse_shaders"
 version = "0.1.0"
-source = "git+https://github.com/PoHsuanLai/vello?rev=3e43d4af1f1955f2efc2cd52e50350811a1386ca#3e43d4af1f1955f2efc2cd52e50350811a1386ca"
+source = "git+https://github.com/PoHsuanLai/vello?rev=5379e4a8cfc2175160365d45b17f53b9eb435ba6#5379e4a8cfc2175160365d45b17f53b9eb435ba6"
 dependencies = [
  "wesl",
  "wesl-macros",
