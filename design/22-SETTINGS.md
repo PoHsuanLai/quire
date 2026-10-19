@@ -205,7 +205,7 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.magnify_enter_ms` | `Ms` | `120` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | proposed |
 | `dock.magnify_leave_ms` | `Ms` | `200` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | settled (~200ms), easing proposed |
 | `dock.hover_label_warm_ms` | `Ms` | `400` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
-| `dock.bounce_period_ms` | `Ms` | `500` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
+| `dock.bounce_period_ms` | `Ms` | `600` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed (Plank) |
 | `dock.bounce_launch_cap_ms` | `Ms` | `10000` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
 | `dock.hold_to_menu_ms` | `Ms` | `600` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
 | `dock.hold_to_menu_move_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
@@ -841,7 +841,7 @@ impl Default for DockSettings {
             magnify_enter_ms: Ms(120),
             magnify_leave_ms: Ms(200),
             hover_label_warm_ms: Ms(400),
-            bounce_period_ms: Ms(500),
+            bounce_period_ms: Ms(600),
             bounce_launch_cap_ms: Ms(10_000),
             hold_to_menu_ms: Ms(600),
             hold_to_menu_move_px: Px(8),

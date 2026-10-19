@@ -125,8 +125,8 @@ The Dock uses the Mac default bounce (settled 2026-10-02): while an app launches
 
 | Value | Number | Status | Basis |
 | --- | --- | --- | --- |
-| Amplitude `A` | one tile height at rest = `T` (48) | settled (brief), R9 (L) |
-| Period `P` (up + down) | 500 ms | proposed (L) |
+| Amplitude `A` | 5/8 of the tile height at rest = `5T/8` (30 at T = 48) | proposed: Plank's LaunchBounceHeight 0.625 (no measured Mac number; a whole tile hopped too high on the trial login of 2026-10-19) |
+| Period `P` (up + down) | 600 ms | proposed: Plank's bounce time (no measured Mac number; 500 ms read as too fast) |
 | Shape | ballistic: 10.5.3 (decelerates up, accelerates down, no squash) | R9 (L) |
 | Settings | `dock.bounce` ON/OFF gates Informational and Critical; `dock.launch_animation` ON/OFF gates Launch | R10 (H) |
 | Frames | a bouncing tile requests frames; all other tiles do not change | proposed |
@@ -377,8 +377,8 @@ in x (slot boundaries map to the same point from both sides).
 ### 10.5.3 Bounce
 
 ```
-u = ((now - since) mod P) / P                  0..1, P = 500 ms
-lift(u) = A * 4 u (1 - u)                      px, A = T = 48; peak A at u = 0.5
+u = ((now - since) mod P) / P                  0..1, P = 600 ms
+lift(u) = A * 4 u (1 - u)                      px, A = 5T/8 = 30; peak A at u = 0.5
 ```
 
 Vertical velocity `A(4 - 8u)/P` falls linearly on the way up and rises on the way down (R9).
@@ -421,7 +421,7 @@ Settings app keys, stored in `~/.config/sill/settings.toml` under `dock` (`22-SE
 | `dock.trash` | `On | Off` | `On` | | proposed |
 
 Gallery-only knobs (not in Settings): `R` (96), `g` (4), `--m-radius` (22, owned by 03-COLOR), enter 120 ms,
-leave 200 ms, bounce `P` 500 ms, hold-to-menu (the `LongPress` delay), remove threshold 64 px.
+leave 200 ms, bounce `P` 600 ms, hold-to-menu (the `LongPress` delay), remove threshold 64 px.
 
 ## 10.7 Integration
 
