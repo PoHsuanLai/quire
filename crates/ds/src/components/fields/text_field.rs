@@ -142,8 +142,9 @@ fn clear_size(size: ControlSize) -> ControlSize {
 /// for Enter; a secure field takes `value` too under `text: FieldText::Caller`, and then keeps
 /// no copy of the text (its renderer's own input aside). `prefix` and `suffix` are
 /// marks inside the frame before and after the text; `help` is a note under it, and `validity`
-/// says the value is rejected: its message replaces the help in the danger ink, and a secure
-/// field shakes once for each new rejection. `Busy` takes no input and shows a spinner after
+/// says the value is rejected: its message replaces the help in the danger ink (a plain field
+/// draws its text and a line under it in that ink instead, the message its `aria-description`),
+/// and a secure field shakes once for each new rejection. `Busy` takes no input and shows a spinner after
 /// the text. `common.id` is the input's own, so `focus_by_selector` can find it.
 #[component]
 pub fn TextField(
@@ -211,7 +212,13 @@ pub fn TextField(
     };
     let clearing =
         kind == FieldKind::Search && !held_text.is_empty() && availability == Availability::Enabled;
-    let note = validity.message().cloned().or(help);
+    // A plain field sits inline in a row of text, so its rejection is its ink and a line under
+    // it, as a browser marks an invalid input; why is the input's description, not a line that
+    // would push the row taller. A bezeled field says why under its frame.
+    let (note, description) = match bezel {
+        FieldBezel::Plain => (help, validity.message().map(TextLine::plain_text)),
+        FieldBezel::Bezeled => (validity.message().cloned().or(help), None),
+    };
     let field = Field {
         bezel,
         rows,
@@ -221,6 +228,7 @@ pub fn TextField(
         placeholder,
         availability,
         invalid: validity.attr().map(|_| "true"),
+        description,
         focus: round.focus(focus),
         focuser: focuser.clone(),
         caret,

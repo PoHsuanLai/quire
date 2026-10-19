@@ -66,7 +66,8 @@ pub enum FieldBezel {
     /// No box, no padding and no ground of its own: font, size, weight, tracking and colour are
     /// the parent's, so a property row's value, a title or a row's name is edited where it reads,
     /// and a container that draws the field's ground shows the focus. Only the caret
-    /// (`--accent`) and the selection are styled.
+    /// (`--accent`) and the selection are styled, and a rejected value: its text and a line
+    /// under it in the danger ink.
     Plain,
 }
 

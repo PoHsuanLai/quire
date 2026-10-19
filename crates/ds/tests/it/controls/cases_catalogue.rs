@@ -450,6 +450,11 @@ pub const CASES: &[Case] = &[
     },
     Case {
         component: "text_field",
+        state: "plain-rejected",
+        make: || rsx! { TextField { label: "To", value: "dana@", bezel: FieldBezel::Plain, validity: rejected(), oninput: |_| {} } },
+    },
+    Case {
+        component: "text_field",
         state: "prefix-suffix",
         make: || {
             rsx! {

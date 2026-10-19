@@ -38,6 +38,8 @@ pub(crate) struct Field {
     pub availability: Availability,
     /// `aria-invalid`, while the value is rejected.
     pub invalid: Option<&'static str>,
+    /// `aria-description`: why a plain field's value is rejected, which it does not draw.
+    pub description: Option<String>,
     pub focus: FieldFocus,
     pub focuser: FieldFocuser,
     /// A masked field's own caret over its dots.
@@ -75,6 +77,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
         placeholder,
         availability,
         invalid,
+        description,
         focus,
         focuser,
         caret,
@@ -107,6 +110,7 @@ pub(crate) fn line(field: Field, kind: FieldKind, value: String) -> Element {
                 "aria-label": "{label}",
                 "aria-placeholder": aria_placeholder(&placeholder),
                 "aria-invalid": invalid,
+                "aria-description": description,
                 "aria-disabled": availability.aria_disabled(),
                 "aria-busy": availability.aria_busy(),
                 autocomplete: "off",
