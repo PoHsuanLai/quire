@@ -225,15 +225,15 @@ blitz-kit = { path = "../blitz-kit/crates/blitz-kit" }
 # vello and anyrender come from our forks (github.com/PoHsuanLai/vello and /anyrender, branch
 # quire-filters): the colour matrix filter, multi-threaded filter layers and CSS filter lists, so
 # every CSS `filter` function paints on both backends; d4ae3885 lets a window renderer name the wgpu
-# backends it probes, falling back once to the default set; 5379e4a8 draws bitmap glyphs (colour
+# backends it probes, falling back once to the default set; 84b2c9f7 draws bitmap glyphs (colour
 # emoji from `sbix` and CBDT fonts) on vello_hybrid. Move back to crates.io once upstream has
 # them (blitz-kit docs/blitz-gaps.md tracks the PRs).
 [patch.crates-io]
-vello_common = { git = "https://github.com/PoHsuanLai/vello", rev = "5379e4a8cfc2175160365d45b17f53b9eb435ba6" }
-vello_cpu = { git = "https://github.com/PoHsuanLai/vello", rev = "5379e4a8cfc2175160365d45b17f53b9eb435ba6" }
-vello_hybrid = { git = "https://github.com/PoHsuanLai/vello", rev = "5379e4a8cfc2175160365d45b17f53b9eb435ba6" }
-vello_sparse_shaders = { git = "https://github.com/PoHsuanLai/vello", rev = "5379e4a8cfc2175160365d45b17f53b9eb435ba6" }
-glifo = { git = "https://github.com/PoHsuanLai/vello", rev = "5379e4a8cfc2175160365d45b17f53b9eb435ba6" }
+vello_common = { git = "https://github.com/PoHsuanLai/vello", rev = "84b2c9f7debed7d15f48d0ec9ea8575c16a56938" }
+vello_cpu = { git = "https://github.com/PoHsuanLai/vello", rev = "84b2c9f7debed7d15f48d0ec9ea8575c16a56938" }
+vello_hybrid = { git = "https://github.com/PoHsuanLai/vello", rev = "84b2c9f7debed7d15f48d0ec9ea8575c16a56938" }
+vello_sparse_shaders = { git = "https://github.com/PoHsuanLai/vello", rev = "84b2c9f7debed7d15f48d0ec9ea8575c16a56938" }
+glifo = { git = "https://github.com/PoHsuanLai/vello", rev = "84b2c9f7debed7d15f48d0ec9ea8575c16a56938" }
 anyrender = { git = "https://github.com/PoHsuanLai/anyrender", rev = "d4ae3885f89a58351ff7e99cd75d9b7de5865337" }
 anyrender_vello_cpu = { git = "https://github.com/PoHsuanLai/anyrender", rev = "d4ae3885f89a58351ff7e99cd75d9b7de5865337" }
 anyrender_vello_hybrid = { git = "https://github.com/PoHsuanLai/anyrender", rev = "d4ae3885f89a58351ff7e99cd75d9b7de5865337" }
