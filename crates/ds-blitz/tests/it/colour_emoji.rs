@@ -55,6 +55,21 @@ fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
         eprintln!("skipped: no COLRv1 colour emoji font (Noto-COLRv1.ttf) is installed");
         return;
     }
+    paints_in_colour("colour_emoji");
+}
+
+/// On a Mac the system's own colour face, Apple Color Emoji, is `sbix` bitmaps: with no COLRv1
+/// font installed, every stack above reaches it, and it paints in colour (`ds_blitz::EmojiChoice`
+/// takes a bitmap colour face where there is no vector one).
+#[cfg(target_os = "macos")]
+#[test]
+fn the_macs_bitmap_emoji_paint_in_colour() {
+    paints_in_colour("bitmap_emoji");
+}
+
+/// Each emoji of [`app`] is coloured, and the text under `.ds-emoji-text` is Inter's. The picture
+/// goes to `$EMOJI_OUT/<name>.png` when that is set.
+fn paints_in_colour(name: &str) {
     let mut harness = Harness::new(app, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
     harness.advance(Duration::from_millis(100));
     let shot = harness.render().expect("renders");
@@ -90,7 +105,7 @@ fn colrv1_emoji_paint_in_colour_on_vello_cpu() {
     };
     let (ours, inter) = (crop("#token-text"), crop("#inter-text"));
     if let Ok(dir) = std::env::var("EMOJI_OUT") {
-        let _ = shot.save(format!("{dir}/colour_emoji.png"));
+        let _ = shot.save(format!("{dir}/{name}.png"));
     }
     assert!(ours == inter, "text under .ds-emoji-text is not Inter's");
 }

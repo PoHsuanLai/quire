@@ -7,9 +7,12 @@
 //! sequences) before the `emoji` generic is ever consulted. So the colour face is inserted into
 //! each generic list just before its first family that maps an emoji: text fonts earlier in the
 //! list still map the letters, digits and spaces (Noto Color Emoji maps digits to empty glyphs).
-//! The face is detected, not named: the one `QUIRE_EMOJI_FAMILY` names, else the first family of
-//! the `emoji` generic that carries a COLR table (CBDT draws nothing on our renderers), else the
-//! COLRv1 file the installer or a distro package left on disk (`emoji_file`), registered here.
+//! The face is detected, not named, and nothing here asks which platform it is on: the one
+//! `QUIRE_EMOJI_FAMILY` names, else the first family of the `emoji` generic that carries a COLR
+//! table, else the COLRv1 file the installer or a distro package left on disk (`emoji_file`),
+//! registered here, else the first family of the `emoji` generic with bitmap colour glyphs
+//! (`sbix`: Apple Color Emoji on every Mac; `CBDT`: Ubuntu's Noto Color Emoji). Vector comes first
+//! because it stays sharp at any size; a bitmap glyph is a PNG at the nearest strike.
 
 use crate::emoji_file::colrv1_emoji_file;
 use blitz_dom::FontContext;
@@ -39,7 +42,8 @@ const GENERICS: [GenericFamily; 10] = [
 /// Which family paints colour emoji.
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub enum EmojiChoice {
-    /// The first COLR family the system lists for `emoji`, else a COLRv1 font file on disk.
+    /// The first COLR family the system lists for `emoji`, else a COLRv1 font file on disk, else
+    /// the first family the system lists for `emoji` with bitmap colour glyphs.
     #[default]
     Detect,
     /// This family, trusted without a table check.
@@ -101,23 +105,36 @@ fn insert_before_first(list: &[FamilyId], covers: &[bool], face: FamilyId) -> Ve
     }
 }
 
+/// The table of vector colour glyphs.
+const VECTOR: [[u8; 4]; 1] = [*b"COLR"];
+
+/// The tables of bitmap colour glyphs, PNGs that the renderers draw through glifo's `png`
+/// feature.
+const BITMAP: [[u8; 4]; 2] = [*b"sbix", *b"CBDT"];
+
 /// The family to paint colour emoji with: the one `choice` names, else the first COLR family of
-/// the `emoji` generic, else the COLRv1 file [`colrv1_emoji_file`] finds, registered.
+/// the `emoji` generic, else the COLRv1 file [`colrv1_emoji_file`] finds, registered, else the
+/// first bitmap colour family of the `emoji` generic.
 fn colour_face(ctx: &mut FontContext, choice: &EmojiChoice) -> Option<FamilyId> {
     match choice {
         EmojiChoice::Named(name) => ctx.collection.family_id(name),
-        EmojiChoice::Detect => system_colour_face(ctx).or_else(|| register_colrv1_file(ctx)),
+        EmojiChoice::Detect => system_colour_face(ctx, &VECTOR)
+            .or_else(|| register_colrv1_file(ctx))
+            .or_else(|| system_colour_face(ctx, &BITMAP)),
     }
 }
 
-fn system_colour_face(ctx: &mut FontContext) -> Option<FamilyId> {
+/// The first family of the `emoji` generic whose font carries one of `tables`.
+fn system_colour_face(ctx: &mut FontContext, tables: &[[u8; 4]]) -> Option<FamilyId> {
     let emoji: Vec<FamilyId> = ctx
         .collection
         .generic_families(GenericFamily::Emoji)
         .collect();
-    emoji
-        .into_iter()
-        .find(|id| first_font(ctx, *id, |font| has_table(font, *b"COLR")))
+    emoji.into_iter().find(|id| {
+        first_font(ctx, *id, |font| {
+            tables.iter().any(|tag| has_table(font, *tag))
+        })
+    })
 }
 
 /// The family of the COLRv1 file on this machine, registered with the collection. The

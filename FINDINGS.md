@@ -1318,17 +1318,22 @@ What Blitz at the pinned rev paints (48 px, headless):
 | Face | vello_cpu | vello_hybrid |
 | --- | --- | --- |
 | Noto Color Emoji COLRv1 (Fedora's default), named in the stack | colour, including skin tones, flags and ZWJ sequences shaped to single glyphs (Noto draws the family in greys) | colour, the same to within anti-aliasing |
-| Noto Color Emoji CBDT | nothing (0 inked) | nothing |
-| CBDT with glifo's `png` feature on | colour | **panics** (`pixmap image sources are not supported by Vello Hybrid`) |
+| Noto Color Emoji CBDT, Apple Color Emoji `sbix` (bitmaps), glifo's `png` feature off | nothing (0 inked) | nothing |
+| the same with `png` on (vello fork 5379e4a8: a default feature of vello_hybrid) | colour, including flags and skin tones | colour: each bitmap is put in the atlas for its frame (before 5379e4a8 it **panicked**, `pixmap image sources are not supported by Vello Hybrid`) |
 | no emoji family named, before `ds_blitz::EmojiChoice` | monochrome from Symbola, with tofu for modifiers and flags | |
 | Noto Emoji (monochrome), named | monochrome outlines | |
 
 - **COLRv1 needs no change in quire**: glifo interprets the paint graphs (layers, gradients,
   clips) on either backend. `ds-blitz/tests/colour_emoji.rs` keeps it as a regression test (skipped where
   the font is not installed).
-- **CBDT must stay off.** glifo decodes CBDT only with its `png` feature (anyrender_vello_cpu
-  turns vello_cpu's defaults off); turning it on crashes the window renderer on the first bitmap
-  glyph. An installed CBDT font is harmless only because it draws nothing.
+- **Bitmap colour emoji draw since vello fork 5379e4a8.** glifo decodes `sbix` and `CBDT` glyphs
+  only with its `png` feature, and vello_hybrid sampled only images uploaded beforehand, so the
+  feature crashed the window renderer on the first bitmap glyph and had to stay off. The fork's
+  vello_hybrid now uploads a frame's pixmap images before drawing it and frees them after, and
+  turns `png` on by default (which turns it on for vello_cpu's glifo too). This is what draws
+  emoji on a Mac at all: Apple Color Emoji is `sbix`, and macOS has no COLR emoji face.
+  `ds-blitz/tests/colour_emoji.rs` `the_macs_bitmap_emoji_paint_in_colour` keeps it on vello_cpu;
+  the hybrid path needs a GPU adapter to test.
 - **Stack order.** Noto Color Emoji's cmap maps U+0020, the digits, `#` and `*` (keycap bases),
   and parley takes each cluster from the first family in the stack that maps it. So the text
   face must come first *and be registered*, and the emoji face must come before `system-ui`
@@ -1345,7 +1350,7 @@ What Blitz at the pinned rev paints (48 px, headless):
   asks the element's stack, then the `emoji` generic, and `system-ui`/`sans-serif` expand to the
   whole fontconfig match list (`fc-match -s`), which reaches Symbola before the `emoji` generic
   is consulted. Fix: `ds_blitz::font_context` (`emoji_face.rs`) detects the first COLR family of
-  the `emoji` generic (CBDT is skipped: it draws nothing) and inserts it into each generic list
+  the `emoji` generic, else the COLRv1 file, else the first `sbix` or `CBDT` family, and inserts it into each generic list
   just before the first family mapping U+1F600, so text fonts earlier in the list keep digits and
   spaces. `QUIRE_EMOJI_FAMILY=<name>` (`EmojiChoice::Named`) overrides the detection. Not
   covered: contexts not built by quire (shell-host's `SharedFonts::system`) still need the
@@ -1353,7 +1358,8 @@ What Blitz at the pinned rev paints (48 px, headless):
 
 - **For an emoji grid**: COLRv1 by name for the whole set; AnimatedEmoji's still first frames
   (`EmojiPlayback::Still`) where a cell must match the picture it becomes; pre-rendered sprite
-  sheets only if scrolling were too slow (it is not, "Hybrid harness backend"); never CBDT.
+  sheets only if scrolling were too slow (it is not, "Hybrid harness backend"); bitmaps (`sbix`,
+  CBDT) where the system has no vector face, as on a Mac.
 
 ## CJK segmentation
 
