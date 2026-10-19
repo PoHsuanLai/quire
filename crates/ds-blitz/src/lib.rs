@@ -17,6 +17,7 @@ mod blitz_host;
 mod click_focus;
 pub mod clipboard;
 mod close_request;
+mod content_fit;
 mod contexts;
 #[cfg(feature = "desktop-outputs")]
 mod desktop_outputs;
@@ -118,6 +119,7 @@ pub use blitz_kit::adapter::{ADAPTER_ENV, AdapterPref};
 pub use blitz_kit::net::FileRoots;
 pub use click_focus::FocusFallback;
 pub use close_request::{CloseAnswer, use_close_request};
+pub use content_fit::{ContentFit, use_content_fit};
 pub use contexts::RootContexts;
 pub use emoji_face::{EMOJI_FAMILY_ENV, EmojiChoice};
 pub use emoji_file::colrv1_emoji_file;
