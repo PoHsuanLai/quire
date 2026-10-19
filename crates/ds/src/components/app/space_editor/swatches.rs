@@ -62,15 +62,22 @@ pub fn PresetSwatches(
 #[cfg(test)]
 mod tests {
     use super::PresetSwatches;
+    use crate::assembly::ds::Ds;
     use dioxus::prelude::*;
+    use ds_style::appearance::{appearance::Appearance, material::Material};
     use ds_style::space::look::SpaceLook;
     use ds_style::space::palette::Dot;
     use ds_style::space::presets::PRESETS;
 
     fn page(look: SpaceLook) -> String {
+        // The swatches paint in the scope's scheme, which only a `Ds` provides.
         #[component]
         fn Host(look: SpaceLook) -> Element {
-            rsx! { PresetSwatches { look, onchange: |_| {} } }
+            rsx! {
+                Ds { appearance: Appearance::default(), material: Material::Window,
+                    PresetSwatches { look, onchange: |_| {} }
+                }
+            }
         }
         let mut dom = VirtualDom::new_with_props(Host, HostProps { look });
         dom.rebuild_in_place();
