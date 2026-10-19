@@ -6,7 +6,7 @@ use crate::harness::Harness;
 use crate::harness_input::paste_keys;
 use crate::input::{ImeInput, PasteChord, RawKeyInput, RawKeyPhase};
 use crate::query::first;
-use blitz_traits::events::{MouseEventButton, UiEvent};
+use blitz_traits::events::{BlitzImeEvent, MouseEventButton, UiEvent};
 use ds::host::captured::{CapturedPointer, PointerPhase};
 use ds::host::ime::{ImeEvent, ImeSwitch};
 use ds::host::position::TextPosition;
@@ -87,12 +87,24 @@ impl Harness {
         self.doc.doc.vdom.in_runtime(|| sink.call(captured));
     }
 
-    /// Hand `event` to the surface that has the keyboard, and bring the document up to date.
+    /// The surface that has the keyboard hears `event` first, then the document, as the window
+    /// delivers it: the document's own text input draws the preedit and takes the commit.
     fn ime_event(&mut self, event: ImeEvent) {
         let sink = self.with_doc(|doc| self.doc.listeners.target(doc));
         if let Some(sink) = sink {
-            self.doc.doc.vdom.in_runtime(|| sink.call(event));
+            let heard = event.clone();
+            self.doc.doc.vdom.in_runtime(|| sink.call(heard));
         }
-        self.settle_now();
+        self.deliver(UiEvent::Ime(blitz_ime(event)));
+    }
+}
+
+/// Blitz's vocabulary for an IME event a surface hears.
+fn blitz_ime(event: ImeEvent) -> BlitzImeEvent {
+    match event {
+        ImeEvent::Enabled => BlitzImeEvent::Enabled,
+        ImeEvent::Preedit { text, cursor } => BlitzImeEvent::Preedit(text, cursor),
+        ImeEvent::Commit(text) => BlitzImeEvent::Commit(text),
+        ImeEvent::Disabled => BlitzImeEvent::Disabled,
     }
 }
