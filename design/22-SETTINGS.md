@@ -426,14 +426,10 @@ data, not a key.
 
 ### 3.15 `display` (sill/settings.toml)
 
-All Advanced (§5). The display service reads the EDID, classifies the panel's gamut, and drives DDC/CI.
+All Advanced (§5). The display service reads the EDID, classifies the panel's gamut, and drives DDC/CI. sill sets no scale: casement picks a display's first scale (`outputs.first_sight_scale`, 2026-10-19) and sill only shows it.
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `display.scale` | `ScalePolicy::{Auto,Manual}` | `Auto` | `Auto` derives the scale from the EDID's physical size aiming at `density_target_ppi` (1.5 on a 27" 4K panel); `Manual` uses `scale_overrides` | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
-| `display.scale_rounding` | `ScaleRounding::{PreferWhole,Nearest}` | `PreferWhole` | Advanced. "Round a sharp display up to a whole scale (crisper, like a Mac's default) or to the nearest step (more space)." Rule: at an ideal of 1.5 or more, take the whole scale (capped at 2) when it leaves at least 1280 px across; else the nearest step. The user preferred 2.0 to 1.5 on the 27" 4K panel (2026-09-25) | sill FINDINGS "Displays" | proposed (2026-09-25) |
-| `display.scale_overrides` | `Text` | `""` | `<identity> = <scale>` pairs separated by `;`. A `Vec` of text is not derivable in the settings macro yet (quire gap: ds-settings-derive list types) | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
-| `display.density_target_ppi` | `Count` | `109` | `72..=220`; 109 pt/inch is the target that makes text the size it is on a Mac | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.brightness_keys_target` | `BrightnessTarget::{PointerOutput,AllOutputs}` | `PointerOutput` | in practice the active window's output; DDC/CI | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.hardware_volume` | `HardwareVolume::{Off,WhenMonitorIsOutput}` | `WhenMonitorIsOutput` | DDC/CI volume when the monitor is the audio output | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
 | `display.night_warmth` | `NightWarmth::{Off,Hardware}` | `Off` | warmth through the monitor's own DDC/CI controls | sill FINDINGS "Displays" (display service, 2026-09-25); `13-BEHAVIOUR-menus-windows.md` | proposed (2026-09-25) |
@@ -491,7 +487,7 @@ The widgets under the notification center's history and the desktop widget layer
 | `widgets.desktop_widgets` | `Vec<WidgetKind>` | `[Calendar, Battery]` | which widgets the desktop shows; where they sit is saved state (`desktop-widgets.json`), not a key | same; F405 | proposed (M10 freeze, 2026-09-26) |
 | `widgets.desktop_cell_px` | `Px` | `164` | `120..=240`; a small widget is one cell, a medium 2x1, a large 2x2 | same; F405 | proposed (M10 freeze, 2026-09-26) |
 | `widgets.desktop_gap_px` | `Px` | `16` | `0..=48`; between cells and around the grid | same; F405 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.world_clocks` | `Text` | `""` | IANA zone names separated by `;` (a `Vec` of text is not derivable yet, as for `display.scale_overrides`) | same; F404 | proposed (M10 freeze, 2026-09-26) |
+| `widgets.world_clocks` | `Text` | `""` | IANA zone names separated by `;` (a `Vec` of text is not derivable yet) | same; F404 | proposed (M10 freeze, 2026-09-26) |
 
 ### 3.21 `calendar` (sill/settings.toml)
 
