@@ -11,8 +11,8 @@ use ds_style::space::look::SpaceLook;
 use ds_style::space::palette::derive;
 use ds_style::space::presets::PRESETS;
 
-/// The eight presets as round swatches, each painted with its own gradient in the window's
-/// scheme and named for itself, in a radio group. The swatch whose dots `look` wears is checked
+/// The eight presets as round swatches, each painted in its dots' own colours (the picks, not
+/// the pale frame), named for itself, in a radio group. The swatch whose dots `look` wears is checked
 /// (a look made in the editor may match none). A press is `look` with that preset's dots;
 /// grain, theme and accent stay, as the editor's presets do.
 #[component]
@@ -24,7 +24,7 @@ pub fn PresetSwatches(
     let scheme = use_scope().scheme;
     let paints: Vec<DotPaint> = PRESETS
         .iter()
-        .map(|preset| DotPaint::gradient(&derive(preset.dots, scheme).stops))
+        .map(|preset| DotPaint::gradient(&derive(preset.dots, scheme).picked))
         .collect();
     let class = common.class("ds-preset-swatches");
     let label = common
