@@ -681,11 +681,11 @@ States: Hidden, Shown(level, glyph), Muted.
 
 | Element / moment | Our detail | Reference | Today | Gap |
 | --- | --- | --- | --- | --- |
-| Launch (Pending) | the launch bounce (design/10 §10.3.5; a real pending operation, capped at 10 s) | bounces until launched (H, design/10 R8) | built in sill (`machine/bounce.rs`) | none |
+| Launch (Pending) | no bounce: the running dot appears when the app's first window maps (design/10 §10.3.5, the owner 2026-10-20) | bounces until launched (H, design/10 R8), not followed | built | none |
 | Running dot (Appear/Dismiss) | `fade` `--t-quick` in (built); out `fade` reversed when the last window closes | the dot appears (L) | in built, out snaps | **G36** (small) |
 | Badge (Appear / Change / Dismiss) | `pop-in` on first count (`--e-out`: not contact), `bump` on change (built through `Count`), `menu-out`-like fade on clear | badge appears with the count (H meaning, L motion) | `Count` bumps on change; appears and clears with no motion | **G37** |
 | Progress ring (Progress) | `Sweep` from the current share `--t-quick` (10.3.2: no faster); Appear from zero; at 100 % `Settle{LockIn}` then fade | macOS draws a bar under the icon (L); the Downloads stack shows a bar (M, [DL]) | ring drawn at the share, snap | **G38** |
-| Attention | informational bounce 1 s; critical repeats (design/10) | as design/10 (H) | built | section 8 item 1 (the critical loop's bound) |
+| Attention | the badge only, no bounce (design/10 §10.3.5) | the Mac bounces (H), not followed | built | none |
 | Download finished (the stack) | the Downloads tile bounces **once** (informational) and its badge bumps | "When a file finishes downloading, the stack notifies you by bouncing" (M, [DL]) | no stack tile | **G39** |
 | Drag out to remove | the tile fades and scales out `--t-move --e-exit`; neighbours heal; `item-deleted` sound (13.3.10) | the "poof" (H, 13.2 R13) | reorder built; remove motion unknown | **G40** |
 | Quit (from the menu) | the running dot fades (G36); nothing else | the dot disappears (L) | as G36 | part of G36 |

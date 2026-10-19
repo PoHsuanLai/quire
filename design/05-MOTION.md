@@ -506,9 +506,7 @@ Behaviour (what triggers what) is in `06-INTERACTIONS.md#20-desktop-interactions
 | Dock magnification while the pointer moves | Plank parabola: `offset = min(abs(cursor - center), zoomIconSize); p = offset / zoomIconSize; zoom = 1 + (1 - p²)(zoomPercent * progress - 1)`; icon 48 px up to 96 px; influence ±1 magnified icon width; neighbours slide apart, baseline fixed | **none**: the icon under the cursor tracks every move with no easing | settled (user) | plan "UX decisions settled"; Appendix C-A |
 | Dock magnification grow-in on enter (`progress` 0 -> 1) | "short" (observed); no number | not specified | not specified | Appendix C-A |
 | Dock magnification shrink on leave (`progress` 1 -> 0) | ~200 ms | not specified (proposed `--e-out`) | settled (user) for the duration; proposed for the easing | plan; Appendix C-A |
-| Dock bounce, informational request | bounces for 1 s | decelerating up, accelerating down (proposed: up `--e-out`, down `--e-exit`) | proposed | Appendix C-A (H) |
-| Dock bounce, critical request / launch | repeats until the app is active / launched | same | proposed; conflicts with "nothing loops" (section 12) | Appendix C-A (H) |
-| Dock bounce amplitude | about one icon height | | proposed | Appendix C-A (L) |
+| Dock bounce | none: the Dock does not bounce (design/10 §10.3.5, the owner 2026-10-20) | | settled | Appendix C-A (H), not followed |
 | Dock auto-hide (off by default) | 0.2 s delay after the pointer rests at the edge, ~0.5 s slide | not specified | settled (user) | plan; Appendix C-A (M) |
 | Launcher panel open | `peek-in`, `--t-big`, `--e-spring` (S's command menu); backdrop none (the catcher surface is never animated) | `--e-spring` | proposed for the keyframe; settled (plan) for "catcher never animated" | S:234; plan sill "Launcher v1" |
 | Launcher open latency budget | p95 < 100 ms from `launcher toggle` to first frame, over 20 toggles | n/a (a latency, not a duration) | settled (plan) | plan sill; sill's `dev/accept/launcher.sh` |
@@ -539,10 +537,10 @@ Moved to `archive/05-MOTION-keyframes.md` (history).
    560 x 1.15 = 644 ms, so the unread rule means what principle 6 says. Implemented (FINDINGS "W2
    integration", heavy exits): the roster settles `CurlHeavy` and `CrumpleHeavy` for an unread
    row and the row stylesheet plays them; the 644 ms value stays proposed.
-4. **Loops.** `dest` (S:447), `breathe`/`spin` (C:288-291) and the dock's critical bounce
-   (section 10) contradict "nothing loops". Proposed: keep `dest` (it lasts only while the
-   pointer is on the button), keep `spin` only while a sync runs (mailo already says so), drop
-   `breathe` (an idle loop), keep the critical bounce (it is the macOS signal for "needs you").
+4. **Loops.** `dest` (S:447) and `breathe`/`spin` (C:288-291) contradict "nothing loops".
+   Proposed: keep `dest` (it lasts only while the pointer is on the button), keep `spin` only
+   while a sync runs (mailo already says so), drop `breathe` (an idle loop). The Dock does not
+   bounce (design/10 §10.3.5).
 5. **Tide's exit in the port.** `dissolve` needs `filter:blur()`. Proposed: a filter-free
    variant (opacity, `translateY(-8px) scale(.99)`), if Tide ships at all (see
    `07-LOOKS.md`).
@@ -678,6 +676,6 @@ Reduced rule.
 | Dock tile drag return (`DragReturnFrame`, sill wires the drag) | `--drag-dx`/`--drag-dy` px, Move | the release, per axis | none (sill had no return) |
 
 Not converted: the launcher's open and close (27 section 3.12 lists it last; it keeps its
-keyframes), the dock's bounce and magnification (27 section 8 decision 4), sheet and panel drag
+keyframes), the dock's magnification (27 section 8 decision 4), sheet and panel drag
 (neither takes a drag yet), workspace swipe (12 section 12.3.7, sill's). The swipe's dismiss
 decision keeps its settings-backed thresholds (80 px, 600 px/s) rather than the projection.

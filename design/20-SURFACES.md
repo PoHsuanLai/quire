@@ -35,7 +35,7 @@ One quiet Look (design/30 §3). Shell chrome is the Mac material alone and takes
 | Layer / role | `Top`, anchor `BOTTOM`, height = base x max magnification + padding, `Reserve(base + margin)` | S |
 | Material | `Dock`, the material alone (target (clean-up phase)); drawn by `Ds` like the bar (bar gaps) | S |
 | Components | `DockTile` (08-ICONS plate; `IconView { plate }` as the placeholder; `Badge` from LauncherEntry; `ProgressIndicator{Bar}`), `RunningDot`, optional `DockFloor`, `DockLabel` hover label, `Menu` with `Placement::Context` (windows, desktop actions, Keep in Dock, Quit), `Popover` for folder stacks; geometry from `DockMetrics` (48 tiles, 8 gaps, 6 padding) and the pill a `Corner::Squircle` | S / P |
-| Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10), capped at 72 px (30 §3.4); the Mac default bounce, while launching and when an app needs attention (10); a badge change swaps at once; the label fades `--t-quick`; the menu opens Instant | S |
+| Motion | magnification: no easing while tracking, ~200 ms shrink on leave (10), capped at 72 px (30 §3.4); no bounce: the running dot says an app is open and the badge that it needs you (10); a badge change swaps at once; the label fades `--t-quick`; the menu opens Instant | S |
 | Behaviours | 10-BEHAVIOUR-dock (Plank parabola, 48 → up to 72 (target (clean-up phase); was 96), neighbours slide apart, click/right-click, stacks, drag-out, badges); auto-hide off by default (0.2 s delay, ~0.5 s slide when on) | S |
 | Keyboard | `None` | S |
 | Blur / input | blur `Element("dock-pill")`; input `Element("dock-hit")`; both follow the pill during magnification | S |

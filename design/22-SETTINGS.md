@@ -190,8 +190,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.autohide_trigger_strip_px` | `Px` | `4` | | `10-BEHAVIOUR-dock.md#10-3-11-auto-hide` | proposed |
 | `dock.position` | `DockPosition::{Bottom,Left,Right}` | `Bottom` | Left/Right deferred | `10-BEHAVIOUR-dock.md#10-6-configuration` | RETIRING: no reader; the dock is always at the bottom until Left and Right are built |
 | `dock.indicators` | `Indicators::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
-| `dock.bounce` | `Bounce::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
-| `dock.launch_animation` | `LaunchAnim::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.click_active_app` | `ActiveClick::{Cycle,Nothing}` | `Cycle` | `Nothing` = macOS | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (plan) |
 | `dock.trash` | `TrashTile::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | proposed |
 | `dock.pill_radius_px` | `Px` | `22` | | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
@@ -205,8 +203,6 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | `dock.magnify_enter_ms` | `Ms` | `120` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | proposed |
 | `dock.magnify_leave_ms` | `Ms` | `200` | | `10-BEHAVIOUR-dock.md#10-3-3-magnification` | settled (~200ms), easing proposed |
 | `dock.hover_label_warm_ms` | `Ms` | `400` | | `10-BEHAVIOUR-dock.md#10-3-4-hover-label` | proposed |
-| `dock.bounce_period_ms` | `Ms` | `600` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed (Plank) |
-| `dock.bounce_launch_cap_ms` | `Ms` | `10000` | | `10-BEHAVIOUR-dock.md#10-3-5-bounce` | proposed |
 | `dock.hold_to_menu_ms` | `Ms` | `600` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
 | `dock.hold_to_menu_move_px` | `Px` | `8` | | `10-BEHAVIOUR-dock.md#10-3-6-clicks` | proposed |
 | `dock.remove_threshold_px` | `Px` | `64` | | `10-BEHAVIOUR-dock.md#10-3-8-drag-inside-drag-out-drops`; `06-INTERACTIONS.md#20-desktop-interactions-settled` | proposed |
@@ -752,8 +748,6 @@ pub struct DockSettings {
     pub autohide_trigger_strip_px: Px,
     pub position: DockPosition,
     pub indicators: Indicators,
-    pub bounce: Bounce,
-    pub launch_animation: LaunchAnim,
     pub click_active_app: ActiveClick,
     pub trash: TrashTile,
     pub pill_radius_px: Px,
@@ -767,8 +761,6 @@ pub struct DockSettings {
     pub magnify_enter_ms: Ms,
     pub magnify_leave_ms: Ms,
     pub hover_label_warm_ms: Ms,
-    pub bounce_period_ms: Ms,
-    pub bounce_launch_cap_ms: Ms,
     pub hold_to_menu_ms: Ms,
     pub hold_to_menu_move_px: Px,
     pub remove_threshold_px: Px,
@@ -789,12 +781,6 @@ pub enum DockPosition { #[default] Bottom, Left, Right }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Indicators { #[default] On, Off }
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Bounce { #[default] On, Off }
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum LaunchAnim { #[default] On, Off }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum ActiveClick { #[default] Cycle, Nothing }
@@ -826,8 +812,6 @@ impl Default for DockSettings {
             autohide_trigger_strip_px: Px(4),
             position: DockPosition::Bottom,
             indicators: Indicators::On,
-            bounce: Bounce::On,
-            launch_animation: LaunchAnim::On,
             click_active_app: ActiveClick::Cycle,
             trash: TrashTile::On,
             pill_radius_px: Px(22),
@@ -841,8 +825,6 @@ impl Default for DockSettings {
             magnify_enter_ms: Ms(120),
             magnify_leave_ms: Ms(200),
             hover_label_warm_ms: Ms(400),
-            bounce_period_ms: Ms(600),
-            bounce_launch_cap_ms: Ms(10_000),
             hold_to_menu_ms: Ms(600),
             hold_to_menu_move_px: Px(8),
             remove_threshold_px: Px(64),
@@ -1006,7 +988,7 @@ only in v1, no widget; a later wave may promote one if the user asks.
 | Settings app page | Keys shown |
 | --- | --- |
 | **Appearance** | `appearance.theme`, `appearance.accent`, `appearance.motion_level`, `appearance.transparency`, `icons.style`, `icons.monochrome_tint` (only when style=Monochrome) |
-| **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.bounce`, `dock.launch_animation`, `dock.click_active_app`, `dock.trash` |
+| **Dock** | `dock.magnification`, `dock.tile_size_px`, `dock.autohide`, `dock.autohide_delay_ms`, `dock.autohide_slide_ms`, `dock.indicators`, `dock.click_active_app`, `dock.trash` |
 | **Mouse & Gestures** | `scroll.natural`, `scroll.speed`, `swipe.workspace_mode`, `tap.*` (as a single "double-tap sensitivity" control), `rejection`, `foreign_output`, `gestures.gesture_action_map` (the remap table) |
 | **Keyboard / Shortcuts** | proposed by `28-CUSTOMIZATION.md#411-keyboard-shortcuts`: `shortcuts.bindings` (the system list, toggle and chord per action) and `shortcuts.app_shortcuts`, rows added here after sill registers them (28 §6.0); sill writes them into the compositor's `system_actions` and `custom` shortcut files, and the chord the desktop already holds wins a clash, shown on the row (28 §7 decision 10) |
 | **Notifications** | `notifications.dnd`, `notifications.banner_style` (per app) |
@@ -1032,7 +1014,7 @@ section 56): the help sits behind the row's ⓘ. It is one or two sentences and 
 
    | Bad input | Field | Expected |
    | --- | --- | --- |
-   | unknown enum string (`"bounceyy"`) | `dock.bounce` | falls back to `Bounce::On`, sibling fields keep their parsed values |
+   | unknown enum string (`"maybe"`) | `dock.indicators` | falls back to `Indicators::On`, sibling fields keep their parsed values |
    | out-of-range `Percent` (`255`) | `icons.plate_inset_percent` | clamped to `100` at construction (the newtype's constructor, not serde) |
    | negative where `Px` (`u16`) expected | any `Px` field | parse error on that field only -> default |
    | missing table entirely (`[dock]` absent) | whole `DockSettings` | `#[serde(default)]` on the struct produces `DockSettings::default()` |

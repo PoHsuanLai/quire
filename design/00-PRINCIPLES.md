@@ -44,7 +44,7 @@ They decide every open question about ornament. They come from `C`'s four cards.
 | Rule | Reading now |
 | --- | --- |
 | One weight, one colour | Glyphs are solid (24 grid, filled paths), one colour (the ink token); a star, heart, pin or bell is outline (a 2 px stroke) while off (design/08 section 1.2). App icons are the one coloured glyph family, and each app has its own colour so apps are told apart as on the Mac. |
-| Springs only on contact | Nothing loops and nothing bounces on its own; the spinner is the one loop. A spring belongs to something a hand touched (30 section 1.3). The Dock's attention bounce is the Mac's own. |
+| Springs only on contact | Nothing loops and nothing bounces on its own; the spinner is the one loop. A spring belongs to something a hand touched (30 section 1.3). The Dock does not bounce (2026-10-20). |
 | Variation with a reason | Whatever differs between two items states a fact about them. |
 | Colour is a claim | Chrome is greyscale; a hue states a fact (unread, starred, destructive, status, which account, which app). The Space tint is the one decorative-but-owned colour: it says which Space you are in, on the sidebar ground only. |
 
@@ -93,7 +93,7 @@ author knows which convention to follow when a detail is missing. What is not li
 
 | Lineage | Elements |
 | --- | --- |
-| Mac | Window structure, sidebar, list and reader order, toolbars, sheets, segmented controls, menus, the bottom toast, the Dock and its bounce, the menu bar, Cmd+Tab, Settings window, `⌃1-9` Desktop switching |
+| Mac | Window structure, sidebar, list and reader order, toolbars, sheets, segmented controls, menus, the bottom toast, the Dock, the menu bar, Cmd+Tab, Settings window, `⌃1-9` Desktop switching |
 | Dia (structure only) | A calm sidebar beside the content; a command pill; no chrome competing with the page |
 | Arc (kept as features, quieter) | Pinned tiles, Today tabs, edge peek, link status pill, grouped launcher commands, a flat Space tint on the sidebar ground |
 | Notion | Composer as a page with `/` and `@` menus; views with group-by and per-view hover actions |
@@ -126,7 +126,7 @@ and nothing else.
 
 The dated decision log is `30-CATALOGUE.md` section 3.4. In short: one flat tint per Space, flush
 window, `⌃1-9` switching with a cross-fade, muted widgets with rings only in the control centre,
-per-app icon colours, Mac Dock bounce with magnification capped at 72 px, eight accents with Blue
+per-app icon colours, Mac Dock with magnification capped at 72 px and no bounce, eight accents with Blue
 the default and the accent set in Settings.
 
 ### 8.2 The zones on the desktop
@@ -145,7 +145,7 @@ the default and the accent set in Settings.
 | One weight, one colour | Every glyph in bar, dock menus, control centre, notifications and OSD is a line glyph in the ink token; tray icons are recoloured to ink. |
 | One coloured thing | App icons are the one full-colour element in the chrome, each in its own colour. |
 | Springs only on contact | Dock magnification tracks the pointer with no easing; the spring belongs to contact (press, drop, open). |
-| Variation with a reason | A badge, an indicator or a bounce states a fact about that item. |
+| Variation with a reason | A badge or an indicator states a fact about that item. |
 | Colour is a claim | In app content, hue states a fact. In the chrome, hue is only status, account, app icon, and the Space name's dot. |
 
 ### 8.4 Surface by surface
@@ -155,7 +155,7 @@ Values are in `20-SURFACES.md`, `01-LAYOUT.md` section 13 and `03-COLOR.md`.
 | Surface | Governing principles |
 | --- | --- |
 | Bar | Mac material; line glyphs; one menu shape for every bar menu |
-| Dock | Mac material; app icons are the coloured thing; magnification without easing, capped at 72 px; Mac bounce |
+| Dock | Mac material; app icons are the coloured thing; magnification without easing, capped at 72 px; no bounce (the running dot says an app is open) |
 | Launcher | The command menu, bigger and centred; one menu shape |
 | Control centre | One field, one menu; rings allowed here only; Dark Mode toggle, no accent picker |
 | Notifications | Acting exits, opening does not; no loops |

@@ -63,7 +63,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Pill corner radius | `--m-radius` of `Material::Dock` | 22; the shell draws it as `Corner::Squircle(Px(dock.pill_radius_px))`, recommended 18 | squircle settled 2026-09-24, value proposed (L) | `03-COLOR.md` materials table (Dock radius 22) and §17.4; a squircle of 18 reaches 36 along each edge, capped at half the 60 px pill |
 | Pill material | `Material::Dock` | tint + edge + shadow tokens from `03-COLOR.md`; compositor blur behind | settled | plan "Design: quire", Material enum |
 | Pill tint with Spaces | None (superseded 2026-10-02: one Look, the Dock is the material alone and takes no Space tint, 21-SPACES §3; target (clean-up phase), the code still tints it). No cross-fade on workspace switch | settled | plan settled decisions (Spaces on the desktop) |
-| Surface height | `H_s` | 160 = `gut + pad + S + T` (room for a magnified tile plus one bounce) | proposed | derived; transparent area outside the input region |
+| Surface height | `H_s` | 160 = `gut + pad + S + T` (room for a magnified tile and the hover label above it) | proposed | derived; transparent area outside the input region |
 | Exclusive zone | | `Reserve(gut + H_p)` = 72 when auto-hide is off; `0` when on | settled | plan: `Reserve(base+margin)`; R4 |
 | Horizontal placement | | pill centred on the output; clamped so it keeps 8 px from both output edges | proposed | L |
 | Overflow at rest | | if `W_0 > output_w - 16`, `T` shrinks to the largest integer that fits (min 24); `S` keeps its ratio to `T` | proposed (M) | macOS shrinks the dock as it fills (commonly observed) |
@@ -78,7 +78,7 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Badge capsule | anchored to the tile's top-right: right edge at tile right + 2, top edge at tile top - 2; height 18, min width 18, horizontal padding 5, radius 9; fill `--danger`, text `--accent-ink`-equivalent white token, ui font 11/700 tabular; text = count; `> 999` renders `999+`; scales with the tile (it is part of the tile's transform); appears and disappears with the tile (no pop, no bump; a count change swaps the text at once, design/30 §1.3) | proposed (R21 H for meaning, geometry L) |
 | Badge source | `com.canonical.Unity.LauncherEntry.Update`: `count` + `count-visible` | settled (plan compositor findings) |
 | Progress | a `ProgressIndicator{Bar}` under the icon, as macOS draws it (design/30 §2.9; the ring and `dock.progress_style` are removed); `progress` 0..1 from LauncherEntry `progress` + `progress-visible`; a changed value tweens linearly over `--t-move` | settled (design/30); bar geometry not yet specified |
-| Urgent | LauncherEntry `urgent = true` starts a Critical bounce (10.3.5) | proposed (M) |
+| Urgent | LauncherEntry `urgent = true` shows on the badge only; the icon does not bounce (10.3.5) | settled 2026-10-20 |
 | Separator | 1 px wide, 36 px tall (0.75 T), `--line`, 6 px margin each side; present only when the Trash tile is present (10.3.9) | proposed (R26 L) |
 | Pressed tile | a `--scrim` overlay clipped to the plate while the primary button is down | proposed (L: macOS darkens the pressed icon) |
 
@@ -113,23 +113,12 @@ and `04-COMPONENTS.md`) or the launch mechanics (plan, "Design: sill", Launch).
 | Hidden | on primary press, while a context menu is open, while dragging, while auto-hide is hidden or sliding | proposed |
 | Text | desktop entry `Name` (localised), single line, truncated per `02-TYPE.md` | proposed |
 
-### 10.3.5 Bounce
+### 10.3.5 No bounce
 
-The Dock uses the Mac default bounce (settled 2026-10-02): while an app launches (the Launch row) and when an app needs attention (the Informational and Critical rows). The Mac's own rules R8-R10 below stay the reference; the rows are not changed by the clean-up phase.
-
-| Kind | Trigger | Duration | Status |
-| --- | --- | --- | --- |
-| Launch | primary click on a tile whose app has no toplevel and was launched by us | repeats until `match_app` sees the app's first toplevel, the launched scope exits, or 10 s pass | settled (R8 H), 10 s cap proposed |
-| Informational | `sill` IPC `Dock{Attention{app, Informational}}` (proposed IPC addition) | 2 periods (1.2 s; the Mac's is about 1 s) | R8 (H) |
-| Critical | LauncherEntry `urgent = true`, or IPC `Dock{Attention{app, Critical}}` | repeats until the app has an activated toplevel or `urgent` clears | R8 (H) |
-
-| Value | Number | Status | Basis |
-| --- | --- | --- | --- |
-| Amplitude `A` | 5/8 of the tile height at rest = `5T/8` (30 at T = 48) | proposed: Plank's LaunchBounceHeight 0.625 (no measured Mac number; a whole tile hopped too high on the trial login of 2026-10-19) |
-| Period `P` (up + down) | 600 ms | proposed: Plank's bounce time (no measured Mac number; 500 ms read as too fast) |
-| Shape | ballistic: 10.5.3 (decelerates up, accelerates down, no squash) | R9 (L) |
-| Settings | `dock.bounce` ON/OFF gates Informational and Critical; `dock.launch_animation` ON/OFF gates Launch | R10 (H) |
-| Frames | a bouncing tile requests frames; all other tiles do not change | proposed |
+The Dock does not bounce (the owner, 2026-10-20): an app that is opening, or one that needs
+attention, does not move its icon. The running dot (10.3.2) says the app is open, and the badge
+says it needs you. The Mac's rules R8-R10 stay in the table above as the reference we chose not
+to follow; there are no bounce settings.
 
 ### 10.3.6 Clicks
 
@@ -139,7 +128,7 @@ an app_id the arriving modifier is unverified (plan shell risks), so the dock ac
 
 | Input | Condition | Action | Status |
 | --- | --- | --- | --- |
-| Primary click (press and release on the same tile, no drag) | app not running | launch (activation token, DBusActivatable, `systemd-run` scope; plan "Launch") + Launch bounce | settled (R15) |
+| Primary click (press and release on the same tile, no drag) | app not running | launch (activation token, DBusActivatable, `systemd-run` scope; plan "Launch") | settled (R15) |
 | | running, no toplevel on any workspace but process alive (DBusActivatable) | `org.freedesktop.Application.Activate` | proposed (R23 L) |
 | | running, all toplevels minimized | unminimize and activate the most recently active toplevel | proposed (R23 L) |
 | | running, not the active app | activate the most recently active toplevel of the app (the compositor activates one toplevel; others are not raised) | proposed (R15 H; limit) |
@@ -256,9 +245,6 @@ pub enum Label {
     Warm    { until: Instant },               // 0 ms delay for the next tile
 }
 
-pub enum Bounce { Still, Bouncing { kind: BounceKind, since: Instant } }
-pub enum BounceKind { Launch { deadline: Instant }, Informational, Critical }
-
 pub enum Press {
     Up,
     Down { tile: TileId, at: Point, button: Button, since: Instant },
@@ -275,13 +261,13 @@ pub enum Reveal {                                  // only when auto-hide is ON
 }
 
 pub struct Dock { hover: Hover, label: Label, press: Press, reveal: Reveal,
-                  bounces: Vec<(TileId, Bounce)>, spring: Option<(TileId, Instant)> }
+                  spring: Option<(TileId, Instant)> }
 
 pub enum DockEvent {
     PointerEnter { x: Px }, PointerMove { x: Px, y: Px }, PointerLeave,
     Press { button: Button, x: Px, y: Px }, Release { button: Button, x: Px, y: Px },
     Key(DockKey), DndMotion { x: Px }, DndLeave, Drop,
-    MenuClosed, AppState { tile: TileId, change: AppChange }, Attention { tile: TileId, kind: BounceKind },
+    MenuClosed,
     Frame,                                          // wl_surface.frame callback
 }
 
@@ -374,17 +360,6 @@ Invariant (property-tested): for every x inside the hit region and no clamp acti
 whose rest slot contains x also contains x after magnification, and the mapping is continuous
 in x (slot boundaries map to the same point from both sides).
 
-### 10.5.3 Bounce
-
-```
-u = ((now - since) mod P) / P                  0..1, P = 600 ms
-lift(u) = A * 4 u (1 - u)                      px, A = 5T/8 = 30; peak A at u = 0.5
-```
-
-Vertical velocity `A(4 - 8u)/P` falls linearly on the way up and rises on the way down (R9).
-Informational stops at `now - since = 2P`; Launch and Critical stop at the end of the period
-in which their stop condition becomes true (never mid-air).
-
 ### 10.5.4 Progress
 
 ```
@@ -415,13 +390,11 @@ Settings app keys, stored in `~/.config/sill/settings.toml` under `dock` (`22-SE
 | `dock.autohide_slide_ms` | ms | 500 | 0..1500 | settled default |
 | `dock.position` | `Bottom | Left | Right` | `Bottom` | never Top (R3) | settled; Left/Right deferred |
 | `dock.indicators` | `On | Off` | `On` | | proposed (R13) |
-| `dock.bounce` | `On | Off` | `On` | | proposed (R10) |
-| `dock.launch_animation` | `On | Off` | `On` | | proposed (R10) |
 | `dock.click_active_app` | `Cycle | Nothing` | `Cycle` | | settled (plan), `Nothing` = macOS |
 | `dock.trash` | `On | Off` | `On` | | proposed |
 
 Gallery-only knobs (not in Settings): `R` (96), `g` (4), `--m-radius` (22, owned by 03-COLOR), enter 120 ms,
-leave 200 ms, bounce `P` 600 ms, hold-to-menu (the `LongPress` delay), remove threshold 64 px.
+leave 200 ms, hold-to-menu (the `LongPress` delay), remove threshold 64 px.
 
 ## 10.7 Integration
 
@@ -475,10 +448,8 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
 7. **Label**: hover a tile and hold still: label appears at the Label profile's open delay (100 ms) +- 1 frame, not before;
    move to the neighbour: its label appears within 1 frame; leave for 300 ms and return: 0 ms
    delay; leave for 500 ms and return: the open delay again.
-8. **Bounce**: Informational: the tile's lift follows 10.5.3 within 1 px per frame and ends at
-   1200 ms +- 1 frame (two periods); Critical: continues until a toplevel of that app is
-   activated, then finishes the current period; Launch with a test app that maps a window at
-   1.3 s: stops at the end of the period containing 1.3 s (1.8 s).
+8. **No bounce**: a launch click and a LauncherEntry `urgent = true` leave every tile's
+   position unchanged; the running dot appears when the app's first toplevel maps.
 9. **Exclusive zone**: a maximised foot window has height `output_h - bar_h - 72`
    (auto-hide Off) and `output_h - bar_h` (auto-hide On).
 10. **Clicks** (scripted with a test app): launch; activate; cycle with two windows alternates
@@ -506,9 +477,6 @@ headless renderer and pure table tests. Frame times refer to the output refresh 
 4. Hover label font: macOS labels are ~13 pt in the system font (R11); design/30 does not fix the
    `DockLabel` type size.
 5. `click_active_app`: Cycle (plan) vs Nothing (macOS).
-6. Informational attention source on Linux: only our IPC today; map app notifications to
-   Informational bounce or not.
-7. Bounce period 500 ms is a guess (UNKNOWN); measure a macOS screen recording.
 
 ## 10.10 Sources
 
