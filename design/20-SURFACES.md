@@ -19,7 +19,7 @@ One quiet Look (design/30 §3). Shell chrome is the Mac material alone and takes
 | Layer / role | layer-shell `Top`, one per output, anchor `TOP\|LEFT\|RIGHT`, `ExclusiveZone::Reserve(h)` | S |
 | Height | height token (value in 01-LAYOUT) | S |
 | Material | `Bar`, the material alone (target (clean-up phase); the code still tints it with the workspace's colour); `Ds` draws it (bar gaps) | S |
-| Content | left: app name, workspace indicator (drag reorder); right: tray, then the module items `control_center.menu_bar_*` shows (sound, network, battery by default; each opens its module's detail pane), the control center item, clock (user direction 2026-09-25: controls at the top right as on macOS) | S |
+| Content | left: the system menu (always first, whichever app is in front, as macOS's Apple menu: System Settings…; Sleep, Restart…, Shut Down…; Lock Screen, Log Out…, an action logind does not offer dimmed in place; the owner 2026-10-20), app name, workspace indicator (drag reorder); right: tray, then the module items `control_center.menu_bar_*` shows (sound, network, battery by default; each opens its module's detail pane), the control center item, clock (user direction 2026-09-25: controls at the top right as on macOS) | S |
 | Components | `MenuBarItem` per status item (box and glyph from `bar.status_*` through `StatusMetrics`) and around the app name, titles and clock (the 4 px hover and open pill, 13/500 text), `WorkspacePills` for the workspace indicator (one segmented group; the workspace's dot is its only colour), `MenuItem` rows (status lines included), `Glyph` (`IconSize::Bar` 22, P), `Menu` with `Placement::Bar` for every menu (22 px rows, 13 px text), `Badge`, `Tooltip` (12 px) | S / P |
 | Motion | menus open Instant and close with a Fade `--t-quick`; hover background `--t-quick`; the workspace dot cross-fades `--t-big` (21-SPACES §5); no press scale | S |
 | Behaviours | 13-BEHAVIOUR-menus-windows (menu bar, menus: open delay, safe triangle), 06 (menus, Escape), 12 (workspace swipe updates indicator) | S |
@@ -128,7 +128,7 @@ and `ds_shell::tokens::osd::OsdMetrics` (`osd.position`, `osd.margin_px`); CONSU
 | --- | --- | --- |
 | Layer / role | `Overlay`, full-output click catcher (dims nothing) + centred panel | P |
 | Material | `Sheet` | P |
-| Content | Log out, Restart, Shut down, Suspend (logind-zbus) | S |
+| Content | Log Out, Restart, Shut Down, Sleep (macOS's words, one list shared with the bar's system menu and the launcher's System rows; the session service alone asks logind). Opened on the chosen action by the system menu and the launcher; Lock Screen and Sleep happen at once and never open it | S |
 | Components | `Ds { material: Sheet, extent: RootExtent::Viewport }` holding `Sheet { attach: Attach::Centre, shown, on_hidden }`; `Button` Cancel, `Button` with role Destructive Restart at `ControlSize::Regular`, the default `Button` Shut Down, an unavailable action `Availability::Disabled`; `KeyEquivalent{Cap}` hints | P |
 | Motion | panel in Slide(Top) with a `Spring` (response Move), out Slide(Top) `--t-move` `--e-exit` (design/30 §1.3); the host unmaps after the exit | P |
 | Behaviours | 06 (Escape, focus ring), 13 (focus/raise) | S |

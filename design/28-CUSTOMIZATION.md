@@ -248,6 +248,8 @@ What the person orders (settled 2026-09-27, decision 2 B), and what stays fixed:
 - **Fixed**: Top Hit (and, with nothing typed, Actions and Recent) stays first; **Web stays pinned
   last** as the fallback row and has no drag handle; the ranking inside a section, the frecency
   tie-break and how rows compete for Top Hit (`SectionPlan` weights) do not follow the list.
+  System rows compete for Top Hit like apps (weight 950, the owner 2026-10-20: typing "logout" or
+  "shutdown" shows the command on top); emoji and clipboard never take it.
 - A provider absent from the list and new since the last write is appended before Web with its
   `default_shown` (so a new app's provider appears, as a new category does on the reference).
 
