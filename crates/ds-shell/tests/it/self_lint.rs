@@ -42,6 +42,8 @@ const INLINE_VARS: &[&str] = &[
     "--layers",
     // A swiped card's offset (`NotificationCard { swipe }`).
     "--swipe-dx",
+    // A chip's leading colour dot (`Chip { dot }`).
+    "--chip-dot",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
     // A stepping spinner's angle (`ProgressIndicator`, design/26 R4).

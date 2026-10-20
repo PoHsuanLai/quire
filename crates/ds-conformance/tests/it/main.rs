@@ -12,6 +12,7 @@ mod button_heights;
 mod button_propagation;
 mod capsule;
 mod cc_pane_switcher;
+mod chip_pressable;
 mod collapse;
 mod column_layout;
 mod component_faces;
