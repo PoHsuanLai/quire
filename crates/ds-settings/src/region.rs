@@ -132,9 +132,17 @@ mod tests {
         }
     }
 
+    /// `LC_ALL`, `LC_TIME` and `LANG` as set, and the locale the time is shown in.
+    type PosixCase = (
+        Option<&'static str>,
+        Option<&'static str>,
+        Option<&'static str>,
+        &'static str,
+    );
+
     #[test]
     fn the_time_locale_follows_posix_precedence() {
-        const CASES: &[(Option<&str>, Option<&str>, Option<&str>, &str)] = &[
+        const CASES: &[PosixCase] = &[
             (Some("de_DE"), Some("en_US"), Some("ja_JP"), "de_DE"),
             (None, Some("en_US"), Some("ja_JP"), "en_US"),
             (Some(""), None, Some("ja_JP"), "ja_JP"),
