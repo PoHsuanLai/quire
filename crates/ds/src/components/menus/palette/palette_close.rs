@@ -7,7 +7,8 @@
 pub enum PaletteClose {
     /// Escape, while the palette was the topmost layer.
     Escape,
-    /// A pointer down outside the card, while the palette was the topmost layer.
+    /// A pointer down outside the card, while the palette was the topmost layer. A palette in a
+    /// `CommandPaletteHost::Surface` has no scrim and never reports it.
     Outside,
     /// A row was picked and its pick closes the palette; `onpick` follows with the value.
     Pick,
