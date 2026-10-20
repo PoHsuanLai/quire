@@ -974,14 +974,30 @@ contrast checks), Attachment count (`.clip`). See O-6.
   <button type="button" class="ds-chip-remove" aria-label="Remove Dana Okafor"><svg class="ds-ic">…x…</svg></button>
 </span>
 
+<span class="ds-chip" data-variant="neutral" data-pressable data-state="on|off">   <!-- onpress set -->
+  <button type="button" class="ds-chip-press" aria-pressed="true|false"><i class="ds-chip-dot" style="--chip-dot:…"></i>120°</button>
+  <button type="button" class="ds-chip-remove" aria-label="Remove 120°">…</button>   <!-- onremove, a sibling -->
+</span>
+
 <span class="ds-clip"><svg class="ds-ic">…paperclip…</svg>3</span>
 ```
+
+A chip with `onpress` is pressable: its face is a real `button` (click, Return and Space press
+it) and the remove button is a sibling of that button, never inside it, so removing a chip does
+not press it. `pressed: Some(Check::On)` is the picked look: `--ink` text and, on Neutral and
+Person, the `--fill` wash and an `--ink-faint` line (a toggle Button that is on); other
+variants have no line of their own and take a hairline ring. `dot` draws a 12 px disc in the
+given colour before the text. The space editor's colour stops and a companion form's choices
+are pressable Neutral chips.
 
 **Props.**
 
 ```rust
 #[component] pub fn Chip(variant: ChipVariant, text: String,
-    #[props(default)] onremove: Option<EventHandler<()>>,   // Person only
+    #[props(default)] onremove: Option<EventHandler<()>>,   // any variant
+    #[props(default)] pressed: Option<Check>,               // aria-pressed, with onpress
+    #[props(default)] onpress: Option<EventHandler<Press>>, // makes the face a button
+    #[props(default)] dot: Option<String>,                  // a CSS colour, a disc before the text
     #[props(default)] pulse: Option<PulseKey>) -> Element    // chip-land / chip-in / flash
 pub enum ChipVariant { Accent, Label(LabelHue), Neutral, Person(Avatar), Token, Status(Verdict) }
 pub enum LabelHue { Red, Amber, Green, Blue, Violet }
@@ -1059,8 +1075,8 @@ Clip (verbatim, `S:543-544`):
 | State | Rule |
 | --- | --- |
 | default | per variant |
-| hover | not specified (chips are not interactive; the Person chip's remove button: not specified) |
-| focus-visible | global ring on the remove button |
+| hover | not specified (a pressable chip and any remove button: not specified) |
+| focus-visible | global ring on the pressable face and on the remove button |
 | entering | Person: `chip-in --t-move --e-spring` on mount. Accent/Label landing after a drop or label pick: `chip-land --t-big --e-spring` (C `.is-landing`, `C:402`) |
 | flash | Person: `0 0 0 3px var(--accent-soft)` for 1200 ms (`S:2119`): `pulse` with `Anim::ChipFlash`, the `chip-flash` keyframe (chip-in's last frame plus the ring) over `--t-flash` |
 | leaving | none (removed at once) |

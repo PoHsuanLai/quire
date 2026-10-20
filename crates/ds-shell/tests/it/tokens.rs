@@ -321,6 +321,8 @@ const PER_ELEMENT: &[&str] = &[
     "--swipe-dx",
     // A surface driven by the presence spring: 0 gone to 1 in place (`EdgePeek`).
     "--present-p",
+    // A chip's leading colour dot (`Chip { dot }`).
+    "--chip-dot",
     // An animated emoji's disc (`AnimatedEmoji { disc }`, design/25).
     "--em-disc",
     // A stepping spinner's angle (`ProgressIndicator`, design/26 R4).
