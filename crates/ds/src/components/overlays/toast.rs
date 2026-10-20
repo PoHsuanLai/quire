@@ -7,8 +7,13 @@
 //! out over `--t-quick --e-exit`; nothing is drawn while the hub is empty. The hold is
 //! `ToastHold` (5 s), and the pointer over the toast pauses it. A toast pushed with an undo has
 //! an action button (`Undo`, or the consumer's own: [`ToastHub::push_action`]); a swipe to the right dismisses it, from where the hand let go.
+//!
+//! While a sheet or a peek is up the toast sits at the top right, where the Mac's banners sit,
+//! instead of the bottom right: a sheet's buttons are at its bottom, and a toast over them would
+//! take the next press (its hold pauses under a still pointer).
 
 use crate::components::overlays::swipe_glue::{SwipeOn, use_swipe_glue};
+use crate::stack::host::use_overlays;
 use crate::stack::toast_hub::{ToastAction, ToastHub, ToastState, use_toast_hub};
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
@@ -21,6 +26,7 @@ use ds_motion::presence::{
 };
 use ds_motion::swipe::SwipeMetrics;
 use ds_style::icon::render::{Glyph, IconSize};
+use ds_style::tokens::layer::ZLayer;
 
 /// The enclosing `Ds`'s toast manager: `push(text, undo)`, one visible at a time.
 pub fn use_toasts() -> ToastHub {
@@ -31,6 +37,7 @@ pub fn use_toasts() -> ToastHub {
 #[component]
 pub fn ToastHost() -> Element {
     let hub = use_toast_hub();
+    let overlays = use_overlays();
     // The toast keeps its last words while it slides away: a plain cell, written as the state
     // is read, so keeping them schedules no second render.
     let mut last = use_hook(|| CopyValue::new((String::new(), None::<ToastAction>)));
@@ -58,6 +65,10 @@ pub fn ToastHost() -> Element {
         return rsx! {};
     };
     let (text, action) = last.peek().clone();
+    let place = match overlays.shown_on(ZLayer::Peek) {
+        Shown::Visible => "top",
+        Shown::Hidden => "bottom",
+    };
     rsx! {
         div { class: "ds-overlay", "data-layer": "toast",
             div {
@@ -66,6 +77,7 @@ pub fn ToastHost() -> Element {
                 "data-presence": drawn,
                 "data-pulse": alias.slug(),
                 "data-swipe": swipe.look(),
+                "data-place": place,
                 style: swipe.style(),
                 onmouseenter: move |_| hub.pause(),
                 onmouseleave: move |_| {

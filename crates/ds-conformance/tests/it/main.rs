@@ -152,6 +152,7 @@ mod titlebar_title_fit;
 mod titlebar_trailing;
 mod toast_action;
 mod toast_motion;
+mod toast_over_sheet;
 mod toolbar_overflow;
 mod toolbar_pick_anchor;
 mod toolbar_search;
