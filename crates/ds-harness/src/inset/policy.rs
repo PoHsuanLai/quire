@@ -111,11 +111,6 @@ pub const QUIRE_ALLOW: &[Allow] = &[
         reason: "the scrubber's time tooltip: `padding: --s-2 --s-6` (scrubber.css, 04-COMPONENTS.md section 22 tooltip)",
     },
     Allow {
-        when: &["ds-stop"],
-        min: Px(6.0),
-        reason: "a Space gradient stop pill: `padding: --s-3 --s-5 --s-3 --s-4` plus its hairline, around a swatch and a remove glyph (space_editor.css)",
-    },
-    Allow {
         when: &["ds-send-pill"],
         min: Px(6.0),
         reason: "the send pill's trailing edge is `--s-6`: the consumer's PillAction button sits inside it (send_pill.css; 12 leading)",

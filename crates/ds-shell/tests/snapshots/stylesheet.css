@@ -525,7 +525,6 @@ html,body{margin:0;padding:0;background:transparent}
    a little below the triangle. */
 .ds-acc-advanced{ display:flex; flex-direction:column; gap:var(--s-20); padding-top:var(--s-12); }
 .ds-acc-caption{ font-size:var(--fs-control); line-height:1.45; color:var(--ink-soft); }
-.ds-acc-detail{ user-select:text; overflow-wrap:anywhere; }
 .ds-acc-waiting{ display:flex; align-items:center; gap:var(--s-8); }
 .ds-acc-url{ font-family:var(--font-data); font-size:var(--fs-small); color:var(--ink-soft); word-break:break-all; user-select:text; }
 .ds-acc-code{ align-self:center; padding:var(--s-8) var(--s-16); font-family:var(--font-data); font-size:var(--fs-display); font-weight:700; color:var(--ink); user-select:text; }
@@ -2504,13 +2503,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
 
 .ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
-.ds-stop{
-  display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
-  color:var(--ink-soft); cursor:default;
-}
-.ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
-.ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
 
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 /* PresetSwatches: the presets as a settings row's control, the checked one ringed. */
@@ -2564,7 +2556,7 @@ html,body{margin:0;padding:0;background:transparent}
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
 .ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
-.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
+.ds-handle{ background:var(--dot-c1); }
 /* -- spaces -- */
 /* Spaces (design/21-SPACES.md section 13): the sidebar head and foot, the parts of a Space's
    menu, and its Edit Space sheet. Colours are the frame's own (`--f-*`) and tokens; nothing is Space-tinted here
@@ -2586,11 +2578,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-space-rename{ width:240px; }
 .ds-space-part-acts{ display:flex; justify-content:flex-end; gap:var(--s-6); }
 
-/* The Edit Space sheet (design/34 section 3.8): the title (a Title label), the grouped form (the name row,
-   then the colour on the group's ground at the row's side inset), and the buttons at the end,
-   Cancel before Save. The form brings its own 20 margin; the title and the buttons share it. */
+/* The Edit Space sheet (design/34 section 3.8): the title, the grouped form (the name row, then
+   the colour on the group's ground at the row's side inset), and the buttons at the end, Cancel
+   before Save. The form brings its own 20 margin; the title and the buttons share it. */
 .ds-space-edit{ display:flex; flex-direction:column; min-width:0; }
-.ds-space-edit-title{ padding:var(--s-20) var(--s-20) 0; }
+.ds-space-edit-title{ margin:0; padding:var(--s-20) var(--s-20) 0; font-size:var(--fs-subject); font-weight:700; color:var(--ink); }
 .ds-space-edit-colour{ padding:var(--s-14); }
 .ds-space-edit-acts{ display:flex; justify-content:flex-end; gap:var(--s-8); padding:0 var(--s-20) var(--s-20); }
 /* -- progress -- */
@@ -3423,6 +3415,11 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-card-form-title{ font-size:var(--fs-title); font-weight:600; }
 .ds-card-form-field{ display:flex; flex-direction:column; gap:var(--s-4); }
 .ds-card-form-picks{ display:flex; flex-wrap:wrap; gap:var(--s-6); }
+
+/* A refusal: the headline, then what to do about it. */
+.ds-card-refused{ display:flex; flex-direction:column; gap:var(--s-4); padding:var(--s-10) var(--s-12); border-radius:var(--r-small); background:var(--fill-quaternary); }
+.ds-card-refused[*|data-why=failed]{ background:var(--danger-wash); }
+.ds-card-refused-head{ font-weight:600; }
 
 /* Actions: a row, each button with its effect tag beside it. The one with the keyboard shows
    the button's own focus ring. */

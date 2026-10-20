@@ -3,14 +3,12 @@
 
 use super::{DotIndex, Picker, dot_index, edit};
 use crate::components::controls::button::Button;
-use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::controls::chip::{Chip, ChipVariant};
-use crate::components::controls::press::Propagation;
 use crate::components::controls::slider::Slider;
 use crate::components::lists::section_header::SectionHeader;
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
-use ds_core::vocab::Fraction;
+use ds_core::vocab::{Check, Fraction};
 use ds_style::appearance::theme::Scheme;
 use ds_style::icon::Icon;
 use ds_style::space::dot_paint::DotPaint;
@@ -37,33 +35,20 @@ pub(super) fn Stops(
     rsx! {
         div { class: "ds-stops",
             for (index, dot) in look.dots.iter().copied().enumerate() {
-                span {
+                Chip {
                     key: "{index}",
-                    class: "ds-stop",
-                    "aria-pressed": if index == current { "true" } else { "false" },
-                    onclick: move |_| picker.pick(dot_index(index)),
-                    i {
-                        class: "ds-stop-disc",
-                        style: DotPaint::solid(&palette.picked.get(index).cloned().unwrap_or_default()).style_attr(),
-                    }
-                    "{dot.hue.round()}°"
-                    if removable {
-                        Button {
-                            bezel: Bezel::Toolbar,
-                            size: ControlSize::Mini,
-                            image: ImagePosition::Only,
-                            icon: Icon::X,
-                            label: "Remove colour",
-                            propagation: Propagation::Stop,
-                            onclick: {
-                                let look = look.clone();
-                                move |_| {
-                                    picker.pick(DotIndex(0));
-                                    onchange.call(edit::removed(&look, index));
-                                }
-                            },
-                        }
-                    }
+                    variant: ChipVariant::Neutral,
+                    text: format!("{}°", dot.hue.round()),
+                    dot: palette.picked.get(index).cloned().unwrap_or_default(),
+                    pressed: if index == current { Check::On } else { Check::Off },
+                    onpress: move |_| picker.pick(dot_index(index)),
+                    onremove: removable.then(|| {
+                        let look = look.clone();
+                        EventHandler::new(move |()| {
+                            picker.pick(DotIndex(0));
+                            onchange.call(edit::removed(&look, index));
+                        })
+                    }),
                 }
             }
             if room {

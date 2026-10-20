@@ -37,13 +37,6 @@
 .ds-handle[*|aria-pressed=true]{ transform:scale(1.15); }
 
 .ds-stops{ display:flex; gap:var(--s-6); align-items:center; margin-top:var(--s-8); flex-wrap:wrap; }
-.ds-stop{
-  display:inline-flex; align-items:center; gap:var(--s-5); border:var(--hair) solid var(--line); background:var(--surface-2);
-  border-radius:var(--r-pill); padding:var(--s-3) var(--s-5) var(--s-3) var(--s-4); font-family:var(--font-data); font-variant-numeric:tabular-nums; font-size:var(--fs-caption);
-  color:var(--ink-soft); cursor:default;
-}
-.ds-stop-disc{ width:14px; height:14px; border-radius:var(--r-pill); display:block; }
-.ds-stop[*|aria-pressed=true]{ border-color:var(--ink-faint); color:var(--ink); }
 
 .ds-presets{ display:grid; grid-template-columns:repeat(8, 22px); gap:var(--s-6); }
 /* PresetSwatches: the presets as a settings row's control, the checked one ringed. */
@@ -97,4 +90,4 @@
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 100%); }
 .ds-space-dot[*|data-stops="3"], .ds-preset[*|data-stops="3"], .ds-space-swatch[*|data-stops="3"]{
   background:linear-gradient(135deg,var(--dot-c1) 0%,var(--dot-c2) 50%,var(--dot-c3) 100%); }
-.ds-handle, .ds-stop-disc{ background:var(--dot-c1); }
+.ds-handle{ background:var(--dot-c1); }
