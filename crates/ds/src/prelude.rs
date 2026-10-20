@@ -98,7 +98,7 @@ pub use crate::keys::{
 // Overlays
 pub use crate::components::content::tip_text::TipText;
 pub use crate::components::controls::icon_button_group::IconButtonGroup;
-pub use crate::components::overlays::alert::Alert;
+pub use crate::components::overlays::alert::{Alert, AlertColumn};
 pub use crate::components::overlays::banner_action_row::BannerActionRow;
 pub use crate::components::overlays::drag_ghost::DragGhost;
 pub use crate::components::overlays::hover_card::HoverCard;

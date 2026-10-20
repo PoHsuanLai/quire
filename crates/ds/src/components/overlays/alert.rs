@@ -30,6 +30,17 @@
 //!
 //! An alert may carry a suppression `Checkbox` under its message ("Do not show this again") and a
 //! help button (the `Help` bezel) at the foot's leading corner.
+//!
+//! Its children are a content slot: whatever the caller puts in the `Alert { ... }` block is drawn
+//! centred in the column between the message and the buttons (an account pop-up, an install
+//! command, a spinner), so a question that needs more than words still has the alert's keys and
+//! buttons. An alert with no buttons (one that waits on a spinner) draws no footer, answers Return
+//! with nothing, and answers Escape only when the caller listens for a dismissal and the keyboard
+//! is inside the column.
+//!
+//! [`AlertColumn`] is the same column bare, for a host that puts it in a window of its own rather
+//! than a sheet: it takes the alert's words, buttons, keys and slot, and brings no sheet, no
+//! stage and no entrance. Escape and Return act while the keyboard is inside it.
 
 use crate::components::content::icon_source::IconSource;
 use crate::components::content::icon_view::IconView;
@@ -92,6 +103,10 @@ const BADGE_PX: u8 = 20;
 /// in flight cannot land on a question the person has not seen. Read when the alert mounts.
 /// `None` (the default) arms it at once.
 ///
+/// The children are the content slot (see the module doc), drawn between the message and the
+/// buttons. `announce` marks the message `role="alert"`, so a screen reader speaks it as the
+/// alert appears (a failure's reason); off by default.
+///
 /// `common` goes on the panel (the sheet), so a host whose blur region resolves an id finds it.
 #[component]
 pub fn Alert(
@@ -104,18 +119,14 @@ pub fn Alert(
     #[props(default)] help: Option<EventHandler<()>>,
     #[props(default)] on_dismiss: Option<EventHandler<()>>,
     #[props(default)] arm_after: Option<Duration>,
+    #[props(default)] announce: bool,
     #[props(default)] flow: Flow,
     #[props(default)] shown: Option<Shown>,
     #[props(default)] on_hidden: Option<EventHandler<()>>,
     #[props(default)] common: Common,
+    children: Element,
 ) -> Element {
-    let arming = use_machine(
-        move |at| Arming::after(at, arm_after),
-        (),
-        || (),
-        |(), _| {},
-    );
-    let words = Words {
+    let words = use_words(Say {
         title: title.clone(),
         message,
         style,
@@ -124,8 +135,9 @@ pub fn Alert(
         suppression,
         help,
         dismiss: on_dismiss,
-        arming,
-    };
+        arm_after,
+        announce,
+    });
     match flow {
         Flow::Floating => {
             let escape = words.clone();
@@ -138,12 +150,12 @@ pub fn Alert(
                     attach: Attach::Centre,
                     width: SheetWidth::Alert,
                     common,
-                    AlertBody { words }
+                    AlertBody { words, {children} }
                 }
             }
         }
         Flow::Inline => rsx! {
-            InlineAlert { words, shown, on_hidden, common }
+            InlineAlert { words, shown, on_hidden, common, {children} }
         },
     }
 }
@@ -156,6 +168,7 @@ fn InlineAlert(
     shown: Option<Shown>,
     on_hidden: Option<EventHandler<()>>,
     common: Common,
+    children: Element,
 ) -> Element {
     let Presented { presence, alias } = use_presence(
         shown.unwrap_or(Shown::Visible),
@@ -184,16 +197,100 @@ fn InlineAlert(
                     "aria-label": "{words.title}",
                     onmounted: move |event| common.mounted(event),
                     ..data,
-                    AlertBody { words: words.clone() }
+                    AlertBody { words: words.clone(), {children} }
                 }
             }
         }
     }
 }
 
-/// The column: icon, title, message, and the buttons, with the keys.
+/// The alert's column without a sheet: the same words, buttons and keys as [`Alert`] (its
+/// props of those names, `announce` included, mean the same here), for a host that draws it in a window of its own. The
+/// children are the content slot between the message and the buttons. Return presses the default
+/// button and Escape the Cancel button, or reports `on_dismiss` when it is set, while the keyboard
+/// is inside the column; the keyboard starts on the default button.
 #[component]
-fn AlertBody(words: Words) -> Element {
+pub fn AlertColumn(
+    #[props(into)] title: String,
+    #[props(default)] message: Option<TextLine>,
+    buttons: Vec<AlertButton>,
+    #[props(default)] style: AlertStyle,
+    #[props(default)] icon: Option<IconSource>,
+    #[props(default)] suppression: Option<Suppression>,
+    #[props(default)] help: Option<EventHandler<()>>,
+    #[props(default)] on_dismiss: Option<EventHandler<()>>,
+    #[props(default)] arm_after: Option<Duration>,
+    #[props(default)] announce: bool,
+    children: Element,
+) -> Element {
+    let words = use_words(Say {
+        title,
+        message,
+        style,
+        buttons,
+        icon,
+        suppression,
+        help,
+        dismiss: on_dismiss,
+        arm_after,
+        announce,
+    });
+    rsx! {
+        AlertBody { words, {children} }
+    }
+}
+
+/// What a caller says to an alert, before it has an arming machine.
+struct Say {
+    title: String,
+    message: Option<TextLine>,
+    style: AlertStyle,
+    buttons: Vec<AlertButton>,
+    icon: Option<IconSource>,
+    suppression: Option<Suppression>,
+    help: Option<EventHandler<()>>,
+    dismiss: Option<EventHandler<()>>,
+    arm_after: Option<Duration>,
+    announce: bool,
+}
+
+/// The words with the arming machine that holds the answers off, started as the alert mounts.
+fn use_words(say: Say) -> Words {
+    let Say {
+        title,
+        message,
+        style,
+        buttons,
+        icon,
+        suppression,
+        help,
+        dismiss,
+        arm_after,
+        announce,
+    } = say;
+    let arming = use_machine(
+        move |at| Arming::after(at, arm_after),
+        (),
+        || (),
+        |(), _| {},
+    );
+    Words {
+        title,
+        message,
+        style,
+        buttons,
+        icon,
+        suppression,
+        help,
+        dismiss,
+        arming,
+        announce,
+    }
+}
+
+/// The column: icon, title, message, the caller's slot, and the buttons, with the keys.
+#[component]
+fn AlertBody(words: Words, children: Element) -> Element {
     let roles = words.roles();
     let default = default_button(&roles);
     let count = words.buttons.len();
@@ -243,8 +340,9 @@ fn AlertBody(words: Words) -> Element {
             }
             div { class: "ds-alert-title", "{words.title}" }
             if let Some(message) = &words.message {
-                div { class: "ds-alert-body", {text(message)} }
+                div { class: "ds-alert-body", role: words.announce.then_some("alert"), {text(message)} }
             }
+            {children}
             if let Some(suppression) = words.suppression.clone() {
                 div { class: "ds-alert-suppression",
                     Checkbox {
@@ -260,9 +358,11 @@ fn AlertBody(words: Words) -> Element {
                     Button { bezel: Bezel::Help, label: "Help", onclick: move |_| help.call(()) }
                 }
             }
-            div { class: "ds-alert-footer", "data-layout": FooterLayout::of(count).slug(),
-                for (index , button) in words.buttons.iter().enumerate() {
-                    {slot(Slot { index, count, button, default, availability, answer, elements })}
+            if count > 0 {
+                div { class: "ds-alert-footer", "data-layout": FooterLayout::of(count).slug(),
+                    for (index , button) in words.buttons.iter().enumerate() {
+                        {slot(Slot { index, count, button, default, availability, answer, elements })}
+                    }
                 }
             }
         }
