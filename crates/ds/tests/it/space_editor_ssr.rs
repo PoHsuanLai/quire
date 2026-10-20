@@ -220,8 +220,8 @@ const MARKUP_EXCEPTIONS: &[ds_lint::Exception] = {
         },
         Exception {
             rule: Rule::HexColour,
-            selector: "i.ds-stop-disc",
-            reason: "a stop's disc is its dot's pick colour from space::palette",
+            selector: "i.ds-chip-dot",
+            reason: "a stop chip's dot is its colour's pick from space::palette",
         },
         Exception {
             rule: Rule::HexColour,

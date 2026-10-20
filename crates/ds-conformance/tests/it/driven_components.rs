@@ -544,15 +544,42 @@ fn the_space_editor_reports_the_dot_picked_inside_it() {
         .with_clock(Clock::Virtual),
     );
     assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
-    assert!(harness.count(".ds-stop") > 1, "{}", harness.html());
-    harness.send(Input::click(centre(&harness, ".ds-stop:nth-child(2)")));
+    assert!(
+        harness.count(".ds-stops .ds-chip") > 1,
+        "{}",
+        harness.html()
+    );
+    harness.send(Input::click(centre(
+        &harness,
+        ".ds-stops .ds-chip:nth-child(2) .ds-chip-press",
+    )));
     assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("1"));
     assert_eq!(
         harness
-            .attr(".ds-stop:nth-child(2)", "aria-pressed")
+            .attr(
+                ".ds-stops .ds-chip:nth-child(2) .ds-chip-press",
+                "aria-pressed"
+            )
             .as_deref(),
         Some("true")
     );
+}
+
+#[test]
+fn removing_a_stop_chip_removes_it_and_does_not_pick_it() {
+    let mut harness = Harness::new(
+        EditorApp,
+        HarnessConfig::new(Viewport {
+            height: 900,
+            ..VIEW
+        })
+        .with_clock(Clock::Virtual),
+    );
+    assert_eq!(harness.count(".ds-stops .ds-chip"), 2);
+    let remove = ".ds-stops .ds-chip:nth-child(2) .ds-chip-remove";
+    harness.send(Input::click(centre(&harness, remove)));
+    assert_eq!(harness.count(".ds-stops .ds-chip"), 1);
+    assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
 }
 
 // ---- Runtime -----------------------------------------------------------------------------
