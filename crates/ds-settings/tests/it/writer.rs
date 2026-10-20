@@ -2,7 +2,7 @@
 
 use crate::support::{Scratch, names};
 use ds_settings::schema::KeyPath;
-use ds_settings::{FileName, Format, SettingsDoc, SettingsError, SettingsWriter};
+use ds_settings::{Edit, FileName, Format, SettingsDoc, SettingsError, SettingsWriter};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
@@ -208,4 +208,46 @@ fn patch_all_applies_every_edit_in_one_write_or_none() {
         .expect_err("b is not a table");
     assert!(matches!(error, SettingsError::Patch { .. }), "{error}");
     assert_eq!(read(&scratch), before);
+}
+
+#[test]
+fn unset_takes_one_key_out_and_leaves_every_other_byte() {
+    let scratch = Scratch::new();
+    let writer = written(&scratch, WITH_COMMENTS);
+    writer.unset(&key("dock.tile_size_px")).expect("unset");
+    assert_eq!(
+        read(&scratch),
+        "# my settings\nversion = 1\n\n[dock]\n# hand-added\nnote = \"mine\"\n\n[future]\nthing = true\n"
+    );
+}
+
+#[test]
+fn unsetting_a_key_that_is_not_there_leaves_the_file_as_it_was() {
+    let scratch = Scratch::new();
+    let writer = written(&scratch, WITH_COMMENTS);
+    writer.unset(&key("dock.missing")).expect("a missing key");
+    writer
+        .unset(&key("nowhere.at.all"))
+        .expect("a missing table");
+    assert_eq!(read(&scratch), WITH_COMMENTS);
+}
+
+#[test]
+fn unset_refuses_a_path_through_a_value_and_set_and_unset_go_in_one_write() {
+    let scratch = Scratch::new();
+    let writer = written(&scratch, WITH_COMMENTS);
+    let refused = writer.unset(&key("version.inner"));
+    assert!(
+        matches!(refused, Err(SettingsError::Patch { .. })),
+        "{refused:?}"
+    );
+    writer
+        .apply(&[
+            Edit::Set(key("dock.tile_size_px"), toml::Value::Integer(64)),
+            Edit::Unset(key("future.thing")),
+        ])
+        .expect("both");
+    let text = read(&scratch);
+    assert!(text.contains("tile_size_px   =  64 # pixels"), "{text}");
+    assert!(!text.contains("thing"), "{text}");
 }

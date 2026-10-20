@@ -4,7 +4,7 @@
 //! (a consent flag) must not load the whole document and save it back: a change made in between
 //! would be lost. [`SettingsWriter::patch`] reads the file under its lock, sets the one key in
 //! the parsed text and writes the result atomically, so every comment, every other key and the
-//! person's formatting stay as they were.
+//! person's formatting stay as they were. [`SettingsWriter::unset`] takes a key out the same way.
 
 use crate::doc::SettingsDoc;
 use crate::error::SettingsError;
@@ -14,6 +14,15 @@ use crate::store::Store;
 use ds_helpers::{NewFileMode, UpdateError, update_atomic};
 use std::path::{Path, PathBuf};
 use toml_edit::{DocumentMut, InlineTable, Item, Table, TableLike, Value};
+
+/// One change to a settings file.
+#[derive(Debug, Clone, PartialEq)]
+pub enum Edit {
+    /// Set the key (a dotted path) to the value, as [`SettingsWriter::patch`] does.
+    Set(KeyPath, toml::Value),
+    /// Take the key out, its line and comments with it, as [`SettingsWriter::unset`] does.
+    Unset(KeyPath),
+}
 
 /// The writer of one TOML settings file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -56,6 +65,24 @@ impl SettingsWriter {
     /// Applies every edit, in order, under one lock and in one atomic write. If any edit fails
     /// nothing is written.
     pub fn patch_all(&self, edits: &[(KeyPath, toml::Value)]) -> Result<(), SettingsError> {
+        let edits: Vec<Edit> = edits
+            .iter()
+            .map(|(key, value)| Edit::Set(key.clone(), value.clone()))
+            .collect();
+        self.apply(&edits)
+    }
+
+    /// Takes `key` (a dotted path) out of the file, so the program reads its default again,
+    /// and leaves every other byte as it was. A key that is not there, or a table on its path
+    /// that is not there, is already unset: the file stays as it is. The tables on the way stay,
+    /// even when the key was their last. Same lock and atomic write as [`patch`](Self::patch).
+    pub fn unset(&self, key: &KeyPath) -> Result<(), SettingsError> {
+        self.apply(&[Edit::Unset(key.clone())])
+    }
+
+    /// Applies every edit, in order, under one lock and in one atomic write. If any edit fails
+    /// nothing is written.
+    pub fn apply(&self, edits: &[Edit]) -> Result<(), SettingsError> {
         if let Some(dir) = self.path.parent() {
             std::fs::create_dir_all(dir).map_err(|source| SettingsError::Io {
                 path: dir.to_path_buf(),
@@ -75,20 +102,23 @@ impl SettingsWriter {
     }
 
     /// `text` with every edit applied.
-    fn edited(
-        &self,
-        text: &str,
-        edits: &[(KeyPath, toml::Value)],
-    ) -> Result<String, SettingsError> {
+    fn edited(&self, text: &str, edits: &[Edit]) -> Result<String, SettingsError> {
         let mut doc: DocumentMut = text
             .parse()
             .map_err(|e: toml_edit::TomlError| self.refuse(e.message().to_owned()))?;
-        for (key, value) in edits {
+        for edit in edits {
+            let key = match edit {
+                Edit::Set(key, _) | Edit::Unset(key) => key,
+            };
             let parts: Vec<&str> = key.0.split('.').collect();
             if parts.iter().any(|part| part.is_empty()) {
                 return Err(self.refuse(format!("{:?} is not a key path", key.0)));
             }
-            set(doc.as_table_mut(), &parts, to_edit(value)).map_err(|()| {
+            let done = match edit {
+                Edit::Set(_, value) => set(doc.as_table_mut(), &parts, to_edit(value)),
+                Edit::Unset(_) => unset(doc.as_table_mut(), &parts),
+            };
+            done.map_err(|()| {
                 self.refuse(format!("{} sits inside a value that is not a table", key.0))
             })?;
         }
@@ -158,5 +188,21 @@ fn set(table: &mut dyn TableLike, path: &[&str], value: Value) -> Result<(), ()>
                 .ok_or(())?;
             set(inner, rest, value)
         }
+    }
+}
+
+/// Takes `path` out of `table`. A missing key or table is already gone; a value that is not a
+/// table where the path goes on is refused.
+fn unset(table: &mut dyn TableLike, path: &[&str]) -> Result<(), ()> {
+    match path {
+        [] => Ok(()),
+        [last] => {
+            table.remove(last);
+            Ok(())
+        }
+        [first, rest @ ..] => match table.get_mut(first) {
+            None => Ok(()),
+            Some(item) => unset(item.as_table_like_mut().ok_or(())?, rest),
+        },
     }
 }

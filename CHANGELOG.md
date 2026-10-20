@@ -31,9 +31,29 @@ for `ds-core` and `ds-settings`; every old path still resolves.
   clockwise arcs with arrowheads. Download is no longer `Native::Drawn`; the Bootstrap
   `cloud-download` conversion is gone (`Upload` still uses `cloud-upload`).
 
+- `SettingsWriter::unset(key)` takes one key out in place (comments and the rest of the file
+  stay; a missing key is a no-op), and `SettingsWriter::apply(&[Edit])` runs `Edit::Set` and
+  `Edit::Unset` under one lock in one write. `patch` and `patch_all` are unchanged.
+- design/22: `cua.accessibility` (on by default; cua's own key, the Computer use row "Read app
+  controls").
+
+**ds (the Mac pass, from mailo)**
+- `SpaceMenu { on_edit }`: an app with its own Space page gets the id instead of the kit's sheet.
+- `PresetSwatches` ends with a ninth swatch, Custom, whose popover holds the colour's field, stops
+  and grain; new optional `oncommit` hears when a look is settled.
+- `Chip`: pressable (`pressed`, `onpress`), a colour `dot`, and `onremove` on any variant; the
+  Space editor's stops and the companion's picks use it. `Button { popup }` for a button that
+  opens a menu, dialog or list. `Alert` takes a content slot, with a bare `AlertColumn`.
+  `SignInFailed` takes an optional detail. A refused companion answer is an `InlineBanner`.
+- Kit words are shorter, with contractions (sign-in, install, consent, delete).
+- Scrolling: fingers that latched a scroller keep it until they lift; with blitz-kit f3c6ea87 a
+  container whose content fits never rubber-bands, so a short sheet stays put under a drag.
+
 **What a consumer changes**
 - Nothing for the moved types. A literal `PageDecl { .. }` gains `listing: Listing::Sidebar`; code
   that lists the sidebar from `PageTable::pages()` calls `PageTable::sidebar()` instead.
+- The blitz-kit pin moves to f3c6ea87 (same Blitz 851fa7dd). A test that matched a kit sentence
+  word for word follows the new wording.
 
 ## v0.3.36
 

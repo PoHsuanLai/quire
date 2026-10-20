@@ -62,4 +62,4 @@ pub use spaces_storage::{Fixup, Origin, SpacesLoad, SpacesStorage};
 pub use store::Store;
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{DEBOUNCE, Watch, WatchState};
-pub use writer::SettingsWriter;
+pub use writer::{Edit, SettingsWriter};
