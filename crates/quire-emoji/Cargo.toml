@@ -1,0 +1,12 @@
+[package]
+name = "quire-emoji"
+description = "Finds the colour emoji face on this machine and puts it first in a fontique collection. No renderer, no toolkit."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+repository.workspace = true
+publish.workspace = true
+
+[dependencies]
+fontique = { workspace = true }

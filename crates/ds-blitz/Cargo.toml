@@ -13,6 +13,8 @@ ds = { workspace = true }
 # The shell's work areas as plain data (`Outputs`); its D-Bus reading is the opt-in `desktop-outputs`
 # feature, so an app that never asks builds no D-Bus client.
 ds-desktop = { workspace = true }
+# The colour emoji face's detection, shared with temor's terminal (no renderer, only fontique).
+quire-emoji = { workspace = true }
 # Portable Blitz repairs shared with shell-host: `data:` decoding, the local file read, hover sync,
 # fonts, pixel snap, adapter choice. `adapter`: `AdapterPref`, the GPU ranking.
 blitz-kit = { workspace = true, features = ["adapter"] }

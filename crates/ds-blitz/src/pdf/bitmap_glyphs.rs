@@ -1,6 +1,6 @@
 //! A glyph run in a bitmap-only colour face, drawn into the PDF as its pictures.
 //!
-//! Where the system has no vector colour emoji face, `emoji_face` takes a bitmap one: Apple
+//! Where the system has no vector colour emoji face, `quire_emoji` takes a bitmap one: Apple
 //! Color Emoji (`sbix`) on a Mac, Noto Color Emoji (`CBDT`) on Ubuntu and Arch. Such a face has
 //! no `glyf`, `CFF` or `CFF2` outlines, so the PDF writer cannot embed it as a font (the
 //! subsetter has nothing to subset), and every printout with an emoji in it failed. Each run in a
@@ -10,11 +10,11 @@
 //! so an emoji is not in the printout's selectable text. A run in a face with neither outlines nor
 //! pictures draws nothing rather than failing the printout.
 
-use crate::sfnt::table_listed;
 use anyrender::recording::{FillCommand, GlyphRunCommand, RenderCommand};
 use anyrender::{Paint, Scene};
 use peniko::kurbo::{Affine, Rect, Shape, Vec2};
 use peniko::{Blob, Fill, ImageAlphaType, ImageBrush, ImageData, ImageFormat};
+use quire_emoji::table_listed;
 use skrifa::bitmap::{BitmapData, BitmapFormat, BitmapStrikes, Origin};
 use skrifa::instance::{LocationRef, Size};
 use skrifa::{FontRef, GlyphId, MetadataProvider};

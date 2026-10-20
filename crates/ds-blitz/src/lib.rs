@@ -30,8 +30,6 @@ mod edit_ime;
 mod edit_locate;
 mod edit_tree;
 mod edit_window;
-mod emoji_face;
-mod emoji_file;
 pub mod error;
 mod focus;
 mod focus_chain;
@@ -82,7 +80,6 @@ mod screen_area;
 #[cfg(feature = "testing")]
 pub mod seam;
 mod setup;
-mod sfnt;
 mod shell_keys;
 mod size_ledger;
 mod sized_window;
@@ -121,8 +118,6 @@ pub use click_focus::FocusFallback;
 pub use close_request::{CloseAnswer, use_close_request};
 pub use content_fit::{ContentFit, use_content_fit};
 pub use contexts::RootContexts;
-pub use emoji_face::{EMOJI_FAMILY_ENV, EmojiChoice};
-pub use emoji_file::colrv1_emoji_file;
 pub use error::{LaunchError, OpenWindowError, RuntimeError};
 pub use fonts::font_context;
 pub use frame_hover::{FrameHover, FrameHoverHandler, FrameLinkHover, HoverPhase};
@@ -149,6 +144,7 @@ pub use pdf_thumb::{
 };
 #[cfg(feature = "print")]
 pub use print::{PrintError, PrintOutcome, print_dialog};
+pub use quire_emoji::{EMOJI_FAMILY_ENV, EmojiChoice, colrv1_emoji_file};
 pub use shell_keys::ShellKeys;
 pub use snap::snap_to_device;
 pub use texture_layer::{

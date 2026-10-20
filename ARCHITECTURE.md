@@ -33,6 +33,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-peer` | a deadline for every call to another process: `Deadline` (named waits: read, start, action, prompt), `within`, and the typed `NotAnswering` a screen shows as "X is not answering"; no runtime, no bus |
 | `ds-desktop` | which extras of our desktop are here: `Capability` with its D-Bus name, `Desktop::probe` and `watch` over name ownership (feature `dbus`), `Outputs` (the shell's per-output work area and scale from `org.quire.Outputs1`, empty without it; `Outputs::read`/`watch` need `dbus`), `use_desktop` (feature `dioxus`); everything `Absent` without `dbus` |
 | `ds-blitz` | `DocumentHost` on Blitz, app window host, launch, clipboard, `TextureLayer` and the window's GPU; features `pdf`, `print`, `spell`, `menus`, `debug-probe` (a test build only: `QUIRE_DEBUG_PROBE=<dir>` makes each window write its controls by role and name with their boxes, `ds-blitz::probe`) |
+| `quire-emoji` | the machine's colour emoji face, found and put first in a `fontique::Collection`: `prefer_colour`, `EmojiChoice` (`QUIRE_EMOJI_FAMILY`), `colrv1_emoji_file`, `table_listed`. Depends on fontique alone, so a program without Blitz (temor's terminal) shares ds-blitz's detection |
 | `ds-harness` | dev-only test driver: `Harness` with its `send` and query methods, snapshots, painters |
 | `ds-conformance` | test-only crate: every component's behaviour tests, one file per component |
 | `ds-gallery` | the visual reference binary: every component across theme, accent, motion, material |
@@ -57,7 +58,7 @@ Workspace crates (`crates/<name>`), plus one sibling repo (`blitz-kit`) and one 
 | `ds-peer` | nothing of ours |
 | `ds-helpers` | `ds-peer` |
 | `ds-desktop` | `ds-peer` |
-| `ds-blitz` | `ds`, `ds-style`, `ds-core`, `ds-helpers` (feature `spell`: the capped file reader), `ds-desktop` (the shell's `Outputs` as data; feature `desktop-outputs` adds its D-Bus reading), `ds-peer` (the print portal's deadlines), `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
+| `ds-blitz` | `quire-emoji`, `ds`, `ds-style`, `ds-core`, `ds-helpers` (feature `spell`: the capped file reader), `ds-desktop` (the shell's `Outputs` as data; feature `desktop-outputs` adds its D-Bus reading), `ds-peer` (the print portal's deadlines), `blitz-kit`; feature `pdf`: `pdfrum-anyrender` (git dependency from the pdfrum repo) |
 | `ds-harness` | `ds-blitz`, `ds-core`, `blitz-kit` |
 | `ds-conformance` | dev-dependencies only: `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` |
 | `ds-gallery` | `ds`, `ds-shell`, `ds-lint`, `ds-settings`, `ds-blitz`, `ds-harness` (snapshots) |
