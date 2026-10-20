@@ -119,7 +119,7 @@ pub fn PresetSwatches(
                     shown.set(Shown::Hidden);
                     commit();
                 },
-                div { class: "ds-space-editor ds-custom-colour", "data-frame": "frameless",
+                div { class: "ds-space-editor ds-custom-colour",
                     Field { look: look.clone(), scheme, current, picker, onchange }
                     Stops { look: look.clone(), scheme, current, picker, onchange }
                     GrainRow { look, onchange }
