@@ -1,8 +1,9 @@
 //! The pages Settings can show: the built-in table plus every `[[page]]` a schema declares.
 
+use ds_core::settings::PageId;
+
 use super::page::Page;
-use super::page_decl::{PageDecl, PageFile, PageTitle};
-use super::page_id::PageId;
+use super::page_decl::{Listing, PageDecl, PageFile, PageTitle};
 use super::program::Schema;
 
 /// The built-in pages, as data (`pages.toml`).
@@ -54,6 +55,14 @@ impl PageTable {
         &self.pages
     }
 
+    /// The pages the sidebar lists, in sidebar order: every page but the [`Listing::Hidden`] ones.
+    /// A hidden page still resolves ([`PageTable::get`], [`PageTable::resolve`]).
+    pub fn sidebar(&self) -> impl Iterator<Item = &PageDecl> {
+        self.pages
+            .iter()
+            .filter(|page| page.listing == Listing::Sidebar)
+    }
+
     /// The page declared with `id`.
     pub fn get(&self, id: &PageId) -> Option<&PageDecl> {
         self.pages.iter().find(|page| page.id == *id)
@@ -99,7 +108,7 @@ impl PageTable {
 #[cfg(test)]
 mod tests {
     use super::{PageStatus, PageTable};
-    use crate::schema::{Page, PageDecl, PageId, PageOrder, PageSymbol, PageTitle};
+    use crate::schema::{Listing, Page, PageDecl, PageId, PageOrder, PageSymbol, PageTitle};
 
     fn wallpaper_retitled() -> PageDecl {
         PageDecl {
@@ -107,6 +116,7 @@ mod tests {
             title: PageTitle("Backdrop".to_owned()),
             symbol: PageSymbol("image".to_owned()),
             order: PageOrder(85),
+            listing: Listing::Sidebar,
             aliases: Vec::new(),
         }
     }
@@ -164,5 +174,27 @@ mod tests {
             table.title_of(&Page::declared("not-declared")).0,
             "not-declared"
         );
+    }
+
+    #[test]
+    fn a_hidden_page_resolves_but_the_sidebar_does_not_list_it() {
+        let table = PageTable::built_in();
+        let setup = PageId::new("assistant-model-setup");
+        assert_eq!(
+            table.get(&setup).map(|page| page.listing),
+            Some(Listing::Hidden)
+        );
+        assert_eq!(table.resolve("assistant-model-setup"), Some(setup.clone()));
+        assert_eq!(
+            table.status(&Page::declared("assistant-model-setup")),
+            PageStatus::Declared
+        );
+        assert!(table.sidebar().all(|page| page.id != setup));
+        assert!(
+            table
+                .sidebar()
+                .any(|page| page.id.as_str() == "assistant-model")
+        );
+        assert_eq!(table.sidebar().count() + 1, table.pages().len());
     }
 }

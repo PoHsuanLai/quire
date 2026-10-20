@@ -3,6 +3,7 @@
 
 use std::collections::BTreeMap;
 
+use ds_core::settings::KeyPath;
 use serde::{Deserialize, Serialize};
 
 use super::column::Column;
@@ -10,12 +11,6 @@ use super::control::ControlName;
 use super::live_action::LiveAction;
 use super::page::Page;
 use super::place::ChoicePlace;
-
-/// A dotted settings key path: `"dock.magnified_px"`. Always `<domain>.<field>`, the derive's
-/// own mechanical rule (`crates/ds-settings-derive/src/gen_struct.rs`).
-#[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
-#[serde(transparent)]
-pub struct KeyPath(pub String);
 
 /// What a picker calls the key.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]

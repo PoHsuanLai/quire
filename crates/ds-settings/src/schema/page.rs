@@ -5,9 +5,8 @@
 //! pages were declared reads unchanged, and a page nobody here has heard of (a newer program's)
 //! reads as `Page::App(<its name>)` instead of failing the schema.
 
+use ds_core::settings::PageId;
 use serde::{Deserialize, Serialize};
-
-use super::page_id::PageId;
 
 /// The Settings app's old fixed page list, plus one page per other id: a third-party program's
 /// page, or a page a schema declares (`Page::declared("wallpaper")`).

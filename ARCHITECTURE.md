@@ -325,8 +325,8 @@ The single place a concept lives. Extend it; never write a second one.
 | The names one app is known by (desktop id, window `app_id`, session-bus names, intents app) | `ds-helpers::AppIdentity`, read from the `X-Quire-WindowId`, `X-Quire-BusNames` and `X-Quire-IntentsApp` keys of the app's desktop entry; nothing guesses one name from another |
 | Settings file I/O (lenient load, atomic save, watch) | `ds-settings::store::Store` |
 | Settings schema | `ds-settings::schema` (derived) |
-| Where in Settings a link points (a page, a key, an account) and its text form | `ds-settings::target::SettingsTarget` (`FromStr` and `Display` are the whole grammar) |
-| The pages of Settings: id, title, glyph, order, aliases; an unknown page tolerated | `ds-settings::schema::{PageTable, PageDecl, PageId}` over the built-in `schema/pages.toml`; `Page` is the typed layer |
+| Where in Settings a link points (a page, a key, an account) and its text form | `ds_core::settings::SettingsTarget`, re-exported as `ds-settings::target::SettingsTarget` (`FromStr` and `Display` are the whole grammar; with `PageId`, `KeyPath`, `AccountRef`) |
+| The pages of Settings: id, title, glyph, order, aliases; an unknown page tolerated | `ds-settings::schema::{PageTable, PageDecl, Listing}` (`PageId` is `ds_core::settings::PageId`) over the built-in `schema/pages.toml`; `Page` is the typed layer |
 | Which control draws a key, and the on/off pair rule | `ds-settings::schema::{Control, TogglePair}` (`KeyKind::default_control`, `KeySpec::control`); no program keeps its own table |
 | Changing one key of a settings file in place | `ds-settings::SettingsWriter::patch` |
 | A key's range, enforced on load and reported | `ds-settings::{Limits, ClampedKey}` through `SettingsDoc::limits` |

@@ -16,7 +16,6 @@ mod key;
 mod live_action;
 mod page;
 mod page_decl;
-mod page_id;
 mod pages;
 mod place;
 mod program;
@@ -30,15 +29,14 @@ pub use column::{Column, ColumnKind, ColumnName};
 pub use control::{Control, ControlName, TogglePair};
 pub use deep_link::{deep_link, deep_link_path};
 pub use doc_table::{DocTableError, key_table, regenerate};
+pub use ds_core::settings::{KeyPath, PageId};
 pub use key::{
     AgentSetting, ChoiceGroup, ChoiceUnavailable, ChoiceWord, Exposure, GroupedChoices, Help,
-    KeyKind, KeyPath, KeySpec, Label, Note, Section, UnavailableReason, WordLabels,
-    kind_from_variants,
+    KeyKind, KeySpec, Label, Note, Section, UnavailableReason, WordLabels, kind_from_variants,
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
 pub use page::Page;
-pub use page_decl::{PageDecl, PageOrder, PageSymbol, PageTitle};
-pub use page_id::PageId;
+pub use page_decl::{Listing, PageDecl, PageOrder, PageSymbol, PageTitle};
 pub use pages::{PageStatus, PageTable};
 pub use place::{ChoicePlace, CompanyName, EngineName, HostName};
 pub use program::{

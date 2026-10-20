@@ -511,7 +511,6 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `session.lock_clock` | `LockClock::{H24,H12}` | `H24` | `14:05`, or `2:05` without AM/PM as the reference lock screen shows it | `20-SURFACES.md#1-9-lock-screen-spec-tier-1`; sill FINDINGS F553 | proposed (M11 freeze, 2026-09-26) |
 | `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | RETIRING: no reader; the picture is wired to `resolve_picture` first |
 | `session.lock_grace_s` | `Secs` | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
 
@@ -749,7 +748,18 @@ schema (`scripts/gen-doc-keys.sh`).
 (`ds_settings::time_locale` picks it from `LC_ALL`, `LC_TIME` and `LANG`): `en_US`, `en_CA`,
 `zh_TW` and a few more write 12 hours, `en_GB`, `de_DE`, `ja_JP` and `C` write 24. A program asks
 `Environment::hours(locale)` (or `HourCycle::resolve`) and draws what comes back; it never reads
-the key itself. The bar, the calendar and mail's snooze times read the same answer.
+the key itself. The bar, the calendar and mail's snooze times read the same answer. So does the lock screen: its
+clock follows `region.hours` and, like the Mac's, never shows AM/PM (`14:05`, or `2:05`); there is
+no lock-clock key of its own.
+
+### 3.33 `wallpaper` (sill/settings.toml)
+
+The desktop picture. Page Wallpaper (the `wallpaper` page of §9.3), where the `picture` control
+shows a grid of pictures with "Add Picture...".
+
+| Key | Type | Default | Range / Alt | Source | Status |
+| --- | --- | --- | --- | --- | --- |
+| `wallpaper.picture` | text, control `picture` | empty | a path to an image; empty means no picture, so the desktop paints `--paper` | sill wallpaper; §9.1 `picture` control | proposed (2026-10-20) |
 
 ## 4. Rust shape
 
@@ -1446,9 +1456,11 @@ unchanged.
    table from kind to control, `TogglePair` the only on/off rule; an id this build does not know,
    or one that does not fit the kind, is ignored and the default control is drawn. `picture` is a
    grid of pictures with "Add Picture…" whose value is a path; it fits a text key.
-3. **A target for every entrance.** `ds_settings::target::SettingsTarget` is `Page(PageId)`,
+3. **A target for every entrance.** `SettingsTarget` (defined in `ds_core::settings`, pure, so a compositor holds it without `ds-settings`; re-exported as `ds_settings::target::SettingsTarget`) is `Page(PageId)`,
    `Key(KeyPath)` or `Account(AccountRef)`, written `page:wallpaper`, `key:dock.tile_size_px`,
-   `account:<id>`. It is the payload of the `settings.page.show` intent.
+   `account:<id>`. It is the payload of the `settings.page.show` intent. A page may say `listing = "hidden"`
+   (`Listing::Hidden`): it resolves by id (`assistant-model-setup`, the model picker's first-run step)
+   but `PageTable::sidebar()` leaves it out.
 4. **One key at a time.** `SettingsWriter::patch(key, value)` sets one key in the file under its
    lock and writes atomically; comments, other keys and unknown keys keep their text. A program
    that owns one field of a shared file patches it; it never loads the whole document and saves.

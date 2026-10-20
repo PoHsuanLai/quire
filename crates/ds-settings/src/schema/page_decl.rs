@@ -3,7 +3,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::page_id::PageId;
+use ds_core::settings::PageId;
 
 /// What the sidebar calls a page.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -22,6 +22,25 @@ pub struct PageSymbol(pub String);
 #[serde(transparent)]
 pub struct PageOrder(pub u16);
 
+/// Whether the sidebar lists a page. A hidden page is still declared: a link, an intent or a
+/// first-run step opens it by id, it just has no row of its own.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum Listing {
+    /// A row in the sidebar, at the page's [`PageOrder`].
+    #[default]
+    Sidebar,
+    /// Reachable by id alone.
+    Hidden,
+}
+
+impl Listing {
+    /// Whether this is the default, which a written declaration leaves out.
+    fn is_default(&self) -> bool {
+        *self == Listing::default()
+    }
+}
+
 /// One `[[page]]` table.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PageDecl {
@@ -29,6 +48,9 @@ pub struct PageDecl {
     pub title: PageTitle,
     pub symbol: PageSymbol,
     pub order: PageOrder,
+    /// Whether the sidebar lists the page. Absent means it does.
+    #[serde(default, skip_serializing_if = "Listing::is_default")]
+    pub listing: Listing,
     /// Other names the page answers to: the names it had before it was declared, so an old link
     /// or an old schema still finds it. Absent when empty.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]

@@ -3,6 +3,32 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.37
+
+The settings target gets a pure home, a hidden page, and the lock clock follows the region. Additive
+for `ds-core` and `ds-settings`; every old path still resolves.
+
+**ds-core**
+- `settings::{SettingsTarget, TargetError, AccountRef, PageId, KeyPath}`: the types moved here
+  from `ds-settings`, with their serde, `FromStr`, `Display` and tests, so sill's pure crates can
+  hold a target without `ds-settings`. No new dependency.
+
+**ds-settings**
+- `target::*` and `schema::{PageId, KeyPath}` are re-exports of the `ds-core` types (same paths).
+- `schema::Listing::{Sidebar, Hidden}` and `PageDecl::listing` (`listing = "hidden"` in a
+  `[[page]]` table; absent means `Sidebar`), and `PageTable::sidebar()`, the pages the sidebar
+  lists. A hidden page still resolves by id.
+- The built-in page `assistant-model-setup` (hidden): the model picker's first-run step.
+
+**Design notes**
+- design/22: `session.lock_clock` is gone; the lock clock follows `region.hours` (3.32) and omits
+  AM/PM like the Mac. New section 3.33 with `wallpaper.picture` (text, control `picture`, page
+  `wallpaper`; empty means no picture, so the desktop paints `--paper`). design/28 follows.
+
+**What a consumer changes**
+- Nothing for the moved types. A literal `PageDecl { .. }` gains `listing: Listing::Sidebar`; code
+  that lists the sidebar from `PageTable::pages()` calls `PageTable::sidebar()` instead.
+
 ## v0.3.36
 
 Settings targets, pages as data, a picture control, patch writes, ranges and the hour cycle. One

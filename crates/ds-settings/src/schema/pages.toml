@@ -107,6 +107,16 @@ symbol = "sparkles"
 order = 55
 aliases = ["assistant_model", "Assistant Model"]
 
+# First-run step of the model picker (detent) and the step sill opens after first login: reachable
+# by id, never a sidebar row.
+[[page]]
+id = "assistant-model-setup"
+title = "Assistant Model Setup"
+symbol = "sparkles"
+order = 56
+listing = "hidden"
+aliases = ["assistant_model_setup"]
+
 [[page]]
 id = "software-update"
 title = "Software Update"

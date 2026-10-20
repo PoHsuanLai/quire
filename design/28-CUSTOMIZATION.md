@@ -104,7 +104,7 @@ add items. "Before/during" = before the app pass or during it (section 6).
 | 4.10 | Gestures | an action per gesture | Settings › Trackpad / Mouse pop-ups | no | `gestures.gesture_action_map` | must (exists) | before (fold into actions) |
 | 4.11 | Keyboard shortcuts | on/off and a chord per system shortcut; per-app menu shortcuts | Settings › Keyboard › Keyboard Shortcuts: list, checkboxes, capture; App Shortcuts "+" | apps add their own menu commands | sill writes the compositor's `custom` and `system_actions` files; no page | must (system list), nice (app shortcuts) | before (system), during (app) |
 | 4.12 | Sidebars in our apps | which built-in items show, favourites and their order | Finder Settings › Sidebar checklist; drag into Favorites, out to remove | apps add locations (file providers) | none (apps not built) | must for Files, nice elsewhere | during |
-| 4.13 | Lock screen | large clock, message, user list (no widgets on the Mac) | Settings › Lock Screen | no | `session.lock_clock`, `session.user_picture` | nice (scalar keys only) | before, small |
+| 4.13 | Lock screen | large clock, message, user list (no widgets on the Mac) | Settings › Lock Screen | no | `session.user_picture`; the clock follows `region.hours` (22 §3.32) | nice (scalar keys only) | before, small |
 | 4.14 | Notifications per app | allow, style, lock screen, center, badge, sound, previews, grouping | Settings › Notifications: app list, one page per app | every app is a row | one global `banner_style`; per-app deferred (F270) | must | before |
 | 4.15 | Focus filters | per Focus: allowed people and apps, per-app filters | Settings › Focus › a Focus › Add Filter | yes (App Intents filters) | Focus is a control center module (DND only) | skip for now (nice later) | after |
 
@@ -610,7 +610,7 @@ users or name and password, Sleep/Restart/Shut Down buttons (mh11784, 14.0). **N
 the Mac lock screen in this era (the page names none; iPhone and iPad Lock Screen widgets and
 controls do not apply).
 
-**Today.** `session.lock_clock`, `session.user_picture` (22 §3.19); quire `LockScreen`.
+**Today.** `session.user_picture` (22 §3.19); the clock follows `region.hours` (22 §3.32); quire `LockScreen`.
 
 **Mapping.** Scalar keys only; no registry. Owner: sill.
 
