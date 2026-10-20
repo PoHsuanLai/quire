@@ -17,7 +17,7 @@ pub enum SpacePick<A> {
     Theme(Theme),
     /// New Space; it opens its name at once.
     New,
-    /// Delete Space...: a question at the pointer.
+    /// Delete Space...: a critical alert that asks first.
     Delete,
     /// Link to... one desktop Space, by its id.
     Link(String),

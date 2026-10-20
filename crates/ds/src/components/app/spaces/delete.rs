@@ -1,27 +1,20 @@
-//! Delete Space...: the question, where the Space's menu stood.
+//! Delete Space...: the question, as an alert.
 
 use super::controller::SpacesHandle;
 use super::menu_pick::delete_words;
-use super::parts::placed;
-use crate::components::controls::button::Button;
-use crate::components::overlays::popover::{Arrow, Popover};
-use crate::focus::soon::focus_soon;
-use crate::host::measure::Anchor;
-use crate::root::common::Common;
+use crate::components::content::text_runs::TextLine;
+use crate::components::overlays::alert::Alert;
+use crate::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyle};
 use dioxus::prelude::*;
-use ds_core::geometry::units::{Point, Px};
-use ds_core::press::{PointerButton, Press};
-use ds_style::icon::Icon;
 use ds_style::space::list::SpaceId;
-use ds_style::tokens::control_size::ControlSize;
 
-/// The question, naming the Space, and what stays. Cancel, the safe default, takes the keyboard
-/// as it opens, so Return cancels. Only the Delete button deletes; Escape or a click outside
-/// deletes nothing. Nothing is offered for the last Space, whose menu has no Delete row.
-/// `kept` names what is not deleted; `on_deleted` hears the Space that went.
+/// The question, naming the Space, and what stays, drawn as every other question that cannot be
+/// undone is: a critical [`Alert`]. Cancel, the safe default, takes the keyboard as it opens, so
+/// Return cancels, and Escape presses it. Only Delete deletes. Nothing is offered for the last
+/// Space, whose menu has no Delete row. `kept` names what is not deleted; `on_deleted` hears the
+/// Space that went.
 #[component]
 pub(super) fn DeletePart<P, R>(
-    at: Point,
     space: SpaceId,
     handle: SpacesHandle<P, R>,
     kept: String,
@@ -46,55 +39,29 @@ where
         return rsx! {};
     }
     let (title, body) = delete_words(&name, &kept);
-    let on_primary = |act: fn(SpacesHandle<P, R>)| {
-        move |press: Press| {
-            if press.button == PointerButton::Primary {
-                act(handle);
+    let delete = AlertButton::new(
+        "Delete",
+        AlertRole::Destructive,
+        EventHandler::new(move |()| {
+            handle.close_menu();
+            if handle.delete(space).is_ok()
+                && let Some(on_deleted) = on_deleted
+            {
+                on_deleted.call(space);
             }
-        }
-    };
+        }),
+    );
+    let cancel = AlertButton::new(
+        "Cancel",
+        AlertRole::Cancel,
+        EventHandler::new(move |()| handle.close_menu()),
+    );
     rsx! {
-        Popover {
-            anchor: Anchor::Point(at),
-            placement: placed(),
-            gap: Px(2.0),
-            arrow: Arrow::None,
-            common: Common { aria_label: Some(title.clone()), ..Common::default() },
-            onclose: move |()| handle.close_menu(),
-            div { class: "ds-space-part ds-space-delete", role: "alertdialog",
-                h3 { "{title}" }
-                p { class: "ds-space-delete-body", "{body}" }
-                div { class: "ds-space-part-acts",
-                    Button {
-                        size: ControlSize::Large,
-                        label: "Cancel",
-                        common: Common {
-                            mounted: Some(EventHandler::new(|event: MountedEvent| {
-                                focus_soon(event.data());
-                            })),
-                            ..Common::default()
-                        },
-                        onclick: on_primary(|handle| handle.close_menu()),
-                    }
-                    Button {
-                        size: ControlSize::Large,
-                        label: "Delete Space",
-                        icon: Icon::Trash,
-                        common: Common { aria_label: Some("Delete Space".to_owned()), ..Common::default() },
-                        onclick: move |press: Press| {
-                            if press.button != PointerButton::Primary {
-                                return;
-                            }
-                            handle.close_menu();
-                            if handle.delete(space).is_ok()
-                                && let Some(on_deleted) = on_deleted
-                            {
-                                on_deleted.call(space);
-                            }
-                        },
-                    }
-                }
-            }
+        Alert {
+            title,
+            message: Some(TextLine::from(body)),
+            style: AlertStyle::Critical,
+            buttons: vec![delete, cancel],
         }
     }
 }

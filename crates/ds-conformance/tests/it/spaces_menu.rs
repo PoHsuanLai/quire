@@ -147,15 +147,15 @@ fn delete_asks_and_only_its_button_deletes() {
     let mut harness = harness(Three);
     open_menu(&mut harness);
     pick(&mut harness, 5);
-    assert_eq!(harness.count(".ds-space-delete"), 1);
+    assert_eq!(harness.count(".ds-alert"), 1);
     assert_eq!(dots(&harness), 3, "asking deletes nothing");
     let confirm = harness
-        .centre(".ds-space-part-acts .ds-button:nth-child(2)")
-        .expect("the Delete Space button");
+        .centre(".ds-alert-slot:nth-child(1) > .ds-button")
+        .expect("the Delete button");
     harness.send(Input::click(confirm));
     harness.advance(ms(400));
     assert_eq!(dots(&harness), 2);
-    assert_eq!(harness.count(".ds-space-delete"), 0);
+    assert_eq!(harness.count(".ds-alert"), 0);
 }
 
 #[test]
@@ -326,13 +326,13 @@ fn delete_focuses_cancel_and_return_cancels() {
     let mut harness = harness(Three);
     open_part(&mut harness, 5);
     assert!(
-        focused(&harness, ".ds-space-part-acts .ds-button:nth-child(1)"),
+        focused(&harness, ".ds-alert-slot:nth-child(2) > .ds-button"),
         "Cancel is the safe default:\n{}",
         harness.html()
     );
     key(&mut harness, ShortcutKey::Enter);
     assert_eq!(
-        harness.count(".ds-space-delete"),
+        harness.count(".ds-alert"),
         0,
         "Return pressed Cancel"
     );
@@ -348,7 +348,7 @@ fn delete_escape_cancels_and_gives_the_keyboard_back() {
     let mut harness = harness(Three);
     open_part(&mut harness, 5);
     key(&mut harness, ShortcutKey::Escape);
-    assert_eq!(harness.count(".ds-space-delete"), 0, "Escape closes it");
+    assert_eq!(harness.count(".ds-alert"), 0, "Escape closes it");
     assert_eq!(dots(&harness), 3, "nothing was deleted");
     assert!(
         focused(&harness, OPENER),
