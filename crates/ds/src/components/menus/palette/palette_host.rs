@@ -2,6 +2,7 @@
 //! 25): over the window on a scrim, or in a surface of its own, with S's
 //! `peek-in`, C's `cmdk-in`, or an opaque spring. Split from `command_palette`.
 
+use super::palette_close::PaletteClose;
 use crate::components::overlays::popover::Float;
 use dioxus::prelude::*;
 use ds_core::vocab::Shown;
@@ -34,7 +35,7 @@ pub(crate) fn hosted(
     float: Float,
     card: Element,
     shown: Shown,
-    onclose: EventHandler<()>,
+    onclose: EventHandler<PaletteClose>,
 ) -> Element {
     match host {
         CommandPaletteHost::Surface => card,
@@ -46,13 +47,13 @@ pub(crate) fn hosted(
                         "data-shown": shown.slug(),
                         onpointerdown: move |_| {
                             if float.is_top() {
-                                onclose.call(());
+                                onclose.call(PaletteClose::Outside);
                             }
                         },
                         {card}
                     }
                 },
-                onclose,
+                EventHandler::new(move |()| onclose.call(PaletteClose::Outside)),
             );
             rsx! {}
         }

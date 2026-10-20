@@ -39,7 +39,7 @@ fn Page() -> Element {
                 empty: "Nothing".to_string(),
                 oninput: move |_| {},
                 onpick: move |value: u8| log.with_mut(|log| log.push(format!("pick:{value}"))),
-                onclose: move |()| log.with_mut(|log| log.push("close".to_string())),
+                onclose: move |_| log.with_mut(|log| log.push("close".to_string())),
             }
         }
     }

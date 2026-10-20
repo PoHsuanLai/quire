@@ -5,6 +5,7 @@ pub(crate) mod command_palette;
 pub mod machine;
 pub(crate) mod palette_body;
 pub mod palette_claim;
+pub mod palette_close;
 pub(crate) mod palette_expand;
 pub mod palette_group;
 pub(crate) mod palette_host;

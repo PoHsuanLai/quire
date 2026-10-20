@@ -54,7 +54,7 @@ fn Files() -> Element {
                     empty: "Nothing",
                     oninput: move |_| {},
                     onpick: move |_| {},
-                    onclose: move |()| {},
+                    onclose: move |_| {},
                     host: CommandPaletteHost::Surface,
                     id: "card".to_string(),
                 }

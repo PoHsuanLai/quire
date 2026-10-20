@@ -60,7 +60,7 @@ fn Launcher() -> Element {
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
                     onpick: move |value: u8| log.with_mut(|log| log.push(format!("row:{value}"))),
-                    onclose: move |()| {},
+                    onclose: move |_| {},
                     host: CommandPaletteHost::Surface,
                     id: "card".to_string(),
                     focus: field,
