@@ -53,7 +53,9 @@ pub(crate) fn hosted(
                         {card}
                     }
                 },
-                EventHandler::new(move |()| onclose.call(PaletteClose::Outside)),
+                // The palette is Semitransient, so the layer never asks it to close; the wrap's
+                // own pointer down above is the outside click.
+                EventHandler::new(|()| {}),
             );
             rsx! {}
         }

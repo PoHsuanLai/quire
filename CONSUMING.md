@@ -1361,7 +1361,7 @@ Palette behaviour:
   moves the focus off the field). A closure typed `|key: KeyboardData|` becomes
   `|key: KeyboardEvent|`; `key.key()`, `key.modifiers()` read as before.
 - **`onclose` says why.** `CommandPalette { onclose: EventHandler<PaletteClose> }` reports
-  `PaletteClose::Escape`, `PaletteClose::Outside` (a pointer down outside the card) or
+  `PaletteClose::Escape`, `PaletteClose::Outside` (a pointer down outside the card; never from a `Surface` host, which has no scrim) or
   `PaletteClose::Pick` (a row whose pick closes; `onpick` follows). A caller that does not care
   writes `onclose: move |_| ..`; one that closes a whole bar on Escape but only dismisses on a
   click outside matches on it.
