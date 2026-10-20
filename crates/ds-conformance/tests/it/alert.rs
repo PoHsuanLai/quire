@@ -34,6 +34,8 @@ thread_local! {
     static FLOW: Cell<Flow> = const { Cell::new(Flow::Floating) };
     static LISTENING: Cell<Listening> = const { Cell::new(Listening::ToButtonsOnly) };
     static ARM_AFTER: Cell<Option<Duration>> = const { Cell::new(None) };
+    static SLOT: Cell<bool> = const { Cell::new(false) };
+    static BUTTONS: Cell<bool> = const { Cell::new(true) };
 }
 
 #[allow(non_snake_case)]
@@ -49,13 +51,16 @@ fn Page() -> Element {
         Alert {
             title: "Turn Bluetooth off?",
             message: Some(TextLine::from("Bluetooth devices such as keyboards and mice will be disconnected.")),
-            buttons: vec![
+            buttons: if BUTTONS.with(Cell::get) { vec![
                 AlertButton::new("Turn Off", ACTION_ROLE.with(Cell::get), EventHandler::new(|()| LOG.write().push("action".to_owned()))),
                 AlertButton::new("Cancel", AlertRole::Cancel, EventHandler::new(|()| LOG.write().push("cancel".to_owned()))),
-            ],
+            ] } else { Vec::new() },
             on_dismiss,
             arm_after: ARM_AFTER.with(Cell::get),
             flow,
+            if SLOT.with(Cell::get) {
+                p { class: "slot", "Which device?" }
+            }
         }
     };
     rsx! {
@@ -95,6 +100,8 @@ fn start_with(
     arm_after: Option<Duration>,
 ) -> Harness {
     ARM_AFTER.with(|cell| cell.set(arm_after));
+    SLOT.with(|cell| cell.set(false));
+    BUTTONS.with(|cell| cell.set(true));
     ACTION_ROLE.with(|cell| cell.set(action));
     FLOW.with(|cell| cell.set(flow));
     LISTENING.with(|cell| cell.set(listening));
@@ -303,4 +310,56 @@ fn an_alert_with_an_arming_delay_answers_nothing_until_it_arms() {
             "{flow:?}: armed, it answers as ever"
         );
     }
+}
+
+/// The alert with a content slot, and with `buttons` or none.
+fn start_slotted(flow: Flow, buttons: bool, listening: Listening) -> Harness {
+    ARM_AFTER.with(|cell| cell.set(None));
+    ACTION_ROLE.with(|cell| cell.set(AlertRole::Normal));
+    FLOW.with(|cell| cell.set(flow));
+    LISTENING.with(|cell| cell.set(listening));
+    SLOT.with(|cell| cell.set(true));
+    BUTTONS.with(|cell| cell.set(buttons));
+    let config = HarnessConfig::new(VIEW).with_clock(Clock::Virtual);
+    let mut harness = Harness::new(Page, config);
+    harness.within(|| LOG.write().clear());
+    harness.advance(Duration::from_millis(600));
+    harness
+}
+
+#[test]
+fn the_slot_stands_between_the_message_and_the_buttons_and_the_keys_still_work() {
+    for flow in [Flow::Floating, Flow::Inline] {
+        let mut harness = start_slotted(flow, true, Listening::ToButtonsOnly);
+        assert_eq!(
+            harness.text_of(".ds-alert .slot").as_deref(),
+            Some("Which device?")
+        );
+        let message = harness.centre(".ds-alert-body").expect("the message");
+        let slot = harness.centre(".ds-alert .slot").expect("the slot");
+        let footer = harness.centre(".ds-alert-footer").expect("the footer");
+        assert!(
+            message.y < slot.y && slot.y < footer.y,
+            "{flow:?}: {}",
+            harness.html()
+        );
+        assert_eq!(harness.focus_of(ACTION), FocusState::Focused, "{flow:?}");
+        press(&mut harness, ShortcutKey::Enter);
+        press(&mut harness, ShortcutKey::Escape);
+        assert_eq!(log(&harness), "action,cancel", "{flow:?}");
+    }
+}
+
+#[test]
+fn an_alert_with_no_buttons_draws_no_footer_and_answers_nothing() {
+    let mut harness = start_slotted(Flow::Floating, false, Listening::ToButtonsOnly);
+    assert_eq!(harness.count(".ds-alert-footer"), 0, "{}", harness.html());
+    assert_eq!(harness.count(".ds-alert .slot"), 1);
+    press(&mut harness, ShortcutKey::Enter);
+    press(&mut harness, ShortcutKey::Escape);
+    assert!(
+        log(&harness).is_empty(),
+        "no button to press: {}",
+        log(&harness)
+    );
 }

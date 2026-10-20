@@ -962,7 +962,9 @@ A few props worth knowing about before you read the signatures:
 - A button's `availability` is its controlled disabled state. `answers: Answers::Return` draws the
   default button and `Answers::Escape` the Cancel button; the keys themselves are routed by the dialog:
   `Alert` routes both (Escape presses the Cancel button; with `on_dismiss: Some(handler)` it reports a
-  dismissal there instead and presses nothing, so "dismissed" is not "Don't Allow"), and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
+  dismissal there instead and presses nothing, so "dismissed" is not "Don't Allow"; `Alert`'s children are a
+  content slot between the message and the buttons, `announce: true` makes the message `role="alert"`, and
+  `AlertColumn` is the same column without a sheet for a host's own window), and `Sheet { on_return: Some(handler), onclose }` routes Return (anywhere a
   control did not take it, a multi-line field's Enter included) to `on_return` and Escape to `onclose`.
   Pass `on_return: None` while the default button is disabled. The first stop of the keyboard in a sheet
   is the caller's: `TextField { focus: FieldFocus::OnMount }` for its first field or `Button { focus:
@@ -1523,7 +1525,8 @@ is theirs). With `Some`, the sheet says to run it in Terminal (the person's comp
 clipboard (`ds_blitz::clipboard::write_text`; ds-shell does not depend on ds-blitz) and a
 `copy: CopyState` (`ds::components::controls::copy_state::CopyState`, also at `ds_shell::accounts::model::CopyState`; default `Idle`; set `Copied` after you copied, as `BrowserWait` does) so the
 button says "Copied". The line itself is `ds`'s `CommandLine` (next section). `on_dismiss` is Not Now and Close;
-Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet.
+Escape does nothing while `Installing`. `HelperBody` is the same column without the sheet; both are
+`ds`'s `Alert` column (`AlertColumn`) with the install command or spinner in its content slot.
 
 ### Showing a command to copy
 

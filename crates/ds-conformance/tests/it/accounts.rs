@@ -14,6 +14,7 @@ use ds_shell::accounts::model::{
     FormField, Limitation, ProviderEntry, ProviderKey, ProviderPick, Requirement, ServiceKey,
     ServiceLine, ServiceOffer, SessionOffer, SignInFault, StepTitle,
 };
+use ds_shell::helpers::HelperPhase;
 use ds_shell::prelude::*;
 use std::time::Duration;
 
@@ -636,4 +637,58 @@ fn the_consent_body_stands_in_a_host_window_with_its_keys() {
         }
     );
     assert_eq!(log(&mut harness), [want, "Dismiss".to_owned()]);
+}
+
+fn helper(phase: HelperPhase) -> Element {
+    Stage(rsx! {
+        HelperBody {
+            app: "Photos",
+            tool: "mpv",
+            purpose: "play videos",
+            phase,
+            on_install: move |()| LOG.write().push("install".to_owned()),
+            on_dismiss: move |()| LOG.write().push("dismiss".to_owned()),
+        }
+    })
+}
+
+#[allow(non_snake_case)]
+fn HelperAsking() -> Element {
+    helper(HelperPhase::Ask)
+}
+
+#[allow(non_snake_case)]
+fn HelperInstalling() -> Element {
+    helper(HelperPhase::Installing)
+}
+
+#[allow(non_snake_case)]
+fn HelperFailed() -> Element {
+    helper(HelperPhase::Failed {
+        reason: "The network is down.".to_owned(),
+    })
+}
+
+#[test]
+fn the_helper_body_installs_on_return_and_dismisses_on_escape() {
+    let mut harness = start(HelperAsking);
+    assert_eq!(harness.count(".ds-sheet"), 0, "no sheet around the body");
+    press(&mut harness, ShortcutKey::Enter);
+    press(&mut harness, ShortcutKey::Escape);
+    assert_eq!(log(&mut harness), ["install", "dismiss"]);
+}
+
+#[test]
+fn the_helper_body_does_nothing_while_installing_and_closes_on_either_key_after() {
+    let mut harness = start(HelperInstalling);
+    assert_eq!(harness.count(".ds-helper-progress"), 1);
+    assert_eq!(harness.count(".ds-alert-footer"), 0);
+    press(&mut harness, ShortcutKey::Enter);
+    press(&mut harness, ShortcutKey::Escape);
+    assert!(log(&mut harness).is_empty(), "{:?}", log(&mut harness));
+    let mut harness = start(HelperFailed);
+    assert_eq!(harness.count(".ds-alert-body[role=alert]"), 1);
+    press(&mut harness, ShortcutKey::Enter);
+    press(&mut harness, ShortcutKey::Escape);
+    assert_eq!(log(&mut harness), ["dismiss", "dismiss"]);
 }

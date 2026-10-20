@@ -20,6 +20,7 @@ pub(super) struct Words {
     pub(super) help: Option<EventHandler<()>>,
     pub(super) dismiss: Option<EventHandler<()>>,
     pub(super) arming: MachineRef<Arming>,
+    pub(super) announce: bool,
 }
 
 impl Words {

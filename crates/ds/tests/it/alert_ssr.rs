@@ -341,3 +341,31 @@ fn an_alert_that_has_not_armed_draws_its_buttons_disabled() {
         "no delay, no disabled button: {plain}"
     );
 }
+
+#[test]
+fn the_slot_stands_between_the_message_and_the_footer_and_an_announced_message_is_an_alert() {
+    fn slotted() -> Element {
+        root(
+            Theme::Light,
+            rsx! {
+                Alert { title: TITLE, message: Some(TextLine::from(MESSAGE)), announce: true,
+                    buttons: vec![button("OK", AlertRole::Normal)],
+                    p { class: "slot", "Pick one" }
+                }
+            },
+        )
+    }
+    let html = render(slotted);
+    let at = |needle: &str| {
+        html.find(needle)
+            .unwrap_or_else(|| panic!("{needle} in {html}"))
+    };
+    assert!(
+        at("ds-alert-body") < at("class=\"slot\"") && at("class=\"slot\"") < at("ds-alert-footer"),
+        "{html}"
+    );
+    assert!(
+        html.contains("class=\"ds-alert-body\" role=\"alert\""),
+        "{html}"
+    );
+}

@@ -5,7 +5,6 @@
 //! [`ConsentAnswer::Dismiss`], which stores nothing; only "Don't Allow" denies. With no account
 //! that fits it offers "Add Account..." instead.
 
-use super::adapter::{Action, Intent, Landing};
 use super::model::{
     AccountChoice, AllowScope, ChoiceKey, ConsentAnswer, PickerChoice, SessionOffer,
 };
@@ -13,14 +12,16 @@ use super::picker::AccountPicker;
 use super::wording::{allow_label, consent_message, consent_title, effective_choice};
 use dioxus::prelude::*;
 use ds::components::content::icon_source::IconSource;
-use ds::components::content::icon_view::IconView;
+use ds::components::content::text_runs::TextLine;
+use ds::components::overlays::alert_model::{AlertButton, AlertRole};
 use ds::components::overlays::sheet::Sheet;
 use ds::components::overlays::sheet_attach::Attach;
 use ds::components::overlays::sheet_width::SheetWidth;
-use ds_style::icon::render::IconSize;
+use ds::prelude::AlertColumn;
 
 /// The consent column: the app's icon, the words, the account pop-up and the buttons, bare, so a
-/// host puts it in a window of its own. Return allows once (or adds an account when none fits),
+/// host puts it in a window of its own. It is `ds`'s `AlertColumn`, with the pop-up in its content
+/// slot. Return allows once (or adds an account when none fits),
 /// Escape answers `Dismiss`. `ConsentAlert` is this in a narrow centred sheet.
 ///  `request` finishes "{app} wants to ..."; `choices` are the accounts that
 /// fit, `chosen` the one the host has picked (the first when it has picked none, or none that
@@ -52,28 +53,40 @@ pub fn ConsentBody(
     let always = EventHandler::new(answer(AllowScope::Always));
     let picked = effective_choice(&choices, chosen.as_ref()).map(|choice| choice.key.clone());
     let several = choices.len() > 1;
-    let fits = !choices.is_empty();
+    let say =
+        |label: &str, role: AlertRole, then: EventHandler<()>| AlertButton::new(label, role, then);
+    let buttons = if choices.is_empty() {
+        let add = EventHandler::new(move |()| on_answer.call(ConsentAnswer::AddAccount));
+        let cancel = EventHandler::new(move |()| on_answer.call(ConsentAnswer::Dismiss));
+        vec![
+            say("Add Account\u{2026}", AlertRole::Normal, add),
+            say("Cancel", AlertRole::Cancel, cancel),
+        ]
+    } else {
+        let deny = EventHandler::new(move |()| on_answer.call(ConsentAnswer::Deny));
+        let mut buttons = vec![say(allow_label(AllowScope::Once), AlertRole::Normal, once)];
+        if session == SessionOffer::Offered {
+            buttons.push(say(
+                allow_label(AllowScope::Session),
+                AlertRole::Normal,
+                this_session,
+            ));
+        }
+        buttons.push(say(
+            allow_label(AllowScope::Always),
+            AlertRole::Normal,
+            always,
+        ));
+        buttons.push(say("Don't Allow", AlertRole::Normal, deny));
+        buttons
+    };
     rsx! {
-        div {
-            class: "ds-alert",
-            onkeydown: move |event| match event.key() {
-                Key::Escape => {
-                    event.stop_propagation();
-                    event.prevent_default();
-                    on_answer.call(ConsentAnswer::Dismiss);
-                }
-                Key::Enter => {
-                    event.stop_propagation();
-                    event.prevent_default();
-                    if fits { once.call(()) } else { on_answer.call(ConsentAnswer::AddAccount) }
-                }
-                _ => {}
-            },
-            if let Some(icon) = icon {
-                div { class: "ds-alert-icon", IconView { source: icon, size: IconSize::Tile48 } }
-            }
-            div { class: "ds-alert-title", "{title}" }
-            div { class: "ds-alert-body", "{message}" }
+        AlertColumn {
+            title,
+            message: TextLine::from(message),
+            icon,
+            buttons,
+            on_dismiss: move |()| on_answer.call(ConsentAnswer::Dismiss),
             if several {
                 div { class: "ds-acc-choice",
                     AccountPicker {
@@ -86,33 +99,7 @@ pub fn ConsentBody(
                     }
                 }
             }
-            div { class: "ds-alert-footer", "data-layout": if fits { "stack" } else { "row" },
-                if fits {
-                    span { class: "ds-alert-slot",
-                        Action { label: allow_label(AllowScope::Once), intent: Intent::Default, landing: Landing::Here, onclick: move |()| once.call(()) }
-                    }
-                    if session == SessionOffer::Offered {
-                        span { class: "ds-alert-slot",
-                            Action { label: allow_label(AllowScope::Session), onclick: move |()| this_session.call(()) }
-                        }
-                    }
-                    span { class: "ds-alert-slot",
-                        Action { label: allow_label(AllowScope::Always), onclick: move |()| always.call(()) }
-                    }
-                    span { class: "ds-alert-slot",
-                        Action { label: "Don't Allow", onclick: move |()| on_answer.call(ConsentAnswer::Deny) }
-                    }
-                } else {
-                    span { class: "ds-alert-slot",
-                        Action { label: "Add Account\u{2026}", intent: Intent::Default, landing: Landing::Here, onclick: move |()| on_answer.call(ConsentAnswer::AddAccount) }
-                    }
-                    span { class: "ds-alert-slot",
-                        Action { label: "Cancel", intent: Intent::Cancel, onclick: move |()| on_answer.call(ConsentAnswer::Dismiss) }
-                    }
-                }
-            }
         }
-
     }
 }
 
