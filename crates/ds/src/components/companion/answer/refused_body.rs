@@ -1,7 +1,12 @@
 //! A refusal: why there is no answer, in words the person can act on.
 
 use super::refused::RefusedView;
+use crate::components::content::text_runs::TextLine;
+use crate::components::overlays::inline_banner::InlineBanner;
+use crate::root::common::Common;
+use crate::root::pass_through::{DataAttr, DataName};
 use dioxus::prelude::*;
+use ds_core::vocab::Severity;
 
 /// The headline and the sentence under it.
 fn words(why: &RefusedView) -> (String, String) {
@@ -39,14 +44,30 @@ fn why_slug(why: &RefusedView) -> &'static str {
     }
 }
 
-/// The refusal as the card body.
+/// How serious each refusal is: a failure is a danger; a limit or a rule the person set is a
+/// warning; the rest tell what would have to change.
+fn severity(why: &RefusedView) -> Severity {
+    match why {
+        RefusedView::Failed { .. } => Severity::Danger,
+        RefusedView::NotAllowed { .. } | RefusedView::OverBudget => Severity::Warn,
+        RefusedView::NeedsCloud { .. } | RefusedView::NoWay { .. } => Severity::Info,
+    }
+}
+
+/// The refusal as the card body: an `InlineBanner` that says the headline and, under it, the
+/// sentence, with `data-why` on it.
 #[component]
 pub fn RefusedBody(why: RefusedView) -> Element {
     let (head, detail) = words(&why);
+    let data = DataName::parse("why")
+        .map(|name| vec![DataAttr::new(name, why_slug(&why))])
+        .unwrap_or_default();
     rsx! {
-        div { class: "ds-card-refused", "data-why": why_slug(&why), role: "alert",
-            div { class: "ds-card-refused-head", "{head}" }
-            p { class: "ds-card-line", "{detail}" }
+        InlineBanner {
+            severity: severity(&why),
+            text: head,
+            detail: TextLine::from(detail),
+            common: Common { data, ..Common::default() },
         }
     }
 }

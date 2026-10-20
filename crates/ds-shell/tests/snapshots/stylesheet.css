@@ -3386,11 +3386,6 @@ html,body{margin:0;padding:0;background:transparent}
 .ds-card-form-field{ display:flex; flex-direction:column; gap:var(--s-4); }
 .ds-card-form-picks{ display:flex; flex-wrap:wrap; gap:var(--s-6); }
 
-/* A refusal: the headline, then what to do about it. */
-.ds-card-refused{ display:flex; flex-direction:column; gap:var(--s-4); padding:var(--s-10) var(--s-12); border-radius:var(--r-small); background:var(--fill-quaternary); }
-.ds-card-refused[*|data-why=failed]{ background:var(--danger-wash); }
-.ds-card-refused-head{ font-weight:600; }
-
 /* Actions: a row, each button with its effect tag beside it. The one with the keyboard shows
    the button's own focus ring. */
 .ds-card-actions{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--s-8); }
