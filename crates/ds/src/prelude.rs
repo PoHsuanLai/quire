@@ -191,6 +191,7 @@ pub use crate::components::menus::palette::command_palette::CommandPalette;
 pub use crate::components::menus::palette::machine::model::{
     PaletteIn, PaletteIndex, PaletteMove, PaletteOut, PaletteParams, PaletteState,
 };
+pub use crate::components::menus::palette::palette_close::PaletteClose;
 pub use crate::components::menus::palette::palette_host::CommandPaletteHost;
 pub use crate::components::menus::pick_list::PickList;
 pub use crate::components::menus::pull_down_button::{PullDownButton, PullDownFace};

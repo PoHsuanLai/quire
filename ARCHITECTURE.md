@@ -674,7 +674,7 @@ from `ds-core`, `ds-style`, `ds-motion` and `ds`, one `pub use` per name:
 | Chrome | `TrafficLights`, `WindowFrame`, `WindowHost`, `ResizeEdge`, `WindowState` |
 | Motion | `Anim`, `Cue`, `Detailed`, `Moment`, `use_detail` |
 | Host | `DocumentHost`, `use_document_host`, `Focused`, `Measured`, `HostSignals`, `SpellService`, `HostWindow` |
-| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `PaletteState`, `PaletteIn`, `PaletteOut`, `PaletteParams`, `PaletteIndex`, `PaletteMove`, `EmptyState`, `Flow`, `SidePanel`, `SpacesBar`, `SpaceTile`, `BarSpaceKey`, `BarExpansion`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
+| Controls, menus and root pieces | `Label`, `Button`, `Choice`, `RadioGroup`, `SegmentedControl`, `Slider`, `Toggle`, `MenuItem`, `MenuImage`, `Menu`, `MenuPlacement`, `CommandPalette`, `CommandPaletteHost`, `PaletteClose`, `PaletteState`, `PaletteIn`, `PaletteOut`, `PaletteParams`, `PaletteIndex`, `PaletteMove`, `EmptyState`, `Flow`, `SidePanel`, `SpacesBar`, `SpaceTile`, `BarSpaceKey`, `BarExpansion`, `RootChrome`, `RootExtent`, `settle`, `use_motion_timer`, `resolve` |
 
 `ds_shell::prelude` (16 names) holds the account sheets' components and the missing-helper sheet.
 sill's `sill_shell_kit::prelude` holds the shell components' names and `Widget`, `WidgetKind`,

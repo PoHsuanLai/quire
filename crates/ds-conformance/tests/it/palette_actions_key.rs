@@ -56,7 +56,7 @@ fn Launcher() -> Element {
                         empty: "Nothing".to_string(),
                         oninput: move |_| {},
                         onpick: move |_| {},
-                        onclose: move |()| {},
+                        onclose: move |_| {},
                         host: CommandPaletteHost::Surface,
                         id: "card".to_string(),
                         focus: field,

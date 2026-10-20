@@ -80,7 +80,7 @@ fn LongPalette() -> Element {
                 empty: "Nothing".to_string(),
                 oninput: move |_: String| {},
                 onpick: move |_| {},
-                onclose: move |()| {},
+                onclose: move |_| {},
             }
         }
     }

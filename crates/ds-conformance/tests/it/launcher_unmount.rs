@@ -103,7 +103,7 @@ fn Scripted(subject: Subject, script: Vec<Step>, motion: Motion) -> Element {
                             empty: "Nothing".to_string(),
                             oninput: move |_| {},
                             onpick: move |_| {},
-                            onclose: move |()| shown.set(Shown::No),
+                            onclose: move |_| shown.set(Shown::No),
                         }
                     },
                     Subject::Menu => rsx! {

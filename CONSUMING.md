@@ -1360,6 +1360,11 @@ Palette behaviour:
   `event.prevent_default()` on a key you take, and Blitz does not also act on it (Tab no longer
   moves the focus off the field). A closure typed `|key: KeyboardData|` becomes
   `|key: KeyboardEvent|`; `key.key()`, `key.modifiers()` read as before.
+- **`onclose` says why.** `CommandPalette { onclose: EventHandler<PaletteClose> }` reports
+  `PaletteClose::Escape`, `PaletteClose::Outside` (a pointer down outside the card) or
+  `PaletteClose::Pick` (a row whose pick closes; `onpick` follows). A caller that does not care
+  writes `onclose: move |_| ..`; one that closes a whole bar on Escape but only dismisses on a
+  click outside matches on it.
 - **A palette kept mounted.** `CommandPalette { shown: Some(Shown::Visible | Shown::Hidden),
   }` (`Shown` is the tooltip's). Hidden, the card is
   `display:none` (nothing laid out or painted, no scrim) and leaves the layer stack, while its
@@ -1378,7 +1383,7 @@ Palette behaviour:
       CommandPalette::<Hit> {
           label, placeholder, query: query(), tokens: Vec::new(), groups, empty,
           oninput: move |text: String| query.set(text),
-          onpick, onclose: move |()| shown.set(Shown::Hidden),
+          onpick, onclose: move |_| shown.set(Shown::Hidden),
           host: CommandPaletteHost::Surface,
           shown: shown(),
       }

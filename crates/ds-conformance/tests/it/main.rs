@@ -58,6 +58,7 @@ mod overlay_fits_window;
 mod overlay_hit;
 mod palette_actions_click;
 mod palette_actions_key;
+mod palette_close_reason;
 mod palette_embedded;
 mod palette_grid_pane;
 mod palette_keep_open;

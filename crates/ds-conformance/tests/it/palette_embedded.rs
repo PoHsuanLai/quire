@@ -92,7 +92,7 @@ fn Panel(selection: Selection, give_back: GiveBack) -> Element {
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
                     onpick: move |value: u8| note(format!("pick:{value}")),
-                    onclose: move |()| note("close".to_string()),
+                    onclose: move |_| note("close".to_string()),
                     host: CommandPaletteHost::Surface,
                     id: "launcher-card".to_string(),
                     focus,
@@ -376,7 +376,7 @@ fn AppIconRow() -> Element {
                     empty: "Nothing".to_string(),
                     oninput: move |_| {},
                     onpick: move |_| {},
-                    onclose: move |()| {},
+                    onclose: move |_| {},
                     host: CommandPaletteHost::Surface,
                 }
             }

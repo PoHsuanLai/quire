@@ -201,7 +201,7 @@ fn Palette(onclose: EventHandler<()>) -> Element {
             empty: "Nothing matches.",
             oninput: move |next| query.set(next),
             onpick: move |_| {},
-            onclose,
+            onclose: move |_| onclose.call(()),
         }
     }
 }

@@ -21,6 +21,7 @@
 use crate::components::menus::alive::use_alive;
 use crate::components::menus::palette::palette_body::{StopEvents, draw_groups};
 use crate::components::menus::palette::palette_claim::{Claim, FieldKey};
+use crate::components::menus::palette::palette_close::PaletteClose;
 use crate::components::menus::palette::palette_group::PaletteGroups;
 use crate::components::menus::palette::palette_lines::{PaletteKey, palette_key};
 use crate::components::menus::palette::palette_motion::{Book, use_action_book, use_list_motion};
@@ -128,7 +129,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
     empty: String,
     oninput: EventHandler<String>,
     onpick: EventHandler<T>,
-    onclose: EventHandler<()>,
+    onclose: EventHandler<PaletteClose>,
     #[props(default)] host: CommandPaletteHost,
     #[props(default)] id: Option<String>,
     #[props(default)] focus: Option<FocusRequest>,
@@ -198,7 +199,7 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
         move |index: usize| match run_of(all.get(index)) {
             Run::Pick(value, after) => {
                 if after == AfterPick::Close {
-                    onclose.call(());
+                    onclose.call(PaletteClose::Pick);
                 }
                 onpick.call(value);
             }
@@ -238,7 +239,9 @@ pub fn CommandPalette<T: Clone + PartialEq + 'static>(
                     }
                 }
                 Some(PaletteKey::Run) => run(current),
-                Some(PaletteKey::Close) if float.takes_escape() => onclose.call(()),
+                Some(PaletteKey::Close) if float.takes_escape() => {
+                    onclose.call(PaletteClose::Escape)
+                }
                 Some(PaletteKey::Close) | None => {}
             }
             if let Some(onkey) = onkey {
