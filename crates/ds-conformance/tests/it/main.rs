@@ -108,6 +108,7 @@ mod settings_rows;
 mod sheet_attach;
 mod sheet_buttons;
 mod sheet_exit;
+mod sheet_stretch;
 mod sheet_within;
 mod shortcut_field;
 mod shortcut_field_single_keys;

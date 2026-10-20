@@ -9,7 +9,7 @@ use blitz_kit::scroll::accel::Accel;
 use blitz_kit::scroll::cmd::ScrollCmd;
 use blitz_kit::scroll::doc::{self, WheelRoute};
 use blitz_kit::scroll::driver::{KeyRepeat, Moved, Moves, ScrollDriver};
-use blitz_kit::scroll::engine::Motion;
+use blitz_kit::scroll::engine::{Engine, Motion};
 use blitz_kit::scroll::geom::ViewPoint;
 use blitz_kit::scroll::keys::ScrollKey;
 use blitz_kit::scroll::time::Elapsed;
@@ -296,11 +296,22 @@ impl WindowScroll {
         let Some(pointer) = pointer else {
             return (WheelUse::Passed, Frames::Idle);
         };
-        let routed = self
-            .shared
-            .phase
-            .document()
-            .and_then(|doc| doc.read(|doc| doc::wheel_route(doc, pointer)));
+        // Fingers that latched a scroller keep it until they lift, whatever is under the pointer
+        // now: a stretch can carry the content out from under a still pointer, and the rest of
+        // the gesture, its lift too, is still that scroller's.
+        let latched = matches!(input.source(), ScrollSource::Finger)
+            && matches!(
+                self.shared.state.borrow().driver.engine(),
+                Engine::Tracking(_)
+            );
+        let routed = match latched {
+            true => Some(WheelRoute::Engine),
+            false => self
+                .shared
+                .phase
+                .document()
+                .and_then(|doc| doc.read(|doc| doc::wheel_route(doc, pointer))),
+        };
         match routed {
             Some(WheelRoute::Engine) => {
                 let moved = self.with_doc(|doc, state| {
