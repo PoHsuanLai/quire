@@ -118,6 +118,7 @@ fn a_bad_value_costs_only_its_own_field() {
         text: &'static str,
         want: AppearanceFile,
         invalid: &'static [&'static str],
+        clamped: &'static [&'static str],
     }
     let cases = [
         Case {
@@ -125,36 +126,42 @@ fn a_bad_value_costs_only_its_own_field() {
             text: "[appearance]\ntheme = \"sepia\"\nmotion_level = \"reduced\"\n",
             want: with(|f| f.appearance.motion_level = Motion::Reduced),
             invalid: &["appearance.theme"],
+            clamped: &[],
         },
         Case {
             name: "unknown motion keeps the theme",
             text: "[appearance]\ntheme = \"dark\"\nmotion_level = \"wild\"\n",
             want: with(|f| f.appearance.theme = Theme::Dark),
             invalid: &["appearance.motion_level"],
+            clamped: &[],
         },
         Case {
             name: "a number where a word belongs keeps the accent",
             text: "[appearance]\ntheme = 7\naccent = \"green\"\n",
             want: with(|f| f.appearance.accent = Accent::Green),
             invalid: &["appearance.theme"],
+            clamped: &[],
         },
         Case {
             name: "the retired postmark accent falls back to blue and is reported",
             text: "[appearance]\naccent = \"postmark\"\ntheme = \"dark\"\n",
             want: with(|f| f.appearance.theme = Theme::Dark),
             invalid: &["appearance.accent"],
+            clamped: &[],
         },
         Case {
             name: "the retired amber accent falls back to blue and is reported",
             text: "[appearance]\naccent = \"amber\"\n",
             want: AppearanceFile::default(),
             invalid: &["appearance.accent"],
+            clamped: &[],
         },
         Case {
             name: "the retired violet accent falls back to blue and is reported",
             text: "[appearance]\naccent = \"violet\"\n",
             want: AppearanceFile::default(),
             invalid: &["appearance.accent"],
+            clamped: &[],
         },
         Case {
             name: "a file from before the field reads transparency as System",
@@ -164,42 +171,52 @@ fn a_bad_value_costs_only_its_own_field() {
                 f.appearance.motion_level = Motion::Reduced;
             }),
             invalid: &[],
+            clamped: &[],
         },
         Case {
             name: "reduced transparency is read",
             text: "[appearance]\ntransparency = \"reduced\"\n",
             want: with(|f| f.appearance.transparency = Transparency::Reduced),
             invalid: &[],
+            clamped: &[],
         },
         Case {
             name: "an unknown transparency costs only itself",
             text: "[appearance]\ntransparency = \"clear\"\ntheme = \"dark\"\n",
             want: with(|f| f.appearance.theme = Theme::Dark),
             invalid: &["appearance.transparency"],
+            clamped: &[],
         },
         Case {
-            name: "an out-of-range percent is clamped, not refused",
+            name: "an out-of-range percent is clamped and reported, not refused",
             text: "[appearance]\nmaterial_tint_alpha = 255\n",
             want: with(|f| f.appearance.material_tint_alpha = Percent(100)),
             invalid: &[],
+            clamped: &["appearance.material_tint_alpha"],
         },
         Case {
-            name: "a negative percent is the default and keeps the theme",
+            name: "a negative percent is held to zero and keeps the theme",
             text: "[appearance]\nmaterial_tint_alpha = -4\ntheme = \"light\"\n",
-            want: with(|f| f.appearance.theme = Theme::Light),
-            invalid: &["appearance.material_tint_alpha"],
+            want: with(|f| {
+                f.appearance.theme = Theme::Light;
+                f.appearance.material_tint_alpha = Percent(0);
+            }),
+            invalid: &[],
+            clamped: &["appearance.material_tint_alpha"],
         },
         Case {
             name: "a missing table is that table's defaults",
             text: "[icons]\nplate_inset_percent = 60\n",
             want: with(|f| f.icons.plate_inset_percent = Percent(60)),
             invalid: &[],
+            clamped: &[],
         },
         Case {
             name: "a table that is not a table is its defaults",
             text: "appearance = 3\n[icons]\ndark_mode_variant = \"adaptive\"\n",
             want: with(|f| f.icons.dark_mode_variant = IconDarkVariant::Adaptive),
             invalid: &["appearance"],
+            clamped: &[],
         },
     ];
     for case in cases {
@@ -208,6 +225,8 @@ fn a_bad_value_costs_only_its_own_field() {
         let loaded = scratch.store().load::<AppearanceFile>();
         assert_eq!(loaded.value, case.want, "{}: {}", case.name, case.text);
         assert_eq!(invalid(&loaded), case.invalid, "{}", case.name);
+        let clamped: Vec<&str> = loaded.clamped.iter().map(|key| key.path.as_str()).collect();
+        assert_eq!(clamped, case.clamped, "{}", case.name);
         assert!(
             loaded.unknown.is_empty(),
             "{}: {:?}",

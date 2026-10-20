@@ -5,7 +5,7 @@
 use crate::doc::{FileName, SettingsDoc};
 use crate::error::SettingsError;
 use crate::latest::{self, Receiver, Sender};
-use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read};
+use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read_within};
 use crate::store::Store;
 use ds_core::spawner::Spawner;
 use notify::{RecommendedWatcher, RecursiveMode, Watcher};
@@ -187,7 +187,7 @@ enum Retry {
 /// The file at `path` as the watch publishes it, updating `good` when it read cleanly or is gone.
 fn reread<D: SettingsDoc + Send>(path: &std::path::Path, good: &mut D) -> (Loaded<D>, Retry) {
     match file_text(path, SETTINGS_CAP) {
-        FileText::Text(text) => match read::<D>(&text, D::FORMAT) {
+        FileText::Text(text) => match read_within::<D>(&text, D::FORMAT, &D::limits()) {
             Read::Garbled { reason } => (Loaded::garbled(good.clone(), reason), Retry::Done),
             Read::Loaded(loaded) => {
                 *good = loaded.value.clone();

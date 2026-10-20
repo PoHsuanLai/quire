@@ -5,7 +5,7 @@
 mod appearance_file;
 mod damaged_files;
 mod derive;
-mod keys;
+mod doc_tables;
 mod rows;
 mod schema;
 mod spaces_file;
@@ -14,6 +14,7 @@ mod store;
 mod support;
 mod user_style;
 mod watch;
+mod writer;
 
 #[path = "../../../ds/tests/it/support/module_guard.rs"]
 mod module_guard;

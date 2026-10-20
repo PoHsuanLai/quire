@@ -5,6 +5,7 @@ use crate::appearance::AppearanceFile;
 use crate::doc::SettingsDoc;
 use crate::lenient::Loaded;
 use crate::portal::{SystemPrefsSource, SystemPrefsWatch};
+use crate::region::ResolvedHours;
 use crate::store::Store;
 use crate::units::Percent;
 use crate::watch::Watch;
@@ -54,6 +55,12 @@ impl Environment {
         ds_style::tokens::hex::Alpha(
             u16::from(self.settings.appearance.material_tint_alpha.0.min(100)) * 10,
         )
+    }
+
+    /// The clock to draw in `locale` (a POSIX locale name, see
+    /// [`time_locale`](crate::time_locale)): `region.hours`, with Automatic settled by the locale.
+    pub fn hours(&self, locale: &str) -> ResolvedHours {
+        self.settings.region.hours.resolve(locale)
     }
 
     /// The six `appearance.material_*` keys as the root's `stack` (`Ds { stack }`): highlight
@@ -150,6 +157,16 @@ mod tests {
             ds_style::tokens::hex::Alpha(800),
             "the key's default is the root's default"
         );
+    }
+
+    #[test]
+    fn the_clock_follows_the_hours_key_and_then_the_locale() {
+        use crate::region::{HourCycle, ResolvedHours};
+        let mut env = Environment::default();
+        assert_eq!(env.hours("en_US.UTF-8"), ResolvedHours::H12);
+        assert_eq!(env.hours("de_DE"), ResolvedHours::H24);
+        env.settings.region.hours = HourCycle::H24;
+        assert_eq!(env.hours("en_US.UTF-8"), ResolvedHours::H24);
     }
 
     #[test]

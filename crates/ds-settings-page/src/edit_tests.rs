@@ -25,6 +25,7 @@ fn spelling() -> KeySpec {
         groups: Default::default(),
         places: Default::default(),
         note: None,
+        control: None,
     }
 }
 

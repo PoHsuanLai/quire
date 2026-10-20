@@ -3,6 +3,7 @@
 //! Every struct is `#[serde(default)]` and read through [`crate::Store`], so a bad value costs
 //! only its own key; a key a struct does not read is reported on load and dropped on save.
 
+use crate::region::RegionSettings;
 use crate::schema::Page;
 use crate::units::{Fraction, Percent};
 use ds_core::word::Word;
@@ -340,6 +341,8 @@ pub struct AppearanceFile {
     pub appearance: AppearanceSettings,
     /// `[icons]`.
     pub icons: IconsSettings,
+    /// `[region]`.
+    pub region: RegionSettings,
 }
 
 impl Default for AppearanceFile {
@@ -348,6 +351,7 @@ impl Default for AppearanceFile {
             version: 1,
             appearance: AppearanceSettings::default(),
             icons: IconsSettings::default(),
+            region: RegionSettings::default(),
         }
     }
 }

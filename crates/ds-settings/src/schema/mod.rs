@@ -9,9 +9,15 @@
 mod agent;
 mod behaviour;
 mod column;
+mod control;
 mod deep_link;
+mod doc_table;
 mod key;
 mod live_action;
+mod page;
+mod page_decl;
+mod page_id;
+mod pages;
 mod place;
 mod program;
 mod traits;
@@ -21,13 +27,19 @@ pub use agent::{
 };
 pub use behaviour::{CornerAction, HotCornerSettings, SwitcherSettings};
 pub use column::{Column, ColumnKind, ColumnName};
+pub use control::{Control, ControlName, TogglePair};
 pub use deep_link::{deep_link, deep_link_path};
+pub use doc_table::{DocTableError, key_table, regenerate};
 pub use key::{
     AgentSetting, ChoiceGroup, ChoiceUnavailable, ChoiceWord, Exposure, GroupedChoices, Help,
-    KeyKind, KeyPath, KeySpec, Label, Note, Page, Section, UnavailableReason, Widget, WordLabels,
+    KeyKind, KeyPath, KeySpec, Label, Note, Section, UnavailableReason, WordLabels,
     kind_from_variants,
 };
 pub use live_action::{ActionLabel, ActionWeight, LiveAction};
+pub use page::Page;
+pub use page_decl::{PageDecl, PageOrder, PageSymbol, PageTitle};
+pub use page_id::PageId;
+pub use pages::{PageStatus, PageTable};
 pub use place::{ChoicePlace, CompanyName, EngineName, HostName};
 pub use program::{
     AppId, FilePath, ForeignTables, Schema, data_dirs, data_dirs_from, discover, maybe_write_schema,

@@ -1,0 +1,101 @@
+# The pages Settings has before any program declares one (design/22-SETTINGS.md section 9.3).
+# `order` is spaced by ten so a program's own page can sit between two of these. An alias is the
+# name a page had before it was declared.
+
+[[page]]
+id = "appearance"
+title = "Appearance"
+symbol = "sun-moon"
+order = 10
+
+[[page]]
+id = "wallpaper"
+title = "Wallpaper"
+symbol = "image"
+order = 20
+
+[[page]]
+id = "displays"
+title = "Displays"
+symbol = "monitor"
+order = 30
+
+[[page]]
+id = "wifi"
+title = "Wi-Fi"
+symbol = "wifi"
+order = 40
+
+[[page]]
+id = "bluetooth"
+title = "Bluetooth"
+symbol = "bluetooth"
+order = 50
+
+[[page]]
+id = "dock"
+title = "Dock"
+symbol = "panel"
+order = 60
+
+[[page]]
+id = "mouse-and-gestures"
+title = "Mouse & Gestures"
+symbol = "mouse"
+order = 70
+aliases = ["mouse_and_gestures"]
+
+[[page]]
+id = "keyboard-and-shortcuts"
+title = "Keyboard & Shortcuts"
+symbol = "keyboard"
+order = 80
+aliases = ["keyboard_and_shortcuts"]
+
+[[page]]
+id = "notifications"
+title = "Notifications"
+symbol = "bell"
+order = 90
+
+[[page]]
+id = "spaces"
+title = "Spaces"
+symbol = "group"
+order = 100
+
+[[page]]
+id = "accounts"
+title = "Accounts"
+symbol = "key"
+order = 110
+
+[[page]]
+id = "privacy"
+title = "Privacy & Security"
+symbol = "lock"
+order = 120
+
+[[page]]
+id = "power"
+title = "Power"
+symbol = "power"
+order = 130
+
+[[page]]
+id = "apps"
+title = "Apps"
+symbol = "grid"
+order = 140
+
+[[page]]
+id = "intelligence"
+title = "Intelligence"
+symbol = "sparkles"
+order = 150
+
+[[page]]
+id = "viewer"
+title = "Viewer"
+symbol = "image"
+order = 160

@@ -2,6 +2,7 @@
 //! lays each key of a file over the type's default one at a time, and asks the tree whether a
 //! key survived a round trip through the type.
 
+use super::limits::LimitBounds;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 
@@ -24,6 +25,10 @@ pub(super) trait Wire {
     fn set(table: &mut Self::Table, path: &[String], value: Self::Value);
     /// Whether `path` names a key in `table`.
     fn has(table: &Self::Table, path: &[String]) -> bool;
+    /// `value` brought into `bounds`, or `None` when it is not a number or already inside.
+    fn clamp(value: &Self::Value, bounds: LimitBounds) -> Option<Self::Value>;
+    /// `value` as the short text a report shows.
+    fn show(value: &Self::Value) -> String;
 }
 
 /// TOML, the format of every hand-edited file.
@@ -95,6 +100,24 @@ impl Wire for TomlWire {
                 None => false,
             },
         }
+    }
+
+    fn clamp(value: &toml::Value, bounds: LimitBounds) -> Option<toml::Value> {
+        match value {
+            toml::Value::Integer(given) => {
+                let held = (*given).clamp(bounds.min, bounds.max);
+                (held != *given).then_some(toml::Value::Integer(held))
+            }
+            toml::Value::Float(given) if !given.is_nan() => {
+                let held = given.clamp(bounds.min as f64, bounds.max as f64);
+                (held != *given).then_some(toml::Value::Float(held))
+            }
+            _ => None,
+        }
+    }
+
+    fn show(value: &toml::Value) -> String {
+        value.to_string()
     }
 }
 
@@ -171,5 +194,15 @@ impl Wire for JsonWire {
                 None => false,
             },
         }
+    }
+
+    fn clamp(value: &serde_json::Value, bounds: LimitBounds) -> Option<serde_json::Value> {
+        let given = value.as_i64()?;
+        let held = given.clamp(bounds.min, bounds.max);
+        (held != given).then(|| serde_json::Value::from(held))
+    }
+
+    fn show(value: &serde_json::Value) -> String {
+        value.to_string()
     }
 }

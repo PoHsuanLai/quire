@@ -1,6 +1,5 @@
 use super::{Control, control_of};
-use crate::pair::Pair;
-use ds_settings::schema::KeyKind;
+use ds_settings::schema::{KeyKind, TogglePair};
 
 fn words(list: &[&str]) -> Vec<String> {
     list.iter().map(|word| (*word).to_owned()).collect()
@@ -13,7 +12,7 @@ fn toggle(a: &str, b: &str) -> KeyKind {
 }
 
 fn switch(on: &str, off: &str) -> Control {
-    Control::Switch(Pair {
+    Control::Switch(TogglePair {
         on: on.to_owned(),
         off: off.to_owned(),
     })
@@ -31,6 +30,7 @@ fn each_kind_gets_the_control_detent_gives_it() {
         ),
         (toggle("standard", "reduced"), switch("reduced", "standard")),
         (toggle("system", "reduced"), switch("reduced", "system")),
+        (toggle("disabled", "enabled"), switch("enabled", "disabled")),
         // A choice between two things is not a switch.
         (
             toggle("icons", "letters"),

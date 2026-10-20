@@ -44,6 +44,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
             advanced,
             agent,
             hint,
+            control,
         } = attrs
         else {
             // `#[settings(skip)]`: a catch-all field such as `extra: toml::Table`, not a key.
@@ -65,6 +66,13 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
         let shape = shape_of(&field_ident.to_string(), &field.ty, hint)
             .map_err(|reason| syn::Error::new(field.ty.span(), reason))?;
         let kind = kind_expr(shape, &field.ty, unit.as_deref());
+        let control = if let Some(control) = control {
+            quote! {
+                ::std::option::Option::Some(::ds_settings::schema::ControlName(#control.to_owned()))
+            }
+        } else {
+            quote! { ::std::option::Option::None }
+        };
         pushes.push(quote! {
             key.push(::ds_settings::schema::KeySpec {
                 path: ::ds_settings::schema::KeyPath(#path.to_owned()),
@@ -81,6 +89,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                 groups: ::std::default::Default::default(),
                 places: ::std::default::Default::default(),
                 note: ::std::default::Default::default(),
+                control: #control,
             });
         });
     }
@@ -97,6 +106,7 @@ pub(crate) fn expand(input: &syn::DeriveInput, data: &syn::DataStruct) -> syn::R
                     file: ::ds_settings::schema::FilePath(#file.to_owned()),
                     version: 1,
                     foreign: ::ds_settings::schema::ForeignTables::default(),
+                    pages: ::std::vec::Vec::new(),
                     key,
                 }
             }
@@ -242,6 +252,27 @@ mod tests {
             .unwrap_or_else(|e| panic!("{e}"))
             .to_string();
         assert!(!text.contains("is_never_settable"), "{text}");
+    }
+
+    #[test]
+    fn a_named_control_is_emitted_on_the_key_and_none_otherwise() {
+        const CASES: &[(&str, &str)] = &[
+            (
+                "#[settings(label = \"L\", control = \"picture\")]",
+                "ControlName (\"picture\"",
+            ),
+            (
+                "#[settings(label = \"L\")]",
+                "control : :: std :: option :: Option :: None",
+            ),
+        ];
+        for (attr, want) in CASES {
+            let source = format!("{HEAD} struct S {{ {attr} f: String }}");
+            let text = expanded(&source)
+                .unwrap_or_else(|e| panic!("{attr}: {e}"))
+                .to_string();
+            assert!(text.contains(want), "{attr}: {text}");
+        }
     }
 
     #[test]

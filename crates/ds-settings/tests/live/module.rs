@@ -30,6 +30,7 @@ pub fn spec(path: &str, kind: KeyKind, default: toml::Value) -> KeySpec {
         groups: Default::default(),
         places: Default::default(),
         note: None,
+        control: None,
     }
 }
 

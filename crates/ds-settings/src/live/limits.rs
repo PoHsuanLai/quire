@@ -11,7 +11,7 @@ pub const SCHEMA_JSON_MAX: usize = 1 << 20;
 /// The most keys a schema, or a snapshot's values, may hold. An accounts page with a few dozen
 /// accounts has a few hundred.
 pub const KEYS_MAX: usize = 1024;
-/// The longest key path, label, help line, note or section name, in bytes.
+/// The longest key path, label, help line, note, section name or control name, in bytes.
 pub const TEXT_MAX: usize = 2048;
 /// The most choices one menu or segmented key may list.
 pub const CHOICES_MAX: usize = 512;
@@ -57,6 +57,9 @@ fn key(spec: &KeySpec) -> Result<(), LiveError> {
         spec.help.0.as_str(),
         spec.section.0.as_str(),
         spec.note.as_ref().map_or("", |note| note.0.as_str()),
+        spec.control
+            .as_ref()
+            .map_or("", |control| control.0.as_str()),
     ];
     let fits = choices.len() <= CHOICES_MAX
         && texts.iter().all(|text| text.len() <= TEXT_MAX)

@@ -98,20 +98,48 @@ control in v1.
 
 ### 3.1 `appearance` (quire/appearance.toml)
 
+The table below is generated from the schema (`scripts/gen-doc-keys.sh`); the notes under it are
+hand-written. Where a note's default disagrees with the table, the table (the code) is right.
+
+<!-- keys:begin appearance -->
+
+| Key | Type | Default | Range | Page | Shown | Agent |
+| --- | --- | --- | --- | --- | --- | --- |
+| `appearance.theme` | choice {system, light, dark} | `system` |  | Appearance | Settings | may set |
+| `appearance.accent` | choice {blue, purple, pink, red, orange, yellow, green, graphite} | `blue` |  | Appearance | Settings | may set |
+| `appearance.motion_level` | choice {standard, reduced} | `standard` |  | Appearance | Settings |  |
+| `appearance.transparency` | choice {system, reduced} | `system` |  | Appearance | Settings |  |
+| `appearance.typeface` | choice {system, editorial} | `system` |  | Appearance | Settings |  |
+| `appearance.material_tint_alpha` | number | `80` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_highlight_light` | number | `30` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_highlight_dark` | number | `12` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_hairline_light` | number | `14` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_hairline_dark` | number | `60` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_shadow_strength` | number | `100` | `0..=100` % | Appearance | file only |  |
+| `appearance.material_vibrancy` | number | `100` | `0..=100` % | Appearance | file only |  |
+
+<!-- keys:end appearance -->
+
+| Key | Notes | Source | Status |
+| --- | --- | --- | --- |
+| `appearance.theme` |  | `30-CATALOGUE.md` section 3.2 | settled (preference) |
+| `appearance.accent` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
+| `appearance.motion_level` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
+| `appearance.transparency` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
+| `appearance.typeface` | RETIRING: The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
+| `appearance.material_tint_alpha` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | settled; to retire in the clean-up phase |
+| `appearance.material_highlight_light` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_highlight_dark` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_hairline_light` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_hairline_dark` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_shadow_strength` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+| `appearance.material_vibrancy` |  | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
+
+Rows for keys that sill owns but this section names (they are stored under `appearance` for the
+vocabulary they use):
+
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `appearance.theme` | `Theme::{System,Light,Dark}` | `System` | | `30-CATALOGUE.md` section 3.2 | settled (preference) |
-| `appearance.accent` | `Accent` (8 variants: `blue`, `purple`, `pink`, `red`, `orange`, `yellow`, `green`, `graphite`, macOS's own list in its picker order) | `Blue` | settled 2026-09-30; a stored `postmark`, `amber` or `violet` is not migrated: it reads as an invalid value and falls to `Blue` | `03-COLOR.md#open-decisions` item 6 | settled (preference), partial |
-| `appearance.motion_level` | `Motion::{Standard,Reduced}` | `Standard` | the portal's `prefers-reduced-motion` makes `Standard` resolve to `Reduced` | `30-CATALOGUE.md` section 1.1 | settled (user, 2026-09-29) |
-| `appearance.transparency` | `Transparency::{System,Reduced}` | `System` | the portal has no key for it, so ours is a setting; `Reduced` paints every material solid and drops the vibrancy boost; the compositor reads it from this file, as it reads `theme` | `27-HIG-PARITY.md` section 3.1 | settled (adopted in 27) |
-| `appearance.typeface` | RETIRING | | The second typeface (Editorial) is dropped (30 section 3.4): one voice, Inter, with Space Mono for code and `Kbd`. Target (clean-up phase): remove the key and `data-typeface`; a stored value is an unknown key | `02-TYPE.md#2-the-faces` | settled; to retire in the clean-up phase (2026-10-02) |
-| `appearance.material_tint_alpha` | `Percent` | `80` | RETIRING with the tinted chrome: the Space no longer tints the bar, dock, launcher, control centre or OSD (21 section 3), so this key has no reader once the frame model goes | `21-SPACES.md#3-where-the-tint-applies` | settled; to retire in the clean-up phase |
-| `appearance.material_highlight_light` | `Percent` | `30` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `appearance.material_highlight_dark` | `Percent` | `12` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `appearance.material_hairline_light` | `Percent` | `14` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `appearance.material_hairline_dark` | `Percent` | `60` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `appearance.material_shadow_strength` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
-| `appearance.material_vibrancy` | `Percent` | `100` | `0..=100` | `FINDINGS.md` "macOS polish"; `04-COMPONENTS.md` | proposed (polish pass, 2026-09-25) |
 | `notifications.banner_material` | `Material::{Toast,Inverse}` | `Toast` | `Inverse` = mail's ink-on-paper toast | `03-COLOR.md#open-decisions` item 10; `13-BEHAVIOUR-menus-windows.md#13-9-open-decisions` item 7 | proposed — **flagged for review** |
 | `control_center.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | RETIRING: no reader; the panel is always a Sheet |
 | `launcher.material` | `Material::{Sheet}` (fixed for v1) | `Sheet` | | `03-COLOR.md#17-3-material-per-surface` | proposed |
@@ -135,16 +163,31 @@ The app-icon *generation* pipeline (`08-ICONS.md#3-generation-pipeline`) is a bu
 (`quire-icons`), not a runtime setting, and is out of scope. These are the runtime,
 per-third-party-icon rendering values `sill`'s dock/launcher apply live (`08-ICONS.md#4-third-party-app-icons`).
 
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `icons.style` | `IconStyle::{Colour,Muted,Monochrome}` | `Colour` (each app in the dialect its icon was designed in) | `Muted` lowers the chroma cap; `Monochrome` draws every icon in one hue, tone on tone, and desaturates and re-tints third-party icons inside our plates to the same hue | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25` | proposed (round four; implementation beyond the key waits for the user's dialect pick) |
-| `icons.monochrome_tint` | `MonochromeTint::{Space,Accent,Neutral}` | `Accent` (target (clean-up phase); the Space gives no accent any more, so the `Space` variant goes) | `Accent` = the desktop accent; `Neutral` = no hue; read only when `icons.style` is `Monochrome` | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25`; `03-COLOR.md#5-accent` | proposed |
-| `icons.plate_inset_percent` | `Percent` | `72` | | `08-ICONS.md#41-plate-mask-rule-settled-rule-proposed-numbers` | proposed |
-| `icons.symbolic_fallback_glyph_percent` | `Percent` | `56` | | `08-ICONS.md#24-object-placement-proposed`; `08-ICONS.md#43-symbolic-fallback-proposed` | proposed |
-| `icons.squircle_detect_iou` | `Fraction` | `900` (0.90) | | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
-| `icons.plate_glyph_colour_policy` | `PlateGlyphPolicy::{Auto,ForceWhite,ForceInk}` | `Auto` (WCAG-driven per family: red/blue/violet -> white, amber/green -> ink) | | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` | proposed — **flagged for review** |
-| `icons.dark_mode_variant` | `IconDarkVariant::{SameAsLight,Adaptive}` | `SameAsLight` | matches freedesktop convention | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` (Open decision 2) | proposed |
-| `icons.symbolic_chroma_max` | `Fraction` | `40` (0.04) | `0..200` (0.0..0.2) | `08-ICONS.md#15-colour` (step 2); `ds::icon::ChromaLimit` | proposed |
+<!-- keys:begin icons -->
+
+| Key | Type | Default | Range | Page | Shown | Agent |
+| --- | --- | --- | --- | --- | --- | --- |
+| `icons.style` | choice {colour, muted, monochrome} | `colour` |  | Appearance | Settings |  |
+| `icons.monochrome_tint` | choice {space, accent, neutral} | `space` |  | Appearance | Settings |  |
+| `icons.plate_inset_percent` | number | `72` | `0..=100` % | Appearance | file only |  |
+| `icons.symbolic_fallback_glyph_percent` | number | `56` | `0..=100` % | Appearance | file only |  |
+| `icons.squircle_detect_iou` | number | `900` | `0..=1000` | Appearance | file only |  |
+| `icons.symbolic_chroma_max` | number | `40` | `0..=200` | Appearance | file only |  |
+| `icons.plate_glyph_colour_policy` | choice {auto, force_white, force_ink} | `auto` |  | Appearance | file only |  |
+| `icons.dark_mode_variant` | choice {same_as_light, adaptive} | `same_as_light` |  | Appearance | file only |  |
+
+<!-- keys:end icons -->
+
+| Key | Notes | Source | Status |
+| --- | --- | --- | --- |
+| `icons.style` | `Muted` lowers the chroma cap; `Monochrome` draws every icon in one hue, tone on tone, and desaturates and re-tints third-party icons inside our plates to the same hue | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25` | proposed (round four; implementation beyond the key waits for the user's dialect pick) |
+| `icons.monochrome_tint` | `Accent` = the desktop accent; `Neutral` = no hue; read only when `icons.style` is `Monochrome`. Target (clean-up phase): the default becomes `Accent` and the `Space` variant goes, because the Space gives no accent any more | `08-ICONS.md#210-dialects-proposed-round-four-2026-09-25`; `03-COLOR.md#5-accent` | proposed |
+| `icons.plate_inset_percent` |  | `08-ICONS.md#41-plate-mask-rule-settled-rule-proposed-numbers` | proposed |
+| `icons.symbolic_fallback_glyph_percent` |  | `08-ICONS.md#24-object-placement-proposed`; `08-ICONS.md#43-symbolic-fallback-proposed` | proposed |
+| `icons.squircle_detect_iou` |  | `08-ICONS.md#42-icons-that-are-already-squircles-or-rounded-squares-proposed` | proposed |
+| `icons.plate_glyph_colour_policy` |  | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` | proposed — **flagged for review** |
+| `icons.dark_mode_variant` | matches freedesktop convention | `08-ICONS.md#23-plate-gradient-settled-source-proposed-mapping` (Open decision 2) | proposed |
+| `icons.symbolic_chroma_max` | `0..200` (0.0..0.2) | `08-ICONS.md#15-colour` (step 2); `ds::icon::ChromaLimit` | proposed |
 
 `icons.symbolic_chroma_max` names the threshold `ds::icon::classify_with` already takes as a
 `ChromaLimit` (bar gaps, `crates/ds-style/src/icon/classify.rs`): a tray or app icon whose opaque
@@ -179,9 +222,9 @@ Pinned items stay in `~/.config/sill/dock.json` (state, not this file;
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
 | `dock.magnification` | `Magnification::{On,Off}` | `On` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
-| `dock.tile_size_px` | `Px` | `48` | `32..80` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
-| `dock.magnified_size_px` | `Px` | `96` | `tile_size..128` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
-| `dock.influence_radius_px` | `Px` | `96` | alt `144` | `10-BEHAVIOUR-dock.md#10-3-3-magnification`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 1 | proposed — **flagged for review** |
+| `dock.tile_size_px` | `Px` | `48` | `32..=80` | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
+| `dock.magnified_size_px` | `Px` | `72` | `32..=72` (was `tile_size..128` and 96 before the shell owner settled it on 72, 2026-10-20) | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled default, range proposed |
+| `dock.influence_radius_px` | `Px` | `72` | `24..=256` (was 96) | `10-BEHAVIOUR-dock.md#10-3-3-magnification`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 1 | proposed — **flagged for review** |
 | `dock.tile_gap_px` | `Px` | `8` | was 4 before the polish pass | `10-BEHAVIOUR-dock.md#10-3-1-geometry-at-rest-bottom-dock-logical-px` | proposed |
 | `dock.progress_style` | `ProgressStyle::{Ring,Bar}` | `Ring` | alt `Bar` (macOS draws a bar under the icon) | `10-BEHAVIOUR-dock.md#10-3-2-running-indicator-badge-progress-separator`; `10-BEHAVIOUR-dock.md#10-9-open-decisions` item 2 | RETIRING: no reader; the Dock draws a bar under the icon, as macOS does (design/30 Part 4) |
 | `dock.autohide` | `AutoHide::{Off,On}` | `Off` | | `10-BEHAVIOUR-dock.md#10-6-configuration` | settled (preference) |
@@ -688,6 +731,26 @@ The file viewer's timings, steps, history and the limits of its decoders. Page V
 | `viewer.image.markdown_inline_mib` | `Count` | `8` | `1..=64` MiB; the largest local image a rendered Markdown file inlines | anyview-text `markdown/images.rs` `MAX_INLINE` | proposed (viewer join, 2026-10-03) |
 
 
+### 3.32 `region` (quire/appearance.toml)
+
+The desktop-wide language and region preferences (owner decision 2026-10-20: one 12/24-hour
+preference for every clock, defaulting from the locale). The table below is generated from the
+schema (`scripts/gen-doc-keys.sh`).
+
+<!-- keys:begin region -->
+
+| Key | Type | Default | Range | Page | Shown | Agent |
+| --- | --- | --- | --- | --- | --- | --- |
+| `region.hours` | choice {auto, 12, 24} | `auto` |  | Appearance | Settings |  |
+
+<!-- keys:end region -->
+
+`region.hours` is `auto`, `12` or `24`. `auto` follows the locale of the session
+(`ds_settings::time_locale` picks it from `LC_ALL`, `LC_TIME` and `LANG`): `en_US`, `en_CA`,
+`zh_TW` and a few more write 12 hours, `en_GB`, `de_DE`, `ja_JP` and `C` write 24. A program asks
+`Environment::hours(locale)` (or `HourCycle::resolve`) and draws what comes back; it never reads
+the key itself. The bar, the calendar and mail's snooze times read the same answer.
+
 ## 4. Rust shape
 
 Adds to `crates/ds-settings` (appearance/icons/motion) and a new `sill-settings` module
@@ -796,8 +859,8 @@ impl Default for DockSettings {
         Self {
             magnification: Magnification::On,
             tile_size_px: Px(48),
-            magnified_size_px: Px(96),
-            influence_radius_px: Px(96),
+            magnified_size_px: Px(72),
+            influence_radius_px: Px(72),
             tile_gap_px: Px(4),
             progress_style: ProgressStyle::Ring,
             autohide: AutoHide::Off,
@@ -1364,6 +1427,39 @@ agent that could raise its own budget or switch computer use on would be its own
 
 The marks of sill's and detent's own keys live in their schemas; quire marks only what
 `quire/appearance.toml` owns (`appearance.theme`, `appearance.accent`).
+
+### 9.8 Pages, controls, targets, patches and ranges (v0.3.36)
+
+Five additions to the schema contract, all additive: a schema or a file written before them reads
+unchanged.
+
+1. **Pages are data.** A schema may carry `[[page]]` tables (`id`, `title`, `symbol`, `order`,
+   optional `aliases`). The built-in table is `crates/ds-settings/src/schema/pages.toml`: the
+   twelve fixed pages (their old snake-case names are aliases of their kebab-case ids) and
+   `wallpaper`, `displays`, `wifi` and `bluetooth`. `Page` stays a typed layer over `PageId`; a key
+   whose page nobody declares is kept and reads as `Page::App(<id>)`, and
+   `PageTable::status` says `Unknown`, so one new page never blanks a whole older schema. A key
+   names its page with `page = Page::declared("wallpaper")`.
+2. **One control vocabulary.** `control = "<id>"` on a key (`#[settings(control = "picture")]`)
+   picks a control from the closed set `readout`, `toggle`, `segmented`, `menu`, `slider`, `text`,
+   `colour`, `shortcut`, `rows`, `button`, `picture`. `KeyKind::default_control` is the only
+   table from kind to control, `TogglePair` the only on/off rule; an id this build does not know,
+   or one that does not fit the kind, is ignored and the default control is drawn. `picture` is a
+   grid of pictures with "Add Picture…" whose value is a path; it fits a text key.
+3. **A target for every entrance.** `ds_settings::target::SettingsTarget` is `Page(PageId)`,
+   `Key(KeyPath)` or `Account(AccountRef)`, written `page:wallpaper`, `key:dock.tile_size_px`,
+   `account:<id>`. It is the payload of the `settings.page.show` intent.
+4. **One key at a time.** `SettingsWriter::patch(key, value)` sets one key in the file under its
+   lock and writes atomically; comments, other keys and unknown keys keep their text. A program
+   that owns one field of a shared file patches it; it never loads the whole document and saves.
+5. **Ranges hold on load.** `SettingsDoc::limits()` gives a document the ranges of its schema
+   (`Limits::of_schema`); a number outside its range is brought to the nearest end and reported in
+   `Loaded::clamped`, whose line in `Loaded::diagnostics` is the one log line.
+
+The key tables of sections 3.1, 3.3 and 3.32 are generated from the schema between
+`<!-- keys:begin <domain> -->` and `<!-- keys:end <domain> -->` (`scripts/gen-doc-keys.sh`;
+`scripts/check-doc-keys.sh` and `ds-settings`' `doc_tables` test fail when the doc differs). A
+program's own sections move onto the same markers when its schema is passed with `--schema`.
 
 ## 7. Open decisions
 

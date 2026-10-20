@@ -50,6 +50,7 @@ mod tests {
             groups: Default::default(),
             places: Default::default(),
             note: None,
+            control: None,
         }
     }
 
@@ -59,6 +60,7 @@ mod tests {
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,
             foreign: Default::default(),
+            pages: Default::default(),
             key: keys,
         }
     }

@@ -7,7 +7,7 @@
 use crate::damaged::{InTheWay, Saved, keep_damaged};
 use crate::doc::{Format, SettingsDoc};
 use crate::error::SettingsError;
-use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read};
+use crate::lenient::{FileText, Loaded, Read, SETTINGS_CAP, file_text, read, read_within};
 use crate::preserve;
 use crate::root::{AppName, ConfigRoot};
 use crate::watch::Watch;
@@ -35,8 +35,12 @@ impl Store {
 
     /// The program's config directory, or the error a write or a watch reports without one.
     pub(crate) fn require_dir(&self) -> Result<PathBuf, SettingsError> {
-        self.dir()
-            .ok_or(SettingsError::NoConfigDir { app: self.app.0 })
+        self.dir().ok_or_else(|| self.no_config_dir())
+    }
+
+    /// The error for a root that has no directory for this program.
+    pub(crate) fn no_config_dir(&self) -> SettingsError {
+        SettingsError::NoConfigDir { app: self.app.0 }
     }
 
     /// The path `D` is stored at.
@@ -64,7 +68,7 @@ impl Store {
     /// `text` read as a `D`; text that is not the document's format at all is the defaults with
     /// the whole file reported invalid.
     pub(crate) fn decode<D: SettingsDoc>(text: &str) -> Loaded<D> {
-        match read::<D>(text, D::FORMAT) {
+        match read_within::<D>(text, D::FORMAT, &D::limits()) {
             Read::Loaded(loaded) => loaded,
             Read::Garbled { reason } => Loaded::garbled(D::default(), reason),
         }

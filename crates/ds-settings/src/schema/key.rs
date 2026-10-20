@@ -6,7 +6,9 @@ use std::collections::BTreeMap;
 use serde::{Deserialize, Serialize};
 
 use super::column::Column;
+use super::control::ControlName;
 use super::live_action::LiveAction;
+use super::page::Page;
 use super::place::ChoicePlace;
 
 /// A dotted settings key path: `"dock.magnified_px"`. Always `<domain>.<field>`, the derive's
@@ -20,7 +22,7 @@ pub struct KeyPath(pub String);
 #[serde(transparent)]
 pub struct Label(pub String);
 
-/// The one-line explanation under the widget.
+/// The one-line explanation under the control.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(transparent)]
 pub struct Help(pub String);
@@ -89,57 +91,6 @@ pub struct GroupedChoices<'a> {
 #[serde(transparent)]
 pub struct Section(pub String);
 
-/// The Settings app's fixed page list (design/22-SETTINGS.md section 9.3), plus one page per
-/// third-party app id.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(tag = "kind", content = "v", rename_all = "snake_case")]
-pub enum Page {
-    Appearance,
-    Dock,
-    MouseAndGestures,
-    KeyboardAndShortcuts,
-    Notifications,
-    Spaces,
-    Accounts,
-    /// What programs may reach: the per-app permission rows the compositor publishes
-    /// (design/22-SETTINGS.md section 5), as macOS's "Privacy & Security" does.
-    Privacy,
-    /// sill's idle service (design/22-SETTINGS.md section 3.24 `idle.*`, section 3.19
-    /// `session.lock_grace_s`).
-    Power,
-    Apps,
-    /// The companion, its models, memory and computer use (design/22-SETTINGS.md sections 3.26 to
-    /// 3.30 `ai.*`, `agent.*`, `memory.*`, `cua.*`, `companion.*`).
-    Intelligence,
-    /// The file viewer's timings, steps, history, export defaults and decoder limits
-    /// (design/22-SETTINGS.md section 3.31 `viewer.*`).
-    Viewer,
-    /// A third-party program's own page, named by its app id.
-    App(String),
-}
-
-impl Page {
-    /// The name a person reads for the page: a fixed page by its name in section 9.3, a
-    /// third-party page by its app id.
-    pub fn label(&self) -> &str {
-        match self {
-            Page::Appearance => "Appearance",
-            Page::Dock => "Dock",
-            Page::MouseAndGestures => "Mouse & Gestures",
-            Page::KeyboardAndShortcuts => "Keyboard & Shortcuts",
-            Page::Notifications => "Notifications",
-            Page::Spaces => "Spaces",
-            Page::Accounts => "Accounts",
-            Page::Privacy => "Privacy & Security",
-            Page::Power => "Power",
-            Page::Apps => "Apps",
-            Page::Intelligence => "Intelligence",
-            Page::Viewer => "Viewer",
-            Page::App(id) => id,
-        }
-    }
-}
-
 /// File-only in v1 (section 5: "Advanced" = no Settings UI control) versus rendered on its
 /// page. Not a `bool`: `CONVENTIONS.md#4-types`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -177,26 +128,7 @@ impl AgentSetting {
     }
 }
 
-/// The widget table is fixed (section 9.1): one component per [`KeyKind`], never chosen by the
-/// Settings app itself.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Widget {
-    /// A read-only label: the one value a one-variant enum can hold.
-    Readout,
-    Toggle,
-    SegmentedControl,
-    Menu,
-    Slider,
-    TextInput,
-    AppearancePickerSwatch,
-    ShortcutField,
-    RowsEditor,
-    /// A button that runs a live module's action ([`KeyKind::Live`]).
-    ActionButton,
-}
-
-/// A key's shape: what values it can hold, and so which widget draws it.
+/// A key's shape: what values it can hold, and so which control draws it.
 ///
 /// Inferred from the field's own type by the derive (`crates/ds-settings-derive/src/shape.rs`):
 /// a one-variant enum is [`KeyKind::Fixed`], a two-variant enum [`KeyKind::Toggle`], three to five [`KeyKind::Segmented`], more
@@ -240,26 +172,6 @@ pub enum KeyKind {
     Live { action: LiveAction },
 }
 
-impl KeyKind {
-    /// The one component that draws this kind (section 9.1's widget table; total by
-    /// construction — every arm below is written, so a new [`KeyKind`] variant is a compile
-    /// error here until it picks one).
-    pub fn widget(&self) -> Widget {
-        match self {
-            KeyKind::Fixed { .. } => Widget::Readout,
-            KeyKind::Toggle { .. } => Widget::Toggle,
-            KeyKind::Segmented { .. } => Widget::SegmentedControl,
-            KeyKind::Menu { .. } => Widget::Menu,
-            KeyKind::Bounded { .. } => Widget::Slider,
-            KeyKind::Text => Widget::TextInput,
-            KeyKind::Colour => Widget::AppearancePickerSwatch,
-            KeyKind::Shortcut => Widget::ShortcutField,
-            KeyKind::List(_) | KeyKind::Rows { .. } => Widget::RowsEditor,
-            KeyKind::Live { .. } => Widget::ActionButton,
-        }
-    }
-}
-
 /// One field of one settings domain struct.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct KeySpec {
@@ -298,6 +210,12 @@ pub struct KeySpec {
     /// the info button. Absent when `None`, so older schemas parse and write unchanged.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub note: Option<Note>,
+    /// The control that draws the key, when its kind's default is not the one wanted: `"picture"`
+    /// for a path chosen from a grid of pictures. Absent when `None`, so older schemas parse and
+    /// write unchanged; a name this build does not know, or one that does not fit the kind, is
+    /// ignored (see [`KeySpec::control`]).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub control: Option<ControlName>,
 }
 
 impl KeySpec {
@@ -380,8 +298,7 @@ pub fn kind_from_variants(mut words: Vec<String>) -> KeyKind {
 
 #[cfg(test)]
 mod tests {
-    use super::{KeyKind, Page, Widget, kind_from_variants};
-    use crate::schema::{ActionLabel, ActionWeight, LiveAction};
+    use super::{KeyKind, kind_from_variants};
 
     #[test]
     fn two_variants_are_a_toggle() {
@@ -425,120 +342,6 @@ mod tests {
     #[should_panic(expected = "at least one variant")]
     fn no_variant_panics() {
         kind_from_variants(Vec::new());
-    }
-
-    #[test]
-    fn every_kind_maps_to_exactly_one_widget() {
-        assert_eq!(
-            KeyKind::Fixed {
-                variant: "a".to_owned()
-            }
-            .widget(),
-            Widget::Readout
-        );
-        assert_eq!(
-            KeyKind::Toggle {
-                variants: ["a".to_owned(), "b".to_owned()]
-            }
-            .widget(),
-            Widget::Toggle
-        );
-        assert_eq!(
-            KeyKind::Segmented {
-                variants: vec!["a".to_owned(), "b".to_owned(), "c".to_owned()]
-            }
-            .widget(),
-            Widget::SegmentedControl
-        );
-        assert_eq!(
-            KeyKind::Menu {
-                variants: (0..6).map(|i| format!("v{i}")).collect()
-            }
-            .widget(),
-            Widget::Menu
-        );
-        assert_eq!(
-            KeyKind::Bounded {
-                min: 0,
-                max: 100,
-                unit: Some("%".to_owned())
-            }
-            .widget(),
-            Widget::Slider
-        );
-        assert_eq!(KeyKind::Text.widget(), Widget::TextInput);
-        assert_eq!(KeyKind::Colour.widget(), Widget::AppearancePickerSwatch);
-        assert_eq!(KeyKind::Shortcut.widget(), Widget::ShortcutField);
-        assert_eq!(
-            KeyKind::List(Box::new(KeyKind::Text)).widget(),
-            Widget::RowsEditor
-        );
-        assert_eq!(
-            KeyKind::Rows {
-                columns: Vec::new()
-            }
-            .widget(),
-            Widget::RowsEditor
-        );
-        assert_eq!(
-            KeyKind::Live {
-                action: LiveAction {
-                    label: ActionLabel("Revoke".to_owned()),
-                    weight: ActionWeight::Plain,
-                }
-            }
-            .widget(),
-            Widget::ActionButton
-        );
-    }
-
-    #[test]
-    fn a_page_is_labelled_as_the_settings_app_names_it_and_keeps_its_wire_form() {
-        const CASES: &[(Page, &str, &str)] = &[
-            (Page::Appearance, "Appearance", "appearance"),
-            (Page::Dock, "Dock", "dock"),
-            (
-                Page::MouseAndGestures,
-                "Mouse & Gestures",
-                "mouse_and_gestures",
-            ),
-            (
-                Page::KeyboardAndShortcuts,
-                "Keyboard & Shortcuts",
-                "keyboard_and_shortcuts",
-            ),
-            (Page::Notifications, "Notifications", "notifications"),
-            (Page::Spaces, "Spaces", "spaces"),
-            (Page::Accounts, "Accounts", "accounts"),
-            (Page::Privacy, "Privacy & Security", "privacy"),
-            (Page::Power, "Power", "power"),
-            (Page::Apps, "Apps", "apps"),
-            (Page::Intelligence, "Intelligence", "intelligence"),
-            (Page::Viewer, "Viewer", "viewer"),
-        ];
-        for (page, label, kind) in CASES {
-            assert_eq!(page.label(), *label, "{page:?}");
-            let wire = format!(r#"{{"kind":"{kind}"}}"#);
-            assert_eq!(
-                serde_json::to_string(page).ok(),
-                Some(wire.clone()),
-                "{page:?}"
-            );
-            assert_eq!(
-                serde_json::from_str::<Page>(&wire).ok().as_ref(),
-                Some(page)
-            );
-            let toml = format!("kind = \"{kind}\"\n");
-            assert_eq!(
-                toml::from_str::<Page>(&toml).ok().as_ref(),
-                Some(page),
-                "{kind}"
-            );
-        }
-        assert_eq!(
-            Page::App("com.example.App".to_owned()).label(),
-            "com.example.App"
-        );
     }
 }
 
@@ -592,5 +395,31 @@ mod agent_tests {
     fn an_unknown_word_is_an_error_not_a_silent_hands_off() {
         let text = format!("agent = \"always\"\n{OLD}");
         assert!(toml::from_str::<KeySpec>(&text).is_err());
+    }
+}
+
+#[cfg(test)]
+mod control_tests {
+    use super::KeySpec;
+    use crate::schema::{Control, ControlName};
+
+    const OLD: &str = "path = \"a.b\"\ndefault = \"x\"\nlabel = \"B\"\nhelp = \"\"\nsection = \"\"\nexposure = \"basic\"\n[kind]\nkind = \"text\"\n[page]\nkind = \"appearance\"\n";
+
+    #[test]
+    fn a_key_written_before_controls_existed_has_none_and_stays_without() {
+        let spec: KeySpec = toml::from_str(OLD).expect("old schema text parses");
+        assert_eq!(spec.control, None);
+        assert_eq!(spec.control(), Control::Text);
+        assert!(!toml::to_string(&spec).unwrap().contains("control"));
+    }
+
+    #[test]
+    fn a_named_control_is_written_and_read_back() {
+        let spec: KeySpec = toml::from_str(&format!("control = \"picture\"\n{OLD}")).unwrap();
+        assert_eq!(spec.control, Some(ControlName("picture".to_owned())));
+        assert_eq!(spec.control(), Control::Picture);
+        let text = toml::to_string(&spec).unwrap();
+        assert!(text.contains("control = \"picture\""), "{text}");
+        assert_eq!(toml::from_str::<KeySpec>(&text).unwrap(), spec);
     }
 }

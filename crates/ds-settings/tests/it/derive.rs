@@ -7,7 +7,7 @@ use std::borrow::Cow;
 use std::path::PathBuf;
 
 use ds_core::word::Word;
-use ds_settings::schema::{KeyKind, Page, SettingsSchema, Widget};
+use ds_settings::schema::{Control, ControlName, KeyKind, Page, SettingsSchema};
 use ds_settings::{Ms, SettingsSchema};
 use serde::{Deserialize, Serialize};
 
@@ -41,6 +41,8 @@ struct Probe {
     material: PanelMaterial,
     #[settings(label = "Delay", range = "0..=1000", unit = "ms")]
     delay_ms: Ms,
+    #[settings(label = "Picture", control = "picture")]
+    picture: PathBuf,
 }
 
 impl Default for Probe {
@@ -52,6 +54,7 @@ impl Default for Probe {
             sound_theme: SoundTheme("freedesktop".to_owned()),
             material: PanelMaterial::Sheet,
             delay_ms: Ms(200),
+            picture: PathBuf::new(),
         }
     }
 }
@@ -79,6 +82,7 @@ fn every_field_gets_the_kind_its_type_or_attribute_names() {
         ("probe.sound_theme", &KeyKind::Text),
         ("probe.material", &fixed),
         ("probe.delay_ms", &bounded),
+        ("probe.picture", &KeyKind::Text),
     ];
     assert_eq!(kinds, want);
 }
@@ -91,7 +95,7 @@ fn a_one_variant_enum_is_a_readout_with_its_default() {
         .iter()
         .find(|key| key.path.0 == "probe.material")
         .unwrap_or_else(|| panic!("no material key"));
-    assert_eq!(key.kind.widget(), Widget::Readout);
+    assert_eq!(key.kind.default_control(), Control::Readout);
     assert_eq!(key.default, toml::Value::String("sheet".to_owned()));
 }
 
@@ -116,4 +120,21 @@ fn text_defaults_are_their_strings_and_the_schema_round_trips() {
     let text = schema.to_toml();
     let back = ds_settings::schema::Schema::from_toml(&text).unwrap_or_else(|e| panic!("{e}"));
     assert_eq!(back, schema, "{text}");
+}
+
+#[test]
+fn a_named_control_reaches_the_key_and_a_key_without_one_has_none() {
+    let schema = Probe::schema();
+    let control_of = |path: &str| {
+        schema
+            .key
+            .iter()
+            .find(|key| key.path.0 == path)
+            .map(|key| (key.control.clone(), key.control()))
+    };
+    assert_eq!(
+        control_of("probe.picture"),
+        Some((Some(ControlName("picture".to_owned())), Control::Picture))
+    );
+    assert_eq!(control_of("probe.name"), Some((None, Control::Text)));
 }

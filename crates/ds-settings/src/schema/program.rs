@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 
 use super::agent::never_settable_violation;
 use super::key::KeySpec;
+use super::page_decl::PageDecl;
 use crate::xdg;
 
 /// The directory name a schema's owning program installs under: `quire`, `sill`, `mailo`. The
@@ -54,6 +55,10 @@ pub struct Schema {
     /// not settings. Absent in the TOML means none.
     #[serde(default, skip_serializing_if = "ForeignTables::is_empty")]
     pub foreign: ForeignTables,
+    /// One `[[page]]` table per page this program declares: its id, title, glyph and place in the
+    /// sidebar (section 9.3). Absent means none; a key's page is then one of the built-in ones.
+    #[serde(default, rename = "page", skip_serializing_if = "Vec::is_empty")]
+    pub pages: Vec<PageDecl>,
     /// One `[[key]]` table per entry, TOML's array-of-tables (section 9.2).
     pub key: Vec<KeySpec>,
 }
@@ -240,6 +245,7 @@ mod tests {
             file: FilePath("quire/appearance.toml".to_owned()),
             version: 1,
             foreign: Default::default(),
+            pages: Default::default(),
             key: vec![crate::schema::KeySpec {
                 path: KeyPath("appearance.theme".to_owned()),
                 kind: KeyKind::Segmented {
@@ -257,6 +263,7 @@ mod tests {
                 groups: Default::default(),
                 places: Default::default(),
                 note: None,
+                control: None,
             }],
         }
     }
@@ -530,5 +537,44 @@ mod foreign_tests {
         for (path, held) in cases {
             assert_eq!(foreign.holds(path), held, "{path}");
         }
+    }
+}
+
+#[cfg(test)]
+mod page_tests {
+    use super::Schema;
+    use crate::schema::{Page, PageStatus, PageTable};
+
+    const HEAD: &str = "app = \"sill\"\nfile = \"sill/settings.toml\"\nversion = 1\n";
+    const PAGE: &str = "[[page]]\nid = \"lighting\"\ntitle = \"Lighting\"\nsymbol = \"sun\"\norder = 25\naliases = [\"light\"]\n";
+    const KEY: &str = "[[key]]\npath = \"lamp.level\"\ndefault = \"x\"\nlabel = \"Level\"\nhelp = \"\"\nsection = \"\"\nexposure = \"basic\"\n[key.kind]\nkind = \"text\"\n[key.page]\nkind = \"lighting\"\n";
+
+    #[test]
+    fn a_key_on_a_page_nobody_declared_is_kept_and_the_page_is_unknown() {
+        let schema = Schema::from_toml(&format!("{HEAD}{KEY}")).expect("the schema still reads");
+        assert_eq!(schema.key.len(), 1);
+        assert_eq!(schema.key[0].page, Page::App("lighting".to_owned()));
+        let table = PageTable::of_schemas(std::slice::from_ref(&schema));
+        assert_eq!(table.status(&schema.key[0].page), PageStatus::Unknown);
+    }
+
+    #[test]
+    fn a_declared_page_reads_writes_and_makes_its_keys_known() {
+        let schema = Schema::from_toml(&format!("{HEAD}{PAGE}{KEY}")).expect("parses");
+        assert_eq!(schema.pages.len(), 1);
+        let table = PageTable::of_schemas(std::slice::from_ref(&schema));
+        assert_eq!(table.status(&schema.key[0].page), PageStatus::Declared);
+        assert_eq!(
+            table.resolve("light").map(|id| id.0),
+            Some("lighting".to_owned())
+        );
+        let again = Schema::from_toml(&schema.to_toml()).expect("round trips");
+        assert_eq!(again, schema);
+    }
+
+    #[test]
+    fn a_schema_without_pages_writes_no_page_table() {
+        let schema = Schema::from_toml(&format!("{HEAD}{KEY}")).expect("parses");
+        assert!(!schema.to_toml().contains("[[page]]"));
     }
 }

@@ -9,10 +9,12 @@
 //! reported in [`Loaded::unknown`]. A TOML file's save leaves it in the file with the comments
 //! around it (`Store::save`); other formats write only the type's own keys.
 
+mod limits;
 mod text;
 mod wire;
 
 use crate::doc::{FileName, Format};
+pub use limits::{ClampedKey, LimitBounds, Limits};
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use std::collections::HashSet;
@@ -30,6 +32,9 @@ pub struct Loaded<D> {
     pub unknown: Vec<UnknownKey>,
     /// Keys whose value was not valid for their field; the field's default was used.
     pub invalid: Vec<InvalidKey>,
+    /// Numbers outside their key's range ([`SettingsDoc::limits`](crate::SettingsDoc::limits)),
+    /// brought to the nearest end.
+    pub clamped: Vec<ClampedKey>,
 }
 
 /// A key path (`dock.puppy`) the file sets and the type does not read. The path stops at the
@@ -77,6 +82,7 @@ impl<D> Loaded<D> {
             value,
             unknown: Vec::new(),
             invalid: Vec::new(),
+            clamped: Vec::new(),
         }
     }
 
@@ -89,10 +95,11 @@ impl<D> Loaded<D> {
                 path: String::new(),
                 reason,
             }],
+            clamped: Vec::new(),
         }
     }
 
-    /// One line per unknown or invalid key, each beginning with the file's name, for the
+    /// One line per unknown, invalid or clamped key, each beginning with the file's name, for the
     /// caller's own log.
     pub fn diagnostics(&self, file: FileName) -> Vec<String> {
         let name = file.0;
@@ -100,6 +107,7 @@ impl<D> Loaded<D> {
             .iter()
             .map(|key| format!("{name}: {key}"))
             .chain(self.invalid.iter().map(|key| format!("{name}: {key}")))
+            .chain(self.clamped.iter().map(|key| format!("{name}: {key}")))
             .collect()
     }
 }
@@ -134,9 +142,17 @@ pub(crate) fn read<D>(text: &str, format: Format) -> Read<D>
 where
     D: Serialize + DeserializeOwned + Default,
 {
+    read_within(text, format, &Limits::none())
+}
+
+/// [`read`], with every number held to its range in `limits`.
+pub(crate) fn read_within<D>(text: &str, format: Format, limits: &Limits) -> Read<D>
+where
+    D: Serialize + DeserializeOwned + Default,
+{
     match format {
-        Format::Toml => overlay::<D, TomlWire>(text),
-        Format::Json => overlay::<D, JsonWire>(text),
+        Format::Toml => overlay::<D, TomlWire>(text, limits),
+        Format::Json => overlay::<D, JsonWire>(text, limits),
         Format::Css => raw::<D>(text),
     }
 }
@@ -151,7 +167,7 @@ fn raw<D: DeserializeOwned>(text: &str) -> Read<D> {
     }
 }
 
-fn overlay<D, W>(text: &str) -> Read<D>
+fn overlay<D, W>(text: &str, limits: &Limits) -> Read<D>
 where
     D: Serialize + DeserializeOwned + Default,
     W: Wire,
@@ -172,7 +188,9 @@ where
     let mut unknown: Vec<UnknownKey> = Vec::new();
     let mut seen_unknown: HashSet<String> = HashSet::new();
     let mut invalid = Vec::new();
+    let mut clamped = Vec::new();
     for (path, value) in leaves {
+        let value = within::<W>(&path, value, limits, &mut clamped);
         let mut candidate = tree.clone();
         W::set(&mut candidate, &path, value);
         match W::decode::<D>(&candidate) {
@@ -196,7 +214,31 @@ where
         value,
         unknown,
         invalid,
+        clamped,
     })
+}
+
+/// `value` brought into the range `limits` gives the key at `path`, noting the change in
+/// `clamped`; a value in range, or a key with no range, comes back as it was.
+fn within<W: Wire>(
+    path: &[String],
+    value: W::Value,
+    limits: &Limits,
+    clamped: &mut Vec<ClampedKey>,
+) -> W::Value {
+    let dotted = path.join(".");
+    let Some(held) = limits
+        .bounds(&dotted)
+        .and_then(|bounds| W::clamp(&value, bounds))
+    else {
+        return value;
+    };
+    clamped.push(ClampedKey {
+        path: dotted,
+        was: W::show(&value),
+        now: W::show(&held),
+    });
+    held
 }
 
 /// The shortest prefix of `path` that `stored` has no key for, dotted.

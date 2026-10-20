@@ -4,8 +4,8 @@
 
 use ds_core::word::Word;
 use ds_settings::schema::{
-    Column, ColumnKind, ColumnName, KeyKind, Label, Page, Schema, SettingsRow, SettingsSchema,
-    Widget,
+    Column, ColumnKind, ColumnName, Control, KeyKind, Label, Page, Schema, SettingsRow,
+    SettingsSchema,
 };
 use ds_settings::{SettingsRow, SettingsSchema};
 use serde::{Deserialize, Serialize};
@@ -95,7 +95,7 @@ fn a_vec_of_rows_is_rows_and_a_vec_of_text_or_words_is_a_list() {
     ];
     assert_eq!(kinds, want.iter().collect::<Vec<_>>());
     for kind in kinds {
-        assert_eq!(kind.widget(), Widget::RowsEditor);
+        assert_eq!(kind.default_control(), Control::Rows);
     }
 }
 

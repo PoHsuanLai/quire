@@ -13,7 +13,6 @@ mod edit;
 mod groups;
 mod key_row;
 mod page;
-mod pair;
 mod section;
 mod words;
 

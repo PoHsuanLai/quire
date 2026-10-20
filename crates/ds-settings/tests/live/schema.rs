@@ -1,5 +1,5 @@
 use ds_settings::live::{LiveSchema, LiveSchemaError};
-use ds_settings::schema::{AgentSetting, KeyKind, KeyPath, Widget, is_never_settable};
+use ds_settings::schema::{AgentSetting, Control, KeyKind, KeyPath, is_never_settable};
 
 use crate::module::{TOGGLE, schema, spec};
 
@@ -84,10 +84,11 @@ fn garbage_is_a_parse_error() {
 }
 
 #[test]
-fn widget_for_kind_is_total_over_live() {
-    let widgets: Vec<Widget> = schema().key.iter().map(|key| key.kind.widget()).collect();
-    assert_eq!(
-        widgets,
-        [Widget::Toggle, Widget::TextInput, Widget::ActionButton]
-    );
+fn control_for_kind_is_total_over_live() {
+    let controls: Vec<Control> = schema()
+        .key
+        .iter()
+        .map(|key| key.kind.default_control())
+        .collect();
+    assert_eq!(controls, [Control::Toggle, Control::Text, Control::Button]);
 }

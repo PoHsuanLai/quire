@@ -26,14 +26,17 @@ mod lenient;
 pub mod live;
 mod portal;
 mod preserve;
+mod region;
 mod root;
 pub mod schema;
 mod spaces_file;
 mod spaces_storage;
 mod store;
+pub mod target;
 mod units;
 mod user_style;
 mod watch;
+mod writer;
 pub mod xdg;
 
 pub use appearance::{
@@ -48,13 +51,15 @@ pub use ds_style::kit::UserStyle;
 pub use environment::{Environment, use_environment};
 pub use error::SettingsError;
 pub use icon_assets::{app_icon_path, apps_dir};
-pub use lenient::{InvalidKey, Loaded, UnknownKey};
+pub use lenient::{ClampedKey, InvalidKey, LimitBounds, Limits, Loaded, UnknownKey};
 pub use portal::{
     SystemPrefsSource, SystemPrefsWatch, contrast_from_portal, reduced_motion_from_portal,
     scheme_from_portal,
 };
+pub use region::{HourCycle, RegionSettings, ResolvedHours, time_locale};
 pub use root::{AppName, ConfigRoot};
 pub use spaces_storage::{Fixup, Origin, SpacesLoad, SpacesStorage};
 pub use store::Store;
 pub use units::{Count, Fraction, Mins, Ms, Percent, Px, Scalar, Secs, Units};
 pub use watch::{DEBOUNCE, Watch, WatchState};
+pub use writer::SettingsWriter;

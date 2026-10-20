@@ -44,7 +44,7 @@ pub(crate) enum AgentMark {
 }
 
 /// `#[settings(label = "...", help = "...", section = "...", range = "a..=b", unit = "...",
-/// advanced, text, agent_settable)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
+/// control = "...", advanced, text, agent_settable)]` on one field, or `#[settings(skip)]` on one that is not a key at all (a
 /// `#[serde(flatten)] extra: toml::Table` catch-all is the only field this workspace's structs
 /// use it for today).
 #[derive(Debug)]
@@ -62,6 +62,9 @@ pub(crate) enum FieldAttrs {
         agent: AgentMark,
         /// `text`, `range` (with its ends) or neither.
         hint: KindHint,
+        /// `control = "picture"`: the control that draws the key when its kind's default is not
+        /// the one wanted.
+        control: Option<String>,
     },
 }
 
@@ -116,6 +119,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
     let mut section = String::new();
     let mut range = None;
     let mut unit = None;
+    let mut control = None;
     let mut advanced = false;
     let mut skip = false;
     let mut agent = AgentMark::HandsOff;
@@ -132,6 +136,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
                 section = lit_str(&meta)?;
             } else if meta.path.is_ident("unit") {
                 unit = Some(lit_str(&meta)?);
+            } else if meta.path.is_ident("control") {
+                control = Some(lit_str(&meta)?);
             } else if meta.path.is_ident("range") {
                 let text = lit_str(&meta)?;
                 range = Some(parse_range(&text).map_err(|reason| meta.error(reason))?);
@@ -146,7 +152,8 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
             } else {
                 return Err(meta.error(
                     "unknown #[settings(...)] attribute on a field; expected `label`, `help`, \
-                     `section`, `range`, `unit`, `advanced`, `text`, `agent_settable` or `skip`",
+                     `section`, `range`, `unit`, `control`, `advanced`, `text`, `agent_settable` \
+                     or `skip`",
                 ));
             }
             Ok(())
@@ -184,6 +191,7 @@ pub(crate) fn field_attrs(fallback: Span, attrs: &[syn::Attribute]) -> syn::Resu
         advanced,
         agent,
         hint,
+        control,
     })
 }
 
@@ -332,6 +340,26 @@ mod tests {
                 panic!("{attr}: expected FieldAttrs::Key");
             };
             assert_eq!(agent, *want, "{attr}");
+        }
+    }
+
+    #[test]
+    fn a_control_is_named_by_its_id_and_absent_otherwise() {
+        const CASES: &[(&str, Option<&str>)] = &[
+            (
+                "#[settings(label = \"L\", control = \"picture\")]",
+                Some("picture"),
+            ),
+            ("#[settings(label = \"L\")]", None),
+        ];
+        for (attr, want) in CASES {
+            let source = format!("struct S {{ {attr} f: String }}");
+            let attrs = first_field_attrs(&source);
+            let parsed = field_attrs(attrs[0].span(), &attrs).unwrap();
+            let FieldAttrs::Key { control, .. } = parsed else {
+                panic!("{attr}: expected FieldAttrs::Key");
+            };
+            assert_eq!(control.as_deref(), *want, "{attr}");
         }
     }
 

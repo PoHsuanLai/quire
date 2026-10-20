@@ -21,6 +21,19 @@ pub enum SettingsError {
     /// The value could not be written as JSON.
     #[error("encoding settings as JSON: {0}")]
     EncodeJson(#[from] serde_json::Error),
+    /// A file there could not be read as text under the size cap (see [`ds_helpers::ReadError`]);
+    /// it is left as it was.
+    #[error(transparent)]
+    Read(#[from] ds_helpers::ReadError),
+    /// A file could not take the edit: it is not valid TOML, or the key sits inside a value that
+    /// is not a table. It is left as it was.
+    #[error("{path}: {reason}")]
+    Patch {
+        /// Which file.
+        path: PathBuf,
+        /// What is wrong with it.
+        reason: String,
+    },
     /// The directory watch could not be started.
     #[error("watching settings: {0}")]
     Watch(#[from] notify::Error),

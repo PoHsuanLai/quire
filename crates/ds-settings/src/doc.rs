@@ -1,6 +1,7 @@
 //! What a settings file is: a serde type that names its file and its format.
 
 use crate::error::SettingsError;
+use crate::lenient::Limits;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
 use serde::ser::Error as _;
@@ -46,4 +47,11 @@ pub trait SettingsDoc:
     const FILE: FileName;
     /// How the file is written.
     const FORMAT: Format;
+
+    /// The range of every bounded key of the file. A number outside its range is brought to the
+    /// nearest end when the file is read, and reported in [`Loaded::clamped`](crate::Loaded). A
+    /// document with a schema returns [`Limits::of_schema`]; the default is no ranges.
+    fn limits() -> Limits {
+        Limits::none()
+    }
 }

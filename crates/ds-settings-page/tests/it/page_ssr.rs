@@ -35,6 +35,7 @@ fn key(path: &str, label: &str, section: &str, kind: KeyKind, default: &str) -> 
         groups: Default::default(),
         places: Default::default(),
         note: None,
+        control: None,
     }
 }
 
@@ -47,6 +48,7 @@ fn schema() -> Schema {
         file: FilePath("sample/sample.toml".to_owned()),
         version: 1,
         foreign: ForeignTables::default(),
+        pages: Default::default(),
         key: vec![
             key(
                 "view.spelling",

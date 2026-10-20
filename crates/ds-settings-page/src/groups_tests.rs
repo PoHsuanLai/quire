@@ -20,6 +20,7 @@ fn key(path: &str, section: &str) -> KeySpec {
         groups: Default::default(),
         places: Default::default(),
         note: None,
+        control: None,
     }
 }
 
@@ -30,6 +31,7 @@ fn sections_keep_the_order_their_first_key_comes_in() {
         file: FilePath("test/test.toml".to_owned()),
         version: 1,
         foreign: ForeignTables::default(),
+        pages: Default::default(),
         key: vec![
             key("a.one", "First"),
             key("b.two", "Second"),
@@ -66,6 +68,7 @@ fn naming_a_page_keeps_only_that_pages_keys() {
         file: FilePath("test/test.toml".to_owned()),
         version: 1,
         foreign: ForeignTables::default(),
+        pages: Default::default(),
         key: vec![key("a.one", "First"), dock],
     };
     let titles = |page| -> Vec<String> {

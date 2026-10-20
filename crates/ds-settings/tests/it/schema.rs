@@ -1,13 +1,14 @@
 //! design/22-SETTINGS.md section 9.6's acceptance list, for the two domains this wave's derive
 //! covers: `AppearanceSettings` and `IconsSettings` (`crates/ds-settings/src/settings.rs`).
 //!
-//! Run as an integration test, not a unit test, because `every_key_in_catalogue_has_a_spec`
-//! reads a file outside the crate (`crates/ds-settings/tests/keys.rs` does the same, for the
-//! same reason: `cargo test`'s working directory for a `tests/` binary is the crate root).
+//! Run as an integration test, not a unit test, because the section 9.7 check reads a file outside
+//! the crate (`doc_tables.rs` does the same: `cargo test`'s working directory for a `tests/`
+//! binary is the crate root). Which keys the doc lists, and with what default and range, is
+//! `doc_tables.rs`: those tables are generated from the schema.
 
 use std::path::Path;
 
-use ds_settings::schema::{KeySpec, Page, Schema, SettingsSchema, deep_link_path};
+use ds_settings::schema::{Page, Schema, SettingsSchema, deep_link_path};
 use ds_settings::{AppearanceSettings, IconsSettings};
 
 const DOC_PATH: &str = "../../design/22-SETTINGS.md";
@@ -52,11 +53,7 @@ fn deep_link_resolves() {
 }
 
 // ---------------------------------------------------------------------------------------------
-// every_key_in_catalogue_has_a_spec
-
-/// `appearance.*` keys the doc assigns to `sill`, not `AppearanceSettings`
-/// (mirrored from `crates/ds-settings/tests/keys.rs`'s `SILL_OWNED`).
-const SILL_OWNED: &[&str] = &["notifications.banner_material", "launcher.material"];
+// The doc's section 9.7 list
 
 fn keys_in_section(doc: &str, heading: &str, next_heading: &str) -> Vec<String> {
     let start = doc
@@ -83,54 +80,6 @@ fn keys_in_section(doc: &str, heading: &str, next_heading: &str) -> Vec<String> 
             (!status.starts_with("RETIRING")).then(|| key.to_owned())
         })
         .collect()
-}
-
-#[test]
-fn every_key_in_catalogue_has_a_spec() {
-    let doc =
-        std::fs::read_to_string(Path::new(DOC_PATH)).unwrap_or_else(|e| panic!("{DOC_PATH}: {e}"));
-
-    let mut doc_keys = keys_in_section(&doc, "### 3.1 `appearance`", "### 3.2 `motion`");
-    doc_keys.extend(keys_in_section(&doc, "### 3.2 `motion`", "### 3.3 `icons`"));
-    doc_keys.extend(keys_in_section(&doc, "### 3.3 `icons`", "### 3.4 `bar`"));
-    assert!(!doc_keys.is_empty(), "no keys parsed from {DOC_PATH}");
-
-    let spec_paths: Vec<String> = schemas()
-        .iter()
-        .flat_map(|schema| schema.key.iter().map(|key: &KeySpec| key.path.0.clone()))
-        .collect();
-
-    let mut seen = Vec::new();
-    for doc_key in &doc_keys {
-        if SILL_OWNED.contains(&doc_key.as_str()) {
-            continue;
-        }
-        assert!(
-            spec_paths.contains(doc_key),
-            "{doc_key}: no KeySpec with that path (have {spec_paths:?})"
-        );
-        seen.push(doc_key.clone());
-    }
-    for path in &spec_paths {
-        assert!(
-            seen.contains(path),
-            "{path} has a KeySpec but no row in {DOC_PATH} sections 3.1-3.3"
-        );
-    }
-}
-
-#[test]
-fn every_sill_owned_row_named_here_is_still_in_the_doc() {
-    let doc =
-        std::fs::read_to_string(Path::new(DOC_PATH)).unwrap_or_else(|e| panic!("{DOC_PATH}: {e}"));
-    let mut doc_keys = keys_in_section(&doc, "### 3.1 `appearance`", "### 3.2 `motion`");
-    doc_keys.extend(keys_in_section(&doc, "### 3.2 `motion`", "### 3.3 `icons`"));
-    for key in SILL_OWNED {
-        assert!(
-            doc_keys.iter().any(|k| k == key),
-            "{key} listed in SILL_OWNED but not found in the doc"
-        );
-    }
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -250,7 +199,7 @@ fn the_design_doc_lists_exactly_the_proposed_keys() {
     let in_doc = keys_in_section(
         &doc,
         "### 9.7 Agent-settable keys (proposed)",
-        "## 7. Open decisions",
+        "### 9.8 Pages, controls",
     );
     assert_eq!(in_doc, AGENT_SETTABLE_PROPOSED);
 }
@@ -280,6 +229,7 @@ mod unavailable {
             groups: Default::default(),
             places: Default::default(),
             note: None,
+            control: None,
         }
     }
 
@@ -379,6 +329,7 @@ mod groups {
                 .collect(),
             places: Default::default(),
             note: None,
+            control: None,
         }
     }
 
@@ -508,6 +459,7 @@ mod places {
             groups: Default::default(),
             places: Default::default(),
             note: None,
+            control: None,
         }
     }
 
