@@ -269,10 +269,14 @@ const CAMERA: &[Shape] = &[Shape::Solid(
     "M15 3a2 2 0 0 1 1.995 1.85l.005 .15a1 1 0 0 0 .883 .993l.117 .007h1a3 3 0 0 1 2.995 2.824l.005 .176v9a3 3 0 0 1 -2.824 2.995l-.176 .005h-14a3 3 0 0 1 -2.995 -2.824l-.005 -.176v-9a3 3 0 0 1 2.824 -2.995l.176 -.005h1a1 1 0 0 0 1 -1a2 2 0 0 1 1.85 -1.995l.15 -.005h6zm-3 7a3 3 0 0 0 -2.985 2.698l-.011 .152l-.004 .15l.004 .15a3 3 0 1 0 2.996 -3.15z",
 )];
 
-/// Tabler Icons 3.48.0 `filled/download` (MIT), verbatim.
-const DOWNLOAD: &[Shape] = &[Shape::Solid(
-    "M20 16a1 1 0 0 1 1 1v2a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-2a1 1 0 0 1 2 0v2a1 1 0 0 0 1 1h12a1 1 0 0 0 1 -1v-2a1 1 0 0 1 1 -1m-8 -13a1 1 0 0 1 1 1v9.585l3.293 -3.292a1 1 0 0 1 1.414 1.414l-5 5a1 1 0 0 1 -.09 .08l.09 -.08a1 1 0 0 1 -.674 .292l-.033 .001h-.032l-.054 -.004l.086 .004a1 1 0 0 1 -.617 -.213a1 1 0 0 1 -.09 -.08l-5 -5a1 1 0 0 1 1.414 -1.414l3.293 3.292v-9.585a1 1 0 0 1 1 -1",
-)];
+/// quire's own drawing, the outline's silhouette at a 2.5 wide stroke: shaft, chevron, baseline.
+const DOWNLOAD: &[Shape] = &[
+    Shape::Solid("M10.75 4.25A1.25 1.25 0 0 1 13.25 4.25V15H10.75Z"),
+    Shape::Solid(
+        "M5.116 10.884L11.116 16.884A1.25 1.25 0 0 0 12.884 16.884L18.884 10.884A1.25 1.25 0 0 0 17.116 9.116L12 14.232L6.884 9.116A1.25 1.25 0 0 0 5.116 10.884Z",
+    ),
+    Shape::Solid("M4 18.75H20A1.25 1.25 0 0 1 20 21.25H4A1.25 1.25 0 0 1 4 18.75Z"),
+];
 
 /// Phosphor Icons 2.1.1 Fill `upload-simple-fill` (MIT), scaled from its 256 grid to 24.
 const UPLOAD: &[Shape] = &[Shape::Solid(

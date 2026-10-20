@@ -90,7 +90,6 @@ either style, with no stroke. Only permissively licensed sources ship.
 
 | Icon | Source | Licence | State |
 | --- | --- | --- | --- |
-| `Download` | Bootstrap Icons 1.13.2 `cloud-download`, scaled by 22/16 from its 16 grid and moved 1 unit so the 1 px padding holds | MIT, `LICENSE-bootstrap.txt` | shipped |
 | `Upload` | Bootstrap Icons 1.13.2 `cloud-upload`, converted the same way; its `evenodd` is dropped, each path being one simple contour | MIT, `LICENSE-bootstrap.txt` | shipped |
 | `Sparkles` | Remix Icon 4.6.0 `sparkling-line`, verbatim (the Apache-2.0 release; later releases carry a restrictive licence, so the version is pinned) | Apache-2.0, `LICENSE-remixicon.txt` | shipped |
 | `LogOut` | SVG Repo download `logout-svgrepo-com.svg`, SVG Repo Mixer Tools, no author or licence in the file; its page could not be reached | unconfirmed | not shipped: the Lucide outline stays |
@@ -123,7 +122,7 @@ no solid glyph carries a stroke attribute.
 | `Mail` | Tabler filled `mail` |
 | `MailOpen` | Tabler filled `mail-opened` |
 | `Tag` | Tabler filled `tag` |
-| `Refresh` | Phosphor Fill `arrows-clockwise` |
+| `Refresh` | quire's own sync drawing (2026-10-20): two clockwise arcs, solid heads |
 | `Send` | Tabler filled `send` |
 | `Command` | Phosphor Fill `command` |
 | `Columns` | Tabler filled `columns-3` |
@@ -191,7 +190,7 @@ no solid glyph carries a stroke attribute.
 | `Terminal` | Phosphor Fill `terminal-window` |
 | `StickyNote` | Phosphor Fill `note` |
 | `Camera` | Tabler filled `camera` |
-| `Download` | Tabler filled `download` |
+| `Download` | quire's own drawing (2026-10-20): arrow, open chevron head, baseline |
 | `Upload` | Phosphor Fill `upload-simple` |
 | `Copy` | Tabler filled `copy` |
 | `Link` | Tabler filled `link` |
@@ -894,7 +893,7 @@ Recorded in `docs/licensing-references.md` (settled location, PLAN "Icons"):
 | Lucide | ISC | notice file `crates/ds-style/assets/icons/LICENSE-lucide.txt`, version/commit of the geometry |
 | Tabler Icons | MIT | notice file `crates/ds-style/assets/icons/LICENSE-tabler.txt` (added 2026-10-07), imported glyph names (1.2.1), version 3.48.0 |
 | Phosphor Icons | MIT | notice file `LICENSE-phosphor.txt` beside it, glyph names (1.2.1), version 2.1.1 |
-| Bootstrap Icons | MIT | notice file `LICENSE-bootstrap.txt` beside it, `Download` and `Upload` (1.2.2), version 1.13.2 |
+| Bootstrap Icons | MIT | notice file `LICENSE-bootstrap.txt` beside it, `Upload` (1.2.2), version 1.13.2 |
 | Remix Icon | Apache-2.0 | notice file `LICENSE-remixicon.txt` beside it, `Sparkles` (1.2.2), version 4.6.0 only |
 | Our glyphs | our licence | author, date |
 | Qwen-Image-2512 weights | Apache-2.0 | model card URL, weights sha256, date |

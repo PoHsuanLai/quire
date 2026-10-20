@@ -4,20 +4,10 @@
 
 use super::shape::Shape;
 
-/// Bootstrap Icons 1.13.2 `cloud-download` (MIT, notice in `assets/icons/LICENSE-bootstrap.txt`),
+/// Bootstrap Icons 1.13.2 `cloud-upload` (MIT, notice in `assets/icons/LICENSE-bootstrap.txt`),
 /// scaled from its 16 grid by 22/16 and moved 1 in x and y so it keeps the 1 px padding, rounded
-/// to three decimals.
-pub(super) const DOWNLOAD: &[Shape] = &[
-    Shape::Solid(
-        "M 7.058 2.845 A 7.604 7.604 0 0 1 12 1 c 3.699 0 6.769 2.75 7.103 6.296 C 21.292 7.606 23 9.438 23 11.688 23 14.157 20.94 16.125 18.445 16.125 H 14.75 a 0.688 0.688 0 0 1 0 -1.375 h 3.696 C 20.221 14.75 21.625 13.358 21.625 11.688 c 0 -1.672 -1.403 -3.064 -3.18 -3.064 h -0.688 v -0.688 C 17.759 4.884 15.201 2.375 12 2.375 a 6.229 6.229 0 0 0 -4.044 1.513 c -1.041 0.897 -1.585 1.977 -1.585 2.826 v 0.616 l -0.612 0.067 C 3.838 7.607 2.375 9.184 2.375 11.062 2.375 13.079 4.066 14.75 6.199 14.75 H 9.25 a 0.688 0.688 0 0 1 0 1.375 H 6.199 C 3.349 16.125 1 13.878 1 11.062 c 0 -2.424 1.741 -4.432 4.045 -4.94 0.197 -1.187 0.96 -2.369 2.013 -3.277",
-    ),
-    Shape::Solid(
-        "M 11.513 22.799 a 0.688 0.688 0 0 0 0.973 0 l 4.125 -4.125 a 0.688 0.688 0 0 0 -0.973 -0.973 L 12.688 20.653 V 8.562 a 0.688 0.688 0 0 0 -1.375 0 v 12.09 l -2.951 -2.952 a 0.688 0.688 0 0 0 -0.973 0.973 z",
-    ),
-];
-
-/// Bootstrap Icons 1.13.2 `cloud-upload` (MIT), converted as `DOWNLOAD` is. Its source paths are
-/// `fill-rule="evenodd"`; each is one simple contour, which fills the same without it.
+/// to three decimals. Its source paths are `fill-rule="evenodd"`; each is one simple contour,
+/// which fills the same without it.
 pub(super) const UPLOAD: &[Shape] = &[
     Shape::Solid(
         "M 7.058 2.845 A 7.604 7.604 0 0 1 12 1 c 3.699 0 6.769 2.75 7.103 6.296 C 21.292 7.606 23 9.438 23 11.688 23 14.157 20.94 16.125 18.445 16.125 H 14.75 a 0.688 0.688 0 0 1 0 -1.375 h 3.696 C 20.221 14.75 21.625 13.358 21.625 11.688 c 0 -1.672 -1.403 -3.064 -3.18 -3.064 h -0.688 v -0.688 C 17.759 4.884 15.201 2.375 12 2.375 a 6.229 6.229 0 0 0 -4.044 1.513 c -1.041 0.897 -1.585 1.977 -1.585 2.826 v 0.616 l -0.612 0.067 C 3.838 7.607 2.375 9.184 2.375 11.062 2.375 13.079 4.066 14.75 6.199 14.75 H 9.25 a 0.688 0.688 0 0 1 0 1.375 H 6.199 C 3.349 16.125 1 13.878 1 11.062 c 0 -2.424 1.741 -4.432 4.045 -4.94 0.197 -1.187 0.96 -2.369 2.013 -3.277",

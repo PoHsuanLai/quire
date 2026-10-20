@@ -74,11 +74,15 @@ pub const TAG: &[Shape] = &[
     },
 ];
 
+/// Refresh is the sync glyph, quire's own drawing: two clockwise arcs of 130 degrees on one circle
+/// (centre 12 12, radius 8), the second the first turned half a turn about the centre. Each ends
+/// in a small filled triangle (`Shape::Solid`, so it is stroked as well and ends up wider than the
+/// 2 px arc); the arcs' own starts keep the set's round cap. Arc, head, arc, head.
 pub const REFRESH: &[Shape] = &[
-    Shape::Path("M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"),
-    Shape::Path("M21 3v5h-5"),
-    Shape::Path("M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"),
-    Shape::Path("M8 16H3v5"),
+    Shape::Path("M4.48 14.74A8 8 0 0 1 14.74 4.48"),
+    Shape::Solid("M15.63 2.04L18.31 7.08L13.85 6.93Z"),
+    Shape::Path("M19.52 9.26A8 8 0 0 1 9.26 19.52"),
+    Shape::Solid("M8.37 21.96L5.69 16.92L10.15 17.07Z"),
 ];
 
 pub const SEND: &[Shape] = &[

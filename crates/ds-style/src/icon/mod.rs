@@ -76,7 +76,7 @@ pub enum Icon {
     MailOpen,
     /// The mailo `Tag` glyph.
     Tag,
-    /// The mailo `Refresh` glyph.
+    /// The sync glyph, quire's own drawing: two clockwise arcs, each ending in an arrowhead.
     Refresh,
     /// The mailo `Send` glyph.
     Send,
@@ -212,7 +212,7 @@ pub enum Icon {
     StickyNote,
     /// Lucide `camera`.
     Camera,
-    /// Lucide `download`.
+    /// quire's own drawing: an arrow with an open chevron head over a baseline.
     Download,
     /// Lucide `upload`.
     Upload,

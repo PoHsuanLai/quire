@@ -25,6 +25,12 @@ for `ds-core` and `ds-settings`; every old path still resolves.
   AM/PM like the Mac. New section 3.33 with `wallpaper.picture` (text, control `picture`, page
   `wallpaper`; empty means no picture, so the desktop paints `--paper`). design/28 follows.
 
+**ds-style**
+- `Icon::Download` and `Icon::Refresh` (the sync glyph) are redrawn as quire's own drawings, in
+  outline and solid. Download is an arrow with an open chevron head over a baseline; Refresh is two
+  clockwise arcs with arrowheads. Download is no longer `Native::Drawn`; the Bootstrap
+  `cloud-download` conversion is gone (`Upload` still uses `cloud-upload`).
+
 **What a consumer changes**
 - Nothing for the moved types. A literal `PageDecl { .. }` gains `listing: Listing::Sidebar`; code
   that lists the sidebar from `PageTable::pages()` calls `PageTable::sidebar()` instead.

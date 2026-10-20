@@ -107,7 +107,7 @@ const HEART: Parts = Parts {
     gesture: PartGesture::Pop,
     parts: &[part(&[0], pivot(120, 130))],
 };
-/// Refresh: both arrows turn together about the centre.
+/// Refresh: both arcs and their heads turn together about the centre.
 const REFRESH: Parts = Parts {
     gesture: PartGesture::Turn,
     parts: &[part(&[0, 1, 2, 3], CENTRE)],

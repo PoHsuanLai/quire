@@ -470,11 +470,11 @@ const CAMERA: &[Shape] = &[
     },
 ];
 
-/// Lucide `download`.
+/// quire's own drawing: a straight arrow with an open chevron head, over a separate baseline.
 const DOWNLOAD: &[Shape] = &[
-    Shape::Path("M12 15V3"),
-    Shape::Path("M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"),
-    Shape::Path("m7 10 5 5 5-5"),
+    Shape::Path("M12 3v12"),
+    Shape::Path("m6 10 6 6 6-6"),
+    Shape::Path("M4 20h16"),
 ];
 
 /// Lucide `upload`.
