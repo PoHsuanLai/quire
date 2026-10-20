@@ -663,7 +663,7 @@ What the companion remembers and for how long. Page Intelligence, section Memory
 
 ### 3.29 `cua` (cua)
 
-Computer use, off by default and on per app. Page Intelligence, section Computer use (`cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`); the rest Advanced. The per-run `denials` budget is deleted: the router's breaker (`agent.budget.denials_in_a_row`) counts them (SPEC C12).
+Computer use, off by default and on per app. Page Intelligence, section Computer use (`cua.enabled`, `cua.apps`, `cua.default_mode`, `cua.autopause`, `cua.accessibility`); the rest Advanced. The per-run `denials` budget is deleted: the router's breaker (`agent.budget.denials_in_a_row`) counts them (SPEC C12).
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
@@ -671,6 +671,7 @@ Computer use, off by default and on per app. Page Intelligence, section Computer
 | `cua.apps` | list of tables `{ app, allow }` | empty: no app is on | `app` a desktop-entry id; `allow` is `ask`, `session` or `always`; a browser never takes `always` (QUESTIONS S9) | cua.md; QUESTIONS S9 | proposed (companion freeze, 2026-10-02) |
 | `cua.default_mode` | `CuaDefaultMode::{Auto,InPlace,AgentWorkspace}` | `Auto` | `Auto` is the agent workspace where the compositor supports it, else in place (QUESTIONS U11) | SPEC section 2; QUESTIONS U11 | proposed (companion freeze, 2026-10-02) |
 | `cua.autopause` | `CuaAutopause::{On,Off}` | `On` | pause a run that shares the seat when the person touches the window | cua.md section 4 | proposed (companion freeze, 2026-10-02) |
+| `cua.accessibility` | `CuaAccessibility::{On,Off}` | `On` | read the controls of the window a run is using (that window only), so a step names the control it clicks; `Off` goes on from pixels. Row "Read app controls" | owner, 2026-10-20 | settled (owner, 2026-10-20) |
 | `cua.budget.steps` | `Count` | `40` | `1..=500` per run | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
 | `cua.budget.active_s` | `Secs` | `600` | `10..=7200` | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
 | `cua.budget.stall_frames` | `Count` | `3` | `1..=20`; identical frames before a run counts as stalled | cua.md section 7 | proposed (companion freeze, 2026-10-02) |
