@@ -21,7 +21,9 @@ use ds_style::space::list::SpaceId;
 /// (one submenu, say Accounts, whose picks reach `on_extra`; give them `AfterPick::KeepOpen` to
 /// keep the menu up), "Link to..." and "Unlink" when `desktop` lists the desktop's Spaces, a
 /// rule, New Space, and Delete Space... while there is more than one.
-/// Edit Space... opens [`EditSpaceSheet`]: the name and colour, changed live, with Cancel and Save.
+/// Edit Space... opens [`EditSpaceSheet`]: the name and colour, changed live, with Cancel and Save;
+/// an app that edits a Space on a settings page of its own gives `on_edit` instead, and Edit
+/// Space... closes the menu and calls it with the Space's id (to open that page).
 /// New Space opens its name at once, a field at the pointer that renames live (Escape puts the old
 /// name back). Delete asks in a critical alert, as any question that cannot be undone does. Each part takes the keyboard as it opens and
 /// hands it back on close. `on_deleted` hears a
@@ -41,6 +43,7 @@ pub fn SpaceMenu<P, R, A>(
     #[props(default)] on_link: Option<EventHandler<(SpaceId, LinkChange)>>,
     #[props(default = "Your data".to_owned())] kept: String,
     #[props(default)] on_deleted: Option<EventHandler<SpaceId>>,
+    #[props(default)] on_edit: Option<EventHandler<SpaceId>>,
 ) -> Element
 where
     P: Clone + PartialEq + 'static,
@@ -75,7 +78,13 @@ where
                         let Some(look) = look else { return };
                         match apply(pick, &look) {
                             Then::Kept(look) => handle.apply(id, |one| one.look = look),
-                            Then::Open(part) => handle.show(id, at, part),
+                            Then::Open(part) => match (part, on_edit) {
+                                (Showing::Edit, Some(on_edit)) => {
+                                    handle.close_menu();
+                                    on_edit.call(id);
+                                }
+                                _ => handle.show(id, at, part),
+                            },
                             Then::NewSpace => {
                                 let made = handle.add(new_payload.call(()));
                                 handle.show(made, at, Showing::Rename);

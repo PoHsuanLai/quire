@@ -22,6 +22,13 @@ enum Extra {
     Accounts,
 }
 
+/// Where Edit Space... edits: the kit's sheet, or the app's own page (`on_edit`).
+#[derive(Clone, Copy)]
+enum Editing {
+    Sheet,
+    Page,
+}
+
 fn spaces_of(count: usize) -> Spaces<Notes, String> {
     Spaces::first_run(
         (0..count).map(|n| Notes {
@@ -31,7 +38,8 @@ fn spaces_of(count: usize) -> Spaces<Notes, String> {
     )
 }
 
-fn page_of(count: usize, with_extra: Extra) -> Element {
+fn page_of(count: usize, with_extra: Extra, editing: Editing) -> Element {
+    let mut edited = use_signal(String::new);
     let mut place = use_signal(String::new);
     let mut writes = use_signal(|| 0u32);
     let spaces = use_spaces(
@@ -81,7 +89,14 @@ fn page_of(count: usize, with_extra: Extra) -> Element {
                     on_extra: move |(_, name): (ds::components::app::spaces::SpaceId, String)| {
                         picked.with_mut(|log| log.push_str(&name));
                     },
+                    on_edit: match editing {
+                        Editing::Sheet => None,
+                        Editing::Page => Some(EventHandler::new(move |space: ds::components::app::spaces::SpaceId| {
+                            edited.set(format!("{}", space.0));
+                        })),
+                    },
                 }
+                p { class: "edited", {edited()} }
                 p { class: "extra-log", {picked()} }
             }
         }
@@ -90,15 +105,21 @@ fn page_of(count: usize, with_extra: Extra) -> Element {
 
 #[allow(non_snake_case)]
 pub fn Three() -> Element {
-    page_of(3, Extra::None)
+    page_of(3, Extra::None, Editing::Sheet)
 }
 
 #[allow(non_snake_case)]
 pub fn One() -> Element {
-    page_of(1, Extra::None)
+    page_of(1, Extra::None, Editing::Sheet)
 }
 
 #[allow(non_snake_case)]
 pub fn WithAccounts() -> Element {
-    page_of(2, Extra::Accounts)
+    page_of(2, Extra::Accounts, Editing::Sheet)
+}
+
+/// Three Spaces whose Edit Space... opens the app's own page.
+#[allow(non_snake_case)]
+pub fn EditedOnAPage() -> Element {
+    page_of(3, Extra::None, Editing::Page)
 }

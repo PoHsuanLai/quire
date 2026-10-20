@@ -2,7 +2,7 @@
 //! sheet keeping what Save keeps and putting back what Cancel drops, New Space opening its name
 //! at once, Delete asking first, and Delete missing for the last Space.
 
-use crate::support::spaces_page::{One, Three, WithAccounts};
+use crate::support::spaces_page::{EditedOnAPage, One, Three, WithAccounts};
 use dioxus::prelude::Element;
 use ds::base::press::PointerButton;
 use ds::prelude::*;
@@ -125,6 +125,26 @@ fn edit_opens_a_sheet_whose_save_keeps_the_name() {
         harness.text_of(".writes").as_deref(),
         Some("1"),
         "written once, when it closed"
+    );
+}
+
+#[test]
+fn edit_goes_to_the_app_s_own_page_when_it_has_one() {
+    let mut harness = harness(EditedOnAPage);
+    open_menu(&mut harness);
+    let current = harness.text_of(".current").expect("the current Space");
+    pick(&mut harness, 1);
+    assert_eq!(
+        harness.count(".ds-space-edit"),
+        0,
+        "no sheet: {}",
+        harness.html()
+    );
+    assert_eq!(harness.count(".ds-menu"), 0, "the menu closed");
+    assert_eq!(
+        harness.text_of(".edited"),
+        Some(current),
+        "on_edit heard the Space"
     );
 }
 
