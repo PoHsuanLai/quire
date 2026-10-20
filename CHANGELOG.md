@@ -3,6 +3,49 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.36
+
+Settings targets, pages as data, a picture control, patch writes, ranges and the hour cycle. One
+additive release for `ds-settings`; sill and detent move onto it after this tag. Two compile
+changes for a consumer that builds the schema types by hand (see "What a consumer changes").
+
+**ds-settings**
+- `target::SettingsTarget { Page(PageId), Key(KeyPath), Account(AccountRef) }`, written
+  `page:wallpaper`, `key:dock.magnified_size_px`, `account:<id>`; `FromStr` and `Display` round
+  trip. It is the payload of `settings.page.show`.
+- Pages are data: `schema::{PageId, PageDecl, PageTable, PageStatus}` and `[[page]]` tables in a
+  schema (`Schema::pages`). The built-in table (`schema/pages.toml`) holds the twelve fixed pages,
+  their old names as aliases, and `wallpaper`, `displays`, `wifi`, `bluetooth`. A key whose page
+  nobody declares is kept (`Page::App(<id>)`, `PageTable::status` is `Unknown`) instead of failing
+  the schema. `Page` stays as a typed layer (`Page::id`, `Page::declared`, `Page::fixed`).
+- One control vocabulary: `schema::{Control, ControlName, TogglePair}`, `control = "<id>"` on a key
+  (`KeySpec::control`, `#[settings(control = "picture")]`), and `picture` (a grid of pictures with
+  "Add Picture..."; the value is a path). `KeyKind::default_control` is the one kind-to-control
+  table. `Widget` and `KeyKind::widget()` are gone (nothing called them); `ds-settings-page`'s
+  `Pair` is gone, it uses `TogglePair` (so `enabled/disabled` and `yes/no` are switches there too).
+- `SettingsWriter::patch(key, value)` sets one key in place under the file's lock and writes it
+  atomically; comments and unknown keys keep their text.
+- Ranges hold on load: `SettingsDoc::limits()` (default none; `AppearanceFile` returns its
+  schema's), `Limits`, `ClampedKey`, `Loaded::clamped`, reported by `Loaded::diagnostics`. A
+  number outside its range is brought to the nearest end instead of being refused.
+- `region.hours` (`HourCycle::{Auto, H12, H24}`) in `appearance.toml`, `AppearanceFile::region`,
+  `HourCycle::resolve(locale) -> ResolvedHours`, `time_locale(lc_all, lc_time, lang)` and
+  `Environment::hours(locale)`.
+- `schema::{regenerate, key_table}` and `examples/doc_tables.rs`: the key tables of design/22 are
+  generated (`scripts/gen-doc-keys.sh`, `scripts/check-doc-keys.sh`).
+
+**What a consumer changes**
+- A literal `KeySpec { .. }` gains `control: None`; a literal `Schema { .. }` gains
+  `pages: Vec::new()`. A derive-built schema needs nothing.
+- A `Loaded { .. }` literal gains `clamped`; a `SettingsError` match gains arms (it is
+  `non_exhaustive`).
+- Code that named `Widget` or `KeyKind::widget()` uses `Control` and `KeyKind::default_control()`.
+
+**design**
+- design/22: sections 3.1, 3.3 and the new 3.32 `region` have generated key tables; the dock's
+  magnified size and influence radius are 72 (the code), with their ranges; section 9.8 describes
+  the additions.
+
 ## v0.3.35
 
 Two API changes, three pin moves and a print fix. Consumers move their whole pin block with this
