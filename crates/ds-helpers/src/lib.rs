@@ -6,6 +6,10 @@
 //! settings code. [`DesktopFile`] is the matching reader for the text of a freedesktop `.desktop`
 //! file (pure: the text comes in, capped, from [`read_text_capped`] or anywhere else).
 //!
+//! The desktop-entry layer: where desktop entries are ([`XdgEnv`]), the walk of them
+//! ([`walk_applications`]), the id of one ([`DesktopId`]), the entry a window belongs to
+//! ([`entry_for_window`], [`match_app`]) and the names an app declares ([`AppIdentity`]).
+//!
 //! Missing helpers (design/27 permission-prompt rules; `quire/CONSUMING.md`, "Missing helpers").
 //!
 //! An app runs distro tools (mpv, ffmpeg, heif-dec) that may not be installed. This crate lets
@@ -66,6 +70,7 @@
 
 mod capability;
 mod catalog;
+mod desktop_entries;
 mod desktop_file;
 mod family;
 mod files;
@@ -79,6 +84,10 @@ mod watch;
 
 pub use capability::{CapabilityName, Executable, NameError, PackageName};
 pub use catalog::{Catalog, CatalogError, Entry, data_dirs};
+pub use desktop_entries::{
+    AppIdentity, AppKeys, ApplicationEntry, DesktopId, EntryFile, XdgEnv, entry_for_window,
+    first_of_each_id, load_entries, match_app, walk_applications,
+};
 pub use desktop_file::{
     DESKTOP_ENTRY_CAP, DesktopFile, DesktopFileError, DesktopGroup, EntryLocale,
 };

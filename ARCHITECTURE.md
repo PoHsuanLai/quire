@@ -321,6 +321,8 @@ The single place a concept lives. Extend it; never write a second one.
 | Emoji: the grid / the picker sheet | `ds::lists::emoji_grid` / sill's `sill-shell-kit::emoji` |
 | Reading a person's file with a size cap and writing it durably (unique temp, `sync_all`, rename, directory fsync, mode kept, symlink followed, per-path lock), and keeping a damaged file under `<name>.bad-<seconds>` | `ds-helpers::files` (UI-free; `ds-settings` and `SpacesStorage` call it, and so should every core crate) |
 | The text of a freedesktop `.desktop` file (groups, keys, `Name[de]`, escapes, `;` lists, booleans, the size cap) | `ds-helpers::DesktopFile` (pure; read the file with `read_text_capped`) |
+| Where desktop entries are (`XDG_DATA_HOME`, `XDG_DATA_DIRS`, Flatpak and Snap exports), the walk of `applications/` with ids (`kde/foo.desktop` is `kde-foo.desktop`), and which entry a window's `app_id` belongs to (exact, lowercase, `StartupWMClass`, reverse-DNS suffix, Flatpak id) | `ds-helpers`: `XdgEnv::applications_dirs`, `walk_applications` + `first_of_each_id`, `load_entries` + `entry_for_window` (`match_app` is the pure rule list); sill, detent, casement-icons and porter-sheets call it, none keeps a walk or a match of its own |
+| The names one app is known by (desktop id, window `app_id`, session-bus names, intents app) | `ds-helpers::AppIdentity`, read from the `X-Quire-WindowId`, `X-Quire-BusNames` and `X-Quire-IntentsApp` keys of the app's desktop entry; nothing guesses one name from another |
 | Settings file I/O (lenient load, atomic save, watch) | `ds-settings::store::Store` |
 | Settings schema | `ds-settings::schema` (derived) |
 | Live (D-Bus) settings modules: schema, skeleton, proxy | `ds-settings::live` (feature `live`; the daemon owns the state) |
