@@ -255,6 +255,12 @@ impl Harness {
         self.doc.shell.text()
     }
 
+    /// What was last put on the harness's primary selection
+    /// (`ds_blitz::clipboard::write_to(ClipboardTarget::Primary, ..)`).
+    pub fn primary_text(&self) -> Option<String> {
+        self.doc.shell.primary_text()
+    }
+
     /// Put `text` on the harness's clipboard, as another app's copy would.
     pub fn set_clipboard_text(&mut self, text: &str) {
         self.doc.shell.put(text.to_owned());
