@@ -51,6 +51,18 @@ pub enum Shown {
     Hidden,
 }
 
+/// What kind of surface a control opens (`aria-haspopup`): the word that tells assistive
+/// technology a press brings up a menu, a dialog or a list of choices.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Word)]
+pub enum HasPopup {
+    /// A menu of commands.
+    Menu,
+    /// A dialog, sheet or popover with its own content.
+    Dialog,
+    /// A list of options to choose one from.
+    Listbox,
+}
+
 /// Whether an option is the selected one (`aria-selected`), or the place the person is
 /// (`aria-current`).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, Word)]
