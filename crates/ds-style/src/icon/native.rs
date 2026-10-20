@@ -107,7 +107,7 @@ pub(super) const TABLE: &[(Icon, Native)] = &[
     (Icon::Terminal, Native::Solid),
     (Icon::StickyNote, Native::Outline),
     (Icon::Camera, Native::Outline),
-    (Icon::Download, Native::Solid),
+    (Icon::Download, Native::Drawn(drawn::DOWNLOAD)),
     (Icon::Upload, Native::Drawn(drawn::UPLOAD)),
     (Icon::Copy, Native::Outline),
     (Icon::Link, Native::Outline),

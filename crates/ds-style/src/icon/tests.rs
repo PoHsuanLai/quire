@@ -237,7 +237,7 @@ fn an_explicit_style_beats_the_pick() {
 
 #[test]
 fn a_replacement_is_filled_paths_on_the_24_grid() {
-    for icon in [Icon::Upload, Icon::Sparkles] {
+    for icon in [Icon::Download, Icon::Upload, Icon::Sparkles] {
         let Native::Drawn(shapes) = icon.native() else {
             panic!("{icon:?}: not drawn");
         };

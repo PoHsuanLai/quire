@@ -4,6 +4,10 @@
 
 use super::shape::Shape;
 
+/// quire's own download drawing (an arrow over a baseline), the same silhouette as the solid
+/// glyph: the native pick keeps Download a replacement, now drawn by us.
+pub(super) const DOWNLOAD: &[Shape] = super::solid_shell::DOWNLOAD;
+
 /// Bootstrap Icons 1.13.2 `cloud-upload` (MIT, notice in `assets/icons/LICENSE-bootstrap.txt`),
 /// scaled from its 16 grid by 22/16 and moved 1 in x and y so it keeps the 1 px padding, rounded
 /// to three decimals. Its source paths are `fill-rule="evenodd"`; each is one simple contour,

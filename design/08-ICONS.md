@@ -90,7 +90,8 @@ either style, with no stroke. Only permissively licensed sources ship.
 
 | Icon | Source | Licence | State |
 | --- | --- | --- | --- |
-| `Upload` | Bootstrap Icons 1.13.2 `cloud-upload`, converted the same way; its `evenodd` is dropped, each path being one simple contour | MIT, `LICENSE-bootstrap.txt` | shipped |
+| `Download` | quire's own drawing (2026-10-20, owner's pick of a reference style): an arrow with an open chevron head over a baseline, the solid glyph's silhouette | ours | shipped |
+| `Upload` | Bootstrap Icons 1.13.2 `cloud-upload`, scaled by 22/16 from its 16 grid and moved 1 unit so the 1 px padding holds; its `evenodd` is dropped, its `evenodd` is dropped, each path being one simple contour | MIT, `LICENSE-bootstrap.txt` | shipped |
 | `Sparkles` | Remix Icon 4.6.0 `sparkling-line`, verbatim (the Apache-2.0 release; later releases carry a restrictive licence, so the version is pinned) | Apache-2.0, `LICENSE-remixicon.txt` | shipped |
 | `LogOut` | SVG Repo download `logout-svgrepo-com.svg`, SVG Repo Mixer Tools, no author or licence in the file; its page could not be reached | unconfirmed | not shipped: the Lucide outline stays |
 | `Phone` | SVG Repo download `mobile-svgrepo-com.svg`, same family | unconfirmed | not shipped: the Lucide outline stays |

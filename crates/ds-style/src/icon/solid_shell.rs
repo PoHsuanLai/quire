@@ -270,7 +270,7 @@ const CAMERA: &[Shape] = &[Shape::Solid(
 )];
 
 /// quire's own drawing, the outline's silhouette at a 2.5 wide stroke: shaft, chevron, baseline.
-const DOWNLOAD: &[Shape] = &[
+pub(super) const DOWNLOAD: &[Shape] = &[
     Shape::Solid("M10.75 4.25A1.25 1.25 0 0 1 13.25 4.25V15H10.75Z"),
     Shape::Solid(
         "M5.116 10.884L11.116 16.884A1.25 1.25 0 0 0 12.884 16.884L18.884 10.884A1.25 1.25 0 0 0 17.116 9.116L12 14.232L6.884 9.116A1.25 1.25 0 0 0 5.116 10.884Z",
