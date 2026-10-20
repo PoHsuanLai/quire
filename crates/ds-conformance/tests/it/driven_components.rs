@@ -595,3 +595,23 @@ fn use_environment_does_not_panic_under_the_harness() {
     );
     let _ = std::fs::remove_dir_all(std::env::temp_dir().join("ds-blitz-harness-environment"));
 }
+
+#[test]
+fn removing_a_stop_takes_it_out_without_picking_it() {
+    let mut harness = Harness::new(
+        EditorApp,
+        HarnessConfig::new(Viewport {
+            height: 900,
+            ..VIEW
+        })
+        .with_clock(Clock::Virtual),
+    );
+    let before = harness.count(".ds-stop");
+    assert!(before > 1, "{}", harness.html());
+    harness.send(Input::click(centre(
+        &harness,
+        ".ds-stop:nth-child(2) .ds-button",
+    )));
+    assert_eq!(harness.count(".ds-stop"), before - 1, "{}", harness.html());
+    assert_eq!(harness.text_of(".probe-dot").as_deref(), Some("0"));
+}

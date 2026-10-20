@@ -3,16 +3,16 @@
 
 use super::{DotIndex, Picker, dot_index, edit};
 use crate::components::controls::button::Button;
+use crate::components::controls::button_model::{Bezel, ImagePosition};
 use crate::components::controls::chip::{Chip, ChipVariant};
+use crate::components::controls::press::Propagation;
 use crate::components::controls::slider::Slider;
 use crate::components::lists::section_header::SectionHeader;
-use crate::focus::click::kept_click;
 use dioxus::prelude::*;
 use ds_core::colour::contrast::Verdict;
 use ds_core::vocab::Fraction;
 use ds_style::appearance::theme::Scheme;
 use ds_style::icon::Icon;
-use ds_style::icon::render::{Glyph, IconSize};
 use ds_style::space::dot_paint::DotPaint;
 use ds_style::space::{
     look::{Grain, SpaceLook},
@@ -48,20 +48,20 @@ pub(super) fn Stops(
                     }
                     "{dot.hue.round()}°"
                     if removable {
-                        button {
-                            r#type: "button",
-                            class: "ds-stop-remove",
-                            "aria-label": "Remove colour",
+                        Button {
+                            bezel: Bezel::Toolbar,
+                            size: ControlSize::Mini,
+                            image: ImagePosition::Only,
+                            icon: Icon::X,
+                            label: "Remove colour",
+                            propagation: Propagation::Stop,
                             onclick: {
                                 let look = look.clone();
-                                move |event: Event<MouseData>| {
-                                    event.stop_propagation();
+                                move |_| {
                                     picker.pick(DotIndex(0));
                                     onchange.call(edit::removed(&look, index));
-                                    kept_click(&event);
                                 }
                             },
-                            Glyph { icon: Icon::X, size: IconSize::Micro }
                         }
                     }
                 }
