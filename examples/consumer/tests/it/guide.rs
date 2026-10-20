@@ -194,7 +194,7 @@ fn EmbeddedPalette() -> Element {
     rsx! {
         CommandPalette::<Hit> {
             label, placeholder, query, tokens: Vec::new(), groups, empty,
-            oninput: move |_: String| {}, onpick: move |_: Hit| {}, onclose: move |()| {},
+            oninput: move |_: String| {}, onpick: move |_: Hit| {}, onclose: move |_: PaletteClose| {},
             host: CommandPaletteHost::Surface,
             id: "launcher-card".to_string(),
             focus: field,
@@ -222,7 +222,7 @@ fn KeptPalette() -> Element {
         CommandPalette::<Hit> {
             label, placeholder, query: query(), tokens: Vec::new(), groups, empty,
             oninput: move |text: String| query.set(text),
-            onpick: move |_: Hit| {}, onclose: move |()| shown.set(Shown::Hidden),
+            onpick: move |_: Hit| {}, onclose: move |_: PaletteClose| shown.set(Shown::Hidden),
             host: CommandPaletteHost::Surface,
             shown: shown(),
         }
@@ -251,7 +251,7 @@ fn ActionsKey() -> Element {
             },
             CommandPalette::<Hit> {
                 label, placeholder, query, tokens: Vec::new(), groups, empty,
-                oninput: move |_: String| {}, onpick: move |_: Hit| {}, onclose: move |()| {},
+                oninput: move |_: String| {}, onpick: move |_: Hit| {}, onclose: move |_: PaletteClose| {},
                 focus: field,
                 onkey: move |event: KeyboardEvent| if is_actions(&event) {
                     event.prevent_default();
