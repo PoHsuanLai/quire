@@ -74,6 +74,7 @@ mod pop_up_menu_focus;
 mod pop_up_start;
 mod popover_dismiss;
 mod popup_root;
+mod preset_swatches;
 mod press_phase;
 mod progress_indicator;
 mod pull_down_button;

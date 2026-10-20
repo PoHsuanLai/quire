@@ -51,6 +51,12 @@
 .ds-preset-swatches{ display:flex; flex-wrap:wrap; justify-content:flex-end; gap:var(--s-8); }
 .ds-preset-swatches .ds-preset{ width:24px; height:24px; }
 .ds-preset-swatches .ds-preset[*|aria-checked=true]{ box-shadow:0 0 0 2px var(--surface), 0 0 0 4px var(--accent); }
+/* Custom: the hue wheel's colours while no look of its own is set (then it wears the look, inline);
+   its popover is the editor's colour at a quarter less, the field 120 px tall in a 240 px card. */
+.ds-preset-custom:not([*|data-stops]){
+  background:linear-gradient(135deg,var(--swatch-red) 0%,var(--swatch-yellow) 25%,var(--swatch-green) 50%,var(--swatch-blue) 75%,var(--swatch-purple) 100%); }
+.ds-custom-colour{ width:240px; padding:var(--s-12); gap:var(--s-10); }
+.ds-custom-colour .ds-field{ height:120px; }
 .ds-preset{
   width:22px; height:22px; box-sizing:border-box; border-radius:var(--r-pill); border:var(--hair) solid var(--line); cursor:default; padding:0;
 }
