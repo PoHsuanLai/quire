@@ -552,6 +552,7 @@ fn a_form_card_draws_a_labelled_input_per_field_and_its_submit() {
             "(optional)",
             ">Invoice<",
             ">Continue<",
+            "class=\"ds-chip-press\" aria-pressed=\"false\"",
         ],
     );
 }

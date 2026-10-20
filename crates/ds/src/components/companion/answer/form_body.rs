@@ -4,13 +4,12 @@
 use crate::components::companion::form::model::{
     FieldKeyId, FieldNeed, FormField, FormInput, FormValue,
 };
-use crate::components::controls::button::Button;
+use crate::components::controls::chip::{Chip, ChipVariant};
 use crate::components::fields::text_field::TextField;
 use crate::components::fields::text_field_model::{FieldKind, FieldRows};
 use dioxus::prelude::*;
 use ds_core::vocab::Check;
 use ds_core::word::Word;
-use ds_style::tokens::control_size::ControlSize;
 
 /// The text a field holds, for an input that types.
 fn typed(value: &FormValue) -> String {
@@ -122,7 +121,7 @@ fn FieldInput(field: FormField, on_edit: EventHandler<(FieldKeyId, FormValue)>) 
     }
 }
 
-/// One toggle button per choice, the picked one pressed in.
+/// One pressable chip per choice, the picked one pressed in.
 #[component]
 fn Picks(
     field: FormField,
@@ -134,12 +133,12 @@ fn Picks(
     rsx! {
         div { class: "ds-card-form-picks", role: "group", "aria-label": "{field.label}",
             for (key , label) in choices {
-                Button {
+                Chip {
                     key: "{key}",
-                    label,
-                    size: ControlSize::Small,
-                    value: Some(pressed(current.as_deref(), &key)),
-                    onclick: {
+                    variant: ChipVariant::Neutral,
+                    text: label,
+                    pressed: Some(pressed(current.as_deref(), &key)),
+                    onpress: {
                         let field_key = field.key.clone();
                         move |_| on_edit.call((field_key.clone(), kind.value(key.clone())))
                     },
