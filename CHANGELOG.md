@@ -3,6 +3,36 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.35
+
+Two API changes, three pin moves and a print fix. Consumers move their whole pin block with this
+release (blitz, blitz-kit, chordkit; the vello fork patches are unchanged), then move their quire tag
+and relock. Every crate that links ds-style must take the same quire commit.
+
+**Pins**
+- blitz fork 851fa7dd (from 4b236792): a nowrap line that overflows a clipping block ends with its
+  ellipsis (`text-overflow: ellipsis`), at fractional scales, with ligatures, selections and table
+  cells.
+- blitz-kit 878dc799 (the same Blitz), chordkit eb0deff (a default that collides gives way to its
+  declared fallback when the fallback is free; both taken still refuses).
+
+**API changes**
+- `CommandPalette`'s `onclose` takes a `PaletteClose::{Escape, Outside, Pick}`, so a consumer can
+  close a whole bar on Escape and only dismiss on a click outside. A caller that does not care
+  writes `|_| ...` instead of `|()| ...` (#44). A palette in a `CommandPaletteHost::Surface` never
+  reports `Outside`.
+- `ds_blitz::clipboard` reaches the primary selection: `ClipboardTarget::{Clipboard, Primary}` on
+  `read_from` and `write_to`; the harness keeps the selection in memory (`Harness::primary_text`)
+  (#45).
+
+**ds-blitz**
+- Print and PDF: a glyph in a bitmap-only colour face (`sbix`, `CBDT`, as Ubuntu's Noto Color Emoji
+  and every Mac's emoji) is written as its picture, so a printout with an emoji no longer fails
+  (#50).
+
+**design**
+- design/22: the `widgets` section is retired; its six keys are ignored where a file still has them.
+
 ## v0.3.34
 
 The type-audit wave, the Mac batch, and four pin moves. Consumers change their whole pin block with
