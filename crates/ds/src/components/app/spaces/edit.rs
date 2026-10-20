@@ -3,6 +3,7 @@
 use super::controller::SpacesHandle;
 use crate::components::app::space_editor::DotIndex;
 use crate::components::app::space_editor::colour::SpaceColour;
+use crate::components::content::label::{Label, LabelStyle};
 use crate::components::controls::button::Button;
 use crate::components::controls::button_model::Answers;
 use crate::components::fields::field_row::FieldRow;
@@ -78,7 +79,9 @@ where
             onclose: cancel,
             on_return: save,
             div { class: "ds-space-edit",
-                h2 { class: "ds-space-edit-title", "Edit Space" }
+                div { class: "ds-space-edit-title",
+                    Label { text: "Edit Space", style: LabelStyle::Title }
+                }
                 Form {
                     FormSection {
                         FieldRow { label: "Name",
