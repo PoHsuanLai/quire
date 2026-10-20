@@ -72,9 +72,16 @@ impl PageTable {
             .map(|page| page.id.clone())
     }
 
+    /// The declaration `page` names, through its aliases: `Page::App("Software Update")` is the
+    /// `software-update` page.
+    pub fn declared(&self, page: &Page) -> Option<&PageDecl> {
+        self.resolve(page.id().as_str())
+            .and_then(|id| self.get(&id))
+    }
+
     /// Whether `page` is declared.
     pub fn status(&self, page: &Page) -> PageStatus {
-        match self.get(&page.id()) {
+        match self.declared(page) {
             Some(_) => PageStatus::Declared,
             None => PageStatus::Unknown,
         }
@@ -82,7 +89,7 @@ impl PageTable {
 
     /// The title of `page`: the declared one, else its label.
     pub fn title_of(&self, page: &Page) -> PageTitle {
-        self.get(&page.id()).map_or_else(
+        self.declared(page).map_or_else(
             || PageTitle(page.label().to_owned()),
             |decl| decl.title.clone(),
         )
@@ -99,7 +106,7 @@ mod tests {
             id: PageId::new("wallpaper"),
             title: PageTitle("Backdrop".to_owned()),
             symbol: PageSymbol("image".to_owned()),
-            order: PageOrder(25),
+            order: PageOrder(85),
             aliases: Vec::new(),
         }
     }
@@ -129,6 +136,10 @@ mod tests {
             ("mouse_and_gestures", Some("mouse-and-gestures")),
             (" wallpaper ", Some("wallpaper")),
             ("app:wifi", Some("wifi")),
+            ("Software Update", Some("software-update")),
+            ("app:Software Update", Some("software-update")),
+            ("Assistant Model", Some("assistant-model")),
+            ("assistant_model", Some("assistant-model")),
             ("nowhere", None),
             ("", None),
         ];
@@ -144,7 +155,7 @@ mod tests {
         assert_eq!(table.title_of(&Page::declared("wallpaper")).0, "Backdrop");
         let ids: Vec<&str> = table.pages().iter().map(|page| page.id.as_str()).collect();
         let at = |id: &str| ids.iter().position(|found| *found == id);
-        assert!(at("wallpaper") > at("appearance") && at("wallpaper") < at("displays"));
+        assert!(at("wallpaper") > at("displays") && at("wallpaper") < at("spaces"));
         assert_eq!(
             table.status(&Page::declared("not-declared")),
             PageStatus::Unknown

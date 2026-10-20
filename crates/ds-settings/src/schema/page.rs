@@ -119,7 +119,7 @@ impl Page {
     pub fn label(&self) -> &str {
         match self {
             Page::Appearance => "Appearance",
-            Page::Dock => "Dock",
+            Page::Dock => "Desktop & Dock",
             Page::MouseAndGestures => "Mouse & Gestures",
             Page::KeyboardAndShortcuts => "Keyboard & Shortcuts",
             Page::Notifications => "Notifications",
@@ -143,7 +143,7 @@ mod tests {
     fn a_fixed_page_is_labelled_as_settings_names_it_and_keeps_its_wire_form() {
         const CASES: &[(Page, &str, &str, &str)] = &[
             (Page::Appearance, "Appearance", "appearance", "appearance"),
-            (Page::Dock, "Dock", "dock", "dock"),
+            (Page::Dock, "Desktop & Dock", "dock", "dock"),
             (
                 Page::MouseAndGestures,
                 "Mouse & Gestures",

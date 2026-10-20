@@ -503,7 +503,7 @@ The client-decorated window frame (design/13 §13.3.11, design/04 "Window frame"
 
 | Key | Type | Default | Range / Alt | Source | Status |
 | --- | --- | --- | --- | --- | --- |
-| `window.move_threshold_px` | `Px` | `4` | `1..=16` | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
+| `window.move_threshold_px` | `Px` | `4` | `1..=16`; read only by the desktop widget grid drag, not by window frames | `13-BEHAVIOUR-menus-windows.md#13-3-11-window-frame-our-client-decorated-windows-settled-2026-09-25` | proposed |
 
 ### 3.19 `session` (sill/settings.toml)
 
@@ -697,7 +697,7 @@ The summon and the confirmation. Page Intelligence, sections Companion and Confi
 | `companion.double_tap_ms` | `Ms` | `350` | `150..=600`; conf L: tuned against a real keyboard | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 | `companion.app_wait_ms` | `Ms` | `80` | `40..=500`; how long the focused app has to take a summon into its own prompt before the launcher opens instead (Advanced) | design/32 section 4.1; sill-model companion/summon.rs | proposed (agent stack, 2026-10-06) |
 | `companion.notify` | `NotifyWhen::{NeedsYou,Never}` | `NeedsYou` | a toggle: "Notify when it needs you" | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
-| `companion.confirm_arm_ms` | `Ms` | `500` | `300..=1500`; the buttons of a confirmation wait this long (QUESTIONS U6) | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
+| `companion.confirm_arm_ms` | `Ms` | `600` | `500..=1500`; the buttons of a confirmation, the permission sheet and the display trial wait this long. The floor is 500 because the compositor refuses answers sooner (QUESTIONS U6) | ux.md section 3.7 | proposed (companion freeze, 2026-10-02) |
 
 
 ### 3.31 `viewer` (anyview, `$XDG_CONFIG_HOME/anyview/settings.toml`)

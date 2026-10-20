@@ -13,7 +13,7 @@ use crate::schema::KeyPath;
 use crate::store::Store;
 use ds_helpers::{NewFileMode, UpdateError, update_atomic};
 use std::path::{Path, PathBuf};
-use toml_edit::{DocumentMut, Item, Table, TableLike, Value};
+use toml_edit::{DocumentMut, InlineTable, Item, Table, TableLike, Value};
 
 /// The writer of one TOML settings file.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -42,14 +42,20 @@ impl SettingsWriter {
 
     /// Sets `key` (a dotted path) to `value`, making the tables on the way, and leaves every
     /// other byte of the file as it was. The key keeps its place, spacing and trailing comment
-    /// when it is already there. The read, the edit and the write happen under the file's lock
-    /// ([`ds_helpers::update_atomic`]): a crash cannot leave half a file and a directory watch
-    /// sees one rename.
+    /// when it is already there. A table value is written as an inline table
+    /// (`consent = { given = 1760000000 }`). The read, the edit and the write happen under the
+    /// file's lock ([`ds_helpers::update_atomic`]): a crash cannot leave half a file and a
+    /// directory watch sees one rename.
     ///
-    /// A file that is there and cannot be used, or is not valid TOML, is left alone and reported.
-    /// A directory that is not there is made.
+    /// A file that is there and cannot be used, or is not valid TOML, or a key under a value that
+    /// is not a table, is left alone and reported. A directory that is not there is made.
     pub fn patch(&self, key: &KeyPath, value: &toml::Value) -> Result<(), SettingsError> {
-        let new = parse_value(value).map_err(|reason| self.refuse(reason))?;
+        self.patch_all(&[(key.clone(), value.clone())])
+    }
+
+    /// Applies every edit, in order, under one lock and in one atomic write. If any edit fails
+    /// nothing is written.
+    pub fn patch_all(&self, edits: &[(KeyPath, toml::Value)]) -> Result<(), SettingsError> {
         if let Some(dir) = self.path.parent() {
             std::fs::create_dir_all(dir).map_err(|source| SettingsError::Io {
                 path: dir.to_path_buf(),
@@ -57,7 +63,7 @@ impl SettingsWriter {
             })?;
         }
         let update = update_atomic(&self.path, SETTINGS_CAP, NewFileMode::Umask, |existing| {
-            self.edited(existing.as_deref().unwrap_or_default(), key, new)
+            self.edited(existing.as_deref().unwrap_or_default(), edits)
         });
         match update {
             Ok(()) => Ok(()),
@@ -68,18 +74,24 @@ impl SettingsWriter {
         }
     }
 
-    /// `text` with `key` set to `value`.
-    fn edited(&self, text: &str, key: &KeyPath, value: Value) -> Result<String, SettingsError> {
+    /// `text` with every edit applied.
+    fn edited(
+        &self,
+        text: &str,
+        edits: &[(KeyPath, toml::Value)],
+    ) -> Result<String, SettingsError> {
         let mut doc: DocumentMut = text
             .parse()
             .map_err(|e: toml_edit::TomlError| self.refuse(e.message().to_owned()))?;
-        let parts: Vec<&str> = key.0.split('.').collect();
-        if parts.iter().any(|part| part.is_empty()) {
-            return Err(self.refuse(format!("{:?} is not a key path", key.0)));
+        for (key, value) in edits {
+            let parts: Vec<&str> = key.0.split('.').collect();
+            if parts.iter().any(|part| part.is_empty()) {
+                return Err(self.refuse(format!("{:?} is not a key path", key.0)));
+            }
+            set(doc.as_table_mut(), &parts, to_edit(value)).map_err(|()| {
+                self.refuse(format!("{} sits inside a value that is not a table", key.0))
+            })?;
         }
-        set(doc.as_table_mut(), &parts, value).map_err(|()| {
-            self.refuse(format!("{} sits inside a value that is not a table", key.0))
-        })?;
         Ok(doc.to_string())
     }
 
@@ -91,12 +103,26 @@ impl SettingsWriter {
     }
 }
 
-/// `value` as a TOML value that can sit in a document, or why it cannot.
-fn parse_value(value: &toml::Value) -> Result<Value, String> {
-    value
-        .to_string()
-        .parse()
-        .map_err(|e: toml_edit::TomlError| e.message().to_owned())
+/// `value` as a document value; a table becomes an inline table.
+fn to_edit(value: &toml::Value) -> Value {
+    match value {
+        toml::Value::String(text) => Value::from(text.as_str()),
+        toml::Value::Integer(number) => Value::from(*number),
+        toml::Value::Float(number) => Value::from(*number),
+        toml::Value::Boolean(flag) => Value::from(*flag),
+        toml::Value::Datetime(when) => when
+            .to_string()
+            .parse()
+            .unwrap_or_else(|_| Value::from(when.to_string())),
+        toml::Value::Array(items) => Value::Array(items.iter().map(to_edit).collect()),
+        toml::Value::Table(table) => {
+            let mut inline = InlineTable::new();
+            for (name, item) in table {
+                inline.insert(name, to_edit(item));
+            }
+            Value::InlineTable(inline)
+        }
+    }
 }
 
 /// Sets `path` in `table` (a real or inline table), making the tables on the way. The key stays
