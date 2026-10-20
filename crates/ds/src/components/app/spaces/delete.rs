@@ -8,7 +8,7 @@ use crate::components::overlays::alert_model::{AlertButton, AlertRole, AlertStyl
 use dioxus::prelude::*;
 use ds_style::space::list::SpaceId;
 
-/// The question, naming the Space, and what stays, drawn as every other question that cannot be
+/// The question, naming the Space, and what is not deleted, drawn as every other question that cannot be
 /// undone is: a critical [`Alert`]. Cancel, the safe default, takes the keyboard as it opens, so
 /// Return cancels, and Escape presses it. Only Delete deletes. Nothing is offered for the last
 /// Space, whose menu has no Delete row. `kept` names what is not deleted; `on_deleted` hears the
