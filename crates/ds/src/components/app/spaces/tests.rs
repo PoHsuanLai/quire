@@ -207,7 +207,10 @@ fn the_delete_question_names_the_space_and_what_is_kept() {
     for &(name, title) in CASES {
         let (said, body) = delete_words(name, "Your mail");
         assert_eq!(said, title);
-        assert!(body.starts_with("Your mail is not affected"), "{body}");
+        assert!(
+            body.starts_with("Your mail won\u{2019}t be deleted"),
+            "{body}"
+        );
     }
 }
 

@@ -13,23 +13,23 @@ fn words(why: &RefusedView) -> (String, String) {
     match why {
         RefusedView::NeedsCloud { class } => (
             "This needs a cloud model".to_owned(),
-            format!("Your {class} would leave this computer. You can allow it just this once."),
+            format!("Your {class} would leave this computer. You can allow it once."),
         ),
         RefusedView::NotAllowed { what } => (
             "Not allowed".to_owned(),
-            format!("{what} is not allowed here."),
+            format!("{what} isn’t allowed here."),
         ),
         RefusedView::NoWay { app } => (
-            format!("Can't do that in {app}"),
+            format!("Can’t do that in {app}"),
             format!(
                 "{app} offers no way to do it directly, and controlling it by sight is turned off."
             ),
         ),
         RefusedView::OverBudget => (
             "Limit reached".to_owned(),
-            "The limit you set for this has been used up.".to_owned(),
+            "You’ve used up the limit you set.".to_owned(),
         ),
-        RefusedView::Failed { why } => ("That didn't work".to_owned(), why.clone()),
+        RefusedView::Failed { why } => ("That didn’t work".to_owned(), why.clone()),
     }
 }
 

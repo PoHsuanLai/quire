@@ -113,8 +113,6 @@ pub fn delete_words(name: &str, kept: &str) -> (String, String) {
     };
     (
         format!("Delete {named}?"),
-        format!(
-            "{kept} is not affected. Only {named}\u{2019}s look and settings go. This cannot be undone."
-        ),
+        format!("{kept} won\u{2019}t be deleted. This can\u{2019}t be undone."),
     )
 }
