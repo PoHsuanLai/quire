@@ -89,8 +89,8 @@ pub(crate) fn problem_text(problem: FieldProblem) -> String {
     let label = field_label(problem.role).to_lowercase();
     match problem.kind {
         ProblemKind::Missing => format!("Enter the {label}."),
-        ProblemKind::Refused => format!("The {label} was not accepted. Check it and try again."),
-        ProblemKind::Invalid => format!("The {label} is not valid. Check it and try again."),
+        ProblemKind::Refused => format!("The {label} wasn’t accepted. Check it and try again."),
+        ProblemKind::Invalid => format!("The {label} isn’t valid. Check it and try again."),
     }
 }
 
@@ -122,10 +122,10 @@ pub(crate) fn limitation(limit: Limitation) -> &'static str {
         Limitation::AppFolderOnly => "Only files this desktop created.",
         Limitation::ProviderOffersNone => "The provider offers no access to this.",
         Limitation::AdminConsent => "Your organisation's administrator has to allow this first.",
-        Limitation::UnverifiedBuild => "The provider has not verified this app yet.",
+        Limitation::UnverifiedBuild => "The provider hasn’t verified this app yet.",
         Limitation::TurnedOff => "Turned off for this account.",
-        Limitation::NotOnServer => "This server does not have it.",
-        Limitation::SevenDays => "Signing in lasts seven days; you will be asked again.",
+        Limitation::NotOnServer => "This server doesn’t have it.",
+        Limitation::SevenDays => "Signing in lasts seven days; you’ll be asked again.",
         Limitation::UntilPasswordChange => "Signing in lasts until the password changes.",
     }
 }
@@ -134,29 +134,29 @@ pub(crate) fn limitation(limit: Limitation) -> &'static str {
 /// `provider` is its mark, when the host knows it.
 pub(crate) fn fault(fault: SignInFault, label: &str, provider: Option<MarkProvider>) -> String {
     let text = match fault {
-        SignInFault::Refused => "The provider did not accept what was entered.",
+        SignInFault::Refused => "The provider didn’t accept that.",
         SignInFault::Unreachable => {
-            "The server could not be reached. Check the address and your connection."
+            "The server couldn’t be reached. Check the address and your connection."
         }
-        SignInFault::Unreadable => "The server answered in a way this desktop cannot read.",
+        SignInFault::Unreadable => "This desktop can’t read the server’s answer.",
         SignInFault::NeedsClientId => match provider {
             Some(MarkProvider::Google) => "Google sign-in needs a client id: see docs/google.md",
             _ => {
-                "This build is not registered with the provider. Add a client id in Settings, under Accounts."
+                "This build isn’t registered with the provider. Add a client id in Settings, under Accounts."
             }
         },
-        SignInFault::TimedOut => "Signing in took too long and was stopped.",
+        SignInFault::TimedOut => "Signing in timed out.",
         SignInFault::Cancelled => "Signing in was cancelled.",
-        SignInFault::Forbidden => "Your organisation or the provider does not allow this.",
-        SignInFault::StoreFailed => "Signed in, but the account could not be saved.",
+        SignInFault::Forbidden => "Your organisation or the provider doesn’t allow this.",
+        SignInFault::StoreFailed => "Signed in, but the account couldn’t be saved.",
         SignInFault::AlreadyAdded => "This account is already added.",
-        SignInFault::NotRunning => "Tailscale isn't running on this computer.",
+        SignInFault::NotRunning => "Tailscale isn’t running on this computer.",
         SignInFault::SignedOut => "Tailscale is signed out.",
         SignInFault::NotAllowed => {
-            "This computer's Tailscale doesn't let your accounts ask it yet."
+            "This computer’s Tailscale doesn’t let your accounts ask it yet."
         }
         SignInFault::NoLauncher => return format!("No app is set up to sign {label} in"),
-        SignInFault::NotInstalled => return format!("{label} isn't installed"),
+        SignInFault::NotInstalled => return format!("{label} isn’t installed"),
     };
     text.to_owned()
 }
@@ -453,12 +453,12 @@ mod tests {
         let cases = [
             (
                 SignInFault::NotRunning,
-                "Tailscale isn't running on this computer.",
+                "Tailscale isn’t running on this computer.",
             ),
             (SignInFault::SignedOut, "Tailscale is signed out."),
             (
                 SignInFault::NotAllowed,
-                "This computer's Tailscale doesn't let your accounts ask it yet.",
+                "This computer’s Tailscale doesn’t let your accounts ask it yet.",
             ),
         ];
         for (kind, want) in cases {
@@ -479,7 +479,7 @@ mod tests {
         );
         for provider in [None, Some(MarkProvider::Imap)] {
             let other = fault(SignInFault::NeedsClientId, "Ada", provider);
-            assert!(other.starts_with("This build is not registered"), "{other}");
+            assert!(other.starts_with("This build isn’t registered"), "{other}");
         }
     }
 
@@ -491,7 +491,7 @@ mod tests {
         );
         assert_eq!(
             fault(SignInFault::NotInstalled, "Claude", None),
-            "Claude isn't installed"
+            "Claude isn’t installed"
         );
     }
 
@@ -501,7 +501,7 @@ mod tests {
             (
                 FieldRole::Password,
                 ProblemKind::Refused,
-                "The password was not accepted. Check it and try again.",
+                "The password wasn’t accepted. Check it and try again.",
             ),
             (
                 FieldRole::Address,
@@ -511,12 +511,12 @@ mod tests {
             (
                 FieldRole::AppPassword,
                 ProblemKind::Refused,
-                "The app password was not accepted. Check it and try again.",
+                "The app password wasn’t accepted. Check it and try again.",
             ),
             (
                 FieldRole::OutgoingPort,
                 ProblemKind::Invalid,
-                "The outgoing port is not valid. Check it and try again.",
+                "The outgoing port isn’t valid. Check it and try again.",
             ),
         ];
         for (role, kind, want) in cases {
