@@ -3,6 +3,51 @@
 Quire has published its release notes as the tag message. This file keeps them in the tree, newest
 first, with what a consumer has to change.
 
+## v0.3.34
+
+The type-audit wave, the Mac batch, and four pin moves. Consumers change their whole pin block with
+this release: the vello fork patches (`docs/fork-patches.toml`, `scripts/fork-patches.sh check`),
+blitz-kit, chordkit and latchkey. Then they move their quire tag and relock. Every crate
+that links ds-style must take the same quire commit. Two copies panic at runtime with
+"Could not find context Signal<Scope>".
+
+**Pins**
+- vello fork 84b2c9f7 (from 3e43d4af): bitmap colour glyphs (`sbix`, `CBDT`) draw on both backends;
+  vello_hybrid no longer panics on them, and glifo's `png` feature is on.
+- blitz-kit f0e9dc3 (one `Scale120`, `Elapsed`), chordkit 7b80edd (keycap 52c66c7, protocol v3,
+  through its lock), latchkey b10ae1b.
+
+**API changes (type audit)**
+- Removed: `KeysHost`, `DocumentHost::keys`, `KeyExtras`, `RawKey::unshifted`; the deprecated
+  `command_keys` and `is_command`; `PendingStyle`; `SheetScale` (the widths are on `SheetSize`);
+  the one-variant `Trailing` (`Button.trailing` is `Option<Icon>`); `Landing` in focus (internals
+  take `Option<InitialCaret>`); the span module (`Stamp::after_span`).
+- Renamed or merged: `SizeToken` replaces its per-size variants; one `SidebarToken` replaces
+  `SidebarRowSize` and `SidebarTileSize`; `WeightRange` and `EffectActivity` replace the font range
+  and the symbol effect's activity; `CapabilityName` and `ToolPresence` in ds-helpers; one
+  `SenderName` and `Verdict` in ds-peer (re-exported at the old paths).
+- Typed values: `Stamp::after` takes `Ms`; `PendingSpec` is an enum; `EasingToken::easing` takes no
+  motion level; `Driver`, `DocQuery` and `Query` are methods on `Harness`; the switcher machine is its
+  `Phase`; ds-blitz binding, run and surface states are enums.
+
+**ds**
+- Spaces: Delete Space asks in a critical Alert (#38).
+- PresetSwatches: a Space's colour as one row of the eight presets (#30).
+- TextField: the placeholder goes while an input method composes (#33); a secure field keeps its
+  focus ring whole while typing (#32); a plain field marks a rejected value in the danger ink with
+  a line under it, with its message as `aria-description` (#37).
+- Row: a source list's selection is the neutral wash, focused or not (#34).
+- Search card: the command palette's launcher scale (#28).
+
+**ds-blitz**
+- `use_content_fit`: a window as tall as its content (#29).
+- `system_key_source(platform, lookup)` and `KeySource`: an app takes the desktop's keymap and
+  follows it.
+- Colour emoji fall back to a bitmap face where the system has no vector one, as on every Mac (#36).
+
+**ds-settings**
+- On macOS, System follows the Mac's appearance, reduced motion and contrast (#31).
+
 ## v0.3.33
 
 Two menu fixes; no public API change and no pin moves (blitz stays at 4b236792). Consumers move their
