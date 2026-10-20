@@ -4,7 +4,9 @@
 
 use dioxus::prelude::*;
 use ds::prelude::*;
-use ds_blitz::clipboard::{ClipboardError, read_text, write_text};
+use ds_blitz::clipboard::{
+    ClipboardError, ClipboardTarget, read_from, read_text, write_text, write_to,
+};
 use ds_harness::{Clock, Harness, HarnessConfig, Input, Viewport};
 use std::time::Duration;
 
@@ -31,6 +33,7 @@ fn Fields() -> Element {
     let mut from = use_signal(|| "hello quire".to_owned());
     let mut to = use_signal(String::new);
     let mut pasted = use_signal(String::new);
+    let mut primary = use_signal(String::new);
     rsx! {
         Ds { appearance: Appearance::default(), material: Material::Sheet,
             div { style: "display:flex; flex-direction:column; gap:12px; width:300px; padding:12px",
@@ -46,6 +49,14 @@ fn Fields() -> Element {
                     Button { label: "Copy address",
                         onclick: move |_| { let _ = write_text("ada@example.org"); } }
                 }
+                div { id: "select", style: "display:flex",
+                    Button { label: "Select address",
+                        onclick: move |_| { let _ = write_to(ClipboardTarget::Primary, "primary text"); } }
+                }
+                div { id: "paste-primary", style: "display:flex",
+                    Button { label: "Paste selection",
+                        onclick: move |_| primary.set(read_from(ClipboardTarget::Primary).unwrap_or_else(|e| format!("error: {e:?}"))) }
+                }
                 div { id: "paste", style: "display:flex",
                     Button { label: "Paste",
                         onclick: move |_| pasted.set(read_text().unwrap_or_else(|e| format!("error: {e:?}"))) }
@@ -53,6 +64,7 @@ fn Fields() -> Element {
             }
             p { class: "to", {to()} }
             p { class: "pasted", {pasted()} }
+            p { class: "primary", {primary()} }
         }
     }
 }
@@ -96,4 +108,29 @@ fn the_apps_write_and_read_reach_the_same_clipboard() {
 #[test]
 fn outside_a_document_there_is_no_clipboard() {
     assert_eq!(read_text(), Err(ClipboardError::NoHost));
+}
+
+#[test]
+fn the_primary_selection_and_the_clipboard_are_separate_slots() {
+    let mut harness = Harness::new(Fields, HarnessConfig::new(VIEW).with_clock(Clock::Virtual));
+    let copy = centre(&harness, "#copy .ds-button");
+    harness.send(Input::click(copy));
+    assert_eq!(
+        harness.primary_text(),
+        None,
+        "a copy leaves the selection alone"
+    );
+
+    let select = centre(&harness, "#select .ds-button");
+    harness.send(Input::click(select));
+    assert_eq!(harness.primary_text().as_deref(), Some("primary text"));
+    assert_eq!(
+        harness.clipboard_text().as_deref(),
+        Some("ada@example.org"),
+        "a selection write leaves the clipboard alone"
+    );
+
+    let paste = centre(&harness, "#paste-primary .ds-button");
+    harness.send(Input::click(paste));
+    assert_eq!(harness.text_of(".primary").as_deref(), Some("primary text"));
 }

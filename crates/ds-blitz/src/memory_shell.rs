@@ -1,4 +1,4 @@
-//! The headless document's shell: a clipboard in memory (text and HTML), so a harness test
+//! The headless document's shell: a clipboard in memory (text and HTML) and a primary selection, so a harness test
 //! copies from one field and pastes into another, and reads what a copy wrote, without the
 //! desktop's clipboard; and the IME requests an edit surface makes, so a test sees them. Nothing
 //! else a shell does (a cursor, a title, a redraw) has anywhere to go headless.
@@ -13,6 +13,7 @@ use std::sync::{Mutex, PoisonError};
 pub struct MemoryShell {
     clipboard: Mutex<Option<String>>,
     html: Mutex<Option<String>>,
+    primary: Mutex<Option<String>>,
     ime: Mutex<ImeState>,
 }
 
@@ -28,6 +29,7 @@ impl Default for MemoryShell {
         MemoryShell {
             clipboard: Mutex::new(None),
             html: Mutex::new(None),
+            primary: Mutex::new(None),
             ime: Mutex::new(ImeState {
                 switch: ImeSwitch::Off,
                 area: None,
@@ -61,6 +63,16 @@ impl MemoryShell {
     pub fn put_html(&self, html: String, text: String) {
         *lock(&self.clipboard) = Some(text);
         *lock(&self.html) = Some(html);
+    }
+
+    /// What was last put on the primary selection, if anything.
+    pub fn primary_text(&self) -> Option<String> {
+        lock(&self.primary).clone()
+    }
+
+    /// Put `text` on the primary selection, as a selection in another app would.
+    pub fn put_primary(&self, text: String) {
+        *lock(&self.primary) = Some(text);
     }
 
     /// Whether the document has the IME on.

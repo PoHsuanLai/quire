@@ -938,6 +938,10 @@ winit at the pinned rev is 0.31.0-beta.3. What the client-drawn frame relies on,
   `arboard` in the fork's root `Cargo.toml` (the fork commit 15ead74d added it), after which the
   lock loses `wl-clipboard-rs`. Until then the build contains the backend but quire's own reads do
   not depend on it.
+- **The primary selection** is `ClipboardTarget::Primary` on `ds_blitz::clipboard::{read_from, write_to}` (a terminal's OSC 52 `p`).
+  Linux reaches it through arboard's `LinuxClipboardKind::Primary` (`clipboard/primary.rs`), so on Wayland it goes through
+  XWayland like the regular clipboard and is not shared with native Wayland clients; other platforms read nothing and refuse a
+  write, never falling back to the regular clipboard. The harness keeps it in memory (`Harness::primary_text`).
 - **Reads are bounded (QUIRE-08).** `ds_blitz::clipboard` reads on a worker thread (`clipboard/read.rs`):
   the UI waits at most 500 ms, takes at most 16 MiB, and starts no second read while one is stuck.
   An owner that is slow, silent or huge reads as an empty clipboard. Still open: the `EditHost::paste`

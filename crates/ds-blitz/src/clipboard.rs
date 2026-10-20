@@ -16,6 +16,7 @@
 //! selection with the window's own connection and does not use the privileged data-control
 //! protocol (FINDINGS "Clipboard"), which would let a client read the clipboard unfocused.
 
+mod primary;
 mod read;
 
 use self::read::Reader;
@@ -45,15 +46,40 @@ pub enum ClipboardError {
     NoShell,
 }
 
+/// Which selection a read or write reaches.
+///
+/// The regular clipboard is what Copy and Paste use. The primary selection is the text last
+/// selected, pasted by a middle click, on X11 and (where the compositor has it) Wayland; a
+/// terminal's OSC 52 `p` writes it. A platform with no primary selection answers
+/// [`ClipboardError::Unavailable`] to a write and nothing to a read: it never falls back to the
+/// regular clipboard, which would replace what the person copied.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
+#[non_exhaustive]
+pub enum ClipboardTarget {
+    /// The regular clipboard.
+    #[default]
+    Clipboard,
+    /// The primary selection.
+    Primary,
+}
+
 /// A clipboard a document's app and its edit surfaces read and write.
 pub trait Clipboard {
-    /// The text on the clipboard.
-    fn read_text(&self) -> Option<String>;
+    /// The text on `target`.
+    fn read_from(&self, target: ClipboardTarget) -> Option<String>;
+    /// Put `text` on `target`, or say why it was not put.
+    fn write_to(&self, target: ClipboardTarget, text: &str) -> Result<(), ClipboardError>;
+    /// The text on the regular clipboard.
+    fn read_text(&self) -> Option<String> {
+        self.read_from(ClipboardTarget::Clipboard)
+    }
     /// What a paste inserts: the HTML with its plain text when the clipboard has HTML, else the
     /// text.
     fn read_html(&self) -> Option<Pasted>;
-    /// Put `text` on the clipboard, or say why it was not put.
-    fn write_text(&self, text: &str) -> Result<(), ClipboardError>;
+    /// Put `text` on the regular clipboard, or say why it was not put.
+    fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
+        self.write_to(ClipboardTarget::Clipboard, text)
+    }
 }
 
 /// The desktop's clipboard, through the window's shell: the shell is reached once the window's
@@ -83,9 +109,26 @@ impl System {
 }
 
 impl Clipboard for System {
-    fn read_text(&self) -> Option<String> {
-        let shell = self.shell()?;
-        self.reader.text(move || shell.get_clipboard_text().ok())
+    fn read_from(&self, target: ClipboardTarget) -> Option<String> {
+        match target {
+            ClipboardTarget::Clipboard => {
+                let shell = self.shell()?;
+                self.reader.text(move || shell.get_clipboard_text().ok())
+            }
+            ClipboardTarget::Primary => self.reader.text(primary::read),
+        }
+    }
+
+    fn write_to(&self, target: ClipboardTarget, text: &str) -> Result<(), ClipboardError> {
+        let text = text.to_owned();
+        match target {
+            ClipboardTarget::Clipboard => {
+                let shell = self.shell().ok_or(ClipboardError::NoShell)?;
+                guarded(move || shell.set_clipboard_text(text).ok())
+            }
+            ClipboardTarget::Primary => guarded(move || primary::write(&text).ok()),
+        }
+        .ok_or(ClipboardError::Unavailable)
     }
 
     fn read_html(&self) -> Option<Pasted> {
@@ -96,12 +139,6 @@ impl Clipboard for System {
         });
         pasted(html, self.read_text())
     }
-
-    fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
-        let shell = self.shell().ok_or(ClipboardError::NoShell)?;
-        let text = text.to_owned();
-        guarded(move || shell.set_clipboard_text(text).ok()).ok_or(ClipboardError::Unavailable)
-    }
 }
 
 /// The harness's clipboard: text and HTML in a shell's memory.
@@ -109,17 +146,23 @@ impl Clipboard for System {
 pub struct Memory(pub Arc<MemoryShell>);
 
 impl Clipboard for Memory {
-    fn read_text(&self) -> Option<String> {
-        self.0.text()
+    fn read_from(&self, target: ClipboardTarget) -> Option<String> {
+        match target {
+            ClipboardTarget::Clipboard => self.0.text(),
+            ClipboardTarget::Primary => self.0.primary_text(),
+        }
+    }
+
+    fn write_to(&self, target: ClipboardTarget, text: &str) -> Result<(), ClipboardError> {
+        match target {
+            ClipboardTarget::Clipboard => self.0.put(text.to_owned()),
+            ClipboardTarget::Primary => self.0.put_primary(text.to_owned()),
+        }
+        Ok(())
     }
 
     fn read_html(&self) -> Option<Pasted> {
         pasted(self.0.html(), self.0.text())
-    }
-
-    fn write_text(&self, text: &str) -> Result<(), ClipboardError> {
-        self.0.put(text.to_owned());
-        Ok(())
     }
 }
 
@@ -131,6 +174,20 @@ impl Clipboard for Memory {
 /// clipboard refuses.
 pub fn write_text(text: &str) -> Result<(), ClipboardError> {
     host()?.write_text(text)
+}
+
+/// Put `text` on `target`. Call it from a handler inside a ds-blitz document.
+///
+/// # Errors
+/// As [`write_text`]; and [`ClipboardError::Unavailable`] for [`ClipboardTarget::Primary`] where
+/// the platform has no primary selection or its compositor does not offer one.
+pub fn write_to(target: ClipboardTarget, text: &str) -> Result<(), ClipboardError> {
+    host()?.write_to(target, text)
+}
+
+/// The text on `target`. Call it from a handler inside a ds-blitz document.
+pub fn read_from(target: ClipboardTarget) -> Result<String, ClipboardError> {
+    host()?.read_from(target).ok_or(ClipboardError::Unavailable)
 }
 
 /// The text on the clipboard. Call it from a handler inside a ds-blitz document.
