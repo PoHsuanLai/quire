@@ -472,18 +472,12 @@ The parts a sill session borrows until M11 draws its own (design/20 §1.9 lock s
 | `session.user_picture` | `PictureChoice::{Auto,Letter,Emoji(name),Photo}` written as a string | `auto` | `auto`, `letter`, `photo` or `emoji:<name>` (a stable name from quire's 42, design/25). Auto: the photo if `~/.face` (or AccountsService's icon) exists, else the letter; Photo with no file falls back to the letter | design/25 (user picture), quire `PictureChoice::resolve` | RETIRING: no reader; the picture is wired to `resolve_picture` first |
 | `session.lock_grace_s` | `Secs` | `5` | `0..=60`; 0 always asks; only after sill's own idle screen-off lock (cause `IdleScreenOff`), never after a manual lock, the lid, suspend or resume | sill F863, F908 | proposed (Q441, 2026-09-27) |
 
-### 3.20 `widgets` (sill/settings.toml)
+### 3.20 `widgets` (retired)
 
-The widgets under the notification center's history and the desktop widget layer (design/20 §1.14; sill FINDINGS "M10 freeze" F404, F405). A small widget is one grid cell, a medium two by one, a large two by two; where a desktop widget sits is saved state, not a key. Page Dock, all Advanced (§5).
-
-| Key | Type | Default | Range / Alt | Source | Status |
-| --- | --- | --- | --- | --- | --- |
-| `widgets.center` | `Vec<WidgetKind>` (`Calendar, UpNext, Battery, NowPlaying, WorldClock`) | `[Calendar, UpNext, Battery]` | which widgets show under the notifications, in order | `20-SURFACES.md#1-14-desktop-widgets-spec-tier-2`; sill FINDINGS "M10 freeze" F404 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.desktop` | `DesktopWidgets::{Off,On}` | `Off` | the desktop widget layer (macOS Sonoma); `sill widgets toggle-desktop` flips it | same; F405 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.desktop_widgets` | `Vec<WidgetKind>` | `[Calendar, Battery]` | which widgets the desktop shows; where they sit is saved state (`desktop-widgets.json`), not a key | same; F405 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.desktop_cell_px` | `Px` | `164` | `120..=240`; a small widget is one cell, a medium 2x1, a large 2x2 | same; F405 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.desktop_gap_px` | `Px` | `16` | `0..=48`; between cells and around the grid | same; F405 | proposed (M10 freeze, 2026-09-26) |
-| `widgets.world_clocks` | `Text` | `""` | IANA zone names separated by `;` (a `Vec` of text is not derivable yet) | same; F404 | proposed (M10 freeze, 2026-09-26) |
+Retired 2026-10-20: sill has one widget host (the notification center's tile) and no desktop widget
+layer, so the six `widgets.*` keys (`center`, `desktop`, `desktop_widgets`, `desktop_cell_px`,
+`desktop_gap_px`, `world_clocks`) are gone; a file that still has them loads, the keys are ignored.
+The section number stays so links to 3.21 and later hold.
 
 ### 3.21 `calendar` (sill/settings.toml)
 
