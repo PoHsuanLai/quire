@@ -1,6 +1,6 @@
-//! The headless document's shell: a clipboard in memory (text and HTML) and a primary selection, so a harness test
-//! copies from one field and pastes into another, and reads what a copy wrote, without the
-//! desktop's clipboard; and the IME requests an edit surface makes, so a test sees them. Nothing
+//! The headless document's shell: a clipboard in memory (text and HTML) and a primary
+//! selection, so a harness test copies from one field and pastes into another, and reads what a
+//! copy wrote, without the desktop's clipboard; and the IME requests an edit surface makes, so a test sees them. Nothing
 //! else a shell does (a cursor, a title, a redraw) has anywhere to go headless.
 
 use blitz_traits::shell::{ClipboardError, ShellProvider};

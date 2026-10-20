@@ -985,7 +985,10 @@ A few props worth knowing about before you read the signatures:
   `use_symbol_attrs(effect)`.
 - Copying to the clipboard from an action is `ds_blitz::clipboard::write_text(&str)` (read: `read_text`),
   reached through the document's host, so call it from a handler; a test reads it back with
-  `Harness::clipboard_text()`. ds-shell has no clipboard of its own.
+  `Harness::clipboard_text()`. `write_to(ClipboardTarget::Primary, text)` and `read_from(target)` reach the
+  primary selection (Linux only; elsewhere a write is `Unavailable`), read back with `Harness::primary_text()`.
+  A custom `Clipboard` implements `read_from` and `write_to`; `read_text`/`write_text` are provided.
+  ds-shell has no clipboard of its own.
 - A settings enum key's menu is built by the caller from `KeySpec::grouped_choices()`: a
   `MenuItem::Header(group)` over each group's items, an unavailable choice as `MenuItem::new(..)
   .with_availability(Availability::Disabled)` with `MenuItem::Info { title: reason, detail: None }` right
