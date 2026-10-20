@@ -678,7 +678,7 @@ fn the_steps_say_what_the_props_say() {
         ("providers", &["Nextcloud", "Fastmail", "Other\u{2026}"]),
         (
             "sign-in-refused",
-            &["The password was not accepted. Check it and try again."],
+            &["The password wasn’t accepted. Check it and try again."],
         ),
         ("code", &["BQKD-4MZP", "https://microsoft.com/devicelogin"]),
         ("browser", &["Copy Link", "Open Again", "Cancel"]),
@@ -690,14 +690,14 @@ fn the_steps_say_what_the_props_say() {
         (
             "failed-unreachable",
             &[
-                "Could not add Fastmail",
-                "The server could not be reached.",
+                "Couldn’t add Fastmail",
+                "The server couldn’t be reached.",
                 "Try Again",
             ],
         ),
         (
             "failed-forbidden",
-            &["Your organisation or the provider does not allow this."],
+            &["Your organisation or the provider doesn’t allow this."],
         ),
         (
             "review",
@@ -705,7 +705,7 @@ fn the_steps_say_what_the_props_say() {
                 "Mail",
                 "Calendar",
                 "Only files this desktop created.",
-                "This server does not have it.",
+                "This server doesn’t have it.",
                 ">Done<",
             ],
         ),
@@ -759,7 +759,7 @@ fn a_manual_form_groups_its_fields_and_draws_choices_as_pop_ups() {
     assert!(!jmap.contains("Outgoing"), "{jmap}");
     let pop3 = light("sign-in-manual-pop3-invalid");
     assert!(
-        pop3.contains("The port is not valid. Check it and try again."),
+        pop3.contains("The port isn’t valid. Check it and try again."),
         "{pop3}"
     );
 }
@@ -818,7 +818,7 @@ fn advanced_fields_sit_under_one_closed_disclosure_in_their_own_parts() {
         "a marked advanced field opens it: {marked}"
     );
     assert!(
-        marked.contains("The outgoing port is not valid. Check it and try again."),
+        marked.contains("The outgoing port isn’t valid. Check it and try again."),
         "{marked}"
     );
 }
@@ -898,7 +898,7 @@ fn the_working_line_names_the_agent_only_for_an_agent_login() {
 #[test]
 fn the_failed_step_says_the_new_faults_and_where_google_looks() {
     assert!(light("failed-no-launcher").contains("No app is set up to sign Fastmail in"));
-    assert!(light("failed-not-installed").contains("Fastmail isn&#39;t installed"));
+    assert!(light("failed-not-installed").contains("Fastmail isn’t installed"));
     assert!(
         light("failed-google-client-id")
             .contains("Google sign-in needs a client id: see docs/google.md")

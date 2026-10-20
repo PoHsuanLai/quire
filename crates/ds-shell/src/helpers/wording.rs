@@ -23,18 +23,18 @@ pub(crate) fn words(app: &str, tool: &str, purpose: &str, phase: &HelperPhase) -
             body: "This takes a moment. The system may ask for your password.".to_owned(),
         },
         HelperPhase::Failed { reason } => Words {
-            title: format!("{tool} was not installed"),
+            title: format!("{tool} wasn’t installed"),
             body: reason.clone(),
         },
         HelperPhase::NotFound { package } => Words {
-            title: format!("{tool} is not in your software sources"),
+            title: format!("{tool} isn’t in your software sources"),
             body: format!(
                 "Look for \u{201c}{package}\u{201d} in your software centre or package \
                  manager, then try again."
             ),
         },
         HelperPhase::Unsupported { program, command } => Words {
-            title: format!("{app} cannot install {tool} here"),
+            title: format!("{app} can’t install {tool} here"),
             body: match command {
                 Some(_) => {
                     "Run this in Terminal to install it yourself, then try again:".to_owned()
@@ -64,14 +64,14 @@ mod tests {
                 HelperPhase::Failed {
                     reason: "No network.".into(),
                 },
-                "mpv was not installed",
+                "mpv wasn’t installed",
                 "No network.",
             ),
             (
                 HelperPhase::NotFound {
                     package: "mpv".into(),
                 },
-                "mpv is not in your software sources",
+                "mpv isn’t in your software sources",
                 "\u{201c}mpv\u{201d}",
             ),
             (
@@ -79,7 +79,7 @@ mod tests {
                     program: "mpv".into(),
                     command: None,
                 },
-                "Photos cannot install mpv here",
+                "Photos can’t install mpv here",
                 "provides \u{201c}mpv\u{201d}, then try again.",
             ),
             (
@@ -87,7 +87,7 @@ mod tests {
                     program: "mpv".into(),
                     command: Some("sudo pacman -S mpv".into()),
                 },
-                "Photos cannot install mpv here",
+                "Photos can’t install mpv here",
                 "Run this in Terminal to install it yourself, then try again:",
             ),
         ];

@@ -425,7 +425,7 @@ pub use ds::components::controls::copy_state::CopyState;
 pub enum SignInFault {
     /// The provider refused what was typed.
     Refused,
-    /// The server could not be reached.
+    /// The server couldn’t be reached.
     Unreachable,
     /// The server answered something unreadable.
     Unreadable,

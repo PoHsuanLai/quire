@@ -11,7 +11,7 @@ use super::{LiveError, OwnerCheck, SenderName, SettingsModule1Proxy, Verdict};
 
 /// What a refused owner is told to the person, in plain words.
 const NOT_THE_SERVICE: &str =
-    "This service could not be confirmed, so nothing was read from it or sent to it.";
+    "This service couldn’t be confirmed, so nothing was read from it or sent to it.";
 
 /// An owner that passed, and the proxy that speaks to it by its unique name.
 #[derive(Debug, Clone)]

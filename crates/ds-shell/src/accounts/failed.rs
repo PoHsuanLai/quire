@@ -79,7 +79,7 @@ pub fn SignInFailed(
         StepFrame {
             shown: title,
             step: "failed",
-            title: "Could not add {provider}",
+            title: "Couldn’t add {provider}",
             onenter: EventHandler::new(move |()| enter.call(())),
             oncancel: on_cancel,
             body: rsx! {
