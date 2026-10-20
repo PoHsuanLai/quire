@@ -2,7 +2,8 @@
 //! (design/22-SETTINGS.md section 9.3 item 3: "the query 'dark mode' resolves to
 //! `appearance.theme`... no hand-kept table").
 
-use super::key::{KeyPath, KeySpec};
+use super::KeyPath;
+use super::key::KeySpec;
 use super::program::Schema;
 
 /// The one key across every schema in `schemas` whose label or help text mentions `query`
